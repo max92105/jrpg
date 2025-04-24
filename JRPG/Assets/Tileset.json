@@ -1,0 +1,27 @@
+﻿{
+  "0": {
+    "Name": "Floor",
+    "IsWalkable": true,
+    "Sprite": "Assets/floor.png",
+    "TriggerType": "None"
+  },
+  "1": {
+    "Name": "Wall",
+    "IsWalkable": false,
+    "Sprite": "Assets/wall.png",
+    "TriggerType": "None"
+  },
+  "2": {
+    "Name": "WarpTile",
+    "IsWalkable": true,
+    "Sprite": "Assets/floor.png",
+    "TriggerType": "Warp",
+    "TriggerData": "Maps/house.map:1,1"
+  },
+  "3": {
+    "Name": "BattleTile",
+    "IsWalkable": true,
+    "Sprite": "Assets/floor.png",
+    "TriggerType": "Battle"
+  }
+}

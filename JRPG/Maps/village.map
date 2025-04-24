@@ -1,0 +1,13 @@
+﻿MAP
+0000000000000000
+0111111111111110
+0100000000000010
+0100000000000010
+0100000000000010
+0111111111111110
+0000000000000000
+TRIGGERS
+6,6:Warp:house.map:2,2
+7,7:Dialogue:It's a well. You peer down into the darkness...
+8,8:Item:Silver Key
+9,9:Battle:Prepare for battle

@@ -1,0 +1,7 @@
+﻿MAP
+01110
+01010
+01010
+01110
+TRIGGERS
+2,1:Warp:village.map:5,6

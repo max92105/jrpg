@@ -159,18 +159,13 @@ namespace JRPG
             double halfScreenX = tilesVisibleX / 2.0;
             double halfScreenY = tilesVisibleY / 2.0;
 
-            // Corrected center position
-            double visualPlayerX = playerX - playerRadius + (-32.0 / tileSize);
-            double visualPlayerY = playerY - playerRadius + (-32.0 / tileSize);
+            double targetX = (playerX - playerRadius + (-32.0 / tileSize)) - halfScreenX + 0.5;
+            double targetY = (playerY - playerRadius + (-32.0 / tileSize)) - halfScreenY + 0.5;
 
-            double targetX = visualPlayerX - halfScreenX + 0.5;
-            double targetY = visualPlayerY - halfScreenY + 0.5;
-
-            // Clamp to map bounds
             targetX = Math.Max(0, Math.Min(targetX, map.Width - tilesVisibleX));
             targetY = Math.Max(0, Math.Min(targetY, map.Height - tilesVisibleY));
 
-            double easing = 0.15;
+            double easing = 0.25;
             cameraX += (targetX - cameraX) * easing;
             cameraY += (targetY - cameraY) * easing;
         }

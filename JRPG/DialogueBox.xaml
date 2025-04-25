@@ -1,0 +1,35 @@
+﻿<UserControl x:Class="JRPG.DialogueBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="120" d:DesignWidth="640">
+    <Border x:Name="DialogueContainer"
+            Background="Black"
+            BorderBrush="White"
+            BorderThickness="2"
+            Padding="10"
+            Visibility="Collapsed"
+            CornerRadius="8">
+        <DockPanel>
+            <Image x:Name="PortraitImage"
+       Width="96" Height="96"
+       Stretch="Uniform"
+       Margin="0,0,10,0"
+       Visibility="Collapsed"
+       ClipToBounds="True">
+                <Image.Clip>
+                    <EllipseGeometry RadiusX="48" RadiusY="48" Center="48,48"/>
+                </Image.Clip>
+            </Image>
+
+            <TextBlock x:Name="DialogueText"
+                       Foreground="White"
+                       FontSize="16"
+                       TextWrapping="Wrap"
+                       Text=""
+                       FontFamily="Consolas"/>
+        </DockPanel>
+    </Border>
+</UserControl>

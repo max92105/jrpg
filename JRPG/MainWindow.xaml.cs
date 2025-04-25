@@ -10,20 +10,23 @@ namespace JRPG
     public partial class MainWindow : Window
     {
         private Game game;
+        private DialogueManager dialogueManager;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            dialogueManager = new DialogueManager(DialogueUI.TextElement, DialogueUI.Container, DialogueUI.PortraitImage);
             game = new Game(GameCanvas);
 
-            CompositionTarget.Rendering += GameLoop;
-            this.Loaded += (s, e) => Keyboard.Focus(GameCanvas);
-        }
+            CompositionTarget.Rendering += (s, e) =>
+            {
+                if (!dialogueManager.IsActive)
+                    game.Update();
+                game.Render();
+            };
 
-        private void GameLoop(object sender, EventArgs e)
-        {
-            game.Update();
-            game.Render();
+            Loaded += (s, e) => Keyboard.Focus(GameCanvas);
         }
 
         public void StartBattle()
@@ -89,10 +92,25 @@ namespace JRPG
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if (RootGrid.Children.Contains(GameCanvas))
+            if (dialogueManager.IsActive && e.Key == Key.Space)
             {
-                game.OnKeyDown(e.Key);
+                dialogueManager.Skip();
+                return;
             }
+
+            if (!dialogueManager.IsActive && RootGrid.Children.Contains(GameCanvas))
+                game.OnKeyDown(e.Key);
+        }
+
+        private void Window_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (!dialogueManager.IsActive && RootGrid.Children.Contains(GameCanvas))
+                game.OnKeyUp(e.Key);
+        }
+
+        public void ShowDialogue(string text, string portraitPath, System.Action callback = null)
+        {
+            dialogueManager.Show(text, portraitPath, callback);
         }
     }
 }

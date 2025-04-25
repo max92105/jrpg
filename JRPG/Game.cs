@@ -1,16 +1,21 @@
 ﻿using JRPG.Enums;
 using JRPGPlayerDemo;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
 
 namespace JRPG
 {
     public class Game
     {
+     private bool isPaused = false;
+
         private Canvas canvas;
         private const int tileSize = 64;
         private const int viewWidth = 10;
@@ -28,18 +33,25 @@ namespace JRPG
         private bool isMoving = false;
         private int moveStartX, moveStartY, moveTargetX, moveTargetY;
         private double moveProgress = 0;
-        private double moveSpeed = 5;
 
-        private int playerX = 1;
-        private int playerY = 1;
+        private const double playerRadius = 0.1;
+        private double playerX = 10.0;
+        private double playerY = 10.0;
+        private double velocityX = 0;
+        private double velocityY = 0;
+        private double moveSpeed = 4.00;
 
         private Direction playerDirection = Direction.Down;
-        private int cameraX = 0;
-        private int cameraY = 0;
+        private double cameraX = 0;
+        private double cameraY = 0;
+
+        private int lastTriggeredX = -1;
+        private int lastTriggeredY = -1;
 
         private DateTime lastFrameTime = DateTime.Now;
         private Map map;
         private string currentMapFile = "village.map";
+        private HashSet<Key> keysDown = new HashSet<Key>();
 
         public Game(Canvas canvas)
         {
@@ -47,7 +59,7 @@ namespace JRPG
             map = new Map();
             map.LoadFromFile(currentMapFile);
 
-            playerBitmap = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), "Assets/player.png")));
+            playerBitmap = new BitmapImage(new Uri(System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Assets/player.png")));
 
             // Preload all animation frames
             playerFrames = new CroppedBitmap[4, totalAnimationFrames];
@@ -55,14 +67,10 @@ namespace JRPG
             {
                 for (int frame = 0; frame < totalAnimationFrames; frame++)
                 {
-                    //TODO Since my file is shit i need to tweak these lines
-                    //int cropX = frame * tileSize;
-                    //int cropY = dir * tileSize;
-                    int cropX = frame * 48;
-                    int cropY = dir * 64;
+                    int cropX = frame * tileSize;
+                    int cropY = dir * tileSize;
 
-                    //playerFrames[dir, frame] = new CroppedBitmap(playerBitmap, new Int32Rect(cropX, cropY, tileSize, tileSize));
-                    playerFrames[dir, frame] = new CroppedBitmap(playerBitmap, new Int32Rect(cropX, cropY, 48, 64));
+                    playerFrames[dir, frame] = new CroppedBitmap(playerBitmap, new Int32Rect(cropX, cropY, tileSize, tileSize));
                 }
             }
 
@@ -70,117 +78,158 @@ namespace JRPG
             canvas.Children.Add(playerImageControl);
         }
 
+        public void OnKeyDown(Key key) => keysDown.Add(key);
+        public void OnKeyUp(Key key) => keysDown.Remove(key);
+
         public void Update()
         {
             double deltaTime = (DateTime.Now - lastFrameTime).TotalSeconds;
             lastFrameTime = DateTime.Now;
 
-            if (isMoving)
+            velocityX = 0;
+            velocityY = 0;
+
+            if (!isPaused)
             {
-                moveProgress += moveSpeed * deltaTime;
-                animationTimer += deltaTime;
+                bool left = keysDown.Contains(Key.Left);
+                bool right = keysDown.Contains(Key.Right);
+                bool up = keysDown.Contains(Key.Up);
+                bool down = keysDown.Contains(Key.Down);
 
-                if (animationTimer >= 1.0 / animationSpeed)
+                if (left && !right) { velocityX = -moveSpeed; playerDirection = Direction.Left; }
+                if (right && !left) { velocityX = moveSpeed; playerDirection = Direction.Right; }
+                if (up && !down) { velocityY = -moveSpeed; playerDirection = Direction.Up; }
+                if (down && !up) { velocityY = moveSpeed; playerDirection = Direction.Down; }
+
+                if (velocityX != 0 || velocityY != 0)
                 {
-                    animationFrame = (animationFrame + 1) % totalAnimationFrames;
-                    animationTimer = 0;
-                }
-
-                if (moveProgress >= 1.0)
-                {
-                    playerX = moveTargetX;
-                    playerY = moveTargetY;
-                    isMoving = false;
-                    animationFrame = 0;
-
-                    var tile = map.GetTileTrigger(playerX, playerY);
-                    if (tile != null && tile.TriggerType != TileTriggerType.None)
+                    animationTimer += deltaTime;
+                    if (animationTimer >= 1.0 / animationSpeed)
                     {
-                        HandleTileTrigger(tile);
+                        animationFrame = (animationFrame + 1) % totalAnimationFrames;
+                        animationTimer = 0;
                     }
+
+                    double newX = playerX + velocityX * deltaTime;
+                    double newY = playerY + velocityY * deltaTime;
+
+                    newX = Clamp(newX, playerRadius, map.Width - playerRadius);
+                    newY = Clamp(newY, playerRadius, map.Height - playerRadius);
+
+                    if (CanMoveTo(newX, newY))
+                    {
+                        playerX = newX;
+                        playerY = newY;
+
+                        int tileX = (int)Math.Floor(playerX);
+                        int tileY = (int)Math.Floor(playerY);
+
+                        // Only trigger if player stepped on a new trigger tile
+                        if ((tileX != lastTriggeredX || tileY != lastTriggeredY))
+                        {
+                            var tile = map.GetTileTrigger(tileX, tileY);
+                            if (tile != null && tile.TriggerType != TileTriggerType.None)
+                            {
+                                HandleTileTrigger(tile);
+                                lastTriggeredX = tileX;
+                                lastTriggeredY = tileY;
+                            }
+                        }
+
+                        // If no trigger under the player, clear last triggered position
+                        if (map.GetTileTrigger(tileX, tileY) == null || map.GetTileTrigger(tileX, tileY)?.TriggerType == TileTriggerType.None)
+                        {
+                            lastTriggeredX = -1;
+                            lastTriggeredY = -1;
+                        }
+                    }
+                }
+                else
+                {
+                    animationFrame = 0;
                 }
             }
 
-            cameraX = Clamp(playerX - viewWidth / 2, 0, map.Width - viewWidth);
-            cameraY = Clamp(playerY - viewHeight / 2, 0, map.Height - viewHeight);
+            cameraX = playerX - (viewWidth / 2.0);
+            cameraY = playerY - (viewHeight / 2.0);
+        }
+
+        private bool CanMoveTo(double x, double y)
+        {
+            double left = x - playerRadius;
+            double right = x + playerRadius;
+            double top = y - playerRadius;
+            double bottom = y + playerRadius;
+
+            for (int ty = (int)Math.Floor(top); ty <= (int)Math.Floor(bottom); ty++)
+            {
+                for (int tx = (int)Math.Floor(left); tx <= (int)Math.Floor(right); tx++)
+                {
+                    if (!map.IsWalkable(tx, ty))
+                        return false;
+                }
+            }
+
+            return true;
         }
 
         public void Render()
         {
             for (int i = canvas.Children.Count - 1; i >= 0; i--)
-            {
                 if (canvas.Children[i] != playerImageControl)
                     canvas.Children.RemoveAt(i);
-            }
 
-            for (int y = 0; y < viewHeight; y++)
+            int startX = (int)Math.Floor(cameraX);
+            int startY = (int)Math.Floor(cameraY);
+
+            for (int y = 0; y < viewHeight + 2; y++)
             {
-                for (int x = 0; x < viewWidth; x++)
+                for (int x = 0; x < viewWidth + 2; x++)
                 {
-                    int mapX = x + cameraX;
-                    int mapY = y + cameraY;
-                    int tileId = map.Tiles[mapX, mapY];
-
-                    string spritePath = map.GetTileSprite(tileId);
-                    if (!string.IsNullOrEmpty(spritePath))
+                    int mapX = x + startX;
+                    int mapY = y + startY;
+                    if (mapX >= 0 && mapY >= 0 && mapX < map.Width && mapY < map.Height)
                     {
-                        var tile = new Image
+                        int tileId = map.Tiles[mapX, mapY];
+                        string spritePath = map.GetTileSprite(tileId);
+                        if (!string.IsNullOrEmpty(spritePath))
                         {
-                            Width = tileSize,
-                            Height = tileSize,
-                            Source = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), spritePath)))
-                        };
-                        Canvas.SetLeft(tile, x * tileSize);
-                        Canvas.SetTop(tile, y * tileSize);
-                        canvas.Children.Add(tile);
+                            var tile = new Image
+                            {
+                                Width = tileSize,
+                                Height = tileSize,
+                                Source = new BitmapImage(new Uri(System.IO.Path.Combine(Directory.GetCurrentDirectory(), spritePath)))
+                            };
+                            Canvas.SetLeft(tile, (mapX - cameraX) * tileSize);
+                            Canvas.SetTop(tile, (mapY - cameraY) * tileSize);
+                            canvas.Children.Add(tile);
+                        }
                     }
                 }
             }
 
-            double renderX = playerX;
-            double renderY = playerY;
-            if (isMoving)
-            {
-                renderX = moveStartX + (moveTargetX - moveStartX) * moveProgress;
-                renderY = moveStartY + (moveTargetY - moveStartY) * moveProgress;
-            }
-
             playerImageControl.Source = playerFrames[(int)playerDirection, animationFrame];
-            Canvas.SetLeft(playerImageControl, (renderX - cameraX) * tileSize);
-            Canvas.SetTop(playerImageControl, (renderY - cameraY) * tileSize);
+
+            double spriteOffsetX = 0.0;
+            double spriteOffsetY = 0.0;
+
+            // example: shift sprite up by 4px and left by 2px
+            spriteOffsetX = -32.0 / tileSize;
+            spriteOffsetY = -32.0 / tileSize;
+
+            double drawX = (playerX - playerRadius + spriteOffsetX - cameraX) * tileSize;
+            double drawY = (playerY - playerRadius + spriteOffsetY - cameraY) * tileSize;
+
+            Canvas.SetLeft(playerImageControl, drawX);
+            Canvas.SetTop(playerImageControl, drawY);
+
             Canvas.SetZIndex(playerImageControl, 10);
-        }
-
-        public void OnKeyDown(Key key)
-        {
-            if (isMoving) return;
-
-            int dx = 0, dy = 0;
-
-            switch (key)
-            {
-                case Key.Up: dy = -1; playerDirection = Direction.Up; break;
-                case Key.Down: dy = 1; playerDirection = Direction.Down; break;
-                case Key.Left: dx = -1; playerDirection = Direction.Left; break;
-                case Key.Right: dx = 1; playerDirection = Direction.Right; break;
-            }
-
-            int nextX = playerX + dx;
-            int nextY = playerY + dy;
-
-            if (map.IsWalkable(nextX, nextY))
-            {
-                moveStartX = playerX;
-                moveStartY = playerY;
-                moveTargetX = nextX;
-                moveTargetY = nextY;
-                isMoving = true;
-                moveProgress = 0;
-            }
         }
 
         private void HandleTileTrigger(TileType tile)
         {
+            isPaused = true;
+
             switch (tile.TriggerType)
             {
                 case TileTriggerType.Warp:
@@ -205,7 +254,12 @@ namespace JRPG
                     break;
 
                 case TileTriggerType.Dialogue:
-                    MessageBox.Show(tile.TriggerData); // Display the message
+                    isPaused = true;
+                    ((MainWindow)Application.Current.MainWindow).ShowDialogue(tile.TriggerData, "Assets/figtherPortrait.png", () =>
+                    {
+                        keysDown.Clear();
+                        isPaused = false;
+                    });
                     break;
 
                 case TileTriggerType.Item:
@@ -216,8 +270,16 @@ namespace JRPG
                 case TileTriggerType.Switch:
                     break;
             }
+
+            keysDown.Clear();
+            isPaused = false;
         }
 
         private int Clamp(int val, int min, int max) => Math.Max(min, Math.Min(max, val));
+
+        private double Clamp(double value, double min, double max)
+        {
+            return (value < min) ? min : (value > max) ? max : value;
+        }
     }
 }

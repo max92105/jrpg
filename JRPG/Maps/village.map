@@ -7,7 +7,8 @@
 0111111111111110
 0000000000000000
 TRIGGERS
-6,6:Warp:house.map:2,2
+6,6:Warp:house.map:5,5
 7,7:Dialogue:It's a well. You peer down into the darkness...
 8,8:Item:Silver Key
 9,9:Battle:Prepare for battle
+11,11:Dialogue:Hello traveler! Welcome to our village.

@@ -87,6 +87,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BattleManager.cs" />
+    <Compile Include="DialogueBox.xaml.cs">
+      <DependentUpon>DialogueBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="DialogManager.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="Enums\BattleState.cs" />
     <Compile Include="Enums\Direction.cs" />
@@ -96,6 +100,10 @@
     <Compile Include="BattleUI.xaml.cs">
       <DependentUpon>BattleUI.xaml</DependentUpon>
     </Compile>
+    <Page Include="DialogueBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -135,6 +143,9 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <Resource Include="Assets\goblin.png" />
+    <Content Include="Assets\figtherPortrait.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Maps\village.map">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

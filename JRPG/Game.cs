@@ -184,28 +184,38 @@ namespace JRPG
             int startX = (int)Math.Floor(cameraX);
             int startY = (int)Math.Floor(cameraY);
 
+            int tilesVisibleX = (int)Math.Ceiling(canvas.ActualWidth / tileSize) + 2;
+            int tilesVisibleY = (int)Math.Ceiling(canvas.ActualHeight / tileSize) + 2;
+
             for (int y = 0; y < viewHeight + 2; y++)
             {
                 for (int x = 0; x < viewWidth + 2; x++)
                 {
                     int mapX = x + startX;
                     int mapY = y + startY;
-                    if (mapX >= 0 && mapY >= 0 && mapX < map.Width && mapY < map.Height)
+
+                    if (mapX < 0 || mapY < 0 || mapX >= map.Width || mapY >= map.Height)
+                        continue;
+
+                    int tileId = map.Tiles[mapX, mapY];
+                    string spritePath = map.GetTileSprite(tileId);
+
+                    if (!string.IsNullOrEmpty(spritePath))
                     {
-                        int tileId = map.Tiles[mapX, mapY];
-                        string spritePath = map.GetTileSprite(tileId);
-                        if (!string.IsNullOrEmpty(spritePath))
+                        var tile = new Image
                         {
-                            var tile = new Image
-                            {
-                                Width = tileSize,
-                                Height = tileSize,
-                                Source = new BitmapImage(new Uri(System.IO.Path.Combine(Directory.GetCurrentDirectory(), spritePath)))
-                            };
-                            Canvas.SetLeft(tile, (mapX - cameraX) * tileSize);
-                            Canvas.SetTop(tile, (mapY - cameraY) * tileSize);
-                            canvas.Children.Add(tile);
-                        }
+                            Width = tileSize,
+                            Height = tileSize,
+                            Source = new BitmapImage(new Uri(System.IO.Path.Combine(Directory.GetCurrentDirectory(), spritePath)))
+                        };
+
+                        double mapDrawX = (mapX - cameraX) * tileSize;
+                        double mapDrawY = (mapY - cameraY) * tileSize;
+
+                        Canvas.SetLeft(tile, mapDrawX);
+                        Canvas.SetTop(tile, mapDrawY);
+
+                        canvas.Children.Add(tile);
                     }
                 }
             }

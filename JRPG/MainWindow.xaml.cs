@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -16,7 +17,12 @@ namespace JRPG
         {
             InitializeComponent();
 
-            dialogueManager = new DialogueManager(DialogueUI.TextElement, DialogueUI.Container, DialogueUI.PortraitImage);
+            WindowStyle = WindowStyle.None;
+            WindowState = WindowState.Maximized;
+            ResizeMode = ResizeMode.NoResize;
+            Topmost = true;
+
+            dialogueManager = new DialogueManager(DialogueUI.TextElement, DialogueUI.Container, DialogueUI.Portrait, DialogueUI.Speaker, DialogueUI.ContinueIcon);
             game = new Game(GameCanvas);
 
             CompositionTarget.Rendering += (s, e) =>
@@ -100,6 +106,11 @@ namespace JRPG
 
             if (!dialogueManager.IsActive && RootGrid.Children.Contains(GameCanvas))
                 game.OnKeyDown(e.Key);
+
+            if (e.Key == Key.Escape)
+            {
+                Application.Current.Shutdown();
+            }
         }
 
         private void Window_KeyUp(object sender, KeyEventArgs e)
@@ -108,9 +119,9 @@ namespace JRPG
                 game.OnKeyUp(e.Key);
         }
 
-        public void ShowDialogue(string text, string portraitPath, System.Action callback = null)
+        public void ShowDialogue(List<string> pages, string portraitPath = null, string speaker = null, Action callback = null)
         {
-            dialogueManager.Show(text, portraitPath, callback);
+            dialogueManager.Show(pages, portraitPath, speaker, callback);
         }
     }
 }

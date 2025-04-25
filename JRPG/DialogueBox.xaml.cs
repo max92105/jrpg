@@ -15,5 +15,7 @@ namespace JRPG
         public TextBlock TextElement => DialogueText;
         public Border Container => DialogueContainer;
         public Image Portrait => PortraitImage;
+        public TextBlock Speaker => SpeakerName;
+        public TextBlock ContinueIcon => ContinueIndicator;
     }
 }

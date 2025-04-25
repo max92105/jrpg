@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
@@ -11,34 +12,49 @@ namespace JRPG
         private TextBlock textBlock;
         private Border container;
         private Image portrait;
+        private TextBlock speakerName;
+        private TextBlock continueIcon;
+        private List<string> pages = new List<string>();
+        private int currentPage = 0;
         private string fullText;
         private int index = 0;
         private DispatcherTimer timer;
         private Action onComplete;
         private bool awaitingKeyPress = false;
 
+        private DispatcherTimer blinkTimer;
+        private bool isBlinkVisible = true;
+
         public bool IsActive => container.Visibility == System.Windows.Visibility.Visible;
 
-        public DialogueManager(TextBlock outputBlock, Border boxContainer, Image portraitImage)
+        public DialogueManager(TextBlock outputBlock, Border boxContainer, Image portraitImage, TextBlock speakerBlock, TextBlock continueIndicator)
         {
             textBlock = outputBlock;
             container = boxContainer;
             portrait = portraitImage;
+            speakerName = speakerBlock;
+            continueIcon = continueIndicator;
 
             timer = new DispatcherTimer();
             timer.Interval = TimeSpan.FromMilliseconds(30);
             timer.Tick += (s, e) => TypeNextCharacter();
+
+            blinkTimer = new DispatcherTimer();
+            blinkTimer.Interval = TimeSpan.FromMilliseconds(500);
+            blinkTimer.Tick += (s, e) => BlinkIndicator();
         }
 
-        public void Show(string text, string portraitPath = null, Action callback = null)
+        public void Show(List<string> dialoguePages, string portraitPath = null, string speaker = null, Action callback = null)
         {
-            fullText = text;
+            pages = dialoguePages;
+            currentPage = 0;
+            fullText = pages[currentPage];
             index = 0;
             onComplete = callback;
             awaitingKeyPress = false;
 
             textBlock.Text = "";
-            container.Visibility = System.Windows.Visibility.Visible;
+            container.Visibility = Visibility.Visible;
 
             if (!string.IsNullOrEmpty(portraitPath))
             {
@@ -49,6 +65,17 @@ namespace JRPG
             {
                 portrait.Source = null;
                 portrait.Visibility = System.Windows.Visibility.Collapsed;
+            }
+
+            if (!string.IsNullOrEmpty(speaker))
+            {
+                speakerName.Text = speaker;
+                speakerName.Visibility = System.Windows.Visibility.Visible;
+            }
+            else
+            {
+                speakerName.Text = "";
+                speakerName.Visibility = System.Windows.Visibility.Collapsed;
             }
 
             timer.Start();
@@ -65,6 +92,14 @@ namespace JRPG
 
             textBlock.Text += fullText[index];
             index++;
+
+            if (currentPage < pages.Count - 1)
+                continueIcon.Text = "▶";
+            else
+                continueIcon.Text = "✓";
+
+            continueIcon.Visibility = Visibility.Visible;
+            blinkTimer.Start();
         }
 
         public void Skip()
@@ -76,19 +111,51 @@ namespace JRPG
                 timer.Stop();
                 textBlock.Text = fullText;
                 awaitingKeyPress = true;
+                continueIcon.Visibility = Visibility.Visible; // show indicator after skipping
             }
             else
             {
-                Hide();
-                onComplete?.Invoke();
+                continueIcon.Visibility = Visibility.Collapsed;
+                blinkTimer.Stop();
+                continueIcon.Opacity = 1.0;
+
+                currentPage++;
+                if (currentPage < pages.Count)
+                {
+                    fullText = pages[currentPage];
+                    textBlock.Text = "";
+                    index = 0;
+                    awaitingKeyPress = false;
+                    continueIcon.Visibility = Visibility.Collapsed; // hide again when new page starts
+                    timer.Start();
+                }
+                else
+                {
+                    Hide();
+                    onComplete?.Invoke();
+                }
             }
         }
 
         public void Hide()
         {
             timer.Stop();
-            container.Visibility = System.Windows.Visibility.Collapsed;
+            container.Visibility = Visibility.Collapsed;
+            continueIcon.Visibility = Visibility.Collapsed;
+            continueIcon.Visibility = Visibility.Collapsed;
+            blinkTimer.Stop();
+            continueIcon.Opacity = 1.0;
+
             awaitingKeyPress = false;
+        }
+
+        private void BlinkIndicator()
+        {
+            if (!continueIcon.IsVisible)
+                return;
+
+            isBlinkVisible = !isBlinkVisible;
+            continueIcon.Opacity = isBlinkVisible ? 1.0 : 0.2;
         }
     }
 }

@@ -6,9 +6,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace JRPG
 {
@@ -18,8 +16,8 @@ namespace JRPG
 
         private Canvas canvas;
         private const int tileSize = 64;
-        private const int viewWidth = 10;
-        private const int viewHeight = 10;
+        private const int viewWidth = 16;
+        private const int viewHeight = 12;
 
         private Image playerImageControl;
         private BitmapImage playerBitmap;
@@ -53,6 +51,9 @@ namespace JRPG
         private string currentMapFile = "village.map";
         private HashSet<Key> keysDown = new HashSet<Key>();
 
+        public void OnKeyDown(Key key) => keysDown.Add(key);
+        public void OnKeyUp(Key key) => keysDown.Remove(key);
+
         public Game(Canvas canvas)
         {
             this.canvas = canvas;
@@ -77,9 +78,6 @@ namespace JRPG
             playerImageControl = new Image { Width = tileSize, Height = tileSize };
             canvas.Children.Add(playerImageControl);
         }
-
-        public void OnKeyDown(Key key) => keysDown.Add(key);
-        public void OnKeyUp(Key key) => keysDown.Remove(key);
 
         public void Update()
         {
@@ -150,27 +148,31 @@ namespace JRPG
                 }
             }
 
-            cameraX = playerX - (viewWidth / 2.0);
-            cameraY = playerY - (viewHeight / 2.0);
+            UpdateCamera();
         }
 
-        private bool CanMoveTo(double x, double y)
+        private void UpdateCamera()
         {
-            double left = x - playerRadius;
-            double right = x + playerRadius;
-            double top = y - playerRadius;
-            double bottom = y + playerRadius;
+            double tilesVisibleX = canvas.ActualWidth / tileSize;
+            double tilesVisibleY = canvas.ActualHeight / tileSize;
 
-            for (int ty = (int)Math.Floor(top); ty <= (int)Math.Floor(bottom); ty++)
-            {
-                for (int tx = (int)Math.Floor(left); tx <= (int)Math.Floor(right); tx++)
-                {
-                    if (!map.IsWalkable(tx, ty))
-                        return false;
-                }
-            }
+            double halfScreenX = tilesVisibleX / 2.0;
+            double halfScreenY = tilesVisibleY / 2.0;
 
-            return true;
+            // Corrected center position
+            double visualPlayerX = playerX - playerRadius + (-32.0 / tileSize);
+            double visualPlayerY = playerY - playerRadius + (-32.0 / tileSize);
+
+            double targetX = visualPlayerX - halfScreenX + 0.5;
+            double targetY = visualPlayerY - halfScreenY + 0.5;
+
+            // Clamp to map bounds
+            targetX = Math.Max(0, Math.Min(targetX, map.Width - tilesVisibleX));
+            targetY = Math.Max(0, Math.Min(targetY, map.Height - tilesVisibleY));
+
+            double easing = 0.15;
+            cameraX += (targetX - cameraX) * easing;
+            cameraY += (targetY - cameraY) * easing;
         }
 
         public void Render()
@@ -226,6 +228,25 @@ namespace JRPG
             Canvas.SetZIndex(playerImageControl, 10);
         }
 
+        private bool CanMoveTo(double x, double y)
+        {
+            double left = x - playerRadius;
+            double right = x + playerRadius;
+            double top = y - playerRadius;
+            double bottom = y + playerRadius;
+
+            for (int ty = (int)Math.Floor(top); ty <= (int)Math.Floor(bottom); ty++)
+            {
+                for (int tx = (int)Math.Floor(left); tx <= (int)Math.Floor(right); tx++)
+                {
+                    if (!map.IsWalkable(tx, ty))
+                        return false;
+                }
+            }
+
+            return true;
+        }
+
         private void HandleTileTrigger(TileType tile)
         {
             isPaused = true;
@@ -255,7 +276,12 @@ namespace JRPG
 
                 case TileTriggerType.Dialogue:
                     isPaused = true;
-                    ((MainWindow)Application.Current.MainWindow).ShowDialogue(tile.TriggerData, "Assets/figtherPortrait.png", () =>
+                    ((MainWindow)Application.Current.MainWindow).ShowDialogue(new List<string>
+                    {
+                        tile.TriggerData,
+                        "Long ago, our ancestors built this sacred tree.",
+                        "You must protect it now, young one."
+                    }, "Assets/figtherPortrait.png", "Fighter", () =>
                     {
                         keysDown.Clear();
                         isPaused = false;

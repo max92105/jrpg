@@ -2,14 +2,16 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:JRPG"
-        Title="JRPG" Height="680" Width="660"
+        Title="JRPG" Width="1024" Height="768"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         KeyDown="Window_KeyDown"
-        KeyUp="Window_KeyUp">
+        KeyUp="Window_KeyUp"
+        WindowStyle="None"       
+        Background="Black">
     <Grid Name="MasterGrid">
         <Grid Name="RootGrid">
-            <Canvas Name="GameCanvas" Width="640" Height="640" Background="Black" />
+                <Canvas x:Name="GameCanvas" Width="1024" Height="768" />
         </Grid>
 
         <Rectangle Name="FadeRect" Fill="Black" Opacity="0" Visibility="Collapsed"

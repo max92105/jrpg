@@ -9,8 +9,8 @@ namespace JRPGPlayerDemo
 {
     public class Map
     {
-        public int Width { get; private set; } = 16;
-        public int Height { get; private set; } = 16;
+        public int Width { get; private set; } = 32;
+        public int Height { get; private set; } = 32;
         public int[,] Tiles { get; private set; }
         public TileType[,] TileTypes { get; private set; }
         public Dictionary<int, string> TileSprites { get; private set; }
@@ -23,38 +23,6 @@ namespace JRPGPlayerDemo
             {
                 { 0, "Assets/floor.png" },
                 { 1, "Assets/wall.png" }
-            };
-
-            GenerateTestMap();
-        }
-
-        private void GenerateTestMap()
-        {
-            // fill map with floor
-            for (int y = 0; y < Height; y++)
-                for (int x = 0; x < Width; x++)
-                    Tiles[x, y] = 0;
-
-            // add walls around
-            for (int i = 0; i < Width; i++)
-            {
-                Tiles[i, 0] = 1;
-                Tiles[i, Height - 1] = 1;
-                Tiles[0, i] = 1;
-                Tiles[Width - 1, i] = 1;
-            }
-
-            // test triggers
-            TileTypes[5, 5] = new TileType
-            {
-                TriggerType = TileTriggerType.Warp,
-                TriggerData = "this:1,1"
-            };
-
-            TileTypes[7, 7] = new TileType
-            {
-                TriggerType = TileTriggerType.Battle,
-                TriggerData = ""
             };
         }
 

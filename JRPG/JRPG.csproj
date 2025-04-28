@@ -96,6 +96,7 @@
     <Compile Include="Enums\Direction.cs" />
     <Compile Include="Enums\TileTriggerType.cs" />
     <Compile Include="Figther.cs" />
+    <Compile Include="InventoryItem.cs" />
     <Compile Include="TileType.cs" />
     <Compile Include="BattleUI.xaml.cs">
       <DependentUpon>BattleUI.xaml</DependentUpon>

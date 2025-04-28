@@ -115,5 +115,20 @@
                    Height="120"
                    Width="600"
                    Panel.ZIndex="200"/>
+
+        <Grid x:Name="PopupConfirmation" Visibility="Collapsed" Panel.ZIndex="10000" Background="#AA000000">
+            <Border Background="#222" CornerRadius="10" Padding="30" BorderBrush="White" BorderThickness="2"
+            HorizontalAlignment="Center" VerticalAlignment="Center">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
+                    <TextBlock x:Name="PopupQuestion" Text="Use Item?" 
+                       FontSize="24" Foreground="White" HorizontalAlignment="Center" TextAlignment="Center"/>
+
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="20">
+                        <Button Content="Yes" Width="100" Height="40" Click="PopupYes_Click"/>
+                        <Button Content="No" Width="100" Height="40" Click="PopupNo_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

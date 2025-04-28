@@ -15,6 +15,9 @@ namespace JRPG
         private Game game;
         private DialogueManager dialogueManager;
 
+        private List<InventoryItem> playerInventory = new List<InventoryItem>();
+        private InventoryItem selectedItem;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -26,6 +29,8 @@ namespace JRPG
 
             dialogueManager = new DialogueManager(DialogueUI.TextElement, DialogueUI.Container, DialogueUI.Portrait, DialogueUI.Speaker, DialogueUI.ContinueIcon);
             game = new Game(GameCanvas);
+
+            InitializeInventory();
 
             GameCanvas.Visibility = Visibility.Collapsed; // Hide gameplay at start
 
@@ -41,6 +46,33 @@ namespace JRPG
             };
 
             Loaded += (s, e) => Keyboard.Focus(GameCanvas);
+        }
+
+        private void InitializeInventory()
+        {
+            playerInventory.Add(new InventoryItem { Name = "Potion", Quantity = 5, Description = "Restores a small amount of HP." });
+            playerInventory.Add(new InventoryItem { Name = "Hi-Potion", Quantity = 2, Description = "Restores a medium amount of HP." });
+            playerInventory.Add(new InventoryItem { Name = "Elixir", Quantity = 1, Description = "Fully restores HP and MP." });
+            playerInventory.Add(new InventoryItem { Name = "Antidote", Quantity = 7, Description = "Cures poison." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
         }
 
         public void StartBattle()
@@ -236,7 +268,156 @@ namespace JRPG
 
         private void InventoryButton_Click(object sender, RoutedEventArgs e)
         {
-            GameMenuContent.Content = CreatePlaceholderPage("Inventory Page");
+            var mainGrid = new Grid();
+            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(7, GridUnitType.Star) });
+            mainGrid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(3, GridUnitType.Star) });
+
+            var itemListStack = new StackPanel();
+
+            // Description Block
+            TextBlock descriptionBlock = new TextBlock
+            {
+                Text = "Select an item to see its description.",
+                FontSize = 18,
+                Foreground = Brushes.White,
+                Margin = new Thickness(10),
+                TextWrapping = TextWrapping.Wrap,
+                VerticalAlignment = VerticalAlignment.Top
+            };
+
+            // Wrap description inside a Border
+            Border descriptionBorder = new Border
+            {
+                BorderBrush = Brushes.White,
+                BorderThickness = new Thickness(2),
+                CornerRadius = new CornerRadius(10),
+                Background = new SolidColorBrush(Color.FromRgb(20, 20, 20)),
+                Margin = new Thickness(10),
+                Child = descriptionBlock
+            };
+
+            foreach (var item in playerInventory)
+            {
+                var itemRow = new Border
+                {
+                    Background = Brushes.Transparent,
+                    BorderBrush = Brushes.White,
+                    BorderThickness = new Thickness(0),
+                    Margin = new Thickness(5),
+                    CornerRadius = new CornerRadius(5)
+                };
+
+                var itemStack = new StackPanel { Orientation = Orientation.Horizontal };
+                itemRow.Child = itemStack;
+
+                itemStack.Children.Add(new TextBlock
+                {
+                    Text = item.Name,
+                    FontSize = 24,
+                    Foreground = Brushes.White,
+                    Width = 200,
+                    VerticalAlignment = VerticalAlignment.Top
+                });
+
+                itemStack.Children.Add(new TextBlock
+                {
+                    Text = "x" + item.Quantity,
+                    FontSize = 24,
+                    Foreground = Brushes.White,
+                    Width = 100,
+                    HorizontalAlignment = HorizontalAlignment.Right
+                });
+
+                // Highlight + description on hover
+                itemRow.MouseEnter += (s, args) =>
+                {
+                    itemRow.Background = new SolidColorBrush(Color.FromRgb(80, 80, 80));
+                    descriptionBlock.Text = item.Description;
+                };
+
+                itemRow.MouseLeave += (s, args) =>
+                {
+                    itemRow.Background = Brushes.Transparent;
+                };
+
+                itemRow.MouseLeftButtonDown += async (s, args) =>
+                {
+                    selectedItem = item;
+                    PopupQuestion.Text = $"Use {item.Name}?";
+                    await FadeInPopup();
+                };
+
+                itemListStack.Children.Add(itemRow);
+            }
+
+
+
+            ScrollViewer scroll = new ScrollViewer
+            {
+                Content = itemListStack,
+                VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
+                Margin = new Thickness(10),
+                Background = Brushes.Transparent
+            };
+
+            Grid.SetRow(scroll, 0);
+            Grid.SetRow(descriptionBorder, 1);
+
+            mainGrid.Children.Add(scroll);
+            mainGrid.Children.Add(descriptionBorder);
+
+            GameMenuContent.Content = mainGrid;
+        }
+
+        private async void PopupYes_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedItem != null)
+            {
+                selectedItem.Quantity--;
+
+                if (selectedItem.Quantity <= 0)
+                {
+                    playerInventory.Remove(selectedItem);
+                }
+
+                selectedItem = null;
+                await FadeOutPopup();
+
+                // Refresh Inventory page
+                InventoryButton_Click(null, null);
+            }
+        }
+
+        private async void PopupNo_Click(object sender, RoutedEventArgs e)
+        {
+            selectedItem = null;
+            await FadeOutPopup();
+        }
+
+        private async Task FadeInPopup()
+        {
+            PopupConfirmation.Visibility = Visibility.Visible;
+            PopupConfirmation.Opacity = 0;
+
+            for (double opacity = 0; opacity <= 1; opacity += 0.05)
+            {
+                PopupConfirmation.Opacity = opacity;
+                await Task.Delay(10);
+            }
+
+            PopupConfirmation.Opacity = 1;
+        }
+
+        private async Task FadeOutPopup()
+        {
+            for (double opacity = 1; opacity >= 0; opacity -= 0.05)
+            {
+                PopupConfirmation.Opacity = opacity;
+                await Task.Delay(10);
+            }
+
+            PopupConfirmation.Visibility = Visibility.Collapsed;
         }
 
         private void PartyButton_Click(object sender, RoutedEventArgs e)

@@ -87,6 +87,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BattleManager.cs" />
+    <Compile Include="Character.cs" />
+    <Compile Include="CinematicManager.cs" />
     <Compile Include="DialogueBox.xaml.cs">
       <DependentUpon>DialogueBox.xaml</DependentUpon>
     </Compile>
@@ -97,6 +99,8 @@
     <Compile Include="Enums\TileTriggerType.cs" />
     <Compile Include="Figther.cs" />
     <Compile Include="InventoryItem.cs" />
+    <Compile Include="SaveData.cs" />
+    <Compile Include="SaveGameManager.cs" />
     <Compile Include="TileType.cs" />
     <Compile Include="BattleUI.xaml.cs">
       <DependentUpon>BattleUI.xaml</DependentUpon>

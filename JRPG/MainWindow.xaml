@@ -63,6 +63,20 @@
                             FontSize="24"
                             HorizontalAlignment="Center"
                             Click="StartButton_Click"/>
+                    <Button Content="Load Game" 
+                            x:Name="LoadButton"
+                            Width="200"
+                            Height="50"
+                            FontSize="24"
+                            HorizontalAlignment="Center"
+                            Click="LoadButton_Click"/>
+                    <Button Content="Exit Game" 
+                            x:Name="ExitGame"
+                            Width="200"
+                            Height="50"
+                            FontSize="24"
+                            HorizontalAlignment="Center"
+                            Click="ExitButton_Click"/>
                 </StackPanel>
             </Grid>
 

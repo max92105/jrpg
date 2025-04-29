@@ -33,8 +33,11 @@ namespace JRPG
         private double moveProgress = 0;
 
         private const double playerRadius = 0.1;
-        private double playerX = 10.0;
-        private double playerY = 10.0;
+
+        //public to be able to save
+        public double playerX = 10.0;
+        public double playerY = 10.0;
+
         private double velocityX = 0;
         private double velocityY = 0;
         private double moveSpeed = 4.00;
@@ -48,7 +51,10 @@ namespace JRPG
 
         private DateTime lastFrameTime = DateTime.Now;
         private Map map;
-        private string currentMapFile = "village.map";
+
+        //public to be able to save
+        public string currentMapFile = "village.map";
+
         private HashSet<Key> keysDown = new HashSet<Key>();
 
         public void OnKeyDown(Key key) => keysDown.Add(key);
@@ -77,6 +83,11 @@ namespace JRPG
 
             playerImageControl = new Image { Width = tileSize, Height = tileSize };
             canvas.Children.Add(playerImageControl);
+        }
+
+        public void LoadFromFile(String currentMapFile)
+        {
+            map.LoadFromFile(currentMapFile);
         }
 
         public void Update()

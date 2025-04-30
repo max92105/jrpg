@@ -2,8 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows;
 using JRPG;
 using JRPG.Core.Enums;
+using JRPG.Core.Maps.Models;
 using JRPG.Core.Models;
 using JRPG.Enums;
 
@@ -16,7 +18,9 @@ namespace JRPGPlayerDemo
         public int[,] Tiles { get; private set; }
         public TileType[,] TileTypes { get; private set; }
         public Dictionary<int, string> TileSprites { get; private set; }
-        public int[,] ObjectLayer { get; private set; }
+
+        public List<PlacedObject> PlacedObjects { get; set; } = new List<PlacedObject>();
+        public Dictionary<int, ObjectDefinition> ObjectDefinitions { get; set; } = new Dictionary<int, ObjectDefinition>();
 
         public Map()
         {
@@ -26,6 +30,13 @@ namespace JRPGPlayerDemo
             {
                 { 0, "Assets/floor.png" },
                 { 1, "Assets/wall.png" }
+            };
+
+            ObjectDefinitions[1] = new ObjectDefinition
+            {
+                SpritePath = "C:\\git\\jrpg\\JRPG\\Assets\\tree.png",
+                HasCollision = true,
+                CollisionBox = new Rect(8, 24, 32, 48) // blocks bottom half
             };
         }
 
@@ -59,8 +70,6 @@ namespace JRPGPlayerDemo
             int mode = 0;
             int y = 0;
 
-            ObjectLayer = new int[Width, Height];
-
             foreach (string line in lines)
             {
                 if (line == "MAP") { mode = 1; y = 0; continue; }
@@ -73,35 +82,29 @@ namespace JRPGPlayerDemo
                         Tiles[x, y] = int.Parse(line[x].ToString());
                     y++;
                 }
-                else if (mode == 2)
-                {
-                    string[] parts = line.Split(':');
-                    string[] coords = parts[0].Split(',');
-                    int xCoord = int.Parse(coords[0]);
-                    int yCoord = int.Parse(coords[1]);
-
-                    Enum.TryParse(parts[1], out TileTriggerType trigger);
-                    string data = parts[2];
-
-                    if(parts.Length == 4)
-                    {
-                         data = data + ":" + parts[3];
-                    }
-
-                    TileTypes[xCoord, yCoord] = new TileType
-                    {
-                        Name = trigger.ToString(),
-                        IsWalkable = true,
-                        Sprite = GetTileSprite(0),
-                        TriggerType = trigger,
-                        TriggerData = data
-                    };
-                }
                 else if (mode == 3) // OBJECTS
                 {
-                    for (int x = 0; x < line.Length; x++)
-                        ObjectLayer[x, y] = int.Parse(line[x].ToString());
-                    y++;
+                    var parts = line.Split(':');
+                    if (parts.Length >= 2 && int.TryParse(parts[0], out int id))
+                    {
+                        var coords = parts[1].Split('.');
+                        if (coords.Length == 2 &&
+                            double.TryParse(coords[0], out double objX) &&
+                            double.TryParse(coords[1], out double objY))
+                        {
+                            bool hasCollision = true;
+                            if (parts.Length == 3)
+                                bool.TryParse(parts[2], out hasCollision);
+
+                            PlacedObjects.Add(new PlacedObject
+                            {
+                                Id = id,
+                                X = objX,
+                                Y = objY,
+                                HasCollision = hasCollision
+                            });
+                        }
+                    }
                 }
             }
         }

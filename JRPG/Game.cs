@@ -8,6 +8,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace JRPG
@@ -55,7 +56,7 @@ namespace JRPG
         private Map map;
 
         //public to be able to save
-        public string currentMapFile = "village.map";
+        public string currentMapFile = "test1.map";
 
         private HashSet<Key> keysDown = new HashSet<Key>();
 
@@ -228,6 +229,56 @@ namespace JRPG
                 }
             }
 
+            foreach (var obj in map.PlacedObjects)
+            {
+                if (!map.ObjectDefinitions.TryGetValue(obj.Id, out var def)) continue;
+                if (string.IsNullOrEmpty(def.SpritePath)) continue;
+
+                double tileDrawX = obj.X - 0.5 - cameraX;
+                double tileDrawY = obj.Y - 0.5 - cameraY;
+
+                if (tileDrawX < -1 || tileDrawX > viewWidth + 1 ||
+                    tileDrawY < -1 || tileDrawY > viewHeight + 1)
+                {
+                    continue; // skip if outside view
+                }
+
+                var image = new Image
+                {
+                    Width = tileSize,
+                    Height = tileSize,
+                    Source = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), def.SpritePath)))
+                };
+
+                // Place image so its center is at obj.X/Y
+                double screenX = (obj.X - 0.5 - cameraX) * tileSize;
+                double screenY = (obj.Y - 0.5 - cameraY) * tileSize;
+
+                Canvas.SetLeft(image, screenX);
+                Canvas.SetTop(image, screenY);
+                Canvas.SetZIndex(image, 5); // just above tiles, below player
+                canvas.Children.Add(image);
+
+                if (def.CollisionBox is Rect box)
+                {
+                    var rect = new System.Windows.Shapes.Rectangle
+                    {
+                        Width = box.Width,
+                        Height = box.Height,
+                        Stroke = Brushes.Red,
+                        StrokeThickness = 1
+                    };
+
+                    double colX = screenX + box.X;
+                    double colY = screenY + box.Y;
+
+                    Canvas.SetLeft(rect, colX);
+                    Canvas.SetTop(rect, colY);
+                    Canvas.SetZIndex(rect, 100);
+                    canvas.Children.Add(rect);
+                }
+            }
+
             playerImageControl.Source = playerFrames[(int)playerDirection, animationFrame];
 
             double spriteOffsetX = 0.0;
@@ -253,12 +304,34 @@ namespace JRPG
             double top = y - playerRadius;
             double bottom = y + playerRadius;
 
+            // Tile-level collision
             for (int ty = (int)Math.Floor(top); ty <= (int)Math.Floor(bottom); ty++)
             {
                 for (int tx = (int)Math.Floor(left); tx <= (int)Math.Floor(right); tx++)
                 {
                     if (!map.IsWalkable(tx, ty))
                         return false;
+                }
+            }
+
+            // Object-layer collision (pixel-precise)
+            foreach (var obj in map.PlacedObjects) // <-- this list should be parsed from .map file
+            {
+                if (!map.ObjectDefinitions.TryGetValue(obj.Id, out var def)) continue;
+                if (!def.HasCollision || def.CollisionBox == null) continue;
+
+                // Convert the object's collision box from relative (within tile) to world position in tile space
+                Rect box = def.CollisionBox;
+                double worldLeft = obj.X - 0.5 + (box.X / tileSize);
+                double worldTop = obj.Y - 0.5 + (box.Y / tileSize);
+                double worldRight = worldLeft + (box.Width / tileSize);
+                double worldBottom = worldTop + (box.Height / tileSize);
+
+                // Check overlap with player collision area
+                if (right > worldLeft && left < worldRight &&
+                    bottom > worldTop && top < worldBottom)
+                {
+                    return false;
                 }
             }
 

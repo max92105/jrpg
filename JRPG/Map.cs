@@ -36,7 +36,7 @@ namespace JRPGPlayerDemo
             {
                 SpritePath = "C:\\git\\jrpg\\JRPG\\Assets\\tree.png",
                 HasCollision = true,
-                CollisionBox = new Rect(8, 24, 32, 48) // blocks bottom half
+                CollisionBox = new Rect(16, 8, 32, 48) // blocks bottom half
             };
         }
 

@@ -85,6 +85,10 @@ namespace JRPG
             }
 
             playerImageControl = new Image { Width = tileSize, Height = tileSize };
+
+            canvas.Width = SystemParameters.PrimaryScreenWidth;
+            canvas.Height = SystemParameters.PrimaryScreenHeight;
+
             canvas.Children.Add(playerImageControl);
         }
 
@@ -170,16 +174,20 @@ namespace JRPG
             double tilesVisibleX = canvas.ActualWidth / tileSize;
             double tilesVisibleY = canvas.ActualHeight / tileSize;
 
-            double halfScreenX = tilesVisibleX / 2.0;
-            double halfScreenY = tilesVisibleY / 2.0;
+            double targetX = playerX - tilesVisibleX / 2.0;
+            double targetY = playerY - tilesVisibleY / 2.0;
 
-            double targetX = (playerX - playerRadius + (-32.0 / tileSize)) - halfScreenX + 0.5;
-            double targetY = (playerY - playerRadius + (-32.0 / tileSize)) - halfScreenY + 0.5;
+            if (map.Width > tilesVisibleX)
+                targetX = Clamp(targetX, 0, map.Width - tilesVisibleX);
+            else
+                targetX = (map.Width - tilesVisibleX) / 2.0;
 
-            targetX = Math.Max(0, Math.Min(targetX, map.Width - tilesVisibleX));
-            targetY = Math.Max(0, Math.Min(targetY, map.Height - tilesVisibleY));
+            if (map.Height > tilesVisibleY)
+                targetY = Clamp(targetY, 0, map.Height - tilesVisibleY);
+            else
+                targetY = (map.Height - tilesVisibleY) / 2.0;
 
-            double easing = 0.25;
+            double easing = 0.35;
             cameraX += (targetX - cameraX) * easing;
             cameraY += (targetY - cameraY) * easing;
         }
@@ -193,13 +201,13 @@ namespace JRPG
             int startX = (int)Math.Floor(cameraX);
             int startY = (int)Math.Floor(cameraY);
 
-            int tilesVisibleX = (int)Math.Ceiling(canvas.ActualWidth / tileSize) + 2;
-            int tilesVisibleY = (int)Math.Ceiling(canvas.ActualHeight / tileSize) + 2;
+            int tilesVisibleX = (int)Math.Ceiling(canvas.ActualWidth / tileSize);
+            int tilesVisibleY = (int)Math.Ceiling(canvas.ActualHeight / tileSize);
 
-            for (int y = 0; y < viewHeight + 2; y++)
+            for (int y = 0; y < tilesVisibleY + 2; y++)
             {
-                for (int x = 0; x < viewWidth + 2; x++)
-                {
+                for (int x = 0; x < tilesVisibleX + 2; x++)
+                { 
                     int mapX = x + startX;
                     int mapY = y + startY;
 
@@ -237,8 +245,11 @@ namespace JRPG
                 double tileDrawX = obj.X - 0.5 - cameraX;
                 double tileDrawY = obj.Y - 0.5 - cameraY;
 
-                if (tileDrawX < -1 || tileDrawX > viewWidth + 1 ||
-                    tileDrawY < -1 || tileDrawY > viewHeight + 1)
+                double objectVisibleX = canvas.ActualWidth / tileSize;
+                double objectVisibleY = canvas.ActualHeight / tileSize;
+
+                if (tileDrawX < -1 || tileDrawX > objectVisibleX + 1 ||
+                    tileDrawY < -1 || tileDrawY > objectVisibleY + 1)
                 {
                     continue; // skip if outside view
                 }

@@ -96,12 +96,10 @@
     <Compile Include="Enemy.cs" />
     <Compile Include="Enums\BattleState.cs" />
     <Compile Include="Enums\Direction.cs" />
-    <Compile Include="Enums\TileTriggerType.cs" />
     <Compile Include="Figther.cs" />
     <Compile Include="InventoryItem.cs" />
     <Compile Include="SaveData.cs" />
     <Compile Include="SaveGameManager.cs" />
-    <Compile Include="TileType.cs" />
     <Compile Include="BattleUI.xaml.cs">
       <DependentUpon>BattleUI.xaml</DependentUpon>
     </Compile>
@@ -151,6 +149,9 @@
     <Content Include="Assets\figtherPortrait.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Assets\tree.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Maps\village.map">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -169,7 +170,12 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\JRPG.Core\JRPG.Core.csproj">
+      <Project>{6e82ec14-29f8-4892-a245-92189f6e793f}</Project>
+      <Name>JRPG.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\floor.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

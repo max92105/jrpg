@@ -1,6 +1,6 @@
-﻿using JRPG.Enums;
+﻿using JRPG.Core.Enums;
 
-namespace JRPG
+namespace JRPG.Core.Models
 {
     public class TileType
     {

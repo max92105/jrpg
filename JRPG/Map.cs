@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using JRPG;
+using JRPG.Core.Enums;
+using JRPG.Core.Models;
 using JRPG.Enums;
 
 namespace JRPGPlayerDemo
@@ -14,6 +16,7 @@ namespace JRPGPlayerDemo
         public int[,] Tiles { get; private set; }
         public TileType[,] TileTypes { get; private set; }
         public Dictionary<int, string> TileSprites { get; private set; }
+        public int[,] ObjectLayer { get; private set; }
 
         public Map()
         {
@@ -56,10 +59,13 @@ namespace JRPGPlayerDemo
             int mode = 0;
             int y = 0;
 
+            ObjectLayer = new int[Width, Height];
+
             foreach (string line in lines)
             {
                 if (line == "MAP") { mode = 1; y = 0; continue; }
                 if (line == "TRIGGERS") { mode = 2; continue; }
+                if (line == "OBJECTS") { mode = 3; y = 0; continue; }
 
                 if (mode == 1)
                 {
@@ -90,6 +96,12 @@ namespace JRPGPlayerDemo
                         TriggerType = trigger,
                         TriggerData = data
                     };
+                }
+                else if (mode == 3) // OBJECTS
+                {
+                    for (int x = 0; x < line.Length; x++)
+                        ObjectLayer[x, y] = int.Parse(line[x].ToString());
+                    y++;
                 }
             }
         }

@@ -1,4 +1,6 @@
-﻿using JRPG.Enums;
+﻿using JRPG.Core.Enums;
+using JRPG.Core.Models;
+using JRPG.Enums;
 using JRPGPlayerDemo;
 using System;
 using System.Collections.Generic;

@@ -1,0 +1,65 @@
+﻿<Window x:Class="MapEditor.EditorMainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MapEditor"
+        mc:Ignorable="d"
+         Title="JRPG Map Editor" WindowState="Maximized" WindowStyle="SingleBorderWindow" Background="#111">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Panel: Tile Palette & Buttons -->
+        <StackPanel Grid.Column="0" Background="#222" VerticalAlignment="Stretch">
+            <TextBlock Text="Tile Palette" Foreground="White" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+            <ListBox x:Name="TilePalette" Height="500" Background="#333"/>
+
+            <TextBlock Text="Object Palette" Foreground="White" Margin="0,10,0,5"/>
+            <ListBox x:Name="ObjectPalette" Height="150" Background="#333" Visibility="Collapsed"/>
+
+            <TextBlock Text="Map Name" Foreground="White" Margin="0,10,0,5"/>
+            <TextBox x:Name="MapNameBox" Text="Custom Map" TextChanged="MapNameBox_TextChanged" Margin="0,0,0,10"/>
+            <Button Content="New Map" Margin="0,10,0,5" Click="NewMap_Click"/>
+
+            <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
+                <RadioButton Content="Tile Mode" IsChecked="True" GroupName="PlacementMode" Checked="TileMode_Checked" Margin="0,0,10,0"/>
+                <RadioButton Content="Object Mode" GroupName="PlacementMode" Checked="ObjectMode_Checked"/>
+            </StackPanel>
+
+            <TextBlock Text="Map Size" Foreground="White" Margin="0,10,0,5"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <TextBox x:Name="MapWidthBox" Width="50" Text="20" Margin="0,0,5,0"/>
+                <TextBox x:Name="MapHeightBox" Width="50" Text="15"/>
+            </StackPanel>
+            
+            <Button Content="Apply Size" Click="ApplySize_Click" Margin="0,0,0,10"/>
+
+            <Button Content="Save Map" Margin="0,10,0,5" Click="SaveMap_Click"/>
+            <Button Content="Load Map" Margin="0,5,0,5" Click="LoadMap_Click"/>
+
+            <CheckBox Content="Show Grid" IsChecked="True" Margin="0,10,0,0"
+          Checked="GridToggle_Checked" Unchecked="GridToggle_Checked"/>
+
+            <Button Content="Exit" Margin="0,20,0,0" Click="Exit_Click"/>
+        </StackPanel>
+
+        <!-- Main Drawing Canvas -->
+        <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <Canvas x:Name="MapCanvas"
+                Background="Black"
+                MouseLeftButtonDown="MapCanvas_Click"
+                MouseRightButtonDown="MapCanvas_MouseRightButtonDown"
+                MouseRightButtonUp="MapCanvas_MouseRightButtonUp"
+                MouseMove="MapCanvas_MouseMove"
+                MouseWheel="MapCanvas_MouseWheel"
+                RenderTransformOrigin="0,0">
+                <Canvas.RenderTransform>
+                    <ScaleTransform x:Name="CanvasScale" ScaleX="1" ScaleY="1"/>
+                </Canvas.RenderTransform>
+            </Canvas>
+        </ScrollViewer>
+    </Grid>
+</Window>

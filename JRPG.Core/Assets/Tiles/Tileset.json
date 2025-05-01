@@ -1,0 +1,40 @@
+﻿{
+  "0": {
+    "Name": "Floor",
+    "IsWalkable": true,
+    "Sprite": "Assets/Tiles/Floor.png"
+
+  },
+  "1": {
+    "Name": "Wall",
+    "IsWalkable": false,
+    "Sprite": "Assets/Tiles/Wall.png"
+
+  },
+  "2": {
+    "Name": "Grass1",
+    "IsWalkable": true,
+    "Sprite": "Assets/Tiles/Grass1.png"
+  },
+  "3": {
+    "Name": "Grass2",
+    "IsWalkable": true,
+    "Sprite": "Assets/Tiles/Grass2.png"
+  },
+  "4": {
+    "Name": "Grass3",
+    "IsWalkable": true,
+    "Sprite": "Assets/Tiles/Grass3.png"
+  },
+  "5": {
+    "Name": "Animated Water",
+    "IsWalkable": false,
+    "Frames": [
+      "Assets/Tiles/water1.png",
+      "Assets/Tiles/water2.png",
+      "Assets/Tiles/water3.png",
+      "Assets/Tiles/water4.png"
+    ],
+    "FrameDuration": 0.25
+  }
+}

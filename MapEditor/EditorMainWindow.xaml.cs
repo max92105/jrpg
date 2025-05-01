@@ -6,8 +6,13 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using System.Windows.Media;
-using System.Collections.Generic;
 using JRPG.Core.Maps.Models;
+using System.Linq;
+using JRPG.Core.Maps.IO;
+using JRPG.Core.Maps;
+using JRPG.Core.Utils;
+using JRPG.Core.Models;
+using System.Collections.Generic;
 
 namespace MapEditor
 {
@@ -16,20 +21,19 @@ namespace MapEditor
     /// </summary>
     public partial class EditorMainWindow : Window
     {
-        private int[,] mapData;
-        private List<PlacedObject> placedObjects = new List<PlacedObject>();
+        private Map map = new Map();
 
+        //Default map Size
         private int mapWidth = 20;
         private int mapHeight = 15;
 
-        private const int tileSize = 64;
-
+        //Selection
         private int selectedTileId = 0;
         private int selectedObjectId = 1;
 
+        //Options
         private bool showGrid = true;
         private bool placingObjects = false;
-
         private string currentMapName = "New Map";
 
         //Zoom
@@ -40,54 +44,27 @@ namespace MapEditor
         //Drag
         private Vector currentPanOffset = new Vector(0, 0);
 
-        private readonly string[] tilePaths =
-        {
-            //TODO::Change That
-            "C:\\git\\jrpg\\JRPG\\Assets\\floor.png",
-            "C:\\git\\jrpg\\JRPG\\Assets\\wall.png",
-            "C:\\git\\jrpg\\JRPG\\Assets\\Grass1.png",
-            "C:\\git\\jrpg\\JRPG\\Assets\\Grass2.png",
-            "C:\\git\\jrpg\\JRPG\\Assets\\Grass3.png"
-        };
-
-        private readonly ObjectDefinition[] objectDefinitions = new ObjectDefinition[]
-        {
-            null,
-            new ObjectDefinition
-            {
-                SpritePath = "C:\\git\\jrpg\\JRPG\\Assets\\tree.png",
-                HasCollision = true,
-                CollisionBox = new Rect(8, 24, 48, 32) // blocks bottom half
-            },
-            new ObjectDefinition
-            {
-                SpritePath = "C:\\git\\jrpg\\JRPG\\Assets\\Tree2.png",
-                HasCollision = true,
-                CollisionBox = new Rect(8, 24, 48, 32) // blocks bottom half
-            },
-            new ObjectDefinition
-            {
-                SpritePath = "C:\\git\\jrpg\\JRPG\\Assets\\Tree3.png",
-                HasCollision = true,
-                CollisionBox = new Rect(8, 24, 48, 32) // blocks bottom half
-            },
-            new ObjectDefinition
-            {
-                SpritePath = "C:\\git\\jrpg\\JRPG\\Assets\\Leaf.png",
-                HasCollision = false,
-            },
-            new ObjectDefinition
-            {
-                SpritePath = "C:\\git\\jrpg\\JRPG\\Assets\\Leafs.png",
-                HasCollision = false,
-            }
-        };
+        //Palette
+        private Dictionary<int, TileDefinition> tileDefinitions;
+        private Dictionary<int, ObjectDefinition> objectDefinitions;
 
         public EditorMainWindow()
         {
             InitializeComponent();
 
-            mapData = new int[mapWidth, mapHeight];
+            // Load definitions from JSON
+            tileDefinitions = TilesetLoader.Load(Path.Combine(Directory.GetCurrentDirectory(), MapConstant.TilesetJsonPath));
+            objectDefinitions = ObjectSetLoader.Load(Path.Combine(Directory.GetCurrentDirectory(), MapConstant.ObjectSetJsonPath));
+
+            map = new Map
+            {
+                Width = mapWidth,
+                Height = mapHeight,
+                Tiles = new List<Tile>(),
+                TileDefinitions = tileDefinitions.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
+                ObjectDefinitions = objectDefinitions
+            };
+
             InitTilePalette();
             InitObjectPalette();
             RedrawMap();
@@ -95,38 +72,46 @@ namespace MapEditor
 
         private void InitTilePalette()
         {
-            for (int i = 0; i < tilePaths.Length; i++)
+            TilePalette.Items.Clear();
+
+            foreach (var kv in tileDefinitions)
             {
+                var def = kv.Value;
                 var img = new Image
                 {
-                    Width = tileSize,
-                    Height = tileSize,
-                    Source = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), tilePaths[i])))
+                    Width = MapConstant.TileSize,
+                    Height = MapConstant.TileSize,
+                    Source = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), def.Sprite ?? def.Frames?.FirstOrDefault())))
                 };
-                var item = new ListBoxItem { Content = img, Tag = i };
+                var item = new ListBoxItem { Content = img, Tag = kv.Key };
                 TilePalette.Items.Add(item);
             }
+
             TilePalette.SelectionChanged += (s, e) =>
             {
                 if (TilePalette.SelectedItem is ListBoxItem selected)
                     selectedTileId = (int)selected.Tag;
             };
+
             TilePalette.SelectedIndex = 0;
         }
 
         private void InitObjectPalette()
         {
-            for (int i = 1; i < objectDefinitions.Length; i++) // skip 0 (empty)
+            ObjectPalette.Items.Clear();
+
+            foreach (var kv in objectDefinitions)
             {
-                if (objectDefinitions[i] == null) continue;
+                var def = kv.Value;
+                if (string.IsNullOrEmpty(def.SpritePath)) continue;
 
                 var img = new Image
                 {
-                    Width = tileSize,
-                    Height = tileSize,
-                    Source = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), objectDefinitions[i].SpritePath)))
+                    Width = MapConstant.TileSize,
+                    Height = MapConstant.TileSize,
+                    Source = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), def.SpritePath)))
                 };
-                var item = new ListBoxItem { Content = img, Tag = i };
+                var item = new ListBoxItem { Content = img, Tag = kv.Key };
                 ObjectPalette.Items.Add(item);
             }
 
@@ -142,68 +127,72 @@ namespace MapEditor
         private void MapCanvas_Click(object sender, MouseButtonEventArgs e)
         {
             var pos = e.GetPosition(MapCanvas);
-            double x = pos.X / tileSize;
-            double y = pos.Y / tileSize;
+            double x = pos.X / MapConstant.TileSize;
+            double y = pos.Y / MapConstant.TileSize;
             int tileX = (int)Math.Floor(x);
             int tileY = (int)Math.Floor(y);
 
             if (tileX >= 0 && tileY >= 0 && tileX < mapWidth && tileY < mapHeight)
             {
                 if (placingObjects)
-                    placedObjects.Add(new PlacedObject { Id = selectedObjectId, X = x, Y = y });
+                    map.Objects.Add(new PlacedObject { Id = selectedObjectId, X = x, Y = y });
                 else
-                    mapData[tileX, tileY] = selectedTileId;
+                    map.SetTile(tileX, tileY, selectedTileId);
+
                 RedrawMap();
             }
         }
 
         private void RedrawMap()
         {
-            if (MapCanvas != null)
-            {
-                MapCanvas.Children.Clear();
-                MapCanvas.Width = mapWidth * tileSize;
-                MapCanvas.Height = mapHeight * tileSize;
+            if (MapCanvas == null) return;
 
-                for (int y = 0; y < mapHeight; y++)
+            MapCanvas.Children.Clear();
+            MapCanvas.Width = mapWidth * MapConstant.TileSize;
+            MapCanvas.Height = mapHeight * MapConstant.TileSize;
+
+            for (int y = 0; y < mapHeight; y++)
+            {
+                for (int x = 0; x < mapWidth; x++)
                 {
-                    for (int x = 0; x < mapWidth; x++)
+                    int tileId = map.GetTileIdAt(x, y);
+
+                    if (tileDefinitions.TryGetValue(tileId, out var tileDef))
                     {
-                        int tileId = mapData[x, y];
-                        if (tileId >= 0 && tileId < tilePaths.Length)
+                        string spritePath = tileDef.Sprite ?? tileDef.Frames?.FirstOrDefault();
+                        if (!string.IsNullOrEmpty(spritePath))
                         {
                             var img = new Image
                             {
-                                Width = tileSize,
-                                Height = tileSize,
-                                Source = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), tilePaths[tileId])))
+                                Width = MapConstant.TileSize,
+                                Height = MapConstant.TileSize,
+                                Source = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), spritePath)))
                             };
-                            Canvas.SetLeft(img, x * tileSize);
-                            Canvas.SetTop(img, y * tileSize);
+                            Canvas.SetLeft(img, x * MapConstant.TileSize);
+                            Canvas.SetTop(img, y * MapConstant.TileSize);
                             MapCanvas.Children.Add(img);
                         }
                     }
                 }
-
-                foreach (var obj in placedObjects)
-                {
-                    var def = objectDefinitions[obj.Id];
-                    if (def == null || def.SpritePath == null) continue;
-
-                    var img = new Image
-                    {
-                        Width = tileSize,
-                        Height = tileSize,
-                        Source = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), def.SpritePath)))
-                    };
-                    Canvas.SetLeft(img, (obj.X * tileSize) - tileSize / 2);
-                    Canvas.SetTop(img, (obj.Y * tileSize) - tileSize / 2);
-                    Panel.SetZIndex(img, 10);
-                    MapCanvas.Children.Add(img);
-                }
-
-                DrawGridOverlay();
             }
+
+            foreach (var obj in map.Objects)
+            {
+                if (!objectDefinitions.TryGetValue(obj.Id, out var def) || string.IsNullOrEmpty(def.SpritePath)) continue;
+
+                var img = new Image
+                {
+                    Width = MapConstant.TileSize,
+                    Height = MapConstant.TileSize,
+                    Source = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), def.SpritePath)))
+                };
+                Canvas.SetLeft(img, (obj.X * MapConstant.TileSize) - MapConstant.TileSize / 2);
+                Canvas.SetTop(img, (obj.Y * MapConstant.TileSize) - MapConstant.TileSize / 2);
+                Panel.SetZIndex(img, 10);
+                MapCanvas.Children.Add(img);
+            }
+
+            DrawGridOverlay();
         }
 
         private void DrawGridOverlay()
@@ -215,9 +204,9 @@ namespace MapEditor
                 var line = new System.Windows.Shapes.Line
                 {
                     X1 = 0,
-                    Y1 = y * tileSize,
-                    X2 = mapWidth * tileSize,
-                    Y2 = y * tileSize,
+                    Y1 = y * MapConstant.TileSize,
+                    X2 = mapWidth * MapConstant.TileSize,
+                    Y2 = y * MapConstant.TileSize,
                     Stroke = Brushes.Red,
                     StrokeThickness = 0.5
                 };
@@ -229,10 +218,10 @@ namespace MapEditor
             {
                 var line = new System.Windows.Shapes.Line
                 {
-                    X1 = x * tileSize,
+                    X1 = x * MapConstant.TileSize,
                     Y1 = 0,
-                    X2 = x * tileSize,
-                    Y2 = mapHeight * tileSize,
+                    X2 = x * MapConstant.TileSize,
+                    Y2 = mapHeight * MapConstant.TileSize,
                     Stroke = Brushes.Red,
                     StrokeThickness = 0.5
                 };
@@ -245,32 +234,35 @@ namespace MapEditor
         {
             var saveDialog = new SaveFileDialog
             {
-                Filter = "Map Files (*.map)|*.map",
-                DefaultExt = ".map",
+                Filter = "JSON Map (*.json)|*.json",
+                DefaultExt = ".json",
                 Title = "Save Map"
             };
 
             if (saveDialog.ShowDialog() == true)
             {
-                using (StreamWriter writer = new StreamWriter(saveDialog.FileName))
-                {
-                    writer.WriteLine($"NAME: {currentMapName}");
-                    writer.WriteLine("MAP");
-                    for (int y = 0; y < mapHeight; y++)
-                    {
-                        string line = "";
-                        for (int x = 0; x < mapWidth; x++)
-                            line += mapData[x, y].ToString();
-                        writer.WriteLine(line);
-                    }
-                    writer.WriteLine("OBJECTS");
-                    foreach (var obj in placedObjects)
-                    {
-                        writer.WriteLine($"{obj.Id}:{obj.X:F2}.{obj.Y:F2}");
-                    }
-                    writer.WriteLine("TRIGGERS");
-                    MessageBox.Show($"Map saved to {Path.GetFileName(saveDialog.FileName)}");
-                }
+                map.Name = currentMapName;
+                map.Width = mapWidth;
+                map.Height = mapHeight;
+
+                // Keep only valid tile definitions
+                map.TileDefinitions = tileDefinitions
+                    .Where(kvp => !string.IsNullOrEmpty(kvp.Value.Sprite ?? kvp.Value.Frames?.FirstOrDefault()))
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value
+                    );
+
+                // Keep only valid object definitions
+                map.ObjectDefinitions = objectDefinitions
+                    .Where(kvp => !string.IsNullOrEmpty(kvp.Value.SpritePath))
+                    .ToDictionary(
+                        kvp => kvp.Key,
+                        kvp => kvp.Value
+                    );
+
+                MapSerializer.Save(saveDialog.FileName, map);
+                MessageBox.Show($"Map saved to {Path.GetFileName(saveDialog.FileName)}");
             }
         }
 
@@ -278,56 +270,26 @@ namespace MapEditor
         {
             var openDialog = new OpenFileDialog
             {
-                Filter = "Map Files (*.map)|*.map",
+                Filter = "JSON Map (*.json)|*.json",
                 Title = "Load Map"
             };
 
             if (openDialog.ShowDialog() == true)
             {
-                string[] lines = File.ReadAllLines(openDialog.FileName);
-                placedObjects.Clear();
-
-                bool readingMap = false;
-                bool readingObjects = false;
-                int y = 0;
-
-                for (int i = 0; i < lines.Length; i++)
+                map = MapSerializer.Load(openDialog.FileName);
+                if (map == null)
                 {
-                    var line = lines[i];
-                    if (line.StartsWith("NAME:"))
-                    {
-                        currentMapName = line.Substring(5).Trim();
-                        continue;
-                    }
-                    if (line == "MAP") { readingMap = true; readingObjects = false; y = 0; continue; }
-                    if (line == "OBJECTS") { readingMap = false; readingObjects = true; y = 0; continue; }
-                    if (line.StartsWith("TRIGGERS")) break;
-
-                    if (readingMap && y < mapHeight)
-                    {
-                        for (int x = 0; x < Math.Min(line.Length, mapWidth); x++)
-                            mapData[x, y] = int.Parse(line[x].ToString());
-                        y++;
-                    }
-                    else if (readingObjects)
-                    {
-                        var parts = line.Split(':');
-                        if (parts.Length == 2 && int.TryParse(parts[0], out int id))
-                        {
-                            var coords = parts[1].Split('.');
-                            if (coords.Length == 2 &&
-                                double.TryParse(coords[0], out double x) &&
-                                double.TryParse(coords[1], out double objY))
-                            {
-                                placedObjects.Add(new PlacedObject { Id = id, X = x, Y = objY });
-                            }
-                        }
-                    }
+                    MessageBox.Show("Failed to load map.");
+                    return;
                 }
 
-                MapNameBox.Text = currentMapName;
-                MapWidthBox.Text = mapWidth.ToString();
-                MapHeightBox.Text = mapHeight.ToString();
+                currentMapName = map.Name;
+                mapWidth = map.Width;
+                mapHeight = map.Height;
+
+                MapNameBox.Text = map.Name;
+                MapWidthBox.Text = map.Width.ToString();
+                MapHeightBox.Text = map.Height.ToString();
 
                 RedrawMap();
                 ApplyCanvasTransform();
@@ -352,13 +314,7 @@ namespace MapEditor
 
         private void NewMap_Click(object sender, RoutedEventArgs e)
         {
-            for (int y = 0; y < mapHeight; y++)
-            {
-                for (int x = 0; x < mapWidth; x++)
-                {
-                    mapData[x, y] = 0; // default tile ID
-                }
-            }
+            map.Tiles.Clear();
 
             currentMapName = "New Map";
             MapNameBox.Text = currentMapName;
@@ -378,7 +334,7 @@ namespace MapEditor
 
                 mapWidth = width;
                 mapHeight = height;
-                mapData = new int[mapWidth, mapHeight];
+                map.Tiles = new List<Tile>();
                 RedrawMap();
             }
             else
@@ -427,7 +383,7 @@ namespace MapEditor
 
                 if (target != null)
                 {
-                    placedObjects.Remove(target);
+                    map.Objects.Remove(target);
                     RedrawMap();
                 }
 
@@ -460,10 +416,10 @@ namespace MapEditor
 
         private PlacedObject GetObjectUnderPointer(Point pointer)
         {
-            double px = pointer.X / tileSize;
-            double py = pointer.Y / tileSize;
+            double px = pointer.X / MapConstant.TileSize;
+            double py = pointer.Y / MapConstant.TileSize;
 
-            foreach (var obj in placedObjects)
+            foreach (var obj in map.Objects)
             {
                 double dx = obj.X - px;
                 double dy = obj.Y - py;

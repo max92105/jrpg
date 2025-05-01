@@ -1,4 +1,5 @@
 ﻿using JRPG.Core.Enums;
+using JRPG.Core.Maps;
 using JRPG.Core.Models;
 using JRPG.Enums;
 using JRPGPlayerDemo;
@@ -18,7 +19,6 @@ namespace JRPG
      private bool isPaused = false;
 
         private Canvas canvas;
-        private const int tileSize = 64;
         private const int viewWidth = 16;
         private const int viewHeight = 12;
 
@@ -67,6 +67,10 @@ namespace JRPG
         private VisualHost mapVisualHost = new VisualHost();
         private DrawingVisual mapVisual = new DrawingVisual();
 
+        //Animated Tile
+        private double tileAnimationTimer = 0;
+        private int tileAnimationFrame = 0;
+
         public Game(Canvas canvas)
         {
             this.canvas = canvas;
@@ -80,14 +84,14 @@ namespace JRPG
             {
                 for (int frame = 0; frame < totalAnimationFrames; frame++)
                 {
-                    int cropX = frame * tileSize;
-                    int cropY = dir * tileSize;
+                    int cropX = frame * MapConstant.TileSize;
+                    int cropY = dir * MapConstant.TileSize;
 
-                    playerFrames[dir, frame] = new CroppedBitmap(playerBitmap, new Int32Rect(cropX, cropY, tileSize, tileSize));
+                    playerFrames[dir, frame] = new CroppedBitmap(playerBitmap, new Int32Rect(cropX, cropY, MapConstant.TileSize, MapConstant.TileSize));
                 }
             }
 
-            playerImageControl = new Image { Width = tileSize, Height = tileSize };
+            playerImageControl = new Image { Width = MapConstant.TileSize, Height = MapConstant.TileSize };
 
             canvas.Width = SystemParameters.PrimaryScreenWidth;
             canvas.Height = SystemParameters.PrimaryScreenHeight;
@@ -181,6 +185,13 @@ namespace JRPG
                 {
                     animationFrame = 0;
                 }
+
+                tileAnimationTimer += deltaTime;
+                if (tileAnimationTimer >= 0.2) // change this to match shortest tile duration
+                {
+                    tileAnimationFrame++;
+                    tileAnimationTimer = 0;
+                }
             }
 
             UpdateCamera();
@@ -188,8 +199,8 @@ namespace JRPG
 
         private void UpdateCamera()
         {
-            double tilesVisibleX = canvas.ActualWidth / tileSize;
-            double tilesVisibleY = canvas.ActualHeight / tileSize;
+            double tilesVisibleX = canvas.ActualWidth / MapConstant.TileSize;
+            double tilesVisibleY = canvas.ActualHeight / MapConstant.TileSize;
 
             double targetX = playerX - tilesVisibleX / 2.0;
             double targetY = playerY - tilesVisibleY / 2.0;
@@ -223,11 +234,11 @@ namespace JRPG
             double spriteOffsetY = 0.0;
 
             // example: shift sprite up by 4px and left by 2px
-            spriteOffsetX = -32.0 / tileSize;
-            spriteOffsetY = -32.0 / tileSize;
+            spriteOffsetX = -32.0 / MapConstant.TileSize;
+            spriteOffsetY = -32.0 / MapConstant.TileSize;
 
-            double drawX = (playerX - playerRadius + spriteOffsetX - cameraX) * tileSize;
-            double drawY = (playerY - playerRadius + spriteOffsetY - cameraY) * tileSize;
+            double drawX = (playerX - playerRadius + spriteOffsetX - cameraX) * MapConstant.TileSize;
+            double drawY = (playerY - playerRadius + spriteOffsetY - cameraY) * MapConstant.TileSize;
 
             Canvas.SetLeft(playerImageControl, drawX);
             Canvas.SetTop(playerImageControl, drawY);
@@ -239,8 +250,8 @@ namespace JRPG
         {
             using (var dc = mapVisual.RenderOpen())
             {
-                int tilesVisibleX = (int)Math.Ceiling(canvas.ActualWidth / tileSize);
-                int tilesVisibleY = (int)Math.Ceiling(canvas.ActualHeight / tileSize);
+                int tilesVisibleX = (int)Math.Ceiling(canvas.ActualWidth / MapConstant.TileSize);
+                int tilesVisibleY = (int)Math.Ceiling(canvas.ActualHeight / MapConstant.TileSize);
                 int startX = (int)Math.Floor(cameraX);
                 int startY = (int)Math.Floor(cameraY);
 
@@ -259,7 +270,7 @@ namespace JRPG
                         if (string.IsNullOrEmpty(spritePath)) continue;
 
                         var img = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), spritePath)));
-                        dc.DrawImage(img, new Rect((mapX - cameraX) * tileSize, (mapY - cameraY) * tileSize, tileSize, tileSize));
+                        dc.DrawImage(img, new Rect((mapX - cameraX) * MapConstant.TileSize, (mapY - cameraY) * MapConstant.TileSize, MapConstant.TileSize, MapConstant.TileSize));
                     }
                 }
 
@@ -271,15 +282,27 @@ namespace JRPG
                     double tileDrawX = obj.X - 0.5 - cameraX;
                     double tileDrawY = obj.Y - 0.5 - cameraY;
 
-                    double tilesVisibleXf = canvas.ActualWidth / tileSize;
-                    double tilesVisibleYf = canvas.ActualHeight / tileSize;
+                    double tilesVisibleXf = canvas.ActualWidth / MapConstant.TileSize;
+                    double tilesVisibleYf = canvas.ActualHeight / MapConstant.TileSize;
 
                     if (tileDrawX < -1 || tileDrawX > tilesVisibleXf + 1 ||
                         tileDrawY < -1 || tileDrawY > tilesVisibleYf + 1)
                         continue;
 
-                    var img = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), def.SpritePath)));
-                    dc.DrawImage(img, new Rect(tileDrawX * tileSize, tileDrawY * tileSize, tileSize, tileSize));
+                    if (map.AnimatedTiles.TryGetValue(obj.Id, out var anim))
+                    {
+                        int frameCount = anim.Frames.Length;
+                        int frameIndex = (tileAnimationFrame % frameCount);
+                        var framePath = anim.Frames[frameIndex];
+                        var img = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), framePath)));
+                        dc.DrawImage(img, new Rect((tileDrawX - cameraX) * MapConstant.TileSize, (tileDrawY - cameraY) * MapConstant.TileSize, MapConstant.TileSize, MapConstant.TileSize));
+                    }
+                    else
+                    {
+                        var img = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), def.SpritePath)));
+                        dc.DrawImage(img, new Rect((tileDrawX - cameraX) * MapConstant.TileSize, (tileDrawY - cameraY) * MapConstant.TileSize, MapConstant.TileSize, MapConstant.TileSize));
+                    }
+                   
                 }
             }
         }
@@ -308,11 +331,11 @@ namespace JRPG
                 if (!def.HasCollision || def.CollisionBox == null) continue;
 
                 // Convert the object's collision box from relative (within tile) to world position in tile space
-                Rect box = def.CollisionBox;
-                double worldLeft = obj.X - 0.5 + (box.X / tileSize);
-                double worldTop = obj.Y - 0.5 + (box.Y / tileSize);
-                double worldRight = worldLeft + (box.Width / tileSize);
-                double worldBottom = worldTop + (box.Height / tileSize);
+                Rect box = def.CollisionBox.Value;
+                double worldLeft = obj.X - 0.5 + (box.X / MapConstant.TileSize);
+                double worldTop = obj.Y - 0.5 + (box.Y / MapConstant.TileSize);
+                double worldRight = worldLeft + (box.Width / MapConstant.TileSize);
+                double worldBottom = worldTop + (box.Height / MapConstant.TileSize);
 
                 // Check overlap with player collision area
                 if (right > worldLeft && left < worldRight &&
@@ -325,58 +348,58 @@ namespace JRPG
             return true;
         }
 
-        private void HandleTileTrigger(TileType tile)
+        private void HandleTileTrigger(TileDefinition tile)
         {
-            isPaused = true;
+            //isPaused = true;
 
-            switch (tile.TriggerType)
-            {
-                case TileTriggerType.Warp:
-                    string[] parts = tile.TriggerData.Split(':');
-                    string targetMap = parts[0];
-                    string[] coords = parts[1].Split(',');
-                    int newX = int.Parse(coords[0]);
-                    int newY = int.Parse(coords[1]);
+            //switch (tile.TriggerType)
+            //{
+            //    case TileTriggerType.Warp:
+            //        string[] parts = tile.TriggerData.Split(':');
+            //        string targetMap = parts[0];
+            //        string[] coords = parts[1].Split(',');
+            //        int newX = int.Parse(coords[0]);
+            //        int newY = int.Parse(coords[1]);
 
-                    currentMapFile = targetMap;
-                    map = new Map();
-                    map.LoadFromFile(currentMapFile);
-                    playerX = newX;
-                    playerY = newY;
-                    break;
+            //        currentMapFile = targetMap;
+            //        map = new Map();
+            //        map.LoadFromFile(currentMapFile);
+            //        playerX = newX;
+            //        playerY = newY;
+            //        break;
 
-                case TileTriggerType.Battle:
-                    Application.Current.Dispatcher.Invoke(() =>
-                    {
-                        ((MainWindow)Application.Current.MainWindow).StartBattle();
-                    });
-                    break;
+            //    case TileTriggerType.Battle:
+            //        Application.Current.Dispatcher.Invoke(() =>
+            //        {
+            //            ((MainWindow)Application.Current.MainWindow).StartBattle();
+            //        });
+            //        break;
 
-                case TileTriggerType.Dialogue:
-                    isPaused = true;
-                    ((MainWindow)Application.Current.MainWindow).ShowDialogue(new List<string>
-                    {
-                        tile.TriggerData,
-                        "Long ago, our ancestors built this sacred tree.",
-                        "You must protect it now, young one."
-                    }, "Assets/figtherPortrait.png", "Fighter", () =>
-                    {
-                        keysDown.Clear();
-                        isPaused = false;
-                    });
-                    break;
+            //    case TileTriggerType.Dialogue:
+            //        isPaused = true;
+            //        ((MainWindow)Application.Current.MainWindow).ShowDialogue(new List<string>
+            //        {
+            //            tile.TriggerData,
+            //            "Long ago, our ancestors built this sacred tree.",
+            //            "You must protect it now, young one."
+            //        }, "Assets/figtherPortrait.png", "Fighter", () =>
+            //        {
+            //            keysDown.Clear();
+            //            isPaused = false;
+            //        });
+            //        break;
 
-                case TileTriggerType.Item:
-                    MessageBox.Show($"You found an item: {tile.TriggerData}!");
-                    tile.TriggerType = TileTriggerType.None; // One-time use
-                    break;
+            //    case TileTriggerType.Item:
+            //        MessageBox.Show($"You found an item: {tile.TriggerData}!");
+            //        tile.TriggerType = TileTriggerType.None; // One-time use
+            //        break;
 
-                case TileTriggerType.Switch:
-                    break;
-            }
+            //    case TileTriggerType.Switch:
+            //        break;
+            //}
 
-            keysDown.Clear();
-            isPaused = false;
+            //keysDown.Clear();
+            //isPaused = false;
         }
 
         private int Clamp(int val, int min, int max) => Math.Max(min, Math.Min(max, val));

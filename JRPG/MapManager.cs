@@ -31,6 +31,17 @@ namespace JRPGPlayerDemo
                 { 1, "Assets/wall.png" }
             };
 
+            AnimatedTiles[2] = new AnimatedTileDefinition
+            {
+                Frames = new[] {
+                "Assets/water1.png",
+                "Assets/water2.png",
+                "Assets/water3.png",
+                "Assets/water4.png"
+                },
+                FrameDuration = 0.2
+            };
+
             ObjectDefinitions[1] = new ObjectDefinition
             {
                 SpritePath = "C:\\git\\jrpg\\JRPG\\Assets\\tree.png",

@@ -23,5 +23,23 @@
     "IsWalkable": true,
     "Sprite": "Assets/floor.png",
     "TriggerType": "Battle"
+  },
+  "4": {
+    "Name": "Grass1",
+    "IsWalkable": true,
+    "Sprite": "Assets/Grass1.png",
+    "TriggerType": "None"
+  },
+  "5": {
+    "Name": "Grass2",
+    "IsWalkable": true,
+    "Sprite": "Assets/Grass2.png",
+    "TriggerType": "None"
+  },
+  "6": {
+    "Name": "Grass3",
+    "IsWalkable": true,
+    "Sprite": "Assets/Grass3.png",
+    "TriggerType": "None"
   }
 }

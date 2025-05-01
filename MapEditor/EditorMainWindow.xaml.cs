@@ -6,7 +6,6 @@ using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using System.Windows.Media;
-using System.Linq;
 using System.Collections.Generic;
 using JRPG.Core.Maps.Models;
 
@@ -45,7 +44,10 @@ namespace MapEditor
         {
             //TODO::Change That
             "C:\\git\\jrpg\\JRPG\\Assets\\floor.png",
-            "C:\\git\\jrpg\\JRPG\\Assets\\wall.png"
+            "C:\\git\\jrpg\\JRPG\\Assets\\wall.png",
+            "C:\\git\\jrpg\\JRPG\\Assets\\Grass1.png",
+            "C:\\git\\jrpg\\JRPG\\Assets\\Grass2.png",
+            "C:\\git\\jrpg\\JRPG\\Assets\\Grass3.png"
         };
 
         private readonly ObjectDefinition[] objectDefinitions = new ObjectDefinition[]
@@ -56,6 +58,28 @@ namespace MapEditor
                 SpritePath = "C:\\git\\jrpg\\JRPG\\Assets\\tree.png",
                 HasCollision = true,
                 CollisionBox = new Rect(8, 24, 48, 32) // blocks bottom half
+            },
+            new ObjectDefinition
+            {
+                SpritePath = "C:\\git\\jrpg\\JRPG\\Assets\\Tree2.png",
+                HasCollision = true,
+                CollisionBox = new Rect(8, 24, 48, 32) // blocks bottom half
+            },
+            new ObjectDefinition
+            {
+                SpritePath = "C:\\git\\jrpg\\JRPG\\Assets\\Tree3.png",
+                HasCollision = true,
+                CollisionBox = new Rect(8, 24, 48, 32) // blocks bottom half
+            },
+            new ObjectDefinition
+            {
+                SpritePath = "C:\\git\\jrpg\\JRPG\\Assets\\Leaf.png",
+                HasCollision = false,
+            },
+            new ObjectDefinition
+            {
+                SpritePath = "C:\\git\\jrpg\\JRPG\\Assets\\Leafs.png",
+                HasCollision = false,
             }
         };
 

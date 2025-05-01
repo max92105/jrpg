@@ -63,6 +63,10 @@ namespace JRPG
         public void OnKeyDown(Key key) => keysDown.Add(key);
         public void OnKeyUp(Key key) => keysDown.Remove(key);
 
+        //for fast rendering
+        private VisualHost mapVisualHost = new VisualHost();
+        private DrawingVisual mapVisual = new DrawingVisual();
+
         public Game(Canvas canvas)
         {
             this.canvas = canvas;
@@ -71,7 +75,6 @@ namespace JRPG
 
             playerBitmap = new BitmapImage(new Uri(System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Assets/player.png")));
 
-            // Preload all animation frames
             playerFrames = new CroppedBitmap[4, totalAnimationFrames];
             for (int dir = 0; dir < 4; dir++)
             {
@@ -89,7 +92,23 @@ namespace JRPG
             canvas.Width = SystemParameters.PrimaryScreenWidth;
             canvas.Height = SystemParameters.PrimaryScreenHeight;
 
+            var root = (Grid)Application.Current.MainWindow.FindName("RootGrid");
+
+            mapVisual = new DrawingVisual();
+            mapVisualHost = new VisualHost();
+            mapVisualHost.SetVisual(mapVisual);
+
+            mapVisualHost.Width = canvas.ActualWidth;
+            mapVisualHost.Height = canvas.ActualHeight;
+            Canvas.SetLeft(mapVisualHost, 0); // just in case it needs it
+            Canvas.SetTop(mapVisualHost, 0);
+
+            // Instead of: canvas.Children.Insert(0, mapVisualHost);
+            root.Children.Insert(0, mapVisualHost); // Put behind everything
+
             canvas.Children.Add(playerImageControl);
+
+            RedrawMapVisual();  // Initial draw
         }
 
         public void LoadFromFile(String currentMapFile)
@@ -140,7 +159,6 @@ namespace JRPG
                         int tileX = (int)Math.Floor(playerX);
                         int tileY = (int)Math.Floor(playerY);
 
-                        // Only trigger if player stepped on a new trigger tile
                         if ((tileX != lastTriggeredX || tileY != lastTriggeredY))
                         {
                             var tile = map.GetTileTrigger(tileX, tileY);
@@ -152,7 +170,6 @@ namespace JRPG
                             }
                         }
 
-                        // If no trigger under the player, clear last triggered position
                         if (map.GetTileTrigger(tileX, tileY) == null || map.GetTileTrigger(tileX, tileY)?.TriggerType == TileTriggerType.None)
                         {
                             lastTriggeredX = -1;
@@ -190,6 +207,8 @@ namespace JRPG
             double easing = 0.35;
             cameraX += (targetX - cameraX) * easing;
             cameraY += (targetY - cameraY) * easing;
+
+            RedrawMapVisual();
         }
 
         public void Render()
@@ -197,98 +216,6 @@ namespace JRPG
             for (int i = canvas.Children.Count - 1; i >= 0; i--)
                 if (canvas.Children[i] != playerImageControl)
                     canvas.Children.RemoveAt(i);
-
-            int startX = (int)Math.Floor(cameraX);
-            int startY = (int)Math.Floor(cameraY);
-
-            int tilesVisibleX = (int)Math.Ceiling(canvas.ActualWidth / tileSize);
-            int tilesVisibleY = (int)Math.Ceiling(canvas.ActualHeight / tileSize);
-
-            for (int y = 0; y < tilesVisibleY + 2; y++)
-            {
-                for (int x = 0; x < tilesVisibleX + 2; x++)
-                { 
-                    int mapX = x + startX;
-                    int mapY = y + startY;
-
-                    if (mapX < 0 || mapY < 0 || mapX >= map.Width || mapY >= map.Height)
-                        continue;
-
-                    int tileId = map.Tiles[mapX, mapY];
-                    string spritePath = map.GetTileSprite(tileId);
-
-                    if (!string.IsNullOrEmpty(spritePath))
-                    {
-                        var tile = new Image
-                        {
-                            Width = tileSize,
-                            Height = tileSize,
-                            Source = new BitmapImage(new Uri(System.IO.Path.Combine(Directory.GetCurrentDirectory(), spritePath)))
-                        };
-
-                        double mapDrawX = (mapX - cameraX) * tileSize;
-                        double mapDrawY = (mapY - cameraY) * tileSize;
-
-                        Canvas.SetLeft(tile, mapDrawX);
-                        Canvas.SetTop(tile, mapDrawY);
-
-                        canvas.Children.Add(tile);
-                    }
-                }
-            }
-
-            foreach (var obj in map.PlacedObjects)
-            {
-                if (!map.ObjectDefinitions.TryGetValue(obj.Id, out var def)) continue;
-                if (string.IsNullOrEmpty(def.SpritePath)) continue;
-
-                double tileDrawX = obj.X - 0.5 - cameraX;
-                double tileDrawY = obj.Y - 0.5 - cameraY;
-
-                double objectVisibleX = canvas.ActualWidth / tileSize;
-                double objectVisibleY = canvas.ActualHeight / tileSize;
-
-                if (tileDrawX < -1 || tileDrawX > objectVisibleX + 1 ||
-                    tileDrawY < -1 || tileDrawY > objectVisibleY + 1)
-                {
-                    continue; // skip if outside view
-                }
-
-                var image = new Image
-                {
-                    Width = tileSize,
-                    Height = tileSize,
-                    Source = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), def.SpritePath)))
-                };
-
-                // Place image so its center is at obj.X/Y
-                double screenX = (obj.X - 0.5 - cameraX) * tileSize;
-                double screenY = (obj.Y - 0.5 - cameraY) * tileSize;
-
-                Canvas.SetLeft(image, screenX);
-                Canvas.SetTop(image, screenY);
-                Canvas.SetZIndex(image, 5); // just above tiles, below player
-                canvas.Children.Add(image);
-
-                if (def.CollisionBox is Rect box)
-                {
-                    var rect = new System.Windows.Shapes.Rectangle
-                    {
-                        Width = box.Width,
-                        Height = box.Height,
-                        Stroke = Brushes.Red,
-                        StrokeThickness = 1
-                    };
-
-                    double colX = screenX + box.X;
-                    double colY = screenY + box.Y;
-
-                    Canvas.SetLeft(rect, colX);
-                    Canvas.SetTop(rect, colY);
-                    Canvas.SetZIndex(rect, 100);
-                    canvas.Children.Add(rect);
-                }
-            }
 
             playerImageControl.Source = playerFrames[(int)playerDirection, animationFrame];
 
@@ -306,6 +233,55 @@ namespace JRPG
             Canvas.SetTop(playerImageControl, drawY);
 
             Canvas.SetZIndex(playerImageControl, 10);
+        }
+
+        private void RedrawMapVisual()
+        {
+            using (var dc = mapVisual.RenderOpen())
+            {
+                int tilesVisibleX = (int)Math.Ceiling(canvas.ActualWidth / tileSize);
+                int tilesVisibleY = (int)Math.Ceiling(canvas.ActualHeight / tileSize);
+                int startX = (int)Math.Floor(cameraX);
+                int startY = (int)Math.Floor(cameraY);
+
+                for (int y = 0; y < tilesVisibleY + 2; y++)
+                {
+                    for (int x = 0; x < tilesVisibleX + 2; x++)
+                    {
+                        int mapX = x + startX;
+                        int mapY = y + startY;
+
+                        if (mapX < 0 || mapY < 0 || mapX >= map.Width || mapY >= map.Height)
+                            continue;
+
+                        int tileId = map.Tiles[mapX, mapY];
+                        string spritePath = map.GetTileSprite(tileId);
+                        if (string.IsNullOrEmpty(spritePath)) continue;
+
+                        var img = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), spritePath)));
+                        dc.DrawImage(img, new Rect((mapX - cameraX) * tileSize, (mapY - cameraY) * tileSize, tileSize, tileSize));
+                    }
+                }
+
+                foreach (var obj in map.PlacedObjects)
+                {
+                    if (!map.ObjectDefinitions.TryGetValue(obj.Id, out var def)) continue;
+                    if (string.IsNullOrEmpty(def.SpritePath)) continue;
+
+                    double tileDrawX = obj.X - 0.5 - cameraX;
+                    double tileDrawY = obj.Y - 0.5 - cameraY;
+
+                    double tilesVisibleXf = canvas.ActualWidth / tileSize;
+                    double tilesVisibleYf = canvas.ActualHeight / tileSize;
+
+                    if (tileDrawX < -1 || tileDrawX > tilesVisibleXf + 1 ||
+                        tileDrawY < -1 || tileDrawY > tilesVisibleYf + 1)
+                        continue;
+
+                    var img = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), def.SpritePath)));
+                    dc.DrawImage(img, new Rect(tileDrawX * tileSize, tileDrawY * tileSize, tileSize, tileSize));
+                }
+            }
         }
 
         private bool CanMoveTo(double x, double y)

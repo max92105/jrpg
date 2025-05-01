@@ -3,11 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows;
-using JRPG;
 using JRPG.Core.Enums;
 using JRPG.Core.Maps.Models;
 using JRPG.Core.Models;
-using JRPG.Enums;
 
 namespace JRPGPlayerDemo
 {
@@ -21,6 +19,7 @@ namespace JRPGPlayerDemo
 
         public List<PlacedObject> PlacedObjects { get; set; } = new List<PlacedObject>();
         public Dictionary<int, ObjectDefinition> ObjectDefinitions { get; set; } = new Dictionary<int, ObjectDefinition>();
+        public Dictionary<int, AnimatedTileDefinition> AnimatedTiles = new Dictionary<int, AnimatedTileDefinition>();
 
         public Map()
         {
@@ -81,6 +80,30 @@ namespace JRPGPlayerDemo
                     for (int x = 0; x < line.Length; x++)
                         Tiles[x, y] = int.Parse(line[x].ToString());
                     y++;
+                }
+                else if (mode == 2) // TRIGGERS
+                {
+                    string[] parts = line.Split(':');
+                    string[] coords = parts[0].Split(',');
+                    int xCoord = int.Parse(coords[0]);
+                    int yCoord = int.Parse(coords[1]);
+
+                    Enum.TryParse(parts[1], out TileTriggerType trigger);
+                    string data = parts[2];
+
+                    if (parts.Length == 4)
+                    {
+                        data = data + ":" + parts[3];
+                    }
+
+                    TileTypes[xCoord, yCoord] = new TileType
+                    {
+                        Name = trigger.ToString(),
+                        IsWalkable = true,
+                        Sprite = GetTileSprite(0),
+                        TriggerType = trigger,
+                        TriggerData = data
+                    };
                 }
                 else if (mode == 3) // OBJECTS
                 {

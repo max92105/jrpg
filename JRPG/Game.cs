@@ -1,11 +1,13 @@
 ﻿using JRPG.Core.Enums;
 using JRPG.Core.Maps;
+using JRPG.Core.Maps.Models;
 using JRPG.Core.Models;
 using JRPG.Enums;
 using JRPGPlayerDemo;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -53,10 +55,10 @@ namespace JRPG
         private int lastTriggeredY = -1;
 
         private DateTime lastFrameTime = DateTime.Now;
-        private Map map;
+        private MapManager mapManager;
 
         //public to be able to save
-        public string currentMapFile = "test1.map";
+        public string currentMapFile = "Maps/start.json";
 
         private HashSet<Key> keysDown = new HashSet<Key>();
 
@@ -74,8 +76,8 @@ namespace JRPG
         public Game(Canvas canvas)
         {
             this.canvas = canvas;
-            map = new Map();
-            map.LoadFromFile(currentMapFile);
+            mapManager = new MapManager();
+            mapManager.LoadFromFile(currentMapFile);
 
             playerBitmap = new BitmapImage(new Uri(System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Assets/player.png")));
 
@@ -107,7 +109,6 @@ namespace JRPG
             Canvas.SetLeft(mapVisualHost, 0); // just in case it needs it
             Canvas.SetTop(mapVisualHost, 0);
 
-            // Instead of: canvas.Children.Insert(0, mapVisualHost);
             root.Children.Insert(0, mapVisualHost); // Put behind everything
 
             canvas.Children.Add(playerImageControl);
@@ -117,7 +118,7 @@ namespace JRPG
 
         public void LoadFromFile(String currentMapFile)
         {
-            map.LoadFromFile(currentMapFile);
+            mapManager.LoadFromFile(currentMapFile);
         }
 
         public void Update()
@@ -152,8 +153,8 @@ namespace JRPG
                     double newX = playerX + velocityX * deltaTime;
                     double newY = playerY + velocityY * deltaTime;
 
-                    newX = Clamp(newX, playerRadius, map.Width - playerRadius);
-                    newY = Clamp(newY, playerRadius, map.Height - playerRadius);
+                    newX = Clamp(newX, playerRadius, mapManager.Width - playerRadius);
+                    newY = Clamp(newY, playerRadius, mapManager.Height - playerRadius);
 
                     if (CanMoveTo(newX, newY))
                     {
@@ -165,16 +166,16 @@ namespace JRPG
 
                         if ((tileX != lastTriggeredX || tileY != lastTriggeredY))
                         {
-                            var tile = map.GetTileTrigger(tileX, tileY);
-                            if (tile != null && tile.TriggerType != TileTriggerType.None)
+                            var tileTrigger = mapManager.GetTileTrigger(tileX, tileY);
+                            if (tileTrigger != null && tileTrigger.TileTriggerType != TileTriggerType.None)
                             {
-                                HandleTileTrigger(tile);
+                                HandleTileTrigger(tileTrigger);
                                 lastTriggeredX = tileX;
                                 lastTriggeredY = tileY;
                             }
                         }
 
-                        if (map.GetTileTrigger(tileX, tileY) == null || map.GetTileTrigger(tileX, tileY)?.TriggerType == TileTriggerType.None)
+                        if (mapManager.GetTileTrigger(tileX, tileY) == null || mapManager.GetTileTrigger(tileX, tileY)?.TileTriggerType == TileTriggerType.None)
                         {
                             lastTriggeredX = -1;
                             lastTriggeredY = -1;
@@ -205,15 +206,15 @@ namespace JRPG
             double targetX = playerX - tilesVisibleX / 2.0;
             double targetY = playerY - tilesVisibleY / 2.0;
 
-            if (map.Width > tilesVisibleX)
-                targetX = Clamp(targetX, 0, map.Width - tilesVisibleX);
+            if (mapManager.Width > tilesVisibleX)
+                targetX = Clamp(targetX, 0, mapManager.Width - tilesVisibleX);
             else
-                targetX = (map.Width - tilesVisibleX) / 2.0;
+                targetX = (mapManager.Width - tilesVisibleX) / 2.0;
 
-            if (map.Height > tilesVisibleY)
-                targetY = Clamp(targetY, 0, map.Height - tilesVisibleY);
+            if (mapManager.Height > tilesVisibleY)
+                targetY = Clamp(targetY, 0, mapManager.Height - tilesVisibleY);
             else
-                targetY = (map.Height - tilesVisibleY) / 2.0;
+                targetY = (mapManager.Height - tilesVisibleY) / 2.0;
 
             double easing = 0.35;
             cameraX += (targetX - cameraX) * easing;
@@ -250,11 +251,14 @@ namespace JRPG
         {
             using (var dc = mapVisual.RenderOpen())
             {
+                double time = DateTime.Now.TimeOfDay.TotalSeconds;
+
                 int tilesVisibleX = (int)Math.Ceiling(canvas.ActualWidth / MapConstant.TileSize);
                 int tilesVisibleY = (int)Math.Ceiling(canvas.ActualHeight / MapConstant.TileSize);
                 int startX = (int)Math.Floor(cameraX);
                 int startY = (int)Math.Floor(cameraY);
 
+                //Rendering Tiles
                 for (int y = 0; y < tilesVisibleY + 2; y++)
                 {
                     for (int x = 0; x < tilesVisibleX + 2; x++)
@@ -262,47 +266,52 @@ namespace JRPG
                         int mapX = x + startX;
                         int mapY = y + startY;
 
-                        if (mapX < 0 || mapY < 0 || mapX >= map.Width || mapY >= map.Height)
+                        if (mapX < 0 || mapY < 0 || mapX >= mapManager.Width || mapY >= mapManager.Height)
                             continue;
 
-                        int tileId = map.Tiles[mapX, mapY];
-                        string spritePath = map.GetTileSprite(tileId);
-                        if (string.IsNullOrEmpty(spritePath)) continue;
+                        int tileId = mapManager.CurrentMap.GetTileIdAt(mapX, mapY);
+                        if (!mapManager.CurrentMap.TileDefinitions.TryGetValue(tileId, out var def)) continue;
 
-                        var img = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), spritePath)));
-                        dc.DrawImage(img, new Rect((mapX - cameraX) * MapConstant.TileSize, (mapY - cameraY) * MapConstant.TileSize, MapConstant.TileSize, MapConstant.TileSize));
+                        ImageSource imgSource = null;
+
+                        if (def.Frames != null && def.Frames.Length > 0)
+                        {
+                            int frameIndex = (int)(time / def.FrameDuration) % def.Frames.Length;
+                            var framePath = def.Frames[frameIndex];
+                            imgSource = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), framePath)));
+                        }
+                        else if (!string.IsNullOrEmpty(def.Sprite))
+                        {
+                            imgSource = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), def.Sprite)));
+                        }
+
+                        if (imgSource != null)
+                        {
+                            double drawX = (mapX - cameraX) * MapConstant.TileSize;
+                            double drawY = (mapY - cameraY) * MapConstant.TileSize;
+
+                            dc.DrawImage(imgSource, new Rect(drawX, drawY, MapConstant.TileSize, MapConstant.TileSize));
+                        }
                     }
                 }
 
-                foreach (var obj in map.PlacedObjects)
+                //Rendering Objects
+                foreach (var obj in mapManager.GetObjects())
                 {
-                    if (!map.ObjectDefinitions.TryGetValue(obj.Id, out var def)) continue;
+                    if (!mapManager.CurrentMap.ObjectDefinitions.TryGetValue(obj.Id, out var def)) continue;
                     if (string.IsNullOrEmpty(def.SpritePath)) continue;
 
-                    double tileDrawX = obj.X - 0.5 - cameraX;
-                    double tileDrawY = obj.Y - 0.5 - cameraY;
+                    double screenX = (obj.X - 0.5 - cameraX) * MapConstant.TileSize;
+                    double screenY = (obj.Y - 0.5 - cameraY) * MapConstant.TileSize;
 
-                    double tilesVisibleXf = canvas.ActualWidth / MapConstant.TileSize;
-                    double tilesVisibleYf = canvas.ActualHeight / MapConstant.TileSize;
-
-                    if (tileDrawX < -1 || tileDrawX > tilesVisibleXf + 1 ||
-                        tileDrawY < -1 || tileDrawY > tilesVisibleYf + 1)
+                    if (screenX + MapConstant.TileSize < 0 || screenX > canvas.ActualWidth ||
+                        screenY + MapConstant.TileSize < 0 || screenY > canvas.ActualHeight)
                         continue;
 
-                    if (map.AnimatedTiles.TryGetValue(obj.Id, out var anim))
-                    {
-                        int frameCount = anim.Frames.Length;
-                        int frameIndex = (tileAnimationFrame % frameCount);
-                        var framePath = anim.Frames[frameIndex];
-                        var img = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), framePath)));
-                        dc.DrawImage(img, new Rect((tileDrawX - cameraX) * MapConstant.TileSize, (tileDrawY - cameraY) * MapConstant.TileSize, MapConstant.TileSize, MapConstant.TileSize));
-                    }
-                    else
-                    {
-                        var img = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), def.SpritePath)));
-                        dc.DrawImage(img, new Rect((tileDrawX - cameraX) * MapConstant.TileSize, (tileDrawY - cameraY) * MapConstant.TileSize, MapConstant.TileSize, MapConstant.TileSize));
-                    }
-                   
+                    var img = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), def.SpritePath)));
+                    Rect rect = new Rect(screenX, screenY, MapConstant.TileSize, MapConstant.TileSize);
+                    
+                    dc.DrawImage(img, new Rect(screenX, screenY, MapConstant.TileSize, MapConstant.TileSize));
                 }
             }
         }
@@ -314,30 +323,33 @@ namespace JRPG
             double top = y - playerRadius;
             double bottom = y + playerRadius;
 
-            // Tile-level collision
+            //Tile Collision
             for (int ty = (int)Math.Floor(top); ty <= (int)Math.Floor(bottom); ty++)
             {
                 for (int tx = (int)Math.Floor(left); tx <= (int)Math.Floor(right); tx++)
                 {
-                    if (!map.IsWalkable(tx, ty))
+                    if (tx < 0 || ty < 0 || tx >= mapManager.Width || ty >= mapManager.Height)
+                        return false;
+
+                    int tileId = mapManager.CurrentMap.GetTileIdAt(tx, ty);
+                    if (!mapManager.CurrentMap.TileDefinitions.TryGetValue(tileId, out var def) || !def.IsWalkable)
                         return false;
                 }
             }
 
-            // Object-layer collision (pixel-precise)
-            foreach (var obj in map.PlacedObjects) // <-- this list should be parsed from .map file
+            //Object Collision
+            foreach (var obj in mapManager.GetObjects())
             {
-                if (!map.ObjectDefinitions.TryGetValue(obj.Id, out var def)) continue;
+                if (!mapManager.CurrentMap.ObjectDefinitions.TryGetValue(obj.Id, out var def)) continue;
                 if (!def.HasCollision || def.CollisionBox == null) continue;
 
-                // Convert the object's collision box from relative (within tile) to world position in tile space
                 Rect box = def.CollisionBox.Value;
+
                 double worldLeft = obj.X - 0.5 + (box.X / MapConstant.TileSize);
                 double worldTop = obj.Y - 0.5 + (box.Y / MapConstant.TileSize);
                 double worldRight = worldLeft + (box.Width / MapConstant.TileSize);
                 double worldBottom = worldTop + (box.Height / MapConstant.TileSize);
 
-                // Check overlap with player collision area
                 if (right > worldLeft && left < worldRight &&
                     bottom > worldTop && top < worldBottom)
                 {
@@ -348,7 +360,7 @@ namespace JRPG
             return true;
         }
 
-        private void HandleTileTrigger(TileDefinition tile)
+        private void HandleTileTrigger(TileTrigger tile)
         {
             //isPaused = true;
 

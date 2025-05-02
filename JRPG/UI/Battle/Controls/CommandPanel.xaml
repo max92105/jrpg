@@ -42,10 +42,40 @@
 
     <Grid Background="#111">
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,10">
-            <Button Content="⚔ Attack" Style="{StaticResource CommandButtonStyle}" Click="OnCommandClick"/>
-            <Button Content="✨ Skill" Style="{StaticResource CommandButtonStyle}" Click="OnCommandClick"/>
-            <Button Content="🧪 Item" Style="{StaticResource CommandButtonStyle}" Click="OnCommandClick"/>
-            <Button Content="🏃 Run" Style="{StaticResource CommandButtonStyle}" Click="OnCommandClick"/>
+            <Button Tag="Attack" Click="Command_Click" Style="{StaticResource CommandButtonStyle}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Name="img_Attack" Width="32" Height="32" />
+                    <TextBlock Text="Attack" Foreground="White" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <Button Tag="Defend" Click="Command_Click" Style="{StaticResource CommandButtonStyle}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Name="img_Defend" Width="32" Height="32" />
+                    <TextBlock Text="Defend" Foreground="White" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <Button Tag="Skill" Click="Command_Click" Style="{StaticResource CommandButtonStyle}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Name="img_Skill" Width="32" Height="32" />
+                    <TextBlock Text="Skill" Foreground="White" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <Button Tag="Item" Click="Command_Click" Style="{StaticResource CommandButtonStyle}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Name="img_Item" Width="32" Height="32" />
+                    <TextBlock Text="Item" Foreground="White" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+
+            <Button Tag="Run" Click="Command_Click" Style="{StaticResource CommandButtonStyle}">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Image Name="img_Run" Width="32" Height="32" />
+                    <TextBlock Text="Run" Foreground="White" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
     </Grid>
 </UserControl>

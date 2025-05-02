@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
+using JRPG.Core.Utils;
 
 namespace JRPG.UI.Battle.Controls
 {
@@ -14,15 +16,27 @@ namespace JRPG.UI.Battle.Controls
         public CommandPanel()
         {
             InitializeComponent();
+            InitializeCommandPanelIcons();
         }
 
-        private void OnCommandClick(object sender, RoutedEventArgs e)
+        private void InitializeCommandPanelIcons()
         {
-            if (sender is Button btn)
+            SetButtonIcon(img_Attack, "Attack.png");
+            SetButtonIcon(img_Defend, "Defend.png");
+            SetButtonIcon(img_Skill, "Skill.png");
+            SetButtonIcon(img_Item, "Item.png");
+            SetButtonIcon(img_Run, "Run.png");
+        }
+
+        private void SetButtonIcon(Image icon, string file)
+        {
+            icon.Source = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath(file)));
+        }
+
+        private void Command_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string command)
             {
-                string command = btn.Content.ToString();
-                if (command.Contains(" ")) 
-                    command = command.Split(' ')[1];
                 OnCommandSelected?.Invoke(command);
             }
         }

@@ -333,6 +333,7 @@ namespace JRPG.UI.Battle
             switch (command)
             {
                 case "Attack": AttackButton_Click(null, null); break;
+                case "Defend": DefendButton_Click(null, null); break;
                 case "Skill": SkillButton_Click(null, null); break;
                 case "Item": UseItemButton_Click(null, null); break;
                 case "Run": RunButton_Click(null, null); break;

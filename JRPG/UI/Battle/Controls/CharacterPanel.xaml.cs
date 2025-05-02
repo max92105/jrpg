@@ -23,9 +23,9 @@ namespace JRPG.UI.Battle.Controls
         {
             set
             {
-                if (!string.IsNullOrEmpty(value) && File.Exists(AssetPathResolver.GetPathPortrait(value)))
+                if (!string.IsNullOrEmpty(value) && File.Exists(AssetPathResolver.GetPortraitPath(value)))
                 {
-                    PortraitImage.Source = new BitmapImage(new Uri(AssetPathResolver.GetPathPortrait(value)));
+                    PortraitImage.Source = new BitmapImage(new Uri(AssetPathResolver.GetPortraitPath(value)));
                 }
             }
         }

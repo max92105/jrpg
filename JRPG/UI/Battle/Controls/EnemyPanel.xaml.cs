@@ -23,9 +23,9 @@ namespace JRPG.UI.Battle.Controls
             EnemyHPBar.Maximum = enemy.MaxHP;
             EnemyHPBar.Value = enemy.CurrentHP;
 
-            if (!string.IsNullOrEmpty(enemy.PortraitPath) && File.Exists(AssetPathResolver.GetPathPortrait(enemy.PortraitPath)))
+            if (!string.IsNullOrEmpty(enemy.PortraitPath) && File.Exists(AssetPathResolver.GetPortraitPath(enemy.PortraitPath)))
             {
-                PortraitImage.Source = new BitmapImage(new Uri(AssetPathResolver.GetPathPortrait(enemy.PortraitPath)));
+                PortraitImage.Source = new BitmapImage(new Uri(AssetPathResolver.GetPortraitPath(enemy.PortraitPath)));
             }
 
             Background = isSelected

@@ -1,13 +1,12 @@
 ﻿using JRPG.Core.Enums;
 using JRPG.Core.Maps;
-using JRPG.Core.Maps.Models;
-using JRPG.Core.Models;
+using JRPG.Core.Triggers.Models;
+using JRPG.Core.Utils;
 using JRPG.Enums;
 using JRPGPlayerDemo;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Security.Cryptography;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -41,7 +40,7 @@ namespace JRPG
 
         //public to be able to save
         public double playerX = 10.0;
-        public double playerY = 10.0;
+        public double playerY = 3.0;
 
         private double velocityX = 0;
         private double velocityY = 0;
@@ -58,7 +57,7 @@ namespace JRPG
         private MapManager mapManager;
 
         //public to be able to save
-        public string currentMapFile = "Maps/start.json";
+        public string currentMapFile = "start.json";
 
         private HashSet<Key> keysDown = new HashSet<Key>();
 
@@ -79,7 +78,7 @@ namespace JRPG
             mapManager = new MapManager();
             mapManager.LoadFromFile(currentMapFile);
 
-            playerBitmap = new BitmapImage(new Uri(System.IO.Path.Combine(Directory.GetCurrentDirectory(), "Assets/player.png")));
+            playerBitmap = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), "player.png")));
 
             playerFrames = new CroppedBitmap[4, totalAnimationFrames];
             for (int dir = 0; dir < 4; dir++)
@@ -167,7 +166,7 @@ namespace JRPG
                         if ((tileX != lastTriggeredX || tileY != lastTriggeredY))
                         {
                             var tileTrigger = mapManager.GetTileTrigger(tileX, tileY);
-                            if (tileTrigger != null && tileTrigger.TileTriggerType != TileTriggerType.None)
+                            if (tileTrigger != null && tileTrigger.Type != TriggerType.None)
                             {
                                 HandleTileTrigger(tileTrigger);
                                 lastTriggeredX = tileX;
@@ -175,7 +174,7 @@ namespace JRPG
                             }
                         }
 
-                        if (mapManager.GetTileTrigger(tileX, tileY) == null || mapManager.GetTileTrigger(tileX, tileY)?.TileTriggerType == TileTriggerType.None)
+                        if (mapManager.GetTileTrigger(tileX, tileY) == null || mapManager.GetTileTrigger(tileX, tileY)?.Type == TriggerType.None)
                         {
                             lastTriggeredX = -1;
                             lastTriggeredY = -1;
@@ -278,11 +277,11 @@ namespace JRPG
                         {
                             int frameIndex = (int)(time / def.FrameDuration) % def.Frames.Length;
                             var framePath = def.Frames[frameIndex];
-                            imgSource = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), framePath)));
+                            imgSource = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), framePath)));
                         }
                         else if (!string.IsNullOrEmpty(def.Sprite))
                         {
-                            imgSource = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), def.Sprite)));
+                            imgSource = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), def.Sprite)));
                         }
 
                         if (imgSource != null)
@@ -308,7 +307,7 @@ namespace JRPG
                         screenY + MapConstant.TileSize < 0 || screenY > canvas.ActualHeight)
                         continue;
 
-                    var img = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), def.SpritePath)));
+                    var img = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), def.SpritePath)));
                     Rect rect = new Rect(screenX, screenY, MapConstant.TileSize, MapConstant.TileSize);
                     
                     dc.DrawImage(img, new Rect(screenX, screenY, MapConstant.TileSize, MapConstant.TileSize));
@@ -360,58 +359,46 @@ namespace JRPG
             return true;
         }
 
-        private void HandleTileTrigger(TileTrigger tile)
+        private void HandleTileTrigger(Core.Triggers.Models.Trigger trigger)
         {
-            //isPaused = true;
+            isPaused = true;
 
-            //switch (tile.TriggerType)
-            //{
-            //    case TileTriggerType.Warp:
-            //        string[] parts = tile.TriggerData.Split(':');
-            //        string targetMap = parts[0];
-            //        string[] coords = parts[1].Split(',');
-            //        int newX = int.Parse(coords[0]);
-            //        int newY = int.Parse(coords[1]);
+            switch (trigger)
+            {
+                case TriggerWarp warp:
+                    currentMapFile = warp.TargetMap;
+                    mapManager.LoadFromFile(currentMapFile);
+                    playerX = warp.TargetX;
+                    playerY = warp.TargetY;
+                    break;
 
-            //        currentMapFile = targetMap;
-            //        map = new Map();
-            //        map.LoadFromFile(currentMapFile);
-            //        playerX = newX;
-            //        playerY = newY;
-            //        break;
+                case TriggerDialogue dialogue:
+                    var lines = dialogue.Lines ?? new List<string> { "..." };
+                    var portrait = string.IsNullOrEmpty(dialogue.PortraitPath) ? "fighter.png" : dialogue.PortraitPath;
+                    var speaker = string.IsNullOrEmpty(dialogue.SpeakerName) ? "???" : dialogue.SpeakerName;
 
-            //    case TileTriggerType.Battle:
-            //        Application.Current.Dispatcher.Invoke(() =>
-            //        {
-            //            ((MainWindow)Application.Current.MainWindow).StartBattle();
-            //        });
-            //        break;
+                    ((MainWindow)Application.Current.MainWindow).ShowDialogue(
+                        lines,
+                        portrait,
+                        speaker,
+                        () =>
+                        {
+                            keysDown.Clear();
+                            isPaused = false;
+                        });
+                    return; // Don't resume yet; callback will unpause.
 
-            //    case TileTriggerType.Dialogue:
-            //        isPaused = true;
-            //        ((MainWindow)Application.Current.MainWindow).ShowDialogue(new List<string>
-            //        {
-            //            tile.TriggerData,
-            //            "Long ago, our ancestors built this sacred tree.",
-            //            "You must protect it now, young one."
-            //        }, "Assets/figtherPortrait.png", "Fighter", () =>
-            //        {
-            //            keysDown.Clear();
-            //            isPaused = false;
-            //        });
-            //        break;
+                case TriggerItem item:
+                    MessageBox.Show($"You found an item: {item.ItemId}!");
+                    // Optional: remove trigger to make it one-time
+                    break;
 
-            //    case TileTriggerType.Item:
-            //        MessageBox.Show($"You found an item: {tile.TriggerData}!");
-            //        tile.TriggerType = TileTriggerType.None; // One-time use
-            //        break;
+                default:
+                    break;
+            }
 
-            //    case TileTriggerType.Switch:
-            //        break;
-            //}
-
-            //keysDown.Clear();
-            //isPaused = false;
+            keysDown.Clear();
+            isPaused = false;
         }
 
         private int Clamp(int val, int min, int max) => Math.Max(min, Math.Min(max, val));

@@ -1,6 +1,8 @@
 ﻿using JRPG.Core.Maps.Models;
+using JRPG.Core.Triggers.IO;
 using System.IO;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace JRPG.Core.Maps.IO
 {
@@ -9,7 +11,12 @@ namespace JRPG.Core.Maps.IO
         private static readonly JsonSerializerOptions Options = new JsonSerializerOptions()
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = false
+            WriteIndented = false,
+            Converters = 
+            {
+                new JsonStringEnumConverter(),
+                new TriggerJsonConverter() 
+            }
         };
 
         public static void Save(string path, Map map)

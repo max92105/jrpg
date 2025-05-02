@@ -1,4 +1,6 @@
-﻿namespace JRPG.Core.Maps.Models
+﻿using JRPG.Core.Triggers.Models;
+
+namespace JRPG.Core.Maps.Models
 {
     public class Tile
     {
@@ -6,5 +8,6 @@
         public int X { get; set; }
         public int Y { get; set; }
 
+        public Trigger Trigger { get; set; }
     }
 }

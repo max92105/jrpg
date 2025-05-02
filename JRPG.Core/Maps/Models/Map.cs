@@ -11,7 +11,6 @@ namespace JRPG.Core.Maps.Models
         public int Height { get; set; }
 
         public List<Tile> Tiles { get; set; } = new List<Tile>();
-        public List<TileTrigger> Triggers { get; set; } = new List<TileTrigger>();
         public List<PlacedObject> Objects { get; set; } = new List<PlacedObject>();
 
         public Dictionary<int, TileDefinition> TileDefinitions { get; set; } = new Dictionary<int, TileDefinition>();
@@ -20,6 +19,11 @@ namespace JRPG.Core.Maps.Models
         public int GetTileIdAt(int x, int y)
         {
             return Tiles.FirstOrDefault(t => t.X == x && t.Y == y)?.Id ?? 0; // default to 0
+        }
+
+        public Tile GetTileAt(int x, int y)
+        {
+            return Tiles.FirstOrDefault(t => t.X == x && t.Y == y);
         }
 
         public void SetTile(int x, int y, int id)

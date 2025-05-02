@@ -1,6 +1,6 @@
 ﻿namespace JRPG.Core.Enums
 {
-    public enum TileTriggerType
+    public enum TriggerType
     {
         None,
         Warp,

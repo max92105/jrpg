@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using JRPG.Core.Maps.IO;
 using JRPG.Core.Maps.Models;
+using JRPG.Core.Triggers;
+using JRPG.Core.Triggers.Models;
+using JRPG.Core.Utils;
 
 namespace JRPGPlayerDemo
 {
@@ -15,9 +19,9 @@ namespace JRPGPlayerDemo
         public int Width => CurrentMap.Width;
         public int Height => CurrentMap.Height;
 
-        public void LoadFromFile(string filePath)
+        public void LoadFromFile(string file)
         {
-            CurrentMap = MapSerializer.Load(filePath);
+            CurrentMap = MapSerializer.Load(AssetPathResolver.GetPath(Path.Combine("Maps//", file)));
         }
 
         public bool IsWalkable(int x, int y)
@@ -29,9 +33,10 @@ namespace JRPGPlayerDemo
             return CurrentMap.TileDefinitions.TryGetValue(tileId, out var def) ? def.IsWalkable : false;
         }
 
-        public TileTrigger GetTileTrigger(int x, int y)
+        public Trigger GetTileTrigger(int x, int y)
         {
-            return CurrentMap.Triggers.FirstOrDefault(t => t.X == x && t.Y == y);
+            Tile tile = CurrentMap.GetTileAt(x, y);
+            return tile?.Trigger;
         }
 
         public string GetTileSprite(int tileId)

@@ -1,0 +1,32 @@
+﻿{
+  "1": {
+    "SpritePath": "Objects/Tree1.png",
+    "HasCollision": true,
+    "CollisionBox": {
+      "X": 24,
+      "Y": 8,
+      "Width": 32,
+      "Height": 48
+    }
+  },
+  "2": {
+    "SpritePath": "Objects/Tree2.png",
+    "HasCollision": true,
+    "CollisionBox": {
+      "X": 24,
+      "Y": 8,
+      "Width": 32,
+      "Height": 48
+    }
+  },
+  "3": {
+    "SpritePath": "Objects/Tree3.png",
+    "HasCollision": true,
+    "CollisionBox": {
+      "X": 24,
+      "Y": 8,
+      "Width": 32,
+      "Height": 48
+    }
+  }
+}

@@ -13,6 +13,8 @@ using JRPG.Core.Maps;
 using JRPG.Core.Utils;
 using JRPG.Core.Models;
 using System.Collections.Generic;
+using JRPG.Core.Triggers.Models;
+using System.Threading;
 
 namespace MapEditor
 {
@@ -33,8 +35,9 @@ namespace MapEditor
 
         //Options
         private bool showGrid = true;
-        private bool placingObjects = false;
-        private string currentMapName = "New Map";
+        private string currentMapName;
+        private enum EditorMode { Tile, Object, Trigger }
+        private EditorMode currentMode = EditorMode.Tile;
 
         //Zoom
         private double zoom = 1.0;
@@ -53,11 +56,12 @@ namespace MapEditor
             InitializeComponent();
 
             // Load definitions from JSON
-            tileDefinitions = TilesetLoader.Load(Path.Combine(Directory.GetCurrentDirectory(), MapConstant.TilesetJsonPath));
-            objectDefinitions = ObjectSetLoader.Load(Path.Combine(Directory.GetCurrentDirectory(), MapConstant.ObjectSetJsonPath));
+            tileDefinitions = TilesetLoader.Load(AssetPathResolver.GetPath(MapConstant.TilesetJsonPath));
+            objectDefinitions = ObjectSetLoader.Load(AssetPathResolver.GetPath(MapConstant.ObjectSetJsonPath));
 
             map = new Map
             {
+                Name = currentMapName,
                 Width = mapWidth,
                 Height = mapHeight,
                 Tiles = new List<Tile>(),
@@ -81,7 +85,7 @@ namespace MapEditor
                 {
                     Width = MapConstant.TileSize,
                     Height = MapConstant.TileSize,
-                    Source = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), def.Sprite ?? def.Frames?.FirstOrDefault())))
+                    Source = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), def.Sprite ?? def.Frames?.FirstOrDefault())))
                 };
                 var item = new ListBoxItem { Content = img, Tag = kv.Key };
                 TilePalette.Items.Add(item);
@@ -109,7 +113,7 @@ namespace MapEditor
                 {
                     Width = MapConstant.TileSize,
                     Height = MapConstant.TileSize,
-                    Source = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), def.SpritePath)))
+                    Source = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), def.SpritePath)))
                 };
                 var item = new ListBoxItem { Content = img, Tag = kv.Key };
                 ObjectPalette.Items.Add(item);
@@ -132,11 +136,28 @@ namespace MapEditor
             int tileX = (int)Math.Floor(x);
             int tileY = (int)Math.Floor(y);
 
-            if (tileX >= 0 && tileY >= 0 && tileX < mapWidth && tileY < mapHeight)
+            if (tileX >= 0 && tileY >= 0 && tileX < map.Width && tileY < map.Height)
             {
-                if (placingObjects)
+                if (currentMode == EditorMode.Trigger)
+                {
+                    var tile = map.GetTileAt(tileX, tileY);
+                    if (tile == null)
+                    {
+                        tile = new Tile { X = tileX, Y = tileY, Id = 0 };
+                        map.Tiles.Add(tile);
+                    }
+
+                    var triggerEditWindow = new TriggerEditWindow(tile.Trigger);
+                    if (triggerEditWindow.ShowDialog() == true)
+                    {
+                        tile.Trigger = triggerEditWindow.Result;
+                    }
+                }
+
+                if (currentMode == EditorMode.Object)
                     map.Objects.Add(new PlacedObject { Id = selectedObjectId, X = x, Y = y });
-                else
+
+                if (currentMode == EditorMode.Tile)
                     map.SetTile(tileX, tileY, selectedTileId);
 
                 RedrawMap();
@@ -166,12 +187,29 @@ namespace MapEditor
                             {
                                 Width = MapConstant.TileSize,
                                 Height = MapConstant.TileSize,
-                                Source = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), spritePath)))
+                                Source = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetPath(), spritePath)))
                             };
                             Canvas.SetLeft(img, x * MapConstant.TileSize);
                             Canvas.SetTop(img, y * MapConstant.TileSize);
                             MapCanvas.Children.Add(img);
                         }
+                    }
+
+                    var tile = map.GetTileAt(x, y);
+                    if (tile?.Trigger != null)
+                    {
+                        var overlay = new System.Windows.Shapes.Rectangle
+                        {
+                            Width = 10,
+                            Height = 10,
+                            Fill = Brushes.Yellow,
+                            Stroke = Brushes.Black,
+                            StrokeThickness = 1
+                        };
+                        Canvas.SetLeft(overlay, x * MapConstant.TileSize + MapConstant.TileSize - 12);
+                        Canvas.SetTop(overlay, y * MapConstant.TileSize + 2);
+                        Panel.SetZIndex(overlay, 100); // on top
+                        MapCanvas.Children.Add(overlay);
                     }
                 }
             }
@@ -184,7 +222,7 @@ namespace MapEditor
                 {
                     Width = MapConstant.TileSize,
                     Height = MapConstant.TileSize,
-                    Source = new BitmapImage(new Uri(Path.Combine(Directory.GetCurrentDirectory(), def.SpritePath)))
+                    Source = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), def.SpritePath)))
                 };
                 Canvas.SetLeft(img, (obj.X * MapConstant.TileSize) - MapConstant.TileSize / 2);
                 Canvas.SetTop(img, (obj.Y * MapConstant.TileSize) - MapConstant.TileSize / 2);
@@ -236,7 +274,9 @@ namespace MapEditor
             {
                 Filter = "JSON Map (*.json)|*.json",
                 DefaultExt = ".json",
-                Title = "Save Map"
+                Title = "Save Map",
+                InitialDirectory = Path.Combine(AssetPathResolver.GetPath(MapConstant.MapFolderPath)),
+                FileName = currentMapName
             };
 
             if (saveDialog.ShowDialog() == true)
@@ -271,7 +311,8 @@ namespace MapEditor
             var openDialog = new OpenFileDialog
             {
                 Filter = "JSON Map (*.json)|*.json",
-                Title = "Load Map"
+                Title = "Load Map",
+                InitialDirectory = Path.Combine(AssetPathResolver.GetPath(MapConstant.MapFolderPath)),
             };
 
             if (openDialog.ShowDialog() == true)
@@ -315,6 +356,7 @@ namespace MapEditor
         private void NewMap_Click(object sender, RoutedEventArgs e)
         {
             map.Tiles.Clear();
+            map.Objects.Clear();
 
             currentMapName = "New Map";
             MapNameBox.Text = currentMapName;
@@ -335,6 +377,10 @@ namespace MapEditor
                 mapWidth = width;
                 mapHeight = height;
                 map.Tiles = new List<Tile>();
+
+                map.Width = width;
+                map.Height = height;
+
                 RedrawMap();
             }
             else
@@ -375,7 +421,7 @@ namespace MapEditor
 
         private void MapCanvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (placingObjects)
+            if (currentMode == EditorMode.Object)
             {
 
                 var pos = e.GetPosition(MapCanvas);
@@ -384,6 +430,23 @@ namespace MapEditor
                 if (target != null)
                 {
                     map.Objects.Remove(target);
+                    RedrawMap();
+                }
+
+                return;
+            }
+
+            if (currentMode == EditorMode.Trigger)
+            {
+                var pos = e.GetPosition(MapCanvas);
+                int tileX = (int)Math.Floor(pos.X / MapConstant.TileSize);
+                int tileY = (int)Math.Floor(pos.Y / MapConstant.TileSize);
+
+                var tile = map.GetTileAt(tileX, tileY);
+
+                if (tile != null && tile.Trigger != null)
+                {
+                    tile.Trigger = null;
                     RedrawMap();
                 }
 
@@ -402,15 +465,22 @@ namespace MapEditor
 
         private void TileMode_Checked(object sender, RoutedEventArgs e)
         {
-            placingObjects = false;
+            currentMode = EditorMode.Tile;
             ObjectPalette.Visibility = Visibility.Collapsed;
             TilePalette.Visibility = Visibility.Visible;
         }
 
         private void ObjectMode_Checked(object sender, RoutedEventArgs e)
         {
-            placingObjects = true;
+            currentMode = EditorMode.Object;
             ObjectPalette.Visibility = Visibility.Visible;
+            TilePalette.Visibility = Visibility.Collapsed;
+        }
+
+        private void TriggerMode_Checked(object sender, RoutedEventArgs e)
+        {
+            currentMode = EditorMode.Trigger;
+            ObjectPalette.Visibility = Visibility.Collapsed;
             TilePalette.Visibility = Visibility.Collapsed;
         }
 

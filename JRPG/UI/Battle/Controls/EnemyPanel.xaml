@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="JRPG.EnemyPanel"
+﻿<UserControl x:Class="JRPG.UI.Battle.Controls.EnemyPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              Height="120" Width="120">

@@ -88,22 +88,25 @@
     </ApplicationDefinition>
     <Compile Include="BattleManager.cs" />
     <Compile Include="Character.cs" />
-    <Compile Include="UI\Battle\CharacterPanel.xaml.cs">
+    <Compile Include="UI\Battle\Controls\CharacterPanel.xaml.cs">
       <DependentUpon>CharacterPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="CinematicManager.cs" />
+    <Compile Include="UI\Battle\Controls\CommandPanel.xaml.cs">
+      <DependentUpon>CommandPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\Dialogue\DialogueBox.xaml.cs">
       <DependentUpon>DialogueBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="DialogManager.cs" />
     <Compile Include="Enemy.cs" />
-    <Compile Include="UI\Battle\EnemyPanel.xaml.cs">
+    <Compile Include="UI\Battle\Controls\EnemyPanel.xaml.cs">
       <DependentUpon>EnemyPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="Enums\BattleState.cs" />
     <Compile Include="Enums\Direction.cs" />
     <Compile Include="Figther.cs" />
-    <Compile Include="UI\Battle\FloatingText.xaml.cs">
+    <Compile Include="UI\Battle\Controls\FloatingText.xaml.cs">
       <DependentUpon>FloatingText.xaml</DependentUpon>
     </Compile>
     <Compile Include="InventoryItem.cs" />
@@ -113,7 +116,11 @@
       <DependentUpon>BattleUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="VisualHost.cs" />
-    <Page Include="UI\Battle\CharacterPanel.xaml">
+    <Page Include="UI\Battle\Controls\CharacterPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Battle\Controls\CommandPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -121,11 +128,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Battle\EnemyPanel.xaml">
+    <Page Include="UI\Battle\Controls\EnemyPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Battle\FloatingText.xaml">
+    <Page Include="UI\Battle\Controls\FloatingText.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

@@ -5,7 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
-namespace JRPG
+namespace JRPG.UI.Battle.Controls
 {
     /// <summary>
     /// Interaction logic for FloatingText.xaml

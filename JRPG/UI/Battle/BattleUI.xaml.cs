@@ -1,17 +1,13 @@
 ﻿using JRPG.Core.Battles.Enum;
-using JRPG.Core.Utils;
 using JRPG.Enums;
-using System;
+using JRPG.UI.Battle.Controls;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
-namespace JRPG
+namespace JRPG.UI.Battle
 {
     /// <summary>
     /// Interaction logic for UserControl1.xaml
@@ -40,11 +36,7 @@ namespace JRPG
 
         private void UpdateUI()
         {
-            AttackButton.IsEnabled = (battle.State == BattleState.PlayerTurn);
-            DefendButton.IsEnabled = (battle.State == BattleState.PlayerTurn);
-            RunButton.IsEnabled = (battle.State == BattleState.PlayerTurn);
-            UseItemButton.IsEnabled = (battle.State == BattleState.PlayerTurn);
-            SkillButton.IsEnabled = (battle.State == BattleState.PlayerTurn);
+            CommandBox.IsEnabled = (battle.State == BattleState.PlayerTurn);
 
             UpdateCharacterPanel();
             UpdateEnemyPanel();
@@ -171,7 +163,7 @@ namespace JRPG
                     result = battle.PlayerUseSkillOnAlly(skillName, target);
 
                     var index = characters.IndexOf(target);
-                    ShowFloatingText(result, FloatingTextType.Heal, CharacterPanelContainer.Children[index]);
+                    ShowFloatingText("50", FloatingTextType.Heal, CharacterPanelContainer.Children[index]);
                 }
                 else
                 {
@@ -334,6 +326,17 @@ namespace JRPG
             Canvas.SetTop(floating, position.Y - 10);
 
             EffectCanvas.Children.Add(floating);
-        }  
+        }
+
+        private void HandleCommandSelected(string command)
+        {
+            switch (command)
+            {
+                case "Attack": AttackButton_Click(null, null); break;
+                case "Skill": SkillButton_Click(null, null); break;
+                case "Item": UseItemButton_Click(null, null); break;
+                case "Run": RunButton_Click(null, null); break;
+            }
+        }
     }
 }

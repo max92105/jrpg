@@ -1,8 +1,9 @@
-﻿<UserControl x:Class="JRPG.BattleUI"
+﻿<UserControl x:Class="JRPG.UI.Battle.BattleUI"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:controls="clr-namespace:JRPG.UI.Battle.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="800">
 
@@ -49,16 +50,6 @@
         </Grid>
 
         <!-- Actions Area -->
-        <StackPanel Grid.Row="2"
-            Orientation="Horizontal"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            Margin="10">
-            <Button x:Name="AttackButton" Content="Attack" Width="100" Margin="5" Click="AttackButton_Click"/>
-            <Button x:Name="DefendButton" Content="Defend" Width="100" Margin="5" Click="DefendButton_Click"/>
-            <Button x:Name="SkillButton" Content="Skill" Width="100" Margin="5" Click="SkillButton_Click"/>
-            <Button x:Name="UseItemButton" Content="Use Item" Width="100" Margin="5" Click="UseItemButton_Click"/>
-            <Button x:Name="RunButton" Content="Run" Width="100" Margin="5" Click="RunButton_Click"/>
-        </StackPanel>
+        <controls:CommandPanel Grid.Row="2" x:Name="CommandBox" OnCommandSelected="HandleCommandSelected"/>
     </Grid>
 </UserControl>

@@ -88,23 +88,44 @@
     </ApplicationDefinition>
     <Compile Include="BattleManager.cs" />
     <Compile Include="Character.cs" />
+    <Compile Include="UI\Battle\CharacterPanel.xaml.cs">
+      <DependentUpon>CharacterPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CinematicManager.cs" />
-    <Compile Include="DialogueBox.xaml.cs">
+    <Compile Include="UI\Dialogue\DialogueBox.xaml.cs">
       <DependentUpon>DialogueBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="DialogManager.cs" />
     <Compile Include="Enemy.cs" />
+    <Compile Include="UI\Battle\EnemyPanel.xaml.cs">
+      <DependentUpon>EnemyPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Enums\BattleState.cs" />
     <Compile Include="Enums\Direction.cs" />
     <Compile Include="Figther.cs" />
+    <Compile Include="UI\Battle\FloatingText.xaml.cs">
+      <DependentUpon>FloatingText.xaml</DependentUpon>
+    </Compile>
     <Compile Include="InventoryItem.cs" />
     <Compile Include="SaveData.cs" />
     <Compile Include="SaveGameManager.cs" />
-    <Compile Include="BattleUI.xaml.cs">
+    <Compile Include="UI\Battle\BattleUI.xaml.cs">
       <DependentUpon>BattleUI.xaml</DependentUpon>
     </Compile>
     <Compile Include="VisualHost.cs" />
-    <Page Include="DialogueBox.xaml">
+    <Page Include="UI\Battle\CharacterPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Dialogue\DialogueBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Battle\EnemyPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Battle\FloatingText.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -121,7 +142,7 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="BattleUI.xaml">
+    <Page Include="UI\Battle\BattleUI.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

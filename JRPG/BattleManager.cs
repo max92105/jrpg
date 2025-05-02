@@ -18,7 +18,7 @@ namespace JRPG
             this.enemies = enemies;
         }
 
-        public string PlayerAttack(Enemy target)
+        public int PlayerAttack(Enemy target)
         {
             var attacker = players[CurrentPlayerIndex];
 
@@ -33,10 +33,9 @@ namespace JRPG
             if (enemies.All(e => e.CurrentHP <= 0))
             {
                 State = BattleState.Won;
-                return $"{attacker.Name} defeated all enemies!";
             }
 
-            return $"{attacker.Name} attacked {target.Name} for {damage} damage!";
+            return damage;
         }
 
         public string PlayerDefend()

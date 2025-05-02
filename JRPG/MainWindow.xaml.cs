@@ -66,6 +66,7 @@ namespace JRPG
             allCharacters.Add(new Character
             {
                 Name = "Alaric",
+                PortraitFile = "Alaric.png",
                 Class = "Warrior",
                 Level = 10,
                 HP = 230,
@@ -203,9 +204,9 @@ namespace JRPG
             {
                 List<Enemy> enemies = new List<Enemy>()
                 {
-                    new Enemy("Goblin", 40, 10, 2, "Assets/goblin.png"),
-                    new Enemy("Goblin", 40, 10, 2, "Assets/goblin.png"),
-                    new Enemy("Goblin", 40, 10, 2, "Assets/goblin.png")
+                    new Enemy("Goblin", 40, 10, 2, "goblin.png", "goblin.png"),
+                    new Enemy("Goblin", 40, 10, 2, "goblin.png", "goblin.png"),
+                    new Enemy("Goblin", 40, 10, 2, "goblin.png", "goblin.png")
                 };
 
                 var battleUI = new BattleUI(activePartyOrder, enemies, playerInventory);

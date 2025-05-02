@@ -172,6 +172,15 @@ namespace JRPG
                                 lastTriggeredX = tileX;
                                 lastTriggeredY = tileY;
                             }
+                            else 
+                            {
+                                Random random = new Random();
+
+                                if(random.Next(1, 20) == 19)
+                                {
+                                    HandleTileTrigger(new TriggerBattle());
+                                }
+                            }
                         }
 
                         if (mapManager.GetTileTrigger(tileX, tileY) == null || mapManager.GetTileTrigger(tileX, tileY)?.Type == TriggerType.None)
@@ -391,6 +400,13 @@ namespace JRPG
                 case TriggerItem item:
                     MessageBox.Show($"You found an item: {item.ItemId}!");
                     // Optional: remove trigger to make it one-time
+                    break;
+
+                case TriggerBattle battle :
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        ((MainWindow)Application.Current.MainWindow).StartBattle();
+                    });
                     break;
 
                 default:

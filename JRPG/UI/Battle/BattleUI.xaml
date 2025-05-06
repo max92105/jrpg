@@ -15,7 +15,16 @@
         <Canvas x:Name="EffectCanvas" IsHitTestVisible="False" Panel.ZIndex="1000" Width="1920" Height="1080"/>
 
         <!-- Sprite Display Layer -->
-        <Canvas x:Name="SpriteCanvas" Panel.ZIndex="10" Width="1920" Height="1080"/>
+        <Canvas x:Name="SpriteCanvas" Panel.ZIndex="10" Width="1920" Height="1080">
+        </Canvas>
+
+        <!-- Command Box Layer (positioned absolutely) -->
+        <Canvas x:Name="CommandCanvas" Panel.ZIndex="200" Width="1920" Height="1080">
+            <controls:CommandPanel x:Name="CommandBox"
+                           Visibility="Visible"
+                           Panel.ZIndex="200"
+                           OnCommandSelected="HandleCommandSelected" />
+        </Canvas>
 
         <!-- Player Info Panel (Top Right) -->
         <StackPanel x:Name="CharacterPanelContainer"
@@ -25,14 +34,5 @@
                     Margin="0,20,20,0"
                     Panel.ZIndex="100">
         </StackPanel>
-
-        <!-- Command Menu (Floating beside active character) -->
-        <controls:CommandPanel x:Name="CommandBox"
-                               HorizontalAlignment="Left"
-                               VerticalAlignment="Top"
-                               Margin="20"
-                               Visibility="Collapsed"
-                               OnCommandSelected="HandleCommandSelected"
-                               Panel.ZIndex="200"/>
     </Grid>
 </UserControl>

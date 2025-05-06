@@ -5,6 +5,8 @@ using JRPG.Enums;
 using JRPG.UI.Battle.Controls;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -43,7 +45,6 @@ namespace JRPG.UI.Battle
             battle = new BattleManager(characters, enemies);
 
             UpdateUI();
-
             CheckNextState();
         }
 
@@ -51,9 +52,15 @@ namespace JRPG.UI.Battle
         {
             CommandBox.IsEnabled = (battle.State == BattleState.PlayerTurn);
             CommandBox.Visibility = (battle.State == BattleState.PlayerTurn) ? Visibility.Visible : Visibility.Collapsed;
-            UpdateCharacterPanel();
+            UpdateOnlyPLayerUI();
             DrawSprites();
             UpdateTurnOrderDisplay();
+        }
+
+        private void UpdateOnlyPLayerUI()
+        {
+            RefreshPanelsOnly();
+            UpdateCommandBoxPosition();
         }
 
         private void UpdateCharacterPanel()
@@ -77,6 +84,35 @@ namespace JRPG.UI.Battle
             }
         }
 
+        private void UpdateCommandBoxPosition()
+        {
+            if (!battle.CurrentTurn.IsPlayer)
+            {
+                CommandBox.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            var activeEntry = battle.CurrentTurn;
+            object player = (object)activeEntry.Character;
+
+            if (!spriteImages.TryGetValue(player, out var playerImage))
+            {
+                CommandBox.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            // Get the position of the playerImage relative to the SpriteCanvas
+            Point playerPosition = playerImage.TranslatePoint(new Point(0, 0), SpriteCanvas);
+
+            double offsetX = - (playerImage.ActualWidth + 50); // sprite + movement
+            double offsetY = (playerImage.ActualHeight - 300) / 2; // Center vertically
+
+            Canvas.SetLeft(CommandBox, playerPosition.X + offsetX);
+            Canvas.SetTop(CommandBox, playerPosition.Y + offsetY);
+
+            CommandBox.Visibility = Visibility.Visible;
+        }
+
         private void RefreshPanelsOnly()
         {
             CommandBox.IsEnabled = (battle.State == BattleState.PlayerTurn);
@@ -97,7 +133,7 @@ namespace JRPG.UI.Battle
             double verticalSpacing = spriteSize + 20;
 
             // Draw Enemies
-            double enemyBaseY = 20;
+            double enemyBaseY = 120;
             double enemyStartX = 200;
             var aliveEnemies = battle.GetAliveEnemies();
 
@@ -112,8 +148,8 @@ namespace JRPG.UI.Battle
             }
 
             // Draw Players
-            double playerBaseY = 20;
-            double playerStartX = canvasWidth - 200;
+            double playerBaseY = 120;
+            double playerStartX = canvasWidth - (200 + spriteSize);
 
             for (int i = 0; i < characters.Count; i++)
             {
@@ -461,7 +497,7 @@ namespace JRPG.UI.Battle
                 // Only move forward, action comes later
                 AnimateStepForward(() =>
                 {
-                    RefreshPanelsOnly();
+                    UpdateOnlyPLayerUI();
                 });
             }
             else if (battle.State == BattleState.Won)

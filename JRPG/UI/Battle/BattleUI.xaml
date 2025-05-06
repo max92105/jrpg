@@ -10,7 +10,7 @@
 
         <StackPanel x:Name="TurnOrderPanel" Orientation="Horizontal" Grid.Row="0"
             HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10" />
-        
+
         <!-- Effects Layer -->
         <Canvas x:Name="EffectCanvas" IsHitTestVisible="False" Panel.ZIndex="1000" Width="1920" Height="1080"/>
 

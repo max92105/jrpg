@@ -3,6 +3,7 @@ using JRPG.Core.Battles.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using JRPG.UI.Battle;
 
 namespace JRPG
 {
@@ -34,17 +35,21 @@ namespace JRPG
 
             // Later: Sort by initiative or speed
             turnQueue = new Queue<TurnEntry>(allUnits.OrderBy(_ => Guid.NewGuid())); // shuffle for now
+
+            State = CurrentTurn.IsPlayer ? BattleState.PlayerTurn : BattleState.EnemyTurn;
         }
 
         public void AdvanceTurn()
         {
-            var finishedTurn = turnQueue.Dequeue();
-            turnQueue.Enqueue(finishedTurn);
+            do
+            {
+                var current = turnQueue.Dequeue();
+                turnQueue.Enqueue(current);
+            }
+            while ((CurrentTurn.IsPlayer && CurrentTurn.Character.HP <= 0)
+                    || (!CurrentTurn.IsPlayer && CurrentTurn.Enemy.CurrentHP <= 0));
 
-            if (turnQueue.Peek().IsPlayer)
-                State = BattleState.PlayerTurn;
-            else
-                State = BattleState.EnemyTurn;
+            State = CurrentTurn.IsPlayer ? BattleState.PlayerTurn : BattleState.EnemyTurn;
         }
 
         public bool IsBattleOver()

@@ -43,6 +43,8 @@ namespace JRPG.UI.Battle
             battle = new BattleManager(characters, enemies);
 
             UpdateUI();
+
+            CheckNextState();
         }
 
         private void UpdateUI()
@@ -51,7 +53,6 @@ namespace JRPG.UI.Battle
             CommandBox.Visibility = (battle.State == BattleState.PlayerTurn) ? Visibility.Visible : Visibility.Collapsed;
             UpdateCharacterPanel();
             DrawSprites();
-            AnimateTurnIndicator();
             UpdateTurnOrderDisplay();
         }
 
@@ -74,6 +75,14 @@ namespace JRPG.UI.Battle
                 };
                 CharacterPanelContainer.Children.Add(panel);
             }
+        }
+
+        private void RefreshPanelsOnly()
+        {
+            CommandBox.IsEnabled = (battle.State == BattleState.PlayerTurn);
+            CommandBox.Visibility = (battle.State == BattleState.PlayerTurn) ? Visibility.Visible : Visibility.Collapsed;
+            UpdateCharacterPanel();
+            UpdateTurnOrderDisplay();
         }
 
         private void DrawSprites()
@@ -142,36 +151,86 @@ namespace JRPG.UI.Battle
             return image;
         }
 
-        private void AnimateTurnIndicator()
+        private void AnimateStepForward(Action onComplete = null)
         {
             var activeEntry = battle.CurrentTurn;
             object actor = activeEntry.IsPlayer ? (object)activeEntry.Character : activeEntry.Enemy;
 
-            if (spriteOffsets.TryGetValue(actor, out var transform))
+            if (!spriteOffsets.TryGetValue(actor, out var translate))
             {
-                var slide = new DoubleAnimation
-                {
-                    To = activeEntry.IsPlayer ? -50 : 50,
-                    Duration = TimeSpan.FromMilliseconds(300),
-                    AutoReverse = true,
-                    RepeatBehavior = new RepeatBehavior(1)
-                };
-                transform.BeginAnimation(TranslateTransform.XProperty, slide);
+                onComplete?.Invoke();
+                return;
             }
+
+            double target = activeEntry.IsPlayer ? -50 : 50;
+
+            var slideIn = new DoubleAnimation
+            {
+                To = target,
+                Duration = TimeSpan.FromMilliseconds(200),
+                FillBehavior = FillBehavior.Stop
+            };
+
+            slideIn.Completed += (s, e) =>
+            {
+                // ✅ force the final value so that step back animates from correct position
+                translate.X = target;
+                onComplete?.Invoke();
+            };
+
+            translate.BeginAnimation(TranslateTransform.XProperty, slideIn);
+        }
+
+        private void AnimateStepBack(Action onComplete = null)
+        {
+            var activeEntry = battle.CurrentTurn;
+            object actor = activeEntry.IsPlayer ? (object)activeEntry.Character : activeEntry.Enemy;
+
+            if (!spriteOffsets.TryGetValue(actor, out var translate))
+            {
+                onComplete?.Invoke();
+                return;
+            }
+
+            var slideOut = new DoubleAnimation
+            {
+                To = 0,
+                Duration = TimeSpan.FromMilliseconds(200),
+                FillBehavior = FillBehavior.HoldEnd
+            };
+
+            slideOut.Completed += (s, e) =>
+            {
+                translate.X = 0; // ensure reset
+                onComplete?.Invoke();
+            };
+
+            translate.BeginAnimation(TranslateTransform.XProperty, slideOut);
         }
 
         private void UpdateTurnOrderDisplay()
         {
             TurnOrderPanel.Children.Clear();
+
             foreach (var turn in battle.TurnQueue)
             {
+                // ❌ Skip dead characters
+                if (turn.IsPlayer && turn.Character.HP <= 0)
+                    continue;
+
+                // ❌ Skip dead enemies
+                if (!turn.IsPlayer && turn.Enemy.CurrentHP <= 0)
+                    continue;
+
                 var path = turn.IsPlayer ? playerpath : turn.Enemy.PortraitPath;
+
                 var img = new Image
                 {
                     Width = 32,
                     Height = 32,
                     Source = new BitmapImage(new Uri(AssetPathResolver.GetSpritesPath(path)))
                 };
+
                 TurnOrderPanel.Children.Add(img);
             }
         }
@@ -184,26 +243,34 @@ namespace JRPG.UI.Battle
                 return;
             }
 
-            var target = battle.GetAliveEnemies()[selectedEnemyIndex];
-            string result = battle.ExecuteCurrentTurnAction("Attack", target);
+            string result = null;
 
+            var target = battle.GetAliveEnemies()[selectedEnemyIndex];
+
+            result = battle.ExecuteCurrentTurnAction("Attack", target);
             MessageBox.Show(result);
 
-            battle.AdvanceTurn();
-            CheckNextState();
-            UpdateUI();
-
-            selectedEnemyIndex = -1;
+            AnimateStepBack(() =>
+            {
+                battle.AdvanceTurn();
+                CheckNextState();
+                UpdateUI();
+                selectedEnemyIndex = -1;
+            });
         }
 
         private void DefendButton_Click(object sender, RoutedEventArgs e)
         {
             string result = battle.ExecuteCurrentTurnAction("Defend");
+
             MessageBox.Show(result);
 
-            battle.AdvanceTurn();
-            CheckNextState();
-            UpdateUI();
+            AnimateStepBack(() =>
+            {
+                battle.AdvanceTurn();
+                UpdateUI();
+                CheckNextState();
+            });
         }
 
         private void UseItemButton_Click(object sender, RoutedEventArgs e)
@@ -224,22 +291,25 @@ namespace JRPG.UI.Battle
                 string selected = list.SelectedItem.ToString();
                 string itemName = selected.Split('(')[0].Trim();
 
+
                 string result = battle.ExecuteCurrentTurnAction("UseItem", itemName);
                 MessageBox.Show(result);
-                //ShowFloatingText(result, FloatingTextType.Heal, CharacterSpriteStack.Children[0]);
 
-                var item = inventory.FirstOrDefault(i => i.Name == itemName);
-                if (item != null)
+                AnimateStepBack(() =>
                 {
-                    item.Quantity--;
-                    if (item.Quantity <= 0)
-                        inventory.Remove(item);
-                }
+                    var item = inventory.FirstOrDefault(i => i.Name == itemName);
+                    if (item != null)
+                    {
+                        item.Quantity--;
+                        if (item.Quantity <= 0)
+                            inventory.Remove(item);
+                    }
 
-                battle.AdvanceTurn();
-                CheckNextState();
-                UpdateUI();
-                window.Close();
+                    battle.AdvanceTurn();
+                    UpdateUI();
+                    CheckNextState();
+                    window.Close();
+                });               
             };
 
             window.ShowDialog();
@@ -290,22 +360,30 @@ namespace JRPG.UI.Battle
                 {
                     var target = characters.First(c => c.Name == selected);
                     result = battle.ExecuteCurrentTurnAction("SkillAlly", Tuple.Create(skillName, target));
+                    MessageBox.Show(result);
 
-                    var index = characters.IndexOf(target);
-                    //ShowFloatingText("50", FloatingTextType.Heal, CharacterSpriteStack.Children[index]);
+                    AnimateStepBack(() =>
+                    {
+                        battle.AdvanceTurn();
+                        UpdateUI();
+                        CheckNextState();
+                        window.Close();
+                    });
                 }
                 else
                 {
                     var target = battle.GetAliveEnemies().First(e => e.Name == selected);
                     result = battle.ExecuteCurrentTurnAction("SkillEnemy", Tuple.Create(skillName, target));
+                    MessageBox.Show(result);
 
-                    //ShowFloatingText(result, FloatingTextType.Damage, EnemySpriteStack.Children[index]);
+                    AnimateStepBack(() =>
+                    {
+                        battle.AdvanceTurn();
+                        UpdateUI();
+                        CheckNextState();
+                        window.Close();
+                    });
                 }
-
-                battle.AdvanceTurn();
-                CheckNextState();
-                UpdateUI();
-                window.Close();
             };
 
             window.ShowDialog();
@@ -356,9 +434,40 @@ namespace JRPG.UI.Battle
         private void CheckNextState()
         {
             if (battle.State == BattleState.EnemyTurn)
-                EnemyTurn();
+            {
+                AnimateStepForward(() =>
+                {
+                    // Do the action once fully moved forward
+                    string result = battle.ExecuteCurrentTurnAction("Auto");
+                    MessageBox.Show(result);
+
+                    // Then move back AFTER the action
+                    AnimateStepBack(() =>
+                    {
+                        if (battle.State == BattleState.Lost)
+                        {
+                            EndBattle("You were defeated.");
+                        }
+                        else
+                        {
+                            battle.AdvanceTurn();
+                            CheckNextState();
+                        }
+                    });
+                });
+            }
+            else if (battle.State == BattleState.PlayerTurn)
+            {
+                // Only move forward, action comes later
+                AnimateStepForward(() =>
+                {
+                    RefreshPanelsOnly();
+                });
+            }
             else if (battle.State == BattleState.Won)
+            {
                 EndBattle("You won!");
+            }
         }
 
         private void EndBattle(string message)

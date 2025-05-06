@@ -1,4 +1,5 @@
-﻿using JRPG.UI.Battle;
+﻿using JRPG.Core.Battles.Models;
+using JRPG.UI.Battle;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -205,9 +206,9 @@ namespace JRPG
             {
                 List<Enemy> enemies = new List<Enemy>()
                 {
-                    new Enemy("Goblin", 40, 10, 2, "goblin.png", "goblin.png"),
-                    new Enemy("Goblin", 40, 10, 2, "goblin.png", "goblin.png"),
-                    new Enemy("Goblin", 40, 10, 2, "goblin.png", "goblin.png")
+                    new Enemy("Goblin", 40, 10, 2, "goblin.png", "PlaceholderEnemy.png"),
+                    new Enemy("Goblin", 40, 10, 2, "goblin.png", "PlaceholderEnemy.png"),
+                    new Enemy("Goblin", 40, 10, 2, "goblin.png", "PlaceholderEnemy.png")
                 };
 
                 var battleUI = new BattleUI(activePartyOrder, enemies, playerInventory);

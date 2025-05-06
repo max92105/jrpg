@@ -2,54 +2,37 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:controls="clr-namespace:JRPG.UI.Battle.Controls"
-             mc:Ignorable="d" 
-             d:DesignHeight="400" d:DesignWidth="800">
+             mc:Ignorable="d" >
 
     <Grid Background="Black">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="2*"/>
-            <!-- Top: Character/Enemy Panels -->
-            <RowDefinition Height="0.8*"/>
-            <!-- Middle: Character Summary Bar -->
-            <RowDefinition Height="1*"/>
-            <!-- Bottom: Buttons -->
-        </Grid.RowDefinitions>
 
-        <Canvas x:Name="EffectCanvas"
-        Grid.Row="0"
-        Grid.ColumnSpan="2"
-        IsHitTestVisible="False"
-        Panel.ZIndex="1000"/>
+        <StackPanel x:Name="TurnOrderPanel" Orientation="Horizontal" Grid.Row="0"
+            HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10" />
+        
+        <!-- Effects Layer -->
+        <Canvas x:Name="EffectCanvas" IsHitTestVisible="False" Panel.ZIndex="1000" Width="1920" Height="1080"/>
 
-        <!-- Combat Display Area -->
-        <Grid Grid.Row="0" Margin="10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*" />
-                <ColumnDefinition Width="1*" />
-            </Grid.ColumnDefinitions>
+        <!-- Sprite Display Layer -->
+        <Canvas x:Name="SpriteCanvas" Panel.ZIndex="10" Width="1920" Height="1080"/>
 
-            <!-- Player Panel -->
-            <StackPanel x:Name="CharacterPanelContainer"
-                Grid.Column="0"
-                Orientation="Vertical"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Margin="10"
-                Background="#222" />
+        <!-- Player Info Panel (Top Right) -->
+        <StackPanel x:Name="CharacterPanelContainer"
+                    Orientation="Vertical"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Margin="0,20,20,0"
+                    Panel.ZIndex="100">
+        </StackPanel>
 
-            <!-- Enemy Panel -->
-            <StackPanel x:Name="EnemyPanelContainer"
-                Grid.Column="1"
-                Orientation="Vertical"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Margin="10"
-                Background="#400" />
-        </Grid>
-
-        <!-- Actions Area -->
-        <controls:CommandPanel Grid.Row="2" x:Name="CommandBox" OnCommandSelected="HandleCommandSelected"/>
+        <!-- Command Menu (Floating beside active character) -->
+        <controls:CommandPanel x:Name="CommandBox"
+                               HorizontalAlignment="Left"
+                               VerticalAlignment="Top"
+                               Margin="20"
+                               Visibility="Collapsed"
+                               OnCommandSelected="HandleCommandSelected"
+                               Panel.ZIndex="200"/>
     </Grid>
 </UserControl>

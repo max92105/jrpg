@@ -74,6 +74,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Battles\Enum\FloatingTextType.cs" />
+    <Compile Include="Battles\Models\Character.cs" />
+    <Compile Include="Battles\Models\Enemy.cs" />
+    <Compile Include="Battles\Models\Figther.cs" />
+    <Compile Include="Battles\Models\TurnEntry.cs" />
     <Compile Include="Maps\Enums\TriggerType.cs" />
     <Compile Include="Maps\IO\MapSerializer.cs" />
     <Compile Include="Maps\IO\ObjectSetLoader.cs" />

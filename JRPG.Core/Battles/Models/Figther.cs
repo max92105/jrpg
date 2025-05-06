@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace JRPG
+namespace JRPG.Core.Battles.Models
 {
     public class Fighter
     {

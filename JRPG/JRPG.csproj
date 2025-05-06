@@ -87,7 +87,6 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="BattleManager.cs" />
-    <Compile Include="Character.cs" />
     <Compile Include="UI\Battle\Controls\CharacterPanel.xaml.cs">
       <DependentUpon>CharacterPanel.xaml</DependentUpon>
     </Compile>
@@ -99,13 +98,11 @@
       <DependentUpon>DialogueBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="DialogManager.cs" />
-    <Compile Include="Enemy.cs" />
     <Compile Include="UI\Battle\Controls\EnemyPanel.xaml.cs">
       <DependentUpon>EnemyPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="Enums\BattleState.cs" />
     <Compile Include="Enums\Direction.cs" />
-    <Compile Include="Figther.cs" />
     <Compile Include="UI\Battle\Controls\FloatingText.xaml.cs">
       <DependentUpon>FloatingText.xaml</DependentUpon>
     </Compile>

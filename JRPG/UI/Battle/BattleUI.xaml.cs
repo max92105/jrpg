@@ -1,11 +1,16 @@
 ﻿using JRPG.Core.Battles.Enum;
+using JRPG.Core.Battles.Models;
+using JRPG.Core.Utils;
 using JRPG.Enums;
 using JRPG.UI.Battle.Controls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 
 namespace JRPG.UI.Battle
 {
@@ -21,7 +26,13 @@ namespace JRPG.UI.Battle
 
         private int selectedEnemyIndex = -1;
 
-        public event System.Action OnBattleEnd;
+        private Dictionary<object, TranslateTransform> spriteOffsets = new Dictionary<object, TranslateTransform>();
+        private Dictionary<object, Image> spriteImages = new Dictionary<object, Image>();
+
+        private string enemypath = "PlaceholderEnemy.png";
+        private string playerpath = "PlaceholderCharacter.png";
+
+        public event Action OnBattleEnd;
 
         public BattleUI(List<Character> characters, List<Enemy> enemies, List<InventoryItem> inventory)
         {
@@ -37,9 +48,132 @@ namespace JRPG.UI.Battle
         private void UpdateUI()
         {
             CommandBox.IsEnabled = (battle.State == BattleState.PlayerTurn);
-
+            CommandBox.Visibility = (battle.State == BattleState.PlayerTurn) ? Visibility.Visible : Visibility.Collapsed;
             UpdateCharacterPanel();
-            UpdateEnemyPanel();
+            DrawSprites();
+            AnimateTurnIndicator();
+            UpdateTurnOrderDisplay();
+        }
+
+        private void UpdateCharacterPanel()
+        {
+            CharacterPanelContainer.Children.Clear();
+
+            foreach (var c in characters)
+            {
+                var panel = new CharacterPanel
+                {
+                    Portrait = c.PortraitFile,
+                    CharacterName = c.Name,
+                    Level = c.Level,
+                    CurrentHP = c.HP,
+                    MaxHP = c.MaxHP,
+                    CurrentMP = c.MP,
+                    MaxMP = c.MaxMP,
+                    IsActive = battle.CurrentTurn.IsPlayer && battle.CurrentTurn.Character == c
+                };
+                CharacterPanelContainer.Children.Add(panel);
+            }
+        }
+
+        private void DrawSprites()
+        {
+            SpriteCanvas.Children.Clear();
+            EffectCanvas.Children.Clear();
+            spriteOffsets.Clear();
+            spriteImages.Clear();
+
+            double canvasWidth = SpriteCanvas.ActualWidth > 0 ? SpriteCanvas.ActualWidth : 1920;
+            double spriteSize = 96;
+            double verticalSpacing = spriteSize + 20;
+
+            // Draw Enemies
+            double enemyBaseY = 20;
+            double enemyStartX = 200;
+            var aliveEnemies = battle.GetAliveEnemies();
+
+            for (int i = 0; i < aliveEnemies.Count; i++)
+            {
+                var enemy = aliveEnemies[i];
+                var image = CreateSpriteImage(AssetPathResolver.GetSpritesPath(enemypath), true, enemy);
+
+                Canvas.SetLeft(image, enemyStartX + (i * 50));
+                Canvas.SetBottom(image, enemyBaseY + (i * verticalSpacing));
+                SpriteCanvas.Children.Add(image);
+            }
+
+            // Draw Players
+            double playerBaseY = 20;
+            double playerStartX = canvasWidth - 200;
+
+            for (int i = 0; i < characters.Count; i++)
+            {
+                var player = characters[i];
+                var image = CreateSpriteImage(AssetPathResolver.GetSpritesPath(playerpath), false, player);
+
+                Canvas.SetLeft(image, playerStartX - (i * 50));
+                Canvas.SetBottom(image, playerBaseY + (i * verticalSpacing));
+                SpriteCanvas.Children.Add(image);
+            }
+        }
+
+        private Image CreateSpriteImage(string path, bool flip, object owner)
+        {
+            var translate = new TranslateTransform();
+            var rotate = new RotateTransform(0, 48, 48);
+            var scale = new ScaleTransform(flip ? -1 : 1, 1, 48, 48);
+
+            var transformGroup = new TransformGroup();
+            transformGroup.Children.Add(scale);
+            transformGroup.Children.Add(rotate);
+            transformGroup.Children.Add(translate);
+
+            var image = new Image
+            {
+                Width = 96,
+                Height = 96,
+                Source = new BitmapImage(new Uri(path, UriKind.Absolute)),
+                RenderTransformOrigin = new Point(0.5, 0.5),
+                RenderTransform = transformGroup
+            };
+
+            spriteOffsets[owner] = translate;
+            spriteImages[owner] = image;
+            return image;
+        }
+
+        private void AnimateTurnIndicator()
+        {
+            var activeEntry = battle.CurrentTurn;
+            object actor = activeEntry.IsPlayer ? (object)activeEntry.Character : activeEntry.Enemy;
+
+            if (spriteOffsets.TryGetValue(actor, out var transform))
+            {
+                var slide = new DoubleAnimation
+                {
+                    To = activeEntry.IsPlayer ? -50 : 50,
+                    Duration = TimeSpan.FromMilliseconds(300),
+                    AutoReverse = true,
+                    RepeatBehavior = new RepeatBehavior(1)
+                };
+                transform.BeginAnimation(TranslateTransform.XProperty, slide);
+            }
+        }
+
+        private void UpdateTurnOrderDisplay()
+        {
+            TurnOrderPanel.Children.Clear();
+            foreach (var turn in battle.TurnQueue)
+            {
+                var path = turn.IsPlayer ? playerpath : turn.Enemy.PortraitPath;
+                var img = new Image
+                {
+                    Width = 32,
+                    Height = 32,
+                    Source = new BitmapImage(new Uri(AssetPathResolver.GetSpritesPath(path)))
+                };
+                TurnOrderPanel.Children.Add(img);
+            }
         }
 
         private void AttackButton_Click(object sender, RoutedEventArgs e)
@@ -50,30 +184,24 @@ namespace JRPG.UI.Battle
                 return;
             }
 
-            var aliveEnemies = battle.GetAliveEnemies();
-            var target = aliveEnemies[selectedEnemyIndex];
+            var target = battle.GetAliveEnemies()[selectedEnemyIndex];
+            string result = battle.ExecuteCurrentTurnAction("Attack", target);
 
-            var result = battle.PlayerAttack(target);
+            MessageBox.Show(result);
 
-            ShowFloatingText(result.ToString(), FloatingTextType.Damage, EnemyPanelContainer.Children[selectedEnemyIndex]);
-
-            if (battle.State != BattleState.Won)
-                battle.NextPlayerTurn();
-
-            selectedEnemyIndex = -1;
-
+            battle.AdvanceTurn();
             CheckNextState();
             UpdateUI();
+
+            selectedEnemyIndex = -1;
         }
 
         private void DefendButton_Click(object sender, RoutedEventArgs e)
         {
-            var result = battle.PlayerDefend();
+            string result = battle.ExecuteCurrentTurnAction("Defend");
             MessageBox.Show(result);
 
-            if (battle.State != BattleState.Won)
-                battle.NextPlayerTurn();
-
+            battle.AdvanceTurn();
             CheckNextState();
             UpdateUI();
         }
@@ -96,8 +224,9 @@ namespace JRPG.UI.Battle
                 string selected = list.SelectedItem.ToString();
                 string itemName = selected.Split('(')[0].Trim();
 
-                string result = battle.PlayerUseItem(itemName);
-                ShowFloatingText(result, FloatingTextType.Heal, CharacterPanelContainer.Children[0]);
+                string result = battle.ExecuteCurrentTurnAction("UseItem", itemName);
+                MessageBox.Show(result);
+                //ShowFloatingText(result, FloatingTextType.Heal, CharacterSpriteStack.Children[0]);
 
                 var item = inventory.FirstOrDefault(i => i.Name == itemName);
                 if (item != null)
@@ -107,7 +236,7 @@ namespace JRPG.UI.Battle
                         inventory.Remove(item);
                 }
 
-                battle.NextPlayerTurn();
+                battle.AdvanceTurn();
                 CheckNextState();
                 UpdateUI();
                 window.Close();
@@ -118,7 +247,7 @@ namespace JRPG.UI.Battle
 
         private void SkillButton_Click(object sender, RoutedEventArgs e)
         {
-            var currentChar = characters[battle.CurrentPlayerIndex];
+            var currentChar = battle.CurrentTurn.Character;
             if (currentChar.Skills == null || currentChar.Skills.Count == 0)
             {
                 MessageBox.Show($"{currentChar.Name} has no skills!");
@@ -160,21 +289,20 @@ namespace JRPG.UI.Battle
                 if (isHeal)
                 {
                     var target = characters.First(c => c.Name == selected);
-                    result = battle.PlayerUseSkillOnAlly(skillName, target);
+                    result = battle.ExecuteCurrentTurnAction("SkillAlly", Tuple.Create(skillName, target));
 
                     var index = characters.IndexOf(target);
-                    ShowFloatingText("50", FloatingTextType.Heal, CharacterPanelContainer.Children[index]);
+                    //ShowFloatingText("50", FloatingTextType.Heal, CharacterSpriteStack.Children[index]);
                 }
                 else
                 {
                     var target = battle.GetAliveEnemies().First(e => e.Name == selected);
-                    int index = battle.GetAliveEnemies().IndexOf(target);
-                    result = battle.PlayerUseSkillOnEnemy(skillName, target);
+                    result = battle.ExecuteCurrentTurnAction("SkillEnemy", Tuple.Create(skillName, target));
 
-                    ShowFloatingText(result, FloatingTextType.Damage, EnemyPanelContainer.Children[index]);
+                    //ShowFloatingText(result, FloatingTextType.Damage, EnemySpriteStack.Children[index]);
                 }
 
-                battle.NextPlayerTurn();
+                battle.AdvanceTurn();
                 CheckNextState();
                 UpdateUI();
                 window.Close();
@@ -209,25 +337,28 @@ namespace JRPG.UI.Battle
             EndBattle("You ran away!");
         }
 
+        private void EnemyTurn()
+        {
+            string result = battle.ExecuteCurrentTurnAction("Auto"); // "Auto" is a placeholder; ignored for enemies
+            MessageBox.Show(result);
+
+            if (battle.State == BattleState.Lost)
+            {
+                EndBattle("You were defeated.");
+                return;
+            }
+
+            battle.AdvanceTurn();
+            CheckNextState();
+            UpdateUI();
+        }
+
         private void CheckNextState()
         {
             if (battle.State == BattleState.EnemyTurn)
                 EnemyTurn();
             else if (battle.State == BattleState.Won)
                 EndBattle("You won!");
-        }
-
-        private void EnemyTurn()
-        {
-            var result = battle.EnemyAttack();
-
-            //TODO :: Need to change but to test
-            ShowFloatingText("-10", FloatingTextType.Damage, CharacterPanelContainer.Children[0]);
-
-            UpdateUI();
-
-            if (battle.State == BattleState.Lost)
-                EndBattle("You were defeated.");
         }
 
         private void EndBattle(string message)
@@ -264,69 +395,7 @@ namespace JRPG.UI.Battle
             }
 
             MessageBox.Show(message);
-        }
-
-        private void UpdateCharacterPanel()
-        {
-            CharacterPanelContainer.Children.Clear();
-
-            for (int i = 0; i < characters.Count; i++)
-            {
-                var character = characters[i];
-
-                var panel = new CharacterPanel
-                {
-                    Portrait = character.PortraitFile,
-                    CharacterName = character.Name,
-                    Level = character.Level,
-                    CurrentHP = character.HP,
-                    MaxHP = character.MaxHP,
-                    CurrentMP = character.MP,
-                    MaxMP = character.MaxMP,
-                    IsActive = (i == battle.CurrentPlayerIndex),
-                };
-
-                CharacterPanelContainer.Children.Add(panel);
-            }
-        }
-
-        private void UpdateEnemyPanel()
-        {
-            EnemyPanelContainer.Children.Clear();
-
-            var aliveEnemies = battle.GetAliveEnemies();
-
-            for (int i = 0; i < aliveEnemies.Count; i++)
-            {
-                var enemy = aliveEnemies[i];
-
-                var panel = new EnemyPanel();
-                panel.SetEnemy(enemy, i == selectedEnemyIndex);
-
-                int capturedIndex = i;
-                panel.MouseLeftButtonDown += (s, e) =>
-                {
-                    selectedEnemyIndex = capturedIndex;
-                    UpdateEnemyPanel(); // Refresh
-                };
-
-                EnemyPanelContainer.Children.Add(panel);
-            }
-        }
-
-        private List<FloatingText> floatingTexts = new List<FloatingText>();
-
-        private void ShowFloatingText(string text, FloatingTextType type, UIElement anchor)
-        {
-            var floating = new FloatingText(text, type);
-
-            Point position = anchor.TranslatePoint(new Point(0, 0), EffectCanvas);
-
-            Canvas.SetLeft(floating, position.X + (anchor.RenderSize.Width / 2) - 20);
-            Canvas.SetTop(floating, position.Y - 10);
-
-            EffectCanvas.Children.Add(floating);
-        }
+        }       
 
         private void HandleCommandSelected(string command)
         {

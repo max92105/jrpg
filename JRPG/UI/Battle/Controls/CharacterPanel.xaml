@@ -25,7 +25,7 @@
                 <!-- MP -->
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,0,0">
                     <TextBlock Text="MP:" Foreground="LightBlue" Width="30"/>
-                    <ProgressBar x:Name="MPBar" Width="120" Height="10" Maximum="1"/>
+                    <ProgressBar x:Name="MPBar" Width="120" Height="10" Maximum="1" Foreground="LightBlue"/>
                     <TextBlock x:Name="MPText" Foreground="White" FontSize="10" Margin="5,0,0,0"/>
                 </StackPanel>
             </StackPanel>

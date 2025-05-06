@@ -1,4 +1,5 @@
-﻿using JRPG.Core.Utils;
+﻿using JRPG.Core.Battles.Models;
+using JRPG.Core.Utils;
 using System;
 using System.IO;
 using System.Windows.Controls;

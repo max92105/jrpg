@@ -34,6 +34,12 @@ namespace JRPG.UI.Battle
         private string enemypath = "PlaceholderEnemy.png";
         private string playerpath = "PlaceholderCharacter.png";
 
+        private bool isTargeting = false;
+        private string targetingAction = null;
+        private Dictionary<Enemy, Image> enemyTargetArrows = new Dictionary<Enemy, Image>();
+        private Enemy currentlySelectedEnemy = null;
+        private BitmapImage targetArrowImage = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath("TargetArrow.png"))); // replace with your arrow filename
+
         public event Action OnBattleEnd;
 
         public BattleUI(List<Character> characters, List<Enemy> enemies, List<InventoryItem> inventory)
@@ -141,6 +147,39 @@ namespace JRPG.UI.Battle
             {
                 var enemy = aliveEnemies[i];
                 var image = CreateSpriteImage(AssetPathResolver.GetSpritesPath(enemypath), true, enemy);
+
+                // Mouse hover = show target arrow
+                image.MouseEnter += (s, e) =>
+                {
+                    if (!isTargeting) return;
+                    ShowHoverArrowFor(enemy);
+                    currentlySelectedEnemy = enemy;
+                    HighlightSelectedEnemyInTurnOrder();
+                };
+
+                // Mouse leave = remove hover arrow
+                image.MouseLeave += (s, e) =>
+                {
+                    if (!isTargeting) return;
+                    HideHoverArrow();
+                };
+
+                // Click = confirm target
+                image.MouseLeftButtonUp += (s, e) =>
+                {
+                    if (!isTargeting || currentlySelectedEnemy == null) return;
+
+                    string result = battle.ExecuteCurrentTurnAction(targetingAction, currentlySelectedEnemy);
+                    MessageBox.Show(result);
+
+                    AnimateStepBack(() =>
+                    {
+                        ExitTargetingMode();
+                        battle.AdvanceTurn();
+                        UpdateUI();
+                        CheckNextState();
+                    });
+                };
 
                 Canvas.SetLeft(image, enemyStartX + (i * 50));
                 Canvas.SetBottom(image, enemyBaseY + (i * verticalSpacing));
@@ -271,29 +310,161 @@ namespace JRPG.UI.Battle
             }
         }
 
-        private void AttackButton_Click(object sender, RoutedEventArgs e)
+        private void HighlightEnemiesForSelection(bool enable)
         {
-            if (selectedEnemyIndex == -1)
+            foreach (var enemy in battle.GetAliveEnemies())
             {
-                MessageBox.Show("Select an enemy to attack!");
+                if (!spriteImages.TryGetValue(enemy, out var enemyImage))
+                    continue;
+
+                if (enable)
+                {
+                    var arrow = new Image
+                    {
+                        Source = targetArrowImage,
+                        Width = 32,
+                        Height = 32
+                    };
+
+                    Point pos = enemyImage.TranslatePoint(new Point(0, 0), SpriteCanvas);
+                    Canvas.SetLeft(arrow, pos.X + 32);
+                    Canvas.SetTop(arrow, pos.Y - 48);
+
+                    enemyTargetArrows.Add(enemy, arrow);
+                    SpriteCanvas.Children.Add(arrow);
+                }
+                else
+                {
+                    foreach (var arrow in enemyTargetArrows)
+                        SpriteCanvas.Children.Remove(arrow.Value);
+
+                    enemyTargetArrows.Clear();
+                }
+            }
+        }
+
+        private Image hoverArrow = null;
+
+        private void ShowHoverArrowFor(Enemy enemy)
+        {
+            HideHoverArrow();
+
+            if (!spriteImages.TryGetValue(enemy, out var img))
                 return;
+
+            hoverArrow = new Image
+            {
+                Width = 24,
+                Height = 24,
+                Source = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath("TargetArrow.png"), UriKind.Absolute)),
+                RenderTransformOrigin = new Point(0.5, 0.5)
+            };
+
+            var pos = img.TranslatePoint(new Point(0, 0), SpriteCanvas);
+            Canvas.SetLeft(hoverArrow, pos.X + 36);
+            Canvas.SetTop(hoverArrow, pos.Y - 40);
+
+            SpriteCanvas.Children.Add(hoverArrow);
+        }
+
+        private void HideHoverArrow()
+        {
+            if (hoverArrow != null)
+            {
+                SpriteCanvas.Children.Remove(hoverArrow);
+                hoverArrow = null;
+            }
+        }
+
+        private void EnterTargetingMode()
+        {
+            foreach (var kvp in enemyTargetArrows)
+            {
+                SpriteCanvas.Children.Remove(kvp.Value);
+            }
+            enemyTargetArrows.Clear();
+
+            foreach (var enemy in battle.GetAliveEnemies())
+            {
+                if (spriteImages.TryGetValue(enemy, out var enemyImage))
+                    enemyImage.MouseLeftButtonUp -= (s, e) => SelectEnemyTarget(enemy); // Clear event binding
             }
 
-            string result = null;
+            currentlySelectedEnemy = null;
+            isTargeting = false;
+            targetingAction = null;
+        }
 
-            var target = battle.GetAliveEnemies()[selectedEnemyIndex];
+        private void SelectEnemyTarget(Enemy enemy)
+        {
+            ExitTargetingMode(); // remove previous arrows/clicks
 
-            result = battle.ExecuteCurrentTurnAction("Attack", target);
+            currentlySelectedEnemy = enemy;
+
+            // Create and show arrow above selected enemy
+            if (spriteImages.TryGetValue(enemy, out var enemyImage))
+            {
+                var arrow = new Image
+                {
+                    Width = 24,
+                    Height = 24,
+                    Source = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath("TargetArrow.png"), UriKind.Absolute)),
+                    RenderTransformOrigin = new Point(0.5, 0.5)
+                };
+
+                var pos = enemyImage.TranslatePoint(new Point(0, 0), SpriteCanvas);
+                Canvas.SetLeft(arrow, pos.X + 36);
+                Canvas.SetTop(arrow, pos.Y - 40);
+
+                SpriteCanvas.Children.Add(arrow);
+                enemyTargetArrows[enemy] = arrow;
+            }
+
+            HighlightSelectedEnemyInTurnOrder();
+        }
+
+        private void ExitTargetingMode()
+        {
+            isTargeting = false;
+            currentlySelectedEnemy = null;
+            HideHoverArrow();
+            HighlightSelectedEnemyInTurnOrder();
+        }
+
+        private void HighlightSelectedEnemyInTurnOrder()
+        {
+            for (int i = 0; i < TurnOrderPanel.Children.Count; i++)
+            {
+                if (TurnOrderPanel.Children[i] is Image img && i < battle.TurnQueue.Count)
+                {
+                    var entry = battle.TurnQueue.ElementAt(i);
+                    img.Opacity = (entry.Enemy == currentlySelectedEnemy) ? 1.0 : 0.5;
+                }
+            }
+        }
+
+        private void ExecuteTargetedAction(string action, Enemy target)
+        {
+            string result = battle.ExecuteCurrentTurnAction(action, target);
             MessageBox.Show(result);
 
             AnimateStepBack(() =>
             {
+                ExitTargetingMode();
                 battle.AdvanceTurn();
-                CheckNextState();
                 UpdateUI();
-                selectedEnemyIndex = -1;
+                CheckNextState();
             });
         }
+
+        private void AttackButton_Click(object sender, RoutedEventArgs e)
+        {
+            isTargeting = true;
+            targetingAction = "Attack";
+            currentlySelectedEnemy = null;
+            HighlightSelectedEnemyInTurnOrder();
+        }
+
 
         private void DefendButton_Click(object sender, RoutedEventArgs e)
         {

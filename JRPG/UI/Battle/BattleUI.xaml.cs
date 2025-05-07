@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 
 namespace JRPG.UI.Battle
@@ -39,6 +40,18 @@ namespace JRPG.UI.Battle
         private Dictionary<Enemy, Image> enemyTargetArrows = new Dictionary<Enemy, Image>();
         private Enemy currentlySelectedEnemy = null;
         private BitmapImage targetArrowImage = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath("TargetArrow.png"))); // replace with your arrow filename
+
+        private Image hoverArrow = null;
+        private Enemy lastHoveredEnemy;
+        private Image glowingEnemyImage;
+
+        private readonly DropShadowEffect glowEffect = new DropShadowEffect
+        {
+            Color = Colors.White,
+            BlurRadius = 20,
+            ShadowDepth = 0,
+            Opacity = 0.8
+        };
 
         public event Action OnBattleEnd;
 
@@ -136,7 +149,7 @@ namespace JRPG.UI.Battle
 
             double canvasWidth = SpriteCanvas.ActualWidth > 0 ? SpriteCanvas.ActualWidth : 1920;
             double spriteSize = 96;
-            double verticalSpacing = spriteSize + 20;
+            double verticalSpacing = spriteSize + 40;
 
             // Draw Enemies
             double enemyBaseY = 120;
@@ -155,13 +168,6 @@ namespace JRPG.UI.Battle
                     ShowHoverArrowFor(enemy);
                     currentlySelectedEnemy = enemy;
                     HighlightSelectedEnemyInTurnOrder();
-                };
-
-                // Mouse leave = remove hover arrow
-                image.MouseLeave += (s, e) =>
-                {
-                    if (!isTargeting) return;
-                    HideHoverArrow();
                 };
 
                 // Click = confirm target
@@ -221,9 +227,68 @@ namespace JRPG.UI.Battle
                 RenderTransform = transformGroup
             };
 
+            // Prepare glow effect
+            var glow = new System.Windows.Media.Effects.DropShadowEffect
+            {
+                Color = Colors.White,
+                BlurRadius = 20,
+                ShadowDepth = 0,
+                Opacity = 0.8
+            };
+
+            image.MouseEnter += (s, e) =>
+            {
+                if (isTargeting && owner is Enemy enemy)
+                {
+                    if (glowingEnemyImage != null && glowingEnemyImage != image)
+                        glowingEnemyImage.Effect = null;
+
+                    glowingEnemyImage = image;
+                    ApplyPulsingGlow(image);
+                    ShowHoverArrowFor(enemy);
+                }
+            };
+
+            // Do not remove the glow on mouse leave anymore
+
             spriteOffsets[owner] = translate;
             spriteImages[owner] = image;
             return image;
+        }
+
+        private void ApplyPulsingGlow(Image target)
+        {
+            var glow = new System.Windows.Media.Effects.DropShadowEffect
+            {
+                Color = Colors.White,
+                BlurRadius = 20,
+                ShadowDepth = 0,
+                Opacity = 0.8
+            };
+
+            target.Effect = glow;
+
+            // Animate the glow's BlurRadius and Opacity in a loop
+            var blurAnim = new DoubleAnimation
+            {
+                From = 20,
+                To = 40,
+                Duration = TimeSpan.FromMilliseconds(800),
+                AutoReverse = true,
+                RepeatBehavior = RepeatBehavior.Forever
+            };
+
+            var opacityAnim = new DoubleAnimation
+            {
+                From = 0.8,
+                To = 0.4,
+                Duration = TimeSpan.FromMilliseconds(800),
+                AutoReverse = true,
+                RepeatBehavior = RepeatBehavior.Forever
+            };
+
+            glow.BeginAnimation(System.Windows.Media.Effects.DropShadowEffect.BlurRadiusProperty, blurAnim);
+            glow.BeginAnimation(System.Windows.Media.Effects.DropShadowEffect.OpacityProperty, opacityAnim);
         }
 
         private void AnimateStepForward(Action onComplete = null)
@@ -310,61 +375,44 @@ namespace JRPG.UI.Battle
             }
         }
 
-        private void HighlightEnemiesForSelection(bool enable)
-        {
-            foreach (var enemy in battle.GetAliveEnemies())
-            {
-                if (!spriteImages.TryGetValue(enemy, out var enemyImage))
-                    continue;
-
-                if (enable)
-                {
-                    var arrow = new Image
-                    {
-                        Source = targetArrowImage,
-                        Width = 32,
-                        Height = 32
-                    };
-
-                    Point pos = enemyImage.TranslatePoint(new Point(0, 0), SpriteCanvas);
-                    Canvas.SetLeft(arrow, pos.X + 32);
-                    Canvas.SetTop(arrow, pos.Y - 48);
-
-                    enemyTargetArrows.Add(enemy, arrow);
-                    SpriteCanvas.Children.Add(arrow);
-                }
-                else
-                {
-                    foreach (var arrow in enemyTargetArrows)
-                        SpriteCanvas.Children.Remove(arrow.Value);
-
-                    enemyTargetArrows.Clear();
-                }
-            }
-        }
-
-        private Image hoverArrow = null;
-
         private void ShowHoverArrowFor(Enemy enemy)
         {
-            HideHoverArrow();
+            currentlySelectedEnemy = enemy;
+
+            // Remove the old one if it exists
+            if (hoverArrow != null)
+            {
+                SpriteCanvas.Children.Remove(hoverArrow);
+                hoverArrow = null;
+            }
 
             if (!spriteImages.TryGetValue(enemy, out var img))
                 return;
 
             hoverArrow = new Image
             {
-                Width = 24,
-                Height = 24,
+                Width = 36,
+                Height = 36,
                 Source = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath("TargetArrow.png"), UriKind.Absolute)),
-                RenderTransformOrigin = new Point(0.5, 0.5)
+                RenderTransformOrigin = new Point(0.5, 0.5),
+                Opacity = 0,
+                RenderTransform = new ScaleTransform(0.5, 0.5)
             };
 
-            var pos = img.TranslatePoint(new Point(0, 0), SpriteCanvas);
-            Canvas.SetLeft(hoverArrow, pos.X + 36);
-            Canvas.SetTop(hoverArrow, pos.Y - 40);
+            Point center = img.TranslatePoint(new Point(img.Width / 2, 0), SpriteCanvas);
+            Canvas.SetLeft(hoverArrow, center.X - (hoverArrow.Width / 2));
+            Canvas.SetTop(hoverArrow, center.Y - hoverArrow.Height - 4);
 
             SpriteCanvas.Children.Add(hoverArrow);
+
+            // Animate "pop"
+            var scale = (ScaleTransform)hoverArrow.RenderTransform;
+            var grow = new DoubleAnimation(1.0, TimeSpan.FromMilliseconds(150)) { EasingFunction = new BackEase { EasingMode = EasingMode.EaseOut } };
+            var fade = new DoubleAnimation(1.0, TimeSpan.FromMilliseconds(150));
+
+            scale.BeginAnimation(ScaleTransform.ScaleXProperty, grow);
+            scale.BeginAnimation(ScaleTransform.ScaleYProperty, grow);
+            hoverArrow.BeginAnimation(UIElement.OpacityProperty, fade);
         }
 
         private void HideHoverArrow()
@@ -374,61 +422,6 @@ namespace JRPG.UI.Battle
                 SpriteCanvas.Children.Remove(hoverArrow);
                 hoverArrow = null;
             }
-        }
-
-        private void EnterTargetingMode()
-        {
-            foreach (var kvp in enemyTargetArrows)
-            {
-                SpriteCanvas.Children.Remove(kvp.Value);
-            }
-            enemyTargetArrows.Clear();
-
-            foreach (var enemy in battle.GetAliveEnemies())
-            {
-                if (spriteImages.TryGetValue(enemy, out var enemyImage))
-                    enemyImage.MouseLeftButtonUp -= (s, e) => SelectEnemyTarget(enemy); // Clear event binding
-            }
-
-            currentlySelectedEnemy = null;
-            isTargeting = false;
-            targetingAction = null;
-        }
-
-        private void SelectEnemyTarget(Enemy enemy)
-        {
-            ExitTargetingMode(); // remove previous arrows/clicks
-
-            currentlySelectedEnemy = enemy;
-
-            // Create and show arrow above selected enemy
-            if (spriteImages.TryGetValue(enemy, out var enemyImage))
-            {
-                var arrow = new Image
-                {
-                    Width = 24,
-                    Height = 24,
-                    Source = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath("TargetArrow.png"), UriKind.Absolute)),
-                    RenderTransformOrigin = new Point(0.5, 0.5)
-                };
-
-                var pos = enemyImage.TranslatePoint(new Point(0, 0), SpriteCanvas);
-                Canvas.SetLeft(arrow, pos.X + 36);
-                Canvas.SetTop(arrow, pos.Y - 40);
-
-                SpriteCanvas.Children.Add(arrow);
-                enemyTargetArrows[enemy] = arrow;
-            }
-
-            HighlightSelectedEnemyInTurnOrder();
-        }
-
-        private void ExitTargetingMode()
-        {
-            isTargeting = false;
-            currentlySelectedEnemy = null;
-            HideHoverArrow();
-            HighlightSelectedEnemyInTurnOrder();
         }
 
         private void HighlightSelectedEnemyInTurnOrder()
@@ -443,28 +436,36 @@ namespace JRPG.UI.Battle
             }
         }
 
-        private void ExecuteTargetedAction(string action, Enemy target)
+        private void ExitTargetingMode()
         {
-            string result = battle.ExecuteCurrentTurnAction(action, target);
-            MessageBox.Show(result);
+            isTargeting = false;
+            currentlySelectedEnemy = null;
+            HideHoverArrow();
+            HighlightSelectedEnemyInTurnOrder();
+        }
 
-            AnimateStepBack(() =>
-            {
-                ExitTargetingMode();
-                battle.AdvanceTurn();
-                UpdateUI();
-                CheckNextState();
-            });
+        private void EnterTargetingMode(string action)
+        {
+            isTargeting = true;
+            targetingAction = action;
+
+            // Hide command menu
+            CommandBox.Visibility = Visibility.Collapsed;
+
+            // Choose default enemy (e.g., last one alive)
+            var enemies = battle.GetAliveEnemies();
+            var defaultEnemy = enemies.LastOrDefault();
+            if (defaultEnemy == null) return;
+
+            ShowHoverArrowFor(defaultEnemy); // ✅ Shows arrow immediately
+            ApplyPulsingGlow(spriteImages[defaultEnemy]); // ✅ Glow on selection
+            HighlightSelectedEnemyInTurnOrder();
         }
 
         private void AttackButton_Click(object sender, RoutedEventArgs e)
         {
-            isTargeting = true;
-            targetingAction = "Attack";
-            currentlySelectedEnemy = null;
-            HighlightSelectedEnemyInTurnOrder();
+            EnterTargetingMode("Attack");
         }
-
 
         private void DefendButton_Click(object sender, RoutedEventArgs e)
         {

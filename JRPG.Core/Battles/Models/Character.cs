@@ -27,7 +27,7 @@ namespace JRPG.Core.Battles.Models
         public int EXP { get; set; } = 0;
         public int EXPToNextLevel { get; set; } = 100; 
 
-        public List<string> Skills { get; set; } = new List<string>();
+        public List<Skill> Skills { get; set; } = new List<Skill>();
 
         public string EquippedWeapon { get; set; }
         public string EquippedArmor { get; set; }
@@ -61,12 +61,6 @@ namespace JRPG.Core.Battles.Models
 
             // New EXP requirement: simple formula, could be more complex later
             EXPToNextLevel = (int)(EXPToNextLevel * 1.2);
-
-            // Optionally: learn a new skill at certain levels
-            if (Level == 12)
-                Skills.Add("Mega Slash");
-            if (Level == 15)
-                Skills.Add("Ultimate Guard");
         }
 
         public void GainEXP(int amount)

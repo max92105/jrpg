@@ -35,10 +35,14 @@ namespace JRPG.UI.Battle
         private string enemypath = "PlaceholderEnemy.png";
         private string playerpath = "PlaceholderCharacter.png";
 
+        //Targeting System
         private bool isTargeting = false;
         private string targetingAction = null;
+        private Skill targetingSkill;
+        private InventoryItem targetingItem;
         private Dictionary<Enemy, Image> enemyTargetArrows = new Dictionary<Enemy, Image>();
         private Enemy currentlySelectedEnemy = null;
+        private Character currentlySelectedAlly = null;
         private BitmapImage targetArrowImage = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath("TargetArrow.png"))); // replace with your arrow filename
 
         private Image hoverArrow = null;
@@ -62,6 +66,8 @@ namespace JRPG.UI.Battle
             this.enemies = enemies;
             this.inventory = inventory;
             battle = new BattleManager(characters, enemies);
+
+            CommandBox.OnSkillSelected += HandleSkillTargeting;
 
             UpdateUI();
             CheckNextState();
@@ -165,9 +171,17 @@ namespace JRPG.UI.Battle
                 image.MouseEnter += (s, e) =>
                 {
                     if (!isTargeting) return;
-                    ShowHoverArrowFor(enemy);
+
+                    if (targetingAction == "SkillAlly" || targetingAction == "SkillSelf" ||
+                        targetingAction == "ItemAlly" || targetingAction == "ItemSelf")
+                        return; // Block enemy hover in Ally/Self item modes
+
+                    currentlySelectedAlly = null;
                     currentlySelectedEnemy = enemy;
+
                     HighlightSelectedEnemyInTurnOrder();
+                    ShowHoverArrowFor(enemy);
+                    ApplyPulsingGlow(image);
                 };
 
                 // Click = confirm target
@@ -175,7 +189,24 @@ namespace JRPG.UI.Battle
                 {
                     if (!isTargeting || currentlySelectedEnemy == null) return;
 
-                    string result = battle.ExecuteCurrentTurnAction(targetingAction, currentlySelectedEnemy);
+                    // ❌ Block enemy clicks in Self or Ally targeting
+                    if (targetingAction == "SkillSelf" || targetingAction == "SkillAlly")
+                        return;
+
+                    string result;
+                    if (targetingAction == "Attack")
+                    {
+                        result = battle.ExecuteCurrentTurnAction("Attack", currentlySelectedEnemy);
+                    }
+                    else if (targetingAction == "SkillEnemy" && targetingSkill != null)
+                    {
+                        result = battle.ExecuteCurrentTurnAction("SkillEnemy", Tuple.Create(targetingSkill, currentlySelectedEnemy));
+                    }
+                    else
+                    {
+                        return; // Unsupported
+                    }
+
                     MessageBox.Show(result);
 
                     AnimateStepBack(() =>
@@ -200,6 +231,45 @@ namespace JRPG.UI.Battle
             {
                 var player = characters[i];
                 var image = CreateSpriteImage(AssetPathResolver.GetSpritesPath(playerpath), false, player);
+
+                image.MouseEnter += (s, e) =>
+                {
+                    if (!isTargeting) return;
+
+                    if (targetingAction == "SkillAlly" || targetingAction == "SkillSelf")
+                    {
+                        if (targetingAction == "SkillSelf" && player != battle.CurrentTurn.Character)
+                            return; // ❌ Disallow hover over other allies in Self mode
+
+                        currentlySelectedEnemy = null;
+                        currentlySelectedAlly = player;
+
+                        HighlightSelectedAllyInTurnOrder();
+                        ShowHoverArrowFor(player);
+                        ApplyPulsingGlow(image);
+                    }
+                };
+
+                image.MouseLeftButtonUp += (s, e) =>
+                {
+                    if (!isTargeting || targetingAction != "SkillAlly" && targetingAction != "SkillSelf")
+                        return;
+
+                    // Block changing selection in SkillSelf mode
+                    if (targetingAction == "SkillSelf" && player != battle.CurrentTurn.Character)
+                        return;
+
+                    string result = battle.ExecuteCurrentTurnAction(targetingAction, Tuple.Create(targetingSkill, player));
+                    MessageBox.Show(result);
+
+                    AnimateStepBack(() =>
+                    {
+                        ExitTargetingMode();
+                        battle.AdvanceTurn();
+                        UpdateUI();
+                        CheckNextState();
+                    });
+                };
 
                 Canvas.SetLeft(image, playerStartX - (i * 50));
                 Canvas.SetBottom(image, playerBaseY + (i * verticalSpacing));
@@ -227,30 +297,6 @@ namespace JRPG.UI.Battle
                 RenderTransform = transformGroup
             };
 
-            // Prepare glow effect
-            var glow = new System.Windows.Media.Effects.DropShadowEffect
-            {
-                Color = Colors.White,
-                BlurRadius = 20,
-                ShadowDepth = 0,
-                Opacity = 0.8
-            };
-
-            image.MouseEnter += (s, e) =>
-            {
-                if (isTargeting && owner is Enemy enemy)
-                {
-                    if (glowingEnemyImage != null && glowingEnemyImage != image)
-                        glowingEnemyImage.Effect = null;
-
-                    glowingEnemyImage = image;
-                    ApplyPulsingGlow(image);
-                    ShowHoverArrowFor(enemy);
-                }
-            };
-
-            // Do not remove the glow on mouse leave anymore
-
             spriteOffsets[owner] = translate;
             spriteImages[owner] = image;
             return image;
@@ -258,7 +304,17 @@ namespace JRPG.UI.Battle
 
         private void ApplyPulsingGlow(Image target)
         {
-            var glow = new System.Windows.Media.Effects.DropShadowEffect
+            // Clear old glow
+            if (glowingEnemyImage != null && glowingEnemyImage != target)
+            {
+                glowingEnemyImage.Effect = null;
+                glowingEnemyImage.BeginAnimation(DropShadowEffect.BlurRadiusProperty, null);
+                glowingEnemyImage.BeginAnimation(DropShadowEffect.OpacityProperty, null);
+            }
+
+            glowingEnemyImage = target;
+
+            var glow = new DropShadowEffect
             {
                 Color = Colors.White,
                 BlurRadius = 20,
@@ -268,7 +324,6 @@ namespace JRPG.UI.Battle
 
             target.Effect = glow;
 
-            // Animate the glow's BlurRadius and Opacity in a loop
             var blurAnim = new DoubleAnimation
             {
                 From = 20,
@@ -287,8 +342,8 @@ namespace JRPG.UI.Battle
                 RepeatBehavior = RepeatBehavior.Forever
             };
 
-            glow.BeginAnimation(System.Windows.Media.Effects.DropShadowEffect.BlurRadiusProperty, blurAnim);
-            glow.BeginAnimation(System.Windows.Media.Effects.DropShadowEffect.OpacityProperty, opacityAnim);
+            glow.BeginAnimation(DropShadowEffect.BlurRadiusProperty, blurAnim);
+            glow.BeginAnimation(DropShadowEffect.OpacityProperty, opacityAnim);
         }
 
         private void AnimateStepForward(Action onComplete = null)
@@ -375,25 +430,23 @@ namespace JRPG.UI.Battle
             }
         }
 
-        private void ShowHoverArrowFor(Enemy enemy)
+        private void ShowHoverArrowFor(object target)
         {
-            currentlySelectedEnemy = enemy;
+            if (!spriteImages.TryGetValue(target, out var img))
+                return;
 
-            // Remove the old one if it exists
+            // Remove old arrow
             if (hoverArrow != null)
             {
                 SpriteCanvas.Children.Remove(hoverArrow);
                 hoverArrow = null;
             }
 
-            if (!spriteImages.TryGetValue(enemy, out var img))
-                return;
-
             hoverArrow = new Image
             {
                 Width = 36,
                 Height = 36,
-                Source = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath("TargetArrow.png"), UriKind.Absolute)),
+                Source = targetArrowImage,
                 RenderTransformOrigin = new Point(0.5, 0.5),
                 Opacity = 0,
                 RenderTransform = new ScaleTransform(0.5, 0.5)
@@ -405,7 +458,7 @@ namespace JRPG.UI.Battle
 
             SpriteCanvas.Children.Add(hoverArrow);
 
-            // Animate "pop"
+            // Animate
             var scale = (ScaleTransform)hoverArrow.RenderTransform;
             var grow = new DoubleAnimation(1.0, TimeSpan.FromMilliseconds(150)) { EasingFunction = new BackEase { EasingMode = EasingMode.EaseOut } };
             var fade = new DoubleAnimation(1.0, TimeSpan.FromMilliseconds(150));
@@ -436,6 +489,18 @@ namespace JRPG.UI.Battle
             }
         }
 
+        private void HighlightSelectedAllyInTurnOrder()
+        {
+            for (int i = 0; i < TurnOrderPanel.Children.Count; i++)
+            {
+                if (TurnOrderPanel.Children[i] is Image img && i < battle.TurnQueue.Count)
+                {
+                    var entry = battle.TurnQueue.ElementAt(i);
+                    img.Opacity = (entry.Character == currentlySelectedAlly) ? 1.0 : 0.5;
+                }
+            }
+        }
+
         private void ExitTargetingMode()
         {
             isTargeting = false;
@@ -452,14 +517,38 @@ namespace JRPG.UI.Battle
             // Hide command menu
             CommandBox.Visibility = Visibility.Collapsed;
 
-            // Choose default enemy (e.g., last one alive)
-            var enemies = battle.GetAliveEnemies();
-            var defaultEnemy = enemies.LastOrDefault();
-            if (defaultEnemy == null) return;
+            if (action == "SkillSelf")
+            {
+                var self = battle.CurrentTurn.Character;
 
-            ShowHoverArrowFor(defaultEnemy); // ✅ Shows arrow immediately
-            ApplyPulsingGlow(spriteImages[defaultEnemy]); // ✅ Glow on selection
-            HighlightSelectedEnemyInTurnOrder();
+                if (!spriteImages.TryGetValue(self, out var img)) return;
+
+                currentlySelectedEnemy = null; // Not using enemy in this case
+
+                // Show arrow and glow over the player
+                ShowHoverArrowFor(self);
+                ApplyPulsingGlow(img);
+
+                return; // skip enemy default logic
+            }
+
+            if (targetingAction == "SkillAlly" || targetingAction == "SkillSelf")
+            {
+                var defaultAlly = battle.CurrentTurn.Character;
+
+                currentlySelectedAlly = defaultAlly;
+                ShowHoverArrowFor(defaultAlly);
+                ApplyPulsingGlow(spriteImages[defaultAlly]);
+                HighlightSelectedAllyInTurnOrder();
+            }
+            else if (targetingAction == "Attack" || targetingAction == "SkillEnemy")
+            {
+                var defaultEnemy = battle.GetAliveEnemies().LastOrDefault();
+                currentlySelectedEnemy = defaultEnemy;
+                ShowHoverArrowFor(defaultEnemy);
+                ApplyPulsingGlow(spriteImages[defaultEnemy]);
+                HighlightSelectedEnemyInTurnOrder();
+            }
         }
 
         private void AttackButton_Click(object sender, RoutedEventArgs e)
@@ -481,141 +570,29 @@ namespace JRPG.UI.Battle
             });
         }
 
-        private void UseItemButton_Click(object sender, RoutedEventArgs e)
+        private void HandleItemTargeting(InventoryItem item)
         {
-            if (inventory == null || !inventory.Any(i => i.Quantity > 0))
+            targetingItem = item;
+
+            switch (item.TargetType)
             {
-                MessageBox.Show("No items available!");
-                return;
+                case TargetType.Enemy:
+                    EnterTargetingMode("ItemEnemy");
+                    break;
+
+                case TargetType.Ally:
+                    EnterTargetingMode("ItemAlly");
+                    break;
+
+                case TargetType.Self:
+                    EnterTargetingMode("ItemSelf");
+                    break;
+
+                case TargetType.AllEnemies:
+                case TargetType.AllAllies:
+                    ExecuteTargetedItem(item, null); // Instant AOE
+                    break;
             }
-
-            var window = CreateSelectionWindow("Select Item", inventory.Select(i => $"{i.Name} (x{i.Quantity})"));
-
-            var list = (ListBox)window.Content;
-            list.SelectionChanged += (s, ev) =>
-            {
-                if (list.SelectedItem == null) return;
-
-                string selected = list.SelectedItem.ToString();
-                string itemName = selected.Split('(')[0].Trim();
-
-
-                string result = battle.ExecuteCurrentTurnAction("UseItem", itemName);
-                MessageBox.Show(result);
-
-                AnimateStepBack(() =>
-                {
-                    var item = inventory.FirstOrDefault(i => i.Name == itemName);
-                    if (item != null)
-                    {
-                        item.Quantity--;
-                        if (item.Quantity <= 0)
-                            inventory.Remove(item);
-                    }
-
-                    battle.AdvanceTurn();
-                    UpdateUI();
-                    CheckNextState();
-                    window.Close();
-                });               
-            };
-
-            window.ShowDialog();
-        }
-
-        private void SkillButton_Click(object sender, RoutedEventArgs e)
-        {
-            var currentChar = battle.CurrentTurn.Character;
-            if (currentChar.Skills == null || currentChar.Skills.Count == 0)
-            {
-                MessageBox.Show($"{currentChar.Name} has no skills!");
-                return;
-            }
-
-            var window = CreateSelectionWindow("Select Skill", currentChar.Skills.Select(s => s));
-            var list = (ListBox)window.Content;
-
-            list.SelectionChanged += (s, ev) =>
-            {
-                if (list.SelectedItem == null) return;
-
-                string selectedSkill = list.SelectedItem.ToString();
-                window.Close();
-                SelectSkillTarget(selectedSkill);
-            };
-
-            window.ShowDialog();
-        }
-
-        private void SelectSkillTarget(string skillName)
-        {
-            bool isHeal = skillName.ToLower().Contains("heal");
-            var targets = isHeal
-                ? characters.Where(c => c.HP > 0).Select(c => c.Name)
-                : battle.GetAliveEnemies().Select(e => e.Name);
-
-            var window = CreateSelectionWindow("Select Target", targets);
-            var list = (ListBox)window.Content;
-
-            list.SelectionChanged += (s, ev) =>
-            {
-                if (list.SelectedItem == null) return;
-
-                string selected = list.SelectedItem.ToString();
-                string result = "";
-
-                if (isHeal)
-                {
-                    var target = characters.First(c => c.Name == selected);
-                    result = battle.ExecuteCurrentTurnAction("SkillAlly", Tuple.Create(skillName, target));
-                    MessageBox.Show(result);
-
-                    AnimateStepBack(() =>
-                    {
-                        battle.AdvanceTurn();
-                        UpdateUI();
-                        CheckNextState();
-                        window.Close();
-                    });
-                }
-                else
-                {
-                    var target = battle.GetAliveEnemies().First(e => e.Name == selected);
-                    result = battle.ExecuteCurrentTurnAction("SkillEnemy", Tuple.Create(skillName, target));
-                    MessageBox.Show(result);
-
-                    AnimateStepBack(() =>
-                    {
-                        battle.AdvanceTurn();
-                        UpdateUI();
-                        CheckNextState();
-                        window.Close();
-                    });
-                }
-            };
-
-            window.ShowDialog();
-        }
-
-        private Window CreateSelectionWindow(string title, IEnumerable<string> items)
-        {
-            var list = new ListBox
-            {
-                Background = Brushes.Black,
-                Foreground = Brushes.White,
-                ItemsSource = items.ToList()
-            };
-
-            return new Window
-            {
-                Title = title,
-                Width = 300,
-                Height = 400,
-                WindowStartupLocation = WindowStartupLocation.CenterOwner,
-                Background = Brushes.Black,
-                Owner = Application.Current.MainWindow,
-                Content = list
-            };
         }
 
         private void RunButton_Click(object sender, RoutedEventArgs e)
@@ -720,9 +697,42 @@ namespace JRPG.UI.Battle
             {
                 case "Attack": AttackButton_Click(null, null); break;
                 case "Defend": DefendButton_Click(null, null); break;
-                case "Skill": SkillButton_Click(null, null); break;
+                case "Skill":
+                    var currentChar = battle.CurrentTurn.Character;
+                    if (currentChar.Skills != null && currentChar.Skills.Count > 0)
+                        CommandBox.ShowSkills(currentChar.Skills);
+                    else
+                    {
+                        MessageBox.Show($"{currentChar.Name} has no skills!");
+                    }
+                    break;
                 case "Item": UseItemButton_Click(null, null); break;
                 case "Run": RunButton_Click(null, null); break;
+            }
+        }
+
+        private void HandleSkillTargeting(Skill skill)
+        {
+            targetingSkill = skill;
+
+            switch (skill.TargetType)
+            {
+                case TargetType.Enemy:
+                    EnterTargetingMode("SkillEnemy");
+                    break;
+                case TargetType.Ally:
+                    EnterTargetingMode("SkillAlly");
+                    break;
+                case TargetType.Self:
+                    targetingSkill = skill;
+                    EnterTargetingMode("SkillSelf");
+                    break;
+                    //case TargetType.AllEnemies:
+                    //    ExecuteAoESkill(skill, battle.GetAliveEnemies());
+                    //    break;
+                    //case TargetType.AllAllies:
+                    //    ExecuteAoESkill(skill, characters.Where(c => c.HP > 0));
+                    //    break;
             }
         }
     }

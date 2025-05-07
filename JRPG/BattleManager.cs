@@ -101,8 +101,8 @@ namespace JRPG
                     return PlayerUseItem(player, target as string);
 
                 case "SkillEnemy":
-                    if (target is Tuple<string, Enemy> skillInfo)
-                        return PlayerUseSkillOnEnemy(player, skillInfo.Item1, skillInfo.Item2);
+                    if (target is Tuple<Skill, Enemy> skillInfo)
+                        return PlayerUseSkillOnEnemy(player, skillInfo.Item1.Name, skillInfo.Item2);
                     return "Invalid skill or target.";
 
                 case "SkillAlly":

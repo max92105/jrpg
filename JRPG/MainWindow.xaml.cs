@@ -1,4 +1,5 @@
-﻿using JRPG.Core.Battles.Models;
+﻿using JRPG.Core.Battles.Enum;
+using JRPG.Core.Battles.Models;
 using JRPG.UI.Battle;
 using System;
 using System.Collections.Generic;
@@ -81,7 +82,12 @@ namespace JRPG
                 EXPToNextLevel = 500,
                 IsActive = true,
                 IsMainCharacter = true,
-                Skills = new List<string> { "Power Slash", "Shield Break" }
+                Skills = new List<Skill> 
+                {
+                    new Skill { Name = "Fireball", MPCost = 10, TargetType = TargetType.Enemy },
+                    new Skill { Name = "Heal", MPCost = 8, TargetType = TargetType.Ally },
+                    new Skill { Name = "Recovery", MPCost = 8, TargetType = TargetType.Self }
+                }
             });
 
             allCharacters.Add(new Character
@@ -97,7 +103,6 @@ namespace JRPG
                 BaseDefense = 3,
                 EXP = 150,
                 EXPToNextLevel = 400,
-                Skills = new List<string> { "Fireball", "Ice Spike" }
             });
 
             allCharacters.Add(new Character
@@ -113,7 +118,6 @@ namespace JRPG
                 BaseDefense = 5,
                 EXP = 300,
                 EXPToNextLevel = 600,
-                Skills = new List<string> { "Backstab", "Poison Knife" }
             });
 
             allCharacters.Add(new Character
@@ -129,7 +133,6 @@ namespace JRPG
                 BaseDefense = 6,
                 EXP = 100,
                 EXPToNextLevel = 300,
-                Skills = new List<string> { "Heal", "Blessing" }
             });
 
             allCharacters.Add(new Character
@@ -145,7 +148,6 @@ namespace JRPG
                 BaseDefense = 12,
                 EXP = 100,
                 EXPToNextLevel = 300,
-                Skills = new List<string> { "Cleave", "Lay on Hands" }
             });
 
             allCharacters.Add(new Character
@@ -161,7 +163,6 @@ namespace JRPG
                 BaseDefense = 5,
                 EXP = 100,
                 EXPToNextLevel = 300,
-                Skills = new List<string> { "Sting", "Hunter's Mark" }
             });
         }
 

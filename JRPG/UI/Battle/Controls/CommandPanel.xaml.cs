@@ -14,6 +14,7 @@ namespace JRPG.UI.Battle.Controls
     {
         public event Action<string> OnCommandSelected;
         public event Action<Skill> OnSkillSelected;
+        public event Action<InventoryItem> OnItemSelected;
 
         public CommandPanel()
         {
@@ -64,11 +65,40 @@ namespace JRPG.UI.Battle.Controls
             }
         }
 
+        public void ShowItems(IEnumerable<InventoryItem> items)
+        {
+            SkillListPanel.Children.Clear();
+
+            foreach (var item in items)
+            {
+                var itemButton = new Button
+                {
+                    Content = new TextBlock
+                    {
+                        Text = $"{item.Name} (x{item.Quantity})",
+                        Foreground = Brushes.White,
+                        FontSize = 14,
+                        TextAlignment = TextAlignment.Center
+                    },
+                    Style = (Style)FindResource("CommandButtonStyle"),
+                    Tag = item
+                };
+
+                itemButton.Click += (s, e) =>
+                {
+                    OnItemSelected?.Invoke(item);
+                    SkillListPanel.Visibility = Visibility.Collapsed;
+                };
+
+                SkillListPanel.Children.Add(itemButton);
+            }
+        }
+
         private void Command_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag is string command)
             {
-                if (command == "Skill")
+                if (command == "Skill" || command == "Item")
                 {
                     // Raise base event but let parent handle showing skills
                     OnCommandSelected?.Invoke(command);

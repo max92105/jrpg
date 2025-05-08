@@ -106,7 +106,6 @@
     <Compile Include="UI\Battle\Controls\FloatingText.xaml.cs">
       <DependentUpon>FloatingText.xaml</DependentUpon>
     </Compile>
-    <Compile Include="InventoryItem.cs" />
     <Compile Include="SaveData.cs" />
     <Compile Include="SaveGameManager.cs" />
     <Compile Include="UI\Battle\BattleUI.xaml.cs">

@@ -68,6 +68,7 @@ namespace JRPG.UI.Battle
             battle = new BattleManager(characters, enemies);
 
             CommandBox.OnSkillSelected += HandleSkillTargeting;
+            CommandBox.OnItemSelected += HandleItemTargeting;
 
             UpdateUI();
             CheckNextState();
@@ -167,7 +168,6 @@ namespace JRPG.UI.Battle
                 var enemy = aliveEnemies[i];
                 var image = CreateSpriteImage(AssetPathResolver.GetSpritesPath(enemypath), true, enemy);
 
-                // Mouse hover = show target arrow
                 image.MouseEnter += (s, e) =>
                 {
                     if (!isTargeting) return;
@@ -176,36 +176,38 @@ namespace JRPG.UI.Battle
                         targetingAction == "ItemAlly" || targetingAction == "ItemSelf")
                         return; // Block enemy hover in Ally/Self item modes
 
-                    currentlySelectedAlly = null;
-                    currentlySelectedEnemy = enemy;
-
-                    HighlightSelectedEnemyInTurnOrder();
                     ShowHoverArrowFor(enemy);
                     ApplyPulsingGlow(image);
+                    currentlySelectedEnemy = enemy;
+                    HighlightSelectedEnemyInTurnOrder();
                 };
 
-                // Click = confirm target
                 image.MouseLeftButtonUp += (s, e) =>
                 {
                     if (!isTargeting || currentlySelectedEnemy == null) return;
 
-                    // ❌ Block enemy clicks in Self or Ally targeting
-                    if (targetingAction == "SkillSelf" || targetingAction == "SkillAlly")
-                        return;
+                    if (targetingAction == "SkillAlly" || targetingAction == "SkillSelf" ||
+                        targetingAction == "ItemAlly" || targetingAction == "ItemSelf")
+                        return; // Block clicks in non-enemy mode
 
-                    string result;
-                    if (targetingAction == "Attack")
+                    string result = null;
+
+                    switch (targetingAction)
                     {
-                        result = battle.ExecuteCurrentTurnAction("Attack", currentlySelectedEnemy);
+                        case "Attack":
+                            result = battle.ExecuteCurrentTurnAction("Attack", currentlySelectedEnemy);
+                            break;
+
+                        case "SkillEnemy":
+                            result = battle.ExecuteCurrentTurnAction("SkillEnemy", Tuple.Create(targetingSkill, currentlySelectedEnemy));
+                            break;
+
+                        case "ItemEnemy":
+                            result = battle.ExecuteCurrentTurnAction("ItemEnemy", Tuple.Create(targetingItem, currentlySelectedEnemy));
+                            break;
                     }
-                    else if (targetingAction == "SkillEnemy" && targetingSkill != null)
-                    {
-                        result = battle.ExecuteCurrentTurnAction("SkillEnemy", Tuple.Create(targetingSkill, currentlySelectedEnemy));
-                    }
-                    else
-                    {
-                        return; // Unsupported
-                    }
+
+                    if (result == null) return;
 
                     MessageBox.Show(result);
 
@@ -236,30 +238,52 @@ namespace JRPG.UI.Battle
                 {
                     if (!isTargeting) return;
 
-                    if (targetingAction == "SkillAlly" || targetingAction == "SkillSelf")
+                    if (targetingAction == "SkillAlly" || targetingAction == "SkillSelf" ||
+                        targetingAction == "ItemAlly" || targetingAction == "ItemSelf")
                     {
-                        if (targetingAction == "SkillSelf" && player != battle.CurrentTurn.Character)
-                            return; // ❌ Disallow hover over other allies in Self mode
+                        // In "Self" mode, block hovering over other allies
+                        if (targetingAction == "SkillSelf" || targetingAction == "ItemSelf")
+                            if (player != battle.CurrentTurn.Character)
+                                return;
 
                         currentlySelectedEnemy = null;
                         currentlySelectedAlly = player;
-
                         HighlightSelectedAllyInTurnOrder();
-                        ShowHoverArrowFor(player);
                         ApplyPulsingGlow(image);
+                        ShowHoverArrowFor(player); // Reuse arrow
                     }
                 };
 
                 image.MouseLeftButtonUp += (s, e) =>
                 {
-                    if (!isTargeting || targetingAction != "SkillAlly" && targetingAction != "SkillSelf")
+                    if (!isTargeting || (targetingAction != "SkillAlly" && targetingAction != "SkillSelf" &&
+                                         targetingAction != "ItemAlly" && targetingAction != "ItemSelf"))
                         return;
 
-                    // Block changing selection in SkillSelf mode
-                    if (targetingAction == "SkillSelf" && player != battle.CurrentTurn.Character)
-                        return;
+                    if ((targetingAction == "SkillSelf" || targetingAction == "ItemSelf") &&
+                        player != battle.CurrentTurn.Character)
+                        return; // Can't use Self-target on another ally
 
-                    string result = battle.ExecuteCurrentTurnAction(targetingAction, Tuple.Create(targetingSkill, player));
+                    string result = null;
+
+                    switch (targetingAction)
+                    {
+                        case "SkillAlly":
+                            result = battle.ExecuteCurrentTurnAction("SkillAlly", Tuple.Create(targetingSkill, player));
+                            break;
+                        case "ItemAlly":
+                            result = battle.ExecuteCurrentTurnAction("ItemAlly", Tuple.Create(targetingItem, player));
+                            break;
+                        case "ItemSelf":
+                            result = battle.ExecuteCurrentTurnAction("ItemSelf", Tuple.Create(targetingItem, player));
+                            break;
+                        case "SkillSelf":
+                            result = battle.ExecuteCurrentTurnAction("SkillSelf", Tuple.Create(targetingSkill, player));
+                            break;
+                    }
+
+                    if (result == null) return;
+
                     MessageBox.Show(result);
 
                     AnimateStepBack(() =>
@@ -514,40 +538,56 @@ namespace JRPG.UI.Battle
             isTargeting = true;
             targetingAction = action;
 
-            // Hide command menu
             CommandBox.Visibility = Visibility.Collapsed;
 
-            if (action == "SkillSelf")
+            // Default target: self
+            if (action == "SkillSelf" || action == "ItemSelf")
             {
                 var self = battle.CurrentTurn.Character;
 
-                if (!spriteImages.TryGetValue(self, out var img)) return;
+                if (spriteImages.TryGetValue(self, out var img))
+                {
+                    currentlySelectedAlly = self;
+                    currentlySelectedEnemy = null;
+                    ShowHoverArrowFor(self);
+                    ApplyPulsingGlow(img);
+                    HighlightSelectedAllyInTurnOrder();
+                }
 
-                currentlySelectedEnemy = null; // Not using enemy in this case
-
-                // Show arrow and glow over the player
-                ShowHoverArrowFor(self);
-                ApplyPulsingGlow(img);
-
-                return; // skip enemy default logic
+                return;
             }
 
-            if (targetingAction == "SkillAlly" || targetingAction == "SkillSelf")
+            // Default target: ally
+            if (action == "SkillAlly" || action == "ItemAlly")
             {
-                var defaultAlly = battle.CurrentTurn.Character;
+                var self = battle.CurrentTurn.Character;
 
-                currentlySelectedAlly = defaultAlly;
-                ShowHoverArrowFor(defaultAlly);
-                ApplyPulsingGlow(spriteImages[defaultAlly]);
-                HighlightSelectedAllyInTurnOrder();
+                if (spriteImages.TryGetValue(self, out var img))
+                {
+                    currentlySelectedAlly = self;
+                    currentlySelectedEnemy = null;
+                    ShowHoverArrowFor(self);
+                    ApplyPulsingGlow(img);
+                    HighlightSelectedAllyInTurnOrder();
+                }
+
+                return;
             }
-            else if (targetingAction == "Attack" || targetingAction == "SkillEnemy")
+
+            // Default target: enemy
+            if (action == "Attack" || action == "SkillEnemy" || action == "ItemEnemy")
             {
                 var defaultEnemy = battle.GetAliveEnemies().LastOrDefault();
-                currentlySelectedEnemy = defaultEnemy;
-                ShowHoverArrowFor(defaultEnemy);
-                ApplyPulsingGlow(spriteImages[defaultEnemy]);
-                HighlightSelectedEnemyInTurnOrder();
+                if (defaultEnemy != null && spriteImages.TryGetValue(defaultEnemy, out var img))
+                {
+                    currentlySelectedEnemy = defaultEnemy;
+                    currentlySelectedAlly = null;
+                    ShowHoverArrowFor(defaultEnemy);
+                    ApplyPulsingGlow(img);
+                    HighlightSelectedEnemyInTurnOrder();
+                }
+
+                return;
             }
         }
 
@@ -590,7 +630,7 @@ namespace JRPG.UI.Battle
 
                 case TargetType.AllEnemies:
                 case TargetType.AllAllies:
-                    ExecuteTargetedItem(item, null); // Instant AOE
+                    EnterTargetingMode("allAlly");
                     break;
             }
         }
@@ -706,7 +746,12 @@ namespace JRPG.UI.Battle
                         MessageBox.Show($"{currentChar.Name} has no skills!");
                     }
                     break;
-                case "Item": UseItemButton_Click(null, null); break;
+                case "Item":
+                    if (inventory != null && inventory.Any(i => i.Quantity > 0))
+                        CommandBox.ShowItems(inventory);
+                    else
+                        MessageBox.Show("No items available!");
+                    break;
                 case "Run": RunButton_Click(null, null); break;
             }
         }

@@ -57,11 +57,11 @@ namespace JRPG
 
         private void InitializeInventory()
         {
-            playerInventory.Add(new InventoryItem { Name = "Potion", Quantity = 5, Description = "Restores a small amount of HP." });
-            playerInventory.Add(new InventoryItem { Name = "Hi-Potion", Quantity = 2, Description = "Restores a medium amount of HP." });
-            playerInventory.Add(new InventoryItem { Name = "Elixir", Quantity = 1, Description = "Fully restores HP and MP." });
-            playerInventory.Add(new InventoryItem { Name = "Antidote", Quantity = 7, Description = "Cures poison." });
-            playerInventory.Add(new InventoryItem { Name = "Phoenix Down", Quantity = 3, Description = "Revives a fallen ally." });
+            playerInventory.Add(new InventoryItem { Name = "Potion", Quantity = 5, Description = "Restores a small amount of HP.", TargetType = TargetType.Ally });
+            playerInventory.Add(new InventoryItem { Name = "Hi-Potion", Quantity = 2, Description = "Restores a medium amount of HP.", TargetType = TargetType.Ally });
+            playerInventory.Add(new InventoryItem { Name = "Elixir", Quantity = 1, Description = "Fully restores HP and MP.", TargetType = TargetType.Ally });
+            playerInventory.Add(new InventoryItem { Name = "Antidote", Quantity = 7, Description = "Cures poison.", TargetType = TargetType.Self });
+            playerInventory.Add(new InventoryItem { Name = "Bomb", Quantity = 3, Description = "Revives a fallen ally.", TargetType = TargetType.Enemy });
         }
 
         private void InitializeCharacters()

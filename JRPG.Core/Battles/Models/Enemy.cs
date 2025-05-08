@@ -1,16 +1,34 @@
-﻿namespace JRPG.Core.Battles.Models
+﻿using System;
+
+namespace JRPG.Core.Battles.Models
 {
-    public class Enemy : Fighter
+    public class Enemy : BattleActor
     {
-        public string SpritePath { get; set; }
-        public string PortraitPath { get; set; }
-
-
-        public Enemy(string name, int hp, int atk, int def, string spritePath, string portraitPath)
-            : base(name, hp, atk, def)
+        public Enemy()
         {
-            SpritePath = spritePath;
-            PortraitPath = portraitPath;
+        }
+
+        public override int GetTotalAttack()
+        {
+            return BaseAttack;
+        }
+
+        public override int GetTotalDefense()
+        {
+            return BaseDefense;
+        }
+
+        public override int TakeDamage(int rawDamage)
+        {
+            int damage = Math.Max(1, rawDamage - GetTotalDefense());
+            HP = Math.Max(0, HP - damage);
+
+            return damage;
+        }
+
+        public override void Heal(int rawHeal)
+        {
+            HP = Math.Min(MaxHP, HP + rawHeal);
         }
     }
 }

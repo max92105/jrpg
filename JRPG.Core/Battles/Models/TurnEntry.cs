@@ -2,9 +2,7 @@
 {
     public class TurnEntry
     {
-        public Character Character { get; set; }
-        public Enemy Enemy { get; set; }
-        public bool IsPlayer => Character != null;
-        public string Name => IsPlayer ? Character.Name : Enemy.Name;
+        public BattleActor BattleActor { get; set; }
+        public bool IsPlayer => BattleActor is Character;
     }
 }

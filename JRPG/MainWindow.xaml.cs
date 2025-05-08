@@ -1,5 +1,6 @@
 ﻿using JRPG.Core.Battles.Enum;
 using JRPG.Core.Battles.Models;
+using JRPG.Core.Battles.Models.Enemies;
 using JRPG.UI.Battle;
 using System;
 using System.Collections.Generic;
@@ -57,13 +58,13 @@ namespace JRPG
 
         private void InitializeInventory()
         {
-            playerInventory.Add(new InventoryItem { Name = "Potion", Quantity = 5, Description = "Restores a small amount of HP.", TargetType = TargetType.Ally });
-            playerInventory.Add(new InventoryItem { Name = "Hi-Potion", Quantity = 2, Description = "Restores a medium amount of HP.", TargetType = TargetType.Ally });
-            playerInventory.Add(new InventoryItem { Name = "Elixir", Quantity = 1, Description = "Fully restores HP and MP.", TargetType = TargetType.Ally });
-            playerInventory.Add(new InventoryItem { Name = "Antidote", Quantity = 7, Description = "Cures poison.", TargetType = TargetType.Self });
-            playerInventory.Add(new InventoryItem { Name = "Bomb", Quantity = 3, Description = "Damage an enemy.", TargetType = TargetType.Enemy });
-            playerInventory.Add(new InventoryItem { Name = "Bomb All", Quantity = 3, Description = "Damage all enemy.", TargetType = TargetType.AllEnemies });
-            playerInventory.Add(new InventoryItem { Name = "Revive Feather", Quantity = 3, Description = "Revives all fallen allies.", TargetType = TargetType.AllAllies });
+            playerInventory.Add(new InventoryItem { Name = "Potion", Quantity = 5, EffectValue = 15, Description = "Restores a small amount of HP.", TargetType = TargetType.Ally });
+            playerInventory.Add(new InventoryItem { Name = "Hi-Potion", Quantity = 2, EffectValue = 50, Description = "Restores a medium amount of HP.", TargetType = TargetType.Ally });
+            playerInventory.Add(new InventoryItem { Name = "Elixir", Quantity = 1, EffectValue = 100, Description = "Fully restores HP and MP.", TargetType = TargetType.Ally });
+            playerInventory.Add(new InventoryItem { Name = "Antidote", Quantity = 7, EffectValue = 15, Description = "Cures poison.", TargetType = TargetType.Self });
+            playerInventory.Add(new InventoryItem { Name = "Bomb", Quantity = 3, EffectValue = 15, Description = "Damage an enemy.", TargetType = TargetType.Enemy });
+            playerInventory.Add(new InventoryItem { Name = "Bomb All", Quantity = 3, EffectValue = 30, Description = "Damage all enemy.", TargetType = TargetType.AllEnemies });
+            playerInventory.Add(new InventoryItem { Name = "Revive Feather", Quantity = 3, EffectValue = 15, Description = "Revives all fallen allies.", TargetType = TargetType.AllAllies });
         }
 
         private void InitializeCharacters()
@@ -72,12 +73,13 @@ namespace JRPG
             {
                 Name = "Alaric",
                 PortraitFile = "Alaric.png",
+                BattleSpriteFile = "PlaceholderCharacter.png",
                 Class = "Warrior",
                 Level = 10,
                 HP = 230,
                 MaxHP = 230,
-                MP = 30,
-                MaxMP = 30,
+                MP = 300,
+                MaxMP = 300,
                 BaseAttack = 15,
                 BaseDefense = 8,
                 EXP = 250,
@@ -86,11 +88,11 @@ namespace JRPG
                 IsMainCharacter = true,
                 Skills = new List<Skill> 
                 {
-                    new Skill { Name = "Fire Blast", MPCost = 10, TargetType = TargetType.Enemy },
-                    new Skill { Name = "Fireball", MPCost = 10, TargetType = TargetType.AllEnemies },
-                    new Skill { Name = "Heal", MPCost = 8, TargetType = TargetType.Ally },
-                    new Skill { Name = "Recovery", MPCost = 8, TargetType = TargetType.Self },
-                    new Skill { Name = "Heal All", MPCost = 8, TargetType = TargetType.AllAllies },
+                    new Skill { Name = "Fire Blast", MPCost = 10, EffectValue = 15, TargetType = TargetType.Enemy },
+                    new Skill { Name = "Fireball", MPCost = 10, EffectValue = 20, TargetType = TargetType.AllEnemies },
+                    new Skill { Name = "Heal", MPCost = 8, EffectValue = 15, TargetType = TargetType.Ally },
+                    new Skill { Name = "Recovery", MPCost = 8, EffectValue = 30, TargetType = TargetType.Self },
+                    new Skill { Name = "Heal All", MPCost = 8, EffectValue = 50, TargetType = TargetType.AllAllies },
                 }
             });
 
@@ -116,8 +118,8 @@ namespace JRPG
                 Level = 11,
                 HP = 190,
                 MaxHP = 190,
-                MP = 30,
-                MaxMP = 30,
+                MP = 300,
+                MaxMP = 300,
                 BaseAttack = 12,
                 BaseDefense = 5,
                 EXP = 300,
@@ -211,12 +213,17 @@ namespace JRPG
             {
                 List<Enemy> enemies = new List<Enemy>()
                 {
-                    new Enemy("Goblin", 40, 10, 2, "goblin.png", "PlaceholderEnemy.png"),
-                    new Enemy("Goblin", 40, 10, 2, "goblin.png", "PlaceholderEnemy.png"),
-                    new Enemy("Goblin", 40, 10, 2, "goblin.png", "PlaceholderEnemy.png")
+                    new Goblin(),
+                    new Goblin(),
+                    new Goblin()
                 };
 
-                var battleUI = new BattleUI(activePartyOrder, enemies, playerInventory);
+                List<BattleActor> battleActors = new List<BattleActor>();
+
+                battleActors.AddRange(enemies);
+                battleActors.AddRange(activePartyOrder);
+
+                var battleUI = new BattleUI(battleActors, playerInventory);
 
                 battleUI.SetBackground("Forest.png");
 
@@ -805,7 +812,7 @@ namespace JRPG
 
                 characterStack.Children.Add(new TextBlock
                 {
-                    Text = $"ATK: {character.GetTotalAttack(weaponAttackBonus)}  DEF: {character.GetTotalDefense(armorDefenseBonus)}",
+                    Text = $"ATK: {character.GetTotalAttack()}  DEF: {character.GetTotalDefense()}",
                     FontSize = 16,
                     Foreground = Brushes.LightBlue,
                     Margin = new Thickness(0, 5, 0, 0)
@@ -1043,7 +1050,7 @@ namespace JRPG
                 // Attack
                 characterStack.Children.Add(new TextBlock
                 {
-                    Text = $"ATK: {character.GetTotalAttack(weaponAttackBonus)} (Base {character.BaseAttack})",
+                    Text = $"ATK: {character.GetTotalAttack()} (Base {character.BaseAttack})",
                     FontSize = 18,
                     Foreground = Brushes.LightBlue
                 });
@@ -1051,7 +1058,7 @@ namespace JRPG
                 // Defense
                 characterStack.Children.Add(new TextBlock
                 {
-                    Text = $"DEF: {character.GetTotalDefense(armorDefenseBonus)} (Base {character.BaseDefense})",
+                    Text = $"DEF: {character.GetTotalDefense()} (Base {character.BaseDefense})",
                     FontSize = 18,
                     Foreground = Brushes.LightBlue
                 });

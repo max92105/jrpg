@@ -3,25 +3,28 @@ using JRPG.Core.Battles.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JRPG.UI.Battle;
+using JRPG.Core.Battles.Enum;
 
 namespace JRPG
 {
     public class BattleManager
     {
-        private readonly List<Character> players;
-        private readonly List<Enemy> enemies;
+        private readonly List<BattleActor> battleActors;
+
+        public List<BattleActor> GetAliveEnemies() => battleActors.Where(battleActors => battleActors is Enemy && battleActors.HP > 0).ToList();
+        public List<BattleActor> GetAlivePlayers() => battleActors.Where(battleActors => battleActors is Character && battleActors.HP > 0).ToList();
+
         private Queue<TurnEntry> turnQueue = new Queue<TurnEntry>();
 
         public BattleState State { get; private set; } = BattleState.PlayerTurn;
 
         public TurnEntry CurrentTurn => turnQueue.Peek();
-        public Queue<TurnEntry> TurnQueue => new Queue<TurnEntry>(turnQueue);
 
-        public BattleManager(List<Character> players, List<Enemy> enemies)
+        public Queue<TurnEntry> TurnQueue => turnQueue;
+
+        public BattleManager(List<BattleActor> battleActors)
         {
-            this.players = players;
-            this.enemies = enemies;
+            this.battleActors = battleActors;
             InitializeTurnOrder();
         }
 
@@ -30,10 +33,8 @@ namespace JRPG
             turnQueue.Clear();
             var allUnits = new List<TurnEntry>();
 
-            allUnits.AddRange(players.Select(p => new TurnEntry { Character = p }));
-            allUnits.AddRange(enemies.Select(e => new TurnEntry { Enemy = e }));
+            allUnits.AddRange(battleActors.Select(p => new TurnEntry { BattleActor = p }));
 
-            // Later: Sort by initiative or speed
             turnQueue = new Queue<TurnEntry>(allUnits.OrderBy(_ => Guid.NewGuid())); // shuffle for now
 
             State = CurrentTurn.IsPlayer ? BattleState.PlayerTurn : BattleState.EnemyTurn;
@@ -46,175 +47,137 @@ namespace JRPG
                 var current = turnQueue.Dequeue();
                 turnQueue.Enqueue(current);
             }
-            while ((CurrentTurn.IsPlayer && CurrentTurn.Character.HP <= 0)
-                    || (!CurrentTurn.IsPlayer && CurrentTurn.Enemy.CurrentHP <= 0));
+            while (CurrentTurn.BattleActor.HP <= 0);
 
             State = CurrentTurn.IsPlayer ? BattleState.PlayerTurn : BattleState.EnemyTurn;
         }
 
         public bool IsBattleOver()
         {
-            if (players.All(p => p.HP <= 0))
+            if (!battleActors.Where(actor => actor is Character && actor.HP > 0).Any())
             {
                 State = BattleState.Lost;
                 return true;
             }
-            if (enemies.All(e => e.CurrentHP <= 0))
+
+            if (!battleActors.Where(actor => actor is Enemy && actor.HP > 0).Any())
             {
                 State = BattleState.Won;
                 return true;
             }
+
             return false;
         }
 
-        public string ExecuteCurrentTurnAction(string action, object target = null)
-        {
-            if (State == BattleState.Won || State == BattleState.Lost)
-                return "Battle is already over.";
-
+        public string ExecuteCurrentTurnAction(CombatAction combatAction, List<BattleActor> targets, object param = null)
+        {          
             var current = CurrentTurn;
 
-            if (current.IsPlayer)
+            if (CurrentTurn.IsPlayer)
             {
-                return ExecutePlayerAction(current.Character, action, target);
+                return ExecutePlayerAction((Character)current.BattleActor, combatAction, targets, param);
             }
             else
             {
-                return ExecuteEnemyAction(current.Enemy);
+                return ExecuteEnemyAction(targets);
             }
         }
 
-        private string ExecutePlayerAction(Character player, string action, object target)
+        private string ExecutePlayerAction(Character character, CombatAction action, List<BattleActor> targets, object param = null)
         {
             switch (action)
             {
-                case "Attack":
-                    if (target is Enemy enemyTarget)
-                        return PlayerAttack(player, enemyTarget);
+                case CombatAction.Attack:
+                    if (targets.Count > 0)
+                        return Attack(character, targets);
                     return "No valid enemy target.";
 
-                case "Defend":
-                    return $"{player.Name} is defending."; // TODO: Add logic
+                case CombatAction.Defend:
+                    return $"{character.Name} is defending."; // TODO: Add logic
 
-                case "UseItem":
-                    // Simplify later for UI call
-                    return PlayerUseItem(player, target as string);
+                case CombatAction.Item:
+                    if (param is InventoryItem item)
+                        return PlayerUseItem(character, item, targets);
+                    return "Invalid item.";
 
-                case "SkillEnemy":
-                    if (target is Tuple<Skill, Enemy> skillInfo)
-                        return PlayerUseSkillOnEnemy(player, skillInfo.Item1.Name, skillInfo.Item2);
-                    return "Invalid skill or target.";
-
-                case "SkillAlly":
-                    if (target is Tuple<string, Character> healInfo)
-                        return PlayerUseSkillOnAlly(player, healInfo.Item1, healInfo.Item2);
-                    return "Invalid skill or ally.";
+                case CombatAction.Skill:
+                    if (param is Skill skill)
+                        return PlayerUseSkill(character, skill, targets);
+                    return "Invalid skill.";
 
                 default:
                     return "Unknown action.";
             }
         }
 
-        private string ExecuteEnemyAction(Enemy enemy)
+        private string Attack(BattleActor attacker, List<BattleActor> targets)
         {
-            var alivePlayers = players.Where(p => p.HP > 0).ToList();
-            if (alivePlayers.Count == 0)
+            foreach (var target in targets)
             {
-                State = BattleState.Lost;
-                return $"All players defeated!";
+                var damage = target.TakeDamage(attacker.GetTotalAttack());
             }
-
-            var target = alivePlayers[new Random().Next(alivePlayers.Count)];
-            int damage = enemy.Attack;
-            target.HP -= damage;
-            if (target.HP < 0) target.HP = 0;
-
-            if (players.All(p => p.HP <= 0))
-            {
-                State = BattleState.Lost;
-                return $"{enemy.Name} defeated the party!";
-            }
-
-            return $"{enemy.Name} attacks {target.Name} for {damage} damage!";
+          
+            return $"{attacker.Name} attacks";
         }
 
-        private string PlayerAttack(Character attacker, Enemy target)
+        private string PlayerUseItem(Character user, InventoryItem item, List<BattleActor> targets)
         {
-            int damage = attacker.GetTotalAttack(new Dictionary<string, int>()) + 5;
-            target.CurrentHP -= damage;
-            if (target.CurrentHP < 0) target.CurrentHP = 0;
-
-            if (IsBattleOver())
-                return $"{attacker.Name} attacked and ended the battle!";
-            return $"{attacker.Name} attacks {target.Name} for {damage} damage!";
-        }
-
-        private string PlayerUseItem(Character user, string itemName)
-        {
-            switch (itemName)
+            if (item.TargetType == TargetType.Enemy || item.TargetType == TargetType.AllEnemies)
             {
-                case "Potion":
-                    user.HP += 50;
-                    return $"{user.Name} used a Potion and restored 50 HP!";
-                case "Mega Potion":
-                    user.HP += 100;
-                    return $"{user.Name} used a Mega Potion and restored 100 HP!";
-                case "Elixir":
-                    user.HP = user.MaxHP;
-                    return $"{user.Name} used an Elixir and fully healed!";
-                default:
-                    return $"{user.Name} used {itemName}, but nothing happened.";
+                foreach (var target in targets)
+                {
+                    target.TakeDamage(item.EffectValue);
+                }
+
+                item.Quantity--;
+
+                return $"{user.Name} used {item.Name} for {item.EffectValue} damage!";
+            }
+            else
+            {
+                foreach (var target in targets)
+                {
+                    target.Heal(item.EffectValue);
+                }
+
+                item.Quantity--;
+
+                return $"{user.Name} used {item.Name} heals for {item.EffectValue} HP!";
             }
         }
 
-        private string PlayerUseSkillOnEnemy(Character user, string skillName, Enemy target)
+        private string PlayerUseSkill(Character user, Skill skill, List<BattleActor> targets)
         {
-            var skillCosts = new Dictionary<string, int>
+            if (user.MP < skill.MPCost)
             {
-                { "Fireball", 10 },
-                { "Power Slash", 5 }
-            };
-
-            if (skillCosts.TryGetValue(skillName, out int cost))
-            {
-                if (user.MP < cost)
-                    return $"{user.Name} does not have enough MP for {skillName}!";
-                user.MP -= cost;
+                return $"{user.Name} does not have enough MP for {skill.Name}!";
             }
 
-            int baseDamage = user.GetTotalAttack(new Dictionary<string, int>());
-            int bonus = skillName == "Fireball" ? 15 : 10;
-            int damage = baseDamage + bonus;
+            user.UseMP(skill.MPCost);
 
-            target.CurrentHP -= damage;
-            if (target.CurrentHP < 0) target.CurrentHP = 0;
+            if (skill.TargetType == Core.Battles.Enum.TargetType.Enemy || skill.TargetType == Core.Battles.Enum.TargetType.AllEnemies)
+            {
+                foreach (var target in targets)
+                {
+                    target.TakeDamage(skill.EffectValue);
+                }
 
-            if (IsBattleOver())
-                return $"{user.Name} used {skillName} and won the battle!";
-            return $"{user.Name} used {skillName} on {target.Name} for {damage} damage!";
+                return $"{user.Name} used {skill.Name} for {skill.EffectValue} damage!";
+            }
+            else
+            {
+                foreach (var target in targets)
+                {
+                    target.Heal(skill.EffectValue);
+                }
+
+                return $"{user.Name} heals for {skill.EffectValue} HP!";
+            }
         }
 
-        private string PlayerUseSkillOnAlly(Character user, string skillName, Character ally)
+        private string ExecuteEnemyAction(List<BattleActor> targets)
         {
-            var skillCosts = new Dictionary<string, int> { { "Heal", 8 } };
-
-            if (skillCosts.TryGetValue(skillName, out int cost))
-            {
-                if (user.MP < cost)
-                    return $"{user.Name} does not have enough MP for {skillName}!";
-                user.MP -= cost;
-            }
-
-            if (skillName == "Heal")
-            {
-                ally.HP = Math.Min(ally.HP + 50, ally.MaxHP);
-                return $"{user.Name} heals {ally.Name} for 50 HP!";
-            }
-
-            return $"{user.Name} tried to use {skillName}, but nothing happened.";
+            return Attack(CurrentTurn.BattleActor, targets);
         }
-
-        public List<Enemy> GetAliveEnemies() => enemies.Where(e => e.CurrentHP > 0).ToList();
-        public List<Character> GetAlivePlayers() => players.Where(p => p.HP > 0).ToList();
     }
 }

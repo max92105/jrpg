@@ -22,11 +22,11 @@ namespace JRPG.UI.Battle.Controls
         {
             EnemyName.Text = enemy.Name;
             EnemyHPBar.Maximum = enemy.MaxHP;
-            EnemyHPBar.Value = enemy.CurrentHP;
+            EnemyHPBar.Value = enemy.HP;
 
-            if (!string.IsNullOrEmpty(enemy.PortraitPath) && File.Exists(AssetPathResolver.GetPortraitPath(enemy.PortraitPath)))
+            if (!string.IsNullOrEmpty(enemy.PortraitFile) && File.Exists(AssetPathResolver.GetPortraitPath(enemy.PortraitFile)))
             {
-                PortraitImage.Source = new BitmapImage(new Uri(AssetPathResolver.GetPortraitPath(enemy.PortraitPath)));
+                PortraitImage.Source = new BitmapImage(new Uri(AssetPathResolver.GetPortraitPath(enemy.PortraitFile)));
             }
 
             Background = isSelected

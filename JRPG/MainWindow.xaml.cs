@@ -61,7 +61,9 @@ namespace JRPG
             playerInventory.Add(new InventoryItem { Name = "Hi-Potion", Quantity = 2, Description = "Restores a medium amount of HP.", TargetType = TargetType.Ally });
             playerInventory.Add(new InventoryItem { Name = "Elixir", Quantity = 1, Description = "Fully restores HP and MP.", TargetType = TargetType.Ally });
             playerInventory.Add(new InventoryItem { Name = "Antidote", Quantity = 7, Description = "Cures poison.", TargetType = TargetType.Self });
-            playerInventory.Add(new InventoryItem { Name = "Bomb", Quantity = 3, Description = "Revives a fallen ally.", TargetType = TargetType.Enemy });
+            playerInventory.Add(new InventoryItem { Name = "Bomb", Quantity = 3, Description = "Damage an enemy.", TargetType = TargetType.Enemy });
+            playerInventory.Add(new InventoryItem { Name = "Bomb All", Quantity = 3, Description = "Damage all enemy.", TargetType = TargetType.AllEnemies });
+            playerInventory.Add(new InventoryItem { Name = "Revive Feather", Quantity = 3, Description = "Revives all fallen allies.", TargetType = TargetType.AllAllies });
         }
 
         private void InitializeCharacters()
@@ -84,9 +86,11 @@ namespace JRPG
                 IsMainCharacter = true,
                 Skills = new List<Skill> 
                 {
-                    new Skill { Name = "Fireball", MPCost = 10, TargetType = TargetType.Enemy },
+                    new Skill { Name = "Fire Blast", MPCost = 10, TargetType = TargetType.Enemy },
+                    new Skill { Name = "Fireball", MPCost = 10, TargetType = TargetType.AllEnemies },
                     new Skill { Name = "Heal", MPCost = 8, TargetType = TargetType.Ally },
-                    new Skill { Name = "Recovery", MPCost = 8, TargetType = TargetType.Self }
+                    new Skill { Name = "Recovery", MPCost = 8, TargetType = TargetType.Self },
+                    new Skill { Name = "Heal All", MPCost = 8, TargetType = TargetType.AllAllies },
                 }
             });
 
@@ -213,6 +217,9 @@ namespace JRPG
                 };
 
                 var battleUI = new BattleUI(activePartyOrder, enemies, playerInventory);
+
+                battleUI.SetBackground("Forest.png");
+
                 battleUI.OnBattleEnd += EndBattle;
 
                 RootGrid.Children.Add(battleUI);

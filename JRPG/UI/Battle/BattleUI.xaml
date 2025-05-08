@@ -5,34 +5,41 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:controls="clr-namespace:JRPG.UI.Battle.Controls"
              mc:Ignorable="d" >
+    <Grid>
+        <!-- Background Layer -->
+        <Image x:Name="BattleBackground"
+           Stretch="Fill"
+           Panel.ZIndex="0"
+           IsHitTestVisible="False"/>
 
-    <Grid Background="Black">
+        <Grid Background="Transparent">
 
-        <StackPanel x:Name="TurnOrderPanel" Orientation="Horizontal" Grid.Row="0"
+            <StackPanel x:Name="TurnOrderPanel" Orientation="Horizontal" Grid.Row="0"
             HorizontalAlignment="Center" VerticalAlignment="Top" Margin="10" />
 
-        <!-- Effects Layer -->
-        <Canvas x:Name="EffectCanvas" IsHitTestVisible="False" Panel.ZIndex="1000" Width="1920" Height="1080"/>
+            <!-- Effects Layer -->
+            <Canvas x:Name="EffectCanvas" IsHitTestVisible="False" Panel.ZIndex="1000" Width="1920" Height="1080"/>
 
-        <!-- Sprite Display Layer -->
-        <Canvas x:Name="SpriteCanvas" Panel.ZIndex="10" Width="1920" Height="1080">
-        </Canvas>
+            <!-- Sprite Display Layer -->
+            <Canvas x:Name="SpriteCanvas" Panel.ZIndex="10" Width="1920" Height="1080">
+            </Canvas>
 
-        <!-- Command Box Layer (positioned absolutely) -->
-        <Canvas x:Name="CommandCanvas" Panel.ZIndex="200" Width="1920" Height="1080">
-            <controls:CommandPanel x:Name="CommandBox"
+            <!-- Command Box Layer (positioned absolutely) -->
+            <Canvas x:Name="CommandCanvas" Panel.ZIndex="200" Width="1920" Height="1080">
+                <controls:CommandPanel x:Name="CommandBox"
                            Visibility="Visible"
                            Panel.ZIndex="200"
                            OnCommandSelected="HandleCommandSelected" />
-        </Canvas>
+            </Canvas>
 
-        <!-- Player Info Panel (Top Right) -->
-        <StackPanel x:Name="CharacterPanelContainer"
+            <!-- Player Info Panel (Top Right) -->
+            <StackPanel x:Name="CharacterPanelContainer"
                     Orientation="Vertical"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Top"
                     Margin="0,20,20,0"
                     Panel.ZIndex="100">
-        </StackPanel>
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

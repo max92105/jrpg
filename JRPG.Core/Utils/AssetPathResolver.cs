@@ -43,5 +43,11 @@ namespace JRPG.Core.Utils
             string root = GetAssetsRootPath();
             return Path.Combine(root, "Sprites/", file);
         }
+
+        public static string GetBackgroundsPath(string file)
+        {
+            string root = GetAssetsRootPath();
+            return Path.Combine(root, "Backgrounds/", file);
+        }
     }
 }

@@ -38,7 +38,7 @@ namespace JRPG.UI.Battle.Controls
 
         public void ShowSkills(IEnumerable<Skill> skills)
         {
-            SkillListPanel.Children.Clear();
+            OptionListPanel.Children.Clear();
 
             foreach (var skill in skills)
             {
@@ -58,16 +58,16 @@ namespace JRPG.UI.Battle.Controls
                 skillButton.Click += (s, e) =>
                 {
                     OnSkillSelected?.Invoke(skill);
-                    SkillListPanel.Visibility = Visibility.Collapsed;
+                    OptionListPanel.Visibility = Visibility.Collapsed;
                 };
 
-                SkillListPanel.Children.Add(skillButton);
+                OptionListPanel.Children.Add(skillButton);
             }
         }
 
         public void ShowItems(IEnumerable<InventoryItem> items)
         {
-            SkillListPanel.Children.Clear();
+            OptionListPanel.Children.Clear();
 
             foreach (var item in items)
             {
@@ -87,10 +87,10 @@ namespace JRPG.UI.Battle.Controls
                 itemButton.Click += (s, e) =>
                 {
                     OnItemSelected?.Invoke(item);
-                    SkillListPanel.Visibility = Visibility.Collapsed;
+                    OptionListPanel.Visibility = Visibility.Collapsed;
                 };
 
-                SkillListPanel.Children.Add(itemButton);
+                OptionListPanel.Children.Add(itemButton);
             }
         }
 
@@ -102,16 +102,11 @@ namespace JRPG.UI.Battle.Controls
                 {
                     // Raise base event but let parent handle showing skills
                     OnCommandSelected?.Invoke(command);
-
-                    // Optional: if you want to toggle collapse on second click
-                    SkillListPanel.Visibility = SkillListPanel.Visibility == Visibility.Visible
-                        ? Visibility.Collapsed
-                        : Visibility.Visible;
                 }
                 else
                 {
                     // Always hide skill list on other command selections
-                    SkillListPanel.Visibility = Visibility.Collapsed;
+                    OptionListPanel.Visibility = Visibility.Collapsed;
                     OnCommandSelected?.Invoke(command);
                 }
             }

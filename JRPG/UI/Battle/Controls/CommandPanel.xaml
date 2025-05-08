@@ -12,7 +12,7 @@
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Padding" Value="5,5"/>
             <Setter Property="Margin" Value="5,5"/>
             <Setter Property="Width" Value="100"/>
             <Setter Property="Height" Value="50"/>
@@ -38,13 +38,53 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <Style x:Key="ModernScrollBar" TargetType="ScrollBar">
+            <Setter Property="SnapsToDevicePixels" Value="true"/>
+            <Setter Property="OverridesDefaultStyle" Value="true"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="Transparent" Width="8">
+                            <Track x:Name="PART_Track" IsDirectionReversed="true">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Style="{x:Null}" Height="0" IsTabStop="False" />
+                                </Track.DecreaseRepeatButton>
+
+                                <Track.Thumb>
+                                    <Thumb x:Name="Thumb" Width="8" Height="30">
+                                        <Thumb.Template>
+                                            <ControlTemplate TargetType="Thumb">
+                                                <Border CornerRadius="4"
+                                                Background="#88FFFFFF"
+                                                Margin="0">
+                                                    <Border.Effect>
+                                                        <DropShadowEffect BlurRadius="4"
+                                                                  Opacity="0.2"
+                                                                  ShadowDepth="0"/>
+                                                    </Border.Effect>
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Thumb.Template>
+                                    </Thumb>
+                                </Track.Thumb>
+
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Style="{x:Null}" Height="0" IsTabStop="False" />
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
     <Grid Background="Transparent">
         <Border BorderBrush="White" BorderThickness="2" CornerRadius="25">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5" Background="Transparent">
                 <!-- Left Column: Main Commands -->
-                <StackPanel x:Name="ButtonStackPanel" Orientation="Vertical" Margin="0,0,10,0" Background="Transparent">
+                <StackPanel x:Name="ButtonStackPanel" Orientation="Vertical" Margin="10,0,10,0" Background="Transparent">
                     <!-- Command Buttons -->
                     <Button Tag="Attack" Click="Command_Click" Style="{StaticResource CommandButtonStyle}">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
@@ -83,13 +123,21 @@
                 </StackPanel>
 
                 <!-- Right Column: Dynamic Skill Panel -->
-                <StackPanel x:Name="SkillListPanel"
-                    Orientation="Vertical"
-                    Visibility="Collapsed"
-                    Background="Transparent"
-                    Width="120"
-                    Panel.ZIndex="100">
-                </StackPanel>
+                <ScrollViewer VerticalScrollBarVisibility="Auto"
+              MaxHeight="{Binding ElementName=ButtonStackPanel, Path=ActualHeight}"
+              Background="Transparent">
+
+                    <ScrollViewer.Resources>
+                        <Style TargetType="ScrollBar" BasedOn="{StaticResource ModernScrollBar}"/>
+                    </ScrollViewer.Resources>
+
+                    <StackPanel x:Name="OptionListPanel"
+                Orientation="Vertical"
+                Visibility="Collapsed"
+                Background="Transparent"
+                Width="120"
+                Panel.ZIndex="100"/>
+                </ScrollViewer>
             </StackPanel>
         </Border>
     </Grid>

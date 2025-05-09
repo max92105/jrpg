@@ -48,7 +48,7 @@ namespace JRPG.UI.Battle.Controls
             {
                 From = 0,
                 To = -50,
-                Duration = TimeSpan.FromSeconds(1),
+                Duration = TimeSpan.FromSeconds(2),
                 EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
             };
 
@@ -56,7 +56,7 @@ namespace JRPG.UI.Battle.Controls
             {
                 From = 1,
                 To = 0,
-                Duration = TimeSpan.FromSeconds(1)
+                Duration = TimeSpan.FromSeconds(2)
             };
 
             transform.BeginAnimation(TranslateTransform.YProperty, moveUp);

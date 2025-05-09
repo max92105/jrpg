@@ -74,6 +74,7 @@ namespace JRPG
                 Name = "Alaric",
                 PortraitFile = "Alaric.png",
                 BattleSpriteFile = "PlaceholderCharacter.png",
+                AttackVFXFile = "AttackPlayer.gif",
                 Class = "Warrior",
                 Level = 10,
                 HP = 230,
@@ -86,7 +87,7 @@ namespace JRPG
                 EXPToNextLevel = 500,
                 IsActive = true,
                 IsMainCharacter = true,
-                Skills = new List<Skill> 
+                Skills = new List<Skill>
                 {
                     new Skill { Name = "Fire Blast", MPCost = 10, EffectValue = 15, TargetType = TargetType.Enemy },
                     new Skill { Name = "Fireball", MPCost = 10, EffectValue = 20, TargetType = TargetType.AllEnemies },
@@ -213,9 +214,18 @@ namespace JRPG
             {
                 List<Enemy> enemies = new List<Enemy>()
                 {
-                    new Goblin(),
-                    new Goblin(),
                     new Goblin()
+                    {
+                        SlotIndex = 0,
+                    },
+                    new Goblin()
+                    {
+                        SlotIndex = 1,
+                    },
+                    new Goblin()
+                    {
+                        SlotIndex = 2,
+                    }
                 };
 
                 List<BattleActor> battleActors = new List<BattleActor>();

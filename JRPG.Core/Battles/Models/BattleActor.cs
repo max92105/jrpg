@@ -12,6 +12,7 @@ namespace JRPG.Core.Battles.Models
 
         public string PortraitFile { get; set; }
         public string BattleSpriteFile { get; set; }
+        public string AttackVFXFile { get; set; }
 
         public int HP { get; set; }
         public int MaxHP { get; set; }

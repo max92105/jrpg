@@ -8,6 +8,7 @@
 
             PortraitFile = "goblin.png";
             BattleSpriteFile = "Goblin.png";
+            AttackVFXFile = "AttackEnemy.gif";
 
             HP = 40;
             MaxHP = 40;

@@ -49,5 +49,11 @@ namespace JRPG.Core.Utils
             string root = GetAssetsRootPath();
             return Path.Combine(root, "Backgrounds/", file);
         }
+
+        public static string GetVFXPath(string file)
+        {
+            string root = GetAssetsRootPath();
+            return Path.Combine(root, "VFXs/", file);
+        }
     }
 }

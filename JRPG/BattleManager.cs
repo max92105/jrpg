@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JRPG.Core.Battles.Enum;
+using System.Windows;
 
 namespace JRPG
 {
@@ -13,7 +14,7 @@ namespace JRPG
 
         public List<BattleActor> GetAliveEnemies() => battleActors.Where(battleActors => battleActors is Enemy && battleActors.HP > 0).ToList();
         public List<BattleActor> GetAlivePlayers() => battleActors.Where(battleActors => battleActors is Character && battleActors.HP > 0).ToList();
-        
+
         private Queue<TurnEntry> turnQueue = new Queue<TurnEntry>();
 
         public BattleState State { get; private set; } = BattleState.PlayerTurn;
@@ -69,8 +70,8 @@ namespace JRPG
             return false;
         }
 
-        public string ExecuteCurrentTurnAction(CombatAction combatAction, List<BattleActor> targets, object param = null)
-        {          
+        public Dictionary<BattleActor, int> ExecuteCurrentTurnAction(CombatAction combatAction, List<BattleActor> targets, object param = null)
+        {
             var current = CurrentTurn;
 
             if (CurrentTurn.IsPlayer)
@@ -83,74 +84,101 @@ namespace JRPG
             }
         }
 
-        private string ExecutePlayerAction(Character character, CombatAction action, List<BattleActor> targets, object param = null)
+        private Dictionary<BattleActor, int> ExecutePlayerAction(Character character, CombatAction action, List<BattleActor> targets, object param = null)
         {
             switch (action)
             {
                 case CombatAction.Attack:
-                    if (targets.Count > 0)
-                        return Attack(character, targets);
-                    return "No valid enemy target.";
+                    {
+                        if (targets.Count > 0)
+                            return Attack(character, targets);
+
+                        throw new Exception("No valid enemy target.");
+                    }
 
                 case CombatAction.Defend:
-                    return $"{character.Name} is defending."; // TODO: Add logic
+                    {
+                        return new Dictionary<BattleActor, int>(); // TODO: Add logic
+                    }
 
                 case CombatAction.Item:
-                    if (param is InventoryItem item)
-                        return PlayerUseItem(character, item, targets);
-                    return "Invalid item.";
+                    {
+                        if (param is InventoryItem item)
+                        {
+                            return PlayerUseItem(character, item, targets);
+                        }
+
+                        throw new Exception("Invalid item.");
+                    }
 
                 case CombatAction.Skill:
-                    if (param is Skill skill)
-                        return PlayerUseSkill(character, skill, targets);
-                    return "Invalid skill.";
+                    {
+                        if (param is Skill skill)
+                        {
+                            return PlayerUseSkill(character, skill, targets);
+                        }
+
+                        throw new Exception("Invalid skill.");
+                    }
 
                 default:
-                    return "Unknown action.";
+                    throw new Exception("Unknown action.");
             }
         }
 
-        private string Attack(BattleActor attacker, List<BattleActor> targets)
+        private Dictionary<BattleActor, int> Attack(BattleActor attacker, List<BattleActor> targets)
         {
+            Dictionary<BattleActor, int> result = new Dictionary<BattleActor, int>();
+
             foreach (var target in targets)
             {
                 var damage = target.TakeDamage(attacker.GetTotalAttack());
+
+                result.Add(target, damage);
             }
-          
-            return $"{attacker.Name} attacks";
+
+            return result;
         }
 
-        private string PlayerUseItem(Character user, InventoryItem item, List<BattleActor> targets)
+        private Dictionary<BattleActor, int> PlayerUseItem(Character user, InventoryItem item, List<BattleActor> targets)
         {
+            Dictionary<BattleActor, int> result = new Dictionary<BattleActor, int>();
+
             if (item.TargetType == TargetType.Enemy || item.TargetType == TargetType.AllEnemies)
             {
                 foreach (var target in targets)
                 {
                     target.TakeDamage(item.EffectValue);
+
+                    result.Add(target, item.EffectValue);
                 }
 
                 item.Quantity--;
 
-                return $"{user.Name} used {item.Name} for {item.EffectValue} damage!";
+                return result;
             }
             else
             {
                 foreach (var target in targets)
                 {
                     target.Heal(item.EffectValue);
+
+                    result.Add(target, item.EffectValue);
                 }
 
                 item.Quantity--;
 
-                return $"{user.Name} used {item.Name} heals for {item.EffectValue} HP!";
+                return result;
             }
         }
 
-        private string PlayerUseSkill(Character user, Skill skill, List<BattleActor> targets)
+        private Dictionary<BattleActor, int> PlayerUseSkill(Character user, Skill skill, List<BattleActor> targets)
         {
+            Dictionary<BattleActor, int> result = new Dictionary<BattleActor, int>();
+
             if (user.MP < skill.MPCost)
             {
-                return $"{user.Name} does not have enough MP for {skill.Name}!";
+                return result;
             }
 
             user.UseMP(skill.MPCost);
@@ -160,22 +188,26 @@ namespace JRPG
                 foreach (var target in targets)
                 {
                     target.TakeDamage(skill.EffectValue);
+
+                    result.Add(target, skill.EffectValue);
                 }
 
-                return $"{user.Name} used {skill.Name} for {skill.EffectValue} damage!";
+                return result;
             }
             else
             {
                 foreach (var target in targets)
                 {
                     target.Heal(skill.EffectValue);
+
+                    result.Add(target, skill.EffectValue);
                 }
 
-                return $"{user.Name} heals for {skill.EffectValue} HP!";
+                return result;
             }
         }
 
-        private string ExecuteEnemyAction(List<BattleActor> targets)
+        private Dictionary<BattleActor, int> ExecuteEnemyAction(List<BattleActor> targets)
         {
             return Attack(CurrentTurn.BattleActor, targets);
         }

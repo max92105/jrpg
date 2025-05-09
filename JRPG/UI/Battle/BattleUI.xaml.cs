@@ -7,12 +7,15 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
+using WpfAnimatedGif;
 using Image = System.Windows.Controls.Image;
 
 namespace JRPG.UI.Battle
@@ -32,6 +35,7 @@ namespace JRPG.UI.Battle
 
         //Targeting System
         private bool isTargeting = false;
+        private bool isTargetingLocked = false;
         private TargetType? TargetType = null;
         private CombatAction? CombatAction = null;
         private object targetingParam;
@@ -167,7 +171,7 @@ namespace JRPG.UI.Battle
 
                 image.MouseLeftButtonUp += (s, e) =>
                 {
-                    if (!isTargeting || currentlySelected == null || !currentlySelected.Any()) 
+                    if (!isTargeting || isTargetingLocked || currentlySelected == null || !currentlySelected.Any())
                         return;
 
                     if (TargetType == Core.Battles.Enum.TargetType.Ally || TargetType == Core.Battles.Enum.TargetType.Self)
@@ -176,8 +180,8 @@ namespace JRPG.UI.Battle
                     SelectTarget();
                 };
 
-                Canvas.SetLeft(image, enemyStartX + (i * 50));
-                Canvas.SetBottom(image, enemyBaseY + (i * verticalSpacing));
+                Canvas.SetLeft(image, enemyStartX + (enemy.SlotIndex * 50));
+                Canvas.SetBottom(image, enemyBaseY + (enemy.SlotIndex * verticalSpacing));
                 SpriteCanvas.Children.Add(image);
             }
 
@@ -208,7 +212,7 @@ namespace JRPG.UI.Battle
 
                 image.MouseLeftButtonUp += (s, e) =>
                 {
-                    if (!isTargeting || currentlySelected == null)
+                    if (!isTargeting || isTargetingLocked || currentlySelected == null || !currentlySelected.Any())
                         return;
 
                     if (TargetType == Core.Battles.Enum.TargetType.Ally
@@ -451,13 +455,83 @@ namespace JRPG.UI.Battle
             EffectCanvas.Children.Add(floatingText);
         }
 
+        private void PlayVFX(string vfxName, Point position)
+        {
+            var vfxImage = new Image
+            {
+                Width = 96,
+                Height = 96,
+                RenderTransformOrigin = new Point(0.5, 0.5)
+            };
+
+            var gifUri = new Uri(AssetPathResolver.GetVFXPath(vfxName), UriKind.Absolute);
+            var imageSource = new BitmapImage(gifUri);
+
+            ImageBehavior.SetAnimatedSource(vfxImage, imageSource);
+            ImageBehavior.SetRepeatBehavior(vfxImage, new System.Windows.Media.Animation.RepeatBehavior(1)); // play once
+
+            Canvas.SetLeft(vfxImage, position.X - vfxImage.Width / 2);
+            Canvas.SetTop(vfxImage, position.Y - vfxImage.Height / 2);
+            EffectCanvas.Children.Add(vfxImage);
+
+            // Remove after duration
+            var fade = new DoubleAnimation(1.0, 0.0, TimeSpan.FromMilliseconds(800));
+            fade.Completed += (s, e) => EffectCanvas.Children.Remove(vfxImage);
+            vfxImage.BeginAnimation(OpacityProperty, fade);
+        }
+
+        private void AnimateDeath(BattleActor actor)
+        {
+            if (!spriteImages.TryGetValue(actor, out var image))
+            {
+                return;
+            }
+
+            // Create white glow flash using DropShadowEffect
+            var glow = new DropShadowEffect
+            {
+                Color = Colors.White,
+                BlurRadius = 0,
+                ShadowDepth = 0,
+                Opacity = 1.0
+            };
+
+            image.Effect = glow;
+
+
+            // Delay before fading
+            var delayTimer = new System.Windows.Threading.DispatcherTimer
+            {
+                Interval = TimeSpan.FromMilliseconds(1000)
+            };
+
+            delayTimer.Tick += (s, e) =>
+            {
+                delayTimer.Stop();
+
+                // Animate opacity (fade out)
+                var fadeOut = new DoubleAnimation
+                {
+                    To = 0,
+                    Duration = TimeSpan.FromMilliseconds(1000),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+
+                fadeOut.Completed += (s2, e2) =>
+                {
+                    image.Effect = null;
+                };
+
+                image.BeginAnimation(OpacityProperty, fadeOut);
+            };
+
+            delayTimer.Start();
+        }
+
         private void ExitTargetingMode()
         {
             isTargeting = false;
             currentlySelected.Clear();
-            ClearAllTargetArrows();
-            RemoveAllGlows();
-            HighlightSelectedInTurnOrder();
         }
 
         private void CheckNextState()
@@ -474,31 +548,25 @@ namespace JRPG.UI.Battle
 
                         currentlySelected.Add(target);
 
-                        string result = battleManager.ExecuteCurrentTurnAction(Core.Battles.Enum.CombatAction.Attack, currentlySelected);
+                        Dictionary<BattleActor, int> results = battleManager.ExecuteCurrentTurnAction(Core.Battles.Enum.CombatAction.Attack, currentlySelected);
 
-                        currentlySelected.Clear();
+                        PlayTurnActionEffect(results, () =>
+                         AnimateStepBack(() =>
+                         {
+                             currentlySelected.Clear();
 
-                        if (spriteImages.TryGetValue(target, out var targetImage))
-                        {
-                            var screenPos = targetImage.TranslatePoint(new Point(targetImage.Width / 2, 0), EffectCanvas);
-                            ShowFloatingText(result, FloatingTextType.Damage, screenPos);
-                        }
+                             if (battleManager.State == BattleState.Lost)
+                             {
+                                 EndBattle("You were defeated.");
+                             }
+                             else
+                             {
+                                 UpdatePlayerUI();
 
-                        // Then move back AFTER the action
-                        AnimateStepBack(() =>
-                        {
-                            if (battleManager.State == BattleState.Lost)
-                            {
-                                EndBattle("You were defeated.");
-                            }
-                            else
-                            {
-                                UpdatePlayerUI();
-
-                                battleManager.AdvanceTurn();
-                                CheckNextState();
-                            }
-                        });
+                                 battleManager.AdvanceTurn();
+                                 CheckNextState();
+                             }
+                         }));                    
                     });
                 }
                 else if (battleManager.State == BattleState.PlayerTurn)
@@ -596,9 +664,9 @@ namespace JRPG.UI.Battle
         {
             currentlySelected.Add(battleManager.CurrentTurn.BattleActor);
 
-            string result = battleManager.ExecuteCurrentTurnAction(Core.Battles.Enum.CombatAction.Defend, currentlySelected);
+            Dictionary<BattleActor, int> results = battleManager.ExecuteCurrentTurnAction(Core.Battles.Enum.CombatAction.Defend, currentlySelected);
 
-            MessageBox.Show(result);
+            MessageBox.Show("I defend");
 
             AnimateStepBack(() =>
             {
@@ -640,7 +708,6 @@ namespace JRPG.UI.Battle
             {
                 case Core.Battles.Enum.TargetType.Self:
                     AddTargets(new List<BattleActor>() { battleManager.CurrentTurn.BattleActor });
-
                     break;
 
                 case Core.Battles.Enum.TargetType.Ally:
@@ -683,29 +750,74 @@ namespace JRPG.UI.Battle
 
         private void SelectTarget()
         {
-            string result = battleManager.ExecuteCurrentTurnAction(CombatAction.Value, currentlySelected, targetingParam);
+            if (isTargetingLocked) return; // 🛑 prevent double-activation
+            isTargetingLocked = true;      // 🔒 lock until animation ends
+
+            Dictionary<BattleActor, int> results = battleManager.ExecuteCurrentTurnAction(CombatAction.Value, currentlySelected, targetingParam);
 
             targetingParam = null;
 
-            if (result == null)
-                return;
-
-            foreach (var target in currentlySelected)
+            if (results == null && results.Any())
             {
-                if (spriteImages.TryGetValue(target, out var targetImage))
+                isTargetingLocked = false; // ❗unlock if nothing happened
+                return;
+            }
+
+            ClearAllTargetArrows();
+            RemoveAllGlows();
+            HighlightSelectedInTurnOrder();
+
+            CommandBox.Visibility = Visibility.Collapsed;
+
+            PlayTurnActionEffect(results, () =>
+            {
+                AnimateStepBack(() =>
+                {
+                    isTargetingLocked = false; // 🔓 unlock after full turn cycle
+                    ExitTargetingMode();
+                    battleManager.AdvanceTurn();
+                    UpdateUI();
+                    CheckNextState();
+                });
+            });
+        }
+
+        public void PlayTurnActionEffect(Dictionary<BattleActor, int> results, Action AnimateStepBack)
+        {
+            var attacker = battleManager.CurrentTurn.BattleActor;
+
+            foreach (var result in results)
+            {
+                //key is target and value is numerical value
+                if (spriteImages.TryGetValue(result.Key, out var targetImage))
                 {
                     var screenPos = targetImage.TranslatePoint(new Point(targetImage.Width / 2, 0), EffectCanvas);
-                    ShowFloatingText(result, FloatingTextType.Damage, screenPos);
+                    ShowFloatingText(result.Value.ToString(), FloatingTextType.Damage, screenPos);
+
+                    var screenVfxPos = targetImage.TranslatePoint(new Point(targetImage.Width / 2, 0), EffectCanvas);
+                    screenVfxPos.Y = screenVfxPos.Y + 30;
+                    PlayVFX(attacker.AttackVFXFile, screenVfxPos);
                 }
             }
 
-            AnimateStepBack(() =>
+            var deadActors = currentlySelected.Where(t => t.HP <= 0).ToList();
+            
+            foreach (var dead in deadActors)
             {
-                ExitTargetingMode();
-                battleManager.AdvanceTurn();
-                UpdateUI();
-                CheckNextState();
-            });
+                AnimateDeath(dead);
+            }
+
+            DispatcherTimer delay = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(1000) };
+
+            if (deadActors.Count > 0)
+                delay = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(2000) };
+
+            delay.Tick += (s, e) =>
+            {
+                delay.Stop();
+                AnimateStepBack();
+            };
+            delay.Start();
         }
         #endregion
     }

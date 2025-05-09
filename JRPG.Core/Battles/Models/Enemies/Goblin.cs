@@ -7,7 +7,7 @@
             Name = "Goblin";
 
             PortraitFile = "goblin.png";
-            BattleSpriteFile = "PlaceholderEnemy.png";
+            BattleSpriteFile = "Goblin.png";
 
             HP = 40;
             MaxHP = 40;

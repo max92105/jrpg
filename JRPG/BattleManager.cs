@@ -13,7 +13,7 @@ namespace JRPG
 
         public List<BattleActor> GetAliveEnemies() => battleActors.Where(battleActors => battleActors is Enemy && battleActors.HP > 0).ToList();
         public List<BattleActor> GetAlivePlayers() => battleActors.Where(battleActors => battleActors is Character && battleActors.HP > 0).ToList();
-
+        
         private Queue<TurnEntry> turnQueue = new Queue<TurnEntry>();
 
         public BattleState State { get; private set; } = BattleState.PlayerTurn;

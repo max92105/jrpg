@@ -4,6 +4,8 @@ namespace JRPG.Core.Battles.Models
 {
     public class Enemy : BattleActor
     {
+        public bool SpriteFlip { get; set; } = false;
+
         public Enemy()
         {
         }

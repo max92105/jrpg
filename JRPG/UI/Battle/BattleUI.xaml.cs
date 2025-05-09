@@ -124,15 +124,17 @@ namespace JRPG.UI.Battle
             {
                 var panel = new CharacterPanel
                 {
-                    Portrait = character.PortraitFile,
                     CharacterName = character.Name,
-                    Level = character.Level,
                     CurrentHP = character.HP,
                     MaxHP = character.MaxHP,
                     CurrentMP = character.MP,
                     MaxMP = character.MaxMP,
-                    IsActive = battleManager.CurrentTurn.IsPlayer && battleManager.CurrentTurn.BattleActor == character
                 };
+
+                // 👇 Offset active one slightly to the left
+                panel.Margin = character == battleManager.CurrentTurn.BattleActor
+                    ? new Thickness(-100, 5, 0, 5)  // Shift left
+                    : new Thickness(0, 5, 0, 5);
 
                 CharacterPanelContainer.Children.Add(panel);
             }

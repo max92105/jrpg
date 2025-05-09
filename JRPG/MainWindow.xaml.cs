@@ -100,6 +100,9 @@ namespace JRPG
             allCharacters.Add(new Character
             {
                 Name = "Selene",
+                PortraitFile = "Alaric.png",
+                BattleSpriteFile = "PlaceholderCharacter.png",
+                AttackVFXFile = "AttackPlayer.gif",
                 Class = "Mage",
                 Level = 9,
                 HP = 120,
@@ -115,6 +118,9 @@ namespace JRPG
             allCharacters.Add(new Character
             {
                 Name = "Dorian",
+                PortraitFile = "Alaric.png",
+                BattleSpriteFile = "PlaceholderCharacter.png",
+                AttackVFXFile = "AttackPlayer.gif",
                 Class = "Thief",
                 Level = 11,
                 HP = 190,
@@ -130,6 +136,9 @@ namespace JRPG
             allCharacters.Add(new Character
             {
                 Name = "Lyra",
+                PortraitFile = "Alaric.png",
+                BattleSpriteFile = "PlaceholderCharacter.png",
+                AttackVFXFile = "AttackPlayer.gif",
                 Class = "Healer",
                 Level = 8,
                 HP = 150,
@@ -145,6 +154,9 @@ namespace JRPG
             allCharacters.Add(new Character
             {
                 Name = "Balthazar",
+                PortraitFile = "Alaric.png",
+                BattleSpriteFile = "PlaceholderCharacter.png",
+                AttackVFXFile = "AttackPlayer.gif",
                 Class = "Knight",
                 Level = 12,
                 HP = 300,
@@ -160,6 +172,9 @@ namespace JRPG
             allCharacters.Add(new Character
             {
                 Name = "Fiora",
+                PortraitFile = "Alaric.png",
+                BattleSpriteFile = "PlaceholderCharacter.png",
+                AttackVFXFile = "AttackPlayer.gif",
                 Class = "Ranger",
                 Level = 10,
                 HP = 170,

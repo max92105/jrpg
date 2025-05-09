@@ -19,67 +19,48 @@ namespace JRPG.UI.Battle.Controls
             InitializeComponent();
         }
 
-        public string Portrait
-        {
-            set
-            {
-                if (!string.IsNullOrEmpty(value) && File.Exists(AssetPathResolver.GetPortraitPath(value)))
-                {
-                    PortraitImage.Source = new BitmapImage(new Uri(AssetPathResolver.GetPortraitPath(value)));
-                }
-            }
-        }
-
         public string CharacterName
         {
             get => NameText.Text;
             set => NameText.Text = value;
         }
 
-        public int Level
-        {
-            set => LevelText.Text = $"Lv {value}";
-        }
-
         public int CurrentHP
         {
             get => hp;
-            set { hp = value; UpdateHPBar(); }
+            set { hp = Math.Max(0, value); UpdateHP(); }
         }
 
         public int MaxHP
         {
             get => maxHp;
-            set { maxHp = value; UpdateHPBar(); }
+            set { maxHp = Math.Max(1, value); UpdateHP(); }
         }
 
         public int CurrentMP
         {
             get => mp;
-            set { mp = value; UpdateMPBar(); }
+            set { mp = Math.Max(0, value); UpdateMP(); }
         }
 
         public int MaxMP
         {
             get => maxMp;
-            set { maxMp = value; UpdateMPBar(); }
+            set { maxMp = Math.Max(1, value); UpdateMP(); }
         }
 
-        public bool IsActive
-        {
-            set => BorderBrush = value ? Brushes.Gold : Brushes.White;
-        }
-
-        private void UpdateHPBar()
+        private void UpdateHP()
         {
             HPBar.Maximum = maxHp;
             HPBar.Value = Math.Min(hp, maxHp);
+            HPText.Text = $"{hp} / {maxHp}";
         }
 
-        private void UpdateMPBar()
+        private void UpdateMP()
         {
             MPBar.Maximum = maxMp;
             MPBar.Value = Math.Min(mp, maxMp);
+            MPText.Text = $"{mp} / {maxMp}";
         }
     }
 }

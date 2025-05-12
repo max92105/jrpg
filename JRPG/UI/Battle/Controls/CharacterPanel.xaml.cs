@@ -1,8 +1,11 @@
 ﻿using JRPG.Core.Utils;
 using System;
 using System.IO;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 
 namespace JRPG.UI.Battle.Controls
@@ -17,6 +20,27 @@ namespace JRPG.UI.Battle.Controls
         public CharacterPanel()
         {
             InitializeComponent();
+        }
+
+        public bool IsActive
+        {
+            set
+            {
+                var targetOffset = value ? -100 : 0;
+                var duration = TimeSpan.FromMilliseconds(300);
+
+                var slide = new DoubleAnimation
+                {
+                    To = targetOffset,
+                    Duration = duration,
+                    EasingFunction = new QuadraticEase
+                    {
+                        EasingMode = value ? EasingMode.EaseOut : EasingMode.EaseIn
+                    }
+                };
+
+                PanelTransform.BeginAnimation(TranslateTransform.XProperty, slide);
+            }
         }
 
         public string CharacterName
@@ -52,14 +76,32 @@ namespace JRPG.UI.Battle.Controls
         private void UpdateHP()
         {
             HPBar.Maximum = maxHp;
-            HPBar.Value = Math.Min(hp, maxHp);
+
+            var animation = new DoubleAnimation
+            {
+                To = Math.Min(hp, maxHp),
+                Duration = TimeSpan.FromMilliseconds(300),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            };
+
+            HPBar.BeginAnimation(ProgressBar.ValueProperty, animation);
+
             HPText.Text = $"{hp} / {maxHp}";
         }
 
         private void UpdateMP()
         {
             MPBar.Maximum = maxMp;
-            MPBar.Value = Math.Min(mp, maxMp);
+
+            var animation = new DoubleAnimation
+            {
+                To = Math.Min(mp, maxMp),
+                Duration = TimeSpan.FromMilliseconds(300),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            };
+
+            MPBar.BeginAnimation(ProgressBar.ValueProperty, animation);
+
             MPText.Text = $"{mp} / {maxMp}";
         }
     }

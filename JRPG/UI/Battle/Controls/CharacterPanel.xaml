@@ -41,6 +41,11 @@
             </Setter>
         </Style>
     </UserControl.Resources>
+
+    <UserControl.RenderTransform>
+        <TranslateTransform x:Name="PanelTransform"/>
+    </UserControl.RenderTransform>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

@@ -16,7 +16,7 @@
             MP = 10;
             MaxMP = 10;
 
-            BaseAttack = 10;
+            BaseAttack = 20;
             BaseDefense = 2;
         }
     }

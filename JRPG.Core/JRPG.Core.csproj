@@ -73,7 +73,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Battles\Enum\FloatingTextType.cs" />
+    <Compile Include="Battles\Enum\EffectType.cs" />
     <Compile Include="Battles\Enum\CombatAction.cs" />
     <Compile Include="Battles\Enum\TargetType.cs" />
     <Compile Include="Battles\Models\BattleActor.cs" />
@@ -82,6 +82,7 @@
     <Compile Include="Battles\Models\Enemy.cs" />
     <Compile Include="Battles\Models\InventoryItem.cs" />
     <Compile Include="Battles\Models\Skill.cs" />
+    <Compile Include="Battles\Models\TurnActionResult.cs" />
     <Compile Include="Battles\Models\TurnEntry.cs" />
     <Compile Include="Maps\Enums\TriggerType.cs" />
     <Compile Include="Maps\IO\MapSerializer.cs" />

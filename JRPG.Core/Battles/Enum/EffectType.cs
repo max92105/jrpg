@@ -1,10 +1,9 @@
 ﻿namespace JRPG.Core.Battles.Enum
 {
-    public enum FloatingTextType
+    public enum EffectType
     {
         Damage,
         Heal,
-        Mana,
-        Neutral
+        ManaRecovery
     }
 }

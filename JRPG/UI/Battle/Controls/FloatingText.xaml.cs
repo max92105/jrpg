@@ -14,7 +14,7 @@ namespace JRPG.UI.Battle.Controls
     {
         private TranslateTransform transform = new TranslateTransform();
 
-        public FloatingText(string text, FloatingTextType type = FloatingTextType.Neutral)
+        public FloatingText(string text, EffectType type)
         {
             InitializeComponent();
             TextLabel.Text = text;
@@ -22,13 +22,13 @@ namespace JRPG.UI.Battle.Controls
             // Set color              
             switch (type)
             {
-                case FloatingTextType.Damage:
+                case EffectType.Damage:
                     TextLabel.Foreground = Brushes.Red;
                     break;
-                case FloatingTextType.Heal:
+                case EffectType.Heal:
                     TextLabel.Foreground = Brushes.LightGreen;
                     break;
-                case FloatingTextType.Mana:
+                case EffectType.ManaRecovery:
                     TextLabel.Foreground = Brushes.LightBlue;
                     break;
                 default:

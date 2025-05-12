@@ -55,13 +55,13 @@ namespace JRPG
 
         public bool IsBattleOver()
         {
-            if (!battleActors.Where(actor => actor is Character && actor.HP > 0).Any())
+            if (!battleActors.Any(actor => actor is Character && actor.HP > 0))
             {
                 State = BattleState.Lost;
                 return true;
             }
 
-            if (!battleActors.Where(actor => actor is Enemy && actor.HP > 0).Any())
+            if (!battleActors.Any(actor => actor is Enemy && actor.HP > 0))
             {
                 State = BattleState.Won;
                 return true;
@@ -70,7 +70,7 @@ namespace JRPG
             return false;
         }
 
-        public Dictionary<BattleActor, int> ExecuteCurrentTurnAction(CombatAction combatAction, List<BattleActor> targets, object param = null)
+        public List<TurnActionResult> ExecuteCurrentTurnAction(CombatAction combatAction, List<BattleActor> targets, object param = null)
         {
             var current = CurrentTurn;
 
@@ -84,7 +84,7 @@ namespace JRPG
             }
         }
 
-        private Dictionary<BattleActor, int> ExecutePlayerAction(Character character, CombatAction action, List<BattleActor> targets, object param = null)
+        private List<TurnActionResult> ExecutePlayerAction(Character character, CombatAction action, List<BattleActor> targets, object param = null)
         {
             switch (action)
             {
@@ -98,7 +98,7 @@ namespace JRPG
 
                 case CombatAction.Defend:
                     {
-                        return new Dictionary<BattleActor, int>(); // TODO: Add logic
+                        return new List<TurnActionResult>(); // TODO: Add logic
                     }
 
                 case CombatAction.Item:
@@ -126,23 +126,23 @@ namespace JRPG
             }
         }
 
-        private Dictionary<BattleActor, int> Attack(BattleActor attacker, List<BattleActor> targets)
+        private List<TurnActionResult> Attack(BattleActor attacker, List<BattleActor> targets)
         {
-            Dictionary<BattleActor, int> result = new Dictionary<BattleActor, int>();
+            List<TurnActionResult> result = new List<TurnActionResult>();
 
             foreach (var target in targets)
             {
                 var damage = target.TakeDamage(attacker.GetTotalAttack());
 
-                result.Add(target, damage);
+                result.Add(new TurnActionResult(target, damage, EffectType.Damage));
             }
 
             return result;
         }
 
-        private Dictionary<BattleActor, int> PlayerUseItem(Character user, InventoryItem item, List<BattleActor> targets)
+        private List<TurnActionResult> PlayerUseItem(Character user, InventoryItem item, List<BattleActor> targets)
         {
-            Dictionary<BattleActor, int> result = new Dictionary<BattleActor, int>();
+            List<TurnActionResult> result = new List<TurnActionResult>();
 
             if (item.TargetType == TargetType.Enemy || item.TargetType == TargetType.AllEnemies)
             {
@@ -150,7 +150,7 @@ namespace JRPG
                 {
                     target.TakeDamage(item.EffectValue);
 
-                    result.Add(target, item.EffectValue);
+                    result.Add(new TurnActionResult(target, item.EffectValue, item.EffectType));
                 }
 
                 item.Quantity--;
@@ -163,7 +163,7 @@ namespace JRPG
                 {
                     target.Heal(item.EffectValue);
 
-                    result.Add(target, item.EffectValue);
+                    result.Add(new TurnActionResult(target, item.EffectValue, item.EffectType));
                 }
 
                 item.Quantity--;
@@ -172,9 +172,9 @@ namespace JRPG
             }
         }
 
-        private Dictionary<BattleActor, int> PlayerUseSkill(Character user, Skill skill, List<BattleActor> targets)
+        private List<TurnActionResult> PlayerUseSkill(Character user, Skill skill, List<BattleActor> targets)
         {
-            Dictionary<BattleActor, int> result = new Dictionary<BattleActor, int>();
+            List<TurnActionResult> result = new List<TurnActionResult>();
 
             if (user.MP < skill.MPCost)
             {
@@ -189,7 +189,7 @@ namespace JRPG
                 {
                     target.TakeDamage(skill.EffectValue);
 
-                    result.Add(target, skill.EffectValue);
+                    result.Add(new TurnActionResult(target, skill.EffectValue, skill.EffectType));
                 }
 
                 return result;
@@ -200,14 +200,14 @@ namespace JRPG
                 {
                     target.Heal(skill.EffectValue);
 
-                    result.Add(target, skill.EffectValue);
+                    result.Add(new TurnActionResult(target, skill.EffectValue, skill.EffectType));
                 }
 
                 return result;
             }
         }
 
-        private Dictionary<BattleActor, int> ExecuteEnemyAction(List<BattleActor> targets)
+        private List<TurnActionResult> ExecuteEnemyAction(List<BattleActor> targets)
         {
             return Attack(CurrentTurn.BattleActor, targets);
         }

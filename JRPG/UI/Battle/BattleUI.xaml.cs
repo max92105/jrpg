@@ -27,6 +27,7 @@ namespace JRPG.UI.Battle
     {
         private BattleManager battleManager;
         private List<BattleActor> battleActors;
+        private Dictionary<Character, CharacterPanel> characterPanels = new Dictionary<Character, CharacterPanel>();
 
         private List<InventoryItem> inventory;
 
@@ -118,23 +119,30 @@ namespace JRPG.UI.Battle
 
         private void UpdateCharacterPanel()
         {
+            var characters = battleActors.Where(b => b is Character).Cast<Character>().ToList();
+
+            // Remove any panels for characters no longer present
+            foreach (var key in characterPanels.Keys.Except(characters).ToList())
+                characterPanels.Remove(key);
+
             CharacterPanelContainer.Children.Clear();
 
-            foreach (Character character in battleActors.Where(battleActors => battleActors is Character))
+            foreach (var character in characters)
             {
-                var panel = new CharacterPanel
+                // Reuse or create panel
+                if (!characterPanels.TryGetValue(character, out var panel))
                 {
-                    CharacterName = character.Name,
-                    CurrentHP = character.HP,
-                    MaxHP = character.MaxHP,
-                    CurrentMP = character.MP,
-                    MaxMP = character.MaxMP,
-                };
+                    panel = new CharacterPanel();
+                    characterPanels[character] = panel;
+                }
 
-                // 👇 Offset active one slightly to the left
-                panel.Margin = character == battleManager.CurrentTurn.BattleActor
-                    ? new Thickness(-100, 5, 0, 5)  // Shift left
-                    : new Thickness(0, 5, 0, 5);
+                // Update values (this avoids reconstructing)
+                panel.CharacterName = character.Name;
+                panel.CurrentHP = character.HP;
+                panel.MaxHP = character.MaxHP;
+                panel.CurrentMP = character.MP;
+                panel.MaxMP = character.MaxMP;
+                panel.IsActive = character == battleManager.CurrentTurn.BattleActor;
 
                 CharacterPanelContainer.Children.Add(panel);
             }
@@ -153,7 +161,7 @@ namespace JRPG.UI.Battle
 
             // Draw Enemies
             double enemyBaseY = 120;
-            double enemyStartX = 200;
+            double enemyStartX = 300 + spriteSize;
             var aliveEnemies = battleManager.GetAliveEnemies();
 
             for (int i = 0; i < aliveEnemies.Count; i++)
@@ -189,7 +197,7 @@ namespace JRPG.UI.Battle
 
             // Draw Characters
             double characterBaseY = 120;
-            double characterStartX = canvasWidth - (200 + spriteSize);
+            double characterStartX = canvasWidth - (400 + spriteSize);
             var characters = battleActors.Where(battleActor => battleActor is Character).ToList();
 
             for (int i = 0; i < characters.Count; i++)
@@ -447,7 +455,7 @@ namespace JRPG.UI.Battle
             }
         }
 
-        private void ShowFloatingText(string text, FloatingTextType type, Point position)
+        private void ShowFloatingText(string text, EffectType type, Point position)
         {
             var floatingText = new FloatingText(text, type);
 
@@ -550,7 +558,7 @@ namespace JRPG.UI.Battle
 
                         currentlySelected.Add(target);
 
-                        Dictionary<BattleActor, int> results = battleManager.ExecuteCurrentTurnAction(Core.Battles.Enum.CombatAction.Attack, currentlySelected);
+                        List<TurnActionResult> results = battleManager.ExecuteCurrentTurnAction(Core.Battles.Enum.CombatAction.Attack, currentlySelected);
 
                         PlayTurnActionEffect(results, () =>
                          AnimateStepBack(() =>
@@ -580,9 +588,15 @@ namespace JRPG.UI.Battle
                     });
                 }
             }
+
             if (battleManager.State == BattleState.Won)
             {
                 EndBattle("You won!");
+            }
+
+            if (battleManager.State == BattleState.Lost)
+            {
+                EndBattle("You lost!");
             }
         }
 
@@ -666,7 +680,7 @@ namespace JRPG.UI.Battle
         {
             currentlySelected.Add(battleManager.CurrentTurn.BattleActor);
 
-            Dictionary<BattleActor, int> results = battleManager.ExecuteCurrentTurnAction(Core.Battles.Enum.CombatAction.Defend, currentlySelected);
+            List<TurnActionResult> results = battleManager.ExecuteCurrentTurnAction(Core.Battles.Enum.CombatAction.Defend, currentlySelected);
 
             MessageBox.Show("I defend");
 
@@ -755,7 +769,7 @@ namespace JRPG.UI.Battle
             if (isTargetingLocked) return; // 🛑 prevent double-activation
             isTargetingLocked = true;      // 🔒 lock until animation ends
 
-            Dictionary<BattleActor, int> results = battleManager.ExecuteCurrentTurnAction(CombatAction.Value, currentlySelected, targetingParam);
+            List<TurnActionResult> results = battleManager.ExecuteCurrentTurnAction(CombatAction.Value, currentlySelected, targetingParam);
 
             targetingParam = null;
 
@@ -784,17 +798,17 @@ namespace JRPG.UI.Battle
             });
         }
 
-        public void PlayTurnActionEffect(Dictionary<BattleActor, int> results, Action AnimateStepBack)
+        public void PlayTurnActionEffect(List<TurnActionResult> results, Action AnimateStepBack)
         {
             var attacker = battleManager.CurrentTurn.BattleActor;
 
-            foreach (var result in results)
+            foreach (TurnActionResult result in results)
             {
                 //key is target and value is numerical value
-                if (spriteImages.TryGetValue(result.Key, out var targetImage))
+                if (spriteImages.TryGetValue(result.Target, out var targetImage))
                 {
                     var screenPos = targetImage.TranslatePoint(new Point(targetImage.Width / 2, 0), EffectCanvas);
-                    ShowFloatingText(result.Value.ToString(), FloatingTextType.Damage, screenPos);
+                    ShowFloatingText(result.EffectFinalValue.ToString(), result.EffectType, screenPos);
 
                     var screenVfxPos = targetImage.TranslatePoint(new Point(targetImage.Width / 2, 0), EffectCanvas);
                     screenVfxPos.Y = screenVfxPos.Y + 30;

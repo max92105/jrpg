@@ -93,9 +93,12 @@
     <Compile Include="UI\Battle\Controls\CharacterPanel.xaml.cs">
       <DependentUpon>CharacterPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CinematicManager.cs" />
+    <Compile Include="CutsceneManager.cs" />
     <Compile Include="UI\Battle\Controls\CommandPanel.xaml.cs">
       <DependentUpon>CommandPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Cutscene\CutscenePlayer.xaml.cs">
+      <DependentUpon>CutscenePlayer.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Dialogue\DialogueBox.xaml.cs">
       <DependentUpon>DialogueBox.xaml</DependentUpon>
@@ -120,6 +123,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Battle\Controls\CommandPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Cutscene\CutscenePlayer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

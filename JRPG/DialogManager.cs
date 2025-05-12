@@ -60,7 +60,7 @@ namespace JRPG
 
             if (!string.IsNullOrEmpty(portraitPath))
             {
-                portrait.Source = new BitmapImage(new Uri(AssetPathResolver.GetPath(Path.Combine("Portraits//", portraitPath))));
+                portrait.Source = new BitmapImage(new Uri(AssetPathResolver.GetPath(Path.Combine("Portraits/", portraitPath))));
                 portrait.Visibility = System.Windows.Visibility.Visible;
             }
             else

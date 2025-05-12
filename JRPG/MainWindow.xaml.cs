@@ -77,8 +77,8 @@ namespace JRPG
                 AttackVFXFile = "AttackPlayer.gif",
                 Class = "Warrior",
                 Level = 10,
-                HP = 10,
-                MaxHP = 10,
+                HP = 200,
+                MaxHP = 200,
                 MP = 300,
                 MaxMP = 300,
                 BaseAttack = 15,
@@ -275,7 +275,7 @@ namespace JRPG
             });
         }
 
-        private void Fade(double toOpacity, double durationSec, Action onComplete = null)
+        public void Fade(double toOpacity, double durationSec, Action onComplete = null)
         {
             FadeRect.Visibility = Visibility.Visible;
             FadeRect.Width = ActualWidth;
@@ -394,6 +394,12 @@ namespace JRPG
             {
                 dialogueManager.Skip();
                 return;
+            }
+
+            if (e.Key == Key.F1)
+            {
+                CutsceneManager cutsceneManager = new CutsceneManager(CutscenePlayer);
+                cutsceneManager.StartIntroCutscene();
             }
 
             if (!dialogueManager.IsActive && RootGrid.Children.Contains(GameCanvas))

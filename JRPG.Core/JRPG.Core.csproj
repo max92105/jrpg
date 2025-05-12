@@ -73,9 +73,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Battles\Enum\EffectType.cs" />
-    <Compile Include="Battles\Enum\CombatAction.cs" />
-    <Compile Include="Battles\Enum\TargetType.cs" />
+    <Compile Include="Battles\BattleManager.cs" />
+    <Compile Include="Battles\Enums\BattleState.cs" />
+    <Compile Include="Battles\Enums\EffectType.cs" />
+    <Compile Include="Battles\Enums\CombatAction.cs" />
+    <Compile Include="Battles\Enums\TargetType.cs" />
+    <Compile Include="Battles\InventoryManager.cs" />
     <Compile Include="Battles\Models\BattleActor.cs" />
     <Compile Include="Battles\Models\Character.cs" />
     <Compile Include="Battles\Models\Enemies\Goblin.cs" />

@@ -1,13 +1,12 @@
-﻿using JRPG.Core.Battles.Enum;
+﻿using JRPG.Core.Battles;
+using JRPG.Core.Battles.Enums;
 using JRPG.Core.Battles.Models;
 using JRPG.Core.Utils;
-using JRPG.Enums;
 using JRPG.UI.Battle.Controls;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -29,7 +28,7 @@ namespace JRPG.UI.Battle
         private List<BattleActor> battleActors;
         private Dictionary<Character, CharacterPanel> characterPanels = new Dictionary<Character, CharacterPanel>();
 
-        private List<InventoryItem> inventory;
+        private InventoryManager inventory;
 
         private Dictionary<object, TranslateTransform> spriteOffsets = new Dictionary<object, TranslateTransform>();
         private Dictionary<object, Image> spriteImages = new Dictionary<object, Image>();
@@ -37,8 +36,8 @@ namespace JRPG.UI.Battle
         //Targeting System
         private bool isTargeting = false;
         private bool isTargetingLocked = false;
-        private TargetType? TargetType = null;
-        private CombatAction? CombatAction = null;
+        private TargetType? ActionTargetType = null;
+        private CombatAction? ParamCombatAction = null;
         private object targetingParam;
 
         private List<BattleActor> currentlySelected = new List<BattleActor>();
@@ -49,7 +48,7 @@ namespace JRPG.UI.Battle
 
         public event Action OnBattleEnd;
 
-        public BattleUI(List<BattleActor> battleActors , List<InventoryItem> inventory)
+        public BattleUI(List<BattleActor> battleActors , InventoryManager inventory)
         {
             InitializeComponent();
 
@@ -173,7 +172,7 @@ namespace JRPG.UI.Battle
                 {
                     if (!isTargeting) return;
 
-                    if (TargetType == Core.Battles.Enum.TargetType.Enemy)
+                    if (ActionTargetType == TargetType.Enemy)
                     {
                         AddTargets(new List<BattleActor>() { enemy });
                     }
@@ -184,7 +183,7 @@ namespace JRPG.UI.Battle
                     if (!isTargeting || isTargetingLocked || currentlySelected == null || !currentlySelected.Any())
                         return;
 
-                    if (TargetType == Core.Battles.Enum.TargetType.Ally || TargetType == Core.Battles.Enum.TargetType.Self)
+                    if (ActionTargetType == TargetType.Ally || ActionTargetType == TargetType.Self)
                         return; // Block clicks in non-enemy mode
 
                     SelectTarget();
@@ -209,10 +208,10 @@ namespace JRPG.UI.Battle
                 {
                     if (!isTargeting) return;
 
-                    if (TargetType == Core.Battles.Enum.TargetType.Ally || TargetType == Core.Battles.Enum.TargetType.Self)
+                    if (ActionTargetType == TargetType.Ally || ActionTargetType == TargetType.Self)
                     {
                         // In "Self" mode, block hovering over other allies
-                        if (TargetType == Core.Battles.Enum.TargetType.Self)
+                        if (ActionTargetType == TargetType.Self)
                             if (character != battleManager.CurrentTurn.BattleActor)
                                 return;
 
@@ -225,13 +224,13 @@ namespace JRPG.UI.Battle
                     if (!isTargeting || isTargetingLocked || currentlySelected == null || !currentlySelected.Any())
                         return;
 
-                    if (TargetType == Core.Battles.Enum.TargetType.Ally
-                    || TargetType == Core.Battles.Enum.TargetType.Self
-                    || TargetType == Core.Battles.Enum.TargetType.AllAllies)
+                    if (ActionTargetType == TargetType.Ally
+                    || ActionTargetType == TargetType.Self
+                    || ActionTargetType == TargetType.AllAllies)
                     {
 
                         // Self lock
-                        if (TargetType != Core.Battles.Enum.TargetType.Self && character != battleManager.CurrentTurn.BattleActor)
+                        if (ActionTargetType != TargetType.Self && character != battleManager.CurrentTurn.BattleActor)
                             return;
 
                         SelectTarget();
@@ -558,7 +557,7 @@ namespace JRPG.UI.Battle
 
                         currentlySelected.Add(target);
 
-                        List<TurnActionResult> results = battleManager.ExecuteCurrentTurnAction(Core.Battles.Enum.CombatAction.Attack, currentlySelected);
+                        List<TurnActionResult> results = battleManager.ExecuteCurrentTurnAction(CombatAction.Attack, currentlySelected);
 
                         PlayTurnActionEffect(results, () =>
                          AnimateStepBack(() =>
@@ -657,9 +656,9 @@ namespace JRPG.UI.Battle
                     }
                     break;
                 case "Item":
-                    if (inventory != null && inventory.Any(i => i.Quantity > 0))
+                    if (inventory != null && inventory.Items.Any(i => i.Quantity > 0))
                     {
-                        CommandBox.ShowItems(inventory);
+                        CommandBox.ShowItems(inventory.Items);
                         CommandBox.OptionListPanel.Visibility = Visibility.Visible;
                     }
                     else
@@ -671,16 +670,16 @@ namespace JRPG.UI.Battle
 
         private void AttackButton_Click(object sender, RoutedEventArgs e)
         {
-            CombatAction = Core.Battles.Enum.CombatAction.Attack;
+            ParamCombatAction = CombatAction.Attack;
 
-            EnterTargetingMode(Core.Battles.Enum.TargetType.Enemy);
+            EnterTargetingMode(TargetType.Enemy);
         }
 
         private void DefendButton_Click(object sender, RoutedEventArgs e)
         {
             currentlySelected.Add(battleManager.CurrentTurn.BattleActor);
 
-            List<TurnActionResult> results = battleManager.ExecuteCurrentTurnAction(Core.Battles.Enum.CombatAction.Defend, currentlySelected);
+            List<TurnActionResult> results = battleManager.ExecuteCurrentTurnAction(CombatAction.Defend, currentlySelected);
 
             MessageBox.Show("I defend");
 
@@ -701,7 +700,7 @@ namespace JRPG.UI.Battle
         private void HandleSkillTargeting(Skill skill)
         {
             targetingParam = skill;
-            CombatAction = Core.Battles.Enum.CombatAction.Skill;
+            ParamCombatAction = CombatAction.Skill;
 
             EnterTargetingMode(skill.TargetType);
         }
@@ -709,7 +708,7 @@ namespace JRPG.UI.Battle
         private void HandleItemTargeting(InventoryItem item)
         {
             targetingParam = item;
-            CombatAction = Core.Battles.Enum.CombatAction.Item;
+            ParamCombatAction = CombatAction.Item;
 
             EnterTargetingMode(item.TargetType);
         }
@@ -717,28 +716,28 @@ namespace JRPG.UI.Battle
         private void EnterTargetingMode(TargetType targetType)
         {
             isTargeting = true;
-            TargetType = targetType;
+            ActionTargetType = targetType;
 
             //Default Target
             switch(targetType)
             {
-                case Core.Battles.Enum.TargetType.Self:
+                case TargetType.Self:
                     AddTargets(new List<BattleActor>() { battleManager.CurrentTurn.BattleActor });
                     break;
 
-                case Core.Battles.Enum.TargetType.Ally:
+                case TargetType.Ally:
                     AddTargets(new List<BattleActor>() { battleManager.CurrentTurn.BattleActor });
                     break;
 
-                case Core.Battles.Enum.TargetType.Enemy:
+                case TargetType.Enemy:
                     AddTargets(new List<BattleActor>() { battleManager.GetAliveEnemies().LastOrDefault() });
                     break;
 
-                case Core.Battles.Enum.TargetType.AllAllies:
+                case TargetType.AllAllies:
                     AddTargets(battleManager.GetAlivePlayers());
                     break;
 
-                case Core.Battles.Enum.TargetType.AllEnemies:
+                case TargetType.AllEnemies:
                     AddTargets(battleManager.GetAliveEnemies());
                     break;
             }
@@ -769,7 +768,7 @@ namespace JRPG.UI.Battle
             if (isTargetingLocked) return; // 🛑 prevent double-activation
             isTargetingLocked = true;      // 🔒 lock until animation ends
 
-            List<TurnActionResult> results = battleManager.ExecuteCurrentTurnAction(CombatAction.Value, currentlySelected, targetingParam);
+            List<TurnActionResult> results = battleManager.ExecuteCurrentTurnAction(ParamCombatAction.Value, currentlySelected, targetingParam);
 
             targetingParam = null;
 

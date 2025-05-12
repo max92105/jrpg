@@ -1,4 +1,4 @@
-﻿namespace JRPG.Enums
+﻿namespace JRPG.Core.Battles.Enums
 {
     public enum BattleState
     {

@@ -1,4 +1,4 @@
-﻿using JRPG.Core.Battles.Enum;
+﻿using JRPG.Core.Battles.Enums;
 
 namespace JRPG.Core.Battles.Models
 {

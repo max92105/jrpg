@@ -383,7 +383,7 @@ namespace JRPG
 
                 case TriggerDialogue dialogue:
                     var lines = dialogue.Lines ?? new List<string> { "..." };
-                    var portrait = string.IsNullOrEmpty(dialogue.PortraitPath) ? "fighter.png" : dialogue.PortraitPath;
+                    var portrait = string.IsNullOrEmpty(dialogue.PortraitPath) ? "Fighter.png" : dialogue.PortraitPath;
                     var speaker = string.IsNullOrEmpty(dialogue.SpeakerName) ? "???" : dialogue.SpeakerName;
 
                     ((MainWindow)Application.Current.MainWindow).ShowDialogue(

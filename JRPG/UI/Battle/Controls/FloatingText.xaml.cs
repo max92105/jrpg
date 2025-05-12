@@ -1,4 +1,4 @@
-﻿using JRPG.Core.Battles.Enum;
+﻿using JRPG.Core.Battles.Enums;
 using System;
 using System.Windows;
 using System.Windows.Controls;

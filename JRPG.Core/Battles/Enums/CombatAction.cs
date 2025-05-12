@@ -1,4 +1,4 @@
-﻿namespace JRPG.Core.Battles.Enum
+﻿namespace JRPG.Core.Battles.Enums
 {
     public enum CombatAction
     {

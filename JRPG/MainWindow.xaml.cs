@@ -1,4 +1,5 @@
-﻿using JRPG.Core.Battles.Enum;
+﻿using JRPG.Core.Battles;
+using JRPG.Core.Battles.Enums;
 using JRPG.Core.Battles.Models;
 using JRPG.Core.Battles.Models.Enemies;
 using JRPG.UI.Battle;
@@ -25,8 +26,7 @@ namespace JRPG
         private int totalPlayTimeSeconds = 0;
 
         //Inventory System
-        private List<InventoryItem> playerInventory = new List<InventoryItem>();
-        private InventoryItem selectedItem;
+        private InventoryManager inventoryManager = new InventoryManager();
 
         //Charater Management System
         private List<Character> allCharacters = new List<Character>();
@@ -54,17 +54,6 @@ namespace JRPG
             WindowState = WindowState.Maximized;
             ResizeMode = ResizeMode.NoResize;
             Topmost = true;
-        }
-
-        private void InitializeInventory()
-        {
-            playerInventory.Add(new InventoryItem { Name = "Potion", Quantity = 5, EffectValue = 15, EffectType = EffectType.Heal, Description = "Restores a small amount of HP.", TargetType = TargetType.Ally });
-            playerInventory.Add(new InventoryItem { Name = "Hi-Potion", Quantity = 2, EffectValue = 50, EffectType = EffectType.Heal, Description = "Restores a medium amount of HP.", TargetType = TargetType.Ally });
-            playerInventory.Add(new InventoryItem { Name = "Elixir", Quantity = 1, EffectValue = 100, EffectType = EffectType.Heal, Description = "Fully restores HP and MP.", TargetType = TargetType.Ally });
-            playerInventory.Add(new InventoryItem { Name = "Antidote", Quantity = 7, EffectValue = 15, EffectType = EffectType.Heal, Description = "Cures poison.", TargetType = TargetType.Self });
-            playerInventory.Add(new InventoryItem { Name = "Bomb", Quantity = 3, EffectValue = 15, EffectType = EffectType.Damage, Description = "Damage an enemy.", TargetType = TargetType.Enemy });
-            playerInventory.Add(new InventoryItem { Name = "Bomb All", Quantity = 3, EffectValue = 30, EffectType = EffectType.Damage, Description = "Damage all enemy.", TargetType = TargetType.AllEnemies });
-            playerInventory.Add(new InventoryItem { Name = "Revive Feather", Quantity = 3, EffectValue = 15, EffectType = EffectType.Heal, Description = "Revives all fallen allies.", TargetType = TargetType.AllAllies });
         }
 
         private void InitializeCharacters()
@@ -248,7 +237,7 @@ namespace JRPG
                 battleActors.AddRange(enemies);
                 battleActors.AddRange(activePartyOrder);
 
-                var battleUI = new BattleUI(battleActors, playerInventory);
+                var battleUI = new BattleUI(battleActors, inventoryManager);
 
                 battleUI.SetBackground("Forest.png");
 
@@ -456,7 +445,6 @@ namespace JRPG
 
             var itemListStack = new StackPanel();
 
-            // Description Block
             TextBlock descriptionBlock = new TextBlock
             {
                 Text = "Select an item to see its description.",
@@ -467,7 +455,6 @@ namespace JRPG
                 VerticalAlignment = VerticalAlignment.Top
             };
 
-            // Wrap description inside a Border
             Border descriptionBorder = new Border
             {
                 BorderBrush = Brushes.White,
@@ -478,7 +465,7 @@ namespace JRPG
                 Child = descriptionBlock
             };
 
-            foreach (var item in playerInventory)
+            foreach (var item in inventoryManager.Items)
             {
                 var itemRow = new Border
                 {
@@ -510,7 +497,6 @@ namespace JRPG
                     HorizontalAlignment = HorizontalAlignment.Right
                 });
 
-                // Highlight + description on hover
                 itemRow.MouseEnter += (s, args) =>
                 {
                     itemRow.Background = new SolidColorBrush(Color.FromRgb(80, 80, 80));
@@ -524,7 +510,7 @@ namespace JRPG
 
                 itemRow.MouseLeftButtonDown += async (s, args) =>
                 {
-                    selectedItem = item;
+                    inventoryManager.SelectItem(item);
                     PopupQuestion.Text = $"Use {item.Name}?";
                     await FadeInPopup();
                 };
@@ -536,7 +522,6 @@ namespace JRPG
             {
                 Content = itemListStack,
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
-                HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
                 Margin = new Thickness(10),
                 Background = Brushes.Transparent
             };
@@ -552,26 +537,17 @@ namespace JRPG
 
         private async void PopupYes_Click(object sender, RoutedEventArgs e)
         {
-            if (selectedItem != null)
+            if (inventoryManager.SelectedItem != null)
             {
-                selectedItem.Quantity--;
-
-                if (selectedItem.Quantity <= 0)
-                {
-                    playerInventory.Remove(selectedItem);
-                }
-
-                selectedItem = null;
+                inventoryManager.UseSelectedItem();
                 await FadeOutPopup();
-
-                // Refresh Inventory page
-                InventoryButton_Click(null, null);
+                InventoryButton_Click(null, null); // Refresh
             }
         }
 
         private async void PopupNo_Click(object sender, RoutedEventArgs e)
         {
-            selectedItem = null;
+            inventoryManager.ClearSelection();
             await FadeOutPopup();
         }
 
@@ -1167,7 +1143,7 @@ namespace JRPG
             var sessionSeconds = (int)(DateTime.Now - sessionStartTime).TotalSeconds;
             var totalSeconds = totalPlayTimeSeconds + sessionSeconds;
 
-            SaveGameManager.SaveGame(slot, allCharacters, playerInventory, weaponStock, armorStock, game.currentMapFile, game.playerX, game.playerY, activePartyOrder, totalSeconds);
+            SaveGameManager.SaveGame(slot, allCharacters, inventoryManager.Items, weaponStock, armorStock, game.currentMapFile, game.playerX, game.playerY, activePartyOrder, totalSeconds);
             MessageBox.Show($"Game Saved in Slot {slot}!");
 
             sessionStartTime = DateTime.Now;
@@ -1273,7 +1249,7 @@ namespace JRPG
                 var saveData = SaveGameManager.LoadGame(slot);
 
                 allCharacters = saveData.Characters;
-                playerInventory = saveData.Inventory;
+                playerInventory = inventoryManager;
                 weaponStock = saveData.WeaponStock;
                 armorStock = saveData.ArmorStock;
                 game.currentMapFile = saveData.CurrentMap;
@@ -1314,7 +1290,7 @@ namespace JRPG
             dialogueManager = new DialogueManager(DialogueUI.TextElement, DialogueUI.Container, DialogueUI.Portrait, DialogueUI.Speaker, DialogueUI.ContinueIcon);
             game = new Game(GameCanvas);
 
-            InitializeInventory();
+            inventoryManager.InitializeDefaultItems();
             InitializeCharacters();
             InitializeEquipment();
             RefreshActivePartyOrder();

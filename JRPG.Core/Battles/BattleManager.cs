@@ -1,12 +1,10 @@
-﻿using JRPG.Enums;
-using JRPG.Core.Battles.Models;
+﻿using JRPG.Core.Battles.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using JRPG.Core.Battles.Enum;
-using System.Windows;
+using JRPG.Core.Battles.Enums;
 
-namespace JRPG
+namespace JRPG.Core.Battles
 {
     public class BattleManager
     {
@@ -183,7 +181,7 @@ namespace JRPG
 
             user.UseMP(skill.MPCost);
 
-            if (skill.TargetType == Core.Battles.Enum.TargetType.Enemy || skill.TargetType == Core.Battles.Enum.TargetType.AllEnemies)
+            if (skill.TargetType == TargetType.Enemy || skill.TargetType == TargetType.AllEnemies)
             {
                 foreach (var target in targets)
                 {

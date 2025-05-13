@@ -1,11 +1,12 @@
 ﻿using JRPG.Core.Battles.Models;
+using JRPG.Core.System.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
 
-namespace JRPG
+namespace JRPG.Core.System
 {
     public class SaveGameManager
     {

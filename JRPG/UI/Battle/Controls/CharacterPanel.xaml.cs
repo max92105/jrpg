@@ -1,12 +1,7 @@
-﻿using JRPG.Core.Utils;
-using System;
-using System.IO;
-using System.Windows;
+﻿using System;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Effects;
-using System.Windows.Media.Imaging;
 
 namespace JRPG.UI.Battle.Controls
 {

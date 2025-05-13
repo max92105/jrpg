@@ -1,0 +1,8 @@
+﻿<UserControl x:Class="JRPG.UI.GameMenu.StatusView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Transparent">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10">
+        <StackPanel x:Name="StatusPanel" />
+    </ScrollViewer>
+</UserControl>

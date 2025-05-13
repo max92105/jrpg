@@ -1,10 +1,8 @@
-﻿using JRPG.Core.Enums;
-using JRPG.Core.Maps;
+﻿using JRPG.Core.Maps;
 using JRPG.Core.Triggers.Models;
 using JRPG.Core.Utils;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Windows;

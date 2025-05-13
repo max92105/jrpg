@@ -1,0 +1,21 @@
+﻿<UserControl x:Class="JRPG.UI.GameMenu.PartyView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Background="Transparent">
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left: Active Party Members -->
+        <StackPanel x:Name="ActivePartyPanel" Grid.Column="0" Margin="10">
+            <TextBlock Text="Active Party" FontSize="24" Foreground="White" Margin="0,0,0,10"/>
+        </StackPanel>
+
+        <!-- Right: Full Roster -->
+        <StackPanel x:Name="FullRosterPanel" Grid.Column="1" Margin="10">
+            <TextBlock Text="Full Roster" FontSize="24" Foreground="White" Margin="0,0,0,10"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

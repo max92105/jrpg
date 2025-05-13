@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using JRPG.Core.Maps.IO;
 using JRPG.Core.Maps.Models;
-using JRPG.Core.Triggers;
 using JRPG.Core.Triggers.Models;
 using JRPG.Core.Utils;
 

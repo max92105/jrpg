@@ -1,0 +1,78 @@
+﻿<UserControl x:Class="JRPG.UI.GameMenu.GameMenuControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:JRPG.UI.GameMenu"
+             Background="Black"
+             Visibility="Collapsed"
+             x:Name="Root">
+    <UserControl.Resources>
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="250" />
+            <Setter Property="Height" Value="50" />
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="#55000000" />
+            <Setter Property="BorderBrush" Value="White" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                         BorderBrush="{TemplateBinding BorderBrush}" 
+                         BorderThickness="{TemplateBinding BorderThickness}" 
+                         CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#88FFFFFF" />
+                    <Setter Property="Foreground" Value="Black" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#CCAAAAAA" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Menu -->
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left" Margin="20,0,0,0">
+            <TextBlock Text="Game Menu" FontSize="32" FontWeight="Bold" Foreground="White" Margin="0,0,0,40" />
+
+            <Button Content="Inventory" Style="{StaticResource MenuButtonStyle}" Click="InventoryButton_Click"/>
+            <Button Content="Manage Party" Style="{StaticResource MenuButtonStyle}" Click="PartyButton_Click"/>
+            <Button Content="Equipment" Style="{StaticResource MenuButtonStyle}" Click="EquipmentButton_Click"/>
+            <Button Content="Status" Style="{StaticResource MenuButtonStyle}" Click="StatusButton_Click"/>
+            <!--<Button Content="Save Game" Style="{StaticResource MenuButtonStyle}" Click="SaveButton_Click"/>-->
+            <Button Content="Options" Style="{StaticResource MenuButtonStyle}" Click="OptionsButton_Click"/>
+
+            <Separator Margin="0,20,0,20"/>
+
+            <Button Content="Return to Game" Style="{StaticResource MenuButtonStyle}" Click="CloseGameMenu_Click"/>
+            <!--<Button Content="Return to Main Menu" Style="{StaticResource MenuButtonStyle}" Click="ReturnToMenuButton_Click"/>-->
+            <!--<Button Content="Exit Game" Style="{StaticResource MenuButtonStyle}" Click="ExitButton_Click"/>-->
+        </StackPanel>
+
+        <!-- Right Content Panel -->
+        <Border Grid.Column="1" 
+                Background="#111111" 
+                CornerRadius="10" 
+                Margin="20" 
+                Padding="20"
+                BorderBrush="White"
+                BorderThickness="2">
+            <ContentControl x:Name="GameMenuContent" />
+        </Border>
+    </Grid>
+</UserControl>

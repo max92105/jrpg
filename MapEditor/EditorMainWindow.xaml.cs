@@ -13,8 +13,6 @@ using JRPG.Core.Maps;
 using JRPG.Core.Utils;
 using JRPG.Core.Models;
 using System.Collections.Generic;
-using JRPG.Core.Triggers.Models;
-using System.Threading;
 
 namespace MapEditor
 {

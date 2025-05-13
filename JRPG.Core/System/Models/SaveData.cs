@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace JRPG
+namespace JRPG.Core.System.Models
 {
     public class SaveData
     {

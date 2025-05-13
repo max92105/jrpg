@@ -110,10 +110,26 @@
     <Compile Include="UI\Battle\Controls\FloatingText.xaml.cs">
       <DependentUpon>FloatingText.xaml</DependentUpon>
     </Compile>
-    <Compile Include="SaveData.cs" />
-    <Compile Include="SaveGameManager.cs" />
     <Compile Include="UI\Battle\BattleUI.xaml.cs">
       <DependentUpon>BattleUI.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\GameMenu\EquipmentView.xaml.cs">
+      <DependentUpon>EquipmentView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\GameMenu\EquipmentSelectionView.xaml.cs">
+      <DependentUpon>EquipmentSelectionView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\GameMenu\GameMenuControl.xaml.cs">
+      <DependentUpon>GameMenuControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\GameMenu\InventoryView.xaml.cs">
+      <DependentUpon>InventoryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\GameMenu\PartyView.xaml.cs">
+      <DependentUpon>PartyView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\GameMenu\StatusView.xaml.cs">
+      <DependentUpon>StatusView.xaml</DependentUpon>
     </Compile>
     <Compile Include="VisualHost.cs" />
     <Page Include="UI\Battle\Controls\CharacterPanel.xaml">
@@ -157,6 +173,30 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\GameMenu\EquipmentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\GameMenu\EquipmentSelectionView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\GameMenu\GameMenuControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\GameMenu\InventoryView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\GameMenu\PartyView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\GameMenu\StatusView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MapManager.cs" />
@@ -192,5 +232,6 @@
       <Name>JRPG.Core</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

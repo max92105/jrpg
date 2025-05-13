@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace JRPG.Core.Cutscene.Models
+﻿namespace JRPG.Core.Cutscene.Models
 {
     public class CutsceneStepSprite : CutsceneStep
     {

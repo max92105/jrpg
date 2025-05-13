@@ -13,9 +13,14 @@ namespace JRPG.Core.Battles
         public IReadOnlyList<InventoryItem> Items => inventory;
         public InventoryItem SelectedItem => selectedItem;
 
+        public InventoryManager() 
+        {
+            InitializeDefaultItems();
+        }
+
         public List<InventoryItem> GetSerializableItems() => Items.ToList();
 
-        public void LoadFromSerialized(List<InventoryItem> loadedItems)
+        public void LoadFromSavedData(List<InventoryItem> loadedItems)
         {
             inventory.Clear();
             inventory.AddRange(loadedItems);

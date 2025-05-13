@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace JRPG.Core.Maps
+﻿namespace JRPG.Core.Maps
 {
     public static class MapConstant
     {

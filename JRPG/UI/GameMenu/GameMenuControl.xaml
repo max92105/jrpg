@@ -15,17 +15,44 @@
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="RenderTransformOrigin" Value="0,0.5"/>
-            <!-- Grows from left edge -->
-            <Setter Property="RenderTransform">
-                <Setter.Value>
-                    <ScaleTransform ScaleX="1" ScaleY="1"/>
-                </Setter.Value>
-            </Setter>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ToggleButton">
-                        <Grid>
+                        <Grid x:Name="RootGrid" RenderTransformOrigin="0,0.5">
+                            <Grid.RenderTransform>
+                                <ScaleTransform x:Name="ScaleTransform" ScaleX="1" ScaleY="1"/>
+                            </Grid.RenderTransform>
+
+                            <!-- ✅ Visual States go here -->
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CheckStates">
+                                    <VisualState x:Name="Unchecked">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ScaleTransform"
+                                                             Storyboard.TargetProperty="ScaleX"
+                                                             To="1.0"
+                                                             Duration="0:0:0.30">
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </VisualState>
+                                    <VisualState x:Name="Checked">
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="ScaleTransform"
+                                                             Storyboard.TargetProperty="ScaleX"
+                                                             To="1.12"
+                                                             Duration="0:0:0.30">           
+                                                <DoubleAnimation.EasingFunction>
+                                                    <CubicEase EasingMode="EaseOut"/>
+                                                </DoubleAnimation.EasingFunction>
+                                            </DoubleAnimation>
+                                        </Storyboard>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+
                             <!-- Background Shape -->
                             <Path x:Name="ButtonShape"
                           Stretch="Fill"
@@ -34,14 +61,13 @@
                           StrokeThickness="1"
                           Data="M 0,0 L 240,0 L 270,25 L 240,50 L 0,50 Z" />
 
-                            <!-- Text -->
                             <ContentPresenter HorizontalAlignment="Left"
                                       VerticalAlignment="Center"
                                       Margin="50,0,0,0"
                                       RecognizesAccessKey="True"/>
                         </Grid>
+
                         <ControlTemplate.Triggers>
-                            <!-- Hover effect -->
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="ButtonShape" Property="Fill" Value="#CCDDDDDD"/>
                                 <Setter Property="Foreground" Value="Black"/>
@@ -50,17 +76,6 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-
-            <!-- Apply scale when selected -->
-            <Style.Triggers>
-                <Trigger Property="IsChecked" Value="True">
-                    <Setter Property="RenderTransform">
-                        <Setter.Value>
-                            <ScaleTransform ScaleX="1.12" ScaleY="1"/>
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-            </Style.Triggers>
         </Style>
 
         <DropShadowEffect x:Key="DropShadow"

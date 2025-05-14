@@ -1,8 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using JRPG.Core.Battles;
-using JRPG.Core.System;
+using System.Windows.Media.Imaging;
+using JRPG.Core.Systems.Equipments;
+using JRPG.Core.Systems.Inventories;
+using JRPG.Core.Systems.Parties;
 using JRPG.Core.Utils;
 
 namespace JRPG.UI.GameMenu

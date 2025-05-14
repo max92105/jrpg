@@ -1,5 +1,6 @@
 ﻿using JRPG.Core.Battles.Models;
-using JRPG.Core.System;
+using JRPG.Core.Systems.Equipments;
+using JRPG.Core.Systems.Parties;
 using JRPG.Core.Utils;
 using System;
 using System.Windows;
@@ -20,7 +21,7 @@ namespace JRPG.UI.GameMenu
         private EquipmentManager equipmentManager;
         private Character selectedCharacter;
 
-        public EquipmentView(PartyManager partyManager, EquipmentManager equipmentManager)
+        public EquipmentView(PartyManager partyManager, EquipmentManager equipmentManager, Character defaultSelectedCharacter = null)
         {
             InitializeComponent();
             this.partyManager = partyManager;
@@ -30,6 +31,15 @@ namespace JRPG.UI.GameMenu
             ArmorNameBlock.MouseLeftButtonUp += ArmorRow_Click;
 
             PopulatePortraits();
+
+            if (defaultSelectedCharacter != null)
+            {
+                SelectCharacter(defaultSelectedCharacter);
+            }
+            else
+            {
+                SelectCharacter(partyManager.AllCharacters[0]);
+            }
         }
 
         private void PopulatePortraits()
@@ -54,10 +64,6 @@ namespace JRPG.UI.GameMenu
 
                 PortraitPanel.Children.Add(image);
             }
-
-            // Auto-select first character
-            if (partyManager.AllCharacters.Count > 0)
-                SelectCharacter(partyManager.AllCharacters[0]);
         }
 
         private void SelectCharacter(Character character)
@@ -66,8 +72,8 @@ namespace JRPG.UI.GameMenu
 
             CharacterNameBlock.Text = character.Name;
 
-            WeaponNameBlock.Text = character.EquippedWeapon ?? "None";
-            ArmorNameBlock.Text = character.EquippedArmor ?? "None";
+            WeaponNameBlock.Text = character.EquippedWeapon?.Name ?? "None";
+            ArmorNameBlock.Text = character.EquippedArmor?.Name ?? "None";
 
             StatsPanel.Children.Clear();
             StatsPanel.Children.Add(CreateStatText("HP", character.HP));

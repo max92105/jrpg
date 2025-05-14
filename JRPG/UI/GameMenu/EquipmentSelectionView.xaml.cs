@@ -1,6 +1,9 @@
 ﻿using JRPG.Core.Battles.Models;
-using JRPG.Core.System;
+using JRPG.Core.Systems.Equipments;
+using JRPG.Core.Systems.Equipments.Models;
+using JRPG.Core.Systems.Parties;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -48,18 +51,20 @@ namespace JRPG.UI.GameMenu
             };
             ItemListPanel.Children.Add(unequip);
 
-            List<string> items = isWeapon
-                ? equipmentManager.GetAvailableWeaponsFor(character.Class)
-                : equipmentManager.GetAvailableArmorFor(character.Class);
+            var entries = equipmentManager.EquipmentInventory
+                .Where(e =>
+                    e.Quantity > 0 &&
+                    e.Equipment is Weapon == isWeapon &&
+                    e.Equipment.AllowedClasses.Contains(character.Class))
+                .ToList();
 
-            foreach (var item in items)
+            foreach (var entry in entries)
             {
+                var equipment = entry.Equipment;
                 int currentStat = isWeapon ? character.GetTotalAttack() : character.GetTotalDefense();
-                int newStat = isWeapon ? character.BaseAttack + equipmentManager.GetWeaponAttackBonus(item)
-                                       : character.BaseDefense + equipmentManager.GetArmorDefenseBonus(item);
-
-                int stock = isWeapon ? equipmentManager.GetWeaponStock(item) : equipmentManager.GetArmorStock(item);
-                if (stock <= 0) continue;
+                int newStat = isWeapon
+                    ? character.BaseAttack + ((Weapon)equipment).AttackBonus
+                    : character.BaseDefense + ((Armor)equipment).DefenseBonus;
 
                 int diff = newStat - currentStat;
                 string statChange = diff > 0 ? $"▲ (+{diff})"
@@ -68,7 +73,7 @@ namespace JRPG.UI.GameMenu
 
                 var textBlock = new TextBlock
                 {
-                    Text = $"{item} ({(isWeapon ? "ATK" : "DEF")}: {newStat}) {statChange}   (x{stock})",
+                    Text = $"{equipment.Name} ({(isWeapon ? "ATK" : "DEF")}: {newStat}) {statChange}   (x{entry.Quantity})",
                     Cursor = Cursors.Hand,
                     Foreground = System.Windows.Media.Brushes.White,
                     Margin = new Thickness(0, 0, 0, 10),
@@ -78,9 +83,9 @@ namespace JRPG.UI.GameMenu
                 textBlock.MouseLeftButtonUp += (s, e) =>
                 {
                     if (isWeapon)
-                        equipmentManager.EquipWeapon(character, item);
+                        equipmentManager.Equip(character, equipment);
                     else
-                        equipmentManager.EquipArmor(character, item);
+                        equipmentManager.Equip(character, equipment);
                     ReturnToEquipmentView();
                 };
 
@@ -92,7 +97,8 @@ namespace JRPG.UI.GameMenu
         {
             var view = new EquipmentView(
                 partyManager,
-                equipmentManager
+                equipmentManager,
+                character
             );
 
             ((MainWindow)Application.Current.MainWindow).GameMenuControl.ShowContent(view);

@@ -3,7 +3,7 @@ using JRPG.Core.Battles.Models;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace JRPG.Core.System
+namespace JRPG.Core.Systems.Parties
 {
     public class PartyManager
     {
@@ -38,9 +38,9 @@ namespace JRPG.Core.System
         {
             AllCharacters.Add(new Character
             {
-                Name = "Alaric",
-                PortraitFile = "Alaric.png",
-                BattleSpriteFile = "PlaceholderCharacter.png",
+                Name = "Sarxian",
+                PortraitFile = "Sarxian.png",
+                BattleSpriteFile = "Sarxian.png",
                 AttackVFXFile = "AttackPlayer.gif",
                 Class = "Warrior",
                 Level = 10,
@@ -66,9 +66,9 @@ namespace JRPG.Core.System
 
             AllCharacters.Add(new Character
             {
-                Name = "Selene",
-                PortraitFile = "Alaric.png",
-                BattleSpriteFile = "PlaceholderCharacter.png",
+                Name = "Jazog",
+                PortraitFile = "Jazog.png",
+                BattleSpriteFile = "Jazog.png",
                 AttackVFXFile = "AttackPlayer.gif",
                 Class = "Mage",
                 Level = 9,
@@ -84,9 +84,9 @@ namespace JRPG.Core.System
 
             AllCharacters.Add(new Character
             {
-                Name = "Dorian",
-                PortraitFile = "Alaric.png",
-                BattleSpriteFile = "PlaceholderCharacter.png",
+                Name = "Teelle",
+                PortraitFile = "Teelle.png",
+                BattleSpriteFile = "Teelle.png",
                 AttackVFXFile = "AttackPlayer.gif",
                 Class = "Thief",
                 Level = 11,
@@ -102,9 +102,9 @@ namespace JRPG.Core.System
 
             AllCharacters.Add(new Character
             {
-                Name = "Lyra",
-                PortraitFile = "Alaric.png",
-                BattleSpriteFile = "PlaceholderCharacter.png",
+                Name = "Zaruk",
+                PortraitFile = "Zaruk.png",
+                BattleSpriteFile = "Zaruk.png",
                 AttackVFXFile = "AttackPlayer.gif",
                 Class = "Healer",
                 Level = 8,
@@ -120,9 +120,9 @@ namespace JRPG.Core.System
 
             AllCharacters.Add(new Character
             {
-                Name = "Balthazar",
-                PortraitFile = "Alaric.png",
-                BattleSpriteFile = "PlaceholderCharacter.png",
+                Name = "Zanyr",
+                PortraitFile = "Zanyr.png",
+                BattleSpriteFile = "Zanyr.png",
                 AttackVFXFile = "AttackPlayer.gif",
                 Class = "Knight",
                 Level = 12,
@@ -138,9 +138,27 @@ namespace JRPG.Core.System
 
             AllCharacters.Add(new Character
             {
-                Name = "Fiora",
-                PortraitFile = "Alaric.png",
-                BattleSpriteFile = "PlaceholderCharacter.png",
+                Name = "Thaali",
+                PortraitFile = "Thaali.png",
+                BattleSpriteFile = "Thaali.png",
+                AttackVFXFile = "AttackPlayer.gif",
+                Class = "Ranger",
+                Level = 10,
+                HP = 170,
+                MaxHP = 170,
+                MP = 30,
+                MaxMP = 30,
+                BaseAttack = 13,
+                BaseDefense = 5,
+                EXP = 100,
+                EXPToNextLevel = 300,
+            });
+
+            AllCharacters.Add(new Character
+            {
+                Name = "Kamilia",
+                PortraitFile = "Kamilia.png",
+                BattleSpriteFile = "Kamilia.png",
                 AttackVFXFile = "AttackPlayer.gif",
                 Class = "Ranger",
                 Level = 10,

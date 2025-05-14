@@ -1,7 +1,7 @@
-﻿using JRPG.Core.System;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows;
+using JRPG.Core.Systems.Parties;
 
 namespace JRPG.UI.GameMenu
 {
@@ -64,14 +64,14 @@ namespace JRPG.UI.GameMenu
 
                 characterStack.Children.Add(new TextBlock
                 {
-                    Text = $"Weapon: {character.EquippedWeapon ?? "None"}",
+                    Text = $"Weapon: {character.EquippedWeapon?.Name ?? "None"}",
                     FontSize = 18,
                     Foreground = Brushes.LightGray
                 });
 
                 characterStack.Children.Add(new TextBlock
                 {
-                    Text = $"Armor: {character.EquippedArmor ?? "None"}",
+                    Text = $"Armor: {character.EquippedArmor?.Name ?? "None"}",
                     FontSize = 18,
                     Foreground = Brushes.LightGray
                 });

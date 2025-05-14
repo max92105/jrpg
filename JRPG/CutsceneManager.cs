@@ -5,7 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using JRPG.Core.Cutscene.Models;
+using JRPG.Core.Cutscenes.Models;
 using JRPG.Core.Utils;
 using JRPG.UI.Cutscene;
 
@@ -151,7 +151,7 @@ namespace JRPG
 
                     new CutsceneStepFade(fadeToBlack: true, 0.5), // Fade to black
                     new CutsceneStepEnd() ,// Clean up
-                };
+            };
 
             PlayCutscene(steps);
         }

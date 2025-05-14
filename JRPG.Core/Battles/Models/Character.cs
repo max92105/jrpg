@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JRPG.Core.Systems.Equipments.Models;
+using System;
 
 namespace JRPG.Core.Battles.Models
 {
@@ -11,19 +12,19 @@ namespace JRPG.Core.Battles.Models
         public bool IsMainCharacter { get; set; } = false;
 
         public int EXP { get; set; } = 0;
-        public int EXPToNextLevel { get; set; } = 100; 
+        public int EXPToNextLevel { get; set; } = 100;
 
-        public string EquippedWeapon { get; set; }
-        public string EquippedArmor { get; set; }
+        public Weapon EquippedWeapon { get; set; }
+        public Armor EquippedArmor { get; set; }
 
         public override int GetTotalAttack()
         {
-            return BaseAttack;
+            return BaseAttack + (EquippedWeapon?.AttackBonus ?? 0);
         }
 
         public override int GetTotalDefense()
         {
-            return BaseDefense;
+            return BaseDefense + (EquippedArmor?.DefenseBonus ?? 0);
         }
 
         public override int TakeDamage(int rawDamage)
@@ -43,24 +44,6 @@ namespace JRPG.Core.Battles.Models
         {
             HP = Math.Min(MaxHP, HP + rawHeal);
         }
-
-        //public override int GetTotalAttack(Dictionary<string, int> weaponAttackBonus)
-        //{
-        //    int bonus = 0;
-        //    if (EquippedWeapon != null && weaponAttackBonus.ContainsKey(EquippedWeapon))
-        //        bonus = weaponAttackBonus[EquippedWeapon];
-
-        //    return BaseAttack + bonus;
-        //}
-
-        //public override int GetTotalDefense(Dictionary<string, int> armorDefenseBonus)
-        //{
-        //    int bonus = 0;
-        //    if (EquippedArmor != null && armorDefenseBonus.ContainsKey(EquippedArmor))
-        //        bonus = armorDefenseBonus[EquippedArmor];
-
-        //    return BaseDefense + bonus;
-        //}
 
         public void LevelUp()
         {

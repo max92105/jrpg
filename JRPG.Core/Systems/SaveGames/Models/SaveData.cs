@@ -1,8 +1,9 @@
 ﻿using JRPG.Core.Battles.Models;
+using JRPG.Core.Systems.Inventories.Models;
 using System;
 using System.Collections.Generic;
 
-namespace JRPG.Core.System.Models
+namespace JRPG.Core.Systems.SaveGames.Models
 {
     public class SaveData
     {

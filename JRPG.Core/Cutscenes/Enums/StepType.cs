@@ -1,4 +1,4 @@
-﻿namespace JRPG.Core.Cutscene.Enums
+﻿namespace JRPG.Core.Cutscenes.Enums
 {
     public enum StepType
     {

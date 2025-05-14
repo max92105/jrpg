@@ -1,6 +1,8 @@
-﻿using JRPG.Core.Battles;
-using JRPG.Core.System;
-using JRPG.Core.System.Models;
+﻿using JRPG.Core.Systems.Equipments;
+using JRPG.Core.Systems.Inventories;
+using JRPG.Core.Systems.Parties;
+using JRPG.Core.Systems.SaveGames;
+using JRPG.Core.Systems.SaveGames.Models;
 using JRPG.Core.Utils;
 using System;
 using System.IO;
@@ -65,8 +67,8 @@ namespace JRPG
                 slot,
                 partyManager.AllCharacters,
                 inventoryManager.GetSerializableItems(),
-                equipmentManager.WeaponStock,
-                equipmentManager.ArmorStock,
+                equipmentManager.GetWeaponStockForSave(),
+                equipmentManager.GetArmorStockForSave(),
                 game.currentMapFile,
                 game.playerX,
                 game.playerY,
@@ -106,14 +108,14 @@ namespace JRPG
 
                 MessageBox.Show("Game Loaded!");
 
-                FadeHelper.FadeToBlackAsync(fadeTarget);
+                await FadeHelper.FadeToBlackAsync(fadeTarget);
 
                 startScreen.Visibility = Visibility.Collapsed;
                 gameCanvas.Visibility = Visibility.Visible;
 
                 await Task.Delay(300);
 
-                FadeHelper.FadeFromBlackAsync(fadeTarget);
+                await FadeHelper.FadeFromBlackAsync(fadeTarget);
 
                 return true;
             }

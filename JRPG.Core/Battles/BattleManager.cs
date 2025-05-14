@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using JRPG.Core.Battles.Enums;
+using JRPG.Core.Systems.Inventories.Models;
 
 namespace JRPG.Core.Battles
 {

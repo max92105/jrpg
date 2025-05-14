@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using JRPG.Core.Battles.Models;
+using JRPG.Core.Systems.Inventories.Models;
 using JRPG.Core.Utils;
 
 namespace JRPG.UI.Battle.Controls

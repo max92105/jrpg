@@ -1,4 +1,4 @@
-﻿namespace JRPG.Core.Cutscene.Models
+﻿namespace JRPG.Core.Cutscenes.Models
 {
     public class CutsceneStepFade : CutsceneStep
     {

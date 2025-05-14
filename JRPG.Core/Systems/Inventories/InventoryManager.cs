@@ -1,9 +1,9 @@
 ﻿using JRPG.Core.Battles.Enums;
-using JRPG.Core.Battles.Models;
+using JRPG.Core.Systems.Inventories.Models;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace JRPG.Core.Battles
+namespace JRPG.Core.Systems.Inventories
 {
     public class InventoryManager
     {

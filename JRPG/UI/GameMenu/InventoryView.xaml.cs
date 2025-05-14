@@ -1,8 +1,8 @@
-﻿using JRPG.Core.Battles.Models;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using JRPG.Core.Battles;
+using JRPG.Core.Systems.Inventories;
+using JRPG.Core.Systems.Inventories.Models;
 
 namespace JRPG.UI.GameMenu
 {

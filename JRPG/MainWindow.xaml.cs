@@ -1,7 +1,8 @@
-﻿using JRPG.Core.Battles;
-using JRPG.Core.Battles.Models;
+﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Battles.Models.Enemies;
-using JRPG.Core.System;
+using JRPG.Core.Systems.Equipments;
+using JRPG.Core.Systems.Inventories;
+using JRPG.Core.Systems.Parties;
 using JRPG.Core.Utils;
 using JRPG.UI.Battle;
 using JRPG.UI.GameMenu;
@@ -37,6 +38,46 @@ namespace JRPG
             WindowState = WindowState.Maximized;
             ResizeMode = ResizeMode.NoResize;
             Topmost = true;
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            game = new Game(GameCanvas);
+
+            dialogueManager = new DialogueManager(DialogueUI.TextElement, DialogueUI.Container, DialogueUI.Portrait, DialogueUI.Speaker, DialogueUI.ContinueIcon);
+            inventoryManager = new InventoryManager();
+            partyManager = new PartyManager();
+            equipmentManager = new EquipmentManager();
+
+            gameSystemManager = new GameSystemManager(
+               partyManager,
+               inventoryManager,
+               equipmentManager,
+               game,
+               FadeRect
+           );
+
+            gameSystemManager.StartSessionTimer();
+
+            GameMenuControl = new GameMenuControl(partyManager, inventoryManager, equipmentManager, gameSystemManager);
+            GameMenuControl.Visibility = Visibility.Collapsed;
+            Panel.SetZIndex(GameMenuControl, 1000);
+            RootGrid.Children.Add(GameMenuControl);
+
+            GameCanvas.Visibility = Visibility.Collapsed; // Hide gameplay at start     
+
+            CompositionTarget.Rendering += (s, eventArgs) =>
+            {
+                if (StartScreen.Visibility == Visibility.Visible || GameMenuControl.Visibility == Visibility.Visible)
+                    return; // Don't update world if Start Menu or Game Menu open
+
+                if (!dialogueManager.IsActive)
+                    game.Update();
+
+                game.Render();
+            };
+
+            Loaded += (s, routedEvent) => Keyboard.Focus(GameCanvas);
         }
 
         public async void StartBattle()
@@ -170,11 +211,6 @@ namespace JRPG
             await FadeHelper.FadeFromBlackAsync(FadeRect);
         }
 
-        private void ExitButton_Click(object sender, RoutedEventArgs e)
-        {
-            gameSystemManager.ExitGame();
-        }
-
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             gameSystemManager.SaveGame();
@@ -185,44 +221,9 @@ namespace JRPG
             await gameSystemManager.LoadGameAsync(StartScreen, GameCanvas);
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
-            game = new Game(GameCanvas);
-
-            dialogueManager = new DialogueManager(DialogueUI.TextElement, DialogueUI.Container, DialogueUI.Portrait, DialogueUI.Speaker, DialogueUI.ContinueIcon);
-            inventoryManager = new InventoryManager();
-            partyManager = new PartyManager();
-            equipmentManager = new EquipmentManager();
-
-            gameSystemManager = new GameSystemManager(
-               partyManager,
-               inventoryManager,
-               equipmentManager,
-               game,
-               FadeRect
-           );
-
-            gameSystemManager.StartSessionTimer();
-
-            GameMenuControl = new GameMenuControl(partyManager, inventoryManager, equipmentManager, gameSystemManager);
-            GameMenuControl.Visibility = Visibility.Collapsed;
-            Panel.SetZIndex(GameMenuControl, 1000);
-            RootGrid.Children.Add(GameMenuControl);
-
-            GameCanvas.Visibility = Visibility.Collapsed; // Hide gameplay at start     
-
-            CompositionTarget.Rendering += (s, eventArgs) =>
-            {
-                if (StartScreen.Visibility == Visibility.Visible || GameMenuControl.Visibility == Visibility.Visible)
-                    return; // Don't update world if Start Menu or Game Menu open
-
-                if (!dialogueManager.IsActive)
-                    game.Update();
-
-                game.Render();
-            };
-
-            Loaded += (s, routedEvent) => Keyboard.Focus(GameCanvas);
+            gameSystemManager.ExitGame();
         }
     }
 }

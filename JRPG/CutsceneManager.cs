@@ -33,7 +33,7 @@ namespace JRPG
             NextStep();
         }
 
-        private void NextStep()
+        private async void NextStep()
         {
             if (steps.Count == 0) return;
 
@@ -41,7 +41,10 @@ namespace JRPG
             switch (step)
             {
                 case CutsceneStepFade fade:
-                    FadeHelper.FadeToBlackAsync(((MainWindow)Application.Current.MainWindow).FadeRect);
+                    if (fade.FadeToBlack)
+                        await FadeHelper.FadeToBlackAsync(((MainWindow)Application.Current.MainWindow).FadeRect);
+                    else
+                        await FadeHelper.FadeFromBlackAsync(((MainWindow)Application.Current.MainWindow).FadeRect);
                     NextStep();
                     break;
 
@@ -120,8 +123,7 @@ namespace JRPG
                     CutscenePlayer.Visibility = Visibility.Collapsed;
                     CutscenePlayer.CutsceneCanvas.Visibility = Visibility.Collapsed;
 
-                    FadeHelper.FadeFromBlackAsync(((MainWindow)Application.Current.MainWindow).FadeRect);
-                    NextStep();
+                    await FadeHelper.FadeFromBlackAsync(((MainWindow)Application.Current.MainWindow).FadeRect);
                     break;
 
                 default:
@@ -134,11 +136,11 @@ namespace JRPG
         {
             var steps = new List<CutsceneStep>
             {
-                    new CutsceneStepFade(1, 0.5), // Fade to black
+                    new CutsceneStepFade(fadeToBlack: true, 0.5), // Fade to black
                     new CutsceneStepBackground("Forest.png"),
                     new CutsceneStepSprite("Hero", "PlaceholderCharacter.png", 4.0, 6.0, flip: false),
                     new CutsceneStepSprite("Villain", "Goblin.png", 10.0, 6.0, flip: true),
-                    new CutsceneStepFade(0, 0.5), // Fade in
+                    new CutsceneStepFade(fadeToBlack: false, 0.5), // Fade in
           
                     new CutsceneStepDialogue(new List<string> { "Where are we?", "This forest gives me chills..." }, "Hero", "Alaric.png"),
                     new CutsceneStepDialogue(new List<string> { "You're too late, hero.", "The ritual is already underway!" }, "Villain", "Goblin.png"),
@@ -147,7 +149,7 @@ namespace JRPG
 
                     new CutsceneStepDialogue(new List<string> { "No!" }, "Hero", "Alaric.png"),
 
-                    new CutsceneStepFade(1, 0.5), // Fade to black
+                    new CutsceneStepFade(fadeToBlack: true, 0.5), // Fade to black
                     new CutsceneStepEnd() ,// Clean up
                 };
 

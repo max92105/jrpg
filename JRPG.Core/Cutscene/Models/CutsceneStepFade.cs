@@ -2,11 +2,11 @@
 {
     public class CutsceneStepFade : CutsceneStep
     {
-        public double ToOpacity { get; }
+        public bool FadeToBlack { get; }
         public double Duration { get; }
-        public CutsceneStepFade(double toOpacity, double duration)
+        public CutsceneStepFade(bool fadeToBlack, double duration)
         {
-            ToOpacity = toOpacity;
+            FadeToBlack = fadeToBlack;
             Duration = duration;
         }
     }

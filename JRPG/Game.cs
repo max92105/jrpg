@@ -176,10 +176,10 @@ namespace JRPG
                             {
                                 Random random = new Random();
 
-                                //if(random.Next(1, 60) == 59)
-                                //{
-                                //    HandleTileTrigger(new TriggerBattle());
-                                //}
+                                if (random.Next(1, 100) == 59)
+                                {
+                                    HandleTileTrigger(new TriggerBattle());
+                                }
                             }
                         }
 

@@ -39,9 +39,9 @@ namespace JRPG
             Topmost = true;
         }
 
-        public void StartBattle()
+        public async void StartBattle()
         {
-            FadeHelper.FadeToBlackAsync(FadeRect);
+            await FadeHelper.FadeToBlackAsync(FadeRect);
 
             List<Enemy> enemies = new List<Enemy>()
             {
@@ -72,12 +72,12 @@ namespace JRPG
 
             RootGrid.Children.Add(battleUI);
 
-            FadeHelper.FadeFromBlackAsync(FadeRect);
+            await FadeHelper.FadeFromBlackAsync(FadeRect);
         }
 
-        private void EndBattle()
+        private async void EndBattle()
         {
-            FadeHelper.FadeToBlackAsync(FadeRect);
+            await FadeHelper.FadeToBlackAsync(FadeRect);
 
             var battleUI = RootGrid.Children.OfType<BattleUI>().FirstOrDefault();
             if (battleUI != null)
@@ -86,7 +86,7 @@ namespace JRPG
             Focus();
             Keyboard.Focus(GameCanvas);
 
-            FadeHelper.FadeFromBlackAsync(FadeRect);
+            await FadeHelper.FadeFromBlackAsync(FadeRect);
         }
 
 
@@ -140,7 +140,7 @@ namespace JRPG
 
         private async void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            FadeHelper.FadeToBlackAsync(FadeRect);
+            await FadeHelper.FadeToBlackAsync(FadeRect);
 
             // Switch screens AFTER full black
             StartScreen.Visibility = Visibility.Collapsed;
@@ -149,7 +149,7 @@ namespace JRPG
             // Small delay to make sure WPF refreshes layout
             await Task.Delay(300);
 
-            FadeHelper.FadeFromBlackAsync(FadeRect);
+            await FadeHelper.FadeFromBlackAsync(FadeRect);
         }
 
         private void ResumeButton_Click(object sender, RoutedEventArgs e)
@@ -159,7 +159,7 @@ namespace JRPG
 
         private async void ReturnToMenuButton_Click(object sender, RoutedEventArgs e)
         {
-            FadeHelper.FadeToBlackAsync(FadeRect);
+            await FadeHelper.FadeToBlackAsync(FadeRect);
 
             GameMenuControl.Visibility = Visibility.Collapsed;
             GameCanvas.Visibility = Visibility.Collapsed;
@@ -167,7 +167,7 @@ namespace JRPG
 
             await Task.Delay(300);
 
-            FadeHelper.FadeFromBlackAsync(FadeRect);
+            await FadeHelper.FadeFromBlackAsync(FadeRect);
         }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)

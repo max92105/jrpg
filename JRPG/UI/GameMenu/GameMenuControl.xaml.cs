@@ -68,8 +68,9 @@ namespace JRPG.UI.GameMenu
             );
         }
 
-        private async  void ReturnToMenuButton_Click(object sender, RoutedEventArgs e)
+        private async void ReturnToMenuButton_Click(object sender, RoutedEventArgs e)
         {
+            await FadeHelper.FadeToBlackAsync(((MainWindow)Application.Current.MainWindow).FadeRect);
 
             // Show start screen and hide game elements
             var mainWindow = (MainWindow)Application.Current.MainWindow;
@@ -79,6 +80,7 @@ namespace JRPG.UI.GameMenu
 
             await Task.Delay(300); // Allow layout update
 
+            await FadeHelper.FadeFromBlackAsync(((MainWindow)Application.Current.MainWindow).FadeRect);
         }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)

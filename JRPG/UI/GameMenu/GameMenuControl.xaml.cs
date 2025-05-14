@@ -31,6 +31,8 @@ namespace JRPG.UI.GameMenu
             this.inventoryManager = inventoryManager;
             this.equipmentManager = equipmentManager;
             this.gameSystemManager = gameSystemManager;
+
+            MenuBackground.Source = new BitmapImage(new Uri(AssetPathResolver.GetBackgroundsPath("GameMenu.png")));
         }
 
         private void InventoryButton_Click(object sender, RoutedEventArgs e)

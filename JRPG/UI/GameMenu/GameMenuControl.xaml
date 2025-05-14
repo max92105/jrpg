@@ -54,14 +54,15 @@
             <Button Content="Manage Party" Style="{StaticResource MenuButtonStyle}" Click="PartyButton_Click"/>
             <Button Content="Equipment" Style="{StaticResource MenuButtonStyle}" Click="EquipmentButton_Click"/>
             <Button Content="Status" Style="{StaticResource MenuButtonStyle}" Click="StatusButton_Click"/>
-            <!--<Button Content="Save Game" Style="{StaticResource MenuButtonStyle}" Click="SaveButton_Click"/>-->
+            <Button Content="Save Game" Style="{StaticResource MenuButtonStyle}" Click="SaveButton_Click"/>
+            <Button Content="Load Game" Style="{StaticResource MenuButtonStyle}" Click="LoadButton_Click"/>
             <Button Content="Options" Style="{StaticResource MenuButtonStyle}" Click="OptionsButton_Click"/>
 
             <Separator Margin="0,20,0,20"/>
 
             <Button Content="Return to Game" Style="{StaticResource MenuButtonStyle}" Click="CloseGameMenu_Click"/>
-            <!--<Button Content="Return to Main Menu" Style="{StaticResource MenuButtonStyle}" Click="ReturnToMenuButton_Click"/>-->
-            <!--<Button Content="Exit Game" Style="{StaticResource MenuButtonStyle}" Click="ExitButton_Click"/>-->
+            <Button Content="Return to Main Menu" Style="{StaticResource MenuButtonStyle}" Click="ReturnToMenuButton_Click"/>
+            <Button Content="Exit Game" Style="{StaticResource MenuButtonStyle}" Click="ExitButton_Click"/>
         </StackPanel>
 
         <!-- Right Content Panel -->

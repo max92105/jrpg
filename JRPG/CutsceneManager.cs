@@ -41,7 +41,8 @@ namespace JRPG
             switch (step)
             {
                 case CutsceneStepFade fade:
-                    ((MainWindow)Application.Current.MainWindow).Fade(fade.ToOpacity, fade.Duration, NextStep);
+                    FadeHelper.FadeToBlackAsync(((MainWindow)Application.Current.MainWindow).FadeRect);
+                    NextStep();
                     break;
 
                 case CutsceneStepBackground bg:
@@ -119,7 +120,8 @@ namespace JRPG
                     CutscenePlayer.Visibility = Visibility.Collapsed;
                     CutscenePlayer.CutsceneCanvas.Visibility = Visibility.Collapsed;
 
-                    ((MainWindow)Application.Current.MainWindow).Fade(0, 0.5, NextStep);
+                    FadeHelper.FadeFromBlackAsync(((MainWindow)Application.Current.MainWindow).FadeRect);
+                    NextStep();
                     break;
 
                 default:

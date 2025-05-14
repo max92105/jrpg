@@ -89,6 +89,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="GameSystemManager.cs" />
     <Compile Include="UI\Battle\Controls\CharacterPanel.xaml.cs">
       <DependentUpon>CharacterPanel.xaml</DependentUpon>
     </Compile>
@@ -131,6 +132,7 @@
     <Compile Include="UI\GameMenu\StatusView.xaml.cs">
       <DependentUpon>StatusView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Utils\FadeHelper.cs" />
     <Compile Include="VisualHost.cs" />
     <Page Include="UI\Battle\Controls\CharacterPanel.xaml">
       <SubType>Designer</SubType>

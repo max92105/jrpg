@@ -1,7 +1,9 @@
-﻿using System.Windows;
+﻿using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using JRPG.Core.Battles;
 using JRPG.Core.System;
+using JRPG.Core.Utils;
 
 namespace JRPG.UI.GameMenu
 {
@@ -11,18 +13,21 @@ namespace JRPG.UI.GameMenu
         private InventoryManager inventoryManager;
         private EquipmentManager equipmentManager;
 
+        private readonly GameSystemManager gameSystemManager;
+
         public GameMenuControl()
         {
             InitializeComponent();
         }
 
-        public GameMenuControl(PartyManager partyManager, InventoryManager inventoryManager, EquipmentManager equipmentManager)
+        public GameMenuControl(PartyManager partyManager, InventoryManager inventoryManager, EquipmentManager equipmentManager, GameSystemManager gameSystemManager)
         {
             InitializeComponent();
 
             this.partyManager = partyManager;
             this.inventoryManager = inventoryManager;
             this.equipmentManager = equipmentManager;
+            this.gameSystemManager = gameSystemManager;
         }
 
         private void InventoryButton_Click(object sender, RoutedEventArgs e)
@@ -45,25 +50,41 @@ namespace JRPG.UI.GameMenu
             GameMenuContent.Content = new StatusView(partyManager);
         }
 
-        //private void SaveButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    ((MainWindow)Application.Current.MainWindow).SaveButton_Click(sender, e);
-        //}
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            gameSystemManager.SaveGame();
+        }
 
         private void OptionsButton_Click(object sender, RoutedEventArgs e)
         {
             GameMenuContent.Content = new TextBlock { Text = "Options (Coming Soon)", FontSize = 24, Foreground = System.Windows.Media.Brushes.White };
         }
 
-        //private void ReturnToMenuButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    ((MainWindow)Application.Current.MainWindow).ReturnToMenuButton_Click(sender, e);
-        //}
+        private async void LoadButton_Click(object sender, RoutedEventArgs e)
+        {
+            await gameSystemManager.LoadGameAsync(
+                ((MainWindow)Application.Current.MainWindow).StartScreen,
+                ((MainWindow)Application.Current.MainWindow).GameCanvas
+            );
+        }
 
-        //private void ExitButton_Click(object sender, RoutedEventArgs e)
-        //{
-        //    ((MainWindow)Application.Current.MainWindow).ExitButton_Click(sender, e);
-        //}
+        private async  void ReturnToMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+
+            // Show start screen and hide game elements
+            var mainWindow = (MainWindow)Application.Current.MainWindow;
+            mainWindow.GameMenuControl.Visibility = Visibility.Collapsed;
+            mainWindow.GameCanvas.Visibility = Visibility.Collapsed;
+            mainWindow.StartScreen.Visibility = Visibility.Visible;
+
+            await Task.Delay(300); // Allow layout update
+
+        }
+
+        private void ExitButton_Click(object sender, RoutedEventArgs e)
+        {
+            gameSystemManager.ExitGame();
+        }
 
         private void CloseGameMenu_Click(object sender, RoutedEventArgs e)
         {

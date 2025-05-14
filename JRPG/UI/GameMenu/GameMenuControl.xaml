@@ -6,7 +6,7 @@
              Visibility="Collapsed"
              x:Name="Root">
     <UserControl.Resources>
-        <Style x:Key="MenuButtonStyle" TargetType="Button">
+        <Style x:Key="MenuToggleStyle" TargetType="ToggleButton">
             <Setter Property="Height" Value="50"/>
             <Setter Property="Width" Value="280"/>
             <Setter Property="FontSize" Value="16"/>
@@ -15,9 +15,16 @@
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="RenderTransformOrigin" Value="0,0.5"/>
+            <!-- Grows from left edge -->
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="Button">
+                    <ControlTemplate TargetType="ToggleButton">
                         <Grid>
                             <!-- Background Shape -->
                             <Path x:Name="ButtonShape"
@@ -33,19 +40,27 @@
                                       Margin="50,0,0,0"
                                       RecognizesAccessKey="True"/>
                         </Grid>
-
                         <ControlTemplate.Triggers>
+                            <!-- Hover effect -->
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ButtonShape" Property="Fill" Value="#FFAAAAAA"/>
+                                <Setter TargetName="ButtonShape" Property="Fill" Value="#CCDDDDDD"/>
                                 <Setter Property="Foreground" Value="Black"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="ButtonShape" Property="Fill" Value="#CCFFFFFF"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+
+            <!-- Apply scale when selected -->
+            <Style.Triggers>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="1.12" ScaleY="1"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
         </Style>
 
         <DropShadowEffect x:Key="DropShadow"
@@ -69,7 +84,7 @@
            Opacity="1" />
 
         <!-- Left Menu -->
-        <StackPanel HorizontalAlignment="Left" Margin="0,0,0,0">
+        <StackPanel Name="ButtonPanel" HorizontalAlignment="Left" Margin="0,0,0,0">
             <Border Margin="0,20,0,100"
                 Effect="{DynamicResource DropShadow}">
                 <Grid>
@@ -96,20 +111,20 @@
                    HorizontalAlignment="Left"/>
                 </Grid>
             </Border>
-            
-            <Button Content="Inventory" Style="{StaticResource MenuButtonStyle}" Click="InventoryButton_Click"/>
-            <Button Content="Manage Party" Style="{StaticResource MenuButtonStyle}" Click="PartyButton_Click"/>
-            <Button Content="Equipment" Style="{StaticResource MenuButtonStyle}" Click="EquipmentButton_Click"/>
-            <Button Content="Status" Style="{StaticResource MenuButtonStyle}" Click="StatusButton_Click"/>
-            <Button Content="Save Game" Style="{StaticResource MenuButtonStyle}" Click="SaveButton_Click"/>
-            <Button Content="Load Game" Style="{StaticResource MenuButtonStyle}" Click="LoadButton_Click"/>
-            <Button Content="Options" Style="{StaticResource MenuButtonStyle}" Click="OptionsButton_Click"/>
+
+            <ToggleButton Content="Inventory" Style="{StaticResource MenuToggleStyle}" Click="MenuButton_Checked"/>
+            <ToggleButton Content="Manage Party" Style="{StaticResource MenuToggleStyle}" Click="MenuButton_Checked"/>
+            <ToggleButton Content="Equipment" Style="{StaticResource MenuToggleStyle}" Click="MenuButton_Checked"/>
+            <ToggleButton Content="Status" Style="{StaticResource MenuToggleStyle}" Click="MenuButton_Checked"/>
+            <ToggleButton Content="Save Game" Style="{StaticResource MenuToggleStyle}" Click="MenuButton_Checked"/>
+            <ToggleButton Content="Load Game" Style="{StaticResource MenuToggleStyle}" Click="MenuButton_Checked"/>
+            <ToggleButton Content="Options" Style="{StaticResource MenuToggleStyle}" Click="MenuButton_Checked"/>
 
             <Separator Margin="0,20,0,20" Background="Transparent"/>
 
-            <Button Content="Return to Game" Style="{StaticResource MenuButtonStyle}" Click="CloseGameMenu_Click"/>
-            <Button Content="Return to Main Menu" Style="{StaticResource MenuButtonStyle}" Click="ReturnToMenuButton_Click"/>
-            <Button Content="Exit Game" Style="{StaticResource MenuButtonStyle}" Click="ExitButton_Click"/>
+            <ToggleButton Content="Return to Game" Style="{StaticResource MenuToggleStyle}" Click="CloseGameMenu_Click"/>
+            <ToggleButton Content="Return to Main Menu" Style="{StaticResource MenuToggleStyle}" Click="ReturnToMenuButton_Click"/>
+            <ToggleButton Content="Exit Game" Style="{StaticResource MenuToggleStyle}" Click="ExitButton_Click"/>
         </StackPanel>
 
         <!-- Right Content Panel -->

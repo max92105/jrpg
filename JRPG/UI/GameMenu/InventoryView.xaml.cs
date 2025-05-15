@@ -1,24 +1,43 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
+using System.Windows.Shapes;
+using JRPG.Core.Battles.Enums;
+using JRPG.Core.Battles.Models;
+using JRPG.Core.Systems;
 using JRPG.Core.Systems.Inventories;
+using JRPG.Core.Systems.Inventories.Enums;
 using JRPG.Core.Systems.Inventories.Models;
+using JRPG.Core.Systems.Parties;
 using JRPG.Core.Utils;
+using JRPG.UI.GameMenu.Controls;
+using JRPG.Utils;
 
 namespace JRPG.UI.GameMenu
 {
-    public partial class InventoryView : UserControl
+    public partial class InventoryView : UserControl, IFilterable<ItemType?>
     {
-        private InventoryManager inventoryManager;
+        private ItemType? selectedFilterType;
 
-        public InventoryView(InventoryManager inventoryManager)
+        private readonly List<Character> selectedTargets = new List<Character>();
+
+        public InventoryView()
         {
             InitializeComponent();
-            this.inventoryManager = inventoryManager;
+
+            Refresh();
+        }
+
+        public void ApplyFilter(ItemType? filterValue)
+        {
+            selectedFilterType = filterValue;
+            FilterHeader.Text = filterValue == null ? "All Items" : $"{filterValue}s";
             Refresh();
         }
 
@@ -27,14 +46,14 @@ namespace JRPG.UI.GameMenu
             ItemListPanel.Children.Clear();
             ItemDescriptionBlock.Text = "Hover an item to see its description.";
 
-            foreach (var item in inventoryManager.Items)
+            foreach (var item in GameSystems.Inventory.Items)
             {
+                if (selectedFilterType != null && item.Type != selectedFilterType.Value)
+                    continue;
+
                 var rowGrid = new Grid
                 {
-                    Height = 50,
-                    Margin = new Thickness(10, 5, 10, 5),
-                    Cursor = Cursors.Hand,
-                    Background = Brushes.Transparent // ✅ Makes the full row clickable
+                    Style = (Style)FindResource("InventoryItemRowStyle")
                 };
 
                 rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(8, GridUnitType.Star) });
@@ -65,7 +84,6 @@ namespace JRPG.UI.GameMenu
 
                 leftPanel.Children.Add(icon);
                 leftPanel.Children.Add(nameText);
-
                 Grid.SetColumn(leftPanel, 0);
                 rowGrid.Children.Add(leftPanel);
 
@@ -83,28 +101,10 @@ namespace JRPG.UI.GameMenu
                 Grid.SetColumn(quantityText, 1);
                 rowGrid.Children.Add(quantityText);
 
-                var scaleTransform = new ScaleTransform(1.0, 1.0);
-                rowGrid.RenderTransformOrigin = new Point(0.5, 0.5);
-                rowGrid.RenderTransform = scaleTransform;
-
+                // Hover + Click Logic
                 rowGrid.MouseEnter += (s, e) =>
                 {
-                    scaleTransform.ScaleX = 1.02;
-                    scaleTransform.ScaleY = 1.02;
-                    rowGrid.Background = new LinearGradientBrush(
-                     Color.FromArgb(40, 255, 255, 255),
-                     Color.FromArgb(0, 255, 255, 255),
-                     new Point(0, 0),
-                     new Point(1, 0));
-
                     ItemDescriptionBlock.Text = item.Description;
-                };
-
-                rowGrid.MouseLeave += (s, e) =>
-                {
-                    scaleTransform.ScaleX = 1.0;
-                    scaleTransform.ScaleY = 1.0;
-                    rowGrid.Background = Brushes.Transparent;
                 };
 
                 rowGrid.MouseLeftButtonDown += (s, e) =>
@@ -118,25 +118,124 @@ namespace JRPG.UI.GameMenu
 
         private void ShowPopup(InventoryItem item)
         {
-            inventoryManager.SelectItem(item);
-            PopupQuestion.Text = $"Use {item.Name}?";
+            GameSystems.Inventory.SelectItem(item);
+            selectedTargets.Clear();
+
+            var fullParty = GameSystems.Party.AllCharacters;
+
+            // Auto-preselect for "All" types
+            switch (item.TargetType)
+            {
+                case TargetType.AllAllies:
+                    selectedTargets.AddRange(fullParty.Where(c => c.IsAlive));
+                    break;
+                case TargetType.AllFaintedAllies:
+                    selectedTargets.AddRange(fullParty.Where(c => !c.IsAlive));
+                    break;
+            }
+
+            PopupQuestion.Text = $"Use {item.Name}";
+            PopupIcon.Source = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath(item.IconFile)));
+
+            RefreshPortraitVisuals();
+
             PopupOverlay.Visibility = Visibility.Visible;
+        }
+
+        private bool IsCharacterValidTarget(InventoryItem item, Character character)
+        {
+            switch (item.TargetType)
+            {
+                case TargetType.Self:
+                case TargetType.Ally:
+                    return character.IsAlive;
+
+                case TargetType.AllAllies:
+                    return character.IsAlive;
+
+                case TargetType.SingleFaintedAlly:
+                    return !character.IsAlive;
+
+                case TargetType.AllFaintedAllies:
+                    return !character.IsAlive;
+
+                // Ignored in inventory popup context
+                case TargetType.Enemy:
+                case TargetType.AllEnemies:
+                default:
+                    return false;
+            }
+        }
+
+        private CharacterPortrait CreateCharacterPortraitWithExtras(Character character, bool isEnabled, bool isSelected)
+        {
+            return new CharacterPortrait
+            {
+                Character = character,
+                IsEnabledTarget = isEnabled,
+                IsSelected = isSelected,
+                Margin = new Thickness(4),
+                Cursor = isEnabled ? Cursors.Hand : Cursors.Arrow
+            };
+        }
+
+        void RefreshPortraitVisuals()
+        {
+            PartyTargetPanel.Children.Clear();
+
+            foreach (var character in partyManager.AllCharacters)
+            {
+                bool isValid = IsCharacterValidTarget(GameSystems.Inventory.SelectedItem, character);
+                bool isSelected = selectedTargets.Contains(character);
+
+                var portrait = CreateCharacterPortraitWithExtras(character, isValid, isSelected);
+                portrait.IsEnabled = isValid;
+
+                // Disable click if type is AllAllies or AllFaintedAllies or Self
+                bool isSelectionLocked =
+                    GameSystems.Inventory.SelectedItem.TargetType == TargetType.AllAllies ||
+                    GameSystems.Inventory.SelectedItem.TargetType == TargetType.AllFaintedAllies;
+
+                if (isValid && !isSelectionLocked)
+                {
+                    portrait.MouseLeftButtonUp += (s, e) =>
+                    {
+                        if (!selectedTargets.Contains(character))
+                        {
+                            if (GameSystems.Inventory.SelectedItem.TargetType is TargetType.Ally 
+                            || GameSystems.Inventory.SelectedItem.TargetType is TargetType.SingleFaintedAlly
+                            || GameSystems.Inventory.SelectedItem.TargetType is TargetType.Self)
+                                selectedTargets.Clear(); // Only one target allowed
+
+                            selectedTargets.Add(character);
+                        }
+                        else
+                        {
+                            selectedTargets.Remove(character);
+                        }
+
+                        RefreshPortraitVisuals();
+                    };
+                }
+
+                PartyTargetPanel.Children.Add(portrait);
+            }
         }
 
         private void PopupYes_Click(object sender, RoutedEventArgs e)
         {
-            if (inventoryManager.SelectedItem != null)
+            foreach (var target in selectedTargets)
             {
-                inventoryManager.UseSelectedItem();
-                inventoryManager.ClearSelection();
-                Refresh();
+                GameSystems.Inventory.UseSelectedItem();
             }
+
             PopupOverlay.Visibility = Visibility.Collapsed;
+            Refresh();
         }
 
         private void PopupNo_Click(object sender, RoutedEventArgs e)
         {
-            inventoryManager.ClearSelection();
+            GameSystems.Inventory.ClearSelection();
             PopupOverlay.Visibility = Visibility.Collapsed;
         }
     }

@@ -1,4 +1,5 @@
-﻿using JRPG.Core.Systems.Equipments;
+﻿using JRPG.Core.Systems;
+using JRPG.Core.Systems.Equipments;
 using JRPG.Core.Systems.Inventories;
 using JRPG.Core.Systems.Parties;
 using JRPG.Core.Systems.SaveGames;
@@ -16,9 +17,6 @@ namespace JRPG
 {
     public class GameSystemManager
     {
-        private readonly PartyManager partyManager;
-        private readonly InventoryManager inventoryManager;
-        private readonly EquipmentManager equipmentManager;
         private readonly Game game;
         private readonly FrameworkElement fadeTarget;
 
@@ -26,15 +24,9 @@ namespace JRPG
         private int totalPlayTimeSeconds;
 
         public GameSystemManager(
-            PartyManager partyManager,
-            InventoryManager inventoryManager,
-            EquipmentManager equipmentManager,
             Game game,
             FrameworkElement fadeTarget)
         {
-            this.partyManager = partyManager;
-            this.inventoryManager = inventoryManager;
-            this.equipmentManager = equipmentManager;
             this.game = game;
             this.fadeTarget = fadeTarget;
         }
@@ -65,14 +57,14 @@ namespace JRPG
 
             SaveGameManager.SaveGame(
                 slot,
-                partyManager.AllCharacters,
-                inventoryManager.GetSerializableItems(),
-                equipmentManager.GetWeaponStockForSave(),
-                equipmentManager.GetArmorStockForSave(),
+                GameSystems.Party.AllCharacters,
+                GameSystems.Inventory.GetSerializableItems(),
+                GameSystems.Equipment.GetWeaponStockForSave(),
+                GameSystems.Equipment.GetArmorStockForSave(),
                 game.currentMapFile,
                 game.playerX,
                 game.playerY,
-                partyManager.ActivePartyOrder,
+                GameSystems.Party.ActivePartyOrder,
                 totalSeconds
             );
 
@@ -96,9 +88,9 @@ namespace JRPG
             {
                 var saveData = SaveGameManager.LoadGame(slot);
 
-                partyManager.LoadFromSaveData(saveData.Characters, saveData.ActivePartyOrder);
-                inventoryManager.LoadFromSavedData(saveData.Inventory);
-                equipmentManager.LoadFromSavedData(saveData.WeaponStock, saveData.ArmorStock);
+                GameSystems.Party.LoadFromSaveData(saveData.Characters, saveData.ActivePartyOrder);
+                GameSystems.Inventory.LoadFromSavedData(saveData.Inventory);
+                GameSystems.Equipment.LoadFromSavedData(saveData.WeaponStock, saveData.ArmorStock);
                 game.currentMapFile = saveData.CurrentMap;
                 game.LoadFromFile(game.currentMapFile);
                 game.playerX = saveData.PlayerX;

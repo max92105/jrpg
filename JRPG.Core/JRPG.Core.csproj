@@ -84,6 +84,8 @@
     <Compile Include="Systems\Equipments\Models\Equipment.cs" />
     <Compile Include="Systems\Equipments\Models\EquipmentEntry.cs" />
     <Compile Include="Systems\Equipments\Models\Weapon.cs" />
+    <Compile Include="Systems\GameSystems.cs" />
+    <Compile Include="Systems\Inventories\Enums\ItemType.cs" />
     <Compile Include="Systems\Inventories\InventoryManager.cs" />
     <Compile Include="Battles\Models\BattleActor.cs" />
     <Compile Include="Battles\Models\Character.cs" />

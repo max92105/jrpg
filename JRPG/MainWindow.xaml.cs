@@ -1,5 +1,6 @@
 ﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Battles.Models.Enemies;
+using JRPG.Core.Systems;
 using JRPG.Core.Systems.Equipments;
 using JRPG.Core.Systems.Inventories;
 using JRPG.Core.Systems.Parties;
@@ -22,7 +23,6 @@ namespace JRPG
         public Game game;
         public DialogueManager dialogueManager;
         private PartyManager partyManager;
-        private InventoryManager inventoryManager;
         private EquipmentManager equipmentManager;
         private GameSystemManager gameSystemManager;
 
@@ -37,7 +37,7 @@ namespace JRPG
             WindowStyle = WindowStyle.None;
             WindowState = WindowState.Maximized;
             ResizeMode = ResizeMode.NoResize;
-            Topmost = true;
+            //Topmost = true;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -45,21 +45,17 @@ namespace JRPG
             game = new Game(GameCanvas);
 
             dialogueManager = new DialogueManager(DialogueUI.TextElement, DialogueUI.Container, DialogueUI.Portrait, DialogueUI.Speaker, DialogueUI.ContinueIcon);
-            inventoryManager = new InventoryManager();
-            partyManager = new PartyManager();
-            equipmentManager = new EquipmentManager();
+
+            GameSystems.Initialize();
 
             gameSystemManager = new GameSystemManager(
-               partyManager,
-               inventoryManager,
-               equipmentManager,
                game,
                FadeRect
            );
 
             gameSystemManager.StartSessionTimer();
 
-            GameMenuControl = new GameMenuControl(partyManager, inventoryManager, equipmentManager, gameSystemManager);
+            GameMenuControl = new GameMenuControl(gameSystemManager);
             GameMenuControl.Visibility = Visibility.Collapsed;
             Panel.SetZIndex(GameMenuControl, 1000);
             RootGrid.Children.Add(GameMenuControl);
@@ -105,7 +101,7 @@ namespace JRPG
             battleActors.AddRange(enemies);
             battleActors.AddRange(partyManager.ActivePartyOrder);
 
-            var battleUI = new BattleUI(battleActors, inventoryManager);
+            var battleUI = new BattleUI(battleActors);
 
             battleUI.SetBackground("Forest.png");
 

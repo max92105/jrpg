@@ -1,6 +1,7 @@
 ﻿using JRPG.Core.Battles;
 using JRPG.Core.Battles.Enums;
 using JRPG.Core.Battles.Models;
+using JRPG.Core.Systems;
 using JRPG.Core.Systems.Inventories;
 using JRPG.Core.Systems.Inventories.Models;
 using JRPG.Core.Utils;
@@ -30,8 +31,6 @@ namespace JRPG.UI.Battle
         private List<BattleActor> battleActors;
         private Dictionary<Character, CharacterPanel> characterPanels = new Dictionary<Character, CharacterPanel>();
 
-        private InventoryManager inventory;
-
         private Dictionary<object, TranslateTransform> spriteOffsets = new Dictionary<object, TranslateTransform>();
         private Dictionary<object, Image> spriteImages = new Dictionary<object, Image>();
 
@@ -50,12 +49,11 @@ namespace JRPG.UI.Battle
 
         public event Action OnBattleEnd;
 
-        public BattleUI(List<BattleActor> battleActors , InventoryManager inventory)
+        public BattleUI(List<BattleActor> battleActors)
         {
             InitializeComponent();
 
             this.battleActors = battleActors;
-            this.inventory = inventory;
 
             battleManager = new BattleManager(battleActors);
 
@@ -658,9 +656,9 @@ namespace JRPG.UI.Battle
                     }
                     break;
                 case "Item":
-                    if (inventory != null && inventory.Items.Any(i => i.Quantity > 0))
+                    if (GameSystems.Inventory != null && GameSystems.Inventory.Items.Any(i => i.Quantity > 0))
                     {
-                        CommandBox.ShowItems(inventory.Items);
+                        CommandBox.ShowItems(GameSystems.Inventory.Items);
                         CommandBox.OptionListPanel.Visibility = Visibility.Visible;
                     }
                     else

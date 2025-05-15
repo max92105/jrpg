@@ -6,6 +6,8 @@
         Ally,
         Self,
         AllEnemies,
-        AllAllies
+        AllAllies,
+        SingleFaintedAlly,
+        AllFaintedAllies
     }
 }

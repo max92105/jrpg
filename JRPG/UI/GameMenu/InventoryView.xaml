@@ -36,6 +36,79 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <Style x:Key="InventoryItemRowStyle" TargetType="Grid">
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Margin" Value="10,0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#00FFFFFF" Offset="0.0"/>
+                                <GradientStop Color="#20FFFFFF" Offset="0.5"/>
+                                <GradientStop Color="#00FFFFFF" Offset="1.0"/>
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="1.02" ScaleY="1.02"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="PopupButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#444"/>
+            <Setter Property="BorderBrush" Value="#AAA"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="6"
+                        Padding="4"
+                        SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                      VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#666"/>
+                    <Setter Property="BorderBrush" Value="White"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#888"/>
+                    <Setter Property="BorderBrush" Value="#FFF"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+            <DropShadowEffect x:Key="DropShadow"
+                  Color="Black"
+                  Direction="315"
+                  ShadowDepth="5"
+                  BlurRadius="20"
+                  Opacity="0.5"/>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -103,7 +176,7 @@
         <Rectangle Grid.Row="3"
                    Height="1"
                    Fill="#666"
-                   Margin="0,10"/>
+                   Margin="0,0"/>
 
         <!-- 📝 Description -->
         <TextBlock  Grid.Row="4"
@@ -116,30 +189,61 @@
                     TextWrapping="Wrap"/>
 
         <Grid x:Name="PopupOverlay"
-                Background="#AA000000"
-                Visibility="Collapsed"
-                Panel.ZIndex="10"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch">
+      Grid.Row="2"
+      Background="#AA000000"  
+            Visibility="Collapsed"
+      Panel.ZIndex="10"
+      HorizontalAlignment="Stretch"
+      VerticalAlignment="Stretch">
 
-            <Border Background="#222"
-            CornerRadius="12"
-            Padding="20"
-            Width="400"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            BorderBrush="White"
-            BorderThickness="2">
+            <Border Background="#AA111111" 
+                CornerRadius="6"
+                Padding="30"
+                Width="500"
+                BorderThickness="1"
+                   BorderBrush="#AA333333"
+                    HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Effect="{DynamicResource DropShadow}">
+
                 <StackPanel>
-                    <TextBlock x:Name="PopupQuestion"
-                       Text="Use item?"
-                       FontSize="22"
-                       Foreground="White"
-                       TextAlignment="Center"
-                       Margin="0,0,0,20"/>
+
+                    <!-- Header: Icon + Item Name -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+                        <Image x:Name="PopupIcon"
+                       Width="32"
+                       Height="32"
+                       Margin="0,0,10,0"/>
+                        <TextBlock x:Name="PopupQuestion"
+                           Text="Use item?"
+                           FontSize="22"
+                           Foreground="White"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <!-- Portraits -->
+                    <WrapPanel x:Name="PartyTargetPanel"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Top"
+                       Margin="0,0,0,20" />
+
+                    <!-- OK / Cancel -->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
-                        <Button Content="Yes" Click="PopupYes_Click" Width="100" Margin="10"/>
-                        <Button Content="No" Click="PopupNo_Click" Width="100" Margin="10"/>
+                        <Button x:Name="PopupYesButton"
+                        Content="OK"
+                        FontWeight="Light"
+                        Click="PopupYes_Click"
+                        Style="{StaticResource PopupButtonStyle}"
+                        Width="120"
+                        Margin="10"/>
+                        
+                        <Button Content="Cancel"
+                        Click="PopupNo_Click"
+                        FontWeight="Light"
+                        Style="{StaticResource PopupButtonStyle}"
+                        Width="120"
+                        Margin="10"/>
                     </StackPanel>
                 </StackPanel>
             </Border>

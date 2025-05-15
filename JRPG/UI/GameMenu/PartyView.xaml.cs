@@ -1,4 +1,5 @@
 ﻿using JRPG.Core.Battles.Models;
+using JRPG.Core.Systems;
 using JRPG.Core.Systems.Parties;
 using System;
 using System.Windows;
@@ -10,13 +11,11 @@ namespace JRPG.UI.GameMenu
 {
     public partial class PartyView : UserControl
     {
-        private PartyManager partyManager;
         private Character draggedCharacter;
 
-        public PartyView(PartyManager partyManager)
+        public PartyView()
         {
             InitializeComponent();
-            this.partyManager = partyManager;
             Refresh();
         }
 
@@ -25,12 +24,12 @@ namespace JRPG.UI.GameMenu
             ActivePartyPanel.Children.Clear();
             FullRosterPanel.Children.Clear();
 
-            foreach (var character in partyManager.ActivePartyOrder)
+            foreach (var character in GameSystems.Party.ActivePartyOrder)
             {
                 ActivePartyPanel.Children.Add(CreateCharacterBlock(character, isActiveParty: true));
             }
 
-            foreach (var character in partyManager.AllCharacters)
+            foreach (var character in GameSystems.Party.AllCharacters)
             {
                 FullRosterPanel.Children.Add(CreateCharacterBlock(character, isActiveParty: false));
             }
@@ -92,7 +91,7 @@ namespace JRPG.UI.GameMenu
                 {
                     if (draggedCharacter != null && draggedCharacter != character)
                     {
-                        partyManager.SwapPartyMembers(draggedCharacter, character);
+                        GameSystems.Party.SwapPartyMembers(draggedCharacter, character);
                         draggedCharacter = null;
                         Refresh();
                     }
@@ -130,9 +129,9 @@ namespace JRPG.UI.GameMenu
                     {
                         // Only do add/remove if it was a click, not a drag
                         if (character.IsActive)
-                            partyManager.RemoveFromParty(character);
+                            GameSystems.Party.RemoveFromParty(character);
                         else
-                            partyManager.AddToParty(character);
+                            GameSystems.Party.AddToParty(character);
 
                         Refresh();
                     }

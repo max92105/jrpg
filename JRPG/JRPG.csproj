@@ -114,6 +114,9 @@
     <Compile Include="UI\Battle\BattleUI.xaml.cs">
       <DependentUpon>BattleUI.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\GameMenu\Controls\CharacterPortrait.xaml.cs">
+      <DependentUpon>CharacterPortrait.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\GameMenu\EquipmentView.xaml.cs">
       <DependentUpon>EquipmentView.xaml</DependentUpon>
     </Compile>
@@ -133,10 +136,9 @@
       <DependentUpon>StatusView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Utils\FadeHelper.cs" />
+    <Compile Include="Utils\FilterOption.cs" />
+    <Compile Include="Utils\IFilterable.cs" />
     <Compile Include="VisualHost.cs" />
-    <Compile Include="Window1.xaml.cs">
-      <DependentUpon>Window1.xaml</DependentUpon>
-    </Compile>
     <Page Include="UI\Battle\Controls\CharacterPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -178,6 +180,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\GameMenu\Controls\CharacterPortrait.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\GameMenu\EquipmentView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -202,7 +208,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Window1.xaml">
+    <Page Include="UI\Styles\Bars.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

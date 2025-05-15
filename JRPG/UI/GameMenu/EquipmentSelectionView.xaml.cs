@@ -1,4 +1,5 @@
 ﻿using JRPG.Core.Battles.Models;
+using JRPG.Core.Systems;
 using JRPG.Core.Systems.Equipments;
 using JRPG.Core.Systems.Equipments.Models;
 using JRPG.Core.Systems.Parties;
@@ -13,16 +14,12 @@ namespace JRPG.UI.GameMenu
     public partial class EquipmentSelectionView : UserControl
     {
         private Character character;
-        private EquipmentManager equipmentManager;
-        private PartyManager partyManager;
         private bool isWeapon;
 
-        public EquipmentSelectionView(Character character, EquipmentManager equipmentManager, PartyManager partyManager, bool isWeapon)
+        public EquipmentSelectionView(Character character, bool isWeapon)
         {
             InitializeComponent();
             this.character = character;
-            this.equipmentManager = equipmentManager;
-            this.partyManager = partyManager;
             this.isWeapon = isWeapon;
 
             TitleText.Text = $"Select {(isWeapon ? "Weapon" : "Armor")} for {character.Name}";
@@ -44,14 +41,14 @@ namespace JRPG.UI.GameMenu
             unequip.MouseLeftButtonUp += (s, e) =>
             {
                 if (isWeapon)
-                    equipmentManager.UnequipWeapon(character);
+                    GameSystems.Equipment.UnequipWeapon(character);
                 else
-                    equipmentManager.UnequipArmor(character);
+                    GameSystems.Equipment.UnequipArmor(character);
                 ReturnToEquipmentView();
             };
             ItemListPanel.Children.Add(unequip);
 
-            var entries = equipmentManager.EquipmentInventory
+            var entries = GameSystems.Equipment.EquipmentInventory
                 .Where(e =>
                     e.Quantity > 0 &&
                     e.Equipment is Weapon == isWeapon &&
@@ -83,9 +80,9 @@ namespace JRPG.UI.GameMenu
                 textBlock.MouseLeftButtonUp += (s, e) =>
                 {
                     if (isWeapon)
-                        equipmentManager.Equip(character, equipment);
+                        GameSystems.Equipment.Equip(character, equipment);
                     else
-                        equipmentManager.Equip(character, equipment);
+                        GameSystems.Equipment.Equip(character, equipment);
                     ReturnToEquipmentView();
                 };
 
@@ -95,12 +92,8 @@ namespace JRPG.UI.GameMenu
 
         private void ReturnToEquipmentView()
         {
-            var view = new EquipmentView(
-                partyManager,
-                equipmentManager,
-                character
-            );
-
+            var view = new EquipmentView(character);
+            
             ((MainWindow)Application.Current.MainWindow).GameMenuControl.ShowContent(view);
         }
 

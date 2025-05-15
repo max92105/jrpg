@@ -17,15 +17,11 @@ namespace JRPG.UI.GameMenu
 
     public partial class EquipmentView : UserControl
     {
-        private PartyManager partyManager;
-        private EquipmentManager equipmentManager;
         private Character selectedCharacter;
 
-        public EquipmentView(PartyManager partyManager, EquipmentManager equipmentManager, Character defaultSelectedCharacter = null)
+        public EquipmentView(Character defaultSelectedCharacter = null)
         {
             InitializeComponent();
-            this.partyManager = partyManager;
-            this.equipmentManager = equipmentManager;
 
             WeaponNameBlock.MouseLeftButtonUp += WeaponRow_Click;
             ArmorNameBlock.MouseLeftButtonUp += ArmorRow_Click;

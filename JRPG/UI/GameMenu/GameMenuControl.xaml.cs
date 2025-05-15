@@ -1,14 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using JRPG.Core.Systems.Equipments;
 using JRPG.Core.Systems.Inventories;
+using JRPG.Core.Systems.Inventories.Enums;
 using JRPG.Core.Systems.Parties;
 using JRPG.Core.Utils;
+using JRPG.Utils;
 
 namespace JRPG.UI.GameMenu
 {
@@ -47,29 +52,25 @@ namespace JRPG.UI.GameMenu
             }
         }
 
-        private Button CreateFilterIcon(string filterName)
+        private Button CreateFilterIcon<T>(FilterOption<T> option)
         {
             var icon = new Button
             {
-                Width = 32,
-                Height = 32,
-                Margin = new Thickness(0, 5, 0, 5),
-                ToolTip = filterName,
-                Background = (Brush)new BrushConverter().ConvertFromString("#AA111111"),
-                BorderBrush = (Brush)new BrushConverter().ConvertFromString("#44111111"),
-                BorderThickness = new Thickness(1),
-                Cursor = System.Windows.Input.Cursors.Hand,
+                Style = (Style)FindResource("FilterIconStyle"),
+                ToolTip = option.Label,
                 Content = new Image
                 {
-                    Source = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath(filterName))),
+                    Source = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath(option.IconFile))),
                     Stretch = Stretch.Uniform
                 }
             };
 
             icon.Click += (s, e) =>
             {
-                // TODO: Apply filter to inventory
-                MessageBox.Show($"Filter selected: {filterName}");
+                if (GameMenuContent.Content is IFilterable<T> filterable)
+                {
+                    filterable.ApplyFilter(option.FilterValue);
+                }
             };
 
             return icon;
@@ -130,12 +131,18 @@ namespace JRPG.UI.GameMenu
 
         private void InventoryButton_Click(object sender, RoutedEventArgs e)
         {
-            GameMenuContent.Content = new InventoryView(inventoryManager);
+            var inventoryView = new InventoryView(inventoryManager, partyManager);
+            GameMenuContent.Content = inventoryView;
 
-            SetContextOptions(
-                CreateFilterIcon("Attack.png"),
-                CreateFilterIcon("Item.png")
-            );
+            var filters = new List<FilterOption<ItemType?>>
+            {
+                new FilterOption<ItemType?> { IconFile = "All.png", FilterValue = null },
+                new FilterOption<ItemType?> { IconFile = "Item.png", FilterValue = ItemType.Potion },
+                new FilterOption<ItemType?> { IconFile = "Attack.png", FilterValue = ItemType.Bomb }
+            };
+
+            var icons = filters.Select(f => CreateFilterIcon(f)).ToArray();
+            SetContextOptions(icons);
         }
 
         private void PartyButton_Click(object sender, RoutedEventArgs e)

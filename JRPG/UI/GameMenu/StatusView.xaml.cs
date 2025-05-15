@@ -1,18 +1,15 @@
 ﻿using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows;
-using JRPG.Core.Systems.Parties;
+using JRPG.Core.Systems;
 
 namespace JRPG.UI.GameMenu
 {
     public partial class StatusView : UserControl
     {
-        private PartyManager partyManager;
-
-        public StatusView(PartyManager partyManager)
+        public StatusView()
         {
             InitializeComponent();
-            this.partyManager = partyManager;
             Refresh();
         }
 
@@ -20,7 +17,7 @@ namespace JRPG.UI.GameMenu
         {
             StatusPanel.Children.Clear();
 
-            foreach (var character in partyManager.ActivePartyOrder)
+            foreach (var character in GameSystems.Party.ActivePartyOrder)
             {
                 var characterBorder = new Border
                 {

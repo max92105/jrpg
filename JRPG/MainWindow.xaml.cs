@@ -22,8 +22,6 @@ namespace JRPG
     {
         public Game game;
         public DialogueManager dialogueManager;
-        private PartyManager partyManager;
-        private EquipmentManager equipmentManager;
         private GameSystemManager gameSystemManager;
 
         private DateTime sessionStartTime;
@@ -99,7 +97,7 @@ namespace JRPG
             List<BattleActor> battleActors = new List<BattleActor>();
 
             battleActors.AddRange(enemies);
-            battleActors.AddRange(partyManager.ActivePartyOrder);
+            battleActors.AddRange(GameSystems.Party.ActivePartyOrder);
 
             var battleUI = new BattleUI(battleActors);
 

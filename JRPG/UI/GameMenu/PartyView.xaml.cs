@@ -1,20 +1,20 @@
 ﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
-using JRPG.Core.Systems.Parties;
 using JRPG.Core.Utils;
 using JRPG.UI.Battle.Controls;
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Effects;
 
 namespace JRPG.UI.GameMenu
 {
     public partial class PartyView : UserControl
     {
         private Character draggedCharacter;
+        private readonly Dictionary<Character, Border> characterBlockMap = new Dictionary<Character, Border>();
 
         public PartyView()
         {
@@ -27,49 +27,51 @@ namespace JRPG.UI.GameMenu
             ActivePartyPanel.Children.Clear();
             FullRosterPanel.Children.Clear();
 
-            // Display only active members in the left panel
-            foreach (var character in GameSystems.Party.ActivePartyOrder)
-            {
-                ActivePartyPanel.Children.Add(CreateCharacterBlock(character, isActiveParty: true));
-            }
-
-            // Display only non-active members in the right panel
             foreach (var character in GameSystems.Party.AllCharacters)
             {
-                if (!character.IsActive)
-                    FullRosterPanel.Children.Add(CreateCharacterBlock(character, isActiveParty: false));
+                if (!characterBlockMap.ContainsKey(character))
+                {
+                    characterBlockMap[character] = CreateCharacterBlock(character);
+                }
+
+                var block = characterBlockMap[character];
+
+                // Detach from previous parent
+                var currentParent = VisualTreeHelper.GetParent(block) as Panel;
+                currentParent?.Children.Remove(block);
+
+                // Add to the right panel
+                if (character.IsActive)
+                    ActivePartyPanel.Children.Add(block);
+                else
+                    FullRosterPanel.Children.Add(block);
             }
         }
 
-        private Border CreateCharacterBlock(Character character, bool isActiveParty)
+        private Border CreateCharacterBlock(Character character)
         {
-            var panel = new CharacterPanel();
-            panel.CharacterName = character.Name;
-            panel.CurrentHP = character.HP;
-            panel.MaxHP = character.MaxHP;
-            panel.CurrentMP = character.MP;
-            panel.MaxMP = character.MaxMP;
+            var panel = new CharacterPanel
+            {
+                CharacterName = character.Name,
+                CurrentHP = character.HP,
+                MaxHP = character.MaxHP,
+                CurrentMP = character.MP,
+                MaxMP = character.MaxMP
+            };
             panel.SetPortrait(AssetPathResolver.GetPortraitPath(character.PortraitFile));
 
             var border = new Border
             {
-                Background = Brushes.Transparent, // Removed all conditional background coloring
+                Style = (Style)FindResource("HoverAnimatedCharacterBorder"),
+                Background = Brushes.Transparent,
                 BorderBrush = Brushes.White,
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(6),
-                Margin = new Thickness(5),
-                Padding = new Thickness(8),
+                Margin = new Thickness(0, 10, 0, 0),
+                Padding = new Thickness(5),
                 Child = panel,
-                Effect = character.IsMainCharacter
-                    ? new DropShadowEffect
-                    {
-                        Color = Colors.White,
-                        BlurRadius = 8,
-                        ShadowDepth = 0,
-                        Opacity = 0.3
-                    }
-                    : null,
-                AllowDrop = true
+                AllowDrop = true,
+                Tag = character.IsMainCharacter
             };
 
             if (!character.IsMainCharacter)

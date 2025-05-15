@@ -39,9 +39,12 @@ namespace JRPG.UI.GameMenu
         {
             ContextOptionsPanel.Children.Clear();
 
-            foreach (var option in options)
+            if (options != null)
             {
-                ContextOptionsPanel.Children.Add(option);
+                foreach (var option in options)
+                {
+                    ContextOptionsPanel.Children.Add(option);
+                }
             }
         }
 
@@ -141,6 +144,8 @@ namespace JRPG.UI.GameMenu
         private void PartyButton_Click(object sender, RoutedEventArgs e)
         {
             GameMenuContent.Content = new PartyView();
+
+            SetContextOptions(null);
         }
 
         private void EquipmentButton_Click(object sender, RoutedEventArgs e)

@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 
 namespace JRPG.UI.Battle.Controls
 {
@@ -42,6 +43,19 @@ namespace JRPG.UI.Battle.Controls
         {
             get => NameText.Text;
             set => NameText.Text = value;
+        }
+
+        public void SetPortrait(string imagePath)
+        {
+            if (!string.IsNullOrEmpty(imagePath))
+            {
+                PortraitImage.Source = new BitmapImage(new Uri(imagePath));
+                PortraitImage.Visibility = System.Windows.Visibility.Visible;
+            }
+            else
+            {
+                PortraitImage.Visibility = System.Windows.Visibility.Collapsed;
+            }
         }
 
         public int CurrentHP

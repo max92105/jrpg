@@ -15,93 +15,107 @@
     </UserControl.RenderTransform>
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="5"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <!-- Portrait -->
+            <ColumnDefinition Width="*"/>
+            <!-- Info panel -->
+        </Grid.ColumnDefinitions>
 
-        <StackPanel Orientation="Vertical">
+        <!-- 🎭 Character Portrait -->
+        <Image x:Name="PortraitImage"
+           Grid.Column="0"
+           Width="64"
+           Height="64"
+           Margin="0,0,10,0"
+           Visibility="Collapsed"
+           Stretch="UniformToFill"
+           SnapsToDevicePixels="True"/>
 
-            <!-- Name -->
-            <TextBlock x:Name="NameText"
+        <!-- 📊 Stats Panel -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Orientation="Vertical">
+                <!-- Name -->
+                <TextBlock x:Name="NameText"
                        FontSize="18"
                        FontWeight="Bold"
                        Foreground="White"
                        FontFamily="Source Sans Pro"
                        Margin="0,0,0,4"/>
 
-            <!-- HP Section -->
-            <StackPanel Orientation="Vertical" Margin="10,0,0,2">
-                <!-- HP Label + Value (aligned left + right) -->
-                <Grid Margin="0,0,0,2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
+                <!-- HP Section -->
+                <StackPanel Orientation="Vertical" Margin="10,0,0,2">
+                    <Grid Margin="0,0,0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Column="0"
-                   Text="HP"
-                   FontSize="10"
-                   FontFamily="Source Sans Pro"
-                   Foreground="LightGreen"
-                   VerticalAlignment="Bottom"/>
+                        <TextBlock Grid.Column="0"
+                               Text="HP"
+                               FontSize="10"
+                               FontFamily="Source Sans Pro"
+                               Foreground="LightGreen"
+                               VerticalAlignment="Bottom"/>
 
-                    <TextBlock x:Name="HPText"
-                   Grid.Column="1"
-                   FontSize="16"
-                   FontWeight="Bold"
-                   FontFamily="Source Sans Pro"
-                   Foreground="White"
-                   HorizontalAlignment="Right"/>
-                </Grid>
+                        <TextBlock x:Name="HPText"
+                               Grid.Column="1"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               FontFamily="Source Sans Pro"
+                               Foreground="White"
+                               HorizontalAlignment="Right"/>
+                    </Grid>
 
-                <!-- HP Progress Bar -->
-                <ProgressBar x:Name="HPBar"
-                 Height="6"
-                 Maximum="1"
-                 Value="0.5"
-                 Style="{StaticResource RoundedProgressBarStyle}"
-                 Background="#222"
-                 Foreground="{StaticResource HPBarFill}"/>
+                    <ProgressBar x:Name="HPBar"
+                             Height="6"
+                             Maximum="1"
+                             Value="0.5"
+                             Style="{StaticResource RoundedProgressBarStyle}"
+                             Background="#222"
+                             Foreground="{StaticResource HPBarFill}"/>
+                </StackPanel>
+
+                <!-- MP Section -->
+                <StackPanel Orientation="Vertical" Margin="20,0,0,0">
+                    <Grid Margin="0,0,0,2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0"
+                               Text="MP"
+                               FontSize="10"
+                               FontFamily="Source Sans Pro"
+                               Foreground="LightBlue"
+                               VerticalAlignment="Bottom"/>
+
+                        <TextBlock x:Name="MPText"
+                               Grid.Column="1"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               FontFamily="Source Sans Pro"
+                               Foreground="White"
+                               HorizontalAlignment="Right"/>
+                    </Grid>
+
+                    <ProgressBar x:Name="MPBar"
+                             Height="6"
+                             Maximum="1"
+                             Value="0.25"
+                             Style="{StaticResource RoundedProgressBarStyle}"
+                             Background="#222"
+                             Foreground="{StaticResource MPBarFill}"/>
+                </StackPanel>
             </StackPanel>
-
-            <!-- MP Section -->
-            <StackPanel Orientation="Vertical" Margin="20,0,0,0">
-                <!-- Top Row: MP and MPText -->
-                <Grid Margin="0,0,0,2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock Grid.Column="0"
-                   Text="MP"
-                   FontSize="10"
-                   FontFamily="Source Sans Pro"
-                   Foreground="LightBlue"
-                   VerticalAlignment="Bottom"/>
-
-                    <TextBlock x:Name="MPText"
-                   Grid.Column="1"
-                   FontSize="16"
-                   FontWeight="Bold"
-                   FontFamily="Source Sans Pro"
-                   Foreground="White"
-                   HorizontalAlignment="Right"/>
-                </Grid>
-
-                <!-- Progress Bar -->
-                <ProgressBar x:Name="MPBar"
-                 Height="6"
-                 Maximum="1"
-                 Value="0.25"
-                 Style="{StaticResource RoundedProgressBarStyle}"
-                 Background="#222"
-                 Foreground="{StaticResource MPBarFill}"/>
-            </StackPanel>
-
-        </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

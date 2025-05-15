@@ -69,8 +69,16 @@
 
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ButtonShape" Property="Fill" Value="#CCDDDDDD"/>
-                                <Setter Property="Foreground" Value="Black"/>
+                                <Setter TargetName="ButtonShape" Property="Fill">
+                                    <Setter.Value>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#AA111111" Offset="0.0"/>
+                                            <GradientStop Color="#AA333333" Offset="0.5"/>
+                                            <GradientStop Color="#AA111111" Offset="1.0"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Foreground" Value="White"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

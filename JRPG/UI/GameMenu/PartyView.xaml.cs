@@ -1,11 +1,14 @@
 ﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
 using JRPG.Core.Systems.Parties;
+using JRPG.Core.Utils;
+using JRPG.UI.Battle.Controls;
 using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
 
 namespace JRPG.UI.GameMenu
 {
@@ -24,79 +27,53 @@ namespace JRPG.UI.GameMenu
             ActivePartyPanel.Children.Clear();
             FullRosterPanel.Children.Clear();
 
+            // Display only active members in the left panel
             foreach (var character in GameSystems.Party.ActivePartyOrder)
             {
                 ActivePartyPanel.Children.Add(CreateCharacterBlock(character, isActiveParty: true));
             }
 
+            // Display only non-active members in the right panel
             foreach (var character in GameSystems.Party.AllCharacters)
             {
-                FullRosterPanel.Children.Add(CreateCharacterBlock(character, isActiveParty: false));
+                if (!character.IsActive)
+                    FullRosterPanel.Children.Add(CreateCharacterBlock(character, isActiveParty: false));
             }
         }
 
         private Border CreateCharacterBlock(Character character, bool isActiveParty)
         {
+            var panel = new CharacterPanel();
+            panel.CharacterName = character.Name;
+            panel.CurrentHP = character.HP;
+            panel.MaxHP = character.MaxHP;
+            panel.CurrentMP = character.MP;
+            panel.MaxMP = character.MaxMP;
+            panel.SetPortrait(AssetPathResolver.GetPortraitPath(character.PortraitFile));
+
             var border = new Border
             {
-                Background = character.IsMainCharacter ? Brushes.DarkSlateBlue : (character.IsActive ? Brushes.DarkGreen : Brushes.Transparent),
+                Background = Brushes.Transparent, // Removed all conditional background coloring
                 BorderBrush = Brushes.White,
                 BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(5),
+                CornerRadius = new CornerRadius(6),
                 Margin = new Thickness(5),
-                Padding = new Thickness(10),
+                Padding = new Thickness(8),
+                Child = panel,
+                Effect = character.IsMainCharacter
+                    ? new DropShadowEffect
+                    {
+                        Color = Colors.White,
+                        BlurRadius = 8,
+                        ShadowDepth = 0,
+                        Opacity = 0.3
+                    }
+                    : null,
                 AllowDrop = true
             };
 
-            var stack = new StackPanel();
-
-            stack.Children.Add(new TextBlock
-            {
-                Text = character.Name,
-                FontSize = 18,
-                Foreground = Brushes.White,
-                TextAlignment = TextAlignment.Center
-            });
-
-            stack.Children.Add(new TextBlock
-            {
-                Text = $"{character.Class} (Lv{character.Level})",
-                FontSize = 14,
-                Foreground = Brushes.LightGray,
-                TextAlignment = TextAlignment.Center
-            });
-
-            stack.Children.Add(new TextBlock
-            {
-                Text = $"HP: {character.HP}",
-                FontSize = 14,
-                Foreground = Brushes.LightGray,
-                TextAlignment = TextAlignment.Center
-            });
-
-            border.Child = stack;
-
             if (!character.IsMainCharacter)
             {
-                border.MouseMove += (s, e) =>
-                {
-                    if (e.LeftButton == MouseButtonState.Pressed)
-                    {
-                        draggedCharacter = character;
-                        DragDrop.DoDragDrop(border, character, DragDropEffects.Move);
-                    }
-                };
-
-                border.Drop += (s, e) =>
-                {
-                    if (draggedCharacter != null && draggedCharacter != character)
-                    {
-                        GameSystems.Party.SwapPartyMembers(draggedCharacter, character);
-                        draggedCharacter = null;
-                        Refresh();
-                    }
-                };
-
                 bool isDragging = false;
                 Point dragStart = new Point();
 
@@ -123,11 +100,20 @@ namespace JRPG.UI.GameMenu
                     }
                 };
 
+                border.Drop += (s, e) =>
+                {
+                    if (draggedCharacter != null && draggedCharacter != character)
+                    {
+                        GameSystems.Party.SwapPartyMembers(draggedCharacter, character);
+                        draggedCharacter = null;
+                        Refresh();
+                    }
+                };
+
                 border.MouseLeftButtonUp += (s, e) =>
                 {
                     if (!isDragging)
                     {
-                        // Only do add/remove if it was a click, not a drag
                         if (character.IsActive)
                             GameSystems.Party.RemoveFromParty(character);
                         else

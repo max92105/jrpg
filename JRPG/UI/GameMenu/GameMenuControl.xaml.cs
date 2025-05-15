@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using JRPG.Core.Systems.Equipments;
 using JRPG.Core.Systems.Inventories;
@@ -36,6 +37,44 @@ namespace JRPG.UI.GameMenu
             MenuBackground.Source = new BitmapImage(new Uri(AssetPathResolver.GetBackgroundsPath("GameMenu.png")));
         }
 
+        private void SetContextOptions(params UIElement[] options)
+        {
+            ContextOptionsPanel.Children.Clear();
+
+            foreach (var option in options)
+            {
+                ContextOptionsPanel.Children.Add(option);
+            }
+        }
+
+        private Button CreateFilterIcon(string filterName)
+        {
+            var icon = new Button
+            {
+                Width = 32,
+                Height = 32,
+                Margin = new Thickness(0, 5, 0, 5),
+                ToolTip = filterName,
+                Background = (Brush)new BrushConverter().ConvertFromString("#AA111111"),
+                BorderBrush = (Brush)new BrushConverter().ConvertFromString("#44111111"),
+                BorderThickness = new Thickness(1),
+                Cursor = System.Windows.Input.Cursors.Hand,
+                Content = new Image
+                {
+                    Source = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath(filterName))),
+                    Stretch = Stretch.Uniform
+                }
+            };
+
+            icon.Click += (s, e) =>
+            {
+                // TODO: Apply filter to inventory
+                MessageBox.Show($"Filter selected: {filterName}");
+            };
+
+            return icon;
+        }
+
         private void MenuButton_Checked(object sender, RoutedEventArgs e)
         {
             var clicked = (ToggleButton)sender;
@@ -56,7 +95,6 @@ namespace JRPG.UI.GameMenu
             }
 
             string selectedMenu = clicked.Content.ToString();
-
 
             switch (selectedMenu)
             {
@@ -93,6 +131,11 @@ namespace JRPG.UI.GameMenu
         private void InventoryButton_Click(object sender, RoutedEventArgs e)
         {
             GameMenuContent.Content = new InventoryView(inventoryManager);
+
+            SetContextOptions(
+                CreateFilterIcon("Attack.png"),
+                CreateFilterIcon("Item.png")
+            );
         }
 
         private void PartyButton_Click(object sender, RoutedEventArgs e)

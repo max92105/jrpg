@@ -1,8 +1,13 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Effects;
+using System.Windows.Media.Imaging;
 using JRPG.Core.Systems.Inventories;
 using JRPG.Core.Systems.Inventories.Models;
+using JRPG.Core.Utils;
 
 namespace JRPG.UI.GameMenu
 {
@@ -20,59 +25,94 @@ namespace JRPG.UI.GameMenu
         private void Refresh()
         {
             ItemListPanel.Children.Clear();
-            ItemDescriptionBlock.Text = "Select an item to see its description.";
+            ItemDescriptionBlock.Text = "Hover an item to see its description.";
 
             foreach (var item in inventoryManager.Items)
             {
-                var itemBorder = new Border
+                var rowGrid = new Grid
                 {
-                    Background = Brushes.Transparent,
-                    BorderBrush = Brushes.White,
-                    BorderThickness = new Thickness(0),
-                    Margin = new Thickness(5),
-                    CornerRadius = new CornerRadius(5)
+                    Height = 50,
+                    Margin = new Thickness(10, 5, 10, 5),
+                    Cursor = Cursors.Hand,
+                    Background = Brushes.Transparent // ✅ Makes the full row clickable
                 };
 
-                var itemRow = new StackPanel { Orientation = Orientation.Horizontal };
-                itemBorder.Child = itemRow;
+                rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(8, GridUnitType.Star) });
+                rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2, GridUnitType.Star) });
+
+                // Left side (Icon + Name)
+                var leftPanel = new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                var icon = new Image
+                {
+                    Source = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath(item.IconFile))),
+                    Width = 32,
+                    Height = 32,
+                    Margin = new Thickness(0, 0, 10, 0)
+                };
 
                 var nameText = new TextBlock
                 {
                     Text = item.Name,
-                    FontSize = 20,
+                    FontSize = 16,
                     Foreground = Brushes.White,
-                    Width = 250
+                    VerticalAlignment = VerticalAlignment.Center
                 };
 
+                leftPanel.Children.Add(icon);
+                leftPanel.Children.Add(nameText);
+
+                Grid.SetColumn(leftPanel, 0);
+                rowGrid.Children.Add(leftPanel);
+
+                // Right side (Quantity)
                 var quantityText = new TextBlock
                 {
                     Text = "x" + item.Quantity,
-                    FontSize = 20,
+                    FontSize = 16,
                     Foreground = Brushes.White,
+                    VerticalAlignment = VerticalAlignment.Center,
                     HorizontalAlignment = HorizontalAlignment.Right,
-                    Width = 100
+                    Margin = new Thickness(0, 0, 10, 0)
                 };
 
-                itemRow.Children.Add(nameText);
-                itemRow.Children.Add(quantityText);
+                Grid.SetColumn(quantityText, 1);
+                rowGrid.Children.Add(quantityText);
 
-                itemBorder.MouseEnter += (s, e) =>
+                var scaleTransform = new ScaleTransform(1.0, 1.0);
+                rowGrid.RenderTransformOrigin = new Point(0.5, 0.5);
+                rowGrid.RenderTransform = scaleTransform;
+
+                rowGrid.MouseEnter += (s, e) =>
                 {
-                    itemBorder.Background = new SolidColorBrush(Color.FromRgb(60, 60, 60));
+                    scaleTransform.ScaleX = 1.02;
+                    scaleTransform.ScaleY = 1.02;
+                    rowGrid.Background = new LinearGradientBrush(
+                     Color.FromArgb(40, 255, 255, 255),
+                     Color.FromArgb(0, 255, 255, 255),
+                     new Point(0, 0),
+                     new Point(1, 0));
+
                     ItemDescriptionBlock.Text = item.Description;
                 };
 
-                itemBorder.MouseLeave += (s, e) =>
+                rowGrid.MouseLeave += (s, e) =>
                 {
-                    itemBorder.Background = Brushes.Transparent;
+                    scaleTransform.ScaleX = 1.0;
+                    scaleTransform.ScaleY = 1.0;
+                    rowGrid.Background = Brushes.Transparent;
                 };
 
-                itemBorder.MouseLeftButtonDown += (s, e) =>
+                rowGrid.MouseLeftButtonDown += (s, e) =>
                 {
                     ShowPopup(item);
                 };
 
-                ItemListPanel.Children.Add(itemBorder);
+                ItemListPanel.Children.Add(rowGrid);
             }
         }
 

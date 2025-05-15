@@ -121,9 +121,31 @@ namespace JRPG.Core.Systems.Inventories
             selectedItem = item;
         }
 
-        public void UseSelectedItem(Character target)
+        public List<ActionResult> UseSelectedItem(Character user, List<BattleActor> targets)
         {
-            if (selectedItem == null) return;
+            if (selectedItem == null)
+                return null;
+
+            List<ActionResult> result = new List<ActionResult>();
+
+            if (selectedItem.TargetType == TargetType.Enemy || selectedItem.TargetType == TargetType.AllEnemies)
+            {
+                foreach (var target in targets)
+                {
+                    target.TakeDamage(selectedItem.EffectValue);
+
+                    result.Add(new ActionResult(target, selectedItem.EffectValue, selectedItem.EffectType));
+                }
+            }
+            else
+            {
+                foreach (var target in targets)
+                {
+                    target.Heal(selectedItem.EffectValue);
+
+                    result.Add(new ActionResult(target, selectedItem.EffectValue, selectedItem.EffectType));
+                }
+            }
 
             selectedItem.Quantity--;
             if (selectedItem.Quantity <= 0)
@@ -132,6 +154,8 @@ namespace JRPG.Core.Systems.Inventories
             }
 
             selectedItem = null;
+
+            return result;
         }
 
         public void ClearSelection()

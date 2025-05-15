@@ -557,7 +557,7 @@ namespace JRPG.UI.Battle
 
                         currentlySelected.Add(target);
 
-                        List<TurnActionResult> results = battleManager.ExecuteCurrentTurnAction(CombatAction.Attack, currentlySelected);
+                        List<ActionResult> results = battleManager.ExecuteCurrentTurnAction(CombatAction.Attack, currentlySelected);
 
                         PlayTurnActionEffect(results, () =>
                          AnimateStepBack(() =>
@@ -679,7 +679,7 @@ namespace JRPG.UI.Battle
         {
             currentlySelected.Add(battleManager.CurrentTurn.BattleActor);
 
-            List<TurnActionResult> results = battleManager.ExecuteCurrentTurnAction(CombatAction.Defend, currentlySelected);
+            List<ActionResult> results = battleManager.ExecuteCurrentTurnAction(CombatAction.Defend, currentlySelected);
 
             MessageBox.Show("I defend");
 
@@ -768,7 +768,7 @@ namespace JRPG.UI.Battle
             if (isTargetingLocked) return; // 🛑 prevent double-activation
             isTargetingLocked = true;      // 🔒 lock until animation ends
 
-            List<TurnActionResult> results = battleManager.ExecuteCurrentTurnAction(ParamCombatAction.Value, currentlySelected, targetingParam);
+            List<ActionResult> results = battleManager.ExecuteCurrentTurnAction(ParamCombatAction.Value, currentlySelected, targetingParam);
 
             targetingParam = null;
 
@@ -797,11 +797,11 @@ namespace JRPG.UI.Battle
             });
         }
 
-        public void PlayTurnActionEffect(List<TurnActionResult> results, Action AnimateStepBack)
+        public void PlayTurnActionEffect(List<ActionResult> results, Action AnimateStepBack)
         {
             var attacker = battleManager.CurrentTurn.BattleActor;
 
-            foreach (TurnActionResult result in results)
+            foreach (ActionResult result in results)
             {
                 //key is target and value is numerical value
                 if (spriteImages.TryGetValue(result.Target, out var targetImage))

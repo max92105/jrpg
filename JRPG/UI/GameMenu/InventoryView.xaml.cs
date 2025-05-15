@@ -183,7 +183,7 @@ namespace JRPG.UI.GameMenu
         {
             PartyTargetPanel.Children.Clear();
 
-            foreach (var character in partyManager.AllCharacters)
+            foreach (var character in GameSystems.Party.AllCharacters)
             {
                 bool isValid = IsCharacterValidTarget(GameSystems.Inventory.SelectedItem, character);
                 bool isSelected = selectedTargets.Contains(character);
@@ -224,10 +224,9 @@ namespace JRPG.UI.GameMenu
 
         private void PopupYes_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var target in selectedTargets)
-            {
-                GameSystems.Inventory.UseSelectedItem();
-            }
+            List<BattleActor> targets = selectedTargets.OfType<BattleActor>().ToList();
+
+            GameSystems.Inventory.UseSelectedItem(null, targets);
 
             PopupOverlay.Visibility = Visibility.Collapsed;
             Refresh();

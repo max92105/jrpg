@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JRPG.Core.Battles.Enums;
 using JRPG.Core.Systems.Inventories.Models;
+using JRPG.Core.Systems;
 
 namespace JRPG.Core.Battles
 {
@@ -69,7 +70,7 @@ namespace JRPG.Core.Battles
             return false;
         }
 
-        public List<TurnActionResult> ExecuteCurrentTurnAction(CombatAction combatAction, List<BattleActor> targets, object param = null)
+        public List<ActionResult> ExecuteCurrentTurnAction(CombatAction combatAction, List<BattleActor> targets, object param = null)
         {
             var current = CurrentTurn;
 
@@ -83,7 +84,7 @@ namespace JRPG.Core.Battles
             }
         }
 
-        private List<TurnActionResult> ExecutePlayerAction(Character character, CombatAction action, List<BattleActor> targets, object param = null)
+        private List<ActionResult> ExecutePlayerAction(Character character, CombatAction action, List<BattleActor> targets, object param = null)
         {
             switch (action)
             {
@@ -97,7 +98,7 @@ namespace JRPG.Core.Battles
 
                 case CombatAction.Defend:
                     {
-                        return new List<TurnActionResult>(); // TODO: Add logic
+                        return new List<ActionResult>(); // TODO: Add logic
                     }
 
                 case CombatAction.Item:
@@ -125,55 +126,30 @@ namespace JRPG.Core.Battles
             }
         }
 
-        private List<TurnActionResult> Attack(BattleActor attacker, List<BattleActor> targets)
+        private List<ActionResult> Attack(BattleActor attacker, List<BattleActor> targets)
         {
-            List<TurnActionResult> result = new List<TurnActionResult>();
+            List<ActionResult> result = new List<ActionResult>();
 
             foreach (var target in targets)
             {
                 var damage = target.TakeDamage(attacker.GetTotalAttack());
 
-                result.Add(new TurnActionResult(target, damage, EffectType.Damage));
+                result.Add(new ActionResult(target, damage, EffectType.Damage));
             }
 
             return result;
         }
 
-        private List<TurnActionResult> PlayerUseItem(Character user, InventoryItem item, List<BattleActor> targets)
+        private List<ActionResult> PlayerUseItem(Character user, InventoryItem item, List<BattleActor> targets)
         {
-            List<TurnActionResult> result = new List<TurnActionResult>();
+            GameSystems.Inventory.SelectItem(item);
 
-            if (item.TargetType == TargetType.Enemy || item.TargetType == TargetType.AllEnemies)
-            {
-                foreach (var target in targets)
-                {
-                    target.TakeDamage(item.EffectValue);
-
-                    result.Add(new TurnActionResult(target, item.EffectValue, item.EffectType));
-                }
-
-                item.Quantity--;
-
-                return result;
-            }
-            else
-            {
-                foreach (var target in targets)
-                {
-                    target.Heal(item.EffectValue);
-
-                    result.Add(new TurnActionResult(target, item.EffectValue, item.EffectType));
-                }
-
-                item.Quantity--;
-
-                return result;
-            }
+            return GameSystems.Inventory.UseSelectedItem(user, targets);
         }
 
-        private List<TurnActionResult> PlayerUseSkill(Character user, Skill skill, List<BattleActor> targets)
+        private List<ActionResult> PlayerUseSkill(Character user, Skill skill, List<BattleActor> targets)
         {
-            List<TurnActionResult> result = new List<TurnActionResult>();
+            List<ActionResult> result = new List<ActionResult>();
 
             if (user.MP < skill.MPCost)
             {
@@ -188,7 +164,7 @@ namespace JRPG.Core.Battles
                 {
                     target.TakeDamage(skill.EffectValue);
 
-                    result.Add(new TurnActionResult(target, skill.EffectValue, skill.EffectType));
+                    result.Add(new ActionResult(target, skill.EffectValue, skill.EffectType));
                 }
 
                 return result;
@@ -199,14 +175,14 @@ namespace JRPG.Core.Battles
                 {
                     target.Heal(skill.EffectValue);
 
-                    result.Add(new TurnActionResult(target, skill.EffectValue, skill.EffectType));
+                    result.Add(new ActionResult(target, skill.EffectValue, skill.EffectType));
                 }
 
                 return result;
             }
         }
 
-        private List<TurnActionResult> ExecuteEnemyAction(List<BattleActor> targets)
+        private List<ActionResult> ExecuteEnemyAction(List<BattleActor> targets)
         {
             return Attack(CurrentTurn.BattleActor, targets);
         }

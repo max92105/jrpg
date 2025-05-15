@@ -1,4 +1,5 @@
 ﻿using JRPG.Core.Battles.Models;
+using JRPG.Core.Systems;
 using JRPG.Core.Systems.Equipments;
 using JRPG.Core.Systems.Parties;
 using JRPG.Core.Utils;
@@ -34,7 +35,7 @@ namespace JRPG.UI.GameMenu
             }
             else
             {
-                SelectCharacter(partyManager.AllCharacters[0]);
+                SelectCharacter(GameSystems.Party.AllCharacters[0]);
             }
         }
 
@@ -42,7 +43,7 @@ namespace JRPG.UI.GameMenu
         {
             PortraitPanel.Children.Clear();
 
-            foreach (var character in partyManager.AllCharacters)
+            foreach (var character in GameSystems.Party.AllCharacters)
             {
                 var image = new Image
                 {
@@ -94,7 +95,7 @@ namespace JRPG.UI.GameMenu
         {
             if (selectedCharacter == null) return;
 
-            var view = new EquipmentSelectionView(selectedCharacter, equipmentManager, partyManager, isWeapon: true);
+            var view = new EquipmentSelectionView(selectedCharacter, isWeapon: true);
             ((MainWindow)Application.Current.MainWindow).GameMenuControl.ShowContent(view);
         }
 
@@ -102,7 +103,7 @@ namespace JRPG.UI.GameMenu
         {
             if (selectedCharacter == null) return;
 
-            var view = new EquipmentSelectionView(selectedCharacter, equipmentManager, partyManager, isWeapon: false);
+            var view = new EquipmentSelectionView(selectedCharacter, isWeapon: false);
             ((MainWindow)Application.Current.MainWindow).GameMenuControl.ShowContent(view);
         }
     }

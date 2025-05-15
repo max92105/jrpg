@@ -93,7 +93,7 @@
     <Compile Include="Battles\Models\Enemy.cs" />
     <Compile Include="Systems\Inventories\Models\InventoryItem.cs" />
     <Compile Include="Battles\Models\Skill.cs" />
-    <Compile Include="Battles\Models\TurnActionResult.cs" />
+    <Compile Include="Battles\Models\ActionResult.cs" />
     <Compile Include="Battles\Models\TurnEntry.cs" />
     <Compile Include="Cutscenes\Models\CutsceneStep.cs" />
     <Compile Include="Cutscenes\Enums\StepType.cs" />

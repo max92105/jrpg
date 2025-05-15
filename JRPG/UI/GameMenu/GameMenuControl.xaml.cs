@@ -19,10 +19,6 @@ namespace JRPG.UI.GameMenu
 {
     public partial class GameMenuControl : UserControl
     {
-        private PartyManager partyManager;
-        private InventoryManager inventoryManager;
-        private EquipmentManager equipmentManager;
-
         private readonly GameSystemManager gameSystemManager;
 
         public GameMenuControl()
@@ -30,13 +26,10 @@ namespace JRPG.UI.GameMenu
             InitializeComponent();
         }
 
-        public GameMenuControl(PartyManager partyManager, InventoryManager inventoryManager, EquipmentManager equipmentManager, GameSystemManager gameSystemManager)
+        public GameMenuControl(GameSystemManager gameSystemManager)
         {
             InitializeComponent();
 
-            this.partyManager = partyManager;
-            this.inventoryManager = inventoryManager;
-            this.equipmentManager = equipmentManager;
             this.gameSystemManager = gameSystemManager;
 
             MenuBackground.Source = new BitmapImage(new Uri(AssetPathResolver.GetBackgroundsPath("GameMenu.png")));
@@ -131,7 +124,7 @@ namespace JRPG.UI.GameMenu
 
         private void InventoryButton_Click(object sender, RoutedEventArgs e)
         {
-            var inventoryView = new InventoryView(inventoryManager, partyManager);
+            var inventoryView = new InventoryView();
             GameMenuContent.Content = inventoryView;
 
             var filters = new List<FilterOption<ItemType?>>
@@ -147,17 +140,17 @@ namespace JRPG.UI.GameMenu
 
         private void PartyButton_Click(object sender, RoutedEventArgs e)
         {
-            GameMenuContent.Content = new PartyView(partyManager);
+            GameMenuContent.Content = new PartyView();
         }
 
         private void EquipmentButton_Click(object sender, RoutedEventArgs e)
         {
-            GameMenuContent.Content = new EquipmentView(partyManager, equipmentManager);
+            GameMenuContent.Content = new EquipmentView();
         }
 
         private void StatusButton_Click(object sender, RoutedEventArgs e)
         {
-            GameMenuContent.Content = new StatusView(partyManager);
+            GameMenuContent.Content = new StatusView();
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)

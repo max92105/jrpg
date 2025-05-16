@@ -62,12 +62,12 @@
         </Border>
 
         <!-- 📦 Item List -->
-        <ScrollViewer Grid.Row="2"
+        <ScrollViewer Grid.Row="2" 
               VerticalScrollBarVisibility="Auto">
             <ScrollViewer.Resources>
                 <Style TargetType="ScrollBar" BasedOn="{StaticResource RoundVerticalScrollBar}" />
             </ScrollViewer.Resources>
-            <StackPanel x:Name="ItemListPanel"/>
+            <StackPanel x:Name="ItemListPanel" Margin="20"/>
         </ScrollViewer>
 
         <!-- 🔻 Divider Line -->

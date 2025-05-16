@@ -88,8 +88,16 @@ namespace JRPG.UI.GameMenu
         }
 
         private void ReturnToEquipmentView()
-        {       
+        {
+            var view = new EquipmentView();
+            
+            ((MainWindow)Application.Current.MainWindow).GameMenuControl.ShowContent(view);
             ((MainWindow)Application.Current.MainWindow).GameMenuControl.HideSecondary();
+        }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            ReturnToEquipmentView();
         }
     }
 }

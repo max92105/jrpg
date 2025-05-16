@@ -1,9 +1,11 @@
-﻿using JRPG.Core.Battles.Models;
+﻿// In PartyView.xaml.cs
+using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
 using JRPG.Core.Utils;
 using JRPG.UI.Battle.Controls;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -13,8 +15,9 @@ namespace JRPG.UI.GameMenu
 {
     public partial class PartyView : UserControl
     {
-        private Character draggedCharacter;
         private readonly Dictionary<Character, Border> characterBlockMap = new Dictionary<Character, Border>();
+        private Character draggedCharacter;
+        private int draggedIndex = -1;
 
         public PartyView()
         {
@@ -29,18 +32,19 @@ namespace JRPG.UI.GameMenu
 
             foreach (var character in GameSystems.Party.AllCharacters)
             {
+                // Get or create the UI block
                 if (!characterBlockMap.ContainsKey(character))
                 {
                     characterBlockMap[character] = CreateCharacterBlock(character);
                 }
 
                 var block = characterBlockMap[character];
-
-                // Detach from previous parent
                 var currentParent = VisualTreeHelper.GetParent(block) as Panel;
                 currentParent?.Children.Remove(block);
 
-                // Add to the right panel
+                // Re-apply interaction behavior
+                SetupDragDropHandlers(block, character);
+
                 if (character.IsActive)
                     ActivePartyPanel.Children.Add(block);
                 else
@@ -70,63 +74,96 @@ namespace JRPG.UI.GameMenu
                 Margin = new Thickness(0, 10, 0, 0),
                 Padding = new Thickness(5),
                 Child = panel,
-                AllowDrop = true,
-                Tag = character.IsMainCharacter
+                Tag = character
             };
 
-            if (!character.IsMainCharacter)
+            if (character.IsActive && !character.IsMainCharacter)
             {
-                bool isDragging = false;
-                Point dragStart = new Point();
-
-                border.MouseLeftButtonDown += (s, e) =>
-                {
-                    isDragging = false;
-                    dragStart = e.GetPosition(null);
-                };
-
-                border.MouseMove += (s, e) =>
-                {
-                    if (e.LeftButton == MouseButtonState.Pressed)
-                    {
-                        Point current = e.GetPosition(null);
-                        Vector delta = current - dragStart;
-
-                        if (!isDragging && (Math.Abs(delta.X) > SystemParameters.MinimumHorizontalDragDistance ||
-                                            Math.Abs(delta.Y) > SystemParameters.MinimumVerticalDragDistance))
-                        {
-                            isDragging = true;
-                            draggedCharacter = character;
-                            DragDrop.DoDragDrop(border, character, DragDropEffects.Move);
-                        }
-                    }
-                };
-
-                border.Drop += (s, e) =>
-                {
-                    if (draggedCharacter != null && draggedCharacter != character)
-                    {
-                        GameSystems.Party.SwapPartyMembers(draggedCharacter, character);
-                        draggedCharacter = null;
-                        Refresh();
-                    }
-                };
-
                 border.MouseLeftButtonUp += (s, e) =>
                 {
-                    if (!isDragging)
+                    if (!character.IsMainCharacter)
                     {
-                        if (character.IsActive)
-                            GameSystems.Party.RemoveFromParty(character);
-                        else
-                            GameSystems.Party.AddToParty(character);
-
+                        GameSystems.Party.AddToParty(character);
                         Refresh();
                     }
                 };
             }
 
             return border;
+        }
+
+        private void SetupDragDropHandlers(Border border, Character character)
+        {
+            // Remove all previous handlers
+            border.MouseLeftButtonUp -= OnReserveClick;
+            border.MouseMove -= OnDragMove;
+            border.Drop -= OnDrop;
+            border.DragOver -= OnDragOver;
+
+            if (character.IsActive && !character.IsMainCharacter)
+            {
+                border.AllowDrop = true;
+                border.MouseMove += OnDragMove;
+                border.DragOver += OnDragOver;
+                border.Drop += OnDrop;
+            }
+            else if (!character.IsMainCharacter)
+            {
+                border.MouseLeftButtonUp += OnReserveClick;
+            }
+        }
+
+        private void OnDragMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed && sender is Border border)
+            {
+                var character = (Character)border.Tag;
+                var data = new DataObject(typeof(Character), character);
+                DragDrop.DoDragDrop(border, data, DragDropEffects.Move);
+            }
+        }
+
+        private void OnDragOver(object sender, DragEventArgs e)
+        {
+            if (!e.Data.GetDataPresent(typeof(Character))) return;
+
+            var draggedChar = e.Data.GetData(typeof(Character)) as Character;
+            var targetBorder = sender as Border;
+            var targetChar = (Character)targetBorder?.Tag;
+
+            if (draggedChar == null || draggedChar == targetChar) return;
+
+            var targetIndex = ActivePartyPanel.Children.IndexOf(targetBorder);
+            var block = characterBlockMap[draggedChar];
+
+            if (ActivePartyPanel.Children.Contains(block))
+            {
+                ActivePartyPanel.Children.Remove(block);
+                ActivePartyPanel.Children.Insert(targetIndex, block);
+            }
+
+            e.Handled = true;
+        }
+
+        private void OnDrop(object sender, DragEventArgs e)
+        {
+            if (!e.Data.GetDataPresent(typeof(Character))) return;
+
+            var newOrder = ActivePartyPanel.Children
+                .OfType<Border>()
+                .Select(b => (Character)b.Tag)
+                .ToList();
+
+            //GameSystems.Party.SwapPartyMembers(draggedCharacter, character);
+        }
+
+        private void OnReserveClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is Border border && border.Tag is Character character)
+            {
+                GameSystems.Party.AddToParty(character);
+                Refresh();
+            }
         }
     }
 }

@@ -138,16 +138,16 @@ namespace JRPG
             {
                     new CutsceneStepFade(fadeToBlack: true, 0.5), // Fade to black
                     new CutsceneStepBackground("Forest.png"),
-                    new CutsceneStepSprite("Hero", "PlaceholderCharacter.png", 4.0, 6.0, flip: false),
+                    new CutsceneStepSprite("Hero", "Sarxian.png", 4.0, 6.0, flip: false),
                     new CutsceneStepSprite("Villain", "Goblin.png", 10.0, 6.0, flip: true),
                     new CutsceneStepFade(fadeToBlack: false, 0.5), // Fade in
           
-                    new CutsceneStepDialogue(new List<string> { "Where are we?", "This forest gives me chills..." }, "Hero", "Alaric.png"),
+                    new CutsceneStepDialogue(new List<string> { "Where are we?", "This forest gives me chills..." }, "Hero", "Sarxian.png"),
                     new CutsceneStepDialogue(new List<string> { "You're too late, hero.", "The ritual is already underway!" }, "Villain", "Goblin.png"),
 
                     new CutsceneStepMove("Villain", 6.0, 6.0, 1.5),
 
-                    new CutsceneStepDialogue(new List<string> { "No!" }, "Hero", "Alaric.png"),
+                    new CutsceneStepDialogue(new List<string> { "No!" }, "Hero", "Sarxian.png"),
 
                     new CutsceneStepFade(fadeToBlack: true, 0.5), // Fade to black
                     new CutsceneStepEnd() ,// Clean up

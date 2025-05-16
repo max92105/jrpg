@@ -16,8 +16,9 @@ namespace JRPG.UI.GameMenu
     public partial class PartyView : UserControl
     {
         private readonly Dictionary<Character, Border> characterBlockMap = new Dictionary<Character, Border>();
-        private Character draggedCharacter;
-        private int draggedIndex = -1;
+
+        private Point _dragStartPoint;
+        private bool _isDragging = false;
 
         public PartyView()
         {
@@ -30,25 +31,32 @@ namespace JRPG.UI.GameMenu
             ActivePartyPanel.Children.Clear();
             FullRosterPanel.Children.Clear();
 
-            foreach (var character in GameSystems.Party.AllCharacters)
+            // Render Active Party in defined order
+            foreach (var character in GameSystems.Party.ActivePartyOrder)
             {
-                // Get or create the UI block
                 if (!characterBlockMap.ContainsKey(character))
-                {
                     characterBlockMap[character] = CreateCharacterBlock(character);
-                }
 
                 var block = characterBlockMap[character];
                 var currentParent = VisualTreeHelper.GetParent(block) as Panel;
                 currentParent?.Children.Remove(block);
 
-                // Re-apply interaction behavior
                 SetupDragDropHandlers(block, character);
+                ActivePartyPanel.Children.Add(block);
+            }
 
-                if (character.IsActive)
-                    ActivePartyPanel.Children.Add(block);
-                else
-                    FullRosterPanel.Children.Add(block);
+            // Render Reserve Members (all characters not in ActivePartyOrder)
+            foreach (var character in GameSystems.Party.AllCharacters.Except(GameSystems.Party.ActivePartyOrder))
+            {
+                if (!characterBlockMap.ContainsKey(character))
+                    characterBlockMap[character] = CreateCharacterBlock(character);
+
+                var block = characterBlockMap[character];
+                var currentParent = VisualTreeHelper.GetParent(block) as Panel;
+                currentParent?.Children.Remove(block);
+
+                SetupDragDropHandlers(block, character);
+                FullRosterPanel.Children.Add(block);
             }
         }
 
@@ -94,32 +102,76 @@ namespace JRPG.UI.GameMenu
 
         private void SetupDragDropHandlers(Border border, Character character)
         {
-            // Remove all previous handlers
+            // Remove all existing handlers to avoid duplicates
+            border.MouseLeftButtonDown -= OnDragMouseDown;
+            border.MouseMove -= OnDragMouseMove;
+            border.MouseLeftButtonUp -= OnDragMouseUp;
             border.MouseLeftButtonUp -= OnReserveClick;
-            border.MouseMove -= OnDragMove;
             border.Drop -= OnDrop;
             border.DragOver -= OnDragOver;
 
+            // LEFT SIDE (Active Party)
             if (character.IsActive && !character.IsMainCharacter)
             {
                 border.AllowDrop = true;
-                border.MouseMove += OnDragMove;
+
+                border.MouseLeftButtonDown += OnDragMouseDown;
+                border.MouseMove += OnDragMouseMove;
+                border.MouseLeftButtonUp += OnDragMouseUp;
+
                 border.DragOver += OnDragOver;
                 border.Drop += OnDrop;
             }
-            else if (!character.IsMainCharacter)
+            // RIGHT SIDE (Reserve Roster)
+            else if (!character.IsActive && !character.IsMainCharacter)
             {
+                border.AllowDrop = false;
                 border.MouseLeftButtonUp += OnReserveClick;
             }
         }
 
-        private void OnDragMove(object sender, MouseEventArgs e)
+        private void OnDragMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            _isDragging = false;
+            _dragStartPoint = e.GetPosition(null);
+        }
+
+        private void OnDragMouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed && sender is Border border)
             {
-                var character = (Character)border.Tag;
-                var data = new DataObject(typeof(Character), character);
-                DragDrop.DoDragDrop(border, data, DragDropEffects.Move);
+                var currentPos = e.GetPosition(null);
+                Vector delta = currentPos - _dragStartPoint;
+
+                if (!_isDragging && (Math.Abs(delta.X) > SystemParameters.MinimumHorizontalDragDistance ||
+                                      Math.Abs(delta.Y) > SystemParameters.MinimumVerticalDragDistance))
+                {
+                    _isDragging = true;
+
+                    if (border.Tag is Character character)
+                    {
+                        var data = new DataObject(typeof(Character), character);
+                        DragDrop.DoDragDrop(border, data, DragDropEffects.Move);
+                    }
+                }
+            }
+        }
+
+        private void OnDragMouseUp(object sender, MouseButtonEventArgs e)
+        {
+            if (!_isDragging && sender is Border border && border.Tag is Character character)
+            {
+                GameSystems.Party.RemoveFromParty(character);
+                Refresh();
+            }
+        }
+
+        private void OnReserveClick(object sender, MouseButtonEventArgs e)
+        {
+            if (sender is Border border && border.Tag is Character character)
+            {
+                GameSystems.Party.AddToParty(character);
+                Refresh();
             }
         }
 
@@ -154,16 +206,7 @@ namespace JRPG.UI.GameMenu
                 .Select(b => (Character)b.Tag)
                 .ToList();
 
-            //GameSystems.Party.SwapPartyMembers(draggedCharacter, character);
-        }
-
-        private void OnReserveClick(object sender, MouseButtonEventArgs e)
-        {
-            if (sender is Border border && border.Tag is Character character)
-            {
-                GameSystems.Party.AddToParty(character);
-                Refresh();
-            }
+            GameSystems.Party.SetPartyOrder(newOrder);
         }
     }
 }

@@ -181,13 +181,24 @@ namespace JRPG.Core.Systems.Parties
                 .ToList();
         }
 
-        public void SwapPartyMembers(Character source, Character target)
+        public void SetPartyOrder(List<Character> newOrder)
         {
-            int i1 = ActivePartyOrder.IndexOf(source);
-            int i2 = ActivePartyOrder.IndexOf(target);
-            if (i1 == -1 || i2 == -1) return;
+            // Ensure only valid active characters are set
+            var validOrder = newOrder
+                .Where(c => AllCharacters.Contains(c))
+                .Distinct()
+                .Take(MaxPartySize)
+                .ToList();
 
-            (ActivePartyOrder[i1], ActivePartyOrder[i2]) = (ActivePartyOrder[i2], ActivePartyOrder[i1]);
+            // Set all as inactive first
+            foreach (var character in AllCharacters)
+                character.IsActive = false;
+
+            // Set active only those in the new order
+            foreach (var character in validOrder)
+                character.IsActive = true;
+
+            ActivePartyOrder = validOrder;
         }
 
         public int GetActivePartyMemberCount() => AllCharacters.Count(c => c.IsActive);

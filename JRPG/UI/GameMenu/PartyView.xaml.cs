@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace JRPG.UI.GameMenu
 {
@@ -183,15 +184,15 @@ namespace JRPG.UI.GameMenu
             var targetBorder = sender as Border;
             var targetChar = (Character)targetBorder?.Tag;
 
-            if (draggedChar == null || draggedChar == targetChar) return;
+            if (draggedChar == null || targetChar == null || draggedChar == targetChar) return;
 
-            var targetIndex = ActivePartyPanel.Children.IndexOf(targetBorder);
-            var block = characterBlockMap[draggedChar];
+            var draggedBlock = characterBlockMap[draggedChar];
+            int oldIndex = ActivePartyPanel.Children.IndexOf(draggedBlock);
+            int newIndex = ActivePartyPanel.Children.IndexOf(targetBorder);
 
-            if (ActivePartyPanel.Children.Contains(block))
+            if (oldIndex != -1 && newIndex != -1 && oldIndex != newIndex)
             {
-                ActivePartyPanel.Children.Remove(block);
-                ActivePartyPanel.Children.Insert(targetIndex, block);
+                AnimateSlideToPosition(draggedBlock, oldIndex, newIndex);
             }
 
             e.Handled = true;
@@ -207,6 +208,37 @@ namespace JRPG.UI.GameMenu
                 .ToList();
 
             GameSystems.Party.SetPartyOrder(newOrder);
+        }
+
+        private void AnimateSlideToPosition(Border block, int oldIndex, int newIndex)
+        {
+            if (oldIndex == newIndex || oldIndex < 0 || newIndex < 0) return;
+
+            // Capture current screen Y before move
+            var oldTop = block.TransformToAncestor(this).Transform(new Point(0, 0)).Y;
+
+            // Move in panel
+            ActivePartyPanel.Children.RemoveAt(oldIndex);
+            ActivePartyPanel.Children.Insert(newIndex, block);
+
+            block.UpdateLayout(); // Force update to get new position
+
+            // Capture new screen Y after move
+            var newTop = block.TransformToAncestor(this).Transform(new Point(0, 0)).Y;
+            double offset = oldTop - newTop;
+
+            // Assign temporary transform
+            var transform = new TranslateTransform { Y = offset };
+            block.RenderTransform = transform;
+
+            // Animate back to 0 (natural position)
+            var anim = new DoubleAnimation
+            {
+                To = 0,
+                Duration = TimeSpan.FromMilliseconds(300),
+                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+            };
+            transform.BeginAnimation(TranslateTransform.YProperty, anim);
         }
     }
 }

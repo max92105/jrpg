@@ -1,9 +1,6 @@
 ﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
-using JRPG.Core.Systems.Equipments;
 using JRPG.Core.Systems.Equipments.Models;
-using JRPG.Core.Systems.Parties;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,7 +19,7 @@ namespace JRPG.UI.GameMenu
             this.character = character;
             this.isWeapon = isWeapon;
 
-            TitleText.Text = $"Select {(isWeapon ? "Weapon" : "Armor")} for {character.Name}";
+            HeaderText.Text = $"Select {(isWeapon ? "Weapon" : "Armor")} for {character.Name}";
             BuildItemList();
         }
 
@@ -91,15 +88,8 @@ namespace JRPG.UI.GameMenu
         }
 
         private void ReturnToEquipmentView()
-        {
-            var view = new EquipmentView(character);
-            
-            ((MainWindow)Application.Current.MainWindow).GameMenuControl.ShowContent(view);
-        }
-
-        private void Cancel_Click(object sender, RoutedEventArgs e)
-        {
-            ReturnToEquipmentView();
+        {       
+            ((MainWindow)Application.Current.MainWindow).GameMenuControl.HideSecondary();
         }
     }
 }

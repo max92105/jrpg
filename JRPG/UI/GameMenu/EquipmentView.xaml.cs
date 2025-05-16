@@ -1,83 +1,57 @@
 ﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
-using JRPG.Core.Systems.Equipments;
-using JRPG.Core.Systems.Parties;
 using JRPG.Core.Utils;
+using JRPG.Utils;
 using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace JRPG.UI.GameMenu
 {
-    /// <summary>
-    /// Interaction logic for EquipmentView.xaml
-    /// </summary>
-
-    public partial class EquipmentView : UserControl
+    public partial class EquipmentView : UserControl, IFilterable<Character>
     {
         private Character selectedCharacter;
 
-        public EquipmentView(Character defaultSelectedCharacter = null)
+        public EquipmentView()
         {
             InitializeComponent();
 
             WeaponNameBlock.MouseLeftButtonUp += WeaponRow_Click;
             ArmorNameBlock.MouseLeftButtonUp += ArmorRow_Click;
 
-            PopulatePortraits();
-
-            if (defaultSelectedCharacter != null)
+            // Default selection
+            var firstCharacter = GameSystems.Party.AllCharacters.FirstOrDefault();
+            if (firstCharacter != null)
             {
-                SelectCharacter(defaultSelectedCharacter);
-            }
-            else
-            {
-                SelectCharacter(GameSystems.Party.AllCharacters[0]);
+                ApplyFilter(firstCharacter);
             }
         }
 
-        private void PopulatePortraits()
+        public void ApplyFilter(Character character)
         {
-            PortraitPanel.Children.Clear();
+            if (character == null) return;
 
-            foreach (var character in GameSystems.Party.AllCharacters)
-            {
-                var image = new Image
-                {
-                    Source = new BitmapImage(new Uri(AssetPathResolver.GetPortraitPath(character.PortraitFile))),
-                    Width = 32,
-                    Height = 32,
-                    Margin = new Thickness(5),
-                    Cursor = Cursors.Hand
-                };
-
-                image.MouseLeftButtonDown += (s, e) =>
-                {
-                    SelectCharacter(character);
-                };
-
-                PortraitPanel.Children.Add(image);
-            }
-        }
-
-        private void SelectCharacter(Character character)
-        {
             selectedCharacter = character;
+            RefreshUI();
+        }
 
-            CharacterNameBlock.Text = character.Name;
+        private void RefreshUI()
+        {
+            if (selectedCharacter == null) return;
 
-            WeaponNameBlock.Text = character.EquippedWeapon?.Name ?? "None";
-            ArmorNameBlock.Text = character.EquippedArmor?.Name ?? "None";
+            CharacterNameBlock.Text = selectedCharacter.Name;
+            WeaponNameBlock.Text = selectedCharacter.EquippedWeapon?.Name ?? "None";
+            ArmorNameBlock.Text = selectedCharacter.EquippedArmor?.Name ?? "None";
 
             StatsPanel.Children.Clear();
-            StatsPanel.Children.Add(CreateStatText("HP", character.HP));
-            StatsPanel.Children.Add(CreateStatText("MP", character.MP));
-            StatsPanel.Children.Add(CreateStatText("ATK", character.GetTotalAttack()));
-            StatsPanel.Children.Add(CreateStatText("DEF", character.GetTotalDefense()));
-            StatsPanel.Children.Add(CreateStatText("Level", character.Level));
+            StatsPanel.Children.Add(CreateStatText("HP", selectedCharacter.HP));
+            StatsPanel.Children.Add(CreateStatText("MP", selectedCharacter.MP));
+            StatsPanel.Children.Add(CreateStatText("ATK", selectedCharacter.GetTotalAttack()));
+            StatsPanel.Children.Add(CreateStatText("DEF", selectedCharacter.GetTotalDefense()));
+            StatsPanel.Children.Add(CreateStatText("Level", selectedCharacter.Level));
         }
 
         private TextBlock CreateStatText(string label, int value)
@@ -96,7 +70,7 @@ namespace JRPG.UI.GameMenu
             if (selectedCharacter == null) return;
 
             var view = new EquipmentSelectionView(selectedCharacter, isWeapon: true);
-            ((MainWindow)Application.Current.MainWindow).GameMenuControl.ShowContent(view);
+            ((MainWindow)Application.Current.MainWindow).GameMenuControl.ShowSecondary(view);
         }
 
         private void ArmorRow_Click(object sender, MouseButtonEventArgs e)
@@ -104,7 +78,7 @@ namespace JRPG.UI.GameMenu
             if (selectedCharacter == null) return;
 
             var view = new EquipmentSelectionView(selectedCharacter, isWeapon: false);
-            ((MainWindow)Application.Current.MainWindow).GameMenuControl.ShowContent(view);
+            ((MainWindow)Application.Current.MainWindow).GameMenuControl.ShowSecondary(view);
         }
     }
 }

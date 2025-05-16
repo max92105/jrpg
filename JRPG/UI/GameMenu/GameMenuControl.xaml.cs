@@ -5,13 +5,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using JRPG.Core.Systems.Equipments;
-using JRPG.Core.Systems.Inventories;
+using JRPG.Core.Battles.Models;
+using JRPG.Core.Systems;
 using JRPG.Core.Systems.Inventories.Enums;
-using JRPG.Core.Systems.Parties;
 using JRPG.Core.Utils;
 using JRPG.Utils;
 
@@ -50,13 +48,20 @@ namespace JRPG.UI.GameMenu
 
         private Button CreateFilterIcon<T>(FilterOption<T> option)
         {
+            string fullPath;
+
+            if (option.PathResolver != null)
+                fullPath = option.PathResolver(option.IconFile);
+            else
+                fullPath = AssetPathResolver.GetIconsPath(option.IconFile); // default to icons
+
             var icon = new Button
             {
                 Style = (Style)FindResource("FilterIconStyle"),
                 ToolTip = option.Label,
                 Content = new Image
                 {
-                    Source = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath(option.IconFile))),
+                    Source = new BitmapImage(new Uri(fullPath, UriKind.Absolute)),
                     Stretch = Stretch.Uniform
                 }
             };
@@ -66,6 +71,7 @@ namespace JRPG.UI.GameMenu
                 if (GameMenuContent.Content is IFilterable<T> filterable)
                 {
                     filterable.ApplyFilter(option.FilterValue);
+                    HideSecondary();
                 }
             };
 
@@ -127,6 +133,8 @@ namespace JRPG.UI.GameMenu
 
         private void InventoryButton_Click(object sender, RoutedEventArgs e)
         {
+            HideSecondary();
+
             var inventoryView = new InventoryView();
             GameMenuContent.Content = inventoryView;
 
@@ -143,6 +151,8 @@ namespace JRPG.UI.GameMenu
 
         private void PartyButton_Click(object sender, RoutedEventArgs e)
         {
+            HideSecondary();
+
             GameMenuContent.Content = new PartyView();
 
             SetContextOptions(null);
@@ -150,7 +160,21 @@ namespace JRPG.UI.GameMenu
 
         private void EquipmentButton_Click(object sender, RoutedEventArgs e)
         {
-            GameMenuContent.Content = new EquipmentView();
+            var equipmentView = new EquipmentView();
+            GameMenuContent.Content = equipmentView;
+
+            var party = GameSystems.Party.AllCharacters;
+
+            var characterFilters = party.Select(c => new FilterOption<Character>
+            {
+                FilterValue = c,
+                IconFile = c.PortraitFile,
+                Label = c.Name,
+                PathResolver = AssetPathResolver.GetPortraitPath
+            });
+
+            var buttons = characterFilters.Select(CreateFilterIcon).ToArray();
+            SetContextOptions(buttons);
         }
 
         private void StatusButton_Click(object sender, RoutedEventArgs e)
@@ -221,5 +245,18 @@ namespace JRPG.UI.GameMenu
         {
             GameMenuContent.Content = content;
         }
+
+        public void ShowSecondary(UserControl view)
+        {
+            SecondaryPanel.Content = view;
+            SecondaryPanelContainer.Visibility = Visibility.Visible;
+        }
+
+        public void HideSecondary()
+        {
+            SecondaryPanel.Content = null;
+            SecondaryPanelContainer.Visibility = Visibility.Collapsed;
+        }
+
     }
 }

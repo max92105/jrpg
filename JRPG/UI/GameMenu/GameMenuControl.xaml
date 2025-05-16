@@ -137,7 +137,6 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="400"/>
-            <ColumnDefinition Width="1000"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -195,9 +194,11 @@
         <Grid Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="48"/>
-                <!-- Context Options Panel -->
+                <!-- Context Options -->
                 <ColumnDefinition Width="*"/>
-                <!-- Main Content Panel -->
+                <!-- Main Panel -->
+                <ColumnDefinition Width="500"/>
+                <!-- Secondary Panel -->
             </Grid.ColumnDefinitions>
 
             <!-- Context Option Buttons -->
@@ -208,7 +209,6 @@
             <!-- Submenu Content Panel -->
             <Border Grid.Column="1"
                 Background="#AA111111"
-
                 BorderBrush="#44111111"
                 BorderThickness="1"
                 Effect="{DynamicResource DropShadow}">
@@ -216,6 +216,20 @@
                 <ContentControl x:Name="GameMenuContent"
                         HorizontalAlignment="Stretch"
                         VerticalAlignment="Stretch" />
+            </Border>
+
+            <Border Grid.Column="2"
+                x:Name="SecondaryPanelContainer"
+                Background="#AA111111"
+                BorderBrush="#44111111"
+                BorderThickness="1"
+                Effect="{DynamicResource DropShadow}"
+                Visibility="Collapsed"
+                Margin="5,0,0,0">
+
+                <ContentControl x:Name="SecondaryPanel"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch" />
             </Border>
         </Grid>
     </Grid>

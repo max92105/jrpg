@@ -57,20 +57,7 @@ namespace JRPG.UI.GameMenu
             {
                 var equipment = (Equipment)entry.Item;
 
-                int baseStat = isWeapon ? character.BaseAttack : character.BaseDefense;
-                int newBonus = isWeapon
-                    ? ((Weapon)equipment).AttackBonus
-                    : ((Armor)equipment).DefenseBonus;
-
-                int newStat = baseStat + newBonus;
-                int currentStat = isWeapon ? character.GetTotalAttack() : character.GetTotalDefense();
-                int diff = newStat - currentStat;
-
-                string statChange = diff > 0 ? $"▲ (+{diff})"
-                                   : diff < 0 ? $"▼ ({diff})"
-                                   : "(no change)";
-
-                string label = $"{equipment.Name} ({(isWeapon ? "ATK" : "DEF")}: {newStat}) {statChange}";
+                string label = $"{equipment.Name}";
 
                 EquipmentListPanel.Children.Add(CreateEquipmentRow(
                     label,
@@ -80,11 +67,13 @@ namespace JRPG.UI.GameMenu
                     {
                         GameSystems.Equipment.Equip(character, equipment);
                         ReturnToEquipmentView();
-                    }));
+                    },
+                    previewEquipment: equipment  // 👈 this enables stat preview
+                ));
             }
         }
 
-        private Grid CreateEquipmentRow(string label, string quantity, Brush foreground, Action onClick)
+        private Grid CreateEquipmentRow(string label, string quantity, Brush foreground, Action onClick, Equipment previewEquipment = null)
         {
             var row = new Grid
             {
@@ -118,6 +107,24 @@ namespace JRPG.UI.GameMenu
 
             row.MouseLeftButtonUp += (s, e) => onClick();
 
+            // 👇 Add hover preview if previewEquipment is passed
+            if (previewEquipment != null)
+            {
+                row.MouseEnter += (s, e) =>
+                {
+                    var menuControl = (MainWindow)Application.Current.MainWindow;
+                    var equipmentView = menuControl.GameMenuControl.GameMenuContent.Content as EquipmentView;
+                    equipmentView?.PreviewStats(previewEquipment, isWeapon);
+                };
+
+                row.MouseLeave += (s, e) =>
+                {
+                    var menuControl = (MainWindow)Application.Current.MainWindow;
+                    var equipmentView = menuControl.GameMenuControl.GameMenuContent.Content as EquipmentView;
+                    equipmentView?.ApplyFilter(character); // Reset to base stats
+                };
+            }
+
             return row;
         }
 
@@ -133,6 +140,7 @@ namespace JRPG.UI.GameMenu
             };
 
             block.MouseLeftButtonUp += (s, e) => onClick?.Invoke();
+
             return block;
         }
 

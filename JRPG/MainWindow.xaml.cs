@@ -28,6 +28,10 @@ namespace JRPG
         private int totalPlayTimeSeconds = 0;
         private Character draggedCharacter = null;
 
+        private bool IsInputLocked => isTransitioning || dialogueManager.IsActive || CutsceneManager.IsPlaying || isInBattle;
+        private bool isTransitioning = false;
+        private bool isInBattle = false;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -76,64 +80,61 @@ namespace JRPG
 
         public async void StartBattle()
         {
+            if (isTransitioning || isInBattle) return;
+            isTransitioning = true;
+            isInBattle = true;
+
             await FadeHelper.FadeToBlackAsync(FadeRect);
 
             List<Enemy> enemies = new List<Enemy>()
             {
-                new Goblin()
-                {
-                    SlotIndex = 0,
-                },
-                new Goblin()
-                {
-                    SlotIndex = 1,
-                },
-                new Goblin()
-                {
-                    SlotIndex = 2,
-                }
+                new Goblin() { SlotIndex = 0 },
+                new Goblin() { SlotIndex = 1 },
+                new Goblin() { SlotIndex = 2 }
             };
 
-            List<BattleActor> battleActors = new List<BattleActor>();
-
+            var battleActors = new List<BattleActor>();
             battleActors.AddRange(enemies);
             battleActors.AddRange(GameSystems.Party.ActivePartyOrder);
 
             var battleUI = new BattleUI(battleActors);
-
             battleUI.SetBackground("Forest.png");
-
             battleUI.OnBattleEnd += EndBattle;
 
             RootGrid.Children.Add(battleUI);
 
             await FadeHelper.FadeFromBlackAsync(FadeRect);
+            isTransitioning = false;
         }
 
         private async void EndBattle()
         {
+            if (isTransitioning) return;
+            isTransitioning = true;
+
             await FadeHelper.FadeToBlackAsync(FadeRect);
 
             var battleUI = RootGrid.Children.OfType<BattleUI>().FirstOrDefault();
             if (battleUI != null)
-                RootGrid.Children.Remove(battleUI); // Only remove BattleUI
+                RootGrid.Children.Remove(battleUI);
 
             Focus();
             Keyboard.Focus(GameCanvas);
 
             await FadeHelper.FadeFromBlackAsync(FadeRect);
-        }
 
+            isInBattle = false;
+            isTransitioning = false;
+        }
 
         public void ShowDialogue(List<string> pages, string portraitPath = null, string speaker = null, Action callback = null)
         {
             dialogueManager.Show(pages, portraitPath, speaker, callback);
         }
 
-        protected override void OnKeyDown(KeyEventArgs e)
+        private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            base.OnKeyDown(e);
-
+            // ESC should always work unless on StartScreen
             if (e.Key == Key.Escape && StartScreen.Visibility != Visibility.Visible)
             {
                 if (GameMenuControl.Visibility == Visibility.Visible)
@@ -146,30 +147,35 @@ namespace JRPG
                     GameMenuControl.Visibility = Visibility.Visible;
                     Panel.SetZIndex(GameMenuControl, 1000);
                 }
+                return;
             }
-        }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e)
-        {
+            // SPACE should always work when dialogue is active
             if (dialogueManager.IsActive && e.Key == Key.Space)
             {
                 dialogueManager.Skip();
                 return;
             }
 
+            // Allow cutscene launch even during gameplay (can limit if needed)
             if (e.Key == Key.F1)
             {
-                CutsceneManager cutsceneManager = new CutsceneManager(CutscenePlayer);
+                var cutsceneManager = new CutsceneManager(CutscenePlayer);
                 cutsceneManager.StartIntroCutscene();
+                return;
             }
 
-            if (!dialogueManager.IsActive && RootGrid.Children.Contains(GameCanvas))
+            if (IsInputLocked) return;
+
+            if (RootGrid.Children.Contains(GameCanvas))
                 game.OnKeyDown(e.Key);
         }
 
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
-            if (!dialogueManager.IsActive && RootGrid.Children.Contains(GameCanvas))
+            if (IsInputLocked) return;
+
+            if (RootGrid.Children.Contains(GameCanvas))
                 game.OnKeyUp(e.Key);
         }
 

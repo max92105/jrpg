@@ -17,6 +17,8 @@ namespace JRPG
         private CutscenePlayer CutscenePlayer;
         private Dictionary<string, Image> activeSprites = new Dictionary<string, Image>();
 
+        public static bool IsPlaying { get; set; }
+
         public Action OnCutsceneEnd;
 
         public CutsceneManager(CutscenePlayer cutscenePlayer)
@@ -153,7 +155,11 @@ namespace JRPG
                     new CutsceneStepEnd() ,// Clean up
             };
 
+            IsPlaying = true;
+
             PlayCutscene(steps);
+
+            IsPlaying = false;
         }
     }
 }

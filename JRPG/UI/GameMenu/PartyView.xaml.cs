@@ -21,6 +21,8 @@ namespace JRPG.UI.GameMenu
         private Point _dragStartPoint;
         private bool _isDragging = false;
 
+        private bool isAnimatingReorder = false;
+
         public PartyView()
         {
             InitializeComponent();
@@ -178,21 +180,27 @@ namespace JRPG.UI.GameMenu
 
         private void OnDragOver(object sender, DragEventArgs e)
         {
+            if (isAnimatingReorder) return;
             if (!e.Data.GetDataPresent(typeof(Character))) return;
 
             var draggedChar = e.Data.GetData(typeof(Character)) as Character;
             var targetBorder = sender as Border;
             var targetChar = (Character)targetBorder?.Tag;
 
-            if (draggedChar == null || targetChar == null || draggedChar == targetChar) return;
+            if (draggedChar == null || draggedChar == targetChar) return;
 
+            var targetIndex = ActivePartyPanel.Children.IndexOf(targetBorder);
             var draggedBlock = characterBlockMap[draggedChar];
-            int oldIndex = ActivePartyPanel.Children.IndexOf(draggedBlock);
-            int newIndex = ActivePartyPanel.Children.IndexOf(targetBorder);
 
-            if (oldIndex != -1 && newIndex != -1 && oldIndex != newIndex)
+            if (ActivePartyPanel.Children.Contains(draggedBlock))
             {
-                AnimateSlideToPosition(draggedBlock, oldIndex, newIndex);
+                int oldIndex = ActivePartyPanel.Children.IndexOf(draggedBlock);
+
+                if (oldIndex != targetIndex)
+                {
+                    isAnimatingReorder = true;
+                    AnimateSlideToPosition(draggedBlock, oldIndex, targetIndex);
+                }
             }
 
             e.Handled = true;
@@ -210,35 +218,67 @@ namespace JRPG.UI.GameMenu
             GameSystems.Party.SetPartyOrder(newOrder);
         }
 
-        private void AnimateSlideToPosition(Border block, int oldIndex, int newIndex)
+        private void AnimateSlideToPosition(Border draggedBlock, int oldIndex, int newIndex)
         {
             if (oldIndex == newIndex || oldIndex < 0 || newIndex < 0) return;
 
-            // Capture current screen Y before move
-            var oldTop = block.TransformToAncestor(this).Transform(new Point(0, 0)).Y;
+            var positionsBefore = ActivePartyPanel.Children
+                .OfType<Border>()
+                .ToDictionary(b => b, b => b.TransformToAncestor(this).Transform(new Point(0, 0)).Y);
 
-            // Move in panel
             ActivePartyPanel.Children.RemoveAt(oldIndex);
-            ActivePartyPanel.Children.Insert(newIndex, block);
+            ActivePartyPanel.Children.Insert(newIndex, draggedBlock);
+            ActivePartyPanel.UpdateLayout();
 
-            block.UpdateLayout(); // Force update to get new position
+            int animCount = 0;
+            int completed = 0;
 
-            // Capture new screen Y after move
-            var newTop = block.TransformToAncestor(this).Transform(new Point(0, 0)).Y;
-            double offset = oldTop - newTop;
-
-            // Assign temporary transform
-            var transform = new TranslateTransform { Y = offset };
-            block.RenderTransform = transform;
-
-            // Animate back to 0 (natural position)
-            var anim = new DoubleAnimation
+            foreach (var block in ActivePartyPanel.Children.OfType<Border>())
             {
-                To = 0,
-                Duration = TimeSpan.FromMilliseconds(300),
-                EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
-            };
-            transform.BeginAnimation(TranslateTransform.YProperty, anim);
+                var newTop = block.TransformToAncestor(this).Transform(new Point(0, 0)).Y;
+                var oldTop = positionsBefore.ContainsKey(block) ? positionsBefore[block] : newTop;
+                double offset = oldTop - newTop;
+
+                if (Math.Abs(offset) > 0.1)
+                {
+                    animCount++;
+
+                    var transform = new TranslateTransform { Y = offset };
+                    block.RenderTransform = transform;
+
+                    var anim = new DoubleAnimation
+                    {
+                        To = 0,
+                        Duration = TimeSpan.FromMilliseconds(300),
+                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                    };
+
+                    anim.Completed += (s, e) =>
+                    {
+                        completed++;
+                        if (completed == animCount)
+                            isAnimatingReorder = false;
+                    };
+
+                    transform.BeginAnimation(TranslateTransform.YProperty, anim);
+                }
+                else
+                {
+                    if(!(block.RenderTransform is TranslateTransform))
+{
+                        block.RenderTransform = new TranslateTransform();
+                    }
+
+                    var transform = (TranslateTransform)block.RenderTransform;
+                    transform.Y = 0; // Reset smoothly
+                }
+            }
+
+            // If no animation was needed
+            if (animCount == 0)
+            {
+                isAnimatingReorder = false;
+            }
         }
     }
 }

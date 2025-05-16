@@ -118,7 +118,7 @@ namespace JRPG.UI.Battle
 
         private void UpdateCharacterPanel()
         {
-            var characters = battleActors.Where(b => b is Character).Cast<Character>().ToList();
+            var characters = GameSystems.Party.ActivePartyOrder;
 
             // Remove any panels for characters no longer present
             foreach (var key in characterPanels.Keys.Except(characters).ToList())
@@ -197,7 +197,8 @@ namespace JRPG.UI.Battle
             // Draw Characters
             double characterBaseY = 120;
             double characterStartX = canvasWidth - (400 + spriteSize);
-            var characters = battleActors.Where(battleActor => battleActor is Character).ToList();
+            //Since we draw from bottom to top the order need to reverse.... 
+            var characters = GameSystems.Party.ActivePartyOrder.Reverse<Character>().ToList();
 
             for (int i = 0; i < characters.Count; i++)
             {
@@ -230,7 +231,7 @@ namespace JRPG.UI.Battle
                     {
 
                         // Self lock
-                        if (ActionTargetType != TargetType.Self && character != battleManager.CurrentTurn.BattleActor)
+                        if (ActionTargetType == TargetType.Self && character != battleManager.CurrentTurn.BattleActor)
                             return;
 
                         SelectTarget();

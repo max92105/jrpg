@@ -66,17 +66,25 @@ namespace JRPG.UI.Battle.Controls
             }
         }
 
-        public void ShowItems(IEnumerable<InventoryItem> items)
+        public void ShowItems(IEnumerable<InventoryItem> inventoryItems)
         {
             OptionListPanel.Children.Clear();
 
-            foreach (var item in items)
+            foreach (var inventoryItem in inventoryItems)
             {
+                var item = inventoryItem?.Item as Consumable;
+                if (item == null)
+                {
+                    return;
+                }
+
+                var consumable = item;
+
                 var itemButton = new Button
                 {
                     Content = new TextBlock
                     {
-                        Text = $"{item.Name} (x{item.Quantity})",
+                        Text = $"{consumable.Name} (x{inventoryItem.Quantity})",
                         Foreground = Brushes.White,
                         FontSize = 14,
                         TextAlignment = TextAlignment.Center
@@ -87,7 +95,7 @@ namespace JRPG.UI.Battle.Controls
 
                 itemButton.Click += (s, e) =>
                 {
-                    OnItemSelected?.Invoke(item);
+                    OnItemSelected?.Invoke(inventoryItem);
                     OptionListPanel.Visibility = Visibility.Collapsed;
                 };
 

@@ -6,6 +6,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/JRPG;component/UI/Styles/RoundVerticalScrollBar.xaml"/>
+                <ResourceDictionary Source="/JRPG;component/UI/Styles/InventoryItemRow.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -61,13 +62,12 @@
             </Grid>
         </Border>
 
-        <!-- 📦 Item List -->
         <ScrollViewer Grid.Row="2" 
               VerticalScrollBarVisibility="Auto">
             <ScrollViewer.Resources>
                 <Style TargetType="ScrollBar" BasedOn="{StaticResource RoundVerticalScrollBar}" />
             </ScrollViewer.Resources>
-            <StackPanel x:Name="ItemListPanel" Margin="20"/>
+            <StackPanel x:Name="EquipmentListPanel" Margin="20"/>
         </ScrollViewer>
 
         <!-- 🔻 Divider Line -->

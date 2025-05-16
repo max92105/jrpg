@@ -9,7 +9,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
+using JRPG.Core.Systems.Equipments.Models;
 using JRPG.Core.Systems.Inventories.Enums;
+using JRPG.Core.Systems.Inventories.Models;
 using JRPG.Core.Utils;
 using JRPG.Utils;
 
@@ -138,11 +140,12 @@ namespace JRPG.UI.GameMenu
             var inventoryView = new InventoryView();
             GameMenuContent.Content = inventoryView;
 
-            var filters = new List<FilterOption<ItemType?>>
+            var filters = new List<FilterOption<Type>>
             {
-                new FilterOption<ItemType?> { IconFile = "All.png", FilterValue = null },
-                new FilterOption<ItemType?> { IconFile = "Item.png", FilterValue = ItemType.Potion },
-                new FilterOption<ItemType?> { IconFile = "Attack.png", FilterValue = ItemType.Bomb }
+                new FilterOption<Type> { IconFile = "All.png", FilterValue = null },
+                new FilterOption<Type> { IconFile = "Consumable.png", FilterValue = typeof(Consumable) },
+                new FilterOption<Type> { IconFile = "Armor.png", FilterValue = typeof(Armor) },
+                new FilterOption<Type> { IconFile = "Weapon.png", FilterValue = typeof(Weapon) }
             };
 
             var icons = filters.Select(f => CreateFilterIcon(f)).ToArray();

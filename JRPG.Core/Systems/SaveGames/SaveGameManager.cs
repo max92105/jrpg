@@ -15,9 +15,7 @@ namespace JRPG.Core.Systems.SaveGames
 
         public static void SaveGame(int slot,
             List<Character> characters,
-            List<InventoryItem> playerInventory,
-            Dictionary<string, int> weaponStock,
-            Dictionary<string, int> armorStock,
+            List<SavedInventoryEntry> playerInventory,
             string currentMapFile, 
             double playerX, 
             double playerY,
@@ -32,8 +30,6 @@ namespace JRPG.Core.Systems.SaveGames
             {
                 Characters = characters,
                 Inventory = playerInventory,
-                WeaponStock = weaponStock,
-                ArmorStock = armorStock,
                 CurrentMap = currentMapFile,
                 PlayerX = playerX,
                 PlayerY = playerY,

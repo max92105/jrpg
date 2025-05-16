@@ -1,11 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using JRPG.Core.Systems.Inventories.Models;
+using System.Collections.Generic;
 
 namespace JRPG.Core.Systems.Equipments.Models
 {
-    public abstract class Equipment
+    public abstract class Equipment: Item
     {
-        public string Id { get; set; } // unique string like "IronSword"
-        public string Name { get; set; }
         public List<string> AllowedClasses { get; set; } = new List<string>();
+
+        protected Equipment()
+        {
+            CanBeUsedFromInventory = false;
+        }
     }
 }

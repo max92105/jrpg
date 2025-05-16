@@ -8,9 +8,7 @@ namespace JRPG.Core.Systems.SaveGames.Models
     public class SaveData
     {
         public List<Character> Characters { get; set; }
-        public List<InventoryItem> Inventory { get; set; }
-        public Dictionary<string, int> WeaponStock { get; set; }
-        public Dictionary<string, int> ArmorStock { get; set; }
+        public List<SavedInventoryEntry> Inventory { get; set; }
         public string CurrentMap { get; set; }
         public double PlayerX { get; set; }
         public double PlayerY { get; set; }

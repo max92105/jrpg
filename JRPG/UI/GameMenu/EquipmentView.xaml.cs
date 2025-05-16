@@ -15,18 +15,25 @@ namespace JRPG.UI.GameMenu
     {
         private Character selectedCharacter;
 
-        public EquipmentView()
+        public EquipmentView(Character selectedCharacter = null)
         {
             InitializeComponent();
 
             WeaponNameBlock.MouseLeftButtonUp += WeaponRow_Click;
             ArmorNameBlock.MouseLeftButtonUp += ArmorRow_Click;
 
-            // Default selection
-            var firstCharacter = GameSystems.Party.AllCharacters.FirstOrDefault();
-            if (firstCharacter != null)
+            if (selectedCharacter != null)
             {
-                ApplyFilter(firstCharacter);
+                ApplyFilter(selectedCharacter);           
+            }
+            else
+            {
+                // Default selection
+                var firstCharacter = GameSystems.Party.AllCharacters.FirstOrDefault();
+                if (firstCharacter != null)
+                {
+                    ApplyFilter(firstCharacter);
+                }
             }
         }
 

@@ -59,8 +59,6 @@ namespace JRPG
                 slot,
                 GameSystems.Party.AllCharacters,
                 GameSystems.Inventory.GetSerializableItems(),
-                GameSystems.Equipment.GetWeaponStockForSave(),
-                GameSystems.Equipment.GetArmorStockForSave(),
                 game.currentMapFile,
                 game.playerX,
                 game.playerY,
@@ -90,7 +88,6 @@ namespace JRPG
 
                 GameSystems.Party.LoadFromSaveData(saveData.Characters, saveData.ActivePartyOrder);
                 GameSystems.Inventory.LoadFromSavedData(saveData.Inventory);
-                GameSystems.Equipment.LoadFromSavedData(saveData.WeaponStock, saveData.ArmorStock);
                 game.currentMapFile = saveData.CurrentMap;
                 game.LoadFromFile(game.currentMapFile);
                 game.playerX = saveData.PlayerX;

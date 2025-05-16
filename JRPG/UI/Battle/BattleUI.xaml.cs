@@ -706,12 +706,12 @@ namespace JRPG.UI.Battle
             EnterTargetingMode(skill.TargetType);
         }
 
-        private void HandleItemTargeting(InventoryItem item)
+        private void HandleItemTargeting(InventoryItem inventoryItem)
         {
-            targetingParam = item;
+            targetingParam = inventoryItem;
             ParamCombatAction = CombatAction.Item;
 
-            EnterTargetingMode(item.TargetType);
+            EnterTargetingMode(((Consumable)inventoryItem.Item).TargetType);
         }
 
         private void EnterTargetingMode(TargetType targetType)

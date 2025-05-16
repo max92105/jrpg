@@ -1,17 +1,20 @@
 ﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
 using JRPG.Core.Systems.Equipments.Models;
+using JRPG.Core.Systems.Inventories.Models;
+using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace JRPG.UI.GameMenu
 {
     public partial class EquipmentSelectionView : UserControl
     {
-        private Character character;
-        private bool isWeapon;
+        private readonly Character character;
+        private readonly bool isWeapon;
 
         public EquipmentSelectionView(Character character, bool isWeapon)
         {
@@ -25,73 +28,117 @@ namespace JRPG.UI.GameMenu
 
         private void BuildItemList()
         {
-            ItemListPanel.Children.Clear();
+            EquipmentListPanel.Children.Clear();
 
-            var unequip = new TextBlock
-            {
-                Text = "None (Unequip)",
-                Cursor = Cursors.Hand,
-                Foreground = System.Windows.Media.Brushes.LightBlue,
-                Margin = new Thickness(0, 0, 0, 10),
-                FontSize = 18
-            };
-            unequip.MouseLeftButtonUp += (s, e) =>
-            {
-                if (isWeapon)
-                    GameSystems.Equipment.UnequipWeapon(character);
-                else
-                    GameSystems.Equipment.UnequipArmor(character);
-                ReturnToEquipmentView();
-            };
-            ItemListPanel.Children.Add(unequip);
+            // Add "None" unequip option
+            EquipmentListPanel.Children.Add(CreateEquipmentRow(
+                label: "None",
+                quantity: "-",
+                foreground: Brushes.LightBlue,
+                onClick: () =>
+                {
+                    if (isWeapon)
+                        GameSystems.Equipment.UnequipWeapon(character);
+                    else
+                        GameSystems.Equipment.UnequipArmor(character);
+                    ReturnToEquipmentView();
+                }));
 
-            var entries = GameSystems.Equipment.EquipmentInventory
+            // Filter inventory for valid equipment
+            var entries = GameSystems.Inventory.Items
                 .Where(e =>
                     e.Quantity > 0 &&
-                    e.Equipment is Weapon == isWeapon &&
-                    e.Equipment.AllowedClasses.Contains(character.Class))
+                    e.Item is Equipment eq &&
+                    eq.AllowedClasses.Contains(character.Class) &&
+                    ((isWeapon && eq is Weapon) || (!isWeapon && eq is Armor)))
                 .ToList();
 
             foreach (var entry in entries)
             {
-                var equipment = entry.Equipment;
+                var equipment = (Equipment)entry.Item;
+
+                int baseStat = isWeapon ? character.BaseAttack : character.BaseDefense;
+                int newBonus = isWeapon
+                    ? ((Weapon)equipment).AttackBonus
+                    : ((Armor)equipment).DefenseBonus;
+
+                int newStat = baseStat + newBonus;
                 int currentStat = isWeapon ? character.GetTotalAttack() : character.GetTotalDefense();
-                int newStat = isWeapon
-                    ? character.BaseAttack + ((Weapon)equipment).AttackBonus
-                    : character.BaseDefense + ((Armor)equipment).DefenseBonus;
-
                 int diff = newStat - currentStat;
+
                 string statChange = diff > 0 ? $"▲ (+{diff})"
-                                    : diff < 0 ? $"▼ ({diff})"
-                                    : "(no change)";
+                                   : diff < 0 ? $"▼ ({diff})"
+                                   : "(no change)";
 
-                var textBlock = new TextBlock
-                {
-                    Text = $"{equipment.Name} ({(isWeapon ? "ATK" : "DEF")}: {newStat}) {statChange}   (x{entry.Quantity})",
-                    Cursor = Cursors.Hand,
-                    Foreground = System.Windows.Media.Brushes.White,
-                    Margin = new Thickness(0, 0, 0, 10),
-                    FontSize = 18
-                };
+                string label = $"{equipment.Name} ({(isWeapon ? "ATK" : "DEF")}: {newStat}) {statChange}";
 
-                textBlock.MouseLeftButtonUp += (s, e) =>
-                {
-                    if (isWeapon)
+                EquipmentListPanel.Children.Add(CreateEquipmentRow(
+                    label,
+                    $"x{entry.Quantity}",
+                    Brushes.White,
+                    () =>
+                    {
                         GameSystems.Equipment.Equip(character, equipment);
-                    else
-                        GameSystems.Equipment.Equip(character, equipment);
-                    ReturnToEquipmentView();
-                };
-
-                ItemListPanel.Children.Add(textBlock);
+                        ReturnToEquipmentView();
+                    }));
             }
+        }
+
+        private Grid CreateEquipmentRow(string label, string quantity, Brush foreground, Action onClick)
+        {
+            var row = new Grid
+            {
+                Style = (Style)FindResource("InventoryItemRowStyle")
+            };
+
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(8, GridUnitType.Star) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2, GridUnitType.Star) });
+
+            var nameBlock = new TextBlock
+            {
+                Text = label,
+                FontSize = 16,
+                Foreground = foreground,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            Grid.SetColumn(nameBlock, 0);
+            row.Children.Add(nameBlock);
+
+            var quantityBlock = new TextBlock
+            {
+                Text = quantity,
+                FontSize = 16,
+                Foreground = foreground,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Right,
+                Margin = new Thickness(0, 0, 10, 0)
+            };
+            Grid.SetColumn(quantityBlock, 1);
+            row.Children.Add(quantityBlock);
+
+            row.MouseLeftButtonUp += (s, e) => onClick();
+
+            return row;
+        }
+
+        private TextBlock CreateOptionText(string text, Brush color, Action onClick)
+        {
+            var block = new TextBlock
+            {
+                Text = text,
+                Cursor = Cursors.Hand,
+                Foreground = color,
+                Margin = new Thickness(0, 0, 0, 10),
+                FontSize = 18
+            };
+
+            block.MouseLeftButtonUp += (s, e) => onClick?.Invoke();
+            return block;
         }
 
         private void ReturnToEquipmentView()
         {
-            var view = new EquipmentView();
-            
-            ((MainWindow)Application.Current.MainWindow).GameMenuControl.ShowContent(view);
+            ((MainWindow)Application.Current.MainWindow).GameMenuControl.ShowContent(new EquipmentView(character));
             ((MainWindow)Application.Current.MainWindow).GameMenuControl.HideSecondary();
         }
 

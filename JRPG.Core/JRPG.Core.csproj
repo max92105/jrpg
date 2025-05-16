@@ -91,6 +91,7 @@
     <Compile Include="Battles\Models\Character.cs" />
     <Compile Include="Battles\Models\Enemies\Goblin.cs" />
     <Compile Include="Battles\Models\Enemy.cs" />
+    <Compile Include="Systems\Inventories\Models\Consumable.cs" />
     <Compile Include="Systems\Inventories\Models\InventoryItem.cs" />
     <Compile Include="Battles\Models\Skill.cs" />
     <Compile Include="Battles\Models\ActionResult.cs" />
@@ -114,8 +115,10 @@
     <Compile Include="Maps\Models\PlacedObject.cs" />
     <Compile Include="Maps\Models\Tile.cs" />
     <Compile Include="Systems\Equipments\EquipmentManager.cs" />
+    <Compile Include="Systems\Inventories\Models\Item.cs" />
     <Compile Include="Systems\SaveGames\Models\SaveData.cs" />
     <Compile Include="Systems\Parties\PartyManager.cs" />
+    <Compile Include="Systems\SaveGames\Models\SavedInventoryEntry.cs" />
     <Compile Include="Systems\SaveGames\SaveGameManager.cs" />
     <Compile Include="Triggers\IO\TriggerJsonConverter.cs" />
     <Compile Include="Triggers\Models\TriggerBattle.cs" />

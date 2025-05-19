@@ -9,11 +9,11 @@
             <RowDefinition Height="Auto"/>
             <!-- Divider -->
             <RowDefinition Height="*"/>
-            <!-- Item List -->
+            <!-- equipment View -->
             <RowDefinition Height="Auto"/>
             <!-- Divider line -->
-            <RowDefinition Height="Auto"/>
-            <!-- Description -->
+            <RowDefinition Height="150"/>
+            <!-- Stats -->
         </Grid.RowDefinitions>
 
         <!-- Header -->

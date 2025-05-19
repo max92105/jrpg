@@ -21,6 +21,10 @@
             <RowDefinition Height="Auto"/>
             <!-- Divider line -->
             <RowDefinition Height="Auto"/>
+            <!-- Equiped on -->
+            <RowDefinition Height="Auto"/>
+            <!-- Divider line -->
+            <RowDefinition Height="150"/>
             <!-- Description -->
         </Grid.RowDefinitions>
 
@@ -75,7 +79,7 @@
                  Height="1"
                  Fill="#666"
                  Margin="0,0"/>
-
+        
         <!-- 📝 Description -->
         <TextBlock  Grid.Row="4"
                   Margin="20"
@@ -85,5 +89,30 @@
                   Foreground="White"
                   Text="Hover an item to see its description."
                   TextWrapping="Wrap"/>
+
+        <!-- 🔻 Divider Line -->
+        <Border Grid.Row="5"
+              Background="#333"
+              Padding="10,6"
+              Margin="0,0,0,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="8*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Equiped On"
+                         Grid.Column="0"
+                         FontSize="16"
+                         FontWeight="SemiBold"
+                         Foreground="White"
+                         Margin="10,0"/>
+            </Grid>
+        </Border>
+
+        <StackPanel Orientation="Horizontal" 
+                    Grid.Row="6"
+                    Name="EquipOnPortrait" 
+                    Margin="20"/>
     </Grid>
 </UserControl>

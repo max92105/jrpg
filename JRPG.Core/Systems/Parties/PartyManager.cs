@@ -38,6 +38,7 @@ namespace JRPG.Core.Systems.Parties
         {
             AllCharacters.Add(new Character
             {
+                Id = "0",
                 Name = "Sarxian",
                 PortraitFile = "Sarxian.png",
                 BattleSpriteFile = "Sarxian.png",
@@ -66,6 +67,7 @@ namespace JRPG.Core.Systems.Parties
 
             AllCharacters.Add(new Character
             {
+                Id = "1",
                 Name = "Jazog",
                 PortraitFile = "Jazog.png",
                 BattleSpriteFile = "Jazog.png",
@@ -84,6 +86,7 @@ namespace JRPG.Core.Systems.Parties
 
             AllCharacters.Add(new Character
             {
+                Id = "2",
                 Name = "Teelle",
                 PortraitFile = "Teelle.png",
                 BattleSpriteFile = "Teelle.png",
@@ -102,6 +105,7 @@ namespace JRPG.Core.Systems.Parties
 
             AllCharacters.Add(new Character
             {
+                Id = "3",
                 Name = "Zaruk",
                 PortraitFile = "Zaruk.png",
                 BattleSpriteFile = "Zaruk.png",
@@ -120,6 +124,7 @@ namespace JRPG.Core.Systems.Parties
 
             AllCharacters.Add(new Character
             {
+                Id = "4",
                 Name = "Zanyr",
                 PortraitFile = "Zanyr.png",
                 BattleSpriteFile = "Zanyr.png",
@@ -138,6 +143,7 @@ namespace JRPG.Core.Systems.Parties
 
             AllCharacters.Add(new Character
             {
+                Id = "5",
                 Name = "Thaali",
                 PortraitFile = "Thaali.png",
                 BattleSpriteFile = "Thaali.png",
@@ -156,6 +162,7 @@ namespace JRPG.Core.Systems.Parties
 
             AllCharacters.Add(new Character
             {
+                Id = "6",
                 Name = "Kamilia",
                 PortraitFile = "Kamilia.png",
                 BattleSpriteFile = "Kamilia.png",
@@ -221,5 +228,9 @@ namespace JRPG.Core.Systems.Parties
             }
         }
 
+        public Character GetCharacterById(string id)
+        {
+            return AllCharacters.FirstOrDefault(c => c.Id == id);
+        }
     }
 }

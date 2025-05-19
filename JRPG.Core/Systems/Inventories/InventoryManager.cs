@@ -6,6 +6,7 @@ using System.Linq;
 using JRPG.Core.Systems.Inventories.Enums;
 using JRPG.Core.Systems.Equipments.Models;
 using JRPG.Core.Systems.SaveGames.Models;
+using System.Windows.Controls;
 
 namespace JRPG.Core.Systems.Inventories
 {
@@ -16,8 +17,6 @@ namespace JRPG.Core.Systems.Inventories
 
         public IReadOnlyList<InventoryItem> Items => inventory;
         public InventoryItem SelectedItem => selectedItem;
-
-        private readonly Dictionary<string, Item> itemDatabase = new Dictionary<string, Item>();
 
         public InventoryManager()
         {
@@ -35,26 +34,192 @@ namespace JRPG.Core.Systems.Inventories
                 .ToList();
         }
 
-        private void Register(Item item, int quantity)
-        {
-            itemDatabase[item.Id] = item;
-            Add(item, quantity);
-        }
-
         public void LoadFromSavedData(List<SavedInventoryEntry> savedItems)
         {
             inventory.Clear();
 
             foreach (var entry in savedItems)
             {
-                if (itemDatabase.TryGetValue(entry.ItemId, out var item))
+                var item = CreateItemById(entry.ItemId);
+                if (item == null) continue;
+
+                var inventoryItem = new InventoryItem
                 {
-                    Add(item, entry.Quantity);
-                }
-                else
+                    Item = item,
+                    Quantity = entry.Quantity
+                };
+
+                foreach (var charId in entry.EquippedToCharacterIds)
                 {
-                    // Optional: log or ignore unknown items
+                    var character = GameSystems.Party.GetCharacterById(charId);
+                    if (character == null) continue;
+
+                    inventoryItem.EquippedTo.Add(character);
+
+                    if (item is Weapon weapon)
+                        character.EquippedWeapon = weapon;
+                    else if (item is Armor armor)
+                        character.EquippedArmor = armor;
                 }
+
+                inventory.Add(inventoryItem);
+            }
+        }
+
+        private Item CreateItemById(string id)
+        {
+            switch (id)
+            {
+                case "potion":
+                    return new Consumable
+                    {
+                        Id = "potion",
+                        Name = "Potion",
+                        IconFile = "Consumable.png",
+                        Description = "Restores a small amount of HP.",
+                        EffectValue = 15,
+                        EffectType = EffectType.Heal,
+                        TargetType = TargetType.Ally
+                    };
+
+                case "hipotion":
+                    return new Consumable
+                    {
+                        Id = "hipotion",
+                        Name = "Hi-Potion",
+                        IconFile = "Consumable.png",
+                        Description = "Restores a medium amount of HP.",
+                        EffectValue = 50,
+                        EffectType = EffectType.Heal,
+                        TargetType = TargetType.Ally
+                    };
+
+                case "elixir":
+                    return new Consumable
+                    {
+                        Id = "elixir",
+                        Name = "Elixir",
+                        IconFile = "Consumable.png",
+                        Description = "Fully restores HP and MP.",
+                        EffectValue = 100,
+                        EffectType = EffectType.Heal,
+                        TargetType = TargetType.Ally
+                    };
+
+                case "antidote":
+                    return new Consumable
+                    {
+                        Id = "antidote",
+                        Name = "Antidote",
+                        IconFile = "Consumable.png",
+                        Description = "Cures poison.",
+                        EffectValue = 15,
+                        EffectType = EffectType.Heal,
+                        TargetType = TargetType.Self
+                    };
+
+                case "bomb":
+                    return new Consumable
+                    {
+                        Id = "bomb",
+                        Name = "Bomb",
+                        IconFile = "Consumable.png",
+                        Description = "Damage an enemy.",
+                        EffectValue = 15,
+                        EffectType = EffectType.Damage,
+                        TargetType = TargetType.Enemy,
+                        CanBeUsedFromInventory = false
+                    };
+
+                case "bomball":
+                    return new Consumable
+                    {
+                        Id = "bomball",
+                        Name = "Bomb All",
+                        IconFile = "Consumable.png",
+                        Description = "Damage all enemies.",
+                        EffectValue = 30,
+                        EffectType = EffectType.Damage,
+                        TargetType = TargetType.AllEnemies,
+                        CanBeUsedFromInventory = false
+                    };
+
+                case "revivefeather":
+                    return new Consumable
+                    {
+                        Id = "revivefeather",
+                        Name = "Revive Feather",
+                        IconFile = "Consumable.png",
+                        Description = "Revives all fallen allies.",
+                        EffectValue = 15,
+                        EffectType = EffectType.Heal,
+                        TargetType = TargetType.AllAllies
+                    };
+
+                case "BronzeSword":
+                    return new Weapon
+                    {
+                        Id = "BronzeSword",
+                        Name = "Bronze Sword",
+                        IconFile = "Weapon.png",
+                        AttackBonus = 5,
+                        AllowedClasses = new List<string> { "Warrior", "Knight", "Thief" },
+                        Description = "Sword made of bronze"
+                    };
+
+                case "IronSword":
+                    return new Weapon
+                    {
+                        Id = "IronSword",
+                        Name = "Iron Sword",
+                        IconFile = "Weapon.png",
+                        AttackBonus = 8,
+                        AllowedClasses = new List<string> { "Warrior", "Knight" },
+                        Description = "Sword made of iron"
+                    };
+
+                case "MagicStaff":
+                    return new Weapon
+                    {
+                        Id = "MagicStaff",
+                        Name = "Magic Staff",
+                        IconFile = "Weapon.png",
+                        AttackBonus = 6,
+                        AllowedClasses = new List<string> { "Mage", "Healer" }
+                    };
+
+                case "LeatherArmor":
+                    return new Armor
+                    {
+                        Id = "LeatherArmor",
+                        Name = "Leather Armor",
+                        IconFile = "Armor.png",
+                        DefenseBonus = 3,
+                        AllowedClasses = new List<string> { "Warrior", "Knight", "Thief", "Ranger" }
+                    };
+
+                case "ChainMail":
+                    return new Armor
+                    {
+                        Id = "ChainMail",
+                        Name = "Chain Mail",
+                        IconFile = "Armor.png",
+                        DefenseBonus = 6,
+                        AllowedClasses = new List<string> { "Warrior", "Knight" }
+                    };
+
+                case "WizardRobe":
+                    return new Armor
+                    {
+                        Id = "WizardRobe",
+                        Name = "Wizard Robe",
+                        IconFile = "Armor.png",
+                        DefenseBonus = 4,
+                        AllowedClasses = new List<string> { "Mage", "Healer" }
+                    };
+
+                default:
+                    return null;
             }
         }
 
@@ -62,92 +227,21 @@ namespace JRPG.Core.Systems.Inventories
         {
             inventory.Clear();
 
-            Add(new Consumable
-            {
-                Id = "potion",
-                Name = "Potion",
-                IconFile = "Consumable.png",
-                Description = "Restores a small amount of HP.",
-                EffectValue = 15,
-                EffectType = EffectType.Heal,
-                TargetType = TargetType.Ally
-            }, 5);
+            Add(CreateItemById("potion"), 5);
+            Add(CreateItemById("hipotion"), 2);
+            Add(CreateItemById("elixir"), 1);
+            Add(CreateItemById("antidote"), 7);
+            Add(CreateItemById("bomb"), 3);
+            Add(CreateItemById("bomball"), 3);
+            Add(CreateItemById("revivefeather"), 3);
 
-            Add(new Consumable
-            {
-                Id = "hipotion",
-                Name = "Hi-Potion",
-                IconFile = "Consumable.png",
-                Description = "Restores a medium amount of HP.",
-                EffectValue = 50,
-                EffectType = EffectType.Heal,
-                TargetType = TargetType.Ally
-            }, 2);
+            Add(CreateItemById("BronzeSword"), 2);
+            Add(CreateItemById("IronSword"), 1);
+            Add(CreateItemById("MagicStaff"), 3);
 
-            Add(new Consumable
-            {
-                Id = "elixir",
-                Name = "Elixir",
-                IconFile = "Consumable.png",
-                Description = "Fully restores HP and MP.",
-                EffectValue = 100,
-                EffectType = EffectType.Heal,
-                TargetType = TargetType.Ally
-            }, 1);
-
-            Add(new Consumable
-            {
-                Id = "antidote",
-                Name = "Antidote",
-                IconFile = "Consumable.png",
-                Description = "Cures poison.",
-                EffectValue = 15,
-                EffectType = EffectType.Heal,
-                TargetType = TargetType.Self
-            }, 7);
-
-            Add(new Consumable
-            {
-                Id = "bomb",
-                Name = "Bomb",
-                IconFile = "Consumable.png",
-                Description = "Damage an enemy.",
-                EffectValue = 15,
-                EffectType = EffectType.Damage,
-                TargetType = TargetType.Enemy,
-                CanBeUsedFromInventory = false
-            }, 3);
-
-            Add(new Consumable
-            {
-                Id = "bomball",
-                Name = "Bomb All",
-                IconFile = "Consumable.png",
-                Description = "Damage all enemies.",
-                EffectValue = 30,
-                EffectType = EffectType.Damage,
-                TargetType = TargetType.AllEnemies,
-                CanBeUsedFromInventory = false
-            }, 3);
-
-            Add(new Consumable
-            {
-                Id = "revivefeather",
-                Name = "Revive Feather",
-                IconFile = "Consumable.png",
-                Description = "Revives all fallen allies.",
-                EffectValue = 15,
-                EffectType = EffectType.Heal,
-                TargetType = TargetType.AllAllies
-            }, 3);
-
-            Add(new Weapon { Id = "BronzeSword", Name = "Bronze Sword", IconFile = "Weapon.png", AttackBonus = 5, AllowedClasses = new List<string>() { "Warrior", "Knight", "Thief" } } , 3);
-            Add(new Weapon { Id = "IronSword", Name = "Iron Sword", IconFile = "Weapon.png", AttackBonus = 8, AllowedClasses = new List<string>() { "Warrior", "Knight" }}, 1);
-            Add(new Weapon { Id = "MagicStaff", Name = "Magic Staff", IconFile = "Weapon.png", AttackBonus = 6, AllowedClasses = new List<string>() { "Mage", "Healer" } }, 3);
-
-            Add(new Armor { Id = "LeatherArmor", Name = "Leather Armor", IconFile = "Armor.png", DefenseBonus = 3, AllowedClasses = new List<string>() { "Warrior", "Knight", "Thief", "Ranger" } }, 2);
-            Add(new Armor { Id = "ChainMail", Name = "Chain Mail", IconFile = "Armor.png", DefenseBonus = 6, AllowedClasses = new List<string>() { "Warrior", "Knight" } }, 3);
-            Add(new Armor { Id = "WizardRobe", Name = "Wizard Robe", IconFile = "Armor.png", DefenseBonus = 4, AllowedClasses = new List<string>() { "Mage", "Healer" } }, 1);
+            Add(CreateItemById("LeatherArmor"), 2);
+            Add(CreateItemById("ChainMail"), 3);
+            Add(CreateItemById("WizardRobe"), 1);
         }
 
         public void Add(Item item, int amount = 1)

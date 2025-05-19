@@ -4,6 +4,7 @@ namespace JRPG.Core.Battles.Models
 {
     public abstract class BattleActor
     {
+        public string Id { get; set; }
         public string Name { get; set; }
 
         public string PortraitFile { get; set; }

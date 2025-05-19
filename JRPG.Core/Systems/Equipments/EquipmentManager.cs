@@ -1,6 +1,7 @@
 ﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems.Equipments.Models;
 using JRPG.Core.Systems;
+using System.Linq;
 
 public class EquipmentManager
 {
@@ -9,26 +10,19 @@ public class EquipmentManager
         InitializeDefaults();
     }
 
-    private void InitializeDefaults()
-    {
-    }
+    private void InitializeDefaults() { }
 
-    public void UnequipWeapon(Character c)
+    public void Unequip(Character c, Equipment equipment)
     {
-        if (c.EquippedWeapon != null)
-        {
-            GameSystems.Inventory.Add(c.EquippedWeapon);
+        if (equipment == null) return;
+
+        if (equipment is Weapon && c.EquippedWeapon == equipment)
             c.EquippedWeapon = null;
-        }
-    }
-
-    public void UnequipArmor(Character c)
-    {
-        if (c.EquippedArmor != null)
-        {
-            GameSystems.Inventory.Add(c.EquippedArmor);
+        else if (equipment is Armor && c.EquippedArmor == equipment)
             c.EquippedArmor = null;
-        }
+
+        var entry = GameSystems.Inventory.Items.FirstOrDefault(i => i.Item == equipment);
+        entry?.EquippedTo.Remove(c);
     }
 
     public bool Equip(Character c, Equipment equipment)
@@ -36,21 +30,21 @@ public class EquipmentManager
         if (!equipment.AllowedClasses.Contains(c.Class))
             return false;
 
-        if (!GameSystems.Inventory.HasItem(equipment.Id))
+        var entry = GameSystems.Inventory.Items.FirstOrDefault(i => i.Item == equipment);
+        if (entry == null || entry.AvailableStock <= 0)
             return false;
 
-        if (equipment is Weapon w)
-        {
-            UnequipWeapon(c);
-            c.EquippedWeapon = w;
-        }
-        else if (equipment is Armor a)
-        {
-            UnequipArmor(c);
-            c.EquippedArmor = a;
-        }
+        // Unequip old
+        if (equipment is Weapon) Unequip(c, c.EquippedWeapon);
+        else if (equipment is Armor) Unequip(c, c.EquippedArmor);
 
-        GameSystems.Inventory.Remove(equipment.Id, 1);
+        // Equip new
+        if (equipment is Weapon w) c.EquippedWeapon = w;
+        else if (equipment is Armor a) c.EquippedArmor = a;
+
+        if (!entry.EquippedTo.Contains(c))
+            entry.EquippedTo.Add(c);
+
         return true;
     }
 }

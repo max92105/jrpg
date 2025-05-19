@@ -29,6 +29,10 @@ namespace JRPG.UI.GameMenu.Controls
             DependencyProperty.Register(nameof(IsEnabledTarget), typeof(bool), typeof(CharacterPortrait),
                 new PropertyMetadata(true, OnEnabledChanged));
 
+        public static readonly DependencyProperty ShowStatsProperty =
+    DependencyProperty.Register(nameof(ShowStats), typeof(bool), typeof(CharacterPortrait),
+        new PropertyMetadata(true, OnShowStatsChanged));
+
         public Character Character
         {
             get => (Character)GetValue(CharacterProperty);
@@ -45,6 +49,12 @@ namespace JRPG.UI.GameMenu.Controls
         {
             get => (bool)GetValue(IsEnabledTargetProperty);
             set => SetValue(IsEnabledTargetProperty, value);
+        }
+
+        public bool ShowStats
+        {
+            get => (bool)GetValue(ShowStatsProperty);
+            set => SetValue(ShowStatsProperty, value);
         }
 
         private void OnLoaded(object sender, RoutedEventArgs e)
@@ -85,6 +95,12 @@ namespace JRPG.UI.GameMenu.Controls
                 control.UpdateVisuals();
         }
 
+        private static void OnShowStatsChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is CharacterPortrait control)
+                control.UpdateVisuals();
+        }
+
         private void UpdateVisuals()
         {
             if (Character == null)
@@ -92,12 +108,17 @@ namespace JRPG.UI.GameMenu.Controls
 
             PortraitImage.Source = new BitmapImage(new Uri(AssetPathResolver.GetPortraitPath(Character.PortraitFile)));
 
-            HPBar.Maximum = Character.MaxHP;
-            HPBar.Value = Character.HP;
+            HPBar.Visibility = ShowStats ? Visibility.Visible : Visibility.Collapsed;
+            MPBar.Visibility = ShowStats ? Visibility.Visible : Visibility.Collapsed;
 
-            MPBar.Maximum = Character.MaxMP;
-            MPBar.Value = Character.MP;
+            if (ShowStats)
+            {
+                HPBar.Maximum = Character.MaxHP;
+                HPBar.Value = Character.HP;
 
+                MPBar.Maximum = Character.MaxMP;
+                MPBar.Value = Character.MP;
+            }
             // Fainting effect (grayscale or opacity)
             PortraitImage.Opacity = Character.IsAlive ? 1.0 : 0.4;
         }

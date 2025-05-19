@@ -1,116 +1,131 @@
-﻿using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows;
+﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
+using JRPG.UI.GameMenu.Controls;
+using JRPG.Utils;
+using System;
+using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Animation;
 
 namespace JRPG.UI.GameMenu
 {
-    public partial class StatusView : UserControl
+    public partial class StatusView : UserControl, IFilterable<Character>
     {
-        public StatusView()
+        private Character selectedCharacter;
+
+        public StatusView(Character selectedCharacter = null)
         {
             InitializeComponent();
-            Refresh();
+
+            if (selectedCharacter != null)
+            {
+                ApplyFilter(selectedCharacter);
+            }
+            else
+            {
+                var firstCharacter = GameSystems.Party.AllCharacters.FirstOrDefault();
+                if (firstCharacter != null)
+                {
+                    ApplyFilter(firstCharacter);
+                }
+            }
         }
 
-        private void Refresh()
+        public void ApplyFilter(Character character)
         {
-            StatusPanel.Children.Clear();
+            if (character == null) return;
+            selectedCharacter = character;
+            RefreshUI();
+        }
 
-            foreach (var character in GameSystems.Party.ActivePartyOrder)
+        private void RefreshUI()
+        {
+            if (selectedCharacter == null) return;
+
+            CharacterNameBlock.Text = selectedCharacter.Name;
+
+            LevelBlock.Text = $"{selectedCharacter.Level}";
+            CurrentXPBlock.Text = $"{selectedCharacter.EXP}";
+            XPToNextLevelBlock.Text = $"{selectedCharacter.EXPToNextLevel}";
+            ClassBlock.Text = $"{selectedCharacter.Class}";
+
+            UpdateXpBar();
+
+            // Clear and rebuild stats
+            cStatsPanel.Load(selectedCharacter);
+
+            SkillsPanel.Children.Clear();
+
+            var skills = selectedCharacter.Skills.ToList();
+            for (int i = 0; i < skills.Count; i += 2)
             {
-                var characterBorder = new Border
-                {
-                    BorderBrush = Brushes.White,
-                    BorderThickness = new Thickness(1),
-                    CornerRadius = new CornerRadius(5),
-                    Margin = new Thickness(5),
-                    Padding = new Thickness(10)
-                };
+                var left = skills[i];
+                var right = (i + 1 < skills.Count) ? skills[i + 1] : null;
 
-                var characterStack = new StackPanel();
-
-                characterStack.Children.Add(new TextBlock
-                {
-                    Text = $"{character.Name} - {character.Class} (Lv {character.Level})",
-                    FontSize = 24,
-                    Foreground = Brushes.White,
-                    Margin = new Thickness(0, 0, 0, 10)
-                });
-
-                characterStack.Children.Add(new TextBlock
-                {
-                    Text = $"HP: {character.HP}",
-                    FontSize = 18,
-                    Foreground = Brushes.LightGreen
-                });
-
-                characterStack.Children.Add(new TextBlock
-                {
-                    Text = $"ATK: {character.GetTotalAttack()} (Base {character.BaseAttack})",
-                    FontSize = 18,
-                    Foreground = Brushes.LightBlue
-                });
-
-                characterStack.Children.Add(new TextBlock
-                {
-                    Text = $"DEF: {character.GetTotalDefense()} (Base {character.BaseDefense})",
-                    FontSize = 18,
-                    Foreground = Brushes.LightBlue
-                });
-
-                characterStack.Children.Add(new TextBlock
-                {
-                    Text = $"Weapon: {character.EquippedWeapon?.Name ?? "None"}",
-                    FontSize = 18,
-                    Foreground = Brushes.LightGray
-                });
-
-                characterStack.Children.Add(new TextBlock
-                {
-                    Text = $"Armor: {character.EquippedArmor?.Name ?? "None"}",
-                    FontSize = 18,
-                    Foreground = Brushes.LightGray
-                });
-
-                characterStack.Children.Add(new TextBlock
-                {
-                    Text = $"EXP: {character.EXP} / {character.EXPToNextLevel}",
-                    FontSize = 18,
-                    Foreground = Brushes.Yellow,
-                    Margin = new Thickness(0, 5, 0, 0)
-                });
-
-                characterStack.Children.Add(new ProgressBar
-                {
-                    Minimum = 0,
-                    Maximum = character.EXPToNextLevel,
-                    Value = character.EXP,
-                    Height = 15,
-                    Margin = new Thickness(0, 5, 0, 0)
-                });
-
-                characterStack.Children.Add(new TextBlock
-                {
-                    Text = "Skills:",
-                    FontSize = 20,
-                    Foreground = Brushes.LightSkyBlue,
-                    Margin = new Thickness(0, 10, 0, 0)
-                });
-
-                foreach (var skill in character.Skills)
-                {
-                    characterStack.Children.Add(new TextBlock
-                    {
-                        Text = $"- {skill}",
-                        FontSize = 16,
-                        Foreground = Brushes.White
-                    });
-                }
-
-                characterBorder.Child = characterStack;
-                StatusPanel.Children.Add(characterBorder);
+                AddSkillRow(
+                    leftSkillName: left.Name,
+                    leftIcon: left.IconFile,
+                    rightSkillName: right?.Name,
+                    rightIcon: right?.IconFile
+                );
             }
+        }
+
+        private void UpdateXpBar()
+        {
+            // Set max before animating
+            XpBar.Maximum = selectedCharacter.EXPToNextLevel;
+
+            // Reset any previous animations and start from 0
+            XpBar.BeginAnimation(ProgressBar.ValueProperty, null);
+            XpBar.Value = 0;
+
+            var animation = new DoubleAnimation
+            {
+                From = 0,
+                To = selectedCharacter.EXP,
+                Duration = TimeSpan.FromMilliseconds(400),
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            };
+
+            XpBar.BeginAnimation(ProgressBar.ValueProperty, animation);
+        }
+
+        private void AddSkillRow(string leftSkillName, string leftIcon = null, string rightSkillName = null, string rightIcon = null)
+        {
+            var rowGrid = new Grid
+            {
+                Margin = new Thickness(0, 4, 0, 4),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+
+            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(24) }); // Left icon
+            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // Left name
+            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(20) }); // Spacer
+            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(24) }); // Right icon
+            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // Right name
+
+            var leftIconImg = VisualFactory.CreateIcon(leftIcon);
+            Grid.SetColumn(leftIconImg, 0);
+            rowGrid.Children.Add(leftIconImg);
+
+            var leftLabel = VisualFactory.CreateText(leftSkillName);
+            leftLabel.Margin = new Thickness(4, 0, 0, 0);
+            Grid.SetColumn(leftLabel, 1);
+            rowGrid.Children.Add(leftLabel);
+
+            var rightIconImg = VisualFactory.CreateIcon(rightIcon);
+            Grid.SetColumn(rightIconImg, 3);
+            rowGrid.Children.Add(rightIconImg);
+
+            var rightLabel = VisualFactory.CreateText(rightSkillName ?? "");
+            rightLabel.Margin = new Thickness(4, 0, 0, 0);
+            Grid.SetColumn(rightLabel, 4);
+            rowGrid.Children.Add(rightLabel);
+
+            SkillsPanel.Children.Add(rowGrid);
         }
     }
 }

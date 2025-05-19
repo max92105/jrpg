@@ -1,6 +1,5 @@
 ﻿using JRPG.Core.Battles;
 using JRPG.Core.Battles.Models;
-using JRPG.Core.Systems.Equipments;
 using JRPG.Core.Systems.Inventories;
 using JRPG.Core.Systems.Parties;
 using System.Collections.Generic;

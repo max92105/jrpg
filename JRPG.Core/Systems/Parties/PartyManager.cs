@@ -57,8 +57,8 @@ namespace JRPG.Core.Systems.Parties
                 IsMainCharacter = true,
                 Skills = new List<Skill>
                 {
-                    new Skill { Name = "Fire Blast", MPCost = 10, EffectValue = 15, EffectType = EffectType.Damage, TargetType = TargetType.Enemy },
-                    new Skill { Name = "Fireball", MPCost = 10, EffectValue = 20, EffectType = EffectType.Damage, TargetType = TargetType.AllEnemies },
+                    new Skill { Name = "Fire Blast", IconFile = "Attack.png", MPCost = 10, EffectValue = 15, EffectType = EffectType.Damage, TargetType = TargetType.Enemy },
+                    new Skill { Name = "Fireball", IconFile = "Attack.png", MPCost = 10, EffectValue = 20, EffectType = EffectType.Damage, TargetType = TargetType.AllEnemies },
                     new Skill { Name = "Heal", MPCost = 8, EffectValue = 15, EffectType = EffectType.Heal, TargetType = TargetType.Ally },
                     new Skill { Name = "Recovery", MPCost = 8, EffectValue = 30, EffectType = EffectType.Heal, TargetType = TargetType.Self },
                     new Skill { Name = "Heal All", MPCost = 8, EffectValue = 50, EffectType = EffectType.Heal, TargetType = TargetType.AllAllies },
@@ -80,7 +80,7 @@ namespace JRPG.Core.Systems.Parties
                 MaxMP = 30,
                 BaseAttack = 5,
                 BaseDefense = 3,
-                EXP = 150,
+                EXP = 399,
                 EXPToNextLevel = 400,
             });
 

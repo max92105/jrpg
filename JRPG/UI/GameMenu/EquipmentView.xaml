@@ -1,6 +1,7 @@
 ﻿<UserControl x:Class="JRPG.UI.GameMenu.EquipmentView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:JRPG.UI.GameMenu.Controls"
              Background="Transparent">
     <Grid>
         <Grid.RowDefinitions>
@@ -68,6 +69,6 @@
         </Border>
 
         <!-- Section: Stats -->
-        <StackPanel x:Name="StatsPanel" Grid.Row="4" Margin="20"/>
+        <controls:StatsPanel x:Name="cStatsPanel" Grid.Row="4" Margin="20"/>
     </Grid>
 </UserControl>

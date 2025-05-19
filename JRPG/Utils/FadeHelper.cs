@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 
 namespace JRPG.Core.Utils
 {

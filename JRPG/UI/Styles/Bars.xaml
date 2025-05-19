@@ -10,6 +10,15 @@
         <GradientStop Color="#FF3366FF" Offset="1"/>
     </LinearGradientBrush>
 
+    <LinearGradientBrush x:Key="XpBarFill" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#FFB8860B" Offset="0" />
+        <!-- Goldenrod -->
+        <GradientStop Color="#FFFFD700" Offset="0.5" />
+        <!-- Bright gold (glow center) -->
+        <GradientStop Color="#FFF5DEB3" Offset="1" />
+        <!-- Light golden wheat -->
+    </LinearGradientBrush>
+
     <Style x:Key="RoundedProgressBarStyle" TargetType="ProgressBar">
         <Setter Property="Height" Value="10"/>
         <Setter Property="FlowDirection" Value="LeftToRight"/>

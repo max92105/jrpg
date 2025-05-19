@@ -3,10 +3,8 @@ using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems.Inventories.Models;
 using System.Collections.Generic;
 using System.Linq;
-using JRPG.Core.Systems.Inventories.Enums;
 using JRPG.Core.Systems.Equipments.Models;
 using JRPG.Core.Systems.SaveGames.Models;
-using System.Windows.Controls;
 
 namespace JRPG.Core.Systems.Inventories
 {

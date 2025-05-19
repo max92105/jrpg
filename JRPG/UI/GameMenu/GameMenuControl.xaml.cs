@@ -10,7 +10,6 @@ using System.Windows.Media.Imaging;
 using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
 using JRPG.Core.Systems.Equipments.Models;
-using JRPG.Core.Systems.Inventories.Enums;
 using JRPG.Core.Systems.Inventories.Models;
 using JRPG.Core.Utils;
 using JRPG.Utils;
@@ -163,6 +162,8 @@ namespace JRPG.UI.GameMenu
 
         private void EquipmentButton_Click(object sender, RoutedEventArgs e)
         {
+            HideSecondary();
+
             var equipmentView = new EquipmentView();
             GameMenuContent.Content = equipmentView;
 
@@ -182,7 +183,22 @@ namespace JRPG.UI.GameMenu
 
         private void StatusButton_Click(object sender, RoutedEventArgs e)
         {
+            HideSecondary();
+
             GameMenuContent.Content = new StatusView();
+
+            var party = GameSystems.Party.AllCharacters;
+
+            var characterFilters = party.Select(c => new FilterOption<Character>
+            {
+                FilterValue = c,
+                IconFile = c.PortraitFile,
+                Label = c.Name,
+                PathResolver = AssetPathResolver.GetPortraitPath
+            });
+
+            var buttons = characterFilters.Select(CreateFilterIcon).ToArray();
+            SetContextOptions(buttons);
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)

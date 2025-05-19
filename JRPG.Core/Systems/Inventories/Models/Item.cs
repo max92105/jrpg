@@ -1,6 +1,4 @@
-﻿using JRPG.Core.Systems.Inventories.Enums;
-
-namespace JRPG.Core.Systems.Inventories.Models
+﻿namespace JRPG.Core.Systems.Inventories.Models
 {
     public class Item
     {

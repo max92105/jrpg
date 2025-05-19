@@ -1,9 +1,6 @@
 ﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Battles.Models.Enemies;
 using JRPG.Core.Systems;
-using JRPG.Core.Systems.Equipments;
-using JRPG.Core.Systems.Inventories;
-using JRPG.Core.Systems.Parties;
 using JRPG.Core.Utils;
 using JRPG.UI.Battle;
 using JRPG.UI.GameMenu;

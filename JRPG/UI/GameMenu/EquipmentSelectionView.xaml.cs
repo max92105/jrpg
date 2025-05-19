@@ -1,7 +1,6 @@
 ﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
 using JRPG.Core.Systems.Equipments.Models;
-using JRPG.Core.Systems.Inventories.Models;
 using JRPG.UI.GameMenu.Controls;
 using System;
 using System.Linq;

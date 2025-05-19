@@ -2,7 +2,6 @@
 using JRPG.Core.Battles.Enums;
 using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
-using JRPG.Core.Systems.Inventories;
 using JRPG.Core.Systems.Inventories.Models;
 using JRPG.Core.Utils;
 using JRPG.UI.Battle.Controls;

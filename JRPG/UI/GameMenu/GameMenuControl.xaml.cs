@@ -19,6 +19,7 @@ namespace JRPG.UI.GameMenu
     public partial class GameMenuControl : UserControl
     {
         public Action<int> OnLoadSlotConfirmed { get; set; }
+        public event Func<Task> ReturnToMainMenuRequested;
 
         public GameMenuControl()
         {
@@ -235,8 +236,6 @@ namespace JRPG.UI.GameMenu
 
         private async void ReturnToMenuButton_Click(object sender, RoutedEventArgs e)
         {
-            await FadeHelper.FadeToBlackAsync(((MainWindow)Application.Current.MainWindow).FadeRect);
-
             foreach (var child in ButtonPanel.Children)
             {
                 if (child is ToggleButton button)
@@ -245,15 +244,8 @@ namespace JRPG.UI.GameMenu
                 }
             }
 
-            // Show start screen and hide game elements
-            var mainWindow = (MainWindow)Application.Current.MainWindow;
-            mainWindow.GameMenuControl.Visibility = Visibility.Collapsed;
-            mainWindow.GameCanvas.Visibility = Visibility.Collapsed;
-            mainWindow.StartScreen.Visibility = Visibility.Visible;
-
-            await Task.Delay(300); // Allow layout update
-
-            await FadeHelper.FadeFromBlackAsync(((MainWindow)Application.Current.MainWindow).FadeRect);
+            if (ReturnToMainMenuRequested != null)
+                await ReturnToMainMenuRequested.Invoke();
         }
 
         private void CloseGameMenu_Click(object sender, RoutedEventArgs e)

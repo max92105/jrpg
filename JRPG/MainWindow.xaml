@@ -11,6 +11,69 @@
         KeyUp="Window_KeyUp"
         WindowStyle="None"
         Background="Black">
+    <Window.Resources>
+        <Style x:Key="StartMenuButtonStyle" TargetType="Button">
+            <Setter Property="FontSize" Value="48" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="FontFamily" Value="Cinzel Decorative"/>
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+            <Setter Property="RenderTransform">
+                <Setter.Value>
+                    <ScaleTransform ScaleX="1" ScaleY="1"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter x:Name="ContentPresenter"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  TextBlock.FontSize="{TemplateBinding FontSize}"
+                                  TextBlock.Foreground="{TemplateBinding Foreground}"
+                                  TextBlock.FontWeight="{TemplateBinding FontWeight}">
+                            <ContentPresenter.Effect>
+                                <DropShadowEffect x:Name="GlowEffect"
+                                          Color="White"
+                                          BlurRadius="8"
+                                          ShadowDepth="0"
+                                          Opacity="0.5"/>
+                            </ContentPresenter.Effect>
+                        </ContentPresenter>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="1.1" ScaleY="1.1"/>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <DropShadowEffect Color="White"
+                                      BlurRadius="15"
+                                      ShadowDepth="0"
+                                      Opacity="1" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="0.98" ScaleY="0.98"/>
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
 
     <Grid Name="MasterGrid">
         <Grid Name="RootGrid">
@@ -25,55 +88,81 @@
                                      Panel.ZIndex="50" />
 
             <!-- 🟢 StartScreen moved to TOP of RootGrid -->
-            <Grid x:Name="StartScreen" Background="Black" Visibility="Visible" Panel.ZIndex="99">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="My JRPG"
-                               Foreground="White"
-                               FontSize="48"
-                               FontWeight="Bold"
-                               HorizontalAlignment="Center"
-                               Margin="0,0,0,20" />
+            <Grid x:Name="StartScreen" Visibility="Visible" Panel.ZIndex="99">
+                <!-- Background image -->
+                <Image Name="MenuBackground"
+                   Stretch="UniformToFill"
+                   Opacity="1"
+                   Panel.ZIndex="0" />
 
-                    <Button Content="Start Game" 
-                            x:Name="StartButton"
-                            Width="200"
-                            Height="50"
-                            FontSize="24"
-                            HorizontalAlignment="Center"
-                            Click="StartButton_Click"/>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <!-- Title -->
+                        <RowDefinition Height="*"/>
+                        <!-- Menu -->
+                    </Grid.RowDefinitions>
 
-                    <Button Content="Load Game" 
-                            x:Name="LoadButton"
-                            Width="200"
-                            Height="50"
-                            FontSize="24"
-                            HorizontalAlignment="Center"
-                            Click="LoadButton_Click" />
+                    <!-- Title Text -->
+                    <TextBlock Text="The Lost Realm"
+                           Grid.Row="0"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Top"
+                           Margin="0,60,0,0"
+                           FontSize="100"
+                           FontWeight="Bold"
+                           Foreground="White"
+                           TextAlignment="Center">
+                        <TextBlock.Effect>
+                            <DropShadowEffect Color="Black"
+                              BlurRadius="10"
+                              ShadowDepth="4"
+                              Direction="320"
+                              Opacity="0.7"/>
+                        </TextBlock.Effect>
+                        <TextBlock.FontFamily>
+                            <!-- Replace with your custom font path or use an embedded font -->
+                            <FontFamily>/Fonts/#Cinzel Decorative</FontFamily>
+                        </TextBlock.FontFamily>
+                    </TextBlock>
 
-                    <Button Content="Exit Game" 
-                            x:Name="ExitGame"
-                            Width="200"
-                            Height="50"
-                            FontSize="24"
-                            HorizontalAlignment="Center"
-                            Click="ExitButton_Click" />
-                </StackPanel>
+                    <!-- Menu StackPanel -->
+                    <StackPanel Grid.Row="1"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Panel.ZIndex="1">
+                        <Button Style="{StaticResource StartMenuButtonStyle}" 
+                                Content="Start Game" Margin="0,0,0,20"
+                                x:Name="StartButton"
+                                Click="StartButton_Click" />
+
+                        <Button Style="{StaticResource StartMenuButtonStyle}" 
+                                Content="Load Game" Margin="0,0,0,20"
+                                x:Name="LoadButton"
+                                Click="LoadButton_Click" />
+
+                        <Button Style="{StaticResource StartMenuButtonStyle}" 
+                                Content="Exit Game" Margin="0,0,0,20"
+                                x:Name="ExitGame"
+                                Click="ExitButton_Click" />
+                    </StackPanel>
+                </Grid>
             </Grid>
-        </Grid>
 
-        <Rectangle x:Name="FadeRect"
+            <Rectangle x:Name="FadeRect"
                    Fill="Black"
                    Opacity="0"
-                   Visibility="Collapsed"
-                   Panel.ZIndex="100"
+                   Visibility="Visible"
+                   Panel.ZIndex="9999"
                    IsHitTestVisible="False" />
 
-        <local:DialogueBox x:Name="DialogueUI"
+            <local:DialogueBox x:Name="DialogueUI"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Bottom"
                            Margin="0,0,0,20"
                            Height="120"
                            Width="600"
                            Panel.ZIndex="200" />
+        </Grid>
     </Grid>
 </Window>

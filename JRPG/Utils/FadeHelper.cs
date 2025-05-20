@@ -11,20 +11,25 @@ namespace JRPG.Core.Utils
         {
             var tcs = new TaskCompletionSource<bool>();
 
+            // Ensure it's visible and fully stretched
             fadeRect.Visibility = Visibility.Visible;
-            fadeRect.Width = Application.Current.MainWindow.ActualWidth;
-            fadeRect.Height = Application.Current.MainWindow.ActualHeight;
+            fadeRect.Opacity = fadeRect.Opacity;
 
-            var storyboard = new Storyboard();
+            // Force a layout/render pass before starting animation
+            await Task.Delay(1);
+            await Application.Current.Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Render);
+
             var animation = new DoubleAnimation
             {
                 To = toOpacity,
                 Duration = TimeSpan.FromSeconds(durationSec),
-                FillBehavior = FillBehavior.Stop
+                FillBehavior = FillBehavior.HoldEnd
             };
 
             Storyboard.SetTarget(animation, fadeRect);
             Storyboard.SetTargetProperty(animation, new PropertyPath(UIElement.OpacityProperty));
+
+            var storyboard = new Storyboard();
             storyboard.Children.Add(animation);
 
             storyboard.Completed += (s, e) =>
@@ -33,7 +38,7 @@ namespace JRPG.Core.Utils
                 if (toOpacity == 0)
                     fadeRect.Visibility = Visibility.Collapsed;
 
-                tcs.SetResult(true);
+                tcs.TrySetResult(true);
             };
 
             storyboard.Begin();

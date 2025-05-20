@@ -6,13 +6,16 @@ using JRPG.UI.Battle;
 using JRPG.UI.GameMenu;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace JRPG
 {
@@ -44,6 +47,8 @@ namespace JRPG
             ResizeMode = ResizeMode.NoResize;
             //Topmost = true;
 
+            MenuBackground.Source = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetBackgroundsPath("StartMenu.png"))));
+
             CompositionTarget.Rendering += (s, eventArgs) =>
             {
                 if (StartScreen.Visibility == Visibility.Visible || GameMenuControl?.Visibility == Visibility.Visible)
@@ -65,6 +70,8 @@ namespace JRPG
             dialogueManager = new DialogueManager(DialogueUI.TextElement, DialogueUI.Container, DialogueUI.Portrait, DialogueUI.Speaker, DialogueUI.ContinueIcon);
 
             GameMenuControl = new GameMenuControl();
+            GameMenuControl.ReturnToMainMenuRequested += ReturnToMainMenuAsync;
+
             GameMenuControl.OnLoadSlotConfirmed = async (slotIndex) =>
             {
                 var save = await gameSystemManager.LoadFromSlotAsync(slotIndex);
@@ -90,7 +97,7 @@ namespace JRPG
             };
 
             GameMenuControl.Visibility = Visibility.Collapsed;
-            Panel.SetZIndex(GameMenuControl, 1000);
+            Panel.SetZIndex(GameMenuControl, 900);
             RootGrid.Children.Add(GameMenuControl);
 
             GameCanvas.Visibility = Visibility.Collapsed;
@@ -209,6 +216,19 @@ namespace JRPG
             await FadeHelper.FadeFromBlackAsync(FadeRect);
 
             Focus();
+        }
+
+        public async Task ReturnToMainMenuAsync()
+        {
+            await FadeHelper.FadeToBlackAsync(FadeRect);
+
+            GameMenuControl.Visibility = Visibility.Collapsed;
+            GameCanvas.Visibility = Visibility.Collapsed;
+            StartScreen.Visibility = Visibility.Visible;
+
+            await Task.Delay(300); // Optional delay for layout
+
+            await FadeHelper.FadeFromBlackAsync(FadeRect);
         }
 
         private async void LoadButton_Click(object sender, RoutedEventArgs e)

@@ -89,7 +89,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="GameSystemManager.cs" />
     <Compile Include="UI\Battle\Controls\CharacterPanel.xaml.cs">
       <DependentUpon>CharacterPanel.xaml</DependentUpon>
     </Compile>
@@ -117,6 +116,9 @@
     <Compile Include="UI\GameMenu\Controls\CharacterPortrait.xaml.cs">
       <DependentUpon>CharacterPortrait.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\GameMenu\Controls\SaveSlotPanel.xaml.cs">
+      <DependentUpon>SaveSlotPanel.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\GameMenu\Controls\StatsPanel.xaml.cs">
       <DependentUpon>StatsPanel.xaml</DependentUpon>
     </Compile>
@@ -134,6 +136,9 @@
     </Compile>
     <Compile Include="UI\GameMenu\PartyView.xaml.cs">
       <DependentUpon>PartyView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\GameMenu\SaveLoadView.xaml.cs">
+      <DependentUpon>SaveLoadView.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\GameMenu\StatusView.xaml.cs">
       <DependentUpon>StatusView.xaml</DependentUpon>
@@ -188,6 +193,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\GameMenu\Controls\SaveSlotPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\GameMenu\Controls\StatsPanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -209,6 +218,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\GameMenu\PartyView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\GameMenu\SaveLoadView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

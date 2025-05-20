@@ -84,6 +84,7 @@
     <Compile Include="Systems\Equipments\Models\Equipment.cs" />
     <Compile Include="Systems\Equipments\Models\EquipmentEntry.cs" />
     <Compile Include="Systems\Equipments\Models\Weapon.cs" />
+    <Compile Include="Systems\GameSystemManager.cs" />
     <Compile Include="Systems\GameSystems.cs" />
     <Compile Include="Systems\Inventories\Enums\ItemType.cs" />
     <Compile Include="Systems\Inventories\InventoryManager.cs" />
@@ -118,6 +119,7 @@
     <Compile Include="Systems\Inventories\Models\Item.cs" />
     <Compile Include="Systems\SaveGames\Models\SaveData.cs" />
     <Compile Include="Systems\Parties\PartyManager.cs" />
+    <Compile Include="Systems\SaveGames\Models\SaveDataPreview.cs" />
     <Compile Include="Systems\SaveGames\Models\SavedInventoryEntry.cs" />
     <Compile Include="Systems\SaveGames\SaveGameManager.cs" />
     <Compile Include="Triggers\IO\TriggerJsonConverter.cs" />

@@ -10,9 +10,9 @@ namespace JRPG.Core.Systems.SaveGames
 {
     public class SaveGameManager
     {
-        private static readonly string SaveDirectory = "Saves";
+        private readonly string SaveDirectory = "Saves";
 
-        public static void SaveGame(int slot,
+        public void SaveGame(int slot,
             List<Character> characters,
             List<SavedInventoryEntry> playerInventory,
             string currentMapFile, 
@@ -46,25 +46,21 @@ namespace JRPG.Core.Systems.SaveGames
             File.WriteAllText(Path.Combine(SaveDirectory, $"save{slot}.json"), json);
         }
 
-        public static string GetLocationName(string mapFilename)
+        public string GetLocationName(string mapFilename)
         {
             // Expand this later
             switch(mapFilename)
             {
-                case "village.map":
-                    return "Village of Beginnings";
-                case "house.map":
-                    return "House";
-                case "forest.map":
-                    return "Mystic Forest";
-                case "cave.map":
-                    return "Goblin Cave";
+                case "start.json":
+                    return "Forest";
+                case "start2.json":
+                    return "Forest 2";
                 default:
                     return "Unknown Location";
             };
         }
 
-        public static SaveData LoadGame(int slot)
+        public SaveData LoadGame(int slot)
         {
             string path = Path.Combine(SaveDirectory, $"save{slot}.json");
 
@@ -80,9 +76,54 @@ namespace JRPG.Core.Systems.SaveGames
             return saveData;
         }
 
-        public static bool SaveExists(int slot)
+        public bool SaveExists(int slot)
         {
             return File.Exists(Path.Combine(SaveDirectory, $"save{slot}.json"));
+        }
+
+        public List<SaveDataPreview> GetAllSavePreviews()
+        {
+            var previews = new List<SaveDataPreview>();
+
+            for (int i = 0; i < 20; i++) // example: 3 slots
+            {
+                string path = Path.Combine("Saves", $"save{i}.json");
+
+                if (!File.Exists(path))
+                {
+                    previews.Add(new SaveDataPreview
+                    {
+                        SlotIndex = i,
+                        IsEmpty = true
+                    });
+                    continue;
+                }
+
+                try
+                {
+                    var json = File.ReadAllText(path);
+                    var data = JsonSerializer.Deserialize<SaveData>(json);
+
+                    previews.Add(new SaveDataPreview
+                    {
+                        SlotIndex = i,
+                        IsEmpty = false,
+                        Timestamp = data.SaveTimestamp,
+                        MapName = data.LocationName,
+                        Party = data.Characters
+                    });
+                }
+                catch
+                {
+                    previews.Add(new SaveDataPreview
+                    {
+                        SlotIndex = i,
+                        IsCorrupt = true
+                    });
+                }
+            }
+
+            return previews;
         }
     }
 }

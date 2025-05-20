@@ -1,5 +1,6 @@
 ﻿using JRPG.Core.Enums;
 using JRPG.Core.Maps;
+using JRPG.Core.Systems;
 using JRPG.Core.Triggers.Models;
 using JRPG.Core.Utils;
 using JRPG.Enums;
@@ -204,6 +205,8 @@ namespace JRPG
             }
 
             UpdateCamera();
+
+            GameSystems.System.UpdatePlayerPosition(playerX, playerY);
         }
 
         private void UpdateCamera()
@@ -379,6 +382,9 @@ namespace JRPG
                     mapManager.LoadFromFile(currentMapFile);
                     playerX = warp.TargetX;
                     playerY = warp.TargetY;
+
+                    GameSystems.System.UpdateCurrentMap(currentMapFile);
+                    GameSystems.System.UpdatePlayerPosition(playerX, playerY);
                     break;
 
                 case TriggerDialogue dialogue:

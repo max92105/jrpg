@@ -25,9 +25,13 @@ namespace JRPG
         private int totalPlayTimeSeconds = 0;
         private Character draggedCharacter = null;
 
-        private bool IsInputLocked => isTransitioning || dialogueManager.IsActive || CutsceneManager.IsPlaying || isInBattle;
+        private bool IsInputLocked => isTransitioning ||
+                                    (dialogueManager?.IsActive ?? false) ||
+                                    (CutsceneManager.IsPlaying) ||
+                                    isInBattle;
         private bool isTransitioning = false;
         private bool isInBattle = false;
+        private bool IsGameReady => game != null && GameCanvas != null && RootGrid.Children.Contains(GameCanvas);
 
         public MainWindow()
         {
@@ -37,42 +41,59 @@ namespace JRPG
             WindowState = WindowState.Maximized;
             ResizeMode = ResizeMode.NoResize;
             //Topmost = true;
+
+            Loaded += (s, routedEvent) => Keyboard.Focus(GameCanvas);
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void NewGame()
         {
-            game = new Game(GameCanvas);
+            GameSystems.Initialize(); // includes GameSystems.System
+            gameSystemManager = GameSystems.System;
 
+            game = new Game(GameCanvas);
             dialogueManager = new DialogueManager(DialogueUI.TextElement, DialogueUI.Container, DialogueUI.Portrait, DialogueUI.Speaker, DialogueUI.ContinueIcon);
 
-            GameSystems.Initialize();
+            GameMenuControl = new GameMenuControl();
+            GameMenuControl.OnLoadSlotConfirmed = async (slotIndex) =>
+            {
+                var save = await gameSystemManager.LoadFromSlotAsync(slotIndex);
+                if (save == null)
+                {
+                    MessageBox.Show("Failed to load save file.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    return;
+                }
 
-            gameSystemManager = new GameSystemManager(
-               game,
-               FadeRect
-           );
+                await FadeHelper.FadeToBlackAsync(FadeRect);
+                StartScreen.Visibility = Visibility.Collapsed;
+                GameCanvas.Visibility = Visibility.Visible;
+                GameMenuControl.Visibility = Visibility.Collapsed;
 
-            gameSystemManager.StartSessionTimer();
+                game.LoadFromFile(save.CurrentMap);
+                game.playerX = save.PlayerX;
+                game.playerY = save.PlayerY;
 
-            GameMenuControl = new GameMenuControl(gameSystemManager);
+                await Task.Delay(300);
+                await FadeHelper.FadeFromBlackAsync(FadeRect);
+
+                GameMenuControl.GameMenuContent.Content = null;
+            };
+
             GameMenuControl.Visibility = Visibility.Collapsed;
             Panel.SetZIndex(GameMenuControl, 1000);
             RootGrid.Children.Add(GameMenuControl);
 
-            GameCanvas.Visibility = Visibility.Collapsed; // Hide gameplay at start     
+            GameCanvas.Visibility = Visibility.Collapsed;
 
             CompositionTarget.Rendering += (s, eventArgs) =>
             {
                 if (StartScreen.Visibility == Visibility.Visible || GameMenuControl.Visibility == Visibility.Visible)
-                    return; // Don't update world if Start Menu or Game Menu open
+                    return;
 
                 if (!dialogueManager.IsActive)
                     game.Update();
 
                 game.Render();
             };
-
-            Loaded += (s, routedEvent) => Keyboard.Focus(GameCanvas);
         }
 
         public async void StartBattle()
@@ -131,31 +152,27 @@ namespace JRPG
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            // ESC should always work unless on StartScreen
-            if (e.Key == Key.Escape && StartScreen.Visibility != Visibility.Visible)
+            // ESC toggles GameMenu unless on StartScreen
+            if (e.Key == Key.Escape && StartScreen?.Visibility != Visibility.Visible)
             {
-                if (GameMenuControl.Visibility == Visibility.Visible)
+                if (GameMenuControl != null)
                 {
-                    GameMenuControl.Visibility = Visibility.Collapsed;
-                    Panel.SetZIndex(GameMenuControl, 0);
-                }
-                else
-                {
-                    GameMenuControl.Visibility = Visibility.Visible;
-                    Panel.SetZIndex(GameMenuControl, 1000);
+                    bool showing = GameMenuControl.Visibility == Visibility.Visible;
+                    GameMenuControl.Visibility = showing ? Visibility.Collapsed : Visibility.Visible;
+                    Panel.SetZIndex(GameMenuControl, showing ? 0 : 1000);
                 }
                 return;
             }
 
-            // SPACE should always work when dialogue is active
-            if (dialogueManager.IsActive && e.Key == Key.Space)
+            // SPACE skips dialogue
+            if (dialogueManager?.IsActive == true && e.Key == Key.Space)
             {
                 dialogueManager.Skip();
                 return;
             }
 
-            // Allow cutscene launch even during gameplay (can limit if needed)
-            if (e.Key == Key.F1)
+            // F1 starts cutscene
+            if (e.Key == Key.F1 && CutscenePlayer != null)
             {
                 var cutsceneManager = new CutsceneManager(CutscenePlayer);
                 cutsceneManager.StartIntroCutscene();
@@ -164,7 +181,7 @@ namespace JRPG
 
             if (IsInputLocked) return;
 
-            if (RootGrid.Children.Contains(GameCanvas))
+            if (game != null && RootGrid.Children.Contains(GameCanvas))
                 game.OnKeyDown(e.Key);
         }
 
@@ -172,7 +189,7 @@ namespace JRPG
         {
             if (IsInputLocked) return;
 
-            if (RootGrid.Children.Contains(GameCanvas))
+            if (IsGameReady)
                 game.OnKeyUp(e.Key);
         }
 
@@ -181,6 +198,8 @@ namespace JRPG
             await FadeHelper.FadeToBlackAsync(FadeRect);
 
             // Switch screens AFTER full black
+            NewGame();
+
             StartScreen.Visibility = Visibility.Collapsed;
             GameCanvas.Visibility = Visibility.Visible;
 
@@ -190,37 +209,14 @@ namespace JRPG
             await FadeHelper.FadeFromBlackAsync(FadeRect);
         }
 
-        private void ResumeButton_Click(object sender, RoutedEventArgs e)
-        {
-            GameMenuControl.Visibility = Visibility.Collapsed;
-        }
-
-        private async void ReturnToMenuButton_Click(object sender, RoutedEventArgs e)
-        {
-            await FadeHelper.FadeToBlackAsync(FadeRect);
-
-            GameMenuControl.Visibility = Visibility.Collapsed;
-            GameCanvas.Visibility = Visibility.Collapsed;
-            StartScreen.Visibility = Visibility.Visible;
-
-            await Task.Delay(300);
-
-            await FadeHelper.FadeFromBlackAsync(FadeRect);
-        }
-
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
-        {
-            gameSystemManager.SaveGame();
-        }
-
         private async void LoadButton_Click(object sender, RoutedEventArgs e)
         {
-            await gameSystemManager.LoadGameAsync(StartScreen, GameCanvas);
+            //await gameSystemManager.LoadGameAsync(StartScreen, GameCanvas);
         }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
-            gameSystemManager.ExitGame();
+            Application.Current.Shutdown();
         }
     }
 }

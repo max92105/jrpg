@@ -1,12 +1,10 @@
 ﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
-using JRPG.UI.GameMenu.Controls;
 using JRPG.Utils;
 using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using System.Windows.Media.Animation;
 
 namespace JRPG.UI.GameMenu

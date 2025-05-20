@@ -18,18 +18,11 @@ namespace JRPG.UI.GameMenu
 {
     public partial class GameMenuControl : UserControl
     {
-        private readonly GameSystemManager gameSystemManager;
+        public Action<int> OnLoadSlotConfirmed { get; set; }
 
         public GameMenuControl()
         {
             InitializeComponent();
-        }
-
-        public GameMenuControl(GameSystemManager gameSystemManager)
-        {
-            InitializeComponent();
-
-            this.gameSystemManager = gameSystemManager;
 
             MenuBackground.Source = new BitmapImage(new Uri(AssetPathResolver.GetBackgroundsPath("GameMenu.png")));
         }
@@ -201,22 +194,43 @@ namespace JRPG.UI.GameMenu
             SetContextOptions(buttons);
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
-        {
-            gameSystemManager.SaveGame();
-        }
-
         private void OptionsButton_Click(object sender, RoutedEventArgs e)
         {
+            HideSecondary();
+
             GameMenuContent.Content = new TextBlock { Text = "Options (Coming Soon)", FontSize = 24, Foreground = System.Windows.Media.Brushes.White };
         }
 
-        private async void LoadButton_Click(object sender, RoutedEventArgs e)
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            await gameSystemManager.LoadGameAsync(
-                ((MainWindow)Application.Current.MainWindow).StartScreen,
-                ((MainWindow)Application.Current.MainWindow).GameCanvas
+            HideSecondary();
+
+            GameMenuContent.Content = new SaveLoadView(
+                 SaveLoadView.SaveLoadMode.Save,
+                 async (slotIndex) => { /* no-op, logic already handled in view */ },
+                 () => { }
+             );
+
+            SetContextOptions(null);
+        }
+
+        private void LoadButton_Click(object sender, RoutedEventArgs e)
+        {
+            HideSecondary();
+
+            GameMenuContent.Content = new SaveLoadView(
+                SaveLoadView.SaveLoadMode.Load,
+                async (slotIndex) =>
+                {
+                    OnLoadSlotConfirmed?.Invoke(slotIndex);
+                },
+                () =>
+                {
+                    GameMenuContent.Content = null;
+                }
             );
+
+            SetContextOptions(null);
         }
 
         private async void ReturnToMenuButton_Click(object sender, RoutedEventArgs e)
@@ -257,7 +271,7 @@ namespace JRPG.UI.GameMenu
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)
         {
-            gameSystemManager.ExitGame();
+            Application.Current.Shutdown();
         }
 
         public void ShowContent(UserControl content)

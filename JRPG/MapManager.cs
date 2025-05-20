@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using JRPG.Core.Maps.IO;
 using JRPG.Core.Maps.Models;
+using JRPG.Core.Systems;
 using JRPG.Core.Triggers.Models;
 using JRPG.Core.Utils;
 
@@ -21,6 +22,8 @@ namespace JRPGPlayerDemo
         public void LoadFromFile(string file)
         {
             CurrentMap = MapSerializer.Load(AssetPathResolver.GetPath(Path.Combine("Maps//", file)));
+
+            GameSystems.System.UpdateCurrentMap(file);
         }
 
         public bool IsWalkable(int x, int y)

@@ -10,8 +10,7 @@
         KeyDown="Window_KeyDown"
         KeyUp="Window_KeyUp"
         WindowStyle="None"       
-        Background="Black"
-        Loaded="Window_Loaded">
+        Background="Black">
     <Grid Name="MasterGrid">
         <Grid Name="RootGrid">
             <Grid x:Name="StartScreen" Background="Black" Visibility="Visible">

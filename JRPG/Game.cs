@@ -106,9 +106,12 @@ namespace JRPG
 
             var root = (Grid)Application.Current.MainWindow.FindName("RootGrid");
 
-            if (mapVisualHost != null && root.Children.Contains(mapVisualHost))
+            for (int i = root.Children.Count - 1; i >= 0; i--)
             {
-                root.Children.Remove(mapVisualHost);
+                if (root.Children[i] is VisualHost)
+                {
+                    root.Children.RemoveAt(i);
+                }
             }
 
             mapVisual = new DrawingVisual();
@@ -117,8 +120,9 @@ namespace JRPG
 
             mapVisualHost.Width = canvas.ActualWidth;
             mapVisualHost.Height = canvas.ActualHeight;
-            Canvas.SetLeft(mapVisualHost, 0); // just in case it needs it
-            Canvas.SetTop(mapVisualHost, 0);
+
+            mapVisualHost.HorizontalAlignment = HorizontalAlignment.Left;
+            mapVisualHost.VerticalAlignment = VerticalAlignment.Top;
 
             root.Children.Insert(0, mapVisualHost); // Put behind everything
 

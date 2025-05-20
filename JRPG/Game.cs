@@ -73,6 +73,12 @@ namespace JRPG
         private double tileAnimationTimer = 0;
         private int tileAnimationFrame = 0;
 
+        //better rendering
+        private Dictionary<string, BitmapImage> imageCache = new Dictionary<string, BitmapImage>();
+        private double lastCameraX = -1;
+        private double lastCameraY = -1;
+        private int lastRedrawnTileFrame = -1;
+
         public Game(Canvas canvas)
         {
             this.canvas = canvas;
@@ -99,6 +105,11 @@ namespace JRPG
             canvas.Height = SystemParameters.PrimaryScreenHeight;
 
             var root = (Grid)Application.Current.MainWindow.FindName("RootGrid");
+
+            if (mapVisualHost != null && root.Children.Contains(mapVisualHost))
+            {
+                root.Children.Remove(mapVisualHost);
+            }
 
             mapVisual = new DrawingVisual();
             mapVisualHost = new VisualHost();
@@ -231,7 +242,15 @@ namespace JRPG
             cameraX += (targetX - cameraX) * easing;
             cameraY += (targetY - cameraY) * easing;
 
-            RedrawMapVisual();
+            bool cameraMoved = Math.Abs(cameraX - lastCameraX) > 0.01 || Math.Abs(cameraY - lastCameraY) > 0.01;
+            bool tileFrameChanged = tileAnimationFrame != lastRedrawnTileFrame;
+
+            if (cameraMoved || tileFrameChanged)
+                RedrawMapVisual();
+
+            lastCameraX = cameraX;
+            lastCameraY = cameraY;
+            lastRedrawnTileFrame = tileAnimationFrame;
         }
 
         public void Render()
@@ -289,11 +308,11 @@ namespace JRPG
                         {
                             int frameIndex = (int)(time / def.FrameDuration) % def.Frames.Length;
                             var framePath = def.Frames[frameIndex];
-                            imgSource = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), framePath)));
+                            imgSource = GetCachedImage(framePath);
                         }
                         else if (!string.IsNullOrEmpty(def.Sprite))
                         {
-                            imgSource = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), def.Sprite)));
+                            imgSource = GetCachedImage(def.Sprite);
                         }
 
                         if (imgSource != null)
@@ -319,12 +338,22 @@ namespace JRPG
                         screenY + MapConstant.TileSize < 0 || screenY > canvas.ActualHeight)
                         continue;
 
-                    var img = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), def.SpritePath)));
+                    var img = GetCachedImage(def.SpritePath);
                     Rect rect = new Rect(screenX, screenY, MapConstant.TileSize, MapConstant.TileSize);
                     
                     dc.DrawImage(img, new Rect(screenX, screenY, MapConstant.TileSize, MapConstant.TileSize));
                 }
             }
+        }
+
+        private BitmapImage GetCachedImage(string path)
+        {
+            if (imageCache.TryGetValue(path, out var cached))
+                return cached;
+
+            var bitmap = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), path)));
+            imageCache[path] = bitmap;
+            return bitmap;
         }
 
         private bool CanMoveTo(double x, double y)

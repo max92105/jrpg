@@ -9,19 +9,30 @@
         WindowStartupLocation="CenterScreen"
         KeyDown="Window_KeyDown"
         KeyUp="Window_KeyUp"
-        WindowStyle="None"       
+        WindowStyle="None"
         Background="Black">
+
     <Grid Name="MasterGrid">
         <Grid Name="RootGrid">
-            <Grid x:Name="StartScreen" Background="Black" Visibility="Visible">
+            <!-- Lower layers first -->
+            <gamemenu:GameMenuControl x:Name="GameMenuControl" />
+
+            <Canvas x:Name="GameCanvas" Width="1920" Height="1080"
+                    Background="Transparent" />
+
+            <cutscene:CutscenePlayer x:Name="CutscenePlayer"
+                                     Visibility="Collapsed"
+                                     Panel.ZIndex="50" />
+
+            <!-- 🟢 StartScreen moved to TOP of RootGrid -->
+            <Grid x:Name="StartScreen" Background="Black" Visibility="Visible" Panel.ZIndex="99">
                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="My JRPG" 
-                   Foreground="White" 
-                   FontSize="48" 
-                   FontWeight="Bold"
-                   HorizontalAlignment="Center"
-                   Margin="0,0,0,20"/>
-                    <!-- Margin to add spacing -->
+                    <TextBlock Text="My JRPG"
+                               Foreground="White"
+                               FontSize="48"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,20" />
 
                     <Button Content="Start Game" 
                             x:Name="StartButton"
@@ -29,41 +40,41 @@
                             Height="50"
                             FontSize="24"
                             HorizontalAlignment="Center"
-                            Click="StartButton_Click"/>
+                            Click="StartButton_Click"
+                            ToolTip="This button is alive!" />
+
                     <Button Content="Load Game" 
                             x:Name="LoadButton"
                             Width="200"
                             Height="50"
                             FontSize="24"
                             HorizontalAlignment="Center"
-                            Click="LoadButton_Click"/>
+                            Click="LoadButton_Click" />
+
                     <Button Content="Exit Game" 
                             x:Name="ExitGame"
                             Width="200"
                             Height="50"
                             FontSize="24"
                             HorizontalAlignment="Center"
-                            Click="ExitButton_Click"/>
+                            Click="ExitButton_Click" />
                 </StackPanel>
             </Grid>
-
-            <gamemenu:GameMenuControl x:Name="GameMenuControl" />
-            
-            <Canvas x:Name="GameCanvas" Width="1920" Height="1080"
-            Background="Transparent" />
-
-            <cutscene:CutscenePlayer x:Name="CutscenePlayer" Visibility="Collapsed" Panel.ZIndex="50"/>
         </Grid>
 
-        <Rectangle Name="FadeRect" Fill="Black" Opacity="0" Visibility="Collapsed"
-               Panel.ZIndex="100" IsHitTestVisible="False"/>
+        <Rectangle x:Name="FadeRect"
+                   Fill="Black"
+                   Opacity="0"
+                   Visibility="Collapsed"
+                   Panel.ZIndex="100"
+                   IsHitTestVisible="False" />
 
         <local:DialogueBox x:Name="DialogueUI"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Bottom"
-                   Margin="0,0,0,20"
-                   Height="120"
-                   Width="600"
-                   Panel.ZIndex="200"/>
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Bottom"
+                           Margin="0,0,0,20"
+                           Height="120"
+                           Width="600"
+                           Panel.ZIndex="200" />
     </Grid>
 </Window>

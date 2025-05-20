@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Media;
 
 namespace JRPG
@@ -29,6 +30,7 @@ namespace JRPG
                                     (dialogueManager?.IsActive ?? false) ||
                                     (CutsceneManager.IsPlaying) ||
                                     isInBattle;
+
         private bool isTransitioning = false;
         private bool isInBattle = false;
         private bool IsGameReady => game != null && GameCanvas != null && RootGrid.Children.Contains(GameCanvas);
@@ -42,7 +44,16 @@ namespace JRPG
             ResizeMode = ResizeMode.NoResize;
             //Topmost = true;
 
-            Loaded += (s, routedEvent) => Keyboard.Focus(GameCanvas);
+            CompositionTarget.Rendering += (s, eventArgs) =>
+            {
+                if (StartScreen.Visibility == Visibility.Visible || GameMenuControl?.Visibility == Visibility.Visible)
+                    return;
+
+                if (dialogueManager != null && !dialogueManager.IsActive)
+                    game?.Update();
+
+                game?.Render();
+            };
         }
 
         private void NewGame()
@@ -83,17 +94,6 @@ namespace JRPG
             RootGrid.Children.Add(GameMenuControl);
 
             GameCanvas.Visibility = Visibility.Collapsed;
-
-            CompositionTarget.Rendering += (s, eventArgs) =>
-            {
-                if (StartScreen.Visibility == Visibility.Visible || GameMenuControl.Visibility == Visibility.Visible)
-                    return;
-
-                if (!dialogueManager.IsActive)
-                    game.Update();
-
-                game.Render();
-            };
         }
 
         public async void StartBattle()
@@ -207,6 +207,8 @@ namespace JRPG
             await Task.Delay(300);
 
             await FadeHelper.FadeFromBlackAsync(FadeRect);
+
+            Focus();
         }
 
         private async void LoadButton_Click(object sender, RoutedEventArgs e)

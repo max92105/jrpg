@@ -25,7 +25,6 @@ namespace JRPG
     {
         public Game game;
         public DialogueManager dialogueManager;
-        private GameSystemManager gameSystemManager;
 
         private DateTime sessionStartTime;
         private int totalPlayTimeSeconds = 0;
@@ -51,6 +50,20 @@ namespace JRPG
 
             MenuBackground.Source = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetBackgroundsPath("StartMenu.png"))));
 
+            
+
+            Dispatcher.InvokeAsync(() =>
+            {
+                GameSystems.Initialize();
+                var preload = new SaveLoadView(
+                     SaveLoadView.SaveLoadMode.Load,
+                     _ => Task.CompletedTask,  // Fix: returns a Task
+                     () => { }                 // No change here, this is just an Action
+                );
+                preload.Measure(new Size(1, 1));
+                preload.Arrange(new Rect(0, 0, 1, 1));
+            }, System.Windows.Threading.DispatcherPriority.Loaded);
+
             CompositionTarget.Rendering += (s, eventArgs) =>
             {
                 if (StartScreen.Visibility == Visibility.Visible || GameMenuControl?.Visibility == Visibility.Visible)
@@ -65,12 +78,32 @@ namespace JRPG
 
         private void NewGame()
         {
-            GameSystems.Initialize(); // includes GameSystems.System
+            InitializeGameState();
+            game.LoadFromFile("start.json"); // Or whatever default map
+            game.playerX = 10.0;
+            game.playerY = 3.0;
+            GameCanvas.Visibility = Visibility.Collapsed;
+        }
 
-            game = new Game(GameCanvas);
-            dialogueManager = new DialogueManager(DialogueUI.TextElement, DialogueUI.Container, DialogueUI.Portrait, DialogueUI.Speaker, DialogueUI.ContinueIcon);
+        private void InitializeGameState()
+        {
+            GameSystems.Initialize();
 
-            GameMenuControl = new GameMenuControl();
+            if (game == null)
+                game = new Game(GameCanvas);
+
+            if (dialogueManager == null)
+                dialogueManager = new DialogueManager(DialogueUI.TextElement, DialogueUI.Container, DialogueUI.Portrait, DialogueUI.Speaker, DialogueUI.ContinueIcon);
+
+            if (GameMenuControl == null)
+            {
+                GameMenuControl = new GameMenuControl();
+                Panel.SetZIndex(GameMenuControl, 900);
+                RootGrid.Children.Add(GameMenuControl);
+            }
+
+            // ✅ Always (re)wire the events
+            GameMenuControl.ReturnToMainMenuRequested -= ReturnToMainMenuAsync;
             GameMenuControl.ReturnToMainMenuRequested += ReturnToMainMenuAsync;
 
             GameMenuControl.OnLoadSlotConfirmed = async (slotIndex) =>
@@ -98,10 +131,6 @@ namespace JRPG
             };
 
             GameMenuControl.Visibility = Visibility.Collapsed;
-            Panel.SetZIndex(GameMenuControl, 900);
-            RootGrid.Children.Add(GameMenuControl);
-
-            GameCanvas.Visibility = Visibility.Collapsed;
         }
 
         public async void StartBattle()
@@ -245,7 +274,8 @@ namespace JRPG
 
         private async void LoadButton_Click(object sender, RoutedEventArgs e)
         {
-            NewGame();
+            GameSystems.Initialize();
+           
             ShowLoadScreen();
         }
 
@@ -254,83 +284,80 @@ namespace JRPG
             // Hide the main menu UI
             StartMenuContent.Visibility = Visibility.Collapsed;
 
-            // Apply blur to the background
+            // Apply blur to background
             StartScreen.Effect = new BlurEffect
             {
                 Radius = 8,
                 RenderingBias = RenderingBias.Quality
             };
 
-            // Show overlay containers
+            // Prepare overlay visibility and opacity
             OverlayViewHost.Visibility = Visibility.Visible;
+            OverlayViewHost.Opacity = 0;
             ContentOverlayViewHost.Visibility = Visibility.Visible;
 
-            // Reset opacity to 0 for fade-in effect
-            ContentOverlayViewHost.Opacity = 0;
+            // Use a very lightweight placeholder (ensures layout pass without delay)
+            ContentOverlayViewHost.Content = new Grid();
 
-            // Create the actual SaveLoadView
-            var loadView = new SaveLoadView(
-                SaveLoadView.SaveLoadMode.Load,
-                async (slotIndex) =>
-                {
-                    var save = await GameSystems.System.LoadFromSlotAsync(slotIndex);
-                    if (save == null)
+            // Start fade on OverlayViewHost immediately
+            var fadeInTask = FadeHelper.FadeToAsync(OverlayViewHost, 1, 0.5); // Slower for visibility
+
+            // Defer the actual heavy content setup *after* the fade begins
+            await Task.Delay(10); // Let WPF breathe
+            await Dispatcher.InvokeAsync(() =>
+            {
+                var loadView = new SaveLoadView(
+                    SaveLoadView.SaveLoadMode.Load,
+                    async (slotIndex) =>
                     {
-                        MessageBox.Show("Failed to load save file.");
-                        return;
-                    }
+                        var save = await GameSystems.System.LoadFromSlotAsync(slotIndex);
+                        if (save == null)
+                        {
+                            MessageBox.Show("Failed to load save file.");
+                            return;
+                        }
 
-                    await FadeHelper.FadeToBlackAsync(FadeRect);
+                        await FadeHelper.FadeToBlackAsync(FadeRect);
 
-                    if (game == null)
-                        game = new Game(GameCanvas);
+                        InitializeGameState();
 
-                    StartScreen.Visibility = Visibility.Collapsed;
-                    GameCanvas.Visibility = Visibility.Visible;
+                        StartScreen.Visibility = Visibility.Collapsed;
+                        GameCanvas.Visibility = Visibility.Visible;
 
-                    game.LoadFromFile(save.CurrentMap);
-                    game.playerX = save.PlayerX;
-                    game.playerY = save.PlayerY;
+                        game.LoadFromFile(save.CurrentMap);
+                        game.playerX = save.PlayerX;
+                        game.playerY = save.PlayerY;
 
-                    ContentOverlayViewHost.Content = null;
-                    ContentOverlayViewHost.Visibility = Visibility.Collapsed;
-                    OverlayViewHost.Visibility = Visibility.Collapsed;
+                        ContentOverlayViewHost.Content = null;
+                        ContentOverlayViewHost.Visibility = Visibility.Collapsed;
+                        OverlayViewHost.Visibility = Visibility.Collapsed;
 
-                    await Task.Delay(300);
-                    await FadeHelper.FadeFromBlackAsync(FadeRect);
-                },
-                () => { _ = CancelLoadScreenAsync(); }
-            );
+                        await Task.Delay(300);
+                        await FadeHelper.FadeFromBlackAsync(FadeRect);
+                    },
+                    () => { _ = CancelLoadScreenAsync(); }
+                );
 
-            ContentOverlayViewHost.Content = loadView;
+                ContentOverlayViewHost.Content = loadView;
+                ContentOverlayViewHost.UpdateLayout();
+            }, System.Windows.Threading.DispatcherPriority.Background);
 
-            // Animate content opacity from 0 to 1
-            var fadeIn = new DoubleAnimation
-            {
-                From = 0,
-                To = 1,
-                Duration = TimeSpan.FromSeconds(0.3),
-                FillBehavior = FillBehavior.Stop
-            };
-
-            fadeIn.Completed += (s, e) =>
-            {
-                ContentOverlayViewHost.Opacity = 1;
-            };
-
-            ContentOverlayViewHost.BeginAnimation(UIElement.OpacityProperty, fadeIn);
+            await fadeInTask;
         }
-
 
         private async Task CancelLoadScreenAsync()
         {
-            await FadeHelper.FadeToAsync(ContentOverlayViewHost, 0, 0.3);
+            await FadeHelper.FadeToAsync(OverlayViewHost, 0, 0.3);
 
-            ContentOverlayViewHost.Visibility = Visibility.Collapsed;
+            // Hide overlays and reset content
             OverlayViewHost.Visibility = Visibility.Collapsed;
+            ContentOverlayViewHost.Visibility = Visibility.Collapsed;
             ContentOverlayViewHost.Content = null;
 
+            // Remove blur and show main menu again
             StartScreen.Effect = null;
+            StartMenuContent.Visibility = Visibility.Visible;
+
             await FadeHelper.FadeToAsync(StartMenuContent, 1, 0.3);
         }
 

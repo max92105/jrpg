@@ -50,15 +50,16 @@ namespace JRPG
 
             MenuBackground.Source = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetBackgroundsPath("StartMenu.png"))));
 
-            
+            // ✅ Initialize systems once
+            GameSystems.Initialize();
 
+            // 🔹 Preload view to prevent layout lag
             Dispatcher.InvokeAsync(() =>
             {
-                GameSystems.Initialize();
                 var preload = new SaveLoadView(
-                     SaveLoadView.SaveLoadMode.Load,
-                     _ => Task.CompletedTask,  // Fix: returns a Task
-                     () => { }                 // No change here, this is just an Action
+                    SaveLoadView.SaveLoadMode.Load,
+                    _ => Task.CompletedTask,
+                    () => { }
                 );
                 preload.Measure(new Size(1, 1));
                 preload.Arrange(new Rect(0, 0, 1, 1));
@@ -78,17 +79,18 @@ namespace JRPG
 
         private void NewGame()
         {
+            GameSystems.Reset(); // optional, if you want clean state
             InitializeGameState();
-            game.LoadFromFile("start.json"); // Or whatever default map
+
+            game.LoadFromFile("start.json");
             game.playerX = 10.0;
             game.playerY = 3.0;
+
             GameCanvas.Visibility = Visibility.Collapsed;
         }
 
         private void InitializeGameState()
         {
-            GameSystems.Initialize();
-
             if (game == null)
                 game = new Game(GameCanvas);
 
@@ -102,7 +104,6 @@ namespace JRPG
                 RootGrid.Children.Add(GameMenuControl);
             }
 
-            // ✅ Always (re)wire the events
             GameMenuControl.ReturnToMainMenuRequested -= ReturnToMainMenuAsync;
             GameMenuControl.ReturnToMainMenuRequested += ReturnToMainMenuAsync;
 
@@ -274,8 +275,6 @@ namespace JRPG
 
         private async void LoadButton_Click(object sender, RoutedEventArgs e)
         {
-            GameSystems.Initialize();
-           
             ShowLoadScreen();
         }
 

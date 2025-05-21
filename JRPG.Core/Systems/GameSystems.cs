@@ -9,6 +9,8 @@ namespace JRPG.Core.Systems
 {
     public static class GameSystems
     {
+        private static bool isInitialized = false;
+
         public static InventoryManager Inventory { get; private set; }
         public static PartyManager Party { get; private set; }
         public static EquipmentManager Equipment { get; private set; }
@@ -18,6 +20,9 @@ namespace JRPG.Core.Systems
 
         public static void Initialize()
         {
+            if (isInitialized)
+                return;
+
             Inventory = new InventoryManager();
             Party = new PartyManager();
             Equipment = new EquipmentManager();
@@ -25,6 +30,14 @@ namespace JRPG.Core.Systems
             Save = new SaveGameManager();
 
             System.StartSessionTimer();
+
+            isInitialized = true;
+        }
+
+        public static void Reset()
+        {
+            isInitialized = false;
+            Initialize();
         }
 
         public static void SetBattleManager(List<BattleActor> battleActors)

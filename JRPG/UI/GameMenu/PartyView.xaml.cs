@@ -73,11 +73,12 @@ namespace JRPG.UI.GameMenu
                 CurrentMP = character.MP,
                 MaxMP = character.MaxMP
             };
+
             panel.SetPortrait(AssetPathResolver.GetPortraitPath(character.PortraitFile));
 
             var border = new Border
             {
-                Style = (Style)FindResource("HoverAnimatedCharacterBorder"),
+                Style = (Style)FindResource("HoverAnimatedBorder"),
                 Background = Brushes.Transparent,
                 BorderBrush = Brushes.White,
                 BorderThickness = new Thickness(1),
@@ -98,6 +99,16 @@ namespace JRPG.UI.GameMenu
                         Refresh();
                     }
                 };
+            }
+
+            if (border.RenderTransform is TransformGroup group)
+            {
+                var clone = new TransformGroup();
+                foreach (var t in group.Children)
+                {
+                    clone.Children.Add(t.CloneCurrentValue());
+                }
+                border.RenderTransform = clone;
             }
 
             return border;
@@ -239,46 +250,43 @@ namespace JRPG.UI.GameMenu
                 var oldTop = positionsBefore.ContainsKey(block) ? positionsBefore[block] : newTop;
                 double offset = oldTop - newTop;
 
-                if (Math.Abs(offset) > 0.1)
+                // Ensure we’re animating Translate.Y inside the existing TransformGroup
+                if (block.RenderTransform is TransformGroup group &&
+                    group.Children.OfType<TranslateTransform>().FirstOrDefault() is TranslateTransform translate)
                 {
-                    animCount++;
-
-                    var transform = new TranslateTransform { Y = offset };
-                    block.RenderTransform = transform;
-
-                    var anim = new DoubleAnimation
+                    if (Math.Abs(offset) > 0.1)
                     {
-                        To = 0,
-                        Duration = TimeSpan.FromMilliseconds(300),
-                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
-                    };
+                        animCount++;
 
-                    anim.Completed += (s, e) =>
-                    {
-                        completed++;
-                        if (completed == animCount)
-                            isAnimatingReorder = false;
-                    };
+                        translate.BeginAnimation(TranslateTransform.YProperty, null);
+                        translate.Y = offset;
 
-                    transform.BeginAnimation(TranslateTransform.YProperty, anim);
-                }
-                else
-                {
-                    if(!(block.RenderTransform is TranslateTransform))
-{
-                        block.RenderTransform = new TranslateTransform();
+                        var anim = new DoubleAnimation
+                        {
+                            To = 0,
+                            Duration = TimeSpan.FromMilliseconds(300),
+                            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                        };
+
+                        anim.Completed += (s, e) =>
+                        {
+                            completed++;
+                            if (completed == animCount)
+                                isAnimatingReorder = false;
+                        };
+
+                        translate.BeginAnimation(TranslateTransform.YProperty, anim);
                     }
-
-                    var transform = (TranslateTransform)block.RenderTransform;
-                    transform.Y = 0; // Reset smoothly
+                    else
+                    {
+                        translate.BeginAnimation(TranslateTransform.YProperty, null);
+                        translate.Y = 0;
+                    }
                 }
             }
 
-            // If no animation was needed
             if (animCount == 0)
-            {
                 isAnimatingReorder = false;
-            }
         }
     }
 }

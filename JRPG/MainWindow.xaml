@@ -12,7 +12,8 @@
         WindowStyle="None"
         Background="Black">
     <Window.Resources>
-        <Style x:Key="StartMenuButtonStyle" TargetType="Button">
+        <BlurEffect x:Key="MenuBlurEffect" Radius="10"/>
+            <Style x:Key="StartMenuButtonStyle" TargetType="Button">
             <Setter Property="FontSize" Value="48" />
             <Setter Property="Foreground" Value="White" />
             <Setter Property="FontWeight" Value="SemiBold" />
@@ -73,12 +74,31 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <DropShadowEffect x:Key="DropShadow"
+                Color="Black"
+                Direction="315"
+                ShadowDepth="5"
+                BlurRadius="15"
+                Opacity="0.5"/>
     </Window.Resources>
 
     <Grid Name="MasterGrid">
         <Grid Name="RootGrid">
             <!-- Lower layers first -->
             <gamemenu:GameMenuControl x:Name="GameMenuControl" />
+
+            <Border
+                Background="#AA111111"
+                Effect="{DynamicResource DropShadow}"
+                x:Name="OverlayViewHost"
+                Visibility="Collapsed" Panel.ZIndex="102" Width="800">      
+                <ContentPresenter x:Name="ContentOverlayViewHost"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Visibility="Collapsed"
+                      Panel.ZIndex="999"/>
+            </Border>
 
             <Canvas x:Name="GameCanvas" Width="1920" Height="1080"
                     Background="Transparent" />
@@ -95,7 +115,7 @@
                    Opacity="1"
                    Panel.ZIndex="0" />
 
-                <Grid>
+                <Grid x:Name="StartMenuContent">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <!-- Title -->

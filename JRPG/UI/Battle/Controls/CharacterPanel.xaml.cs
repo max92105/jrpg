@@ -12,16 +12,24 @@ namespace JRPG.UI.Battle.Controls
     public partial class CharacterPanel : UserControl
     {
         private int hp, maxHp, mp, maxMp;
+        private bool isActive;
 
         public CharacterPanel()
         {
             InitializeComponent();
+
+            isActive = false;
         }
 
         public bool IsActive
         {
             set
             {
+                if (isActive == value)
+                    return;
+
+                isActive = value;
+
                 var targetOffset = value ? -100 : 0;
                 var duration = TimeSpan.FromMilliseconds(300);
 
@@ -61,34 +69,76 @@ namespace JRPG.UI.Battle.Controls
         public int CurrentHP
         {
             get => hp;
-            set { hp = Math.Max(0, value); UpdateHP(); }
+            set
+            {
+                var clamped = Math.Max(0, value);
+                if (clamped != hp)
+                {
+                    hp = clamped;
+                    UpdateHP();
+                }
+            }
         }
 
         public int MaxHP
         {
             get => maxHp;
-            set { maxHp = Math.Max(1, value); UpdateHP(); }
+            set
+            {
+                var clamped = Math.Max(1, value);
+                if (clamped != maxHp)
+                {
+                    maxHp = clamped;
+                    UpdateHP();
+                }
+            }
         }
 
         public int CurrentMP
         {
             get => mp;
-            set { mp = Math.Max(0, value); UpdateMP(); }
+            set
+            {
+                var clamped = Math.Max(0, value);
+                if (clamped != mp)
+                {
+                    mp = clamped;
+                    UpdateMP();
+                }
+            }
         }
 
         public int MaxMP
         {
             get => maxMp;
-            set { maxMp = Math.Max(1, value); UpdateMP(); }
+            set
+            {
+                var clamped = Math.Max(1, value);
+                if (clamped != maxMp)
+                {
+                    maxMp = clamped;
+                    UpdateMP();
+                }
+            }
         }
 
         private void UpdateHP()
         {
             HPBar.Maximum = maxHp;
 
+            double currentValue = HPBar.Value;
+            double targetValue = Math.Min(hp, maxHp);
+
+            // Prevent animation if value is unchanged
+            if (Math.Abs(currentValue - targetValue) < 0.1)
+                return;
+
+            HPBar.BeginAnimation(ProgressBar.ValueProperty, null); // Cancel ongoing animation
+
             var animation = new DoubleAnimation
             {
-                To = Math.Min(hp, maxHp),
+                From = currentValue,
+                To = targetValue,
                 Duration = TimeSpan.FromMilliseconds(300),
                 EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
             };
@@ -102,9 +152,18 @@ namespace JRPG.UI.Battle.Controls
         {
             MPBar.Maximum = maxMp;
 
+            double currentValue = MPBar.Value;
+            double targetValue = Math.Min(mp, maxMp);
+
+            if (Math.Abs(currentValue - targetValue) < 0.1)
+                return;
+
+            MPBar.BeginAnimation(ProgressBar.ValueProperty, null);
+
             var animation = new DoubleAnimation
             {
-                To = Math.Min(mp, maxMp),
+                From = currentValue,
+                To = targetValue,
                 Duration = TimeSpan.FromMilliseconds(300),
                 EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
             };

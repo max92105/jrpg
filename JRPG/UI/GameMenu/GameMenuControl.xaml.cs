@@ -26,6 +26,8 @@ namespace JRPG.UI.GameMenu
             InitializeComponent();
 
             MenuBackground.Source = new BitmapImage(new Uri(AssetPathResolver.GetBackgroundsPath("GameMenu.png")));
+
+            ContainerGameMenuContent.Visibility = Visibility.Collapsed;
         }
 
         private void SetContextOptions(params UIElement[] options)
@@ -76,6 +78,8 @@ namespace JRPG.UI.GameMenu
         private void MenuButton_Checked(object sender, RoutedEventArgs e)
         {
             var clicked = (ToggleButton)sender;
+
+            ContainerGameMenuContent.Visibility = Visibility.Visible;
 
             // If already checked, prevent unchecking
             if (clicked.IsChecked == false)
@@ -224,6 +228,14 @@ namespace JRPG.UI.GameMenu
                 async (slotIndex) =>
                 {
                     OnLoadSlotConfirmed?.Invoke(slotIndex);
+
+                    foreach (var child in ButtonPanel.Children)
+                    {
+                        if (child is ToggleButton button)
+                        {
+                            button.IsChecked = false;
+                        }
+                    }
                 },
                 () =>
                 {

@@ -168,8 +168,7 @@ namespace JRPG.UI.GameMenu
 
                 bool isSelectionLocked =
                     targetType == TargetType.AllAllies ||
-                    targetType == TargetType.AllFaintedAllies ||
-                    targetType == TargetType.Self;
+                    targetType == TargetType.AllFaintedAllies;
 
                 if (isValid && !isSelectionLocked)
                 {
@@ -218,7 +217,11 @@ namespace JRPG.UI.GameMenu
         private void PopupYes_Click(object sender, RoutedEventArgs e)
         {
             var targets = selectedTargets.OfType<BattleActor>().ToList();
-            GameSystems.Inventory.UseSelectedItem(null, targets);
+
+            if (targets.Count > 0)
+            {
+                GameSystems.Inventory.UseSelectedItem(null, targets);
+            }
 
             PopupOverlay.Visibility = Visibility.Collapsed;
             Refresh();

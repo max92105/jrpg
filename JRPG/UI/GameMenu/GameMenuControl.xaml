@@ -211,7 +211,8 @@
                 Background="#AA111111"
                 BorderBrush="#44111111"
                 BorderThickness="1"
-                Effect="{DynamicResource DropShadow}">
+                Effect="{DynamicResource DropShadow}"
+                x:Name="ContainerGameMenuContent">
 
                 <ContentControl x:Name="GameMenuContent"
                         HorizontalAlignment="Stretch"

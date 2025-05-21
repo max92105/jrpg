@@ -1,7 +1,6 @@
 ﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems.SaveGames.Models;
 using System;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;

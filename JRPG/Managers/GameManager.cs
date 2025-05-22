@@ -1,4 +1,6 @@
-﻿using JRPG.Core.Enums;
+﻿using JRPG.Core.Battles.Models.Enemies;
+using JRPG.Core.Battles.Models;
+using JRPG.Core.Enums;
 using JRPG.Core.Maps;
 using JRPG.Core.Systems;
 using JRPG.Core.Triggers.Models;
@@ -78,7 +80,7 @@ namespace JRPG
                 onItemFound: (itemId) => MessageBox.Show($"You found an item: {itemId}!"),
                 onBattleStart: () => Application.Current.Dispatcher.Invoke(() =>
                 {
-                    ((MainWindow)Application.Current.MainWindow).StartBattle();
+                   
                 })
             );
 
@@ -101,6 +103,18 @@ namespace JRPG
 
             camera.SnapTo(Player.X, Player.Y, mapManager.CurrentMap);
             mapRenderer.Redraw(camera.X, camera.Y, mapManager.CurrentMap);
+        }
+
+        public void Dispose()
+        {
+            if (playerImageControl != null && canvas.Children.Contains(playerImageControl))
+                canvas.Children.Remove(playerImageControl);
+
+            if (mapRenderer?.VisualHost != null && canvas.Children.Contains(mapRenderer.VisualHost))
+                canvas.Children.Remove(mapRenderer.VisualHost);
+
+            // Clear input state
+            keysDown.Clear();
         }
 
         public void LoadMapAndPositionPlayer(string mapId, double x, double y)

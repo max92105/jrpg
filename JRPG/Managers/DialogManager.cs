@@ -1,4 +1,5 @@
 ﻿using JRPG.Core.Utils;
+using JRPG.Managers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -44,6 +45,17 @@ namespace JRPG
             blinkTimer = new DispatcherTimer();
             blinkTimer.Interval = TimeSpan.FromMilliseconds(500);
             blinkTimer.Tick += (s, e) => BlinkIndicator();
+        }
+
+        public void ShowWithFlow(List<string> pages, string portraitPath = null, string speaker = null, Action callback = null)
+        {
+            GameFlowManager.StartDialogue();
+
+            Show(pages, portraitPath, speaker, () =>
+            {
+                GameFlowManager.EndDialogue();
+                callback?.Invoke();
+            });
         }
 
         public void Show(List<string> dialoguePages, string portraitPath = null, string speaker = null, Action callback = null)

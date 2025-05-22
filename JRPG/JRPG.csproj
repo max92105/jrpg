@@ -89,17 +89,21 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Enums\SceneType.cs" />
     <Compile Include="Managers\CameraManager.cs" />
     <Compile Include="Managers\GameFlowManager.cs" />
+    <Compile Include="Managers\GameStateManager.cs" />
     <Compile Include="Managers\InputManager.cs" />
+    <Compile Include="Managers\InputRouter.cs" />
     <Compile Include="Managers\MapRenderer.cs" />
     <Compile Include="Managers\PlayerManager.cs" />
+    <Compile Include="Managers\SceneManager.cs" />
     <Compile Include="Managers\TriggerHandler.cs" />
     <Compile Include="MapManager.cs" />
     <Compile Include="UI\Battle\Controls\CharacterPanel.xaml.cs">
       <DependentUpon>CharacterPanel.xaml</DependentUpon>
     </Compile>
-    <Compile Include="CutsceneManager.cs" />
+    <Compile Include="Managers\CutsceneManager.cs" />
     <Compile Include="UI\Battle\Controls\CommandPanel.xaml.cs">
       <DependentUpon>CommandPanel.xaml</DependentUpon>
     </Compile>
@@ -109,7 +113,7 @@
     <Compile Include="UI\Dialogue\DialogueBox.xaml.cs">
       <DependentUpon>DialogueBox.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DialogManager.cs" />
+    <Compile Include="Managers\DialogManager.cs" />
     <Compile Include="UI\Battle\Controls\EnemyPanel.xaml.cs">
       <DependentUpon>EnemyPanel.xaml</DependentUpon>
     </Compile>
@@ -153,6 +157,7 @@
     <Compile Include="Utils\FadeHelper.cs" />
     <Compile Include="Utils\FilterOption.cs" />
     <Compile Include="Utils\IFilterable.cs" />
+    <Compile Include="Utils\UIBootstrapper.cs" />
     <Compile Include="Utils\VisualFactory.cs" />
     <Compile Include="VisualHost.cs" />
     <Page Include="UI\Battle\Controls\CharacterPanel.xaml">

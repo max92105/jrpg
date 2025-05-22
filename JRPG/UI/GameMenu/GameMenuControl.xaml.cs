@@ -12,6 +12,8 @@ using JRPG.Core.Systems;
 using JRPG.Core.Systems.Equipments.Models;
 using JRPG.Core.Systems.Inventories.Models;
 using JRPG.Core.Utils;
+using JRPG.Enums;
+using JRPG.Managers;
 using JRPG.Utils;
 
 namespace JRPG.UI.GameMenu
@@ -269,6 +271,8 @@ namespace JRPG.UI.GameMenu
                     button.IsChecked = false;
                 }
             }
+
+            GameStateManager.SetState(SceneType.Exploration);
 
             this.Visibility = Visibility.Collapsed;
         }

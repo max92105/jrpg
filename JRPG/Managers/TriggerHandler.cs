@@ -1,4 +1,7 @@
-﻿using JRPG.Core.Triggers.Models;
+﻿using JRPG.Core.Battles.Models.Enemies;
+using JRPG.Core.Battles.Models;
+using JRPG.Core.Triggers.Models;
+using JRPG.Managers;
 using System;
 using System.Collections.Generic;
 
@@ -44,6 +47,14 @@ namespace JRPG.Systems
 
                 case TriggerBattle battle:
                     onBattleStart?.Invoke();
+                    List<Enemy> enemies = new List<Enemy>
+                    {
+                        new Goblin { SlotIndex = 0 },
+                        new Goblin { SlotIndex = 1 },
+                        new Goblin { SlotIndex = 2 }
+                    };
+
+                    SceneManager.StartBattleAsync(enemies);
                     break;
 
                 default:

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using JRPG.Enums;
+using System.Collections.Generic;
 using System.Windows.Input;
 
 namespace JRPG.Managers.Input
@@ -8,6 +9,17 @@ namespace JRPG.Managers.Input
         private static readonly HashSet<Key> keysDown = new HashSet<Key>();
 
         public static bool IsEnabled { get; private set; } = true;
+
+        public static void Initialize()
+        {
+            GameStateManager.OnStateChanged += (newState) =>
+            {
+                if (newState == SceneType.Battle || newState == SceneType.Dialogue || newState == SceneType.Cutscene)
+                    Disable();
+                else
+                    Enable();
+            };
+        }
 
         public static void Enable() => IsEnabled = true;
         public static void Disable()

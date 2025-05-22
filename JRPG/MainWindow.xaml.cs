@@ -15,12 +15,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
+using JRPG.Managers.Input;
+using JRPG.Managers;
 
 namespace JRPG
 {
     public partial class MainWindow : Window
     {
-        public Game game;
+        public GameManager game;
         public DialogueManager dialogueManager;
 
         private DateTime sessionStartTime;
@@ -34,7 +36,7 @@ namespace JRPG
 
         private bool isTransitioning = false;
         private bool isInBattle = false;
-        private bool IsGameReady => game != null && GameCanvas != null && RootGrid.Children.Contains(GameCanvas);
+        private bool IsGameReady => game != null;
 
         public MainWindow()
         {
@@ -76,12 +78,10 @@ namespace JRPG
 
         private void NewGame()
         {
-            GameSystems.Reset(); // optional, if you want clean state
+            GameSystems.Reset();
             InitializeGameState();
 
-            game.LoadFromFile("start.json");
-            game.playerX = 10.0;
-            game.playerY = 3.0;
+            game.LoadMapAndPositionPlayer("start.json", 10.0, 3.0);
 
             GameCanvas.Visibility = Visibility.Collapsed;
         }
@@ -89,7 +89,7 @@ namespace JRPG
         private void InitializeGameState()
         {
             if (game == null)
-                game = new Game(GameCanvas);
+                game = new GameManager(GameCanvas);
 
             if (dialogueManager == null)
                 dialogueManager = new DialogueManager(DialogueUI.TextElement, DialogueUI.Container, DialogueUI.Portrait, DialogueUI.Speaker, DialogueUI.ContinueIcon);
@@ -118,9 +118,7 @@ namespace JRPG
                 GameCanvas.Visibility = Visibility.Visible;
                 GameMenuControl.Visibility = Visibility.Collapsed;
 
-                game.LoadFromFile(save.CurrentMap);
-                game.playerX = save.PlayerX;
-                game.playerY = save.PlayerY;
+                game.LoadMapAndPositionPlayer(save.CurrentMap, save.PlayerX, save.PlayerY);
 
                 await Task.Delay(300);
                 await FadeHelper.FadeFromBlackAsync(FadeRect);
@@ -133,17 +131,16 @@ namespace JRPG
 
         public async void StartBattle()
         {
-            if (isTransitioning || isInBattle) return;
-            isTransitioning = true;
-            isInBattle = true;
+            if (GameFlowManager.IsInBattle) return;
 
+            GameFlowManager.StartBattle();
             await FadeHelper.FadeToBlackAsync(FadeRect);
 
-            List<Enemy> enemies = new List<Enemy>()
+            List<Enemy> enemies = new List<Enemy>
             {
-                new Goblin() { SlotIndex = 0 },
-                new Goblin() { SlotIndex = 1 },
-                new Goblin() { SlotIndex = 2 }
+                new Goblin { SlotIndex = 0 },
+                new Goblin { SlotIndex = 1 },
+                new Goblin { SlotIndex = 2 }
             };
 
             var battleActors = new List<BattleActor>();
@@ -157,13 +154,11 @@ namespace JRPG
             RootGrid.Children.Add(battleUI);
 
             await FadeHelper.FadeFromBlackAsync(FadeRect);
-            isTransitioning = false;
         }
 
         private async void EndBattle()
         {
-            if (isTransitioning) return;
-            isTransitioning = true;
+            GameFlowManager.EndBattle();
 
             await FadeHelper.FadeToBlackAsync(FadeRect);
 
@@ -175,26 +170,28 @@ namespace JRPG
             Keyboard.Focus(GameCanvas);
 
             await FadeHelper.FadeFromBlackAsync(FadeRect);
-
-            isInBattle = false;
-            isTransitioning = false;
         }
 
         public void ShowDialogue(List<string> pages, string portraitPath = null, string speaker = null, Action callback = null)
         {
-            dialogueManager.Show(pages, portraitPath, speaker, callback);
+            GameFlowManager.StartDialogue();
+
+            dialogueManager.Show(pages, portraitPath, speaker, () =>
+            {
+                GameFlowManager.EndDialogue();
+                callback?.Invoke();
+            });
         }
+
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            // 🔹 ESC during loading screen: Cancel and return to Start Menu
             if (e.Key == Key.Escape && OverlayViewHost.Visibility == Visibility.Visible)
             {
-                _ = CancelLoadScreenAsync(); // run async without blocking
+                _ = CancelLoadScreenAsync();
                 return;
             }
 
-            // 🔹 ESC toggles Game Menu if not on Start Screen
             if (e.Key == Key.Escape && StartScreen?.Visibility != Visibility.Visible)
             {
                 if (GameMenuControl != null)
@@ -206,35 +203,30 @@ namespace JRPG
                 return;
             }
 
-            // 🔹 SPACE skips dialogue
             if (dialogueManager?.IsActive == true && e.Key == Key.Space)
             {
                 dialogueManager.Skip();
                 return;
             }
 
-            // 🔹 F1 starts cutscene
             if (e.Key == Key.F1 && CutscenePlayer != null)
             {
+                GameFlowManager.StartCutscene();
                 var cutsceneManager = new CutsceneManager(CutscenePlayer);
                 cutsceneManager.StartIntroCutscene();
                 return;
             }
 
-            // 🔹 Block input if locked
-            if (IsInputLocked) return;
+            if (GameFlowManager.IsGamePaused) return;
 
-            // 🔹 Forward key to game if active
-            if (game != null && RootGrid.Children.Contains(GameCanvas))
-                game.OnKeyDown(e.Key);
+            Managers.Input.InputManager.OnKeyDown(e.Key);
         }
 
         private void Window_KeyUp(object sender, KeyEventArgs e)
         {
-            if (IsInputLocked) return;
+            if (GameFlowManager.IsGamePaused) return;
 
-            if (IsGameReady)
-                game.OnKeyUp(e.Key);
+            Managers.Input.InputManager.OnKeyUp(e.Key);
         }
 
         private async void StartButton_Click(object sender, RoutedEventArgs e)
@@ -320,9 +312,7 @@ namespace JRPG
                         StartScreen.Visibility = Visibility.Collapsed;
                         GameCanvas.Visibility = Visibility.Visible;
 
-                        game.LoadFromFile(save.CurrentMap);
-                        game.playerX = save.PlayerX;
-                        game.playerY = save.PlayerY;
+                        game.LoadMapAndPositionPlayer(save.CurrentMap, save.PlayerX, save.PlayerY);
 
                         ContentOverlayViewHost.Content = null;
                         ContentOverlayViewHost.Visibility = Visibility.Collapsed;

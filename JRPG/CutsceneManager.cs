@@ -8,30 +8,33 @@ using System.Windows.Threading;
 using JRPG.Core.Cutscenes.Models;
 using JRPG.Core.Utils;
 using JRPG.UI.Cutscene;
+using JRPG.Managers;
 
 namespace JRPG
 {
     public class CutsceneManager
     {
         private Queue<CutsceneStep> steps = new Queue<CutsceneStep>();
-        private CutscenePlayer CutscenePlayer;
-        private Dictionary<string, Image> activeSprites = new Dictionary<string, Image>();
+        private readonly CutscenePlayer CutscenePlayer;
+        private readonly Dictionary<string, Image> activeSprites = new Dictionary<string, Image>();
 
-        public static bool IsPlaying { get; set; }
+        private Action onComplete;
 
-        public Action OnCutsceneEnd;
+        public static bool IsPlaying { get; private set; }
 
         public CutsceneManager(CutscenePlayer cutscenePlayer)
         {
-            this.CutscenePlayer = cutscenePlayer;
+            CutscenePlayer = cutscenePlayer;
         }
 
-        public void PlayCutscene(List<CutsceneStep> cutscene)
+        public void PlayCutscene(List<CutsceneStep> cutscene, Action onComplete = null)
         {
+            this.onComplete = onComplete;
             CutscenePlayer.Visibility = Visibility.Visible;
             CutscenePlayer.CutsceneCanvas.Visibility = Visibility.Visible;
 
             steps = new Queue<CutsceneStep>(cutscene);
+            IsPlaying = true;
             NextStep();
         }
 
@@ -53,7 +56,7 @@ namespace JRPG
                 case CutsceneStepBackground bg:
                     var bgImage = new Image
                     {
-                        Source = new BitmapImage(new Uri(AssetPathResolver.GetBackgroundsPath(bg.BackgroundPath), UriKind.Absolute)),
+                        Source = new BitmapImage(new Uri(AssetPathResolver.GetBackgroundsPath(bg.BackgroundPath))),
                         Width = 1920,
                         Height = 1080
                     };
@@ -92,13 +95,13 @@ namespace JRPG
                         var startY = Canvas.GetTop(movingImg);
                         var endX = move.ToX * 96;
                         var endY = move.ToY * 96;
-                        var dx = (endX - startX);
-                        var dy = (endY - startY);
+                        var dx = endX - startX;
+                        var dy = endY - startY;
 
                         var frames = (int)(move.Duration * 60);
                         int current = 0;
 
-                        DispatcherTimer timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(1000.0 / 60) };
+                        var timer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(1000.0 / 60) };
                         timer.Tick += (s, e) =>
                         {
                             current++;
@@ -126,6 +129,10 @@ namespace JRPG
                     CutscenePlayer.CutsceneCanvas.Visibility = Visibility.Collapsed;
 
                     await FadeHelper.FadeFromBlackAsync(((MainWindow)Application.Current.MainWindow).FadeRect);
+                    IsPlaying = false;
+
+                    // 🔚 Signal cutscene end
+                    onComplete?.Invoke();
                     break;
 
                 default:
@@ -134,32 +141,28 @@ namespace JRPG
             }
         }
 
-        public void StartIntroCutscene()
+        public void StartIntroCutscene(Action onComplete = null)
         {
             var steps = new List<CutsceneStep>
             {
-                    new CutsceneStepFade(fadeToBlack: true, 0.5), // Fade to black
-                    new CutsceneStepBackground("Forest.png"),
-                    new CutsceneStepSprite("Hero", "Sarxian.png", 4.0, 6.0, flip: false),
-                    new CutsceneStepSprite("Villain", "Goblin.png", 10.0, 6.0, flip: true),
-                    new CutsceneStepFade(fadeToBlack: false, 0.5), // Fade in
-          
-                    new CutsceneStepDialogue(new List<string> { "Where are we?", "This forest gives me chills..." }, "Hero", "Sarxian.png"),
-                    new CutsceneStepDialogue(new List<string> { "You're too late, hero.", "The ritual is already underway!" }, "Villain", "Goblin.png"),
-
-                    new CutsceneStepMove("Villain", 6.0, 6.0, 1.5),
-
-                    new CutsceneStepDialogue(new List<string> { "No!" }, "Hero", "Sarxian.png"),
-
-                    new CutsceneStepFade(fadeToBlack: true, 0.5), // Fade to black
-                    new CutsceneStepEnd() ,// Clean up
+                new CutsceneStepFade(true, 0.5),
+                new CutsceneStepBackground("Forest.png"),
+                new CutsceneStepSprite("Hero", "Sarxian.png", 4.0, 6.0, false),
+                new CutsceneStepSprite("Villain", "Goblin.png", 10.0, 6.0, true),
+                new CutsceneStepFade(false, 0.5),
+                new CutsceneStepDialogue(new List<string> { "Where are we?", "This forest gives me chills..." }, "Hero", "Sarxian.png"),
+                new CutsceneStepDialogue(new List<string> { "You're too late, hero.", "The ritual is already underway!" }, "Villain", "Goblin.png"),
+                new CutsceneStepMove("Villain", 6.0, 6.0, 1.5),
+                new CutsceneStepDialogue(new List<string> { "No!" }, "Hero", "Sarxian.png"),
+                new CutsceneStepFade(true, 0.5),
+                new CutsceneStepEnd()
             };
 
-            IsPlaying = true;
-
-            PlayCutscene(steps);
-
-            IsPlaying = false;
+            PlayCutscene(steps, () =>
+            {
+                GameFlowManager.EndCutscene();
+                onComplete?.Invoke();
+            });
         }
     }
 }

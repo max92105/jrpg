@@ -89,6 +89,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Managers\CameraManager.cs" />
+    <Compile Include="Managers\GameFlowManager.cs" />
+    <Compile Include="Managers\InputManager.cs" />
+    <Compile Include="Managers\MapRenderer.cs" />
+    <Compile Include="Managers\PlayerManager.cs" />
+    <Compile Include="Managers\TriggerHandler.cs" />
+    <Compile Include="MapManager.cs" />
     <Compile Include="UI\Battle\Controls\CharacterPanel.xaml.cs">
       <DependentUpon>CharacterPanel.xaml</DependentUpon>
     </Compile>
@@ -180,7 +187,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Game.cs" />
+    <Compile Include="Managers\GameManager.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -247,7 +254,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MapManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

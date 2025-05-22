@@ -9,7 +9,7 @@ using JRPG.Core.Systems;
 using JRPG.Core.Triggers.Models;
 using JRPG.Core.Utils;
 
-namespace JRPGPlayerDemo
+namespace JRPG
 {
     public class MapManager
     {

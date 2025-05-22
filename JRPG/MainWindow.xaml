@@ -4,7 +4,7 @@
         xmlns:local="clr-namespace:JRPG"
         xmlns:cutscene="clr-namespace:JRPG.UI.Cutscene"
         xmlns:gamemenu="clr-namespace:JRPG.UI.GameMenu"
-        Title="JRPG" Width="1024" Height="768"
+        Title="JRPG" Width="1920" Height="1080"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         KeyDown="Window_KeyDown"

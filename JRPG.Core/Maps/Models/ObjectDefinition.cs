@@ -8,7 +8,9 @@ namespace JRPG.Core.Maps.Models
 		public string SpritePath { get; set; }
 		public bool HasCollision { get; set; }
 
-		[JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public bool IsNpc { get; set; } = false;
+
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 		public Rect? CollisionBox { get; set; }
 	}
 }

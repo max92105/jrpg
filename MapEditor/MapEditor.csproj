@@ -55,9 +55,23 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\BatchCommand.cs" />
+    <Compile Include="Commands\FillTileCommand.cs" />
+    <Compile Include="Commands\SetTriggerCommand .cs" />
+    <Compile Include="Commands\RemoveObjectCommad.cs" />
+    <Compile Include="Commands\PlaceObjectCommand.cs" />
+    <Compile Include="Commands\SetTileCommand.cs" />
+    <Compile Include="IEditorCommand.cs" />
+    <Compile Include="NpcEditWindow.xaml.cs">
+      <DependentUpon>NpcEditWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TilesheetImportWindow.xaml.cs">
+      <DependentUpon>TilesheetImportWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TriggerEditWindow.xaml.cs">
       <DependentUpon>TriggerEditWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UndoManager.cs" />
     <Page Include="EditorMainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -70,6 +84,14 @@
       <DependentUpon>EditorMainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="NpcEditWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TilesheetImportWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="TriggerEditWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

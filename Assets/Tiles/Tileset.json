@@ -36,5 +36,19 @@
       "Tiles/water4.png"
     ],
     "FrameDuration": 0.25
+  },
+  "6": {
+    "Name": "SheetTile1",
+    "IsWalkable": true,
+    "Tilesheet": "Tiles/Tilesheet.png",
+    "SheetX": 0,
+    "SheetY": 0
+  },
+  "7": {
+    "Name": "SheetTile2",
+    "IsWalkable": true,
+    "Tilesheet": "Tiles/Tilesheet2.png",
+    "SheetX": 1,
+    "SheetY": 0
   }
 }

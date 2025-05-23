@@ -13,6 +13,8 @@ using JRPG.Core.Maps;
 using JRPG.Core.Utils;
 using JRPG.Core.Models;
 using System.Collections.Generic;
+using MapEditor.Undo;
+using MapEditor.Commands;
 
 namespace MapEditor
 {
@@ -24,8 +26,8 @@ namespace MapEditor
         private Map map = new Map();
 
         //Default map Size
-        private int mapWidth = 20;
-        private int mapHeight = 15;
+        private int mapWidth = 30;
+        private int mapHeight = 17;
 
         //Selection
         private int selectedTileId = 0;
@@ -42,12 +44,24 @@ namespace MapEditor
         private Point? dragStart = null;
         private TranslateTransform canvasOffset = new TranslateTransform();
 
-        //Drag
+        //Drag map
         private Vector currentPanOffset = new Vector(0, 0);
+        private bool isSpaceHeld = false;
+
+        //Drag Object
+        private PlacedObject draggedObject = null;
+        private Point dragOffset;
+
+        //Selection
+        private Point? selectionStart = null;
+        private Rect selectionRect;
+        private bool isSelecting = false;
 
         //Palette
         private Dictionary<int, TileDefinition> tileDefinitions;
         private Dictionary<int, ObjectDefinition> objectDefinitions;
+
+        private readonly UndoManager undoManager = new UndoManager();
 
         public EditorMainWindow()
         {
@@ -67,6 +81,9 @@ namespace MapEditor
                 ObjectDefinitions = objectDefinitions
             };
 
+            this.PreviewKeyDown += EditorMainWindow_PreviewKeyDown;
+            this.PreviewKeyUp += EditorMainWindow_PreviewKeyUp;
+
             InitTilePalette();
             InitObjectPalette();
             RedrawMap();
@@ -79,12 +96,31 @@ namespace MapEditor
             foreach (var kv in tileDefinitions)
             {
                 var def = kv.Value;
+                BitmapSource source;
+
+                if (!string.IsNullOrEmpty(def.Tilesheet) && def.SheetX.HasValue && def.SheetY.HasValue)
+                {
+                    var sheetPath = Path.Combine(AssetPathResolver.GetAssetsRootPath(), def.Tilesheet);
+                    var sheet = new BitmapImage(new Uri(sheetPath));
+                    source = new CroppedBitmap(sheet,
+                        new Int32Rect(def.SheetX.Value * MapConstant.TileSize, def.SheetY.Value * MapConstant.TileSize, MapConstant.TileSize, MapConstant.TileSize));
+                }
+                else if (!string.IsNullOrEmpty(def.Sprite))
+                {
+                    source = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), def.Sprite)));
+                }
+                else
+                {
+                    continue;
+                }
+
                 var img = new Image
                 {
                     Width = MapConstant.TileSize,
                     Height = MapConstant.TileSize,
-                    Source = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), def.Sprite ?? def.Frames?.FirstOrDefault())))
+                    Source = source
                 };
+
                 var item = new ListBoxItem { Content = img, Tag = kv.Key };
                 TilePalette.Items.Add(item);
             }
@@ -126,95 +162,113 @@ namespace MapEditor
             ObjectPalette.SelectedIndex = 0;
         }
 
-        private void MapCanvas_Click(object sender, MouseButtonEventArgs e)
+        private void InitNpcPalette()
         {
-            var pos = e.GetPosition(MapCanvas);
-            double x = pos.X / MapConstant.TileSize;
-            double y = pos.Y / MapConstant.TileSize;
-            int tileX = (int)Math.Floor(x);
-            int tileY = (int)Math.Floor(y);
+            NpcPalette.Items.Clear();
 
-            if (tileX >= 0 && tileY >= 0 && tileX < map.Width && tileY < map.Height)
+            foreach (var kv in objectDefinitions.Where(o => o.Value.IsNpc))
             {
-                if (currentMode == EditorMode.Trigger)
+                var def = kv.Value;
+                var img = new Image
                 {
-                    var tile = map.GetTileAt(tileX, tileY);
-                    if (tile == null)
-                    {
-                        tile = new Tile { X = tileX, Y = tileY, Id = 0 };
-                        map.Tiles.Add(tile);
-                    }
-
-                    var triggerEditWindow = new TriggerEditWindow(tile.Trigger);
-                    if (triggerEditWindow.ShowDialog() == true)
-                    {
-                        tile.Trigger = triggerEditWindow.Result;
-                    }
-                }
-
-                if (currentMode == EditorMode.Object)
-                    map.Objects.Add(new PlacedObject { Id = selectedObjectId, X = x, Y = y });
-
-                if (currentMode == EditorMode.Tile)
-                    map.SetTile(tileX, tileY, selectedTileId);
-
-                RedrawMap();
+                    Width = MapConstant.TileSize,
+                    Height = MapConstant.TileSize,
+                    Source = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), def.SpritePath)))
+                };
+                var item = new ListBoxItem { Content = img, Tag = kv.Key };
+                NpcPalette.Items.Add(item);
             }
+
+            NpcPalette.SelectionChanged += (s, e) =>
+            {
+                if (NpcPalette.SelectedItem is ListBoxItem selected)
+                    selectedObjectId = (int)selected.Tag;
+            };
+
+            NpcPalette.SelectedIndex = 0;
+        }
+
+        private bool IsObjectInteractionMode()
+        {
+            return currentMode == EditorMode.Object;
         }
 
         private void RedrawMap()
         {
             if (MapCanvas == null) return;
-
             MapCanvas.Children.Clear();
             MapCanvas.Width = mapWidth * MapConstant.TileSize;
             MapCanvas.Height = mapHeight * MapConstant.TileSize;
 
-            for (int y = 0; y < mapHeight; y++)
+            DrawTiles();
+            DrawTriggers();
+            DrawObjects();
+            DrawSelectionBox();
+            DrawGridOverlay();
+        }
+
+        private void DrawTiles()
+        {
+            double canvasWidth = MapScrollViewer.ViewportWidth / zoom;
+            double canvasHeight = MapScrollViewer.ViewportHeight / zoom;
+            double offsetX = -currentPanOffset.X / zoom;
+            double offsetY = -currentPanOffset.Y / zoom;
+
+            int startX = Math.Max(0, (int)Math.Floor(offsetX / MapConstant.TileSize));
+            int endX = Math.Min(mapWidth, (int)Math.Ceiling((offsetX + canvasWidth) / MapConstant.TileSize));
+            int startY = Math.Max(0, (int)Math.Floor(offsetY / MapConstant.TileSize));
+            int endY = Math.Min(mapHeight, (int)Math.Ceiling((offsetY + canvasHeight) / MapConstant.TileSize));
+
+            for (int y = startY; y < endY; y++)
             {
-                for (int x = 0; x < mapWidth; x++)
+                for (int x = startX; x < endX; x++)
                 {
                     int tileId = map.GetTileIdAt(x, y);
+                    if (!tileDefinitions.TryGetValue(tileId, out var tileDef)) continue;
+                    string spritePath = tileDef.Sprite ?? tileDef.Frames?.FirstOrDefault();
+                    if (string.IsNullOrEmpty(spritePath)) continue;
 
-                    if (tileDefinitions.TryGetValue(tileId, out var tileDef))
+                    var img = new Image
                     {
-                        string spritePath = tileDef.Sprite ?? tileDef.Frames?.FirstOrDefault();
-                        if (!string.IsNullOrEmpty(spritePath))
-                        {
-                            var img = new Image
-                            {
-                                Width = MapConstant.TileSize,
-                                Height = MapConstant.TileSize,
-                                Source = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetPath(), spritePath)))
-                            };
-                            Canvas.SetLeft(img, x * MapConstant.TileSize);
-                            Canvas.SetTop(img, y * MapConstant.TileSize);
-                            MapCanvas.Children.Add(img);
-                        }
-                    }
-
-                    var tile = map.GetTileAt(x, y);
-                    if (tile?.Trigger != null)
-                    {
-                        var overlay = new System.Windows.Shapes.Rectangle
-                        {
-                            Width = 10,
-                            Height = 10,
-                            Fill = Brushes.Yellow,
-                            Stroke = Brushes.Black,
-                            StrokeThickness = 1
-                        };
-                        Canvas.SetLeft(overlay, x * MapConstant.TileSize + MapConstant.TileSize - 12);
-                        Canvas.SetTop(overlay, y * MapConstant.TileSize + 2);
-                        Panel.SetZIndex(overlay, 100); // on top
-                        MapCanvas.Children.Add(overlay);
-                    }
+                        Width = MapConstant.TileSize,
+                        Height = MapConstant.TileSize,
+                        Source = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetPath(), spritePath)))
+                    };
+                    Canvas.SetLeft(img, x * MapConstant.TileSize);
+                    Canvas.SetTop(img, y * MapConstant.TileSize);
+                    MapCanvas.Children.Add(img);
                 }
             }
+        }
 
+        private void DrawTriggers()
+        {
+            foreach (var tile in map.Tiles.Where(t => t.Trigger != null))
+            {
+                var overlay = new System.Windows.Shapes.Rectangle
+                {
+                    Width = 10,
+                    Height = 10,
+                    Fill = Brushes.Yellow,
+                    Stroke = Brushes.Black,
+                    StrokeThickness = 1
+                };
+                Canvas.SetLeft(overlay, tile.X * MapConstant.TileSize + MapConstant.TileSize - 12);
+                Canvas.SetTop(overlay, tile.Y * MapConstant.TileSize + 2);
+                Panel.SetZIndex(overlay, 100);
+                MapCanvas.Children.Add(overlay);
+            }
+        }
+
+        private void DrawObjects()
+        {
             foreach (var obj in map.Objects)
             {
-                if (!objectDefinitions.TryGetValue(obj.Id, out var def) || string.IsNullOrEmpty(def.SpritePath)) continue;
+                if (!objectDefinitions.TryGetValue(obj.Id, out var def) || string.IsNullOrEmpty(def.SpritePath))
+                    continue;
+
+                double px = obj.X * MapConstant.TileSize - MapConstant.TileSize / 2;
+                double py = obj.Y * MapConstant.TileSize - MapConstant.TileSize / 2;
 
                 var img = new Image
                 {
@@ -222,13 +276,49 @@ namespace MapEditor
                     Height = MapConstant.TileSize,
                     Source = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), def.SpritePath)))
                 };
-                Canvas.SetLeft(img, (obj.X * MapConstant.TileSize) - MapConstant.TileSize / 2);
-                Canvas.SetTop(img, (obj.Y * MapConstant.TileSize) - MapConstant.TileSize / 2);
-                Panel.SetZIndex(img, 10);
-                MapCanvas.Children.Add(img);
-            }
 
-            DrawGridOverlay();
+                Canvas.SetLeft(img, px);
+                Canvas.SetTop(img, py);
+                Panel.SetZIndex(img, obj.Z);
+                MapCanvas.Children.Add(img);
+
+                // Highlight selection if inside selectionRect
+                var screenPoint = new Point(obj.X * MapConstant.TileSize, obj.Y * MapConstant.TileSize);
+                if (!selectionRect.IsEmpty && selectionRect.Contains(screenPoint))
+                {
+                    var highlight = new System.Windows.Shapes.Rectangle
+                    {
+                        Width = MapConstant.TileSize,
+                        Height = MapConstant.TileSize,
+                        Stroke = Brushes.Cyan,
+                        StrokeThickness = 2,
+                        Fill = null
+                    };
+                    Canvas.SetLeft(highlight, px);
+                    Canvas.SetTop(highlight, py);
+                    Panel.SetZIndex(highlight, obj.Z + 1);
+                    MapCanvas.Children.Add(highlight);
+                }
+            }
+        }
+
+        private void DrawSelectionBox()
+        {
+            if (isSelecting && !selectionRect.IsEmpty)
+            {
+                var rect = new System.Windows.Shapes.Rectangle
+                {
+                    Width = selectionRect.Width,
+                    Height = selectionRect.Height,
+                    Stroke = Brushes.Cyan,
+                    StrokeThickness = 1,
+                    Fill = new SolidColorBrush(Color.FromArgb(50, 0, 255, 255))
+                };
+                Canvas.SetLeft(rect, selectionRect.X);
+                Canvas.SetTop(rect, selectionRect.Y);
+                Panel.SetZIndex(rect, 9999);
+                MapCanvas.Children.Add(rect);
+            }
         }
 
         private void DrawGridOverlay()
@@ -330,7 +420,6 @@ namespace MapEditor
                 MapWidthBox.Text = map.Width.ToString();
                 MapHeightBox.Text = map.Height.ToString();
 
-                RedrawMap();
                 ApplyCanvasTransform();
             }
         }
@@ -385,28 +474,15 @@ namespace MapEditor
             {
                 MessageBox.Show("Invalid map size.");
             }
-        }
+        }    
 
-        private void MapCanvas_MouseWheel(object sender, MouseWheelEventArgs e)
+        private Rect NormalizeRect(Rect rect)
         {
-            double delta = e.Delta > 0 ? 0.1 : -0.1;
-            zoom = Math.Max(0.2, Math.Min(5, zoom + delta));
-            ApplyCanvasTransform();
-        }
-
-        private void MapCanvas_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (dragStart.HasValue && e.RightButton == MouseButtonState.Pressed)
-            {
-                var currentPos = e.GetPosition(this);
-                var delta = currentPos - dragStart.Value;
-                var offset = currentPanOffset + delta;
-
-                currentPanOffset = offset;
-                dragStart = currentPos;
-
-                ApplyCanvasTransform();
-            }
+            double x = Math.Min(rect.Left, rect.Right);
+            double y = Math.Min(rect.Top, rect.Bottom);
+            double width = Math.Abs(rect.Width);
+            double height = Math.Abs(rect.Height);
+            return new Rect(x, y, width, height);
         }
 
         private void ApplyCanvasTransform()
@@ -415,50 +491,33 @@ namespace MapEditor
             group.Children.Add(new ScaleTransform(zoom, zoom));
             group.Children.Add(new TranslateTransform(currentPanOffset.X, currentPanOffset.Y));
             MapCanvas.RenderTransform = group;
+
+            RedrawMap();
         }
 
-        private void MapCanvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        private void DeleteSelectedObjects()
         {
-            if (currentMode == EditorMode.Object)
+            var deleted = new List<IEditorCommand>();
+
+            foreach (var obj in map.Objects.ToList())
             {
+                double px = obj.X * MapConstant.TileSize;
+                double py = obj.Y * MapConstant.TileSize;
 
-                var pos = e.GetPosition(MapCanvas);
-                var target = GetObjectUnderPointer(pos);
-
-                if (target != null)
+                if (selectionRect.Contains(new Point(px, py)))
                 {
-                    map.Objects.Remove(target);
-                    RedrawMap();
+                    deleted.Add(new RemoveObjectCommand(map, obj));
                 }
-
-                return;
             }
 
-            if (currentMode == EditorMode.Trigger)
+            if (deleted.Count > 0)
             {
-                var pos = e.GetPosition(MapCanvas);
-                int tileX = (int)Math.Floor(pos.X / MapConstant.TileSize);
-                int tileY = (int)Math.Floor(pos.Y / MapConstant.TileSize);
-
-                var tile = map.GetTileAt(tileX, tileY);
-
-                if (tile != null && tile.Trigger != null)
-                {
-                    tile.Trigger = null;
-                    RedrawMap();
-                }
-
-                return;
+                var batch = new BatchCommand(deleted);
+                undoManager.ExecuteCommand(batch);
+                RedrawMap();
             }
 
-            dragStart = e.GetPosition(this); // screen-relative
-            MapCanvas.CaptureMouse();
-        }
-
-        private void MapCanvas_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            dragStart = null;
-            MapCanvas.ReleaseMouseCapture();
+            selectionRect = Rect.Empty;
         }
 
         private void TileMode_Checked(object sender, RoutedEventArgs e)
@@ -466,6 +525,10 @@ namespace MapEditor
             currentMode = EditorMode.Tile;
             ObjectPalette.Visibility = Visibility.Collapsed;
             TilePalette.Visibility = Visibility.Visible;
+            NpcPalette.Visibility = Visibility.Collapsed;
+            
+            if(MapCanvas != null)
+                MapCanvas.Focus();
         }
 
         private void ObjectMode_Checked(object sender, RoutedEventArgs e)
@@ -473,6 +536,10 @@ namespace MapEditor
             currentMode = EditorMode.Object;
             ObjectPalette.Visibility = Visibility.Visible;
             TilePalette.Visibility = Visibility.Collapsed;
+            NpcPalette.Visibility = Visibility.Collapsed;
+
+            if (MapCanvas != null)
+                MapCanvas.Focus();
         }
 
         private void TriggerMode_Checked(object sender, RoutedEventArgs e)
@@ -480,6 +547,21 @@ namespace MapEditor
             currentMode = EditorMode.Trigger;
             ObjectPalette.Visibility = Visibility.Collapsed;
             TilePalette.Visibility = Visibility.Collapsed;
+            NpcPalette.Visibility = Visibility.Collapsed;
+
+            if (MapCanvas != null)
+                MapCanvas.Focus();
+        }
+
+        private void NpcMode_Checked(object sender, RoutedEventArgs e)
+        {
+            currentMode = EditorMode.Object;
+            ObjectPalette.Visibility = Visibility.Collapsed;
+            TilePalette.Visibility = Visibility.Collapsed;
+            NpcPalette.Visibility = Visibility.Visible;
+
+            if (MapCanvas != null)
+                MapCanvas.Focus();
         }
 
         private PlacedObject GetObjectUnderPointer(Point pointer)
@@ -498,6 +580,315 @@ namespace MapEditor
             }
 
             return null;
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            HandleKeyboardInput(e);
+            base.OnKeyDown(e);
+        }
+
+        private void HandleKeyboardInput(KeyEventArgs e)
+        {
+            if (Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                if (e.Key == Key.Z)
+                {
+                    undoManager.Undo();
+                    RedrawMap();
+                    e.Handled = true;
+                }
+                else if (e.Key == Key.Y)
+                {
+                    undoManager.Redo();
+                    RedrawMap();
+                    e.Handled = true;
+                }
+            }
+            else if (e.Key == Key.Delete && !selectionRect.IsEmpty)
+            {
+                DeleteSelectedObjects();
+                e.Handled = true;
+            }
+        }
+
+        private void EditorMainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+                isSpaceHeld = true;
+        }
+
+        private void EditorMainWindow_PreviewKeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space)
+                isSpaceHeld = false;
+        }
+
+        private void ImportTilesheet_Click(object sender, RoutedEventArgs e)
+        {
+            var window = new TilesheetImportWindow();
+            if (window.ShowDialog() == true)
+            {
+                foreach (var kv in window.GeneratedTiles)
+                {
+                    tileDefinitions[kv.Key] = kv.Value;
+                }
+
+                InitTilePalette(); // Refresh the palette
+                RedrawMap();
+            }
+        }
+
+        private void MapCanvas_MouseWheel(object sender, MouseWheelEventArgs e)
+        {
+            double delta = e.Delta > 0 ? 0.1 : -0.1;
+            zoom = Math.Max(0.2, Math.Min(5, zoom + delta));
+            ApplyCanvasTransform();
+        }
+
+        private void MapCanvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var pos = e.GetPosition(MapCanvas);
+
+            // === Prioritize Panning (Space + Left Click) ===
+            if (isSpaceHeld)
+            {
+                dragStart = e.GetPosition(this); // screen coords
+                MapCanvas.CaptureMouse();
+
+                if (!MapCanvas.IsKeyboardFocused)
+                    MapCanvas.Focus();
+
+                e.Handled = true;
+                return;
+            }
+
+            // === Begin Selection with Ctrl ===
+            if (Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                selectionStart = pos;
+                isSelecting = true;
+                MapCanvas.CaptureMouse();
+                return;
+            }
+
+            // === Dragging Object ===
+            if (IsObjectInteractionMode())
+            {
+                var target = GetObjectUnderPointer(pos);
+                if (target != null)
+                {
+                    draggedObject = target;
+                    dragOffset = new Point(target.X * MapConstant.TileSize - pos.X, target.Y * MapConstant.TileSize - pos.Y);
+                    MapCanvas.CaptureMouse();
+                    return;
+                }
+                else
+                {
+                    selectionRect = Rect.Empty;
+                    RedrawMap();
+                }
+            }
+
+            // === Default Click Actions ===
+            double x = pos.X / MapConstant.TileSize;
+            double y = pos.Y / MapConstant.TileSize;
+            int tileX = (int)Math.Floor(x);
+            int tileY = (int)Math.Floor(y);
+
+            if (tileX < 0 || tileY < 0 || tileX >= map.Width || tileY >= map.Height)
+                return;
+
+            if (isSelecting)
+                return;
+
+            switch (currentMode)
+            {
+                case EditorMode.Tile:
+                    HandleTileClick(tileX, tileY);
+                    break;
+                case EditorMode.Object:
+                    HandleObjectClick(x, y);
+                    break;
+                case EditorMode.Trigger:
+                    HandleTriggerClick(tileX, tileY);
+                    break;
+            }
+        }
+
+        private void MapCanvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            // === End panning ===
+            if (dragStart.HasValue && isSpaceHeld)
+            {
+                dragStart = null;
+                MapCanvas.ReleaseMouseCapture();
+                e.Handled = true;
+                return;
+            }
+
+            // === End drag object ===
+            if (draggedObject != null)
+            {
+                var pos = e.GetPosition(MapCanvas);
+                draggedObject.X = (pos.X + dragOffset.X) / MapConstant.TileSize;
+                draggedObject.Y = (pos.Y + dragOffset.Y) / MapConstant.TileSize;
+                draggedObject = null;
+                MapCanvas.ReleaseMouseCapture();
+                RedrawMap();
+                return;
+            }
+
+            // === Selection finalization ===
+            if (isSelecting)
+            {
+                isSelecting = false;
+                MapCanvas.ReleaseMouseCapture();
+
+                if (selectionStart.HasValue)
+                {
+                    var end = e.GetPosition(MapCanvas);
+                    var norm = NormalizeRect(new Rect(selectionStart.Value, end));
+                    selectionRect = (norm.Width > 1 && norm.Height > 1) ? norm : Rect.Empty;
+                }
+                else
+                {
+                    selectionRect = Rect.Empty;
+                }
+
+                selectionStart = null;
+                RedrawMap();
+            }
+
+            if (e.ClickCount == 2)
+            {
+                HandleDoubleClick(e);
+            }
+        }
+
+        private void HandleTileClick(int tileX, int tileY)
+        {
+            IEditorCommand command;
+            if (Keyboard.Modifiers == ModifierKeys.Shift)
+            {
+                command = new FillTileCommand(map, tileX, tileY, selectedTileId);
+            }
+            else
+            {
+                command = new SetTileCommand(map, tileX, tileY, selectedTileId);
+            }
+
+            undoManager.ExecuteCommand(command);
+            RedrawMap();
+        }
+
+        private void HandleObjectClick(double x, double y)
+        {
+            var isNpc = objectDefinitions.TryGetValue(selectedObjectId, out var def) && def.IsNpc;
+            var obj = new PlacedObject
+            {
+                Id = selectedObjectId,
+                X = x,
+                Y = y,
+                Z = isNpc ? 5 : 10,
+                Meta = isNpc ? new Dictionary<string, string> { ["npc"] = "true", ["name"] = "New NPC" } : null
+            };
+
+            var command = new PlaceObjectCommand(map, obj);
+            undoManager.ExecuteCommand(command);
+            RedrawMap();
+        }
+
+        private void HandleTriggerClick(int tileX, int tileY)
+        {
+            var existingTile = map.GetTileAt(tileX, tileY);
+            var triggerEditWindow = new TriggerEditWindow(existingTile?.Trigger);
+            if (triggerEditWindow.ShowDialog() == true)
+            {
+                var command = new SetTriggerCommand(map, tileX, tileY, triggerEditWindow.Result);
+                undoManager.ExecuteCommand(command);
+                RedrawMap();
+            }
+        }
+
+        private void MapCanvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed && isSpaceHeld)
+            {
+                if (!dragStart.HasValue)
+                {
+                    dragStart = e.GetPosition(this); // Start panning on first move
+                    MapCanvas.CaptureMouse();
+                }
+
+                var currentPos = e.GetPosition(this);
+                var delta = currentPos - dragStart.Value;
+                currentPanOffset += (Vector)delta;
+                dragStart = currentPos;
+                ApplyCanvasTransform();
+                e.Handled = true;
+                return;
+            }
+
+            if (draggedObject != null && e.LeftButton == MouseButtonState.Pressed)
+            {
+                var pos = e.GetPosition(MapCanvas);
+                draggedObject.X = (pos.X + dragOffset.X) / MapConstant.TileSize;
+                draggedObject.Y = (pos.Y + dragOffset.Y) / MapConstant.TileSize;
+                RedrawMap();
+                return;
+            }
+
+            if (dragStart.HasValue && e.RightButton == MouseButtonState.Pressed)
+            {
+                var currentPos = e.GetPosition(this);
+                var delta = currentPos - dragStart.Value;
+                var offset = currentPanOffset + delta;
+                currentPanOffset = offset;
+                dragStart = currentPos;
+                ApplyCanvasTransform();
+            }
+
+            if (isSelecting && selectionStart.HasValue && e.LeftButton == MouseButtonState.Pressed)
+            {
+                var current = e.GetPosition(MapCanvas);
+                selectionRect = new Rect(selectionStart.Value, current);
+                RedrawMap();
+            }
+        }
+
+        private void HandleDoubleClick(MouseButtonEventArgs e)
+        {
+            var pos = e.GetPosition(MapCanvas);
+
+            if (IsObjectInteractionMode())
+            {
+                var target = GetObjectUnderPointer(pos);
+                if (target != null && target.Meta != null && target.Meta.TryGetValue("npc", out var tag) && tag == "true")
+                {
+                    var npcWindow = new NpcEditWindow(target.Meta);
+                    if (npcWindow.ShowDialog() == true)
+                    {
+                        target.Meta = npcWindow.ResultMeta;
+                        RedrawMap();
+                    }
+                }
+            }
+            else if (currentMode == EditorMode.Trigger)
+            {
+                int tileX = (int)(pos.X / MapConstant.TileSize);
+                int tileY = (int)(pos.Y / MapConstant.TileSize);
+                var tile = map.GetTileAt(tileX, tileY);
+                if (tile == null || tile.Trigger == null) return;
+
+                var triggerEditWindow = new TriggerEditWindow(tile.Trigger);
+                if (triggerEditWindow.ShowDialog() == true)
+                {
+                    var command = new SetTriggerCommand(map, tileX, tileY, triggerEditWindow.Result);
+                    undoManager.ExecuteCommand(command);
+                    RedrawMap();
+                }
+            }
         }
     }
 }

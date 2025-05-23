@@ -7,16 +7,24 @@ namespace JRPG.Managers
         public double X { get; private set; }
         public double Y { get; private set; }
 
+        public double PreviousX { get; private set; }
+        public double PreviousY { get; private set; }
+
         public double ViewWidthTiles { get; }
         public double ViewHeightTiles { get; }
 
-        private readonly double easing;
+        private double easing;
 
         public CameraManager(double viewWidthTiles, double viewHeightTiles, double easingFactor = 0.35)
         {
             ViewWidthTiles = viewWidthTiles;
             ViewHeightTiles = viewHeightTiles;
             easing = easingFactor;
+        }
+
+        public void SetEasing(double value)
+        {
+            easing = value;
         }
 
         public void SnapTo(double centerX, double centerY, Map map)
@@ -28,8 +36,12 @@ namespace JRPG.Managers
 
         public void Update(double centerX, double centerY, Map map)
         {
+            PreviousX = X;
+
             var target = ClampToBounds(centerX, centerY, map);
             X += (target.x - X) * easing;
+
+            PreviousY = Y;
             Y += (target.y - Y) * easing;
         }
 

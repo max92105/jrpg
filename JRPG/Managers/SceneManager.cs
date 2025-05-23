@@ -55,10 +55,10 @@ namespace JRPG.Managers
                 CurrentGame?.Update();
         }
 
-        public static void Render()
+        public static void Render(double interpolation)
         {
             if (GameStateManager.IsExploration)
-                CurrentGame?.Render();
+                CurrentGame?.Render(interpolation);
         }
 
         public static async Task StartNewGameAsync()

@@ -6,13 +6,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
 
 namespace JRPG
 {
     public partial class MainWindow : Window
     {
         public DialogueManager dialogueManager;
+        private GameLoopManager gameLoop;
 
         public MainWindow()
         {
@@ -33,25 +33,19 @@ namespace JRPG
             if (dialogueManager == null)
                 dialogueManager = new DialogueManager(DialogueUI.TextElement, DialogueUI.Container, DialogueUI.Portrait, DialogueUI.Speaker, DialogueUI.ContinueIcon);
 
-            CompositionTarget.Rendering += OnRender;
+            gameLoop = new GameLoopManager(
+             () =>
+             {
+                SceneManager.Update();
+             },
+             (interpolation) =>
+             {
+                SceneManager.Render(interpolation);
+             });
+
+            gameLoop.Start();
         }
 
-        private void OnRender(object sender, EventArgs e)
-        {
-            if (StartScreen.Visibility == Visibility.Visible || GameMenuControl?.Visibility == Visibility.Visible)
-                return;
-
-            CompositionTarget.Rendering += OnRenderLoop;
-        }
-
-        private void OnRenderLoop(object sender, EventArgs e)
-        {
-            if (!GameStateManager.IsExploration)
-                return;
-
-            SceneManager.Update();
-            SceneManager.Render();
-        }
 
         private async void StartButton_Click(object sender, RoutedEventArgs e)
         {

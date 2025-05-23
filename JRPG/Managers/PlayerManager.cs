@@ -10,6 +10,9 @@ namespace JRPG.Managers
         // Position and movement
         public double X { get; private set; } = 10.0;
         public double Y { get; private set; } = 3.0;
+        public double PreviousX { get; private set; }
+        public double PreviousY { get; private set; }
+
         public double Radius => 0.1;
 
         public double VelocityX { get; private set; }
@@ -36,6 +39,9 @@ namespace JRPG.Managers
         {
             VelocityX = 0;
             VelocityY = 0;
+
+            PreviousX = X;
+            PreviousY = Y;
 
             if (left && !right)
             {

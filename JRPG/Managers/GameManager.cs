@@ -38,6 +38,9 @@ namespace JRPG
         private int lastTriggeredY = -1;
         private DateTime lastFrameTime = DateTime.Now;
 
+        private static readonly Random rng = new Random();
+
+
         // State
         public string currentMapFile = "start.json";
 
@@ -113,7 +116,7 @@ namespace JRPG
             if (mapRenderer?.VisualHost != null && canvas.Children.Contains(mapRenderer.VisualHost))
                 canvas.Children.Remove(mapRenderer.VisualHost);
 
-            // Clear input state
+            canvas.Children.Clear(); // Full wipe
             keysDown.Clear();
         }
 
@@ -171,42 +174,63 @@ namespace JRPG
 
                 if (Player.IsMoving)
                 {
-                    int tileX = (int)Math.Floor(Player.X);
-                    int tileY = (int)Math.Floor(Player.Y);
-
-                    var tileTrigger = mapManager.GetTileTrigger(tileX, tileY);
-                    if ((tileX != lastTriggeredX || tileY != lastTriggeredY) && tileTrigger?.Type != TriggerType.None)
-                    {
-                        triggerHandler.HandleTrigger(tileTrigger);
-                        lastTriggeredX = tileX;
-                        lastTriggeredY = tileY;
-                    }
-                    else if (tileTrigger == null || tileTrigger.Type == TriggerType.None)
-                    {
-                        lastTriggeredX = -1;
-                        lastTriggeredY = -1;
-
-                        if (new Random().Next(1, 100) == 59)
-                            triggerHandler.HandleTrigger(new TriggerBattle());
-                    }
+                    CheckForTriggers();
+                    camera.SetEasing(0.35);
+                }
+                else
+                { 
+                    camera.SetEasing(0.1);
                 }
             }
 
             GameSystems.System.UpdatePlayerPosition(Player.X, Player.Y);
+            lastFrameTime = DateTime.Now;
         }
 
-        public void Render()
+        public void Render(double interpolationFactor)
         {
             playerImageControl.Source = playerFrames[(int)Player.Direction, Player.AnimationFrame];
 
+            // Interpolate player position
+            double interpX = Player.PreviousX + (Player.X - Player.PreviousX) * interpolationFactor;
+            double interpY = Player.PreviousY + (Player.Y - Player.PreviousY) * interpolationFactor;
+
+            // Interpolate camera position
+            double interpCamX = camera.PreviousX + (camera.X - camera.PreviousX) * interpolationFactor;
+            double interpCamY = camera.PreviousY + (camera.Y - camera.PreviousY) * interpolationFactor;
+
+            // Pixel offset so sprite is centered and visually balanced
             double spriteOffsetX = -32.0 / MapConstant.TileSize;
             double spriteOffsetY = -32.0 / MapConstant.TileSize;
 
-            double drawX = (Player.X - Player.Radius + spriteOffsetX - camera.X) * MapConstant.TileSize;
-            double drawY = (Player.Y - Player.Radius + spriteOffsetY - camera.Y) * MapConstant.TileSize;
+            double drawX = (interpX - Player.Radius + spriteOffsetX - interpCamX) * MapConstant.TileSize;
+            double drawY = (interpY - Player.Radius + spriteOffsetY - interpCamY) * MapConstant.TileSize;
 
             Canvas.SetLeft(playerImageControl, drawX);
             Canvas.SetTop(playerImageControl, drawY);
+        }
+
+        private void CheckForTriggers()
+        {
+            int tileX = (int)Math.Floor(Player.X);
+            int tileY = (int)Math.Floor(Player.Y);
+
+            var tileTrigger = mapManager.GetTileTrigger(tileX, tileY);
+
+            if ((tileX != lastTriggeredX || tileY != lastTriggeredY) && tileTrigger?.Type != TriggerType.None)
+            {
+                triggerHandler.HandleTrigger(tileTrigger);
+                lastTriggeredX = tileX;
+                lastTriggeredY = tileY;
+            }
+            else if (tileTrigger == null || tileTrigger.Type == TriggerType.None)
+            {
+                lastTriggeredX = -1;
+                lastTriggeredY = -1;
+
+                if (rng.Next(1, 500) == 59)
+                    triggerHandler.HandleTrigger(new TriggerBattle());
+            }
         }
     }
 }

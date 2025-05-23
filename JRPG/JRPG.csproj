@@ -92,6 +92,7 @@
     <Compile Include="Enums\SceneType.cs" />
     <Compile Include="Managers\CameraManager.cs" />
     <Compile Include="Managers\GameFlowManager.cs" />
+    <Compile Include="Managers\GameLoopManager.cs" />
     <Compile Include="Managers\GameStateManager.cs" />
     <Compile Include="Managers\InputManager.cs" />
     <Compile Include="Managers\InputRouter.cs" />

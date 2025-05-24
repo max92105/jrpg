@@ -3,6 +3,7 @@ using JRPG.Core.Utils;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace JRPG.Core.Maps.IO
 {
@@ -12,6 +13,15 @@ namespace JRPG.Core.Maps.IO
         private static string filePath = AssetPathResolver.GetTilePath("Tileset.json");
 
         public static IReadOnlyDictionary<int, TileDefinition> Definitions => definitions;
+
+        public static void AddOrUpdate(TileDefinition def)
+        {
+            var dict = Definitions as Dictionary<int, TileDefinition>;
+            if (dict != null)
+            {
+                dict[def.Id] = def;
+            }
+        }
 
         public static void Load()
         {
@@ -47,10 +57,9 @@ namespace JRPG.Core.Maps.IO
             Save();
         }
 
-        public static void ReloadAssets()
+        public static int GetNextId()
         {
-            // Nothing required here yet unless you cache images.
-            // You can call Load() if needed.
+            return Definitions.Keys.Any() ? Definitions.Keys.Max() + 1 : 1;
         }
     }
 }

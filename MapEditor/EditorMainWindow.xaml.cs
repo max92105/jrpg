@@ -36,8 +36,17 @@ namespace MapEditor
         //Options
         private bool showGrid = true;
         private string currentMapName;
-        private enum EditorMode { Tile, Object, Trigger }
+        private enum EditorMode { Tile, Object, Trigger, NPC }
         private EditorMode currentMode = EditorMode.Tile;
+
+        // Preview panel state
+        private double assetZoom = 1.0;
+        private Point? assetDragStart = null;
+        private Vector assetOffset = new Vector(0, 0);
+
+        // Track current folder selection
+        private string currentAssetFolder = "";
+        private string selectedAssetPath = "";
 
         //Zoom
         private double zoom = 1.0;
@@ -60,16 +69,21 @@ namespace MapEditor
         //Z placement
         private int selectedLayer = 0;
 
+        private int selectedSheetX = -1;
+        private int selectedSheetY = -1;
+        private string selectedTilesheet = null;
+
         //Palette
         private Dictionary<int, ObjectDefinition> objectDefinitions;
 
         private readonly UndoManager undoManager = new UndoManager();
 
-        private TilesheetViewer tilesheetViewer;
-
         public EditorMainWindow()
         {
             InitializeComponent();
+
+            // ✅ Load tile definitions from disk
+            TileDatabase.Load();
 
             // Load definitions from JSON
             objectDefinitions = ObjectSetLoader.Load(AssetPathResolver.GetPath(MapConstant.ObjectSetJsonPath));
@@ -86,124 +100,7 @@ namespace MapEditor
             this.PreviewKeyDown += EditorMainWindow_PreviewKeyDown;
             this.PreviewKeyUp += EditorMainWindow_PreviewKeyUp;
 
-            InitTilePalette();
-            InitObjectPalette();
-            InitTilesheetViewer();
             RedrawMap();
-        }
-
-        private void InitTilesheetViewer()
-        {
-            if (tilesheetViewer != null) return;
-
-            tilesheetViewer = new TilesheetViewer();
-            tilesheetViewer.Margin = new Thickness(0, 5, 0, 5);
-
-
-            TilePanelContainer.Children.Add(tilesheetViewer);
-
-            tilesheetViewer.LoadSheet("Tilesheet.png");
-        }
-
-        private void InitTilePalette()
-        {
-            TilePalette.Items.Clear();
-
-            TileDatabase.Load();
-
-            foreach (var kv in TileDatabase.Definitions)
-            {
-                var def = kv.Value;
-                BitmapSource source;
-
-                if (!string.IsNullOrEmpty(def.Tilesheet) && def.SheetX.HasValue && def.SheetY.HasValue)
-                {
-                    var sheetPath = Path.Combine(AssetPathResolver.GetAssetsRootPath(), def.Tilesheet);
-                    var sheet = new BitmapImage(new Uri(sheetPath));
-                    source = new CroppedBitmap(sheet,
-                        new Int32Rect(def.SheetX.Value * MapConstant.TileSize, def.SheetY.Value * MapConstant.TileSize, MapConstant.TileSize, MapConstant.TileSize));
-                }
-                else if (!string.IsNullOrEmpty(def.Sprite))
-                {
-                    source = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), def.Sprite)));
-                }
-                else
-                {
-                    continue;
-                }
-
-                var img = new Image
-                {
-                    Width = MapConstant.TileSize,
-                    Height = MapConstant.TileSize,
-                    Source = source
-                };
-
-                var item = new ListBoxItem { Content = img, Tag = kv.Key };
-                TilePalette.Items.Add(item);
-            }
-
-            TilePalette.SelectionChanged += (s, e) =>
-            {
-                if (TilePalette.SelectedItem is ListBoxItem selected)
-                    selectedTileId = (int)selected.Tag;
-            };
-
-            TilePalette.SelectedIndex = 0;
-        }
-
-        private void InitObjectPalette()
-        {
-            ObjectPalette.Items.Clear();
-
-            foreach (var kv in objectDefinitions)
-            {
-                var def = kv.Value;
-                if (string.IsNullOrEmpty(def.SpritePath)) continue;
-
-                var img = new Image
-                {
-                    Width = MapConstant.TileSize,
-                    Height = MapConstant.TileSize,
-                    Source = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), def.SpritePath)))
-                };
-                var item = new ListBoxItem { Content = img, Tag = kv.Key };
-                ObjectPalette.Items.Add(item);
-            }
-
-            ObjectPalette.SelectionChanged += (s, e) =>
-            {
-                if (ObjectPalette.SelectedItem is ListBoxItem selected)
-                    selectedObjectId = (int)selected.Tag;
-            };
-
-            ObjectPalette.SelectedIndex = 0;
-        }
-
-        private void InitNpcPalette()
-        {
-            NpcPalette.Items.Clear();
-
-            foreach (var kv in objectDefinitions.Where(o => o.Value.IsNpc))
-            {
-                var def = kv.Value;
-                var img = new Image
-                {
-                    Width = MapConstant.TileSize,
-                    Height = MapConstant.TileSize,
-                    Source = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetAssetsRootPath(), def.SpritePath)))
-                };
-                var item = new ListBoxItem { Content = img, Tag = kv.Key };
-                NpcPalette.Items.Add(item);
-            }
-
-            NpcPalette.SelectionChanged += (s, e) =>
-            {
-                if (NpcPalette.SelectedItem is ListBoxItem selected)
-                    selectedObjectId = (int)selected.Tag;
-            };
-
-            NpcPalette.SelectedIndex = 0;
         }
 
         private bool IsObjectInteractionMode()
@@ -227,6 +124,8 @@ namespace MapEditor
 
         private void DrawTiles()
         {
+            bool showCollision = ToggleCollisionOverlay?.IsChecked == true;
+
             double canvasWidth = MapScrollViewer.ViewportWidth / zoom;
             double canvasHeight = MapScrollViewer.ViewportHeight / zoom;
             double offsetX = -currentPanOffset.X / zoom;
@@ -249,7 +148,7 @@ namespace MapEditor
 
                         if (!string.IsNullOrEmpty(tileDef.Tilesheet) && tileDef.SheetX.HasValue && tileDef.SheetY.HasValue)
                         {
-                            var sheetPath = Path.Combine(AssetPathResolver.GetAssetsRootPath(), tileDef.Tilesheet);
+                            var sheetPath = AssetPathResolver.GetTilePath(tileDef.Tilesheet);
 
                             var sheet = new BitmapImage();
                             sheet.BeginInit();
@@ -281,6 +180,22 @@ namespace MapEditor
                         Canvas.SetTop(img, y * MapConstant.TileSize);
                         Panel.SetZIndex(img, tile.Z);
                         MapCanvas.Children.Add(img);
+
+                        if (showCollision && tileDef.CollisionPolygon != null && tileDef.CollisionPolygon.Count >= 2)
+                        {
+                            var polygon = new System.Windows.Shapes.Polygon
+                            {
+                                Stroke = Brushes.Lime,
+                                StrokeThickness = 1,
+                                Fill = new SolidColorBrush(Color.FromArgb(40, 0, 255, 0)),
+                                Points = new PointCollection(tileDef.CollisionPolygon.Select(p =>
+                                  new Point((x + p.X) * MapConstant.TileSize,
+                                        (y + p.Y) * MapConstant.TileSize)))
+                            };
+
+                            Panel.SetZIndex(polygon, tile.Z + 1);
+                            MapCanvas.Children.Add(polygon);
+                        }
                     }
                 }
             }
@@ -560,45 +475,226 @@ namespace MapEditor
         private void TileMode_Checked(object sender, RoutedEventArgs e)
         {
             currentMode = EditorMode.Tile;
-            ObjectPalette.Visibility = Visibility.Collapsed;
-            TilePalette.Visibility = Visibility.Visible;
-            NpcPalette.Visibility = Visibility.Collapsed;
-            
-            if(MapCanvas != null)
-                MapCanvas.Focus();
+            RefreshFolderBrowser();
         }
 
         private void ObjectMode_Checked(object sender, RoutedEventArgs e)
         {
             currentMode = EditorMode.Object;
-            ObjectPalette.Visibility = Visibility.Visible;
-            TilePalette.Visibility = Visibility.Collapsed;
-            NpcPalette.Visibility = Visibility.Collapsed;
-
-            if (MapCanvas != null)
-                MapCanvas.Focus();
+            RefreshFolderBrowser();
         }
 
         private void TriggerMode_Checked(object sender, RoutedEventArgs e)
         {
             currentMode = EditorMode.Trigger;
-            ObjectPalette.Visibility = Visibility.Collapsed;
-            TilePalette.Visibility = Visibility.Collapsed;
-            NpcPalette.Visibility = Visibility.Collapsed;
-
-            if (MapCanvas != null)
-                MapCanvas.Focus();
+            RefreshFolderBrowser();
         }
 
         private void NpcMode_Checked(object sender, RoutedEventArgs e)
         {
-            currentMode = EditorMode.Object;
-            ObjectPalette.Visibility = Visibility.Collapsed;
-            TilePalette.Visibility = Visibility.Collapsed;
-            NpcPalette.Visibility = Visibility.Visible;
+            currentMode = EditorMode.NPC;
+            RefreshFolderBrowser();
+        }
 
-            if (MapCanvas != null)
-                MapCanvas.Focus();
+        private void RefreshFolderBrowser()
+        {
+            FolderBrowser.Items.Clear();
+
+            string targetFolder;
+
+            switch (currentMode)
+            {
+                case EditorMode.Tile:
+                    targetFolder = "Tiles";
+                    break;
+                case EditorMode.Object:
+                    targetFolder = "Objects";
+                    break;
+                case EditorMode.NPC:
+                    targetFolder = "NPCs";
+                    break;
+                default:
+                    targetFolder = "";
+                    break;
+            }
+
+            if (string.IsNullOrEmpty(targetFolder))
+            {
+                AssetPreviewHost.Content = null;
+                return;
+            }
+
+            string fullPath = Path.Combine(AssetPathResolver.GetAssetsRootPath(), targetFolder);
+            if (!Directory.Exists(fullPath)) return;
+
+            currentAssetFolder = fullPath;
+
+            foreach (var file in Directory.GetFiles(fullPath))
+            {
+                var item = new ListBoxItem
+                {
+                    Content = System.IO.Path.GetFileName(file),
+                    Tag = file
+                };
+                FolderBrowser.Items.Add(item);
+            }
+
+            FolderBrowser.SelectionChanged += FolderBrowser_SelectionChanged;
+        }
+
+        private void FolderBrowser_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (FolderBrowser.SelectedItem is ListBoxItem selected)
+            {
+                selectedAssetPath = selected.Tag as string;
+                DisplayAsset(selectedAssetPath);
+            }
+        }
+
+        private void DisplayAsset(string path)
+        {
+            AssetPreviewHost.Content = null;
+
+            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+                return;
+
+            var image = new BitmapImage(new Uri(path, UriKind.Absolute));
+
+            var viewer = new ZoomableImageViewer();
+            viewer.SetImage(image);
+
+            if (currentMode == EditorMode.Tile)
+            {
+                selectedTilesheet = Path.GetFileName(path);
+
+                viewer.TileClicked += (tileX, tileY) =>
+                {
+                    var match = TileDatabase.Definitions.FirstOrDefault(kvp =>
+                        kvp.Value.Tilesheet != null &&
+                        Path.GetFileName(kvp.Value.Tilesheet).Equals(Path.GetFileName(path), StringComparison.OrdinalIgnoreCase) &&
+                        kvp.Value.SheetX == tileX &&
+                        kvp.Value.SheetY == tileY
+                    );
+
+                    TileDefinition def;
+                    if (!match.Equals(default(KeyValuePair<int, TileDefinition>)))
+                    {
+                        def = match.Value;
+                        selectedTileId = match.Key;
+                    }
+                    else
+                    {
+                        def = new TileDefinition
+                        {
+                            Id = TileDatabase.GetNextId(),
+                            Name = "New Tile",
+                            IsWalkable = true,
+                            Tilesheet = Path.GetFileName(path),
+                            SheetX = tileX,
+                            SheetY = tileY
+                        };
+                        TileDatabase.AddOrUpdate(def);
+                        selectedTileId = def.Id;
+                    }
+
+                    ShowTileProperties(def);
+                };
+            }
+
+            AssetPreviewHost.Content = viewer;
+        }
+
+        private void ShowTileProperties(TileDefinition def)
+        {
+            PropertyPanel.Children.Clear();
+
+            void SaveAndPersist()
+            {
+                TileDatabase.AddOrUpdate(def);
+                TileDatabase.Save();
+            }
+
+            void AddLabel(string text)
+            {
+                PropertyPanel.Children.Add(new TextBlock { Text = text, Foreground = Brushes.White });
+            }
+
+            void AddTextBox(string label, string value, Action<string> onChange)
+            {
+                var box = new TextBox { Text = value, Margin = new Thickness(0, 5, 0, 10) };
+                box.TextChanged += (s, e) => {
+                    onChange(box.Text);
+                    SaveAndPersist();
+                };
+                PropertyPanel.Children.Add(box);
+            }
+
+            void AddCheckbox(string label, bool value, Action<bool> onChange)
+            {
+                var cb = new CheckBox { Content = label, IsChecked = value, Foreground = Brushes.White };
+                cb.Checked += (s, e) => {
+                    onChange(true);
+                    SaveAndPersist();
+                };
+                cb.Unchecked += (s, e) => {
+                    onChange(false);
+                    SaveAndPersist();
+                };
+                PropertyPanel.Children.Add(cb);
+            }
+
+            AddLabel("Name:");
+            AddTextBox("Name", def.Name, v => def.Name = v);
+
+            AddLabel("Sprite:");
+            AddTextBox("Sprite", def.Sprite, v => def.Sprite = v);
+
+            AddLabel("Tilesheet:");
+            AddTextBox("Tilesheet", def.Tilesheet, v => def.Tilesheet = v);
+
+            AddLabel("Frame Duration:");
+            AddTextBox("FrameDuration", def.FrameDuration.ToString(), v => {
+                if (double.TryParse(v, out var d)) def.FrameDuration = d;
+            });
+
+            AddLabel("Sheet X:");
+            AddTextBox("SheetX", def.SheetX?.ToString() ?? "0", v => {
+                if (int.TryParse(v, out var i)) def.SheetX = i;
+            });
+
+            AddLabel("Sheet Y:");
+            AddTextBox("SheetY", def.SheetY?.ToString() ?? "0", v => {
+                if (int.TryParse(v, out var i)) def.SheetY = i;
+            });
+
+            AddCheckbox("Walkable", def.IsWalkable, b => def.IsWalkable = b);
+
+            var collisionEditCheckbox = new CheckBox
+            {
+                Content = "Edit Collision Polygon",
+                IsChecked = false,
+                Foreground = Brushes.White,
+                Margin = new Thickness(0, 10, 0, 0)
+            };
+
+            collisionEditCheckbox.Checked += (s, e) =>
+            {
+                if (AssetPreviewHost.Content is ZoomableImageViewer viewer)
+                    viewer.EnableCollisionPolygonEdit(def.CollisionPolygon ?? new List<Point>());
+            };
+
+            collisionEditCheckbox.Unchecked += (s, e) =>
+            {
+                if (AssetPreviewHost.Content is ZoomableImageViewer viewer)
+                {
+                    def.CollisionPolygon = viewer.GetCollisionPolygon();
+                    TileDatabase.AddOrUpdate(def);
+                    TileDatabase.Save();
+                    viewer.DisableCollisionPolygonEdit();
+                }
+            };
+
+            PropertyPanel.Children.Add(collisionEditCheckbox);
         }
 
         private PlacedObject GetObjectUnderPointer(Point pointer)
@@ -671,24 +767,6 @@ namespace MapEditor
         {
             if (e.Key == Key.Space)
                 isSpaceHeld = false;
-        }
-
-        private void ImportTilesheet_Click(object sender, RoutedEventArgs e)
-        {
-            var importWindow = new TilesheetImportWindow();
-            if (importWindow.ShowDialog() == true)
-            {
-                TileDatabase.AddTiles(importWindow.GeneratedTiles);
-                InitTilePalette(); // Refresh the tile palette
-            }
-        }
-
-        private void LayerSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (LayerSelector.SelectedItem is ComboBoxItem item && int.TryParse(item.Content.ToString(), out int z))
-            {
-                selectedLayer = z;
-            }
         }
 
         private void MapCanvas_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -938,6 +1016,19 @@ namespace MapEditor
                     RedrawMap();
                 }
             }
+        }
+
+        private void LayerInput_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (int.TryParse(LayerInput.Text, out int z))
+            {
+                selectedLayer = z;
+            }
+        }
+
+        private void ToggleCollisionOverlay_Checked(object sender, RoutedEventArgs e)
+        {
+            RedrawMap();
         }
     }
 }

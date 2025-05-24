@@ -84,6 +84,8 @@
     <Compile Include="Battles\Enums\CombatAction.cs" />
     <Compile Include="Battles\Enums\TargetType.cs" />
     <Compile Include="Maps\IO\TileDatabase.cs" />
+    <Compile Include="Maps\Models\TileGroup.cs" />
+    <Compile Include="Maps\Models\TileGroupEntry.cs" />
     <Compile Include="Systems\Equipments\Models\Armor.cs" />
     <Compile Include="Systems\Equipments\Models\Equipment.cs" />
     <Compile Include="Systems\Equipments\Models\EquipmentEntry.cs" />

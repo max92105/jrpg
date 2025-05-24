@@ -1,26 +1,36 @@
 ﻿using JRPG.Core.Maps.Models;
 using MapEditor.Undo;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MapEditor.Commands
 {
     public class FillTileCommand : IEditorCommand
     {
         private readonly Map map;
-        private readonly int targetId;
         private readonly int newId;
-        private readonly List<(int x, int y)> affectedTiles = new List<(int x, int y)>();
+        private readonly int layerZ;
 
-        public FillTileCommand(Map map, int startX, int startY, int newId)
+        private readonly List<(int x, int y, int oldId)> affected = new List<(int x, int y, int oldId)>();
+
+        public FillTileCommand(Map map, int startX, int startY, int layerZ, int newId)
         {
             this.map = map;
             this.newId = newId;
+            this.layerZ = layerZ;
 
-            targetId = map.GetTileIdAt(startX, startY);
-            FloodFill(startX, startY);
+            // Get target ID at layerZ (even if no tile exists)
+            var tile = map.Tiles.FirstOrDefault(t => t.X == startX && t.Y == startY && t.Z == layerZ);
+            int targetId = tile?.Id ?? 0;
+
+            // Always fill unless you're already drawing the same tile at same layer
+            if (targetId != newId)
+            {
+                FloodFill(startX, startY, targetId);
+            }
         }
 
-        private void FloodFill(int startX, int startY)
+        private void FloodFill(int startX, int startY, int targetId)
         {
             var visited = new HashSet<(int x, int y)>();
             var queue = new Queue<(int x, int y)>();
@@ -29,13 +39,19 @@ namespace MapEditor.Commands
             while (queue.Count > 0)
             {
                 var (x, y) = queue.Dequeue();
-                if (visited.Contains((x, y))) continue;
-                visited.Add((x, y));
+                if (!visited.Add((x, y))) continue;
 
-                if (x < 0 || x >= map.Width || y < 0 || y >= map.Height) continue;
-                if (map.GetTileIdAt(x, y) != targetId) continue;
+                if (x < 0 || x >= map.Width || y < 0 || y >= map.Height)
+                    continue;
 
-                affectedTiles.Add((x, y));
+                var tile = map.Tiles.FirstOrDefault(t => t.X == x && t.Y == y && t.Z == layerZ);
+                int currentId = tile?.Id ?? 0;
+
+                if (currentId != targetId)
+                    continue;
+
+                affected.Add((x, y, currentId));
+                map.SetTile(x, y, layerZ, newId);
 
                 queue.Enqueue((x + 1, y));
                 queue.Enqueue((x - 1, y));
@@ -46,14 +62,14 @@ namespace MapEditor.Commands
 
         public void Execute()
         {
-            foreach (var (x, y) in affectedTiles)
-                map.SetTile(x, y, newId);
+            foreach (var (x, y, _) in affected)
+                map.SetTile(x, y, layerZ, newId);
         }
 
         public void Undo()
         {
-            foreach (var (x, y) in affectedTiles)
-                map.SetTile(x, y, targetId);
+            foreach (var (x, y, oldId) in affected)
+                map.SetTile(x, y, layerZ, oldId);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using JRPG.Core.Maps;
+using JRPG.Core.Maps.IO;
 using JRPG.Core.Maps.Models;
 using JRPG.Core.Utils;
 using System;
@@ -88,7 +89,7 @@ namespace JRPG.Managers
                             continue;
 
                         int tileId = map.GetTileIdAt(mapX, mapY);
-                        if (!map.TileDefinitions.TryGetValue(tileId, out var def)) continue;
+                        if (!TileDatabase.Definitions.TryGetValue(tileId, out var def)) continue;
 
                         ImageSource imgSource = null;
 

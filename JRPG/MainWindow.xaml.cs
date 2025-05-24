@@ -1,4 +1,5 @@
-﻿using JRPG.Core.Systems;
+﻿using JRPG.Core.Maps.IO;
+using JRPG.Core.Systems;
 using JRPG.Managers;
 using JRPG.Utils;
 using System;
@@ -32,6 +33,8 @@ namespace JRPG
 
             if (dialogueManager == null)
                 dialogueManager = new DialogueManager(DialogueUI.TextElement, DialogueUI.Container, DialogueUI.Portrait, DialogueUI.Speaker, DialogueUI.ContinueIcon);
+
+            TileDatabase.Load();
 
             gameLoop = new GameLoopManager(
              () =>

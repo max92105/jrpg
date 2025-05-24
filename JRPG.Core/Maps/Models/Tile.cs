@@ -7,6 +7,7 @@ namespace JRPG.Core.Maps.Models
         public int Id { get; set; }
         public int X { get; set; }
         public int Y { get; set; }
+        public int Z { get; set; } = 0;
 
         public Trigger Trigger { get; set; }
     }

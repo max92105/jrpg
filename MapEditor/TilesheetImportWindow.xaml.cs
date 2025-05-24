@@ -10,6 +10,8 @@ using System.Windows.Media;
 using JRPG.Core.Maps;
 using JRPG.Core.Utils;
 using System.IO;
+using JRPG.Core.Maps.IO;
+using System.Linq;
 
 namespace MapEditor
 {
@@ -83,7 +85,7 @@ namespace MapEditor
 
         private void AddAll_Click(object sender, RoutedEventArgs e)
         {
-            int id = 1000; // Start high to avoid collisions
+            int id = TileDatabase.Definitions.Keys.Any() ? TileDatabase.Definitions.Keys.Max() + 1 : 1000;
             string prefix = NamePrefixBox.Text.Trim();
             bool walkable = WalkableCheck.IsChecked == true;
 
@@ -102,6 +104,9 @@ namespace MapEditor
                     id++;
                 }
             }
+
+            // 🟢 Add to the actual tile database and persist
+            JRPG.Core.Maps.IO.TileDatabase.AddTiles(GeneratedTiles);
 
             DialogResult = true;
         }

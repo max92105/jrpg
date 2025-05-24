@@ -26,6 +26,12 @@ namespace JRPG.Core.Utils
             return Path.Combine(new[] { root }.Concat(paths).ToArray());
         }
 
+        public static string GetTilePath(string file)
+        {
+            string root = GetAssetsRootPath();
+            return Path.Combine(root, "Tiles/", file);
+        }
+
         public static string GetPortraitPath(string file)
         {
             string root = GetAssetsRootPath();

@@ -32,7 +32,7 @@ namespace JRPG
                 return false;
 
             int tileId = CurrentMap.GetTileIdAt(x, y);
-            return CurrentMap.TileDefinitions.TryGetValue(tileId, out var def) ? def.IsWalkable : false;
+            return TileDatabase.Definitions.TryGetValue(tileId, out var def) ? def.IsWalkable : false;
         }
 
         public Trigger GetTileTrigger(int x, int y)
@@ -43,20 +43,20 @@ namespace JRPG
 
         public string GetTileSprite(int tileId)
         {
-            return CurrentMap.TileDefinitions.TryGetValue(tileId, out var def)
+            return TileDatabase.Definitions.TryGetValue(tileId, out var def)
                 ? def.Sprite ?? def.Frames?.FirstOrDefault()
                 : null;
         }
 
         public bool IsAnimatedTile(int tileId)
         {
-            return CurrentMap.TileDefinitions.TryGetValue(tileId, out var def)
+            return TileDatabase.Definitions.TryGetValue(tileId, out var def)
                 && def.Frames != null && def.Frames.Length > 0;
         }
 
         public string GetAnimatedFrame(int tileId)
         {
-            if (!CurrentMap.TileDefinitions.TryGetValue(tileId, out var def) || def.Frames == null)
+            if (!TileDatabase.Definitions.TryGetValue(tileId, out var def) || def.Frames == null)
                 return null;
 
             int frameIndex = (int)(mapTimeElapsed / def.FrameDuration) % def.Frames.Length;

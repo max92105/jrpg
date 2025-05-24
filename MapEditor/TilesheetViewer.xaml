@@ -1,0 +1,26 @@
+﻿<UserControl x:Class="MapEditor.TilesheetViewer"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="Auto" Height="Auto">
+    <Grid>
+        <!-- Display the tilesheet image -->
+        <Image x:Name="SheetImage" Stretch="None" />
+
+        <!-- Draw the grid overlay -->
+        <Canvas x:Name="GridCanvas" IsHitTestVisible="False" />
+
+        <!-- Highlight selected tile -->
+        <Border x:Name="HighlightBox"
+                BorderBrush="Yellow"
+                BorderThickness="2"
+                Visibility="Collapsed"
+                Width="32"
+                Height="32"
+                IsHitTestVisible="False"
+                RenderTransformOrigin="0,0">
+            <Border.RenderTransform>
+                <TranslateTransform x:Name="HighlightTransform" />
+            </Border.RenderTransform>
+        </Border>
+    </Grid>
+</UserControl>

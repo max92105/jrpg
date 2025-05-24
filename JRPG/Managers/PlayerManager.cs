@@ -1,4 +1,5 @@
 ﻿using JRPG.Core.Maps;
+using JRPG.Core.Maps.IO;
 using JRPG.Core.Maps.Models;
 using JRPG.Enums;
 using System;
@@ -103,7 +104,7 @@ namespace JRPG.Managers
                         return false;
 
                     int tileId = map.GetTileIdAt(tx, ty);
-                    if (!map.TileDefinitions.TryGetValue(tileId, out var def) || !def.IsWalkable)
+                    if (!TileDatabase.Definitions.TryGetValue(tileId, out var def) || !def.IsWalkable)
                         return false;
                 }
             }

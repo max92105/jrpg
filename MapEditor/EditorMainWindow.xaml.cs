@@ -57,18 +57,21 @@ namespace MapEditor
         private Rect selectionRect;
         private bool isSelecting = false;
 
+        //Z placement
+        private int selectedLayer = 0;
+
         //Palette
-        private Dictionary<int, TileDefinition> tileDefinitions;
         private Dictionary<int, ObjectDefinition> objectDefinitions;
 
         private readonly UndoManager undoManager = new UndoManager();
+
+        private TilesheetViewer tilesheetViewer;
 
         public EditorMainWindow()
         {
             InitializeComponent();
 
             // Load definitions from JSON
-            tileDefinitions = TilesetLoader.Load(AssetPathResolver.GetPath(MapConstant.TilesetJsonPath));
             objectDefinitions = ObjectSetLoader.Load(AssetPathResolver.GetPath(MapConstant.ObjectSetJsonPath));
 
             map = new Map
@@ -77,7 +80,6 @@ namespace MapEditor
                 Width = mapWidth,
                 Height = mapHeight,
                 Tiles = new List<Tile>(),
-                TileDefinitions = tileDefinitions.ToDictionary(kvp => kvp.Key, kvp => kvp.Value),
                 ObjectDefinitions = objectDefinitions
             };
 
@@ -86,14 +88,30 @@ namespace MapEditor
 
             InitTilePalette();
             InitObjectPalette();
+            InitTilesheetViewer();
             RedrawMap();
+        }
+
+        private void InitTilesheetViewer()
+        {
+            if (tilesheetViewer != null) return;
+
+            tilesheetViewer = new TilesheetViewer();
+            tilesheetViewer.Margin = new Thickness(0, 5, 0, 5);
+
+
+            TilePanelContainer.Children.Add(tilesheetViewer);
+
+            tilesheetViewer.LoadSheet("Tilesheet.png");
         }
 
         private void InitTilePalette()
         {
             TilePalette.Items.Clear();
 
-            foreach (var kv in tileDefinitions)
+            TileDatabase.Load();
+
+            foreach (var kv in TileDatabase.Definitions)
             {
                 var def = kv.Value;
                 BitmapSource source;
@@ -223,20 +241,47 @@ namespace MapEditor
             {
                 for (int x = startX; x < endX; x++)
                 {
-                    int tileId = map.GetTileIdAt(x, y);
-                    if (!tileDefinitions.TryGetValue(tileId, out var tileDef)) continue;
-                    string spritePath = tileDef.Sprite ?? tileDef.Frames?.FirstOrDefault();
-                    if (string.IsNullOrEmpty(spritePath)) continue;
-
-                    var img = new Image
+                    foreach (var tile in map.GetTilesAt(x, y))
                     {
-                        Width = MapConstant.TileSize,
-                        Height = MapConstant.TileSize,
-                        Source = new BitmapImage(new Uri(Path.Combine(AssetPathResolver.GetPath(), spritePath)))
-                    };
-                    Canvas.SetLeft(img, x * MapConstant.TileSize);
-                    Canvas.SetTop(img, y * MapConstant.TileSize);
-                    MapCanvas.Children.Add(img);
+                        if (!TileDatabase.Definitions.TryGetValue(tile.Id, out var tileDef)) continue;
+
+                        BitmapSource source = null;
+
+                        if (!string.IsNullOrEmpty(tileDef.Tilesheet) && tileDef.SheetX.HasValue && tileDef.SheetY.HasValue)
+                        {
+                            var sheetPath = Path.Combine(AssetPathResolver.GetAssetsRootPath(), tileDef.Tilesheet);
+
+                            var sheet = new BitmapImage();
+                            sheet.BeginInit();
+                            sheet.CacheOption = BitmapCacheOption.OnLoad;
+                            sheet.UriSource = new Uri(sheetPath, UriKind.Absolute);
+                            sheet.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+                            sheet.EndInit();
+                            sheet.Freeze();
+
+                            source = new CroppedBitmap(sheet,
+                                new Int32Rect(tileDef.SheetX.Value * MapConstant.TileSize, tileDef.SheetY.Value * MapConstant.TileSize, MapConstant.TileSize, MapConstant.TileSize));
+                        }
+                        else if (!string.IsNullOrEmpty(tileDef.Sprite))
+                        {
+                            var fullPath = Path.Combine(AssetPathResolver.GetAssetsRootPath(), tileDef.Sprite);
+                            source = new BitmapImage(new Uri(fullPath, UriKind.Absolute));
+                        }
+
+                        if (source == null) continue;
+
+                        var img = new Image
+                        {
+                            Width = MapConstant.TileSize,
+                            Height = MapConstant.TileSize,
+                            Source = source
+                        };
+
+                        Canvas.SetLeft(img, x * MapConstant.TileSize);
+                        Canvas.SetTop(img, y * MapConstant.TileSize);
+                        Panel.SetZIndex(img, tile.Z);
+                        MapCanvas.Children.Add(img);
+                    }
                 }
             }
         }
@@ -372,14 +417,6 @@ namespace MapEditor
                 map.Name = currentMapName;
                 map.Width = mapWidth;
                 map.Height = mapHeight;
-
-                // Keep only valid tile definitions
-                map.TileDefinitions = tileDefinitions
-                    .Where(kvp => !string.IsNullOrEmpty(kvp.Value.Sprite ?? kvp.Value.Frames?.FirstOrDefault()))
-                    .ToDictionary(
-                        kvp => kvp.Key,
-                        kvp => kvp.Value
-                    );
 
                 // Keep only valid object definitions
                 map.ObjectDefinitions = objectDefinitions
@@ -610,6 +647,18 @@ namespace MapEditor
                 DeleteSelectedObjects();
                 e.Handled = true;
             }
+            else if (e.Key == Key.Delete && currentMode == EditorMode.Tile)
+            {
+                // Determine tile coordinates from mouse position
+                Point pos = Mouse.GetPosition(MapCanvas);
+                int tileX = (int)(pos.X / MapConstant.TileSize);
+                int tileY = (int)(pos.Y / MapConstant.TileSize);
+
+                var command = new RemoveTileCommand(map, tileX, tileY, selectedLayer);
+                undoManager.ExecuteCommand(command);
+                RedrawMap();
+                e.Handled = true;
+            }
         }
 
         private void EditorMainWindow_PreviewKeyDown(object sender, KeyEventArgs e)
@@ -626,16 +675,19 @@ namespace MapEditor
 
         private void ImportTilesheet_Click(object sender, RoutedEventArgs e)
         {
-            var window = new TilesheetImportWindow();
-            if (window.ShowDialog() == true)
+            var importWindow = new TilesheetImportWindow();
+            if (importWindow.ShowDialog() == true)
             {
-                foreach (var kv in window.GeneratedTiles)
-                {
-                    tileDefinitions[kv.Key] = kv.Value;
-                }
+                TileDatabase.AddTiles(importWindow.GeneratedTiles);
+                InitTilePalette(); // Refresh the tile palette
+            }
+        }
 
-                InitTilePalette(); // Refresh the palette
-                RedrawMap();
+        private void LayerSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (LayerSelector.SelectedItem is ComboBoxItem item && int.TryParse(item.Content.ToString(), out int z))
+            {
+                selectedLayer = z;
             }
         }
 
@@ -655,9 +707,6 @@ namespace MapEditor
             {
                 dragStart = e.GetPosition(this); // screen coords
                 MapCanvas.CaptureMouse();
-
-                if (!MapCanvas.IsKeyboardFocused)
-                    MapCanvas.Focus();
 
                 e.Handled = true;
                 return;
@@ -771,11 +820,11 @@ namespace MapEditor
             IEditorCommand command;
             if (Keyboard.Modifiers == ModifierKeys.Shift)
             {
-                command = new FillTileCommand(map, tileX, tileY, selectedTileId);
+                command = new FillTileCommand(map, tileX, tileY, selectedLayer, selectedTileId);
             }
             else
             {
-                command = new SetTileCommand(map, tileX, tileY, selectedTileId);
+                command = new SetTileCommand(map, tileX, tileY, selectedLayer, selectedTileId);
             }
 
             undoManager.ExecuteCommand(command);
@@ -790,7 +839,7 @@ namespace MapEditor
                 Id = selectedObjectId,
                 X = x,
                 Y = y,
-                Z = isNpc ? 5 : 10,
+                Z = selectedLayer,
                 Meta = isNpc ? new Dictionary<string, string> { ["npc"] = "true", ["name"] = "New NPC" } : null
             };
 

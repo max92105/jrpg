@@ -57,6 +57,7 @@
     </ApplicationDefinition>
     <Compile Include="Commands\BatchCommand.cs" />
     <Compile Include="Commands\FillTileCommand.cs" />
+    <Compile Include="Commands\RemoveTileCommand.cs" />
     <Compile Include="Commands\SetTriggerCommand .cs" />
     <Compile Include="Commands\RemoveObjectCommad.cs" />
     <Compile Include="Commands\PlaceObjectCommand.cs" />
@@ -67,6 +68,9 @@
     </Compile>
     <Compile Include="TilesheetImportWindow.xaml.cs">
       <DependentUpon>TilesheetImportWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="TilesheetViewer.xaml.cs">
+      <DependentUpon>TilesheetViewer.xaml</DependentUpon>
     </Compile>
     <Compile Include="TriggerEditWindow.xaml.cs">
       <DependentUpon>TriggerEditWindow.xaml</DependentUpon>
@@ -89,6 +93,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="TilesheetImportWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="TilesheetViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

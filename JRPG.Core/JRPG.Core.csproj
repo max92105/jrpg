@@ -83,6 +83,7 @@
     <Compile Include="Battles\Enums\EffectType.cs" />
     <Compile Include="Battles\Enums\CombatAction.cs" />
     <Compile Include="Battles\Enums\TargetType.cs" />
+    <Compile Include="Maps\IO\TileGroupDatabase.cs" />
     <Compile Include="Maps\IO\TileDatabase.cs" />
     <Compile Include="Maps\Models\TileGroup.cs" />
     <Compile Include="Maps\Models\TileGroupEntry.cs" />

@@ -73,6 +73,9 @@ namespace MapEditor
         private int selectedSheetY = -1;
         private string selectedTilesheet = null;
 
+        private TileGroup selectedTileGroup = null;
+        private bool showTileGroups = false;
+
         //Palette
         private Dictionary<int, ObjectDefinition> objectDefinitions;
 
@@ -84,6 +87,7 @@ namespace MapEditor
 
             // ✅ Load tile definitions from disk
             TileDatabase.Load();
+            TileGroupDatabase.Load();
 
             // Load definitions from JSON
             objectDefinitions = ObjectSetLoader.Load(AssetPathResolver.GetPath(MapConstant.ObjectSetJsonPath));
@@ -101,6 +105,16 @@ namespace MapEditor
             this.PreviewKeyUp += EditorMainWindow_PreviewKeyUp;
 
             RedrawMap();
+        }
+
+        private void TileGroupButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is TileGroup group)
+            {
+                selectedTileGroup = group;
+                MessageBox.Show($"Selected tile group: {group.Name}");
+                // Optional: switch to tile paint mode with this group
+            }
         }
 
         private bool IsObjectInteractionMode()
@@ -563,6 +577,16 @@ namespace MapEditor
             var viewer = new ZoomableImageViewer();
             viewer.SetImage(image);
 
+            // ✅ INSERT HERE
+            if (showTileGroups && currentMode == EditorMode.Tile)
+            {
+                var matchingGroups = TileGroupDatabase.Groups.Values
+                    .Where(g => g.Tiles.Any()) // Optional: Filter by tilesheet later
+                    .ToList();
+
+                viewer.ShowTileGroups(matchingGroups);
+            }
+
             if (currentMode == EditorMode.Tile)
             {
                 selectedTilesheet = Path.GetFileName(path);
@@ -695,6 +719,156 @@ namespace MapEditor
             };
 
             PropertyPanel.Children.Add(collisionEditCheckbox);
+
+            var groupEditCheckbox = new CheckBox
+            {
+                Content = "Group Edit Mode",
+                IsChecked = false,
+                Foreground = Brushes.White,
+                Margin = new Thickness(0, 10, 0, 0)
+            };
+
+            groupEditCheckbox.Checked += (s, e) =>
+            {
+                if (AssetPreviewHost.Content is ZoomableImageViewer viewer)
+                    viewer.EnableGroupTileEdit();
+            };
+
+            groupEditCheckbox.Unchecked += (s, e) =>
+            {
+                if (AssetPreviewHost.Content is ZoomableImageViewer viewer)
+                    viewer.DisableGroupTileEdit();
+            };
+
+            PropertyPanel.Children.Add(groupEditCheckbox);
+
+            var groupCollisionCheckbox = new CheckBox
+            {
+                Content = "Edit Group Collision Polygon",
+                IsChecked = false,
+                Foreground = Brushes.White,
+                Margin = new Thickness(0, 10, 0, 0)
+            };
+
+            TileGroup currentGroup = null;
+
+            groupCollisionCheckbox.Checked += (s, e) =>
+            {
+                if (selectedTileGroup == null)
+                {
+                    MessageBox.Show("No group selected.");
+                    return;
+                }
+
+                currentGroup = selectedTileGroup;
+
+                if (AssetPreviewHost.Content is ZoomableImageViewer viewer)
+                {
+                    viewer.EnableCollisionPolygonEdit(currentGroup.CollisionPolygon ?? new List<Point>());
+                }
+            };
+
+            groupCollisionCheckbox.Unchecked += (s, e) =>
+            {
+                if (AssetPreviewHost.Content is ZoomableImageViewer viewer && currentGroup != null)
+                {
+                    currentGroup.CollisionPolygon = viewer.GetCollisionPolygon();
+                    TileGroupDatabase.AddOrUpdate(currentGroup);
+                    viewer.DisableCollisionPolygonEdit();
+                    MessageBox.Show("Group collision polygon saved.");
+                }
+            };
+
+            PropertyPanel.Children.Add(groupCollisionCheckbox);
+
+            var saveGroupButton = new Button
+            {
+                Content = "Create Tile Group",
+                Margin = new Thickness(0, 10, 0, 0)
+            };
+            saveGroupButton.Click += (s, e) =>
+            {
+                if (AssetPreviewHost.Content is ZoomableImageViewer viewer)
+                {
+                    var selectedPoints = viewer.GetSelectedGroupTiles(); // List<Point>
+                    if (selectedPoints.Count == 0)
+                    {
+                        MessageBox.Show("No tiles selected for grouping.");
+                        return;
+                    }
+
+                    var groupTiles = new List<TileGroupEntry>();
+
+                    foreach (var point in selectedPoints)
+                    {
+                        int sheetX = (int)point.X;
+                        int sheetY = (int)point.Y;
+
+                        // Try to find an exact tile definition
+                        var match = TileDatabase.Definitions.FirstOrDefault(kvp =>
+                            kvp.Value.SheetX == sheetX &&
+                            kvp.Value.SheetY == sheetY &&
+                            Path.GetFileName(kvp.Value.Tilesheet ?? "") == Path.GetFileName(selectedTilesheet ?? "")
+                        );
+
+                        int tileId;
+
+                        if (!match.Equals(default(KeyValuePair<int, TileDefinition>)))
+                        {
+                            tileId = match.Key;
+                        }
+                        else
+                        {
+                            var newDef = new TileDefinition
+                            {
+                                Id = TileDatabase.GetNextId(),
+                                Name = $"Auto_{sheetX}_{sheetY}",
+                                IsWalkable = true,
+                                Tilesheet = Path.GetFileName(selectedTilesheet),
+                                SheetX = sheetX,
+                                SheetY = sheetY
+                            };
+
+                            TileDatabase.AddOrUpdate(newDef);
+                            tileId = newDef.Id;
+                        }
+
+                        groupTiles.Add(new TileGroupEntry
+                        {
+                            X = sheetX,
+                            Y = sheetY,
+                            TileId = tileId,
+                            Z = 0
+                        });
+                    }
+
+                    TileDatabase.Save(); // Persist all added tile definitions
+
+                    var newGroup = new TileGroup
+                    {
+                        Id = TileGroupDatabase.Groups.Keys.Any() ? TileGroupDatabase.Groups.Keys.Max() + 1 : 1,
+                        Name = $"Group {TileGroupDatabase.Groups.Count + 1}",
+                        Tiles = groupTiles
+                    };
+
+                    TileGroupDatabase.AddOrUpdate(newGroup);
+                    MessageBox.Show("Tile group saved.");
+                }
+            };
+
+            PropertyPanel.Children.Add(saveGroupButton);
+        }
+
+        private void ToggleGroupDisplay_Checked(object sender, RoutedEventArgs e)
+        {
+            showTileGroups = true;
+            DisplayAsset(selectedAssetPath); // refresh
+        }
+
+        private void ToggleGroupDisplay_Unchecked(object sender, RoutedEventArgs e)
+        {
+            showTileGroups = false;
+            DisplayAsset(selectedAssetPath); // refresh
         }
 
         private PlacedObject GetObjectUnderPointer(Point pointer)

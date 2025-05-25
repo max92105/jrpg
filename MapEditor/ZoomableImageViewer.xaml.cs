@@ -1,6 +1,8 @@
 ﻿using JRPG.Core.Maps;
+using JRPG.Core.Maps.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -29,6 +31,9 @@ namespace MapEditor
         private Ellipse draggingHandle = null;
         private Point dragOffset;
 
+        private bool isGroupEditMode = false;
+        private List<Point> selectedTiles = new List<Point>();
+
         public ZoomableImageViewer()
         {
             InitializeComponent();
@@ -48,6 +53,25 @@ namespace MapEditor
             isEditingCollision = false;
             polygonPoints.Clear();
             RemoveOverlay();
+        }
+
+        public void EnableGroupTileEdit()
+        {
+            isGroupEditMode = true;
+            selectedTiles.Clear();
+            RedrawGroupOverlay();
+        }
+
+        public void DisableGroupTileEdit()
+        {
+            isGroupEditMode = false;
+            selectedTiles.Clear();
+            RedrawGroupOverlay();
+        }
+
+        public List<Point> GetSelectedGroupTiles()
+        {
+            return new List<Point>(selectedTiles);
         }
 
         public void SetImage(BitmapImage image)
@@ -175,6 +199,61 @@ namespace MapEditor
             pointHandles.Clear();
         }
 
+        private void RedrawGroupOverlay()
+        {
+            // Remove old highlights
+            ImageCanvas.Children.OfType<Rectangle>()
+                .Where(r => (string)r.Tag == "GroupOverlay")
+                .ToList()
+                .ForEach(r => ImageCanvas.Children.Remove(r));
+
+            foreach (var tile in selectedTiles)
+            {
+                var rect = new Rectangle
+                {
+                    Width = MapConstant.TileSize,
+                    Height = MapConstant.TileSize,
+                    Stroke = Brushes.Orange,
+                    StrokeThickness = 2,
+                    Fill = new SolidColorBrush(Color.FromArgb(50, 255, 165, 0)),
+                    Tag = "GroupOverlay"
+                };
+
+                Canvas.SetLeft(rect, tile.X * MapConstant.TileSize);
+                Canvas.SetTop(rect, tile.Y * MapConstant.TileSize);
+                Panel.SetZIndex(rect, 1000);
+                ImageCanvas.Children.Add(rect);
+            }
+        }
+
+        public void ShowTileGroups(List<TileGroup> groups)
+        {
+            // Clear existing visual group overlays
+            foreach (var child in ImageCanvas.Children.OfType<Rectangle>().Where(r => r.Tag?.ToString() == "GroupHighlight").ToList())
+                ImageCanvas.Children.Remove(child);
+
+            foreach (var group in groups)
+            {
+                foreach (var tile in group.Tiles)
+                {
+                    var rect = new Rectangle
+                    {
+                        Width = MapConstant.TileSize,
+                        Height = MapConstant.TileSize,
+                        Stroke = Brushes.Orange,
+                        StrokeThickness = 2,
+                        Fill = new SolidColorBrush(Color.FromArgb(40, 255, 165, 0)),
+                        Tag = "GroupHighlight"
+                    };
+
+                    Canvas.SetLeft(rect, tile.X * MapConstant.TileSize);
+                    Canvas.SetTop(rect, tile.Y * MapConstant.TileSize);
+                    Panel.SetZIndex(rect, 100);
+                    ImageCanvas.Children.Add(rect);
+                }
+            }
+        }
+
         private void Canvas_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             double delta = e.Delta > 0 ? 0.1 : -0.1;
@@ -194,6 +273,22 @@ namespace MapEditor
 
                 polygonPoints.Add(new Point(normX, normY));
                 RedrawOverlay();
+                return;
+            }
+
+            if (isGroupEditMode)
+            {
+                var pos = e.GetPosition(ImageCanvas);
+                int tileX = (int)(pos.X / MapConstant.TileSize);
+                int tileY = (int)(pos.Y / MapConstant.TileSize);
+                var pt = new Point(tileX, tileY);
+
+                if (!selectedTiles.Contains(pt))
+                    selectedTiles.Add(pt);
+                else
+                    selectedTiles.Remove(pt);
+
+                RedrawGroupOverlay();
                 return;
             }
 
@@ -255,6 +350,22 @@ namespace MapEditor
 
         private void Handle_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            if (isGroupEditMode)
+            {
+                var pos = e.GetPosition(ImageCanvas);
+                int tileX = (int)(pos.X / MapConstant.TileSize);
+                int tileY = (int)(pos.Y / MapConstant.TileSize);
+                var point = new Point(tileX, tileY);
+
+                if (!selectedTiles.Contains(point))
+                    selectedTiles.Add(point);
+                else
+                    selectedTiles.Remove(point);
+
+                RedrawGroupOverlay();
+                return;
+            }
+
             if (sender is Ellipse ellipse)
             {
                 draggingHandle = ellipse;

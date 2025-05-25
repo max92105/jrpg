@@ -104,7 +104,72 @@ namespace MapEditor
             this.PreviewKeyDown += EditorMainWindow_PreviewKeyDown;
             this.PreviewKeyUp += EditorMainWindow_PreviewKeyUp;
 
+            PopulateTileGroupPalette();
             RedrawMap();
+        }
+
+        private void PopulateTileGroupPalette()
+        {
+            TileGroupPalettePanel.Children.Clear();
+
+            foreach (var group in TileGroupDatabase.Groups.Values.OrderBy(g => g.Name))
+            {
+                var button = new Button
+                {
+                    Margin = new Thickness(2),
+                    Padding = new Thickness(4),
+                    Tag = group,
+                    Background = Brushes.Transparent,
+                    BorderBrush = Brushes.Orange,
+                    BorderThickness = new Thickness(1)
+                };
+
+                var canvas = new Canvas
+                {
+                    Width = MapConstant.TileSize * 4,
+                    Height = MapConstant.TileSize * 4
+                };
+
+                int minX = group.Tiles.Min(t => t.X);
+                int minY = group.Tiles.Min(t => t.Y);
+
+                foreach (var entry in group.Tiles)
+                {
+                    if (!TileDatabase.Definitions.TryGetValue(entry.TileId, out var def)) continue;
+                    if (string.IsNullOrEmpty(def.Tilesheet) || def.SheetX == null || def.SheetY == null) continue;
+
+                    var sheetPath = AssetPathResolver.GetTilePath(def.Tilesheet);
+                    var sheet = new BitmapImage();
+                    sheet.BeginInit();
+                    sheet.CacheOption = BitmapCacheOption.OnLoad;
+                    sheet.UriSource = new Uri(sheetPath, UriKind.Absolute);
+                    sheet.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+                    sheet.EndInit();
+                    sheet.Freeze();
+
+                    var crop = new CroppedBitmap(sheet, new Int32Rect(
+                        def.SheetX.Value * MapConstant.TileSize,
+                        def.SheetY.Value * MapConstant.TileSize,
+                        MapConstant.TileSize,
+                        MapConstant.TileSize));
+
+                    var img = new Image
+                    {
+                        Source = crop,
+                        Width = MapConstant.TileSize,
+                        Height = MapConstant.TileSize
+                    };
+
+                    Canvas.SetLeft(img, (entry.X - minX) * MapConstant.TileSize);
+                    Canvas.SetTop(img, (entry.Y - minY) * MapConstant.TileSize);
+                    canvas.Children.Add(img);
+                }
+
+                button.Content = canvas;
+                button.Click += TileGroupButton_Click;
+
+                TileGroupPalettePanel.Children.Add(button);
+            }
         }
 
         private void TileGroupButton_Click(object sender, RoutedEventArgs e)
@@ -852,6 +917,7 @@ namespace MapEditor
                     };
 
                     TileGroupDatabase.AddOrUpdate(newGroup);
+                    PopulateTileGroupPalette(); // Refresh display
                     MessageBox.Show("Tile group saved.");
                 }
             };

@@ -1,5 +1,4 @@
-﻿using JRPG.Core.Maps;
-using JRPG.Core.Maps.IO;
+﻿using JRPG.Core.Maps.IO;
 using JRPG.Core.Maps.Models;
 using JRPG.Enums;
 using System;
@@ -111,20 +110,19 @@ namespace JRPG.Managers
 
             foreach (var obj in map.Objects)
             {
-                if (!map.ObjectDefinitions.TryGetValue(obj.Id, out var def)) continue;
-                if (!def.HasCollision || def.CollisionBox == null) continue;
+                if (!ObjectDatabase.Definitions.TryGetValue(obj.Id, out var def)) continue;
+                if (def.CollisionPolygon == null || def.CollisionPolygon.Count == 0) continue;
 
-                var box = def.CollisionBox.Value;
-
-                double worldLeft = obj.X - 0.5 + (box.X / MapConstant.TileSize);
-                double worldTop = obj.Y - 0.5 + (box.Y / MapConstant.TileSize);
-                double worldRight = worldLeft + (box.Width / MapConstant.TileSize);
-                double worldBottom = worldTop + (box.Height / MapConstant.TileSize);
-
-                if (right > worldLeft && left < worldRight &&
-                    bottom > worldTop && top < worldBottom)
+                foreach (var point in def.CollisionPolygon)
                 {
-                    return false;
+                    // Offset by object position (centered on tile grid)
+                    double px = obj.X - 0.5 + point.X;
+                    double py = obj.Y - 0.5 + point.Y;
+
+                    if (px >= left && px <= right && py >= top && py <= bottom)
+                    {
+                        return false;
+                    }
                 }
             }
 

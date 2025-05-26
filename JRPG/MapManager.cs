@@ -67,7 +67,7 @@ namespace JRPG
 
         public ObjectDefinition GetObjectDefinition(int id)
         {
-            return CurrentMap.ObjectDefinitions.TryGetValue(id, out var def) ? def : null;
+            return ObjectDatabase.Definitions.TryGetValue(id, out var def) ? def : null;
         }
     }
 }

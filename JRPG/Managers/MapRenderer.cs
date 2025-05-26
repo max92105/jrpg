@@ -116,18 +116,36 @@ namespace JRPG.Managers
                 // Draw objects
                 foreach (var obj in map.Objects)
                 {
-                    if (!map.ObjectDefinitions.TryGetValue(obj.Id, out var def)) continue;
-                    if (string.IsNullOrEmpty(def.SpritePath)) continue;
+                    if (!ObjectDatabase.Definitions.TryGetValue(obj.Id, out var def)) continue;
+                    if (def.Tiles == null) continue;
 
-                    var img = GetCachedImage(def.SpritePath);
-                    double screenX = (obj.X - 0.5 - cameraX) * MapConstant.TileSize;
-                    double screenY = (obj.Y - 0.5 - cameraY) * MapConstant.TileSize;
+                    foreach (var entry in def.Tiles)
+                    {
+                        if (!TileDatabase.Definitions.TryGetValue(entry.TileId, out var tileDef)) continue;
 
-                    if (screenX + MapConstant.TileSize < 0 || screenX > canvas.ActualWidth ||
-                        screenY + MapConstant.TileSize < 0 || screenY > canvas.ActualHeight)
-                        continue;
+                        ImageSource imgSource = null;
+                        if (tileDef.Frames != null && tileDef.Frames.Length > 0)
+                        {
+                            int frameIndex = (int)(time / tileDef.FrameDuration) % tileDef.Frames.Length;
+                            string framePath = tileDef.Frames[frameIndex];
+                            imgSource = GetCachedImage(framePath);
+                        }
+                        else if (!string.IsNullOrEmpty(tileDef.Sprite))
+                        {
+                            imgSource = GetCachedImage(tileDef.Sprite);
+                        }
 
-                    dc.DrawImage(img, new Rect(screenX, screenY, MapConstant.TileSize, MapConstant.TileSize));
+                        if (imgSource == null) continue;
+
+                        double drawX = (obj.X - 0.5 + entry.X - cameraX) * MapConstant.TileSize;
+                        double drawY = (obj.Y - 0.5 + entry.Y - cameraY) * MapConstant.TileSize;
+
+                        if (drawX + MapConstant.TileSize < 0 || drawX > canvas.ActualWidth ||
+                            drawY + MapConstant.TileSize < 0 || drawY > canvas.ActualHeight)
+                            continue;
+
+                        dc.DrawImage(imgSource, new Rect(drawX, drawY, MapConstant.TileSize, MapConstant.TileSize));
+                    }
                 }
             }
         }

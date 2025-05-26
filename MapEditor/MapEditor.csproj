@@ -62,6 +62,13 @@
     <Compile Include="Commands\RemoveObjectCommad.cs" />
     <Compile Include="Commands\PlaceObjectCommand.cs" />
     <Compile Include="Commands\SetTileCommand.cs" />
+    <Compile Include="Controls\CollisionEditorWindow.xaml.cs">
+      <DependentUpon>CollisionEditorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PropertyEditor.xaml.cs">
+      <DependentUpon>PropertyEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Enums\EditorMode.cs" />
     <Compile Include="IEditorCommand.cs" />
     <Compile Include="NpcEditWindow.xaml.cs">
       <DependentUpon>NpcEditWindow.xaml</DependentUpon>
@@ -70,9 +77,18 @@
       <DependentUpon>TriggerEditWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="UndoManager.cs" />
-    <Compile Include="ZoomableImageViewer.xaml.cs">
+    <Compile Include="Utils\EditModeHelper.cs" />
+    <Compile Include="Controls\ZoomableImageViewer.xaml.cs">
       <DependentUpon>ZoomableImageViewer.xaml</DependentUpon>
     </Compile>
+    <Page Include="Controls\CollisionEditorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\PropertyEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="EditorMainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -93,7 +109,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ZoomableImageViewer.xaml">
+    <Page Include="Controls\ZoomableImageViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -130,8 +146,6 @@
       <Name>JRPG.Core</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Controls\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

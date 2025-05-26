@@ -1,6 +1,4 @@
-﻿using JRPG.Core.Battles.Models.Enemies;
-using JRPG.Core.Battles.Models;
-using JRPG.Core.Enums;
+﻿using JRPG.Core.Enums;
 using JRPG.Core.Maps;
 using JRPG.Core.Systems;
 using JRPG.Core.Triggers.Models;
@@ -13,7 +11,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
 
 namespace JRPG

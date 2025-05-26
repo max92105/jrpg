@@ -1,5 +1,4 @@
 ﻿using JRPG.Core.Maps;
-using JRPG.Core.Maps.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
-namespace MapEditor
+namespace MapEditor.Controls
 {
     public partial class ZoomableImageViewer : UserControl
     {
@@ -59,6 +58,7 @@ namespace MapEditor
         {
             isGroupEditMode = true;
             selectedTiles.Clear();
+            ClearSelectedTileHighlight();
             RedrawGroupOverlay();
         }
 
@@ -74,27 +74,26 @@ namespace MapEditor
             return new List<Point>(selectedTiles);
         }
 
-        public void SetImage(BitmapImage image)
+        public void SetImage(ImageSource image)
         {
             ImageCanvas.Children.Clear();
 
             displayedImage = new Image
             {
                 Source = image,
-                Width = image.PixelWidth,
-                Height = image.PixelHeight,
+                Width = image.Width,
+                Height = image.Height,
                 IsHitTestVisible = false
             };
 
             Canvas.SetLeft(displayedImage, 0);
             Canvas.SetTop(displayedImage, 0);
-            ImageCanvas.Width = image.PixelWidth;
-            ImageCanvas.Height = image.PixelHeight;
+            ImageCanvas.Width = image.Width;
+            ImageCanvas.Height = image.Height;
             ImageCanvas.Children.Add(displayedImage);
 
-            DrawGrid(image.PixelWidth, image.PixelHeight);
+            DrawGrid(image.Width, image.Height);
 
-            // Reset transforms
             zoom = 1.0;
             offset = new Vector(0, 0);
             ZoomTransform.ScaleX = zoom;
@@ -226,34 +225,6 @@ namespace MapEditor
             }
         }
 
-        public void ShowTileGroups(List<TileGroup> groups)
-        {
-            // Clear existing visual group overlays
-            foreach (var child in ImageCanvas.Children.OfType<Rectangle>().Where(r => r.Tag?.ToString() == "GroupHighlight").ToList())
-                ImageCanvas.Children.Remove(child);
-
-            foreach (var group in groups)
-            {
-                foreach (var tile in group.Tiles)
-                {
-                    var rect = new Rectangle
-                    {
-                        Width = MapConstant.TileSize,
-                        Height = MapConstant.TileSize,
-                        Stroke = Brushes.Orange,
-                        StrokeThickness = 2,
-                        Fill = new SolidColorBrush(Color.FromArgb(40, 255, 165, 0)),
-                        Tag = "GroupHighlight"
-                    };
-
-                    Canvas.SetLeft(rect, tile.X * MapConstant.TileSize);
-                    Canvas.SetTop(rect, tile.Y * MapConstant.TileSize);
-                    Panel.SetZIndex(rect, 100);
-                    ImageCanvas.Children.Add(rect);
-                }
-            }
-        }
-
         private void Canvas_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             double delta = e.Delta > 0 ? 0.1 : -0.1;
@@ -326,6 +297,15 @@ namespace MapEditor
             Canvas.SetTop(selectionHighlight, tileY * MapConstant.TileSize);
             Panel.SetZIndex(selectionHighlight, 1000);
             ImageCanvas.Children.Add(selectionHighlight);
+        }
+
+        public void ClearSelectedTileHighlight()
+        {
+            if (selectionHighlight != null)
+            {
+                ImageCanvas.Children.Remove(selectionHighlight);
+                selectionHighlight = null;
+            }
         }
 
         private void Canvas_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)

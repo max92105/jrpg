@@ -1,5 +1,4 @@
-﻿using JRPG.Core.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace JRPG.Core.Maps.Models
@@ -14,7 +13,6 @@ namespace JRPG.Core.Maps.Models
         public HashSet<int> UsedTileIds => Tiles.Select(t => t.Id).Distinct().ToHashSet();
 
         public List<PlacedObject> Objects { get; set; } = new List<PlacedObject>();
-        public Dictionary<int, ObjectDefinition> ObjectDefinitions { get; set; } = new Dictionary<int, ObjectDefinition>();
 
         // === GET ALL LAYERS ===
         public IEnumerable<Tile> GetTilesAt(int x, int y)

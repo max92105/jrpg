@@ -68,6 +68,9 @@
     <Compile Include="Controls\PropertyEditor.xaml.cs">
       <DependentUpon>PropertyEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\ZEditPopup.xaml.cs">
+      <DependentUpon>ZEditPopup.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Enums\EditorMode.cs" />
     <Compile Include="IEditorCommand.cs" />
     <Compile Include="NpcEditWindow.xaml.cs">
@@ -86,6 +89,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\PropertyEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ZEditPopup.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

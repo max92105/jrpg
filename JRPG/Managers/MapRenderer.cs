@@ -154,9 +154,17 @@ namespace JRPG.Managers
                     double drawX = (obj.X + (entry.X - minX) - cameraX) * MapConstant.TileSize;
                     double drawY = (obj.Y + (entry.Y - minY) - cameraY) * MapConstant.TileSize;
 
+                    // ✅ Override key
+                    string key = $"{entry.X},{entry.Y}";
+                    int z = obj.Z;
+                    if (obj.ZOverrides.TryGetValue(key, out int overrideZ))
+                    {
+                        z = overrideZ;
+                    }
+
                     drawables.Add(new Drawable
                     {
-                        Z = obj.Z,
+                        Z = z,
                         DrawY = drawY + MapConstant.TileSize,
                         DrawAction = dc => dc.DrawImage(img, new Rect(drawX, drawY, MapConstant.TileSize, MapConstant.TileSize))
                     });

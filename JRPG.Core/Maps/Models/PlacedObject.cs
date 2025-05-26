@@ -10,5 +10,7 @@ namespace JRPG.Core.Maps.Models
         public int Z { get; set; } = 10;
 
         public Dictionary<string, string> Meta { get; set; } = new Dictionary<string, string>();
+
+        public Dictionary<string, int> ZOverrides { get; set; } = new Dictionary<string, int>();
     }
 }

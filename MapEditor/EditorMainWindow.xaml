@@ -19,6 +19,8 @@
                 <RadioButton Content="Object" Foreground="White" GroupName="EditorMode" Checked="ObjectMode_Checked"/>
                 <RadioButton Content="Trigger" Foreground="White" GroupName="EditorMode" Checked="TriggerMode_Checked"/>
                 <RadioButton Content="NPC" Foreground="White" GroupName="EditorMode" Checked="NpcMode_Checked"/>
+                <RadioButton Content="Selection" GroupName="EditorMode" Checked="SelectionMode_Checked"/>
+                <RadioButton Content="SelectionObject" GroupName="EditorMode" Checked="SelectionObjectMode_Checked"/>
             </StackPanel>
 
             <TextBlock Text="Layer (Z-Index)" Foreground="White"/>

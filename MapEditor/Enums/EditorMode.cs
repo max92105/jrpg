@@ -6,6 +6,7 @@
         Object, 
         Trigger, 
         NPC,
-        Selection
+        Selection,
+        ObjectSelection
     }
 }

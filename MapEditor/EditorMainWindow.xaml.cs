@@ -18,6 +18,7 @@ using MapEditor.Commands;
 using MapEditor.Enums;
 using MapEditor.Utils;
 using MapEditor.Controls;
+using static System.Net.WebRequestMethods;
 
 namespace MapEditor
 {
@@ -76,6 +77,9 @@ namespace MapEditor
 
         private bool showTileGroups = false;
 
+        //SelectionMode
+        private PlacedObject hoveredObject = null;
+        private Point? hoveredObjectTile = null;
 
         private Point? hoverMapPosition = null;
 
@@ -465,6 +469,34 @@ namespace MapEditor
                     }
                 }
             }
+
+            if (hoveredObject != null && hoveredObjectTile != null)
+            {
+                if (!ObjectDatabase.Definitions.TryGetValue(hoveredObject.Id, out var def)) return;
+                int minX = def.Tiles.Min(t => t.X);
+                int minY = def.Tiles.Min(t => t.Y);
+
+                double tileX = hoveredObject.X + (hoveredObjectTile.Value.X - minX);
+                double tileY = hoveredObject.Y + (hoveredObjectTile.Value.Y - minY);
+
+                double drawX = tileX * MapConstant.TileSize;
+                double drawY = tileY * MapConstant.TileSize;
+
+                var rect = new System.Windows.Shapes.Rectangle
+                {
+                    Width = MapConstant.TileSize,
+                    Height = MapConstant.TileSize,
+                    Stroke = Brushes.Gold,
+                    StrokeThickness = 2,
+                    Fill = new SolidColorBrush(Color.FromArgb(40, 255, 215, 0)),
+                    IsHitTestVisible = false
+                };
+
+                Canvas.SetLeft(rect, drawX);
+                Canvas.SetTop(rect, drawY);
+                Panel.SetZIndex(rect, 9999);
+                MapCanvas.Children.Add(rect);
+            }
         }
 
         private void DrawSelectionBox()
@@ -499,7 +531,8 @@ namespace MapEditor
                     X2 = mapWidth * MapConstant.TileSize,
                     Y2 = y * MapConstant.TileSize,
                     Stroke = Brushes.Red,
-                    StrokeThickness = 0.5
+                    StrokeThickness = 0.5,
+                    IsHitTestVisible = false
                 };
                 Panel.SetZIndex(line, 1000);
                 MapCanvas.Children.Add(line);
@@ -689,6 +722,20 @@ namespace MapEditor
             RefreshFolderBrowser();
         }
 
+        private void SelectionMode_Checked(object sender, RoutedEventArgs e)
+        {
+            EditModeHelper.CurrentMode = EditorMode.Selection;
+            AssetPreviewHost.Content = null;
+            MapCanvas.Focus();
+        }
+
+        private void SelectionObjectMode_Checked(object sender, RoutedEventArgs e)
+        {
+            EditModeHelper.CurrentMode = EditorMode.ObjectSelection;
+            AssetPreviewHost.Content = null;
+            MapCanvas.Focus();
+        }
+
         private void RefreshObjectBrowser()
         {
             ObjectBrowser.Items.Clear();
@@ -826,7 +873,7 @@ namespace MapEditor
         {
             AssetPreviewHost.Content = null;
 
-            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+            if (string.IsNullOrEmpty(path) || !System.IO.File.Exists(path))
                 return;
 
             var image = new BitmapImage(new Uri(path, UriKind.Absolute));
@@ -1026,6 +1073,68 @@ namespace MapEditor
                 return;
             }
 
+            if (EditModeHelper.CurrentMode == EditorMode.Selection)
+            {
+                int stileX = (int)(pos.X / MapConstant.TileSize);
+                int stileY = (int)(pos.Y / MapConstant.TileSize);
+
+                // Check tile map first
+                var tile = map.GetTileAt(stileX, stileY);
+                if (tile != null)
+                {
+                    var zEditor = new ZEditPopup(tile.Z);
+                    if (zEditor.ShowDialog() == true)
+                    {
+                        tile.Z = zEditor.Result;
+                        RedrawMap();
+                    }
+                    return;
+                }
+            }
+
+            // If no tile, check for object tile
+            if (EditModeHelper.CurrentMode == EditorMode.ObjectSelection)
+            {
+                var opos = e.GetPosition(MapCanvas);
+                double px = opos.X / MapConstant.TileSize;
+                double py = opos.Y / MapConstant.TileSize;
+
+                foreach (var obj in map.Objects)
+                {
+                    if (!ObjectDatabase.Definitions.TryGetValue(obj.Id, out var def)) continue;
+                    if (def.Tiles == null) continue;
+
+                    int minX = def.Tiles.Min(t => t.X);
+                    int minY = def.Tiles.Min(t => t.Y);
+
+                    foreach (var entry in def.Tiles)
+                    {
+                        // Match exact draw logic
+                        double otileX = obj.X + (entry.X - minX);
+                        double otileY = obj.Y + (entry.Y - minY);
+
+                        int gridX = (int)Math.Floor(otileX);
+                        int gridY = (int)Math.Floor(otileY);
+
+                        if (gridX == (int)Math.Floor(px) && gridY == (int)Math.Floor(py))
+                        {
+                            string key = $"{entry.X},{entry.Y}";
+                            var currentZ = obj.ZOverrides.TryGetValue(key, out var overrideZ) ? overrideZ : obj.Z;
+
+                            var popup = new ZEditPopup(currentZ);
+                            if (popup.ShowDialog() == true)
+                            {
+                                obj.ZOverrides[key] = popup.Result;
+                                RedrawMap();
+                            }
+                            return;
+                        }
+                    }
+                }
+
+                return;
+            }
+
             // === Dragging Object ===
             if (EditModeHelper.IsInObjectMode)
             {
@@ -1204,6 +1313,42 @@ namespace MapEditor
                 return;
             }
 
+            if (EditModeHelper.CurrentMode == EditorMode.ObjectSelection)
+            {
+                var mapPos = GetMouseMapPosition(e);
+                int tileMouseX = (int)(mapPos.X / MapConstant.TileSize);
+                int tileMouseY = (int)(mapPos.Y / MapConstant.TileSize);
+
+                hoveredObject = null;
+                hoveredObjectTile = null;
+
+                foreach (var obj in map.Objects)
+                {
+                    if (!ObjectDatabase.Definitions.TryGetValue(obj.Id, out var def)) continue;
+                    if (def.Tiles == null) continue;
+
+                    int minX = def.Tiles.Min(t => t.X);
+                    int minY = def.Tiles.Min(t => t.Y);
+
+                    foreach (var entry in def.Tiles)
+                    {
+                        int tileX = (int)Math.Floor(obj.X + (entry.X - minX));
+                        int tileY = (int)Math.Floor(obj.Y + (entry.Y - minY));
+
+                        if (tileX == tileMouseX && tileY == tileMouseY)
+                        {
+                            hoveredObject = obj;
+                            hoveredObjectTile = new Point(entry.X, entry.Y);
+
+                            RedrawMap();
+                            return;
+                        }
+                    }
+                }
+
+                RedrawMap();
+            }
+
             if (draggedObject != null && e.LeftButton == MouseButtonState.Pressed)
             {
                 draggedObject.X = (pos.X + dragOffset.X) / MapConstant.TileSize;
@@ -1222,6 +1367,14 @@ namespace MapEditor
             {
                 RedrawMap();
             }
+        }
+
+        private Point GetMouseMapPosition(MouseEventArgs e)
+        {
+            Point screenPos = e.GetPosition(MapCanvas);
+            double mapX = (screenPos.X - currentPanOffset.X) / zoom;
+            double mapY = (screenPos.Y - currentPanOffset.Y) / zoom;
+            return new Point(mapX, mapY);
         }
 
         private void HandleDoubleClick(MouseButtonEventArgs e)
@@ -1280,5 +1433,6 @@ namespace MapEditor
         {
             CreateObjectFromGroupSelection();
         }
+
     }
 }

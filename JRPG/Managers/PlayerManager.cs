@@ -2,6 +2,8 @@
 using JRPG.Core.Maps.Models;
 using JRPG.Enums;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace JRPG.Managers
 {
@@ -17,7 +19,7 @@ namespace JRPG.Managers
 
         public double VelocityX { get; private set; }
         public double VelocityY { get; private set; }
-        public double MoveSpeed { get; set; } = 4.0;
+        public double MoveSpeed { get; set; } = 3.0;
 
         public Direction Direction { get; private set; } = Direction.Down;
 
@@ -113,20 +115,46 @@ namespace JRPG.Managers
                 if (!ObjectDatabase.Definitions.TryGetValue(obj.Id, out var def)) continue;
                 if (def.CollisionPolygon == null || def.CollisionPolygon.Count == 0) continue;
 
-                foreach (var point in def.CollisionPolygon)
-                {
-                    // Offset by object position (centered on tile grid)
-                    double px = obj.X - 0.5 + point.X;
-                    double py = obj.Y - 0.5 + point.Y;
+                int minX = def.Tiles.Min(t => t.X);
+                int minY = def.Tiles.Min(t => t.Y);
+                int maxX = def.Tiles.Max(t => t.X);
+                int maxY = def.Tiles.Max(t => t.Y);
 
-                    if (px >= left && px <= right && py >= top && py <= bottom)
-                    {
-                        return false;
-                    }
-                }
+                int width = (maxX - minX) + 1;
+                int height = (maxY - minY) + 1;
+
+                // Reconstruct full polygon in world space
+                var polygon = def.CollisionPolygon.Select(p =>
+                {
+                    double worldX = obj.X + (p.X * width);
+                    double worldY = obj.Y + (p.Y * height);
+                    return (worldX, worldY);
+                }).ToList();
+
+                // Check if player's center is inside polygon
+                if (IsPointInsidePolygon(x, y, polygon))
+                    return false;
             }
 
             return true;
+        }
+
+        private bool IsPointInsidePolygon(double x, double y, List<(double x, double y)> polygon)
+        {
+            bool inside = false;
+            for (int i = 0, j = polygon.Count - 1; i < polygon.Count; j = i++)
+            {
+                var xi = polygon[i].x;
+                var yi = polygon[i].y;
+                var xj = polygon[j].x;
+                var yj = polygon[j].y;
+
+                bool intersect = ((yi > y) != (yj > y)) &&
+                                 (x < (xj - xi) * (y - yi) / (yj - yi + 0.00001) + xi);
+                if (intersect)
+                    inside = !inside;
+            }
+            return inside;
         }
 
         private double Clamp(double value, double min, double max)

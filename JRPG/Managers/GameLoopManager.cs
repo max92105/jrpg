@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Windows.Threading;
+using System.Windows.Media;
 using JRPG.Core.Utils;
 
 namespace JRPG
@@ -9,47 +9,45 @@ namespace JRPG
         private readonly Action update;
         private readonly Action<double> render;
 
-        private readonly DispatcherTimer timer;
         private DateTime lastTime;
-        private double accumulator = 0.0;
+        private double accumulator;
 
-        private const double TargetDelta = 1.0 / 60.0; // 60 FPS fixed timestep
+        private const double TargetDelta = 1.0 / 60.0; // 60 FPS fixed update
 
         public GameLoopManager(Action update, Action<double> render)
         {
             this.update = update;
             this.render = render;
-
             lastTime = DateTime.Now;
-            timer = new DispatcherTimer
-            {
-                Interval = TimeSpan.FromMilliseconds(1) // Frequent enough to simulate real loop
-            };
-            timer.Tick += OnTick;
         }
 
-        private void OnTick(object sender, EventArgs e)
+        public void Start()
         {
-            var now = DateTime.Now;
+            CompositionTarget.Rendering += OnRendering;
+        }
+
+        public void Stop()
+        {
+            CompositionTarget.Rendering -= OnRendering;
+        }
+
+        private void OnRendering(object sender, EventArgs e)
+        {
+            DateTime now = DateTime.Now;
             double frameTime = (now - lastTime).TotalSeconds;
             lastTime = now;
 
-            // Avoid spiral of death
-            frameTime = frameTime.Clamp(0, 0.25);
-
+            frameTime = frameTime.Clamp(0.001, 0.25); // avoid big spikes
             accumulator += frameTime;
 
             while (accumulator >= TargetDelta)
             {
-                update?.Invoke(); // Call game.Update()
+                update?.Invoke();
                 accumulator -= TargetDelta;
             }
 
-            double interpolationFactor = (accumulator / TargetDelta).Clamp(0, 1);
-            render?.Invoke(interpolationFactor); // Call game.Render(interpolation)
+            double interpolation = accumulator / TargetDelta;
+            render?.Invoke(interpolation.Clamp(0, 1));
         }
-
-        public void Start() => timer.Start();
-        public void Stop() => timer.Stop();
     }
 }

@@ -5,6 +5,7 @@
         Tile, 
         Object, 
         Trigger, 
-        NPC 
+        NPC,
+        Selection
     }
 }

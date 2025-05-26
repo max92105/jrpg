@@ -37,7 +37,6 @@ namespace JRPG
 
         private static readonly Random rng = new Random();
 
-
         // State
         public string currentMapFile = "start.json";
 
@@ -54,7 +53,7 @@ namespace JRPG
             Player = new PlayerManager();
             Player.SetPosition(10, 3); // optional: load from save
 
-            camera = new CameraManager(30, 17);
+            camera = new CameraManager(canvas.Width / MapConstant.TileSize, canvas.Height / MapConstant.TileSize);
             mapRenderer = new MapRenderer(canvas);
             triggerHandler = new TriggerHandler(
                 onWarp: (mapId, x, y) =>
@@ -88,28 +87,16 @@ namespace JRPG
             canvas.Children.Add(mapRenderer.VisualHost);
             Canvas.SetZIndex(mapRenderer.VisualHost, 0);
 
-            playerImageControl = new Image
-            {
-                Width = MapConstant.TileSize,
-                Height = MapConstant.TileSize,
-                Stretch = Stretch.None,
-                SnapsToDevicePixels = true
-            };
-
-            canvas.Children.Add(playerImageControl);
-            Canvas.SetZIndex(playerImageControl, 10);
-
             LoadPlayerSpriteSheet();
 
             camera.SnapTo(Player.X, Player.Y, mapManager.CurrentMap);
-            mapRenderer.Redraw(camera.X, camera.Y, mapManager.CurrentMap);
+
+            var frame = playerFrames[(int)Player.Direction, Player.AnimationFrame];
+            mapRenderer.Redraw(camera.X, camera.Y, mapManager.CurrentMap, Player.X, Player.Y, frame);
         }
 
         public void Dispose()
         {
-            if (playerImageControl != null && canvas.Children.Contains(playerImageControl))
-                canvas.Children.Remove(playerImageControl);
-
             if (mapRenderer?.VisualHost != null && canvas.Children.Contains(mapRenderer.VisualHost))
                 canvas.Children.Remove(mapRenderer.VisualHost);
 
@@ -167,7 +154,6 @@ namespace JRPG
                 Player.UpdateMovement(up, down, left, right, deltaTime, mapManager.CurrentMap);
                 camera.Update(Player.X, Player.Y, mapManager.CurrentMap);
                 mapRenderer.Update(deltaTime);
-                mapRenderer.RedrawIfNeeded(camera.X, camera.Y, mapManager.CurrentMap);
 
                 if (Player.IsMoving)
                 {
@@ -186,25 +172,14 @@ namespace JRPG
 
         public void Render(double interpolationFactor)
         {
-            playerImageControl.Source = playerFrames[(int)Player.Direction, Player.AnimationFrame];
-
-            // Interpolate player position
             double interpX = Player.PreviousX + (Player.X - Player.PreviousX) * interpolationFactor;
             double interpY = Player.PreviousY + (Player.Y - Player.PreviousY) * interpolationFactor;
 
-            // Interpolate camera position
             double interpCamX = camera.PreviousX + (camera.X - camera.PreviousX) * interpolationFactor;
             double interpCamY = camera.PreviousY + (camera.Y - camera.PreviousY) * interpolationFactor;
 
-            // Pixel offset so sprite is centered and visually balanced
-            double spriteOffsetX = -32.0 / MapConstant.TileSize;
-            double spriteOffsetY = -32.0 / MapConstant.TileSize;
-
-            double drawX = (interpX - Player.Radius + spriteOffsetX - interpCamX) * MapConstant.TileSize;
-            double drawY = (interpY - Player.Radius + spriteOffsetY - interpCamY) * MapConstant.TileSize;
-
-            Canvas.SetLeft(playerImageControl, drawX);
-            Canvas.SetTop(playerImageControl, drawY);
+            var frame = playerFrames[(int)Player.Direction, Player.AnimationFrame];
+            mapRenderer.Redraw(interpCamX, interpCamY, mapManager.CurrentMap, interpX, interpY, frame);
         }
 
         private void CheckForTriggers()
@@ -225,8 +200,8 @@ namespace JRPG
                 lastTriggeredX = -1;
                 lastTriggeredY = -1;
 
-                if (rng.Next(1, 500) == 59)
-                    triggerHandler.HandleTrigger(new TriggerBattle());
+                //if (rng.Next(1, 500) == 59)
+                //    triggerHandler.HandleTrigger(new TriggerBattle());
             }
         }
     }

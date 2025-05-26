@@ -35,6 +35,7 @@ namespace JRPG
                 dialogueManager = new DialogueManager(DialogueUI.TextElement, DialogueUI.Container, DialogueUI.Portrait, DialogueUI.Speaker, DialogueUI.ContinueIcon);
 
             TileDatabase.Load();
+            ObjectDatabase.Load();
 
             gameLoop = new GameLoopManager(
              () =>

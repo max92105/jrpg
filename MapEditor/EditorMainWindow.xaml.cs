@@ -304,8 +304,6 @@ namespace MapEditor
 
         private void DrawObjects()
         {
-            Console.WriteLine($"Object count: {map.Objects.Count}");
-
             foreach (var obj in map.Objects)
             {
                 if (!ObjectDatabase.Definitions.TryGetValue(obj.Id, out var def)) continue;

@@ -65,21 +65,18 @@
 
             <!-- MAP CANVAS -->
             <ScrollViewer x:Name="MapScrollViewer"
-                  Grid.Row="0"
-                  HorizontalScrollBarVisibility="Auto"
-                  VerticalScrollBarVisibility="Auto">
-                <Canvas x:Name="MapCanvas"
+              HorizontalScrollBarVisibility="Auto"
+              VerticalScrollBarVisibility="Auto">
+                <Grid x:Name="MapLayerContainer">
+                    <Canvas x:Name="MapCanvas"
                 Background="Black"
                 Focusable="True"
                 MouseLeftButtonDown="MapCanvas_MouseLeftButtonDown"
                 MouseLeftButtonUp="MapCanvas_MouseLeftButtonUp"
                 MouseMove="MapCanvas_MouseMove"
-                MouseWheel="MapCanvas_MouseWheel"
-                RenderTransformOrigin="0,0">
-                    <Canvas.RenderTransform>
-                        <ScaleTransform x:Name="CanvasScale" ScaleX="1" ScaleY="1"/>
-                    </Canvas.RenderTransform>
-                </Canvas>
+                MouseWheel="MapCanvas_MouseWheel" />
+                    <Canvas x:Name="HighlightCanvas" IsHitTestVisible="False"/>
+                </Grid>
             </ScrollViewer>
 
             <!-- BOTTOM PANEL -->

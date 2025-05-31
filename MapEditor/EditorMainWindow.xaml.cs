@@ -19,6 +19,8 @@ using MapEditor.Enums;
 using MapEditor.Utils;
 using MapEditor.Controls;
 using static System.Net.WebRequestMethods;
+using System.Windows.Shapes;
+using Path = System.IO.Path;
 
 namespace MapEditor
 {
@@ -75,13 +77,13 @@ namespace MapEditor
         private int selectedSheetY = -1;
         private string selectedTilesheet = null;
 
-        private bool showTileGroups = false;
-
         //SelectionMode
         private PlacedObject hoveredObject = null;
         private Point? hoveredObjectTile = null;
 
-        private Point? hoverMapPosition = null;
+
+        private readonly Dictionary<string, BitmapImage> tilesheetCache = new Dictionary<string, BitmapImage>();
+
 
         private readonly UndoManager undoManager = new UndoManager();
 
@@ -107,6 +109,23 @@ namespace MapEditor
             PropertyEditorControl.RequestEditObjectCollision += OpenCollisionEditorForObject;
 
             RedrawMap();
+        }
+
+        private BitmapImage GetOrLoadTilesheet(string path)
+        {
+            if (tilesheetCache.TryGetValue(path, out var cached))
+                return cached;
+
+            var sheet = new BitmapImage();
+            sheet.BeginInit();
+            sheet.CacheOption = BitmapCacheOption.OnLoad;
+            sheet.UriSource = new Uri(path, UriKind.Absolute);
+            sheet.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
+            sheet.EndInit();
+            sheet.Freeze();
+
+            tilesheetCache[path] = sheet;
+            return sheet;
         }
 
         private void OpenCollisionEditorForTile(TileDefinition def)
@@ -212,10 +231,13 @@ namespace MapEditor
             double offsetX = -currentPanOffset.X / zoom;
             double offsetY = -currentPanOffset.Y / zoom;
 
-            int startX = Math.Max(0, (int)Math.Floor(offsetX / MapConstant.TileSize));
-            int endX = Math.Min(mapWidth, (int)Math.Ceiling((offsetX + canvasWidth) / MapConstant.TileSize));
-            int startY = Math.Max(0, (int)Math.Floor(offsetY / MapConstant.TileSize));
-            int endY = Math.Min(mapHeight, (int)Math.Ceiling((offsetY + canvasHeight) / MapConstant.TileSize));
+            Point topLeft = MapScrollViewer.TranslatePoint(new Point(0, 0), MapCanvas);
+            Point bottomRight = MapScrollViewer.TranslatePoint(new Point(MapScrollViewer.ViewportWidth, MapScrollViewer.ViewportHeight), MapCanvas);
+
+            int startX = Math.Max(0, (int)Math.Floor(topLeft.X / MapConstant.TileSize));
+            int endX = Math.Min(mapWidth, (int)Math.Ceiling(bottomRight.X / MapConstant.TileSize));
+            int startY = Math.Max(0, (int)Math.Floor(topLeft.Y / MapConstant.TileSize));
+            int endY = Math.Min(mapHeight, (int)Math.Ceiling(bottomRight.Y / MapConstant.TileSize));
 
             for (int y = startY; y < endY; y++)
             {
@@ -231,13 +253,7 @@ namespace MapEditor
                         {
                             var sheetPath = AssetPathResolver.GetTilePath(tileDef.Tilesheet);
 
-                            var sheet = new BitmapImage();
-                            sheet.BeginInit();
-                            sheet.CacheOption = BitmapCacheOption.OnLoad;
-                            sheet.UriSource = new Uri(sheetPath, UriKind.Absolute);
-                            sheet.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
-                            sheet.EndInit();
-                            sheet.Freeze();
+                            var sheet = GetOrLoadTilesheet(sheetPath);
 
                             source = new CroppedBitmap(sheet,
                                 new Int32Rect(tileDef.SheetX.Value * MapConstant.TileSize, tileDef.SheetY.Value * MapConstant.TileSize, MapConstant.TileSize, MapConstant.TileSize));
@@ -283,6 +299,53 @@ namespace MapEditor
             }
         }
 
+        private void RedrawHighlightLayer()
+        {
+            HighlightCanvas.Children.Clear();
+
+            if (hoveredObject != null && hoveredObjectTile != null)
+            {
+                if (!ObjectDatabase.Definitions.TryGetValue(hoveredObject.Id, out var def)) return;
+
+                int minX = def.Tiles.Min(t => t.X);
+                int minY = def.Tiles.Min(t => t.Y);
+
+                double tileX = (hoveredObject.X + hoveredObjectTile.Value.X - minX) * MapConstant.TileSize;
+                double tileY = (hoveredObject.Y + hoveredObjectTile.Value.Y - minY) * MapConstant.TileSize;
+
+                var rect = new Rectangle
+                {
+                    Width = MapConstant.TileSize,
+                    Height = MapConstant.TileSize,
+                    Stroke = Brushes.Gold,
+                    StrokeThickness = 2,
+                    Fill = new SolidColorBrush(Color.FromArgb(40, 255, 215, 0)),
+                    IsHitTestVisible = false
+                };
+
+                Canvas.SetLeft(rect, tileX);
+                Canvas.SetTop(rect, tileY);
+                HighlightCanvas.Children.Add(rect);
+            }
+
+            if (!selectionRect.IsEmpty && isSelecting)
+            {
+                var sel = new System.Windows.Shapes.Rectangle
+                {
+                    Width = selectionRect.Width,
+                    Height = selectionRect.Height,
+                    Stroke = Brushes.Cyan,
+                    StrokeThickness = 1,
+                    Fill = new SolidColorBrush(Color.FromArgb(50, 0, 255, 255))
+                };
+
+                Canvas.SetLeft(sel, selectionRect.X);
+                Canvas.SetTop(sel, selectionRect.Y);
+                Panel.SetZIndex(sel, 1);
+                HighlightCanvas.Children.Add(sel);
+            }
+        }
+
         private void DrawTriggers()
         {
             foreach (var tile in map.Tiles.Where(t => t.Trigger != null))
@@ -321,13 +384,7 @@ namespace MapEditor
                     if (!string.IsNullOrEmpty(tileDef.Tilesheet) && tileDef.SheetX.HasValue && tileDef.SheetY.HasValue)
                     {
                         var sheetPath = AssetPathResolver.GetTilePath(tileDef.Tilesheet);
-                        var sheet = new BitmapImage();
-                        sheet.BeginInit();
-                        sheet.CacheOption = BitmapCacheOption.OnLoad;
-                        sheet.UriSource = new Uri(sheetPath, UriKind.Absolute);
-                        sheet.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
-                        sheet.EndInit();
-                        sheet.Freeze();
+                        var sheet = GetOrLoadTilesheet(sheetPath);
 
                         source = new CroppedBitmap(sheet,
                             new Int32Rect(tileDef.SheetX.Value * MapConstant.TileSize,
@@ -397,103 +454,6 @@ namespace MapEditor
                     Panel.SetZIndex(highlight, obj.Z + 1000);
                     MapCanvas.Children.Add(highlight);
                 }
-            }
-
-            if (hoverMapPosition.HasValue && EditModeHelper.IsInObjectMode)
-            {
-                if (ObjectDatabase.Definitions.TryGetValue(selectedObjectId, out var def) && def.Tiles != null)
-                {
-                    int minX = def.Tiles.Min(t => t.X);
-                    int minY = def.Tiles.Min(t => t.Y);
-                    int maxX = def.Tiles.Max(t => t.X);
-                    int maxY = def.Tiles.Max(t => t.Y);
-
-                    double width = maxX - minX + 1;
-                    double height = maxY - minY + 1;
-
-                    double centerTileX = hoverMapPosition.Value.X / MapConstant.TileSize;
-                    double centerTileY = hoverMapPosition.Value.Y / MapConstant.TileSize;
-
-                    double originX = centerTileX - width / 2.0;
-                    double originY = centerTileY - height / 2.0;
-
-                    foreach (var entry in def.Tiles)
-                    {
-                        if (!TileDatabase.Definitions.TryGetValue(entry.TileId, out var tileDef)) continue;
-
-                        BitmapSource source = null;
-
-                        if (!string.IsNullOrEmpty(tileDef.Tilesheet) && tileDef.SheetX.HasValue && tileDef.SheetY.HasValue)
-                        {
-                            var sheetPath = AssetPathResolver.GetTilePath(tileDef.Tilesheet);
-                            var sheet = new BitmapImage();
-                            sheet.BeginInit();
-                            sheet.CacheOption = BitmapCacheOption.OnLoad;
-                            sheet.UriSource = new Uri(sheetPath, UriKind.Absolute);
-                            sheet.CreateOptions = BitmapCreateOptions.PreservePixelFormat;
-                            sheet.EndInit();
-                            sheet.Freeze();
-
-                            source = new CroppedBitmap(sheet,
-                                new Int32Rect(tileDef.SheetX.Value * MapConstant.TileSize,
-                                              tileDef.SheetY.Value * MapConstant.TileSize,
-                                              MapConstant.TileSize,
-                                              MapConstant.TileSize));
-                        }
-                        else if (!string.IsNullOrEmpty(tileDef.Sprite))
-                        {
-                            var fullPath = Path.Combine(AssetPathResolver.GetAssetsRootPath(), tileDef.Sprite);
-                            source = new BitmapImage(new Uri(fullPath, UriKind.Absolute));
-                        }
-
-                        if (source == null) continue;
-
-                        double drawX = (originX + (entry.X - minX)) * MapConstant.TileSize;
-                        double drawY = (originY + (entry.Y - minY)) * MapConstant.TileSize;
-
-                        var img = new Image
-                        {
-                            Width = MapConstant.TileSize,
-                            Height = MapConstant.TileSize,
-                            Source = source,
-                            Opacity = 0.5,
-                            IsHitTestVisible = false // <- Add this line
-                        };
-
-                        Canvas.SetLeft(img, drawX);
-                        Canvas.SetTop(img, drawY);
-                        Panel.SetZIndex(img, 9999);
-                        MapCanvas.Children.Add(img);
-                    }
-                }
-            }
-
-            if (hoveredObject != null && hoveredObjectTile != null)
-            {
-                if (!ObjectDatabase.Definitions.TryGetValue(hoveredObject.Id, out var def)) return;
-                int minX = def.Tiles.Min(t => t.X);
-                int minY = def.Tiles.Min(t => t.Y);
-
-                double tileX = hoveredObject.X + (hoveredObjectTile.Value.X - minX);
-                double tileY = hoveredObject.Y + (hoveredObjectTile.Value.Y - minY);
-
-                double drawX = tileX * MapConstant.TileSize;
-                double drawY = tileY * MapConstant.TileSize;
-
-                var rect = new System.Windows.Shapes.Rectangle
-                {
-                    Width = MapConstant.TileSize,
-                    Height = MapConstant.TileSize,
-                    Stroke = Brushes.Gold,
-                    StrokeThickness = 2,
-                    Fill = new SolidColorBrush(Color.FromArgb(40, 255, 215, 0)),
-                    IsHitTestVisible = false
-                };
-
-                Canvas.SetLeft(rect, drawX);
-                Canvas.SetTop(rect, drawY);
-                Panel.SetZIndex(rect, 9999);
-                MapCanvas.Children.Add(rect);
             }
         }
 
@@ -658,9 +618,11 @@ namespace MapEditor
             var group = new TransformGroup();
             group.Children.Add(new ScaleTransform(zoom, zoom));
             group.Children.Add(new TranslateTransform(currentPanOffset.X, currentPanOffset.Y));
-            MapCanvas.RenderTransform = group;
+
+            MapLayerContainer.RenderTransform = group; // Apply to parent container
 
             RedrawMap();
+            RedrawHighlightLayer();
         }
 
         private void DeleteSelectedObjects()
@@ -789,13 +751,7 @@ namespace MapEditor
                     if (!string.IsNullOrEmpty(tileDef.Tilesheet) && tileDef.SheetX.HasValue && tileDef.SheetY.HasValue)
                     {
                         var sheetPath = AssetPathResolver.GetTilePath(tileDef.Tilesheet);
-                        var sheet = new BitmapImage();
-                        sheet.BeginInit();
-                        sheet.CacheOption = BitmapCacheOption.OnLoad;
-                        sheet.UriSource = new Uri(sheetPath, UriKind.Absolute);
-                        sheet.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
-                        sheet.EndInit();
-                        sheet.Freeze();
+                        var sheet = GetOrLoadTilesheet(sheetPath);
 
                         source = new CroppedBitmap(sheet,
                             new Int32Rect(tileDef.SheetX.Value * MapConstant.TileSize,
@@ -1292,7 +1248,6 @@ namespace MapEditor
         private void MapCanvas_MouseMove(object sender, MouseEventArgs e)
         {
             var pos = e.GetPosition(MapCanvas);
-            hoverMapPosition = pos;
 
             if (e.LeftButton == MouseButtonState.Pressed && isSpaceHeld)
             {
@@ -1338,20 +1293,19 @@ namespace MapEditor
                             hoveredObject = obj;
                             hoveredObjectTile = new Point(entry.X, entry.Y);
 
-                            RedrawMap();
+                            RedrawHighlightLayer();
                             return;
                         }
                     }
                 }
 
-                RedrawMap();
+                RedrawHighlightLayer();
             }
 
             if (draggedObject != null && e.LeftButton == MouseButtonState.Pressed)
             {
                 draggedObject.X = (pos.X + dragOffset.X) / MapConstant.TileSize;
                 draggedObject.Y = (pos.Y + dragOffset.Y) / MapConstant.TileSize;
-                RedrawMap();
                 return;
             }
 

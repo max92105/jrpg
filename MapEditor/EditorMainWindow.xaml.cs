@@ -83,6 +83,25 @@ namespace MapEditor
 
 
         private readonly Dictionary<string, BitmapImage> tilesheetCache = new Dictionary<string, BitmapImage>();
+        private readonly Dictionary<string, ImageSource> tileImageCache = new Dictionary<string, ImageSource>();
+
+        //Map drawing (one visual for the whole map instead of one element per tile)
+        private struct MapDrawable
+        {
+            public int Z;
+            public Action<DrawingContext> Draw;
+        }
+
+        private MapDrawingHost mapDrawing;
+        private readonly List<MapDrawable> mapDrawables = new List<MapDrawable>();
+
+        private static readonly Brush TileCollisionFill = Frozen(new SolidColorBrush(Color.FromArgb(40, 0, 255, 0)));
+        private static readonly Pen TileCollisionPen = Frozen(new Pen(Brushes.Lime, 1));
+        private static readonly Brush ObjectCollisionFill = Frozen(new SolidColorBrush(Color.FromArgb(40, 255, 165, 0)));
+        private static readonly Pen ObjectCollisionPen = Frozen(new Pen(Brushes.Orange, 2));
+        private static readonly Pen TriggerPen = Frozen(new Pen(Brushes.Black, 1));
+        private static readonly Pen SelectedObjectPen = Frozen(new Pen(Brushes.Cyan, 2));
+        private static readonly Pen GridPen = Frozen(new Pen(Brushes.Red, 0.5));
 
 
         private readonly UndoManager undoManager = new UndoManager();
@@ -211,88 +230,129 @@ namespace MapEditor
         private void RedrawMap()
         {
             if (MapCanvas == null) return;
-            MapCanvas.Children.Clear();
             MapCanvas.Width = mapWidth * MapConstant.TileSize;
             MapCanvas.Height = mapHeight * MapConstant.TileSize;
+
+            if (mapDrawing == null)
+            {
+                mapDrawing = new MapDrawingHost();
+                MapCanvas.Children.Add(mapDrawing);
+            }
+
+            mapDrawables.Clear();
 
             DrawTiles();
             DrawTriggers();
             DrawObjects();
-            DrawSelectionBox();
             DrawGridOverlay();
+
+            // OrderBy is stable, so equal Z keeps insertion order (same as Panel.ZIndex did)
+            using (var dc = mapDrawing.RenderOpen())
+            {
+                foreach (var drawable in mapDrawables.OrderBy(d => d.Z))
+                    drawable.Draw(dc);
+            }
+        }
+
+        private void AddMapDrawable(int z, Action<DrawingContext> draw)
+        {
+            mapDrawables.Add(new MapDrawable { Z = z, Draw = draw });
+        }
+
+        private ImageSource GetTileSource(TileDefinition tileDef)
+        {
+            string key;
+            if (!string.IsNullOrEmpty(tileDef.Tilesheet) && tileDef.SheetX.HasValue && tileDef.SheetY.HasValue)
+                key = $"{tileDef.Tilesheet}|{tileDef.SheetX.Value}|{tileDef.SheetY.Value}";
+            else if (!string.IsNullOrEmpty(tileDef.Sprite))
+                key = tileDef.Sprite;
+            else
+                return null;
+
+            if (tileImageCache.TryGetValue(key, out var cached))
+                return cached;
+
+            BitmapSource source;
+            if (!string.IsNullOrEmpty(tileDef.Tilesheet) && tileDef.SheetX.HasValue && tileDef.SheetY.HasValue)
+            {
+                var sheet = GetOrLoadTilesheet(AssetPathResolver.GetTilePath(tileDef.Tilesheet));
+                source = new CroppedBitmap(sheet,
+                    new Int32Rect(tileDef.SheetX.Value * MapConstant.TileSize,
+                                  tileDef.SheetY.Value * MapConstant.TileSize,
+                                  MapConstant.TileSize,
+                                  MapConstant.TileSize));
+            }
+            else
+            {
+                var fullPath = Path.Combine(AssetPathResolver.GetAssetsRootPath(), tileDef.Sprite);
+                var bitmap = new BitmapImage();
+                bitmap.BeginInit();
+                bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                bitmap.UriSource = new Uri(fullPath, UriKind.Absolute);
+                bitmap.EndInit();
+                source = bitmap;
+            }
+
+            source.Freeze();
+            tileImageCache[key] = source;
+            return source;
+        }
+
+        private static Geometry CreatePolygonGeometry(IEnumerable<Point> points)
+        {
+            var geometry = new StreamGeometry();
+            using (var ctx = geometry.Open())
+            {
+                bool first = true;
+                foreach (var point in points)
+                {
+                    if (first)
+                    {
+                        ctx.BeginFigure(point, true, true);
+                        first = false;
+                    }
+                    else
+                    {
+                        ctx.LineTo(point, true, false);
+                    }
+                }
+            }
+            geometry.Freeze();
+            return geometry;
+        }
+
+        private static T Frozen<T>(T freezable) where T : Freezable
+        {
+            freezable.Freeze();
+            return freezable;
         }
 
         private void DrawTiles()
         {
             bool showCollision = ToggleCollisionOverlay?.IsChecked == true;
 
-            double canvasWidth = MapScrollViewer.ViewportWidth / zoom;
-            double canvasHeight = MapScrollViewer.ViewportHeight / zoom;
-            double offsetX = -currentPanOffset.X / zoom;
-            double offsetY = -currentPanOffset.Y / zoom;
-
-            Point topLeft = MapScrollViewer.TranslatePoint(new Point(0, 0), MapCanvas);
-            Point bottomRight = MapScrollViewer.TranslatePoint(new Point(MapScrollViewer.ViewportWidth, MapScrollViewer.ViewportHeight), MapCanvas);
-
-            int startX = Math.Max(0, (int)Math.Floor(topLeft.X / MapConstant.TileSize));
-            int endX = Math.Min(mapWidth, (int)Math.Ceiling(bottomRight.X / MapConstant.TileSize));
-            int startY = Math.Max(0, (int)Math.Floor(topLeft.Y / MapConstant.TileSize));
-            int endY = Math.Min(mapHeight, (int)Math.Ceiling(bottomRight.Y / MapConstant.TileSize));
-
-            for (int y = startY; y < endY; y++)
+            for (int y = 0; y < mapHeight; y++)
             {
-                for (int x = startX; x < endX; x++)
+                for (int x = 0; x < mapWidth; x++)
                 {
                     foreach (var tile in map.GetTilesAt(x, y))
                     {
                         if (!TileDatabase.Definitions.TryGetValue(tile.Id, out var tileDef)) continue;
 
-                        BitmapSource source = null;
-
-                        if (!string.IsNullOrEmpty(tileDef.Tilesheet) && tileDef.SheetX.HasValue && tileDef.SheetY.HasValue)
-                        {
-                            var sheetPath = AssetPathResolver.GetTilePath(tileDef.Tilesheet);
-
-                            var sheet = GetOrLoadTilesheet(sheetPath);
-
-                            source = new CroppedBitmap(sheet,
-                                new Int32Rect(tileDef.SheetX.Value * MapConstant.TileSize, tileDef.SheetY.Value * MapConstant.TileSize, MapConstant.TileSize, MapConstant.TileSize));
-                        }
-                        else if (!string.IsNullOrEmpty(tileDef.Sprite))
-                        {
-                            var fullPath = Path.Combine(AssetPathResolver.GetAssetsRootPath(), tileDef.Sprite);
-                            source = new BitmapImage(new Uri(fullPath, UriKind.Absolute));
-                        }
-
+                        var source = GetTileSource(tileDef);
                         if (source == null) continue;
 
-                        var img = new Image
-                        {
-                            Width = MapConstant.TileSize,
-                            Height = MapConstant.TileSize,
-                            Source = source,
-                            IsHitTestVisible = false
-                        };
-
-                        Canvas.SetLeft(img, x * MapConstant.TileSize);
-                        Canvas.SetTop(img, y * MapConstant.TileSize);
-                        Panel.SetZIndex(img, tile.Z);
-                        MapCanvas.Children.Add(img);
+                        var rect = new Rect(x * MapConstant.TileSize, y * MapConstant.TileSize, MapConstant.TileSize, MapConstant.TileSize);
+                        AddMapDrawable(tile.Z, dc => dc.DrawImage(source, rect));
 
                         if (showCollision && tileDef.CollisionPolygon != null && tileDef.CollisionPolygon.Count >= 2)
                         {
-                            var polygon = new System.Windows.Shapes.Polygon
-                            {
-                                Stroke = Brushes.Lime,
-                                StrokeThickness = 1,
-                                Fill = new SolidColorBrush(Color.FromArgb(40, 0, 255, 0)),
-                                Points = new PointCollection(tileDef.CollisionPolygon.Select(p =>
-                                  new Point((x + p.X) * MapConstant.TileSize,
-                                        (y + p.Y) * MapConstant.TileSize)))
-                            };
+                            int tx = x, ty = y;
+                            var polygon = CreatePolygonGeometry(tileDef.CollisionPolygon.Select(p =>
+                                new Point((tx + p.X) * MapConstant.TileSize,
+                                          (ty + p.Y) * MapConstant.TileSize)));
 
-                            Panel.SetZIndex(polygon, tile.Z + 1);
-                            MapCanvas.Children.Add(polygon);
+                            AddMapDrawable(tile.Z + 1, dc => dc.DrawGeometry(TileCollisionFill, TileCollisionPen, polygon));
                         }
                     }
                 }
@@ -350,27 +410,19 @@ namespace MapEditor
         {
             foreach (var tile in map.Tiles.Where(t => t.Trigger != null))
             {
-                var overlay = new System.Windows.Shapes.Rectangle
-                {
-                    Width = 10,
-                    Height = 10,
-                    Fill = Brushes.Yellow,
-                    Stroke = Brushes.Black,
-                    StrokeThickness = 1
-                };
-                Canvas.SetLeft(overlay, tile.X * MapConstant.TileSize + MapConstant.TileSize - 12);
-                Canvas.SetTop(overlay, tile.Y * MapConstant.TileSize + 2);
-                Panel.SetZIndex(overlay, 100);
-                MapCanvas.Children.Add(overlay);
+                var rect = new Rect(tile.X * MapConstant.TileSize + MapConstant.TileSize - 12, tile.Y * MapConstant.TileSize + 2, 10, 10);
+                AddMapDrawable(100, dc => dc.DrawRectangle(Brushes.Yellow, TriggerPen, rect));
             }
         }
 
         private void DrawObjects()
         {
+            bool showCollision = ToggleCollisionOverlay?.IsChecked == true;
+
             foreach (var obj in map.Objects)
             {
                 if (!ObjectDatabase.Definitions.TryGetValue(obj.Id, out var def)) continue;
-                if (def.Tiles == null) continue;
+                if (def.Tiles == null || def.Tiles.Count == 0) continue;
 
                 int minX = def.Tiles.Min(t => t.X);
                 int minY = def.Tiles.Min(t => t.Y);
@@ -379,100 +431,34 @@ namespace MapEditor
                 {
                     if (!TileDatabase.Definitions.TryGetValue(entry.TileId, out var tileDef)) continue;
 
-                    BitmapSource source = null;
-
-                    if (!string.IsNullOrEmpty(tileDef.Tilesheet) && tileDef.SheetX.HasValue && tileDef.SheetY.HasValue)
-                    {
-                        var sheetPath = AssetPathResolver.GetTilePath(tileDef.Tilesheet);
-                        var sheet = GetOrLoadTilesheet(sheetPath);
-
-                        source = new CroppedBitmap(sheet,
-                            new Int32Rect(tileDef.SheetX.Value * MapConstant.TileSize,
-                                          tileDef.SheetY.Value * MapConstant.TileSize,
-                                          MapConstant.TileSize,
-                                          MapConstant.TileSize));
-                    }
-                    else if (!string.IsNullOrEmpty(tileDef.Sprite))
-                    {
-                        var fullPath = Path.Combine(AssetPathResolver.GetAssetsRootPath(), tileDef.Sprite);
-                        source = new BitmapImage(new Uri(fullPath, UriKind.Absolute));
-                    }
-
+                    var source = GetTileSource(tileDef);
                     if (source == null) continue;
 
                     double px = (obj.X + (entry.X - minX)) * MapConstant.TileSize;
                     double py = (obj.Y + (entry.Y - minY)) * MapConstant.TileSize;
 
-                    var img = new Image
-                    {
-                        Width = MapConstant.TileSize,
-                        Height = MapConstant.TileSize,
-                        Source = source,
-                        IsHitTestVisible = false
-                    };
-
-                    Canvas.SetLeft(img, px);
-                    Canvas.SetTop(img, py);
-                    Panel.SetZIndex(img, obj.Z + entry.Z);
-                    MapCanvas.Children.Add(img);
+                    var rect = new Rect(px, py, MapConstant.TileSize, MapConstant.TileSize);
+                    AddMapDrawable(obj.Z + entry.Z, dc => dc.DrawImage(source, rect));
                 }
 
-                if (ToggleCollisionOverlay?.IsChecked == true && def.CollisionPolygon != null && def.CollisionPolygon.Count >= 2)
+                if (showCollision && def.CollisionPolygon != null && def.CollisionPolygon.Count >= 2)
                 {
-                    int minpolygonX = def.Tiles.Min(t => t.X);
-                    int mipolygonY = def.Tiles.Min(t => t.Y);
-                    int width = def.Tiles.Max(t => t.X) - minpolygonX + 1;
-                    int height = def.Tiles.Max(t => t.Y) - mipolygonY + 1;
+                    int width = def.Tiles.Max(t => t.X) - minX + 1;
+                    int height = def.Tiles.Max(t => t.Y) - minY + 1;
 
-                    var objectPolygon = new System.Windows.Shapes.Polygon
-                    {
-                        Stroke = Brushes.Orange,
-                        StrokeThickness = 2,
-                        Fill = new SolidColorBrush(Color.FromArgb(40, 255, 165, 0)),
-                        Points = new PointCollection(def.CollisionPolygon.Select(p =>
-                            new Point((obj.X + p.X * width) * MapConstant.TileSize,
-                                      (obj.Y + p.Y * height) * MapConstant.TileSize)))
-                    };
+                    var polygon = CreatePolygonGeometry(def.CollisionPolygon.Select(p =>
+                        new Point((obj.X + p.X * width) * MapConstant.TileSize,
+                                  (obj.Y + p.Y * height) * MapConstant.TileSize)));
 
-                    Panel.SetZIndex(objectPolygon, obj.Z + 1);
-                    MapCanvas.Children.Add(objectPolygon);
+                    AddMapDrawable(obj.Z + 1, dc => dc.DrawGeometry(ObjectCollisionFill, ObjectCollisionPen, polygon));
                 }
 
                 var screenPoint = new Point(obj.X * MapConstant.TileSize, obj.Y * MapConstant.TileSize);
                 if (!selectionRect.IsEmpty && selectionRect.Contains(screenPoint))
                 {
-                    var highlight = new System.Windows.Shapes.Rectangle
-                    {
-                        Width = MapConstant.TileSize,
-                        Height = MapConstant.TileSize,
-                        Stroke = Brushes.Cyan,
-                        StrokeThickness = 2,
-                        Fill = null
-                    };
-                    Canvas.SetLeft(highlight, obj.X * MapConstant.TileSize);
-                    Canvas.SetTop(highlight, obj.Y * MapConstant.TileSize);
-                    Panel.SetZIndex(highlight, obj.Z + 1000);
-                    MapCanvas.Children.Add(highlight);
+                    var rect = new Rect(screenPoint.X, screenPoint.Y, MapConstant.TileSize, MapConstant.TileSize);
+                    AddMapDrawable(obj.Z + 1000, dc => dc.DrawRectangle(null, SelectedObjectPen, rect));
                 }
-            }
-        }
-
-        private void DrawSelectionBox()
-        {
-            if (isSelecting && !selectionRect.IsEmpty)
-            {
-                var rect = new System.Windows.Shapes.Rectangle
-                {
-                    Width = selectionRect.Width,
-                    Height = selectionRect.Height,
-                    Stroke = Brushes.Cyan,
-                    StrokeThickness = 1,
-                    Fill = new SolidColorBrush(Color.FromArgb(50, 0, 255, 255))
-                };
-                Canvas.SetLeft(rect, selectionRect.X);
-                Canvas.SetTop(rect, selectionRect.Y);
-                Panel.SetZIndex(rect, 9999);
-                MapCanvas.Children.Add(rect);
             }
         }
 
@@ -480,36 +466,17 @@ namespace MapEditor
         {
             if (!showGrid) return;
 
-            for (int y = 0; y <= mapHeight; y++)
-            {
-                var line = new System.Windows.Shapes.Line
-                {
-                    X1 = 0,
-                    Y1 = y * MapConstant.TileSize,
-                    X2 = mapWidth * MapConstant.TileSize,
-                    Y2 = y * MapConstant.TileSize,
-                    Stroke = Brushes.Red,
-                    StrokeThickness = 0.5,
-                    IsHitTestVisible = false
-                };
-                Panel.SetZIndex(line, 1000);
-                MapCanvas.Children.Add(line);
-            }
+            double width = mapWidth * MapConstant.TileSize;
+            double height = mapHeight * MapConstant.TileSize;
 
-            for (int x = 0; x <= mapWidth; x++)
+            AddMapDrawable(1000, dc =>
             {
-                var line = new System.Windows.Shapes.Line
-                {
-                    X1 = x * MapConstant.TileSize,
-                    Y1 = 0,
-                    X2 = x * MapConstant.TileSize,
-                    Y2 = mapHeight * MapConstant.TileSize,
-                    Stroke = Brushes.Red,
-                    StrokeThickness = 0.5
-                };
-                Panel.SetZIndex(line, 1000);
-                MapCanvas.Children.Add(line);
-            }
+                for (int y = 0; y <= mapHeight; y++)
+                    dc.DrawLine(GridPen, new Point(0, y * MapConstant.TileSize), new Point(width, y * MapConstant.TileSize));
+
+                for (int x = 0; x <= mapWidth; x++)
+                    dc.DrawLine(GridPen, new Point(x * MapConstant.TileSize, 0), new Point(x * MapConstant.TileSize, height));
+            });
         }
 
         private void SaveMap_Click(object sender, RoutedEventArgs e)
@@ -561,6 +528,7 @@ namespace MapEditor
                 MapHeightBox.Text = map.Height.ToString();
 
                 ApplyCanvasTransform();
+                RedrawMap();
             }
         }
 
@@ -619,10 +587,8 @@ namespace MapEditor
             group.Children.Add(new ScaleTransform(zoom, zoom));
             group.Children.Add(new TranslateTransform(currentPanOffset.X, currentPanOffset.Y));
 
-            MapLayerContainer.RenderTransform = group; // Apply to parent container
-
-            RedrawMap();
-            RedrawHighlightLayer();
+            // Apply to parent container. The map and highlight layers are retained, so no redraw is needed
+            MapLayerContainer.RenderTransform = group;
         }
 
         private void DeleteSelectedObjects()
@@ -746,25 +712,7 @@ namespace MapEditor
                     if (!TileDatabase.Definitions.TryGetValue(entry.TileId, out var tileDef))
                         continue;
 
-                    BitmapSource source = null;
-
-                    if (!string.IsNullOrEmpty(tileDef.Tilesheet) && tileDef.SheetX.HasValue && tileDef.SheetY.HasValue)
-                    {
-                        var sheetPath = AssetPathResolver.GetTilePath(tileDef.Tilesheet);
-                        var sheet = GetOrLoadTilesheet(sheetPath);
-
-                        source = new CroppedBitmap(sheet,
-                            new Int32Rect(tileDef.SheetX.Value * MapConstant.TileSize,
-                                          tileDef.SheetY.Value * MapConstant.TileSize,
-                                          MapConstant.TileSize,
-                                          MapConstant.TileSize));
-                    }
-                    else if (!string.IsNullOrEmpty(tileDef.Sprite))
-                    {
-                        var fullPath = Path.Combine(AssetPathResolver.GetAssetsRootPath(), tileDef.Sprite);
-                        source = new BitmapImage(new Uri(fullPath, UriKind.Absolute));
-                    }
-
+                    var source = GetTileSource(tileDef);
                     if (source == null) continue;
 
                     var img = new Image
@@ -1040,6 +988,7 @@ namespace MapEditor
                     if (zEditor.ShowDialog() == true)
                     {
                         tile.Z = zEditor.Result;
+                        map.InvalidateTileIndex();
                         RedrawMap();
                     }
                     return;
@@ -1177,6 +1126,7 @@ namespace MapEditor
 
                 selectionStart = null;
                 RedrawMap();
+                RedrawHighlightLayer();
             }
 
             if (e.ClickCount == 2)
@@ -1313,11 +1263,7 @@ namespace MapEditor
             {
                 var current = e.GetPosition(MapCanvas);
                 selectionRect = new Rect(selectionStart.Value, current);
-                RedrawMap();
-            }
-            else
-            {
-                RedrawMap();
+                RedrawHighlightLayer();
             }
         }
 

@@ -158,6 +158,7 @@
     <Compile Include="Utils\FadeHelper.cs" />
     <Compile Include="Utils\FilterOption.cs" />
     <Compile Include="Utils\IFilterable.cs" />
+    <Compile Include="Utils\ImageLoader.cs" />
     <Compile Include="Utils\UIBootstrapper.cs" />
     <Compile Include="Utils\VisualFactory.cs" />
     <Compile Include="VisualHost.cs" />

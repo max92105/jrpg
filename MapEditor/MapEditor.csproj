@@ -65,6 +65,7 @@
     <Compile Include="Controls\CollisionEditorWindow.xaml.cs">
       <DependentUpon>CollisionEditorWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\MapDrawingHost.cs" />
     <Compile Include="Controls\PropertyEditor.xaml.cs">
       <DependentUpon>PropertyEditor.xaml</DependentUpon>
     </Compile>

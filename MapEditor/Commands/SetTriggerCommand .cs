@@ -29,7 +29,7 @@ namespace MapEditor.Commands
             if (tile == null)
             {
                 tile = new Tile { X = x, Y = y, Id = 0 };
-                map.Tiles.Add(tile);
+                map.AddTile(tile);
             }
             tile.Trigger = newTrigger;
         }

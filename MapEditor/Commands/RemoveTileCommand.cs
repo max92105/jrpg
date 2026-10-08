@@ -33,7 +33,7 @@ namespace MapEditor.Commands
 
         public void Undo()
         {
-            map.Tiles.AddRange(removedTiles);
+            map.AddTiles(removedTiles);
         }
     }
 }

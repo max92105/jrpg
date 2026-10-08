@@ -101,11 +101,7 @@ namespace JRPG.Managers
             {
                 for (int tx = (int)Math.Floor(left); tx <= (int)Math.Floor(right); tx++)
                 {
-                    if (tx < 0 || ty < 0 || tx >= map.Width || ty >= map.Height)
-                        return false;
-
-                    int tileId = map.GetTileIdAt(tx, ty);
-                    if (!TileDatabase.Definitions.TryGetValue(tileId, out var def) || !def.IsWalkable)
+                    if (!MapManager.IsCellWalkable(map, tx, ty))
                         return false;
                 }
             }
@@ -114,40 +110,39 @@ namespace JRPG.Managers
             {
                 if (!ObjectDatabase.Definitions.TryGetValue(obj.Id, out var def)) continue;
                 if (def.CollisionPolygon == null || def.CollisionPolygon.Count == 0) continue;
+                if (def.Tiles == null || def.Tiles.Count == 0) continue;
 
-                int minX = def.Tiles.Min(t => t.X);
-                int minY = def.Tiles.Min(t => t.Y);
-                int maxX = def.Tiles.Max(t => t.X);
-                int maxY = def.Tiles.Max(t => t.Y);
+                int minX = int.MaxValue, minY = int.MaxValue;
+                int maxX = int.MinValue, maxY = int.MinValue;
+                foreach (var t in def.Tiles)
+                {
+                    if (t.X < minX) minX = t.X;
+                    if (t.Y < minY) minY = t.Y;
+                    if (t.X > maxX) maxX = t.X;
+                    if (t.Y > maxY) maxY = t.Y;
+                }
 
                 int width = (maxX - minX) + 1;
                 int height = (maxY - minY) + 1;
 
-                // Reconstruct full polygon in world space
-                var polygon = def.CollisionPolygon.Select(p =>
-                {
-                    double worldX = obj.X + (p.X * width);
-                    double worldY = obj.Y + (p.Y * height);
-                    return (worldX, worldY);
-                }).ToList();
-
-                // Check if player's center is inside polygon
-                if (IsPointInsidePolygon(x, y, polygon))
+                // Check if player's center is inside the polygon (in world space)
+                if (IsPointInsidePolygon(x, y, def.CollisionPolygon, obj.X, obj.Y, width, height))
                     return false;
             }
 
             return true;
         }
 
-        private bool IsPointInsidePolygon(double x, double y, List<(double x, double y)> polygon)
+        // Polygon points are relative to the object's size; they are mapped to world space on the fly
+        private bool IsPointInsidePolygon(double x, double y, List<System.Windows.Point> polygon, double originX, double originY, int width, int height)
         {
             bool inside = false;
             for (int i = 0, j = polygon.Count - 1; i < polygon.Count; j = i++)
             {
-                var xi = polygon[i].x;
-                var yi = polygon[i].y;
-                var xj = polygon[j].x;
-                var yj = polygon[j].y;
+                var xi = originX + polygon[i].X * width;
+                var yi = originY + polygon[i].Y * height;
+                var xj = originX + polygon[j].X * width;
+                var yj = originY + polygon[j].Y * height;
 
                 bool intersect = ((yi > y) != (yj > y)) &&
                                  (x < (xj - xi) * (y - yi) / (yj - yi + 0.00001) + xi);

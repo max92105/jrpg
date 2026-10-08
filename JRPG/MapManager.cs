@@ -26,19 +26,39 @@ namespace JRPG
             GameSystems.System.UpdateCurrentMap(file);
         }
 
-        public bool IsWalkable(int x, int y)
+        public bool IsWalkable(int x, int y) => IsCellWalkable(CurrentMap, x, y);
+
+        // A cell is walkable when it has at least one real tile (on any layer) and every
+        // tile in it is walkable. Id 0 tiles are only placeholders holding a trigger.
+        public static bool IsCellWalkable(Map map, int x, int y)
         {
-            if (x < 0 || y < 0 || x >= CurrentMap.Width || y >= CurrentMap.Height)
+            if (x < 0 || y < 0 || x >= map.Width || y >= map.Height)
                 return false;
 
-            int tileId = CurrentMap.GetTileIdAt(x, y);
-            return TileDatabase.Definitions.TryGetValue(tileId, out var def) ? def.IsWalkable : false;
+            bool hasTile = false;
+            foreach (var tile in map.GetTilesAt(x, y))
+            {
+                if (tile.Id == 0) continue;
+
+                if (!TileDatabase.Definitions.TryGetValue(tile.Id, out var def) || !def.IsWalkable)
+                    return false;
+
+                hasTile = true;
+            }
+
+            return hasTile;
         }
 
+        // Trigger on the cell, from any layer (top-most first)
         public Trigger GetTileTrigger(int x, int y)
         {
-            Tile tile = CurrentMap.GetTileAt(x, y);
-            return tile?.Trigger;
+            var tiles = CurrentMap.GetTilesAt(x, y);
+            for (int i = tiles.Count - 1; i >= 0; i--)
+            {
+                if (tiles[i].Trigger != null)
+                    return tiles[i].Trigger;
+            }
+            return null;
         }
 
         public string GetTileSprite(int tileId)

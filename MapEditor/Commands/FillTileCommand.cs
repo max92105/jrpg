@@ -20,7 +20,7 @@ namespace MapEditor.Commands
             this.layerZ = layerZ;
 
             // Get target ID at layerZ (even if no tile exists)
-            var tile = map.Tiles.FirstOrDefault(t => t.X == startX && t.Y == startY && t.Z == layerZ);
+            var tile = map.GetTileAt(startX, startY, layerZ);
             int targetId = tile?.Id ?? 0;
 
             // Always fill unless you're already drawing the same tile at same layer
@@ -44,7 +44,7 @@ namespace MapEditor.Commands
                 if (x < 0 || x >= map.Width || y < 0 || y >= map.Height)
                     continue;
 
-                var tile = map.Tiles.FirstOrDefault(t => t.X == x && t.Y == y && t.Z == layerZ);
+                var tile = map.GetTileAt(x, y, layerZ);
                 int currentId = tile?.Id ?? 0;
 
                 if (currentId != targetId)

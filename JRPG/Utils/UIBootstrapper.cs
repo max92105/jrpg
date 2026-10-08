@@ -20,9 +20,10 @@ namespace JRPG.Utils
             window.WindowState = WindowState.Maximized;
             window.ResizeMode = ResizeMode.NoResize;
 
-            window.MenuBackground.Source = new BitmapImage(
-                new Uri(Path.Combine(AssetPathResolver.GetBackgroundsPath("StartMenu.png")))
-            );
+            window.MenuBackground.Source = ImageLoader.LoadBackground("StartMenu.png");
+
+            // Decode the battle background now so the first battle transition doesn't stall
+            ImageLoader.LoadBackground("Forest.png");
 
             if (window.GameMenuControl == null)
             {

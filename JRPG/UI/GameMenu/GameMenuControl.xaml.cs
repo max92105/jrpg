@@ -27,7 +27,7 @@ namespace JRPG.UI.GameMenu
         {
             InitializeComponent();
 
-            MenuBackground.Source = new BitmapImage(new Uri(AssetPathResolver.GetBackgroundsPath("GameMenu.png")));
+            MenuBackground.Source = ImageLoader.LoadBackground("GameMenu.png");
 
             ContainerGameMenuContent.Visibility = Visibility.Collapsed;
         }

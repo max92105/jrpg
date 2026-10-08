@@ -70,7 +70,7 @@ namespace JRPG.UI.Battle
 
         public void SetBackground(string filename)
         {
-            BattleBackground.Source = new BitmapImage(new Uri(AssetPathResolver.GetBackgroundsPath(filename), UriKind.Absolute));
+            BattleBackground.Source = Utils.ImageLoader.LoadBackground(filename);
         }    
 
         private void UpdateUI()

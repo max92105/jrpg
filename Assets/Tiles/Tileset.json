@@ -202,5 +202,113 @@
     "SheetX": 2,
     "SheetY": 3,
     "CollisionPolygon": null
+  },
+  "18": {
+    "Id": 18,
+    "Name": "New Tile",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "RA_Jungle.png",
+    "SheetX": 4,
+    "SheetY": 1,
+    "CollisionPolygon": null
+  },
+  "19": {
+    "Id": 19,
+    "Name": "New Tile",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "RA_Jungle.png",
+    "SheetX": 5,
+    "SheetY": 1,
+    "CollisionPolygon": null
+  },
+  "20": {
+    "Id": 20,
+    "Name": "New Tile",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "RA_Jungle.png",
+    "SheetX": 6,
+    "SheetY": 1,
+    "CollisionPolygon": null
+  },
+  "21": {
+    "Id": 21,
+    "Name": "New Tile",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "Water1.png",
+    "SheetX": 13,
+    "SheetY": 10,
+    "CollisionPolygon": null
+  },
+  "22": {
+    "Id": 22,
+    "Name": "New Tile",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "Water2.png",
+    "SheetX": 2,
+    "SheetY": 4,
+    "CollisionPolygon": null
+  },
+  "23": {
+    "Id": 23,
+    "Name": "New Tile",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "Water2.png",
+    "SheetX": 3,
+    "SheetY": 4,
+    "CollisionPolygon": null
+  },
+  "24": {
+    "Id": 24,
+    "Name": "New Tile",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "Ground.png",
+    "SheetX": 22,
+    "SheetY": 6,
+    "CollisionPolygon": null
+  },
+  "25": {
+    "Id": 25,
+    "Name": "New Tile",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "Water1.png",
+    "SheetX": 1,
+    "SheetY": 1,
+    "CollisionPolygon": null
+  },
+  "26": {
+    "Id": 26,
+    "Name": "New Tile",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "Water1.png",
+    "SheetX": 1,
+    "SheetY": 1,
+    "CollisionPolygon": null
   }
 }

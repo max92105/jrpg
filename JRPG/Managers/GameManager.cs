@@ -33,9 +33,8 @@ namespace JRPG
         private bool isPaused = false;
         private int lastTriggeredX = -1;
         private int lastTriggeredY = -1;
-        private DateTime lastFrameTime = DateTime.Now;
-
         private static readonly Random rng = new Random();
+        private const int EncounterOneIn = 500; // chance per update while walking; raise for fewer battles
 
         // State
         public string currentMapFile = "start.json";
@@ -118,6 +117,7 @@ namespace JRPG
         {
             var spritePath = Path.Combine(Core.Utils.AssetPathResolver.GetAssetsRootPath(), "player.png");
             var playerBitmap = new BitmapImage(new Uri(spritePath));
+            playerBitmap.Freeze();
             playerFrames = new CroppedBitmap[4, 8];
 
             for (int dir = 0; dir < 4; dir++)
@@ -127,6 +127,7 @@ namespace JRPG
                     int cropX = frame * MapConstant.TileSize;
                     int cropY = dir * MapConstant.TileSize;
                     playerFrames[dir, frame] = new CroppedBitmap(playerBitmap, new Int32Rect(cropX, cropY, MapConstant.TileSize, MapConstant.TileSize));
+                    playerFrames[dir, frame].Freeze();
                 }
             }
         }
@@ -141,8 +142,9 @@ namespace JRPG
 
         public void Update()
         {
-            double deltaTime = (DateTime.Now - lastFrameTime).TotalSeconds;
-            lastFrameTime = DateTime.Now;
+            // Update runs on GameLoopManager's fixed timestep, so the step is always the same.
+            // (Measuring time here gave ~0 on catch-up steps and a huge jump after closing the menu.)
+            double deltaTime = GameLoopManager.TargetDelta;
 
             if (!isPaused)
             {
@@ -167,7 +169,6 @@ namespace JRPG
             }
 
             GameSystems.System.UpdatePlayerPosition(Player.X, Player.Y);
-            lastFrameTime = DateTime.Now;
         }
 
         public void Render(double interpolationFactor)
@@ -188,21 +189,28 @@ namespace JRPG
             int tileY = (int)Math.Floor(Player.Y);
 
             var tileTrigger = mapManager.GetTileTrigger(tileX, tileY);
+            bool hasTrigger = tileTrigger != null && tileTrigger.Type != TriggerType.None;
 
-            if ((tileX != lastTriggeredX || tileY != lastTriggeredY) && tileTrigger?.Type != TriggerType.None)
+            if (hasTrigger)
             {
-                triggerHandler.HandleTrigger(tileTrigger);
-                lastTriggeredX = tileX;
-                lastTriggeredY = tileY;
+                // Fire once when entering the tile, not every update while standing on it
+                if (tileX != lastTriggeredX || tileY != lastTriggeredY)
+                {
+                    triggerHandler.HandleTrigger(tileTrigger);
+                    lastTriggeredX = tileX;
+                    lastTriggeredY = tileY;
+                }
+                return;
             }
-            else if (tileTrigger == null || tileTrigger.Type == TriggerType.None)
-            {
-                lastTriggeredX = -1;
-                lastTriggeredY = -1;
 
-                //if (rng.Next(1, 500) == 59)
-                //    triggerHandler.HandleTrigger(new TriggerBattle());
-            }
+            lastTriggeredX = -1;
+            lastTriggeredY = -1;
+
+            // Random encounter: only roll when the player actually moved (not when pushing against a wall).
+            // Rolled once per fixed update (60/s), so on average one battle every ~8 seconds of walking.
+            bool moved = Player.X != Player.PreviousX || Player.Y != Player.PreviousY;
+            if (moved && rng.Next(EncounterOneIn) == 0)
+                triggerHandler.HandleTrigger(new TriggerBattle());
         }
     }
 }

@@ -1,19 +1,14 @@
-﻿using JRPG.Core.Maps;
+using JRPG.Core.Maps;
 using JRPG.Core.Maps.IO;
 using JRPG.Core.Maps.Models;
 using JRPG.Core.Models;
 using JRPG.Core.Utils;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
-using System.Xml.Linq;
 
 namespace JRPG.Managers
 {
@@ -23,26 +18,43 @@ namespace JRPG.Managers
         {
             public int Z;
             public double DrawY; // Used for sorting (vertical position)
-            public Action<DrawingContext> DrawAction;
+            public int Order;    // Insertion order, keeps the sort stable
+            public ImageSource Image;
+            public Rect Rect;
         }
+
+        private static readonly Comparison<Drawable> DrawOrder = (a, b) =>
+        {
+            int cmp = a.Z.CompareTo(b.Z);
+            if (cmp != 0) return cmp;
+            cmp = a.DrawY.CompareTo(b.DrawY);
+            return cmp != 0 ? cmp : a.Order.CompareTo(b.Order);
+        };
 
         public VisualHost VisualHost { get; }
         private DrawingVisual tileVisual;
         private DrawingVisual objectVisual;
 
         private readonly Dictionary<string, BitmapImage> imageCache = new Dictionary<string, BitmapImage>();
+        private readonly Dictionary<int, ImageSource> tileImageCache = new Dictionary<int, ImageSource>();
+        private readonly List<Drawable> drawables = new List<Drawable>();
+
         private double tileAnimationTimer = 0;
         private int tileAnimationFrame = 0;
 
-        private double lastCameraX = -1;
-        private double lastCameraY = -1;
-
-        private int lastTileCameraX = -1;
-        private int lastTileCameraY = -1;
-
+        // State of the last redraw, used to skip frames where nothing changed
+        private double lastCameraX = double.NaN;
+        private double lastCameraY = double.NaN;
+        private double lastPlayerX = double.NaN;
+        private double lastPlayerY = double.NaN;
+        private double lastViewWidth = -1;
+        private double lastViewHeight = -1;
+        private ImageSource lastPlayerFrame;
+        private Map lastMap;
         private int lastRedrawnTileFrame = -1;
 
         private readonly Canvas canvas;
+        private double dpiScale = 1.0;
 
         public MapRenderer(Canvas canvas)
         {
@@ -50,6 +62,14 @@ namespace JRPG.Managers
 
             tileVisual = new DrawingVisual();
             objectVisual = new DrawingVisual();
+
+            // Pixel-art friendly: no smoothing when scaled (smoothing blends tile borders with
+            // transparent pixels) and no anti-aliased edges between neighbouring tiles
+            foreach (var visual in new[] { tileVisual, objectVisual })
+            {
+                RenderOptions.SetBitmapScalingMode(visual, BitmapScalingMode.NearestNeighbor);
+                RenderOptions.SetEdgeMode(visual, EdgeMode.Aliased);
+            }
 
             VisualHost = new VisualHost();
             VisualHost.SetVisuals(new[] { tileVisual, objectVisual });
@@ -71,27 +91,68 @@ namespace JRPG.Managers
             }
         }
 
-
         public void Redraw(double cameraX, double cameraY, Map map, double playerX, double playerY, CroppedBitmap playerFrame)
         {
-            var drawables = new List<Drawable>();
+            double viewWidth = canvas.ActualWidth;
+            double viewHeight = canvas.ActualHeight;
 
-            AddTileDrawables(drawables, cameraX, cameraY, map);
-            AddPlayerDrawable(drawables, cameraX, cameraY, playerX, playerY, playerFrame);
-            AddObjectDrawables(drawables, cameraX, cameraY, map);
+            if (cameraX == lastCameraX && cameraY == lastCameraY &&
+                playerX == lastPlayerX && playerY == lastPlayerY &&
+                viewWidth == lastViewWidth && viewHeight == lastViewHeight &&
+                ReferenceEquals(playerFrame, lastPlayerFrame) &&
+                ReferenceEquals(map, lastMap) &&
+                tileAnimationFrame == lastRedrawnTileFrame)
+                return;
 
-            // Sort all by vertical Y and draw
+            lastCameraX = cameraX;
+            lastCameraY = cameraY;
+            lastPlayerX = playerX;
+            lastPlayerY = playerY;
+            lastViewWidth = viewWidth;
+            lastViewHeight = viewHeight;
+            lastPlayerFrame = playerFrame;
+            lastMap = map;
+            lastRedrawnTileFrame = tileAnimationFrame;
+
+            drawables.Clear();
+            dpiScale = VisualTreeHelper.GetDpi(VisualHost).DpiScaleX;
+
+            AddTileDrawables(cameraX, cameraY, map, viewWidth, viewHeight);
+            AddPlayerDrawable(cameraX, cameraY, playerX, playerY, playerFrame);
+            AddObjectDrawables(cameraX, cameraY, map, viewWidth, viewHeight);
+
+            // Sort all by Z then vertical Y and draw
+            drawables.Sort(DrawOrder);
+
             using (var dc = tileVisual.RenderOpen())
             {
-                foreach (var d in drawables.OrderBy(d => d.Z).ThenBy(d => d.DrawY))
-                    d.DrawAction(dc);
+                foreach (var d in drawables)
+                    dc.DrawImage(d.Image, d.Rect);
             }
         }
 
-        private void AddTileDrawables(List<Drawable> drawables, double cameraX, double cameraY, Map map)
+        private void AddDrawable(int z, ImageSource image, double drawX, double drawY)
         {
-            int tilesVisibleX = (int)Math.Ceiling(canvas.ActualWidth / MapConstant.TileSize);
-            int tilesVisibleY = (int)Math.Ceiling(canvas.ActualHeight / MapConstant.TileSize);
+            // Snap to whole device pixels: a tile at a fractional position gets its edges
+            // anti-aliased, which shows up as thin lines between tiles while the camera moves.
+            // Rounding in device pixels (not DIPs) keeps this correct with Windows display scaling.
+            drawX = Math.Round(drawX * dpiScale) / dpiScale;
+            drawY = Math.Round(drawY * dpiScale) / dpiScale;
+
+            drawables.Add(new Drawable
+            {
+                Z = z,
+                DrawY = drawY + MapConstant.TileSize,
+                Order = drawables.Count,
+                Image = image,
+                Rect = new Rect(drawX, drawY, MapConstant.TileSize, MapConstant.TileSize)
+            });
+        }
+
+        private void AddTileDrawables(double cameraX, double cameraY, Map map, double viewWidth, double viewHeight)
+        {
+            int tilesVisibleX = (int)Math.Ceiling(viewWidth / MapConstant.TileSize);
+            int tilesVisibleY = (int)Math.Ceiling(viewHeight / MapConstant.TileSize);
             int startX = (int)Math.Floor(cameraX);
             int startY = (int)Math.Floor(cameraY);
 
@@ -110,72 +171,70 @@ namespace JRPG.Managers
                     foreach (var tile in map.GetTilesAt(mapX, mapY))
                     {
                         if (!TileDatabase.Definitions.TryGetValue(tile.Id, out var def)) continue;
-                        var img = GetTileImage(def);
+                        var img = GetTileImage(tile.Id, def);
                         if (img == null) continue;
 
-                        drawables.Add(new Drawable
-                        {
-                            Z = tile.Z,
-                            DrawY = drawY + MapConstant.TileSize,
-                            DrawAction = dc => dc.DrawImage(img, new Rect(drawX, drawY, MapConstant.TileSize, MapConstant.TileSize))
-                        });
+                        AddDrawable(tile.Z, img, drawX, drawY);
                     }
                 }
             }
         }
 
-        private void AddPlayerDrawable(List<Drawable> drawables, double cameraX, double cameraY, double playerX, double playerY, CroppedBitmap frame)
+        private void AddPlayerDrawable(double cameraX, double cameraY, double playerX, double playerY, CroppedBitmap frame)
         {
             double drawX = (playerX - cameraX) * MapConstant.TileSize - (MapConstant.TileSize / 2);
             double drawY = (playerY - cameraY) * MapConstant.TileSize - (MapConstant.TileSize / 2);
 
-            drawables.Add(new Drawable
-            {
-                Z = 1,
-                DrawY = drawY + MapConstant.TileSize,
-                DrawAction = dc => dc.DrawImage(frame, new Rect(drawX, drawY, MapConstant.TileSize, MapConstant.TileSize))
-            });
+            AddDrawable(1, frame, drawX, drawY);
         }
 
-        private void AddObjectDrawables(List<Drawable> drawables, double cameraX, double cameraY, Map map)
+        private void AddObjectDrawables(double cameraX, double cameraY, Map map, double viewWidth, double viewHeight)
         {
             foreach (var obj in map.Objects)
             {
-                if (!ObjectDatabase.Definitions.TryGetValue(obj.Id, out var def) || def.Tiles == null) continue;
-                int minX = def.Tiles.Min(t => t.X);
-                int minY = def.Tiles.Min(t => t.Y);
+                if (!ObjectDatabase.Definitions.TryGetValue(obj.Id, out var def) || def.Tiles == null || def.Tiles.Count == 0) continue;
+
+                int minX = int.MaxValue;
+                int minY = int.MaxValue;
+                foreach (var entry in def.Tiles)
+                {
+                    if (entry.X < minX) minX = entry.X;
+                    if (entry.Y < minY) minY = entry.Y;
+                }
 
                 foreach (var entry in def.Tiles)
                 {
-                    if (!TileDatabase.Definitions.TryGetValue(entry.TileId, out var tileDef)) continue;
-                    var img = GetTileImage(tileDef);
-                    if (img == null) continue;
-
                     double drawX = (obj.X + (entry.X - minX) - cameraX) * MapConstant.TileSize;
                     double drawY = (obj.Y + (entry.Y - minY) - cameraY) * MapConstant.TileSize;
 
+                    // Skip tiles outside the view
+                    if (drawX + MapConstant.TileSize < 0 || drawY + MapConstant.TileSize < 0 || drawX > viewWidth || drawY > viewHeight)
+                        continue;
+
+                    if (!TileDatabase.Definitions.TryGetValue(entry.TileId, out var tileDef)) continue;
+                    var img = GetTileImage(entry.TileId, tileDef);
+                    if (img == null) continue;
+
                     // ✅ Override key
-                    string key = $"{entry.X},{entry.Y}";
                     int z = obj.Z;
-                    if (obj.ZOverrides.TryGetValue(key, out int overrideZ))
+                    if (obj.ZOverrides != null && obj.ZOverrides.Count > 0 &&
+                        obj.ZOverrides.TryGetValue($"{entry.X},{entry.Y}", out int overrideZ))
                     {
                         z = overrideZ;
                     }
 
-                    drawables.Add(new Drawable
-                    {
-                        Z = z,
-                        DrawY = drawY + MapConstant.TileSize,
-                        DrawAction = dc => dc.DrawImage(img, new Rect(drawX, drawY, MapConstant.TileSize, MapConstant.TileSize))
-                    });
+                    AddDrawable(z, img, drawX, drawY);
                 }
             }
         }
 
-        private ImageSource GetTileImage(TileDefinition def)
+        private ImageSource GetTileImage(int tileId, TileDefinition def)
         {
             if (!string.IsNullOrEmpty(def.Tilesheet) && def.SheetX.HasValue && def.SheetY.HasValue)
             {
+                if (tileImageCache.TryGetValue(tileId, out var cachedTile))
+                    return cachedTile;
+
                 var fullSheet = GetCachedImage(def.Tilesheet);
                 if (fullSheet == null) return null;
 
@@ -186,7 +245,11 @@ namespace JRPG.Managers
                     MapConstant.TileSize
                 );
 
-                return new CroppedBitmap(fullSheet, rect);
+                var cropped = new CroppedBitmap(fullSheet, rect);
+                cropped.Freeze();
+
+                tileImageCache[tileId] = cropped;
+                return cropped;
             }
 
             if (def.Frames != null && def.Frames.Length > 0)

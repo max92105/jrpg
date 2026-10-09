@@ -11,6 +11,10 @@ namespace JRPG.Core.Maps.Models
         public int Width { get; set; }
         public int Height { get; set; }
 
+        // Random battles while walking (off for towns, houses...). Maps saved before this
+        // setting existed don't have it in their file and keep encounters on.
+        public bool RandomEncounters { get; set; } = true;
+
         private List<Tile> tiles = new List<Tile>();
         public List<Tile> Tiles
         {
@@ -120,6 +124,15 @@ namespace JRPG.Core.Maps.Models
         {
             foreach (var tile in newTiles)
                 AddTile(tile);
+        }
+
+        public void RemoveTile(Tile tile)
+        {
+            if (GetTileIndex().TryGetValue((tile.X, tile.Y), out var cell))
+                cell.Remove(tile);
+
+            tiles.Remove(tile);
+            indexedTileCount = tiles.Count;
         }
 
         public void RemoveTileAt(int x, int y, int z = 0)

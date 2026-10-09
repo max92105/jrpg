@@ -29,6 +29,8 @@ namespace JRPG.Core.Triggers.IO
                         return JsonSerializer.Deserialize<TriggerDialogue>(root.GetRawText(), options);
                     case TriggerType.Item:
                         return JsonSerializer.Deserialize<TriggerItem>(root.GetRawText(), options);
+                    case TriggerType.Battle:
+                        return JsonSerializer.Deserialize<TriggerBattle>(root.GetRawText(), options);
                     default:
                         throw new JsonException($"Unknown TriggerType '{typeStr}'");
                 };

@@ -78,7 +78,7 @@ namespace MapEditor.Controls
 
             var btnObjectCollision = new Button
             {
-                Content = "Edit Object Collision",
+                Content = "Open Object Editor...",
                 Margin = new Thickness(0, 10, 0, 0)
             };
             btnObjectCollision.Click += (s, e) => RequestEditObjectCollision?.Invoke(def);

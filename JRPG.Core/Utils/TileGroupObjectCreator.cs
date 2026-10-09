@@ -13,7 +13,8 @@ namespace JRPG.Core.Utils
 {
     public static class TileGroupObjectCreator
     {
-        public static bool TryCreateObjectFromSelection(string tilesheet, List<Point> selectedPoints, out ObjectDefinition newObj)
+        public static bool TryCreateObjectFromSelection(string tilesheet, List<Point> selectedPoints, out ObjectDefinition newObj,
+            string name = null, string category = null)
         {
             newObj = null;
 
@@ -43,7 +44,7 @@ namespace JRPG.Core.Utils
                     var newDef = new TileDefinition
                     {
                         Id = TileDatabase.GetNextId(),
-                        Name = $"Auto_{sheetX}_{sheetY}",
+                        Name = $"{TilesheetDatabase.Get(tilesheet).Name} {sheetX},{sheetY}",
                         IsWalkable = true,
                         Tilesheet = Path.GetFileName(tilesheet),
                         SheetX = sheetX,
@@ -69,8 +70,8 @@ namespace JRPG.Core.Utils
             newObj = new ObjectDefinition
             {
                 Id = newId,
-                Name = $"Object {newId}",
-                Category = "General",
+                Name = string.IsNullOrWhiteSpace(name) ? $"Object {newId}" : name,
+                Category = string.IsNullOrWhiteSpace(category) ? "General" : category,
                 Width = 1,
                 Height = 1,
                 Tiles = objectTiles

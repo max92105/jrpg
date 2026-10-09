@@ -1,5 +1,6 @@
 ﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Utils;
+using JRPG.Utils;
 using System;
 using System.Windows;
 using System.Windows.Controls;
@@ -106,7 +107,7 @@ namespace JRPG.UI.GameMenu.Controls
             if (Character == null)
                 return;
 
-            PortraitImage.Source = new BitmapImage(new Uri(AssetPathResolver.GetPortraitPath(Character.PortraitFile)));
+            PortraitImage.Source = ImageLoader.LoadPortrait(Character.PortraitFile);
 
             HPBar.Visibility = ShowStats ? Visibility.Visible : Visibility.Collapsed;
             MPBar.Visibility = ShowStats ? Visibility.Visible : Visibility.Collapsed;

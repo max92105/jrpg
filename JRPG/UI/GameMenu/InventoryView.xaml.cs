@@ -60,7 +60,7 @@ namespace JRPG.UI.GameMenu
 
                 var icon = new Image
                 {
-                    Source = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath(entry.Item.IconFile))),
+                    Source = ImageLoader.LoadIcon(entry.Item.IconFile),
                     Width = 32,
                     Height = 32,
                     Margin = new Thickness(0, 0, 10, 0)
@@ -128,7 +128,7 @@ namespace JRPG.UI.GameMenu
             }
 
             PopupQuestion.Text = $"Use {item.Item.Name}";
-            PopupIcon.Source = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath(item.Item.IconFile)));
+            PopupIcon.Source = ImageLoader.LoadIcon(item.Item.IconFile);
 
             RefreshPortraitVisuals();
 

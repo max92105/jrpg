@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JRPG.Utils;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -56,7 +57,7 @@ namespace JRPG
                 case CutsceneStepBackground bg:
                     var bgImage = new Image
                     {
-                        Source = new BitmapImage(new Uri(AssetPathResolver.GetBackgroundsPath(bg.BackgroundPath))),
+                        Source = ImageLoader.LoadBackground(bg.BackgroundPath),
                         Width = 1920,
                         Height = 1080
                     };
@@ -69,7 +70,7 @@ namespace JRPG
                 case CutsceneStepSprite sprite:
                     var img = new Image
                     {
-                        Source = new BitmapImage(new Uri(AssetPathResolver.GetSpritesPath(sprite.SpritePath), UriKind.Absolute)),
+                        Source = ImageLoader.LoadSprite(sprite.SpritePath),
                         Width = 96,
                         Height = 96
                     };

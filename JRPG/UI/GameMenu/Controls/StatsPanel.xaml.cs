@@ -1,6 +1,7 @@
 ﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems.Equipments.Models;
 using JRPG.Core.Utils;
+using JRPG.Utils;
 using System;
 using System.Linq;
 using System.Windows;
@@ -131,7 +132,7 @@ namespace JRPG.UI.GameMenu.Controls
                 Height = 24,
                 VerticalAlignment = VerticalAlignment.Center,
                 Opacity = string.IsNullOrEmpty(path) ? 0 : 1,
-                Source = string.IsNullOrEmpty(path) ? null : new BitmapImage(new Uri(AssetPathResolver.GetIconsPath(path)))
+                Source = string.IsNullOrEmpty(path) ? null : ImageLoader.LoadIcon(path)
             };
         }
 

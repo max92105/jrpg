@@ -1,0 +1,18 @@
+[
+  {
+    "File": "FG_Forest_Fall.png",
+    "Name": "FG_Forest_Fall",
+    "TileWidth": 16,
+    "TileHeight": 16,
+    "Margin": 0,
+    "Spacing": 0
+  },
+  {
+    "File": "Floor.png",
+    "Name": "Floor",
+    "TileWidth": 64,
+    "TileHeight": 64,
+    "Margin": 0,
+    "Spacing": 0
+  }
+]

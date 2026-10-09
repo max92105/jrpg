@@ -60,23 +60,41 @@ namespace JRPG.Managers
                 CurrentGame?.Render(interpolation);
         }
 
+        // Short pause on black between scenes
+        private const int BlackPauseMs = 150;
+
+        // Ignores clicks/keys that would start a second transition while one is running
+        private static bool isTransitioning;
+
         public static async Task StartNewGameAsync()
         {
-            GameSystems.Reset();
+            if (isTransitioning) return;
+            isTransitioning = true;
 
-            CurrentGame?.Dispose();
-            CurrentGame = new GameManager(GameCanvas);
-            CurrentGame.LoadMapAndPositionPlayer("start.json", 10.0, 3.0);
+            try
+            {
+                // Fade first: building the game (map load + first draw) happens behind the
+                // black screen instead of freezing the menu right after the click
+                await FadeHelper.FadeToBlackAsync(FadeRect);
 
-            GameStateManager.SetState(SceneType.Exploration);
+                GameSystems.Reset();
 
-            await FadeHelper.FadeToBlackAsync(FadeRect);
+                CurrentGame?.Dispose();
+                CurrentGame = new GameManager(GameCanvas);
+                CurrentGame.LoadMapAndPositionPlayer("start.json", 10.0, 3.0);
 
-            GameCanvas.Visibility = Visibility.Visible;
-            StartScreen.Visibility = Visibility.Collapsed;
+                GameStateManager.SetState(SceneType.Exploration);
 
-            await Task.Delay(300);
-            await FadeHelper.FadeFromBlackAsync(FadeRect);
+                GameCanvas.Visibility = Visibility.Visible;
+                StartScreen.Visibility = Visibility.Collapsed;
+
+                await Task.Delay(BlackPauseMs);
+                await FadeHelper.FadeFromBlackAsync(FadeRect);
+            }
+            finally
+            {
+                isTransitioning = false;
+            }
         }
 
         public static async Task ShowLoadScreenAsync()
@@ -88,7 +106,7 @@ namespace JRPG.Managers
             StartScreen.Effect = new BlurEffect
             {
                 Radius = 8,
-                RenderingBias = RenderingBias.Quality
+                RenderingBias = RenderingBias.Performance // full-screen blur, re-rendered during the fade
             };
 
             // Prepare overlay fade in
@@ -133,27 +151,39 @@ namespace JRPG.Managers
 
         public static async Task LoadGameAsync(SaveData save)
         {
-            GameSystems.Reset();
-            
-            CurrentGame?.Dispose();
-            CurrentGame = new GameManager(GameCanvas);
+            if (isTransitioning) return;
+            isTransitioning = true;
 
-            CurrentGame.LoadMapAndPositionPlayer(save.CurrentMap, save.PlayerX, save.PlayerY);
+            try
+            {
+                // Fade first, then build the game behind the black screen
+                await FadeHelper.FadeToBlackAsync(FadeRect);
 
-            GameStateManager.SetState(SceneType.Exploration);
+                GameSystems.Reset();
 
-            await FadeHelper.FadeToBlackAsync(FadeRect);
+                CurrentGame?.Dispose();
+                CurrentGame = new GameManager(GameCanvas);
+                CurrentGame.LoadMapAndPositionPlayer(save.CurrentMap, save.PlayerX, save.PlayerY);
 
-            GameSystems.Inventory.LoadFromSavedData(save.Inventory);
-            GameSystems.Party.LoadFromSaveData(save.Characters, save.ActivePartyOrder);
+                GameSystems.Inventory.LoadFromSavedData(save.Inventory);
+                GameSystems.Party.LoadFromSaveData(save.Characters, save.ActivePartyOrder);
 
-            GameCanvas.Visibility = Visibility.Visible;
-            OverlayViewHost.Visibility = Visibility.Collapsed;
-            StartScreen.Visibility = Visibility.Collapsed;
-            GameMenuControl.Visibility = Visibility.Collapsed;
+                // Loading from the in-game menu: close and reset it
+                GameMenuControl.Close();
+                GameStateManager.SetState(SceneType.Exploration);
 
-            await Task.Delay(300);
-            await FadeHelper.FadeFromBlackAsync(FadeRect);
+                GameCanvas.Visibility = Visibility.Visible;
+                OverlayViewHost.Visibility = Visibility.Collapsed;
+                StartScreen.Visibility = Visibility.Collapsed;
+                StartScreen.Effect = null;
+
+                await Task.Delay(BlackPauseMs);
+                await FadeHelper.FadeFromBlackAsync(FadeRect);
+            }
+            finally
+            {
+                isTransitioning = false;
+            }
         }
 
         public static async Task CancelLoadScreenAsync()
@@ -176,21 +206,28 @@ namespace JRPG.Managers
 
         public static async Task ReturnToMainMenuAsync()
         {
-            await FadeHelper.FadeToBlackAsync(FadeRect);
+            if (isTransitioning) return;
+            isTransitioning = true;
 
-            if (GameMenuControl != null)
-                GameMenuControl.Visibility = Visibility.Collapsed;
+            try
+            {
+                await FadeHelper.FadeToBlackAsync(FadeRect);
 
-            GameStateManager.SetState(SceneType.Menu);
+                GameMenuControl?.Close();
+                GameStateManager.SetState(SceneType.Menu);
 
-            GameCanvas.Visibility = Visibility.Collapsed;
-            StartScreen.Visibility = Visibility.Visible;
-            StartScreen.Effect = null;
-            StartMenuContent.Visibility = Visibility.Visible;
+                GameCanvas.Visibility = Visibility.Collapsed;
+                StartScreen.Visibility = Visibility.Visible;
+                StartScreen.Effect = null;
+                StartMenuContent.Visibility = Visibility.Visible;
 
-            await Task.Delay(300); // Allow layout pass if needed
-
-            await FadeHelper.FadeFromBlackAsync(FadeRect);
+                await Task.Delay(BlackPauseMs);
+                await FadeHelper.FadeFromBlackAsync(FadeRect);
+            }
+            finally
+            {
+                isTransitioning = false;
+            }
         }
 
         public static async Task StartBattleAsync(List<Enemy> enemies)

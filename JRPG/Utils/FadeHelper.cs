@@ -15,8 +15,8 @@ namespace JRPG.Core.Utils
             fadeRect.Visibility = Visibility.Visible;
             fadeRect.Opacity = fadeRect.Opacity;
 
-            // Force a layout/render pass before starting animation
-            await Task.Delay(1);
+            // Let one render pass happen before starting the animation
+            // (a Task.Delay(1) here used to add ~15ms of lag to every fade)
             await Application.Current.Dispatcher.InvokeAsync(() => { }, System.Windows.Threading.DispatcherPriority.Render);
 
             var animation = new DoubleAnimation

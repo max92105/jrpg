@@ -1,4 +1,5 @@
 ﻿// CommandPanel.xaml.cs
+using JRPG.Utils;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -34,7 +35,7 @@ namespace JRPG.UI.Battle.Controls
 
         private void SetButtonIcon(Image icon, string file)
         {
-            icon.Source = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath(file)));
+            icon.Source = ImageLoader.LoadIcon(file);
         }
 
         public void ShowSkills(IEnumerable<Skill> skills)

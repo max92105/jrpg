@@ -5,6 +5,7 @@ using JRPG.Core.Systems;
 using JRPG.Core.Systems.Inventories.Models;
 using JRPG.Core.Utils;
 using JRPG.UI.Battle.Controls;
+using JRPG.Utils;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -42,7 +43,7 @@ namespace JRPG.UI.Battle
 
         private List<BattleActor> currentlySelected = new List<BattleActor>();
 
-        private BitmapImage targetArrowImage = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath("TargetArrow.png"))); // replace with your arrow filename
+        private BitmapSource targetArrowImage = ImageLoader.LoadIcon("TargetArrow.png"); // replace with your arrow filename
         private HashSet<Image> glowingSprites = new HashSet<Image>();
         private HashSet<Image> activeTargetArrows = new HashSet<Image>();
 
@@ -258,7 +259,7 @@ namespace JRPG.UI.Battle
             {
                 Width = 96,
                 Height = 96,
-                Source = new BitmapImage(new Uri(path, UriKind.Absolute)),
+                Source = ImageLoader.Load(path, 256),
                 RenderTransformOrigin = new Point(0.5, 0.5),
                 RenderTransform = transformGroup
             };
@@ -394,7 +395,7 @@ namespace JRPG.UI.Battle
                 {
                     Width = 32,
                     Height = 32,
-                    Source = new BitmapImage(new Uri(AssetPathResolver.GetPortraitPath(portraitFile)))
+                    Source = ImageLoader.LoadPortrait(portraitFile)
                 };
 
                 TurnOrderPanel.Children.Add(img);
@@ -409,7 +410,7 @@ namespace JRPG.UI.Battle
             {
                 Width = 36,
                 Height = 36,
-                Source = new BitmapImage(new Uri(AssetPathResolver.GetIconsPath("TargetArrow.png"), UriKind.Absolute)),
+                Source = ImageLoader.LoadIcon("TargetArrow.png"),
                 RenderTransformOrigin = new Point(0.5, 0.5),
                 Opacity = 0,
                 RenderTransform = new ScaleTransform(0.5, 0.5)

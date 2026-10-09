@@ -11,7 +11,8 @@ namespace MapEditor.Commands
         private readonly int newId;
         private readonly int layerZ;
 
-        private readonly List<(int x, int y, int oldId)> affected = new List<(int x, int y, int oldId)>();
+        // hadTile: whether a tile existed on this layer before, so undo can remove instead of writing Id 0
+        private readonly List<(int x, int y, bool hadTile, int oldId)> affected = new List<(int x, int y, bool hadTile, int oldId)>();
 
         public FillTileCommand(Map map, int startX, int startY, int layerZ, int newId)
         {
@@ -50,7 +51,7 @@ namespace MapEditor.Commands
                 if (currentId != targetId)
                     continue;
 
-                affected.Add((x, y, currentId));
+                affected.Add((x, y, tile != null, currentId));
                 map.SetTile(x, y, layerZ, newId);
 
                 queue.Enqueue((x + 1, y));
@@ -62,14 +63,19 @@ namespace MapEditor.Commands
 
         public void Execute()
         {
-            foreach (var (x, y, _) in affected)
+            foreach (var (x, y, _, _) in affected)
                 map.SetTile(x, y, layerZ, newId);
         }
 
         public void Undo()
         {
-            foreach (var (x, y, oldId) in affected)
-                map.SetTile(x, y, layerZ, oldId);
+            foreach (var (x, y, hadTile, oldId) in affected)
+            {
+                if (hadTile)
+                    map.SetTile(x, y, layerZ, oldId);
+                else
+                    map.RemoveTileAt(x, y, layerZ);
+            }
         }
     }
 }

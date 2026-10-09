@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace JRPG.Core.Maps.Models
 {
@@ -12,5 +13,23 @@ namespace JRPG.Core.Maps.Models
         public Dictionary<string, string> Meta { get; set; } = new Dictionary<string, string>();
 
         public Dictionary<string, int> ZOverrides { get; set; } = new Dictionary<string, int>();
+
+        /// <summary>
+        /// Draw layer of one tile of this object. Used by both the game and the editor so
+        /// they always agree: per-instance override, else the object's layer (+ tile offset).
+        /// </summary>
+        public int GetTileZ(TileGroupEntry entry)
+        {
+            if (ZOverrides != null && ZOverrides.TryGetValue($"{entry.X},{entry.Y}", out int overrideZ))
+                return overrideZ;
+
+            return Z + entry.Z;
+        }
+
+        /// <summary>
+        /// Layer of the definition's "above player" zones: always over the player,
+        /// even when the object itself is on a lower layer.
+        /// </summary>
+        public int AbovePlayerZoneZ => Math.Max(MapConstant.AbovePlayerZ, Z);
     }
 }

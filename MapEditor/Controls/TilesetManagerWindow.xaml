@@ -1,0 +1,116 @@
+<Window x:Class="MapEditor.Controls.TilesetManagerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:MapEditor.Controls"
+        Title="Tileset Manager" Height="820" Width="1400"
+        WindowStartupLocation="CenterOwner" Background="#1A1A1A">
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#DDD"/>
+        </Style>
+        <Style x:Key="Header" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
+        <Style x:Key="Label" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#AAA"/>
+            <Setter Property="Margin" Value="0,8,0,2"/>
+        </Style>
+    </Window.Resources>
+
+    <DockPanel>
+        <!-- Bottom buttons -->
+        <Border DockPanel.Dock="Bottom" Background="#202020" Padding="10,8">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Content="Save" Width="100" Margin="0,0,8,0" Click="Save_Click"/>
+                    <Button Content="Close" Width="100" Click="Close_Click"/>
+                </StackPanel>
+                <TextBlock x:Name="StatusText" VerticalAlignment="Center" Foreground="#8C8"/>
+            </DockPanel>
+        </Border>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="290"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- LEFT: sheets and how they are cut -->
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="12">
+                    <TextBlock Text="Tilesheets" Style="{StaticResource Header}"/>
+                    <ListBox x:Name="SheetList" Height="220" Background="#222" Foreground="White"
+                             SelectionChanged="SheetList_SelectionChanged"/>
+                    <Button Content="Import image(s)..." Margin="0,6,0,0" Click="Import_Click"
+                            ToolTip="Copy PNG files into Assets/Tiles and add them as tilesheets"/>
+
+                    <TextBlock Text="Sheet" Style="{StaticResource Header}" Margin="0,18,0,0"/>
+                    <TextBlock x:Name="SheetFileText" Foreground="#888"/>
+                    <TextBlock x:Name="SheetImageSizeText" Foreground="#888"/>
+
+                    <TextBlock Text="Name" Style="{StaticResource Label}"/>
+                    <TextBox x:Name="SheetNameBox" TextChanged="SheetName_TextChanged"/>
+
+                    <TextBlock Text="Tile size in the image (px)" Style="{StaticResource Label}"/>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox x:Name="TileWidthBox" Width="55" TextChanged="Grid_TextChanged"/>
+                        <TextBlock Text=" x " VerticalAlignment="Center"/>
+                        <TextBox x:Name="TileHeightBox" Width="55" TextChanged="Grid_TextChanged"/>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                        <StackPanel Margin="0,0,12,0">
+                            <TextBlock Text="Margin" Foreground="#AAA" ToolTip="Empty pixels around the whole sheet"/>
+                            <TextBox x:Name="MarginBox" Width="55" TextChanged="Grid_TextChanged"/>
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock Text="Spacing" Foreground="#AAA" ToolTip="Empty pixels between tiles"/>
+                            <TextBox x:Name="SpacingBox" Width="55" TextChanged="Grid_TextChanged"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <TextBlock x:Name="GridSummaryText" Margin="0,8,0,0" TextWrapping="Wrap"/>
+                    <TextBlock x:Name="GridWarningText" Margin="0,4,0,0" TextWrapping="Wrap" Foreground="DarkOrange" Visibility="Collapsed"/>
+
+                    <Button Content="Add all tiles of this sheet" Margin="0,14,0,0" Click="AddAllTiles_Click"
+                            ToolTip="Create a tile for every cell that is not empty (fully transparent cells are skipped)"/>
+
+                    <TextBlock Foreground="#888" FontSize="11" TextWrapping="Wrap" Margin="0,16,0,0"
+                               Text="Tiles are always drawn at 48 x 48 on the map: a 16 or 32 px sheet is scaled up. Blue cells are already tiles. Click a cell to edit it. Wheel: zoom, drag: move."/>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- CENTER: the sheet -->
+            <controls:ZoomableImageViewer x:Name="SheetViewer" Grid.Column="1" Margin="0,8"/>
+
+            <!-- RIGHT: the selected tile -->
+            <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="12">
+                    <TextBlock Text="Tile" Style="{StaticResource Header}"/>
+                    <TextBlock x:Name="CellText" Text="Click a cell in the sheet." TextWrapping="Wrap"/>
+
+                    <Border Background="#111" Margin="0,10,0,0" Width="144" Height="144" HorizontalAlignment="Left">
+                        <Image x:Name="TilePreview" Width="144" Height="144" RenderOptions.BitmapScalingMode="NearestNeighbor"/>
+                    </Border>
+
+                    <Button x:Name="AddTileButton" Content="Add this cell as a tile" Margin="0,10,0,0" Visibility="Collapsed" Click="AddTile_Click"/>
+
+                    <StackPanel x:Name="TilePanel" Visibility="Collapsed">
+                        <TextBlock x:Name="TileIdText" Foreground="#888" Margin="0,10,0,0"/>
+                        <TextBlock Text="Name" Style="{StaticResource Label}"/>
+                        <TextBox x:Name="TileNameBox" TextChanged="TileName_TextChanged"/>
+                        <CheckBox x:Name="WalkableBox" Content="Walkable" Foreground="White" Margin="0,10,0,0"
+                                  Checked="Walkable_Changed" Unchecked="Walkable_Changed"/>
+                        <Button Content="Edit collision..." Margin="0,10,0,0" Click="EditCollision_Click"/>
+                        <TextBlock x:Name="CollisionText" Foreground="#888" Margin="0,4,0,0"/>
+                        <Button Content="Delete tile" Margin="0,24,0,0" Click="DeleteTile_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </DockPanel>
+</Window>

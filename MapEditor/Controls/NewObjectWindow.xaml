@@ -1,0 +1,20 @@
+<Window x:Class="MapEditor.Controls.NewObjectWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="New Object" SizeToContent="WidthAndHeight" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner">
+    <StackPanel Margin="16" Width="300">
+        <TextBlock x:Name="InfoText" Foreground="Gray" Margin="0,0,0,10" TextWrapping="Wrap"/>
+
+        <TextBlock Text="Name" Margin="0,0,0,2"/>
+        <TextBox x:Name="NameBox"/>
+
+        <TextBlock Text="Category (pick one or type a new one)" Margin="0,12,0,2"/>
+        <ComboBox x:Name="CategoryBox" IsEditable="True"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,0,0">
+            <Button Content="Create" Width="80" Margin="0,0,8,0" IsDefault="True" Click="Create_Click"/>
+            <Button Content="Cancel" Width="80" IsCancel="True"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

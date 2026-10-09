@@ -92,10 +92,11 @@
                 Background="#AA111111"
                 Effect="{DynamicResource DropShadow}"
                 x:Name="OverlayViewHost"
-                Visibility="Collapsed" Panel.ZIndex="102" Width="800">      
+                Visibility="Collapsed" Panel.ZIndex="102" Width="1000">
+                <!-- Stretch like the in-game menu's content panel, so the save slots get the same size -->
                 <ContentPresenter x:Name="ContentOverlayViewHost"
-                      HorizontalAlignment="Center"
-                      VerticalAlignment="Center"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Stretch"
                       Visibility="Collapsed"
                       Panel.ZIndex="999"/>
             </Border>

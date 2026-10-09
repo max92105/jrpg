@@ -208,6 +208,10 @@ namespace JRPG
 
             // Random encounter: only roll when the player actually moved (not when pushing against a wall).
             // Rolled once per fixed update (60/s), so on average one battle every ~8 seconds of walking.
+            // Maps can turn random battles off (Map Properties in the editor), e.g. towns
+            if (!mapManager.CurrentMap.RandomEncounters)
+                return;
+
             bool moved = Player.X != Player.PreviousX || Player.Y != Player.PreviousY;
             if (moved && rng.Next(EncounterOneIn) == 0)
                 triggerHandler.HandleTrigger(new TriggerBattle());

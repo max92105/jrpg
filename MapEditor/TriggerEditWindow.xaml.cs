@@ -21,29 +21,38 @@ namespace MapEditor
 
             if (existing is TriggerWarp warp)
             {
-                TriggerTypeBox.SelectedIndex = 1;
+                SelectType("Warp");
                 WarpMapBox.Text = warp.TargetMap;
                 WarpXBox.Text = warp.TargetX.ToString();
                 WarpYBox.Text = warp.TargetY.ToString();
             }
             else if (existing is TriggerDialogue dialogue)
             {
+                SelectType("Dialogue");
                 DialogueSpeakerBox.Text = dialogue.SpeakerName ?? "";
                 DialoguePortraitBox.Text = dialogue.PortraitPath ?? "";
 
                 DialogueLinesBox.Items.Clear();
-                foreach (var line in dialogue.Lines)
+                foreach (var line in dialogue.Lines ?? Enumerable.Empty<string>())
                     DialogueLinesBox.Items.Add(line);
             }
             else if (existing is TriggerItem item)
             {
-                TriggerTypeBox.SelectedIndex = 3;
+                SelectType("Item");
                 ItemBox.Text = item.ItemId;
             }
             else
             {
-                TriggerTypeBox.SelectedIndex = 0;
+                SelectType("Warp");
             }
+        }
+
+        // Select by tag rather than index so the list order can change safely
+        private void SelectType(string tag)
+        {
+            TriggerTypeBox.SelectedItem = TriggerTypeBox.Items
+                .OfType<ComboBoxItem>()
+                .FirstOrDefault(i => (string)i.Tag == tag);
         }
 
         private void TriggerTypeBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -98,6 +107,9 @@ namespace MapEditor
                             ItemId = ItemBox.Text.Trim()
                         };
                         break;
+
+                    default:
+                        throw new Exception("Choose a trigger type");
                 }
 
                 DialogResult = true;

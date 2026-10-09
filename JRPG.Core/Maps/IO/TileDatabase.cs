@@ -23,9 +23,26 @@ namespace JRPG.Core.Maps.IO
             }
         }
 
+        public static void Remove(int id)
+        {
+            definitions.Remove(id);
+        }
+
+        /// <summary>The tile cut from this cell of this sheet, if one is defined.</summary>
+        public static TileDefinition FindSheetTile(string sheetFile, int sheetX, int sheetY)
+        {
+            string file = Path.GetFileName(sheetFile ?? "");
+            return definitions.Values.FirstOrDefault(d =>
+                d.SheetX == sheetX && d.SheetY == sheetY &&
+                string.Equals(Path.GetFileName(d.Tilesheet ?? ""), file, System.StringComparison.OrdinalIgnoreCase));
+        }
+
         public static void Load()
         {
             definitions.Clear();
+
+            // Sheet settings (how each sheet is cut) are needed wherever tiles are
+            TilesheetDatabase.Load();
 
             if (!File.Exists(filePath))
                 return;
@@ -36,14 +53,17 @@ namespace JRPG.Core.Maps.IO
             foreach (var kvp in raw)
             {
                 if (int.TryParse(kvp.Key, out int id))
+                {
+                    kvp.Value.Id = id; // the key is the real id
                     definitions[id] = kvp.Value;
+                }
             }
         }
 
         public static void Save()
         {
             var serializable = new Dictionary<string, TileDefinition>();
-            foreach (var kvp in definitions)
+            foreach (var kvp in definitions.OrderBy(k => k.Key))
                 serializable[kvp.Key.ToString()] = kvp.Value;
 
             File.WriteAllText(filePath, JsonConvert.SerializeObject(serializable, Formatting.Indented));

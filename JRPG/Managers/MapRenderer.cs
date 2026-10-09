@@ -16,20 +16,13 @@ namespace JRPG.Managers
     {
         private struct Drawable
         {
-            public int Z;
-            public double DrawY; // Used for sorting (vertical position)
-            public int Order;    // Insertion order, keeps the sort stable
+            public DrawSortKey Key; // same draw order rule as the map editor
             public ImageSource Image;
             public Rect Rect;
+            public Geometry Clip; // only part of the image inside it is drawn (above-player zones)
         }
 
-        private static readonly Comparison<Drawable> DrawOrder = (a, b) =>
-        {
-            int cmp = a.Z.CompareTo(b.Z);
-            if (cmp != 0) return cmp;
-            cmp = a.DrawY.CompareTo(b.DrawY);
-            return cmp != 0 ? cmp : a.Order.CompareTo(b.Order);
-        };
+        private static readonly Comparison<Drawable> DrawOrder = (a, b) => a.Key.CompareTo(b.Key);
 
         public VisualHost VisualHost { get; }
         private DrawingVisual tileVisual;
@@ -127,12 +120,24 @@ namespace JRPG.Managers
             using (var dc = tileVisual.RenderOpen())
             {
                 foreach (var d in drawables)
-                    dc.DrawImage(d.Image, d.Rect);
+                {
+                    if (d.Clip != null)
+                    {
+                        dc.PushClip(d.Clip);
+                        dc.DrawImage(d.Image, d.Rect);
+                        dc.Pop();
+                    }
+                    else
+                    {
+                        dc.DrawImage(d.Image, d.Rect);
+                    }
+                }
             }
         }
 
-        private void AddDrawable(int z, ImageSource image, double drawX, double drawY)
+        private void AddDrawable(DrawSortKey key, ImageSource image, double drawX, double drawY, Geometry clip = null)
         {
+            key.Order = drawables.Count; // insertion order breaks ties
             // Snap to whole device pixels: a tile at a fractional position gets its edges
             // anti-aliased, which shows up as thin lines between tiles while the camera moves.
             // Rounding in device pixels (not DIPs) keeps this correct with Windows display scaling.
@@ -141,11 +146,10 @@ namespace JRPG.Managers
 
             drawables.Add(new Drawable
             {
-                Z = z,
-                DrawY = drawY + MapConstant.TileSize,
-                Order = drawables.Count,
+                Key = key,
                 Image = image,
-                Rect = new Rect(drawX, drawY, MapConstant.TileSize, MapConstant.TileSize)
+                Rect = new Rect(drawX, drawY, MapConstant.TileSize, MapConstant.TileSize),
+                Clip = clip
             });
         }
 
@@ -174,7 +178,7 @@ namespace JRPG.Managers
                         var img = GetTileImage(tile.Id, def);
                         if (img == null) continue;
 
-                        AddDrawable(tile.Z, img, drawX, drawY);
+                        AddDrawable(DrawSortKey.ForMapTile(tile.Z, 0), img, drawX, drawY);
                     }
                 }
             }
@@ -185,7 +189,8 @@ namespace JRPG.Managers
             double drawX = (playerX - cameraX) * MapConstant.TileSize - (MapConstant.TileSize / 2);
             double drawY = (playerY - cameraY) * MapConstant.TileSize - (MapConstant.TileSize / 2);
 
-            AddDrawable(1, frame, drawX, drawY);
+            // Sorted by the feet: the sprite is centered on the player's position
+            AddDrawable(DrawSortKey.ForSprite(MapConstant.PlayerZ, playerY + 0.5, 0), frame, drawX, drawY);
         }
 
         private void AddObjectDrawables(double cameraX, double cameraY, Map map, double viewWidth, double viewHeight)
@@ -194,13 +199,8 @@ namespace JRPG.Managers
             {
                 if (!ObjectDatabase.Definitions.TryGetValue(obj.Id, out var def) || def.Tiles == null || def.Tiles.Count == 0) continue;
 
-                int minX = int.MaxValue;
-                int minY = int.MaxValue;
-                foreach (var entry in def.Tiles)
-                {
-                    if (entry.X < minX) minX = entry.X;
-                    if (entry.Y < minY) minY = entry.Y;
-                }
+                var (minX, minY, width, height) = def.GetTileBounds();
+                var zoneClips = BuildAbovePlayerClips(def, obj, cameraX, cameraY, width, height);
 
                 foreach (var entry in def.Tiles)
                 {
@@ -215,17 +215,59 @@ namespace JRPG.Managers
                     var img = GetTileImage(entry.TileId, tileDef);
                     if (img == null) continue;
 
-                    // ✅ Override key
-                    int z = obj.Z;
-                    if (obj.ZOverrides != null && obj.ZOverrides.Count > 0 &&
-                        obj.ZOverrides.TryGetValue($"{entry.X},{entry.Y}", out int overrideZ))
-                    {
-                        z = overrideZ;
-                    }
+                    // Every tile of the object uses the object's base, so the object sorts as one unit
+                    AddDrawable(DrawSortKey.ForObject(obj.GetTileZ(entry), obj, def, 0), img, drawX, drawY);
 
-                    AddDrawable(z, img, drawX, drawY);
+                    // Draw the part of this tile inside an "above player" zone again, over the player
+                    if (zoneClips != null)
+                    {
+                        var tileRect = new Rect(drawX, drawY, MapConstant.TileSize, MapConstant.TileSize);
+                        foreach (var clip in zoneClips)
+                        {
+                            if (clip.Bounds.IntersectsWith(tileRect))
+                                AddDrawable(DrawSortKey.ForObject(obj.AbovePlayerZoneZ, obj, def, 0), img, drawX, drawY, clip);
+                        }
+                    }
                 }
             }
+        }
+
+        /// <summary>
+        /// Screen-space shapes of the object's "above player" zones (stored normalized over the
+        /// object's tile bounds, like the collision polygon), or null when it has none.
+        /// </summary>
+        private static List<Geometry> BuildAbovePlayerClips(ObjectDefinition def, PlacedObject obj, double cameraX, double cameraY, int width, int height)
+        {
+            if (def.AbovePlayerZones == null || def.AbovePlayerZones.Count == 0)
+                return null;
+
+            List<Geometry> clips = null;
+            foreach (var zone in def.AbovePlayerZones)
+            {
+                if (zone == null || zone.Count < 3)
+                    continue;
+
+                var geometry = new StreamGeometry();
+                using (var ctx = geometry.Open())
+                {
+                    for (int i = 0; i < zone.Count; i++)
+                    {
+                        var p = new Point(
+                            (obj.X + zone[i].X * width - cameraX) * MapConstant.TileSize,
+                            (obj.Y + zone[i].Y * height - cameraY) * MapConstant.TileSize);
+
+                        if (i == 0)
+                            ctx.BeginFigure(p, true, true);
+                        else
+                            ctx.LineTo(p, true, false);
+                    }
+                }
+                geometry.Freeze();
+
+                (clips ?? (clips = new List<Geometry>())).Add(geometry);
+            }
+
+            return clips;
         }
 
         private ImageSource GetTileImage(int tileId, TileDefinition def)
@@ -238,14 +280,11 @@ namespace JRPG.Managers
                 var fullSheet = GetCachedImage(def.Tilesheet);
                 if (fullSheet == null) return null;
 
-                var rect = new Int32Rect(
-                    def.SheetX.Value * MapConstant.TileSize,
-                    def.SheetY.Value * MapConstant.TileSize,
-                    MapConstant.TileSize,
-                    MapConstant.TileSize
-                );
+                // Cut with the sheet's own grid (Tilesheets.json); drawn at TileSize on the map
+                var rect = TilesheetDatabase.GetSourceRect(def, fullSheet.PixelWidth, fullSheet.PixelHeight);
+                if (rect == null) return null;
 
-                var cropped = new CroppedBitmap(fullSheet, rect);
+                var cropped = new CroppedBitmap(fullSheet, rect.Value);
                 cropped.Freeze();
 
                 tileImageCache[tileId] = cropped;

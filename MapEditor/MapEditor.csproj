@@ -57,6 +57,7 @@
     </ApplicationDefinition>
     <Compile Include="Commands\BatchCommand.cs" />
     <Compile Include="Commands\FillTileCommand.cs" />
+    <Compile Include="Commands\MoveObjectCommand.cs" />
     <Compile Include="Commands\RemoveTileCommand.cs" />
     <Compile Include="Commands\SetTriggerCommand .cs" />
     <Compile Include="Commands\RemoveObjectCommad.cs" />
@@ -66,6 +67,18 @@
       <DependentUpon>CollisionEditorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\MapDrawingHost.cs" />
+    <Compile Include="Controls\ObjectEditorWindow.xaml.cs">
+      <DependentUpon>ObjectEditorWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\MapPropertiesWindow.xaml.cs">
+      <DependentUpon>MapPropertiesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\NewObjectWindow.xaml.cs">
+      <DependentUpon>NewObjectWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\TilesetManagerWindow.xaml.cs">
+      <DependentUpon>TilesetManagerWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\PropertyEditor.xaml.cs">
       <DependentUpon>PropertyEditor.xaml</DependentUpon>
     </Compile>
@@ -86,6 +99,22 @@
       <DependentUpon>ZoomableImageViewer.xaml</DependentUpon>
     </Compile>
     <Page Include="Controls\CollisionEditorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ObjectEditorWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\MapPropertiesWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\NewObjectWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\TilesetManagerWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

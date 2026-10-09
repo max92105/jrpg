@@ -1,4 +1,4 @@
-﻿using JRPG.Core.Maps.Models;
+using JRPG.Core.Maps.Models;
 using MapEditor.Undo;
 
 namespace MapEditor.Commands
@@ -7,6 +7,7 @@ namespace MapEditor.Commands
     {
         private readonly Map map;
         private readonly PlacedObject obj;
+        private int index = -1;
 
         public RemoveObjectCommand(Map map, PlacedObject obj)
         {
@@ -16,12 +17,17 @@ namespace MapEditor.Commands
 
         public void Execute()
         {
+            index = map.Objects.IndexOf(obj);
             map.Objects.Remove(obj);
         }
 
         public void Undo()
         {
-            map.Objects.Add(obj);
+            // Put it back at the same position in the list so draw order is unchanged
+            if (index >= 0 && index <= map.Objects.Count)
+                map.Objects.Insert(index, obj);
+            else
+                map.Objects.Add(obj);
         }
     }
 }

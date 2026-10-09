@@ -19,7 +19,7 @@ namespace JRPG.Utils
                 Opacity = string.IsNullOrEmpty(iconPath) ? 0 : 1,
                 Source = string.IsNullOrEmpty(iconPath)
                     ? null
-                    : new BitmapImage(new Uri(AssetPathResolver.GetIconsPath(iconPath)))
+                    : ImageLoader.LoadIcon(iconPath)
             };
         }
 

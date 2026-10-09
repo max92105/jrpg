@@ -16,17 +16,17 @@ namespace JRPG.Managers
                 return;
             }
 
-            // Toggle in-game menu
-            if (key == Key.Escape && !GameStateManager.IsMenu && !GameStateManager.IsCutscene && !GameStateManager.IsDialogue && window.StartScreen?.Visibility != Visibility.Visible)
+            // Esc while the in-game menu is open: close it
+            if (key == Key.Escape && window.GameMenuControl != null && window.GameMenuControl.IsOpen)
             {
-                if (window.GameMenuControl != null)
-                {
-                    bool showing = window.GameMenuControl.Visibility == Visibility.Visible;
-                    window.GameMenuControl.Visibility = showing ? Visibility.Collapsed : Visibility.Visible;
-                    Panel.SetZIndex(window.GameMenuControl, showing ? 0 : 1000);
+                window.GameMenuControl.Close();
+                return;
+            }
 
-                    GameStateManager.SetState(showing ? SceneType.Exploration : SceneType.Menu);
-                }
+            // Esc while exploring: open the in-game menu
+            if (key == Key.Escape && GameStateManager.IsExploration && window.StartScreen?.Visibility != Visibility.Visible)
+            {
+                window.GameMenuControl?.Open();
                 return;
             }
 

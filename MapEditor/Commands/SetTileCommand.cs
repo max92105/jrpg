@@ -1,4 +1,4 @@
-﻿using JRPG.Core.Maps.Models;
+using JRPG.Core.Maps.Models;
 using MapEditor.Undo;
 
 namespace MapEditor.Commands
@@ -7,6 +7,7 @@ namespace MapEditor.Commands
     {
         private readonly Map map;
         private readonly int x, y, z;
+        private readonly bool hadTile;
         private readonly int oldTileId;
         private readonly int newTileId;
 
@@ -17,7 +18,11 @@ namespace MapEditor.Commands
             this.y = y;
             this.z = z;
             this.newTileId = newTileId;
-            this.oldTileId = map.GetTileIdAt(x, y);
+
+            // Remember what was on this layer (not Z=0) so undo restores it exactly
+            var oldTile = map.GetTileAt(x, y, z);
+            hadTile = oldTile != null;
+            oldTileId = oldTile?.Id ?? 0;
         }
 
         public void Execute()
@@ -27,7 +32,10 @@ namespace MapEditor.Commands
 
         public void Undo()
         {
-            map.SetTile(x, y, z, oldTileId);
+            if (hadTile)
+                map.SetTile(x, y, z, oldTileId);
+            else
+                map.RemoveTileAt(x, y, z);
         }
     }
 }

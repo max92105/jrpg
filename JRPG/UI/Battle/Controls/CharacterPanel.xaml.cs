@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JRPG.Utils;
+using System;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -57,7 +58,7 @@ namespace JRPG.UI.Battle.Controls
         {
             if (!string.IsNullOrEmpty(imagePath))
             {
-                PortraitImage.Source = new BitmapImage(new Uri(imagePath));
+                PortraitImage.Source = ImageLoader.Load(imagePath, 256);
                 PortraitImage.Visibility = System.Windows.Visibility.Visible;
             }
             else

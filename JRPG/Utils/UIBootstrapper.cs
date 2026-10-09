@@ -25,6 +25,10 @@ namespace JRPG.Utils
             // Decode the battle background now so the first battle transition doesn't stall
             ImageLoader.LoadBackground("Forest.png");
 
+            // Icons, portraits and battle sprites are 1024px files: decode them (small) in the
+            // background now, so menus and battles never wait for them
+            _ = ImageLoader.PreloadUiImagesAsync();
+
             if (window.GameMenuControl == null)
             {
                 window.GameMenuControl = new GameMenuControl();

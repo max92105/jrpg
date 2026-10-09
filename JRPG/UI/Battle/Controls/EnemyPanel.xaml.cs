@@ -1,5 +1,6 @@
 ﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Utils;
+using JRPG.Utils;
 using System;
 using System.IO;
 using System.Windows.Controls;
@@ -26,7 +27,7 @@ namespace JRPG.UI.Battle.Controls
 
             if (!string.IsNullOrEmpty(enemy.PortraitFile) && File.Exists(AssetPathResolver.GetPortraitPath(enemy.PortraitFile)))
             {
-                PortraitImage.Source = new BitmapImage(new Uri(AssetPathResolver.GetPortraitPath(enemy.PortraitFile)));
+                PortraitImage.Source = ImageLoader.LoadPortrait(enemy.PortraitFile);
             }
 
             Background = isSelected

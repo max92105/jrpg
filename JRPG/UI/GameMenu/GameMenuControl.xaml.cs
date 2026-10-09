@@ -60,7 +60,7 @@ namespace JRPG.UI.GameMenu
                 ToolTip = option.Label,
                 Content = new Image
                 {
-                    Source = new BitmapImage(new Uri(fullPath, UriKind.Absolute)),
+                    Source = ImageLoader.Load(fullPath, 256),
                     Stretch = Stretch.Uniform
                 }
             };
@@ -262,19 +262,34 @@ namespace JRPG.UI.GameMenu
                 await ReturnToMainMenuRequested.Invoke();
         }
 
-        private void CloseGameMenu_Click(object sender, RoutedEventArgs e)
+        private void CloseGameMenu_Click(object sender, RoutedEventArgs e) => Close();
+
+        public bool IsOpen => Visibility == Visibility.Visible;
+
+        public void Open()
+        {
+            Visibility = Visibility.Visible;
+            Panel.SetZIndex(this, 1000);
+            GameStateManager.SetState(SceneType.Menu);
+        }
+
+        /// <summary>Closes the menu and resets it, so it reopens on the main list next time.</summary>
+        public void Close()
         {
             foreach (var child in ButtonPanel.Children)
             {
                 if (child is ToggleButton button)
-                {
                     button.IsChecked = false;
-                }
             }
 
-            GameStateManager.SetState(SceneType.Exploration);
+            HideSecondary();
+            SetContextOptions(null);
+            GameMenuContent.Content = null;
+            ContainerGameMenuContent.Visibility = Visibility.Collapsed;
 
-            this.Visibility = Visibility.Collapsed;
+            Visibility = Visibility.Collapsed;
+            Panel.SetZIndex(this, 0);
+            GameStateManager.SetState(SceneType.Exploration);
         }
 
         private void ExitButton_Click(object sender, RoutedEventArgs e)

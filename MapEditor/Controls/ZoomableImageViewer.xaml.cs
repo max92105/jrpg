@@ -1,4 +1,5 @@
 ﻿using JRPG.Core.Maps;
+using JRPG.Core.Maps.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,9 +34,93 @@ namespace MapEditor.Controls
         private bool isGroupEditMode = false;
         private List<Point> selectedTiles = new List<Point>();
 
+        // How the shown sheet is cut into cells (default: the map's tile size)
+        private TilesheetDefinition grid = new TilesheetDefinition();
+        private List<Point> markedCells = new List<Point>();
+
+        private static readonly Brush MarkedFill = Frozen(new SolidColorBrush(Color.FromArgb(45, 0, 200, 255)));
+
         public ZoomableImageViewer()
         {
             InitializeComponent();
+        }
+
+        /// <summary>Sets how the image is cut into cells and redraws the grid.</summary>
+        public void SetGrid(TilesheetDefinition sheet)
+        {
+            grid = sheet ?? new TilesheetDefinition();
+
+            if (displayedImage != null)
+                DrawGrid(displayedImage.Width, displayedImage.Height);
+
+            ClearSelectedTileHighlight();
+            RedrawGroupOverlay();
+            RedrawMarkedCells();
+        }
+
+        /// <summary>Tints cells (e.g. cells that are already defined as tiles).</summary>
+        public void SetMarkedCells(IEnumerable<Point> cells)
+        {
+            markedCells = cells?.ToList() ?? new List<Point>();
+            RedrawMarkedCells();
+        }
+
+        public void SelectCell(int column, int row)
+        {
+            HighlightSelectedTile(column, row);
+        }
+
+        private Rect CellRect(int column, int row)
+        {
+            return new Rect(grid.CellLeft(column), grid.CellTop(row), grid.TileWidth, grid.TileHeight);
+        }
+
+        /// <summary>Cell under a point of the image, or null when outside the grid (margin, spacing, edges).</summary>
+        private Point? PointToCell(Point pos)
+        {
+            if (grid.TileWidth <= 0 || grid.TileHeight <= 0 || displayedImage == null)
+                return null;
+
+            int column = (int)Math.Floor((pos.X - grid.Margin) / (grid.TileWidth + grid.Spacing));
+            int row = (int)Math.Floor((pos.Y - grid.Margin) / (grid.TileHeight + grid.Spacing));
+
+            if (column < 0 || row < 0 ||
+                column >= grid.ColumnsFor((int)displayedImage.Width) || row >= grid.RowsFor((int)displayedImage.Height))
+                return null;
+
+            if (!CellRect(column, row).Contains(pos))
+                return null; // in the spacing between cells
+
+            return new Point(column, row);
+        }
+
+        private void RedrawMarkedCells()
+        {
+            RemoveTagged("Marked");
+
+            foreach (var cell in markedCells)
+            {
+                var rect = CellRect((int)cell.X, (int)cell.Y);
+                var shape = new Rectangle { Width = rect.Width, Height = rect.Height, Fill = MarkedFill, Tag = "Marked", IsHitTestVisible = false };
+                Canvas.SetLeft(shape, rect.X);
+                Canvas.SetTop(shape, rect.Y);
+                Panel.SetZIndex(shape, 500);
+                ImageCanvas.Children.Add(shape);
+            }
+        }
+
+        private void RemoveTagged(string tag)
+        {
+            ImageCanvas.Children.OfType<FrameworkElement>()
+                .Where(e => (e.Tag as string) == tag)
+                .ToList()
+                .ForEach(e => ImageCanvas.Children.Remove(e));
+        }
+
+        private static T Frozen<T>(T freezable) where T : Freezable
+        {
+            freezable.Freeze();
+            return freezable;
         }
 
         public event Action<int, int> TileClicked;
@@ -77,22 +162,30 @@ namespace MapEditor.Controls
         public void SetImage(ImageSource image)
         {
             ImageCanvas.Children.Clear();
+            selectionHighlight = null;
+
+            // Show 1 image pixel = 1 unit, so the grid (in pixels) lines up even when the
+            // PNG was saved with a DPI other than 96 (image.Width would then be scaled)
+            double width = image is BitmapSource bitmap ? bitmap.PixelWidth : image.Width;
+            double height = image is BitmapSource bitmap2 ? bitmap2.PixelHeight : image.Height;
 
             displayedImage = new Image
             {
                 Source = image,
-                Width = image.Width,
-                Height = image.Height,
+                Width = width,
+                Height = height,
+                Stretch = Stretch.Fill,
                 IsHitTestVisible = false
             };
+            RenderOptions.SetBitmapScalingMode(displayedImage, BitmapScalingMode.NearestNeighbor);
 
             Canvas.SetLeft(displayedImage, 0);
             Canvas.SetTop(displayedImage, 0);
-            ImageCanvas.Width = image.Width;
-            ImageCanvas.Height = image.Height;
+            ImageCanvas.Width = width;
+            ImageCanvas.Height = height;
             ImageCanvas.Children.Add(displayedImage);
 
-            DrawGrid(image.Width, image.Height);
+            DrawGrid(width, height);
 
             zoom = 1.0;
             offset = new Vector(0, 0);
@@ -104,35 +197,41 @@ namespace MapEditor.Controls
 
         private void DrawGrid(double width, double height)
         {
-            int tilesX = (int)(width / MapConstant.TileSize);
-            int tilesY = (int)(height / MapConstant.TileSize);
+            RemoveTagged("Grid");
 
-            for (int x = 0; x <= tilesX; x++)
+            int columns = grid.ColumnsFor((int)width);
+            int rows = grid.RowsFor((int)height);
+            if (columns <= 0 || rows <= 0)
+                return;
+
+            double top = grid.CellTop(0);
+            double bottom = grid.CellTop(rows - 1) + grid.TileHeight;
+            double left = grid.CellLeft(0);
+            double right = grid.CellLeft(columns - 1) + grid.TileWidth;
+
+            void AddLine(double x1, double y1, double x2, double y2)
             {
-                var line = new Line
+                ImageCanvas.Children.Add(new Line
                 {
-                    X1 = x * MapConstant.TileSize,
-                    Y1 = 0,
-                    X2 = x * MapConstant.TileSize,
-                    Y2 = height,
+                    X1 = x1, Y1 = y1, X2 = x2, Y2 = y2,
                     Stroke = Brushes.Gray,
-                    StrokeThickness = 0.5
-                };
-                ImageCanvas.Children.Add(line);
+                    StrokeThickness = 0.5,
+                    Tag = "Grid",
+                    IsHitTestVisible = false
+                });
             }
 
-            for (int y = 0; y <= tilesY; y++)
+            // Both edges of every cell, so margin/spacing gaps are visible
+            for (int c = 0; c < columns; c++)
             {
-                var line = new Line
-                {
-                    X1 = 0,
-                    Y1 = y * MapConstant.TileSize,
-                    X2 = width,
-                    Y2 = y * MapConstant.TileSize,
-                    Stroke = Brushes.Gray,
-                    StrokeThickness = 0.5
-                };
-                ImageCanvas.Children.Add(line);
+                AddLine(grid.CellLeft(c), top, grid.CellLeft(c), bottom);
+                AddLine(grid.CellLeft(c) + grid.TileWidth, top, grid.CellLeft(c) + grid.TileWidth, bottom);
+            }
+
+            for (int r = 0; r < rows; r++)
+            {
+                AddLine(left, grid.CellTop(r), right, grid.CellTop(r));
+                AddLine(left, grid.CellTop(r) + grid.TileHeight, right, grid.CellTop(r) + grid.TileHeight);
             }
         }
 
@@ -208,18 +307,20 @@ namespace MapEditor.Controls
 
             foreach (var tile in selectedTiles)
             {
+                var cell = CellRect((int)tile.X, (int)tile.Y);
                 var rect = new Rectangle
                 {
-                    Width = MapConstant.TileSize,
-                    Height = MapConstant.TileSize,
+                    Width = cell.Width,
+                    Height = cell.Height,
                     Stroke = Brushes.Orange,
                     StrokeThickness = 2,
                     Fill = new SolidColorBrush(Color.FromArgb(50, 255, 165, 0)),
-                    Tag = "GroupOverlay"
+                    Tag = "GroupOverlay",
+                    IsHitTestVisible = false
                 };
 
-                Canvas.SetLeft(rect, tile.X * MapConstant.TileSize);
-                Canvas.SetTop(rect, tile.Y * MapConstant.TileSize);
+                Canvas.SetLeft(rect, cell.X);
+                Canvas.SetTop(rect, cell.Y);
                 Panel.SetZIndex(rect, 1000);
                 ImageCanvas.Children.Add(rect);
             }
@@ -249,17 +350,7 @@ namespace MapEditor.Controls
 
             if (isGroupEditMode)
             {
-                var pos = e.GetPosition(ImageCanvas);
-                int tileX = (int)(pos.X / MapConstant.TileSize);
-                int tileY = (int)(pos.Y / MapConstant.TileSize);
-                var pt = new Point(tileX, tileY);
-
-                if (!selectedTiles.Contains(pt))
-                    selectedTiles.Add(pt);
-                else
-                    selectedTiles.Remove(pt);
-
-                RedrawGroupOverlay();
+                ToggleGroupCell(e.GetPosition(ImageCanvas));
                 return;
             }
 
@@ -268,13 +359,30 @@ namespace MapEditor.Controls
 
             if (TileClicked != null && displayedImage?.Source != null)
             {
-                var pos = e.GetPosition(ImageCanvas);
-                int tileX = (int)(pos.X / MapConstant.TileSize);
-                int tileY = (int)(pos.Y / MapConstant.TileSize);
+                var cell = PointToCell(e.GetPosition(ImageCanvas));
+                if (cell == null)
+                    return;
+
+                int tileX = (int)cell.Value.X;
+                int tileY = (int)cell.Value.Y;
 
                 HighlightSelectedTile(tileX, tileY);
                 TileClicked?.Invoke(tileX, tileY);
             }
+        }
+
+        private void ToggleGroupCell(Point pos)
+        {
+            var cell = PointToCell(pos);
+            if (cell == null)
+                return;
+
+            if (!selectedTiles.Contains(cell.Value))
+                selectedTiles.Add(cell.Value);
+            else
+                selectedTiles.Remove(cell.Value);
+
+            RedrawGroupOverlay();
         }
 
         private void HighlightSelectedTile(int tileX, int tileY)
@@ -284,17 +392,19 @@ namespace MapEditor.Controls
                 ImageCanvas.Children.Remove(selectionHighlight);
             }
 
+            var cell = CellRect(tileX, tileY);
             selectionHighlight = new Rectangle
             {
-                Width = MapConstant.TileSize,
-                Height = MapConstant.TileSize,
+                Width = cell.Width,
+                Height = cell.Height,
                 Stroke = Brushes.Yellow,
                 StrokeThickness = 2,
-                Fill = new SolidColorBrush(Color.FromArgb(40, 255, 255, 0))
+                Fill = new SolidColorBrush(Color.FromArgb(40, 255, 255, 0)),
+                IsHitTestVisible = false
             };
 
-            Canvas.SetLeft(selectionHighlight, tileX * MapConstant.TileSize);
-            Canvas.SetTop(selectionHighlight, tileY * MapConstant.TileSize);
+            Canvas.SetLeft(selectionHighlight, cell.X);
+            Canvas.SetTop(selectionHighlight, cell.Y);
             Panel.SetZIndex(selectionHighlight, 1000);
             ImageCanvas.Children.Add(selectionHighlight);
         }
@@ -332,17 +442,7 @@ namespace MapEditor.Controls
         {
             if (isGroupEditMode)
             {
-                var pos = e.GetPosition(ImageCanvas);
-                int tileX = (int)(pos.X / MapConstant.TileSize);
-                int tileY = (int)(pos.Y / MapConstant.TileSize);
-                var point = new Point(tileX, tileY);
-
-                if (!selectedTiles.Contains(point))
-                    selectedTiles.Add(point);
-                else
-                    selectedTiles.Remove(point);
-
-                RedrawGroupOverlay();
+                ToggleGroupCell(e.GetPosition(ImageCanvas));
                 return;
             }
 

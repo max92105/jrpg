@@ -114,6 +114,9 @@
     <Compile Include="Maps\IO\MapSerializer.cs" />
     <Compile Include="Maps\IO\ObjectDatabase.cs" />
     <Compile Include="Maps\IO\TilesetLoader.cs" />
+    <Compile Include="Maps\IO\TilesheetDatabase.cs" />
+    <Compile Include="Maps\Models\TilesheetDefinition.cs" />
+    <Compile Include="Maps\DrawSortKey.cs" />
     <Compile Include="Maps\MapConstant.cs" />
     <Compile Include="Maps\Models\AnimatedTileDefinition.cs" />
     <Compile Include="Maps\Models\Map.cs" />

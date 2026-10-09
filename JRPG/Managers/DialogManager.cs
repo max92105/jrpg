@@ -1,5 +1,6 @@
 ﻿using JRPG.Core.Utils;
 using JRPG.Managers;
+using JRPG.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -72,7 +73,7 @@ namespace JRPG
 
             if (!string.IsNullOrEmpty(portraitPath))
             {
-                portrait.Source = new BitmapImage(new Uri(AssetPathResolver.GetPath(Path.Combine("Portraits/", portraitPath))));
+                portrait.Source = ImageLoader.Load(AssetPathResolver.GetPath(Path.Combine("Portraits/", portraitPath)), 256);
                 portrait.Visibility = System.Windows.Visibility.Visible;
             }
             else

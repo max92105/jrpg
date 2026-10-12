@@ -1,10 +1,7 @@
-﻿// In PartyView.xaml.cs
-using JRPG.Core.Battles.Models;
+﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
-using JRPG.Core.Utils;
-using JRPG.UI.Battle.Controls;
+using JRPG.UI.GameMenu.Controls;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,14 +11,18 @@ using System.Windows.Media.Animation;
 
 namespace JRPG.UI.GameMenu
 {
-    public partial class PartyView : UserControl
+    /// <summary>
+    /// Party page: who fights and in what order.
+    /// Click an active member to send them to the reserve, click a reserve member to bring them in,
+    /// drag active members to reorder them. The leader never moves.
+    /// </summary>
+    public partial class PartyView : MenuPage
     {
-        private readonly Dictionary<Character, Border> characterBlockMap = new Dictionary<Character, Border>();
+        private static readonly Duration ReorderDuration = TimeSpan.FromMilliseconds(300);
 
-        private Point _dragStartPoint;
-        private bool _isDragging = false;
-
-        private bool isAnimatingReorder = false;
+        private Point dragStartPoint;
+        private bool isDragging;
+        private bool isAnimatingReorder;
 
         public PartyView()
         {
@@ -32,260 +33,168 @@ namespace JRPG.UI.GameMenu
         private void Refresh()
         {
             ActivePartyPanel.Children.Clear();
-            FullRosterPanel.Children.Clear();
+            ReservePanel.Children.Clear();
 
-            // Render Active Party in defined order
             foreach (var character in GameSystems.Party.ActivePartyOrder)
-            {
-                if (!characterBlockMap.ContainsKey(character))
-                    characterBlockMap[character] = CreateCharacterBlock(character);
+                ActivePartyPanel.Children.Add(CreateActiveCard(character));
 
-                var block = characterBlockMap[character];
-                var currentParent = VisualTreeHelper.GetParent(block) as Panel;
-                currentParent?.Children.Remove(block);
-
-                SetupDragDropHandlers(block, character);
-                ActivePartyPanel.Children.Add(block);
-            }
-
-            // Render Reserve Members (all characters not in ActivePartyOrder)
             foreach (var character in GameSystems.Party.AllCharacters.Except(GameSystems.Party.ActivePartyOrder))
-            {
-                if (!characterBlockMap.ContainsKey(character))
-                    characterBlockMap[character] = CreateCharacterBlock(character);
+                ReservePanel.Children.Add(CreateReserveCard(character));
 
-                var block = characterBlockMap[character];
-                var currentParent = VisualTreeHelper.GetParent(block) as Panel;
-                currentParent?.Children.Remove(block);
-
-                SetupDragDropHandlers(block, character);
-                FullRosterPanel.Children.Add(block);
-            }
+            ActiveCountText.Text = $"{GameSystems.Party.ActivePartyOrder.Count} / {GameSystems.Party.MaxPartySize}";
         }
 
-        private Border CreateCharacterBlock(Character character)
+        private PartyMemberCard CreateActiveCard(Character character)
         {
-            var panel = new CharacterPanel
+            var card = CreateCard(character);
+
+            if (character.IsMainCharacter)
             {
-                CharacterName = character.Name,
-                CurrentHP = character.HP,
-                MaxHP = character.MaxHP,
-                CurrentMP = character.MP,
-                MaxMP = character.MaxMP
+                card.MouseEnter += (s, e) => ShowHint($"{character.Name} leads the party and always stays in it.");
+                return card;
+            }
+
+            card.IsInteractive = true;
+            card.AllowDrop = true;
+            card.MouseEnter += (s, e) => ShowHint($"Click to move {character.Name} to the reserve. Drag to change the order.");
+            card.MouseLeftButtonDown += OnDragMouseDown;
+            card.MouseMove += OnDragMouseMove;
+            card.MouseLeftButtonUp += OnActiveCardClick;
+            card.DragOver += OnDragOver;
+            card.Drop += OnDrop;
+            return card;
+        }
+
+        private PartyMemberCard CreateReserveCard(Character character)
+        {
+            var card = CreateCard(character);
+            card.IsInteractive = true;
+
+            card.MouseEnter += (s, e) => ShowHint(IsPartyFull
+                ? "The party is full. Send someone to the reserve first."
+                : $"Click to add {character.Name} to the party.");
+
+            card.MouseLeftButtonUp += (s, e) =>
+            {
+                GameSystems.Party.AddToParty(character);
+                PartyHasChanged();
+            };
+            return card;
+        }
+
+        private PartyMemberCard CreateCard(Character character)
+        {
+            var card = new PartyMemberCard(character)
+            {
+                Margin = new Thickness(0, 0, 0, 10),
+                RenderTransform = new TranslateTransform() // used by the reorder animation
             };
 
-            panel.SetPortrait(AssetPathResolver.GetPortraitPath(character.PortraitFile));
-
-            var border = new Border
-            {
-                Style = (Style)FindResource("HoverAnimatedBorder"),
-                Background = Brushes.Transparent,
-                BorderBrush = Brushes.White,
-                BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(6),
-                Margin = new Thickness(0, 10, 0, 0),
-                Padding = new Thickness(5),
-                Child = panel,
-                Tag = character
-            };
-
-            if (character.IsActive && !character.IsMainCharacter)
-            {
-                border.MouseLeftButtonUp += (s, e) =>
-                {
-                    if (!character.IsMainCharacter)
-                    {
-                        GameSystems.Party.AddToParty(character);
-                        Refresh();
-                    }
-                };
-            }
-
-            if (border.RenderTransform is TransformGroup group)
-            {
-                var clone = new TransformGroup();
-                foreach (var t in group.Children)
-                {
-                    clone.Children.Add(t.CloneCurrentValue());
-                }
-                border.RenderTransform = clone;
-            }
-
-            return border;
+            card.MouseLeave += (s, e) => ShowHint(null);
+            return card;
         }
 
-        private void SetupDragDropHandlers(Border border, Character character)
+        private bool IsPartyFull => GameSystems.Party.GetActivePartyMemberCount() >= GameSystems.Party.MaxPartySize;
+
+        private void PartyHasChanged()
         {
-            // Remove all existing handlers to avoid duplicates
-            border.MouseLeftButtonDown -= OnDragMouseDown;
-            border.MouseMove -= OnDragMouseMove;
-            border.MouseLeftButtonUp -= OnDragMouseUp;
-            border.MouseLeftButtonUp -= OnReserveClick;
-            border.Drop -= OnDrop;
-            border.DragOver -= OnDragOver;
-
-            // LEFT SIDE (Active Party)
-            if (character.IsActive && !character.IsMainCharacter)
-            {
-                border.AllowDrop = true;
-
-                border.MouseLeftButtonDown += OnDragMouseDown;
-                border.MouseMove += OnDragMouseMove;
-                border.MouseLeftButtonUp += OnDragMouseUp;
-
-                border.DragOver += OnDragOver;
-                border.Drop += OnDrop;
-            }
-            // RIGHT SIDE (Reserve Roster)
-            else if (!character.IsActive && !character.IsMainCharacter)
-            {
-                border.AllowDrop = false;
-                border.MouseLeftButtonUp += OnReserveClick;
-            }
+            Refresh();
+            NotifyPartyChanged();
         }
+
+        // ============ Click / drag on active members ============
 
         private void OnDragMouseDown(object sender, MouseButtonEventArgs e)
         {
-            _isDragging = false;
-            _dragStartPoint = e.GetPosition(null);
+            isDragging = false;
+            dragStartPoint = e.GetPosition(null);
         }
 
         private void OnDragMouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed && sender is Border border)
+            if (e.LeftButton != MouseButtonState.Pressed || isDragging || !(sender is PartyMemberCard card))
+                return;
+
+            Vector moved = e.GetPosition(null) - dragStartPoint;
+            if (Math.Abs(moved.X) > SystemParameters.MinimumHorizontalDragDistance ||
+                Math.Abs(moved.Y) > SystemParameters.MinimumVerticalDragDistance)
             {
-                var currentPos = e.GetPosition(null);
-                Vector delta = currentPos - _dragStartPoint;
-
-                if (!_isDragging && (Math.Abs(delta.X) > SystemParameters.MinimumHorizontalDragDistance ||
-                                      Math.Abs(delta.Y) > SystemParameters.MinimumVerticalDragDistance))
-                {
-                    _isDragging = true;
-
-                    if (border.Tag is Character character)
-                    {
-                        var data = new DataObject(typeof(Character), character);
-                        DragDrop.DoDragDrop(border, data, DragDropEffects.Move);
-                    }
-                }
+                isDragging = true;
+                DragDrop.DoDragDrop(card, new DataObject(typeof(Character), card.Character), DragDropEffects.Move);
             }
         }
 
-        private void OnDragMouseUp(object sender, MouseButtonEventArgs e)
+        private void OnActiveCardClick(object sender, MouseButtonEventArgs e)
         {
-            if (!_isDragging && sender is Border border && border.Tag is Character character)
-            {
-                GameSystems.Party.RemoveFromParty(character);
-                Refresh();
-            }
-        }
+            // A drag also ends with a mouse up: only a real click sends the member to the reserve
+            if (isDragging || !(sender is PartyMemberCard card))
+                return;
 
-        private void OnReserveClick(object sender, MouseButtonEventArgs e)
-        {
-            if (sender is Border border && border.Tag is Character character)
-            {
-                GameSystems.Party.AddToParty(character);
-                Refresh();
-            }
+            GameSystems.Party.RemoveFromParty(card.Character);
+            PartyHasChanged();
         }
 
         private void OnDragOver(object sender, DragEventArgs e)
         {
-            if (isAnimatingReorder) return;
-            if (!e.Data.GetDataPresent(typeof(Character))) return;
-
-            var draggedChar = e.Data.GetData(typeof(Character)) as Character;
-            var targetBorder = sender as Border;
-            var targetChar = (Character)targetBorder?.Tag;
-
-            if (draggedChar == null || draggedChar == targetChar) return;
-
-            var targetIndex = ActivePartyPanel.Children.IndexOf(targetBorder);
-            var draggedBlock = characterBlockMap[draggedChar];
-
-            if (ActivePartyPanel.Children.Contains(draggedBlock))
-            {
-                int oldIndex = ActivePartyPanel.Children.IndexOf(draggedBlock);
-
-                if (oldIndex != targetIndex)
-                {
-                    isAnimatingReorder = true;
-                    AnimateSlideToPosition(draggedBlock, oldIndex, targetIndex);
-                }
-            }
-
             e.Handled = true;
+
+            if (isAnimatingReorder || !(e.Data.GetData(typeof(Character)) is Character dragged))
+                return;
+
+            var target = (PartyMemberCard)sender;
+            var draggedCard = ActivePartyPanel.Children.OfType<PartyMemberCard>().FirstOrDefault(c => c.Character == dragged);
+            if (draggedCard == null || draggedCard == target)
+                return;
+
+            int oldIndex = ActivePartyPanel.Children.IndexOf(draggedCard);
+            int newIndex = ActivePartyPanel.Children.IndexOf(target);
+            if (oldIndex != newIndex)
+                AnimateReorder(draggedCard, oldIndex, newIndex);
         }
 
         private void OnDrop(object sender, DragEventArgs e)
         {
-            if (!e.Data.GetDataPresent(typeof(Character))) return;
-
-            var newOrder = ActivePartyPanel.Children
-                .OfType<Border>()
-                .Select(b => (Character)b.Tag)
-                .ToList();
-
+            var newOrder = ActivePartyPanel.Children.OfType<PartyMemberCard>().Select(c => c.Character).ToList();
             GameSystems.Party.SetPartyOrder(newOrder);
+            NotifyPartyChanged();
         }
 
-        private void AnimateSlideToPosition(Border draggedBlock, int oldIndex, int newIndex)
+        /// <summary>Moves the dragged card to its new place, and slides every card that moved from its old spot.</summary>
+        private void AnimateReorder(PartyMemberCard draggedCard, int oldIndex, int newIndex)
         {
-            if (oldIndex == newIndex || oldIndex < 0 || newIndex < 0) return;
-
-            var positionsBefore = ActivePartyPanel.Children
-                .OfType<Border>()
-                .ToDictionary(b => b, b => b.TransformToAncestor(this).Transform(new Point(0, 0)).Y);
+            var cards = ActivePartyPanel.Children.OfType<PartyMemberCard>().ToList();
+            var topsBefore = cards.ToDictionary(c => c, c => c.TranslatePoint(new Point(0, 0), ActivePartyPanel).Y);
 
             ActivePartyPanel.Children.RemoveAt(oldIndex);
-            ActivePartyPanel.Children.Insert(newIndex, draggedBlock);
+            ActivePartyPanel.Children.Insert(newIndex, draggedCard);
             ActivePartyPanel.UpdateLayout();
 
-            int animCount = 0;
-            int completed = 0;
+            int running = 0;
+            isAnimatingReorder = true;
 
-            foreach (var block in ActivePartyPanel.Children.OfType<Border>())
+            foreach (var card in cards)
             {
-                var newTop = block.TransformToAncestor(this).Transform(new Point(0, 0)).Y;
-                var oldTop = positionsBefore.ContainsKey(block) ? positionsBefore[block] : newTop;
-                double offset = oldTop - newTop;
+                double offset = topsBefore[card] - card.TranslatePoint(new Point(0, 0), ActivePartyPanel).Y;
+                var slide = (TranslateTransform)card.RenderTransform;
 
-                // Ensure we’re animating Translate.Y inside the existing TransformGroup
-                if (block.RenderTransform is TransformGroup group &&
-                    group.Children.OfType<TranslateTransform>().FirstOrDefault() is TranslateTransform translate)
+                if (Math.Abs(offset) < 0.1)
+                    continue;
+
+                running++;
+                var animation = new DoubleAnimation(offset, 0, ReorderDuration)
                 {
-                    if (Math.Abs(offset) > 0.1)
-                    {
-                        animCount++;
-
-                        translate.BeginAnimation(TranslateTransform.YProperty, null);
-                        translate.Y = offset;
-
-                        var anim = new DoubleAnimation
-                        {
-                            To = 0,
-                            Duration = TimeSpan.FromMilliseconds(300),
-                            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
-                        };
-
-                        anim.Completed += (s, e) =>
-                        {
-                            completed++;
-                            if (completed == animCount)
-                                isAnimatingReorder = false;
-                        };
-
-                        translate.BeginAnimation(TranslateTransform.YProperty, anim);
-                    }
-                    else
-                    {
-                        translate.BeginAnimation(TranslateTransform.YProperty, null);
-                        translate.Y = 0;
-                    }
-                }
+                    EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                };
+                animation.Completed += (s, e) =>
+                {
+                    running--;
+                    if (running == 0)
+                        isAnimatingReorder = false;
+                };
+                slide.BeginAnimation(TranslateTransform.YProperty, animation);
             }
 
-            if (animCount == 0)
+            if (running == 0)
                 isAnimatingReorder = false;
         }
     }

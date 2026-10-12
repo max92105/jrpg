@@ -128,8 +128,27 @@
     <Compile Include="UI\GameMenu\Controls\CharacterPortrait.xaml.cs">
       <DependentUpon>CharacterPortrait.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\GameMenu\Controls\ConfirmDialog.xaml.cs">
+      <DependentUpon>ConfirmDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\GameMenu\Controls\ListRow.xaml.cs">
+      <DependentUpon>ListRow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\GameMenu\Controls\MenuHeader.xaml.cs">
+      <DependentUpon>MenuHeader.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\GameMenu\Controls\MenuTab.cs" />
+    <Compile Include="UI\GameMenu\Controls\PartyMemberCard.xaml.cs">
+      <DependentUpon>PartyMemberCard.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\GameMenu\Controls\PartySidebar.xaml.cs">
+      <DependentUpon>PartySidebar.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\GameMenu\Controls\SaveSlotPanel.xaml.cs">
       <DependentUpon>SaveSlotPanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\GameMenu\Controls\StatLine.xaml.cs">
+      <DependentUpon>StatLine.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\GameMenu\Controls\StatsPanel.xaml.cs">
       <DependentUpon>StatsPanel.xaml</DependentUpon>
@@ -146,6 +165,10 @@
     <Compile Include="UI\GameMenu\InventoryView.xaml.cs">
       <DependentUpon>InventoryView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\GameMenu\MenuPage.cs" />
+    <Compile Include="UI\GameMenu\OptionsView.xaml.cs">
+      <DependentUpon>OptionsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\GameMenu\PartyView.xaml.cs">
       <DependentUpon>PartyView.xaml</DependentUpon>
     </Compile>
@@ -155,10 +178,12 @@
     <Compile Include="UI\GameMenu\StatusView.xaml.cs">
       <DependentUpon>StatusView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Utils\ArtExtension.cs" />
     <Compile Include="Utils\FadeHelper.cs" />
     <Compile Include="Utils\FilterOption.cs" />
     <Compile Include="Utils\IFilterable.cs" />
     <Compile Include="Utils\ImageLoader.cs" />
+    <Compile Include="Utils\UiArt.cs" />
     <Compile Include="Utils\UIBootstrapper.cs" />
     <Compile Include="Utils\VisualFactory.cs" />
     <Compile Include="VisualHost.cs" />
@@ -207,7 +232,31 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\GameMenu\Controls\ConfirmDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\GameMenu\Controls\ListRow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\GameMenu\Controls\MenuHeader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\GameMenu\Controls\PartyMemberCard.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\GameMenu\Controls\PartySidebar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\GameMenu\Controls\SaveSlotPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\GameMenu\Controls\StatLine.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -231,6 +280,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\GameMenu\OptionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\GameMenu\PartyView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -243,11 +296,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Styles\HoverAnimatedBorder.xaml">
+    <Page Include="UI\Styles\Art.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UI\Styles\InventoryItemRow.xaml">
+    <Page Include="UI\Styles\MenuStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\Styles\Theme.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -1,0 +1,39 @@
+﻿<!--
+    Placeholder art for the UI, drawn as simple 24x24 shapes.
+
+    To swap one for real art, drop a PNG at  Assets/UI/<key>.png
+    e.g. the key "Menu/Inventory" is replaced by  Assets/UI/Menu/Inventory.png
+    No code change needed: UiArt (Utils/UiArt.cs) uses the PNG when it exists,
+    and falls back to the shape below otherwise.
+
+    In XAML, art is used with  {utils:Art Menu/Inventory}
+    In C#, with                UiArt.Get("Menu/Inventory")
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ============ Menu pages (nav tabs, page watermark) ============ -->
+    <Geometry x:Key="Menu/Inventory">F0 M9,3 H15 A1,1 0 0 1 16,4 V6 H19 A1,1 0 0 1 20,7 L19,20 A1,1 0 0 1 18,21 H6 A1,1 0 0 1 5,20 L4,7 A1,1 0 0 1 5,6 H8 V4 A1,1 0 0 1 9,3 Z M10,4.5 V6 H14 V4.5 Z</Geometry>
+    <Geometry x:Key="Menu/Party">M9,4 A3.5,3.5 0 1 1 9,11 A3.5,3.5 0 1 1 9,4 Z M2,20 C2,15.5 5,13 9,13 C13,13 16,15.5 16,20 Z M17,5 A3,3 0 1 1 17,11 A3,3 0 1 1 17,5 Z M17,13 C20,13 22,15.5 22,20 H17.5 C17.5,17.2 16.7,15 15.1,13.5 C15.7,13.2 16.3,13 17,13 Z</Geometry>
+    <Geometry x:Key="Menu/Equipment">M21,3 V6.5 L11.5,16 L8,12.5 L17.5,3 Z M6.5,11 L13,17.5 L12,18.5 L5.5,12 Z M8.6,15.9 L10,17.3 L5.4,21.9 L4,20.5 Z</Geometry>
+    <Geometry x:Key="Menu/Status">M3,19.5 H21 V21 H3 Z M5,11 H8 V18 H5 Z M10.5,6 H13.5 V18 H10.5 Z M16,3 H19 V18 H16 Z</Geometry>
+    <Geometry x:Key="Menu/System">F0 M19.15,10.08 L21.88,10.44 L21.88,13.56 L19.15,13.92 L18.41,15.7 L20.09,17.88 L17.88,20.09 L15.7,18.41 L13.92,19.15 L13.56,21.88 L10.44,21.88 L10.08,19.15 L8.3,18.41 L6.12,20.09 L3.91,17.88 L5.59,15.7 L4.85,13.92 L2.12,13.56 L2.12,10.44 L4.85,10.08 L5.59,8.3 L3.91,6.12 L6.12,3.91 L8.3,5.59 L10.08,4.85 L10.44,2.12 L13.56,2.12 L13.92,4.85 L15.7,5.59 L17.88,3.91 L20.09,6.12 L18.41,8.3 Z M12,8.5 A3.5,3.5 0 0 1 12,15.5 A3.5,3.5 0 0 1 12,8.5 Z</Geometry>
+    <Geometry x:Key="Menu/Save">F0 M4,3 H16.5 L20,6.5 V21 H4 Z M7,4.5 V9 H15 V4.5 Z M7,13 V19.5 H17 V13 Z</Geometry>
+    <Geometry x:Key="Menu/Load">M2,5 H9 L11,7 H21 A1,1 0 0 1 22,8 V19 A1,1 0 0 1 21,20 H3 A1,1 0 0 1 2,19 Z</Geometry>
+    <Geometry x:Key="Menu/Options">M3,5.5 H21 V7 H3 Z M3,11.25 H21 V12.75 H3 Z M3,17 H21 V18.5 H3 Z M6,3.5 H9.5 V9 H6 Z M14.5,9.25 H18 V14.75 H14.5 Z M9,15 H12.5 V20.5 H9 Z</Geometry>
+
+    <!-- ============ Equipment slots and actions ============ -->
+    <Geometry x:Key="Slot/Weapon">M21,3 V6.5 L11.5,16 L8,12.5 L17.5,3 Z M6.5,11 L13,17.5 L12,18.5 L5.5,12 Z M8.6,15.9 L10,17.3 L5.4,21.9 L4,20.5 Z</Geometry>
+    <Geometry x:Key="Slot/Armor">M7,3 L10,4.5 H14 L17,3 L21,6 L19,10 L17,9 V21 H7 V9 L5,10 L3,6 Z</Geometry>
+    <Geometry x:Key="Action/RemoveAll">M6.3,4.9 L12,10.6 L17.7,4.9 L19.1,6.3 L13.4,12 L19.1,17.7 L17.7,19.1 L12,13.4 L6.3,19.1 L4.9,17.7 L10.6,12 L4.9,6.3 Z</Geometry>
+
+    <!-- ============ Stats ============ -->
+    <Geometry x:Key="Stat/HP">M12,21 C12,21 3,15 3,8.5 A4.5,4.5 0 0 1 12,6.5 A4.5,4.5 0 0 1 21,8.5 C21,15 12,21 12,21 Z</Geometry>
+    <Geometry x:Key="Stat/MP">M12,2 C12,2 5,10 5,14.5 A7,7 0 0 0 19,14.5 C19,10 12,2 12,2 Z</Geometry>
+    <Geometry x:Key="Stat/Attack">M21,3 V6.5 L11.5,16 L8,12.5 L17.5,3 Z M6.5,11 L13,17.5 L12,18.5 L5.5,12 Z M8.6,15.9 L10,17.3 L5.4,21.9 L4,20.5 Z</Geometry>
+    <Geometry x:Key="Stat/Defense">M12,2 L20,5 V11 C20,16 16.5,20 12,22 C7.5,20 4,16 4,11 V5 Z</Geometry>
+
+    <!-- ============ Header ============ -->
+    <Geometry x:Key="Header/PlayTime">F0 M12,2 A10,10 0 0 1 12,22 A10,10 0 0 1 12,2 Z M12,4 A8,8 0 0 1 12,20 A8,8 0 0 1 12,4 Z M11,6.5 H13 V11.4 L16.4,13.4 L15.4,15.1 L11,12.6 Z</Geometry>
+    <Geometry x:Key="Header/Location">F0 M12,2 C8,2 5,5 5,9 C5,14 12,22 12,22 C12,22 19,14 19,9 C19,5 16,2 12,2 Z M12,6.5 A2.5,2.5 0 0 1 12,11.5 A2.5,2.5 0 0 1 12,6.5 Z</Geometry>
+</ResourceDictionary>

@@ -1,194 +1,75 @@
-﻿<UserControl x:Class="JRPG.UI.GameMenu.InventoryView"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             Background="Transparent">
-    <UserControl.Resources>
+﻿<menu:MenuPage x:Class="JRPG.UI.GameMenu.InventoryView"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:menu="clr-namespace:JRPG.UI.GameMenu"
+                Background="Transparent">
+    <menu:MenuPage.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/JRPG;component/UI/Styles/RoundVerticalScrollBar.xaml"/>
-                <ResourceDictionary Source="/JRPG;component/UI/Styles/InventoryItemRow.xaml"/>
             </ResourceDictionary.MergedDictionaries>
- 
-            <Style x:Key="PopupButtonStyle" TargetType="Button">
-                <Setter Property="Width" Value="100"/>
-                <Setter Property="Height" Value="40"/>
-                <Setter Property="FontSize" Value="18"/>
-                <Setter Property="FontWeight" Value="Bold"/>
-                <Setter Property="Foreground" Value="White"/>
-                <Setter Property="Background" Value="#444"/>
-                <Setter Property="BorderBrush" Value="#AAA"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="Cursor" Value="Hand"/>
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="6"
-                        Padding="4"
-                        SnapsToDevicePixels="True">
-                                <ContentPresenter HorizontalAlignment="Center"
-                                      VerticalAlignment="Center"/>
-                            </Border>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-                <Style.Triggers>
-                    <Trigger Property="IsMouseOver" Value="True">
-                        <Setter Property="Background" Value="#666"/>
-                        <Setter Property="BorderBrush" Value="White"/>
-                    </Trigger>
-                    <Trigger Property="IsPressed" Value="True">
-                        <Setter Property="Background" Value="#888"/>
-                        <Setter Property="BorderBrush" Value="#FFF"/>
-                    </Trigger>
-                </Style.Triggers>
-            </Style>
-            <DropShadowEffect x:Key="DropShadow"
-                  Color="Black"
-                  Direction="315"
-                  ShadowDepth="5"
-                  BlurRadius="20"
-                  Opacity="0.5"/>
         </ResourceDictionary>
-    </UserControl.Resources>
+    </menu:MenuPage.Resources>
+
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="120"/>
-            <!-- Header -->
-            <RowDefinition Height="Auto"/>
-            <!-- Divider -->
-            <RowDefinition Height="*"/>
-            <!-- Item List -->
-            <RowDefinition Height="Auto"/>
-            <!-- Divider line -->
-            <RowDefinition Height="Auto"/>
-            <!-- Description -->
-        </Grid.RowDefinitions>
+        <Grid Margin="28,20,28,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <!-- Category name -->
+                <RowDefinition Height="Auto"/>
+                <!-- Column headers -->
+                <RowDefinition Height="*"/>
+                <!-- Item list -->
+            </Grid.RowDefinitions>
 
-        <!-- 🏷️ Header: Filter name -->
-        <TextBlock 
-            Grid.Row="0"
-            x:Name="FilterHeader"
-                   Text="All Items"
-                   FontSize="24"
-                   FontWeight="Light"
-                   Foreground="White"
-                   Margin="20"
-                   VerticalAlignment="Bottom" />
+            <TextBlock x:Name="FilterHeader" Text="All Items" Style="{StaticResource Text.Heading}"/>
 
-        <!-- 📑 Table Header Row -->
-        <Border Grid.Row="1"
-                Background="#333"
-                Padding="10,6"
-                Margin="0,0,0,0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="8*"/>
-                    <ColumnDefinition Width="2*"/>
-                </Grid.ColumnDefinitions>
+            <!-- Column headers (same columns as ListRow) -->
+            <Border Grid.Row="1" Style="{StaticResource SectionHeaderStyle}">
+                <Grid Margin="10,0,16,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="48"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="1" Text="Name" Style="{StaticResource Text.Label}"/>
+                    <TextBlock Grid.Column="2" Text="Qty" Style="{StaticResource Text.Label}" HorizontalAlignment="Right"/>
+                </Grid>
+            </Border>
 
-                <TextBlock Text="Name"
-                           Grid.Column="0"
-                           FontSize="16"
-                           FontWeight="SemiBold"
-                           Foreground="White"
-                           Margin="10,0"/>
-                <TextBlock Text="Quantity"
-                           Grid.Column="1"
-                           FontSize="16"
-                           FontWeight="SemiBold"
-                           Foreground="White"
-                           HorizontalAlignment="Right"
-                           Margin="0,0,10,0"/>
-            </Grid>
-        </Border>
+            <!-- Item list: filled with ListRows by Refresh() -->
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer.Resources>
+                    <Style TargetType="ScrollBar" BasedOn="{StaticResource RoundVerticalScrollBar}"/>
+                </ScrollViewer.Resources>
+                <StackPanel x:Name="ItemListPanel"/>
+            </ScrollViewer>
 
-        <!-- 📦 Item List -->
-        <ScrollViewer Grid.Row="2"
-              VerticalScrollBarVisibility="Auto">
-            <ScrollViewer.Resources>
-                <Style TargetType="ScrollBar" BasedOn="{StaticResource RoundVerticalScrollBar}" />
-            </ScrollViewer.Resources>
-            <StackPanel x:Name="ItemListPanel"/>
-        </ScrollViewer>
+            <TextBlock x:Name="EmptyText" Grid.Row="2" Text="Nothing here."
+                       Style="{StaticResource Text.Secondary}"
+                       HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,40,0,0"
+                       Visibility="Collapsed"/>
+        </Grid>
 
-        <!-- 🔻 Divider Line -->
-        <Rectangle Grid.Row="3"
-                   Height="1"
-                   Fill="#666"
-                   Margin="0,0"/>
-
-        <!-- 📝 Description -->
-        <TextBlock  Grid.Row="4"
-                    Margin="20"
-                    Height="100"
-                    x:Name="ItemDescriptionBlock"
-                    FontSize="16"
-                    Foreground="White"
-                    Text="Hover an item to see its description."
-                    TextWrapping="Wrap"/>
-
-        <Grid x:Name="PopupOverlay"
-      Grid.Row="2"
-      Background="#AA000000"  
-            Visibility="Collapsed"
-      Panel.ZIndex="10"
-      HorizontalAlignment="Stretch"
-      VerticalAlignment="Stretch">
-
-            <Border Background="#AA111111" 
-                CornerRadius="6"
-                Padding="30"
-                Width="500"
-                BorderThickness="1"
-                   BorderBrush="#AA333333"
-                    HorizontalAlignment="Center"
-                VerticalAlignment="Center"
-                Effect="{DynamicResource DropShadow}">
-
+        <!-- ============ Use item dialog ============ -->
+        <Grid x:Name="PopupOverlay" Background="{StaticResource Brush.Scrim}" Visibility="Collapsed">
+            <Border Style="{StaticResource DialogStyle}">
                 <StackPanel>
-
-                    <!-- Header: Icon + Item Name -->
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
-                        <Image x:Name="PopupIcon"
-                       Width="32"
-                       Height="32"
-                       Margin="0,0,10,0"/>
-                        <TextBlock x:Name="PopupQuestion"
-                           Text="Use item?"
-                           FontSize="22"
-                           Foreground="White"
-                           FontWeight="SemiBold"
-                           VerticalAlignment="Center"/>
+                    <!-- Icon + "Use <item>" -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,24">
+                        <Image x:Name="PopupIcon" Width="32" Height="32" Margin="0,0,12,0"/>
+                        <TextBlock x:Name="PopupQuestion" Style="{StaticResource Text.Heading}"/>
                     </StackPanel>
 
-                    <!-- Portraits -->
-                    <WrapPanel x:Name="PartyTargetPanel"
-                       HorizontalAlignment="Center"
-                       VerticalAlignment="Top"
-                       Margin="0,0,0,20" />
+                    <!-- Who to use it on -->
+                    <WrapPanel x:Name="PartyTargetPanel" HorizontalAlignment="Center" Margin="0,0,0,28"/>
 
-                    <!-- OK / Cancel -->
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
-                        <Button x:Name="PopupYesButton"
-                        Content="OK"
-                        FontWeight="Light"
-                        Click="PopupYes_Click"
-                        Style="{StaticResource PopupButtonStyle}"
-                        Width="120"
-                        Margin="10"/>
-
-                        <Button Content="Cancel"
-                        Click="PopupNo_Click"
-                        FontWeight="Light"
-                        Style="{StaticResource PopupButtonStyle}"
-                        Width="120"
-                        Margin="10"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button x:Name="PopupYesButton" Content="Use" Style="{StaticResource PrimaryMenuButtonStyle}" Click="PopupYes_Click"/>
+                        <Button Content="Cancel" Style="{StaticResource MenuButtonStyle}" Click="PopupNo_Click"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
         </Grid>
     </Grid>
-</UserControl>
+</menu:MenuPage>

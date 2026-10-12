@@ -1,0 +1,169 @@
+﻿<!--
+    Design tokens for the whole UI: colors, brushes, fonts and text styles.
+    Change a value here and every screen using it follows.
+    Merged once in App.xaml, so any view can use these with {StaticResource ...}.
+-->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ============ Colors ============ -->
+    <Color x:Key="Color.Text.Primary">#FFF2F2F5</Color>
+    <Color x:Key="Color.Text.Secondary">#FFA4A8B4</Color>
+    <Color x:Key="Color.Text.Disabled">#FF5C606B</Color>
+
+    <!-- Pale blue: selection lines, main dialog button -->
+    <Color x:Key="Color.Accent">#FFD6DCFF</Color>
+    <!-- Stat goes up / down when previewing equipment -->
+    <Color x:Key="Color.Positive">#FF6FD3E0</Color>
+    <Color x:Key="Color.Negative">#FF8C909A</Color>
+
+    <Color x:Key="Color.Surface">#C70C0D11</Color>
+    <Color x:Key="Color.Surface.Raised">#F2141620</Color>
+    <Color x:Key="Color.Stroke">#2EFFFFFF</Color>
+    <Color x:Key="Color.Stroke.Strong">#66FFFFFF</Color>
+
+    <!-- ============ Solid brushes ============ -->
+    <SolidColorBrush x:Key="Brush.Text.Primary" Color="{StaticResource Color.Text.Primary}"/>
+    <SolidColorBrush x:Key="Brush.Text.Secondary" Color="{StaticResource Color.Text.Secondary}"/>
+    <SolidColorBrush x:Key="Brush.Text.Disabled" Color="{StaticResource Color.Text.Disabled}"/>
+
+    <SolidColorBrush x:Key="Brush.Accent" Color="{StaticResource Color.Accent}"/>
+    <SolidColorBrush x:Key="Brush.Positive" Color="{StaticResource Color.Positive}"/>
+    <SolidColorBrush x:Key="Brush.Negative" Color="{StaticResource Color.Negative}"/>
+
+    <SolidColorBrush x:Key="Brush.Surface" Color="{StaticResource Color.Surface}"/>
+    <SolidColorBrush x:Key="Brush.Surface.Raised" Color="{StaticResource Color.Surface.Raised}"/>
+    <SolidColorBrush x:Key="Brush.Stroke" Color="{StaticResource Color.Stroke}"/>
+    <SolidColorBrush x:Key="Brush.Stroke.Strong" Color="{StaticResource Color.Stroke.Strong}"/>
+
+    <!-- Dims everything behind a dialog -->
+    <SolidColorBrush x:Key="Brush.Scrim" Color="#B3000000"/>
+
+    <!-- Header and footer bars -->
+    <SolidColorBrush x:Key="Brush.Bar" Color="#EB000000"/>
+
+    <!-- Nav tabs (the arrow-shaped entries on the left) -->
+    <SolidColorBrush x:Key="Brush.Nav" Color="#D9141519"/>
+    <SolidColorBrush x:Key="Brush.Nav.Hover" Color="#E62A2C35"/>
+    <SolidColorBrush x:Key="Brush.Nav.Stroke" Color="#40FFFFFF"/>
+
+    <!-- ============ Selection ============ -->
+
+    <!-- Selected nav tab / hovered sub menu entry: deep blue glowing out to the right -->
+    <LinearGradientBrush x:Key="Brush.Selection" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#F01A1F5C" Offset="0"/>
+        <GradientStop Color="#F0343C9E" Offset="0.45"/>
+        <GradientStop Color="#CC7C86E0" Offset="0.8"/>
+        <GradientStop Color="#66C8CEFF" Offset="1"/>
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="Brush.Selection.Stroke" Color="#B3D6DCFF"/>
+
+    <!-- Bright line under the selection -->
+    <LinearGradientBrush x:Key="Brush.SelectionLine" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#00E6EAFF" Offset="0"/>
+        <GradientStop Color="#FFE6EAFF" Offset="0.35"/>
+        <GradientStop Color="#FFFFFFFF" Offset="0.75"/>
+        <GradientStop Color="#00FFFFFF" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- List rows: hovered -->
+    <LinearGradientBrush x:Key="Brush.Highlight" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#993D4590" Offset="0"/>
+        <GradientStop Color="#665A64B8" Offset="0.45"/>
+        <GradientStop Color="#005A64B8" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- List rows: selected (stays lit, e.g. the slot being changed) -->
+    <LinearGradientBrush x:Key="Brush.Highlight.Selected" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#E64A53A8" Offset="0"/>
+        <GradientStop Color="#B36E78C8" Offset="0.5"/>
+        <GradientStop Color="#1A6E78C8" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- Thin lines above and below a highlighted row -->
+    <LinearGradientBrush x:Key="Brush.HighlightLine" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#00FFFFFF" Offset="0"/>
+        <GradientStop Color="#B3E6EAFF" Offset="0.15"/>
+        <GradientStop Color="#4DE6EAFF" Offset="0.8"/>
+        <GradientStop Color="#00FFFFFF" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- Underline of a section title, fading out to the right -->
+    <LinearGradientBrush x:Key="Brush.SectionLine" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#80FFFFFF" Offset="0"/>
+        <GradientStop Color="#33FFFFFF" Offset="0.7"/>
+        <GradientStop Color="#00FFFFFF" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- ============ Backgrounds ============ -->
+
+    <!-- Darkens the edges of the menu background art; the middle stays visible -->
+    <LinearGradientBrush x:Key="Brush.MenuScrim" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#B3000000" Offset="0"/>
+        <GradientStop Color="#33000000" Offset="0.4"/>
+        <GradientStop Color="#40000000" Offset="0.7"/>
+        <GradientStop Color="#99000000" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- Party cards: solid on the portrait side, fading out to the right -->
+    <LinearGradientBrush x:Key="Brush.Card" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="#E00C0D11" Offset="0"/>
+        <GradientStop Color="#990C0D11" Offset="0.6"/>
+        <GradientStop Color="#330C0D11" Offset="1"/>
+    </LinearGradientBrush>
+
+    <!-- ============ Fonts ============ -->
+    <FontFamily x:Key="Font.Ui">Segoe UI</FontFamily>
+
+    <!-- ============ Text styles ============ -->
+
+    <!-- Page title in the header bar -->
+    <Style x:Key="Text.Title" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource Font.Ui}"/>
+        <Setter Property="FontSize" Value="28"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Primary}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+    </Style>
+
+    <!-- Title at the top of a panel (character name, "Weapon"...) -->
+    <Style x:Key="Text.Heading" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource Font.Ui}"/>
+        <Setter Property="FontSize" Value="22"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Primary}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    </Style>
+
+    <!-- Regular text: list entries, descriptions -->
+    <Style x:Key="Text.Body" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource Font.Ui}"/>
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Primary}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+    </Style>
+
+    <Style x:Key="Text.Secondary" TargetType="TextBlock" BasedOn="{StaticResource Text.Body}">
+        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Secondary}"/>
+    </Style>
+
+    <!-- Small supporting text (class name, dates) -->
+    <Style x:Key="Text.Caption" TargetType="TextBlock" BasedOn="{StaticResource Text.Body}">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Secondary}"/>
+    </Style>
+
+    <!-- Section titles and column headers (Parameters, Name, Qty, HP) -->
+    <Style x:Key="Text.Label" TargetType="TextBlock" BasedOn="{StaticResource Text.Body}">
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Foreground" Value="{StaticResource Brush.Text.Secondary}"/>
+    </Style>
+
+    <!-- Numbers: digits share one width so columns of numbers line up -->
+    <Style x:Key="Text.Number" TargetType="TextBlock" BasedOn="{StaticResource Text.Body}">
+        <Setter Property="Typography.NumeralAlignment" Value="Tabular"/>
+        <Setter Property="HorizontalAlignment" Value="Right"/>
+    </Style>
+</ResourceDictionary>

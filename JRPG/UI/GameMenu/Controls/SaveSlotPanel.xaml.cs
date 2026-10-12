@@ -1,56 +1,57 @@
-﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems.SaveGames.Models;
-using System;
+using JRPG.Utils;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace JRPG.UI.GameMenu.Controls
 {
-    /// <summary>
-    /// Interaction logic for SaveSlotPanel.xaml
-    /// </summary>
+    /// <summary>One save file in the Save / Load list. Clicks are handled by SaveLoadView.</summary>
     public partial class SaveSlotPanel : UserControl
     {
-        private int slotIndex;
-        private Action<int> clickCallback;
+        private const double PortraitSize = 52;
 
-        public SaveSlotPanel()
+        public SaveSlotPanel(SaveDataPreview preview)
         {
             InitializeComponent();
-            MouseLeftButtonUp += OnClick;
+            Preview = preview;
             Cursor = Cursors.Hand;
-        }
 
-        public void SetData(SaveDataPreview data, bool isSaveMode, int index, Action<int> onClick)
-        {
-            slotIndex = index;
-            clickCallback = onClick;
+            SlotNameText.Text = $"File {preview.SlotIndex + 1}";
 
-            SlotNameText.Text = $"Slot {index + 1}";
-            TimestampText.Text = data.Timestamp.HasValue ? data.Timestamp.Value.ToString("g") : null; // e.g., 5/19/2025 2:45 PM
-            MapNameText.Text = data.MapName ?? String.Empty;
-
-            PartyPortraitPanel.Children.Clear();
-            foreach (Character c in data.Party)
+            if (preview.IsEmpty || preview.IsCorrupt)
             {
-                var portrait = new CharacterPortrait
-                {
-                    Character = c,
-                    Width = 48,
-                    Height = 48,
-                    IsSelected = false,
-                    ShowStats = false,
-                    Margin = new Thickness(4)
-                };
-
-                PartyPortraitPanel.Children.Add(portrait);
+                LocationText.Text = preview.IsCorrupt ? "Unreadable file" : "Empty";
+                LocationText.Foreground = (Brush)FindResource("Brush.Text.Disabled");
+                TimestampText.Visibility = Visibility.Collapsed;
+                return;
             }
+
+            LocationText.Text = preview.MapName ?? string.Empty;
+            TimestampText.Text = preview.Timestamp?.ToString("g"); // e.g. 5/19/2025 2:45 PM
+
+            foreach (var character in preview.Party)
+                PartyPortraitPanel.Children.Add(CreatePortrait(character.PortraitFile));
         }
 
-        private void OnClick(object sender, MouseButtonEventArgs e)
+        public SaveDataPreview Preview { get; }
+
+        private Border CreatePortrait(string portraitFile)
         {
-            clickCallback?.Invoke(slotIndex);
+            return new Border
+            {
+                Width = PortraitSize,
+                Height = PortraitSize,
+                Margin = new Thickness(6, 0, 0, 0),
+                BorderBrush = (Brush)FindResource("Brush.Stroke"),
+                BorderThickness = new Thickness(1),
+                Child = new Image
+                {
+                    Source = ImageLoader.LoadPortrait(portraitFile),
+                    Stretch = Stretch.UniformToFill
+                }
+            };
         }
     }
 }

@@ -1,89 +1,98 @@
 ﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
 using JRPG.Core.Systems.Equipments.Models;
+using JRPG.UI.GameMenu.Controls;
 using JRPG.Utils;
 using System.Linq;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace JRPG.UI.GameMenu
 {
-    public partial class EquipmentView : UserControl, IFilterable<Character>
+    /// <summary>Equipment page: a character's slots and parameters. The category tabs pick the character.</summary>
+    public partial class EquipmentView : MenuPage, IFilterable<Character>
     {
-        private Character selectedCharacter;
+        private const string EmptySlotText = "—";
 
-        public EquipmentView(Character selectedCharacter = null)
+        private Character character;
+
+        public EquipmentView()
         {
             InitializeComponent();
 
-            WeaponNameBlock.MouseLeftButtonUp += WeaponRow_Click;
-            ArmorNameBlock.MouseLeftButtonUp += ArmorRow_Click;
+            WeaponSlot.MouseEnter += (s, e) => ShowHint(character?.EquippedWeapon?.Description);
+            ArmorSlot.MouseEnter += (s, e) => ShowHint(character?.EquippedArmor?.Description);
+            WeaponSlot.MouseLeave += (s, e) => ShowHint(null);
+            ArmorSlot.MouseLeave += (s, e) => ShowHint(null);
 
-            if (selectedCharacter != null)
-            {
-                ApplyFilter(selectedCharacter);           
-            }
-            else
-            {
-                // Default selection
-                var firstCharacter = GameSystems.Party.AllCharacters.FirstOrDefault();
-                if (firstCharacter != null)
-                {
-                    ApplyFilter(firstCharacter);
-                }
-            }
+            ApplyFilter(GameSystems.Party.AllCharacters.FirstOrDefault());
         }
 
-        public void ApplyFilter(Character character)
+        public void ApplyFilter(Character newCharacter)
         {
-            if (character == null) return;
+            if (newCharacter == null)
+                return;
 
-            selectedCharacter = character;
-            RefreshUI();
+            character = newCharacter;
+            ClosePicker();
+            Refresh();
         }
 
-        private void RefreshUI()
+        private void Refresh()
         {
-            if (selectedCharacter == null) return;
-
-            CharacterNameBlock.Text = selectedCharacter.Name;
-            WeaponNameBlock.Text = selectedCharacter.EquippedWeapon?.Name ?? "None";
-            ArmorNameBlock.Text = selectedCharacter.EquippedArmor?.Name ?? "None";
-
-            cStatsPanel.Load(selectedCharacter);
+            CharacterNameText.Text = character.Name;
+            ShowSlot(WeaponSlot, character.EquippedWeapon);
+            ShowSlot(ArmorSlot, character.EquippedArmor);
+            Stats.Load(character);
         }
 
-        private TextBlock CreateStatText(string label, int value)
+        private static void ShowSlot(ListRow slot, Equipment equipped)
         {
-            return new TextBlock
+            slot.Detail = equipped?.Name ?? EmptySlotText;
+            slot.DetailIcon = equipped == null ? null : ImageLoader.LoadIcon(equipped.IconFile);
+        }
+
+        // ============ Slots ============
+
+        private void WeaponSlot_Click(object sender, MouseButtonEventArgs e) => OpenPicker(WeaponSlot, isWeapon: true);
+
+        private void ArmorSlot_Click(object sender, MouseButtonEventArgs e) => OpenPicker(ArmorSlot, isWeapon: false);
+
+        private void RemoveAll_Click(object sender, MouseButtonEventArgs e)
+        {
+            ClosePicker();
+
+            GameSystems.Equipment.Unequip(character, character.EquippedWeapon);
+            GameSystems.Equipment.Unequip(character, character.EquippedArmor);
+
+            Refresh();
+        }
+
+        // ============ Picker (right panel) ============
+
+        private void OpenPicker(ListRow slot, bool isWeapon)
+        {
+            WeaponSlot.IsSelected = slot == WeaponSlot;
+            ArmorSlot.IsSelected = slot == ArmorSlot;
+
+            var picker = new EquipmentSelectionView(character, isWeapon);
+            picker.Previewing += equipment => Stats.PreviewStatChange(character, equipment, isWeapon);
+            picker.PreviewEnded += Stats.ClearPreview;
+            picker.HintRequested += ShowHint;
+            picker.Done += () =>
             {
-                Text = $"{label}: {value}",
-                FontSize = 16,
-                Foreground = System.Windows.Media.Brushes.White,
-                Margin = new Thickness(2)
+                ClosePicker();
+                Refresh();
             };
+
+            ShowSecondary(picker);
         }
 
-        public void PreviewStats(Equipment equipment, bool isWeapon)
+        private void ClosePicker()
         {
-            cStatsPanel.PreviewStatChange(selectedCharacter, equipment, isWeapon);
-        }
-
-        private void WeaponRow_Click(object sender, MouseButtonEventArgs e)
-        {
-            if (selectedCharacter == null) return;
-
-            var view = new EquipmentSelectionView(selectedCharacter, isWeapon: true);
-            ((MainWindow)Application.Current.MainWindow).GameMenuControl.ShowSecondary(view);
-        }
-
-        private void ArmorRow_Click(object sender, MouseButtonEventArgs e)
-        {
-            if (selectedCharacter == null) return;
-
-            var view = new EquipmentSelectionView(selectedCharacter, isWeapon: false);
-            ((MainWindow)Application.Current.MainWindow).GameMenuControl.ShowSecondary(view);
+            WeaponSlot.IsSelected = false;
+            ArmorSlot.IsSelected = false;
+            Stats.ClearPreview();
+            HideSecondary();
         }
     }
 }

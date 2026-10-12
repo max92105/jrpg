@@ -4,8 +4,6 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using JRPG.Core.Battles.Enums;
 using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
@@ -16,7 +14,11 @@ using JRPG.Utils;
 
 namespace JRPG.UI.GameMenu
 {
-    public partial class InventoryView : UserControl, IFilterable<Type>
+    /// <summary>
+    /// Inventory page: the item list, filtered by the category tabs, and the "Use item" dialog.
+    /// Item descriptions show in the menu footer.
+    /// </summary>
+    public partial class InventoryView : MenuPage, IFilterable<Type>
     {
         private Type selectedFilterType;
         private readonly List<Character> selectedTargets = new List<Character>();
@@ -37,76 +39,36 @@ namespace JRPG.UI.GameMenu
         private void Refresh()
         {
             ItemListPanel.Children.Clear();
-            ItemDescriptionBlock.Text = "Hover an item to see its description.";
+            ShowHint(null);
 
             foreach (var entry in GameSystems.Inventory.Items)
             {
                 if (selectedFilterType != null && !selectedFilterType.IsInstanceOfType(entry.Item))
                     continue;
 
-                var row = new Grid
-                {
-                    Style = (Style)FindResource("InventoryItemRowStyle")
-                };
+                bool canUse = entry.Item.CanBeUsedFromInventory;
 
-                row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(8, GridUnitType.Star) });
-                row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(2, GridUnitType.Star) });
-
-                var leftPanel = new StackPanel
+                var row = new ListRow
                 {
-                    Orientation = Orientation.Horizontal,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-
-                var icon = new Image
-                {
-                    Source = ImageLoader.LoadIcon(entry.Item.IconFile),
-                    Width = 32,
-                    Height = 32,
-                    Margin = new Thickness(0, 0, 10, 0)
-                };
-
-                var nameText = new TextBlock
-                {
+                    Icon = ImageLoader.LoadIcon(entry.Item.IconFile),
                     Text = entry.Item.Name,
-                    FontSize = 16,
-                    Foreground = Brushes.White,
-                    VerticalAlignment = VerticalAlignment.Center
+                    Value = entry.Quantity.ToString(),
+                    Badge = entry.EquippedTo.Count > 0 ? "E" : null,
+                    // Grey out consumables that only work in battle; equipment stays normal
+                    IsDimmed = entry.Item is Consumable && !canUse,
+                    IsClickable = canUse
                 };
 
-                leftPanel.Children.Add(icon);
-                leftPanel.Children.Add(nameText);
-                Grid.SetColumn(leftPanel, 0);
-                row.Children.Add(leftPanel);
+                row.MouseEnter += (s, e) => ShowHint(entry.Item.Description);
+                row.MouseLeave += (s, e) => ShowHint(null);
 
-                var quantityText = new TextBlock
-                {
-                    Text = "x" + entry.Quantity,
-                    FontSize = 16,
-                    Foreground = Brushes.White,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Right,
-                    Margin = new Thickness(0, 0, 10, 0)
-                };
-
-                Grid.SetColumn(quantityText, 1);
-                row.Children.Add(quantityText);
-
-                row.MouseEnter += (s, e) =>
-                {
-                    ItemDescriptionBlock.Text = entry.Item.Description;
-                };
-
-                if (entry.Item.CanBeUsedFromInventory)
-                {
-                    row.MouseLeftButtonDown += (s, e) =>
-                    {
-                        ShowPopup(entry);
-                    };
-                }
+                if (canUse)
+                    row.MouseLeftButtonDown += (s, e) => ShowPopup(entry);
 
                 ItemListPanel.Children.Add(row);
             }
+
+            EmptyText.Visibility = ItemListPanel.Children.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void ShowPopup(InventoryItem item)
@@ -225,6 +187,7 @@ namespace JRPG.UI.GameMenu
 
             PopupOverlay.Visibility = Visibility.Collapsed;
             Refresh();
+            NotifyPartyChanged();
         }
 
         private void PopupNo_Click(object sender, RoutedEventArgs e)

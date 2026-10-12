@@ -91,6 +91,9 @@ namespace JRPG
             }
         }
 
+        /// <summary>Total play time: what was saved plus the current session.</summary>
+        public TimeSpan GetPlayTime() => TimeSpan.FromSeconds(totalPlayTimeSeconds) + (DateTime.Now - sessionStartTime);
+
         public string GetCurrentMapFile() => currentMapFile;
         public (double x, double y) GetPlayerPosition() => (playerX, playerY);
     }

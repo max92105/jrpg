@@ -1,5 +1,6 @@
 ﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
+using JRPG.UI.GameMenu.Controls;
 using JRPG.Utils;
 using System;
 using System.Linq;
@@ -9,121 +10,68 @@ using System.Windows.Media.Animation;
 
 namespace JRPG.UI.GameMenu
 {
-    public partial class StatusView : UserControl, IFilterable<Character>
+    /// <summary>Status page: profile, experience, parameters and skills. The category tabs pick the character.</summary>
+    public partial class StatusView : MenuPage, IFilterable<Character>
     {
-        private Character selectedCharacter;
+        private static readonly Duration XpBarFillDuration = TimeSpan.FromMilliseconds(400);
 
-        public StatusView(Character selectedCharacter = null)
+        private Character character;
+
+        public StatusView()
         {
             InitializeComponent();
-
-            if (selectedCharacter != null)
-            {
-                ApplyFilter(selectedCharacter);
-            }
-            else
-            {
-                var firstCharacter = GameSystems.Party.AllCharacters.FirstOrDefault();
-                if (firstCharacter != null)
-                {
-                    ApplyFilter(firstCharacter);
-                }
-            }
+            ApplyFilter(GameSystems.Party.AllCharacters.FirstOrDefault());
         }
 
-        public void ApplyFilter(Character character)
+        public void ApplyFilter(Character newCharacter)
         {
-            if (character == null) return;
-            selectedCharacter = character;
-            RefreshUI();
+            if (newCharacter == null)
+                return;
+
+            character = newCharacter;
+            Refresh();
         }
 
-        private void RefreshUI()
+        private void Refresh()
         {
-            if (selectedCharacter == null) return;
+            CharacterNameText.Text = character.Name;
+            ClassText.Text = character.Class;
+            PortraitImage.Source = ImageLoader.LoadPortrait(character.PortraitFile);
 
-            CharacterNameBlock.Text = selectedCharacter.Name;
+            LevelText.Text = character.Level.ToString();
+            ExpText.Text = character.EXP.ToString();
+            NextLevelText.Text = Math.Max(0, character.EXPToNextLevel - character.EXP).ToString();
+            AnimateXpBar();
 
-            LevelBlock.Text = $"{selectedCharacter.Level}";
-            CurrentXPBlock.Text = $"{selectedCharacter.EXP}";
-            XPToNextLevelBlock.Text = $"{selectedCharacter.EXPToNextLevel}";
-            ClassBlock.Text = $"{selectedCharacter.Class}";
+            Stats.Load(character);
+            ShowSkills();
+        }
 
-            UpdateXpBar();
+        private void AnimateXpBar()
+        {
+            XpBar.Maximum = character.EXPToNextLevel;
+            XpBar.BeginAnimation(ProgressBar.ValueProperty, new DoubleAnimation(0, character.EXP, XpBarFillDuration)
+            {
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            });
+        }
 
-            // Clear and rebuild stats
-            cStatsPanel.Load(selectedCharacter);
-
+        private void ShowSkills()
+        {
             SkillsPanel.Children.Clear();
 
-            var skills = selectedCharacter.Skills.ToList();
-            for (int i = 0; i < skills.Count; i += 2)
+            foreach (var skill in character.Skills)
             {
-                var left = skills[i];
-                var right = (i + 1 < skills.Count) ? skills[i + 1] : null;
-
-                AddSkillRow(
-                    leftSkillName: left.Name,
-                    leftIcon: left.IconFile,
-                    rightSkillName: right?.Name,
-                    rightIcon: right?.IconFile
-                );
+                SkillsPanel.Children.Add(new ListRow
+                {
+                    Icon = ImageLoader.LoadIcon(skill.IconFile),
+                    Text = skill.Name,
+                    Value = skill.MPCost.ToString(),
+                    Margin = new Thickness(0, 0, 16, 0)
+                });
             }
-        }
 
-        private void UpdateXpBar()
-        {
-            // Set max before animating
-            XpBar.Maximum = selectedCharacter.EXPToNextLevel;
-
-            // Reset any previous animations and start from 0
-            XpBar.BeginAnimation(ProgressBar.ValueProperty, null);
-            XpBar.Value = 0;
-
-            var animation = new DoubleAnimation
-            {
-                From = 0,
-                To = selectedCharacter.EXP,
-                Duration = TimeSpan.FromMilliseconds(400),
-                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-            };
-
-            XpBar.BeginAnimation(ProgressBar.ValueProperty, animation);
-        }
-
-        private void AddSkillRow(string leftSkillName, string leftIcon = null, string rightSkillName = null, string rightIcon = null)
-        {
-            var rowGrid = new Grid
-            {
-                Margin = new Thickness(0, 4, 0, 4),
-                VerticalAlignment = VerticalAlignment.Center
-            };
-
-            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(24) }); // Left icon
-            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // Left name
-            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(20) }); // Spacer
-            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(24) }); // Right icon
-            rowGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // Right name
-
-            var leftIconImg = VisualFactory.CreateIcon(leftIcon);
-            Grid.SetColumn(leftIconImg, 0);
-            rowGrid.Children.Add(leftIconImg);
-
-            var leftLabel = VisualFactory.CreateText(leftSkillName);
-            leftLabel.Margin = new Thickness(4, 0, 0, 0);
-            Grid.SetColumn(leftLabel, 1);
-            rowGrid.Children.Add(leftLabel);
-
-            var rightIconImg = VisualFactory.CreateIcon(rightIcon);
-            Grid.SetColumn(rightIconImg, 3);
-            rowGrid.Children.Add(rightIconImg);
-
-            var rightLabel = VisualFactory.CreateText(rightSkillName ?? "");
-            rightLabel.Margin = new Thickness(4, 0, 0, 0);
-            Grid.SetColumn(rightLabel, 4);
-            rowGrid.Children.Add(rightLabel);
-
-            SkillsPanel.Children.Add(rowGrid);
+            NoSkillsText.Visibility = SkillsPanel.Children.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }

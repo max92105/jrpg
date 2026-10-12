@@ -4,6 +4,13 @@
              xmlns:local="clr-namespace:JRPG"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Shared UI look: colors and text styles, menu building blocks, placeholder art -->
+                <ResourceDictionary Source="/JRPG;component/UI/Styles/Theme.xaml"/>
+                <ResourceDictionary Source="/JRPG;component/UI/Styles/MenuStyles.xaml"/>
+                <ResourceDictionary Source="/JRPG;component/UI/Styles/Art.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

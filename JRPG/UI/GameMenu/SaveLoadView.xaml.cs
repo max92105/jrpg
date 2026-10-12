@@ -2,35 +2,30 @@
 using JRPG.Core.Systems.SaveGames.Models;
 using JRPG.UI.GameMenu.Controls;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace JRPG.UI.GameMenu
 {
     /// <summary>
-    /// Interaction logic for SaveLoadView.xaml
+    /// Save / Load page: one SaveSlotPanel per file.
+    /// Saving happens here; loading is handed to onConfirmedSlotClicked (the caller knows how to switch scenes).
     /// </summary>
-    public partial class SaveLoadView : UserControl
+    public partial class SaveLoadView : MenuPage
     {
         public enum SaveLoadMode { Save, Load }
 
-        private SaveLoadMode currentMode;
-        private Action onBack;
-        private Func<int, Task> onConfirmedSlotClicked;
+        private readonly SaveLoadMode mode;
+        private readonly Func<int, Task> onConfirmedSlotClicked;
 
-        public SaveLoadView(
-            SaveLoadMode mode,
-            Func<int, Task> onConfirmedSlotClicked,
-            Action onBack)
+        // onBack is kept for the existing callers; the page has no back button (Esc / the nav handle that)
+        public SaveLoadView(SaveLoadMode mode, Func<int, Task> onConfirmedSlotClicked, Action onBack)
         {
             InitializeComponent();
-            currentMode = mode;
-            this.onConfirmedSlotClicked = onConfirmedSlotClicked; // ✅ missing assignment
-            this.onBack = onBack;
+            this.mode = mode;
+            this.onConfirmedSlotClicked = onConfirmedSlotClicked;
 
-            HeaderText.Text = currentMode == SaveLoadMode.Save ? "Save Game" : "Load Game";
+            HeaderText.Text = mode == SaveLoadMode.Save ? "Save Game" : "Load Game";
             PopulateSlots();
         }
 
@@ -38,38 +33,48 @@ namespace JRPG.UI.GameMenu
         {
             SlotListPanel.Children.Clear();
 
-            List<SaveDataPreview> previews = GameSystems.Save.GetAllSavePreviews();
-
-            foreach (var preview in previews)
+            foreach (var preview in GameSystems.Save.GetAllSavePreviews())
             {
-                var slot = new SaveSlotPanel();
-                slot.SetData(preview, currentMode == SaveLoadMode.Save, preview.SlotIndex, OnSlotClicked);
+                var slot = new SaveSlotPanel(preview);
+                slot.MouseEnter += (s, e) => ShowHint(HintFor(preview));
+                slot.MouseLeave += (s, e) => ShowHint(null);
+                slot.MouseLeftButtonUp += OnSlotClicked;
                 SlotListPanel.Children.Add(slot);
             }
         }
 
-        private async void OnSlotClicked(int slotIndex)
+        private string HintFor(SaveDataPreview preview)
         {
-            if (currentMode == SaveLoadMode.Save)
-            {
-                var confirm = MessageBox.Show(
-                    $"Are you sure you want to overwrite Slot {slotIndex + 1}?",
-                    "Confirm Save",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question
-                );
+            string file = FileName(preview);
 
-                if (confirm != MessageBoxResult.Yes)
-                    return;
+            if (mode == SaveLoadMode.Save)
+                return preview.IsEmpty ? $"Save to {file}." : $"Overwrite {file}.";
 
-                await GameSystems.System.SaveToSlotAsync(slotIndex);
-                MessageBox.Show("Game saved!", "Save Complete", MessageBoxButton.OK, MessageBoxImage.Information);
-                PopulateSlots();
-            }
-            else
-            {
-                await onConfirmedSlotClicked(slotIndex); // Delegate does transition
-            }
+            return preview.IsEmpty || preview.IsCorrupt ? $"{file} can't be loaded." : $"Load {file}.";
         }
+
+        private async void OnSlotClicked(object sender, MouseButtonEventArgs e)
+        {
+            var preview = ((SaveSlotPanel)sender).Preview;
+
+            if (mode == SaveLoadMode.Save)
+                await SaveAsync(preview);
+            else if (!preview.IsEmpty && !preview.IsCorrupt)
+                await onConfirmedSlotClicked(preview.SlotIndex); // the caller switches scenes
+        }
+
+        private async Task SaveAsync(SaveDataPreview preview)
+        {
+            string file = FileName(preview);
+
+            if (!preview.IsEmpty && !await Dialog.AskAsync($"Overwrite {file}?", "Overwrite"))
+                return;
+
+            await GameSystems.System.SaveToSlotAsync(preview.SlotIndex);
+            PopulateSlots();
+            ShowHint($"Saved to {file}.");
+        }
+
+        private static string FileName(SaveDataPreview preview) => $"File {preview.SlotIndex + 1}";
     }
 }

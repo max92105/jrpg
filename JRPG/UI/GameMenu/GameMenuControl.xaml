@@ -1,237 +1,119 @@
-﻿<UserControl x:Class="JRPG.UI.GameMenu.GameMenuControl"
+﻿<!--
+    The in-game menu shell.
+
+    No page open (main menu):           A page open:
+    ┌ Header: Menu ──────────────┐      ┌ Header: Equipment ─────────────────────────────┐
+    │ ▶ Inventory                │      │ ▶ │ rail │ Page (GameMenuContent) │ Party or  │
+    │ ▶ Party                    │      │ ▶ │      │                        │ secondary │
+    │ ▶ ...                      │      │ ▶ │      │                        │ panel     │
+    └ Footer: hint ──── [Esc] ───┘      └ Footer: hint ─────────────────────── [Esc] ────┘
+
+    The nav tabs shrink to icons while a page is open.
+    Pages are MenuPages (InventoryView, StatusView...) shown in GameMenuContent.
+-->
+<UserControl x:Class="JRPG.UI.GameMenu.GameMenuControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:JRPG.UI.GameMenu"
+             xmlns:controls="clr-namespace:JRPG.UI.GameMenu.Controls"
+             xmlns:utils="clr-namespace:JRPG.Utils"
              Background="Transparent"
-             Visibility="Collapsed"
-             x:Name="Root">
-    <UserControl.Resources>
-        <Style x:Key="MenuToggleStyle" TargetType="ToggleButton">
-            <Setter Property="Height" Value="50"/>
-            <Setter Property="Width" Value="280"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Margin" Value="0,5"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ToggleButton">
-                        <Grid x:Name="RootGrid" RenderTransformOrigin="0,0.5">
-                            <Grid.RenderTransform>
-                                <ScaleTransform x:Name="ScaleTransform" ScaleX="1" ScaleY="1"/>
-                            </Grid.RenderTransform>
-
-                            <!-- ✅ Visual States go here -->
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup x:Name="CheckStates">
-                                    <VisualState x:Name="Unchecked">
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="ScaleTransform"
-                                                             Storyboard.TargetProperty="ScaleX"
-                                                             To="1.0"
-                                                             Duration="0:0:0.30">
-                                                <DoubleAnimation.EasingFunction>
-                                                    <CubicEase EasingMode="EaseOut"/>
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                        </Storyboard>
-                                    </VisualState>
-                                    <VisualState x:Name="Checked">
-                                        <Storyboard>
-                                            <DoubleAnimation Storyboard.TargetName="ScaleTransform"
-                                                             Storyboard.TargetProperty="ScaleX"
-                                                             To="1.12"
-                                                             Duration="0:0:0.30">           
-                                                <DoubleAnimation.EasingFunction>
-                                                    <CubicEase EasingMode="EaseOut"/>
-                                                </DoubleAnimation.EasingFunction>
-                                            </DoubleAnimation>
-                                        </Storyboard>
-                                    </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
-
-                            <!-- Background Shape -->
-                            <Path x:Name="ButtonShape"
-                          Stretch="Fill"
-                          Fill="#88000000"
-                          Stroke="#AA111111"
-                          StrokeThickness="1"
-                          Data="M 0,0 L 240,0 L 270,25 L 240,50 L 0,50 Z" />
-
-                            <ContentPresenter HorizontalAlignment="Left"
-                                      VerticalAlignment="Center"
-                                      Margin="50,0,0,0"
-                                      RecognizesAccessKey="True"/>
-                        </Grid>
-
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ButtonShape" Property="Fill">
-                                    <Setter.Value>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                            <GradientStop Color="#AA111111" Offset="0.0"/>
-                                            <GradientStop Color="#AA333333" Offset="0.5"/>
-                                            <GradientStop Color="#AA111111" Offset="1.0"/>
-                                        </LinearGradientBrush>
-                                    </Setter.Value>
-                                </Setter>
-                                <Setter Property="Foreground" Value="White"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <DropShadowEffect x:Key="SubtleGlow"
-                  Color="White"
-                  BlurRadius="10"
-                  ShadowDepth="0"
-                  Opacity="0.25"/>
-
-        <Style x:Key="FilterIconStyle" TargetType="Button">
-            <Setter Property="Width" Value="48"/>
-            <Setter Property="Height" Value="48"/>
-            <Setter Property="Background" Value="#AA111111"/>
-            <Setter Property="BorderBrush" Value="#44111111"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Padding" Value="4"/>
-            <Setter Property="Effect" Value="{x:Null}"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="Border"
-                        Background="{TemplateBinding Background}"
-                        BorderBrush="{TemplateBinding BorderBrush}"
-                        BorderThickness="{TemplateBinding BorderThickness}"
-                        CornerRadius="6"
-                        SnapsToDevicePixels="True"
-                        Effect="{TemplateBinding Effect}">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                      VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Border" Property="Effect" Value="{StaticResource SubtleGlow}"/>
-                            </Trigger>
-                            <Trigger Property="IsMouseOver" Value="False">
-                                <Setter TargetName="Border" Property="Effect" Value="{x:Null}"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <DropShadowEffect x:Key="DropShadow"
-                      Color="Black"
-                      Direction="315"
-                      ShadowDepth="5"
-                      BlurRadius="15"
-                      Opacity="0.5"/>
-    </UserControl.Resources>
+             Visibility="Collapsed">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="400"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="80"/>
+            <!-- Header -->
+            <RowDefinition Height="*"/>
+            <!-- Body -->
+            <RowDefinition Height="64"/>
+            <!-- Footer -->
+        </Grid.RowDefinitions>
 
-        <Image Name="MenuBackground"
-               Grid.ColumnSpan="3"
-           Stretch="Fill"
-           Panel.ZIndex="0"
-           Opacity="1" />
+        <!-- Background art, darkened at the edges -->
+        <Image x:Name="MenuBackground" Grid.RowSpan="3" Stretch="UniformToFill"/>
+        <Rectangle Grid.RowSpan="3" Fill="{StaticResource Brush.MenuScrim}"/>
 
-        <!-- Left Menu -->
-        <StackPanel Name="ButtonPanel" HorizontalAlignment="Left" Margin="0,0,0,0">
-            <Border Margin="0,20,0,100"
-                Effect="{DynamicResource DropShadow}">
+        <!-- ============ Header ============ -->
+        <controls:MenuHeader x:Name="Header" Grid.Row="0"/>
+
+        <!-- ============ Body ============ -->
+        <Grid Grid.Row="1" Margin="0,40,40,32">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <!-- Nav tabs -->
+                <ColumnDefinition Width="Auto"/>
+                <!-- Category rail -->
+                <ColumnDefinition Width="*"/>
+                <!-- Page -->
+                <ColumnDefinition Width="Auto"/>
+                <!-- Party sidebar / secondary panel -->
+            </Grid.ColumnDefinitions>
+
+            <!-- Nav tabs -->
+            <StackPanel x:Name="NavPanel" Grid.Column="0">
+                <controls:MenuTab Content="Inventory" Icon="{utils:Art Menu/Inventory}" Style="{StaticResource NavTabStyle}" Click="Inventory_Click"/>
+                <controls:MenuTab Content="Party" Icon="{utils:Art Menu/Party}" Style="{StaticResource NavTabStyle}" Click="Party_Click"/>
+                <controls:MenuTab Content="Equipment" Icon="{utils:Art Menu/Equipment}" Style="{StaticResource NavTabStyle}" Click="Equipment_Click"/>
+                <controls:MenuTab Content="Status" Icon="{utils:Art Menu/Status}" Style="{StaticResource NavTabStyle}" Click="Status_Click"/>
+                <controls:MenuTab x:Name="SystemTab" Content="System" Icon="{utils:Art Menu/System}" Style="{StaticResource NavTabStyle}" Click="System_Click"/>
+            </StackPanel>
+
+            <!-- Category rail: filters for the current page (item types, characters...) -->
+            <Border x:Name="CategoryRail" Grid.Column="1" Width="72" Margin="12,0,0,0" Style="{StaticResource CategoryRailStyle}">
+                <StackPanel x:Name="CategoryPanel"/>
+            </Border>
+
+            <!-- Page, with its icon as a faint watermark in the corner -->
+            <Border x:Name="ContainerGameMenuContent" Grid.Column="2" Margin="12,0,0,0" Style="{StaticResource GlassPanelStyle}">
+                <Border.RenderTransform>
+                    <TranslateTransform x:Name="PageSlide"/>
+                </Border.RenderTransform>
                 <Grid>
-                    <Rectangle>
-                        <Rectangle.Fill>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                <GradientStop Color="#AA000000" Offset="0.0"/>
-                                <!-- Dark start -->
-                                <GradientStop Color="#44000000" Offset="0.5"/>
-                                <!-- Midpoint -->
-                                <GradientStop Color="#00000000" Offset="1.0"/>
-                                <!-- Fully transparent -->
-                            </LinearGradientBrush>
-                        </Rectangle.Fill>
-                    </Rectangle>
-
-                    <!-- Text on top -->
-                    <TextBlock Text="Menu" 
-                   Margin="50,10"
-                   FontSize="28" 
-                   FontWeight="Light" 
-                   Foreground="White"
-                   VerticalAlignment="Center"
-                   HorizontalAlignment="Left"/>
+                    <Image x:Name="PageWatermark" Width="110" Height="110" Opacity="0.08"
+                           HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,16,24,0"
+                           IsHitTestVisible="False"/>
+                    <ContentControl x:Name="GameMenuContent"/>
                 </Grid>
             </Border>
 
-            <ToggleButton Content="Inventory" Style="{StaticResource MenuToggleStyle}" Click="MenuButton_Checked"/>
-            <ToggleButton Content="Manage Party" Style="{StaticResource MenuToggleStyle}" Click="MenuButton_Checked"/>
-            <ToggleButton Content="Equipment" Style="{StaticResource MenuToggleStyle}" Click="MenuButton_Checked"/>
-            <ToggleButton Content="Status" Style="{StaticResource MenuToggleStyle}" Click="MenuButton_Checked"/>
-            <ToggleButton Content="Save Game" Style="{StaticResource MenuToggleStyle}" Click="MenuButton_Checked"/>
-            <ToggleButton Content="Load Game" Style="{StaticResource MenuToggleStyle}" Click="MenuButton_Checked"/>
-            <ToggleButton Content="Options" Style="{StaticResource MenuToggleStyle}" Click="MenuButton_Checked"/>
+            <!-- Right side: the party, or a secondary panel (e.g. the equipment picker) -->
+            <controls:PartySidebar x:Name="PartySidebar" Grid.Column="3" Width="460" Margin="24,0,0,0"/>
 
-            <Separator Margin="0,20,0,20" Background="Transparent"/>
-
-            <ToggleButton Content="Return to Game" Style="{StaticResource MenuToggleStyle}" Click="CloseGameMenu_Click"/>
-            <ToggleButton Content="Return to Main Menu" Style="{StaticResource MenuToggleStyle}" Click="ReturnToMenuButton_Click"/>
-            <ToggleButton Content="Exit Game" Style="{StaticResource MenuToggleStyle}" Click="ExitButton_Click"/>
-        </StackPanel>
-
-        <!-- Right Content Panel -->
-        <Grid Grid.Column="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="48"/>
-                <!-- Context Options -->
-                <ColumnDefinition Width="*"/>
-                <!-- Main Panel -->
-                <ColumnDefinition Width="500"/>
-                <!-- Secondary Panel -->
-            </Grid.ColumnDefinitions>
-
-            <!-- Context Option Buttons -->
-            <StackPanel VerticalAlignment="Top" Margin="0,180,0,0" x:Name="ContextOptionsPanel"
-                Grid.Column="0"
-                HorizontalAlignment="Left" />
-
-            <!-- Submenu Content Panel -->
-            <Border Grid.Column="1"
-                Background="#AA111111"
-                BorderBrush="#44111111"
-                BorderThickness="1"
-                Effect="{DynamicResource DropShadow}"
-                x:Name="ContainerGameMenuContent">
-
-                <ContentControl x:Name="GameMenuContent"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Stretch" />
+            <Border x:Name="SecondaryPanelContainer" Grid.Column="3" Width="560" Margin="12,0,0,0"
+                    Style="{StaticResource GlassPanelStyle}" Visibility="Collapsed">
+                <ContentControl x:Name="SecondaryPanel"/>
             </Border>
 
-            <Border Grid.Column="2"
-                x:Name="SecondaryPanelContainer"
-                Background="#AA111111"
-                BorderBrush="#44111111"
-                BorderThickness="1"
-                Effect="{DynamicResource DropShadow}"
-                Visibility="Collapsed"
-                Margin="5,0,0,0">
+            <!-- ============ System sub menu: unfolds next to the System tab ============ -->
 
-                <ContentControl x:Name="SecondaryPanel"
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch" />
-            </Border>
+            <!-- Invisible layer: clicking anywhere outside the sub menu closes it -->
+            <Rectangle x:Name="SubMenuDismissLayer" Grid.Column="1" Grid.ColumnSpan="3" Fill="Transparent"
+                       Visibility="Collapsed" MouseLeftButtonDown="SubMenuDismissLayer_Click"/>
+
+            <Canvas x:Name="SubMenuLayer" Grid.ColumnSpan="4">
+                <StackPanel x:Name="SystemSubMenu" Visibility="Collapsed">
+                    <Button Content="Save" Style="{StaticResource SubMenuItemStyle}" Click="Save_Click"/>
+                    <Button Content="Load" Style="{StaticResource SubMenuItemStyle}" Click="Load_Click"/>
+                    <Button Content="Options" Style="{StaticResource SubMenuItemStyle}" Click="Options_Click"/>
+                    <Button Content="Title Screen" Style="{StaticResource SubMenuItemStyle}" Click="TitleScreen_Click"/>
+                    <Button Content="Quit Game" Style="{StaticResource SubMenuItemStyle}" Click="Quit_Click"/>
+                </StackPanel>
+            </Canvas>
         </Grid>
+
+        <!-- ============ Footer ============ -->
+        <Border Grid.Row="2" Style="{StaticResource FooterBarStyle}">
+            <DockPanel Margin="48,0">
+                <!-- [Esc] Close (also clickable) -->
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center"
+                            Background="Transparent" Cursor="Hand" MouseLeftButtonUp="CloseHint_Click">
+                    <Border Style="{StaticResource KeyHintStyle}">
+                        <TextBlock Text="Esc" Style="{StaticResource Text.Caption}" Foreground="{StaticResource Brush.Text.Primary}"/>
+                    </Border>
+                    <TextBlock Text="Close" Style="{StaticResource Text.Body}"/>
+                </StackPanel>
+
+                <TextBlock x:Name="HintText" Style="{StaticResource Text.Body}"/>
+            </DockPanel>
+        </Border>
     </Grid>
 </UserControl>

@@ -3274,5 +3274,53 @@
     "SheetX": 13,
     "SheetY": 1,
     "CollisionPolygon": null
+  },
+  "274": {
+    "Id": 274,
+    "Name": "Ground 5,1",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "Ground.png",
+    "SheetX": 5,
+    "SheetY": 1,
+    "CollisionPolygon": null
+  },
+  "275": {
+    "Id": 275,
+    "Name": "Ground 9,2",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "Ground.png",
+    "SheetX": 9,
+    "SheetY": 2,
+    "CollisionPolygon": null
+  },
+  "276": {
+    "Id": 276,
+    "Name": "Ground 9,10",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "Ground.png",
+    "SheetX": 9,
+    "SheetY": 10,
+    "CollisionPolygon": null
+  },
+  "277": {
+    "Id": 277,
+    "Name": "Ground 9,6",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "Ground.png",
+    "SheetX": 9,
+    "SheetY": 6,
+    "CollisionPolygon": null
   }
 }

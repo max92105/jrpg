@@ -3250,5 +3250,29 @@
     "SheetX": 17,
     "SheetY": 1,
     "CollisionPolygon": null
+  },
+  "272": {
+    "Id": 272,
+    "Name": "FG_Forest_Fall 13,0",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "FG_Forest_Fall.png",
+    "SheetX": 13,
+    "SheetY": 0,
+    "CollisionPolygon": null
+  },
+  "273": {
+    "Id": 273,
+    "Name": "FG_Forest_Fall 13,1",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "FG_Forest_Fall.png",
+    "SheetX": 13,
+    "SheetY": 1,
+    "CollisionPolygon": null
   }
 }

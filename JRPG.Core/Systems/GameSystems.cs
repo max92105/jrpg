@@ -17,12 +17,14 @@ namespace JRPG.Core.Systems
         public static GameSystemManager System { get; private set; }
         public static SaveGameManager Save { get; private set; }
         public static BattleManager Battle { get; private set; }
+        public static WorldState World { get; private set; }
 
         public static void Initialize()
         {
             if (isInitialized)
                 return;
 
+            World = new WorldState();
             Inventory = new InventoryManager();
             Party = new PartyManager();
             Equipment = new EquipmentManager();

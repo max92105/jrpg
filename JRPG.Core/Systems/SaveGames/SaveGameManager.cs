@@ -37,7 +37,9 @@ namespace JRPG.Core.Systems.SaveGames
                 PartyAverageLevel = (int)characters.Average(c => c.Level),
                 LocationName = GetLocationName(currentMapFile),
                 SaveTimestamp = DateTime.Now,
-                PlayTimeSeconds = totalPlayTimeSeconds
+                PlayTimeSeconds = totalPlayTimeSeconds,
+                CompletedEvents = GameSystems.World.CompletedEvents.ToList(),
+                ObjectSwaps = new Dictionary<string, int>(GameSystems.World.ObjectSwaps)
             };
 
             var options = new JsonSerializerOptions { WriteIndented = true };

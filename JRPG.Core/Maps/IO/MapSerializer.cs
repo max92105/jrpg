@@ -1,5 +1,6 @@
 ﻿using JRPG.Core.Maps.Models;
 using JRPG.Core.Triggers.IO;
+using System.Globalization;
 using System.IO;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -28,7 +29,20 @@ namespace JRPG.Core.Maps.IO
         public static Map Load(string path)
         {
             string json = File.ReadAllText(path);
-            return JsonSerializer.Deserialize<Map>(json, Options);
+            var map = JsonSerializer.Deserialize<Map>(json, Options);
+
+            // Objects saved before uids existed get one derived from their type and position, so it
+            // is the same every time the map loads (the game remembers opened chests by uid)
+            if (map?.Objects != null)
+            {
+                foreach (var obj in map.Objects)
+                {
+                    if (string.IsNullOrEmpty(obj.Uid))
+                        obj.Uid = string.Format(CultureInfo.InvariantCulture, "{0}@{1:0.###},{2:0.###}", obj.Id, obj.X, obj.Y);
+                }
+            }
+
+            return map;
         }
     }
 }

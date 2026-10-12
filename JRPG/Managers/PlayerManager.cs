@@ -35,6 +35,10 @@ namespace JRPG.Managers
         {
             X = x;
             Y = y;
+
+            // A teleport, not a move: don't interpolate from the old position
+            PreviousX = x;
+            PreviousY = y;
         }
 
         public void UpdateMovement(bool up, bool down, bool left, bool right, double deltaTime, Map map)

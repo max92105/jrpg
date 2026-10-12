@@ -23,6 +23,9 @@ namespace JRPG
         {
             CurrentMap = MapSerializer.Load(AssetPathResolver.GetPath(Path.Combine("Maps//", file)));
 
+            // Opened chests etc. stay as the player left them
+            GameSystems.World.ApplyTo(CurrentMap, file);
+
             GameSystems.System.UpdateCurrentMap(file);
         }
 

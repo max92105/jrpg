@@ -7,6 +7,7 @@ using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using System.Windows.Media;
 using JRPG.Core.Maps.Models;
+using JRPG.Core.Events.Models;
 using System.Linq;
 using JRPG.Core.Maps.IO;
 using JRPG.Core.Maps;
@@ -101,6 +102,7 @@ namespace MapEditor
         private static readonly Brush ZoneFill = Frozen(new SolidColorBrush(Color.FromArgb(50, 0, 150, 255)));
         private static readonly Pen ZonePen = Frozen(new Pen(Brushes.DeepSkyBlue, 2));
         private static readonly Pen TriggerPen = Frozen(new Pen(Brushes.Black, 1));
+        private static readonly Pen EventMarkerPen = Frozen(new Pen(Brushes.Black, 1.5));
         private static readonly Pen SelectedObjectPen = Frozen(new Pen(Brushes.Cyan, 2));
         private static readonly Pen GridPen = Frozen(new Pen(Brushes.Red, 0.5));
 
@@ -715,7 +717,17 @@ namespace MapEditor
                     break;
 
                 case EditorMode.Trigger:
-                    AddHighlightRect(cellRect, Brushes.Yellow, HoverFill, 2);
+                    // Clicking an object edits its event: outline the whole object; otherwise the tile
+                    var hoveredForEvent = GetObjectUnderPointer(pos);
+                    if (hoveredForEvent != null)
+                    {
+                        foreach (var rect in GetObjectTileRects(hoveredForEvent))
+                            AddHighlightRect(rect, Brushes.Yellow, HoverFill, 2);
+                    }
+                    else
+                    {
+                        AddHighlightRect(cellRect, Brushes.Yellow, HoverFill, 2);
+                    }
                     break;
             }
         }
@@ -832,6 +844,14 @@ namespace MapEditor
 
                     if (showCollision)
                         AddMapDrawable(zoneZ + 1, dc => dc.DrawGeometry(ZoneFill, ZonePen, clip));
+                }
+
+                // Event marker at the object's top-right corner: yellow = press to use, cyan = walk into
+                if (obj.Event != null)
+                {
+                    var center = new Point((obj.X + width) * MapConstant.TileSize - 8, obj.Y * MapConstant.TileSize + 8);
+                    var fill = obj.Event.Activation == EventActivation.Touch ? Brushes.Cyan : Brushes.Gold;
+                    AddMapDrawable(100, dc => dc.DrawEllipse(fill, EventMarkerPen, center, 6, 6));
                 }
 
                 if (showCollision && def.CollisionPolygon != null && def.CollisionPolygon.Count >= 2)
@@ -1127,9 +1147,11 @@ namespace MapEditor
                 "  Right click or Delete: delete the object under the mouse\n" +
                 "  Shift + drag: move an object\n" +
                 "  Double-click an object in the list: open the Object Editor\n\n" +
-                "TRIGGERS\n" +
-                "  Left click: add or edit the trigger on a tile\n" +
-                "  Right click: remove it\n\n" +
+                "EVENTS\n" +
+                "  Left click an object: edit its event (presets: Chest, Door, Sign)\n" +
+                "  Left click a tile: add or edit the tile's trigger\n" +
+                "  Right click: remove the event / trigger\n" +
+                "  Markers on the map: yellow = press to use, cyan = walk into\n\n" +
                 "EVERYWHERE\n" +
                 "  Ctrl + drag: select objects, then Delete to remove them (Esc to clear)\n" +
                 "\nCAMERA\n" +
@@ -1204,7 +1226,7 @@ namespace MapEditor
             SetMode(EditorMode.Object, "Pick an object in the list, click to place. Right/Del: delete, Shift+drag: move. Double-click the list to edit");
 
         private void TriggerMode_Checked(object sender, RoutedEventArgs e) =>
-            SetMode(EditorMode.Trigger, "Click a tile to add or edit its trigger, right-click to remove it");
+            SetMode(EditorMode.Trigger, "Click an object to give it an event (chest, door, sign), or a tile for a tile trigger. Right-click removes it");
 
         private void SelectionMode_Checked(object sender, RoutedEventArgs e) =>
             SetMode(EditorMode.Selection, "Click a tile to change its layer (Z)");
@@ -1936,9 +1958,32 @@ namespace MapEditor
                     HandleTileClick(tileX, tileY);
                     break;
                 case EditorMode.Trigger:
-                    HandleTriggerClick(tileX, tileY);
+                    // An object under the mouse gets an object event; otherwise the tile gets a trigger
+                    var clickedObject = GetObjectUnderPointer(pos);
+                    if (clickedObject != null)
+                        EditObjectEvent(clickedObject);
+                    else
+                        HandleTriggerClick(tileX, tileY);
                     break;
             }
+        }
+
+        private void EditObjectEvent(PlacedObject obj)
+        {
+            ObjectDatabase.Definitions.TryGetValue(obj.Id, out var def);
+
+            var window = new ObjectEventWindow(def, obj.Event, currentFilePath) { Owner = this };
+            if (window.ShowDialog() != true)
+                return;
+
+            if (string.IsNullOrEmpty(obj.Uid))
+                obj.Uid = PlacedObject.NewUid();
+
+            ExecuteEdit(new SetObjectEventCommand(obj, window.Result));
+            RedrawMap();
+            ShowStatusMessage(window.Result == null
+                ? $"Removed the event of {def?.Name ?? "object"}"
+                : $"{def?.Name ?? "Object"}: event saved ({window.Result.Actions.Count} action(s)). Save the map to keep it.");
         }
 
         private void MapCanvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -1969,7 +2014,17 @@ namespace MapEditor
                     break;
 
                 case EditorMode.Trigger:
-                    RemoveTrigger(tileX, tileY);
+                    var eventObject = GetObjectUnderPointer(pos);
+                    if (eventObject?.Event != null)
+                    {
+                        ExecuteEdit(new SetObjectEventCommand(eventObject, null));
+                        RedrawMap();
+                        ShowStatusMessage("Removed the object's event (Ctrl+Z to undo)");
+                    }
+                    else
+                    {
+                        RemoveTrigger(tileX, tileY);
+                    }
                     break;
             }
 
@@ -2347,6 +2402,7 @@ namespace MapEditor
                 X = originX,
                 Y = originY,
                 Z = selectedLayer,
+                Uid = PlacedObject.NewUid(),
                 Meta = isNpc ? new Dictionary<string, string> { ["npc"] = "true", ["name"] = "New NPC" } : null
             };
 

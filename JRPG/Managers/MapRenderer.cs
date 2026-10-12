@@ -74,6 +74,12 @@ namespace JRPG.Managers
             VisualHost.VerticalAlignment = VerticalAlignment.Top;
         }
 
+        /// <summary>Forces a redraw next frame (e.g. an object changed but nothing moved).</summary>
+        public void Invalidate()
+        {
+            lastMap = null;
+        }
+
         public void Update(double deltaTime)
         {
             tileAnimationTimer += deltaTime;

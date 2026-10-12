@@ -32,6 +32,10 @@ namespace JRPG.Managers
             var clamped = ClampToBounds(centerX, centerY, map);
             X = clamped.x;
             Y = clamped.y;
+
+            // A jump, not a move: don't interpolate from the old position
+            PreviousX = X;
+            PreviousY = Y;
         }
 
         public void Update(double centerX, double centerY, Map map)

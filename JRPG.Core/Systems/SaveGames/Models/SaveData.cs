@@ -18,5 +18,9 @@ namespace JRPG.Core.Systems.SaveGames.Models
         public string LocationName { get; set; }
         public DateTime SaveTimestamp { get; set; }
         public int PlayTimeSeconds { get; set; }
+
+        // World state: events already done (opened chests...) and swapped objects
+        public List<string> CompletedEvents { get; set; }
+        public Dictionary<string, int> ObjectSwaps { get; set; }
     }
 }

@@ -73,6 +73,10 @@
     <Compile Include="Controls\MapPropertiesWindow.xaml.cs">
       <DependentUpon>MapPropertiesWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Commands\SetObjectEventCommand.cs" />
+    <Compile Include="Controls\ObjectEventWindow.xaml.cs">
+      <DependentUpon>ObjectEventWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\NewObjectWindow.xaml.cs">
       <DependentUpon>NewObjectWindow.xaml</DependentUpon>
     </Compile>
@@ -107,6 +111,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Controls\MapPropertiesWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\ObjectEventWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

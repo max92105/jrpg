@@ -1,4 +1,5 @@
-﻿using System;
+﻿using JRPG.Core.Events.Models;
+using System;
 using System.Collections.Generic;
 
 namespace JRPG.Core.Maps.Models
@@ -13,6 +14,14 @@ namespace JRPG.Core.Maps.Models
         public Dictionary<string, string> Meta { get; set; } = new Dictionary<string, string>();
 
         public Dictionary<string, int> ZOverrides { get; set; } = new Dictionary<string, int>();
+
+        // Stable id of this placed object on its map (used to remember opened chests etc.)
+        public string Uid { get; set; }
+
+        // Optional event (chest, door, sign...); null for plain decoration
+        public MapEvent Event { get; set; }
+
+        public static string NewUid() => Guid.NewGuid().ToString("N").Substring(0, 8);
 
         /// <summary>
         /// Draw layer of one tile of this object. Used by both the game and the editor so

@@ -51,8 +51,8 @@
                              ToolTip="Left: paint, Right: erase, Alt+click: pick, Shift+click: fill" Checked="TileMode_Checked"/>
                 <RadioButton GroupName="EditorMode" Content="Place Objects" Padding="8,2"
                              ToolTip="Left: place, Right/Del: delete, Shift+drag: move, click an NPC: edit it" Checked="ObjectMode_Checked"/>
-                <RadioButton GroupName="EditorMode" Content="Triggers" Padding="8,2"
-                             ToolTip="Left: add/edit trigger, Right: remove it" Checked="TriggerMode_Checked"/>
+                <RadioButton GroupName="EditorMode" Content="Events" Padding="8,2"
+                             ToolTip="Click an object to give it an event (chest, door, sign...), or a tile for a tile trigger. Right-click removes it." Checked="TriggerMode_Checked"/>
                 <Separator/>
                 <RadioButton GroupName="EditorMode" Content="Tile Z" Padding="8,2"
                              ToolTip="Click a tile to change its layer" Checked="SelectionMode_Checked"/>

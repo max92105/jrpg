@@ -64,7 +64,14 @@ namespace JRPG.Core.Systems.Inventories
             }
         }
 
-        private Item CreateItemById(string id)
+        // Every item id CreateItemById knows (used by the map editor to pick items)
+        public static readonly string[] KnownItemIds =
+        {
+            "potion", "hipotion", "elixir", "antidote", "bomb", "bomball", "revivefeather",
+            "BronzeSword", "IronSword", "MagicStaff", "LeatherArmor", "ChainMail", "WizardRobe"
+        };
+
+        public Item CreateItemById(string id)
         {
             switch (id)
             {

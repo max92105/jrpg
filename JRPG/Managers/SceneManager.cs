@@ -1,6 +1,7 @@
 ﻿using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
 using JRPG.Core.Systems.SaveGames.Models;
+using System;
 using JRPG.Core.Utils;
 using JRPG.Enums;
 using JRPG.UI.Battle;
@@ -65,6 +66,15 @@ namespace JRPG.Managers
 
         // Ignores clicks/keys that would start a second transition while one is running
         private static bool isTransitioning;
+
+        /// <summary>Quick fade to black, runs the change (e.g. load another map), fades back.</summary>
+        public static async Task TransitionAsync(Action whileBlack)
+        {
+            await FadeHelper.FadeToBlackAsync(FadeRect, 0.25);
+            whileBlack();
+            await Task.Delay(80);
+            await FadeHelper.FadeFromBlackAsync(FadeRect, 0.25);
+        }
 
         public static async Task StartNewGameAsync()
         {
@@ -160,6 +170,7 @@ namespace JRPG.Managers
                 await FadeHelper.FadeToBlackAsync(FadeRect);
 
                 GameSystems.Reset();
+                GameSystems.World.LoadFrom(save.CompletedEvents, save.ObjectSwaps); // before maps load
 
                 CurrentGame?.Dispose();
                 CurrentGame = new GameManager(GameCanvas);

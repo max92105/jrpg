@@ -33,6 +33,13 @@
     <Geometry x:Key="Stat/Attack">M21,3 V6.5 L11.5,16 L8,12.5 L17.5,3 Z M6.5,11 L13,17.5 L12,18.5 L5.5,12 Z M8.6,15.9 L10,17.3 L5.4,21.9 L4,20.5 Z</Geometry>
     <Geometry x:Key="Stat/Defense">M12,2 L20,5 V11 C20,16 16.5,20 12,22 C7.5,20 4,16 4,11 V5 Z</Geometry>
 
+    <!-- ============ Battle ============ -->
+    <!-- Pointing hand, pointing right. Rotated to point down at battle targets. -->
+    <Geometry x:Key="Battle/Pointer">M2,8 H8 L10,6.5 H21.5 A1.5,1.5 0 0 1 21.5,9.5 H13 V10.5 H15.5 A1.25,1.25 0 0 1 15.5,13 H13 V14 H15 A1.25,1.25 0 0 1 15,16.5 H13 V17 A1.25,1.25 0 0 1 13,19.5 H8.5 L5.5,17.5 H2 Z</Geometry>
+
+    <!-- Battle/VictoryOrnament: decoration in the victory screen's top-left corner.
+         No placeholder on purpose: nothing shows until Assets/UI/Battle/VictoryOrnament.png exists. -->
+
     <!-- ============ Header ============ -->
     <Geometry x:Key="Header/PlayTime">F0 M12,2 A10,10 0 0 1 12,22 A10,10 0 0 1 12,2 Z M12,4 A8,8 0 0 1 12,20 A8,8 0 0 1 12,4 Z M11,6.5 H13 V11.4 L16.4,13.4 L15.4,15.1 L11,12.6 Z</Geometry>
     <Geometry x:Key="Header/Location">F0 M12,2 C8,2 5,5 5,9 C5,14 12,22 12,22 C12,22 19,14 19,9 C19,5 16,2 12,2 Z M12,6.5 A2.5,2.5 0 0 1 12,11.5 A2.5,2.5 0 0 1 12,6.5 Z</Geometry>

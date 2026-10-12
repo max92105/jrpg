@@ -1,144 +1,42 @@
-﻿<UserControl x:Class="JRPG.UI.Battle.Controls.CommandPanel"
+﻿<!--
+    Command menu, shown next to the acting character:
+
+        ◀  Sarxian  ▶            header: whose turn it is
+      ┌───────────────────┐
+      │ ☛ Attack           │     hovered row glows, with the pointing hand
+      │   Skills           │
+      │   Items            │
+      │   Defend           │
+      │   Run              │
+      └───────────────────┘
+        Strike one enemy…        description of the hovered row
+
+    Skills and Items open their list in place, with a Back row.
+-->
+<UserControl x:Class="JRPG.UI.Battle.Controls.CommandPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d"
-             d:DesignHeight="120" d:DesignWidth="500">
+             Width="360">
+    <StackPanel>
+        <!-- Header: whose turn it is -->
+        <Grid Height="32" Margin="30,0,30,6">
+            <Path Data="{StaticResource Shape.BattleHeader}" Stretch="Fill"
+                  Fill="{StaticResource Brush.Selection}" Stroke="{StaticResource Brush.Selection.Stroke}" StrokeThickness="1"/>
+            <TextBlock x:Name="HeaderText" Style="{StaticResource Text.Body}" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+        </Grid>
 
-    <UserControl.Resources>
-        <Style x:Key="CommandButtonStyle" TargetType="Button">
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="FontSize" Value="16"/>
-            <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Padding" Value="5,5"/>
-            <Setter Property="Margin" Value="5,5"/>
-            <Setter Property="Width" Value="100"/>
-            <Setter Property="Height" Value="50"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" CornerRadius="8">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#444"/>
-                    <Setter Property="Effect">
-                        <Setter.Value>
-                            <DropShadowEffect BlurRadius="10" ShadowDepth="0" Color="White" Opacity="0.5"/>
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <Style x:Key="ModernScrollBar" TargetType="ScrollBar">
-            <Setter Property="SnapsToDevicePixels" Value="true"/>
-            <Setter Property="OverridesDefaultStyle" Value="true"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="ScrollBar">
-                        <Grid Background="Transparent" Width="8">
-                            <Track x:Name="PART_Track" IsDirectionReversed="true">
-                                <Track.DecreaseRepeatButton>
-                                    <RepeatButton Style="{x:Null}" Height="0" IsTabStop="False" />
-                                </Track.DecreaseRepeatButton>
-
-                                <Track.Thumb>
-                                    <Thumb x:Name="Thumb" Width="8" Height="30">
-                                        <Thumb.Template>
-                                            <ControlTemplate TargetType="Thumb">
-                                                <Border CornerRadius="4"
-                                                Background="#88FFFFFF"
-                                                Margin="0">
-                                                    <Border.Effect>
-                                                        <DropShadowEffect BlurRadius="4"
-                                                                  Opacity="0.2"
-                                                                  ShadowDepth="0"/>
-                                                    </Border.Effect>
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Thumb.Template>
-                                    </Thumb>
-                                </Track.Thumb>
-
-                                <Track.IncreaseRepeatButton>
-                                    <RepeatButton Style="{x:Null}" Height="0" IsTabStop="False" />
-                                </Track.IncreaseRepeatButton>
-                            </Track>
-                        </Grid>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-    </UserControl.Resources>
-
-    <Grid Background="Transparent">
-        <Border BorderBrush="White" BorderThickness="2" CornerRadius="25">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="5" Background="Transparent">
-                <!-- Left Column: Main Commands -->
-                <StackPanel x:Name="ButtonStackPanel" Orientation="Vertical" Margin="10,0,10,0" Background="Transparent">
-                    <!-- Command Buttons -->
-                    <Button Tag="Attack" Click="Command_Click" Style="{StaticResource CommandButtonStyle}">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Image Name="img_Attack" Width="32" Height="32" />
-                            <TextBlock Text="Attack" Foreground="White" FontSize="14" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-
-                    <Button Tag="Defend" Click="Command_Click" Style="{StaticResource CommandButtonStyle}">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Image Name="img_Defend" Width="32" Height="32" />
-                            <TextBlock Text="Defend" Foreground="White" FontSize="14" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-
-                    <Button Tag="Skill" Click="Command_Click" Style="{StaticResource CommandButtonStyle}">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Image Name="img_Skill" Width="32" Height="32" />
-                            <TextBlock Text="Skill" Foreground="White" FontSize="14" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-
-                    <Button Tag="Item" Click="Command_Click" Style="{StaticResource CommandButtonStyle}">
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Image Name="img_Item" Width="32" Height="32" />
-                            <TextBlock Text="Item" Foreground="White" FontSize="14" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-
-                    <Button Tag="Run" Click="Command_Click" Style="{StaticResource CommandButtonStyle}" >
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Image Name="img_Run" Width="32" Height="32" />
-                            <TextBlock Text="Run" Foreground="White" FontSize="14" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-
-                <!-- Right Column: Dynamic Skill Panel -->
-                <ScrollViewer VerticalScrollBarVisibility="Auto"
-              MaxHeight="{Binding ElementName=ButtonStackPanel, Path=ActualHeight}"
-              Background="Transparent">
-
-                    <ScrollViewer.Resources>
-                        <Style TargetType="ScrollBar" BasedOn="{StaticResource ModernScrollBar}"/>
-                    </ScrollViewer.Resources>
-
-                    <StackPanel x:Name="OptionListPanel"
-                Orientation="Vertical"
-                Visibility="Collapsed"
-                Background="Transparent"
-                Width="120"
-                Panel.ZIndex="100"/>
-                </ScrollViewer>
-            </StackPanel>
+        <!-- Rows: a thin double frame, like the reference -->
+        <Border BorderBrush="{StaticResource Brush.Stroke.Strong}" BorderThickness="1" Padding="3" Background="#99000000">
+            <Border BorderBrush="{StaticResource Brush.Stroke}" BorderThickness="1">
+                <!-- Filled with buttons by ShowCommands / ShowSkills / ShowItems -->
+                <StackPanel x:Name="RowsPanel"/>
+            </Border>
         </Border>
-    </Grid>
+
+        <!-- Description of the hovered row, or a short instruction -->
+        <Border x:Name="DescriptionBox" Margin="30,6,0,0" Padding="16,10" Visibility="Collapsed"
+                Background="#E60C0D11" BorderBrush="{StaticResource Brush.HighlightLine}" BorderThickness="0,0,0,1">
+            <TextBlock x:Name="DescriptionText" Style="{StaticResource Text.Body}" FontSize="16" TextWrapping="Wrap"/>
+        </Border>
+    </StackPanel>
 </UserControl>

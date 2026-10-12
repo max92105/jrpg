@@ -1,0 +1,32 @@
+﻿<!--
+    A portrait in a diamond. Used by the turn order (enemies get a red lower half)
+    and next to each party member. Drawn on a 48x48 grid; the Viewbox scales it to any size.
+-->
+<UserControl x:Class="JRPG.UI.Battle.Controls.TurnPortrait"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="64" Height="64">
+    <Viewbox>
+        <Grid Width="48" Height="48">
+            <!-- Backdrop -->
+            <Path Data="M24,2 L46,24 L24,46 L2,24 Z" Fill="#E6181A26"/>
+
+            <!-- Enemy: red lower half -->
+            <Path x:Name="EnemyTint" Data="M2,24 L46,24 L24,46 Z" Fill="#CC8A1C24" Visibility="Collapsed"/>
+
+            <!-- Portrait, cut to the diamond -->
+            <Image x:Name="PortraitImage" Width="40" Height="40" Stretch="UniformToFill">
+                <Image.Clip>
+                    <PathGeometry Figures="M20,0 L40,20 L20,40 L0,20 Z"/>
+                </Image.Clip>
+            </Image>
+
+            <!-- Frame -->
+            <Path x:Name="Frame" Data="M24,2 L46,24 L24,46 L2,24 Z" Stroke="{StaticResource Brush.Stroke.Strong}" StrokeThickness="1"/>
+
+            <!-- Current: a second, brighter frame around the first -->
+            <Path x:Name="CurrentFrame" Data="M24,0.5 L47.5,24 L24,47.5 L0.5,24 Z"
+                  Stroke="{StaticResource Brush.Selection.Stroke}" StrokeThickness="1" Visibility="Collapsed"/>
+        </Grid>
+    </Viewbox>
+</UserControl>

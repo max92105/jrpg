@@ -64,16 +64,43 @@ namespace JRPG.Managers
         // Short pause on black between scenes
         private const int BlackPauseMs = 150;
 
-        // Ignores clicks/keys that would start a second transition while one is running
+        // Only one scene change at a time (warp, battle start, new game, load...): two fades on the
+        // same black screen fight each other, and the second change can land in the middle of the first
         private static bool isTransitioning;
 
-        /// <summary>Quick fade to black, runs the change (e.g. load another map), fades back.</summary>
-        public static async Task TransitionAsync(Action whileBlack)
+        /// <summary>True while the screen is fading for a scene change. Nothing else should start one.</summary>
+        public static bool IsTransitioning => isTransitioning;
+
+        /// <summary>
+        /// Quick fade to black, runs the change (e.g. switch map), fades back.
+        /// Returns false, without doing anything, if another scene change is already running.
+        /// The screen always comes back from black, even if the change fails.
+        /// </summary>
+        public static async Task<bool> TransitionAsync(Action whileBlack)
         {
-            await FadeHelper.FadeToBlackAsync(FadeRect, 0.25);
-            whileBlack();
-            await Task.Delay(80);
-            await FadeHelper.FadeFromBlackAsync(FadeRect, 0.25);
+            if (isTransitioning)
+                return false;
+            isTransitioning = true;
+
+            try
+            {
+                await FadeHelper.FadeToBlackAsync(FadeRect, 0.25);
+                try
+                {
+                    whileBlack();
+                }
+                finally
+                {
+                    await Task.Delay(80);
+                    await FadeHelper.FadeFromBlackAsync(FadeRect, 0.25);
+                }
+            }
+            finally
+            {
+                isTransitioning = false;
+            }
+
+            return true;
         }
 
         public static async Task StartNewGameAsync()
@@ -224,13 +251,7 @@ namespace JRPG.Managers
             {
                 await FadeHelper.FadeToBlackAsync(FadeRect);
 
-                GameMenuControl?.Close();
-                GameStateManager.SetState(SceneType.Menu);
-
-                GameCanvas.Visibility = Visibility.Collapsed;
-                StartScreen.Visibility = Visibility.Visible;
-                StartScreen.Effect = null;
-                StartMenuContent.Visibility = Visibility.Visible;
+                ShowTitleScreen();
 
                 await Task.Delay(BlackPauseMs);
                 await FadeHelper.FadeFromBlackAsync(FadeRect);
@@ -241,41 +262,71 @@ namespace JRPG.Managers
             }
         }
 
-        public static async Task StartBattleAsync(List<Enemy> enemies)
+        /// <summary>Swaps to the title screen. Call while the screen is black.</summary>
+        private static void ShowTitleScreen()
         {
-            GameFlowManager.StartBattle();
-            await FadeHelper.FadeToBlackAsync(FadeRect);
+            GameMenuControl?.Close();
+            GameStateManager.SetState(SceneType.Menu);
 
-            GameStateManager.SetState(SceneType.Battle);
-
-            var battleActors = new List<BattleActor>();
-            battleActors.AddRange(enemies);
-            battleActors.AddRange(GameSystems.Party.ActivePartyOrder);
-
-            var battleUI = new BattleUI(battleActors);
-            battleUI.SetBackground("Forest.png");
-            battleUI.OnBattleEnd += async () =>
-            {
-                await EndBattleAsync(RootGrid, FadeRect);
-            };
-
-            RootGrid.Children.Add(battleUI);
-            await FadeHelper.FadeFromBlackAsync(FadeRect);
+            GameCanvas.Visibility = Visibility.Collapsed;
+            StartScreen.Visibility = Visibility.Visible;
+            StartScreen.Effect = null;
+            StartMenuContent.Visibility = Visibility.Visible;
         }
 
-        public static async Task EndBattleAsync(Grid rootGrid, Rectangle fadeRect)
+        /// <summary>Starts a battle. Does nothing if another scene change (e.g. a warp) is running.</summary>
+        public static async Task StartBattleAsync(List<Enemy> enemies)
         {
-            await FadeHelper.FadeToBlackAsync(fadeRect);
+            if (isTransitioning)
+                return;
+            isTransitioning = true;
 
-            GameStateManager.SetState(SceneType.Exploration);
+            try
+            {
+                GameFlowManager.StartBattle();
+                await FadeHelper.FadeToBlackAsync(FadeRect);
 
-            var battleUI = rootGrid.Children.OfType<BattleUI>().FirstOrDefault();
+                GameStateManager.SetState(SceneType.Battle);
+
+                var battleActors = new List<BattleActor>();
+                battleActors.AddRange(enemies);
+                battleActors.AddRange(GameSystems.Party.ActivePartyOrder);
+
+                var battleUI = new BattleUI(battleActors);
+                battleUI.SetBackground("Forest.png");
+                battleUI.OnBattleEnd += async exit => await EndBattleAsync(exit);
+
+                RootGrid.Children.Add(battleUI);
+                await FadeHelper.FadeFromBlackAsync(FadeRect);
+            }
+            finally
+            {
+                isTransitioning = false;
+            }
+        }
+
+        /// <summary>
+        /// Removes the battle screen and goes where the battle says:
+        /// back to the map (victory, escape), or the title screen (defeat), with the Load list open if asked.
+        /// </summary>
+        public static async Task EndBattleAsync(BattleExit exit)
+        {
+            await FadeHelper.FadeToBlackAsync(FadeRect);
+
+            var battleUI = RootGrid.Children.OfType<BattleUI>().FirstOrDefault();
             if (battleUI != null)
-                rootGrid.Children.Remove(battleUI);
+                RootGrid.Children.Remove(battleUI);
 
-            GameFlowManager.EndBattle();
+            if (exit == BattleExit.BackToMap)
+                GameFlowManager.EndBattle();
+            else
+                ShowTitleScreen();
 
-            await FadeHelper.FadeFromBlackAsync(fadeRect);
+            await Task.Delay(BlackPauseMs);
+            await FadeHelper.FadeFromBlackAsync(FadeRect);
+
+            if (exit == BattleExit.LoadSave)
+                await ShowLoadScreenAsync();
         }
     }
 }

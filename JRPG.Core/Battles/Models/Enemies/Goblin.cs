@@ -18,6 +18,8 @@
 
             BaseAttack = 20;
             BaseDefense = 2;
+
+            ExpReward = 40;
         }
     }
 }

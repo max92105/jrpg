@@ -89,6 +89,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Enums\BattleExit.cs" />
     <Compile Include="Enums\SceneType.cs" />
     <Compile Include="Managers\CameraManager.cs" />
     <Compile Include="Managers\GameFlowManager.cs" />
@@ -115,12 +116,30 @@
       <DependentUpon>DialogueBox.xaml</DependentUpon>
     </Compile>
     <Compile Include="Managers\DialogManager.cs" />
-    <Compile Include="UI\Battle\Controls\EnemyPanel.xaml.cs">
-      <DependentUpon>EnemyPanel.xaml</DependentUpon>
+    <Compile Include="UI\Battle\Controls\BattleBanner.xaml.cs">
+      <DependentUpon>BattleBanner.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Battle\Controls\DefeatScreen.xaml.cs">
+      <DependentUpon>DefeatScreen.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Battle\Controls\EnemyTag.xaml.cs">
+      <DependentUpon>EnemyTag.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Battle\Controls\ExpGainRow.xaml.cs">
+      <DependentUpon>ExpGainRow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Battle\Controls\VictoryScreen.xaml.cs">
+      <DependentUpon>VictoryScreen.xaml</DependentUpon>
     </Compile>
     <Compile Include="Enums\Direction.cs" />
     <Compile Include="UI\Battle\Controls\FloatingText.xaml.cs">
       <DependentUpon>FloatingText.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Battle\Controls\TurnOrderBar.xaml.cs">
+      <DependentUpon>TurnOrderBar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Battle\Controls\TurnPortrait.xaml.cs">
+      <DependentUpon>TurnPortrait.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\Battle\BattleUI.xaml.cs">
       <DependentUpon>BattleUI.xaml</DependentUpon>
@@ -203,13 +222,41 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\Battle\Controls\EnemyPanel.xaml">
+    <Page Include="UI\Battle\Controls\BattleBanner.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Battle\Controls\DefeatScreen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Battle\Controls\ExpGainRow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Battle\Controls\VictoryScreen.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Battle\Controls\EnemyTag.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\Battle\Controls\FloatingText.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Battle\Controls\TurnOrderBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Battle\Controls\TurnPortrait.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\Styles\BattleStyles.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

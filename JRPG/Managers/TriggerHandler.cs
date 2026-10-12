@@ -9,13 +9,13 @@ namespace JRPG.Systems
 {
     public class TriggerHandler
     {
-        private readonly Action<string, double, double> onWarp;
+        private readonly Action<string, int, int> onWarp; // map file, target tile X, target tile Y
         private readonly Action<List<string>, string, string, Action> onDialogue;
         private readonly Action<string> onItemFound;
         private readonly Action onBattleStart;
 
         public TriggerHandler(
-            Action<string, double, double> onWarp,
+            Action<string, int, int> onWarp,
             Action<List<string>, string, string, Action> onDialogue,
             Action<string> onItemFound,
             Action onBattleStart)

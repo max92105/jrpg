@@ -53,6 +53,33 @@ namespace JRPG.Core.Battles
             State = CurrentTurn.IsPlayer ? BattleState.PlayerTurn : BattleState.EnemyTurn;
         }
 
+        /// <summary>EXP from every enemy in this battle.</summary>
+        public int TotalExpReward => battleActors.OfType<Enemy>().Sum(enemy => enemy.ExpReward);
+
+        /// <summary>Splits the battle's EXP evenly between the party members who fought, and gives it to them.</summary>
+        public List<ExpGain> ShareExperience()
+        {
+            var party = battleActors.OfType<Character>().ToList();
+            var gains = new List<ExpGain>();
+
+            if (party.Count == 0)
+                return gains;
+
+            int share = TotalExpReward / party.Count;
+
+            foreach (var member in party)
+            {
+                gains.Add(new ExpGain
+                {
+                    Character = member,
+                    Amount = share,
+                    Steps = member.GainEXPByLevel(share)
+                });
+            }
+
+            return gains;
+        }
+
         public bool IsBattleOver()
         {
             if (!battleActors.Any(actor => actor is Character && actor.HP > 0))

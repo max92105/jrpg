@@ -1,177 +1,67 @@
-﻿using JRPG.Utils;
+﻿using JRPG.Core.Battles.Models;
 using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
-using System.Windows.Media.Imaging;
 
 namespace JRPG.UI.Battle.Controls
 {
-    /// <summary>
-    /// Interaction logic for CharacterPanel.xaml
-    /// </summary>
+    /// <summary>A party member's name, HP and MP during battle.</summary>
     public partial class CharacterPanel : UserControl
     {
-        private int hp, maxHp, mp, maxMp;
+        private const double ActiveSlide = -36;
+        private const double KnockedOutOpacity = 0.55;
+        private static readonly Duration BarDuration = TimeSpan.FromMilliseconds(300);
+        private static readonly Duration SlideDuration = TimeSpan.FromMilliseconds(250);
+
         private bool isActive;
 
         public CharacterPanel()
         {
             InitializeComponent();
-
-            isActive = false;
         }
 
-        public bool IsActive
+        /// <param name="isActive">This member is acting now: the panel slides out and its diamond lights up.</param>
+        public void Show(Character character, bool isActive)
         {
-            set
+            NameText.Text = character.Name;
+            Portrait.Show(character);
+
+            ShowStat(HPBar, HPText, MaxHPText, character.HP, character.MaxHP);
+            ShowStat(MPBar, MPText, MaxMPText, character.MP, character.MaxMP);
+
+            // Knocked out: red 0 and the whole panel faded
+            HPText.Foreground = (Brush)FindResource(character.IsAlive ? "Brush.Text.Primary" : "Brush.Danger");
+            Opacity = character.IsAlive ? 1.0 : KnockedOutOpacity;
+
+            SetActive(isActive);
+        }
+
+        private static void ShowStat(ProgressBar bar, TextBlock valueText, TextBlock maxText, int value, int max)
+        {
+            valueText.Text = value.ToString();
+            maxText.Text = $"/{max}";
+
+            bar.Maximum = Math.Max(1, max);
+            bar.BeginAnimation(ProgressBar.ValueProperty, new DoubleAnimation(Math.Min(value, max), BarDuration)
             {
-                if (isActive == value)
-                    return;
-
-                isActive = value;
-
-                var targetOffset = value ? -100 : 0;
-                var duration = TimeSpan.FromMilliseconds(300);
-
-                var slide = new DoubleAnimation
-                {
-                    To = targetOffset,
-                    Duration = duration,
-                    EasingFunction = new QuadraticEase
-                    {
-                        EasingMode = value ? EasingMode.EaseOut : EasingMode.EaseIn
-                    }
-                };
-
-                PanelTransform.BeginAnimation(TranslateTransform.XProperty, slide);
-            }
+                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+            });
         }
 
-        public string CharacterName
+        private void SetActive(bool active)
         {
-            get => NameText.Text;
-            set => NameText.Text = value;
-        }
+            Portrait.IsCurrent = active;
 
-        public void SetPortrait(string imagePath)
-        {
-            if (!string.IsNullOrEmpty(imagePath))
-            {
-                PortraitImage.Source = ImageLoader.Load(imagePath, 256);
-                PortraitImage.Visibility = System.Windows.Visibility.Visible;
-            }
-            else
-            {
-                PortraitImage.Visibility = System.Windows.Visibility.Collapsed;
-            }
-        }
-
-        public int CurrentHP
-        {
-            get => hp;
-            set
-            {
-                var clamped = Math.Max(0, value);
-                if (clamped != hp)
-                {
-                    hp = clamped;
-                    UpdateHP();
-                }
-            }
-        }
-
-        public int MaxHP
-        {
-            get => maxHp;
-            set
-            {
-                var clamped = Math.Max(1, value);
-                if (clamped != maxHp)
-                {
-                    maxHp = clamped;
-                    UpdateHP();
-                }
-            }
-        }
-
-        public int CurrentMP
-        {
-            get => mp;
-            set
-            {
-                var clamped = Math.Max(0, value);
-                if (clamped != mp)
-                {
-                    mp = clamped;
-                    UpdateMP();
-                }
-            }
-        }
-
-        public int MaxMP
-        {
-            get => maxMp;
-            set
-            {
-                var clamped = Math.Max(1, value);
-                if (clamped != maxMp)
-                {
-                    maxMp = clamped;
-                    UpdateMP();
-                }
-            }
-        }
-
-        private void UpdateHP()
-        {
-            HPBar.Maximum = maxHp;
-
-            double currentValue = HPBar.Value;
-            double targetValue = Math.Min(hp, maxHp);
-
-            // Prevent animation if value is unchanged
-            if (Math.Abs(currentValue - targetValue) < 0.1)
+            if (isActive == active)
                 return;
 
-            HPBar.BeginAnimation(ProgressBar.ValueProperty, null); // Cancel ongoing animation
-
-            var animation = new DoubleAnimation
+            isActive = active;
+            PanelSlide.BeginAnimation(TranslateTransform.XProperty, new DoubleAnimation(active ? ActiveSlide : 0, SlideDuration)
             {
-                From = currentValue,
-                To = targetValue,
-                Duration = TimeSpan.FromMilliseconds(300),
                 EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-            };
-
-            HPBar.BeginAnimation(ProgressBar.ValueProperty, animation);
-
-            HPText.Text = $"{hp} / {maxHp}";
-        }
-
-        private void UpdateMP()
-        {
-            MPBar.Maximum = maxMp;
-
-            double currentValue = MPBar.Value;
-            double targetValue = Math.Min(mp, maxMp);
-
-            if (Math.Abs(currentValue - targetValue) < 0.1)
-                return;
-
-            MPBar.BeginAnimation(ProgressBar.ValueProperty, null);
-
-            var animation = new DoubleAnimation
-            {
-                From = currentValue,
-                To = targetValue,
-                Duration = TimeSpan.FromMilliseconds(300),
-                EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-            };
-
-            MPBar.BeginAnimation(ProgressBar.ValueProperty, animation);
-
-            MPText.Text = $"{mp} / {maxMp}";
+            });
         }
     }
 }

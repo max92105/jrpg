@@ -2413,7 +2413,7 @@ namespace MapEditor
         private void HandleTriggerClick(int tileX, int tileY)
         {
             var existingTile = map.GetTileAt(tileX, tileY);
-            var triggerEditWindow = new TriggerEditWindow(existingTile?.Trigger) { Owner = this };
+            var triggerEditWindow = new TriggerEditWindow(existingTile?.Trigger, currentFilePath) { Owner = this };
             if (triggerEditWindow.ShowDialog() == true)
             {
                 ExecuteEdit(new SetTriggerCommand(map, tileX, tileY, triggerEditWindow.Result));

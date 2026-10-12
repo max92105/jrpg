@@ -19,13 +19,38 @@ namespace JRPG
         public int Width => CurrentMap.Width;
         public int Height => CurrentMap.Height;
 
-        public void LoadFromFile(string file)
+        public void LoadFromFile(string file) => SetMap(file, ReadMap(file));
+
+        /// <summary>
+        /// Reads and checks a map without switching to it. Throws if the file is missing or broken,
+        /// so a bad warp never leaves the game half on one map, half on another.
+        /// </summary>
+        public static Map ReadMap(string file)
         {
-            CurrentMap = MapSerializer.Load(AssetPathResolver.GetPath(Path.Combine("Maps//", file)));
+            if (string.IsNullOrWhiteSpace(file))
+                throw new ArgumentException("No map file given.");
 
+            string path = AssetPathResolver.GetPath(Path.Combine("Maps", file));
+            if (!File.Exists(path))
+                throw new FileNotFoundException($"Map \"{file}\" not found.", path);
+
+            var map = MapSerializer.Load(path);
+            if (map == null || map.Width <= 0 || map.Height <= 0)
+                throw new InvalidDataException($"Map \"{file}\" is empty or has no size.");
+
+            if (map.Objects == null)
+                map.Objects = new List<PlacedObject>();
+
+            return map;
+        }
+
+        /// <summary>Switches to a map that was already read with ReadMap.</summary>
+        public void SetMap(string file, Map map)
+        {
             // Opened chests etc. stay as the player left them
-            GameSystems.World.ApplyTo(CurrentMap, file);
+            GameSystems.World.ApplyTo(map, file);
 
+            CurrentMap = map;
             GameSystems.System.UpdateCurrentMap(file);
         }
 

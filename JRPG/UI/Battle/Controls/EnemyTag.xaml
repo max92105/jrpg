@@ -1,0 +1,11 @@
+﻿<!-- Under each enemy:   Goblin
+                         ━━━━━━━━━━━  (HP)                -->
+<UserControl x:Class="JRPG.UI.Battle.Controls.EnemyTag"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="160" IsHitTestVisible="False">
+    <StackPanel Effect="{StaticResource Effect.TextOutline}">
+        <TextBlock x:Name="NameText" Style="{StaticResource Text.Body}" FontSize="16" FontWeight="SemiBold" Margin="0,0,0,3"/>
+        <ProgressBar x:Name="HPBar" Style="{StaticResource BattleBarStyle}" Height="4" Foreground="{StaticResource Brush.Bar.EnemyHP}"/>
+    </StackPanel>
+</UserControl>

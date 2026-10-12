@@ -15,9 +15,13 @@ namespace MapEditor
     {
         public Trigger Result { get; private set; }
 
-        public TriggerEditWindow(Trigger existing = null)
+        // The map being edited, to catch warps that point back at it by mistake
+        private readonly string currentMapFile;
+
+        public TriggerEditWindow(Trigger existing = null, string currentMapFile = null)
         {
             InitializeComponent();
+            this.currentMapFile = currentMapFile;
 
             if (existing is TriggerWarp warp)
             {
@@ -80,6 +84,18 @@ namespace MapEditor
                         if (string.IsNullOrWhiteSpace(WarpMapBox.Text)) throw new Exception("Target map required");
                         if (!int.TryParse(WarpXBox.Text, out int x)) throw new Exception("Invalid X");
                         if (!int.TryParse(WarpYBox.Text, out int y)) throw new Exception("Invalid Y");
+
+                        string targetMap = WarpMapBox.Text.Trim();
+                        if (!File.Exists(AssetPathResolver.GetPath(MapConstant.MapFolderPath, targetMap)))
+                            throw new Exception($"Map \"{targetMap}\" doesn't exist in the Maps folder");
+
+                        // Warping inside the same map is allowed (teleport), but it's usually a wrong pick
+                        bool sameMap = currentMapFile != null &&
+                                       string.Equals(Path.GetFileName(currentMapFile), targetMap, StringComparison.OrdinalIgnoreCase);
+                        if (sameMap && MessageBox.Show(
+                                $"This warp leads to the map it is on ({targetMap}), so the player only teleports inside it.\n\nIs that intended?",
+                                "Warp to the same map", MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes)
+                            return;
 
                         Result = new TriggerWarp
                         {

@@ -1,124 +1,170 @@
-﻿// CommandPanel.xaml.cs
+﻿using JRPG.Core.Battles.Enums;
+using JRPG.Core.Battles.Models;
+using JRPG.Core.Systems.Inventories.Models;
 using JRPG.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using JRPG.Core.Battles.Models;
-using JRPG.Core.Systems.Inventories.Models;
-using JRPG.Core.Utils;
 
 namespace JRPG.UI.Battle.Controls
 {
+    /// <summary>
+    /// The battle command menu. It only shows choices and raises events;
+    /// BattleUI decides what each choice does.
+    /// </summary>
     public partial class CommandPanel : UserControl
     {
+        private const double UnavailableOpacity = 0.4;
+
+        /// <summary>"Attack", "Skill", "Item", "Defend" or "Run".</summary>
         public event Action<string> OnCommandSelected;
         public event Action<Skill> OnSkillSelected;
         public event Action<InventoryItem> OnItemSelected;
 
+        private string actorName;
+
         public CommandPanel()
         {
             InitializeComponent();
-            InitializeCommandPanelIcons();
         }
 
-        private void InitializeCommandPanelIcons()
+        // ============ Lists ============
+
+        /// <summary>The main list, for whoever is acting.</summary>
+        public void ShowCommands(string actingName)
         {
-            SetButtonIcon(img_Attack, "Attack.png");
-            SetButtonIcon(img_Defend, "Defend.png");
-            SetButtonIcon(img_Skill, "Skill.png");
-            SetButtonIcon(img_Item, "Item.png");
-            SetButtonIcon(img_Run, "Run.png");
+            actorName = actingName;
+            ShowCommands();
         }
 
-        private void SetButtonIcon(Image icon, string file)
+        /// <summary>Back to the main list (e.g. from Skills, or on right-click).</summary>
+        public void ShowCommands()
         {
-            icon.Source = ImageLoader.LoadIcon(file);
+            HeaderText.Text = actorName;
+            ClearRows();
+
+            AddRow("Attack", "Attack.png", null, "Strike one enemy with your weapon.", () => OnCommandSelected?.Invoke("Attack"));
+            AddRow("Skills", "Skill.png", null, "Use a skill. Skills cost MP.", () => OnCommandSelected?.Invoke("Skill"));
+            AddRow("Items", "Item.png", null, "Use an item from the bag.", () => OnCommandSelected?.Invoke("Item"));
+            AddRow("Defend", "Defend.png", null, "Brace yourself and end your turn.", () => OnCommandSelected?.Invoke("Defend"));
+            AddRow("Run", "Run.png", null, "Escape from the battle.", () => OnCommandSelected?.Invoke("Run"));
         }
 
-        public void ShowSkills(IEnumerable<Skill> skills)
+        public void ShowSkills(BattleActor actor)
         {
-            OptionListPanel.Children.Clear();
+            ClearRows();
 
-            foreach (var skill in skills)
+            foreach (var skill in actor.Skills)
             {
-                var skillButton = new Button
-                {
-                    Content = new TextBlock
-                    {
-                        Text = skill.Name,
-                        Foreground = Brushes.White,
-                        FontSize = 14,
-                        TextAlignment = TextAlignment.Center
-                    },
-                    Style = (Style)FindResource("CommandButtonStyle"),
-                    Tag = skill
-                };
+                string notEnoughMp = actor.MP < skill.MPCost ? "Not enough MP." : null;
 
-                skillButton.Click += (s, e) =>
-                {
-                    OnSkillSelected?.Invoke(skill);
-                    OptionListPanel.Visibility = Visibility.Collapsed;
-                };
-
-                OptionListPanel.Children.Add(skillButton);
+                AddRow(skill.Name, skill.IconFile, $"{skill.MPCost} MP", DescribeSkill(skill),
+                    () => OnSkillSelected?.Invoke(skill), notEnoughMp);
             }
+
+            AddBackRow();
         }
 
-        public void ShowItems(IEnumerable<InventoryItem> inventoryItems)
+        public void ShowItems(IEnumerable<InventoryItem> inventory)
         {
-            OptionListPanel.Children.Clear();
+            ClearRows();
 
-            foreach (var inventoryItem in inventoryItems)
+            foreach (var entry in inventory.Where(e => e.Item is Consumable && e.Quantity > 0))
             {
-                var item = inventoryItem?.Item as Consumable;
-                if (item == null)
-                {
-                    return;
-                }
-
-                var consumable = item;
-
-                var itemButton = new Button
-                {
-                    Content = new TextBlock
-                    {
-                        Text = $"{consumable.Name} (x{inventoryItem.Quantity})",
-                        Foreground = Brushes.White,
-                        FontSize = 14,
-                        TextAlignment = TextAlignment.Center
-                    },
-                    Style = (Style)FindResource("CommandButtonStyle"),
-                    Tag = item
-                };
-
-                itemButton.Click += (s, e) =>
-                {
-                    OnItemSelected?.Invoke(inventoryItem);
-                    OptionListPanel.Visibility = Visibility.Collapsed;
-                };
-
-                OptionListPanel.Children.Add(itemButton);
+                AddRow(entry.Item.Name, entry.Item.IconFile, $"x{entry.Quantity}", entry.Item.Description,
+                    () => OnItemSelected?.Invoke(entry));
             }
+
+            AddBackRow();
         }
 
-        private void Command_Click(object sender, RoutedEventArgs e)
+        /// <summary>Shows a line of help under the list, e.g. "Choose a target". Null hides it.</summary>
+        public void ShowMessage(string text)
         {
-            if (sender is Button btn && btn.Tag is string command)
+            DescriptionText.Text = text;
+            DescriptionBox.Visibility = string.IsNullOrEmpty(text) ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        // ============ Rows ============
+
+        private void ClearRows()
+        {
+            RowsPanel.Children.Clear();
+            ShowMessage(null);
+        }
+
+        private void AddBackRow()
+        {
+            AddRow("Back", null, null, "Return to the commands.", ShowCommands);
+        }
+
+        /// <summary>
+        /// Adds one row:  [icon] Text ........ value
+        /// </summary>
+        /// <param name="unavailableReason">If set, the row is greyed out and clicking it explains why instead.</param>
+        private void AddRow(string text, string iconFile, string value, string description, Action onClick, string unavailableReason = null)
+        {
+            var content = new DockPanel();
+
+            var valueText = new TextBlock { Text = value, Style = (Style)FindResource("Text.Number"), FontSize = 16 };
+            DockPanel.SetDock(valueText, Dock.Right);
+            content.Children.Add(valueText);
+
+            var icon = new Image { Source = ImageLoader.LoadIcon(iconFile), Width = 24, Height = 24, Margin = new Thickness(0, 0, 12, 0) };
+            DockPanel.SetDock(icon, Dock.Left);
+            content.Children.Add(icon);
+
+            content.Children.Add(new TextBlock { Text = text, Style = (Style)FindResource("Text.Body"), FontSize = 20 });
+
+            var row = new Button
             {
-                if (command == "Skill" || command == "Item")
-                {
-                    // Raise base event but let parent handle showing skills
-                    OnCommandSelected?.Invoke(command);
-                }
+                Content = content,
+                Style = (Style)FindResource("BattleCommandStyle"),
+                Opacity = unavailableReason == null ? 1.0 : UnavailableOpacity
+            };
+
+            row.MouseEnter += (s, e) => ShowMessage(description);
+            row.Click += (s, e) =>
+            {
+                if (unavailableReason != null)
+                    ShowMessage(unavailableReason);
                 else
-                {
-                    // Always hide skill list on other command selections
-                    OptionListPanel.Visibility = Visibility.Collapsed;
-                    OnCommandSelected?.Invoke(command);
-                }
+                    onClick();
+            };
+
+            RowsPanel.Children.Add(row);
+        }
+
+        // ============ Descriptions ============
+
+        /// <summary>Skills have no description yet, so one is built from what they do, e.g. "Deals 15 damage to one enemy."</summary>
+        private static string DescribeSkill(Skill skill)
+        {
+            string effect;
+            switch (skill.EffectType)
+            {
+                case EffectType.Damage: effect = $"Deals {skill.EffectValue} damage"; break;
+                case EffectType.ManaRecovery: effect = $"Restores {skill.EffectValue} MP"; break;
+                default: effect = $"Restores {skill.EffectValue} HP"; break;
+            }
+
+            return $"{effect} to {DescribeTarget(skill.TargetType)}.";
+        }
+
+        private static string DescribeTarget(TargetType target)
+        {
+            switch (target)
+            {
+                case TargetType.Enemy: return "one enemy";
+                case TargetType.AllEnemies: return "all enemies";
+                case TargetType.Ally: return "one ally";
+                case TargetType.Self: return "yourself";
+                case TargetType.AllAllies: return "the whole party";
+                case TargetType.SingleFaintedAlly: return "a fallen ally";
+                case TargetType.AllFaintedAllies: return "all fallen allies";
+                default: return "the target";
             }
         }
     }

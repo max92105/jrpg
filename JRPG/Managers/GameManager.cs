@@ -10,6 +10,7 @@ using JRPG.Managers;
 using JRPG.Systems;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -42,6 +43,12 @@ namespace JRPG
         private static readonly Random rng = new Random();
         private const int EncounterOneIn = 500; // chance per update while walking; raise for fewer battles
 
+        // Warps
+        private bool isWarping;                     // a map change is running: the world is frozen
+        private double encounterGrace;              // seconds of walking left before battles can start again
+        private const double EncounterGraceAfterWarp = 1.0;
+        private const int ArrivalSearchRadius = 8;  // how far to look for a free tile if a warp's target is blocked
+
         // Object events (chests, doors, signs...)
         private const double InteractReach = 0.6;   // how far in front of the player we look, in tiles
         private bool eventRunning;
@@ -70,14 +77,8 @@ namespace JRPG
             camera = new CameraManager(canvas.Width / MapConstant.TileSize, canvas.Height / MapConstant.TileSize);
             mapRenderer = new MapRenderer(canvas);
             triggerHandler = new TriggerHandler(
-                onWarp: (mapId, x, y) =>
-                {
-                    currentMapFile = mapId;
-                    mapManager.LoadFromFile(mapId);
-                    Player.SetPosition(x, y);
-                    GameSystems.System.UpdateCurrentMap(mapId);
-                    GameSystems.System.UpdatePlayerPosition(x, y);
-                },
+                // Warp tiles use the same warp as doors and events: fade, safe load, safe arrival
+                onWarp: (mapId, tileX, tileY) => _ = WarpAsync(mapId, tileX, tileY),
                 onDialogue: (lines, speaker, portrait, resumeCallback) =>
                 {
                     ((MainWindow)Application.Current.MainWindow).ShowDialogue(
@@ -134,14 +135,10 @@ namespace JRPG
             keysDown.Clear();
         }
 
+        /// <summary>New game / loaded save: puts the player at an exact position on a map, no fade.</summary>
         public void LoadMapAndPositionPlayer(string mapId, double x, double y)
         {
-            currentMapFile = mapId;
-            mapManager.LoadFromFile(mapId);
-            Player.SetPosition(x, y);
-            camera.SnapTo(x, y, mapManager.CurrentMap);
-            GameSystems.System.UpdateCurrentMap(mapId);
-            GameSystems.System.UpdatePlayerPosition(x, y);
+            EnterMap(mapId, MapManager.ReadMap(mapId), x, y);
         }
 
         private void LoadPlayerSpriteSheet()
@@ -177,7 +174,8 @@ namespace JRPG
             // (Measuring time here gave ~0 on catch-up steps and a huge jump after closing the menu.)
             double deltaTime = GameLoopManager.TargetDelta;
 
-            if (!isPaused)
+            // Frozen during dialogues, events and warps
+            if (!isPaused && !isWarping)
             {
                 bool left = Managers.Input.InputManager.IsKeyDown(Key.Left);
                 bool right = Managers.Input.InputManager.IsKeyDown(Key.Right);
@@ -187,18 +185,13 @@ namespace JRPG
                 Player.UpdateMovement(up, down, left, right, deltaTime, mapManager.CurrentMap);
                 camera.Update(Player.X, Player.Y, mapManager.CurrentMap);
                 mapRenderer.Update(deltaTime);
+                camera.SetEasing(Player.IsMoving ? 0.35 : 0.1);
 
-                if (Player.IsMoving)
-                {
-                    CheckForTriggers();
-                    camera.SetEasing(0.35);
-                }
-                else
-                {
-                    camera.SetEasing(0.1);
-                }
+                // One thing at a time: if a trigger or an encounter took over (warp, battle...),
+                // nothing else may start in the same update (e.g. a door warp on top of a battle)
+                bool tookOver = Player.IsMoving && CheckForTriggers(deltaTime);
 
-                if (!isPaused)
+                if (!tookOver && !isPaused && !isWarping)
                     UpdateObjectEvents();
             }
 
@@ -327,7 +320,7 @@ namespace JRPG
                             break;
 
                         case EventActionType.Warp:
-                            await WarpAsync(action.TargetMap, action.TargetX + 0.5, action.TargetY + 0.5);
+                            await WarpAsync(action.TargetMap, action.TargetX, action.TargetY);
                             break;
 
                         case EventActionType.Battle:
@@ -345,25 +338,110 @@ namespace JRPG
             }
         }
 
-        private async Task WarpAsync(string targetMap, double x, double y)
-        {
-            if (string.IsNullOrEmpty(targetMap))
-                return;
+        // === Warps ===
 
-            if (!File.Exists(Core.Utils.AssetPathResolver.GetPath(Path.Combine("Maps", targetMap))))
-            {
-                await ShowDialogueAsync(new List<string> { $"(Map \"{targetMap}\" not found)" });
+        /// <summary>
+        /// The one way the player changes map: warp tiles and event warps both come here.
+        /// Fades out, switches map, puts the player in the middle of the target tile, fades back in.
+        ///   - Only one warp at a time, and the world is frozen while it runs (no walking, triggers, battles).
+        ///   - The new map is fully read before anything changes: a missing or broken map
+        ///     leaves the player where they were, with a message, instead of a half-switched game.
+        ///   - A blocked or off-map target is moved to the nearest free tile, so the player is never stuck.
+        /// </summary>
+        private async Task WarpAsync(string targetMap, int tileX, int tileY)
+        {
+            if (isWarping)
                 return;
+            isWarping = true;
+
+            try
+            {
+                Map map;
+                try
+                {
+                    map = MapManager.ReadMap(targetMap);
+                }
+                catch (Exception ex)
+                {
+                    await ShowDialogueAsync(new List<string> { $"(Can't go to map \"{targetMap}\": {ex.Message})" });
+                    return;
+                }
+
+                // Middle of the target tile, so the player doesn't straddle four tiles
+                await SceneManager.TransitionAsync(() => EnterMap(targetMap, map, tileX + 0.5, tileY + 0.5));
+            }
+            finally
+            {
+                isWarping = false;
+            }
+        }
+
+        /// <summary>Switches to an already-read map and places the player. Used by warps, new game and loading.</summary>
+        private void EnterMap(string mapFile, Map map, double x, double y)
+        {
+            mapManager.SetMap(mapFile, map);
+            currentMapFile = mapFile;
+
+            Point arrival = FindArrivalPoint(map, x, y);
+            Player.SetPosition(arrival.X, arrival.Y);
+            camera.SnapTo(arrival.X, arrival.Y, map);
+            GameSystems.System.UpdatePlayerPosition(arrival.X, arrival.Y);
+
+            // The arrival tile's own trigger stays quiet until the player steps off it
+            // (arriving on a warp tile must not send them straight back)
+            lastTriggeredX = (int)Math.Floor(arrival.X);
+            lastTriggeredY = (int)Math.Floor(arrival.Y);
+            touchArmed = false;                         // same for doors: wait until the player stops
+            encounterGrace = EncounterGraceAfterWarp;   // no battle the instant the screen fades in
+            promptTarget = null;
+
+            mapRenderer.Invalidate();
+        }
+
+        /// <summary>
+        /// The target position if the player can stand there, otherwise the middle of the nearest
+        /// walkable tile (closest first). Keeps a bad warp target from trapping the player in a wall.
+        /// </summary>
+        private static Point FindArrivalPoint(Map map, double x, double y)
+        {
+            int tileX = Math.Max(0, Math.Min(map.Width - 1, (int)Math.Floor(x)));
+            int tileY = Math.Max(0, Math.Min(map.Height - 1, (int)Math.Floor(y)));
+
+            bool insideMap = x >= 0 && y >= 0 && x < map.Width && y < map.Height;
+            if (insideMap && MapManager.IsCellWalkable(map, tileX, tileY))
+                return new Point(x, y);
+
+            for (int radius = 1; radius <= ArrivalSearchRadius; radius++)
+            {
+                Point? best = null;
+                double bestDistance = double.MaxValue;
+
+                for (int dy = -radius; dy <= radius; dy++)
+                {
+                    for (int dx = -radius; dx <= radius; dx++)
+                    {
+                        if (Math.Max(Math.Abs(dx), Math.Abs(dy)) != radius)
+                            continue; // only the ring at this distance
+
+                        int cx = tileX + dx, cy = tileY + dy;
+                        if (!MapManager.IsCellWalkable(map, cx, cy))
+                            continue;
+
+                        double distance = dx * dx + dy * dy;
+                        if (distance < bestDistance)
+                        {
+                            bestDistance = distance;
+                            best = new Point(cx + 0.5, cy + 0.5);
+                        }
+                    }
+                }
+
+                if (best.HasValue)
+                    return best.Value;
             }
 
-            await SceneManager.TransitionAsync(() =>
-            {
-                LoadMapAndPositionPlayer(targetMap, x, y);
-                lastTriggeredX = lastTriggeredY = -1;
-                mapRenderer.Invalidate();
-            });
-
-            touchArmed = false; // don't walk straight back through the door you arrived at
+            Debug.WriteLine($"Warp: no walkable tile near ({x}, {y}) on map \"{map.Name}\"");
+            return new Point(tileX + 0.5, tileY + 0.5);
         }
 
         private static Task ShowDialogueAsync(List<string> lines, string portrait = null, string speaker = null)
@@ -395,7 +473,8 @@ namespace JRPG
             Canvas.SetTop(promptBox, Math.Round(top));
         }
 
-        private void CheckForTriggers()
+        /// <summary>Tile triggers, then random encounters. True if something took over (warp, battle...).</summary>
+        private bool CheckForTriggers(double deltaTime)
         {
             int tileX = (int)Math.Floor(Player.X);
             int tileY = (int)Math.Floor(Player.Y);
@@ -406,27 +485,47 @@ namespace JRPG
             if (hasTrigger)
             {
                 // Fire once when entering the tile, not every update while standing on it
-                if (tileX != lastTriggeredX || tileY != lastTriggeredY)
-                {
-                    triggerHandler.HandleTrigger(tileTrigger);
-                    lastTriggeredX = tileX;
-                    lastTriggeredY = tileY;
-                }
-                return;
+                if (tileX == lastTriggeredX && tileY == lastTriggeredY)
+                    return false;
+
+                lastTriggeredX = tileX;
+                lastTriggeredY = tileY;
+                triggerHandler.HandleTrigger(tileTrigger);
+                return true;
             }
 
             lastTriggeredX = -1;
             lastTriggeredY = -1;
 
-            // Random encounter: only roll when the player actually moved (not when pushing against a wall).
-            // Rolled once per fixed update (60/s), so on average one battle every ~8 seconds of walking.
-            // Maps can turn random battles off (Map Properties in the editor), e.g. towns
-            if (!mapManager.CurrentMap.RandomEncounters)
-                return;
+            return TryRandomEncounter(deltaTime);
+        }
+
+        /// <summary>
+        /// Random encounter: only rolled when the player actually moved (not when pushing against a wall).
+        /// Rolled once per fixed update (60/s), so on average one battle every ~8 seconds of walking.
+        /// Maps can turn random battles off (Map Properties in the editor), e.g. towns.
+        /// </summary>
+        private bool TryRandomEncounter(double deltaTime)
+        {
+            if (!mapManager.CurrentMap.RandomEncounters || SceneManager.IsTransitioning)
+                return false;
 
             bool moved = Player.X != Player.PreviousX || Player.Y != Player.PreviousY;
-            if (moved && rng.Next(EncounterOneIn) == 0)
-                triggerHandler.HandleTrigger(new TriggerBattle());
+            if (!moved)
+                return false;
+
+            // Right after a warp, the player gets a moment of walking before battles can start
+            if (encounterGrace > 0)
+            {
+                encounterGrace -= deltaTime;
+                return false;
+            }
+
+            if (rng.Next(EncounterOneIn) != 0)
+                return false;
+
+            triggerHandler.HandleTrigger(new TriggerBattle());
+            return true;
         }
     }
 }

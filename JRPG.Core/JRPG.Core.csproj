@@ -102,6 +102,8 @@
     <Compile Include="Battles\Models\Skill.cs" />
     <Compile Include="Battles\Models\ActionResult.cs" />
     <Compile Include="Battles\Models\TurnEntry.cs" />
+    <Compile Include="Battles\Models\ExpGain.cs" />
+    <Compile Include="Battles\Models\ExpStep.cs" />
     <Compile Include="Cutscenes\Models\CutsceneStep.cs" />
     <Compile Include="Cutscenes\Enums\StepType.cs" />
     <Compile Include="Cutscenes\Models\CutsceneStepBackground.cs" />

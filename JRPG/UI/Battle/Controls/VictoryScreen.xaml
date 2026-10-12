@@ -1,0 +1,64 @@
+﻿<!--
+    Victory screen, drawn over the (blurred) battle on the 1920 x 1080 design area:
+
+      Victory! ─────────────────────────────────────────────
+      ◀ EXP        120              ░░░░░                    reward bar
+      ◀ Sarxian   Lv.10 ▶   ◀ Jazog     Lv.9 ▶               party cards (ExpGainRow), 2 per line
+        EXP   250/500          EXP   399/400
+        ━━━━━━━░░░░░           ━━━━━━━━━━━░
+      ◀ Teelle ...         ◀ Zaruk ...
+      ──────────────────────────────────────────────────────
+                                                [Click] Next   footer
+
+    First click skips the animation, the next one continues.
+-->
+<UserControl x:Class="JRPG.UI.Battle.Controls.VictoryScreen"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:utils="clr-namespace:JRPG.Utils"
+             Background="Transparent" Cursor="Hand"
+             MouseLeftButtonUp="VictoryScreen_Click">
+    <Grid>
+        <!-- Optional ornaments: only show once art exists at Assets/UI/Battle/VictoryOrnament.png -->
+        <Image Source="{utils:Art Battle/VictoryOrnament}" Width="220" Height="220" Opacity="0.8"
+               HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-40,100,0,0"/>
+
+        <!-- Title -->
+        <Rectangle Style="{StaticResource OutcomeTitleLineStyle}"/>
+        <TextBlock x:Name="TitleText" Text="Victory!" Style="{StaticResource OutcomeTitleStyle}" RenderTransformOrigin="0,1">
+            <TextBlock.RenderTransform>
+                <TranslateTransform x:Name="TitleSlide"/>
+            </TextBlock.RenderTransform>
+        </TextBlock>
+
+        <!-- Rewards -->
+        <Grid x:Name="ExpRewardBar" Width="800" Height="64" HorizontalAlignment="Left" VerticalAlignment="Top"
+              Margin="88,268,0,0" Opacity="0">
+            <Path Data="{StaticResource Shape.RewardBar}" Stretch="Fill" Fill="{StaticResource Brush.RewardBar}"/>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Effect="{StaticResource Effect.TextOutline}">
+                <TextBlock Text="EXP" Style="{StaticResource Text.Label}" FontSize="22" Width="200" Margin="34,0,0,0"
+                           Foreground="{StaticResource Brush.Text.Primary}" Opacity="0.75"/>
+                <TextBlock x:Name="ExpValueText" Style="{StaticResource Text.Number}" FontSize="40" HorizontalAlignment="Left"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Party: filled with ExpGainRows by Show(), two per line -->
+        <UniformGrid x:Name="RowsPanel" Columns="2" Width="880" HorizontalAlignment="Left" VerticalAlignment="Top"
+                     Margin="104,420,0,0"/>
+
+        <!-- Bottom line -->
+        <Rectangle Height="1" Fill="{StaticResource Brush.Stroke.Strong}" VerticalAlignment="Bottom" Margin="0,0,0,170"/>
+
+        <!-- Footer -->
+        <Border Height="100" VerticalAlignment="Bottom" Background="{StaticResource Brush.Bar}"
+                BorderBrush="{StaticResource Brush.Stroke.Strong}" BorderThickness="0,1,0,0">
+            <StackPanel x:Name="ContinueHint" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center"
+                        Margin="0,0,70,0" Opacity="0">
+                <Border Style="{StaticResource KeyHintStyle}" Margin="0,0,14,0">
+                    <TextBlock Text="Click" Style="{StaticResource Text.Caption}" Foreground="{StaticResource Brush.Text.Primary}"/>
+                </Border>
+                <TextBlock Text="Next" Style="{StaticResource Text.Body}" FontSize="28"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

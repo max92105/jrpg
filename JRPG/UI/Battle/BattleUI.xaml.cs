@@ -1,17 +1,18 @@
-﻿using JRPG.Core.Battles;
+using JRPG.Core.Battles;
 using JRPG.Core.Battles.Enums;
 using JRPG.Core.Battles.Models;
 using JRPG.Core.Systems;
 using JRPG.Core.Systems.Inventories.Models;
 using JRPG.Core.Utils;
+using JRPG.Enums;
 using JRPG.UI.Battle.Controls;
 using JRPG.Utils;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Effects;
@@ -23,129 +24,154 @@ using Image = System.Windows.Controls.Image;
 namespace JRPG.UI.Battle
 {
     /// <summary>
-    /// Interaction logic for BattleUI.xaml
+    /// The battle screen (layout in BattleUI.xaml). Turn rules live in BattleManager;
+    /// this class draws the fight, asks the player for commands and targets, and plays the effects.
     /// </summary>
     public partial class BattleUI : UserControl
     {
-        private BattleManager battleManager;
-        private List<BattleActor> battleActors;
-        private Dictionary<Character, CharacterPanel> characterPanels = new Dictionary<Character, CharacterPanel>();
+        // ============ Layout ============
+        // Positions are on the 1920 x 1080 design area (BattleScene in the XAML),
+        // which is scaled to the real window size, so these numbers work on any screen.
+        private const double CanvasHeight = 1080;
+        private const double SpriteSize = 96;
+        private const double RowSpacing = SpriteSize + 40;  // vertical distance between rows of sprites
+        private const double RowShift = 50;                 // each row is shifted sideways, for depth
+        private const double EnemyStartX = 300 + SpriteSize;
+        private const double PartyStartX = 1920 - (400 + SpriteSize);
+        private const double SpritesBottom = 120;
+        private const double EnemyTagGap = 38;              // enemy tag sits this far under its sprite
+        private const double StepForwardDistance = 50;
 
-        private Dictionary<object, TranslateTransform> spriteOffsets = new Dictionary<object, TranslateTransform>();
-        private Dictionary<object, Image> spriteImages = new Dictionary<object, Image>();
+        private const double CommandGap = 40;               // between the command menu and the acting sprite
+        private const double CommandMinTop = 260;           // stay under the turn order and party status
+        private const double CommandMaxHeight = 420;        // keeps the menu on screen for the lowest row
 
-        //Targeting System
-        private bool isTargeting = false;
-        private bool isTargetingLocked = false;
-        private TargetType? ActionTargetType = null;
-        private CombatAction? ParamCombatAction = null;
-        private object targetingParam;
+        private const double TargetPointerSize = 44;
+        private const double VictoryBlurRadius = 10;
 
-        private List<BattleActor> currentlySelected = new List<BattleActor>();
+        // ============ Timing ============
+        private static readonly Duration StepDuration = TimeSpan.FromMilliseconds(200);
+        private static readonly TimeSpan EffectDelay = TimeSpan.FromMilliseconds(1000);
+        private static readonly TimeSpan EffectDelayWithDeath = TimeSpan.FromMilliseconds(2000);
+        private static readonly TimeSpan EscapedDisplayTime = TimeSpan.FromSeconds(1.5);
 
-        private BitmapSource targetArrowImage = ImageLoader.LoadIcon("TargetArrow.png"); // replace with your arrow filename
-        private HashSet<Image> glowingSprites = new HashSet<Image>();
-        private HashSet<Image> activeTargetArrows = new HashSet<Image>();
+        /// <summary>The battle is over; tells the scene where to go next.</summary>
+        public event Action<BattleExit> OnBattleEnd;
 
-        public event Action OnBattleEnd;
+        private readonly BattleManager battleManager;
+
+        private readonly Dictionary<Character, CharacterPanel> characterPanels = new Dictionary<Character, CharacterPanel>();
+        private readonly Dictionary<BattleActor, TranslateTransform> spriteOffsets = new Dictionary<BattleActor, TranslateTransform>();
+        private readonly Dictionary<BattleActor, Image> spriteImages = new Dictionary<BattleActor, Image>();
+        private readonly Dictionary<Enemy, EnemyTag> enemyTags = new Dictionary<Enemy, EnemyTag>();
+
+        // Targeting
+        private bool isTargeting;
+        private bool isTargetingLocked;
+        private TargetType? actionTargetType;
+        private CombatAction? pendingAction;
+        private object pendingActionParam; // the Skill or InventoryItem being used
+        private readonly List<BattleActor> currentlySelected = new List<BattleActor>();
+        private readonly HashSet<Image> glowingSprites = new HashSet<Image>();
+        private readonly HashSet<Image> targetPointers = new HashSet<Image>();
+
+        // End of battle
+        private bool hasEnded;
+        private bool hasFinished;
+        private DispatcherTimer escapedTimer;
 
         public BattleUI(List<BattleActor> battleActors)
         {
             InitializeComponent();
 
-            this.battleActors = battleActors;
-
             battleManager = new BattleManager(battleActors);
 
-            HookCommandBox();
+            CommandBox.OnSkillSelected += HandleSkillTargeting;
+            CommandBox.OnItemSelected += HandleItemTargeting;
+
+            Victory.Continued += () => FinishBattle(BattleExit.BackToMap);
+            Defeat.Chosen += FinishBattle;
 
             UpdateUI();
             CheckNextState();
         }
 
-        private void HookCommandBox()
-        {
-            CommandBox.OnSkillSelected += HandleSkillTargeting;
-            CommandBox.OnItemSelected += HandleItemTargeting;
-        }
-
         public void SetBackground(string filename)
         {
-            BattleBackground.Source = Utils.ImageLoader.LoadBackground(filename);
-        }    
+            BattleBackground.Source = ImageLoader.LoadBackground(filename);
+        }
+
+        // ============ HUD ============
 
         private void UpdateUI()
         {
+            DrawSprites();
             UpdatePlayerUI();
-            DrawSprites();          
         }
 
         private void UpdatePlayerUI()
         {
-            UpdateCharacterPanel();
+            UpdateCharacterPanels();
             UpdateCommandBox();
-            UpdateTurnOrderDisplay();
-        }    
-
-        private void UpdateCommandBox()
-        {
-            if (!battleManager.CurrentTurn.IsPlayer)
-            {
-                CommandBox.Visibility = Visibility.Collapsed;
-                return;
-            }
-
-            var activeEntry = battleManager.CurrentTurn;
-            object player = (object)activeEntry.BattleActor;
-
-            if (!spriteImages.TryGetValue(player, out var playerImage))
-            {
-                CommandBox.Visibility = Visibility.Collapsed;
-                return;
-            }
-
-            // Get the position of the playerImage relative to the SpriteCanvas
-            Point playerPosition = playerImage.TranslatePoint(new Point(0, 0), SpriteCanvas);
-
-            double offsetX = -(playerImage.ActualWidth + 50); // sprite + movement
-            double offsetY = (playerImage.ActualHeight - 300) / 2; // Center vertically
-
-            Canvas.SetLeft(CommandBox, playerPosition.X + offsetX);
-            Canvas.SetTop(CommandBox, playerPosition.Y + offsetY);
-
-            CommandBox.Visibility = Visibility.Visible;
+            UpdateTurnOrder();
         }
 
-        private void UpdateCharacterPanel()
+        private void UpdateCharacterPanels()
         {
             var characters = GameSystems.Party.ActivePartyOrder;
 
-            // Remove any panels for characters no longer present
-            foreach (var key in characterPanels.Keys.Except(characters).ToList())
-                characterPanels.Remove(key);
+            // Forget panels of characters who left the party
+            foreach (var gone in characterPanels.Keys.Except(characters).ToList())
+                characterPanels.Remove(gone);
 
             CharacterPanelContainer.Children.Clear();
 
             foreach (var character in characters)
             {
-                // Reuse or create panel
                 if (!characterPanels.TryGetValue(character, out var panel))
                 {
                     panel = new CharacterPanel();
                     characterPanels[character] = panel;
                 }
 
-                // Update values (this avoids reconstructing)
-                panel.CharacterName = character.Name;
-                panel.CurrentHP = character.HP;
-                panel.MaxHP = character.MaxHP;
-                panel.CurrentMP = character.MP;
-                panel.MaxMP = character.MaxMP;
-                panel.IsActive = character == battleManager.CurrentTurn.BattleActor;
-
+                panel.Show(character, isActive: character == battleManager.CurrentTurn.BattleActor);
                 CharacterPanelContainer.Children.Add(panel);
             }
         }
+
+        private void UpdateTurnOrder()
+        {
+            var order = battleManager.TurnQueue
+                .Select(turn => turn.BattleActor)
+                .Where(actor => actor.HP > 0)
+                .ToList();
+
+            TurnOrder.Show(order);
+        }
+
+        /// <summary>Shows the command menu to the left of the acting character, or hides it on an enemy turn.</summary>
+        private void UpdateCommandBox()
+        {
+            var actor = battleManager.CurrentTurn.BattleActor;
+
+            if (!battleManager.CurrentTurn.IsPlayer || !spriteImages.TryGetValue(actor, out var sprite))
+            {
+                CommandBox.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            double spriteLeft = Canvas.GetLeft(sprite) + spriteOffsets[actor].X;
+            double spriteTop = CanvasHeight - Canvas.GetBottom(sprite) - SpriteSize;
+            double top = Math.Min(spriteTop - SpriteSize, CanvasHeight - CommandMaxHeight);
+
+            Canvas.SetLeft(CommandBox, spriteLeft - CommandBox.Width - CommandGap);
+            Canvas.SetTop(CommandBox, Math.Max(CommandMinTop, top));
+
+            CommandBox.ShowCommands(actor.Name);
+            CommandBox.Visibility = Visibility.Visible;
+        }
+
+        // ============ Sprites ============
 
         private void DrawSprites()
         {
@@ -153,536 +179,242 @@ namespace JRPG.UI.Battle
             EffectCanvas.Children.Clear();
             spriteOffsets.Clear();
             spriteImages.Clear();
+            enemyTags.Clear();
+            targetPointers.Clear();
+            glowingSprites.Clear();
 
-            double canvasWidth = SpriteCanvas.ActualWidth > 0 ? SpriteCanvas.ActualWidth : 1920;
-            double spriteSize = 96;
-            double verticalSpacing = spriteSize + 40;
-
-            // Draw Enemies
-            double enemyBaseY = 120;
-            double enemyStartX = 300 + spriteSize;
-            var aliveEnemies = battleManager.GetAliveEnemies();
-
-            for (int i = 0; i < aliveEnemies.Count; i++)
+            // Enemies, on the left. SlotIndex places each one on its own row.
+            foreach (Enemy enemy in battleManager.GetAliveEnemies())
             {
-                Enemy enemy = (Enemy)aliveEnemies[i];
-                var image = CreateSpriteImage(AssetPathResolver.GetSpritesPath(enemy.BattleSpriteFile), enemy.SpriteFlip, enemy);
+                var image = CreateSprite(AssetPathResolver.GetSpritesPath(enemy.BattleSpriteFile), enemy.SpriteFlip, enemy);
 
                 image.MouseEnter += (s, e) =>
                 {
-                    if (!isTargeting) return;
-
-                    if (ActionTargetType == TargetType.Enemy)
-                    {
-                        AddTargets(new List<BattleActor>() { enemy });
-                    }
+                    if (isTargeting && actionTargetType == TargetType.Enemy)
+                        AddTargets(new List<BattleActor> { enemy });
                 };
-
                 image.MouseLeftButtonUp += (s, e) =>
                 {
-                    if (!isTargeting || isTargetingLocked || currentlySelected == null || !currentlySelected.Any())
-                        return;
-
-                    if (ActionTargetType == TargetType.Ally || ActionTargetType == TargetType.Self)
-                        return; // Block clicks in non-enemy mode
-
-                    SelectTarget();
+                    // Ally-only skills can't be aimed at an enemy
+                    if (actionTargetType != TargetType.Ally && actionTargetType != TargetType.Self)
+                        TrySelectTarget();
                 };
 
-                Canvas.SetLeft(image, enemyStartX + (enemy.SlotIndex * 50));
-                Canvas.SetBottom(image, enemyBaseY + (enemy.SlotIndex * verticalSpacing));
-                SpriteCanvas.Children.Add(image);
+                double left = EnemyStartX + enemy.SlotIndex * RowShift;
+                double bottom = SpritesBottom + enemy.SlotIndex * RowSpacing;
+                PlaceOnCanvas(image, left, bottom);
+
+                var tag = new EnemyTag(enemy);
+                PlaceOnCanvas(tag, left, bottom - EnemyTagGap);
+                enemyTags[enemy] = tag;
             }
 
-            // Draw Characters
-            double characterBaseY = 120;
-            double characterStartX = canvasWidth - (400 + spriteSize);
-            //Since we draw from bottom to top the order need to reverse.... 
+            // Party, on the right. Drawn bottom row first, so the order is reversed.
             var characters = GameSystems.Party.ActivePartyOrder.Reverse<Character>().ToList();
 
-            for (int i = 0; i < characters.Count; i++)
+            for (int row = 0; row < characters.Count; row++)
             {
-                var character = characters[i];
-                var image = CreateSpriteImage(AssetPathResolver.GetSpritesPath(character.BattleSpriteFile), false, character);
+                var character = characters[row];
+                var image = CreateSprite(AssetPathResolver.GetSpritesPath(character.BattleSpriteFile), false, character);
 
                 image.MouseEnter += (s, e) =>
                 {
-                    if (!isTargeting) return;
-
-                    if (ActionTargetType == TargetType.Ally || ActionTargetType == TargetType.Self)
-                    {
-                        // In "Self" mode, block hovering over other allies
-                        if (ActionTargetType == TargetType.Self)
-                            if (character != battleManager.CurrentTurn.BattleActor)
-                                return;
-
-                        AddTargets(new List<BattleActor>() { character });
-                    }
-                };
-
-                image.MouseLeftButtonUp += (s, e) =>
-                {
-                    if (!isTargeting || isTargetingLocked || currentlySelected == null || !currentlySelected.Any())
+                    if (!isTargeting)
                         return;
 
-                    if (ActionTargetType == TargetType.Ally
-                    || ActionTargetType == TargetType.Self
-                    || ActionTargetType == TargetType.AllAllies)
-                    {
-
-                        // Self lock
-                        if (ActionTargetType == TargetType.Self && character != battleManager.CurrentTurn.BattleActor)
-                            return;
-
-                        SelectTarget();
-                    }
+                    bool canAim = actionTargetType == TargetType.Ally
+                               || (actionTargetType == TargetType.Self && character == battleManager.CurrentTurn.BattleActor);
+                    if (canAim)
+                        AddTargets(new List<BattleActor> { character });
+                };
+                image.MouseLeftButtonUp += (s, e) =>
+                {
+                    bool canSelect = actionTargetType == TargetType.Ally
+                                  || actionTargetType == TargetType.AllAllies
+                                  || (actionTargetType == TargetType.Self && character == battleManager.CurrentTurn.BattleActor);
+                    if (canSelect)
+                        TrySelectTarget();
                 };
 
-                Canvas.SetLeft(image, characterStartX - (i * 50));
-                Canvas.SetBottom(image, characterBaseY + (i * verticalSpacing));
-                SpriteCanvas.Children.Add(image);
+                PlaceOnCanvas(image, PartyStartX - row * RowShift, SpritesBottom + row * RowSpacing);
             }
         }
 
-        private Image CreateSpriteImage(string path, bool flip, object owner)
+        private void PlaceOnCanvas(UIElement element, double left, double bottom)
         {
-            var translate = new TranslateTransform();
-            var rotate = new RotateTransform(0, 48, 48);
-            var scale = new ScaleTransform(flip ? -1 : 1, 1, 48, 48);
+            Canvas.SetLeft(element, left);
+            Canvas.SetBottom(element, bottom);
+            SpriteCanvas.Children.Add(element);
+        }
 
-            var transformGroup = new TransformGroup();
-            transformGroup.Children.Add(scale);
-            transformGroup.Children.Add(rotate);
-            transformGroup.Children.Add(translate);
+        private Image CreateSprite(string path, bool flip, BattleActor owner)
+        {
+            var offset = new TranslateTransform();
+
+            var transforms = new TransformGroup();
+            transforms.Children.Add(new ScaleTransform(flip ? -1 : 1, 1, SpriteSize / 2, SpriteSize / 2));
+            transforms.Children.Add(offset);
 
             var image = new Image
             {
-                Width = 96,
-                Height = 96,
+                Width = SpriteSize,
+                Height = SpriteSize,
                 Source = ImageLoader.Load(path, 256),
                 RenderTransformOrigin = new Point(0.5, 0.5),
-                RenderTransform = transformGroup
+                RenderTransform = transforms
             };
 
-            spriteOffsets[owner] = translate;
+            spriteOffsets[owner] = offset;
             spriteImages[owner] = image;
             return image;
         }
 
-        private void ApplyPulsingGlow(Image target)
+        /// <summary>Top-center of a sprite, on the canvas, including its step-forward offset.</summary>
+        private Point SpriteTopCenter(BattleActor actor)
         {
-            if (target == null || glowingSprites.Contains(target)) return;
-
-            glowingSprites.Add(target);
-
-            var glow = new DropShadowEffect
-            {
-                Color = Colors.White,
-                BlurRadius = 20,
-                ShadowDepth = 0,
-                Opacity = 0.8
-            };
-
-            target.Effect = glow;
-
-            var blurAnim = new DoubleAnimation
-            {
-                From = 20,
-                To = 40,
-                Duration = TimeSpan.FromMilliseconds(800),
-                AutoReverse = true,
-                RepeatBehavior = RepeatBehavior.Forever
-            };
-
-            var opacityAnim = new DoubleAnimation
-            {
-                From = 0.8,
-                To = 0.4,
-                Duration = TimeSpan.FromMilliseconds(800),
-                AutoReverse = true,
-                RepeatBehavior = RepeatBehavior.Forever
-            };
-
-            glow.BeginAnimation(DropShadowEffect.BlurRadiusProperty, blurAnim);
-            glow.BeginAnimation(DropShadowEffect.OpacityProperty, opacityAnim);
+            var sprite = spriteImages[actor];
+            double left = Canvas.GetLeft(sprite) + spriteOffsets[actor].X;
+            double top = CanvasHeight - Canvas.GetBottom(sprite) - SpriteSize;
+            return new Point(left + SpriteSize / 2, top);
         }
 
-        private void RemoveAllGlows()
-        {
-            foreach (var img in glowingSprites)
-            {
-                if (img.Effect is DropShadowEffect effect)
-                {
-                    effect.BeginAnimation(DropShadowEffect.BlurRadiusProperty, null);
-                    effect.BeginAnimation(DropShadowEffect.OpacityProperty, null);
-                }
-                img.Effect = null;
-            }
-
-            glowingSprites.Clear();
-        }
-
-        private void AnimateStepForward(Action onComplete = null)
-        {
-            var activeEntry = battleManager.CurrentTurn;
-            object actor = activeEntry.BattleActor;
-
-            if (!spriteOffsets.TryGetValue(actor, out var translate))
-            {
-                onComplete?.Invoke();
-                return;
-            }
-
-            double target = activeEntry.IsPlayer ? -50 : 50;
-
-            var slideIn = new DoubleAnimation
-            {
-                To = target,
-                Duration = TimeSpan.FromMilliseconds(200),
-                FillBehavior = FillBehavior.Stop
-            };
-
-            slideIn.Completed += (s, e) =>
-            {
-                // ✅ force the final value so that step back animates from correct position
-                translate.X = target;
-                onComplete?.Invoke();
-            };
-
-            translate.BeginAnimation(TranslateTransform.XProperty, slideIn);
-        }
-
-        private void AnimateStepBack(Action onComplete = null)
-        {
-            var activeEntry = battleManager.CurrentTurn;
-            object actor = activeEntry.BattleActor;
-
-            if (!spriteOffsets.TryGetValue(actor, out var translate))
-            {
-                onComplete?.Invoke();
-                return;
-            }
-
-            var slideOut = new DoubleAnimation
-            {
-                To = 0,
-                Duration = TimeSpan.FromMilliseconds(200),
-                FillBehavior = FillBehavior.HoldEnd
-            };
-
-            slideOut.Completed += (s, e) =>
-            {
-                translate.X = 0; // ensure reset
-                onComplete?.Invoke();
-            };
-
-            translate.BeginAnimation(TranslateTransform.XProperty, slideOut);
-        }
-
-        private void UpdateTurnOrderDisplay()
-        {
-            TurnOrderPanel.Children.Clear();
-
-            foreach (var turn in battleManager.TurnQueue)
-            {
-                // ❌ Skip dead enemies
-                if (!turn.IsPlayer && turn.BattleActor.HP <= 0)
-                    continue;
-
-                var portraitFile = turn.BattleActor.PortraitFile;
-
-                var img = new Image
-                {
-                    Width = 32,
-                    Height = 32,
-                    Source = ImageLoader.LoadPortrait(portraitFile)
-                };
-
-                TurnOrderPanel.Children.Add(img);
-            }
-        }
-
-        private void ShowHoverArrowFor(object target)
-        {
-            if (!spriteImages.TryGetValue(target, out var img)) return;
-
-            var arrow = new Image
-            {
-                Width = 36,
-                Height = 36,
-                Source = ImageLoader.LoadIcon("TargetArrow.png"),
-                RenderTransformOrigin = new Point(0.5, 0.5),
-                Opacity = 0,
-                RenderTransform = new ScaleTransform(0.5, 0.5)
-            };
-
-            Point center = img.TranslatePoint(new Point(img.Width / 2, 0), SpriteCanvas);
-            Canvas.SetLeft(arrow, center.X - (arrow.Width / 2));
-            Canvas.SetTop(arrow, center.Y - arrow.Height - 4);
-
-            SpriteCanvas.Children.Add(arrow);
-            activeTargetArrows.Add(arrow);
-
-            var scale = (ScaleTransform)arrow.RenderTransform;
-            var grow = new DoubleAnimation(1.0, TimeSpan.FromMilliseconds(150)) { EasingFunction = new BackEase { EasingMode = EasingMode.EaseOut } };
-            var fade = new DoubleAnimation(1.0, TimeSpan.FromMilliseconds(150));
-
-            scale.BeginAnimation(ScaleTransform.ScaleXProperty, grow);
-            scale.BeginAnimation(ScaleTransform.ScaleYProperty, grow);
-            arrow.BeginAnimation(UIElement.OpacityProperty, fade);
-        }
-
-        private void ClearAllTargetArrows()
-        {
-            foreach (var arrow in activeTargetArrows)
-            {
-                SpriteCanvas.Children.Remove(arrow);
-            }
-            activeTargetArrows.Clear();
-        }
-
-        private void HighlightSelectedInTurnOrder()
-        {
-            for (int i = 0; i < TurnOrderPanel.Children.Count; i++)
-            {
-                var aliveEntries = battleManager.TurnQueue.Where(entry => entry.BattleActor.HP > 0);
-
-                if (TurnOrderPanel.Children[i] is Image img && i < aliveEntries.Count())
-                {
-                    var entry = aliveEntries.ElementAt(i);
-                    img.Opacity = (currentlySelected.Contains(entry.BattleActor)) ? 1.0 : 0.5;
-                }
-            }
-        }
-
-        private void ShowFloatingText(string text, EffectType type, Point position)
-        {
-            var floatingText = new FloatingText(text, type);
-
-            Canvas.SetLeft(floatingText, position.X - 50); // center horizontally
-            Canvas.SetTop(floatingText, position.Y);       // appears just above target
-
-            EffectCanvas.Children.Add(floatingText);
-        }
-
-        private void PlayVFX(string vfxName, Point position)
-        {
-            var vfxImage = new Image
-            {
-                Width = 96,
-                Height = 96,
-                RenderTransformOrigin = new Point(0.5, 0.5)
-            };
-
-            var gifUri = new Uri(AssetPathResolver.GetVFXPath(vfxName), UriKind.Absolute);
-            var imageSource = new BitmapImage(gifUri);
-
-            ImageBehavior.SetAnimatedSource(vfxImage, imageSource);
-            ImageBehavior.SetRepeatBehavior(vfxImage, new System.Windows.Media.Animation.RepeatBehavior(1)); // play once
-
-            Canvas.SetLeft(vfxImage, position.X - vfxImage.Width / 2);
-            Canvas.SetTop(vfxImage, position.Y - vfxImage.Height / 2);
-            EffectCanvas.Children.Add(vfxImage);
-
-            // Remove after duration
-            var fade = new DoubleAnimation(1.0, 0.0, TimeSpan.FromMilliseconds(800));
-            fade.Completed += (s, e) => EffectCanvas.Children.Remove(vfxImage);
-            vfxImage.BeginAnimation(OpacityProperty, fade);
-        }
-
-        private void AnimateDeath(BattleActor actor)
-        {
-            if (!spriteImages.TryGetValue(actor, out var image))
-            {
-                return;
-            }
-
-            // Create white glow flash using DropShadowEffect
-            var glow = new DropShadowEffect
-            {
-                Color = Colors.White,
-                BlurRadius = 0,
-                ShadowDepth = 0,
-                Opacity = 1.0
-            };
-
-            image.Effect = glow;
-
-
-            // Delay before fading
-            var delayTimer = new System.Windows.Threading.DispatcherTimer
-            {
-                Interval = TimeSpan.FromMilliseconds(1000)
-            };
-
-            delayTimer.Tick += (s, e) =>
-            {
-                delayTimer.Stop();
-
-                // Animate opacity (fade out)
-                var fadeOut = new DoubleAnimation
-                {
-                    To = 0,
-                    Duration = TimeSpan.FromMilliseconds(1000),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
-                };
-
-                fadeOut.Completed += (s2, e2) =>
-                {
-                    image.Effect = null;
-                };
-
-                image.BeginAnimation(OpacityProperty, fadeOut);
-            };
-
-            delayTimer.Start();
-        }
-
-        private void ExitTargetingMode()
-        {
-            isTargeting = false;
-            currentlySelected.Clear();
-        }
+        // ============ Turn flow ============
 
         private void CheckNextState()
         {
             if (!battleManager.IsBattleOver())
             {
                 if (battleManager.State == BattleState.EnemyTurn)
-                {
-                    AnimateStepForward(() =>
-                    {
-                        // Do the action once fully moved forward
-
-                        var target = battleManager.GetAlivePlayers()[new Random().Next(battleManager.GetAlivePlayers().Count)];
-
-                        currentlySelected.Add(target);
-
-                        List<ActionResult> results = battleManager.ExecuteCurrentTurnAction(CombatAction.Attack, currentlySelected);
-
-                        PlayTurnActionEffect(results, () =>
-                         AnimateStepBack(() =>
-                         {
-                             currentlySelected.Clear();
-
-                             if (battleManager.State == BattleState.Lost)
-                             {
-                                 EndBattle("You were defeated.");
-                             }
-                             else
-                             {
-                                 UpdatePlayerUI();
-
-                                 battleManager.AdvanceTurn();
-                                 CheckNextState();
-                             }
-                         }));                    
-                    });
-                }
+                    PlayEnemyTurn();
                 else if (battleManager.State == BattleState.PlayerTurn)
-                {
-                    // Only move forward, action comes later
-                    AnimateStepForward(() =>
-                    {
-                        UpdatePlayerUI();
-                    });
-                }
+                    AnimateStepForward(UpdatePlayerUI); // the player picks a command next
             }
 
             if (battleManager.State == BattleState.Won)
-            {
-                EndBattle("You won!");
-            }
+                ShowVictory();
 
             if (battleManager.State == BattleState.Lost)
-            {
-                EndBattle("You lost!");
-            }
+                ShowDefeat();
         }
 
-        private void EndBattle(string message)
+        private void PlayEnemyTurn()
         {
-            MessageBox.Show(message);
-
-            if (battleManager.State == BattleState.Won)
+            AnimateStepForward(() =>
             {
-                //GrantBattleRewards(120, 50); // EXP and Gold reward
-            }
+                var alivePlayers = battleManager.GetAlivePlayers();
+                currentlySelected.Add(alivePlayers[new Random().Next(alivePlayers.Count)]);
 
-            OnBattleEnd?.Invoke();
+                var results = battleManager.ExecuteCurrentTurnAction(CombatAction.Attack, currentlySelected);
+
+                PlayTurnActionEffect(results, () => AnimateStepBack(() =>
+                {
+                    currentlySelected.Clear();
+                    UpdatePlayerUI();
+
+                    battleManager.AdvanceTurn();
+                    CheckNextState();
+                }));
+            });
         }
 
-        private void GrantBattleRewards(int expReward, int goldReward)
+        /// <summary>After a player's action: step back, next turn.</summary>
+        private void FinishPlayerTurn()
         {
-            List<string> leveledUpNames = new List<string>();
-
-            foreach (Character character in battleActors.Where(battleActor => battleActor is Character))
+            AnimateStepBack(() =>
             {
-                int oldLevel = character.Level;
-                character.GainEXP(expReward);
-                if (character.Level > oldLevel)
-                    leveledUpNames.Add(character.Name);
-            }
-
-            string message = $"Victory!\nGained {expReward} EXP and {goldReward} Gold.";
-
-            if (leveledUpNames.Count > 0)
-            {
-                message += "\n\nLevel Up!\n";
-                foreach (var name in leveledUpNames)
-                    message += $"- {name}\n";
-            }
-
-            MessageBox.Show(message);
+                isTargetingLocked = false;
+                ExitTargetingMode();
+                battleManager.AdvanceTurn();
+                UpdateUI();
+                CheckNextState();
+            });
         }
 
-        #region Targeting System
+        private void AnimateStepForward(Action onComplete = null)
+        {
+            var turn = battleManager.CurrentTurn;
+            if (!spriteOffsets.TryGetValue(turn.BattleActor, out var offset))
+            {
+                onComplete?.Invoke();
+                return;
+            }
+
+            // Players step left, towards the enemies; enemies step right
+            double target = turn.IsPlayer ? -StepForwardDistance : StepForwardDistance;
+
+            var step = new DoubleAnimation { To = target, Duration = StepDuration, FillBehavior = FillBehavior.Stop };
+            step.Completed += (s, e) =>
+            {
+                offset.X = target; // keep the final position, so stepping back starts from here
+                onComplete?.Invoke();
+            };
+
+            offset.BeginAnimation(TranslateTransform.XProperty, step);
+        }
+
+        private void AnimateStepBack(Action onComplete = null)
+        {
+            if (!spriteOffsets.TryGetValue(battleManager.CurrentTurn.BattleActor, out var offset))
+            {
+                onComplete?.Invoke();
+                return;
+            }
+
+            var step = new DoubleAnimation { To = 0, Duration = StepDuration };
+            step.Completed += (s, e) =>
+            {
+                offset.X = 0;
+                onComplete?.Invoke();
+            };
+
+            offset.BeginAnimation(TranslateTransform.XProperty, step);
+        }
+
+        // ============ Commands ============
 
         private void HandleCommandSelected(string command)
         {
+            var actor = battleManager.CurrentTurn.BattleActor;
+
             switch (command)
             {
-                case "Attack": AttackButton_Click(null, null); break;
-                case "Defend": DefendButton_Click(null, null); break;
+                case "Attack":
+                    pendingAction = CombatAction.Attack;
+                    EnterTargetingMode(TargetType.Enemy);
+                    break;
+
                 case "Skill":
-                    var currentChar = battleManager.CurrentTurn.BattleActor;
-                    if (currentChar.Skills != null && currentChar.Skills.Count > 0)
-                    {
-                        CommandBox.ShowSkills(currentChar.Skills);
-                        CommandBox.OptionListPanel.Visibility = Visibility.Visible;
-                    }
+                    if (actor.Skills != null && actor.Skills.Count > 0)
+                        CommandBox.ShowSkills(actor);
                     else
-                    {
-                        MessageBox.Show($"{currentChar.Name} has no skills!");
-                    }
+                        Banner.Show($"{actor.Name} has no skills.");
                     break;
+
                 case "Item":
-                    if (GameSystems.Inventory != null && GameSystems.Inventory.Items.Any(i => i.Quantity > 0))
-                    {
+                    if (GameSystems.Inventory.Items.Any(i => i.Item is Consumable && i.Quantity > 0))
                         CommandBox.ShowItems(GameSystems.Inventory.Items);
-                        CommandBox.OptionListPanel.Visibility = Visibility.Visible;
-                    }
                     else
-                        MessageBox.Show("No items available!");
+                        Banner.Show("No items to use.");
                     break;
-                case "Run": RunButton_Click(null, null); break;
+
+                case "Defend":
+                    Defend();
+                    break;
+
+                case "Run":
+                    ShowEscaped();
+                    break;
             }
         }
 
-        private void AttackButton_Click(object sender, RoutedEventArgs e)
+        private void Defend()
         {
-            ParamCombatAction = CombatAction.Attack;
+            var actor = battleManager.CurrentTurn.BattleActor;
+            currentlySelected.Add(actor);
+            battleManager.ExecuteCurrentTurnAction(CombatAction.Defend, currentlySelected);
 
-            EnterTargetingMode(TargetType.Enemy);
-        }
-
-        private void DefendButton_Click(object sender, RoutedEventArgs e)
-        {
-            currentlySelected.Add(battleManager.CurrentTurn.BattleActor);
-
-            List<ActionResult> results = battleManager.ExecuteCurrentTurnAction(CombatAction.Defend, currentlySelected);
-
-            MessageBox.Show("I defend");
+            CommandBox.Visibility = Visibility.Collapsed;
+            Banner.Show($"{actor.Name} defends.");
 
             AnimateStepBack(() =>
             {
@@ -693,148 +425,365 @@ namespace JRPG.UI.Battle
             });
         }
 
-        private void RunButton_Click(object sender, RoutedEventArgs e)
-        {
-            EndBattle("You ran away!");
-        }
-
         private void HandleSkillTargeting(Skill skill)
         {
-            targetingParam = skill;
-            ParamCombatAction = CombatAction.Skill;
-
+            pendingActionParam = skill;
+            pendingAction = CombatAction.Skill;
             EnterTargetingMode(skill.TargetType);
         }
 
         private void HandleItemTargeting(InventoryItem inventoryItem)
         {
-            targetingParam = inventoryItem;
-            ParamCombatAction = CombatAction.Item;
-
+            pendingActionParam = inventoryItem;
+            pendingAction = CombatAction.Item;
             EnterTargetingMode(((Consumable)inventoryItem.Item).TargetType);
         }
+
+        // ============ Targeting ============
 
         private void EnterTargetingMode(TargetType targetType)
         {
             isTargeting = true;
-            ActionTargetType = targetType;
+            actionTargetType = targetType;
+            CommandBox.ShowMessage("Choose a target. Right-click to cancel.");
 
-            //Default Target
-            switch(targetType)
+            // Start on a sensible target, so a single click confirms
+            switch (targetType)
             {
                 case TargetType.Self:
-                    AddTargets(new List<BattleActor>() { battleManager.CurrentTurn.BattleActor });
-                    break;
-
                 case TargetType.Ally:
-                    AddTargets(new List<BattleActor>() { battleManager.CurrentTurn.BattleActor });
+                    AddTargets(new List<BattleActor> { battleManager.CurrentTurn.BattleActor });
                     break;
-
                 case TargetType.Enemy:
-                    AddTargets(new List<BattleActor>() { battleManager.GetAliveEnemies().LastOrDefault() });
+                    AddTargets(new List<BattleActor> { battleManager.GetAliveEnemies().LastOrDefault() });
                     break;
-
                 case TargetType.AllAllies:
                     AddTargets(battleManager.GetAlivePlayers());
                     break;
-
                 case TargetType.AllEnemies:
                     AddTargets(battleManager.GetAliveEnemies());
                     break;
             }
         }
 
+        private void ExitTargetingMode()
+        {
+            isTargeting = false;
+            currentlySelected.Clear();
+        }
+
+        /// <summary>Right-click: cancel the target choice, or go back to the main command list.</summary>
+        private void BattleUI_MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            if (isTargetingLocked || hasEnded || battleManager.State != BattleState.PlayerTurn)
+                return;
+
+            if (isTargeting)
+            {
+                ClearTargetMarks();
+                ExitTargetingMode();
+                pendingActionParam = null;
+                TurnOrder.Highlight(currentlySelected);
+                CommandBox.ShowMessage(null);
+            }
+            else
+            {
+                CommandBox.ShowCommands();
+            }
+        }
+
         private void AddTargets(List<BattleActor> actors)
         {
             currentlySelected.Clear();
-            ClearAllTargetArrows();
-            RemoveAllGlows();
+            ClearTargetMarks();
 
-            foreach (var actor in actors)
+            foreach (var actor in actors.Where(a => a != null))
             {
                 if (spriteImages.TryGetValue(actor, out var image))
                 {
                     ApplyPulsingGlow(image);
-                    ShowHoverArrowFor(actor);
+                    ShowTargetPointer(actor);
                 }
 
                 currentlySelected.Add(actor);
             }
 
-            HighlightSelectedInTurnOrder();
+            TurnOrder.Highlight(currentlySelected);
+        }
+
+        private void TrySelectTarget()
+        {
+            if (isTargeting && !isTargetingLocked && currentlySelected.Any())
+                SelectTarget();
         }
 
         private void SelectTarget()
         {
-            if (isTargetingLocked) return; // 🛑 prevent double-activation
-            isTargetingLocked = true;      // 🔒 lock until animation ends
+            isTargetingLocked = true; // until the whole turn has played out
 
-            List<ActionResult> results = battleManager.ExecuteCurrentTurnAction(ParamCombatAction.Value, currentlySelected, targetingParam);
+            string actionName = (pendingActionParam as Skill)?.Name ?? (pendingActionParam as InventoryItem)?.Item.Name;
+            var results = battleManager.ExecuteCurrentTurnAction(pendingAction.Value, currentlySelected, pendingActionParam);
+            pendingActionParam = null;
 
-            targetingParam = null;
-
-            if (results == null && results.Any())
+            if (results == null)
             {
-                isTargetingLocked = false; // ❗unlock if nothing happened
+                isTargetingLocked = false; // nothing happened, let the player choose again
                 return;
             }
 
-            ClearAllTargetArrows();
-            RemoveAllGlows();
-            HighlightSelectedInTurnOrder();
+            if (actionName != null)
+                Banner.Show(actionName);
 
+            ClearTargetMarks();
             CommandBox.Visibility = Visibility.Collapsed;
 
-            PlayTurnActionEffect(results, () =>
+            PlayTurnActionEffect(results, FinishPlayerTurn);
+        }
+
+        /// <summary>The bobbing hand above a target.</summary>
+        private void ShowTargetPointer(BattleActor target)
+        {
+            Point topCenter = SpriteTopCenter(target);
+
+            var bob = new TranslateTransform();
+            var transforms = new TransformGroup();
+            transforms.Children.Add(new RotateTransform(90)); // the art points right; turn it to point down
+            transforms.Children.Add(bob);
+
+            var pointer = new Image
             {
-                AnimateStepBack(() =>
-                {
-                    isTargetingLocked = false; // 🔓 unlock after full turn cycle
-                    ExitTargetingMode();
-                    battleManager.AdvanceTurn();
-                    UpdateUI();
-                    CheckNextState();
-                });
+                Width = TargetPointerSize,
+                Height = TargetPointerSize,
+                Source = UiArt.Get("Battle/Pointer"),
+                RenderTransformOrigin = new Point(0.5, 0.5),
+                RenderTransform = transforms,
+                IsHitTestVisible = false,
+                Effect = (Effect)FindResource("Effect.TextOutline")
+            };
+
+            Canvas.SetLeft(pointer, topCenter.X - TargetPointerSize / 2);
+            Canvas.SetTop(pointer, topCenter.Y - TargetPointerSize - 6);
+            SpriteCanvas.Children.Add(pointer);
+            targetPointers.Add(pointer);
+
+            bob.BeginAnimation(TranslateTransform.YProperty, new DoubleAnimation(0, -8, TimeSpan.FromMilliseconds(450))
+            {
+                AutoReverse = true,
+                RepeatBehavior = RepeatBehavior.Forever,
+                EasingFunction = new SineEase { EasingMode = EasingMode.EaseInOut }
             });
         }
 
-        public void PlayTurnActionEffect(List<ActionResult> results, Action AnimateStepBack)
+        private void ApplyPulsingGlow(Image target)
+        {
+            if (glowingSprites.Contains(target))
+                return;
+
+            glowingSprites.Add(target);
+
+            var glow = new DropShadowEffect
+            {
+                Color = (Color)FindResource("Color.Accent"),
+                BlurRadius = 20,
+                ShadowDepth = 0,
+                Opacity = 0.8
+            };
+            target.Effect = glow;
+
+            var pulse = TimeSpan.FromMilliseconds(800);
+            glow.BeginAnimation(DropShadowEffect.BlurRadiusProperty,
+                new DoubleAnimation(20, 40, pulse) { AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever });
+            glow.BeginAnimation(DropShadowEffect.OpacityProperty,
+                new DoubleAnimation(0.8, 0.4, pulse) { AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever });
+        }
+
+        /// <summary>Removes every target pointer and glow.</summary>
+        private void ClearTargetMarks()
+        {
+            foreach (var pointer in targetPointers)
+                SpriteCanvas.Children.Remove(pointer);
+            targetPointers.Clear();
+
+            foreach (var image in glowingSprites)
+                image.Effect = null;
+            glowingSprites.Clear();
+        }
+
+        // ============ Effects ============
+
+        /// <summary>Damage numbers, attack animation and deaths for one action, then onFinished.</summary>
+        private void PlayTurnActionEffect(List<ActionResult> results, Action onFinished)
         {
             var attacker = battleManager.CurrentTurn.BattleActor;
 
-            foreach (ActionResult result in results)
+            foreach (var result in results)
             {
-                //key is target and value is numerical value
-                if (spriteImages.TryGetValue(result.Target, out var targetImage))
-                {
-                    var screenPos = targetImage.TranslatePoint(new Point(targetImage.Width / 2, 0), EffectCanvas);
-                    ShowFloatingText(result.EffectFinalValue.ToString(), result.EffectType, screenPos);
+                if (!spriteImages.ContainsKey(result.Target))
+                    continue;
 
-                    var screenVfxPos = targetImage.TranslatePoint(new Point(targetImage.Width / 2, 0), EffectCanvas);
-                    screenVfxPos.Y = screenVfxPos.Y + 30;
-                    PlayVFX(attacker.AttackVFXFile, screenVfxPos);
-                }
+                Point topCenter = SpriteTopCenter(result.Target);
+                ShowFloatingText(result.EffectFinalValue.ToString(), result.EffectType, topCenter);
+                PlayVFX(attacker.AttackVFXFile, new Point(topCenter.X, topCenter.Y + 30));
+
+                if (result.Target is Enemy enemy && enemyTags.TryGetValue(enemy, out var tag))
+                    tag.Refresh(enemy);
             }
+
+            // Party HP / MP change right away, not at the end of the turn
+            UpdateCharacterPanels();
 
             var deadActors = currentlySelected.Where(t => t.HP <= 0).ToList();
-            
             foreach (var dead in deadActors)
-            {
                 AnimateDeath(dead);
-            }
 
-            DispatcherTimer delay = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(1000) };
-
-            if (deadActors.Count > 0)
-                delay = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(2000) };
-
+            var delay = new DispatcherTimer { Interval = deadActors.Count > 0 ? EffectDelayWithDeath : EffectDelay };
             delay.Tick += (s, e) =>
             {
                 delay.Stop();
-                AnimateStepBack();
+                onFinished();
             };
             delay.Start();
         }
-        #endregion
+
+        private void ShowFloatingText(string text, EffectType type, Point position)
+        {
+            var floatingText = new FloatingText(text, type);
+            Canvas.SetLeft(floatingText, position.X - FloatingText.HalfWidth);
+            Canvas.SetTop(floatingText, position.Y - 30);
+            EffectCanvas.Children.Add(floatingText);
+        }
+
+        private void PlayVFX(string vfxName, Point position)
+        {
+            var vfxImage = new Image
+            {
+                Width = SpriteSize,
+                Height = SpriteSize,
+                RenderTransformOrigin = new Point(0.5, 0.5)
+            };
+
+            var gif = new BitmapImage(new Uri(AssetPathResolver.GetVFXPath(vfxName), UriKind.Absolute));
+            ImageBehavior.SetAnimatedSource(vfxImage, gif);
+            ImageBehavior.SetRepeatBehavior(vfxImage, new RepeatBehavior(1)); // play once
+
+            Canvas.SetLeft(vfxImage, position.X - vfxImage.Width / 2);
+            Canvas.SetTop(vfxImage, position.Y - vfxImage.Height / 2);
+            EffectCanvas.Children.Add(vfxImage);
+
+            var fade = new DoubleAnimation(1.0, 0.0, TimeSpan.FromMilliseconds(800));
+            fade.Completed += (s, e) => EffectCanvas.Children.Remove(vfxImage);
+            vfxImage.BeginAnimation(OpacityProperty, fade);
+        }
+
+        /// <summary>White flash, a pause, then the sprite (and its enemy tag) fade out.</summary>
+        private void AnimateDeath(BattleActor actor)
+        {
+            if (!spriteImages.TryGetValue(actor, out var image))
+                return;
+
+            image.Effect = new DropShadowEffect { Color = Colors.White, BlurRadius = 0, ShadowDepth = 0, Opacity = 1.0 };
+
+            var pause = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(1000) };
+            pause.Tick += (s, e) =>
+            {
+                pause.Stop();
+
+                var fadeOut = new DoubleAnimation
+                {
+                    To = 0,
+                    Duration = TimeSpan.FromMilliseconds(1000),
+                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseIn }
+                };
+                fadeOut.Completed += (s2, e2) => image.Effect = null;
+
+                image.BeginAnimation(OpacityProperty, fadeOut);
+                if (actor is Enemy enemy && enemyTags.TryGetValue(enemy, out var tag))
+                    tag.BeginAnimation(OpacityProperty, fadeOut);
+            };
+            pause.Start();
+        }
+
+        // ============ End of battle ============
+
+        private void ShowVictory()
+        {
+            if (!BeginEnding())
+                return;
+
+            // EXP is given here, split between the members who fought; the screen animates it
+            var gains = battleManager.ShareExperience();
+
+            // Like the reference: the battle stays visible behind the results,
+            // background blurred, sprites sharp, only the left side darkened
+            HideHud();
+            BattleBackground.Effect = new BlurEffect { Radius = VictoryBlurRadius, RenderingBias = RenderingBias.Performance };
+            ShowOutcomeLayer((Brush)FindResource("Brush.VictoryShade"));
+
+            Victory.Show(battleManager.TotalExpReward, gains);
+        }
+
+        private void ShowDefeat()
+        {
+            if (!BeginEnding())
+                return;
+
+            HideHud();
+            ShowOutcomeLayer((Brush)FindResource("Brush.Scrim"));
+            Defeat.Show();
+        }
+
+        /// <summary>Hides the fight's turn order, party status and banner.</summary>
+        private void HideHud()
+        {
+            TurnOrder.Visibility = Visibility.Collapsed;
+            CharacterPanelContainer.Visibility = Visibility.Collapsed;
+            Banner.Visibility = Visibility.Collapsed;
+        }
+
+        private void ShowEscaped()
+        {
+            if (!BeginEnding())
+                return;
+
+            ShowOutcomeLayer((Brush)FindResource("Brush.Scrim"));
+            EscapedScreen.Visibility = Visibility.Visible;
+
+            escapedTimer = new DispatcherTimer { Interval = EscapedDisplayTime };
+            escapedTimer.Tick += (s, e) => FinishBattle(BattleExit.BackToMap);
+            escapedTimer.Start();
+        }
+
+        private void EscapedScreen_Click(object sender, MouseButtonEventArgs e) => FinishBattle(BattleExit.BackToMap);
+
+        /// <summary>Stops the fight UI. False if the battle had already ended.</summary>
+        private bool BeginEnding()
+        {
+            if (hasEnded)
+                return false;
+            hasEnded = true;
+
+            CommandBox.Visibility = Visibility.Collapsed;
+            ClearTargetMarks();
+            return true;
+        }
+
+        /// <param name="shade">What darkens the battle behind the screen.</param>
+        private void ShowOutcomeLayer(Brush shade)
+        {
+            OutcomeLayer.Background = shade;
+            OutcomeLayer.Visibility = Visibility.Visible;
+            OutcomeLayer.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(300)));
+        }
+
+        /// <summary>Hands control back to the scene, once.</summary>
+        private void FinishBattle(BattleExit exit)
+        {
+            if (hasFinished)
+                return;
+            hasFinished = true;
+
+            escapedTimer?.Stop();
+            OnBattleEnd?.Invoke(exit);
+        }
     }
 }

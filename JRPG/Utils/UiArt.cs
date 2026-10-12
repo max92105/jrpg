@@ -26,7 +26,11 @@ namespace JRPG.Utils
                 return cached;
 
             ImageSource image = LoadFile(key) ?? CreatePlaceholder(key);
-            cache[key] = image;
+
+            // Not cached when missing: the art dictionary may simply not be loaded yet
+            if (image != null)
+                cache[key] = image;
+
             return image;
         }
 

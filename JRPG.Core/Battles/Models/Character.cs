@@ -1,5 +1,6 @@
 ﻿using JRPG.Core.Systems.Equipments.Models;
 using System;
+using System.Collections.Generic;
 
 namespace JRPG.Core.Battles.Models
 {
@@ -66,6 +67,37 @@ namespace JRPG.Core.Battles.Models
             {
                 LevelUp();
             }
+        }
+
+        /// <summary>
+        /// Same as GainEXP, but one level at a time, reporting each step
+        /// so the victory screen can fill the EXP bar level by level.
+        /// </summary>
+        public List<ExpStep> GainEXPByLevel(int amount)
+        {
+            var steps = new List<ExpStep>();
+
+            while (amount > 0)
+            {
+                int gained = Math.Min(amount, Math.Max(0, EXPToNextLevel - EXP));
+                int levelBefore = Level;
+
+                var step = new ExpStep
+                {
+                    Level = Level,
+                    FromEXP = EXP,
+                    ToEXP = EXP + gained,
+                    EXPToNextLevel = EXPToNextLevel
+                };
+
+                GainEXP(gained);
+
+                step.LeveledUp = Level > levelBefore;
+                steps.Add(step);
+                amount -= gained;
+            }
+
+            return steps;
         }
     }
 }

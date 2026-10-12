@@ -7,6 +7,9 @@ namespace JRPG.Core.Battles.Models
         public bool SpriteFlip { get; set; } = false;
         public int SlotIndex { get; set; }
 
+        /// <summary>EXP the party shares when this enemy is beaten.</summary>
+        public int ExpReward { get; set; } = 10;
+
         public Enemy()
         {
         }

@@ -1,0 +1,24 @@
+﻿<!--
+    Turn order, top left:   ◆ (acting now, big)  ◆◆◆◆ (next ones) ────────
+-->
+<UserControl x:Class="JRPG.UI.Battle.Controls.TurnOrderBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:controls="clr-namespace:JRPG.UI.Battle.Controls"
+             IsHitTestVisible="False">
+    <Grid>
+        <!-- Thin line the next portraits sit on -->
+        <Rectangle Height="1" Width="760" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="110,0,0,0"
+                   Fill="{StaticResource Brush.SectionLine}"/>
+
+        <StackPanel Orientation="Horizontal">
+            <controls:TurnPortrait x:Name="CurrentPortrait" Width="140" Height="140" IsCurrent="True"/>
+
+            <StackPanel VerticalAlignment="Center" Margin="-8,0,0,0">
+                <TextBlock Text="NEXT" Style="{StaticResource Text.Label}" Margin="20,0,0,2"/>
+                <!-- Filled with small TurnPortraits by Show() -->
+                <StackPanel x:Name="UpcomingPanel" Orientation="Horizontal"/>
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

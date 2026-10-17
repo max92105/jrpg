@@ -131,6 +131,28 @@ public sealed class InventoryTests
     }
 
     [Fact]
+    public void HasRoomFor_StackBelowMax_ReturnsTrue()
+    {
+        var potion = new ItemDefinitionBuilder().WithMaxStack(3).Build();
+        _inventory.Add(potion, 2);
+
+        var hasRoom = _inventory.HasRoomFor(potion);
+
+        Assert.True(hasRoom);
+    }
+
+    [Fact]
+    public void HasRoomFor_StackAtMax_ReturnsFalse()
+    {
+        var potion = new ItemDefinitionBuilder().WithMaxStack(3).Build();
+        _inventory.Add(potion, 3);
+
+        var hasRoom = _inventory.HasRoomFor(potion);
+
+        Assert.False(hasRoom);
+    }
+
+    [Fact]
     public void QuantityOf_ItemNotOwned_ReturnsZero()
     {
         var quantity = _inventory.QuantityOf("potion");

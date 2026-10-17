@@ -4,6 +4,8 @@ namespace Jrpg.Core.Tests.Builders;
 
 internal sealed class PartyMemberBuilder
 {
+    private string _id = "test_member";
+    private string _classId = "warrior";
     private int _level = 1;
     private int _experience;
     private int _hp = 100;
@@ -12,6 +14,18 @@ internal sealed class PartyMemberBuilder
     private int _maxMp = 20;
     private int _attack = 10;
     private int _defense = 5;
+
+    public PartyMemberBuilder WithId(string id)
+    {
+        _id = id;
+        return this;
+    }
+
+    public PartyMemberBuilder WithClass(string classId)
+    {
+        _classId = classId;
+        return this;
+    }
 
     public PartyMemberBuilder AtLevel(int level, int experience = 0)
     {
@@ -38,9 +52,9 @@ internal sealed class PartyMemberBuilder
 
     public PartyMember Build() => PartyMember.Recruit(new PartyMemberDefinition
     {
-        Id = "test_member",
+        Id = _id,
         Name = "Test Member",
-        ClassId = "warrior",
+        ClassId = _classId,
         PortraitFile = "portrait.png",
         BattleSpriteFile = "battle.png",
         AttackEffectFile = "slash.png",

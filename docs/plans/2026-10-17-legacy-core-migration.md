@@ -246,23 +246,31 @@ Slice numbers refer to this plan. P2 = follow-up "world and exploration core", P
   - **From slice 3a review:** `Effect` and `EquipmentStats` are positional records, so System.Text.Json fills them through the constructor, where `required` doesn't apply. Without `RespectRequiredConstructorParameters` a missing `allowedClassIds` would load as `null`. Use an `equipment` without `allowedClassIds` as the case in `ContentFileReader_Read_MissingRequiredField_ThrowsNamingTheFile`. Record equality on definitions is shallow for their lists; compare definitions by `Id`.
   - **Tests (Data):** `ContentCatalogLoader_Load_RepositoryContent_Succeeds` (the "all of content/ must load" test required by `content.md`), `ItemCatalogValidator_Validate_DuplicateId_ThrowsNamingTheId`, `ItemCatalogValidator_Validate_MaxStackZero_ThrowsNamingTheField`, `ItemCatalogValidator_Validate_MenuItemTargetingEnemies_ThrowsNamingTheItem`, `ContentFileReader_Read_MalformedJson_ThrowsNamingTheFile`, `ContentFileReader_Read_MissingRequiredField_ThrowsNamingTheFile`
 
-- [ ] **ADR: equipment ownership model** (before 4). Records the developer's choice of the move model over the legacy "worn copies stay counted" model, and its effect on menus, saves and future shops.
+- [x] **ADR: equipment ownership model** (before 4). Accepted as [ADR 0003](../decisions/0003-equipment-ownership-model.md): move model. Records the developer's choice of the move model over the legacy "worn copies stay counted" model, and its effect on menus, saves and future shops.
 
-- [ ] **4. Party roster and equipment**
-  - **Goal:** Members are recruited from content, the active party enforces size and leader rules, and members equip weapons and armor from the inventory, which changes their total stats.
+Slice 4 was split into 4a (Core) and 4b (content) before implementation: about 1,000 lines as one slice (developer decision 2026-10-17).
+
+- [x] **4a. Party roster and equipment**
+  - **Deviations:**
+    - `ClassDefinition` moved to 4b and `PartyState.MemberById` to slice 8, their first users.
+    - Equipment bonuses sum both items' attack and defense bonuses (legacy only counted weapon attack and armor defense; content allows either on any item).
+    - `TryEquip` with the item already worn returns true and changes nothing. `TryAddToActive`/`TryMoveToReserve` throw `ArgumentException` for a member who isn't recruited.
+    - `Inventory.HasRoomFor` added so equipping checks before it changes anything. `PartyMember.Wear` takes the slot explicitly; slot switches throw on an unknown slot.
+  - **Goal:** The active party enforces size and leader rules, and members equip weapons and armor from the inventory, which changes their total stats. Core only; members are built with test builders.
   - **New types (Core):**
-    - `Party/ClassDefinition`: `record ClassDefinition(string Id, string Name)`. A class that equipment can be restricted to.
     - `Party/PartyRules`: `record PartyRules(int MaxActiveMembers)`. Design limits of the party.
-    - `Content/GameRules`: `record GameRules(PartyRules Party, ExperienceTable Experience)`. The global rules from `content/rules.json`. `ContentCatalog` gains `Rules`.
     - `Party/PartyState`: recruited members and the ordered active party, with the size and leader rules enforced. The leader is always first in the active order. `PartyState(IReadOnlyList<PartyMember> members, IReadOnlyList<PartyMember> activeOrder, PartyRules rules)` (the leader is `activeOrder[0]`), `Members`, `ActiveMembers`, `Leader`, `IsFull`, `PartyMember MemberById(string id)`, `bool TryAddToActive(PartyMember member)`, `bool TryMoveToReserve(PartyMember member)` (false for the leader), `void Reorder(IReadOnlyList<PartyMember> newOrder)`. Throws `ArgumentException` if the set of members differs or the leader isn't first. Legacy silently filtered.
     - `Party/PartyEquipment`: moves equipment between the inventory and party members. `PartyEquipment(Inventory inventory)`, `bool TryEquip(PartyMember member, ItemDefinition item)` (false if the item isn't equipment, the class isn't allowed, no copy is in the inventory, or the replaced item can't fit back in the inventory; on success the copy leaves the inventory and the replaced item returns to it), `bool TryUnequip(PartyMember member, EquipmentSlot slot)` (false if the slot is empty or the inventory stack is full).
     - `PartyMember` gains `Weapon`, `Armor` (`ItemDefinition?`), `CombatStats TotalStats` (base + bonuses), `CombatStats StatsWith(ItemDefinition item)` (the stat preview: total stats if `item` replaced what's in its slot), and `internal` `Wear`/`TakeOff` used only by `PartyEquipment`.
+  - **Tests (Core):** `PartyState_TryAddToActive_PartyFull_ReturnsFalse`, `PartyState_TryMoveToReserve_Leader_ReturnsFalse`, `PartyState_Reorder_DifferentMembers_Throws`, `PartyState_Reorder_LeaderNotFirst_Throws`, `PartyEquipment_TryEquip_ClassNotAllowed_ReturnsFalse`, `PartyEquipment_TryEquip_NoCopyInInventory_ReturnsFalse`, `PartyEquipment_TryEquip_Success_RemovesCopyFromInventory`, `PartyEquipment_TryEquip_SlotOccupied_ReturnsPreviousItemToInventory`, `PartyEquipment_TryEquip_AfterUnequipFromOtherWearer_Succeeds` (the legacy "take it from another wearer" flow), `PartyEquipment_TryUnequip_InventoryStackFull_ReturnsFalseAndKeepsItem`, `PartyMember_TotalStats_WithWeaponAndArmor_AddsBonuses`, `PartyMember_StatsWith_OtherWeapon_ReplacesCurrentWeaponBonus`
+
+- [ ] **4b. Party content**
+  - **Goal:** Classes, the 7 legacy party members and the global rules load and validate from content.
+  - **New types (Core):** `Party/ClassDefinition`: `record ClassDefinition(string Id, string Name)`, a class that equipment can be restricted to. `Content/GameRules`: `record GameRules(PartyRules Party, ExperienceTable Experience)`. The global rules from `content/rules.json`. `ContentCatalog` gains `Classes`, `PartyMembers` and `Rules`.
   - **From slice 2 review:** `ExperienceTable` keeps the caller's list and compares it by reference; copy the list in when it's loaded from content. A definition whose `Experience` is at or above its level's threshold makes `GainExperience` report an odd step, so the validator must reject it (with a test).
   - **New types (Data):** `Party/ClassCatalogValidator`, `Party/PartyMemberCatalogValidator` (unknown class id, `Hp <= MaxHp`, level >= 1, level within the experience table, `Experience` below its level's threshold), `Content/GameRulesValidator` (`MaxActiveMembers >= 1`, every table entry >= 1). `ItemCatalogValidator` also checks `AllowedClassIds` against the classes.
   - **Content:** `content/classes.json` (Warrior, Mage, Thief, Healer, Knight, Ranger), `content/party-members.json` (the 7 legacy members, test values), `content/rules.json` (`maxActiveMembers` 4, a placeholder experience table).
-  - **Tests:**
-    - Core: `PartyState_TryAddToActive_PartyFull_ReturnsFalse`, `PartyState_TryMoveToReserve_Leader_ReturnsFalse`, `PartyState_Reorder_DifferentMembers_Throws`, `PartyState_Reorder_LeaderNotFirst_Throws`, `PartyEquipment_TryEquip_ClassNotAllowed_ReturnsFalse`, `PartyEquipment_TryEquip_NoCopyInInventory_ReturnsFalse`, `PartyEquipment_TryEquip_Success_RemovesCopyFromInventory`, `PartyEquipment_TryEquip_SlotOccupied_ReturnsPreviousItemToInventory`, `PartyEquipment_TryEquip_AfterUnequipFromOtherWearer_Succeeds` (the legacy "take it from another wearer" flow), `PartyEquipment_TryUnequip_InventoryStackFull_ReturnsFalseAndKeepsItem`, `PartyMember_TotalStats_WithWeaponAndArmor_AddsBonuses`, `PartyMember_StatsWith_OtherWeapon_ReplacesCurrentWeaponBonus`
-    - Data: `PartyMemberCatalogValidator_Validate_UnknownClassId_ThrowsNamingTheMember`, `ItemCatalogValidator_Validate_UnknownAllowedClass_ThrowsNamingTheItem`, `GameRulesValidator_Validate_ZeroMaxActiveMembers_ThrowsNamingTheField`
+  - **Tests (Data):** `PartyMemberCatalogValidator_Validate_UnknownClassId_ThrowsNamingTheMember`, `ItemCatalogValidator_Validate_UnknownAllowedClass_ThrowsNamingTheItem`, `GameRulesValidator_Validate_ZeroMaxActiveMembers_ThrowsNamingTheField`
 
 - [ ] **5a. Combatants, turn order and damage**
   - **Goal:** Combatants for both sides are built from party members and enemy definitions, take turns in a seeded shuffled order, and hits use the damage formula.
@@ -357,6 +365,7 @@ Slice numbers refer to this plan. P2 = follow-up "world and exploration core", P
     - `Items/FieldItemUse`: uses a consumable from the menu on party members. `FieldItemUse(Inventory inventory)`, `bool CanUse(ItemDefinition item)` (owned, `IsUsableFromMenu`, has an effect), `IReadOnlyList<int> Use(ItemDefinition item, PartyMember user, IReadOnlyList<PartyMember> targets)` (amount applied per target). Uses `Effects/TargetRules` and `Effects/EffectResolver`, the same code as battle, without creating combatants. `Self` items only target the user.
     - `ContentCatalog` gains `NewGame`.
     - `tests/Jrpg.Core.Tests/Builders/ContentCatalogBuilder` (deferred from 3b), for the `GameSession` tests.
+    - `PartyState.MemberById(string id)` (deferred from 4a), for resolving `ActiveMemberIds`.
   - **New types (Data):** `Session/NewGameValidator` (unknown member or item ids, active members must be recruited, active count within `PartyRules`, quantities >= 1 and within `MaxStack`).
   - **Content:** `content/new-game.json` (all 7 recruited, only Sarxian active, the legacy starting stacks minus Antidote). Test values, to be replaced when the real opening is designed.
   - **Tests:**

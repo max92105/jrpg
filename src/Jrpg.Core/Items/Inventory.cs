@@ -62,5 +62,7 @@ public sealed class Inventory
         return index < 0 ? 0 : _entries[index].Quantity;
     }
 
+    public bool HasRoomFor(ItemDefinition item) => QuantityOf(item.Id) < item.MaxStack;
+
     private int IndexOf(string itemId) => _entries.FindIndex(entry => entry.ItemId == itemId);
 }

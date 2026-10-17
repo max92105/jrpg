@@ -1,3 +1,4 @@
+using Jrpg.Core.Items;
 using Jrpg.Core.Progression;
 using Jrpg.Core.Stats;
 
@@ -28,7 +29,28 @@ public sealed class PartyMember
 
     public Vitals Vitals { get; }
 
+    public ItemDefinition? Weapon { get; private set; }
+
+    public ItemDefinition? Armor { get; private set; }
+
+    /// <summary>Base stats plus the bonuses of everything worn.</summary>
+    public CombatStats TotalStats => StatsWearing(Weapon, Armor);
+
     public static PartyMember Recruit(PartyMemberDefinition definition) => new(definition);
+
+    /// <summary>The stat preview: total stats if <paramref name="item"/> replaced whatever is worn in its slot.</summary>
+    public CombatStats StatsWith(ItemDefinition item)
+    {
+        var slot = item.Equipment?.Slot
+            ?? throw new ArgumentException($"Item '{item.Id}' is not equipment.", nameof(item));
+
+        return slot switch
+        {
+            EquipmentSlot.Weapon => StatsWearing(item, Armor),
+            EquipmentSlot.Armor => StatsWearing(Weapon, item),
+            _ => throw new ArgumentOutOfRangeException(nameof(item), slot, "Unknown equipment slot."),
+        };
+    }
 
     /// <returns>One step per level the experience passes through; empty at the maximum level.</returns>
     public IReadOnlyList<LevelProgressStep> GainExperience(int amount, ExperienceTable table)
@@ -46,6 +68,41 @@ public sealed class PartyMember
 
         return steps;
     }
+
+    internal ItemDefinition? EquippedIn(EquipmentSlot slot) => slot switch
+    {
+        EquipmentSlot.Weapon => Weapon,
+        EquipmentSlot.Armor => Armor,
+        _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot."),
+    };
+
+    /// <remarks>Only <see cref="PartyEquipment"/> calls this, after moving the copy out of the inventory.</remarks>
+    internal void Wear(EquipmentSlot slot, ItemDefinition item) => FillSlot(slot, item);
+
+    internal void TakeOff(EquipmentSlot slot) => FillSlot(slot, null);
+
+    private void FillSlot(EquipmentSlot slot, ItemDefinition? item)
+    {
+        switch (slot)
+        {
+            case EquipmentSlot.Weapon:
+                Weapon = item;
+                break;
+            case EquipmentSlot.Armor:
+                Armor = item;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot.");
+        }
+    }
+
+    private static int AttackBonusOf(ItemDefinition? item) => item?.Equipment?.AttackBonus ?? 0;
+
+    private static int DefenseBonusOf(ItemDefinition? item) => item?.Equipment?.DefenseBonus ?? 0;
+
+    private CombatStats StatsWearing(ItemDefinition? weapon, ItemDefinition? armor) => new(
+        BaseStats.Attack + AttackBonusOf(weapon) + AttackBonusOf(armor),
+        BaseStats.Defense + DefenseBonusOf(weapon) + DefenseBonusOf(armor));
 
     private LevelProgressStep AdvanceTowardNextLevel(int amount, int experienceToNextLevel)
     {

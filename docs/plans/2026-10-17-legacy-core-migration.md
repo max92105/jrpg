@@ -226,7 +226,12 @@ Slice numbers refer to this plan. P2 = follow-up "world and exploration core", P
     - `Items/Inventory`: owned, unworn item quantities in pickup order. `int Add(ItemDefinition item, int quantity)` fills up to `MaxStack` and returns how many didn't fit (throws `ArgumentOutOfRangeException` when the quantity is 0 or less), `bool TryRemove(string itemId, int quantity)`, `int QuantityOf(string itemId)`, `IReadOnlyList<InventoryEntry> Entries`.
   - **Tests (`tests/Jrpg.Core.Tests/Items`; builder `Builders/ItemDefinitionBuilder`):** `Inventory_Add_ExistingItem_IncreasesQuantity`, `Inventory_Add_BeyondMaxStack_FillsToMaxAndReturnsLeftover`, `Inventory_Add_NonPositiveQuantity_Throws`, `Inventory_TryRemove_LastCopy_RemovesEntry`, `Inventory_TryRemove_MoreThanOwned_ReturnsFalseAndKeepsQuantity`, `EquipmentStats_CanBeWornBy_ClassNotAllowed_ReturnsFalse`
 
-- [ ] **3b. Content loading pipeline**
+- [x] **3b. Content loading pipeline**
+  - **Deviations:**
+    - `ContentCatalogBuilder` is deferred to the first slice whose Core tests build a catalog (slice 8); nothing uses it yet.
+    - `Jrpg.Data` declares `InternalsVisibleTo` for `Jrpg.Data.Tests`, so the reader, options and validators stay `internal`; only `ContentCatalogLoader` and `ContentValidationException` are public.
+    - Stricter than planned, from review: duplicate JSON properties are rejected (`AllowDuplicateProperties = false`), and the validator rejects `null` entries and null or empty class ids (the serializer doesn't check collection elements). Parse errors include the JSON path (`items.json at $[0].equipment: …`).
+    - The catalog's dictionary is frozen. Test names drop the class prefix, like Core.Tests. Items with no legacy description have `""`.
   - **Goal:** `content/items.json` loads and validates into a `ContentCatalog`. This sets up the pipeline every later slice extends.
   - **New types (Core):** `Content/ContentCatalog`: record of `IReadOnlyDictionary<string, …>` per definition type, all loaded content by id. Starts with `Items` and gains a property per slice.
   - **New types (Data):**
@@ -351,6 +356,7 @@ Slice numbers refer to this plan. P2 = follow-up "world and exploration core", P
     - `Session/GameSession`: all mutable state of one playthrough, which is what a save will capture in P2. `static GameSession StartNew(ContentCatalog catalog)`, `Party` (`PartyState`), `Inventory`, `Equipment` (`PartyEquipment`).
     - `Items/FieldItemUse`: uses a consumable from the menu on party members. `FieldItemUse(Inventory inventory)`, `bool CanUse(ItemDefinition item)` (owned, `IsUsableFromMenu`, has an effect), `IReadOnlyList<int> Use(ItemDefinition item, PartyMember user, IReadOnlyList<PartyMember> targets)` (amount applied per target). Uses `Effects/TargetRules` and `Effects/EffectResolver`, the same code as battle, without creating combatants. `Self` items only target the user.
     - `ContentCatalog` gains `NewGame`.
+    - `tests/Jrpg.Core.Tests/Builders/ContentCatalogBuilder` (deferred from 3b), for the `GameSession` tests.
   - **New types (Data):** `Session/NewGameValidator` (unknown member or item ids, active members must be recruited, active count within `PartyRules`, quantities >= 1 and within `MaxStack`).
   - **Content:** `content/new-game.json` (all 7 recruited, only Sarxian active, the legacy starting stacks minus Antidote). Test values, to be replaced when the real opening is designed.
   - **Tests:**

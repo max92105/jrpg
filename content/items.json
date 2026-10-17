@@ -1,0 +1,110 @@
+[
+  {
+    "id": "potion",
+    "name": "Potion",
+    "description": "Restores a small amount of HP.",
+    "iconFile": "Consumable.png",
+    "maxStack": 99,
+    "isUsableFromMenu": true,
+    "effect": { "kind": "restoreHp", "power": 15, "targeting": "singleAlly" }
+  },
+  {
+    "id": "hi_potion",
+    "name": "Hi-Potion",
+    "description": "Restores a medium amount of HP.",
+    "iconFile": "Consumable.png",
+    "maxStack": 99,
+    "isUsableFromMenu": true,
+    "effect": { "kind": "restoreHp", "power": 50, "targeting": "singleAlly" }
+  },
+  {
+    "id": "elixir",
+    "name": "Elixir",
+    "description": "Restores 100 HP.",
+    "iconFile": "Consumable.png",
+    "maxStack": 99,
+    "isUsableFromMenu": true,
+    "effect": { "kind": "restoreHp", "power": 100, "targeting": "singleAlly" }
+  },
+  {
+    "id": "bomb",
+    "name": "Bomb",
+    "description": "Damage an enemy.",
+    "iconFile": "Consumable.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "effect": { "kind": "damage", "power": 15, "targeting": "singleEnemy" }
+  },
+  {
+    "id": "bomb_all",
+    "name": "Bomb All",
+    "description": "Damage all enemies.",
+    "iconFile": "Consumable.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "effect": { "kind": "damage", "power": 30, "targeting": "allEnemies" }
+  },
+  {
+    "id": "revive_feather",
+    "name": "Revive Feather",
+    "description": "Revives all fallen allies.",
+    "iconFile": "Consumable.png",
+    "maxStack": 99,
+    "isUsableFromMenu": true,
+    "effect": { "kind": "revive", "power": 15, "targeting": "allFallenAllies" }
+  },
+  {
+    "id": "bronze_sword",
+    "name": "Bronze Sword",
+    "description": "Sword made of bronze",
+    "iconFile": "Weapon.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": { "slot": "weapon", "attackBonus": 5, "defenseBonus": 0, "allowedClassIds": ["warrior", "knight", "thief"] }
+  },
+  {
+    "id": "iron_sword",
+    "name": "Iron Sword",
+    "description": "Sword made of iron",
+    "iconFile": "Weapon.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": { "slot": "weapon", "attackBonus": 8, "defenseBonus": 0, "allowedClassIds": ["warrior", "knight"] }
+  },
+  {
+    "id": "magic_staff",
+    "name": "Magic Staff",
+    "description": "",
+    "iconFile": "Weapon.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": { "slot": "weapon", "attackBonus": 6, "defenseBonus": 0, "allowedClassIds": ["mage", "healer"] }
+  },
+  {
+    "id": "leather_armor",
+    "name": "Leather Armor",
+    "description": "",
+    "iconFile": "Armor.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 3, "allowedClassIds": ["warrior", "knight", "thief", "ranger"] }
+  },
+  {
+    "id": "chain_mail",
+    "name": "Chain Mail",
+    "description": "",
+    "iconFile": "Armor.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 6, "allowedClassIds": ["warrior", "knight"] }
+  },
+  {
+    "id": "wizard_robe",
+    "name": "Wizard Robe",
+    "description": "",
+    "iconFile": "Armor.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 4, "allowedClassIds": ["mage", "healer"] }
+  }
+]

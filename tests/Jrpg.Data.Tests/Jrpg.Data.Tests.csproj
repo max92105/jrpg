@@ -3,8 +3,6 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <!-- No tests until slice 3b of docs/plans/2026-10-17-legacy-core-migration.md, and an empty run exits with code 8. Remove then. -->
-    <TestingPlatformCommandLineArguments>--ignore-exit-code 8</TestingPlatformCommandLineArguments>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +12,11 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Jrpg.Core\Jrpg.Core.csproj" />
     <ProjectReference Include="..\..\src\Jrpg.Data\Jrpg.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\content\**" LinkBase="content" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="TestContent\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

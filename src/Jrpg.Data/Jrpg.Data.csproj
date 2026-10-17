@@ -8,4 +8,8 @@
     <ProjectReference Include="..\Jrpg.Core\Jrpg.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Jrpg.Data.Tests" />
+  </ItemGroup>
+
 </Project>

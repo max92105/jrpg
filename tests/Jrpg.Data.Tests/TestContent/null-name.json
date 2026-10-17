@@ -1,0 +1,10 @@
+[
+  {
+    "id": "potion",
+    "name": null,
+    "description": "",
+    "iconFile": "Consumable.png",
+    "maxStack": 99,
+    "isUsableFromMenu": true
+  }
+]

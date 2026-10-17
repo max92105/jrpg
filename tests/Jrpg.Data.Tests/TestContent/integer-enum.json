@@ -1,0 +1,11 @@
+[
+  {
+    "id": "potion",
+    "name": "Potion",
+    "description": "",
+    "iconFile": "Consumable.png",
+    "maxStack": 99,
+    "isUsableFromMenu": true,
+    "effect": { "kind": 1, "power": 15, "targeting": "singleAlly" }
+  }
+]

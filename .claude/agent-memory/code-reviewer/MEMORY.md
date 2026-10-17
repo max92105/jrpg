@@ -1,1 +1,1 @@
-- [Scratch builds blocked](scratch-builds-blocked.md) — WDAC blocks running DLLs from temp scratchpad; grep DLL bytes instead
+- [Scratch builds blocked](scratch-builds-blocked.md) — WDAC blocks scratch DLLs; grep DLL bytes; `dotnet fsi` + #r repo bin DLL works for probes

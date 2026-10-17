@@ -1774,5 +1774,43 @@
     "AbovePlayerZones": [],
     "IsNpc": false,
     "Meta": {}
+  },
+  {
+    "Id": 11,
+    "Name": "Door_Close",
+    "Category": "General",
+    "Width": 1,
+    "Height": 1,
+    "Tiles": [
+      {
+        "X": 18,
+        "Y": 24,
+        "TileId": 94,
+        "Z": 0
+      }
+    ],
+    "CollisionPolygon": [],
+    "AbovePlayerZones": [],
+    "IsNpc": false,
+    "Meta": {}
+  },
+  {
+    "Id": 12,
+    "Name": "Door_Open",
+    "Category": "General",
+    "Width": 1,
+    "Height": 1,
+    "Tiles": [
+      {
+        "X": 18,
+        "Y": 30,
+        "TileId": 283,
+        "Z": 0
+      }
+    ],
+    "CollisionPolygon": [],
+    "AbovePlayerZones": [],
+    "IsNpc": false,
+    "Meta": {}
   }
 ]

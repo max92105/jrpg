@@ -1,6 +1,7 @@
 ﻿using JRPG.Core.Events.Models;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace JRPG.Core.Maps.Models
 {
@@ -18,8 +19,26 @@ namespace JRPG.Core.Maps.Models
         // Stable id of this placed object on its map (used to remember opened chests etc.)
         public string Uid { get; set; }
 
-        // Optional event (chest, door, sign...); null for plain decoration
-        public MapEvent Event { get; set; }
+        // Events (chest, door, sign...); empty for plain decoration. Several events let one object
+        // react to a press and to a touch, or differently by state (closed door / open door).
+        public List<MapEvent> Events { get; set; } = new List<MapEvent>();
+
+        // Maps saved before multiple events had a single "event": read into Events, never written
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public MapEvent Event
+        {
+            get => null;
+            set { if (value != null) Events.Add(value); }
+        }
+
+        [JsonIgnore]
+        public bool HasEvents => Events != null && Events.Count > 0;
+
+        /// <summary>
+        /// Key remembering a "once" event as done. The first event keeps the plain uid,
+        /// so saves made before multiple events still know which chests were opened.
+        /// </summary>
+        public string EventKey(int index) => index == 0 ? Uid : $"{Uid}#{index}";
 
         public static string NewUid() => Guid.NewGuid().ToString("N").Substring(0, 8);
 

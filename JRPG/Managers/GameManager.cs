@@ -54,7 +54,7 @@ namespace JRPG
         private bool eventRunning;
         private bool interactWasDown = true;        // a key already held doesn't count as a new press
         private bool touchArmed = true;             // off right after a warp until the player stops (no door ping-pong)
-        private PlacedObject promptTarget;          // object whose "[E] ..." prompt is shown
+        private ObjectEvent promptTarget;           // event whose "[E] ..." prompt is shown
         private Border promptBox;
         private TextBlock promptText;
 
@@ -244,8 +244,16 @@ namespace JRPG
             }
         }
 
-        /// <summary>The object with an event of this kind just in front of the player, if any.</summary>
-        private PlacedObject FindEventInFront(EventActivation activation)
+        /// <summary>One event of a placed object (an object can have several: press to open, walk in to warp...).</summary>
+        private sealed class ObjectEvent
+        {
+            public PlacedObject Object;
+            public MapEvent Event;
+            public int Index;
+        }
+
+        /// <summary>The first event of this kind that can run on the object just in front of the player, if any.</summary>
+        private ObjectEvent FindEventInFront(EventActivation activation)
         {
             double dx = Player.Direction == Direction.Left ? -1 : Player.Direction == Direction.Right ? 1 : 0;
             double dy = Player.Direction == Direction.Up ? -1 : Player.Direction == Direction.Down ? 1 : 0;
@@ -256,27 +264,36 @@ namespace JRPG
             for (int i = objects.Count - 1; i >= 0; i--) // top-most first
             {
                 var obj = objects[i];
-                var ev = obj.Event;
-                if (ev == null || ev.Activation != activation || ev.Actions == null || ev.Actions.Count == 0)
-                    continue;
-                if (ev.Once && GameSystems.World.IsEventDone(currentMapFile, obj.Uid))
+                if (!obj.HasEvents)
                     continue;
                 if (!ObjectDatabase.Definitions.TryGetValue(obj.Id, out var def))
                     continue;
 
                 const double margin = 0.1;
                 var (_, _, width, height) = def.GetTileBounds();
-                if (px >= obj.X - margin && px <= obj.X + width + margin &&
-                    py >= obj.Y - margin && py <= obj.Y + height + margin)
-                    return obj;
+                if (px < obj.X - margin || px > obj.X + width + margin ||
+                    py < obj.Y - margin || py > obj.Y + height + margin)
+                    continue;
+
+                for (int e = 0; e < obj.Events.Count; e++)
+                {
+                    var ev = obj.Events[e];
+                    if (ev == null || ev.Activation != activation || !ev.IsActiveOn(obj))
+                        continue;
+                    if (ev.Once && GameSystems.World.IsEventDone(currentMapFile, obj.EventKey(e)))
+                        continue;
+
+                    return new ObjectEvent { Object = obj, Event = ev, Index = e };
+                }
             }
 
             return null;
         }
 
-        private async Task RunEventAsync(PlacedObject obj)
+        private async Task RunEventAsync(ObjectEvent target)
         {
-            var ev = obj.Event;
+            var obj = target.Object;
+            var ev = target.Event;
             string mapFile = currentMapFile;
 
             eventRunning = true;
@@ -285,7 +302,7 @@ namespace JRPG
 
             // Mark it first, so a battle or warp in the middle can't make it run twice
             if (ev.Once)
-                GameSystems.World.MarkEventDone(mapFile, obj.Uid);
+                GameSystems.World.MarkEventDone(mapFile, obj.EventKey(target.Index));
 
             try
             {
@@ -453,14 +470,14 @@ namespace JRPG
 
         private void UpdatePrompt(double cameraX, double cameraY)
         {
-            var obj = promptTarget;
+            var obj = promptTarget?.Object;
             if (obj == null || eventRunning || isPaused || !ObjectDatabase.Definitions.TryGetValue(obj.Id, out var def))
             {
                 promptBox.Visibility = Visibility.Collapsed;
                 return;
             }
 
-            string prompt = string.IsNullOrWhiteSpace(obj.Event.Prompt) ? "Check" : obj.Event.Prompt;
+            string prompt = string.IsNullOrWhiteSpace(promptTarget.Event.Prompt) ? "Check" : promptTarget.Event.Prompt;
             promptText.Text = $"[E] {prompt}";
             promptBox.Visibility = Visibility.Visible;
             promptBox.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));

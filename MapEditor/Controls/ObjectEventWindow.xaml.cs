@@ -16,48 +16,135 @@ using System.Windows.Media;
 namespace MapEditor.Controls
 {
     /// <summary>
-    /// Edits the event of a placed object: when it starts, its prompt, "only once", and its
-    /// list of actions. Works on a copy; Result is the edited event (null = remove it).
+    /// Edits the events of a placed object. Each event has when it starts, its prompt, an optional
+    /// "only while the object is" condition, "only once", and its list of actions. Works on copies;
+    /// Result is the edited list (empty = remove them all).
     /// </summary>
     public partial class ObjectEventWindow : Window
     {
         private readonly ObjectDefinition definition;
         private readonly string currentMapFile;
-        private readonly MapEvent working;
+        private readonly List<MapEvent> events;
+        private bool loadingFields;
 
-        public MapEvent Result { get; private set; }
+        public List<MapEvent> Result { get; private set; }
 
-        public ObjectEventWindow(ObjectDefinition definition, MapEvent existing, string currentMapFile)
+        // The event being edited (there is always at least one while the window is open)
+        private MapEvent working => events[Math.Max(0, EventList.SelectedIndex)];
+
+        public ObjectEventWindow(ObjectDefinition definition, IEnumerable<MapEvent> existing, string currentMapFile)
         {
             InitializeComponent();
 
             this.definition = definition;
             this.currentMapFile = currentMapFile;
-            working = existing?.Clone() ?? new MapEvent();
+            events = existing?.Where(e => e != null).Select(e => e.Clone()).ToList() ?? new List<MapEvent>();
+            if (events.Count == 0)
+                events.Add(new MapEvent());
 
             ObjectText.Text = $"Object: {definition?.Name ?? "?"}";
+
+            ConditionBox.Items.Add(new ComboBoxItem { Content = "(anything: always)", Tag = null });
+            foreach (var def in ObjectDatabase.Definitions.Values.OrderBy(d => d.Category).ThenBy(d => d.Name))
+                ConditionBox.Items.Add(new ComboBoxItem { Content = $"{def.Name}  ({def.Category})", Tag = def.Id });
+
+            // Fields write straight into the selected event, so switching events keeps the edits
+            ActivationBox.SelectionChanged += (s, e) => ReadEventFields();
+            PromptBox.TextChanged += (s, e) => ReadEventFields();
+            ConditionBox.SelectionChanged += (s, e) => ReadEventFields();
+            OnceBox.Click += (s, e) => ReadEventFields();
+
+            RefreshEventList(0);
+        }
+
+        // === Event list ===
+
+        private void RefreshEventList(int select)
+        {
+            loadingFields = true;
+            EventList.Items.Clear();
+            for (int i = 0; i < events.Count; i++)
+                EventList.Items.Add(new ListBoxItem { Content = $"{i + 1}. {events[i].Describe(ObjectName)}" });
+            loadingFields = false;
+
+            EventList.SelectedIndex = Math.Max(0, Math.Min(select, events.Count - 1));
+        }
+
+        private void RefreshSelectedEventLabel()
+        {
+            int index = EventList.SelectedIndex;
+            if (index >= 0 && EventList.Items[index] is ListBoxItem item)
+                item.Content = $"{index + 1}. {events[index].Describe(ObjectName)}";
+        }
+
+        private void EventList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (loadingFields || EventList.SelectedIndex < 0)
+                return;
+
             LoadEventFields();
             RefreshActionList(working.Actions.Count > 0 ? 0 : -1);
+        }
+
+        private void AddEvent_Click(object sender, RoutedEventArgs e)
+        {
+            events.Add(new MapEvent());
+            RefreshEventList(events.Count - 1);
+        }
+
+        private void RemoveEvent_Click(object sender, RoutedEventArgs e)
+        {
+            int index = EventList.SelectedIndex;
+            if (index < 0) return;
+
+            events.RemoveAt(index);
+            if (events.Count == 0)
+                events.Add(new MapEvent());
+            RefreshEventList(index);
+        }
+
+        private void EventUp_Click(object sender, RoutedEventArgs e) => MoveSelectedEvent(-1);
+        private void EventDown_Click(object sender, RoutedEventArgs e) => MoveSelectedEvent(+1);
+
+        private void MoveSelectedEvent(int direction)
+        {
+            int index = EventList.SelectedIndex;
+            int target = index + direction;
+            if (index < 0 || target < 0 || target >= events.Count) return;
+
+            var ev = events[index];
+            events.RemoveAt(index);
+            events.Insert(target, ev);
+            RefreshEventList(target);
         }
 
         // === Event settings ===
 
         private void LoadEventFields()
         {
+            loadingFields = true;
             ActivationBox.SelectedItem = ActivationBox.Items.OfType<ComboBoxItem>()
                 .FirstOrDefault(i => (string)i.Tag == working.Activation.ToString());
             PromptBox.Text = working.Prompt ?? "";
+            ConditionBox.SelectedItem = ConditionBox.Items.OfType<ComboBoxItem>()
+                .FirstOrDefault(i => (int?)i.Tag == working.OnlyWhenObjectId) ?? ConditionBox.Items[0];
             OnceBox.IsChecked = working.Once;
+            loadingFields = false;
         }
 
         private void ReadEventFields()
         {
+            if (loadingFields)
+                return;
+
             if (ActivationBox.SelectedItem is ComboBoxItem item &&
                 Enum.TryParse((string)item.Tag, out EventActivation activation))
                 working.Activation = activation;
 
             working.Prompt = PromptBox.Text.Trim();
+            working.OnlyWhenObjectId = (ConditionBox.SelectedItem as ComboBoxItem)?.Tag as int?;
             working.Once = OnceBox.IsChecked == true;
+            RefreshSelectedEventLabel();
         }
 
         // === Action list ===
@@ -74,6 +161,8 @@ namespace MapEditor.Controls
             ActionList.SelectedIndex = Math.Min(select, working.Actions.Count - 1);
             if (ActionList.SelectedIndex < 0)
                 ShowActionEditor(null);
+
+            RefreshSelectedEventLabel(); // the action count changed
         }
 
         /// <summary>Updates the label of the selected action after one of its fields changed.</summary>
@@ -275,38 +364,81 @@ namespace MapEditor.Controls
 
         // === Presets ===
 
+        /// <summary>Replaces all events with the preset's, selects one event and one of its actions to check.</summary>
+        private void ApplyPreset(List<MapEvent> presetEvents, int showEvent, int showAction)
+        {
+            events.Clear();
+            events.AddRange(presetEvents);
+            RefreshEventList(showEvent);
+            RefreshActionList(showAction);
+        }
+
         private void PresetChest_Click(object sender, RoutedEventArgs e)
         {
-            working.Activation = EventActivation.Interact;
-            working.Prompt = "Open";
-            working.Once = true;
-            working.Actions = new List<EventAction>
+            ApplyPreset(new List<MapEvent>
             {
-                CreateAction(EventActionType.GiveItem),
-                CreateAction(EventActionType.SwapObject)
-            };
-            LoadEventFields();
-            RefreshActionList(1); // show the swap: check it points to the open chest
+                new MapEvent
+                {
+                    Activation = EventActivation.Interact,
+                    Prompt = "Open",
+                    Once = true,
+                    Actions = new List<EventAction>
+                    {
+                        CreateAction(EventActionType.GiveItem),
+                        CreateAction(EventActionType.SwapObject)
+                    }
+                }
+            }, 0, 1); // show the swap: check it points to the open chest
         }
 
         private void PresetDoor_Click(object sender, RoutedEventArgs e)
         {
-            working.Activation = EventActivation.Touch;
-            working.Prompt = "Enter";
-            working.Once = false;
-            working.Actions = new List<EventAction> { CreateAction(EventActionType.Warp) };
-            LoadEventFields();
-            RefreshActionList(0);
+            ApplyPreset(new List<MapEvent>
+            {
+                new MapEvent
+                {
+                    Activation = EventActivation.Touch,
+                    Prompt = "Enter",
+                    Actions = new List<EventAction> { CreateAction(EventActionType.Warp) }
+                }
+            }, 0, 0);
+        }
+
+        private void PresetOpenDoor_Click(object sender, RoutedEventArgs e)
+        {
+            int openId = GuessOpenVersion();
+            ApplyPreset(new List<MapEvent>
+            {
+                // Closed: press to open (turns into the open door, remembered in the save)
+                new MapEvent
+                {
+                    Activation = EventActivation.Interact,
+                    Prompt = "Open",
+                    OnlyWhenObjectId = definition?.Id,
+                    Actions = new List<EventAction> { new EventAction { Type = EventActionType.SwapObject, ObjectId = openId } }
+                },
+                // Open: walk in to warp
+                new MapEvent
+                {
+                    Activation = EventActivation.Touch,
+                    Prompt = "Enter",
+                    OnlyWhenObjectId = openId,
+                    Actions = new List<EventAction> { CreateAction(EventActionType.Warp) }
+                }
+            }, 1, 0); // show the warp: set where the door leads
         }
 
         private void PresetSign_Click(object sender, RoutedEventArgs e)
         {
-            working.Activation = EventActivation.Interact;
-            working.Prompt = "Read";
-            working.Once = false;
-            working.Actions = new List<EventAction> { CreateAction(EventActionType.Dialogue) };
-            LoadEventFields();
-            RefreshActionList(0);
+            ApplyPreset(new List<MapEvent>
+            {
+                new MapEvent
+                {
+                    Activation = EventActivation.Interact,
+                    Prompt = "Read",
+                    Actions = new List<EventAction> { CreateAction(EventActionType.Dialogue) }
+                }
+            }, 0, 0);
         }
 
         /// <summary>Best guess for the "open" version of this object (e.g. "Chest" -> "Chest Open").</summary>
@@ -349,20 +481,21 @@ namespace MapEditor.Controls
         {
             ReadEventFields();
 
-            if (working.Actions.Count == 0)
+            int empty = events.Count(ev => ev.Actions.Count == 0);
+            if (empty > 0)
             {
-                var answer = MessageBox.Show(this, "This event has no actions, so it will do nothing. Keep it anyway?",
-                    "Object Event", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                var answer = MessageBox.Show(this, $"{empty} event(s) have no actions, so they will do nothing. Keep them anyway?",
+                    "Object Events", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (answer != MessageBoxResult.Yes) return;
             }
 
-            Result = working;
+            Result = events;
             DialogResult = true;
         }
 
-        private void RemoveEvent_Click(object sender, RoutedEventArgs e)
+        private void RemoveAllEvents_Click(object sender, RoutedEventArgs e)
         {
-            Result = null;
+            Result = new List<MapEvent>();
             DialogResult = true;
         }
     }

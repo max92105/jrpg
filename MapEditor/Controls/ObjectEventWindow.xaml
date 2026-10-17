@@ -1,12 +1,12 @@
 <Window x:Class="MapEditor.Controls.ObjectEventWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Object Event" Height="600" Width="820"
+        Title="Object Events" Height="760" Width="820"
         WindowStartupLocation="CenterOwner">
     <DockPanel Margin="12">
         <!-- Bottom buttons -->
         <DockPanel DockPanel.Dock="Bottom" Margin="0,12,0,0">
-            <Button Content="Remove event" Width="110" DockPanel.Dock="Left" Click="RemoveEvent_Click"
+            <Button Content="Remove all events" Width="130" DockPanel.Dock="Left" Click="RemoveAllEvents_Click"
                     ToolTip="This object becomes plain decoration again"/>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button Content="OK" Width="90" Margin="0,0,8,0" IsDefault="True" Click="Ok_Click"/>
@@ -26,16 +26,28 @@
                 <StackPanel DockPanel.Dock="Top">
                     <TextBlock x:Name="ObjectText" Foreground="Gray" Margin="0,0,0,8"/>
 
-                    <TextBlock Text="Quick start" FontWeight="Bold"/>
-                    <StackPanel Orientation="Horizontal" Margin="0,4,0,12">
-                        <Button Content="Chest" Width="80" Margin="0,0,6,0" Click="PresetChest_Click"
+                    <TextBlock Text="Quick start (replaces all events)" FontWeight="Bold"/>
+                    <WrapPanel Margin="0,4,0,12">
+                        <Button Content="Chest" Width="80" Margin="0,0,6,6" Click="PresetChest_Click"
                                 ToolTip="Press to open, gives an item, turns into the open chest, only once"/>
-                        <Button Content="Door" Width="80" Margin="0,0,6,0" Click="PresetDoor_Click"
+                        <Button Content="Door" Width="80" Margin="0,0,6,6" Click="PresetDoor_Click"
                                 ToolTip="Walk into it to go to another map"/>
-                        <Button Content="Sign" Width="80" Click="PresetSign_Click"
+                        <Button Content="Door you open" Width="100" Margin="0,0,6,6" Click="PresetOpenDoor_Click"
+                                ToolTip="Closed: press to open it (turns into the open door). Open: walk into it to go to another map"/>
+                        <Button Content="Sign" Width="80" Margin="0,0,6,6" Click="PresetSign_Click"
                                 ToolTip="Press to read a message"/>
+                    </WrapPanel>
+
+                    <TextBlock Text="Events on this object (the first one that fits runs)" FontWeight="Bold"/>
+                    <ListBox x:Name="EventList" Height="90" Margin="0,4,0,4" SelectionChanged="EventList_SelectionChanged"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                        <Button Content="Add event" Width="80" Margin="0,0,6,0" Click="AddEvent_Click"/>
+                        <Button Content="Up" Width="50" Margin="0,0,6,0" Click="EventUp_Click"/>
+                        <Button Content="Down" Width="50" Margin="0,0,6,0" Click="EventDown_Click"/>
+                        <Button Content="Remove event" Width="100" Click="RemoveEvent_Click"/>
                     </StackPanel>
 
+                    <Border BorderBrush="#DDD" BorderThickness="0,1,0,0" Padding="0,8,0,0"/>
                     <TextBlock Text="Starts when" FontWeight="Bold"/>
                     <ComboBox x:Name="ActivationBox" Margin="0,4,0,8">
                         <ComboBoxItem Content="The player faces it and presses E / Space / Enter" Tag="Interact"/>
@@ -44,6 +56,9 @@
 
                     <TextBlock Text="Prompt shown above it (for 'presses')"/>
                     <TextBox x:Name="PromptBox" Margin="0,4,0,8"/>
+
+                    <TextBlock Text="Only while the object is" ToolTip="E.g. 'open' only works on the closed door, 'enter' only on the open door"/>
+                    <ComboBox x:Name="ConditionBox" Margin="0,4,0,8"/>
 
                     <CheckBox x:Name="OnceBox" Content="Only once (remembered in the save, e.g. a chest)" Margin="0,0,0,12"/>
 

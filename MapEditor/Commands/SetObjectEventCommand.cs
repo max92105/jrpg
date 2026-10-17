@@ -1,25 +1,26 @@
 using JRPG.Core.Events.Models;
 using JRPG.Core.Maps.Models;
 using MapEditor.Undo;
+using System.Collections.Generic;
 
 namespace MapEditor.Commands
 {
-    /// <summary>Sets (or removes, with null) the event of a placed object.</summary>
+    /// <summary>Sets (or removes, with an empty list) the events of a placed object.</summary>
     public class SetObjectEventCommand : IEditorCommand
     {
         private readonly PlacedObject obj;
-        private readonly MapEvent newEvent;
-        private readonly MapEvent oldEvent;
+        private readonly List<MapEvent> newEvents;
+        private readonly List<MapEvent> oldEvents;
 
-        public SetObjectEventCommand(PlacedObject obj, MapEvent newEvent)
+        public SetObjectEventCommand(PlacedObject obj, List<MapEvent> newEvents)
         {
             this.obj = obj;
-            this.newEvent = newEvent;
-            oldEvent = obj.Event;
+            this.newEvents = newEvents ?? new List<MapEvent>();
+            oldEvents = obj.Events;
         }
 
-        public void Execute() => obj.Event = newEvent;
+        public void Execute() => obj.Events = newEvents;
 
-        public void Undo() => obj.Event = oldEvent;
+        public void Undo() => obj.Events = oldEvents;
     }
 }

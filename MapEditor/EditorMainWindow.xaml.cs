@@ -846,12 +846,15 @@ namespace MapEditor
                         AddMapDrawable(zoneZ + 1, dc => dc.DrawGeometry(ZoneFill, ZonePen, clip));
                 }
 
-                // Event marker at the object's top-right corner: yellow = press to use, cyan = walk into
-                if (obj.Event != null)
+                // Event markers along the object's top-right corner, one per event: yellow = press to use, cyan = walk into
+                if (obj.HasEvents)
                 {
-                    var center = new Point((obj.X + width) * MapConstant.TileSize - 8, obj.Y * MapConstant.TileSize + 8);
-                    var fill = obj.Event.Activation == EventActivation.Touch ? Brushes.Cyan : Brushes.Gold;
-                    AddMapDrawable(100, dc => dc.DrawEllipse(fill, EventMarkerPen, center, 6, 6));
+                    for (int i = 0; i < obj.Events.Count; i++)
+                    {
+                        var center = new Point((obj.X + width) * MapConstant.TileSize - 8 - i * 13, obj.Y * MapConstant.TileSize + 8);
+                        var fill = obj.Events[i].Activation == EventActivation.Touch ? Brushes.Cyan : Brushes.Gold;
+                        AddMapDrawable(100, dc => dc.DrawEllipse(fill, EventMarkerPen, center, 6, 6));
+                    }
                 }
 
                 if (showCollision && def.CollisionPolygon != null && def.CollisionPolygon.Count >= 2)
@@ -1148,7 +1151,8 @@ namespace MapEditor
                 "  Shift + drag: move an object\n" +
                 "  Double-click an object in the list: open the Object Editor\n\n" +
                 "EVENTS\n" +
-                "  Left click an object: edit its event (presets: Chest, Door, Sign)\n" +
+                "  Left click an object: edit its events (presets: Chest, Door, Door you open, Sign)\n" +
+                "  An object can have several events, e.g. press to open, then walk in to warp\n" +
                 "  Left click a tile: add or edit the tile's trigger\n" +
                 "  Right click: remove the event / trigger\n" +
                 "  Markers on the map: yellow = press to use, cyan = walk into\n\n" +
@@ -1972,7 +1976,7 @@ namespace MapEditor
         {
             ObjectDatabase.Definitions.TryGetValue(obj.Id, out var def);
 
-            var window = new ObjectEventWindow(def, obj.Event, currentFilePath) { Owner = this };
+            var window = new ObjectEventWindow(def, obj.Events, currentFilePath) { Owner = this };
             if (window.ShowDialog() != true)
                 return;
 
@@ -1981,9 +1985,9 @@ namespace MapEditor
 
             ExecuteEdit(new SetObjectEventCommand(obj, window.Result));
             RedrawMap();
-            ShowStatusMessage(window.Result == null
-                ? $"Removed the event of {def?.Name ?? "object"}"
-                : $"{def?.Name ?? "Object"}: event saved ({window.Result.Actions.Count} action(s)). Save the map to keep it.");
+            ShowStatusMessage(window.Result.Count == 0
+                ? $"Removed the events of {def?.Name ?? "object"}"
+                : $"{def?.Name ?? "Object"}: {window.Result.Count} event(s) saved. Save the map to keep them.");
         }
 
         private void MapCanvas_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
@@ -2015,11 +2019,11 @@ namespace MapEditor
 
                 case EditorMode.Trigger:
                     var eventObject = GetObjectUnderPointer(pos);
-                    if (eventObject?.Event != null)
+                    if (eventObject != null && eventObject.HasEvents)
                     {
                         ExecuteEdit(new SetObjectEventCommand(eventObject, null));
                         RedrawMap();
-                        ShowStatusMessage("Removed the object's event (Ctrl+Z to undo)");
+                        ShowStatusMessage("Removed the object's events (Ctrl+Z to undo)");
                     }
                     else
                     {

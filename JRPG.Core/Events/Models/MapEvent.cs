@@ -1,3 +1,4 @@
+using JRPG.Core.Maps.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
@@ -81,7 +82,26 @@ namespace JRPG.Core.Events.Models
         // Runs only once per game (remembered in the save), e.g. a chest
         public bool Once { get; set; }
 
+        // Only runs while the object is this object definition (null = always). Lets one object
+        // react by state, e.g. a closed door opens on a press, the open door warps on touch.
+        public int? OnlyWhenObjectId { get; set; }
+
         public List<EventAction> Actions { get; set; } = new List<EventAction>();
+
+        /// <summary>True if this event can start on this object right now (ignores "once").</summary>
+        public bool IsActiveOn(PlacedObject obj) =>
+            Actions != null && Actions.Count > 0 &&
+            (OnlyWhenObjectId == null || OnlyWhenObjectId == obj.Id);
+
+        /// <summary>One-line summary for lists in the editor.</summary>
+        public string Describe(System.Func<int, string> objectName = null)
+        {
+            string when = Activation == EventActivation.Touch ? "Walk into" : $"Press \"{Prompt}\"";
+            string condition = OnlyWhenObjectId.HasValue
+                ? $" if {objectName?.Invoke(OnlyWhenObjectId.Value) ?? "#" + OnlyWhenObjectId}"
+                : "";
+            return $"{when}{condition}: {Actions?.Count ?? 0} action(s){(Once ? ", once" : "")}";
+        }
 
         private static readonly JsonSerializerOptions CloneOptions = new JsonSerializerOptions
         {

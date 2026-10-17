@@ -3322,5 +3322,77 @@
     "SheetX": 9,
     "SheetY": 6,
     "CollisionPolygon": null
+  },
+  "278": {
+    "Id": 278,
+    "Name": "City 5,14",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "City.png",
+    "SheetX": 5,
+    "SheetY": 14,
+    "CollisionPolygon": null
+  },
+  "279": {
+    "Id": 279,
+    "Name": "City 1,7",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "City.png",
+    "SheetX": 1,
+    "SheetY": 7,
+    "CollisionPolygon": null
+  },
+  "280": {
+    "Id": 280,
+    "Name": "City 0,7",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "City.png",
+    "SheetX": 0,
+    "SheetY": 7,
+    "CollisionPolygon": null
+  },
+  "281": {
+    "Id": 281,
+    "Name": "City 2,7",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "City.png",
+    "SheetX": 2,
+    "SheetY": 7,
+    "CollisionPolygon": null
+  },
+  "282": {
+    "Id": 282,
+    "Name": "City 5,15",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "City.png",
+    "SheetX": 5,
+    "SheetY": 15,
+    "CollisionPolygon": null
+  },
+  "283": {
+    "Id": 283,
+    "Name": "City 18,30",
+    "IsWalkable": true,
+    "Sprite": null,
+    "Frames": null,
+    "FrameDuration": 0.0,
+    "Tilesheet": "City.png",
+    "SheetX": 18,
+    "SheetY": 30,
+    "CollisionPolygon": null
   }
 }

@@ -13,6 +13,12 @@ internal static class GameRulesValidator
         }
 
         var thresholds = rules.Experience.ExperienceToNextLevel;
+        if (thresholds.Count == 0)
+        {
+            // An empty table caps everyone at level 1, so nobody could ever level up (developer decision 24).
+            throw new ContentValidationException($"{fileName}: experience.experienceToNextLevel must have at least one entry.");
+        }
+
         for (var index = 0; index < thresholds.Count; index++)
         {
             if (thresholds[index] < 1)

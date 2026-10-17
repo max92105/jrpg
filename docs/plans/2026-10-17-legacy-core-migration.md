@@ -307,7 +307,7 @@ Slice 4 was split into 4a (Core) and 4b (content) before implementation: about 1
 - [x] **5b. Battle commands: attack, defend, flee**
   - **Deviations:**
     - `BattleState` gains `IsOver` (for battle loops). Its constructor also rejects a side with nobody alive and a combatant listed twice.
-    - If both sides fall in the same turn, the result is Defeat, as in the demo (it checked "lost" first). No current mechanic can cause this; the developer is to confirm the rule.
+    - If both sides fall in the same turn, the result is Defeat, as in the demo (it checked "lost" first). Confirmed by the developer (decision 23).
     - `BattleCommand` has a `private protected` constructor, so only Core defines commands.
     - `EnemyTactics` stays internal until the Game calls it (part 3).
     - Test names: `EnemyTactics_ChooseCommand_ScriptedRandom_AttacksChosenLivingPartyMember` (scripted values, not a seed), and the rejected-command tests also assert nothing changed.
@@ -361,10 +361,18 @@ Slice 6 was split into 6a (Core) and 6b (content) before implementation: about 1
     - `BattleState_Execute_ItemCommand_ConsumesOneCopy`
     - `BattleState_Execute_ItemCommandOnInvalidTarget_Throws`
 
-- [ ] **6b. Skill content**
+- [x] **6b. Skill content**
+  - **Deviations:**
+    - Resolving `SkillIds` into skills for `PartyMember.Recruit` moves to slice 8 (`GameSession.StartNew`), its first real caller; here only the loader test resolves them.
+    - `ContentCatalog` changed from a positional record to `required init` properties (a 5th positional parameter breaks the max-4 rule).
+    - The party member validator takes its references as one internal `PartyMemberReferences` record (class ids, skill ids, experience table), for the same reason.
+    - A shared `Data/Effects/EffectValidator` holds the effect rules for items and skills.
+    - The validator also rejects a skill listed twice on one member.
+    - Heal, Recovery and Heal All have `iconFile: ""`, as legacy had no icon for them.
   - **Goal:** Skills load and validate from content, and party members are recruited with their skills resolved by id.
   - **New types (Data):** `Skills/SkillCatalogValidator` (`MpCost >= 0`, duplicate ids). `PartyMemberDefinition` gains `SkillIds`, checked against skills. `ContentCatalog` gains `Skills`.
-  - **Content:** `content/skills.json` (Fire Blast, Fireball, Heal, Recovery, Heal All). Sarxian's `skillIds` in `party-members.json`. Open question: the plan said "Recovery restores MP", but legacy Recovery heals 30 HP on its user (Self); no legacy skill used `ManaRecovery`. Developer to decide before 6b.
+  - **Content:** `content/skills.json` (Fire Blast, Fireball, Heal, Recovery, Heal All). Sarxian's `skillIds` in `party-members.json`. Recovery heals 30 HP on its user (Self), as in legacy (decision 22).
+  - **Also:** `GameRulesValidator` rejects an empty experience table (decision 24), with a test.
   - **From slice 6a review:** a `revive` effect needs power >= 1 (`Vitals.Revive` throws below that, after the item copy is spent). Add that rule to the item and skill validators, with tests.
   - **Tests (Data):** `SkillCatalogValidator_Validate_NegativeMpCost_ThrowsNamingTheSkill`, `PartyMemberCatalogValidator_Validate_UnknownSkillId_ThrowsNamingTheMember`
 
@@ -394,6 +402,7 @@ Slice 6 was split into 6a (Core) and 6b (content) before implementation: about 1
     - `ContentCatalog` gains `NewGame`.
     - `tests/Jrpg.Core.Tests/Builders/ContentCatalogBuilder` (deferred from 3b), for the `GameSession` tests.
     - `PartyState.MemberById(string id)` (deferred from 4a), for resolving `ActiveMemberIds`.
+    - Recruit members with their skills resolved from `definition.SkillIds` (deferred from 6b). Make it impossible for the skills to disagree with `SkillIds`: either `Recruit` resolves the ids against the catalog itself, or it rejects a list whose ids differ.
   - **New types (Data):** `Session/NewGameValidator` (unknown member or item ids, active members must be recruited, active count within `PartyRules`, quantities >= 1 and within `MaxStack`).
   - **Content:** `content/new-game.json` (all 7 recruited, only Sarxian active, the legacy starting stacks minus Antidote). Test values, to be replaced when the real opening is designed.
   - **Tests:**
@@ -402,7 +411,7 @@ Slice 6 was split into 6a (Core) and 6b (content) before implementation: about 1
 
 ## Follow-up plans (to be detailed with /plan-feature before starting)
 - **Part 2: world and exploration core.** (a) Map model + legacy map/tile/object/tilesheet readers in Data; JSON moves from `Assets/` to `content/maps`, `content/tiles`, `content/objects`. (b) Walkability, `PlayerWalker` movement and polygon collision. (c) `MapEvent` + `EventStep` records + `EventRun` state machine + `WorldState` + `InteractionFinder`, with tile triggers unified into events. (d) Warps (`WarpArrival` nearest-walkable search) and `RandomEncounters` (`IRandom`, rolled per step, rate set per map). (e) Save/load v1 (`SaveGame`, `ISaveStore`, `SaveSlotSummary`, `PlayTime`); legacy saves are not loaded. (f) Cutscene scripts + intro content.
-- **Part 3: rendering in Jrpg.Game.** Scene stack, battle screen, map renderer with `DrawOrderKey`, dialogue box, menus (Octopath-style direction). Decide the MonoGame content pipeline here. Add `TurnOrder.Upcoming` (living combatants from the current one, for the turn bar), deferred from 5a. `BattleState.CanUse` says whether a skill or item is usable, not whether a legal target exists (e.g. a Revive Feather with nobody fallen); the battle menu must also check targets before offering it. In the first slice that draws pixel art, add a per-monitor DPI-aware `app.manifest`; without it Windows display scaling above 100% blurs the window.
+- **Part 3: rendering in Jrpg.Game.** Scene stack, battle screen, map renderer with `DrawOrderKey`, dialogue box, menus (Octopath-style direction). Decide the MonoGame content pipeline here. Add `TurnOrder.Upcoming` (living combatants from the current one, for the turn bar), deferred from 5a. `BattleState.CanUse` says whether a skill or item is usable, not whether a legal target exists (e.g. a Revive Feather with nobody fallen); the battle menu must also check targets before offering it. Skills and items with `iconFile: ""` have no icon (legacy had none); the developer decides whether the menu skips the icon or shows a default. In the first slice that draws pixel art, add a per-monitor DPI-aware `app.manifest`; without it Windows display scaling above 100% blurs the window.
 - **Part 4: editor port.** Create `src/Jrpg.Editor`. Map editor on MVVM: `EditHistory` (was `UndoManager`), edit commands, flood fill, tile-group object creation, content editors validating through Jrpg.Data. Decide `CommunityToolkit.Mvvm` here.
 - **Class design (no plan yet, developer to design).** Class resources replacing MP (Rage, Faith…), stat growth on level-up, experience curves (one shared table or one per class), damage, Defend, escape chance, speed-based turn order. Each replaces a placeholder listed in the guiding rule.
 
@@ -428,6 +437,9 @@ Slice 6 was split into 6a (Core) and 6b (content) before implementation: about 1
 19. **Menu "Self" items:** target only the member using them.
 20. **Part 2:** encounters roll per step with a per-map rate; tile triggers and events are unified; legacy saves don't need to load; a found item is added to the inventory. Still open for part 2: dialogue defaults (`"???"` / `Fighter.png`), location names (legacy maps file names to place names in code), number of save slots (legacy has 20).
 21. **Equipment model:** move model (equipping takes the copy out of the inventory).
+22. **Recovery:** heals 30 HP on its user (Self), as in legacy; it does not restore MP.
+23. **Both sides fall in one turn:** the battle is a defeat.
+24. **Experience table:** must not be empty.
 
 ## Risks
 - **Scope.** The legacy logic is about twice what this plan holds. This plan stops at a playable headless battle. Part 2 must be planned before the Game can show a map.

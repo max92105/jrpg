@@ -13,7 +13,8 @@
     "mp": 200,
     "maxMp": 300,
     "attack": 15,
-    "defense": 8
+    "defense": 8,
+    "skillIds": ["fire_blast", "fireball", "heal", "recovery", "heal_all"]
   },
   {
     "id": "jazog",
@@ -29,7 +30,8 @@
     "mp": 30,
     "maxMp": 30,
     "attack": 5,
-    "defense": 3
+    "defense": 3,
+    "skillIds": []
   },
   {
     "id": "teelle",
@@ -45,7 +47,8 @@
     "mp": 300,
     "maxMp": 300,
     "attack": 12,
-    "defense": 5
+    "defense": 5,
+    "skillIds": []
   },
   {
     "id": "zaruk",
@@ -61,7 +64,8 @@
     "mp": 30,
     "maxMp": 30,
     "attack": 4,
-    "defense": 6
+    "defense": 6,
+    "skillIds": []
   },
   {
     "id": "zanyr",
@@ -77,7 +81,8 @@
     "mp": 30,
     "maxMp": 30,
     "attack": 18,
-    "defense": 12
+    "defense": 12,
+    "skillIds": []
   },
   {
     "id": "thaali",
@@ -93,7 +98,8 @@
     "mp": 30,
     "maxMp": 30,
     "attack": 13,
-    "defense": 5
+    "defense": 5,
+    "skillIds": []
   },
   {
     "id": "kamilia",
@@ -109,6 +115,7 @@
     "mp": 30,
     "maxMp": 30,
     "attack": 13,
-    "defense": 5
+    "defense": 5,
+    "skillIds": []
   }
 ]

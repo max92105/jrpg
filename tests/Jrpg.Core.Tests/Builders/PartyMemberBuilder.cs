@@ -74,5 +74,6 @@ internal sealed class PartyMemberBuilder
         MaxMp = _maxMp,
         Attack = _attack,
         Defense = _defense,
+        SkillIds = [.. _skills.Select(skill => skill.Id)],
     }, _skills);
 }

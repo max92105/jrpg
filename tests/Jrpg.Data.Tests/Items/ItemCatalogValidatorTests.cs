@@ -96,6 +96,16 @@ public sealed class ItemCatalogValidatorTests
     }
 
     [Fact]
+    public void Validate_ReviveWithZeroPower_ThrowsNamingTheField()
+    {
+        var feather = _potion with { Id = "revive_feather", Effect = new Effect(EffectKind.Revive, Power: 0, Targeting.AllFallenAllies) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [feather], _classIds));
+
+        Assert.Equal("items.json: item 'revive_feather': effect.power must be at least 1 for a revive effect (was 0).", exception.Message);
+    }
+
+    [Fact]
     public void Validate_NegativeDefenseBonus_ThrowsNamingTheField()
     {
         var armor = _potion with

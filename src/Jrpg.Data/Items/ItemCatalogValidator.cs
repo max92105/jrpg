@@ -1,6 +1,7 @@
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
 using Jrpg.Data.Content;
+using Jrpg.Data.Effects;
 
 namespace Jrpg.Data.Items;
 
@@ -37,9 +38,10 @@ internal static class ItemCatalogValidator
 
     private static string? FindEffectProblem(Effect effect, bool isUsableFromMenu)
     {
-        if (effect.Power < 0)
+        var problem = EffectValidator.FindProblem(effect);
+        if (problem is not null)
         {
-            return $"effect.power must be at least 0 (was {effect.Power}).";
+            return problem;
         }
 
         var targetsEnemies = effect.Targeting is Targeting.SingleEnemy or Targeting.AllEnemies;

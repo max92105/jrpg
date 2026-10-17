@@ -1,0 +1,37 @@
+[
+  {
+    "id": "fire_blast",
+    "name": "Fire Blast",
+    "iconFile": "Attack.png",
+    "mpCost": 10,
+    "effect": { "kind": "damage", "power": 15, "targeting": "singleEnemy" }
+  },
+  {
+    "id": "fireball",
+    "name": "Fireball",
+    "iconFile": "Attack.png",
+    "mpCost": 10,
+    "effect": { "kind": "damage", "power": 20, "targeting": "allEnemies" }
+  },
+  {
+    "id": "heal",
+    "name": "Heal",
+    "iconFile": "",
+    "mpCost": 8,
+    "effect": { "kind": "restoreHp", "power": 15, "targeting": "singleAlly" }
+  },
+  {
+    "id": "recovery",
+    "name": "Recovery",
+    "iconFile": "",
+    "mpCost": 8,
+    "effect": { "kind": "restoreHp", "power": 30, "targeting": "self" }
+  },
+  {
+    "id": "heal_all",
+    "name": "Heal All",
+    "iconFile": "",
+    "mpCost": 8,
+    "effect": { "kind": "restoreHp", "power": 50, "targeting": "allAllies" }
+  }
+]

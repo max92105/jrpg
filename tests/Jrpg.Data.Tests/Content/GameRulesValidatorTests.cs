@@ -18,6 +18,16 @@ public sealed class GameRulesValidatorTests
     }
 
     [Fact]
+    public void Validate_EmptyExperienceTable_ThrowsNamingTheField()
+    {
+        var rules = new GameRules(new PartyRules(MaxActiveMembers: 4), new ExperienceTable([]));
+
+        var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
+
+        Assert.Equal("rules.json: experience.experienceToNextLevel must have at least one entry.", exception.Message);
+    }
+
+    [Fact]
     public void Validate_ZeroExperienceEntry_ThrowsNamingTheIndex()
     {
         var rules = new GameRules(new PartyRules(MaxActiveMembers: 4), new ExperienceTable([100, 0]));

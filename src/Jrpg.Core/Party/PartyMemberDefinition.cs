@@ -31,4 +31,7 @@ public sealed record PartyMemberDefinition
     public required int Attack { get; init; }
 
     public required int Defense { get; init; }
+
+    /// <summary>Ids of the skills the member joins with, resolved against the skill catalog.</summary>
+    public required IReadOnlyList<string> SkillIds { get; init; }
 }

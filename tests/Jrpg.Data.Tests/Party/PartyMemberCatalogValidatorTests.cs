@@ -9,9 +9,10 @@ public sealed class PartyMemberCatalogValidatorTests
 {
     private const string FileName = "party-members.json";
 
-    private static readonly HashSet<string> _classIds = ["warrior"];
-
-    private static readonly ExperienceTable _experience = new([100, 120]);
+    private static readonly PartyMemberReferences _references = new(
+        ClassIds: new HashSet<string> { "warrior" },
+        SkillIds: new HashSet<string> { "heal" },
+        Experience: new ExperienceTable([100, 120]));
 
     private static readonly PartyMemberDefinition _sarxian = new()
     {
@@ -29,6 +30,7 @@ public sealed class PartyMemberCatalogValidatorTests
         MaxMp = 30,
         Attack = 15,
         Defense = 8,
+        SkillIds = ["heal"],
     };
 
     public static TheoryData<PartyMemberDefinition> ValidMembers => new()
@@ -42,6 +44,8 @@ public sealed class PartyMemberCatalogValidatorTests
     {
         { _sarxian with { Name = " " }, "name must not be empty." },
         { _sarxian with { ClassId = "necromancer" }, "classId 'necromancer' is not a known class." },
+        { _sarxian with { SkillIds = ["heal", "meteor"] }, "skillIds has unknown skill id 'meteor'." },
+        { _sarxian with { SkillIds = ["heal", "heal"] }, "skillIds lists 'heal' more than once." },
         { _sarxian with { Attack = -1 }, "attack must be at least 0 (was -1)." },
         { _sarxian with { Defense = -2 }, "defense must be at least 0 (was -2)." },
         { _sarxian with { MaxHp = 0, Hp = 0 }, "maxHp must be at least 1 (was 0)." },
@@ -76,5 +80,5 @@ public sealed class PartyMemberCatalogValidatorTests
     }
 
     private static void Validate(PartyMemberDefinition member) =>
-        PartyMemberCatalogValidator.Validate(FileName, [member], _classIds, _experience);
+        PartyMemberCatalogValidator.Validate(FileName, [member], _references);
 }

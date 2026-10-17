@@ -62,14 +62,14 @@ Jrpg.Core/
   Stats/       Vitals, CombatStats
   Progression/ ExperienceTable, LevelProgressStep
   Effects/     Effect, EffectKind, Targeting, TargetRelation, TargetRules, EffectResolver, DamageFormula
-  Items/       ItemDefinition, EquipmentStats, EquipmentSlot, Inventory, InventoryEntry, FieldItemUse
+  Items/       ItemDefinition, EquipmentStats, EquipmentSlot, Inventory, InventoryEntry
   Skills/      SkillDefinition
-  Party/       PartyMemberDefinition, ClassDefinition, PartyRules, PartyMember, PartyState, PartyEquipment
+  Party/       PartyMemberDefinition, ClassDefinition, PartyRules, PartyMember, PartyState, PartyEquipment, FieldItemUse
   Battle/      BattleState, BattlePhase, BattleSide, Combatant, TurnOrder,
                BattleCommand (+ Attack/Defend/Flee/Skill/Item commands), BattleEvent (+ ActionStarted/EffectApplied/CombatantDefeated/BattleEnded),
                EnemyDefinition, EnemyTactics, EncounterDefinition, BattleRewards, ExperienceGain
-  Content/     ContentCatalog, GameRules
-  Session/     GameSession, NewGameDefinition
+  Content/     ContentCatalog, GameRules, NewGameDefinition
+  Session/     GameSession
 ```
 Naming choices, made once:
 - **PartyMember**, never "Character" or "Hero". **Enemy**, never "Monster". **Combatant** for either side inside a battle.
@@ -398,7 +398,12 @@ Slice 6 was split into 6a (Core) and 6b (content) before implementation: about 1
   - **Also:** remove `--ignore-exit-code 8` from `Jrpg.Simulations.csproj`.
   - **Verify by hand:** `dotnet test --project tests/Jrpg.Simulations --output Detailed` prints the summary table.
 
-- [ ] **8. Game session replaces GameSystems**
+- [x] **8. Game session replaces GameSystems**
+  - **Deviations:**
+    - `NewGameDefinition` lives in `Content/` (next to `GameRules`), and `FieldItemUse` in `Party/` (next to `PartyEquipment`): both avoid namespace cycles (Content↔Session, Items↔Party). The Data validator for it is `Content/NewGameValidator` with an internal `NewGameReferences` record.
+    - `FieldItemUse(PartyState party, Inventory inventory)`: it needs the party to check "all" items. As in the demo, every recruited member can be a menu target, reserve included; the user only matters for "self" items. Pending developer confirmation (question 25).
+    - `GameSession` also exposes `FieldItems`. `PartyMember.Recruit(definition, skillCatalog)` resolves `SkillIds` itself, so a member's skills can't disagree with them.
+    - Battle and menu share `TargetRules.IsLegalChoice`. The validator rejects null or empty member ids. `PartyState.MemberById` still has no user (see above).
   - **Goal:** `GameSession.StartNew(catalog)` builds the new-game state (recruited members, the active party with the leader first, the starting inventory) from `content/new-game.json`. Consumables can be used from the menu on party members. Nothing static remains.
   - **New types (Core):**
     - `Session/NewGameDefinition`: content record (`RecruitedMemberIds`, `ActiveMemberIds` in order with the leader first, `IReadOnlyList<InventoryEntry> StartingItems`). The state a new playthrough starts from.
@@ -406,7 +411,7 @@ Slice 6 was split into 6a (Core) and 6b (content) before implementation: about 1
     - `Items/FieldItemUse`: uses a consumable from the menu on party members. `FieldItemUse(Inventory inventory)`, `bool CanUse(ItemDefinition item)` (owned, `IsUsableFromMenu`, has an effect), `IReadOnlyList<int> Use(ItemDefinition item, PartyMember user, IReadOnlyList<PartyMember> targets)` (amount applied per target). Uses `Effects/TargetRules` and `Effects/EffectResolver`, the same code as battle, without creating combatants. `Self` items only target the user.
     - `ContentCatalog` gains `NewGame`.
     - `tests/Jrpg.Core.Tests/Builders/ContentCatalogBuilder` (deferred from 3b), for the `GameSession` tests.
-    - `PartyState.MemberById(string id)` (deferred from 4a), for resolving `ActiveMemberIds`.
+    - `PartyState.MemberById(string id)` (deferred from 4a): not added; `StartNew` resolves ids before `PartyState` exists, so it still has no user. It comes with save/load (part 2).
     - Recruit members with their skills resolved from `definition.SkillIds` (deferred from 6b). Make it impossible for the skills to disagree with `SkillIds`: either `Recruit` resolves the ids against the catalog itself, or it rejects a list whose ids differ.
   - **New types (Data):** `Session/NewGameValidator` (unknown member or item ids, active members must be recruited, active count within `PartyRules`, quantities >= 1 and within `MaxStack`).
   - **Content:** `content/new-game.json` (all 7 recruited, only Sarxian active, the legacy starting stacks minus Antidote). Test values, to be replaced when the real opening is designed.
@@ -445,6 +450,7 @@ Slice 6 was split into 6a (Core) and 6b (content) before implementation: about 1
 22. **Recovery:** heals 30 HP on its user (Self), as in legacy; it does not restore MP.
 23. **Both sides fall in one turn:** the battle is a defeat.
 24. **Experience table:** must not be empty.
+25. *(Open)* **Menu item targets:** legacy let menu items target every recruited member, reserve included, so "all" items hit everyone and a fallen reserve member can be revived from the menu. Slice 8 keeps that. Developer to confirm, or restrict it to the active party.
 
 ## Risks
 - **Scope.** The legacy logic is about twice what this plan holds. This plan stops at a playable headless battle. Part 2 must be planned before the Game can show a map.

@@ -16,3 +16,5 @@ Seen again in 5b (`Execute_SeededBattleLoop_EndsInVictory`): stats make the hero
 Seen again in 6a (guard-clause variant): `ThrowIfIllegalTargets`' `Distinct` check, `CanUse(item)`'s party-side check and `ApplyToTargets`' `wasAlive` guard could each be deleted with every test still passing, and the revive test asserted only `events[1]`. For each deliberate rule the caller lists, ask "which test fails if I delete this clause?"
 
 Seen again in slice 7 (identical-inputs variant): `Start_PartyAndEnemies_CreatesCombatantsOnBothSides` builds three identical goblins, so "in encounter order" can't be checked; and the simulation's only assertion ("every battle ends") would still pass if the party never acted, since win rate is 0 %. When a test claims an order, check the inputs are distinguishable.
+
+Seen again in slice 8: `FieldItemUse.CanUse`'s `item.Effect is not null` clause can be deleted with every test passing (no test uses a menu-usable item without an effect, and the validator doesn't forbid one).

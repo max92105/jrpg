@@ -1,6 +1,7 @@
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
+using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
 using Jrpg.Core.Tests.Builders;
 
@@ -23,6 +24,14 @@ public sealed class PartyMemberTests
         Assert.Equal(30, member.Experience);
         Assert.Equal(new CombatStats(Attack: 12, Defense: 7), member.BaseStats);
         Assert.Equal((40, 100, 5, 20), (member.Vitals.Hp, member.Vitals.MaxHp, member.Vitals.Mp, member.Vitals.MaxMp));
+    }
+
+    [Fact]
+    public void Recruit_SkillIdNotInCatalog_Throws()
+    {
+        var definition = new PartyMemberBuilder().BuildDefinition() with { SkillIds = ["heal"] };
+
+        Assert.Throws<ArgumentException>(() => PartyMember.Recruit(definition, new Dictionary<string, SkillDefinition>()));
     }
 
     [Fact]

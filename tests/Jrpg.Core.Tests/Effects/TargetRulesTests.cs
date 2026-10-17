@@ -68,6 +68,21 @@ public sealed class TargetRulesTests
     }
 
     [Theory]
+    [InlineData(Targeting.SingleAlly, new[] { "a" }, true)]
+    [InlineData(Targeting.SingleAlly, new[] { "a", "b" }, false)]
+    [InlineData(Targeting.SingleAlly, new string[0], false)]
+    [InlineData(Targeting.SingleAlly, new[] { "outsider" }, false)]
+    [InlineData(Targeting.AllAllies, new[] { "a", "b" }, true)]
+    [InlineData(Targeting.AllAllies, new[] { "a" }, false)]
+    [InlineData(Targeting.AllAllies, new[] { "a", "a" }, false)]
+    public void IsLegalChoice_ChosenTargets_FollowsTargetingCount(Targeting targeting, string[] chosen, bool expected)
+    {
+        var isLegal = TargetRules.IsLegalChoice(targeting, new HashSet<string> { "a", "b" }, chosen);
+
+        Assert.Equal(expected, isLegal);
+    }
+
+    [Theory]
     [InlineData(Targeting.AllEnemies, true)]
     [InlineData(Targeting.AllAllies, true)]
     [InlineData(Targeting.AllFallenAllies, true)]

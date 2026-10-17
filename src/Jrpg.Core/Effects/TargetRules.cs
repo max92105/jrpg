@@ -17,4 +17,17 @@ internal static class TargetRules
 
     public static bool HitsEveryValidTarget(Targeting targeting) =>
         targeting is Targeting.AllEnemies or Targeting.AllAllies or Targeting.AllFallenAllies;
+
+    /// <summary>
+    /// Whether <paramref name="chosen"/> is a legal set of targets: one valid target for a single-target effect,
+    /// every valid target for an "all" effect, never empty, never the same target twice.
+    /// </summary>
+    public static bool IsLegalChoice<TTarget>(Targeting targeting, IReadOnlySet<TTarget> validTargets, IReadOnlyList<TTarget> chosen)
+    {
+        var expectedCount = HitsEveryValidTarget(targeting) ? validTargets.Count : 1;
+        return chosen.Count > 0
+            && chosen.Count == expectedCount
+            && chosen.Distinct().Count() == chosen.Count
+            && chosen.All(validTargets.Contains);
+    }
 }

@@ -58,7 +58,9 @@ internal sealed class PartyMemberBuilder
         return this;
     }
 
-    public PartyMember Build() => PartyMember.Recruit(new PartyMemberDefinition
+    public PartyMember Build() => PartyMember.Recruit(BuildDefinition(), _skills.ToDictionary(skill => skill.Id));
+
+    public PartyMemberDefinition BuildDefinition() => new()
     {
         Id = _id,
         Name = "Test Member",
@@ -75,5 +77,5 @@ internal sealed class PartyMemberBuilder
         Attack = _attack,
         Defense = _defense,
         SkillIds = [.. _skills.Select(skill => skill.Id)],
-    }, _skills);
+    };
 }

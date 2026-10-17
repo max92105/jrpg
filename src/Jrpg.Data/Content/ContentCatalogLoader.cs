@@ -20,6 +20,7 @@ public static class ContentCatalogLoader
     private const string PartyMembersFile = "party-members.json";
     private const string EnemiesFile = "enemies.json";
     private const string EncountersFile = "encounters.json";
+    private const string NewGameFile = "new-game.json";
 
     /// <summary>Loads and validates every content file under <paramref name="contentRoot"/>, referenced files first.</summary>
     /// <exception cref="ContentValidationException">A file is malformed or breaks a content rule.</exception>
@@ -38,6 +39,10 @@ public static class ContentCatalogLoader
         var enemyIds = enemies.Select(enemy => enemy.Id).ToFrozenSet();
         var encounters = ReadValidated<IReadOnlyList<EncounterDefinition>>(
             contentRoot, EncountersFile, (file, list) => EncounterCatalogValidator.Validate(file, list, enemyIds));
+        var newGameReferences = new NewGameReferences(
+            members.Select(member => member.Id).ToFrozenSet(), items.ToFrozenDictionary(item => item.Id), rules.Party);
+        var newGame = ReadValidated<NewGameDefinition>(
+            contentRoot, NewGameFile, (file, definition) => NewGameValidator.Validate(file, definition, newGameReferences));
 
         return new ContentCatalog
         {
@@ -48,6 +53,7 @@ public static class ContentCatalogLoader
             Enemies = enemies.ToFrozenDictionary(enemy => enemy.Id),
             Encounters = encounters.ToFrozenDictionary(encounter => encounter.Id),
             Rules = rules,
+            NewGame = newGame,
         };
     }
 

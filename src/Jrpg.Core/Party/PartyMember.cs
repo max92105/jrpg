@@ -40,7 +40,19 @@ public sealed class PartyMember
     /// <summary>Base stats plus the bonuses of everything worn.</summary>
     public CombatStats TotalStats => StatsWearing(Weapon, Armor);
 
-    public static PartyMember Recruit(PartyMemberDefinition definition, IReadOnlyList<SkillDefinition> skills) => new(definition, skills);
+    /// <param name="definition">Who joins and with what starting values.</param>
+    /// <param name="skillCatalog">All skills by id; the member gets those named by <see cref="PartyMemberDefinition.SkillIds"/>, in that order.</param>
+    /// <exception cref="ArgumentException">A skill id isn't in the catalog.</exception>
+    public static PartyMember Recruit(PartyMemberDefinition definition, IReadOnlyDictionary<string, SkillDefinition> skillCatalog)
+    {
+        var unknownSkillId = definition.SkillIds.FirstOrDefault(id => !skillCatalog.ContainsKey(id));
+        if (unknownSkillId is not null)
+        {
+            throw new ArgumentException($"'{definition.Id}' has unknown skill id '{unknownSkillId}'.", nameof(skillCatalog));
+        }
+
+        return new(definition, [.. definition.SkillIds.Select(id => skillCatalog[id])]);
+    }
 
     /// <summary>The stat preview: total stats if <paramref name="item"/> replaced whatever is worn in its slot.</summary>
     public CombatStats StatsWith(ItemDefinition item)

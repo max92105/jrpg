@@ -175,19 +175,12 @@ public sealed class BattleState
         ApplyToTargets(effect, command.Targets, events);
     }
 
-    /// <summary>Single-target effects need exactly one valid target; "all" effects need every valid target.</summary>
     private void ThrowIfIllegalTargets(Combatant actor, Effect effect, IReadOnlyList<Combatant> targets)
     {
         var validTargets = Combatants
             .Where(candidate => TargetRules.CanTarget(effect.Targeting, RelationOf(actor, candidate), candidate.Vitals))
             .ToHashSet();
-        var expectedCount = TargetRules.HitsEveryValidTarget(effect.Targeting) ? validTargets.Count : 1;
-
-        var isLegal = targets.Count > 0
-            && targets.Count == expectedCount
-            && targets.Distinct().Count() == targets.Count
-            && validTargets.IsSupersetOf(targets);
-        if (!isLegal)
+        if (!TargetRules.IsLegalChoice(effect.Targeting, validTargets, targets))
         {
             throw new ArgumentException(
                 $"Illegal targets for a {effect.Targeting} effect from {actor.Name}: {string.Join(", ", targets.Select(target => target.Name))}.",

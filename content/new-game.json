@@ -1,0 +1,18 @@
+{
+  "recruitedMemberIds": ["sarxian", "jazog", "teelle", "zaruk", "zanyr", "thaali", "kamilia"],
+  "activeMemberIds": ["sarxian"],
+  "startingItems": [
+    { "itemId": "potion", "quantity": 5 },
+    { "itemId": "hi_potion", "quantity": 2 },
+    { "itemId": "elixir", "quantity": 1 },
+    { "itemId": "bomb", "quantity": 3 },
+    { "itemId": "bomb_all", "quantity": 3 },
+    { "itemId": "revive_feather", "quantity": 3 },
+    { "itemId": "bronze_sword", "quantity": 2 },
+    { "itemId": "iron_sword", "quantity": 1 },
+    { "itemId": "magic_staff", "quantity": 3 },
+    { "itemId": "leather_armor", "quantity": 2 },
+    { "itemId": "chain_mail", "quantity": 3 },
+    { "itemId": "wizard_robe", "quantity": 1 }
+  ]
+}

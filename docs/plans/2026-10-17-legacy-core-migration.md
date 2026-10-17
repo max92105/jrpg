@@ -401,7 +401,7 @@ Slice 6 was split into 6a (Core) and 6b (content) before implementation: about 1
 - [x] **8. Game session replaces GameSystems**
   - **Deviations:**
     - `NewGameDefinition` lives in `Content/` (next to `GameRules`), and `FieldItemUse` in `Party/` (next to `PartyEquipment`): both avoid namespace cycles (Content↔Session, Items↔Party). The Data validator for it is `Content/NewGameValidator` with an internal `NewGameReferences` record.
-    - `FieldItemUse(PartyState party, Inventory inventory)`: it needs the party to check "all" items. As in the demo, every recruited member can be a menu target, reserve included; the user only matters for "self" items. Pending developer confirmation (question 25).
+    - `FieldItemUse(PartyState party, Inventory inventory)`: it needs the party to check "all" items. As in the demo, every recruited member can be a menu target, reserve included; the user only matters for "self" items. Confirmed by the developer (decision 25).
     - `GameSession` also exposes `FieldItems`. `PartyMember.Recruit(definition, skillCatalog)` resolves `SkillIds` itself, so a member's skills can't disagree with them.
     - Battle and menu share `TargetRules.IsLegalChoice`. The validator rejects null or empty member ids. `PartyState.MemberById` still has no user (see above).
   - **Goal:** `GameSession.StartNew(catalog)` builds the new-game state (recruited members, the active party with the leader first, the starting inventory) from `content/new-game.json`. Consumables can be used from the menu on party members. Nothing static remains.
@@ -450,7 +450,7 @@ Slice 6 was split into 6a (Core) and 6b (content) before implementation: about 1
 22. **Recovery:** heals 30 HP on its user (Self), as in legacy; it does not restore MP.
 23. **Both sides fall in one turn:** the battle is a defeat.
 24. **Experience table:** must not be empty.
-25. *(Open)* **Menu item targets:** legacy let menu items target every recruited member, reserve included, so "all" items hit everyone and a fallen reserve member can be revived from the menu. Slice 8 keeps that. Developer to confirm, or restrict it to the active party.
+25. **Menu item targets:** reserve included. Menu items can target every recruited member, as legacy and slice 8 do, so "all" items hit everyone and a fallen reserve member can be revived from the menu (confirmed in part 2's review).
 
 ## Risks
 - **Scope.** The legacy logic is about twice what this plan holds. This plan stops at a playable headless battle. Part 2 must be planned before the Game can show a map.

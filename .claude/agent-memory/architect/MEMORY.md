@@ -1,3 +1,4 @@
-- [Migration roadmap](project_migration_roadmap.md) — legacy demo migration split into parts 1-4; part 1 naming vocabulary
-- [Legacy content quirks](project_legacy_content_quirks.md) — "x,y" point strings, PascalCase tileset, int tile/object ids, old "event"/uid
+- [Migration roadmap](project_migration_roadmap.md) — parts 1-4 plan files, what moved to part 3, Assets/ source-of-truth exception, next ADR 0008 / number 46
+- [Legacy content quirks](project_legacy_content_quirks.md) — "x,y" points, keyed tileset, stale sizes, computed map fields, older-format Back maps
 - [Type/folder name clash](feedback_type_folder_name_clash.md) — never name a type after its feature folder (CA1724); use PartyState/BattleState
+- [Plan lessons](feedback_plan_lessons.md) — slice sizes, folder-dependency table, cut no-caller APIs, converter error-vs-report rules

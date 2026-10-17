@@ -1,12 +1,14 @@
 ---
 name: migration-roadmap
-description: How the legacy WPF demo migration is split into plans (part 1 battle/party, part 2 world/save, part 3 rendering, part 4 editor) and the naming decisions made in part 1
+description: How the legacy WPF demo migration is split into plans (part 1 battle/party, part 2 world/save, part 3 rendering, part 4 editor), naming vocabulary, ADR/decision/question numbering, temporary source-of-truth exception
 metadata:
   type: project
 ---
 
-Legacy migration is split: part 1 = docs/plans/2026-10-17-legacy-core-migration.md (skeleton, progression, items/inventory, party/equipment, battle, rewards+simulation, GameSession). Part 2 = maps/exploration/events/world state/save/cutscenes. Part 3 = MonoGame rendering. Part 4 = map editor port.
+Part 1 = docs/plans/2026-10-17-legacy-core-migration.md (done; decisions 1-25, ADRs 0001-0004). Part 2 = docs/plans/2026-10-17-world-exploration-core.md (approved 2026-10-17; 16 slices; decisions 26-43; open questions 30, 44, 45; ADRs 0005-0007). Part 3 = MonoGame rendering, and also receives from part 2: cutscenes (design ready), event-started battles (StartBattleStep, Q30), render-only content (tilesheets, layer Z, object tiles, AbovePlayerZones), SaveSlotSummary, defeat flow, stick deadzone, autosave mapping. Part 4 = editor port; ends the converter.
 
-**Why:** legacy logic is about 2x what 8 slices of ~300 lines can hold, so part 1 stops at a headless playable battle built from content.
+Temporary exception (decision 42): developer keeps editing maps in the legacy MapEditor, so `Assets/` is the source of map geometry until part 4; `tools/Jrpg.ContentConverter` rewrites only `content/generated/`; hand-written map settings live in `content/maps/{id}.json`.
 
-**How to apply:** when planning part 2+, reuse the part 1 vocabulary: PartyMember (not Character), Enemy, Combatant, Experience; Definition records for content; BattleState (runtime battle) with the BattlePhase enum; PartyState in Party/; Inventory in Items/; ContentCatalog plus ContentCatalogLoader; IRandom/SeededRandom. Check the plan file for the status of open questions (Q1 packages, Q2 Data.Tests, Q3 id scheme) before assuming. See [[legacy-content-quirks]] and [[type-folder-name-clash]].
+**Why:** legacy logic is ~2x what a plan of ~300-line slices holds; the developer has no new editor until part 4.
+
+**How to apply:** reuse vocabulary (PartyMember, Enemy, Combatant, *Definition, BattleState, PartyState, ContentCatalog, IRandom.NextBelow; part 2: ExplorationState, EventRun, WorldState, MapLayout/MapSettings/MapDefinition, MapLocation in Maps/, ExplorationRules in Content/, PartyMemberProgress in Party/, Speech, SaveGame, FileSaveStore). Next decision/question number 46, next ADR 0008. See [[legacy-content-quirks]], [[plan-lessons]].

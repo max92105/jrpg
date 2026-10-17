@@ -304,7 +304,13 @@ Slice 4 was split into 4a (Core) and 4b (content) before implementation: about 1
 
 - [x] **ADR: battle command flow** (before 5b). Accepted as [ADR 0004](../decisions/0004-battle-command-flow.md): one `Execute` per turn returning a minimal list of battle events; enemy tactics stay outside `BattleState`.
 
-- [ ] **5b. Battle commands: attack, defend, flee**
+- [x] **5b. Battle commands: attack, defend, flee**
+  - **Deviations:**
+    - `BattleState` gains `IsOver` (for battle loops). Its constructor also rejects a side with nobody alive and a combatant listed twice.
+    - If both sides fall in the same turn, the result is Defeat, as in the demo (it checked "lost" first). No current mechanic can cause this; the developer is to confirm the rule.
+    - `BattleCommand` has a `private protected` constructor, so only Core defines commands.
+    - `EnemyTactics` stays internal until the Game calls it (part 3).
+    - Test names: `EnemyTactics_ChooseCommand_ScriptedRandom_AttacksChosenLivingPartyMember` (scripted values, not a seed), and the rejected-command tests also assert nothing changed.
   - **Goal:** A battle runs headless with a fixed seed through typed commands, with enemy target choice and victory, defeat or escape.
   - **New types (Core):**
     - `Battle/BattleCommand` (abstract record), `Battle/AttackCommand(Combatant Target)`, `Battle/DefendCommand` (placeholder: no effect), `Battle/FleeCommand` (placeholder: always succeeds; an escape chance comes later).

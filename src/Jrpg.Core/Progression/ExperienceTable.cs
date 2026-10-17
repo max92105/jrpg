@@ -7,6 +7,9 @@ namespace Jrpg.Core.Progression;
 /// </summary>
 public sealed record ExperienceTable(IReadOnlyList<int> ExperienceToNextLevel)
 {
+    // A copy, so whoever passed the list in can't change the table afterwards.
+    public IReadOnlyList<int> ExperienceToNextLevel { get; } = [.. ExperienceToNextLevel];
+
     public int MaxLevel => ExperienceToNextLevel.Count + 1;
 
     public bool IsMaxLevel(int level) => level >= MaxLevel;

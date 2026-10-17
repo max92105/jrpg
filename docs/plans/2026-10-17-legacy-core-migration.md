@@ -264,7 +264,13 @@ Slice 4 was split into 4a (Core) and 4b (content) before implementation: about 1
     - `PartyMember` gains `Weapon`, `Armor` (`ItemDefinition?`), `CombatStats TotalStats` (base + bonuses), `CombatStats StatsWith(ItemDefinition item)` (the stat preview: total stats if `item` replaced what's in its slot), and `internal` `Wear`/`TakeOff` used only by `PartyEquipment`.
   - **Tests (Core):** `PartyState_TryAddToActive_PartyFull_ReturnsFalse`, `PartyState_TryMoveToReserve_Leader_ReturnsFalse`, `PartyState_Reorder_DifferentMembers_Throws`, `PartyState_Reorder_LeaderNotFirst_Throws`, `PartyEquipment_TryEquip_ClassNotAllowed_ReturnsFalse`, `PartyEquipment_TryEquip_NoCopyInInventory_ReturnsFalse`, `PartyEquipment_TryEquip_Success_RemovesCopyFromInventory`, `PartyEquipment_TryEquip_SlotOccupied_ReturnsPreviousItemToInventory`, `PartyEquipment_TryEquip_AfterUnequipFromOtherWearer_Succeeds` (the legacy "take it from another wearer" flow), `PartyEquipment_TryUnequip_InventoryStackFull_ReturnsFalseAndKeepsItem`, `PartyMember_TotalStats_WithWeaponAndArmor_AddsBonuses`, `PartyMember_StatsWith_OtherWeapon_ReplacesCurrentWeaponBonus`
 
-- [ ] **4b. Party content**
+- [x] **4b. Party content**
+  - **Deviations:**
+    - New shared `Data/Content/ContentListValidator<T>` holds the null-entry, empty-id and duplicate-id checks for every list file; the item validator uses it too, so its null-entry message is now "entry N is null.".
+    - Party members get more rules than listed: attack, defense, MP range, experience >= 0, and 0 experience at the maximum level. Each message names one field.
+    - The legacy per-member thresholds (Sarxian 500, Jazog 400, …) are replaced by one placeholder table generated from the legacy formula (100, then ×1.2 floored, 20 entries), so e.g. Sarxian needs 511 at level 10.
+    - `ExperienceTable` copies its list in its constructor; equality is still by reference (nothing compares tables).
+    - Not checked yet: empty file names on members (part 3, when rendering loads them).
   - **Goal:** Classes, the 7 legacy party members and the global rules load and validate from content.
   - **New types (Core):** `Party/ClassDefinition`: `record ClassDefinition(string Id, string Name)`, a class that equipment can be restricted to. `Content/GameRules`: `record GameRules(PartyRules Party, ExperienceTable Experience)`. The global rules from `content/rules.json`. `ContentCatalog` gains `Classes`, `PartyMembers` and `Rules`.
   - **From slice 2 review:** `ExperienceTable` keeps the caller's list and compares it by reference; copy the list in when it's loaded from content. A definition whose `Experience` is at or above its level's threshold makes `GainExperience` report an odd step, so the validator must reject it (with a test).

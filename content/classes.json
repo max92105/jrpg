@@ -1,0 +1,8 @@
+[
+  { "id": "warrior", "name": "Warrior" },
+  { "id": "mage", "name": "Mage" },
+  { "id": "thief", "name": "Thief" },
+  { "id": "healer", "name": "Healer" },
+  { "id": "knight", "name": "Knight" },
+  { "id": "ranger", "name": "Ranger" }
+]

@@ -6,38 +6,12 @@ namespace Jrpg.Data.Items;
 
 internal static class ItemCatalogValidator
 {
-    public static void Validate(string fileName, IReadOnlyList<ItemDefinition> items)
+    public static void Validate(string fileName, IReadOnlyList<ItemDefinition> items, IReadOnlySet<string> classIds) =>
+        new ContentListValidator<ItemDefinition>(fileName, "item", item => item.Id)
+            .Validate(items, item => FindProblem(item, classIds));
+
+    private static string? FindProblem(ItemDefinition item, IReadOnlySet<string> classIds)
     {
-        var seenIds = new HashSet<string>();
-        for (var index = 0; index < items.Count; index++)
-        {
-            // The serializer doesn't apply nullable annotations to collection elements, so a stray null gets here.
-            var item = items[index];
-            if (item is null)
-            {
-                throw new ContentValidationException($"{fileName}: entry {index} is null instead of an item.");
-            }
-
-            if (!seenIds.Add(item.Id))
-            {
-                throw new ContentValidationException($"{fileName}: item id '{item.Id}' is used more than once.");
-            }
-
-            var problem = FindProblem(item);
-            if (problem is not null)
-            {
-                throw new ContentValidationException($"{fileName}: item '{item.Id}': {problem}");
-            }
-        }
-    }
-
-    private static string? FindProblem(ItemDefinition item)
-    {
-        if (string.IsNullOrWhiteSpace(item.Id))
-        {
-            return "id must not be empty.";
-        }
-
         if (string.IsNullOrWhiteSpace(item.Name))
         {
             return "name must not be empty.";
@@ -58,7 +32,7 @@ internal static class ItemCatalogValidator
             return FindEffectProblem(item.Effect, item.IsUsableFromMenu);
         }
 
-        return item.Equipment is null ? null : FindEquipmentProblem(item.Equipment);
+        return item.Equipment is null ? null : FindEquipmentProblem(item.Equipment, classIds);
     }
 
     private static string? FindEffectProblem(Effect effect, bool isUsableFromMenu)
@@ -74,7 +48,7 @@ internal static class ItemCatalogValidator
             : null;
     }
 
-    private static string? FindEquipmentProblem(EquipmentStats equipment)
+    private static string? FindEquipmentProblem(EquipmentStats equipment, IReadOnlySet<string> classIds)
     {
         if (equipment.AttackBonus < 0)
         {
@@ -86,8 +60,12 @@ internal static class ItemCatalogValidator
             return $"equipment.defenseBonus must be at least 0 (was {equipment.DefenseBonus}).";
         }
 
-        return equipment.AllowedClassIds.Any(string.IsNullOrWhiteSpace)
-            ? "equipment.allowedClassIds must not contain a null or empty class id."
-            : null;
+        if (equipment.AllowedClassIds.Any(string.IsNullOrWhiteSpace))
+        {
+            return "equipment.allowedClassIds must not contain a null or empty class id.";
+        }
+
+        var unknownClassId = equipment.AllowedClassIds.FirstOrDefault(id => !classIds.Contains(id));
+        return unknownClassId is null ? null : $"equipment.allowedClassIds has unknown class id '{unknownClassId}'.";
     }
 }

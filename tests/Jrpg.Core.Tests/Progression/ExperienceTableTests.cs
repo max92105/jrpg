@@ -29,6 +29,17 @@ public sealed class ExperienceTableTests
     }
 
     [Fact]
+    public void Constructor_SourceChangedAfterwards_KeepsOriginalEntries()
+    {
+        int[] source = [100, 120];
+        var table = new ExperienceTable(source);
+
+        source[0] = 5;
+
+        Assert.Equal(100, table.ExperienceToReachNext(1));
+    }
+
+    [Fact]
     public void IsMaxLevel_LevelBelowMax_ReturnsFalse()
     {
         var isMaxLevel = _table.IsMaxLevel(2);

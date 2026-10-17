@@ -178,7 +178,8 @@ Slice numbers refer to this plan. P2 = follow-up "world and exploration core", P
     - `CLAUDE.md`: add `tests/Jrpg.Data.Tests` to the architecture list.
   - **Tests:** `CoreAssembly_ReferencedAssemblies_ContainNoUiOrEngineAssembly` loads `Jrpg.Core` and fails on any reference whose name starts with `PresentationCore`, `PresentationFramework`, `WindowsBase`, `System.Windows`, `MonoGame` or `Microsoft.Xna`.
 
-- [ ] **1b. Game window**
+- [x] **1b. Game window**
+  - **Deviations:** MonoGame.Framework.DesktopGL 3.8.6. `GraphicsDeviceManager` is created with a discard (`_ =`) because no code reads it yet; bring back a `_graphics` field when back-buffer size is set.
   - **Goal:** `src/Jrpg.Game` opens a black window with MonoGame and closes cleanly.
   - **Files:** `src/Jrpg.Game/Jrpg.Game.csproj`, `Program.cs`, `JrpgGame.cs` (`internal sealed class JrpgGame : Game`: MonoGame host, fixed 60 Hz update step, clears the screen to black). Added to `Jrpg.slnx`.
   - **Tests:** none (no behavior). The 1a architecture test keeps guarding Core.
@@ -354,7 +355,7 @@ Slice numbers refer to this plan. P2 = follow-up "world and exploration core", P
 
 ## Follow-up plans (to be detailed with /plan-feature before starting)
 - **Part 2: world and exploration core.** (a) Map model + legacy map/tile/object/tilesheet readers in Data; JSON moves from `Assets/` to `content/maps`, `content/tiles`, `content/objects`. (b) Walkability, `PlayerWalker` movement and polygon collision. (c) `MapEvent` + `EventStep` records + `EventRun` state machine + `WorldState` + `InteractionFinder`, with tile triggers unified into events. (d) Warps (`WarpArrival` nearest-walkable search) and `RandomEncounters` (`IRandom`, rolled per step, rate set per map). (e) Save/load v1 (`SaveGame`, `ISaveStore`, `SaveSlotSummary`, `PlayTime`); legacy saves are not loaded. (f) Cutscene scripts + intro content.
-- **Part 3: rendering in Jrpg.Game.** Scene stack, battle screen, map renderer with `DrawOrderKey`, dialogue box, menus (Octopath-style direction). Decide the MonoGame content pipeline here.
+- **Part 3: rendering in Jrpg.Game.** Scene stack, battle screen, map renderer with `DrawOrderKey`, dialogue box, menus (Octopath-style direction). Decide the MonoGame content pipeline here. In the first slice that draws pixel art, add a per-monitor DPI-aware `app.manifest`; without it Windows display scaling above 100% blurs the window.
 - **Part 4: editor port.** Create `src/Jrpg.Editor`. Map editor on MVVM: `EditHistory` (was `UndoManager`), edit commands, flood fill, tile-group object creation, content editors validating through Jrpg.Data. Decide `CommunityToolkit.Mvvm` here.
 - **Class design (no plan yet, developer to design).** Class resources replacing MP (Rage, Faith…), stat growth on level-up, experience curves (one shared table or one per class), damage, Defend, escape chance, speed-based turn order. Each replaces a placeholder listed in the guiding rule.
 

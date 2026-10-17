@@ -51,7 +51,7 @@ Placeholders in this plan: level-up grants no stat growth, the experience table 
 Test projects that read real content link `content/**` into their output (`<None Include="..\..\content\**" LinkBase="content" CopyToOutputDirectory="PreserveNewest" />`), so tests never walk up the directory tree looking for the repo root.
 
 ### Visibility rule
-- `public`: content definitions (`*Definition`, `Effect`, `EquipmentStats`, `ContentCatalog`, `GameRules`), feature state roots and what callers hold (`PartyState`, `PartyMember`, `Inventory`, `PartyEquipment`, `BattleState`, `Combatant`, `GameSession`, `FieldItemUse`), commands and results (`BattleCommand` records, `TurnResult`, `EffectOutcome`), and `IRandom`/`SeededRandom`. Data, Game and the simulations need these.
+- `public`: content definitions (`*Definition`, `Effect`, `EquipmentStats`, `ContentCatalog`, `GameRules`), feature state roots and what callers hold (`PartyState`, `PartyMember`, `Inventory`, `PartyEquipment`, `BattleState`, `Combatant`, `GameSession`, `FieldItemUse`), commands and battle events (`BattleCommand` and `BattleEvent` records), and `IRandom`/`SeededRandom`. Data, Game and the simulations need these.
 - Everything else is `internal sealed` (`TurnOrder`, `DamageFormula`, `EffectResolver`, `TargetRules`, `EnemyTactics`, `BattleRewards`, helpers).
 - `Jrpg.Core` declares `InternalsVisibleTo` for `Jrpg.Core.Tests` and `Jrpg.Simulations` only.
 
@@ -66,7 +66,7 @@ Jrpg.Core/
   Skills/      SkillDefinition
   Party/       PartyMemberDefinition, ClassDefinition, PartyRules, PartyMember, PartyState, PartyEquipment
   Battle/      BattleState, BattlePhase, BattleSide, Combatant, TurnOrder, DamageFormula,
-               BattleCommand (+ Attack/Defend/Flee/Skill/Item commands), TurnResult, EffectOutcome,
+               BattleCommand (+ Attack/Defend/Flee/Skill/Item commands), BattleEvent (+ ActionStarted/EffectApplied/CombatantDefeated/BattleEnded),
                EnemyDefinition, EnemyTactics, EncounterDefinition, BattleRewards
   Content/     ContentCatalog, GameRules
   Session/     GameSession, NewGameDefinition
@@ -84,7 +84,7 @@ Naming choices, made once:
    - A single sealed `Combatant` built by `Combatant.FromPartyMember(...)` or `Combatant.FromEnemy(...)`.
    - Enemies are content (`EnemyDefinition`), not subclasses.
 2. **Vitals are shared, not copied.** `Combatant.FromPartyMember` uses the same `Vitals` instance as the `PartyMember`, so damage taken in battle persists after it (legacy behavior, since legacy battles mutated `Character` directly). One source of truth, no write-back step. A test covers it.
-3. **Battle API returns results** (ADR before slice 5b). `BattleState.Execute(BattleCommand)` validates the command for the current actor, applies it, ends the turn, and returns `TurnResult(Combatant Actor, IReadOnlyList<EffectOutcome> Outcomes)`, so the renderer knows who acted after the turn has moved on. This replaces the legacy `ExecuteCurrentTurnAction(CombatAction, targets, object param)` + `AdvanceTurn()` + `IsBattleOver()` (a query that also changed state).
+3. **Battle API returns events** ([ADR 0004](../decisions/0004-battle-command-flow.md)). `BattleState.Execute(BattleCommand)` validates the command for the current actor, applies it, ends the turn, and returns the `BattleEvent`s it produced in order (who acted, what each effect actually did, who fell, how the battle ended), so the renderer can play them back after the turn has moved on. This replaces the legacy `ExecuteCurrentTurnAction(CombatAction, targets, object param)` + `AdvanceTurn()` + `IsBattleOver()` (a query that also changed state).
 4. **Commands are typed records**, not an enum plus an `object` parameter: `AttackCommand`, `DefendCommand`, `FleeCommand`, `SkillCommand`, `ItemCommand`. Every party action goes through `Execute`.
 5. **Enemy choice is separate from battle rules.** `EnemyTactics` picks a command for an enemy turn with `IRandom`. The legacy UI picked a target with `new Random()`.
 6. **Equipment uses the move model** (developer decision 2026-10-17, ADR before slice 4). Equipping takes the copy out of `Inventory`; unequipping puts it back. `Inventory` only ever holds unworn copies, so nothing needs to check who wears what. This replaces `InventoryItem.EquippedTo` and `AvailableStock`.
@@ -102,7 +102,7 @@ Slice numbers refer to this plan. P2 = follow-up "world and exploration core", P
 | `Character` | `Party/PartyMember` + `Party/PartyMemberDefinition` | 2, 4 | Runtime vs content split. `IsActive`/`IsMainCharacter` flags move to `PartyState`. |
 | `Enemy`, `Enemies/Goblin` | `Battle/EnemyDefinition` + `content/enemies.json` | 5a, 7 | No subclass per enemy. `SlotIndex` = position in the encounter. `SpriteFlip` -> `IsSpriteFlipped`. |
 | `Skill` | `Skills/SkillDefinition` + `content/skills.json` | 6 | Uses the shared `Effect` record. |
-| `ActionResult` | `Battle/EffectOutcome` | 5b | Reports the amount actually applied. Legacy reported raw power for skills and items. |
+| `ActionResult` | `Battle/EffectApplied` (a `BattleEvent`) | 5b | Reports the amount actually applied. Legacy reported raw power for skills and items. |
 | `TurnEntry` | removed | 5a | `TurnOrder` holds combatants. `IsPlayer` -> `Combatant.Side`. |
 | `ExpStep`, `ExpGain` | `Progression/LevelProgressStep`, `Progression/ExperienceGain` | 2, 7 | Immutable records. |
 | `Enums/BattleState` | `Battle/BattlePhase` | 5b | Adds `Escaped`. |
@@ -302,25 +302,24 @@ Slice 4 was split into 4a (Core) and 4b (content) before implementation: about 1
     - `Combatant_FromPartyMember_DamageInBattle_PersistsOnMember`
     - `Combatant_FromEnemy_StartsAtFullHp`
 
-- [ ] **ADR: battle command flow** (before 5b). `Execute` validates, applies and ends the turn, returning `TurnResult` with the actor for the renderer to animate. The alternative is separate execute and advance steps driven by the UI, as in legacy. Enemy tactics stay outside `BattleState`.
+- [x] **ADR: battle command flow** (before 5b). Accepted as [ADR 0004](../decisions/0004-battle-command-flow.md): one `Execute` per turn returning a minimal list of battle events; enemy tactics stay outside `BattleState`.
 
 - [ ] **5b. Battle commands: attack, defend, flee**
   - **Goal:** A battle runs headless with a fixed seed through typed commands, with enemy target choice and victory, defeat or escape.
   - **New types (Core):**
     - `Battle/BattleCommand` (abstract record), `Battle/AttackCommand(Combatant Target)`, `Battle/DefendCommand` (placeholder: no effect), `Battle/FleeCommand` (placeholder: always succeeds; an escape chance comes later).
-    - `Battle/EffectOutcome`: `record EffectOutcome(Combatant Target, EffectKind Kind, int Amount)`. What one effect actually did to one target.
-    - `Battle/TurnResult`: `record TurnResult(Combatant Actor, IReadOnlyList<EffectOutcome> Outcomes)`.
+    - `Battle/BattleEvent` (abstract record) and its four records: `ActionStarted(Combatant Actor, BattleCommand Command)`, `EffectApplied(Combatant Target, EffectKind Kind, int Amount)` (the amount actually applied), `CombatantDefeated(Combatant Combatant)`, `BattleEnded(BattlePhase Outcome)`.
     - `Battle/BattlePhase`: `PartyTurn`, `EnemyTurn`, `Victory`, `Defeat`, `Escaped`.
-    - `Battle/BattleState`: a battle in progress (whose turn it is, executing commands, the outcome). `BattleState(IReadOnlyList<Combatant> combatants, IRandom random)`, `Phase`, `CurrentActor`, `Combatants`, `IReadOnlyList<Combatant> LivingOn(BattleSide side)`, `TurnResult Execute(BattleCommand command)` (throws `InvalidOperationException` once the battle is over or for `FleeCommand` on an enemy turn, `ArgumentException` for a dead or same-side attack target).
+    - `Battle/BattleState`: a battle in progress (whose turn it is, executing commands, the outcome). `BattleState(IReadOnlyList<Combatant> combatants, IRandom random)`, `Phase`, `CurrentActor`, `Combatants`, `IReadOnlyList<Combatant> LivingOn(BattleSide side)`, `IReadOnlyList<BattleEvent> Execute(BattleCommand command)` (throws `InvalidOperationException` once the battle is over or for `FleeCommand` on an enemy turn, `ArgumentException` for a dead or same-side attack target).
     - `Battle/EnemyTactics`: chooses the command for an enemy's turn: attack a random living party member. `EnemyTactics(IRandom random)`, `BattleCommand ChooseCommand(BattleState battle)`.
   - **Tests:**
     - `BattleState_Execute_Attack_ReducesTargetHpByFormula`
-    - `BattleState_Execute_Attack_EndsTurnAndReportsActor`
-    - `BattleState_Execute_LastEnemyDefeated_PhaseIsVictory`
+    - `BattleState_Execute_Attack_EndsTurnAndReportsActorFirst`
+    - `BattleState_Execute_LastEnemyDefeated_EndsWithDefeatedAndVictoryEvents`
     - `BattleState_Execute_LastPartyMemberDefeated_PhaseIsDefeat`
     - `BattleState_Execute_AttackOnDefeatedTarget_Throws`
     - `BattleState_Execute_AfterBattleEnded_Throws`
-    - `BattleState_Execute_Defend_ReturnsNoOutcomesAndEndsTurn`
+    - `BattleState_Execute_Defend_ReturnsOnlyActionStartedAndEndsTurn`
     - `BattleState_Execute_Flee_PhaseIsEscaped`
     - `BattleState_Execute_FleeOnEnemyTurn_Throws`
     - `EnemyTactics_ChooseCommand_FixedSeed_TargetsLivingPartyMember`

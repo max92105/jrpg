@@ -1,0 +1,2 @@
+# Cyclomatic complexity limit per method (CA1502). Above this, split the method.
+CA1502(Method): 10

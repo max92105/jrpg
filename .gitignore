@@ -48,3 +48,12 @@ build/NV00SVC/tools
 build/OTOSVC2/builds
 build/OTOSVC2/tools
 /build/OTOSQL/tools/packages.config.md5sum
+
+# --- Claude Code: append these lines to your existing .gitignore ---
+# Personal settings and per-machine notes
+.claude/settings.local.json
+CLAUDE.local.md
+.claude/agent-memory-local/
+.claude/worktrees/
+# Keep committed: CLAUDE.md, .claude/settings.json, .claude/agents/, .claude/skills/,
+# .claude/rules/, .claude/hooks/, .claude/agent-memory/ (shared reviewer/architect memory)

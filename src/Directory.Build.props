@@ -1,0 +1,25 @@
+<Project>
+  <!-- Quality gates for every project under src/ and tests/. Legacy projects at the repo root are not affected. -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Deterministic>true</Deterministic>
+
+    <!-- Warnings are errors: problems get fixed, not ignored. -->
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+    <!-- Roslyn analyzers + .editorconfig style/naming rules run on every build. -->
+    <AnalysisLevel>latest-recommended</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+
+    <!-- Required for IDE0005 (unused usings) in build. XML docs stay optional: see .claude/rules/code-quality.md. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Complexity thresholds for CA1502. -->
+    <AdditionalFiles Include="$(MSBuildThisFileDirectory)..\CodeMetricsConfig.txt" />
+  </ItemGroup>
+</Project>

@@ -16,6 +16,9 @@
     <!-- Required for IDE0005 (unused usings) in build. XML docs stay optional: see .claude/rules/code-quality.md. -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
+
+    <!-- Versions live in the root Directory.Packages.props. Enabled here rather than there so the legacy projects are unaffected. -->
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
   <ItemGroup>

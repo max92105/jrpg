@@ -1,0 +1,1 @@
+- [Scratch builds blocked](scratch-builds-blocked.md) — WDAC blocks running DLLs from temp scratchpad; grep DLL bytes instead

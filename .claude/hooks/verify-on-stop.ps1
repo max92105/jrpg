@@ -29,7 +29,9 @@ foreach ($solution in $solutions) {
     $build = & dotnet build $solution --nologo -v q 2>&1 | Out-String
     if ($LASTEXITCODE -ne 0) { Fail "dotnet build $solution" $build }
 
-    $test = & dotnet test $solution --no-build --nologo -v q 2>&1 | Out-String
+    # Only the new solution has test projects. global.json selects Microsoft.Testing.Platform, which needs --solution.
+    if ($solution -ne 'Jrpg.slnx') { continue }
+    $test = & dotnet test --solution $solution --no-build 2>&1 | Out-String
     if ($LASTEXITCODE -ne 0) {
         # Known bugs written by the QA agent are allowed to fail; anything else is not.
         $failedNames = ($test -split "`r?`n") | Where-Object { $_ -match '^\s*Failed\s' }

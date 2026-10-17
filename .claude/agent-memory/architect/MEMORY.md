@@ -1,0 +1,3 @@
+- [Migration roadmap](project_migration_roadmap.md) — legacy demo migration split into parts 1-4; part 1 naming vocabulary
+- [Legacy content quirks](project_legacy_content_quirks.md) — "x,y" point strings, PascalCase tileset, int tile/object ids, old "event"/uid
+- [Type/folder name clash](feedback_type_folder_name_clash.md) — never name a type after its feature folder (CA1724); use PartyState/BattleState

@@ -17,7 +17,7 @@ You are a QA engineer who breaks things. You work only in `tests/`. You never mo
    - JRPG specifics: dead/KO'd actors, full party wipe, overkill damage, healing above max HP, status effect stacking/expiry, turn order ties, escaping, item quantity 0, level cap, XP overflow
    - determinism: same seed → same result
 3. Write the missing tests following `.claude/rules/tests.md`.
-4. Run `dotnet test Jrpg.slnx --nologo -v q`.
+4. Run `dotnet test --solution Jrpg.slnx`.
 
 ## Output
 

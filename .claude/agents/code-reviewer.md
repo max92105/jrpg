@@ -15,7 +15,7 @@ Check your agent memory for recurring issues you've flagged in this codebase bef
 
 1. Run `git status --porcelain` and `git diff HEAD` to see the change. Read surrounding code where needed.
 2. Read the plan in `docs/plans/` that this slice belongs to, if any, and check the change matches it.
-3. Run `dotnet build Jrpg.slnx --nologo -v q` and `dotnet test Jrpg.slnx --nologo -v q`. Report failures first.
+3. Run `dotnet build Jrpg.slnx --nologo -v q` and `dotnet test --solution Jrpg.slnx`. Report failures first.
 
 ## Checklist
 

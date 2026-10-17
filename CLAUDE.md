@@ -11,6 +11,7 @@ A 2D JRPG written from scratch in C#. Personal project, single developer.
 - `src/Jrpg.Game` — MonoGame shell: game loop, input, rendering, audio. Thin. Reads Core state, sends commands to Core.
 - `src/Jrpg.Editor` — WPF tools (map, database, dialogue editors). References Core + Data, never Game.
 - `tests/Jrpg.Core.Tests` — xUnit unit tests for Core.
+- `tests/Jrpg.Data.Tests` — xUnit tests for content loaders and validators.
 - `tests/Jrpg.Simulations` — headless battle/balance simulations.
 - `content/` — JSON game data (items, monsters, skills, dialogue). Source of truth for content.
 - `docs/decisions/` — architecture decision records (ADRs). Read the relevant ADR before changing a design area.
@@ -28,7 +29,7 @@ Dependency direction: Game → Data → Core; Editor → Data → Core. Never th
 ## Commands
 
 - Build: `dotnet build Jrpg.slnx --nologo -v q`
-- Test: `dotnet test Jrpg.slnx --nologo -v q`
+- Test: `dotnet test --solution Jrpg.slnx`
 - Format check: `dotnet format Jrpg.slnx --verify-no-changes`
 - Format fix: `dotnet format Jrpg.slnx`
 - Run game: `dotnet run --project src/Jrpg.Game`

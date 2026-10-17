@@ -194,7 +194,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
   - Inputs absent from the data are conversion errors naming the file; content the plan can't express yet is skipped and listed in `conversion-report.txt`.
   - Part 4 ends the exception: the new editor writes `content/` directly and the converter is deleted.
 
-- [ ] **1a. Map model and walkability** (Core, about 200 lines)
+- [x] **1a. Map model and walkability** (Core, about 200 lines)
   - **Goal:** tiles, objects and maps exist as immutable Core records, and a map answers which cells can be walked on.
   - **New types (Core):**
     - `Geometry/Point2D`: `readonly record struct Point2D(double X, double Y)`. A position in tile units.
@@ -213,6 +213,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
     - `WalkabilityGrid_IsWalkable_BlockingTileOnUpperLayer_ReturnsFalse`
     - `WalkabilityGrid_IsWalkable_CellWithNoTile_ReturnsFalse`
     - `WalkabilityGrid_IsWalkable_OutsideMap_ReturnsFalse` (one cell at -1, one at `Width`)
+  - **Done, with deviations:** There is no `TileDefinitionBuilder`: tests build the two-field record inline. Extra tests cover an unknown tile id (blocks, as in legacy), rows read by y on a non-square map, and a point on a cell's top-left corner. `MapDefinition` rejects settings whose id differs from the layout's.
 
 - [ ] **1b. Converter tool and tile content** (tool + Data, about 280 lines)
   - **Goal:** `dotnet run --project tools/Jrpg.ContentConverter -- Assets content` regenerates `content/generated/tiles.json`, which loads and validates into `ContentCatalog.Tiles`.
@@ -242,7 +243,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
   - **Content (hand-written):** `content/maps/start.json`, `interior_1.json`, `forest.json` with `displayName` seeded from the legacy map names (`start`, `Interior1`, `Forest`; placeholders, decision 33).
   - **Tests:**
     - Tool: `MapConversion_Convert_TileIdZero_IsDropped`, `MapConversion_Convert_TwoTilesOnSameCellAndLayer_ThrowsNamingTheCell`, `MapConversion_Convert_LayersOrderedByZ`, `MapConversion_Convert_LiveObjectWithoutUid_ThrowsNamingTheFile`, `LegacyContentConversion_Convert_RepositoryAssets_ProducesLoadableContent` (converts `legacy-assets` into a temp copy of `content/` and loads it with `ContentCatalogLoader`)
-    - Data: `MapLayoutValidator_Validate_IdDiffersFromFileName_ThrowsNamingTheFile`, `MapLayoutValidator_Validate_RowCountDiffersFromHeight_ThrowsNamingTheLayer`, `MapLayoutValidator_Validate_UnknownObjectId_ThrowsNamingTheUid`, `MapFolderReader_Read_LayoutWithoutSettings_ThrowsNamingTheMap`
+    - Data: `MapLayoutValidator_Validate_IdDiffersFromFileName_ThrowsNamingTheFile`, `MapLayoutValidator_Validate_RowCountDiffersFromHeight_ThrowsNamingTheLayer`, `MapLayoutValidator_Validate_ShortRow_ThrowsNamingTheLayerAndRow`, `MapLayoutValidator_Validate_UnknownObjectId_ThrowsNamingTheUid`, `MapFolderReader_Read_LayoutWithoutSettings_ThrowsNamingTheMap`
 
 - [ ] **2. Walking and collision** (Core + rules content, about 300 lines)
   - **Goal:** the player walks with an analog direction and game-loop deltas, at partial speed for a partial tilt and never faster diagonally, and is stopped by unwalkable cells and object collision polygons.

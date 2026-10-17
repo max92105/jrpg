@@ -11,4 +11,6 @@ Records that carry lists or dictionaries (`ExperienceTable`, `EquipmentStats.All
 
 **How to apply:** For any new record with a collection member, check whether equality is used anywhere. If not, a Suggestion is enough. If a test or lookup compares them, it's a Warning.
 
+Seen again in part 2 slice 1a (`MapLayout`, `TileLayer` rows-of-rows, `ObjectDefinition.CollisionPolygon`): no equality user there, so Suggestion only.
+
 Also watch for, seen in 4b: validator messages that combine two fields ("attack and defense must be...") when the item validator uses one field per message. And loader tests whose only assertion can't fail (`Select(...).ToList().Count == source.Count`).

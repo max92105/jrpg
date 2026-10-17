@@ -1,8 +1,10 @@
 using System.Collections.Frozen;
+using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Skills;
+using Jrpg.Data.Battle;
 using Jrpg.Data.Items;
 using Jrpg.Data.Party;
 using Jrpg.Data.Skills;
@@ -16,27 +18,26 @@ public static class ContentCatalogLoader
     private const string ItemsFile = "items.json";
     private const string SkillsFile = "skills.json";
     private const string PartyMembersFile = "party-members.json";
+    private const string EnemiesFile = "enemies.json";
+    private const string EncountersFile = "encounters.json";
 
-    /// <summary>Loads and validates every content file under <paramref name="contentRoot"/>.</summary>
+    /// <summary>Loads and validates every content file under <paramref name="contentRoot"/>, referenced files first.</summary>
     /// <exception cref="ContentValidationException">A file is malformed or breaks a content rule.</exception>
     public static ContentCatalog Load(string contentRoot)
     {
-        var classes = ContentFileReader.Read<IReadOnlyList<ClassDefinition>>(Path.Combine(contentRoot, ClassesFile));
-        ClassCatalogValidator.Validate(ClassesFile, classes);
+        var classes = ReadValidated<IReadOnlyList<ClassDefinition>>(contentRoot, ClassesFile, ClassCatalogValidator.Validate);
         var classIds = classes.Select(classDefinition => classDefinition.Id).ToFrozenSet();
-
-        var rules = ContentFileReader.Read<GameRules>(Path.Combine(contentRoot, RulesFile));
-        GameRulesValidator.Validate(RulesFile, rules);
-
-        var items = ContentFileReader.Read<IReadOnlyList<ItemDefinition>>(Path.Combine(contentRoot, ItemsFile));
-        ItemCatalogValidator.Validate(ItemsFile, items, classIds);
-
-        var skills = ContentFileReader.Read<IReadOnlyList<SkillDefinition>>(Path.Combine(contentRoot, SkillsFile));
-        SkillCatalogValidator.Validate(SkillsFile, skills);
-
-        var members = ContentFileReader.Read<IReadOnlyList<PartyMemberDefinition>>(Path.Combine(contentRoot, PartyMembersFile));
+        var rules = ReadValidated<GameRules>(contentRoot, RulesFile, GameRulesValidator.Validate);
+        var items = ReadValidated<IReadOnlyList<ItemDefinition>>(
+            contentRoot, ItemsFile, (file, list) => ItemCatalogValidator.Validate(file, list, classIds));
+        var skills = ReadValidated<IReadOnlyList<SkillDefinition>>(contentRoot, SkillsFile, SkillCatalogValidator.Validate);
         var memberReferences = new PartyMemberReferences(classIds, skills.Select(skill => skill.Id).ToFrozenSet(), rules.Experience);
-        PartyMemberCatalogValidator.Validate(PartyMembersFile, members, memberReferences);
+        var members = ReadValidated<IReadOnlyList<PartyMemberDefinition>>(
+            contentRoot, PartyMembersFile, (file, list) => PartyMemberCatalogValidator.Validate(file, list, memberReferences));
+        var enemies = ReadValidated<IReadOnlyList<EnemyDefinition>>(contentRoot, EnemiesFile, EnemyCatalogValidator.Validate);
+        var enemyIds = enemies.Select(enemy => enemy.Id).ToFrozenSet();
+        var encounters = ReadValidated<IReadOnlyList<EncounterDefinition>>(
+            contentRoot, EncountersFile, (file, list) => EncounterCatalogValidator.Validate(file, list, enemyIds));
 
         return new ContentCatalog
         {
@@ -44,7 +45,16 @@ public static class ContentCatalogLoader
             Classes = classes.ToFrozenDictionary(classDefinition => classDefinition.Id),
             Skills = skills.ToFrozenDictionary(skill => skill.Id),
             PartyMembers = members.ToFrozenDictionary(member => member.Id),
+            Enemies = enemies.ToFrozenDictionary(enemy => enemy.Id),
+            Encounters = encounters.ToFrozenDictionary(encounter => encounter.Id),
             Rules = rules,
         };
+    }
+
+    private static T ReadValidated<T>(string contentRoot, string fileName, Action<string, T> validate)
+    {
+        var content = ContentFileReader.Read<T>(Path.Combine(contentRoot, fileName));
+        validate(fileName, content);
+        return content;
     }
 }

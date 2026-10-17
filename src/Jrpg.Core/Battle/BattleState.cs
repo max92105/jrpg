@@ -1,5 +1,7 @@
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
+using Jrpg.Core.Party;
+using Jrpg.Core.Progression;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Skills;
 
@@ -13,6 +15,7 @@ public sealed class BattleState
 {
     private readonly TurnOrder _turnOrder;
     private readonly Inventory _inventory;
+    private bool _isExperienceGranted;
 
     /// <param name="combatants">Both sides, each with at least one living combatant.</param>
     /// <param name="inventory">The party's items; using one in battle consumes a copy.</param>
@@ -38,6 +41,18 @@ public sealed class BattleState
 
     public BattlePhase Phase { get; private set; }
 
+    /// <summary>A battle between the active party, in party order, and <paramref name="enemies"/>, in encounter order.</summary>
+    /// <exception cref="ArgumentException">Every active member has fallen, or there are no enemies.</exception>
+    public static BattleState Start(PartyState party, IReadOnlyList<EnemyDefinition> enemies, Inventory inventory, IRandom random)
+    {
+        IReadOnlyList<Combatant> combatants =
+        [
+            .. party.ActiveMembers.Select(Combatant.FromPartyMember),
+            .. enemies.Select(Combatant.FromEnemy),
+        ];
+        return new BattleState(combatants, inventory, random);
+    }
+
     public bool IsOver => Phase is BattlePhase.Victory or BattlePhase.Defeat or BattlePhase.Escaped;
 
     public Combatant CurrentActor => _turnOrder.Current;
@@ -53,6 +68,22 @@ public sealed class BattleState
     /// <summary>Whether the current actor can use <paramref name="item"/>: a party member, an owned copy, and an effect to apply.</summary>
     public bool CanUse(ItemDefinition item) =>
         CurrentActor.Side == BattleSide.Party && item.Effect is not null && _inventory.QuantityOf(item.Id) > 0;
+
+    /// <summary>Gives the enemies' experience to the party members still standing (developer decision 13). Call once, after a victory.</summary>
+    /// <returns>One gain per living party member, with the level steps it produced, for the victory screen.</returns>
+    /// <exception cref="InvalidOperationException">The battle wasn't won, or the experience was already granted.</exception>
+    public IReadOnlyList<ExperienceGain> GrantVictoryExperience(ExperienceTable table)
+    {
+        if (Phase != BattlePhase.Victory || _isExperienceGranted)
+        {
+            throw new InvalidOperationException($"Experience is granted once, after a victory (phase is {Phase}).");
+        }
+
+        _isExperienceGranted = true;
+        var defeated = Combatants.Select(combatant => combatant.Enemy).OfType<EnemyDefinition>().ToList();
+        var members = Combatants.Select(combatant => combatant.Member).OfType<PartyMember>().ToList();
+        return BattleRewards.GrantExperience(defeated, members, table);
+    }
 
     /// <summary>The current actor carries out <paramref name="command"/>, then the turn ends.</summary>
     /// <returns>What happened, in order, starting with <see cref="ActionStarted"/>.</returns>

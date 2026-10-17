@@ -1,6 +1,7 @@
 using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
 using Jrpg.Data.Content;
+using static Jrpg.Data.Content.RangeProblems;
 
 namespace Jrpg.Data.Party;
 
@@ -66,10 +67,4 @@ internal static class PartyMemberCatalogValidator
         return AtLeast("experience", member.Experience, 0)
             ?? (member.Experience < threshold ? null : $"experience must be below {threshold}, the threshold for level {member.Level} (was {member.Experience}).");
     }
-
-    private static string? AtLeast(string field, int value, int minimum) =>
-        value < minimum ? $"{field} must be at least {minimum} (was {value})." : null;
-
-    private static string? AtMost(string field, int value, string limitName, int limit) =>
-        value > limit ? $"{field} must be at most {limitName} ({limit}) (was {value})." : null;
 }

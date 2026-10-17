@@ -60,14 +60,14 @@ Test projects that read real content link `content/**` into their output (`<None
 Jrpg.Core/
   Randomness/  IRandom, SeededRandom
   Stats/       Vitals, CombatStats
-  Progression/ ExperienceTable, LevelProgressStep, ExperienceGain
+  Progression/ ExperienceTable, LevelProgressStep
   Effects/     Effect, EffectKind, Targeting, TargetRelation, TargetRules, EffectResolver, DamageFormula
   Items/       ItemDefinition, EquipmentStats, EquipmentSlot, Inventory, InventoryEntry, FieldItemUse
   Skills/      SkillDefinition
   Party/       PartyMemberDefinition, ClassDefinition, PartyRules, PartyMember, PartyState, PartyEquipment
   Battle/      BattleState, BattlePhase, BattleSide, Combatant, TurnOrder,
                BattleCommand (+ Attack/Defend/Flee/Skill/Item commands), BattleEvent (+ ActionStarted/EffectApplied/CombatantDefeated/BattleEnded),
-               EnemyDefinition, EnemyTactics, EncounterDefinition, BattleRewards
+               EnemyDefinition, EnemyTactics, EncounterDefinition, BattleRewards, ExperienceGain
   Content/     ContentCatalog, GameRules
   Session/     GameSession, NewGameDefinition
 ```
@@ -376,7 +376,12 @@ Slice 6 was split into 6a (Core) and 6b (content) before implementation: about 1
   - **From slice 6a review:** a `revive` effect needs power >= 1 (`Vitals.Revive` throws below that, after the item copy is spent). Add that rule to the item and skill validators, with tests.
   - **Tests (Data):** `SkillCatalogValidator_Validate_NegativeMpCost_ThrowsNamingTheSkill`, `PartyMemberCatalogValidator_Validate_UnknownSkillId_ThrowsNamingTheMember`
 
-- [ ] **7. Encounters, rewards and the first simulation**
+- [x] **7. Encounters, rewards and the first simulation**
+  - **Deviations:**
+    - `BattleRewards` stays internal; the public way to award experience is `BattleState.GrantVictoryExperience(ExperienceTable)`, which works once and only after a victory. For that, `Combatant` remembers its source (`Member` for the party, `Enemy` for enemies).
+    - `ExperienceGain` lives in `Battle/`, not `Progression/`, so `Progression` doesn't depend on `Party`.
+    - Data's range-check messages are shared in `Content/RangeProblems`. `ContentCatalogLoader` reads each file through one read-then-validate helper.
+    - The simulation's summary is printed in invariant culture. Baseline at this commit: 0.0 % wins, 23.5 average turns over 1,000 seeds (as expected for attack-only play).
   - **Goal:** A battle is set up from the active party and a content encounter (the legacy goblin trio), and victory grants experience to the living members. A headless simulation runs many seeded battles and prints a summary.
   - **New types (Core):**
     - `Battle/EncounterDefinition`: content record (`Id`, `IReadOnlyList<string> EnemyIds`, `BackgroundFile`). A group of enemies fought together.

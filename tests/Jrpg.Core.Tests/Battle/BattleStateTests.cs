@@ -1,6 +1,8 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
+using Jrpg.Core.Party;
+using Jrpg.Core.Progression;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -190,6 +192,64 @@ public sealed class BattleStateTests
         Assert.Equal(BattlePhase.Victory, battle.Phase);
         Assert.Equal(100 - (3 * 12), _hero.Vitals.Hp);
     }
+
+    [Fact]
+    public void Start_PartyAndEnemies_CreatesCombatantsInPartyThenEncounterOrder()
+    {
+        var sarxian = new PartyMemberBuilder().WithId("sarxian").Build();
+        var jazog = new PartyMemberBuilder().WithId("jazog").Build();
+        var reserve = new PartyMemberBuilder().WithId("reserve").Build();
+        var party = new PartyState([sarxian, jazog, reserve], [sarxian, jazog], new PartyRules(MaxActiveMembers: 4));
+        EnemyDefinition[] enemies = [Enemy("Goblin A"), Enemy("Goblin B"), Enemy("Goblin C")];
+
+        var battle = BattleState.Start(party, enemies, new Inventory(), new FixedSequenceRandom(4, 3, 2, 1));
+
+        Assert.Equal(
+            [(BattleSide.Party, "Test Member"), (BattleSide.Party, "Test Member"), (BattleSide.Enemies, "Goblin A"), (BattleSide.Enemies, "Goblin B"), (BattleSide.Enemies, "Goblin C")],
+            battle.Combatants.Select(combatant => (combatant.Side, combatant.Name)));
+        Assert.Equal([sarxian, jazog], battle.Combatants.Take(2).Select(combatant => combatant.Member));
+    }
+
+    [Fact]
+    public void GrantVictoryExperience_AfterVictory_GivesEnemyExperienceToLivingMembers()
+    {
+        var member = new PartyMemberBuilder().WithStats(attack: 15, defense: 8).Build();
+        var party = new PartyState([member], [member], new PartyRules(MaxActiveMembers: 4));
+        var battle = BattleState.Start(party, [Enemy("Goblin", maxHp: 10)], new Inventory(), new FixedSequenceRandom(1));
+        battle.Execute(new AttackCommand(battle.LivingOn(BattleSide.Enemies)[0]));
+
+        var gains = battle.GrantVictoryExperience(new ExperienceTable([1000]));
+
+        var gain = Assert.Single(gains);
+        Assert.Same(member, gain.Member);
+        Assert.Equal(40, gain.Amount);
+        Assert.Equal(40, member.Experience);
+    }
+
+    [Fact]
+    public void GrantVictoryExperience_BeforeTheBattleIsWon_Throws()
+    {
+        var battle = new BattleState([_hero, _goblin], new Inventory(), new FixedSequenceRandom(1));
+
+        Assert.Throws<InvalidOperationException>(() => battle.GrantVictoryExperience(new ExperienceTable([1000])));
+    }
+
+    [Fact]
+    public void GrantVictoryExperience_CalledTwice_Throws()
+    {
+        var member = new PartyMemberBuilder().WithStats(attack: 15, defense: 8).Build();
+        var party = new PartyState([member], [member], new PartyRules(MaxActiveMembers: 4));
+        var battle = BattleState.Start(party, [Enemy("Goblin", maxHp: 10)], new Inventory(), new FixedSequenceRandom(1));
+        battle.Execute(new AttackCommand(battle.LivingOn(BattleSide.Enemies)[0]));
+        var table = new ExperienceTable([1000]);
+        battle.GrantVictoryExperience(table);
+
+        Assert.Throws<InvalidOperationException>(() => battle.GrantVictoryExperience(table));
+        Assert.Equal(40, member.Experience);
+    }
+
+    private static EnemyDefinition Enemy(string name, int maxHp = 40) =>
+        new EnemyDefinitionBuilder().WithName(name).WithStats(maxHp, attack: 20, defense: 2).Build();
 
     private static Combatant Hero(int hp) => Combatant.FromPartyMember(
         new PartyMemberBuilder().WithStats(attack: 15, defense: 8).WithVitals(hp, maxHp: 100, mp: 0, maxMp: 0).Build());

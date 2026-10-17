@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.Versioning;
+using Jrpg.Core.Stats;
 
 namespace Jrpg.Core.Tests.Architecture;
 
@@ -15,7 +16,7 @@ public sealed class CoreDependencyTests
         "Microsoft.Xna",
     ];
 
-    private static readonly Assembly _core = Assembly.Load(new AssemblyName("Jrpg.Core"));
+    private static readonly Assembly _core = typeof(Vitals).Assembly;
 
     [Fact]
     public void CoreAssembly_ReferencedAssemblies_ContainNoUiOrEngineAssembly()

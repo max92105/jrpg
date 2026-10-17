@@ -185,7 +185,7 @@ Slice numbers refer to this plan. P3 = rendering, P4 = editor.
 ## Slices
 Line counts are estimates of hand-written code plus tests; generated content isn't counted.
 
-- [ ] **ADR 0005: map content format and source of truth** (before 1a). Options: (A) copy legacy files and read them through permanent Data DTOs; (B) a re-runnable converter from `Assets/` into a new schema loaded straight into Core records; (C) convert catalogs, read maps as-is. Recommendation (decision 42): **B**, with these rules recorded:
+- [x] **ADR 0005: map content format and source of truth** (before 1a). Options: (A) copy legacy files and read them through permanent Data DTOs; (B) a re-runnable converter from `Assets/` into a new schema loaded straight into Core records; (C) convert catalogs, read maps as-is. Recommendation (decision 42): **B**, with these rules recorded:
   - `Assets/` + the legacy MapEditor are the source of truth for map geometry (tiles, objects, placements, legacy events) until part 4: a temporary, explicit exception to "`content/` is the source of truth".
   - The converter owns `content/generated/` and rewrites all of it on every run; it never writes elsewhere. Generated files aren't edited by hand.
   - Everything the legacy editor can't express (display name, encounter table, odds, grace steps) lives in hand-written `content/maps/{id}.json`, composed with the layout at load.

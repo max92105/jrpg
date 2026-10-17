@@ -215,7 +215,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
     - `WalkabilityGrid_IsWalkable_OutsideMap_ReturnsFalse` (one cell at -1, one at `Width`)
   - **Done, with deviations:** There is no `TileDefinitionBuilder`: tests build the two-field record inline. Extra tests cover an unknown tile id (blocks, as in legacy), rows read by y on a non-square map, and a point on a cell's top-left corner. `MapDefinition` rejects settings whose id differs from the layout's.
 
-- [ ] **1b. Converter tool and tile content** (tool + Data, about 280 lines)
+- [x] **1b. Converter tool and tile content** (tool + Data, about 280 lines)
   - **Goal:** `dotnet run --project tools/Jrpg.ContentConverter -- Assets content` regenerates `content/generated/tiles.json`, which loads and validates into `ContentCatalog.Tiles`.
   - **Projects:** `tools/Jrpg.ContentConverter` (console, `net10.0`, references Core and Data) and `tests/Jrpg.ContentConverter.Tests` (references the tool), both added to `Jrpg.slnx` (decision 41). `CLAUDE.md` gains the `tools/` line and the converter command. The test project links `Assets/Tiles/*.json`, `Assets/Objects/*.json`, `Assets/Maps/*.json` and `Assets/Maps/Back/*.json` as `legacy-assets/`, and `content/**` as `content/`.
   - **Tool types (internal unless stated):**
@@ -227,6 +227,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
   - **Tests:**
     - Tool: `TileConversion_Convert_KeyDisagreesWithInnerId_ThrowsNamingTheKey`, `TileConversion_Convert_RepositoryTileset_Converts283WalkableTiles`, `LegacyContentConversion_Convert_ExistingGeneratedFile_IsReplaced` (a stale extra file in `generated/` is gone after the run), `LegacyContentConversion_Convert_FileOutsideGenerated_IsUntouched`
     - Data: `TileCatalogValidator_Validate_TileIdZero_ThrowsNamingTheField`, `TileCatalogValidator_Validate_DuplicateId_ThrowsNamingTheId`, `ContentCatalogLoader_Load_RepositoryContent_Succeeds` (existing)
+  - **Done, with deviations:** `LegacyFileReader` (new) reads legacy PascalCase JSON strictly and names the file and JSON path on errors. The converter converts and validates everything (with `TileCatalogValidator`) before replacing `generated/`, so a failed run keeps the last good content. A tile with a sprite, frames or collision polygon is a conversion error (none exist). `ConversionReport` only has `AddConverted` until 1c. The test project links only `Assets/Tiles/*.json`; 1c and 1d add the rest. `ContentCatalogLoader` owns the `generated/` paths, which the converter reuses.
 
 - [ ] **1c. Object content** (tool + Data, about 220 lines)
   - **Goal:** `content/generated/objects.json` is generated with snake_case ids and real sizes, and loads and validates.

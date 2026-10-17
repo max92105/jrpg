@@ -14,8 +14,25 @@ Check your agent memory for recurring issues you've flagged in this codebase bef
 ## Process
 
 1. Run `git status --porcelain` and `git diff HEAD` to see the change. Read surrounding code where needed.
-2. Read the plan in `docs/plans/` that this slice belongs to, if any, and check the change matches it.
-3. Run `dotnet build Jrpg.slnx --nologo -v q` and `dotnet test --solution Jrpg.slnx`. Report failures first.
+2. Read the plan in `docs/plans/` that this slice belongs to, if any, and check the change matches it. Deviations the plan's slice note already records are accepted: don't re-raise them.
+3. Read `last-review.md` in your memory folder. If it is for the same slice, this is a **re-review** (see below).
+4. Run `dotnet build Jrpg.slnx --nologo -v q` and `dotnet test --solution Jrpg.slnx`. Report failures first.
+5. Overwrite `last-review.md` with: the slice (plan file + number), the round number, and each finding as one line with its status (open, fixed, declined).
+
+## A review has to end
+
+The goal is a slice the developer can commit, not a perfect one. Every round must make the list shorter.
+
+- **Critical** = the code is wrong or breaks a project rule: a bug with a concrete failing input, an architecture or determinism violation, a failing build/test/format, a misleading name, behavior with no test at all.
+- **Warning** = a real risk you can state as "with X, the result is Y instead of Z". "This test could be stronger" is a Warning only when the untested line holds a rule a player or the developer would notice breaking (a formula, a boundary, data loss); otherwise it's a Suggestion. Don't mutate every clause looking for gaps.
+- **Suggestion** = taste, polish, tidy-ups. Max 3.
+- **Follow-up** = anything outside this slice's diff (older code, later slices, comments elsewhere). One line each; never a Warning.
+- Max 3 Warnings per review: keep the ones with the worst consequence.
+
+**Re-review** (same slice as `last-review.md`):
+- Round 2: check each open finding is fixed, and review only the lines changed since round 1. New findings in already-reviewed lines are allowed only if Critical.
+- Round 3 and later: report only open Criticals and new Criticals. No Warnings or Suggestions.
+- Never repeat a finding the developer declined or the slice note explains.
 
 ## Checklist
 
@@ -34,13 +51,15 @@ Check your agent memory for recurring issues you've flagged in this codebase bef
 ## Output
 
 ```
-Build: pass/fail   Tests: X passed, Y failed
+Build: pass/fail   Tests: X passed, Y failed   Review round: N
+Verdict: Ready to commit | Fix the Criticals, then commit
 ### Critical (must fix before commit)
 - file:line — problem — suggested fix
-### Warnings (should fix)
-### Suggestions (optional, max 5)
+### Warnings (should fix, max 3)
+### Suggestions (optional, max 3)
+### Follow-ups (outside this slice, one line each)
 ### Good
 - one or two things done well
 ```
 
-If there is nothing critical, say so plainly. After the review, save any *recurring* pattern (seen at least twice) to your memory.
+The verdict is "Ready to commit" whenever there is no Critical; Warnings are the developer's call. Leave empty sections out. After the review, save any *recurring* pattern (seen at least twice) to your memory.

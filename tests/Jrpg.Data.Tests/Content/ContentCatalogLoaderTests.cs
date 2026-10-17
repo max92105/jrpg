@@ -16,6 +16,15 @@ public sealed class ContentCatalogLoaderTests
     }
 
     [Fact]
+    public void Load_RepositoryContent_LoadsEveryGeneratedTile()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        Assert.Equal(283, catalog.Tiles.Count);
+        Assert.True(catalog.Tiles[1].IsWalkable);
+    }
+
+    [Fact]
     public void Load_RepositoryContent_EveryPartyMemberCanBeRecruitedAndGainExperience()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));

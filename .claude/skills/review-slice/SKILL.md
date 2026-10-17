@@ -13,4 +13,4 @@ Current working tree:
 
 Extra focus requested by the developer (may be empty): $ARGUMENTS
 
-Follow your review process and output format exactly. Be strict about architecture boundaries and test coverage.
+Follow your review process and output format exactly, including the re-review rules: be strict on Criticals, and make each round's list shorter than the last.

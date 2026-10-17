@@ -11,7 +11,7 @@ Implement one slice. Arguments: $ARGUMENTS
 3. Implement **only that slice**. Write the tests in the same change (test first when the behavior is a pure function or formula).
 4. Run `dotnet build Jrpg.slnx --nologo -v q` and `dotnet test --solution Jrpg.slnx` until both are clean with zero warnings.
 5. Re-read your own diff against `.claude/rules/code-quality.md` before handing it to the reviewer: rename anything vague, delete anything unused or speculative, remove comments that narrate.
-6. Delegate to the **code-reviewer** subagent. Fix every Critical finding. List Warnings you chose not to fix and why.
+6. Delegate to the **code-reviewer** subagent, once. Fix every Critical finding. Fix the Warnings that are cheap and in scope; list the others with one line each on why not. Don't re-run the reviewer unless a Critical fix changed the design; the developer can run `/review-slice` for an independent check.
 7. Tick the slice in the plan file and add a one-line note for any deviation from the plan.
 8. Stop. Show me: what changed (files), test results, review outcome, and a proposed commit message. **Do not commit**; I commit myself.
 

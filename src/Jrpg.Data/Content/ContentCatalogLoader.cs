@@ -2,10 +2,12 @@ using System.Collections.Frozen;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Core.Items;
+using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Skills;
 using Jrpg.Data.Battle;
 using Jrpg.Data.Items;
+using Jrpg.Data.Maps;
 using Jrpg.Data.Party;
 using Jrpg.Data.Skills;
 
@@ -21,6 +23,10 @@ public static class ContentCatalogLoader
     private const string EnemiesFile = "enemies.json";
     private const string EncountersFile = "encounters.json";
     private const string NewGameFile = "new-game.json";
+
+    /// <summary>The folder the content converter owns and rewrites on every run (ADR 0005).</summary>
+    internal const string GeneratedFolder = "generated";
+    internal const string TilesFile = GeneratedFolder + "/tiles.json";
 
     /// <summary>Loads and validates every content file under <paramref name="contentRoot"/>, referenced files first.</summary>
     /// <exception cref="ContentValidationException">A file is malformed or breaks a content rule.</exception>
@@ -43,6 +49,7 @@ public static class ContentCatalogLoader
             members.Select(member => member.Id).ToFrozenSet(), items.ToFrozenDictionary(item => item.Id), rules.Party);
         var newGame = ReadValidated<NewGameDefinition>(
             contentRoot, NewGameFile, (file, definition) => NewGameValidator.Validate(file, definition, newGameReferences));
+        var tiles = ReadValidated<IReadOnlyList<TileDefinition>>(contentRoot, TilesFile, TileCatalogValidator.Validate);
 
         return new ContentCatalog
         {
@@ -52,6 +59,7 @@ public static class ContentCatalogLoader
             PartyMembers = members.ToFrozenDictionary(member => member.Id),
             Enemies = enemies.ToFrozenDictionary(enemy => enemy.Id),
             Encounters = encounters.ToFrozenDictionary(encounter => encounter.Id),
+            Tiles = tiles.ToFrozenDictionary(tile => tile.Id),
             Rules = rules,
             NewGame = newGame,
         };

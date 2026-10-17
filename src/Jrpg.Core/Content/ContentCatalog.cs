@@ -1,5 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Items;
+using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Skills;
 
@@ -19,6 +20,8 @@ public sealed record ContentCatalog
     public required IReadOnlyDictionary<string, EnemyDefinition> Enemies { get; init; }
 
     public required IReadOnlyDictionary<string, EncounterDefinition> Encounters { get; init; }
+
+    public required IReadOnlyDictionary<int, TileDefinition> Tiles { get; init; }
 
     public required GameRules Rules { get; init; }
 

@@ -10,6 +10,7 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Jrpg.Data.Tests" />
+    <InternalsVisibleTo Include="Jrpg.ContentConverter" />
   </ItemGroup>
 
 </Project>

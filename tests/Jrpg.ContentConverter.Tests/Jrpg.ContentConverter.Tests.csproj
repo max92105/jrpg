@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.v3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\tools\Jrpg.ContentConverter\Jrpg.ContentConverter.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\Assets\Tiles\*.json" LinkBase="legacy-assets\Tiles" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>

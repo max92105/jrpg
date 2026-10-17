@@ -1,6 +1,7 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Core.Items;
+using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
 using Jrpg.Core.Skills;
@@ -47,6 +48,7 @@ internal sealed class ContentCatalogBuilder
         PartyMembers = _members.ToDictionary(member => member.Id),
         Enemies = new Dictionary<string, EnemyDefinition>(),
         Encounters = new Dictionary<string, EncounterDefinition>(),
+        Tiles = new Dictionary<int, TileDefinition>(),
         Rules = new GameRules(new PartyRules(MaxActiveMembers: 4), new ExperienceTable([100])),
         NewGame = _newGame,
     };

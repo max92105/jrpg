@@ -1,6 +1,8 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
+using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
 using Jrpg.Core.Tests.Builders;
 
@@ -32,6 +34,24 @@ public sealed class CombatantTests
 
         Assert.Equal(BattleSide.Party, combatant.Side);
         Assert.Equal(new CombatStats(Attack: 15, Defense: 5), combatant.Stats);
+    }
+
+    [Fact]
+    public void FromPartyMember_MemberWithSkills_CarriesThem()
+    {
+        var heal = new SkillDefinition
+        {
+            Id = "heal",
+            Name = "Heal",
+            IconFile = "Skill.png",
+            MpCost = 8,
+            Effect = new Effect(EffectKind.RestoreHp, 15, Targeting.SingleAlly),
+        };
+        var member = new PartyMemberBuilder().WithSkills(heal).Build();
+
+        var combatant = Combatant.FromPartyMember(member);
+
+        Assert.Equal([heal], combatant.Skills);
     }
 
     [Fact]

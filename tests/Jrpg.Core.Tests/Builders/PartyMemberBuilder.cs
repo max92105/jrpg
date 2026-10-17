@@ -1,4 +1,5 @@
 using Jrpg.Core.Party;
+using Jrpg.Core.Skills;
 
 namespace Jrpg.Core.Tests.Builders;
 
@@ -14,6 +15,7 @@ internal sealed class PartyMemberBuilder
     private int _maxMp = 20;
     private int _attack = 10;
     private int _defense = 5;
+    private SkillDefinition[] _skills = [];
 
     public PartyMemberBuilder WithId(string id)
     {
@@ -50,6 +52,12 @@ internal sealed class PartyMemberBuilder
         return this;
     }
 
+    public PartyMemberBuilder WithSkills(params SkillDefinition[] skills)
+    {
+        _skills = skills;
+        return this;
+    }
+
     public PartyMember Build() => PartyMember.Recruit(new PartyMemberDefinition
     {
         Id = _id,
@@ -66,5 +74,5 @@ internal sealed class PartyMemberBuilder
         MaxMp = _maxMp,
         Attack = _attack,
         Defense = _defense,
-    });
+    }, _skills);
 }

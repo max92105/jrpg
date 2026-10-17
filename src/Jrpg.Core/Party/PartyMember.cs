@@ -1,5 +1,6 @@
 using Jrpg.Core.Items;
 using Jrpg.Core.Progression;
+using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
 
 namespace Jrpg.Core.Party;
@@ -7,9 +8,10 @@ namespace Jrpg.Core.Party;
 /// <summary>A recruited party member's runtime state.</summary>
 public sealed class PartyMember
 {
-    private PartyMember(PartyMemberDefinition definition)
+    private PartyMember(PartyMemberDefinition definition, IReadOnlyList<SkillDefinition> skills)
     {
         Definition = definition;
+        Skills = [.. skills];
         Level = definition.Level;
         Experience = definition.Experience;
         BaseStats = new CombatStats(definition.Attack, definition.Defense);
@@ -33,10 +35,12 @@ public sealed class PartyMember
 
     public ItemDefinition? Armor { get; private set; }
 
+    public IReadOnlyList<SkillDefinition> Skills { get; }
+
     /// <summary>Base stats plus the bonuses of everything worn.</summary>
     public CombatStats TotalStats => StatsWearing(Weapon, Armor);
 
-    public static PartyMember Recruit(PartyMemberDefinition definition) => new(definition);
+    public static PartyMember Recruit(PartyMemberDefinition definition, IReadOnlyList<SkillDefinition> skills) => new(definition, skills);
 
     /// <summary>The stat preview: total stats if <paramref name="item"/> replaced whatever is worn in its slot.</summary>
     public CombatStats StatsWith(ItemDefinition item)

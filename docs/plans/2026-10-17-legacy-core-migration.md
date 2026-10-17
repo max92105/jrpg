@@ -61,11 +61,11 @@ Jrpg.Core/
   Randomness/  IRandom, SeededRandom
   Stats/       Vitals, CombatStats
   Progression/ ExperienceTable, LevelProgressStep, ExperienceGain
-  Effects/     Effect, EffectKind, Targeting, TargetRelation, TargetRules, EffectResolver
+  Effects/     Effect, EffectKind, Targeting, TargetRelation, TargetRules, EffectResolver, DamageFormula
   Items/       ItemDefinition, EquipmentStats, EquipmentSlot, Inventory, InventoryEntry, FieldItemUse
   Skills/      SkillDefinition
   Party/       PartyMemberDefinition, ClassDefinition, PartyRules, PartyMember, PartyState, PartyEquipment
-  Battle/      BattleState, BattlePhase, BattleSide, Combatant, TurnOrder, DamageFormula,
+  Battle/      BattleState, BattlePhase, BattleSide, Combatant, TurnOrder,
                BattleCommand (+ Attack/Defend/Flee/Skill/Item commands), BattleEvent (+ ActionStarted/EffectApplied/CombatantDefeated/BattleEnded),
                EnemyDefinition, EnemyTactics, EncounterDefinition, BattleRewards
   Content/     ContentCatalog, GameRules
@@ -330,8 +330,15 @@ Slice 4 was split into 4a (Core) and 4b (content) before implementation: about 1
     - `BattleState_Execute_FleeOnEnemyTurn_Throws`
     - `EnemyTactics_ChooseCommand_FixedSeed_TargetsLivingPartyMember`
 
-- [ ] **6. Skills and items in battle**
-  - **Goal:** Party combatants use skills (spending MP) and consumables (spending inventory copies). Targets are checked against the effect's targeting rule, and outcomes report the amounts actually applied.
+Slice 6 was split into 6a (Core) and 6b (content) before implementation: about 1,000 lines as one slice (developer decision 2026-10-17).
+
+- [x] **6a. Skills and items in battle**
+  - **Deviations:**
+    - `DamageFormula` moved from `Battle/` to `Effects/`: `EffectResolver` uses it, and `Effects/` must not depend on `Battle/`.
+    - Attacks go through the same target check and effect path as skills and items (a single-enemy damage effect whose power is the attacker's attack).
+    - Target rules for commands: an "all" effect must list exactly every valid target, a single-target effect exactly one, with no duplicates. Enemies can't use items. `CombatantDefeated` is reported only when a target goes from alive to fallen.
+    - `BattleState(combatants, inventory, random)`: the inventory sits between the two existing parameters. `Combatant.Skills` is set through a private `init` to stay within 4 constructor parameters.
+  - **Goal:** Core only, members and skills built with test builders. Party combatants use skills (spending MP) and consumables (spending inventory copies). Targets are checked against the effect's targeting rule, and outcomes report the amounts actually applied.
   - **New types (Core):**
     - `Skills/SkillDefinition`: content record (`Id`, `Name`, `IconFile`, `MpCost`, `Effect`). One skill. MP is the only skill resource for now; class resources come with the class design.
     - `Effects/TargetRelation`: `Self`, `Ally`, `Enemy`. How a candidate relates to the user.
@@ -340,8 +347,6 @@ Slice 4 was split into 4a (Core) and 4b (content) before implementation: about 1
     - `Battle/SkillCommand(SkillDefinition Skill, IReadOnlyList<Combatant> Targets)`, `Battle/ItemCommand(ItemDefinition Item, IReadOnlyList<Combatant> Targets)`.
     - `BattleState` gains an `Inventory` constructor parameter, `bool CanUse(SkillDefinition skill)` (enough MP), and `bool CanUse(ItemDefinition item)` (owned, consumable). Executing a skill without enough MP throws; the UI greys it out.
     - `PartyMember` and `Combatant` gain `IReadOnlyList<SkillDefinition> Skills`. `PartyMember.Recruit` takes the resolved skills.
-  - **New types (Data):** `Skills/SkillCatalogValidator` (`MpCost >= 0`, duplicate ids). `PartyMemberDefinition` gains `SkillIds`, checked against skills.
-  - **Content:** `content/skills.json` (Fire Blast, Fireball, Heal, Recovery, Heal All; Recovery restores MP). Sarxian's `skillIds` in `party-members.json`.
   - **Tests:**
     - `TargetRules_CanTarget_SingleEnemyOnAlly_ReturnsFalse`
     - `TargetRules_CanTarget_SelfOnOtherAlly_ReturnsFalse`
@@ -355,7 +360,13 @@ Slice 4 was split into 4a (Core) and 4b (content) before implementation: about 1
     - `BattleState_Execute_SkillCommandWithoutEnoughMp_Throws`
     - `BattleState_Execute_ItemCommand_ConsumesOneCopy`
     - `BattleState_Execute_ItemCommandOnInvalidTarget_Throws`
-    - Data: `SkillCatalogValidator_Validate_NegativeMpCost_ThrowsNamingTheSkill`, `PartyMemberCatalogValidator_Validate_UnknownSkillId_ThrowsNamingTheMember`
+
+- [ ] **6b. Skill content**
+  - **Goal:** Skills load and validate from content, and party members are recruited with their skills resolved by id.
+  - **New types (Data):** `Skills/SkillCatalogValidator` (`MpCost >= 0`, duplicate ids). `PartyMemberDefinition` gains `SkillIds`, checked against skills. `ContentCatalog` gains `Skills`.
+  - **Content:** `content/skills.json` (Fire Blast, Fireball, Heal, Recovery, Heal All). Sarxian's `skillIds` in `party-members.json`. Open question: the plan said "Recovery restores MP", but legacy Recovery heals 30 HP on its user (Self); no legacy skill used `ManaRecovery`. Developer to decide before 6b.
+  - **From slice 6a review:** a `revive` effect needs power >= 1 (`Vitals.Revive` throws below that, after the item copy is spent). Add that rule to the item and skill validators, with tests.
+  - **Tests (Data):** `SkillCatalogValidator_Validate_NegativeMpCost_ThrowsNamingTheSkill`, `PartyMemberCatalogValidator_Validate_UnknownSkillId_ThrowsNamingTheMember`
 
 - [ ] **7. Encounters, rewards and the first simulation**
   - **Goal:** A battle is set up from the active party and a content encounter (the legacy goblin trio), and victory grants experience to the living members. A headless simulation runs many seeded battles and prints a summary.
@@ -391,7 +402,7 @@ Slice 4 was split into 4a (Core) and 4b (content) before implementation: about 1
 
 ## Follow-up plans (to be detailed with /plan-feature before starting)
 - **Part 2: world and exploration core.** (a) Map model + legacy map/tile/object/tilesheet readers in Data; JSON moves from `Assets/` to `content/maps`, `content/tiles`, `content/objects`. (b) Walkability, `PlayerWalker` movement and polygon collision. (c) `MapEvent` + `EventStep` records + `EventRun` state machine + `WorldState` + `InteractionFinder`, with tile triggers unified into events. (d) Warps (`WarpArrival` nearest-walkable search) and `RandomEncounters` (`IRandom`, rolled per step, rate set per map). (e) Save/load v1 (`SaveGame`, `ISaveStore`, `SaveSlotSummary`, `PlayTime`); legacy saves are not loaded. (f) Cutscene scripts + intro content.
-- **Part 3: rendering in Jrpg.Game.** Scene stack, battle screen, map renderer with `DrawOrderKey`, dialogue box, menus (Octopath-style direction). Decide the MonoGame content pipeline here. Add `TurnOrder.Upcoming` (living combatants from the current one, for the turn bar), deferred from 5a. In the first slice that draws pixel art, add a per-monitor DPI-aware `app.manifest`; without it Windows display scaling above 100% blurs the window.
+- **Part 3: rendering in Jrpg.Game.** Scene stack, battle screen, map renderer with `DrawOrderKey`, dialogue box, menus (Octopath-style direction). Decide the MonoGame content pipeline here. Add `TurnOrder.Upcoming` (living combatants from the current one, for the turn bar), deferred from 5a. `BattleState.CanUse` says whether a skill or item is usable, not whether a legal target exists (e.g. a Revive Feather with nobody fallen); the battle menu must also check targets before offering it. In the first slice that draws pixel art, add a per-monitor DPI-aware `app.manifest`; without it Windows display scaling above 100% blurs the window.
 - **Part 4: editor port.** Create `src/Jrpg.Editor`. Map editor on MVVM: `EditHistory` (was `UndoManager`), edit commands, flood fill, tile-group object creation, content editors validating through Jrpg.Data. Decide `CommunityToolkit.Mvvm` here.
 - **Class design (no plan yet, developer to design).** Class resources replacing MP (Rage, Faith…), stat growth on level-up, experience curves (one shared table or one per class), damage, Defend, escape chance, speed-based turn order. Each replaces a placeholder listed in the guiding rule.
 

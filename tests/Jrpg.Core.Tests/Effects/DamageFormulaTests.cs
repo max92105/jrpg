@@ -1,6 +1,6 @@
-using Jrpg.Core.Battle;
+using Jrpg.Core.Effects;
 
-namespace Jrpg.Core.Tests.Battle;
+namespace Jrpg.Core.Tests.Effects;
 
 public sealed class DamageFormulaTests
 {

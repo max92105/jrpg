@@ -1,4 +1,5 @@
 using Jrpg.Core.Party;
+using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
 
 namespace Jrpg.Core.Battle;
@@ -25,9 +26,12 @@ public sealed class Combatant
 
     public bool IsAlive => Vitals.IsAlive;
 
+    /// <summary>The skills this combatant can use; enemies have none yet.</summary>
+    public IReadOnlyList<SkillDefinition> Skills { get; private init; } = [];
+
     /// <summary>Shares the member's <see cref="Vitals"/>, so damage and healing in battle stay after it.</summary>
     public static Combatant FromPartyMember(PartyMember member) =>
-        new(member.Definition.Name, BattleSide.Party, member.TotalStats, member.Vitals);
+        new(member.Definition.Name, BattleSide.Party, member.TotalStats, member.Vitals) { Skills = member.Skills };
 
     public static Combatant FromEnemy(EnemyDefinition enemy) => new(
         enemy.Name,

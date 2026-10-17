@@ -1,4 +1,4 @@
-namespace Jrpg.Core.Battle;
+namespace Jrpg.Core.Effects;
 
 /// <summary>
 /// Placeholder ported from the demo (plan 2026-10-17, guiding rule): defense subtracts straight from power,

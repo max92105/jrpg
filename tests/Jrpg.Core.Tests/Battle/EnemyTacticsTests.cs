@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Items;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -16,7 +17,7 @@ public sealed class EnemyTacticsTests
     {
         _jazog.Vitals.TakeDamage(999);
         // Shuffle values (0, 2, 1) swap the goblin to the front, so it is the enemy's turn.
-        var battle = new BattleState([_sarxian, _jazog, _teelle, _goblin], new FixedSequenceRandom(0, 2, 1));
+        var battle = new BattleState([_sarxian, _jazog, _teelle, _goblin], new Inventory(), new FixedSequenceRandom(0, 2, 1));
         var tactics = new EnemyTactics(new FixedSequenceRandom(1));
 
         var command = tactics.ChooseCommand(battle);
@@ -28,7 +29,7 @@ public sealed class EnemyTacticsTests
     [Fact]
     public void ChooseCommand_OnPartyTurn_Throws()
     {
-        var battle = new BattleState([_sarxian, _goblin], new FixedSequenceRandom(1));
+        var battle = new BattleState([_sarxian, _goblin], new Inventory(), new FixedSequenceRandom(1));
         var tactics = new EnemyTactics(new FixedSequenceRandom(0));
 
         Assert.Throws<InvalidOperationException>(() => tactics.ChooseCommand(battle));

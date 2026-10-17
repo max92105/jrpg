@@ -1,3 +1,4 @@
+using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
 
 namespace Jrpg.Core.Tests.Builders;
@@ -7,6 +8,7 @@ internal sealed class ItemDefinitionBuilder
     private string _id = "potion";
     private int _maxStack = 99;
     private EquipmentStats? _equipment;
+    private Effect? _effect;
 
     public ItemDefinitionBuilder WithId(string id)
     {
@@ -39,6 +41,12 @@ internal sealed class ItemDefinitionBuilder
         return this;
     }
 
+    public ItemDefinitionBuilder WithEffect(Effect effect)
+    {
+        _effect = effect;
+        return this;
+    }
+
     public ItemDefinition Build() => new()
     {
         Id = _id,
@@ -47,6 +55,7 @@ internal sealed class ItemDefinitionBuilder
         IconFile = "icon.png",
         MaxStack = _maxStack,
         IsUsableFromMenu = false,
+        Effect = _effect,
         Equipment = _equipment,
     };
 }

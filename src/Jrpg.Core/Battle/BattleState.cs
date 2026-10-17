@@ -1,5 +1,7 @@
 using Jrpg.Core.Effects;
+using Jrpg.Core.Items;
 using Jrpg.Core.Randomness;
+using Jrpg.Core.Skills;
 
 namespace Jrpg.Core.Battle;
 
@@ -10,9 +12,13 @@ namespace Jrpg.Core.Battle;
 public sealed class BattleState
 {
     private readonly TurnOrder _turnOrder;
+    private readonly Inventory _inventory;
 
+    /// <param name="combatants">Both sides, each with at least one living combatant.</param>
+    /// <param name="inventory">The party's items; using one in battle consumes a copy.</param>
+    /// <param name="random">Decides the turn order.</param>
     /// <exception cref="ArgumentException">A side has no living combatant, or a combatant is listed twice.</exception>
-    public BattleState(IReadOnlyList<Combatant> combatants, IRandom random)
+    public BattleState(IReadOnlyList<Combatant> combatants, Inventory inventory, IRandom random)
     {
         Combatants = [.. combatants];
         if (Combatants.Distinct().Count() != Combatants.Count)
@@ -25,6 +31,7 @@ public sealed class BattleState
             throw new ArgumentException("Both sides need at least one living combatant.", nameof(combatants));
         }
 
+        _inventory = inventory;
         _turnOrder = new TurnOrder(Combatants, random);
         Phase = TurnPhaseOf(CurrentActor);
     }
@@ -40,10 +47,17 @@ public sealed class BattleState
     public IReadOnlyList<Combatant> LivingOn(BattleSide side) =>
         [.. Combatants.Where(combatant => combatant.Side == side && combatant.IsAlive)];
 
+    /// <summary>Whether the current actor knows <paramref name="skill"/> and has the MP for it. The UI greys out the rest.</summary>
+    public bool CanUse(SkillDefinition skill) => CurrentActor.Skills.Contains(skill) && CurrentActor.Vitals.Mp >= skill.MpCost;
+
+    /// <summary>Whether the current actor can use <paramref name="item"/>: a party member, an owned copy, and an effect to apply.</summary>
+    public bool CanUse(ItemDefinition item) =>
+        CurrentActor.Side == BattleSide.Party && item.Effect is not null && _inventory.QuantityOf(item.Id) > 0;
+
     /// <summary>The current actor carries out <paramref name="command"/>, then the turn ends.</summary>
     /// <returns>What happened, in order, starting with <see cref="ActionStarted"/>.</returns>
     /// <exception cref="InvalidOperationException">The battle is over, or the current actor can't give this command.</exception>
-    /// <exception cref="ArgumentException">The command's target is not a legal target.</exception>
+    /// <exception cref="ArgumentException">The command's targets are not legal targets.</exception>
     public IReadOnlyList<BattleEvent> Execute(BattleCommand command)
     {
         if (IsOver)
@@ -57,6 +71,12 @@ public sealed class BattleState
         {
             case AttackCommand attack:
                 Attack(actor, attack.Target, events);
+                break;
+            case SkillCommand skill:
+                UseSkill(actor, skill, events);
+                break;
+            case ItemCommand item:
+                UseItem(actor, item, events);
                 break;
             case DefendCommand:
                 break;
@@ -74,18 +94,73 @@ public sealed class BattleState
     private static BattlePhase TurnPhaseOf(Combatant actor) =>
         actor.Side == BattleSide.Party ? BattlePhase.PartyTurn : BattlePhase.EnemyTurn;
 
+    private static TargetRelation RelationOf(Combatant actor, Combatant candidate) =>
+        candidate == actor ? TargetRelation.Self
+        : candidate.Side == actor.Side ? TargetRelation.Ally
+        : TargetRelation.Enemy;
+
+    private static void ApplyToTargets(Effect effect, IReadOnlyList<Combatant> targets, List<BattleEvent> events)
+    {
+        foreach (var target in targets)
+        {
+            var wasAlive = target.IsAlive;
+            events.Add(new EffectApplied(target, effect.Kind, EffectResolver.Apply(effect, target.Vitals, target.Stats.Defense)));
+            if (wasAlive && !target.IsAlive)
+            {
+                events.Add(new CombatantDefeated(target));
+            }
+        }
+    }
+
+    // An attack is a single-enemy damage effect whose power is the attacker's attack.
     private void Attack(Combatant actor, Combatant target, List<BattleEvent> events)
     {
-        if (!Combatants.Contains(target) || target.Side == actor.Side || !target.IsAlive)
+        var effect = new Effect(EffectKind.Damage, actor.Stats.Attack, Targeting.SingleEnemy);
+        ThrowIfIllegalTargets(actor, effect, [target]);
+        ApplyToTargets(effect, [target], events);
+    }
+
+    private void UseSkill(Combatant actor, SkillCommand command, List<BattleEvent> events)
+    {
+        if (!CanUse(command.Skill))
         {
-            throw new ArgumentException($"{target.Name} is not a living opponent of {actor.Name} in this battle.", nameof(target));
+            throw new InvalidOperationException($"{actor.Name} can't use {command.Skill.Name} (unknown skill or not enough MP).");
         }
 
-        var damage = DamageFormula.Calculate(actor.Stats.Attack, target.Stats.Defense);
-        events.Add(new EffectApplied(target, EffectKind.Damage, target.Vitals.TakeDamage(damage)));
-        if (!target.IsAlive)
+        ThrowIfIllegalTargets(actor, command.Skill.Effect, command.Targets);
+        actor.Vitals.TrySpendMp(command.Skill.MpCost);
+        ApplyToTargets(command.Skill.Effect, command.Targets, events);
+    }
+
+    private void UseItem(Combatant actor, ItemCommand command, List<BattleEvent> events)
+    {
+        if (!CanUse(command.Item) || command.Item.Effect is not { } effect)
         {
-            events.Add(new CombatantDefeated(target));
+            throw new InvalidOperationException($"{actor.Name} can't use {command.Item.Name} (not owned, not usable, or not a party member).");
+        }
+
+        ThrowIfIllegalTargets(actor, effect, command.Targets);
+        _inventory.TryRemove(command.Item.Id, 1);
+        ApplyToTargets(effect, command.Targets, events);
+    }
+
+    /// <summary>Single-target effects need exactly one valid target; "all" effects need every valid target.</summary>
+    private void ThrowIfIllegalTargets(Combatant actor, Effect effect, IReadOnlyList<Combatant> targets)
+    {
+        var validTargets = Combatants
+            .Where(candidate => TargetRules.CanTarget(effect.Targeting, RelationOf(actor, candidate), candidate.Vitals))
+            .ToHashSet();
+        var expectedCount = TargetRules.HitsEveryValidTarget(effect.Targeting) ? validTargets.Count : 1;
+
+        var isLegal = targets.Count > 0
+            && targets.Count == expectedCount
+            && targets.Distinct().Count() == targets.Count
+            && validTargets.IsSupersetOf(targets);
+        if (!isLegal)
+        {
+            throw new ArgumentException(
+                $"Illegal targets for a {effect.Targeting} effect from {actor.Name}: {string.Join(", ", targets.Select(target => target.Name))}.",
+                nameof(targets));
         }
     }
 

@@ -20,7 +20,7 @@ public sealed class ContentCatalogLoaderTests
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
         var stepsPerMember = catalog.PartyMembers.Values
-            .Select(definition => PartyMember.Recruit(definition).GainExperience(1, catalog.Rules.Experience))
+            .Select(definition => PartyMember.Recruit(definition, []).GainExperience(1, catalog.Rules.Experience))
             .ToList();
 
         Assert.Equal(7, stepsPerMember.Count);

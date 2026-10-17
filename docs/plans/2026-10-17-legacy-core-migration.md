@@ -278,7 +278,13 @@ Slice 4 was split into 4a (Core) and 4b (content) before implementation: about 1
   - **Content:** `content/classes.json` (Warrior, Mage, Thief, Healer, Knight, Ranger), `content/party-members.json` (the 7 legacy members, test values), `content/rules.json` (`maxActiveMembers` 4, a placeholder experience table).
   - **Tests (Data):** `PartyMemberCatalogValidator_Validate_UnknownClassId_ThrowsNamingTheMember`, `ItemCatalogValidator_Validate_UnknownAllowedClass_ThrowsNamingTheItem`, `GameRulesValidator_Validate_ZeroMaxActiveMembers_ThrowsNamingTheField`
 
-- [ ] **5a. Combatants, turn order and damage**
+- [x] **5a. Combatants, turn order and damage**
+  - **Deviations:**
+    - `IRandom.Next` is `NextBelow` (CA1716 rejects `Next`, a VB keyword).
+    - `TurnOrder.Upcoming` moved to part 3, its only user (the turn bar). `CombatantBuilder` isn't needed: tests build combatants with `Combatant.FromEnemy` and the existing builders.
+    - `TurnOrder` also skips the defeated when it starts, because a fallen member (shared `Vitals`) can enter a battle; it throws if nobody is alive.
+    - Core now has `InternalsVisibleTo` for `Jrpg.Core.Tests` and `Jrpg.Simulations` (deferred from 1a).
+    - The seeded tests pin known values instead of comparing two runs: `SeededRandom_NextBelow_Seed42_ReturnsKnownSequence` and `TurnOrder_Constructor_Seed7_ProducesKnownOrder`. .NET doesn't guarantee the seeded `Random` sequence across versions, so these fail first if it changes.
   - **Goal:** Combatants for both sides are built from party members and enemy definitions, take turns in a seeded shuffled order, and hits use the damage formula.
   - **New types (Core):**
     - `Randomness/IRandom`: the seam for all randomness in Core. `int Next(int maxExclusive)`.
@@ -380,7 +386,7 @@ Slice 4 was split into 4a (Core) and 4b (content) before implementation: about 1
 
 ## Follow-up plans (to be detailed with /plan-feature before starting)
 - **Part 2: world and exploration core.** (a) Map model + legacy map/tile/object/tilesheet readers in Data; JSON moves from `Assets/` to `content/maps`, `content/tiles`, `content/objects`. (b) Walkability, `PlayerWalker` movement and polygon collision. (c) `MapEvent` + `EventStep` records + `EventRun` state machine + `WorldState` + `InteractionFinder`, with tile triggers unified into events. (d) Warps (`WarpArrival` nearest-walkable search) and `RandomEncounters` (`IRandom`, rolled per step, rate set per map). (e) Save/load v1 (`SaveGame`, `ISaveStore`, `SaveSlotSummary`, `PlayTime`); legacy saves are not loaded. (f) Cutscene scripts + intro content.
-- **Part 3: rendering in Jrpg.Game.** Scene stack, battle screen, map renderer with `DrawOrderKey`, dialogue box, menus (Octopath-style direction). Decide the MonoGame content pipeline here. In the first slice that draws pixel art, add a per-monitor DPI-aware `app.manifest`; without it Windows display scaling above 100% blurs the window.
+- **Part 3: rendering in Jrpg.Game.** Scene stack, battle screen, map renderer with `DrawOrderKey`, dialogue box, menus (Octopath-style direction). Decide the MonoGame content pipeline here. Add `TurnOrder.Upcoming` (living combatants from the current one, for the turn bar), deferred from 5a. In the first slice that draws pixel art, add a per-monitor DPI-aware `app.manifest`; without it Windows display scaling above 100% blurs the window.
 - **Part 4: editor port.** Create `src/Jrpg.Editor`. Map editor on MVVM: `EditHistory` (was `UndoManager`), edit commands, flood fill, tile-group object creation, content editors validating through Jrpg.Data. Decide `CommunityToolkit.Mvvm` here.
 - **Class design (no plan yet, developer to design).** Class resources replacing MP (Rage, Faith…), stat growth on level-up, experience curves (one shared table or one per class), damage, Defend, escape chance, speed-based turn order. Each replaces a placeholder listed in the guiding rule.
 

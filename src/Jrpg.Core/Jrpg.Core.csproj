@@ -4,4 +4,9 @@
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Jrpg.Core.Tests" />
+    <InternalsVisibleTo Include="Jrpg.Simulations" />
+  </ItemGroup>
+
 </Project>

@@ -1,2 +1,3 @@
 - [Records with lists equality](records-with-lists-equality.md) — records with list members compare by reference; combined-field messages; tautological tests
 - [Scratch builds blocked](scratch-builds-blocked.md) — WDAC blocks scratch DLLs; grep DLL bytes; `dotnet fsi` + #r repo bin DLL works for probes
+- [Tautological tests](tautological-tests.md) — same-seed-twice and count==count tests that cannot fail; ask for pinned golden values

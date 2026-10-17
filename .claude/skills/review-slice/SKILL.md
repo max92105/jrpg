@@ -1,10 +1,9 @@
 ---
 name: review-slice
-description: Independent fresh-context review of the current uncommitted changes against this project's rules.
+description: Independent fresh-context review of the current uncommitted changes against this project's rules. Run only when the user explicitly asks for /review-slice.
 context: fork
 agent: code-reviewer
 background: false
-disable-model-invocation: true
 ---
 
 Review the current uncommitted changes in this repository.

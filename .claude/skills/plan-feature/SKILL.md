@@ -1,8 +1,7 @@
 ---
 name: plan-feature
-description: Plan a feature as small vertical slices, then have the plan challenged before any code is written.
+description: Plan a feature as small vertical slices, then have the plan challenged before any code is written. Run only when the user explicitly asks for /plan-feature.
 argument-hint: "<feature description>"
-disable-model-invocation: true
 ---
 
 Plan this feature: $ARGUMENTS

@@ -1,8 +1,7 @@
 ---
 name: qa
-description: Hunt for bugs and missing edge cases in the recently changed code by writing tests.
+description: Hunt for bugs and missing edge cases in the recently changed code by writing tests. Run only when the user explicitly asks for /qa.
 argument-hint: "[area to focus on]"
-disable-model-invocation: true
 ---
 
 Delegate to the **qa-engineer** subagent. Focus area (optional): $ARGUMENTS

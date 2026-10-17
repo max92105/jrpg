@@ -1,8 +1,7 @@
 ---
 name: adr
-description: Record an architecture decision (ADR) with options, trade-offs and the chosen outcome.
+description: Record an architecture decision (ADR) with options, trade-offs and the chosen outcome. Run only when the user explicitly asks for /adr.
 argument-hint: "<decision topic>"
-disable-model-invocation: true
 ---
 
 Write an Architecture Decision Record about: $ARGUMENTS

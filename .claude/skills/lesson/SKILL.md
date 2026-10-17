@@ -1,8 +1,7 @@
 ---
 name: lesson
-description: Turn a mistake or correction from this session into a permanent rule in the right place.
+description: Turn a mistake or correction from this session into a permanent rule in the right place. Run only when the user explicitly asks for /lesson.
 argument-hint: "<what went wrong or what to remember>"
-disable-model-invocation: true
 ---
 
 Something should be remembered permanently: $ARGUMENTS

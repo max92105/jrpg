@@ -1,8 +1,7 @@
 ---
 name: slice
-description: Implement the next unchecked slice of an approved plan, with tests, then verify and review it.
+description: Implement the next unchecked slice of an approved plan, with tests, then verify and review it. Run only when the user explicitly asks for /slice.
 argument-hint: "[plan file path] [slice number]"
-disable-model-invocation: true
 ---
 
 Implement one slice. Arguments: $ARGUMENTS

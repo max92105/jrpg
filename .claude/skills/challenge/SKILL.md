@@ -1,8 +1,7 @@
 ---
 name: challenge
-description: Get a skeptical second opinion on a plan, design idea, or decision.
+description: Get a skeptical second opinion on a plan, design idea, or decision. Run only when the user explicitly asks for /challenge.
 argument-hint: "<plan file path, or the idea/decision to challenge>"
-disable-model-invocation: true
 ---
 
 Delegate to the **devils-advocate** subagent to challenge: $ARGUMENTS

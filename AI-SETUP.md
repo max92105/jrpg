@@ -22,7 +22,7 @@
    - Delete `.github/copilot-instructions.md` (it only contains Azure rules unrelated to this project).
    - The legacy demo (`JRPG/`, `MapEditor/`, `JRPG.Core/`, `JRPG.sln`) stays untouched (already on .NET 10). The Stop hook builds it and the new `Jrpg.slnx` (created by the first migration slice); the quality commands only gate `Jrpg.slnx`.
 2. Commit: `git add -A && git commit -m "Add Claude Code setup"`.
-3. Open a terminal in the repo and run `claude`. Accept the **trust this folder** prompt (hooks don't run until you do).
+3. Open the repo folder in VS Code (`C:\Git\jrpg` itself, not a parent folder) and start a new Claude Code conversation. Accept the **trust this folder** prompt if asked (hooks don't run until you do).
 4. Check it loaded:
    - `/context` → `CLAUDE.md` is listed under Memory files.
    - `/hooks` → a `PreToolUse` and a `Stop` hook are listed.
@@ -80,6 +80,7 @@ The architect will read your demo code and propose the slices, including a mappi
 
 ## Troubleshooting
 
+- **A command like `/plan-feature` isn't in the `/` menu:** the VS Code extension hides skills marked `disable-model-invocation: true`. Don't add that flag to skills in this repo; guard them with "Run only when the user explicitly asks for /name." in the description instead.
 - **Hooks don't appear in `/hooks`:** check the JSON is valid (no trailing commas) and you trusted the folder. Restart `claude`.
 - **A hook errors with "running scripts is disabled":** the command already passes `-ExecutionPolicy Bypass`; make sure you didn't edit that out.
 - **Claude keeps looping on a failing build:** the hook lets Claude stop after one retry round (`stop_hook_active`). Then fix it together or run `/verify`.

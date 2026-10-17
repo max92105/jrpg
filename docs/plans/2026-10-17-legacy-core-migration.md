@@ -212,7 +212,8 @@ Slice numbers refer to this plan. P2 = follow-up "world and exploration core", P
 
 - [x] **ADR: content schema mapping** (before 3a). Accepted as [ADR 0002](../decisions/0002-content-schema-mapping.md): option C, content loads straight into Core records, with a Data DTO only where a file's format doesn't match the model. Deserialize Core definition records directly from JSON, or use separate DTOs in Jrpg.Data mapped to Core types. Decides how much JSON shapes Core's public records.
 
-- [ ] **3a. Items and inventory**
+- [x] **3a. Items and inventory**
+  - **Deviations:** `TryRemove` also throws `ArgumentOutOfRangeException` for a quantity of 0 or less (a caller bug, like `Add`), with a test. Extra tests: pickup order after re-adding, stack already full, item not owned, and "an empty class list means nobody can wear it".
   - **Goal:** Items are defined as records and an `Inventory` holds quantities, enforcing each item's max stack.
   - **New types (Core):**
     - `Effects/EffectKind`: `Damage`, `RestoreHp`, `RestoreMp`, `Revive`.
@@ -237,6 +238,7 @@ Slice numbers refer to this plan. P2 = follow-up "world and exploration core", P
   - **Test builder:** `tests/Jrpg.Core.Tests/Builders/ContentCatalogBuilder` (defaults for every property), so adding a catalog property doesn't break existing tests.
   - **Content:** `content/items.json`: the 12 legacy items with snake_case ids. Descriptions now match effects (Elixir: "Restores 100 HP."). Antidote is dropped until status effects exist. Revive Feather becomes `Revive` 15, `AllFallenAllies`.
   - **Also:** remove `--ignore-exit-code 8` from `Jrpg.Data.Tests.csproj`.
+  - **From slice 3a review:** `Effect` and `EquipmentStats` are positional records, so System.Text.Json fills them through the constructor, where `required` doesn't apply. Without `RespectRequiredConstructorParameters` a missing `allowedClassIds` would load as `null`. Use an `equipment` without `allowedClassIds` as the case in `ContentFileReader_Read_MissingRequiredField_ThrowsNamingTheFile`. Record equality on definitions is shallow for their lists; compare definitions by `Id`.
   - **Tests (Data):** `ContentCatalogLoader_Load_RepositoryContent_Succeeds` (the "all of content/ must load" test required by `content.md`), `ItemCatalogValidator_Validate_DuplicateId_ThrowsNamingTheId`, `ItemCatalogValidator_Validate_MaxStackZero_ThrowsNamingTheField`, `ItemCatalogValidator_Validate_MenuItemTargetingEnemies_ThrowsNamingTheItem`, `ContentFileReader_Read_MalformedJson_ThrowsNamingTheFile`, `ContentFileReader_Read_MissingRequiredField_ThrowsNamingTheFile`
 
 - [ ] **ADR: equipment ownership model** (before 4). Records the developer's choice of the move model over the legacy "worn copies stay counted" model, and its effect on menus, saves and future shops.

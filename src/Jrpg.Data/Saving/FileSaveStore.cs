@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
+using Jrpg.Core.Content;
 using Jrpg.Core.Saving;
 
 namespace Jrpg.Data.Saving;
@@ -9,7 +10,7 @@ namespace Jrpg.Data.Saving;
 /// Saves in a folder, one <c>{slot}.json</c> per slot. Which slots exist (manual slots, the autosave) is the Game's
 /// (developer decision 34); here a slot is any name of lowercase letters, digits and underscores.
 /// </summary>
-public sealed partial class FileSaveStore(string directory)
+public sealed partial class FileSaveStore(string directory, ContentCatalog catalog)
 {
     private const string FormatVersionProperty = "formatVersion";
 
@@ -31,10 +32,14 @@ public sealed partial class FileSaveStore(string directory)
         File.Move(temporaryPath, path, overwrite: true);
     }
 
-    /// <returns>The save, or null when the slot is empty.</returns>
+    /// <returns>
+    /// The save repaired against the current content, with what the repair changed (decision 40), or null when the slot is empty.
+    /// </returns>
     /// <exception cref="ArgumentException">The slot name has characters other than a-z, 0-9 and underscore.</exception>
-    /// <exception cref="UnreadableSaveException">The file is damaged, from the legacy demo, or from a newer version.</exception>
-    public SaveGame? Read(string slotName)
+    /// <exception cref="UnreadableSaveException">
+    /// The file is damaged, from the legacy demo or a newer version, or none of its active members exists anymore.
+    /// </exception>
+    public RepairedSave? Read(string slotName)
     {
         var path = PathOf(slotName);
         if (!File.Exists(path))
@@ -46,7 +51,7 @@ public sealed partial class FileSaveStore(string directory)
         CheckFormatVersion(slotName, root);
         var game = Deserialize(slotName, root).Game;
         CheckNoNullEntries(slotName, game);
-        return game;
+        return SaveGameRepair.Repair(slotName, game, catalog);
     }
 
     [GeneratedRegex("^[a-z0-9_]+$")]

@@ -1,9 +1,11 @@
+using Jrpg.Core.Content;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Saving;
 using Jrpg.Core.World;
+using Jrpg.Data.Content;
 using Jrpg.Data.Saving;
 
 namespace Jrpg.Data.Tests.Saving;
@@ -20,7 +22,7 @@ public sealed class FileSaveStoreTests : IDisposable
         Members =
         [
             new PartyMemberProgress("sarxian", Level: 3, Experience: 42, Hp: 77, Mp: 5, WeaponId: "bronze_sword", ArmorId: null),
-            new PartyMemberProgress("jazog", Level: 1, Experience: 0, Hp: 120, Mp: 0, WeaponId: null, ArmorId: "chain_mail"),
+            new PartyMemberProgress("jazog", Level: 1, Experience: 0, Hp: 120, Mp: 0, WeaponId: null, ArmorId: "wizard_robe"),
         ],
         ActiveMemberIds = ["sarxian", "jazog"],
         Inventory = [new InventoryEntry("potion", 4), new InventoryEntry("bomb", 3)],
@@ -28,12 +30,15 @@ public sealed class FileSaveStoreTests : IDisposable
         ObjectSwaps = [new ObjectSwap("start", "0bff6243", "chest_opened")],
     };
 
+    // The repository content, which the sample save fits, so reading it changes nothing.
+    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
     private readonly string _directory = Path.Combine(Path.GetTempPath(), $"jrpg-saves-{Guid.NewGuid():N}");
     private readonly FileSaveStore _store;
 
     public FileSaveStoreTests()
     {
-        _store = new FileSaveStore(_directory);
+        _store = new FileSaveStore(_directory, _catalog);
     }
 
     public void Dispose()
@@ -49,7 +54,8 @@ public sealed class FileSaveStoreTests : IDisposable
     {
         _store.Write(Slot, _save);
 
-        var read = _store.Read(Slot)!;
+        var repaired = _store.Read(Slot)!;
+        var read = repaired.Save;
 
         Assert.Equal((_save.SavedAt, _save.PlayTime, _save.Location), (read.SavedAt, read.PlayTime, read.Location));
         Assert.Equal(_save.Members, read.Members);
@@ -57,6 +63,7 @@ public sealed class FileSaveStoreTests : IDisposable
         Assert.Equal(_save.Inventory, read.Inventory);
         Assert.Equal(_save.CompletedEvents, read.CompletedEvents);
         Assert.Equal(_save.ObjectSwaps, read.ObjectSwaps);
+        Assert.Empty(repaired.Changes);
     }
 
     [Fact]
@@ -193,7 +200,7 @@ public sealed class FileSaveStoreTests : IDisposable
 
         _store.Write(Slot, _save with { PlayTime = TimeSpan.FromHours(2) });
 
-        Assert.Equal(TimeSpan.FromHours(2), _store.Read(Slot)!.PlayTime);
+        Assert.Equal(TimeSpan.FromHours(2), _store.Read(Slot)!.Save.PlayTime);
         Assert.Equal(["slot_01.json"], Directory.GetFiles(_directory).Select(Path.GetFileName));
     }
 

@@ -429,7 +429,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
     - `FileSaveStore_Write_InvalidSlotName_Throws`
   - **Done, with deviations:** `Read` pre-parses a `JsonNode` (duplicate keys rejected) to check `formatVersion`, then deserializes strictly; a version that isn't a positive integer is unreadable too. A null entry in any save list is refused as damaged. `UnreadableSaveException` exposes `SlotName` and `Reason`. Extra tests: the envelope shape, invalid versions, duplicate keys, an unknown field, a null entry per list. Follow-up for 5c and migrations: every `JsonNode` pre-parse needs `AllowDuplicateProperties = false`.
 
-- [ ] **5c. Save repair against current content** (Data, about 300 lines)
+- [x] **5c. Save repair against current content** (Data, about 300 lines)
   - **Goal:** a save made before content changed still loads: whatever no longer exists or no longer fits the rules is dropped or brought back into range, the rest is kept, and the player can continue (decision 40).
   - **New types (Data):**
     - `Saving/SaveGameRepair` (internal): fixes a save so it fits the current catalog. `static RepairedSave Repair(SaveGame save, ContentCatalog catalog)`. Rules, each with a test:
@@ -459,6 +459,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
     - `SaveGameRepair_Repair_UnknownLocationMap_UsesNewGameStart`
     - `SaveGameRepair_Repair_ValidSave_ReportsNoChanges`
     - `GameSession_SaveToFileAndRestore_RepositoryContent_ContinuesWhereSaved` (new game, open the chest, walk, save, read, restore; compare inventory, location and world)
+  - **Done, with deviations:** `RepairedSave` is public and `FileSaveStore.Read` returns it, so the change list can reach the Game (part 3). `SaveGameRepair` is an instance class behind a static `Repair(slotName, save, catalog)`; world checks live in `WorldStateRepair`. Extra rules: a duplicate member keeps its first copy; repeated or unrecruited active ids are dropped and reported; level below 1 and negative experience are clamped; duplicate inventory entries merge (saturating, then clamped to `MaxStack`); a worn item that isn't equipment goes back to the inventory. Follow-up for part 3: change lines are English text in C#; if shown to the player they belong in content or become message ids.
 
 ## Decisions (developer, 2026-10-17)
 Numbering continues from part 1 (1-25; decision 25 is now decided there: menu items can target reserve members).

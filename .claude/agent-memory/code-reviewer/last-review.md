@@ -5,14 +5,13 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-17-world-exploration-core.md, 5b (Save files)
-Round: 1 (verdict: Fix the Criticals, then commit)
+Slice: docs/plans/2026-10-17-world-exploration-core.md, 5c (Save repair against current content)
+Round: 1 (verdict: Ready to commit)
 
-Accepted (don't re-raise): JsonNode pre-parse for formatVersion then strict deserialize; null list entries refused as damaged; .tmp + File.Move(overwrite); SaveJsonOptions duplicates content options on purpose (+WriteIndented); UnreadableSaveException with SlotName/Reason; Reason embeds STJ message (plan: "naming the slot and path").
+Accepted (don't re-raise): public RepairedSave returned by Read; SaveGameRepair instance + static Repair(slotName, save, catalog); static WorldStateRepair; level<1/negative experience clamped; inventory merge then MaxStack clamp; position outside an existing map left to WarpArrival; test names without class prefix (matches the project's test files).
 
-- open (Critical): FileSaveStore.ParseObject - duplicate key ({"formatVersion":1,"formatVersion":1,...}) throws ArgumentException from JsonObject, escaping the UnreadableSaveException contract (verified with fsi); pass JsonDocumentOptions { AllowDuplicateProperties = false } to JsonNode.Parse + test
-- open (Warning): Read_MissingRequiredField_ThrowsNamingTheField renames playTime->playtime, so it hits the unmapped-member path; the missing-required path is untested
-- open (Warning): CheckNoNullEntries has 5 clauses, only Inventory tested; theory per list
-- open (Suggestion): WriteThenRead_ReturnsEquivalentSave lacks Method_ prefix (plan: FileSaveStore_WriteThenRead_...)
-- open (Suggestion): Deserialize's `?? throw "doesn't hold a save"` unreachable (root is a JsonObject)
-- open (Suggestion): Reason doc says "words the Game can show the player" but damaged reasons carry raw STJ text
+- open (Warning): SaveGameRepair.RepairInventory `quantities[itemId] += quantity` overflows (potion int.MaxValue + potion 1 -> int.MinValue, passes ClampToMaxStack, Inventory.Add throws on restore); clamp per entry or add in long
+- open (Warning): duplicate member ids in Members kept -> GameSession.ActiveOrder .Single throws InvalidOperationException on Restore; dedupe (first wins + change line) or refuse as damaged
+- open (Suggestion): RepairActiveOrder drops duplicate active ids / active ids absent from Members with no change line
+- open (Suggestion): event/swap change lines say "which no longer exists" without saying whether map or event; name the missing part
+- open (Suggestion): worn non-equipment (Equipment is null) and swap on unknown map clauses untested

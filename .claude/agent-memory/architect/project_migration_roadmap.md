@@ -1,14 +1,14 @@
 ---
 name: migration-roadmap
-description: How the legacy WPF demo migration is split into plans (part 1 battle/party, part 2 world/save, part 3 rendering, part 4 editor), naming vocabulary, ADR/decision/question numbering, temporary source-of-truth exception
+description: How the legacy WPF demo migration is split into plans (part 1 battle/party, part 2 world/save, part 3 game+editor+legacy removal), naming vocabulary, ADR/decision/question numbering
 metadata:
   type: project
 ---
 
-Part 1 = docs/plans/2026-10-17-legacy-core-migration.md (done; decisions 1-25, ADRs 0001-0004). Part 2 = docs/plans/2026-10-17-world-exploration-core.md (approved 2026-10-17; 16 slices; decisions 26-43; open questions 30, 44, 45; ADRs 0005-0007). Part 3 = MonoGame rendering, and also receives from part 2: cutscenes (design ready), event-started battles (StartBattleStep, Q30), render-only content (tilesheets, layer Z, object tiles, AbovePlayerZones), SaveSlotSummary, defeat flow, stick deadzone, autosave mapping. Part 4 = editor port; ends the converter.
+Part 1 = docs/plans/2026-10-17-legacy-core-migration.md (done; decisions 1-25, ADRs 0001-0004). Part 2 = docs/plans/2026-10-17-world-exploration-core.md (done; decisions 26-45; ADRs 0005-0007). Part 3 was split (decision 77, 2026-10-18). Part 3a = docs/plans/2026-10-18-shell-cutover-and-map-editing.md (titled "part 3a: game shell, content cutover and map editing", APPROVED): ADRs 0008-0012, slices 1a-1c, 2a-2c, 3a-3b, 10 cutover, 11a-11j editor. Parts 3b (game parity) and 3c (editor catalogs, legacy to legacy/) are unapproved notes at the end of that file; each needs its own /plan-feature. Autosave (Q44, Q67) and event battles (Q30) are new features, not parity. Decisions 46 FontStashSharp, 47 CommunityToolkit.Mvvm, 48 1920x1080/48 px fit+letterbox, 72 no editing gap, 73 legacy -> legacy/, 77 split + review fixes; Q78 window mode open.
 
-Temporary exception (decision 42): developer keeps editing maps in the legacy MapEditor, so `Assets/` is the source of map geometry until part 4; `tools/Jrpg.ContentConverter` rewrites only `content/generated/`; hand-written map settings live in `content/maps/{id}.json`.
+Part 3a rules: both apps read the repo content/ in Debug via AssemblyMetadata("ContentRoot") + --content (Data ContentRootLocator), content copied only on publish; legacy art read from Assets/ (ArtRoot metadata) until slice 10.
 
-**Why:** legacy logic is ~2x what a plan of ~300-line slices holds; the developer has no new editor until part 4.
+**Why:** developer wants "nothing legacy left" before new features, and Play in Visual Studio launching game + editor.
 
-**How to apply:** reuse vocabulary (PartyMember, Enemy, Combatant, *Definition, BattleState, PartyState, ContentCatalog, IRandom.NextBelow; part 2: ExplorationState, EventRun, WorldState, MapLayout/MapSettings/MapDefinition, MapLocation in Maps/, ExplorationRules in Content/, PartyMemberProgress in Party/, Speech, SaveGame, FileSaveStore). Next decision/question number 46, next ADR 0008. See [[legacy-content-quirks]], [[plan-lessons]].
+**How to apply:** reuse vocabulary (PartyMember, Enemy, Combatant, *Definition, BattleState, PartyState, ContentCatalog, IRandom.NextBelow, ExplorationState, EventRun, WorldState, MapLayout/MapSettings/MapDefinition, SaveGame, FileSaveStore; part 3: SceneRequest/GameFlow, TargetChoice<T>, DrawOrderKey/MapLayers, MapDraft/IMapEdit/EditHistory, ContentWriter, ArtReferenceCheck, UiMessages). Next question/decision number 79, next ADR 0013. See [[legacy-content-quirks]], [[plan-lessons]].

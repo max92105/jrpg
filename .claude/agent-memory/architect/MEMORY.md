@@ -1,4 +1,4 @@
-- [Migration roadmap](project_migration_roadmap.md) — parts 1-4 plan files, what moved to part 3, Assets/ source-of-truth exception, next ADR 0008 / number 46
-- [Legacy content quirks](project_legacy_content_quirks.md) — "x,y" points, keyed tileset, stale sizes, computed map fields, older-format Back maps
+- [Migration roadmap](project_migration_roadmap.md) — parts 1-2, part 3a approved (3b/3c unapproved notes), next ADR 0013 / number 79
+- [Legacy content quirks](project_legacy_content_quirks.md) — "x,y" points, keyed tileset, stale sizes, one-layer objects, GIF VFX, XAML icons, sheet rows
 - [Type/folder name clash](feedback_type_folder_name_clash.md) — never name a type after its feature folder (CA1724); use PartyState/BattleState
-- [Plan lessons](feedback_plan_lessons.md) — slice sizes, folder-dependency table, cut no-caller APIs, converter error-vs-report rules
+- [Plan lessons](feedback_plan_lessons.md) — slice sizes, folder-dependency tables, no-caller APIs, presenter/draw split, packages are questions

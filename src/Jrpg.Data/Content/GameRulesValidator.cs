@@ -46,5 +46,11 @@ internal static class GameRulesValidator
             throw new ContentValidationException(
                 string.Create(CultureInfo.InvariantCulture, $"{fileName}: exploration.playerRadius must be above 0 and below 0.5 (was {exploration.PlayerRadius})."));
         }
+
+        if (!double.IsFinite(exploration.InteractReach) || exploration.InteractReach <= 0)
+        {
+            throw new ContentValidationException(
+                string.Create(CultureInfo.InvariantCulture, $"{fileName}: exploration.interactReach must be above 0 (was {exploration.InteractReach})."));
+        }
     }
 }

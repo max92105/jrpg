@@ -10,7 +10,7 @@ public sealed class GameRulesValidatorTests
     private static readonly GameRules _rules = new(
         new PartyRules(MaxActiveMembers: 4),
         new ExperienceTable([100]),
-        new ExplorationRules { WalkSpeed = 3, PlayerRadius = 0.1 });
+        new ExplorationRules { WalkSpeed = 3, PlayerRadius = 0.1, InteractReach = 0.6 });
 
     [Fact]
     public void Validate_ZeroMaxActiveMembers_ThrowsNamingTheField()
@@ -85,6 +85,18 @@ public sealed class GameRulesValidatorTests
         var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
 
         Assert.StartsWith("rules.json: exploration.playerRadius must be above 0 and below 0.5", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(double.NaN)]
+    public void Validate_InteractReachNotPositive_ThrowsNamingTheField(double reach)
+    {
+        var rules = _rules with { Exploration = _rules.Exploration with { InteractReach = reach } };
+
+        var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
+
+        Assert.StartsWith("rules.json: exploration.interactReach must be above 0", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]

@@ -1,6 +1,6 @@
 {
   "party": { "maxActiveMembers": 4 },
-  "exploration": { "walkSpeed": 3.0, "playerRadius": 0.1 },
+  "exploration": { "walkSpeed": 3.0, "playerRadius": 0.1, "interactReach": 0.6 },
   "experience": {
     "experienceToNextLevel": [
       100, 120, 144, 172, 206, 247, 296, 355, 426, 511,

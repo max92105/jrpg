@@ -4,9 +4,17 @@ namespace Jrpg.Core.Tests.Builders;
 
 internal sealed class MapEventBuilder
 {
+    private string _id = "chest_0";
+    private EventActivation _activation = EventActivation.Interact;
     private EventStep[] _steps = [];
     private bool _isOnce;
     private string? _onlyWhenObjectId;
+
+    public MapEventBuilder WithId(string id)
+    {
+        _id = id;
+        return this;
+    }
 
     public MapEventBuilder WithSteps(params EventStep[] steps)
     {
@@ -20,6 +28,12 @@ internal sealed class MapEventBuilder
         return this;
     }
 
+    public MapEventBuilder AsTouch()
+    {
+        _activation = EventActivation.Touch;
+        return this;
+    }
+
     public MapEventBuilder OnlyWhenObjectIs(string objectId)
     {
         _onlyWhenObjectId = objectId;
@@ -28,9 +42,9 @@ internal sealed class MapEventBuilder
 
     public MapEvent Build() => new()
     {
-        Id = "chest_0",
-        Activation = EventActivation.Interact,
-        Prompt = "Open",
+        Id = _id,
+        Activation = _activation,
+        Prompt = _activation == EventActivation.Interact ? "Open" : null,
         IsOnce = _isOnce,
         OnlyWhenObjectId = _onlyWhenObjectId,
         Steps = _steps,

@@ -5,14 +5,13 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-17-world-exploration-core.md, 3c (event conversion; Back maps dropped by developer)
+Slice: docs/plans/2026-10-17-world-exploration-core.md, 3d (Interaction and touch)
 Round: 1 (verdict: Fix the Criticals, then commit)
 
-Accepted choices (don't re-raise): Back maps dropped (no BackMapConversion, back_* settings, Back tests); Dialogue triggers converted though no live map has one (ADR 0005 editing); Battle skipped+reported, Item trigger and old "event" field are errors; event ids keep legacy index when an earlier one is skipped; two converted triggers on one cell = error; empty prompt -> "Check"; MapConversionContext in root namespace; test names ConvertTileTriggers_/ConvertObjectEvents_ instead of plan's EventConversion_Convert_ (developer to note).
+Accepted choices (don't re-raise): touch disarmed at map entry, any object touch event disarms; cell events edge-triggered, start cell counts as entered; Walk/TryInteract throw InvalidOperationException while an event runs; ContinueEvent on WarpStep throws NotSupportedException with TODO(slice 4a); Location allocates a record per call.
 
-- open (Critical): dotnet format --verify-no-changes fails (exit 2, ENDOFLINE): EventConversion.cs and EventConversionTests.cs are LF-only; run dotnet format Jrpg.slnx
-- open (Warning): GridCell.Center (computed) is written into generated content for every cell event and warp cell; ignored on read, stale if hand-edited; skip read-only props in ContentJsonOptions modifier
-- open (Suggestion): EventConversion.NewObjectId is a noun; ToNewObjectId / FindNewObjectId
-- open (Suggestion): LegacyMapEventJson.Activation binds legacy JSON to Core EventActivation member names, unlike the Legacy*Type enums for actions/triggers
-- open (Suggestion): object-action Portrait mapping untested (only trigger PortraitPath is)
-- follow-up: two id-0 tiles with triggers on the same cell/z would report "triggers on two layers" (wrong wording)
+- open (Critical): ExplorationState.TryStartCellEvent "once and done" branch has no test; add Walk_ReenterOnceCellEventDone_DoesNotStartIt
+- open (Warning): cell (touch) events don't disarm object touch; sign cell in front of a touch door -> door fires right after the dialogue while the player keeps pushing (plan: "since the last touch event")
+- open (Suggestion): InteractionFinder looks up CurrentDefinitionOf for objects without events every moving frame; skip Events.Count == 0 first (legacy HasEvents)
+- open (Suggestion): TryInteract-while-event-running throw is untested (Walk's is)
+- open (Suggestion): Game will read Location per frame; consider exposing Position/Facing or caching when 4a wires it

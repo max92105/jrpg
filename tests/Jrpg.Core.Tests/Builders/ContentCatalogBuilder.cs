@@ -15,6 +15,9 @@ internal sealed class ContentCatalogBuilder
     private SkillDefinition[] _skills = [];
     private PartyMemberDefinition[] _members = [];
     private NewGameDefinition _newGame = new() { RecruitedMemberIds = [], ActiveMemberIds = [], StartingItems = [] };
+    private TileDefinition[] _tiles = [];
+    private ObjectDefinition[] _objects = [];
+    private MapLayout[] _maps = [];
 
     public ContentCatalogBuilder WithItems(params ItemDefinition[] items)
     {
@@ -34,6 +37,25 @@ internal sealed class ContentCatalogBuilder
         return this;
     }
 
+    public ContentCatalogBuilder WithTiles(params TileDefinition[] tiles)
+    {
+        _tiles = tiles;
+        return this;
+    }
+
+    public ContentCatalogBuilder WithObjects(params ObjectDefinition[] objects)
+    {
+        _objects = objects;
+        return this;
+    }
+
+    /// <summary>Each layout gets settings with its id as display name.</summary>
+    public ContentCatalogBuilder WithMaps(params MapLayout[] maps)
+    {
+        _maps = maps;
+        return this;
+    }
+
     public ContentCatalogBuilder WithNewGame(NewGameDefinition newGame)
     {
         _newGame = newGame;
@@ -48,10 +70,10 @@ internal sealed class ContentCatalogBuilder
         PartyMembers = _members.ToDictionary(member => member.Id),
         Enemies = new Dictionary<string, EnemyDefinition>(),
         Encounters = new Dictionary<string, EncounterDefinition>(),
-        Tiles = new Dictionary<int, TileDefinition>(),
-        Objects = new Dictionary<string, ObjectDefinition>(),
-        Maps = new Dictionary<string, MapDefinition>(),
-        Rules = new GameRules(new PartyRules(MaxActiveMembers: 4), new ExperienceTable([100]), new ExplorationRules { WalkSpeed = 3, PlayerRadius = 0.1 }),
+        Tiles = _tiles.ToDictionary(tile => tile.Id),
+        Objects = _objects.ToDictionary(definition => definition.Id),
+        Maps = _maps.ToDictionary(layout => layout.Id, layout => new MapDefinition(layout, new MapSettings { Id = layout.Id, DisplayName = layout.Id })),
+        Rules = new GameRules(new PartyRules(MaxActiveMembers: 4), new ExperienceTable([100]), new ExplorationRules { WalkSpeed = 3, PlayerRadius = 0.1, InteractReach = 0.6 }),
         NewGame = _newGame,
     };
 }

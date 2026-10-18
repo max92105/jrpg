@@ -1,4 +1,5 @@
 using Jrpg.Core.Events;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Core.World;
 
@@ -20,6 +21,21 @@ internal sealed class ActiveMap(
 
     public void SwapObject(PlacedObject placed, string objectId) =>
         world.SwapObject(new ObjectSwap(Definition.Id, placed.Uid, objectId));
+
+    /// <returns>The touch event on that cell, or null. Called only when the player enters a new cell.</returns>
+    public CellEvent? CellEventAt(GridCell cell)
+    {
+        var cellEvents = Definition.Layout.CellEvents;
+        for (var index = 0; index < cellEvents.Count; index++)
+        {
+            if (cellEvents[index].Cell == cell)
+            {
+                return cellEvents[index];
+            }
+        }
+
+        return null;
+    }
 
     public bool IsDone(MapEvent mapEvent) => world.IsEventDone(KeyOf(mapEvent));
 

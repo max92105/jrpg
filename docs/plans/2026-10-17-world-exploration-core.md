@@ -328,7 +328,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
     - `LegacyContentConversion_Convert_RepositoryAssets_ChestGivesPotionOnce` (the chest on `start`: one `giveItem` of `potion`, then a swap to `chest_opened`, `isOnce` true)
   - **Done, with deviations:** the Back maps are dropped (decision 39, developer): no `BackMapConversion`, no `back_*` settings, no Back tests. Dialogue triggers are still converted because the legacy MapEditor can add them (ADR 0005). Two triggers on one cell are a conversion error, so generated maps never hold two cell events on a cell (3b follow-up). Conversion takes a `MapConversionContext` (source file, object ids, report); legacy activations have their own enum. Data's `ComputedPropertyFilter` keeps computed properties such as `GridCell.Center` out of written content.
 
-- [ ] **3d. Interaction and touch** (Core + rules content, about 300 lines)
+- [x] **3d. Interaction and touch** (Core + rules content, about 300 lines)
   - **Goal:** pressing interact in front of the chest starts its event, walking onto a warp cell or into the open door starts theirs, and nothing fires twice by accident.
   - **New types (Core):**
     - `Exploration/InteractionFinder` (internal): finds the object event the player can start. `const double InteractMargin = 0.1`. `InteractionFinder(ActiveMap map, ExplorationRules rules)`, `TriggeredEvent? FindInFront(Point2D position, Facing facing, EventActivation activation)`: probe point = position + facing × `InteractReach`; objects whose bounds plus the margin contain it, last placed first; on an object, the first event with that activation that `CanRunOn` its current definition and isn't a done "once" event. Objects only; cell events are touch events found by cell.
@@ -351,6 +351,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
     - `ExplorationState_Walk_WithinSameCell_DoesNotRestartCellEvent`
     - `ExplorationState_Walk_KeepPushingIntoObjectAfterTouchEvent_DoesNotRefireUntilStopped`
     - `ExplorationState_Walk_WhileEventRunning_Throws`
+  - **Done, with deviations:** a cell event also disarms object touch (legacy didn't), so a cell in front of a door can't chain into the door's event without the player stopping (decision 38). A done "once" cell event doesn't start again. `ActiveMap` gains `CellEventAt`; `InteractionFinder` skips objects without events. `TryInteract` and `Walk` throw while an event runs. Test builders gain maps, objects and tiles (`ContentCatalogBuilder`), object events (`ActiveMapBuilder`) and touch events (`MapEventBuilder`). Follow-up for 4a: the map-entry path must reset the last cell and disarm touch as the constructor does.
 
 - [ ] **4a. Warps and the new game's start location** (Core + content, about 300 lines)
   - **Goal:** warp steps move the player to another map, landing on the nearest walkable cell when the target is blocked, and a new game starts on `start` at (10, 3) through the same map entry.

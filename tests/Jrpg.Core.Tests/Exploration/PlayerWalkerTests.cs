@@ -9,7 +9,7 @@ public sealed class PlayerWalkerTests
 {
     private const double Precision = 9;
 
-    private static readonly ExplorationRules _rules = new() { WalkSpeed = 3, PlayerRadius = 0.1 };
+    private static readonly ExplorationRules _rules = new() { WalkSpeed = 3, PlayerRadius = 0.1, InteractReach = 0.6 };
     private static readonly TimeSpan _halfSecond = TimeSpan.FromSeconds(0.5);
 
     private static readonly MapCollision _openField = new(new ActiveMapBuilder().WithRows("11111", "11111", "11111", "11111", "11111").Build());

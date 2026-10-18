@@ -1,3 +1,4 @@
+using Jrpg.Core.Events;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
@@ -29,10 +30,10 @@ internal sealed class ActiveMapBuilder
         return this;
     }
 
-    public ActiveMapBuilder WithObject(ObjectDefinition definition, Point2D position)
+    public ActiveMapBuilder WithObject(ObjectDefinition definition, Point2D position, params MapEvent[] events)
     {
         _objects[definition.Id] = definition;
-        _placed.Add(new PlacedObject { Uid = $"{definition.Id}_{_placed.Count}", ObjectId = definition.Id, Position = position });
+        _placed.Add(new PlacedObject { Uid = $"{definition.Id}_{_placed.Count}", ObjectId = definition.Id, Position = position, Events = events });
         return this;
     }
 

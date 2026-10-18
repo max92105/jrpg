@@ -85,7 +85,7 @@ internal static class MapEventValidator
             return "an interact event needs a prompt.";
         }
 
-        if (mapEvent.OnlyWhenObjectId is { } onlyWhen && !references.Objects.ContainsKey(onlyWhen))
+        if (mapEvent.OnlyWhenObjectId is { } onlyWhen && !references.Content.Objects.ContainsKey(onlyWhen))
         {
             return $"onlyWhenObjectId has unknown object id '{onlyWhen}'.";
         }
@@ -110,9 +110,9 @@ internal static class MapEventValidator
     private static string? FindStepProblem(EventStep step, MapReferences references) => step switch
     {
         DialogueStep dialogue when dialogue.Speech.Lines.Count == 0 => "dialogue needs at least one line.",
-        GiveItemStep give when !references.ItemIds.Contains(give.ItemId) => $"giveItem has unknown item id '{give.ItemId}'.",
+        GiveItemStep give when !references.Content.ItemIds.Contains(give.ItemId) => $"giveItem has unknown item id '{give.ItemId}'.",
         GiveItemStep give when give.Quantity < 1 => $"giveItem quantity must be at least 1 (was {give.Quantity}).",
-        SwapObjectStep swap when !references.Objects.ContainsKey(swap.ObjectId) => $"swapObject has unknown object id '{swap.ObjectId}'.",
+        SwapObjectStep swap when !references.Content.Objects.ContainsKey(swap.ObjectId) => $"swapObject has unknown object id '{swap.ObjectId}'.",
         WarpStep warp when !references.Layouts.TryGetValue(warp.MapId, out _) => $"warp has unknown map id '{warp.MapId}'.",
         WarpStep warp when !references.Layouts[warp.MapId].Contains(warp.Cell) =>
             $"warp cell ({warp.Cell.X}, {warp.Cell.Y}) is outside map '{warp.MapId}'.",

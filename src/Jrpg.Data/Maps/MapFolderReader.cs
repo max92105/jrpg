@@ -13,15 +13,11 @@ internal static class MapFolderReader
     internal const string SettingsFolder = "maps";
 
     /// <summary>Reads all layouts before validating any, since a warp's target map must exist and contain its cell.</summary>
-    public static IReadOnlyList<MapDefinition> Read(
-        string contentRoot,
-        IReadOnlySet<int> tileIds,
-        IReadOnlyDictionary<string, ObjectDefinition> objects,
-        IReadOnlySet<string> itemIds)
+    public static IReadOnlyList<MapDefinition> Read(string contentRoot, MapContentReferences content)
     {
         var mapIds = PairedMapIds(contentRoot);
         var layouts = mapIds.ToDictionary(id => id, id => ContentFileReader.Read<MapLayout>(Path.Combine(contentRoot, LayoutFile(id))));
-        var references = new MapReferences(tileIds, objects, itemIds, layouts);
+        var references = new MapReferences(content, layouts);
         return [.. mapIds.Select(id => ReadValidatedMap(contentRoot, id, references))];
     }
 
@@ -56,7 +52,7 @@ internal static class MapFolderReader
 
         var settingsFile = $"{SettingsFolder}/{id}.json";
         var settings = ContentFileReader.Read<MapSettings>(Path.Combine(contentRoot, settingsFile));
-        MapSettingsValidator.Validate(settingsFile, settings);
+        MapSettingsValidator.Validate(settingsFile, settings, references.Content.EncounterIds);
         return new MapDefinition(layout, settings);
     }
 

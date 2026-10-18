@@ -20,9 +20,11 @@ public sealed class MapEventValidatorTests
     };
 
     private static readonly MapReferences _references = new(
+        new MapContentReferences(
         TileIds: new HashSet<int>(),
         Objects: new Dictionary<string, ObjectDefinition> { ["chest"] = _chestDefinition, ["chest_opened"] = _chestDefinition with { Id = "chest_opened" } },
         ItemIds: new HashSet<string> { "potion" },
+        EncounterIds: new HashSet<string>()),
         Layouts: new Dictionary<string, MapLayout> { ["cave"] = _cave });
 
     private static readonly MapEvent _openChest = new()

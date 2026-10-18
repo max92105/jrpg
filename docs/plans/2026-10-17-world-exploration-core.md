@@ -367,7 +367,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
     - Data: `NewGameValidator_Validate_StartMapUnknown_ThrowsNamingTheField`, `NewGameValidator_Validate_StartPositionOutsideMap_ThrowsNamingTheField`, `GameSession_StartNew_RepositoryContent_StartsOnStartMap`, `GameSession_RepositoryContent_DoorLeadsIntoInterior` (open the door, walk in, end on `interior_1`)
   - **Done, with deviations:** `WarpArrival` searches from ring 0 (the target's cell clamped to the map), so an off-map target next to a walkable edge lands on that edge; legacy started at ring 1 and skipped it. `GameSession.World` isn't added until its first user in 5a; the `WorldState` lives in the `ExplorationContext`. Facing is kept across a warp (legacy). `WalkabilityGrid` gains `Width`/`Height`; the start-location check reuses `MapLayout.Contains`. Test `ContentCatalogBuilder` gets a default one-cell map, floor tile and `DefaultStart`. Follow-up: arrival checks tiles only, so a walkable cell whose center is inside an object's collision polygon could still trap the player (as in legacy).
 
-- [ ] **4b. Encounter rolls and per-map tables** (Core + Data + content, about 250 lines)
+- [x] **4b. Encounter rolls and per-map tables** (Core + Data + content, about 250 lines)
   - **Goal:** a map's settings say how often random battles happen, which, and how many grace steps follow a map entry or a fight; one roll per step decides.
   - **New types (Core):**
     - `Maps/RandomEncounterTable`: content record (`OneInSteps`, `GraceSteps`, `EncounterIds`). A map's random battles (decision 26). `MapSettings` gains `RandomEncounters` (null = none).
@@ -377,6 +377,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
   - **Tests:**
     - Core: `RandomEncounters_RollStep_NoTable_DoesNotDraw` (a `FixedSequenceRandom` with no values throws if drawn), `RandomEncounters_RollStep_WithinGraceSteps_DoesNotDraw`, `RandomEncounters_RollStep_FirstStepAfterGrace_Draws`, `RandomEncounters_RollStep_RollZero_ReturnsEncounterPickedBySecondDraw`, `RandomEncounters_RollStep_RollNonZero_ReturnsNull`, `RandomEncounters_ResetSteps_AfterGrace_GraceAppliesAgain`
     - Data: `MapSettingsValidator_Validate_UnknownEncounterId_ThrowsNamingTheMap`, `MapSettingsValidator_Validate_ZeroOneInSteps_ThrowsNamingTheField`
+  - **Done, with deviations:** `graceSteps` must be at least 1, not 0, since decision 26 says no battle right after another. `MapReferences` now holds a `MapContentReferences` (tile ids, objects, item ids, encounter ids) plus the layouts, and `MapFolderReader.Read` takes that record; the converter passes no encounter ids because it never reads settings. `RandomEncounters` has no production caller until 4c.
 
 - [ ] **4c. Pending encounters and the encounter-rate simulation** (Core + simulation, about 250 lines)
   - **Goal:** walking rolls once per new cell; a hit hands an `EncounterDefinition` to the caller, who runs the part 1 battle and reports back, which resets the step counter.

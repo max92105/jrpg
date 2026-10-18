@@ -33,11 +33,13 @@ internal static class LegacyContentConversion
         report.AddConverted(ObjectConversion.SourceFile, $"{definitions.Count} objects");
 
         var maps = ConvertMaps(assetsRoot, objects.IdsByLegacyId, report);
-        var references = new MapReferences(
+        // Only layouts are checked here; the encounter ids matter for the hand-written settings, which the converter never reads.
+        var content = new MapContentReferences(
             tiles.Select(tile => tile.Id).ToHashSet(),
             definitions.ToDictionary(definition => definition.Id),
             ReadItemIds(contentRoot),
-            maps.ToDictionary(map => map.Id));
+            EncounterIds: new HashSet<string>());
+        var references = new MapReferences(content, maps.ToDictionary(map => map.Id));
         foreach (var map in maps)
         {
             MapLayoutValidator.Validate(MapFolderReader.LayoutFile(map.Id), map, references);

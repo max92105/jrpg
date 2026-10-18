@@ -1,4 +1,5 @@
 {
   "id": "forest",
-  "displayName": "Forest"
+  "displayName": "Forest",
+  "randomEncounters": { "oneInSteps": 25, "graceSteps": 3, "encounterIds": ["goblin_trio"] }
 }

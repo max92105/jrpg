@@ -48,6 +48,18 @@ public sealed class ContentCatalogLoaderTests
     }
 
     [Fact]
+    public void Load_RepositoryContent_OnlyTheForestHasRandomBattles()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        var forestBattles = catalog.Maps["forest"].Settings.RandomEncounters;
+
+        Assert.Equal(["goblin_trio"], forestBattles?.EncounterIds);
+        Assert.Null(catalog.Maps["start"].Settings.RandomEncounters);
+        Assert.Null(catalog.Maps["interior_1"].Settings.RandomEncounters);
+    }
+
+    [Fact]
     public void Load_RepositoryContent_EveryPartyMemberCanBeRecruitedAndGainExperience()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));

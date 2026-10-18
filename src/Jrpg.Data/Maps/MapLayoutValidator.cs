@@ -78,7 +78,7 @@ internal static class MapLayoutValidator
             for (var x = 0; x < layout.Width; x++)
             {
                 var tileId = layer.TileIdAt(new GridCell(x, y));
-                if (tileId != TileLayer.EmptyTileId && !references.TileIds.Contains(tileId))
+                if (tileId != TileLayer.EmptyTileId && !references.Content.TileIds.Contains(tileId))
                 {
                     return $"cell ({x}, {y}) has unknown tile id {tileId}.";
                 }
@@ -109,7 +109,7 @@ internal static class MapLayoutValidator
                 return $"object uid '{placed.Uid}' is used more than once.";
             }
 
-            if (!references.Objects.ContainsKey(placed.ObjectId))
+            if (!references.Content.Objects.ContainsKey(placed.ObjectId))
             {
                 return $"object '{placed.Uid}' has unknown object id '{placed.ObjectId}'.";
             }

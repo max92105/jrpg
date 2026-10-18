@@ -22,7 +22,7 @@ public static class ContentCatalogLoader
     private const string PartyMembersFile = "party-members.json";
     private const string EnemiesFile = "enemies.json";
     private const string EncountersFile = "encounters.json";
-    private const string NewGameFile = "new-game.json";
+    internal const string NewGameFile = "new-game.json";
 
     internal const string TilesheetsFile = "tilesheets.json";
     internal const string TilesFile = "tiles.json";

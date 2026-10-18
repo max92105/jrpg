@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 10 (Content cutover)
-Round: 1 (verdict: Ready to commit; caller said this is the single review round)
+Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 11a (Writing maps with validation)
+Round: 1 (verdict: Fix the Criticals; caller said this is the single review round)
 
-- open (Warning): .gitattributes gives eol=crlf to layouts and catalogs but not content/maps/** (settings, editor-written per ADR 0011 A); with core.autocrlf=false they check out LF and 11a's identical-bytes save test / editor saves diverge
-- open (Warning): ContentCatalogLoaderTests Load_RepositoryContent_LoadsEveryGeneratedTile / LoadsGeneratedObjectsWithTileGroupSizes still say "Generated" after content/generated/ is gone
-- open (Suggestion): FontLibrary.FontsFolder = "art/fonts" duplicates the "art" now owned by ArtFolders.RootIn; add ArtFolders.Fonts and build the path from RootIn
-- open (Suggestion): tick slice 10 in the plan and note the deviations (ArtFolders.RootIn instead of path constants in ContentRootLocator, tools/Directory.Build.props deleted)
-- follow-up: ADR 0009 "Until the cutover (slice 10)" bullets now describe the past; mark them done or point to ADR 0011
+- open (Critical): ContentWriter.WriteMap skips NewGameValidator's startLocation check; shrinking start to 10x45 saves, then ContentCatalogLoader.Load fails "new-game.json: startLocation.position (10, 3) must be inside map 'start'"
+- open (Suggestion): a failed second WriteAside leaves "{layout}.saving" behind in content/ (shows as untracked); delete the aside files on failure
+- open (Suggestion): ContentReferencesOf duplicates the MapContentReferences construction in ContentCatalogLoader; share one factory
+- open (Suggestion): WritesIdenticalBytes compares ReadAllText (hides BOM); compare File.ReadAllBytes per file; tick slice 11a in the plan with deviations
+- follow-up: after WriteMap the editor's ContentCatalog is stale; a second save validates against the old map (11d must reload or WriteMap return the updated catalog)

@@ -23,6 +23,8 @@ internal static class MapFolderReader
 
     internal static string LayoutFile(string mapId) => $"{LayoutsFolder}/{mapId}.json";
 
+    internal static string SettingsFile(string mapId) => $"{SettingsFolder}/{mapId}.json";
+
     private static List<string> PairedMapIds(string contentRoot)
     {
         var layoutIds = MapIdsIn(contentRoot, LayoutsFolder);
@@ -50,7 +52,7 @@ internal static class MapFolderReader
         var layout = references.Layouts[id];
         MapLayoutValidator.Validate(LayoutFile(id), layout, references);
 
-        var settingsFile = $"{SettingsFolder}/{id}.json";
+        var settingsFile = SettingsFile(id);
         var settings = ContentFileReader.Read<MapSettings>(Path.Combine(contentRoot, settingsFile));
         MapSettingsValidator.Validate(settingsFile, settings, references.Content.EncounterIds);
         return new MapDefinition(layout, settings);

@@ -248,7 +248,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
     - Data: `MapLayoutValidator_Validate_IdDiffersFromFileName_ThrowsNamingTheFile`, `MapLayoutValidator_Validate_RowCountDiffersFromHeight_ThrowsNamingTheLayer`, `MapLayoutValidator_Validate_ShortRow_ThrowsNamingTheLayerAndRow`, `MapLayoutValidator_Validate_UnknownObjectId_ThrowsNamingTheUid`, `MapFolderReader_Read_LayoutWithoutSettings_ThrowsNamingTheMap`
   - **Done, with deviations:** `ObjectConversion.Convert` returns `ConvertedObjects` (definitions plus the legacy int id -> new id map that maps place objects by). `LegacyFileReader` matches names case-insensitively (legacy maps are camelCase). Extra conversion errors: a tile outside the map, an unknown legacy object id, placed-object meta, a legacy object id used twice, two map files giving one id. `MapLayoutValidator` also rejects an empty uid. `Convert_RepositoryAssets_MatchesCommittedGeneratedContent` compares a fresh conversion with `content/generated/` byte for byte, and `.gitattributes` keeps `content/generated/**` CRLF so it holds on every checkout. Follow-up: `MapFolderReader` and `ContentCatalogLoader` refer to each other's folder constants.
 
-- [ ] **2. Walking and collision** (Core + rules content, about 300 lines)
+- [x] **2. Walking and collision** (Core + rules content, about 300 lines)
   - **Goal:** the player walks with an analog direction and game-loop deltas, at partial speed for a partial tilt and never faster diagonally, and is stopped by unwalkable cells and object collision polygons.
   - **New types (Core):**
     - `Geometry/Facing`: `Up`, `Down`, `Left`, `Right`.
@@ -262,6 +262,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
   - **Tests:**
     - Core: `Polygon_Contains_PointInConcaveNotch_ReturnsFalse`, `Polygon_Contains_PointLevelWithHorizontalEdge_ReturnsExpectedSide`, `MoveIntent_FromAxes_KeyboardDiagonal_HasLengthOne`, `MoveIntent_FromAxes_HalfTilt_KeepsHalfMagnitude`, `MapCollision_CanStandAt_BodyOverlapsBlockedNeighbourCell_ReturnsFalse`, `MapCollision_CanStandAt_CenterInsideObjectPolygon_ReturnsFalse`, `MapCollision_CanStandAt_InsideBoundsButOutsidePolygon_ReturnsTrue`, `PlayerWalker_Walk_FullTiltForHalfSecond_MovesSpeedTimesDelta`, `PlayerWalker_Walk_HalfTilt_MovesHalfAsFar`, `PlayerWalker_Walk_DiagonalIntoWall_SlidesAlongIt`, `PlayerWalker_Walk_IntoBlockedCell_KeepsPositionButIsMoving`, `PlayerWalker_Walk_PastMapEdge_ClampsToRadius`, `PlayerWalker_Walk_EqualAxes_FacesVertical`, `PlayerWalker_Walk_NoIntent_StopsMovingAndKeepsFacing`
     - Data: `GameRulesValidator_Validate_ZeroWalkSpeed_ThrowsNamingTheField`
+  - **Done, with deviations:** clamping to the map is `MapCollision.KeepOnMap`. The body covers `[center - r, center + r)`, so it can stand flush against a wall and reach the right and bottom edges (legacy floored the right edge and stopped short). A move is split into steps no longer than `PlayerRadius`, so a long frame can't pass through a wall. Sliding only applies to diagonals. `playerRadius` must be below 0.5 so the body fits one cell; both values must be finite. Facing test is one theory over the four directions and the tie.
 
 - [ ] **ADR 0006: map event flow** (before 3a). Options: (A) a step cursor: Core waits on steps the player must see or that exploration completes, and the Game calls `Continue()`; (B) run the whole event at once and return field events, like battle (breaks on a warp mid-event); (C) the Game iterates steps and applies effects (legacy; rules in the Game). Recommendation: **A**, recording: a `GiveItemStep` applies when it becomes current and exposes an `ItemReceipt` (item, added, lost), so the message reports what actually happened, as ADR 0004 does for amounts; a warp completes on `Continue()`, after the Game's fade-out; a swap applies without waiting; "once" is marked when the event starts; event-started battles are out until question 30 is answered.
 
@@ -470,11 +471,11 @@ Numbering continues from part 1 (1-25; decision 25 is now decided there: menu it
 41. **Tool project:** `tools/Jrpg.ContentConverter` is approved. No NuGet package is needed.
 42. **Map source of truth until part 4:** the developer keeps editing maps in the legacy MapEditor. `Assets/` stays the source of map geometry, the converter stays re-runnable and only overwrites its own generated files, and hand-written map settings live where it never writes (ADR 0005).
 43. **Random state:** not saved.
+45. **Sliding along walls:** a diagonal move blocked by a wall slides along it (each axis tried alone) instead of stopping dead as legacy did (slice 2).
 
 ## Open design questions (developer decides)
 30. **Battle inside an event** (see decisions): do the remaining steps run after a victory? What happens on escape? Blocks event-started battles (part 3).
 44. **Autosave slot:** one shared by all playthroughs, or one per playthrough? Part 3; part 2's store takes any slot name, so it doesn't depend on the answer.
-45. **Sliding along walls:** slice 2 makes a blocked diagonal slide along the wall (each axis tried alone), as part of "tight" movement; legacy stopped dead. Confirm, or keep the legacy stop.
 
 ## Risks
 - **Two sources until part 4.** Map geometry is edited in `Assets/` and converted; hand-written settings live in `content/maps/`. Editing a generated file by hand is lost on the next run; the folder name `generated/` and ADR 0005 say so. A map renamed in the legacy editor gets a new id, which orphans its settings file (the loader fails loudly) and saved progress keyed by that map id (repaired by dropping, decision 40).

@@ -1,3 +1,4 @@
+using System.Globalization;
 using Jrpg.Core.Content;
 
 namespace Jrpg.Data.Content;
@@ -11,6 +12,8 @@ internal static class GameRulesValidator
             throw new ContentValidationException(
                 $"{fileName}: party.maxActiveMembers must be at least 1 (was {rules.Party.MaxActiveMembers}).");
         }
+
+        ValidateExploration(fileName, rules.Exploration);
 
         var thresholds = rules.Experience.ExperienceToNextLevel;
         if (thresholds.Count == 0)
@@ -26,6 +29,22 @@ internal static class GameRulesValidator
                 throw new ContentValidationException(
                     $"{fileName}: experience.experienceToNextLevel[{index}] must be at least 1 (was {thresholds[index]}).");
             }
+        }
+    }
+
+    private static void ValidateExploration(string fileName, ExplorationRules exploration)
+    {
+        if (!double.IsFinite(exploration.WalkSpeed) || exploration.WalkSpeed <= 0)
+        {
+            throw new ContentValidationException(
+                string.Create(CultureInfo.InvariantCulture, $"{fileName}: exploration.walkSpeed must be above 0 (was {exploration.WalkSpeed})."));
+        }
+
+        // The body must fit inside one cell, or no map cell could ever hold the player.
+        if (!double.IsFinite(exploration.PlayerRadius) || exploration.PlayerRadius is <= 0 or >= 0.5)
+        {
+            throw new ContentValidationException(
+                string.Create(CultureInfo.InvariantCulture, $"{fileName}: exploration.playerRadius must be above 0 and below 0.5 (was {exploration.PlayerRadius})."));
         }
     }
 }

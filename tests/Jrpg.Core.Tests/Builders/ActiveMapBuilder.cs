@@ -1,0 +1,43 @@
+using Jrpg.Core.Exploration;
+using Jrpg.Core.Geometry;
+using Jrpg.Core.Maps;
+
+namespace Jrpg.Core.Tests.Builders;
+
+/// <summary>A map to walk on: tile 1 is walkable and tile 2 blocks; objects are placed by id.</summary>
+internal sealed class ActiveMapBuilder
+{
+    public const int Floor = 1;
+    public const int Wall = 2;
+
+    private static readonly Dictionary<int, TileDefinition> _tiles = new()
+    {
+        [Floor] = new TileDefinition { Id = Floor, IsWalkable = true },
+        [Wall] = new TileDefinition { Id = Wall, IsWalkable = false },
+    };
+
+    private readonly Dictionary<string, ObjectDefinition> _objects = [];
+    private readonly List<PlacedObject> _placed = [];
+    private string[] _rows = ["1"];
+
+    /// <summary>Each string is one map row of single-digit tile ids.</summary>
+    public ActiveMapBuilder WithRows(params string[] rows)
+    {
+        _rows = rows;
+        return this;
+    }
+
+    public ActiveMapBuilder WithObject(ObjectDefinition definition, Point2D position)
+    {
+        _objects[definition.Id] = definition;
+        _placed.Add(new PlacedObject { Uid = $"{definition.Id}_{_placed.Count}", ObjectId = definition.Id, Position = position });
+        return this;
+    }
+
+    public ActiveMap Build()
+    {
+        var layout = new MapLayoutBuilder().WithLayer(_rows).Build() with { Objects = [.. _placed] };
+        var definition = new MapDefinition(layout, new MapSettings { Id = layout.Id, DisplayName = "Test Map" });
+        return new ActiveMap(definition, _objects, WalkabilityGrid.Build(layout, _tiles));
+    }
+}

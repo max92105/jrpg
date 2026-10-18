@@ -7,10 +7,15 @@ namespace Jrpg.Data.Tests.Content;
 
 public sealed class GameRulesValidatorTests
 {
+    private static readonly GameRules _rules = new(
+        new PartyRules(MaxActiveMembers: 4),
+        new ExperienceTable([100]),
+        new ExplorationRules { WalkSpeed = 3, PlayerRadius = 0.1 });
+
     [Fact]
     public void Validate_ZeroMaxActiveMembers_ThrowsNamingTheField()
     {
-        var rules = new GameRules(new PartyRules(MaxActiveMembers: 0), new ExperienceTable([100]));
+        var rules = _rules with { Party = new PartyRules(MaxActiveMembers: 0) };
 
         var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
 
@@ -20,7 +25,7 @@ public sealed class GameRulesValidatorTests
     [Fact]
     public void Validate_EmptyExperienceTable_ThrowsNamingTheField()
     {
-        var rules = new GameRules(new PartyRules(MaxActiveMembers: 4), new ExperienceTable([]));
+        var rules = _rules with { Experience = new ExperienceTable([]) };
 
         var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
 
@@ -30,10 +35,63 @@ public sealed class GameRulesValidatorTests
     [Fact]
     public void Validate_ZeroExperienceEntry_ThrowsNamingTheIndex()
     {
-        var rules = new GameRules(new PartyRules(MaxActiveMembers: 4), new ExperienceTable([100, 0]));
+        var rules = _rules with { Experience = new ExperienceTable([100, 0]) };
 
         var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
 
         Assert.Equal("rules.json: experience.experienceToNextLevel[1] must be at least 1 (was 0).", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_ZeroWalkSpeed_ThrowsNamingTheField()
+    {
+        var rules = _rules with { Exploration = _rules.Exploration with { WalkSpeed = 0 } };
+
+        var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
+
+        Assert.Equal("rules.json: exploration.walkSpeed must be above 0 (was 0).", exception.Message);
+    }
+
+    [Theory]
+    [InlineData(double.NaN)]
+    [InlineData(double.PositiveInfinity)]
+    public void Validate_WalkSpeedNotANumber_ThrowsNamingTheField(double walkSpeed)
+    {
+        var rules = _rules with { Exploration = _rules.Exploration with { WalkSpeed = walkSpeed } };
+
+        var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
+
+        Assert.StartsWith("rules.json: exploration.walkSpeed must be above 0", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Validate_PlayerRadiusJustUnderHalfACell_DoesNotThrow()
+    {
+        var rules = _rules with { Exploration = _rules.Exploration with { PlayerRadius = 0.49 } };
+
+        var exception = Record.Exception(() => GameRulesValidator.Validate("rules.json", rules));
+
+        Assert.Null(exception);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(0.5)]
+    [InlineData(double.NaN)]
+    public void Validate_PlayerRadiusNotInsideOneCell_ThrowsNamingTheField(double radius)
+    {
+        var rules = _rules with { Exploration = _rules.Exploration with { PlayerRadius = radius } };
+
+        var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
+
+        Assert.StartsWith("rules.json: exploration.playerRadius must be above 0 and below 0.5", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Validate_ValidRules_DoesNotThrow()
+    {
+        var exception = Record.Exception(() => GameRulesValidator.Validate("rules.json", _rules));
+
+        Assert.Null(exception);
     }
 }

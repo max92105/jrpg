@@ -51,7 +51,7 @@ internal sealed class ContentCatalogBuilder
         Tiles = new Dictionary<int, TileDefinition>(),
         Objects = new Dictionary<string, ObjectDefinition>(),
         Maps = new Dictionary<string, MapDefinition>(),
-        Rules = new GameRules(new PartyRules(MaxActiveMembers: 4), new ExperienceTable([100])),
+        Rules = new GameRules(new PartyRules(MaxActiveMembers: 4), new ExperienceTable([100]), new ExplorationRules { WalkSpeed = 3, PlayerRadius = 0.1 }),
         NewGame = _newGame,
     };
 }

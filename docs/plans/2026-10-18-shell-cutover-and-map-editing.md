@@ -231,12 +231,13 @@ Sizes are estimates of hand-written code plus tests; moved files, generated cont
 ### Phase 2: render data through the converter
 The developer still edits maps in the legacy MapEditor (ADR 0005), so render data is converted like the rest and regenerated on every run.
 
-- [ ] **2a. Tilesheets and tile cells** (tool + Data + Core, about 280 lines)
+- [x] **2a. Tilesheets and tile cells** (tool + Data + Core, about 280 lines)
   - **Goal:** every tile knows its sheet and cell, and every sheet a tile uses is listed with its grid.
   - **Core:** `Maps/TilesheetDefinition` (content record: `Id`, `File`, `TileWidth`, `TileHeight`, `Margin`, `Spacing`; `CellLeft(int column)`, `CellTop(int row)`; how one sheet image is cut). `TileDefinition` gains `SheetId`, `Column`, `Row`. `ContentCatalog` gains `Tilesheets`.
   - **Tool:** `Tiles/LegacyTilesheetJson`, `Tiles/TilesheetConversion`: one entry per sheet referenced by a tile; a sheet missing from `Tilesheets.json` gets the legacy 48 px grid and a report line; sheet ids from the file name by `LegacyIds`; a configured sheet no tile uses is reported and skipped. Writes `content/generated/tilesheets.json`.
   - **Data:** `Maps/TilesheetCatalogValidator` (duplicate ids, empty file, tile size >= 1, margin and spacing >= 0). `TileCatalogValidator`: unknown sheet id, column or row < 0.
   - **Tests:** Core `TilesheetDefinition_CellLeft_WithMarginAndSpacing_SkipsBoth`. Tool `TilesheetConversion_Convert_UnconfiguredSheet_Uses48PixelGridAndReports`, `TilesheetConversion_Convert_RepositoryTileset_ListsEveryReferencedSheet`. Data `TileCatalogValidator_Validate_UnknownSheet_ThrowsNamingTheTile`, `TilesheetCatalogValidator_Validate_ZeroTileWidth_ThrowsNamingTheSheet`. The converter drift test covers the regenerated files.
+  - **Done, with deviations:** 10 sheets: `FG_Forest_Fall` at 16 px, the other 9 on the legacy 48 px grid. `Floor.png` is used only by the dropped `Maps/Back` maps, so it's reported as skipped, and question 49 (64 px shrunk to 48) has no sheet to apply to for now. Sheets are matched by file name ignoring case, as legacy did. A tile without a sheet cell is a conversion error (none exist). The validators also refuse an empty sheet `file` and a negative column or row. Core tests build tiles through `Builders/TestTiles`.
 
 - [ ] **2b. Object tiles, above-player zones and categories** (tool + Data + Core, about 250 lines)
   - **Goal:** objects carry their tiles, the parts drawn over the player, and the browser category.

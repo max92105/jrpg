@@ -26,6 +26,7 @@ public static class ContentCatalogLoader
 
     /// <summary>The folder the content converter owns and rewrites on every run (ADR 0005).</summary>
     internal const string GeneratedFolder = "generated";
+    internal const string TilesheetsFile = GeneratedFolder + "/tilesheets.json";
     internal const string TilesFile = GeneratedFolder + "/tiles.json";
     internal const string ObjectsFile = GeneratedFolder + "/objects.json";
 
@@ -46,7 +47,10 @@ public static class ContentCatalogLoader
         var enemyIds = enemies.Select(enemy => enemy.Id).ToFrozenSet();
         var encounters = ReadValidated<IReadOnlyList<EncounterDefinition>>(
             contentRoot, EncountersFile, (file, list) => EncounterCatalogValidator.Validate(file, list, enemyIds));
-        var tiles = ReadValidated<IReadOnlyList<TileDefinition>>(contentRoot, TilesFile, TileCatalogValidator.Validate);
+        var tilesheets = ReadValidated<IReadOnlyList<TilesheetDefinition>>(contentRoot, TilesheetsFile, TilesheetCatalogValidator.Validate);
+        var sheetIds = tilesheets.Select(sheet => sheet.Id).ToFrozenSet();
+        var tiles = ReadValidated<IReadOnlyList<TileDefinition>>(
+            contentRoot, TilesFile, (file, list) => TileCatalogValidator.Validate(file, list, sheetIds));
         var objects = ReadValidated<IReadOnlyList<ObjectDefinition>>(contentRoot, ObjectsFile, ObjectCatalogValidator.Validate);
         var objectsById = objects.ToFrozenDictionary(definition => definition.Id);
         var mapContent = new MapContentReferences(
@@ -70,6 +74,7 @@ public static class ContentCatalogLoader
             Enemies = enemies.ToFrozenDictionary(enemy => enemy.Id),
             Encounters = encounters.ToFrozenDictionary(encounter => encounter.Id),
             Tiles = tiles.ToFrozenDictionary(tile => tile.Id),
+            Tilesheets = tilesheets.ToFrozenDictionary(sheet => sheet.Id),
             Objects = objectsById,
             Maps = mapsById,
             Rules = rules,

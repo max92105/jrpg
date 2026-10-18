@@ -22,7 +22,7 @@ internal sealed class ContentCatalogBuilder
     public static readonly MapLocation DefaultStart = new("test_map", new Point2D(0.5, 0.5), Facing.Down);
 
     private NewGameDefinition _newGame = new() { RecruitedMemberIds = [], ActiveMemberIds = [], StartingItems = [], StartLocation = DefaultStart };
-    private TileDefinition[] _tiles = [new TileDefinition { Id = 1, IsWalkable = true }];
+    private TileDefinition[] _tiles = [TestTiles.Walkable(1)];
     private ObjectDefinition[] _objects = [];
     private MapLayout[] _maps = [new MapLayoutBuilder().WithLayer("1").Build()];
     private EncounterDefinition[] _encounters = [];
@@ -92,6 +92,7 @@ internal sealed class ContentCatalogBuilder
         Enemies = new Dictionary<string, EnemyDefinition>(),
         Encounters = _encounters.ToDictionary(encounter => encounter.Id),
         Tiles = _tiles.ToDictionary(tile => tile.Id),
+        Tilesheets = new Dictionary<string, TilesheetDefinition> { [TestTiles.Sheet.Id] = TestTiles.Sheet },
         Objects = _objects.ToDictionary(definition => definition.Id),
         Maps = _maps.ToDictionary(layout => layout.Id, layout => new MapDefinition(layout, SettingsFor(layout.Id))),
         Rules = new GameRules(new PartyRules(MaxActiveMembers: 4), new ExperienceTable([100]), new ExplorationRules { WalkSpeed = 3, PlayerRadius = 0.1, InteractReach = 0.6 }),

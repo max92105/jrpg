@@ -64,6 +64,23 @@ public sealed class TileConversionTests
     }
 
     [Fact]
+    public void Convert_Tile_KeepsItsSheetCell()
+    {
+        var tile = Assert.Single(TileConversion.Convert(new Dictionary<string, LegacyTileJson> { ["1"] = _grass }));
+
+        Assert.Equal(("ra_ground_tiles", 2, 5), (tile.SheetId, tile.Column, tile.Row));
+    }
+
+    [Fact]
+    public void Convert_TileWithoutSheetCell_ThrowsNamingTheTile()
+    {
+        var exception = Assert.Throws<ConversionException>(
+            () => TileConversion.Convert(new Dictionary<string, LegacyTileJson> { ["1"] = _grass with { SheetY = null } }));
+
+        Assert.Equal("Tiles/Tileset.json: tile 1 has no tilesheet cell.", exception.Message);
+    }
+
+    [Fact]
     public void Convert_KeysOutOfOrder_ReturnsTilesOrderedById()
     {
         var legacyTiles = new Dictionary<string, LegacyTileJson>

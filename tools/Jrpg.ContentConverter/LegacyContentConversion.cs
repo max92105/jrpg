@@ -21,10 +21,7 @@ internal static class LegacyContentConversion
     public static ConversionReport Convert(string assetsRoot, string contentRoot)
     {
         var report = new ConversionReport();
-        var tiles = TileConversion.Convert(
-            LegacyFileReader.Read<Dictionary<string, LegacyTileJson>>(assetsRoot, TileConversion.SourceFile));
-        TileCatalogValidator.Validate(ContentCatalogLoader.TilesFile, tiles);
-        report.AddConverted(TileConversion.SourceFile, $"{tiles.Count} tiles");
+        var (tiles, tilesheets) = ConvertTiles(assetsRoot, report);
 
         var legacyObjects = LegacyFileReader.Read<IReadOnlyList<LegacyObjectJson>>(assetsRoot, ObjectConversion.SourceFile);
         var objects = ObjectConversion.Convert(legacyObjects, report);
@@ -47,6 +44,7 @@ internal static class LegacyContentConversion
 
         // Everything is converted and validated before the folder is touched, so a failed run leaves the last good content.
         var generatedRoot = ReplaceGeneratedFolder(contentRoot);
+        ContentFileWriter.Write(Path.Combine(contentRoot, ContentCatalogLoader.TilesheetsFile), tilesheets);
         ContentFileWriter.Write(Path.Combine(contentRoot, ContentCatalogLoader.TilesFile), tiles);
         ContentFileWriter.Write(Path.Combine(contentRoot, ContentCatalogLoader.ObjectsFile), definitions);
         Directory.CreateDirectory(Path.Combine(contentRoot, MapFolderReader.LayoutsFolder));
@@ -57,6 +55,25 @@ internal static class LegacyContentConversion
 
         File.WriteAllText(Path.Combine(generatedRoot, ReportFile), string.Concat(report.Lines.Select(line => line + "\r\n")));
         return report;
+    }
+
+    private static (IReadOnlyList<TileDefinition> Tiles, IReadOnlyList<TilesheetDefinition> Tilesheets) ConvertTiles(
+        string assetsRoot, ConversionReport report)
+    {
+        var legacyTiles = LegacyFileReader.Read<Dictionary<string, LegacyTileJson>>(assetsRoot, TileConversion.SourceFile);
+        var tiles = TileConversion.Convert(legacyTiles);
+        report.AddConverted(TileConversion.SourceFile, $"{tiles.Count} tiles");
+
+        var tilesheets = TilesheetConversion.Convert(
+            LegacyFileReader.Read<IReadOnlyList<LegacyTilesheetJson>>(assetsRoot, TilesheetConversion.SourceFile),
+            // TileConversion has already refused a tile without a sheet.
+            legacyTiles.Values.Select(tile => tile.Tilesheet!),
+            report);
+        report.AddConverted(TilesheetConversion.SourceFile, $"{tilesheets.Count} tilesheets");
+
+        TilesheetCatalogValidator.Validate(ContentCatalogLoader.TilesheetsFile, tilesheets);
+        TileCatalogValidator.Validate(ContentCatalogLoader.TilesFile, tiles, tilesheets.Select(sheet => sheet.Id).ToHashSet());
+        return (tiles, tilesheets);
     }
 
     /// <summary>Converts the live maps. The older ones in <c>Maps/Back/</c> use their own tile set and aren't converted (developer, slice 3c).</summary>

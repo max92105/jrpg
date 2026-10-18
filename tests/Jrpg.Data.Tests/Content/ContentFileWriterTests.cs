@@ -15,7 +15,7 @@ public sealed class ContentFileWriterTests : IDisposable
     [Fact]
     public void Write_TileList_ReadsBackEqualThroughContentFileReader()
     {
-        IReadOnlyList<TileDefinition> tiles = [new() { Id = 1, IsWalkable = true }, new() { Id = 7, IsWalkable = false }];
+        IReadOnlyList<TileDefinition> tiles = [new() { Id = 1, IsWalkable = true, SheetId = "city", Column = 0, Row = 2 }, new() { Id = 7, IsWalkable = false, SheetId = "city", Column = 3, Row = 0 }];
 
         ContentFileWriter.Write(_path, tiles);
         var readBack = ContentFileReader.Read<IReadOnlyList<TileDefinition>>(_path);
@@ -56,10 +56,10 @@ public sealed class ContentFileWriterTests : IDisposable
     [Fact]
     public void Write_TileList_UsesCamelCaseCrlfAndFinalNewline()
     {
-        IReadOnlyList<TileDefinition> tiles = [new() { Id = 1, IsWalkable = true }];
+        IReadOnlyList<TileDefinition> tiles = [new() { Id = 1, IsWalkable = true, SheetId = "city", Column = 4, Row = 2 }];
 
         ContentFileWriter.Write(_path, tiles);
 
-        Assert.Equal("[\r\n  {\r\n    \"id\": 1,\r\n    \"isWalkable\": true\r\n  }\r\n]\r\n", File.ReadAllText(_path));
+        Assert.Equal("[\r\n  {\r\n    \"id\": 1,\r\n    \"isWalkable\": true,\r\n    \"sheetId\": \"city\",\r\n    \"column\": 4,\r\n    \"row\": 2\r\n  }\r\n]\r\n", File.ReadAllText(_path));
     }
 }

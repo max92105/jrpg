@@ -9,8 +9,8 @@ public sealed class WarpArrivalTests
 {
     private static readonly Dictionary<int, TileDefinition> _tiles = new()
     {
-        [ActiveMapBuilder.Floor] = new TileDefinition { Id = ActiveMapBuilder.Floor, IsWalkable = true },
-        [ActiveMapBuilder.Wall] = new TileDefinition { Id = ActiveMapBuilder.Wall, IsWalkable = false },
+        [ActiveMapBuilder.Floor] = TestTiles.Walkable(ActiveMapBuilder.Floor),
+        [ActiveMapBuilder.Wall] = TestTiles.Blocking(ActiveMapBuilder.Wall),
     };
 
     [Fact]

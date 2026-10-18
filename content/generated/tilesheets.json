@@ -1,0 +1,82 @@
+[
+  {
+    "id": "city",
+    "file": "City.png",
+    "tileWidth": 48,
+    "tileHeight": 48,
+    "margin": 0,
+    "spacing": 0
+  },
+  {
+    "id": "fg_forest_fall",
+    "file": "FG_Forest_Fall.png",
+    "tileWidth": 16,
+    "tileHeight": 16,
+    "margin": 0,
+    "spacing": 0
+  },
+  {
+    "id": "grass_1",
+    "file": "Grass1.png",
+    "tileWidth": 48,
+    "tileHeight": 48,
+    "margin": 0,
+    "spacing": 0
+  },
+  {
+    "id": "grass_2",
+    "file": "Grass2.png",
+    "tileWidth": 48,
+    "tileHeight": 48,
+    "margin": 0,
+    "spacing": 0
+  },
+  {
+    "id": "ground",
+    "file": "Ground.png",
+    "tileWidth": 48,
+    "tileHeight": 48,
+    "margin": 0,
+    "spacing": 0
+  },
+  {
+    "id": "ra_ground_tiles",
+    "file": "RA_Ground_Tiles.png",
+    "tileWidth": 48,
+    "tileHeight": 48,
+    "margin": 0,
+    "spacing": 0
+  },
+  {
+    "id": "ra_jungle",
+    "file": "RA_Jungle.png",
+    "tileWidth": 48,
+    "tileHeight": 48,
+    "margin": 0,
+    "spacing": 0
+  },
+  {
+    "id": "tree_01_s_01_animation",
+    "file": "tree01_s_01_animation.png",
+    "tileWidth": 48,
+    "tileHeight": 48,
+    "margin": 0,
+    "spacing": 0
+  },
+  {
+    "id": "water_1",
+    "file": "Water1.png",
+    "tileWidth": 48,
+    "tileHeight": 48,
+    "margin": 0,
+    "spacing": 0
+  },
+  {
+    "id": "water_2",
+    "file": "Water2.png",
+    "tileWidth": 48,
+    "tileHeight": 48,
+    "margin": 0,
+    "spacing": 0
+  }
+]

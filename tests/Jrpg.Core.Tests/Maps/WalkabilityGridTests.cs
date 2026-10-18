@@ -11,8 +11,8 @@ public sealed class WalkabilityGridTests
 
     private static readonly Dictionary<int, TileDefinition> _tiles = new()
     {
-        [Grass] = new TileDefinition { Id = Grass, IsWalkable = true },
-        [Rock] = new TileDefinition { Id = Rock, IsWalkable = false },
+        [Grass] = TestTiles.Walkable(Grass),
+        [Rock] = TestTiles.Blocking(Rock),
     };
 
     [Fact]

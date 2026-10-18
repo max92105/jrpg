@@ -1,4 +1,15 @@
 Tiles/Tileset.json: converted 283 tiles.
+Tiles/Tilesheets.json: changed tilesheet City.png to the legacy 48 px grid, since it has no settings.
+Tiles/Tilesheets.json: changed tilesheet Grass1.png to the legacy 48 px grid, since it has no settings.
+Tiles/Tilesheets.json: changed tilesheet Grass2.png to the legacy 48 px grid, since it has no settings.
+Tiles/Tilesheets.json: changed tilesheet Ground.png to the legacy 48 px grid, since it has no settings.
+Tiles/Tilesheets.json: changed tilesheet RA_Ground_Tiles.png to the legacy 48 px grid, since it has no settings.
+Tiles/Tilesheets.json: changed tilesheet RA_Jungle.png to the legacy 48 px grid, since it has no settings.
+Tiles/Tilesheets.json: changed tilesheet Water1.png to the legacy 48 px grid, since it has no settings.
+Tiles/Tilesheets.json: changed tilesheet Water2.png to the legacy 48 px grid, since it has no settings.
+Tiles/Tilesheets.json: changed tilesheet tree01_s_01_animation.png to the legacy 48 px grid, since it has no settings.
+Tiles/Tilesheets.json: skipped tilesheet Floor.png, which no tile uses.
+Tiles/Tilesheets.json: converted 10 tilesheets.
 Objects/Objects.json: changed object 'Tree': stale size 1x1 replaced by its tile group's 4x4.
 Objects/Objects.json: changed object 'House1': stale size 1x1 replaced by its tile group's 7x7.
 Objects/Objects.json: changed object 'House2': stale size 1x1 replaced by its tile group's 8x6.

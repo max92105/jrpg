@@ -14,8 +14,8 @@ internal sealed class ActiveMapBuilder
 
     private static readonly Dictionary<int, TileDefinition> _tiles = new()
     {
-        [Floor] = new TileDefinition { Id = Floor, IsWalkable = true },
-        [Wall] = new TileDefinition { Id = Wall, IsWalkable = false },
+        [Floor] = TestTiles.Walkable(Floor),
+        [Wall] = TestTiles.Blocking(Wall),
     };
 
     private readonly Dictionary<string, ObjectDefinition> _objects = [];

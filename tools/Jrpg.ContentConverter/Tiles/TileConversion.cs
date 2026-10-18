@@ -8,7 +8,7 @@ internal static class TileConversion
 {
     public const string SourceFile = "Tiles/Tileset.json";
 
-    /// <returns>The tiles ordered by id. Sheet and name fields are render data, converted in part 3.</returns>
+    /// <returns>The tiles ordered by id. Legacy names are dropped: the editor shows the sheet cell (question 69).</returns>
     public static IReadOnlyList<TileDefinition> Convert(IReadOnlyDictionary<string, LegacyTileJson> legacyTiles) =>
         [.. legacyTiles
             .Select(entry => ConvertTile(entry.Key, entry.Value))
@@ -39,6 +39,19 @@ internal static class TileConversion
             throw new ConversionException($"{SourceFile}: tile {id} has a sprite, frames or a collision polygon, which the converter doesn't support yet.");
         }
 
-        return new TileDefinition { Id = id, IsWalkable = legacyTile.IsWalkable };
+        // Every tile today comes from a sheet cell; a tile without one would have nothing to draw.
+        if (legacyTile.Tilesheet is null || legacyTile.SheetX is not { } column || legacyTile.SheetY is not { } row)
+        {
+            throw new ConversionException($"{SourceFile}: tile {id} has no tilesheet cell.");
+        }
+
+        return new TileDefinition
+        {
+            Id = id,
+            IsWalkable = legacyTile.IsWalkable,
+            SheetId = TilesheetConversion.IdOf(legacyTile.Tilesheet),
+            Column = column,
+            Row = row,
+        };
     }
 }

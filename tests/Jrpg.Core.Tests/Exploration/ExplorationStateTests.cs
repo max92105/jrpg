@@ -222,7 +222,7 @@ public sealed class ExplorationStateTests
             ],
         };
         var catalog = new ContentCatalogBuilder()
-            .WithTiles(new TileDefinition { Id = 1, IsWalkable = true })
+            .WithTiles(TestTiles.Walkable(1))
             .WithObjects(_chest, _openedChest, _lever, _leverPulled, _openDoor)
             .WithItems(_potion)
             .WithMaps(layout)

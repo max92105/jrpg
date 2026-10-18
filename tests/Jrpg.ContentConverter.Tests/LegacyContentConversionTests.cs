@@ -151,7 +151,11 @@ public sealed class LegacyContentConversionTests : IDisposable
         Directory.CreateDirectory(Path.Combine(assetsRoot, "Tiles"));
         File.WriteAllText(
             Path.Combine(assetsRoot, "Tiles", "Tileset.json"),
-            """{ "1": { "Id": 1, "Name": "A", "IsWalkable": true, "FrameDuration": 0.0 }, "01": { "Id": 1, "Name": "B", "IsWalkable": true, "FrameDuration": 0.0 } }""");
+            """
+            { "1": { "Id": 1, "Name": "A", "IsWalkable": true, "FrameDuration": 0.0, "Tilesheet": "City.png", "SheetX": 0, "SheetY": 0 },
+              "01": { "Id": 1, "Name": "B", "IsWalkable": true, "FrameDuration": 0.0, "Tilesheet": "City.png", "SheetX": 1, "SheetY": 0 } }
+            """);
+        File.WriteAllText(Path.Combine(assetsRoot, "Tiles", "Tilesheets.json"), "[]");
 
         var exception = Assert.Throws<ContentValidationException>(() => LegacyContentConversion.Convert(assetsRoot, _contentRoot));
 

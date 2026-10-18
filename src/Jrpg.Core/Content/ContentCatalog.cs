@@ -23,6 +23,8 @@ public sealed record ContentCatalog
 
     public required IReadOnlyDictionary<int, TileDefinition> Tiles { get; init; }
 
+    public required IReadOnlyDictionary<string, TilesheetDefinition> Tilesheets { get; init; }
+
     public required IReadOnlyDictionary<string, ObjectDefinition> Objects { get; init; }
 
     public required IReadOnlyDictionary<string, MapDefinition> Maps { get; init; }

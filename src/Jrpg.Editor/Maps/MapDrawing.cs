@@ -18,6 +18,9 @@ internal sealed class MapDrawing(ContentCatalog catalog, string artRoot)
     /// <summary>Pixels per map cell at 100 % zoom, the same as the game's virtual screen.</summary>
     public const double CellPixels = 48;
 
+    // Faint enough to read the tiles through.
+    private static readonly SolidColorBrush _gridBrush = CreateGridBrush();
+
     private static readonly IComparer<MapPart> _byDrawOrder = Comparer<MapPart>.Create((left, right) => left.Key.CompareTo(right.Key));
 
     private readonly Dictionary<string, BitmapSource> _sheets = [];
@@ -39,6 +42,29 @@ internal sealed class MapDrawing(ContentCatalog catalog, string artRoot)
         }
 
         var image = new DrawingImage(drawing);
+        image.Freeze();
+        return image;
+    }
+
+    /// <summary>Lines between the map's cells, drawn over the map when the grid is shown.</summary>
+    /// <param name="layout">The map whose cells are outlined.</param>
+    /// <param name="lineWidth">In map pixels; one screen pixel is 1 / zoom, so the lines stay visible when zoomed out.</param>
+    public static DrawingImage DrawGrid(MapLayout layout, double lineWidth)
+    {
+        var width = layout.Width * CellPixels;
+        var height = layout.Height * CellPixels;
+        var lines = new GeometryGroup();
+        for (var x = 0; x <= layout.Width; x++)
+        {
+            lines.Children.Add(new LineGeometry(new Point(x * CellPixels, 0), new Point(x * CellPixels, height)));
+        }
+
+        for (var y = 0; y <= layout.Height; y++)
+        {
+            lines.Children.Add(new LineGeometry(new Point(0, y * CellPixels), new Point(width, y * CellPixels)));
+        }
+
+        var image = new DrawingImage(new GeometryDrawing(null, new Pen(_gridBrush, lineWidth), lines));
         image.Freeze();
         return image;
     }
@@ -157,6 +183,13 @@ internal sealed class MapDrawing(ContentCatalog catalog, string artRoot)
         }
 
         return sheet;
+    }
+
+    private static SolidColorBrush CreateGridBrush()
+    {
+        var brush = new SolidColorBrush(Color.FromArgb(0x60, 0xFF, 0xFF, 0xFF));
+        brush.Freeze();
+        return brush;
     }
 
     private static Rect CellRect(double x, double y) => new(x * CellPixels, y * CellPixels, CellPixels, CellPixels);

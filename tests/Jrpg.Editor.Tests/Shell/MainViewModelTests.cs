@@ -1,3 +1,4 @@
+using Jrpg.Core.Geometry;
 using Jrpg.Editor.Shell;
 
 namespace Jrpg.Editor.Tests.Shell;
@@ -34,6 +35,39 @@ public sealed class MainViewModelTests : IDisposable
         viewModel.SelectedMapId = "start";
 
         Assert.Equal("start", viewModel.CurrentMap?.Map.Id);
+    }
+
+    [Fact]
+    public void ShowCursorAt_CellOnTheMap_NamesTheCellAndItsTopTile()
+    {
+        var viewModel = new MainViewModel(_repositoryContent);
+        var tile = viewModel.CurrentMap!.TopTileAt(new GridCell(3, 2))!.Value;
+
+        viewModel.ShowCursorAt(new GridCell(3, 2));
+
+        Assert.Equal($"Cell (3, 2)   Tile {tile.TileId} on layer z {tile.LayerZ}", viewModel.CursorStatus);
+    }
+
+    [Fact]
+    public void ShowCursorAt_CellWithoutTiles_SaysSo()
+    {
+        // The start map's one hole, left by the legacy editor (seen in slice 3a).
+        var viewModel = new MainViewModel(_repositoryContent) { SelectedMapId = "start" };
+
+        viewModel.ShowCursorAt(new GridCell(5, 13));
+
+        Assert.Equal("Cell (5, 13)   No tile", viewModel.CursorStatus);
+    }
+
+    [Fact]
+    public void ShowCursorAt_CellOffTheMap_ClearsTheStatus()
+    {
+        var viewModel = new MainViewModel(_repositoryContent);
+        viewModel.ShowCursorAt(new GridCell(3, 2));
+
+        viewModel.ShowCursorAt(new GridCell(-1, 2));
+
+        Assert.Equal("", viewModel.CursorStatus);
     }
 
     [Fact]

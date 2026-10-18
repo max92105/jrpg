@@ -3,14 +3,26 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Jrpg map editor"
-        Width="1280"
-        Height="800">
+        WindowState="Maximized">
+  <Window.Resources>
+    <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
+  </Window.Resources>
   <DockPanel>
     <TextBlock DockPanel.Dock="Top"
                Margin="8"
                Foreground="DarkRed"
                TextWrapping="Wrap"
                Text="{Binding LoadError}" />
+    <ToolBar DockPanel.Dock="Top">
+      <CheckBox Content="Grid" IsChecked="{Binding IsGridShown}" />
+      <Separator />
+      <Button Content="Fit (Ctrl+0)" Click="OnFitClicked" />
+      <Button Content="100 % (Ctrl+1)" Click="OnActualSizeClicked" />
+    </ToolBar>
+    <StatusBar DockPanel.Dock="Bottom">
+      <StatusBarItem Content="{Binding CursorStatus}" />
+      <StatusBarItem x:Name="ZoomStatus" HorizontalAlignment="Right" />
+    </StatusBar>
     <ListBox DockPanel.Dock="Left"
              Width="180"
              ItemsSource="{Binding MapIds}"
@@ -24,15 +36,30 @@
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
-    <ScrollViewer Background="#202020"
-                  HorizontalScrollBarVisibility="Auto"
-                  VerticalScrollBarVisibility="Auto">
-      <!-- Nearest-pixel scaling and aliased edges keep pixel art sharp and tiles seamless, as in the game. -->
-      <Image x:Name="MapImage"
-             Stretch="None"
-             RenderOptions.BitmapScalingMode="NearestNeighbor"
-             RenderOptions.EdgeMode="Aliased"
-             SnapsToDevicePixels="True" />
-    </ScrollViewer>
+    <!-- Pan: middle drag, Space + drag, arrows. Zoom: wheel, toward the cursor. -->
+    <Border x:Name="MapViewport"
+            Background="#202020"
+            ClipToBounds="True"
+            Focusable="True"
+            PreviewMouseDown="OnViewportMouseDown"
+            PreviewMouseMove="OnViewportMouseMove"
+            PreviewMouseUp="OnViewportMouseUp"
+            MouseWheel="OnViewportMouseWheel"
+            MouseLeave="OnViewportMouseLeave"
+            LostMouseCapture="OnViewportLostMouseCapture"
+            SizeChanged="OnViewportSizeChanged">
+      <!-- A canvas gives the map its full size, so the view's bounds clip it rather than layout. -->
+      <Canvas>
+        <!-- Nearest-pixel scaling and aliased edges keep pixel art sharp and tiles seamless, as in the game. -->
+        <Grid x:Name="MapLayers"
+              RenderOptions.BitmapScalingMode="NearestNeighbor"
+              RenderOptions.EdgeMode="Aliased">
+          <Image x:Name="MapImage" Stretch="None" />
+          <Image x:Name="GridImage"
+                 Stretch="None"
+                 Visibility="{Binding IsGridShown, Converter={StaticResource VisibleWhenTrue}}" />
+        </Grid>
+      </Canvas>
+    </Border>
   </DockPanel>
 </Window>

@@ -1,6 +1,7 @@
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Content;
+using Jrpg.Core.Geometry;
 using Jrpg.Data.Art;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Maps;
@@ -46,6 +47,27 @@ internal sealed partial class MainViewModel : ObservableObject
 
     [ObservableProperty]
     public partial MapViewModel? CurrentMap { get; private set; }
+
+    /// <summary>Whether the cell grid is drawn over the map; on by default, as in the legacy editor.</summary>
+    [ObservableProperty]
+    public partial bool IsGridShown { get; set; } = true;
+
+    /// <summary>What the status bar says about the cell under the cursor; empty when the cursor is off the map.</summary>
+    [ObservableProperty]
+    public partial string CursorStatus { get; private set; } = "";
+
+    /// <param name="cell">The cell under the cursor, or null when the cursor left the view.</param>
+    public void ShowCursorAt(GridCell? cell)
+    {
+        if (cell is not { } at || CurrentMap is null || !CurrentMap.Map.Layout.Contains(at))
+        {
+            CursorStatus = "";
+            return;
+        }
+
+        var position = $"Cell ({at.X}, {at.Y})";
+        CursorStatus = CurrentMap.TopTileAt(at) is { } tile ? $"{position}   Tile {tile.TileId} on layer z {tile.LayerZ}" : $"{position}   No tile";
+    }
 
     partial void OnSelectedMapIdChanged(string? value) =>
         CurrentMap = value is null ? null : new MapViewModel(Catalog!.Maps[value]);

@@ -11,8 +11,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Exploration;
 
 /// <summary>
-/// The player on the current map; the scene a new game starts in. Part 3a shows the tile layers and the standing
-/// player; walking, objects and events come in 3b.
+/// The player on the current map; the scene a new game starts in. It shows the tile layers, the standing
+/// player and objects in depth order; walking and events come in part 3b.
 /// </summary>
 internal sealed class ExplorationScene : IScene
 {
@@ -24,35 +24,41 @@ internal sealed class ExplorationScene : IScene
     private readonly MapView _view;
     private readonly string _fieldSpriteFile;
     private readonly MapCamera _camera = new();
+    private readonly MapDrawList _drawList = new();
 
     public ExplorationScene(MapLocation location, ContentCatalog catalog, TileAtlas atlas)
     {
         _location = location;
         _layout = catalog.Maps[location.MapId].Layout;
-        _view = new MapView(_layout, atlas);
+        _view = new MapView(_layout, catalog.Objects, atlas);
         _fieldSpriteFile = catalog.NewGame.FieldSpriteFile;
         _camera.SnapTo(location.Position, _layout);
+        _drawList.Rebuild(_layout, catalog.Objects, location.Position);
     }
 
     public void Update(TimeSpan delta, InputFrame input)
     {
     }
 
-    /// <summary>Layers up to the player's draw first, then the player, then the layers above (<see cref="MapLayers"/>).</summary>
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
         var origin = _camera.Origin;
-        var layers = _layout.Layers;
-        var layerIndex = 0;
-        for (; layerIndex < layers.Count && layers[layerIndex].Z <= MapLayers.PlayerZ; layerIndex++)
+        var drawables = _drawList.Drawables;
+        for (var index = 0; index < drawables.Count; index++)
         {
-            _view.DrawLayer(batch, textures, layers[layerIndex], origin);
-        }
-
-        DrawPlayer(batch, textures, origin);
-        for (; layerIndex < layers.Count; layerIndex++)
-        {
-            _view.DrawLayer(batch, textures, layers[layerIndex], origin);
+            var drawable = drawables[index];
+            switch (drawable.Kind)
+            {
+                case DrawableKind.Layer:
+                    _view.DrawLayer(batch, textures, _layout.Layers[drawable.Index], origin);
+                    break;
+                case DrawableKind.Object:
+                    _view.DrawObject(batch, textures, _layout.Objects[drawable.Index], origin);
+                    break;
+                case DrawableKind.Player:
+                    DrawPlayer(batch, textures, origin);
+                    break;
+            }
         }
     }
 

@@ -18,6 +18,22 @@ public sealed class PartyStateTests
     }
 
     [Fact]
+    public void MemberById_ReserveMember_ReturnsIt()
+    {
+        var party = new PartyState([_leader, _jazog, _lyra], [_leader], new PartyRules(MaxActiveMembers: 3));
+
+        Assert.Same(_lyra, party.MemberById("lyra"));
+    }
+
+    [Fact]
+    public void MemberById_UnknownId_Throws()
+    {
+        var party = CreateParty(maxActiveMembers: 3, _leader, _jazog);
+
+        Assert.Throws<ArgumentException>(() => party.MemberById("stranger"));
+    }
+
+    [Fact]
     public void Constructor_MoreActiveMembersThanAllowed_Throws()
     {
         Assert.Throws<ArgumentException>(() => CreateParty(maxActiveMembers: 1, _leader, _jazog));

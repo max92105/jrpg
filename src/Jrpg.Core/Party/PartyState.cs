@@ -36,6 +36,11 @@ public sealed class PartyState
 
     public bool IsFull => _activeMembers.Count >= _rules.MaxActiveMembers;
 
+    /// <exception cref="ArgumentException">No recruited member has that id.</exception>
+    public PartyMember MemberById(string id) =>
+        Members.FirstOrDefault(member => member.Id == id)
+        ?? throw new ArgumentException($"'{id}' is not a recruited member.", nameof(id));
+
     /// <returns>False if the party is full or the member is already active.</returns>
     public bool TryAddToActive(PartyMember member)
     {

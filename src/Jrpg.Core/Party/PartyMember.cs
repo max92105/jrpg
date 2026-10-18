@@ -8,14 +8,14 @@ namespace Jrpg.Core.Party;
 /// <summary>A recruited party member's runtime state.</summary>
 public sealed class PartyMember
 {
-    private PartyMember(PartyMemberDefinition definition, IReadOnlyList<SkillDefinition> skills)
+    private PartyMember(PartyMemberDefinition definition, IReadOnlyList<SkillDefinition> skills, PartyMemberProgress progress)
     {
         Definition = definition;
         Skills = [.. skills];
-        Level = definition.Level;
-        Experience = definition.Experience;
+        Level = progress.Level;
+        Experience = progress.Experience;
         BaseStats = new CombatStats(definition.Attack, definition.Defense);
-        Vitals = new Vitals(definition.Hp, definition.MaxHp, definition.Mp, definition.MaxMp);
+        Vitals = new Vitals(progress.Hp, definition.MaxHp, progress.Mp, definition.MaxMp);
     }
 
     public string Id => Definition.Id;
@@ -45,14 +45,20 @@ public sealed class PartyMember
     /// <exception cref="ArgumentException">A skill id isn't in the catalog.</exception>
     public static PartyMember Recruit(PartyMemberDefinition definition, IReadOnlyDictionary<string, SkillDefinition> skillCatalog)
     {
-        var unknownSkillId = definition.SkillIds.FirstOrDefault(id => !skillCatalog.ContainsKey(id));
-        if (unknownSkillId is not null)
-        {
-            throw new ArgumentException($"'{definition.Id}' has unknown skill id '{unknownSkillId}'.", nameof(skillCatalog));
-        }
-
-        return new(definition, [.. definition.SkillIds.Select(id => skillCatalog[id])]);
+        var starting = new PartyMemberProgress(
+            definition.Id, definition.Level, definition.Experience, definition.Hp, definition.Mp, WeaponId: null, ArmorId: null);
+        return new(definition, SkillsOf(definition, skillCatalog), starting);
     }
+
+    /// <summary>Rebuilds a member from a save. Worn items are put on by <c>GameSession</c>, which resolves their ids.</summary>
+    /// <remarks>The progress is assumed repaired against current content by Data (ADR 0007).</remarks>
+    internal static PartyMember Restore(
+        PartyMemberDefinition definition, IReadOnlyDictionary<string, SkillDefinition> skillCatalog, PartyMemberProgress progress) =>
+        new(definition, SkillsOf(definition, skillCatalog), progress);
+
+    /// <summary>What a save keeps of this member.</summary>
+    public PartyMemberProgress CaptureProgress() =>
+        new(Id, Level, Experience, Vitals.Hp, Vitals.Mp, Weapon?.Id, Armor?.Id);
 
     /// <summary>The stat preview: total stats if <paramref name="item"/> replaced whatever is worn in its slot.</summary>
     public CombatStats StatsWith(ItemDefinition item)
@@ -110,6 +116,18 @@ public sealed class PartyMember
             default:
                 throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot.");
         }
+    }
+
+    /// <exception cref="ArgumentException">A skill id isn't in the catalog.</exception>
+    private static List<SkillDefinition> SkillsOf(PartyMemberDefinition definition, IReadOnlyDictionary<string, SkillDefinition> skillCatalog)
+    {
+        var unknownSkillId = definition.SkillIds.FirstOrDefault(id => !skillCatalog.ContainsKey(id));
+        if (unknownSkillId is not null)
+        {
+            throw new ArgumentException($"'{definition.Id}' has unknown skill id '{unknownSkillId}'.", nameof(skillCatalog));
+        }
+
+        return [.. definition.SkillIds.Select(id => skillCatalog[id])];
     }
 
     private static int AttackBonusOf(ItemDefinition? item) => item?.Equipment?.AttackBonus ?? 0;

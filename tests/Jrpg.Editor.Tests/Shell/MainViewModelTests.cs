@@ -269,6 +269,110 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
+    public void PlaceObjectAt_ObjectChosen_CentersItOnThePointWithTheNextUid()
+    {
+        var viewModel = OpenWithObjectChosen("chest");
+        viewModel.LayerZ = 1;
+
+        viewModel.PlaceObjectAt(new Point2D(4.5, 6.5));
+        viewModel.PlaceObjectAt(new Point2D(8, 8));
+
+        var placed = viewModel.CurrentMap!.Map.Layout.Objects;
+        Assert.Equal(("chest_1", new Point2D(4, 6), 1), (placed[^2].Uid, placed[^2].Position, placed[^2].Z));
+        Assert.Equal("chest_2", placed[^1].Uid);
+    }
+
+    [Fact]
+    public void PlaceObjectAt_NoObjectChosen_ChangesNothing()
+    {
+        var viewModel = Open(_repositoryContent);
+
+        viewModel.PlaceObjectAt(new Point2D(4.5, 6.5));
+
+        Assert.False(viewModel.CurrentMap!.IsDirty);
+    }
+
+    [Fact]
+    public void MoveObject_ThenUndo_PutsItBack()
+    {
+        var viewModel = OpenWithObjectChosen("chest");
+        viewModel.PlaceObjectAt(new Point2D(4.5, 6.5));
+
+        viewModel.MoveObject("chest_1", new Point2D(10, 3));
+        Assert.Equal(new Point2D(10, 3), viewModel.ObjectAt(new Point2D(10.5, 3.5))?.Position);
+        viewModel.CurrentMap!.UndoCommand.Execute(null);
+
+        Assert.Equal(new Point2D(4, 6), viewModel.ObjectAt(new Point2D(4.5, 6.5))?.Position);
+    }
+
+    [Fact]
+    public void DeleteSelectedObjects_RemovesThemAsOneStepAndClearsTheSelection()
+    {
+        var viewModel = OpenWithObjectChosen("chest");
+        viewModel.PlaceObjectAt(new Point2D(4.5, 6.5));
+        viewModel.PlaceObjectAt(new Point2D(5.5, 6.5));
+        var before = viewModel.CurrentMap!.Map.Layout.Objects.Count;
+        viewModel.SelectObjectsIn(new Point2D(3.9, 5.9), new Point2D(6.1, 7.1));
+        Assert.Equal(["chest_1", "chest_2"], viewModel.SelectedObjectUids);
+
+        viewModel.DeleteSelectedObjects();
+
+        Assert.Equal(before - 2, viewModel.CurrentMap.Map.Layout.Objects.Count);
+        Assert.Empty(viewModel.SelectedObjectUids);
+        viewModel.CurrentMap.UndoCommand.Execute(null);
+        Assert.Equal(before, viewModel.CurrentMap.Map.Layout.Objects.Count);
+    }
+
+    [Fact]
+    public void RemoveObject_IsUndoable()
+    {
+        var viewModel = OpenWithObjectChosen("chest");
+        viewModel.PlaceObjectAt(new Point2D(4.5, 6.5));
+
+        viewModel.RemoveObject("chest_1");
+
+        Assert.Null(viewModel.ObjectAt(new Point2D(4.5, 6.5)));
+        viewModel.CurrentMap!.UndoCommand.Execute(null);
+        Assert.Equal("chest_1", viewModel.ObjectAt(new Point2D(4.5, 6.5))?.Uid);
+    }
+
+    [Fact]
+    public void SelectedObjectUids_AfterUndoingThePlacement_DropsTheObject()
+    {
+        var viewModel = OpenWithObjectChosen("chest");
+        viewModel.PlaceObjectAt(new Point2D(4.5, 6.5));
+        viewModel.SelectObjectsIn(new Point2D(3.9, 5.9), new Point2D(5.1, 7.1));
+
+        viewModel.CurrentMap!.UndoCommand.Execute(null);
+        viewModel.PlaceObjectAt(new Point2D(9.5, 9.5));
+
+        Assert.Empty(viewModel.SelectedObjectUids);
+    }
+
+    [Fact]
+    public void PlaceObjectAt_PointOffTheMap_PlacesNothing()
+    {
+        var viewModel = OpenWithObjectChosen("chest");
+
+        viewModel.PlaceObjectAt(new Point2D(-0.5, 3));
+
+        Assert.False(viewModel.CurrentMap!.IsDirty);
+    }
+
+    [Fact]
+    public void TryOpenMap_AnotherMap_ClearsTheObjectSelection()
+    {
+        var viewModel = OpenWithObjectChosen("chest");
+        viewModel.PlaceObjectAt(new Point2D(4.5, 6.5));
+        viewModel.SelectObjectsIn(new Point2D(3.9, 5.9), new Point2D(5.1, 7.1));
+        viewModel.SaveCommand.Execute(null);
+
+        viewModel.TryOpenMap("start");
+
+        Assert.Empty(viewModel.SelectedObjectUids);
+    }
+
+    [Fact]
     public void GrowBrush_FromFive_SkipsToSeven()
     {
         var viewModel = Open(_repositoryContent);
@@ -308,6 +412,14 @@ public sealed class MainViewModelTests : IDisposable
         var viewModel = Open(_repositoryContent);
         viewModel.PickTileAt(new GridCell(0, 0));
         viewModel.LayerZ = layerZ;
+        return viewModel;
+    }
+
+    // The forest map open in a copy of the content, the given object chosen to place.
+    private MainViewModel OpenWithObjectChosen(string objectId)
+    {
+        var viewModel = Open(CopyOfRepositoryContent());
+        viewModel.Objects!.SelectedObject = viewModel.Catalog!.Objects[objectId];
         return viewModel;
     }
 

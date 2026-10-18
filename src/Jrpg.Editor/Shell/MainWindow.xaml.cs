@@ -29,6 +29,7 @@ internal sealed partial class MainWindow : Window
     private Point? _panFrom;
     private MouseButton? _strokeButton;
     private GridCell? _brushCell;
+    private Point2D? _mapPoint;
 
     // Where a rectangle drag started; it is filled when its button is released.
     private GridCell? _rectangleStart;
@@ -46,6 +47,7 @@ internal sealed partial class MainWindow : Window
             var tileImages = new TileImages(catalog, viewModel.ArtRoot);
             _drawing = new MapDrawing(catalog, tileImages);
             TileBrowser.Images = tileImages;
+            ObjectBrowser.Drawing = _drawing;
         }
 
         DataContext = _viewModel = viewModel;
@@ -66,7 +68,7 @@ internal sealed partial class MainWindow : Window
     protected override void OnPreviewKeyDown(KeyEventArgs e)
     {
         base.OnPreviewKeyDown(e);
-        e.Handled = Keyboard.Modifiers == ModifierKeys.Control ? HandleZoomKey(e.Key) : HandleToolKey(e.Key) || HandleViewportKey(e.Key);
+        e.Handled = Keyboard.Modifiers == ModifierKeys.Control ? HandleZoomKey(e.Key) : HandleToolKey(e.Key) || HandleObjectKey(e.Key) || HandleViewportKey(e.Key);
     }
 
     protected override void OnPreviewKeyUp(KeyEventArgs e)
@@ -91,6 +93,13 @@ internal sealed partial class MainWindow : Window
             case nameof(MainViewModel.BrushSize) or nameof(MainViewModel.Tool):
                 ShowBrushAt(_brushCell);
                 break;
+            case nameof(MainViewModel.Mode):
+                ShowBrushAt(_brushCell);
+                ShowObjectDragAt(_mapPoint);
+                break;
+            case nameof(MainViewModel.SelectedObjectUids):
+                DrawSelectionMarks();
+                break;
         }
     }
 
@@ -99,6 +108,7 @@ internal sealed partial class MainWindow : Window
         if (e.PropertyName == nameof(MapViewModel.Map))
         {
             DrawCurrentMap();
+            DrawSelectionMarks();
         }
     }
 
@@ -219,7 +229,9 @@ internal sealed partial class MainWindow : Window
         }
         else if (_strokeButton is null)
         {
-            e.Handled = HandlePaintButton(e.ChangedButton, CellAt(e));
+            e.Handled = _viewModel.Mode == EditingMode.Objects
+                ? HandleObjectButton(e.ChangedButton, MapPointAt(e))
+                : HandlePaintButton(e.ChangedButton, CellAt(e));
         }
     }
 
@@ -285,6 +297,7 @@ internal sealed partial class MainWindow : Window
     {
         var position = e.GetPosition(MapViewport);
         var cell = CellAt(e);
+        _mapPoint = MapPointAt(e);
         if (_panFrom is { } from)
         {
             _viewport.PanBy(position - from);
@@ -298,6 +311,7 @@ internal sealed partial class MainWindow : Window
 
         _viewModel.ShowCursorAt(cell);
         ShowBrushAt(cell);
+        ShowObjectDragAt(_mapPoint);
     }
 
     private void OnViewportMouseUp(object sender, MouseButtonEventArgs e)
@@ -308,6 +322,8 @@ internal sealed partial class MainWindow : Window
             {
                 FinishRectangle(start, CellAt(e));
             }
+
+            FinishObjectDrag(MapPointAt(e));
 
             MapViewport.ReleaseMouseCapture();
             e.Handled = true;
@@ -320,6 +336,7 @@ internal sealed partial class MainWindow : Window
         _panFrom = null;
         _rectangleStart = null;
         ShowBrushAt(_brushCell);
+        CancelObjectDrag();
         MapViewport.Cursor = null;
         if (_strokeButton is not null)
         {
@@ -330,12 +347,18 @@ internal sealed partial class MainWindow : Window
 
     private GridCell CellAt(MouseEventArgs e) => _viewport.ScreenToCell(e.GetPosition(MapViewport), MapDrawing.CellPixels);
 
+    private Point2D MapPointAt(MouseEventArgs e)
+    {
+        var mapPixel = _viewport.ScreenToMap(e.GetPosition(MapViewport));
+        return new Point2D(mapPixel.X / MapDrawing.CellPixels, mapPixel.Y / MapDrawing.CellPixels);
+    }
+
     /// <summary>Outlines what a click or drag at the cell would change: the brush, the rectangle being dragged, or one cell.</summary>
     /// <param name="cell">The cell under the mouse, or null to hide the outline.</param>
     private void ShowBrushAt(GridCell? cell)
     {
         _brushCell = cell;
-        if (cell is not { } at || _viewModel.CurrentMap is null)
+        if (cell is not { } at || _viewModel.CurrentMap is null || _viewModel.Mode != EditingMode.Tiles)
         {
             BrushOutline.Visibility = Visibility.Collapsed;
             return;
@@ -368,8 +391,10 @@ internal sealed partial class MainWindow : Window
 
     private void OnViewportMouseLeave(object sender, MouseEventArgs e)
     {
+        _mapPoint = null;
         _viewModel.ShowCursorAt(null);
         ShowBrushAt(null);
+        ShowObjectDragAt(null);
     }
 
     private void RefitMap()
@@ -408,6 +433,7 @@ internal sealed partial class MainWindow : Window
         if (_gridZoom != zoom && _viewModel.CurrentMap is { } map)
         {
             GridImage.Source = MapDrawing.DrawGrid(map.Map.Layout, 1 / zoom);
+            DrawSelectionMarks();
             _gridZoom = zoom;
         }
     }

@@ -12,12 +12,14 @@ internal sealed class MapDraft
 {
     private readonly MapLayout _source;
     private readonly SortedDictionary<int, int[][]> _layerRowsByZ;
+    private readonly List<PlacedObject> _objects;
     private readonly MapSettings _settings;
 
     private MapDraft(MapDefinition source)
     {
         _source = source.Layout;
         _layerRowsByZ = new(_source.Layers.ToDictionary(layer => layer.Z, layer => layer.Rows.Select(row => row.ToArray()).ToArray()));
+        _objects = [.. _source.Objects];
         _settings = source.Settings;
     }
 
@@ -41,6 +43,19 @@ internal sealed class MapDraft
         rows[cell.Y][cell.X] = tileId;
     }
 
+    /// <summary>In placement order, which is also their draw order on the same Z and base.</summary>
+    public IReadOnlyList<PlacedObject> Objects => _objects;
+
+    public void InsertObject(int index, PlacedObject placed) => _objects.Insert(index, placed);
+
+    public void RemoveObjectAt(int index) => _objects.RemoveAt(index);
+
+    public void MoveObject(string uid, Point2D position)
+    {
+        var index = _objects.FindIndex(placed => placed.Uid == uid);
+        _objects[index] = _objects[index] with { Position = position };
+    }
+
     /// <summary>
     /// An immutable map with the draft's current content, to draw or save; later edits don't change it. A layer with
     /// no tiles left is omitted, so erasing a layer's last tile removes the layer.
@@ -50,6 +65,6 @@ internal sealed class MapDraft
         var layers = _layerRowsByZ
             .Where(layer => layer.Value.Any(row => row.Any(tileId => tileId != TileLayer.EmptyTileId)))
             .Select(layer => new TileLayer { Z = layer.Key, Rows = [.. layer.Value.Select(row => (IReadOnlyList<int>)[.. row])] });
-        return new MapDefinition(_source with { Layers = [.. layers] }, _settings);
+        return new MapDefinition(_source with { Layers = [.. layers], Objects = [.. _objects] }, _settings);
     }
 }

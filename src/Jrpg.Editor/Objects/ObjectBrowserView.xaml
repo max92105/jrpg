@@ -1,0 +1,33 @@
+<UserControl x:Class="Jrpg.Editor.Objects.ObjectBrowserView"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <UserControl.Resources>
+    <CollectionViewSource x:Key="ObjectsByCategory" Source="{Binding Objects}">
+      <CollectionViewSource.GroupDescriptions>
+        <PropertyGroupDescription PropertyName="Category" />
+      </CollectionViewSource.GroupDescriptions>
+    </CollectionViewSource>
+  </UserControl.Resources>
+  <DockPanel>
+    <Border DockPanel.Dock="Bottom" Height="220" Background="#202020">
+      <Image x:Name="Preview"
+             Stretch="Uniform"
+             StretchDirection="DownOnly"
+             RenderOptions.BitmapScalingMode="NearestNeighbor" />
+    </Border>
+    <ListBox ItemsSource="{Binding Source={StaticResource ObjectsByCategory}}"
+             SelectedItem="{Binding SelectedObject}"
+             DisplayMemberPath="Id">
+      <ListBox.GroupStyle>
+        <GroupStyle>
+          <GroupStyle.HeaderTemplate>
+            <DataTemplate>
+              <TextBlock Margin="0,4,0,0" FontWeight="Bold" Text="{Binding Name}" />
+            </DataTemplate>
+          </GroupStyle.HeaderTemplate>
+        </GroupStyle>
+      </ListBox.GroupStyle>
+    </ListBox>
+  </DockPanel>
+</UserControl>

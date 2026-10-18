@@ -56,6 +56,25 @@ internal sealed class MapDrawing(ContentCatalog catalog, TileImages tileImages)
         return image;
     }
 
+    /// <summary>One object on its own, at the map's scale: the browser's preview and the outline of where it would go.</summary>
+    public DrawingImage DrawObject(ObjectDefinition definition)
+    {
+        var area = new Rect(0, 0, definition.Width * CellPixels, definition.Height * CellPixels);
+        var drawing = new DrawingGroup { ClipGeometry = new RectangleGeometry(area) };
+        using (var context = drawing.Open())
+        {
+            context.DrawRectangle(Brushes.Transparent, null, area);
+            foreach (var tile in definition.Tiles)
+            {
+                context.DrawImage(tileImages.TileImageOf(tile.TileId), CellRect(tile.X, tile.Y));
+            }
+        }
+
+        var image = new DrawingImage(drawing);
+        image.Freeze();
+        return image;
+    }
+
     /// <summary>Lines between the map's cells, drawn over the map when the grid is shown.</summary>
     /// <param name="layout">The map whose cells are outlined.</param>
     /// <param name="lineWidth">In map pixels; one screen pixel is 1 / zoom, so the lines stay visible when zoomed out.</param>

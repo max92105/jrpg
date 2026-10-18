@@ -28,3 +28,5 @@ Seen again in 1c and 1d (converter error branches): each slice adds `ConversionE
 Seen again in part 2 slice 4a (fixture variant): `ContinueEvent_WarpOntoTouchCell_DoesNotFireArrivalCell` warps to town (3, 2), but the fixture's touch cell is (3, 3), so it never arrives on a touch cell. When a test name claims a scenario, trace the fixture coordinates and check the scenario actually happens.
 
 Seen again in part 2 slice 5b: `Read_MissingRequiredField_ThrowsNamingTheField` renames a key, so it tests the unmapped-member error, not the missing field; `CheckNoNullEntries` (5 `||` clauses) tested on one list only.
+
+Seen again in 11g (oracle variant): `ObjectBrowserViewModelTests` asserts the list equals the same `OrderBy(Category).ThenBy(Id)` the production code runs, so it passes for any sort bug shared by both. Pin a golden prefix instead (it did, with `Take(2)`).

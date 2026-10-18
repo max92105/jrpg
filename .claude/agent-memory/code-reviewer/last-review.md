@@ -5,10 +5,14 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 11f (Rectangle, flood fill, fill and clear layer)
-Round: 1 (verdict: Ready to commit; build, 715 tests, format exit 0 all pass)
+Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 11g (Placing objects)
+Round: 1 (verdict: Ready to commit; build, 733 tests, format exit 0 all pass)
 
-- open (Suggestion): MainWindow.xaml.cs OnViewportLostMouseCapture clears _rectangleStart but doesn't call ShowBrushAt(_brushCell), so the dragged-rectangle outline stays on screen after release until the mouse moves
-- open (Suggestion): MainWindow.xaml.cs ShowBrushAt enumerates the whole rectangle/square for First()/Last() on every mouse move; compute the bounds from the corners
-- open (Suggestion): tick 11f in the plan with deviations (TileTool enum + ComboBox, MapViewModel.PutTiles, Fill tool as well as Shift+click, layer the map lacks counts as empty)
-- follow-up: FillLayer/ClearLayer commands always enabled (no CanExecute on open map / chosen tile)
+- open (Warning): MainViewModel.cs:105/240 SelectedObjectUids not pruned after undo/redo/remove; uids are reused (lowest free), so a re-placed chest_1 inherits the selection and Delete removes it instead of the hovered object; Delete with only stale uids does nothing
+- open (Warning): MainViewModel.cs:198 PlaceObjectAt has no map-bounds check; click in viewport margin places an object clipped out of sight (MapDrawing clips), saved since MapLayoutValidator has no bounds check
+- open (Warning): MainViewModel.cs ~320 lines, three concerns (open/save, tiles, objects); split before 11h adds map settings (not blocking)
+- open (Suggestion): MainWindow.ObjectEditing.cs:82 ShowObjectDragAt also shows the placement ghost with no drag; rename ShowObjectPreviewAt
+- open (Suggestion): MainWindow.ObjectEditing.cs:146 selection mark thickness fixed at 2/zoom at selection time; ApplyViewport doesn't redraw marks
+- open (Suggestion): tick 11g in the plan with deviations (PlacedObjectHits instead of MapDraft.ObjectsInRectangle, EditingMode tabs, Delete on hovered object, DrawObject)
+- follow-up: plan decision 8 reuses freed object uids (chest_1 after deleting chest_1) while event ids deliberately don't; saves remember objects by uid, ask developer
+- follow-up: TopAt ignores canopy Z; ObjectBrowserViewModelTests line 2 re-implements the sort (tautological)

@@ -1,3 +1,4 @@
+using Jrpg.Game.Input;
 using Jrpg.Game.Scenes;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -17,7 +18,7 @@ public sealed class SceneStackTests
         stack.Push(new RecordingScene("map", _calls));
         stack.Push(new RecordingScene("menu", _calls));
 
-        stack.Update(TimeSpan.FromSeconds(0.1));
+        stack.Update(TimeSpan.FromSeconds(0.1), default);
 
         Assert.Equal(["update menu"], _calls);
     }
@@ -51,7 +52,7 @@ public sealed class SceneStackTests
         stack.Push(new RecordingScene("menu", _calls));
 
         stack.Pop();
-        stack.Update(TimeSpan.FromSeconds(0.1));
+        stack.Update(TimeSpan.FromSeconds(0.1), default);
 
         Assert.Equal(["update map"], _calls);
     }
@@ -79,7 +80,7 @@ public sealed class SceneStackTests
 
     private sealed class RecordingScene(string name, List<string> calls) : IScene
     {
-        public void Update(TimeSpan delta) => calls.Add($"update {name}");
+        public void Update(TimeSpan delta, InputFrame input) => calls.Add($"update {name}");
 
         public void Draw(SpriteBatch batch) => calls.Add($"draw {name}");
     }

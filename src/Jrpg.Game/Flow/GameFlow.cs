@@ -1,5 +1,6 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Session;
+using Jrpg.Game.Input;
 using Jrpg.Game.Scenes;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -21,10 +22,10 @@ internal sealed class GameFlow
     public GameSession Session { get; }
 
     /// <summary>Play time counts every update, menus and pause included (developer decision 35).</summary>
-    public void Update(TimeSpan delta)
+    public void Update(TimeSpan delta, InputFrame input)
     {
         Session.AddPlayTime(delta);
-        _scenes.Update(delta);
+        _scenes.Update(delta, input);
     }
 
     public void Draw(SpriteBatch batch) => _scenes.Draw(batch);

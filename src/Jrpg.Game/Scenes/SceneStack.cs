@@ -1,3 +1,4 @@
+using Jrpg.Game.Input;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Jrpg.Game.Scenes;
@@ -33,11 +34,11 @@ internal sealed class SceneStack
         _scenes[^1] = scene;
     }
 
-    public void Update(TimeSpan delta)
+    public void Update(TimeSpan delta, InputFrame input)
     {
         if (_scenes.Count > 0)
         {
-            _scenes[^1].Update(delta);
+            _scenes[^1].Update(delta, input);
         }
     }
 

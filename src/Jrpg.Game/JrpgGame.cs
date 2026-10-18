@@ -1,7 +1,9 @@
 using Jrpg.Game.Flow;
+using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Jrpg.Game;
 
@@ -15,6 +17,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     private const int StartingWindowHeight = VirtualScreen.Height * 2 / 3;
 
     private readonly GameFlow _flow;
+    private readonly InputReader _input = new();
     private SpriteBatch? _batch;
     private RenderTarget2D? _virtualScreen;
 
@@ -41,7 +44,9 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
 
     protected override void Update(GameTime gameTime)
     {
-        _flow.Update(gameTime.ElapsedGameTime);
+        // No dead zone from MonoGame: StickReader applies the game's own.
+        var input = _input.Read(Keyboard.GetState(), GamePad.GetState(PlayerIndex.One, GamePadDeadZone.None));
+        _flow.Update(gameTime.ElapsedGameTime, input);
         base.Update(gameTime);
     }
 

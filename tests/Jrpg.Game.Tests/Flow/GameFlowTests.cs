@@ -21,8 +21,8 @@ public sealed class GameFlowTests
     {
         var flow = new GameFlow(_catalog);
 
-        flow.Update(TimeSpan.FromSeconds(0.5));
-        flow.Update(TimeSpan.FromSeconds(0.25));
+        flow.Update(TimeSpan.FromSeconds(0.5), default);
+        flow.Update(TimeSpan.FromSeconds(0.25), default);
 
         Assert.Equal(TimeSpan.FromSeconds(0.75), flow.Session.PlayTime);
     }

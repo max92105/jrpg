@@ -5,12 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 1a (Game host, content root and scene stack)
-Round: 1 (verdict: Ready to commit)
+Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 1b (Input mapping)
+Round: 1 (verdict: Ready to commit; caller said this is the single review round)
 
-Accepted (don't re-raise): plain aspect fit in VirtualScreen.DestinationIn (plan's reading of decision 48, developer to confirm); Find delegates to internal Choose; empty ExplorationScene; seed from Environment.TickCount to Debug; null SpriteBatch in SceneStack tests; DefaultStartup in slnx instead of a .slnLaunch file (F5 unverified, CLAUDE.md fallback); test names without class prefix.
+Accepted (don't re-raise): ButtonSet bitset struct not in plan; StickReader.FromKeys renamed FromDirectionButtons taking held ButtonSet; tab buttons have no keyboard key (question 50); Esc maps to both Cancel and Menu (legacy).
 
-- open (Warning): GameFlow/SessionTransitions have no test: Update adding delta to play time (decision 35) and the new game pushing ExplorationScene; both headless-testable
-- open (Suggestion): ContentRootLocatorTests named Find_* but three of four call Choose; name them Choose_* or keep Find_* only for the Find test
-- open (Suggestion): GameFlow.Session public with no user outside GameFlow; private until 3b's Capture needs it
-- open (Suggestion): Program catch filter misses ArgumentException from Path.GetFullPath (`--content ""`) and UnauthorizedAccessException -> unhandled crash instead of the start message
+- open (Suggestion): StickReader.FromStick uses `< Deadzone`, so exactly 0.2 moves; the boundary is untested; pin it with a 0.2f test
+- open (Suggestion): InputFrame exposes Held/Pressed positional properties next to IsHeld/IsPressed; two ways to ask the same thing
+- open (Suggestion): InputBindings.Keyboard/GamePad properties shadow the MonoGame Keyboard/GamePad types; KeyBindings/PadBindings reads clearer

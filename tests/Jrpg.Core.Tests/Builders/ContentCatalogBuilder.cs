@@ -50,6 +50,7 @@ internal sealed class ContentCatalogBuilder
         Encounters = new Dictionary<string, EncounterDefinition>(),
         Tiles = new Dictionary<int, TileDefinition>(),
         Objects = new Dictionary<string, ObjectDefinition>(),
+        Maps = new Dictionary<string, MapDefinition>(),
         Rules = new GameRules(new PartyRules(MaxActiveMembers: 4), new ExperienceTable([100])),
         NewGame = _newGame,
     };

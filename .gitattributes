@@ -61,3 +61,9 @@
 #*.PDF   diff=astextplain
 #*.rtf   diff=astextplain
 #*.RTF   diff=astextplain
+
+###############################################################################
+# Generated content is written with CRLF (ContentFileWriter); keep it CRLF on every
+# checkout so the "matches committed generated content" test compares like with like.
+###############################################################################
+content/generated/** text eol=crlf

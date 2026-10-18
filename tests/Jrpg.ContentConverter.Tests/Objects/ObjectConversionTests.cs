@@ -30,7 +30,7 @@ public sealed class ObjectConversionTests
         };
         var report = new ConversionReport();
 
-        var converted = Assert.Single(ObjectConversion.Convert([tree], report));
+        var converted = Assert.Single(ObjectConversion.Convert([tree], report).Definitions);
 
         Assert.Equal(("tree", 4, 4), (converted.Id, converted.Width, converted.Height));
         Assert.Equal(["Objects/Objects.json: changed object 'Tree': stale size 1x1 replaced by its tile group's 4x4."], report.Lines);
@@ -41,11 +41,28 @@ public sealed class ObjectConversionTests
     {
         var report = new ConversionReport();
 
-        var converted = Assert.Single(ObjectConversion.Convert([_chest], report));
+        var converted = Assert.Single(ObjectConversion.Convert([_chest], report).Definitions);
 
         Assert.Equal(("chest", 1, 1), (converted.Id, converted.Width, converted.Height));
         Assert.Equal(_chest.CollisionPolygon, converted.CollisionPolygon);
         Assert.Empty(report.Lines);
+    }
+
+    [Fact]
+    public void Convert_Objects_MapsEachLegacyIdToTheNewId()
+    {
+        var converted = ObjectConversion.Convert([_chest, _chest with { Id = 3, Name = "Door_Open" }], new ConversionReport());
+
+        Assert.Equal(new Dictionary<int, string> { [9] = "chest", [3] = "door_open" }, converted.IdsByLegacyId);
+    }
+
+    [Fact]
+    public void Convert_TwoObjectsSameLegacyId_ThrowsNamingTheId()
+    {
+        var exception = Assert.Throws<ConversionException>(
+            () => ObjectConversion.Convert([_chest, _chest with { Name = "Chest Opened" }], new ConversionReport()));
+
+        Assert.Equal("Objects/Objects.json: legacy id 9 is used by more than one object.", exception.Message);
     }
 
     [Fact]
@@ -100,7 +117,7 @@ public sealed class ObjectConversionTests
     {
         var legacyObjects = LegacyFileReader.Read<IReadOnlyList<LegacyObjectJson>>(TestPaths.LegacyAssets, ObjectConversion.SourceFile);
 
-        var objects = ObjectConversion.Convert(legacyObjects, new ConversionReport());
+        var objects = ObjectConversion.Convert(legacyObjects, new ConversionReport()).Definitions;
 
         Assert.Equal(
             ["chest", "chest_opened", "door_close", "door_open", "house_1", "house_2", "house_3", "house_4", "house_5", "tree", "tree_2", "tree_3"],

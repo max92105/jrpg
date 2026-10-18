@@ -36,6 +36,8 @@ internal static class LegacyFileReader
     {
         var options = new JsonSerializerOptions
         {
+            // The legacy editor wrote tiles and objects in PascalCase but maps in camelCase.
+            PropertyNameCaseInsensitive = true,
             RespectNullableAnnotations = true,
             UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
             AllowDuplicateProperties = false,

@@ -22,3 +22,5 @@ Seen again in slice 8: `FieldItemUse.CanUse`'s `item.Effect is not null` clause 
 Seen again in part 2 slice 1b (converter): `TileConversion` rejects Sprite, Frames or CollisionPolygon but only CollisionPolygon is tested; `LegacyFileReader`'s strict options (unmapped members disallowed) have no test. Multi-clause `||` guards and serializer option flags are the usual blind spot: ask for a theory per clause.
 
 Seen again in the 1b re-review (fixed the clauses above): `id <= EmptyTileId` tested only with 0, so `==` would pass; and `Convert_RepositoryAssets_WritesTilesAndReport` only asserts `File.Exists`. Boundary comparisons need a value past the boundary; file-writing tests need a content check. For generated content, ask for a drift test (convert to temp, compare to the committed `content/generated/`).
+
+Seen again in 1c and 1d (converter error branches): each slice adds `ConversionException` throws "none exist today" (meta, duplicate legacy id, null object) and tests only some. In 1d raised as one Critical listing the untested throws. Grep every new `throw` in the diff and match it to a test message.

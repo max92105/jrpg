@@ -25,6 +25,8 @@ public sealed record ContentCatalog
 
     public required IReadOnlyDictionary<string, ObjectDefinition> Objects { get; init; }
 
+    public required IReadOnlyDictionary<string, MapDefinition> Maps { get; init; }
+
     public required GameRules Rules { get; init; }
 
     public required NewGameDefinition NewGame { get; init; }

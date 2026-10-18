@@ -52,6 +52,8 @@ public static class ContentCatalogLoader
             contentRoot, NewGameFile, (file, definition) => NewGameValidator.Validate(file, definition, newGameReferences));
         var tiles = ReadValidated<IReadOnlyList<TileDefinition>>(contentRoot, TilesFile, TileCatalogValidator.Validate);
         var objects = ReadValidated<IReadOnlyList<ObjectDefinition>>(contentRoot, ObjectsFile, ObjectCatalogValidator.Validate);
+        var objectsById = objects.ToFrozenDictionary(definition => definition.Id);
+        var maps = MapFolderReader.Read(contentRoot, new MapReferences(tiles.Select(tile => tile.Id).ToFrozenSet(), objectsById));
 
         return new ContentCatalog
         {
@@ -62,7 +64,8 @@ public static class ContentCatalogLoader
             Enemies = enemies.ToFrozenDictionary(enemy => enemy.Id),
             Encounters = encounters.ToFrozenDictionary(encounter => encounter.Id),
             Tiles = tiles.ToFrozenDictionary(tile => tile.Id),
-            Objects = objects.ToFrozenDictionary(definition => definition.Id),
+            Objects = objectsById,
+            Maps = maps.ToFrozenDictionary(map => map.Id),
             Rules = rules,
             NewGame = newGame,
         };

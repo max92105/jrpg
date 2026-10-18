@@ -14,16 +14,70 @@ public sealed class LegacyContentConversionTests : IDisposable
     public void Dispose() => Directory.Delete(_contentRoot, recursive: true);
 
     [Fact]
-    public void Convert_RepositoryAssets_WritesContentAndReport()
+    public void Convert_RepositoryAssets_WritesTheReport()
     {
         var report = LegacyContentConversion.Convert(TestPaths.LegacyAssets, _contentRoot);
 
-        Assert.True(File.Exists(Path.Combine(_contentRoot, "generated", "tiles.json")));
-        Assert.True(File.Exists(Path.Combine(_contentRoot, "generated", "objects.json")));
         Assert.Equal(report.Lines, File.ReadAllLines(Path.Combine(_contentRoot, "generated", "conversion-report.txt")));
         Assert.Equal("Tiles/Tileset.json: converted 283 tiles.", report.Lines[0]);
         Assert.Equal(8, report.Lines.Count(line => line.Contains("stale size", StringComparison.Ordinal)));
-        Assert.Equal("Objects/Objects.json: converted 12 objects.", report.Lines[^1]);
+        Assert.Contains("Objects/Objects.json: converted 12 objects.", report.Lines);
+        Assert.Equal("Maps/start.json: converted map 'start' (45x45, 2 layers, 55 objects).", report.Lines[^1]);
+    }
+
+    [Fact]
+    public void Convert_RepositoryAssets_ProducesLoadableContent()
+    {
+        CopyFolder(TestPaths.RepositoryContent, _contentRoot);
+
+        LegacyContentConversion.Convert(TestPaths.LegacyAssets, _contentRoot);
+        var catalog = ContentCatalogLoader.Load(_contentRoot);
+
+        Assert.Equal(["forest", "interior_1", "start"], catalog.Maps.Keys.Order(StringComparer.Ordinal));
+    }
+
+    [Fact]
+    public void Convert_TwoMapFilesSameId_ThrowsNamingBothAndWritesNothing()
+    {
+        var assetsRoot = Path.Combine(_contentRoot, "assets");
+        CopyFolder(TestPaths.LegacyAssets, assetsRoot);
+        File.Copy(Path.Combine(assetsRoot, "Maps", "Interior1.json"), Path.Combine(assetsRoot, "Maps", "interior_1.json"));
+
+        var exception = Assert.Throws<ConversionException>(() => LegacyContentConversion.Convert(assetsRoot, _contentRoot));
+
+        Assert.Equal("Maps/Interior1.json and Maps/interior_1.json both become map id 'interior_1'.", exception.Message);
+        Assert.False(Directory.Exists(Path.Combine(_contentRoot, "generated")));
+    }
+
+    // Catches a map edited in the legacy editor but never converted, and a converter change never re-run.
+    [Fact]
+    public void Convert_RepositoryAssets_MatchesCommittedGeneratedContent()
+    {
+        LegacyContentConversion.Convert(TestPaths.LegacyAssets, _contentRoot);
+
+        var committedRoot = Path.Combine(TestPaths.RepositoryContent, "generated");
+        var freshRoot = Path.Combine(_contentRoot, "generated");
+        Assert.Equal(RelativeFiles(committedRoot), RelativeFiles(freshRoot));
+        Assert.All(
+            RelativeFiles(committedRoot),
+            file => Assert.True(
+                File.ReadAllBytes(Path.Combine(committedRoot, file)).SequenceEqual(File.ReadAllBytes(Path.Combine(freshRoot, file))),
+                $"content/generated/{file} is stale: run the content converter."));
+    }
+
+    private static List<string> RelativeFiles(string root) =>
+        [.. Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories)
+            .Select(path => Path.GetRelativePath(root, path).Replace('\\', '/'))
+            .Order(StringComparer.Ordinal)];
+
+    private static void CopyFolder(string source, string destination)
+    {
+        foreach (var file in Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories))
+        {
+            var target = Path.Combine(destination, Path.GetRelativePath(source, file));
+            Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+            File.Copy(file, target);
+        }
     }
 
     [Fact]
@@ -36,7 +90,6 @@ public sealed class LegacyContentConversionTests : IDisposable
         LegacyContentConversion.Convert(TestPaths.LegacyAssets, _contentRoot);
 
         Assert.False(File.Exists(staleFile));
-        Assert.False(Directory.Exists(Path.GetDirectoryName(staleFile)));
     }
 
     [Fact]

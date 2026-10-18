@@ -5,13 +5,12 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-17-world-exploration-core.md, 1c (object content)
-Round: 2 (verdict: Ready to commit)
+Slice: docs/plans/2026-10-17-world-exploration-core.md, 1d (map content)
+Round: 1 (verdict: Fix the Criticals, then commit)
 
-- fixed (Critical): ObjectConversion.RejectUnsupportedFields also rejected an object with no tiles - check moved into TileGroupSize
-- fixed (Warning): null entry in a legacy object's Tiles list -> NRE - now a ConversionException naming the object, tested
-- fixed (Warning): IsNpc/Meta shared one message, Meta untested - split messages, both tested
-- fixed (Suggestion): empty `<param name="name">` in LegacyIds.FromName
-- fixed (Suggestion): PointStringConverter moved to tool root (slice note records it)
-- fixed (Suggestion): Load_RepositoryContent objects test now pins count, tree size, polygon count and a point
-- follow-up: committed content/generated vs fresh conversion (still 1d's end-to-end test)
+- open (Critical): untested new throws - ObjectConversion.IdsByLegacyId duplicate legacy id, MapConversion placed-object Meta, MapConversion null object entry (only null tile tested), MapLayoutValidator empty uid
+- open (Warning): two legacy map files giving the same id (Interior1.json + interior_1.json) -> second silently overwrites the first in generated/maps; no error
+- open (Warning): MatchesCommittedGeneratedContent compares bytes; writer pins CRLF, index stores LF, so a checkout with LF working files (autocrlf=input, WSL/Linux) fails falsely - pin eol=crlf for content/generated in .gitattributes
+- open (Suggestion): split combined messages ("null entry or an empty uid", "tile or object list holds a null entry")
+- open (Suggestion): IdsByLegacyId temporal coupling ("call after Convert") and recomputes LegacyIds.FromName
+- follow-up: MapFolderReader <-> ContentCatalogLoader mutual class reference (GeneratedFolder const)

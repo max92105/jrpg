@@ -1,5 +1,7 @@
+using Jrpg.ContentConverter.Maps;
 using Jrpg.ContentConverter.Objects;
 using Jrpg.ContentConverter.Tiles;
+using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
 using Jrpg.Data.Maps;
 
@@ -23,17 +25,53 @@ internal static class LegacyContentConversion
         TileCatalogValidator.Validate(ContentCatalogLoader.TilesFile, tiles);
         report.AddConverted(TileConversion.SourceFile, $"{tiles.Count} tiles");
 
-        var objects = ObjectConversion.Convert(
-            LegacyFileReader.Read<IReadOnlyList<LegacyObjectJson>>(assetsRoot, ObjectConversion.SourceFile), report);
-        ObjectCatalogValidator.Validate(ContentCatalogLoader.ObjectsFile, objects);
-        report.AddConverted(ObjectConversion.SourceFile, $"{objects.Count} objects");
+        var legacyObjects = LegacyFileReader.Read<IReadOnlyList<LegacyObjectJson>>(assetsRoot, ObjectConversion.SourceFile);
+        var objects = ObjectConversion.Convert(legacyObjects, report);
+        var definitions = objects.Definitions;
+        ObjectCatalogValidator.Validate(ContentCatalogLoader.ObjectsFile, definitions);
+        report.AddConverted(ObjectConversion.SourceFile, $"{definitions.Count} objects");
+
+        var references = new MapReferences(
+            tiles.Select(tile => tile.Id).ToHashSet(), definitions.ToDictionary(definition => definition.Id));
+        var maps = ConvertMaps(assetsRoot, objects.IdsByLegacyId, references, report);
 
         // Everything is converted and validated before the folder is touched, so a failed run leaves the last good content.
         var generatedRoot = ReplaceGeneratedFolder(contentRoot);
         ContentFileWriter.Write(Path.Combine(contentRoot, ContentCatalogLoader.TilesFile), tiles);
-        ContentFileWriter.Write(Path.Combine(contentRoot, ContentCatalogLoader.ObjectsFile), objects);
+        ContentFileWriter.Write(Path.Combine(contentRoot, ContentCatalogLoader.ObjectsFile), definitions);
+        Directory.CreateDirectory(Path.Combine(contentRoot, MapFolderReader.LayoutsFolder));
+        foreach (var map in maps)
+        {
+            ContentFileWriter.Write(Path.Combine(contentRoot, MapFolderReader.LayoutsFolder, $"{map.Id}.json"), map);
+        }
+
         File.WriteAllText(Path.Combine(generatedRoot, ReportFile), string.Concat(report.Lines.Select(line => line + "\r\n")));
         return report;
+    }
+
+    /// <summary>Converts the live maps; the older ones in <c>Maps/Back/</c> come in slice 3c.</summary>
+    private static List<MapLayout> ConvertMaps(
+        string assetsRoot, IReadOnlyDictionary<int, string> objectIdsByLegacyId, MapReferences references, ConversionReport report)
+    {
+        var sourceFiles = Directory.EnumerateFiles(Path.Combine(assetsRoot, MapConversion.SourceFolder), "*.json")
+            .Select(path => $"{MapConversion.SourceFolder}/{Path.GetFileName(path)}")
+            .Order(StringComparer.Ordinal);
+        var sourceFilesById = new Dictionary<string, string>();
+        var maps = new List<MapLayout>();
+        foreach (var sourceFile in sourceFiles)
+        {
+            var map = MapConversion.Convert(sourceFile, LegacyFileReader.Read<LegacyMapJson>(assetsRoot, sourceFile), objectIdsByLegacyId);
+            if (!sourceFilesById.TryAdd(map.Id, sourceFile))
+            {
+                throw new ConversionException($"{sourceFilesById[map.Id]} and {sourceFile} both become map id '{map.Id}'.");
+            }
+
+            MapLayoutValidator.Validate($"{MapFolderReader.LayoutsFolder}/{map.Id}.json", map, references);
+            report.AddConverted(sourceFile, $"map '{map.Id}' ({map.Width}x{map.Height}, {map.Layers.Count} layers, {map.Objects.Count} objects)");
+            maps.Add(map);
+        }
+
+        return maps;
     }
 
     private static string ReplaceGeneratedFolder(string contentRoot)

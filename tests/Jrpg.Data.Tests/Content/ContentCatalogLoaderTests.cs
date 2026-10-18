@@ -37,6 +37,17 @@ public sealed class ContentCatalogLoaderTests
     }
 
     [Fact]
+    public void Load_RepositoryContent_ComposesTheThreeLiveMaps()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        Assert.Equal(["forest", "interior_1", "start"], catalog.Maps.Keys.Order(StringComparer.Ordinal));
+        var start = catalog.Maps["start"];
+        Assert.Equal((45, 45, 55), (start.Layout.Width, start.Layout.Height, start.Layout.Objects.Count));
+        Assert.Equal("Interior1", catalog.Maps["interior_1"].Settings.DisplayName);
+    }
+
+    [Fact]
     public void Load_RepositoryContent_EveryPartyMemberCanBeRecruitedAndGainExperience()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));

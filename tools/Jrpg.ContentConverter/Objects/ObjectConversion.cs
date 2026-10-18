@@ -11,9 +11,10 @@ internal static class ObjectConversion
 {
     public const string SourceFile = "Objects/Objects.json";
 
-    public static IReadOnlyList<ObjectDefinition> Convert(IReadOnlyList<LegacyObjectJson> legacyObjects, ConversionReport report)
+    public static ConvertedObjects Convert(IReadOnlyList<LegacyObjectJson> legacyObjects, ConversionReport report)
     {
         var namesById = new Dictionary<string, string>();
+        var idsByLegacyId = new Dictionary<int, string>();
         var objects = new List<ObjectDefinition>();
         foreach (var legacyObject in legacyObjects)
         {
@@ -24,10 +25,15 @@ internal static class ObjectConversion
                     $"{SourceFile}: objects '{namesById[converted.Id]}' and '{legacyObject.Name}' both become id '{converted.Id}'.");
             }
 
+            if (!idsByLegacyId.TryAdd(legacyObject.Id, converted.Id))
+            {
+                throw new ConversionException($"{SourceFile}: legacy id {legacyObject.Id} is used by more than one object.");
+            }
+
             objects.Add(converted);
         }
 
-        return [.. objects.OrderBy(definition => definition.Id, StringComparer.Ordinal)];
+        return new ConvertedObjects([.. objects.OrderBy(definition => definition.Id, StringComparer.Ordinal)], idsByLegacyId);
     }
 
     private static ObjectDefinition ConvertObject(LegacyObjectJson? legacyObject, ConversionReport report)

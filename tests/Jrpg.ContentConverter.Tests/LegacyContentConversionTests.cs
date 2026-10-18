@@ -14,13 +14,16 @@ public sealed class LegacyContentConversionTests : IDisposable
     public void Dispose() => Directory.Delete(_contentRoot, recursive: true);
 
     [Fact]
-    public void Convert_RepositoryAssets_WritesTilesAndReport()
+    public void Convert_RepositoryAssets_WritesContentAndReport()
     {
         var report = LegacyContentConversion.Convert(TestPaths.LegacyAssets, _contentRoot);
 
         Assert.True(File.Exists(Path.Combine(_contentRoot, "generated", "tiles.json")));
+        Assert.True(File.Exists(Path.Combine(_contentRoot, "generated", "objects.json")));
         Assert.Equal(report.Lines, File.ReadAllLines(Path.Combine(_contentRoot, "generated", "conversion-report.txt")));
-        Assert.Equal(["Tiles/Tileset.json: converted 283 tiles."], report.Lines);
+        Assert.Equal("Tiles/Tileset.json: converted 283 tiles.", report.Lines[0]);
+        Assert.Equal(8, report.Lines.Count(line => line.Contains("stale size", StringComparison.Ordinal)));
+        Assert.Equal("Objects/Objects.json: converted 12 objects.", report.Lines[^1]);
     }
 
     [Fact]

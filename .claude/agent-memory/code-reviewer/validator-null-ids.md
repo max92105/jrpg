@@ -9,6 +9,8 @@ System.Text.Json's `RespectNullableAnnotations` does not cover collection elemen
 
 Verified 2026-10-17 in slice 8 (NewGameValidator recruitedMemberIds: loader accepted it, `GameSession.StartNew` threw). Same idiom pre-exists in EncounterCatalogValidator (enemyIds) and PartyMemberCatalogValidator (skillIds).
 
+Seen again in part 2 slice 1c (nested list: `Tiles: [null]` inside a legacy object -> NRE in ObjectConversion.TileGroupSize, while the outer list null was guarded).
+
 Seen again in part 2 slice 1b (dictionary-value variant): the converter reads `Dictionary<string, LegacyTileJson>`; `{ "1": null }` passes the strict reader and `TileConversion` throws a NullReferenceException that `Program` doesn't catch (verified with `dotnet fsi` + reflection on the internal type). Dictionary values are elements too.
 
 **Why:** CLAUDE.md/code-quality rule: validate at boundaries with a message naming the bad field.

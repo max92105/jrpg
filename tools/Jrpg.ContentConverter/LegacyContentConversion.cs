@@ -1,3 +1,4 @@
+using Jrpg.ContentConverter.Objects;
 using Jrpg.ContentConverter.Tiles;
 using Jrpg.Data.Content;
 using Jrpg.Data.Maps;
@@ -22,9 +23,15 @@ internal static class LegacyContentConversion
         TileCatalogValidator.Validate(ContentCatalogLoader.TilesFile, tiles);
         report.AddConverted(TileConversion.SourceFile, $"{tiles.Count} tiles");
 
+        var objects = ObjectConversion.Convert(
+            LegacyFileReader.Read<IReadOnlyList<LegacyObjectJson>>(assetsRoot, ObjectConversion.SourceFile), report);
+        ObjectCatalogValidator.Validate(ContentCatalogLoader.ObjectsFile, objects);
+        report.AddConverted(ObjectConversion.SourceFile, $"{objects.Count} objects");
+
         // Everything is converted and validated before the folder is touched, so a failed run leaves the last good content.
         var generatedRoot = ReplaceGeneratedFolder(contentRoot);
         ContentFileWriter.Write(Path.Combine(contentRoot, ContentCatalogLoader.TilesFile), tiles);
+        ContentFileWriter.Write(Path.Combine(contentRoot, ContentCatalogLoader.ObjectsFile), objects);
         File.WriteAllText(Path.Combine(generatedRoot, ReportFile), string.Concat(report.Lines.Select(line => line + "\r\n")));
         return report;
     }

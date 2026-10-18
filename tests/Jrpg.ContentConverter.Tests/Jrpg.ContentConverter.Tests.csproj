@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <None Include="..\..\Assets\Tiles\*.json" LinkBase="legacy-assets\Tiles" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="..\..\Assets\Objects\*.json" LinkBase="legacy-assets\Objects" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
 using Jrpg.Core.Effects;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Party;
 using Jrpg.Data.Content;
 
@@ -22,6 +23,17 @@ public sealed class ContentCatalogLoaderTests
 
         Assert.Equal(283, catalog.Tiles.Count);
         Assert.True(catalog.Tiles[1].IsWalkable);
+    }
+
+    [Fact]
+    public void Load_RepositoryContent_LoadsGeneratedObjectsWithTileGroupSizes()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        Assert.Equal(12, catalog.Objects.Count);
+        Assert.Equal((4, 4), (catalog.Objects["tree"].Width, catalog.Objects["tree"].Height));
+        Assert.Equal(9, catalog.Objects["tree"].CollisionPolygon.Count);
+        Assert.Equal(new Point2D(0.4, 0.94375), catalog.Objects["tree"].CollisionPolygon[1]);
     }
 
     [Fact]

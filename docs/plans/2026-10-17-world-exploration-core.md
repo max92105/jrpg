@@ -229,13 +229,14 @@ Line counts are estimates of hand-written code plus tests; generated content isn
     - Data: `TileCatalogValidator_Validate_TileIdZero_ThrowsNamingTheField`, `TileCatalogValidator_Validate_DuplicateId_ThrowsNamingTheId`, `ContentCatalogLoader_Load_RepositoryContent_Succeeds` (existing)
   - **Done, with deviations:** `LegacyFileReader` (new) reads legacy PascalCase JSON strictly and names the file and JSON path on errors. The converter converts and validates everything (with `TileCatalogValidator`) before replacing `generated/`, so a failed run keeps the last good content. A tile with a sprite, frames or collision polygon is a conversion error (none exist). `ConversionReport` only has `AddConverted` until 1c. The test project links only `Assets/Tiles/*.json`; 1c and 1d add the rest. `ContentCatalogLoader` owns the `generated/` paths, which the converter reuses.
 
-- [ ] **1c. Object content** (tool + Data, about 220 lines)
+- [x] **1c. Object content** (tool + Data, about 220 lines)
   - **Goal:** `content/generated/objects.json` is generated with snake_case ids and real sizes, and loads and validates.
   - **Tool:** `Objects/PointStringConverter` (`"x,y"`, invariant culture), `Objects/LegacyObjectJson`, `LegacyIds` (`"Chest Opened"` -> `chest_opened`, `"House1"` -> `house_1`, `"Door_Close"` -> `door_close`, `Interior1.json` -> `interior_1`; one rule for every id), `Objects/ObjectConversion` (size from the tile group's bounds; the stale `Width`/`Height` are reported when they differ; two names giving the same id is an error).
   - **Data:** `Maps/ObjectCatalogValidator`: duplicate ids, size >= 1, polygon has 0 or >= 3 points, every point within 0..1. `ContentCatalog` gains `Objects`.
   - **Tests:**
     - Tool: `PointStringConverter_Read_UnderFrenchCulture_ParsesDotAsDecimal` (sets the current culture to fr-FR), `LegacyIds_FromName_MixedSeparatorsAndDigits_ReturnsSnakeCase` (theory over the examples), `ObjectConversion_Convert_StaleSize_UsesTileGroupBoundsAndReports` (the tree: 4×4), `ObjectConversion_Convert_TwoNamesSameId_ThrowsNamingBoth`
     - Data: `ObjectCatalogValidator_Validate_TwoPointPolygon_ThrowsNamingTheObject`, `ObjectCatalogValidator_Validate_PointOutsideUnitSquare_ThrowsNamingTheObject`
+  - **Done, with deviations:** `PointStringConverter` lives at the tool's root, next to `LegacyFileReader`, which registers it for every legacy file; it only reads. `LegacyIds.FromName` takes the source file for its messages and also splits camelCase. An NPC, meta data, an object with no tiles or a null tile is a conversion error (none exist). The report lists the 8 stale sizes. The test project now links `Assets/Objects/*.json`.
 
 - [ ] **1d. Map content** (tool + Data + content, about 300 lines)
   - **Goal:** the three live maps are generated as layouts, their hand-written settings exist, and both load, validate and compose into `ContentCatalog.Maps`. Back maps and events come in 3c.

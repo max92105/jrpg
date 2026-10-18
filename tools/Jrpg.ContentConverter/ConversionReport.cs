@@ -8,4 +8,7 @@ internal sealed class ConversionReport
     public IReadOnlyList<string> Lines => _lines;
 
     public void AddConverted(string sourceFile, string summary) => _lines.Add($"{sourceFile}: converted {summary}.");
+
+    /// <summary>Records legacy data the conversion corrected, so the developer can check the result.</summary>
+    public void AddChanged(string sourceFile, string change) => _lines.Add($"{sourceFile}: changed {change}.");
 }

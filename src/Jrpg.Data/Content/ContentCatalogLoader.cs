@@ -27,6 +27,7 @@ public static class ContentCatalogLoader
     /// <summary>The folder the content converter owns and rewrites on every run (ADR 0005).</summary>
     internal const string GeneratedFolder = "generated";
     internal const string TilesFile = GeneratedFolder + "/tiles.json";
+    internal const string ObjectsFile = GeneratedFolder + "/objects.json";
 
     /// <summary>Loads and validates every content file under <paramref name="contentRoot"/>, referenced files first.</summary>
     /// <exception cref="ContentValidationException">A file is malformed or breaks a content rule.</exception>
@@ -50,6 +51,7 @@ public static class ContentCatalogLoader
         var newGame = ReadValidated<NewGameDefinition>(
             contentRoot, NewGameFile, (file, definition) => NewGameValidator.Validate(file, definition, newGameReferences));
         var tiles = ReadValidated<IReadOnlyList<TileDefinition>>(contentRoot, TilesFile, TileCatalogValidator.Validate);
+        var objects = ReadValidated<IReadOnlyList<ObjectDefinition>>(contentRoot, ObjectsFile, ObjectCatalogValidator.Validate);
 
         return new ContentCatalog
         {
@@ -60,6 +62,7 @@ public static class ContentCatalogLoader
             Enemies = enemies.ToFrozenDictionary(enemy => enemy.Id),
             Encounters = encounters.ToFrozenDictionary(encounter => encounter.Id),
             Tiles = tiles.ToFrozenDictionary(tile => tile.Id),
+            Objects = objects.ToFrozenDictionary(definition => definition.Id),
             Rules = rules,
             NewGame = newGame,
         };

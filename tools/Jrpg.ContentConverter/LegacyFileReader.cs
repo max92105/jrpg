@@ -40,6 +40,7 @@ internal static class LegacyFileReader
             UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
             AllowDuplicateProperties = false,
         };
+        options.Converters.Add(new PointStringConverter());
 
         // Shared static instance: read-only so it isn't static mutable state.
         options.MakeReadOnly(populateMissingResolver: true);

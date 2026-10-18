@@ -10,7 +10,7 @@ namespace Jrpg.Game.Flow;
 /// Owns the screens and the one playthrough (ADR 0008). Its update never touches the graphics device, so it can run
 /// headless in tests; drawing is separate.
 /// </summary>
-internal sealed class GameFlow
+internal sealed class GameFlow : IScene
 {
     private readonly SceneStack _scenes = new();
 

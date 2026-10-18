@@ -1,23 +1,56 @@
 using System.Diagnostics;
-using Jrpg.Core.Content;
 using Jrpg.Data.Content;
+using Jrpg.Data.Messages;
 using Jrpg.Game;
 using Jrpg.Game.Flow;
+using Jrpg.Game.Rendering;
+using Jrpg.Game.Scenes;
+using Jrpg.Game.Ui;
 
-ContentCatalog catalog;
+string contentRoot;
+UiMessages messages;
+FontLibrary fonts;
 try
 {
-    catalog = ContentCatalogLoader.Load(ContentRootLocator.Find(args, typeof(JrpgGame).Assembly));
+    contentRoot = ContentRootLocator.Find(args, typeof(JrpgGame).Assembly);
+    messages = new UiMessages(UiMessageLoader.Load(contentRoot));
+    fonts = FontLibrary.Load(contentRoot);
 }
-catch (Exception exception) when (exception is ContentValidationException or IOException or UnauthorizedAccessException or ArgumentException)
+catch (Exception exception) when (IsStartupProblem(exception))
 {
-    // No text can be drawn yet (slice 1c), so the reason goes where a developer sees it: the console and the debug output.
-    var message = $"The game can't start: {exception.Message}";
-    Console.Error.WriteLine(message);
-    Debug.WriteLine(message);
+    // Without the message table and a font nothing can be drawn, so the reason goes only where a developer sees it.
+    Report($"The game can't start: {exception.Message}");
     return 1;
 }
 
-using var game = new JrpgGame(new GameFlow(catalog));
-game.Run();
+using (fonts)
+{
+    using var game = new JrpgGame(FirstScene(contentRoot, messages, fonts));
+    game.Run();
+}
+
 return 0;
+
+// A new game, or the reason it can't start, shown on screen as well as logged.
+static IScene FirstScene(string contentRoot, UiMessages messages, FontLibrary fonts)
+{
+    try
+    {
+        return new GameFlow(ContentCatalogLoader.Load(contentRoot));
+    }
+    catch (Exception exception) when (IsStartupProblem(exception))
+    {
+        var message = messages.Format(MessageIds.StartupFailed, new MessageArgument("reason", exception.Message));
+        Report(message);
+        return new StartupErrorScene(message, fonts);
+    }
+}
+
+static bool IsStartupProblem(Exception exception) =>
+    exception is ContentValidationException or IOException or UnauthorizedAccessException or ArgumentException;
+
+static void Report(string message)
+{
+    Console.Error.WriteLine(message);
+    Debug.WriteLine(message);
+}

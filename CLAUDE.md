@@ -34,7 +34,7 @@ Dependency direction: Game → Data → Core; Editor → Data → Core. Never th
 - Test: `dotnet test --solution Jrpg.slnx`
 - Format check: `dotnet format Jrpg.slnx --verify-no-changes`
 - Format fix: `dotnet format Jrpg.slnx`
-- Run game: `dotnet run --project src/Jrpg.Game` (Debug reads the repository's `content/` directly, so content edits show on the next start without rebuilding; `-- --content <folder>` reads another folder). A broken content file stops the start with the file named in the console and the Visual Studio Output window. A Release build only finds content when published (`dotnet publish`) or given `--content`.
+- Run game: `dotnet run --project src/Jrpg.Game` (Debug reads the repository's `content/` directly, so content edits show on the next start without rebuilding; `-- --content <folder>` reads another folder). A broken content file stops the start with the file named on screen, in the console and in the Visual Studio Output window (only the console and Output window if the message table or fonts are what's broken). A Release build only finds content when published (`dotnet publish`) or given `--content`.
 - Visual Studio: F5 starts `Jrpg.Game`, the default startup project (`DefaultStartup` in `Jrpg.slnx`). If a fresh clone starts another project, right-click `Jrpg.Game` > Set as Startup Project.
 - Regenerate map content after editing in the legacy MapEditor: `dotnet run --project tools/Jrpg.ContentConverter -- Assets content` (rewrites `content/generated/` only; read `content/generated/conversion-report.txt`). Tests pin the converted counts (e.g. 283 tiles), so adding a tile or object in the MapEditor fails them on purpose: update the count in the same commit.
 

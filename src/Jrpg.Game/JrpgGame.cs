@@ -1,13 +1,13 @@
-using Jrpg.Game.Flow;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
+using Jrpg.Game.Scenes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 namespace Jrpg.Game;
 
-/// <summary>The MonoGame host: steps the game flow at a fixed rate and shows the virtual screen fitted to the window.</summary>
+/// <summary>The MonoGame host: steps the game at a fixed rate and shows the virtual screen fitted to the window.</summary>
 internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
 {
     private static readonly TimeSpan _simulationStep = TimeSpan.FromTicks(TimeSpan.TicksPerSecond / 60);
@@ -16,14 +16,14 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     private const int StartingWindowWidth = VirtualScreen.Width * 2 / 3;
     private const int StartingWindowHeight = VirtualScreen.Height * 2 / 3;
 
-    private readonly GameFlow _flow;
+    private readonly IScene _rootScene;
     private readonly InputReader _input = new();
     private SpriteBatch? _batch;
     private RenderTarget2D? _virtualScreen;
 
-    public JrpgGame(GameFlow flow)
+    public JrpgGame(IScene rootScene)
     {
-        _flow = flow;
+        _rootScene = rootScene;
 
         // The constructor registers the manager in Services; Game finds it there, uses it, and disposes it.
         _ = new GraphicsDeviceManager(this)
@@ -46,7 +46,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     {
         // No dead zone from MonoGame: StickReader applies the game's own.
         var input = _input.Read(Keyboard.GetState(), GamePad.GetState(PlayerIndex.One, GamePadDeadZone.None));
-        _flow.Update(gameTime.ElapsedGameTime, input);
+        _rootScene.Update(gameTime.ElapsedGameTime, input);
         base.Update(gameTime);
     }
 
@@ -56,7 +56,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
         GraphicsDevice.SetRenderTarget(_virtualScreen);
         GraphicsDevice.Clear(Color.Black);
         batch.Begin(samplerState: SamplerState.PointClamp);
-        _flow.Draw(batch);
+        _rootScene.Draw(batch);
         batch.End();
 
         GraphicsDevice.SetRenderTarget(null);

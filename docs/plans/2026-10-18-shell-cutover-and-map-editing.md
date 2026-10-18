@@ -211,13 +211,22 @@ Sizes are estimates of hand-written code plus tests; moved files, generated cont
 
 - [x] **ADR 0010: Player-facing text** (before 1c). Options: (A) strings in Game code; (B) one message table `content/text/ui.json` (id -> text with named placeholders like `{item}`) loaded by Data, ids as constants in `Ui/MessageIds`; (C) one file per screen. Recommendation: **B** (CLAUDE.md: no player-facing text in C#; ready for localization). Save repair notes become structured records worded by the Game (part 3b, question 63).
 
-- [ ] **1c. Text on screen** (Data + Game + content, about 250 lines)
+- [x] **1c. Text on screen** (Data + Game + content, about 250 lines)
   - **Goal:** the game draws crisp text from the message table, and startup errors (content, art) are shown on screen from here on, as well as logged.
   - **Package:** `FontStashSharp.MonoGame` (decision 46).
   - **Data:** `Messages/UiMessageLoader` (public static): `IReadOnlyDictionary<string, string> Load(string contentRoot)` reads `content/text/ui.json`; fails naming the id for an empty text or an unbalanced `{`.
   - **Game:** `Rendering/FontLibrary` (loads `{content}/art/fonts/` directly: fonts are new files, so the transitional `Assets/` art root never applies to them), `Ui/MessageArgument` (`readonly record struct MessageArgument(string Name, string Value)`), `Ui/UiMessages` (`string Text(string id)`, `string Format(string id, params ReadOnlySpan<MessageArgument> arguments)`; unknown id or missing placeholder throws), `Ui/MessageIds`. Formatted strings are built when state changes, never per frame. A startup error screen shows the exception message.
   - **Content:** `content/text/ui.json`; one OFL font with its license file in `content/art/fonts/`.
   - **Tests:** Data `UiMessageLoader_Load_EmptyText_ThrowsNamingTheId`, `UiMessageLoader_Load_UnbalancedBrace_ThrowsNamingTheId`, `UiMessageLoader_Load_RepositoryContent_Succeeds`. Game `UiMessages_Format_NamedPlaceholder_IsReplaced`, `UiMessages_Format_MissingArgument_Throws`, `UiMessages_Text_UnknownId_Throws`, `MessageIds_EveryConstant_ExistsInRepositoryContent` (reflects over `MessageIds`).
+  - **Done, with deviations:**
+    - **Package and font:** `FontStashSharp.MonoGame` 1.6.2 is Zlib-licensed, not MIT. The font is Lato Regular (SIL OFL, from google/fonts), a placeholder until the developer picks one.
+    - **Fonts:** `FontLibrary` loads every `.ttf` in `art/fonts/` in name order (first = main font), so no file name is in code; a file that isn't a font fails naming it.
+    - **Startup:**
+      - The message table and fonts load first; if either fails, the reason goes to the console only (exit 1), since nothing can be drawn.
+      - A content failure shows `Scenes/StartupErrorScene` and is logged. Art errors wait for `ArtReferenceCheck`.
+      - `JrpgGame` runs an `IScene`: `GameFlow` implements it, so the host runs the flow or the error scene.
+    - **Message ids:** they use underscores like other content ids (`startup_failed`).
+    - **Follow-up (decision 48):** the host point-samples the virtual screen into a smaller window, so text aliases at the 2/3 starting size.
 
 ### Phase 2: render data through the converter
 The developer still edits maps in the legacy MapEditor (ADR 0005), so render data is converted like the rest and regenerated on every run.

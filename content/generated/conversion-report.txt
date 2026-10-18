@@ -8,6 +8,6 @@ Objects/Objects.json: changed object 'House5': stale size 1x1 replaced by its ti
 Objects/Objects.json: changed object 'Tree2': stale size 1x1 replaced by its tile group's 4x5.
 Objects/Objects.json: changed object 'Tree3': stale size 1x1 replaced by its tile group's 4x5.
 Objects/Objects.json: converted 12 objects.
-Maps/Forest.json: converted map 'forest' (30x17, 1 layers, 0 objects).
-Maps/Interior1.json: converted map 'interior_1' (15x20, 2 layers, 0 objects).
-Maps/start.json: converted map 'start' (45x45, 2 layers, 55 objects).
+Maps/Forest.json: converted map 'forest' (30x17, 1 layers, 0 objects, 0 object events, 0 cell events).
+Maps/Interior1.json: converted map 'interior_1' (15x20, 2 layers, 0 objects, 0 object events, 2 cell events).
+Maps/start.json: converted map 'start' (45x45, 2 layers, 55 objects, 3 object events, 2 cell events).

@@ -57,7 +57,7 @@ internal static class LegacyContentConversion
         return report;
     }
 
-    /// <summary>Converts the live maps; the older ones in <c>Maps/Back/</c> come in slice 3c.</summary>
+    /// <summary>Converts the live maps. The older ones in <c>Maps/Back/</c> use their own tile set and aren't converted (developer, slice 3c).</summary>
     private static List<MapLayout> ConvertMaps(
         string assetsRoot, IReadOnlyDictionary<int, string> objectIdsByLegacyId, ConversionReport report)
     {
@@ -68,13 +68,17 @@ internal static class LegacyContentConversion
         var maps = new List<MapLayout>();
         foreach (var sourceFile in sourceFiles)
         {
-            var map = MapConversion.Convert(sourceFile, LegacyFileReader.Read<LegacyMapJson>(assetsRoot, sourceFile), objectIdsByLegacyId);
+            var context = new MapConversionContext(sourceFile, objectIdsByLegacyId, report);
+            var map = MapConversion.Convert(LegacyFileReader.Read<LegacyMapJson>(assetsRoot, sourceFile), context);
             if (!sourceFilesById.TryAdd(map.Id, sourceFile))
             {
                 throw new ConversionException($"{sourceFilesById[map.Id]} and {sourceFile} both become map id '{map.Id}'.");
             }
 
-            report.AddConverted(sourceFile, $"map '{map.Id}' ({map.Width}x{map.Height}, {map.Layers.Count} layers, {map.Objects.Count} objects)");
+            var objectEventCount = map.Objects.Sum(placed => placed.Events.Count);
+            report.AddConverted(
+                sourceFile,
+                $"map '{map.Id}' ({map.Width}x{map.Height}, {map.Layers.Count} layers, {map.Objects.Count} objects, {objectEventCount} object events, {map.CellEvents.Count} cell events)");
             maps.Add(map);
         }
 

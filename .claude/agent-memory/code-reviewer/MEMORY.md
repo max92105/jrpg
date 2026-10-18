@@ -4,3 +4,4 @@
 - [Validator null ids](validator-null-ids.md) — null list elements AND dictionary values pass strict STJ; check null entries first (seen slices 8, 1b, 1c; nested lists too)
 - [Namespace cycles](namespace-cycles.md) — grep reverse usings for each new Core using; Content is the hub (Content<->Session seen in slice 8)
 - [Last review](last-review.md) — slice, round and finding status of the latest review; read first to apply re-review rules
+- [Format check line endings](format-check-line-endings.md) — run format unpiped; new LF-only files fail ENDOFLINE despite "format clean" hand-offs

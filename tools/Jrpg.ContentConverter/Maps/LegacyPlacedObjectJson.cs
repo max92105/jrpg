@@ -1,4 +1,5 @@
 using System.Text.Json;
+using Jrpg.ContentConverter.Events;
 
 namespace Jrpg.ContentConverter.Maps;
 
@@ -18,12 +19,12 @@ internal sealed record LegacyPlacedObjectJson
 
     public required IReadOnlyDictionary<string, int> ZOverrides { get; init; }
 
-    /// <summary>Missing on maps saved before uids existed (the Back maps, slice 3c).</summary>
+    /// <summary>Missing on maps saved before uids existed, which the converter rejects.</summary>
     public string? Uid { get; init; }
 
-    // TODO(plan 2026-10-17-world-exploration-core, slice 3c): convert object events, and the old single event.
-    public JsonElement? Events { get; init; }
+    public IReadOnlyList<LegacyMapEventJson> Events { get; init; } = [];
 
+    /// <summary>The single event of maps saved before objects had several; no live map has one, so it's rejected.</summary>
     public JsonElement? Event { get; init; }
 
     /// <summary>A computed property the legacy serializer wrote by accident; never read.</summary>

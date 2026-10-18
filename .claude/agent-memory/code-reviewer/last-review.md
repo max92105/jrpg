@@ -5,14 +5,14 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-17-world-exploration-core.md, 3b (event content loading)
+Slice: docs/plans/2026-10-17-world-exploration-core.md, 3c (event conversion; Back maps dropped by developer)
 Round: 1 (verdict: Fix the Criticals, then commit)
 
-Accepted choices (don't re-raise): swap-in-cell-event checked in the cell path (no flag arg); only null *entries* checked (strict reading rejects null lists); converter needs content/items.json (tests copy it); MapFolderReader.Read takes 4 params instead of MapReferences; MapReferences carries whole layouts, not just sizes.
+Accepted choices (don't re-raise): Back maps dropped (no BackMapConversion, back_* settings, Back tests); Dialogue triggers converted though no live map has one (ADR 0005 editing); Battle skipped+reported, Item trigger and old "event" field are errors; event ids keep legacy index when an earlier one is skipped; two converted triggers on one cell = error; empty prompt -> "Check"; MapConversionContext in root namespace; test names ConvertTileTriggers_/ConvertObjectEvents_ instead of plan's EventConversion_Convert_ (developer to note).
 
-- open (Critical): MapFolderReader.ValidateMap reads the settings file and builds the MapDefinition; name hides I/O + construction; rename e.g. ReadValidatedMap / CompleteMap
-- open (Suggestion): converter ReadItemIds with no items.json -> uncaught FileNotFoundException stack trace (Program.cs only catches ConversionException/ContentValidationException)
-- open (Suggestion): ContentFileWriterTests round-trip never asserts Speaker survives (only Lines); also combined "steps or dialogue lines" null message
-- open (Suggestion): slice note: test names differ from plan (FindProblem_..._Names... vs MapEventValidator_Validate_..._Throws...), MapReferences holds layouts not sizes; tick 3b
-- follow-up: two cell events on the same cell are not rejected (which one fires in 3d?)
-- follow-up: ContentFileReader's NotSupportedException catch also relabels programmer errors (Core type STJ can't build) as content errors
+- open (Critical): dotnet format --verify-no-changes fails (exit 2, ENDOFLINE): EventConversion.cs and EventConversionTests.cs are LF-only; run dotnet format Jrpg.slnx
+- open (Warning): GridCell.Center (computed) is written into generated content for every cell event and warp cell; ignored on read, stale if hand-edited; skip read-only props in ContentJsonOptions modifier
+- open (Suggestion): EventConversion.NewObjectId is a noun; ToNewObjectId / FindNewObjectId
+- open (Suggestion): LegacyMapEventJson.Activation binds legacy JSON to Core EventActivation member names, unlike the Legacy*Type enums for actions/triggers
+- open (Suggestion): object-action Portrait mapping untested (only trigger PortraitPath is)
+- follow-up: two id-0 tiles with triggers on the same cell/z would report "triggers on two layers" (wrong wording)

@@ -110,7 +110,7 @@ Nothing lower points back up: `Content` never references `Exploration` (so `Expl
 |---|---|---|---|
 | `content/generated/tiles.json` | converter | 283 tiles (`id`, `isWalkable`) | 1b |
 | `content/generated/objects.json` | converter | 12 objects (snake_case ids, size, polygon) | 1c |
-| `content/generated/maps/{id}.json` | converter | `start`, `interior_1`, `forest`, `back_start`, `back_start2`, `back_test` layouts | 1d, 3c |
+| `content/generated/maps/{id}.json` | converter | `start`, `interior_1`, `forest` layouts (Back maps dropped, decision 39) | 1d, 3c |
 | `content/generated/conversion-report.txt` | converter | what was skipped or changed, by file and object/cell | 1b onwards |
 | `content/maps/{id}.json` | hand | display name, random encounters | 1d, 4b |
 | `content/rules.json` | hand | gains `exploration` | 2, 3d |
@@ -310,7 +310,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
     - `MapEventValidator_Validate_InteractEventWithoutPrompt_ThrowsNamingTheEvent`
   - **Done, with deviations:** `MapEventValidator.FindProblem` returns the problem and `MapLayoutValidator` throws, so its tests are `MapEventValidator_FindProblem_..._Names...`. `MapReferences` holds every map's layout (not just sizes); `MapFolderReader.Read` takes the tile ids, objects and item ids and reads all layouts before validating any. `Speech`'s speaker and portrait became optional trailing constructor parameters, so content can leave them out. `ContentFileReader` also translates `NotSupportedException` (a step without `type`). The converter checks event items against `content/items.json` and fails with a named error without it. Follow-up for 3d: nothing rejects two cell events on the same cell.
 
-- [ ] **3c. Event conversion and backup maps** (tool + content, about 300 lines)
+- [x] **3c. Event conversion and backup maps** (tool + content, about 300 lines)
   - **Goal:** the chest, the door and the warp tiles are in the generated maps as events, and the Back maps are converted where the plan can express them, with a report for the rest.
   - **Tool:**
     - `Events/LegacyMapEventJson`, `Events/LegacyEventActionJson`, `Events/LegacyTriggerJson` DTOs. `Events/EventConversion`: flat actions -> typed steps (int object ids and map file names -> new ids; warp targets resolve relative to the map's own folder); event ids `{uid}_{index}` and `cell_{x}_{y}`; `Warp` and `Dialogue` triggers -> touch `CellEvent`s; `Battle` actions/triggers skipped and reported (decision 39); the single legacy `event` field and `Item` triggers are errors naming the file (no data has them). Empty prompts become `"Check"` (the legacy display default, now content).
@@ -326,6 +326,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
     - `BackMapConversion_Convert_ObjectWithoutUid_DerivesLegacyUid`
     - `BackMapConversion_Convert_TileWithoutZ_GoesToLayerZero`
     - `LegacyContentConversion_Convert_RepositoryAssets_ChestGivesPotionOnce` (the chest on `start`: one `giveItem` of `potion`, then a swap to `chest_opened`, `isOnce` true)
+  - **Done, with deviations:** the Back maps are dropped (decision 39, developer): no `BackMapConversion`, no `back_*` settings, no Back tests. Dialogue triggers are still converted because the legacy MapEditor can add them (ADR 0005). Two triggers on one cell are a conversion error, so generated maps never hold two cell events on a cell (3b follow-up). Conversion takes a `MapConversionContext` (source file, object ids, report); legacy activations have their own enum. Data's `ComputedPropertyFilter` keeps computed properties such as `GridCell.Center` out of written content.
 
 - [ ] **3d. Interaction and touch** (Core + rules content, about 300 lines)
   - **Goal:** pressing interact in front of the chest starts its event, walking onto a warp cell or into the open door starts theirs, and nothing fires twice by accident.
@@ -468,7 +469,7 @@ Numbering continues from part 1 (1-25; decision 25 is now decided there: menu it
 36. **Intro cutscene:** stays a test hook; cutscenes move to part 3.
 37. **Movement:** parameters are named and live in `rules.json`; movement is tight on a joystick and works with controller and keyboard/mouse. `MoveIntent` is an analog vector (0..1) with diagonals normalized. Deadzone in part 3's input settings; acceleration only if needed.
 38. **Touch events that don't warp:** re-arm only after the player stops.
-39. **Back maps:** converted where feasible (tiles, objects, dialogue); what the plan can't express (`Battle`) is skipped and reported by file and object/cell. `Custom Map.json` is an older copy of `Back/start.json` and is skipped.
+39. **Back maps:** dropped (developer, slice 3c). `Back/start`, `start2` and `Custom Map` embed their own tile set, so their tile ids show the wrong art and walkability with today's tiles; `Test.json` is a scratch map without events. They stay in `Assets/` unconverted. Battle actions and triggers in live maps are skipped and reported.
 40. **Saves after content changes:** drop what isn't valid anymore, keep the rest, keep it clean. Not a strict refusal.
 41. **Tool project:** `tools/Jrpg.ContentConverter` is approved. No NuGet package is needed.
 42. **Map source of truth until part 4:** the developer keeps editing maps in the legacy MapEditor. `Assets/` stays the source of map geometry, the converter stays re-runnable and only overwrites its own generated files, and hand-written map settings live where it never writes (ADR 0005).

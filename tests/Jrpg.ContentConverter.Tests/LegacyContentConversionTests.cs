@@ -1,3 +1,4 @@
+using Jrpg.Core.Events;
 using Jrpg.Data.Content;
 
 namespace Jrpg.ContentConverter.Tests;
@@ -24,7 +25,7 @@ public sealed class LegacyContentConversionTests : IDisposable
         Assert.Equal("Tiles/Tileset.json: converted 283 tiles.", report.Lines[0]);
         Assert.Equal(8, report.Lines.Count(line => line.Contains("stale size", StringComparison.Ordinal)));
         Assert.Contains("Objects/Objects.json: converted 12 objects.", report.Lines);
-        Assert.Equal("Maps/start.json: converted map 'start' (45x45, 2 layers, 55 objects).", report.Lines[^1]);
+        Assert.Equal("Maps/start.json: converted map 'start' (45x45, 2 layers, 55 objects, 3 object events, 2 cell events).", report.Lines[^1]);
     }
 
     [Fact]
@@ -36,6 +37,19 @@ public sealed class LegacyContentConversionTests : IDisposable
         var catalog = ContentCatalogLoader.Load(_contentRoot);
 
         Assert.Equal(["forest", "interior_1", "start"], catalog.Maps.Keys.Order(StringComparer.Ordinal));
+    }
+
+    [Fact]
+    public void Convert_RepositoryAssets_ChestGivesPotionOnce()
+    {
+        CopyFolder(TestPaths.RepositoryContent, _contentRoot);
+
+        LegacyContentConversion.Convert(TestPaths.LegacyAssets, _contentRoot);
+        var chest = ContentCatalogLoader.Load(_contentRoot).Maps["start"].Layout.Objects.Single(placed => placed.ObjectId == "chest");
+
+        var openChest = Assert.Single(chest.Events);
+        Assert.True(openChest.IsOnce);
+        Assert.Equal([new GiveItemStep("potion", 1), new SwapObjectStep("chest_opened")], openChest.Steps);
     }
 
     [Fact]

@@ -4727,7 +4727,26 @@
         "x": 19.002765098157166,
         "y": 20.052608719946424
       },
-      "events": []
+      "events": [
+        {
+          "id": "0bff6243_0",
+          "activation": "interact",
+          "prompt": "Open",
+          "isOnce": true,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "giveItem",
+              "itemId": "potion",
+              "quantity": 1
+            },
+            {
+              "type": "swapObject",
+              "objectId": "chest_opened"
+            }
+          ]
+        }
+      ]
     },
     {
       "uid": "e5ab86b9",
@@ -4736,8 +4755,86 @@
         "x": 5.362180401359314,
         "y": 13.14202386985441
       },
-      "events": []
+      "events": [
+        {
+          "id": "e5ab86b9_0",
+          "activation": "interact",
+          "prompt": "Open",
+          "isOnce": false,
+          "onlyWhenObjectId": "door_close",
+          "steps": [
+            {
+              "type": "swapObject",
+              "objectId": "door_open"
+            }
+          ]
+        },
+        {
+          "id": "e5ab86b9_1",
+          "activation": "touch",
+          "prompt": "Enter",
+          "isOnce": false,
+          "onlyWhenObjectId": "door_open",
+          "steps": [
+            {
+              "type": "warp",
+              "mapId": "interior_1",
+              "cell": {
+                "x": 0,
+                "y": 0
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
-  "cellEvents": []
+  "cellEvents": [
+    {
+      "cell": {
+        "x": 0,
+        "y": 14
+      },
+      "event": {
+        "id": "cell_0_14",
+        "activation": "touch",
+        "prompt": null,
+        "isOnce": false,
+        "onlyWhenObjectId": null,
+        "steps": [
+          {
+            "type": "warp",
+            "mapId": "forest",
+            "cell": {
+              "x": 1,
+              "y": 1
+            }
+          }
+        ]
+      }
+    },
+    {
+      "cell": {
+        "x": 0,
+        "y": 15
+      },
+      "event": {
+        "id": "cell_0_15",
+        "activation": "touch",
+        "prompt": null,
+        "isOnce": false,
+        "onlyWhenObjectId": null,
+        "steps": [
+          {
+            "type": "warp",
+            "mapId": "forest",
+            "cell": {
+              "x": 1,
+              "y": 1
+            }
+          }
+        ]
+      }
+    }
+  ]
 }

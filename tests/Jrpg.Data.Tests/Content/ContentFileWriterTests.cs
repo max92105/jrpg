@@ -46,6 +46,14 @@ public sealed class ContentFileWriterTests : IDisposable
     }
 
     [Fact]
+    public void Write_GridCell_LeavesOutTheComputedCenter()
+    {
+        ContentFileWriter.Write(_path, new GridCell(2, 3));
+
+        Assert.Equal("{\r\n  \"x\": 2,\r\n  \"y\": 3\r\n}\r\n", File.ReadAllText(_path));
+    }
+
+    [Fact]
     public void Write_TileList_UsesCamelCaseCrlfAndFinalNewline()
     {
         IReadOnlyList<TileDefinition> tiles = [new() { Id = 1, IsWalkable = true }];

@@ -43,6 +43,7 @@ internal static class LegacyFileReader
             AllowDuplicateProperties = false,
         };
         options.Converters.Add(new PointStringConverter());
+        options.Converters.Add(new JsonStringEnumConverter(namingPolicy: null, allowIntegerValues: false));
 
         // Shared static instance: read-only so it isn't static mutable state.
         options.MakeReadOnly(populateMissingResolver: true);

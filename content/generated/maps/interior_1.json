@@ -693,5 +693,52 @@
     }
   ],
   "objects": [],
-  "cellEvents": []
+  "cellEvents": [
+    {
+      "cell": {
+        "x": 6,
+        "y": 19
+      },
+      "event": {
+        "id": "cell_6_19",
+        "activation": "touch",
+        "prompt": null,
+        "isOnce": false,
+        "onlyWhenObjectId": null,
+        "steps": [
+          {
+            "type": "warp",
+            "mapId": "start",
+            "cell": {
+              "x": 5,
+              "y": 5
+            }
+          }
+        ]
+      }
+    },
+    {
+      "cell": {
+        "x": 7,
+        "y": 19
+      },
+      "event": {
+        "id": "cell_7_19",
+        "activation": "touch",
+        "prompt": null,
+        "isOnce": false,
+        "onlyWhenObjectId": null,
+        "steps": [
+          {
+            "type": "warp",
+            "mapId": "start",
+            "cell": {
+              "x": 5,
+              "y": 5
+            }
+          }
+        ]
+      }
+    }
+  ]
 }

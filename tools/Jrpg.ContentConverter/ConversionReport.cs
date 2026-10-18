@@ -11,4 +11,7 @@ internal sealed class ConversionReport
 
     /// <summary>Records legacy data the conversion corrected, so the developer can check the result.</summary>
     public void AddChanged(string sourceFile, string change) => _lines.Add($"{sourceFile}: changed {change}.");
+
+    /// <summary>Records legacy content the new schema can't express yet, so it isn't lost silently.</summary>
+    public void AddSkipped(string sourceFile, string content) => _lines.Add($"{sourceFile}: skipped {content}.");
 }

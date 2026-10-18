@@ -53,6 +53,18 @@ public sealed class LegacyContentConversionTests : IDisposable
     }
 
     [Fact]
+    public void Convert_RepositoryAssets_TreeHasOneCanopyZone()
+    {
+        CopyFolder(TestPaths.RepositoryContent, _contentRoot);
+
+        LegacyContentConversion.Convert(TestPaths.LegacyAssets, _contentRoot);
+        var tree = ContentCatalogLoader.Load(_contentRoot).Objects["tree"];
+
+        Assert.Single(tree.AbovePlayerZones);
+        Assert.Equal(16, tree.Tiles.Count);
+    }
+
+    [Fact]
     public void Convert_ContentFolderWithoutItems_ThrowsNamingTheFile()
     {
         File.Delete(Path.Combine(_contentRoot, "items.json"));

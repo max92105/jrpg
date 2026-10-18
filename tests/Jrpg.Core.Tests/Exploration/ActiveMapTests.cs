@@ -14,6 +14,9 @@ public sealed class ActiveMapTests
         Width = 1,
         Height = 1,
         CollisionPolygon = [new(0, 0), new(1, 0), new(1, 1), new(0, 1)],
+        Category = "test",
+        Tiles = [],
+        AbovePlayerZones = [],
     };
 
     private static readonly ObjectDefinition _openDoor = _closedDoor with { Id = "door_open", CollisionPolygon = [] };

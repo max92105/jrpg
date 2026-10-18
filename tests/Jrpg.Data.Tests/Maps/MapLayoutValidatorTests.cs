@@ -14,7 +14,7 @@ public sealed class MapLayoutValidatorTests
         TileIds: new HashSet<int> { 1, 2 },
         Objects: new Dictionary<string, ObjectDefinition>
         {
-            ["tree"] = new() { Id = "tree", Width = 4, Height = 4, CollisionPolygon = [] },
+            ["tree"] = new() { Id = "tree", Width = 4, Height = 4, CollisionPolygon = [], Category = "General", Tiles = [new ObjectTile(0, 0, 1)], AbovePlayerZones = [] },
         },
         ItemIds: new HashSet<string>(),
         EncounterIds: new HashSet<string>()),

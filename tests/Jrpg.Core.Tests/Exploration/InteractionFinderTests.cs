@@ -11,7 +11,7 @@ namespace Jrpg.Core.Tests.Exploration;
 public sealed class InteractionFinderTests
 {
     private static readonly ExplorationRules _rules = new() { WalkSpeed = 3, PlayerRadius = 0.1, InteractReach = 0.6 };
-    private static readonly ObjectDefinition _chest = new() { Id = "chest", Width = 1, Height = 1, CollisionPolygon = [] };
+    private static readonly ObjectDefinition _chest = new() { Id = "chest", Width = 1, Height = 1, CollisionPolygon = [], Category = "test", Tiles = [], AbovePlayerZones = [] };
     private static readonly DialogueStep _look = new(new Speech(["A chest."]));
 
     // The player stands below the cell (2, 1) and faces up, so the probe lands at (2.5, 1.9).

@@ -8,7 +8,7 @@ namespace Jrpg.Data.Tests.Maps;
 
 public sealed class MapEventValidatorTests
 {
-    private static readonly ObjectDefinition _chestDefinition = new() { Id = "chest", Width = 1, Height = 1, CollisionPolygon = [] };
+    private static readonly ObjectDefinition _chestDefinition = new() { Id = "chest", Width = 1, Height = 1, CollisionPolygon = [], Category = "test", Tiles = [], AbovePlayerZones = [] };
 
     private static readonly MapLayout _cave = new()
     {

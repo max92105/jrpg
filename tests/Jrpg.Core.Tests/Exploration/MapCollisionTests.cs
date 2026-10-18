@@ -16,6 +16,9 @@ public sealed class MapCollisionTests
         Width = 2,
         Height = 2,
         CollisionPolygon = [new(0, 0), new(1, 1), new(0, 1)],
+        Category = "test",
+        Tiles = [],
+        AbovePlayerZones = [],
     };
 
     [Fact]
@@ -59,7 +62,7 @@ public sealed class MapCollisionTests
     [Fact]
     public void CanStandAt_ObjectWithoutPolygon_NeverBlocks()
     {
-        var rug = _rock with { Id = "rug", CollisionPolygon = [] };
+        var rug = _rock with { Id = "rug", CollisionPolygon = [], Category = "test", Tiles = [], AbovePlayerZones = [] };
         var map = new ActiveMapBuilder().WithRows("1111", "1111").WithObject(rug, new Point2D(1, 0)).Build();
 
         var canStand = new MapCollision(map).CanStandAt(new Point2D(1.5, 1.5), Radius);

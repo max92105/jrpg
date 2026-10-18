@@ -51,10 +51,12 @@ public static class ContentCatalogLoader
         var sheetIds = tilesheets.Select(sheet => sheet.Id).ToFrozenSet();
         var tiles = ReadValidated<IReadOnlyList<TileDefinition>>(
             contentRoot, TilesFile, (file, list) => TileCatalogValidator.Validate(file, list, sheetIds));
-        var objects = ReadValidated<IReadOnlyList<ObjectDefinition>>(contentRoot, ObjectsFile, ObjectCatalogValidator.Validate);
+        var tileIds = tiles.Select(tile => tile.Id).ToFrozenSet();
+        var objects = ReadValidated<IReadOnlyList<ObjectDefinition>>(
+            contentRoot, ObjectsFile, (file, list) => ObjectCatalogValidator.Validate(file, list, tileIds));
         var objectsById = objects.ToFrozenDictionary(definition => definition.Id);
         var mapContent = new MapContentReferences(
-            tiles.Select(tile => tile.Id).ToFrozenSet(),
+            tileIds,
             objectsById,
             items.Select(item => item.Id).ToFrozenSet(),
             encounters.Select(encounter => encounter.Id).ToFrozenSet());

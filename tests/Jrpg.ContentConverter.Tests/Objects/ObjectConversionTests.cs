@@ -1,5 +1,6 @@
 using Jrpg.ContentConverter.Objects;
 using Jrpg.Core.Geometry;
+using Jrpg.Core.Maps;
 
 namespace Jrpg.ContentConverter.Tests.Objects;
 
@@ -34,6 +35,41 @@ public sealed class ObjectConversionTests
 
         Assert.Equal(("tree", 4, 4), (converted.Id, converted.Width, converted.Height));
         Assert.Equal(["Objects/Objects.json: changed object 'Tree': stale size 1x1 replaced by its tile group's 4x4."], report.Lines);
+    }
+
+    [Fact]
+    public void Convert_TileGroupNotAtOrigin_ShiftsToOrigin()
+    {
+        var tree = _chest with
+        {
+            Tiles = [new(X: 2, Y: 1, TileId: 2, Z: 0), new(X: 5, Y: 1, TileId: 5, Z: 0), new(X: 3, Y: 4, TileId: 10, Z: 0)],
+        };
+
+        var converted = Assert.Single(ObjectConversion.Convert([tree], new ConversionReport()).Definitions);
+
+        Assert.Equal([new ObjectTile(0, 0, 2), new ObjectTile(3, 0, 5), new ObjectTile(1, 3, 10)], converted.Tiles);
+    }
+
+    [Fact]
+    public void Convert_TileWithZOffset_ThrowsNamingTheObject()
+    {
+        var chest = _chest with { Tiles = [new(X: 0, Y: 0, TileId: 40, Z: 2)] };
+
+        var exception = Assert.Throws<ConversionException>(() => ObjectConversion.Convert([chest], new ConversionReport()));
+
+        Assert.Equal(
+            "Objects/Objects.json: object 'Chest' has tile (0, 0) with Z offset 2, which the converter doesn't support.", exception.Message);
+    }
+
+    [Fact]
+    public void Convert_ZonesAndCategory_CarryOver()
+    {
+        IReadOnlyList<Point2D> canopy = [new Point2D(0, 0), new Point2D(1, 0), new Point2D(0.5, 0.5)];
+
+        var converted = Assert.Single(ObjectConversion.Convert([_chest with { AbovePlayerZones = [canopy] }], new ConversionReport()).Definitions);
+
+        Assert.Equal("Chests", converted.Category);
+        Assert.Equal(canopy, Assert.Single(converted.AbovePlayerZones));
     }
 
     [Fact]

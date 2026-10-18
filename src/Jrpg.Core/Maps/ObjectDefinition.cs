@@ -18,4 +18,16 @@ public sealed record ObjectDefinition
     /// stays right if the object is resized. Empty means the object never blocks.
     /// </summary>
     public required IReadOnlyList<Point2D> CollisionPolygon { get; init; }
+
+    /// <summary>The group the editor's object browser lists it under, such as "House".</summary>
+    public required string Category { get; init; }
+
+    /// <summary>The tiles that draw the object, each on its own cell within <see cref="Width"/> x <see cref="Height"/>.</summary>
+    public required IReadOnlyList<ObjectTile> Tiles { get; init; }
+
+    /// <summary>
+    /// Outlines of the parts drawn over the player, such as a canopy or a roof, in the same 0..1 coordinates as
+    /// <see cref="CollisionPolygon"/>. Empty means the whole object is drawn by depth.
+    /// </summary>
+    public required IReadOnlyList<IReadOnlyList<Point2D>> AbovePlayerZones { get; init; }
 }

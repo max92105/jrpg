@@ -19,7 +19,7 @@ public sealed class ExplorationStateTests
 {
     private static readonly TimeSpan _thirdOfASecond = TimeSpan.FromSeconds(1.0 / 3);
 
-    private static readonly ObjectDefinition _chest = new() { Id = "chest", Width = 1, Height = 1, CollisionPolygon = [] };
+    private static readonly ObjectDefinition _chest = new() { Id = "chest", Width = 1, Height = 1, CollisionPolygon = [], Category = "test", Tiles = [], AbovePlayerZones = [] };
     private static readonly ObjectDefinition _openedChest = _chest with { Id = "chest_opened" };
     private static readonly ObjectDefinition _lever = _chest with { Id = "lever" };
     private static readonly ObjectDefinition _leverPulled = _chest with { Id = "lever_pulled" };

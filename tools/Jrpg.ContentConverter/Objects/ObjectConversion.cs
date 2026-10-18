@@ -4,8 +4,8 @@ namespace Jrpg.ContentConverter.Objects;
 
 /// <summary>
 /// Turns the legacy object list into the object catalog: snake_case ids from the names, and the size from the
-/// tile group, which is what legacy collision and drawing actually used. Tiles, above-player zones and the
-/// category are render or editor data, converted in parts 3 and 4.
+/// tile group, which is what legacy collision and drawing actually used. The tile group moves to start at (0, 0);
+/// the collision polygon and above-player zones are already fractions of the group's bounds, so they carry over.
 /// </summary>
 internal static class ObjectConversion
 {
@@ -46,20 +46,23 @@ internal static class ObjectConversion
 
         RejectUnsupportedFields(legacyObject);
         var id = LegacyIds.FromName(SourceFile, legacyObject.Name);
-        var (width, height) = TileGroupSize(legacyObject);
-        if (width != legacyObject.Width || height != legacyObject.Height)
+        var bounds = TileGroupBounds(legacyObject);
+        if (bounds.Width != legacyObject.Width || bounds.Height != legacyObject.Height)
         {
             report.AddChanged(
                 SourceFile,
-                $"object '{legacyObject.Name}': stale size {legacyObject.Width}x{legacyObject.Height} replaced by its tile group's {width}x{height}");
+                $"object '{legacyObject.Name}': stale size {legacyObject.Width}x{legacyObject.Height} replaced by its tile group's {bounds.Width}x{bounds.Height}");
         }
 
         return new ObjectDefinition
         {
             Id = id,
-            Width = width,
-            Height = height,
+            Width = bounds.Width,
+            Height = bounds.Height,
             CollisionPolygon = legacyObject.CollisionPolygon,
+            Category = legacyObject.Category,
+            Tiles = [.. legacyObject.Tiles.Select(tile => new ObjectTile(tile.X - bounds.Left, tile.Y - bounds.Top, tile.TileId))],
+            AbovePlayerZones = legacyObject.AbovePlayerZones,
         };
     }
 
@@ -78,7 +81,7 @@ internal static class ObjectConversion
     }
 
     /// <summary>The tile group's bounds, as legacy <c>ObjectDefinition.GetTileBounds</c> computed them.</summary>
-    private static (int Width, int Height) TileGroupSize(LegacyObjectJson legacyObject)
+    private static (int Left, int Top, int Width, int Height) TileGroupBounds(LegacyObjectJson legacyObject)
     {
         if (legacyObject.Tiles.Count == 0)
         {
@@ -91,8 +94,16 @@ internal static class ObjectConversion
             throw new ConversionException($"{SourceFile}: object '{legacyObject.Name}' has a null tile.");
         }
 
+        // Every object draws on one layer, which lets the game bake its canopy (plan 3a); a per-tile Z would break that.
+        var offsetTile = legacyObject.Tiles.FirstOrDefault(tile => tile.Z != 0);
+        if (offsetTile is not null)
+        {
+            throw new ConversionException(
+                $"{SourceFile}: object '{legacyObject.Name}' has tile ({offsetTile.X}, {offsetTile.Y}) with Z offset {offsetTile.Z}, which the converter doesn't support.");
+        }
+
         var columns = legacyObject.Tiles.Select(tile => tile.X).ToList();
         var rows = legacyObject.Tiles.Select(tile => tile.Y).ToList();
-        return (columns.Max() - columns.Min() + 1, rows.Max() - rows.Min() + 1);
+        return (columns.Min(), rows.Min(), columns.Max() - columns.Min() + 1, rows.Max() - rows.Min() + 1);
     }
 }

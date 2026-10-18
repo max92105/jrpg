@@ -17,7 +17,7 @@ namespace Jrpg.Core.Tests.Exploration;
 /// </summary>
 public sealed class ExplorationWarpTests
 {
-    private static readonly ObjectDefinition _chest = new() { Id = "chest", Width = 1, Height = 1, CollisionPolygon = [] };
+    private static readonly ObjectDefinition _chest = new() { Id = "chest", Width = 1, Height = 1, CollisionPolygon = [], Category = "test", Tiles = [], AbovePlayerZones = [] };
     private static readonly ObjectDefinition _openedChest = _chest with { Id = "chest_opened" };
     private static readonly ItemDefinition _potion = new ItemDefinitionBuilder().WithId("potion").Build();
     private static readonly DialogueStep _greeting = new(new Speech(["Welcome to the cave."]));

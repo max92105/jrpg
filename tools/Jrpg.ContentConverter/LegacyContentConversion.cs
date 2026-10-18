@@ -26,13 +26,14 @@ internal static class LegacyContentConversion
         var legacyObjects = LegacyFileReader.Read<IReadOnlyList<LegacyObjectJson>>(assetsRoot, ObjectConversion.SourceFile);
         var objects = ObjectConversion.Convert(legacyObjects, report);
         var definitions = objects.Definitions;
-        ObjectCatalogValidator.Validate(ContentCatalogLoader.ObjectsFile, definitions);
+        var tileIds = tiles.Select(tile => tile.Id).ToHashSet();
+        ObjectCatalogValidator.Validate(ContentCatalogLoader.ObjectsFile, definitions, tileIds);
         report.AddConverted(ObjectConversion.SourceFile, $"{definitions.Count} objects");
 
         var maps = ConvertMaps(assetsRoot, objects.IdsByLegacyId, report);
         // Only layouts are checked here; the encounter ids matter for the hand-written settings, which the converter never reads.
         var content = new MapContentReferences(
-            tiles.Select(tile => tile.Id).ToHashSet(),
+            tileIds,
             definitions.ToDictionary(definition => definition.Id),
             ReadItemIds(contentRoot),
             EncounterIds: new HashSet<string>());

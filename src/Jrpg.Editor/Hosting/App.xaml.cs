@@ -11,6 +11,6 @@ internal sealed partial class App : Application
     {
         base.OnStartup(e);
         var contentRoot = ContentRootLocator.Find(e.Args, typeof(App).Assembly);
-        new MainWindow(new MainViewModel(contentRoot)).Show();
+        new Shell.MainWindow(new MainViewModel(contentRoot, Shell.MainWindow.AskToDiscard)).Show();
     }
 }

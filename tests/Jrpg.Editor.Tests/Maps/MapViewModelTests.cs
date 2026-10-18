@@ -2,6 +2,7 @@ using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Maps;
+using Jrpg.Editor.Maps.Editing;
 
 namespace Jrpg.Editor.Tests.Maps;
 
@@ -47,4 +48,61 @@ public sealed class MapViewModelTests
     {
         Assert.Null(_twoLayers.TopTileAt(new GridCell(2, 0)));
     }
+
+    [Fact]
+    public void Do_Edit_RefreshesTheMapAndEnablesUndo()
+    {
+        var viewModel = new MapViewModel(_twoLayers.Map);
+        var changed = new List<string?>();
+        viewModel.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+        viewModel.Do(PaintLeftGround(2));
+
+        Assert.Equal(2, viewModel.Map.Layout.Layers[0].TileIdAt(new GridCell(0, 0)));
+        Assert.True(viewModel.IsDirty);
+        Assert.True(viewModel.UndoCommand.CanExecute(null));
+        Assert.Contains(nameof(MapViewModel.Map), changed);
+        Assert.Contains(nameof(MapViewModel.IsDirty), changed);
+    }
+
+    [Fact]
+    public void UndoCommand_AfterEdit_RestoresTheTileAndClearsUnsavedChanges()
+    {
+        var viewModel = new MapViewModel(_twoLayers.Map);
+        viewModel.Do(PaintLeftGround(2));
+
+        viewModel.UndoCommand.Execute(null);
+
+        Assert.Equal(1, viewModel.Map.Layout.Layers[0].TileIdAt(new GridCell(0, 0)));
+        Assert.False(viewModel.IsDirty);
+        Assert.False(viewModel.UndoCommand.CanExecute(null));
+        Assert.True(viewModel.RedoCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void RedoCommand_AfterUndo_ReappliesTheEdit()
+    {
+        var viewModel = new MapViewModel(_twoLayers.Map);
+        viewModel.Do(PaintLeftGround(2));
+        viewModel.UndoCommand.Execute(null);
+
+        viewModel.RedoCommand.Execute(null);
+
+        Assert.Equal(2, viewModel.Map.Layout.Layers[0].TileIdAt(new GridCell(0, 0)));
+        Assert.True(viewModel.IsDirty);
+        Assert.False(viewModel.RedoCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void MarkSaved_AfterEdit_ClearsUnsavedChanges()
+    {
+        var viewModel = new MapViewModel(_twoLayers.Map);
+        viewModel.Do(PaintLeftGround(2));
+
+        viewModel.MarkSaved();
+
+        Assert.False(viewModel.IsDirty);
+    }
+
+    private static SetTilesEdit PaintLeftGround(int tileId) => new(0, [new TileChange(new GridCell(0, 0), 1, tileId)]);
 }

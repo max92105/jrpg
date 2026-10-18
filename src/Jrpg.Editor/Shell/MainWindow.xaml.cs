@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Jrpg.Editor.Maps;
@@ -24,6 +25,7 @@ internal sealed partial class MainWindow : Window
     private bool _isSpaceHeld;
     private Point? _panFrom;
     private double? _gridZoom;
+    private MapViewModel? _shownMap;
 
     // A newly opened map is fitted to the view, which has no size until the window is laid out.
     private bool _isFitPending = true;
@@ -34,7 +36,17 @@ internal sealed partial class MainWindow : Window
         DataContext = _viewModel = viewModel;
         _drawing = viewModel.Catalog is { } catalog ? new MapDrawing(catalog, viewModel.ArtRoot) : null;
         viewModel.PropertyChanged += OnViewModelChanged;
-        ShowCurrentMap();
+        OpenCurrentMap();
+    }
+
+    /// <summary>The question <see cref="MainViewModel"/> asks before unsaved changes are dropped.</summary>
+    public static bool AskToDiscard(string question) =>
+        MessageBox.Show(question, "Unsaved changes", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
+
+    protected override void OnClosing(CancelEventArgs e)
+    {
+        base.OnClosing(e);
+        e.Cancel = !_viewModel.ConfirmClose();
     }
 
     protected override void OnPreviewKeyDown(KeyEventArgs e)
@@ -56,16 +68,43 @@ internal sealed partial class MainWindow : Window
     {
         if (e.PropertyName == nameof(MainViewModel.CurrentMap))
         {
-            ShowCurrentMap();
+            OpenCurrentMap();
         }
     }
 
-    private void ShowCurrentMap()
+    private void OnOpenMapChanged(object? sender, PropertyChangedEventArgs e)
     {
-        var layout = _viewModel.CurrentMap?.Map.Layout;
-        MapImage.Source = layout is not null && _drawing is not null ? _drawing.Draw(layout) : null;
+        if (e.PropertyName == nameof(MapViewModel.Map))
+        {
+            DrawCurrentMap();
+        }
+    }
+
+    private void OpenCurrentMap()
+    {
+        _shownMap?.PropertyChanged -= OnOpenMapChanged;
+        _shownMap = _viewModel.CurrentMap;
+        _shownMap?.PropertyChanged += OnOpenMapChanged;
+
+        // Kept in step here rather than bound, so a refused switch simply leaves the list on the open map.
+        MapList.SelectedItem = _shownMap?.Map.Id;
         _gridZoom = null;
+        DrawCurrentMap();
         RefitMap();
+    }
+
+    private void DrawCurrentMap()
+    {
+        var layout = _shownMap?.Map.Layout;
+        MapImage.Source = layout is not null && _drawing is not null ? _drawing.Draw(layout) : null;
+    }
+
+    private void OnMapListSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (MapList.SelectedItem is string mapId && !_viewModel.TryOpenMap(mapId))
+        {
+            MapList.SelectedItem = _shownMap?.Map.Id;
+        }
     }
 
     private bool HandleZoomKey(Key key)

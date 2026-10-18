@@ -7,13 +7,27 @@
   <Window.Resources>
     <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
   </Window.Resources>
+  <Window.InputBindings>
+    <KeyBinding Key="Z" Modifiers="Control" Command="{Binding CurrentMap.UndoCommand}" />
+    <KeyBinding Key="Y" Modifiers="Control" Command="{Binding CurrentMap.RedoCommand}" />
+    <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}" />
+  </Window.InputBindings>
   <DockPanel>
     <TextBlock DockPanel.Dock="Top"
                Margin="8"
                Foreground="DarkRed"
                TextWrapping="Wrap"
                Text="{Binding LoadError}" />
+    <TextBlock DockPanel.Dock="Top"
+               Margin="8,0"
+               Foreground="DarkRed"
+               TextWrapping="Wrap"
+               Text="{Binding SaveError, StringFormat=Not saved: {0}, TargetNullValue=''}" />
     <ToolBar DockPanel.Dock="Top">
+      <Button Content="Save (Ctrl+S)" Command="{Binding SaveCommand}" />
+      <Button Content="Undo (Ctrl+Z)" Command="{Binding CurrentMap.UndoCommand}" />
+      <Button Content="Redo (Ctrl+Y)" Command="{Binding CurrentMap.RedoCommand}" />
+      <Separator />
       <CheckBox Content="Grid" IsChecked="{Binding IsGridShown}" />
       <Separator />
       <Button Content="Fit (Ctrl+0)" Click="OnFitClicked" />
@@ -21,12 +35,15 @@
     </ToolBar>
     <StatusBar DockPanel.Dock="Bottom">
       <StatusBarItem Content="{Binding CursorStatus}" />
+      <StatusBarItem Content="Unsaved changes"
+                     Visibility="{Binding CurrentMap.IsDirty, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}" />
       <StatusBarItem x:Name="ZoomStatus" HorizontalAlignment="Right" />
     </StatusBar>
-    <ListBox DockPanel.Dock="Left"
+    <ListBox x:Name="MapList"
+             DockPanel.Dock="Left"
              Width="180"
              ItemsSource="{Binding MapIds}"
-             SelectedItem="{Binding SelectedMapId}" />
+             SelectionChanged="OnMapListSelectionChanged" />
     <ListBox DockPanel.Dock="Right"
              Width="140"
              ItemsSource="{Binding CurrentMap.Layers}">

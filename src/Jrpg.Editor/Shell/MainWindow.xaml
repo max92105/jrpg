@@ -2,6 +2,7 @@
         x:ClassModifier="internal"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:tiles="clr-namespace:Jrpg.Editor.Tiles"
         Title="Jrpg map editor"
         WindowState="Maximized">
   <Window.Resources>
@@ -30,6 +31,25 @@
       <Separator />
       <CheckBox Content="Grid" IsChecked="{Binding IsGridShown}" />
       <Separator />
+      <TextBlock Text="Layer" VerticalAlignment="Center" Margin="4,0" />
+      <ComboBox Width="230"
+                ItemsSource="{Binding LayerPresets}"
+                SelectedValuePath="Z"
+                SelectedValue="{Binding LayerZ}">
+        <ComboBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock><Run Text="{Binding Name, Mode=OneWay}" /> (<Run Text="{Binding Z, Mode=OneWay}" />)</TextBlock>
+          </DataTemplate>
+        </ComboBox.ItemTemplate>
+      </ComboBox>
+      <TextBox Width="40"
+               ToolTip="Layer z: any whole number"
+               Text="{Binding LayerZ, UpdateSourceTrigger=PropertyChanged}" />
+      <CheckBox Content="Dim other layers" IsChecked="{Binding IsOtherLayersDimmed}" />
+      <Separator />
+      <TextBlock Text="Brush ([ ])" VerticalAlignment="Center" Margin="4,0" />
+      <ComboBox Width="50" ItemsSource="{Binding BrushSizes}" SelectedItem="{Binding BrushSize}" />
+      <Separator />
       <Button Content="Fit (Ctrl+0)" Click="OnFitClicked" />
       <Button Content="100 % (Ctrl+1)" Click="OnActualSizeClicked" />
     </ToolBar>
@@ -44,16 +64,20 @@
              Width="180"
              ItemsSource="{Binding MapIds}"
              SelectionChanged="OnMapListSelectionChanged" />
-    <ListBox DockPanel.Dock="Right"
-             Width="140"
-             ItemsSource="{Binding CurrentMap.Layers}">
-      <ListBox.ItemTemplate>
-        <DataTemplate>
-          <TextBlock Text="{Binding Z, StringFormat=Layer z {0}}" />
-        </DataTemplate>
-      </ListBox.ItemTemplate>
-    </ListBox>
-    <!-- Pan: middle drag, Space + drag, arrows. Zoom: wheel, toward the cursor. -->
+    <DockPanel DockPanel.Dock="Right" Width="420">
+      <ListBox DockPanel.Dock="Top"
+               Height="110"
+               ItemsSource="{Binding CurrentMap.Layers}">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock Text="{Binding Z, StringFormat=Layer z {0}}" />
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+      <tiles:TileBrowserView x:Name="TileBrowser" DataContext="{Binding Tiles}" />
+    </DockPanel>
+    <!-- Pan: middle drag, Space + drag, arrows. Zoom: wheel, toward the cursor. Left drag paints the chosen tile,
+         right drag erases, Alt + click picks the tile and layer under the mouse. -->
     <Border x:Name="MapViewport"
             Background="#202020"
             ClipToBounds="True"
@@ -75,6 +99,9 @@
           <Image x:Name="GridImage"
                  Stretch="None"
                  Visibility="{Binding IsGridShown, Converter={StaticResource VisibleWhenTrue}}" />
+          <Canvas IsHitTestVisible="False">
+            <Rectangle x:Name="BrushOutline" Stroke="White" Visibility="Collapsed" />
+          </Canvas>
         </Grid>
       </Canvas>
     </Border>

@@ -1,0 +1,67 @@
+using System.Windows;
+using System.Windows.Media;
+using Jrpg.Core.Maps;
+using Jrpg.Editor.Maps;
+
+namespace Jrpg.Editor.Tiles;
+
+/// <summary>
+/// Drawn over a tilesheet in the tile browser: its grid, the cells that are tiles, and the chosen tile. The browser
+/// shows a sheet's cells at the map's cell size, so line widths are set in screen pixels at that scale.
+/// </summary>
+internal static class TilesheetMarks
+{
+    private static readonly Brush _gridBrush = Frozen(new SolidColorBrush(Color.FromArgb(0x50, 0xFF, 0xFF, 0xFF)));
+    private static readonly Brush _tileFill = Frozen(new SolidColorBrush(Color.FromArgb(0x30, 0x00, 0xFF, 0x00)));
+
+    /// <summary>How much the browser scales a sheet's image, so its cells show at the map's cell size.</summary>
+    public static double DisplayScaleOf(TilesheetDefinition sheet) => MapDrawing.CellPixels / sheet.TileWidth;
+
+    /// <param name="sheet">How the image is cut into cells.</param>
+    /// <param name="imageSize">The image's size in its own pixels.</param>
+    /// <param name="tiles">The tiles cut from this sheet.</param>
+    /// <param name="selectedTileId">The chosen tile, outlined if it is on this sheet.</param>
+    public static DrawingImage Draw(TilesheetDefinition sheet, Size imageSize, IReadOnlyList<TileDefinition> tiles, int? selectedTileId)
+    {
+        var screenPixel = 1 / DisplayScaleOf(sheet);
+        var gridPen = new Pen(_gridBrush, screenPixel);
+        // Clipped to the image, so lines on its edges don't widen the drawing and shift it against the image.
+        var drawing = new DrawingGroup { ClipGeometry = new RectangleGeometry(new Rect(imageSize)) };
+        using (var context = drawing.Open())
+        {
+            // Pins the marks to the image's top-left, since a drawing's origin follows what it draws.
+            context.DrawRectangle(Brushes.Transparent, null, new Rect(imageSize));
+            for (var row = 0; sheet.CellTop(row) + sheet.TileHeight <= imageSize.Height; row++)
+            {
+                for (var column = 0; sheet.CellLeft(column) + sheet.TileWidth <= imageSize.Width; column++)
+                {
+                    context.DrawRectangle(null, gridPen, CellRect(sheet, column, row));
+                }
+            }
+
+            foreach (var tile in tiles)
+            {
+                context.DrawRectangle(_tileFill, null, CellRect(sheet, tile.Column, tile.Row));
+            }
+
+            if (tiles.FirstOrDefault(tile => tile.Id == selectedTileId) is { } selected)
+            {
+                context.DrawRectangle(null, new Pen(Brushes.Cyan, 3 * screenPixel), CellRect(sheet, selected.Column, selected.Row));
+            }
+        }
+
+        var image = new DrawingImage(drawing);
+        image.Freeze();
+        return image;
+    }
+
+    private static Rect CellRect(TilesheetDefinition sheet, int column, int row) =>
+        new(sheet.CellLeft(column), sheet.CellTop(row), sheet.TileWidth, sheet.TileHeight);
+
+    private static T Frozen<T>(T freezable)
+        where T : Freezable
+    {
+        freezable.Freeze();
+        return freezable;
+    }
+}

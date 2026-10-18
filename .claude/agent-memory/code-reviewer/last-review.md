@@ -5,11 +5,13 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 11d (Map documents: draft, undo and save)
-Round: 1 (verdict: Fix the Criticals, then commit; caller said this is the single review round)
+Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 11e (Tile painting)
+Round: 1 (verdict: Fix the Criticals, then commit)
 
-- open (Critical): MapViewModel Undo/Redo commands + Refresh (Map replaced, IsDirty raised, CanExecute refreshed) have no test; add MapViewModelTests for UndoCommand/RedoCommand
-- open (Suggestion): CanClose()/CanLeaveCurrentMap() show a modal dialog behind a Can* predicate name; rename ConfirmClose / ConfirmLeaveCurrentMap
-- open (Suggestion): verify by hand that refusing the discard question leaves the map list on the open map (SelectionChanged re-entrancy is the same risk the TwoWay binding had)
-- open (Suggestion): tick 11d in the plan with deviations (tiles-only draft, TryOpenMap replaced SelectedMapId, Catalog updated on save, confirmDiscard Func)
-- follow-up: ContentWriter.Write moves layout then settings; a failed second File.Move leaves a half-saved map
+- open (Critical): dotnet format --verify-no-changes fails, exit 2: ENDOFLINE at src/Jrpg.Editor/Shell/MainViewModel.cs:47 (LF line in CRLF file); run dotnet format
+- open (Warning): Save (Ctrl+S) mid-drag doesn't end the stroke: file holds the partial stroke, stroke recorded after MarkSaved, Undo then reports clean while draft differs from file; also close mid-drag skips the discard question. Fix: MarkSaved (and ConfirmLeaveCurrentMap/close) call EndStroke first
+- open (Warning): EndStroke inside Undo/Redo/Do (mid-drag closes the stroke) has no test; add MapViewModelTests Undo_MidStroke_UndoesTheStroke
+- open (Suggestion): MainViewModel.ContinueStroke/EndStroke are pure forwarders to CurrentMap
+- open (Suggestion): TileBrowserView redraws on every PropertyChanged (3 redraws per Select, SheetTiles LINQ re-run each time); filter on property name
+- open (Suggestion): tick 11e in the plan with deviations (Square doesn't clip, TileStroke/TileBrush/TileImages/TilesheetMarks added, MapDraft keyed by Z, EditHistory.Record)
+- follow-up: Layers ListBox doesn't set LayerZ on selection (could pick the paint layer)

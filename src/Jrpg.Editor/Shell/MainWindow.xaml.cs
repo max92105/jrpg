@@ -3,7 +3,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Jrpg.Core.Geometry;
 using Jrpg.Editor.Maps;
+using Jrpg.Editor.Maps.Editing;
+using Jrpg.Editor.Tiles;
 using Jrpg.Editor.Viewport;
 
 namespace Jrpg.Editor.Shell;
@@ -11,7 +14,7 @@ namespace Jrpg.Editor.Shell;
 /// <summary>
 /// The editor window. Turning the open map into WPF images and mouse and keys into pan and zoom are view concerns, done
 /// here; the view models hold plain data and run in tests without a UI thread (ADR 0012). The camera rules are in
-/// <see cref="ViewportTransform"/>.
+/// <see cref="ViewportTransform"/>, the painting rules in <see cref="MapViewModel"/>.
 /// </summary>
 internal sealed partial class MainWindow : Window
 {
@@ -24,6 +27,8 @@ internal sealed partial class MainWindow : Window
     private readonly ViewportTransform _viewport = new();
     private bool _isSpaceHeld;
     private Point? _panFrom;
+    private MouseButton? _strokeButton;
+    private GridCell? _brushCell;
     private double? _gridZoom;
     private MapViewModel? _shownMap;
 
@@ -33,8 +38,14 @@ internal sealed partial class MainWindow : Window
     public MainWindow(MainViewModel viewModel)
     {
         InitializeComponent();
+        if (viewModel.Catalog is { } catalog)
+        {
+            var tileImages = new TileImages(catalog, viewModel.ArtRoot);
+            _drawing = new MapDrawing(catalog, tileImages);
+            TileBrowser.Images = tileImages;
+        }
+
         DataContext = _viewModel = viewModel;
-        _drawing = viewModel.Catalog is { } catalog ? new MapDrawing(catalog, viewModel.ArtRoot) : null;
         viewModel.PropertyChanged += OnViewModelChanged;
         OpenCurrentMap();
     }
@@ -52,7 +63,7 @@ internal sealed partial class MainWindow : Window
     protected override void OnPreviewKeyDown(KeyEventArgs e)
     {
         base.OnPreviewKeyDown(e);
-        e.Handled = Keyboard.Modifiers == ModifierKeys.Control ? HandleZoomKey(e.Key) : HandleViewportKey(e.Key);
+        e.Handled = Keyboard.Modifiers == ModifierKeys.Control ? HandleZoomKey(e.Key) : HandleBrushKey(e.Key) || HandleViewportKey(e.Key);
     }
 
     protected override void OnPreviewKeyUp(KeyEventArgs e)
@@ -66,9 +77,17 @@ internal sealed partial class MainWindow : Window
 
     private void OnViewModelChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(MainViewModel.CurrentMap))
+        switch (e.PropertyName)
         {
-            OpenCurrentMap();
+            case nameof(MainViewModel.CurrentMap):
+                OpenCurrentMap();
+                break;
+            case nameof(MainViewModel.LayerZ) or nameof(MainViewModel.IsOtherLayersDimmed):
+                DrawCurrentMap();
+                break;
+            case nameof(MainViewModel.BrushSize):
+                ShowBrushAt(_brushCell);
+                break;
         }
     }
 
@@ -96,7 +115,8 @@ internal sealed partial class MainWindow : Window
     private void DrawCurrentMap()
     {
         var layout = _shownMap?.Map.Layout;
-        MapImage.Source = layout is not null && _drawing is not null ? _drawing.Draw(layout) : null;
+        var focusZ = _viewModel.IsOtherLayersDimmed ? _viewModel.LayerZ : (int?)null;
+        MapImage.Source = layout is not null && _drawing is not null ? _drawing.Draw(layout, focusZ) : null;
     }
 
     private void OnMapListSelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -155,35 +175,96 @@ internal sealed partial class MainWindow : Window
 
     private void OnViewportSizeChanged(object sender, SizeChangedEventArgs e) => FitMap();
 
+    // Anywhere but a text box, so the brush size changes while browsing tiles too.
+    private bool HandleBrushKey(Key key)
+    {
+        if (Keyboard.FocusedElement is TextBox)
+        {
+            return false;
+        }
+
+        switch (key)
+        {
+            case Key.OemOpenBrackets:
+                _viewModel.ShrinkBrush();
+                return true;
+            case Key.OemCloseBrackets:
+                _viewModel.GrowBrush();
+                return true;
+            default:
+                return false;
+        }
+    }
+
     private void OnViewportMouseDown(object sender, MouseButtonEventArgs e)
     {
         MapViewport.Focus();
         var isPanGesture = e.ChangedButton == MouseButton.Middle || (e.ChangedButton == MouseButton.Left && _isSpaceHeld);
         if (isPanGesture)
         {
-            _panFrom = e.GetPosition(MapViewport);
-            MapViewport.CaptureMouse();
-            MapViewport.Cursor = Cursors.SizeAll;
+            StartPanning(e.GetPosition(MapViewport));
             e.Handled = true;
         }
+        else if (_strokeButton is null)
+        {
+            e.Handled = HandlePaintButton(e.ChangedButton, CellAt(e));
+        }
+    }
+
+    private bool HandlePaintButton(MouseButton button, GridCell cell)
+    {
+        if (button == MouseButton.Left && Keyboard.Modifiers == ModifierKeys.Alt)
+        {
+            _viewModel.PickTileAt(cell);
+            return true;
+        }
+
+        switch (button)
+        {
+            case MouseButton.Left:
+                _viewModel.StartPainting(cell);
+                break;
+            case MouseButton.Right:
+                _viewModel.StartErasing(cell);
+                break;
+            default:
+                return false;
+        }
+
+        _strokeButton = button;
+        MapViewport.CaptureMouse();
+        return true;
+    }
+
+    private void StartPanning(Point from)
+    {
+        _panFrom = from;
+        MapViewport.CaptureMouse();
+        MapViewport.Cursor = Cursors.SizeAll;
     }
 
     private void OnViewportMouseMove(object sender, MouseEventArgs e)
     {
         var position = e.GetPosition(MapViewport);
+        var cell = CellAt(e);
         if (_panFrom is { } from)
         {
             _viewport.PanBy(position - from);
             _panFrom = position;
             ApplyViewport();
         }
+        else if (_strokeButton is not null)
+        {
+            _viewModel.ContinueStroke(cell);
+        }
 
-        _viewModel.ShowCursorAt(_viewport.ScreenToCell(position, MapDrawing.CellPixels));
+        _viewModel.ShowCursorAt(cell);
+        ShowBrushAt(cell);
     }
 
     private void OnViewportMouseUp(object sender, MouseButtonEventArgs e)
     {
-        if (_panFrom is not null)
+        if (_panFrom is not null || e.ChangedButton == _strokeButton)
         {
             MapViewport.ReleaseMouseCapture();
             e.Handled = true;
@@ -195,6 +276,32 @@ internal sealed partial class MainWindow : Window
     {
         _panFrom = null;
         MapViewport.Cursor = null;
+        if (_strokeButton is not null)
+        {
+            _strokeButton = null;
+            _viewModel.EndStroke();
+        }
+    }
+
+    private GridCell CellAt(MouseEventArgs e) => _viewport.ScreenToCell(e.GetPosition(MapViewport), MapDrawing.CellPixels);
+
+    /// <param name="cell">The cell under the mouse, or null to hide the outline.</param>
+    private void ShowBrushAt(GridCell? cell)
+    {
+        _brushCell = cell;
+        if (cell is not { } center || _viewModel.CurrentMap is null)
+        {
+            BrushOutline.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        var size = _viewModel.BrushSize;
+        var topLeft = BrushCells.Square(center, size).First();
+        Canvas.SetLeft(BrushOutline, topLeft.X * MapDrawing.CellPixels);
+        Canvas.SetTop(BrushOutline, topLeft.Y * MapDrawing.CellPixels);
+        BrushOutline.Width = BrushOutline.Height = size * MapDrawing.CellPixels;
+        BrushOutline.StrokeThickness = 2 / _viewport.Zoom;
+        BrushOutline.Visibility = Visibility.Visible;
     }
 
     private void OnViewportMouseWheel(object sender, MouseWheelEventArgs e)
@@ -205,7 +312,11 @@ internal sealed partial class MainWindow : Window
         e.Handled = true;
     }
 
-    private void OnViewportMouseLeave(object sender, MouseEventArgs e) => _viewModel.ShowCursorAt(null);
+    private void OnViewportMouseLeave(object sender, MouseEventArgs e)
+    {
+        _viewModel.ShowCursorAt(null);
+        ShowBrushAt(null);
+    }
 
     private void RefitMap()
     {

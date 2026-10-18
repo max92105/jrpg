@@ -1,0 +1,25 @@
+<UserControl x:Class="Jrpg.Editor.Tiles.TileBrowserView"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <DockPanel>
+    <ComboBox DockPanel.Dock="Top"
+              Margin="0,4"
+              ItemsSource="{Binding Sheets}"
+              SelectedItem="{Binding SelectedSheet}"
+              DisplayMemberPath="Id" />
+    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto"
+                  Background="#202020">
+      <!-- Sized in the sheet's own pixels and scaled as a whole, so a click's position is a sheet pixel. -->
+      <Grid x:Name="SheetView"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            RenderOptions.BitmapScalingMode="NearestNeighbor"
+            MouseLeftButtonDown="OnSheetClicked">
+        <Image x:Name="SheetImage" Stretch="Fill" />
+        <Image x:Name="SheetMarks" Stretch="Fill" />
+      </Grid>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

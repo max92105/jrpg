@@ -1,32 +1,32 @@
-using System.IO;
 using System.Windows;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using Jrpg.Core.Content;
 using Jrpg.Core.Maps;
-using Jrpg.Data.Art;
+using Jrpg.Editor.Tiles;
 
 namespace Jrpg.Editor.Maps;
 
 /// <summary>
 /// Draws a map as the game does (ADR 0012): tile layers, objects and their canopies in Core's <see cref="DrawOrderKey"/>
 /// order, at the game's 48 pixels per cell. Canopies are the object's tiles again, clipped to its above-player zones, as
-/// the legacy editor did. Tile images are cut once and kept for the editor's lifetime.
+/// the legacy editor did.
 /// </summary>
-internal sealed class MapDrawing(ContentCatalog catalog, string artRoot)
+internal sealed class MapDrawing(ContentCatalog catalog, TileImages tileImages)
 {
     /// <summary>Pixels per map cell at 100 % zoom, the same as the game's virtual screen.</summary>
     public const double CellPixels = 48;
+
+    // Legacy "dim other layers": faint enough to tell apart, clear enough to paint against.
+    private const double DimmedOpacity = 0.3;
 
     // Faint enough to read the tiles through.
     private static readonly SolidColorBrush _gridBrush = CreateGridBrush();
 
     private static readonly IComparer<MapPart> _byDrawOrder = Comparer<MapPart>.Create((left, right) => left.Key.CompareTo(right.Key));
 
-    private readonly Dictionary<string, BitmapSource> _sheets = [];
-    private readonly Dictionary<int, ImageSource> _tiles = [];
-
-    public DrawingImage Draw(MapLayout layout)
+    /// <param name="layout">The map to draw.</param>
+    /// <param name="focusZ">When set, everything on another Z is drawn faint, to show what the layer at this Z holds.</param>
+    public DrawingImage Draw(MapLayout layout, int? focusZ)
     {
         // Clipped to the map, as the game's camera shows it; objects may reach past an edge, and an image's origin
         // follows what it draws, so the transparent fill also pins cell (0, 0) to the image's top-left.
@@ -37,7 +37,17 @@ internal sealed class MapDrawing(ContentCatalog catalog, string artRoot)
             context.DrawRectangle(Brushes.Transparent, null, mapArea);
             foreach (var part in PartsInDrawOrder(layout))
             {
+                var isDimmed = focusZ is { } z && part.Z != z;
+                if (isDimmed)
+                {
+                    context.PushOpacity(DimmedOpacity);
+                }
+
                 DrawPart(context, layout, part);
+                if (isDimmed)
+                {
+                    context.Pop();
+                }
             }
         }
 
@@ -74,7 +84,7 @@ internal sealed class MapDrawing(ContentCatalog catalog, string artRoot)
         var parts = new List<MapPart>();
         for (var index = 0; index < layout.Layers.Count; index++)
         {
-            parts.Add(new MapPart(DrawOrderKey.ForTile(layout.Layers[index].Z, index), MapPartKind.Layer, index));
+            parts.Add(new MapPart(DrawOrderKey.ForTile(layout.Layers[index].Z, index), layout.Layers[index].Z, MapPartKind.Layer, index));
         }
 
         for (var index = 0; index < layout.Objects.Count; index++)
@@ -82,12 +92,12 @@ internal sealed class MapDrawing(ContentCatalog catalog, string artRoot)
             var placed = layout.Objects[index];
             var definition = catalog.Objects[placed.ObjectId];
             var baseY = placed.Position.Y + definition.Height;
-            parts.Add(new MapPart(DrawOrderKey.ForSprite(placed.Z, baseY, index), MapPartKind.Object, index));
+            parts.Add(new MapPart(DrawOrderKey.ForSprite(placed.Z, baseY, index), placed.Z, MapPartKind.Object, index));
 
             var canopyZ = MapLayers.CanopyZOf(placed.Z);
             if (definition.AbovePlayerZones.Count > 0 && canopyZ > placed.Z)
             {
-                parts.Add(new MapPart(DrawOrderKey.ForSprite(canopyZ, baseY, index), MapPartKind.Canopy, index));
+                parts.Add(new MapPart(DrawOrderKey.ForSprite(canopyZ, baseY, index), canopyZ, MapPartKind.Canopy, index));
             }
         }
 
@@ -120,7 +130,7 @@ internal sealed class MapDrawing(ContentCatalog catalog, string artRoot)
                 var tileId = layer.Rows[y][x];
                 if (tileId != TileLayer.EmptyTileId)
                 {
-                    context.DrawImage(TileImageOf(tileId), CellRect(x, y));
+                    context.DrawImage(tileImages.TileImageOf(tileId), CellRect(x, y));
                 }
             }
         }
@@ -130,7 +140,7 @@ internal sealed class MapDrawing(ContentCatalog catalog, string artRoot)
     {
         foreach (var tile in catalog.Objects[placed.ObjectId].Tiles)
         {
-            context.DrawImage(TileImageOf(tile.TileId), CellRect(placed.Position.X + tile.X, placed.Position.Y + tile.Y));
+            context.DrawImage(tileImages.TileImageOf(tile.TileId), CellRect(placed.Position.X + tile.X, placed.Position.Y + tile.Y));
         }
     }
 
@@ -153,38 +163,6 @@ internal sealed class MapDrawing(ContentCatalog catalog, string artRoot)
         context.Pop();
     }
 
-    private ImageSource TileImageOf(int tileId)
-    {
-        if (!_tiles.TryGetValue(tileId, out var image))
-        {
-            var tile = catalog.Tiles[tileId];
-            var sheet = catalog.Tilesheets[tile.SheetId];
-            var cell = new Int32Rect(sheet.CellLeft(tile.Column), sheet.CellTop(tile.Row), sheet.TileWidth, sheet.TileHeight);
-            image = new CroppedBitmap(SheetImageOf(sheet.File), cell);
-            image.Freeze();
-            _tiles.Add(tileId, image);
-        }
-
-        return image;
-    }
-
-    private BitmapSource SheetImageOf(string file)
-    {
-        if (!_sheets.TryGetValue(file, out var sheet))
-        {
-            var bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.UriSource = new Uri(Path.Combine(artRoot, ArtFolders.Tilesheets, file));
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            bitmap.EndInit();
-            bitmap.Freeze();
-            sheet = bitmap;
-            _sheets.Add(file, sheet);
-        }
-
-        return sheet;
-    }
-
     private static SolidColorBrush CreateGridBrush()
     {
         var brush = new SolidColorBrush(Color.FromArgb(0x60, 0xFF, 0xFF, 0xFF));
@@ -201,5 +179,5 @@ internal sealed class MapDrawing(ContentCatalog catalog, string artRoot)
         Canopy,
     }
 
-    private readonly record struct MapPart(DrawOrderKey Key, MapPartKind Kind, int Index);
+    private readonly record struct MapPart(DrawOrderKey Key, int Z, MapPartKind Kind, int Index);
 }

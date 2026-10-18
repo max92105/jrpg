@@ -7,6 +7,8 @@ using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Maps;
+using Jrpg.Editor.Maps.Editing;
+using Jrpg.Editor.Tiles;
 
 namespace Jrpg.Editor.Shell;
 
@@ -16,6 +18,9 @@ namespace Jrpg.Editor.Shell;
 /// </summary>
 internal sealed partial class MainViewModel : ObservableObject
 {
+    // Legacy brush sizes, in cells; [ and ] step through them.
+    private static readonly int[] _brushSizes = [1, 2, 3, 4, 5, 7, 9];
+
     private readonly ContentWriter _writer;
     private readonly Func<string, bool> _confirmDiscard;
 
@@ -37,8 +42,9 @@ internal sealed partial class MainViewModel : ObservableObject
             LoadError = exception.Message;
         }
 
-        // Maps only open when their content and art are whole, since drawing reads both.
+        // Maps and tiles only show when their content and art are whole, since drawing reads both.
         MapIds = Catalog is not null && LoadError is null ? [.. Catalog.Maps.Keys.Order(StringComparer.Ordinal)] : [];
+        Tiles = Catalog is not null && LoadError is null ? new TileBrowserViewModel(Catalog) : null;
         if (MapIds.Count > 0)
         {
             TryOpenMap(MapIds[0]);
@@ -55,6 +61,13 @@ internal sealed partial class MainViewModel : ObservableObject
 
     public IReadOnlyList<string> MapIds { get; }
 
+    /// <summary>The tile to paint; null when the content or its art didn't load.</summary>
+    public TileBrowserViewModel? Tiles { get; }
+
+    public IReadOnlyList<LayerPreset> LayerPresets { get; } = Maps.LayerPresets.All;
+
+    public IReadOnlyList<int> BrushSizes { get; } = _brushSizes;
+
     [ObservableProperty]
     public partial MapViewModel? CurrentMap { get; private set; }
 
@@ -69,6 +82,18 @@ internal sealed partial class MainViewModel : ObservableObject
     /// <summary>What the status bar says about the cell under the cursor; empty when the cursor is off the map.</summary>
     [ObservableProperty]
     public partial string CursorStatus { get; private set; } = "";
+
+    /// <summary>The layer painted and erased on, picked from <see cref="LayerPresets"/> or typed in; the ground by default, as in the legacy editor.</summary>
+    [ObservableProperty]
+    public partial int LayerZ { get; set; } = Maps.LayerPresets.GroundZ;
+
+    /// <summary>The brush's width and height in cells, one of <see cref="BrushSizes"/>.</summary>
+    [ObservableProperty]
+    public partial int BrushSize { get; set; } = 1;
+
+    /// <summary>Whether everything off <see cref="LayerZ"/> is drawn faint.</summary>
+    [ObservableProperty]
+    public partial bool IsOtherLayersDimmed { get; set; }
 
     /// <summary>Opens another map, asking first if the open one has unsaved changes.</summary>
     /// <returns>False when the user kept the open map.</returns>
@@ -105,6 +130,35 @@ internal sealed partial class MainViewModel : ObservableObject
         CursorStatus = CurrentMap.TopTileAt(at) is { } tile ? $"{position}   Tile {tile.TileId} on layer z {tile.LayerZ}" : $"{position}   No tile";
     }
 
+    /// <summary>Starts painting the chosen tile on <see cref="LayerZ"/>; nothing happens until a tile is chosen.</summary>
+    public void StartPainting(GridCell cell)
+    {
+        if (Tiles?.SelectedTileId is { } tileId)
+        {
+            CurrentMap?.StartStroke(new TileBrush(LayerZ, tileId, BrushSize), cell);
+        }
+    }
+
+    public void StartErasing(GridCell cell) => CurrentMap?.StartStroke(new TileBrush(LayerZ, TileLayer.EmptyTileId, BrushSize), cell);
+
+    public void ContinueStroke(GridCell cell) => CurrentMap?.ContinueStroke(cell);
+
+    public void EndStroke() => CurrentMap?.EndStroke();
+
+    /// <summary>The eyedropper: chooses the tile seen at a cell and its layer, to paint more of it.</summary>
+    public void PickTileAt(GridCell cell)
+    {
+        if (CurrentMap?.TopTileAt(cell) is { } tile)
+        {
+            Tiles?.Select(tile.TileId);
+            LayerZ = tile.LayerZ;
+        }
+    }
+
+    public void GrowBrush() => StepBrushSize(1);
+
+    public void ShrinkBrush() => StepBrushSize(-1);
+
     /// <summary>Saves the open map if the game would load it; otherwise keeps it unsaved and shows why.</summary>
     [RelayCommand]
     private void Save()
@@ -130,7 +184,17 @@ internal sealed partial class MainViewModel : ObservableObject
         SaveError = null;
     }
 
-    private bool ConfirmLeaveCurrentMap() =>
-        CurrentMap is not { IsDirty: true } open
-        || _confirmDiscard($"Map '{open.Map.Id}' has unsaved changes. Discard them?");
+    private void StepBrushSize(int steps)
+    {
+        var index = Math.Clamp(Array.IndexOf(_brushSizes, BrushSize) + steps, 0, _brushSizes.Length - 1);
+        BrushSize = _brushSizes[index];
+    }
+
+    // A stroke still being dragged counts as a change, so it ends before the question.
+    private bool ConfirmLeaveCurrentMap()
+    {
+        CurrentMap?.EndStroke();
+        return CurrentMap is not { IsDirty: true } open
+            || _confirmDiscard($"Map '{open.Map.Id}' has unsaved changes. Discard them?");
+    }
 }

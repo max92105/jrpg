@@ -22,13 +22,19 @@ internal sealed class EditHistory(MapDraft draft)
     public void Do(IMapEdit edit)
     {
         edit.Apply(draft);
+        Record(edit);
+    }
+
+    /// <summary>Adds an edit already applied to the draft, such as a stroke shown while dragging, as <see cref="Do"/> would.</summary>
+    public void Record(IMapEdit appliedEdit)
+    {
         if (_savedDepth > _done.Count)
         {
             // The saved state was among the undone edits, which are now gone.
             _savedDepth = null;
         }
 
-        _done.Push(edit);
+        _done.Push(appliedEdit);
         _undone.Clear();
     }
 

@@ -6,12 +6,14 @@ namespace Jrpg.Editor.Tests.Maps.Editing;
 
 public sealed class EditingTests
 {
+    private const int GroundZ = -5;
+
     private static readonly GridCell _left = new(0, 0);
     private static readonly GridCell _right = new(1, 0);
 
     // A 2x1 meadow: one ground layer of grass (1).
     private static readonly MapDefinition _meadow = new(
-        new MapLayout { Id = "meadow", Width = 2, Height = 1, Layers = [new TileLayer { Z = -5, Rows = [[1, 1]] }], Objects = [] },
+        new MapLayout { Id = "meadow", Width = 2, Height = 1, Layers = [new TileLayer { Z = GroundZ, Rows = [[1, 1]] }], Objects = [] },
         new MapSettings { Id = "meadow", DisplayName = "Meadow" });
 
     private readonly MapDraft _draft = MapDraft.From(_meadow);
@@ -27,10 +29,37 @@ public sealed class EditingTests
     {
         var before = _draft.ToDefinition();
 
-        _draft.SetTileId(0, _left, 2);
+        _draft.SetTileId(GroundZ, _left, 2);
 
         Assert.Equal(1, before.Layout.Layers[0].TileIdAt(_left));
         Assert.Equal(2, _draft.ToDefinition().Layout.Layers[0].TileIdAt(_left));
+    }
+
+    [Fact]
+    public void MapDraft_SetTileId_NewZ_InsertsLayerInZOrder()
+    {
+        _draft.SetTileId(-3, _left, 4);
+        _draft.SetTileId(-7, _right, 5);
+
+        var layers = _draft.ToDefinition().Layout.Layers;
+
+        Assert.Equal([-7, GroundZ, -3], layers.Select(layer => layer.Z));
+        Assert.Equal([[0, 5]], layers[0].Rows);
+    }
+
+    [Fact]
+    public void MapDraft_ToDefinition_EmptyLayer_IsOmitted()
+    {
+        _draft.SetTileId(-3, _left, 4);
+        _draft.SetTileId(-3, _left, TileLayer.EmptyTileId);
+
+        Assert.Equal([GroundZ], _draft.ToDefinition().Layout.Layers.Select(layer => layer.Z));
+    }
+
+    [Fact]
+    public void MapDraft_TileIdAt_ZWithoutLayer_IsEmpty()
+    {
+        Assert.Equal(TileLayer.EmptyTileId, _draft.TileIdAt(-3, _left));
     }
 
     [Fact]
@@ -41,7 +70,7 @@ public sealed class EditingTests
 
         edit.Revert(_draft);
 
-        Assert.Equal(1, _draft.TileIdAt(0, _left));
+        Assert.Equal(1, _draft.TileIdAt(GroundZ, _left));
     }
 
     [Fact]
@@ -53,7 +82,7 @@ public sealed class EditingTests
 
         history.Undo();
 
-        Assert.Equal((2, 1), (_draft.TileIdAt(0, _left), _draft.TileIdAt(0, _right)));
+        Assert.Equal((2, 1), (_draft.TileIdAt(GroundZ, _left), _draft.TileIdAt(GroundZ, _right)));
         Assert.True(history.CanRedo);
     }
 
@@ -66,7 +95,7 @@ public sealed class EditingTests
 
         history.Redo();
 
-        Assert.Equal(2, _draft.TileIdAt(0, _left));
+        Assert.Equal(2, _draft.TileIdAt(GroundZ, _left));
     }
 
     [Fact]
@@ -109,5 +138,19 @@ public sealed class EditingTests
         Assert.True(history.IsDirty);
     }
 
-    private static SetTilesEdit Paint(GridCell cell, int from, int to) => new(0, [new TileChange(cell, from, to)]);
+    [Fact]
+    public void EditHistory_Record_AppliedEdit_UndoesIt()
+    {
+        var history = new EditHistory(_draft);
+        var edit = Paint(_left, from: 1, to: 2);
+        edit.Apply(_draft);
+
+        history.Record(edit);
+        history.Undo();
+
+        Assert.Equal(1, _draft.TileIdAt(GroundZ, _left));
+        Assert.False(history.IsDirty);
+    }
+
+    private static SetTilesEdit Paint(GridCell cell, int from, int to) => new(GroundZ, [new TileChange(cell, from, to)]);
 }

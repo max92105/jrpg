@@ -1,5 +1,7 @@
 using Jrpg.Core.Geometry;
+using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
+using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
 using Jrpg.Editor.Shell;
 
@@ -75,6 +77,16 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
+    public void ConfirmClose_MidStroke_AsksTheUser()
+    {
+        var viewModel = Open(_repositoryContent, discardAnswer: false);
+        viewModel.StartErasing(new GridCell(0, 0));
+
+        Assert.False(viewModel.ConfirmClose());
+        Assert.Single(_questions);
+    }
+
+    [Fact]
     public void Save_ValidEdit_WritesTheMapAndClearsUnsavedChanges()
     {
         var viewModel = Open(CopyOfRepositoryContent());
@@ -92,7 +104,7 @@ public sealed class MainViewModelTests : IDisposable
     {
         var viewModel = Open(CopyOfRepositoryContent());
         var forest = viewModel.CurrentMap!;
-        forest.Do(new SetTilesEdit(0, [new TileChange(new GridCell(0, 0), forest.Map.Layout.Layers[0].TileIdAt(new GridCell(0, 0)), 99_999)]));
+        forest.Do(new SetTilesEdit(forest.Map.Layout.Layers[0].Z, [new TileChange(new GridCell(0, 0), forest.Map.Layout.Layers[0].TileIdAt(new GridCell(0, 0)), 99_999)]));
 
         viewModel.SaveCommand.Execute(null);
 
@@ -135,6 +147,94 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
+    public void StartPainting_TileChosen_PaintsItOnTheChosenLayerAsOneStep()
+    {
+        var viewModel = Open(_repositoryContent);
+        viewModel.PickTileAt(new GridCell(0, 0));
+        var tileId = viewModel.Tiles!.SelectedTileId;
+        viewModel.LayerZ = -3;
+
+        viewModel.StartPainting(new GridCell(4, 4));
+        viewModel.ContinueStroke(new GridCell(5, 4));
+        viewModel.EndStroke();
+
+        var layer = viewModel.CurrentMap!.Layers.Single(layer => layer.Z == -3);
+        Assert.Equal((tileId, tileId), (layer.TileIdAt(new GridCell(4, 4)), layer.TileIdAt(new GridCell(5, 4))));
+        Assert.True(viewModel.CurrentMap.IsDirty);
+    }
+
+    [Fact]
+    public void StartPainting_NoTileChosen_ChangesNothing()
+    {
+        var viewModel = Open(_repositoryContent);
+
+        viewModel.StartPainting(new GridCell(4, 4));
+        viewModel.EndStroke();
+
+        Assert.False(viewModel.CurrentMap!.IsDirty);
+    }
+
+    [Fact]
+    public void StartErasing_UsesTheChosenLayerAndBrushSize()
+    {
+        var viewModel = Open(_repositoryContent);
+        viewModel.GrowBrush();
+
+        viewModel.StartErasing(new GridCell(4, 4));
+        viewModel.EndStroke();
+
+        var ground = viewModel.CurrentMap!.Layers.Single(layer => layer.Z == LayerPresets.GroundZ);
+        Assert.All([new GridCell(4, 4), new GridCell(5, 4), new GridCell(4, 5), new GridCell(5, 5)], cell =>
+            Assert.Equal(TileLayer.EmptyTileId, ground.TileIdAt(cell)));
+    }
+
+    [Fact]
+    public void PickTileAt_CellWithTiles_ChoosesTheTopTileAndItsLayer()
+    {
+        var viewModel = Open(_repositoryContent);
+        viewModel.TryOpenMap("start");
+        var top = viewModel.CurrentMap!.TopTileAt(new GridCell(3, 2))!.Value;
+
+        viewModel.PickTileAt(new GridCell(3, 2));
+
+        Assert.Equal((top.TileId, top.LayerZ), (viewModel.Tiles!.SelectedTileId, viewModel.LayerZ));
+    }
+
+    [Fact]
+    public void PickTileAt_CellWithoutTiles_KeepsTheChoice()
+    {
+        var viewModel = Open(_repositoryContent);
+        viewModel.TryOpenMap("start");
+        viewModel.LayerZ = -3;
+
+        viewModel.PickTileAt(new GridCell(5, 13));
+
+        Assert.Equal(-3, viewModel.LayerZ);
+        Assert.Null(viewModel.Tiles!.SelectedTileId);
+    }
+
+    [Fact]
+    public void GrowBrush_FromFive_SkipsToSeven()
+    {
+        var viewModel = Open(_repositoryContent);
+        viewModel.BrushSize = 5;
+
+        viewModel.GrowBrush();
+
+        Assert.Equal(7, viewModel.BrushSize);
+    }
+
+    [Fact]
+    public void ShrinkBrush_AtSmallest_StaysThere()
+    {
+        var viewModel = Open(_repositoryContent);
+
+        viewModel.ShrinkBrush();
+
+        Assert.Equal(1, viewModel.BrushSize);
+    }
+
+    [Fact]
     public void Constructor_BrokenContentFile_ShowsTheLoaderMessageAndNoMaps()
     {
         Directory.CreateDirectory(_contentCopy);
@@ -161,7 +261,7 @@ public sealed class MainViewModelTests : IDisposable
         var ground = map.Map.Layout.Layers[0];
         var before = ground.TileIdAt(new GridCell(0, 0));
         var after = ground.Rows.SelectMany(row => row).First(id => id != before && id != 0);
-        map.Do(new SetTilesEdit(0, [new TileChange(new GridCell(0, 0), before, after)]));
+        map.Do(new SetTilesEdit(ground.Z, [new TileChange(new GridCell(0, 0), before, after)]));
         return after;
     }
 

@@ -104,5 +104,68 @@ public sealed class MapViewModelTests
         Assert.False(viewModel.IsDirty);
     }
 
-    private static SetTilesEdit PaintLeftGround(int tileId) => new(0, [new TileChange(new GridCell(0, 0), 1, tileId)]);
+    [Fact]
+    public void ContinueStroke_BeforeTheStrokeEnds_ShowsThePaintedTiles()
+    {
+        var viewModel = new MapViewModel(_twoLayers.Map);
+        viewModel.StartStroke(new TileBrush(-5, 3, Size: 1), new GridCell(0, 0));
+
+        viewModel.ContinueStroke(new GridCell(1, 0));
+
+        Assert.Equal([[3, 3]], viewModel.Map.Layout.Layers[0].Rows);
+    }
+
+    [Fact]
+    public void EndStroke_AfterADrag_UndoesAsOneStep()
+    {
+        var viewModel = new MapViewModel(_twoLayers.Map);
+        viewModel.StartStroke(new TileBrush(-5, 3, Size: 1), new GridCell(0, 0));
+        viewModel.ContinueStroke(new GridCell(1, 0));
+
+        viewModel.EndStroke();
+        viewModel.UndoCommand.Execute(null);
+
+        Assert.Equal([[1, 1]], viewModel.Map.Layout.Layers[0].Rows);
+        Assert.False(viewModel.UndoCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void EndStroke_ErasedALayersLastTile_RemovesTheLayer()
+    {
+        var viewModel = new MapViewModel(_twoLayers.Map);
+        viewModel.StartStroke(new TileBrush(-4, TileLayer.EmptyTileId, Size: 1), new GridCell(1, 0));
+
+        viewModel.EndStroke();
+
+        Assert.Equal([-5], viewModel.Layers.Select(layer => layer.Z));
+        Assert.True(viewModel.IsDirty);
+    }
+
+    [Fact]
+    public void UndoCommand_MidStroke_UndoesTheStroke()
+    {
+        var viewModel = new MapViewModel(_twoLayers.Map);
+        viewModel.StartStroke(new TileBrush(-5, 3, Size: 1), new GridCell(0, 0));
+        viewModel.ContinueStroke(new GridCell(1, 0));
+
+        viewModel.UndoCommand.Execute(null);
+
+        Assert.Equal([[1, 1]], viewModel.Map.Layout.Layers[0].Rows);
+        Assert.False(viewModel.UndoCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void MarkSaved_MidStroke_KeepsTheStrokeAsSaved()
+    {
+        var viewModel = new MapViewModel(_twoLayers.Map);
+        viewModel.StartStroke(new TileBrush(-5, 3, Size: 1), new GridCell(0, 0));
+
+        viewModel.MarkSaved();
+        viewModel.EndStroke();
+
+        Assert.False(viewModel.IsDirty);
+        Assert.True(viewModel.UndoCommand.CanExecute(null));
+    }
+
+    private static SetTilesEdit PaintLeftGround(int tileId) => new(-5, [new TileChange(new GridCell(0, 0), 1, tileId)]);
 }

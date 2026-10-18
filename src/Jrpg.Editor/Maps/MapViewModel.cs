@@ -8,12 +8,13 @@ namespace Jrpg.Editor.Maps;
 
 /// <summary>
 /// The open map: an editable draft with its undo history (ADR 0012). <see cref="Map"/> is the draft's current content,
-/// refreshed after every edit, undo or redo, for drawing and saving.
+/// refreshed after every edit, undo or redo, and while a stroke is dragged, for drawing and saving.
 /// </summary>
 internal sealed partial class MapViewModel : ObservableObject
 {
     private readonly MapDraft _draft;
     private readonly EditHistory _history;
+    private TileStroke? _stroke;
 
     public MapViewModel(MapDefinition map)
     {
@@ -33,13 +34,43 @@ internal sealed partial class MapViewModel : ObservableObject
 
     public void Do(IMapEdit edit)
     {
+        EndStroke();
         _history.Do(edit);
         Refresh();
     }
 
-    /// <summary>The draft now matches what was saved.</summary>
+    /// <summary>Starts a brush or eraser drag on a cell; each cell it reaches shows at once.</summary>
+    public void StartStroke(TileBrush brush, GridCell cell)
+    {
+        EndStroke();
+        _stroke = new TileStroke(_draft, brush);
+        ContinueStroke(cell);
+    }
+
+    public void ContinueStroke(GridCell cell)
+    {
+        if (_stroke?.MoveTo(cell) == true)
+        {
+            Map = _draft.ToDefinition();
+        }
+    }
+
+    /// <summary>Ends the drag: what it changed becomes one undo step.</summary>
+    public void EndStroke()
+    {
+        var edit = _stroke?.ToEdit();
+        _stroke = null;
+        if (edit is not null)
+        {
+            _history.Record(edit);
+            Refresh();
+        }
+    }
+
+    /// <summary>The draft now matches what was saved; a stroke still being dragged was saved with it and ends here.</summary>
     public void MarkSaved()
     {
+        EndStroke();
         _history.MarkSaved();
         OnPropertyChanged(nameof(IsDirty));
     }
@@ -64,9 +95,11 @@ internal sealed partial class MapViewModel : ObservableObject
         return null;
     }
 
+    // An undo or redo pressed mid-drag first closes the stroke, so the history never misses its changes.
     [RelayCommand(CanExecute = nameof(CanUndo))]
     private void Undo()
     {
+        EndStroke();
         _history.Undo();
         Refresh();
     }
@@ -74,6 +107,7 @@ internal sealed partial class MapViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanRedo))]
     private void Redo()
     {
+        EndStroke();
         _history.Redo();
         Refresh();
     }

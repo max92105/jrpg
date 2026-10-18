@@ -5,5 +5,8 @@ internal enum DrawableKind
 {
     Layer,
     Object,
+
+    /// <summary>The part of an object drawn over the player (its above-player zones).</summary>
+    Canopy,
     Player,
 }

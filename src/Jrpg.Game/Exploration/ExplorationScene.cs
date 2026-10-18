@@ -11,8 +11,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Exploration;
 
 /// <summary>
-/// The player on the current map; the scene a new game starts in. It shows the tile layers, the standing
-/// player and objects in depth order; walking and events come in part 3b.
+/// The player on the current map; the scene a new game starts in. It shows the tile layers, the standing player and
+/// objects in depth order, canopies and roofs over the player; walking and events come in part 3b.
 /// </summary>
 internal sealed class ExplorationScene : IScene
 {
@@ -25,10 +25,12 @@ internal sealed class ExplorationScene : IScene
     private readonly string _fieldSpriteFile;
     private readonly MapCamera _camera = new();
     private readonly MapDrawList _drawList = new();
+    private readonly CanopyTextures _canopies;
 
-    public ExplorationScene(MapLocation location, ContentCatalog catalog, TileAtlas atlas)
+    public ExplorationScene(MapLocation location, ContentCatalog catalog, TileAtlas atlas, CanopyTextures canopies)
     {
         _location = location;
+        _canopies = canopies;
         _layout = catalog.Maps[location.MapId].Layout;
         _view = new MapView(_layout, catalog.Objects, atlas);
         _fieldSpriteFile = catalog.NewGame.FieldSpriteFile;
@@ -54,6 +56,10 @@ internal sealed class ExplorationScene : IScene
                     break;
                 case DrawableKind.Object:
                     _view.DrawObject(batch, textures, _layout.Objects[drawable.Index], origin);
+                    break;
+                case DrawableKind.Canopy:
+                    var placed = _layout.Objects[drawable.Index];
+                    _view.DrawCanopy(batch, _canopies.CanopyOf(placed.ObjectId, textures), placed, origin);
                     break;
                 case DrawableKind.Player:
                     DrawPlayer(batch, textures, origin);

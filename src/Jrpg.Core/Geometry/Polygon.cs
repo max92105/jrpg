@@ -1,6 +1,6 @@
 namespace Jrpg.Core.Geometry;
 
-internal static class Polygon
+public static class Polygon
 {
     /// <summary>
     /// Whether <paramref name="point"/> lies inside the polygon, by the even-odd rule: a ray cast to the right

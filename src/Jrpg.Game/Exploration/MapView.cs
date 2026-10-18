@@ -46,12 +46,9 @@ internal sealed class MapView(MapLayout layout, IReadOnlyDictionary<string, Obje
     /// <summary>Draws a placed object's tiles at its position, as seen from the camera's <paramref name="origin"/>.</summary>
     public void DrawObject(SpriteBatch batch, TextureLibrary textures, PlacedObject placed, Vector2 origin)
     {
-        // Objects can sit between cells (legacy positions such as 2.5), so the top-left is rounded to a whole pixel once.
-        var left = (int)Math.Round((placed.Position.X * CellPixels) - origin.X);
-        var top = (int)Math.Round((placed.Position.Y * CellPixels) - origin.Y);
         var definition = objects[placed.ObjectId];
-        if (left + (definition.Width * CellPixels) <= 0 || top + (definition.Height * CellPixels) <= 0
-            || left >= VirtualScreen.Width || top >= VirtualScreen.Height)
+        var area = ScreenAreaOf(placed, definition, origin);
+        if (!IsOnScreen(area))
         {
             return;
         }
@@ -60,9 +57,30 @@ internal sealed class MapView(MapLayout layout, IReadOnlyDictionary<string, Obje
         for (var index = 0; index < tiles.Count; index++)
         {
             var tile = tiles[index];
-            DrawTile(batch, textures, tile.TileId, new Point(left + (tile.X * CellPixels), top + (tile.Y * CellPixels)));
+            DrawTile(batch, textures, tile.TileId, new Point(area.X + (tile.X * CellPixels), area.Y + (tile.Y * CellPixels)));
         }
     }
+
+    /// <summary>Draws a placed object's baked canopy over its body, as seen from the camera's <paramref name="origin"/>.</summary>
+    public void DrawCanopy(SpriteBatch batch, Texture2D canopy, PlacedObject placed, Vector2 origin)
+    {
+        var area = ScreenAreaOf(placed, objects[placed.ObjectId], origin);
+        if (IsOnScreen(area))
+        {
+            batch.Draw(canopy, area, Color.White);
+        }
+    }
+
+    // Objects can sit between cells (legacy positions such as 2.5), so the top-left is rounded to a whole pixel once.
+    private static Rectangle ScreenAreaOf(PlacedObject placed, ObjectDefinition definition, Vector2 origin) =>
+        new(
+            (int)Math.Round((placed.Position.X * CellPixels) - origin.X),
+            (int)Math.Round((placed.Position.Y * CellPixels) - origin.Y),
+            definition.Width * CellPixels,
+            definition.Height * CellPixels);
+
+    private static bool IsOnScreen(Rectangle area) =>
+        area.Right > 0 && area.Bottom > 0 && area.Left < VirtualScreen.Width && area.Top < VirtualScreen.Height;
 
     private void DrawTile(SpriteBatch batch, TextureLibrary textures, int tileId, Point screenTopLeft)
     {

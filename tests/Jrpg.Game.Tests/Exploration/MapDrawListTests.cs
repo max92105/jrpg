@@ -18,6 +18,16 @@ public sealed class MapDrawListTests
             Tiles = [new ObjectTile(0, 0, 1)],
             AbovePlayerZones = [],
         },
+        ["canopy_tree"] = new()
+        {
+            Id = "canopy_tree",
+            Width = 4,
+            Height = 4,
+            CollisionPolygon = [],
+            Category = "General",
+            Tiles = [new ObjectTile(0, 0, 1)],
+            AbovePlayerZones = [[new Point2D(0, 0), new Point2D(1, 0), new Point2D(0.5, 0.5)]],
+        },
     };
 
     private readonly MapDrawList _drawList = new();
@@ -72,6 +82,39 @@ public sealed class MapDrawListTests
         Assert.Equal(
             [(DrawableKind.Layer, 0), (DrawableKind.Layer, 1), (DrawableKind.Object, 0), (DrawableKind.Player, 0), (DrawableKind.Layer, 2)],
             _drawList.Drawables.Select(drawable => (drawable.Kind, drawable.Index)));
+    }
+
+    [Fact]
+    public void Rebuild_CanopyOfObjectBelowPlayer_DrawnAfterPlayer()
+    {
+        // The legacy tree: its body at -3 stays under the player, its canopy goes over (MapLayers.CanopyZOf).
+        var layout = Layout(layers: [-5], Tree(y: 0, z: -3) with { ObjectId = "canopy_tree" });
+
+        _drawList.Rebuild(layout, _objects, new Point2D(1, 1));
+
+        Assert.Equal(
+            [(DrawableKind.Layer, 0), (DrawableKind.Object, 0), (DrawableKind.Player, 0), (DrawableKind.Canopy, 0)],
+            _drawList.Drawables.Select(drawable => (drawable.Kind, drawable.Index)));
+    }
+
+    [Fact]
+    public void Rebuild_ObjectOnCanopyLayer_HasNoCanopy()
+    {
+        var layout = Layout(layers: [], Tree(y: 0, z: MapLayers.AbovePlayerZ) with { ObjectId = "canopy_tree" });
+
+        _drawList.Rebuild(layout, _objects, new Point2D(1, 1));
+
+        Assert.DoesNotContain(_drawList.Drawables, drawable => drawable.Kind == DrawableKind.Canopy);
+    }
+
+    [Fact]
+    public void Rebuild_ObjectWithoutZones_HasNoCanopy()
+    {
+        var layout = Layout(layers: [], Tree(y: 0, z: -3));
+
+        _drawList.Rebuild(layout, _objects, new Point2D(1, 1));
+
+        Assert.DoesNotContain(_drawList.Drawables, drawable => drawable.Kind == DrawableKind.Canopy);
     }
 
     [Fact]

@@ -1,5 +1,6 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Session;
+using Jrpg.Game.Exploration;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Scenes;
@@ -17,7 +18,9 @@ internal sealed class GameFlow : IScene
 
     public GameFlow(ContentCatalog catalog)
     {
-        Session = new SessionTransitions(catalog, _scenes, new TileAtlas(catalog)).StartNewGame();
+        var atlas = new TileAtlas(catalog);
+        var canopies = new CanopyTextures(catalog.Objects, atlas, MapView.CellPixels);
+        Session = new SessionTransitions(catalog, _scenes, atlas, canopies).StartNewGame();
     }
 
     public GameSession Session { get; }

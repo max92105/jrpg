@@ -5,12 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 3b-1 (Objects in depth order; 3b split into 3b-1/3b-2 in the same diff)
+Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 3b-2 (Canopies and roofs over the player)
 Round: 1 (verdict: Ready to commit; caller said this is the single review round)
 
-Accepted (don't re-raise): object bodies drawn tile by tile, only canopies baked (3b-2); MapDrawList rebuilt once at scene construction until walking; player order = object count; placed objects use catalog definitions, swapped objects (ActiveMap.CurrentDefinitionOf) in part 3b; split into 3b-1/3b-2 judged sound.
+Accepted (don't re-raise): CanopyTextures bakes every canopy on first CanopyOf (device exists only at draw); TextureLibrary.Create owns baked textures; cellPixels passed from GameFlow (Rendering can't depend on Exploration); CanopyMask loops instead of Any.
 
-- open (Warning): MapDrawList player-vs-object tie (feet == object base) untested; the "player order = object count" rule has no test pinning it
-- open (Suggestion): MapView.DrawObject draws every object tile each frame, no on-screen cull (legacy and DrawLayer cull)
-- open (Suggestion): tick 3b-1 checkbox in the plan when committing (DoD 5)
-- open (Follow-up): swapped-object definitions (ActiveMap.CurrentDefinitionOf) not recorded in the plan's 3b-1 note or part 3b notes
+- open (Suggestion): MapDrawList canopy key equals the body key when object Z >= AbovePlayerZ (5); List.Sort is unstable, so the canopy can sort before its body. Same pixels, so no visible change today; add a kind tiebreak or skip the canopy when CanopyZOf(z) == z
+- open (Suggestion): CanopyTextures.CanopyOf takes a TextureLibrary on every call but only uses the first one; document it or bake from an explicit call in the scene's first Draw
+- open (Suggestion): tick 3b-2 in the plan and record the deviations (CanopyTextures lazy bake, SheetPixels, TextureLibrary.Create, cellPixels parameter)

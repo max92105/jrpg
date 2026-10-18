@@ -4,8 +4,8 @@ using Jrpg.Core.Maps;
 namespace Jrpg.Game.Exploration;
 
 /// <summary>
-/// The map's tile layers, placed objects and the player in the order Core's <see cref="DrawOrderKey"/> gives, so the
-/// game draws what the editor will show. Rebuilding reuses its storage: nothing is allocated once it has grown.
+/// The map's tile layers, placed objects, their canopies and the player in the order Core's <see cref="DrawOrderKey"/>
+/// gives, so the game draws what the editor will show. Rebuilding reuses its storage: nothing is allocated once it has grown.
 /// </summary>
 internal sealed class MapDrawList
 {
@@ -33,8 +33,15 @@ internal sealed class MapDrawList
         {
             // An object sorts as a whole by its bottom edge, so overlapping objects never interleave their tiles.
             var placed = layout.Objects[index];
-            var baseY = placed.Position.Y + objects[placed.ObjectId].Height;
+            var definition = objects[placed.ObjectId];
+            var baseY = placed.Position.Y + definition.Height;
             _drawables.Add(new Drawable(DrawOrderKey.ForSprite(placed.Z, baseY, index), DrawableKind.Object, index));
+            // An object already on or above the canopy layer covers the player whole; a canopy would only tie with its body.
+            var canopyZ = MapLayers.CanopyZOf(placed.Z);
+            if (definition.AbovePlayerZones.Count > 0 && canopyZ > placed.Z)
+            {
+                _drawables.Add(new Drawable(DrawOrderKey.ForSprite(canopyZ, baseY, index), DrawableKind.Canopy, index));
+            }
         }
 
         // After every object in insertion order, so a tie with an object's base never depends on the sort.

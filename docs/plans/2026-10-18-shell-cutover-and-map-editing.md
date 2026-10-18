@@ -287,12 +287,13 @@ The developer still edits maps in the legacy MapEditor (ADR 0005), so render dat
   - **Verify by hand:** the start map's houses, trees and chest appear where the legacy game shows them.
   - **Done, with deviations:** object bodies are drawn tile by tile (skipped when off screen), not baked. The draw list is rebuilt once, since the player doesn't move until part 3b, and reuses its storage for when walking rebuilds it every frame. The player's order is the object count, so a tie with an object's base always draws the player in front (tested). Verified on the start map: the town's houses, trees and chest draw in place, and the legacy hole at (5, 13) is under a house.
 
-- [ ] **3b-2. Canopies and roofs over the player** (Core + Game, about 150 lines)
+- [x] **3b-2. Canopies and roofs over the player** (Core + Game, about 150 lines)
   - **Goal:** the parts of trees and houses inside their above-player zones are drawn over the player, as in the legacy game.
   - **Core:** `Geometry/Polygon` made public.
   - **Game:** `Rendering/CanopyMask` (static, pure: `bool[] Build(IReadOnlyList<IReadOnlyList<Point2D>> zones, int width, int height)`, pixel centers tested with `Polygon.Contains`), `Rendering/ObjectSpriteBaker` (per object definition with zones: a canopy texture of its tiles at 48 px per cell, only the pixels inside the mask); `MapDrawList` adds canopies at `MapLayers.CanopyZOf(z)`.
   - **Tests:** Game `CanopyMask_Build_PixelOutsideEveryZone_IsFalse`, `CanopyMask_Build_PixelInsideZone_IsTrue`, `MapDrawList_Rebuild_CanopyOfObjectBelowPlayer_DrawnAfterPlayer`.
   - **Verify by hand:** move `startLocation` in `new-game.json` next to a tree and a house (no rebuild needed, decision 77); compare with the legacy game at the same spot.
+  - **Done, with deviations:** baking needs the graphics device, so `Rendering/CanopyTextures` (created once per game in `GameFlow`, beside the `TileAtlas`) bakes every canopy on the first one drawn; `TextureLibrary.Create` owns the baked textures, and `SheetPixels` carries a sheet's pixels to the pure `ObjectSpriteBaker.CanopyPixels`. The cell size reaches the baker as a parameter (Rendering can't depend on Exploration). An object on or above `AbovePlayerZ` gets no canopy (it already covers the player). Verified with a scratch content copy: under `tree_3`'s canopy the player is hidden, at its trunk the player stands over it.
 
 ### Phase 4: content cutover
 

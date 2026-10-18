@@ -18,5 +18,7 @@ public sealed record MapLayout
 
     public required IReadOnlyList<PlacedObject> Objects { get; init; }
 
+    public IReadOnlyList<CellEvent> CellEvents { get; init; } = [];
+
     public bool Contains(GridCell cell) => cell.X >= 0 && cell.Y >= 0 && cell.X < Width && cell.Y < Height;
 }

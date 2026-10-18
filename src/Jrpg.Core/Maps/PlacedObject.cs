@@ -1,3 +1,4 @@
+using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 
 namespace Jrpg.Core.Maps;
@@ -12,4 +13,7 @@ public sealed record PlacedObject
 
     /// <summary>The object's top-left corner.</summary>
     public required Point2D Position { get; init; }
+
+    /// <summary>What the object does when the player interacts with it or touches it; empty for decoration.</summary>
+    public IReadOnlyList<MapEvent> Events { get; init; } = [];
 }

@@ -1,6 +1,7 @@
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
+using Jrpg.Core.World;
 
 namespace Jrpg.Core.Tests.Builders;
 
@@ -19,6 +20,7 @@ internal sealed class ActiveMapBuilder
     private readonly Dictionary<string, ObjectDefinition> _objects = [];
     private readonly List<PlacedObject> _placed = [];
     private string[] _rows = ["1"];
+    private WorldState _world = new();
 
     /// <summary>Each string is one map row of single-digit tile ids.</summary>
     public ActiveMapBuilder WithRows(params string[] rows)
@@ -34,10 +36,24 @@ internal sealed class ActiveMapBuilder
         return this;
     }
 
+    /// <summary>Makes an object known to the map without placing it, as a swap target.</summary>
+    public ActiveMapBuilder WithKnownObject(ObjectDefinition definition)
+    {
+        _objects[definition.Id] = definition;
+        return this;
+    }
+
+    /// <summary>Shares the world state with other maps or asserts on it afterwards.</summary>
+    public ActiveMapBuilder WithWorld(WorldState world)
+    {
+        _world = world;
+        return this;
+    }
+
     public ActiveMap Build()
     {
         var layout = new MapLayoutBuilder().WithLayer(_rows).Build() with { Objects = [.. _placed] };
         var definition = new MapDefinition(layout, new MapSettings { Id = layout.Id, DisplayName = "Test Map" });
-        return new ActiveMap(definition, _objects, WalkabilityGrid.Build(layout, _tiles));
+        return new ActiveMap(definition, _objects, WalkabilityGrid.Build(layout, _tiles), _world);
     }
 }

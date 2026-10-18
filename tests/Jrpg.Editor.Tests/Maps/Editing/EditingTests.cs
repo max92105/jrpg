@@ -152,5 +152,17 @@ public sealed class EditingTests
         Assert.False(history.IsDirty);
     }
 
+    [Fact]
+    public void EditHistory_ForgetSavedState_StaysUnsavedEvenAfterUndoingEverything()
+    {
+        var history = new EditHistory(_draft);
+        history.ForgetSavedState();
+        history.Do(Paint(_left, from: 1, to: 2));
+
+        history.Undo();
+
+        Assert.True(history.IsDirty);
+    }
+
     private static SetTilesEdit Paint(GridCell cell, int from, int to) => new(GroundZ, [new TileChange(cell, from, to)]);
 }

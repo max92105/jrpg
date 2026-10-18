@@ -91,6 +91,12 @@ internal sealed partial class MainWindow : Window
             case nameof(MainViewModel.CurrentMap):
                 OpenCurrentMap();
                 break;
+            case nameof(MainViewModel.MapIds):
+                // A new map's first save rebuilds the list, which drops its selection; the list is refreshed first, since this
+                // handler may run before its binding does.
+                MapList.GetBindingExpression(ItemsControl.ItemsSourceProperty)?.UpdateTarget();
+                MapList.SelectedItem = _shownMap?.Map.Id;
+                break;
             case nameof(MainViewModel.Mode):
                 ShowBrushAt(_brushCell);
                 ShowObjectDragAt(_mapPoint);
@@ -184,6 +190,14 @@ internal sealed partial class MainWindow : Window
     }
 
     private void OnFitClicked(object sender, RoutedEventArgs e) => RefitMap();
+
+    private void OnNewMapClicked(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel.StartNewMap() is { } newMap)
+        {
+            new NewMapWindow(newMap, _viewModel.TryCreateMap) { Owner = this }.ShowDialog();
+        }
+    }
 
     private void OnMapSettingsClicked(object sender, RoutedEventArgs e)
     {

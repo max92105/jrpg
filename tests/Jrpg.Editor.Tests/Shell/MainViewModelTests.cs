@@ -222,6 +222,71 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
+    public void TryCreateMap_ValidFields_OpensItUnsavedOutsideTheList()
+    {
+        var viewModel = Open(_repositoryContent);
+        var newMap = viewModel.StartNewMap()!;
+        newMap.Name = "Old Mill";
+
+        Assert.True(viewModel.TryCreateMap(newMap));
+
+        Assert.Equal("old_mill", viewModel.CurrentMap!.Map.Id);
+        Assert.True(viewModel.CurrentMap.IsDirty);
+        Assert.DoesNotContain("old_mill", viewModel.MapIds);
+    }
+
+    [Fact]
+    public void Save_NewMap_WritesItAndAddsItToTheList()
+    {
+        var viewModel = Open(CopyOfRepositoryContent());
+        var newMap = viewModel.StartNewMap()!;
+        newMap.Name = "Old Mill";
+        viewModel.TryCreateMap(newMap);
+
+        viewModel.SaveCommand.Execute(null);
+
+        Assert.Null(viewModel.SaveError);
+        Assert.Equal(["forest", "interior_1", "old_mill", "start"], viewModel.MapIds);
+        Assert.False(viewModel.CurrentMap!.IsDirty);
+        Assert.Equal("Old Mill", ContentCatalogLoader.Load(_contentCopy).Maps["old_mill"].Settings.DisplayName);
+    }
+
+    [Fact]
+    public void TryCreateMap_UnsavedChangesKept_StaysOnTheOpenMap()
+    {
+        var viewModel = Open(_repositoryContent, answer: false);
+        PaintTopLeft(viewModel);
+
+        Assert.False(viewModel.TryCreateMap(viewModel.StartNewMap()!));
+
+        Assert.Equal("forest", viewModel.CurrentMap!.Map.Id);
+    }
+
+    [Fact]
+    public void TryCreateMap_InvalidSize_OpensNothing()
+    {
+        var viewModel = Open(_repositoryContent);
+        var newMap = viewModel.StartNewMap()!;
+        newMap.WidthText = "0";
+
+        Assert.False(viewModel.TryCreateMap(newMap));
+
+        Assert.Equal("forest", viewModel.CurrentMap!.Map.Id);
+    }
+
+    [Fact]
+    public void TryCreateMap_BlankName_OpensNothing()
+    {
+        var viewModel = Open(_repositoryContent);
+        var newMap = viewModel.StartNewMap()!;
+        newMap.Name = "";
+
+        Assert.False(viewModel.TryCreateMap(newMap));
+
+        Assert.Equal("forest", viewModel.CurrentMap!.Map.Id);
+    }
+
+    [Fact]
     public void Constructor_BrokenContentFile_ShowsTheLoaderMessageAndNoMaps()
     {
         Directory.CreateDirectory(_contentCopy);

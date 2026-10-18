@@ -45,7 +45,7 @@ internal sealed partial class MainViewModel : ObservableObject
         // Maps, tiles and objects only show when their content and art are whole, since drawing reads both.
         if (Catalog is not null && LoadError is null)
         {
-            MapIds = [.. Catalog.Maps.Keys.Order(StringComparer.Ordinal)];
+            MapIds = SortedMapIds(Catalog);
             Painting = new TilePaintingViewModel(Catalog, Layer);
             Placing = new ObjectPlacingViewModel(Catalog.Objects, Layer);
             if (MapIds.Count > 0)
@@ -63,7 +63,9 @@ internal sealed partial class MainViewModel : ObservableObject
     /// <summary>Why the content can't be edited, naming the file; null when it loaded.</summary>
     public string? LoadError { get; }
 
-    public IReadOnlyList<string> MapIds { get; } = [];
+    /// <summary>The saved maps, by id; a new map joins when it is first saved.</summary>
+    [ObservableProperty]
+    public partial IReadOnlyList<string> MapIds { get; private set; } = [];
 
     /// <summary>The layer tiles are painted and objects placed on.</summary>
     public LayerChoiceViewModel Layer { get; } = new();
@@ -108,6 +110,26 @@ internal sealed partial class MainViewModel : ObservableObject
         }
 
         CurrentMap = new MapViewModel(Catalog!.Maps[mapId]);
+        SaveError = null;
+        return true;
+    }
+
+    /// <summary>The new map dialog's state; null when the content or its art didn't load, so no map can be made.</summary>
+    public NewMapViewModel? StartNewMap() => Painting is not null ? new NewMapViewModel([.. Catalog!.Maps.Keys]) : null;
+
+    /// <summary>
+    /// Opens the new map dialog's map as an unsaved draft, asking first if the open map has unsaved changes. It joins the
+    /// map list, and the content, when it is saved.
+    /// </summary>
+    /// <returns>False when nothing was opened: the name or size is invalid, or the user kept the open map.</returns>
+    public bool TryCreateMap(NewMapViewModel newMap)
+    {
+        if (newMap.NameProblem is not null || newMap.SizeProblem is not null || !ConfirmLeaveCurrentMap())
+        {
+            return false;
+        }
+
+        CurrentMap = MapViewModel.ForNewMap(newMap.ToMap());
         SaveError = null;
         return true;
     }
@@ -177,6 +199,11 @@ internal sealed partial class MainViewModel : ObservableObject
         }
 
         Catalog = Catalog! with { Maps = new Dictionary<string, MapDefinition>(Catalog.Maps) { [map.Id] = map } };
+        if (!MapIds.Contains(map.Id))
+        {
+            MapIds = SortedMapIds(Catalog);
+        }
+
         CurrentMap.MarkSaved();
         SaveError = null;
     }
@@ -186,6 +213,8 @@ internal sealed partial class MainViewModel : ObservableObject
         Painting?.OpenMap = value;
         Placing?.OpenMap = value;
     }
+
+    private static IReadOnlyList<string> SortedMapIds(ContentCatalog catalog) => [.. catalog.Maps.Keys.Order(StringComparer.Ordinal)];
 
     private bool TryResize(MapViewModel open, int width, int height)
     {

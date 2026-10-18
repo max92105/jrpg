@@ -26,6 +26,7 @@
                TextWrapping="Wrap"
                Text="{Binding SaveError, StringFormat=Not saved: {0}, TargetNullValue=''}" />
     <ToolBar DockPanel.Dock="Top">
+      <Button Content="New map..." Click="OnNewMapClicked" />
       <Button Content="Save (Ctrl+S)" Command="{Binding SaveCommand}" />
       <Button Content="Undo (Ctrl+Z)" Command="{Binding CurrentMap.UndoCommand}" />
       <Button Content="Redo (Ctrl+Y)" Command="{Binding CurrentMap.RedoCommand}" />

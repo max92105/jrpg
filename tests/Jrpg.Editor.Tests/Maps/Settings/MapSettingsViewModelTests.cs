@@ -74,7 +74,7 @@ public sealed class MapSettingsViewModelTests
     {
         _settings.HeightText = "0";
 
-        Assert.Equal($"Width and height must be whole numbers from 1 to {MapSettingsViewModel.MaxSize}.", _settings.SizeProblem);
+        Assert.Equal(TypedCounts.MapSizeProblem, _settings.SizeProblem);
         Assert.Null(_settings.NewSize);
     }
 

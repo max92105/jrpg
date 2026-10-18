@@ -53,4 +53,7 @@ internal sealed class EditHistory(MapDraft draft)
     }
 
     public void MarkSaved() => _savedDepth = _done.Count;
+
+    /// <summary>The draft matches no saved file, as for a map not saved yet: it stays unsaved until <see cref="MarkSaved"/>.</summary>
+    public void ForgetSavedState() => _savedDepth = null;
 }

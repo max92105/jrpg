@@ -23,6 +23,14 @@ internal sealed partial class MapViewModel : ObservableObject
         Map = _draft.ToDefinition();
     }
 
+    /// <summary>A map that isn't in the content yet: it counts as unsaved, even with no edits, until it is saved.</summary>
+    public static MapViewModel ForNewMap(MapDefinition map)
+    {
+        var viewModel = new MapViewModel(map);
+        viewModel._history.ForgetSavedState();
+        return viewModel;
+    }
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Layers))]
     public partial MapDefinition Map { get; private set; }

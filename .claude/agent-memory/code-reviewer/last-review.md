@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 11h-2 (Map settings and resize)
-Round: 1 (verdict: Ready to commit; build, 753 tests, format exit 0 all pass)
+Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 11h-3 (New maps)
+Round: 1 (verdict: Ready to commit; build, 770 tests, format exit 0 all pass)
 
-- open (Warning): MapSettingsWindow.xaml:22-24,36,41 int TextBoxes with UpdateSourceTrigger=PropertyChanged; clearing "20" by backspace leaves Width=2 (last parse), OK resizes to 2 (silently if nothing dropped); use string properties parsed in the VM so SizeProblem covers unparsable text
-- open (Suggestion): ResizeMapEditTests.cs:91 Apply_ThenPaintOnANewCell_Works ("Works", paints on a non-existing layer -3); and SetMapSettingsEdit test lives in ResizeMapEditTests (move to SetMapSettingsEditTests, name Revert_RestoresTheSettings)
-- open (Suggestion): MainViewModel.SettingsOfCurrentMap is a noun phrase; e.g. StartEditingSettings / EditSettingsOfCurrentMap; add TryApplySettings_Grow_DoesNotAsk test
-- open (Suggestion): tick 11h-2 in plan; note placeholders (undoable settings, odds start 1/1), confirm callback generalized, objects already fully off-map dropped by any resize
-- verified: refit logic (OnOpenMapChanged compares _gridDrawnFor size; ApplyViewport redraws grid on size change), undo/redo linear history consistent with ReplaceLayout snapshots, Catalog! safe, placing selection prunes dropped uids
+- open (Warning): MainViewModel.TryCreateMap size gate untested; without it ToMap throws InvalidOperationException (editor crash) on Create with bad size; add TryCreateMap_InvalidSize_OpensNothing
+- open (Suggestion): MainViewModel.StartNewMap gates on Painting but reads Catalog!; doc says "content didn't load" (also art); gate on Catalog/Painting consistently with doc
+- open (Suggestion): sorted map id list built twice (ctor line 48, Save line 204); one private SortedMapIds()
+- open (Suggestion): tick 11h-3 in plan; note "New map..." button stays enabled when content is broken (does nothing)
+- verified: MapIds rebinding (UpdateTarget then SelectedItem; SelectionChanged reenters TryOpenMap with same id -> true), draft not in list selects nothing, refused switch from draft leaves list unselected, empty Layers pass MapLayoutValidator and ContentWriter (map not in catalog), case-insensitive id collisions, ForgetSavedState keeps draft dirty

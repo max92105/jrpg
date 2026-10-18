@@ -6,6 +6,7 @@ using System.Windows.Media;
 using Jrpg.Core.Geometry;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
+using Jrpg.Editor.Maps.Settings;
 using Jrpg.Editor.Tiles;
 using Jrpg.Editor.Viewport;
 
@@ -33,7 +34,7 @@ internal sealed partial class MainWindow : Window
 
     // Where a rectangle drag started; it is filled when its button is released.
     private GridCell? _rectangleStart;
-    private double? _gridZoom;
+    private (double Zoom, int Width, int Height)? _gridDrawnFor;
     private MapViewModel? _shownMap;
 
     // A newly opened map is fitted to the view, which has no size until the window is laid out.
@@ -58,9 +59,9 @@ internal sealed partial class MainWindow : Window
         OpenCurrentMap();
     }
 
-    /// <summary>The question <see cref="MainViewModel"/> asks before unsaved changes are dropped.</summary>
-    public static bool AskToDiscard(string question) =>
-        MessageBox.Show(question, "Unsaved changes", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
+    /// <summary>The yes or no questions <see cref="MainViewModel"/> asks, such as before unsaved changes are dropped.</summary>
+    public static bool Ask(string question) =>
+        MessageBox.Show(question, "Map editor", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
 
     protected override void OnClosing(CancelEventArgs e)
     {
@@ -103,6 +104,12 @@ internal sealed partial class MainWindow : Window
         {
             DrawCurrentMap();
             DrawSelectionMarks();
+
+            // A resize, or its undo: show the whole map at its new size, as the legacy editor did.
+            if (_gridDrawnFor is { } grid && _shownMap!.Map.Layout is var layout && (grid.Width, grid.Height) != (layout.Width, layout.Height))
+            {
+                RefitMap();
+            }
         }
     }
 
@@ -114,7 +121,7 @@ internal sealed partial class MainWindow : Window
 
         // Kept in step here rather than bound, so a refused switch simply leaves the list on the open map.
         MapList.SelectedItem = _shownMap?.Map.Id;
-        _gridZoom = null;
+        _gridDrawnFor = null;
         DrawCurrentMap();
         RefitMap();
     }
@@ -177,6 +184,14 @@ internal sealed partial class MainWindow : Window
     }
 
     private void OnFitClicked(object sender, RoutedEventArgs e) => RefitMap();
+
+    private void OnMapSettingsClicked(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel.StartEditingSettings() is { } settings)
+        {
+            new MapSettingsWindow(settings, _viewModel.TryApplySettings) { Owner = this }.ShowDialog();
+        }
+    }
 
     private void OnActualSizeClicked(object sender, RoutedEventArgs e) => ZoomAtViewCenter(1);
 
@@ -426,12 +441,14 @@ internal sealed partial class MainWindow : Window
         MapLayers.RenderTransform = new MatrixTransform(zoom, 0, 0, zoom, _viewport.Origin.X, _viewport.Origin.Y);
         ZoomStatus.Content = $"{zoom:P0}";
 
-        // The grid's lines are one screen pixel wide, so they're redrawn when the zoom changes, not on every pan.
-        if (_gridZoom != zoom && _viewModel.CurrentMap is { } map)
+        // The grid's lines are one screen pixel wide, so they're redrawn when the zoom or the map's size changes, not on every pan.
+        if (_viewModel.CurrentMap?.Map.Layout is not { } layout || _gridDrawnFor == (zoom, layout.Width, layout.Height))
         {
-            GridImage.Source = MapDrawing.DrawGrid(map.Map.Layout, 1 / zoom);
-            DrawSelectionMarks();
-            _gridZoom = zoom;
+            return;
         }
+
+        GridImage.Source = MapDrawing.DrawGrid(layout, 1 / zoom);
+        DrawSelectionMarks();
+        _gridDrawnFor = (zoom, layout.Width, layout.Height);
     }
 }

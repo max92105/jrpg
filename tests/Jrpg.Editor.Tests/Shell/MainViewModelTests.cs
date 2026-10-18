@@ -44,7 +44,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void TryOpenMap_UnsavedChangesAndUserKeepsThem_StaysOnTheMap()
     {
-        var viewModel = Open(_repositoryContent, discardAnswer: false);
+        var viewModel = Open(_repositoryContent, answer: false);
         PaintTopLeft(viewModel);
 
         Assert.False(viewModel.TryOpenMap("start"));
@@ -56,7 +56,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void TryOpenMap_UnsavedChangesAndUserDiscards_OpensTheOther()
     {
-        var viewModel = Open(_repositoryContent, discardAnswer: true);
+        var viewModel = Open(_repositoryContent, answer: true);
         PaintTopLeft(viewModel);
 
         Assert.True(viewModel.TryOpenMap("start"));
@@ -67,7 +67,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void ConfirmClose_UnsavedChanges_AsksTheUser()
     {
-        var viewModel = Open(_repositoryContent, discardAnswer: false);
+        var viewModel = Open(_repositoryContent, answer: false);
         PaintTopLeft(viewModel);
 
         Assert.False(viewModel.ConfirmClose());
@@ -77,7 +77,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void ConfirmClose_MidStroke_AsksTheUser()
     {
-        var viewModel = Open(_repositoryContent, discardAnswer: false);
+        var viewModel = Open(_repositoryContent, answer: false);
         viewModel.Painting!.StartErasing(new GridCell(0, 0));
 
         Assert.False(viewModel.ConfirmClose());
@@ -156,6 +156,72 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
+    public void TryApplySettings_ShrinkRefused_KeepsTheMapAsItIs()
+    {
+        var viewModel = Open(_repositoryContent, answer: false);
+        var settings = viewModel.StartEditingSettings()!;
+        settings.WidthText = "1";
+        settings.DisplayName = "Small forest";
+
+        Assert.False(viewModel.TryApplySettings(settings));
+
+        Assert.StartsWith("Resizing to 1 x ", Assert.Single(_questions), StringComparison.Ordinal);
+        Assert.False(viewModel.CurrentMap!.IsDirty);
+    }
+
+    [Fact]
+    public void TryApplySettings_ShrinkAccepted_ResizesAndRenamesAsTwoUndoSteps()
+    {
+        var viewModel = Open(_repositoryContent, answer: true);
+        var settings = viewModel.StartEditingSettings()!;
+        settings.WidthText = "1";
+        settings.DisplayName = "Small forest";
+
+        Assert.True(viewModel.TryApplySettings(settings));
+
+        var map = viewModel.CurrentMap!;
+        Assert.Equal((1, "Small forest"), (map.Map.Layout.Width, map.Map.Settings.DisplayName));
+        map.UndoCommand.Execute(null);
+        Assert.Equal((1, "Forest"), (map.Map.Layout.Width, map.Map.Settings.DisplayName));
+        map.UndoCommand.Execute(null);
+        Assert.False(map.IsDirty);
+    }
+
+    [Fact]
+    public void TryApplySettings_Grow_ResizesWithoutAsking()
+    {
+        var viewModel = Open(_repositoryContent);
+        var settings = viewModel.StartEditingSettings()!;
+        settings.HeightText = "100";
+
+        Assert.True(viewModel.TryApplySettings(settings));
+
+        Assert.Equal(100, viewModel.CurrentMap!.Map.Layout.Height);
+        Assert.Empty(_questions);
+    }
+
+    [Fact]
+    public void TryApplySettings_NothingChanged_AddsNoUndoStep()
+    {
+        var viewModel = Open(_repositoryContent);
+
+        Assert.True(viewModel.TryApplySettings(viewModel.StartEditingSettings()!));
+
+        Assert.False(viewModel.CurrentMap!.UndoCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void TryApplySettings_EmptySizeBox_AppliesNothing()
+    {
+        var viewModel = Open(_repositoryContent);
+        var settings = viewModel.StartEditingSettings()!;
+        settings.HeightText = "";
+
+        Assert.False(viewModel.TryApplySettings(settings));
+        Assert.False(viewModel.CurrentMap!.IsDirty);
+    }
+
+    [Fact]
     public void Constructor_BrokenContentFile_ShowsTheLoaderMessageAndNoMaps()
     {
         Directory.CreateDirectory(_contentCopy);
@@ -170,11 +236,11 @@ public sealed class MainViewModelTests : IDisposable
         Assert.Null(viewModel.Placing);
     }
 
-    private MainViewModel Open(string contentRoot, bool discardAnswer = false) =>
+    private MainViewModel Open(string contentRoot, bool answer = false) =>
         new(contentRoot, question =>
         {
             _questions.Add(question);
-            return discardAnswer;
+            return answer;
         });
 
     // Paints the open map's top-left ground cell with another tile already used on the map, so the result is valid content.

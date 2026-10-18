@@ -29,6 +29,7 @@
       <Button Content="Save (Ctrl+S)" Command="{Binding SaveCommand}" />
       <Button Content="Undo (Ctrl+Z)" Command="{Binding CurrentMap.UndoCommand}" />
       <Button Content="Redo (Ctrl+Y)" Command="{Binding CurrentMap.RedoCommand}" />
+      <Button Content="Map settings..." Click="OnMapSettingsClicked" />
       <Separator />
       <CheckBox Content="Grid" IsChecked="{Binding IsGridShown}" />
       <Separator />

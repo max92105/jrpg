@@ -363,10 +363,11 @@ The developer still edits maps in the legacy MapEditor (ADR 0005), so render dat
   - **Tests:** the existing painting and object tests move to the new view models' test classes, unchanged in what they check.
   - **Done, with deviations:** the chosen layer (Z, dimming, presets) is its own `Maps/LayerChoiceViewModel`, shared by painting and placing, since both use it. The new view models are built directly over the repository catalog in their tests; `MainViewModel` (about 170 lines) hands them the open map and is null-safe when content fails to load. With no map open, clicks on the view are now ignored instead of starting an empty stroke.
 
-- [ ] **11h-2. Map settings and resize** (Editor, about 250 lines)
+- [x] **11h-2. Map settings and resize** (Editor, about 250 lines)
   - **Goal:** edit the display name and the random encounter table (odds, grace steps, encounters, or none) and resize the map; shrinking warns and drops what falls outside.
   - **New types:** `Maps/Settings/MapSettingsViewModel`, `Maps/Editing/SetMapSettingsEdit`, `Maps/Editing/ResizeMapEdit` (keeps what it drops, for undo). Settings changes go into the map's undo history (placeholder until the developer confirms; legacy applied them directly).
   - **Tests:** `ResizeMapEdit_Shrink_DropsTilesAndObjectsOutside`, `ResizeMapEdit_Revert_RestoresDroppedContent`, `MapSettingsViewModel_NoEncounters_ProducesNullTable`.
+  - **Done, with deviations:** a "Map settings..." dialog (`MapSettingsWindow`, with `EncounterChoice` ticks) edits a copy that OK applies: the resize first, asking only when it drops something, then name and battles, each one undo step; the view refits after a resize or its undo. A resize keeps cell (0, 0) in place (legacy), keeps the whole map for undo, and drops tiles and cell events outside and objects that no longer overlap the map (some legacy objects reach past an edge; one lying wholly off the map is dropped by any resize). Sizes are 1 to 1000 (legacy); numbers are parsed from the boxes' text, so an emptied box is refused rather than keeping a half-typed number. Placeholders: settings changes are undoable (developer to confirm); a map getting random battles starts at the lowest odds the game accepts (1 in 1, 1 grace step). `MainViewModel`'s discard question became a general yes or no `confirm`.
 
 - [ ] **11h-3. New maps** (Editor, about 150 lines)
   - **Goal:** create a map from a name and a size; its id is made from the name and fixed (question 70); it opens as an unsaved draft and joins the map list when saved.

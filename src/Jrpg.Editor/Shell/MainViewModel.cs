@@ -7,6 +7,8 @@ using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Maps;
+using Jrpg.Editor.Maps.Editing;
+using Jrpg.Editor.Maps.Settings;
 using Jrpg.Editor.Objects;
 using Jrpg.Editor.Tiles;
 
@@ -20,14 +22,14 @@ namespace Jrpg.Editor.Shell;
 internal sealed partial class MainViewModel : ObservableObject
 {
     private readonly ContentWriter _writer;
-    private readonly Func<string, bool> _confirmDiscard;
+    private readonly Func<string, bool> _confirm;
 
     /// <param name="contentRoot">The content folder to edit.</param>
-    /// <param name="confirmDiscard">Asks the user whether to drop unsaved changes, given the question; true to drop them.</param>
-    public MainViewModel(string contentRoot, Func<string, bool> confirmDiscard)
+    /// <param name="confirm">Asks the user a yes or no question, such as whether to drop unsaved changes; true for yes.</param>
+    public MainViewModel(string contentRoot, Func<string, bool> confirm)
     {
         _writer = new ContentWriter(contentRoot);
-        _confirmDiscard = confirmDiscard;
+        _confirm = confirm;
         ArtRoot = ArtFolders.RootIn(contentRoot);
         try
         {
@@ -126,6 +128,34 @@ internal sealed partial class MainViewModel : ObservableObject
         CursorStatus = CurrentMap.TopTileAt(at) is { } tile ? $"{position}   Tile {tile.TileId} on layer z {tile.LayerZ}" : $"{position}   No tile";
     }
 
+    /// <summary>The settings dialog's state for the open map; null when no map is open.</summary>
+    public MapSettingsViewModel? StartEditingSettings() => CurrentMap is { } open ? new(open.Map, Catalog!.Encounters.Keys) : null;
+
+    /// <summary>
+    /// Applies the settings dialog to the open map: the new size first, asking before it drops anything, then the name
+    /// and random battles. Each is one undo step.
+    /// </summary>
+    /// <returns>False when nothing was applied: a number is invalid or the user kept the old size.</returns>
+    public bool TryApplySettings(MapSettingsViewModel edited)
+    {
+        if (CurrentMap is not { } open || edited.NewSize is not { } size || edited.OddsProblem is not null)
+        {
+            return false;
+        }
+
+        if (edited.IsResizing && !TryResize(open, size.Width, size.Height))
+        {
+            return false;
+        }
+
+        if (edited.AreSettingsChanged)
+        {
+            open.Do(new SetMapSettingsEdit(open.Map.Settings, edited.ToSettings()));
+        }
+
+        return true;
+    }
+
     /// <summary>Saves the open map if the game would load it; otherwise keeps it unsaved and shows why.</summary>
     [RelayCommand]
     private void Save()
@@ -157,11 +187,26 @@ internal sealed partial class MainViewModel : ObservableObject
         Placing?.OpenMap = value;
     }
 
+    private bool TryResize(MapViewModel open, int width, int height)
+    {
+        var resize = new ResizeMapEdit(open.Map.Layout, width, height, Catalog!.Objects);
+        var dropsSomething = resize.DroppedTileCount + resize.DroppedObjectCount + resize.DroppedCellEventCount > 0;
+        var question = $"Resizing to {width} x {height} drops {resize.DroppedTileCount} tiles, {resize.DroppedObjectCount} objects "
+            + $"and {resize.DroppedCellEventCount} cell events outside the new size. Resize anyway?";
+        if (dropsSomething && !_confirm(question))
+        {
+            return false;
+        }
+
+        open.Do(resize);
+        return true;
+    }
+
     // A stroke still being dragged counts as a change, so it ends before the question.
     private bool ConfirmLeaveCurrentMap()
     {
         CurrentMap?.EndStroke();
         return CurrentMap is not { IsDirty: true } open
-            || _confirmDiscard($"Map '{open.Map.Id}' has unsaved changes. Discard them?");
+            || _confirm($"Map '{open.Map.Id}' has unsaved changes. Discard them?");
     }
 }

@@ -1,6 +1,7 @@
 using Jrpg.ContentConverter.Maps;
 using Jrpg.ContentConverter.Objects;
 using Jrpg.ContentConverter.Tiles;
+using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
 using Jrpg.Data.Maps;
@@ -31,9 +32,16 @@ internal static class LegacyContentConversion
         ObjectCatalogValidator.Validate(ContentCatalogLoader.ObjectsFile, definitions);
         report.AddConverted(ObjectConversion.SourceFile, $"{definitions.Count} objects");
 
+        var maps = ConvertMaps(assetsRoot, objects.IdsByLegacyId, report);
         var references = new MapReferences(
-            tiles.Select(tile => tile.Id).ToHashSet(), definitions.ToDictionary(definition => definition.Id));
-        var maps = ConvertMaps(assetsRoot, objects.IdsByLegacyId, references, report);
+            tiles.Select(tile => tile.Id).ToHashSet(),
+            definitions.ToDictionary(definition => definition.Id),
+            ReadItemIds(contentRoot),
+            maps.ToDictionary(map => map.Id));
+        foreach (var map in maps)
+        {
+            MapLayoutValidator.Validate(MapFolderReader.LayoutFile(map.Id), map, references);
+        }
 
         // Everything is converted and validated before the folder is touched, so a failed run leaves the last good content.
         var generatedRoot = ReplaceGeneratedFolder(contentRoot);
@@ -51,7 +59,7 @@ internal static class LegacyContentConversion
 
     /// <summary>Converts the live maps; the older ones in <c>Maps/Back/</c> come in slice 3c.</summary>
     private static List<MapLayout> ConvertMaps(
-        string assetsRoot, IReadOnlyDictionary<int, string> objectIdsByLegacyId, MapReferences references, ConversionReport report)
+        string assetsRoot, IReadOnlyDictionary<int, string> objectIdsByLegacyId, ConversionReport report)
     {
         var sourceFiles = Directory.EnumerateFiles(Path.Combine(assetsRoot, MapConversion.SourceFolder), "*.json")
             .Select(path => $"{MapConversion.SourceFolder}/{Path.GetFileName(path)}")
@@ -66,12 +74,23 @@ internal static class LegacyContentConversion
                 throw new ConversionException($"{sourceFilesById[map.Id]} and {sourceFile} both become map id '{map.Id}'.");
             }
 
-            MapLayoutValidator.Validate($"{MapFolderReader.LayoutsFolder}/{map.Id}.json", map, references);
             report.AddConverted(sourceFile, $"map '{map.Id}' ({map.Width}x{map.Height}, {map.Layers.Count} layers, {map.Objects.Count} objects)");
             maps.Add(map);
         }
 
         return maps;
+    }
+
+    // Items are hand-written content; events that give one are checked against them before anything is written.
+    private static HashSet<string> ReadItemIds(string contentRoot)
+    {
+        var itemsPath = Path.Combine(contentRoot, ContentCatalogLoader.ItemsFile);
+        if (!File.Exists(itemsPath))
+        {
+            throw new ConversionException($"{ContentCatalogLoader.ItemsFile}: not found in the content folder; event items are checked against it.");
+        }
+
+        return [.. ContentFileReader.Read<IReadOnlyList<ItemDefinition>>(itemsPath).Select(item => item.Id)];
     }
 
     private static string ReplaceGeneratedFolder(string contentRoot)

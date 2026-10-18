@@ -18,5 +18,10 @@ internal static class ContentFileReader
             var location = exception.Path is null ? fileName : $"{fileName} at {exception.Path}";
             throw new ContentValidationException($"{location}: {exception.Message}", exception);
         }
+        catch (NotSupportedException exception)
+        {
+            // Thrown for a value the serializer can't create, such as an event step without its "type". The message holds the path.
+            throw new ContentValidationException($"{fileName}: {exception.Message}", exception);
+        }
     }
 }

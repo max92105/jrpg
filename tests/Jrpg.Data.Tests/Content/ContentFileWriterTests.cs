@@ -1,3 +1,6 @@
+using Jrpg.Core.Dialogue;
+using Jrpg.Core.Events;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
 
@@ -18,6 +21,28 @@ public sealed class ContentFileWriterTests : IDisposable
         var readBack = ContentFileReader.Read<IReadOnlyList<TileDefinition>>(_path);
 
         Assert.Equal(tiles, readBack);
+    }
+
+    [Fact]
+    public void Write_EveryEventStepKind_ReadsBackAsTheSameSteps()
+    {
+        IReadOnlyList<EventStep> steps =
+        [
+            new DialogueStep(new Speech(["Hello."], Speaker: "Sarxian")),
+            new GiveItemStep("potion", 2),
+            new SwapObjectStep("chest_opened"),
+            new WarpStep("forest", new GridCell(1, 2)),
+        ];
+
+        ContentFileWriter.Write(_path, steps);
+        var readBack = ContentFileReader.Read<IReadOnlyList<EventStep>>(_path);
+
+        Assert.Equal(steps.Select(step => step.GetType()), readBack.Select(step => step.GetType()));
+        Assert.Equal(steps.Skip(1), readBack.Skip(1));
+        var speech = ((DialogueStep)readBack[0]).Speech;
+        Assert.Equal(["Hello."], speech.Lines);
+        Assert.Equal(("Sarxian", null), (speech.Speaker, speech.PortraitFile));
+        Assert.Contains("\"type\": \"giveItem\"", File.ReadAllText(_path), StringComparison.Ordinal);
     }
 
     [Fact]

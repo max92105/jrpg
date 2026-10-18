@@ -17,7 +17,7 @@ public static class ContentCatalogLoader
 {
     private const string ClassesFile = "classes.json";
     private const string RulesFile = "rules.json";
-    private const string ItemsFile = "items.json";
+    internal const string ItemsFile = "items.json";
     private const string SkillsFile = "skills.json";
     private const string PartyMembersFile = "party-members.json";
     private const string EnemiesFile = "enemies.json";
@@ -53,7 +53,8 @@ public static class ContentCatalogLoader
         var tiles = ReadValidated<IReadOnlyList<TileDefinition>>(contentRoot, TilesFile, TileCatalogValidator.Validate);
         var objects = ReadValidated<IReadOnlyList<ObjectDefinition>>(contentRoot, ObjectsFile, ObjectCatalogValidator.Validate);
         var objectsById = objects.ToFrozenDictionary(definition => definition.Id);
-        var maps = MapFolderReader.Read(contentRoot, new MapReferences(tiles.Select(tile => tile.Id).ToFrozenSet(), objectsById));
+        var maps = MapFolderReader.Read(
+            contentRoot, tiles.Select(tile => tile.Id).ToFrozenSet(), objectsById, items.Select(item => item.Id).ToFrozenSet());
 
         return new ContentCatalog
         {

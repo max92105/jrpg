@@ -1,0 +1,124 @@
+using Jrpg.Core.Events;
+using Jrpg.Core.Maps;
+
+namespace Jrpg.Data.Maps;
+
+/// <summary>The rules for one map's object and cell events. Each problem names the event, and the step when it's one.</summary>
+internal static class MapEventValidator
+{
+    /// <returns>What is wrong with the map's events, or null if nothing is.</returns>
+    public static string? FindProblem(MapLayout layout, MapReferences references) =>
+        FindNullEntry(layout)
+        ?? FindRepeatedEventId(layout)
+        ?? FindObjectEventProblem(layout, references)
+        ?? FindCellEventProblem(layout, references);
+
+    // The serializer doesn't apply nullable annotations to collection elements, so stray nulls get here.
+    private static string? FindNullEntry(MapLayout layout)
+    {
+        var objectWithNullEvent = layout.Objects.FirstOrDefault(placed => placed.Events.Contains(null));
+        if (objectWithNullEvent is not null)
+        {
+            return $"object '{objectWithNullEvent.Uid}': events holds a null entry.";
+        }
+
+        if (layout.CellEvents.Contains(null))
+        {
+            return "cellEvents holds a null entry.";
+        }
+
+        var eventWithNullStep = AllEvents(layout).FirstOrDefault(mapEvent => mapEvent.Steps.Contains(null));
+        if (eventWithNullStep is not null)
+        {
+            return $"event '{eventWithNullStep.Id}': steps holds a null entry.";
+        }
+
+        var eventWithNullLine = AllEvents(layout).FirstOrDefault(
+            mapEvent => mapEvent.Steps.OfType<DialogueStep>().Any(dialogue => dialogue.Speech.Lines.Contains(null)));
+        return eventWithNullLine is null ? null : $"event '{eventWithNullLine.Id}': a dialogue's lines hold a null entry.";
+    }
+
+    private static string? FindRepeatedEventId(MapLayout layout)
+    {
+        var repeatedId = AllEvents(layout).GroupBy(mapEvent => mapEvent.Id).FirstOrDefault(group => group.Count() > 1)?.Key;
+        return repeatedId is null ? null : $"event id '{repeatedId}' is used more than once.";
+    }
+
+    private static string? FindObjectEventProblem(MapLayout layout, MapReferences references)
+    {
+        foreach (var placed in layout.Objects)
+        {
+            foreach (var mapEvent in placed.Events)
+            {
+                var problem = FindEventProblem(mapEvent, references);
+                if (problem is not null)
+                {
+                    return $"event '{mapEvent.Id}': {problem}";
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static string? FindCellEventProblem(MapLayout layout, MapReferences references)
+    {
+        foreach (var cellEvent in layout.CellEvents)
+        {
+            var problem = !layout.Contains(cellEvent.Cell) ? "the cell is outside the map."
+                : cellEvent.Event.Activation != EventActivation.Touch ? "a cell event must have touch activation."
+                : cellEvent.Event.Steps.Any(step => step is SwapObjectStep) ? "swapObject only works in an object's event."
+                : FindEventProblem(cellEvent.Event, references);
+            if (problem is not null)
+            {
+                return $"cell event '{cellEvent.Event.Id}' at ({cellEvent.Cell.X}, {cellEvent.Cell.Y}): {problem}";
+            }
+        }
+
+        return null;
+    }
+
+    private static string? FindEventProblem(MapEvent mapEvent, MapReferences references)
+    {
+        if (mapEvent.Activation == EventActivation.Interact && string.IsNullOrWhiteSpace(mapEvent.Prompt))
+        {
+            return "an interact event needs a prompt.";
+        }
+
+        if (mapEvent.OnlyWhenObjectId is { } onlyWhen && !references.Objects.ContainsKey(onlyWhen))
+        {
+            return $"onlyWhenObjectId has unknown object id '{onlyWhen}'.";
+        }
+
+        if (mapEvent.Steps.Count == 0)
+        {
+            return "steps must not be empty.";
+        }
+
+        for (var index = 0; index < mapEvent.Steps.Count; index++)
+        {
+            var problem = FindStepProblem(mapEvent.Steps[index], references);
+            if (problem is not null)
+            {
+                return $"step {index}: {problem}";
+            }
+        }
+
+        return null;
+    }
+
+    private static string? FindStepProblem(EventStep step, MapReferences references) => step switch
+    {
+        DialogueStep dialogue when dialogue.Speech.Lines.Count == 0 => "dialogue needs at least one line.",
+        GiveItemStep give when !references.ItemIds.Contains(give.ItemId) => $"giveItem has unknown item id '{give.ItemId}'.",
+        GiveItemStep give when give.Quantity < 1 => $"giveItem quantity must be at least 1 (was {give.Quantity}).",
+        SwapObjectStep swap when !references.Objects.ContainsKey(swap.ObjectId) => $"swapObject has unknown object id '{swap.ObjectId}'.",
+        WarpStep warp when !references.Layouts.TryGetValue(warp.MapId, out _) => $"warp has unknown map id '{warp.MapId}'.",
+        WarpStep warp when !references.Layouts[warp.MapId].Contains(warp.Cell) =>
+            $"warp cell ({warp.Cell.X}, {warp.Cell.Y}) is outside map '{warp.MapId}'.",
+        _ => null,
+    };
+
+    private static IEnumerable<MapEvent> AllEvents(MapLayout layout) =>
+        layout.Objects.SelectMany(placed => placed.Events).Concat(layout.CellEvents.Select(cellEvent => cellEvent.Event));
+}

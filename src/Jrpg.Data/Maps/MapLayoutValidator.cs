@@ -11,7 +11,8 @@ internal static class MapLayoutValidator
     {
         var problem = FindShapeProblem(fileName, layout)
             ?? FindLayerProblem(layout, references)
-            ?? FindObjectProblem(layout, references);
+            ?? FindObjectProblem(layout, references)
+            ?? MapEventValidator.FindProblem(layout, references);
         if (problem is not null)
         {
             throw new ContentValidationException($"{fileName}: {problem}");

@@ -14,7 +14,9 @@ public sealed class MapLayoutValidatorTests
         Objects: new Dictionary<string, ObjectDefinition>
         {
             ["tree"] = new() { Id = "tree", Width = 4, Height = 4, CollisionPolygon = [] },
-        });
+        },
+        ItemIds: new HashSet<string>(),
+        Layouts: new Dictionary<string, MapLayout>());
 
     private static readonly PlacedObject _tree = new() { Uid = "1@0,0", ObjectId = "tree", Position = new Point2D(0, 0) };
 

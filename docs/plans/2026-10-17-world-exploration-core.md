@@ -295,7 +295,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
     - `MapEvent_CanRunOn_OnlyWhenOtherObject_ReturnsFalse`
   - **Done, with deviations:** `WorldState` has only the empty constructor, the queries and the mutators; the restore constructor and `CompletedEvents`/`ObjectSwaps` come with their first user in 5a. `ActiveMap.IsDone` has no production caller until 3d (`InteractionFinder`). `EventRun` throws for a swap step without a source object (3b's validator forbids it). The over-`MaxStack` test is `EventRun_Constructor_GiveItemBeyondMaxStack_ReceiptReportsLostCopies` (the first step applies in the constructor). `content/generated/maps/` regenerated with empty `events`/`cellEvents`.
 
-- [ ] **3b. Event content loading** (Data, about 260 lines)
+- [x] **3b. Event content loading** (Data, about 260 lines)
   - **Goal:** map files with events load through polymorphic steps, and broken event content fails at load time naming the map, event and step. Tested with hand-written fixtures; the repository maps get their events in 3c.
   - **Data:**
     - `Content/ContentTypeDiscriminators` (internal): a type-info modifier added to `ContentJsonOptions` that registers `EventStep`'s derived types under a `"type"` discriminator (`dialogue`, `giveItem`, `swapObject`, `warp`), unknown types rejected. Core stays attribute-free (ADR 0002).
@@ -308,6 +308,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
     - `MapEventValidator_Validate_SwapStepInCellEvent_ThrowsNamingTheCell`
     - `MapEventValidator_Validate_InteractCellEvent_ThrowsNamingTheCell`
     - `MapEventValidator_Validate_InteractEventWithoutPrompt_ThrowsNamingTheEvent`
+  - **Done, with deviations:** `MapEventValidator.FindProblem` returns the problem and `MapLayoutValidator` throws, so its tests are `MapEventValidator_FindProblem_..._Names...`. `MapReferences` holds every map's layout (not just sizes); `MapFolderReader.Read` takes the tile ids, objects and item ids and reads all layouts before validating any. `Speech`'s speaker and portrait became optional trailing constructor parameters, so content can leave them out. `ContentFileReader` also translates `NotSupportedException` (a step without `type`). The converter checks event items against `content/items.json` and fails with a named error without it. Follow-up for 3d: nothing rejects two cell events on the same cell.
 
 - [ ] **3c. Event conversion and backup maps** (tool + content, about 300 lines)
   - **Goal:** the chest, the door and the warp tiles are in the generated maps as events, and the Back maps are converted where the plan can express them, with a report for the rest.

@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace Jrpg.Data.Content;
 
@@ -17,6 +18,10 @@ internal static class ContentJsonOptions
             RespectRequiredConstructorParameters = true,
             UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
             AllowDuplicateProperties = false,
+
+            // Hand-written content may put "type" anywhere in a step, not only first.
+            AllowOutOfOrderMetadataProperties = true,
+            TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { ContentTypeDiscriminators.Register } },
         };
         options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false));
 

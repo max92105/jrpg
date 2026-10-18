@@ -1,3 +1,5 @@
+using Jrpg.Core.Events;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
 using Jrpg.Data.Maps;
@@ -9,7 +11,7 @@ public sealed class MapFolderReaderTests : IDisposable
     private const string Layout = """{ "id": "forest", "width": 1, "height": 1, "layers": [ { "rows": [ [ 1 ] ] } ], "objects": [] }""";
     private const string Settings = """{ "id": "forest", "displayName": "Whispering Forest" }""";
 
-    private static readonly MapReferences _references = new(new HashSet<int> { 1 }, new Dictionary<string, ObjectDefinition>());
+    private static readonly HashSet<int> _tileIds = [1];
 
     private readonly string _contentRoot = Path.Combine(Path.GetTempPath(), $"jrpg-maps-{Guid.NewGuid():N}");
 
@@ -21,7 +23,7 @@ public sealed class MapFolderReaderTests : IDisposable
         WriteContent("generated/maps/forest.json", Layout);
         WriteContent("maps/forest.json", Settings);
 
-        var map = Assert.Single(MapFolderReader.Read(_contentRoot, _references));
+        var map = Assert.Single(Read());
 
         Assert.Equal(("forest", "Whispering Forest", 1), (map.Id, map.Settings.DisplayName, map.Layout.Width));
     }
@@ -32,7 +34,7 @@ public sealed class MapFolderReaderTests : IDisposable
         WriteContent("generated/maps/forest.json", Layout);
         Directory.CreateDirectory(Path.Combine(_contentRoot, "maps"));
 
-        var exception = Assert.Throws<ContentValidationException>(() => MapFolderReader.Read(_contentRoot, _references));
+        var exception = Assert.Throws<ContentValidationException>(() => Read());
 
         Assert.Equal("generated/maps/forest.json: map 'forest' has no settings file in maps/.", exception.Message);
     }
@@ -42,10 +44,34 @@ public sealed class MapFolderReaderTests : IDisposable
     {
         WriteContent("maps/forest.json", Settings);
 
-        var exception = Assert.Throws<ContentValidationException>(() => MapFolderReader.Read(_contentRoot, _references));
+        var exception = Assert.Throws<ContentValidationException>(() => Read());
 
         Assert.Equal("maps/forest.json: map 'forest' has no layout in generated/maps/; run the content converter.", exception.Message);
     }
+
+    [Fact]
+    public void Read_WarpToMapReadLater_LoadsWithTheStepTypeAnywhereInTheStep()
+    {
+        // "woods" sorts after "forest", so the warp target is only known because every layout is read first.
+        WriteContent("maps/forest.json", Settings);
+        WriteContent(
+            "generated/maps/forest.json",
+            """
+            { "id": "forest", "width": 1, "height": 1, "layers": [ { "rows": [ [ 1 ] ] } ], "objects": [],
+              "cellEvents": [ { "cell": { "x": 0, "y": 0 }, "event": { "id": "cell_0_0", "activation": "touch",
+                "steps": [ { "mapId": "woods", "type": "warp", "cell": { "x": 1, "y": 0 } } ] } } ] }
+            """);
+        WriteContent("generated/maps/woods.json", """{ "id": "woods", "width": 2, "height": 1, "layers": [ { "rows": [ [ 1, 1 ] ] } ], "objects": [] }""");
+        WriteContent("maps/woods.json", """{ "id": "woods", "displayName": "Woods" }""");
+
+        var maps = Read();
+
+        var step = maps.Single(map => map.Id == "forest").Layout.CellEvents[0].Event.Steps[0];
+        Assert.Equal(new WarpStep("woods", new GridCell(1, 0)), step);
+    }
+
+    private IReadOnlyList<MapDefinition> Read() =>
+        MapFolderReader.Read(_contentRoot, _tileIds, new Dictionary<string, ObjectDefinition>(), new HashSet<string>());
 
     private void WriteContent(string relativePath, string json)
     {

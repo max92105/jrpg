@@ -1,3 +1,4 @@
+using Jrpg.Core.Events;
 using Jrpg.Core.Items;
 using Jrpg.Data.Content;
 
@@ -43,6 +44,18 @@ public sealed class ContentFileReaderTests
             () => ContentFileReader.Read<IReadOnlyList<ItemDefinition>>(TestContentPath("unknown-field.json")));
 
         Assert.Contains("maxStak", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Theory]
+    [InlineData("unknown-step-type.json")]
+    [InlineData("step-without-type.json")]
+    public void Read_EventStepWithUnknownType_ThrowsNamingTheFile(string fileName)
+    {
+        var exception = Assert.Throws<ContentValidationException>(
+            () => ContentFileReader.Read<IReadOnlyList<MapEvent>>(TestContentPath(fileName)));
+
+        Assert.StartsWith(fileName, exception.Message, StringComparison.Ordinal);
+        Assert.Contains("$[0].steps[0]", exception.Message, StringComparison.Ordinal);
     }
 
     private static string TestContentPath(string fileName) => Path.Combine(AppContext.BaseDirectory, "TestContent", fileName);

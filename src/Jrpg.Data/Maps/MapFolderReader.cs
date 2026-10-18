@@ -12,7 +12,22 @@ internal static class MapFolderReader
     internal const string LayoutsFolder = ContentCatalogLoader.GeneratedFolder + "/maps";
     internal const string SettingsFolder = "maps";
 
-    public static IReadOnlyList<MapDefinition> Read(string contentRoot, MapReferences references)
+    /// <summary>Reads all layouts before validating any, since a warp's target map must exist and contain its cell.</summary>
+    public static IReadOnlyList<MapDefinition> Read(
+        string contentRoot,
+        IReadOnlySet<int> tileIds,
+        IReadOnlyDictionary<string, ObjectDefinition> objects,
+        IReadOnlySet<string> itemIds)
+    {
+        var mapIds = PairedMapIds(contentRoot);
+        var layouts = mapIds.ToDictionary(id => id, id => ContentFileReader.Read<MapLayout>(Path.Combine(contentRoot, LayoutFile(id))));
+        var references = new MapReferences(tileIds, objects, itemIds, layouts);
+        return [.. mapIds.Select(id => ReadValidatedMap(contentRoot, id, references))];
+    }
+
+    internal static string LayoutFile(string mapId) => $"{LayoutsFolder}/{mapId}.json";
+
+    private static List<string> PairedMapIds(string contentRoot)
     {
         var layoutIds = MapIdsIn(contentRoot, LayoutsFolder);
         var settingsIds = MapIdsIn(contentRoot, SettingsFolder);
@@ -20,7 +35,7 @@ internal static class MapFolderReader
         if (layoutWithoutSettings is not null)
         {
             throw new ContentValidationException(
-                $"{LayoutsFolder}/{layoutWithoutSettings}.json: map '{layoutWithoutSettings}' has no settings file in {SettingsFolder}/.");
+                $"{LayoutFile(layoutWithoutSettings)}: map '{layoutWithoutSettings}' has no settings file in {SettingsFolder}/.");
         }
 
         var settingsWithoutLayout = settingsIds.Except(layoutIds).FirstOrDefault();
@@ -30,14 +45,14 @@ internal static class MapFolderReader
                 $"{SettingsFolder}/{settingsWithoutLayout}.json: map '{settingsWithoutLayout}' has no layout in {LayoutsFolder}/; run the content converter.");
         }
 
-        return [.. layoutIds.Select(id => ReadMap(contentRoot, id, references))];
+        return layoutIds;
     }
 
-    private static MapDefinition ReadMap(string contentRoot, string id, MapReferences references)
+    // The id comes from the file names; the layout's own id must match it, which the validator checks.
+    private static MapDefinition ReadValidatedMap(string contentRoot, string id, MapReferences references)
     {
-        var layoutFile = $"{LayoutsFolder}/{id}.json";
-        var layout = ContentFileReader.Read<MapLayout>(Path.Combine(contentRoot, layoutFile));
-        MapLayoutValidator.Validate(layoutFile, layout, references);
+        var layout = references.Layouts[id];
+        MapLayoutValidator.Validate(LayoutFile(id), layout, references);
 
         var settingsFile = $"{SettingsFolder}/{id}.json";
         var settings = ContentFileReader.Read<MapSettings>(Path.Combine(contentRoot, settingsFile));

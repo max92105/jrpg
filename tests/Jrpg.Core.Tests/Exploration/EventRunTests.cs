@@ -15,7 +15,7 @@ public sealed class EventRunTests
     private static readonly ItemDefinition _potion = new ItemDefinitionBuilder().WithId("potion").WithMaxStack(99).Build();
     private static readonly Dictionary<string, ItemDefinition> _items = new() { [_potion.Id] = _potion };
 
-    private static readonly DialogueStep _foundSomething = new(new Speech(Speaker: null, PortraitFile: null, ["Something glints inside."]));
+    private static readonly DialogueStep _foundSomething = new(new Speech(["Something glints inside."]));
     private static readonly GiveItemStep _givePotions = new("potion", 3);
     private static readonly SwapObjectStep _openChest = new("chest_opened");
 

@@ -8,7 +8,9 @@ public sealed class LegacyContentConversionTests : IDisposable
 
     public LegacyContentConversionTests()
     {
+        // The converter checks event items against the hand-written item list.
         Directory.CreateDirectory(_contentRoot);
+        File.Copy(Path.Combine(TestPaths.RepositoryContent, "items.json"), Path.Combine(_contentRoot, "items.json"));
     }
 
     public void Dispose() => Directory.Delete(_contentRoot, recursive: true);
@@ -34,6 +36,16 @@ public sealed class LegacyContentConversionTests : IDisposable
         var catalog = ContentCatalogLoader.Load(_contentRoot);
 
         Assert.Equal(["forest", "interior_1", "start"], catalog.Maps.Keys.Order(StringComparer.Ordinal));
+    }
+
+    [Fact]
+    public void Convert_ContentFolderWithoutItems_ThrowsNamingTheFile()
+    {
+        File.Delete(Path.Combine(_contentRoot, "items.json"));
+
+        var exception = Assert.Throws<ConversionException>(() => LegacyContentConversion.Convert(TestPaths.LegacyAssets, _contentRoot));
+
+        Assert.StartsWith("items.json: not found", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -76,7 +88,7 @@ public sealed class LegacyContentConversionTests : IDisposable
         {
             var target = Path.Combine(destination, Path.GetRelativePath(source, file));
             Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-            File.Copy(file, target);
+            File.Copy(file, target, overwrite: true);
         }
     }
 

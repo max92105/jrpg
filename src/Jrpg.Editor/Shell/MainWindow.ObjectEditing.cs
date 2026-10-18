@@ -6,6 +6,7 @@ using System.Windows.Shapes;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Editor.Maps;
+using Jrpg.Editor.Objects;
 
 namespace Jrpg.Editor.Shell;
 
@@ -26,9 +27,9 @@ internal sealed partial class MainWindow
     {
         if (button == MouseButton.Right)
         {
-            if (_viewModel.ObjectAt(point) is { } hit)
+            if (Placing.ObjectAt(point) is { } hit)
             {
-                _viewModel.RemoveObject(hit.Uid);
+                Placing.RemoveObject(hit.Uid);
             }
 
             return true;
@@ -43,13 +44,13 @@ internal sealed partial class MainWindow
         {
             _selectionStart = point;
         }
-        else if (Keyboard.Modifiers == ModifierKeys.Shift && _viewModel.ObjectAt(point) is { } grabbed)
+        else if (Keyboard.Modifiers == ModifierKeys.Shift && Placing.ObjectAt(point) is { } grabbed)
         {
             _movedObject = (grabbed, new Vector(grabbed.Position.X - point.X, grabbed.Position.Y - point.Y));
         }
         else
         {
-            _viewModel.PlaceObjectAt(point);
+            Placing.PlaceObjectAt(point);
             return true;
         }
 
@@ -60,18 +61,18 @@ internal sealed partial class MainWindow
 
     private bool HandleObjectKey(Key key)
     {
-        if (key != Key.Delete || _viewModel.Mode != EditingMode.Objects || Keyboard.FocusedElement is TextBox)
+        if (key != Key.Delete || _viewModel.Mode != EditingMode.Objects || _viewModel.CurrentMap is null || Keyboard.FocusedElement is TextBox)
         {
             return false;
         }
 
-        if (_viewModel.SelectedObjectUids.Count > 0)
+        if (Placing.SelectedObjectUids.Count > 0)
         {
-            _viewModel.DeleteSelectedObjects();
+            Placing.DeleteSelectedObjects();
         }
-        else if (_mapPoint is { } point && _viewModel.ObjectAt(point) is { } hovered)
+        else if (_mapPoint is { } point && Placing.ObjectAt(point) is { } hovered)
         {
-            _viewModel.RemoveObject(hovered.Uid);
+            Placing.RemoveObject(hovered.Uid);
         }
 
         return true;
@@ -83,7 +84,7 @@ internal sealed partial class MainWindow
     {
         SelectionOutline.Visibility = Visibility.Collapsed;
         ObjectGhost.Visibility = Visibility.Collapsed;
-        if (point is not { } at || _viewModel.Mode != EditingMode.Objects || _drawing is null)
+        if (point is not { } at || _viewModel.Mode != EditingMode.Objects || _viewModel.CurrentMap is null)
         {
             return;
         }
@@ -98,7 +99,7 @@ internal sealed partial class MainWindow
         {
             ShowGhost(_viewModel.Catalog!.Objects[moved.Placed.ObjectId], new Point2D(at.X + moved.Offset.X, at.Y + moved.Offset.Y));
         }
-        else if (_viewModel.Objects?.SelectedObject is { } chosen)
+        else if (Placing.Browser.SelectedObject is { } chosen)
         {
             ShowGhost(chosen, new Point2D(at.X - (chosen.Width / 2.0), at.Y - (chosen.Height / 2.0)));
         }
@@ -121,11 +122,11 @@ internal sealed partial class MainWindow
     {
         if (_selectionStart is { } start)
         {
-            _viewModel.SelectObjectsIn(start, point);
+            Placing.SelectObjectsIn(start, point);
         }
         else if (_movedObject is { } moved)
         {
-            _viewModel.MoveObject(moved.Placed.Uid, new Point2D(point.X + moved.Offset.X, point.Y + moved.Offset.Y));
+            Placing.MoveObject(moved.Placed.Uid, new Point2D(point.X + moved.Offset.X, point.Y + moved.Offset.Y));
         }
     }
 
@@ -140,7 +141,8 @@ internal sealed partial class MainWindow
     {
         SelectionMarks.Children.Clear();
         var objects = _viewModel.CurrentMap?.Map.Layout.Objects ?? [];
-        foreach (var placed in objects.Where(placed => _viewModel.SelectedObjectUids.Contains(placed.Uid)))
+        var selected = _viewModel.Placing?.SelectedObjectUids ?? [];
+        foreach (var placed in objects.Where(placed => selected.Contains(placed.Uid)))
         {
             var definition = _viewModel.Catalog!.Objects[placed.ObjectId];
             var mark = new Rectangle { Stroke = _selectionBrush, StrokeThickness = 2 / _viewport.Zoom };
@@ -148,6 +150,9 @@ internal sealed partial class MainWindow
             SelectionMarks.Children.Add(mark);
         }
     }
+
+    // Placing exists whenever a map is open, which the mouse and key handlers check first.
+    private ObjectPlacingViewModel Placing => _viewModel.Placing!;
 
     private void OnEditingTabChanged(object sender, SelectionChangedEventArgs e)
     {

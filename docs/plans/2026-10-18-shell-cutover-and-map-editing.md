@@ -354,10 +354,24 @@ The developer still edits maps in the legacy MapEditor (ADR 0005), so render dat
   - **Tests:** `PlacedObjectUids_Next_Chest1Taken_ReturnsChest2`, `PlacedObjectUids_Next_NoneTaken_ReturnsSuffixOne`, `RemoveObjectsEdit_Revert_RestoresObjectsInPlacementOrder`, `MoveObjectEdit_Revert_RestoresPosition`, `MapDraft_ObjectsInRectangle_ReturnsOnlyOverlapping`.
   - **Done, with deviations:** the side panel has Tiles and Objects tabs, and the open tab sets what clicks do (`Shell/EditingMode`, legacy editor modes). Hit-testing is `Maps/Editing/PlacedObjectHits` on the map's layout (`TopAt`: a tile of the object under the point, the one drawn last on top; `InRectangle`: bounds overlap), since it needs object definitions; the planned `MapDraft_ObjectsInRectangle_...` test is `PlacedObjectHits_InRectangle_ReturnsOnlyOverlapping`. Objects are placed centered on the mouse and unsnapped, as legacy, on the chosen layer Z; a click off the map places nothing. Delete removes the selection, or the object under the mouse when nothing is selected. The selection drops objects that leave the map (an undo), since uids are reused. Previews and the ghost under the mouse come from `MapDrawing.DrawObject`. **Before 11h:** split `MainViewModel` (open and save, tile painting, object placing; about 330 lines) so map settings don't make it a fourth concern. Follow-ups: `TopAt` ranks by the object's Z, so a click on a canopy may pick an object drawn under it; uid reuse (next free) is the risk noted under Risks.
 
-- [ ] **11h. Map settings, resize and new maps** (Editor, about 250 lines)
+- **11h. Map settings, resize and new maps** (Editor): split in three (developer, after 11g), about 600 lines in all.
   - **Goal:** edit a map's display name, size (shrinking warns and drops what falls outside) and random encounter table (odds, grace steps, encounters, or none); create a new map whose id is fixed at creation (question 70).
-  - **New types:** `Maps/Settings/MapSettingsViewModel`, `Maps/Editing/ResizeMapEdit` (keeps what it drops, for undo), `Maps/Editing/MapIds` (`string FromName(string name, IReadOnlyCollection<string> taken)`: snake_case, unique).
-  - **Tests:** `ResizeMapEdit_Shrink_DropsTilesAndObjectsOutside`, `ResizeMapEdit_Revert_RestoresDroppedContent`, `MapIds_FromName_TakenId_AppendsNumber`, `MapSettingsViewModel_NoEncounters_ProducesNullTable`.
+
+- [x] **11h-1. Split the editor's main view model** (Editor, about 150 lines moved; no behavior change)
+  - **Goal:** `MainViewModel` keeps opening, saving and closing; tile painting and object placing move to their own view models, owned by the shell, so map settings don't add a fourth concern (11g review).
+  - **New types:** `Tiles/TilePaintingViewModel` (layer Z, brush size, tool, dimming, strokes, rectangle, flood fill, fill and clear layer, eyedropper), `Objects/ObjectPlacingViewModel` (place, move, remove, selection). Both act on the open map, given by the shell.
+  - **Tests:** the existing painting and object tests move to the new view models' test classes, unchanged in what they check.
+  - **Done, with deviations:** the chosen layer (Z, dimming, presets) is its own `Maps/LayerChoiceViewModel`, shared by painting and placing, since both use it. The new view models are built directly over the repository catalog in their tests; `MainViewModel` (about 170 lines) hands them the open map and is null-safe when content fails to load. With no map open, clicks on the view are now ignored instead of starting an empty stroke.
+
+- [ ] **11h-2. Map settings and resize** (Editor, about 250 lines)
+  - **Goal:** edit the display name and the random encounter table (odds, grace steps, encounters, or none) and resize the map; shrinking warns and drops what falls outside.
+  - **New types:** `Maps/Settings/MapSettingsViewModel`, `Maps/Editing/SetMapSettingsEdit`, `Maps/Editing/ResizeMapEdit` (keeps what it drops, for undo). Settings changes go into the map's undo history (placeholder until the developer confirms; legacy applied them directly).
+  - **Tests:** `ResizeMapEdit_Shrink_DropsTilesAndObjectsOutside`, `ResizeMapEdit_Revert_RestoresDroppedContent`, `MapSettingsViewModel_NoEncounters_ProducesNullTable`.
+
+- [ ] **11h-3. New maps** (Editor, about 150 lines)
+  - **Goal:** create a map from a name and a size; its id is made from the name and fixed (question 70); it opens as an unsaved draft and joins the map list when saved.
+  - **New types:** `Maps/Editing/MapIds` (`string FromName(string name, IReadOnlyCollection<string> taken)`: snake_case, unique).
+  - **Tests:** `MapIds_FromName_TakenId_AppendsNumber`, plus opening and saving a new map.
 
 - [ ] **11i. Object events** (Editor, about 300 lines)
   - **Goal:** clicking a placed object in event mode opens its events: activation, prompt, once, "only while the object is", and steps (dialogue, give item, swap object, warp) with add, remove and reorder; ids stay stable. Map markers: yellow for interact, cyan for touch (legacy).

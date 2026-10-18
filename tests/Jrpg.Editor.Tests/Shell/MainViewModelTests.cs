@@ -1,7 +1,5 @@
 using Jrpg.Core.Geometry;
-using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
-using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
 using Jrpg.Editor.Shell;
 
@@ -80,7 +78,7 @@ public sealed class MainViewModelTests : IDisposable
     public void ConfirmClose_MidStroke_AsksTheUser()
     {
         var viewModel = Open(_repositoryContent, discardAnswer: false);
-        viewModel.StartErasing(new GridCell(0, 0));
+        viewModel.Painting!.StartErasing(new GridCell(0, 0));
 
         Assert.False(viewModel.ConfirmClose());
         Assert.Single(_questions);
@@ -147,250 +145,14 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
-    public void StartPainting_TileChosen_PaintsItOnTheChosenLayerAsOneStep()
+    public void TryOpenMap_AnotherMap_HandsItToPaintingAndPlacing()
     {
         var viewModel = Open(_repositoryContent);
-        viewModel.PickTileAt(new GridCell(0, 0));
-        var tileId = viewModel.Tiles!.SelectedTileId;
-        viewModel.LayerZ = -3;
-
-        viewModel.StartPainting(new GridCell(4, 4));
-        viewModel.ContinueStroke(new GridCell(5, 4));
-        viewModel.EndStroke();
-
-        var layer = viewModel.CurrentMap!.Layers.Single(layer => layer.Z == -3);
-        Assert.Equal((tileId, tileId), (layer.TileIdAt(new GridCell(4, 4)), layer.TileIdAt(new GridCell(5, 4))));
-        Assert.True(viewModel.CurrentMap.IsDirty);
-    }
-
-    [Fact]
-    public void StartPainting_NoTileChosen_ChangesNothing()
-    {
-        var viewModel = Open(_repositoryContent);
-
-        viewModel.StartPainting(new GridCell(4, 4));
-        viewModel.EndStroke();
-
-        Assert.False(viewModel.CurrentMap!.IsDirty);
-    }
-
-    [Fact]
-    public void StartErasing_UsesTheChosenLayerAndBrushSize()
-    {
-        var viewModel = Open(_repositoryContent);
-        viewModel.GrowBrush();
-
-        viewModel.StartErasing(new GridCell(4, 4));
-        viewModel.EndStroke();
-
-        var ground = viewModel.CurrentMap!.Layers.Single(layer => layer.Z == LayerPresets.GroundZ);
-        Assert.All([new GridCell(4, 4), new GridCell(5, 4), new GridCell(4, 5), new GridCell(5, 5)], cell =>
-            Assert.Equal(TileLayer.EmptyTileId, ground.TileIdAt(cell)));
-    }
-
-    [Fact]
-    public void PickTileAt_CellWithTiles_ChoosesTheTopTileAndItsLayer()
-    {
-        var viewModel = Open(_repositoryContent);
-        viewModel.TryOpenMap("start");
-        var top = viewModel.CurrentMap!.TopTileAt(new GridCell(3, 2))!.Value;
-
-        viewModel.PickTileAt(new GridCell(3, 2));
-
-        Assert.Equal((top.TileId, top.LayerZ), (viewModel.Tiles!.SelectedTileId, viewModel.LayerZ));
-    }
-
-    [Fact]
-    public void PickTileAt_CellWithoutTiles_KeepsTheChoice()
-    {
-        var viewModel = Open(_repositoryContent);
-        viewModel.TryOpenMap("start");
-        viewModel.LayerZ = -3;
-
-        viewModel.PickTileAt(new GridCell(5, 13));
-
-        Assert.Equal(-3, viewModel.LayerZ);
-        Assert.Null(viewModel.Tiles!.SelectedTileId);
-    }
-
-    [Fact]
-    public void PaintRectangle_TileChosen_PaintsEveryCellOfIt()
-    {
-        var viewModel = OpenWithTileChosen(layerZ: -3);
-
-        viewModel.PaintRectangle(new GridCell(3, 2), new GridCell(1, 1));
-
-        var layer = viewModel.CurrentMap!.Layers.Single(layer => layer.Z == -3);
-        Assert.Equal(6, layer.Rows.SelectMany(row => row).Count(tileId => tileId == viewModel.Tiles!.SelectedTileId));
-    }
-
-    [Fact]
-    public void EraseRectangle_EmptiesItsCellsOnTheChosenLayer()
-    {
-        var viewModel = Open(_repositoryContent);
-
-        viewModel.EraseRectangle(new GridCell(0, 0), new GridCell(1, 1));
-
-        var ground = viewModel.CurrentMap!.Layers.Single(layer => layer.Z == LayerPresets.GroundZ);
-        Assert.All(BrushCells.Rectangle(new GridCell(0, 0), new GridCell(1, 1)), cell => Assert.Equal(TileLayer.EmptyTileId, ground.TileIdAt(cell)));
-    }
-
-    [Fact]
-    public void FloodFill_EmptyLayer_FillsTheWholeMapAsOneStep()
-    {
-        var viewModel = OpenWithTileChosen(layerZ: -3);
-
-        viewModel.FloodFill(new GridCell(2, 2));
-
-        var layer = viewModel.CurrentMap!.Layers.Single(layer => layer.Z == -3);
-        Assert.All(layer.Rows.SelectMany(row => row), tileId => Assert.Equal(viewModel.Tiles!.SelectedTileId, tileId));
-        viewModel.CurrentMap.UndoCommand.Execute(null);
-        Assert.DoesNotContain(viewModel.CurrentMap.Layers, layer => layer.Z == -3);
-    }
-
-    [Fact]
-    public void FillLayerCommand_NoTileChosen_ChangesNothing()
-    {
-        var viewModel = Open(_repositoryContent);
-
-        viewModel.FillLayerCommand.Execute(null);
-
-        Assert.False(viewModel.CurrentMap!.IsDirty);
-    }
-
-    [Fact]
-    public void ClearLayerCommand_RemovesTheLayer()
-    {
-        var viewModel = Open(_repositoryContent);
-
-        viewModel.ClearLayerCommand.Execute(null);
-
-        Assert.DoesNotContain(viewModel.CurrentMap!.Layers, layer => layer.Z == LayerPresets.GroundZ);
-    }
-
-    [Fact]
-    public void PlaceObjectAt_ObjectChosen_CentersItOnThePointWithTheNextUid()
-    {
-        var viewModel = OpenWithObjectChosen("chest");
-        viewModel.LayerZ = 1;
-
-        viewModel.PlaceObjectAt(new Point2D(4.5, 6.5));
-        viewModel.PlaceObjectAt(new Point2D(8, 8));
-
-        var placed = viewModel.CurrentMap!.Map.Layout.Objects;
-        Assert.Equal(("chest_1", new Point2D(4, 6), 1), (placed[^2].Uid, placed[^2].Position, placed[^2].Z));
-        Assert.Equal("chest_2", placed[^1].Uid);
-    }
-
-    [Fact]
-    public void PlaceObjectAt_NoObjectChosen_ChangesNothing()
-    {
-        var viewModel = Open(_repositoryContent);
-
-        viewModel.PlaceObjectAt(new Point2D(4.5, 6.5));
-
-        Assert.False(viewModel.CurrentMap!.IsDirty);
-    }
-
-    [Fact]
-    public void MoveObject_ThenUndo_PutsItBack()
-    {
-        var viewModel = OpenWithObjectChosen("chest");
-        viewModel.PlaceObjectAt(new Point2D(4.5, 6.5));
-
-        viewModel.MoveObject("chest_1", new Point2D(10, 3));
-        Assert.Equal(new Point2D(10, 3), viewModel.ObjectAt(new Point2D(10.5, 3.5))?.Position);
-        viewModel.CurrentMap!.UndoCommand.Execute(null);
-
-        Assert.Equal(new Point2D(4, 6), viewModel.ObjectAt(new Point2D(4.5, 6.5))?.Position);
-    }
-
-    [Fact]
-    public void DeleteSelectedObjects_RemovesThemAsOneStepAndClearsTheSelection()
-    {
-        var viewModel = OpenWithObjectChosen("chest");
-        viewModel.PlaceObjectAt(new Point2D(4.5, 6.5));
-        viewModel.PlaceObjectAt(new Point2D(5.5, 6.5));
-        var before = viewModel.CurrentMap!.Map.Layout.Objects.Count;
-        viewModel.SelectObjectsIn(new Point2D(3.9, 5.9), new Point2D(6.1, 7.1));
-        Assert.Equal(["chest_1", "chest_2"], viewModel.SelectedObjectUids);
-
-        viewModel.DeleteSelectedObjects();
-
-        Assert.Equal(before - 2, viewModel.CurrentMap.Map.Layout.Objects.Count);
-        Assert.Empty(viewModel.SelectedObjectUids);
-        viewModel.CurrentMap.UndoCommand.Execute(null);
-        Assert.Equal(before, viewModel.CurrentMap.Map.Layout.Objects.Count);
-    }
-
-    [Fact]
-    public void RemoveObject_IsUndoable()
-    {
-        var viewModel = OpenWithObjectChosen("chest");
-        viewModel.PlaceObjectAt(new Point2D(4.5, 6.5));
-
-        viewModel.RemoveObject("chest_1");
-
-        Assert.Null(viewModel.ObjectAt(new Point2D(4.5, 6.5)));
-        viewModel.CurrentMap!.UndoCommand.Execute(null);
-        Assert.Equal("chest_1", viewModel.ObjectAt(new Point2D(4.5, 6.5))?.Uid);
-    }
-
-    [Fact]
-    public void SelectedObjectUids_AfterUndoingThePlacement_DropsTheObject()
-    {
-        var viewModel = OpenWithObjectChosen("chest");
-        viewModel.PlaceObjectAt(new Point2D(4.5, 6.5));
-        viewModel.SelectObjectsIn(new Point2D(3.9, 5.9), new Point2D(5.1, 7.1));
-
-        viewModel.CurrentMap!.UndoCommand.Execute(null);
-        viewModel.PlaceObjectAt(new Point2D(9.5, 9.5));
-
-        Assert.Empty(viewModel.SelectedObjectUids);
-    }
-
-    [Fact]
-    public void PlaceObjectAt_PointOffTheMap_PlacesNothing()
-    {
-        var viewModel = OpenWithObjectChosen("chest");
-
-        viewModel.PlaceObjectAt(new Point2D(-0.5, 3));
-
-        Assert.False(viewModel.CurrentMap!.IsDirty);
-    }
-
-    [Fact]
-    public void TryOpenMap_AnotherMap_ClearsTheObjectSelection()
-    {
-        var viewModel = OpenWithObjectChosen("chest");
-        viewModel.PlaceObjectAt(new Point2D(4.5, 6.5));
-        viewModel.SelectObjectsIn(new Point2D(3.9, 5.9), new Point2D(5.1, 7.1));
-        viewModel.SaveCommand.Execute(null);
 
         viewModel.TryOpenMap("start");
 
-        Assert.Empty(viewModel.SelectedObjectUids);
-    }
-
-    [Fact]
-    public void GrowBrush_FromFive_SkipsToSeven()
-    {
-        var viewModel = Open(_repositoryContent);
-        viewModel.BrushSize = 5;
-
-        viewModel.GrowBrush();
-
-        Assert.Equal(7, viewModel.BrushSize);
-    }
-
-    [Fact]
-    public void ShrinkBrush_AtSmallest_StaysThere()
-    {
-        var viewModel = Open(_repositoryContent);
-
-        viewModel.ShrinkBrush();
-
-        Assert.Equal(1, viewModel.BrushSize);
+        Assert.Same(viewModel.CurrentMap, viewModel.Painting!.OpenMap);
+        Assert.Same(viewModel.CurrentMap, viewModel.Placing!.OpenMap);
     }
 
     [Fact]
@@ -404,23 +166,8 @@ public sealed class MainViewModelTests : IDisposable
         Assert.StartsWith("classes.json", viewModel.LoadError, StringComparison.Ordinal);
         Assert.Empty(viewModel.MapIds);
         Assert.Null(viewModel.CurrentMap);
-    }
-
-    // The forest map open, its top-left tile chosen, painting on the given layer.
-    private MainViewModel OpenWithTileChosen(int layerZ)
-    {
-        var viewModel = Open(_repositoryContent);
-        viewModel.PickTileAt(new GridCell(0, 0));
-        viewModel.LayerZ = layerZ;
-        return viewModel;
-    }
-
-    // The forest map open in a copy of the content, the given object chosen to place.
-    private MainViewModel OpenWithObjectChosen(string objectId)
-    {
-        var viewModel = Open(CopyOfRepositoryContent());
-        viewModel.Objects!.SelectedObject = viewModel.Catalog!.Objects[objectId];
-        return viewModel;
+        Assert.Null(viewModel.Painting);
+        Assert.Null(viewModel.Placing);
     }
 
     private MainViewModel Open(string contentRoot, bool discardAnswer = false) =>

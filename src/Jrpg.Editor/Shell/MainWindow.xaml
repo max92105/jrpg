@@ -34,9 +34,9 @@
       <Separator />
       <TextBlock Text="Layer" VerticalAlignment="Center" Margin="4,0" />
       <ComboBox Width="230"
-                ItemsSource="{Binding LayerPresets}"
+                ItemsSource="{Binding Layer.Presets}"
                 SelectedValuePath="Z"
-                SelectedValue="{Binding LayerZ}">
+                SelectedValue="{Binding Layer.Z}">
         <ComboBox.ItemTemplate>
           <DataTemplate>
             <TextBlock><Run Text="{Binding Name, Mode=OneWay}" /> (<Run Text="{Binding Z, Mode=OneWay}" />)</TextBlock>
@@ -45,18 +45,18 @@
       </ComboBox>
       <TextBox Width="40"
                ToolTip="Layer z: any whole number"
-               Text="{Binding LayerZ, UpdateSourceTrigger=PropertyChanged}" />
-      <CheckBox Content="Dim other layers" IsChecked="{Binding IsOtherLayersDimmed}" />
+               Text="{Binding Layer.Z, UpdateSourceTrigger=PropertyChanged}" />
+      <CheckBox Content="Dim other layers" IsChecked="{Binding Layer.AreOtherLayersDimmed}" />
       <Separator />
       <TextBlock Text="Tool (B R F)" VerticalAlignment="Center" Margin="4,0" />
       <ComboBox Width="90"
                 ToolTip="Brush: drag. Rectangle: drag, filled on release. Fill: click (or Shift + click with any tool). Right button erases."
-                ItemsSource="{Binding Tools}"
-                SelectedItem="{Binding Tool}" />
+                ItemsSource="{Binding Painting.Tools}"
+                SelectedItem="{Binding Painting.Tool}" />
       <TextBlock Text="Brush ([ ])" VerticalAlignment="Center" Margin="4,0" />
-      <ComboBox Width="50" ItemsSource="{Binding BrushSizes}" SelectedItem="{Binding BrushSize}" />
-      <Button Content="Fill layer" Command="{Binding FillLayerCommand}" />
-      <Button Content="Clear layer" Command="{Binding ClearLayerCommand}" />
+      <ComboBox Width="50" ItemsSource="{Binding Painting.BrushSizes}" SelectedItem="{Binding Painting.BrushSize}" />
+      <Button Content="Fill layer" Command="{Binding Painting.FillLayerCommand}" />
+      <Button Content="Clear layer" Command="{Binding Painting.ClearLayerCommand}" />
       <Separator />
       <Button Content="Fit (Ctrl+0)" Click="OnFitClicked" />
       <Button Content="100 % (Ctrl+1)" Click="OnActualSizeClicked" />
@@ -84,11 +84,11 @@
       </ListBox>
       <TabControl x:Name="EditingTabs" SelectionChanged="OnEditingTabChanged">
         <TabItem Header="Tiles">
-          <tiles:TileBrowserView x:Name="TileBrowser" DataContext="{Binding Tiles}" />
+          <tiles:TileBrowserView x:Name="TileBrowser" DataContext="{Binding Painting.Browser}" />
         </TabItem>
         <!-- Click places the chosen object, Shift + drag moves one, right click or Delete removes, Ctrl + drag selects. -->
         <TabItem x:Name="ObjectsTab" Header="Objects">
-          <objects:ObjectBrowserView x:Name="ObjectBrowser" DataContext="{Binding Objects}" />
+          <objects:ObjectBrowserView x:Name="ObjectBrowser" DataContext="{Binding Placing.Browser}" />
         </TabItem>
       </TabControl>
     </DockPanel>

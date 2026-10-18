@@ -52,6 +52,9 @@ internal sealed partial class MainWindow : Window
 
         DataContext = _viewModel = viewModel;
         viewModel.PropertyChanged += OnViewModelChanged;
+        viewModel.Layer.PropertyChanged += (_, _) => DrawCurrentMap();
+        viewModel.Painting?.PropertyChanged += (_, _) => ShowBrushAt(_brushCell);
+        viewModel.Placing?.PropertyChanged += (_, _) => DrawSelectionMarks();
         OpenCurrentMap();
     }
 
@@ -87,18 +90,9 @@ internal sealed partial class MainWindow : Window
             case nameof(MainViewModel.CurrentMap):
                 OpenCurrentMap();
                 break;
-            case nameof(MainViewModel.LayerZ) or nameof(MainViewModel.IsOtherLayersDimmed):
-                DrawCurrentMap();
-                break;
-            case nameof(MainViewModel.BrushSize) or nameof(MainViewModel.Tool):
-                ShowBrushAt(_brushCell);
-                break;
             case nameof(MainViewModel.Mode):
                 ShowBrushAt(_brushCell);
                 ShowObjectDragAt(_mapPoint);
-                break;
-            case nameof(MainViewModel.SelectedObjectUids):
-                DrawSelectionMarks();
                 break;
         }
     }
@@ -128,7 +122,7 @@ internal sealed partial class MainWindow : Window
     private void DrawCurrentMap()
     {
         var layout = _shownMap?.Map.Layout;
-        var focusZ = _viewModel.IsOtherLayersDimmed ? _viewModel.LayerZ : (int?)null;
+        var focusZ = _viewModel.Layer.AreOtherLayersDimmed ? _viewModel.Layer.Z : (int?)null;
         MapImage.Source = layout is not null && _drawing is not null ? _drawing.Draw(layout, focusZ) : null;
     }
 
@@ -191,7 +185,7 @@ internal sealed partial class MainWindow : Window
     // Anywhere but a text box, so tools and brush size change while browsing tiles too.
     private bool HandleToolKey(Key key)
     {
-        if (Keyboard.FocusedElement is TextBox)
+        if (_viewModel.Painting is not { } painting || Keyboard.FocusedElement is TextBox)
         {
             return false;
         }
@@ -199,19 +193,19 @@ internal sealed partial class MainWindow : Window
         switch (key)
         {
             case Key.OemOpenBrackets:
-                _viewModel.ShrinkBrush();
+                painting.ShrinkBrush();
                 return true;
             case Key.OemCloseBrackets:
-                _viewModel.GrowBrush();
+                painting.GrowBrush();
                 return true;
             case Key.B:
-                _viewModel.Tool = TileTool.Brush;
+                painting.Tool = TileTool.Brush;
                 return true;
             case Key.R:
-                _viewModel.Tool = TileTool.Rectangle;
+                painting.Tool = TileTool.Rectangle;
                 return true;
             case Key.F:
-                _viewModel.Tool = TileTool.Fill;
+                painting.Tool = TileTool.Fill;
                 return true;
             default:
                 return false;
@@ -227,7 +221,7 @@ internal sealed partial class MainWindow : Window
             StartPanning(e.GetPosition(MapViewport));
             e.Handled = true;
         }
-        else if (_strokeButton is null)
+        else if (_strokeButton is null && _viewModel.CurrentMap is not null)
         {
             e.Handled = _viewModel.Mode == EditingMode.Objects
                 ? HandleObjectButton(e.ChangedButton, MapPointAt(e))
@@ -239,14 +233,14 @@ internal sealed partial class MainWindow : Window
     {
         if (button == MouseButton.Left && Keyboard.Modifiers == ModifierKeys.Alt)
         {
-            _viewModel.PickTileAt(cell);
+            Painting.PickTileAt(cell);
             return true;
         }
 
         // Shift + click fills with any tool, as in the legacy editor.
-        if (button == MouseButton.Left && (Keyboard.Modifiers == ModifierKeys.Shift || _viewModel.Tool == TileTool.Fill))
+        if (button == MouseButton.Left && (Keyboard.Modifiers == ModifierKeys.Shift || Painting.Tool == TileTool.Fill))
         {
-            _viewModel.FloodFill(cell);
+            Painting.FloodFill(cell);
             return true;
         }
 
@@ -256,17 +250,17 @@ internal sealed partial class MainWindow : Window
     // Left paints, right erases: with the brush as the mouse moves, with the rectangle tool when the button is released.
     private bool StartDrag(MouseButton button, GridCell cell)
     {
-        if (_viewModel.Tool == TileTool.Rectangle)
+        if (Painting.Tool == TileTool.Rectangle)
         {
             _rectangleStart = cell;
         }
         else if (button == MouseButton.Left)
         {
-            _viewModel.StartPainting(cell);
+            Painting.StartPainting(cell);
         }
         else
         {
-            _viewModel.StartErasing(cell);
+            Painting.StartErasing(cell);
         }
 
         _strokeButton = button;
@@ -278,11 +272,11 @@ internal sealed partial class MainWindow : Window
     {
         if (_strokeButton == MouseButton.Left)
         {
-            _viewModel.PaintRectangle(start, end);
+            Painting.PaintRectangle(start, end);
         }
         else
         {
-            _viewModel.EraseRectangle(start, end);
+            Painting.EraseRectangle(start, end);
         }
     }
 
@@ -306,7 +300,7 @@ internal sealed partial class MainWindow : Window
         }
         else if (_strokeButton is not null && _rectangleStart is null)
         {
-            _viewModel.ContinueStroke(cell);
+            Painting.ContinueStroke(cell);
         }
 
         _viewModel.ShowCursorAt(cell);
@@ -341,9 +335,12 @@ internal sealed partial class MainWindow : Window
         if (_strokeButton is not null)
         {
             _strokeButton = null;
-            _viewModel.EndStroke();
+            Painting.EndStroke();
         }
     }
+
+    // Painting exists whenever a map is open, which the mouse and key handlers check first.
+    private TilePaintingViewModel Painting => _viewModel.Painting!;
 
     private GridCell CellAt(MouseEventArgs e) => _viewport.ScreenToCell(e.GetPosition(MapViewport), MapDrawing.CellPixels);
 
@@ -376,7 +373,7 @@ internal sealed partial class MainWindow : Window
     // Only the brush is wider than one cell.
     private (GridCell Corner, GridCell OppositeCorner) SquareCorners(GridCell center)
     {
-        var size = _viewModel.Tool == TileTool.Brush ? _viewModel.BrushSize : 1;
+        var size = Painting.Tool == TileTool.Brush ? Painting.BrushSize : 1;
         var topLeft = BrushCells.Square(center, size).First();
         return (topLeft, new GridCell(topLeft.X + size - 1, topLeft.Y + size - 1));
     }

@@ -17,13 +17,18 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     private const int StartingWindowHeight = VirtualScreen.Height * 2 / 3;
 
     private readonly IScene _rootScene;
+    private readonly string _artRoot;
     private readonly InputReader _input = new();
     private SpriteBatch? _batch;
     private RenderTarget2D? _virtualScreen;
+    private TextureLibrary? _textures;
 
-    public JrpgGame(IScene rootScene)
+    /// <param name="rootScene">The game flow, or the screen explaining why the game can't start.</param>
+    /// <param name="artRoot">Where <see cref="TextureLibrary"/> reads images from.</param>
+    public JrpgGame(IScene rootScene, string artRoot)
     {
         _rootScene = rootScene;
+        _artRoot = artRoot;
 
         // The constructor registers the manager in Services; Game finds it there, uses it, and disposes it.
         _ = new GraphicsDeviceManager(this)
@@ -40,6 +45,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     {
         _batch = new SpriteBatch(GraphicsDevice);
         _virtualScreen = new RenderTarget2D(GraphicsDevice, VirtualScreen.Width, VirtualScreen.Height);
+        _textures = new TextureLibrary(GraphicsDevice, _artRoot);
     }
 
     protected override void Update(GameTime gameTime)
@@ -56,7 +62,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
         GraphicsDevice.SetRenderTarget(_virtualScreen);
         GraphicsDevice.Clear(Color.Black);
         batch.Begin(samplerState: SamplerState.PointClamp);
-        _rootScene.Draw(batch);
+        _rootScene.Draw(batch, _textures!);
         batch.End();
 
         GraphicsDevice.SetRenderTarget(null);
@@ -73,6 +79,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
         {
             _batch?.Dispose();
             _virtualScreen?.Dispose();
+            _textures?.Dispose();
         }
 
         base.Dispose(disposing);

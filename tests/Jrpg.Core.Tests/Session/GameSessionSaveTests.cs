@@ -179,6 +179,7 @@ public sealed class GameSessionSaveTests
             ActiveMemberIds = ["sarxian"],
             StartingItems = [new InventoryEntry("potion", 3), new InventoryEntry("bronze_sword", 1), new InventoryEntry("chain_mail", 1)],
             StartLocation = start,
+            FieldSpriteFile = "player.png",
         };
         return new ContentCatalogBuilder()
             .WithMembers(

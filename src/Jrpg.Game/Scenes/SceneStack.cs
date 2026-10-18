@@ -1,4 +1,5 @@
 using Jrpg.Game.Input;
+using Jrpg.Game.Rendering;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Jrpg.Game.Scenes;
@@ -42,11 +43,11 @@ internal sealed class SceneStack
         }
     }
 
-    public void Draw(SpriteBatch batch)
+    public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
         for (var index = 0; index < _scenes.Count; index++)
         {
-            _scenes[index].Draw(batch);
+            _scenes[index].Draw(batch, textures);
         }
     }
 }

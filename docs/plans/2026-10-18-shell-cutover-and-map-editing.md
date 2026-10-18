@@ -257,7 +257,7 @@ The developer still edits maps in the legacy MapEditor (ADR 0005), so render dat
 
 ### Phase 3: the map on screen
 
-- [ ] **3a. Map tiles on screen** (Data + Core + Game + content, about 290 lines)
+- [x] **3a. Map tiles on screen** (Data + Core + Game + content, about 290 lines)
   - **Goal:** the game shows the start map's tile layers and the player sprite at the new game's start position, the view centered on it and clamped to the map.
   - **Core:** `NewGameDefinition.FieldSpriteFile` (the one legacy map sprite, `player.png`, until question 58).
   - **Data:** `Art/ArtFolders` (folder per art kind; legacy names until slice 10), `Art/PngSize` (width and height from the PNG header; fails naming the file), `Art/ArtReferenceCheck` (public static `IReadOnlyList<string> FindProblems(ContentCatalog catalog, string artRoot)`: every tilesheet and the field sprite exist, every tile cell lies inside its image). `NewGameValidator` rejects an empty `fieldSpriteFile`. `ContentRootLocator` gains the transitional art root (`ArtRoot` metadata).
@@ -265,6 +265,18 @@ The developer still edits maps in the legacy MapEditor (ADR 0005), so render dat
   - **Content:** `new-game.json` gains `"fieldSpriteFile": "player.png"`.
   - **Tests:** Data `PngSize_Read_RepositoryTilesheet_ReturnsItsSize`, `PngSize_Read_NotAPng_ThrowsNamingTheFile`, `ArtReferenceCheck_FindProblems_CellOutsideSheet_NamesTheTile`, `ArtReferenceCheck_FindProblems_RepositoryContent_FindsNone` (Data.Tests links the legacy art it checks), `NewGameValidator_Validate_EmptyFieldSprite_ThrowsNamingTheField`. Game `MapCamera_SnapTo_MapSmallerThanView_CentersMap`, `MapCamera_SnapTo_NearMapEdge_ClampsToEdge`, `MapView_VisibleCells_CameraAtOrigin_CoversScreenPlusOneCell`, `MapView_VisibleCells_NearMapEdge_ClampsToMap`.
   - **Verify by hand:** the start map's ground appears around (10, 3) with no seams or blur; the 16 px forest sheet is sharp at 3x; note how the 64 px `Floor.png` looks at 48 px (question 49).
+  - **Done, with deviations:**
+    - **Art check:** it runs in `Program` after the catalog loads, not in `GameFlow`, since `Program` chooses the error screen; `GameFlow` stays headless.
+    - **Texture loading:** `JrpgGame` owns `TextureLibrary` (it needs the device) and `IScene.Draw` takes it. Textures load on first use through it, cached by (folder, file) so drawing builds no strings.
+    - **Tile atlas:** `TileAtlas` is pure (`TileImage`: sheet file and source rectangle) and is built once in `GameFlow`.
+    - **Scene:** `ExplorationScene` reads the location once (3b follows the player). Layers up to `PlayerZ` draw before the player, the rest after.
+    - **Legacy data:** `player.png` is 384x288; legacy used rows 0-3 only. `Floor.png` isn't used (2a), so question 49 didn't come up.
+    - **Publishing:** until slice 10, publishing also copies the legacy tilesheets and `player.png` into `content/art` with the legacy folder names.
+    - **Verified by hand:**
+      - The start map draws with no seams, and the player stands at (10, 3) facing down.
+      - Cell (5, 13) is black: a hole in the legacy map (an empty ground tile), to fill in the editor.
+      - The published build starts.
+    - **Follow-up:** `ArtReferenceCheck` doesn't check the field sprite's size yet (question 58).
 
 - [ ] **3b. Objects and depth** (Core + Game, about 260 lines; split into "baking" and "draw list" if it grows past ~300)
   - **Goal:** houses, trees, the chest and doors are drawn in depth order with the player, and canopies and roofs over the player, as in the legacy game.

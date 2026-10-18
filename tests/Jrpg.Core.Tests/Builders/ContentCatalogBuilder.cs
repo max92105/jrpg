@@ -21,7 +21,7 @@ internal sealed class ContentCatalogBuilder
     /// </summary>
     public static readonly MapLocation DefaultStart = new("test_map", new Point2D(0.5, 0.5), Facing.Down);
 
-    private NewGameDefinition _newGame = new() { RecruitedMemberIds = [], ActiveMemberIds = [], StartingItems = [], StartLocation = DefaultStart };
+    private NewGameDefinition _newGame = new() { RecruitedMemberIds = [], ActiveMemberIds = [], StartingItems = [], StartLocation = DefaultStart, FieldSpriteFile = "player.png" };
     private TileDefinition[] _tiles = [TestTiles.Walkable(1)];
     private ObjectDefinition[] _objects = [];
     private MapLayout[] _maps = [new MapLayoutBuilder().WithLayer("1").Build()];

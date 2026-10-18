@@ -1,4 +1,5 @@
 using Jrpg.Game.Input;
+using Jrpg.Game.Rendering;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Jrpg.Game.Scenes;
@@ -12,5 +13,5 @@ internal interface IScene
     void Update(TimeSpan delta, InputFrame input);
 
     /// <summary>Draws in virtual-screen coordinates; the batch is already begun.</summary>
-    void Draw(SpriteBatch batch);
+    void Draw(SpriteBatch batch, TextureLibrary textures);
 }

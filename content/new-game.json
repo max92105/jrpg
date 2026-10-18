@@ -15,5 +15,6 @@
     { "itemId": "chain_mail", "quantity": 3 },
     { "itemId": "wizard_robe", "quantity": 1 }
   ],
-  "startLocation": { "mapId": "start", "position": { "x": 10, "y": 3 }, "facing": "down" }
+  "startLocation": { "mapId": "start", "position": { "x": 10, "y": 3 }, "facing": "down" },
+  "fieldSpriteFile": "player.png"
 }

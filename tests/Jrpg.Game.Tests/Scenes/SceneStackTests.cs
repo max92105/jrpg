@@ -1,4 +1,5 @@
 using Jrpg.Game.Input;
+using Jrpg.Game.Rendering;
 using Jrpg.Game.Scenes;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -6,8 +7,9 @@ namespace Jrpg.Game.Tests.Scenes;
 
 public sealed class SceneStackTests
 {
-    // Draw needs a SpriteBatch only to pass it on; the recording scenes never use it, so no graphics device is needed.
+    // Draw needs a SpriteBatch and textures only to pass them on; the recording scenes never use them, so no graphics device is needed.
     private static readonly SpriteBatch _noBatch = null!;
+    private static readonly TextureLibrary _noTextures = null!;
 
     private readonly List<string> _calls = [];
 
@@ -30,7 +32,7 @@ public sealed class SceneStackTests
         stack.Push(new RecordingScene("map", _calls));
         stack.Push(new RecordingScene("menu", _calls));
 
-        stack.Draw(_noBatch);
+        stack.Draw(_noBatch, _noTextures);
 
         Assert.Equal(["draw map", "draw menu"], _calls);
     }
@@ -65,7 +67,7 @@ public sealed class SceneStackTests
         stack.Push(new RecordingScene("battle", _calls));
 
         stack.Replace(new RecordingScene("victory", _calls));
-        stack.Draw(_noBatch);
+        stack.Draw(_noBatch, _noTextures);
 
         Assert.Equal(["draw map", "draw victory"], _calls);
     }
@@ -82,6 +84,6 @@ public sealed class SceneStackTests
     {
         public void Update(TimeSpan delta, InputFrame input) => calls.Add($"update {name}");
 
-        public void Draw(SpriteBatch batch) => calls.Add($"draw {name}");
+        public void Draw(SpriteBatch batch, TextureLibrary textures) => calls.Add($"draw {name}");
     }
 }

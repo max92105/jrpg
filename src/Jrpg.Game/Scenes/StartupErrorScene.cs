@@ -30,5 +30,5 @@ internal sealed class StartupErrorScene : IScene
     {
     }
 
-    public void Draw(SpriteBatch batch) => _layout.Draw(batch, new Vector2(Margin, Margin), Color.White);
+    public void Draw(SpriteBatch batch, TextureLibrary textures) => _layout.Draw(batch, new Vector2(Margin, Margin), Color.White);
 }

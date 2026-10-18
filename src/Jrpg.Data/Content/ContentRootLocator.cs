@@ -11,6 +11,7 @@ public static class ContentRootLocator
 {
     private const string ContentArgument = "--content";
     private const string ContentRootMetadataKey = "ContentRoot";
+    private const string ArtRootMetadataKey = "ArtRoot";
 
     public static string Find(IReadOnlyList<string> args, Assembly app) => Choose(args, BuiltInContentRoot(app));
 
@@ -27,6 +28,16 @@ public static class ContentRootLocator
         return builtInContentRoot ?? Path.Combine(AppContext.BaseDirectory, "content");
     }
 
-    private static string? BuiltInContentRoot(Assembly app) =>
-        app.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault(metadata => metadata.Key == ContentRootMetadataKey)?.Value;
+    /// <summary>
+    /// Where art is read from (ADR 0009): until the content cutover (slice 10) a Debug build points at the repository's
+    /// legacy <c>Assets/</c>; otherwise <c>{content}/art</c>.
+    /// </summary>
+    public static string FindArtRoot(Assembly app, string contentRoot) => ChooseArtRoot(BuiltIn(app, ArtRootMetadataKey), contentRoot);
+
+    internal static string ChooseArtRoot(string? builtInArtRoot, string contentRoot) => builtInArtRoot ?? Path.Combine(contentRoot, "art");
+
+    private static string? BuiltInContentRoot(Assembly app) => BuiltIn(app, ContentRootMetadataKey);
+
+    private static string? BuiltIn(Assembly app, string key) =>
+        app.GetCustomAttributes<AssemblyMetadataAttribute>().FirstOrDefault(metadata => metadata.Key == key)?.Value;
 }

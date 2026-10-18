@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Jrpg.Data.Art;
 using Jrpg.Data.Content;
 using Jrpg.Data.Messages;
 using Jrpg.Game;
@@ -23,27 +24,38 @@ catch (Exception exception) when (IsStartupProblem(exception))
     return 1;
 }
 
+var artRoot = ContentRootLocator.FindArtRoot(typeof(JrpgGame).Assembly, contentRoot);
 using (fonts)
 {
-    using var game = new JrpgGame(FirstScene(contentRoot, messages, fonts));
+    using var game = new JrpgGame(FirstScene(contentRoot, artRoot, messages, fonts), artRoot);
     game.Run();
 }
 
 return 0;
 
 // A new game, or the reason it can't start, shown on screen as well as logged.
-static IScene FirstScene(string contentRoot, UiMessages messages, FontLibrary fonts)
+static IScene FirstScene(string contentRoot, string artRoot, UiMessages messages, FontLibrary fonts)
 {
+    string reason;
     try
     {
-        return new GameFlow(ContentCatalogLoader.Load(contentRoot));
+        var catalog = ContentCatalogLoader.Load(contentRoot);
+        var artProblems = ArtReferenceCheck.FindProblems(catalog, artRoot);
+        if (artProblems.Count == 0)
+        {
+            return new GameFlow(catalog);
+        }
+
+        reason = string.Join(Environment.NewLine, artProblems);
     }
     catch (Exception exception) when (IsStartupProblem(exception))
     {
-        var message = messages.Format(MessageIds.StartupFailed, new MessageArgument("reason", exception.Message));
-        Report(message);
-        return new StartupErrorScene(message, fonts);
+        reason = exception.Message;
     }
+
+    var message = messages.Format(MessageIds.StartupFailed, new MessageArgument("reason", reason));
+    Report(message);
+    return new StartupErrorScene(message, fonts);
 }
 
 static bool IsStartupProblem(Exception exception) =>

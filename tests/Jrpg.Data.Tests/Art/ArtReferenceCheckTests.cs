@@ -1,0 +1,51 @@
+using Jrpg.Core.Content;
+using Jrpg.Core.Maps;
+using Jrpg.Data.Art;
+using Jrpg.Data.Content;
+
+namespace Jrpg.Data.Tests.Art;
+
+public sealed class ArtReferenceCheckTests
+{
+    private static readonly string _legacyArt = Path.Combine(AppContext.BaseDirectory, "legacy-art");
+    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+    [Fact]
+    public void FindProblems_RepositoryContent_FindsNone()
+    {
+        Assert.Empty(ArtReferenceCheck.FindProblems(_catalog, _legacyArt));
+    }
+
+    [Fact]
+    public void FindProblems_CellOutsideSheet_NamesTheTile()
+    {
+        // The forest sheet is cut in 16-pixel cells; column 1000 is far past its right edge.
+        var tile = _catalog.Tiles.Values.First(tile => tile.SheetId == "fg_forest_fall");
+        var catalog = _catalog with { Tiles = new Dictionary<int, TileDefinition> { [tile.Id] = tile with { Column = 1000 } } };
+
+        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _legacyArt));
+
+        Assert.StartsWith($"Tiles/FG_Forest_Fall.png: tile {tile.Id}'s cell (1000, {tile.Row}) lies outside the ", problem, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void FindProblems_MissingFieldSprite_NamesTheFile()
+    {
+        var catalog = _catalog with { NewGame = _catalog.NewGame with { FieldSpriteFile = "ghost.png" } };
+
+        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _legacyArt));
+
+        Assert.Equal($"ghost.png: not found in {_legacyArt}.", problem);
+    }
+
+    [Fact]
+    public void FindProblems_MissingTilesheet_NamesTheFileAndSkipsItsTiles()
+    {
+        var sheet = _catalog.Tilesheets["city"];
+        var catalog = _catalog with { Tilesheets = new Dictionary<string, TilesheetDefinition>(_catalog.Tilesheets) { ["city"] = sheet with { File = "Gone.png" } } };
+
+        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _legacyArt));
+
+        Assert.Equal($"Tiles/Gone.png: not found in {_legacyArt}.", problem);
+    }
+}

@@ -25,6 +25,20 @@ public sealed class ContentRootLocatorTests
     }
 
     [Fact]
+    public void ChooseArtRoot_BuiltInArtRoot_WinsOverContentArt()
+    {
+        var legacyAssets = Path.Combine(Path.GetTempPath(), "repo", "Assets");
+
+        Assert.Equal(legacyAssets, ContentRootLocator.ChooseArtRoot(legacyAssets, _repositoryContent));
+    }
+
+    [Fact]
+    public void ChooseArtRoot_NoBuiltInArtRoot_UsesArtUnderContent()
+    {
+        Assert.Equal(Path.Combine(_repositoryContent, "art"), ContentRootLocator.ChooseArtRoot(null, _repositoryContent));
+    }
+
+    [Fact]
     public void Find_NoArgumentNoMetadata_UsesBaseDirectory()
     {
         // This test assembly carries no ContentRoot metadata, like a published app.

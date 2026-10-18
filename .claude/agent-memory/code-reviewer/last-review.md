@@ -5,11 +5,12 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 2c (Layers and draw order)
+Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 3a (Map tiles on screen)
 Round: 1 (verdict: Ready to commit; caller said this is the single review round)
 
-Accepted (don't re-raise): DrawOrderKey/MapLayers have no production caller until 3a/3b/11b; tiles compare base Y too (always 0, tie); comparison operators for CA1036; Z required, builders use Z 0,1,2 and MapLayers.PlayerZ; MapFolderReaderTests JSON gained "z": 0.
+Accepted (don't re-raise): art check in Program.FirstScene not GameFlow; IScene.Draw(SpriteBatch, TextureLibrary); TextureLibrary keyed by (folder, file); TileAtlas pure, built in GameFlow; ExplorationScene reads Location once (following in 3b); layers split at Z <= PlayerZ, DrawOrderKey merge in 3b; player.png 384x288 uses rows 0-3.
 
-- open (Suggestion): MapConversion.cs class doc says canopy baking is "plan 3a"; baking (ObjectSpriteBaker) is slice 3b
-- open (Suggestion): DrawOrderKey.ForTile `order` doc says "position among layers with the same Z", but the validator makes layer Zs unique; say "the layer's index in the map"
-- open (Suggestion): DrawOrderKeyTests.CompareTo_TilesSameZ_IgnoreBaseAndKeepInsertionOrder: tiles have no base to ignore; rename to CompareTo_TilesSameZ_KeepInsertionOrder
+- open (Warning): Release/published build: no ArtRoot metadata -> {content}/art, which doesn't exist until slice 10, so the published game stops on the error screen; record in slice note/CLAUDE.md or publish Assets art to content/art
+- open (Suggestion): ExplorationScene.DrawPlayer uses MapView.CellPixels (screen size) as the sprite sheet's frame size (art fact); name a separate 48 px frame constant
+- open (Suggestion): PngSizeTests.Read_RepositoryTilesheet_ReturnsItsSize reads player.png, not a tilesheet; rename Read_RepositoryFieldSprite_ReturnsItsSize (plan's name)
+- open (Follow-up): ArtReferenceCheck doesn't check the field sprite is >= 4 rows x 48 px

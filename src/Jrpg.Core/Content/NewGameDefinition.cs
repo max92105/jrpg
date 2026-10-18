@@ -14,4 +14,7 @@ public sealed record NewGameDefinition
     public required IReadOnlyList<InventoryEntry> StartingItems { get; init; }
 
     public required MapLocation StartLocation { get; init; }
+
+    /// <summary>The sprite the party walks the map with, a file in the field-sprite art folder (one for everyone, as legacy; question 58).</summary>
+    public required string FieldSpriteFile { get; init; }
 }

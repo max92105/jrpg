@@ -13,7 +13,8 @@ internal static class NewGameValidator
         var problem = FindRecruitedProblem(newGame, references)
             ?? FindActiveProblem(newGame, references)
             ?? FindStartingItemsProblem(newGame.StartingItems, references)
-            ?? FindStartLocationProblem(newGame.StartLocation, references);
+            ?? FindStartLocationProblem(newGame.StartLocation, references)
+            ?? (string.IsNullOrWhiteSpace(newGame.FieldSpriteFile) ? "fieldSpriteFile must name the map sprite's file." : null);
         if (problem is not null)
         {
             throw new ContentValidationException($"{fileName}: {problem}");

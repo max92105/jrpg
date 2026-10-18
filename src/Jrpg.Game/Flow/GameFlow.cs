@@ -1,6 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Session;
 using Jrpg.Game.Input;
+using Jrpg.Game.Rendering;
 using Jrpg.Game.Scenes;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -16,7 +17,7 @@ internal sealed class GameFlow : IScene
 
     public GameFlow(ContentCatalog catalog)
     {
-        Session = new SessionTransitions(catalog, _scenes).StartNewGame();
+        Session = new SessionTransitions(catalog, _scenes, new TileAtlas(catalog)).StartNewGame();
     }
 
     public GameSession Session { get; }
@@ -28,5 +29,5 @@ internal sealed class GameFlow : IScene
         _scenes.Update(delta, input);
     }
 
-    public void Draw(SpriteBatch batch) => _scenes.Draw(batch);
+    public void Draw(SpriteBatch batch, TextureLibrary textures) => _scenes.Draw(batch, textures);
 }

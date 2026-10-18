@@ -170,7 +170,7 @@ public sealed class GameSessionSaveTests
         var camp = new MapLayoutBuilder().WithLayer("1111", "1111", "1111", "1111").Build() with
         {
             Id = "camp",
-            Objects = [new PlacedObject { Uid = "chest@1,0", ObjectId = "chest", Position = new Point2D(1, 0), Events = [_openChest] }],
+            Objects = [new PlacedObject { Uid = "chest@1,0", ObjectId = "chest", Position = new Point2D(1, 0), Z = MapLayers.PlayerZ, Events = [_openChest] }],
         };
         var field = new MapLayoutBuilder().WithLayer("1111").Build() with { Id = "field" };
         var newGame = new NewGameDefinition

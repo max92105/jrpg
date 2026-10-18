@@ -49,7 +49,7 @@ public sealed class MapEventValidatorTests
         Width = 2,
         Height = 2,
         Layers = [],
-        Objects = [new PlacedObject { Uid = "chest@1,1", ObjectId = "chest", Position = new Point2D(1, 1), Events = [_openChest] }],
+        Objects = [new PlacedObject { Uid = "chest@1,1", ObjectId = "chest", Position = new Point2D(1, 1), Z = MapLayers.PlayerZ, Events = [_openChest] }],
         CellEvents = [new CellEvent(new GridCell(0, 0), _warpToCave)],
     };
 

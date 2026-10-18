@@ -8,7 +8,7 @@ namespace Jrpg.Data.Tests.Maps;
 
 public sealed class MapFolderReaderTests : IDisposable
 {
-    private const string Layout = """{ "id": "forest", "width": 1, "height": 1, "layers": [ { "rows": [ [ 1 ] ] } ], "objects": [] }""";
+    private const string Layout = """{ "id": "forest", "width": 1, "height": 1, "layers": [ { "z": 0, "rows": [ [ 1 ] ] } ], "objects": [] }""";
     private const string Settings = """{ "id": "forest", "displayName": "Whispering Forest" }""";
 
     private static readonly HashSet<int> _tileIds = [1];
@@ -57,11 +57,11 @@ public sealed class MapFolderReaderTests : IDisposable
         WriteContent(
             "generated/maps/forest.json",
             """
-            { "id": "forest", "width": 1, "height": 1, "layers": [ { "rows": [ [ 1 ] ] } ], "objects": [],
+            { "id": "forest", "width": 1, "height": 1, "layers": [ { "z": 0, "rows": [ [ 1 ] ] } ], "objects": [],
               "cellEvents": [ { "cell": { "x": 0, "y": 0 }, "event": { "id": "cell_0_0", "activation": "touch",
                 "steps": [ { "mapId": "woods", "type": "warp", "cell": { "x": 1, "y": 0 } } ] } } ] }
             """);
-        WriteContent("generated/maps/woods.json", """{ "id": "woods", "width": 2, "height": 1, "layers": [ { "rows": [ [ 1, 1 ] ] } ], "objects": [] }""");
+        WriteContent("generated/maps/woods.json", """{ "id": "woods", "width": 2, "height": 1, "layers": [ { "z": 0, "rows": [ [ 1, 1 ] ] } ], "objects": [] }""");
         WriteContent("maps/woods.json", """{ "id": "woods", "displayName": "Woods" }""");
 
         var maps = Read();

@@ -210,9 +210,9 @@ public sealed class ExplorationStateTests
         {
             Objects =
             [
-                new PlacedObject { Uid = "lever@0,0", ObjectId = "lever", Position = new Point2D(0, 0), Events = [_pullLever] },
-                new PlacedObject { Uid = "chest@2,0", ObjectId = "chest", Position = new Point2D(2, 0), Events = [_openChest] },
-                new PlacedObject { Uid = "door@4,2", ObjectId = "door_open", Position = new Point2D(4, 2), Events = [_greetAtDoor] },
+                new PlacedObject { Uid = "lever@0,0", ObjectId = "lever", Position = new Point2D(0, 0), Z = MapLayers.PlayerZ, Events = [_pullLever] },
+                new PlacedObject { Uid = "chest@2,0", ObjectId = "chest", Position = new Point2D(2, 0), Z = MapLayers.PlayerZ, Events = [_openChest] },
+                new PlacedObject { Uid = "door@4,2", ObjectId = "door_open", Position = new Point2D(4, 2), Z = MapLayers.PlayerZ, Events = [_greetAtDoor] },
             ],
             CellEvents =
             [

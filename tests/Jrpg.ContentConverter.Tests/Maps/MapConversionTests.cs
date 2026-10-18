@@ -53,6 +53,37 @@ public sealed class MapConversionTests
     }
 
     [Fact]
+    public void Convert_LayerKeepsLegacyZ()
+    {
+        var map = LegacyMap(width: 1, height: 1, Tile(id: 7, x: 0, y: 0, z: -4), Tile(id: 3, x: 0, y: 0, z: -5), Tile(id: 8, x: 0, y: 0, z: 2));
+
+        var layout = MapConversion.Convert(map, _context);
+
+        Assert.Equal([-5, -4, 2], layout.Layers.Select(layer => layer.Z));
+    }
+
+    [Fact]
+    public void Convert_PlacedObject_KeepsItsZ()
+    {
+        var map = LegacyMap(width: 4, height: 4) with { Objects = [_chest] };
+
+        var placed = Assert.Single(MapConversion.Convert(map, _context).Objects);
+
+        Assert.Equal(-3, placed.Z);
+    }
+
+    [Fact]
+    public void Convert_ZOverride_ThrowsNamingTheUid()
+    {
+        var chest = _chest with { ZOverrides = new Dictionary<string, int> { ["0,0"] = 5 } };
+        var map = LegacyMap(width: 4, height: 4) with { Objects = [chest] };
+
+        var exception = Assert.Throws<ConversionException>(() => MapConversion.Convert(map, _context));
+
+        Assert.Equal("Maps/Interior1.json: object uid '9@2.5,1' has z overrides, which the converter doesn't support.", exception.Message);
+    }
+
+    [Fact]
     public void Convert_TwoTilesOnSameCellAndLayer_ThrowsNamingTheCell()
     {
         var map = LegacyMap(width: 2, height: 2, Tile(id: 3, x: 1, y: 1, z: -5), Tile(id: 4, x: 1, y: 1, z: -5));

@@ -7,8 +7,8 @@ namespace Jrpg.ContentConverter.Maps;
 
 /// <summary>
 /// Turns a legacy map into a layout: its tile list becomes one row grid per distinct z, bottom first; its objects keep
-/// their uid, get the new string object id and keep their events; tile triggers become cell events. Draw order and
-/// z overrides are converted in part 3.
+/// their uid, z, the new string object id and their events; tile triggers become cell events. Per-tile z overrides
+/// are refused: every object draws on one layer, which lets the game bake its canopy (slice 3b).
 /// </summary>
 internal static class MapConversion
 {
@@ -50,7 +50,7 @@ internal static class MapConversion
             .OrderBy(layerTiles => layerTiles.Key)
             .Select(layerTiles => ConvertLayer(sourceFile, legacyMap, layerTiles))];
 
-    private static TileLayer ConvertLayer(string sourceFile, LegacyMapJson legacyMap, IEnumerable<LegacyMapTileJson> layerTiles)
+    private static TileLayer ConvertLayer(string sourceFile, LegacyMapJson legacyMap, IGrouping<int, LegacyMapTileJson> layerTiles)
     {
         var rows = Enumerable.Range(0, legacyMap.Height).Select(_ => new int[legacyMap.Width]).ToArray();
         foreach (var tile in layerTiles)
@@ -68,7 +68,7 @@ internal static class MapConversion
             rows[tile.Y][tile.X] = tile.Id;
         }
 
-        return new TileLayer { Rows = rows };
+        return new TileLayer { Z = layerTiles.Key, Rows = rows };
     }
 
     private static PlacedObject ConvertObject(LegacyPlacedObjectJson placed, MapConversionContext context)
@@ -82,6 +82,11 @@ internal static class MapConversion
         if (placed.Meta is { Count: > 0 })
         {
             throw new ConversionException($"{description} has meta data, which the converter doesn't support yet.");
+        }
+
+        if (placed.ZOverrides.Count > 0)
+        {
+            throw new ConversionException($"{context.SourceFile}: object uid '{placed.Uid}' has z overrides, which the converter doesn't support.");
         }
 
         if (placed.Event is not null)
@@ -99,6 +104,7 @@ internal static class MapConversion
             Uid = placed.Uid,
             ObjectId = objectId,
             Position = new Point2D(placed.X, placed.Y),
+            Z = placed.Z,
             Events = EventConversion.ConvertObjectEvents(placed.Uid, placed.Events, context),
         };
     }

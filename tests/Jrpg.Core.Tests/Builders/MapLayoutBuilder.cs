@@ -6,11 +6,12 @@ internal sealed class MapLayoutBuilder
 {
     private readonly List<TileLayer> _layers = [];
 
-    /// <summary>Adds a layer above the previous ones; each string is one row of single-digit tile ids.</summary>
+    /// <summary>Adds a layer above the previous ones (Z 0, 1, 2 and so on); each string is one row of single-digit tile ids.</summary>
     public MapLayoutBuilder WithLayer(params string[] rows)
     {
         _layers.Add(new TileLayer
         {
+            Z = _layers.Count,
             Rows = [.. rows.Select(row => (IReadOnlyList<int>)[.. row.Select(digit => digit - '0')])],
         });
         return this;

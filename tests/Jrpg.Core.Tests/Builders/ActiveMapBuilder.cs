@@ -33,7 +33,7 @@ internal sealed class ActiveMapBuilder
     public ActiveMapBuilder WithObject(ObjectDefinition definition, Point2D position, params MapEvent[] events)
     {
         _objects[definition.Id] = definition;
-        _placed.Add(new PlacedObject { Uid = $"{definition.Id}_{_placed.Count}", ObjectId = definition.Id, Position = position, Events = events });
+        _placed.Add(new PlacedObject { Uid = $"{definition.Id}_{_placed.Count}", ObjectId = definition.Id, Position = position, Z = MapLayers.PlayerZ, Events = events });
         return this;
     }
 

@@ -247,12 +247,13 @@ The developer still edits maps in the legacy MapEditor (ADR 0005), so render dat
   - **Tests:** Tool `ObjectConversion_Convert_TileGroupNotAtOrigin_ShiftsToOrigin`, `ObjectConversion_Convert_TileWithZOffset_ThrowsNamingTheObject`, `LegacyContentConversion_Convert_RepositoryAssets_TreeHasOneCanopyZone`. Data `ObjectCatalogValidator_Validate_TileOutsideBounds_ThrowsNamingTheObject`, `ObjectCatalogValidator_Validate_UnknownTileId_ThrowsNamingTheObject`.
   - **Done, with deviations:** legacy zones were already 0..1 over the tile group's bounds (as the collision polygon), so they carry over unchanged; only tiles are shifted. 8 of 12 objects have one zone each; categories "Chests", "General", "House" carry over as written. The validator also refuses an empty tile list, two tiles on one cell and a null zone; it's split into tile, zone and outline checks to stay under CA1502. Core tests fill the new fields with placeholders.
 
-- [ ] **2c. Layers and draw order** (tool + Data + Core, about 250 lines)
+- [x] **2c. Layers and draw order** (tool + Data + Core, about 250 lines)
   - **Goal:** tile layers and placed objects carry their Z, and one Core rule decides what's drawn over what, for the game and the editor.
   - **Core:** `TileLayer` gains `Z`; `PlacedObject` gains `Z`. `Maps/MapLayers` (static): `PlayerZ = 1` (depth-sorted with the player by base Y), `AbovePlayerZ = 5` (always over the player), `CanopyZOf(int objectZ)` (`Max(AbovePlayerZ, objectZ)`). `Maps/DrawOrderKey` (`readonly record struct`, `IComparable`): Z, then tiles before sprites on one Z, then sprites by base Y, then insertion order (legacy `DrawSortKey`); `ForTile(int z, int order)`, `ForSprite(int z, double baseY, int order)`.
   - **Tool:** layers keep their legacy z, placed objects their `z`; a non-empty `zOverrides` is a conversion error naming the uid (none exist).
   - **Data:** `MapLayoutValidator`: layer Zs strictly ascending.
   - **Tests:** Core `DrawOrderKey_CompareTo_LowerZ_DrawsFirst`, `DrawOrderKey_CompareTo_SameZTileAndSprite_TileFirst`, `DrawOrderKey_CompareTo_SpritesSameZ_LowerBaseDrawsLater`, `DrawOrderKey_CompareTo_EqualKeys_InsertionOrderDecides`, `MapLayers_CanopyZOf_ObjectBelowPlayer_ReturnsAbovePlayerZ`. Tool `MapConversion_Convert_LayerKeepsLegacyZ`, `MapConversion_Convert_ZOverride_ThrowsNamingTheUid`. Data `MapLayoutValidator_Validate_LayersOutOfZOrder_ThrowsNamingTheMap`.
+  - **Done, with deviations:** legacy Zs kept as they were: layers at -5 and -4, most placed objects at -3 (one at -2, one at -5), so today every object draws under the player and only canopies (`CanopyZOf` = 5) go over it. `DrawOrderKey` and `MapLayers` have no caller until 3a/3b and 11b. `DrawOrderKey` compares base Y for tiles too (always 0, so a tie), one branch fewer than legacy with the same order. Test builders give layers Z 0, 1, 2 and placed objects `PlayerZ`.
 
 ### Phase 3: the map on screen
 

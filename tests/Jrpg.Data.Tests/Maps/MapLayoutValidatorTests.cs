@@ -20,23 +20,37 @@ public sealed class MapLayoutValidatorTests
         EncounterIds: new HashSet<string>()),
         Layouts: new Dictionary<string, MapLayout>());
 
-    private static readonly PlacedObject _tree = new() { Uid = "1@0,0", ObjectId = "tree", Position = new Point2D(0, 0) };
+    private static readonly PlacedObject _tree = new() { Uid = "1@0,0", ObjectId = "tree", Position = new Point2D(0, 0), Z = MapLayers.PlayerZ };
 
     private static readonly MapLayout _forest = new()
     {
         Id = "forest",
         Width = 3,
         Height = 2,
-        Layers = [new TileLayer { Rows = [[1, 1, 2], [1, 0, 1]] }],
+        Layers = [new TileLayer { Z = 0, Rows = [[1, 1, 2], [1, 0, 1]] }],
         Objects = [_tree],
     };
+
+    [Theory]
+    [InlineData(-4)]
+    [InlineData(0)]
+    public void Validate_LayersOutOfZOrder_ThrowsNamingTheMap(int secondZ)
+    {
+        var layout = _forest with { Layers = [_forest.Layers[0], _forest.Layers[0] with { Z = secondZ }] };
+
+        var exception = Assert.Throws<ContentValidationException>(() => MapLayoutValidator.Validate(FileName, layout, _references));
+
+        Assert.Equal(
+            $"generated/maps/forest.json: layer 1: z {secondZ} must be above the previous layer's z 0; layers are listed bottom first.",
+            exception.Message);
+    }
 
     public static TheoryData<MapLayout, string> InvalidLayouts => new()
     {
         { _forest with { Width = 0, Layers = [] }, "width and height must be at least 1 (was 0x2)." },
-        { _forest with { Layers = [new TileLayer { Rows = [[1, 1, 2]] }] }, "layer 0: must have 2 rows, one per map row (had 1)." },
-        { _forest with { Layers = [_forest.Layers[0], new TileLayer { Rows = [[1, 1, 2], [1, 1]] }] }, "layer 1: row 1 must have 3 tile ids, one per map column (had 2)." },
-        { _forest with { Layers = [new TileLayer { Rows = [[1, 1, 2], [1, 9, 1]] }] }, "layer 0: cell (1, 1) has unknown tile id 9." },
+        { _forest with { Layers = [new TileLayer { Z = 0, Rows = [[1, 1, 2]] }] }, "layer 0: must have 2 rows, one per map row (had 1)." },
+        { _forest with { Layers = [_forest.Layers[0], new TileLayer { Z = 1, Rows = [[1, 1, 2], [1, 1]] }] }, "layer 1: row 1 must have 3 tile ids, one per map column (had 2)." },
+        { _forest with { Layers = [new TileLayer { Z = 0, Rows = [[1, 1, 2], [1, 9, 1]] }] }, "layer 0: cell (1, 1) has unknown tile id 9." },
         { _forest with { Objects = [_tree, _tree with { Position = new Point2D(1, 1) }] }, "object uid '1@0,0' is used more than once." },
         { _forest with { Objects = [_tree, null!] }, "objects holds a null entry." },
         { _forest with { Objects = [_tree with { Uid = " " }] }, "an object 'tree' has an empty uid." },
@@ -71,7 +85,7 @@ public sealed class MapLayoutValidatorTests
     [Fact]
     public void Validate_ShortRow_ThrowsNamingTheLayerAndRow()
     {
-        var layout = _forest with { Layers = [new TileLayer { Rows = [[1, 1], [1, 0, 1]] }] };
+        var layout = _forest with { Layers = [new TileLayer { Z = 0, Rows = [[1, 1], [1, 0, 1]] }] };
 
         var exception = Assert.Throws<ContentValidationException>(() => MapLayoutValidator.Validate(FileName, layout, _references));
 

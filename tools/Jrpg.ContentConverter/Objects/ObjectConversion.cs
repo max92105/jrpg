@@ -94,7 +94,7 @@ internal static class ObjectConversion
             throw new ConversionException($"{SourceFile}: object '{legacyObject.Name}' has a null tile.");
         }
 
-        // Every object draws on one layer, which lets the game bake its canopy (plan 3a); a per-tile Z would break that.
+        // Every object draws on one layer, which lets the game bake its canopy (slice 3b); a per-tile Z would break that.
         var offsetTile = legacyObject.Tiles.FirstOrDefault(tile => tile.Z != 0);
         if (offsetTile is not null)
         {

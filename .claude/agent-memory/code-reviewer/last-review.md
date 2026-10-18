@@ -5,10 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 2b (Object tiles, above-player zones and categories)
+Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 2c (Layers and draw order)
 Round: 1 (verdict: Ready to commit; caller said this is the single review round)
 
-Accepted (don't re-raise): zones carried over unchanged (already 0..1 over tile-group bounds); categories as written; validator split into FindTileProblem/FindZoneProblem/FindOutlineProblem for CA1502; loader reuses tileIds; Core test initializers use Category="test", empty Tiles/Zones.
+Accepted (don't re-raise): DrawOrderKey/MapLayers have no production caller until 3a/3b/11b; tiles compare base Y too (always 0, tie); comparison operators for CA1036; Z required, builders use Z 0,1,2 and MapLayers.PlayerZ; MapFolderReaderTests JSON gained "z": 0.
 
-- open (Suggestion): ObjectConversionTests.Convert_TileGroupNotAtOrigin_ShiftsToOrigin has min X = 0, so the X shift (tile.X - bounds.Left) is never exercised; start the group at column 2
-- open (Suggestion): plan 2b checkbox and slice note not yet written
+- open (Suggestion): MapConversion.cs class doc says canopy baking is "plan 3a"; baking (ObjectSpriteBaker) is slice 3b
+- open (Suggestion): DrawOrderKey.ForTile `order` doc says "position among layers with the same Z", but the validator makes layer Zs unique; say "the layer's index in the map"
+- open (Suggestion): DrawOrderKeyTests.CompareTo_TilesSameZ_IgnoreBaseAndKeepInsertionOrder: tiles have no base to ignore; rename to CompareTo_TilesSameZ_KeepInsertionOrder

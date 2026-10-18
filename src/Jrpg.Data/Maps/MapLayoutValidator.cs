@@ -36,7 +36,9 @@ internal static class MapLayoutValidator
     {
         for (var layerIndex = 0; layerIndex < layout.Layers.Count; layerIndex++)
         {
-            var problem = FindRowProblem(layout, layout.Layers[layerIndex]) ?? FindUnknownTile(layout, layout.Layers[layerIndex], references);
+            var problem = FindRowProblem(layout, layout.Layers[layerIndex])
+                ?? FindZOrderProblem(layout, layerIndex)
+                ?? FindUnknownTile(layout, layout.Layers[layerIndex], references);
             if (problem is not null)
             {
                 return $"layer {layerIndex}: {problem}";
@@ -69,6 +71,19 @@ internal static class MapLayoutValidator
         }
 
         return null;
+    }
+
+    // Layers are listed bottom first, so the list order and the Z order can't disagree.
+    private static string? FindZOrderProblem(MapLayout layout, int layerIndex)
+    {
+        if (layerIndex == 0)
+        {
+            return null;
+        }
+
+        var z = layout.Layers[layerIndex].Z;
+        var belowZ = layout.Layers[layerIndex - 1].Z;
+        return z > belowZ ? null : $"z {z} must be above the previous layer's z {belowZ}; layers are listed bottom first.";
     }
 
     private static string? FindUnknownTile(MapLayout layout, TileLayer layer, MapReferences references)

@@ -1,6 +1,6 @@
 # 0005. Map content format and source of truth
 
-Status: accepted
+Status: superseded by 0011
 Date: 2026-10-17
 
 ## Context

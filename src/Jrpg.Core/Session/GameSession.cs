@@ -1,16 +1,19 @@
 using Jrpg.Core.Content;
+using Jrpg.Core.Exploration;
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
+using Jrpg.Core.World;
 
 namespace Jrpg.Core.Session;
 
 /// <summary>All mutable state of one playthrough; what a save will capture. Replaces the demo's static GameSystems.</summary>
 public sealed class GameSession
 {
-    private GameSession(PartyState party, Inventory inventory)
+    private GameSession(PartyState party, Inventory inventory, ExplorationState exploration)
     {
         Party = party;
         Inventory = inventory;
+        Exploration = exploration;
         Equipment = new PartyEquipment(inventory);
         FieldItems = new FieldItemUse(party, inventory);
     }
@@ -23,6 +26,9 @@ public sealed class GameSession
 
     /// <summary>Using consumables from the menu.</summary>
     public FieldItemUse FieldItems { get; }
+
+    /// <summary>The player on the current map.</summary>
+    public ExplorationState Exploration { get; }
 
     /// <summary>Starts a playthrough from <see cref="ContentCatalog.NewGame"/>. The catalog is assumed validated by Data.</summary>
     public static GameSession StartNew(ContentCatalog catalog)
@@ -38,7 +44,8 @@ public sealed class GameSession
             inventory.Add(catalog.Items[entry.ItemId], entry.Quantity);
         }
 
-        return new GameSession(party, inventory);
+        var exploration = new ExplorationState(new ExplorationContext(catalog, inventory, new WorldState()), newGame.StartLocation);
+        return new GameSession(party, inventory, exploration);
     }
 
     private static PartyMember Recruit(ContentCatalog catalog, string memberId)

@@ -79,5 +79,5 @@ public sealed class GameSessionTests
     }
 
     private static NewGameDefinition NewGame(string[] recruited, string[] active, params InventoryEntry[] items) =>
-        new() { RecruitedMemberIds = recruited, ActiveMemberIds = active, StartingItems = items };
+        new() { RecruitedMemberIds = recruited, ActiveMemberIds = active, StartingItems = items, StartLocation = ContentCatalogBuilder.DefaultStart };
 }

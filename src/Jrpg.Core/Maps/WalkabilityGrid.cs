@@ -30,6 +30,12 @@ internal sealed class WalkabilityGrid
         return new WalkabilityGrid(isWalkable);
     }
 
+    /// <summary>Width in cells.</summary>
+    public int Width => _isWalkable.GetLength(0);
+
+    /// <summary>Height in cells.</summary>
+    public int Height => _isWalkable.GetLength(1);
+
     public bool IsWalkable(GridCell cell) =>
         cell.X >= 0 && cell.Y >= 0
         && cell.X < _isWalkable.GetLength(0) && cell.Y < _isWalkable.GetLength(1)

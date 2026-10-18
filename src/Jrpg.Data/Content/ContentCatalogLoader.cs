@@ -46,15 +46,16 @@ public static class ContentCatalogLoader
         var enemyIds = enemies.Select(enemy => enemy.Id).ToFrozenSet();
         var encounters = ReadValidated<IReadOnlyList<EncounterDefinition>>(
             contentRoot, EncountersFile, (file, list) => EncounterCatalogValidator.Validate(file, list, enemyIds));
-        var newGameReferences = new NewGameReferences(
-            members.Select(member => member.Id).ToFrozenSet(), items.ToFrozenDictionary(item => item.Id), rules.Party);
-        var newGame = ReadValidated<NewGameDefinition>(
-            contentRoot, NewGameFile, (file, definition) => NewGameValidator.Validate(file, definition, newGameReferences));
         var tiles = ReadValidated<IReadOnlyList<TileDefinition>>(contentRoot, TilesFile, TileCatalogValidator.Validate);
         var objects = ReadValidated<IReadOnlyList<ObjectDefinition>>(contentRoot, ObjectsFile, ObjectCatalogValidator.Validate);
         var objectsById = objects.ToFrozenDictionary(definition => definition.Id);
         var maps = MapFolderReader.Read(
             contentRoot, tiles.Select(tile => tile.Id).ToFrozenSet(), objectsById, items.Select(item => item.Id).ToFrozenSet());
+        var mapsById = maps.ToFrozenDictionary(map => map.Id);
+        var newGameReferences = new NewGameReferences(
+            members.Select(member => member.Id).ToFrozenSet(), items.ToFrozenDictionary(item => item.Id), rules.Party, mapsById);
+        var newGame = ReadValidated<NewGameDefinition>(
+            contentRoot, NewGameFile, (file, definition) => NewGameValidator.Validate(file, definition, newGameReferences));
 
         return new ContentCatalog
         {
@@ -66,7 +67,7 @@ public static class ContentCatalogLoader
             Encounters = encounters.ToFrozenDictionary(encounter => encounter.Id),
             Tiles = tiles.ToFrozenDictionary(tile => tile.Id),
             Objects = objectsById,
-            Maps = maps.ToFrozenDictionary(map => map.Id),
+            Maps = mapsById,
             Rules = rules,
             NewGame = newGame,
         };

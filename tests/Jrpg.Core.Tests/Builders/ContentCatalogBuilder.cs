@@ -1,5 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
@@ -14,10 +15,16 @@ internal sealed class ContentCatalogBuilder
     private ItemDefinition[] _items = [];
     private SkillDefinition[] _skills = [];
     private PartyMemberDefinition[] _members = [];
-    private NewGameDefinition _newGame = new() { RecruitedMemberIds = [], ActiveMemberIds = [], StartingItems = [] };
-    private TileDefinition[] _tiles = [];
+    /// <summary>
+    /// The middle of the default one-cell floor map "test_map", where a default new game starts. <see cref="WithMaps"/>
+    /// and <see cref="WithTiles"/> replace that map and its tile, so a test using them with a new game sets its own start.
+    /// </summary>
+    public static readonly MapLocation DefaultStart = new("test_map", new Point2D(0.5, 0.5), Facing.Down);
+
+    private NewGameDefinition _newGame = new() { RecruitedMemberIds = [], ActiveMemberIds = [], StartingItems = [], StartLocation = DefaultStart };
+    private TileDefinition[] _tiles = [new TileDefinition { Id = 1, IsWalkable = true }];
     private ObjectDefinition[] _objects = [];
-    private MapLayout[] _maps = [];
+    private MapLayout[] _maps = [new MapLayoutBuilder().WithLayer("1").Build()];
 
     public ContentCatalogBuilder WithItems(params ItemDefinition[] items)
     {

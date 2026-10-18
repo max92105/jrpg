@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
@@ -11,10 +12,10 @@ namespace Jrpg.Core.Exploration;
 public sealed class ExplorationState
 {
     private readonly ExplorationContext _context;
-    private readonly ActiveMap _map;
     private readonly PlayerWalker _walker;
-    private readonly MapCollision _collision;
-    private readonly InteractionFinder _finder;
+    private ActiveMap _map;
+    private MapCollision _collision;
+    private InteractionFinder _finder;
     private GridCell _lastCell;
     private bool _isTouchArmed;
     private EventRun? _run;
@@ -22,15 +23,8 @@ public sealed class ExplorationState
     internal ExplorationState(ExplorationContext context, MapLocation start)
     {
         _context = context;
-        var catalog = context.Catalog;
-        var definition = catalog.Maps[start.MapId];
-        _map = new ActiveMap(definition, catalog.Objects, WalkabilityGrid.Build(definition.Layout, catalog.Tiles), context.World);
-        _walker = new PlayerWalker(start.Position, start.Facing, catalog.Rules.Exploration);
-        _collision = new MapCollision(_map);
-        _finder = new InteractionFinder(_map, catalog.Rules.Exploration);
-
-        // The arrival cell stays quiet, and object touch events wait until the player has stood still (decision 38).
-        _lastCell = _walker.Cell;
+        _walker = new PlayerWalker(start.Position, start.Facing, context.Catalog.Rules.Exploration);
+        EnterMap(start.MapId, start.Position);
     }
 
     public MapLocation Location => new(_map.Definition.Id, _walker.Position, _walker.Facing);
@@ -88,17 +82,17 @@ public sealed class ExplorationState
         return true;
     }
 
-    /// <summary>The player has read the current step; the event moves on to its next waiting step or ends.</summary>
+    /// <summary>
+    /// The player has read the current step, or the Game has faded out for a warp, which then moves the player to the
+    /// center of the target cell. The event moves on to its next waiting step or ends.
+    /// </summary>
     /// <exception cref="InvalidOperationException">No event is running.</exception>
-    /// <exception cref="NotSupportedException">The current step is a warp, which arrives in slice 4a.</exception>
     public void ContinueEvent()
     {
         var run = _run ?? throw new InvalidOperationException("No event is running.");
-
-        // TODO(plan 2026-10-17-world-exploration-core, slice 4a): complete the warp by entering the target map.
-        if (run.Current is WarpStep)
+        if (run.Current is WarpStep warp)
         {
-            throw new NotSupportedException("Warps are completed in slice 4a.");
+            EnterMap(warp.MapId, warp.Cell.Center);
         }
 
         run.Continue();
@@ -106,6 +100,24 @@ public sealed class ExplorationState
         {
             _run = null;
         }
+    }
+
+    /// <summary>
+    /// The one way onto a map, for a new game, a warp and (later) a loaded save, as legacy EnterMap was. The arrival
+    /// cell stays quiet, and object touch events wait until the player has stood still (decision 38).
+    /// </summary>
+    [MemberNotNull(nameof(_map), nameof(_collision), nameof(_finder))]
+    private void EnterMap(string mapId, Point2D target)
+    {
+        var catalog = _context.Catalog;
+        var definition = catalog.Maps[mapId];
+        var walkability = WalkabilityGrid.Build(definition.Layout, catalog.Tiles);
+        _map = new ActiveMap(definition, catalog.Objects, walkability, _context.World);
+        _collision = new MapCollision(_map);
+        _finder = new InteractionFinder(_map, catalog.Rules.Exploration);
+        _walker.PlaceAt(WarpArrival.Find(walkability, target));
+        _lastCell = _walker.Cell;
+        _isTouchArmed = false;
     }
 
     private bool TryStartCellEvent(GridCell cell)

@@ -1,5 +1,7 @@
 using Jrpg.Core.Content;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Items;
+using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Data.Content;
 
@@ -17,16 +19,22 @@ public sealed class NewGameValidatorTests
         IsUsableFromMenu = true,
     };
 
+    private static readonly MapDefinition _start = new(
+        new MapLayout { Id = "start", Width = 45, Height = 45, Layers = [], Objects = [] },
+        new MapSettings { Id = "start", DisplayName = "start" });
+
     private static readonly NewGameReferences _references = new(
         MemberIds: new HashSet<string> { "sarxian", "jazog", "teelle" },
         Items: new Dictionary<string, ItemDefinition> { ["potion"] = _potion },
-        Party: new PartyRules(MaxActiveMembers: 2));
+        Party: new PartyRules(MaxActiveMembers: 2),
+        Maps: new Dictionary<string, MapDefinition> { ["start"] = _start });
 
     private static readonly NewGameDefinition _newGame = new()
     {
         RecruitedMemberIds = ["sarxian", "jazog"],
         ActiveMemberIds = ["sarxian"],
         StartingItems = [new InventoryEntry("potion", 5)],
+        StartLocation = new MapLocation("start", new Point2D(10, 3), Facing.Down),
     };
 
     public static TheoryData<NewGameDefinition, string> InvalidNewGames => new()
@@ -43,6 +51,9 @@ public sealed class NewGameValidatorTests
         { _newGame with { StartingItems = [new InventoryEntry("potion", 0)] }, "startingItems 'potion': quantity must be within 1..99 (was 0)." },
         { _newGame with { StartingItems = [new InventoryEntry("potion", 100)] }, "startingItems 'potion': quantity must be within 1..99 (was 100)." },
         { _newGame with { StartingItems = [new InventoryEntry("potion", 1), new InventoryEntry("potion", 2)] }, "startingItems lists 'potion' more than once." },
+        { _newGame with { StartLocation = _newGame.StartLocation with { MapId = "castle" } }, "startLocation.mapId has unknown map id 'castle'." },
+        { _newGame with { StartLocation = _newGame.StartLocation with { Position = new Point2D(45, 3) } }, "startLocation.position (45, 3) must be inside map 'start' (45x45)." },
+        { _newGame with { StartLocation = _newGame.StartLocation with { Position = new Point2D(-0.5, 3) } }, "startLocation.position (-0.5, 3) must be inside map 'start' (45x45)." },
     };
 
     [Fact]

@@ -1,4 +1,5 @@
 using Jrpg.Core.Items;
+using Jrpg.Core.Maps;
 
 namespace Jrpg.Core.Content;
 
@@ -11,4 +12,6 @@ public sealed record NewGameDefinition
     public required IReadOnlyList<string> ActiveMemberIds { get; init; }
 
     public required IReadOnlyList<InventoryEntry> StartingItems { get; init; }
+
+    public required MapLocation StartLocation { get; init; }
 }

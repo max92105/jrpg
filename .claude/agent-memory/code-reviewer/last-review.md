@@ -5,13 +5,12 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-17-world-exploration-core.md, 3d (Interaction and touch)
+Slice: docs/plans/2026-10-17-world-exploration-core.md, 4a (Warps and the new game's start location)
 Round: 1 (verdict: Fix the Criticals, then commit)
 
-Accepted choices (don't re-raise): touch disarmed at map entry, any object touch event disarms; cell events edge-triggered, start cell counts as entered; Walk/TryInteract throw InvalidOperationException while an event runs; ContinueEvent on WarpStep throws NotSupportedException with TODO(slice 4a); Location allocates a record per call.
+Accepted deviations (don't re-raise): WarpArrival searches from ring 0 (the clamped cell); GameSession.World not added until 5a; facing kept across a warp. All three need a note in the plan's slice entry.
 
-- open (Critical): ExplorationState.TryStartCellEvent "once and done" branch has no test; add Walk_ReenterOnceCellEventDone_DoesNotStartIt
-- open (Warning): cell (touch) events don't disarm object touch; sign cell in front of a touch door -> door fires right after the dialogue while the player keeps pushing (plan: "since the last touch event")
-- open (Suggestion): InteractionFinder looks up CurrentDefinitionOf for objects without events every moving frame; skip Events.Count == 0 first (legacy HasEvents)
-- open (Suggestion): TryInteract-while-event-running throw is untested (Walk's is)
-- open (Suggestion): Game will read Location per frame; consider exposing Position/Facing or caching when 4a wires it
+- open (Critical): ExplorationWarpTests.ContinueEvent_WarpOntoTouchCell_DoesNotFireArrivalCell lands on town (3,2), which has no cell event (the town warp cell is (3,3)), so it can't fail. Make the cave warp land on a touch cell.
+- open (Warning): bounds check written again. WarpArrival `isOnMap` is redundant (IsWalkable(targetCell) already returns false off the map), and NewGameValidator's isInside copies MapLayout.Contains(GridCell.Containing(position))
+- open (Suggestion): ContentCatalogBuilder's DefaultStart points at "test_map", which WithMaps/WithTiles drop silently, so StartNew on such a catalog throws KeyNotFoundException
+- open (Suggestion): Find_TargetOffMapNextToBlockedEdge_SearchesFromClampedCell would also pass under legacy ring-1; the ring-0 deviation is pinned only by Find_TargetOffMap_ClampsBeforeSearching. Rename one to say so.

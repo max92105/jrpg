@@ -1,5 +1,8 @@
+using System.Globalization;
 using Jrpg.Core.Content;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Items;
+using Jrpg.Core.Maps;
 
 namespace Jrpg.Data.Content;
 
@@ -9,7 +12,8 @@ internal static class NewGameValidator
     {
         var problem = FindRecruitedProblem(newGame, references)
             ?? FindActiveProblem(newGame, references)
-            ?? FindStartingItemsProblem(newGame.StartingItems, references);
+            ?? FindStartingItemsProblem(newGame.StartingItems, references)
+            ?? FindStartLocationProblem(newGame.StartLocation, references);
         if (problem is not null)
         {
             throw new ContentValidationException($"{fileName}: {problem}");
@@ -71,6 +75,22 @@ internal static class NewGameValidator
         }
 
         return FindRepeatedId("startingItems", [.. entries.Select(entry => entry.ItemId)]);
+    }
+
+    private static string? FindStartLocationProblem(MapLocation start, NewGameReferences references)
+    {
+        if (!references.Maps.TryGetValue(start.MapId, out var map))
+        {
+            return $"startLocation.mapId has unknown map id '{start.MapId}'.";
+        }
+
+        var layout = map.Layout;
+        var position = start.Position;
+        return layout.Contains(GridCell.Containing(position))
+            ? null
+            : string.Create(
+                CultureInfo.InvariantCulture,
+                $"startLocation.position ({position.X}, {position.Y}) must be inside map '{start.MapId}' ({layout.Width}x{layout.Height}).");
     }
 
     private static string? FindRepeatedId(string field, IReadOnlyList<string> ids)

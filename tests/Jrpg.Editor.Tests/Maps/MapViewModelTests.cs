@@ -167,5 +167,27 @@ public sealed class MapViewModelTests
         Assert.True(viewModel.UndoCommand.CanExecute(null));
     }
 
+    [Fact]
+    public void PutTiles_SomeCellsOffTheMapOrUnchanged_RecordsOnlyRealChangesAsOneStep()
+    {
+        var viewModel = new MapViewModel(_twoLayers.Map);
+
+        viewModel.PutTiles(-5, 3, [new GridCell(0, 0), new GridCell(1, 0), new GridCell(2, 0)]);
+        viewModel.UndoCommand.Execute(null);
+
+        Assert.Equal([[1, 1]], viewModel.Map.Layout.Layers[0].Rows);
+        Assert.False(viewModel.UndoCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void PutTiles_NothingChanges_AddsNoUndoStep()
+    {
+        var viewModel = new MapViewModel(_twoLayers.Map);
+
+        viewModel.PutTiles(-5, 1, [new GridCell(0, 0)]);
+
+        Assert.False(viewModel.UndoCommand.CanExecute(null));
+    }
+
     private static SetTilesEdit PaintLeftGround(int tileId) => new(-5, [new TileChange(new GridCell(0, 0), 1, tileId)]);
 }

@@ -29,6 +29,9 @@ internal sealed partial class MainWindow : Window
     private Point? _panFrom;
     private MouseButton? _strokeButton;
     private GridCell? _brushCell;
+
+    // Where a rectangle drag started; it is filled when its button is released.
+    private GridCell? _rectangleStart;
     private double? _gridZoom;
     private MapViewModel? _shownMap;
 
@@ -63,7 +66,7 @@ internal sealed partial class MainWindow : Window
     protected override void OnPreviewKeyDown(KeyEventArgs e)
     {
         base.OnPreviewKeyDown(e);
-        e.Handled = Keyboard.Modifiers == ModifierKeys.Control ? HandleZoomKey(e.Key) : HandleBrushKey(e.Key) || HandleViewportKey(e.Key);
+        e.Handled = Keyboard.Modifiers == ModifierKeys.Control ? HandleZoomKey(e.Key) : HandleToolKey(e.Key) || HandleViewportKey(e.Key);
     }
 
     protected override void OnPreviewKeyUp(KeyEventArgs e)
@@ -85,7 +88,7 @@ internal sealed partial class MainWindow : Window
             case nameof(MainViewModel.LayerZ) or nameof(MainViewModel.IsOtherLayersDimmed):
                 DrawCurrentMap();
                 break;
-            case nameof(MainViewModel.BrushSize):
+            case nameof(MainViewModel.BrushSize) or nameof(MainViewModel.Tool):
                 ShowBrushAt(_brushCell);
                 break;
         }
@@ -175,8 +178,8 @@ internal sealed partial class MainWindow : Window
 
     private void OnViewportSizeChanged(object sender, SizeChangedEventArgs e) => FitMap();
 
-    // Anywhere but a text box, so the brush size changes while browsing tiles too.
-    private bool HandleBrushKey(Key key)
+    // Anywhere but a text box, so tools and brush size change while browsing tiles too.
+    private bool HandleToolKey(Key key)
     {
         if (Keyboard.FocusedElement is TextBox)
         {
@@ -190,6 +193,15 @@ internal sealed partial class MainWindow : Window
                 return true;
             case Key.OemCloseBrackets:
                 _viewModel.GrowBrush();
+                return true;
+            case Key.B:
+                _viewModel.Tool = TileTool.Brush;
+                return true;
+            case Key.R:
+                _viewModel.Tool = TileTool.Rectangle;
+                return true;
+            case Key.F:
+                _viewModel.Tool = TileTool.Fill;
                 return true;
             default:
                 return false;
@@ -219,21 +231,47 @@ internal sealed partial class MainWindow : Window
             return true;
         }
 
-        switch (button)
+        // Shift + click fills with any tool, as in the legacy editor.
+        if (button == MouseButton.Left && (Keyboard.Modifiers == ModifierKeys.Shift || _viewModel.Tool == TileTool.Fill))
         {
-            case MouseButton.Left:
-                _viewModel.StartPainting(cell);
-                break;
-            case MouseButton.Right:
-                _viewModel.StartErasing(cell);
-                break;
-            default:
-                return false;
+            _viewModel.FloodFill(cell);
+            return true;
+        }
+
+        return button is MouseButton.Left or MouseButton.Right && StartDrag(button, cell);
+    }
+
+    // Left paints, right erases: with the brush as the mouse moves, with the rectangle tool when the button is released.
+    private bool StartDrag(MouseButton button, GridCell cell)
+    {
+        if (_viewModel.Tool == TileTool.Rectangle)
+        {
+            _rectangleStart = cell;
+        }
+        else if (button == MouseButton.Left)
+        {
+            _viewModel.StartPainting(cell);
+        }
+        else
+        {
+            _viewModel.StartErasing(cell);
         }
 
         _strokeButton = button;
         MapViewport.CaptureMouse();
         return true;
+    }
+
+    private void FinishRectangle(GridCell start, GridCell end)
+    {
+        if (_strokeButton == MouseButton.Left)
+        {
+            _viewModel.PaintRectangle(start, end);
+        }
+        else
+        {
+            _viewModel.EraseRectangle(start, end);
+        }
     }
 
     private void StartPanning(Point from)
@@ -253,7 +291,7 @@ internal sealed partial class MainWindow : Window
             _panFrom = position;
             ApplyViewport();
         }
-        else if (_strokeButton is not null)
+        else if (_strokeButton is not null && _rectangleStart is null)
         {
             _viewModel.ContinueStroke(cell);
         }
@@ -266,6 +304,11 @@ internal sealed partial class MainWindow : Window
     {
         if (_panFrom is not null || e.ChangedButton == _strokeButton)
         {
+            if (_rectangleStart is { } start)
+            {
+                FinishRectangle(start, CellAt(e));
+            }
+
             MapViewport.ReleaseMouseCapture();
             e.Handled = true;
         }
@@ -275,6 +318,8 @@ internal sealed partial class MainWindow : Window
     private void OnViewportLostMouseCapture(object sender, MouseEventArgs e)
     {
         _panFrom = null;
+        _rectangleStart = null;
+        ShowBrushAt(_brushCell);
         MapViewport.Cursor = null;
         if (_strokeButton is not null)
         {
@@ -285,23 +330,32 @@ internal sealed partial class MainWindow : Window
 
     private GridCell CellAt(MouseEventArgs e) => _viewport.ScreenToCell(e.GetPosition(MapViewport), MapDrawing.CellPixels);
 
+    /// <summary>Outlines what a click or drag at the cell would change: the brush, the rectangle being dragged, or one cell.</summary>
     /// <param name="cell">The cell under the mouse, or null to hide the outline.</param>
     private void ShowBrushAt(GridCell? cell)
     {
         _brushCell = cell;
-        if (cell is not { } center || _viewModel.CurrentMap is null)
+        if (cell is not { } at || _viewModel.CurrentMap is null)
         {
             BrushOutline.Visibility = Visibility.Collapsed;
             return;
         }
 
-        var size = _viewModel.BrushSize;
-        var topLeft = BrushCells.Square(center, size).First();
-        Canvas.SetLeft(BrushOutline, topLeft.X * MapDrawing.CellPixels);
-        Canvas.SetTop(BrushOutline, topLeft.Y * MapDrawing.CellPixels);
-        BrushOutline.Width = BrushOutline.Height = size * MapDrawing.CellPixels;
+        var (corner, oppositeCorner) = _rectangleStart is { } start ? (start, at) : SquareCorners(at);
+        Canvas.SetLeft(BrushOutline, Math.Min(corner.X, oppositeCorner.X) * MapDrawing.CellPixels);
+        Canvas.SetTop(BrushOutline, Math.Min(corner.Y, oppositeCorner.Y) * MapDrawing.CellPixels);
+        BrushOutline.Width = (Math.Abs(oppositeCorner.X - corner.X) + 1) * MapDrawing.CellPixels;
+        BrushOutline.Height = (Math.Abs(oppositeCorner.Y - corner.Y) + 1) * MapDrawing.CellPixels;
         BrushOutline.StrokeThickness = 2 / _viewport.Zoom;
         BrushOutline.Visibility = Visibility.Visible;
+    }
+
+    // Only the brush is wider than one cell.
+    private (GridCell Corner, GridCell OppositeCorner) SquareCorners(GridCell center)
+    {
+        var size = _viewModel.Tool == TileTool.Brush ? _viewModel.BrushSize : 1;
+        var topLeft = BrushCells.Square(center, size).First();
+        return (topLeft, new GridCell(topLeft.X + size - 1, topLeft.Y + size - 1));
     }
 
     private void OnViewportMouseWheel(object sender, MouseWheelEventArgs e)

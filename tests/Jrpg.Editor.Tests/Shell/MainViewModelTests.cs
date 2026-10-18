@@ -214,6 +214,61 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
+    public void PaintRectangle_TileChosen_PaintsEveryCellOfIt()
+    {
+        var viewModel = OpenWithTileChosen(layerZ: -3);
+
+        viewModel.PaintRectangle(new GridCell(3, 2), new GridCell(1, 1));
+
+        var layer = viewModel.CurrentMap!.Layers.Single(layer => layer.Z == -3);
+        Assert.Equal(6, layer.Rows.SelectMany(row => row).Count(tileId => tileId == viewModel.Tiles!.SelectedTileId));
+    }
+
+    [Fact]
+    public void EraseRectangle_EmptiesItsCellsOnTheChosenLayer()
+    {
+        var viewModel = Open(_repositoryContent);
+
+        viewModel.EraseRectangle(new GridCell(0, 0), new GridCell(1, 1));
+
+        var ground = viewModel.CurrentMap!.Layers.Single(layer => layer.Z == LayerPresets.GroundZ);
+        Assert.All(BrushCells.Rectangle(new GridCell(0, 0), new GridCell(1, 1)), cell => Assert.Equal(TileLayer.EmptyTileId, ground.TileIdAt(cell)));
+    }
+
+    [Fact]
+    public void FloodFill_EmptyLayer_FillsTheWholeMapAsOneStep()
+    {
+        var viewModel = OpenWithTileChosen(layerZ: -3);
+
+        viewModel.FloodFill(new GridCell(2, 2));
+
+        var layer = viewModel.CurrentMap!.Layers.Single(layer => layer.Z == -3);
+        Assert.All(layer.Rows.SelectMany(row => row), tileId => Assert.Equal(viewModel.Tiles!.SelectedTileId, tileId));
+        viewModel.CurrentMap.UndoCommand.Execute(null);
+        Assert.DoesNotContain(viewModel.CurrentMap.Layers, layer => layer.Z == -3);
+    }
+
+    [Fact]
+    public void FillLayerCommand_NoTileChosen_ChangesNothing()
+    {
+        var viewModel = Open(_repositoryContent);
+
+        viewModel.FillLayerCommand.Execute(null);
+
+        Assert.False(viewModel.CurrentMap!.IsDirty);
+    }
+
+    [Fact]
+    public void ClearLayerCommand_RemovesTheLayer()
+    {
+        var viewModel = Open(_repositoryContent);
+
+        viewModel.ClearLayerCommand.Execute(null);
+
+        Assert.DoesNotContain(viewModel.CurrentMap!.Layers, layer => layer.Z == LayerPresets.GroundZ);
+    }
+
+    [Fact]
     public void GrowBrush_FromFive_SkipsToSeven()
     {
         var viewModel = Open(_repositoryContent);
@@ -245,6 +300,15 @@ public sealed class MainViewModelTests : IDisposable
         Assert.StartsWith("classes.json", viewModel.LoadError, StringComparison.Ordinal);
         Assert.Empty(viewModel.MapIds);
         Assert.Null(viewModel.CurrentMap);
+    }
+
+    // The forest map open, its top-left tile chosen, painting on the given layer.
+    private MainViewModel OpenWithTileChosen(int layerZ)
+    {
+        var viewModel = Open(_repositoryContent);
+        viewModel.PickTileAt(new GridCell(0, 0));
+        viewModel.LayerZ = layerZ;
+        return viewModel;
     }
 
     private MainViewModel Open(string contentRoot, bool discardAnswer = false) =>

@@ -91,6 +91,12 @@ internal sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     public partial int BrushSize { get; set; } = 1;
 
+    /// <summary>What a left click or drag on the map does; the brush by default.</summary>
+    [ObservableProperty]
+    public partial TileTool Tool { get; set; }
+
+    public IReadOnlyList<TileTool> Tools { get; } = Enum.GetValues<TileTool>();
+
     /// <summary>Whether everything off <see cref="LayerZ"/> is drawn faint.</summary>
     [ObservableProperty]
     public partial bool IsOtherLayersDimmed { get; set; }
@@ -145,6 +151,20 @@ internal sealed partial class MainViewModel : ObservableObject
 
     public void EndStroke() => CurrentMap?.EndStroke();
 
+    /// <summary>Paints the chosen tile on every cell of a rectangle, as one undo step.</summary>
+    public void PaintRectangle(GridCell corner, GridCell oppositeCorner) => PutChosenTile(BrushCells.Rectangle(corner, oppositeCorner));
+
+    public void EraseRectangle(GridCell corner, GridCell oppositeCorner) => PutTiles(TileLayer.EmptyTileId, BrushCells.Rectangle(corner, oppositeCorner));
+
+    /// <summary>Paints the chosen tile over the area of the same tile joined to a cell on <see cref="LayerZ"/>.</summary>
+    public void FloodFill(GridCell start)
+    {
+        if (CurrentMap is { } open)
+        {
+            PutChosenTile(TileFloodFill.Cells(open.Map.Layout, LayerZ, start));
+        }
+    }
+
     /// <summary>The eyedropper: chooses the tile seen at a cell and its layer, to paint more of it.</summary>
     public void PickTileAt(GridCell cell)
     {
@@ -183,6 +203,27 @@ internal sealed partial class MainViewModel : ObservableObject
         CurrentMap.MarkSaved();
         SaveError = null;
     }
+
+    /// <summary>Paints the chosen tile on every cell of <see cref="LayerZ"/>, as one undo step.</summary>
+    [RelayCommand]
+    private void FillLayer() => PutChosenTile(AllCellsOfCurrentMap());
+
+    [RelayCommand]
+    private void ClearLayer() => PutTiles(TileLayer.EmptyTileId, AllCellsOfCurrentMap());
+
+    private IEnumerable<GridCell> AllCellsOfCurrentMap() =>
+        CurrentMap?.Map.Layout is { } layout ? BrushCells.Rectangle(new GridCell(0, 0), new GridCell(layout.Width - 1, layout.Height - 1)) : [];
+
+    // Nothing happens until a tile is chosen.
+    private void PutChosenTile(IEnumerable<GridCell> cells)
+    {
+        if (Tiles?.SelectedTileId is { } tileId)
+        {
+            PutTiles(tileId, cells);
+        }
+    }
+
+    private void PutTiles(int tileId, IEnumerable<GridCell> cells) => CurrentMap?.PutTiles(LayerZ, tileId, cells);
 
     private void StepBrushSize(int steps)
     {

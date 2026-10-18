@@ -47,8 +47,15 @@
                Text="{Binding LayerZ, UpdateSourceTrigger=PropertyChanged}" />
       <CheckBox Content="Dim other layers" IsChecked="{Binding IsOtherLayersDimmed}" />
       <Separator />
+      <TextBlock Text="Tool (B R F)" VerticalAlignment="Center" Margin="4,0" />
+      <ComboBox Width="90"
+                ToolTip="Brush: drag. Rectangle: drag, filled on release. Fill: click (or Shift + click with any tool). Right button erases."
+                ItemsSource="{Binding Tools}"
+                SelectedItem="{Binding Tool}" />
       <TextBlock Text="Brush ([ ])" VerticalAlignment="Center" Margin="4,0" />
       <ComboBox Width="50" ItemsSource="{Binding BrushSizes}" SelectedItem="{Binding BrushSize}" />
+      <Button Content="Fill layer" Command="{Binding FillLayerCommand}" />
+      <Button Content="Clear layer" Command="{Binding ClearLayerCommand}" />
       <Separator />
       <Button Content="Fit (Ctrl+0)" Click="OnFitClicked" />
       <Button Content="100 % (Ctrl+1)" Click="OnActualSizeClicked" />

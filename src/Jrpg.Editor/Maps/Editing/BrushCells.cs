@@ -2,7 +2,7 @@ using Jrpg.Core.Geometry;
 
 namespace Jrpg.Editor.Maps.Editing;
 
-/// <summary>The cells a brush stroke covers (legacy MapEditor <c>BrushCells</c> and <c>LineCells</c>).</summary>
+/// <summary>The cells a brush stroke or a rectangle covers (legacy MapEditor <c>BrushCells</c> and <c>LineCells</c>).</summary>
 internal static class BrushCells
 {
     /// <summary>The square brush around a cell; even sizes reach one cell further right and down. It may reach off the map.</summary>
@@ -14,6 +14,18 @@ internal static class BrushCells
             for (var dx = 0; dx < size; dx++)
             {
                 yield return new GridCell(center.X + start + dx, center.Y + start + dy);
+            }
+        }
+    }
+
+    /// <summary>Every cell of the rectangle between two opposite corners, in any order of the corners.</summary>
+    public static IEnumerable<GridCell> Rectangle(GridCell corner, GridCell oppositeCorner)
+    {
+        for (var y = Math.Min(corner.Y, oppositeCorner.Y); y <= Math.Max(corner.Y, oppositeCorner.Y); y++)
+        {
+            for (var x = Math.Min(corner.X, oppositeCorner.X); x <= Math.Max(corner.X, oppositeCorner.X); x++)
+            {
+                yield return new GridCell(x, y);
             }
         }
     }

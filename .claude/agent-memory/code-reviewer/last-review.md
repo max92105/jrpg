@@ -5,13 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 11e (Tile painting)
-Round: 1 (verdict: Fix the Criticals, then commit)
+Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 11f (Rectangle, flood fill, fill and clear layer)
+Round: 1 (verdict: Ready to commit; build, 715 tests, format exit 0 all pass)
 
-- open (Critical): dotnet format --verify-no-changes fails, exit 2: ENDOFLINE at src/Jrpg.Editor/Shell/MainViewModel.cs:47 (LF line in CRLF file); run dotnet format
-- open (Warning): Save (Ctrl+S) mid-drag doesn't end the stroke: file holds the partial stroke, stroke recorded after MarkSaved, Undo then reports clean while draft differs from file; also close mid-drag skips the discard question. Fix: MarkSaved (and ConfirmLeaveCurrentMap/close) call EndStroke first
-- open (Warning): EndStroke inside Undo/Redo/Do (mid-drag closes the stroke) has no test; add MapViewModelTests Undo_MidStroke_UndoesTheStroke
-- open (Suggestion): MainViewModel.ContinueStroke/EndStroke are pure forwarders to CurrentMap
-- open (Suggestion): TileBrowserView redraws on every PropertyChanged (3 redraws per Select, SheetTiles LINQ re-run each time); filter on property name
-- open (Suggestion): tick 11e in the plan with deviations (Square doesn't clip, TileStroke/TileBrush/TileImages/TilesheetMarks added, MapDraft keyed by Z, EditHistory.Record)
-- follow-up: Layers ListBox doesn't set LayerZ on selection (could pick the paint layer)
+- open (Suggestion): MainWindow.xaml.cs OnViewportLostMouseCapture clears _rectangleStart but doesn't call ShowBrushAt(_brushCell), so the dragged-rectangle outline stays on screen after release until the mouse moves
+- open (Suggestion): MainWindow.xaml.cs ShowBrushAt enumerates the whole rectangle/square for First()/Last() on every mouse move; compute the bounds from the corners
+- open (Suggestion): tick 11f in the plan with deviations (TileTool enum + ComboBox, MapViewModel.PutTiles, Fill tool as well as Shift+click, layer the map lacks counts as empty)
+- follow-up: FillLayer/ClearLayer commands always enabled (no CanExecute on open map / chosen tile)

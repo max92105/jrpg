@@ -35,6 +35,14 @@ public sealed class BrushCellsTests
     }
 
     [Fact]
+    public void Rectangle_DraggedUpLeft_NormalizesCorners()
+    {
+        Assert.Equal(
+            [new GridCell(1, 2), new GridCell(2, 2), new GridCell(1, 3), new GridCell(2, 3)],
+            BrushCells.Rectangle(new GridCell(2, 3), new GridCell(1, 2)));
+    }
+
+    [Fact]
     public void Line_SameCell_ReturnsIt()
     {
         Assert.Equal([new GridCell(3, 4)], BrushCells.Line(new GridCell(3, 4), new GridCell(3, 4)));

@@ -39,6 +39,23 @@ internal sealed partial class MapViewModel : ObservableObject
         Refresh();
     }
 
+    /// <summary>Puts one tile, or empty to erase, on many cells as one undo step; cells off the map are skipped.</summary>
+    /// <param name="layerZ">The layer changed.</param>
+    /// <param name="tileId">The tile put down, or empty.</param>
+    /// <param name="cells">Each cell at most once.</param>
+    public void PutTiles(int layerZ, int tileId, IEnumerable<GridCell> cells)
+    {
+        var changes = cells
+            .Where(_draft.Contains)
+            .Select(cell => new TileChange(cell, _draft.TileIdAt(layerZ, cell), tileId))
+            .Where(change => change.Before != change.After)
+            .ToList();
+        if (changes.Count > 0)
+        {
+            Do(new SetTilesEdit(layerZ, changes));
+        }
+    }
+
     /// <summary>Starts a brush or eraser drag on a cell; each cell it reaches shows at once.</summary>
     public void StartStroke(TileBrush brush, GridCell cell)
     {

@@ -13,6 +13,7 @@ A 2D JRPG written from scratch in C#. Personal project, single developer.
 - `tools/Jrpg.ContentConverter` — temporary console tool (ADR 0005): converts the legacy `Assets/` JSON into `content/generated/`. Deleted in part 4.
 - `tests/Jrpg.Core.Tests` — xUnit unit tests for Core.
 - `tests/Jrpg.Data.Tests` — xUnit tests for content loaders and validators.
+- `tests/Jrpg.Game.Tests` — xUnit tests for the Game's pure parts (screen fitting, scene stack, flow, presenters); nothing that needs a window.
 - `tests/Jrpg.Simulations` — headless battle/balance simulations.
 - `content/` — JSON game data (items, monsters, skills, dialogue). Source of truth for content.
 - `docs/decisions/` — architecture decision records (ADRs). Read the relevant ADR before changing a design area.
@@ -33,7 +34,8 @@ Dependency direction: Game → Data → Core; Editor → Data → Core. Never th
 - Test: `dotnet test --solution Jrpg.slnx`
 - Format check: `dotnet format Jrpg.slnx --verify-no-changes`
 - Format fix: `dotnet format Jrpg.slnx`
-- Run game: `dotnet run --project src/Jrpg.Game`
+- Run game: `dotnet run --project src/Jrpg.Game` (Debug reads the repository's `content/` directly, so content edits show on the next start without rebuilding; `-- --content <folder>` reads another folder). A broken content file stops the start with the file named in the console and the Visual Studio Output window. A Release build only finds content when published (`dotnet publish`) or given `--content`.
+- Visual Studio: F5 starts `Jrpg.Game`, the default startup project (`DefaultStartup` in `Jrpg.slnx`). If a fresh clone starts another project, right-click `Jrpg.Game` > Set as Startup Project.
 - Regenerate map content after editing in the legacy MapEditor: `dotnet run --project tools/Jrpg.ContentConverter -- Assets content` (rewrites `content/generated/` only; read `content/generated/conversion-report.txt`). Tests pin the converted counts (e.g. 283 tiles), so adding a tile or object in the MapEditor fails them on purpose: update the count in the same commit.
 
 ## Coding rules

@@ -5,13 +5,12 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-17-world-exploration-core.md, 5c (Save repair against current content)
+Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 1a (Game host, content root and scene stack)
 Round: 1 (verdict: Ready to commit)
 
-Accepted (don't re-raise): public RepairedSave returned by Read; SaveGameRepair instance + static Repair(slotName, save, catalog); static WorldStateRepair; level<1/negative experience clamped; inventory merge then MaxStack clamp; position outside an existing map left to WarpArrival; test names without class prefix (matches the project's test files).
+Accepted (don't re-raise): plain aspect fit in VirtualScreen.DestinationIn (plan's reading of decision 48, developer to confirm); Find delegates to internal Choose; empty ExplorationScene; seed from Environment.TickCount to Debug; null SpriteBatch in SceneStack tests; DefaultStartup in slnx instead of a .slnLaunch file (F5 unverified, CLAUDE.md fallback); test names without class prefix.
 
-- open (Warning): SaveGameRepair.RepairInventory `quantities[itemId] += quantity` overflows (potion int.MaxValue + potion 1 -> int.MinValue, passes ClampToMaxStack, Inventory.Add throws on restore); clamp per entry or add in long
-- open (Warning): duplicate member ids in Members kept -> GameSession.ActiveOrder .Single throws InvalidOperationException on Restore; dedupe (first wins + change line) or refuse as damaged
-- open (Suggestion): RepairActiveOrder drops duplicate active ids / active ids absent from Members with no change line
-- open (Suggestion): event/swap change lines say "which no longer exists" without saying whether map or event; name the missing part
-- open (Suggestion): worn non-equipment (Equipment is null) and swap on unknown map clauses untested
+- open (Warning): GameFlow/SessionTransitions have no test: Update adding delta to play time (decision 35) and the new game pushing ExplorationScene; both headless-testable
+- open (Suggestion): ContentRootLocatorTests named Find_* but three of four call Choose; name them Choose_* or keep Find_* only for the Find test
+- open (Suggestion): GameFlow.Session public with no user outside GameFlow; private until 3b's Capture needs it
+- open (Suggestion): Program catch filter misses ArgumentException from Path.GetFullPath (`--content ""`) and UnauthorizedAccessException -> unhandled crash instead of the start message

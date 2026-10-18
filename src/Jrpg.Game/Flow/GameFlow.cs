@@ -1,0 +1,31 @@
+using Jrpg.Core.Content;
+using Jrpg.Core.Session;
+using Jrpg.Game.Scenes;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace Jrpg.Game.Flow;
+
+/// <summary>
+/// Owns the screens and the one playthrough (ADR 0008). Its update never touches the graphics device, so it can run
+/// headless in tests; drawing is separate.
+/// </summary>
+internal sealed class GameFlow
+{
+    private readonly SceneStack _scenes = new();
+
+    public GameFlow(ContentCatalog catalog)
+    {
+        Session = new SessionTransitions(catalog, _scenes).StartNewGame();
+    }
+
+    public GameSession Session { get; }
+
+    /// <summary>Play time counts every update, menus and pause included (developer decision 35).</summary>
+    public void Update(TimeSpan delta)
+    {
+        Session.AddPlayTime(delta);
+        _scenes.Update(delta);
+    }
+
+    public void Draw(SpriteBatch batch) => _scenes.Draw(batch);
+}

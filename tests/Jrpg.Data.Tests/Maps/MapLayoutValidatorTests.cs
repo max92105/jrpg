@@ -7,7 +7,7 @@ namespace Jrpg.Data.Tests.Maps;
 
 public sealed class MapLayoutValidatorTests
 {
-    private const string FileName = "generated/maps/forest.json";
+    private const string FileName = "map-layouts/forest.json";
 
     private static readonly MapReferences _references = new(
         new MapContentReferences(
@@ -41,7 +41,7 @@ public sealed class MapLayoutValidatorTests
         var exception = Assert.Throws<ContentValidationException>(() => MapLayoutValidator.Validate(FileName, layout, _references));
 
         Assert.Equal(
-            $"generated/maps/forest.json: layer 1: z {secondZ} must be above the previous layer's z 0; layers are listed bottom first.",
+            $"map-layouts/forest.json: layer 1: z {secondZ} must be above the previous layer's z 0; layers are listed bottom first.",
             exception.Message);
     }
 
@@ -70,7 +70,7 @@ public sealed class MapLayoutValidatorTests
         var exception = Assert.Throws<ContentValidationException>(
             () => MapLayoutValidator.Validate(FileName, _forest with { Id = "woods" }, _references));
 
-        Assert.Equal("generated/maps/forest.json: id must equal the file name 'forest' (was 'woods').", exception.Message);
+        Assert.Equal("map-layouts/forest.json: id must equal the file name 'forest' (was 'woods').", exception.Message);
     }
 
     [Fact]
@@ -79,7 +79,7 @@ public sealed class MapLayoutValidatorTests
         var exception = Assert.Throws<ContentValidationException>(
             () => MapLayoutValidator.Validate(FileName, _forest with { Height = 3 }, _references));
 
-        Assert.Equal("generated/maps/forest.json: layer 0: must have 3 rows, one per map row (had 2).", exception.Message);
+        Assert.Equal("map-layouts/forest.json: layer 0: must have 3 rows, one per map row (had 2).", exception.Message);
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public sealed class MapLayoutValidatorTests
 
         var exception = Assert.Throws<ContentValidationException>(() => MapLayoutValidator.Validate(FileName, layout, _references));
 
-        Assert.Equal("generated/maps/forest.json: layer 0: row 0 must have 3 tile ids, one per map column (had 2).", exception.Message);
+        Assert.Equal("map-layouts/forest.json: layer 0: row 0 must have 3 tile ids, one per map column (had 2).", exception.Message);
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public sealed class MapLayoutValidatorTests
 
         var exception = Assert.Throws<ContentValidationException>(() => MapLayoutValidator.Validate(FileName, layout, _references));
 
-        Assert.Equal("generated/maps/forest.json: object '1@0,0' has unknown object id 'house_9'.", exception.Message);
+        Assert.Equal("map-layouts/forest.json: object '1@0,0' has unknown object id 'house_9'.", exception.Message);
     }
 
     [Theory]
@@ -108,6 +108,6 @@ public sealed class MapLayoutValidatorTests
     {
         var exception = Assert.Throws<ContentValidationException>(() => MapLayoutValidator.Validate(FileName, layout, _references));
 
-        Assert.Equal($"generated/maps/forest.json: {problem}", exception.Message);
+        Assert.Equal($"map-layouts/forest.json: {problem}", exception.Message);
     }
 }

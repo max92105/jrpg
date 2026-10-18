@@ -12,12 +12,12 @@ public sealed class ContentCatalogLoaderTests
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-        // Assets/Maps/start.json already refers to "potion", and ids never change once used.
+        // content/map-layouts/start.json already refers to "potion", and ids never change once used.
         Assert.Contains("potion", catalog.Items.Keys);
     }
 
     [Fact]
-    public void Load_RepositoryContent_LoadsEveryGeneratedTile()
+    public void Load_RepositoryContent_LoadsEveryTile()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
@@ -26,7 +26,7 @@ public sealed class ContentCatalogLoaderTests
     }
 
     [Fact]
-    public void Load_RepositoryContent_LoadsGeneratedObjectsWithTileGroupSizes()
+    public void Load_RepositoryContent_LoadsObjectsWithTileGroupSizes()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 

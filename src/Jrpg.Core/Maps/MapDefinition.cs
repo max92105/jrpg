@@ -1,6 +1,6 @@
 namespace Jrpg.Core.Maps;
 
-/// <summary>One map as the game uses it: the generated layout with its hand-written settings.</summary>
+/// <summary>One map as the game uses it: its layout with its settings (ADR 0011).</summary>
 public sealed record MapDefinition
 {
     public MapDefinition(MapLayout layout, MapSettings settings)

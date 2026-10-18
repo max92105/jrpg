@@ -1,6 +1,6 @@
 namespace Jrpg.Core.Maps;
 
-/// <summary>A map's hand-written settings: what the legacy map editor can't express (ADR 0005).</summary>
+/// <summary>A map's settings, kept apart from its layout so they stay small and easy to review (ADR 0011).</summary>
 public sealed record MapSettings
 {
     public required string Id { get; init; }

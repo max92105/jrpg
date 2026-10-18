@@ -4,8 +4,7 @@ using Jrpg.Data.Content;
 namespace Jrpg.Game.Rendering;
 
 /// <summary>
-/// The game's fonts, rendered at any size from TTF files (ADR 0009). Fonts are new files, so they're read from
-/// <c>{content}/art/fonts/</c> even while other art still comes from <c>Assets/</c>.
+/// The game's fonts, rendered at any size from the TTF files in <c>{content}/art/fonts/</c> (ADR 0009).
 /// </summary>
 internal sealed class FontLibrary : IDisposable
 {

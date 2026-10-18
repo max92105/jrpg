@@ -8,7 +8,7 @@ namespace Jrpg.Data.Tests.Maps;
 
 public sealed class ObjectCatalogValidatorTests
 {
-    private const string FileName = "generated/objects.json";
+    private const string FileName = "objects.json";
 
     private static readonly HashSet<int> _tileIds = [1, 2];
 
@@ -39,7 +39,7 @@ public sealed class ObjectCatalogValidatorTests
 
         var exception = Assert.Throws<ContentValidationException>(() => ObjectCatalogValidator.Validate(FileName, [chest], _tileIds));
 
-        Assert.Equal("generated/objects.json: object 'chest': collisionPolygon must be empty or have at least 3 points (had 2).", exception.Message);
+        Assert.Equal("objects.json: object 'chest': collisionPolygon must be empty or have at least 3 points (had 2).", exception.Message);
     }
 
     [Theory]
@@ -52,7 +52,7 @@ public sealed class ObjectCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(() => ObjectCatalogValidator.Validate(FileName, [chest], _tileIds));
 
         Assert.StartsWith(
-            string.Create(CultureInfo.InvariantCulture, $"generated/objects.json: object 'chest': collisionPolygon point ({x}, {y}) must be within 0..1"),
+            string.Create(CultureInfo.InvariantCulture, $"objects.json: object 'chest': collisionPolygon point ({x}, {y}) must be within 0..1"),
             exception.Message,
             StringComparison.Ordinal);
     }
@@ -65,7 +65,7 @@ public sealed class ObjectCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(
             () => ObjectCatalogValidator.Validate(FileName, [_chest with { Width = width, Height = height }], _tileIds));
 
-        Assert.Equal($"generated/objects.json: object 'chest': width and height must be at least 1 (was {width}x{height}).", exception.Message);
+        Assert.Equal($"objects.json: object 'chest': width and height must be at least 1 (was {width}x{height}).", exception.Message);
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public sealed class ObjectCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(
             () => ObjectCatalogValidator.Validate(FileName, [_chest with { Category = "" }], _tileIds));
 
-        Assert.Equal("generated/objects.json: object 'chest': category must not be empty.", exception.Message);
+        Assert.Equal("objects.json: object 'chest': category must not be empty.", exception.Message);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public sealed class ObjectCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(
             () => ObjectCatalogValidator.Validate(FileName, [_chest with { Tiles = [] }], _tileIds));
 
-        Assert.Equal("generated/objects.json: object 'chest': tiles must not be empty; an object without tiles draws nothing.", exception.Message);
+        Assert.Equal("objects.json: object 'chest': tiles must not be empty; an object without tiles draws nothing.", exception.Message);
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public sealed class ObjectCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(
             () => ObjectCatalogValidator.Validate(FileName, [_chest with { Tiles = [new ObjectTile(0, 0, 9)] }], _tileIds));
 
-        Assert.Equal("generated/objects.json: object 'chest': tile (0, 0) has tile id 9, which isn't a tile.", exception.Message);
+        Assert.Equal("objects.json: object 'chest': tile (0, 0) has tile id 9, which isn't a tile.", exception.Message);
     }
 
     [Theory]
@@ -104,7 +104,7 @@ public sealed class ObjectCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(
             () => ObjectCatalogValidator.Validate(FileName, [_chest with { Tiles = [new ObjectTile(x, y, 1)] }], _tileIds));
 
-        Assert.Equal($"generated/objects.json: object 'chest': tile ({x}, {y}) must be inside the object's 1x2 cells.", exception.Message);
+        Assert.Equal($"objects.json: object 'chest': tile ({x}, {y}) must be inside the object's 1x2 cells.", exception.Message);
     }
 
     [Fact]
@@ -113,7 +113,7 @@ public sealed class ObjectCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(
             () => ObjectCatalogValidator.Validate(FileName, [_chest with { Tiles = [new ObjectTile(0, 1, 1), new ObjectTile(0, 1, 2)] }], _tileIds));
 
-        Assert.Equal("generated/objects.json: object 'chest': tile (0, 1) is listed more than once; an object has one tile per cell.", exception.Message);
+        Assert.Equal("objects.json: object 'chest': tile (0, 1) is listed more than once; an object has one tile per cell.", exception.Message);
     }
 
     [Fact]
@@ -123,7 +123,7 @@ public sealed class ObjectCatalogValidatorTests
 
         var exception = Assert.Throws<ContentValidationException>(() => ObjectCatalogValidator.Validate(FileName, [chest], _tileIds));
 
-        Assert.Equal("generated/objects.json: object 'chest': abovePlayerZones[0] must have at least 3 points.", exception.Message);
+        Assert.Equal("objects.json: object 'chest': abovePlayerZones[0] must have at least 3 points.", exception.Message);
     }
 
     [Fact]
@@ -133,6 +133,6 @@ public sealed class ObjectCatalogValidatorTests
 
         var exception = Assert.Throws<ContentValidationException>(() => ObjectCatalogValidator.Validate(FileName, [chest], _tileIds));
 
-        Assert.StartsWith("generated/objects.json: object 'chest': abovePlayerZones[0] point (2, 0) must be within 0..1", exception.Message, StringComparison.Ordinal);
+        Assert.StartsWith("objects.json: object 'chest': abovePlayerZones[0] point (2, 0) must be within 0..1", exception.Message, StringComparison.Ordinal);
     }
 }

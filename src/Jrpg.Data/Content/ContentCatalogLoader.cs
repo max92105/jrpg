@@ -24,11 +24,9 @@ public static class ContentCatalogLoader
     private const string EncountersFile = "encounters.json";
     private const string NewGameFile = "new-game.json";
 
-    /// <summary>The folder the content converter owns and rewrites on every run (ADR 0005).</summary>
-    internal const string GeneratedFolder = "generated";
-    internal const string TilesheetsFile = GeneratedFolder + "/tilesheets.json";
-    internal const string TilesFile = GeneratedFolder + "/tiles.json";
-    internal const string ObjectsFile = GeneratedFolder + "/objects.json";
+    internal const string TilesheetsFile = "tilesheets.json";
+    internal const string TilesFile = "tiles.json";
+    internal const string ObjectsFile = "objects.json";
 
     /// <summary>Loads and validates every content file under <paramref name="contentRoot"/>, referenced files first.</summary>
     /// <exception cref="ContentValidationException">A file is malformed or breaks a content rule.</exception>

@@ -23,16 +23,11 @@
   <!-- Debug reads the repository's content/ directly, so an edit shows on the next start without rebuilding (plan 3a, decision 77). -->
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
     <AssemblyMetadata Include="ContentRoot" Value="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\content'))" />
-    <!-- Legacy art stays in Assets/ until the content cutover (slice 10, ADR 0009). -->
-    <AssemblyMetadata Include="ArtRoot" Value="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\Assets'))" />
   </ItemGroup>
 
   <!-- A published build carries its own copy of content/. -->
   <ItemGroup>
     <None Include="..\..\content\**" LinkBase="content" CopyToPublishDirectory="PreserveNewest" />
-    <!-- Until the content cutover (slice 10) the art a published build needs is still in Assets/; it goes where the art root will be, with the legacy folder names. -->
-    <None Include="..\..\Assets\Tiles\*.png" LinkBase="content\art\Tiles" CopyToPublishDirectory="PreserveNewest" />
-    <None Include="..\..\Assets\player.png" Link="content\art\player.png" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

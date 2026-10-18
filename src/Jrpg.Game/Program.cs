@@ -24,7 +24,7 @@ catch (Exception exception) when (IsStartupProblem(exception))
     return 1;
 }
 
-var artRoot = ContentRootLocator.FindArtRoot(typeof(JrpgGame).Assembly, contentRoot);
+var artRoot = ArtFolders.RootIn(contentRoot);
 using (fonts)
 {
     using var game = new JrpgGame(FirstScene(contentRoot, artRoot, messages, fonts), artRoot);

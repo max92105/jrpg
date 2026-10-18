@@ -13,7 +13,7 @@ public sealed class PngSizeTests : IDisposable
     public void Read_RepositoryFieldSprite_ReturnsItsSize()
     {
         // The legacy player sheet: 8 frames of 48 pixels across, 6 rows down (legacy only used the first 4, one per facing).
-        var size = PngSize.Read(Path.Combine(AppContext.BaseDirectory, "legacy-art", "player.png"));
+        var size = PngSize.Read(Path.Combine(AppContext.BaseDirectory, "content", "art", "field-sprites", "player.png"));
 
         Assert.Equal((384, 288), size);
     }

@@ -7,13 +7,13 @@ namespace Jrpg.Data.Tests.Art;
 
 public sealed class ArtReferenceCheckTests
 {
-    private static readonly string _legacyArt = Path.Combine(AppContext.BaseDirectory, "legacy-art");
+    private static readonly string _artRoot = ArtFolders.RootIn(Path.Combine(AppContext.BaseDirectory, "content"));
     private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
     [Fact]
     public void FindProblems_RepositoryContent_FindsNone()
     {
-        Assert.Empty(ArtReferenceCheck.FindProblems(_catalog, _legacyArt));
+        Assert.Empty(ArtReferenceCheck.FindProblems(_catalog, _artRoot));
     }
 
     [Fact]
@@ -23,9 +23,9 @@ public sealed class ArtReferenceCheckTests
         var tile = _catalog.Tiles.Values.First(tile => tile.SheetId == "fg_forest_fall");
         var catalog = _catalog with { Tiles = new Dictionary<int, TileDefinition> { [tile.Id] = tile with { Column = 1000 } } };
 
-        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _legacyArt));
+        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
 
-        Assert.StartsWith($"Tiles/FG_Forest_Fall.png: tile {tile.Id}'s cell (1000, {tile.Row}) lies outside the ", problem, StringComparison.Ordinal);
+        Assert.StartsWith($"tilesheets/FG_Forest_Fall.png: tile {tile.Id}'s cell (1000, {tile.Row}) lies outside the ", problem, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -33,9 +33,9 @@ public sealed class ArtReferenceCheckTests
     {
         var catalog = _catalog with { NewGame = _catalog.NewGame with { FieldSpriteFile = "ghost.png" } };
 
-        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _legacyArt));
+        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
 
-        Assert.Equal($"ghost.png: not found in {_legacyArt}.", problem);
+        Assert.Equal($"field-sprites/ghost.png: not found in {_artRoot}.", problem);
     }
 
     [Fact]
@@ -44,8 +44,8 @@ public sealed class ArtReferenceCheckTests
         var sheet = _catalog.Tilesheets["city"];
         var catalog = _catalog with { Tilesheets = new Dictionary<string, TilesheetDefinition>(_catalog.Tilesheets) { ["city"] = sheet with { File = "Gone.png" } } };
 
-        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _legacyArt));
+        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
 
-        Assert.Equal($"Tiles/Gone.png: not found in {_legacyArt}.", problem);
+        Assert.Equal($"tilesheets/Gone.png: not found in {_artRoot}.", problem);
     }
 }

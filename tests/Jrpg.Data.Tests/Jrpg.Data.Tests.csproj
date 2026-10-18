@@ -17,9 +17,6 @@
   <ItemGroup>
     <None Include="..\..\content\**" LinkBase="content" CopyToOutputDirectory="PreserveNewest" />
     <None Update="TestContent\**" CopyToOutputDirectory="PreserveNewest" />
-    <!-- The art ArtReferenceCheck checks; the legacy folders until the content cutover (slice 10, ADR 0009). -->
-    <None Include="..\..\Assets\Tiles\*.png" LinkBase="legacy-art\Tiles" CopyToOutputDirectory="PreserveNewest" />
-    <None Include="..\..\Assets\player.png" Link="legacy-art\player.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>

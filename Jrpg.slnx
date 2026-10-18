@@ -4,14 +4,10 @@
     <Project Path="src/Jrpg.Data/Jrpg.Data.csproj" />
     <Project Path="src/Jrpg.Game/Jrpg.Game.csproj" DefaultStartup="true" />
   </Folder>
-  <Folder Name="/tools/">
-    <Project Path="tools/Jrpg.ContentConverter/Jrpg.ContentConverter.csproj" />
-  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Jrpg.Core.Tests/Jrpg.Core.Tests.csproj" />
     <Project Path="tests/Jrpg.Data.Tests/Jrpg.Data.Tests.csproj" />
     <Project Path="tests/Jrpg.Game.Tests/Jrpg.Game.Tests.csproj" />
-    <Project Path="tests/Jrpg.ContentConverter.Tests/Jrpg.ContentConverter.Tests.csproj" />
     <Project Path="tests/Jrpg.Simulations/Jrpg.Simulations.csproj" />
   </Folder>
 </Solution>

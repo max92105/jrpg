@@ -20,7 +20,7 @@ public sealed class MapFolderReaderTests : IDisposable
     [Fact]
     public void Read_LayoutAndSettings_ComposesTheMap()
     {
-        WriteContent("generated/maps/forest.json", Layout);
+        WriteContent("map-layouts/forest.json", Layout);
         WriteContent("maps/forest.json", Settings);
 
         var map = Assert.Single(Read());
@@ -31,12 +31,12 @@ public sealed class MapFolderReaderTests : IDisposable
     [Fact]
     public void Read_LayoutWithoutSettings_ThrowsNamingTheMap()
     {
-        WriteContent("generated/maps/forest.json", Layout);
+        WriteContent("map-layouts/forest.json", Layout);
         Directory.CreateDirectory(Path.Combine(_contentRoot, "maps"));
 
         var exception = Assert.Throws<ContentValidationException>(() => Read());
 
-        Assert.Equal("generated/maps/forest.json: map 'forest' has no settings file in maps/.", exception.Message);
+        Assert.Equal("map-layouts/forest.json: map 'forest' has no settings file in maps/.", exception.Message);
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public sealed class MapFolderReaderTests : IDisposable
 
         var exception = Assert.Throws<ContentValidationException>(() => Read());
 
-        Assert.Equal("maps/forest.json: map 'forest' has no layout in generated/maps/; run the content converter.", exception.Message);
+        Assert.Equal("maps/forest.json: map 'forest' has no layout in map-layouts/.", exception.Message);
     }
 
     [Fact]
@@ -55,13 +55,13 @@ public sealed class MapFolderReaderTests : IDisposable
         // "woods" sorts after "forest", so the warp target is only known because every layout is read first.
         WriteContent("maps/forest.json", Settings);
         WriteContent(
-            "generated/maps/forest.json",
+            "map-layouts/forest.json",
             """
             { "id": "forest", "width": 1, "height": 1, "layers": [ { "z": 0, "rows": [ [ 1 ] ] } ], "objects": [],
               "cellEvents": [ { "cell": { "x": 0, "y": 0 }, "event": { "id": "cell_0_0", "activation": "touch",
                 "steps": [ { "mapId": "woods", "type": "warp", "cell": { "x": 1, "y": 0 } } ] } } ] }
             """);
-        WriteContent("generated/maps/woods.json", """{ "id": "woods", "width": 2, "height": 1, "layers": [ { "z": 0, "rows": [ [ 1, 1 ] ] } ], "objects": [] }""");
+        WriteContent("map-layouts/woods.json", """{ "id": "woods", "width": 2, "height": 1, "layers": [ { "z": 0, "rows": [ [ 1, 1 ] ] } ], "objects": [] }""");
         WriteContent("maps/woods.json", """{ "id": "woods", "displayName": "Woods" }""");
 
         var maps = Read();

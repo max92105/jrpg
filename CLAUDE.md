@@ -10,12 +10,11 @@ A 2D JRPG written from scratch in C#. Personal project, single developer.
 - `src/Jrpg.Data` — content loaders and schemas (JSON). Depends on Core only.
 - `src/Jrpg.Game` — MonoGame shell: game loop, input, rendering, audio. Thin. Reads Core state, sends commands to Core.
 - `src/Jrpg.Editor` — WPF tools (map, database, dialogue editors). References Core + Data, never Game.
-- `tools/Jrpg.ContentConverter` — temporary console tool (ADR 0005): converts the legacy `Assets/` JSON into `content/generated/`. Deleted in part 4.
 - `tests/Jrpg.Core.Tests` — xUnit unit tests for Core.
 - `tests/Jrpg.Data.Tests` — xUnit tests for content loaders and validators.
 - `tests/Jrpg.Game.Tests` — xUnit tests for the Game's pure parts (screen fitting, scene stack, flow, presenters); nothing that needs a window.
 - `tests/Jrpg.Simulations` — headless battle/balance simulations.
-- `content/` — JSON game data (items, monsters, skills, dialogue). Source of truth for content.
+- `content/` — JSON game data (items, monsters, skills, maps, dialogue) and art (`content/art/<kind>/`, ADR 0009). The only source of truth for content (ADR 0011).
 - `docs/decisions/` — architecture decision records (ADRs). Read the relevant ADR before changing a design area.
 - `docs/plans/` — feature plans produced by `/plan-feature`.
 
@@ -25,8 +24,8 @@ Dependency direction: Game → Data → Core; Editor → Data → Core. Never th
 
 - `JRPG/`, `MapEditor/`, `JRPG.Core/` are the **legacy WPF demo** (.NET 10, `net10.0-windows`, `JRPG.sln`). It is reference material for the migration: read it, port behavior out of it, don't extend it. Build: `dotnet build JRPG.sln --nologo -v q`. Run: `dotnet run --project JRPG` / `dotnet run --project MapEditor`.
 - Legacy `JRPG.Core` still references WPF (`UseWPF`) for `Rect`/`ImageSource` in map types. The new `src/Jrpg.Core` must not.
-- `Assets/` holds the current art and map JSON. Content moves to `content/` as each loader is ported.
-- New code goes only in `src/`, `tests/` and `tools/`, built by `Jrpg.slnx`.
+- `Assets/` is the legacy demo's art and map JSON, frozen since the content cutover (ADR 0011): the new code reads only `content/`, and `Assets/` goes with the legacy code in part 3c.
+- New code goes only in `src/` and `tests/`, built by `Jrpg.slnx`.
 
 ## Commands
 
@@ -36,7 +35,6 @@ Dependency direction: Game → Data → Core; Editor → Data → Core. Never th
 - Format fix: `dotnet format Jrpg.slnx`
 - Run game: `dotnet run --project src/Jrpg.Game` (Debug reads the repository's `content/` directly, so content edits show on the next start without rebuilding; `-- --content <folder>` reads another folder). A broken content file stops the start with the file named on screen, in the console and in the Visual Studio Output window (only the console and Output window if the message table or fonts are what's broken). A Release build only finds content when published (`dotnet publish`) or given `--content`.
 - Visual Studio: F5 starts `Jrpg.Game`, the default startup project (`DefaultStartup` in `Jrpg.slnx`). If a fresh clone starts another project, right-click `Jrpg.Game` > Set as Startup Project.
-- Regenerate map content after editing in the legacy MapEditor: `dotnet run --project tools/Jrpg.ContentConverter -- Assets content` (rewrites `content/generated/` only; read `content/generated/conversion-report.txt`). Tests pin the converted counts (e.g. 283 tiles), so adding a tile or object in the MapEditor fails them on purpose: update the count in the same commit.
 
 ## Coding rules
 

@@ -1,4 +1,0 @@
-<Project>
-  <!-- Tools follow the same quality gates as production code. -->
-  <Import Project="$(MSBuildThisFileDirectory)..\src\Directory.Build.props" />
-</Project>

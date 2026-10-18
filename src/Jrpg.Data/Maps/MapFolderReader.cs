@@ -4,12 +4,12 @@ using Jrpg.Data.Content;
 namespace Jrpg.Data.Maps;
 
 /// <summary>
-/// Reads every map: the generated layouts and the hand-written settings (ADR 0005), paired by file name.
+/// Reads every map: its layout and its settings, two files paired by file name (ADR 0011).
 /// Every layout needs settings and every settings file a layout, so a renamed or deleted map fails loudly.
 /// </summary>
 internal static class MapFolderReader
 {
-    internal const string LayoutsFolder = ContentCatalogLoader.GeneratedFolder + "/maps";
+    internal const string LayoutsFolder = "map-layouts";
     internal const string SettingsFolder = "maps";
 
     /// <summary>Reads all layouts before validating any, since a warp's target map must exist and contain its cell.</summary>
@@ -38,7 +38,7 @@ internal static class MapFolderReader
         if (settingsWithoutLayout is not null)
         {
             throw new ContentValidationException(
-                $"{SettingsFolder}/{settingsWithoutLayout}.json: map '{settingsWithoutLayout}' has no layout in {LayoutsFolder}/; run the content converter.");
+                $"{SettingsFolder}/{settingsWithoutLayout}.json: map '{settingsWithoutLayout}' has no layout in {LayoutsFolder}/.");
         }
 
         return layoutIds;

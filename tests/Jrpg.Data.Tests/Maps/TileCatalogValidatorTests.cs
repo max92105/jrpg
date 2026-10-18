@@ -6,7 +6,7 @@ namespace Jrpg.Data.Tests.Maps;
 
 public sealed class TileCatalogValidatorTests
 {
-    private const string FileName = "generated/tiles.json";
+    private const string FileName = "tiles.json";
 
     private static readonly TileDefinition _grass = new() { Id = 1, IsWalkable = true, SheetId = "city", Column = 2, Row = 5 };
     private static readonly HashSet<string> _sheetIds = ["city"];
@@ -25,7 +25,7 @@ public sealed class TileCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(
             () => TileCatalogValidator.Validate(FileName, [_grass, _grass with { Id = 0 }], _sheetIds));
 
-        Assert.Equal("generated/tiles.json: tile '0': id must be at least 1, since 0 means an empty cell (was 0).", exception.Message);
+        Assert.Equal("tiles.json: tile '0': id must be at least 1, since 0 means an empty cell (was 0).", exception.Message);
     }
 
     [Fact]
@@ -34,7 +34,7 @@ public sealed class TileCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(
             () => TileCatalogValidator.Validate(FileName, [_grass, _grass with { IsWalkable = false }], _sheetIds));
 
-        Assert.Equal("generated/tiles.json: tile id '1' is used more than once.", exception.Message);
+        Assert.Equal("tiles.json: tile id '1' is used more than once.", exception.Message);
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public sealed class TileCatalogValidatorTests
     {
         var exception = Assert.Throws<ContentValidationException>(() => TileCatalogValidator.Validate(FileName, [_grass, null!], _sheetIds));
 
-        Assert.Equal("generated/tiles.json: entry 1 is null.", exception.Message);
+        Assert.Equal("tiles.json: entry 1 is null.", exception.Message);
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public sealed class TileCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(
             () => TileCatalogValidator.Validate(FileName, [_grass with { SheetId = "jungle" }], _sheetIds));
 
-        Assert.Equal("generated/tiles.json: tile '1': sheetId 'jungle' isn't a tilesheet.", exception.Message);
+        Assert.Equal("tiles.json: tile '1': sheetId 'jungle' isn't a tilesheet.", exception.Message);
     }
 
     [Theory]
@@ -62,6 +62,6 @@ public sealed class TileCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(
             () => TileCatalogValidator.Validate(FileName, [_grass with { Column = column, Row = row }], _sheetIds));
 
-        Assert.Equal($"generated/tiles.json: tile '1': column and row must not be negative (was {column}, {row}).", exception.Message);
+        Assert.Equal($"tiles.json: tile '1': column and row must not be negative (was {column}, {row}).", exception.Message);
     }
 }

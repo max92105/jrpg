@@ -8,7 +8,7 @@ namespace Jrpg.Game.Rendering;
 /// <summary>
 /// Bakes each object's canopy: its tiles composed at screen size, keeping only the pixels inside its above-player zones,
 /// so drawing the canopy over the player needs no clipping or shader (plan 3a, key decision 4). It works because every
-/// object draws on one layer, which the converter and the validator enforce.
+/// object draws on one layer: an object tile has no Z of its own.
 /// </summary>
 internal static class ObjectSpriteBaker
 {

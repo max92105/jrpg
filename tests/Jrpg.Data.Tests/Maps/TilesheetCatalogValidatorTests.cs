@@ -6,7 +6,7 @@ namespace Jrpg.Data.Tests.Maps;
 
 public sealed class TilesheetCatalogValidatorTests
 {
-    private const string FileName = "generated/tilesheets.json";
+    private const string FileName = "tilesheets.json";
 
     private static readonly TilesheetDefinition _city = new()
     {
@@ -32,7 +32,7 @@ public sealed class TilesheetCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(
             () => TilesheetCatalogValidator.Validate(FileName, [_city with { TileWidth = 0 }]));
 
-        Assert.Equal("generated/tilesheets.json: tilesheet 'city': tileWidth and tileHeight must be at least 1 (was 0 x 48).", exception.Message);
+        Assert.Equal("tilesheets.json: tilesheet 'city': tileWidth and tileHeight must be at least 1 (was 0 x 48).", exception.Message);
     }
 
     [Fact]
@@ -41,7 +41,7 @@ public sealed class TilesheetCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(
             () => TilesheetCatalogValidator.Validate(FileName, [_city with { File = " " }]));
 
-        Assert.Equal("generated/tilesheets.json: tilesheet 'city': file must not be empty.", exception.Message);
+        Assert.Equal("tilesheets.json: tilesheet 'city': file must not be empty.", exception.Message);
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public sealed class TilesheetCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(
             () => TilesheetCatalogValidator.Validate(FileName, [_city with { Spacing = -1 }]));
 
-        Assert.Equal("generated/tilesheets.json: tilesheet 'city': margin and spacing must not be negative (was 0 and -1).", exception.Message);
+        Assert.Equal("tilesheets.json: tilesheet 'city': margin and spacing must not be negative (was 0 and -1).", exception.Message);
     }
 
     [Fact]
@@ -59,6 +59,6 @@ public sealed class TilesheetCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(
             () => TilesheetCatalogValidator.Validate(FileName, [_city, _city with { File = "City2.png" }]));
 
-        Assert.Equal("generated/tilesheets.json: tilesheet id 'city' is used more than once.", exception.Message);
+        Assert.Equal("tilesheets.json: tilesheet id 'city' is used more than once.", exception.Message);
     }
 }

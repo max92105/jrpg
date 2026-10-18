@@ -63,7 +63,11 @@
 #*.RTF   diff=astextplain
 
 ###############################################################################
-# Generated content is written with CRLF (ContentFileWriter); keep it CRLF on every
-# checkout so the "matches committed generated content" test compares like with like.
+# Editor-written content (ContentFileWriter) uses CRLF; keep it CRLF on every
+# checkout so an editor save that changes nothing leaves no diff (ADR 0011).
 ###############################################################################
-content/generated/** text eol=crlf
+content/tiles.json text eol=crlf
+content/tilesheets.json text eol=crlf
+content/objects.json text eol=crlf
+content/map-layouts/** text eol=crlf
+content/maps/** text eol=crlf

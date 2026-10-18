@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 11a (Writing maps with validation)
-Round: 1 (verdict: Fix the Criticals; caller said this is the single review round)
+Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 11b (Editor skeleton and map view)
+Round: 1 (verdict: Ready to commit; caller said this is the single review round)
 
-- open (Critical): ContentWriter.WriteMap skips NewGameValidator's startLocation check; shrinking start to 10x45 saves, then ContentCatalogLoader.Load fails "new-game.json: startLocation.position (10, 3) must be inside map 'start'"
-- open (Suggestion): a failed second WriteAside leaves "{layout}.saving" behind in content/ (shows as untracked); delete the aside files on failure
-- open (Suggestion): ContentReferencesOf duplicates the MapContentReferences construction in ContentCatalogLoader; share one factory
-- open (Suggestion): WritesIdenticalBytes compares ReadAllText (hides BOM); compare File.ReadAllBytes per file; tick slice 11a in the plan with deviations
-- follow-up: after WriteMap the editor's ContentCatalog is stale; a second save validates against the old map (11d must reload or WriteMap return the updated catalog)
+- open (Suggestion): MapDrawing.DrawCanopy pushes one clip per zone, so overlapping zones draw semi-transparent pixels twice; game's CanopyMask is the union. Use one GeometryGroup clip (no multi-zone objects today)
+- open (Suggestion): test Open_StartMap_ExposesItsLayersInZOrder names a method that doesn't exist; rename Constructor_LayersOutOfZOrder_ExposesThemBottomFirst
+- open (Suggestion): tick 11b in the plan with deviations (DrawingGroup+Image instead of DrawingVisual, test rename, MainViewModel tests, ArtReferenceCheck gate)
+- follow-up: art-problem branch of MainViewModel (ArtReferenceCheck -> LoadError, no maps) has no test
+- follow-up: a corrupt (present but undecodable) tilesheet PNG throws from MapDrawing in the PropertyChanged handler, crashing the editor

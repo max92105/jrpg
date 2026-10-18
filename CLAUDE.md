@@ -13,6 +13,7 @@ A 2D JRPG written from scratch in C#. Personal project, single developer.
 - `tests/Jrpg.Core.Tests` — xUnit unit tests for Core.
 - `tests/Jrpg.Data.Tests` — xUnit tests for content loaders and validators.
 - `tests/Jrpg.Game.Tests` — xUnit tests for the Game's pure parts (screen fitting, scene stack, flow, presenters); nothing that needs a window.
+- `tests/Jrpg.Editor.Tests` — xUnit tests for the editor's view models and headless editing logic; nothing that needs a window.
 - `tests/Jrpg.Simulations` — headless battle/balance simulations.
 - `content/` — JSON game data (items, monsters, skills, maps, dialogue) and art (`content/art/<kind>/`, ADR 0009). The only source of truth for content (ADR 0011).
 - `docs/decisions/` — architecture decision records (ADRs). Read the relevant ADR before changing a design area.
@@ -34,7 +35,8 @@ Dependency direction: Game → Data → Core; Editor → Data → Core. Never th
 - Format check: `dotnet format Jrpg.slnx --verify-no-changes`
 - Format fix: `dotnet format Jrpg.slnx`
 - Run game: `dotnet run --project src/Jrpg.Game` (Debug reads the repository's `content/` directly, so content edits show on the next start without rebuilding; `-- --content <folder>` reads another folder). A broken content file stops the start with the file named on screen, in the console and in the Visual Studio Output window (only the console and Output window if the message table or fonts are what's broken). A Release build only finds content when published (`dotnet publish`) or given `--content`.
-- Visual Studio: F5 starts `Jrpg.Game`, the default startup project (`DefaultStartup` in `Jrpg.slnx`). If a fresh clone starts another project, right-click `Jrpg.Game` > Set as Startup Project.
+- Run editor: `dotnet run --project src/Jrpg.Editor` (same content root rule as the game).
+- Visual Studio: the "Game and editor" launch profile (`Jrpg.slnLaunch`) starts both with F5; pick it in the toolbar's startup list. Without it, F5 starts `Jrpg.Game`, the default startup project (`DefaultStartup` in `Jrpg.slnx`).
 
 ## Coding rules
 

@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <OutputType>WinExe</OutputType>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Jrpg.Core\Jrpg.Core.csproj" />
+    <ProjectReference Include="..\Jrpg.Data\Jrpg.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Jrpg.Editor.Tests" />
+  </ItemGroup>
+
+  <!-- The application lives in its feature folder, not at the project root where WPF looks by default. -->
+  <ItemGroup>
+    <Page Remove="Hosting\App.xaml" />
+    <ApplicationDefinition Include="Hosting\App.xaml" />
+  </ItemGroup>
+
+  <!-- Debug reads the repository's content/ directly, like the game, so both apps edit and show the same files (decision 77). -->
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <AssemblyMetadata Include="ContentRoot" Value="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\content'))" />
+  </ItemGroup>
+
+</Project>

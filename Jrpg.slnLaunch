@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Game and editor",
+    "Projects": [
+      {
+        "Path": "src\\Jrpg.Game\\Jrpg.Game.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "src\\Jrpg.Editor\\Jrpg.Editor.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

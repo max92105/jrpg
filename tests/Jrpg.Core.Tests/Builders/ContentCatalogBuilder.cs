@@ -25,6 +25,8 @@ internal sealed class ContentCatalogBuilder
     private TileDefinition[] _tiles = [new TileDefinition { Id = 1, IsWalkable = true }];
     private ObjectDefinition[] _objects = [];
     private MapLayout[] _maps = [new MapLayoutBuilder().WithLayer("1").Build()];
+    private EncounterDefinition[] _encounters = [];
+    private readonly Dictionary<string, RandomEncounterTable> _randomEncounters = [];
 
     public ContentCatalogBuilder WithItems(params ItemDefinition[] items)
     {
@@ -63,6 +65,18 @@ internal sealed class ContentCatalogBuilder
         return this;
     }
 
+    public ContentCatalogBuilder WithEncounters(params EncounterDefinition[] encounters)
+    {
+        _encounters = encounters;
+        return this;
+    }
+
+    public ContentCatalogBuilder WithRandomEncounters(string mapId, RandomEncounterTable table)
+    {
+        _randomEncounters[mapId] = table;
+        return this;
+    }
+
     public ContentCatalogBuilder WithNewGame(NewGameDefinition newGame)
     {
         _newGame = newGame;
@@ -76,11 +90,14 @@ internal sealed class ContentCatalogBuilder
         Skills = _skills.ToDictionary(skill => skill.Id),
         PartyMembers = _members.ToDictionary(member => member.Id),
         Enemies = new Dictionary<string, EnemyDefinition>(),
-        Encounters = new Dictionary<string, EncounterDefinition>(),
+        Encounters = _encounters.ToDictionary(encounter => encounter.Id),
         Tiles = _tiles.ToDictionary(tile => tile.Id),
         Objects = _objects.ToDictionary(definition => definition.Id),
-        Maps = _maps.ToDictionary(layout => layout.Id, layout => new MapDefinition(layout, new MapSettings { Id = layout.Id, DisplayName = layout.Id })),
+        Maps = _maps.ToDictionary(layout => layout.Id, layout => new MapDefinition(layout, SettingsFor(layout.Id))),
         Rules = new GameRules(new PartyRules(MaxActiveMembers: 4), new ExperienceTable([100]), new ExplorationRules { WalkSpeed = 3, PlayerRadius = 0.1, InteractReach = 0.6 }),
         NewGame = _newGame,
     };
+
+    private MapSettings SettingsFor(string mapId) =>
+        new() { Id = mapId, DisplayName = mapId, RandomEncounters = _randomEncounters.GetValueOrDefault(mapId) };
 }

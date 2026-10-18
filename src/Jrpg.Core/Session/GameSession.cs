@@ -2,6 +2,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
+using Jrpg.Core.Randomness;
 using Jrpg.Core.World;
 
 namespace Jrpg.Core.Session;
@@ -30,8 +31,10 @@ public sealed class GameSession
     /// <summary>The player on the current map.</summary>
     public ExplorationState Exploration { get; }
 
-    /// <summary>Starts a playthrough from <see cref="ContentCatalog.NewGame"/>. The catalog is assumed validated by Data.</summary>
-    public static GameSession StartNew(ContentCatalog catalog)
+    /// <summary>Starts a playthrough. The catalog is assumed validated by Data.</summary>
+    /// <param name="catalog">Validated content; the new game starts from its <see cref="ContentCatalog.NewGame"/>.</param>
+    /// <param name="random">The seeded source for everything random in the playthrough, such as battle rolls.</param>
+    public static GameSession StartNew(ContentCatalog catalog, IRandom random)
     {
         var newGame = catalog.NewGame;
         var members = newGame.RecruitedMemberIds.Select(id => Recruit(catalog, id)).ToList();
@@ -44,7 +47,7 @@ public sealed class GameSession
             inventory.Add(catalog.Items[entry.ItemId], entry.Quantity);
         }
 
-        var exploration = new ExplorationState(new ExplorationContext(catalog, inventory, new WorldState()), newGame.StartLocation);
+        var exploration = new ExplorationState(new ExplorationContext(catalog, inventory, new WorldState(), random), newGame.StartLocation);
         return new GameSession(party, inventory, exploration);
     }
 

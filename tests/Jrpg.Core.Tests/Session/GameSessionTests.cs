@@ -1,6 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
+using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Tests.Builders;
@@ -30,7 +31,7 @@ public sealed class GameSessionTests
     {
         var catalog = _catalog.WithNewGame(NewGame(recruited: ["sarxian", "jazog", "teelle"], active: ["teelle", "sarxian"])).Build();
 
-        var session = GameSession.StartNew(catalog);
+        var session = GameSession.StartNew(catalog, new SeededRandom(0));
 
         Assert.Equal(["teelle", "sarxian"], session.Party.ActiveMembers.Select(member => member.Id));
         Assert.Equal("teelle", session.Party.Leader.Id);
@@ -47,7 +48,7 @@ public sealed class GameSessionTests
             .WithNewGame(NewGame(recruited: ["sarxian"], active: ["sarxian"], new InventoryEntry("potion", 5), new InventoryEntry("bomb", 3)))
             .Build();
 
-        var session = GameSession.StartNew(catalog);
+        var session = GameSession.StartNew(catalog, new SeededRandom(0));
 
         Assert.Equal([new InventoryEntry("potion", 5), new InventoryEntry("bomb", 3)], session.Inventory.Entries);
     }
@@ -57,7 +58,7 @@ public sealed class GameSessionTests
     {
         var catalog = _catalog.WithNewGame(NewGame(recruited: ["sarxian"], active: ["sarxian"])).Build();
 
-        var session = GameSession.StartNew(catalog);
+        var session = GameSession.StartNew(catalog, new SeededRandom(0));
 
         Assert.Equal([_heal], session.Party.Leader.Skills);
     }
@@ -70,7 +71,7 @@ public sealed class GameSessionTests
             .WithItems(sword)
             .WithNewGame(NewGame(recruited: ["sarxian"], active: ["sarxian"], new InventoryEntry("bronze_sword", 1)))
             .Build();
-        var session = GameSession.StartNew(catalog);
+        var session = GameSession.StartNew(catalog, new SeededRandom(0));
 
         var equipped = session.Equipment.TryEquip(session.Party.Leader, sword);
 

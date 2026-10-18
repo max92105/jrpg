@@ -5,11 +5,12 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-17-world-exploration-core.md, 4b (Encounter rolls and per-map tables)
+Slice: docs/plans/2026-10-17-world-exploration-core.md, 4c (Pending encounters and the encounter-rate simulation)
 Round: 1 (verdict: Ready to commit)
 
-Accepted (don't re-raise): RandomEncounters has no production caller until 4c; RollStep counts steps on maps without a table (unobservable, since map entry resets); graceSteps >= 0 is the plan's rule.
+Accepted (don't re-raise): step = new cell; cell-event cells don't roll; separate turn SeededRandom; call cap 4x step limit; empty FixedSequenceRandom on battle-free test maps; event battles call FinishEncounter in part 3.
 
-- open (Warning): MapContentReferences and MapReferences repeat 3 of 4 fields under names that don't say which is which; MapFolderReader copies them field by field and passes EncounterIds beside `references`. Suggest MapReferences(MapContentReferences Content, Layouts) or one record.
-- open (Suggestion): validator accept-boundaries untested (graceSteps 0 and oneInSteps 1 accepted)
-- open (Suggestion): "so battles never come back to back" in RandomEncounterTable/RandomEncounters docs is false for graceSteps 0, which the validator allows
+- open (Suggestion): simulation turns to any of 4 directions (can repeat the blocked one), plan says "random walkable direction"; record as deviation in slice note
+- open (Suggestion): `seed + Seeds` reuses the seed-count constant as the turn-seed offset; name it (TurnSeedOffset)
+- open (Suggestion): Walk_WhileEncounterPending_Throws also asserts TryInteract; split into TryInteract_WhileEncounterPending_Throws
+- follow-up: 4b items still open (MapReferences/MapContentReferences naming; "never back to back" doc wording)

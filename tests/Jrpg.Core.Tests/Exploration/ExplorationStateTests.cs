@@ -5,6 +5,7 @@ using Jrpg.Core.Geometry;
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Tests.Builders;
+using Jrpg.Core.Tests.Randomness;
 using Jrpg.Core.World;
 
 namespace Jrpg.Core.Tests.Exploration;
@@ -226,7 +227,7 @@ public sealed class ExplorationStateTests
             .WithItems(_potion)
             .WithMaps(layout)
             .Build();
-        var context = new ExplorationContext(catalog, _inventory, new WorldState());
+        var context = new ExplorationContext(catalog, _inventory, new WorldState(), new FixedSequenceRandom());
         return new ExplorationState(context, new MapLocation(layout.Id, position, facing));
     }
 }

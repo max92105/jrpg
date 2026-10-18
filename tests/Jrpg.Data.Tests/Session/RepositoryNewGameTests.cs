@@ -2,6 +2,7 @@ using Jrpg.Core.Events;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Data.Content;
 
@@ -14,7 +15,7 @@ public sealed class RepositoryNewGameTests
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-        var session = GameSession.StartNew(catalog);
+        var session = GameSession.StartNew(catalog, new SeededRandom(0));
 
         Assert.Equal("sarxian", session.Party.Leader.Id);
         Assert.Equal(["sarxian"], session.Party.ActiveMembers.Select(member => member.Id));
@@ -27,7 +28,7 @@ public sealed class RepositoryNewGameTests
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-        var session = GameSession.StartNew(catalog);
+        var session = GameSession.StartNew(catalog, new SeededRandom(0));
 
         Assert.Equal(new MapLocation("start", new Point2D(10, 3), Facing.Down), session.Exploration.Location);
     }
@@ -38,7 +39,7 @@ public sealed class RepositoryNewGameTests
         // Below the door at (5.36, 13.14), facing it: open it, stand still, then walk in.
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
         var belowDoor = new MapLocation("start", new Point2D(5.86, 14.6), Facing.Up);
-        var exploration = GameSession.StartNew(catalog with { NewGame = catalog.NewGame with { StartLocation = belowDoor } }).Exploration;
+        var exploration = GameSession.StartNew(catalog with { NewGame = catalog.NewGame with { StartLocation = belowDoor } }, new SeededRandom(0)).Exploration;
 
         var opened = exploration.TryInteract();
         exploration.Walk(MoveIntent.None, TimeSpan.FromSeconds(0.1));

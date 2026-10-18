@@ -5,6 +5,7 @@ using Jrpg.Core.Geometry;
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Tests.Builders;
+using Jrpg.Core.Tests.Randomness;
 using Jrpg.Core.World;
 
 namespace Jrpg.Core.Tests.Exploration;
@@ -115,7 +116,7 @@ public sealed class ExplorationWarpTests
             .WithItems(_potion)
             .WithMaps(town, cave)
             .Build();
-        return new ExplorationState(new ExplorationContext(catalog, _inventory, _world), start);
+        return new ExplorationState(new ExplorationContext(catalog, _inventory, _world, new FixedSequenceRandom()), start);
     }
 
     private static MapEvent WarpEvent(string id, string mapId, GridCell cell) =>

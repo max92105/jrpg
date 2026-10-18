@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Jrpg.Core.Battle;
 using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
@@ -13,6 +14,7 @@ public sealed class ExplorationState
 {
     private readonly ExplorationContext _context;
     private readonly PlayerWalker _walker;
+    private readonly RandomEncounters _encounters;
     private ActiveMap _map;
     private MapCollision _collision;
     private InteractionFinder _finder;
@@ -24,6 +26,7 @@ public sealed class ExplorationState
     {
         _context = context;
         _walker = new PlayerWalker(start.Position, start.Facing, context.Catalog.Rules.Exploration);
+        _encounters = new RandomEncounters(context.Random);
         EnterMap(start.MapId, start.Position);
     }
 
@@ -35,14 +38,20 @@ public sealed class ExplorationState
     public bool IsEventRunning => _run is not null;
 
     /// <summary>
-    /// Moves the player. Entering a new cell starts its touch event, once per entry. Otherwise, while moving, a touch
-    /// event on the object in front starts, if the player has stood still since entering the map or since the last cell or
-    /// object touch event (decision 38).
+    /// The battle a step just started, or null. The Game runs it, then calls <see cref="FinishEncounter"/>; the player
+    /// can't walk or interact meanwhile. What follows a defeat is the Game's (decision 31).
     /// </summary>
-    /// <exception cref="InvalidOperationException">An event is running; the player can't walk during it.</exception>
+    public EncounterDefinition? PendingEncounter { get; private set; }
+
+    /// <summary>
+    /// Moves the player. Entering a new cell starts its touch event, once per entry, or else rolls for a random battle
+    /// (one step). Otherwise, while moving, a touch event on the object in front starts, if the player has stood still
+    /// since entering the map or since the last cell or object touch event (decision 38).
+    /// </summary>
+    /// <exception cref="InvalidOperationException">An event is running or a battle is pending.</exception>
     public void Walk(MoveIntent intent, TimeSpan delta)
     {
-        ThrowIfEventRunning();
+        ThrowIfBusy();
         _walker.Walk(intent, delta, _collision);
         if (!_walker.IsMoving)
         {
@@ -53,7 +62,7 @@ public sealed class ExplorationState
         if (_walker.Cell != _lastCell)
         {
             _lastCell = _walker.Cell;
-            if (TryStartCellEvent(_lastCell))
+            if (TryStartCellEvent(_lastCell) || TryStartEncounter())
             {
                 return;
             }
@@ -68,10 +77,10 @@ public sealed class ExplorationState
 
     /// <summary>Starts the interact event of the object the player faces, as the confirm button does.</summary>
     /// <returns>False when nothing in front can be interacted with.</returns>
-    /// <exception cref="InvalidOperationException">An event is already running.</exception>
+    /// <exception cref="InvalidOperationException">An event is running or a battle is pending.</exception>
     public bool TryInteract()
     {
-        ThrowIfEventRunning();
+        ThrowIfBusy();
         var triggered = _finder.FindInFront(_walker.Position, _walker.Facing, EventActivation.Interact);
         if (triggered is null)
         {
@@ -102,6 +111,19 @@ public sealed class ExplorationState
         }
     }
 
+    /// <summary>The pending battle is over, whatever its outcome; the next steps are grace steps again (decision 26).</summary>
+    /// <exception cref="InvalidOperationException">No encounter is pending.</exception>
+    public void FinishEncounter()
+    {
+        if (PendingEncounter is null)
+        {
+            throw new InvalidOperationException("No encounter is pending.");
+        }
+
+        PendingEncounter = null;
+        _encounters.ResetSteps();
+    }
+
     /// <summary>
     /// The one way onto a map, for a new game, a warp and (later) a loaded save, as legacy EnterMap was. The arrival
     /// cell stays quiet, and object touch events wait until the player has stood still (decision 38).
@@ -118,6 +140,7 @@ public sealed class ExplorationState
         _walker.PlaceAt(WarpArrival.Find(walkability, target));
         _lastCell = _walker.Cell;
         _isTouchArmed = false;
+        _encounters.ResetSteps();
     }
 
     private bool TryStartCellEvent(GridCell cell)
@@ -133,17 +156,35 @@ public sealed class ExplorationState
         return true;
     }
 
+    // Called once per new cell without a cell event: that's what counts as a step.
+    private bool TryStartEncounter()
+    {
+        var encounterId = _encounters.RollStep(_map.Definition.Settings.RandomEncounters);
+        if (encounterId is null)
+        {
+            return false;
+        }
+
+        PendingEncounter = _context.Catalog.Encounters[encounterId];
+        return true;
+    }
+
     private void Start(TriggeredEvent triggered)
     {
         var run = new EventRun(triggered, _map, _context.Inventory, _context.Catalog.Items);
         _run = run.IsFinished ? null : run;
     }
 
-    private void ThrowIfEventRunning()
+    private void ThrowIfBusy()
     {
         if (_run is not null)
         {
             throw new InvalidOperationException("An event is running; call ContinueEvent until it ends.");
+        }
+
+        if (PendingEncounter is not null)
+        {
+            throw new InvalidOperationException("A battle is pending; call FinishEncounter once it's over.");
         }
     }
 }

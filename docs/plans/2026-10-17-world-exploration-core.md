@@ -411,7 +411,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
     - `PartyState_MemberById_UnknownId_Throws`
   - **Done, with deviations:** `PartyMember.Progress()` is `CaptureProgress()`, pairing with `GameSession.Capture`; its private constructor takes a `PartyMemberProgress`, which `Recruit` builds from the definition. `WorldState` gains the restore constructor and `CompletedEvents`/`ObjectSwaps` (deferred from 3a), ordered by id so the same world always saves the same way. `GameSession` keeps the `WorldState` privately; `PlayTime` is set by an object initializer in `Restore` to keep the constructor at 4 parameters. ADR 0007 now uses the plan's `"game"` envelope key and names the 5c repair step.
 
-- [ ] **5b. Save files** (Data, about 250 lines)
+- [x] **5b. Save files** (Data, about 250 lines)
   - **Goal:** saves are written atomically to and read from files in a versioned format, and a legacy or newer save is refused with a clear message.
   - **New types (Data):**
     - `Saving/SaveJsonOptions` (internal): strict camelCase options for saves, separate from content options so content changes never change the save format.
@@ -427,6 +427,7 @@ Line counts are estimates of hand-written code plus tests; generated content isn
     - `FileSaveStore_Read_MissingRequiredField_ThrowsNamingTheField`
     - `FileSaveStore_Write_ExistingSlot_ReplacesIt`
     - `FileSaveStore_Write_InvalidSlotName_Throws`
+  - **Done, with deviations:** `Read` pre-parses a `JsonNode` (duplicate keys rejected) to check `formatVersion`, then deserializes strictly; a version that isn't a positive integer is unreadable too. A null entry in any save list is refused as damaged. `UnreadableSaveException` exposes `SlotName` and `Reason`. Extra tests: the envelope shape, invalid versions, duplicate keys, an unknown field, a null entry per list. Follow-up for 5c and migrations: every `JsonNode` pre-parse needs `AllowDuplicateProperties = false`.
 
 - [ ] **5c. Save repair against current content** (Data, about 300 lines)
   - **Goal:** a save made before content changed still loads: whatever no longer exists or no longer fits the rules is dropped or brought back into range, the rest is kept, and the player can continue (decision 40).

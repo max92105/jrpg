@@ -26,3 +26,5 @@ Seen again in the 1b re-review (fixed the clauses above): `id <= EmptyTileId` te
 Seen again in 1c and 1d (converter error branches): each slice adds `ConversionException` throws "none exist today" (meta, duplicate legacy id, null object) and tests only some. In 1d raised as one Critical listing the untested throws. Grep every new `throw` in the diff and match it to a test message.
 
 Seen again in part 2 slice 4a (fixture variant): `ContinueEvent_WarpOntoTouchCell_DoesNotFireArrivalCell` warps to town (3, 2), but the fixture's touch cell is (3, 3), so it never arrives on a touch cell. When a test name claims a scenario, trace the fixture coordinates and check the scenario actually happens.
+
+Seen again in part 2 slice 5b: `Read_MissingRequiredField_ThrowsNamingTheField` renames a key, so it tests the unmapped-member error, not the missing field; `CheckNoNullEntries` (5 `||` clauses) tested on one list only.

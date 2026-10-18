@@ -5,12 +5,14 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-17-world-exploration-core.md, 5a (Session snapshot and play time)
-Round: 1 (verdict: Ready to commit)
+Slice: docs/plans/2026-10-17-world-exploration-core.md, 5b (Save files)
+Round: 1 (verdict: Fix the Criticals, then commit)
 
-Accepted (don't re-raise): PlayTime set by object initializer in Restore; worn items put straight on the member (ADR 0003, save assumed repaired by Data 5c); Capture throws during event/pending battle (ADR 0007); WorldState ordinal ordering; restore resets grace steps/touch arming like a warp (plan: "enters through WarpArrival"); SaveGame record holds lists (5b compares element by element).
+Accepted (don't re-raise): JsonNode pre-parse for formatVersion then strict deserialize; null list entries refused as damaged; .tmp + File.Move(overwrite); SaveJsonOptions duplicates content options on purpose (+WriteIndented); UnreadableSaveException with SlotName/Reason; Reason embeds STJ message (plan: "naming the slot and path").
 
-- open (Warning): restored ObjectSwaps never asserted on the restored side (no WorldState restore-ctor test, session test only checks save.ObjectSwaps); dropping the SwapObject loop keeps all tests green
-- open (Suggestion): WorldState CompletedEvents/ObjectSwaps ordinal order untested (single element in every test)
-- open (Suggestion): PartyMember.Progress() is a noun method; consider CaptureProgress() to pair with GameSession.Capture (plan named it Progress, developer's call)
-- follow-up: ADR 0007 envelope key "save" vs plan 5b "game"; ADR says FileSaveStore reads against a ContentCatalog, plan 5b Read(slotName) has none
+- open (Critical): FileSaveStore.ParseObject - duplicate key ({"formatVersion":1,"formatVersion":1,...}) throws ArgumentException from JsonObject, escaping the UnreadableSaveException contract (verified with fsi); pass JsonDocumentOptions { AllowDuplicateProperties = false } to JsonNode.Parse + test
+- open (Warning): Read_MissingRequiredField_ThrowsNamingTheField renames playTime->playtime, so it hits the unmapped-member path; the missing-required path is untested
+- open (Warning): CheckNoNullEntries has 5 clauses, only Inventory tested; theory per list
+- open (Suggestion): WriteThenRead_ReturnsEquivalentSave lacks Method_ prefix (plan: FileSaveStore_WriteThenRead_...)
+- open (Suggestion): Deserialize's `?? throw "doesn't hold a save"` unreachable (root is a JsonObject)
+- open (Suggestion): Reason doc says "words the Game can show the player" but damaged reasons carry raw STJ text

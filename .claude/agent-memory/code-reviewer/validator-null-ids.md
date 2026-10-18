@@ -16,3 +16,5 @@ Seen again in part 2 slice 1b (dictionary-value variant): the converter reads `D
 **Why:** CLAUDE.md/code-quality rule: validate at boundaries with a message naming the bad field.
 
 **How to apply:** In any validator over a list of ids, check for a null/blank element first (the item validator already does `Any(string.IsNullOrWhiteSpace)` for allowedClassIds). Probe with `dotnet fsi` + a scratch copy of `content/` (see [[scratch-builds-blocked]]).
+
+Related strict-reading gap (part 2 slice 5b): `JsonNode.Parse` with default options accepts duplicate keys and `JsonObject` then throws ArgumentException (not JsonException) on first access, bypassing `AllowDuplicateProperties = false` in the serializer options. Any JsonNode pre-parse (save migrations) needs `JsonDocumentOptions { AllowDuplicateProperties = false }`.

@@ -15,6 +15,9 @@ internal static class MessageIds
     /// <summary>Placeholder <c>{lost}</c>: how many copies didn't fit in their full stack and were left behind.</summary>
     public const string ItemFoundLost = "item_found_lost";
 
+    /// <summary>The game's name, written large on the title.</summary>
+    public const string GameTitle = "game_title";
+
     /// <summary>The title's entry that starts a new game.</summary>
     public const string TitleNewGame = "title_new_game";
 

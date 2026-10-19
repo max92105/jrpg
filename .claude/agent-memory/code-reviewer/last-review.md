@@ -5,11 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, T1b (Title menu)
-Round: 1 (verdict: Ready to commit; build 0 warnings, 921/921 tests on rerun (first run: test host crash, known flaky), format exit 0)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, T2 (Title look)
+Round: 1 (verdict: Ready to commit; build 0 warnings, 925/925 tests, format exit 0)
 
-- open (Suggestion): Pressing(GameButton) helper duplicated in GameFlowTests and TitleMenuTests; share one test input helper
-- open (Suggestion): GameFlow constructor test only asserts Session is null; also assert New Game after Confirm (covered by other tests) or that the top scene is the title
-- open (Suggestion): MessageIds.TitleNewGame/TitleQuit lack the doc comment the other ids carry (e.g. "No placeholders: the title's New Game entry.")
-- follow-up: TitleEntry maps to label and request in two switches (TitleScene, TitleMenu); S2b adds Continue/Load to both
-- follow-up: plan's T1b hand checks unticked; developer to do before ticking the slice
+- open (Warning): TitleScene EntryPitch = 98 but its comment's numbers (48 line + 10 + 10 padding + 20 margin) sum to 88; legacy template ignores Padding, so state the real derivation or fix the value
+- open (Suggestion): _shadowOffset (3,3) under a comment saying "4 px"; say it is 4 px at legacy Direction 320 (~3.1, 2.6) rounded
+- open (Suggestion): plan T2 still unticked with no "Done, with deviations" note (Blurry effect vs decision 10, UiArtFiles only StartMenu.png, Backgrounds folder, no bold, no marker, test name)
+- follow-up: none new

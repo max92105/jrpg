@@ -3,6 +3,7 @@
   "item_found": "Obtained {item}!",
   "item_found_many": "Obtained {item} x{count}!",
   "item_found_lost": "{lost} didn't fit and were left behind.",
+  "game_title": "The Lost Realm",
   "title_new_game": "New Game",
   "title_quit": "Quit"
 }

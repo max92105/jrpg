@@ -354,7 +354,7 @@ M4 was split in two before it started (developer, 2026-10-19): it came out at ab
     - `ListCursor` takes `Func<int, bool>` for enabled entries and throws when none is.
     - Tests use `Method_Scenario_Result` names, and a shared `InputFrames.Pressing` helper.
     - Follow-up: each entry is mapped twice, to its label (`TitleScene`) and to its request (`TitleMenu`), so S2b adds Continue and Load to both.
-    - Follow-up: the test host sometimes crashes (0xC0000005) partway through, which is the source of the short totals seen since 3a. It predates this slice; find which assembly crashes.
+    - Follow-up: the test host sometimes crashes (0xC0000005) partway through, which is the source of the short totals seen since 3a. It predates this slice: it's the M3b follow-up (`FontLibraryTests.Load_FileThatIsNotAFont_ThrowsNamingTheFile` reads past a too-short font file).
   - **Goal:**
     - The game opens on the title with New game and Quit (Continue and Load come in S2b), as plain text with the selected entry marked.
     - New game fades to the start map.
@@ -374,7 +374,16 @@ M4 was split in two before it started (developer, 2026-10-19): it came out at ab
     - [ ] New game fades to the map.
     - [ ] Quit closes the window.
 
-- [ ] **T2. Title look** (Game, about 160 lines)
+- [x] **T2. Title look** (Game, about 160 lines)
+  - **Done, with deviations:**
+    - The glow and the drop shadow use FontStashSharp's blurred glyphs (`FontSystemEffect.Blurry`) rather than stacked offset copies (key decision 10).
+    - `UiArtFiles` names only `StartMenu.png`; `GameMenu.png` and `All.png` join with their first users (G1, P1). Data's `ArtFolders` gains `Backgrounds`.
+    - New pure `Ui/CoverFit`, with 3 tests. The 1536 x 1024 picture is scaled by 1.25 with point sampling, so its pixels come out uneven.
+    - No bold, since Lato Regular is the only font.
+    - T1b's ">" marker is gone: legacy marks the selection by glow and size only.
+    - The entries are one line height plus 20 px apart, centered at y 630.
+    - The test is `EveryConstant_ExistsInRepositoryContent`, like `MessageIds`.
+    - The hand checks are still to do; check the blur's placement in particular.
   - **Goal:** the title looks like legacy (decision 82):
     - `StartMenu.png` fills the screen (cover-fit, no stretching);
     - "The Lost Realm" (`game_title` in `ui.json`, placeholder, decision 80) at 100 px with a drop shadow;

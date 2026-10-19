@@ -28,18 +28,19 @@ internal sealed class GameFlow : IScene
     public GameFlow(ContentCatalog catalog, ScreenText text)
     {
         var playedCatalog = EncounterFreeContent.Of(catalog);
-        _sessions = new SessionTransitions(playedCatalog, _scenes, new SceneFactory(playedCatalog, text));
-        StartBehindFade(new NewGameRequested());
+        var factory = new SceneFactory(playedCatalog, text);
+        _sessions = new SessionTransitions(playedCatalog, _scenes, factory);
+        _scenes.Push(factory.CreateTitle());
     }
 
-    /// <summary>The playthrough, once one has started; null until the first fade reaches black.</summary>
+    /// <summary>The playthrough, once one has started; null on the title until a game starts.</summary>
     public GameSession? Session { get; private set; }
 
     /// <summary>
     /// Play time counts every update while a game is on, menus and pause included (developer decision 35). The scenes
     /// get no input while the fade plays.
     /// </summary>
-    /// <returns>Null: the flow handles every request itself.</returns>
+    /// <returns>Quit, which only the host can do; null otherwise, since the flow handles every other request.</returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
         Session?.AddPlayTime(delta);
@@ -48,6 +49,11 @@ internal sealed class GameFlow : IScene
 
         var isFading = _fade.Phase != FadePhase.Idle;
         var request = _scenes.Update(delta, isFading ? default : input);
+        if (request is QuitRequested)
+        {
+            return request;
+        }
+
         if (request is not null)
         {
             StartBehindFade(request);

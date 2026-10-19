@@ -348,7 +348,13 @@ M4 was split in two before it started (developer, 2026-10-19): it came out at ab
   - **Changes:** `GameFlow`'s `Session` becomes nullable and play time is added only while one exists. The flow ignores input while its fade plays.
   - **Tests:** `SceneStack_Update_ReturnsTopSceneRequest`, `SceneStack_ReplaceAll_LeavesOnlyNewScene`, `GameFlow_Constructor_StartsNewGameBehindFade`, `GameFlow_Update_DuringFade_IgnoresInput`. `GameFlowTests` are updated: a session exists only once the fade reaches black.
 
-- [ ] **T1b. Title menu** (Game, about 220 lines)
+- [x] **T1b. Title menu** (Game, about 220 lines)
+  - **Done, with deviations:**
+    - The entries are a `Title/TitleEntry` enum. The labels "New Game" and "Quit" are in `ui.json`.
+    - `ListCursor` takes `Func<int, bool>` for enabled entries and throws when none is.
+    - Tests use `Method_Scenario_Result` names, and a shared `InputFrames.Pressing` helper.
+    - Follow-up: each entry is mapped twice, to its label (`TitleScene`) and to its request (`TitleMenu`), so S2b adds Continue and Load to both.
+    - Follow-up: the test host sometimes crashes (0xC0000005) partway through, which is the source of the short totals seen since 3a. It predates this slice; find which assembly crashes.
   - **Goal:**
     - The game opens on the title with New game and Quit (Continue and Load come in S2b), as plain text with the selected entry marked.
     - New game fades to the start map.

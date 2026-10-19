@@ -2,6 +2,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Exploration;
 using Jrpg.Game.Exploration;
 using Jrpg.Game.Rendering;
+using Jrpg.Game.Title;
 using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Flow;
@@ -24,6 +25,8 @@ internal sealed class SceneFactory
         _text = text;
         _art = new MapArt(catalog, MapView.CellPixels);
     }
+
+    public TitleScene CreateTitle() => new(_text);
 
     public ExplorationScene CreateExploration(ExplorationState exploration) => new(exploration, _catalog, _art, _text);
 }

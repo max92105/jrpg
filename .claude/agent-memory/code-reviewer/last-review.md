@@ -5,10 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, T1a (Scene requests and the flow's fade)
-Round: 1 (verdict: Fix the Criticals; build 0 warnings, 911/911 tests, format exit 0)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, T1b (Title menu)
+Round: 1 (verdict: Ready to commit; build 0 warnings, 921/921 tests on rerun (first run: test host crash, known flaky), format exit 0)
 
-- open (Critical): SceneStackTests.cs RecordingScene doc comment mangled (empty name/calls param tags, stray blank line, two `///` on one line); format didn't catch it
-- open (Suggestion): SceneFactory.Exploration is a noun method; verb phrase e.g. CreateExploration
-- open (Suggestion): full-screen black overlay draw duplicated in GameFlow.Draw and EventPresenter.Draw; one shared draw for a ScreenFade
-- follow-up: a scene returning a request while the flow's fade plays makes ScreenFade.Start throw; unreachable today (no input while fading), decide queue/ignore when G1 adds menu requests
+- open (Suggestion): Pressing(GameButton) helper duplicated in GameFlowTests and TitleMenuTests; share one test input helper
+- open (Suggestion): GameFlow constructor test only asserts Session is null; also assert New Game after Confirm (covered by other tests) or that the top scene is the title
+- open (Suggestion): MessageIds.TitleNewGame/TitleQuit lack the doc comment the other ids carry (e.g. "No placeholders: the title's New Game entry.")
+- follow-up: TitleEntry maps to label and request in two switches (TitleScene, TitleMenu); S2b adds Continue/Load to both
+- follow-up: plan's T1b hand checks unticked; developer to do before ticking the slice

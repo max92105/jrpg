@@ -80,7 +80,11 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
         // focus, so a key held across the switch isn't seen as a new press, but the game doesn't act on it (decision 83).
         // Alt+Enter's Enter is the shortcut's, not a Confirm.
         var input = _input.Read(keyboard, GamePad.GetState(PlayerIndex.One, GamePadDeadZone.None));
-        _rootScene.Update(gameTime.ElapsedGameTime, IsActive && !isShortcutPressed ? input : default);
+        if (_rootScene.Update(gameTime.ElapsedGameTime, IsActive && !isShortcutPressed ? input : default) is QuitRequested)
+        {
+            Exit();
+        }
+
         base.Update(gameTime);
     }
 

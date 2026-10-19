@@ -505,7 +505,11 @@ G4 was split in two (developer, 2026-10-19), since it came to about 420 lines: G
 
 ### Phase S: save and load
 
-- [ ] **E1. Placed-object uids never reuse a lower number** (Editor, about 60 lines)
+- [x] **E1. Placed-object uids never reuse a lower number** (Editor, about 60 lines)
+  - **Done, with deviations:**
+    - The old test `PlacedObjectUids_Next_GapLeftByARemovedObject_ReusesIt` pinned the rule decision 87 changes, so `PlacedObjectUids_Next_LowerNumberFree_ReturnsHighestPlusOne` replaces it.
+    - Extra: `PlacedObjectUids_Next_OtherObjectsSharingThePrefix_AreIgnored`, so `chest_open_7` and `chests_9` don't count for `chest`.
+    - Uids and event ids now read their numbers through one shared `Maps/Editing/NumberedIds.HighestNumber`, and fail loudly instead of wrapping past `int.MaxValue`.
   - **Goal:** a newly placed object gets `{objectId}_{n}` with n one above the highest n on the map (decision 87). Deleting `chest_1` while `chest_2` exists gives `chest_3`, not `chest_1`, so a new object doesn't inherit an old save's "opened" state.
   - **Change:** `Maps/Editing/PlacedObjectUids.Next` (same signature). `EventIds` already uses highest + 1, so it needs no change.
   - **Remaining case:** both schemes still reuse the highest id after deleting it (question 88).

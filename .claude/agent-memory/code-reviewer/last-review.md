@@ -5,11 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, G4-2 (Status bars)
-Round: 1 (verdict: Ready to commit; build 0 warnings, 962/962 tests, format exit 0)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, E1 (placed-object uids highest + 1)
+Round: 1 (verdict: Ready to commit; build 0 errors, format exit 0; Core/Data/Game 767 pass; Editor.Tests + Simulations DLLs blocked by WDAC in reviewer env, so not run by reviewer)
 
-- open (Warning): StatusPage.ShowMember XP fill (experience / ExperienceToReachNext, full at max level) untested; dropping the IsMaxLevel guard throws on a max-level member. Extract pure static like ToNextLevelText + 2 tests
-- open (Suggestion): StatBar.Draw MathF.Round makes a living member with small HP/max show an empty bar; use ceiling when Fraction > 0
-- open (Suggestion): _vitalBars[0]/[1] tied to stat order by comment only; name two fields or derive from sheet
-- open (Suggestion): tick G4-2 in plan with deviations (square corners, 6 px HP/MP, HP/MP bars not in legacy StatusView)
-- follow-up: DialogueBox name strip bakes its own gradient (DialogueBox.cs:110); could use UiTextures.Gradient
+- open (Warning): PlacedObjectUids.Next duplicates EventIds.Next's "highest numeric suffix after prefix" parse (prefix + StartsWith Ordinal + int.TryParse NumberStyles.None invariant); extract one shared function, keep differing start (0 vs 1) at callers
+- open (Suggestion): highest == int.MaxValue (hand-edited "chest_2147483647") wraps to "chest_-2147483648"; use long or checked

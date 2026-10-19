@@ -34,9 +34,16 @@ public sealed class ObjectEditingTests
     }
 
     [Fact]
-    public void PlacedObjectUids_Next_GapLeftByARemovedObject_ReusesIt()
+    public void PlacedObjectUids_Next_LowerNumberFree_ReturnsHighestPlusOne()
     {
-        Assert.Equal("chest_2", PlacedObjectUids.Next("chest", new HashSet<string> { "chest_1", "chest_3" }));
+        Assert.Equal("chest_4", PlacedObjectUids.Next("chest", new HashSet<string> { "chest_1", "chest_3" }));
+    }
+
+    [Fact]
+    public void PlacedObjectUids_Next_OtherObjectsSharingThePrefix_AreIgnored()
+    {
+        // chest_open is its own object, whose uids also start with "chest_"; only a bare number after the prefix counts.
+        Assert.Equal("chest_2", PlacedObjectUids.Next("chest", new HashSet<string> { "chest_1", "chest_open_7", "chests_9" }));
     }
 
     [Fact]

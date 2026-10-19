@@ -1,5 +1,3 @@
-using System.Globalization;
-
 namespace Jrpg.Editor.Maps.Editing;
 
 /// <summary>
@@ -14,11 +12,7 @@ internal static class EventIds
     public static string Next(string uid, IEnumerable<string> usedIds)
     {
         var prefix = $"{uid}_";
-        var highest = usedIds
-            .Where(id => id.StartsWith(prefix, StringComparison.Ordinal))
-            .Select(id => int.TryParse(id.AsSpan(prefix.Length), NumberStyles.None, CultureInfo.InvariantCulture, out var index) ? index : -1)
-            .DefaultIfEmpty(-1)
-            .Max();
-        return $"{prefix}{highest + 1}";
+        var highest = NumberedIds.HighestNumber(prefix, usedIds) ?? -1;
+        return $"{prefix}{checked(highest + 1)}";
     }
 }

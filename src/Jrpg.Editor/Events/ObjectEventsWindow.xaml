@@ -20,6 +20,14 @@
     <!-- The object's events, in the order they're tried. -->
     <DockPanel DockPanel.Dock="Left" Width="300">
       <TextBlock DockPanel.Dock="Top" Text="Events" FontWeight="Bold" />
+      <!-- A preset replaces all the events; the first field it leaves empty is shown. -->
+      <WrapPanel DockPanel.Dock="Top" Margin="0,4,0,4">
+        <TextBlock Text="Preset" VerticalAlignment="Center" Margin="0,0,4,0" />
+        <Button Content="Chest" Width="50" Command="{Binding ApplyChestPresetCommand}" />
+        <Button Content="Door" Width="50" Margin="4,0,0,0" Command="{Binding ApplyDoorPresetCommand}" />
+        <Button Content="Door you open" Width="90" Margin="4,0,0,0" Command="{Binding ApplyDoorYouOpenPresetCommand}" />
+        <Button Content="Sign" Width="50" Margin="4,0,0,0" Command="{Binding ApplySignPresetCommand}" />
+      </WrapPanel>
       <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
         <Button Content="Add" Width="60" Command="{Binding AddEventCommand}" />
         <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding RemoveEventCommand}" />

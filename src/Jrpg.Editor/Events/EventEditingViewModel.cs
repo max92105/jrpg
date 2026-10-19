@@ -21,7 +21,7 @@ internal sealed class EventEditingViewModel(ContentCatalog catalog)
     /// <param name="point">In map cells.</param>
     public EventListViewModel? StartEditingAt(Point2D point) =>
         OpenMap is { } open && PlacedObjectHits.TopAt(open.Map.Layout, point, catalog.Objects) is { } placed
-            ? new EventListViewModel(placed, new StepChoices(_itemIds, _objectIds, MapIds))
+            ? new EventListViewModel(placed, new StepChoices(_itemIds, _objectIds, MapIds), EventPresets.GuessOpenedObject(placed.ObjectId, catalog.Objects))
             : null;
 
     /// <summary>Gives the object the dialog's events, as one undo step; nothing when they didn't change.</summary>

@@ -389,10 +389,19 @@ The developer still edits maps in the legacy MapEditor (ADR 0005), so render dat
   - **Tests:** `EventStepViewModel_Label_Warp_NamesMapAndCell`, plus each type's round trip from step to fields and back.
   - **Done, with deviations:** steps have a kind (`EventStepKind`); ids are picked from lists in a `StepChoices` record (items, objects, and maps kept current by the shell, so a newly saved map can be warped to); `EventEditingViewModel` takes the `ContentCatalog`. Numbers stay text: a quantity under 1, a warp cell under 0 or an unchosen id is a step problem, shown under the step, and OK refuses while there is one, naming the event and step. The warp label test came in 11i-1.
 
-- [ ] **11j. Event presets and cell events** (Editor, about 250 lines)
+- **11j. Event presets and cell events** (Editor): split in two (developer, after 11i-2), about 500 lines in all.
   - **Goal:** presets Chest, Door, Door you open and Sign fill an object's events (with the legacy guess of the "opened" object); clicking a cell in event mode adds or edits its touch event (warp or dialogue); right click removes it.
-  - **New types:** `Events/EventPresets` (pure: a preset's events for an object, and the likely opened object id from the object list), `SetCellEventEdit`.
-  - **Tests:** `EventPresets_Chest_GivesItemThenSwapsToOpenedObject`, `EventPresets_GuessOpenedObject_ChestFindsChestOpened`, `EventPresets_Door_TouchWarpOnlyWhenOpen`, `SetCellEventEdit_SecondEventOnSameCell_ReplacesFirst`.
+
+- [x] **11j-1. Event presets** (Editor, about 150 lines)
+  - **Goal:** the event dialog's presets replace the object's events with the legacy ones; the "opened" object is guessed as legacy did (an id containing "open", same category first); new ids don't reuse the replaced events' ids.
+  - **New types:** `Events/EventPresets` (pure: a preset's events for an object, and the likely opened object id from the object list).
+  - **Tests:** `EventPresets_Chest_GivesItemThenSwapsToOpenedObject`, `EventPresets_GuessOpenedObject_ChestFindsChestOpened`, `EventPresets_Door_TouchWarpOnlyWhenOpen`.
+  - **Done, with deviations:** presets leave empty what only the developer can say (the chest's item, the warp's map, the sign's text), and the dialog selects the first such step; a dialogue without lines is now a step problem (the game already refused it on save). The planned door test is `EventPresetsTests.DoorYouOpen_OpensWhileClosed_WarpsOnlyWhenOpen`, since Door and Door you open are separate presets. New ids come from `EventIdAllocation` (also used by Add), skipping the ids the object had when the dialog opened. The guess sorts by id, so it doesn't depend on load order; with no object id containing "open" it falls back to the object itself, as legacy did, which makes the chest swap into itself (to check by hand).
+
+- [ ] **11j-2. Cell events** (Editor, about 350 lines)
+  - **Goal:** clicking a cell with no object in event mode adds or edits its touch event (warp or dialogue steps); right click removes it; cells with an event are marked. Ids keep the content's `cell_{x}_{y}`.
+  - **New types:** `SetCellEventEdit`, a cell event dialog.
+  - **Tests:** `SetCellEventEdit_SecondEventOnSameCell_ReplacesFirst`.
   - **Verify by hand (end of part 3a):** open `start`, paint a path with brush, rectangle and fill on two layers, place a tree and a chest with the Chest preset, add a warp cell, set encounters, undo and redo across it, save, press F5: the game shows the change.
 
 ## Decisions (developer, 2026-10-18)

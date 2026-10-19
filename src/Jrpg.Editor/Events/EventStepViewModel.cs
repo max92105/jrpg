@@ -34,7 +34,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
 
     /// <summary>One message box per line; blank lines are left out.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Label))]
+    [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
     public partial string LinesText { get; set; } = "";
 
     /// <summary>Empty for no speaker name.</summary>
@@ -84,6 +84,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
     /// <summary>Why the step can't be kept as typed; null when it can.</summary>
     public string? Problem => Kind switch
     {
+        EventStepKind.Dialogue when Speech().Lines.Count == 0 => "Write at least one line.",
         // A list the step's id isn't in can clear its choice, so empty covers null too.
         EventStepKind.GiveItem when string.IsNullOrEmpty(ItemId) => "Choose the item to give.",
         EventStepKind.SwapObject when string.IsNullOrEmpty(ObjectId) => "Choose the object it becomes.",

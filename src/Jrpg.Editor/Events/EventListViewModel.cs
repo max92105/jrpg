@@ -16,12 +16,15 @@ internal sealed partial class EventListViewModel : ObservableObject
     private const string NewEventPrompt = "Check";
 
     private readonly PlacedObject _placed;
+    private readonly string _likelyOpenedObjectId;
 
     /// <param name="placed">The object whose events are edited.</param>
     /// <param name="choices">The ids the steps and "only while the object is" can pick from.</param>
-    public EventListViewModel(PlacedObject placed, StepChoices choices)
+    /// <param name="likelyOpenedObjectId">What the chest and door presets turn the object into (<see cref="EventPresets.GuessOpenedObject"/>).</param>
+    public EventListViewModel(PlacedObject placed, StepChoices choices, string likelyOpenedObjectId)
     {
         _placed = placed;
+        _likelyOpenedObjectId = likelyOpenedObjectId;
         Events = [.. placed.Events.Select(mapEvent => new EventViewModel(mapEvent))];
         Choices = choices;
         OnlyWhenChoices = ["", .. choices.ObjectIds];
@@ -57,11 +60,9 @@ internal sealed partial class EventListViewModel : ObservableObject
     [RelayCommand]
     private void AddEvent()
     {
-        // The object's events as the dialog opened count too, so an event deleted here doesn't hand its id on.
-        var usedIds = Events.Select(mapEvent => mapEvent.Id).Concat(_placed.Events.Select(mapEvent => mapEvent.Id));
         var added = new EventViewModel(new MapEvent
         {
-            Id = EventIds.Next(_placed.Uid, usedIds),
+            Id = IdAllocation().NewEventIds(1)[0],
             Activation = EventActivation.Interact,
             Prompt = NewEventPrompt,
             Steps = [],
@@ -69,6 +70,35 @@ internal sealed partial class EventListViewModel : ObservableObject
         Events.Add(added);
         SelectedEvent = added;
     }
+
+    [RelayCommand]
+    private void ApplyChestPreset() => ApplyPreset(EventPresets.Chest(IdAllocation(), _likelyOpenedObjectId));
+
+    [RelayCommand]
+    private void ApplyDoorPreset() => ApplyPreset(EventPresets.Door(IdAllocation()));
+
+    [RelayCommand]
+    private void ApplyDoorYouOpenPreset() => ApplyPreset(EventPresets.DoorYouOpen(IdAllocation(), _likelyOpenedObjectId));
+
+    [RelayCommand]
+    private void ApplySignPreset() => ApplyPreset(EventPresets.Sign(IdAllocation()));
+
+    // Replaces every event, as legacy did, and shows the first field the preset leaves to fill in.
+    private void ApplyPreset(IReadOnlyList<MapEvent> presetEvents)
+    {
+        Events.Clear();
+        foreach (var mapEvent in presetEvents)
+        {
+            Events.Add(new EventViewModel(mapEvent));
+        }
+
+        SelectedEvent = Events.FirstOrDefault(item => item.Problem is not null) ?? Events[0];
+        SelectedEvent.SelectedStep = SelectedEvent.Steps.FirstOrDefault(step => step.Problem is not null) ?? SelectedEvent.Steps.FirstOrDefault();
+    }
+
+    // The object's events as the dialog opened count too, so an event replaced or deleted here doesn't hand its id on.
+    private EventIdAllocation IdAllocation() =>
+        new(_placed.Uid, _placed.ObjectId, [.. Events.Select(mapEvent => mapEvent.Id).Concat(_placed.Events.Select(mapEvent => mapEvent.Id))]);
 
     [RelayCommand(CanExecute = nameof(HasSelectedEvent))]
     private void RemoveEvent() => SelectedEvent = ListOrder.Remove(Events, SelectedEvent!);

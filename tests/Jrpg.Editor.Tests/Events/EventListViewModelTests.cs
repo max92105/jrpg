@@ -37,7 +37,7 @@ public sealed class EventListViewModelTests
 
     private static readonly StepChoices _choices = new(["ether", "potion"], ["chest", "door_close", "door_open"], ["interior_1", "start"]);
 
-    private readonly EventListViewModel _list = new(_door, _choices);
+    private readonly EventListViewModel _list = new(_door, _choices, "door_open");
 
     [Fact]
     public void Constructor_ObjectWithEvents_ListsThemAndSelectsTheFirst()
@@ -97,7 +97,7 @@ public sealed class EventListViewModelTests
             Events = [_open with { Steps = [new DialogueStep(new Speech(["Welcome.", "Mind the step."], "Innkeeper", "innkeeper.png"))] }],
         };
 
-        Assert.Null(new EventListViewModel(sign, _choices).ToEdit());
+        Assert.Null(new EventListViewModel(sign, _choices, "door_open").ToEdit());
     }
 
     [Fact]
@@ -166,6 +166,35 @@ public sealed class EventListViewModelTests
         open.SelectedStep!.QuantityText = "";
 
         Assert.Equal("Event door_1_0, step 2: The quantity must be a whole number of at least 1.", _list.Problem);
+    }
+
+    [Fact]
+    public void ApplyChestPresetCommand_ReplacesTheEventsAndShowsTheItemToChoose()
+    {
+        _list.ApplyChestPresetCommand.Execute(null);
+
+        var chest = Assert.Single(_list.Events);
+        Assert.Equal("door_1_2", chest.Id);
+        Assert.Same(chest, _list.SelectedEvent);
+        Assert.Same(chest.Steps[0], chest.SelectedStep);
+        Assert.Equal("Event door_1_2, step 1: Choose the item to give.", _list.Problem);
+    }
+
+    [Fact]
+    public void ApplyDoorYouOpenPresetCommand_SelectsTheWarpToFill()
+    {
+        _list.ApplyDoorYouOpenPresetCommand.Execute(null);
+
+        Assert.Same(_list.Events[1], _list.SelectedEvent);
+        Assert.True(_list.SelectedEvent!.SelectedStep!.IsWarp);
+    }
+
+    [Fact]
+    public void ApplySignPresetCommand_AsksForTheText()
+    {
+        _list.ApplySignPresetCommand.Execute(null);
+
+        Assert.Equal("Event door_1_2, step 1: Write at least one line.", _list.Problem);
     }
 
     [Fact]

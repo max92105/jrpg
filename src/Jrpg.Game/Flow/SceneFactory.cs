@@ -1,5 +1,6 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Exploration;
+using Jrpg.Core.Session;
 using Jrpg.Game.Exploration;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Rendering;
@@ -30,7 +31,9 @@ internal sealed class SceneFactory
 
     public TitleScene CreateTitle() => new(_text);
 
-    public GameMenuScene CreateGameMenu() => new(_text, _ui, [new SystemPage(_text, _ui)]);
+    /// <param name="session">The playthrough the header reports on.</param>
+    public GameMenuScene CreateGameMenu(GameSession session) =>
+        new(_text, _ui, new MenuHeader(_text, session), [new SystemPage(_text, _ui)]);
 
     public ExplorationScene CreateExploration(ExplorationState exploration) => new(exploration, _catalog, _art, _text);
 }

@@ -58,7 +58,7 @@ internal sealed class GameFlow : IScene
             case QuitRequested:
                 return request;
             case MenuRequested:
-                _menus.Open();
+                _menus.Open(Session ?? throw new InvalidOperationException("The menu opened with no game started."));
                 break;
             case MenuClosed:
                 _menus.Close();

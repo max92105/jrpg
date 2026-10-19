@@ -20,11 +20,10 @@ internal sealed class GameMenuScene : IScene
     // Legacy GameMenuControl.OpenDuration; opacity only.
     private static readonly TimeSpan _openFade = TimeSpan.FromSeconds(0.15);
 
-    // Legacy layout: an 80 px header, the body 40 px below it, the tabs 14 px apart, the page 24 px right of them, 40 px
+    // Legacy layout: the header, the body 40 px below it, the tabs 14 px apart, the page 24 px right of them, 40 px
     // from the right edge, and 32 px above the 64 px footer.
-    private const int HeaderHeight = 80;
     private const int FooterHeight = 64;
-    private const int BodyTop = HeaderHeight + 40;
+    private const int BodyTop = MenuHeader.Height + 40;
     private const int TabPitch = NavTabShape.Height + 14;
     private const int PageLeft = NavTabShape.Width + 24;
     private static readonly Rectangle _pageArea = new(PageLeft, BodyTop, VirtualScreen.Width - 40 - PageLeft, VirtualScreen.Height - FooterHeight - 32 - BodyTop);
@@ -35,6 +34,8 @@ internal sealed class GameMenuScene : IScene
     private const int SelectionLineThickness = 2;
 
     private readonly UiTextures _ui;
+    private readonly MenuHeader _header;
+    private readonly string _menuTitle;
     private readonly ImmutableArray<IMenuPage> _pages;
     private readonly ListCursor _tabs;
     private readonly SpriteFontBase _font;
@@ -44,10 +45,13 @@ internal sealed class GameMenuScene : IScene
 
     /// <param name="text">Messages and fonts for the tab labels.</param>
     /// <param name="ui">The shared tab and gradient textures.</param>
+    /// <param name="header">The header bar's title, location and play time.</param>
     /// <param name="pages">One per tab, top to bottom.</param>
-    public GameMenuScene(ScreenText text, UiTextures ui, ImmutableArray<IMenuPage> pages)
+    public GameMenuScene(ScreenText text, UiTextures ui, MenuHeader header, ImmutableArray<IMenuPage> pages)
     {
         _ui = ui;
+        _header = header;
+        _menuTitle = text.Messages.Text(MessageIds.MenuTitle);
         _pages = pages;
         _tabs = new ListCursor(pages.Length, _ => true);
         _font = text.Fonts.FontAt(UiTheme.MenuTextPixels);
@@ -57,6 +61,7 @@ internal sealed class GameMenuScene : IScene
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
         _sinceOpened += delta;
+        _header.Update();
         return _isInPage ? UpdatePage(input) : UpdateTabs(input);
     }
 
@@ -64,6 +69,7 @@ internal sealed class GameMenuScene : IScene
     {
         var opacity = (float)Math.Min(1, _sinceOpened / _openFade);
         DrawFrame(batch, textures, opacity);
+        _header.Draw(batch, _isInPage ? _tabLabels[_tabs.Selected] : _menuTitle, opacity);
         for (var index = 0; index < _tabLabels.Length; index++)
         {
             DrawTab(batch, textures, index, opacity);
@@ -83,8 +89,8 @@ internal sealed class GameMenuScene : IScene
         batch.Draw(_ui.MenuScrim(textures), _screen, tint);
 
         var footerTop = VirtualScreen.Height - FooterHeight;
-        batch.Draw(textures.Pixel, new Rectangle(0, 0, VirtualScreen.Width, HeaderHeight), UiTheme.Bar * opacity);
-        batch.Draw(textures.Pixel, new Rectangle(0, HeaderHeight - 1, VirtualScreen.Width, 1), UiTheme.BarLine * opacity);
+        batch.Draw(textures.Pixel, new Rectangle(0, 0, VirtualScreen.Width, MenuHeader.Height), UiTheme.Bar * opacity);
+        batch.Draw(textures.Pixel, new Rectangle(0, MenuHeader.Height - 1, VirtualScreen.Width, 1), UiTheme.BarLine * opacity);
         batch.Draw(textures.Pixel, new Rectangle(0, footerTop, VirtualScreen.Width, FooterHeight), UiTheme.Bar * opacity);
         batch.Draw(textures.Pixel, new Rectangle(0, footerTop, VirtualScreen.Width, 1), UiTheme.BarLine * opacity);
     }

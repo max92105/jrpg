@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, G2 (Confirmation prompt; Title screen and Quit ask first)
-Round: 1 (verdict: Ready to commit; build 0 warnings, 949/949 tests, format exit 0)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, G3 (Menu header: location and play time)
+Round: 1 (verdict: Ready to commit; build 0 warnings, format exit 0; full test run hit the known flaky Game host crash, Game-only rerun 168/168)
 
-- open (Suggestion): tick G2 in the plan and record deviations (test names Method_Scenario_Result, Yes/No not legacy "Cancel", prompt owned/drawn by SystemPage)
-- open (Suggestion): GameMenuSceneTests.Update_ConfirmOnTab_EntersPage now walks the whole Yes flow; name no longer matches its last assert
-- open (Suggestion): Update_RightAfterLeft_SelectsNoAgain asserts state only; plan's Cancel-only test (no Left first) not separately pinned (covered via Escape-while-asking)
-- follow-up: ConfirmPromptView is per page; when S1 (overwrite) needs a prompt, share one view instance via SceneFactory
+- open (Suggestion): tick G3 in the plan and record deviations (no header icons, test names, extra PlayTimeText tests, seeded session in GameMenuSceneTests, menu_title message)
+- open (Suggestion): header title rule (menu_title on tabs, tab label inside a page) has no test; expose the title or pin it if a page adds its own title later
+- open (Suggestion): MenuHeader.Draw `_measuredLocation is not null` guard only covers Draw-before-Update; measure once in the constructor (call Update) and drop the guard
+- follow-up: FontLibraryTests non-font input still crashes the Game test host intermittently (guard header size before AddFont)

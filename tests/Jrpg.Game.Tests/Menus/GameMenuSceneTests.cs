@@ -1,6 +1,9 @@
+using Jrpg.Core.Randomness;
+using Jrpg.Core.Session;
 using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Scenes;
+using Jrpg.Game.Tests.Exploration;
 using Jrpg.Game.Tests.Ui;
 using Jrpg.Game.Ui;
 using static Jrpg.Game.Tests.Input.InputFrames;
@@ -73,5 +76,10 @@ public sealed class GameMenuSceneTests
         Assert.Null(leavingPage);
     }
 
-    private static GameMenuScene NewMenu() => new(RepositoryScreenText.Text, new UiTextures(), [new SystemPage(RepositoryScreenText.Text, new UiTextures())]);
+    private static GameMenuScene NewMenu()
+    {
+        var session = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
+        var header = new MenuHeader(RepositoryScreenText.Text, session);
+        return new(RepositoryScreenText.Text, new UiTextures(), header, [new SystemPage(RepositoryScreenText.Text, new UiTextures())]);
+    }
 }

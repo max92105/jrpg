@@ -24,6 +24,9 @@ internal static class MessageIds
     /// <summary>The title's entry that closes the game.</summary>
     public const string TitleQuit = "title_quit";
 
+    /// <summary>The menu header's title while no page is open.</summary>
+    public const string MenuTitle = "menu_title";
+
     /// <summary>The game menu's System tab.</summary>
     public const string MenuSystem = "menu_system";
 

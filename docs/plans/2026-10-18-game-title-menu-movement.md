@@ -454,7 +454,12 @@ G1 was split in two (developer, 2026-10-19): about 550 lines in all. G1-1 is the
   - **Verify by hand:**
     - [ ] Both entries ask; No and Esc stay; Yes leaves.
 
-- [ ] **G3. Menu header: location and play time** (Game, about 130 lines)
+- [x] **G3. Menu header: location and play time** (Game, about 130 lines)
+  - **Done, with deviations:**
+    - No header icons (decision 51): legacy's location and clock images don't exist in `content/`.
+    - The header title is "Menu" (new `menu_title`, legacy `MenuTitle`) on the tabs, and the tab's name inside a page.
+    - The session reaches the menu through `MenuTransitions.Open(session)` and `SceneFactory.CreateGameMenu(session)`. `MenuHeader.Height` sets the bar's height.
+    - Tests use `Method_Scenario_Result` names, plus two extra `PlayTimeText` tests. `GameMenuSceneTests` builds a seeded session from `StartMapScenarios`.
   - **Goal:** the header shows the page title, the current map's display name and the play time (hh:mm:ss, ticking), as legacy `MenuHeader`.
   - **New types (Game):**
     - `Ui/PlayTimeText`: the play time as text, formatted only when the shown second changes. `Update(TimeSpan playTime)`, `Text`.

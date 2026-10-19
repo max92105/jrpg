@@ -3,6 +3,8 @@ using Jrpg.Core.Exploration;
 using Jrpg.Game.Exploration;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
+using Jrpg.Game.Scenes;
+using Jrpg.Game.Tests.Input;
 using Jrpg.Game.Tests.Ui;
 
 namespace Jrpg.Game.Tests.Exploration;
@@ -55,6 +57,32 @@ public sealed class ExplorationSceneTests
         scene.Update(StartMapScenarios.OneUpdate, _confirmPressed);
 
         Assert.False(exploration.IsEventRunning);
+    }
+
+    [Fact]
+    public void Update_MenuPressedWhileIdle_RequestsMenu()
+    {
+        var (_, scene) = Start(StartMapScenarios.BelowClosedDoor);
+
+        var request = scene.Update(StartMapScenarios.OneUpdate, InputFrames.PressingEscape);
+
+        Assert.IsType<MenuRequested>(request);
+    }
+
+    [Fact]
+    public void Update_MenuPressedDuringWarpFade_RequestsNothing()
+    {
+        var (exploration, scene) = Start(StartMapScenarios.NextToForestWarp);
+        for (var update = 0; update < 120 && !exploration.IsEventRunning; update++)
+        {
+            scene.Update(StartMapScenarios.OneUpdate, StartMapScenarios.HoldingLeft);
+        }
+
+        Assert.True(exploration.IsEventRunning);
+
+        var request = scene.Update(StartMapScenarios.OneUpdate, InputFrames.PressingEscape);
+
+        Assert.Null(request);
     }
 
     private static (ExplorationState Exploration, ExplorationScene Scene) Start(ContentCatalog catalog)

@@ -113,6 +113,35 @@ public sealed class GameFlowTests
         Assert.Equal(Facing.Right, exploration.PlayerFacing);
     }
 
+    [Fact]
+    public void Update_TitleRequested_EndsSession()
+    {
+        var flow = StartedFlow();
+        flow.Update(_oneUpdate, InputFrames.PressingEscape);
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+
+        flow.Update(_fadeOut, default);
+
+        Assert.Null(flow.Session);
+    }
+
+    [Fact]
+    public void Update_NewGameAfterTitleRequested_StartsFreshSession()
+    {
+        var flow = StartedFlow();
+        var first = SessionOf(flow);
+        flow.Update(_oneUpdate, InputFrames.PressingEscape);
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(_wholeFade, default);
+
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(_fadeOut, default);
+
+        Assert.NotSame(first, SessionOf(flow));
+    }
+
     // New game is the title's first entry, so Confirm alone picks it; the fade starts on that update.
     private static GameFlow FlowWithNewGameConfirmed()
     {

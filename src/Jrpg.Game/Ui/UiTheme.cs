@@ -30,4 +30,19 @@ internal static class UiTheme
     /// </summary>
     public static ImmutableArray<GradientStop> SpeakerStrip { get; } =
         [new(0, new Color(0, 0, 0, 0xE0)), new(0.6f, new Color(0, 0, 0, 0x99)), new(1, Color.Transparent)];
+
+    /// <summary>Legacy <c>Color.Text.Primary</c>: menu text, and the selected entry.</summary>
+    public static Color TextPrimary { get; } = new(0xF2, 0xF2, 0xF5);
+
+    /// <summary>Legacy <c>Color.Text.Secondary</c>: entries that aren't selected.</summary>
+    public static Color TextSecondary { get; } = new(0xA4, 0xA8, 0xB4);
+
+    /// <summary>Legacy <c>NavTabStyle</c> and <c>SubMenuItemStyle</c> text, 1:1 on the virtual screen.</summary>
+    public const int MenuTextPixels = 20;
+
+    /// <summary>Legacy menu tabs and entries are 56 px tall.</summary>
+    public const int MenuRowHeight = 56;
+
+    /// <summary>Legacy menu text starts 44 px in from its row's left edge.</summary>
+    public const int MenuTextInset = 44;
 }

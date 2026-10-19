@@ -23,6 +23,7 @@ internal sealed class GameFlow : IScene
     private readonly SceneStack _scenes = new();
     private readonly ScreenFade _fade = new(_fadeOut, _blackHold, _fadeIn);
     private readonly SessionTransitions _sessions;
+    private readonly MenuTransitions _menus;
     private SceneRequest? _requestBehindFade;
 
     public GameFlow(ContentCatalog catalog, ScreenText text)
@@ -30,6 +31,7 @@ internal sealed class GameFlow : IScene
         var playedCatalog = EncounterFreeContent.Of(catalog);
         var factory = new SceneFactory(playedCatalog, text);
         _sessions = new SessionTransitions(playedCatalog, _scenes, factory);
+        _menus = new MenuTransitions(_scenes, factory);
         _scenes.Push(factory.CreateTitle());
     }
 
@@ -49,14 +51,21 @@ internal sealed class GameFlow : IScene
 
         var isFading = _fade.Phase != FadePhase.Idle;
         var request = _scenes.Update(delta, isFading ? default : input);
-        if (request is QuitRequested)
+        switch (request)
         {
-            return request;
-        }
-
-        if (request is not null)
-        {
-            StartBehindFade(request);
+            case null:
+                break;
+            case QuitRequested:
+                return request;
+            case MenuRequested:
+                _menus.Open();
+                break;
+            case MenuClosed:
+                _menus.Close();
+                break;
+            default:
+                StartBehindFade(request);
+                break;
         }
 
         return null;
@@ -88,10 +97,17 @@ internal sealed class GameFlow : IScene
 
         var request = _requestBehindFade;
         _requestBehindFade = null;
-        Session = request switch
+        switch (request)
         {
-            NewGameRequested => _sessions.StartNewGame(),
-            _ => throw new InvalidOperationException($"The game can't handle a {request.GetType().Name} yet."),
-        };
+            case NewGameRequested:
+                Session = _sessions.StartNewGame();
+                break;
+            case TitleRequested:
+                _sessions.ShowTitle();
+                Session = null;
+                break;
+            default:
+                throw new InvalidOperationException($"The game can't handle a {request.GetType().Name} yet.");
+        }
     }
 }

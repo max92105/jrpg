@@ -9,4 +9,6 @@ namespace Jrpg.Game.Ui;
 internal static class UiArtFiles
 {
     public const string TitleBackground = "StartMenu.png";
+
+    public const string MenuBackground = "GameMenu.png";
 }

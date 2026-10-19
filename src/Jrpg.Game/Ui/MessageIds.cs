@@ -23,4 +23,13 @@ internal static class MessageIds
 
     /// <summary>The title's entry that closes the game.</summary>
     public const string TitleQuit = "title_quit";
+
+    /// <summary>The game menu's System tab.</summary>
+    public const string MenuSystem = "menu_system";
+
+    /// <summary>The System page's entry that ends the playthrough and goes back to the title.</summary>
+    public const string SystemTitleScreen = "system_title_screen";
+
+    /// <summary>The System page's entry that closes the game.</summary>
+    public const string SystemQuit = "system_quit";
 }

@@ -1,6 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Exploration;
 using Jrpg.Game.Exploration;
+using Jrpg.Game.Menus;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Title;
 using Jrpg.Game.Ui;
@@ -27,6 +28,8 @@ internal sealed class SceneFactory
     }
 
     public TitleScene CreateTitle() => new(_text);
+
+    public GameMenuScene CreateGameMenu() => new(_text, [new SystemPage(_text)]);
 
     public ExplorationScene CreateExploration(ExplorationState exploration) => new(exploration, _catalog, _art, _text);
 }

@@ -1,0 +1,29 @@
+using Jrpg.Game.Input;
+using Jrpg.Game.Rendering;
+using Jrpg.Game.Scenes;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace Jrpg.Game.Menus;
+
+/// <summary>One page of the game menu, entered from its tab; the menu draws the tabs and frames the page.</summary>
+internal interface IMenuPage
+{
+    /// <summary>The message id of the page's name, shown on its tab.</summary>
+    string TitleMessageId { get; }
+
+    /// <summary>
+    /// Whether Cancel now goes back to the tabs. False while something inside the page, such as a confirmation, answers
+    /// Cancel itself.
+    /// </summary>
+    bool LeavesOnCancel { get; }
+
+    /// <returns>What the page asks the flow for, or null.</returns>
+    SceneRequest? Update(InputFrame input);
+
+    /// <param name="batch">Already begun.</param>
+    /// <param name="textures">The images the page draws.</param>
+    /// <param name="area">Where the page goes, in virtual-screen pixels.</param>
+    /// <param name="opacity">0 to 1, while the menu fades in.</param>
+    void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity);
+}

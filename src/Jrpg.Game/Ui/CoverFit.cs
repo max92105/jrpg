@@ -1,4 +1,6 @@
+using Jrpg.Game.Rendering;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Jrpg.Game.Ui;
 
@@ -18,5 +20,15 @@ internal static class CoverFit
         var width = isImageWider ? (int)Math.Round((double)image.Y * area.X / area.Y) : image.X;
         var height = isImageWider ? image.Y : (int)Math.Round((double)image.X * area.Y / area.X);
         return new Rectangle((image.X - width) / 2, (image.Y - height) / 2, width, height);
+    }
+
+    /// <summary>Draws the image covering the whole virtual screen.</summary>
+    /// <param name="batch">Already begun.</param>
+    /// <param name="image">The picture.</param>
+    /// <param name="tint">White, faded to fade the picture.</param>
+    public static void DrawOverScreen(SpriteBatch batch, Texture2D image, Color tint)
+    {
+        var source = SourceIn(new Point(image.Width, image.Height), new Point(VirtualScreen.Width, VirtualScreen.Height));
+        batch.Draw(image, new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height), source, tint);
     }
 }

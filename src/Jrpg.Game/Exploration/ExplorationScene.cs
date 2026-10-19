@@ -49,10 +49,10 @@ internal sealed class ExplorationScene : IScene
     }
 
     /// <summary>
-    /// Shows the running event's step; interacts and walks only once it and its fade are over. An interaction that
-    /// starts an event waits for it like any other.
+    /// Shows the running event's step; interacts, walks and opens the menu only once it and its fade are over. An
+    /// interaction that starts an event waits for it like any other.
     /// </summary>
-    /// <returns>Null: the map asks the flow for nothing yet.</returns>
+    /// <returns>The menu when Menu is pressed between events; otherwise null.</returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
         // Sampled before the presenter runs: the Confirm that closes the last message mustn't also interact again.
@@ -72,6 +72,12 @@ internal sealed class ExplorationScene : IScene
         {
             _walkAnimation.Stand();
             return null;
+        }
+
+        if (input.IsPressed(GameButton.Menu))
+        {
+            _walkAnimation.Stand();
+            return new MenuRequested();
         }
 
         WalkAndFollow(delta, input);

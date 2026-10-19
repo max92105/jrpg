@@ -396,10 +396,18 @@ M4 was split in two before it started (developer, 2026-10-19): it came out at ab
 
 ### Phase G: menu shell
 
-- [ ] **G1. Menu shell and System page** (Game, about 300 lines)
+G1 was split in two (developer, 2026-10-19): about 550 lines in all. G1-1 is the behavior below with a plain look (`GameMenu.png` behind plain text tabs). G1-2 is the legacy look.
+
+- [x] **G1-1. Menu shell and System page** (Game, about 300 lines)
+  - **Done, with deviations:**
+    - No `Ui/TabStrip`: the tabs reuse `ListCursor`, which already wraps, and its tests cover the planned `TabStrip` ones.
+    - New `Menus/SystemEntry` enum. `UiTheme` gains the legacy text colors and menu sizes; `CoverFit.DrawOverScreen` is shared with the title.
+    - Closing the menu has no fade.
+    - Tests use `Method_Scenario_Result` names. Extra tests: `Update_MenuOnTabs_RequestsMenuClosed` and `Update_NewGameAfterTitleRequested_StartsFreshSession`.
+    - Follow-up for G1-2: tabs and System rows center their text the same way; share it when restyling.
   - **Goal** (decision 81):
     - Menu (Esc, Start) on the map opens the game menu with a 0.15 s fade. It is ignored while the presenter is busy.
-    - The menu has the legacy background (`GameMenu.png` with the edge scrim), header and footer bars, and vertical arrow-shaped tabs on the left. Tabs are text only for now (decision 51). The selected tab has the legacy blue selection gradient and line.
+    - The menu shows `GameMenu.png` behind plain text tabs on the left; the legacy look comes in G1-2.
     - Confirm enters a page; Cancel goes back to the tabs.
     - On the tabs, Cancel or Menu closes the menu. In a page, Esc only goes back to the tabs (Esc rule).
     - First tab: System, with Title screen and Quit (no confirmation until G2).
@@ -408,7 +416,6 @@ M4 was split in two before it started (developer, 2026-10-19): it came out at ab
     - `Flow/MenuTransitions`: pushes and pops the menu.
     - `SessionTransitions` handles `TitleRequested`: ends the session, `ReplaceAll` with the title, behind the fade.
     - `Ui/TabStrip` (pure): the selected tab; `Previous`, `Next`, wraps.
-    - `Ui/UiTextures` gains the nav-tab arrow (legacy `Shape.NavTab`, masked through `CanopyMask.Build`) and the selection gradients. Moved here from M3b: `UiTextures` itself. (`Ui/GradientStrip` arrived earlier, in M4b.)
     - `Menus/IMenuPage`: one page of the game menu. Title message id, `SceneRequest? Update(InputFrame input)`, `Draw`, and whether Cancel leaves it. Implemented by every page in this plan.
     - `Menus/GameMenuScene`: the tabs and the open page.
     - `Menus/SystemPage`: the System entries.
@@ -416,6 +423,15 @@ M4 was split in two before it started (developer, 2026-10-19): it came out at ab
   - **Verify by hand:**
     - [ ] Esc and Start open the menu; Esc inside System goes back to the tabs, then closes.
     - [ ] Title screen goes to the title, and New game starts fresh.
+
+- [ ] **G1-2. Menu look** (Game, about 250 lines)
+  - **Goal** (decisions 81, 82): the menu looks like legacy `GameMenuControl.xaml`:
+    - the edge scrim over `GameMenu.png` (legacy `Brush.MenuScrim`);
+    - the header and footer bars (80 and 64 px);
+    - vertical arrow-shaped tabs (legacy `Shape.NavTab`, 410 x 56, 14 px apart), text only (decision 51);
+    - the selected tab has the legacy blue selection gradient (`Brush.Selection`) and line.
+  - **New types (Game):** `Ui/UiTextures` (moved here from M3b) with the nav-tab arrow, masked through `CanopyMask.Build`, and the selection gradients through `Ui/GradientStrip`.
+  - **Verify by hand:**
     - [ ] The layout matches `GameMenuControl.xaml`.
 
 - [ ] **G2. Confirmation prompt; Title screen and Quit ask first** (Game, about 160 lines)

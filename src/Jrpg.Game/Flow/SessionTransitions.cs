@@ -6,7 +6,7 @@ using Jrpg.Game.Scenes;
 
 namespace Jrpg.Game.Flow;
 
-/// <summary>Starting and leaving playthroughs (ADR 0008). Only a new game so far; load, title and quit come later in 3b.</summary>
+/// <summary>Starting and leaving playthroughs (ADR 0008). A new game and back to the title so far; loading comes in S2a.</summary>
 internal sealed class SessionTransitions(ContentCatalog catalog, SceneStack scenes, SceneFactory factory)
 {
     /// <summary>
@@ -21,4 +21,7 @@ internal sealed class SessionTransitions(ContentCatalog catalog, SceneStack scen
         scenes.ReplaceAll(factory.CreateExploration(session.Exploration));
         return session;
     }
+
+    /// <summary>Ends the playthrough on screen: the title replaces the map and anything over it.</summary>
+    public void ShowTitle() => scenes.ReplaceAll(factory.CreateTitle());
 }

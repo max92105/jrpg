@@ -46,7 +46,6 @@ internal sealed class TitleScene : IScene
     private readonly string[] _labels;
     private readonly Vector2[] _labelCenters;
     private readonly Vector2[] _labelOrigins;
-    private Rectangle? _backgroundSource;
 
     public TitleScene(ScreenText text)
     {
@@ -66,7 +65,7 @@ internal sealed class TitleScene : IScene
 
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
-        DrawBackground(batch, textures);
+        CoverFit.DrawOverScreen(batch, textures.Get(ArtFolders.Backgrounds, UiArtFiles.TitleBackground), Color.White);
         batch.DrawString(_nameFont, _name, _namePosition + _shadowOffset, _shadow, effect: FontSystemEffect.Blurry, effectAmount: ShadowBlur);
         batch.DrawString(_nameFont, _name, _namePosition, Color.White);
         for (var index = 0; index < _labels.Length; index++)
@@ -81,13 +80,6 @@ internal sealed class TitleScene : IScene
         TitleEntry.Quit => MessageIds.TitleQuit,
         _ => throw new ArgumentOutOfRangeException(nameof(entry), entry, null),
     };
-
-    private void DrawBackground(SpriteBatch batch, TextureLibrary textures)
-    {
-        var background = textures.Get(ArtFolders.Backgrounds, UiArtFiles.TitleBackground);
-        _backgroundSource ??= CoverFit.SourceIn(new Point(background.Width, background.Height), new Point(VirtualScreen.Width, VirtualScreen.Height));
-        batch.Draw(background, new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height), _backgroundSource, Color.White);
-    }
 
     // Drawn around its center, so the selected entry grows in place.
     private void DrawEntry(SpriteBatch batch, int index)

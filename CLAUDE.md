@@ -18,6 +18,7 @@ A 2D JRPG written from scratch in C#. Personal project, single developer.
 - `content/` — JSON game data (items, monsters, skills, maps, dialogue) and art (`content/art/<kind>/`, ADR 0009). The only source of truth for content (ADR 0011).
 - `docs/decisions/` — architecture decision records (ADRs). Read the relevant ADR before changing a design area.
 - `docs/plans/` — feature plans produced by `/plan-feature`.
+- `docs/ui_ux_exemples/` — screenshots of the developer's favorite UI/UX (Octopath Traveler II), the target style for every screen. Look at them before planning or drawing UI; take inspiration, don't copy 1:1 (see `.claude/rules/game.md`, "UI look"). Reference only: never shipped.
 
 Dependency direction: Game → Data → Core; Editor → Data → Core. Never the reverse.
 

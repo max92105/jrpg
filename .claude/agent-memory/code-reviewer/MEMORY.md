@@ -5,4 +5,4 @@
 - [Namespace cycles](namespace-cycles.md) — grep reverse usings for each new Core using; Content is the hub (Content<->Session seen in slice 8)
 - [Last review](last-review.md) — slice, round and finding status of the latest review; read first to apply re-review rules
 - [Format check line endings](format-check-line-endings.md) — run format unpiped, trust exit code; "format clean" hand-offs wrong twice (3c, 11e mixed LF line)
-- [Flaky font test crash](flaky-font-test-crash.md) — Game test host AccessViolation/hang in FontLibraryTests non-font test; rerun before blaming slice
+- [Flaky font test crash](flaky-font-test-crash.md) — Game test host crash/hang or odd failure in unrelated test (font OOB read); rerun before blaming slice

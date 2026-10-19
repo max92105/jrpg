@@ -50,6 +50,21 @@ public sealed class EventPresenterTests
     }
 
     [Fact]
+    public void Update_ConfirmOnLastPage_ContinuesEvent()
+    {
+        var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowTalkingChest);
+        exploration.TryInteract();
+        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text);
+        presenter.Update(StartMapScenarios.OneUpdate, default);
+        presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+        Assert.IsType<DialogueStep>(exploration.CurrentEventStep);
+
+        presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+
+        Assert.False(exploration.IsEventRunning);
+    }
+
+    [Fact]
     public void Update_FirstUpdateOnFoundItem_WaitsEvenWithConfirmPressed()
     {
         var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowChest);

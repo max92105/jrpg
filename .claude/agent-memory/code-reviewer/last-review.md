@@ -5,14 +5,12 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, M3b (Legacy theme, message box and found items)
-Round: 1 (verdict: Ready to commit; build 0 warnings, format exit 0; tests 875/876 on first full run: Game test host crashed with AccessViolation in pre-existing FontLibraryTests.Load_FileThatIsNotAFont, then 9 clean Game reruns, one rerun hung)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, M3c (Dialogue steps)
+Round: 1 (verdict: Ready to commit; build 0 warnings, format exit 0; Game test host flaked twice in 2 full runs (host crash "error: 1" with 866 total; then ExplorationSceneTests.Update_DuringWarpFadeIn_DoesNotWalk failed inside Start), 5 clean Game reruns of 98 tests)
 
-Accepted before coding (not findings): message box copies legacy in-game DialogueBox doubled (1200x240, 40 px bottom, radius 20, border 4, text 32) instead of menu DialogStyle; GradientStrip + UiTextures moved to G1, PanelView bakes lazily via pure PanelStyle/BakePixels.
-
-- open (Warning): ExplorationScene.cs:57-70 wasBusy rule (closing Confirm must not interact) has no test; start chest isOnce=true so reverting is invisible; needs a repeatable give-item fixture
-- open (Suggestion): FoundItemText all-lost text omits the item name ("3 didn't fit...") - ask developer (decision 55 wording)
-- open (Suggestion): EventPresenter.Blackness now only read by a test
-- open (Suggestion): M3b slice note: test names (Update_ConfirmOnFoundItem_ContinuesEvent etc.), extra tests, GradientStrip/UiTextures to G1, DialogueBox source, checkbox (DoD 5)
-- follow-up: FontLibraryTests.Load_FileThatIsNotAFont feeds a 23-byte file to StbTrueType, which reads out of bounds -> intermittent AccessViolation/hang of the whole Game test host
-- verified: BakePixels border exactly BorderWidth px (depth 0.5..3.5 border, 4.5 fill), premultiplied lerp correct; give-item quantity >=1 validated so FoundItemText never returns empty; MessageIdsTests covers new ids in ui.json; Dialogue->Ui/Rendering and Exploration->Dialogue edges match plan
+- open (Suggestion): EventPresenter PagesOf default arm throws for an impossible step; could build pages in the Update switch arms (DialogueStep d => d.Speech.Lines) and drop the extra type test
+- open (Suggestion): plan M3c slice note: tick checkbox, record BelowTalkingChest fixture (no map has a dialogue), extra tests CurrentPage_New_IsFirstPage / Confirm_AfterFinished_Throws (DoD 5)
+- open (Suggestion): page-2 text after first Confirm is unobservable in tests (DialogueBox has no text accessor); covered only by SpeechPlayback unit tests
+- follow-up: flaky Game test host now also fails in non-font tests (ExplorationSceneTests.Start) - native OOB read in FontLibraryTests corrupts the shared host
+- follow-up: a long dialogue line overflows the 240 px box (no paging by height); M4 or later
+- verified: consecutive steps reset _reading before ContinueEvent; first update never consumes Confirm; Dialogue folder has no Core dependency; validator rejects 0-line dialogue so CurrentPage is safe

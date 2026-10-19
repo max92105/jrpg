@@ -278,7 +278,8 @@ Sizes are estimates of hand-written code plus tests. A slice estimated past ~300
     - [ ] A held Confirm doesn't reopen anything.
     - [ ] The box matches the legacy box's colors and border.
 
-- [ ] **M3c. Dialogue steps** (Game, about 120 lines)
+- [x] **M3c. Dialogue steps** (Game, about 120 lines)
+  - **Done, with deviations:** no map has a dialogue step, so the presenter test uses a test-only copy of the start map where the chest talks (`StartMapScenarios.BelowTalkingChest`). Extra tests: `SpeechPlayback_CurrentPage_New_IsFirstPage`, `SpeechPlayback_Confirm_AfterFinished_Throws`. A line too long for the 240 px box isn't split into pages yet (M4 or later). The hand check with an editor-placed sign is still to do.
   - **Goal:** a dialogue step shows its lines one page per Confirm.
   - **New types (Game):** `Dialogue/SpeechPlayback` (pure): the pages of one step. `Confirm()` moves to the next page; `IsFinished`. Found items become a one-page playback.
   - **Tests:** `SpeechPlayback_Confirm_NotLastPage_ShowsNextPage`, `SpeechPlayback_Confirm_OnLastPage_Finishes`, `EventPresenter_Confirm_OnLastPage_ContinuesEvent`.

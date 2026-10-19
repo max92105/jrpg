@@ -1,4 +1,6 @@
 using Jrpg.Core.Content;
+using Jrpg.Core.Dialogue;
+using Jrpg.Core.Events;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
@@ -29,7 +31,11 @@ internal static class StartMapScenarios
     /// Below the chest as in <see cref="BelowChest"/>, but the chest only gives its potion, every time, and never opens:
     /// what a well or a shop sign would do.
     /// </summary>
-    public static ContentCatalog BelowRepeatableChest { get; } = WithRepeatableChest(BelowChest);
+    public static ContentCatalog BelowRepeatableChest { get; } = WithChestSaying(BelowChest, new GiveItemStep("potion", 1));
+
+    /// <summary>Below the chest, which now talks, in two lines, every time: the stand-in for a sign (no map has one).</summary>
+    public static ContentCatalog BelowTalkingChest { get; } =
+        WithChestSaying(BelowChest, new DialogueStep(new Speech(["A voice from the chest.", "It falls silent."])));
 
     public static InputFrame HoldingLeft { get; } =
         new(MoveIntent.FromAxes(-1, 0), ButtonSet.Empty.With(GameButton.Left), ButtonSet.Empty);
@@ -44,12 +50,13 @@ internal static class StartMapScenarios
         NewGame = _repositoryContent.NewGame with { StartLocation = new MapLocation("start", position, facing) },
     };
 
-    private static ContentCatalog WithRepeatableChest(ContentCatalog catalog)
+    // The chest's interact event, made repeatable, runs only this step, so the chest never swaps open.
+    private static ContentCatalog WithChestSaying(ContentCatalog catalog, EventStep step)
     {
         var start = catalog.Maps["start"];
         var objects = start.Layout.Objects
             .Select(placed => placed.ObjectId == "chest"
-                ? placed with { Events = [placed.Events[0] with { IsOnce = false, Steps = [placed.Events[0].Steps[0]] }] }
+                ? placed with { Events = [placed.Events[0] with { IsOnce = false, Steps = [step] }] }
                 : placed)
             .ToList();
         var maps = new Dictionary<string, MapDefinition>(catalog.Maps)

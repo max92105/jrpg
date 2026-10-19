@@ -12,8 +12,8 @@ namespace Jrpg.Game.Exploration;
 
 /// <summary>
 /// Shows the running map event's current step and continues it once shown (ADR 0006): a warp fades to black, moves the
-/// player while the screen is black, and fades back in (legacy <c>GameManager.WarpAsync</c>); a found item shows its
-/// message until Confirm.
+/// player while the screen is black, and fades back in (legacy <c>GameManager.WarpAsync</c>); a dialogue shows its lines
+/// one page per Confirm, and a found item its message as one page.
 /// </summary>
 internal sealed class EventPresenter
 {
@@ -24,7 +24,8 @@ internal sealed class EventPresenter
     // Legacy SceneManager.TransitionAsync for warps.
     private readonly ScreenFade _warpFade = new(TimeSpan.FromSeconds(0.25), TimeSpan.FromSeconds(0.08), TimeSpan.FromSeconds(0.25));
 
-    private bool _isMessageShown;
+    // The pages of the step being read; null when no message is on screen.
+    private SpeechPlayback? _reading;
 
     public EventPresenter(ExplorationState exploration, ScreenText text)
     {
@@ -43,17 +44,18 @@ internal sealed class EventPresenter
     public void Update(TimeSpan delta, InputFrame input)
     {
         _warpFade.Update(delta);
-        switch (_exploration.CurrentEventStep)
+        var step = _exploration.CurrentEventStep;
+        switch (step)
         {
             case null:
                 break;
             case WarpStep:
                 ShowWarp();
                 break;
-            case GiveItemStep:
-                ShowFoundItem(input);
+            case DialogueStep or GiveItemStep:
+                ShowPages(step, input);
                 break;
-            case var step:
+            default:
                 throw new InvalidOperationException($"The game can't show a {step.GetType().Name} yet.");
         }
     }
@@ -61,7 +63,7 @@ internal sealed class EventPresenter
     /// <summary>Draws over the map: the message being read, then the fade over everything.</summary>
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
-        if (_isMessageShown)
+        if (_reading is not null)
         {
             _messageBox.Draw(batch, textures);
         }
@@ -85,20 +87,39 @@ internal sealed class EventPresenter
         }
     }
 
-    // The text is built once, on the step's first update; the press that started the event came an update earlier, so
-    // it can't also close the message.
-    private void ShowFoundItem(InputFrame input)
+    // The pages are built once, on the step's first update; the press that started the event came an update earlier, so
+    // it can't also turn the first page.
+    private void ShowPages(EventStep step, InputFrame input)
     {
-        if (!_isMessageShown)
+        if (_reading is null)
         {
-            // Core sets a receipt on every give-item step.
-            _messageBox.Show(FoundItemText.Of(_exploration.CurrentItemReceipt!, _messages));
-            _isMessageShown = true;
+            _reading = new SpeechPlayback(PagesOf(step));
+            _messageBox.Show(_reading.CurrentPage);
+            return;
         }
-        else if (input.IsPressed(GameButton.Confirm))
+
+        if (!input.IsPressed(GameButton.Confirm))
         {
-            _isMessageShown = false;
-            _exploration.ContinueEvent();
+            return;
         }
+
+        _reading.Confirm();
+        if (!_reading.IsFinished)
+        {
+            _messageBox.Show(_reading.CurrentPage);
+            return;
+        }
+
+        _reading = null;
+        _exploration.ContinueEvent();
     }
+
+    private IReadOnlyList<string> PagesOf(EventStep step) => step switch
+    {
+        DialogueStep dialogue => dialogue.Speech.Lines,
+
+        // Core sets a receipt on every give-item step.
+        GiveItemStep => [FoundItemText.Of(_exploration.CurrentItemReceipt!, _messages)],
+        _ => throw new ArgumentOutOfRangeException(nameof(step), step, "Only dialogue and found items have pages."),
+    };
 }

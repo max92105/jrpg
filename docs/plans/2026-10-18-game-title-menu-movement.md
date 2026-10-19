@@ -517,21 +517,33 @@ G4 was split in two (developer, 2026-10-19), since it came to about 420 lines: G
   - **Verify by hand:**
     - [ ] Place two chests, delete the first, place another: it's `chest_3`.
 
-- [ ] **S1. Save slots and saving from the menu** (Game, about 300 lines)
-  - **Goal:** System gains Save. It opens the 20 files in the legacy `SaveSlotPanel` look: empty, damaged, or with location, play time, save date and the active party's names and levels. Confirm writes the save and the entry updates. Overwrite doesn't ask yet (S3).
+S1 was split in two (developer, 2026-10-19), since it came to about 600 lines. S1-1 is the save storage, with no UI. S1-2 is the Save page and the wiring; `GamePaths` and the `Program` changes have no user before S1-2.
+
+- [x] **S1-1. Save slots** (Game, about 200 lines)
+  - **Done, with deviations:**
+    - New `Saving/SaveSummary` and `Saving/PartyMemberSummary`. `SaveSlotEntry` has `Empty`, `Damaged` and `Saved` factories.
+    - A file another program holds open, or that can't be accessed, also shows as damaged, so one bad file never breaks the list.
+    - Tests use `Method_Scenario_Result` names: `ReadAll_DamagedFile_GivesDamagedEntry`, and extra `ReadAll_FileHeldOpenElsewhere_GivesDamagedEntryForItOnly`. The round trip checks a two-member party's order and levels.
+    - Follow-up for S1-2 or S3: `Write` lets disk errors through, so the Save page decides what the player sees.
+  - **Goal:** the 20 manual save files, read as summaries and written from a session, with no UI yet.
   - **New types (Game):**
-    - `Hosting/GamePaths`: where the game keeps its files. `SaveDirectory` = `%LocalAppData%/Jrpg/Saves` (decision 64).
     - `Saving/SaveSlots`: the 20 manual slots over `FileSaveStore`.
       - `SaveSlots(FileSaveStore store, ContentCatalog catalog, Func<DateTimeOffset> clock)`.
       - `static string NameOf(int number)`.
       - `IReadOnlyList<SaveSlotEntry> ReadAll()`: when a list opens, never per frame; a damaged file's reason goes to the debug output.
       - `void Write(int number, GameSession session)`: captures at `clock()`.
     - `Saving/SaveSlotEntry`: one file's summary from a repaired `SaveGame` and the catalog.
+  - **Tests:** `SaveSlots_NameOf_FirstSlot_IsSlot01`, `SaveSlots_ReadAll_EmptyFolder_GivesTwentyEmptyEntriesInOrder`, `SaveSlots_Write_ThenReadAll_SlotShowsMapNameAndPlayTime` (temporary folder, fixed clock), `SaveSlots_ReadAll_DamagedFile_IsUnreadable`.
+
+- [ ] **S1-2. Saving from the menu** (Game, about 350 lines)
+  - **Goal:** System gains Save. It opens the 20 files in the legacy `SaveSlotPanel` look: empty, damaged, or with location, play time, save date and the active party's names and levels. Confirm writes the save and the entry updates. Overwrite doesn't ask yet (S3).
+  - **New types (Game):**
+    - `Hosting/GamePaths`: where the game keeps its files. `SaveDirectory` = `%LocalAppData%/Jrpg/Saves` (decision 64).
     - `Ui/ListCursor` gains a visible window: `VisibleRows`, `FirstVisible`, scrolling with the cursor.
     - `Saving/SaveSlotList` (pure): the entries with a cursor. `Saving/SaveSlotListView` draws it.
     - `Menus/SavePage`.
   - **Changes:** `Program` builds `FileSaveStore` and `SaveSlots`; `SceneFactory` takes them.
-  - **Tests:** `SaveSlots_NameOf_FirstSlot_IsSlot01`, `SaveSlots_ReadAll_EmptyFolder_GivesTwentyEmptyEntriesInOrder`, `SaveSlots_Write_ThenReadAll_SlotShowsMapNameAndPlayTime` (temporary folder, fixed clock), `SaveSlots_ReadAll_DamagedFile_IsUnreadable`, `ListCursor_MoveDown_PastVisibleRows_ScrollsWindow`, `ListCursor_MoveUp_OnFirstEntry_WrapsToLastAndScrolls`, `SavePage_ConfirmSlot_WritesSave`.
+  - **Tests:** `ListCursor_MoveDown_PastVisibleRows_ScrollsWindow`, `ListCursor_MoveUp_OnFirstEntry_WrapsToLastAndScrolls`, `SavePage_ConfirmSlot_WritesSave`.
   - **Verify by hand:**
     - [ ] Save to File 1 and File 20: the files appear in `%LocalAppData%/Jrpg/Saves`, and the entries show "start", the play time and the date.
     - [ ] A file broken by hand shows as damaged.

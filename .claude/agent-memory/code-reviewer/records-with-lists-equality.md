@@ -13,4 +13,6 @@ Records that carry lists or dictionaries (`ExperienceTable`, `EquipmentStats.All
 
 Seen again in part 2 slice 1a (`MapLayout`, `TileLayer` rows-of-rows, `ObjectDefinition.CollisionPolygon`): no equality user there, so Suggestion only.
 
+Seen in editor slice 11i-1: "unchanged?" checks (dialog ToEdit null -> no undo step) need structural compare (`MapEventComparison`); check the test data actually exercises the nested-list branch (content had no dialogue steps, so the Speech.Lines path was untested -> Warning).
+
 Also watch for, seen in 4b: validator messages that combine two fields ("attack and defense must be...") when the item validator uses one field per message. And loader tests whose only assertion can't fail (`Select(...).ToList().Count == source.Count`).

@@ -92,6 +92,11 @@
         <TabItem x:Name="ObjectsTab" Header="Objects">
           <objects:ObjectBrowserView x:Name="ObjectBrowser" DataContext="{Binding Placing.Browser}" />
         </TabItem>
+        <TabItem x:Name="EventsTab" Header="Events">
+          <TextBlock Margin="8"
+                     TextWrapping="Wrap"
+                     Text="Click an object on the map to edit its events. Dots on an object show its events: yellow when the player presses a button, cyan when the player walks into it." />
+        </TabItem>
       </TabControl>
     </DockPanel>
     <!-- Pan: middle drag, Space + drag, arrows. Zoom: wheel, toward the cursor. Left drag paints the chosen tile,
@@ -121,6 +126,7 @@
             <Rectangle x:Name="BrushOutline" Stroke="White" Visibility="Collapsed" />
             <Image x:Name="ObjectGhost" Stretch="None" Opacity="0.6" Visibility="Collapsed" />
             <Canvas x:Name="SelectionMarks" />
+            <Canvas x:Name="EventMarks" />
             <Rectangle x:Name="SelectionOutline" Stroke="Cyan" StrokeDashArray="4 2" Visibility="Collapsed" />
           </Canvas>
         </Grid>

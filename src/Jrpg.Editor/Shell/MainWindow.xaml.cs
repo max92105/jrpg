@@ -110,6 +110,7 @@ internal sealed partial class MainWindow : Window
         {
             DrawCurrentMap();
             DrawSelectionMarks();
+            DrawEventMarks();
 
             // A resize, or its undo: show the whole map at its new size, as the legacy editor did.
             if (_gridDrawnFor is { } grid && _shownMap!.Map.Layout is var layout && (grid.Width, grid.Height) != (layout.Width, layout.Height))
@@ -129,6 +130,7 @@ internal sealed partial class MainWindow : Window
         MapList.SelectedItem = _shownMap?.Map.Id;
         _gridDrawnFor = null;
         DrawCurrentMap();
+        DrawEventMarks();
         RefitMap();
     }
 
@@ -252,9 +254,12 @@ internal sealed partial class MainWindow : Window
         }
         else if (_strokeButton is null && _viewModel.CurrentMap is not null)
         {
-            e.Handled = _viewModel.Mode == EditingMode.Objects
-                ? HandleObjectButton(e.ChangedButton, MapPointAt(e))
-                : HandlePaintButton(e.ChangedButton, CellAt(e));
+            e.Handled = _viewModel.Mode switch
+            {
+                EditingMode.Objects => HandleObjectButton(e.ChangedButton, MapPointAt(e)),
+                EditingMode.Events => HandleEventButton(e.ChangedButton, MapPointAt(e)),
+                _ => HandlePaintButton(e.ChangedButton, CellAt(e)),
+            };
         }
     }
 

@@ -1,3 +1,4 @@
+using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 
@@ -54,6 +55,12 @@ internal sealed class MapDraft
     {
         var index = _objects.FindIndex(placed => placed.Uid == uid);
         _objects[index] = _objects[index] with { Position = position };
+    }
+
+    public void SetObjectEvents(string uid, IReadOnlyList<MapEvent> events)
+    {
+        var index = _objects.FindIndex(placed => placed.Uid == uid);
+        _objects[index] = _objects[index] with { Events = events };
     }
 
     /// <summary>Replaces everything on the map at once: its size, tiles, objects and cell events, as a resize does.</summary>

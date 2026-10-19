@@ -375,10 +375,18 @@ The developer still edits maps in the legacy MapEditor (ADR 0005), so render dat
   - **Tests:** `MapIds_FromName_TakenId_AppendsNumber`, plus opening and saving a new map.
   - **Done, with deviations:** a "New map..." dialog (`NewMapWindow`, `NewMapViewModel`) starts at the legacy "New Map", 30 x 17, and shows the id the name gives. The map has no tiles, objects or random battles yet, and counts as unsaved until saved, even after undoing every edit (`EditHistory.ForgetSavedState`). Ids compare without case, since they are file names; a name with no letters or digits gives `map`. Number parsing for both map dialogs moved to `Maps/Settings/TypedCounts`. Follow-up: "New map..." and "Map settings..." stay enabled when the content is broken and then do nothing (click handlers, not commands).
 
-- [ ] **11i. Object events** (Editor, about 300 lines)
-  - **Goal:** clicking a placed object in event mode opens its events: activation, prompt, once, "only while the object is", and steps (dialogue, give item, swap object, warp) with add, remove and reorder; ids stay stable. Map markers: yellow for interact, cyan for touch (legacy).
-  - **New types:** `Events/EventListViewModel`, `Events/EventStepViewModel` (one step's fields and its one-line label, legacy `Describe`), `Maps/Editing/EventIds` (`string Next(PlacedObject placed)`: `{uid}_{n}`, n one above the highest index on the object), `SetObjectEventsEdit`.
-  - **Tests:** `EventIds_Next_AfterDeletingFirst_DoesNotReuseItsId`, `EventIds_Next_ReorderedEvents_KeepTheirIds`, `EventStepViewModel_Label_Warp_NamesMapAndCell`, `SetObjectEventsEdit_Revert_RestoresPreviousEvents`. Save-time checks (unknown items, warps outside maps) come from `ContentWriter`.
+- **11i. Object events** (Editor): split in two (developer, after 11h; the legacy event window alone is about 600 lines).
+  - **Goal:** clicking a placed object in event mode opens its events: activation, prompt, once, "only while the object is", and steps (dialogue, give item, swap object, warp) with add, remove and reorder; ids stay stable. Map markers: yellow for interact, cyan for touch (legacy). Save-time checks (unknown items, warps outside maps) come from `ContentWriter`.
+
+- [x] **11i-1. Events mode and the event dialog, with dialogue steps** (Editor, about 400 lines)
+  - **Goal:** an Events tab; clicking an object opens its events (activation, prompt, once, only while the object is; add, remove, reorder events and steps); dialogue steps only (lines, optional speaker and portrait); map markers.
+  - **New types:** `Events/EventListViewModel`, `Events/EventStepViewModel` (one step's fields and its one-line label, legacy `Describe`), `Maps/Editing/EventIds` (`{uid}_{n}`, n one above the highest index on the object), `SetObjectEventsEdit`.
+  - **Tests:** `EventIds_Next_AfterDeletingFirst_DoesNotReuseItsId`, `EventIds_Next_ReorderedEvents_KeepTheirIds`, `SetObjectEventsEdit_Revert_RestoresPreviousEvents`, plus the list's add, remove and reorder.
+  - **Done, with deviations:** more types than planned: `EventViewModel` (one event), `EventEditingViewModel` (shell-owned like painting and placing: picks the object under a click, applies the dialog as one undo step, none when nothing changed), `MapEventComparison` (records compare lists by reference), `ListOrder` (Up, Down, Remove) and the `ObjectEventsWindow` dialog. `EventIds.Next` takes the uid and the ids used, counting the ones the object had when the dialog opened, so an event removed and re-added in one sitting doesn't reuse its id. New events start as legacy's (pressed, prompt "Check"). Steps of the other kinds keep their step unchanged and show their label, so the warp label test came here. Markers show in every mode. Follow-up for 11j: pick the cell-event id scheme so it can't collide with `{uid}_{n}`.
+
+- [ ] **11i-2. Give item, swap object and warp steps** (Editor, about 300 lines)
+  - **Goal:** the other three step types with their fields (item and quantity; object; map and cell) and labels.
+  - **Tests:** `EventStepViewModel_Label_Warp_NamesMapAndCell`, plus each type's round trip from step to fields and back.
 
 - [ ] **11j. Event presets and cell events** (Editor, about 250 lines)
   - **Goal:** presets Chest, Door, Door you open and Sign fill an object's events (with the legacy guess of the "opened" object); clicking a cell in event mode adds or edits its touch event (warp or dialogue); right click removes it.

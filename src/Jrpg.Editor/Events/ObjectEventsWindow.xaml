@@ -1,0 +1,86 @@
+<Window x:Class="Jrpg.Editor.Events.ObjectEventsWindow"
+        x:ClassModifier="internal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding Title}"
+        Width="820"
+        Height="560"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+  <Window.Resources>
+    <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
+  </Window.Resources>
+  <DockPanel Margin="12">
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+      <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked" />
+      <Button Content="Cancel" Width="80" Margin="8,0,0,0" IsCancel="True" />
+    </StackPanel>
+
+    <!-- The object's events, in the order they're tried. -->
+    <DockPanel DockPanel.Dock="Left" Width="300">
+      <TextBlock DockPanel.Dock="Top" Text="Events" FontWeight="Bold" />
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
+        <Button Content="Add" Width="60" Command="{Binding AddEventCommand}" />
+        <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding RemoveEventCommand}" />
+        <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveEventUpCommand}" />
+        <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveEventDownCommand}" />
+      </StackPanel>
+      <ListBox ItemsSource="{Binding Events}" SelectedItem="{Binding SelectedEvent}" DisplayMemberPath="Label" />
+    </DockPanel>
+
+    <!-- The chosen event: when it runs, then its steps. -->
+    <DockPanel Margin="12,0,0,0" DataContext="{Binding SelectedEvent}">
+      <StackPanel DockPanel.Dock="Top">
+        <TextBlock Text="{Binding Id, StringFormat=Event id: {0}}" Foreground="Gray" />
+        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+          <TextBlock Text="Starts when the player" Width="160" VerticalAlignment="Center" />
+          <ComboBox Width="120"
+                    ItemsSource="{Binding DataContext.Activations, RelativeSource={RelativeSource AncestorType=Window}}"
+                    SelectedItem="{Binding Activation}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Prompt (for interact)" Width="160" VerticalAlignment="Center" />
+          <TextBox Width="160" Text="{Binding Prompt, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Only while the object is" Width="160" VerticalAlignment="Center" />
+          <ComboBox Width="160"
+                    ItemsSource="{Binding DataContext.OnlyWhenChoices, RelativeSource={RelativeSource AncestorType=Window}}"
+                    SelectedItem="{Binding OnlyWhenObjectId}"
+                    ToolTip="Empty: always" />
+        </StackPanel>
+        <CheckBox Content="Only once per playthrough (remembered in saves)" IsChecked="{Binding IsOnce}" Margin="0,6,0,8" />
+        <TextBlock Text="Steps, run in order" FontWeight="Bold" />
+      </StackPanel>
+
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
+        <Button Content="Add dialogue" Width="90" Command="{Binding AddDialogueCommand}" />
+        <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding RemoveStepCommand}" />
+        <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepUpCommand}" />
+        <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepDownCommand}" />
+      </StackPanel>
+
+      <!-- The chosen step's fields. -->
+      <StackPanel DockPanel.Dock="Bottom" DataContext="{Binding SelectedStep}" Margin="0,8,0,0">
+        <StackPanel Visibility="{Binding IsDialogue, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
+          <TextBlock Text="Lines, one message box each" />
+          <TextBox Height="90"
+                   AcceptsReturn="True"
+                   TextWrapping="Wrap"
+                   VerticalScrollBarVisibility="Auto"
+                   Text="{Binding LinesText, UpdateSourceTrigger=PropertyChanged}" />
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Speaker (optional)" Width="160" VerticalAlignment="Center" />
+            <TextBox Width="160" Text="{Binding Speaker, UpdateSourceTrigger=PropertyChanged}" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Portrait file (optional)" Width="160" VerticalAlignment="Center" />
+            <TextBox Width="160" Text="{Binding PortraitFile, UpdateSourceTrigger=PropertyChanged}" />
+          </StackPanel>
+        </StackPanel>
+      </StackPanel>
+
+      <ListBox ItemsSource="{Binding Steps}" SelectedItem="{Binding SelectedStep}" DisplayMemberPath="Label" />
+    </DockPanel>
+  </DockPanel>
+</Window>

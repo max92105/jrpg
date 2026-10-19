@@ -6,6 +6,7 @@ using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
 using Jrpg.Data.Content;
+using Jrpg.Editor.Events;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
 using Jrpg.Editor.Maps.Settings;
@@ -16,8 +17,9 @@ namespace Jrpg.Editor.Shell;
 
 /// <summary>
 /// The editor window's state: the loaded content, the maps to choose from and the open one, which it opens, saves and
-/// closes; painting tiles and placing objects on it are <see cref="Painting"/> and <see cref="Placing"/>. Content that
-/// can't load is shown with the loader's message instead of crashing, so a broken file can be found and fixed.
+/// closes; painting tiles, placing objects and editing their events are <see cref="Painting"/>, <see cref="Placing"/>
+/// and <see cref="EventEditing"/>. Content that can't load is shown with the loader's message instead of crashing, so a
+/// broken file can be found and fixed.
 /// </summary>
 internal sealed partial class MainViewModel : ObservableObject
 {
@@ -48,6 +50,7 @@ internal sealed partial class MainViewModel : ObservableObject
             MapIds = SortedMapIds(Catalog);
             Painting = new TilePaintingViewModel(Catalog, Layer);
             Placing = new ObjectPlacingViewModel(Catalog.Objects, Layer);
+            EventEditing = new EventEditingViewModel(Catalog.Objects);
             if (MapIds.Count > 0)
             {
                 TryOpenMap(MapIds[0]);
@@ -75,6 +78,9 @@ internal sealed partial class MainViewModel : ObservableObject
 
     /// <summary>Null when the content or its art didn't load.</summary>
     public ObjectPlacingViewModel? Placing { get; }
+
+    /// <summary>Null when the content or its art didn't load.</summary>
+    public EventEditingViewModel? EventEditing { get; }
 
     [ObservableProperty]
     public partial MapViewModel? CurrentMap { get; private set; }
@@ -212,6 +218,7 @@ internal sealed partial class MainViewModel : ObservableObject
     {
         Painting?.OpenMap = value;
         Placing?.OpenMap = value;
+        EventEditing?.OpenMap = value;
     }
 
     private static IReadOnlyList<string> SortedMapIds(ContentCatalog catalog) => [.. catalog.Maps.Keys.Order(StringComparer.Ordinal)];

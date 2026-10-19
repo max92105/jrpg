@@ -159,7 +159,12 @@ internal sealed partial class MainWindow
         // Selection changes inside the tabs' lists bubble up here too.
         if (e.OriginalSource == EditingTabs)
         {
-            _viewModel.Mode = ObjectsTab.IsSelected ? EditingMode.Objects : EditingMode.Tiles;
+            _viewModel.Mode = EditingTabs.SelectedItem switch
+            {
+                var tab when tab == ObjectsTab => EditingMode.Objects,
+                var tab when tab == EventsTab => EditingMode.Events,
+                _ => EditingMode.Tiles,
+            };
         }
     }
 

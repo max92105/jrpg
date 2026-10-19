@@ -4,6 +4,7 @@ using Jrpg.Core.Geometry;
 using Jrpg.Data.Content;
 using Jrpg.Game.Flow;
 using Jrpg.Game.Input;
+using Jrpg.Game.Tests.Ui;
 
 namespace Jrpg.Game.Tests.Flow;
 
@@ -14,7 +15,7 @@ public sealed class GameFlowTests
     [Fact]
     public void Constructor_RepositoryContent_StartsANewGameOnTheStartMap()
     {
-        var flow = new GameFlow(_catalog);
+        var flow = new GameFlow(_catalog, RepositoryScreenText.Text);
 
         Assert.Equal("start", flow.Session.Exploration.Location.MapId);
     }
@@ -22,7 +23,7 @@ public sealed class GameFlowTests
     [Fact]
     public void Update_TwoDeltas_AddsBothToPlayTime()
     {
-        var flow = new GameFlow(_catalog);
+        var flow = new GameFlow(_catalog, RepositoryScreenText.Text);
 
         flow.Update(TimeSpan.FromSeconds(0.5), default);
         flow.Update(TimeSpan.FromSeconds(0.25), default);
@@ -33,7 +34,7 @@ public sealed class GameFlowTests
     [Fact]
     public void Update_HoldingRight_MovesPlayerRight()
     {
-        var flow = new GameFlow(_catalog);
+        var flow = new GameFlow(_catalog, RepositoryScreenText.Text);
         var start = flow.Session.Exploration.PlayerPosition;
         var holdingRight = new InputFrame(MoveIntent.FromAxes(1, 0), ButtonSet.Empty.With(GameButton.Right), ButtonSet.Empty);
 

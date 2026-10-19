@@ -256,7 +256,8 @@ Sizes are estimates of hand-written code plus tests. A slice estimated past ~300
     - [ ] The door opens and stays open after walking away.
     - [ ] Walking into the open door warps to `interior_1` and back.
 
-- [ ] **M3b. Legacy theme, message box and found items** (Core + Game, about 300 lines)
+- [x] **M3b. Legacy theme, message box and found items** (Core + Game, about 300 lines)
+  - **Done, with deviations (developer, 2026-10-19):** the box copies the legacy in-game `DialogueBox` (what legacy showed for found items), not the menu's `DialogStyle`: `#AA000000` fill, white border, rounded corners, doubled to 1200 x 240 px, 40 px from the bottom, radius 20, border 4, text 32 px. `GradientStrip` and `UiTextures` move to G1 (no user here); `PanelView` bakes its own rounded texture from a `PanelStyle`. `EventPresenter` now draws the message and the fade. Tests are named `EventPresenter_Update_ConfirmOnFoundItem_ContinuesEvent`; extra: `Update_FirstUpdateOnFoundItem_WaitsEvenWithConfirmPressed`, `ExplorationScene_Update_ConfirmClosingFoundItem_DoesNotInteractAgain`, `FoundItemText_Of_AllLost_OnlyMentionsLostCopies`, `PanelViewTests` (4). Open: the all-lost message doesn't name the item (decision 55 wording). Follow-up: `FontLibraryTests.Load_FileThatIsNotAFont_ThrowsNamingTheFile` sometimes crashes the test host (native read past a 23-byte non-font); `FontLibrary` should reject too-short files first. The hand checks below are still to do.
   - **Goal:** opening the chest shows "Obtained {item}!" in a message box styled like legacy (`DialogStyle`). Confirm closes it, and the chest draws opened.
   - **Core:** `ItemReceipt` public; `ExplorationState.CurrentItemReceipt`.
   - **New types (Game):**
@@ -372,7 +373,7 @@ Sizes are estimates of hand-written code plus tests. A slice estimated past ~300
     - `Flow/MenuTransitions`: pushes and pops the menu.
     - `SessionTransitions` handles `TitleRequested`: ends the session, `ReplaceAll` with the title, behind the fade.
     - `Ui/TabStrip` (pure): the selected tab; `Previous`, `Next`, wraps.
-    - `Ui/UiTextures` gains the nav-tab arrow (legacy `Shape.NavTab`, masked through `CanopyMask.Build`) and the selection gradients.
+    - `Ui/UiTextures` gains the nav-tab arrow (legacy `Shape.NavTab`, masked through `CanopyMask.Build`) and the selection gradients. Moved here from M3b: `UiTextures` itself and the pure `Ui/GradientStrip`, with `GradientStrip_Colors_TwoStops_InterpolatesMidpoint`.
     - `Menus/IMenuPage`: one page of the game menu. Title message id, `SceneRequest? Update(InputFrame input)`, `Draw`, and whether Cancel leaves it. Implemented by every page in this plan.
     - `Menus/GameMenuScene`: the tabs and the open page.
     - `Menus/SystemPage`: the System entries.

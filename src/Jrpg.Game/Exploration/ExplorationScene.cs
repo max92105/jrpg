@@ -6,6 +6,7 @@ using Jrpg.Data.Art;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Scenes;
+using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -37,13 +38,13 @@ internal sealed class ExplorationScene : IScene
     private MapDefinition _map;
     private MapView _view;
 
-    public ExplorationScene(ExplorationState exploration, ContentCatalog catalog, MapArt art)
+    public ExplorationScene(ExplorationState exploration, ContentCatalog catalog, MapArt art, ScreenText text)
     {
         _exploration = exploration;
         _currentDefinitionOf = exploration.CurrentDefinitionOf;
         _art = art;
         _fieldSpriteFile = catalog.NewGame.FieldSpriteFile;
-        _presenter = new EventPresenter(exploration);
+        _presenter = new EventPresenter(exploration, text);
         EnterCurrentMap();
     }
 
@@ -53,18 +54,20 @@ internal sealed class ExplorationScene : IScene
     /// </summary>
     public void Update(TimeSpan delta, InputFrame input)
     {
-        _presenter.Update(delta);
+        // Sampled before the presenter runs: the Confirm that closes the last message mustn't also interact again.
+        var wasBusy = _presenter.IsBusy;
+        _presenter.Update(delta, input);
         if (!ReferenceEquals(_exploration.CurrentMap, _map))
         {
             EnterCurrentMap();
         }
 
-        if (!_presenter.IsBusy && input.IsPressed(GameButton.Confirm))
+        if (!wasBusy && input.IsPressed(GameButton.Confirm))
         {
             _exploration.TryInteract();
         }
 
-        if (_presenter.IsBusy)
+        if (wasBusy || _presenter.IsBusy)
         {
             _walkAnimation.Stand();
             return;
@@ -76,11 +79,7 @@ internal sealed class ExplorationScene : IScene
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
         DrawMap(batch, textures);
-        var blackness = _presenter.Blackness;
-        if (blackness > 0)
-        {
-            batch.Draw(textures.Pixel, new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height), Color.Black * blackness);
-        }
+        _presenter.Draw(batch, textures);
     }
 
     // The one way onto a map, at the start and after each warp: the camera jumps rather than gliding across the map.

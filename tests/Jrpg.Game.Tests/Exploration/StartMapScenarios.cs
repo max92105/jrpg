@@ -22,6 +22,15 @@ internal static class StartMapScenarios
     /// <summary>Just below the closed door, whose interact event swaps it open, facing it.</summary>
     public static ContentCatalog BelowClosedDoor { get; } = StartingAt(new Point2D(5.86, 14.6), Facing.Up);
 
+    /// <summary>Just below the chest, whose interact event gives a potion then swaps it open, facing it.</summary>
+    public static ContentCatalog BelowChest { get; } = StartingAt(new Point2D(19.5, 21.6), Facing.Up);
+
+    /// <summary>
+    /// Below the chest as in <see cref="BelowChest"/>, but the chest only gives its potion, every time, and never opens:
+    /// what a well or a shop sign would do.
+    /// </summary>
+    public static ContentCatalog BelowRepeatableChest { get; } = WithRepeatableChest(BelowChest);
+
     public static InputFrame HoldingLeft { get; } =
         new(MoveIntent.FromAxes(-1, 0), ButtonSet.Empty.With(GameButton.Left), ButtonSet.Empty);
 
@@ -34,4 +43,19 @@ internal static class StartMapScenarios
     {
         NewGame = _repositoryContent.NewGame with { StartLocation = new MapLocation("start", position, facing) },
     };
+
+    private static ContentCatalog WithRepeatableChest(ContentCatalog catalog)
+    {
+        var start = catalog.Maps["start"];
+        var objects = start.Layout.Objects
+            .Select(placed => placed.ObjectId == "chest"
+                ? placed with { Events = [placed.Events[0] with { IsOnce = false, Steps = [placed.Events[0].Steps[0]] }] }
+                : placed)
+            .ToList();
+        var maps = new Dictionary<string, MapDefinition>(catalog.Maps)
+        {
+            ["start"] = new MapDefinition(start.Layout with { Objects = objects }, start.Settings),
+        };
+        return catalog with { Maps = maps };
+    }
 }

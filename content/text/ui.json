@@ -1,3 +1,6 @@
 {
-  "startup_failed": "The game can't start: {reason}"
+  "startup_failed": "The game can't start: {reason}",
+  "item_found": "Obtained {item}!",
+  "item_found_many": "Obtained {item} x{count}!",
+  "item_found_lost": "{lost} didn't fit and were left behind."
 }

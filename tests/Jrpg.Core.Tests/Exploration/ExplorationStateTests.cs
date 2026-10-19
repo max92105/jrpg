@@ -86,6 +86,27 @@ public sealed class ExplorationStateTests
     }
 
     [Fact]
+    public void CurrentItemReceipt_OnGiveItemStep_ReportsAddedCopies()
+    {
+        var exploration = StartAt(new Point2D(2.5, 1.5), Facing.Up);
+
+        exploration.TryInteract();
+
+        Assert.Equal(new ItemReceipt(_potion, Added: 1, Lost: 0), exploration.CurrentItemReceipt);
+    }
+
+    [Fact]
+    public void CurrentItemReceipt_AfterContinue_IsNull()
+    {
+        var exploration = StartAt(new Point2D(2.5, 1.5), Facing.Up);
+        exploration.TryInteract();
+
+        exploration.ContinueEvent();
+
+        Assert.Null(exploration.CurrentItemReceipt);
+    }
+
+    [Fact]
     public void CurrentDefinitionOf_AfterSwap_ReturnsSwappedDefinition()
     {
         var exploration = StartAt(new Point2D(0.5, 1.5), Facing.Up);

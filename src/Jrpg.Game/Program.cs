@@ -43,7 +43,7 @@ static IScene FirstScene(string contentRoot, string artRoot, UiMessages messages
         var artProblems = ArtReferenceCheck.FindProblems(catalog, artRoot);
         if (artProblems.Count == 0)
         {
-            return new GameFlow(catalog);
+            return new GameFlow(catalog, new ScreenText(messages, fonts));
         }
 
         reason = string.Join(Environment.NewLine, artProblems);

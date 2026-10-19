@@ -4,6 +4,7 @@ using Jrpg.Game.Exploration;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Scenes;
+using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework.Graphics;
 
 namespace Jrpg.Game.Flow;
@@ -16,11 +17,11 @@ internal sealed class GameFlow : IScene
 {
     private readonly SceneStack _scenes = new();
 
-    public GameFlow(ContentCatalog catalog)
+    public GameFlow(ContentCatalog catalog, ScreenText text)
     {
         var playedCatalog = EncounterFreeContent.Of(catalog);
         var art = new MapArt(playedCatalog, MapView.CellPixels);
-        Session = new SessionTransitions(playedCatalog, _scenes, art).StartNewGame();
+        Session = new SessionTransitions(playedCatalog, _scenes, art, text).StartNewGame();
     }
 
     public GameSession Session { get; }

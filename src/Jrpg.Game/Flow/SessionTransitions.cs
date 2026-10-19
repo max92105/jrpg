@@ -5,11 +5,12 @@ using Jrpg.Core.Session;
 using Jrpg.Game.Exploration;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Scenes;
+using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Flow;
 
 /// <summary>Starting and leaving playthroughs (ADR 0008). Part 3a only starts a new game; load, title and quit come in 3b.</summary>
-internal sealed class SessionTransitions(ContentCatalog catalog, SceneStack scenes, MapArt art)
+internal sealed class SessionTransitions(ContentCatalog catalog, SceneStack scenes, MapArt art, ScreenText text)
 {
     /// <summary>
     /// Starts a new game on its own seed, taken from the clock and written to the debug output so a run can be replayed
@@ -20,7 +21,7 @@ internal sealed class SessionTransitions(ContentCatalog catalog, SceneStack scen
         var seed = Environment.TickCount;
         Debug.WriteLine($"New game seed: {seed}");
         var session = GameSession.StartNew(catalog, new SeededRandom(seed));
-        scenes.Push(new ExplorationScene(session.Exploration, catalog, art));
+        scenes.Push(new ExplorationScene(session.Exploration, catalog, art, text));
         return session;
     }
 }

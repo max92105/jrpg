@@ -48,6 +48,9 @@ public sealed class ExplorationState
 
     public bool IsEventRunning => _run is not null;
 
+    /// <summary>What the current give-item step really added and lost, for its message; null on any other step.</summary>
+    public ItemReceipt? CurrentItemReceipt => _run?.CurrentReceipt;
+
     /// <summary>
     /// What a placed object on the current map is now, after any swap (an opened chest or door), so the Game draws it
     /// as the player left it.

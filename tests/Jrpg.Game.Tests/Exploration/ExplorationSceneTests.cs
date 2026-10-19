@@ -3,6 +3,7 @@ using Jrpg.Core.Exploration;
 using Jrpg.Game.Exploration;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
+using Jrpg.Game.Tests.Ui;
 
 namespace Jrpg.Game.Tests.Exploration;
 
@@ -42,9 +43,22 @@ public sealed class ExplorationSceneTests
         Assert.False(exploration.IsEventRunning);
     }
 
+    [Fact]
+    public void Update_ConfirmClosingFoundItem_DoesNotInteractAgain()
+    {
+        var (exploration, scene) = Start(StartMapScenarios.BelowRepeatableChest);
+        scene.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+        scene.Update(StartMapScenarios.OneUpdate, default);
+        Assert.True(exploration.IsEventRunning);
+
+        scene.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+
+        Assert.False(exploration.IsEventRunning);
+    }
+
     private static (ExplorationState Exploration, ExplorationScene Scene) Start(ContentCatalog catalog)
     {
         var exploration = StartMapScenarios.StartExploring(catalog);
-        return (exploration, new ExplorationScene(exploration, catalog, new MapArt(catalog, MapView.CellPixels)));
+        return (exploration, new ExplorationScene(exploration, catalog, new MapArt(catalog, MapView.CellPixels), RepositoryScreenText.Text));
     }
 }

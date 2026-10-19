@@ -26,7 +26,8 @@ internal sealed class ExplorationScene : IScene
     private const double StandingCameraShare = 0.1;
 
     private readonly ExplorationState _exploration;
-    private readonly IReadOnlyDictionary<string, ObjectDefinition> _objects;
+    // Built once: a method group converted on every call would allocate a delegate per frame.
+    private readonly Func<PlacedObject, ObjectDefinition> _currentDefinitionOf;
     private readonly MapArt _art;
     private readonly string _fieldSpriteFile;
     private readonly EventPresenter _presenter;
@@ -39,20 +40,28 @@ internal sealed class ExplorationScene : IScene
     public ExplorationScene(ExplorationState exploration, ContentCatalog catalog, MapArt art)
     {
         _exploration = exploration;
-        _objects = catalog.Objects;
+        _currentDefinitionOf = exploration.CurrentDefinitionOf;
         _art = art;
         _fieldSpriteFile = catalog.NewGame.FieldSpriteFile;
         _presenter = new EventPresenter(exploration);
         EnterCurrentMap();
     }
 
-    /// <summary>Shows the running event's step; walks only once it and its fade are over.</summary>
+    /// <summary>
+    /// Shows the running event's step; interacts and walks only once it and its fade are over. An interaction that
+    /// starts an event waits for it like any other.
+    /// </summary>
     public void Update(TimeSpan delta, InputFrame input)
     {
         _presenter.Update(delta);
         if (!ReferenceEquals(_exploration.CurrentMap, _map))
         {
             EnterCurrentMap();
+        }
+
+        if (!_presenter.IsBusy && input.IsPressed(GameButton.Confirm))
+        {
+            _exploration.TryInteract();
         }
 
         if (_presenter.IsBusy)
@@ -79,9 +88,9 @@ internal sealed class ExplorationScene : IScene
     private void EnterCurrentMap()
     {
         _map = _exploration.CurrentMap;
-        _view = new MapView(_map.Layout, _objects, _art.Atlas);
+        _view = new MapView(_map.Layout, _currentDefinitionOf, _art.Atlas);
         _camera.SnapTo(_exploration.PlayerPosition, _map.Layout);
-        _drawList.Rebuild(_map.Layout, _objects, _exploration.PlayerPosition);
+        _drawList.Rebuild(_map.Layout, _currentDefinitionOf, _exploration.PlayerPosition);
     }
 
     private void WalkAndFollow(TimeSpan delta, InputFrame input)
@@ -99,7 +108,7 @@ internal sealed class ExplorationScene : IScene
 
         var position = _exploration.PlayerPosition;
         _camera.Follow(position, _map.Layout, delta, isMoving ? WalkingCameraShare : StandingCameraShare);
-        _drawList.Rebuild(_map.Layout, _objects, position);
+        _drawList.Rebuild(_map.Layout, _currentDefinitionOf, position);
     }
 
     private void DrawMap(SpriteBatch batch, TextureLibrary textures)
@@ -119,7 +128,7 @@ internal sealed class ExplorationScene : IScene
                     break;
                 case DrawableKind.Canopy:
                     var placed = _map.Layout.Objects[drawable.Index];
-                    _view.DrawCanopy(batch, _art.Canopies.CanopyOf(placed.ObjectId, textures), placed, origin);
+                    _view.DrawCanopy(batch, _art.Canopies.CanopyOf(_currentDefinitionOf(placed).Id, textures), placed, origin);
                     break;
                 case DrawableKind.Player:
                     DrawPlayer(batch, textures, origin);

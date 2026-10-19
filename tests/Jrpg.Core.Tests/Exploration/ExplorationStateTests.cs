@@ -86,6 +86,28 @@ public sealed class ExplorationStateTests
     }
 
     [Fact]
+    public void CurrentDefinitionOf_AfterSwap_ReturnsSwappedDefinition()
+    {
+        var exploration = StartAt(new Point2D(0.5, 1.5), Facing.Up);
+        var lever = exploration.CurrentMap.Layout.Objects.Single(placed => placed.ObjectId == "lever");
+
+        exploration.TryInteract();
+
+        Assert.Equal(_leverPulled, exploration.CurrentDefinitionOf(lever));
+    }
+
+    [Fact]
+    public void CurrentDefinitionOf_NeverSwapped_ReturnsPlacedDefinition()
+    {
+        var exploration = StartAt(new Point2D(0.5, 1.5), Facing.Up);
+        var lever = exploration.CurrentMap.Layout.Objects.Single(placed => placed.ObjectId == "lever");
+
+        var definition = exploration.CurrentDefinitionOf(lever);
+
+        Assert.Equal(_lever, definition);
+    }
+
+    [Fact]
     public void Walk_EnterCellWithTouchEvent_StartsIt()
     {
         var exploration = StartAt(new Point2D(0.5, 3.5), Facing.Right);

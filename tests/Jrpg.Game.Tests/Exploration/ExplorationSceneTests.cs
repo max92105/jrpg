@@ -1,27 +1,50 @@
+using Jrpg.Core.Content;
+using Jrpg.Core.Exploration;
 using Jrpg.Game.Exploration;
+using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
 
 namespace Jrpg.Game.Tests.Exploration;
 
 public sealed class ExplorationSceneTests
 {
+    private static readonly InputFrame _confirmPressed =
+        new(MoveIntent.None, ButtonSet.Empty.With(GameButton.Confirm), ButtonSet.Empty.With(GameButton.Confirm));
+
     [Fact]
     public void Update_DuringWarpFadeIn_DoesNotWalk()
     {
-        var exploration = ForestWarpStart.StartExploring();
-        var scene = new ExplorationScene(exploration, ForestWarpStart.Catalog, new MapArt(ForestWarpStart.Catalog, MapView.CellPixels));
+        var (exploration, scene) = Start(StartMapScenarios.NextToForestWarp);
         for (var update = 0; update < 120 && exploration.CurrentMap.Id != "forest"; update++)
         {
-            scene.Update(ForestWarpStart.OneUpdate, ForestWarpStart.HoldingLeft);
+            scene.Update(StartMapScenarios.OneUpdate, StartMapScenarios.HoldingLeft);
         }
 
         Assert.Equal("forest", exploration.CurrentMap.Id);
         var arrival = exploration.PlayerPosition;
 
         // The rest of the hold and most of the 0.25 s fade-in.
-        scene.Update(TimeSpan.FromSeconds(0.1), ForestWarpStart.HoldingLeft);
-        scene.Update(TimeSpan.FromSeconds(0.1), ForestWarpStart.HoldingLeft);
+        scene.Update(TimeSpan.FromSeconds(0.1), StartMapScenarios.HoldingLeft);
+        scene.Update(TimeSpan.FromSeconds(0.1), StartMapScenarios.HoldingLeft);
 
         Assert.Equal(arrival, exploration.PlayerPosition);
+    }
+
+    [Fact]
+    public void Update_ConfirmFacingDoor_OpensIt()
+    {
+        var (exploration, scene) = Start(StartMapScenarios.BelowClosedDoor);
+        var door = exploration.CurrentMap.Layout.Objects.Single(placed => placed.ObjectId == "door_close");
+
+        scene.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+
+        Assert.Equal("door_open", exploration.CurrentDefinitionOf(door).Id);
+        Assert.False(exploration.IsEventRunning);
+    }
+
+    private static (ExplorationState Exploration, ExplorationScene Scene) Start(ContentCatalog catalog)
+    {
+        var exploration = StartMapScenarios.StartExploring(catalog);
+        return (exploration, new ExplorationScene(exploration, catalog, new MapArt(catalog, MapView.CellPixels)));
     }
 }

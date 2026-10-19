@@ -19,9 +19,9 @@ internal sealed class MapDrawList
     public IReadOnlyList<Drawable> Drawables => _drawables;
 
     /// <param name="layout">The map whose layers and placed objects are drawn.</param>
-    /// <param name="objects">Object definitions by id, for each placed object's height.</param>
+    /// <param name="currentDefinitionOf">What each placed object is now, after any swap, for its height and canopy.</param>
     /// <param name="playerPosition">The player's position, in cells.</param>
-    public void Rebuild(MapLayout layout, IReadOnlyDictionary<string, ObjectDefinition> objects, Point2D playerPosition)
+    public void Rebuild(MapLayout layout, Func<PlacedObject, ObjectDefinition> currentDefinitionOf, Point2D playerPosition)
     {
         _drawables.Clear();
         for (var index = 0; index < layout.Layers.Count; index++)
@@ -33,7 +33,7 @@ internal sealed class MapDrawList
         {
             // An object sorts as a whole by its bottom edge, so overlapping objects never interleave their tiles.
             var placed = layout.Objects[index];
-            var definition = objects[placed.ObjectId];
+            var definition = currentDefinitionOf(placed);
             var baseY = placed.Position.Y + definition.Height;
             _drawables.Add(new Drawable(DrawOrderKey.ForSprite(placed.Z, baseY, index), DrawableKind.Object, index));
             // An object already on or above the canopy layer covers the player whole; a canopy would only tie with its body.

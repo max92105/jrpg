@@ -38,7 +38,7 @@ public sealed class MapDrawListTests
         // The second tree is placed first but stands lower on screen, so it's drawn over the first.
         var layout = Layout(layers: [], Tree(y: 6, z: 1), Tree(y: 2, z: 1));
 
-        _drawList.Rebuild(layout, _objects, new Point2D(0, 20));
+        _drawList.Rebuild(layout, PlacedDefinitionOf, new Point2D(0, 20));
 
         Assert.Equal(
             [(DrawableKind.Object, 1), (DrawableKind.Object, 0), (DrawableKind.Player, 0)],
@@ -51,7 +51,7 @@ public sealed class MapDrawListTests
         // The player's feet are at 7.5: in front of the first tree's base (2 + 4), behind the second's (6 + 4).
         var layout = Layout(layers: [], Tree(y: 2, z: MapLayers.PlayerZ), Tree(y: 6, z: MapLayers.PlayerZ));
 
-        _drawList.Rebuild(layout, _objects, new Point2D(3, 7));
+        _drawList.Rebuild(layout, PlacedDefinitionOf, new Point2D(3, 7));
 
         Assert.Equal(
             [(DrawableKind.Object, 0), (DrawableKind.Player, 0), (DrawableKind.Object, 1)],
@@ -64,7 +64,7 @@ public sealed class MapDrawListTests
         // The tree's base is -0.5 + 4 = 3.5, exactly the player's feet; the tie must not depend on the unstable sort.
         var layout = Layout(layers: [], Tree(y: -0.5, z: MapLayers.PlayerZ));
 
-        _drawList.Rebuild(layout, _objects, new Point2D(0, 3));
+        _drawList.Rebuild(layout, PlacedDefinitionOf, new Point2D(0, 3));
 
         Assert.Equal(
             [(DrawableKind.Object, 0), (DrawableKind.Player, 0)],
@@ -77,7 +77,7 @@ public sealed class MapDrawListTests
         // The legacy start map: ground at -5 and -4, objects at -3, so the player stands over them; a roof layer at 5 covers all.
         var layout = Layout(layers: [-5, -4, 5], Tree(y: 0, z: -3));
 
-        _drawList.Rebuild(layout, _objects, new Point2D(0, 0));
+        _drawList.Rebuild(layout, PlacedDefinitionOf, new Point2D(0, 0));
 
         Assert.Equal(
             [(DrawableKind.Layer, 0), (DrawableKind.Layer, 1), (DrawableKind.Object, 0), (DrawableKind.Player, 0), (DrawableKind.Layer, 2)],
@@ -90,7 +90,7 @@ public sealed class MapDrawListTests
         // The legacy tree: its body at -3 stays under the player, its canopy goes over (MapLayers.CanopyZOf).
         var layout = Layout(layers: [-5], Tree(y: 0, z: -3) with { ObjectId = "canopy_tree" });
 
-        _drawList.Rebuild(layout, _objects, new Point2D(1, 1));
+        _drawList.Rebuild(layout, PlacedDefinitionOf, new Point2D(1, 1));
 
         Assert.Equal(
             [(DrawableKind.Layer, 0), (DrawableKind.Object, 0), (DrawableKind.Player, 0), (DrawableKind.Canopy, 0)],
@@ -102,7 +102,7 @@ public sealed class MapDrawListTests
     {
         var layout = Layout(layers: [], Tree(y: 0, z: MapLayers.AbovePlayerZ) with { ObjectId = "canopy_tree" });
 
-        _drawList.Rebuild(layout, _objects, new Point2D(1, 1));
+        _drawList.Rebuild(layout, PlacedDefinitionOf, new Point2D(1, 1));
 
         Assert.DoesNotContain(_drawList.Drawables, drawable => drawable.Kind == DrawableKind.Canopy);
     }
@@ -112,7 +112,7 @@ public sealed class MapDrawListTests
     {
         var layout = Layout(layers: [], Tree(y: 0, z: -3));
 
-        _drawList.Rebuild(layout, _objects, new Point2D(1, 1));
+        _drawList.Rebuild(layout, PlacedDefinitionOf, new Point2D(1, 1));
 
         Assert.DoesNotContain(_drawList.Drawables, drawable => drawable.Kind == DrawableKind.Canopy);
     }
@@ -122,11 +122,27 @@ public sealed class MapDrawListTests
     {
         var layout = Layout(layers: [-5], Tree(y: 0, z: -3));
 
-        _drawList.Rebuild(layout, _objects, new Point2D(0, 0));
-        _drawList.Rebuild(layout, _objects, new Point2D(0, 1));
+        _drawList.Rebuild(layout, PlacedDefinitionOf, new Point2D(0, 0));
+        _drawList.Rebuild(layout, PlacedDefinitionOf, new Point2D(0, 1));
 
         Assert.Equal(3, _drawList.Drawables.Count);
     }
+
+    [Fact]
+    public void Rebuild_SwappedObject_UsesCurrentDefinitionHeight()
+    {
+        // Placed as a 4-cell tree (base 6, in front of the player's feet at 4.5) but now a 1-cell stump (base 3, behind).
+        var stump = _objects["tree"] with { Id = "stump", Height = 1 };
+        var layout = Layout(layers: [], Tree(y: 2, z: MapLayers.PlayerZ));
+
+        _drawList.Rebuild(layout, _ => stump, new Point2D(3, 4));
+
+        Assert.Equal(
+            [(DrawableKind.Object, 0), (DrawableKind.Player, 0)],
+            _drawList.Drawables.Select(drawable => (drawable.Kind, drawable.Index)));
+    }
+
+    private static ObjectDefinition PlacedDefinitionOf(PlacedObject placed) => _objects[placed.ObjectId];
 
     private static PlacedObject Tree(double y, int z) =>
         new() { Uid = $"tree@{y}", ObjectId = "tree", Position = new Point2D(0, y), Z = z };

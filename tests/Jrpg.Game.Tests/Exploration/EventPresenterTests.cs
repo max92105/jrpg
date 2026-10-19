@@ -8,15 +8,15 @@ public sealed class EventPresenterTests
     [Fact]
     public void Update_WarpStep_ContinuesOnlyOnceBlack()
     {
-        var exploration = ForestWarpStart.StartExploring();
+        var exploration = StartMapScenarios.StartExploring(StartMapScenarios.NextToForestWarp);
         for (var update = 0; update < 120 && !exploration.IsEventRunning; update++)
         {
-            exploration.Walk(ForestWarpStart.HoldingLeft.Move, ForestWarpStart.OneUpdate);
+            exploration.Walk(StartMapScenarios.HoldingLeft.Move, StartMapScenarios.OneUpdate);
         }
 
         Assert.IsType<WarpStep>(exploration.CurrentEventStep);
         var presenter = new EventPresenter(exploration);
-        presenter.Update(ForestWarpStart.OneUpdate);
+        presenter.Update(StartMapScenarios.OneUpdate);
         presenter.Update(TimeSpan.FromSeconds(0.2));
         Assert.Equal("start", exploration.CurrentMap.Id);
 

@@ -221,7 +221,7 @@ Sizes are estimates of hand-written code plus tests. A slice estimated past ~300
   - **Known gap until M2:** stepping on a warp cell starts its event, and the player stays frozen.
 
 - [x] **M2. Warps with a fade; random battles off** (Core + Game, about 290 lines)
-  - **Done, with deviations:** `MapArt` takes the cell size (so Rendering doesn't depend on Exploration). The two repository-content tests share a test helper, `ForestWarpStart`. Extra tests: `ScreenFade_Update_LeftoverPastHold_CarriesIntoFadeIn`, `ScreenFade_Update_Idle_StaysClear`. The scene re-enters a map when the `CurrentMap` reference changes, so a warp within the same map would ease the camera instead of snapping it (no content does this yet). **The forest has no warp back** (`forest.json` has no cell events), so the "Walk back" check can't be done until content adds one. The hand checks below are still to do.
+  - **Done, with deviations:** `MapArt` takes the cell size (so Rendering doesn't depend on Exploration). The two repository-content tests share a test helper, `ForestWarpStart` (renamed `StartMapScenarios` in M3a). Extra tests: `ScreenFade_Update_LeftoverPastHold_CarriesIntoFadeIn`, `ScreenFade_Update_Idle_StaysClear`. The scene re-enters a map when the `CurrentMap` reference changes, so a warp within the same map would ease the camera instead of snapping it (no content does this yet). **The forest has no warp back** (`forest.json` has no cell events), so the "Walk back" check can't be done until content adds one. The hand checks below are still to do.
   - **Goal:** warp cells fade to black, change the map and fade back in, with the camera snapped to the arrival point. Walking, interacting and the menu are blocked until the fade-in ends. Random battles never start (decision 79).
   - **Core:** `ExplorationState.CurrentMap`.
   - **New types (Game):**
@@ -243,7 +243,8 @@ Sizes are estimates of hand-written code plus tests. A slice estimated past ~300
     - [ ] Walk 200 steps in the forest: no battle.
     - [ ] Walk back.
 
-- [ ] **M3a. Interact and swapped objects** (Core + Game, about 150 lines)
+- [x] **M3a. Interact and swapped objects** (Core + Game, about 150 lines)
+  - **Done, with deviations:** `MapView` and `MapDrawList.Rebuild` take a `Func<PlacedObject, ObjectDefinition>` (the scene passes `CurrentDefinitionOf`, built once) instead of the definition dictionary. The Core tests use the lever fixture: `CurrentDefinitionOf_AfterSwap_ReturnsSwappedDefinition`, `CurrentDefinitionOf_NeverSwapped_ReturnsPlacedDefinition`. The M2 test helper became `StartMapScenarios`, shared by both scene tests. The hand checks below are still to do.
   - **Goal:** Confirm in front of an object starts its interact event. The closed door opens on Confirm (a swap, which doesn't wait), draws open, and warps when walked into.
   - **Core:** `ExplorationState.CurrentDefinitionOf(PlacedObject)` (forwards `ActiveMap.CurrentDefinitionOf`).
   - **Changes:**

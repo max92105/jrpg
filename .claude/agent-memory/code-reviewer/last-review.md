@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, M2 (Warps with a fade; random battles off)
-Round: 1 (verdict: Ready to commit; build 0 errors/warnings, 860 tests pass, format exit 0)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, M3a (Interact and swapped objects)
+Round: 1 (verdict: Ready to commit; build 0 warnings, 864 tests pass, format exit 0)
 
-- open (Suggestion): ScreenFade._inPhase reads as a bool; rename _timeInPhase
-- open (Suggestion): record the same-map-warp limitation (camera eases instead of snapping, same MapDefinition reference) in the M2 slice note so later slices don't rediscover it
-- follow-up: content/map-layouts/forest.json has no cellEvents, so the M2 hand check "Walk back" (and the plan goal "to the forest and back") can't be done with current content
-- follow-up: M2 checkbox and hand checks in the plan not ticked yet (DoD 5)
-- verified: fixed timestep (JrpgGame IsFixedTimeStep, 1/60) means a frame always lands in the 0.08 s Holding phase, so ContinueEvent can't be skipped; forest (0,1) is walkable so ExplorationSceneTests can fail if IsBusy stops blocking; M1 suggestion "sprite freezes on stride frame" now fixed (Stand while busy)
+- open (Suggestion): record in the M3a slice note that the Core tests use the lever fixture (CurrentDefinitionOf_AfterSwap_ReturnsSwappedDefinition) instead of the plan's door-named test
+- open (Suggestion): StartMapScenarios also carries HoldingLeft/OneUpdate, which aren't start-map scenarios; fine for now, split if it grows
+- follow-up: M3b must stop the Confirm that closes a message box from re-triggering TryInteract in the same ExplorationScene.Update (presenter runs first, then IsBusy is false and the same press interacts again)
+- follow-up: M3a checkbox, hand checks and test-name deviation not yet in the plan (DoD 5)
+- verified: _currentDefinitionOf delegate field avoids per-frame instance method-group allocation; CanopyTextures built from all catalog objects so swapped ids resolve; MapDrawList swap test fails with the old dictionary lookup (tree base 6 vs stump base 3 around feet 4.5)

@@ -7,8 +7,11 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Jrpg.Game.Exploration;
 
-/// <summary>Draws one map's tile layers, only the cells on screen, and its placed objects.</summary>
-internal sealed class MapView(MapLayout layout, IReadOnlyDictionary<string, ObjectDefinition> objects, TileAtlas atlas)
+/// <summary>
+/// Draws one map's tile layers, only the cells on screen, and its placed objects as they are now (an opened door draws
+/// open).
+/// </summary>
+internal sealed class MapView(MapLayout layout, Func<PlacedObject, ObjectDefinition> currentDefinitionOf, TileAtlas atlas)
 {
     /// <summary>Screen pixels per map cell at the 1920x1080 virtual screen (decision 48, legacy <c>TileSize</c>).</summary>
     public const int CellPixels = 48;
@@ -46,7 +49,7 @@ internal sealed class MapView(MapLayout layout, IReadOnlyDictionary<string, Obje
     /// <summary>Draws a placed object's tiles at its position, as seen from the camera's <paramref name="origin"/>.</summary>
     public void DrawObject(SpriteBatch batch, TextureLibrary textures, PlacedObject placed, Vector2 origin)
     {
-        var definition = objects[placed.ObjectId];
+        var definition = currentDefinitionOf(placed);
         var area = ScreenAreaOf(placed, definition, origin);
         if (!IsOnScreen(area))
         {
@@ -64,7 +67,7 @@ internal sealed class MapView(MapLayout layout, IReadOnlyDictionary<string, Obje
     /// <summary>Draws a placed object's baked canopy over its body, as seen from the camera's <paramref name="origin"/>.</summary>
     public void DrawCanopy(SpriteBatch batch, Texture2D canopy, PlacedObject placed, Vector2 origin)
     {
-        var area = ScreenAreaOf(placed, objects[placed.ObjectId], origin);
+        var area = ScreenAreaOf(placed, currentDefinitionOf(placed), origin);
         if (IsOnScreen(area))
         {
             batch.Draw(canopy, area, Color.White);

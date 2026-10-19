@@ -49,6 +49,12 @@ public sealed class ExplorationState
     public bool IsEventRunning => _run is not null;
 
     /// <summary>
+    /// What a placed object on the current map is now, after any swap (an opened chest or door), so the Game draws it
+    /// as the player left it.
+    /// </summary>
+    public ObjectDefinition CurrentDefinitionOf(PlacedObject placed) => _map.CurrentDefinitionOf(placed);
+
+    /// <summary>
     /// The battle a step just started, or null. The Game runs it, then calls <see cref="FinishEncounter"/>; the player
     /// can't walk or interact meanwhile. What follows a defeat is the Game's (decision 31).
     /// </summary>

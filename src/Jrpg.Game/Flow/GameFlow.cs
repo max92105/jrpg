@@ -18,9 +18,9 @@ internal sealed class GameFlow : IScene
 
     public GameFlow(ContentCatalog catalog)
     {
-        var atlas = new TileAtlas(catalog);
-        var canopies = new CanopyTextures(catalog.Objects, atlas, MapView.CellPixels);
-        Session = new SessionTransitions(catalog, _scenes, atlas, canopies).StartNewGame();
+        var playedCatalog = EncounterFreeContent.Of(catalog);
+        var art = new MapArt(playedCatalog, MapView.CellPixels);
+        Session = new SessionTransitions(playedCatalog, _scenes, art).StartNewGame();
     }
 
     public GameSession Session { get; }

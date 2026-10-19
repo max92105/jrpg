@@ -32,6 +32,9 @@ public sealed class ExplorationState
 
     public MapLocation Location => new(_map.Definition.Id, _walker.Position, _walker.Facing);
 
+    /// <summary>The map the player is on, read every frame so the Game can redraw after a warp.</summary>
+    public MapDefinition CurrentMap => _map.Definition;
+
     /// <summary>The player's position, read every frame without building a <see cref="MapLocation"/>.</summary>
     public Point2D PlayerPosition => _walker.Position;
 

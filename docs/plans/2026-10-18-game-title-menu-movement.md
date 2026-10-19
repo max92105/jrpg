@@ -220,7 +220,8 @@ Sizes are estimates of hand-written code plus tests. A slice estimated past ~300
     - [ ] Focusing another window stops walking.
   - **Known gap until M2:** stepping on a warp cell starts its event, and the player stays frozen.
 
-- [ ] **M2. Warps with a fade; random battles off** (Core + Game, about 290 lines)
+- [x] **M2. Warps with a fade; random battles off** (Core + Game, about 290 lines)
+  - **Done, with deviations:** `MapArt` takes the cell size (so Rendering doesn't depend on Exploration). The two repository-content tests share a test helper, `ForestWarpStart`. Extra tests: `ScreenFade_Update_LeftoverPastHold_CarriesIntoFadeIn`, `ScreenFade_Update_Idle_StaysClear`. The scene re-enters a map when the `CurrentMap` reference changes, so a warp within the same map would ease the camera instead of snapping it (no content does this yet). **The forest has no warp back** (`forest.json` has no cell events), so the "Walk back" check can't be done until content adds one. The hand checks below are still to do.
   - **Goal:** warp cells fade to black, change the map and fade back in, with the camera snapped to the arrival point. Walking, interacting and the menu are blocked until the fade-in ends. Random battles never start (decision 79).
   - **Core:** `ExplorationState.CurrentMap`.
   - **New types (Game):**

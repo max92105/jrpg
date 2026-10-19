@@ -12,6 +12,10 @@ internal sealed class TextureLibrary(GraphicsDevice device, string artRoot) : ID
     // Keyed by folder and file rather than a combined path, so a lookup while drawing builds no string.
     private readonly Dictionary<(string Folder, string File), Texture2D> _textures = [];
     private readonly List<Texture2D> _created = [];
+    private Texture2D? _pixel;
+
+    /// <summary>A 1 x 1 white texture, tinted and stretched to draw fades and plain rectangles.</summary>
+    public Texture2D Pixel => _pixel ??= Create(1, 1, [Color.White]);
 
     /// <param name="folder">A folder from <c>ArtFolders</c>.</param>
     /// <param name="file">The file name content gives.</param>

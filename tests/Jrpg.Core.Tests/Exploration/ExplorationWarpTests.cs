@@ -43,6 +43,17 @@ public sealed class ExplorationWarpTests
     }
 
     [Fact]
+    public void CurrentMap_AfterWarp_IsTargetMap()
+    {
+        var exploration = StartAt(new MapLocation("town", new Point2D(2.5, 3.5), Facing.Right));
+        exploration.Walk(MoveIntent.FromAxes(1, 0), TimeSpan.FromSeconds(1.0 / 3));
+
+        exploration.ContinueEvent();
+
+        Assert.Equal("cave", exploration.CurrentMap.Id);
+    }
+
+    [Fact]
     public void ContinueEvent_WarpOntoTouchCell_DoesNotFireArrivalCell()
     {
         var exploration = StartAt(new MapLocation("cave", new Point2D(2.5, 1.5), Facing.Down));

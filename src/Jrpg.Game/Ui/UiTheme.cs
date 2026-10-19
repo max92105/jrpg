@@ -103,6 +103,14 @@ internal static class UiTheme
     /// <summary>Legacy <c>Brush.Stroke</c>: a button's outline.</summary>
     public static Color ButtonStroke { get; } = FromLegacy(0x2EFFFFFF);
 
+    /// <summary>Legacy <c>Brush.SectionLine</c>: the underline of a section title, fading out to the right.</summary>
+    public static ImmutableArray<GradientStop> SectionLine { get; } =
+    [
+        new(0, FromLegacy(0x80FFFFFF)),
+        new(0.7f, FromLegacy(0x33FFFFFF)),
+        new(1, FromLegacy(0x00FFFFFF)),
+    ];
+
     // Legacy XAML colors are #AARRGGBB with straight alpha; the game draws premultiplied.
     private static Color FromLegacy(uint argb) => Color.FromNonPremultiplied(
         (int)((argb >> 16) & 0xFF),

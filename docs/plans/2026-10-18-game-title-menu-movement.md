@@ -469,20 +469,33 @@ G1 was split in two (developer, 2026-10-19): about 550 lines in all. G1-1 is the
     - [ ] Play time ticks with the menu open.
     - [ ] The location reads "start", and "Forest" after the warp.
 
-- [ ] **G4. Status page** (Data + Game, about 280 lines)
+G4 was split in two (developer, 2026-10-19), since it came to about 420 lines: G4-1 is the page as text, G4-2 adds the bars.
+
+- [x] **G4-1. Status page** (Data + Game, about 280 lines)
+  - **Done, with deviations:**
+    - The portrait is a 190 px diamond framed by a pale diamond: the reference UI's frame, like the dialogue's, rather than legacy's square. `DiamondCrop` already shrinks the 1024 px art smoothly; point sampling it down to a square would alias.
+    - Values are left-aligned at a fixed offset rather than right-aligned. No skills list and no stat icons (not in this slice; decision 51).
+    - Status comes before System in the tabs. Members are a snapshot taken when the menu opens.
+    - `UiTextures` gains `SectionLine` and a `DiamondPortrait` cache. The experience-to-next-level text is the pure `StatusPage.ToNextLevelText`, with 2 tests.
+    - The tests shipped as `Members_SecondMemberMadeActive_ListedBeforeTheReserve`, `Update_LeftOnFirstMember_WrapsToLast` and `Update_NextTabOnLastMember_WrapsToFirst`, and Data `FindProblems_MissingPartyPortrait_NamesTheMember`.
+    - Follow-up: `DialogueBox` still bakes its own portraits. Pass it `UiTextures` so it uses `DiamondPortrait`; that means threading it through `EventPresenter` and `ExplorationScene`, whose constructor is already at four parameters.
   - **Goal:** the first tab, Status, shows one member at a time in the legacy `StatusView` layout:
-    - portrait, name, class, level;
-    - HP, MP and experience bars (legacy `Bars.xaml` gradients);
+    - portrait, name, class, level, experience and experience to the next level;
+    - HP and MP as numbers;
     - attack and defense with equipment;
     - worn weapon and armor.
     PreviousTab/NextTab or Left/Right change the member (legacy character rail; question 92). Members are in active order, then the reserve.
-  - **New types (Game):**
-    - `Ui/StatBar`: draws a filled bar with a legacy gradient.
-    - `Menus/StatusPage`.
+  - **New types (Game):** `Menus/StatusPage`.
   - **Data:** `ArtReferenceCheck` covers party portraits.
   - **Tests:** `StatusPage_NextMember_OnLastMember_WrapsToFirst`, `StatusPage_Members_ActiveFirstThenReserve`, Data `ArtReferenceCheck_FindProblems_MissingPartyPortrait_NamesTheMember`.
   - **Verify by hand:**
-    - [ ] Every member shows the right portrait, stats and bars.
+    - [ ] Every member shows the right portrait and stats.
+
+- [ ] **G4-2. Status bars** (Game, about 140 lines)
+  - **Goal:** the Status page shows HP, MP and experience as bars with the legacy `Bars.xaml` gradients.
+  - **New types (Game):** `Ui/StatBar`: draws a filled bar with a legacy gradient.
+  - **Verify by hand:**
+    - [ ] Every member's bars match their numbers.
 
 ### Phase S: save and load
 

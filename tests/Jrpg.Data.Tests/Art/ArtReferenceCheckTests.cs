@@ -2,6 +2,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Dialogue;
 using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Party;
 using Jrpg.Data.Art;
 using Jrpg.Data.Content;
 
@@ -56,6 +57,17 @@ public sealed class ArtReferenceCheckTests
         var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
 
         Assert.Equal($"portraits/ghost.png: not found in {_artRoot}. Named by event '{chest.Events[0].Id}' on map 'start'.", problem);
+    }
+
+    [Fact]
+    public void FindProblems_MissingPartyPortrait_NamesTheMember()
+    {
+        var jazog = _catalog.PartyMembers["jazog"] with { PortraitFile = "Gone.png" };
+        var catalog = _catalog with { PartyMembers = new Dictionary<string, PartyMemberDefinition>(_catalog.PartyMembers) { ["jazog"] = jazog } };
+
+        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
+
+        Assert.Equal($"portraits/Gone.png: not found in {_artRoot}. Named by party member 'jazog'.", problem);
     }
 
     [Fact]

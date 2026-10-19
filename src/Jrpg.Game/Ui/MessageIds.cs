@@ -47,4 +47,37 @@ internal static class MessageIds
 
     /// <summary>A confirmation's button that changes nothing.</summary>
     public const string ConfirmNo = "confirm_no";
+
+    /// <summary>The game menu's Status tab.</summary>
+    public const string MenuStatus = "menu_status";
+
+    public const string StatusExperience = "status_experience";
+
+    public const string StatusLevel = "status_level";
+
+    public const string StatusExp = "status_exp";
+
+    public const string StatusNextLevel = "status_next_level";
+
+    /// <summary>Shown as the experience to the next level once a member is at the highest level.</summary>
+    public const string StatusMaxLevel = "status_max_level";
+
+    public const string StatusParameters = "status_parameters";
+
+    public const string StatusEquipment = "status_equipment";
+
+    public const string StatHp = "stat_hp";
+
+    public const string StatMp = "stat_mp";
+
+    public const string StatAttack = "stat_attack";
+
+    public const string StatDefense = "stat_defense";
+
+    public const string SlotWeapon = "slot_weapon";
+
+    public const string SlotArmor = "slot_armor";
+
+    /// <summary>Shown for an equipment slot with nothing worn.</summary>
+    public const string SlotEmpty = "slot_empty";
 }

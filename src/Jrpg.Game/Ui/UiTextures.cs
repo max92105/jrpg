@@ -1,3 +1,4 @@
+using Jrpg.Data.Art;
 using Jrpg.Game.Rendering;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,6 +16,8 @@ internal sealed class UiTextures
     private Texture2D? _menuScrim;
     private Texture2D? _selectionLine;
     private Texture2D? _selectionFill;
+    private Texture2D? _sectionLine;
+    private readonly Dictionary<(string File, int Size), Texture2D> _diamondPortraits = [];
 
     /// <summary>A tab that isn't selected: the arrow, dark and faintly outlined.</summary>
     public Texture2D NavTab(TextureLibrary textures) =>
@@ -38,6 +41,28 @@ internal sealed class UiTextures
     /// <summary>The blue selection gradient as one row, stretched over a selected button.</summary>
     public Texture2D SelectionFill(TextureLibrary textures) =>
         _selectionFill ??= textures.Create(NavTabShape.Width, 1, GradientStrip.Colors(UiTheme.Selection, NavTabShape.Width));
+
+    /// <summary>One row, stretched under a section title.</summary>
+    public Texture2D SectionLine(TextureLibrary textures) =>
+        _sectionLine ??= textures.Create(NavTabShape.Width, 1, GradientStrip.Colors(UiTheme.SectionLine, NavTabShape.Width));
+
+    /// <summary>A portrait cut into the reference UI's diamond (<see cref="DiamondCrop"/>), once per file and size.</summary>
+    /// <param name="textures">Where the portrait is read and the diamond made.</param>
+    /// <param name="portraitFile">In the portraits folder.</param>
+    /// <param name="size">The diamond's square side in pixels.</param>
+    public Texture2D DiamondPortrait(TextureLibrary textures, string portraitFile, int size)
+    {
+        if (!_diamondPortraits.TryGetValue((portraitFile, size), out var baked))
+        {
+            var source = textures.Get(ArtFolders.Portraits, portraitFile);
+            var pixels = new Color[source.Width * source.Height];
+            source.GetData(pixels);
+            baked = textures.Create(size, size, DiamondCrop.Bake(pixels, source.Width, source.Height, size));
+            _diamondPortraits.Add((portraitFile, size), baked);
+        }
+
+        return baked;
+    }
 
     private static Color[] SolidRow(Color color, int width)
     {

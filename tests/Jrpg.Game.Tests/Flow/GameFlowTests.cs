@@ -118,6 +118,7 @@ public sealed class GameFlowTests
     {
         var flow = StartedFlow();
         flow.Update(_oneUpdate, InputFrames.PressingEscape);
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Left));
@@ -134,6 +135,7 @@ public sealed class GameFlowTests
         var flow = StartedFlow();
         var first = SessionOf(flow);
         flow.Update(_oneUpdate, InputFrames.PressingEscape);
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Left));

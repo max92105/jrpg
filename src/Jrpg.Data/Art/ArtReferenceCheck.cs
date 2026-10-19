@@ -12,8 +12,8 @@ namespace Jrpg.Data.Art;
 public static class ArtReferenceCheck
 {
     /// <summary>
-    /// Every tilesheet, the field sprite and every dialogue portrait exist as PNGs, and every tile's cell lies inside
-    /// its sheet.
+    /// Every tilesheet, the field sprite, every dialogue portrait and every party member's portrait exist as PNGs, and
+    /// every tile's cell lies inside its sheet.
     /// </summary>
     /// <returns>One line per problem, naming the file; empty when the art is complete.</returns>
     public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string artRoot)
@@ -42,6 +42,14 @@ public static class ArtReferenceCheck
             if (ReadSize(artRoot, ArtFolders.Portraits, portraitFile).Problem is { } problem)
             {
                 problems.Add($"{problem} Named by event '{mapEvent.Id}' on map '{mapId}'.");
+            }
+        }
+
+        foreach (var member in catalog.PartyMembers.Values.OrderBy(member => member.Id, StringComparer.Ordinal))
+        {
+            if (ReadSize(artRoot, ArtFolders.Portraits, member.PortraitFile).Problem is { } problem)
+            {
+                problems.Add($"{problem} Named by party member '{member.Id}'.");
             }
         }
 

@@ -17,6 +17,9 @@ namespace Jrpg.Game.Exploration;
 /// </summary>
 internal sealed class EventPresenter
 {
+    // Developer decision 54; becomes the player's text speed with the Options page (P5).
+    private static readonly TimeSpan _dialogueCharacterTime = TimeSpan.FromMilliseconds(30);
+
     private readonly ExplorationState _exploration;
     private readonly UiMessages _messages;
     private readonly DialogueBox _messageBox;
@@ -53,7 +56,7 @@ internal sealed class EventPresenter
                 ShowWarp();
                 break;
             case DialogueStep or GiveItemStep:
-                ShowPages(step, input);
+                ShowPages(step, delta, input);
                 break;
             default:
                 throw new InvalidOperationException($"The game can't show a {step.GetType().Name} yet.");
@@ -65,7 +68,7 @@ internal sealed class EventPresenter
     {
         if (_reading is not null)
         {
-            _messageBox.Draw(batch, textures);
+            _messageBox.Draw(batch, textures, _reading);
         }
 
         var blackness = Blackness;
@@ -88,38 +91,43 @@ internal sealed class EventPresenter
     }
 
     // The pages are built once, on the step's first update; the press that started the event came an update earlier, so
-    // it can't also turn the first page.
-    private void ShowPages(EventStep step, InputFrame input)
+    // it can't also complete the first page.
+    private void ShowPages(EventStep step, TimeSpan delta, InputFrame input)
     {
         if (_reading is null)
         {
-            _reading = new SpeechPlayback(PagesOf(step));
+            _reading = StartReading(step);
             _messageBox.Show(_reading.CurrentPage);
             return;
         }
 
+        // Confirm is judged on the page as the player last saw it, so a press on the update the last character would
+        // appear completes the page rather than turning it (decision 54).
         if (!input.IsPressed(GameButton.Confirm))
         {
+            _reading.Update(delta);
             return;
         }
 
+        var shownPage = _reading.PageIndex;
         _reading.Confirm();
-        if (!_reading.IsFinished)
+        if (_reading.IsFinished)
+        {
+            _reading = null;
+            _exploration.ContinueEvent();
+        }
+        else if (_reading.PageIndex != shownPage)
         {
             _messageBox.Show(_reading.CurrentPage);
-            return;
         }
-
-        _reading = null;
-        _exploration.ContinueEvent();
     }
 
-    private IReadOnlyList<string> PagesOf(EventStep step) => step switch
+    private SpeechPlayback StartReading(EventStep step) => step switch
     {
-        DialogueStep dialogue => dialogue.Speech.Lines,
+        DialogueStep dialogue => new SpeechPlayback(dialogue.Speech.Lines, _dialogueCharacterTime),
 
-        // Core sets a receipt on every give-item step.
-        GiveItemStep => [FoundItemText.Of(_exploration.CurrentItemReceipt!, _messages)],
+        // Shown whole: there's nothing to discover in it letter by letter. Core sets a receipt on every give-item step.
+        GiveItemStep => new SpeechPlayback([FoundItemText.Of(_exploration.CurrentItemReceipt!, _messages)], TimeSpan.Zero),
         _ => throw new ArgumentOutOfRangeException(nameof(step), step, "Only dialogue and found items have pages."),
     };
 }

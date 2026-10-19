@@ -5,12 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, M3c (Dialogue steps)
-Round: 1 (verdict: Ready to commit; build 0 warnings, format exit 0; Game test host flaked twice in 2 full runs (host crash "error: 1" with 866 total; then ExplorationSceneTests.Update_DuringWarpFadeIn_DoesNotWalk failed inside Start), 5 clean Game reruns of 98 tests)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, M4a (Typewriter and page marker; M4 split into M4a/M4b on 2026-10-19)
+Round: 1 (verdict: Ready to commit; build 0 warnings, format exit 0; full run: Game host "error: 1" flake with 876 total, Game-only rerun 108/108 clean)
 
-- open (Suggestion): EventPresenter PagesOf default arm throws for an impossible step; could build pages in the Update switch arms (DialogueStep d => d.Speech.Lines) and drop the extra type test
-- open (Suggestion): plan M3c slice note: tick checkbox, record BelowTalkingChest fixture (no map has a dialogue), extra tests CurrentPage_New_IsFirstPage / Confirm_AfterFinished_Throws (DoD 5)
-- open (Suggestion): page-2 text after first Confirm is unobservable in tests (DialogueBox has no text accessor); covered only by SpeechPlayback unit tests
-- follow-up: flaky Game test host now also fails in non-font tests (ExplorationSceneTests.Start) - native OOB read in FontLibraryTests corrupts the shared host
-- follow-up: a long dialogue line overflows the 240 px box (no paging by height); M4 or later
-- verified: consecutive steps reset _reading before ContinueEvent; first update never consumes Confirm; Dialogue folder has no Core dependency; validator rejects 0-line dialogue so CurrentPage is safe
+- open (Suggestion): EventPresenter.ShowPages runs _reading.Update(delta) before Confirm, so a press on the frame the last character lands turns the page instead of completing it; handle Confirm first
+- open (Suggestion): DialogueBox.DrawTypedText slices by TextLine.Count (glyphs/codepoints, probed) as a char count; a non-BMP char on a line cuts that line's last char
+- open (Suggestion): EventPresenter static _dialogueCharacterTime sits between instance readonly fields; move above them
+- verified (fsi probe of FontStashSharp 1.6.2): TextLine.TextStartIndex is a char index; wrap-space is inside Count; '\n' counted in Count and harmless to DrawText
+- verified: found-item zero-time path covered by Update_ConfirmOnFoundItem_ContinuesEvent (one Confirm, no extra time)

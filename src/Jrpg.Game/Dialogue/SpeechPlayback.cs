@@ -1,15 +1,53 @@
 namespace Jrpg.Game.Dialogue;
 
-/// <summary>The pages of one message being read, one message box each; Confirm turns the page (legacy <c>DialogManager</c>).</summary>
-/// <param name="pages">At least one page; content validation guarantees a dialogue step has a line.</param>
-internal sealed class SpeechPlayback(IReadOnlyList<string> pages)
+/// <summary>
+/// The pages of one message being read, one message box each, typed out one character at a time. Confirm completes a
+/// page still typing, then turns it (legacy <c>DialogManager</c>, developer decision 54).
+/// </summary>
+internal sealed class SpeechPlayback
 {
-    private int _index;
+    // The marker is shown for half a second, then hidden for half a second (developer decision 54).
+    private static readonly TimeSpan _markerBlinkHalf = TimeSpan.FromSeconds(0.5);
+
+    private readonly IReadOnlyList<string> _pages;
+    private readonly TimeSpan _characterTime;
+    private Typewriter _typewriter;
+    private TimeSpan _sinceComplete;
+
+    /// <param name="pages">At least one page; content validation guarantees a dialogue step has a line.</param>
+    /// <param name="characterTime">Per character typed; zero shows each page whole.</param>
+    public SpeechPlayback(IReadOnlyList<string> pages, TimeSpan characterTime)
+    {
+        _pages = pages;
+        _characterTime = characterTime;
+        _typewriter = new Typewriter(pages[0].Length, characterTime);
+    }
+
+    /// <summary>Which page is on screen, so the box lays a page out only when it turns.</summary>
+    public int PageIndex { get; private set; }
 
     /// <summary>The page on screen; read it only while the playback isn't finished.</summary>
-    public string CurrentPage => pages[_index];
+    public string CurrentPage => _pages[PageIndex];
 
-    public bool IsFinished => _index >= pages.Count;
+    /// <summary>How many characters of the current page are typed out.</summary>
+    public int VisibleLength => _typewriter.VisibleLength;
+
+    /// <summary>The page is complete and waits for Confirm, in the visible half of the blink.</summary>
+    public bool IsMarkerVisible => _typewriter.IsComplete && (_sinceComplete.Ticks / _markerBlinkHalf.Ticks) % 2 == 0;
+
+    public bool IsFinished => PageIndex >= _pages.Count;
+
+    public void Update(TimeSpan delta)
+    {
+        if (_typewriter.IsComplete)
+        {
+            _sinceComplete += delta;
+        }
+        else
+        {
+            _typewriter.Update(delta);
+        }
+    }
 
     /// <exception cref="InvalidOperationException">The last page was already read.</exception>
     public void Confirm()
@@ -19,6 +57,17 @@ internal sealed class SpeechPlayback(IReadOnlyList<string> pages)
             throw new InvalidOperationException("Every page was already read.");
         }
 
-        _index++;
+        if (!_typewriter.IsComplete)
+        {
+            _typewriter.RevealAll();
+            return;
+        }
+
+        PageIndex++;
+        _sinceComplete = TimeSpan.Zero;
+        if (!IsFinished)
+        {
+            _typewriter = new Typewriter(CurrentPage.Length, _characterTime);
+        }
     }
 }

@@ -55,8 +55,11 @@ public sealed class EventPresenterTests
         var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowTalkingChest);
         exploration.TryInteract();
         var presenter = new EventPresenter(exploration, RepositoryScreenText.Text);
+        var typedOut = TimeSpan.FromSeconds(2);
         presenter.Update(StartMapScenarios.OneUpdate, default);
+        presenter.Update(typedOut, default);
         presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+        presenter.Update(typedOut, default);
         Assert.IsType<DialogueStep>(exploration.CurrentEventStep);
 
         presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);

@@ -286,18 +286,28 @@ Sizes are estimates of hand-written code plus tests. A slice estimated past ~300
   - **Verify by hand:**
     - [ ] A two-line sign placed in the editor shows two pages.
 
-- [ ] **M4. Typewriter, speaker and portrait** (Data + Game, about 200 lines)
+M4 was split in two before it started (developer, 2026-10-19): it came out at about 320 lines.
+
+- [x] **M4a. Typewriter and page marker** (Game, about 180 lines)
+  - **Done, with deviations:** the marker is a small white diamond (the font lacks legacy's ▶; diamonds echo the reference UI). `SpeechPlayback` exposes `PageIndex` so the box lays a page out only when it turns. Confirm is handled before the typing advances, so a press as the last character would appear completes the page. Extra tests: `Typewriter` (half steps, stops at length, zero time, new), `SpeechPlayback` (next page starts typing, marker hidden while typing, marker blink). The hand checks below are still to do.
   - **Goal:**
     - Dialogue pages type out at 30 ms per character. Confirm completes the page first, then advances (decision 54).
-    - Speaker and portrait show when the step has them; a blinking marker shows when the page is complete.
+    - A blinking marker shows when the page is complete.
     - Found-item messages appear whole.
-  - **New types (Game):** `Dialogue/Typewriter` (pure): `Update(TimeSpan delta)`, `RevealAll()`, `VisibleLength`, `IsComplete`. Its character time is a constructor value, so Options (P5) can change it.
-  - **Data:** `ArtReferenceCheck` covers portraits named by dialogue steps.
-  - **Tests:** `Typewriter_Update_OneCharacterTime_RevealsOneCharacter`, `Typewriter_RevealAll_CompletesPage`, `SpeechPlayback_Confirm_WhileTyping_CompletesPageWithoutAdvancing`, Data `ArtReferenceCheck_FindProblems_MissingDialoguePortrait_NamesTheEvent`.
+  - **New types (Game):** `Dialogue/Typewriter` (pure): `Update(TimeSpan delta)`, `RevealAll()`, `VisibleLength`, `IsComplete`. Its character time is a constructor value, so Options (P5) can change it; zero shows the page whole.
+  - **Changes:** `SpeechPlayback` types each page and knows when the marker shows; `DialogueBox` draws the visible part of each wrapped line as a `StringSegment` of the page (FontStashSharp `SpriteFontBase.DrawText`), so nothing is allocated per frame.
+  - **Tests:** `Typewriter_Update_OneCharacterTime_RevealsOneCharacter`, `Typewriter_RevealAll_CompletesPage`, `SpeechPlayback_Confirm_WhileTyping_CompletesPageWithoutAdvancing`.
   - **Verify by hand:**
     - [ ] The sign types out; Confirm mid-page completes it.
-    - [ ] Speaker and portrait show; the marker blinks.
-    - [ ] Partial text is drawn without a new string per frame (FontStashSharp's API is checked first).
+    - [ ] The marker blinks once the page is complete.
+    - [ ] Opening the chest shows the message whole.
+
+- [ ] **M4b. Speaker and portrait** (Data + Game, about 140 lines)
+  - **Goal:** speaker and portrait show when the step has them. **Look (developer, 2026-10-19):** a diamond-framed portrait at the box's left, like the examples' turn-order portraits; the name above the box in spaced caps on a dark strip fading to the right.
+  - **Data:** `ArtReferenceCheck` covers portraits named by dialogue steps.
+  - **Tests:** Data `ArtReferenceCheck_FindProblems_MissingDialoguePortrait_NamesTheEvent`.
+  - **Verify by hand:**
+    - [ ] Speaker and portrait show on a sign that has them; a sign without them shows neither.
 
 ### Phase W: full screen
 

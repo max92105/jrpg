@@ -15,6 +15,8 @@ When planning slices in this repo:
 - Converters: handle only inputs the data actually has; absent cases are errors naming the file; inexpressible content is skipped into a report. Converter/legacy code lives in a tool project, not in Data.
 - Per-frame code: no allocation; bounding-box before polygon tests. Fixed technical limits become named Core constants.
 - Game/Editor slices: split each screen into a pure presenter (tested in Jrpg.Game.Tests / Jrpg.Editor.Tests) and a thin draw part with a manual checklist; build a Game folder-dependency table too (scenes return requests to a flow, or Title->Exploration->Battle->Title cycles).
+- Order Game slices so shared pieces (fade, panels, text) arrive with their first real caller; note any intermediate "freeze" gap in the slice. Keep transition handlers <= 4 ctor params via a SceneFactory, not a bag.
+- Game UI: developer wants the legacy WPF look ported (Theme.xaml tokens, layouts), not invented; Esc = Cancel+Menu needs an explicit "Cancel wins when nested" rule; known-gap lines when a slice leaves a step unhandled (exhaustive switch throws).
 - Packages are never assumed: font package, MonoGame content pipeline and CommunityToolkit.Mvvm are open questions until the developer approves.
 
 **Why:** part 1 split slices mid-way; the part 2 devil's advocate (2026-10-17) raised exactly these as blockers/concerns.

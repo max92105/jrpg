@@ -20,7 +20,7 @@
    - Append `.gitignore.additions` to your `.gitignore`, then delete the `.additions` file.
    - The build props live in `src/` and `tests/` on purpose: at the repo root they would also apply to the legacy demo, whose code doesn't meet them (nullable, warnings as errors), and break its build.
    - Delete `.github/copilot-instructions.md` (it only contains Azure rules unrelated to this project).
-   - The legacy demo (`JRPG/`, `MapEditor/`, `JRPG.Core/`, `JRPG.sln`) stays untouched (already on .NET 10). The Stop hook builds it and the new `Jrpg.slnx` (created by the first migration slice); the quality commands only gate `Jrpg.slnx`.
+   - The legacy demo (`JRPG/`, `MapEditor/`, `JRPG.Core/`, `JRPG.sln`) now sits in `legacy/` as reference only and isn't built. The Stop hook and the quality commands build `Jrpg.slnx`.
 2. Commit: `git add -A && git commit -m "Add Claude Code setup"`.
 3. Open the repo folder in VS Code (`C:\Git\jrpg` itself, not a parent folder) and start a new Claude Code conversation. Accept the **trust this folder** prompt if asked (hooks don't run until you do).
 4. Check it loaded:
@@ -86,4 +86,3 @@ The architect will read your demo code and propose the slices, including a mappi
 - **Claude keeps looping on a failing build:** the hook lets Claude stop after one retry round (`stop_hook_active`). Then fix it together or run `/verify`.
 - **An agent isn't used:** call it by name ("use the code-reviewer agent") or with `@`.
 - **Too many analyzer errors on day one:** set `AnalysisLevel` to `latest-default` in `src/Directory.Build.props`, then tighten later. Don't raise the complexity limit in `CodeMetricsConfig.txt` to get a build green; split the method.
-- **`dotnet build` fails with "multiple project or solution files":** two solutions sit at the root during the migration. Name one: `dotnet build Jrpg.slnx` or `dotnet build JRPG.sln`.

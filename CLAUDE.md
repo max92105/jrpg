@@ -23,9 +23,9 @@ Dependency direction: Game → Data → Core; Editor → Data → Core. Never th
 
 ## Current state (migration in progress)
 
-- `JRPG/`, `MapEditor/`, `JRPG.Core/` are the **legacy WPF demo** (.NET 10, `net10.0-windows`, `JRPG.sln`). It is reference material for the migration: read it, port behavior out of it, don't extend it. Build: `dotnet build JRPG.sln --nologo -v q`. Run: `dotnet run --project JRPG` / `dotnet run --project MapEditor`.
-- Legacy `JRPG.Core` still references WPF (`UseWPF`) for `Rect`/`ImageSource` in map types. The new `src/Jrpg.Core` must not.
-- `Assets/` is the legacy demo's art and map JSON, frozen since the content cutover (ADR 0011): the new code reads only `content/`, and `Assets/` goes with the legacy code in part 3c.
+- `legacy/` holds the **legacy WPF demo** (`JRPG/`, `MapEditor/`, `JRPG.Core/`, `JRPG.sln`; decision 73). It is reference material only: read it, port behavior out of it, don't extend it. It no longer runs, since its `Assets/` folder was removed; git history has both.
+- Legacy `JRPG.Core` references WPF (`UseWPF`) for `Rect`/`ImageSource` in map types. The new `src/Jrpg.Core` must not.
+- `content/` is the only content and art (ADR 0011). `content/art/effects-source/` keeps the legacy battle-effect GIFs until part 3b turns them into strips; nothing reads them yet.
 - New code goes only in `src/` and `tests/`, built by `Jrpg.slnx`.
 
 ## Commands

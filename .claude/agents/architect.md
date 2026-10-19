@@ -23,7 +23,7 @@ Turn a feature request into a plan that a developer can implement one slice at a
 4. For each slice list: goal, files to create/change, public types/signatures, tests to write (by name), and how to verify by hand if relevant.
    - Every new type gets a one-line responsibility next to its name. If the line needs "and", split the type.
    - Place types in feature folders (`Battle/`, `Inventory/`), following `.claude/rules/code-quality.md`. Naming is part of the design: choose names here, not during implementation.
-   - When porting from the legacy demo (`JRPG/`, `JRPG.Core/`), map each old class to its new type(s) and say what changes. Don't carry over a structure just because it exists (`GameSystems` static singletons, `*Manager` classes, `Models/`/`Enums/` folders).
+   - When porting from the legacy demo (`legacy/JRPG/`, `legacy/JRPG.Core/`), map each old class to its new type(s) and say what changes. Don't carry over a structure just because it exists (`GameSystems` static singletons, `*Manager` classes, `Models/`/`Enums/` folders).
 5. List open questions that are game-design decisions. Do not answer them yourself; they belong to the developer.
 6. List risks: coupling, performance, determinism, save-format impact.
 7. If a decision has real alternatives, note "ADR needed: <topic>".

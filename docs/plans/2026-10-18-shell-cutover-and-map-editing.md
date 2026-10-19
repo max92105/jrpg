@@ -443,7 +443,7 @@ Numbering continues from part 2 (questions and decisions share numbers).
 - **78. Window mode:** windowed, borderless fullscreen (legacy), or a choice? (1a uses a resizable window)
 
 **Part 3c (editor catalogs and retirement):**
-- **74. Leftover assets:** `Assets/Maps/Back/*` (decision 39) and unused PNGs (`Objects/Tree1-3.png`, `playerx64.png`): move with the legacy code to `legacy/`, or delete?
+- **74. Leftover assets:** `Assets/Maps/Back/*` (decision 39) and unused PNGs (`Objects/Tree1-3.png`, `playerx64.png`): move with the legacy code to `legacy/`, or delete? **Answered (developer, after 3a):** delete; only the battle-effect GIFs were kept, in `content/art/effects-source/`, for part 3b. Git history has the rest.
 - **75. "Legacy" in code comments:** rewrite them to state the rule, or keep them as history (the code they cite stays under `legacy/`)?
 
 **New features (not parity, own plans):**
@@ -519,7 +519,7 @@ Goal: the editor manages tilesheets, tiles and object definitions, matches the l
 - **11m. Object definitions: collision, zones, category.** `ContentWriter.WriteObjects` (refuses removing an object a map places or an event names); `Objects/ObjectEditorViewModel`, `Objects/ShapeEditing`. Tests: `ContentWriter_WriteObjects_RemovingPlacedObject_ThrowsNamingTheMap`, `ShapeEditing_InsertIndexNear_PointOnSecondEdge_ReturnsTwo`, `ShapeEditing_Normalize_PointOutsideObject_ClampsToUnitSquare`.
 - **11n. Objects from tiles, overlays and help.** `Objects/ObjectFromTiles`; overlay toggles; F1 help. Tests: `ObjectFromTiles_Create_SelectionWithEmptyCells_SkipsThem`, `ObjectFromTiles_Create_TakenId_AppendsNumber`, `ObjectFromTiles_Create_SizeFromSelectionBounds`.
 - **12. Editor parity check** (manual): a full legacy MapEditor session redone in the new editor, then played in the game.
-- **13a. Move the legacy demo under `legacy/`** (decision 73): tag `legacy-demo-final`; `git mv` `JRPG.sln`, `JRPG/`, `JRPG.Core/`, `MapEditor/` and the rest of `Assets/` under `legacy/` with a README (read-only reference, built by nothing); `Jrpg.slnx` and every build ignore it. Verify: build, test and format on `Jrpg.slnx` pass; nothing outside `legacy/`, ADRs and plans names `JRPG.sln`, `JRPG.Core`, `MapEditor` or `Assets/`.
+- **13a. Move the legacy demo under `legacy/`** (decision 73). **Done early (developer, after 3a), with deviations:** `JRPG.sln`, `JRPG/`, `JRPG.Core/`, `MapEditor/` moved with a README; `Assets/` deleted rather than moved (question 74), so the legacy demo no longer runs; no tag made (the developer tags). CLAUDE.md, `AI-SETUP.md`, `README.md` and the architect agent were updated (part of 13b). The original plan: tag `legacy-demo-final`; `git mv` `JRPG.sln`, `JRPG/`, `JRPG.Core/`, `MapEditor/` and the rest of `Assets/` under `legacy/` with a README (read-only reference, built by nothing); `Jrpg.slnx` and every build ignore it. Verify: build, test and format on `Jrpg.slnx` pass; nothing outside `legacy/`, ADRs and plans names `JRPG.sln`, `JRPG.Core`, `MapEditor` or `Assets/`.
 - **13b. Docs, hooks and launch setup:** CLAUDE.md (drop "Current state (migration in progress)"; add `tests/Jrpg.Game.Tests`, `tests/Jrpg.Editor.Tests`, editor run command, F5 profile), `.claude/hooks/verify-on-stop.ps1` (only `Jrpg.slnx`), `src/Directory.Build.props` comment, `.editorconfig` (its comment near line 75 mentions the legacy demo), `AI-SETUP.md`, `README.md`, `.claude/agents/architect.md`, agent memories naming legacy paths; "legacy" comments in code per question 75.
 
 ### New features, not parity (own plans)

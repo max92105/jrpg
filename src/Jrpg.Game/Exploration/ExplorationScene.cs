@@ -1,5 +1,5 @@
 using Jrpg.Core.Content;
-using Jrpg.Core.Geometry;
+using Jrpg.Core.Exploration;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
 using Jrpg.Game.Input;
@@ -11,35 +11,63 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Exploration;
 
 /// <summary>
-/// The player on the current map; the scene a new game starts in. It shows the tile layers, the standing player and
-/// objects in depth order, canopies and roofs over the player; walking and events come in part 3b.
+/// The player walking the current map; the scene a new game starts in. It shows the tile layers, the animated player and
+/// objects in depth order, canopies and roofs over the player, with the camera easing after the player.
 /// </summary>
 internal sealed class ExplorationScene : IScene
 {
     // One frame of the legacy sprite sheet, in the image's pixels; equal to a screen cell only by coincidence (question 58).
     private const int FieldSpriteFramePixels = 48;
 
-    private readonly MapLocation _location;
+    // Legacy GameManager: the camera catches up quickly while the player walks and settles gently once they stop.
+    private const double WalkingCameraShare = 0.35;
+    private const double StandingCameraShare = 0.1;
+
+    private readonly ExplorationState _exploration;
+    private readonly IReadOnlyDictionary<string, ObjectDefinition> _objects;
     private readonly MapLayout _layout;
     private readonly MapView _view;
     private readonly string _fieldSpriteFile;
     private readonly MapCamera _camera = new();
     private readonly MapDrawList _drawList = new();
+    private readonly WalkAnimation _walkAnimation = new();
     private readonly CanopyTextures _canopies;
 
-    public ExplorationScene(MapLocation location, ContentCatalog catalog, TileAtlas atlas, CanopyTextures canopies)
+    public ExplorationScene(ExplorationState exploration, ContentCatalog catalog, TileAtlas atlas, CanopyTextures canopies)
     {
-        _location = location;
+        _exploration = exploration;
+        _objects = catalog.Objects;
         _canopies = canopies;
-        _layout = catalog.Maps[location.MapId].Layout;
+        _layout = catalog.Maps[exploration.Location.MapId].Layout;
         _view = new MapView(_layout, catalog.Objects, atlas);
         _fieldSpriteFile = catalog.NewGame.FieldSpriteFile;
-        _camera.SnapTo(location.Position, _layout);
-        _drawList.Rebuild(_layout, catalog.Objects, location.Position);
+        _camera.SnapTo(exploration.PlayerPosition, _layout);
+        _drawList.Rebuild(_layout, _objects, exploration.PlayerPosition);
     }
 
+    /// <summary>Walks while no event runs; until events are shown (M2), a started event leaves the player standing still.</summary>
     public void Update(TimeSpan delta, InputFrame input)
     {
+        if (_exploration.IsEventRunning)
+        {
+            _walkAnimation.Stand();
+            return;
+        }
+
+        _exploration.Walk(input.Move, delta);
+        var isMoving = _exploration.IsPlayerMoving;
+        if (isMoving)
+        {
+            _walkAnimation.Advance(delta);
+        }
+        else
+        {
+            _walkAnimation.Stand();
+        }
+
+        var position = _exploration.PlayerPosition;
+        _camera.Follow(position, _layout, delta, isMoving ? WalkingCameraShare : StandingCameraShare);
+        _drawList.Rebuild(_layout, _objects, position);
     }
 
     public void Draw(SpriteBatch batch, TextureLibrary textures)
@@ -68,24 +96,18 @@ internal sealed class ExplorationScene : IScene
         }
     }
 
-    // The sprite is one cell square, centered on the player's position (legacy MapRenderer); frame 0 until walking animates it.
+    // The sprite is one cell square, centered on the player's position (legacy MapRenderer).
     private void DrawPlayer(SpriteBatch batch, TextureLibrary textures, Vector2 origin)
     {
         const int size = MapView.CellPixels;
-        var position = _location.Position;
+        var position = _exploration.PlayerPosition;
         var left = (int)Math.Round((position.X * size) - (size / 2.0) - origin.X);
         var top = (int)Math.Round((position.Y * size) - (size / 2.0) - origin.Y);
-        var source = new Rectangle(0, SpriteRowOf(_location.Facing) * FieldSpriteFramePixels, FieldSpriteFramePixels, FieldSpriteFramePixels);
+        var source = new Rectangle(
+            _walkAnimation.Frame * FieldSpriteFramePixels,
+            WalkAnimation.RowOf(_exploration.PlayerFacing) * FieldSpriteFramePixels,
+            FieldSpriteFramePixels,
+            FieldSpriteFramePixels);
         batch.Draw(textures.Get(ArtFolders.FieldSprites, _fieldSpriteFile), new Rectangle(left, top, size, size), source, Color.White);
     }
-
-    // The legacy sheet's rows, top to bottom: down, left, right, up.
-    private static int SpriteRowOf(Facing facing) => facing switch
-    {
-        Facing.Down => 0,
-        Facing.Left => 1,
-        Facing.Right => 2,
-        Facing.Up => 3,
-        _ => throw new ArgumentOutOfRangeException(nameof(facing), facing, null),
-    };
 }

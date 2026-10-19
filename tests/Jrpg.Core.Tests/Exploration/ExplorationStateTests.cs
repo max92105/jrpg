@@ -204,6 +204,41 @@ public sealed class ExplorationStateTests
         Assert.Throws<InvalidOperationException>(exploration.ContinueEvent);
     }
 
+    [Fact]
+    public void IsPlayerMoving_PushingIntoMapEdge_IsTrue()
+    {
+        var exploration = StartAt(new Point2D(4.5, 4.5), Facing.Down);
+        exploration.Walk(MoveIntent.FromAxes(0, 1), _thirdOfASecond);
+        var againstEdge = exploration.PlayerPosition;
+
+        exploration.Walk(MoveIntent.FromAxes(0, 1), _thirdOfASecond);
+
+        Assert.Equal(againstEdge, exploration.PlayerPosition);
+        Assert.True(exploration.IsPlayerMoving);
+    }
+
+    [Fact]
+    public void IsPlayerMoving_NoIntent_IsFalse()
+    {
+        var exploration = StartAt(new Point2D(0.5, 4.5), Facing.Down);
+        exploration.Walk(MoveIntent.FromAxes(1, 0), TimeSpan.FromSeconds(0.1));
+
+        exploration.Walk(MoveIntent.None, TimeSpan.FromSeconds(0.1));
+
+        Assert.False(exploration.IsPlayerMoving);
+    }
+
+    [Fact]
+    public void PlayerPosition_AfterWalking_MatchesLocation()
+    {
+        var exploration = StartAt(new Point2D(0.5, 4.5), Facing.Down);
+
+        exploration.Walk(MoveIntent.FromAxes(1, 0), TimeSpan.FromSeconds(0.1));
+
+        Assert.Equal(exploration.Location.Position, exploration.PlayerPosition);
+        Assert.Equal(Facing.Right, exploration.PlayerFacing);
+    }
+
     private ExplorationState StartAt(Point2D position, Facing facing)
     {
         var layout = new MapLayoutBuilder().WithLayer("11111", "11111", "11111", "11111", "11111").Build() with

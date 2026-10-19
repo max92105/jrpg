@@ -61,6 +61,24 @@ public sealed class InputReaderTests
     }
 
     [Fact]
+    public void Read_WKey_MovesUp()
+    {
+        var frame = _reader.Read(new KeyboardState(Keys.W), _padAtRest);
+
+        Assert.Equal(0, frame.Move.X);
+        Assert.Equal(-1, frame.Move.Y);
+    }
+
+    [Fact]
+    public void Read_Backspace_PressesCancelOnly()
+    {
+        var frame = _reader.Read(new KeyboardState(Keys.Back), _padAtRest);
+
+        Assert.True(frame.IsPressed(GameButton.Cancel));
+        Assert.False(frame.IsPressed(GameButton.Menu));
+    }
+
+    [Fact]
     public void Read_StickOutsideDeadzone_OverridesKeys()
     {
         var stickDown = PadWith(new Vector2(0, -0.6f));

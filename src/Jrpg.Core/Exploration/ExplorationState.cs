@@ -32,6 +32,14 @@ public sealed class ExplorationState
 
     public MapLocation Location => new(_map.Definition.Id, _walker.Position, _walker.Facing);
 
+    /// <summary>The player's position, read every frame without building a <see cref="MapLocation"/>.</summary>
+    public Point2D PlayerPosition => _walker.Position;
+
+    public Facing PlayerFacing => _walker.Facing;
+
+    /// <summary>True while the player pushes in a direction, even against a wall, so the walk animation plays.</summary>
+    public bool IsPlayerMoving => _walker.IsMoving;
+
     /// <summary>The event step the player is reading, or null when no event runs.</summary>
     public EventStep? CurrentEventStep => _run?.Current;
 

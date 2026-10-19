@@ -20,7 +20,7 @@ internal sealed class SessionTransitions(ContentCatalog catalog, SceneStack scen
         var seed = Environment.TickCount;
         Debug.WriteLine($"New game seed: {seed}");
         var session = GameSession.StartNew(catalog, new SeededRandom(seed));
-        scenes.Push(new ExplorationScene(session.Exploration.Location, catalog, atlas, canopies));
+        scenes.Push(new ExplorationScene(session.Exploration, catalog, atlas, canopies));
         return session;
     }
 }

@@ -7,25 +7,44 @@ namespace Jrpg.Game.Exploration;
 
 /// <summary>
 /// Which part of the map the screen shows. A map smaller than the screen sits centered; a larger one follows its target
-/// but never shows past its edges (legacy <c>CameraManager</c>; following arrives with walking in part 3b).
+/// but never shows past its edges (legacy <c>CameraManager</c>).
 /// </summary>
 internal sealed class MapCamera
 {
+    // Legacy eased once per 60 Hz update; the share is applied per that tick so the feel doesn't depend on the frame rate.
+    private const double TicksPerSecond = 60;
+
+    // Kept unrounded so small easing steps add up instead of rounding away.
+    private double _originX;
+    private double _originY;
+
     /// <summary>The map pixel at the screen's top-left, in whole pixels so tiles never land between pixels and show seams.</summary>
-    public Vector2 Origin { get; private set; }
+    public Vector2 Origin => new((float)Math.Round(_originX), (float)Math.Round(_originY));
 
     /// <summary>Jumps to show <paramref name="center"/> (in cells) without easing, as when a map is entered.</summary>
-    public void SnapTo(Point2D center, MapLayout layout) =>
-        Origin = new Vector2(
-            AxisOrigin(center.X, layout.Width, VirtualScreen.Width),
-            AxisOrigin(center.Y, layout.Height, VirtualScreen.Height));
+    public void SnapTo(Point2D center, MapLayout layout)
+    {
+        _originX = AxisTarget(center.X, layout.Width, VirtualScreen.Width);
+        _originY = AxisTarget(center.Y, layout.Height, VirtualScreen.Height);
+    }
 
-    private static float AxisOrigin(double center, int mapCells, int screenPixels)
+    /// <summary>
+    /// Eases toward showing <paramref name="target"/> (in cells): each 1/60 s closes <paramref name="sharePerTick"/> of
+    /// the gap, so over <paramref name="delta"/> it closes <c>1 - (1 - share)^(delta × 60)</c>, and two half ticks equal
+    /// one tick (developer decision 86). The share is 0..1; legacy used 0.35 while walking and 0.1 standing.
+    /// </summary>
+    public void Follow(Point2D target, MapLayout layout, TimeSpan delta, double sharePerTick)
+    {
+        var closed = 1 - Math.Pow(1 - sharePerTick, delta.TotalSeconds * TicksPerSecond);
+        _originX += (AxisTarget(target.X, layout.Width, VirtualScreen.Width) - _originX) * closed;
+        _originY += (AxisTarget(target.Y, layout.Height, VirtualScreen.Height) - _originY) * closed;
+    }
+
+    private static double AxisTarget(double center, int mapCells, int screenPixels)
     {
         var mapPixels = mapCells * MapView.CellPixels;
-        var origin = mapPixels <= screenPixels
+        return mapPixels <= screenPixels
             ? (mapPixels - screenPixels) / 2.0
             : Math.Clamp((center * MapView.CellPixels) - (screenPixels / 2.0), 0, mapPixels - screenPixels);
-        return (float)Math.Round(origin);
     }
 }

@@ -197,7 +197,8 @@ Sizes are estimates of hand-written code plus tests. A slice estimated past ~300
 
 ### Phase M: walking and map events
 
-- [ ] **M1. Walking, walk animation and camera follow** (Core + Game, about 270 lines)
+- [x] **M1. Walking, walk animation and camera follow** (Core + Game, about 270 lines)
+  - **Done, with deviations:** the Core wall test is `IsPlayerMoving_PushingIntoMapEdge_IsTrue` (the test map has no walls; the edge blocks). Extra tests: `PlayerPosition_AfterWalking_MatchesLocation`, `WalkAnimation_Advance_LeftoverFromLastFrame_CountsTowardNext`. The camera keeps an unrounded origin and only rounds `Origin`. Input is still read while the window is unfocused (so held keys don't re-press), but the scene gets an empty frame. While an event runs, the sprite stands on frame 0. The hand checks below are still to do.
   - **Goal:** arrows, WASD, D-pad and stick walk the player. Walls and objects block, and diagonals slide along walls (Core, part 2). The sprite faces its direction and animates while pushing. The camera eases after the player and stays inside the map.
   - **Core:** `ExplorationState.IsPlayerMoving`, `PlayerPosition`, `PlayerFacing`.
   - **New types (Game):**

@@ -50,9 +50,10 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
 
     protected override void Update(GameTime gameTime)
     {
-        // No dead zone from MonoGame: StickReader applies the game's own.
+        // No dead zone from MonoGame: StickReader applies the game's own. Input is still read while another window has
+        // focus, so a key held across the switch isn't seen as a new press, but the game doesn't act on it (decision 83).
         var input = _input.Read(Keyboard.GetState(), GamePad.GetState(PlayerIndex.One, GamePadDeadZone.None));
-        _rootScene.Update(gameTime.ElapsedGameTime, input);
+        _rootScene.Update(gameTime.ElapsedGameTime, IsActive ? input : default);
         base.Update(gameTime);
     }
 

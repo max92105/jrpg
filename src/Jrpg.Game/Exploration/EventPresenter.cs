@@ -1,3 +1,4 @@
+using Jrpg.Core.Dialogue;
 using Jrpg.Core.Events;
 using Jrpg.Core.Exploration;
 using Jrpg.Game.Dialogue;
@@ -97,7 +98,7 @@ internal sealed class EventPresenter
         if (_reading is null)
         {
             _reading = StartReading(step);
-            _messageBox.Show(_reading.CurrentPage);
+            _messageBox.Show(_reading);
             return;
         }
 
@@ -118,16 +119,16 @@ internal sealed class EventPresenter
         }
         else if (_reading.PageIndex != shownPage)
         {
-            _messageBox.Show(_reading.CurrentPage);
+            _messageBox.Show(_reading);
         }
     }
 
     private SpeechPlayback StartReading(EventStep step) => step switch
     {
-        DialogueStep dialogue => new SpeechPlayback(dialogue.Speech.Lines, _dialogueCharacterTime),
+        DialogueStep dialogue => new SpeechPlayback(dialogue.Speech, _dialogueCharacterTime),
 
         // Shown whole: there's nothing to discover in it letter by letter. Core sets a receipt on every give-item step.
-        GiveItemStep => new SpeechPlayback([FoundItemText.Of(_exploration.CurrentItemReceipt!, _messages)], TimeSpan.Zero),
+        GiveItemStep => new SpeechPlayback(new Speech([FoundItemText.Of(_exploration.CurrentItemReceipt!, _messages)]), TimeSpan.Zero),
         _ => throw new ArgumentOutOfRangeException(nameof(step), step, "Only dialogue and found items have pages."),
     };
 }

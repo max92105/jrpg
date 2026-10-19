@@ -1,4 +1,6 @@
 using Jrpg.Core.Content;
+using Jrpg.Core.Dialogue;
+using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
 using Jrpg.Data.Content;
@@ -36,6 +38,24 @@ public sealed class ArtReferenceCheckTests
         var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
 
         Assert.Equal($"field-sprites/ghost.png: not found in {_artRoot}.", problem);
+    }
+
+    [Fact]
+    public void FindProblems_MissingDialoguePortrait_NamesTheEvent()
+    {
+        var start = _catalog.Maps["start"];
+        var chest = start.Layout.Objects.First(placed => placed.ObjectId == "chest");
+        var speech = new Speech(["Who goes there?"], Speaker: "Ghost", PortraitFile: "ghost.png");
+        var talkingChest = chest with { Events = [chest.Events[0] with { Steps = [new DialogueStep(speech)] }] };
+        var layout = start.Layout with { Objects = [.. start.Layout.Objects.Select(placed => placed == chest ? talkingChest : placed)] };
+        var catalog = _catalog with
+        {
+            Maps = new Dictionary<string, MapDefinition>(_catalog.Maps) { ["start"] = new MapDefinition(layout, start.Settings) },
+        };
+
+        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
+
+        Assert.Equal($"portraits/ghost.png: not found in {_artRoot}. Named by event '{chest.Events[0].Id}' on map 'start'.", problem);
     }
 
     [Fact]

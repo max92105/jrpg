@@ -1,3 +1,4 @@
+using Jrpg.Core.Dialogue;
 using Jrpg.Game.Dialogue;
 
 namespace Jrpg.Game.Tests.Dialogue;
@@ -7,7 +8,7 @@ public sealed class SpeechPlaybackTests
     private static readonly TimeSpan _characterTime = TimeSpan.FromMilliseconds(30);
 
     // Shown whole, so Confirm always turns the page.
-    private readonly SpeechPlayback _playback = new(["Hello.", "Goodbye."], TimeSpan.Zero);
+    private readonly SpeechPlayback _playback = new(new Speech(["Hello.", "Goodbye."]), TimeSpan.Zero);
 
     [Fact]
     public void CurrentPage_New_IsFirstPage()
@@ -48,7 +49,7 @@ public sealed class SpeechPlaybackTests
     [Fact]
     public void Confirm_WhileTyping_CompletesPageWithoutAdvancing()
     {
-        var typing = new SpeechPlayback(["Hello.", "Goodbye."], _characterTime);
+        var typing = new SpeechPlayback(new Speech(["Hello.", "Goodbye."]), _characterTime);
         typing.Update(_characterTime * 2);
 
         typing.Confirm();
@@ -60,7 +61,7 @@ public sealed class SpeechPlaybackTests
     [Fact]
     public void Confirm_TurningPage_StartsTypingNextPage()
     {
-        var typing = new SpeechPlayback(["Hello.", "Goodbye."], _characterTime);
+        var typing = new SpeechPlayback(new Speech(["Hello.", "Goodbye."]), _characterTime);
         typing.Update(TimeSpan.FromSeconds(1));
 
         typing.Confirm();
@@ -72,7 +73,7 @@ public sealed class SpeechPlaybackTests
     [Fact]
     public void IsMarkerVisible_WhileTyping_IsFalse()
     {
-        var typing = new SpeechPlayback(["Hello."], _characterTime);
+        var typing = new SpeechPlayback(new Speech(["Hello."]), _characterTime);
 
         typing.Update(_characterTime);
 

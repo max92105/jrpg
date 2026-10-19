@@ -1,4 +1,5 @@
 using Jrpg.Core.Content;
+using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
 
@@ -10,7 +11,10 @@ namespace Jrpg.Data.Art;
 /// </summary>
 public static class ArtReferenceCheck
 {
-    /// <summary>Every tilesheet and the field sprite exist as PNGs, and every tile's cell lies inside its sheet.</summary>
+    /// <summary>
+    /// Every tilesheet, the field sprite and every dialogue portrait exist as PNGs, and every tile's cell lies inside
+    /// its sheet.
+    /// </summary>
     /// <returns>One line per problem, naming the file; empty when the art is complete.</returns>
     public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string artRoot)
     {
@@ -33,34 +37,58 @@ public static class ArtReferenceCheck
         }
 
         TryReadSize(artRoot, ArtFolders.FieldSprites, catalog.NewGame.FieldSpriteFile, problems);
+        foreach (var (mapId, mapEvent, portraitFile) in DialoguePortraits(catalog))
+        {
+            if (ReadSize(artRoot, ArtFolders.Portraits, portraitFile).Problem is { } problem)
+            {
+                problems.Add($"{problem} Named by event '{mapEvent.Id}' on map '{mapId}'.");
+            }
+        }
+
         return problems;
     }
+
+    // Every portrait a dialogue step names, with the map and event that name it, in a stable order for the report.
+    private static IEnumerable<(string MapId, MapEvent Event, string PortraitFile)> DialoguePortraits(ContentCatalog catalog) =>
+        from map in catalog.Maps.Values.OrderBy(map => map.Id, StringComparer.Ordinal)
+        from mapEvent in map.Layout.Objects.SelectMany(placed => placed.Events).Concat(map.Layout.CellEvents.Select(cell => cell.Event))
+        from step in mapEvent.Steps.OfType<DialogueStep>()
+        where step.Speech.PortraitFile is not null
+        select (map.Id, mapEvent, step.Speech.PortraitFile!);
 
     private static bool IsCellInside(TileDefinition tile, TilesheetDefinition sheet, (int Width, int Height) size) =>
         sheet.CellLeft(tile.Column) + sheet.TileWidth <= size.Width && sheet.CellTop(tile.Row) + sheet.TileHeight <= size.Height;
 
     private static (int Width, int Height)? TryReadSize(string artRoot, string folder, string file, List<string> problems)
     {
+        var (size, problem) = ReadSize(artRoot, folder, file);
+        if (problem is not null)
+        {
+            problems.Add(problem);
+        }
+
+        return size;
+    }
+
+    private static ((int Width, int Height)? Size, string? Problem) ReadSize(string artRoot, string folder, string file)
+    {
         var path = Path.Combine(artRoot, folder, file);
         if (!File.Exists(path))
         {
-            problems.Add($"{ShownPath(folder, file)}: not found in {artRoot}.");
-            return null;
+            return (null, $"{ShownPath(folder, file)}: not found in {artRoot}.");
         }
 
         try
         {
-            return PngSize.Read(path);
+            return (PngSize.Read(path), null);
         }
         catch (ContentValidationException)
         {
-            problems.Add($"{ShownPath(folder, file)}: not a PNG image.");
-            return null;
+            return (null, $"{ShownPath(folder, file)}: not a PNG image.");
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            problems.Add($"{ShownPath(folder, file)}: {exception.Message}");
-            return null;
+            return (null, $"{ShownPath(folder, file)}: {exception.Message}");
         }
     }
 

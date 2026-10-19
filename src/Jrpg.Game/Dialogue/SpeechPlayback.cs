@@ -1,3 +1,5 @@
+using Jrpg.Core.Dialogue;
+
 namespace Jrpg.Game.Dialogue;
 
 /// <summary>
@@ -14,14 +16,18 @@ internal sealed class SpeechPlayback
     private Typewriter _typewriter;
     private TimeSpan _sinceComplete;
 
-    /// <param name="pages">At least one page; content validation guarantees a dialogue step has a line.</param>
+    /// <param name="speech">Its lines are the pages, at least one (content validation); its speaker and portrait show with them.</param>
     /// <param name="characterTime">Per character typed; zero shows each page whole.</param>
-    public SpeechPlayback(IReadOnlyList<string> pages, TimeSpan characterTime)
+    public SpeechPlayback(Speech speech, TimeSpan characterTime)
     {
-        _pages = pages;
+        Speech = speech;
+        _pages = speech.Lines;
         _characterTime = characterTime;
-        _typewriter = new Typewriter(pages[0].Length, characterTime);
+        _typewriter = new Typewriter(_pages[0].Length, characterTime);
     }
+
+    /// <summary>Who speaks and with which portrait; a found item has neither.</summary>
+    public Speech Speech { get; }
 
     /// <summary>Which page is on screen, so the box lays a page out only when it turns.</summary>
     public int PageIndex { get; private set; }

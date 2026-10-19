@@ -302,7 +302,8 @@ M4 was split in two before it started (developer, 2026-10-19): it came out at ab
     - [ ] The marker blinks once the page is complete.
     - [ ] Opening the chest shows the message whole.
 
-- [ ] **M4b. Speaker and portrait** (Data + Game, about 140 lines)
+- [x] **M4b. Speaker and portrait** (Data + Game, about 140 lines)
+  - **Done, with deviations:** `Ui/GradientStrip` and `GradientStop` came forward from G1 (the name strip is their first user), with `GradientStrip_Colors_TwoStops_InterpolatesMidpoint` and two more tests. New pure `Ui/DiamondCrop` cuts each portrait (1024 px) into its 200 px diamond once, since SpriteBatch can't clip; 5 tests. `SpeechPlayback` now takes the Core `Speech`. The name strip is a fixed 520 px, so a very long name can run past its fade (follow-up: size it to the name). No content has a speaker or portrait yet: the hand check needs a sign made in the editor. The hand check is still to do.
   - **Goal:** speaker and portrait show when the step has them. **Look (developer, 2026-10-19):** a diamond-framed portrait at the box's left, like the examples' turn-order portraits; the name above the box in spaced caps on a dark strip fading to the right.
   - **Data:** `ArtReferenceCheck` covers portraits named by dialogue steps.
   - **Tests:** Data `ArtReferenceCheck_FindProblems_MissingDialoguePortrait_NamesTheEvent`.
@@ -384,7 +385,7 @@ M4 was split in two before it started (developer, 2026-10-19): it came out at ab
     - `Flow/MenuTransitions`: pushes and pops the menu.
     - `SessionTransitions` handles `TitleRequested`: ends the session, `ReplaceAll` with the title, behind the fade.
     - `Ui/TabStrip` (pure): the selected tab; `Previous`, `Next`, wraps.
-    - `Ui/UiTextures` gains the nav-tab arrow (legacy `Shape.NavTab`, masked through `CanopyMask.Build`) and the selection gradients. Moved here from M3b: `UiTextures` itself and the pure `Ui/GradientStrip`, with `GradientStrip_Colors_TwoStops_InterpolatesMidpoint`.
+    - `Ui/UiTextures` gains the nav-tab arrow (legacy `Shape.NavTab`, masked through `CanopyMask.Build`) and the selection gradients. Moved here from M3b: `UiTextures` itself. (`Ui/GradientStrip` arrived earlier, in M4b.)
     - `Menus/IMenuPage`: one page of the game menu. Title message id, `SceneRequest? Update(InputFrame input)`, `Draw`, and whether Cancel leaves it. Implemented by every page in this plan.
     - `Menus/GameMenuScene`: the tabs and the open page.
     - `Menus/SystemPage`: the System entries.

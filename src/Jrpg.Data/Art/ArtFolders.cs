@@ -8,5 +8,8 @@ public static class ArtFolders
     /// <summary>The sprites the party walks the map with.</summary>
     public const string FieldSprites = "field-sprites";
 
+    /// <summary>The faces dialogue shows next to a speaker's lines.</summary>
+    public const string Portraits = "portraits";
+
     public static string RootIn(string contentRoot) => Path.Combine(contentRoot, "art");
 }

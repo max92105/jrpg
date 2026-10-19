@@ -1,5 +1,6 @@
 using FontStashSharp;
 using FontStashSharp.RichText;
+using Jrpg.Data.Art;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
@@ -8,8 +9,9 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Dialogue;
 
 /// <summary>
-/// The message box at the bottom of the map: the typed part of one page in the legacy <c>DialogueBox</c> panel, and a
-/// blinking marker once the page is complete.
+/// The message box at the bottom of the map: the typed part of one page in the legacy <c>DialogueBox</c> panel, a
+/// blinking marker once the page is complete, and the speaker's name and diamond-framed portrait when the speech has
+/// them (developer, 2026-10-19: the look of the turn-order portraits in <c>docs/ui_ux_exemples</c>).
 /// </summary>
 internal sealed class DialogueBox
 {
@@ -21,42 +23,116 @@ internal sealed class DialogueBox
     // Legacy 2 px border plus 8 px padding, doubled.
     private const int TextInset = 20;
 
-    // A small diamond rather than legacy's ▶, which the font lacks; diamonds echo the reference UI (docs/ui_ux_exemples).
+    // A small diamond rather than legacy's ▶, which the font lacks; diamonds echo the reference UI.
     private const int MarkerSide = 14;
+
+    // The portrait's diamond fills the box's height inside the inset; a white frame shows around it.
+    private const int PortraitSize = Height - (2 * TextInset);
+    private const int PortraitFrame = 3;
+
+    // The name sits on a strip just above the box's top-left corner.
+    private const int NameStripWidth = 520;
+    private const int NameStripHeight = 44;
+    private const int NameStripGap = 8;
+    private const int NameInset = 24;
 
     private static readonly Rectangle _area = new((VirtualScreen.Width - Width) / 2, VirtualScreen.Height - BottomMargin - Height, Width, Height);
     private static readonly Vector2 _markerCenter = new(_area.Right - TextInset - MarkerSide, _area.Bottom - TextInset - MarkerSide);
+    private static readonly Vector2 _portraitCenter = new(_area.X + TextInset + (PortraitSize / 2f), _area.Y + (Height / 2f));
+    private static readonly Rectangle _nameStrip = new(_area.X, _area.Y - NameStripGap - NameStripHeight, NameStripWidth, NameStripHeight);
 
     private readonly PanelView _panel = new(UiTheme.MessagePanel);
     private readonly SpriteFontBase _font;
+    private readonly SpriteFontBase _speakerFont;
     private readonly RichTextLayout _layout;
+
+    // Baked on first use: a portrait is cut into its diamond once, the strip's gradient once.
+    private readonly Dictionary<string, Texture2D> _portraits = [];
+    private Texture2D? _nameStripTexture;
+
+    private Vector2 _textTopLeft;
+    private string? _speakerCaps;
 
     public DialogueBox(FontLibrary fonts)
     {
         _font = fonts.FontAt(UiTheme.MessageTextPixels);
+        _speakerFont = fonts.FontAt(UiTheme.SpeakerTextPixels);
         _layout = new RichTextLayout
         {
             // Off, so a bracket or a slash in content text is never read as a FontStashSharp formatting command.
             SupportsCommands = false,
             Font = _font,
-            Width = Width - (2 * TextInset),
         };
     }
 
-    /// <summary>Wraps the page into lines once; drawing then shows slices of it and allocates nothing.</summary>
-    public void Show(string page) => _layout.Text = page;
+    /// <summary>
+    /// Lays out the current page, beside the portrait when there is one, and the speaker's name. Called when a speech
+    /// starts and when its page turns; drawing then shows slices of the page and allocates nothing.
+    /// </summary>
+    public void Show(SpeechPlayback reading)
+    {
+        var textLeft = reading.Speech.PortraitFile is null ? TextInset : TextInset + PortraitSize + TextInset;
+        _textTopLeft = new Vector2(_area.X + textLeft, _area.Y + TextInset);
+        _layout.Width = Width - textLeft - TextInset;
+        _layout.Text = reading.CurrentPage;
+        _speakerCaps = reading.Speech.Speaker?.ToUpperInvariant();
+    }
 
     /// <param name="batch">The begun batch.</param>
-    /// <param name="textures">For the panel and the marker.</param>
-    /// <param name="reading">The playback whose current page was given to <see cref="Show"/>.</param>
+    /// <param name="textures">For the panel, the portrait and the marker.</param>
+    /// <param name="reading">The playback last given to <see cref="Show"/>.</param>
     public void Draw(SpriteBatch batch, TextureLibrary textures, SpeechPlayback reading)
     {
         _panel.Draw(batch, textures, _area);
+        if (_speakerCaps is not null)
+        {
+            DrawSpeaker(batch, textures, _speakerCaps);
+        }
+
+        if (reading.Speech.PortraitFile is { } portraitFile)
+        {
+            DrawPortrait(batch, textures, portraitFile);
+        }
+
         DrawTypedText(batch, reading.VisibleLength);
         if (reading.IsMarkerVisible)
         {
-            batch.Draw(textures.Pixel, _markerCenter, null, UiTheme.MessageText, MathHelper.PiOver4, new Vector2(0.5f), new Vector2(MarkerSide), SpriteEffects.None, 0);
+            DrawDiamond(batch, textures, _markerCenter, MarkerSide);
         }
+    }
+
+    // A white square turned 45°: the marker, and the portrait's frame.
+    private static void DrawDiamond(SpriteBatch batch, TextureLibrary textures, Vector2 center, float side) =>
+        batch.Draw(textures.Pixel, center, null, UiTheme.MessageText, MathHelper.PiOver4, new Vector2(0.5f), new Vector2(side), SpriteEffects.None, 0);
+
+    private void DrawSpeaker(SpriteBatch batch, TextureLibrary textures, string speakerCaps)
+    {
+        _nameStripTexture ??= textures.Create(NameStripWidth, 1, GradientStrip.Colors(UiTheme.SpeakerStrip, NameStripWidth));
+        batch.Draw(_nameStripTexture, _nameStrip, Color.White);
+        var namePosition = new Vector2(_nameStrip.X + NameInset, _nameStrip.Y + ((NameStripHeight - _speakerFont.LineHeight) / 2f));
+        _speakerFont.DrawText(batch, speakerCaps, namePosition, UiTheme.MessageText, characterSpacing: UiTheme.SpeakerLetterSpacing);
+    }
+
+    private void DrawPortrait(SpriteBatch batch, TextureLibrary textures, string portraitFile)
+    {
+        // A diamond's diagonal is its square's side times √2, so the frame's square is the framed diagonal over √2.
+        DrawDiamond(batch, textures, _portraitCenter, (PortraitSize + (2 * PortraitFrame)) / MathF.Sqrt(2));
+        var corner = new Point((int)_portraitCenter.X - (PortraitSize / 2), (int)_portraitCenter.Y - (PortraitSize / 2));
+        batch.Draw(PortraitOf(portraitFile, textures), new Rectangle(corner, new Point(PortraitSize)), Color.White);
+    }
+
+    private Texture2D PortraitOf(string portraitFile, TextureLibrary textures)
+    {
+        if (!_portraits.TryGetValue(portraitFile, out var baked))
+        {
+            var source = textures.Get(ArtFolders.Portraits, portraitFile);
+            var pixels = new Color[source.Width * source.Height];
+            source.GetData(pixels);
+            baked = textures.Create(PortraitSize, PortraitSize, DiamondCrop.Bake(pixels, source.Width, source.Height, PortraitSize));
+            _portraits.Add(portraitFile, baked);
+        }
+
+        return baked;
     }
 
     // Each line is cut where the typing has reached, so words never jump to the next line as they appear. A line ends
@@ -66,7 +142,7 @@ internal sealed class DialogueBox
     {
         var text = _layout.Text;
         var lines = _layout.Lines;
-        var position = new Vector2(_area.X + TextInset, _area.Y + TextInset);
+        var position = _textTopLeft;
         for (var index = 0; index < lines.Count; index++)
         {
             var line = lines[index];

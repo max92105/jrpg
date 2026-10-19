@@ -95,7 +95,7 @@
         <TabItem x:Name="EventsTab" Header="Events">
           <TextBlock Margin="8"
                      TextWrapping="Wrap"
-                     Text="Click an object on the map to edit its events. Dots on an object show its events: yellow when the player presses a button, cyan when the player walks into it." />
+                     Text="Click an object on the map to edit its events, or a cell without an object to edit the event that runs when the player walks onto it; right click removes a cell's event. Dots on an object show its events (yellow: pressed, cyan: walked into); a cyan square marks a cell with an event." />
         </TabItem>
       </TabControl>
     </DockPanel>

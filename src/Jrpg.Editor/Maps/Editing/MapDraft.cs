@@ -13,6 +13,7 @@ internal sealed class MapDraft
 {
     private readonly SortedDictionary<int, int[][]> _layerRowsByZ = [];
     private readonly List<PlacedObject> _objects = [];
+    private readonly List<CellEvent> _cellEvents = [];
     private MapLayout _source;
 
     private MapDraft(MapDefinition source)
@@ -63,6 +64,12 @@ internal sealed class MapDraft
         _objects[index] = _objects[index] with { Events = events };
     }
 
+    public void InsertCellEvent(int index, CellEvent cellEvent) => _cellEvents.Insert(index, cellEvent);
+
+    public void RemoveCellEventAt(int index) => _cellEvents.RemoveAt(index);
+
+    public void ReplaceCellEvent(int index, CellEvent cellEvent) => _cellEvents[index] = cellEvent;
+
     /// <summary>Replaces everything on the map at once: its size, tiles, objects and cell events, as a resize does.</summary>
     public void ReplaceLayout(MapLayout layout)
     {
@@ -75,6 +82,8 @@ internal sealed class MapDraft
 
         _objects.Clear();
         _objects.AddRange(layout.Objects);
+        _cellEvents.Clear();
+        _cellEvents.AddRange(layout.CellEvents);
     }
 
     /// <summary>
@@ -86,6 +95,6 @@ internal sealed class MapDraft
         var layers = _layerRowsByZ
             .Where(layer => layer.Value.Any(row => row.Any(tileId => tileId != TileLayer.EmptyTileId)))
             .Select(layer => new TileLayer { Z = layer.Key, Rows = [.. layer.Value.Select(row => (IReadOnlyList<int>)[.. row])] });
-        return new MapDefinition(_source with { Layers = [.. layers], Objects = [.. _objects] }, Settings);
+        return new MapDefinition(_source with { Layers = [.. layers], Objects = [.. _objects], CellEvents = [.. _cellEvents] }, Settings);
     }
 }

@@ -1,0 +1,53 @@
+<!-- The fields of one event step, shown for the step in its DataContext; the lists come from the window's Choices. -->
+<UserControl x:Class="Jrpg.Editor.Events.EventStepEditor"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <UserControl.Resources>
+    <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
+  </UserControl.Resources>
+  <StackPanel>
+    <StackPanel Visibility="{Binding IsDialogue, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
+      <TextBlock Text="Lines, one message box each" />
+      <TextBox Height="90"
+               AcceptsReturn="True"
+               TextWrapping="Wrap"
+               VerticalScrollBarVisibility="Auto"
+               Text="{Binding LinesText, UpdateSourceTrigger=PropertyChanged}" />
+      <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+        <TextBlock Text="Speaker (optional)" Width="160" VerticalAlignment="Center" />
+        <TextBox Width="160" Text="{Binding Speaker, UpdateSourceTrigger=PropertyChanged}" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+        <TextBlock Text="Portrait file (optional)" Width="160" VerticalAlignment="Center" />
+        <TextBox Width="160" Text="{Binding PortraitFile, UpdateSourceTrigger=PropertyChanged}" />
+      </StackPanel>
+    </StackPanel>
+    <StackPanel Orientation="Horizontal" Visibility="{Binding IsGiveItem, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
+      <TextBlock Text="Give" VerticalAlignment="Center" Margin="0,0,4,0" />
+      <TextBox Width="50" Text="{Binding QuantityText, UpdateSourceTrigger=PropertyChanged}" />
+      <TextBlock Text=" x " VerticalAlignment="Center" />
+      <ComboBox Width="200"
+                ItemsSource="{Binding DataContext.Choices.ItemIds, RelativeSource={RelativeSource AncestorType=Window}}"
+                SelectedItem="{Binding ItemId}" />
+    </StackPanel>
+    <StackPanel Orientation="Horizontal" Visibility="{Binding IsSwapObject, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
+      <TextBlock Text="The object becomes" VerticalAlignment="Center" Margin="0,0,4,0" />
+      <ComboBox Width="200"
+                ItemsSource="{Binding DataContext.Choices.ObjectIds, RelativeSource={RelativeSource AncestorType=Window}}"
+                SelectedItem="{Binding ObjectId}" />
+    </StackPanel>
+    <StackPanel Orientation="Horizontal" Visibility="{Binding IsWarp, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
+      <TextBlock Text="Warp to" VerticalAlignment="Center" Margin="0,0,4,0" />
+      <ComboBox Width="160"
+                ItemsSource="{Binding DataContext.Choices.MapIds, RelativeSource={RelativeSource AncestorType=Window}}"
+                SelectedItem="{Binding MapId}" />
+      <TextBlock Text=" at cell (" VerticalAlignment="Center" />
+      <TextBox Width="40" Text="{Binding CellXText, UpdateSourceTrigger=PropertyChanged}" />
+      <TextBlock Text=", " VerticalAlignment="Center" />
+      <TextBox Width="40" Text="{Binding CellYText, UpdateSourceTrigger=PropertyChanged}" />
+      <TextBlock Text=")" VerticalAlignment="Center" />
+    </StackPanel>
+    <TextBlock Foreground="DarkRed" TextWrapping="Wrap" Text="{Binding Problem}" />
+  </StackPanel>
+</UserControl>

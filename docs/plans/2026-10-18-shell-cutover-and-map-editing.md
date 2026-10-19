@@ -398,10 +398,11 @@ The developer still edits maps in the legacy MapEditor (ADR 0005), so render dat
   - **Tests:** `EventPresets_Chest_GivesItemThenSwapsToOpenedObject`, `EventPresets_GuessOpenedObject_ChestFindsChestOpened`, `EventPresets_Door_TouchWarpOnlyWhenOpen`.
   - **Done, with deviations:** presets leave empty what only the developer can say (the chest's item, the warp's map, the sign's text), and the dialog selects the first such step; a dialogue without lines is now a step problem (the game already refused it on save). The planned door test is `EventPresetsTests.DoorYouOpen_OpensWhileClosed_WarpsOnlyWhenOpen`, since Door and Door you open are separate presets. New ids come from `EventIdAllocation` (also used by Add), skipping the ids the object had when the dialog opened. The guess sorts by id, so it doesn't depend on load order; with no object id containing "open" it falls back to the object itself, as legacy did, which makes the chest swap into itself (to check by hand).
 
-- [ ] **11j-2. Cell events** (Editor, about 350 lines)
+- [x] **11j-2. Cell events** (Editor, about 350 lines)
   - **Goal:** clicking a cell with no object in event mode adds or edits its touch event (warp or dialogue steps); right click removes it; cells with an event are marked. Ids keep the content's `cell_{x}_{y}`.
   - **New types:** `SetCellEventEdit`, a cell event dialog.
   - **Tests:** `SetCellEventEdit_SecondEventOnSameCell_ReplacesFirst`.
+  - **Done, with deviations:** the cell event dialog (`CellEventWindow`, `CellEventViewModel`) offers warp and dialogue steps and the once flag; an event needs at least one step. The step fields moved into a shared `EventStepEditor` used by both dialogs. Edits keep a cell event's place in the list, so files change only where the map did. A right click on an object does nothing in event mode, so a cell event hidden under it isn't removed unseen. Cell markers are cyan squares in the cell's top-right corner (legacy yellow; cyan matches "walked into" in the object markers). The planned test is `SetCellEventEditTests.Apply_SecondEventOnSameCell_ReplacesFirstInPlace`. The end-of-3a hand check below is still to do.
   - **Verify by hand (end of part 3a):** open `start`, paint a path with brush, rectangle and fill on two layers, place a tree and a chest with the Chest preset, add a warp cell, set encounters, undo and redo across it, save, press F5: the game shows the change.
 
 ## Decisions (developer, 2026-10-18)

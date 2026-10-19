@@ -53,6 +53,55 @@ public sealed class EventEditingViewModelTests
     }
 
     [Fact]
+    public void StartEditingCellAt_CellWithEvent_EditsIt()
+    {
+        _eventEditing.OpenMap = new MapViewModel(_catalog.Maps["interior_1"]);
+
+        var cellEvent = _eventEditing.StartEditingCellAt(new GridCell(6, 19))!;
+
+        Assert.Equal("cell_6_19", cellEvent.Event.Id);
+    }
+
+    [Fact]
+    public void StartEditingCellAt_OffTheMap_IsNull()
+    {
+        Assert.Null(_eventEditing.StartEditingCellAt(new GridCell(-1, 0)));
+    }
+
+    [Fact]
+    public void RemoveCellEventAt_CellWithEvent_IsOneUndoStep()
+    {
+        var map = _eventEditing.OpenMap = new MapViewModel(_catalog.Maps["interior_1"]);
+        var before = map.Map.Layout.CellEvents.Count;
+
+        _eventEditing.RemoveCellEventAt(new GridCell(6, 19));
+
+        Assert.Equal(before - 1, map.Map.Layout.CellEvents.Count);
+        map.UndoCommand.Execute(null);
+        Assert.Equal(before, map.Map.Layout.CellEvents.Count);
+    }
+
+    [Fact]
+    public void RemoveCellEventAt_CellWithoutEvent_ChangesNothing()
+    {
+        _eventEditing.RemoveCellEventAt(new GridCell(0, 0));
+
+        Assert.False(_eventEditing.OpenMap!.IsDirty);
+    }
+
+    [Fact]
+    public void Apply_NewCellEvent_AddsIt()
+    {
+        var cellEvent = _eventEditing.StartEditingCellAt(new GridCell(1, 1))!;
+        cellEvent.Event.AddWarpCommand.Execute(null);
+        cellEvent.Event.SelectedStep!.MapId = "forest";
+
+        _eventEditing.Apply(cellEvent);
+
+        Assert.Contains(_eventEditing.OpenMap!.Map.Layout.CellEvents, added => added.Event.Id == "cell_1_1");
+    }
+
+    [Fact]
     public void Apply_NothingChanged_AddsNoUndoStep()
     {
         _eventEditing.Apply(_eventEditing.StartEditingAt(ChestCenter)!);

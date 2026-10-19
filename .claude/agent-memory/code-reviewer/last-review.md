@@ -5,12 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 11j-1 (Event presets)
-Round: 1 (verdict: Fix the Criticals; build 0 warnings, 819 tests pass, format exit 0)
+Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 11j-2 (Cell events)
+Round: 1 (verdict: Ready to commit; build 0 warnings, 832 tests pass, format exit 0)
 
-- open (Critical): tests/Jrpg.Editor.Tests/Events/EventPresetsTests.cs:28 Door_TouchWarpOnlyWhenOpen tests DoorYouOpen (misleading next to Door_WalkedInto_Warps); rename DoorYouOpen_...
-- open (Warning): selection after a preset only pinned when the first event has the problem; DoorYouOpen (problem in event 2, warp) untested at VM level
-- open (Suggestion): fallback guess = object itself makes chest swap to itself / DoorYouOpen warp while closed, no Problem flags it (legacy same)
-- open (Suggestion): PresetTarget also serves AddEvent; name is preset-specific
-- open (Suggestion): GuessOpenedObject_ChestFindsChestOpened duplicates the theory's ("chest","chest_opened") row
-- verified: ids skip both current and dialog-open event ids; legacy prompts/IsOnce/OnlyWhen match; Dialogue empty-lines Problem notified via LinesText; validator refuses empty ids on save
+- open (Suggestion): ObjectEventsWindow.xaml:12 VisibleWhenTrue resource now unused after the step fields moved to EventStepEditor; delete it
+- open (Suggestion): SetCellEventEditTests.cs:20 SecondEventOnSameCell_ReplacesFirst lacks the Method_ part; Apply_SecondEventOnSameCell_ReplacesFirstInPlace
+- open (Suggestion): right click on an object in event mode silently removes a cell event hidden under it (cell under an object can't be opened by left click); consider ignoring right click when an object is hit
+- verified: SetCellEventEdit index stays valid on a linear undo stack (ResizeMapEdit swaps whole layouts); MapDraft ctor fills cell events via ReplaceLayout; EventStepEditor RelativeSource Window binding resolves Choices in both dialogs; ids cell_x_y can't collide with {uid}_{n}

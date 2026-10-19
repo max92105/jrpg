@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, M4b (Speaker and portrait)
-Round: 1 (verdict: Fix the Criticals; build 0 warnings, format exit 0; full run 899/900 with ExplorationSceneTests flake, second full run and Game-only rerun 115/115 clean)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, W1 (Full screen and Alt+Enter)
+Round: 1 (verdict: Ready to commit; build 0 warnings, 905/905 tests, format exit 0)
 
-- open (Critical): DiamondCrop.Bake block side = side/size integer; a portrait smaller than 200 px (PortraitSize) gives a 0x0 block -> DivideByZeroException in Average during Draw; use per-pixel bounds [x*side/size, max((x+1)*side/size, start+1)) and add an upscale test
-- open (Suggestion): record in M4b slice note: GradientStrip pulled from G1, new DiamondCrop type, extra tests
-- open (Suggestion): name strip is a fixed 520 px; a long speaker name in spaced caps runs past its fade
-- follow-up: content/art/portraits/fighter.png is a JPEG with a .png name; enemies.json names "goblin.png" but the file is "Goblin.png" (case only works on Windows)
+- open (Suggestion): Alt+Enter swallowing the Confirm lives only in JrpgGame.Update, untested; add a W1 hand-check ("Alt+Enter on the dialogue box doesn't advance it")
+- open (Suggestion): back-buffer size choice duplicated in ctor and ApplyWindowMode; one private `BackBufferSizeFor(bool fullScreen)`; `DisplaySize()` is a noun, e.g. `ReadDisplaySize()`
+- open (Suggestion): record in W1 slice note the test-name prefix deviation (IsPressed_... vs plan's FullScreenShortcut_...) and the extra RightAlt test
+- follow-up: full screen sizes to the primary display (DefaultAdapter.CurrentDisplayMode); check by hand on a second monitor of another resolution

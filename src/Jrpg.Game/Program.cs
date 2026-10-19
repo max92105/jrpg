@@ -4,6 +4,7 @@ using Jrpg.Data.Content;
 using Jrpg.Data.Messages;
 using Jrpg.Game;
 using Jrpg.Game.Flow;
+using Jrpg.Game.Hosting;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Scenes;
 using Jrpg.Game.Ui;
@@ -27,7 +28,7 @@ catch (Exception exception) when (IsStartupProblem(exception))
 var artRoot = ArtFolders.RootIn(contentRoot);
 using (fonts)
 {
-    using var game = new JrpgGame(FirstScene(contentRoot, artRoot, messages, fonts), artRoot);
+    using var game = new JrpgGame(FirstScene(contentRoot, artRoot, messages, fonts), artRoot, new PlayerSettings());
     game.Run();
 }
 

@@ -312,7 +312,8 @@ M4 was split in two before it started (developer, 2026-10-19): it came out at ab
 
 ### Phase W: full screen
 
-- [ ] **W1. Full screen and Alt+Enter** (Game, about 140 lines)
+- [x] **W1. Full screen and Alt+Enter** (Game, about 140 lines)
+  - **Done, with deviations:** the tests are named `IsPressed_...` like the other Game tests, and `IsPressed_RightAlt_IsTrue` was added. The update that Alt+Enter fires gives the scene no input, since Enter is also Confirm. Full screen takes the primary display's size (follow-up: check a second monitor by hand). The hand checks are still to do.
   - **Goal:** the game starts in borderless full screen (decision 78). Alt+Enter switches between full screen and the resizable window. The 1920 x 1080 virtual screen stays letterboxed in both.
   - **New types (Game):**
     - `Hosting/PlayerSettings`: the options the player chose. Here only `IsFullScreen`; created by `Program`, given to `JrpgGame`.
@@ -324,6 +325,7 @@ M4 was split in two before it started (developer, 2026-10-19): it came out at ab
     - [ ] Alt+Enter goes windowed and back without stretching.
     - [ ] Alt+Tab away and back works.
     - [ ] Debugging with a breakpoint is still usable (question 93).
+    - [ ] Alt+Enter while a dialogue page is open switches the screen mode and doesn't advance the page.
 
 ### Phase T: title screen
 

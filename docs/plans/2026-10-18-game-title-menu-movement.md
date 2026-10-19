@@ -491,7 +491,13 @@ G4 was split in two (developer, 2026-10-19), since it came to about 420 lines: G
   - **Verify by hand:**
     - [ ] Every member shows the right portrait and stats.
 
-- [ ] **G4-2. Status bars** (Game, about 140 lines)
+- [x] **G4-2. Status bars** (Game, about 140 lines)
+  - **Done, with deviations:**
+    - Legacy `StatusView` had no HP or MP bars; these sit under their stat lines. They are 6 px tall like the XP bar, rather than legacy's default 10, so they fit the 36 px lines.
+    - Square corners: the legacy track was rounded.
+    - The gradient covers only the filled part, as WPF did, and anything above zero shows at least 1 px.
+    - `UiTextures.Gradient` caches one texture per theme gradient. The XP fill rule is the pure `StatusPage.ExperienceProgress`, with 2 tests; `StatBar.Show` has 3.
+    - Follow-up: `DialogueBox`'s name strip could use `UiTextures.Gradient`, alongside its portrait-cache follow-up.
   - **Goal:** the Status page shows HP, MP and experience as bars with the legacy `Bars.xaml` gradients.
   - **New types (Game):** `Ui/StatBar`: draws a filled bar with a legacy gradient.
   - **Verify by hand:**

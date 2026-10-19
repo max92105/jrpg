@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Jrpg.Data.Art;
 using Jrpg.Game.Rendering;
 using Microsoft.Xna.Framework;
@@ -11,6 +12,9 @@ namespace Jrpg.Game.Ui;
 /// </summary>
 internal sealed class UiTextures
 {
+    // Wide enough that a gradient stretched over a long bar shows no steps.
+    private const int GradientWidth = 256;
+
     private Texture2D? _navTab;
     private Texture2D? _selectedNavTab;
     private Texture2D? _menuScrim;
@@ -18,6 +22,7 @@ internal sealed class UiTextures
     private Texture2D? _selectionFill;
     private Texture2D? _sectionLine;
     private readonly Dictionary<(string File, int Size), Texture2D> _diamondPortraits = [];
+    private readonly Dictionary<ImmutableArray<GradientStop>, Texture2D> _gradients = [];
 
     /// <summary>A tab that isn't selected: the arrow, dark and faintly outlined.</summary>
     public Texture2D NavTab(TextureLibrary textures) =>
@@ -62,6 +67,21 @@ internal sealed class UiTextures
         }
 
         return baked;
+    }
+
+    /// <summary>
+    /// A gradient as one row, stretched over whatever shows it, made once per gradient. The theme's gradients are
+    /// single instances, so they work as keys.
+    /// </summary>
+    public Texture2D Gradient(TextureLibrary textures, ImmutableArray<GradientStop> stops)
+    {
+        if (!_gradients.TryGetValue(stops, out var texture))
+        {
+            texture = textures.Create(GradientWidth, 1, GradientStrip.Colors(stops, GradientWidth));
+            _gradients.Add(stops, texture);
+        }
+
+        return texture;
     }
 
     private static Color[] SolidRow(Color color, int width)

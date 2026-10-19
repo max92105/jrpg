@@ -5,12 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, G4-1 (Status page, text only; G4-2 bars split off)
-Round: 1 (verdict: Fix the Criticals; build 0 warnings, 957/957 tests, format exit 2)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, G4-2 (Status bars)
+Round: 1 (verdict: Ready to commit; build 0 warnings, 962/962 tests, format exit 0)
 
-- open (Critical): format fails, ENDOFLINE on every line of new tests/Jrpg.Game.Tests/Menus/StatusPageTests.cs; run dotnet format
-- open (Warning): StatusPage.SheetOf experience-to-next (table value - member.Experience) and "Max" at max level have no test
-- open (Warning): UiTextures.DiamondPortrait duplicates DialogueBox's portrait bake/cache (lines ~125-135); developer lists it as follow-up but plan note doesn't record it
-- open (Suggestion): plan test names differ from shipped (StatusPage_* vs Members_/Update_*, Data FindProblems_*); tick G4-1 and note deviations (diamond portrait, left-aligned values, no skills/icons, DialogueBox cache)
-- open (Suggestion): MemberSheet.Experiences / StatusLabels.Experiences name the level/EXP/next trio poorly; e.g. Progress / ProgressLabels
-- follow-up: DialogueBox should use UiTextures.DiamondPortrait
+- open (Warning): StatusPage.ShowMember XP fill (experience / ExperienceToReachNext, full at max level) untested; dropping the IsMaxLevel guard throws on a max-level member. Extract pure static like ToNextLevelText + 2 tests
+- open (Suggestion): StatBar.Draw MathF.Round makes a living member with small HP/max show an empty bar; use ceiling when Fraction > 0
+- open (Suggestion): _vitalBars[0]/[1] tied to stat order by comment only; name two fields or derive from sheet
+- open (Suggestion): tick G4-2 in plan with deviations (square corners, 6 px HP/MP, HP/MP bars not in legacy StatusView)
+- follow-up: DialogueBox name strip bakes its own gradient (DialogueBox.cs:110); could use UiTextures.Gradient

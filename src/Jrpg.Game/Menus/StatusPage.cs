@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using FontStashSharp;
 using Jrpg.Core.Content;
@@ -44,6 +45,13 @@ internal sealed class StatusPage : IMenuPage
     private const int SectionLineGap = 20;
     private const int ValueBelowLabel = 20;
 
+    // Legacy XpBar: 6 px tall, 12 px under the experience values, 16 px short of the profile's right edge. HP and MP get the
+    // same slim bar under their lines.
+    private const int BarHeight = 6;
+    private const int XpBarTop = ValueBelowLabel + 34;
+    private const int XpBarRightGap = 16;
+    private const int VitalBarTop = 26;
+
     private readonly ContentCatalog _catalog;
     private readonly UiTextures _ui;
     private readonly ListCursor _cursor;
@@ -51,6 +59,9 @@ internal sealed class StatusPage : IMenuPage
     private readonly SpriteFontBase _bodyFont;
     private readonly SpriteFontBase _labelFont;
     private readonly StatusLabels _labels;
+    // HP then MP: the first two of the sheet's stats, so a stat's index is its bar's.
+    private readonly StatBar[] _vitalBars;
+    private readonly StatBar _xpBar;
     private MemberSheet _sheet;
 
     /// <param name="text">Messages and fonts.</param>
@@ -68,7 +79,9 @@ internal sealed class StatusPage : IMenuPage
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _labelFont = text.Fonts.FontAt(LabelPixels);
         _labels = StatusLabels.From(text.Messages);
-        _sheet = SheetOf(Shown);
+        _vitalBars = [new StatBar(ui, UiTheme.HpBar), new StatBar(ui, UiTheme.MpBar)];
+        _xpBar = new StatBar(ui, UiTheme.XpBar);
+        ShowMember();
     }
 
     /// <summary>Everyone recruited: the active party in its order, then the reserve.</summary>
@@ -95,7 +108,7 @@ internal sealed class StatusPage : IMenuPage
 
         if (_cursor.Selected != before)
         {
-            _sheet = SheetOf(Shown);
+            ShowMember();
         }
 
         return null;
@@ -116,6 +129,18 @@ internal sealed class StatusPage : IMenuPage
         DrawExperience(page, new Rectangle(left, top + ExperienceTop, profileWidth, 0));
         DrawParameters(page, new Rectangle(left, top + ParametersTop, fullWidth, 0));
         DrawEquipment(page, new Rectangle(left, top + EquipmentTop, fullWidth, 0));
+    }
+
+    // The text and bars are set when the member changes, so drawing only reads them.
+    [MemberNotNull(nameof(_sheet))]
+    private void ShowMember()
+    {
+        var member = Shown;
+        _sheet = SheetOf(member);
+        _vitalBars[0].Show(member.Vitals.Hp, member.Vitals.MaxHp);
+        _vitalBars[1].Show(member.Vitals.Mp, member.Vitals.MaxMp);
+        var (earned, needed) = ExperienceProgress(member.Level, member.Experience, _catalog.Rules.Experience);
+        _xpBar.Show(earned, needed);
     }
 
     private MemberSheet SheetOf(PartyMember member)
@@ -144,6 +169,13 @@ internal sealed class StatusPage : IMenuPage
     internal static string ToNextLevelText(int level, int experience, ExperienceTable table, string maxLevelText) =>
         table.IsMaxLevel(level) ? maxLevelText : Number(table.ExperienceToReachNext(level) - experience);
 
+    /// <summary>How far the member is through their level, for the experience bar; all the way at the highest level.</summary>
+    /// <param name="level">The member's level.</param>
+    /// <param name="experience">Earned toward the next level.</param>
+    /// <param name="table">How much each level takes.</param>
+    internal static (int Earned, int Needed) ExperienceProgress(int level, int experience, ExperienceTable table) =>
+        table.IsMaxLevel(level) ? (1, 1) : (experience, table.ExperienceToReachNext(level));
+
     private static string Number(int value) => value.ToString(CultureInfo.InvariantCulture);
 
     // A diamond like the dialogue's, framed by a slightly larger pale diamond behind it.
@@ -169,6 +201,9 @@ internal sealed class StatusPage : IMenuPage
             page.Write(_labelFont, _labels.Progress[column], new Vector2(columnLeft, labelsTop), UiTheme.TextSecondary);
             page.Write(_headingFont, _sheet.Progress[column], new Vector2(columnLeft, labelsTop + ValueBelowLabel), UiTheme.TextPrimary);
         }
+
+        var xpBar = new Rectangle(section.X + Indent, labelsTop + XpBarTop, section.Width - Indent - XpBarRightGap, BarHeight);
+        _xpBar.Draw(page.Batch, page.Textures, xpBar, page.Opacity);
     }
 
     // HP and MP on the first line, attack and defense on the second, as legacy StatsPanel's two columns.
@@ -181,6 +216,11 @@ internal sealed class StatusPage : IMenuPage
             var columnLeft = section.X + Indent + (index % 2 * (columnWidth + ColumnGap));
             var lineTop = section.Y + SectionHeight + (index / 2 * StatLineHeight);
             DrawLine(page, new Vector2(columnLeft, lineTop), _labels.Stats[index], _sheet.Stats[index]);
+            if (index < _vitalBars.Length)
+            {
+                var bar = new Rectangle(columnLeft, lineTop + VitalBarTop, columnWidth, BarHeight);
+                _vitalBars[index].Draw(page.Batch, page.Textures, bar, page.Opacity);
+            }
         }
     }
 

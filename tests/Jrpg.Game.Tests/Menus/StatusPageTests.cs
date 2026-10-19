@@ -65,6 +65,26 @@ public sealed class StatusPageTests
         Assert.Equal("Max", text);
     }
 
+    [Fact]
+    public void ExperienceProgress_PartWayThroughLevelTwo_IsEarnedOverWhatTheLevelTakes()
+    {
+        var table = new ExperienceTable([100, 250, 400]);
+
+        var progress = StatusPage.ExperienceProgress(2, 70, table);
+
+        Assert.Equal((70, 250), progress);
+    }
+
+    [Fact]
+    public void ExperienceProgress_AtHighestLevel_IsFull()
+    {
+        var table = new ExperienceTable([100, 250, 400]);
+
+        var progress = StatusPage.ExperienceProgress(table.MaxLevel, 0, table);
+
+        Assert.Equal((1, 1), progress);
+    }
+
     private static GameSession NewSession() => GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
 
     private static StatusPage NewPage(GameSession session) =>

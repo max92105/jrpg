@@ -111,6 +111,19 @@ internal static class UiTheme
         new(1, FromLegacy(0x00FFFFFF)),
     ];
 
+    /// <summary>Legacy <c>RoundedProgressBarStyle</c>'s track behind every bar.</summary>
+    public static Color BarTrack { get; } = FromLegacy(0xFF222222);
+
+    /// <summary>Legacy <c>HPBarFill</c>: pale to forest green.</summary>
+    public static ImmutableArray<GradientStop> HpBar { get; } = [new(0, FromLegacy(0x6644AA44)), new(1, FromLegacy(0xFF228B22))];
+
+    /// <summary>Legacy <c>MPBarFill</c>: pale to deep blue.</summary>
+    public static ImmutableArray<GradientStop> MpBar { get; } = [new(0, FromLegacy(0x8899CCFF)), new(1, FromLegacy(0xFF3366FF))];
+
+    /// <summary>Legacy <c>XpBarFill</c>: goldenrod, bright gold, then pale wheat.</summary>
+    public static ImmutableArray<GradientStop> XpBar { get; } =
+        [new(0, FromLegacy(0xFFB8860B)), new(0.5f, FromLegacy(0xFFFFD700)), new(1, FromLegacy(0xFFF5DEB3))];
+
     // Legacy XAML colors are #AARRGGBB with straight alpha; the game draws premultiplied.
     private static Color FromLegacy(uint argb) => Color.FromNonPremultiplied(
         (int)((argb >> 16) & 0xFF),

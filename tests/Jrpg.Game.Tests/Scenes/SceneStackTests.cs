@@ -26,6 +26,27 @@ public sealed class SceneStackTests
     }
 
     [Fact]
+    public void Update_TopSceneAsks_ReturnsItsRequest()
+    {
+        var stack = new SceneStack();
+        var newGame = new NewGameRequested();
+        stack.Push(new RecordingScene("map", _calls));
+        stack.Push(new RecordingScene("title", _calls, newGame));
+
+        var request = stack.Update(TimeSpan.FromSeconds(0.1), default);
+
+        Assert.Same(newGame, request);
+    }
+
+    [Fact]
+    public void Update_EmptyStack_ReturnsNull()
+    {
+        var request = new SceneStack().Update(TimeSpan.FromSeconds(0.1), default);
+
+        Assert.Null(request);
+    }
+
+    [Fact]
     public void Draw_DrawsBottomToTop()
     {
         var stack = new SceneStack();
@@ -73,6 +94,19 @@ public sealed class SceneStackTests
     }
 
     [Fact]
+    public void ReplaceAll_SeveralScenes_LeavesOnlyNewScene()
+    {
+        var stack = new SceneStack();
+        stack.Push(new RecordingScene("map", _calls));
+        stack.Push(new RecordingScene("menu", _calls));
+
+        stack.ReplaceAll(new RecordingScene("title", _calls));
+        stack.Draw(_noBatch, _noTextures);
+
+        Assert.Equal(["draw title"], _calls);
+    }
+
+    [Fact]
     public void Replace_EmptyStack_Throws()
     {
         var stack = new SceneStack();
@@ -80,9 +114,16 @@ public sealed class SceneStackTests
         Assert.Throws<InvalidOperationException>(() => stack.Replace(new RecordingScene("map", _calls)));
     }
 
-    private sealed class RecordingScene(string name, List<string> calls) : IScene
+    /// <param name="name">Names the scene in every recorded call.</param>
+    /// <param name="calls">Where its updates and draws are recorded, in order.</param>
+    /// <param name="request">What the scene asks for on every update.</param>
+    private sealed class RecordingScene(string name, List<string> calls, SceneRequest? request = null) : IScene
     {
-        public void Update(TimeSpan delta, InputFrame input) => calls.Add($"update {name}");
+        public SceneRequest? Update(TimeSpan delta, InputFrame input)
+        {
+            calls.Add($"update {name}");
+            return request;
+        }
 
         public void Draw(SpriteBatch batch, TextureLibrary textures) => calls.Add($"draw {name}");
     }

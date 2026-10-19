@@ -329,7 +329,13 @@ M4 was split in two before it started (developer, 2026-10-19): it came out at ab
 
 ### Phase T: title screen
 
-- [ ] **T1a. Scene requests and the flow's fade** (Game, about 220 lines)
+- [x] **T1a. Scene requests and the flow's fade** (Game, about 220 lines)
+  - **Done, with deviations:**
+    - Tests use the Game tests' `Method_Scenario_Result` names. `SceneFactory` takes only the catalog and screen text for now; save slots come in S1 and settings in P5.
+    - The request is applied once the fade is past fading out rather than exactly on hold, so one long update can't skip it.
+    - The opening adds about 0.65 s of black before the map, which T1b's title replaces.
+    - Fixed a flaky race the slice exposed: FontStashSharp's font cache isn't thread-safe, so the test classes sharing `RepositoryScreenText` now run in one xunit collection.
+    - Follow-up for G1: a request returned while the flow's fade plays would throw, so decide whether to queue or ignore it.
   - **Goal:** no visible change; the game still starts on the map. Underneath:
     - scenes return requests;
     - the flow starts the game by applying `NewGameRequested` through `SessionTransitions`, behind its own fade;

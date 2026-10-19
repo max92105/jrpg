@@ -52,7 +52,8 @@ internal sealed class ExplorationScene : IScene
     /// Shows the running event's step; interacts and walks only once it and its fade are over. An interaction that
     /// starts an event waits for it like any other.
     /// </summary>
-    public void Update(TimeSpan delta, InputFrame input)
+    /// <returns>Null: the map asks the flow for nothing yet.</returns>
+    public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
         // Sampled before the presenter runs: the Confirm that closes the last message mustn't also interact again.
         var wasBusy = _presenter.IsBusy;
@@ -70,10 +71,11 @@ internal sealed class ExplorationScene : IScene
         if (wasBusy || _presenter.IsBusy)
         {
             _walkAnimation.Stand();
-            return;
+            return null;
         }
 
         WalkAndFollow(delta, input);
+        return null;
     }
 
     public void Draw(SpriteBatch batch, TextureLibrary textures)

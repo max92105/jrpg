@@ -10,7 +10,8 @@ namespace Jrpg.Game.Scenes;
 /// </summary>
 internal interface IScene
 {
-    void Update(TimeSpan delta, InputFrame input);
+    /// <returns>What the scene asks the flow for, or null (almost always).</returns>
+    SceneRequest? Update(TimeSpan delta, InputFrame input);
 
     /// <summary>Draws in virtual-screen coordinates; the batch is already begun.</summary>
     void Draw(SpriteBatch batch, TextureLibrary textures);

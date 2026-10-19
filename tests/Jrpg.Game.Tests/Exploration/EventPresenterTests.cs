@@ -6,6 +6,7 @@ using Jrpg.Game.Tests.Ui;
 
 namespace Jrpg.Game.Tests.Exploration;
 
+[Collection(RepositoryScreenText.CollectionName)]
 public sealed class EventPresenterTests
 {
     private static readonly InputFrame _confirmPressed =

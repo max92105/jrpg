@@ -26,9 +26,7 @@ internal sealed class StartupErrorScene : IScene
         };
     }
 
-    public void Update(TimeSpan delta, InputFrame input)
-    {
-    }
+    public SceneRequest? Update(TimeSpan delta, InputFrame input) => null;
 
     public void Draw(SpriteBatch batch, TextureLibrary textures) => _layout.Draw(batch, new Vector2(Margin, Margin), Color.White);
 }

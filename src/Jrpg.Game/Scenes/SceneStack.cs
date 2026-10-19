@@ -35,13 +35,15 @@ internal sealed class SceneStack
         _scenes[^1] = scene;
     }
 
-    public void Update(TimeSpan delta, InputFrame input)
+    /// <summary>Swaps everything on show for one scene, such as the title for the map and the menu over it.</summary>
+    public void ReplaceAll(IScene scene)
     {
-        if (_scenes.Count > 0)
-        {
-            _scenes[^1].Update(delta, input);
-        }
+        _scenes.Clear();
+        _scenes.Add(scene);
     }
+
+    /// <returns>The top scene's request; null when it has none or the stack is empty.</returns>
+    public SceneRequest? Update(TimeSpan delta, InputFrame input) => _scenes.Count > 0 ? _scenes[^1].Update(delta, input) : null;
 
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {

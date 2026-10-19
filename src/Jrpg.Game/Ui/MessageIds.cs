@@ -32,4 +32,16 @@ internal static class MessageIds
 
     /// <summary>The System page's entry that closes the game.</summary>
     public const string SystemQuit = "system_quit";
+
+    /// <summary>Asked before going back to the title.</summary>
+    public const string ConfirmTitleScreen = "confirm_title_screen";
+
+    /// <summary>Asked before closing the game.</summary>
+    public const string ConfirmQuit = "confirm_quit";
+
+    /// <summary>A confirmation's button that goes ahead.</summary>
+    public const string ConfirmYes = "confirm_yes";
+
+    /// <summary>A confirmation's button that changes nothing.</summary>
+    public const string ConfirmNo = "confirm_no";
 }

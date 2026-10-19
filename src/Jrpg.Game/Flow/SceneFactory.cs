@@ -30,7 +30,7 @@ internal sealed class SceneFactory
 
     public TitleScene CreateTitle() => new(_text);
 
-    public GameMenuScene CreateGameMenu() => new(_text, _ui, [new SystemPage(_text)]);
+    public GameMenuScene CreateGameMenu() => new(_text, _ui, [new SystemPage(_text, _ui)]);
 
     public ExplorationScene CreateExploration(ExplorationState exploration) => new(exploration, _catalog, _art, _text);
 }

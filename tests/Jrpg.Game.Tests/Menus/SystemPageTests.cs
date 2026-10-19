@@ -2,6 +2,7 @@ using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Scenes;
 using Jrpg.Game.Tests.Ui;
+using Jrpg.Game.Ui;
 using static Jrpg.Game.Tests.Input.InputFrames;
 
 namespace Jrpg.Game.Tests.Menus;
@@ -10,9 +11,36 @@ namespace Jrpg.Game.Tests.Menus;
 public sealed class SystemPageTests
 {
     [Fact]
-    public void Update_ConfirmTitleScreen_RequestsTitle()
+    public void Update_ConfirmQuit_AsksBeforeRequesting()
     {
-        var page = new SystemPage(RepositoryScreenText.Text);
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Down));
+
+        var request = page.Update(Pressing(GameButton.Confirm));
+
+        Assert.Null(request);
+        Assert.False(page.LeavesOnCancel);
+    }
+
+    [Fact]
+    public void Update_YesToQuit_RequestsQuit()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Down));
+        page.Update(Pressing(GameButton.Confirm));
+        page.Update(Pressing(GameButton.Left));
+
+        var request = page.Update(Pressing(GameButton.Confirm));
+
+        Assert.IsType<QuitRequested>(request);
+    }
+
+    [Fact]
+    public void Update_YesToTitleScreen_RequestsTitle()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Confirm));
+        page.Update(Pressing(GameButton.Left));
 
         var request = page.Update(Pressing(GameButton.Confirm));
 
@@ -20,13 +48,16 @@ public sealed class SystemPageTests
     }
 
     [Fact]
-    public void Update_ConfirmQuit_RequestsQuit()
+    public void Update_AnswerNo_StaysInPage()
     {
-        var page = new SystemPage(RepositoryScreenText.Text);
-        page.Update(Pressing(GameButton.Down));
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Confirm));
 
         var request = page.Update(Pressing(GameButton.Confirm));
 
-        Assert.IsType<QuitRequested>(request);
+        Assert.Null(request);
+        Assert.True(page.LeavesOnCancel);
     }
+
+    private static SystemPage NewPage() => new(RepositoryScreenText.Text, new UiTextures());
 }

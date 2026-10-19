@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, G1-2 (Menu look)
-Round: 1 (verdict: Ready to commit; build 0 warnings, 939/939 tests, format exit 0)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, G2 (Confirmation prompt; Title screen and Quit ask first)
+Round: 1 (verdict: Ready to commit; build 0 warnings, 949/949 tests, format exit 0)
 
-- open (Suggestion): UiTheme.MenuRowHeight doc still says "tabs" though tabs now use NavTabShape.Height (both 56); reword to System rows, and G1-1's shared text-centering follow-up is still unshared (note it as deferred in the plan)
-- open (Suggestion): FromLegacy channel order unpinned; one golden test, e.g. UiTheme.BarLine == new Color(0x66,0x66,0x66,0x66)
-- open (Suggestion): tick G1-2 in the plan and record the hand-off deviations (no slide animation, plain System rows, no header/footer text)
-- follow-up: CanopyMask (Rendering, canopy-worded doc) now also masks UI shapes; rename to PolygonMask / generic doc when next touched
+- open (Suggestion): tick G2 in the plan and record deviations (test names Method_Scenario_Result, Yes/No not legacy "Cancel", prompt owned/drawn by SystemPage)
+- open (Suggestion): GameMenuSceneTests.Update_ConfirmOnTab_EntersPage now walks the whole Yes flow; name no longer matches its last assert
+- open (Suggestion): Update_RightAfterLeft_SelectsNoAgain asserts state only; plan's Cancel-only test (no Left first) not separately pinned (covered via Escape-while-asking)
+- follow-up: ConfirmPromptView is per page; when S1 (overwrite) needs a prompt, share one view instance via SceneFactory

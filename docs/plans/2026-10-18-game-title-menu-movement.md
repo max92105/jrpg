@@ -440,7 +440,12 @@ G1 was split in two (developer, 2026-10-19): about 550 lines in all. G1-1 is the
   - **Verify by hand:**
     - [ ] The layout matches `GameMenuControl.xaml`.
 
-- [ ] **G2. Confirmation prompt; Title screen and Quit ask first** (Game, about 160 lines)
+- [x] **G2. Confirmation prompt; Title screen and Quit ask first** (Game, about 160 lines)
+  - **Done, with deviations:**
+    - The buttons are Yes and No, as planned (legacy's second button said "Cancel"). Left selects Yes and Right selects No.
+    - `SystemPage` owns and draws its prompt over the whole screen. Its `SystemEntry` enum became a private `Entry` record holding the label, the question and the request.
+    - New `Ui/ConfirmAnswer`. Tests use `Method_Scenario_Result` names. Extra: `GameMenuScene` `Update_EscapeWhileAsking_AnswersNoAndStaysInPage`.
+    - Follow-up for S1: share one `ConfirmPromptView` through `SceneFactory` when the overwrite prompt arrives.
   - **Goal:** Title screen and Quit always ask first (decision 85; unsaved progress isn't tracked). The prompt is the legacy `ConfirmDialog` look, with Yes/No starting on No. Cancel or Esc answers No.
   - **New types (Game):**
     - `Ui/ConfirmPrompt` (pure): the Yes/No cursor and the answer.

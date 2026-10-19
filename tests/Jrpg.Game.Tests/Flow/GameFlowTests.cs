@@ -120,6 +120,8 @@ public sealed class GameFlowTests
         flow.Update(_oneUpdate, InputFrames.PressingEscape);
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Left));
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
 
         flow.Update(_fadeOut, default);
 
@@ -133,6 +135,8 @@ public sealed class GameFlowTests
         var first = SessionOf(flow);
         flow.Update(_oneUpdate, InputFrames.PressingEscape);
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Left));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_wholeFade, default);
 

@@ -88,6 +88,21 @@ internal static class UiTheme
         new(1, FromLegacy(0x99000000)),
     ];
 
+    /// <summary>Legacy <c>Brush.Scrim</c>: dims everything behind a dialog.</summary>
+    public static Color Scrim { get; } = FromLegacy(0xB3000000);
+
+    /// <summary>Legacy <c>Color.Surface.Raised</c>: a dialog's band.</summary>
+    public static Color RaisedSurface { get; } = FromLegacy(0xF2141620);
+
+    /// <summary>Legacy <c>Color.Accent</c>: the outline of a dialog's main button.</summary>
+    public static Color Accent { get; } = FromLegacy(0xFFD6DCFF);
+
+    /// <summary>Legacy <c>MenuButtonStyle</c>'s faint white fill.</summary>
+    public static Color ButtonFill { get; } = FromLegacy(0x1AFFFFFF);
+
+    /// <summary>Legacy <c>Brush.Stroke</c>: a button's outline.</summary>
+    public static Color ButtonStroke { get; } = FromLegacy(0x2EFFFFFF);
+
     // Legacy XAML colors are #AARRGGBB with straight alpha; the game draws premultiplied.
     private static Color FromLegacy(uint argb) => Color.FromNonPremultiplied(
         (int)((argb >> 16) & 0xFF),

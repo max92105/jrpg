@@ -33,11 +33,13 @@ public sealed class GameMenuSceneTests
     }
 
     [Fact]
-    public void Update_ConfirmOnTab_EntersPage()
+    public void Update_YesInSystemPage_RequestsTitle()
     {
         var menu = NewMenu();
 
         var entering = menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+        menu.Update(_oneUpdate, Pressing(GameButton.Left));
         var inPage = menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
 
         Assert.Null(entering);
@@ -57,5 +59,19 @@ public sealed class GameMenuSceneTests
         Assert.IsType<MenuClosed>(onTabs);
     }
 
-    private static GameMenuScene NewMenu() => new(RepositoryScreenText.Text, new UiTextures(), [new SystemPage(RepositoryScreenText.Text)]);
+    [Fact]
+    public void Update_EscapeWhileAsking_AnswersNoAndStaysInPage()
+    {
+        var menu = NewMenu();
+        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+
+        var answering = menu.Update(_oneUpdate, PressingEscape);
+        var leavingPage = menu.Update(_oneUpdate, PressingEscape);
+
+        Assert.Null(answering);
+        Assert.Null(leavingPage);
+    }
+
+    private static GameMenuScene NewMenu() => new(RepositoryScreenText.Text, new UiTextures(), [new SystemPage(RepositoryScreenText.Text, new UiTextures())]);
 }

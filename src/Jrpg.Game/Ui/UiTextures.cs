@@ -14,6 +14,7 @@ internal sealed class UiTextures
     private Texture2D? _selectedNavTab;
     private Texture2D? _menuScrim;
     private Texture2D? _selectionLine;
+    private Texture2D? _selectionFill;
 
     /// <summary>A tab that isn't selected: the arrow, dark and faintly outlined.</summary>
     public Texture2D NavTab(TextureLibrary textures) =>
@@ -33,6 +34,10 @@ internal sealed class UiTextures
     /// <summary>One row, as wide as the tab up to its point; stretched to the line's thickness.</summary>
     public Texture2D SelectionLine(TextureLibrary textures) =>
         _selectionLine ??= textures.Create(NavTabShape.ShoulderPixels, 1, GradientStrip.Colors(UiTheme.SelectionLine, NavTabShape.ShoulderPixels));
+
+    /// <summary>The blue selection gradient as one row, stretched over a selected button.</summary>
+    public Texture2D SelectionFill(TextureLibrary textures) =>
+        _selectionFill ??= textures.Create(NavTabShape.Width, 1, GradientStrip.Colors(UiTheme.Selection, NavTabShape.Width));
 
     private static Color[] SolidRow(Color color, int width)
     {

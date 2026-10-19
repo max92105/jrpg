@@ -8,5 +8,9 @@
   "title_quit": "Quit",
   "menu_system": "System",
   "system_title_screen": "Title Screen",
-  "system_quit": "Quit Game"
+  "system_quit": "Quit Game",
+  "confirm_title_screen": "Return to the title screen?",
+  "confirm_quit": "Quit the game?",
+  "confirm_yes": "Yes",
+  "confirm_no": "No"
 }

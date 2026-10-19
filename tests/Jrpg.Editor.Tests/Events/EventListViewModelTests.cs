@@ -35,7 +35,9 @@ public sealed class EventListViewModelTests
         Events = [_open, _enter],
     };
 
-    private readonly EventListViewModel _list = new(_door, ["door_open", "door_close", "chest"]);
+    private static readonly StepChoices _choices = new(["ether", "potion"], ["chest", "door_close", "door_open"], ["interior_1", "start"]);
+
+    private readonly EventListViewModel _list = new(_door, _choices);
 
     [Fact]
     public void Constructor_ObjectWithEvents_ListsThemAndSelectsTheFirst()
@@ -95,7 +97,7 @@ public sealed class EventListViewModelTests
             Events = [_open with { Steps = [new DialogueStep(new Speech(["Welcome.", "Mind the step."], "Innkeeper", "innkeeper.png"))] }],
         };
 
-        Assert.Null(new EventListViewModel(sign, ["door_close"]).ToEdit());
+        Assert.Null(new EventListViewModel(sign, _choices).ToEdit());
     }
 
     [Fact]
@@ -141,6 +143,29 @@ public sealed class EventListViewModelTests
         open.SelectedStep!.LinesText = "It creaks.";
 
         Assert.Equal(["Swap object to: door_open", "Dialogue: \"It creaks.\""], open.Steps.Select(step => step.Label));
+    }
+
+    [Fact]
+    public void AddWarpCommand_AddsAWarpToCellZeroOfNoMapYet()
+    {
+        var open = _list.Events[0];
+
+        open.AddWarpCommand.Execute(null);
+
+        Assert.Equal("Warp to:  (0, 0)", open.SelectedStep!.Label);
+        Assert.True(open.SelectedStep.IsWarp);
+    }
+
+    [Fact]
+    public void Problem_QuantityLeftEmpty_NamesTheEventAndStep()
+    {
+        var open = _list.Events[0];
+        open.AddGiveItemCommand.Execute(null);
+        open.SelectedStep!.ItemId = "potion";
+
+        open.SelectedStep!.QuantityText = "";
+
+        Assert.Equal("Event door_1_0, step 2: The quantity must be a whole number of at least 1.", _list.Problem);
     }
 
     [Fact]

@@ -247,6 +247,7 @@ public sealed class MainViewModelTests : IDisposable
 
         Assert.Null(viewModel.SaveError);
         Assert.Equal(["forest", "interior_1", "old_mill", "start"], viewModel.MapIds);
+        Assert.Equal(viewModel.MapIds, viewModel.EventEditing!.MapIds);
         Assert.False(viewModel.CurrentMap!.IsDirty);
         Assert.Equal("Old Mill", ContentCatalogLoader.Load(_contentCopy).Maps["old_mill"].Settings.DisplayName);
     }

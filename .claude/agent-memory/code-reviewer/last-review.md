@@ -5,11 +5,12 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 11i-1 (Events mode and the event dialog, with dialogue steps)
-Round: 1 (verdict: Ready to commit; build 0 warnings, 793 tests, format exit 0)
+Slice: docs/plans/2026-10-18-shell-cutover-and-map-editing.md, 11i-2 (Give item, swap object and warp steps)
+Round: 1 (verdict: Fix the Criticals; build 0 warnings, 805 tests pass, format exit 2)
 
-- open (Warning): MapEventComparison dialogue branch (Speech lines SequenceEqual) untested; no content map has a dialogue step, so ToEdit_NothingChanged_IsNull only covers swap/warp/giveItem; add ToEdit_UnchangedDialogue_IsNull
-- open (Suggestion): ListOrder.Remove "one before" and "none left" branches untested; RemoveEventCommand_LastEvent_SelectsThePrevious / _OnlyEvent_SelectsNothing
-- open (Suggestion): EventIds doc says deleting never hands an id on; plan risk line 448 says deleting the last event across dialog sessions frees it; align the comment
-- open (Suggestion): SetObjectEventsEdit_Revert test sits in EventListViewModelTests; move to Maps/Editing/SetObjectEventsEditTests; add plan Done note listing extra types (EventViewModel, EventEditingViewModel, MapEventComparison, ListOrder, ObjectEventsWindow)
-- verified: event id map-wide uniqueness ({uid}_{digits}, uids distinct, suffix has no '_', so no cross-object collision); OnlyWhen ComboBox values always in choices (validator rejects unknown object ids); right pane null DataContext safe (FallbackValue Collapsed); markers redraw on Map change and on open, EventMarks under IsHitTestVisible=False canvas; Events mode guarded in Delete key / drag / brush handlers
+- open (Critical): format ENDOFLINE at tests/Jrpg.Editor.Tests/Shell/MainViewModelTests.cs:250 (the added EventEditing.MapIds assert is an LF line); run dotnet format
+- open (Warning): number boundaries half-pinned: Problem_ZeroQuantity_SaysSo only NotNull, quantity "1" never accepted in a test, CellYText-only bad value untested (Problem checking only X would let OK through, then ToStep throws in Apply and crashes the editor)
+- open (Suggestion): ProblemText in ObjectEventsWindow stays stale after the problem is fixed until OK is pressed again
+- open (Suggestion): Label/ToStep use `_ =>` as the Warp arm; name EventStepKind.Warp and make `_` throw UnreachableException
+- open (Suggestion): hand-check shared ComboBoxes (SelectedItem TwoWay) when switching selected step between kinds don't write null/"" back into the other step's id
+- verified: Apply only reached after OK, which refuses while Problem != null; RelativeSource DataContext.Choices.* resolves to EventListViewModel.Choices; OnMapIdsChanged + ctor init keep EventEditing.MapIds in sync (tested); validator rejects "" item/object/map ids on save

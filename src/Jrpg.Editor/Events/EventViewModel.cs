@@ -66,10 +66,26 @@ internal sealed partial class EventViewModel : ObservableObject
         Steps = [.. Steps.Select(step => step.ToStep())],
     };
 
+    /// <summary>Why a step can't be kept as typed, naming it; null when every step can.</summary>
+    public string? Problem =>
+        Steps.Select((step, index) => step.Problem is { } problem ? $"step {index + 1}: {problem}" : null).FirstOrDefault(problem => problem is not null);
+
     [RelayCommand]
-    private void AddDialogue()
+    private void AddDialogue() => AddStep(EventStepKind.Dialogue);
+
+    [RelayCommand]
+    private void AddGiveItem() => AddStep(EventStepKind.GiveItem);
+
+    [RelayCommand]
+    private void AddSwapObject() => AddStep(EventStepKind.SwapObject);
+
+    [RelayCommand]
+    private void AddWarp() => AddStep(EventStepKind.Warp);
+
+    // After the chosen step, or last when none is chosen.
+    private void AddStep(EventStepKind kind)
     {
-        var step = EventStepViewModel.NewDialogue();
+        var step = EventStepViewModel.New(kind);
         Steps.Insert(SelectedStep is null ? Steps.Count : Steps.IndexOf(SelectedStep) + 1, step);
         SelectedStep = step;
     }

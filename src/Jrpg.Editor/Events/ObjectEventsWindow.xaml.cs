@@ -5,11 +5,21 @@ namespace Jrpg.Editor.Events;
 /// <summary>The event dialog for one placed object; OK keeps the edited events, Cancel drops them.</summary>
 internal sealed partial class ObjectEventsWindow : Window
 {
+    private readonly EventListViewModel _events;
+
     public ObjectEventsWindow(EventListViewModel events)
     {
         InitializeComponent();
-        DataContext = events;
+        DataContext = _events = events;
     }
 
-    private void OnOkClicked(object sender, RoutedEventArgs e) => DialogResult = true;
+    // A number left half typed keeps the dialog open, saying which event and step it is in.
+    private void OnOkClicked(object sender, RoutedEventArgs e)
+    {
+        ProblemText.Text = _events.Problem;
+        if (_events.Problem is null)
+        {
+            DialogResult = true;
+        }
+    }
 }

@@ -15,6 +15,7 @@
       <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked" />
       <Button Content="Cancel" Width="80" Margin="8,0,0,0" IsCancel="True" />
     </StackPanel>
+    <TextBlock x:Name="ProblemText" DockPanel.Dock="Bottom" Foreground="DarkRed" TextWrapping="Wrap" Margin="0,8,0,0" />
 
     <!-- The object's events, in the order they're tried. -->
     <DockPanel DockPanel.Dock="Left" Width="300">
@@ -53,11 +54,19 @@
         <TextBlock Text="Steps, run in order" FontWeight="Bold" />
       </StackPanel>
 
-      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
-        <Button Content="Add dialogue" Width="90" Command="{Binding AddDialogueCommand}" />
-        <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding RemoveStepCommand}" />
-        <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepUpCommand}" />
-        <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepDownCommand}" />
+      <StackPanel DockPanel.Dock="Bottom" Margin="0,4,0,0">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="Add" VerticalAlignment="Center" Margin="0,0,4,0" />
+          <Button Content="Dialogue" Width="70" Command="{Binding AddDialogueCommand}" />
+          <Button Content="Give item" Width="70" Margin="4,0,0,0" Command="{Binding AddGiveItemCommand}" />
+          <Button Content="Swap object" Width="80" Margin="4,0,0,0" Command="{Binding AddSwapObjectCommand}" />
+          <Button Content="Warp" Width="60" Margin="4,0,0,0" Command="{Binding AddWarpCommand}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <Button Content="Remove" Width="60" Command="{Binding RemoveStepCommand}" />
+          <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepUpCommand}" />
+          <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepDownCommand}" />
+        </StackPanel>
       </StackPanel>
 
       <!-- The chosen step's fields. -->
@@ -78,6 +87,32 @@
             <TextBox Width="160" Text="{Binding PortraitFile, UpdateSourceTrigger=PropertyChanged}" />
           </StackPanel>
         </StackPanel>
+        <StackPanel Orientation="Horizontal" Visibility="{Binding IsGiveItem, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
+          <TextBlock Text="Give" VerticalAlignment="Center" Margin="0,0,4,0" />
+          <TextBox Width="50" Text="{Binding QuantityText, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Text=" x " VerticalAlignment="Center" />
+          <ComboBox Width="200"
+                    ItemsSource="{Binding DataContext.Choices.ItemIds, RelativeSource={RelativeSource AncestorType=Window}}"
+                    SelectedItem="{Binding ItemId}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Visibility="{Binding IsSwapObject, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
+          <TextBlock Text="The object becomes" VerticalAlignment="Center" Margin="0,0,4,0" />
+          <ComboBox Width="200"
+                    ItemsSource="{Binding DataContext.Choices.ObjectIds, RelativeSource={RelativeSource AncestorType=Window}}"
+                    SelectedItem="{Binding ObjectId}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Visibility="{Binding IsWarp, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
+          <TextBlock Text="Warp to" VerticalAlignment="Center" Margin="0,0,4,0" />
+          <ComboBox Width="160"
+                    ItemsSource="{Binding DataContext.Choices.MapIds, RelativeSource={RelativeSource AncestorType=Window}}"
+                    SelectedItem="{Binding MapId}" />
+          <TextBlock Text=" at cell (" VerticalAlignment="Center" />
+          <TextBox Width="40" Text="{Binding CellXText, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Text=", " VerticalAlignment="Center" />
+          <TextBox Width="40" Text="{Binding CellYText, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Text=")" VerticalAlignment="Center" />
+        </StackPanel>
+        <TextBlock Foreground="DarkRed" TextWrapping="Wrap" Text="{Binding Problem}" />
       </StackPanel>
 
       <ListBox ItemsSource="{Binding Steps}" SelectedItem="{Binding SelectedStep}" DisplayMemberPath="Label" />

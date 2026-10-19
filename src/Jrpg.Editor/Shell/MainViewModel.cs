@@ -50,7 +50,7 @@ internal sealed partial class MainViewModel : ObservableObject
             MapIds = SortedMapIds(Catalog);
             Painting = new TilePaintingViewModel(Catalog, Layer);
             Placing = new ObjectPlacingViewModel(Catalog.Objects, Layer);
-            EventEditing = new EventEditingViewModel(Catalog.Objects);
+            EventEditing = new EventEditingViewModel(Catalog) { MapIds = MapIds };
             if (MapIds.Count > 0)
             {
                 TryOpenMap(MapIds[0]);
@@ -213,6 +213,8 @@ internal sealed partial class MainViewModel : ObservableObject
         CurrentMap.MarkSaved();
         SaveError = null;
     }
+
+    partial void OnMapIdsChanged(IReadOnlyList<string> value) => EventEditing?.MapIds = value;
 
     partial void OnCurrentMapChanged(MapViewModel? value)
     {

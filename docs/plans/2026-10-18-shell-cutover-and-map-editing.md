@@ -384,9 +384,10 @@ The developer still edits maps in the legacy MapEditor (ADR 0005), so render dat
   - **Tests:** `EventIds_Next_AfterDeletingFirst_DoesNotReuseItsId`, `EventIds_Next_ReorderedEvents_KeepTheirIds`, `SetObjectEventsEdit_Revert_RestoresPreviousEvents`, plus the list's add, remove and reorder.
   - **Done, with deviations:** more types than planned: `EventViewModel` (one event), `EventEditingViewModel` (shell-owned like painting and placing: picks the object under a click, applies the dialog as one undo step, none when nothing changed), `MapEventComparison` (records compare lists by reference), `ListOrder` (Up, Down, Remove) and the `ObjectEventsWindow` dialog. `EventIds.Next` takes the uid and the ids used, counting the ones the object had when the dialog opened, so an event removed and re-added in one sitting doesn't reuse its id. New events start as legacy's (pressed, prompt "Check"). Steps of the other kinds keep their step unchanged and show their label, so the warp label test came here. Markers show in every mode. Follow-up for 11j: pick the cell-event id scheme so it can't collide with `{uid}_{n}`.
 
-- [ ] **11i-2. Give item, swap object and warp steps** (Editor, about 300 lines)
+- [x] **11i-2. Give item, swap object and warp steps** (Editor, about 300 lines)
   - **Goal:** the other three step types with their fields (item and quantity; object; map and cell) and labels.
   - **Tests:** `EventStepViewModel_Label_Warp_NamesMapAndCell`, plus each type's round trip from step to fields and back.
+  - **Done, with deviations:** steps have a kind (`EventStepKind`); ids are picked from lists in a `StepChoices` record (items, objects, and maps kept current by the shell, so a newly saved map can be warped to); `EventEditingViewModel` takes the `ContentCatalog`. Numbers stay text: a quantity under 1, a warp cell under 0 or an unchosen id is a step problem, shown under the step, and OK refuses while there is one, naming the event and step. The warp label test came in 11i-1.
 
 - [ ] **11j. Event presets and cell events** (Editor, about 250 lines)
   - **Goal:** presets Chest, Door, Door you open and Sign fill an object's events (with the legacy guess of the "opened" object); clicking a cell in event mode adds or edits its touch event (warp or dialogue); right click removes it.

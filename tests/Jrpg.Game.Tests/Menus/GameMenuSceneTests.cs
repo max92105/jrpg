@@ -2,6 +2,7 @@ using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Scenes;
 using Jrpg.Game.Tests.Ui;
+using Jrpg.Game.Ui;
 using static Jrpg.Game.Tests.Input.InputFrames;
 
 namespace Jrpg.Game.Tests.Menus;
@@ -56,5 +57,5 @@ public sealed class GameMenuSceneTests
         Assert.IsType<MenuClosed>(onTabs);
     }
 
-    private static GameMenuScene NewMenu() => new(RepositoryScreenText.Text, [new SystemPage(RepositoryScreenText.Text)]);
+    private static GameMenuScene NewMenu() => new(RepositoryScreenText.Text, new UiTextures(), [new SystemPage(RepositoryScreenText.Text)]);
 }

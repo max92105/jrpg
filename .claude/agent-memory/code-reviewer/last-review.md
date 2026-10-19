@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, G1-1 (Menu shell and System page)
-Round: 1 (verdict: Ready to commit; build 0 warnings, 935/935 tests, format exit 0)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, G1-2 (Menu look)
+Round: 1 (verdict: Ready to commit; build 0 warnings, 939/939 tests, format exit 0)
 
-- open (Suggestion): GameFlowTests.Update_TitleRequested_EndsSessionOnTitle asserts only Session == null; "OnTitle" unverified (rename or assert Confirm then starts a new game)
-- open (Suggestion): GameMenuScene.UpdateTabs `_isInPage = input.IsPressed(Confirm)` reads as a two-way toggle; use `if (Confirm) { _isInPage = true; }`
-- open (Suggestion): SystemPage.Selected is public but only read inside the class; make it private (or drop it into Update)
-- follow-up: row text centering duplicated in GameMenuScene.Draw and SystemPage.Draw; fold when G1-2 restyles rows
+- open (Suggestion): UiTheme.MenuRowHeight doc still says "tabs" though tabs now use NavTabShape.Height (both 56); reword to System rows, and G1-1's shared text-centering follow-up is still unshared (note it as deferred in the plan)
+- open (Suggestion): FromLegacy channel order unpinned; one golden test, e.g. UiTheme.BarLine == new Color(0x66,0x66,0x66,0x66)
+- open (Suggestion): tick G1-2 in the plan and record the hand-off deviations (no slide animation, plain System rows, no header/footer text)
+- follow-up: CanopyMask (Rendering, canopy-worded doc) now also masks UI shapes; rename to PolygonMask / generic doc when next touched

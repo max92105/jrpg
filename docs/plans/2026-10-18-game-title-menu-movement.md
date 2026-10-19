@@ -424,7 +424,13 @@ G1 was split in two (developer, 2026-10-19): about 550 lines in all. G1-1 is the
     - [ ] Esc and Start open the menu; Esc inside System goes back to the tabs, then closes.
     - [ ] Title screen goes to the title, and New game starts fresh.
 
-- [ ] **G1-2. Menu look** (Game, about 250 lines)
+- [x] **G1-2. Menu look** (Game, about 250 lines)
+  - **Done, with deviations:**
+    - The selected tab's label slides 14 px without legacy's 0.18 s animation. All tab labels use the primary text color, as legacy did.
+    - The header and footer bars have no text yet: G3 adds the header's.
+    - The System rows stay plain: legacy `SubMenuItemStyle` and the shared row-text centering (G1-1 follow-up) are left for when a page restyles its rows.
+    - New pure `Ui/NavTabShape` (4 tests) and `UiThemeTests` (2) for the legacy color conversion. `UiTextures` is owned by `SceneFactory`, so reopening the menu bakes nothing.
+    - Follow-up: rename `Rendering/CanopyMask` to something general such as `PolygonMask`, since menu tabs use it too.
   - **Goal** (decisions 81, 82): the menu looks like legacy `GameMenuControl.xaml`:
     - the edge scrim over `GameMenu.png` (legacy `Brush.MenuScrim`);
     - the header and footer bars (80 and 64 px);

@@ -40,9 +40,58 @@ internal static class UiTheme
     /// <summary>Legacy <c>NavTabStyle</c> and <c>SubMenuItemStyle</c> text, 1:1 on the virtual screen.</summary>
     public const int MenuTextPixels = 20;
 
-    /// <summary>Legacy menu tabs and entries are 56 px tall.</summary>
+    /// <summary>Legacy menu entries (<c>SubMenuItemStyle</c>) are 56 px tall, like the tabs.</summary>
     public const int MenuRowHeight = 56;
 
     /// <summary>Legacy menu text starts 44 px in from its row's left edge.</summary>
     public const int MenuTextInset = 44;
+
+    /// <summary>Legacy <c>Brush.Bar</c>: the header and footer bars.</summary>
+    public static Color Bar { get; } = FromLegacy(0xEB000000);
+
+    /// <summary>Legacy <c>Brush.Stroke.Strong</c>: the hairline between a bar and the body.</summary>
+    public static Color BarLine { get; } = FromLegacy(0x66FFFFFF);
+
+    /// <summary>Legacy <c>Brush.Nav</c>: a tab that isn't selected.</summary>
+    public static Color NavFill { get; } = FromLegacy(0xD9141519);
+
+    /// <summary>Legacy <c>Brush.Nav.Stroke</c>: the outline of a tab that isn't selected.</summary>
+    public static Color NavStroke { get; } = FromLegacy(0x40FFFFFF);
+
+    /// <summary>Legacy <c>Brush.Selection.Stroke</c>: the outline of the selected tab.</summary>
+    public static Color SelectionStroke { get; } = FromLegacy(0xB3D6DCFF);
+
+    /// <summary>Legacy <c>Brush.Selection</c>: the selected tab, deep blue glowing out to the right.</summary>
+    public static ImmutableArray<GradientStop> Selection { get; } =
+    [
+        new(0, FromLegacy(0xF01A1F5C)),
+        new(0.45f, FromLegacy(0xF0343C9E)),
+        new(0.8f, FromLegacy(0xCC7C86E0)),
+        new(1, FromLegacy(0x66C8CEFF)),
+    ];
+
+    /// <summary>Legacy <c>Brush.SelectionLine</c>: the bright line under the selected tab.</summary>
+    public static ImmutableArray<GradientStop> SelectionLine { get; } =
+    [
+        new(0, FromLegacy(0x00E6EAFF)),
+        new(0.35f, FromLegacy(0xFFE6EAFF)),
+        new(0.75f, FromLegacy(0xFFFFFFFF)),
+        new(1, FromLegacy(0x00FFFFFF)),
+    ];
+
+    /// <summary>Legacy <c>Brush.MenuScrim</c>: darkens the menu picture's edges and leaves its middle visible.</summary>
+    public static ImmutableArray<GradientStop> MenuScrim { get; } =
+    [
+        new(0, FromLegacy(0xB3000000)),
+        new(0.4f, FromLegacy(0x33000000)),
+        new(0.7f, FromLegacy(0x40000000)),
+        new(1, FromLegacy(0x99000000)),
+    ];
+
+    // Legacy XAML colors are #AARRGGBB with straight alpha; the game draws premultiplied.
+    private static Color FromLegacy(uint argb) => Color.FromNonPremultiplied(
+        (int)((argb >> 16) & 0xFF),
+        (int)((argb >> 8) & 0xFF),
+        (int)(argb & 0xFF),
+        (int)(argb >> 24));
 }

@@ -8,21 +8,24 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Draws every living battler at its spot in the formation, centered on it with its feet on the spot's bottom. The
-/// fallen are gone, as legacy <c>AnimateDeath</c> faded out any combatant that fell.
+/// Draws every living battler at its spot in the formation, centered on it with its feet on the spot's bottom, the actor
+/// stepped out toward the other side. The fallen are gone, as legacy <c>AnimateDeath</c> faded out any combatant that fell.
 /// </summary>
 internal sealed class BattlersView
 {
     private readonly IReadOnlyList<Combatant> _combatants;
     private readonly Rectangle[] _spots;
     private readonly BattlerArt[] _arts;
+    private readonly BattleTurnSequence _sequence;
     private readonly UiTextures _ui;
 
     /// <param name="combatants">The battle's combatants, in its order.</param>
+    /// <param name="sequence">Who is stepping out of the formation, and how far.</param>
     /// <param name="ui">Where painted battlers are shrunk, once.</param>
-    public BattlersView(IReadOnlyList<Combatant> combatants, UiTextures ui)
+    public BattlersView(IReadOnlyList<Combatant> combatants, BattleTurnSequence sequence, UiTextures ui)
     {
         _combatants = combatants;
+        _sequence = sequence;
         _spots = BattleLayout.SpotsOf(combatants);
         _arts = [.. combatants.Select(BattlerArt.Of)];
         _ui = ui;
@@ -32,9 +35,10 @@ internal sealed class BattlersView
     {
         for (var index = 0; index < _combatants.Count; index++)
         {
-            if (_combatants[index].IsAlive)
+            var combatant = _combatants[index];
+            if (combatant.IsAlive)
             {
-                DrawBattler(batch, textures, _arts[index], _spots[index]);
+                DrawBattler(batch, textures, _arts[index], SteppedSpot(combatant, _spots[index]));
             }
         }
     }
@@ -62,6 +66,14 @@ internal sealed class BattlersView
         }
 
         throw new ArgumentException($"{combatant.Name} isn't in this battle.", nameof(combatant));
+    }
+
+    // Each side steps toward the other: the party left, the enemies right.
+    private Rectangle SteppedSpot(Combatant combatant, Rectangle spot)
+    {
+        var direction = combatant.Side == BattleSide.Party ? -1 : 1;
+        spot.Offset((int)(direction * BattlePacing.StepDistance * _sequence.StepShare(combatant)), 0);
+        return spot;
     }
 
     // Centered on the spot, feet on its bottom.

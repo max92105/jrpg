@@ -22,8 +22,9 @@ public sealed class BattleSceneTests
     {
         var (session, scene) = StartForestBattle(StartMapScenarios.NextToForestWarpAlwaysRolling);
         scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Up));
+        scene.Update(StartMapScenarios.OneUpdate, _confirm);
 
-        var request = scene.Update(StartMapScenarios.OneUpdate, _confirm);
+        var request = Settle(scene);
 
         Assert.IsType<BattleFinished>(request);
         Assert.Null(session.ActiveBattle);
@@ -36,6 +37,7 @@ public sealed class BattleSceneTests
         var (_, scene) = StartForestBattle(StartMapScenarios.NextToForestWarpAlwaysRolling);
         scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Up));
         scene.Update(StartMapScenarios.OneUpdate, _confirm);
+        Settle(scene);
 
         var request = scene.Update(StartMapScenarios.OneUpdate, _confirm);
 
@@ -50,8 +52,9 @@ public sealed class BattleSceneTests
         var (session, scene) = StartForestBattle(catalog);
         var experienceBefore = session.Party.Leader.Experience;
         scene.Update(StartMapScenarios.OneUpdate, _confirm);
+        scene.Update(StartMapScenarios.OneUpdate, _confirm);
 
-        var request = scene.Update(StartMapScenarios.OneUpdate, _confirm);
+        var request = Settle(scene);
 
         Assert.IsType<BattleFinished>(request);
         Assert.Equal(experienceBefore + catalog.Enemies["goblin"].ExperienceReward, session.Party.Leader.Experience);
@@ -64,7 +67,9 @@ public sealed class BattleSceneTests
         var hpBefore = session.Party.Leader.Vitals.Hp;
         scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Down));
 
-        var request = scene.Update(StartMapScenarios.OneUpdate, _confirm);
+        scene.Update(StartMapScenarios.OneUpdate, _confirm);
+
+        var request = Settle(scene);
 
         Assert.Null(request);
         Assert.Equal(BattlePhase.PartyTurn, session.ActiveBattle?.Phase);
@@ -78,20 +83,28 @@ public sealed class BattleSceneTests
         var catalog = WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { Attack = 9999 });
         var (session, scene) = StartForestBattleScene(catalog);
 
-        var request = scene.Update(StartMapScenarios.OneUpdate, default)
-            ?? scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Down))
-            ?? scene.Update(StartMapScenarios.OneUpdate, _confirm);
+        var request = Settle(scene) ?? DefendAndSettle(scene);
 
         Assert.IsType<TitleRequested>(request);
         Assert.Null(session.ActiveBattle);
     }
 
-    // The first update plays any enemy turns ahead of Sarxian (200 HP, out of the goblins' reach), so the list is offered.
+    // Settling plays any enemy turns ahead of Sarxian (200 HP, out of the goblins' reach), so the list is offered.
     private static (GameSession Session, BattleScene Scene) StartForestBattle(ContentCatalog catalog)
     {
         var (session, scene) = StartForestBattleScene(catalog);
-        Assert.Null(scene.Update(StartMapScenarios.OneUpdate, default));
+        Assert.Null(Settle(scene));
         return (session, scene);
+    }
+
+    // Long enough for any enemy turns and the actor's steps to play out.
+    private static SceneRequest? Settle(BattleScene scene) => scene.Update(TimeSpan.FromSeconds(10), default);
+
+    private static SceneRequest? DefendAndSettle(BattleScene scene)
+    {
+        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Down));
+        scene.Update(StartMapScenarios.OneUpdate, _confirm);
+        return Settle(scene);
     }
 
     private static (GameSession Session, BattleScene Scene) StartForestBattleScene(ContentCatalog catalog)

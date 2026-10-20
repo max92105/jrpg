@@ -3,24 +3,66 @@ using Jrpg.Core.Battle;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Whose turn the battle screen shows and what happens next (ADR 0013). Enemy turns are resolved at once until playback
-/// paces them (plan 2026-10-20-battle, B5a); a party turn waits for the player's command.
+/// Whose turn the battle screen shows and what happens next (ADR 0013): the actor steps forward, a party member waits for
+/// a command while an enemy asks Core's tactics, the command is executed and the screen holds, then the actor steps back.
+/// Time left over at the end of a stage carries into the next one.
 /// </summary>
-internal sealed class BattleTurnSequence(BattleState battle, EnemyTactics tactics)
+internal sealed class BattleTurnSequence
 {
-    public bool IsOver => battle.IsOver;
+    private readonly BattleState _battle;
+    private readonly EnemyTactics _tactics;
+    private TimeSpan _timeInStage;
+    private TimeSpan _hold;
 
-    public bool IsAwaitingCommand => battle.Phase == BattlePhase.PartyTurn;
-
-    /// <summary>The combatant acting on screen.</summary>
-    public Combatant Actor => battle.CurrentActor;
-
-    /// <summary>Plays the enemy turns due now, each with the command Core's tactics choose.</summary>
-    public void Update()
+    public BattleTurnSequence(BattleState battle, EnemyTactics tactics)
     {
-        while (battle.Phase == BattlePhase.EnemyTurn)
+        _battle = battle;
+        _tactics = tactics;
+        Actor = battle.CurrentActor;
+    }
+
+    public TurnStage Stage { get; private set; } = TurnStage.StepForward;
+
+    /// <summary>Which turn the screen shows, counting from 1; with <see cref="Stage"/>, says when the screen must change.</summary>
+    public int Turn { get; private set; } = 1;
+
+    public bool IsOver => Stage == TurnStage.Over;
+
+    public bool IsAwaitingCommand => Stage == TurnStage.AwaitingCommand;
+
+    /// <summary>The combatant acting on screen: the one who acted until the next turn steps forward, unlike Core's current actor.</summary>
+    public Combatant Actor { get; private set; }
+
+    /// <summary>How far <paramref name="combatant"/> has stepped out of the formation, 0 in place to 1 fully out.</summary>
+    public float StepShare(Combatant combatant)
+    {
+        if (combatant != Actor)
         {
-            battle.Execute(tactics.ChooseCommand(battle));
+            return 0;
+        }
+
+        return Stage switch
+        {
+            TurnStage.StepForward => (float)(_timeInStage / BattlePacing.Step),
+            TurnStage.AwaitingCommand or TurnStage.Holding => 1,
+            TurnStage.StepBack => 1 - (float)(_timeInStage / BattlePacing.Step),
+            _ => 0,
+        };
+    }
+
+    /// <summary>Plays the turn on; waiting for a command or the end of the battle stops the clock.</summary>
+    public void Update(TimeSpan delta)
+    {
+        if (DurationOf(Stage) is null)
+        {
+            return;
+        }
+
+        _timeInStage += delta;
+        while (DurationOf(Stage) is { } duration && _timeInStage >= duration)
+        {
+            _timeInStage -= duration;
+            EndStage();
         }
     }
 
@@ -30,9 +72,63 @@ internal sealed class BattleTurnSequence(BattleState battle, EnemyTactics tactic
     {
         if (!IsAwaitingCommand)
         {
-            throw new InvalidOperationException($"No party member is waiting for a command ({battle.Phase}).");
+            throw new InvalidOperationException($"No party member is waiting for a command ({Stage}).");
         }
 
-        battle.Execute(command);
+        Act(command);
+    }
+
+    // Defend and Run land on nobody, so nothing holds the screen (B5b paces each event instead).
+    private static TimeSpan HoldFor(IReadOnlyList<BattleEvent> events) =>
+        events.Any(battleEvent => battleEvent is CombatantDefeated) ? BattlePacing.DefeatHold
+        : events.Any(battleEvent => battleEvent is EffectApplied) ? BattlePacing.ImpactHold
+        : TimeSpan.Zero;
+
+    private TimeSpan? DurationOf(TurnStage stage) => stage switch
+    {
+        TurnStage.StepForward or TurnStage.StepBack => BattlePacing.Step,
+        TurnStage.Holding => _hold,
+        _ => null,
+    };
+
+    private void EndStage()
+    {
+        switch (Stage)
+        {
+            case TurnStage.StepForward when _battle.Phase == BattlePhase.PartyTurn:
+                Stage = TurnStage.AwaitingCommand;
+                _timeInStage = TimeSpan.Zero; // The wait is the player's; leftover time doesn't count toward the hold.
+                break;
+            case TurnStage.StepForward:
+                Act(_tactics.ChooseCommand(_battle));
+                break;
+            case TurnStage.Holding:
+                Stage = TurnStage.StepBack;
+                break;
+            case TurnStage.StepBack:
+                StartNextTurn();
+                break;
+            default:
+                throw new InvalidOperationException($"The {Stage} stage doesn't end on its own.");
+        }
+    }
+
+    private void Act(BattleCommand command)
+    {
+        _hold = HoldFor(_battle.Execute(command));
+        Stage = TurnStage.Holding;
+    }
+
+    private void StartNextTurn()
+    {
+        if (_battle.IsOver)
+        {
+            Stage = TurnStage.Over;
+            return;
+        }
+
+        Actor = _battle.CurrentActor;
+        Turn++;
+        Stage = TurnStage.StepForward;
     }
 }

@@ -210,9 +210,10 @@ public sealed class GameFlowTests : IDisposable
 
         Assert.NotNull(session.ActiveBattle);
         var battlePosition = session.Exploration.PlayerPosition;
-        flow.Update(_wholeFade, default);
+        flow.Update(TimeSpan.FromSeconds(10), default);
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Up));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(TimeSpan.FromSeconds(0.5), default);
         Assert.Null(session.ActiveBattle);
 
         flow.Update(_wholeFade, default);

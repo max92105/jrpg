@@ -29,6 +29,7 @@ internal sealed class BattleScene : IScene
     private readonly EnemyTagView _enemyTags;
     private readonly CommandMenu _commands = new();
     private readonly CommandPanelView _commandPanel;
+    private (int Turn, TurnStage Stage) _shown;
     private bool _isFinished;
 
     /// <param name="session">The playthrough whose active battle this screen shows.</param>
@@ -43,14 +44,14 @@ internal sealed class BattleScene : IScene
         _battle = battle;
         _turnOrder = new TurnOrderView(_turnOrderStrip, battle.Combatants, text, ui);
         _turnOrderStrip.Refresh(battle);
-        _battlers = new BattlersView(battle.Combatants, ui);
+        _sequence = new BattleTurnSequence(battle, session.EnemyTactics);
+        _shown = (_sequence.Turn, _sequence.Stage);
+        _battlers = new BattlersView(battle.Combatants, _sequence, ui);
         _partyStatus = new PartyStatusView([.. battle.Combatants.Where(combatant => combatant.Side == BattleSide.Party)], text, ui);
         _enemyTags = new EnemyTagView(battle.Combatants, text, ui);
-        _sequence = new BattleTurnSequence(battle, session.EnemyTactics);
         _backgroundFile = session.Exploration.PendingEncounter?.BackgroundFile
             ?? throw new InvalidOperationException("A battle screen needs the encounter it fights.");
         _commandPanel = new CommandPanelView(_commands, _battlers, text, ui);
-        _commands.Start(battle);
     }
 
     /// <returns>
@@ -64,24 +65,19 @@ internal sealed class BattleScene : IScene
             return null;
         }
 
-        // The order moves on when enemy turns play (no command awaited) or when a command is given.
-        var isOrderMoving = !_sequence.IsAwaitingCommand;
         if (_sequence.IsAwaitingCommand && _commands.Update(input) is { } command)
         {
             _sequence.Submit(command);
-            isOrderMoving = true;
         }
 
         _turnOrderStrip.Highlight(_commands.Targets?.Selected ?? []);
         _commandPanel.Advance(delta);
-        _sequence.Update();
-        if (isOrderMoving)
+        _sequence.Update(delta);
+        if (_shown != (_sequence.Turn, _sequence.Stage))
         {
-            StartTurn();
+            ShowStage(_sequence.Turn, _sequence.Stage);
         }
 
-        _partyStatus.Refresh();
-        _enemyTags.Refresh();
         return _sequence.IsOver ? Finish() : null;
     }
 
@@ -92,17 +88,25 @@ internal sealed class BattleScene : IScene
         _enemyTags.Draw(batch, textures);
         _turnOrder.Draw(batch, textures);
         var isAwaitingCommand = !_isFinished && _sequence.IsAwaitingCommand;
-        _partyStatus.Draw(batch, textures, isAwaitingCommand ? _sequence.Actor : null);
+        _partyStatus.Draw(batch, textures, _sequence.IsOver ? null : _sequence.Actor);
         if (isAwaitingCommand)
         {
             _commandPanel.Draw(batch, textures, _sequence.Actor);
         }
     }
 
-    private void StartTurn()
+    // Text is formatted at stage changes, never per frame: the vitals once an action lands, the order when a turn starts.
+    private void ShowStage(int turn, TurnStage stage)
     {
-        _turnOrderStrip.Refresh(_battle);
-        if (_sequence.IsAwaitingCommand)
+        _shown = (turn, stage);
+        _partyStatus.Refresh();
+        _enemyTags.Refresh();
+        if (stage is TurnStage.StepForward or TurnStage.AwaitingCommand)
+        {
+            _turnOrderStrip.Refresh(_battle);
+        }
+
+        if (stage == TurnStage.AwaitingCommand)
         {
             _commands.Start(_battle);
         }

@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-battle/slices/B4c.md, B4c (CommandPanelView, CommandPanelPlacement, PointerBob, OutlinedShape/CommandHeaderShape)
-Round: 1 (verdict: Ready to commit; verify all pass, 1211 tests)
+Slice: docs/plans/2026-10-20-battle/slices/B5a.md, B5a (TurnStage, BattlePacing, BattleTurnSequence stage machine, BattlersView step offset, BattleScene ShowStage)
+Round: 1 (verdict: Ready to commit; verify all pass, 1218 tests)
 
-- open (Suggestion): CommandPanelView._pointerTime never resets; PointerBob param doc says "since the pointer appeared". Reset when Targets goes from null to set, or reword the doc.
-- open (Suggestion): OutlinedShape.Pixels names the path `outline` while NavTabShape/CommandHeaderShape name the edge color `outline`; rename the path param to `corners`.
-- open (Suggestion): PointerBob tests only pin 0 and peak; add 0.225 s -> 4 px to pin the cosine ease.
+- open (Suggestion): BattleScene._shown hardcodes (1, StepForward); initialize from (_sequence.Turn, _sequence.Stage) after the sequence is built.
+- open (Suggestion): no test pins StepBack's share falling (e.g. 0.1 s into StepBack -> 0.5) or Defend's zero hold; Run's zero hold is only implied by Submit_Flee_IsOver.
+- open (Suggestion): Update_LongDelta test relies on goblin A's attack producing EffectApplied (1.0 s hold); a comment says so, fine, but a miss/defeat change in Core would shift it.
 - follow-up: none.

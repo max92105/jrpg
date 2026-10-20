@@ -32,3 +32,5 @@ Seen again in part 2 slice 5b: `Read_MissingRequiredField_ThrowsNamingTheField` 
 Seen again in 11g (oracle variant): `ObjectBrowserViewModelTests` asserts the list equals the same `OrderBy(Category).ThenBy(Id)` the production code runs, so it passes for any sort bug shared by both. Pin a golden prefix instead (it did, with `Take(2)`).
 
 Seen again in battle C1 (single-recipient variant): `VictoryRewards.Experience` ("before the split") tested only with a one-member party, so total == share and `Experience = Gains[0].Amount` would pass. For totals vs per-member values, ask for two recipients.
+
+Seen again in battle B1b (loop-exit variant): the flow test loops `while session.ActiveBattle is not null`, then asserts `ActiveBattle` is null and the position kept (Core forbids walking anyway), so a no-op `BattleTransitions.Finish` (battle screen never popped) passes. When asserts restate a loop's exit condition, ask what proves the screen/stack changed (e.g. the map takes input again).

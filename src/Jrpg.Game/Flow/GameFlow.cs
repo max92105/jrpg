@@ -26,6 +26,7 @@ internal sealed class GameFlow : IScene
     private readonly FadeGate _fade = new(new ScreenFade(_fadeOut, _blackHold, _fadeIn));
     private readonly SessionTransitions _sessions;
     private readonly MenuTransitions _menus;
+    private readonly BattleTransitions _battles;
 
     /// <param name="catalog">The content, as loaded.</param>
     /// <param name="text">Messages and fonts.</param>
@@ -33,10 +34,10 @@ internal sealed class GameFlow : IScene
     /// <param name="settings">The player's options, which the Options page edits and dialogue reads.</param>
     public GameFlow(ContentCatalog catalog, ScreenText text, SaveSlots saveSlots, PlayerSettings settings)
     {
-        var playedCatalog = EncounterFreeContent.Of(catalog);
-        var factory = new SceneFactory(playedCatalog, text, saveSlots, settings);
-        _sessions = new SessionTransitions(playedCatalog, _scenes, factory);
+        var factory = new SceneFactory(catalog, text, saveSlots, settings);
+        _sessions = new SessionTransitions(catalog, _scenes, factory);
         _menus = new MenuTransitions(_scenes, factory);
+        _battles = new BattleTransitions(_scenes, factory);
         _scenes.Push(factory.CreateTitle());
     }
 
@@ -117,6 +118,12 @@ internal sealed class GameFlow : IScene
             case TitleRequested:
                 _sessions.ShowTitle();
                 Session = null;
+                break;
+            case BattleRequested:
+                _battles.Start(Session ?? throw new InvalidOperationException("A battle started with no game started."));
+                break;
+            case BattleFinished:
+                _battles.Finish();
                 break;
             case var request:
                 throw new InvalidOperationException($"The game can't handle a {request.GetType().Name} yet.");

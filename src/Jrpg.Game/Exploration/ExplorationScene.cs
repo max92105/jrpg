@@ -49,9 +49,12 @@ internal sealed class ExplorationScene : IScene
 
     /// <summary>
     /// Shows the running event's step; interacts, walks and opens the menu only once it and its fade are over. An
-    /// interaction that starts an event waits for it like any other.
+    /// interaction that starts an event waits for it like any other. While a step's encounter is pending, the player
+    /// stands.
     /// </summary>
-    /// <returns>The menu when Menu is pressed between events; otherwise null.</returns>
+    /// <returns>
+    /// The menu when Menu is pressed between events; a battle on the update a step starts an encounter; otherwise null.
+    /// </returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
         // Sampled before the presenter runs: the Confirm that closes the last message mustn't also interact again.
@@ -60,6 +63,13 @@ internal sealed class ExplorationScene : IScene
         if (!ReferenceEquals(_exploration.CurrentMap, _map))
         {
             EnterCurrentMap();
+        }
+
+        // Core refuses walking and interacting until the battle the encounter started is finished.
+        if (_exploration.PendingEncounter is not null)
+        {
+            _walkAnimation.Stand();
+            return null;
         }
 
         if (!wasBusy && input.IsPressed(GameButton.Confirm))
@@ -80,7 +90,7 @@ internal sealed class ExplorationScene : IScene
         }
 
         WalkAndFollow(delta, input);
-        return null;
+        return _exploration.PendingEncounter is null ? null : new BattleRequested();
     }
 
     public void Draw(SpriteBatch batch, TextureLibrary textures)

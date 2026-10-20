@@ -40,3 +40,4 @@ Part of [the battle plan](../README.md). Design: [design.md](../design.md).
   - **Known gaps:**
     - until B2a-B4b: no battlers, HUD or Attack;
     - until C4: a party left with only fallen members active (possible from the Party page) crashes on the next battle.
+- **Done, with deviations:** `BattleScene` takes `GameSession` and `ScreenText` only (no `UiTextures` until a slice draws with them). Test names drop the class prefix, as in the existing files. Test helpers: `StartMapScenarios.NextToForestWarpAlwaysRolling`, `SceneOf`, `WalkUntilBattleRequested`. Known gap until B8b: a defeat also returns `BattleFinished` (the party stays at 0 HP on the map). Review added `ExplorationScene_Update_MenuPressedWhileEncounterPending_RequestsNothing`, and the flow test now walks after the battle to prove the map is back on top.

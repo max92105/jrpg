@@ -221,4 +221,7 @@ internal static class MessageIds
     public const string TextSpeedFast = "text_speed_fast";
 
     public const string TextSpeedInstant = "text_speed_instant";
+
+    /// <summary>The battle command that leaves the fight.</summary>
+    public const string BattleRun = "battle_run";
 }

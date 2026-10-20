@@ -1,9 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Exploration;
 using Jrpg.Game.Exploration;
-using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
-using Jrpg.Game.Rendering;
 using Jrpg.Game.Scenes;
 using Jrpg.Game.Tests.Input;
 using Jrpg.Game.Tests.Ui;
@@ -33,6 +31,59 @@ public sealed class ExplorationSceneTests
         scene.Update(TimeSpan.FromSeconds(0.1), StartMapScenarios.HoldingLeft);
 
         Assert.Equal(arrival, exploration.PlayerPosition);
+    }
+
+    [Fact]
+    public void Update_StepStartsEncounter_RequestsBattleOnce()
+    {
+        var (_, scene) = Start(StartMapScenarios.NextToForestWarpAlwaysRolling);
+
+        var requests = 0;
+        for (var update = 0; update < 600; update++)
+        {
+            if (scene.Update(StartMapScenarios.OneUpdate, StartMapScenarios.HoldingLeft) is BattleRequested)
+            {
+                requests++;
+            }
+        }
+
+        Assert.Equal(1, requests);
+    }
+
+    [Fact]
+    public void Update_EncounterPending_DoesNotWalk()
+    {
+        var (exploration, scene) = Start(StartMapScenarios.NextToForestWarpAlwaysRolling);
+        Assert.True(StartMapScenarios.WalkUntilBattleRequested(scene));
+        var position = exploration.PlayerPosition;
+
+        scene.Update(TimeSpan.FromSeconds(0.5), StartMapScenarios.HoldingLeft);
+
+        Assert.Equal(position, exploration.PlayerPosition);
+    }
+
+    [Fact]
+    public void Update_MenuPressedWhileEncounterPending_RequestsNothing()
+    {
+        var (_, scene) = Start(StartMapScenarios.NextToForestWarpAlwaysRolling);
+        Assert.True(StartMapScenarios.WalkUntilBattleRequested(scene));
+
+        var request = scene.Update(StartMapScenarios.OneUpdate, InputFrames.PressingEscape);
+
+        Assert.Null(request);
+    }
+
+    [Fact]
+    public void Update_EncounterCleared_WalksAgain()
+    {
+        var (exploration, scene) = Start(StartMapScenarios.NextToForestWarpAlwaysRolling);
+        Assert.True(StartMapScenarios.WalkUntilBattleRequested(scene));
+        var position = exploration.PlayerPosition;
+        exploration.FinishEncounter();
+
+        scene.Update(StartMapScenarios.OneUpdate, StartMapScenarios.HoldingLeft);
+
+        Assert.NotEqual(position, exploration.PlayerPosition);
     }
 
     [Fact]
@@ -89,6 +140,6 @@ public sealed class ExplorationSceneTests
     private static (ExplorationState Exploration, ExplorationScene Scene) Start(ContentCatalog catalog)
     {
         var exploration = StartMapScenarios.StartExploring(catalog);
-        return (exploration, new ExplorationScene(exploration, catalog, new MapArt(catalog, MapView.CellPixels), new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings())));
+        return (exploration, StartMapScenarios.SceneOf(exploration, catalog));
     }
 }

@@ -7,7 +7,12 @@ using Jrpg.Core.Maps;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Data.Content;
+using Jrpg.Game.Exploration;
+using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
+using Jrpg.Game.Rendering;
+using Jrpg.Game.Scenes;
+using Jrpg.Game.Tests.Ui;
 
 namespace Jrpg.Game.Tests.Exploration;
 
@@ -20,6 +25,12 @@ internal static class StartMapScenarios
 
     /// <summary>One cell right of the warp cell (0, 14) to the forest, facing it.</summary>
     public static ContentCatalog NextToForestWarp { get; } = StartingAt(new Point2D(1.5, 14.5), Facing.Left);
+
+    /// <summary>
+    /// Next to the forest warp as in <see cref="NextToForestWarp"/>, but every step in the forest starts the goblin trio,
+    /// with no grace steps.
+    /// </summary>
+    public static ContentCatalog NextToForestWarpAlwaysRolling { get; } = WithForestAlwaysRolling(NextToForestWarp);
 
     /// <summary>Just below the closed door, whose interact event swaps it open, facing it.</summary>
     public static ContentCatalog BelowClosedDoor { get; } = StartingAt(new Point2D(5.86, 14.6), Facing.Up);
@@ -45,10 +56,39 @@ internal static class StartMapScenarios
     public static ExplorationState StartExploring(ContentCatalog catalog) =>
         GameSession.StartNew(catalog, new SeededRandom(1)).Exploration;
 
+    public static ExplorationScene SceneOf(ExplorationState exploration, ContentCatalog catalog) =>
+        new(exploration, catalog, new MapArt(catalog, MapView.CellPixels), new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings()));
+
+    /// <summary>Holds Left from <see cref="NextToForestWarpAlwaysRolling"/>, through the warp, until a step requests a battle.</summary>
+    /// <returns>Whether a battle was requested within 10 s.</returns>
+    public static bool WalkUntilBattleRequested(ExplorationScene scene)
+    {
+        for (var update = 0; update < 600; update++)
+        {
+            if (scene.Update(OneUpdate, HoldingLeft) is BattleRequested)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private static ContentCatalog StartingAt(Point2D position, Facing facing) => _repositoryContent with
     {
         NewGame = _repositoryContent.NewGame with { StartLocation = new MapLocation("start", position, facing) },
     };
+
+    private static ContentCatalog WithForestAlwaysRolling(ContentCatalog catalog)
+    {
+        var forest = catalog.Maps["forest"];
+        var table = new RandomEncounterTable { OneInSteps = 1, GraceSteps = 0, EncounterIds = ["goblin_trio"] };
+        var maps = new Dictionary<string, MapDefinition>(catalog.Maps)
+        {
+            ["forest"] = new MapDefinition(forest.Layout, forest.Settings with { RandomEncounters = table }),
+        };
+        return catalog with { Maps = maps };
+    }
 
     // The chest's interact event, made repeatable, runs only this step, so the chest never swaps open.
     private static ContentCatalog WithChestSaying(ContentCatalog catalog, EventStep step)

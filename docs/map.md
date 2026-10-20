@@ -49,14 +49,15 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Folder | Purpose | Key types |
 |---|---|---|
 | (root) | Startup and the host loop | `Program`, `JrpgGame` |
-| Flow | The screens and the playthrough; applies scene requests | `GameFlow`, `FadeGate`, `SceneFactory`, `SessionTransitions`, `MenuTransitions` |
-| Scenes | The scene contract, the stack, requests, the screen fade | `IScene`, `SceneStack`, `SceneRequest` (+ records), `ScreenFade` |
+| Flow | The screens and the playthrough; applies scene requests | `GameFlow`, `FadeGate`, `SceneFactory`, `SessionTransitions`, `MenuTransitions`, `BattleTransitions` |
+| Scenes | The scene contract, the stack, requests, the screen fade | `IScene`, `SceneStack`, `SceneRequest` (+ records, `BattleRequested`, `BattleFinished`), `ScreenFade` |
 | Hosting | Window, settings, file locations | `PlayerSettings`, `TextSpeed`, `GamePaths`, `FullScreenShortcut` |
 | Input | Keys and pads to game buttons, per update | `InputReader`, `InputFrame`, `InputBindings`, `GameButton` |
 | Rendering | Textures, fonts, the virtual screen, baked map art | `TextureLibrary`, `FontLibrary`, `VirtualScreen`, `MapArt`, `TileAtlas` |
 | Exploration | The map scene: drawing, camera, walking, showing events | `ExplorationScene`, `EventPresenter`, `MapView`, `MapDrawList`, `MapCamera` |
 | Dialogue | The message box and typing | `DialogueBox`, `SpeechPlayback`, `Typewriter`, `FoundItemText` |
 | Title | The title screen | `TitleScene`, `TitleMenu` |
+| Battle | The battle screen over the map: turns, commands, playback (ADR 0013) | `BattleScene`, `BattleTurnSequence` |
 | Menus | The game menu and its pages | `GameMenuScene`, `IMenuPage`, `StatusPage`, `InventoryPage`, `EquipmentPage`, `EquipmentSheet`/`EquipmentSheetView`, `EquipmentChoice`/`EquipmentChoiceView`, `StatPreviewText`, `PartyPage`, `PartyCursor`, `PartyColumns`/`PartyColumnsView`, `PartyActionChoiceView`, `OptionsPage`, `SystemPage` |
 | Saving | The 20 save files and their list | `SaveSlots`, `SaveSlotList`, `SaveFilesPanel` |
 | Ui | Shared UI pieces: theme, text, cursors, panels, bars, shapes | `UiTheme`, `UiTextures`, `UiMessages`/`MessageIds`, `ListCursor`, `StatBar`, `SectionTitle`, `MeasuredText`, `VitalMeter`, `MemberVitalBars`, `MemberCardView`, `Diamond`, `ConfirmPrompt` |

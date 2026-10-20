@@ -119,7 +119,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **ADR 0013: Battle presentation and playback** (before B1b) → [slices/ADR-0013.md](slices/ADR-0013.md)
 - [x] **C1. Battles in the session** (Core, about 230 lines) → [slices/C1.md](slices/C1.md)
 - [x] **B1a. A request during the flow's fade waits for it** (Game, about 90 lines; devil's advocate B-1) → [slices/B1a.md](slices/B1a.md)
-- [ ] **B1b. Random battles start; Run ends them** (Game, about 270 lines) → [slices/B1b.md](slices/B1b.md)
+- [x] **B1b. Random battles start; Run ends them** (Game, about 270 lines) → [slices/B1b.md](slices/B1b.md)
 
 ### Phase 2: the stage and the HUD
 

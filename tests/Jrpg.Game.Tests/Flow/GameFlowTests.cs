@@ -9,6 +9,7 @@ using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
 using Jrpg.Game.Saving;
 using Jrpg.Game.Scenes;
+using Jrpg.Game.Tests.Exploration;
 using Jrpg.Game.Tests.Input;
 using Jrpg.Game.Tests.Saving;
 using Jrpg.Game.Tests.Ui;
@@ -196,18 +197,44 @@ public sealed class GameFlowTests : IDisposable
         Assert.Equal(savedPlayTime, loaded.PlayTime);
     }
 
-    // New game is the title's first entry, so Confirm alone picks it; the fade starts on that update.
-    private static GameFlow FlowWithNewGameConfirmed(SaveSlots? slots = null)
+    // ADR 0008's headless test. Seed-independent: Run always works, and the goblins' first turns can't fell Sarxian.
+    [Fact]
+    public void Update_WalkIntoForestThatAlwaysRolls_FightsAndReturnsToMap()
     {
-        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, slots ?? UnwrittenSaveSlots.Create(), new PlayerSettings());
+        var flow = StartedFlow(catalog: StartMapScenarios.NextToForestWarpAlwaysRolling);
+        var session = SessionOf(flow);
+        for (var update = 0; update < 600 && session.ActiveBattle is null; update++)
+        {
+            flow.Update(_oneUpdate, StartMapScenarios.HoldingLeft);
+        }
+
+        Assert.NotNull(session.ActiveBattle);
+        var battlePosition = session.Exploration.PlayerPosition;
+        for (var update = 0; update < 600 && session.ActiveBattle is not null; update++)
+        {
+            flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        }
+
+        flow.Update(_wholeFade, default);
+        Assert.Equal(battlePosition, session.Exploration.PlayerPosition);
+
+        flow.Update(TimeSpan.FromSeconds(0.1), StartMapScenarios.HoldingLeft);
+
+        Assert.NotEqual(battlePosition, session.Exploration.PlayerPosition);
+    }
+
+    // New game is the title's first entry, so Confirm alone picks it; the fade starts on that update.
+    private static GameFlow FlowWithNewGameConfirmed(SaveSlots? slots = null, ContentCatalog? catalog = null)
+    {
+        var flow = new GameFlow(catalog ?? _catalog, RepositoryScreenText.Text, slots ?? UnwrittenSaveSlots.Create(), new PlayerSettings());
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         return flow;
     }
 
     // A new game whose fade is over, so the map gets input.
-    private static GameFlow StartedFlow(SaveSlots? slots = null)
+    private static GameFlow StartedFlow(SaveSlots? slots = null, ContentCatalog? catalog = null)
     {
-        var flow = FlowWithNewGameConfirmed(slots);
+        var flow = FlowWithNewGameConfirmed(slots, catalog);
         flow.Update(_fadeOut, default);
         flow.Update(_wholeFade - _fadeOut, default);
         return flow;

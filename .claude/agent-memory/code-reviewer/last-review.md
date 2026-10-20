@@ -5,10 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-battle/slices/B3a.md, B3a (party status: VitalsText, PartyStatusView/Panel, BattleVitalRow, VitalRowStyle, OutlinedFont, StatBar track)
-Round: 1 (verdict: Ready to commit; verify all pass, 1172 tests)
+Slice: docs/plans/2026-10-20-battle/slices/B3b.md, B3b (enemy tags and letters: EnemyLabels, EnemyTagView, battle_enemy_letter)
+Round: 1 (verdict: Ready to commit; verify all pass, 1176 tests)
 
-- open (Suggestion): BattleVitalRow.Show(string value, string max, int current, int maximum) pairs near-synonym names; rename to valueText/maxText (or value/maximum ints) so a swap is visible.
-- open (Suggestion): PartyStatusPanel ctor takes a (Hp, Mp) tuple to dodge the 4-param limit; a panel-style record (row styles + labels) passed once would read straighter.
-- open (Suggestion): VitalsText's MP/MaxMp change path untested (only HP); one MP-changed case would cover MaxIfChanged's second use.
-- follow-up: UiTheme.Danger's doc still says "a save that failed"; now also a fallen member's HP.
+- open (Suggestion): EnemyTagView._tags holds Rectangles, not tags; rename _tagAreas to match how StatBar.Draw names its `area`.
+- open (Suggestion): EnemyLabels.Of recounts names per enemy (names.Count inside the loop); a name->count dictionary built once reads as the rule "repeated names get letters".
+- follow-up: none.

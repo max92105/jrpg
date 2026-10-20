@@ -10,3 +10,4 @@ Part of [the battle plan](../README.md). Design: [design.md](../design.md).
   - **Tests:** `EnemyLabels_Of_ThreeGoblins_LettersInFormationOrder`, `EnemyLabels_Of_UniqueNames_NoLetters`, `EnemyLabels_Of_MixedEncounter_LettersOnlyRepeatedNames`.
   - **Verify by hand:**
     - [ ] Tags sit under each goblin, and a bar shrinks as it is hit (after B4b).
+- **Done, with deviations:** "Goblin A" is written through the new message `battle_enemy_letter` ("{name} {letter}"), so `EnemyLabels.Of` takes the names and `UiMessages`. Tags use `OutlinedFont` and the battle bar track from B3a.

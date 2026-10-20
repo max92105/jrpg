@@ -227,4 +227,7 @@ internal static class MessageIds
 
     /// <summary>Placeholder <c>{max}</c>: a vital's maximum, written small after its value on the battle screen.</summary>
     public const string BattleVitalMax = "battle_vital_max";
+
+    /// <summary>Placeholders <c>{name}</c> and <c>{letter}</c>: an enemy sharing its name with others, as "Goblin A".</summary>
+    public const string BattleEnemyLetter = "battle_enemy_letter";
 }

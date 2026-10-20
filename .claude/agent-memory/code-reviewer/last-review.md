@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-menu-cleanup/slices/M1.md, M1 (IMenuPage.Open; GameMenuScene opens page on Confirm; each page rebuilds and resets cursor)
+Slice: docs/plans/2026-10-20-menu-cleanup/slices/U1.md, U1 (Ui/SectionTitle replaces 3 DrawSectionTitle copies)
 Round: 1 (verdict: Ready to commit; verify all pass, 1109 tests)
 
-- open (Suggestion): slice M1.md:18 says constructors call the same private method; Status/Equipment ctors duplicate Open's Members/sheet build instead. Record the deviation in the slice note (dev's stated reason: cursors readonly, count only known in ctor)
-- open (Suggestion): M1 checkbox in README.md:92 not ticked (DoD step 5)
-- open (Follow-up): EquipmentPage ~404 / PartyPage ~398 lines, splits already planned in E1/E2, P1/P2
+- open (Suggestion): add SectionTitle to docs/map.md Ui row key types (others build on it in U2-U4)
+- open (Suggestion): U1 checkbox in README.md:96 not ticked (DoD step 5)
+- open (Follow-up): EquipmentPage 395 / PartyPage 390 lines, splits already planned in E1/E2, P1/P2

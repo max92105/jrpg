@@ -42,7 +42,6 @@ internal sealed class StatusPage : IMenuPage
     private const int ParametersTop = PortraitSize + 18;
     private const int EquipmentTop = ParametersTop + SectionHeight + (2 * StatLineHeight) + 18;
     private const int SectionHeight = 28;
-    private const int SectionLineGap = 20;
     private const int ValueBelowLabel = 20;
 
     // Legacy XpBar: 6 px tall, 12 px under the experience values, 16 px short of the profile's right edge. HP and MP get the
@@ -60,6 +59,9 @@ internal sealed class StatusPage : IMenuPage
     private readonly SpriteFontBase _bodyFont;
     private readonly SpriteFontBase _labelFont;
     private readonly StatusLabels _labels;
+    private readonly SectionTitle _experienceTitle;
+    private readonly SectionTitle _parametersTitle;
+    private readonly SectionTitle _equipmentTitle;
     // HP then MP: the first two of the sheet's stats, so a stat's index is its bar's.
     private readonly StatBar[] _vitalBars;
     private readonly StatBar _xpBar;
@@ -78,6 +80,9 @@ internal sealed class StatusPage : IMenuPage
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _labelFont = text.Fonts.FontAt(LabelPixels);
         _labels = StatusLabels.From(text.Messages);
+        _experienceTitle = new SectionTitle(text, ui, MessageIds.StatusExperience);
+        _parametersTitle = new SectionTitle(text, ui, MessageIds.StatusParameters);
+        _equipmentTitle = new SectionTitle(text, ui, MessageIds.StatusEquipment);
         _vitalBars = [new StatBar(ui, UiTheme.HpBar), new StatBar(ui, UiTheme.MpBar)];
         _xpBar = new StatBar(ui, UiTheme.XpBar);
         _cursor = new ListCursor(_party.Members.Count, _ => true);
@@ -202,7 +207,7 @@ internal sealed class StatusPage : IMenuPage
     // Level, experience and experience to the next level, each a small label over its value, in three columns.
     private void DrawExperience(PageFrame page, Rectangle section)
     {
-        DrawSectionTitle(page, _labels.Experience, section);
+        _experienceTitle.Draw(page.Batch, page.Textures, section, page.Opacity);
         var columnWidth = (section.Width - Indent) / 3;
         var labelsTop = section.Y + SectionHeight;
         for (var column = 0; column < 3; column++)
@@ -219,7 +224,7 @@ internal sealed class StatusPage : IMenuPage
     // HP and MP on the first line, attack and defense on the second, as legacy StatsPanel's two columns.
     private void DrawParameters(PageFrame page, Rectangle section)
     {
-        DrawSectionTitle(page, _labels.Parameters, section);
+        _parametersTitle.Draw(page.Batch, page.Textures, section, page.Opacity);
         var columnWidth = (section.Width - Indent - ColumnGap) / 2;
         for (var index = 0; index < _labels.Stats.Length; index++)
         {
@@ -236,7 +241,7 @@ internal sealed class StatusPage : IMenuPage
 
     private void DrawEquipment(PageFrame page, Rectangle section)
     {
-        DrawSectionTitle(page, _labels.Equipment, section);
+        _equipmentTitle.Draw(page.Batch, page.Textures, section, page.Opacity);
         for (var index = 0; index < _labels.Slots.Length; index++)
         {
             var lineTop = section.Y + SectionHeight + (index * StatLineHeight);
@@ -248,14 +253,6 @@ internal sealed class StatusPage : IMenuPage
     {
         page.Write(_bodyFont, label, position, UiTheme.TextSecondary);
         page.Write(_bodyFont, value, position + new Vector2(ValueOffset, 0), UiTheme.TextPrimary);
-    }
-
-    // Legacy SectionHeaderStyle: a small label over a hairline that fades out to the right.
-    private void DrawSectionTitle(PageFrame page, string title, Rectangle section)
-    {
-        page.Write(_labelFont, title, new Vector2(section.X, section.Y), UiTheme.TextSecondary);
-        var line = new Rectangle(section.X, section.Y + SectionLineGap, section.Width, 1);
-        page.Batch.Draw(_ui.SectionLine(page.Textures), line, Color.White * page.Opacity);
     }
 
     // What the page draws with this frame, so the drawing helpers stay at a few parameters.
@@ -276,22 +273,16 @@ internal sealed class StatusPage : IMenuPage
 
     // The page's fixed text, in the order the sheet's arrays use.
     private sealed record StatusLabels(
-        string Experience,
         string[] Progress,
         string MaxLevel,
-        string Parameters,
         string[] Stats,
-        string Equipment,
         string[] Slots,
         string Empty)
     {
         public static StatusLabels From(UiMessages messages) => new(
-            messages.Text(MessageIds.StatusExperience),
             [messages.Text(MessageIds.StatusLevel), messages.Text(MessageIds.StatusExp), messages.Text(MessageIds.StatusNextLevel)],
             messages.Text(MessageIds.StatusMaxLevel),
-            messages.Text(MessageIds.StatusParameters),
             [messages.Text(MessageIds.StatHp), messages.Text(MessageIds.StatMp), messages.Text(MessageIds.StatAttack), messages.Text(MessageIds.StatDefense)],
-            messages.Text(MessageIds.StatusEquipment),
             [messages.Text(MessageIds.SlotWeapon), messages.Text(MessageIds.SlotArmor)],
             messages.Text(MessageIds.SlotEmpty));
     }

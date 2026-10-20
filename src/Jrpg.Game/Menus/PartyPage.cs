@@ -26,8 +26,7 @@ internal sealed class PartyPage : IMenuPage
     private const int ColumnGap = 40;
     private const int LabelPixels = 14;
     private const int BodyPixels = 18;
-    private const int SectionLineGap = 20;
-    private const int CardsTop = SectionLineGap + 12;
+    private const int CardsTop = SectionTitle.LineGap + 12;
     private const int NoticeGap = 16;
     private const int ActiveColumn = 0;
     private const int ReserveColumn = 1;
@@ -48,8 +47,8 @@ internal sealed class PartyPage : IMenuPage
     private readonly PartyMemberCardView _cardView;
     private readonly SpriteFontBase _labelFont;
     private readonly SpriteFontBase _bodyFont;
-    private readonly string _activeTitle;
-    private readonly string _reserveTitle;
+    private readonly SectionTitle _activeTitle;
+    private readonly SectionTitle _reserveTitle;
     private readonly string[] _actions;
     private int _column = ActiveColumn;
     private Dictionary<PartyMember, PartyMemberCardView.Card> _cards = [];
@@ -78,8 +77,8 @@ internal sealed class PartyPage : IMenuPage
         _cardView = new PartyMemberCardView(text, ui, catalog);
         _labelFont = text.Fonts.FontAt(LabelPixels);
         _bodyFont = text.Fonts.FontAt(BodyPixels);
-        _activeTitle = text.Messages.Text(MessageIds.PartyActive);
-        _reserveTitle = text.Messages.Text(MessageIds.PartyReserve);
+        _activeTitle = new SectionTitle(text, ui, MessageIds.PartyActive);
+        _reserveTitle = new SectionTitle(text, ui, MessageIds.PartyReserve);
         _actions = [text.Messages.Text(MessageIds.PartyChangeOrder), text.Messages.Text(MessageIds.PartyToReserve)];
         ShowParty();
     }
@@ -133,9 +132,9 @@ internal sealed class PartyPage : IMenuPage
         var top = area.Y + TopMargin;
         var active = new Rectangle(area.X + Margin, top, columnWidth, 0);
         var reserve = new Rectangle(active.Right + ColumnGap, top, columnWidth, 0);
-        DrawSectionTitle(batch, textures, _activeTitle, active, opacity);
+        _activeTitle.Draw(batch, textures, active, opacity);
         batch.DrawString(_labelFont, _count.Text, new Vector2(active.Right - _count.Width, top), UiTheme.TextSecondary * opacity);
-        DrawSectionTitle(batch, textures, _reserveTitle, reserve, opacity);
+        _reserveTitle.Draw(batch, textures, reserve, opacity);
         DrawCards(batch, textures, ActiveColumn, active, opacity);
         DrawCards(batch, textures, ReserveColumn, reserve, opacity);
         if (_actionChoice is not null)
@@ -387,13 +386,5 @@ internal sealed class PartyPage : IMenuPage
         }
 
         return isSelected ? UiTheme.TextPrimary : UiTheme.TextSecondary;
-    }
-
-    // Legacy SectionHeaderStyle: a small label over a hairline that fades out to the right.
-    private void DrawSectionTitle(SpriteBatch batch, TextureLibrary textures, string title, Rectangle section, float opacity)
-    {
-        batch.DrawString(_labelFont, title, new Vector2(section.X, section.Y), UiTheme.TextSecondary * opacity);
-        var line = new Rectangle(section.X, section.Y + SectionLineGap, section.Width, 1);
-        batch.Draw(_ui.SectionLine(textures), line, Color.White * opacity);
     }
 }

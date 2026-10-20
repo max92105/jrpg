@@ -28,10 +28,8 @@ internal sealed class EquipmentPage : IMenuPage
     private const int TopMargin = 20;
     private const int HeadingPixels = 22;
     private const int BodyPixels = 18;
-    private const int LabelPixels = 14;
     private const int EquipmentTop = 44;
     private const int SectionHeight = 28;
-    private const int SectionLineGap = 20;
     private const int RowHeight = 44;
     private const int RowInset = 10;
     private const int IconColumn = 40;
@@ -63,7 +61,8 @@ internal sealed class EquipmentPage : IMenuPage
     private readonly ListCursor _rowCursor = new(_slots.Length + 1, _ => true);
     private readonly SpriteFontBase _headingFont;
     private readonly SpriteFontBase _bodyFont;
-    private readonly SpriteFontBase _labelFont;
+    private readonly SectionTitle _equipmentTitle;
+    private readonly SectionTitle _parametersTitle;
     private readonly EquipmentLabels _labels;
     private MemberSheet _sheet;
     private EquipmentChoice? _choice;
@@ -88,7 +87,8 @@ internal sealed class EquipmentPage : IMenuPage
         _memberCursor = new ListCursor(_party.Members.Count, _ => true);
         _headingFont = text.Fonts.FontAt(HeadingPixels);
         _bodyFont = text.Fonts.FontAt(BodyPixels);
-        _labelFont = text.Fonts.FontAt(LabelPixels);
+        _equipmentTitle = new SectionTitle(text, ui, MessageIds.StatusEquipment);
+        _parametersTitle = new SectionTitle(text, ui, MessageIds.StatusParameters);
         _labels = EquipmentLabels.From(text.Messages);
         Open();
     }
@@ -159,7 +159,7 @@ internal sealed class EquipmentPage : IMenuPage
         batch.DrawString(_headingFont, _sheet.Name, new Vector2(left, top), UiTheme.TextPrimary * opacity);
 
         var equipment = new Rectangle(left, top + EquipmentTop, width, 0);
-        DrawSectionTitle(batch, textures, _labels.Equipment, equipment, opacity);
+        _equipmentTitle.Draw(batch, textures, equipment, opacity);
         var rowsTop = equipment.Y + SectionHeight;
         for (var index = 0; index < _slots.Length; index++)
         {
@@ -349,7 +349,7 @@ internal sealed class EquipmentPage : IMenuPage
     // Legacy StatsPanel: Max HP and Max MP, then Attack and Defense, two to a line.
     private void DrawParameters(SpriteBatch batch, TextureLibrary textures, Rectangle section, float opacity)
     {
-        DrawSectionTitle(batch, textures, _labels.Parameters, section, opacity);
+        _parametersTitle.Draw(batch, textures, section, opacity);
         var columnWidth = (section.Width - RowInset - ColumnGap) / 2;
         for (var index = 0; index < _labels.Stats.Length; index++)
         {
@@ -374,14 +374,6 @@ internal sealed class EquipmentPage : IMenuPage
         batch.DrawString(_bodyFont, value.Text, position + new Vector2(PreviewValueGap, 0), value.Color);
     }
 
-    // Legacy SectionHeaderStyle: a small label over a hairline that fades out to the right.
-    private void DrawSectionTitle(SpriteBatch batch, TextureLibrary textures, string title, Rectangle section, float opacity)
-    {
-        batch.DrawString(_labelFont, title, new Vector2(section.X, section.Y), UiTheme.TextSecondary * opacity);
-        var line = new Rectangle(section.X, section.Y + SectionLineGap, section.Width, 1);
-        batch.Draw(_ui.SectionLine(textures), line, Color.White * opacity);
-    }
-
     // The shown member: what they wear in _slots' order (null for nothing) and their parameter values, in the labels' order.
     private sealed record MemberSheet(string Name, ItemDefinition?[] Worn, string[] Stats);
 
@@ -392,14 +384,12 @@ internal sealed class EquipmentPage : IMenuPage
     private sealed record PreviewValue(string Text, Color Color);
 
     // The page's fixed text; Slots follows _slots, Stats the parameters' order.
-    private sealed record EquipmentLabels(string Equipment, string[] Slots, string Empty, string RemoveAll, string Parameters, string[] Stats)
+    private sealed record EquipmentLabels(string[] Slots, string Empty, string RemoveAll, string[] Stats)
     {
         public static EquipmentLabels From(UiMessages messages) => new(
-            messages.Text(MessageIds.StatusEquipment),
             [.. _slots.Select(slot => messages.Text(LabelIdOf(slot)))],
             messages.Text(MessageIds.SlotEmpty),
             messages.Text(MessageIds.EquipmentRemoveAll),
-            messages.Text(MessageIds.StatusParameters),
             [messages.Text(MessageIds.StatMaxHp), messages.Text(MessageIds.StatMaxMp), messages.Text(MessageIds.StatAttack), messages.Text(MessageIds.StatDefense)]);
     }
 }

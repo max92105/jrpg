@@ -1,6 +1,6 @@
 ---
 name: plan-checkbox-unticked
-description: Slice hand-offs often leave the plan README checkbox unticked and deviations unrecorded in the slice file (seen C2, M1 of menu-cleanup)
+description: Slice hand-offs often leave the plan README checkbox unticked and deviations unrecorded in the slice file (seen C2, M1, U1 of menu-cleanup)
 metadata:
   type: feedback
 ---

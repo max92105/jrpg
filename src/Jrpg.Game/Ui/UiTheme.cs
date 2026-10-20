@@ -193,6 +193,15 @@ internal static class UiTheme
     /// <summary>Legacy <c>TurnPortrait</c>'s enemy tint (#CC8A1C24) laid over <see cref="TurnBackdrop"/>: an enemy's red lower half.</summary>
     public static Color TurnEnemyHalf { get; } = Over(FromLegacy(0xCC8A1C24), TurnBackdrop);
 
+    /// <summary>Legacy <c>CommandPanel</c>: the dark ground inside the command list's double frame.</summary>
+    public static Color CommandPanelFill { get; } = FromLegacy(0x99000000);
+
+    /// <summary>Legacy <c>BattleCommandStyle</c>: a command row that isn't selected.</summary>
+    public static Color CommandRowFill { get; } = FromLegacy(0xCC0C0D11);
+
+    /// <summary>Legacy <c>CommandPanel</c>'s description box under the list.</summary>
+    public static Color CommandHintFill { get; } = FromLegacy(0xE60C0D11);
+
     // Premultiplied "over": the top color, then what shows through it of the bottom one.
     private static Color Over(Color top, Color bottom)
     {

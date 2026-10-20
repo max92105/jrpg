@@ -39,14 +39,45 @@ internal sealed class BattlersView
         }
     }
 
+    /// <summary>Where <paramref name="combatant"/>'s sprite starts at the top, for whatever points at them.</summary>
+    /// <exception cref="ArgumentException">The combatant isn't in this battle.</exception>
+    public int TopOf(TextureLibrary textures, Combatant combatant)
+    {
+        var index = IndexOf(combatant);
+        return DrawnArea(textures, _arts[index], _spots[index]).Top;
+    }
+
+    /// <summary>Where <paramref name="combatant"/> stands in the formation.</summary>
+    /// <exception cref="ArgumentException">The combatant isn't in this battle.</exception>
+    public Rectangle SpotOf(Combatant combatant) => _spots[IndexOf(combatant)];
+
+    private int IndexOf(Combatant combatant)
+    {
+        for (var index = 0; index < _combatants.Count; index++)
+        {
+            if (_combatants[index] == combatant)
+            {
+                return index;
+            }
+        }
+
+        throw new ArgumentException($"{combatant.Name} isn't in this battle.", nameof(combatant));
+    }
+
+    // Centered on the spot, feet on its bottom.
+    private static Rectangle DrawnArea(TextureLibrary textures, BattlerArt art, Rectangle spot)
+    {
+        var source = textures.Get(ArtFolders.Battlers, art.SpriteFile);
+        var size = BattlerScaling.Of(new Point(source.Width, source.Height)).DrawnSize;
+        return new Rectangle(spot.Center.X - (size.X / 2), spot.Bottom - size.Y, size.X, size.Y);
+    }
+
     private void DrawBattler(SpriteBatch batch, TextureLibrary textures, BattlerArt art, Rectangle spot)
     {
         var source = textures.Get(ArtFolders.Battlers, art.SpriteFile);
         var scaling = BattlerScaling.Of(new Point(source.Width, source.Height));
         var image = scaling.IsShrunkSmoothly ? _ui.Battler(textures, art.SpriteFile, scaling.DrawnSize.X) : source;
-        var size = scaling.DrawnSize;
-        var destination = new Rectangle(spot.Center.X - (size.X / 2), spot.Bottom - size.Y, size.X, size.Y);
         var effects = art.IsFlipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-        batch.Draw(image, destination, null, Color.White, 0, Vector2.Zero, effects, 0);
+        batch.Draw(image, DrawnArea(textures, art, spot), null, Color.White, 0, Vector2.Zero, effects, 0);
     }
 }

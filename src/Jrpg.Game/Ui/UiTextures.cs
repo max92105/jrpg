@@ -30,6 +30,7 @@ internal sealed class UiTextures
     private Texture2D? _sectionLine;
     private Texture2D? _battleVignette;
     private Texture2D? _topShade;
+    private Texture2D? _commandHeader;
     private readonly Dictionary<(string File, int Size), Texture2D> _diamondPortraits = [];
     private readonly Dictionary<(string Folder, string File, int Size), Texture2D> _shrunk = [];
     private readonly Dictionary<DiamondShape, Texture2D> _diamonds = [];
@@ -69,6 +70,13 @@ internal sealed class UiTextures
     /// <summary>One column, stretched over the top of the battle, <see cref="TopShadeHeight"/> pixels down.</summary>
     public Texture2D TopShade(TextureLibrary textures) =>
         _topShade ??= textures.Create(1, TopShadeHeight, GradientStrip.Colors(UiTheme.BattleTopShade, TopShadeHeight));
+
+    /// <summary>The battle command panel's header tab, in the selection gradient with its bright outline.</summary>
+    public Texture2D CommandHeader(TextureLibrary textures) =>
+        _commandHeader ??= textures.Create(
+            CommandHeaderShape.Width,
+            CommandHeaderShape.Height,
+            CommandHeaderShape.Pixels(GradientStrip.Colors(UiTheme.Selection, CommandHeaderShape.Width), UiTheme.SelectionStroke));
 
     /// <summary>A diamond or diamond ring, baked once per shape.</summary>
     public Texture2D Diamond(TextureLibrary textures, DiamondShape shape)

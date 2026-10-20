@@ -237,6 +237,21 @@ internal static class MessageIds
     /// <summary>The battle command that leaves the fight.</summary>
     public const string BattleRun = "battle_run";
 
+    /// <summary>The hint under the command panel while Attack is selected.</summary>
+    public const string BattleAttackHint = "battle_attack_hint";
+
+    /// <summary>The hint under the command panel while Skills is selected.</summary>
+    public const string BattleSkillsHint = "battle_skills_hint";
+
+    /// <summary>The hint under the command panel while Items is selected.</summary>
+    public const string BattleItemsHint = "battle_items_hint";
+
+    /// <summary>The hint under the command panel while Defend is selected.</summary>
+    public const string BattleDefendHint = "battle_defend_hint";
+
+    /// <summary>The hint under the command panel while Run is selected.</summary>
+    public const string BattleRunHint = "battle_run_hint";
+
     /// <summary>Placeholder <c>{max}</c>: a vital's maximum, written small after its value on the battle screen.</summary>
     public const string BattleVitalMax = "battle_vital_max";
 

@@ -28,7 +28,7 @@ internal sealed class BattleScene : IScene
     private readonly PartyStatusView _partyStatus;
     private readonly EnemyTagView _enemyTags;
     private readonly CommandMenu _commands = new();
-    private readonly CommandListView _commandList;
+    private readonly CommandPanelView _commandPanel;
     private bool _isFinished;
 
     /// <param name="session">The playthrough whose active battle this screen shows.</param>
@@ -49,7 +49,7 @@ internal sealed class BattleScene : IScene
         _sequence = new BattleTurnSequence(battle, session.EnemyTactics);
         _backgroundFile = session.Exploration.PendingEncounter?.BackgroundFile
             ?? throw new InvalidOperationException("A battle screen needs the encounter it fights.");
-        _commandList = new CommandListView(_commands, battle.Combatants, text);
+        _commandPanel = new CommandPanelView(_commands, _battlers, text, ui);
         _commands.Start(battle);
     }
 
@@ -72,6 +72,8 @@ internal sealed class BattleScene : IScene
             isOrderMoving = true;
         }
 
+        _turnOrderStrip.Highlight(_commands.Targets?.Selected ?? []);
+        _commandPanel.Advance(delta);
         _sequence.Update();
         if (isOrderMoving)
         {
@@ -93,7 +95,7 @@ internal sealed class BattleScene : IScene
         _partyStatus.Draw(batch, textures, isAwaitingCommand ? _sequence.Actor : null);
         if (isAwaitingCommand)
         {
-            _commandList.Draw(batch, textures, _sequence.Actor);
+            _commandPanel.Draw(batch, textures, _sequence.Actor);
         }
     }
 

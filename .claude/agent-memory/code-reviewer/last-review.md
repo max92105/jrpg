@@ -5,9 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-battle/slices/B4b.md, B4b (CommandListView, BattleScene feeds CommandMenu, Finish on any outcome)
-Round: 1 (verdict: Ready to commit; verify all pass, 1204 tests)
+Slice: docs/plans/2026-10-20-battle/slices/B4c.md, B4c (CommandPanelView, CommandPanelPlacement, PointerBob, OutlinedShape/CommandHeaderShape)
+Round: 1 (verdict: Ready to commit; verify all pass, 1211 tests)
 
-- open (Warning): BattleScene.Finish defeat branch (TitleRequested) has no test; add Update_DefeatOnEnemyTurn_RequestsTitle with a catalog goblin whose attack fells Sarxian, Defend, assert TitleRequested + ActiveBattle null.
-- open (Suggestion): Update_AttackUntilOver asserts experienceBefore + 40 (repository goblin's experienceReward); read it from the catalog so balance edits don't break it.
+- open (Suggestion): CommandPanelView._pointerTime never resets; PointerBob param doc says "since the pointer appeared". Reset when Targets goes from null to set, or reword the doc.
+- open (Suggestion): OutlinedShape.Pixels names the path `outline` while NavTabShape/CommandHeaderShape name the edge color `outline`; rename the path param to `corners`.
+- open (Suggestion): PointerBob tests only pin 0 and peak; add 0.225 s -> 4 px to pin the cosine ease.
 - follow-up: none.

@@ -88,6 +88,11 @@
   "battle_items": "Items",
   "battle_defend": "Defend",
   "battle_run": "Run",
+  "battle_attack_hint": "Strike one enemy with your weapon.",
+  "battle_skills_hint": "Use a skill. Skills cost MP.",
+  "battle_items_hint": "Use an item from the bag.",
+  "battle_defend_hint": "Brace yourself and end your turn.",
+  "battle_run_hint": "Escape from the battle.",
   "battle_vital_max": "/{max}",
   "battle_enemy_letter": "{name} {letter}",
   "battle_next": "NEXT"

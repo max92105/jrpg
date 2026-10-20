@@ -27,6 +27,44 @@ public sealed class InventoryPageTests
     }
 
     [Fact]
+    public void Open_AfterLastCopyTakenElsewhere_NoLongerListsIt()
+    {
+        var session = NewSession();
+        var page = NewPage(session);
+        var taken = session.Inventory.Entries[0];
+        session.Inventory.TryRemove(taken.ItemId, taken.Quantity);
+
+        page.Open();
+
+        Assert.DoesNotContain(taken.ItemId, page.ShownItemIds);
+    }
+
+    [Fact]
+    public void Open_ClearsTheLastUseNotice()
+    {
+        var session = NewSession();
+        session.Party.Leader.Vitals.TakeDamage(50);
+        var page = NewPage(session);
+        UseThirdItemOnLeader(page);
+
+        page.Open();
+
+        Assert.Null(page.Notice);
+    }
+
+    [Fact]
+    public void Open_AfterChangingCategory_ShowsAll()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.NextTab));
+
+        page.Open();
+
+        Assert.Equal(InventoryCategory.All, page.Category);
+        Assert.Equal(0, page.SelectedRow);
+    }
+
+    [Fact]
     public void Constructor_StartingItems_ShowsAllInPickupOrder()
     {
         var session = NewSession();
@@ -139,6 +177,15 @@ public sealed class InventoryPageTests
         Assert.True(jazog.Vitals.IsAlive);
         Assert.True(teelle.Vitals.IsAlive);
         Assert.Equal($"{StartMapScenarios.BelowClosedDoor.Items["revive_feather"].Name} was used.", page.Notice);
+    }
+
+    // The third starting item is the elixir; the target picker starts on the leader.
+    private static void UseThirdItemOnLeader(InventoryPage page)
+    {
+        page.Update(Pressing(GameButton.Down));
+        page.Update(Pressing(GameButton.Down));
+        page.Update(Pressing(GameButton.Confirm));
+        page.Update(Pressing(GameButton.Confirm));
     }
 
     private static GameSession NewSession() => GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));

@@ -98,6 +98,17 @@ internal sealed class PartyPage : IMenuPage
     /// <summary>Why the last Confirm changed nothing, or null.</summary>
     public string? Notice { get; private set; }
 
+    /// <summary>The member's card as last formatted.</summary>
+    internal PartyMemberCardView.Card CardOf(PartyMember member) => _cards[member];
+
+    public void Open()
+    {
+        Notice = null;
+        _column = ActiveColumn;
+        _row = 0;
+        ShowParty();
+    }
+
     public SceneRequest? Update(InputFrame input)
     {
         if (_actionChoice is not null)

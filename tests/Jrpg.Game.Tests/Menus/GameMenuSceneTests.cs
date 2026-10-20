@@ -80,12 +80,39 @@ public sealed class GameMenuSceneTests
         Assert.Null(leavingPage);
     }
 
+    [Fact]
+    public void Update_ConfirmOnTab_OpensThatPage()
+    {
+        var page = new CountingMenuPage();
+        var menu = NewMenu(page);
+
+        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+
+        Assert.Equal(1, page.OpenCount);
+    }
+
+    [Fact]
+    public void Update_ConfirmOnTabAgainAfterCancel_OpensThePageAgain()
+    {
+        var page = new CountingMenuPage();
+        var menu = NewMenu(page);
+        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+        menu.Update(_oneUpdate, Pressing(GameButton.Cancel));
+
+        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+
+        Assert.Equal(2, page.OpenCount);
+    }
+
     private static GameMenuScene NewMenu()
     {
-        var session = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
-        var header = new MenuHeader(RepositoryScreenText.Text, session);
+        var session = NewSession();
         var ui = new UiTextures();
-        var system = TestSystemPages.Create(session, ui);
-        return new(RepositoryScreenText.Text, ui, header, [system]);
+        return new(RepositoryScreenText.Text, ui, new MenuHeader(RepositoryScreenText.Text, session), [TestSystemPages.Create(session, ui)]);
     }
+
+    private static GameMenuScene NewMenu(IMenuPage page) =>
+        new(RepositoryScreenText.Text, new UiTextures(), new MenuHeader(RepositoryScreenText.Text, NewSession()), [page]);
+
+    private static GameSession NewSession() => GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
 }

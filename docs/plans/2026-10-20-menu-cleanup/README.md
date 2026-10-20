@@ -89,7 +89,7 @@ One line per slice. Each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 3: pages rebuilt when shown
 
-- [ ] **M1. Entering a page rebuilds it from Core and starts on the first entry** (Game, about 260 lines; decision 109) → [slices/M1.md](slices/M1.md)
+- [x] **M1. Entering a page rebuilds it from Core and starts on the first entry** (Game, about 260 lines; decision 109) → [slices/M1.md](slices/M1.md)
 
 ### Phase 4: shared parts
 

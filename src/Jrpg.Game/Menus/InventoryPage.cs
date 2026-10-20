@@ -113,6 +113,13 @@ internal sealed class InventoryPage : IMenuPage
     /// <summary>Whether the player is choosing who to use an item on.</summary>
     public bool IsChoosingTarget => _itemUse.IsOpen;
 
+    public void Open()
+    {
+        _notice = null;
+        _categoryCursor.Select(0);
+        ShowRowsFrom(0);
+    }
+
     public SceneRequest? Update(InputFrame input)
     {
         if (_itemUse.IsOpen)

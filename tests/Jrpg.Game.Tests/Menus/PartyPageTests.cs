@@ -196,6 +196,29 @@ public sealed class PartyPageTests
         Assert.Same(lastReserve, page.Selected);
     }
 
+    [Fact]
+    public void Open_AfterHpChanged_CardShowsTheNewHp()
+    {
+        var page = NewPage();
+        var leader = _session.Party.Leader;
+        leader.Vitals.TakeDamage(10);
+
+        page.Open();
+
+        Assert.Equal((float)leader.Vitals.Hp / leader.Vitals.MaxHp, page.CardOf(leader).Hp.Bar.Fraction);
+    }
+
+    [Fact]
+    public void Open_AfterMovingTheCursor_StartsOnTheLeader()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Right));
+
+        page.Open();
+
+        Assert.Same(_session.Party.Leader, page.Selected);
+    }
+
     // The selected reserve card joins, and the next one slides into its place.
     private static void AddSelectedReserveMembers(PartyPage page, int count)
     {

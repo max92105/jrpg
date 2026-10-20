@@ -67,6 +67,18 @@ public sealed class EquipmentPageTests
     }
 
     [Fact]
+    public void Open_AfterMemberJoinedElsewhere_ListsThemAmongTheActive()
+    {
+        var page = NewPage();
+        var joining = _session.Party.MemberById("teelle");
+        _session.Party.TryAddToActive(joining);
+
+        page.Open();
+
+        Assert.Same(joining, page.Members[1]);
+    }
+
+    [Fact]
     public void Update_ConfirmOnWeaponRow_OpensTheChoice()
     {
         var page = NewPage();

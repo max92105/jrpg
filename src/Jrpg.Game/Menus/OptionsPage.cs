@@ -53,6 +53,9 @@ internal sealed class OptionsPage : IMenuPage
 
     public bool LeavesOnCancel => true;
 
+    // The values are read from the settings when drawing, so only the cursor goes back.
+    public void Open() => _cursor.Select(0);
+
     public SceneRequest? Update(InputFrame input)
     {
         if (input.IsPressed(GameButton.Up))

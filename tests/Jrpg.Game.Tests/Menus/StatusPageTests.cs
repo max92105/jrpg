@@ -46,6 +46,42 @@ public sealed class StatusPageTests
     }
 
     [Fact]
+    public void Open_AfterHpChanged_ShowsTheNewHp()
+    {
+        var session = NewSession();
+        var page = NewPage(session);
+        var vitals = session.Party.Leader.Vitals;
+        vitals.TakeDamage(10);
+
+        page.Open();
+
+        Assert.Equal($"{vitals.Hp} / {vitals.MaxHp}", page.ShownStats[0]);
+    }
+
+    [Fact]
+    public void Open_AfterMemberJoinedElsewhere_ListsThemAmongTheActive()
+    {
+        var session = NewSession();
+        var page = NewPage(session);
+        session.Party.TryAddToActive(session.Party.MemberById("teelle"));
+
+        page.Open();
+
+        Assert.Equal(["sarxian", "teelle", "jazog", "zaruk", "zanyr", "thaali", "kamilia"], page.Members.Select(member => member.Id));
+    }
+
+    [Fact]
+    public void Open_AfterMovingToAnotherMember_ShowsTheFirst()
+    {
+        var page = NewPage(NewSession());
+        page.Update(Pressing(GameButton.Right));
+
+        page.Open();
+
+        Assert.Same(page.Members[0], page.Shown);
+    }
+
+    [Fact]
     public void ToNextLevelText_PartWayThroughLevelTwo_ShowsWhatRemains()
     {
         var table = new ExperienceTable([100, 250, 400]);

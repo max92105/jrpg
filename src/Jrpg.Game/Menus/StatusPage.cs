@@ -54,6 +54,7 @@ internal sealed class StatusPage : IMenuPage
 
     private readonly ContentCatalog _catalog;
     private readonly UiTextures _ui;
+    private readonly PartyState _party;
     private readonly ListCursor _cursor;
     private readonly SpriteFontBase _headingFont;
     private readonly SpriteFontBase _bodyFont;
@@ -72,25 +73,37 @@ internal sealed class StatusPage : IMenuPage
     {
         _catalog = catalog;
         _ui = ui;
-        Members = MemberOrder.ActiveThenReserve(session.Party);
-        _cursor = new ListCursor(Members.Count, _ => true);
+        _party = session.Party;
         _headingFont = text.Fonts.FontAt(HeadingPixels);
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _labelFont = text.Fonts.FontAt(LabelPixels);
         _labels = StatusLabels.From(text.Messages);
         _vitalBars = [new StatBar(ui, UiTheme.HpBar), new StatBar(ui, UiTheme.MpBar)];
         _xpBar = new StatBar(ui, UiTheme.XpBar);
-        ShowMember();
+        _cursor = new ListCursor(_party.Members.Count, _ => true);
+        Open();
     }
 
     /// <summary>Everyone recruited: the active party in its order, then the reserve.</summary>
-    public IReadOnlyList<PartyMember> Members { get; }
+    public IReadOnlyList<PartyMember> Members { get; private set; }
 
     public PartyMember Shown => Members[_cursor.Selected];
 
     public string TitleMessageId => MessageIds.MenuStatus;
 
     public bool LeavesOnCancel => true;
+
+    /// <summary>The shown member's HP, MP, Attack and Defense, as the page writes them.</summary>
+    internal IReadOnlyList<string> ShownStats => _sheet.Stats;
+
+    // Recruits don't change while the menu is open, so the cursor's member count still holds.
+    [MemberNotNull(nameof(Members), nameof(_sheet))]
+    public void Open()
+    {
+        Members = MemberOrder.ActiveThenReserve(_party);
+        _cursor.Select(0);
+        ShowMember();
+    }
 
     public SceneRequest? Update(InputFrame input)
     {

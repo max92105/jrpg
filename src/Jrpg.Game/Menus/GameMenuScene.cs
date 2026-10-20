@@ -131,6 +131,7 @@ internal sealed class GameMenuScene : IScene
 
         if (input.IsPressed(GameButton.Confirm))
         {
+            _pages[_tabs.Selected].Open();
             _isInPage = true;
         }
 

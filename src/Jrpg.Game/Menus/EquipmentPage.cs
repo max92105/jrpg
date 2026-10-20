@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using FontStashSharp;
 using Jrpg.Core.Content;
@@ -51,6 +52,7 @@ internal sealed class EquipmentPage : IMenuPage
     // The rows: one per slot, in this order, then "Remove all".
     private static readonly ImmutableArray<EquipmentSlot> _slots = [EquipmentSlot.Weapon, EquipmentSlot.Armor];
 
+    private readonly PartyState _party;
     private readonly PartyEquipment _equipment;
     private readonly Inventory _inventory;
     private readonly IReadOnlyDictionary<string, ItemDefinition> _items;
@@ -76,27 +78,38 @@ internal sealed class EquipmentPage : IMenuPage
     /// <param name="catalog">The items, to list what each slot can take.</param>
     public EquipmentPage(ScreenText text, UiTextures ui, GameSession session, ContentCatalog catalog)
     {
+        _party = session.Party;
         _equipment = session.Equipment;
         _inventory = session.Inventory;
         _items = catalog.Items;
         _messages = text.Messages;
         _choiceView = new EquipmentChoiceView(text, ui);
         _ui = ui;
-        Members = MemberOrder.ActiveThenReserve(session.Party);
-        _memberCursor = new ListCursor(Members.Count, _ => true);
+        _memberCursor = new ListCursor(_party.Members.Count, _ => true);
         _headingFont = text.Fonts.FontAt(HeadingPixels);
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _labelFont = text.Fonts.FontAt(LabelPixels);
         _labels = EquipmentLabels.From(text.Messages);
-        _sheet = SheetOf(Shown);
+        Open();
     }
 
     /// <summary>Everyone recruited: the active party in its order, then the reserve.</summary>
-    public IReadOnlyList<PartyMember> Members { get; }
+    public IReadOnlyList<PartyMember> Members { get; private set; }
 
     public PartyMember Shown => Members[_memberCursor.Selected];
 
     public string TitleMessageId => MessageIds.MenuEquipment;
+
+    // Recruits don't change while the menu is open, so the member cursor's count still holds.
+    [MemberNotNull(nameof(Members), nameof(_sheet))]
+    public void Open()
+    {
+        Members = MemberOrder.ActiveThenReserve(_party);
+        _memberCursor.Select(0);
+        _rowCursor.Select(0);
+        _sheet = SheetOf(Shown);
+        _notice = null;
+    }
 
     /// <summary>False while choosing what goes in a slot: Cancel closes that instead.</summary>
     public bool LeavesOnCancel => _choice is null;

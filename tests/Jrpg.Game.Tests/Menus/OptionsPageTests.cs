@@ -24,6 +24,18 @@ public sealed class OptionsPageTests
     }
 
     [Fact]
+    public void Open_AfterMovingDown_SelectsFullScreen()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Down));
+
+        page.Open();
+        page.Update(Pressing(GameButton.Right));
+
+        Assert.False(_settings.IsFullScreen);
+    }
+
+    [Fact]
     public void Update_LeftOnFullScreen_TogglesSettingBack()
     {
         var page = NewPage();

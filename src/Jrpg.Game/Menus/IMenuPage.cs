@@ -18,6 +18,12 @@ internal interface IMenuPage
     /// </summary>
     bool LeavesOnCancel { get; }
 
+    /// <summary>
+    /// Called each time the player enters the page from its tab: rebuilds what it shows from Core and starts on the first
+    /// entry.
+    /// </summary>
+    void Open();
+
     /// <returns>What the page asks the flow for, or null.</returns>
     SceneRequest? Update(InputFrame input);
 

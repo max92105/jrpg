@@ -28,8 +28,6 @@ internal sealed class PartyPage : IMenuPage
     private const int BodyPixels = 18;
     private const int CardsTop = SectionTitle.LineGap + 12;
     private const int NoticeGap = 16;
-    private const int ActiveColumn = 0;
-    private const int ReserveColumn = 1;
 
     // The action choice: a 240 px glass panel of 44 px rows over the right of the chosen card (legacy ListRow height).
     private const int ChoiceWidth = 240;
@@ -50,10 +48,9 @@ internal sealed class PartyPage : IMenuPage
     private readonly SectionTitle _activeTitle;
     private readonly SectionTitle _reserveTitle;
     private readonly string[] _actions;
-    private int _column = ActiveColumn;
+    private readonly PartyCursor _cursor;
     private Dictionary<PartyMember, MemberCardView.Card> _cards = [];
     private MeasuredText _count;
-    private int _row;
 
     // Where the moving member stood, so Cancel puts the cursor back on them.
     private int _movingFromRow;
@@ -80,6 +77,7 @@ internal sealed class PartyPage : IMenuPage
         _activeTitle = new SectionTitle(text, ui, MessageIds.PartyActive);
         _reserveTitle = new SectionTitle(text, ui, MessageIds.PartyReserve);
         _actions = [text.Messages.Text(MessageIds.PartyChangeOrder), text.Messages.Text(MessageIds.PartyToReserve)];
+        _cursor = new PartyCursor(_party);
         ShowParty();
     }
 
@@ -89,7 +87,7 @@ internal sealed class PartyPage : IMenuPage
     public bool LeavesOnCancel => _actionChoice is null && MovingMember is null;
 
     /// <summary>The member under the cursor.</summary>
-    public PartyMember Selected => MembersIn(_column)[_row];
+    public PartyMember Selected => _cursor.Selected;
 
     /// <summary>The member whose place is being swapped, while the player picks where; null otherwise.</summary>
     public PartyMember? MovingMember { get; private set; }
@@ -103,8 +101,7 @@ internal sealed class PartyPage : IMenuPage
     public void Open()
     {
         Notice = null;
-        _column = ActiveColumn;
-        _row = 0;
+        _cursor.Reset();
         ShowParty();
     }
 
@@ -135,11 +132,11 @@ internal sealed class PartyPage : IMenuPage
         _activeTitle.Draw(batch, textures, active, opacity);
         batch.DrawString(_labelFont, _count.Text, new Vector2(active.Right - _count.Width, top), UiTheme.TextSecondary * opacity);
         _reserveTitle.Draw(batch, textures, reserve, opacity);
-        DrawCards(batch, textures, ActiveColumn, active, opacity);
-        DrawCards(batch, textures, ReserveColumn, reserve, opacity);
+        DrawCards(batch, textures, new CardColumn(_party.ActiveMembers, active, _cursor.IsOnReserve ? null : _cursor.Row), opacity);
+        DrawCards(batch, textures, new CardColumn(_party.ReserveMembers, reserve, _cursor.IsOnReserve ? _cursor.Row : null), opacity);
         if (_actionChoice is not null)
         {
-            DrawActionChoice(batch, textures, _actionChoice, CardArea(active, _row));
+            DrawActionChoice(batch, textures, _actionChoice, CardArea(active, _cursor.Row));
         }
 
         if (Notice is not null)
@@ -151,8 +148,6 @@ internal sealed class PartyPage : IMenuPage
 
     private static Rectangle CardArea(Rectangle column, int index) =>
         new(column.X, column.Y + CardsTop + (index * MemberCardView.Height), column.Width, MemberCardView.Height);
-
-    private IReadOnlyList<PartyMember> MembersIn(int column) => column == ActiveColumn ? _party.ActiveMembers : _party.ReserveMembers;
 
     private void UpdateBrowsing(InputFrame input)
     {
@@ -180,29 +175,25 @@ internal sealed class PartyPage : IMenuPage
     private void MoveInColumn(int step)
     {
         Notice = null;
-        var count = MembersIn(_column).Count;
-        _row = (_row + step + count) % count;
+        _cursor.MoveInColumn(step);
     }
 
-    // To the other column at the same row, or its last card when it's shorter (developer, 2026-10-20).
+    // The notice stays when there's no other column to go to, as nothing moved.
     private void SwitchColumn()
     {
-        var other = _column == ActiveColumn ? ReserveColumn : ActiveColumn;
-        if (MembersIn(other).Count == 0)
+        var wasOnReserve = _cursor.IsOnReserve;
+        _cursor.SwitchColumn();
+        if (_cursor.IsOnReserve != wasOnReserve)
         {
-            return;
+            Notice = null;
         }
-
-        Notice = null;
-        _column = other;
-        _row = Math.Min(_row, MembersIn(other).Count - 1);
     }
 
     private void ConfirmSelected()
     {
         var member = Selected;
         Notice = null;
-        if (_column == ReserveColumn)
+        if (_cursor.IsOnReserve)
         {
             Join(member);
         }
@@ -227,7 +218,7 @@ internal sealed class PartyPage : IMenuPage
         }
 
         ShowParty();
-        KeepCursorOnACard();
+        _cursor.KeepOnACard();
     }
 
     private void UpdateActionChoice(ListCursor choice, InputFrame input)
@@ -257,7 +248,7 @@ internal sealed class PartyPage : IMenuPage
         if (choice.Selected == ChangeOrderEntry)
         {
             MovingMember = Selected;
-            _movingFromRow = _row;
+            _movingFromRow = _cursor.Row;
             return;
         }
 
@@ -268,27 +259,26 @@ internal sealed class PartyPage : IMenuPage
         }
 
         ShowParty();
-        KeepCursorOnACard();
+        _cursor.KeepOnACard();
     }
 
-    // The cursor moves over the active places Core lets change, so never onto the leader's.
     private void UpdateSwap(PartyMember moving, InputFrame input)
     {
         if (input.IsPressed(GameButton.Cancel))
         {
             MovingMember = null;
-            _row = _movingFromRow;
+            _cursor.ReturnTo(_movingFromRow);
             return;
         }
 
         if (input.IsPressed(GameButton.Up))
         {
-            MoveToNextPlaceToSwap(-1);
+            _cursor.MoveToNextPlaceToSwap(-1);
         }
 
         if (input.IsPressed(GameButton.Down))
         {
-            MoveToNextPlaceToSwap(1);
+            _cursor.MoveToNextPlaceToSwap(1);
         }
 
         if (input.IsPressed(GameButton.Confirm))
@@ -297,29 +287,6 @@ internal sealed class PartyPage : IMenuPage
             MovingMember = null;
             ShowParty();
         }
-    }
-
-    // The moving member can change place, so the loop always finds a place to land on.
-    private void MoveToNextPlaceToSwap(int step)
-    {
-        var count = _party.ActiveMembers.Count;
-        do
-        {
-            _row = (_row + step + count) % count;
-        }
-        while (!_party.CanChangePlace(_party.ActiveMembers[_row]));
-    }
-
-    // A member who moved leaves a gap: the next card slides into the cursor's place, or the cursor steps back to the
-    // last one. The reserve can empty out (four recruits or fewer); the active party never does.
-    private void KeepCursorOnACard()
-    {
-        if (MembersIn(_column).Count == 0)
-        {
-            _column = ActiveColumn;
-        }
-
-        _row = Math.Min(_row, MembersIn(_column).Count - 1);
     }
 
     // Formats every card and the count once per change, so drawing formats nothing.
@@ -333,13 +300,13 @@ internal sealed class PartyPage : IMenuPage
         _count = MeasuredText.Of(_labelFont, count);
     }
 
-    private void DrawCards(SpriteBatch batch, TextureLibrary textures, int column, Rectangle columnArea, float opacity)
+    private void DrawCards(SpriteBatch batch, TextureLibrary textures, CardColumn column, float opacity)
     {
-        var members = MembersIn(column);
+        var members = column.Members;
         for (var index = 0; index < members.Count; index++)
         {
-            var card = CardArea(columnArea, index);
-            var isSelected = column == _column && index == _row;
+            var card = CardArea(column.Area, index);
+            var isSelected = index == column.SelectedRow;
             _cardView.Draw(batch, textures, new MemberCardView.Place(_cards[members[index]], card, isSelected), opacity);
             if (members[index] == MovingMember)
             {
@@ -387,4 +354,7 @@ internal sealed class PartyPage : IMenuPage
 
         return isSelected ? UiTheme.TextPrimary : UiTheme.TextSecondary;
     }
+
+    // One column's members, where its cards go, and the cursor's row when the cursor is in it.
+    private readonly record struct CardColumn(IReadOnlyList<PartyMember> Members, Rectangle Area, int? SelectedRow);
 }

@@ -5,10 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-menu-cleanup/slices/E2.md, E2 (EquipmentSheetView extracted from EquipmentPage, draw-only move)
-Round: 1 (verdict: Ready to commit; verify all pass, 1125 tests; pixel math checked identical)
+Slice: docs/plans/2026-10-20-menu-cleanup/slices/P1.md, P1 (PartyCursor extracted from PartyPage, no behavior change)
+Round: 1 (verdict: Ready to commit; verify all pass, 1131 tests; navigation and notice clearing checked identical)
 
-- open (Suggestion): tick E2 in README.md:105; record in E2.md deviations: page keeps no Margin (view owns margins), 3 private record structs added for the 4-param rule, page is 215 lines not ~170
-- open (Suggestion): add EquipmentSheetView (and EquipmentChoiceView) to docs/map.md Menus row
-- open (Follow-up): private one-line Number(int) copied in ~6 Game files -> one shared invariant formatter (from E1)
-- open (Follow-up): StatusPage slot labels could use EquipmentSheet.Slots/LabelIdOf (README:73)
+- open (Suggestion): tick P1 in README.md:109; note in P1.md that PartyPage keeps MoveInColumn/SwitchColumn wrappers for the notice and the private CardColumn record
+- open (Suggestion): add PartyCursor to docs/map.md Menus row (next to PartyPage)
+- open (Suggestion): ReturnTo with a non-zero row (cancelled swap) only covered indirectly via PartyPageTests; optional direct test

@@ -106,7 +106,7 @@ One line per slice. Each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 6: split PartyPage
 
-- [ ] **P1. The party cursor as a pure type** (Game, about 220 lines) → [slices/P1.md](slices/P1.md)
+- [x] **P1. The party cursor as a pure type** (Game, about 220 lines) → [slices/P1.md](slices/P1.md)
 - [ ] **P2. The party page views** (Game, about 250 lines, mostly moved) → [slices/P2.md](slices/P2.md)
 - [ ] **Z. Hand check** (manual) → [slices/Z.md](slices/Z.md)
 

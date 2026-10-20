@@ -52,6 +52,8 @@ public sealed class FieldItemUseTests
     [Fact]
     public void Use_FallenAllyItemOnLivingMember_ThrowsAndKeepsTheCopy()
     {
+        // Someone is fallen, so the feather can be used; just not on a living member.
+        _reserve.Vitals.TakeDamage(1000);
         var feather = Owned(Item("revive_feather", EffectKind.Revive, 15, Targeting.SingleFallenAlly), copies: 1);
 
         Assert.Throws<ArgumentException>(() => _fieldItems.Use(feather, _sarxian, [_jazog]));
@@ -128,6 +130,75 @@ public sealed class FieldItemUseTests
         var potion = Owned(Item("potion", EffectKind.RestoreHp, 15, Targeting.SingleAlly), copies: 1);
 
         Assert.Throws<ArgumentException>(() => _fieldItems.Use(potion, stranger, [_jazog]));
+    }
+
+    [Fact]
+    public void TargetChoiceFor_HealItem_ListsLivingMembersIncludingReserve()
+    {
+        _jazog.Vitals.TakeDamage(1000);
+        var potion = Item("potion", EffectKind.RestoreHp, 15, Targeting.SingleAlly);
+
+        var choice = _fieldItems.TargetChoiceFor(potion, _sarxian);
+
+        Assert.Equal([_sarxian, _reserve], choice.Candidates);
+        Assert.False(choice.TakesAll);
+    }
+
+    [Fact]
+    public void TargetChoiceFor_ReviveItem_ListsOnlyFallen()
+    {
+        _reserve.Vitals.TakeDamage(1000);
+        var feather = Item("revive_feather", EffectKind.Revive, 15, Targeting.SingleFallenAlly);
+
+        var choice = _fieldItems.TargetChoiceFor(feather, _sarxian);
+
+        Assert.Equal([_reserve], choice.Candidates);
+    }
+
+    [Fact]
+    public void TargetChoiceFor_AllAlliesItem_TakesAll()
+    {
+        var tent = Item("tent", EffectKind.RestoreHp, 30, Targeting.AllAllies);
+
+        var choice = _fieldItems.TargetChoiceFor(tent, _sarxian);
+
+        Assert.True(choice.TakesAll);
+        Assert.Equal([_sarxian, _jazog, _reserve], choice.Candidates);
+    }
+
+    [Fact]
+    public void TargetChoiceFor_SelfItem_ListsOnlyUser()
+    {
+        var tonic = Item("tonic", EffectKind.RestoreHp, 10, Targeting.Self);
+
+        var choice = _fieldItems.TargetChoiceFor(tonic, _jazog);
+
+        Assert.Equal([_jazog], choice.Candidates);
+    }
+
+    [Fact]
+    public void CanUse_ReviveWithNobodyFallen_ReturnsFalse()
+    {
+        var feather = Owned(Item("revive_feather", EffectKind.Revive, 15, Targeting.SingleFallenAlly), copies: 1);
+
+        Assert.False(_fieldItems.CanUse(feather));
+    }
+
+    [Fact]
+    public void CanUse_ReviveWithSomeoneFallen_ReturnsTrue()
+    {
+        _jazog.Vitals.TakeDamage(1000);
+        var feather = Owned(Item("revive_feather", EffectKind.Revive, 15, Targeting.SingleFallenAlly), copies: 1);
+
+        Assert.True(_fieldItems.CanUse(feather));
+    }
+
+    [Fact]
+    public void TargetChoiceFor_ItemWithoutEffect_Throws()
+    {
+        var trinket = new ItemDefinitionBuilder().WithId("trinket").Build();
+
+        Assert.Throws<ArgumentException>(() => _fieldItems.TargetChoiceFor(trinket, _sarxian));
     }
 
     private static PartyMember Member(string id, int hp) =>

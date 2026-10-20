@@ -637,7 +637,12 @@ P1 was split in two (developer, 2026-10-19), since it came to about 500 lines. T
   - **Verify by hand:**
     - [ ] The right icons show on the rail and on every row.
 
-- [ ] **P2a. Field item targets in Core** (Core, about 150 lines)
+- [x] **P2a. Field item targets in Core** (Core, about 150 lines)
+  - **Done, with deviations:**
+    - `Use` takes its legal targets from `TargetChoiceFor`, so the picker and the check can't drift apart.
+    - `CanUse` judges every member as a possible user, so a "self" item stays usable while anyone stands.
+    - Tests drop the `FieldItemUse_` prefix, as the class names its tests. Extra: `CanUse_ReviveWithSomeoneFallen_ReturnsTrue` and `TargetChoiceFor_ItemWithoutEffect_Throws`.
+    - `Use_FallenAllyItemOnLivingMember_ThrowsAndKeepsTheCopy` knocks out the reserve member first: with nobody fallen the feather now fails `CanUse`. Its assertions are unchanged.
   - **Goal:** Core says who an item can be used on, so the menu never offers an illegal choice.
   - **Core:**
     - `Effects/TargetChoice<T>` (public record): the legal targets of one effect, and whether it takes them all.

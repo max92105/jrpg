@@ -70,6 +70,7 @@
   "party_level": "Lv {level}",
   "party_full": "The party is full.",
   "party_leader_stays": "{name} leads the party and always stays in it.",
+  "party_needs_someone_standing": "{name} is the only one standing and can't leave the party.",
   "party_change_order": "Change order",
   "party_to_reserve": "To reserve",
   "menu_options": "Options",

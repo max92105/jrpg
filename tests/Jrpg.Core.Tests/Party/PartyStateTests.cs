@@ -124,6 +124,94 @@ public sealed class PartyStateTests
     }
 
     [Fact]
+    public void TryMoveToReserve_LastStanding_ReturnsFalseAndKeepsThemActive()
+    {
+        var party = CreateParty(maxActiveMembers: 3, _leader, _jazog);
+        KnockOut(_leader);
+
+        var moved = party.TryMoveToReserve(_jazog);
+
+        Assert.False(moved);
+        Assert.Equal([_leader, _jazog], party.ActiveMembers);
+    }
+
+    [Fact]
+    public void CanMoveToReserve_Leader_ReturnsFalse()
+    {
+        var party = CreateParty(maxActiveMembers: 3, _leader, _jazog);
+
+        Assert.False(party.CanMoveToReserve(_leader));
+    }
+
+    [Fact]
+    public void CanMoveToReserve_ActiveMemberWithAnotherStanding_ReturnsTrue()
+    {
+        var party = CreateParty(maxActiveMembers: 3, _leader, _jazog);
+
+        Assert.True(party.CanMoveToReserve(_jazog));
+    }
+
+    [Fact]
+    public void CanMoveToReserve_ReserveMember_ReturnsFalse()
+    {
+        var party = CreateParty(maxActiveMembers: 3, _leader, _jazog);
+
+        Assert.False(party.CanMoveToReserve(_lyra));
+    }
+
+    [Fact]
+    public void CanMoveToReserve_LastStandingWithFallenLeader_ReturnsFalse()
+    {
+        var party = CreateParty(maxActiveMembers: 3, _leader, _jazog, _lyra);
+        KnockOut(_leader);
+        KnockOut(_lyra);
+
+        Assert.False(party.CanMoveToReserve(_jazog));
+    }
+
+    [Fact]
+    public void CanMoveToReserve_FallenMemberWithLeaderStanding_ReturnsTrue()
+    {
+        var party = CreateParty(maxActiveMembers: 3, _leader, _jazog);
+        KnockOut(_jazog);
+
+        Assert.True(party.CanMoveToReserve(_jazog));
+    }
+
+    [Fact]
+    public void CanChangePlace_Leader_ReturnsFalse()
+    {
+        var party = CreateParty(maxActiveMembers: 3, _leader, _jazog);
+
+        Assert.False(party.CanChangePlace(_leader));
+    }
+
+    [Fact]
+    public void CanChangePlace_ActiveMember_ReturnsTrue()
+    {
+        var party = CreateParty(maxActiveMembers: 3, _leader, _jazog);
+
+        Assert.True(party.CanChangePlace(_jazog));
+    }
+
+    [Fact]
+    public void CanChangePlace_ReserveMember_ReturnsFalse()
+    {
+        var party = CreateParty(maxActiveMembers: 3, _leader, _jazog);
+
+        Assert.False(party.CanChangePlace(_lyra));
+    }
+
+    [Fact]
+    public void CanChangePlace_NotRecruited_Throws()
+    {
+        var party = CreateParty(maxActiveMembers: 3, _leader);
+        var stranger = new PartyMemberBuilder().WithId("stranger").Build();
+
+        Assert.Throws<ArgumentException>(() => party.CanChangePlace(stranger));
+    }
+
+    [Fact]
     public void ReserveMembers_NewParty_AreTheInactiveRecruitsInRecruitOrder()
     {
         var party = new PartyState([_leader, _jazog, _lyra, _mira], [_leader, _lyra], new PartyRules(MaxActiveMembers: 3));
@@ -194,6 +282,8 @@ public sealed class PartyStateTests
 
         Assert.Throws<ArgumentException>(() => party.Reorder([_jazog, _leader]));
     }
+
+    private static void KnockOut(PartyMember member) => member.Vitals.TakeDamage(member.Vitals.MaxHp);
 
     private PartyState CreateParty(int maxActiveMembers, params PartyMember[] activeOrder) =>
         new([_leader, _jazog, _lyra], activeOrder, new PartyRules(maxActiveMembers));

@@ -68,6 +68,26 @@ public sealed class PartyPageTests
     }
 
     [Fact]
+    public void Update_ToReserveOnLastStanding_RefusesAndSaysWhy()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Right));
+        page.Update(Pressing(GameButton.Confirm));
+        page.Update(Pressing(GameButton.Left));
+        page.Update(Pressing(GameButton.Down));
+        var leader = _session.Party.Leader;
+        leader.Vitals.TakeDamage(leader.Vitals.MaxHp);
+        var lastStanding = page.Selected;
+        page.Update(Pressing(GameButton.Confirm));
+        page.Update(Pressing(GameButton.Down));
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.Equal([leader, lastStanding], _session.Party.ActiveMembers);
+        Assert.Equal($"{lastStanding.Definition.Name} is the only one standing and can't leave the party.", page.Notice);
+    }
+
+    [Fact]
     public void Update_CancelInActions_ChangesNothing()
     {
         var page = NewPage();

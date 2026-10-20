@@ -85,7 +85,7 @@ One line per slice. Each slice's goal, types, tests and hand checks are in its f
 ### Phase 2: party rules in Core
 
 - [x] **C1. `PartyState.ReserveMembers`** (Core + Game, about 90 lines; decision 108) → [slices/C1.md](slices/C1.md)
-- [ ] **C2. The leader rule and "never all fallen" in Core** (Core + content + Game, about 230 lines; decision 107) → [slices/C2.md](slices/C2.md)
+- [x] **C2. The leader rule and "never all fallen" in Core** (Core + content + Game, about 230 lines; decision 107) → [slices/C2.md](slices/C2.md)
 
 ### Phase 3: pages rebuilt when shown
 

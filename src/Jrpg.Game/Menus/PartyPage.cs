@@ -15,7 +15,8 @@ namespace Jrpg.Game.Menus;
 /// <summary>
 /// The menu's Party page (legacy <c>PartyView</c>): the active party with its count on the left, the reserve on the
 /// right, one card per member. Confirm brings a reserve member in; on an active member it offers "Change order" (pick
-/// the place to swap with) or "To reserve". Core keeps the leader first and refuses a full party, and the page says why.
+/// the place to swap with) or "To reserve". Core keeps the leader first, refuses a full party and never leaves the active
+/// party entirely fallen; the page asks it what a member may do and says why it refused.
 /// </summary>
 internal sealed class PartyPage : IMenuPage
 {
@@ -60,6 +61,9 @@ internal sealed class PartyPage : IMenuPage
 
     // While an active member's actions are offered; null otherwise.
     private ListCursor? _actionChoice;
+
+    // Whether Core lets the chosen member leave, worked out when the choice opens so drawing asks nothing.
+    private bool _canMoveSelectedToReserve;
 
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared textures: section lines, portraits, bars, the selected card.</param>
@@ -192,12 +196,14 @@ internal sealed class PartyPage : IMenuPage
         {
             Join(member);
         }
-        else if (member == _party.Leader)
+        else if (!_party.CanChangePlace(member) && !_party.CanMoveToReserve(member))
         {
             Notice = _messages.Format(MessageIds.PartyLeaderStays, new MessageArgument("name", member.Definition.Name));
         }
         else
         {
+            // Greyed actions stay selectable, so Confirm on one can say why (battle decision 105).
+            _canMoveSelectedToReserve = _party.CanMoveToReserve(member);
             _actionChoice = new ListCursor(_actions.Length, _ => true);
         }
     }
@@ -245,13 +251,17 @@ internal sealed class PartyPage : IMenuPage
             return;
         }
 
-        // Only active members other than the leader are offered this, so Core accepts it.
-        _party.TryMoveToReserve(Selected);
+        if (!_party.TryMoveToReserve(Selected))
+        {
+            Notice = _messages.Format(MessageIds.PartyNeedsSomeoneStanding, new MessageArgument("name", Selected.Definition.Name));
+            return;
+        }
+
         ShowParty();
         KeepCursorOnACard();
     }
 
-    // The cursor moves over the active places but the leader's, which can't be taken (Core rule).
+    // The cursor moves over the active places Core lets change, so never onto the leader's.
     private void UpdateSwap(PartyMember moving, InputFrame input)
     {
         if (input.IsPressed(GameButton.Cancel))
@@ -279,7 +289,7 @@ internal sealed class PartyPage : IMenuPage
         }
     }
 
-    // A non-leader is moving, so there's always a place other than the leader's to land on.
+    // The moving member can change place, so the loop always finds a place to land on.
     private void MoveToNextPlaceToSwap(int step)
     {
         var count = _party.ActiveMembers.Count;
@@ -287,7 +297,7 @@ internal sealed class PartyPage : IMenuPage
         {
             _row = (_row + step + count) % count;
         }
-        while (_row == 0);
+        while (!_party.CanChangePlace(_party.ActiveMembers[_row]));
     }
 
     // A member who moved leaves a gap: the next card slides into the cursor's place, or the cursor steps back to the
@@ -354,9 +364,18 @@ internal sealed class PartyPage : IMenuPage
             }
 
             var textTop = row.Y + ((ChoiceRowHeight - _bodyFont.LineHeight) / 2);
-            var color = isSelected ? UiTheme.TextPrimary : UiTheme.TextSecondary;
-            batch.DrawString(_bodyFont, _actions[index], new Vector2(row.X + ChoiceInset, textTop), color);
+            batch.DrawString(_bodyFont, _actions[index], new Vector2(row.X + ChoiceInset, textTop), ActionColor(index, isSelected));
         }
+    }
+
+    private Color ActionColor(int index, bool isSelected)
+    {
+        if (index != ChangeOrderEntry && !_canMoveSelectedToReserve)
+        {
+            return UiTheme.TextDisabled;
+        }
+
+        return isSelected ? UiTheme.TextPrimary : UiTheme.TextSecondary;
     }
 
     // Legacy SectionHeaderStyle: a small label over a hairline that fades out to the right.

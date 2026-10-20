@@ -60,11 +60,35 @@ public sealed class PartyState
         return true;
     }
 
-    /// <returns>False for the leader or a member who isn't active.</returns>
-    public bool TryMoveToReserve(PartyMember member)
+    /// <summary>
+    /// Whether the member may leave the active party: they are active, aren't the leader (decision 107), and another
+    /// active member is standing, so the active party is never left entirely fallen.
+    /// </summary>
+    /// <exception cref="ArgumentException">The member isn't recruited.</exception>
+    public bool CanMoveToReserve(PartyMember member)
     {
         ThrowIfNotRecruited(member);
-        if (member == Leader || !_activeMembers.Remove(member))
+        return member != Leader
+            && _activeMembers.Contains(member)
+            && _activeMembers.Exists(other => other != member && other.Vitals.IsAlive);
+    }
+
+    /// <summary>
+    /// Whether the member may swap places with another active member: they are active and aren't the leader, who
+    /// always stays first. Unlike <see cref="CanMoveToReserve"/>, nobody needs to be standing: reordering never changes
+    /// who is active.
+    /// </summary>
+    /// <exception cref="ArgumentException">The member isn't recruited.</exception>
+    public bool CanChangePlace(PartyMember member)
+    {
+        ThrowIfNotRecruited(member);
+        return member != Leader && _activeMembers.Contains(member);
+    }
+
+    /// <returns>False when <see cref="CanMoveToReserve"/> refuses the member.</returns>
+    public bool TryMoveToReserve(PartyMember member)
+    {
+        if (!CanMoveToReserve(member) || !_activeMembers.Remove(member))
         {
             return false;
         }
@@ -73,7 +97,9 @@ public sealed class PartyState
         return true;
     }
 
-    /// <exception cref="ArgumentException">The new order has different members, or the leader isn't first.</exception>
+    /// <exception cref="ArgumentException">
+    /// The new order has different members, or moves a member who can't change place (the leader isn't first).
+    /// </exception>
     public void Reorder(IReadOnlyList<PartyMember> newOrder)
     {
         if (newOrder.Count != _activeMembers.Count || !_activeMembers.ToHashSet().SetEquals(newOrder))
@@ -81,7 +107,7 @@ public sealed class PartyState
             throw new ArgumentException("The new order must contain exactly the active members.", nameof(newOrder));
         }
 
-        if (newOrder[0] != Leader)
+        if (Enumerable.Range(0, newOrder.Count).Any(index => newOrder[index] != _activeMembers[index] && !CanChangePlace(_activeMembers[index])))
         {
             throw new ArgumentException("The leader must stay first.", nameof(newOrder));
         }

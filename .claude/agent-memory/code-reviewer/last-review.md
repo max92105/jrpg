@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-menu-cleanup/slices/P1.md, P1 (PartyCursor extracted from PartyPage, no behavior change)
-Round: 1 (verdict: Ready to commit; verify all pass, 1131 tests; navigation and notice clearing checked identical)
+Slice: docs/plans/2026-10-20-menu-cleanup/slices/P2.md, P2 (PartyColumnsView, PartyColumns, PartyActionChoiceView out of PartyPage, no behavior change)
+Round: 1 (verdict: Ready to commit; verify all pass, 1132 tests; draw geometry, notice/choice no overlap, ShowParty after every mutation checked)
 
-- open (Suggestion): tick P1 in README.md:109; note in P1.md that PartyPage keeps MoveInColumn/SwitchColumn wrappers for the notice and the private CardColumn record
-- open (Suggestion): add PartyCursor to docs/map.md Menus row (next to PartyPage)
-- open (Suggestion): ReturnTo with a non-zero row (cancelled swap) only covered indirectly via PartyPageTests; optional direct test
+- open (Suggestion): tick P2 in README.md:110; record in P2.md the deviations (Active/Reserve snapshots in PartyColumns, static ActiveCardArea instead of CardArea(bool), ChangeOrderEntry/EntryCount on the view)
+- open (Suggestion): add PartyColumns/PartyColumnsView, PartyActionChoiceView to docs/map.md Menus row
+- open (Suggestion): PartyColumnsView.CardColumn carries the whole Place as `Page` only for Cards/Moving; pass those two (or drop CardColumn.Page)

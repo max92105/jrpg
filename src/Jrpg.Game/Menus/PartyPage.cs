@@ -1,5 +1,3 @@
-using System.Globalization;
-using FontStashSharp;
 using Jrpg.Core.Content;
 using Jrpg.Core.Party;
 using Jrpg.Core.Session;
@@ -20,37 +18,12 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class PartyPage : IMenuPage
 {
-    // Legacy PartyView: a 28 x 20 margin, two columns 40 px apart, each under a section title 12 px above its cards.
-    private const int Margin = 28;
-    private const int TopMargin = 20;
-    private const int ColumnGap = 40;
-    private const int LabelPixels = 14;
-    private const int BodyPixels = 18;
-    private const int CardsTop = SectionTitle.LineGap + 12;
-    private const int NoticeGap = 16;
-
-    // The action choice: a 240 px glass panel of 44 px rows over the right of the chosen card (legacy ListRow height).
-    private const int ChoiceWidth = 240;
-    private const int ChoiceRowHeight = 44;
-    private const int ChoiceInset = 16;
-    private const int ChangeOrderEntry = 0;
-
-    // The member being moved is outlined while the player picks the place to swap with.
-    private const int MovingOutline = 2;
-
     private readonly PartyState _party;
-    private readonly int _maxActive;
     private readonly UiMessages _messages;
-    private readonly UiTextures _ui;
-    private readonly MemberCardView _cardView;
-    private readonly SpriteFontBase _labelFont;
-    private readonly SpriteFontBase _bodyFont;
-    private readonly SectionTitle _activeTitle;
-    private readonly SectionTitle _reserveTitle;
-    private readonly string[] _actions;
+    private readonly PartyColumnsView _columnsView;
+    private readonly PartyActionChoiceView _choiceView;
     private readonly PartyCursor _cursor;
-    private Dictionary<PartyMember, MemberCardView.Card> _cards = [];
-    private MeasuredText _count;
+    private PartyColumns _columns;
 
     // Where the moving member stood, so Cancel puts the cursor back on them.
     private int _movingFromRow;
@@ -68,17 +41,11 @@ internal sealed class PartyPage : IMenuPage
     public PartyPage(ScreenText text, UiTextures ui, GameSession session, ContentCatalog catalog)
     {
         _party = session.Party;
-        _maxActive = catalog.Rules.Party.MaxActiveMembers;
         _messages = text.Messages;
-        _ui = ui;
-        _cardView = new MemberCardView(text, ui, catalog);
-        _labelFont = text.Fonts.FontAt(LabelPixels);
-        _bodyFont = text.Fonts.FontAt(BodyPixels);
-        _activeTitle = new SectionTitle(text, ui, MessageIds.PartyActive);
-        _reserveTitle = new SectionTitle(text, ui, MessageIds.PartyReserve);
-        _actions = [text.Messages.Text(MessageIds.PartyChangeOrder), text.Messages.Text(MessageIds.PartyToReserve)];
+        _columnsView = new PartyColumnsView(text, ui, catalog);
+        _choiceView = new PartyActionChoiceView(text, ui);
         _cursor = new PartyCursor(_party);
-        ShowParty();
+        _columns = _columnsView.ColumnsOf(_party, notice: null);
     }
 
     public string TitleMessageId => MessageIds.MenuParty;
@@ -93,10 +60,14 @@ internal sealed class PartyPage : IMenuPage
     public PartyMember? MovingMember { get; private set; }
 
     /// <summary>Why the last Confirm changed nothing, or null.</summary>
-    public string? Notice { get; private set; }
+    public string? Notice
+    {
+        get => _columns.Notice;
+        private set => _columns = _columns with { Notice = value };
+    }
 
     /// <summary>The member's card as last formatted.</summary>
-    internal MemberCardView.Card CardOf(PartyMember member) => _cards[member];
+    internal MemberCardView.Card CardOf(PartyMember member) => _columns.Cards[member];
 
     public void Open()
     {
@@ -123,31 +94,16 @@ internal sealed class PartyPage : IMenuPage
         return null;
     }
 
+    // The action choice is offered on an active card only, over its right.
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
-        var columnWidth = (area.Width - (2 * Margin) - ColumnGap) / 2;
-        var top = area.Y + TopMargin;
-        var active = new Rectangle(area.X + Margin, top, columnWidth, 0);
-        var reserve = new Rectangle(active.Right + ColumnGap, top, columnWidth, 0);
-        _activeTitle.Draw(batch, textures, active, opacity);
-        batch.DrawString(_labelFont, _count.Text, new Vector2(active.Right - _count.Width, top), UiTheme.TextSecondary * opacity);
-        _reserveTitle.Draw(batch, textures, reserve, opacity);
-        DrawCards(batch, textures, new CardColumn(_party.ActiveMembers, active, _cursor.IsOnReserve ? null : _cursor.Row), opacity);
-        DrawCards(batch, textures, new CardColumn(_party.ReserveMembers, reserve, _cursor.IsOnReserve ? _cursor.Row : null), opacity);
+        _columnsView.Draw(batch, textures, new PartyColumnsView.Place(_columns, area, _cursor, MovingMember), opacity);
         if (_actionChoice is not null)
         {
-            DrawActionChoice(batch, textures, _actionChoice, CardArea(active, _cursor.Row));
-        }
-
-        if (Notice is not null)
-        {
-            var noticeTop = top + CardsTop + (_maxActive * MemberCardView.Height) + NoticeGap;
-            batch.DrawString(_bodyFont, Notice, new Vector2(active.X, noticeTop), UiTheme.Danger * opacity);
+            var card = PartyColumnsView.ActiveCardArea(area, _cursor.Row);
+            _choiceView.Draw(batch, textures, new PartyActionChoiceView.Place(_actionChoice, card, _canMoveSelectedToReserve));
         }
     }
-
-    private static Rectangle CardArea(Rectangle column, int index) =>
-        new(column.X, column.Y + CardsTop + (index * MemberCardView.Height), column.Width, MemberCardView.Height);
 
     private void UpdateBrowsing(InputFrame input)
     {
@@ -205,7 +161,7 @@ internal sealed class PartyPage : IMenuPage
         {
             // Greyed actions stay selectable, so Confirm on one can say why (battle decision 105).
             _canMoveSelectedToReserve = _party.CanMoveToReserve(member);
-            _actionChoice = new ListCursor(_actions.Length, _ => true);
+            _actionChoice = new ListCursor(PartyActionChoiceView.EntryCount, _ => true);
         }
     }
 
@@ -245,7 +201,7 @@ internal sealed class PartyPage : IMenuPage
         }
 
         _actionChoice = null;
-        if (choice.Selected == ChangeOrderEntry)
+        if (choice.Selected == PartyActionChoiceView.ChangeOrderEntry)
         {
             MovingMember = Selected;
             _movingFromRow = _cursor.Row;
@@ -289,72 +245,6 @@ internal sealed class PartyPage : IMenuPage
         }
     }
 
-    // Formats every card and the count once per change, so drawing formats nothing.
-    private void ShowParty()
-    {
-        _cards = _party.Members.ToDictionary(member => member, member => _cardView.CardOf(member, _party.Leader));
-        var count = _messages.Format(
-            MessageIds.PartyCount,
-            new MessageArgument("count", _party.ActiveMembers.Count.ToString(CultureInfo.InvariantCulture)),
-            new MessageArgument("max", _maxActive.ToString(CultureInfo.InvariantCulture)));
-        _count = MeasuredText.Of(_labelFont, count);
-    }
-
-    private void DrawCards(SpriteBatch batch, TextureLibrary textures, CardColumn column, float opacity)
-    {
-        var members = column.Members;
-        for (var index = 0; index < members.Count; index++)
-        {
-            var card = CardArea(column.Area, index);
-            var isSelected = index == column.SelectedRow;
-            _cardView.Draw(batch, textures, new MemberCardView.Place(_cards[members[index]], card, isSelected), opacity);
-            if (members[index] == MovingMember)
-            {
-                DrawMovingOutline(batch, textures, card);
-            }
-        }
-    }
-
-    // The choice and the swap only open once the menu has faded in, so they draw at full opacity.
-    private static void DrawMovingOutline(SpriteBatch batch, TextureLibrary textures, Rectangle card)
-    {
-        for (var ring = 0; ring < MovingOutline; ring++)
-        {
-            card.Inflate(-1, -1);
-            Outline.Draw(batch, textures.Pixel, card, UiTheme.SelectionStroke);
-        }
-    }
-
-    // Legacy GlassPanelStyle: the Surface fill with a faint outline, one ListRow per action.
-    private void DrawActionChoice(SpriteBatch batch, TextureLibrary textures, ListCursor choice, Rectangle card)
-    {
-        var panel = new Rectangle(card.Right - ChoiceWidth - ChoiceInset, card.Y + ChoiceInset, ChoiceWidth, _actions.Length * ChoiceRowHeight);
-        batch.Draw(textures.Pixel, panel, UiTheme.Surface);
-        Outline.Draw(batch, textures.Pixel, panel, UiTheme.Stroke);
-        for (var index = 0; index < _actions.Length; index++)
-        {
-            var row = new Rectangle(panel.X, panel.Y + (index * ChoiceRowHeight), panel.Width, ChoiceRowHeight);
-            var isSelected = index == choice.Selected;
-            if (isSelected)
-            {
-                _ui.DrawSelectedRow(batch, textures, row, 1);
-            }
-
-            var textTop = row.Y + ((ChoiceRowHeight - _bodyFont.LineHeight) / 2);
-            batch.DrawString(_bodyFont, _actions[index], new Vector2(row.X + ChoiceInset, textTop), ActionColor(index, isSelected));
-        }
-    }
-
-    private Color ActionColor(int index, bool isSelected)
-    {
-        if (index != ChangeOrderEntry && !_canMoveSelectedToReserve)
-        {
-            return UiTheme.TextDisabled;
-        }
-
-        return isSelected ? UiTheme.TextPrimary : UiTheme.TextSecondary;
-    }
-
-    // One column's members, where its cards go, and the cursor's row when the cursor is in it.
-    private readonly record struct CardColumn(IReadOnlyList<PartyMember> Members, Rectangle Area, int? SelectedRow);
+    // Formats every card and the count once per change, keeping the notice, so drawing formats nothing.
+    private void ShowParty() => _columns = _columnsView.ColumnsOf(_party, Notice);
 }

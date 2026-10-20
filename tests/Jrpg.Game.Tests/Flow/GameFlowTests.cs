@@ -3,8 +3,10 @@ using Jrpg.Core.Exploration;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Session;
 using Jrpg.Data.Content;
+using Jrpg.Data.Saving;
 using Jrpg.Game.Flow;
 using Jrpg.Game.Input;
+using Jrpg.Game.Saving;
 using Jrpg.Game.Scenes;
 using Jrpg.Game.Tests.Input;
 using Jrpg.Game.Tests.Saving;
@@ -13,7 +15,7 @@ using Jrpg.Game.Tests.Ui;
 namespace Jrpg.Game.Tests.Flow;
 
 [Collection(RepositoryScreenText.CollectionName)]
-public sealed class GameFlowTests
+public sealed class GameFlowTests : IDisposable
 {
     private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
@@ -24,6 +26,16 @@ public sealed class GameFlowTests
 
     private static readonly InputFrame _holdingRight =
         new(MoveIntent.FromAxes(1, 0), ButtonSet.Empty.With(GameButton.Right), ButtonSet.Empty);
+
+    private readonly string _directory = Path.Combine(Path.GetTempPath(), $"jrpg-flow-saves-{Guid.NewGuid():N}");
+
+    public void Dispose()
+    {
+        if (Directory.Exists(_directory))
+        {
+            Directory.Delete(_directory, recursive: true);
+        }
+    }
 
     [Fact]
     public void Constructor_WaitingOnTitle_HasNoSession()
@@ -122,6 +134,7 @@ public sealed class GameFlowTests
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Left));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
@@ -140,6 +153,7 @@ public sealed class GameFlowTests
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Left));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
@@ -151,18 +165,45 @@ public sealed class GameFlowTests
         Assert.NotSame(first, SessionOf(flow));
     }
 
-    // New game is the title's first entry, so Confirm alone picks it; the fade starts on that update.
-    private static GameFlow FlowWithNewGameConfirmed()
+    [Fact]
+    public void Update_LoadRequested_RestoresSavedLocationAndPlayTime()
     {
-        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create());
+        var slots = new SaveSlots(new FileSaveStore(_directory, _catalog), _catalog, () => DateTimeOffset.UnixEpoch);
+        var flow = StartedFlow(slots);
+        flow.Update(TimeSpan.FromSeconds(0.3), _holdingRight);
+        var saved = SessionOf(flow);
+        slots.Write(1, saved);
+        var (savedPosition, savedPlayTime) = (saved.Exploration.PlayerPosition, saved.PlayTime);
+        flow.Update(TimeSpan.FromSeconds(0.3), _holdingRight);
+        Assert.NotEqual(savedPosition, SessionOf(flow).Exploration.PlayerPosition);
+
+        flow.Update(_oneUpdate, InputFrames.PressingEscape);
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(_fadeOut, default);
+
+        var loaded = SessionOf(flow);
+        Assert.NotSame(saved, loaded);
+        Assert.Equal("start", loaded.Exploration.Location.MapId);
+        Assert.Equal(savedPosition, loaded.Exploration.PlayerPosition);
+        Assert.Equal(savedPlayTime, loaded.PlayTime);
+    }
+
+    // New game is the title's first entry, so Confirm alone picks it; the fade starts on that update.
+    private static GameFlow FlowWithNewGameConfirmed(SaveSlots? slots = null)
+    {
+        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, slots ?? UnwrittenSaveSlots.Create());
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         return flow;
     }
 
     // A new game whose fade is over, so the map gets input.
-    private static GameFlow StartedFlow()
+    private static GameFlow StartedFlow(SaveSlots? slots = null)
     {
-        var flow = FlowWithNewGameConfirmed();
+        var flow = FlowWithNewGameConfirmed(slots);
         flow.Update(_fadeOut, default);
         flow.Update(_wholeFade - _fadeOut, default);
         return flow;

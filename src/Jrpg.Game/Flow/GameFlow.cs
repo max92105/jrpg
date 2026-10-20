@@ -106,6 +106,9 @@ internal sealed class GameFlow : IScene
             case NewGameRequested:
                 Session = _sessions.StartNewGame();
                 break;
+            case LoadRequested load:
+                Session = _sessions.Restore(load.Save);
+                break;
             case TitleRequested:
                 _sessions.ShowTitle();
                 Session = null;

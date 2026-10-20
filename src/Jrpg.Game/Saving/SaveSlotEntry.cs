@@ -21,6 +21,9 @@ internal sealed record SaveSlotEntry
 
     public bool IsEmpty => Summary is null && !IsDamaged;
 
+    /// <summary>Whether the file holds a save that can be loaded.</summary>
+    public bool IsReadable => Summary is not null;
+
     public static SaveSlotEntry Empty(int number) => new(number, null, isDamaged: false);
 
     public static SaveSlotEntry Damaged(int number) => new(number, null, isDamaged: true);

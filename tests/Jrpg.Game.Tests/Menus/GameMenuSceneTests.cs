@@ -4,7 +4,6 @@ using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Scenes;
 using Jrpg.Game.Tests.Exploration;
-using Jrpg.Game.Tests.Saving;
 using Jrpg.Game.Tests.Ui;
 using Jrpg.Game.Ui;
 using static Jrpg.Game.Tests.Input.InputFrames;
@@ -43,6 +42,7 @@ public sealed class GameMenuSceneTests
 
         var entering = menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
         menu.Update(_oneUpdate, Pressing(GameButton.Down));
+        menu.Update(_oneUpdate, Pressing(GameButton.Down));
         menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
         menu.Update(_oneUpdate, Pressing(GameButton.Left));
         var inPage = menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
@@ -70,6 +70,7 @@ public sealed class GameMenuSceneTests
         var menu = NewMenu();
         menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
         menu.Update(_oneUpdate, Pressing(GameButton.Down));
+        menu.Update(_oneUpdate, Pressing(GameButton.Down));
         menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
 
         var answering = menu.Update(_oneUpdate, PressingEscape);
@@ -84,7 +85,7 @@ public sealed class GameMenuSceneTests
         var session = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
         var header = new MenuHeader(RepositoryScreenText.Text, session);
         var ui = new UiTextures();
-        var system = new SystemPage(RepositoryScreenText.Text, ui, new SavePage(UnwrittenSaveSlots.Create(), session, RepositoryScreenText.Text, ui));
+        var system = TestSystemPages.Create(session, ui);
         return new(RepositoryScreenText.Text, ui, header, [system]);
     }
 }

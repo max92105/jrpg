@@ -24,7 +24,7 @@ internal sealed class SceneFactory
 
     /// <param name="catalog">The content as played, without random battles.</param>
     /// <param name="text">Messages and fonts for everything a scene writes.</param>
-    /// <param name="saveSlots">The save files the menu writes.</param>
+    /// <param name="saveSlots">The save files the menu writes and loads.</param>
     public SceneFactory(ContentCatalog catalog, ScreenText text, SaveSlots saveSlots)
     {
         _catalog = catalog;
@@ -41,5 +41,6 @@ internal sealed class SceneFactory
 
     public ExplorationScene CreateExploration(ExplorationState exploration) => new(exploration, _catalog, _art, _text);
 
-    private SystemPage CreateSystemPage(GameSession session) => new(_text, _ui, new SavePage(_saveSlots, session, _text, _ui));
+    private SystemPage CreateSystemPage(GameSession session) =>
+        new(_text, _ui, new SavePage(_saveSlots, session, _text, _ui), new LoadPage(_saveSlots, _text, _ui));
 }

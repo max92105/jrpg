@@ -9,6 +9,7 @@
   "menu_title": "Menu",
   "menu_status": "Status",
   "system_save": "Save",
+  "system_load": "Load",
   "menu_system": "System",
   "system_title_screen": "Title Screen",
   "system_quit": "Quit Game",

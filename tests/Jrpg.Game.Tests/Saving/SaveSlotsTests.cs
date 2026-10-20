@@ -83,4 +83,28 @@ public sealed class SaveSlotsTests : IDisposable
         Assert.True(entries[3].IsDamaged);
         Assert.True(entries[4].IsEmpty);
     }
+
+    [Fact]
+    public void Load_SavedSlot_GivesTheSave()
+    {
+        var session = GameSession.StartNew(_catalog, new SeededRandom(1));
+        session.AddPlayTime(TimeSpan.FromMinutes(3));
+        _slots.Write(7, session);
+
+        var save = _slots.Load(7);
+
+        Assert.NotNull(save);
+        Assert.Equal(TimeSpan.FromMinutes(3), save.PlayTime);
+        Assert.Equal(_now, save.SavedAt);
+    }
+
+    [Fact]
+    public void Load_EmptyOrDamagedSlot_GivesNull()
+    {
+        Directory.CreateDirectory(_directory);
+        File.WriteAllText(Path.Combine(_directory, "slot_02.json"), "{ not json");
+
+        Assert.Null(_slots.Load(1));
+        Assert.Null(_slots.Load(2));
+    }
 }

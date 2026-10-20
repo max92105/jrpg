@@ -84,6 +84,9 @@ internal static class MessageIds
     /// <summary>The System page's entry that opens the save files.</summary>
     public const string SystemSave = "system_save";
 
+    /// <summary>The System page's entry that opens the save files to load one.</summary>
+    public const string SystemLoad = "system_load";
+
     public const string SaveColumnFile = "save_column_file";
 
     public const string SaveColumnLocation = "save_column_location";

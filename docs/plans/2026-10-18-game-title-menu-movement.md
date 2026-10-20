@@ -124,9 +124,9 @@ Jrpg.Game/
   Exploration/ WalkAnimation (M1); EventPresenter (M2)
   Title/       TitleMenu, TitleScene (T1b)
   Menus/       GameMenuScene, IMenuPage, SystemPage (G1); MenuHeader (G3); StatusPage (G4); SavePage (S1);
-               LoadPage (S2a); InventoryPage, InventoryFilter (P1); ItemTargetPicker (P2b); EquipmentPage (P3a);
+               LoadPage, ISaveFilesPage (S2a); InventoryPage, InventoryFilter (P1); ItemTargetPicker (P2b); EquipmentPage (P3a);
                EquipmentChoice, StatPreview (P3b); PartyPage, PartyOrderEdit (P4); OptionsPage (P5)
-  Saving/      SaveSlots, SaveSlotEntry, SaveSlotList, SaveSlotListView (S1)
+  Saving/      SaveSlots, SaveSlotEntry, SaveSlotList, SaveSlotListView (S1); SaveFilesPanel (S2a)
   Flow/        SceneFactory (T1a); MenuTransitions (G1); EncounterFreeContent (M2)
 ```
 **Folder dependencies, checked edge by edge (acyclic):**
@@ -555,7 +555,11 @@ S1 was split in two (developer, 2026-10-19), since it came to about 600 lines. S
     - [ ] Save to File 1 and File 20: the files appear in `%LocalAppData%/Jrpg/Saves`, and the entries show "start", the play time and the date.
     - [ ] A file broken by hand shows as damaged.
 
-- [ ] **S2a. Loading from the menu** (Game, about 200 lines)
+- [x] **S2a. Loading from the menu** (Game, about 200 lines)
+  - **Done, with deviations:**
+    - **`LoadRequested(SaveGame Save)`, not a slot number.** `LoadPage` reads the file at Confirm through the new `SaveSlots.Load`, which logs the repair changes. A file that turned unreadable since the list opened is then caught while the list is open (the edge case below) rather than at black mid-fade. `SessionTransitions.Restore(save)` only restores, with a fresh logged seed, and replaces the scenes.
+    - Save and Load share a new `Saving/SaveFilesPanel` (heading, list, view). `Menus/ISaveFilesPage` has two implementations, so `SystemPage` opens either through one `OpensFiles` entry. Entries are in legacy order: Save, Load, Title Screen, Quit.
+    - Tests: `SaveSlots` `Load_SavedSlot_GivesTheSave` and `Load_EmptyOrDamagedSlot_GivesNull`; `LoadPage` `Update_ConfirmEmptySlot_RequestsNothing`, `Update_ConfirmSavedSlot_RequestsLoadingIt` and `Update_FileDamagedSinceTheListOpened_RequestsNothingAndShowsItDamaged`; `GameFlow` `Update_LoadRequested_RestoresSavedLocationAndPlayTime`. The existing flow and menu tests press Down once more to reach Title Screen.
   - **Goal:** System gains Load, the same list where only readable files can be chosen. Loading fades to the saved map, position and facing, with party, inventory, opened chests and play time.
   - **New types (Game):**
     - `Scenes/LoadRequested(int SlotNumber)`.

@@ -4,7 +4,6 @@ using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Scenes;
 using Jrpg.Game.Tests.Exploration;
-using Jrpg.Game.Tests.Saving;
 using Jrpg.Game.Tests.Ui;
 using Jrpg.Game.Ui;
 using static Jrpg.Game.Tests.Input.InputFrames;
@@ -57,6 +56,7 @@ public sealed class SystemPageTests
     {
         var page = NewPage();
         page.Update(Pressing(GameButton.Down));
+        page.Update(Pressing(GameButton.Down));
         page.Update(Pressing(GameButton.Confirm));
         page.Update(Pressing(GameButton.Left));
 
@@ -70,6 +70,7 @@ public sealed class SystemPageTests
     {
         var page = NewPage();
         page.Update(Pressing(GameButton.Down));
+        page.Update(Pressing(GameButton.Down));
         page.Update(Pressing(GameButton.Confirm));
 
         var request = page.Update(Pressing(GameButton.Confirm));
@@ -82,6 +83,6 @@ public sealed class SystemPageTests
     {
         var ui = new UiTextures();
         var session = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
-        return new(RepositoryScreenText.Text, ui, new SavePage(UnwrittenSaveSlots.Create(), session, RepositoryScreenText.Text, ui));
+        return TestSystemPages.Create(session, ui);
     }
 }

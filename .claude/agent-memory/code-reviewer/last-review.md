@@ -5,12 +5,12 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, S1-2 (Saving from the menu: ListCursor window, SaveSlotList/View, SavePage, SystemPage Save entry, GamePaths, Program wiring)
-Round: 1 (verdict: Ready to commit; build 0 warnings, 976 tests pass on rerun after a known flaky Game host crash, format exit 0)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, S2a (Loading from the menu: SaveSlots.Load, LoadRequested(SaveGame), SessionTransitions.Restore, SaveFilesPanel shared by SavePage/LoadPage, ISaveFilesPage, SystemPage Load entry)
+Round: 1 (verdict: Ready to commit; build 0 warnings, 982 tests pass on rerun after the known flaky Game host crash, format exit 0)
 
-- open (Warning): SavePage implements IMenuPage but is only ever used as a concrete SavePage inside SystemPage; TitleMessageId has no reader and LeavesOnCancel is constant true, so SystemPage's `&& _savePage.LeavesOnCancel` is dead until S3
-- open (Suggestion): SavePage.Update throws when not opened while Draw silently returns; pick one contract (or note why)
-- open (Suggestion): ListCursor.VisibleRows public getter has no reader (SaveSlotListView uses SaveSlotList.VisibleRows)
-- open (Suggestion): party separator "   " and the date format are hardcoded in SaveSlotListView; could live in the save_member/save_details messages
-- accepted (plan/hand-off): write IOException not handled until S3; 8 rows instead of 5; names+levels instead of portraits
-- follow-up: FontLibrary non-font test crashes the Game test host intermittently (again this review)
+- open (Warning): plan S2a not yet updated: LoadRequested(SaveGame) deviation, SaveFilesPanel/ISaveFilesPage missing from the code map (lines 122-129); tick + note before commit
+- open (Suggestion): GameFlow round-trip test: assert the second walk moved the player (position != saved) so the position check can fail
+- open (Suggestion): LoadPage `is not { Summary: not null } chosen` reads awkwardly; a named "readable" check on SaveSlotEntry would say it
+- fixed (from S1): SavePage implemented IMenuPage with dead TitleMessageId/LeavesOnCancel; now ISaveFilesPage with two users
+- accepted (hand-off): LoadRequested carries the SaveGame instead of the slot number (catches a turned-unreadable file while the list is open)
+- follow-up: FontLibrary test crash of the Game test host (exit -1073741819) again this review

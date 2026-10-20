@@ -1,6 +1,4 @@
-using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using FontStashSharp;
 using Jrpg.Core.Content;
 using Jrpg.Core.Items;
@@ -47,9 +45,6 @@ internal sealed class EquipmentPage : IMenuPage
     private const int AttackLine = 2;
     private const int DefenseLine = 3;
 
-    // The rows: one per slot, in this order, then "Remove all".
-    private static readonly ImmutableArray<EquipmentSlot> _slots = [EquipmentSlot.Weapon, EquipmentSlot.Armor];
-
     private readonly PartyState _party;
     private readonly PartyEquipment _equipment;
     private readonly Inventory _inventory;
@@ -58,15 +53,15 @@ internal sealed class EquipmentPage : IMenuPage
     private readonly EquipmentChoiceView _choiceView;
     private readonly UiTextures _ui;
     private readonly ListCursor _memberCursor;
-    private readonly ListCursor _rowCursor = new(_slots.Length + 1, _ => true);
+    private readonly ListCursor _rowCursor = new(EquipmentSheet.Slots.Length + 1, _ => true);
     private readonly SpriteFontBase _headingFont;
     private readonly SpriteFontBase _bodyFont;
     private readonly SectionTitle _equipmentTitle;
     private readonly SectionTitle _parametersTitle;
     private readonly EquipmentLabels _labels;
-    private MemberSheet _sheet;
+    private EquipmentSheet _sheet;
     private EquipmentChoice? _choice;
-    private PreviewText? _preview;
+    private StatPreviewText? _preview;
     // The choice row the preview was built for; -1 when none was.
     private int _previewedRow = -1;
     private string? _notice;
@@ -107,7 +102,7 @@ internal sealed class EquipmentPage : IMenuPage
         Members = MemberOrder.ActiveThenReserve(_party);
         _memberCursor.Select(0);
         _rowCursor.Select(0);
-        _sheet = SheetOf(Shown);
+        _sheet = EquipmentSheet.Of(Shown);
         _notice = null;
     }
 
@@ -141,7 +136,7 @@ internal sealed class EquipmentPage : IMenuPage
 
         if (_memberCursor.Selected != shownBefore)
         {
-            _sheet = SheetOf(Shown);
+            _sheet = EquipmentSheet.Of(Shown);
             _notice = null;
             return null;
         }
@@ -161,12 +156,12 @@ internal sealed class EquipmentPage : IMenuPage
         var equipment = new Rectangle(left, top + EquipmentTop, width, 0);
         _equipmentTitle.Draw(batch, textures, equipment, opacity);
         var rowsTop = equipment.Y + SectionHeight;
-        for (var index = 0; index < _slots.Length; index++)
+        for (var index = 0; index < EquipmentSheet.Slots.Length; index++)
         {
             DrawSlotRow(batch, textures, new Rectangle(left, rowsTop + (index * RowHeight), width, RowHeight), index, opacity);
         }
 
-        var removeAllTop = rowsTop + (_slots.Length * RowHeight) + ActionGap;
+        var removeAllTop = rowsTop + (EquipmentSheet.Slots.Length * RowHeight) + ActionGap;
         batch.Draw(textures.Pixel, new Rectangle(left, removeAllTop - 1, width, 1), UiTheme.Stroke * opacity);
         DrawRemoveAllRow(batch, textures, new Rectangle(left, removeAllTop, width, RowHeight), opacity);
 
@@ -190,12 +185,12 @@ internal sealed class EquipmentPage : IMenuPage
     /// </summary>
     private void RemoveAll()
     {
-        foreach (var slot in _slots)
+        foreach (var slot in EquipmentSheet.Slots)
         {
             _equipment.TryUnequip(Shown, slot);
         }
 
-        _sheet = SheetOf(Shown);
+        _sheet = EquipmentSheet.Of(Shown);
     }
 
     private void MoveOrChoose(InputFrame input)
@@ -216,13 +211,13 @@ internal sealed class EquipmentPage : IMenuPage
         }
 
         _notice = null;
-        if (_rowCursor.Selected == _slots.Length)
+        if (_rowCursor.Selected == EquipmentSheet.Slots.Length)
         {
             RemoveAll();
             return;
         }
 
-        _choice = new EquipmentChoice(_equipment.WearableFor(Shown, _slots[_rowCursor.Selected], _items));
+        _choice = new EquipmentChoice(_equipment.WearableFor(Shown, EquipmentSheet.Slots[_rowCursor.Selected], _items));
         _choiceView.Show(_choice, _labels.Slots[_rowCursor.Selected], _inventory);
         ShowPreview(_choice);
     }
@@ -237,7 +232,7 @@ internal sealed class EquipmentPage : IMenuPage
 
         if (choice.Update(input) is { } pick)
         {
-            Apply(pick, _slots[_rowCursor.Selected]);
+            Apply(pick, EquipmentSheet.Slots[_rowCursor.Selected]);
             CloseChoice();
             return;
         }
@@ -254,8 +249,8 @@ internal sealed class EquipmentPage : IMenuPage
         }
 
         _previewedRow = choice.SelectedRow;
-        var slot = _slots[_rowCursor.Selected];
-        _preview = PreviewOf(choice.Highlighted is { } item ? StatPreview.Of(Shown, item) : StatPreview.OfRemoving(Shown, slot));
+        var slot = EquipmentSheet.Slots[_rowCursor.Selected];
+        _preview = StatPreviewText.Of(choice.Highlighted is { } item ? StatPreview.Of(Shown, item) : StatPreview.OfRemoving(Shown, slot));
     }
 
     private void CloseChoice()
@@ -269,50 +264,13 @@ internal sealed class EquipmentPage : IMenuPage
     private void Apply(EquipmentPick pick, EquipmentSlot slot)
     {
         var changed = pick.Item is null ? _equipment.TryUnequip(Shown, slot) : _equipment.TryEquip(Shown, pick.Item);
-        if (!changed && WornIn(Shown, slot) is { } worn && !_inventory.HasRoomFor(worn))
+        if (!changed && Shown.EquippedIn(slot) is { } worn && !_inventory.HasRoomFor(worn))
         {
             _notice = _messages.Format(MessageIds.EquipmentNoRoom, new MessageArgument("item", worn.Name));
         }
 
-        _sheet = SheetOf(Shown);
+        _sheet = EquipmentSheet.Of(Shown);
     }
-
-    private static PreviewText PreviewOf(StatPreview preview) => new(
-        new PreviewValue(Number(preview.WithItem.Attack), ColorOf(preview.AttackChange)),
-        new PreviewValue(Number(preview.WithItem.Defense), ColorOf(preview.DefenseChange)));
-
-    private static Color ColorOf(int change) => change switch
-    {
-        > 0 => UiTheme.Positive,
-        < 0 => UiTheme.Negative,
-        _ => UiTheme.TextPrimary,
-    };
-
-    // Built when the member or what they wear changes, so drawing formats nothing.
-    private static MemberSheet SheetOf(PartyMember member)
-    {
-        var stats = member.TotalStats;
-        return new MemberSheet(
-            member.Definition.Name,
-            [.. _slots.Select(slot => WornIn(member, slot))],
-            [Number(member.Vitals.MaxHp), Number(member.Vitals.MaxMp), Number(stats.Attack), Number(stats.Defense)]);
-    }
-
-    private static ItemDefinition? WornIn(PartyMember member, EquipmentSlot slot) => slot switch
-    {
-        EquipmentSlot.Weapon => member.Weapon,
-        EquipmentSlot.Armor => member.Armor,
-        _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, null),
-    };
-
-    private static string LabelIdOf(EquipmentSlot slot) => slot switch
-    {
-        EquipmentSlot.Weapon => MessageIds.SlotWeapon,
-        EquipmentSlot.Armor => MessageIds.SlotArmor,
-        _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, null),
-    };
-
-    private static string Number(int value) => value.ToString(CultureInfo.InvariantCulture);
 
     private void DrawSlotRow(SpriteBatch batch, TextureLibrary textures, Rectangle row, int index, float opacity)
     {
@@ -337,7 +295,7 @@ internal sealed class EquipmentPage : IMenuPage
 
     private void DrawRemoveAllRow(SpriteBatch batch, TextureLibrary textures, Rectangle row, float opacity)
     {
-        if (_rowCursor.Selected == _slots.Length)
+        if (_rowCursor.Selected == EquipmentSheet.Slots.Length)
         {
             _ui.DrawSelectedRow(batch, textures, row, opacity);
         }
@@ -367,27 +325,18 @@ internal sealed class EquipmentPage : IMenuPage
 
     // Legacy StatLine's preview: an arrow, drawn as a small diamond since the font lacks ▸, then the new value colored by
     // whether it goes up or down. The choice only opens once the menu has faded in, so it draws at full opacity.
-    private void DrawPreview(SpriteBatch batch, TextureLibrary textures, Vector2 position, PreviewValue value)
+    private void DrawPreview(SpriteBatch batch, TextureLibrary textures, Vector2 position, StatPreviewText.PreviewValue value)
     {
         var arrowCenter = position + new Vector2(PreviewArrowSide, _bodyFont.LineHeight / 2f);
         new Diamond(arrowCenter, PreviewArrowSide).Draw(batch, textures.Pixel, UiTheme.TextSecondary);
         batch.DrawString(_bodyFont, value.Text, position + new Vector2(PreviewValueGap, 0), value.Color);
     }
 
-    // The shown member: what they wear in _slots' order (null for nothing) and their parameter values, in the labels' order.
-    private sealed record MemberSheet(string Name, ItemDefinition?[] Worn, string[] Stats);
-
-    // The preview's new attack and defense.
-    private sealed record PreviewText(PreviewValue Attack, PreviewValue Defense);
-
-    // One previewed value, colored by whether it goes up or down.
-    private sealed record PreviewValue(string Text, Color Color);
-
-    // The page's fixed text; Slots follows _slots, Stats the parameters' order.
+    // The page's fixed text; Slots follows EquipmentSheet.Slots, Stats the sheet's.
     private sealed record EquipmentLabels(string[] Slots, string Empty, string RemoveAll, string[] Stats)
     {
         public static EquipmentLabels From(UiMessages messages) => new(
-            [.. _slots.Select(slot => messages.Text(LabelIdOf(slot)))],
+            [.. EquipmentSheet.Slots.Select(slot => messages.Text(EquipmentSheet.LabelIdOf(slot)))],
             messages.Text(MessageIds.SlotEmpty),
             messages.Text(MessageIds.EquipmentRemoveAll),
             [messages.Text(MessageIds.StatMaxHp), messages.Text(MessageIds.StatMaxMp), messages.Text(MessageIds.StatAttack), messages.Text(MessageIds.StatDefense)]);

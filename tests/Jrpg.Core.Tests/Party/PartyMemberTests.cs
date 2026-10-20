@@ -192,6 +192,28 @@ public sealed class PartyMemberTests
         Assert.Throws<ArgumentOutOfRangeException>(() => member.GainExperience(-1, _table));
     }
 
+    [Fact]
+    public void EquippedIn_WornArmor_ReturnsIt()
+    {
+        var member = new PartyMemberBuilder().WithClass("warrior").Build();
+        var armor = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6, "warrior").Build();
+        Equip(member, armor);
+
+        var worn = member.EquippedIn(EquipmentSlot.Armor);
+
+        Assert.Same(armor, worn);
+    }
+
+    [Fact]
+    public void EquippedIn_EmptyWeaponSlot_ReturnsNull()
+    {
+        var member = new PartyMemberBuilder().Build();
+
+        var worn = member.EquippedIn(EquipmentSlot.Weapon);
+
+        Assert.Null(worn);
+    }
+
     private static void Equip(PartyMember member, ItemDefinition item)
     {
         var inventory = new Inventory();

@@ -1,0 +1,25 @@
+using System.Globalization;
+using Jrpg.Game.Ui;
+using Microsoft.Xna.Framework;
+
+namespace Jrpg.Game.Menus;
+
+/// <summary>A stat preview's new attack and defense as text, each colored by whether it goes up or down.</summary>
+internal sealed record StatPreviewText(StatPreviewText.PreviewValue Attack, StatPreviewText.PreviewValue Defense)
+{
+    public static StatPreviewText Of(StatPreview preview) => new(
+        new PreviewValue(Number(preview.WithItem.Attack), ColorOf(preview.AttackChange)),
+        new PreviewValue(Number(preview.WithItem.Defense), ColorOf(preview.DefenseChange)));
+
+    private static Color ColorOf(int change) => change switch
+    {
+        > 0 => UiTheme.Positive,
+        < 0 => UiTheme.Negative,
+        _ => UiTheme.TextPrimary,
+    };
+
+    private static string Number(int value) => value.ToString(CultureInfo.InvariantCulture);
+
+    /// <summary>One previewed value and its color.</summary>
+    public sealed record PreviewValue(string Text, Color Color);
+}

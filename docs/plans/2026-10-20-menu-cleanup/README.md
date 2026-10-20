@@ -72,6 +72,7 @@ Nothing else changes on screen, apart from:
 - **Why Core refused an equipment change.** `EquipmentPage.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. A Core result would own both.
 - **`StatusPage`'s own slot labels** could use `EquipmentSheet.Slots` after E1.
 - **`InventoryLabels`' measured texts** could use `MeasuredText` after U2.
+- **The private `Number(int)` invariant formatter** is copied in five Game files (`EquipmentSheet`, `StatPreviewText`, `StatusPage`, `SaveSlotListView`, `MemberCardView`). One shared `Ui` formatter would replace them.
 - **The battle HUD's party status** (battle plan B3a) has its own layout. It could use `VitalMeter`'s format when built.
 
 ## Slices
@@ -100,7 +101,7 @@ One line per slice. Each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 5: split EquipmentPage
 
-- [ ] **E1. The equipment sheet and preview text as pure types** (Core + Game, about 200 lines) → [slices/E1.md](slices/E1.md)
+- [x] **E1. The equipment sheet and preview text as pure types** (Core + Game, about 200 lines) → [slices/E1.md](slices/E1.md)
 - [ ] **E2. The equipment sheet view** (Game, about 260 lines, mostly moved) → [slices/E2.md](slices/E2.md)
 
 ### Phase 6: split PartyPage

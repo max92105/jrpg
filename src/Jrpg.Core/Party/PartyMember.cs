@@ -99,7 +99,8 @@ public sealed class PartyMember
         return steps;
     }
 
-    internal ItemDefinition? EquippedIn(EquipmentSlot slot) => slot switch
+    /// <returns>Null when the slot is empty.</returns>
+    public ItemDefinition? EquippedIn(EquipmentSlot slot) => slot switch
     {
         EquipmentSlot.Weapon => Weapon,
         EquipmentSlot.Armor => Armor,

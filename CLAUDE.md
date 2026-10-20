@@ -71,6 +71,7 @@ Full standard: `.claude/rules/code-quality.md`, loaded automatically for `.cs` f
 ## How we work
 
 - The workflow: `/plan-feature` → `/slice` (one slice per run) → I commit; `/verify` before a commit, `/review-slice` for an independent review, `/challenge` for a second opinion, `/qa` to hunt bugs, `/lesson` to turn a correction into a rule, `/retro` at the end of a plan.
+- A plan whose slices are all done (hand check included) is `retro pending`, not done: it moves to `docs/plans/done/` only after `/retro`, or when I explicitly say to skip the retro. If a plan sits in `retro pending` when I start other work, remind me.
 - Work in **small vertical slices**: one behavior, end to end, tests included, buildable at the end.
 - Before non-trivial work, plan first (`/plan-feature`). Don't start coding a feature that has no plan.
 - When a design choice has real alternatives, write an ADR (`/adr`) rather than deciding silently.

@@ -1,6 +1,8 @@
 # Plans
 
-Feature plans from `/plan-feature`, worked through one slice at a time with `/slice`. Finished plans move to `done/`.
+Feature plans from `/plan-feature`, worked through one slice at a time with `/slice`. Status goes `approved` → `approved, in progress` → `retro pending` (every slice done) → `done` (after `/retro`, or when the developer skips it), and the plan then moves to `done/`.
+
+Code-health work found along the way (big files, copies, open follow-ups) waits in [backlog.md](backlog.md) for the next cleanup plan.
 
 **Layout of a plan** (from the battle plan on): a folder `YYYY-MM-DD-name/` with
 - `README.md`: status, goal, order, guiding rules, out of scope, the slice index (one line and a checkbox per slice), the developer's decisions, open questions, ADRs needed. Read for every slice.

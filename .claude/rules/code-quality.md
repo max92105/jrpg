@@ -32,6 +32,7 @@ The bar: a professional reviewer reads the diff and understands the intent from 
 - Guard clauses and early returns instead of nested `if`. Max 2 levels of nesting.
 - Max 4 parameters. More → introduce a parameter object that is a real concept (`AttackContext`), not a bag.
 - No boolean flag parameters that switch behavior (`Move(true)`). Make two methods.
+- Code moved to a new type in a refactor slice must meet these rules in its new home; moving it isn't refactoring unrelated code.
 - Command or query, not both: a method either changes state or returns information.
 - No magic numbers: name the constant, or move it to content JSON if it's a design value.
 

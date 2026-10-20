@@ -16,8 +16,8 @@ Then propose, and wait for my OK before changing anything:
 1. **Repeated deviations or review findings** (the same kind 2+ times) → a rule in `.claude/rules/`, a reviewer checklist line, or a hook if it must hold every time. One or two concrete lines each.
 2. **Workflow friction** (steps that cost many turns or tokens, re-reads, slices that had to be split, questions asked too late) → a change to a skill or agent prompt, as an exact edit.
 3. **Drift in the docs**: folders or key types missing from `docs/map.md`, ADRs missing from `docs/decisions/README.md`, the plan's row in `docs/plans/README.md`. Fix these directly; they need no OK.
-4. **Code health**: files over ~300 lines, code copied 3+ times, follow-ups left open → a list for the next cleanup plan, one line each.
+4. **Code health**: files over ~300 lines, code copied 3+ times, follow-ups left open → one line each, appended to `docs/plans/backlog.md` (no OK needed) for the next cleanup plan. Skip lines already there.
 5. **Memory pruning**: notes now recorded in code, `docs/map.md`, an ADR or a rule, or about issues since fixed → list them for deletion.
-6. **Finished plan** → move it to `docs/plans/done/` and update the index.
+6. **Finished plan** (status `retro pending`) → once I've answered the proposals, set its status to done, move it to `docs/plans/done/` and update the index.
 
 Report as one short list per heading; leave empty headings out. Keep each proposal to what would have saved real time or tokens in this plan.

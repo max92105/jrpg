@@ -5,9 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-menu-cleanup/slices/F1.md, F1 (FontFileHeader.IsComplete guards FontLibrary.AddFont; FontLibraryTests in RepositoryScreenText collection)
-Round: 1 (verdict: Ready to commit; verify all pass, 1081 tests)
+Slice: docs/plans/2026-10-20-menu-cleanup/slices/C1.md, C1 (PartyState.ReserveMembers; PartyPage/MemberOrder read it)
+Round: 1 (verdict: Ready to commit; verify all pass, 1086 tests)
 
-- open (Suggestion): diagnosis (3/50 host deaths -> out-of-bounds read) and checkbox not yet written in F1.md / README index (DoD step 5)
-- open (Suggestion): no test pins the `<=` boundary (table ending exactly at EOF accepted); only covered implicitly by the Lato file
-- note: flaky-font-test-crash memory stays until the developer reports clean repeat runs
+- open (Suggestion): C1 checkbox in README.md:87 not ticked (DoD step 5)
+- open (Suggestion): ReserveMembers_AfterRefusedTryAddToActive_Unchanged passes even if the refused path rebuilt; could snapshot before/after or use Assert.Same on elements — low value, slice-specified

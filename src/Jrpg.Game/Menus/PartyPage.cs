@@ -51,7 +51,6 @@ internal sealed class PartyPage : IMenuPage
     private readonly string _reserveTitle;
     private readonly string[] _actions;
     private int _column = ActiveColumn;
-    private IReadOnlyList<PartyMember> _reserve = [];
     private Dictionary<PartyMember, PartyMemberCardView.Card> _cards = [];
     private PartyMemberCardView.MeasuredText _count;
     private int _row;
@@ -139,7 +138,7 @@ internal sealed class PartyPage : IMenuPage
     private static Rectangle CardArea(Rectangle column, int index) =>
         new(column.X, column.Y + CardsTop + (index * PartyMemberCardView.Height), column.Width, PartyMemberCardView.Height);
 
-    private IReadOnlyList<PartyMember> MembersIn(int column) => column == ActiveColumn ? _party.ActiveMembers : _reserve;
+    private IReadOnlyList<PartyMember> MembersIn(int column) => column == ActiveColumn ? _party.ActiveMembers : _party.ReserveMembers;
 
     private void UpdateBrowsing(InputFrame input)
     {
@@ -306,7 +305,6 @@ internal sealed class PartyPage : IMenuPage
     // Formats every card and the count once per change, so drawing formats nothing.
     private void ShowParty()
     {
-        _reserve = [.. _party.Members.Where(member => !_party.ActiveMembers.Contains(member))];
         _cards = _party.Members.ToDictionary(member => member, member => _cardView.CardOf(member, _party.Leader));
         var count = _messages.Format(
             MessageIds.PartyCount,

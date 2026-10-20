@@ -6,9 +6,6 @@ namespace Jrpg.Game.Menus;
 internal static class MemberOrder
 {
     /// <summary>Everyone recruited: the active party in its order, then the reserve.</summary>
-    public static IReadOnlyList<PartyMember> ActiveThenReserve(PartyState party)
-    {
-        var active = party.ActiveMembers;
-        return [.. active, .. party.Members.Where(member => !active.Contains(member))];
-    }
+    public static IReadOnlyList<PartyMember> ActiveThenReserve(PartyState party) =>
+        [.. party.ActiveMembers, .. party.ReserveMembers];
 }

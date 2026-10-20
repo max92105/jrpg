@@ -154,7 +154,7 @@ public sealed class PartyPageTests
         page.Update(Pressing(GameButton.Left));
         page.Update(Pressing(GameButton.Down));
         page.Update(Pressing(GameButton.Down));
-        var reserve = _session.Party.Members.Except(_session.Party.ActiveMembers).ToList();
+        var reserve = _session.Party.ReserveMembers.ToList();
 
         page.Update(Pressing(GameButton.Right));
 
@@ -167,7 +167,7 @@ public sealed class PartyPageTests
         var page = NewPage();
         page.Update(Pressing(GameButton.Right));
         AddSelectedReserveMembers(page, count: 3);
-        var lastReserve = _session.Party.Members.Except(_session.Party.ActiveMembers).Last();
+        var lastReserve = _session.Party.ReserveMembers[^1];
         page.Update(Pressing(GameButton.Left));
         page.Update(Pressing(GameButton.Up));
 

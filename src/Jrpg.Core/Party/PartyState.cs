@@ -1,13 +1,15 @@
 namespace Jrpg.Core.Party;
 
 /// <summary>
-/// Recruited members and the ordered active party. The active party never exceeds
-/// <see cref="PartyRules.MaxActiveMembers"/>, and the leader (the first member of the starting active order) is always first in it.
+/// Recruited members, the ordered active party and the reserve (recruited members not in the active party, in
+/// recruitment order). The active party never exceeds <see cref="PartyRules.MaxActiveMembers"/>, and the leader (the
+/// first member of the starting active order) is always first in it.
 /// </summary>
 public sealed class PartyState
 {
     private readonly PartyRules _rules;
     private readonly List<PartyMember> _activeMembers;
+    private readonly List<PartyMember> _reserveMembers = [];
 
     public PartyState(IReadOnlyList<PartyMember> members, IReadOnlyList<PartyMember> activeOrder, PartyRules rules)
     {
@@ -26,11 +28,14 @@ public sealed class PartyState
         Members = [.. members];
         _activeMembers = [.. activeOrder];
         Leader = activeOrder[0];
+        RebuildReserve();
     }
 
     public IReadOnlyList<PartyMember> Members { get; }
 
     public IReadOnlyList<PartyMember> ActiveMembers => _activeMembers;
+
+    public IReadOnlyList<PartyMember> ReserveMembers => _reserveMembers;
 
     public PartyMember Leader { get; }
 
@@ -51,6 +56,7 @@ public sealed class PartyState
         }
 
         _activeMembers.Add(member);
+        RebuildReserve();
         return true;
     }
 
@@ -58,7 +64,13 @@ public sealed class PartyState
     public bool TryMoveToReserve(PartyMember member)
     {
         ThrowIfNotRecruited(member);
-        return member != Leader && _activeMembers.Remove(member);
+        if (member == Leader || !_activeMembers.Remove(member))
+        {
+            return false;
+        }
+
+        RebuildReserve();
+        return true;
     }
 
     /// <exception cref="ArgumentException">The new order has different members, or the leader isn't first.</exception>
@@ -76,6 +88,12 @@ public sealed class PartyState
 
         _activeMembers.Clear();
         _activeMembers.AddRange(newOrder);
+    }
+
+    private void RebuildReserve()
+    {
+        _reserveMembers.Clear();
+        _reserveMembers.AddRange(Members.Where(member => !_activeMembers.Contains(member)));
     }
 
     private void ThrowIfNotRecruited(PartyMember member)

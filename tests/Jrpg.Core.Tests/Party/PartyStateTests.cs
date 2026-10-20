@@ -8,6 +8,7 @@ public sealed class PartyStateTests
     private readonly PartyMember _leader = new PartyMemberBuilder().WithId("sarxian").Build();
     private readonly PartyMember _jazog = new PartyMemberBuilder().WithId("jazog").Build();
     private readonly PartyMember _lyra = new PartyMemberBuilder().WithId("lyra").Build();
+    private readonly PartyMember _mira = new PartyMemberBuilder().WithId("mira").Build();
 
     [Fact]
     public void Constructor_FirstActiveMember_IsLeader()
@@ -120,6 +121,44 @@ public sealed class PartyStateTests
 
         Assert.False(moved);
         Assert.Equal([_leader, _jazog], party.ActiveMembers);
+    }
+
+    [Fact]
+    public void ReserveMembers_NewParty_AreTheInactiveRecruitsInRecruitOrder()
+    {
+        var party = new PartyState([_leader, _jazog, _lyra, _mira], [_leader, _lyra], new PartyRules(MaxActiveMembers: 3));
+
+        Assert.Equal([_jazog, _mira], party.ReserveMembers);
+    }
+
+    [Fact]
+    public void ReserveMembers_AfterTryAddToActive_LeavesOutTheJoiner()
+    {
+        var party = new PartyState([_leader, _jazog, _lyra, _mira], [_leader], new PartyRules(MaxActiveMembers: 3));
+
+        party.TryAddToActive(_lyra);
+
+        Assert.Equal([_jazog, _mira], party.ReserveMembers);
+    }
+
+    [Fact]
+    public void ReserveMembers_AfterTryMoveToReserve_PutsTheMemberBackInRecruitOrder()
+    {
+        var party = new PartyState([_leader, _jazog, _lyra, _mira], [_leader, _lyra], new PartyRules(MaxActiveMembers: 3));
+
+        party.TryMoveToReserve(_lyra);
+
+        Assert.Equal([_jazog, _lyra, _mira], party.ReserveMembers);
+    }
+
+    [Fact]
+    public void ReserveMembers_AfterRefusedTryAddToActive_Unchanged()
+    {
+        var party = new PartyState([_leader, _jazog, _lyra], [_leader, _jazog], new PartyRules(MaxActiveMembers: 2));
+
+        party.TryAddToActive(_lyra);
+
+        Assert.Equal([_lyra], party.ReserveMembers);
     }
 
     [Fact]

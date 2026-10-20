@@ -5,9 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-battle/slices/C2.md, C2 (BattleState.TargetChoiceForAttack, private ChoiceFor(Targeting) shared with ThrowIfIllegalTargets, AttackTargeting const)
-Round: 1 (verdict: Ready to commit; verify all pass, 1190 tests)
+Slice: docs/plans/2026-10-20-battle/slices/B4a.md, B4a (CommandEntry, CommandMenu, BattleTargetCursor, shared test BattleScenarios)
+Round: 1 (verdict: Fix the Criticals; verify all pass, 1198 tests)
 
-- open (Suggestion): ThrowIfIllegalTargets keeps an `actor` parameter used only for the message while ChoiceFor reads CurrentActor; drop the parameter or pass actor into ChoiceFor so one actor is used.
-- open (Suggestion): comment "An attack hits one living enemy." on AttackTargeting restates the value; say why it's a const (shared by offer and Execute) or remove.
+- open (Critical): BattleTargetCursor.StartIndex actor-is-candidate branch (decision 56) and the walk-back past trailing allies have no test; add Start_ActorIsCandidate_SelectsActor (TargetChoice of party+enemies incl. actor).
+- open (Critical): CommandMenu Run -> FleeCommand has no test; add Update_ConfirmRun_ProducesFlee (Down twice, Confirm).
+- open (Suggestion): MovePrevious wrap (index 0 -> last) untested; one test pins the negative modulo.
+- open (Suggestion): Start_SingleEnemy_SelectsLastLivingEnemy runs on three goblins; "SingleEnemy" means single-target choice, rename to Start_SingleTargetChoice_... (slice-given name, developer's call).
 - follow-up: none.

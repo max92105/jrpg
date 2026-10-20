@@ -1,20 +1,11 @@
 using Jrpg.Core.Battle;
-using Jrpg.Core.Content;
-using Jrpg.Core.Items;
-using Jrpg.Core.Party;
 using Jrpg.Core.Randomness;
-using Jrpg.Data.Content;
 using Jrpg.Game.Battle;
 
 namespace Jrpg.Game.Tests.Battle;
 
 public sealed class TurnOrderStripTests
 {
-    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
-
-    // Seed 4 shuffles Sarxian and the three goblins into that same order.
-    private const int SarxianFirstSeed = 4;
-
     private readonly TurnOrderStrip _strip = new();
 
     [Fact]
@@ -50,11 +41,6 @@ public sealed class TurnOrderStripTests
         Assert.All(battle.Combatants, combatant => Assert.True(_strip.IsLit(combatant)));
     }
 
-    private static BattleState SarxianAgainstGoblinTrio()
-    {
-        var sarxian = PartyMember.Recruit(_catalog.PartyMembers["sarxian"], _catalog.Skills);
-        var party = new PartyState([sarxian], [sarxian], _catalog.Rules.Party);
-        var goblin = _catalog.Enemies["goblin"];
-        return BattleState.Start(party, [goblin, goblin, goblin], new Inventory(), new SeededRandom(SarxianFirstSeed));
-    }
+    private static BattleState SarxianAgainstGoblinTrio() =>
+        BattleScenarios.SarxianAgainstGoblinTrio(new SeededRandom(BattleScenarios.SarxianFirstSeed));
 }

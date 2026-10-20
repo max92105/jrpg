@@ -67,16 +67,58 @@ public sealed class EquipmentPageTests
     }
 
     [Fact]
-    public void Update_ConfirmOnWeaponRow_ChangesNothing()
+    public void Update_ConfirmOnWeaponRow_OpensTheChoice()
     {
-        var sarxian = WearingSwordAndArmor();
-        var sword = sarxian.Weapon;
         var page = NewPage();
 
         page.Update(Pressing(GameButton.Confirm));
 
-        Assert.Same(sword, sarxian.Weapon);
-        Assert.Equal(1, _session.Inventory.QuantityOf("bronze_sword"));
+        Assert.True(page.IsChoosing);
+        Assert.False(page.LeavesOnCancel);
+    }
+
+    [Fact]
+    public void Update_ConfirmRemove_UnequipsSlot()
+    {
+        var sarxian = WearingSwordAndArmor();
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Confirm));
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.Null(sarxian.Weapon);
+        Assert.False(page.IsChoosing);
+        Assert.Equal(2, _session.Inventory.QuantityOf("bronze_sword"));
+    }
+
+    [Fact]
+    public void Update_ChooseIronSword_SwapsItIn()
+    {
+        var sarxian = WearingSwordAndArmor();
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Confirm));
+        ChooseIronSword(page);
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.Same(StartMapScenarios.BelowClosedDoor.Items["iron_sword"], sarxian.Weapon);
+        Assert.Equal(2, _session.Inventory.QuantityOf("bronze_sword"));
+    }
+
+    [Fact]
+    public void Update_ChooseIronSwordWithBronzeStackFull_RefusesAndSaysWhy()
+    {
+        var sarxian = WearingSwordAndArmor();
+        var bronze = StartMapScenarios.BelowClosedDoor.Items["bronze_sword"];
+        _session.Inventory.Add(bronze, bronze.MaxStack - _session.Inventory.QuantityOf(bronze.Id));
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Confirm));
+        ChooseIronSword(page);
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.Same(bronze, sarxian.Weapon);
+        Assert.Equal($"There's no room in the bag for {bronze.Name}.", page.Notice);
     }
 
     // Starts with 2 bronze swords and 2 leather armors in the inventory; the leader, a warrior, can wear both.
@@ -89,6 +131,13 @@ public sealed class EquipmentPageTests
         return sarxian;
     }
 
+    // The weapon choice lists Remove, then the warrior's owned weapons in pickup order: the bronze sword, the iron sword.
+    private static void ChooseIronSword(EquipmentPage page)
+    {
+        page.Update(Pressing(GameButton.Down));
+        page.Update(Pressing(GameButton.Down));
+    }
+
     // The rows are Weapon, Armor, then Remove all.
     private static void ConfirmRemoveAll(EquipmentPage page)
     {
@@ -97,5 +146,5 @@ public sealed class EquipmentPageTests
         page.Update(Pressing(GameButton.Confirm));
     }
 
-    private EquipmentPage NewPage() => new(RepositoryScreenText.Text, new UiTextures(), _session);
+    private EquipmentPage NewPage() => new(RepositoryScreenText.Text, new UiTextures(), _session, StartMapScenarios.BelowClosedDoor);
 }

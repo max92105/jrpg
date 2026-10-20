@@ -1,6 +1,7 @@
 using System.Collections.Immutable;
 using System.Globalization;
 using FontStashSharp;
+using Jrpg.Core.Content;
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Session;
@@ -40,11 +41,21 @@ internal sealed class EquipmentPage : IMenuPage
     private const int StatLineHeight = 36;
     private const int ColumnGap = 40;
     private const int ValueOffset = 160;
+    private const int PreviewArrowGap = 70;
+    private const int PreviewArrowSide = 6;
+    private const int PreviewValueGap = 16;
+    private const int NoticeGap = 24;
+    private const int AttackLine = 2;
+    private const int DefenseLine = 3;
 
     // The rows: one per slot, in this order, then "Remove all".
     private static readonly ImmutableArray<EquipmentSlot> _slots = [EquipmentSlot.Weapon, EquipmentSlot.Armor];
 
     private readonly PartyEquipment _equipment;
+    private readonly Inventory _inventory;
+    private readonly IReadOnlyDictionary<string, ItemDefinition> _items;
+    private readonly UiMessages _messages;
+    private readonly EquipmentChoiceView _choiceView;
     private readonly UiTextures _ui;
     private readonly ListCursor _memberCursor;
     private readonly ListCursor _rowCursor = new(_slots.Length + 1, _ => true);
@@ -53,13 +64,23 @@ internal sealed class EquipmentPage : IMenuPage
     private readonly SpriteFontBase _labelFont;
     private readonly EquipmentLabels _labels;
     private MemberSheet _sheet;
+    private EquipmentChoice? _choice;
+    private PreviewText? _preview;
+    // The choice row the preview was built for; -1 when none was.
+    private int _previewedRow = -1;
+    private string? _notice;
 
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared textures: section lines, icons, the selected row.</param>
     /// <param name="session">Whose party and inventory.</param>
-    public EquipmentPage(ScreenText text, UiTextures ui, GameSession session)
+    /// <param name="catalog">The items, to list what each slot can take.</param>
+    public EquipmentPage(ScreenText text, UiTextures ui, GameSession session, ContentCatalog catalog)
     {
         _equipment = session.Equipment;
+        _inventory = session.Inventory;
+        _items = catalog.Items;
+        _messages = text.Messages;
+        _choiceView = new EquipmentChoiceView(text, ui);
         _ui = ui;
         Members = MemberOrder.ActiveThenReserve(session.Party);
         _memberCursor = new ListCursor(Members.Count, _ => true);
@@ -77,10 +98,23 @@ internal sealed class EquipmentPage : IMenuPage
 
     public string TitleMessageId => MessageIds.MenuEquipment;
 
-    public bool LeavesOnCancel => true;
+    /// <summary>False while choosing what goes in a slot: Cancel closes that instead.</summary>
+    public bool LeavesOnCancel => _choice is null;
+
+    /// <summary>Whether the player is choosing what goes in a slot.</summary>
+    public bool IsChoosing => _choice is not null;
+
+    /// <summary>Why the last change didn't happen, or null.</summary>
+    public string? Notice => _notice;
 
     public SceneRequest? Update(InputFrame input)
     {
+        if (_choice is not null)
+        {
+            UpdateChoice(_choice, input);
+            return null;
+        }
+
         var shownBefore = _memberCursor.Selected;
         if (input.IsPressed(GameButton.PreviousTab) || input.IsPressed(GameButton.Left))
         {
@@ -95,6 +129,7 @@ internal sealed class EquipmentPage : IMenuPage
         if (_memberCursor.Selected != shownBefore)
         {
             _sheet = SheetOf(Shown);
+            _notice = null;
             return null;
         }
 
@@ -106,7 +141,8 @@ internal sealed class EquipmentPage : IMenuPage
     {
         var left = area.X + Margin;
         var top = area.Y + TopMargin;
-        var width = area.Right - Margin - left;
+        var right = _choice is null ? area.Right : area.Right - EquipmentChoiceView.PanelWidth;
+        var width = right - Margin - left;
         batch.DrawString(_headingFont, _sheet.Name, new Vector2(left, top), UiTheme.TextPrimary * opacity);
 
         var equipment = new Rectangle(left, top + EquipmentTop, width, 0);
@@ -123,6 +159,16 @@ internal sealed class EquipmentPage : IMenuPage
 
         var parameters = new Rectangle(left, removeAllTop + RowHeight + ParametersGap, width, 0);
         DrawParameters(batch, textures, parameters, opacity);
+        if (_notice is not null)
+        {
+            var noticeTop = parameters.Y + SectionHeight + (2 * StatLineHeight) + NoticeGap;
+            batch.DrawString(_bodyFont, _notice, new Vector2(left + RowInset, noticeTop), UiTheme.Danger * opacity);
+        }
+
+        if (_choice is not null)
+        {
+            _choiceView.Draw(batch, textures, _choice, new Rectangle(right, area.Y, EquipmentChoiceView.PanelWidth, area.Height));
+        }
     }
 
     /// <summary>
@@ -151,11 +197,83 @@ internal sealed class EquipmentPage : IMenuPage
             _rowCursor.MoveDown();
         }
 
-        if (input.IsPressed(GameButton.Confirm) && _rowCursor.Selected == _slots.Length)
+        if (!input.IsPressed(GameButton.Confirm))
+        {
+            return;
+        }
+
+        _notice = null;
+        if (_rowCursor.Selected == _slots.Length)
         {
             RemoveAll();
+            return;
         }
+
+        _choice = new EquipmentChoice(_equipment.WearableFor(Shown, _slots[_rowCursor.Selected], _items));
+        _choiceView.Show(_choice, _labels.Slots[_rowCursor.Selected], _inventory);
+        ShowPreview(_choice);
     }
+
+    private void UpdateChoice(EquipmentChoice choice, InputFrame input)
+    {
+        if (input.IsPressed(GameButton.Cancel))
+        {
+            CloseChoice();
+            return;
+        }
+
+        if (choice.Update(input) is { } pick)
+        {
+            Apply(pick, _slots[_rowCursor.Selected]);
+            CloseChoice();
+            return;
+        }
+
+        ShowPreview(choice);
+    }
+
+    // Rebuilt when the highlighted row changes, so drawing formats nothing; on "Remove" it previews the empty slot.
+    private void ShowPreview(EquipmentChoice choice)
+    {
+        if (choice.SelectedRow == _previewedRow)
+        {
+            return;
+        }
+
+        _previewedRow = choice.SelectedRow;
+        var slot = _slots[_rowCursor.Selected];
+        _preview = PreviewOf(choice.Highlighted is { } item ? StatPreview.Of(Shown, item) : StatPreview.OfRemoving(Shown, slot));
+    }
+
+    private void CloseChoice()
+    {
+        _choice = null;
+        _preview = null;
+        _previewedRow = -1;
+    }
+
+    // Core refuses a change when the item it would take off has no room left in the inventory; the player is told why.
+    private void Apply(EquipmentPick pick, EquipmentSlot slot)
+    {
+        var changed = pick.Item is null ? _equipment.TryUnequip(Shown, slot) : _equipment.TryEquip(Shown, pick.Item);
+        if (!changed && WornIn(Shown, slot) is { } worn && !_inventory.HasRoomFor(worn))
+        {
+            _notice = _messages.Format(MessageIds.EquipmentNoRoom, new MessageArgument("item", worn.Name));
+        }
+
+        _sheet = SheetOf(Shown);
+    }
+
+    private static PreviewText PreviewOf(StatPreview preview) => new(
+        new PreviewValue(Number(preview.WithItem.Attack), ColorOf(preview.AttackChange)),
+        new PreviewValue(Number(preview.WithItem.Defense), ColorOf(preview.DefenseChange)));
+
+    private static Color ColorOf(int change) => change switch
+    {
+        > 0 => UiTheme.Positive,
+        < 0 => UiTheme.Negative,
+        _ => UiTheme.TextPrimary,
+    };
 
     // Built when the member or what they wear changes, so drawing formats nothing.
     private static MemberSheet SheetOf(PartyMember member)
@@ -226,7 +344,21 @@ internal sealed class EquipmentPage : IMenuPage
             var position = new Vector2(columnLeft, section.Y + SectionHeight + (index / 2 * StatLineHeight));
             batch.DrawString(_bodyFont, _labels.Stats[index], position, UiTheme.TextSecondary * opacity);
             batch.DrawString(_bodyFont, _sheet.Stats[index], position + new Vector2(ValueOffset, 0), UiTheme.TextPrimary * opacity);
+            if (_preview is not null && index is AttackLine or DefenseLine)
+            {
+                var value = index == AttackLine ? _preview.Attack : _preview.Defense;
+                DrawPreview(batch, textures, position + new Vector2(ValueOffset + PreviewArrowGap, 0), value);
+            }
         }
+    }
+
+    // Legacy StatLine's preview: an arrow, drawn as a small diamond since the font lacks ▸, then the new value colored by
+    // whether it goes up or down. The choice only opens once the menu has faded in, so it draws at full opacity.
+    private void DrawPreview(SpriteBatch batch, TextureLibrary textures, Vector2 position, PreviewValue value)
+    {
+        var arrowCenter = position + new Vector2(PreviewArrowSide, _bodyFont.LineHeight / 2f);
+        new Diamond(arrowCenter, PreviewArrowSide).Draw(batch, textures.Pixel, UiTheme.TextSecondary);
+        batch.DrawString(_bodyFont, value.Text, position + new Vector2(PreviewValueGap, 0), value.Color);
     }
 
     // Legacy SectionHeaderStyle: a small label over a hairline that fades out to the right.
@@ -239,6 +371,12 @@ internal sealed class EquipmentPage : IMenuPage
 
     // The shown member: what they wear in _slots' order (null for nothing) and their parameter values, in the labels' order.
     private sealed record MemberSheet(string Name, ItemDefinition?[] Worn, string[] Stats);
+
+    // The preview's new attack and defense.
+    private sealed record PreviewText(PreviewValue Attack, PreviewValue Defense);
+
+    // One previewed value, colored by whether it goes up or down.
+    private sealed record PreviewValue(string Text, Color Color);
 
     // The page's fixed text; Slots follows _slots, Stats the parameters' order.
     private sealed record EquipmentLabels(string Equipment, string[] Slots, string Empty, string RemoveAll, string Parameters, string[] Stats)

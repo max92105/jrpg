@@ -41,6 +41,15 @@ public sealed class PartyEquipment(Inventory inventory)
         return true;
     }
 
+    /// <summary>What the member could put on in the slot: owned items for that slot their class can wear, in pickup order.</summary>
+    /// <param name="member">Who would wear it.</param>
+    /// <param name="slot">Weapon or armor.</param>
+    /// <param name="items">Every item by id, to read the owned ones' slot and classes.</param>
+    public IReadOnlyList<ItemDefinition> WearableFor(PartyMember member, EquipmentSlot slot, IReadOnlyDictionary<string, ItemDefinition> items) =>
+        [.. inventory.Entries
+            .Select(entry => items[entry.ItemId])
+            .Where(item => item.Equipment is { } equipment && equipment.Slot == slot && equipment.CanBeWornBy(member.Definition.ClassId))];
+
     /// <returns>False if the slot is empty or the item's inventory stack is full. Nothing changes when it returns false.</returns>
     public bool TryUnequip(PartyMember member, EquipmentSlot slot)
     {

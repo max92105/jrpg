@@ -47,6 +47,19 @@ public sealed class PartyMemberTests
     }
 
     [Fact]
+    public void StatsWithout_Weapon_DropsOnlyTheWeaponBonus()
+    {
+        var member = new PartyMemberBuilder().WithClass("warrior").WithStats(attack: 10, defense: 5).Build();
+        Equip(member, new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5, "warrior").Build());
+        Equip(member, new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6, "warrior").Build());
+
+        var preview = member.StatsWithout(EquipmentSlot.Weapon);
+
+        Assert.Equal(new CombatStats(Attack: 10, Defense: 11), preview);
+        Assert.Equal(new CombatStats(Attack: 15, Defense: 11), member.TotalStats);
+    }
+
+    [Fact]
     public void StatsWith_OtherWeapon_ReplacesCurrentWeaponBonus()
     {
         var member = new PartyMemberBuilder().WithClass("warrior").WithStats(attack: 10, defense: 5).Build();

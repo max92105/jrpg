@@ -694,7 +694,14 @@ P2b was split in two (developer, 2026-10-19), since it came to about 420 lines w
   - **Verify by hand:**
     - [ ] Worn items show per member; Remove all puts them back in the inventory.
 
-- [ ] **P3b. Changing equipment with a stat preview** (Core + Game, about 290 lines)
+- [x] **P3b. Changing equipment with a stat preview** (Core + Game, about 290 lines)
+  - **Done, with deviations:**
+    - `WearableFor(member, slot, items)` takes the item catalog, since the inventory stores ids only.
+    - Core gains `PartyMember.StatsWithout(slot)` (1 test), so highlighting "Remove" previews the emptied slot, as legacy did.
+    - New `Menus/EquipmentPick` and `Menus/EquipmentChoiceView`: the choice in legacy's 560 px glass panel at the page's right.
+    - The preview arrow is a small diamond, since the font lacks ▸. A refused swap shows "There's no room in the bag for {item}." (`equipment_no_room`).
+    - P3a's `Update_ConfirmOnWeaponRow_ChangesNothing` became `Update_ConfirmOnWeaponRow_OpensTheChoice`. The planned `EquipmentChoice_ConfirmRemove_UnequipsSlot` is `EquipmentPageTests.Update_ConfirmRemove_UnequipsSlot`.
+    - Extra tests: choosing the iron sword, a refused swap, and `StatPreview_OfRemoving_WornWeapon_ShowsTheBonusLost`.
   - **Goal:** Confirm on a slot lists the items the member can wear there, plus "Remove", in the legacy `EquipmentSelectionView` look. Moving the cursor previews attack and defense (legacy positive/negative colors). Confirm equips through `TryEquip`. An item that can't be worn because the replaced one doesn't fit back is refused with a message.
   - **Core:** `PartyEquipment.WearableFor(PartyMember member, EquipmentSlot slot)`: inventory items of that slot the member's class can wear, in pickup order.
   - **New types (Game):**

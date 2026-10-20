@@ -60,6 +60,14 @@ public sealed class PartyMember
     public PartyMemberProgress CaptureProgress() =>
         new(Id, Level, Experience, Vitals.Hp, Vitals.Mp, Weapon?.Id, Armor?.Id);
 
+    /// <summary>The stat preview of taking off what's worn in <paramref name="slot"/>: total stats with that slot empty.</summary>
+    public CombatStats StatsWithout(EquipmentSlot slot) => slot switch
+    {
+        EquipmentSlot.Weapon => StatsWearing(null, Armor),
+        EquipmentSlot.Armor => StatsWearing(Weapon, null),
+        _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot."),
+    };
+
     /// <summary>The stat preview: total stats if <paramref name="item"/> replaced whatever is worn in its slot.</summary>
     public CombatStats StatsWith(ItemDefinition item)
     {

@@ -59,5 +59,7 @@
   "item_used": "{item} was used.",
   "equipment_remove_all": "Remove all",
   "stat_max_hp": "Max HP",
-  "stat_max_mp": "Max MP"
+  "stat_max_mp": "Max MP",
+  "equipment_remove": "Remove",
+  "equipment_no_room": "There's no room in the bag for {item}."
 }

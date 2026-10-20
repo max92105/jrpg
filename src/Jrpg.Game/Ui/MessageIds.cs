@@ -162,4 +162,10 @@ internal static class MessageIds
     public const string StatMaxHp = "stat_max_hp";
 
     public const string StatMaxMp = "stat_max_mp";
+
+    /// <summary>The equipment choice's first row, which takes off what's worn in the slot.</summary>
+    public const string EquipmentRemove = "equipment_remove";
+
+    /// <summary>Placeholder <c>{item}</c>: the worn item that can't go back in its full inventory stack.</summary>
+    public const string EquipmentNoRoom = "equipment_no_room";
 }

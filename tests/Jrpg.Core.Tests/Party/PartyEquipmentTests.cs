@@ -173,4 +173,31 @@ public sealed class PartyEquipmentTests
         Assert.Same(bronzeSword, _warrior.Weapon);
         Assert.Equal(1, _inventory.QuantityOf(bronzeSword.Id));
     }
+
+    [Fact]
+    public void WearableFor_OtherClassItem_IsExcluded()
+    {
+        var staff = new ItemDefinitionBuilder().WithId("magic_staff").AsWeapon(6, "mage").Build();
+        _inventory.Add(_ironSword, 1);
+        _inventory.Add(staff, 1);
+        _inventory.Add(_bronzeSword, 1);
+
+        var wearable = _equipment.WearableFor(_warrior, EquipmentSlot.Weapon, Catalog(_ironSword, staff, _bronzeSword));
+
+        Assert.Equal([_ironSword, _bronzeSword], wearable);
+    }
+
+    [Fact]
+    public void WearableFor_ArmorSlot_ExcludesWeapons()
+    {
+        var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6, "warrior").Build();
+        _inventory.Add(_bronzeSword, 1);
+        _inventory.Add(chainMail, 1);
+
+        var wearable = _equipment.WearableFor(_warrior, EquipmentSlot.Armor, Catalog(_bronzeSword, chainMail));
+
+        Assert.Equal([chainMail], wearable);
+    }
+
+    private static Dictionary<string, ItemDefinition> Catalog(params ItemDefinition[] items) => items.ToDictionary(item => item.Id);
 }

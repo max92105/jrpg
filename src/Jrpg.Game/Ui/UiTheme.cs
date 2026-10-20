@@ -144,6 +144,15 @@ internal static class UiTheme
         new(1, FromLegacy(0x00FFFFFF)),
     ];
 
+    /// <summary>Legacy <c>Brush.Surface</c>: a <c>GlassPanelStyle</c> panel, such as the equipment choice.</summary>
+    public static Color Surface { get; } = FromLegacy(0xC70C0D11);
+
+    /// <summary>Legacy <c>Color.Positive</c>: a stat that goes up in a preview.</summary>
+    public static Color Positive { get; } = FromLegacy(0xFF6FD3E0);
+
+    /// <summary>Legacy <c>Color.Negative</c>: a stat that goes down in a preview.</summary>
+    public static Color Negative { get; } = FromLegacy(0xFF8C909A);
+
     /// <summary>Legacy <c>CategoryRailStyle</c>: the strip behind the inventory's category icons.</summary>
     public static Color CategoryRail { get; } = FromLegacy(0x80000000);
 

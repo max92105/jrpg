@@ -1,0 +1,42 @@
+# B1b. Random battles start; Run ends them
+
+Part of [the battle plan](../README.md). Design: [design.md](../design.md).
+
+- **B1b. Random battles start; Run ends them** (Game, about 270 lines)
+  - **Goal:** walking in the forest starts battles again (decision 79 ends).
+    - The screen fades to the encounter's background, over the map.
+    - It shows the acting member's name and a single "Run". Enemy turns are resolved at once, with no playback yet.
+    - Confirm runs, and the screen fades back to the map, unchanged. Grace steps follow.
+  - **New types (Game):**
+    - `Scenes/BattleRequested`: fight the encounter that just started on the map.
+    - `Scenes/BattleFinished`: the battle is over and the party carries on (victory or escape).
+    - `Flow/BattleTransitions(SceneStack scenes, SceneFactory factory)`: into a battle and back to the map. `Start(GameSession session)` pushes the battle; `Finish()` pops it.
+    - `Battle/BattleTurnSequence` (pure): whose turn it is on screen and what happens next. In this slice:
+      - the constructor takes `BattleState` and `EnemyTactics`;
+      - `Update()` resolves enemy turns at once;
+      - `IsAwaitingCommand`, `Actor`, `Submit(BattleCommand command)` (throws unless awaiting), `IsOver`.
+    - `Battle/BattleScene`: the battle screen; draws the fight and turns input into commands.
+      - It takes `GameSession`, `ScreenText`, `UiTextures`.
+      - When the sequence is over, it calls `session.FinishBattle()` once and returns `BattleFinished` once (null after).
+  - **Changes:**
+    - Delete `Flow/EncounterFreeContent` and its test. `GameFlow` plays the catalog as loaded, and `SceneFactory`'s "without random battles" comment is updated.
+    - `GameFlow` applies `BattleRequested` and `BattleFinished` through `BattleTransitions` once black.
+    - `SceneFactory.CreateBattle(GameSession session)`.
+    - `ExplorationScene` returns `BattleRequested` on the update a step starts an encounter. While one is pending, it stands, doesn't walk, and returns null; it resumes once it is cleared.
+    - Message `battle_run`.
+  - **Tests:**
+    - Exploration: `ExplorationScene_Update_StepStartsEncounter_RequestsBattleOnce`, `ExplorationScene_Update_EncounterPending_DoesNotWalk`, `ExplorationScene_Update_EncounterCleared_WalksAgain`.
+    - Turn sequence: `BattleTurnSequence_Update_EnemyActsFirst_RunsUntilPartyTurn` (seeded), `BattleTurnSequence_SubmitFlee_IsOver`, `BattleTurnSequence_Submit_NotAwaiting_Throws`.
+    - Scene: `BattleScene_Update_ConfirmRun_RequestsBattleFinishedAndClearsEncounter`, `BattleScene_Update_AfterOutcomeRequest_ReturnsNull`.
+    - Flow (ADR 0008's headless test): `GameFlow_Update_WalkIntoForestThatAlwaysRolls_FightsAndReturnsToMap`.
+      - It starts next to the warp (`StartMapScenarios`), with the forest table at 1 in 1 and no grace.
+      - It walks until a battle shows, presses Confirm until the map is back, and checks the position kept.
+      - It is seed-independent: Run always works, and the first enemy turns can't fell Sarxian.
+  - **Verify by hand:**
+    - [ ] Walk in the forest: a battle fades in over `Forest.png`.
+    - [ ] Confirm fades back to the same spot. The next 3 steps never start a battle.
+    - [ ] Save after a battle: it works.
+    - [ ] The menu doesn't open in battle.
+  - **Known gaps:**
+    - until B2a-B4b: no battlers, HUD or Attack;
+    - until C4: a party left with only fallen members active (possible from the Party page) crashes on the next battle.

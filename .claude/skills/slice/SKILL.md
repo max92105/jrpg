@@ -1,18 +1,26 @@
 ---
 name: slice
 description: Implement the next unchecked slice of an approved plan, with tests, then verify and review it. Run only when the user explicitly asks for /slice.
-argument-hint: "[plan file path] [slice number]"
+argument-hint: "[plan path] [slice id]"
 ---
 
 Implement one slice. Arguments: $ARGUMENTS
 
-1. Find the plan: use the path given, otherwise the most recent file in `docs/plans/` with `Status: approved`. If there is none, stop and tell me to run `/plan-feature` first.
-2. Pick the slice: the number given, otherwise the first unchecked `- [ ]` slice. Restate its goal in one sentence.
-3. Implement **only that slice**. Write the tests in the same change (test first when the behavior is a pure function or formula).
-4. Run `dotnet build Jrpg.slnx --nologo -v q` and `dotnet test --solution Jrpg.slnx` until both are clean with zero warnings.
-5. Re-read your own diff against `.claude/rules/code-quality.md` before handing it to the reviewer: rename anything vague, delete anything unused or speculative, remove comments that narrate.
-6. Delegate to the **code-reviewer** subagent, once. Fix every Critical finding. Fix the Warnings that are cheap and in scope; list the others with one line each on why not. Don't re-run the reviewer unless a Critical fix changed the design; the developer can run `/review-slice` for an independent check.
-7. Tick the slice in the plan file and add a one-line note for any deviation from the plan.
-8. Stop. Show me: what changed (files), test results, review outcome, and a proposed commit message. **Do not commit**; I commit myself.
+Read only what the slice needs: the plan's `README.md`, the slice's own file, and `docs/map.md`. Open `design.md`, ADRs (`docs/decisions/README.md` first) and code only for what those don't answer.
 
-If the slice turns out bigger than planned or the plan is wrong, stop at step 2 or 3 and tell me instead of improvising.
+1. **Find the plan**: the path given, otherwise the plan listed as in progress in `docs/plans/README.md`. If none is approved, stop and tell me to run `/plan-feature`. For an older single-file plan, read its header and only the slice's section (find it with Grep), never the whole file.
+2. **Pick the slice**: the id given, otherwise the first unchecked `- [ ]` in the plan's slice index. Read its file in `slices/`. Restate its goal in one sentence. If the working tree has uncommitted changes from another slice, say so before starting.
+3. **Implement only that slice**, tests in the same change (test first for a pure function or formula). Follow `docs/map.md`'s patterns and reuse what it lists before writing anything new.
+4. **Verify** with `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/scripts/verify.ps1 -Fix` until every line passes. Don't run the `dotnet` commands directly unless one failure needs more detail.
+5. **Self-review** the diff against `.claude/rules/code-quality.md`: rename anything vague, delete anything unused or speculative, remove narrating comments. Note any file now over ~300 lines and any method copied a third time.
+6. **Review**: delegate once to the **code-reviewer** with a short prompt: the slice file path, the plan README path, a 5-10 line summary of the change, decisions the developer took this session, and "Build, tests and format pass". Don't paste the plan or the diff. Fix every Critical; fix the Warnings that are cheap and in scope and list the rest with one line each on why not. Re-run the reviewer only if a Critical fix changed the design.
+7. **Record**: tick the slice in the plan's index; in the slice file add `- **Done, with deviations:** ...` (one or two lines, or "as planned"). If the slice added a folder or a type other code will build on, update its line in `docs/map.md`.
+8. **Stop and report**, in this shape and no longer:
+   - one sentence: what the slice does now;
+   - **Changed:** files, one line each;
+   - **Checks:** the verify script's lines (tests count included);
+   - **Review:** Criticals fixed / Warnings fixed / left with why;
+   - **Deviations:** or "none";
+   - **Commit message** (proposed). **Do not commit**; I commit myself.
+
+If the slice turns out bigger than planned (past ~300 lines with tests) or the plan is wrong, stop at step 2 or 3 and tell me instead of improvising.

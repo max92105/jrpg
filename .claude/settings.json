@@ -1,4 +1,27 @@
 {
+  "skillOverrides": {
+    "dataviz": "off",
+    "artifact-design": "off",
+    "artifact-diagramming": "off",
+    "artifact-capabilities": "off",
+    "plugin-authoring": "off",
+    "morning": "off",
+    "schedule": "off",
+    "claude-api": "off",
+    "keybindings-help": "off",
+    "init": "off",
+    "anthropic-skills:docx": "off",
+    "anthropic-skills:pptx": "off",
+    "anthropic-skills:xlsx": "off",
+    "anthropic-skills:pdf": "off",
+    "anthropic-skills:docs": "off",
+    "anthropic-skills:google-workspace": "off",
+    "anthropic-skills:chrome-browser": "off",
+    "anthropic-skills:built-in-browser": "off",
+    "anthropic-skills:computer-use": "off",
+    "anthropic-skills:morning": "off",
+    "anthropic-skills:import-memory": "off"
+  },
   "permissions": {
     "allow": [
       "Bash(dotnet build *)",
@@ -9,6 +32,7 @@
       "Bash(git diff *)",
       "Bash(git log *)",
       "Bash(git show *)",
+      "Bash(powershell -NoProfile -ExecutionPolicy Bypass -File .claude/scripts/verify.ps1*)",
       "PowerShell(dotnet build *)",
       "PowerShell(dotnet test *)",
       "PowerShell(dotnet format *)",
@@ -16,7 +40,8 @@
       "PowerShell(git status *)",
       "PowerShell(git diff *)",
       "PowerShell(git log *)",
-      "PowerShell(git show *)"
+      "PowerShell(git show *)",
+      "PowerShell(powershell -NoProfile -ExecutionPolicy Bypass -File .claude/scripts/verify.ps1*)"
     ],
     "deny": [
       "Bash(git push *)",

@@ -7,12 +7,15 @@
 | Project memory | `CLAUDE.md` | Architecture, commands, coding rules, definition of done. Loaded every session. |
 | Area rules | `.claude/rules/*.md` | Extra rules that load only when Claude touches Core, Game, Editor, tests or content. |
 | Agents | `.claude/agents/` | `architect`, `devils-advocate`, `code-reviewer`, `qa-engineer`, `balance-analyst`. Each runs in its own fresh context. |
-| Commands | `.claude/skills/` | `/plan-feature`, `/challenge`, `/slice`, `/review-slice`, `/qa`, `/adr`, `/verify`, `/lesson`. |
+| Commands | `.claude/skills/` | `/plan-feature`, `/challenge`, `/slice`, `/review-slice`, `/qa`, `/adr`, `/verify`, `/lesson`, `/retro`. |
+| Checks script | `.claude/scripts/verify.ps1` | Build, tests, format, Core and naming rules in one run, printing one line per check; used by `/verify`, `/slice`, the reviewer and the Stop hook. |
+| Skill list | `skillOverrides` in `.claude/settings.json` | Turns off general-purpose skills this project never uses, so their descriptions stay out of every turn. |
 | Guardrails | `.claude/settings.json` + `.claude/hooks/` | Auto-approves safe commands, blocks dangerous ones, protects config files, auto build+test when Claude finishes a turn. |
 | Code quality standard | `.claude/rules/code-quality.md` | Naming, structure, method size, comments, "no AI slop" list. Loaded whenever Claude touches a `.cs` file; the reviewer checks against it. |
 | Build quality | `src/Directory.Build.props`, `tests/Directory.Build.props`, `CodeMetricsConfig.txt`, `.editorconfig` | Nullable on, warnings = errors, analyzers. The build fails on unused code, methods with complexity > 10, naming violations, namespace ≠ folder, unsealed internal classes. Applies only to new projects in `src/` and `tests/`. |
-| Decisions | `docs/decisions/` | ADRs. `0001` records the MonoGame + WPF tools + Core decision. |
-| Plans | `docs/plans/` | Where `/plan-feature` writes plans. |
+| Codebase map | `docs/map.md` | One line per feature folder with its key types, and the patterns the code follows. Agents read it instead of exploring. |
+| Decisions | `docs/decisions/` | ADRs, indexed one line each in `docs/decisions/README.md`. |
+| Plans | `docs/plans/` | Where `/plan-feature` writes plans: one folder per plan (slice index, design, one file per slice), indexed in `docs/plans/README.md`; finished ones in `done/`. |
 
 ## Install (10 minutes)
 

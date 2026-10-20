@@ -16,8 +16,9 @@ A 2D JRPG written from scratch in C#. Personal project, single developer.
 - `tests/Jrpg.Editor.Tests` — xUnit tests for the editor's view models and headless editing logic; nothing that needs a window.
 - `tests/Jrpg.Simulations` — headless battle/balance simulations.
 - `content/` — JSON game data (items, monsters, skills, maps, dialogue) and art (`content/art/<kind>/`, ADR 0009). The only source of truth for content (ADR 0011).
-- `docs/decisions/` — architecture decision records (ADRs). Read the relevant ADR before changing a design area.
-- `docs/plans/` — feature plans produced by `/plan-feature`.
+- `docs/map.md` — the codebase map: one line per feature folder with its key types, and the patterns the code follows. Read it before exploring the code.
+- `docs/decisions/` — architecture decision records (ADRs), indexed one line each in `docs/decisions/README.md`. Read the relevant ADR before changing a design area.
+- `docs/plans/` — feature plans produced by `/plan-feature`, indexed in `docs/plans/README.md`; each plan is a folder with a slice index, a design file and one file per slice.
 - `docs/ui_ux_exemples/` — screenshots of the developer's favorite UI/UX (Octopath Traveler II), the target style for every screen. Look at them before planning or drawing UI; take inspiration, don't copy 1:1 (see `.claude/rules/game.md`, "UI look"). Reference only: never shipped.
 
 Dependency direction: Game → Data → Core; Editor → Data → Core. Never the reverse.
@@ -31,6 +32,7 @@ Dependency direction: Game → Data → Core; Editor → Data → Core. Never th
 
 ## Commands
 
+- All checks at once (build, tests, format, Core and naming rules; one line per check): `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/scripts/verify.ps1` (`-Fix` formats first). Prefer it to the commands below.
 - Build: `dotnet build Jrpg.slnx --nologo -v q`
 - Test: `dotnet test --solution Jrpg.slnx`
 - Format check: `dotnet format Jrpg.slnx --verify-no-changes`
@@ -68,6 +70,7 @@ Full standard: `.claude/rules/code-quality.md`, loaded automatically for `.cs` f
 
 ## How we work
 
+- The workflow: `/plan-feature` → `/slice` (one slice per run) → I commit; `/verify` before a commit, `/review-slice` for an independent review, `/challenge` for a second opinion, `/qa` to hunt bugs, `/lesson` to turn a correction into a rule, `/retro` at the end of a plan.
 - Work in **small vertical slices**: one behavior, end to end, tests included, buildable at the end.
 - Before non-trivial work, plan first (`/plan-feature`). Don't start coding a feature that has no plan.
 - When a design choice has real alternatives, write an ADR (`/adr`) rather than deciding silently.

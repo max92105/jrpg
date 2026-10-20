@@ -127,7 +127,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **B2b. Battlers** (Data + Game, about 220 lines) → [slices/B2b.md](slices/B2b.md)
 - [x] **B3a. Party status** (Game, about 240 lines) → [slices/B3a.md](slices/B3a.md)
 - [x] **B3b. Enemy tags and letters** (Game, about 160 lines; decision 99) → [slices/B3b.md](slices/B3b.md)
-- [ ] **B3c. Turn order bar** (Core + Data + content + Game, about 280 lines) → [slices/B3c.md](slices/B3c.md)
+- [x] **B3c. Turn order bar** (Core + Data + content + Game, about 280 lines) → [slices/B3c.md](slices/B3c.md)
 
 ### Phase 3: commands
 

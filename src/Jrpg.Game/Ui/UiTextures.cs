@@ -32,6 +32,7 @@ internal sealed class UiTextures
     private Texture2D? _topShade;
     private readonly Dictionary<(string File, int Size), Texture2D> _diamondPortraits = [];
     private readonly Dictionary<(string Folder, string File, int Size), Texture2D> _shrunk = [];
+    private readonly Dictionary<DiamondShape, Texture2D> _diamonds = [];
     private readonly Dictionary<ImmutableArray<GradientStop>, Texture2D> _gradients = [];
 
     /// <summary>A tab that isn't selected: the arrow, dark and faintly outlined.</summary>
@@ -68,6 +69,18 @@ internal sealed class UiTextures
     /// <summary>One column, stretched over the top of the battle, <see cref="TopShadeHeight"/> pixels down.</summary>
     public Texture2D TopShade(TextureLibrary textures) =>
         _topShade ??= textures.Create(1, TopShadeHeight, GradientStrip.Colors(UiTheme.BattleTopShade, TopShadeHeight));
+
+    /// <summary>A diamond or diamond ring, baked once per shape.</summary>
+    public Texture2D Diamond(TextureLibrary textures, DiamondShape shape)
+    {
+        if (!_diamonds.TryGetValue(shape, out var baked))
+        {
+            baked = textures.Create(shape.Size, shape.Size, shape.Pixels());
+            _diamonds.Add(shape, baked);
+        }
+
+        return baked;
+    }
 
     /// <summary>A portrait cut into the reference UI's diamond (<see cref="DiamondCrop"/>), once per file and size.</summary>
     /// <param name="textures">Where the portrait is read and the diamond made.</param>

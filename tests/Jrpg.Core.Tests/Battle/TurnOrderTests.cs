@@ -92,6 +92,15 @@ public sealed class TurnOrderTests
         Assert.Throws<InvalidOperationException>(order.Advance);
     }
 
+    [Fact]
+    public void Upcoming_EveryoneDefeated_Throws()
+    {
+        var order = new TurnOrder([_first], new FixedSequenceRandom());
+        _first.Vitals.TakeDamage(999);
+
+        Assert.Throws<InvalidOperationException>(() => order.Upcoming(3));
+    }
+
     private static Combatant Enemy(string name) => Combatant.FromEnemy(new EnemyDefinitionBuilder().WithName(name).Build());
 
     private static List<Combatant> TakeTurns(TurnOrder order, int count)

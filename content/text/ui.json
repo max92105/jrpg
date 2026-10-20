@@ -85,5 +85,6 @@
   "text_speed_instant": "Instant",
   "battle_run": "Run",
   "battle_vital_max": "/{max}",
-  "battle_enemy_letter": "{name} {letter}"
+  "battle_enemy_letter": "{name} {letter}",
+  "battle_next": "NEXT"
 }

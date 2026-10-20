@@ -243,6 +243,37 @@ public sealed class BattleStateTests
     }
 
     [Fact]
+    public void UpcomingActors_FourCombatants_ListsCycleAfterCurrent()
+    {
+        var (battle, goblins) = HeroAgainstThreeWeakGoblins();
+
+        var upcoming = battle.UpcomingActors(3);
+
+        Assert.Equal(goblins, upcoming);
+    }
+
+    [Fact]
+    public void UpcomingActors_DefeatedCombatant_IsSkipped()
+    {
+        var (battle, goblins) = HeroAgainstThreeWeakGoblins();
+        battle.Execute(new AttackCommand(goblins[0]));
+
+        var upcoming = battle.UpcomingActors(3);
+
+        Assert.Equal([goblins[2], _hero, goblins[1]], upcoming);
+    }
+
+    [Fact]
+    public void UpcomingActors_CountPastCycle_Wraps()
+    {
+        var (battle, goblins) = HeroAgainstThreeWeakGoblins();
+
+        var upcoming = battle.UpcomingActors(5);
+
+        Assert.Equal([.. goblins, _hero, goblins[0]], upcoming);
+    }
+
+    [Fact]
     public void GrantVictoryExperience_BeforeTheBattleIsWon_Throws()
     {
         var battle = new BattleState([_hero, _goblin], new Inventory(), new FixedSequenceRandom(1));
@@ -266,6 +297,13 @@ public sealed class BattleStateTests
 
     private static EnemyDefinition Enemy(string name, int maxHp = 40) =>
         new EnemyDefinitionBuilder().WithName(name).WithStats(maxHp, attack: 20, defense: 2).Build();
+
+    // The shuffle (3, 2, 1) keeps the listed order: the hero, then the goblins. One hit fells a 10 HP goblin.
+    private (BattleState Battle, Combatant[] Goblins) HeroAgainstThreeWeakGoblins()
+    {
+        Combatant[] goblins = [Goblin(hp: 10), Goblin(hp: 10), Goblin(hp: 10)];
+        return (new BattleState([_hero, .. goblins], new Inventory(), new FixedSequenceRandom(3, 2, 1)), goblins);
+    }
 
     private static Combatant Hero(int hp) => Combatant.FromPartyMember(
         new PartyMemberBuilder().WithStats(attack: 15, defense: 8).WithVitals(hp, maxHp: 100, mp: 0, maxMp: 0).Build());

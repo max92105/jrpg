@@ -13,8 +13,8 @@ public static class ArtReferenceCheck
 {
     /// <summary>
     /// Every tilesheet, the field sprite, every dialogue portrait, every party member's portrait, every item's icon,
-    /// every battle sprite and every encounter's background exist as PNGs, and every tile's cell lies inside its sheet.
-    /// Battle art names must match their files exactly, case included.
+    /// every battle sprite, every enemy's portrait and every encounter's background exist as PNGs, and every tile's cell
+    /// lies inside its sheet. Battle art names must match their files exactly, case included.
     /// </summary>
     /// <returns>One line per problem, naming the file; empty when the art is complete.</returns>
     public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string artRoot)
@@ -47,6 +47,7 @@ public static class ArtReferenceCheck
         AddMissingByExactName(problems, artRoot, ArtFolders.Battlers, members.Select(member => (member.BattleSpriteFile, $"party member '{member.Id}'")));
         var enemies = catalog.Enemies.Values.OrderBy(enemy => enemy.Id, StringComparer.Ordinal);
         AddMissingByExactName(problems, artRoot, ArtFolders.Battlers, enemies.Select(enemy => (enemy.BattleSpriteFile, $"enemy '{enemy.Id}'")));
+        AddMissingByExactName(problems, artRoot, ArtFolders.Portraits, enemies.Select(enemy => (enemy.PortraitFile, $"enemy '{enemy.Id}'")));
         var encounters = catalog.Encounters.Values.OrderBy(encounter => encounter.Id, StringComparer.Ordinal);
         AddMissingByExactName(problems, artRoot, ArtFolders.Backgrounds, encounters.Select(encounter => (encounter.BackgroundFile, $"encounter '{encounter.Id}'")));
         return problems;

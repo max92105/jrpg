@@ -22,6 +22,9 @@ internal sealed class BattleScene : IScene
     private static readonly Vector2 _runPosition = new(1464, 700);
 
     private readonly GameSession _session;
+    private readonly BattleState _battle;
+    private readonly TurnOrderStrip _turnOrderStrip = new();
+    private readonly TurnOrderView _turnOrder;
     private readonly UiTextures _ui;
     private readonly BattlersView _battlers;
     private readonly BattleTurnSequence _sequence;
@@ -41,6 +44,9 @@ internal sealed class BattleScene : IScene
         _session = session;
         _ui = ui;
         var battle = session.ActiveBattle ?? throw new InvalidOperationException("A battle screen needs an active battle.");
+        _battle = battle;
+        _turnOrder = new TurnOrderView(_turnOrderStrip, battle.Combatants, text, ui);
+        _turnOrderStrip.Refresh(battle);
         _battlers = new BattlersView(battle.Combatants, ui);
         _partyStatus = new PartyStatusView([.. battle.Combatants.Where(combatant => combatant.Side == BattleSide.Party)], text, ui);
         _enemyTags = new EnemyTagView(battle.Combatants, text, ui);
@@ -59,12 +65,20 @@ internal sealed class BattleScene : IScene
             return null;
         }
 
+        // The order moves on when enemy turns play (no command awaited) or when a command is given.
+        var isOrderMoving = !_sequence.IsAwaitingCommand;
         if (_sequence.IsAwaitingCommand && input.IsPressed(GameButton.Confirm))
         {
             _sequence.Submit(new FleeCommand());
+            isOrderMoving = true;
         }
 
         _sequence.Update();
+        if (isOrderMoving)
+        {
+            _turnOrderStrip.Refresh(_battle);
+        }
+
         _partyStatus.Refresh();
         _enemyTags.Refresh();
         if (!_sequence.IsOver)
@@ -82,6 +96,7 @@ internal sealed class BattleScene : IScene
         DrawBackdrop(batch, textures);
         _battlers.Draw(batch, textures);
         _enemyTags.Draw(batch, textures);
+        _turnOrder.Draw(batch, textures);
         var isAwaitingCommand = !_isFinished && _sequence.IsAwaitingCommand;
         _partyStatus.Draw(batch, textures, isAwaitingCommand ? _sequence.Actor : null);
         if (!isAwaitingCommand)

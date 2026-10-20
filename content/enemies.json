@@ -2,7 +2,7 @@
   {
     "id": "goblin",
     "name": "Goblin",
-    "portraitFile": "goblin.png",
+    "portraitFile": "Goblin.png",
     "battleSpriteFile": "Goblin.png",
     "attackEffectFile": "AttackEnemy.gif",
     "isSpriteFlipped": false,

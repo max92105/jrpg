@@ -230,4 +230,7 @@ internal static class MessageIds
 
     /// <summary>Placeholders <c>{name}</c> and <c>{letter}</c>: an enemy sharing its name with others, as "Goblin A".</summary>
     public const string BattleEnemyLetter = "battle_enemy_letter";
+
+    /// <summary>The label over the turn order's upcoming turns.</summary>
+    public const string BattleNext = "battle_next";
 }

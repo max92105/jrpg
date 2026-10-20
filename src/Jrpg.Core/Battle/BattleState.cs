@@ -59,6 +59,10 @@ public sealed class BattleState
 
     public IReadOnlyList<Combatant> Combatants { get; }
 
+    /// <summary>The <paramref name="count"/> turns after the current one, as the order stands now; a fall changes it.</summary>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative.</exception>
+    public IReadOnlyList<Combatant> UpcomingActors(int count) => _turnOrder.Upcoming(count);
+
     public IReadOnlyList<Combatant> LivingOn(BattleSide side) =>
         [.. Combatants.Where(combatant => combatant.Side == side && combatant.IsAlive)];
 

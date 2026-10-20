@@ -26,6 +26,33 @@ internal sealed class TurnOrder
 
     public Combatant Current => _cycle[_currentIndex];
 
+    /// <summary>
+    /// The next <paramref name="count"/> turns after the current one as the order stands now: the cycle walked on from
+    /// the current combatant, wrapping, skipping the fallen. A combatant appears again once the cycle comes back to them.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative.</exception>
+    /// <exception cref="InvalidOperationException">Everyone is defeated; the battle should have ended.</exception>
+    public IReadOnlyList<Combatant> Upcoming(int count)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(count);
+        if (!_cycle.Any(combatant => combatant.IsAlive))
+        {
+            throw new InvalidOperationException("No combatant is alive.");
+        }
+
+        var upcoming = new List<Combatant>(count);
+        for (var index = _currentIndex; upcoming.Count < count;)
+        {
+            index = (index + 1) % _cycle.Count;
+            if (_cycle[index].IsAlive)
+            {
+                upcoming.Add(_cycle[index]);
+            }
+        }
+
+        return upcoming;
+    }
+
     /// <summary>Moves to the next living combatant, wrapping around the cycle.</summary>
     /// <exception cref="InvalidOperationException">Everyone is defeated; the battle should have ended.</exception>
     public void Advance()

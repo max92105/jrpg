@@ -21,3 +21,4 @@ Part of [the battle plan](../README.md). Design: [design.md](../design.md).
   - **Verify by hand:**
     - [ ] Compare with `Combat5.webp`.
     - [ ] The order advances each turn.
+- **Done, with deviations:** about 400 lines with tests instead of 280; the developer chose to keep it one slice. The enemy's red lower half and the hairline frames needed a baked `Ui/DiamondShape` (diamond or ring, two-color halves, smoothed edges; cached in `UiTextures.Diamond`, tested). Drawing is split into `TurnOrderView` (layout) and `TurnDiamondView` + `TurnDiamondStyle` (one diamond). "NEXT" is the message `battle_next`. The scene refreshes the strip when enemy turns play or a command is given. Core test names drop the `BattleState_` prefix, as in the existing file. After review: `TurnOrder.Upcoming` throws like `Advance` when everyone has fallen (tested), and the strip tests were renamed to `Method_Scenario_Result`.

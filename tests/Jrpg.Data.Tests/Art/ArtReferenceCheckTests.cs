@@ -106,6 +106,17 @@ public sealed class ArtReferenceCheckTests
     }
 
     [Fact]
+    public void FindProblems_EnemyPortraitNameDiffersInCase_NamesTheEnemy()
+    {
+        var goblin = _catalog.Enemies["goblin"] with { PortraitFile = "goblin.png" };
+        var catalog = _catalog with { Enemies = new Dictionary<string, EnemyDefinition>(_catalog.Enemies) { ["goblin"] = goblin } };
+
+        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
+
+        Assert.Equal("portraits/goblin.png: the file is named Goblin.png; names must match exactly. Named by enemy 'goblin'.", problem);
+    }
+
+    [Fact]
     public void FindProblems_MissingEncounterBackground_NamesTheEncounter()
     {
         var catalog = WithGoblinTrioBackground("Gone.png");

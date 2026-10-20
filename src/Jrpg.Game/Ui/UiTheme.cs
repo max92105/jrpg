@@ -187,6 +187,23 @@ internal static class UiTheme
     /// <summary>Legacy <c>Effect.TextOutline</c>: the soft dark edge behind text drawn straight on the battle background.</summary>
     public static Color TextOutline { get; } = FromLegacy(0xE6000000);
 
+    /// <summary>Legacy <c>TurnPortrait</c>: the dark diamond behind a portrait in the turn order.</summary>
+    public static Color TurnBackdrop { get; } = FromLegacy(0xE6181A26);
+
+    /// <summary>Legacy <c>TurnPortrait</c>'s enemy tint (#CC8A1C24) laid over <see cref="TurnBackdrop"/>: an enemy's red lower half.</summary>
+    public static Color TurnEnemyHalf { get; } = Over(FromLegacy(0xCC8A1C24), TurnBackdrop);
+
+    // Premultiplied "over": the top color, then what shows through it of the bottom one.
+    private static Color Over(Color top, Color bottom)
+    {
+        var through = 1 - (top.A / 255f);
+        return new Color(
+            top.R + (int)(bottom.R * through),
+            top.G + (int)(bottom.G * through),
+            top.B + (int)(bottom.B * through),
+            top.A + (int)(bottom.A * through));
+    }
+
     // Legacy XAML colors are #AARRGGBB with straight alpha; the game draws premultiplied.
     private static Color FromLegacy(uint argb) => Color.FromNonPremultiplied(
         (int)((argb >> 16) & 0xFF),

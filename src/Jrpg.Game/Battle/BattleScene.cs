@@ -11,16 +11,12 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// The battle screen over the map (ADR 0013): the encounter's background, the acting member's name and the commands.
-/// When the battle is over it finishes it in the session once and asks the flow, once, to go back to the map.
+/// The battle screen over the map (ADR 0013): the encounter's background, the battlers, the HUD and the commands.
+/// When the battle is over it finishes it in the session once and asks the flow, once, to go back to the map (or to the
+/// title after a defeat).
 /// </summary>
 internal sealed class BattleScene : IScene
 {
-    // Placeholder spot until the command panel (plan 2026-10-20-battle, B4c): the party's side of the legacy formation.
-    private const int TextPixels = 32;
-    private static readonly Vector2 _actorPosition = new(1424, 640);
-    private static readonly Vector2 _runPosition = new(1464, 700);
-
     private readonly GameSession _session;
     private readonly BattleState _battle;
     private readonly TurnOrderStrip _turnOrderStrip = new();
@@ -31,8 +27,8 @@ internal sealed class BattleScene : IScene
     private readonly string _backgroundFile;
     private readonly PartyStatusView _partyStatus;
     private readonly EnemyTagView _enemyTags;
-    private readonly OutlinedFont _font;
-    private readonly string _runLabel;
+    private readonly CommandMenu _commands = new();
+    private readonly CommandListView _commandList;
     private bool _isFinished;
 
     /// <param name="session">The playthrough whose active battle this screen shows.</param>
@@ -53,11 +49,14 @@ internal sealed class BattleScene : IScene
         _sequence = new BattleTurnSequence(battle, session.EnemyTactics);
         _backgroundFile = session.Exploration.PendingEncounter?.BackgroundFile
             ?? throw new InvalidOperationException("A battle screen needs the encounter it fights.");
-        _font = new OutlinedFont(text.Fonts.FontAt(TextPixels));
-        _runLabel = text.Messages.Text(MessageIds.BattleRun);
+        _commandList = new CommandListView(_commands, battle.Combatants, text);
+        _commands.Start(battle);
     }
 
-    /// <returns><see cref="BattleFinished"/> on the update the battle ends; null otherwise.</returns>
+    /// <returns>
+    /// On the update the battle ends: <see cref="BattleFinished"/> after a victory or an escape, <see cref="TitleRequested"/>
+    /// after a defeat until the defeat screen (plan 2026-10-20-battle, B8b). Null otherwise.
+    /// </returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
         if (_isFinished)
@@ -67,28 +66,21 @@ internal sealed class BattleScene : IScene
 
         // The order moves on when enemy turns play (no command awaited) or when a command is given.
         var isOrderMoving = !_sequence.IsAwaitingCommand;
-        if (_sequence.IsAwaitingCommand && input.IsPressed(GameButton.Confirm))
+        if (_sequence.IsAwaitingCommand && _commands.Update(input) is { } command)
         {
-            _sequence.Submit(new FleeCommand());
+            _sequence.Submit(command);
             isOrderMoving = true;
         }
 
         _sequence.Update();
         if (isOrderMoving)
         {
-            _turnOrderStrip.Refresh(_battle);
+            StartTurn();
         }
 
         _partyStatus.Refresh();
         _enemyTags.Refresh();
-        if (!_sequence.IsOver)
-        {
-            return null;
-        }
-
-        _session.FinishBattle();
-        _isFinished = true;
-        return new BattleFinished();
+        return _sequence.IsOver ? Finish() : null;
     }
 
     public void Draw(SpriteBatch batch, TextureLibrary textures)
@@ -99,13 +91,27 @@ internal sealed class BattleScene : IScene
         _turnOrder.Draw(batch, textures);
         var isAwaitingCommand = !_isFinished && _sequence.IsAwaitingCommand;
         _partyStatus.Draw(batch, textures, isAwaitingCommand ? _sequence.Actor : null);
-        if (!isAwaitingCommand)
+        if (isAwaitingCommand)
         {
-            return;
+            _commandList.Draw(batch, textures, _sequence.Actor);
         }
+    }
 
-        _font.Draw(batch, _sequence.Actor.Name, _actorPosition, UiTheme.TextPrimary);
-        _font.Draw(batch, _runLabel, _runPosition, UiTheme.TextPrimary);
+    private void StartTurn()
+    {
+        _turnOrderStrip.Refresh(_battle);
+        if (_sequence.IsAwaitingCommand)
+        {
+            _commands.Start(_battle);
+        }
+    }
+
+    private SceneRequest Finish()
+    {
+        _isFinished = true;
+        var outcome = _battle.Phase;
+        _session.FinishBattle();
+        return outcome == BattlePhase.Defeat ? new TitleRequested() : new BattleFinished();
     }
 
     // Legacy BattleUI's backdrop: the picture, the vignette over the whole screen, and the shade across the top.

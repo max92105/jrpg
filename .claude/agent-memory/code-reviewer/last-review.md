@@ -5,11 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-battle/slices/B4a.md, B4a (CommandEntry, CommandMenu, BattleTargetCursor, shared test BattleScenarios)
-Round: 1 (verdict: Fix the Criticals; verify all pass, 1198 tests)
+Slice: docs/plans/2026-10-20-battle/slices/B4b.md, B4b (CommandListView, BattleScene feeds CommandMenu, Finish on any outcome)
+Round: 1 (verdict: Ready to commit; verify all pass, 1204 tests)
 
-- open (Critical): BattleTargetCursor.StartIndex actor-is-candidate branch (decision 56) and the walk-back past trailing allies have no test; add Start_ActorIsCandidate_SelectsActor (TargetChoice of party+enemies incl. actor).
-- open (Critical): CommandMenu Run -> FleeCommand has no test; add Update_ConfirmRun_ProducesFlee (Down twice, Confirm).
-- open (Suggestion): MovePrevious wrap (index 0 -> last) untested; one test pins the negative modulo.
-- open (Suggestion): Start_SingleEnemy_SelectsLastLivingEnemy runs on three goblins; "SingleEnemy" means single-target choice, rename to Start_SingleTargetChoice_... (slice-given name, developer's call).
+- open (Warning): BattleScene.Finish defeat branch (TitleRequested) has no test; add Update_DefeatOnEnemyTurn_RequestsTitle with a catalog goblin whose attack fells Sarxian, Defend, assert TitleRequested + ActiveBattle null.
+- open (Suggestion): Update_AttackUntilOver asserts experienceBefore + 40 (repository goblin's experienceReward); read it from the catalog so balance edits don't break it.
 - follow-up: none.

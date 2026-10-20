@@ -222,6 +222,18 @@ internal static class MessageIds
 
     public const string TextSpeedInstant = "text_speed_instant";
 
+    /// <summary>The battle command that hits one enemy.</summary>
+    public const string BattleAttack = "battle_attack";
+
+    /// <summary>The battle command that opens the actor's skills.</summary>
+    public const string BattleSkills = "battle_skills";
+
+    /// <summary>The battle command that opens the party's items.</summary>
+    public const string BattleItems = "battle_items";
+
+    /// <summary>The battle command that passes the turn on guard.</summary>
+    public const string BattleDefend = "battle_defend";
+
     /// <summary>The battle command that leaves the fight.</summary>
     public const string BattleRun = "battle_run";
 

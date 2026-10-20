@@ -133,7 +133,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 - [x] **C2. Attack targets in Core** (Core, about 120 lines) → [slices/C2.md](slices/C2.md)
 - [x] **B4a. Command menu and target cursor** (Game, about 230 lines) → [slices/B4a.md](slices/B4a.md)
-- [ ] **B4b. Fighting with Attack, Defend and Run** (Game, about 170 lines) → [slices/B4b.md](slices/B4b.md)
+- [x] **B4b. Fighting with Attack, Defend and Run** (Game, about 170 lines) → [slices/B4b.md](slices/B4b.md)
 - [ ] **B4c. Command panel and target pointer look** (Game, about 260 lines) → [slices/B4c.md](slices/B4c.md)
 
 ### Phase 4: playback

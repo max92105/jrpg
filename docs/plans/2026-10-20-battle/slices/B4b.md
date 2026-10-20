@@ -15,3 +15,4 @@ Part of [the battle plan](../README.md). Design: [design.md](../design.md).
     - [ ] Defend passes the turn.
     - [ ] Cancel while aiming returns to the list.
     - [ ] Losing (a near-dead leader set in a save) goes to the title.
+- **Done, with deviations:** the scene calls `FinishBattle` on every outcome (defeat included, before `TitleRequested`), as design key decision 5 says. Labels are new messages `battle_attack`, `battle_skills`, `battle_items`, `battle_defend`. The marker is a small accent diamond over the target's spot. The weak-enemy test catalog is the repository's with one 1 HP goblin. The flow test waits out the fade, presses Up, then Confirm. Review added `BattleScene_Update_PartyFalls_RequestsTitle` (one goblin strong enough to fell Sarxian); the victory test reads the reward from the catalog.

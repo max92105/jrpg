@@ -210,10 +210,10 @@ public sealed class GameFlowTests : IDisposable
 
         Assert.NotNull(session.ActiveBattle);
         var battlePosition = session.Exploration.PlayerPosition;
-        for (var update = 0; update < 600 && session.ActiveBattle is not null; update++)
-        {
-            flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
-        }
+        flow.Update(_wholeFade, default);
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Up));
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        Assert.Null(session.ActiveBattle);
 
         flow.Update(_wholeFade, default);
         Assert.Equal(battlePosition, session.Exploration.PlayerPosition);

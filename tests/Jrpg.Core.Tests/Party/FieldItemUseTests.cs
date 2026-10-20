@@ -201,6 +201,39 @@ public sealed class FieldItemUseTests
         Assert.Throws<ArgumentException>(() => _fieldItems.TargetChoiceFor(trinket, _sarxian));
     }
 
+    [Fact]
+    public void TargetChoiceForAnyUser_SelfItem_ListsEveryStandingMember()
+    {
+        _jazog.Vitals.TakeDamage(1000);
+        var tonic = Item("tonic", EffectKind.RestoreHp, 10, Targeting.Self);
+
+        var choice = _fieldItems.TargetChoiceForAnyUser(tonic);
+
+        Assert.Equal([_sarxian, _reserve], choice.Candidates);
+        Assert.False(choice.TakesAll);
+    }
+
+    [Fact]
+    public void TargetChoiceForAnyUser_HealItem_MatchesTheLeadersChoice()
+    {
+        var potion = Item("potion", EffectKind.RestoreHp, 15, Targeting.SingleAlly);
+
+        var choice = _fieldItems.TargetChoiceForAnyUser(potion);
+
+        Assert.Equal(_fieldItems.TargetChoiceFor(potion, _sarxian).Candidates, choice.Candidates);
+    }
+
+    [Fact]
+    public void UseOn_SelfItemOnNonLeader_HealsThemAsTheirOwnUser()
+    {
+        var tonic = Owned(Item("tonic", EffectKind.RestoreHp, 10, Targeting.Self), copies: 1);
+
+        var amounts = _fieldItems.UseOn(tonic, [_jazog]);
+
+        Assert.Equal([10], amounts);
+        Assert.Equal(50, _jazog.Vitals.Hp);
+    }
+
     private static PartyMember Member(string id, int hp) =>
         new PartyMemberBuilder().WithId(id).WithVitals(hp, maxHp: 100, mp: 0, maxMp: 0).Build();
 

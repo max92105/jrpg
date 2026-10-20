@@ -650,8 +650,15 @@ P1 was split in two (developer, 2026-10-19), since it came to about 500 lines. T
     - `CanUse` is false when no target is legal, such as a revive with nobody fallen.
   - **Tests:** `FieldItemUse_TargetChoiceFor_HealItem_ListsLivingMembersIncludingReserve`, `FieldItemUse_TargetChoiceFor_ReviveItem_ListsOnlyFallen`, `FieldItemUse_TargetChoiceFor_AllAlliesItem_TakesAll`, `FieldItemUse_TargetChoiceFor_SelfItem_ListsOnlyUser`, `FieldItemUse_CanUse_ReviveWithNobodyFallen_ReturnsFalse`.
 
-- [ ] **P2b. Using items from the inventory** (Game, about 270 lines)
-  - **Goal:** Confirm on a usable consumable opens the target picker (legacy use popup: portraits with HP/MP).
+P2b was split in two (developer, 2026-10-19), since it came to about 420 lines with the legacy popup look. P2b-1 makes using items work with a plain picker; P2b-2 gives it the legacy portraits.
+
+- [x] **P2b-1. Using items from the inventory** (Game, about 270 lines)
+  - **Done, with deviations:**
+    - **The rule is in Core** (review): `FieldItemUse.TargetChoiceForAnyUser` (a "self" item goes to anyone standing, on themselves) and `UseOn` (a single target is the user; the leader stands in for "all" items), with 3 Core tests.
+    - New types: `Menus/ItemUseDialog`, which turns input into calls and the result into text, and `Menus/ItemTargetPickerView`, the plain list in the band. `ListCursor.Select` keeps the row after a use.
+    - An "all" item with a single target, such as the feather with one member fallen, names that member. With several, it says "{item} was used." (`item_used`).
+    - Tests use `Method_Scenario_Result` names. Extra: the feather with two fallen, Cancel while choosing, and `ListCursor` `Select` (2).
+  - **Goal:** Confirm on a usable consumable opens the target picker: a plain list of members with HP and MP, in the legacy `DialogStyle` band, with members the item can't be used on dimmed.
     - A single-target item picks one member; an "all" item selects everyone and confirms once.
     - The user is the chosen target (question 91).
     - The result shows as "{member} recovers {amount} HP." (placeholder wording, question 91), and the counts and bars update.
@@ -662,6 +669,11 @@ P1 was split in two (developer, 2026-10-19), since it came to about 500 lines. T
     - [ ] Use a potion on a member at full HP and on a hurt one (set by hand in a save).
     - [ ] Use an all-allies item.
     - [ ] The revive is greyed with nobody fallen.
+
+- [ ] **P2b-2. Item target portraits** (Game, about 150 lines)
+  - **Goal:** the picker looks like the legacy use popup: a "Use <item>" heading with its icon, and each member as a portrait card with HP and MP bars (legacy `CharacterPortrait`), dimmed when the item can't be used on them and lit when selected.
+  - **Verify by hand:**
+    - [ ] The cards match the legacy popup, and the selection is clear.
 
 - [ ] **P3a. Equipment page: members, slots and stats** (Game, about 220 lines)
   - **Goal:** an Equipment tab in the legacy `EquipmentView` layout: one member at a time (PreviousTab/NextTab), the weapon and armor slots with what's worn, the member's stats, and "Remove all" (question 60; through `PartyEquipment.TryUnequip`).

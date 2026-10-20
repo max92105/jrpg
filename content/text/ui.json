@@ -50,5 +50,11 @@
   "inventory_armor": "Armor",
   "inventory_column_name": "Name",
   "inventory_column_quantity": "Qty",
-  "inventory_empty": "Nothing here."
+  "inventory_empty": "Nothing here.",
+  "item_use_title": "Use {item}",
+  "item_target_vitals": "HP {hp} / {maxHp}   MP {mp} / {maxMp}",
+  "item_used_hp": "{member} recovers {amount} HP.",
+  "item_used_mp": "{member} recovers {amount} MP.",
+  "item_used_revive": "{member} is revived with {amount} HP.",
+  "item_used": "{item} was used."
 }

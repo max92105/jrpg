@@ -82,4 +82,23 @@ public sealed class ListCursorTests
 
         Assert.Equal(0, cursor.FirstVisible);
     }
+
+    [Fact]
+    public void Select_PastTheEnd_SelectsLastAndScrolls()
+    {
+        var cursor = new ListCursor(20, _ => true, visibleRows: 5);
+
+        cursor.Select(25);
+
+        Assert.Equal(19, cursor.Selected);
+        Assert.Equal(15, cursor.FirstVisible);
+    }
+
+    [Fact]
+    public void Select_DisabledEntry_Throws()
+    {
+        var cursor = new ListCursor(3, index => index != 1);
+
+        Assert.Throws<ArgumentException>(() => cursor.Select(1));
+    }
 }

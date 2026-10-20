@@ -42,6 +42,20 @@ internal sealed class ListCursor
     /// <summary>The index of the first entry in the visible window.</summary>
     public int FirstVisible { get; private set; }
 
+    /// <summary>Selects the entry at <paramref name="index"/>, or the last one when the list got shorter; it must be enabled.</summary>
+    /// <exception cref="ArgumentException">That entry is disabled.</exception>
+    public void Select(int index)
+    {
+        var clamped = Math.Clamp(index, 0, _count - 1);
+        if (!_isEnabled(clamped))
+        {
+            throw new ArgumentException($"Entry {clamped} is disabled.", nameof(index));
+        }
+
+        Selected = clamped;
+        ScrollToSelected();
+    }
+
     public void MoveUp() => Step(-1);
 
     public void MoveDown() => Step(1);

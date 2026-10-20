@@ -69,8 +69,12 @@ internal sealed class InventoryPage : IMenuPage
     private readonly SpriteFontBase _labelFont;
     private readonly InventoryLabels _labels;
     private readonly string[] _categoryNames;
+    private readonly ItemUseDialog _itemUse;
     private ListCursor? _rowCursor;
     private ItemRow[] _rows = [];
+
+    // What the last item used did; shown in the description's place until the player moves on.
+    private string? _notice;
 
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared gradient textures.</param>
@@ -86,12 +90,14 @@ internal sealed class InventoryPage : IMenuPage
         _labelFont = text.Fonts.FontAt(LabelPixels);
         _labels = InventoryLabels.From(text.Messages, _labelFont, _bodyFont);
         _categoryNames = [.. _tabs.Select(tab => text.Messages.Text(tab.LabelId))];
-        ShowCategory();
+        _itemUse = new ItemUseDialog(session, text, ui);
+        ShowRowsFrom(0);
     }
 
     public string TitleMessageId => MessageIds.MenuInventory;
 
-    public bool LeavesOnCancel => true;
+    /// <summary>False while choosing who to use an item on: Cancel closes that instead.</summary>
+    public bool LeavesOnCancel => !_itemUse.IsOpen;
 
     public InventoryCategory Category => _tabs[_categoryCursor.Selected].Category;
 
@@ -101,20 +107,71 @@ internal sealed class InventoryPage : IMenuPage
     /// <summary>The selected row's index; null when the category is empty.</summary>
     public int? SelectedRow => _rowCursor?.Selected;
 
+    /// <summary>The last use's result, until the player moves on; null otherwise.</summary>
+    public string? Notice => _notice;
+
+    /// <summary>Whether the player is choosing who to use an item on.</summary>
+    public bool IsChoosingTarget => _itemUse.IsOpen;
+
     public SceneRequest? Update(InputFrame input)
     {
+        if (_itemUse.IsOpen)
+        {
+            if (_itemUse.Update(input) is { } result)
+            {
+                _notice = result;
+                ShowRowsFrom(_rowCursor?.Selected ?? 0);
+            }
+
+            return null;
+        }
+
+        if (input.IsPressed(GameButton.Confirm))
+        {
+            OpenItemUse();
+            return null;
+        }
+
+        MoveThroughList(input);
+        return null;
+    }
+
+    public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
+    {
+        DrawList(batch, textures, area, opacity);
+        _itemUse.Draw(batch, textures, opacity);
+    }
+
+    private void OpenItemUse()
+    {
+        if (_rowCursor is not null && _rows[_rowCursor.Selected].IsUsable)
+        {
+            _itemUse.Open(_catalog.Items[_rows[_rowCursor.Selected].ItemId]);
+        }
+    }
+
+    private static bool MovesThroughList(InputFrame input) =>
+        input.IsPressed(GameButton.PreviousTab) || input.IsPressed(GameButton.NextTab) || input.IsPressed(GameButton.Up) || input.IsPressed(GameButton.Down);
+
+    private void MoveThroughList(InputFrame input)
+    {
+        if (MovesThroughList(input))
+        {
+            _notice = null;
+        }
+
         if (input.IsPressed(GameButton.PreviousTab))
         {
             _categoryCursor.MoveUp();
-            ShowCategory();
-            return null;
+            ShowRowsFrom(0);
+            return;
         }
 
         if (input.IsPressed(GameButton.NextTab))
         {
             _categoryCursor.MoveDown();
-            ShowCategory();
-            return null;
+            ShowRowsFrom(0);
+            return;
         }
 
         if (input.IsPressed(GameButton.Up))
@@ -126,11 +183,9 @@ internal sealed class InventoryPage : IMenuPage
         {
             _rowCursor?.MoveDown();
         }
-
-        return null;
     }
 
-    public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
+    private void DrawList(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
         DrawRail(batch, textures, area, opacity);
         var left = area.X + RailWidth + RailGap + Margin;
@@ -140,6 +195,12 @@ internal sealed class InventoryPage : IMenuPage
         DrawColumnTitles(batch, textures, new Rectangle(left, top + ColumnTitlesTop, width, 0), opacity);
 
         var rowsTop = top + RowsTop;
+        var descriptionPosition = new Vector2(left + RowInset, rowsTop + (VisibleRows * RowHeight) + DescriptionGap);
+        if (_notice is not null)
+        {
+            batch.DrawString(_bodyFont, _notice, descriptionPosition, UiTheme.TextPrimary * opacity);
+        }
+
         if (_rowCursor is null)
         {
             var emptyLeft = left + ((width - _labels.EmptyWidth) / 2f);
@@ -154,23 +215,27 @@ internal sealed class InventoryPage : IMenuPage
             DrawRow(batch, textures, row, index, opacity);
         }
 
-        var descriptionTop = rowsTop + (VisibleRows * RowHeight) + DescriptionGap;
-        batch.DrawString(_bodyFont, _rows[_rowCursor.Selected].Description, new Vector2(left + RowInset, descriptionTop), UiTheme.TextSecondary * opacity);
+        if (_notice is null)
+        {
+            batch.DrawString(_bodyFont, _rows[_rowCursor.Selected].Description, descriptionPosition, UiTheme.TextSecondary * opacity);
+        }
     }
 
-    // Built when the category changes, so drawing formats nothing; the cursor goes back to the first row.
-    private void ShowCategory()
+    // Built when the category or the items change, so drawing formats nothing. The cursor stays on the same row, or the
+    // last one once the list got shorter.
+    private void ShowRowsFrom(int selectedRow)
     {
         var shown = InventoryFilter.Select(Category, _session.Inventory.Entries, _catalog.Items);
         _rows = [.. shown.Select(RowOf)];
         _rowCursor = _rows.Length == 0 ? null : new ListCursor(_rows.Length, _ => true, VisibleRows);
+        _rowCursor?.Select(selectedRow);
     }
 
     private ItemRow RowOf(InventoryEntry entry)
     {
         var item = _catalog.Items[entry.ItemId];
         var quantity = entry.Quantity.ToString(CultureInfo.InvariantCulture);
-        return new ItemRow(item.Id, item.Name, item.IconFile, quantity, _bodyFont.MeasureString(quantity).X, item.Description);
+        return new ItemRow(item.Id, item.Name, item.IconFile, quantity, _bodyFont.MeasureString(quantity).X, item.Description, _session.FieldItems.CanUse(item));
     }
 
     // Legacy SectionHeaderStyle over the rows' columns: Name after the icon column, Qty at the right.
@@ -195,12 +260,13 @@ internal sealed class InventoryPage : IMenuPage
         }
 
         var item = _rows[index];
+        var textColor = (item.IsUsable ? UiTheme.TextPrimary : UiTheme.TextDisabled) * opacity;
         var textTop = row.Y + ((RowHeight - _bodyFont.LineHeight) / 2f);
         var iconTop = row.Y + ((RowHeight - RowIconSize) / 2);
         batch.Draw(_ui.Icon(textures, item.IconFile, RowIconSize), new Vector2(row.X + RowInset, iconTop), Color.White * opacity);
-        batch.DrawString(_bodyFont, item.Name, new Vector2(row.X + RowInset + IconColumn, textTop), UiTheme.TextPrimary * opacity);
+        batch.DrawString(_bodyFont, item.Name, new Vector2(row.X + RowInset + IconColumn, textTop), textColor);
         var quantityLeft = row.Right - QuantityInset - item.QuantityWidth;
-        batch.DrawString(_bodyFont, item.Quantity, new Vector2(quantityLeft, textTop), UiTheme.TextPrimary * opacity);
+        batch.DrawString(_bodyFont, item.Quantity, new Vector2(quantityLeft, textTop), textColor);
     }
 
     // Legacy CategoryRailStyle: a dark strip with hairlines left and right, one icon tab per category.
@@ -236,7 +302,7 @@ internal sealed class InventoryPage : IMenuPage
     private sealed record CategoryTab(InventoryCategory Category, string LabelId, string IconFile);
 
     // One owned item's row text.
-    private sealed record ItemRow(string ItemId, string Name, string IconFile, string Quantity, float QuantityWidth, string Description);
+    private sealed record ItemRow(string ItemId, string Name, string IconFile, string Quantity, float QuantityWidth, string Description, bool IsUsable);
 
     // The page's fixed text.
     private sealed record InventoryLabels(string Name, string Quantity, float QuantityWidth, string Empty, float EmptyWidth)

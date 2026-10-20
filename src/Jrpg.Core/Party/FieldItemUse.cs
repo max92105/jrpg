@@ -32,6 +32,32 @@ public sealed class FieldItemUse(PartyState party, Inventory inventory)
         return new TargetChoice<PartyMember>(candidates, TargetRules.HitsEveryValidTarget(effect.Targeting));
     }
 
+    /// <summary>
+    /// Who the item can be used on from the menu, where the chosen member is also the user (question 91, placeholder): a
+    /// "self" item can go to anyone standing, on themselves; for any other item the user changes nothing.
+    /// </summary>
+    /// <exception cref="ArgumentException">The item has no effect.</exception>
+    public TargetChoice<PartyMember> TargetChoiceForAnyUser(ItemDefinition item)
+    {
+        if (item.Effect?.Targeting != Targeting.Self)
+        {
+            return TargetChoiceFor(item, party.Leader);
+        }
+
+        var selfUsers = party.Members.Where(member => TargetChoiceFor(item, member).Candidates.Contains(member)).ToList();
+        return new TargetChoice<PartyMember>(selfUsers, TakesAll: false);
+    }
+
+    /// <summary>
+    /// Uses the item on targets chosen from <see cref="TargetChoiceForAnyUser"/>: a single target is also the user, and the
+    /// leader stands in for an item that takes everyone.
+    /// </summary>
+    /// <returns>The amount actually applied to each target, in target order.</returns>
+    /// <exception cref="InvalidOperationException">The item can't be used now (<see cref="CanUse"/>).</exception>
+    /// <exception cref="ArgumentException">The targets aren't legal for this item.</exception>
+    public IReadOnlyList<int> UseOn(ItemDefinition item, IReadOnlyList<PartyMember> targets) =>
+        Use(item, targets.Count == 1 ? targets[0] : party.Leader, targets);
+
     /// <param name="item">A consumable usable from the menu.</param>
     /// <param name="user">Whoever uses it; only matters for "self" items, and may be fallen.</param>
     /// <param name="targets">One target, or every valid target for an "all" item.</param>

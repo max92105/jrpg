@@ -137,4 +137,22 @@ internal static class MessageIds
 
     /// <summary>Shown when the party owns nothing in the category.</summary>
     public const string InventoryEmpty = "inventory_empty";
+
+    /// <summary>Placeholder <c>{item}</c>: the heading over the item target picker.</summary>
+    public const string ItemUseTitle = "item_use_title";
+
+    /// <summary>Placeholders <c>{hp}</c>, <c>{maxHp}</c>, <c>{mp}</c>, <c>{maxMp}</c>: a member's row in the target picker.</summary>
+    public const string ItemTargetVitals = "item_target_vitals";
+
+    /// <summary>Placeholders <c>{member}</c> and <c>{amount}</c> (question 91, placeholder wording).</summary>
+    public const string ItemUsedHp = "item_used_hp";
+
+    /// <summary>Placeholders <c>{member}</c> and <c>{amount}</c>.</summary>
+    public const string ItemUsedMp = "item_used_mp";
+
+    /// <summary>Placeholders <c>{member}</c> and <c>{amount}</c>: the HP the member comes back with.</summary>
+    public const string ItemUsedRevive = "item_used_revive";
+
+    /// <summary>Placeholder <c>{item}</c>: an item used on several members at once.</summary>
+    public const string ItemUsed = "item_used";
 }

@@ -22,13 +22,9 @@ internal sealed class BattleScene : IScene
     private static readonly Vector2 _actorPosition = new(1424, 640);
     private static readonly Vector2 _runPosition = new(1464, 700);
 
-    // Placeholder marks on each battler's spot until battlers are drawn (plan 2026-10-20-battle, B2b).
-    private static readonly Color _spotMark = Color.White * 0.25f;
-
     private readonly GameSession _session;
     private readonly UiTextures _ui;
-    private readonly IReadOnlyList<Combatant> _combatants;
-    private readonly Rectangle[] _spots;
+    private readonly BattlersView _battlers;
     private readonly BattleTurnSequence _sequence;
     private readonly string _backgroundFile;
     private readonly SpriteFontBase _font;
@@ -37,15 +33,14 @@ internal sealed class BattleScene : IScene
 
     /// <param name="session">The playthrough whose active battle this screen shows.</param>
     /// <param name="text">Messages and fonts.</param>
-    /// <param name="ui">The shared code-drawn textures: the vignette and the top shade.</param>
+    /// <param name="ui">The shared code-drawn textures: the vignette, the top shade and shrunk battlers.</param>
     /// <exception cref="InvalidOperationException">The session has no active battle.</exception>
     public BattleScene(GameSession session, ScreenText text, UiTextures ui)
     {
         _session = session;
         _ui = ui;
         var battle = session.ActiveBattle ?? throw new InvalidOperationException("A battle screen needs an active battle.");
-        _combatants = battle.Combatants;
-        _spots = BattleLayout.SpotsOf(battle.Combatants);
+        _battlers = new BattlersView(battle.Combatants, ui);
         _sequence = new BattleTurnSequence(battle, session.EnemyTactics);
         _backgroundFile = session.Exploration.PendingEncounter?.BackgroundFile
             ?? throw new InvalidOperationException("A battle screen needs the encounter it fights.");
@@ -80,13 +75,7 @@ internal sealed class BattleScene : IScene
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
         DrawBackdrop(batch, textures);
-        for (var index = 0; index < _combatants.Count; index++)
-        {
-            if (_combatants[index].IsAlive)
-            {
-                batch.Draw(textures.Pixel, _spots[index], _spotMark);
-            }
-        }
+        _battlers.Draw(batch, textures);
 
         if (_isFinished || !_sequence.IsAwaitingCommand)
         {

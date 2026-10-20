@@ -14,7 +14,10 @@ public static class ArtFolders
     /// <summary>Item and menu icons.</summary>
     public const string Icons = "icons";
 
-    /// <summary>Full-screen pictures behind the title and the menus.</summary>
+    /// <summary>Battle sprites: party members' and enemies' pictures on the battle screen.</summary>
+    public const string Battlers = "battlers";
+
+    /// <summary>Full-screen pictures behind the title, the menus and battles.</summary>
     public const string Backgrounds = "backgrounds";
 
     public static string RootIn(string contentRoot) => Path.Combine(contentRoot, "art");

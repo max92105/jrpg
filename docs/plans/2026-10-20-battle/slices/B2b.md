@@ -19,3 +19,4 @@ Part of [the battle plan](../README.md). Design: [design.md](../design.md).
     - [ ] The goblin's pixels stay crisp (no smoothing).
     - [ ] Sarxian's painting shrinks cleanly.
     - [ ] Formation as in legacy.
+- **Done, with deviations:** drawing lives in a new `Battle/BattlersView`, so `BattleScene` stays a router. Only living combatants are drawn, so fallen party members disappear too (legacy `AnimateDeath` faded any combatant out). `BattlerScaling` is a record struct (`DrawnSize`, `IsShrunkSmoothly`); `UiTextures.Icon` and `Battler` share one `ShrunkOnce` helper and one cache keyed by folder, instead of a third copy. Review added the 512 px boundary test and a missing party battle sprite test.

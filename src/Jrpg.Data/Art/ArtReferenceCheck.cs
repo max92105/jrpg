@@ -12,9 +12,9 @@ namespace Jrpg.Data.Art;
 public static class ArtReferenceCheck
 {
     /// <summary>
-    /// Every tilesheet, the field sprite, every dialogue portrait, every party member's portrait, every item's icon and
-    /// every encounter's background exist as PNGs, and every tile's cell lies inside its sheet. Battle art names must
-    /// match their files exactly, case included.
+    /// Every tilesheet, the field sprite, every dialogue portrait, every party member's portrait, every item's icon,
+    /// every battle sprite and every encounter's background exist as PNGs, and every tile's cell lies inside its sheet.
+    /// Battle art names must match their files exactly, case included.
     /// </summary>
     /// <returns>One line per problem, naming the file; empty when the art is complete.</returns>
     public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string artRoot)
@@ -44,6 +44,9 @@ public static class ArtReferenceCheck
         AddMissing(problems, artRoot, ArtFolders.Portraits, members.Select(member => (member.PortraitFile, $"party member '{member.Id}'")));
         var items = catalog.Items.Values.OrderBy(item => item.Id, StringComparer.Ordinal);
         AddMissing(problems, artRoot, ArtFolders.Icons, items.Select(item => (item.IconFile, $"item '{item.Id}'")));
+        AddMissingByExactName(problems, artRoot, ArtFolders.Battlers, members.Select(member => (member.BattleSpriteFile, $"party member '{member.Id}'")));
+        var enemies = catalog.Enemies.Values.OrderBy(enemy => enemy.Id, StringComparer.Ordinal);
+        AddMissingByExactName(problems, artRoot, ArtFolders.Battlers, enemies.Select(enemy => (enemy.BattleSpriteFile, $"enemy '{enemy.Id}'")));
         var encounters = catalog.Encounters.Values.OrderBy(encounter => encounter.Id, StringComparer.Ordinal);
         AddMissingByExactName(problems, artRoot, ArtFolders.Backgrounds, encounters.Select(encounter => (encounter.BackgroundFile, $"encounter '{encounter.Id}'")));
         return problems;

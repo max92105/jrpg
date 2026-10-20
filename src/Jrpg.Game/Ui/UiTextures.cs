@@ -31,7 +31,7 @@ internal sealed class UiTextures
     private Texture2D? _battleVignette;
     private Texture2D? _topShade;
     private readonly Dictionary<(string File, int Size), Texture2D> _diamondPortraits = [];
-    private readonly Dictionary<(string File, int Size), Texture2D> _icons = [];
+    private readonly Dictionary<(string Folder, string File, int Size), Texture2D> _shrunk = [];
     private readonly Dictionary<ImmutableArray<GradientStop>, Texture2D> _gradients = [];
 
     /// <summary>A tab that isn't selected: the arrow, dark and faintly outlined.</summary>
@@ -91,19 +91,14 @@ internal sealed class UiTextures
     /// <param name="textures">Where the icon is read and the small one made.</param>
     /// <param name="iconFile">In the icons folder.</param>
     /// <param name="size">The drawn square's side in pixels.</param>
-    public Texture2D Icon(TextureLibrary textures, string iconFile, int size)
-    {
-        if (!_icons.TryGetValue((iconFile, size), out var baked))
-        {
-            var source = textures.Get(ArtFolders.Icons, iconFile);
-            var pixels = new Color[source.Width * source.Height];
-            source.GetData(pixels);
-            baked = textures.Create(size, size, SquareShrink.Bake(pixels, source.Width, source.Height, size));
-            _icons.Add((iconFile, size), baked);
-        }
+    public Texture2D Icon(TextureLibrary textures, string iconFile, int size) => ShrunkOnce(textures, ArtFolders.Icons, iconFile, size);
 
-        return baked;
-    }
+    /// <summary>A painted battler shrunk smoothly (<see cref="SquareShrink"/>), once per file and size (decision 100).</summary>
+    /// <param name="textures">Where the battler is read and the small one made.</param>
+    /// <param name="spriteFile">In the battlers folder.</param>
+    /// <param name="size">The drawn square's side in pixels.</param>
+    public Texture2D Battler(TextureLibrary textures, string spriteFile, int size) =>
+        ShrunkOnce(textures, ArtFolders.Battlers, spriteFile, size);
 
     /// <summary>
     /// A gradient as one row, stretched over whatever shows it, made once per gradient. The theme's gradients are
@@ -135,6 +130,20 @@ internal sealed class UiTextures
         var line = Gradient(textures, UiTheme.HighlightLine);
         batch.Draw(line, new Rectangle(row.X, row.Y, row.Width, 1), tint);
         batch.Draw(line, new Rectangle(row.X, row.Bottom - 1, row.Width, 1), tint);
+    }
+
+    private Texture2D ShrunkOnce(TextureLibrary textures, string folder, string file, int size)
+    {
+        if (!_shrunk.TryGetValue((folder, file, size), out var baked))
+        {
+            var source = textures.Get(folder, file);
+            var pixels = new Color[source.Width * source.Height];
+            source.GetData(pixels);
+            baked = textures.Create(size, size, SquareShrink.Bake(pixels, source.Width, source.Height, size));
+            _shrunk.Add((folder, file, size), baked);
+        }
+
+        return baked;
     }
 
     private static Color[] SolidRow(Color color, int width)

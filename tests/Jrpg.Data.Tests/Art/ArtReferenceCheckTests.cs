@@ -84,6 +84,28 @@ public sealed class ArtReferenceCheckTests
     }
 
     [Fact]
+    public void FindProblems_MissingBattleSprite_NamesTheEnemy()
+    {
+        var goblin = _catalog.Enemies["goblin"] with { BattleSpriteFile = "Gone.png" };
+        var catalog = _catalog with { Enemies = new Dictionary<string, EnemyDefinition>(_catalog.Enemies) { ["goblin"] = goblin } };
+
+        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
+
+        Assert.Equal($"battlers/Gone.png: not found in {_artRoot}. Named by enemy 'goblin'.", problem);
+    }
+
+    [Fact]
+    public void FindProblems_MissingBattleSprite_NamesTheMember()
+    {
+        var jazog = _catalog.PartyMembers["jazog"] with { BattleSpriteFile = "Gone.png" };
+        var catalog = _catalog with { PartyMembers = new Dictionary<string, PartyMemberDefinition>(_catalog.PartyMembers) { ["jazog"] = jazog } };
+
+        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
+
+        Assert.Equal($"battlers/Gone.png: not found in {_artRoot}. Named by party member 'jazog'.", problem);
+    }
+
+    [Fact]
     public void FindProblems_MissingEncounterBackground_NamesTheEncounter()
     {
         var catalog = WithGoblinTrioBackground("Gone.png");

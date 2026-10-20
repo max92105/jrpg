@@ -535,7 +535,14 @@ S1 was split in two (developer, 2026-10-19), since it came to about 600 lines. S
     - `Saving/SaveSlotEntry`: one file's summary from a repaired `SaveGame` and the catalog.
   - **Tests:** `SaveSlots_NameOf_FirstSlot_IsSlot01`, `SaveSlots_ReadAll_EmptyFolder_GivesTwentyEmptyEntriesInOrder`, `SaveSlots_Write_ThenReadAll_SlotShowsMapNameAndPlayTime` (temporary folder, fixed clock), `SaveSlots_ReadAll_DamagedFile_IsUnreadable`.
 
-- [ ] **S1-2. Saving from the menu** (Game, about 350 lines)
+- [x] **S1-2. Saving from the menu** (Game, about 350 lines)
+  - **Done, with deviations:**
+    - 8 rows of 92 px fit a page, not the placeholder 5. The party shows as "Name Lv N" rather than legacy's small portraits, as the plan says.
+    - Dates are written `yyyy-MM-dd HH:mm` in local time; `PlayTimeText.Format` is shared with the header.
+    - Save comes first among the System entries, as in legacy. `SavePage` is shown in the System page's place, not as an `IMenuPage`, and Cancel goes back to the entries. The System entries became `OpensSaves` and `AsksFirst` records.
+    - `UiTheme.ButtonStroke` is renamed `Stroke`, since row separators use it too.
+    - Tests: the 3 `ListCursor` window tests, `SystemPage` `Update_ConfirmSave_OpensSaveFilesUntilCancel`, `SavePage` `Update_ConfirmSlot_WritesSave` and `Open_AfterSavingElsewhere_ShowsTheNewSave`. `GameFlowTests` and `GameMenuSceneTests` press Down past Save. A test helper, `UnwrittenSaveSlots`, gives menus save files that never touch the disk.
+    - A failed write isn't caught yet: S3 says so to the player.
   - **Goal:** System gains Save. It opens the 20 files in the legacy `SaveSlotPanel` look: empty, damaged, or with location, play time, save date and the active party's names and levels. Confirm writes the save and the entry updates. Overwrite doesn't ask yet (S3).
   - **New types (Game):**
     - `Hosting/GamePaths`: where the game keeps its files. `SaveDirectory` = `%LocalAppData%/Jrpg/Saves` (decision 64).

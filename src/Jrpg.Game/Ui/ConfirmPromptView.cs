@@ -76,7 +76,7 @@ internal sealed class ConfirmPromptView
         batch.DrawString(_questionFont, prompt.Question, questionPosition, UiTheme.TextPrimary * opacity);
 
         DrawButton(batch, textures, new PromptButton(_yesButton, _yes, _yesWidth, prompt.IsYesSelected, UiTheme.Accent), opacity);
-        DrawButton(batch, textures, new PromptButton(_noButton, _no, _noWidth, !prompt.IsYesSelected, UiTheme.ButtonStroke), opacity);
+        DrawButton(batch, textures, new PromptButton(_noButton, _no, _noWidth, !prompt.IsYesSelected, UiTheme.Stroke), opacity);
     }
 
     private void DrawButton(SpriteBatch batch, TextureLibrary textures, PromptButton button, float opacity)

@@ -7,6 +7,7 @@ using Jrpg.Game.Flow;
 using Jrpg.Game.Input;
 using Jrpg.Game.Scenes;
 using Jrpg.Game.Tests.Input;
+using Jrpg.Game.Tests.Saving;
 using Jrpg.Game.Tests.Ui;
 
 namespace Jrpg.Game.Tests.Flow;
@@ -27,7 +28,7 @@ public sealed class GameFlowTests
     [Fact]
     public void Constructor_WaitingOnTitle_HasNoSession()
     {
-        var flow = new GameFlow(_catalog, RepositoryScreenText.Text);
+        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create());
 
         flow.Update(_wholeFade, default);
 
@@ -37,7 +38,7 @@ public sealed class GameFlowTests
     [Fact]
     public void Update_QuitConfirmed_ReturnsQuitRequest()
     {
-        var flow = new GameFlow(_catalog, RepositoryScreenText.Text);
+        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create());
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
 
         var request = flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
@@ -120,6 +121,7 @@ public sealed class GameFlowTests
         flow.Update(_oneUpdate, InputFrames.PressingEscape);
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Left));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
@@ -137,6 +139,7 @@ public sealed class GameFlowTests
         flow.Update(_oneUpdate, InputFrames.PressingEscape);
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Left));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
@@ -151,7 +154,7 @@ public sealed class GameFlowTests
     // New game is the title's first entry, so Confirm alone picks it; the fade starts on that update.
     private static GameFlow FlowWithNewGameConfirmed()
     {
-        var flow = new GameFlow(_catalog, RepositoryScreenText.Text);
+        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create());
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         return flow;
     }

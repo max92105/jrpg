@@ -4,6 +4,7 @@ using Jrpg.Core.Session;
 using Jrpg.Game.Exploration;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Rendering;
+using Jrpg.Game.Saving;
 using Jrpg.Game.Title;
 using Jrpg.Game.Ui;
 
@@ -16,15 +17,18 @@ namespace Jrpg.Game.Flow;
 internal sealed class SceneFactory
 {
     private readonly ContentCatalog _catalog;
+    private readonly SaveSlots _saveSlots;
     private readonly ScreenText _text;
     private readonly MapArt _art;
     private readonly UiTextures _ui = new();
 
     /// <param name="catalog">The content as played, without random battles.</param>
     /// <param name="text">Messages and fonts for everything a scene writes.</param>
-    public SceneFactory(ContentCatalog catalog, ScreenText text)
+    /// <param name="saveSlots">The save files the menu writes.</param>
+    public SceneFactory(ContentCatalog catalog, ScreenText text, SaveSlots saveSlots)
     {
         _catalog = catalog;
+        _saveSlots = saveSlots;
         _text = text;
         _art = new MapArt(catalog, MapView.CellPixels);
     }
@@ -33,7 +37,9 @@ internal sealed class SceneFactory
 
     /// <param name="session">The playthrough the header reports on.</param>
     public GameMenuScene CreateGameMenu(GameSession session) =>
-        new(_text, _ui, new MenuHeader(_text, session), [new StatusPage(_text, _ui, session, _catalog), new SystemPage(_text, _ui)]);
+        new(_text, _ui, new MenuHeader(_text, session), [new StatusPage(_text, _ui, session, _catalog), CreateSystemPage(session)]);
 
     public ExplorationScene CreateExploration(ExplorationState exploration) => new(exploration, _catalog, _art, _text);
+
+    private SystemPage CreateSystemPage(GameSession session) => new(_text, _ui, new SavePage(_saveSlots, session, _text, _ui));
 }

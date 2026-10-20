@@ -100,8 +100,8 @@ internal static class UiTheme
     /// <summary>Legacy <c>MenuButtonStyle</c>'s faint white fill.</summary>
     public static Color ButtonFill { get; } = FromLegacy(0x1AFFFFFF);
 
-    /// <summary>Legacy <c>Brush.Stroke</c>: a button's outline.</summary>
-    public static Color ButtonStroke { get; } = FromLegacy(0x2EFFFFFF);
+    /// <summary>Legacy <c>Brush.Stroke</c>: a button's outline, and the line between list rows.</summary>
+    public static Color Stroke { get; } = FromLegacy(0x2EFFFFFF);
 
     /// <summary>Legacy <c>Brush.SectionLine</c>: the underline of a section title, fading out to the right.</summary>
     public static ImmutableArray<GradientStop> SectionLine { get; } =
@@ -123,6 +123,22 @@ internal static class UiTheme
     /// <summary>Legacy <c>XpBarFill</c>: goldenrod, bright gold, then pale wheat.</summary>
     public static ImmutableArray<GradientStop> XpBar { get; } =
         [new(0, FromLegacy(0xFFB8860B)), new(0.5f, FromLegacy(0xFFFFD700)), new(1, FromLegacy(0xFFF5DEB3))];
+
+    /// <summary>Legacy <c>Color.Text.Disabled</c>: an empty or unreadable save file.</summary>
+    public static Color TextDisabled { get; } = FromLegacy(0xFF5C606B);
+
+    /// <summary>Legacy <c>Brush.Highlight</c>: the selected list row, fading out to the right.</summary>
+    public static ImmutableArray<GradientStop> Highlight { get; } =
+        [new(0, FromLegacy(0x993D4590)), new(0.45f, FromLegacy(0x665A64B8)), new(1, FromLegacy(0x005A64B8))];
+
+    /// <summary>Legacy <c>Brush.HighlightLine</c>: the thin lines above and below the selected row.</summary>
+    public static ImmutableArray<GradientStop> HighlightLine { get; } =
+    [
+        new(0, FromLegacy(0x00FFFFFF)),
+        new(0.15f, FromLegacy(0xB3E6EAFF)),
+        new(0.8f, FromLegacy(0x4DE6EAFF)),
+        new(1, FromLegacy(0x00FFFFFF)),
+    ];
 
     // Legacy XAML colors are #AARRGGBB with straight alpha; the game draws premultiplied.
     private static Color FromLegacy(uint argb) => Color.FromNonPremultiplied(

@@ -2,6 +2,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Session;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
+using Jrpg.Game.Saving;
 using Jrpg.Game.Scenes;
 using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
@@ -26,10 +27,13 @@ internal sealed class GameFlow : IScene
     private readonly MenuTransitions _menus;
     private SceneRequest? _requestBehindFade;
 
-    public GameFlow(ContentCatalog catalog, ScreenText text)
+    /// <param name="catalog">The content, as loaded.</param>
+    /// <param name="text">Messages and fonts.</param>
+    /// <param name="saveSlots">The player's save files.</param>
+    public GameFlow(ContentCatalog catalog, ScreenText text, SaveSlots saveSlots)
     {
         var playedCatalog = EncounterFreeContent.Of(catalog);
-        var factory = new SceneFactory(playedCatalog, text);
+        var factory = new SceneFactory(playedCatalog, text, saveSlots);
         _sessions = new SessionTransitions(playedCatalog, _scenes, factory);
         _menus = new MenuTransitions(_scenes, factory);
         _scenes.Push(factory.CreateTitle());

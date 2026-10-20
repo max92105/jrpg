@@ -80,4 +80,27 @@ internal static class MessageIds
 
     /// <summary>Shown for an equipment slot with nothing worn.</summary>
     public const string SlotEmpty = "slot_empty";
+
+    /// <summary>The System page's entry that opens the save files.</summary>
+    public const string SystemSave = "system_save";
+
+    public const string SaveColumnFile = "save_column_file";
+
+    public const string SaveColumnLocation = "save_column_location";
+
+    public const string SaveColumnParty = "save_column_party";
+
+    /// <summary>Placeholder <c>{number}</c>: the file's number, 1 to 20.</summary>
+    public const string SaveFile = "save_file";
+
+    public const string SaveEmpty = "save_empty";
+
+    /// <summary>A save file that exists but can't be loaded.</summary>
+    public const string SaveDamaged = "save_damaged";
+
+    /// <summary>Placeholders <c>{date}</c> and <c>{time}</c>: when the save was made, and its play time.</summary>
+    public const string SaveDetails = "save_details";
+
+    /// <summary>Placeholders <c>{name}</c> and <c>{level}</c>: one active member in a save file's entry.</summary>
+    public const string SaveMember = "save_member";
 }

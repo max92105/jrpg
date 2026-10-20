@@ -2,10 +2,12 @@ using System.Diagnostics;
 using Jrpg.Data.Art;
 using Jrpg.Data.Content;
 using Jrpg.Data.Messages;
+using Jrpg.Data.Saving;
 using Jrpg.Game;
 using Jrpg.Game.Flow;
 using Jrpg.Game.Hosting;
 using Jrpg.Game.Rendering;
+using Jrpg.Game.Saving;
 using Jrpg.Game.Scenes;
 using Jrpg.Game.Ui;
 
@@ -44,7 +46,9 @@ static IScene FirstScene(string contentRoot, string artRoot, UiMessages messages
         var artProblems = ArtReferenceCheck.FindProblems(catalog, artRoot);
         if (artProblems.Count == 0)
         {
-            return new GameFlow(catalog, new ScreenText(messages, fonts));
+            // Saves are stamped with the real clock here, the one place the game reads it (ADR 0008).
+            var saveSlots = new SaveSlots(new FileSaveStore(GamePaths.SaveDirectory, catalog), catalog, () => DateTimeOffset.Now);
+            return new GameFlow(catalog, new ScreenText(messages, fonts), saveSlots);
         }
 
         reason = string.Join(Environment.NewLine, artProblems);

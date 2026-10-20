@@ -5,10 +5,12 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, S1-1 (Save slots: SaveSlots/SaveSlotEntry/SaveSummary, no UI; S1 split into S1-1/S1-2 recorded in plan)
-Round: 1 (verdict: Ready to commit; build 0 warnings, 969 tests pass, format exit 0)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, S1-2 (Saving from the menu: ListCursor window, SaveSlotList/View, SavePage, SystemPage Save entry, GamePaths, Program wiring)
+Round: 1 (verdict: Ready to commit; build 0 warnings, 976 tests pass on rerun after a known flaky Game host crash, format exit 0)
 
-- open (Warning): SaveSlots.Read catches only UnreadableSaveException; a locked/access-denied slot file (IOException/UnauthorizedAccessException from File.ReadAllText) escapes ReadAll and crashes the list instead of showing Damaged
-- open (Suggestion): test ReadAll_DamagedFile_IsUnreadable asserts IsDamaged; rename ReadAll_DamagedFile_GivesDamagedEntry (plan name too)
-- open (Suggestion): Write_ThenReadAll test uses a one-member party; a two-member order/level case would pin leader-first ordering
-- follow-up: Write's IO failures (disk full, access denied) need a player-facing outcome in S1-2
+- open (Warning): SavePage implements IMenuPage but is only ever used as a concrete SavePage inside SystemPage; TitleMessageId has no reader and LeavesOnCancel is constant true, so SystemPage's `&& _savePage.LeavesOnCancel` is dead until S3
+- open (Suggestion): SavePage.Update throws when not opened while Draw silently returns; pick one contract (or note why)
+- open (Suggestion): ListCursor.VisibleRows public getter has no reader (SaveSlotListView uses SaveSlotList.VisibleRows)
+- open (Suggestion): party separator "   " and the date format are hardcoded in SaveSlotListView; could live in the save_member/save_details messages
+- accepted (plan/hand-off): write IOException not handled until S3; 8 rows instead of 5; names+levels instead of portraits
+- follow-up: FontLibrary non-font test crashes the Game test host intermittently (again this review)

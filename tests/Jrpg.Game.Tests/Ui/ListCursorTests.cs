@@ -48,4 +48,38 @@ public sealed class ListCursorTests
     {
         Assert.Throws<ArgumentException>(() => new ListCursor(2, _ => false));
     }
+
+    [Fact]
+    public void MoveDown_PastVisibleRows_ScrollsWindow()
+    {
+        var cursor = new ListCursor(20, _ => true, visibleRows: 5);
+        for (var press = 0; press < 5; press++)
+        {
+            cursor.MoveDown();
+        }
+
+        Assert.Equal(5, cursor.Selected);
+        Assert.Equal(1, cursor.FirstVisible);
+    }
+
+    [Fact]
+    public void MoveUp_OnFirstEntry_WrapsToLastAndScrolls()
+    {
+        var cursor = new ListCursor(20, _ => true, visibleRows: 5);
+
+        cursor.MoveUp();
+
+        Assert.Equal(19, cursor.Selected);
+        Assert.Equal(15, cursor.FirstVisible);
+    }
+
+    [Fact]
+    public void MoveDown_WithinVisibleRows_KeepsWindow()
+    {
+        var cursor = new ListCursor(20, _ => true, visibleRows: 5);
+
+        cursor.MoveDown();
+
+        Assert.Equal(0, cursor.FirstVisible);
+    }
 }

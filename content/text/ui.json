@@ -8,6 +8,7 @@
   "title_quit": "Quit",
   "menu_title": "Menu",
   "menu_status": "Status",
+  "system_save": "Save",
   "menu_system": "System",
   "system_title_screen": "Title Screen",
   "system_quit": "Quit Game",
@@ -28,5 +29,13 @@
   "stat_defense": "Defense",
   "slot_weapon": "Weapon",
   "slot_armor": "Armor",
-  "slot_empty": "None"
+  "slot_empty": "None",
+  "save_column_file": "File",
+  "save_column_location": "Location",
+  "save_column_party": "Party",
+  "save_file": "File {number}",
+  "save_empty": "Empty",
+  "save_damaged": "Unreadable file",
+  "save_details": "{date}   {time}",
+  "save_member": "{name} Lv {level}"
 }

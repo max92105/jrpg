@@ -190,4 +190,10 @@ internal static class MessageIds
 
     /// <summary>Placeholder <c>{name}</c>: shown when the leader is chosen, who can't leave the party.</summary>
     public const string PartyLeaderStays = "party_leader_stays";
+
+    /// <summary>The active member's choice that starts swapping their place with another's.</summary>
+    public const string PartyChangeOrder = "party_change_order";
+
+    /// <summary>The active member's choice that sends them to the reserve.</summary>
+    public const string PartyToReserve = "party_to_reserve";
 }

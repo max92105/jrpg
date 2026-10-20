@@ -69,5 +69,7 @@
   "party_leader": "Leader",
   "party_level": "Lv {level}",
   "party_full": "The party is full.",
-  "party_leader_stays": "{name} leads the party and always stays in it."
+  "party_leader_stays": "{name} leads the party and always stays in it.",
+  "party_change_order": "Change order",
+  "party_to_reserve": "To reserve"
 }

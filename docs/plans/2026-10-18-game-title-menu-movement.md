@@ -727,7 +727,8 @@ P4 was split in two before it started (developer, 2026-10-20): it came out at ab
     - [ ] Add three reserve members, send one back; the leader stays.
     - [ ] Status and save reflect the new party.
 
-- [ ] **P4-2. Changing the order** (Game, about 150 lines)
+- [x] **P4-2. Changing the order** (Game, about 150 lines)
+  - **Done, with deviations:** the choice is a small glass panel over the card's right (legacy `GlassPanelStyle`, `ListRow` rows); the moving member's card is outlined in the selection stroke while the place is picked; Cancel backs out of the choice, then the swap (cursor back on the member), before leaving the page. P4-1's `Update_ConfirmActiveMember_MovesToReserve` became `Update_ConfirmActiveMember_OffersActionsWithoutMoving` and `Update_ToReserveChosen_MovesToReserve` (requested change: Confirm now offers the choice). Extra tests: `PartyOrderEdit_Swap_LeavesTheGivenOrderUnchanged`, cancel in the choice, Up skips the leader's place, cancel while moving. Follow-up: the Game repeats Core's leader rule (no choice for the leader, the leader's place skipped); a Core query would own it. The hand check is still to do.
   - **Goal:** on an active member other than the leader, Confirm offers "Change order" or "To reserve". Reordering: pick the member, then the place to swap with (question 61); the leader's place can't be taken.
   - **New types (Game):** `Menus/PartyOrderEdit` (pure: builds the new order for `PartyState.Reorder`).
   - **Tests:** `PartyOrderEdit_Swap_TwoMembers_SwapsTheirPlaces`, `PartyOrderEdit_Swap_SameMember_KeepsOrder`, `PartyPage_ChangeOrder_SwapsTwoMembers`.

@@ -1,3 +1,4 @@
+using Jrpg.Core.Party;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Game.Input;
@@ -41,19 +42,84 @@ public sealed class PartyPageTests
     }
 
     [Fact]
-    public void Update_ConfirmActiveMember_MovesToReserve()
+    public void Update_ConfirmActiveMember_OffersActionsWithoutMoving()
     {
         var page = NewPage();
-        page.Update(Pressing(GameButton.Right));
-        AddSelectedReserveMembers(page, count: 1);
-        page.Update(Pressing(GameButton.Left));
+        var second = PartyOfThree(page)[1];
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.False(page.LeavesOnCancel);
+        Assert.Contains(second, _session.Party.ActiveMembers);
+    }
+
+    [Fact]
+    public void Update_ToReserveChosen_MovesToReserve()
+    {
+        var page = NewPage();
+        var leaving = PartyOfThree(page)[1];
+        page.Update(Pressing(GameButton.Confirm));
         page.Update(Pressing(GameButton.Down));
-        var leaving = page.Selected;
 
         page.Update(Pressing(GameButton.Confirm));
 
         Assert.DoesNotContain(leaving, _session.Party.ActiveMembers);
-        Assert.Single(_session.Party.ActiveMembers);
+        Assert.Equal(2, _session.Party.ActiveMembers.Count);
+    }
+
+    [Fact]
+    public void Update_CancelInActions_ChangesNothing()
+    {
+        var page = NewPage();
+        var before = PartyOfThree(page);
+        page.Update(Pressing(GameButton.Confirm));
+
+        page.Update(Pressing(GameButton.Cancel));
+
+        Assert.Equal(before, _session.Party.ActiveMembers);
+        Assert.True(page.LeavesOnCancel);
+    }
+
+    [Fact]
+    public void Update_ChangeOrder_SwapsTwoMembers()
+    {
+        var page = NewPage();
+        var (leader, second, third) = Three(PartyOfThree(page));
+        ChooseChangeOrder(page);
+        page.Update(Pressing(GameButton.Down));
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.Equal([leader, third, second], _session.Party.ActiveMembers);
+        Assert.Null(page.MovingMember);
+    }
+
+    [Fact]
+    public void Update_ChangeOrderUp_SkipsTheLeadersPlace()
+    {
+        var page = NewPage();
+        var (leader, second, third) = Three(PartyOfThree(page));
+        ChooseChangeOrder(page);
+
+        page.Update(Pressing(GameButton.Up));
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.Equal([leader, third, second], _session.Party.ActiveMembers);
+    }
+
+    [Fact]
+    public void Update_CancelWhileMoving_KeepsOrderAndReturnsToTheMember()
+    {
+        var page = NewPage();
+        var before = PartyOfThree(page);
+        ChooseChangeOrder(page);
+        page.Update(Pressing(GameButton.Down));
+
+        page.Update(Pressing(GameButton.Cancel));
+
+        Assert.Equal(before, _session.Party.ActiveMembers);
+        Assert.Same(before[1], page.Selected);
+        Assert.True(page.LeavesOnCancel);
     }
 
     [Fact]
@@ -65,6 +131,7 @@ public sealed class PartyPageTests
 
         Assert.Equal([_session.Party.Leader], _session.Party.ActiveMembers);
         Assert.Equal($"{_session.Party.Leader.Definition.Name} leads the party and always stays in it.", page.Notice);
+        Assert.True(page.LeavesOnCancel);
     }
 
     [Fact]
@@ -117,6 +184,26 @@ public sealed class PartyPageTests
             page.Update(Pressing(GameButton.Confirm));
         }
     }
+
+    // Brings two reserve members in, then puts the cursor on the second active card; returns the active order.
+    private IReadOnlyList<PartyMember> PartyOfThree(PartyPage page)
+    {
+        page.Update(Pressing(GameButton.Right));
+        AddSelectedReserveMembers(page, count: 2);
+        page.Update(Pressing(GameButton.Left));
+        page.Update(Pressing(GameButton.Down));
+        return [.. _session.Party.ActiveMembers];
+    }
+
+    // On the second active card: open its actions and take the first, "Change order".
+    private static void ChooseChangeOrder(PartyPage page)
+    {
+        page.Update(Pressing(GameButton.Confirm));
+        page.Update(Pressing(GameButton.Confirm));
+    }
+
+    private static (PartyMember First, PartyMember Second, PartyMember Third) Three(IReadOnlyList<PartyMember> members) =>
+        (members[0], members[1], members[2]);
 
     private PartyPage NewPage() => new(RepositoryScreenText.Text, new UiTextures(), _session, StartMapScenarios.BelowClosedDoor);
 }

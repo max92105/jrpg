@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, P4-1 (Party page: active party and reserve; PartyPage, PartyMemberCardView, UiTheme.Card, party_* messages, Party tab)
-Round: 1 (verdict: Ready to commit; build 0 warnings, 1054 tests pass, format exit 0)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, P4-2 (Changing the order: PartyOrderEdit.Swap, PartyPage action choice "Change order"/"To reserve", swap mode, party_change_order/party_to_reserve)
+Round: 1 (verdict: Ready to commit; build 0 warnings, 1063 tests pass, format exit 0)
 
-- open (Warning): cards built at page creation/move only; potion on Inventory then Party tab in same visit shows old HP/MP; known but not in plan slice note -> record deviation + follow-up (or refresh hook)
-- open (Suggestion): PartyMemberCardView.CardOf(member, bool isLeader) bool param -> pass the leader / derive inside
-- open (Suggestion): Notice stays after cursor moves (only cleared on Confirm)
-- open (Suggestion): Card.Bars array paired by index with _barLabels -> named Hp/Mp VitalBar fields
-- follow-up: PartyState.ReserveMembers in Core instead of Game deriving reserve with Where/Contains
+- open (Suggestion): PartyPage.Moving (PartyMember?) reads like a bool state -> MovingMember
+- open (Suggestion): UpdateSwap Cancel does ActiveMembers.ToList().IndexOf(moving) -> keep the moving member's row in a field when the swap starts
+- open (Suggestion): Update_LeaderSelected_OffersNoMove could also assert LeavesOnCancel stays true (no choice opened for the leader)
+- follow-up: Core query (e.g. PartyState.CanLeave / leader's place) so Game stops restating the leader rule (member == Leader check, row 0 skipped)
+- follow-up (from P4-1, still open): PartyState.ReserveMembers in Core; cards refresh hook

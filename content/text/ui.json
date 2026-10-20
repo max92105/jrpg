@@ -71,5 +71,14 @@
   "party_full": "The party is full.",
   "party_leader_stays": "{name} leads the party and always stays in it.",
   "party_change_order": "Change order",
-  "party_to_reserve": "To reserve"
+  "party_to_reserve": "To reserve",
+  "menu_options": "Options",
+  "options_full_screen": "Full screen",
+  "options_text_speed": "Text speed",
+  "options_on": "On",
+  "options_off": "Off",
+  "text_speed_slow": "Slow",
+  "text_speed_normal": "Normal",
+  "text_speed_fast": "Fast",
+  "text_speed_instant": "Instant"
 }

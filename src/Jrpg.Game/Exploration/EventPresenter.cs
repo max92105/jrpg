@@ -2,6 +2,7 @@ using Jrpg.Core.Dialogue;
 using Jrpg.Core.Events;
 using Jrpg.Core.Exploration;
 using Jrpg.Game.Dialogue;
+using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Scenes;
@@ -18,10 +19,8 @@ namespace Jrpg.Game.Exploration;
 /// </summary>
 internal sealed class EventPresenter
 {
-    // Developer decision 54; becomes the player's text speed with the Options page (P5).
-    private static readonly TimeSpan _dialogueCharacterTime = TimeSpan.FromMilliseconds(30);
-
     private readonly ExplorationState _exploration;
+    private readonly PlayerSettings _settings;
     private readonly UiMessages _messages;
     private readonly DialogueBox _messageBox;
 
@@ -31,9 +30,13 @@ internal sealed class EventPresenter
     // The pages of the step being read; null when no message is on screen.
     private SpeechPlayback? _reading;
 
-    public EventPresenter(ExplorationState exploration, ScreenText text)
+    /// <param name="exploration">The map events to show.</param>
+    /// <param name="text">Messages and fonts for the message box.</param>
+    /// <param name="settings">Read when a dialogue starts, so a text speed changed in the menu applies to the next one.</param>
+    public EventPresenter(ExplorationState exploration, ScreenText text, PlayerSettings settings)
     {
         _exploration = exploration;
+        _settings = settings;
         _messages = text.Messages;
         _messageBox = new DialogueBox(text.Fonts);
     }
@@ -125,7 +128,7 @@ internal sealed class EventPresenter
 
     private SpeechPlayback StartReading(EventStep step) => step switch
     {
-        DialogueStep dialogue => new SpeechPlayback(dialogue.Speech, _dialogueCharacterTime),
+        DialogueStep dialogue => new SpeechPlayback(dialogue.Speech, _settings.CharacterTime),
 
         // Shown whole: there's nothing to discover in it letter by letter. Core sets a receipt on every give-item step.
         GiveItemStep => new SpeechPlayback(new Speech([FoundItemText.Of(_exploration.CurrentItemReceipt!, _messages)]), TimeSpan.Zero),

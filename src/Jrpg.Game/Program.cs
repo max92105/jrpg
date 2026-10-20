@@ -30,14 +30,16 @@ catch (Exception exception) when (IsStartupProblem(exception))
 var artRoot = ArtFolders.RootIn(contentRoot);
 using (fonts)
 {
-    using var game = new JrpgGame(FirstScene(contentRoot, artRoot, messages, fonts), artRoot, new PlayerSettings());
+    // One settings object: the host applies the window mode, the menu edits it, dialogue reads the text speed.
+    var settings = new PlayerSettings();
+    using var game = new JrpgGame(FirstScene(contentRoot, artRoot, new ScreenText(messages, fonts), settings), artRoot, settings);
     game.Run();
 }
 
 return 0;
 
 // A new game, or the reason it can't start, shown on screen as well as logged.
-static IScene FirstScene(string contentRoot, string artRoot, UiMessages messages, FontLibrary fonts)
+static IScene FirstScene(string contentRoot, string artRoot, ScreenText text, PlayerSettings settings)
 {
     string reason;
     try
@@ -48,7 +50,7 @@ static IScene FirstScene(string contentRoot, string artRoot, UiMessages messages
         {
             // Saves are stamped with the real clock here, the one place the game reads it (ADR 0008).
             var saveSlots = new SaveSlots(new FileSaveStore(GamePaths.SaveDirectory, catalog), catalog, () => DateTimeOffset.Now);
-            return new GameFlow(catalog, new ScreenText(messages, fonts), saveSlots);
+            return new GameFlow(catalog, text, saveSlots, settings);
         }
 
         reason = string.Join(Environment.NewLine, artProblems);
@@ -58,9 +60,9 @@ static IScene FirstScene(string contentRoot, string artRoot, UiMessages messages
         reason = exception.Message;
     }
 
-    var message = messages.Format(MessageIds.StartupFailed, new MessageArgument("reason", reason));
+    var message = text.Messages.Format(MessageIds.StartupFailed, new MessageArgument("reason", reason));
     Report(message);
-    return new StartupErrorScene(message, fonts);
+    return new StartupErrorScene(message, text.Fonts);
 }
 
 static bool IsStartupProblem(Exception exception) =>

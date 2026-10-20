@@ -5,11 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, P4-2 (Changing the order: PartyOrderEdit.Swap, PartyPage action choice "Change order"/"To reserve", swap mode, party_change_order/party_to_reserve)
-Round: 1 (verdict: Ready to commit; build 0 warnings, 1063 tests pass, format exit 0)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, P5 (Options page: TextSpeed enum, PlayerSettings.TextSpeed/CharacterTime, OptionsPage, EventPresenter reads settings, SceneFactory builds EventPresenter)
+Round: 1 (verdict: Ready to commit; build 0 errors, 1069 tests pass, format exit 0)
 
-- open (Suggestion): PartyPage.Moving (PartyMember?) reads like a bool state -> MovingMember
-- open (Suggestion): UpdateSwap Cancel does ActiveMembers.ToList().IndexOf(moving) -> keep the moving member's row in a field when the swap starts
-- open (Suggestion): Update_LeaderSelected_OffersNoMove could also assert LeavesOnCancel stays true (no choice opened for the leader)
-- follow-up: Core query (e.g. PartyState.CanLeave / leader's place) so Game stops restating the leader rule (member == Leader check, row 0 skipped)
-- follow-up (from P4-1, still open): PartyState.ReserveMembers in Core; cards refresh hook
+- open (Suggestion): PlayerSettings.CharacterTime Slow 45 / Fast 15 untested -> Theory pinning the question-90 table
+- open (Suggestion): OptionsPage._speeds indexed by (int)TextSpeed and clamped by _speeds.Length -> order coupling only held by a comment; consider a switch/name-per-speed lookup
+- open (Suggestion): no test for Left from Normal -> Slow (only clamp ends and Right step tested)

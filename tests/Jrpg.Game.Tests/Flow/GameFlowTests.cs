@@ -5,6 +5,7 @@ using Jrpg.Core.Session;
 using Jrpg.Data.Content;
 using Jrpg.Data.Saving;
 using Jrpg.Game.Flow;
+using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
 using Jrpg.Game.Saving;
 using Jrpg.Game.Scenes;
@@ -40,7 +41,7 @@ public sealed class GameFlowTests : IDisposable
     [Fact]
     public void Constructor_WaitingOnTitle_HasNoSession()
     {
-        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create());
+        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create(), new PlayerSettings());
 
         flow.Update(_wholeFade, default);
 
@@ -50,7 +51,7 @@ public sealed class GameFlowTests : IDisposable
     [Fact]
     public void Update_QuitConfirmed_ReturnsQuitRequest()
     {
-        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create());
+        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create(), new PlayerSettings());
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
 
         var request = flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
@@ -198,7 +199,7 @@ public sealed class GameFlowTests : IDisposable
     // New game is the title's first entry, so Confirm alone picks it; the fade starts on that update.
     private static GameFlow FlowWithNewGameConfirmed(SaveSlots? slots = null)
     {
-        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, slots ?? UnwrittenSaveSlots.Create());
+        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, slots ?? UnwrittenSaveSlots.Create(), new PlayerSettings());
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         return flow;
     }

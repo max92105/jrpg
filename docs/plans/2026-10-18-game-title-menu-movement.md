@@ -735,7 +735,8 @@ P4 was split in two before it started (developer, 2026-10-20): it came out at ab
   - **Verify by hand:**
     - [ ] Reorder the party; Status and save reflect the new order.
 
-- [ ] **P5. Options page** (Game, about 200 lines)
+- [x] **P5. Options page** (Game, about 200 lines)
+  - **Done, with deviations:** `Hosting/TextSpeed` is its own enum, and `PlayerSettings.CharacterTime` maps it (Slow 45, Normal 30, Fast 15, Instant 0 ms). `Program` makes the one settings object and `FirstScene` takes `ScreenText` and the settings. `ExplorationScene` was already at four parameters, so `SceneFactory` builds the `EventPresenter` and the scene takes it instead of `ScreenText`. The Options tab sits before System (System stays last). The selected value has a small diamond either side (Left/Right change it). The planned `OptionsPage_*` tests are `Update_*` in `OptionsPageTests`; extra tests: Left on full screen, Right and Left one step on text speed, `PlayerSettings_CharacterTime_EachSpeed_MatchesQuestion90`. The hand checks below are still to do.
   - **Goal:** an Options tab with the settings that exist: Full screen (on/off) and Text speed (Slow, Normal, Fast, Instant; question 90). Left/Right changes a value, and it takes effect at once. Not saved between runs (question 89).
   - **Changes:**
     - `Hosting/PlayerSettings` gains `TextSpeed`; `SceneFactory` passes the settings to `EventPresenter` (typewriter character time).

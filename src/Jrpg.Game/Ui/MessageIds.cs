@@ -196,4 +196,23 @@ internal static class MessageIds
 
     /// <summary>The active member's choice that sends them to the reserve.</summary>
     public const string PartyToReserve = "party_to_reserve";
+
+    /// <summary>The game menu's Options tab.</summary>
+    public const string MenuOptions = "menu_options";
+
+    public const string OptionsFullScreen = "options_full_screen";
+
+    public const string OptionsTextSpeed = "options_text_speed";
+
+    public const string OptionsOn = "options_on";
+
+    public const string OptionsOff = "options_off";
+
+    public const string TextSpeedSlow = "text_speed_slow";
+
+    public const string TextSpeedNormal = "text_speed_normal";
+
+    public const string TextSpeedFast = "text_speed_fast";
+
+    public const string TextSpeedInstant = "text_speed_instant";
 }

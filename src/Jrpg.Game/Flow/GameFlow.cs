@@ -1,5 +1,6 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Session;
+using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Saving;
@@ -30,10 +31,11 @@ internal sealed class GameFlow : IScene
     /// <param name="catalog">The content, as loaded.</param>
     /// <param name="text">Messages and fonts.</param>
     /// <param name="saveSlots">The player's save files.</param>
-    public GameFlow(ContentCatalog catalog, ScreenText text, SaveSlots saveSlots)
+    /// <param name="settings">The player's options, which the Options page edits and dialogue reads.</param>
+    public GameFlow(ContentCatalog catalog, ScreenText text, SaveSlots saveSlots, PlayerSettings settings)
     {
         var playedCatalog = EncounterFreeContent.Of(catalog);
-        var factory = new SceneFactory(playedCatalog, text, saveSlots);
+        var factory = new SceneFactory(playedCatalog, text, saveSlots, settings);
         _sessions = new SessionTransitions(playedCatalog, _scenes, factory);
         _menus = new MenuTransitions(_scenes, factory);
         _scenes.Push(factory.CreateTitle());

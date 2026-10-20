@@ -1,6 +1,7 @@
 using Jrpg.Core.Events;
 using Jrpg.Core.Exploration;
 using Jrpg.Game.Exploration;
+using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
 using Jrpg.Game.Tests.Ui;
 
@@ -22,7 +23,7 @@ public sealed class EventPresenterTests
         }
 
         Assert.IsType<WarpStep>(exploration.CurrentEventStep);
-        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text);
+        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings());
         presenter.Update(StartMapScenarios.OneUpdate, default);
         presenter.Update(TimeSpan.FromSeconds(0.2), default);
         Assert.Equal("start", exploration.CurrentMap.Id);
@@ -40,7 +41,7 @@ public sealed class EventPresenterTests
         var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowChest);
         var chest = exploration.CurrentMap.Layout.Objects.Single(placed => placed.ObjectId == "chest");
         Assert.True(exploration.TryInteract());
-        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text);
+        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings());
         presenter.Update(StartMapScenarios.OneUpdate, default);
         Assert.IsType<GiveItemStep>(exploration.CurrentEventStep);
 
@@ -55,7 +56,7 @@ public sealed class EventPresenterTests
     {
         var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowTalkingChest);
         exploration.TryInteract();
-        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text);
+        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings());
         var typedOut = TimeSpan.FromSeconds(2);
         presenter.Update(StartMapScenarios.OneUpdate, default);
         presenter.Update(typedOut, default);
@@ -69,11 +70,26 @@ public sealed class EventPresenterTests
     }
 
     [Fact]
+    public void Update_TextSpeedInstant_ShowsWholePage()
+    {
+        var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowTalkingChest);
+        exploration.TryInteract();
+        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings { TextSpeed = TextSpeed.Instant });
+        presenter.Update(StartMapScenarios.OneUpdate, default);
+        presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+
+        // Each page shows whole, so one Confirm per page reads the dialogue with no time to type.
+        presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+
+        Assert.False(exploration.IsEventRunning);
+    }
+
+    [Fact]
     public void Update_FirstUpdateOnFoundItem_WaitsEvenWithConfirmPressed()
     {
         var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowChest);
         exploration.TryInteract();
-        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text);
+        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings());
 
         presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
 

@@ -1,6 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Exploration;
 using Jrpg.Game.Exploration;
+using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Scenes;
@@ -88,6 +89,6 @@ public sealed class ExplorationSceneTests
     private static (ExplorationState Exploration, ExplorationScene Scene) Start(ContentCatalog catalog)
     {
         var exploration = StartMapScenarios.StartExploring(catalog);
-        return (exploration, new ExplorationScene(exploration, catalog, new MapArt(catalog, MapView.CellPixels), RepositoryScreenText.Text));
+        return (exploration, new ExplorationScene(exploration, catalog, new MapArt(catalog, MapView.CellPixels), new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings())));
     }
 }

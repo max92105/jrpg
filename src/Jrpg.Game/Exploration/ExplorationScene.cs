@@ -6,7 +6,6 @@ using Jrpg.Data.Art;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Scenes;
-using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -38,13 +37,13 @@ internal sealed class ExplorationScene : IScene
     private MapDefinition _map;
     private MapView _view;
 
-    public ExplorationScene(ExplorationState exploration, ContentCatalog catalog, MapArt art, ScreenText text)
+    public ExplorationScene(ExplorationState exploration, ContentCatalog catalog, MapArt art, EventPresenter presenter)
     {
         _exploration = exploration;
         _currentDefinitionOf = exploration.CurrentDefinitionOf;
         _art = art;
         _fieldSpriteFile = catalog.NewGame.FieldSpriteFile;
-        _presenter = new EventPresenter(exploration, text);
+        _presenter = presenter;
         EnterCurrentMap();
     }
 

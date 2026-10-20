@@ -118,4 +118,23 @@ internal static class MessageIds
 
     /// <summary>Placeholder <c>{number}</c>: the disk refused the save.</summary>
     public const string SaveFailed = "save_failed";
+
+    /// <summary>The game menu's Inventory tab.</summary>
+    public const string MenuInventory = "menu_inventory";
+
+    /// <summary>The inventory heading when every item shows.</summary>
+    public const string InventoryAll = "inventory_all";
+
+    public const string InventoryConsumables = "inventory_consumables";
+
+    public const string InventoryWeapons = "inventory_weapons";
+
+    public const string InventoryArmor = "inventory_armor";
+
+    public const string InventoryColumnName = "inventory_column_name";
+
+    public const string InventoryColumnQuantity = "inventory_column_quantity";
+
+    /// <summary>Shown when the party owns nothing in the category.</summary>
+    public const string InventoryEmpty = "inventory_empty";
 }

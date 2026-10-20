@@ -9,6 +9,7 @@
   "title_load": "Load Game",
   "title_quit": "Quit",
   "menu_title": "Menu",
+  "menu_inventory": "Inventory",
   "menu_status": "Status",
   "system_save": "Save",
   "system_load": "Load",
@@ -42,5 +43,12 @@
   "save_details": "{date}   {time}",
   "save_member": "{name} Lv {level}",
   "save_overwrite": "Overwrite File {number}?",
-  "save_failed": "Couldn't save to File {number}."
+  "save_failed": "Couldn't save to File {number}.",
+  "inventory_all": "All Items",
+  "inventory_consumables": "Consumables",
+  "inventory_weapons": "Weapons",
+  "inventory_armor": "Armor",
+  "inventory_column_name": "Name",
+  "inventory_column_quantity": "Qty",
+  "inventory_empty": "Nothing here."
 }

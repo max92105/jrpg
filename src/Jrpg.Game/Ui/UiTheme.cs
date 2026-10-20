@@ -131,6 +131,10 @@ internal static class UiTheme
     public static ImmutableArray<GradientStop> Highlight { get; } =
         [new(0, FromLegacy(0x993D4590)), new(0.45f, FromLegacy(0x665A64B8)), new(1, FromLegacy(0x005A64B8))];
 
+    /// <summary>Legacy <c>Brush.Highlight.Selected</c>: the selected row of a menu list, fading out to the right.</summary>
+    public static ImmutableArray<GradientStop> SelectedRow { get; } =
+        [new(0, FromLegacy(0xE64A53A8)), new(0.5f, FromLegacy(0xB36E78C8)), new(1, FromLegacy(0x1A6E78C8))];
+
     /// <summary>Legacy <c>Brush.HighlightLine</c>: the thin lines above and below the selected row.</summary>
     public static ImmutableArray<GradientStop> HighlightLine { get; } =
     [

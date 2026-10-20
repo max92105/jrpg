@@ -602,20 +602,34 @@ S1 was split in two (developer, 2026-10-19), since it came to about 600 lines. S
 
 ### Phase P: menu pages
 
-- [ ] **P1. Inventory page** (Data + Game, about 280 lines)
-  - **Goal:** an Inventory tab in the legacy `InventoryView` layout:
-    - a category rail with the legacy icons: All (`All.png`), Consumables, Weapons, Armor (`Consumable.png`, `Weapon.png`, `Armor.png`; decision 51, question 60);
-    - item rows with icon, name and quantity, in pickup order;
+P1 was split in two (developer, 2026-10-19), since it came to about 500 lines. The icons are 1024 px and need a smooth shrink, so P1-2 adds them to P1-1's text page.
+
+- [x] **P1-1. Inventory page** (Game, about 300 lines)
+  - **Done, with deviations:**
+    - Inventory is the first tab, in legacy order: Inventory, Status, System.
+    - The description shows under the list: legacy put it in the footer's hint bar, which doesn't exist yet.
+    - Rows keep legacy `ListRow`'s 40 px icon column empty for P1-2. The selected row uses legacy `Brush.Highlight.Selected` (`UiTheme.SelectedRow`).
+    - An empty category shows "Nothing here." with no cursor.
+    - Tests use `Method_Scenario_Result` names, plus an Armor filter test, a wrap test, a pickup-order test and `Update_CategoryWithNothingOwned_HasNoSelectedRow`.
+  - **Goal:** an Inventory tab in the legacy `InventoryView` layout, without icons yet:
+    - the category (All, Consumables, Weapons, Armor; question 60) named in the heading;
+    - item rows with name and quantity, in pickup order, scrolling;
     - the selected item's description.
     PreviousTab/NextTab change the category (question 92). Read-only here; using items is P2b.
   - **New types (Game):**
     - `Menus/InventoryFilter`: which items a category keeps (consumables: has an effect; weapons and armor: by equipment slot).
     - `Menus/InventoryPage`.
-  - **Data:** `ArtReferenceCheck` covers item icons.
-  - **Tests:** `InventoryFilter_Weapons_KeepsOnlyWeaponSlotItems`, `InventoryFilter_Consumables_KeepsItemsWithEffect`, `InventoryFilter_All_KeepsPickupOrder`, `InventoryPage_NextCategory_ResetsCursorToFirstRow`, Data `ArtReferenceCheck_FindProblems_MissingItemIcon_NamesTheItem`.
+  - **Tests:** `InventoryFilter_Weapons_KeepsOnlyWeaponSlotItems`, `InventoryFilter_Consumables_KeepsItemsWithEffect`, `InventoryFilter_All_KeepsPickupOrder`, `InventoryPage_NextCategory_ResetsCursorToFirstRow`.
   - **Verify by hand:**
-    - [ ] The starting items show under every category with the right icons and counts.
+    - [ ] The starting items show under every category with the right counts.
     - [ ] The list scrolls.
+
+- [ ] **P1-2. Inventory icons** (Data + Game, about 200 lines)
+  - **Goal:** the category rail with the legacy icons, All (`All.png`), Consumables, Weapons and Armor (`Consumable.png`, `Weapon.png`, `Armor.png`; decision 51), and each row's item icon, shrunk smoothly from the 1024 px art.
+  - **Data:** `ArtReferenceCheck` covers item icons.
+  - **Tests:** Data `ArtReferenceCheck_FindProblems_MissingItemIcon_NamesTheItem`.
+  - **Verify by hand:**
+    - [ ] The right icons show on the rail and on every row.
 
 - [ ] **P2a. Field item targets in Core** (Core, about 150 lines)
   - **Goal:** Core says who an item can be used on, so the menu never offers an illegal choice.

@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, S3 (overwrite asks via ConfirmPrompt in SavePage; failed write shows save_failed notice in UiTheme.Danger; ISaveFilesPage.LeavesOnCancel gates SystemPage Cancel)
-Round: 1 (verdict: Ready to commit; build 0 warnings, 995 tests pass on rerun after font-crash flake, format exit 0)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, P1-1 (Inventory page: InventoryFilter, InventoryPage first tab, category via PreviousTab/NextTab, 10-row scroll, "Nothing here." empty state)
+Round: 1 (verdict: Fix the Criticals; build 0 warnings, 1004 tests pass, format exit 0)
 
-- open (Warning): SystemPage `&& files.LeavesOnCancel` gate untested; removing it closes the list on Esc and leaves the prompt pending on reopen (Open doesn't clear _asking). Add SystemPageTests Esc-while-asking test
-- open (Warning): plan S3 not ticked; deviations (LeavesOnCancel on ISaveFilesPage, own ConfirmPromptView, extra AnswerNo test, test name KeepsListOpenAndSaysSo) not recorded
-- open (Suggestion): failure test could also assert a later successful save clears Notice
-- accepted (hand-off): SavePage builds its own ConfirmPromptView; G2 share-through-SceneFactory follow-up stays open
+- open (Critical): empty-category state (null row cursor, SelectedRow null, Up/Down no-op, no ListCursor(0) throw) has no test; starting items fill every category. Add test using Inventory.TryRemove to empty Armor
+- open (Suggestion): Update_NextCategory test doesn't assert SelectedRow == 2 before NextTab, so it can't tell reset from never-moved
+- open (Suggestion): category order kept in three parallel places (enum, _categories, InventoryLabels.Categories); use Enum.GetValues / key labels by category
+- open (Suggestion): tick P1-1 in plan and record test-name deviation (Update_NextCategory_... vs InventoryPage_NextCategory_...)

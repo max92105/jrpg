@@ -102,7 +102,7 @@ One line per slice. Each slice's goal, types, tests and hand checks are in its f
 ### Phase 5: split EquipmentPage
 
 - [x] **E1. The equipment sheet and preview text as pure types** (Core + Game, about 200 lines) → [slices/E1.md](slices/E1.md)
-- [ ] **E2. The equipment sheet view** (Game, about 260 lines, mostly moved) → [slices/E2.md](slices/E2.md)
+- [x] **E2. The equipment sheet view** (Game, about 260 lines, mostly moved) → [slices/E2.md](slices/E2.md)
 
 ### Phase 6: split PartyPage
 

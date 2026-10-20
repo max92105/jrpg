@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, P5 (Options page: TextSpeed enum, PlayerSettings.TextSpeed/CharacterTime, OptionsPage, EventPresenter reads settings, SceneFactory builds EventPresenter)
-Round: 1 (verdict: Ready to commit; build 0 errors, 1069 tests pass, format exit 0)
+Slice: docs/plans/2026-10-20-menu-cleanup/slices/F1.md, F1 (FontFileHeader.IsComplete guards FontLibrary.AddFont; FontLibraryTests in RepositoryScreenText collection)
+Round: 1 (verdict: Ready to commit; verify all pass, 1081 tests)
 
-- open (Suggestion): PlayerSettings.CharacterTime Slow 45 / Fast 15 untested -> Theory pinning the question-90 table
-- open (Suggestion): OptionsPage._speeds indexed by (int)TextSpeed and clamped by _speeds.Length -> order coupling only held by a comment; consider a switch/name-per-speed lookup
-- open (Suggestion): no test for Left from Normal -> Slow (only clamp ends and Right step tested)
+- open (Suggestion): diagnosis (3/50 host deaths -> out-of-bounds read) and checkbox not yet written in F1.md / README index (DoD step 5)
+- open (Suggestion): no test pins the `<=` boundary (table ending exactly at EOF accepted); only covered implicitly by the Lato file
+- note: flaky-font-test-crash memory stays until the developer reports clean repeat runs

@@ -1,8 +1,10 @@
 using Jrpg.Data.Content;
 using Jrpg.Game.Rendering;
+using Jrpg.Game.Tests.Ui;
 
 namespace Jrpg.Game.Tests.Rendering;
 
+[Collection(RepositoryScreenText.CollectionName)]
 public sealed class FontLibraryTests : IDisposable
 {
     private readonly string _contentRoot = Path.Combine(Path.GetTempPath(), $"jrpg-fonts-{Guid.NewGuid():N}");
@@ -43,5 +45,18 @@ public sealed class FontLibraryTests : IDisposable
         var exception = Assert.Throws<ContentValidationException>(() => FontLibrary.Load(_contentRoot));
 
         Assert.Equal("art/fonts/bad.ttf: not a readable font.", exception.Message);
+    }
+
+    [Fact]
+    public void Load_TruncatedFont_ThrowsNamingTheFile()
+    {
+        var fontsFolder = Path.Combine(_contentRoot, "art", "fonts");
+        Directory.CreateDirectory(fontsFolder);
+        var font = File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory, "content", "art", "fonts", "Lato-Regular.ttf"));
+        File.WriteAllBytes(Path.Combine(fontsFolder, "cut.ttf"), font[..1024]);
+
+        var exception = Assert.Throws<ContentValidationException>(() => FontLibrary.Load(_contentRoot));
+
+        Assert.Equal("art/fonts/cut.ttf: not a readable font.", exception.Message);
     }
 }

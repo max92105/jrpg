@@ -20,6 +20,10 @@ When planning slices in this repo:
 - Flow requests: a scene must return a transition request only once (GameFlow's fade throws on a second Start); headless flow tests must be seed-independent since GameFlow seeds from the clock (and its ctor is at 4 params).
 - Put each Core change in (or right before) the slice that first uses it, not in an up-front "Core seams" batch (battle-plan review C-1).
 - Tests needing a battle outcome use a test catalog; developer: balance isn't done, plans implement and test systems. Pixel art is point-scaled by whole factors, only painted art is smoothed.
+- Cleanup plans: grep earlier plans' "Done, with deviations"/follow-up lines and the code-reviewer memory first; they hold the diagnosis (e.g. font crash cause) and the exact follow-up wording.
+- Developer wants UI built from many small reusable Ui/ components (card, meter, title); put cross-screen parts in Ui/, not Menus/, so Battle can reuse them.
+- Test seams: a small internal read accessor (CardOf, ShownStats) beats a vacuous behavior test; drop tests that only exercise a library (MeasuredText.Of).
+- Refactor slices: "existing tests pass unchanged" is the guard; draw-only moves get before/after screenshots, not invented tests.
 - Packages are never assumed: font package, MonoGame content pipeline and CommunityToolkit.Mvvm are open questions until the developer approves.
 
 **Why:** part 1 split slices mid-way; the part 2 devil's advocate (2026-10-17) raised exactly these as blockers/concerns.

@@ -56,6 +56,11 @@ internal sealed class FontLibrary : IDisposable
     private static void AddFont(FontSystem fonts, string file)
     {
         var bytes = File.ReadAllBytes(file);
+        if (!FontFileHeader.IsComplete(bytes))
+        {
+            throw new ContentValidationException(NotReadableMessage(file));
+        }
+
         try
         {
             fonts.AddFont(bytes);
@@ -63,7 +68,9 @@ internal sealed class FontLibrary : IDisposable
         catch (Exception exception)
         {
             // The rasterizer throws a bare Exception for bytes that aren't a font; name the file for the startup report.
-            throw new ContentValidationException($"{FontsFolder}/{Path.GetFileName(file)}: not a readable font.", exception);
+            throw new ContentValidationException(NotReadableMessage(file), exception);
         }
     }
+
+    private static string NotReadableMessage(string file) => $"{FontsFolder}/{Path.GetFileName(file)}: not a readable font.";
 }

@@ -46,4 +46,24 @@ public sealed class ItemTargetPickerTests
         Assert.Null(picker.Update(default));
         Assert.True(picker.IsSelected(_members[1]));
     }
+
+    [Fact]
+    public void Update_Right_MovesLikeDown()
+    {
+        var picker = new ItemTargetPicker(_members, new TargetChoice<PartyMember>([_members[0], _members[2]], TakesAll: false));
+
+        picker.Update(Pressing(GameButton.Right));
+
+        Assert.True(picker.IsSelected(_members[2]));
+    }
+
+    [Fact]
+    public void Update_Left_MovesLikeUp()
+    {
+        var picker = new ItemTargetPicker(_members, new TargetChoice<PartyMember>([_members[0], _members[2]], TakesAll: false));
+
+        picker.Update(Pressing(GameButton.Left));
+
+        Assert.True(picker.IsSelected(_members[2]));
+    }
 }

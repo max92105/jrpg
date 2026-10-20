@@ -97,13 +97,9 @@ internal sealed class DialogueBox
         DrawTypedText(batch, reading.VisibleLength);
         if (reading.IsMarkerVisible)
         {
-            DrawDiamond(batch, textures, _markerCenter, MarkerSide);
+            new Diamond(_markerCenter, MarkerSide).Draw(batch, textures.Pixel, UiTheme.MessageText);
         }
     }
-
-    // A white square turned 45°: the marker, and the portrait's frame.
-    private static void DrawDiamond(SpriteBatch batch, TextureLibrary textures, Vector2 center, float side) =>
-        batch.Draw(textures.Pixel, center, null, UiTheme.MessageText, MathHelper.PiOver4, new Vector2(0.5f), new Vector2(side), SpriteEffects.None, 0);
 
     private void DrawSpeaker(SpriteBatch batch, TextureLibrary textures, string speakerCaps)
     {
@@ -115,8 +111,7 @@ internal sealed class DialogueBox
 
     private void DrawPortrait(SpriteBatch batch, TextureLibrary textures, string portraitFile)
     {
-        // A diamond's diagonal is its square's side times √2, so the frame's square is the framed diagonal over √2.
-        DrawDiamond(batch, textures, _portraitCenter, (PortraitSize + (2 * PortraitFrame)) / MathF.Sqrt(2));
+        Diamond.WithDiagonal(_portraitCenter, PortraitSize + (2 * PortraitFrame)).Draw(batch, textures.Pixel, UiTheme.MessageText);
         var corner = new Point((int)_portraitCenter.X - (PortraitSize / 2), (int)_portraitCenter.Y - (PortraitSize / 2));
         batch.Draw(PortraitOf(portraitFile, textures), new Rectangle(corner, new Point(PortraitSize)), Color.White);
     }

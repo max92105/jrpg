@@ -37,12 +37,13 @@ internal sealed class ItemTargetPicker
             return input.IsPressed(GameButton.Confirm) ? _choice.Candidates : null;
         }
 
-        if (input.IsPressed(GameButton.Up))
+        // The cards sit side by side, so Left and Right move as well as Up and Down.
+        if (input.IsPressed(GameButton.Up) || input.IsPressed(GameButton.Left))
         {
             _cursor.MoveUp();
         }
 
-        if (input.IsPressed(GameButton.Down))
+        if (input.IsPressed(GameButton.Down) || input.IsPressed(GameButton.Right))
         {
             _cursor.MoveDown();
         }

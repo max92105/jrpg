@@ -181,9 +181,7 @@ internal sealed class StatusPage : IMenuPage
     // A diamond like the dialogue's, framed by a slightly larger pale diamond behind it.
     private void DrawPortrait(PageFrame page, Vector2 center)
     {
-        var frameSide = (PortraitSize + (2 * PortraitFrame)) / MathF.Sqrt(2);
-        var pixel = page.Textures.Pixel;
-        page.Batch.Draw(pixel, center, null, UiTheme.BarLine * page.Opacity, MathHelper.PiOver4, new Vector2(0.5f), new Vector2(frameSide), SpriteEffects.None, 0);
+        Diamond.WithDiagonal(center, PortraitSize + (2 * PortraitFrame)).Draw(page.Batch, page.Textures.Pixel, UiTheme.BarLine * page.Opacity);
         var portrait = _ui.DiamondPortrait(page.Textures, _sheet.PortraitFile, PortraitSize);
         var corner = new Vector2(center.X - (PortraitSize / 2f), center.Y - (PortraitSize / 2f));
         page.Batch.Draw(portrait, corner, Color.White * page.Opacity);

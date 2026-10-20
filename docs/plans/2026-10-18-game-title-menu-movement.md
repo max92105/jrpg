@@ -670,7 +670,13 @@ P2b was split in two (developer, 2026-10-19), since it came to about 420 lines w
     - [ ] Use an all-allies item.
     - [ ] The revive is greyed with nobody fallen.
 
-- [ ] **P2b-2. Item target portraits** (Game, about 150 lines)
+- [x] **P2b-2. Item target portraits** (Game, about 150 lines)
+  - **Done, with deviations:**
+    - The portraits are 96 px diamonds (the reference UI's frame, as on the Status page) rather than legacy's 48 px squares. The selected card glows with a pale diamond, not legacy's pulsing white glow.
+    - The cards sit in one centered row, which fits about 13 members, so Left and Right move the cursor too.
+    - The rotated-pixel diamond drawn by the dialogue box, the Status page and this view became one `Ui/Diamond`.
+    - P2b-1's `item_target_vitals` message went with the plain list.
+    - Tests: `ItemTargetPicker` `Update_Right_MovesLikeDown` and `Update_Left_MovesLikeUp`.
   - **Goal:** the picker looks like the legacy use popup: a "Use <item>" heading with its icon, and each member as a portrait card with HP and MP bars (legacy `CharacterPortrait`), dimmed when the item can't be used on them and lit when selected.
   - **Verify by hand:**
     - [ ] The cards match the legacy popup, and the selection is clear.

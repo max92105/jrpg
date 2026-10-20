@@ -45,7 +45,7 @@ internal sealed class ItemUseDialog
 
         var picker = new ItemTargetPicker(_party.Members, _fieldItems.TargetChoiceForAnyUser(item));
         _open = new OpenUse(item, picker);
-        _view.Show(picker, item.Name);
+        _view.Show(picker, item.Name, item.IconFile);
     }
 
     /// <summary>Cancel closes the picker; Confirm uses the item.</summary>

@@ -5,9 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-battle/slices/B2b.md, B2b (battlers: BattlerArt, BattlerScaling, BattlersView, UiTextures.Battler)
-Round: 1 (verdict: Fix the Criticals; verify all pass, 1167 tests)
+Slice: docs/plans/2026-10-20-battle/slices/B3a.md, B3a (party status: VitalsText, PartyStatusView/Panel, BattleVitalRow, VitalRowStyle, OutlinedFont, StatBar track)
+Round: 1 (verdict: Ready to commit; verify all pass, 1172 tests)
 
-- open (Critical): UiTextures.ShrunkOnce has 5 parameters (max 4); fix by one `_shrunk` cache keyed (Folder, File, Size) replacing `_icons` + `_battlers`, so ShrunkOnce(textures, folder, file, size) is an instance method.
-- open (Suggestion): BattlerScaling's 512 px boundary (`>`) is untested; a 512 px case pinning point-scale to 256 would fix the edge.
-- open (Suggestion): ArtReferenceCheck party-member battle sprite line has no test of its own (only the enemy one).
+- open (Suggestion): BattleVitalRow.Show(string value, string max, int current, int maximum) pairs near-synonym names; rename to valueText/maxText (or value/maximum ints) so a swap is visible.
+- open (Suggestion): PartyStatusPanel ctor takes a (Hp, Mp) tuple to dodge the 4-param limit; a panel-style record (row styles + labels) passed once would read straighter.
+- open (Suggestion): VitalsText's MP/MaxMp change path untested (only HP); one MP-changed case would cover MaxIfChanged's second use.
+- follow-up: UiTheme.Danger's doc still says "a save that failed"; now also a fallen member's HP.

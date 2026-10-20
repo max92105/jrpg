@@ -83,5 +83,6 @@
   "text_speed_normal": "Normal",
   "text_speed_fast": "Fast",
   "text_speed_instant": "Instant",
-  "battle_run": "Run"
+  "battle_run": "Run",
+  "battle_vital_max": "/{max}"
 }

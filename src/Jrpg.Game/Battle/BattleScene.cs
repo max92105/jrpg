@@ -1,4 +1,3 @@
-using FontStashSharp;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Session;
 using Jrpg.Data.Art;
@@ -27,7 +26,8 @@ internal sealed class BattleScene : IScene
     private readonly BattlersView _battlers;
     private readonly BattleTurnSequence _sequence;
     private readonly string _backgroundFile;
-    private readonly SpriteFontBase _font;
+    private readonly PartyStatusView _partyStatus;
+    private readonly OutlinedFont _font;
     private readonly string _runLabel;
     private bool _isFinished;
 
@@ -41,10 +41,11 @@ internal sealed class BattleScene : IScene
         _ui = ui;
         var battle = session.ActiveBattle ?? throw new InvalidOperationException("A battle screen needs an active battle.");
         _battlers = new BattlersView(battle.Combatants, ui);
+        _partyStatus = new PartyStatusView([.. battle.Combatants.Where(combatant => combatant.Side == BattleSide.Party)], text, ui);
         _sequence = new BattleTurnSequence(battle, session.EnemyTactics);
         _backgroundFile = session.Exploration.PendingEncounter?.BackgroundFile
             ?? throw new InvalidOperationException("A battle screen needs the encounter it fights.");
-        _font = text.Fonts.FontAt(TextPixels);
+        _font = new OutlinedFont(text.Fonts.FontAt(TextPixels));
         _runLabel = text.Messages.Text(MessageIds.BattleRun);
     }
 
@@ -62,6 +63,7 @@ internal sealed class BattleScene : IScene
         }
 
         _sequence.Update();
+        _partyStatus.Refresh();
         if (!_sequence.IsOver)
         {
             return null;
@@ -76,14 +78,15 @@ internal sealed class BattleScene : IScene
     {
         DrawBackdrop(batch, textures);
         _battlers.Draw(batch, textures);
-
-        if (_isFinished || !_sequence.IsAwaitingCommand)
+        var isAwaitingCommand = !_isFinished && _sequence.IsAwaitingCommand;
+        _partyStatus.Draw(batch, textures, isAwaitingCommand ? _sequence.Actor : null);
+        if (!isAwaitingCommand)
         {
             return;
         }
 
-        batch.DrawString(_font, _sequence.Actor.Name, _actorPosition, UiTheme.TextPrimary);
-        batch.DrawString(_font, _runLabel, _runPosition, UiTheme.TextPrimary);
+        _font.Draw(batch, _sequence.Actor.Name, _actorPosition, UiTheme.TextPrimary);
+        _font.Draw(batch, _runLabel, _runPosition, UiTheme.TextPrimary);
     }
 
     // Legacy BattleUI's backdrop: the picture, the vignette over the whole screen, and the shade across the top.

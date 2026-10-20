@@ -11,8 +11,15 @@ namespace Jrpg.Game.Ui;
 /// </summary>
 /// <param name="ui">Where the gradient's texture is made, once.</param>
 /// <param name="fill">The legacy gradient, such as <see cref="UiTheme.HpBar"/>.</param>
-internal sealed class StatBar(UiTextures ui, ImmutableArray<GradientStop> fill)
+/// <param name="track">The color behind the filled part, such as <see cref="UiTheme.BarTrack"/>.</param>
+internal sealed class StatBar(UiTextures ui, ImmutableArray<GradientStop> fill, Color track)
 {
+    /// <summary>A menu bar, on the menus' dark track.</summary>
+    public StatBar(UiTextures ui, ImmutableArray<GradientStop> fill)
+        : this(ui, fill, UiTheme.BarTrack)
+    {
+    }
+
     /// <summary>0 empty to 1 full.</summary>
     public float Fraction { get; private set; }
 
@@ -25,7 +32,7 @@ internal sealed class StatBar(UiTextures ui, ImmutableArray<GradientStop> fill)
     /// <param name="opacity">0 to 1, while the menu fades in.</param>
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
-        batch.Draw(textures.Pixel, area, UiTheme.BarTrack * opacity);
+        batch.Draw(textures.Pixel, area, track * opacity);
         // At least a pixel for anything above zero, so a member on 1 HP never looks like one on 0.
         var filledWidth = Fraction > 0 ? Math.Max(1, (int)MathF.Round(area.Width * Fraction)) : 0;
         if (filledWidth > 0)

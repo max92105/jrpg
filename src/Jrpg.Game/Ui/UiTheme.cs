@@ -160,7 +160,7 @@ internal static class UiTheme
     /// <summary>Legacy <c>CategoryRailStyle</c>: the strip behind the inventory's category icons.</summary>
     public static Color CategoryRail { get; } = FromLegacy(0x80000000);
 
-    /// <summary>Legacy <c>Color.Danger</c>: a save that failed.</summary>
+    /// <summary>Legacy <c>Color.Danger</c>: a save that failed, a fallen member's HP in battle.</summary>
     public static Color Danger { get; } = FromLegacy(0xFFE0524A);
 
     /// <summary>Legacy <c>OverlayViewHost</c>: the column the title's file list sits in.</summary>
@@ -171,6 +171,21 @@ internal static class UiTheme
 
     /// <summary>Legacy <c>Brush.BattleTopShade</c>, from the top down: keeps the turn order and party numbers readable.</summary>
     public static ImmutableArray<GradientStop> BattleTopShade { get; } = [new(0, FromLegacy(0x99000000)), new(1, FromLegacy(0x00000000))];
+
+    /// <summary>Legacy <c>Brush.Bar.HP</c>: a party member's thin battle HP bar.</summary>
+    public static ImmutableArray<GradientStop> BattleHpBar { get; } = [new(0, FromLegacy(0xFF3E7F5A)), new(1, FromLegacy(0xFF7FD39A))];
+
+    /// <summary>Legacy <c>Brush.Bar.MP</c>: a party member's thin battle MP bar.</summary>
+    public static ImmutableArray<GradientStop> BattleMpBar { get; } = [new(0, FromLegacy(0xFF3E5C9A)), new(1, FromLegacy(0xFF8FB4F0))];
+
+    /// <summary>Legacy <c>Brush.Bar.EnemyHP</c>: an enemy's HP bar under its name.</summary>
+    public static ImmutableArray<GradientStop> EnemyHpBar { get; } = [new(0, FromLegacy(0xFF8A2A2A)), new(1, FromLegacy(0xFFE0524A))];
+
+    /// <summary>Legacy <c>BattleBarStyle</c>'s track: the battle bars sit straight on the background.</summary>
+    public static Color BattleBarTrack { get; } = FromLegacy(0x80000000);
+
+    /// <summary>Legacy <c>Effect.TextOutline</c>: the soft dark edge behind text drawn straight on the battle background.</summary>
+    public static Color TextOutline { get; } = FromLegacy(0xE6000000);
 
     // Legacy XAML colors are #AARRGGBB with straight alpha; the game draws premultiplied.
     private static Color FromLegacy(uint argb) => Color.FromNonPremultiplied(

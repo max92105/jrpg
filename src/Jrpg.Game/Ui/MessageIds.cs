@@ -224,4 +224,7 @@ internal static class MessageIds
 
     /// <summary>The battle command that leaves the fight.</summary>
     public const string BattleRun = "battle_run";
+
+    /// <summary>Placeholder <c>{max}</c>: a vital's maximum, written small after its value on the battle screen.</summary>
+    public const string BattleVitalMax = "battle_vital_max";
 }

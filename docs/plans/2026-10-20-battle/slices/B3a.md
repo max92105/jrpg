@@ -19,3 +19,4 @@ Part of [the battle plan](../README.md). Design: [design.md](../design.md).
   - **Verify by hand:**
     - [ ] Compare with `Combat6.webp`.
     - [ ] A hurt member (set in a save) shows the same numbers as the Status page.
+- **Done, with deviations:** the view is split into `PartyStatusView` (layout), `PartyStatusPanel` (one member) and `BattleVitalRow` + `VitalRowStyle` (one HP or MP row) to keep methods under 4 parameters. The legacy text outline is `Ui/OutlinedFont` (blurred dark text under the text), also used for the actor name and "Run". "/max" is the message `battle_vital_max`. The active slide is instant (legacy animated it over 0.25 s) and the diamond does not light up yet; both wait for the turn order look (B3c, B4c). Review added `VitalsText_Refresh_MpChanged_ReformatsMpOnly`.

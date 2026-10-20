@@ -16,5 +16,4 @@ One line per ADR: what was decided. Read the ADR itself before changing that are
 | [0010](0010-player-facing-text.md) | Text | Player-facing text lives in `content/text/ui.json`, with `{name}` placeholders; ids are constants in `Ui/MessageIds`, each checked by a test. |
 | [0011](0011-content-after-the-converter.md) | Content | `content/` is the only source of truth: two files per map (settings and layout), catalogs at the content root, the editor writes through Data's `ContentWriter`. |
 | [0012](0012-editor-architecture.md) | Editor | MVVM with `CommunityToolkit.Mvvm`; editing logic is headless (`MapDraft`, `IMapEdit`, `EditHistory`) and tested; content I/O only through Data. |
-
-Planned: 0013, battle presentation and playback (battle plan, before B1b).
+| [0013](0013-battle-presentation-and-playback.md) | Battle | The battle HUD reads live Core state (`Execute` at the moment of impact); the battle scene stacks over the map; playback is event-driven beats, exhaustive over `BattleEvent`. |

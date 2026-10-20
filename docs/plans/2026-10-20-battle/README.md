@@ -1,5 +1,5 @@
 # Game: battles
-Status: approved
+Status: approved, in progress
 
 Second plan of part 3b (game parity). It takes from the part 3b notes at the end of `2026-10-18-shell-cutover-and-map-editing.md`:
 - the battle seams in Core (note 4a);
@@ -116,7 +116,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 1: the session and the shell
 
-- [ ] **ADR 0013: Battle presentation and playback** (before B1b) → [slices/ADR-0013.md](slices/ADR-0013.md)
+- [x] **ADR 0013: Battle presentation and playback** (before B1b) → [slices/ADR-0013.md](slices/ADR-0013.md)
 - [ ] **C1. Battles in the session** (Core, about 230 lines) → [slices/C1.md](slices/C1.md)
 - [ ] **B1a. A request during the flow's fade waits for it** (Game, about 90 lines; devil's advocate B-1) → [slices/B1a.md](slices/B1a.md)
 - [ ] **B1b. Random battles start; Run ends them** (Game, about 270 lines) → [slices/B1b.md](slices/B1b.md)

@@ -2,6 +2,7 @@ using FontStashSharp;
 using Jrpg.Data.Art;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
+using Jrpg.Game.Saving;
 using Jrpg.Game.Scenes;
 using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
@@ -38,7 +39,14 @@ internal sealed class TitleScene : IScene
     private const float SelectedScale = 1.1f;
     private static readonly Color _glow = Color.White * 0.5f;
 
-    private readonly TitleMenu _menu = new();
+    // Legacy OverlayViewHost: the file list in a 1000 px column, #AA111111, over the dimmed title.
+    private const int FilesWidth = 1000;
+    private static readonly Rectangle _filesArea = new((VirtualScreen.Width - FilesWidth) / 2, 0, FilesWidth, VirtualScreen.Height);
+
+    private readonly SaveSlots _slots;
+    private readonly IReadOnlyList<SaveSlotEntry> _saves;
+    private readonly TitleMenu _menu;
+    private readonly SaveFilesPanel _files;
     private readonly SpriteFontBase _nameFont;
     private readonly SpriteFontBase _entryFont;
     private readonly string _name;
@@ -47,8 +55,15 @@ internal sealed class TitleScene : IScene
     private readonly Vector2[] _labelCenters;
     private readonly Vector2[] _labelOrigins;
 
-    public TitleScene(ScreenText text)
+    /// <param name="text">Messages and fonts.</param>
+    /// <param name="slots">The save files, read once each time the title shows.</param>
+    /// <param name="ui">The shared gradient textures the file list uses.</param>
+    public TitleScene(ScreenText text, SaveSlots slots, UiTextures ui)
     {
+        _slots = slots;
+        _saves = slots.ReadAll();
+        _menu = new TitleMenu(SaveSlots.MostRecent(_saves) is not null);
+        _files = new SaveFilesPanel(slots, MessageIds.TitleLoad, text, ui);
         _nameFont = text.Fonts.FontAt(NameTextPixels);
         _entryFont = text.Fonts.FontAt(EntryTextPixels);
         _name = text.Messages.Text(MessageIds.GameTitle);
@@ -61,7 +76,10 @@ internal sealed class TitleScene : IScene
         _labelOrigins = [.. _labels.Select(label => _entryFont.MeasureString(label) / 2)];
     }
 
-    public SceneRequest? Update(TimeSpan delta, InputFrame input) => _menu.Update(input);
+    /// <summary>Whether the file list is open over the title, after Load.</summary>
+    public bool IsChoosingFile { get; private set; }
+
+    public SceneRequest? Update(TimeSpan delta, InputFrame input) => IsChoosingFile ? ChooseFile(input) : Choose(_menu.Update(input));
 
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
@@ -72,19 +90,69 @@ internal sealed class TitleScene : IScene
         {
             DrawEntry(batch, index);
         }
+
+        if (IsChoosingFile)
+        {
+            batch.Draw(textures.Pixel, new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height), UiTheme.Scrim);
+            batch.Draw(textures.Pixel, _filesArea, UiTheme.FilesOverlay);
+            _files.Draw(batch, textures, _filesArea, opacity: 1);
+        }
     }
 
     private static string LabelIdOf(TitleEntry entry) => entry switch
     {
         TitleEntry.NewGame => MessageIds.TitleNewGame,
+        TitleEntry.Continue => MessageIds.TitleContinue,
+        TitleEntry.Load => MessageIds.TitleLoad,
         TitleEntry.Quit => MessageIds.TitleQuit,
         _ => throw new ArgumentOutOfRangeException(nameof(entry), entry, null),
     };
 
+    private SceneRequest? Choose(TitleEntry? entry)
+    {
+        switch (entry)
+        {
+            case TitleEntry.NewGame:
+                return new NewGameRequested();
+            case TitleEntry.Continue:
+                return ContinueLatest();
+            case TitleEntry.Load:
+                _files.Open();
+                IsChoosingFile = true;
+                return null;
+            case TitleEntry.Quit:
+                return new QuitRequested();
+            default:
+                return null;
+        }
+    }
+
+    // Continue is enabled only with a readable save; a file broken since the title read it is logged and changes nothing.
+    private LoadRequested? ContinueLatest() =>
+        SaveSlots.MostRecent(_saves) is { } latest && _slots.Load(latest.Number) is { } save ? new LoadRequested(save) : null;
+
+    private LoadRequested? ChooseFile(InputFrame input)
+    {
+        if (input.IsPressed(GameButton.Cancel))
+        {
+            IsChoosingFile = false;
+            return null;
+        }
+
+        return _files.ChooseToLoad(input) is { } save ? new LoadRequested(save) : null;
+    }
+
     // Drawn around its center, so the selected entry grows in place.
     private void DrawEntry(SpriteBatch batch, int index)
     {
-        var isSelected = TitleMenu.Entries[index] == _menu.Selected;
+        var entry = TitleMenu.Entries[index];
+        if (!_menu.IsEnabled(entry))
+        {
+            batch.DrawString(_entryFont, _labels[index], _labelCenters[index], UiTheme.TextDisabled, origin: _labelOrigins[index]);
+            return;
+        }
+
+        var isSelected = entry == _menu.Selected;
         var scale = new Vector2(isSelected ? SelectedScale : 1);
         var label = _labels[index];
         var center = _labelCenters[index];

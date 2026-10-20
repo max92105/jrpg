@@ -21,6 +21,12 @@ internal static class MessageIds
     /// <summary>The title's entry that starts a new game.</summary>
     public const string TitleNewGame = "title_new_game";
 
+    /// <summary>The title's entry that continues from the most recent save.</summary>
+    public const string TitleContinue = "title_continue";
+
+    /// <summary>The title's entry that opens the save files to load one; also their heading there.</summary>
+    public const string TitleLoad = "title_load";
+
     /// <summary>The title's entry that closes the game.</summary>
     public const string TitleQuit = "title_quit";
 

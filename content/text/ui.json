@@ -5,6 +5,8 @@
   "item_found_lost": "{lost} didn't fit and were left behind.",
   "game_title": "The Lost Realm",
   "title_new_game": "New Game",
+  "title_continue": "Continue",
+  "title_load": "Load Game",
   "title_quit": "Quit",
   "menu_title": "Menu",
   "menu_status": "Status",

@@ -1,26 +1,33 @@
 using System.Collections.Immutable;
 using Jrpg.Game.Input;
-using Jrpg.Game.Scenes;
 using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Title;
 
-/// <summary>The title screen's entries and which one is selected; what confirming each asks the flow for.</summary>
+/// <summary>
+/// The title screen's entries and which one is selected (decision 80). Continue and Load need a readable save; without
+/// one they still show, greyed, and the cursor passes over them.
+/// </summary>
 internal sealed class TitleMenu
 {
     private readonly ListCursor _cursor;
+    private readonly bool _hasReadableSave;
 
-    public TitleMenu()
+    /// <param name="hasReadableSave">Whether any save file can be loaded.</param>
+    public TitleMenu(bool hasReadableSave)
     {
-        _cursor = new ListCursor(Entries.Length, _ => true);
+        _hasReadableSave = hasReadableSave;
+        _cursor = new ListCursor(Entries.Length, index => IsEnabled(Entries[index]));
     }
 
-    public static ImmutableArray<TitleEntry> Entries { get; } = [TitleEntry.NewGame, TitleEntry.Quit];
+    public static ImmutableArray<TitleEntry> Entries { get; } = [TitleEntry.NewGame, TitleEntry.Continue, TitleEntry.Load, TitleEntry.Quit];
 
     public TitleEntry Selected => Entries[_cursor.Selected];
 
-    /// <returns>The request of the entry confirmed this update, or null.</returns>
-    public SceneRequest? Update(InputFrame input)
+    public bool IsEnabled(TitleEntry entry) => _hasReadableSave || entry is not (TitleEntry.Continue or TitleEntry.Load);
+
+    /// <returns>The entry confirmed this update, or null.</returns>
+    public TitleEntry? Update(InputFrame input)
     {
         if (input.IsPressed(GameButton.Up))
         {
@@ -32,16 +39,6 @@ internal sealed class TitleMenu
             _cursor.MoveDown();
         }
 
-        if (!input.IsPressed(GameButton.Confirm))
-        {
-            return null;
-        }
-
-        return Selected switch
-        {
-            TitleEntry.NewGame => new NewGameRequested(),
-            TitleEntry.Quit => new QuitRequested(),
-            _ => throw new InvalidOperationException($"The title has no request for {Selected}."),
-        };
+        return input.IsPressed(GameButton.Confirm) ? Selected : null;
     }
 }

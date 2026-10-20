@@ -570,7 +570,12 @@ S1 was split in two (developer, 2026-10-19), since it came to about 600 lines. S
   - **Verify by hand:**
     - [ ] Open the chest, save, start a new game, load: the chest is open and the item owned.
 
-- [ ] **S2b. Continue and Load on the title** (Game, about 230 lines)
+- [x] **S2b. Continue and Load on the title** (Game, about 230 lines)
+  - **Done, with deviations:**
+    - `TitleMenu(bool hasReadableSave)` stays pure and returns the confirmed `TitleEntry`. `TitleScene` maps entries to requests and holds the file list, since loading reads files and the list needs fonts. Continue and Load show greyed, with no glow, when disabled.
+    - The loading logic moved from `LoadPage` into `SaveFilesPanel.ChooseToLoad`, shared by both. The title reads the files once per visit.
+    - Question 52 placeholder: the list sits in legacy `OverlayViewHost`'s 1000 px `#AA111111` column over a full-screen scrim. No blur. The list's heading and the entry read "Load Game".
+    - Tests: `TitleMenu` (5: first entry, disabled entries, skipping them, Continue selectable, nothing pressed). `TitleScene` covers Continue picking the most recent save, Load opening the list, Cancel closing it, loading a file from it, and Continue after the file broke. `SaveSlots` `MostRecent_PicksLatestSavedAt` and `MostRecent_NoReadableSave_ReturnsNull`.
   - **Goal** (decision 80): the title's entries become New game, Continue, Load and Quit.
     - **Continue** loads the most recent readable save (by save date).
     - **Load** opens the slot list over the dimmed title (question 52); Cancel or Esc returns to the entries.

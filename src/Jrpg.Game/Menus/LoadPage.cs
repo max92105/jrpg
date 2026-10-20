@@ -26,18 +26,7 @@ internal sealed class LoadPage(SaveSlots slots, ScreenText text, UiTextures ui) 
 
     public SceneRequest? Update(InputFrame input)
     {
-        if (_panel.Update(input) is not { IsReadable: true } chosen)
-        {
-            return null;
-        }
-
-        if (slots.Load(chosen.Number) is { } save)
-        {
-            return new LoadRequested(save);
-        }
-
-        _panel.Refresh();
-        return null;
+        return _panel.ChooseToLoad(input) is { } save ? new LoadRequested(save) : null;
     }
 
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity) => _panel.Draw(batch, textures, area, opacity);

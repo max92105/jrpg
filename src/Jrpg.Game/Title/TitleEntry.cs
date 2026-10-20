@@ -4,5 +4,7 @@ namespace Jrpg.Game.Title;
 internal enum TitleEntry
 {
     NewGame,
+    Continue,
+    Load,
     Quit,
 }

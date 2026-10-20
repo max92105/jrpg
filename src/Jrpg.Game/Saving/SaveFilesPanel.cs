@@ -1,4 +1,5 @@
 using FontStashSharp;
+using Jrpg.Core.Saving;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Ui;
@@ -56,6 +57,28 @@ internal sealed class SaveFilesPanel
     /// <returns>The file confirmed this update, or null.</returns>
     /// <exception cref="InvalidOperationException">The panel wasn't opened.</exception>
     public SaveSlotEntry? Update(InputFrame input) => OpenList().Update(input);
+
+    /// <summary>
+    /// Moves through the files and loads the readable one confirmed. A file that turned unreadable since the list was
+    /// read is shown so instead (the reason is logged), and the list stays.
+    /// </summary>
+    /// <returns>The save to continue from, fitted to the current content; null on every other update.</returns>
+    /// <exception cref="InvalidOperationException">The panel wasn't opened.</exception>
+    public SaveGame? ChooseToLoad(InputFrame input)
+    {
+        if (Update(input) is not { IsReadable: true } chosen)
+        {
+            return null;
+        }
+
+        var save = _slots.Load(chosen.Number);
+        if (save is null)
+        {
+            Refresh();
+        }
+
+        return save;
+    }
 
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the plain pixel and gradients come from.</param>

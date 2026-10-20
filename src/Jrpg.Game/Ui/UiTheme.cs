@@ -140,6 +140,9 @@ internal static class UiTheme
         new(1, FromLegacy(0x00FFFFFF)),
     ];
 
+    /// <summary>Legacy <c>OverlayViewHost</c>: the column the title's file list sits in.</summary>
+    public static Color FilesOverlay { get; } = FromLegacy(0xAA111111);
+
     // Legacy XAML colors are #AARRGGBB with straight alpha; the game draws premultiplied.
     private static Color FromLegacy(uint argb) => Color.FromNonPremultiplied(
         (int)((argb >> 16) & 0xFF),

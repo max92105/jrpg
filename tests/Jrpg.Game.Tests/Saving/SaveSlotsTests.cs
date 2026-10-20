@@ -107,4 +107,26 @@ public sealed class SaveSlotsTests : IDisposable
         Assert.Null(_slots.Load(1));
         Assert.Null(_slots.Load(2));
     }
+
+    [Fact]
+    public void MostRecent_PicksLatestSavedAt()
+    {
+        var session = GameSession.StartNew(_catalog, new SeededRandom(1));
+        _slots.Write(2, session);
+        var later = new SaveSlots(new FileSaveStore(_directory, _catalog), _catalog, () => _now.AddDays(1));
+        later.Write(9, session);
+
+        var latest = SaveSlots.MostRecent(_slots.ReadAll());
+
+        Assert.Equal(9, latest?.Number);
+    }
+
+    [Fact]
+    public void MostRecent_NoReadableSave_ReturnsNull()
+    {
+        Directory.CreateDirectory(_directory);
+        File.WriteAllText(Path.Combine(_directory, "slot_02.json"), "{ not json");
+
+        Assert.Null(SaveSlots.MostRecent(_slots.ReadAll()));
+    }
 }

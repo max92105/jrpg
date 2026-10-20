@@ -1,41 +1,57 @@
 using Jrpg.Game.Input;
-using Jrpg.Game.Scenes;
-using Jrpg.Game.Tests.Input;
 using Jrpg.Game.Title;
+using static Jrpg.Game.Tests.Input.InputFrames;
 
 namespace Jrpg.Game.Tests.Title;
 
 public sealed class TitleMenuTests
 {
     [Fact]
-    public void Update_ConfirmNewGame_RequestsNewGame()
+    public void Update_ConfirmFirstEntry_ReturnsNewGame()
     {
-        var menu = new TitleMenu();
+        var menu = new TitleMenu(hasReadableSave: true);
 
-        var request = menu.Update(InputFrames.Pressing(GameButton.Confirm));
+        var entry = menu.Update(Pressing(GameButton.Confirm));
 
-        Assert.IsType<NewGameRequested>(request);
+        Assert.Equal(TitleEntry.NewGame, entry);
     }
 
     [Fact]
-    public void Update_ConfirmQuit_RequestsQuit()
+    public void Constructor_NoReadableSave_ContinueAndLoadDisabled()
     {
-        var menu = new TitleMenu();
-        menu.Update(InputFrames.Pressing(GameButton.Down));
+        var menu = new TitleMenu(hasReadableSave: false);
 
-        var request = menu.Update(InputFrames.Pressing(GameButton.Confirm));
-
-        Assert.IsType<QuitRequested>(request);
+        Assert.False(menu.IsEnabled(TitleEntry.Continue));
+        Assert.False(menu.IsEnabled(TitleEntry.Load));
+        Assert.True(menu.IsEnabled(TitleEntry.Quit));
     }
 
     [Fact]
-    public void Update_NothingPressed_RequestsNothing()
+    public void Update_DownWithoutReadableSave_SkipsToQuit()
     {
-        var menu = new TitleMenu();
+        var menu = new TitleMenu(hasReadableSave: false);
 
-        var request = menu.Update(default);
+        menu.Update(Pressing(GameButton.Down));
 
-        Assert.Null(request);
+        Assert.Equal(TitleEntry.Quit, menu.Selected);
+    }
+
+    [Fact]
+    public void Update_DownWithReadableSave_SelectsContinue()
+    {
+        var menu = new TitleMenu(hasReadableSave: true);
+
+        menu.Update(Pressing(GameButton.Down));
+
+        Assert.Equal(TitleEntry.Continue, menu.Selected);
+    }
+
+    [Fact]
+    public void Update_NothingPressed_ReturnsNothing()
+    {
+        var menu = new TitleMenu(hasReadableSave: true);
+
+        Assert.Null(menu.Update(default));
         Assert.Equal(TitleEntry.NewGame, menu.Selected);
     }
 }

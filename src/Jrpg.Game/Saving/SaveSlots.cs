@@ -21,6 +21,11 @@ internal sealed class SaveSlots(FileSaveStore store, ContentCatalog catalog, Fun
     /// <param name="number">1 to <see cref="Count"/>.</param>
     public static string NameOf(int number) => string.Create(CultureInfo.InvariantCulture, $"slot_{number:00}");
 
+    /// <summary>The readable save made last, by its save date, for the title's Continue (decision 80).</summary>
+    /// <returns>Null when no file holds a readable save.</returns>
+    public static SaveSlotEntry? MostRecent(IReadOnlyList<SaveSlotEntry> entries) =>
+        entries.Where(entry => entry.IsReadable).MaxBy(entry => entry.Summary?.SavedAt);
+
     /// <summary>Every file's entry in order. Reads the disk, so it runs when a list opens, never every frame.</summary>
     public IReadOnlyList<SaveSlotEntry> ReadAll() => [.. Enumerable.Range(1, Count).Select(Read)];
 

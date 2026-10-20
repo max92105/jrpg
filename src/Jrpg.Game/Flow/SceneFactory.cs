@@ -33,7 +33,7 @@ internal sealed class SceneFactory
         _art = new MapArt(catalog, MapView.CellPixels);
     }
 
-    public TitleScene CreateTitle() => new(_text);
+    public TitleScene CreateTitle() => new(_text, _saveSlots, _ui);
 
     /// <param name="session">The playthrough the header reports on.</param>
     public GameMenuScene CreateGameMenu(GameSession session) =>

@@ -23,10 +23,9 @@ internal sealed class GameFlow : IScene
     private static readonly TimeSpan _fadeIn = TimeSpan.FromSeconds(0.5);
 
     private readonly SceneStack _scenes = new();
-    private readonly ScreenFade _fade = new(_fadeOut, _blackHold, _fadeIn);
+    private readonly FadeGate _fade = new(new ScreenFade(_fadeOut, _blackHold, _fadeIn));
     private readonly SessionTransitions _sessions;
     private readonly MenuTransitions _menus;
-    private SceneRequest? _requestBehindFade;
 
     /// <param name="catalog">The content, as loaded.</param>
     /// <param name="text">Messages and fonts.</param>
@@ -46,7 +45,7 @@ internal sealed class GameFlow : IScene
 
     /// <summary>
     /// Play time counts every update while a game is on, menus and pause included (developer decision 35). The scenes
-    /// get no input while the fade plays.
+    /// get no input while the fade plays, and a request one returns meanwhile waits for the fade to end.
     /// </summary>
     /// <returns>Quit, which only the host can do; null otherwise, since the flow handles every other request.</returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
@@ -54,24 +53,24 @@ internal sealed class GameFlow : IScene
         Session?.AddPlayTime(delta);
         _fade.Update(delta);
         ApplyRequestOnceBlack();
-
-        var isFading = _fade.Phase != FadePhase.Idle;
-        var request = _scenes.Update(delta, isFading ? default : input);
-        switch (request)
+        if (_fade.TakeReleased() is { } released)
         {
-            case null:
-                break;
-            case QuitRequested:
-                return request;
-            case MenuRequested:
-                _menus.Open(Session ?? throw new InvalidOperationException("The menu opened with no game started."));
-                break;
-            case MenuClosed:
-                _menus.Close();
-                break;
-            default:
-                StartBehindFade(request);
-                break;
+            Start(released);
+        }
+
+        var request = _scenes.Update(delta, _fade.IsFading ? default : input);
+        if (request is null or QuitRequested)
+        {
+            return request;
+        }
+
+        if (_fade.IsFading)
+        {
+            _fade.Hold(request);
+        }
+        else
+        {
+            Start(request);
         }
 
         return null;
@@ -87,24 +86,28 @@ internal sealed class GameFlow : IScene
         }
     }
 
-    private void StartBehindFade(SceneRequest request)
+    private void Start(SceneRequest request)
     {
-        _fade.Start();
-        _requestBehindFade = request;
-    }
-
-    // Past fading out rather than exactly holding: one long update can carry the fade over the whole hold.
-    private void ApplyRequestOnceBlack()
-    {
-        if (_requestBehindFade is null || _fade.Phase == FadePhase.FadingOut)
-        {
-            return;
-        }
-
-        var request = _requestBehindFade;
-        _requestBehindFade = null;
         switch (request)
         {
+            case MenuRequested:
+                _menus.Open(Session ?? throw new InvalidOperationException("The menu opened with no game started."));
+                break;
+            case MenuClosed:
+                _menus.Close();
+                break;
+            default:
+                _fade.StartBehindFade(request);
+                break;
+        }
+    }
+
+    private void ApplyRequestOnceBlack()
+    {
+        switch (_fade.TakeDueAtBlack())
+        {
+            case null:
+                break;
             case NewGameRequested:
                 Session = _sessions.StartNewGame();
                 break;
@@ -115,7 +118,7 @@ internal sealed class GameFlow : IScene
                 _sessions.ShowTitle();
                 Session = null;
                 break;
-            default:
+            case var request:
                 throw new InvalidOperationException($"The game can't handle a {request.GetType().Name} yet.");
         }
     }

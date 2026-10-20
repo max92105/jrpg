@@ -5,10 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-battle/slices/B3c.md, B3c (turn order bar: TurnOrder.Upcoming, TurnOrderStrip, TurnOrderView, TurnDiamondView, DiamondShape, enemy portrait art check)
-Round: 1 (verdict: Ready to commit; verify all pass, 1186 tests)
+Slice: docs/plans/2026-10-20-battle/slices/C2.md, C2 (BattleState.TargetChoiceForAttack, private ChoiceFor(Targeting) shared with ThrowIfIllegalTargets, AttackTargeting const)
+Round: 1 (verdict: Ready to commit; verify all pass, 1190 tests)
 
-- open (Suggestion): UiTheme.cs Over() inserted between FromLegacy and its "Legacy XAML colors ... premultiplied" comment; move Over above that comment.
-- open (Suggestion): TurnOrderStripTests names lack a scenario/method (Refresh_ListsCurrentThenEightNext, HighlightNobody_LightsEveryone -> Highlight_Empty_LightsEveryone).
-- open (Suggestion): TurnOrder.Upcoming's all-fallen guard returns empty untested while Advance throws for the same state; pick one behavior and test it (the guard prevents an infinite loop).
+- open (Suggestion): ThrowIfIllegalTargets keeps an `actor` parameter used only for the message while ChoiceFor reads CurrentActor; drop the parameter or pass actor into ChoiceFor so one actor is used.
+- open (Suggestion): comment "An attack hits one living enemy." on AttackTargeting restates the value; say why it's a const (shared by offer and Execute) or remove.
 - follow-up: none.

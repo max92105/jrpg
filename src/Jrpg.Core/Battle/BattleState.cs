@@ -13,6 +13,9 @@ namespace Jrpg.Core.Battle;
 /// </summary>
 public sealed class BattleState
 {
+    // Shared by the attack Execute checks and the targets it offers, so the two can't drift.
+    private const Targeting AttackTargeting = Targeting.SingleEnemy;
+
     private readonly TurnOrder _turnOrder;
     private readonly Inventory _inventory;
     private bool _isExperienceGranted;
@@ -65,6 +68,9 @@ public sealed class BattleState
 
     public IReadOnlyList<Combatant> LivingOn(BattleSide side) =>
         [.. Combatants.Where(combatant => combatant.Side == side && combatant.IsAlive)];
+
+    /// <summary>Who the current actor can attack: one living enemy, in formation order.</summary>
+    public TargetChoice<Combatant> TargetChoiceForAttack() => ChoiceFor(AttackTargeting);
 
     /// <summary>Whether the current actor knows <paramref name="skill"/> and has the MP for it. The UI greys out the rest.</summary>
     public bool CanUse(SkillDefinition skill) => CurrentActor.Skills.Contains(skill) && CurrentActor.Vitals.Mp >= skill.MpCost;
@@ -150,8 +156,8 @@ public sealed class BattleState
     // An attack is a single-enemy damage effect whose power is the attacker's attack.
     private void Attack(Combatant actor, Combatant target, List<BattleEvent> events)
     {
-        var effect = new Effect(EffectKind.Damage, actor.Stats.Attack, Targeting.SingleEnemy);
-        ThrowIfIllegalTargets(actor, effect, [target]);
+        var effect = new Effect(EffectKind.Damage, actor.Stats.Attack, AttackTargeting);
+        ThrowIfIllegalTargets(effect, [target]);
         ApplyToTargets(effect, [target], events);
     }
 
@@ -162,7 +168,7 @@ public sealed class BattleState
             throw new InvalidOperationException($"{actor.Name} can't use {command.Skill.Name} (unknown skill or not enough MP).");
         }
 
-        ThrowIfIllegalTargets(actor, command.Skill.Effect, command.Targets);
+        ThrowIfIllegalTargets(command.Skill.Effect, command.Targets);
         actor.Vitals.TrySpendMp(command.Skill.MpCost);
         ApplyToTargets(command.Skill.Effect, command.Targets, events);
     }
@@ -174,20 +180,23 @@ public sealed class BattleState
             throw new InvalidOperationException($"{actor.Name} can't use {command.Item.Name} (not owned, not usable, or not a party member).");
         }
 
-        ThrowIfIllegalTargets(actor, effect, command.Targets);
+        ThrowIfIllegalTargets(effect, command.Targets);
         _inventory.TryRemove(command.Item.Id, 1);
         ApplyToTargets(effect, command.Targets, events);
     }
 
-    private void ThrowIfIllegalTargets(Combatant actor, Effect effect, IReadOnlyList<Combatant> targets)
+    // The one rule for who the current actor may aim at, behind both the choices offered and the check in Execute.
+    private TargetChoice<Combatant> ChoiceFor(Targeting targeting) => new(
+        [.. Combatants.Where(candidate => TargetRules.CanTarget(targeting, RelationOf(CurrentActor, candidate), candidate.Vitals))],
+        TargetRules.HitsEveryValidTarget(targeting));
+
+    private void ThrowIfIllegalTargets(Effect effect, IReadOnlyList<Combatant> targets)
     {
-        var validTargets = Combatants
-            .Where(candidate => TargetRules.CanTarget(effect.Targeting, RelationOf(actor, candidate), candidate.Vitals))
-            .ToHashSet();
+        var validTargets = ChoiceFor(effect.Targeting).Candidates.ToHashSet();
         if (!TargetRules.IsLegalChoice(effect.Targeting, validTargets, targets))
         {
             throw new ArgumentException(
-                $"Illegal targets for a {effect.Targeting} effect from {actor.Name}: {string.Join(", ", targets.Select(target => target.Name))}.",
+                $"Illegal targets for a {effect.Targeting} effect from {CurrentActor.Name}: {string.Join(", ", targets.Select(target => target.Name))}.",
                 nameof(targets));
         }
     }

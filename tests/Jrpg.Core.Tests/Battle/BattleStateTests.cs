@@ -243,6 +243,39 @@ public sealed class BattleStateTests
     }
 
     [Fact]
+    public void TargetChoiceForAttack_DefeatedEnemy_IsExcluded()
+    {
+        var fallen = Goblin(hp: 40);
+        fallen.Vitals.TakeDamage(999);
+        var battle = new BattleState([_hero, fallen, _goblin], new Inventory(), new FixedSequenceRandom(2, 1));
+
+        var choice = battle.TargetChoiceForAttack();
+
+        Assert.Equal([_goblin], choice.Candidates);
+    }
+
+    [Fact]
+    public void TargetChoiceForAttack_TwoLivingEnemies_InFormationOrder()
+    {
+        var second = Goblin(hp: 40);
+        var battle = new BattleState([_hero, _goblin, second], new Inventory(), new FixedSequenceRandom(2, 1));
+
+        var choice = battle.TargetChoiceForAttack();
+
+        Assert.Equal([_goblin, second], choice.Candidates);
+    }
+
+    [Fact]
+    public void TargetChoiceForAttack_IsSingleTarget()
+    {
+        var battle = new BattleState([_hero, _goblin], new Inventory(), new FixedSequenceRandom(1));
+
+        var choice = battle.TargetChoiceForAttack();
+
+        Assert.False(choice.TakesAll);
+    }
+
+    [Fact]
     public void UpcomingActors_FourCombatants_ListsCycleAfterCurrent()
     {
         var (battle, goblins) = HeroAgainstThreeWeakGoblins();

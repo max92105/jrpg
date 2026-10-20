@@ -166,6 +166,12 @@ internal static class UiTheme
     /// <summary>Legacy <c>OverlayViewHost</c>: the column the title's file list sits in.</summary>
     public static Color FilesOverlay { get; } = FromLegacy(0xAA111111);
 
+    /// <summary>Legacy <c>Brush.BattleVignette</c>: clear in the middle, darkening toward the battle's edges and corners.</summary>
+    public static ImmutableArray<GradientStop> BattleVignette { get; } = [new(0.45f, FromLegacy(0x00000000)), new(1, FromLegacy(0xB3000000))];
+
+    /// <summary>Legacy <c>Brush.BattleTopShade</c>, from the top down: keeps the turn order and party numbers readable.</summary>
+    public static ImmutableArray<GradientStop> BattleTopShade { get; } = [new(0, FromLegacy(0x99000000)), new(1, FromLegacy(0x00000000))];
+
     // Legacy XAML colors are #AARRGGBB with straight alpha; the game draws premultiplied.
     private static Color FromLegacy(uint argb) => Color.FromNonPremultiplied(
         (int)((argb >> 16) & 0xFF),

@@ -17,3 +17,4 @@ Part of [the battle plan](../README.md). Design: [design.md](../design.md).
     - Data: `ArtReferenceCheck_FindProblems_MissingEncounterBackground_NamesTheEncounter`, `ArtReferenceCheck_FindProblems_BackgroundNameDiffersInCase_NamesTheFile`.
   - **Verify by hand:**
     - [ ] Corners darkened like `Combat3.webp`.
+- **Done, with deviations:** vignette tests are `Vignette_Colors_...` (it returns colors from theme stops, reusing `GradientStrip.ColorAt`, now public), not alphas. The vignette is baked at a quarter of the screen and stretched. `BattleScene` now takes `UiTextures`. Spot marks are faint white squares on living combatants. After review: `BattleLayout.SpotsOf` (tested) assigns each combatant its spot, and the case check accepts an exact match before looking for one that ignores case.

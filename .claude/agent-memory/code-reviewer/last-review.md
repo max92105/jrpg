@@ -5,9 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-battle/slices/B1b.md, B1b (random battles start; Run ends them)
-Round: 1 (verdict: Fix the Criticals; verify all pass, 1153 tests)
+Slice: docs/plans/2026-10-20-battle/slices/B2a.md, B2a (backdrop, formation, background check)
+Round: 1 (verdict: Ready to commit; verify all pass, 1161 tests)
 
-- open (Critical): StartMapScenarios.cs ~line 29-35: the BelowClosedDoor summary was left above NextToForestWarpAlwaysRolling's (two summaries on one property, none on BelowClosedDoor).
-- open (Warning): GameFlowTests Update_WalkIntoForestThatAlwaysRolls_FightsAndReturnsToMap asserts only what the loop exit and Core already guarantee; a no-op BattleTransitions.Finish passes. Assert the map takes input after the fade (hold Left, position changes).
-- open (Suggestion): Update_EncounterPending_DoesNotWalk passes without the scene's guard (Core refuses walking); the guard's real job (no Menu / no repeat BattleRequested while pending) could get a Menu-pressed test.
+- open (Suggestion): ArtReferenceCheck.CaseMismatch can report a false mismatch on a case-sensitive file system when both "Forest.png" and "forest.png" exist; check for an exact ordinal match first.
+- open (Suggestion): BattleScene.SpotsOf (combatant -> spot pairing, enemy slot = index - partyCount) is untested and EnemySpot(0)'s absolute position is not pinned; could move to BattleLayout with a test.

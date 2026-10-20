@@ -15,12 +15,21 @@ internal sealed class UiTextures
     // Wide enough that a gradient stretched over a long bar shows no steps.
     private const int GradientWidth = 256;
 
+    // A quarter of the screen: the vignette changes slowly enough that stretching it shows no steps.
+    private const int VignetteWidth = VirtualScreen.Width / 4;
+    private const int VignetteHeight = VirtualScreen.Height / 4;
+
+    /// <summary>Legacy <c>BattleUI</c>: the top shade covers the top 320 pixels.</summary>
+    public const int TopShadeHeight = 320;
+
     private Texture2D? _navTab;
     private Texture2D? _selectedNavTab;
     private Texture2D? _menuScrim;
     private Texture2D? _selectionLine;
     private Texture2D? _selectionFill;
     private Texture2D? _sectionLine;
+    private Texture2D? _battleVignette;
+    private Texture2D? _topShade;
     private readonly Dictionary<(string File, int Size), Texture2D> _diamondPortraits = [];
     private readonly Dictionary<(string File, int Size), Texture2D> _icons = [];
     private readonly Dictionary<ImmutableArray<GradientStop>, Texture2D> _gradients = [];
@@ -51,6 +60,14 @@ internal sealed class UiTextures
     /// <summary>One row, stretched under a section title.</summary>
     public Texture2D SectionLine(TextureLibrary textures) =>
         _sectionLine ??= textures.Create(NavTabShape.Width, 1, GradientStrip.Colors(UiTheme.SectionLine, NavTabShape.Width));
+
+    /// <summary>Darkens the battle's edges and corners; stretched over the whole screen.</summary>
+    public Texture2D BattleVignette(TextureLibrary textures) =>
+        _battleVignette ??= textures.Create(VignetteWidth, VignetteHeight, Vignette.Colors(UiTheme.BattleVignette, VignetteWidth, VignetteHeight));
+
+    /// <summary>One column, stretched over the top of the battle, <see cref="TopShadeHeight"/> pixels down.</summary>
+    public Texture2D TopShade(TextureLibrary textures) =>
+        _topShade ??= textures.Create(1, TopShadeHeight, GradientStrip.Colors(UiTheme.BattleTopShade, TopShadeHeight));
 
     /// <summary>A portrait cut into the reference UI's diamond (<see cref="DiamondCrop"/>), once per file and size.</summary>
     /// <param name="textures">Where the portrait is read and the diamond made.</param>

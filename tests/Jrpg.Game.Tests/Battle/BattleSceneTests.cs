@@ -6,6 +6,7 @@ using Jrpg.Game.Scenes;
 using Jrpg.Game.Tests.Exploration;
 using Jrpg.Game.Tests.Input;
 using Jrpg.Game.Tests.Ui;
+using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Tests.Battle;
 
@@ -42,7 +43,7 @@ public sealed class BattleSceneTests
         var session = GameSession.StartNew(catalog, new SeededRandom(1));
         Assert.True(StartMapScenarios.WalkUntilBattleRequested(StartMapScenarios.SceneOf(session.Exploration, catalog)));
         session.StartPendingBattle();
-        var scene = new BattleScene(session, RepositoryScreenText.Text);
+        var scene = new BattleScene(session, RepositoryScreenText.Text, new UiTextures());
         Assert.Null(scene.Update(StartMapScenarios.OneUpdate, default));
         return (session, scene);
     }

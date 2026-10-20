@@ -12,8 +12,9 @@ namespace Jrpg.Data.Art;
 public static class ArtReferenceCheck
 {
     /// <summary>
-    /// Every tilesheet, the field sprite, every dialogue portrait, every party member's portrait and every item's icon
-    /// exist as PNGs, and every tile's cell lies inside its sheet.
+    /// Every tilesheet, the field sprite, every dialogue portrait, every party member's portrait, every item's icon and
+    /// every encounter's background exist as PNGs, and every tile's cell lies inside its sheet. Battle art names must
+    /// match their files exactly, case included.
     /// </summary>
     /// <returns>One line per problem, naming the file; empty when the art is complete.</returns>
     public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string artRoot)
@@ -43,7 +44,39 @@ public static class ArtReferenceCheck
         AddMissing(problems, artRoot, ArtFolders.Portraits, members.Select(member => (member.PortraitFile, $"party member '{member.Id}'")));
         var items = catalog.Items.Values.OrderBy(item => item.Id, StringComparer.Ordinal);
         AddMissing(problems, artRoot, ArtFolders.Icons, items.Select(item => (item.IconFile, $"item '{item.Id}'")));
+        var encounters = catalog.Encounters.Values.OrderBy(encounter => encounter.Id, StringComparer.Ordinal);
+        AddMissingByExactName(problems, artRoot, ArtFolders.Backgrounds, encounters.Select(encounter => (encounter.BackgroundFile, $"encounter '{encounter.Id}'")));
         return problems;
+    }
+
+    // Battle art is matched by exact name, case included: Windows finds "goblin.png" for "Goblin.png", other systems don't.
+    private static void AddMissingByExactName(List<string> problems, string artRoot, string folder, IEnumerable<(string File, string NamedBy)> references)
+    {
+        foreach (var (file, namedBy) in references)
+        {
+            if ((CaseMismatch(artRoot, folder, file) ?? ReadSize(artRoot, folder, file).Problem) is { } problem)
+            {
+                problems.Add($"{problem} Named by {namedBy}.");
+            }
+        }
+    }
+
+    private static string? CaseMismatch(string artRoot, string folder, string file)
+    {
+        var directory = Path.Combine(artRoot, folder);
+        if (!Directory.Exists(directory))
+        {
+            return null;
+        }
+
+        var names = Directory.EnumerateFiles(directory).Select(Path.GetFileName).ToList();
+        if (names.Contains(file, StringComparer.Ordinal))
+        {
+            return null;
+        }
+
+        var actual = names.FirstOrDefault(name => string.Equals(name, file, StringComparison.OrdinalIgnoreCase));
+        return actual is null ? null : $"{ShownPath(folder, file)}: the file is named {actual}; names must match exactly.";
     }
 
     // One problem per named file that can't be read, saying what names it so the content can be fixed there.

@@ -21,8 +21,8 @@ internal static class GradientStrip
         return colors;
     }
 
-    // Past either end, the nearest stop's color holds, as in WPF.
-    private static Color ColorAt(float offset, IReadOnlyList<GradientStop> stops)
+    /// <summary>The color at <paramref name="offset"/>; past either end, the nearest stop's color holds, as in WPF.</summary>
+    public static Color ColorAt(float offset, IReadOnlyList<GradientStop> stops)
     {
         if (offset <= stops[0].Offset)
         {

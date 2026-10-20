@@ -5,11 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, S2b (Continue and Load on the title: SaveSlots.MostRecent, SaveFilesPanel.ChooseToLoad shared with LoadPage, TitleMenu(bool hasReadableSave) returns TitleEntry, TitleScene maps entries to requests and hosts the file list over a scrim)
-Round: 1 (verdict: Ready to commit; build 0 warnings, 990 tests pass, format exit 0)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, S3 (overwrite asks via ConfirmPrompt in SavePage; failed write shows save_failed notice in UiTheme.Danger; ISaveFilesPage.LeavesOnCancel gates SystemPage Cancel)
+Round: 1 (verdict: Ready to commit; build 0 warnings, 995 tests pass on rerun after font-crash flake, format exit 0)
 
-- open (Warning): plan S2b not ticked, deviations (TitleMenu returns entry, slot-list state in TitleScene, TitleMenu tests moved to TitleSceneTests, bool ctor, ChooseToLoad extraction) not recorded
-- open (Suggestion): TitleScene Continue when the latest file broke since the title read it (returns null) has no test
-- open (Suggestion): TitleMenuTests dropped the "starts on New Game" assertion from Update_NothingPressed; keep it
-- accepted (hand-off): TitleMenu returns TitleEntry, not requests; file list state lives in TitleScene
-- S2a items: plan updated (fixed); the two S2a suggestions not pursued (declined implicitly)
+- open (Warning): SystemPage `&& files.LeavesOnCancel` gate untested; removing it closes the list on Esc and leaves the prompt pending on reopen (Open doesn't clear _asking). Add SystemPageTests Esc-while-asking test
+- open (Warning): plan S3 not ticked; deviations (LeavesOnCancel on ISaveFilesPage, own ConfirmPromptView, extra AnswerNo test, test name KeepsListOpenAndSaysSo) not recorded
+- open (Suggestion): failure test could also assert a later successful save clears Notice
+- accepted (hand-off): SavePage builds its own ConfirmPromptView; G2 share-through-SceneFactory follow-up stays open

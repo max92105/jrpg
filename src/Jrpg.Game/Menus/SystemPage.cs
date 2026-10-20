@@ -92,7 +92,7 @@ internal sealed class SystemPage : IMenuPage
 
     private SceneRequest? UpdateFiles(ISaveFilesPage files, InputFrame input)
     {
-        if (input.IsPressed(GameButton.Cancel))
+        if (input.IsPressed(GameButton.Cancel) && files.LeavesOnCancel)
         {
             _openFiles = null;
             return null;

@@ -112,4 +112,10 @@ internal static class MessageIds
 
     /// <summary>Placeholders <c>{name}</c> and <c>{level}</c>: one active member in a save file's entry.</summary>
     public const string SaveMember = "save_member";
+
+    /// <summary>Placeholder <c>{number}</c>: asked before saving onto a file in use.</summary>
+    public const string SaveOverwrite = "save_overwrite";
+
+    /// <summary>Placeholder <c>{number}</c>: the disk refused the save.</summary>
+    public const string SaveFailed = "save_failed";
 }

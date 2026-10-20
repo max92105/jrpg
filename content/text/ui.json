@@ -40,5 +40,7 @@
   "save_empty": "Empty",
   "save_damaged": "Unreadable file",
   "save_details": "{date}   {time}",
-  "save_member": "{name} Lv {level}"
+  "save_member": "{name} Lv {level}",
+  "save_overwrite": "Overwrite File {number}?",
+  "save_failed": "Couldn't save to File {number}."
 }

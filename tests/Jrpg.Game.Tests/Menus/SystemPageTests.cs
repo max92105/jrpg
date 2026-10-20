@@ -1,7 +1,9 @@
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
+using Jrpg.Data.Saving;
 using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
+using Jrpg.Game.Saving;
 using Jrpg.Game.Scenes;
 using Jrpg.Game.Tests.Exploration;
 using Jrpg.Game.Tests.Ui;
@@ -77,6 +79,35 @@ public sealed class SystemPageTests
 
         Assert.Null(request);
         Assert.True(page.LeavesOnCancel);
+    }
+
+    [Fact]
+    public void Update_CancelWhileAskingToOverwrite_AnswersNoAndKeepsTheFilesOpen()
+    {
+        var directory = Path.Combine(Path.GetTempPath(), $"jrpg-system-{Guid.NewGuid():N}");
+        try
+        {
+            var catalog = StartMapScenarios.BelowClosedDoor;
+            var slots = new SaveSlots(new FileSaveStore(directory, catalog), catalog, () => DateTimeOffset.UnixEpoch);
+            var session = GameSession.StartNew(catalog, new SeededRandom(1));
+            slots.Write(1, session);
+            var ui = new UiTextures();
+            var text = RepositoryScreenText.Text;
+            var page = new SystemPage(text, ui, new SavePage(slots, session, text, ui), new LoadPage(slots, text, ui));
+            page.Update(Pressing(GameButton.Confirm));
+            page.Update(Pressing(GameButton.Confirm));
+
+            page.Update(Pressing(GameButton.Cancel));
+            var filesStillOpen = !page.LeavesOnCancel;
+            page.Update(Pressing(GameButton.Cancel));
+
+            Assert.True(filesStillOpen);
+            Assert.True(page.LeavesOnCancel);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
     }
 
     private static SystemPage NewPage()

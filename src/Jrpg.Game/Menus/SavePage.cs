@@ -1,3 +1,6 @@
+using System.Diagnostics;
+using System.Globalization;
+using FontStashSharp;
 using Jrpg.Core.Session;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
@@ -9,31 +12,135 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Jrpg.Game.Menus;
 
-/// <summary>Saving from the menu: Confirm writes the playthrough into the chosen file. Overwriting doesn't ask yet (S3).</summary>
-/// <param name="slots">The files.</param>
-/// <param name="session">What a save writes.</param>
-/// <param name="text">Messages and fonts.</param>
-/// <param name="ui">The shared gradient textures.</param>
-internal sealed class SavePage(SaveSlots slots, GameSession session, ScreenText text, UiTextures ui) : ISaveFilesPage
+/// <summary>
+/// Saving from the menu: Confirm writes the playthrough into the chosen file, asking first when the file is in use
+/// (decision 62). A write the disk refuses says so on the page and leaves the list open.
+/// </summary>
+internal sealed class SavePage : ISaveFilesPage
 {
-    private readonly SaveFilesPanel _panel = new(slots, MessageIds.SystemSave, text, ui);
+    // The notice sits on the heading's line, at the page's right margin (legacy SaveLoadView's 28 x 20 margin).
+    private const int NoticeMargin = 28;
+    private const int NoticeTop = 20;
+    private const int NoticePixels = 18;
+
+    private readonly SaveSlots _slots;
+    private readonly GameSession _session;
+    private readonly UiMessages _messages;
+    private readonly SaveFilesPanel _panel;
+    private readonly ConfirmPromptView _promptView;
+    private readonly SpriteFontBase _noticeFont;
+    private ConfirmPrompt? _asking;
+    private int _askingFor;
+    private float _noticeWidth;
+
+    /// <param name="slots">The files.</param>
+    /// <param name="session">What a save writes.</param>
+    /// <param name="text">Messages and fonts.</param>
+    /// <param name="ui">The shared gradient textures.</param>
+    public SavePage(SaveSlots slots, GameSession session, ScreenText text, UiTextures ui)
+    {
+        _slots = slots;
+        _session = session;
+        _messages = text.Messages;
+        _panel = new SaveFilesPanel(slots, MessageIds.SystemSave, text, ui);
+        _promptView = new ConfirmPromptView(text, ui);
+        _noticeFont = text.Fonts.FontAt(NoticePixels);
+    }
 
     /// <summary>The files as last read; empty until the page is opened.</summary>
     public IReadOnlyList<SaveSlotEntry> Entries => _panel.Entries;
 
-    public void Open() => _panel.Open();
+    /// <summary>Whether the overwrite question is open.</summary>
+    public bool IsAsking => _asking is not null;
+
+    /// <summary>Why the last save didn't happen, or null.</summary>
+    public string? Notice { get; private set; }
+
+    /// <summary>False while the overwrite question is open: Cancel answers it No instead.</summary>
+    public bool LeavesOnCancel => _asking is null;
+
+    public void Open()
+    {
+        _panel.Open();
+        Notice = null;
+        _asking = null;
+    }
 
     /// <returns>Null: saving asks the flow for nothing.</returns>
     public SceneRequest? Update(InputFrame input)
     {
-        if (_panel.Update(input) is { } chosen)
+        if (_asking is not null)
         {
-            slots.Write(chosen.Number, session);
-            _panel.Refresh();
+            Answer(_asking, input);
+        }
+        else if (_panel.Update(input) is { } chosen)
+        {
+            Choose(chosen);
         }
 
         return null;
     }
 
-    public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity) => _panel.Draw(batch, textures, area, opacity);
+    public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
+    {
+        _panel.Draw(batch, textures, area, opacity);
+        if (Notice is not null)
+        {
+            var position = new Vector2(area.Right - NoticeMargin - _noticeWidth, area.Y + NoticeTop);
+            batch.DrawString(_noticeFont, Notice, position, UiTheme.Danger * opacity);
+        }
+
+        if (_asking is not null)
+        {
+            _promptView.Draw(batch, textures, _asking, opacity);
+        }
+    }
+
+    private void Choose(SaveSlotEntry chosen)
+    {
+        if (chosen.IsEmpty)
+        {
+            Write(chosen.Number);
+            return;
+        }
+
+        _asking = new ConfirmPrompt(_messages.Format(MessageIds.SaveOverwrite, FileNumber(chosen.Number)));
+        _askingFor = chosen.Number;
+    }
+
+    private void Answer(ConfirmPrompt asking, InputFrame input)
+    {
+        var answer = asking.Update(input);
+        if (answer is null)
+        {
+            return;
+        }
+
+        _asking = null;
+        if (answer == ConfirmAnswer.Yes)
+        {
+            Write(_askingFor);
+        }
+    }
+
+    private void Write(int number)
+    {
+        try
+        {
+            _slots.Write(number, _session);
+            Notice = null;
+        }
+        catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
+        {
+            // The player is told the save didn't happen; the reason is for whoever debugs it.
+            Debug.WriteLine($"Saving to {SaveSlots.NameOf(number)} failed: {exception.Message}");
+            Notice = _messages.Format(MessageIds.SaveFailed, FileNumber(number));
+            _noticeWidth = _noticeFont.MeasureString(Notice).X;
+        }
+
+        _panel.Refresh();
+    }
+
+    private static MessageArgument FileNumber(int number) =>
+        new("number", number.ToString(CultureInfo.InvariantCulture));
 }

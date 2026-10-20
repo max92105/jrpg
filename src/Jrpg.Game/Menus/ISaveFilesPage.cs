@@ -9,6 +9,9 @@ namespace Jrpg.Game.Menus;
 /// <summary>Saving or loading: the save files, shown in the System page's place until Cancel.</summary>
 internal interface ISaveFilesPage
 {
+    /// <summary>False while something in the page, such as a question, answers Cancel itself.</summary>
+    bool LeavesOnCancel { get; }
+
     /// <summary>Reads the files; called each time the System page opens this one.</summary>
     void Open();
 

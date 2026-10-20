@@ -22,6 +22,8 @@ internal sealed class LoadPage(SaveSlots slots, ScreenText text, UiTextures ui) 
     /// <summary>The files as last read; empty until the page is opened.</summary>
     public IReadOnlyList<SaveSlotEntry> Entries => _panel.Entries;
 
+    public bool LeavesOnCancel => true;
+
     public void Open() => _panel.Open();
 
     public SceneRequest? Update(InputFrame input)

@@ -140,6 +140,9 @@ internal static class UiTheme
         new(1, FromLegacy(0x00FFFFFF)),
     ];
 
+    /// <summary>Legacy <c>Color.Danger</c>: a save that failed.</summary>
+    public static Color Danger { get; } = FromLegacy(0xFFE0524A);
+
     /// <summary>Legacy <c>OverlayViewHost</c>: the column the title's file list sits in.</summary>
     public static Color FilesOverlay { get; } = FromLegacy(0xAA111111);
 

@@ -586,7 +586,12 @@ S1 was split in two (developer, 2026-10-19), since it came to about 600 lines. S
     - [ ] Quit, start the game: Continue lands where the last save was.
     - [ ] With an empty save folder, both entries are greyed.
 
-- [ ] **S3. Overwrite asks first; failed saves say so** (Game, about 130 lines)
+- [x] **S3. Overwrite asks first; failed saves say so** (Game, about 130 lines)
+  - **Done, with deviations:**
+    - Any file that isn't empty asks first, damaged ones too. `ISaveFilesPage` gains `LeavesOnCancel`, so Esc answers the question No and the files stay open. Reopening Save clears any old question.
+    - The notice is drawn in legacy `Color.Danger` (`UiTheme.Danger`), right-aligned on the heading's line. It clears on the next successful save or on reopening.
+    - `SavePage` builds its own `ConfirmPromptView`: the G2 follow-up to share one is still open, since `SystemPage`'s constructor is at four parameters.
+    - Tests: `SavePage` covers a filled slot asking before writing, Yes overwriting, No keeping the old save, a failed write keeping the list open and saying so, and a later save clearing the notice. `SystemPage` has `Update_CancelWhileAskingToOverwrite_AnswersNoAndKeepsTheFilesOpen`.
   - **Goal:**
     - Saving onto a used file asks "Overwrite File n?" (decision 62, G2's prompt, starting on No).
     - A failed write (`IOException`, `UnauthorizedAccessException`) shows "Couldn't save to File n." (message id `save_failed`), keeps the list open, and logs the reason.

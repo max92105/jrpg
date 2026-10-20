@@ -19,7 +19,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 
 | Folder | Purpose | Key types |
 |---|---|---|
-| Battle | One battle: turn order, commands, events, enemy AI, rewards | `BattleState`, `BattleCommand`, `BattleEvent`, `TurnOrder`, `EnemyTactics` |
+| Battle | One battle: turn order, commands, events, enemy AI, rewards | `BattleState`, `BattleCommand`, `BattleEvent`, `TurnOrder`, `EnemyTactics`, `VictoryRewards` |
 | Content | The loaded catalog and global rules | `ContentCatalog`, `GameRules`, `NewGameDefinition` |
 | Dialogue | What a speaker says | `Speech` |
 | Effects | What skills and items do, targeting, damage formula | `Effect`, `EffectResolver`, `Targeting`, `TargetChoice`, `DamageFormula` |
@@ -31,7 +31,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Party | Members, the active party, equipment, field item use | `PartyState`, `PartyMember`, `PartyEquipment`, `FieldItemUse` |
 | Progression | Experience and levels | `ExperienceTable`, `LevelProgressStep` |
 | Randomness | Seeded randomness | `IRandom`, `SeededRandom` |
-| Saving / Session / World | The save record; one playthrough; what the player changed in the world | `SaveGame`, `GameSession`, `WorldState` |
+| Saving / Session / World | The save record; one playthrough (starts and finishes its battles); what the player changed in the world | `SaveGame`, `GameSession`, `WorldState` |
 | Skills / Stats | Skill definitions; stats and HP/MP | `SkillDefinition`, `CombatStats`, `Vitals` |
 
 ## Jrpg.Data (content and saves on disk)

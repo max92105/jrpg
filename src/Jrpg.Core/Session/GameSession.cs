@@ -1,6 +1,8 @@
+using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Items;
+using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Saving;
@@ -11,16 +13,18 @@ namespace Jrpg.Core.Session;
 /// <summary>All mutable state of one playthrough; what a save captures. Replaces the demo's static GameSystems.</summary>
 public sealed class GameSession
 {
-    private readonly WorldState _world;
+    // The catalog, inventory, world and random source shared by exploration and battles.
+    private readonly ExplorationContext _context;
 
-    private GameSession(PartyState party, Inventory inventory, WorldState world, ExplorationState exploration)
+    private GameSession(PartyState party, ExplorationContext context, MapLocation start)
     {
         Party = party;
-        Inventory = inventory;
-        _world = world;
-        Exploration = exploration;
-        Equipment = new PartyEquipment(inventory);
-        FieldItems = new FieldItemUse(party, inventory);
+        _context = context;
+        Inventory = context.Inventory;
+        Exploration = new ExplorationState(context, start);
+        Equipment = new PartyEquipment(Inventory);
+        FieldItems = new FieldItemUse(party, Inventory);
+        EnemyTactics = new EnemyTactics(context.Random);
     }
 
     public PartyState Party { get; }
@@ -35,6 +39,12 @@ public sealed class GameSession
     /// <summary>The player on the current map.</summary>
     public ExplorationState Exploration { get; }
 
+    /// <summary>What enemies do in this playthrough's battles, drawing from the session's random source (ADR 0004).</summary>
+    public EnemyTactics EnemyTactics { get; }
+
+    /// <summary>The battle started by <see cref="StartPendingBattle"/>, until <see cref="FinishBattle"/>; null otherwise.</summary>
+    public BattleState? ActiveBattle { get; private set; }
+
     /// <summary>Everything since the playthrough began, menus, battles and pause included (developer decision 35).</summary>
     public TimeSpan PlayTime { get; private set; }
 
@@ -47,9 +57,7 @@ public sealed class GameSession
         var members = newGame.RecruitedMemberIds.Select(id => PartyMember.Recruit(catalog.PartyMembers[id], catalog.Skills)).ToList();
         var party = new PartyState(members, ActiveOrder(members, newGame.ActiveMemberIds), catalog.Rules.Party);
         var inventory = InventoryHolding(newGame.StartingItems, catalog);
-        var world = new WorldState();
-        var exploration = new ExplorationState(new ExplorationContext(catalog, inventory, world, random), newGame.StartLocation);
-        return new GameSession(party, inventory, world, exploration);
+        return new GameSession(party, new ExplorationContext(catalog, inventory, new WorldState(), random), newGame.StartLocation);
     }
 
     /// <summary>
@@ -65,8 +73,41 @@ public sealed class GameSession
         var party = new PartyState(members, ActiveOrder(members, save.ActiveMemberIds), catalog.Rules.Party);
         var inventory = InventoryHolding(save.Inventory, catalog);
         var world = new WorldState(save.CompletedEvents, save.ObjectSwaps);
-        var exploration = new ExplorationState(new ExplorationContext(catalog, inventory, world, random), save.Location);
-        return new GameSession(party, inventory, world, exploration) { PlayTime = save.PlayTime };
+        return new GameSession(party, new ExplorationContext(catalog, inventory, world, random), save.Location) { PlayTime = save.PlayTime };
+    }
+
+    /// <summary>Starts the encounter a step left pending, between the active party and its enemies in encounter order.</summary>
+    /// <exception cref="InvalidOperationException">No encounter is pending, or a battle is already active.</exception>
+    public BattleState StartPendingBattle()
+    {
+        if (ActiveBattle is not null)
+        {
+            throw new InvalidOperationException("A battle is already active; finish it first.");
+        }
+
+        var encounter = Exploration.PendingEncounter ?? throw new InvalidOperationException("No encounter is pending.");
+        var enemies = encounter.EnemyIds.Select(id => _context.Catalog.Enemies[id]).ToList();
+        ActiveBattle = BattleState.Start(Party, enemies, Inventory, _context.Random);
+        return ActiveBattle;
+    }
+
+    /// <summary>
+    /// Ends the active battle whatever its outcome: a victory grants its experience, and the encounter is cleared so the
+    /// grace steps restart and saving works again.
+    /// </summary>
+    /// <returns>What a victory gave; null after an escape or a defeat.</returns>
+    /// <exception cref="InvalidOperationException">No battle is active, or it isn't over.</exception>
+    public VictoryRewards? FinishBattle()
+    {
+        if (ActiveBattle is not { IsOver: true } battle)
+        {
+            throw new InvalidOperationException("Only a battle that is over can be finished.");
+        }
+
+        var rewards = battle.Phase == BattlePhase.Victory ? battle.GrantVictoryExperience(_context.Catalog.Rules.Experience) : null;
+        Exploration.FinishEncounter();
+        ActiveBattle = null;
+        return rewards;
     }
 
     /// <summary>The Game adds every update's delta, so play time counts everything (developer decision 35).</summary>
@@ -95,8 +136,8 @@ public sealed class GameSession
             Members = [.. Party.Members.Select(member => member.CaptureProgress())],
             ActiveMemberIds = [.. Party.ActiveMembers.Select(member => member.Id)],
             Inventory = [.. Inventory.Entries],
-            CompletedEvents = _world.CompletedEvents,
-            ObjectSwaps = _world.ObjectSwaps,
+            CompletedEvents = _context.World.CompletedEvents,
+            ObjectSwaps = _context.World.ObjectSwaps,
         };
     }
 

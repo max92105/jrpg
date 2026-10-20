@@ -218,12 +218,28 @@ public sealed class BattleStateTests
         var battle = BattleState.Start(party, [Enemy("Goblin", maxHp: 10)], new Inventory(), new FixedSequenceRandom(1));
         battle.Execute(new AttackCommand(battle.LivingOn(BattleSide.Enemies)[0]));
 
-        var gains = battle.GrantVictoryExperience(new ExperienceTable([1000]));
+        var gains = battle.GrantVictoryExperience(new ExperienceTable([1000])).Gains;
 
         var gain = Assert.Single(gains);
         Assert.Same(member, gain.Member);
         Assert.Equal(40, gain.Amount);
         Assert.Equal(40, member.Experience);
+    }
+
+    [Fact]
+    public void GrantVictoryExperience_ThreeGoblins_ExperienceIsSumOfRewards()
+    {
+        var sarxian = new PartyMemberBuilder().WithStats(attack: 15, defense: 8).Build();
+        var jazog = new PartyMemberBuilder().WithStats(attack: 15, defense: 8).Build();
+        var party = new PartyState([sarxian, jazog], [sarxian, jazog], new PartyRules(MaxActiveMembers: 4));
+        EnemyDefinition[] goblins = [Enemy("Goblin A", maxHp: 10), Enemy("Goblin B", maxHp: 10), Enemy("Goblin C", maxHp: 10)];
+        var battle = BattleState.Start(party, goblins, new Inventory(), new FixedSequenceRandom(4, 3, 2, 1));
+        BattleScript.AttackUntilOver(battle);
+
+        var rewards = battle.GrantVictoryExperience(new ExperienceTable([1000]));
+
+        Assert.Equal(120, rewards.Experience);
+        Assert.Equal([60, 60], rewards.Gains.Select(gain => gain.Amount));
     }
 
     [Fact]

@@ -70,9 +70,9 @@ public sealed class BattleState
         CurrentActor.Side == BattleSide.Party && item.Effect is not null && _inventory.QuantityOf(item.Id) > 0;
 
     /// <summary>Gives the enemies' experience to the party members still standing (developer decision 13). Call once, after a victory.</summary>
-    /// <returns>One gain per living party member, with the level steps it produced, for the victory screen.</returns>
+    /// <returns>The total experience and one gain per living party member, with the level steps it produced.</returns>
     /// <exception cref="InvalidOperationException">The battle wasn't won, or the experience was already granted.</exception>
-    public IReadOnlyList<ExperienceGain> GrantVictoryExperience(ExperienceTable table)
+    public VictoryRewards GrantVictoryExperience(ExperienceTable table)
     {
         if (Phase != BattlePhase.Victory || _isExperienceGranted)
         {
@@ -82,7 +82,7 @@ public sealed class BattleState
         _isExperienceGranted = true;
         var defeated = Combatants.Select(combatant => combatant.Enemy).OfType<EnemyDefinition>().ToList();
         var members = Combatants.Select(combatant => combatant.Member).OfType<PartyMember>().ToList();
-        return BattleRewards.GrantExperience(defeated, members, table);
+        return new VictoryRewards(BattleRewards.TotalExperience(defeated), BattleRewards.GrantExperience(defeated, members, table));
     }
 
     /// <summary>The current actor carries out <paramref name="command"/>, then the turn ends.</summary>

@@ -30,3 +30,5 @@ Seen again in part 2 slice 4a (fixture variant): `ContinueEvent_WarpOntoTouchCel
 Seen again in part 2 slice 5b: `Read_MissingRequiredField_ThrowsNamingTheField` renames a key, so it tests the unmapped-member error, not the missing field; `CheckNoNullEntries` (5 `||` clauses) tested on one list only.
 
 Seen again in 11g (oracle variant): `ObjectBrowserViewModelTests` asserts the list equals the same `OrderBy(Category).ThenBy(Id)` the production code runs, so it passes for any sort bug shared by both. Pin a golden prefix instead (it did, with `Take(2)`).
+
+Seen again in battle C1 (single-recipient variant): `VictoryRewards.Experience` ("before the split") tested only with a one-member party, so total == share and `Experience = Gains[0].Amount` would pass. For totals vs per-member values, ask for two recipients.

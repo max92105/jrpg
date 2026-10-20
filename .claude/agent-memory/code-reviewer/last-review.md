@@ -5,9 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-menu-cleanup/slices/P2.md, P2 (PartyColumnsView, PartyColumns, PartyActionChoiceView out of PartyPage, no behavior change)
-Round: 1 (verdict: Ready to commit; verify all pass, 1132 tests; draw geometry, notice/choice no overlap, ShowParty after every mutation checked)
+Slice: docs/plans/2026-10-20-battle/slices/C1.md, C1 (battles in the session: VictoryRewards, GameSession.StartPendingBattle/FinishBattle/ActiveBattle/EnemyTactics)
+Round: 1 (verdict: Ready to commit; verify all pass, 1140 tests)
 
-- open (Suggestion): tick P2 in README.md:110; record in P2.md the deviations (Active/Reserve snapshots in PartyColumns, static ActiveCardArea instead of CardArea(bool), ChangeOrderEntry/EntryCount on the view)
-- open (Suggestion): add PartyColumns/PartyColumnsView, PartyActionChoiceView to docs/map.md Menus row
-- open (Suggestion): PartyColumnsView.CardColumn carries the whole Place as `Page` only for Cards/Moving; pass those two (or drop CardColumn.Page)
+- open (Warning): VictoryRewards.Experience "before the split" only tested with one-member parties (BattleStateTests ThreeGoblins, GameSessionBattleTests AfterVictory); total == share, so a share-based Experience passes. Use two members, assert 120 vs 60 each.
+- open (Suggestion): FinishBattle after a defeat (returns null, clears encounter) has no test.

@@ -3,7 +3,7 @@ using Jrpg.Core.Randomness;
 namespace Jrpg.Core.Battle;
 
 /// <summary>Chooses what an enemy does on its turn: attack a random living party member.</summary>
-internal sealed class EnemyTactics(IRandom random)
+public sealed class EnemyTactics(IRandom random)
 {
     /// <exception cref="InvalidOperationException">It isn't an enemy's turn.</exception>
     public BattleCommand ChooseCommand(BattleState battle)

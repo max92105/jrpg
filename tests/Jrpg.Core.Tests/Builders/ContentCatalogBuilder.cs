@@ -25,6 +25,7 @@ internal sealed class ContentCatalogBuilder
     private TileDefinition[] _tiles = [TestTiles.Walkable(1)];
     private ObjectDefinition[] _objects = [];
     private MapLayout[] _maps = [new MapLayoutBuilder().WithLayer("1").Build()];
+    private EnemyDefinition[] _enemies = [];
     private EncounterDefinition[] _encounters = [];
     private readonly Dictionary<string, RandomEncounterTable> _randomEncounters = [];
 
@@ -65,6 +66,12 @@ internal sealed class ContentCatalogBuilder
         return this;
     }
 
+    public ContentCatalogBuilder WithEnemies(params EnemyDefinition[] enemies)
+    {
+        _enemies = enemies;
+        return this;
+    }
+
     public ContentCatalogBuilder WithEncounters(params EncounterDefinition[] encounters)
     {
         _encounters = encounters;
@@ -89,7 +96,7 @@ internal sealed class ContentCatalogBuilder
         Classes = new Dictionary<string, ClassDefinition>(),
         Skills = _skills.ToDictionary(skill => skill.Id),
         PartyMembers = _members.ToDictionary(member => member.Id),
-        Enemies = new Dictionary<string, EnemyDefinition>(),
+        Enemies = _enemies.ToDictionary(enemy => enemy.Id),
         Encounters = _encounters.ToDictionary(encounter => encounter.Id),
         Tiles = _tiles.ToDictionary(tile => tile.Id),
         Tilesheets = new Dictionary<string, TilesheetDefinition> { [TestTiles.Sheet.Id] = TestTiles.Sheet },

@@ -253,10 +253,7 @@ internal sealed class InventoryPage : IMenuPage
     {
         if (index == _rowCursor?.Selected)
         {
-            batch.Draw(_ui.Gradient(textures, UiTheme.SelectedRow), row, Color.White * opacity);
-            var line = _ui.Gradient(textures, UiTheme.HighlightLine);
-            batch.Draw(line, new Rectangle(row.X, row.Y, row.Width, 1), Color.White * opacity);
-            batch.Draw(line, new Rectangle(row.X, row.Bottom - 1, row.Width, 1), Color.White * opacity);
+            _ui.DrawSelectedRow(batch, textures, row, opacity);
         }
 
         var item = _rows[index];

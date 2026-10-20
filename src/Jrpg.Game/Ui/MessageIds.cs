@@ -152,4 +152,14 @@ internal static class MessageIds
 
     /// <summary>Placeholder <c>{item}</c>: an item used on several members at once.</summary>
     public const string ItemUsed = "item_used";
+
+    /// <summary>The game menu's Equipment tab.</summary>
+    public const string MenuEquipment = "menu_equipment";
+
+    /// <summary>The Equipment page's action that takes off everything the member wears.</summary>
+    public const string EquipmentRemoveAll = "equipment_remove_all";
+
+    public const string StatMaxHp = "stat_max_hp";
+
+    public const string StatMaxMp = "stat_max_mp";
 }

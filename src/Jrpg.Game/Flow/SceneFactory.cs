@@ -37,7 +37,7 @@ internal sealed class SceneFactory
 
     /// <param name="session">The playthrough the header reports on.</param>
     public GameMenuScene CreateGameMenu(GameSession session) =>
-        new(_text, _ui, new MenuHeader(_text, session), [new InventoryPage(_text, _ui, session, _catalog), new StatusPage(_text, _ui, session, _catalog), CreateSystemPage(session)]);
+        new(_text, _ui, new MenuHeader(_text, session), [new InventoryPage(_text, _ui, session, _catalog), new EquipmentPage(_text, _ui, session), new StatusPage(_text, _ui, session, _catalog), CreateSystemPage(session)]);
 
     public ExplorationScene CreateExploration(ExplorationState exploration) => new(exploration, _catalog, _art, _text);
 

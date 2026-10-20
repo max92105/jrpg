@@ -681,7 +681,13 @@ P2b was split in two (developer, 2026-10-19), since it came to about 420 lines w
   - **Verify by hand:**
     - [ ] The cards match the legacy popup, and the selection is clear.
 
-- [ ] **P3a. Equipment page: members, slots and stats** (Game, about 220 lines)
+- [x] **P3a. Equipment page: members, slots and stats** (Game, about 220 lines)
+  - **Done, with deviations:**
+    - Left and Right change the member as well as the tab buttons, as on Status. Up and Down move between Weapon, Armor and Remove all.
+    - No slot icons: legacy's `Slot/*` art doesn't exist, so the worn item's icon shows instead. No hint footer.
+    - Tab order: Inventory, Equipment, Status, System (legacy's, without Party until P4).
+    - New `Menus/MemberOrder.ActiveThenReserve`, shared with Status. `UiTextures.DrawSelectedRow` replaces Inventory's copy.
+    - Tests use `Method_Scenario_Result` names. Extra: `Update_Right_ShowsTheNextMember` and `Update_ConfirmOnWeaponRow_ChangesNothing`.
   - **Goal:** an Equipment tab in the legacy `EquipmentView` layout: one member at a time (PreviousTab/NextTab), the weapon and armor slots with what's worn, the member's stats, and "Remove all" (question 60; through `PartyEquipment.TryUnequip`).
   - **New types (Game):** `Menus/EquipmentPage`.
   - **Tests:** `EquipmentPage_NextMember_OnLastMember_WrapsToFirst`, `EquipmentPage_RemoveAll_EmptiesBothSlots`, `EquipmentPage_RemoveAll_StackFull_KeepsThatItemWorn`.

@@ -133,6 +133,7 @@ public sealed class GameFlowTests : IDisposable
         flow.Update(_oneUpdate, InputFrames.PressingEscape);
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
@@ -151,6 +152,7 @@ public sealed class GameFlowTests : IDisposable
         var flow = StartedFlow();
         var first = SessionOf(flow);
         flow.Update(_oneUpdate, InputFrames.PressingEscape);
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
@@ -180,6 +182,7 @@ public sealed class GameFlowTests : IDisposable
         Assert.NotEqual(savedPosition, SessionOf(flow).Exploration.PlayerPosition);
 
         flow.Update(_oneUpdate, InputFrames.PressingEscape);
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));

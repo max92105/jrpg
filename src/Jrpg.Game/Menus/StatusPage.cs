@@ -72,8 +72,7 @@ internal sealed class StatusPage : IMenuPage
     {
         _catalog = catalog;
         _ui = ui;
-        var active = session.Party.ActiveMembers;
-        Members = [.. active, .. session.Party.Members.Where(member => !active.Contains(member))];
+        Members = MemberOrder.ActiveThenReserve(session.Party);
         _cursor = new ListCursor(Members.Count, _ => true);
         _headingFont = text.Fonts.FontAt(HeadingPixels);
         _bodyFont = text.Fonts.FontAt(BodyPixels);

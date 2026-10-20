@@ -1,0 +1,101 @@
+using Jrpg.Core.Party;
+using Jrpg.Core.Randomness;
+using Jrpg.Core.Session;
+using Jrpg.Game.Input;
+using Jrpg.Game.Menus;
+using Jrpg.Game.Tests.Exploration;
+using Jrpg.Game.Tests.Ui;
+using Jrpg.Game.Ui;
+using static Jrpg.Game.Tests.Input.InputFrames;
+
+namespace Jrpg.Game.Tests.Menus;
+
+[Collection(RepositoryScreenText.CollectionName)]
+public sealed class EquipmentPageTests
+{
+    private readonly GameSession _session = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
+
+    [Fact]
+    public void Update_NextMemberOnLastMember_WrapsToFirst()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.PreviousTab));
+        var last = page.Shown;
+
+        page.Update(Pressing(GameButton.NextTab));
+
+        Assert.Same(page.Members[^1], last);
+        Assert.Same(page.Members[0], page.Shown);
+    }
+
+    [Fact]
+    public void Update_RemoveAll_EmptiesBothSlots()
+    {
+        var sarxian = WearingSwordAndArmor();
+        var page = NewPage();
+
+        ConfirmRemoveAll(page);
+
+        Assert.Null(sarxian.Weapon);
+        Assert.Null(sarxian.Armor);
+        Assert.Equal(2, _session.Inventory.QuantityOf("bronze_sword"));
+        Assert.Equal(2, _session.Inventory.QuantityOf("leather_armor"));
+    }
+
+    [Fact]
+    public void Update_RemoveAllWithWeaponStackFull_KeepsTheWeaponWorn()
+    {
+        var sarxian = WearingSwordAndArmor();
+        var sword = StartMapScenarios.BelowClosedDoor.Items["bronze_sword"];
+        _session.Inventory.Add(sword, sword.MaxStack - _session.Inventory.QuantityOf(sword.Id));
+        var page = NewPage();
+
+        ConfirmRemoveAll(page);
+
+        Assert.Same(sword, sarxian.Weapon);
+        Assert.Null(sarxian.Armor);
+    }
+
+    [Fact]
+    public void Update_Right_ShowsTheNextMember()
+    {
+        var page = NewPage();
+
+        page.Update(Pressing(GameButton.Right));
+
+        Assert.Same(page.Members[1], page.Shown);
+    }
+
+    [Fact]
+    public void Update_ConfirmOnWeaponRow_ChangesNothing()
+    {
+        var sarxian = WearingSwordAndArmor();
+        var sword = sarxian.Weapon;
+        var page = NewPage();
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.Same(sword, sarxian.Weapon);
+        Assert.Equal(1, _session.Inventory.QuantityOf("bronze_sword"));
+    }
+
+    // Starts with 2 bronze swords and 2 leather armors in the inventory; the leader, a warrior, can wear both.
+    private PartyMember WearingSwordAndArmor()
+    {
+        var sarxian = _session.Party.Leader;
+        var items = StartMapScenarios.BelowClosedDoor.Items;
+        Assert.True(_session.Equipment.TryEquip(sarxian, items["bronze_sword"]));
+        Assert.True(_session.Equipment.TryEquip(sarxian, items["leather_armor"]));
+        return sarxian;
+    }
+
+    // The rows are Weapon, Armor, then Remove all.
+    private static void ConfirmRemoveAll(EquipmentPage page)
+    {
+        page.Update(Pressing(GameButton.Down));
+        page.Update(Pressing(GameButton.Down));
+        page.Update(Pressing(GameButton.Confirm));
+    }
+
+    private EquipmentPage NewPage() => new(RepositoryScreenText.Text, new UiTextures(), _session);
+}

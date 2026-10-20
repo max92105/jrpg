@@ -10,6 +10,7 @@
   "title_quit": "Quit",
   "menu_title": "Menu",
   "menu_inventory": "Inventory",
+  "menu_equipment": "Equipment",
   "menu_status": "Status",
   "system_save": "Save",
   "system_load": "Load",
@@ -55,5 +56,8 @@
   "item_used_hp": "{member} recovers {amount} HP.",
   "item_used_mp": "{member} recovers {amount} MP.",
   "item_used_revive": "{member} is revived with {amount} HP.",
-  "item_used": "{item} was used."
+  "item_used": "{item} was used.",
+  "equipment_remove_all": "Remove all",
+  "stat_max_hp": "Max HP",
+  "stat_max_mp": "Max MP"
 }

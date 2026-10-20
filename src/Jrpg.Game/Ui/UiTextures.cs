@@ -103,6 +103,23 @@ internal sealed class UiTextures
         return texture;
     }
 
+    /// <summary>
+    /// The selected row of a menu list (legacy <c>ListRow</c>): the <see cref="UiTheme.SelectedRow"/> gradient between two
+    /// bright hairlines.
+    /// </summary>
+    /// <param name="batch">Already begun.</param>
+    /// <param name="textures">Where the gradients are made.</param>
+    /// <param name="row">The row's area.</param>
+    /// <param name="opacity">0 to 1, while the menu fades in.</param>
+    public void DrawSelectedRow(SpriteBatch batch, TextureLibrary textures, Rectangle row, float opacity)
+    {
+        var tint = Color.White * opacity;
+        batch.Draw(Gradient(textures, UiTheme.SelectedRow), row, tint);
+        var line = Gradient(textures, UiTheme.HighlightLine);
+        batch.Draw(line, new Rectangle(row.X, row.Y, row.Width, 1), tint);
+        batch.Draw(line, new Rectangle(row.X, row.Bottom - 1, row.Width, 1), tint);
+    }
+
     private static Color[] SolidRow(Color color, int width)
     {
         var row = new Color[width];

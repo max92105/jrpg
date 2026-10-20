@@ -1,5 +1,5 @@
 # Cleanup: font test crash, menu pages, party rules, shared menu pieces
-Status: approved
+Status: done (2026-10-20)
 
 A cleanup plan between part 3b's menu plan (`2026-10-18-game-title-menu-movement.md`, every slice done) and the battle plan (`2026-10-20-battle/`, not started). It closes follow-ups those slices left open:
 - the M3b test-host crash;
@@ -108,7 +108,7 @@ One line per slice. Each slice's goal, types, tests and hand checks are in its f
 
 - [x] **P1. The party cursor as a pure type** (Game, about 220 lines) → [slices/P1.md](slices/P1.md)
 - [x] **P2. The party page views** (Game, about 250 lines, mostly moved) → [slices/P2.md](slices/P2.md)
-- [ ] **Z. Hand check** (manual) → [slices/Z.md](slices/Z.md)
+- [x] **Z. Hand check** (manual) → [slices/Z.md](slices/Z.md)
 
 ## Decisions (developer, 2026-10-20)
 Questions and decisions share numbers.
@@ -131,6 +131,7 @@ Earlier decisions that apply:
 
 ## Open design questions (developer decides)
 Each slice uses the placeholder until answered.
+- **Closed at the hand check (developer, 2026-10-20, "all good"):** the placeholders below are kept as they are.
 - **107 follow-up:** review the wording of `party_needs_someone_standing`. Placeholder: "{name} is the only one standing and can't leave the party."
 - **112. The item target picker with the shared card.** The Party card is a 120 px tall row, so seven members no longer fit in one centered row of small cards.
   - Placeholder: the picker band shows the cards in two columns, 560 px wide each, filled in member order. Navigation stays as today (`ItemTargetPicker` unchanged: every direction steps through the members in order).

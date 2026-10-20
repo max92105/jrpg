@@ -1,4 +1,5 @@
 using System.Globalization;
+using Jrpg.Core.Content;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
@@ -25,12 +26,13 @@ internal sealed class ItemUseDialog
     /// <param name="session">Whose party and inventory the item is used with.</param>
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared gradient textures.</param>
-    public ItemUseDialog(GameSession session, ScreenText text, UiTextures ui)
+    /// <param name="catalog">Class names, for the member cards.</param>
+    public ItemUseDialog(GameSession session, ScreenText text, UiTextures ui, ContentCatalog catalog)
     {
         _party = session.Party;
         _fieldItems = session.FieldItems;
         _messages = text.Messages;
-        _view = new ItemTargetPickerView(text, ui);
+        _view = new ItemTargetPickerView(text, ui, catalog);
     }
 
     public bool IsOpen => _open is not null;
@@ -45,7 +47,7 @@ internal sealed class ItemUseDialog
 
         var picker = new ItemTargetPicker(_party.Members, _fieldItems.TargetChoiceForAnyUser(item));
         _open = new OpenUse(item, picker);
-        _view.Show(picker, item.Name, item.IconFile);
+        _view.Show(picker, item, _party.Leader);
     }
 
     /// <summary>Cancel closes the picker; Confirm uses the item.</summary>

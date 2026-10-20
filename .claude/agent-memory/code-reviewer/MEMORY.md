@@ -6,4 +6,4 @@
 - [Last review](last-review.md) — slice, round and finding status of the latest review; read first to apply re-review rules
 - [Format check line endings](format-check-line-endings.md) — run format unpiped, trust exit code; "format clean" hand-offs wrong twice (3c, 11e mixed LF line)
 - [Flaky font test crash](flaky-font-test-crash.md) — Game test host crash/hang or odd failure in unrelated test (font OOB read); rerun before blaming slice
-- [Plan checkbox unticked](plan-checkbox-unticked.md) — README box unticked, deviations only in message, new Ui types missing from map.md (C2, M1, U1, U2, U3)
+- [Plan checkbox unticked](plan-checkbox-unticked.md) — README box unticked, deviations only in message, new Ui types missing from map.md (C2, M1, U1-U4)

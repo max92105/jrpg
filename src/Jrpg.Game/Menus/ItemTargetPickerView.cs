@@ -1,4 +1,7 @@
 using FontStashSharp;
+using Jrpg.Core.Content;
+using Jrpg.Core.Items;
+using Jrpg.Core.Party;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
@@ -8,69 +11,65 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// Draws an <see cref="ItemTargetPicker"/> as the legacy use popup, in <c>DialogStyle</c>'s raised band over the dimmed
-/// menu: the item's icon and "Use item", then every member side by side as a card (legacy <c>CharacterPortrait</c>), a
-/// diamond portrait over the name and the HP and MP bars. Members the item can't be used on are faded; the chosen ones
-/// glow.
+/// menu: the item's icon and "Use item", then every member's card (the Party page's), in two columns in member order.
+/// Members the item can't be used on are faded; the chosen ones are drawn selected.
 /// </summary>
 internal sealed class ItemTargetPickerView
 {
     // Legacy DialogStyle padding 32; Text.Heading 22 px with the 32 px item icon 12 px before it and 24 px below.
     private const int BandPadding = 32;
     private const int HeadingPixels = 22;
-    private const int NamePixels = 14;
     private const int IconSize = 32;
     private const int IconGap = 12;
     private const int HeadingGap = 24;
 
-    // Each card: a 96 px diamond portrait (the reference UI's frame; legacy drew 48 px squares), the name 6 px under it,
-    // then the 6 px HP and MP bars 2 px apart; cards 16 px apart.
-    private const int CardWidth = 112;
-    private const int CardGap = 16;
-    private const int PortraitSize = 96;
-    private const int NameGap = 6;
-    private const int BarGap = 2;
-    private const int BarHeight = 6;
-    private const int SelectedGlow = 10;
+    // Question 112's placeholder: two 560 px columns of cards, 16 px apart, centered.
+    private const int Columns = 2;
+    private const int CardWidth = 560;
+    private const int ColumnGap = 16;
     private const float UnavailableOpacity = 0.4f;
 
-    private readonly ScreenText _text;
     private readonly UiMessages _messages;
     private readonly UiTextures _ui;
+    private readonly MemberCardView _cardView;
     private readonly SpriteFontBase _headingFont;
-    private readonly SpriteFontBase _nameFont;
     private string _heading = string.Empty;
     private float _headingWidth;
     private string _iconFile = string.Empty;
-    private MemberCard[] _cards = [];
+    private MemberCardView.Card[] _cards = [];
 
     /// <param name="text">Messages and fonts.</param>
-    /// <param name="ui">The shared textures: portraits, icons and bar gradients.</param>
-    public ItemTargetPickerView(ScreenText text, UiTextures ui)
+    /// <param name="ui">The shared textures: portraits, icons, the card gradient and bars.</param>
+    /// <param name="catalog">Class names, for the cards.</param>
+    public ItemTargetPickerView(ScreenText text, UiTextures ui, ContentCatalog catalog)
     {
-        _text = text;
         _messages = text.Messages;
         _ui = ui;
+        _cardView = new MemberCardView(text, ui, catalog);
         _headingFont = text.Fonts.FontAt(HeadingPixels);
-        _nameFont = text.Fonts.FontAt(NamePixels);
     }
 
-    private int CardsHeight => PortraitSize + NameGap + (int)_nameFont.LineHeight + NameGap + (2 * BarHeight) + BarGap;
+    private int CardsHeight => (_cards.Length + Columns - 1) / Columns * MemberCardView.Height;
 
-    /// <summary>Builds the text and bars once, when the picker opens.</summary>
+    /// <summary>Where the card at <paramref name="index"/> goes: left to right, then down, in member order.</summary>
+    /// <param name="index">The member's index in the picker.</param>
+    /// <param name="cardsTopLeft">The first card's top left corner.</param>
+    internal static Rectangle CardArea(int index, Point cardsTopLeft) => new(
+        cardsTopLeft.X + (index % Columns * (CardWidth + ColumnGap)),
+        cardsTopLeft.Y + (index / Columns * MemberCardView.Height),
+        CardWidth,
+        MemberCardView.Height);
+
+    /// <summary>Builds the text and cards once, when the picker opens.</summary>
     /// <param name="picker">The members and who can be chosen.</param>
-    /// <param name="itemName">The item being used.</param>
-    /// <param name="iconFile">Its icon.</param>
-    public void Show(ItemTargetPicker picker, string itemName, string iconFile)
+    /// <param name="item">The item being used: its name and icon.</param>
+    /// <param name="leader">Who gets the cards' Leader badge.</param>
+    public void Show(ItemTargetPicker picker, ItemDefinition item, PartyMember leader)
     {
-        _heading = _messages.Format(MessageIds.ItemUseTitle, new MessageArgument("item", itemName));
+        _heading = _messages.Format(MessageIds.ItemUseTitle, new MessageArgument("item", item.Name));
         _headingWidth = _headingFont.MeasureString(_heading).X;
-        _iconFile = iconFile;
-        _cards = [.. picker.Members.Select(member =>
-        {
-            var vitals = new MemberVitalBars(_text, _ui, NamePixels);
-            vitals.Show(member.Vitals);
-            return new MemberCard(MeasuredText.Of(_nameFont, member.Definition.Name), member.Definition.PortraitFile, vitals);
-        })];
+        _iconFile = item.IconFile;
+        _cards = [.. picker.Members.Select(member => _cardView.CardOf(member, leader))];
     }
 
     /// <param name="batch">Already begun.</param>
@@ -87,15 +86,14 @@ internal sealed class ItemTargetPickerView
         batch.Draw(textures.Pixel, new Rectangle(0, band.Bottom - 1, VirtualScreen.Width, 1), UiTheme.BarLine * opacity);
         DrawHeading(batch, textures, band.Top + BandPadding, opacity);
 
-        var cardsTop = band.Top + BandPadding + (int)_headingFont.LineHeight + HeadingGap;
-        var rowWidth = (_cards.Length * CardWidth) + ((_cards.Length - 1) * CardGap);
-        var left = (VirtualScreen.Width - rowWidth) / 2;
+        var cardsWidth = (Columns * CardWidth) + ((Columns - 1) * ColumnGap);
+        var cardsTopLeft = new Point((VirtualScreen.Width - cardsWidth) / 2, band.Top + BandPadding + (int)_headingFont.LineHeight + HeadingGap);
         for (var index = 0; index < _cards.Length; index++)
         {
             var member = picker.Members[index];
-            var cardLeft = left + (index * (CardWidth + CardGap));
             var cardOpacity = picker.IsCandidate(member) ? opacity : opacity * UnavailableOpacity;
-            DrawCard(batch, textures, new CardPlace(_cards[index], new Point(cardLeft, cardsTop), picker.IsSelected(member)), cardOpacity);
+            var place = new MemberCardView.Place(_cards[index], CardArea(index, cardsTopLeft), picker.IsSelected(member));
+            _cardView.Draw(batch, textures, place, cardOpacity);
         }
     }
 
@@ -107,34 +105,4 @@ internal sealed class ItemTargetPickerView
         batch.Draw(_ui.Icon(textures, _iconFile, IconSize), new Vector2(left, iconTop), Color.White * opacity);
         batch.DrawString(_headingFont, _heading, new Vector2(left + IconSize + IconGap, top), UiTheme.TextPrimary * opacity);
     }
-
-    private void DrawCard(SpriteBatch batch, TextureLibrary textures, CardPlace place, float opacity)
-    {
-        var card = place.Card;
-        var center = new Vector2(place.TopLeft.X + (CardWidth / 2f), place.TopLeft.Y + (PortraitSize / 2f));
-        if (place.IsSelected)
-        {
-            // A pale diamond behind the portrait, like the Status page's frame but wider: legacy's white glow.
-            Diamond.WithDiagonal(center, PortraitSize + (2 * SelectedGlow)).Draw(batch, textures.Pixel, UiTheme.SelectionStroke * opacity);
-        }
-
-        var portrait = _ui.DiamondPortrait(textures, card.PortraitFile, PortraitSize);
-        batch.Draw(portrait, new Vector2(center.X - (PortraitSize / 2f), place.TopLeft.Y), Color.White * opacity);
-
-        var nameTop = place.TopLeft.Y + PortraitSize + NameGap;
-        var nameColor = (place.IsSelected ? UiTheme.TextPrimary : UiTheme.TextSecondary) * opacity;
-        batch.DrawString(_nameFont, card.Name.Text, new Vector2(center.X - (card.Name.Width / 2), nameTop), nameColor);
-
-        var barsTop = nameTop + (int)_nameFont.LineHeight + NameGap;
-        var barLeft = place.TopLeft.X + ((CardWidth - PortraitSize) / 2);
-        card.Vitals.Hp.Bar.Draw(batch, textures, new Rectangle(barLeft, barsTop, PortraitSize, BarHeight), opacity);
-        card.Vitals.Mp.Bar.Draw(batch, textures, new Rectangle(barLeft, barsTop + BarHeight + BarGap, PortraitSize, BarHeight), opacity);
-    }
-
-    // One member's card, built when the picker opens.
-    // Only the bars are drawn; the shared card (U4) draws the values too.
-    private sealed record MemberCard(MeasuredText Name, string PortraitFile, MemberVitalBars Vitals);
-
-    // Where a card goes this frame, and whether it's chosen.
-    private readonly record struct CardPlace(MemberCard Card, Point TopLeft, bool IsSelected);
 }

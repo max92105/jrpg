@@ -5,9 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-menu-cleanup/slices/U3.md, U3 (Ui/VitalMeter + MemberVitalBars, "45 / 60" format)
-Round: 1 (verdict: Ready to commit; verify all pass, 1114 tests)
+Slice: docs/plans/2026-10-20-menu-cleanup/slices/U4.md, U4 (Ui/MemberCardView shared by PartyPage and ItemTargetPickerView)
+Round: 1 (verdict: Ready to commit; verify all pass, 1117 tests)
 
-- open (Suggestion): StatusPage.SheetOf reads _vitals texts, so ShowMember order matters (temporal coupling); pass the two texts in instead
-- open (Suggestion): add VitalMeter/MemberVitalBars to docs/map.md Ui row; tick U3 in README.md:98
-- open (Follow-up): picker formats value texts at 14 px it never draws until U4 (accepted by slice)
+- open (Suggestion): add MemberCardView to docs/map.md Ui row; tick U4 in README.md:99
+- open (Suggestion): odd last card sits in the left column, not centered; note for question 112 when checking by hand
+- open (Follow-up): band grows with rows and overflows 1080 px past ~7 rows (14+ members); question 112 / scrolling later
+- fixed (U3 follow-up): picker no longer formats value texts it never draws

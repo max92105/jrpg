@@ -44,14 +44,14 @@ internal sealed class PartyPage : IMenuPage
     private readonly int _maxActive;
     private readonly UiMessages _messages;
     private readonly UiTextures _ui;
-    private readonly PartyMemberCardView _cardView;
+    private readonly MemberCardView _cardView;
     private readonly SpriteFontBase _labelFont;
     private readonly SpriteFontBase _bodyFont;
     private readonly SectionTitle _activeTitle;
     private readonly SectionTitle _reserveTitle;
     private readonly string[] _actions;
     private int _column = ActiveColumn;
-    private Dictionary<PartyMember, PartyMemberCardView.Card> _cards = [];
+    private Dictionary<PartyMember, MemberCardView.Card> _cards = [];
     private MeasuredText _count;
     private int _row;
 
@@ -74,7 +74,7 @@ internal sealed class PartyPage : IMenuPage
         _maxActive = catalog.Rules.Party.MaxActiveMembers;
         _messages = text.Messages;
         _ui = ui;
-        _cardView = new PartyMemberCardView(text, ui, catalog);
+        _cardView = new MemberCardView(text, ui, catalog);
         _labelFont = text.Fonts.FontAt(LabelPixels);
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _activeTitle = new SectionTitle(text, ui, MessageIds.PartyActive);
@@ -98,7 +98,7 @@ internal sealed class PartyPage : IMenuPage
     public string? Notice { get; private set; }
 
     /// <summary>The member's card as last formatted.</summary>
-    internal PartyMemberCardView.Card CardOf(PartyMember member) => _cards[member];
+    internal MemberCardView.Card CardOf(PartyMember member) => _cards[member];
 
     public void Open()
     {
@@ -144,13 +144,13 @@ internal sealed class PartyPage : IMenuPage
 
         if (Notice is not null)
         {
-            var noticeTop = top + CardsTop + (_maxActive * PartyMemberCardView.Height) + NoticeGap;
+            var noticeTop = top + CardsTop + (_maxActive * MemberCardView.Height) + NoticeGap;
             batch.DrawString(_bodyFont, Notice, new Vector2(active.X, noticeTop), UiTheme.Danger * opacity);
         }
     }
 
     private static Rectangle CardArea(Rectangle column, int index) =>
-        new(column.X, column.Y + CardsTop + (index * PartyMemberCardView.Height), column.Width, PartyMemberCardView.Height);
+        new(column.X, column.Y + CardsTop + (index * MemberCardView.Height), column.Width, MemberCardView.Height);
 
     private IReadOnlyList<PartyMember> MembersIn(int column) => column == ActiveColumn ? _party.ActiveMembers : _party.ReserveMembers;
 
@@ -340,7 +340,7 @@ internal sealed class PartyPage : IMenuPage
         {
             var card = CardArea(columnArea, index);
             var isSelected = column == _column && index == _row;
-            _cardView.Draw(batch, textures, new PartyMemberCardView.Place(_cards[members[index]], card, isSelected), opacity);
+            _cardView.Draw(batch, textures, new MemberCardView.Place(_cards[members[index]], card, isSelected), opacity);
             if (members[index] == MovingMember)
             {
                 DrawMovingOutline(batch, textures, card);

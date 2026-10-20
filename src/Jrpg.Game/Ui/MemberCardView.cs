@@ -3,17 +3,17 @@ using FontStashSharp;
 using Jrpg.Core.Content;
 using Jrpg.Core.Party;
 using Jrpg.Game.Rendering;
-using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Jrpg.Game.Menus;
+namespace Jrpg.Game.Ui;
 
 /// <summary>
 /// Draws one member as a card (legacy <c>PartyMemberCard</c>): the portrait, here in the reference UI's diamond, then
-/// the name with a "Leader" badge, the level at the right, the class, and the HP and MP bars with their values.
+/// the name with a "Leader" badge, the level at the right, the class, and the HP and MP bars with their values. The card
+/// fills the width it's given, so the same card fits a Party column or the item target picker's.
 /// </summary>
-internal sealed class PartyMemberCardView
+internal sealed class MemberCardView
 {
     /// <summary>Legacy <c>CardStyle</c> padding 12 above and below the portrait and text block.</summary>
     public const int Height = 120;
@@ -52,7 +52,7 @@ internal sealed class PartyMemberCardView
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared textures: portraits, the card gradient, the bars.</param>
     /// <param name="catalog">Class names.</param>
-    public PartyMemberCardView(ScreenText text, UiTextures ui, ContentCatalog catalog)
+    public MemberCardView(ScreenText text, UiTextures ui, ContentCatalog catalog)
     {
         _classes = catalog.Classes;
         _text = text;
@@ -75,8 +75,7 @@ internal sealed class PartyMemberCardView
         vitals.Show(member.Vitals);
         var level = _messages.Format(MessageIds.PartyLevel, new MessageArgument("level", Number(member.Level)));
         return new Card(
-            member.Definition.Name,
-            _nameFont.MeasureString(member.Definition.Name).X,
+            MeasuredText.Of(_nameFont, member.Definition.Name),
             member == leader,
             MeasuredText.Of(_captionFont, level),
             _classes[member.Definition.ClassId].Name,
@@ -117,7 +116,7 @@ internal sealed class PartyMemberCardView
     // The name, the leader's badge after it, and the level at the right.
     private void DrawHeadline(SpriteBatch batch, TextureLibrary textures, Card card, Rectangle text, float opacity)
     {
-        batch.DrawString(_nameFont, card.Name, new Vector2(text.X, text.Y), UiTheme.TextPrimary * opacity);
+        batch.DrawString(_nameFont, card.Name.Text, new Vector2(text.X, text.Y), UiTheme.TextPrimary * opacity);
         var levelTop = text.Y + ((_nameFont.LineHeight - _captionFont.LineHeight) / 2);
         batch.DrawString(_captionFont, card.Level.Text, new Vector2(text.Right - card.Level.Width, levelTop), UiTheme.TextSecondary * opacity);
         if (!card.IsLeader)
@@ -128,7 +127,7 @@ internal sealed class PartyMemberCardView
         // Legacy BadgeStyle: a small label in a thin box beside the name.
         var badgeWidth = (int)_leaderBadge.Width + (2 * BadgePadding);
         var badgeHeight = (int)_badgeFont.LineHeight + 2;
-        var badge = new Rectangle((int)(text.X + card.NameWidth + BadgeGap), (int)(text.Y + ((_nameFont.LineHeight - badgeHeight) / 2)), badgeWidth, badgeHeight);
+        var badge = new Rectangle((int)(text.X + card.Name.Width + BadgeGap), (int)(text.Y + ((_nameFont.LineHeight - badgeHeight) / 2)), badgeWidth, badgeHeight);
         Outline.Draw(batch, textures.Pixel, badge, UiTheme.TextSecondary * opacity);
         batch.DrawString(_badgeFont, _leaderBadge.Text, new Vector2(badge.X + BadgePadding, badge.Y + 1), UiTheme.TextSecondary * opacity);
     }
@@ -145,10 +144,9 @@ internal sealed class PartyMemberCardView
     // One bar row's label and where it goes.
     private readonly record struct BarRow(string Label, int Left, int Top, int Width);
 
-    /// <summary>One member's card, formatted when the party changes.</summary>
+    /// <summary>One member's card, formatted when what it shows changes.</summary>
     public sealed record Card(
-        string Name,
-        float NameWidth,
+        MeasuredText Name,
         bool IsLeader,
         MeasuredText Level,
         string ClassName,

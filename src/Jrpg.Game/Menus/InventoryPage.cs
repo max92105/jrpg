@@ -90,7 +90,7 @@ internal sealed class InventoryPage : IMenuPage
         _labelFont = text.Fonts.FontAt(LabelPixels);
         _labels = InventoryLabels.From(text.Messages, _labelFont, _bodyFont);
         _categoryNames = [.. _tabs.Select(tab => text.Messages.Text(tab.LabelId))];
-        _itemUse = new ItemUseDialog(session, text, ui);
+        _itemUse = new ItemUseDialog(session, text, ui, catalog);
         ShowRowsFrom(0);
     }
 

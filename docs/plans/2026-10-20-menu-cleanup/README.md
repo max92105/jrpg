@@ -96,7 +96,7 @@ One line per slice. Each slice's goal, types, tests and hand checks are in its f
 - [x] **U1. One section title** (Game, about 130 lines) → [slices/U1.md](slices/U1.md)
 - [x] **U2. Measured text** (Game, about 70 lines) → [slices/U2.md](slices/U2.md)
 - [x] **U3. The vital meter, one HP and MP format** (content + Game, about 200 lines; decision 110) → [slices/U3.md](slices/U3.md)
-- [ ] **U4. One member card for the Party page and the item target picker** (Game, about 280 lines; decision 111, question 112) → [slices/U4.md](slices/U4.md)
+- [x] **U4. One member card for the Party page and the item target picker** (Game, about 280 lines; decision 111, question 112) → [slices/U4.md](slices/U4.md)
 
 ### Phase 5: split EquipmentPage
 
@@ -135,6 +135,7 @@ Each slice uses the placeholder until answered.
   - Placeholder: the picker band shows the cards in two columns, 560 px wide each, filled in member order. Navigation stays as today (`ItemTargetPicker` unchanged: every direction steps through the members in order).
   - A member the item can't be used on is dimmed (as today), and the selected one gets the card's selected-row glow.
   - Or a different arrangement?
+  - Seen while building U4: with an odd member count the last card sits alone in the left column. The band grows 120 px a row, so 14 or more members (8 rows) no longer fit 1080 px.
 
 ## ADRs needed
 - **None.** `IMenuPage.Open()` follows the existing `ISaveFilesPage.Open()`; the alternatives are in [design.md](design.md), key decision 2. The "never all fallen" rule is a Core query with tests and changes no format.

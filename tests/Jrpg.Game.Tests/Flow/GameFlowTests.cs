@@ -131,9 +131,8 @@ public sealed class GameFlowTests : IDisposable
     {
         var flow = StartedFlow();
         flow.Update(_oneUpdate, InputFrames.PressingEscape);
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
+        // System is the last tab: Up wraps to it from the first.
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Up));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
@@ -152,9 +151,8 @@ public sealed class GameFlowTests : IDisposable
         var flow = StartedFlow();
         var first = SessionOf(flow);
         flow.Update(_oneUpdate, InputFrames.PressingEscape);
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
+        // System is the last tab: Up wraps to it from the first.
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Up));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
@@ -182,9 +180,8 @@ public sealed class GameFlowTests : IDisposable
         Assert.NotEqual(savedPosition, SessionOf(flow).Exploration.PlayerPosition);
 
         flow.Update(_oneUpdate, InputFrames.PressingEscape);
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
+        // System is the last tab: Up wraps to it from the first.
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Up));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));

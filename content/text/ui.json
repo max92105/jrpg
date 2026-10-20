@@ -61,5 +61,13 @@
   "stat_max_hp": "Max HP",
   "stat_max_mp": "Max MP",
   "equipment_remove": "Remove",
-  "equipment_no_room": "There's no room in the bag for {item}."
+  "equipment_no_room": "There's no room in the bag for {item}.",
+  "menu_party": "Party",
+  "party_active": "Active party",
+  "party_count": "{count} / {max}",
+  "party_reserve": "Reserve",
+  "party_leader": "Leader",
+  "party_level": "Lv {level}",
+  "party_full": "The party is full.",
+  "party_leader_stays": "{name} leads the party and always stays in it."
 }

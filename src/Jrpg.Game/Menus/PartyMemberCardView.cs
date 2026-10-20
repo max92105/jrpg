@@ -1,0 +1,175 @@
+using System.Globalization;
+using FontStashSharp;
+using Jrpg.Core.Content;
+using Jrpg.Core.Party;
+using Jrpg.Game.Rendering;
+using Jrpg.Game.Ui;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace Jrpg.Game.Menus;
+
+/// <summary>
+/// Draws one member as a card (legacy <c>PartyMemberCard</c>): the portrait, here in the reference UI's diamond, then
+/// the name with a "Leader" badge, the level at the right, the class, and the HP and MP bars with their values.
+/// </summary>
+internal sealed class PartyMemberCardView
+{
+    /// <summary>Legacy <c>CardStyle</c> padding 12 above and below the portrait and text block.</summary>
+    public const int Height = 120;
+
+    // Legacy PartyMemberCard: 16 x 12 padding, an 80 px portrait, 16 px before the text, Text.Heading names, Text.Caption
+    // level and class (8 px above the bars), 22 px bar rows of a 32 px label, a 6 px bar and a 100 px value; a badge
+    // 10 px after the name with 4 px padding.
+    private const int PaddingX = 16;
+    private const int PaddingY = 12;
+    private const int PortraitSize = 80;
+    private const int TextGap = 16;
+    private const int NamePixels = 22;
+    private const int CaptionPixels = 14;
+    private const int BadgePixels = 12;
+    private const int ValuePixels = 15;
+    private const int ClassGap = 8;
+    private const int BarRowHeight = 22;
+    private const int BarLabelColumn = 32;
+    private const int BarValueColumn = 100;
+    private const int BarHeight = 6;
+    private const int BadgeGap = 10;
+    private const int BadgePadding = 4;
+
+    private readonly IReadOnlyDictionary<string, ClassDefinition> _classes;
+    private readonly UiMessages _messages;
+    private readonly UiTextures _ui;
+    private readonly SpriteFontBase _nameFont;
+    private readonly SpriteFontBase _captionFont;
+    private readonly SpriteFontBase _badgeFont;
+    private readonly SpriteFontBase _valueFont;
+    private readonly MeasuredText _leaderBadge;
+    private readonly string _hpLabel;
+    private readonly string _mpLabel;
+
+    /// <param name="text">Messages and fonts.</param>
+    /// <param name="ui">The shared textures: portraits, the card gradient, the bars.</param>
+    /// <param name="catalog">Class names.</param>
+    public PartyMemberCardView(ScreenText text, UiTextures ui, ContentCatalog catalog)
+    {
+        _classes = catalog.Classes;
+        _messages = text.Messages;
+        _ui = ui;
+        _nameFont = text.Fonts.FontAt(NamePixels);
+        _captionFont = text.Fonts.FontAt(CaptionPixels);
+        _badgeFont = text.Fonts.FontAt(BadgePixels);
+        _valueFont = text.Fonts.FontAt(ValuePixels);
+        var badge = text.Messages.Text(MessageIds.PartyLeader);
+        _leaderBadge = new MeasuredText(badge, _badgeFont.MeasureString(badge).X);
+        _hpLabel = text.Messages.Text(MessageIds.StatHp);
+        _mpLabel = text.Messages.Text(MessageIds.StatMp);
+    }
+
+    /// <summary>Formats the member's card once, when the party changes, so drawing formats nothing.</summary>
+    public Card CardOf(PartyMember member, PartyMember leader)
+    {
+        var vitals = member.Vitals;
+        var hp = new StatBar(_ui, UiTheme.HpBar);
+        hp.Show(vitals.Hp, vitals.MaxHp);
+        var mp = new StatBar(_ui, UiTheme.MpBar);
+        mp.Show(vitals.Mp, vitals.MaxMp);
+        var level = _messages.Format(MessageIds.PartyLevel, new MessageArgument("level", Number(member.Level)));
+        return new Card(
+            member.Definition.Name,
+            _nameFont.MeasureString(member.Definition.Name).X,
+            member == leader,
+            new MeasuredText(level, _captionFont.MeasureString(level).X),
+            _classes[member.Definition.ClassId].Name,
+            member.Definition.PortraitFile,
+            new VitalBar(hp, Measured(vitals.Hp, vitals.MaxHp)),
+            new VitalBar(mp, Measured(vitals.Mp, vitals.MaxMp)));
+    }
+
+    /// <param name="batch">Already begun.</param>
+    /// <param name="textures">Where the shared textures are made.</param>
+    /// <param name="place">The card, where it goes, and whether it's selected.</param>
+    /// <param name="opacity">0 to 1, while the menu fades in.</param>
+    public void Draw(SpriteBatch batch, TextureLibrary textures, Place place, float opacity)
+    {
+        var area = place.Area;
+        var card = place.Card;
+        batch.Draw(_ui.Gradient(textures, UiTheme.Card), area, Color.White * opacity);
+        batch.Draw(textures.Pixel, new Rectangle(area.X, area.Bottom - 1, area.Width, 1), UiTheme.Stroke * opacity);
+        if (place.IsSelected)
+        {
+            _ui.DrawSelectedRow(batch, textures, area, opacity);
+        }
+
+        var portrait = _ui.DiamondPortrait(textures, card.PortraitFile, PortraitSize);
+        batch.Draw(portrait, new Vector2(area.X + PaddingX, area.Y + ((Height - PortraitSize) / 2)), Color.White * opacity);
+
+        var text = new Rectangle(area.X + PaddingX + PortraitSize + TextGap, area.Y + PaddingY, 0, 0);
+        text.Width = area.Right - PaddingX - text.X;
+        DrawHeadline(batch, textures, card, text, opacity);
+        var classTop = text.Y + _nameFont.LineHeight;
+        batch.DrawString(_captionFont, card.ClassName, new Vector2(text.X, classTop), UiTheme.TextSecondary * opacity);
+        var barsTop = (int)(classTop + _captionFont.LineHeight + ClassGap);
+        DrawBarRow(batch, textures, card.Hp, new BarRow(_hpLabel, text.X, barsTop, text.Width), opacity);
+        DrawBarRow(batch, textures, card.Mp, new BarRow(_mpLabel, text.X, barsTop + BarRowHeight, text.Width), opacity);
+    }
+
+    private static string Number(int value) => value.ToString(CultureInfo.InvariantCulture);
+
+    private MeasuredText Measured(int value, int max)
+    {
+        var text = $"{Number(value)}/{Number(max)}";
+        return new MeasuredText(text, _valueFont.MeasureString(text).X);
+    }
+
+    // The name, the leader's badge after it, and the level at the right.
+    private void DrawHeadline(SpriteBatch batch, TextureLibrary textures, Card card, Rectangle text, float opacity)
+    {
+        batch.DrawString(_nameFont, card.Name, new Vector2(text.X, text.Y), UiTheme.TextPrimary * opacity);
+        var levelTop = text.Y + ((_nameFont.LineHeight - _captionFont.LineHeight) / 2);
+        batch.DrawString(_captionFont, card.Level.Text, new Vector2(text.Right - card.Level.Width, levelTop), UiTheme.TextSecondary * opacity);
+        if (!card.IsLeader)
+        {
+            return;
+        }
+
+        // Legacy BadgeStyle: a small label in a thin box beside the name.
+        var badgeWidth = (int)_leaderBadge.Width + (2 * BadgePadding);
+        var badgeHeight = (int)_badgeFont.LineHeight + 2;
+        var badge = new Rectangle((int)(text.X + card.NameWidth + BadgeGap), (int)(text.Y + ((_nameFont.LineHeight - badgeHeight) / 2)), badgeWidth, badgeHeight);
+        Outline.Draw(batch, textures.Pixel, badge, UiTheme.TextSecondary * opacity);
+        batch.DrawString(_badgeFont, _leaderBadge.Text, new Vector2(badge.X + BadgePadding, badge.Y + 1), UiTheme.TextSecondary * opacity);
+    }
+
+    private void DrawBarRow(SpriteBatch batch, TextureLibrary textures, VitalBar bar, BarRow row, float opacity)
+    {
+        batch.DrawString(_captionFont, row.Label, new Vector2(row.Left, row.Top), UiTheme.TextSecondary * opacity);
+        var barTop = row.Top + ((int)_captionFont.LineHeight - BarHeight) / 2;
+        var barWidth = row.Width - BarLabelColumn - BarValueColumn;
+        bar.Bar.Draw(batch, textures, new Rectangle(row.Left + BarLabelColumn, barTop, barWidth, BarHeight), opacity);
+        batch.DrawString(_valueFont, bar.Value.Text, new Vector2(row.Left + row.Width - bar.Value.Width, row.Top), UiTheme.TextPrimary * opacity);
+    }
+
+    // One bar row's label and where it goes.
+    private readonly record struct BarRow(string Label, int Left, int Top, int Width);
+
+    /// <summary>One member's card, formatted when the party changes.</summary>
+    public sealed record Card(
+        string Name,
+        float NameWidth,
+        bool IsLeader,
+        MeasuredText Level,
+        string ClassName,
+        string PortraitFile,
+        VitalBar Hp,
+        VitalBar Mp);
+
+    /// <summary>A piece of a card's text and its measured width, for right-aligning it.</summary>
+    public readonly record struct MeasuredText(string Text, float Width);
+
+    /// <summary>A card's HP or MP bar, and its "value/max" text.</summary>
+    public sealed record VitalBar(StatBar Bar, MeasuredText Value);
+
+    /// <summary>Where a card goes this frame, and whether it's selected.</summary>
+    public readonly record struct Place(Card Card, Rectangle Area, bool IsSelected);
+}

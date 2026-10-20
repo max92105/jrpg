@@ -168,4 +168,26 @@ internal static class MessageIds
 
     /// <summary>Placeholder <c>{item}</c>: the worn item that can't go back in its full inventory stack.</summary>
     public const string EquipmentNoRoom = "equipment_no_room";
+
+    /// <summary>The game menu's Party tab.</summary>
+    public const string MenuParty = "menu_party";
+
+    public const string PartyActive = "party_active";
+
+    /// <summary>Placeholders <c>{count}</c> and <c>{max}</c>: how many members are active, out of how many can be.</summary>
+    public const string PartyCount = "party_count";
+
+    public const string PartyReserve = "party_reserve";
+
+    /// <summary>The badge beside the leader's name.</summary>
+    public const string PartyLeader = "party_leader";
+
+    /// <summary>Placeholder <c>{level}</c>: a member card's level.</summary>
+    public const string PartyLevel = "party_level";
+
+    /// <summary>Shown when a reserve member can't join because the active party has no free place.</summary>
+    public const string PartyFull = "party_full";
+
+    /// <summary>Placeholder <c>{name}</c>: shown when the leader is chosen, who can't leave the party.</summary>
+    public const string PartyLeaderStays = "party_leader_stays";
 }

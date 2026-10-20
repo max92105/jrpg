@@ -713,17 +713,26 @@ P2b was split in two (developer, 2026-10-19), since it came to about 420 lines w
     - [ ] Another class's armor isn't listed.
     - [ ] Remove works.
 
-- [ ] **P4. Party page** (Game, about 260 lines)
-  - **Goal:** a Party tab in the legacy `PartyView` layout: the active party (n / 4) and the reserve as member cards.
-    - On an active member: Confirm offers "Change order" or "To reserve".
+P4 was split in two before it started (developer, 2026-10-20): it came out at about 450 lines. Navigation (developer): Up/Down within a column (wrapping), Left/Right to the other column at the same row, or its last card when that column is shorter.
+
+- [x] **P4-1. Party page: active party and reserve** (Game, about 300 lines)
+  - **Done, with deviations:** the card is its own `Menus/PartyMemberCardView`, with the portrait in an 80 px diamond. The Party tab sits between Inventory and Equipment (legacy `GameMenuControl` order); three `GameFlowTests` that pressed Down three times to reach System now press Up once (System is the last tab), assertions unchanged. A notice clears when the cursor moves. Extra tests: `Update_RightFromLowerThanReserve_SelectsLastReserveCard`, `Update_MovingAfterRefusal_ClearsTheNotice`. **Known gap:** cards are built when the menu opens and on each move, so a potion used on the Inventory page shows on the Party cards only after reopening the menu (the Status page has the same gap). Follow-up: a "page shown" hook on `IMenuPage` that rebuilds them, and a Core `PartyState.ReserveMembers` query (the page works the reserve out itself). The hand checks below are still to do.
+  - **Goal:** a Party tab in the legacy `PartyView` layout: "Active party" with its count (n / 4) on the left, "Reserve" on the right, each member as a card (legacy `PartyMemberCard`: portrait, here in the reference UI's diamond, name, "Leader" badge, level, class, HP and MP bars).
+    - On an active member: Confirm sends them to the reserve (legacy click; P4-2 turns this into a choice).
     - On a reserve member: Confirm adds them if the party isn't full; otherwise it shows "The party is full."
-    - The leader never moves (Core rule; legacy hint text).
-    - Reordering: pick the member, then the place to swap with (question 61).
-  - **New types (Game):** `Menus/PartyOrderEdit` (pure: builds the new order for `PartyState.Reorder`), `Menus/PartyPage`.
-  - **Tests:** `PartyOrderEdit_Swap_TwoMembers_SwapsTheirPlaces`, `PartyOrderEdit_Swap_SameMember_KeepsOrder`, `PartyPage_ConfirmReserveMember_PartyFull_AddsNobody`, `PartyPage_LeaderSelected_OffersNoMove`.
+    - The leader never moves (Core rule); Confirm on them shows legacy's hint "{name} leads the party and always stays in it."
+  - **New types (Game):** `Menus/PartyPage`.
+  - **Tests:** `PartyPage_ConfirmReserveMember_PartyFull_AddsNobody`, `PartyPage_ConfirmReserveMember_AddsToParty`, `PartyPage_ConfirmActiveMember_MovesToReserve`, `PartyPage_LeaderSelected_OffersNoMove`, `PartyPage_RightFromActive_SelectsReserveAtSameRow`.
   - **Verify by hand:**
-    - [ ] Add three reserve members, reorder, send one back.
-    - [ ] Status and save reflect the new order.
+    - [ ] Add three reserve members, send one back; the leader stays.
+    - [ ] Status and save reflect the new party.
+
+- [ ] **P4-2. Changing the order** (Game, about 150 lines)
+  - **Goal:** on an active member other than the leader, Confirm offers "Change order" or "To reserve". Reordering: pick the member, then the place to swap with (question 61); the leader's place can't be taken.
+  - **New types (Game):** `Menus/PartyOrderEdit` (pure: builds the new order for `PartyState.Reorder`).
+  - **Tests:** `PartyOrderEdit_Swap_TwoMembers_SwapsTheirPlaces`, `PartyOrderEdit_Swap_SameMember_KeepsOrder`, `PartyPage_ChangeOrder_SwapsTwoMembers`.
+  - **Verify by hand:**
+    - [ ] Reorder the party; Status and save reflect the new order.
 
 - [ ] **P5. Options page** (Game, about 200 lines)
   - **Goal:** an Options tab with the settings that exist: Full screen (on/off) and Text speed (Slow, Normal, Fast, Instant; question 90). Left/Right changes a value, and it takes effect at once. Not saved between runs (question 89).

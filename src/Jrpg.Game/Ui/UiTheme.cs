@@ -144,6 +144,10 @@ internal static class UiTheme
         new(1, FromLegacy(0x00FFFFFF)),
     ];
 
+    /// <summary>Legacy <c>Brush.Card</c>: a party member's card, solid on the portrait side and fading out to the right.</summary>
+    public static ImmutableArray<GradientStop> Card { get; } =
+        [new(0, FromLegacy(0xE00C0D11)), new(0.6f, FromLegacy(0x990C0D11)), new(1, FromLegacy(0x330C0D11))];
+
     /// <summary>Legacy <c>Brush.Surface</c>: a <c>GlassPanelStyle</c> panel, such as the equipment choice.</summary>
     public static Color Surface { get; } = FromLegacy(0xC70C0D11);
 

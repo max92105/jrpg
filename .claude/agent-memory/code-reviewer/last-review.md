@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-18-game-title-menu-movement.md, P3b (Changing equipment with a stat preview; WearableFor, EquipmentChoice, EquipmentChoiceView, EquipmentPick, StatPreview, EquipmentPage choice/notice/preview)
-Round: 1 (verdict: Fix the Criticals; build 0 errors, 1046 tests pass, format exit 0)
+Slice: docs/plans/2026-10-18-game-title-menu-movement.md, P4-1 (Party page: active party and reserve; PartyPage, PartyMemberCardView, UiTheme.Card, party_* messages, Party tab)
+Round: 1 (verdict: Ready to commit; build 0 warnings, 1054 tests pass, format exit 0)
 
-- open (Critical): EquipmentPage.DrawPreview(..., bool isAttack) is a flag argument -> nested record PreviewValue(Text, Color), PreviewText(Attack, Defense), DrawPreview(batch, textures, position, PreviewValue)
-- open (Warning): Remove row highlighted shows no preview; legacy previews null = empty slot (attack drop) -> preview the empty slot or record as deviation
-- open (Suggestion): EquipmentChoice.VisibleRows doc names 44 px row height (view detail in pure type)
-- open (Suggestion): record deviations in P3b slice note (WearableFor takes catalog, ConfirmRemove test lives on EquipmentPage, Remove no preview)
-- open (Suggestion): highlight-change preview recompute untested at page level
+- open (Warning): cards built at page creation/move only; potion on Inventory then Party tab in same visit shows old HP/MP; known but not in plan slice note -> record deviation + follow-up (or refresh hook)
+- open (Suggestion): PartyMemberCardView.CardOf(member, bool isLeader) bool param -> pass the leader / derive inside
+- open (Suggestion): Notice stays after cursor moves (only cleared on Confirm)
+- open (Suggestion): Card.Bars array paired by index with _barLabels -> named Hp/Mp VitalBar fields
+- follow-up: PartyState.ReserveMembers in Core instead of Game deriving reserve with Where/Contains

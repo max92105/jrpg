@@ -30,6 +30,7 @@
   "status_equipment": "Equipment",
   "stat_hp": "HP",
   "stat_mp": "MP",
+  "stat_value_of_max": "{value} / {max}",
   "stat_attack": "Attack",
   "stat_defense": "Defense",
   "slot_weapon": "Weapon",

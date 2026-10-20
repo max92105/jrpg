@@ -62,8 +62,7 @@ internal sealed class StatusPage : IMenuPage
     private readonly SectionTitle _experienceTitle;
     private readonly SectionTitle _parametersTitle;
     private readonly SectionTitle _equipmentTitle;
-    // HP then MP: the first two of the sheet's stats, so a stat's index is its bar's.
-    private readonly StatBar[] _vitalBars;
+    private readonly MemberVitalBars _vitals;
     private readonly StatBar _xpBar;
     private MemberSheet _sheet;
 
@@ -83,7 +82,7 @@ internal sealed class StatusPage : IMenuPage
         _experienceTitle = new SectionTitle(text, ui, MessageIds.StatusExperience);
         _parametersTitle = new SectionTitle(text, ui, MessageIds.StatusParameters);
         _equipmentTitle = new SectionTitle(text, ui, MessageIds.StatusEquipment);
-        _vitalBars = [new StatBar(ui, UiTheme.HpBar), new StatBar(ui, UiTheme.MpBar)];
+        _vitals = new MemberVitalBars(text, ui, BodyPixels);
         _xpBar = new StatBar(ui, UiTheme.XpBar);
         _cursor = new ListCursor(_party.Members.Count, _ => true);
         Open();
@@ -153,14 +152,14 @@ internal sealed class StatusPage : IMenuPage
     private void ShowMember()
     {
         var member = Shown;
-        _sheet = SheetOf(member);
-        _vitalBars[0].Show(member.Vitals.Hp, member.Vitals.MaxHp);
-        _vitalBars[1].Show(member.Vitals.Mp, member.Vitals.MaxMp);
+        _vitals.Show(member.Vitals);
+        _sheet = SheetOf(member, _vitals);
         var (earned, needed) = ExperienceProgress(member.Level, member.Experience, _catalog.Rules.Experience);
         _xpBar.Show(earned, needed);
     }
 
-    private MemberSheet SheetOf(PartyMember member)
+    // The HP and MP texts come from the meters, already showing the member.
+    private MemberSheet SheetOf(PartyMember member, MemberVitalBars shownVitals)
     {
         var nextLevel = ToNextLevelText(member.Level, member.Experience, _catalog.Rules.Experience, _labels.MaxLevel);
         var stats = member.TotalStats;
@@ -170,8 +169,8 @@ internal sealed class StatusPage : IMenuPage
             member.Definition.PortraitFile,
             [Number(member.Level), Number(member.Experience), nextLevel],
             [
-                $"{member.Vitals.Hp} / {member.Vitals.MaxHp}",
-                $"{member.Vitals.Mp} / {member.Vitals.MaxMp}",
+                shownVitals.Hp.Value.Text,
+                shownVitals.Mp.Value.Text,
                 Number(stats.Attack),
                 Number(stats.Defense),
             ],
@@ -231,12 +230,13 @@ internal sealed class StatusPage : IMenuPage
             var columnLeft = section.X + Indent + (index % 2 * (columnWidth + ColumnGap));
             var lineTop = section.Y + SectionHeight + (index / 2 * StatLineHeight);
             DrawLine(page, new Vector2(columnLeft, lineTop), _labels.Stats[index], _sheet.Stats[index]);
-            if (index < _vitalBars.Length)
-            {
-                var bar = new Rectangle(columnLeft, lineTop + VitalBarTop, columnWidth, BarHeight);
-                _vitalBars[index].Draw(page.Batch, page.Textures, bar, page.Opacity);
-            }
         }
+
+        // HP and MP are the first line, so their bars go under its two columns.
+        var hpBar = new Rectangle(section.X + Indent, section.Y + SectionHeight + VitalBarTop, columnWidth, BarHeight);
+        _vitals.Hp.Bar.Draw(page.Batch, page.Textures, hpBar, page.Opacity);
+        var mpBar = hpBar with { X = hpBar.X + columnWidth + ColumnGap };
+        _vitals.Mp.Bar.Draw(page.Batch, page.Textures, mpBar, page.Opacity);
     }
 
     private void DrawEquipment(PageFrame page, Rectangle section)

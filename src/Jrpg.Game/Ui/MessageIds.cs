@@ -76,6 +76,9 @@ internal static class MessageIds
 
     public const string StatMp = "stat_mp";
 
+    /// <summary>Placeholders <c>{value}</c> and <c>{max}</c>: an HP or MP value, the one format everywhere (decision 110).</summary>
+    public const string StatValueOfMax = "stat_value_of_max";
+
     public const string StatAttack = "stat_attack";
 
     public const string StatDefense = "stat_defense";

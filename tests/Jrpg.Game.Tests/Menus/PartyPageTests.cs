@@ -205,7 +205,7 @@ public sealed class PartyPageTests
 
         page.Open();
 
-        Assert.Equal((float)leader.Vitals.Hp / leader.Vitals.MaxHp, page.CardOf(leader).Hp.Bar.Fraction);
+        Assert.Equal((float)leader.Vitals.Hp / leader.Vitals.MaxHp, page.CardOf(leader).Vitals.Hp.Bar.Fraction);
     }
 
     [Fact]

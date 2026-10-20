@@ -33,6 +33,7 @@ internal sealed class ItemTargetPickerView
     private const int SelectedGlow = 10;
     private const float UnavailableOpacity = 0.4f;
 
+    private readonly ScreenText _text;
     private readonly UiMessages _messages;
     private readonly UiTextures _ui;
     private readonly SpriteFontBase _headingFont;
@@ -46,6 +47,7 @@ internal sealed class ItemTargetPickerView
     /// <param name="ui">The shared textures: portraits, icons and bar gradients.</param>
     public ItemTargetPickerView(ScreenText text, UiTextures ui)
     {
+        _text = text;
         _messages = text.Messages;
         _ui = ui;
         _headingFont = text.Fonts.FontAt(HeadingPixels);
@@ -65,11 +67,9 @@ internal sealed class ItemTargetPickerView
         _iconFile = iconFile;
         _cards = [.. picker.Members.Select(member =>
         {
-            var hp = new StatBar(_ui, UiTheme.HpBar);
-            hp.Show(member.Vitals.Hp, member.Vitals.MaxHp);
-            var mp = new StatBar(_ui, UiTheme.MpBar);
-            mp.Show(member.Vitals.Mp, member.Vitals.MaxMp);
-            return new MemberCard(MeasuredText.Of(_nameFont, member.Definition.Name), member.Definition.PortraitFile, hp, mp);
+            var vitals = new MemberVitalBars(_text, _ui, NamePixels);
+            vitals.Show(member.Vitals);
+            return new MemberCard(MeasuredText.Of(_nameFont, member.Definition.Name), member.Definition.PortraitFile, vitals);
         })];
     }
 
@@ -127,12 +127,13 @@ internal sealed class ItemTargetPickerView
 
         var barsTop = nameTop + (int)_nameFont.LineHeight + NameGap;
         var barLeft = place.TopLeft.X + ((CardWidth - PortraitSize) / 2);
-        card.Hp.Draw(batch, textures, new Rectangle(barLeft, barsTop, PortraitSize, BarHeight), opacity);
-        card.Mp.Draw(batch, textures, new Rectangle(barLeft, barsTop + BarHeight + BarGap, PortraitSize, BarHeight), opacity);
+        card.Vitals.Hp.Bar.Draw(batch, textures, new Rectangle(barLeft, barsTop, PortraitSize, BarHeight), opacity);
+        card.Vitals.Mp.Bar.Draw(batch, textures, new Rectangle(barLeft, barsTop + BarHeight + BarGap, PortraitSize, BarHeight), opacity);
     }
 
     // One member's card, built when the picker opens.
-    private sealed record MemberCard(MeasuredText Name, string PortraitFile, StatBar Hp, StatBar Mp);
+    // Only the bars are drawn; the shared card (U4) draws the values too.
+    private sealed record MemberCard(MeasuredText Name, string PortraitFile, MemberVitalBars Vitals);
 
     // Where a card goes this frame, and whether it's chosen.
     private readonly record struct CardPlace(MemberCard Card, Point TopLeft, bool IsSelected);

@@ -59,7 +59,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Title | The title screen | `TitleScene`, `TitleMenu` |
 | Menus | The game menu and its pages | `GameMenuScene`, `IMenuPage`, `StatusPage`, `InventoryPage`, `EquipmentPage`, `PartyPage`, `OptionsPage`, `SystemPage` |
 | Saving | The 20 save files and their list | `SaveSlots`, `SaveSlotList`, `SaveFilesPanel` |
-| Ui | Shared UI pieces: theme, text, cursors, panels, bars, shapes | `UiTheme`, `UiTextures`, `UiMessages`/`MessageIds`, `ListCursor`, `StatBar`, `SectionTitle`, `MeasuredText`, `Diamond`, `ConfirmPrompt` |
+| Ui | Shared UI pieces: theme, text, cursors, panels, bars, shapes | `UiTheme`, `UiTextures`, `UiMessages`/`MessageIds`, `ListCursor`, `StatBar`, `SectionTitle`, `MeasuredText`, `VitalMeter`, `MemberVitalBars`, `Diamond`, `ConfirmPrompt` |
 
 ## Jrpg.Editor (WPF tools)
 

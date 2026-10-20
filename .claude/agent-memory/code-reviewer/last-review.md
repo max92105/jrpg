@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-menu-cleanup/slices/U2.md, U2 (Ui/MeasuredText replaces 3 text+width copies)
-Round: 1 (verdict: Ready to commit; verify all pass, 1109 tests)
+Slice: docs/plans/2026-10-20-menu-cleanup/slices/U3.md, U3 (Ui/VitalMeter + MemberVitalBars, "45 / 60" format)
+Round: 1 (verdict: Ready to commit; verify all pass, 1114 tests)
 
-- open (Suggestion): add MeasuredText to docs/map.md Ui row key types
-- open (Suggestion): U2 checkbox in README.md:97 not ticked; note in U2.md that card Name/NameWidth stays for U4
-- open (Follow-up): other text+width pairs (InventoryPage ItemRow, SaveSlotListView RowText, ConfirmPromptView, MenuHeader, EquipmentChoiceView) could use MeasuredText
+- open (Suggestion): StatusPage.SheetOf reads _vitals texts, so ShowMember order matters (temporal coupling); pass the two texts in instead
+- open (Suggestion): add VitalMeter/MemberVitalBars to docs/map.md Ui row; tick U3 in README.md:98
+- open (Follow-up): picker formats value texts at 14 px it never draws until U4 (accepted by slice)

@@ -38,6 +38,7 @@ internal sealed class PartyMemberCardView
     private const int BadgePadding = 4;
 
     private readonly IReadOnlyDictionary<string, ClassDefinition> _classes;
+    private readonly ScreenText _text;
     private readonly UiMessages _messages;
     private readonly UiTextures _ui;
     private readonly SpriteFontBase _nameFont;
@@ -54,6 +55,7 @@ internal sealed class PartyMemberCardView
     public PartyMemberCardView(ScreenText text, UiTextures ui, ContentCatalog catalog)
     {
         _classes = catalog.Classes;
+        _text = text;
         _messages = text.Messages;
         _ui = ui;
         _nameFont = text.Fonts.FontAt(NamePixels);
@@ -69,11 +71,8 @@ internal sealed class PartyMemberCardView
     /// <summary>Formats the member's card once, when the party changes, so drawing formats nothing.</summary>
     public Card CardOf(PartyMember member, PartyMember leader)
     {
-        var vitals = member.Vitals;
-        var hp = new StatBar(_ui, UiTheme.HpBar);
-        hp.Show(vitals.Hp, vitals.MaxHp);
-        var mp = new StatBar(_ui, UiTheme.MpBar);
-        mp.Show(vitals.Mp, vitals.MaxMp);
+        var vitals = new MemberVitalBars(_text, _ui, ValuePixels);
+        vitals.Show(member.Vitals);
         var level = _messages.Format(MessageIds.PartyLevel, new MessageArgument("level", Number(member.Level)));
         return new Card(
             member.Definition.Name,
@@ -82,8 +81,7 @@ internal sealed class PartyMemberCardView
             MeasuredText.Of(_captionFont, level),
             _classes[member.Definition.ClassId].Name,
             member.Definition.PortraitFile,
-            new VitalBar(hp, Measured(vitals.Hp, vitals.MaxHp)),
-            new VitalBar(mp, Measured(vitals.Mp, vitals.MaxMp)));
+            vitals);
     }
 
     /// <param name="batch">Already begun.</param>
@@ -110,13 +108,11 @@ internal sealed class PartyMemberCardView
         var classTop = text.Y + _nameFont.LineHeight;
         batch.DrawString(_captionFont, card.ClassName, new Vector2(text.X, classTop), UiTheme.TextSecondary * opacity);
         var barsTop = (int)(classTop + _captionFont.LineHeight + ClassGap);
-        DrawBarRow(batch, textures, card.Hp, new BarRow(_hpLabel, text.X, barsTop, text.Width), opacity);
-        DrawBarRow(batch, textures, card.Mp, new BarRow(_mpLabel, text.X, barsTop + BarRowHeight, text.Width), opacity);
+        DrawBarRow(batch, textures, card.Vitals.Hp, new BarRow(_hpLabel, text.X, barsTop, text.Width), opacity);
+        DrawBarRow(batch, textures, card.Vitals.Mp, new BarRow(_mpLabel, text.X, barsTop + BarRowHeight, text.Width), opacity);
     }
 
     private static string Number(int value) => value.ToString(CultureInfo.InvariantCulture);
-
-    private MeasuredText Measured(int value, int max) => MeasuredText.Of(_valueFont, $"{Number(value)}/{Number(max)}");
 
     // The name, the leader's badge after it, and the level at the right.
     private void DrawHeadline(SpriteBatch batch, TextureLibrary textures, Card card, Rectangle text, float opacity)
@@ -137,13 +133,13 @@ internal sealed class PartyMemberCardView
         batch.DrawString(_badgeFont, _leaderBadge.Text, new Vector2(badge.X + BadgePadding, badge.Y + 1), UiTheme.TextSecondary * opacity);
     }
 
-    private void DrawBarRow(SpriteBatch batch, TextureLibrary textures, VitalBar bar, BarRow row, float opacity)
+    private void DrawBarRow(SpriteBatch batch, TextureLibrary textures, VitalMeter meter, BarRow row, float opacity)
     {
         batch.DrawString(_captionFont, row.Label, new Vector2(row.Left, row.Top), UiTheme.TextSecondary * opacity);
         var barTop = row.Top + ((int)_captionFont.LineHeight - BarHeight) / 2;
         var barWidth = row.Width - BarLabelColumn - BarValueColumn;
-        bar.Bar.Draw(batch, textures, new Rectangle(row.Left + BarLabelColumn, barTop, barWidth, BarHeight), opacity);
-        batch.DrawString(_valueFont, bar.Value.Text, new Vector2(row.Left + row.Width - bar.Value.Width, row.Top), UiTheme.TextPrimary * opacity);
+        meter.Bar.Draw(batch, textures, new Rectangle(row.Left + BarLabelColumn, barTop, barWidth, BarHeight), opacity);
+        batch.DrawString(_valueFont, meter.Value.Text, new Vector2(row.Left + row.Width - meter.Value.Width, row.Top), UiTheme.TextPrimary * opacity);
     }
 
     // One bar row's label and where it goes.
@@ -157,11 +153,7 @@ internal sealed class PartyMemberCardView
         MeasuredText Level,
         string ClassName,
         string PortraitFile,
-        VitalBar Hp,
-        VitalBar Mp);
-
-    /// <summary>A card's HP or MP bar, and its "value/max" text.</summary>
-    public sealed record VitalBar(StatBar Bar, MeasuredText Value);
+        MemberVitalBars Vitals);
 
     /// <summary>Where a card goes this frame, and whether it's selected.</summary>
     public readonly record struct Place(Card Card, Rectangle Area, bool IsSelected);

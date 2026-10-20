@@ -1,6 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Dialogue;
 using Jrpg.Core.Events;
+using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Data.Art;
@@ -68,6 +69,17 @@ public sealed class ArtReferenceCheckTests
         var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
 
         Assert.Equal($"portraits/Gone.png: not found in {_artRoot}. Named by party member 'jazog'.", problem);
+    }
+
+    [Fact]
+    public void FindProblems_MissingItemIcon_NamesTheItem()
+    {
+        var potion = _catalog.Items["potion"] with { IconFile = "Gone.png" };
+        var catalog = _catalog with { Items = new Dictionary<string, ItemDefinition>(_catalog.Items) { ["potion"] = potion } };
+
+        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
+
+        Assert.Equal($"icons/Gone.png: not found in {_artRoot}. Named by item 'potion'.", problem);
     }
 
     [Fact]

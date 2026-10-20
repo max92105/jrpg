@@ -24,7 +24,7 @@ internal sealed class InventoryPage : IMenuPage
     public const int VisibleRows = 10;
 
     // Legacy InventoryView and ListRow: a 28 x 20 margin, the Text.Heading title, column titles over a hairline, 44 px rows
-    // 10 px in with a 40 px icon column (icons come in P1-2) and the quantity 16 px from the right; Text.Body 18 px.
+    // 10 px in with a 26 px icon in a 40 px column and the quantity 16 px from the right; Text.Body 18 px.
     private const int Margin = 28;
     private const int TopMargin = 20;
     private const int HeadingPixels = 22;
@@ -38,18 +38,37 @@ internal sealed class InventoryPage : IMenuPage
     private const int IconColumn = 40;
     private const int QuantityInset = 16;
     private const int DescriptionGap = 24;
+    private const int RowIconSize = 26;
 
-    private static readonly ImmutableArray<InventoryCategory> _categories =
-        [InventoryCategory.All, InventoryCategory.Consumables, InventoryCategory.Weapons, InventoryCategory.Armor];
+    // Legacy CategoryRailStyle and CategoryTabStyle: a 72 px rail, 12 px from the list, with 12 px padding and 64 px tabs
+    // holding a 40 px icon, faint until selected; the selected tab glows inside an 8 x 4 margin.
+    private const int RailWidth = 72;
+    private const int RailGap = 12;
+    private const int RailPadding = 12;
+    private const int RailTabHeight = 64;
+    private const int RailIconSize = 40;
+    private const int RailGlowInsetX = 8;
+    private const int RailGlowInsetY = 4;
+    private const float UnselectedIconOpacity = 0.5f;
+
+    // The rail, top to bottom: each category with its heading and its icon, in one place so their order can't drift.
+    private static readonly ImmutableArray<CategoryTab> _tabs =
+    [
+        new(InventoryCategory.All, MessageIds.InventoryAll, UiArtFiles.Icons.AllItems),
+        new(InventoryCategory.Consumables, MessageIds.InventoryConsumables, UiArtFiles.Icons.Consumables),
+        new(InventoryCategory.Weapons, MessageIds.InventoryWeapons, UiArtFiles.Icons.Weapons),
+        new(InventoryCategory.Armor, MessageIds.InventoryArmor, UiArtFiles.Icons.Armor),
+    ];
 
     private readonly GameSession _session;
     private readonly ContentCatalog _catalog;
     private readonly UiTextures _ui;
-    private readonly ListCursor _categoryCursor = new(_categories.Length, _ => true);
+    private readonly ListCursor _categoryCursor = new(_tabs.Length, _ => true);
     private readonly SpriteFontBase _headingFont;
     private readonly SpriteFontBase _bodyFont;
     private readonly SpriteFontBase _labelFont;
     private readonly InventoryLabels _labels;
+    private readonly string[] _categoryNames;
     private ListCursor? _rowCursor;
     private ItemRow[] _rows = [];
 
@@ -66,6 +85,7 @@ internal sealed class InventoryPage : IMenuPage
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _labelFont = text.Fonts.FontAt(LabelPixels);
         _labels = InventoryLabels.From(text.Messages, _labelFont, _bodyFont);
+        _categoryNames = [.. _tabs.Select(tab => text.Messages.Text(tab.LabelId))];
         ShowCategory();
     }
 
@@ -73,7 +93,7 @@ internal sealed class InventoryPage : IMenuPage
 
     public bool LeavesOnCancel => true;
 
-    public InventoryCategory Category => _categories[_categoryCursor.Selected];
+    public InventoryCategory Category => _tabs[_categoryCursor.Selected].Category;
 
     /// <summary>The items on show, in order.</summary>
     public IReadOnlyList<string> ShownItemIds => [.. _rows.Select(row => row.ItemId)];
@@ -112,10 +132,11 @@ internal sealed class InventoryPage : IMenuPage
 
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
-        var left = area.X + Margin;
+        DrawRail(batch, textures, area, opacity);
+        var left = area.X + RailWidth + RailGap + Margin;
         var top = area.Y + TopMargin;
         var width = area.Right - Margin - left;
-        batch.DrawString(_headingFont, _labels.Categories[_categoryCursor.Selected], new Vector2(left, top), UiTheme.TextPrimary * opacity);
+        batch.DrawString(_headingFont, _categoryNames[_categoryCursor.Selected], new Vector2(left, top), UiTheme.TextPrimary * opacity);
         DrawColumnTitles(batch, textures, new Rectangle(left, top + ColumnTitlesTop, width, 0), opacity);
 
         var rowsTop = top + RowsTop;
@@ -149,7 +170,7 @@ internal sealed class InventoryPage : IMenuPage
     {
         var item = _catalog.Items[entry.ItemId];
         var quantity = entry.Quantity.ToString(CultureInfo.InvariantCulture);
-        return new ItemRow(item.Id, item.Name, quantity, _bodyFont.MeasureString(quantity).X, item.Description);
+        return new ItemRow(item.Id, item.Name, item.IconFile, quantity, _bodyFont.MeasureString(quantity).X, item.Description);
     }
 
     // Legacy SectionHeaderStyle over the rows' columns: Name after the icon column, Qty at the right.
@@ -175,28 +196,56 @@ internal sealed class InventoryPage : IMenuPage
 
         var item = _rows[index];
         var textTop = row.Y + ((RowHeight - _bodyFont.LineHeight) / 2f);
+        var iconTop = row.Y + ((RowHeight - RowIconSize) / 2);
+        batch.Draw(_ui.Icon(textures, item.IconFile, RowIconSize), new Vector2(row.X + RowInset, iconTop), Color.White * opacity);
         batch.DrawString(_bodyFont, item.Name, new Vector2(row.X + RowInset + IconColumn, textTop), UiTheme.TextPrimary * opacity);
         var quantityLeft = row.Right - QuantityInset - item.QuantityWidth;
         batch.DrawString(_bodyFont, item.Quantity, new Vector2(quantityLeft, textTop), UiTheme.TextPrimary * opacity);
     }
 
-    // One owned item's row text.
-    private sealed record ItemRow(string ItemId, string Name, string Quantity, float QuantityWidth, string Description);
+    // Legacy CategoryRailStyle: a dark strip with hairlines left and right, one icon tab per category.
+    private void DrawRail(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
+    {
+        var rail = new Rectangle(area.X, area.Y, RailWidth, area.Height);
+        batch.Draw(textures.Pixel, rail, UiTheme.CategoryRail * opacity);
+        batch.Draw(textures.Pixel, new Rectangle(rail.X, rail.Y, 1, rail.Height), UiTheme.Stroke * opacity);
+        batch.Draw(textures.Pixel, new Rectangle(rail.Right - 1, rail.Y, 1, rail.Height), UiTheme.Stroke * opacity);
+        for (var index = 0; index < _tabs.Length; index++)
+        {
+            var tab = new Rectangle(rail.X, rail.Y + RailPadding + (index * RailTabHeight), RailWidth, RailTabHeight);
+            DrawRailTab(batch, textures, tab, index, opacity);
+        }
+    }
 
-    // The page's fixed text; Categories is in rail order.
-    private sealed record InventoryLabels(string[] Categories, string Name, string Quantity, float QuantityWidth, string Empty, float EmptyWidth)
+    private void DrawRailTab(SpriteBatch batch, TextureLibrary textures, Rectangle tab, int index, float opacity)
+    {
+        var isSelected = index == _categoryCursor.Selected;
+        if (isSelected)
+        {
+            var glow = new Rectangle(tab.X + RailGlowInsetX, tab.Y + RailGlowInsetY, tab.Width - (2 * RailGlowInsetX), tab.Height - (2 * RailGlowInsetY));
+            batch.Draw(_ui.Gradient(textures, UiTheme.SelectedRow), glow, Color.White * opacity);
+            Outline.Draw(batch, textures.Pixel, glow, UiTheme.SelectionStroke * opacity);
+        }
+
+        var icon = _ui.Icon(textures, _tabs[index].IconFile, RailIconSize);
+        var corner = new Vector2(tab.Center.X - (RailIconSize / 2), tab.Center.Y - (RailIconSize / 2));
+        batch.Draw(icon, corner, Color.White * (isSelected ? opacity : opacity * UnselectedIconOpacity));
+    }
+
+    // One category on the rail.
+    private sealed record CategoryTab(InventoryCategory Category, string LabelId, string IconFile);
+
+    // One owned item's row text.
+    private sealed record ItemRow(string ItemId, string Name, string IconFile, string Quantity, float QuantityWidth, string Description);
+
+    // The page's fixed text.
+    private sealed record InventoryLabels(string Name, string Quantity, float QuantityWidth, string Empty, float EmptyWidth)
     {
         public static InventoryLabels From(UiMessages messages, SpriteFontBase labelFont, SpriteFontBase bodyFont)
         {
             var quantity = messages.Text(MessageIds.InventoryColumnQuantity);
             var empty = messages.Text(MessageIds.InventoryEmpty);
             return new InventoryLabels(
-                [
-                    messages.Text(MessageIds.InventoryAll),
-                    messages.Text(MessageIds.InventoryConsumables),
-                    messages.Text(MessageIds.InventoryWeapons),
-                    messages.Text(MessageIds.InventoryArmor),
-                ],
                 messages.Text(MessageIds.InventoryColumnName),
                 quantity,
                 labelFont.MeasureString(quantity).X,

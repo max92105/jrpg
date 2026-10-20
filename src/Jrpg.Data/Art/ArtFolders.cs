@@ -11,6 +11,9 @@ public static class ArtFolders
     /// <summary>The faces dialogue shows next to a speaker's lines.</summary>
     public const string Portraits = "portraits";
 
+    /// <summary>Item and menu icons.</summary>
+    public const string Icons = "icons";
+
     /// <summary>Full-screen pictures behind the title and the menus.</summary>
     public const string Backgrounds = "backgrounds";
 

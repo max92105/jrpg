@@ -22,6 +22,7 @@ internal sealed class UiTextures
     private Texture2D? _selectionFill;
     private Texture2D? _sectionLine;
     private readonly Dictionary<(string File, int Size), Texture2D> _diamondPortraits = [];
+    private readonly Dictionary<(string File, int Size), Texture2D> _icons = [];
     private readonly Dictionary<ImmutableArray<GradientStop>, Texture2D> _gradients = [];
 
     /// <summary>A tab that isn't selected: the arrow, dark and faintly outlined.</summary>
@@ -64,6 +65,24 @@ internal sealed class UiTextures
             source.GetData(pixels);
             baked = textures.Create(size, size, DiamondCrop.Bake(pixels, source.Width, source.Height, size));
             _diamondPortraits.Add((portraitFile, size), baked);
+        }
+
+        return baked;
+    }
+
+    /// <summary>An icon shrunk smoothly from its 1024 px art (<see cref="SquareShrink"/>), once per file and size.</summary>
+    /// <param name="textures">Where the icon is read and the small one made.</param>
+    /// <param name="iconFile">In the icons folder.</param>
+    /// <param name="size">The drawn square's side in pixels.</param>
+    public Texture2D Icon(TextureLibrary textures, string iconFile, int size)
+    {
+        if (!_icons.TryGetValue((iconFile, size), out var baked))
+        {
+            var source = textures.Get(ArtFolders.Icons, iconFile);
+            var pixels = new Color[source.Width * source.Height];
+            source.GetData(pixels);
+            baked = textures.Create(size, size, SquareShrink.Bake(pixels, source.Width, source.Height, size));
+            _icons.Add((iconFile, size), baked);
         }
 
         return baked;

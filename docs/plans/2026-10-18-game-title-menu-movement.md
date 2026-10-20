@@ -624,7 +624,13 @@ P1 was split in two (developer, 2026-10-19), since it came to about 500 lines. T
     - [ ] The starting items show under every category with the right counts.
     - [ ] The list scrolls.
 
-- [ ] **P1-2. Inventory icons** (Data + Game, about 200 lines)
+- [x] **P1-2. Inventory icons** (Data + Game, about 200 lines)
+  - **Done, with deviations:**
+    - New pure `Ui/SquareShrink` (box filter, 3 tests). `DiamondCrop` is now `SquareShrink` plus its diamond mask. `UiTextures.Icon` caches each icon per file and size.
+    - The rail sits inside the page area, at its left, with the 12 px gap after it; legacy gave it its own column with the gap before it. The selected tab's glow has square corners (legacy rounded them by 4 px).
+    - Categories, with their headings and icons, are one list, so their order lives in one place. `UiArtFiles` groups `Backgrounds` and `Icons`, and its test checks each group against its folder. `Ui/Outline` is shared with the confirmation prompt.
+    - `ArtReferenceCheck`'s three named-file checks became one helper, to stay under the complexity limit; the messages are unchanged. The test is `FindProblems_MissingItemIcon_NamesTheItem`, as the class names its tests.
+    - Follow-up: check skill icons once something draws them.
   - **Goal:** the category rail with the legacy icons, All (`All.png`), Consumables, Weapons and Armor (`Consumable.png`, `Weapon.png`, `Armor.png`; decision 51), and each row's item icon, shrunk smoothly from the 1024 px art.
   - **Data:** `ArtReferenceCheck` covers item icons.
   - **Tests:** Data `ArtReferenceCheck_FindProblems_MissingItemIcon_NamesTheItem`.

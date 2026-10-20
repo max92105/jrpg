@@ -85,7 +85,7 @@ internal sealed class GameMenuScene : IScene
     private void DrawFrame(SpriteBatch batch, TextureLibrary textures, float opacity)
     {
         var tint = Color.White * opacity;
-        CoverFit.DrawOverScreen(batch, textures.Get(ArtFolders.Backgrounds, UiArtFiles.MenuBackground), tint);
+        CoverFit.DrawOverScreen(batch, textures.Get(ArtFolders.Backgrounds, UiArtFiles.Backgrounds.Menu), tint);
         batch.Draw(_ui.MenuScrim(textures), _screen, tint);
 
         var footerTop = VirtualScreen.Height - FooterHeight;

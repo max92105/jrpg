@@ -92,18 +92,10 @@ internal sealed class ConfirmPromptView
         }
 
         var outline = (button.IsSelected ? UiTheme.SelectionStroke : button.Outline) * opacity;
-        DrawOutline(batch, textures.Pixel, area, outline);
+        Outline.Draw(batch, textures.Pixel, area, outline);
 
         var labelPosition = new Vector2(area.Center.X - (button.LabelWidth / 2), area.Y + ((area.Height - _buttonFont.LineHeight) / 2f));
         batch.DrawString(_buttonFont, button.Label, labelPosition, UiTheme.TextPrimary * opacity);
-    }
-
-    private static void DrawOutline(SpriteBatch batch, Texture2D pixel, Rectangle area, Color color)
-    {
-        batch.Draw(pixel, new Rectangle(area.X, area.Y, area.Width, 1), color);
-        batch.Draw(pixel, new Rectangle(area.X, area.Bottom - 1, area.Width, 1), color);
-        batch.Draw(pixel, new Rectangle(area.X, area.Y, 1, area.Height), color);
-        batch.Draw(pixel, new Rectangle(area.Right - 1, area.Y, 1, area.Height), color);
     }
 
     // One of the two buttons as drawn this frame; Outline is its border when it isn't selected.

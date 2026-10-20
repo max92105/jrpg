@@ -12,8 +12,8 @@ namespace Jrpg.Data.Art;
 public static class ArtReferenceCheck
 {
     /// <summary>
-    /// Every tilesheet, the field sprite, every dialogue portrait and every party member's portrait exist as PNGs, and
-    /// every tile's cell lies inside its sheet.
+    /// Every tilesheet, the field sprite, every dialogue portrait, every party member's portrait and every item's icon
+    /// exist as PNGs, and every tile's cell lies inside its sheet.
     /// </summary>
     /// <returns>One line per problem, naming the file; empty when the art is complete.</returns>
     public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string artRoot)
@@ -37,23 +37,25 @@ public static class ArtReferenceCheck
         }
 
         TryReadSize(artRoot, ArtFolders.FieldSprites, catalog.NewGame.FieldSpriteFile, problems);
-        foreach (var (mapId, mapEvent, portraitFile) in DialoguePortraits(catalog))
-        {
-            if (ReadSize(artRoot, ArtFolders.Portraits, portraitFile).Problem is { } problem)
-            {
-                problems.Add($"{problem} Named by event '{mapEvent.Id}' on map '{mapId}'.");
-            }
-        }
-
-        foreach (var member in catalog.PartyMembers.Values.OrderBy(member => member.Id, StringComparer.Ordinal))
-        {
-            if (ReadSize(artRoot, ArtFolders.Portraits, member.PortraitFile).Problem is { } problem)
-            {
-                problems.Add($"{problem} Named by party member '{member.Id}'.");
-            }
-        }
-
+        var dialoguePortraits = DialoguePortraits(catalog).Select(named => (named.PortraitFile, $"event '{named.Event.Id}' on map '{named.MapId}'"));
+        AddMissing(problems, artRoot, ArtFolders.Portraits, dialoguePortraits);
+        var members = catalog.PartyMembers.Values.OrderBy(member => member.Id, StringComparer.Ordinal);
+        AddMissing(problems, artRoot, ArtFolders.Portraits, members.Select(member => (member.PortraitFile, $"party member '{member.Id}'")));
+        var items = catalog.Items.Values.OrderBy(item => item.Id, StringComparer.Ordinal);
+        AddMissing(problems, artRoot, ArtFolders.Icons, items.Select(item => (item.IconFile, $"item '{item.Id}'")));
         return problems;
+    }
+
+    // One problem per named file that can't be read, saying what names it so the content can be fixed there.
+    private static void AddMissing(List<string> problems, string artRoot, string folder, IEnumerable<(string File, string NamedBy)> references)
+    {
+        foreach (var (file, namedBy) in references)
+        {
+            if (ReadSize(artRoot, folder, file).Problem is { } problem)
+            {
+                problems.Add($"{problem} Named by {namedBy}.");
+            }
+        }
     }
 
     // Every portrait a dialogue step names, with the map and event that name it, in a stable order for the report.

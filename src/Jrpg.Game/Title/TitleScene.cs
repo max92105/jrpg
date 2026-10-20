@@ -83,7 +83,7 @@ internal sealed class TitleScene : IScene
 
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
-        CoverFit.DrawOverScreen(batch, textures.Get(ArtFolders.Backgrounds, UiArtFiles.TitleBackground), Color.White);
+        CoverFit.DrawOverScreen(batch, textures.Get(ArtFolders.Backgrounds, UiArtFiles.Backgrounds.Title), Color.White);
         batch.DrawString(_nameFont, _name, _namePosition + _shadowOffset, _shadow, effect: FontSystemEffect.Blurry, effectAmount: ShadowBlur);
         batch.DrawString(_nameFont, _name, _namePosition, Color.White);
         for (var index = 0; index < _labels.Length; index++)

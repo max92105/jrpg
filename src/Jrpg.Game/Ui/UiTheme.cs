@@ -144,6 +144,9 @@ internal static class UiTheme
         new(1, FromLegacy(0x00FFFFFF)),
     ];
 
+    /// <summary>Legacy <c>CategoryRailStyle</c>: the strip behind the inventory's category icons.</summary>
+    public static Color CategoryRail { get; } = FromLegacy(0x80000000);
+
     /// <summary>Legacy <c>Color.Danger</c>: a save that failed.</summary>
     public static Color Danger { get; } = FromLegacy(0xFFE0524A);
 

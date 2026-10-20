@@ -29,8 +29,8 @@ internal sealed class OptionsPage : IMenuPage
     private readonly UiTextures _ui;
     private readonly SpriteFontBase _font;
     private readonly string[] _labels;
-    private readonly ValueText[] _onOff;
-    private readonly ValueText[] _speeds;
+    private readonly MeasuredText[] _onOff;
+    private readonly MeasuredText[] _speeds;
     private readonly ListCursor _cursor = new(RowCount, _ => true);
 
     /// <param name="text">Messages and fonts.</param>
@@ -43,10 +43,10 @@ internal sealed class OptionsPage : IMenuPage
         _font = text.Fonts.FontAt(UiTheme.MenuTextPixels);
         var messages = text.Messages;
         _labels = [messages.Text(MessageIds.OptionsFullScreen), messages.Text(MessageIds.OptionsTextSpeed)];
-        _onOff = [Measured(messages.Text(MessageIds.OptionsOff)), Measured(messages.Text(MessageIds.OptionsOn))];
+        _onOff = [MeasuredText.Of(_font, messages.Text(MessageIds.OptionsOff)), MeasuredText.Of(_font, messages.Text(MessageIds.OptionsOn))];
 
         // Indexed by TextSpeed, so each label follows its speed whatever the enum's order.
-        _speeds = [.. Enum.GetValues<TextSpeed>().Select(speed => Measured(messages.Text(LabelIdOf(speed))))];
+        _speeds = [.. Enum.GetValues<TextSpeed>().Select(speed => MeasuredText.Of(_font, messages.Text(LabelIdOf(speed))))];
     }
 
     public string TitleMessageId => MessageIds.MenuOptions;
@@ -103,7 +103,7 @@ internal sealed class OptionsPage : IMenuPage
         _settings.TextSpeed = (TextSpeed)speed;
     }
 
-    private ValueText ValueOf(int row) => row == TextSpeedRow
+    private MeasuredText ValueOf(int row) => row == TextSpeedRow
         ? _speeds[(int)_settings.TextSpeed]
         : _onOff[_settings.IsFullScreen ? 1 : 0];
 
@@ -115,8 +115,6 @@ internal sealed class OptionsPage : IMenuPage
         TextSpeed.Instant => MessageIds.TextSpeedInstant,
         _ => throw new ArgumentOutOfRangeException(nameof(speed), speed, null),
     };
-
-    private ValueText Measured(string text) => new(text, _font.MeasureString(text).X);
 
     private void DrawRow(SpriteBatch batch, TextureLibrary textures, RowPlace place, float opacity)
     {
@@ -141,9 +139,6 @@ internal sealed class OptionsPage : IMenuPage
             new Diamond(new Vector2(valueLeft + value.Width + ArrowGap, middle), ArrowSide).Draw(batch, textures.Pixel, color);
         }
     }
-
-    // One value as shown, measured once so the diamonds around the selected one need no measuring per frame.
-    private readonly record struct ValueText(string Text, float Width);
 
     // Which row is drawn, and where.
     private readonly record struct RowPlace(int Index, Rectangle Area);

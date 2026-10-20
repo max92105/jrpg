@@ -61,7 +61,7 @@ internal sealed class PartyMemberCardView
         _badgeFont = text.Fonts.FontAt(BadgePixels);
         _valueFont = text.Fonts.FontAt(ValuePixels);
         var badge = text.Messages.Text(MessageIds.PartyLeader);
-        _leaderBadge = new MeasuredText(badge, _badgeFont.MeasureString(badge).X);
+        _leaderBadge = MeasuredText.Of(_badgeFont, badge);
         _hpLabel = text.Messages.Text(MessageIds.StatHp);
         _mpLabel = text.Messages.Text(MessageIds.StatMp);
     }
@@ -79,7 +79,7 @@ internal sealed class PartyMemberCardView
             member.Definition.Name,
             _nameFont.MeasureString(member.Definition.Name).X,
             member == leader,
-            new MeasuredText(level, _captionFont.MeasureString(level).X),
+            MeasuredText.Of(_captionFont, level),
             _classes[member.Definition.ClassId].Name,
             member.Definition.PortraitFile,
             new VitalBar(hp, Measured(vitals.Hp, vitals.MaxHp)),
@@ -116,11 +116,7 @@ internal sealed class PartyMemberCardView
 
     private static string Number(int value) => value.ToString(CultureInfo.InvariantCulture);
 
-    private MeasuredText Measured(int value, int max)
-    {
-        var text = $"{Number(value)}/{Number(max)}";
-        return new MeasuredText(text, _valueFont.MeasureString(text).X);
-    }
+    private MeasuredText Measured(int value, int max) => MeasuredText.Of(_valueFont, $"{Number(value)}/{Number(max)}");
 
     // The name, the leader's badge after it, and the level at the right.
     private void DrawHeadline(SpriteBatch batch, TextureLibrary textures, Card card, Rectangle text, float opacity)
@@ -163,9 +159,6 @@ internal sealed class PartyMemberCardView
         string PortraitFile,
         VitalBar Hp,
         VitalBar Mp);
-
-    /// <summary>A piece of a card's text and its measured width, for right-aligning it.</summary>
-    public readonly record struct MeasuredText(string Text, float Width);
 
     /// <summary>A card's HP or MP bar, and its "value/max" text.</summary>
     public sealed record VitalBar(StatBar Bar, MeasuredText Value);

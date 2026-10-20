@@ -69,8 +69,7 @@ internal sealed class ItemTargetPickerView
             hp.Show(member.Vitals.Hp, member.Vitals.MaxHp);
             var mp = new StatBar(_ui, UiTheme.MpBar);
             mp.Show(member.Vitals.Mp, member.Vitals.MaxMp);
-            var name = member.Definition.Name;
-            return new MemberCard(name, _nameFont.MeasureString(name).X, member.Definition.PortraitFile, hp, mp);
+            return new MemberCard(MeasuredText.Of(_nameFont, member.Definition.Name), member.Definition.PortraitFile, hp, mp);
         })];
     }
 
@@ -124,7 +123,7 @@ internal sealed class ItemTargetPickerView
 
         var nameTop = place.TopLeft.Y + PortraitSize + NameGap;
         var nameColor = (place.IsSelected ? UiTheme.TextPrimary : UiTheme.TextSecondary) * opacity;
-        batch.DrawString(_nameFont, card.Name, new Vector2(center.X - (card.NameWidth / 2), nameTop), nameColor);
+        batch.DrawString(_nameFont, card.Name.Text, new Vector2(center.X - (card.Name.Width / 2), nameTop), nameColor);
 
         var barsTop = nameTop + (int)_nameFont.LineHeight + NameGap;
         var barLeft = place.TopLeft.X + ((CardWidth - PortraitSize) / 2);
@@ -133,7 +132,7 @@ internal sealed class ItemTargetPickerView
     }
 
     // One member's card, built when the picker opens.
-    private sealed record MemberCard(string Name, float NameWidth, string PortraitFile, StatBar Hp, StatBar Mp);
+    private sealed record MemberCard(MeasuredText Name, string PortraitFile, StatBar Hp, StatBar Mp);
 
     // Where a card goes this frame, and whether it's chosen.
     private readonly record struct CardPlace(MemberCard Card, Point TopLeft, bool IsSelected);

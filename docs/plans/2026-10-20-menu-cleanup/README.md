@@ -94,7 +94,7 @@ One line per slice. Each slice's goal, types, tests and hand checks are in its f
 ### Phase 4: shared parts
 
 - [x] **U1. One section title** (Game, about 130 lines) → [slices/U1.md](slices/U1.md)
-- [ ] **U2. Measured text** (Game, about 70 lines) → [slices/U2.md](slices/U2.md)
+- [x] **U2. Measured text** (Game, about 70 lines) → [slices/U2.md](slices/U2.md)
 - [ ] **U3. The vital meter, one HP and MP format** (content + Game, about 200 lines; decision 110) → [slices/U3.md](slices/U3.md)
 - [ ] **U4. One member card for the Party page and the item target picker** (Game, about 280 lines; decision 111, question 112) → [slices/U4.md](slices/U4.md)
 

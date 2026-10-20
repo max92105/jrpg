@@ -52,7 +52,7 @@ internal sealed class PartyPage : IMenuPage
     private readonly string[] _actions;
     private int _column = ActiveColumn;
     private Dictionary<PartyMember, PartyMemberCardView.Card> _cards = [];
-    private PartyMemberCardView.MeasuredText _count;
+    private MeasuredText _count;
     private int _row;
 
     // Where the moving member stood, so Cancel puts the cursor back on them.
@@ -330,7 +330,7 @@ internal sealed class PartyPage : IMenuPage
             MessageIds.PartyCount,
             new MessageArgument("count", _party.ActiveMembers.Count.ToString(CultureInfo.InvariantCulture)),
             new MessageArgument("max", _maxActive.ToString(CultureInfo.InvariantCulture)));
-        _count = new PartyMemberCardView.MeasuredText(count, _labelFont.MeasureString(count).X);
+        _count = MeasuredText.Of(_labelFont, count);
     }
 
     private void DrawCards(SpriteBatch batch, TextureLibrary textures, int column, Rectangle columnArea, float opacity)

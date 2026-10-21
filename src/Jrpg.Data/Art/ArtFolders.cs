@@ -17,6 +17,9 @@ public static class ArtFolders
     /// <summary>Battle sprites: party members' and enemies' pictures on the battle screen.</summary>
     public const string Battlers = "battlers";
 
+    /// <summary>Battle effects: strips of square frames played left to right (decision 57).</summary>
+    public const string Effects = "effects";
+
     /// <summary>Full-screen pictures behind the title, the menus and battles.</summary>
     public const string Backgrounds = "backgrounds";
 

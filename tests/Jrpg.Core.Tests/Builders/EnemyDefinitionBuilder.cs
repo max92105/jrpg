@@ -29,7 +29,7 @@ internal sealed class EnemyDefinitionBuilder
         Name = _name,
         PortraitFile = "goblin.png",
         BattleSpriteFile = "Goblin.png",
-        AttackEffectFile = "AttackEnemy.gif",
+        AttackEffectFile = "AttackEnemy.png",
         IsSpriteFlipped = false,
         MaxHp = _maxHp,
         MaxMp = 10,

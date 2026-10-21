@@ -102,6 +102,26 @@ public sealed class ActionPlaybackTests
         Assert.Equal([new FloatingNumber(_goblin, "13", EffectKind.Damage)], playback.Numbers);
     }
 
+    [Fact]
+    public void Start_AttackLanded_PlaysAttackersStripOnTarget()
+    {
+        var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), new EffectApplied(_goblin, EffectKind.Damage, 13)]);
+
+        Assert.Equal([new EffectOnTarget(_goblin, "AttackPlayer.png")], playback.Strips);
+        Assert.Empty(playback.Cues);
+    }
+
+    [Fact]
+    public void Start_HealLanded_ShowsPlaceholderCueNotStrip()
+    {
+        var potion = BattleScenarios.Catalog.Items["potion"];
+
+        var playback = Start([new ActionStarted(_sarxian, new ItemCommand(potion, [_sarxian])), new EffectApplied(_sarxian, EffectKind.RestoreHp, 50)]);
+
+        Assert.Equal([new CueOnTarget(_sarxian, potion.Name)], playback.Cues);
+        Assert.Empty(playback.Strips);
+    }
+
     // The fallen stay lit white for 1.0 s, then fade out over 1.0 s.
     [Fact]
     public void Update_FallenEnemy_FadesAfterTint()

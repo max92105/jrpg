@@ -32,6 +32,7 @@ internal sealed class BattleScene : IScene
     private readonly BattleBanner _banner = new();
     private readonly BattleBannerView _bannerView;
     private readonly FloatingNumbersView _numbers;
+    private readonly ImpactEffectsView _impactEffects;
     private ActionPlayback? _shownPlayback;
     private (int Turn, TurnStage Stage) _shown;
     private bool _isFinished;
@@ -58,6 +59,7 @@ internal sealed class BattleScene : IScene
             ?? throw new InvalidOperationException("A battle screen needs the encounter it fights.");
         _commandPanel = new CommandPanelView(_commands, _battlers, text, ui);
         _numbers = new FloatingNumbersView(_sequence, _battlers, text);
+        _impactEffects = new ImpactEffectsView(_sequence, _battlers, text);
     }
 
     /// <returns>
@@ -98,6 +100,7 @@ internal sealed class BattleScene : IScene
         DrawBackdrop(batch, textures);
         _battlers.Draw(batch, textures);
         _enemyTags.Draw(batch, textures);
+        _impactEffects.Draw(batch, textures);
         _numbers.Draw(batch, textures);
         _turnOrder.Draw(batch, textures);
         _bannerView.Draw(batch, textures);

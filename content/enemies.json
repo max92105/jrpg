@@ -4,7 +4,7 @@
     "name": "Goblin",
     "portraitFile": "Goblin.png",
     "battleSpriteFile": "Goblin.png",
-    "attackEffectFile": "AttackEnemy.gif",
+    "attackEffectFile": "AttackEnemy.png",
     "isSpriteFlipped": false,
     "maxHp": 40,
     "maxMp": 10,

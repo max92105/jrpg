@@ -12,7 +12,7 @@ public sealed class EnemyCatalogValidatorTests
         Name = "Goblin",
         PortraitFile = "goblin.png",
         BattleSpriteFile = "Goblin.png",
-        AttackEffectFile = "AttackEnemy.gif",
+        AttackEffectFile = "AttackEnemy.png",
         IsSpriteFlipped = false,
         MaxHp = 40,
         MaxMp = 10,

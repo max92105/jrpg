@@ -1,3 +1,4 @@
+using System.Buffers.Binary;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Core.Dialogue;
@@ -117,6 +118,38 @@ public sealed class ArtReferenceCheckTests
     }
 
     [Fact]
+    public void FindProblems_MissingAttackEffect_NamesTheMember()
+    {
+        var jazog = _catalog.PartyMembers["jazog"] with { AttackEffectFile = "Gone.png" };
+        var catalog = _catalog with { PartyMembers = new Dictionary<string, PartyMemberDefinition>(_catalog.PartyMembers) { ["jazog"] = jazog } };
+
+        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
+
+        Assert.Equal($"effects/Gone.png: not found in {_artRoot}. Named by party member 'jazog'.", problem);
+    }
+
+    // Only the strip is in the art root, so the rest of the art is reported missing too; the test looks for its own line.
+    [Fact]
+    public void FindProblems_EffectStripWithPartialFrame_NamesTheFile()
+    {
+        var artRoot = Path.Combine(Path.GetTempPath(), $"jrpg-art-{Guid.NewGuid():N}");
+        try
+        {
+            WritePngHeader(Path.Combine(artRoot, ArtFolders.Effects, "Partial.png"), width: 300, height: 128);
+            var jazog = _catalog.PartyMembers["jazog"] with { AttackEffectFile = "Partial.png" };
+            var catalog = _catalog with { PartyMembers = new Dictionary<string, PartyMemberDefinition>(_catalog.PartyMembers) { ["jazog"] = jazog } };
+
+            var problems = ArtReferenceCheck.FindProblems(catalog, artRoot);
+
+            Assert.Contains("effects/Partial.png: a 300x128 strip isn't a row of whole square frames.", problems);
+        }
+        finally
+        {
+            Directory.Delete(artRoot, recursive: true);
+        }
+    }
+
+    [Fact]
     public void FindProblems_MissingEncounterBackground_NamesTheEncounter()
     {
         var catalog = WithGoblinTrioBackground("Gone.png");
@@ -151,5 +184,15 @@ public sealed class ArtReferenceCheckTests
     {
         var trio = _catalog.Encounters["goblin_trio"] with { BackgroundFile = file };
         return _catalog with { Encounters = new Dictionary<string, EncounterDefinition>(_catalog.Encounters) { ["goblin_trio"] = trio } };
+    }
+
+    // Only the header: the art check reads a PNG's size from it (PngSize).
+    private static void WritePngHeader(string path, int width, int height)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        byte[] header = [0x89, (byte)'P', (byte)'N', (byte)'G', 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 13, (byte)'I', (byte)'H', (byte)'D', (byte)'R', 0, 0, 0, 0, 0, 0, 0, 0];
+        BinaryPrimitives.WriteInt32BigEndian(header.AsSpan(16), width);
+        BinaryPrimitives.WriteInt32BigEndian(header.AsSpan(20), height);
+        File.WriteAllBytes(path, header);
     }
 }

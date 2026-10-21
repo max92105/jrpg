@@ -27,6 +27,6 @@ public sealed class BattlerArtTests
 
         var art = BattlerArt.Of(Combatant.FromPartyMember(sarxian));
 
-        Assert.Equal(new BattlerArt("Sarxian.png", false, "Sarxian.png", "AttackPlayer.gif"), art);
+        Assert.Equal(new BattlerArt("Sarxian.png", false, "Sarxian.png", "AttackPlayer.png"), art);
     }
 }

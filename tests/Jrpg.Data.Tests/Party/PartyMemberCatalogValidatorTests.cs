@@ -21,7 +21,7 @@ public sealed class PartyMemberCatalogValidatorTests
         ClassId = "warrior",
         PortraitFile = "Sarxian.png",
         BattleSpriteFile = "Sarxian.png",
-        AttackEffectFile = "AttackPlayer.gif",
+        AttackEffectFile = "AttackPlayer.png",
         Level = 1,
         Experience = 50,
         Hp = 200,

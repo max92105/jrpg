@@ -13,8 +13,9 @@ public static class ArtReferenceCheck
 {
     /// <summary>
     /// Every tilesheet, the field sprite, every dialogue portrait, every party member's portrait, every item's icon,
-    /// every battle sprite, every enemy's portrait and every encounter's background exist as PNGs, and every tile's cell
-    /// lies inside its sheet. Battle art names must match their files exactly, case included.
+    /// every battle sprite, every enemy's portrait, every attack effect and every encounter's background exist as PNGs,
+    /// every tile's cell lies inside its sheet, and every effect strip is whole square frames. Battle art names must match
+    /// their files exactly, case included.
     /// </summary>
     /// <returns>One line per problem, naming the file; empty when the art is complete.</returns>
     public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string artRoot)
@@ -48,9 +49,26 @@ public static class ArtReferenceCheck
         var enemies = catalog.Enemies.Values.OrderBy(enemy => enemy.Id, StringComparer.Ordinal);
         AddMissingByExactName(problems, artRoot, ArtFolders.Battlers, enemies.Select(enemy => (enemy.BattleSpriteFile, $"enemy '{enemy.Id}'")));
         AddMissingByExactName(problems, artRoot, ArtFolders.Portraits, enemies.Select(enemy => (enemy.PortraitFile, $"enemy '{enemy.Id}'")));
+        var attackEffects = members.Select(member => (File: member.AttackEffectFile, NamedBy: $"party member '{member.Id}'"))
+            .Concat(enemies.Select(enemy => (File: enemy.AttackEffectFile, NamedBy: $"enemy '{enemy.Id}'")))
+            .ToList();
+        AddMissingByExactName(problems, artRoot, ArtFolders.Effects, attackEffects);
+        AddPartialFrameStrips(problems, artRoot, attackEffects.Select(effect => effect.File));
         var encounters = catalog.Encounters.Values.OrderBy(encounter => encounter.Id, StringComparer.Ordinal);
         AddMissingByExactName(problems, artRoot, ArtFolders.Backgrounds, encounters.Select(encounter => (encounter.BackgroundFile, $"encounter '{encounter.Id}'")));
         return problems;
+    }
+
+    // An effect strip is square frames side by side (decision 57), so its width must be a whole number of its heights.
+    private static void AddPartialFrameStrips(List<string> problems, string artRoot, IEnumerable<string> files)
+    {
+        foreach (var file in files.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal))
+        {
+            if (ReadSize(artRoot, ArtFolders.Effects, file).Size is { } size && (size.Height == 0 || size.Width % size.Height != 0))
+            {
+                problems.Add($"{ShownPath(ArtFolders.Effects, file)}: a {size.Width}x{size.Height} strip isn't a row of whole square frames.");
+            }
+        }
     }
 
     // Battle art is matched by exact name, case included: Windows finds "goblin.png" for "Goblin.png", other systems don't.

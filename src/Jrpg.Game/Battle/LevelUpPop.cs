@@ -1,0 +1,17 @@
+namespace Jrpg.Game.Battle;
+
+/// <summary>"Level Up!" popping in on a victory card (legacy <c>ExpGainRow.Pop</c>): drawn 1.5x large, settling to its size.</summary>
+internal static class LevelUpPop
+{
+    private const float StartScale = 1.5f;
+    private static readonly TimeSpan _length = TimeSpan.FromSeconds(0.35);
+
+    /// <param name="sinceLevelUp">Time since the bar filled the level.</param>
+    /// <returns>The text's scale: 1.5 at the level-up, easing out to 1.</returns>
+    public static float ScaleAt(TimeSpan sinceLevelUp)
+    {
+        var share = Math.Clamp((float)(sinceLevelUp / _length), 0, 1);
+        var eased = 1 - MathF.Pow(1 - share, 3);
+        return StartScale + ((1 - StartScale) * eased);
+    }
+}

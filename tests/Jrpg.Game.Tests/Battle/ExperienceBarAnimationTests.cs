@@ -56,6 +56,27 @@ public sealed class ExperienceBarAnimationTests
     }
 
     [Fact]
+    public void Update_PastLevelUp_CountsTimeSinceIt()
+    {
+        var bar = new ExperienceBarAnimation(_twoLevelUps, finalLevel: 3);
+        bar.Update(TimeSpan.FromSeconds(0.55));
+
+        bar.Update(TimeSpan.FromSeconds(0.1));
+
+        Assert.Equal(TimeSpan.FromSeconds(0.1), bar.SinceLastLevelUp);
+    }
+
+    [Fact]
+    public void Skip_PastLevelUps_ShowsThemWithoutPop()
+    {
+        var bar = new ExperienceBarAnimation(_twoLevelUps, finalLevel: 3);
+
+        bar.Skip();
+
+        Assert.Null(bar.SinceLastLevelUp);
+    }
+
+    [Fact]
     public void IsComplete_NoSteps_IsTrue()
     {
         var bar = new ExperienceBarAnimation([], finalLevel: 4);

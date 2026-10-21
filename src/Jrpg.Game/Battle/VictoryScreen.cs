@@ -18,15 +18,19 @@ internal sealed class VictoryScreen
     {
         Rewards = rewards;
         _bars = [.. rewards.Gains.Select(gain => new ExperienceBarAnimation(gain.Steps, gain.Member.Level))];
+        Entrance = new VictoryEntrance(_bars.Length);
     }
 
     public VictoryRewards Rewards { get; }
 
+    /// <summary>How the title, the reward bar and the cards come in, before the bars fill.</summary>
+    public VictoryEntrance Entrance { get; }
+
     /// <summary>One bar per gain, in the same order.</summary>
     public IReadOnlyList<ExperienceBarAnimation> Bars => _bars;
 
-    /// <summary>Whether every bar has finished filling.</summary>
-    public bool IsComplete => Array.TrueForAll(_bars, bar => bar.IsComplete);
+    /// <summary>Whether everything has come in and every bar has filled, so the footer shows "Next".</summary>
+    public bool IsComplete => Entrance.IsComplete && Array.TrueForAll(_bars, bar => bar.IsComplete);
 
     /// <returns><see cref="BattleFinished"/> on the Confirm after the bars are full, once; null otherwise.</returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
@@ -36,9 +40,13 @@ internal sealed class VictoryScreen
             return null;
         }
 
+        // The bars fill only once the entrance is over, so they get only the update's time past it.
+        var barTimeBefore = Entrance.BarTime;
+        Entrance.Update(delta);
+        var barDelta = Entrance.BarTime - barTimeBefore;
         foreach (var bar in _bars)
         {
-            bar.Update(delta);
+            bar.Update(barDelta);
         }
 
         if (!input.IsPressed(GameButton.Confirm))
@@ -48,6 +56,7 @@ internal sealed class VictoryScreen
 
         if (!IsComplete)
         {
+            Entrance.Skip();
             Array.ForEach(_bars, bar => bar.Skip());
             return null;
         }

@@ -57,9 +57,16 @@ internal sealed class ExperienceBarAnimation
     /// <summary>How many level-ups the bar has filled so far; "Level Up!" shows from the first.</summary>
     public int LevelUps { get; private set; }
 
+    /// <summary>
+    /// Time since the bar last filled a level, for the pop; null before any level-up, and after a skip, which shows
+    /// "Level Up!" without popping.
+    /// </summary>
+    public TimeSpan? SinceLastLevelUp { get; private set; }
+
     public void Update(TimeSpan delta)
     {
         _inStep += delta;
+        SinceLastLevelUp += delta;
         while (!IsComplete && _inStep >= DurationOf(_steps[_stepIndex]))
         {
             _inStep -= DurationOf(_steps[_stepIndex]);
@@ -73,6 +80,8 @@ internal sealed class ExperienceBarAnimation
         {
             FinishStep();
         }
+
+        SinceLastLevelUp = null;
     }
 
     private static TimeSpan DurationOf(LevelProgressStep step)
@@ -87,6 +96,7 @@ internal sealed class ExperienceBarAnimation
         if (_steps[_stepIndex].IsLevelUp)
         {
             LevelUps++;
+            SinceLastLevelUp = TimeSpan.Zero;
         }
 
         _stepIndex++;

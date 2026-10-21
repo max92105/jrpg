@@ -40,6 +40,7 @@ internal sealed class VictoryScreenView
     private const int LevelUpTop = -34;
     private const int FooterHeight = 100;
     private const int FooterLineAbove = 170;
+    private const int NextHintRight = 70;
     private const int TitlePixels = 96;
     private const int RewardLabelPixels = 22;
     private const int RewardValuePixels = 40;
@@ -48,6 +49,7 @@ internal sealed class VictoryScreenView
     private const int SmallPixels = 20;
     private const int LabelPixels = 16;
     private const int ExperiencePixels = 30;
+    private const int NextHintPixels = 28;
 
     private readonly VictoryScreen _screen;
     private readonly UiTextures _ui;
@@ -60,6 +62,7 @@ internal sealed class VictoryScreenView
     private readonly OutlinedFont _smallFont;
     private readonly OutlinedFont _labelFont;
     private readonly OutlinedFont _experienceFont;
+    private readonly OutlinedFont _nextHintFont;
     private readonly string _title;
     private readonly string[] _rewardLabels;
     private readonly string[] _rewardValues;
@@ -67,6 +70,7 @@ internal sealed class VictoryScreenView
     private readonly MeasuredText _levelLabel;
     private readonly string _experienceLabel;
     private readonly MeasuredText _levelUp;
+    private readonly MeasuredText _nextHint;
     private readonly StatBar[] _bars;
     private readonly (int Level, int Experience, int Needed)[] _shown;
     private readonly MeasuredText[] _levelTexts;
@@ -89,6 +93,7 @@ internal sealed class VictoryScreenView
         _smallFont = new OutlinedFont(text.Fonts.FontAt(SmallPixels));
         _labelFont = new OutlinedFont(text.Fonts.FontAt(LabelPixels));
         _experienceFont = new OutlinedFont(text.Fonts.FontAt(ExperiencePixels));
+        _nextHintFont = new OutlinedFont(text.Fonts.FontAt(NextHintPixels));
         _title = text.Messages.Text(MessageIds.BattleVictory);
         var rewardRows = RewardRows(screen.Rewards);
         _rewardLabels = [.. rewardRows.Select(row => text.Messages.Text(row.LabelId))];
@@ -97,6 +102,7 @@ internal sealed class VictoryScreenView
         _levelLabel = MeasuredText.Of(_smallFont.Font, text.Messages.Text(MessageIds.BattleLevelLabel));
         _experienceLabel = text.Messages.Text(MessageIds.StatusExp);
         _levelUp = MeasuredText.Of(_nameFont.Font, text.Messages.Text(MessageIds.BattleLevelUp));
+        _nextHint = MeasuredText.Of(_nextHintFont.Font, text.Messages.Text(MessageIds.BattleVictoryNext));
         _bars = [.. _names.Select(_ => new StatBar(ui, UiTheme.BattleXpBar, UiTheme.BattleBarTrack))];
         _shown = new (int, int, int)[_names.Length];
         Array.Fill(_shown, (-1, -1, -1));
@@ -115,7 +121,8 @@ internal sealed class VictoryScreenView
     {
         // Decision 52: the battle is dimmed, not blurred.
         batch.Draw(_ui.MenuScrim(textures), new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height), Color.White);
-        _titleFont.Draw(batch, _title, new Vector2(TitleLeft, TitleTop), UiTheme.TextPrimary);
+        var entrance = _screen.Entrance;
+        _titleFont.Draw(batch, _title, new Vector2(TitleLeft + entrance.TitleOffset, TitleTop), UiTheme.TextPrimary * entrance.TitleOpacity);
         batch.Draw(textures.Pixel, new Rectangle(TitleLineLeft, TitleLineTop, VirtualScreen.Width - TitleLineLeft, 1), UiTheme.BarLine);
         DrawRewards(batch, textures);
         for (var index = 0; index < _names.Length; index++)
@@ -123,7 +130,7 @@ internal sealed class VictoryScreenView
             ShowCard(index);
             var column = index % 2;
             var topLeft = new Point(
-                CardsLeft + (column * (PointedBarShape.CardHeaderWidth + CardColumnGap)),
+                CardsLeft + (column * (PointedBarShape.CardHeaderWidth + CardColumnGap)) + (int)entrance.CardOffset(index),
                 CardsTop + (index / 2 * CardPitch));
             DrawCard(batch, textures, index, topLeft);
         }
@@ -132,34 +139,43 @@ internal sealed class VictoryScreenView
         batch.Draw(textures.Pixel, new Rectangle(0, VirtualScreen.Height - FooterLineAbove, VirtualScreen.Width, 1), UiTheme.BarLine);
         batch.Draw(textures.Pixel, new Rectangle(0, footerTop, VirtualScreen.Width, FooterHeight), UiTheme.Bar);
         batch.Draw(textures.Pixel, new Rectangle(0, footerTop, VirtualScreen.Width, 1), UiTheme.BarLine);
+        if (_screen.IsComplete)
+        {
+            var hintTop = footerTop + ((FooterHeight - _nextHintFont.Font.LineHeight) / 2f);
+            _nextHintFont.Draw(batch, _nextHint.Text, new Vector2(VirtualScreen.Width - NextHintRight - _nextHint.Width, hintTop), UiTheme.TextPrimary);
+        }
     }
 
     private void DrawRewards(SpriteBatch batch, TextureLibrary textures)
     {
+        var opacity = _screen.Entrance.RewardOpacity;
         for (var index = 0; index < _rewardLabels.Length; index++)
         {
             var bar = new Rectangle(RewardLeft, RewardTop + (index * (PointedBarShape.RewardBarHeight + RewardGap)), PointedBarShape.RewardBarWidth, PointedBarShape.RewardBarHeight);
-            batch.Draw(_ui.RewardBar(textures), bar, Color.White);
+            batch.Draw(_ui.RewardBar(textures), bar, Color.White * opacity);
             var labelTop = bar.Center.Y - (_rewardLabelFont.Font.LineHeight / 2f);
-            _rewardLabelFont.Draw(batch, _rewardLabels[index], new Vector2(bar.X + RewardLabelLeft, labelTop), UiTheme.TextPrimary * RewardLabelOpacity);
+            _rewardLabelFont.Draw(batch, _rewardLabels[index], new Vector2(bar.X + RewardLabelLeft, labelTop), UiTheme.TextPrimary * (RewardLabelOpacity * opacity));
             var valueTop = bar.Center.Y - (_rewardValueFont.Font.LineHeight / 2f);
-            _rewardValueFont.Draw(batch, _rewardValues[index], new Vector2(bar.X + RewardValueLeft, valueTop), UiTheme.TextPrimary);
+            _rewardValueFont.Draw(batch, _rewardValues[index], new Vector2(bar.X + RewardValueLeft, valueTop), UiTheme.TextPrimary * opacity);
         }
     }
 
     private void DrawCard(SpriteBatch batch, TextureLibrary textures, int index, Point topLeft)
     {
+        var opacity = _screen.Entrance.CardOpacity(index);
         var tab = new Rectangle(topLeft.X, topLeft.Y, PointedBarShape.CardHeaderWidth, PointedBarShape.CardHeaderHeight);
-        batch.Draw(_ui.CardHeader(textures), tab, Color.White);
-        _nameFont.Draw(batch, _names[index], new Vector2(tab.X + CardNameLeft, tab.Center.Y - (_nameFont.Font.LineHeight / 2f)), UiTheme.TextPrimary);
+        batch.Draw(_ui.CardHeader(textures), tab, Color.White * opacity);
+        _nameFont.Draw(batch, _names[index], new Vector2(tab.X + CardNameLeft, tab.Center.Y - (_nameFont.Font.LineHeight / 2f)), UiTheme.TextPrimary * opacity);
         var level = _levelTexts[index];
         var levelLeft = tab.Right - CardLevelRight - level.Width;
-        _levelFont.Draw(batch, level.Text, new Vector2(levelLeft, tab.Center.Y - (_levelFont.Font.LineHeight / 2f)), UiTheme.TextPrimary);
+        _levelFont.Draw(batch, level.Text, new Vector2(levelLeft, tab.Center.Y - (_levelFont.Font.LineHeight / 2f)), UiTheme.TextPrimary * opacity);
         var labelTop = tab.Center.Y - (_levelFont.Font.LineHeight / 2f) + _levelFont.Font.LineHeight - _smallFont.Font.LineHeight;
-        _smallFont.Draw(batch, _levelLabel.Text, new Vector2(levelLeft - _levelLabel.Width - LevelLabelGap, labelTop), UiTheme.TextPrimary);
-        if (_screen.Bars[index].LevelUps > 0)
+        _smallFont.Draw(batch, _levelLabel.Text, new Vector2(levelLeft - _levelLabel.Width - LevelLabelGap, labelTop), UiTheme.TextPrimary * opacity);
+        if (_screen.Bars[index] is { LevelUps: > 0 } bar)
         {
-            _nameFont.Draw(batch, _levelUp.Text, new Vector2(tab.Right - LevelUpRight - _levelUp.Width, tab.Y + LevelUpTop), UiTheme.Positive);
+            var scale = bar.SinceLastLevelUp is { } since ? LevelUpPop.ScaleAt(since) : 1;
+            var center = new Vector2(tab.Right - LevelUpRight - (_levelUp.Width / 2), tab.Y + LevelUpTop + (_nameFont.Font.LineHeight / 2f));
+            _nameFont.DrawCentered(batch, _levelUp, center, (UiTheme.Positive, scale));
         }
 
         DrawExperience(batch, textures, index, topLeft);
@@ -168,15 +184,16 @@ internal sealed class VictoryScreenView
     // "EXP" on the left, the experience and "/needed" right-aligned on one baseline, then the gold bar.
     private void DrawExperience(SpriteBatch batch, TextureLibrary textures, int index, Point topLeft)
     {
+        var opacity = _screen.Entrance.CardOpacity(index);
         var right = topLeft.X + PointedBarShape.CardHeaderWidth - CardInset;
         var baseline = topLeft.Y + CardExperienceTop + _experienceFont.Font.LineHeight;
-        _labelFont.Draw(batch, _experienceLabel, new Vector2(topLeft.X + CardInset, baseline - _labelFont.Font.LineHeight), UiTheme.TextSecondary);
+        _labelFont.Draw(batch, _experienceLabel, new Vector2(topLeft.X + CardInset, baseline - _labelFont.Font.LineHeight), UiTheme.TextSecondary * opacity);
         var needed = _nextLevelTexts[index];
-        _smallFont.Draw(batch, needed.Text, new Vector2(right - needed.Width, baseline - _smallFont.Font.LineHeight), UiTheme.TextSecondary);
+        _smallFont.Draw(batch, needed.Text, new Vector2(right - needed.Width, baseline - _smallFont.Font.LineHeight), UiTheme.TextSecondary * opacity);
         var experience = _experienceTexts[index];
-        _experienceFont.Draw(batch, experience.Text, new Vector2(right - needed.Width - experience.Width, baseline - _experienceFont.Font.LineHeight), UiTheme.TextPrimary);
+        _experienceFont.Draw(batch, experience.Text, new Vector2(right - needed.Width - experience.Width, baseline - _experienceFont.Font.LineHeight), UiTheme.TextPrimary * opacity);
         var bar = new Rectangle(topLeft.X + CardInset, topLeft.Y + CardBarTop, PointedBarShape.CardHeaderWidth - (2 * CardInset), CardBarHeight);
-        _bars[index].Draw(batch, textures, bar, 1);
+        _bars[index].Draw(batch, textures, bar, opacity);
     }
 
     // A card's numbers are formatted only when its bar moves on, never on a frame where they stay the same.

@@ -13,7 +13,7 @@ public sealed class VictoryScreenTests
     private static readonly InputFrame _confirm = InputFrames.Pressing(GameButton.Confirm);
     private static readonly TimeSpan _oneUpdate = TimeSpan.FromSeconds(1.0 / 60);
 
-    // Sarxian's 60 experience fill half of a 120-point level: 0.55 s.
+    // One card comes in, the bars wait 1.05 s, then Sarxian's 60 experience fill half of a 120-point level in 0.55 s.
     private readonly VictoryScreen _screen = new(
         new VictoryRewards(60, [new ExperienceGain(Sarxian(), 60, [new LevelProgressStep(1, 0, 60, 120)])]));
 
@@ -27,9 +27,27 @@ public sealed class VictoryScreenTests
     }
 
     [Fact]
-    public void Update_ConfirmWhenDone_RequestsBattleFinishedOnce()
+    public void Update_DuringEntrance_BarsWait()
     {
         _screen.Update(TimeSpan.FromSeconds(1), default);
+
+        Assert.Equal(0, _screen.Bars[0].Experience);
+    }
+
+    [Fact]
+    public void Update_Done_ShowsNextHint()
+    {
+        _screen.Update(TimeSpan.FromSeconds(1), default);
+
+        _screen.Update(TimeSpan.FromSeconds(1), default);
+
+        Assert.True(_screen.IsComplete);
+    }
+
+    [Fact]
+    public void Update_ConfirmWhenDone_RequestsBattleFinishedOnce()
+    {
+        _screen.Update(TimeSpan.FromSeconds(3), default);
 
         var first = _screen.Update(_oneUpdate, _confirm);
         var second = _screen.Update(_oneUpdate, _confirm);

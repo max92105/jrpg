@@ -279,6 +279,9 @@ internal static class MessageIds
     /// <summary>The small label before a member's level on a victory card.</summary>
     public const string BattleLevelLabel = "battle_level_label";
 
+    /// <summary>The victory screen's footer hint once everything has filled: Confirm leaves.</summary>
+    public const string BattleVictoryNext = "battle_victory_next";
+
     /// <summary>Shown on the victory screen by a member whose bar filled a level.</summary>
     public const string BattleLevelUp = "battle_level_up";
 }

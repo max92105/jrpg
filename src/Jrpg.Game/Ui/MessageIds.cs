@@ -260,4 +260,7 @@ internal static class MessageIds
 
     /// <summary>The label over the turn order's upcoming turns.</summary>
     public const string BattleNext = "battle_next";
+
+    /// <summary>Placeholder <c>{name}</c>: the banner when a combatant defends.</summary>
+    public const string BattleDefends = "battle_defends";
 }

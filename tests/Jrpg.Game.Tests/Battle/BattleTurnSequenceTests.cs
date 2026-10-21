@@ -1,10 +1,12 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Randomness;
 using Jrpg.Game.Battle;
+using Jrpg.Game.Tests.Ui;
 
 namespace Jrpg.Game.Tests.Battle;
 
 // A turn on screen: 0.2 s forward, then the command or the enemy's action, a 1.0 s hold (2.0 s with a fall), 0.2 s back.
+[Collection(RepositoryScreenText.CollectionName)]
 public sealed class BattleTurnSequenceTests
 {
     private static readonly TimeSpan _step = TimeSpan.FromSeconds(0.2);
@@ -140,6 +142,6 @@ public sealed class BattleTurnSequenceTests
     {
         var random = new SeededRandom(seed);
         var battle = BattleScenarios.SarxianAgainstGoblinTrio(random);
-        return (battle, new BattleTurnSequence(battle, new EnemyTactics(random)));
+        return (battle, new BattleTurnSequence(battle, new EnemyTactics(random), RepositoryScreenText.Text.Messages));
     }
 }

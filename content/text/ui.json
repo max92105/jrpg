@@ -95,5 +95,6 @@
   "battle_run_hint": "Escape from the battle.",
   "battle_vital_max": "/{max}",
   "battle_enemy_letter": "{name} {letter}",
-  "battle_next": "NEXT"
+  "battle_next": "NEXT",
+  "battle_defends": "{name} defends."
 }

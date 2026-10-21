@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Battle;
 
@@ -11,13 +12,17 @@ internal sealed class BattleTurnSequence
 {
     private readonly BattleState _battle;
     private readonly EnemyTactics _tactics;
+    private readonly UiMessages _messages;
     private TimeSpan _timeInStage;
-    private TimeSpan _hold;
 
-    public BattleTurnSequence(BattleState battle, EnemyTactics tactics)
+    /// <param name="battle">The battle it plays.</param>
+    /// <param name="tactics">What enemies do on their turn.</param>
+    /// <param name="messages">How the banner writes what an actor does.</param>
+    public BattleTurnSequence(BattleState battle, EnemyTactics tactics, UiMessages messages)
     {
         _battle = battle;
         _tactics = tactics;
+        _messages = messages;
         Actor = battle.CurrentActor;
     }
 
@@ -25,6 +30,9 @@ internal sealed class BattleTurnSequence
 
     /// <summary>Which turn the screen shows, counting from 1; with <see cref="Stage"/>, says when the screen must change.</summary>
     public int Turn { get; private set; } = 1;
+
+    /// <summary>The last action's playback; null until someone acts. The screen holds for its beats.</summary>
+    public ActionPlayback? Playback { get; private set; }
 
     public bool IsOver => Stage == TurnStage.Over;
 
@@ -78,16 +86,10 @@ internal sealed class BattleTurnSequence
         Act(command);
     }
 
-    // Defend and Run land on nobody, so nothing holds the screen (B5b paces each event instead).
-    private static TimeSpan HoldFor(IReadOnlyList<BattleEvent> events) =>
-        events.Any(battleEvent => battleEvent is CombatantDefeated) ? BattlePacing.DefeatHold
-        : events.Any(battleEvent => battleEvent is EffectApplied) ? BattlePacing.ImpactHold
-        : TimeSpan.Zero;
-
     private TimeSpan? DurationOf(TurnStage stage) => stage switch
     {
         TurnStage.StepForward or TurnStage.StepBack => BattlePacing.Step,
-        TurnStage.Holding => _hold,
+        TurnStage.Holding => Playback?.Duration ?? TimeSpan.Zero,
         _ => null,
     };
 
@@ -115,7 +117,7 @@ internal sealed class BattleTurnSequence
 
     private void Act(BattleCommand command)
     {
-        _hold = HoldFor(_battle.Execute(command));
+        Playback = ActionPlayback.Start(_battle.Execute(command), _messages);
         Stage = TurnStage.Holding;
     }
 

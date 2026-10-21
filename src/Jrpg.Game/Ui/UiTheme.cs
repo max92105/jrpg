@@ -202,6 +202,10 @@ internal static class UiTheme
     /// <summary>Legacy <c>CommandPanel</c>'s description box under the list.</summary>
     public static Color CommandHintFill { get; } = FromLegacy(0xE60C0D11);
 
+    /// <summary>Legacy <c>Brush.Banner</c>: the battle banner's dark band, fading out at both ends.</summary>
+    public static ImmutableArray<GradientStop> Banner { get; } =
+        [new(0, FromLegacy(0x00101320)), new(0.25f, FromLegacy(0xE6101320)), new(0.75f, FromLegacy(0xE6101320)), new(1, FromLegacy(0x00101320))];
+
     // Premultiplied "over": the top color, then what shows through it of the bottom one.
     private static Color Over(Color top, Color bottom)
     {

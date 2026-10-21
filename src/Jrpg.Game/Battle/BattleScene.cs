@@ -29,6 +29,9 @@ internal sealed class BattleScene : IScene
     private readonly EnemyTagView _enemyTags;
     private readonly CommandMenu _commands = new();
     private readonly CommandPanelView _commandPanel;
+    private readonly BattleBanner _banner = new();
+    private readonly BattleBannerView _bannerView;
+    private ActionPlayback? _shownPlayback;
     private (int Turn, TurnStage Stage) _shown;
     private bool _isFinished;
 
@@ -44,7 +47,8 @@ internal sealed class BattleScene : IScene
         _battle = battle;
         _turnOrder = new TurnOrderView(_turnOrderStrip, battle.Combatants, text, ui);
         _turnOrderStrip.Refresh(battle);
-        _sequence = new BattleTurnSequence(battle, session.EnemyTactics);
+        _sequence = new BattleTurnSequence(battle, session.EnemyTactics, text.Messages);
+        _bannerView = new BattleBannerView(_banner, text, ui);
         _shown = (_sequence.Turn, _sequence.Stage);
         _battlers = new BattlersView(battle.Combatants, _sequence, ui);
         _partyStatus = new PartyStatusView([.. battle.Combatants.Where(combatant => combatant.Side == BattleSide.Party)], text, ui);
@@ -71,8 +75,14 @@ internal sealed class BattleScene : IScene
         }
 
         _turnOrderStrip.Highlight(_commands.Targets?.Selected ?? []);
+        _banner.Update(delta);
         _commandPanel.Advance(delta);
         _sequence.Update(delta);
+        if (!ReferenceEquals(_sequence.Playback, _shownPlayback))
+        {
+            ShowPlayback(_sequence.Playback);
+        }
+
         if (_shown != (_sequence.Turn, _sequence.Stage))
         {
             ShowStage(_sequence.Turn, _sequence.Stage);
@@ -87,6 +97,7 @@ internal sealed class BattleScene : IScene
         _battlers.Draw(batch, textures);
         _enemyTags.Draw(batch, textures);
         _turnOrder.Draw(batch, textures);
+        _bannerView.Draw(batch, textures);
         var isAwaitingCommand = !_isFinished && _sequence.IsAwaitingCommand;
         _partyStatus.Draw(batch, textures, _sequence.IsOver ? null : _sequence.Actor);
         if (isAwaitingCommand)
@@ -109,6 +120,16 @@ internal sealed class BattleScene : IScene
         if (stage == TurnStage.AwaitingCommand)
         {
             _commands.Start(_battle);
+        }
+    }
+
+    // Checked on its own, not at a stage change: an action with no hold (Defend) passes the Holding stage within one update.
+    private void ShowPlayback(ActionPlayback? playback)
+    {
+        _shownPlayback = playback;
+        if (playback?.BannerText is { } bannerText)
+        {
+            _banner.Show(bannerText);
         }
     }
 

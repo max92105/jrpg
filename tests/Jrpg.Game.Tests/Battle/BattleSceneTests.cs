@@ -116,6 +116,7 @@ public sealed class BattleSceneTests
             DefendAndSettle(scene);
         }
 
+        Settle(scene); // The defeat screen's choices come in before they take input.
         var request = scene.Update(StartMapScenarios.OneUpdate, _confirm);
 
         Assert.IsType<TitleRequested>(request);

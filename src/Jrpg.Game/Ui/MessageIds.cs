@@ -297,6 +297,9 @@ internal static class MessageIds
     /// <summary>The defeat choice that ends the session for the title screen.</summary>
     public const string BattleMainMenu = "battle_main_menu";
 
+    /// <summary>The defeat screen's footer hint.</summary>
+    public const string BattleDefeatHint = "battle_defeat_hint";
+
     /// <summary>Shown on the victory screen by a member whose bar filled a level.</summary>
     public const string BattleLevelUp = "battle_level_up";
 }

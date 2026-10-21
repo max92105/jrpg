@@ -15,6 +15,8 @@ namespace Jrpg.Game.Tests.Battle;
 [Collection(RepositoryScreenText.CollectionName)]
 public sealed class DefeatScreenTests : IDisposable
 {
+    private static readonly TimeSpan _oneUpdate = TimeSpan.FromSeconds(1.0 / 60);
+
     private readonly string _directory = Path.Combine(Path.GetTempPath(), $"jrpg-defeat-{Guid.NewGuid():N}");
     private readonly SaveSlots _slots;
     private DateTimeOffset _now = new(2026, 10, 21, 20, 0, 0, TimeSpan.Zero);
@@ -41,7 +43,7 @@ public sealed class DefeatScreenTests : IDisposable
         SaveWithPlayTime(1, TimeSpan.FromMinutes(10));
         var screen = NewScreen();
 
-        var request = screen.Update(Pressing(GameButton.Confirm));
+        var request = screen.Update(_oneUpdate, Pressing(GameButton.Confirm));
 
         Assert.Equal(TimeSpan.FromMinutes(10), Assert.IsType<LoadRequested>(request).Save.PlayTime);
     }
@@ -51,10 +53,10 @@ public sealed class DefeatScreenTests : IDisposable
     {
         SaveWithPlayTime(1, TimeSpan.FromMinutes(5));
         var screen = NewScreen();
-        screen.Update(Pressing(GameButton.Down));
-        screen.Update(Pressing(GameButton.Confirm));
+        screen.Update(_oneUpdate, Pressing(GameButton.Down));
+        screen.Update(_oneUpdate, Pressing(GameButton.Confirm));
 
-        var request = screen.Update(Pressing(GameButton.Confirm));
+        var request = screen.Update(_oneUpdate, Pressing(GameButton.Confirm));
 
         Assert.Equal(TimeSpan.FromMinutes(5), Assert.IsType<LoadRequested>(request).Save.PlayTime);
     }
@@ -64,12 +66,23 @@ public sealed class DefeatScreenTests : IDisposable
     {
         SaveWithPlayTime(1, TimeSpan.Zero);
         var screen = NewScreen();
-        screen.Update(Pressing(GameButton.Down));
-        screen.Update(Pressing(GameButton.Confirm));
+        screen.Update(_oneUpdate, Pressing(GameButton.Down));
+        screen.Update(_oneUpdate, Pressing(GameButton.Confirm));
 
-        screen.Update(Pressing(GameButton.Cancel));
+        screen.Update(_oneUpdate, Pressing(GameButton.Cancel));
 
         Assert.False(screen.IsChoosingFile);
+    }
+
+    [Fact]
+    public void Update_ConfirmBeforeChoicesShow_DoesNothing()
+    {
+        SaveWithPlayTime(1, TimeSpan.Zero);
+        var screen = new DefeatScreen(_slots, RepositoryScreenText.Text, new UiTextures());
+
+        var request = screen.Update(TimeSpan.FromSeconds(0.5), Pressing(GameButton.Confirm));
+
+        Assert.Null(request);
     }
 
     [Fact]
@@ -77,10 +90,10 @@ public sealed class DefeatScreenTests : IDisposable
     {
         SaveWithPlayTime(1, TimeSpan.Zero);
         var screen = NewScreen();
-        screen.Update(Pressing(GameButton.Up));
+        screen.Update(_oneUpdate, Pressing(GameButton.Up));
 
-        var first = screen.Update(Pressing(GameButton.Confirm));
-        var second = screen.Update(Pressing(GameButton.Confirm));
+        var first = screen.Update(_oneUpdate, Pressing(GameButton.Confirm));
+        var second = screen.Update(_oneUpdate, Pressing(GameButton.Confirm));
 
         Assert.IsType<TitleRequested>(first);
         Assert.Null(second);
@@ -93,5 +106,11 @@ public sealed class DefeatScreenTests : IDisposable
         _slots.Write(slot, session);
     }
 
-    private DefeatScreen NewScreen() => new(_slots, RepositoryScreenText.Text, new UiTextures());
+    // Past the entrance, so the choices take input.
+    private DefeatScreen NewScreen()
+    {
+        var screen = new DefeatScreen(_slots, RepositoryScreenText.Text, new UiTextures());
+        screen.Update(TimeSpan.FromSeconds(1), default);
+        return screen;
+    }
 }

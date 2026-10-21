@@ -243,6 +243,7 @@ public sealed class GameFlowTests : IDisposable
         Assert.NotNull(session.Exploration.PendingEncounter);
         flow.Update(TimeSpan.FromSeconds(10), default);
         Assert.Null(session.Exploration.PendingEncounter);
+        flow.Update(TimeSpan.FromSeconds(1), default); // The defeat screen's choices come in before they take input.
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
 
         flow.Update(_wholeFade, default);

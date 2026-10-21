@@ -48,6 +48,7 @@ internal sealed class BattleScene : IScene
     private VictoryScreen? _victory;
     private VictoryScreenView? _victoryView;
     private DefeatScreen? _defeat;
+    private DefeatScreenView? _defeatView;
     private EscapedNotice? _escaped;
     private MeasuredText _escapedText;
 
@@ -129,9 +130,9 @@ internal sealed class BattleScene : IScene
             return;
         }
 
-        if (_defeat is { } defeat)
+        if (_defeatView is { } defeatView)
         {
-            defeat.Draw(batch, textures);
+            defeatView.Draw(batch, textures);
             return;
         }
 
@@ -187,7 +188,7 @@ internal sealed class BattleScene : IScene
             return victory.Update(delta, input);
         }
 
-        return _escaped is { } escaped ? escaped.Update(delta, input) : _defeat?.Update(input);
+        return _escaped is { } escaped ? escaped.Update(delta, input) : _defeat?.Update(delta, input);
     }
 
     // Each outcome stays on this screen for its own: a victory's rewards, an escape's notice, a defeat's choices.
@@ -210,6 +211,7 @@ internal sealed class BattleScene : IScene
         }
 
         _defeat = new DefeatScreen(_saves, _text, _ui);
+        _defeatView = new DefeatScreenView(_defeat, _text, _ui);
     }
 
     // Legacy EscapedScreen: the battle under a scrim, and "Escaped" on a banner band across the middle of the screen.

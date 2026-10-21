@@ -108,5 +108,6 @@
   "battle_defeat": "Defeat",
   "battle_party_fallen": "The party has fallen.",
   "battle_load_last_save": "Load last save",
-  "battle_main_menu": "Main menu"
+  "battle_main_menu": "Main menu",
+  "battle_defeat_hint": "Choose what to do next."
 }

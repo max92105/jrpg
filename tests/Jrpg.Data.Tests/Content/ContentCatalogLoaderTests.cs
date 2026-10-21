@@ -84,6 +84,14 @@ public sealed class ContentCatalogLoaderTests
     }
 
     [Fact]
+    public void Load_RepositoryContent_EverySkillHasDescription()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        Assert.All(catalog.Skills.Values, skill => Assert.False(string.IsNullOrWhiteSpace(skill.Description), skill.Id));
+    }
+
+    [Fact]
     public void Load_RepositoryContent_RecoveryHealsItsUser()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));

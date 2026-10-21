@@ -2,6 +2,7 @@
   {
     "id": "fire_blast",
     "name": "Fire Blast",
+    "description": "Strikes one enemy with fire.",
     "iconFile": "Attack.png",
     "mpCost": 10,
     "effect": { "kind": "damage", "power": 15, "targeting": "singleEnemy" }
@@ -9,6 +10,7 @@
   {
     "id": "fireball",
     "name": "Fireball",
+    "description": "Strikes every enemy with fire.",
     "iconFile": "Attack.png",
     "mpCost": 10,
     "effect": { "kind": "damage", "power": 20, "targeting": "allEnemies" }
@@ -16,6 +18,7 @@
   {
     "id": "heal",
     "name": "Heal",
+    "description": "Restores 15 HP to one ally.",
     "iconFile": "",
     "mpCost": 8,
     "effect": { "kind": "restoreHp", "power": 15, "targeting": "singleAlly" }
@@ -23,6 +26,7 @@
   {
     "id": "recovery",
     "name": "Recovery",
+    "description": "Restores 30 HP to its user.",
     "iconFile": "",
     "mpCost": 8,
     "effect": { "kind": "restoreHp", "power": 30, "targeting": "self" }
@@ -30,6 +34,7 @@
   {
     "id": "heal_all",
     "name": "Heal All",
+    "description": "Restores 50 HP to every ally.",
     "iconFile": "",
     "mpCost": 8,
     "effect": { "kind": "restoreHp", "power": 50, "targeting": "allAllies" }

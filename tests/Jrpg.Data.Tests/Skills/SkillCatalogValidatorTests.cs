@@ -13,6 +13,7 @@ public sealed class SkillCatalogValidatorTests
     {
         Id = "heal",
         Name = "Heal",
+        Description = "",
         IconFile = "",
         MpCost = 8,
         Effect = new Effect(EffectKind.RestoreHp, Power: 15, Targeting.SingleAlly),

@@ -205,7 +205,7 @@ public sealed class BattleSkillAndItemTests
     }
 
     private static SkillDefinition Skill(string id, int mpCost, Effect effect) =>
-        new() { Id = id, Name = id, IconFile = "Attack.png", MpCost = mpCost, Effect = effect };
+        new() { Id = id, Name = id, Description = "", IconFile = "Attack.png", MpCost = mpCost, Effect = effect };
 
     private static ItemDefinition Item(string id, Effect effect) =>
         new ItemDefinitionBuilder().WithId(id).WithEffect(effect).Build();

@@ -9,6 +9,9 @@ public sealed record SkillDefinition
 
     public required string Name { get; init; }
 
+    /// <summary>What the skill does, shown while choosing it; it may be empty, as an item's may.</summary>
+    public required string Description { get; init; }
+
     public required string IconFile { get; init; }
 
     public required int MpCost { get; init; }

@@ -19,3 +19,4 @@ Part of [the editor plan](../README.md). Design: [design.md](../design.md), "Dat
     - `TileBrowserViewModelTests`: `SheetChoices_ImageWithoutSheet_IsListedNotSetUp`, `SelectCellAt_ImageNotSetUp_ChoosesNothing`.
   - **Verify by hand:**
     - [ ] The box lists all 34 images; 24 say "(not set up)"; choosing `Grass3.png` shows it without a grid.
+- **Done, with deviations:** the sheet box isn't rebuilt when `Current.Tilesheets` changes yet: nothing changes sheets until E5b, which adds the rebuild with the first edit that needs it. An image whose file has two sheets is listed once per sheet; files match sheets ignoring case. On an image not set up, the line also names the cell the brush still paints ("Not set up yet. Brush: cell (1, 0) of dungeon"; review).

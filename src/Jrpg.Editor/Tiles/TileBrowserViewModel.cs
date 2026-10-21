@@ -6,8 +6,8 @@ using Jrpg.Editor.Catalogs;
 namespace Jrpg.Editor.Tiles;
 
 /// <summary>
-/// Choosing what to paint with: one tilesheet at a time, where a click chooses the whole cell under it, a tile or not.
-/// A cell that isn't a tile yet becomes one when painted.
+/// Choosing what to paint with: one tilesheet image at a time, where a click on a set-up sheet chooses the whole cell
+/// under it, a tile or not. A cell that isn't a tile yet becomes one when painted.
 /// </summary>
 internal sealed partial class TileBrowserViewModel : ObservableObject
 {
@@ -15,21 +15,26 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     private readonly Func<string, (int Width, int Height)> _imageSizeOf;
 
     /// <param name="catalog">The sheets and tiles.</param>
+    /// <param name="imageFiles">Every image in the tilesheet folder, in the order the sheet box lists them.</param>
     /// <param name="imageSizeOf">A sheet image's size in pixels, by its file name, so the browser reads no files.</param>
-    public TileBrowserViewModel(CatalogDraft catalog, Func<string, (int Width, int Height)> imageSizeOf)
+    public TileBrowserViewModel(CatalogDraft catalog, IReadOnlyList<string> imageFiles, Func<string, (int Width, int Height)> imageSizeOf)
     {
         _catalog = catalog;
         _imageSizeOf = imageSizeOf;
         catalog.PropertyChanged += OnCatalogChanged;
-        Sheets = [.. catalog.Current.Tilesheets.Values.OrderBy(sheet => sheet.Id, StringComparer.Ordinal)];
-        SelectedSheet = Sheets.Count > 0 ? Sheets[0] : null;
+        SheetChoices = ChoicesOf(imageFiles, catalog.Current.Tilesheets.Values);
+        SelectedChoice = SheetChoices.Count > 0 ? SheetChoices[0] : null;
     }
 
-    public IReadOnlyList<TilesheetDefinition> Sheets { get; }
+    /// <summary>Every image, each set-up sheet by its id; an image cut into two sheets is listed twice.</summary>
+    public IReadOnlyList<SheetChoice> SheetChoices { get; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(SheetTiles))]
-    public partial TilesheetDefinition? SelectedSheet { get; set; }
+    [NotifyPropertyChangedFor(nameof(SelectedSheet), nameof(SheetTiles), nameof(ChoiceText))]
+    public partial SheetChoice? SelectedChoice { get; set; }
+
+    /// <summary>How the shown image is cut; null when it isn't set up yet.</summary>
+    public TilesheetDefinition? SelectedSheet => SelectedChoice?.Sheet;
 
     /// <summary>The tiles cut from the shown sheet.</summary>
     public IReadOnlyList<TileDefinition> SheetTiles =>
@@ -43,12 +48,17 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     /// <summary>The tile the brush paints: the chosen cell's tile, or null when it isn't a tile yet.</summary>
     public int? SelectedTileId => SelectedCell is { } cell ? _catalog.TileAt(cell)?.Id : null;
 
-    /// <summary>The line under the sheet: the chosen cell and its tile, or that it isn't one yet.</summary>
-    public string ChoiceText => SelectedCell switch
+    /// <summary>
+    /// The line under the sheet: the chosen cell and its tile, or that it isn't one yet. On an image not set up, it says so
+    /// and names the cell the brush still paints.
+    /// </summary>
+    public string ChoiceText => (SelectedChoice, SelectedCell) switch
     {
-        null => "",
-        { } cell when _catalog.TileAt(cell) is { } tile => $"Cell ({cell.Column}, {cell.Row}): tile {tile.Id}",
-        { } cell => $"Cell ({cell.Column}, {cell.Row}): not a tile yet",
+        ({ Sheet: null }, null) => "Not set up yet",
+        ({ Sheet: null }, { } cell) => $"Not set up yet. Brush: cell ({cell.Column}, {cell.Row}) of {cell.SheetId}",
+        (_, null) => "",
+        (_, { } cell) when _catalog.TileAt(cell) is { } tile => $"Cell ({cell.Column}, {cell.Row}): tile {tile.Id}",
+        (_, { } cell) => $"Cell ({cell.Column}, {cell.Row}): not a tile yet",
     };
 
     /// <summary>The whole cell of the shown sheet under an image pixel; null on the margin, on spacing or past the last whole cell.</summary>
@@ -82,8 +92,17 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     public void Select(int tileId)
     {
         var tile = _catalog.Current.Tiles[tileId];
-        SelectedSheet = Sheets.First(sheet => sheet.Id == tile.SheetId);
+        SelectedChoice = SheetChoices.First(choice => choice.Sheet?.Id == tile.SheetId);
         SelectedCell = new SheetCell(tile.SheetId, tile.Column, tile.Row);
+    }
+
+    // Matched ignoring case, as Windows finds the file a sheet names whatever its case.
+    private static SheetChoice[] ChoicesOf(IReadOnlyList<string> imageFiles, IEnumerable<TilesheetDefinition> sheets)
+    {
+        var sheetsByFile = sheets.OrderBy(sheet => sheet.Id, StringComparer.Ordinal).ToLookup(sheet => sheet.File, StringComparer.OrdinalIgnoreCase);
+        return [.. imageFiles.SelectMany(file => sheetsByFile.Contains(file)
+            ? sheetsByFile[file].Select(sheet => new SheetChoice(sheet.File, sheet))
+            : [new SheetChoice(file, null)])];
     }
 
     // A tile made by painting is marked on the sheet, and named under it, at once.

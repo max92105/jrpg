@@ -36,27 +36,28 @@ internal sealed partial class TileBrowserView : UserControl
 
     private void OnBrowserChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(TileBrowserViewModel.SelectedSheet) or nameof(TileBrowserViewModel.SelectedCell) or nameof(TileBrowserViewModel.SheetTiles))
+        if (e.PropertyName is nameof(TileBrowserViewModel.SelectedChoice) or nameof(TileBrowserViewModel.SelectedCell) or nameof(TileBrowserViewModel.SheetTiles))
         {
             DrawSheet();
         }
     }
 
+    // An image not set up has no cells to scale to the map's, so it shows at its own size, with no marks.
     private void DrawSheet()
     {
-        if (_browser?.SelectedSheet is not { } sheet || Images is null)
+        if (_browser?.SelectedChoice is not { } choice || Images is null)
         {
             SheetImage.Source = SheetMarks.Source = null;
             return;
         }
 
-        var image = Images.SheetImageOf(sheet.File);
+        var image = Images.SheetImageOf(choice.File);
         var size = new Size(image.PixelWidth, image.PixelHeight);
         SheetImage.Source = image;
-        SheetMarks.Source = TilesheetMarks.Draw(sheet, size, _browser.SheetTiles, _browser.SelectedCell);
+        SheetMarks.Source = choice.Sheet is { } sheet ? TilesheetMarks.Draw(sheet, size, _browser.SheetTiles, _browser.SelectedCell) : null;
         SheetImage.Width = SheetMarks.Width = size.Width;
         SheetImage.Height = SheetMarks.Height = size.Height;
-        var scale = TilesheetMarks.DisplayScaleOf(sheet);
+        var scale = choice.Sheet is { } cut ? TilesheetMarks.DisplayScaleOf(cut) : 1;
         SheetView.LayoutTransform = new ScaleTransform(scale, scale);
     }
 

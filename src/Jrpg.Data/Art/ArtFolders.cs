@@ -24,4 +24,11 @@ public static class ArtFolders
     public const string Backgrounds = "backgrounds";
 
     public static string RootIn(string contentRoot) => Path.Combine(contentRoot, "art");
+
+    /// <summary>The PNG file names in the tilesheet folder, set up as sheets or not, sorted ordinally.</summary>
+    /// <param name="artRoot">The <c>art</c> folder, from <see cref="RootIn"/>.</param>
+    public static IReadOnlyList<string> TilesheetImagesIn(string artRoot) =>
+        [.. Directory.EnumerateFiles(Path.Combine(artRoot, Tilesheets), "*.png")
+            .Select(path => Path.GetFileName(path))
+            .Order(StringComparer.Ordinal)];
 }

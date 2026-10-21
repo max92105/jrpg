@@ -79,7 +79,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 4: sheets
 
-- [ ] **E5a. Every sheet image is listed** (Data + Editor, about 120 lines) → [slices/E5a.md](slices/E5a.md)
+- [x] **E5a. Every sheet image is listed** (Data + Editor, about 120 lines) → [slices/E5a.md](slices/E5a.md)
 - [ ] **E5b. Setting up a sheet by columns and rows** (Editor, about 300 lines) → [slices/E5b.md](slices/E5b.md)
 - [ ] **E6. Re-cutting a set-up sheet** (Editor, about 250 lines) → [slices/E6.md](slices/E6.md)
 - [ ] **E7. Importing a sheet image** (Data + Editor, about 220 lines) → [slices/E7.md](slices/E7.md)

@@ -32,16 +32,37 @@ public sealed class TileBrowserViewModelTests
 
     public TileBrowserViewModelTests()
     {
-        _browser = new TileBrowserViewModel(_draft, file => _imageSizes[file]);
+        // Grass3.png has no sheet yet.
+        _browser = new TileBrowserViewModel(_draft, ["Dungeon.png", "Forest.png", "Grass3.png"], file => _imageSizes[file]);
     }
 
     [Fact]
-    public void Constructor_SheetsSortedById_ShowsTheFirst()
+    public void Constructor_ImagesSortedByFile_ShowsTheFirst()
     {
-        Assert.Equal(["dungeon", "forest"], _browser.Sheets.Select(sheet => sheet.Id));
+        Assert.Equal(["Dungeon.png", "Forest.png", "Grass3.png"], _browser.SheetChoices.Select(choice => choice.File));
         Assert.Equal(_dungeon, _browser.SelectedSheet);
         Assert.Equal([7], _browser.SheetTiles.Select(tile => tile.Id));
         Assert.Null(_browser.SelectedTileId);
+    }
+
+    [Fact]
+    public void SheetChoices_ImageWithoutSheet_IsListedNotSetUp()
+    {
+        Assert.Equal(["dungeon", "forest", "Grass3.png (not set up)"], _browser.SheetChoices.Select(choice => choice.Label));
+        Assert.Null(_browser.SheetChoices[2].Sheet);
+    }
+
+    [Fact]
+    public void SelectCellAt_ImageNotSetUp_ChoosesNothing()
+    {
+        _browser.SelectCellAt(19, 2);
+        _browser.SelectedChoice = _browser.SheetChoices[2];
+
+        _browser.SelectCellAt(5, 5);
+
+        Assert.Equal(new SheetCell("dungeon", 1, 0), _browser.SelectedCell);
+        Assert.Null(_browser.SelectedSheet);
+        Assert.Equal("Not set up yet. Brush: cell (1, 0) of dungeon", _browser.ChoiceText);
     }
 
     [Fact]

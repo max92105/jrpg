@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-21-editor/slices/E4b2.md, E4b2 (undo removing a used tile is refused)
-Round: 1 (verdict: Ready to commit; verify all pass, 1379 tests)
+Slice: docs/plans/2026-10-21-editor/slices/E5a.md, E5a (every sheet image is listed)
+Round: 1 (verdict: Ready to commit; verify all pass, 1384 tests)
 
-- open (Suggestion): CatalogUsageTests never pins "open layout replaces its saved version" (the layout.Id != openLayout?.Id filter); add saved-uses/open-doesn't -> empty, and no duplicate "map x".
-- open (Suggestion): refusal test doesn't assert journal untouched (CanRedo false, second Ctrl+Z refuses again) nor that UndoRefusal clears on redo/record.
-- open (Follow-up): MainViewModel.cs now 467 lines; split undo routing (journal + refusal) out of the shell VM.
+- open (Warning): choosing an image not set up keeps SelectedCell from the previous sheet (HasChoice true), so map clicks still paint it while ChoiceText only says "Not set up yet"; append the held brush to the text or clear the brush, and pin it in SelectCellAt_ImageNotSetUp_ChoosesNothing.
+- open (Suggestion): Select(tileId) uses First(); a sheet whose file isn't in the image list (not .png, subfolder) throws InvalidOperationException; ChoicesOf could append unmatched sheets.
+- open (Follow-up): ArtFoldersTests pins 34 images, so adding any tilesheet PNG breaks a Data test.

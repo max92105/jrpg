@@ -5,9 +5,9 @@
   <DockPanel>
     <ComboBox DockPanel.Dock="Top"
               Margin="0,4"
-              ItemsSource="{Binding Sheets}"
-              SelectedItem="{Binding SelectedSheet}"
-              DisplayMemberPath="Id" />
+              ItemsSource="{Binding SheetChoices}"
+              SelectedItem="{Binding SelectedChoice}"
+              DisplayMemberPath="Label" />
     <TextBlock DockPanel.Dock="Bottom" Margin="0,4" Text="{Binding ChoiceText}" />
     <ScrollViewer HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"

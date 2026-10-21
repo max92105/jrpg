@@ -1,6 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
+using Jrpg.Data.Art;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Maps;
@@ -11,7 +12,8 @@ namespace Jrpg.Editor.Tests.Tiles;
 
 public sealed class TilePaintingViewModelTests
 {
-    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+    private static readonly string _contentRoot = Path.Combine(AppContext.BaseDirectory, "content");
+    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(_contentRoot);
 
     private readonly CatalogDraft _draft = new(_catalog);
     private readonly LayerChoiceViewModel _layer = new();
@@ -19,7 +21,7 @@ public sealed class TilePaintingViewModelTests
 
     public TilePaintingViewModelTests()
     {
-        _painting = new TilePaintingViewModel(_draft, _layer, _ => (1000, 1000)) { OpenMap = new MapViewModel(_catalog.Maps["forest"]) };
+        _painting = new TilePaintingViewModel(_draft, _layer, ArtFolders.TilesheetImagesIn(ArtFolders.RootIn(_contentRoot)), _ => (1000, 1000)) { OpenMap = new MapViewModel(_catalog.Maps["forest"]) };
     }
 
     private MapViewModel Map => _painting.OpenMap!;

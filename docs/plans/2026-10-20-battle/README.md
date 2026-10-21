@@ -156,7 +156,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **B7b2. Victory timing** (Game, about 180 lines; split from B7b) → [slices/B7b2.md](slices/B7b2.md)
 - [x] **B8a. Escaped** (Game, about 110 lines) → [slices/B8a.md](slices/B8a.md)
 - [x] **C4. A battle with nobody standing is lost at once** (Core, about 90 lines; decision 97) → [slices/C4.md](slices/C4.md)
-- [ ] **B8b. Defeat** (Game, about 290 lines; decision 65) → [slices/B8b.md](slices/B8b.md)
+- [x] **B8b1. Defeat choices** (Game, about 300 lines; decision 65; split from B8b) → [slices/B8b1.md](slices/B8b1.md)
+- [ ] **B8b2. Defeat look** (Game, about 150 lines; split from B8b) → [slices/B8b2.md](slices/B8b2.md)
 - [ ] **Z. Play-through check** (manual) → [slices/Z.md](slices/Z.md)
 
 ## Decisions (developer, 2026-10-20)

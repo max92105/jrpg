@@ -226,6 +226,30 @@ public sealed class GameFlowTests : IDisposable
         Assert.NotEqual(battlePosition, session.Exploration.PlayerPosition);
     }
 
+    // The whole party is down before the forest, so the battle is lost at its start (decision 97), and with no save to
+    // load the defeat screen's cursor starts on Main menu.
+    [Fact]
+    public void Update_DefeatThenMainMenu_EndsSession()
+    {
+        var flow = StartedFlow(catalog: StartMapScenarios.NextToForestWarpAlwaysRolling);
+        var session = SessionOf(flow);
+        session.Party.Leader.Vitals.TakeDamage(9999);
+        for (var update = 0; update < 600 && session.Exploration.PendingEncounter is null; update++)
+        {
+            flow.Update(_oneUpdate, StartMapScenarios.HoldingLeft);
+        }
+
+        // The battle starts at the fade's black and, lost already, ends on the screen's first update.
+        Assert.NotNull(session.Exploration.PendingEncounter);
+        flow.Update(TimeSpan.FromSeconds(10), default);
+        Assert.Null(session.Exploration.PendingEncounter);
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+
+        flow.Update(_wholeFade, default);
+
+        Assert.Null(flow.Session);
+    }
+
     // New game is the title's first entry, so Confirm alone picks it; the fade starts on that update.
     private static GameFlow FlowWithNewGameConfirmed(SaveSlots? slots = null, ContentCatalog? catalog = null)
     {

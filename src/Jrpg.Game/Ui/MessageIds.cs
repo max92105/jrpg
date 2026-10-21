@@ -285,6 +285,18 @@ internal static class MessageIds
     /// <summary>The banner after a successful Run.</summary>
     public const string BattleEscaped = "battle_escaped";
 
+    /// <summary>The defeat screen's title.</summary>
+    public const string BattleDefeat = "battle_defeat";
+
+    /// <summary>The line under the defeat screen's title.</summary>
+    public const string BattlePartyFallen = "battle_party_fallen";
+
+    /// <summary>The defeat choice that loads the most recent save at once.</summary>
+    public const string BattleLoadLastSave = "battle_load_last_save";
+
+    /// <summary>The defeat choice that ends the session for the title screen.</summary>
+    public const string BattleMainMenu = "battle_main_menu";
+
     /// <summary>Shown on the victory screen by a member whose bar filled a level.</summary>
     public const string BattleLevelUp = "battle_level_up";
 }

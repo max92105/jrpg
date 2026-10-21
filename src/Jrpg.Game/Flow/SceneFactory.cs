@@ -45,7 +45,7 @@ internal sealed class SceneFactory
         new(_text, _ui, new MenuHeader(_text, session), [new InventoryPage(_text, _ui, session, _catalog), new PartyPage(_text, _ui, session, _catalog), new EquipmentPage(_text, _ui, session, _catalog), new StatusPage(_text, _ui, session, _catalog), new OptionsPage(_text, _ui, _settings), CreateSystemPage(session)]);
 
     /// <param name="session">The playthrough whose active battle the screen shows.</param>
-    public BattleScene CreateBattle(GameSession session) => new(session, _catalog.Items, _text, _ui);
+    public BattleScene CreateBattle(GameSession session) => new(session, new BattleSceneSources(_catalog.Items, _saveSlots), _text, _ui);
 
     public ExplorationScene CreateExploration(ExplorationState exploration) =>
         new(exploration, _catalog, _art, new EventPresenter(exploration, _text, _settings));

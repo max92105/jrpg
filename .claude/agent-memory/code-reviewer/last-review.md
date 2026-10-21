@@ -5,8 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-battle/slices/C4.md, C4 (battle with nobody standing starts as Defeat; decision 97)
-Round: 1 (verdict: Ready to commit; verify all pass, 1295 tests)
+Slice: docs/plans/2026-10-20-battle/slices/B8b1.md, B8b1 (defeat choices, plain draw; split from B8b)
+Round: 1 (verdict: Ready to commit; verify all pass, 1303 tests)
 
-- No Critical, Warning or Suggestion findings.
-- open (Follow-up): Game's BattleTurnSequence lets an enemy act in a battle lost at start, so Core throws until B8b (already recorded in the slice note).
+- open (Suggestion): BattleSceneTests.Update_BattleLostAtStart_ShowsDefeat asserts TitleRequested after Confirm; name or an IsChoosingFile/defeat-shown assert should match.
+- open (Suggestion): BattleScene.UpdateOutcomeScreen `?? ` chain reads as fallthrough; a switch on the one non-null screen is clearer.
+- open (Follow-up): TitleScene and DefeatScreen carry identical LoadLatest + ChooseFile (Cancel closes) code; extract on a third copy.

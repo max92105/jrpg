@@ -1,10 +1,10 @@
 using FontStashSharp;
 using Jrpg.Core.Battle;
-using Jrpg.Core.Items;
 using Jrpg.Core.Session;
 using Jrpg.Data.Art;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
+using Jrpg.Game.Saving;
 using Jrpg.Game.Scenes;
 using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
@@ -29,6 +29,7 @@ internal sealed class BattleScene : IScene
     private readonly TurnOrderView _turnOrder;
     private readonly UiTextures _ui;
     private readonly ScreenText _text;
+    private readonly SaveSlots _saves;
     private readonly SpriteFontBase _escapedFont;
     private readonly BattlersView _battlers;
     private readonly BattleTurnSequence _sequence;
@@ -46,15 +47,16 @@ internal sealed class BattleScene : IScene
     private bool _isFinished;
     private VictoryScreen? _victory;
     private VictoryScreenView? _victoryView;
+    private DefeatScreen? _defeat;
     private EscapedNotice? _escaped;
     private MeasuredText _escapedText;
 
     /// <param name="session">The playthrough whose active battle this screen shows.</param>
-    /// <param name="items">Every item by id, from the catalog, for the party's items.</param>
+    /// <param name="sources">The catalog's items, for the party's items, and the save files, for the defeat screen.</param>
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared code-drawn textures: the vignette, the top shade and shrunk battlers.</param>
     /// <exception cref="InvalidOperationException">The session has no active battle.</exception>
-    public BattleScene(GameSession session, IReadOnlyDictionary<string, ItemDefinition> items, ScreenText text, UiTextures ui)
+    public BattleScene(GameSession session, BattleSceneSources sources, ScreenText text, UiTextures ui)
     {
         _session = session;
         _text = text;
@@ -72,16 +74,16 @@ internal sealed class BattleScene : IScene
         _enemyTags = new EnemyTagView(battle.Combatants, _sequence, text, ui);
         _backgroundFile = session.Exploration.PendingEncounter?.BackgroundFile
             ?? throw new InvalidOperationException("A battle screen needs the encounter it fights.");
-        _commands = new CommandMenu(session.Inventory, items);
+        _saves = sources.Saves;
+        _commands = new CommandMenu(session.Inventory, sources.Items);
         _commandPanel = new CommandPanelView(_commands, _battlers, text, ui);
         _numbers = new FloatingNumbersView(_sequence, _battlers, text);
         _impactEffects = new ImpactEffectsView(_sequence, _battlers, text);
     }
 
     /// <returns>
-    /// <see cref="BattleFinished"/> when the victory screen or the escaped notice is left;
-    /// <see cref="TitleRequested"/> on the update a defeat ends it, until the defeat screen (plan 2026-10-20-battle, B8b).
-    /// Null otherwise.
+    /// <see cref="BattleFinished"/> when the victory screen or the escaped notice is left; <see cref="LoadRequested"/> or
+    /// <see cref="TitleRequested"/> from the defeat screen's choice. Null otherwise.
     /// </returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
@@ -109,7 +111,12 @@ internal sealed class BattleScene : IScene
             ShowStage(_sequence.Turn, _sequence.Stage);
         }
 
-        return _sequence.IsOver ? Finish() : null;
+        if (_sequence.IsOver)
+        {
+            Finish();
+        }
+
+        return null;
     }
 
     public void Draw(SpriteBatch batch, TextureLibrary textures)
@@ -119,6 +126,12 @@ internal sealed class BattleScene : IScene
         if (_victoryView is { } victoryView)
         {
             victoryView.Draw(batch, textures);
+            return;
+        }
+
+        if (_defeat is { } defeat)
+        {
+            defeat.Draw(batch, textures);
             return;
         }
 
@@ -166,12 +179,19 @@ internal sealed class BattleScene : IScene
         }
     }
 
-    // After a defeat there is no screen yet (plan 2026-10-20-battle, B8b), so nothing more is requested.
-    private SceneRequest? UpdateOutcomeScreen(TimeSpan delta, InputFrame input) =>
-        _victory is { } victory ? victory.Update(delta, input) : _escaped?.Update(delta, input);
+    // Exactly one outcome screen is set once the battle is finished.
+    private SceneRequest? UpdateOutcomeScreen(TimeSpan delta, InputFrame input)
+    {
+        if (_victory is { } victory)
+        {
+            return victory.Update(delta, input);
+        }
 
-    // A victory stays on this screen for its rewards and an escape for its notice; a defeat leaves at once.
-    private TitleRequested? Finish()
+        return _escaped is { } escaped ? escaped.Update(delta, input) : _defeat?.Update(input);
+    }
+
+    // Each outcome stays on this screen for its own: a victory's rewards, an escape's notice, a defeat's choices.
+    private void Finish()
     {
         _isFinished = true;
         var outcome = _battle.Phase;
@@ -179,17 +199,17 @@ internal sealed class BattleScene : IScene
         {
             _victory = new VictoryScreen(rewards);
             _victoryView = new VictoryScreenView(_victory, _text, _ui);
-            return null;
+            return;
         }
 
         if (outcome == BattlePhase.Escaped)
         {
             _escaped = new EscapedNotice();
             _escapedText = MeasuredText.Of(_escapedFont, _text.Messages.Text(MessageIds.BattleEscaped));
-            return null;
+            return;
         }
 
-        return new TitleRequested();
+        _defeat = new DefeatScreen(_saves, _text, _ui);
     }
 
     // Legacy EscapedScreen: the battle under a scrim, and "Escaped" on a banner band across the middle of the screen.

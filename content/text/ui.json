@@ -104,5 +104,9 @@
   "battle_level_label": "Lv.",
   "battle_level_up": "Level Up!",
   "battle_victory_next": "Next",
-  "battle_escaped": "Escaped"
+  "battle_escaped": "Escaped",
+  "battle_defeat": "Defeat",
+  "battle_party_fallen": "The party has fallen.",
+  "battle_load_last_save": "Load last save",
+  "battle_main_menu": "Main menu"
 }

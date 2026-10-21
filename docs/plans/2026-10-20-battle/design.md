@@ -28,7 +28,7 @@ Legacy values unless said otherwise. "Where" is where the value lives, so it cha
 | victory | `Battle/VictoryScreen` | the title slides 60 px in 0.45 s; the reward bar comes after 0.25 s; the first card after 0.45 s, then 0.1 s apart; a 0.5 s pause. A full bar fills in 1.1 s, with 0.2 s minimum per level. "Level Up!" pops to 1.5x over 0.35 s. | Legacy `VictoryScreen`, `ExpGainRow`. | B7a, B7b1, B7b2 |
 | victory layout | `Battle/VictoryScreenView` | "Victory!" 96 px at (104, 112), line at y 226; one reward bar per reward, 800 x 64 from (88, 268); cards in 2 columns, 880 px wide at (104, 420); 100 px footer | Legacy `VictoryScreen.xaml`. | B7b1 |
 | escaped | `Battle/EscapedNotice` | "Escaped" at 64 px on the banner for 1.5 s, or until Confirm | Legacy `EscapedScreen`. | B8a |
-| defeat | `Battle/DefeatScreen` | red "Defeat" fades in over 0.6 s; choices appear after 0.7 s | Legacy `DefeatScreen`; decision 65. | B8b |
+| defeat | `Battle/DefeatScreen` | red "Defeat" fades in over 0.6 s; choices appear after 0.7 s | Legacy `DefeatScreen`; decision 65. | B8b1, B8b2 |
 
 
 ## Design overview
@@ -113,7 +113,7 @@ Jrpg.Game/
             CommandPanelView, CommandPanelPlacement, CommandHeaderShape, PointerBob (B4c);
             TurnStage, BattlePacing (B5a); ActionPlayback, PlaybackBeat, BattleBanner (B5b); FloatingNumber (B5c);
             EffectStrip, PlaceholderCue (B5d); ExperienceBarAnimation, VictoryScreen (B7a);
-            VictoryScreenView, PointedBarShape (B7b1); VictoryEntrance (B7b2); EscapedNotice (B8a); DefeatEntry, DefeatMenu, DefeatScreen (B8b)
+            VictoryScreenView, PointedBarShape (B7b1); VictoryEntrance (B7b2); EscapedNotice (B8a); DefeatEntry, DefeatMenu, DefeatScreen (B8b1); DefeatScreenView, DefeatEntrance (B8b2)
   Ui/       Vignette; UiTextures.BattleVignette, TopShade (B2a); UiTextures.Battler (B2b); UiTheme battle tokens (B3a)
 ```
 No type is named after its folder. `Jrpg.Game.Battle` sits beside `Jrpg.Core.Battle`, as `Exploration` already does.
@@ -129,7 +129,7 @@ No type is named after its folder. `Jrpg.Game.Battle` sits beside `Jrpg.Core.Bat
 | `Exploration` | Scenes, Dialogue, Hosting, Ui, Rendering, Input |
 | `Menus` | Scenes, Saving, Hosting, Ui, Rendering, Input |
 | `Title` | Scenes, Saving, Ui, Rendering, Input |
-| **`Battle`** (new) | Scenes, **Saving** (defeat's save list, B8b), Ui, Rendering, Input. Not Menus, Exploration or Title. |
+| **`Battle`** (new) | Scenes, **Saving** (defeat's save list, B8b1), Ui, Rendering, Input. Not Menus, Exploration or Title. |
 | `Flow` | all of the above, now with Battle; only `JrpgGame` and `Program` depend on `Flow` |
 
 ### Key design decisions
@@ -190,7 +190,7 @@ No type is named after its folder. `Jrpg.Game.Battle` sits beside `Jrpg.Core.Bat
 |---|---|---|
 | `GameManager.TryRandomEncounter` | Core `RandomEncounters` (part 2); `ExplorationScene` returns `BattleRequested` | B1b |
 | `TriggerHandler` `TriggerBattle` | `encounters.json`; event battles are decision 30 | - |
-| `SceneManager.StartBattleAsync`, `EndBattleAsync`, `BattleExit` | `Flow/BattleTransitions` (push/pop behind the fade); `BattleFinished`, `LoadRequested`, `TitleRequested` | B1b, B8b |
+| `SceneManager.StartBattleAsync`, `EndBattleAsync`, `BattleExit` | `Flow/BattleTransitions` (push/pop behind the fade); `BattleFinished`, `LoadRequested`, `TitleRequested` | B1b, B8b1 |
 | `BattleManager.ShareExperience`, `TotalExpReward` | `GameSession.FinishBattle` -> `VictoryRewards` | C1 |
 | `BattleUI` turn flow | `Battle/BattleScene` + `BattleTurnSequence` | B1b, B5a |
 | `BattleUI` layout, `DrawSprites`, `CreateSprite` | `Battle/BattleLayout`, `BattlerArt`, `BattlerScaling`, `UiTextures.Battler` | B2a, B2b |
@@ -207,7 +207,7 @@ No type is named after its folder. `Jrpg.Game.Battle` sits beside `Jrpg.Core.Bat
 | `PlayVFX` (GIF) | `Battle/EffectStrip` (damage only), `PlaceholderCue` | B5d |
 | `VictoryScreen`, `ExpGainRow` | `Battle/VictoryScreen`, `ExperienceBarAnimation`, `VictoryScreenView` | B7a, B7b1, B7b2 |
 | `ShowEscaped` | `Battle/EscapedNotice` | B8a |
-| `DefeatScreen` | `Battle/DefeatMenu`, `DefeatScreen` over `Saving/SaveFilesPanel` | B8b |
+| `DefeatScreen` | `Battle/DefeatMenu`, `DefeatScreen` over `Saving/SaveFilesPanel`, `DefeatScreenView` | B8b1, B8b2 |
 
 
 ## Risks

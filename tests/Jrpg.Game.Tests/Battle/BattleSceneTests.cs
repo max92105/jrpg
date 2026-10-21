@@ -7,6 +7,7 @@ using Jrpg.Game.Input;
 using Jrpg.Game.Scenes;
 using Jrpg.Game.Tests.Exploration;
 using Jrpg.Game.Tests.Input;
+using Jrpg.Game.Tests.Saving;
 using Jrpg.Game.Tests.Ui;
 using Jrpg.Game.Ui;
 
@@ -105,14 +106,34 @@ public sealed class BattleSceneTests
 
     // The goblin fells Sarxian on its first turn, whether it acts before him or after his Defend.
     [Fact]
-    public void Update_PartyFalls_RequestsTitle()
+    public void Update_PartyFallsThenMainMenu_RequestsTitle()
     {
         var catalog = WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { Attack = 9999 });
         var (session, scene) = StartForestBattleScene(catalog);
+        Settle(scene);
+        if (session.ActiveBattle is not null)
+        {
+            DefendAndSettle(scene);
+        }
 
-        var request = Settle(scene) ?? DefendAndSettle(scene);
+        var request = scene.Update(StartMapScenarios.OneUpdate, _confirm);
 
         Assert.IsType<TitleRequested>(request);
+        Assert.Null(session.ActiveBattle);
+    }
+
+    // No enemy acts in a battle lost at the start: it is finished at once, and the defeat screen waits for a choice.
+    [Fact]
+    public void Update_BattleLostAtStart_FinishesBattleAndWaitsOnDefeat()
+    {
+        var catalog = StartMapScenarios.NextToForestWarpAlwaysRolling;
+        var (session, scene) = StartForestBattleScene(catalog, session => session.Party.Leader.Vitals.TakeDamage(9999));
+
+        var first = Settle(scene);
+        var second = Settle(scene);
+
+        Assert.Null(first);
+        Assert.Null(second);
         Assert.Null(session.ActiveBattle);
     }
 
@@ -137,12 +158,17 @@ public sealed class BattleSceneTests
         return Settle(scene);
     }
 
-    private static (GameSession Session, BattleScene Scene) StartForestBattleScene(ContentCatalog catalog)
+    private static (GameSession Session, BattleScene Scene) StartForestBattleScene(ContentCatalog catalog) =>
+        StartForestBattleScene(catalog, _ => { });
+
+    // beforeBattle changes the session once the encounter is pending, before the battle starts.
+    private static (GameSession Session, BattleScene Scene) StartForestBattleScene(ContentCatalog catalog, Action<GameSession> beforeBattle)
     {
         var session = GameSession.StartNew(catalog, new SeededRandom(1));
         Assert.True(StartMapScenarios.WalkUntilBattleRequested(StartMapScenarios.SceneOf(session.Exploration, catalog)));
+        beforeBattle(session);
         session.StartPendingBattle();
-        return (session, new BattleScene(session, catalog.Items, RepositoryScreenText.Text, new UiTextures()));
+        return (session, new BattleScene(session, new BattleSceneSources(catalog.Items, UnwrittenSaveSlots.Create()), RepositoryScreenText.Text, new UiTextures()));
     }
 
     // The forest encounter becomes a single goblin, changed as the test needs.

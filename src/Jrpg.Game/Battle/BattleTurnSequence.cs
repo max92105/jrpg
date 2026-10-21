@@ -24,6 +24,11 @@ internal sealed class BattleTurnSequence
         _tactics = tactics;
         _messages = messages;
         Actor = battle.CurrentActor;
+        if (battle.IsOver)
+        {
+            // A battle lost at the start (decision 97) has no turn to play: it goes straight to its end screen.
+            Stage = TurnStage.Over;
+        }
     }
 
     public TurnStage Stage { get; private set; } = TurnStage.StepForward;

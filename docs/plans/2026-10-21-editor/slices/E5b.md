@@ -1,0 +1,45 @@
+# E5b. Setting up a sheet by columns and rows
+
+Part of [the editor plan](../README.md). Design: [design.md](../design.md), "Tunables" (tile size guess, new sheet id), "Key decisions" 5; decisions 115, 118. Set-up and cut are one step (review): **Set up** opens the cut panel pre-filled with a guessed cut, and **Apply** creates the sheet.
+
+- **E5b. Setting up a sheet by columns and rows** (Editor, about 300 lines)
+  - **Goal:**
+    - Choosing an image that isn't set up shows a **Set up...** button (and Tiles > Set up sheet... in the menu). It opens the **Cut** panel under the sheet, pre-filled with the guessed cut (tile size 48, then 32, 16, 64, 24 px: the first that divides both sides, else 48; margin and spacing 0) turned into columns and rows.
+    - The panel shows the sheet's id (from the file name in snake case, decision 118: `Grass3.png` -> `grass_3`), then **Columns** and **Rows** (as asked), **Margin** and **Spacing**, then, read-only, the tile size they give ("48 x 48 px") and the count ("8 x 16 = 128 cells") (decision 115: no tile-size input).
+    - Editing a field redraws the grid over the image at once (a preview; the catalog doesn't change yet).
+    - A cut that doesn't split the image evenly ("1000 px doesn't split into 12 columns") or gives a tile under 1 px shows the problem and disables **Apply**.
+    - **Apply** creates the sheet in the draft (one catalog step: undoable through E4b, saved with Ctrl+S, stored as tile size); the grid stays and cells can be chosen and painted. **Cancel** closes the panel; nothing is created.
+    - Re-cutting a sheet that is already set up is E6.
+  - **New types:**
+    - `Tiles/SheetCutViewModel` (`ObservableObject`): the cut being edited for one sheet image, and the tile size and problem it gives.
+      - `SheetCutViewModel(TilesheetDefinition sheet, (int Width, int Height) imageSize)`: starts from the sheet's cut, columns and rows computed with `ColumnsIn`/`RowsIn`.
+      - `Columns`, `Rows`, `Margin`, `Spacing` (observable inputs); `TileWidth`, `TileHeight` (read-only, computed).
+      - `Problem` (null when the cut is whole), `Summary`.
+      - `PreviewSheet`: the sheet as the fields stand, for the grid preview.
+      - `ToSheet()`: the cut as a `TilesheetDefinition` with the same id and file; throws with `Problem` when there is one.
+    - `Tiles/SheetCutGuess` (static): the tile size a new sheet starts with, from its image size.
+    - `Tiles/TilesheetIds` (static): a new sheet's id from its file name, unique among the taken ids.
+  - **Changes:**
+    - `Catalogs/CatalogDraft.SetTilesheet(TilesheetDefinition sheet)`: adds the sheet, or replaces the one with its id; one undoable step. Undoing a set-up is refused while tiles are cut from the sheet (`CatalogUsage`, E4b).
+    - `Tiles/TileBrowserViewModel`: `Cut` (`SheetCutViewModel?`, the open panel); `SetUpSheetCommand` (can execute on an image not set up: builds the guessed sheet and opens `Cut`); `ApplyCutCommand` (can execute when `Cut.Problem` is null: `SetTilesheet(Cut.ToSheet())`, closes the panel); `CancelCutCommand`.
+    - `Tiles/TileBrowserView`: the Cut expander; draws the marks with `Cut.PreviewSheet` while it is open.
+  - **Tests:**
+    - `SheetCutGuessTests`: `TileSizeFor_DivisibleBy48_Is48`, `TileSizeFor_DivisibleBy32Only_Is32`, `TileSizeFor_NoCommonSizeDivides_Is48`.
+    - `TilesheetIdsTests`: `FromFile_MixedCaseWithDigits_IsSnakeCase` (`Grass3.png` -> `grass_3`, `tree02_s_01_animation.png` -> `tree_02_s_01_animation`), `FromFile_IdTaken_AppendsNumber`.
+    - `SheetCutViewModelTests`:
+      - `Columns_ImageSplitsEvenly_SetsTileWidth`;
+      - `Columns_ImageDoesNotSplit_ReportsProblem`;
+      - `Margin_Set_RecomputesTileSize`;
+      - `ToSheet_ColumnsChanged_KeepsIdAndFile`.
+    - `CatalogDraftTests`: `SetTilesheet_NewId_AddsItAndMarksDirty`, `Undo_AfterSetTilesheetWithTilesCut_IsRefused`.
+    - `TileBrowserViewModelTests`:
+      - `SetUpSheetCommand_ImageNotSetUp_OpensCutWithGuessedColumnsAndRows`;
+      - `SetUpSheetCommand_SheetAlreadySetUp_CannotExecute`;
+      - `ApplyCutCommand_NewSheet_AddsItAndShowsTheGrid`;
+      - `ApplyCutCommand_CutWithProblem_CannotExecute`;
+      - `CancelCutCommand_NewSheet_AddsNothing`.
+  - **Verify by hand:**
+    - [ ] Choose `Grass3.png`, Set up: the panel shows `grass_3` and a guessed grid; adjust Columns and Rows until the preview lines up with the art; Apply; paint from it; Ctrl+S; `git diff` shows `grass_3` in `tilesheets.json` and its tiles in `tiles.json`; F5: the game draws it.
+    - [ ] Set up `Floor.png` (64 px art): the guess is 64 px; Cancel: still "(not set up)".
+    - [ ] Type columns that don't divide the width: the problem shows and Apply is greyed.
+    - [ ] Apply a set-up, Ctrl+Z: the sheet is "(not set up)" again; set up, paint, Ctrl+Z until the set-up: refused, naming the tiles' use.

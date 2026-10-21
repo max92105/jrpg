@@ -1,0 +1,43 @@
+# E3b. Any whole cell of a sheet can be chosen
+
+Part of [the editor plan](../README.md). Design: [design.md](../design.md), "Why painting doesn't work" and "Key decisions" 2.
+
+- **E3b. Any whole cell of a sheet can be chosen** (Core + Data + Editor, about 200 lines)
+  - **Goal:**
+    - A click on any whole cell of the shown sheet chooses it, outlined in cyan, whether or not it is a tile yet. Clicks on the margin, on spacing, or on a partial cell at the right or bottom edge are ignored.
+    - A line under the sheet says what is chosen: "Cell (3, 4): tile 57" or "Cell (3, 4): not a tile yet".
+    - With a tile cell chosen, painting works as before. Alt + click on the map chooses the tile's cell and shows its sheet.
+    - The status bar says "Choose a tile in the Tiles panel" when the map is clicked in Tiles mode with nothing chosen.
+    - **Known gap until E3d:** a cell that isn't a tile yet doesn't paint; the line under the sheet says "not a tile yet". The developer's check "click any cell of any sheet and paint it" is E3d's.
+  - **Core:**
+    - `Maps/TilesheetDefinition.ColumnsIn(int imageWidth)` and `RowsIn(int imageHeight)`: how many whole cells fit, with margin and spacing.
+  - **Data:** `Art/PngSize` becomes public (its `Read` is unchanged), for the shell's image size lookup.
+  - **New types:**
+    - `Catalogs/SheetCell` (readonly record struct `SheetId`, `Column`, `Row`): one cell of a sheet's grid, a tile or not.
+  - **Changes:**
+    - `Tiles/TileBrowserViewModel(CatalogDraft catalog, Func<string, (int Width, int Height)> imageSizeOf)`: image sizes come in as a lookup by file name, so the view model reads no files and tests give sizes directly.
+      - `SelectedCell` (`SheetCell?`) replaces `SelectedTileId` as the choice; `SelectedTileId` becomes a read-only query (the chosen cell's tile, or null).
+      - `CellAt(double x, double y)`: the whole cell under an image pixel of the shown sheet, or null (also E4a's and E12a's way in).
+      - `SelectCellAt(double x, double y)` replaces `SelectTileAt`: chooses `CellAt`, ignores null.
+      - `ChoiceText`: the line under the sheet.
+      - `Select(int tileId)` selects the tile's cell.
+    - `Shell/MainViewModel`: builds the lookup from `PngSize.Read` on `content/art/tilesheets/<file>`, cached per file.
+    - `Tiles/TilesheetMarks.Draw` takes the chosen `SheetCell` (outlined whether or not it is a tile).
+    - `Tiles/TilePaintingViewModel`: `HasChoice`; `Shell/MainViewModel.ShowPaintHint()` sets the status text (called by `HandlePaintButton` when nothing is chosen).
+  - **Existing tests this breaks:** `TileBrowserViewModelTests` (4 tests): construction lines gain a size lookup for their made-up `Dungeon.png`/`Forest.png`; `SelectTileAt_CellThatIsNoTile_KeepsTheSelection` pins the old behavior and is replaced (below).
+  - **Tests:**
+    - `TilesheetDefinitionTests` (Core): `ColumnsIn_MarginAndSpacing_CountsWholeCells`, `RowsIn_PartialLastRow_IsNotCounted`.
+    - `TileBrowserViewModelTests`:
+      - `Constructor_SheetsSortedById_ShowsTheFirst` (kept);
+      - `SelectCellAt_CellThatIsATile_SelectsItsTile`;
+      - `SelectCellAt_CellThatIsNoTile_SelectsTheCell` (replaces `SelectTileAt_CellThatIsNoTile_KeepsTheSelection`);
+      - `SelectCellAt_PastLastWholeColumn_KeepsTheChoice`;
+      - `Select_TileOnAnotherSheet_ShowsItsSheet` (kept);
+      - `ChoiceText_CellThatIsNoTile_SaysNotATileYet`.
+    - `TilePaintingViewModelTests`: `StartPainting_NoTileChosen_ChangesNothing` (kept); `HasChoice_NothingChosen_IsFalse`.
+  - **Verify by hand:**
+    - [ ] **Before the change**, reproduce the reported failure: on `grass_1`, click a cell with no green mark, then drag on the map: nothing paints, nothing says why. Note it in the slice's "Done" note.
+    - [ ] After: on `grass_1`, click every cell: each is outlined; the line names the one tile and says "not a tile yet" elsewhere.
+    - [ ] On `fg_forest_fall` (16 px), cells outline at the right size.
+    - [ ] Choose a tile cell, paint: it works. Alt + click on the map: the panel shows that tile's sheet and cell.
+    - [ ] Click the map with nothing chosen: the status bar says so.

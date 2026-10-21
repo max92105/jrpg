@@ -25,6 +25,9 @@ When planning slices in this repo:
 - Developer wants UI built from many small reusable Ui/ components (card, meter, title); put cross-screen parts in Ui/, not Menus/, so Battle can reuse them.
 - Test seams: a small internal read accessor (CardOf, ShownStats) beats a vacuous behavior test; drop tests that only exercise a library (MeasuredText.Of).
 - Refactor slices: "existing tests pass unchanged" is the guard; draw-only moves get before/after screenshots, not invented tests.
+- Editor dialogs follow `StartX()` returns a view model / `TryApplyX(vm)` on the owning view model, with `XProblem` properties and `ToX()` throwing on a problem; plan new windows that way. WPF dark themes: ComboBox/ScrollBar need templates (size risk).
+- Reviews want splits planned up front (writer vs first user, behavior vs look, layout vs theme), not "split if it grows"; view models take lookups (image sizes) instead of reading files; one responsibility per panel VM.
+- Developer wants Ctrl+Z to cover every edit (map and catalog alike); expect "undo everything" in editor features.
 - Packages are never assumed: font package, MonoGame content pipeline and CommunityToolkit.Mvvm are open questions until the developer approves.
 
 **Why:** part 1 split slices mid-way; the part 2 devil's advocate (2026-10-17) raised exactly these as blockers/concerns.

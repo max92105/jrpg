@@ -24,4 +24,18 @@ internal sealed class OutlinedFont(SpriteFontBase font)
         batch.DrawString(font, text, position, UiTheme.TextOutline * fade, effect: FontSystemEffect.Blurry, effectAmount: OutlineBlur);
         batch.DrawString(font, text, position, color);
     }
+
+    /// <summary>Draws <paramref name="text"/> centered on a point and scaled about it, such as a number popping.</summary>
+    /// <param name="batch">Already begun.</param>
+    /// <param name="text">Measured in this font, when its value changed.</param>
+    /// <param name="center">Where the text's middle goes.</param>
+    /// <param name="look">The color, already faded, and the size (1 is the font's own).</param>
+    public void DrawCentered(SpriteBatch batch, MeasuredText text, Vector2 center, (Color Color, float Scale) look)
+    {
+        var origin = new Vector2(text.Width / 2, font.LineHeight / 2f);
+        var scale = new Vector2(look.Scale);
+        var outline = UiTheme.TextOutline * (look.Color.A / 255f);
+        batch.DrawString(font, text.Text, center, outline, origin: origin, scale: scale, effect: FontSystemEffect.Blurry, effectAmount: OutlineBlur);
+        batch.DrawString(font, text.Text, center, look.Color, origin: origin, scale: scale);
+    }
 }

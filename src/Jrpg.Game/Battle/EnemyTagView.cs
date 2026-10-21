@@ -8,6 +8,7 @@ namespace Jrpg.Game.Battle;
 
 /// <summary>
 /// Under each living enemy, its shown name and a thin red HP bar (legacy <c>EnemyTag</c>), on the left edge of its spot.
+/// A fallen enemy's tag fades out with it.
 /// </summary>
 internal sealed class EnemyTagView
 {
@@ -18,6 +19,7 @@ internal sealed class EnemyTagView
     private const int BarHeight = 4;
     private const int GapBelowSprite = 38;
 
+    private readonly BattleTurnSequence _sequence;
     private readonly OutlinedFont _font;
     private readonly Combatant[] _enemies;
     private readonly string[] _labels;
@@ -25,10 +27,12 @@ internal sealed class EnemyTagView
     private readonly Rectangle[] _tagAreas;
 
     /// <param name="combatants">The battle's combatants, in its order.</param>
+    /// <param name="sequence">Whose fall is playing, so a fallen enemy's tag fades with it.</param>
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">Where the bars' gradient is made, once.</param>
-    public EnemyTagView(IReadOnlyList<Combatant> combatants, ScreenText text, UiTextures ui)
+    public EnemyTagView(IReadOnlyList<Combatant> combatants, BattleTurnSequence sequence, ScreenText text, UiTextures ui)
     {
+        _sequence = sequence;
         _font = new OutlinedFont(text.Fonts.FontAt(NamePixels));
         var tagHeight = (int)_font.Font.LineHeight + NameGap + BarHeight;
         var spots = BattleLayout.SpotsOf(combatants);
@@ -56,11 +60,13 @@ internal sealed class EnemyTagView
     {
         for (var index = 0; index < _enemies.Length; index++)
         {
-            if (_enemies[index].IsAlive)
+            var enemy = _enemies[index];
+            var opacity = _sequence.OpacityOf(enemy);
+            if (opacity > 0)
             {
                 var area = _tagAreas[index];
-                _font.Draw(batch, _labels[index], new Vector2(area.X, area.Y), UiTheme.TextPrimary);
-                _bars[index].Draw(batch, textures, new Rectangle(area.X, area.Bottom - BarHeight, area.Width, BarHeight), 1);
+                _font.Draw(batch, _labels[index], new Vector2(area.X, area.Y), UiTheme.TextPrimary * opacity);
+                _bars[index].Draw(batch, textures, new Rectangle(area.X, area.Bottom - BarHeight, area.Width, BarHeight), opacity);
             }
         }
     }

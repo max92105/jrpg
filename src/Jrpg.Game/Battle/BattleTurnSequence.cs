@@ -58,9 +58,14 @@ internal sealed class BattleTurnSequence
         };
     }
 
+    /// <summary>How visible <paramref name="combatant"/> is: 1 standing, fading while their fall plays, 0 once gone.</summary>
+    public float OpacityOf(Combatant combatant) => combatant.IsAlive ? 1 : Playback?.FallOpacityOf(combatant) ?? 0;
+
     /// <summary>Plays the turn on; waiting for a command or the end of the battle stops the clock.</summary>
     public void Update(TimeSpan delta)
     {
+        // The last action keeps playing (numbers rising, the fallen fading) even while a command is awaited.
+        Playback?.Update(delta);
         if (DurationOf(Stage) is null)
         {
             return;

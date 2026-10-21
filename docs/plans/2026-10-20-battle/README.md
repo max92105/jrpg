@@ -140,7 +140,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 - [x] **B5a. Turn pacing: step forward and back** (Game, about 270 lines) → [slices/B5a.md](slices/B5a.md)
 - [x] **B5b. Event-driven beats and the banner** (Game, about 260 lines) → [slices/B5b.md](slices/B5b.md)
-- [ ] **B5c. Floating numbers and fading enemies** (Game, about 220 lines) → [slices/B5c.md](slices/B5c.md)
+- [x] **B5c. Floating numbers and fading enemies** (Game, about 220 lines) → [slices/B5c.md](slices/B5c.md)
 - [ ] **B5d. Effect strips and placeholder cues** (content + Data + Game, about 230 lines; decisions 57, 101) → [slices/B5d.md](slices/B5d.md)
 
 ### Phase 5: skills and items

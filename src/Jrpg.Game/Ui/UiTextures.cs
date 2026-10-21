@@ -34,6 +34,7 @@ internal sealed class UiTextures
     private readonly Dictionary<(string File, int Size), Texture2D> _diamondPortraits = [];
     private readonly Dictionary<(string Folder, string File, int Size), Texture2D> _shrunk = [];
     private readonly Dictionary<DiamondShape, Texture2D> _diamonds = [];
+    private readonly Dictionary<Texture2D, Texture2D> _silhouettes = [];
     private readonly Dictionary<ImmutableArray<GradientStop>, Texture2D> _gradients = [];
 
     /// <summary>A tab that isn't selected: the arrow, dark and faintly outlined.</summary>
@@ -77,6 +78,29 @@ internal sealed class UiTextures
             CommandHeaderShape.Width,
             CommandHeaderShape.Height,
             CommandHeaderShape.Pixels(GradientStrip.Colors(UiTheme.Selection, CommandHeaderShape.Width), UiTheme.SelectionStroke));
+
+    /// <summary>
+    /// <paramref name="source"/>'s shape in plain white, made once per texture: drawn over a sprite, it lights it white the
+    /// way legacy's white glow did, with no shader.
+    /// </summary>
+    public Texture2D WhiteSilhouette(TextureLibrary textures, Texture2D source)
+    {
+        if (!_silhouettes.TryGetValue(source, out var baked))
+        {
+            var pixels = new Color[source.Width * source.Height];
+            source.GetData(pixels);
+            for (var index = 0; index < pixels.Length; index++)
+            {
+                var alpha = pixels[index].A;
+                pixels[index] = new Color(alpha, alpha, alpha, alpha);
+            }
+
+            baked = textures.Create(source.Width, source.Height, pixels);
+            _silhouettes.Add(source, baked);
+        }
+
+        return baked;
+    }
 
     /// <summary>A diamond or diamond ring, baked once per shape.</summary>
     public Texture2D Diamond(TextureLibrary textures, DiamondShape shape)

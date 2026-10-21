@@ -202,6 +202,12 @@ internal static class UiTheme
     /// <summary>Legacy <c>CommandPanel</c>'s description box under the list.</summary>
     public static Color CommandHintFill { get; } = FromLegacy(0xE60C0D11);
 
+    /// <summary>Legacy <c>FloatingText</c> on a heal or revive: the bright end of <c>Brush.Bar.HP</c>.</summary>
+    public static Color FloatingHeal { get; } = FromLegacy(0xFF7FD39A);
+
+    /// <summary>Legacy <c>FloatingText</c> on MP restored: the bright end of <c>Brush.Bar.MP</c>.</summary>
+    public static Color FloatingMp { get; } = FromLegacy(0xFF8FB4F0);
+
     /// <summary>Legacy <c>Brush.Banner</c>: the battle banner's dark band, fading out at both ends.</summary>
     public static ImmutableArray<GradientStop> Banner { get; } =
         [new(0, FromLegacy(0x00101320)), new(0.25f, FromLegacy(0xE6101320)), new(0.75f, FromLegacy(0xE6101320)), new(1, FromLegacy(0x00101320))];

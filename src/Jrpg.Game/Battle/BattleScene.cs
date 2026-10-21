@@ -31,6 +31,7 @@ internal sealed class BattleScene : IScene
     private readonly CommandPanelView _commandPanel;
     private readonly BattleBanner _banner = new();
     private readonly BattleBannerView _bannerView;
+    private readonly FloatingNumbersView _numbers;
     private ActionPlayback? _shownPlayback;
     private (int Turn, TurnStage Stage) _shown;
     private bool _isFinished;
@@ -52,10 +53,11 @@ internal sealed class BattleScene : IScene
         _shown = (_sequence.Turn, _sequence.Stage);
         _battlers = new BattlersView(battle.Combatants, _sequence, ui);
         _partyStatus = new PartyStatusView([.. battle.Combatants.Where(combatant => combatant.Side == BattleSide.Party)], text, ui);
-        _enemyTags = new EnemyTagView(battle.Combatants, text, ui);
+        _enemyTags = new EnemyTagView(battle.Combatants, _sequence, text, ui);
         _backgroundFile = session.Exploration.PendingEncounter?.BackgroundFile
             ?? throw new InvalidOperationException("A battle screen needs the encounter it fights.");
         _commandPanel = new CommandPanelView(_commands, _battlers, text, ui);
+        _numbers = new FloatingNumbersView(_sequence, _battlers, text);
     }
 
     /// <returns>
@@ -96,6 +98,7 @@ internal sealed class BattleScene : IScene
         DrawBackdrop(batch, textures);
         _battlers.Draw(batch, textures);
         _enemyTags.Draw(batch, textures);
+        _numbers.Draw(batch, textures);
         _turnOrder.Draw(batch, textures);
         _bannerView.Draw(batch, textures);
         var isAwaitingCommand = !_isFinished && _sequence.IsAwaitingCommand;

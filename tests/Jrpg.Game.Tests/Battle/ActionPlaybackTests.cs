@@ -94,6 +94,31 @@ public sealed class ActionPlaybackTests
         Assert.Equal(potion.Name, playback.BannerText);
     }
 
+    [Fact]
+    public void Start_AttackLanded_AddsDamageNumberOnTarget()
+    {
+        var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), new EffectApplied(_goblin, EffectKind.Damage, 13)]);
+
+        Assert.Equal([new FloatingNumber(_goblin, "13", EffectKind.Damage)], playback.Numbers);
+    }
+
+    // The fallen stay lit white for 1.0 s, then fade out over 1.0 s.
+    [Fact]
+    public void Update_FallenEnemy_FadesAfterTint()
+    {
+        var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), new EffectApplied(_goblin, EffectKind.Damage, 40), new CombatantDefeated(_goblin)]);
+        playback.Update(TimeSpan.FromSeconds(0.9));
+        var duringTint = playback.FallOpacityOf(_goblin);
+
+        playback.Update(TimeSpan.FromSeconds(0.6));
+
+        Assert.Equal(1, duringTint);
+        Assert.Equal(0.75f, playback.FallOpacityOf(_goblin) ?? -1, 3); // Halfway through the fade, eased in: 1 - 0.5².
+        playback.Update(TimeSpan.FromSeconds(0.5));
+        Assert.Equal(0, playback.FallOpacityOf(_goblin));
+        Assert.Null(playback.FallOpacityOf(_sarxian));
+    }
+
     // BattleEvent stays open, unlike BattleCommand: new events come with new mechanics (ADR 0004), and the playback must
     // refuse what it can't show rather than show it silently wrong.
     [Fact]

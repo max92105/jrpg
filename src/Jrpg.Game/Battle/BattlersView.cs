@@ -9,13 +9,17 @@ namespace Jrpg.Game.Battle;
 
 /// <summary>
 /// Draws every living battler at its spot in the formation, centered on it with its feet on the spot's bottom, the actor
-/// stepped out toward the other side. The fallen are gone, as legacy <c>AnimateDeath</c> faded out any combatant that fell.
+/// stepped out toward the other side. Whoever falls is lit white, then fades out, as legacy <c>AnimateDeath</c> did for any
+/// combatant.
 /// </summary>
 internal sealed class BattlersView
 {
     private readonly IReadOnlyList<Combatant> _combatants;
     private readonly Rectangle[] _spots;
     private readonly BattlerArt[] _arts;
+    // How strongly the white lies over a falling battler: bright, with its own colors still showing through.
+    private const float FallenWhiteness = 0.6f;
+
     private readonly BattleTurnSequence _sequence;
     private readonly UiTextures _ui;
 
@@ -36,9 +40,10 @@ internal sealed class BattlersView
         for (var index = 0; index < _combatants.Count; index++)
         {
             var combatant = _combatants[index];
-            if (combatant.IsAlive)
+            var opacity = _sequence.OpacityOf(combatant);
+            if (opacity > 0)
             {
-                DrawBattler(batch, textures, _arts[index], SteppedSpot(combatant, _spots[index]));
+                DrawBattler(batch, textures, index, opacity);
             }
         }
     }
@@ -48,12 +53,12 @@ internal sealed class BattlersView
     public int TopOf(TextureLibrary textures, Combatant combatant)
     {
         var index = IndexOf(combatant);
-        return DrawnArea(textures, _arts[index], _spots[index]).Top;
+        return DrawnArea(textures, _arts[index], SpotOf(combatant)).Top;
     }
 
-    /// <summary>Where <paramref name="combatant"/> stands in the formation.</summary>
+    /// <summary>Where <paramref name="combatant"/> stands now: their formation spot, stepped out while they act.</summary>
     /// <exception cref="ArgumentException">The combatant isn't in this battle.</exception>
-    public Rectangle SpotOf(Combatant combatant) => _spots[IndexOf(combatant)];
+    public Rectangle SpotOf(Combatant combatant) => SteppedSpot(combatant, _spots[IndexOf(combatant)]);
 
     private int IndexOf(Combatant combatant)
     {
@@ -84,12 +89,19 @@ internal sealed class BattlersView
         return new Rectangle(spot.Center.X - (size.X / 2), spot.Bottom - size.Y, size.X, size.Y);
     }
 
-    private void DrawBattler(SpriteBatch batch, TextureLibrary textures, BattlerArt art, Rectangle spot)
+    // A fallen battler, still fading, is lit white over its own colors.
+    private void DrawBattler(SpriteBatch batch, TextureLibrary textures, int index, float opacity)
     {
+        var (combatant, art) = (_combatants[index], _arts[index]);
+        var area = DrawnArea(textures, art, SteppedSpot(combatant, _spots[index]));
         var source = textures.Get(ArtFolders.Battlers, art.SpriteFile);
         var scaling = BattlerScaling.Of(new Point(source.Width, source.Height));
         var image = scaling.IsShrunkSmoothly ? _ui.Battler(textures, art.SpriteFile, scaling.DrawnSize.X) : source;
         var effects = art.IsFlipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-        batch.Draw(image, DrawnArea(textures, art, spot), null, Color.White, 0, Vector2.Zero, effects, 0);
+        batch.Draw(image, area, null, Color.White * opacity, 0, Vector2.Zero, effects, 0);
+        if (!combatant.IsAlive)
+        {
+            batch.Draw(_ui.WhiteSilhouette(textures, image), area, null, Color.White * (opacity * FallenWhiteness), 0, Vector2.Zero, effects, 0);
+        }
     }
 }

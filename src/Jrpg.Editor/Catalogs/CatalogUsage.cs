@@ -33,4 +33,9 @@ internal static class CatalogUsage
             .Select(id => $"object {id}");
         return [.. maps, .. objects];
     }
+
+    /// <summary>The tiles cut from a sheet, used or not: a tile can't outlive its sheet, so the sheet's removal waits for theirs.</summary>
+    /// <returns>Their ids, lowest first.</returns>
+    public static IReadOnlyList<int> TilesCutFrom(string sheetId, ContentCatalog catalog) =>
+        [.. catalog.Tiles.Values.Where(tile => tile.SheetId == sheetId).Select(tile => tile.Id).Order()];
 }

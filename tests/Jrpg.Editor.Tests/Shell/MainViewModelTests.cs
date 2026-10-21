@@ -256,6 +256,22 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
+    public void Undo_SetUpSheetWithTilesCut_RefusesNamingTheTile()
+    {
+        var viewModel = Open(_repositoryContent);
+        var browser = viewModel.Painting!.Browser;
+        browser.SelectedChoice = browser.SheetChoices.First(choice => choice.File == "Grass3.png");
+        browser.SetUpSheetCommand.Execute(null);
+        browser.SelectCellAt(1, 1);
+        var tileId = viewModel.Content!.AddTile(browser.SelectedCell!.Value);
+
+        viewModel.UndoCommand.Execute(null);
+
+        Assert.Equal($"Can't undo: tile {tileId} is cut from sheet grass_3.", viewModel.UndoRefusal);
+        Assert.True(viewModel.Catalog!.Tilesheets.ContainsKey("grass_3"));
+    }
+
+    [Fact]
     public void Undo_RefusedThenAnEdit_ClearsTheRefusal()
     {
         var viewModel = Open(CopyOfRepositoryContent());

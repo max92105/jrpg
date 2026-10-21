@@ -289,10 +289,19 @@ internal sealed partial class MainViewModel : ObservableObject
         NotifyUndoRedoChanged();
     }
 
-    // The first tile the undo would remove that something still uses, named with its first user (decision 117).
+    // The first tile the undo would remove that something still uses, named with its first user (decision 117); or the
+    // first tile cut from a sheet it would remove.
     private string? RefusalOfCatalogUndo()
     {
-        foreach (var tileId in Content!.TilesRemovedByUndo())
+        foreach (var sheetId in Content!.SheetsRemovedByUndo())
+        {
+            if (CatalogUsage.TilesCutFrom(sheetId, Content.Current) is [var cutTileId, ..])
+            {
+                return $"Can't undo: tile {cutTileId} is cut from sheet {sheetId}.";
+            }
+        }
+
+        foreach (var tileId in Content.TilesRemovedByUndo())
         {
             if (CatalogUsage.UsersOfTile(tileId, Content.Current, CurrentMap?.Map.Layout) is [var user, ..])
             {

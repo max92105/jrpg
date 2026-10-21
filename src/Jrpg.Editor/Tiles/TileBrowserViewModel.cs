@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Jrpg.Core.Maps;
 using Jrpg.Editor.Catalogs;
 
@@ -12,7 +13,10 @@ namespace Jrpg.Editor.Tiles;
 internal sealed partial class TileBrowserViewModel : ObservableObject
 {
     private readonly CatalogDraft _catalog;
+    private readonly IReadOnlyList<string> _imageFiles;
     private readonly Func<string, (int Width, int Height)> _imageSizeOf;
+    // The sheets the choices were built from; a catalog change replaces this dictionary only when it changes a sheet.
+    private IReadOnlyDictionary<string, TilesheetDefinition> _listedSheets;
 
     /// <param name="catalog">The sheets and tiles.</param>
     /// <param name="imageFiles">Every image in the tilesheet folder, in the order the sheet box lists them.</param>
@@ -20,21 +24,28 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     public TileBrowserViewModel(CatalogDraft catalog, IReadOnlyList<string> imageFiles, Func<string, (int Width, int Height)> imageSizeOf)
     {
         _catalog = catalog;
+        _imageFiles = imageFiles;
         _imageSizeOf = imageSizeOf;
         catalog.PropertyChanged += OnCatalogChanged;
-        SheetChoices = ChoicesOf(imageFiles, catalog.Current.Tilesheets.Values);
+        _listedSheets = catalog.Current.Tilesheets;
+        SheetChoices = ChoicesOf(imageFiles, _listedSheets.Values);
         SelectedChoice = SheetChoices.Count > 0 ? SheetChoices[0] : null;
     }
 
     /// <summary>Every image, each set-up sheet by its id; an image cut into two sheets is listed twice.</summary>
-    public IReadOnlyList<SheetChoice> SheetChoices { get; }
+    [ObservableProperty]
+    public partial IReadOnlyList<SheetChoice> SheetChoices { get; private set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(SelectedSheet), nameof(SheetTiles), nameof(ChoiceText))]
+    [NotifyPropertyChangedFor(nameof(SelectedSheet), nameof(SheetTiles), nameof(ChoiceText), nameof(CanSetUpSheet))]
+    [NotifyCanExecuteChangedFor(nameof(SetUpSheetCommand))]
     public partial SheetChoice? SelectedChoice { get; set; }
 
     /// <summary>How the shown image is cut; null when it isn't set up yet.</summary>
     public TilesheetDefinition? SelectedSheet => SelectedChoice?.Sheet;
+
+    /// <summary>Whether the shown image has no sheet yet, so Set up can make one.</summary>
+    public bool CanSetUpSheet => SelectedChoice is { Sheet: null };
 
     /// <summary>The tiles cut from the shown sheet.</summary>
     public IReadOnlyList<TileDefinition> SheetTiles =>
@@ -96,6 +107,27 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
         SelectedCell = new SheetCell(tile.SheetId, tile.Column, tile.Row);
     }
 
+    /// <summary>
+    /// Makes the shown image a sheet, as one undo step: id from its file name (decision 118), square tiles of the guessed
+    /// size, no margin or spacing.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanSetUpSheet))]
+    private void SetUpSheet()
+    {
+        var file = SelectedChoice!.File;
+        var (width, height) = _imageSizeOf(file);
+        var tileSize = SheetCutGuess.TileSizeFor(width, height);
+        _catalog.SetTilesheet(new TilesheetDefinition
+        {
+            Id = TilesheetIds.FromFile(file, [.. _catalog.Current.Tilesheets.Keys]),
+            File = file,
+            TileWidth = tileSize,
+            TileHeight = tileSize,
+            Margin = 0,
+            Spacing = 0,
+        });
+    }
+
     // Matched ignoring case, as Windows finds the file a sheet names whatever its case.
     private static SheetChoice[] ChoicesOf(IReadOnlyList<string> imageFiles, IEnumerable<TilesheetDefinition> sheets)
     {
@@ -105,7 +137,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
             : [new SheetChoice(file, null)])];
     }
 
-    // A tile made by painting is marked on the sheet, and named under it, at once.
+    // A tile made by painting is marked on the sheet, and named under it, at once; a sheet set up or undone is listed anew.
     private void OnCatalogChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName != nameof(CatalogDraft.Current))
@@ -113,8 +145,28 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
             return;
         }
 
+        if (!ReferenceEquals(_catalog.Current.Tilesheets, _listedSheets))
+        {
+            ListSheetsAnew();
+        }
+
         OnPropertyChanged(nameof(SheetTiles));
         OnPropertyChanged(nameof(SelectedTileId));
         OnPropertyChanged(nameof(ChoiceText));
+    }
+
+    // The same image stays shown, by its sheet if that is still there, else by its file. A chosen cell whose sheet is gone
+    // is let go, so painting never makes a tile on a sheet that doesn't exist.
+    private void ListSheetsAnew()
+    {
+        var shown = SelectedChoice;
+        _listedSheets = _catalog.Current.Tilesheets;
+        SheetChoices = ChoicesOf(_imageFiles, _listedSheets.Values);
+        SelectedChoice = SheetChoices.FirstOrDefault(choice => choice.Sheet is { } sheet && sheet.Id == shown?.Sheet?.Id)
+            ?? SheetChoices.FirstOrDefault(choice => string.Equals(choice.File, shown?.File, StringComparison.OrdinalIgnoreCase));
+        if (SelectedCell is { } cell && !_listedSheets.ContainsKey(cell.SheetId))
+        {
+            SelectedCell = null;
+        }
     }
 }

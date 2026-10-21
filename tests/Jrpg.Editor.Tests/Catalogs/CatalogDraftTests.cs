@@ -149,6 +149,29 @@ public sealed class CatalogDraftTests
         Assert.True(_draft.IsDirty);
     }
 
+    [Fact]
+    public void SetTilesheet_NewId_AddsItAndMarksDirty()
+    {
+        _draft.SetTilesheet(Grass3);
+
+        Assert.Same(Grass3, _draft.Current.Tilesheets["grass_3"]);
+        Assert.True(_draft.IsDirty);
+    }
+
+    [Fact]
+    public void Undo_SetTilesheet_RemovesTheSheet()
+    {
+        _draft.SetTilesheet(Grass3);
+        Assert.Equal(["grass_3"], _draft.SheetsRemovedByUndo());
+
+        _draft.Undo();
+
+        Assert.False(_draft.Current.Tilesheets.ContainsKey("grass_3"));
+        Assert.False(_draft.IsDirty);
+    }
+
+    private static TilesheetDefinition Grass3 => new() { Id = "grass_3", File = "Grass3.png", TileWidth = 48, TileHeight = 48, Margin = 0, Spacing = 0 };
+
     // Far past any sheet's last cell, so no tile of the repository's content is cut from it.
     private SheetCell EmptyCell => new(_draft.Current.Tilesheets.Keys.First(), 999, 999);
 }

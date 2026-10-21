@@ -79,9 +79,22 @@ internal sealed partial class CatalogDraft : ObservableObject
         }
     }
 
+    /// <summary>Adds a sheet, or replaces the one with its id, as one undo step.</summary>
+    public void SetTilesheet(TilesheetDefinition sheet)
+    {
+        var before = Current.Tilesheets.GetValueOrDefault(sheet.Id);
+        Do(new CatalogEdit(
+            catalog => WithTilesheet(catalog, sheet),
+            catalog => before is null ? WithoutTilesheet(catalog, sheet.Id) : WithTilesheet(catalog, before)));
+    }
+
     /// <summary>The tiles the next undo would remove, so it can be refused while one is in use; empty when it removes none.</summary>
     public IReadOnlyList<int> TilesRemovedByUndo() =>
         _history.NextUndo is { } edit ? [.. Current.Tiles.Keys.Except(edit.Revert(Current).Tiles.Keys).Order()] : [];
+
+    /// <summary>The sheets the next undo would remove, so it can be refused while tiles are cut from one.</summary>
+    public IReadOnlyList<string> SheetsRemovedByUndo() =>
+        _history.NextUndo is { } edit ? [.. Current.Tilesheets.Keys.Except(edit.Revert(Current).Tilesheets.Keys).Order(StringComparer.Ordinal)] : [];
 
     /// <summary>Takes back the newest catalog step; nothing when there is none.</summary>
     public void Undo()
@@ -118,6 +131,12 @@ internal sealed partial class CatalogDraft : ObservableObject
 
     private static ContentCatalog WithoutTile(ContentCatalog catalog, int tileId) =>
         catalog with { Tiles = catalog.Tiles.Where(pair => pair.Key != tileId).ToDictionary() };
+
+    private static ContentCatalog WithTilesheet(ContentCatalog catalog, TilesheetDefinition sheet) =>
+        catalog with { Tilesheets = new Dictionary<string, TilesheetDefinition>(catalog.Tilesheets) { [sheet.Id] = sheet } };
+
+    private static ContentCatalog WithoutTilesheet(ContentCatalog catalog, string sheetId) =>
+        catalog with { Tilesheets = catalog.Tilesheets.Where(pair => pair.Key != sheetId).ToDictionary() };
 
     private TileDefinition NewTileAt(SheetCell cell, bool isWalkable) => new()
     {

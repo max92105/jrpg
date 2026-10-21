@@ -16,6 +16,7 @@ public sealed class TileBrowserViewModelTests
     {
         ["Dungeon.png"] = (54, 19),
         ["Forest.png"] = (96, 48),
+        ["Grass3.png"] = (96, 64),
     };
 
     private readonly CatalogDraft _draft = new(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")) with
@@ -98,6 +99,39 @@ public sealed class TileBrowserViewModelTests
         _browser.SelectCellAt(x, y);
 
         Assert.Equal(7, _browser.SelectedTileId);
+    }
+
+    // 96 x 64: 32 is the first common size that divides both sides.
+    [Fact]
+    public void SetUpSheetCommand_ImageNotSetUp_AddsTheGuessedSheetAndShowsIt()
+    {
+        _browser.SelectedChoice = _browser.SheetChoices[2];
+
+        _browser.SetUpSheetCommand.Execute(null);
+
+        var expected = new TilesheetDefinition { Id = "grass_3", File = "Grass3.png", TileWidth = 32, TileHeight = 32, Margin = 0, Spacing = 0 };
+        Assert.Equal(expected, _draft.Current.Tilesheets["grass_3"]);
+        Assert.Equal(expected, _browser.SelectedSheet);
+        Assert.Equal(["dungeon", "forest", "grass_3"], _browser.SheetChoices.Select(choice => choice.Label));
+    }
+
+    [Fact]
+    public void SetUpSheetCommand_SheetAlreadySetUp_CannotExecute()
+    {
+        Assert.False(_browser.SetUpSheetCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void Undo_SetUpOfTheChosenCellsSheet_ClearsTheChoice()
+    {
+        _browser.SelectedChoice = _browser.SheetChoices[2];
+        _browser.SetUpSheetCommand.Execute(null);
+        _browser.SelectCellAt(5, 5);
+
+        _draft.Undo();
+
+        Assert.Null(_browser.SelectedCell);
+        Assert.Equal(new SheetChoice("Grass3.png", null), _browser.SelectedChoice);
     }
 
     [Fact]

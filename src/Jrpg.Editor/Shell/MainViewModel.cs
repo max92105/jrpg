@@ -27,6 +27,7 @@ internal sealed partial class MainViewModel : ObservableObject
     private readonly ContentWriter _writer;
     private readonly Func<string, bool> _confirm;
     private readonly Dictionary<string, (int Width, int Height)> _sheetImageSizes = [];
+    private readonly UndoJournal _journal = new();
 
     /// <param name="contentRoot">The content folder to edit.</param>
     /// <param name="confirm">Asks the user a yes or no question, such as whether to drop unsaved changes; true for yes.</param>
@@ -61,6 +62,12 @@ internal sealed partial class MainViewModel : ObservableObject
             Painting = new TilePaintingViewModel(Content, Layer, SheetImageSizeOf);
             Marking = new WalkabilityMarking(Content, Painting.Browser);
             Content.PropertyChanged += OnContentChanged;
+            Content.StepRecorded += (_, _) => RecordStep(UndoTarget.Catalogs);
+            Content.RedoDropped += (_, _) =>
+            {
+                _journal.ForgetUndoneCatalogSteps();
+                NotifyUndoRedoChanged();
+            };
             Placing = new ObjectPlacingViewModel(Content, Layer);
             EventEditing = new EventEditingViewModel(Content) { MapIds = MapIds };
             if (MapIds.Count > 0)
@@ -226,6 +233,68 @@ internal sealed partial class MainViewModel : ObservableObject
         return true;
     }
 
+    /// <summary>Undoes the newest step, whether it went to the open map or to the catalogs (decision 117).</summary>
+    [RelayCommand(CanExecute = nameof(CanUndo))]
+    private void Undo()
+    {
+        // A stroke still being dragged is the newest step.
+        CurrentMap?.EndStroke();
+        if (!_journal.CanUndo)
+        {
+            return;
+        }
+
+        if (_journal.Undo() == UndoTarget.Map)
+        {
+            CurrentMap!.UndoCommand.Execute(null);
+        }
+        else
+        {
+            Content!.Undo();
+        }
+
+        NotifyUndoRedoChanged();
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRedo))]
+    private void Redo()
+    {
+        CurrentMap?.EndStroke();
+        if (!_journal.CanRedo)
+        {
+            return;
+        }
+
+        if (_journal.Redo() == UndoTarget.Map)
+        {
+            CurrentMap!.RedoCommand.Execute(null);
+        }
+        else
+        {
+            Content!.Redo();
+        }
+
+        NotifyUndoRedoChanged();
+    }
+
+    private bool CanUndo() => _journal.CanUndo;
+
+    private bool CanRedo() => _journal.CanRedo;
+
+    private void OnMapStepRecorded(object? sender, EventArgs e) => RecordStep(UndoTarget.Map);
+
+    private void RecordStep(UndoTarget step)
+    {
+        _journal.Record(step);
+        NotifyUndoRedoChanged();
+    }
+
+    private void NotifyUndoRedoChanged()
+    {
+        UndoCommand.NotifyCanExecuteChanged();
+        RedoCommand.NotifyCanExecuteChanged();
+    }
+
     /// <summary>Saves the open map if the game would load it; otherwise keeps it unsaved and shows why.</summary>
     [RelayCommand]
     private void Save()
@@ -266,6 +335,10 @@ internal sealed partial class MainViewModel : ObservableObject
     {
         oldValue?.PropertyChanged -= OnOpenMapChanged;
         newValue?.PropertyChanged += OnOpenMapChanged;
+        oldValue?.StepRecorded -= OnMapStepRecorded;
+        newValue?.StepRecorded += OnMapStepRecorded;
+        _journal.ForgetMapSteps();
+        NotifyUndoRedoChanged();
         Painting?.OpenMap = newValue;
         Placing?.OpenMap = newValue;
         EventEditing?.OpenMap = newValue;

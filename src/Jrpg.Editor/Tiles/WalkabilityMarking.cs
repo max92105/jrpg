@@ -30,7 +30,7 @@ internal sealed partial class WalkabilityMarking(CatalogDraft catalog, TileBrows
         }
         else
         {
-            catalog.SetWalkable(catalog.AddTile(cell), isWalkable: false);
+            catalog.AddBlockedTile(cell);
         }
     }
 }

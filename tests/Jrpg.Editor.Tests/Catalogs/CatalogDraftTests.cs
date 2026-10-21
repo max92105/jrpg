@@ -90,6 +90,65 @@ public sealed class CatalogDraftTests
         Assert.False(_draft.IsDirty);
     }
 
+    [Fact]
+    public void Undo_AfterSetWalkable_RestoresTheTile()
+    {
+        var tile = _draft.Current.Tiles.Values.First(tile => tile.IsWalkable);
+        _draft.SetWalkable(tile.Id, isWalkable: false);
+
+        _draft.Undo();
+
+        Assert.Equal(tile, _draft.Current.Tiles[tile.Id]);
+    }
+
+    [Fact]
+    public void Undo_BackToSavedVersion_IsClean()
+    {
+        var tile = _draft.Current.Tiles.Values.First(tile => tile.IsWalkable);
+        _draft.SetWalkable(tile.Id, isWalkable: false);
+        _draft.MarkSaved();
+        _draft.SetWalkable(tile.Id, isWalkable: true);
+
+        _draft.Undo();
+
+        Assert.False(_draft.IsDirty);
+    }
+
+    [Fact]
+    public void Undo_NothingDone_ChangesNothing()
+    {
+        var before = _draft.Current;
+
+        _draft.Undo();
+
+        Assert.Same(before, _draft.Current);
+    }
+
+    [Fact]
+    public void Undo_AddBlockedTile_RemovesTheTile()
+    {
+        _draft.AddBlockedTile(EmptyCell);
+        Assert.False(_draft.TileAt(EmptyCell)!.IsWalkable);
+
+        _draft.Undo();
+
+        Assert.Null(_draft.TileAt(EmptyCell));
+        Assert.False(_draft.IsDirty);
+    }
+
+    [Fact]
+    public void Undo_AfterAddTile_StaysDirty()
+    {
+        var tile = _draft.Current.Tiles.Values.First(tile => tile.IsWalkable);
+        _draft.SetWalkable(tile.Id, isWalkable: false);
+        _draft.AddTile(EmptyCell);
+
+        _draft.Undo();
+
+        Assert.NotNull(_draft.TileAt(EmptyCell));
+        Assert.True(_draft.IsDirty);
+    }
+
     // Far past any sheet's last cell, so no tile of the repository's content is cut from it.
     private SheetCell EmptyCell => new(_draft.Current.Tilesheets.Keys.First(), 999, 999);
 }

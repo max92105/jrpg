@@ -66,9 +66,9 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 
 | Folder | Purpose | Key types |
 |---|---|---|
-| Shell | The main window, its menu bar and editing modes; F1 lists the controls (a new gesture adds its line there) | `MainWindow`, `MainViewModel`, `EditingMode`, `MapEntry`, `ControlsHelpWindow` |
+| Shell | The main window, its menu bar and editing modes; one undo order over the map and the catalogs (`UndoJournal`); F1 lists the controls (a new gesture adds its line there) | `MainWindow`, `MainViewModel`, `EditingMode`, `MapEntry`, `ControlsHelpWindow`, `UndoJournal` |
 | Maps / Maps/Editing / Maps/Settings | The map document, its undoable edits, map settings and new maps | `MapViewModel`, `MapDraft`, `IMapEdit`, `EditHistory`, `MapSettingsViewModel`, `LayerChoiceViewModel`, `LayerEntry` |
-| Catalogs | The content the editor works on, read by every panel and the drawing; catalog changes go through it (ADR 0014) | `CatalogDraft`, `SheetCell` |
+| Catalogs | The content the editor works on, read by every panel and the drawing; catalog changes go through it as undo steps, each a `CatalogEdit` of two functions (ADR 0014) | `CatalogDraft`, `CatalogEdit`, `CatalogHistory`, `SheetCell` |
 | Tiles, Objects | Tile and object browsers, painting and placing; marking tiles blocked | `TilePaintingViewModel`, `WalkabilityMarking`, `ObjectPlacingViewModel` |
 | Events | Object and cell event dialogs and presets | `EventEditingViewModel`, `EventStepViewModel`, `EventPresets` |
 | Viewport | Zoom and pan | `ViewportTransform` |

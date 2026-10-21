@@ -31,6 +31,9 @@ internal sealed partial class MapViewModel : ObservableObject
         return viewModel;
     }
 
+    /// <summary>An edit or a finished stroke became an undo step.</summary>
+    public event EventHandler? StepRecorded;
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Layers))]
     public partial MapDefinition Map { get; private set; }
@@ -45,6 +48,7 @@ internal sealed partial class MapViewModel : ObservableObject
         EndStroke();
         _history.Do(edit);
         Refresh();
+        StepRecorded?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>Puts one tile, or empty to erase, on many cells as one undo step; cells off the map are skipped.</summary>
@@ -89,6 +93,7 @@ internal sealed partial class MapViewModel : ObservableObject
         {
             _history.Record(edit);
             Refresh();
+            StepRecorded?.Invoke(this, EventArgs.Empty);
         }
     }
 

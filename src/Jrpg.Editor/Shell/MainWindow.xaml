@@ -28,8 +28,8 @@
     <CommandBinding Command="Help" Executed="OnControlsHelpExecuted" />
   </Window.CommandBindings>
   <Window.InputBindings>
-    <KeyBinding Key="Z" Modifiers="Control" Command="{Binding CurrentMap.UndoCommand}" />
-    <KeyBinding Key="Y" Modifiers="Control" Command="{Binding CurrentMap.RedoCommand}" />
+    <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoCommand}" />
+    <KeyBinding Key="Y" Modifiers="Control" Command="{Binding RedoCommand}" />
     <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}" />
   </Window.InputBindings>
   <DockPanel>
@@ -42,8 +42,8 @@
         <MenuItem Header="Exit" Click="OnExitClicked" />
       </MenuItem>
       <MenuItem Header="Edit">
-        <MenuItem Header="Undo" Command="{Binding CurrentMap.UndoCommand}" InputGestureText="Ctrl+Z" />
-        <MenuItem Header="Redo" Command="{Binding CurrentMap.RedoCommand}" InputGestureText="Ctrl+Y" />
+        <MenuItem Header="Undo" Command="{Binding UndoCommand}" InputGestureText="Ctrl+Z" />
+        <MenuItem Header="Redo" Command="{Binding RedoCommand}" InputGestureText="Ctrl+Y" />
         <MenuItem Header="Delete selected objects" Command="{Binding Placing.DeleteSelectedObjectsCommand}" InputGestureText="Del" />
       </MenuItem>
       <MenuItem Header="View">
@@ -74,8 +74,8 @@
                Text="{Binding SaveError, StringFormat=Not saved: {0}, TargetNullValue=''}" />
     <ToolBar DockPanel.Dock="Top">
       <Button Content="Save (Ctrl+S)" Command="{Binding SaveCommand}" />
-      <Button Content="Undo (Ctrl+Z)" Command="{Binding CurrentMap.UndoCommand}" />
-      <Button Content="Redo (Ctrl+Y)" Command="{Binding CurrentMap.RedoCommand}" />
+      <Button Content="Undo (Ctrl+Z)" Command="{Binding UndoCommand}" />
+      <Button Content="Redo (Ctrl+Y)" Command="{Binding RedoCommand}" />
       <Separator />
       <CheckBox Content="Grid" IsChecked="{Binding IsGridShown}" />
       <Separator />

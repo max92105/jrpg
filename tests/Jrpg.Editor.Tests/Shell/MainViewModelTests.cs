@@ -190,6 +190,64 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
+    public void Undo_BlockedTileMarkThenPaint_UndoesThePaintFirst()
+    {
+        var viewModel = Open(_repositoryContent);
+        var blockedId = BlockFirstWalkableTile(viewModel);
+        PaintTopLeft(viewModel);
+
+        viewModel.UndoCommand.Execute(null);
+
+        Assert.False(viewModel.CurrentMap!.IsDirty);
+        Assert.False(viewModel.Catalog!.Tiles[blockedId].IsWalkable);
+        viewModel.UndoCommand.Execute(null);
+        Assert.True(viewModel.Catalog!.Tiles[blockedId].IsWalkable);
+        Assert.False(viewModel.HasUnsavedChanges);
+    }
+
+    [Fact]
+    public void Redo_AfterUndoingMarkAndPaint_RedoesTheMarkFirst()
+    {
+        var viewModel = Open(_repositoryContent);
+        var blockedId = BlockFirstWalkableTile(viewModel);
+        PaintTopLeft(viewModel);
+        viewModel.UndoCommand.Execute(null);
+        viewModel.UndoCommand.Execute(null);
+
+        viewModel.RedoCommand.Execute(null);
+
+        Assert.False(viewModel.Catalog!.Tiles[blockedId].IsWalkable);
+        Assert.False(viewModel.CurrentMap!.IsDirty);
+        viewModel.RedoCommand.Execute(null);
+        Assert.True(viewModel.CurrentMap.IsDirty);
+    }
+
+    [Fact]
+    public void Redo_NewTilePaintedOffTheMapAfterUndo_HasNothingToRedo()
+    {
+        var viewModel = Open(CopyOfRepositoryContent());
+        viewModel.Content!.AddBlockedTile(new SheetCell(viewModel.Catalog!.Tilesheets.Keys.First(), 999, 999));
+        viewModel.UndoCommand.Execute(null);
+        ChooseCellNotATile(viewModel);
+
+        viewModel.Painting!.PaintRectangle(new GridCell(-5, -5), new GridCell(-4, -4));
+
+        Assert.False(viewModel.RedoCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void Undo_CatalogStepAfterSwitchingMaps_UndoesIt()
+    {
+        var viewModel = Open(_repositoryContent);
+        var blockedId = BlockFirstWalkableTile(viewModel);
+        viewModel.TryOpenMap(viewModel.MapIds.First(id => id != viewModel.CurrentMap!.Map.Id));
+
+        viewModel.UndoCommand.Execute(null);
+
+        Assert.True(viewModel.Catalog!.Tiles[blockedId].IsWalkable);
+    }
+
+    [Fact]
     public void Save_CatalogChangedMapUnchanged_WritesTilesAndClearsUnsavedChanges()
     {
         var viewModel = Open(CopyOfRepositoryContent());

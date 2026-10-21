@@ -25,3 +25,4 @@ Code-health work waiting for the next cleanup plan; `/retro` appends to it. One 
 - `ContentWriter.WriteAll`: the final moves aren't atomic across files, and the cleanup's `File.Delete` can hide the first error when a folder is missing (review of E3c).
 - Editor: Space + drag pans only if the map had focus when Space was pressed (`HandleViewportKey` checks focus before setting `_isSpaceHeld`); with the Tiles panel focused, the drag paints instead (review of E2).
 - `MainViewModel` (367 lines after E4a): move the unsaved-change questions (`ConfirmClose`, `ConfirmLeaveCurrentMap`, which repeat their wording) or the map-list rebuild into their own type.
+- `MainViewModel` (about 440 lines after E4b1): move the undo routing (journal, `Undo`/`Redo` commands, which mirror each other, and the step event wiring) into its own type.

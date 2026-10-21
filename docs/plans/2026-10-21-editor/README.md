@@ -28,7 +28,7 @@ Everything is saved through Data (`ContentWriter`), checked by the loader's vali
 1. **The window (E1).** Small fixes the developer sees at once, layer choice included.
 2. **ADR 0014, then painting (E3a-E3d).** Painting is the reported breakage. E3a gives the editor one live catalog (the seam every catalog edit needs, every panel reading it); E3b lets any cell be chosen; E3c is the Data writer for the catalogs; E3d makes a cell a tile on first paint and saves it.
 3. **The menu bar (E2),** once painting works, so every later command has a home.
-4. **Walkability and catalog undo (E4a, E4b).** E4a is the first catalog change that doesn't touch the map; E4b makes Ctrl+Z undo it (decision 117), before more kinds of catalog change arrive.
+4. **Walkability and catalog undo (E4a, E4b1, E4b2).** E4a is the first catalog change that doesn't touch the map; E4b1 makes Ctrl+Z undo it (decision 117) and E4b2 refuses an undo that would remove a tile in use, before more kinds of catalog change arrive.
 5. **Sheets (E5a-E7).** Listing every image first, then setting up new sheets (no tile can change under them), then re-cutting sheets, then importing images from outside `content/`.
 6. **Collision and zones (E8-E11b).** The overlay first, so every later shape edit is checked on the map; then the shapes window with a plain behavior (collision, then zones), then its tools, then its look.
 7. **New objects (E12a, E12b)** from sheet cells, ending in the shapes window.
@@ -74,7 +74,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 3: walkability and catalog undo
 
 - [x] **E4a. Blocked tiles: Mark blocked** (Editor, about 180 lines) → [slices/E4a.md](slices/E4a.md)
-- [ ] **E4b. Ctrl+Z undoes catalog changes** (Editor, about 300 lines) → [slices/E4b.md](slices/E4b.md)
+- [x] **E4b1. Ctrl+Z undoes catalog changes** (Editor, about 320 lines) → [slices/E4b1.md](slices/E4b1.md)
+- [ ] **E4b2. An undo that would remove a used tile is refused** (Editor, about 150 lines) → [slices/E4b2.md](slices/E4b2.md)
 
 ### Phase 4: sheets
 

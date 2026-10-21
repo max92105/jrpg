@@ -73,7 +73,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 3: walkability and catalog undo
 
-- [ ] **E4a. Blocked tiles: Mark blocked** (Editor, about 180 lines) → [slices/E4a.md](slices/E4a.md)
+- [x] **E4a. Blocked tiles: Mark blocked** (Editor, about 180 lines) → [slices/E4a.md](slices/E4a.md)
 - [ ] **E4b. Ctrl+Z undoes catalog changes** (Editor, about 300 lines) → [slices/E4b.md](slices/E4b.md)
 
 ### Phase 4: sheets

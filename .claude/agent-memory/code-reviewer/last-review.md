@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-21-editor/slices/E2.md, E2 (menu bar and controls help window)
-Round: 1 (verdict: Ready to commit; verify all pass, 1350 tests)
+Slice: docs/plans/2026-10-21-editor/slices/E4a.md, E4a (Mark blocked)
+Round: 1 (verdict: Ready to commit; verify all pass, 1358 tests)
 
-- open (Suggestion): ControlsHelpWindow Events line "Right click a cell: remove its event" omits that an object on the cell blocks it (HandleEventButton).
-- open (Suggestion): F1 pressed twice opens two modeless help windows; keep one and Activate it.
-- open (Suggestion): Edit > Delete selected objects runs in every mode, the Del key only in Objects mode; gesture text "Del" suggests they match.
-- open (Follow-up): Space + drag pans only if the map had focus when Space went down (HandleViewportKey checks focus; mouse down reads _isSpaceHeld before focusing).
+- open (Suggestion): TileBrowserViewModel.OnCatalogChanged reacts to every CatalogDraft property, so the now-observable IsDirty rebuilds SheetTiles and redraws the sheet marks on first edit and on each save; filter on nameof(CatalogDraft.Current).
+- open (Suggestion): ConfirmClose with map + tiles dirty ("Map 'x' and the tiles have...") has no test; only the tiles-only text is pinned.
+- open (Suggestion): ConfirmClose repeats ConfirmLeaveCurrentMap's EndStroke + "Discard them?" wording; one private method building the "what's unsaved" phrase would keep both texts in step.
+- open (Follow-up): MainViewModel.cs at 367 lines (was ~337 before the slice); split dirty/confirm questions or map-list handling out.

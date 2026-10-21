@@ -53,6 +53,9 @@
         <MenuItem Header="Fit map" Click="OnFitClicked" InputGestureText="Ctrl+0" />
         <MenuItem Header="Actual size" Click="OnActualSizeClicked" InputGestureText="Ctrl+1" />
       </MenuItem>
+      <MenuItem Header="Tiles">
+        <MenuItem Header="Mark blocked" IsCheckable="True" IsChecked="{Binding Marking.IsMarkingBlocked}" />
+      </MenuItem>
       <MenuItem Header="Map">
         <MenuItem Header="Settings..." Click="OnMapSettingsClicked" />
         <MenuItem Header="Add layer..." Click="OnAddLayerMenuClicked" />
@@ -108,7 +111,7 @@
     <StatusBar DockPanel.Dock="Bottom">
       <StatusBarItem Content="{Binding CursorStatus}" />
       <StatusBarItem Content="Unsaved changes"
-                     Visibility="{Binding CurrentMap.IsDirty, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}" />
+                     Visibility="{Binding HasUnsavedChanges, Converter={StaticResource VisibleWhenTrue}}" />
       <StatusBarItem x:Name="ZoomStatus" HorizontalAlignment="Right" />
     </StatusBar>
     <ListBox x:Name="MapList"
@@ -136,7 +139,14 @@
       </DockPanel>
       <TabControl x:Name="EditingTabs" SelectionChanged="OnEditingTabChanged">
         <TabItem Header="Tiles">
-          <tiles:TileBrowserView x:Name="TileBrowser" DataContext="{Binding Painting.Browser}" />
+          <DockPanel>
+            <CheckBox DockPanel.Dock="Top"
+                      Margin="0,4"
+                      Content="Mark blocked"
+                      ToolTip="While on, a click on a cell flips it between walkable and blocked (red cross) instead of choosing it."
+                      IsChecked="{Binding Marking.IsMarkingBlocked}" />
+            <tiles:TileBrowserView x:Name="TileBrowser" DataContext="{Binding Painting.Browser}" />
+          </DockPanel>
         </TabItem>
         <!-- Click places the chosen object, Shift + drag moves one, right click or Delete removes, Ctrl + drag selects. -->
         <TabItem x:Name="ObjectsTab" Header="Objects">

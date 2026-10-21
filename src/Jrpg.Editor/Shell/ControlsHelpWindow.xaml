@@ -22,7 +22,7 @@
       <TextBlock Style="{StaticResource Heading}" Text="Anywhere" />
       <TextBlock Style="{StaticResource Lines}">
         Ctrl+N: new map.<LineBreak />
-        Ctrl+S: save the map (and the tiles it made).<LineBreak />
+        Ctrl+S: save the map and the tiles.<LineBreak />
         Ctrl+Z / Ctrl+Y: undo / redo.<LineBreak />
         F1: this list.
       </TextBlock>
@@ -43,6 +43,7 @@
         B: brush (paints as you drag). R: rectangle (filled on release). F: fill (click).<LineBreak />
         Shift + click: fill, with any tool.<LineBreak />
         Alt + click: pick the tile and layer under the mouse.<LineBreak />
+        Mark blocked (Tiles panel or menu): while on, a click on a sheet cell flips it between walkable and blocked (red cross).<LineBreak />
         [ and ]: smaller / larger brush.<LineBreak />
         Fill layer / Clear layer: the whole chosen layer.
       </TextBlock>

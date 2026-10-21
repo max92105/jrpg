@@ -18,7 +18,8 @@ internal sealed partial class CatalogDraft : ObservableObject
     public partial ContentCatalog Current { get; private set; }
 
     /// <summary>Whether a tile, sheet or object changed since the catalogs were last saved.</summary>
-    public bool IsDirty { get; private set; }
+    [ObservableProperty]
+    public partial bool IsDirty { get; private set; }
 
     /// <summary>The tile cut from a sheet cell, or null when the cell isn't a tile yet.</summary>
     public TileDefinition? TileAt(SheetCell cell) =>
@@ -36,6 +37,19 @@ internal sealed partial class CatalogDraft : ObservableObject
         IsDirty = true;
         Current = Current with { Tiles = new Dictionary<int, TileDefinition>(Current.Tiles) { [id] = tile } };
         return id;
+    }
+
+    /// <summary>Whether the player can walk onto the tile (Core's walkability rule); nothing changes when it already is.</summary>
+    public void SetWalkable(int tileId, bool isWalkable)
+    {
+        var tile = Current.Tiles[tileId];
+        if (tile.IsWalkable == isWalkable)
+        {
+            return;
+        }
+
+        IsDirty = true;
+        Current = Current with { Tiles = new Dictionary<int, TileDefinition>(Current.Tiles) { [tileId] = tile with { IsWalkable = isWalkable } } };
     }
 
     public void MarkSaved() => IsDirty = false;

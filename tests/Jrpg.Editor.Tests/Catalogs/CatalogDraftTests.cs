@@ -67,6 +67,29 @@ public sealed class CatalogDraftTests
         Assert.False(_draft.IsDirty);
     }
 
+    [Fact]
+    public void SetWalkable_ExistingTile_ReplacesItAndMarksDirty()
+    {
+        var tile = _draft.Current.Tiles.Values.First(tile => tile.IsWalkable);
+
+        _draft.SetWalkable(tile.Id, isWalkable: false);
+
+        Assert.Equal(tile with { IsWalkable = false }, _draft.Current.Tiles[tile.Id]);
+        Assert.True(_draft.IsDirty);
+    }
+
+    [Fact]
+    public void SetWalkable_SameValue_StaysClean()
+    {
+        var before = _draft.Current;
+        var tile = before.Tiles.Values.First(tile => tile.IsWalkable);
+
+        _draft.SetWalkable(tile.Id, isWalkable: true);
+
+        Assert.Same(before, _draft.Current);
+        Assert.False(_draft.IsDirty);
+    }
+
     // Far past any sheet's last cell, so no tile of the repository's content is cut from it.
     private SheetCell EmptyCell => new(_draft.Current.Tilesheets.Keys.First(), 999, 999);
 }

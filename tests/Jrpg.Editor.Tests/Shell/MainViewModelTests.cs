@@ -156,6 +156,53 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
+    public void ConfirmClose_UnsavedCatalogChange_AsksTheUser()
+    {
+        var viewModel = Open(_repositoryContent);
+        BlockFirstWalkableTile(viewModel);
+
+        Assert.False(viewModel.ConfirmClose());
+        Assert.Equal(["The tiles have unsaved changes. Discard them?"], _questions);
+    }
+
+    [Fact]
+    public void ConfirmClose_UnsavedMapAndCatalogChanges_AsksOnceNamingBoth()
+    {
+        var viewModel = Open(_repositoryContent);
+        BlockFirstWalkableTile(viewModel);
+        PaintTopLeft(viewModel);
+
+        Assert.False(viewModel.ConfirmClose());
+        Assert.Equal([$"Map '{viewModel.CurrentMap!.Map.Id}' and the tiles have unsaved changes. Discard them?"], _questions);
+    }
+
+    [Fact]
+    public void TryOpenMap_UnsavedCatalogChangeOnly_OpensWithoutAsking()
+    {
+        var viewModel = Open(_repositoryContent);
+        BlockFirstWalkableTile(viewModel);
+        var otherMapId = viewModel.MapIds.First(id => id != viewModel.CurrentMap!.Map.Id);
+
+        Assert.True(viewModel.TryOpenMap(otherMapId));
+
+        Assert.Empty(_questions);
+        Assert.True(viewModel.HasUnsavedChanges);
+    }
+
+    [Fact]
+    public void Save_CatalogChangedMapUnchanged_WritesTilesAndClearsUnsavedChanges()
+    {
+        var viewModel = Open(CopyOfRepositoryContent());
+        var blockedId = BlockFirstWalkableTile(viewModel);
+
+        viewModel.SaveCommand.Execute(null);
+
+        Assert.Null(viewModel.SaveError);
+        Assert.False(viewModel.HasUnsavedChanges);
+        Assert.False(ContentCatalogLoader.Load(_contentCopy).Tiles[blockedId].IsWalkable);
+    }
+
+    [Fact]
     public void Save_MapPaintedWithNewTile_WritesTileAndMapThatLoadBack()
     {
         var viewModel = Open(CopyOfRepositoryContent());
@@ -421,6 +468,13 @@ public sealed class MainViewModelTests : IDisposable
                     select new SheetCell(sheet.Id, column, row)).First(cell => viewModel.Content!.TileAt(cell) is null);
         browser.SelectCellAt(sheet.CellLeft(cell.Column), sheet.CellTop(cell.Row));
         return cell;
+    }
+
+    private static int BlockFirstWalkableTile(MainViewModel viewModel)
+    {
+        var tileId = viewModel.Catalog!.Tiles.Values.First(tile => tile.IsWalkable).Id;
+        viewModel.Content!.SetWalkable(tileId, isWalkable: false);
+        return tileId;
     }
 
     private byte[] TilesAndForestBytes() =>

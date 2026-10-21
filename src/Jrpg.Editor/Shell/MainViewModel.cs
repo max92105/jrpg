@@ -59,6 +59,8 @@ internal sealed partial class MainViewModel : ObservableObject
         {
             ShowMapList(Content.Current);
             Painting = new TilePaintingViewModel(Content, Layer, SheetImageSizeOf);
+            Marking = new WalkabilityMarking(Content, Painting.Browser);
+            Content.PropertyChanged += OnContentChanged;
             Placing = new ObjectPlacingViewModel(Content, Layer);
             EventEditing = new EventEditingViewModel(Content) { MapIds = MapIds };
             if (MapIds.Count > 0)
@@ -96,6 +98,9 @@ internal sealed partial class MainViewModel : ObservableObject
 
     /// <summary>Null when the content or its art didn't load.</summary>
     public TilePaintingViewModel? Painting { get; }
+
+    /// <summary>Null when the content or its art didn't load.</summary>
+    public WalkabilityMarking? Marking { get; }
 
     /// <summary>Null when the content or its art didn't load.</summary>
     public ObjectPlacingViewModel? Placing { get; }
@@ -161,8 +166,21 @@ internal sealed partial class MainViewModel : ObservableObject
         return true;
     }
 
+    /// <summary>Whether the open map or the tiles changed since they were saved; the tiles' changes stay when another map opens.</summary>
+    public bool HasUnsavedChanges => CurrentMap is { IsDirty: true } || Content is { IsDirty: true };
+
     /// <summary>Whether the editor may close: nothing unsaved, or the user agreed, when asked, to drop it.</summary>
-    public bool ConfirmClose() => ConfirmLeaveCurrentMap();
+    public bool ConfirmClose()
+    {
+        if (Content is not { IsDirty: true })
+        {
+            return ConfirmLeaveCurrentMap();
+        }
+
+        CurrentMap?.EndStroke();
+        var unsaved = CurrentMap is { IsDirty: true } open ? $"Map '{open.Map.Id}' and the tiles have" : "The tiles have";
+        return _confirm($"{unsaved} unsaved changes. Discard them?");
+    }
 
     /// <param name="cell">The cell under the cursor, or null when the cursor left the view.</param>
     public void ShowCursorAt(GridCell? cell)
@@ -252,6 +270,7 @@ internal sealed partial class MainViewModel : ObservableObject
         Placing?.OpenMap = newValue;
         EventEditing?.OpenMap = newValue;
         RefreshLayerEntries();
+        OnPropertyChanged(nameof(HasUnsavedChanges));
     }
 
     // A save can add a map or rename one, so both lists are rebuilt; the ids only when they changed, since the window
@@ -285,11 +304,23 @@ internal sealed partial class MainViewModel : ObservableObject
         return size;
     }
 
+    private void OnContentChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(CatalogDraft.IsDirty))
+        {
+            OnPropertyChanged(nameof(HasUnsavedChanges));
+        }
+    }
+
     private void OnOpenMapChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(MapViewModel.Map))
         {
             RefreshLayerEntries();
+        }
+        else if (e.PropertyName == nameof(MapViewModel.IsDirty))
+        {
+            OnPropertyChanged(nameof(HasUnsavedChanges));
         }
     }
 

@@ -23,6 +23,9 @@ internal sealed partial class TileBrowserView : UserControl
     /// <summary>Where the sheets' images come from; set by the window, which shares it with the map drawing.</summary>
     public TileImages? Images { get; set; }
 
+    /// <summary>While it marks blocked tiles, a click flips the cell instead of choosing it; set by the window.</summary>
+    public WalkabilityMarking? Marking { get; set; }
+
     private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
         _browser?.PropertyChanged -= OnBrowserChanged;
@@ -60,6 +63,13 @@ internal sealed partial class TileBrowserView : UserControl
     private void OnSheetClicked(object sender, MouseButtonEventArgs e)
     {
         var pixel = e.GetPosition(SheetView);
-        _browser?.SelectCellAt(pixel.X, pixel.Y);
+        if (Marking is { IsMarkingBlocked: true })
+        {
+            Marking.FlipCellAt(pixel.X, pixel.Y);
+        }
+        else
+        {
+            _browser?.SelectCellAt(pixel.X, pixel.Y);
+        }
     }
 }

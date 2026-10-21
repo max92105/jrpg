@@ -89,6 +89,11 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     // A tile made by painting is marked on the sheet, and named under it, at once.
     private void OnCatalogChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName != nameof(CatalogDraft.Current))
+        {
+            return;
+        }
+
         OnPropertyChanged(nameof(SheetTiles));
         OnPropertyChanged(nameof(SelectedTileId));
         OnPropertyChanged(nameof(ChoiceText));

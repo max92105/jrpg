@@ -24,3 +24,4 @@ Code-health work waiting for the next cleanup plan; `/retro` appends to it. One 
 - **"Load the latest save" and the save-list overlay are written twice** (`TitleScene`, `DefeatScreen`/`DefeatScreenView`), and the banner band twice (`BattleBannerView`, `BattleScene.DrawEscaped`). Share each on a third copy.
 - `ContentWriter.WriteAll`: the final moves aren't atomic across files, and the cleanup's `File.Delete` can hide the first error when a folder is missing (review of E3c).
 - Editor: Space + drag pans only if the map had focus when Space was pressed (`HandleViewportKey` checks focus before setting `_isSpaceHeld`); with the Tiles panel focused, the drag paints instead (review of E2).
+- `MainViewModel` (367 lines after E4a): move the unsaved-change questions (`ConfirmClose`, `ConfirmLeaveCurrentMap`, which repeat their wording) or the map-list rebuild into their own type.

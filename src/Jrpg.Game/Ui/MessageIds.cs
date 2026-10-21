@@ -282,6 +282,9 @@ internal static class MessageIds
     /// <summary>The victory screen's footer hint once everything has filled: Confirm leaves.</summary>
     public const string BattleVictoryNext = "battle_victory_next";
 
+    /// <summary>The banner after a successful Run.</summary>
+    public const string BattleEscaped = "battle_escaped";
+
     /// <summary>Shown on the victory screen by a member whose bar filled a level.</summary>
     public const string BattleLevelUp = "battle_level_up";
 }

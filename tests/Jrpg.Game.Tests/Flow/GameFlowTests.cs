@@ -216,6 +216,8 @@ public sealed class GameFlowTests : IDisposable
         flow.Update(TimeSpan.FromSeconds(0.5), default);
         Assert.Null(session.ActiveBattle);
 
+        // "Escaped" shows for 1.5 s before the fade back to the map.
+        flow.Update(TimeSpan.FromSeconds(1.5), default);
         flow.Update(_wholeFade, default);
         Assert.Equal(battlePosition, session.Exploration.PlayerPosition);
 

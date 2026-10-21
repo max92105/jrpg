@@ -103,5 +103,6 @@
   "battle_victory": "Victory!",
   "battle_level_label": "Lv.",
   "battle_level_up": "Level Up!",
-  "battle_victory_next": "Next"
+  "battle_victory_next": "Next",
+  "battle_escaped": "Escaped"
 }

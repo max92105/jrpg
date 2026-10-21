@@ -5,11 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-battle/slices/B7b2.md, B7b2 (victory timing: VictoryEntrance, LevelUpPop, ExperienceBarAnimation.SinceLastLevelUp, "Next" hint)
-Round: 1 (verdict: Ready to commit; verify all pass, 1289 tests)
+Slice: docs/plans/2026-10-20-battle/slices/B8a.md, B8a (Escaped: EscapedNotice, BattleScene.DrawEscaped/UpdateOutcomeScreen)
+Round: 1 (verdict: Ready to commit; verify all pass, 1294 tests)
 
-- open (Suggestion): cubic ease-out + clamped share copied in LevelUpPop.ScaleAt and VictoryEntrance.EaseOut/ShareOf; share one (third copy would be a Warning).
-- open (Suggestion): VictoryEntranceTests header says the bars wait "0.5 s past the last card's start"; code/legacy wait 0.5 s past firstCardDelay + stagger*count (0.1 s after the last card's start).
-- open (Suggestion): VictoryScreenTests.Update_Done_ShowsNextHint asserts in the Arrange section; split into its own fact or drop (BarsWait covers it).
+- open (Suggestion): DrawEscaped copies BattleBannerView's band drawing (Banner gradient + two HighlightLine hairlines + centered text); a third copy (e.g. B8b defeat) should become a shared band shape in Ui.
+- open (Suggestion): the Confirm-to-leave path is only unit-tested on EscapedNotice, not through BattleScene (scene tests use the 10 s Settle).
 - open (Follow-up): max-level member shows "EXP 0 /0" and an empty bar (carried from B7a).
-- open (Follow-up): cards grow down by index/2 with no cap; >6 active members run into the footer (carried from B7b1).
+- open (Follow-up): victory cards grow down by index/2 with no cap; >6 active members run into the footer (carried from B7b1).

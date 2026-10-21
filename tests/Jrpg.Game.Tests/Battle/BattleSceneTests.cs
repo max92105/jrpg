@@ -18,7 +18,7 @@ public sealed class BattleSceneTests
     private static readonly InputFrame _confirm = InputFrames.Pressing(GameButton.Confirm);
 
     [Fact]
-    public void Update_ConfirmRun_RequestsBattleFinishedAndClearsEncounter()
+    public void Update_ConfirmRun_ShowsEscapedAndClearsEncounter()
     {
         var (session, scene) = StartForestBattle(StartMapScenarios.NextToForestWarpAlwaysRolling);
         scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Up));
@@ -26,9 +26,22 @@ public sealed class BattleSceneTests
 
         var request = Settle(scene);
 
-        Assert.IsType<BattleFinished>(request);
+        Assert.Null(request);
         Assert.Null(session.ActiveBattle);
         Assert.Null(session.Exploration.PendingEncounter);
+    }
+
+    [Fact]
+    public void Update_RunThenWait_RequestsBattleFinished()
+    {
+        var (_, scene) = StartForestBattle(StartMapScenarios.NextToForestWarpAlwaysRolling);
+        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Up));
+        scene.Update(StartMapScenarios.OneUpdate, _confirm);
+        Settle(scene);
+
+        var request = Settle(scene);
+
+        Assert.IsType<BattleFinished>(request);
     }
 
     [Fact]
@@ -37,6 +50,7 @@ public sealed class BattleSceneTests
         var (_, scene) = StartForestBattle(StartMapScenarios.NextToForestWarpAlwaysRolling);
         scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Up));
         scene.Update(StartMapScenarios.OneUpdate, _confirm);
+        Settle(scene);
         Settle(scene);
 
         var request = scene.Update(StartMapScenarios.OneUpdate, _confirm);

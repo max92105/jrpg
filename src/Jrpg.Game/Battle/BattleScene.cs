@@ -1,3 +1,4 @@
+using FontStashSharp;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Items;
 using Jrpg.Core.Session;
@@ -18,12 +19,17 @@ namespace Jrpg.Game.Battle;
 /// </summary>
 internal sealed class BattleScene : IScene
 {
+    // Legacy EscapedScreen: "Escaped" at 64 px on a band padded 18 px.
+    private const int EscapedTextPixels = 64;
+    private const int EscapedPaddingY = 18;
+
     private readonly GameSession _session;
     private readonly BattleState _battle;
     private readonly TurnOrderStrip _turnOrderStrip = new();
     private readonly TurnOrderView _turnOrder;
     private readonly UiTextures _ui;
     private readonly ScreenText _text;
+    private readonly SpriteFontBase _escapedFont;
     private readonly BattlersView _battlers;
     private readonly BattleTurnSequence _sequence;
     private readonly string _backgroundFile;
@@ -40,6 +46,8 @@ internal sealed class BattleScene : IScene
     private bool _isFinished;
     private VictoryScreen? _victory;
     private VictoryScreenView? _victoryView;
+    private EscapedNotice? _escaped;
+    private MeasuredText _escapedText;
 
     /// <param name="session">The playthrough whose active battle this screen shows.</param>
     /// <param name="items">Every item by id, from the catalog, for the party's items.</param>
@@ -50,6 +58,7 @@ internal sealed class BattleScene : IScene
     {
         _session = session;
         _text = text;
+        _escapedFont = text.Fonts.FontAt(EscapedTextPixels);
         _ui = ui;
         var battle = session.ActiveBattle ?? throw new InvalidOperationException("A battle screen needs an active battle.");
         _battle = battle;
@@ -70,20 +79,15 @@ internal sealed class BattleScene : IScene
     }
 
     /// <returns>
-    /// <see cref="BattleFinished"/> when the victory screen is left, or on the update an escape ends the battle;
+    /// <see cref="BattleFinished"/> when the victory screen or the escaped notice is left;
     /// <see cref="TitleRequested"/> on the update a defeat ends it, until the defeat screen (plan 2026-10-20-battle, B8b).
     /// Null otherwise.
     /// </returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
-        if (_victory is { } victory)
-        {
-            return victory.Update(delta, input);
-        }
-
         if (_isFinished)
         {
-            return null;
+            return UpdateOutcomeScreen(delta, input);
         }
 
         if (_sequence.IsAwaitingCommand && _commands.Update(input) is { } command)
@@ -128,6 +132,11 @@ internal sealed class BattleScene : IScene
         {
             _commandPanel.Draw(batch, textures, _sequence.Actor);
         }
+
+        if (_escaped is not null)
+        {
+            DrawEscaped(batch, textures);
+        }
     }
 
     // Text is formatted at stage changes, never per frame: the vitals once an action lands, the order when a turn starts.
@@ -157,8 +166,12 @@ internal sealed class BattleScene : IScene
         }
     }
 
-    // A victory stays on this screen for its rewards; an escape or a defeat leaves at once.
-    private SceneRequest? Finish()
+    // After a defeat there is no screen yet (plan 2026-10-20-battle, B8b), so nothing more is requested.
+    private SceneRequest? UpdateOutcomeScreen(TimeSpan delta, InputFrame input) =>
+        _victory is { } victory ? victory.Update(delta, input) : _escaped?.Update(delta, input);
+
+    // A victory stays on this screen for its rewards and an escape for its notice; a defeat leaves at once.
+    private TitleRequested? Finish()
     {
         _isFinished = true;
         var outcome = _battle.Phase;
@@ -169,7 +182,27 @@ internal sealed class BattleScene : IScene
             return null;
         }
 
-        return outcome == BattlePhase.Defeat ? new TitleRequested() : new BattleFinished();
+        if (outcome == BattlePhase.Escaped)
+        {
+            _escaped = new EscapedNotice();
+            _escapedText = MeasuredText.Of(_escapedFont, _text.Messages.Text(MessageIds.BattleEscaped));
+            return null;
+        }
+
+        return new TitleRequested();
+    }
+
+    // Legacy EscapedScreen: the battle under a scrim, and "Escaped" on a banner band across the middle of the screen.
+    private void DrawEscaped(SpriteBatch batch, TextureLibrary textures)
+    {
+        batch.Draw(textures.Pixel, new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height), UiTheme.Scrim);
+        var height = (int)_escapedFont.LineHeight + (2 * EscapedPaddingY);
+        var band = new Rectangle(0, (VirtualScreen.Height - height) / 2, VirtualScreen.Width, height);
+        batch.Draw(_ui.Gradient(textures, UiTheme.Banner), band, Color.White);
+        var line = _ui.Gradient(textures, UiTheme.HighlightLine);
+        batch.Draw(line, new Rectangle(band.X, band.Y, band.Width, 1), Color.White);
+        batch.Draw(line, new Rectangle(band.X, band.Bottom - 1, band.Width, 1), Color.White);
+        batch.DrawString(_escapedFont, _escapedText.Text, new Vector2(band.Center.X - (_escapedText.Width / 2), band.Y + EscapedPaddingY), UiTheme.TextPrimary);
     }
 
     // Legacy BattleUI's backdrop: the picture, the vignette over the whole screen, and the shade across the top.

@@ -39,6 +39,18 @@ public sealed class GameSessionBattleTests
     }
 
     [Fact]
+    public void StartPendingBattle_NobodyStanding_StartsLostBattle()
+    {
+        var session = SessionWithEncounterPending();
+        session.Party.Leader.Vitals.TakeDamage(999);
+
+        var battle = session.StartPendingBattle();
+
+        Assert.Equal(BattlePhase.Defeat, battle.Phase);
+        Assert.Null(session.FinishBattle());
+    }
+
+    [Fact]
     public void StartPendingBattle_BattleAlreadyActive_Throws()
     {
         var session = SessionWithEncounterPending();

@@ -20,10 +20,13 @@ public sealed class BattleState
     private readonly Inventory _inventory;
     private bool _isExperienceGranted;
 
-    /// <param name="combatants">Both sides, each with at least one living combatant.</param>
+    /// <param name="combatants">
+    /// Both sides, with at least one living enemy. With nobody standing in the party, the battle is lost from the start
+    /// (decision 97).
+    /// </param>
     /// <param name="inventory">The party's items; using one in battle consumes a copy.</param>
     /// <param name="random">Decides the turn order.</param>
-    /// <exception cref="ArgumentException">A side has no living combatant, or a combatant is listed twice.</exception>
+    /// <exception cref="ArgumentException">No enemy is alive, or a combatant is listed twice.</exception>
     public BattleState(IReadOnlyList<Combatant> combatants, Inventory inventory, IRandom random)
     {
         Combatants = [.. combatants];
@@ -32,20 +35,20 @@ public sealed class BattleState
             throw new ArgumentException("A combatant can only be in a battle once.", nameof(combatants));
         }
 
-        if (LivingOn(BattleSide.Party).Count == 0 || LivingOn(BattleSide.Enemies).Count == 0)
+        if (LivingOn(BattleSide.Enemies).Count == 0)
         {
-            throw new ArgumentException("Both sides need at least one living combatant.", nameof(combatants));
+            throw new ArgumentException("A battle needs at least one living enemy.", nameof(combatants));
         }
 
         _inventory = inventory;
         _turnOrder = new TurnOrder(Combatants, random);
-        Phase = TurnPhaseOf(CurrentActor);
+        Phase = LivingOn(BattleSide.Party).Count == 0 ? BattlePhase.Defeat : TurnPhaseOf(CurrentActor);
     }
 
     public BattlePhase Phase { get; private set; }
 
     /// <summary>A battle between the active party, in party order, and <paramref name="enemies"/>, in encounter order.</summary>
-    /// <exception cref="ArgumentException">Every active member has fallen, or there are no enemies.</exception>
+    /// <exception cref="ArgumentException">There are no enemies.</exception>
     public static BattleState Start(PartyState party, IReadOnlyList<EnemyDefinition> enemies, Inventory inventory, IRandom random)
     {
         IReadOnlyList<Combatant> combatants =

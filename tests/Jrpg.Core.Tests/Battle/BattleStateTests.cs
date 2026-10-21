@@ -14,15 +14,24 @@ public sealed class BattleStateTests
     private readonly Combatant _hero = Hero(hp: 100);
     private readonly Combatant _goblin = Goblin(hp: 40);
 
-    [Theory]
-    [InlineData(BattleSide.Party)]
-    [InlineData(BattleSide.Enemies)]
-    public void Constructor_SideWithNobodyAlive_Throws(BattleSide fallenSide)
+    [Fact]
+    public void Constructor_NoLivingEnemy_Throws()
     {
-        var fallen = fallenSide == BattleSide.Party ? _hero : _goblin;
-        fallen.Vitals.TakeDamage(999);
+        _goblin.Vitals.TakeDamage(999);
 
         Assert.Throws<ArgumentException>(() => new BattleState([_hero, _goblin], new Inventory(), new FixedSequenceRandom(1)));
+    }
+
+    // Decision 97: a battle that starts with the whole party down is a defeat, so the defeat screen offers its choices.
+    [Fact]
+    public void Constructor_NobodyStanding_IsDefeatAtOnce()
+    {
+        _hero.Vitals.TakeDamage(999);
+
+        var battle = new BattleState([_hero, _goblin], new Inventory(), new FixedSequenceRandom(1));
+
+        Assert.Equal(BattlePhase.Defeat, battle.Phase);
+        Assert.Throws<InvalidOperationException>(() => battle.Execute(new DefendCommand()));
     }
 
     [Fact]

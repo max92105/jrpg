@@ -76,7 +76,10 @@ public sealed class GameSession
         return new GameSession(party, new ExplorationContext(catalog, inventory, world, random), save.Location) { PlayTime = save.PlayTime };
     }
 
-    /// <summary>Starts the encounter a step left pending, between the active party and its enemies in encounter order.</summary>
+    /// <summary>
+    /// Starts the encounter a step left pending, between the active party and its enemies in encounter order. With every
+    /// active member fallen, the battle starts already lost (decision 97), so the defeat screen offers its choices.
+    /// </summary>
     /// <exception cref="InvalidOperationException">No encounter is pending, or a battle is already active.</exception>
     public BattleState StartPendingBattle()
     {

@@ -18,4 +18,7 @@ internal static class LayerPresets
         new("Same as player (Y-sorted)", MapLayers.PlayerZ),
         new("Above player (roofs, treetops)", MapLayers.AbovePlayerZ),
     ];
+
+    /// <returns>The preset's name for <paramref name="z"/>, or "Layer" for a Z no preset uses.</returns>
+    public static string NameOf(int z) => All.FirstOrDefault(preset => preset.Z == z)?.Name ?? "Layer";
 }

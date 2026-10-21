@@ -5,9 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-battle/slices/B8b2.md, B8b2 (defeat look: DefeatEntrance, DefeatScreenView)
-Round: 1 (verdict: Ready to commit; verify all pass, 1307 tests)
+Slice: docs/plans/2026-10-21-editor/slices/E1.md, E1 (error lines collapse, layer list chooses/adds layers, map list by name)
+Round: 1 (verdict: Fix the Criticals; verify all pass, 1317 tests)
 
-- open (Suggestion): DefeatEntranceTests has no test of TitleOpacity mid-fade (e.g. 0.3 s -> 0.5); only the clamp end is pinned.
-- open (Follow-up): shade + hairline + footer drawing is now in VictoryScreenView and DefeatScreenView (recorded second copy); extract an outcome frame on a third.
-- open (Follow-up): TitleScene and DefeatScreenView both draw the scrim + FilesOverlay + centred 1000 px save list; same extract-on-third rule.
+- open (Critical): MainViewModel.OnOpenMapChanged (refresh LayerEntries on Map change, i.e. after painting) has no test; add paint-at-empty-Z test asserting "empty" mark goes.
+- open (Warning): RefreshLayerEntries reassigns LayerEntries on every Map change (each painted cell) and every Z change (incl. clicks in the list) -> ItemsSource reset mid-selection; reassign only when !SequenceEqual.
+- open (Suggestion): RefreshLayerEntriesOn(changed, watched) string-pair helper; inline the two property-name checks.
+- open (Follow-up): MainWindow.xaml.cs is 475 lines (pre-existing).

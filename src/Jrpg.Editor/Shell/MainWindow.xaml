@@ -8,6 +8,19 @@
         WindowState="Maximized">
   <Window.Resources>
     <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
+    <!-- An error line takes no space until there is an error to show. -->
+    <Style x:Key="ErrorLine" TargetType="TextBlock">
+      <Setter Property="Foreground" Value="DarkRed" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Self}}" Value="">
+          <Setter Property="Visibility" Value="Collapsed" />
+        </DataTrigger>
+        <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Self}}" Value="{x:Null}">
+          <Setter Property="Visibility" Value="Collapsed" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
   </Window.Resources>
   <Window.InputBindings>
     <KeyBinding Key="Z" Modifiers="Control" Command="{Binding CurrentMap.UndoCommand}" />
@@ -17,13 +30,11 @@
   <DockPanel>
     <TextBlock DockPanel.Dock="Top"
                Margin="8"
-               Foreground="DarkRed"
-               TextWrapping="Wrap"
+               Style="{StaticResource ErrorLine}"
                Text="{Binding LoadError}" />
     <TextBlock DockPanel.Dock="Top"
-               Margin="8,0"
-               Foreground="DarkRed"
-               TextWrapping="Wrap"
+               Margin="8,4"
+               Style="{StaticResource ErrorLine}"
                Text="{Binding SaveError, StringFormat=Not saved: {0}, TargetNullValue=''}" />
     <ToolBar DockPanel.Dock="Top">
       <Button Content="New map..." Click="OnNewMapClicked" />
@@ -72,18 +83,26 @@
     <ListBox x:Name="MapList"
              DockPanel.Dock="Left"
              Width="180"
-             ItemsSource="{Binding MapIds}"
+             ItemsSource="{Binding MapEntries}"
+             DisplayMemberPath="Text"
+             SelectedValuePath="Id"
              SelectionChanged="OnMapListSelectionChanged" />
     <DockPanel DockPanel.Dock="Right" Width="420">
+      <!-- Choosing a row chooses the layer edits go to, as the toolbar's layer box does. -->
       <ListBox DockPanel.Dock="Top"
                Height="110"
-               ItemsSource="{Binding CurrentMap.Layers}">
-        <ListBox.ItemTemplate>
-          <DataTemplate>
-            <TextBlock Text="{Binding Z, StringFormat=Layer z {0}}" />
-          </DataTemplate>
-        </ListBox.ItemTemplate>
-      </ListBox>
+               ItemsSource="{Binding LayerEntries}"
+               DisplayMemberPath="Text"
+               SelectedValuePath="Z"
+               SelectedValue="{Binding Layer.Z}" />
+      <DockPanel DockPanel.Dock="Top" Margin="0,4">
+        <Button DockPanel.Dock="Right" Content="Add layer" Click="OnAddLayerClicked" />
+        <ComboBox x:Name="NewLayerBox"
+                  IsEditable="True"
+                  ToolTip="A preset, or any whole number for the layer's z"
+                  ItemsSource="{Binding Layer.Presets}"
+                  DisplayMemberPath="Name" />
+      </DockPanel>
       <TabControl x:Name="EditingTabs" SelectionChanged="OnEditingTabChanged">
         <TabItem Header="Tiles">
           <tiles:TileBrowserView x:Name="TileBrowser" DataContext="{Binding Painting.Browser}" />

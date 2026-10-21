@@ -1,5 +1,5 @@
 # Editor: tilesheets, collision, above-player zones and NPCs
-Status: approved
+Status: approved, in progress
 
 The editor plan of part 3 (the "part 3c" notes at the end of `done/2026-10-18-shell-cutover-and-map-editing.md`, slices 11k-11n and 12). Names and question numbers are reused from there where still valid (69, 70, 71).
 
@@ -60,7 +60,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 1: the window
 
-- [ ] **E1. The window: no empty strip, a layer list that chooses and adds layers, maps by name** (Editor, about 190 lines) → [slices/E1.md](slices/E1.md)
+- [x] **E1. The window: no empty strip, a layer list that chooses and adds layers, maps by name** (Editor, about 190 lines) → [slices/E1.md](slices/E1.md)
 
 ### Phase 2: painting
 

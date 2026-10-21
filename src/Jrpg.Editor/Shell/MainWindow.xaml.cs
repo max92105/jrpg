@@ -91,11 +91,11 @@ internal sealed partial class MainWindow : Window
             case nameof(MainViewModel.CurrentMap):
                 OpenCurrentMap();
                 break;
-            case nameof(MainViewModel.MapIds):
-                // A new map's first save rebuilds the list, which drops its selection; the list is refreshed first, since this
-                // handler may run before its binding does.
+            case nameof(MainViewModel.MapEntries):
+                // A save rebuilds the list (a new map, a new name), which drops its selection; the list is refreshed first,
+                // since this handler may run before its binding does.
                 MapList.GetBindingExpression(ItemsControl.ItemsSourceProperty)?.UpdateTarget();
-                MapList.SelectedItem = _shownMap?.Map.Id;
+                MapList.SelectedValue = _shownMap?.Map.Id;
                 break;
             case nameof(MainViewModel.Mode):
                 ShowBrushAt(_brushCell);
@@ -127,7 +127,7 @@ internal sealed partial class MainWindow : Window
         _shownMap?.PropertyChanged += OnOpenMapChanged;
 
         // Kept in step here rather than bound, so a refused switch simply leaves the list on the open map.
-        MapList.SelectedItem = _shownMap?.Map.Id;
+        MapList.SelectedValue = _shownMap?.Map.Id;
         _gridDrawnFor = null;
         DrawCurrentMap();
         DrawEventMarks();
@@ -143,9 +143,9 @@ internal sealed partial class MainWindow : Window
 
     private void OnMapListSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (MapList.SelectedItem is string mapId && !_viewModel.TryOpenMap(mapId))
+        if (MapList.SelectedValue is string mapId && !_viewModel.TryOpenMap(mapId))
         {
-            MapList.SelectedItem = _shownMap?.Map.Id;
+            MapList.SelectedValue = _shownMap?.Map.Id;
         }
     }
 
@@ -192,6 +192,8 @@ internal sealed partial class MainWindow : Window
     }
 
     private void OnFitClicked(object sender, RoutedEventArgs e) => RefitMap();
+
+    private void OnAddLayerClicked(object sender, RoutedEventArgs e) => _viewModel.Layer.TryAddLayer(NewLayerBox.Text);
 
     private void OnNewMapClicked(object sender, RoutedEventArgs e)
     {

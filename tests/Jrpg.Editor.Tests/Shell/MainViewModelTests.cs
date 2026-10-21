@@ -31,6 +31,49 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
+    public void MapEntries_RepositoryContent_ShowsNameThenIdSortedByName()
+    {
+        var viewModel = Open(_repositoryContent);
+
+        var texts = viewModel.MapEntries.Select(entry => entry.Text);
+
+        Assert.Equal(["Forest (forest)", "Interior1 (interior_1)", "start (start)"], texts);
+    }
+
+    // interior_1 has a ground layer (z -5) and a ground detail layer (z -4); the ground is chosen at the start.
+    [Fact]
+    public void LayerEntries_MapWithTwoLayers_ListsThemBottomFirstWithNames()
+    {
+        var viewModel = Open(_repositoryContent);
+
+        viewModel.TryOpenMap("interior_1");
+
+        Assert.Equal(["Ground (z -5)", "Ground detail (z -4)"], viewModel.LayerEntries.Select(entry => entry.Text));
+    }
+
+    [Fact]
+    public void LayerEntries_PaintedOnEmptyZ_DropsTheEmptyMark()
+    {
+        var viewModel = Open(_repositoryContent);
+        viewModel.Layer.Z = 2;
+        var tileId = viewModel.CurrentMap!.Map.Layout.Layers[0].TileIdAt(new GridCell(0, 0));
+
+        viewModel.CurrentMap.Do(new SetTilesEdit(2, [new TileChange(new GridCell(0, 0), 0, tileId)]));
+
+        Assert.Equal(["Ground (z -5)", "Layer (z 2)"], viewModel.LayerEntries.Select(entry => entry.Text));
+    }
+
+    [Fact]
+    public void LayerEntries_ChosenZWithoutLayer_ListsItAsEmpty()
+    {
+        var viewModel = Open(_repositoryContent);
+
+        viewModel.Layer.Z = 2;
+
+        Assert.Equal(["Ground (z -5)", "Layer (z 2), empty"], viewModel.LayerEntries.Select(entry => entry.Text));
+    }
+
+    [Fact]
     public void TryOpenMap_NoUnsavedChanges_OpensItWithoutAsking()
     {
         var viewModel = Open(_repositoryContent);
@@ -250,6 +293,19 @@ public sealed class MainViewModelTests : IDisposable
         Assert.Equal(viewModel.MapIds, viewModel.EventEditing!.MapIds);
         Assert.False(viewModel.CurrentMap!.IsDirty);
         Assert.Equal("Old Mill", ContentCatalogLoader.Load(_contentCopy).Maps["old_mill"].Settings.DisplayName);
+    }
+
+    [Fact]
+    public void Save_NewMap_AddsItsEntry()
+    {
+        var viewModel = Open(CopyOfRepositoryContent());
+        var newMap = viewModel.StartNewMap()!;
+        newMap.Name = "Old Mill";
+        viewModel.TryCreateMap(newMap);
+
+        viewModel.SaveCommand.Execute(null);
+
+        Assert.Contains(new MapEntry("old_mill", "Old Mill (old_mill)"), viewModel.MapEntries);
     }
 
     [Fact]

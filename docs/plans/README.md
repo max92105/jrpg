@@ -13,7 +13,7 @@ Older plans are single files with the same sections.
 
 | Plan | Status |
 |---|---|
-| [2026-10-21-editor](2026-10-21-editor/README.md) | approved |
+| [2026-10-21-editor](2026-10-21-editor/README.md) | approved, in progress |
 | [done/2026-10-20-menu-cleanup](done/2026-10-20-menu-cleanup/README.md) | done |
 | [2026-10-20-battle](2026-10-20-battle/README.md) | approved, in progress |
 | [2026-10-18-game-title-menu-movement](2026-10-18-game-title-menu-movement.md) | approved; every slice done, play-through check Z left |

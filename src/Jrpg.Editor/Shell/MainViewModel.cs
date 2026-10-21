@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -32,6 +33,13 @@ internal sealed partial class MainViewModel : ObservableObject
     {
         _writer = new ContentWriter(contentRoot);
         _confirm = confirm;
+        Layer.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(LayerChoiceViewModel.Z))
+            {
+                RefreshLayerEntries();
+            }
+        };
         ArtRoot = ArtFolders.RootIn(contentRoot);
         try
         {
@@ -47,7 +55,7 @@ internal sealed partial class MainViewModel : ObservableObject
         // Maps, tiles and objects only show when their content and art are whole, since drawing reads both.
         if (Catalog is not null && LoadError is null)
         {
-            MapIds = SortedMapIds(Catalog);
+            ShowMapList(Catalog);
             Painting = new TilePaintingViewModel(Catalog, Layer);
             Placing = new ObjectPlacingViewModel(Catalog.Objects, Layer);
             EventEditing = new EventEditingViewModel(Catalog) { MapIds = MapIds };
@@ -69,6 +77,14 @@ internal sealed partial class MainViewModel : ObservableObject
     /// <summary>The saved maps, by id; a new map joins when it is first saved.</summary>
     [ObservableProperty]
     public partial IReadOnlyList<string> MapIds { get; private set; } = [];
+
+    /// <summary>The map list's rows: display name then id, sorted by display name (decision 122).</summary>
+    [ObservableProperty]
+    public partial IReadOnlyList<MapEntry> MapEntries { get; private set; } = [];
+
+    /// <summary>The open map's layers, bottom first, and the chosen Z marked empty when the map has nothing there yet.</summary>
+    [ObservableProperty]
+    public partial IReadOnlyList<LayerEntry> LayerEntries { get; private set; } = [];
 
     /// <summary>The layer tiles are painted and objects placed on.</summary>
     public LayerChoiceViewModel Layer { get; } = new();
@@ -205,10 +221,7 @@ internal sealed partial class MainViewModel : ObservableObject
         }
 
         Catalog = Catalog! with { Maps = new Dictionary<string, MapDefinition>(Catalog.Maps) { [map.Id] = map } };
-        if (!MapIds.Contains(map.Id))
-        {
-            MapIds = SortedMapIds(Catalog);
-        }
+        ShowMapList(Catalog);
 
         CurrentMap.MarkSaved();
         SaveError = null;
@@ -216,14 +229,60 @@ internal sealed partial class MainViewModel : ObservableObject
 
     partial void OnMapIdsChanged(IReadOnlyList<string> value) => EventEditing?.MapIds = value;
 
-    partial void OnCurrentMapChanged(MapViewModel? value)
+    partial void OnCurrentMapChanged(MapViewModel? oldValue, MapViewModel? newValue)
     {
-        Painting?.OpenMap = value;
-        Placing?.OpenMap = value;
-        EventEditing?.OpenMap = value;
+        oldValue?.PropertyChanged -= OnOpenMapChanged;
+        newValue?.PropertyChanged += OnOpenMapChanged;
+        Painting?.OpenMap = newValue;
+        Placing?.OpenMap = newValue;
+        EventEditing?.OpenMap = newValue;
+        RefreshLayerEntries();
     }
 
-    private static IReadOnlyList<string> SortedMapIds(ContentCatalog catalog) => [.. catalog.Maps.Keys.Order(StringComparer.Ordinal)];
+    // A save can add a map or rename one, so both lists are rebuilt; the ids only when they changed, since the window
+    // reselects the open map then.
+    private void ShowMapList(ContentCatalog catalog)
+    {
+        IReadOnlyList<string> ids = [.. catalog.Maps.Keys.Order(StringComparer.Ordinal)];
+        if (!ids.SequenceEqual(MapIds))
+        {
+            MapIds = ids;
+        }
+
+        MapEntries =
+        [
+            .. catalog.Maps.Values
+                .OrderBy(map => map.Settings.DisplayName, StringComparer.OrdinalIgnoreCase)
+                .ThenBy(map => map.Id, StringComparer.Ordinal)
+                .Select(map => new MapEntry(map.Id, $"{map.Settings.DisplayName} ({map.Id})")),
+        ];
+    }
+
+    private void OnOpenMapChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MapViewModel.Map))
+        {
+            RefreshLayerEntries();
+        }
+    }
+
+    // Replaced only when a row changed: every painted cell changes the map, and the side list writes Z itself, so a new
+    // list each time would reset the list's selection mid-click.
+    private void RefreshLayerEntries()
+    {
+        var layers = CurrentMap?.Layers ?? [];
+        var entries = layers.Select(layer => new LayerEntry(layer.Z, LayerPresets.NameOf(layer.Z), IsEmpty: false)).ToList();
+        if (CurrentMap is not null && !layers.Any(layer => layer.Z == Layer.Z))
+        {
+            entries.Add(new LayerEntry(Layer.Z, LayerPresets.NameOf(Layer.Z), IsEmpty: true));
+        }
+
+        IReadOnlyList<LayerEntry> sorted = [.. entries.OrderBy(entry => entry.Z)];
+        if (!sorted.SequenceEqual(LayerEntries))
+        {
+            LayerEntries = sorted;
+        }
+    }
 
     private bool TryResize(MapViewModel open, int width, int height)
     {

@@ -23,6 +23,7 @@ internal sealed class BattleScene : IScene
     private readonly TurnOrderStrip _turnOrderStrip = new();
     private readonly TurnOrderView _turnOrder;
     private readonly UiTextures _ui;
+    private readonly ScreenText _text;
     private readonly BattlersView _battlers;
     private readonly BattleTurnSequence _sequence;
     private readonly string _backgroundFile;
@@ -37,6 +38,7 @@ internal sealed class BattleScene : IScene
     private ActionPlayback? _shownPlayback;
     private (int Turn, TurnStage Stage) _shown;
     private bool _isFinished;
+    private VictoryScreen? _victory;
 
     /// <param name="session">The playthrough whose active battle this screen shows.</param>
     /// <param name="items">Every item by id, from the catalog, for the party's items.</param>
@@ -46,6 +48,7 @@ internal sealed class BattleScene : IScene
     public BattleScene(GameSession session, IReadOnlyDictionary<string, ItemDefinition> items, ScreenText text, UiTextures ui)
     {
         _session = session;
+        _text = text;
         _ui = ui;
         var battle = session.ActiveBattle ?? throw new InvalidOperationException("A battle screen needs an active battle.");
         _battle = battle;
@@ -66,11 +69,17 @@ internal sealed class BattleScene : IScene
     }
 
     /// <returns>
-    /// On the update the battle ends: <see cref="BattleFinished"/> after a victory or an escape, <see cref="TitleRequested"/>
-    /// after a defeat until the defeat screen (plan 2026-10-20-battle, B8b). Null otherwise.
+    /// <see cref="BattleFinished"/> when the victory screen is left, or on the update an escape ends the battle;
+    /// <see cref="TitleRequested"/> on the update a defeat ends it, until the defeat screen (plan 2026-10-20-battle, B8b).
+    /// Null otherwise.
     /// </returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
+        if (_victory is { } victory)
+        {
+            return victory.Update(delta, input);
+        }
+
         if (_isFinished)
         {
             return null;
@@ -113,6 +122,8 @@ internal sealed class BattleScene : IScene
         {
             _commandPanel.Draw(batch, textures, _sequence.Actor);
         }
+
+        _victory?.Draw(batch, textures);
     }
 
     // Text is formatted at stage changes, never per frame: the vitals once an action lands, the order when a turn starts.
@@ -142,11 +153,17 @@ internal sealed class BattleScene : IScene
         }
     }
 
-    private SceneRequest Finish()
+    // A victory stays on this screen for its rewards; an escape or a defeat leaves at once.
+    private SceneRequest? Finish()
     {
         _isFinished = true;
         var outcome = _battle.Phase;
-        _session.FinishBattle();
+        if (_session.FinishBattle() is { } rewards)
+        {
+            _victory = new VictoryScreen(rewards, _text, _ui);
+            return null;
+        }
+
         return outcome == BattlePhase.Defeat ? new TitleRequested() : new BattleFinished();
     }
 

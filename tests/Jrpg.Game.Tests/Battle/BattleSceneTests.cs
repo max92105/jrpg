@@ -46,7 +46,7 @@ public sealed class BattleSceneTests
 
     // A test catalog, not repository balance (devil's advocate B-2): one goblin that a single hit fells.
     [Fact]
-    public void Update_AttackUntilOver_RequestsBattleFinished()
+    public void Update_AttackUntilOver_FinishesBattleAndShowsVictory()
     {
         var catalog = WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { MaxHp = 1 });
         var (session, scene) = StartForestBattle(catalog);
@@ -56,8 +56,24 @@ public sealed class BattleSceneTests
 
         var request = Settle(scene);
 
-        Assert.IsType<BattleFinished>(request);
+        Assert.Null(request);
+        Assert.Null(session.ActiveBattle);
         Assert.Equal(experienceBefore + catalog.Enemies["goblin"].ExperienceReward, session.Party.Leader.Experience);
+    }
+
+    [Fact]
+    public void Update_ConfirmOnFilledVictory_RequestsBattleFinished()
+    {
+        var catalog = WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { MaxHp = 1 });
+        var (_, scene) = StartForestBattle(catalog);
+        scene.Update(StartMapScenarios.OneUpdate, _confirm);
+        scene.Update(StartMapScenarios.OneUpdate, _confirm);
+        Settle(scene);
+        Settle(scene);
+
+        var request = scene.Update(StartMapScenarios.OneUpdate, _confirm);
+
+        Assert.IsType<BattleFinished>(request);
     }
 
     [Fact]

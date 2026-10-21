@@ -151,7 +151,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 6: end screens
 
-- [ ] **B7a. Victory: experience fill** (Game, about 270 lines) → [slices/B7a.md](slices/B7a.md)
+- [x] **B7a. Victory: experience fill** (Game, about 270 lines) → [slices/B7a.md](slices/B7a.md)
 - [ ] **B7b. Victory look** (Game, about 260 lines) → [slices/B7b.md](slices/B7b.md)
 - [ ] **B8a. Escaped** (Game, about 110 lines) → [slices/B8a.md](slices/B8a.md)
 - [ ] **C4. A battle with nobody standing is lost at once** (Core, about 90 lines; decision 97) → [slices/C4.md](slices/C4.md)

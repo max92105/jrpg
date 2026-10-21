@@ -272,4 +272,13 @@ internal static class MessageIds
 
     /// <summary>Placeholder <c>{count}</c>: how many copies of an item the party owns, on its row in battle.</summary>
     public const string BattleItemCount = "battle_item_count";
+
+    /// <summary>The title of the victory screen.</summary>
+    public const string BattleVictory = "battle_victory";
+
+    /// <summary>Placeholder <c>{amount}</c>: the experience the defeated enemies gave, before the split.</summary>
+    public const string BattleExperienceEarned = "battle_experience_earned";
+
+    /// <summary>Shown on the victory screen by a member whose bar filled a level.</summary>
+    public const string BattleLevelUp = "battle_level_up";
 }

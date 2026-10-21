@@ -27,8 +27,9 @@ internal sealed partial class ObjectBrowserView : UserControl
         ShowPreview();
     }
 
-    private void OnBrowserChanged(object? sender, PropertyChangedEventArgs e) => ShowPreview();
-
-    private void ShowPreview() =>
+    /// <summary>Draws the chosen object again; the window calls it when a catalog change (a re-cut sheet) changes its art.</summary>
+    public void ShowPreview() =>
         Preview.Source = _browser?.SelectedObject is { } definition && Drawing is not null ? Drawing.DrawObject(definition) : null;
+
+    private void OnBrowserChanged(object? sender, PropertyChangedEventArgs e) => ShowPreview();
 }

@@ -8,7 +8,7 @@ public sealed class SheetCutViewModelTests
     // A 96 x 64 image cut into 32 px tiles: 3 columns, 2 rows.
     private static readonly TilesheetDefinition _sheet = new() { Id = "grass_3", File = "Grass3.png", TileWidth = 32, TileHeight = 32, Margin = 0, Spacing = 0 };
 
-    private readonly SheetCutViewModel _cut = new(_sheet, (96, 64));
+    private readonly SheetCutViewModel _cut = new(_sheet, (96, 64), []);
 
     [Fact]
     public void Constructor_SheetCut_ShowsItsColumnsAndRows()
@@ -87,6 +87,26 @@ public sealed class SheetCutViewModelTests
         _cut.Spacing = spacing;
 
         Assert.Equal(expected, _cut.Problem);
+    }
+
+    [Fact]
+    public void Problem_TileOutsideNewGrid_NamesTheTile()
+    {
+        var recut = new SheetCutViewModel(_sheet, (96, 64), [new TileDefinition { Id = 9, IsWalkable = true, SheetId = "grass_3", Column = 2, Row = 1 }]);
+
+        recut.Columns = 2;
+
+        Assert.Equal("Tile 9 at (2, 1) would be outside the 2 x 2 grid.", recut.Problem);
+    }
+
+    [Fact]
+    public void Problem_TileBelowNewGrid_NamesTheTile()
+    {
+        var recut = new SheetCutViewModel(_sheet, (96, 64), [new TileDefinition { Id = 9, IsWalkable = true, SheetId = "grass_3", Column = 0, Row = 1 }]);
+
+        recut.Rows = 1;
+
+        Assert.Equal("Tile 9 at (0, 1) would be outside the 3 x 1 grid.", recut.Problem);
     }
 
     [Fact]

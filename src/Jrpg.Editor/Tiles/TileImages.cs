@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
 using Jrpg.Editor.Catalogs;
 
@@ -11,18 +12,21 @@ namespace Jrpg.Editor.Tiles;
 internal sealed class TileImages(CatalogDraft catalog, string artRoot)
 {
     private readonly Dictionary<string, BitmapSource> _sheets = [];
-    private readonly Dictionary<int, ImageSource> _tiles = [];
+
+    // Keyed by the sheet's cut as well as the cell, so a re-cut sheet (another record) is cropped anew (design key decision 3).
+    private readonly Dictionary<(TilesheetDefinition Sheet, int Column, int Row), ImageSource> _tiles = [];
 
     public ImageSource TileImageOf(int tileId)
     {
-        if (!_tiles.TryGetValue(tileId, out var image))
+        var tile = catalog.Current.Tiles[tileId];
+        var sheet = catalog.Current.Tilesheets[tile.SheetId];
+        var key = (sheet, tile.Column, tile.Row);
+        if (!_tiles.TryGetValue(key, out var image))
         {
-            var tile = catalog.Current.Tiles[tileId];
-            var sheet = catalog.Current.Tilesheets[tile.SheetId];
             var cell = new Int32Rect(sheet.CellLeft(tile.Column), sheet.CellTop(tile.Row), sheet.TileWidth, sheet.TileHeight);
             image = new CroppedBitmap(SheetImageOf(sheet.File), cell);
             image.Freeze();
-            _tiles.Add(tileId, image);
+            _tiles.Add(key, image);
         }
 
         return image;

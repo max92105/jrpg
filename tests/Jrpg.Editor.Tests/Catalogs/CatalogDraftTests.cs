@@ -170,6 +170,18 @@ public sealed class CatalogDraftTests
         Assert.False(_draft.IsDirty);
     }
 
+    [Fact]
+    public void Undo_AfterReCut_RestoresTheOldCut()
+    {
+        var sheet = _draft.Current.Tilesheets.Values.First();
+        _draft.SetTilesheet(sheet with { TileWidth = 24, TileHeight = 24 });
+        Assert.Empty(_draft.SheetsRemovedByUndo());
+
+        _draft.Undo();
+
+        Assert.Equal(sheet, _draft.Current.Tilesheets[sheet.Id]);
+    }
+
     private static TilesheetDefinition Grass3 => new() { Id = "grass_3", File = "Grass3.png", TileWidth = 48, TileHeight = 48, Margin = 0, Spacing = 0 };
 
     // Far past any sheet's last cell, so no tile of the repository's content is cut from it.

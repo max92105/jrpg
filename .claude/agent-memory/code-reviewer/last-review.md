@@ -5,12 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-21-editor/slices/E5b2.md, E5b2 (the Cut panel: columns and rows; uncommitted)
-Round: 1 (verdict: Fix the Criticals; verify all pass, 1409 tests)
+Slice: docs/plans/2026-10-21-editor/slices/E6a.md, E6a (re-cutting a set-up sheet; uncommitted)
+Round: 1 (verdict: Ready to commit; verify all pass, 1420 tests)
 
-- open (Critical): TileBrowserViewModel.OnSelectedChoiceChanged closes the Cut, no test; add SelectedChoice_OtherImageWhileCutOpen_ClosesCut.
-- open (Warning): SheetCutViewModel margin is symmetric (2*Margin) but TilesheetMarks/ColumnsIn need only one margin; 96 px, 8 cols, margin 12 -> 9 px tiles, preview and sheet show 9 columns, panel says 8. Add a problem when margin >= tile+spacing, or test-pin.
-- open (Warning): OnCutFieldChanged -> ApplyCutCommand.NotifyCanExecuteChanged untested; broken wiring leaves Apply enabled and ToSheet throws (crash). Test CanExecuteChanged raised on Columns change.
-- open (Suggestion): unchecked int overflow in SpanAlong (Margin 1,500,000,000, Columns 2 -> Problem null); cap inputs or use checked/long.
-- open (Suggestion): rows problem, zero columns and negative margin messages untested.
-- open (Suggestion): Set up while the Cut is open rebuilds the guess, losing typed fields; hide Set up while IsCutOpen.
+- open (Warning): SheetCutViewModel._tiles is a snapshot taken at CutSheet; painting with the panel open (cell chosen before Cut) runs AddTile on that sheet, so Apply can put the new tile outside the grid and the save is refused by the art check. Re-read SheetTiles in OnCatalogChanged (or close the Cut / re-check in CanApplyCut).
+- open (Suggestion): Rows clause of TileOutsideProblem untested (only the column boundary is pinned).
+- open (Suggestion): CanCutSheet guards untested (image not set up, Cut already open).
+- Follow-up: MainWindow.xaml.cs is 512 lines (over 300 before this diff); split the catalog/drawing reactions out.

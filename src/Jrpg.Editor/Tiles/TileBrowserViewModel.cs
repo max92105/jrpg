@@ -37,8 +37,8 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     public partial IReadOnlyList<SheetChoice> SheetChoices { get; private set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(SelectedSheet), nameof(SheetTiles), nameof(ChoiceText), nameof(CanSetUpSheet))]
-    [NotifyCanExecuteChangedFor(nameof(SetUpSheetCommand))]
+    [NotifyPropertyChangedFor(nameof(SelectedSheet), nameof(SheetTiles), nameof(ChoiceText), nameof(CanSetUpSheet), nameof(CanCutSheet))]
+    [NotifyCanExecuteChangedFor(nameof(SetUpSheetCommand), nameof(CutSheetCommand))]
     public partial SheetChoice? SelectedChoice { get; set; }
 
     /// <summary>How the shown image is cut; null when it isn't set up yet.</summary>
@@ -47,10 +47,13 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     /// <summary>Whether the shown image has no sheet yet and no Cut panel open, so Set up can start one.</summary>
     public bool CanSetUpSheet => SelectedChoice is { Sheet: null } && Cut is null;
 
+    /// <summary>Whether the shown image is a sheet and no Cut panel is open, so Cut can re-cut it.</summary>
+    public bool CanCutSheet => SelectedChoice is { Sheet: not null } && Cut is null;
+
     /// <summary>The open Cut panel, for the shown image; null when closed.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsCutOpen), nameof(CanSetUpSheet))]
-    [NotifyCanExecuteChangedFor(nameof(ApplyCutCommand), nameof(SetUpSheetCommand))]
+    [NotifyPropertyChangedFor(nameof(IsCutOpen), nameof(CanSetUpSheet), nameof(CanCutSheet))]
+    [NotifyCanExecuteChangedFor(nameof(ApplyCutCommand), nameof(SetUpSheetCommand), nameof(CutSheetCommand))]
     public partial SheetCutViewModel? Cut { get; private set; }
 
     public bool IsCutOpen => Cut is not null;
@@ -134,8 +137,12 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
             Margin = 0,
             Spacing = 0,
         };
-        Cut = new SheetCutViewModel(guess, imageSize);
+        Cut = new SheetCutViewModel(guess, imageSize, []);
     }
+
+    /// <summary>Opens the Cut panel on the shown sheet's cut; applying it re-cuts the sheet, its tiles keeping their cells.</summary>
+    [RelayCommand(CanExecute = nameof(CanCutSheet))]
+    private void CutSheet() => Cut = new SheetCutViewModel(SelectedSheet!, _imageSizeOf(SelectedSheet!.File), SheetTiles);
 
     /// <summary>Makes the sheet as the Cut panel has it, as one undo step, and closes the panel.</summary>
     [RelayCommand(CanExecute = nameof(CanApplyCut))]
@@ -184,6 +191,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
             ListSheetsAnew();
         }
 
+        Cut?.Tiles = SheetTiles;
         OnPropertyChanged(nameof(SheetTiles));
         OnPropertyChanged(nameof(SelectedTileId));
         OnPropertyChanged(nameof(ChoiceText));

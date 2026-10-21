@@ -56,6 +56,7 @@
       <MenuItem Header="Tiles">
         <MenuItem Header="Mark blocked" IsCheckable="True" IsChecked="{Binding Marking.IsMarkingBlocked}" />
         <MenuItem Header="Set up sheet" Command="{Binding Painting.Browser.SetUpSheetCommand}" />
+        <MenuItem Header="Cut sheet" Command="{Binding Painting.Browser.CutSheetCommand}" />
       </MenuItem>
       <MenuItem Header="Map">
         <MenuItem Header="Settings..." Click="OnMapSettingsClicked" />

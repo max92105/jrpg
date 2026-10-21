@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Jrpg.Core.Geometry;
+using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
 using Jrpg.Editor.Maps.Settings;
@@ -51,6 +52,7 @@ internal sealed partial class MainWindow : Window
             TileBrowser.Images = tileImages;
             TileBrowser.Marking = viewModel.Marking;
             ObjectBrowser.Drawing = _drawing;
+            content.PropertyChanged += OnContentChanged;
         }
 
         DataContext = _viewModel = viewModel;
@@ -103,6 +105,16 @@ internal sealed partial class MainWindow : Window
                 ShowBrushAt(_brushCell);
                 ShowObjectDragAt(_mapPoint);
                 break;
+        }
+    }
+
+    // A catalog change can change art the map shows without changing the map: a re-cut sheet.
+    private void OnContentChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(CatalogDraft.Current))
+        {
+            DrawCurrentMap();
+            ObjectBrowser.ShowPreview();
         }
     }
 

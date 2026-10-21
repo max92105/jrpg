@@ -14,10 +14,12 @@ internal sealed partial class SheetCutViewModel : ObservableObject
 
     /// <param name="sheet">The cut it starts from; its id and file are kept.</param>
     /// <param name="imageSize">The image's size in its own pixels.</param>
-    public SheetCutViewModel(TilesheetDefinition sheet, (int Width, int Height) imageSize)
+    /// <param name="tiles">The tiles already cut from the sheet.</param>
+    public SheetCutViewModel(TilesheetDefinition sheet, (int Width, int Height) imageSize, IReadOnlyList<TileDefinition> tiles)
     {
         _sheet = sheet;
         _imageSize = imageSize;
+        Tiles = tiles;
         Columns = sheet.ColumnsIn(imageSize.Width);
         Rows = sheet.RowsIn(imageSize.Height);
         Margin = sheet.Margin;
@@ -25,6 +27,14 @@ internal sealed partial class SheetCutViewModel : ObservableObject
     }
 
     public string SheetId => _sheet.Id;
+
+    /// <summary>
+    /// The tiles cut from the sheet, which keep their column and row (decision 116); kept current while the panel is open,
+    /// as painting can make one.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Problem), nameof(Summary))]
+    public partial IReadOnlyList<TileDefinition> Tiles { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TileWidth), nameof(Problem), nameof(Summary), nameof(PreviewSheet))]
@@ -65,7 +75,7 @@ internal sealed partial class SheetCutViewModel : ObservableObject
                 return "Margin and spacing must not be negative.";
             }
 
-            return ProblemAlong(_imageSize.Width, Columns, "columns") ?? ProblemAlong(_imageSize.Height, Rows, "rows") ?? MarginProblem();
+            return ProblemAlong(_imageSize.Width, Columns, "columns") ?? ProblemAlong(_imageSize.Height, Rows, "rows") ?? MarginProblem() ?? TileOutsideProblem();
         }
     }
 
@@ -102,5 +112,11 @@ internal sealed partial class SheetCutViewModel : ObservableObject
     private string? MarginProblem() =>
         PreviewSheet is { } cut && (cut.ColumnsIn(_imageSize.Width) != Columns || cut.RowsIn(_imageSize.Height) != Rows)
             ? $"A {Margin} px margin leaves room for another cell; make it smaller than a cell."
+            : null;
+
+    // A tile past the new grid would fail the art check on save, and the maps using it would no longer open.
+    private string? TileOutsideProblem() =>
+        Tiles.Where(tile => tile.Column >= Columns || tile.Row >= Rows).MinBy(tile => tile.Id) is { } outside
+            ? $"Tile {outside.Id} at ({outside.Column}, {outside.Row}) would be outside the {Columns} x {Rows} grid."
             : null;
 }

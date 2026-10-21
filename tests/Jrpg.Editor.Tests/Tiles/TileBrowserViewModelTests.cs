@@ -138,6 +138,57 @@ public sealed class TileBrowserViewModelTests
         Assert.False(_browser.ApplyCutCommand.CanExecute(null));
     }
 
+    // The dungeon's 54 x 19 image holds 3 whole columns and 1 row past its margin of 2 and spacing of 1.
+    [Fact]
+    public void CutSheetCommand_SetUpSheet_OpensCutWithItsColumnsAndRows()
+    {
+        _browser.CutSheetCommand.Execute(null);
+
+        Assert.Equal(("dungeon", 3, 1, 2, 1), (_browser.Cut!.SheetId, _browser.Cut.Columns, _browser.Cut.Rows, _browser.Cut.Margin, _browser.Cut.Spacing));
+        Assert.False(_browser.SetUpSheetCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void CutSheetCommand_ImageNotSetUpOrPanelOpen_CannotExecute()
+    {
+        OpenGrass3Cut();
+        Assert.False(_browser.CutSheetCommand.CanExecute(null));
+
+        _browser.CancelCutCommand.Execute(null);
+
+        Assert.False(_browser.CutSheetCommand.CanExecute(null));
+    }
+
+    // Dungeon cell (2, 0) becomes a tile while the panel is open; 2 columns would leave it outside.
+    [Fact]
+    public void ApplyCutCommand_TileMadeWhileOpenOutsideNewGrid_CannotExecute()
+    {
+        _browser.CutSheetCommand.Execute(null);
+        _browser.Cut!.Columns = 2;
+        _browser.Cut.Margin = 0;
+        _browser.Cut.Spacing = 0;
+        Assert.True(_browser.ApplyCutCommand.CanExecute(null));
+
+        _draft.AddTile(new SheetCell("dungeon", 2, 0));
+
+        Assert.False(_browser.ApplyCutCommand.CanExecute(null));
+    }
+
+    // The forest's 96 x 48 image in 4 columns: 24 px wide tiles; tile 8 keeps its cell (0, 0).
+    [Fact]
+    public void ApplyCutCommand_ReCut_ReplacesTheCut()
+    {
+        _browser.SelectedChoice = _browser.SheetChoices[1];
+        _browser.CutSheetCommand.Execute(null);
+        _browser.Cut!.Columns = 4;
+
+        _browser.ApplyCutCommand.Execute(null);
+
+        Assert.Equal(_forest with { TileWidth = 24 }, _draft.Current.Tilesheets["forest"]);
+        Assert.Equal(_forest with { TileWidth = 24 }, _browser.SelectedSheet);
+        Assert.Equal(8, _draft.TileAt(new SheetCell("forest", 0, 0))?.Id);
+    }
+
     [Fact]
     public void ApplyCutCommand_FieldMadeWrong_AnnouncesItCannotExecute()
     {

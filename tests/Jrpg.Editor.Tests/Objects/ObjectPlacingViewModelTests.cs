@@ -84,6 +84,14 @@ public sealed class ObjectPlacingViewModelTests
     }
 
     [Fact]
+    public void DeleteSelectedObjectsCommand_NothingSelected_ChangesNothing()
+    {
+        _placing.DeleteSelectedObjectsCommand.Execute(null);
+
+        Assert.False(Map.IsDirty);
+    }
+
+    [Fact]
     public void RemoveObject_IsUndoable()
     {
         _placing.PlaceObjectAt(new Point2D(4.5, 6.5));

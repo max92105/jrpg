@@ -5,9 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-21-editor/slices/E3d.md, E3d (painting a cell makes it a tile; Save writes the catalogs first)
-Round: 1 (verdict: Ready to commit; verify all pass, 1348 tests)
+Slice: docs/plans/2026-10-21-editor/slices/E2.md, E2 (menu bar and controls help window)
+Round: 1 (verdict: Ready to commit; verify all pass, 1350 tests)
 
-- open (Suggestion): no test that painting with no open map adds no tile (TryTakeChosenTile guarded by OpenMap in StartPainting/PutChosenTile).
-- open (Suggestion): Save_MapPaintedWithNewTile_WritesTilesThenMap name claims an order it can't observe; order is what the refusal test covers.
-- open (Follow-up): ConfirmLeaveCurrentMap/ConfirmClose ignore CatalogDraft.IsDirty; paint new tile, undo, close: no prompt, tile dropped (harmless now; matters when E5/E6 edit tiles without a map change).
+- open (Suggestion): ControlsHelpWindow Events line "Right click a cell: remove its event" omits that an object on the cell blocks it (HandleEventButton).
+- open (Suggestion): F1 pressed twice opens two modeless help windows; keep one and Activate it.
+- open (Suggestion): Edit > Delete selected objects runs in every mode, the Del key only in Objects mode; gesture text "Del" suggests they match.
+- open (Follow-up): Space + drag pans only if the map had focus when Space went down (HandleViewportKey checks focus; mouse down reads _isSpaceHeld before focusing).

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Editor.Catalogs;
@@ -81,6 +82,7 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
             : [];
 
     /// <summary>Removes the selected objects as one undo step.</summary>
+    [RelayCommand]
     public void DeleteSelectedObjects()
     {
         RemoveObjects(SelectedObjectUids);

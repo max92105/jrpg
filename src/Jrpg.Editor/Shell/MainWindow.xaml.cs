@@ -39,6 +39,7 @@ internal sealed partial class MainWindow : Window
 
     // A newly opened map is fitted to the view, which has no size until the window is laid out.
     private bool _isFitPending = true;
+    private ControlsHelpWindow? _controlsHelp;
 
     public MainWindow(MainViewModel viewModel)
     {
@@ -195,7 +196,24 @@ internal sealed partial class MainWindow : Window
 
     private void OnAddLayerClicked(object sender, RoutedEventArgs e) => _viewModel.Layer.TryAddLayer(NewLayerBox.Text);
 
-    private void OnNewMapClicked(object sender, RoutedEventArgs e)
+    private void OnAddLayerMenuClicked(object sender, RoutedEventArgs e) => NewLayerBox.Focus();
+
+    // Closing goes through OnClosing, so unsaved changes still ask.
+    private void OnExitClicked(object sender, RoutedEventArgs e) => Close();
+
+    // One controls window, kept open beside the map: F1 again brings it to the front.
+    private void OnControlsHelpExecuted(object sender, ExecutedRoutedEventArgs e)
+    {
+        if (_controlsHelp is not { IsVisible: true })
+        {
+            _controlsHelp = new ControlsHelpWindow { Owner = this };
+            _controlsHelp.Show();
+        }
+
+        _controlsHelp.Activate();
+    }
+
+    private void OnNewMapExecuted(object sender, ExecutedRoutedEventArgs e)
     {
         if (_viewModel.StartNewMap() is { } newMap)
         {

@@ -1,0 +1,68 @@
+<Window x:Class="Jrpg.Editor.Shell.ControlsHelpWindow"
+        x:ClassModifier="internal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Controls"
+        Width="560"
+        Height="640"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+  <!-- Every gesture and key the editor has; a slice that adds one adds its line here. -->
+  <Window.Resources>
+    <Style x:Key="Heading" TargetType="TextBlock">
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Margin" Value="0,12,0,4" />
+    </Style>
+    <Style x:Key="Lines" TargetType="TextBlock">
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+  </Window.Resources>
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="12,0,12,12">
+      <TextBlock Style="{StaticResource Heading}" Text="Anywhere" />
+      <TextBlock Style="{StaticResource Lines}">
+        Ctrl+N: new map.<LineBreak />
+        Ctrl+S: save the map (and the tiles it made).<LineBreak />
+        Ctrl+Z / Ctrl+Y: undo / redo.<LineBreak />
+        F1: this list.
+      </TextBlock>
+
+      <TextBlock Style="{StaticResource Heading}" Text="View" />
+      <TextBlock Style="{StaticResource Lines}">
+        Middle drag, or Space + drag: pan.<LineBreak />
+        Arrow keys: pan, while the map has focus.<LineBreak />
+        Mouse wheel: zoom toward the mouse.<LineBreak />
+        Ctrl+0: fit the map. Ctrl+1: actual size.<LineBreak />
+        The layer list chooses the layer edits go to; Add layer adds one at a preset or any z.
+      </TextBlock>
+
+      <TextBlock Style="{StaticResource Heading}" Text="Tiles" />
+      <TextBlock Style="{StaticResource Lines}">
+        Click a cell in the Tiles panel: choose it; it becomes a tile the first time it is painted.<LineBreak />
+        Left drag: paint with the chosen tool. Right drag: erase.<LineBreak />
+        B: brush (paints as you drag). R: rectangle (filled on release). F: fill (click).<LineBreak />
+        Shift + click: fill, with any tool.<LineBreak />
+        Alt + click: pick the tile and layer under the mouse.<LineBreak />
+        [ and ]: smaller / larger brush.<LineBreak />
+        Fill layer / Clear layer: the whole chosen layer.
+      </TextBlock>
+
+      <TextBlock Style="{StaticResource Heading}" Text="Objects" />
+      <TextBlock Style="{StaticResource Lines}">
+        Click: place the chosen object, centered on the mouse.<LineBreak />
+        Shift + drag: move an object.<LineBreak />
+        Right click: remove an object.<LineBreak />
+        Ctrl + drag: select objects.<LineBreak />
+        Delete: remove the selected objects, or the one under the mouse.
+      </TextBlock>
+
+      <TextBlock Style="{StaticResource Heading}" Text="Events" />
+      <TextBlock Style="{StaticResource Lines}">
+        Click an object: edit its events.<LineBreak />
+        Click a cell without an object: edit the event that runs when the player walks onto it.<LineBreak />
+        Right click a cell without an object: remove its event.<LineBreak />
+        On the map, in every mode: a yellow dot is an event run when pressed, a cyan dot one run when walked into, a cyan square a cell with an event.
+      </TextBlock>
+    </StackPanel>
+  </ScrollViewer>
+</Window>

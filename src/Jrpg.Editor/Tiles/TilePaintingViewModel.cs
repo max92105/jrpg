@@ -1,8 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Jrpg.Core.Content;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
+using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
 
@@ -19,7 +19,7 @@ internal sealed partial class TilePaintingViewModel : ObservableObject
 
     private readonly LayerChoiceViewModel _layer;
 
-    public TilePaintingViewModel(ContentCatalog catalog, LayerChoiceViewModel layer)
+    public TilePaintingViewModel(CatalogDraft catalog, LayerChoiceViewModel layer)
     {
         Browser = new TileBrowserViewModel(catalog);
         _layer = layer;

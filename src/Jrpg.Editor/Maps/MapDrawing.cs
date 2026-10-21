@@ -1,7 +1,7 @@
 using System.Windows;
 using System.Windows.Media;
-using Jrpg.Core.Content;
 using Jrpg.Core.Maps;
+using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Tiles;
 
 namespace Jrpg.Editor.Maps;
@@ -11,7 +11,7 @@ namespace Jrpg.Editor.Maps;
 /// order, at the game's 48 pixels per cell. Canopies are the object's tiles again, clipped to its above-player zones, as
 /// the legacy editor did.
 /// </summary>
-internal sealed class MapDrawing(ContentCatalog catalog, TileImages tileImages)
+internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
 {
     /// <summary>Pixels per map cell at 100 % zoom, the same as the game's virtual screen.</summary>
     public const double CellPixels = 48;
@@ -109,7 +109,7 @@ internal sealed class MapDrawing(ContentCatalog catalog, TileImages tileImages)
         for (var index = 0; index < layout.Objects.Count; index++)
         {
             var placed = layout.Objects[index];
-            var definition = catalog.Objects[placed.ObjectId];
+            var definition = catalog.Current.Objects[placed.ObjectId];
             var baseY = placed.Position.Y + definition.Height;
             parts.Add(new MapPart(DrawOrderKey.ForSprite(placed.Z, baseY, index), placed.Z, MapPartKind.Object, index));
 
@@ -157,7 +157,7 @@ internal sealed class MapDrawing(ContentCatalog catalog, TileImages tileImages)
 
     private void DrawObject(DrawingContext context, PlacedObject placed)
     {
-        foreach (var tile in catalog.Objects[placed.ObjectId].Tiles)
+        foreach (var tile in catalog.Current.Objects[placed.ObjectId].Tiles)
         {
             context.DrawImage(tileImages.TileImageOf(tile.TileId), CellRect(placed.Position.X + tile.X, placed.Position.Y + tile.Y));
         }
@@ -166,7 +166,7 @@ internal sealed class MapDrawing(ContentCatalog catalog, TileImages tileImages)
     private void DrawCanopy(DrawingContext context, PlacedObject placed)
     {
         // One clip for all zones (nonzero fill: their union), so overlapping zones draw each pixel once, as the game's mask does.
-        var definition = catalog.Objects[placed.ObjectId];
+        var definition = catalog.Current.Objects[placed.ObjectId];
         var zones = new GeometryGroup { FillRule = FillRule.Nonzero };
         foreach (var zone in definition.AbovePlayerZones)
         {

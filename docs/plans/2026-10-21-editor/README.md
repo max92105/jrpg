@@ -65,7 +65,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 2: painting
 
 - [x] **ADR 0014: Editing the shared catalogs** (before E3a) → [slices/ADR-0014.md](slices/ADR-0014.md)
-- [ ] **E3a. One live catalog in the editor** (Editor, refactor, about 190 lines) → [slices/E3a.md](slices/E3a.md)
+- [x] **E3a. One live catalog in the editor** (Editor, refactor, about 190 lines) → [slices/E3a.md](slices/E3a.md)
 - [ ] **E3b. Any whole cell of a sheet can be chosen** (Core + Data + Editor, about 200 lines) → [slices/E3b.md](slices/E3b.md)
 - [ ] **E3c. The catalog writer** (Data, about 170 lines) → [slices/E3c.md](slices/E3c.md)
 - [ ] **E3d. A chosen cell becomes a tile when painted; Save writes the catalogs** (Editor, about 200 lines) → [slices/E3d.md](slices/E3d.md)

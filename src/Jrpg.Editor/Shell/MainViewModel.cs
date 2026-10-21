@@ -4,9 +4,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Jrpg.Core.Content;
 using Jrpg.Core.Geometry;
-using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
 using Jrpg.Data.Content;
+using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Events;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
@@ -43,8 +43,9 @@ internal sealed partial class MainViewModel : ObservableObject
         ArtRoot = ArtFolders.RootIn(contentRoot);
         try
         {
-            Catalog = ContentCatalogLoader.Load(contentRoot);
-            var artProblems = ArtReferenceCheck.FindProblems(Catalog, ArtRoot);
+            var loaded = ContentCatalogLoader.Load(contentRoot);
+            Content = new CatalogDraft(loaded);
+            var artProblems = ArtReferenceCheck.FindProblems(loaded, ArtRoot);
             LoadError = artProblems.Count == 0 ? null : string.Join(Environment.NewLine, artProblems);
         }
         catch (Exception exception) when (exception is ContentValidationException or IOException or UnauthorizedAccessException)
@@ -53,12 +54,12 @@ internal sealed partial class MainViewModel : ObservableObject
         }
 
         // Maps, tiles and objects only show when their content and art are whole, since drawing reads both.
-        if (Catalog is not null && LoadError is null)
+        if (Content is not null && LoadError is null)
         {
-            ShowMapList(Catalog);
-            Painting = new TilePaintingViewModel(Catalog, Layer);
-            Placing = new ObjectPlacingViewModel(Catalog.Objects, Layer);
-            EventEditing = new EventEditingViewModel(Catalog) { MapIds = MapIds };
+            ShowMapList(Content.Current);
+            Painting = new TilePaintingViewModel(Content, Layer);
+            Placing = new ObjectPlacingViewModel(Content, Layer);
+            EventEditing = new EventEditingViewModel(Content) { MapIds = MapIds };
             if (MapIds.Count > 0)
             {
                 TryOpenMap(MapIds[0]);
@@ -68,8 +69,11 @@ internal sealed partial class MainViewModel : ObservableObject
 
     public string ArtRoot { get; }
 
+    /// <summary>The content the editor works on (ADR 0014); null when it didn't load.</summary>
+    public CatalogDraft? Content { get; }
+
     /// <summary>The content as last loaded or saved; a save puts the saved map in it, so later saves check against it.</summary>
-    public ContentCatalog? Catalog { get; private set; }
+    public ContentCatalog? Catalog => Content?.Current;
 
     /// <summary>Why the content can't be edited, naming the file; null when it loaded.</summary>
     public string? LoadError { get; }
@@ -220,8 +224,8 @@ internal sealed partial class MainViewModel : ObservableObject
             return;
         }
 
-        Catalog = Catalog! with { Maps = new Dictionary<string, MapDefinition>(Catalog.Maps) { [map.Id] = map } };
-        ShowMapList(Catalog);
+        Content!.AddSavedMap(map);
+        ShowMapList(Content.Current);
 
         CurrentMap.MarkSaved();
         SaveError = null;

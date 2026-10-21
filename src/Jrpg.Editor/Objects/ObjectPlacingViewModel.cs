@@ -2,6 +2,7 @@ using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
+using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
 
@@ -13,13 +14,13 @@ namespace Jrpg.Editor.Objects;
 /// </summary>
 internal sealed partial class ObjectPlacingViewModel : ObservableObject
 {
-    private readonly IReadOnlyDictionary<string, ObjectDefinition> _definitions;
+    private readonly CatalogDraft _catalog;
     private readonly LayerChoiceViewModel _layer;
 
-    public ObjectPlacingViewModel(IReadOnlyDictionary<string, ObjectDefinition> definitions, LayerChoiceViewModel layer)
+    public ObjectPlacingViewModel(CatalogDraft catalog, LayerChoiceViewModel layer)
     {
-        Browser = new ObjectBrowserViewModel(definitions);
-        _definitions = definitions;
+        Browser = new ObjectBrowserViewModel(catalog);
+        _catalog = catalog;
         _layer = layer;
     }
 
@@ -58,7 +59,7 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
     /// <summary>The object drawn on top at a point, to move or remove; null when none is there.</summary>
     /// <param name="point">In map cells.</param>
     public PlacedObject? ObjectAt(Point2D point) =>
-        OpenMap is { } open ? PlacedObjectHits.TopAt(open.Map.Layout, point, _definitions) : null;
+        OpenMap is { } open ? PlacedObjectHits.TopAt(open.Map.Layout, point, _catalog.Current.Objects) : null;
 
     /// <param name="uid">The placed object to move.</param>
     /// <param name="to">Its new top-left corner, in map cells.</param>
@@ -76,7 +77,7 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
     /// <summary>Selects the objects overlapping the rectangle between two corners, in map cells.</summary>
     public void SelectObjectsIn(Point2D corner, Point2D oppositeCorner) =>
         SelectedObjectUids = OpenMap is { } open
-            ? [.. PlacedObjectHits.InRectangle(open.Map.Layout, corner, oppositeCorner, _definitions).Select(placed => placed.Uid)]
+            ? [.. PlacedObjectHits.InRectangle(open.Map.Layout, corner, oppositeCorner, _catalog.Current.Objects).Select(placed => placed.Uid)]
             : [];
 
     /// <summary>Removes the selected objects as one undo step.</summary>

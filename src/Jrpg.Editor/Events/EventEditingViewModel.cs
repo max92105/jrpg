@@ -1,5 +1,5 @@
-using Jrpg.Core.Content;
 using Jrpg.Core.Geometry;
+using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
 
@@ -9,11 +9,8 @@ namespace Jrpg.Editor.Events;
 /// Editing the events on the open map: an object's events, or a cell's when no object is clicked; which one a click
 /// picks, and applying the dialogs. Each change is one undo step.
 /// </summary>
-internal sealed class EventEditingViewModel(ContentCatalog catalog)
+internal sealed class EventEditingViewModel(CatalogDraft catalog)
 {
-    private readonly IReadOnlyList<string> _itemIds = [.. catalog.Items.Keys.Order(StringComparer.Ordinal)];
-    private readonly IReadOnlyList<string> _objectIds = [.. catalog.Objects.Keys.Order(StringComparer.Ordinal)];
-
     /// <summary>The map whose events are edited; set by the shell when a map opens.</summary>
     public MapViewModel? OpenMap { get; set; }
 
@@ -23,8 +20,8 @@ internal sealed class EventEditingViewModel(ContentCatalog catalog)
     /// <summary>The event dialog's state for the object drawn on top at a point; null when no object is there.</summary>
     /// <param name="point">In map cells.</param>
     public EventListViewModel? StartEditingAt(Point2D point) =>
-        OpenMap is { } open && PlacedObjectHits.TopAt(open.Map.Layout, point, catalog.Objects) is { } placed
-            ? new EventListViewModel(placed, Choices(), EventPresets.GuessOpenedObject(placed.ObjectId, catalog.Objects))
+        OpenMap is { } open && PlacedObjectHits.TopAt(open.Map.Layout, point, catalog.Current.Objects) is { } placed
+            ? new EventListViewModel(placed, Choices(), EventPresets.GuessOpenedObject(placed.ObjectId, catalog.Current.Objects))
             : null;
 
     /// <summary>The cell event dialog's state for a cell, with its event if it has one; null off the map.</summary>
@@ -60,5 +57,9 @@ internal sealed class EventEditingViewModel(ContentCatalog catalog)
         }
     }
 
-    private StepChoices Choices() => new(_itemIds, _objectIds, MapIds);
+    // Read when a dialog opens, so objects made since the editor started can be chosen.
+    private StepChoices Choices() => new(
+        [.. catalog.Current.Items.Keys.Order(StringComparer.Ordinal)],
+        [.. catalog.Current.Objects.Keys.Order(StringComparer.Ordinal)],
+        MapIds);
 }

@@ -1,6 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Geometry;
 using Jrpg.Data.Content;
+using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Objects;
 
@@ -16,7 +17,7 @@ public sealed class ObjectPlacingViewModelTests
     // The forest map open, the chest chosen to place.
     public ObjectPlacingViewModelTests()
     {
-        _placing = new ObjectPlacingViewModel(_catalog.Objects, _layer) { OpenMap = new MapViewModel(_catalog.Maps["forest"]) };
+        _placing = new ObjectPlacingViewModel(new CatalogDraft(_catalog), _layer) { OpenMap = new MapViewModel(_catalog.Maps["forest"]) };
         _placing.Browser.SelectedObject = _catalog.Objects["chest"];
     }
 

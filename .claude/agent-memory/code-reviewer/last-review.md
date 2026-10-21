@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-21-editor/slices/E1.md, E1 (error lines collapse, layer list chooses/adds layers, map list by name)
-Round: 1 (verdict: Fix the Criticals; verify all pass, 1317 tests)
+Slice: docs/plans/2026-10-21-editor/slices/E3a.md, E3a (CatalogDraft: one live catalog in the editor, refactor)
+Round: 1 (verdict: Ready to commit; verify all pass, 1320 tests)
 
-- open (Critical): MainViewModel.OnOpenMapChanged (refresh LayerEntries on Map change, i.e. after painting) has no test; add paint-at-empty-Z test asserting "empty" mark goes.
-- open (Warning): RefreshLayerEntries reassigns LayerEntries on every Map change (each painted cell) and every Z change (incl. clicks in the list) -> ItemsSource reset mid-selection; reassign only when !SequenceEqual.
-- open (Suggestion): RefreshLayerEntriesOn(changed, watched) string-pair helper; inline the two property-name checks.
-- open (Follow-up): MainWindow.xaml.cs is 475 lines (pre-existing).
+- open (Suggestion): EventEditingViewModel.cs:13 blank line left after the class brace where the two fields were removed.
+- open (Suggestion): no test pins "reads Current at each use" (e.g. ObjectPlacing.ObjectAt finds an object added to the draft after construction); worth adding with the first change method (E3d/E9).
+- open (Follow-up): TileImages caches cropped tiles by id forever; E3d/E5b changing a tile's cell or sheet will draw the stale image unless the cache is invalidated on Current change.
+- open (Follow-up): MainWindow partials still read `_viewModel.Catalog!` (three spots); fine now, revisit if Content becomes the only entry point.

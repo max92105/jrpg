@@ -43,10 +43,10 @@ internal sealed partial class MainWindow : Window
     public MainWindow(MainViewModel viewModel)
     {
         InitializeComponent();
-        if (viewModel.Catalog is { } catalog)
+        if (viewModel.Content is { } content)
         {
-            var tileImages = new TileImages(catalog, viewModel.ArtRoot);
-            _drawing = new MapDrawing(catalog, tileImages);
+            var tileImages = new TileImages(content, viewModel.ArtRoot);
+            _drawing = new MapDrawing(content, tileImages);
             TileBrowser.Images = tileImages;
             ObjectBrowser.Drawing = _drawing;
         }

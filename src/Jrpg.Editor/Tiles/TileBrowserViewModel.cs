@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
-using Jrpg.Core.Content;
 using Jrpg.Core.Maps;
+using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Tiles;
 
@@ -10,12 +10,12 @@ namespace Jrpg.Editor.Tiles;
 /// </summary>
 internal sealed partial class TileBrowserViewModel : ObservableObject
 {
-    private readonly IReadOnlyDictionary<int, TileDefinition> _tiles;
+    private readonly CatalogDraft _catalog;
 
-    public TileBrowserViewModel(ContentCatalog catalog)
+    public TileBrowserViewModel(CatalogDraft catalog)
     {
-        _tiles = catalog.Tiles;
-        Sheets = [.. catalog.Tilesheets.Values.OrderBy(sheet => sheet.Id, StringComparer.Ordinal)];
+        _catalog = catalog;
+        Sheets = [.. catalog.Current.Tilesheets.Values.OrderBy(sheet => sheet.Id, StringComparer.Ordinal)];
         SelectedSheet = Sheets.Count > 0 ? Sheets[0] : null;
     }
 
@@ -27,7 +27,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
 
     /// <summary>The tiles cut from the shown sheet.</summary>
     public IReadOnlyList<TileDefinition> SheetTiles =>
-        SelectedSheet is null ? [] : [.. _tiles.Values.Where(tile => tile.SheetId == SelectedSheet.Id)];
+        SelectedSheet is null ? [] : [.. _catalog.Current.Tiles.Values.Where(tile => tile.SheetId == SelectedSheet.Id)];
 
     /// <summary>The tile the brush paints; null until one is chosen.</summary>
     [ObservableProperty]
@@ -54,7 +54,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     /// <summary>Selects a tile and shows its sheet, as picking a tile from the map does.</summary>
     public void Select(int tileId)
     {
-        SelectedSheet = Sheets.First(sheet => sheet.Id == _tiles[tileId].SheetId);
+        SelectedSheet = Sheets.First(sheet => sheet.Id == _catalog.Current.Tiles[tileId].SheetId);
         SelectedTileId = tileId;
     }
 }

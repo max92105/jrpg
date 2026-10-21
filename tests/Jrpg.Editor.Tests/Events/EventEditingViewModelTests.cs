@@ -1,6 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Geometry;
 using Jrpg.Data.Content;
+using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Events;
 using Jrpg.Editor.Maps;
 
@@ -10,7 +11,7 @@ public sealed class EventEditingViewModelTests
 {
     private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-    private readonly EventEditingViewModel _eventEditing = new(_catalog) { OpenMap = new MapViewModel(_catalog.Maps["start"]), MapIds = ["forest", "start"] };
+    private readonly EventEditingViewModel _eventEditing = new(new CatalogDraft(_catalog)) { OpenMap = new MapViewModel(_catalog.Maps["start"]), MapIds = ["forest", "start"] };
 
     // The start map's chest, which gives a potion and turns into an opened chest (converted from the legacy demo).
     private Point2D ChestCenter

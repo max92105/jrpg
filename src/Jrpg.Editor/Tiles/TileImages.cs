@@ -2,13 +2,13 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using Jrpg.Core.Content;
 using Jrpg.Data.Art;
+using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Tiles;
 
 /// <summary>Tilesheet images and the tiles cut from them, each loaded once and kept for the editor's lifetime.</summary>
-internal sealed class TileImages(ContentCatalog catalog, string artRoot)
+internal sealed class TileImages(CatalogDraft catalog, string artRoot)
 {
     private readonly Dictionary<string, BitmapSource> _sheets = [];
     private readonly Dictionary<int, ImageSource> _tiles = [];
@@ -17,8 +17,8 @@ internal sealed class TileImages(ContentCatalog catalog, string artRoot)
     {
         if (!_tiles.TryGetValue(tileId, out var image))
         {
-            var tile = catalog.Tiles[tileId];
-            var sheet = catalog.Tilesheets[tile.SheetId];
+            var tile = catalog.Current.Tiles[tileId];
+            var sheet = catalog.Current.Tilesheets[tile.SheetId];
             var cell = new Int32Rect(sheet.CellLeft(tile.Column), sheet.CellTop(tile.Row), sheet.TileWidth, sheet.TileHeight);
             image = new CroppedBitmap(SheetImageOf(sheet.File), cell);
             image.Freeze();

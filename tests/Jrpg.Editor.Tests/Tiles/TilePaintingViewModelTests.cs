@@ -2,6 +2,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
+using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
 using Jrpg.Editor.Tiles;
@@ -17,7 +18,7 @@ public sealed class TilePaintingViewModelTests
 
     public TilePaintingViewModelTests()
     {
-        _painting = new TilePaintingViewModel(_catalog, _layer) { OpenMap = new MapViewModel(_catalog.Maps["forest"]) };
+        _painting = new TilePaintingViewModel(new CatalogDraft(_catalog), _layer) { OpenMap = new MapViewModel(_catalog.Maps["forest"]) };
     }
 
     private MapViewModel Map => _painting.OpenMap!;

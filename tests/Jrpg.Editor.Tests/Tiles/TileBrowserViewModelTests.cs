@@ -1,5 +1,6 @@
 using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
+using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Tiles;
 
 namespace Jrpg.Editor.Tests.Tiles;
@@ -10,7 +11,7 @@ public sealed class TileBrowserViewModelTests
     private static readonly TilesheetDefinition _dungeon = new() { Id = "dungeon", File = "Dungeon.png", TileWidth = 16, TileHeight = 16, Margin = 2, Spacing = 1 };
     private static readonly TilesheetDefinition _forest = new() { Id = "forest", File = "Forest.png", TileWidth = 48, TileHeight = 48, Margin = 0, Spacing = 0 };
 
-    private readonly TileBrowserViewModel _browser = new(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")) with
+    private readonly TileBrowserViewModel _browser = new(new CatalogDraft(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")) with
     {
         Tilesheets = new Dictionary<string, TilesheetDefinition> { ["forest"] = _forest, ["dungeon"] = _dungeon },
         Tiles = new Dictionary<int, TileDefinition>
@@ -18,7 +19,7 @@ public sealed class TileBrowserViewModelTests
             [7] = new() { Id = 7, IsWalkable = true, SheetId = "dungeon", Column = 1, Row = 0 },
             [8] = new() { Id = 8, IsWalkable = true, SheetId = "forest", Column = 0, Row = 0 },
         },
-    });
+    }));
 
     [Fact]
     public void Constructor_SheetsSortedById_ShowsTheFirst()

@@ -26,4 +26,13 @@ public sealed record TilesheetDefinition
 
     /// <summary>The top edge of a cell row, in image pixels.</summary>
     public int CellTop(int row) => Margin + (row * (TileHeight + Spacing));
+
+    /// <summary>How many whole cell columns an image of this width holds; a cut-off last column doesn't count.</summary>
+    public int ColumnsIn(int imageWidth) => WholeCellsIn(imageWidth, TileWidth);
+
+    /// <summary>How many whole cell rows an image of this height holds; a cut-off last row doesn't count.</summary>
+    public int RowsIn(int imageHeight) => WholeCellsIn(imageHeight, TileHeight);
+
+    // Cell n ends at Margin + n * (cell + Spacing) + cell, which must fit in the image; the last cell has no spacing after it.
+    private int WholeCellsIn(int imageLength, int cellLength) => Math.Max(0, (imageLength - Margin + Spacing) / (cellLength + Spacing));
 }

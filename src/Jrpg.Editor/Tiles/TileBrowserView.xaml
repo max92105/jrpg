@@ -8,6 +8,7 @@
               ItemsSource="{Binding Sheets}"
               SelectedItem="{Binding SelectedSheet}"
               DisplayMemberPath="Id" />
+    <TextBlock DockPanel.Dock="Bottom" Margin="0,4" Text="{Binding ChoiceText}" />
     <ScrollViewer HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"
                   Background="#202020">

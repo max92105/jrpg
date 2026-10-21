@@ -19,13 +19,19 @@ internal sealed partial class TilePaintingViewModel : ObservableObject
 
     private readonly LayerChoiceViewModel _layer;
 
-    public TilePaintingViewModel(CatalogDraft catalog, LayerChoiceViewModel layer)
+    /// <param name="catalog">The sheets and tiles.</param>
+    /// <param name="layer">The layer painted on.</param>
+    /// <param name="imageSizeOf">A sheet image's size in pixels, by its file name.</param>
+    public TilePaintingViewModel(CatalogDraft catalog, LayerChoiceViewModel layer, Func<string, (int Width, int Height)> imageSizeOf)
     {
-        Browser = new TileBrowserViewModel(catalog);
+        Browser = new TileBrowserViewModel(catalog, imageSizeOf);
         _layer = layer;
     }
 
     public TileBrowserViewModel Browser { get; }
+
+    /// <summary>Whether a cell is chosen in the browser; with none, a click on the map only says to choose one.</summary>
+    public bool HasChoice => Browser.SelectedCell is not null;
 
     public IReadOnlyList<int> BrushSizes { get; } = _brushSizes;
 

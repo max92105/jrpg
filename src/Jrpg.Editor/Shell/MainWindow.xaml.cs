@@ -273,6 +273,12 @@ internal sealed partial class MainWindow : Window
             return true;
         }
 
+        if (button == MouseButton.Left && !Painting.HasChoice)
+        {
+            _viewModel.ShowPaintHint();
+            return true;
+        }
+
         // Shift + click fills with any tool, as in the legacy editor.
         if (button == MouseButton.Left && (Keyboard.Modifiers == ModifierKeys.Shift || Painting.Tool == TileTool.Fill))
         {

@@ -8,7 +8,7 @@ namespace Jrpg.Editor.Tiles;
 
 /// <summary>
 /// Shows the <see cref="TileBrowserViewModel"/>'s sheet, scaled so its cells match the map's, with the cells that are
-/// tiles marked; a click chooses the tile under it.
+/// tiles marked; a click chooses the whole cell under it.
 /// </summary>
 internal sealed partial class TileBrowserView : UserControl
 {
@@ -33,7 +33,7 @@ internal sealed partial class TileBrowserView : UserControl
 
     private void OnBrowserChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(TileBrowserViewModel.SelectedSheet) or nameof(TileBrowserViewModel.SelectedTileId))
+        if (e.PropertyName is nameof(TileBrowserViewModel.SelectedSheet) or nameof(TileBrowserViewModel.SelectedCell))
         {
             DrawSheet();
         }
@@ -50,7 +50,7 @@ internal sealed partial class TileBrowserView : UserControl
         var image = Images.SheetImageOf(sheet.File);
         var size = new Size(image.PixelWidth, image.PixelHeight);
         SheetImage.Source = image;
-        SheetMarks.Source = TilesheetMarks.Draw(sheet, size, _browser.SheetTiles, _browser.SelectedTileId);
+        SheetMarks.Source = TilesheetMarks.Draw(sheet, size, _browser.SheetTiles, _browser.SelectedCell);
         SheetImage.Width = SheetMarks.Width = size.Width;
         SheetImage.Height = SheetMarks.Height = size.Height;
         var scale = TilesheetMarks.DisplayScaleOf(sheet);
@@ -60,6 +60,6 @@ internal sealed partial class TileBrowserView : UserControl
     private void OnSheetClicked(object sender, MouseButtonEventArgs e)
     {
         var pixel = e.GetPosition(SheetView);
-        _browser?.SelectTileAt(pixel.X, pixel.Y);
+        _browser?.SelectCellAt(pixel.X, pixel.Y);
     }
 }

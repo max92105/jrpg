@@ -8,18 +8,27 @@ namespace Jrpg.Editor.Tests.Tiles;
 public sealed class TileBrowserViewModelTests
 {
     // Two sheets: "dungeon" has 16-pixel cells inside a 2-pixel margin, 1 pixel apart, and one tile at column 1, row 0.
+    // Its image is 54 x 19: three whole columns (the third ends at 2 + 2 * 17 + 16 = 52) and one row.
     private static readonly TilesheetDefinition _dungeon = new() { Id = "dungeon", File = "Dungeon.png", TileWidth = 16, TileHeight = 16, Margin = 2, Spacing = 1 };
     private static readonly TilesheetDefinition _forest = new() { Id = "forest", File = "Forest.png", TileWidth = 48, TileHeight = 48, Margin = 0, Spacing = 0 };
 
-    private readonly TileBrowserViewModel _browser = new(new CatalogDraft(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")) with
+    private static readonly Dictionary<string, (int Width, int Height)> _imageSizes = new()
     {
-        Tilesheets = new Dictionary<string, TilesheetDefinition> { ["forest"] = _forest, ["dungeon"] = _dungeon },
-        Tiles = new Dictionary<int, TileDefinition>
+        ["Dungeon.png"] = (54, 19),
+        ["Forest.png"] = (96, 48),
+    };
+
+    private readonly TileBrowserViewModel _browser = new(
+        new CatalogDraft(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")) with
         {
-            [7] = new() { Id = 7, IsWalkable = true, SheetId = "dungeon", Column = 1, Row = 0 },
-            [8] = new() { Id = 8, IsWalkable = true, SheetId = "forest", Column = 0, Row = 0 },
-        },
-    }));
+            Tilesheets = new Dictionary<string, TilesheetDefinition> { ["forest"] = _forest, ["dungeon"] = _dungeon },
+            Tiles = new Dictionary<int, TileDefinition>
+            {
+                [7] = new() { Id = 7, IsWalkable = true, SheetId = "dungeon", Column = 1, Row = 0 },
+                [8] = new() { Id = 8, IsWalkable = true, SheetId = "forest", Column = 0, Row = 0 },
+            },
+        }),
+        file => _imageSizes[file]);
 
     [Fact]
     public void Constructor_SheetsSortedById_ShowsTheFirst()
@@ -31,20 +40,36 @@ public sealed class TileBrowserViewModelTests
     }
 
     [Fact]
-    public void SelectTileAt_PixelInATileCell_SelectsIt()
+    public void SelectCellAt_CellThatIsATile_SelectsItsTile()
     {
         // Column 1 starts at margin 2 + one cell of 16 + spacing 1 = 19.
-        _browser.SelectTileAt(19, 2);
+        _browser.SelectCellAt(19, 2);
 
+        Assert.Equal(new SheetCell("dungeon", 1, 0), _browser.SelectedCell);
         Assert.Equal(7, _browser.SelectedTileId);
     }
 
     [Fact]
-    public void SelectTileAt_CellThatIsNoTile_KeepsTheSelection()
+    public void SelectCellAt_CellThatIsNoTile_SelectsTheCell()
     {
-        _browser.SelectTileAt(20, 5);
+        _browser.SelectCellAt(19, 2);
 
-        _browser.SelectTileAt(5, 5);
+        _browser.SelectCellAt(5, 5);
+
+        Assert.Equal(new SheetCell("dungeon", 0, 0), _browser.SelectedCell);
+        Assert.Null(_browser.SelectedTileId);
+    }
+
+    // Past the last whole column (53), on the spacing after column 0 (18), on the margin (1).
+    [Theory]
+    [InlineData(53, 5)]
+    [InlineData(18, 5)]
+    [InlineData(1, 5)]
+    public void SelectCellAt_OffEveryWholeCell_KeepsTheChoice(double x, double y)
+    {
+        _browser.SelectCellAt(19, 2);
+
+        _browser.SelectCellAt(x, y);
 
         Assert.Equal(7, _browser.SelectedTileId);
     }
@@ -56,5 +81,21 @@ public sealed class TileBrowserViewModelTests
 
         Assert.Equal(_forest, _browser.SelectedSheet);
         Assert.Equal(8, _browser.SelectedTileId);
+    }
+
+    [Fact]
+    public void ChoiceText_CellThatIsNoTile_SaysNotATileYet()
+    {
+        _browser.SelectCellAt(40, 5);
+
+        Assert.Equal("Cell (2, 0): not a tile yet", _browser.ChoiceText);
+    }
+
+    [Fact]
+    public void ChoiceText_CellThatIsATile_NamesTheTile()
+    {
+        _browser.SelectCellAt(19, 2);
+
+        Assert.Equal("Cell (1, 0): tile 7", _browser.ChoiceText);
     }
 }

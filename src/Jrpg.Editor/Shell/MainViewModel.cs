@@ -26,6 +26,7 @@ internal sealed partial class MainViewModel : ObservableObject
 {
     private readonly ContentWriter _writer;
     private readonly Func<string, bool> _confirm;
+    private readonly Dictionary<string, (int Width, int Height)> _sheetImageSizes = [];
 
     /// <param name="contentRoot">The content folder to edit.</param>
     /// <param name="confirm">Asks the user a yes or no question, such as whether to drop unsaved changes; true for yes.</param>
@@ -57,7 +58,7 @@ internal sealed partial class MainViewModel : ObservableObject
         if (Content is not null && LoadError is null)
         {
             ShowMapList(Content.Current);
-            Painting = new TilePaintingViewModel(Content, Layer);
+            Painting = new TilePaintingViewModel(Content, Layer, SheetImageSizeOf);
             Placing = new ObjectPlacingViewModel(Content, Layer);
             EventEditing = new EventEditingViewModel(Content) { MapIds = MapIds };
             if (MapIds.Count > 0)
@@ -176,6 +177,9 @@ internal sealed partial class MainViewModel : ObservableObject
         CursorStatus = CurrentMap.TopTileAt(at) is { } tile ? $"{position}   Tile {tile.TileId} on layer z {tile.LayerZ}" : $"{position}   No tile";
     }
 
+    /// <summary>Says in the status bar why a click on the map painted nothing: no cell is chosen in the Tiles panel.</summary>
+    public void ShowPaintHint() => CursorStatus = "Choose a tile in the Tiles panel";
+
     /// <summary>The settings dialog's state for the open map; null when no map is open.</summary>
     public MapSettingsViewModel? StartEditingSettings() => CurrentMap is { } open ? new(open.Map, Catalog!.Encounters.Keys) : null;
 
@@ -260,6 +264,18 @@ internal sealed partial class MainViewModel : ObservableObject
                 .ThenBy(map => map.Id, StringComparer.Ordinal)
                 .Select(map => new MapEntry(map.Id, $"{map.Settings.DisplayName} ({map.Id})")),
         ];
+    }
+
+    // Read from the PNG header once per file; the art check has already found every sheet image readable.
+    private (int Width, int Height) SheetImageSizeOf(string file)
+    {
+        if (!_sheetImageSizes.TryGetValue(file, out var size))
+        {
+            size = PngSize.Read(Path.Combine(ArtRoot, ArtFolders.Tilesheets, file));
+            _sheetImageSizes.Add(file, size);
+        }
+
+        return size;
     }
 
     private void OnOpenMapChanged(object? sender, PropertyChangedEventArgs e)

@@ -4,7 +4,7 @@ using Jrpg.Data.Content;
 namespace Jrpg.Data.Art;
 
 /// <summary>Reads an image's size from its PNG header, so art can be checked without a graphics device.</summary>
-internal static class PngSize
+public static class PngSize
 {
     // The 8-byte signature, then the IHDR chunk's length and type, then its width and height (PNG spec, section 5 and 11.2.2).
     private const int HeaderLength = 24;

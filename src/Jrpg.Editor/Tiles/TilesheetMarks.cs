@@ -1,12 +1,13 @@
 using System.Windows;
 using System.Windows.Media;
 using Jrpg.Core.Maps;
+using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Maps;
 
 namespace Jrpg.Editor.Tiles;
 
 /// <summary>
-/// Drawn over a tilesheet in the tile browser: its grid, the cells that are tiles, and the chosen tile. The browser
+/// Drawn over a tilesheet in the tile browser: its grid, the cells that are tiles, and the chosen cell. The browser
 /// shows a sheet's cells at the map's cell size, so line widths are set in screen pixels at that scale.
 /// </summary>
 internal static class TilesheetMarks
@@ -20,8 +21,8 @@ internal static class TilesheetMarks
     /// <param name="sheet">How the image is cut into cells.</param>
     /// <param name="imageSize">The image's size in its own pixels.</param>
     /// <param name="tiles">The tiles cut from this sheet.</param>
-    /// <param name="selectedTileId">The chosen tile, outlined if it is on this sheet.</param>
-    public static DrawingImage Draw(TilesheetDefinition sheet, Size imageSize, IReadOnlyList<TileDefinition> tiles, int? selectedTileId)
+    /// <param name="selected">The chosen cell, outlined if it is on this sheet, a tile or not.</param>
+    public static DrawingImage Draw(TilesheetDefinition sheet, Size imageSize, IReadOnlyList<TileDefinition> tiles, SheetCell? selected)
     {
         var screenPixel = 1 / DisplayScaleOf(sheet);
         var gridPen = new Pen(_gridBrush, screenPixel);
@@ -44,9 +45,9 @@ internal static class TilesheetMarks
                 context.DrawRectangle(_tileFill, null, CellRect(sheet, tile.Column, tile.Row));
             }
 
-            if (tiles.FirstOrDefault(tile => tile.Id == selectedTileId) is { } selected)
+            if (selected is { } cell && cell.SheetId == sheet.Id)
             {
-                context.DrawRectangle(null, new Pen(Brushes.Cyan, 3 * screenPixel), CellRect(sheet, selected.Column, selected.Row));
+                context.DrawRectangle(null, new Pen(Brushes.Cyan, 3 * screenPixel), CellRect(sheet, cell.Column, cell.Row));
             }
         }
 

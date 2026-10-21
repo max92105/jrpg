@@ -68,7 +68,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 |---|---|---|
 | Shell | The main window and editing modes | `MainWindow`, `MainViewModel`, `EditingMode`, `MapEntry` |
 | Maps / Maps/Editing / Maps/Settings | The map document, its undoable edits, map settings and new maps | `MapViewModel`, `MapDraft`, `IMapEdit`, `EditHistory`, `MapSettingsViewModel`, `LayerChoiceViewModel`, `LayerEntry` |
-| Catalogs | The content the editor works on, read by every panel and the drawing; catalog changes go through it (ADR 0014) | `CatalogDraft` |
+| Catalogs | The content the editor works on, read by every panel and the drawing; catalog changes go through it (ADR 0014) | `CatalogDraft`, `SheetCell` |
 | Tiles, Objects | Tile and object browsers, painting and placing | `TilePaintingViewModel`, `ObjectPlacingViewModel` |
 | Events | Object and cell event dialogs and presets | `EventEditingViewModel`, `EventStepViewModel`, `EventPresets` |
 | Viewport | Zoom and pan | `ViewportTransform` |

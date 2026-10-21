@@ -18,7 +18,7 @@ public sealed class TilePaintingViewModelTests
 
     public TilePaintingViewModelTests()
     {
-        _painting = new TilePaintingViewModel(new CatalogDraft(_catalog), _layer) { OpenMap = new MapViewModel(_catalog.Maps["forest"]) };
+        _painting = new TilePaintingViewModel(new CatalogDraft(_catalog), _layer, _ => (1000, 1000)) { OpenMap = new MapViewModel(_catalog.Maps["forest"]) };
     }
 
     private MapViewModel Map => _painting.OpenMap!;
@@ -46,6 +46,20 @@ public sealed class TilePaintingViewModelTests
         _painting.EndStroke();
 
         Assert.False(Map.IsDirty);
+    }
+
+    [Fact]
+    public void HasChoice_NothingChosen_IsFalse()
+    {
+        Assert.False(_painting.HasChoice);
+    }
+
+    [Fact]
+    public void HasChoice_CellChosen_IsTrue()
+    {
+        _painting.Browser.Select(_catalog.Tiles.Keys.First());
+
+        Assert.True(_painting.HasChoice);
     }
 
     [Fact]

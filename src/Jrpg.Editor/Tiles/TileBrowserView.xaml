@@ -16,9 +16,45 @@
             HorizontalAlignment="Left"
             Padding="8,2"
             Content="Set up"
-            ToolTip="Make this image a sheet: id from its file name, cut into square tiles of a guessed size."
+            ToolTip="Make this image a sheet: opens the Cut panel with a guessed cut."
             Command="{Binding SetUpSheetCommand}"
             Visibility="{Binding CanSetUpSheet, Converter={StaticResource VisibleWhenTrue}}" />
+    <!-- Columns and rows are the input; the tile size they give is shown, never typed (decision 115). -->
+    <Expander DockPanel.Dock="Bottom"
+              Margin="0,4"
+              Header="Cut"
+              IsExpanded="True"
+              Visibility="{Binding IsCutOpen, Converter={StaticResource VisibleWhenTrue}}">
+      <StackPanel DataContext="{Binding Cut}" Margin="4">
+        <TextBlock Text="{Binding SheetId, StringFormat=Sheet: {0}}" Margin="0,0,0,4" />
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="60" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="60" />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+          </Grid.RowDefinitions>
+          <TextBlock Grid.Row="0" Grid.Column="0" Margin="0,2,4,2" Text="Columns" />
+          <TextBox Grid.Row="0" Grid.Column="1" Margin="0,2" Text="{Binding Columns, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Grid.Row="0" Grid.Column="2" Margin="8,2,4,2" Text="Rows" />
+          <TextBox Grid.Row="0" Grid.Column="3" Margin="0,2" Text="{Binding Rows, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Grid.Row="1" Grid.Column="0" Margin="0,2,4,2" Text="Margin" />
+          <TextBox Grid.Row="1" Grid.Column="1" Margin="0,2" Text="{Binding Margin, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Grid.Row="1" Grid.Column="2" Margin="8,2,4,2" Text="Spacing" />
+          <TextBox Grid.Row="1" Grid.Column="3" Margin="0,2" Text="{Binding Spacing, UpdateSourceTrigger=PropertyChanged}" />
+        </Grid>
+        <TextBlock Margin="0,4,0,0" Text="{Binding Summary}" />
+        <TextBlock Margin="0,4,0,0" Foreground="Firebrick" TextWrapping="Wrap" Text="{Binding Problem}" />
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <Button Padding="8,2" Content="Apply" Command="{Binding DataContext.ApplyCutCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+          <Button Padding="8,2" Margin="4,0,0,0" Content="Cancel" Command="{Binding DataContext.CancelCutCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+        </StackPanel>
+      </StackPanel>
+    </Expander>
     <TextBlock DockPanel.Dock="Bottom" Margin="0,4" Text="{Binding ChoiceText}" />
     <ScrollViewer HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"

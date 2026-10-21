@@ -262,6 +262,7 @@ public sealed class MainViewModelTests : IDisposable
         var browser = viewModel.Painting!.Browser;
         browser.SelectedChoice = browser.SheetChoices.First(choice => choice.File == "Grass3.png");
         browser.SetUpSheetCommand.Execute(null);
+        browser.ApplyCutCommand.Execute(null);
         browser.SelectCellAt(1, 1);
         var tileId = viewModel.Content!.AddTile(browser.SelectedCell!.Value);
 

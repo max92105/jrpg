@@ -43,7 +43,7 @@
         B: brush (paints as you drag). R: rectangle (filled on release). F: fill (click).<LineBreak />
         Shift + click: fill, with any tool.<LineBreak />
         Alt + click: pick the tile and layer under the mouse.<LineBreak />
-        Set up (Tiles panel or menu), on an image "(not set up)": make it a sheet, cut into square tiles of a guessed size.<LineBreak />
+        Set up (Tiles panel or menu), on an image "(not set up)": open the Cut panel with a guessed cut; set columns, rows, margin and spacing, then Apply.<LineBreak />
         Mark blocked (Tiles panel or menu): while on, a click on a sheet cell flips it between walkable and blocked (red cross).<LineBreak />
         [ and ]: smaller / larger brush.<LineBreak />
         Fill layer / Clear layer: the whole chosen layer.

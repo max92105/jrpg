@@ -101,18 +101,83 @@ public sealed class TileBrowserViewModelTests
         Assert.Equal(7, _browser.SelectedTileId);
     }
 
-    // 96 x 64: 32 is the first common size that divides both sides.
+    // 96 x 64: 32 is the first common size that divides both sides, so 3 columns and 2 rows.
     [Fact]
-    public void SetUpSheetCommand_ImageNotSetUp_AddsTheGuessedSheetAndShowsIt()
+    public void SetUpSheetCommand_ImageNotSetUp_OpensCutWithGuessedColumnsAndRows()
     {
         _browser.SelectedChoice = _browser.SheetChoices[2];
 
         _browser.SetUpSheetCommand.Execute(null);
 
-        var expected = new TilesheetDefinition { Id = "grass_3", File = "Grass3.png", TileWidth = 32, TileHeight = 32, Margin = 0, Spacing = 0 };
+        Assert.Equal(("grass_3", 3, 2), (_browser.Cut!.SheetId, _browser.Cut.Columns, _browser.Cut.Rows));
+        Assert.False(_draft.Current.Tilesheets.ContainsKey("grass_3"));
+    }
+
+    [Fact]
+    public void ApplyCutCommand_NewSheet_AddsItAndShowsTheGrid()
+    {
+        OpenGrass3Cut();
+        _browser.Cut!.Columns = 2;
+
+        _browser.ApplyCutCommand.Execute(null);
+
+        var expected = new TilesheetDefinition { Id = "grass_3", File = "Grass3.png", TileWidth = 48, TileHeight = 32, Margin = 0, Spacing = 0 };
         Assert.Equal(expected, _draft.Current.Tilesheets["grass_3"]);
         Assert.Equal(expected, _browser.SelectedSheet);
+        Assert.Null(_browser.Cut);
         Assert.Equal(["dungeon", "forest", "grass_3"], _browser.SheetChoices.Select(choice => choice.Label));
+    }
+
+    [Fact]
+    public void ApplyCutCommand_CutWithProblem_CannotExecute()
+    {
+        OpenGrass3Cut();
+
+        _browser.Cut!.Columns = 5;
+
+        Assert.False(_browser.ApplyCutCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void ApplyCutCommand_FieldMadeWrong_AnnouncesItCannotExecute()
+    {
+        OpenGrass3Cut();
+        var announced = false;
+        _browser.ApplyCutCommand.CanExecuteChanged += (_, _) => announced = true;
+
+        _browser.Cut!.Columns = 5;
+
+        Assert.True(announced);
+    }
+
+    [Fact]
+    public void SelectedChoice_OtherImageWhileCutOpen_ClosesCut()
+    {
+        OpenGrass3Cut();
+
+        _browser.SelectedChoice = _browser.SheetChoices[0];
+
+        Assert.Null(_browser.Cut);
+    }
+
+    [Fact]
+    public void SetUpSheetCommand_CutOpen_CannotExecute()
+    {
+        OpenGrass3Cut();
+
+        Assert.False(_browser.SetUpSheetCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void CancelCutCommand_NewSheet_AddsNothing()
+    {
+        OpenGrass3Cut();
+
+        _browser.CancelCutCommand.Execute(null);
+
+        Assert.Null(_browser.Cut);
+        Assert.False(_draft.Current.Tilesheets.ContainsKey("grass_3"));
+        Assert.Equal(new SheetChoice("Grass3.png", null), _browser.SelectedChoice);
     }
 
     [Fact]
@@ -124,8 +189,8 @@ public sealed class TileBrowserViewModelTests
     [Fact]
     public void Undo_SetUpOfTheChosenCellsSheet_ClearsTheChoice()
     {
-        _browser.SelectedChoice = _browser.SheetChoices[2];
-        _browser.SetUpSheetCommand.Execute(null);
+        OpenGrass3Cut();
+        _browser.ApplyCutCommand.Execute(null);
         _browser.SelectCellAt(5, 5);
 
         _draft.Undo();
@@ -171,5 +236,11 @@ public sealed class TileBrowserViewModelTests
         _browser.SelectCellAt(19, 2);
 
         Assert.Equal("Cell (1, 0): tile 7", _browser.ChoiceText);
+    }
+
+    private void OpenGrass3Cut()
+    {
+        _browser.SelectedChoice = _browser.SheetChoices[2];
+        _browser.SetUpSheetCommand.Execute(null);
     }
 }

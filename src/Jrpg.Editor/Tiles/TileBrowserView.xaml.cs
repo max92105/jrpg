@@ -13,6 +13,7 @@ namespace Jrpg.Editor.Tiles;
 internal sealed partial class TileBrowserView : UserControl
 {
     private TileBrowserViewModel? _browser;
+    private SheetCutViewModel? _cut;
 
     public TileBrowserView()
     {
@@ -36,13 +37,29 @@ internal sealed partial class TileBrowserView : UserControl
 
     private void OnBrowserChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(TileBrowserViewModel.SelectedChoice) or nameof(TileBrowserViewModel.SelectedCell) or nameof(TileBrowserViewModel.SheetTiles))
+        if (e.PropertyName == nameof(TileBrowserViewModel.Cut))
+        {
+            _cut?.PropertyChanged -= OnCutChanged;
+            _cut = _browser?.Cut;
+            _cut?.PropertyChanged += OnCutChanged;
+        }
+
+        if (e.PropertyName is nameof(TileBrowserViewModel.SelectedChoice) or nameof(TileBrowserViewModel.SelectedCell) or nameof(TileBrowserViewModel.SheetTiles) or nameof(TileBrowserViewModel.Cut))
         {
             DrawSheet();
         }
     }
 
-    // An image not set up has no cells to scale to the map's, so it shows at its own size, with no marks.
+    private void OnCutChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(SheetCutViewModel.PreviewSheet))
+        {
+            DrawSheet();
+        }
+    }
+
+    // An image not set up has no cells to scale to the map's, so it shows at its own size, with no marks, or with the
+    // Cut panel's grid while it is open; the scale stays put while the cut is typed.
     private void DrawSheet()
     {
         if (_browser?.SelectedChoice is not { } choice || Images is null)
@@ -53,11 +70,12 @@ internal sealed partial class TileBrowserView : UserControl
 
         var image = Images.SheetImageOf(choice.File);
         var size = new Size(image.PixelWidth, image.PixelHeight);
+        var marked = _browser.Cut is { } cut ? cut.PreviewSheet : choice.Sheet;
         SheetImage.Source = image;
-        SheetMarks.Source = choice.Sheet is { } sheet ? TilesheetMarks.Draw(sheet, size, _browser.SheetTiles, _browser.SelectedCell) : null;
+        SheetMarks.Source = marked is null ? null : TilesheetMarks.Draw(marked, size, _browser.SheetTiles, _browser.SelectedCell);
         SheetImage.Width = SheetMarks.Width = size.Width;
         SheetImage.Height = SheetMarks.Height = size.Height;
-        var scale = choice.Sheet is { } cut ? TilesheetMarks.DisplayScaleOf(cut) : 1;
+        var scale = choice.Sheet is { } sheet ? TilesheetMarks.DisplayScaleOf(sheet) : 1;
         SheetView.LayoutTransform = new ScaleTransform(scale, scale);
     }
 

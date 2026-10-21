@@ -44,8 +44,16 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     /// <summary>How the shown image is cut; null when it isn't set up yet.</summary>
     public TilesheetDefinition? SelectedSheet => SelectedChoice?.Sheet;
 
-    /// <summary>Whether the shown image has no sheet yet, so Set up can make one.</summary>
-    public bool CanSetUpSheet => SelectedChoice is { Sheet: null };
+    /// <summary>Whether the shown image has no sheet yet and no Cut panel open, so Set up can start one.</summary>
+    public bool CanSetUpSheet => SelectedChoice is { Sheet: null } && Cut is null;
+
+    /// <summary>The open Cut panel, for the shown image; null when closed.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsCutOpen), nameof(CanSetUpSheet))]
+    [NotifyCanExecuteChangedFor(nameof(ApplyCutCommand), nameof(SetUpSheetCommand))]
+    public partial SheetCutViewModel? Cut { get; private set; }
+
+    public bool IsCutOpen => Cut is not null;
 
     /// <summary>The tiles cut from the shown sheet.</summary>
     public IReadOnlyList<TileDefinition> SheetTiles =>
@@ -108,16 +116,16 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Makes the shown image a sheet, as one undo step: id from its file name (decision 118), square tiles of the guessed
-    /// size, no margin or spacing.
+    /// Opens the Cut panel for the shown image, pre-filled with a guess: id from its file name (decision 118), square tiles
+    /// of the guessed size, no margin or spacing. The sheet is made only when the cut is applied.
     /// </summary>
     [RelayCommand(CanExecute = nameof(CanSetUpSheet))]
     private void SetUpSheet()
     {
         var file = SelectedChoice!.File;
-        var (width, height) = _imageSizeOf(file);
-        var tileSize = SheetCutGuess.TileSizeFor(width, height);
-        _catalog.SetTilesheet(new TilesheetDefinition
+        var imageSize = _imageSizeOf(file);
+        var tileSize = SheetCutGuess.TileSizeFor(imageSize.Width, imageSize.Height);
+        var guess = new TilesheetDefinition
         {
             Id = TilesheetIds.FromFile(file, [.. _catalog.Current.Tilesheets.Keys]),
             File = file,
@@ -125,8 +133,34 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
             TileHeight = tileSize,
             Margin = 0,
             Spacing = 0,
-        });
+        };
+        Cut = new SheetCutViewModel(guess, imageSize);
     }
+
+    /// <summary>Makes the sheet as the Cut panel has it, as one undo step, and closes the panel.</summary>
+    [RelayCommand(CanExecute = nameof(CanApplyCut))]
+    private void ApplyCut()
+    {
+        var sheet = Cut!.ToSheet();
+        Cut = null;
+        _catalog.SetTilesheet(sheet);
+    }
+
+    private bool CanApplyCut() => Cut is { Problem: null };
+
+    [RelayCommand]
+    private void CancelCut() => Cut = null;
+
+    partial void OnCutChanged(SheetCutViewModel? oldValue, SheetCutViewModel? newValue)
+    {
+        oldValue?.PropertyChanged -= OnCutFieldChanged;
+        newValue?.PropertyChanged += OnCutFieldChanged;
+    }
+
+    private void OnCutFieldChanged(object? sender, PropertyChangedEventArgs e) => ApplyCutCommand.NotifyCanExecuteChanged();
+
+    // A cut belongs to the image it was opened on.
+    partial void OnSelectedChoiceChanged(SheetChoice? value) => Cut = null;
 
     // Matched ignoring case, as Windows finds the file a sheet names whatever its case.
     private static SheetChoice[] ChoicesOf(IReadOnlyList<string> imageFiles, IEnumerable<TilesheetDefinition> sheets)

@@ -102,6 +102,84 @@ public sealed class ContentWriterTests : IDisposable
         Assert.Equal("forest_2", ContentCatalogLoader.Load(_contentRoot).Maps["forest_2"].Settings.Id);
     }
 
+    [Fact]
+    public void WriteMapCatalogs_UnchangedRepositoryCatalogs_WritesIdenticalBytes()
+    {
+        var filesBefore = CatalogFileBytes();
+
+        _writer.WriteMapCatalogs(_catalog);
+
+        Assert.Equal(filesBefore, CatalogFileBytes());
+    }
+
+    [Fact]
+    public void WriteMapCatalogs_NewTile_LoadsBackWithIt()
+    {
+        var tile = NewTile();
+
+        _writer.WriteMapCatalogs(WithTile(tile));
+
+        Assert.Equal(tile, ContentCatalogLoader.Load(_contentRoot).Tiles[tile.Id]);
+    }
+
+    [Fact]
+    public void WriteMapCatalogs_TileOnUnknownSheet_ThrowsAndWritesNothing()
+    {
+        var filesBefore = CatalogFileBytes();
+
+        var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMapCatalogs(WithTile(NewTile() with { SheetId = "nowhere" })));
+
+        Assert.StartsWith("tiles.json: ", exception.Message, StringComparison.Ordinal);
+        Assert.Equal(filesBefore, CatalogFileBytes());
+        Assert.Empty(Directory.EnumerateFiles(_contentRoot, "*.saving", SearchOption.AllDirectories));
+    }
+
+    [Fact]
+    public void WriteMapCatalogs_TileOutsideItsImage_ThrowsNamingTheTileAndWritesNothing()
+    {
+        var tile = NewTile() with { Column = 9999 };
+        var filesBefore = CatalogFileBytes();
+
+        var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMapCatalogs(WithTile(tile)));
+
+        Assert.Contains($"tile {tile.Id}'s cell", exception.Message, StringComparison.Ordinal);
+        Assert.Equal(filesBefore, CatalogFileBytes());
+    }
+
+    [Fact]
+    public void WriteMapCatalogs_MapUsesMissingTile_ThrowsNamingTheMap()
+    {
+        var forest = _catalog.Maps["forest"];
+        var ground = forest.Layout.Layers[0];
+        var missingTileId = _catalog.Tiles.Keys.Max() + 1;
+        var paintedRow = (IReadOnlyList<int>)[missingTileId, .. ground.Rows[0].Skip(1)];
+        var layers = forest.Layout.Layers.Select(layer => layer == ground ? layer with { Rows = [paintedRow, .. layer.Rows.Skip(1)] } : layer);
+        var painted = new MapDefinition(forest.Layout with { Layers = [.. layers] }, forest.Settings);
+        var maps = _catalog.Maps.Values.Select(map => map.Id == "forest" ? painted : map).ToDictionary(map => map.Id);
+
+        var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMapCatalogs(_catalog with { Maps = maps }));
+
+        Assert.StartsWith("map-layouts/forest.json: ", exception.Message, StringComparison.Ordinal);
+    }
+
+    // A tile on the first sheet that isn't in the catalog yet.
+    private TileDefinition NewTile() => new()
+    {
+        Id = _catalog.Tiles.Keys.Max() + 1,
+        IsWalkable = true,
+        SheetId = _catalog.Tilesheets.Keys.Order(StringComparer.Ordinal).First(),
+        Column = 0,
+        Row = 0,
+    };
+
+    private ContentCatalog WithTile(TileDefinition tile) =>
+        _catalog with { Tiles = _catalog.Tiles.Values.Append(tile).ToDictionary(other => other.Id) };
+
+    private byte[] CatalogFileBytes() =>
+        [.. File.ReadAllBytes(Path.Combine(_contentRoot, "tilesheets.json")),
+         .. File.ReadAllBytes(Path.Combine(_contentRoot, "tiles.json")),
+         .. File.ReadAllBytes(Path.Combine(_contentRoot, "objects.json"))];
+
     // Both files one after the other, compared byte for byte: line endings and encoding count.
     private byte[] MapFileBytes(string mapId) =>
         [.. File.ReadAllBytes(Path.Combine(_contentRoot, "map-layouts", $"{mapId}.json")),

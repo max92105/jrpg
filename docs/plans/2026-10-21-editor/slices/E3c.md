@@ -18,4 +18,6 @@ Part of [the editor plan](../README.md). Design: [design.md](../design.md), "Dat
       - `WriteMapCatalogs_MapUsesMissingTile_ThrowsNamingTheMap`.
   - **If the identical-bytes test fails** on number formatting in `objects.json` (design.md, "Risks"): a one-off reformat commit of the content before this slice, noted here, not a custom number format.
   - **Verify by hand:**
-    - [ ] After the tests, `git status` shows no change under `content/` (they write into a temporary copy).
+    - [x] After the tests, `git status` shows no change under `content/` (they write into a temporary copy).
+- **Done, with deviations:** as planned; the identical-bytes test passed, so `objects.json` needed no reformat. `WriteMap` and `WriteMapCatalogs` share one aside-then-move writer (`WriteAll`); art problems are joined one per line into the exception message.
+- **Review follow-ups (pre-existing, now covering three files):** `WriteAll`'s final moves aren't atomic across files (a failed 2nd move leaves the 1st replaced); its catch's `File.Delete` can throw for a folder not created yet, hiding the first error.

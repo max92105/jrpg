@@ -22,3 +22,4 @@ Code-health work waiting for the next cleanup plan; `/retro` appends to it. One 
 - **Victory cards have no row limit**: more than 6 active members reach the footer line (B7b1 review).
 - **Enemy attack strips are drawn unmirrored over the party**; no flip rule is decided (B5d). A design question for the developer.
 - **"Load the latest save" and the save-list overlay are written twice** (`TitleScene`, `DefeatScreen`/`DefeatScreenView`), and the banner band twice (`BattleBannerView`, `BattleScene.DrawEscaped`). Share each on a third copy.
+- `ContentWriter.WriteAll`: the final moves aren't atomic across files, and the cleanup's `File.Delete` can hide the first error when a folder is missing (review of E3c).

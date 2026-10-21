@@ -5,10 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-21-editor/slices/E3b.md, E3b (any whole cell of a sheet can be chosen)
-Round: 1 (verdict: Ready to commit; verify all pass, 1331 tests)
+Slice: docs/plans/2026-10-21-editor/slices/E3c.md, E3c (the catalog writer, ContentWriter.WriteMapCatalogs)
+Round: 1 (verdict: Ready to commit; verify all pass, 1338 tests)
 
-- open (Suggestion): TilePaintingViewModelTests has only HasChoice false; add HasChoice true after Browser.Select / SelectCellAt.
-- open (Suggestion): ColumnsIn/RowsIn tests never reach the Math.Max(0, ...) clamp (needs margin > cell + spacing, image smaller than margin).
-- open (Follow-up): MainViewModel._sheetImageSizes caches PNG sizes per file forever; invalidate when a sheet image is replaced/added (E5-ish).
-- open (Follow-up): MainViewModel.cs is 329 lines (was 314 before E3b), MainWindow.xaml.cs 481; split when next touched.
+- open (Warning): ContentWriter.Aside<T> writes nothing, it pairs a path with a write action; name reads as "write aside" at call sites. Rename (PendingWrite/FileToWrite) or small private record.
+- open (Suggestion): no test that an art problem (not a validator) also writes nothing; TileOutsideItsImage only checks the message.
+- open (Suggestion): (string Path, Action<string> WriteTo) tuple spelled twice; a private record FileToWrite would name it.
+- open (Follow-up): WriteAll's move loop isn't atomic across files (a failed 2nd/3rd move leaves earlier files replaced and .saving leftovers); its comment only covers the write phase. Predates (WriteMap).
+- open (Follow-up): WriteAll's catch File.Delete throws DirectoryNotFoundException for a later file whose folder wasn't created yet, masking the original error (WriteMap layout/settings folders). Predates.

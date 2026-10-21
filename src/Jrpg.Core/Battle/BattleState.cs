@@ -72,8 +72,18 @@ public sealed class BattleState
     /// <summary>Who the current actor can attack: one living enemy, in formation order.</summary>
     public TargetChoice<Combatant> TargetChoiceForAttack() => ChoiceFor(AttackTargeting);
 
-    /// <summary>Whether the current actor knows <paramref name="skill"/> and has the MP for it. The UI greys out the rest.</summary>
-    public bool CanUse(SkillDefinition skill) => CurrentActor.Skills.Contains(skill) && CurrentActor.Vitals.Mp >= skill.MpCost;
+    /// <summary>Who the current actor can aim <paramref name="skill"/> at, in formation order.</summary>
+    public TargetChoice<Combatant> TargetChoiceFor(SkillDefinition skill) => ChoiceFor(skill.Effect.Targeting);
+
+    /// <summary>Whether the current actor has the MP for <paramref name="skill"/>.</summary>
+    public bool CanAfford(SkillDefinition skill) => CurrentActor.Vitals.Mp >= skill.MpCost;
+
+    /// <summary>
+    /// Whether the current actor knows <paramref name="skill"/>, has the MP for it and has someone to aim it at. The UI
+    /// greys out the rest.
+    /// </summary>
+    public bool CanUse(SkillDefinition skill) =>
+        CurrentActor.Skills.Contains(skill) && CanAfford(skill) && TargetChoiceFor(skill).Candidates.Count > 0;
 
     /// <summary>Whether the current actor can use <paramref name="item"/>: a party member, an owned copy, and an effect to apply.</summary>
     public bool CanUse(ItemDefinition item) =>

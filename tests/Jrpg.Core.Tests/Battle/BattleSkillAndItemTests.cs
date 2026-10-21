@@ -78,6 +78,48 @@ public sealed class BattleSkillAndItemTests
     }
 
     [Fact]
+    public void TargetChoiceFor_AllEnemiesSkill_TakesAll()
+    {
+        var battle = CreateBattle();
+
+        var choice = battle.TargetChoiceFor(_fireball);
+
+        Assert.True(choice.TakesAll);
+        Assert.Equal([_goblin, _otherGoblin], choice.Candidates);
+    }
+
+    [Fact]
+    public void TargetChoiceFor_SelfSkill_ListsOnlyActor()
+    {
+        var battle = CreateBattle();
+
+        var choice = battle.TargetChoiceFor(Skill("recovery", mpCost: 8, new Effect(EffectKind.RestoreHp, 30, Targeting.Self)));
+
+        Assert.Equal([_mage], choice.Candidates);
+    }
+
+    [Fact]
+    public void CanAfford_NotEnoughMp_ReturnsFalse()
+    {
+        _mage.Vitals.TrySpendMp(25);
+        var battle = CreateBattle();
+
+        Assert.False(battle.CanAfford(_fireball));
+        Assert.True(battle.CanAfford(Skill("cheap", mpCost: 5, _fireball.Effect)));
+    }
+
+    [Fact]
+    public void CanUse_ReviveWithNobodyFallen_ReturnsFalse()
+    {
+        var raise = Skill("raise", mpCost: 8, new Effect(EffectKind.Revive, 20, Targeting.SingleFallenAlly));
+        var mage = PartyCombatant("mage", hp: 100, mp: 30, raise);
+        var battle = new BattleState([mage, _ally, _goblin, _otherGoblin], _inventory, new FixedSequenceRandom(3, 2, 1));
+
+        Assert.True(battle.CanAfford(raise));
+        Assert.False(battle.CanUse(raise));
+    }
+
+    [Fact]
     public void Execute_HealOnFallenAlly_Throws()
     {
         _ally.Vitals.TakeDamage(999);

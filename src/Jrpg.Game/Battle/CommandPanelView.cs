@@ -1,3 +1,4 @@
+using System.Globalization;
 using FontStashSharp;
 using Jrpg.Core.Battle;
 using Jrpg.Game.Rendering;
@@ -10,7 +11,8 @@ namespace Jrpg.Game.Battle;
 /// <summary>
 /// The command choice (legacy <c>CommandPanel</c>, leaning toward <c>Combat9</c>): a pointed header tab with the actor's
 /// name, the rows in a thin double frame with their icons, the selected row lit with a pointer, and a one-line hint under
-/// it. While a target is chosen, a pointer bobs over each selected target.
+/// it. The actor's skills replace the commands, each with its MP cost and its description as the hint. While a target is
+/// chosen, a pointer bobs over each selected target.
 /// </summary>
 internal sealed class CommandPanelView
 {
@@ -24,6 +26,7 @@ internal sealed class CommandPanelView
     private const int IconLeft = 44;
     private const int IconSize = 24;
     private const int IconGap = 12;
+    private const int CostRight = 16;
     private const int SelectionLineHeight = 2;
     private const float DisabledOpacity = 0.4f;
     private const int HintPaddingX = 16;
@@ -43,13 +46,16 @@ internal sealed class CommandPanelView
     private readonly CommandMenu _menu;
     private readonly BattlersView _battlers;
     private readonly UiTextures _ui;
+    private readonly UiMessages _messages;
     private readonly SpriteFontBase _headerFont;
     private readonly SpriteFontBase _rowFont;
     private readonly SpriteFontBase _hintFont;
     private readonly string[] _labels;
     private readonly string[] _hints;
-    private readonly int _frameHeight;
+    private readonly string _notEnoughMp;
     private MeasuredText _actorName = new(string.Empty, 0);
+    private BattleSkillChoice? _shownSkills;
+    private MeasuredText[] _skillCosts = [];
     private TimeSpan _pointerTime;
 
     /// <param name="menu">The choice it shows.</param>
@@ -61,12 +67,13 @@ internal sealed class CommandPanelView
         _menu = menu;
         _battlers = battlers;
         _ui = ui;
+        _messages = text.Messages;
         _headerFont = text.Fonts.FontAt(HeaderTextPixels);
         _rowFont = text.Fonts.FontAt(RowTextPixels);
         _hintFont = text.Fonts.FontAt(HintTextPixels);
         _labels = [.. CommandMenu.Entries.Select(entry => text.Messages.Text(LabelIdOf(entry)))];
         _hints = [.. CommandMenu.Entries.Select(entry => text.Messages.Text(HintIdOf(entry)))];
-        _frameHeight = (2 * FrameInset) + (CommandMenu.Entries.Length * RowHeight);
+        _notEnoughMp = text.Messages.Text(MessageIds.BattleNotEnoughMp);
     }
 
     /// <summary>Moves the target pointer's bob on.</summary>
@@ -88,15 +95,11 @@ internal sealed class CommandPanelView
         var nameTop = header.Center.Y - (_headerFont.LineHeight / 2);
         batch.DrawString(_headerFont, _actorName.Text, new Vector2(header.Center.X - (_actorName.Width / 2), nameTop), UiTheme.TextPrimary);
 
-        var frame = new Rectangle(topLeft.X, header.Bottom + HeaderGap, CommandPanelPlacement.Width, _frameHeight);
-        DrawFrame(batch, textures.Pixel, frame);
-        for (var index = 0; index < _labels.Length; index++)
-        {
-            var row = new Rectangle(frame.X + FrameInset, frame.Y + FrameInset + (index * RowHeight), frame.Width - (2 * FrameInset), RowHeight);
-            DrawRow(batch, textures, index, row);
-        }
-
-        DrawHint(batch, textures, new Point(topLeft.X + HeaderInset, frame.Bottom + HeaderGap));
+        var frameTop = header.Bottom + HeaderGap;
+        var frameBottom = _menu.Skills is { } skills
+            ? DrawSkills(batch, textures, skills, new Point(topLeft.X, frameTop))
+            : DrawCommands(batch, textures, new Point(topLeft.X, frameTop));
+        DrawHint(batch, textures, new Point(topLeft.X + HeaderInset, frameBottom + HeaderGap));
         if (_menu.Targets is { } targets)
         {
             DrawTargetPointers(batch, textures, targets.Selected);
@@ -124,36 +127,95 @@ internal sealed class CommandPanelView
     };
 
     // A thin double frame, like the reference: a strong outer line, then a faint inner one 3 px in.
-    private static void DrawFrame(SpriteBatch batch, Texture2D pixel, Rectangle frame)
+    private static Rectangle DrawFrame(SpriteBatch batch, Texture2D pixel, Point topLeft, int rowCount)
     {
+        var frame = new Rectangle(topLeft.X, topLeft.Y, CommandPanelPlacement.Width, (2 * FrameInset) + (rowCount * RowHeight));
         batch.Draw(pixel, frame, UiTheme.CommandPanelFill);
         Outline.Draw(batch, pixel, frame, UiTheme.BarLine);
         var inner = frame;
         inner.Inflate(1 - FrameInset, 1 - FrameInset);
         Outline.Draw(batch, pixel, inner, UiTheme.Stroke);
+        return frame;
     }
 
-    private void DrawRow(SpriteBatch batch, TextureLibrary textures, int index, Rectangle row)
+    private static Rectangle RowIn(Rectangle frame, int row) =>
+        new(frame.X + FrameInset, frame.Y + FrameInset + (row * RowHeight), frame.Width - (2 * FrameInset), RowHeight);
+
+    /// <returns>The frame's bottom.</returns>
+    private int DrawCommands(SpriteBatch batch, TextureLibrary textures, Point topLeft)
     {
-        var entry = CommandMenu.Entries[index];
-        var isSelected = entry == _menu.Selected;
-        if (isSelected)
+        var frame = DrawFrame(batch, textures.Pixel, topLeft, CommandMenu.Entries.Length);
+        DrawRowBacks(batch, textures, frame, CommandMenu.Entries.IndexOf(_menu.Selected));
+        for (var index = 0; index < CommandMenu.Entries.Length; index++)
         {
+            var entry = CommandMenu.Entries[index];
+            var row = RowIn(frame, index);
+            var opacity = _menu.IsEnabled(entry) ? 1 : DisabledOpacity;
+            DrawRowLabel(batch, textures, row, new CommandRowLabel(_icons[index], _labels[index], opacity));
+        }
+
+        return frame.Bottom;
+    }
+
+    /// <returns>The frame's bottom.</returns>
+    private int DrawSkills(SpriteBatch batch, TextureLibrary textures, BattleSkillChoice skills, Point topLeft)
+    {
+        if (!ReferenceEquals(skills, _shownSkills))
+        {
+            _shownSkills = skills;
+            _skillCosts = [.. skills.Skills.Select(skill => MeasuredText.Of(_rowFont, _messages.Format(
+                MessageIds.BattleSkillCost, new MessageArgument("cost", skill.MpCost.ToString(CultureInfo.InvariantCulture)))))];
+        }
+
+        var rowCount = Math.Min(skills.Skills.Count, BattleSkillChoice.VisibleRows);
+        var frame = DrawFrame(batch, textures.Pixel, topLeft, rowCount);
+        DrawRowBacks(batch, textures, frame, skills.SelectedIndex - skills.FirstVisible);
+        for (var visible = 0; visible < rowCount; visible++)
+        {
+            var index = skills.FirstVisible + visible;
+            var skill = skills.Skills[index];
+            var row = RowIn(frame, visible);
+            var opacity = skills.IsUsable(index) ? 1 : DisabledOpacity;
+            DrawRowLabel(batch, textures, row, new CommandRowLabel(skill.IconFile, skill.Name, opacity));
+            var cost = _skillCosts[index];
+            var costLeft = row.Right - CostRight - cost.Width;
+            batch.DrawString(_rowFont, cost.Text, new Vector2(costLeft, row.Center.Y - (_rowFont.LineHeight / 2)), UiTheme.TextPrimary * opacity);
+        }
+
+        return frame.Bottom;
+    }
+
+    // Every row of the frame gets the plain fill and separator, except the selected one, lit with the pointer.
+    private void DrawRowBacks(SpriteBatch batch, TextureLibrary textures, Rectangle frame, int selectedRow)
+    {
+        var rowCount = (frame.Height - (2 * FrameInset)) / RowHeight;
+        for (var index = 0; index < rowCount; index++)
+        {
+            var row = RowIn(frame, index);
+            if (index != selectedRow)
+            {
+                batch.Draw(textures.Pixel, row, UiTheme.CommandRowFill);
+                batch.Draw(textures.Pixel, new Rectangle(row.X, row.Bottom - 1, row.Width, 1), UiTheme.Stroke);
+                continue;
+            }
+
             batch.Draw(_ui.Gradient(textures, UiTheme.Selection), row, Color.White);
             batch.Draw(_ui.Gradient(textures, UiTheme.SelectionLine), new Rectangle(row.X, row.Bottom - SelectionLineHeight, row.Width, SelectionLineHeight), Color.White);
             new Diamond(new Vector2(row.X + RowPointerLeft + RowPointerSide, row.Center.Y), RowPointerSide).Draw(batch, textures.Pixel, Color.White);
         }
-        else
+    }
+
+    // A skill with no icon file leaves the icon's place empty, so the names stay aligned.
+    private void DrawRowLabel(SpriteBatch batch, TextureLibrary textures, Rectangle row, CommandRowLabel content)
+    {
+        var icon = new Rectangle(row.X + IconLeft, row.Center.Y - (IconSize / 2), IconSize, IconSize);
+        if (content.IconFile.Length > 0)
         {
-            batch.Draw(textures.Pixel, row, UiTheme.CommandRowFill);
-            batch.Draw(textures.Pixel, new Rectangle(row.X, row.Bottom - 1, row.Width, 1), UiTheme.Stroke);
+            batch.Draw(_ui.Icon(textures, content.IconFile, IconSize), icon, Color.White * content.Opacity);
         }
 
-        var opacity = CommandMenu.IsEnabled(entry) ? 1 : DisabledOpacity;
-        var icon = new Rectangle(row.X + IconLeft, row.Center.Y - (IconSize / 2), IconSize, IconSize);
-        batch.Draw(_ui.Icon(textures, _icons[index], IconSize), icon, Color.White * opacity);
         var textTop = row.Center.Y - (_rowFont.LineHeight / 2);
-        batch.DrawString(_rowFont, _labels[index], new Vector2(icon.Right + IconGap, textTop), UiTheme.TextPrimary * opacity);
+        batch.DrawString(_rowFont, content.Label, new Vector2(icon.Right + IconGap, textTop), UiTheme.TextPrimary * content.Opacity);
     }
 
     private void DrawHint(SpriteBatch batch, TextureLibrary textures, Point topLeft)
@@ -162,9 +224,15 @@ internal sealed class CommandPanelView
         var box = new Rectangle(topLeft.X, topLeft.Y, CommandPanelPlacement.Width - HeaderInset, height);
         batch.Draw(textures.Pixel, box, UiTheme.CommandHintFill);
         batch.Draw(_ui.Gradient(textures, UiTheme.HighlightLine), new Rectangle(box.X, box.Bottom - 1, box.Width, 1), Color.White);
-        var hint = _hints[CommandMenu.Entries.IndexOf(_menu.Selected)];
-        batch.DrawString(_hintFont, hint, new Vector2(box.X + HintPaddingX, box.Y + HintPaddingY), UiTheme.TextPrimary);
+        batch.DrawString(_hintFont, HintText(), new Vector2(box.X + HintPaddingX, box.Y + HintPaddingY), UiTheme.TextPrimary);
     }
+
+    private string HintText() => _menu.Skills switch
+    {
+        { IsSayingNotEnoughMp: true } => _notEnoughMp,
+        { } skills => skills.Selected.Description,
+        null => _hints[CommandMenu.Entries.IndexOf(_menu.Selected)],
+    };
 
     private void DrawTargetPointers(SpriteBatch batch, TextureLibrary textures, IReadOnlyList<Combatant> targets)
     {

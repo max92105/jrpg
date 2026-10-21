@@ -65,11 +65,8 @@ public sealed class BattleSceneTests
     {
         var (session, scene) = StartForestBattle(StartMapScenarios.NextToForestWarpAlwaysRolling);
         var hpBefore = session.Party.Leader.Vitals.Hp;
-        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Down));
 
-        scene.Update(StartMapScenarios.OneUpdate, _confirm);
-
-        var request = Settle(scene);
+        var request = DefendAndSettle(scene);
 
         Assert.Null(request);
         Assert.Equal(BattlePhase.PartyTurn, session.ActiveBattle?.Phase);
@@ -100,8 +97,10 @@ public sealed class BattleSceneTests
     // Long enough for any enemy turns and the actor's steps to play out.
     private static SceneRequest? Settle(BattleScene scene) => scene.Update(TimeSpan.FromSeconds(10), default);
 
+    // Sarxian knows skills, so Defend is two rows down: past Skills, and past the greyed Items.
     private static SceneRequest? DefendAndSettle(BattleScene scene)
     {
+        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Down));
         scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Down));
         scene.Update(StartMapScenarios.OneUpdate, _confirm);
         return Settle(scene);

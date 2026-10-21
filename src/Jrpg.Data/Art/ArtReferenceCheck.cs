@@ -13,9 +13,9 @@ public static class ArtReferenceCheck
 {
     /// <summary>
     /// Every tilesheet, the field sprite, every dialogue portrait, every party member's portrait, every item's icon,
-    /// every battle sprite, every enemy's portrait, every attack effect and every encounter's background exist as PNGs,
-    /// every tile's cell lies inside its sheet, and every effect strip is whole square frames. Battle art names must match
-    /// their files exactly, case included.
+    /// every skill icon named (a skill may have none), every battle sprite, every enemy's portrait, every attack effect
+    /// and every encounter's background exist as PNGs, every tile's cell lies inside its sheet, and every effect strip is
+    /// whole square frames. Skill icons and battle art names must match their files exactly, case included.
     /// </summary>
     /// <returns>One line per problem, naming the file; empty when the art is complete.</returns>
     public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string artRoot)
@@ -45,6 +45,8 @@ public static class ArtReferenceCheck
         AddMissing(problems, artRoot, ArtFolders.Portraits, members.Select(member => (member.PortraitFile, $"party member '{member.Id}'")));
         var items = catalog.Items.Values.OrderBy(item => item.Id, StringComparer.Ordinal);
         AddMissing(problems, artRoot, ArtFolders.Icons, items.Select(item => (item.IconFile, $"item '{item.Id}'")));
+        var skillsWithIcons = catalog.Skills.Values.Where(skill => skill.IconFile.Length > 0).OrderBy(skill => skill.Id, StringComparer.Ordinal);
+        AddMissingByExactName(problems, artRoot, ArtFolders.Icons, skillsWithIcons.Select(skill => (skill.IconFile, $"skill '{skill.Id}'")));
         AddMissingByExactName(problems, artRoot, ArtFolders.Battlers, members.Select(member => (member.BattleSpriteFile, $"party member '{member.Id}'")));
         var enemies = catalog.Enemies.Values.OrderBy(enemy => enemy.Id, StringComparer.Ordinal);
         AddMissingByExactName(problems, artRoot, ArtFolders.Battlers, enemies.Select(enemy => (enemy.BattleSpriteFile, $"enemy '{enemy.Id}'")));

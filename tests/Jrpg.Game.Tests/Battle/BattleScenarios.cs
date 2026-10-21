@@ -20,10 +20,14 @@ internal static class BattleScenarios
     public static ContentCatalog Catalog { get; } = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
     /// <param name="random">Shuffles the turn order; tests that run enemy turns pass the same source to the tactics.</param>
-    public static BattleState SarxianAgainstGoblinTrio(IRandom random)
+    public static BattleState SarxianAgainstGoblinTrio(IRandom random) => MemberAgainstGoblinTrio("sarxian", random);
+
+    /// <param name="memberId">The party member who fights alone, listed first.</param>
+    /// <param name="random">Shuffles the turn order; tests that run enemy turns pass the same source to the tactics.</param>
+    public static BattleState MemberAgainstGoblinTrio(string memberId, IRandom random)
     {
-        var sarxian = PartyMember.Recruit(Catalog.PartyMembers["sarxian"], Catalog.Skills);
-        var party = new PartyState([sarxian], [sarxian], Catalog.Rules.Party);
+        var member = PartyMember.Recruit(Catalog.PartyMembers[memberId], Catalog.Skills);
+        var party = new PartyState([member], [member], Catalog.Rules.Party);
         var goblin = Catalog.Enemies["goblin"];
         return BattleState.Start(party, [goblin, goblin, goblin], new Inventory(), random);
     }

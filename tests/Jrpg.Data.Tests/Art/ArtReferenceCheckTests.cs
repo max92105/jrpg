@@ -6,6 +6,7 @@ using Jrpg.Core.Events;
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
+using Jrpg.Core.Skills;
 using Jrpg.Data.Art;
 using Jrpg.Data.Content;
 
@@ -82,6 +83,17 @@ public sealed class ArtReferenceCheckTests
         var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
 
         Assert.Equal($"icons/Gone.png: not found in {_artRoot}. Named by item 'potion'.", problem);
+    }
+
+    [Fact]
+    public void FindProblems_SkillIconNameDiffersInCase_NamesTheSkill()
+    {
+        var fireBlast = _catalog.Skills["fire_blast"] with { IconFile = "attack.png" };
+        var catalog = _catalog with { Skills = new Dictionary<string, SkillDefinition>(_catalog.Skills) { ["fire_blast"] = fireBlast } };
+
+        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
+
+        Assert.Equal("icons/attack.png: the file is named Attack.png; names must match exactly. Named by skill 'fire_blast'.", problem);
     }
 
     [Fact]

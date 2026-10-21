@@ -263,4 +263,10 @@ internal static class MessageIds
 
     /// <summary>Placeholder <c>{name}</c>: the banner when a combatant defends.</summary>
     public const string BattleDefends = "battle_defends";
+
+    /// <summary>Placeholder <c>{cost}</c>: a skill's MP cost on its row in battle.</summary>
+    public const string BattleSkillCost = "battle_skill_cost";
+
+    /// <summary>The hint when Confirm is pressed on a skill the actor lacks the MP for (decision 105).</summary>
+    public const string BattleNotEnoughMp = "battle_not_enough_mp";
 }

@@ -7,30 +7,44 @@ namespace Jrpg.Game.Battle;
 
 /// <summary>
 /// The acting party member's command choice, from the list down to a target (legacy <c>CommandPanel</c>). Attack opens
-/// the target cursor on Core's legal targets; Defend and Run act at once. Cancel on the list does nothing: there is no
-/// menu in battle (decision 50).
+/// the target cursor on Core's legal targets; Skills opens the actor's skills, and a skill its targets; Defend and Run act
+/// at once. Cancel steps back one level; on the list it does nothing: there is no menu in battle (decision 50).
 /// </summary>
 internal sealed class CommandMenu
 {
-    private readonly ListCursor _cursor = new(Entries.Length, index => IsEnabled(Entries[index]));
+    private readonly ListCursor _cursor;
     private BattleState? _battle;
+
+    public CommandMenu() => _cursor = new ListCursor(Entries.Length, index => IsEnabled(Entries[index]));
 
     public static ImmutableArray<CommandEntry> Entries { get; } =
         [CommandEntry.Attack, CommandEntry.Skills, CommandEntry.Items, CommandEntry.Defend, CommandEntry.Run];
 
     public CommandEntry Selected => Entries[_cursor.Selected];
 
-    /// <summary>The target being picked after Attack; null while the list is open.</summary>
+    /// <summary>The actor's skills after Skills, until one is used or Cancel; null while the command list shows.</summary>
+    public BattleSkillChoice? Skills { get; private set; }
+
+    /// <summary>The target being picked after Attack or a skill; null while a list is open.</summary>
     public BattleTargetCursor? Targets { get; private set; }
 
-    /// <summary>Skills and items stay greyed until the battle can use them (plan 2026-10-20-battle, B6a and B6b).</summary>
-    public static bool IsEnabled(CommandEntry entry) => entry is not (CommandEntry.Skills or CommandEntry.Items);
+    /// <summary>
+    /// Skills is greyed for a member who knows none; Items stays greyed until the battle can use them (plan
+    /// 2026-10-20-battle, B6b).
+    /// </summary>
+    public bool IsEnabled(CommandEntry entry) => entry switch
+    {
+        CommandEntry.Skills => _battle?.CurrentActor.Skills.Count > 0,
+        CommandEntry.Items => false,
+        _ => true,
+    };
 
     /// <summary>Begins a party turn: the list open, on Attack.</summary>
     public void Start(BattleState battle)
     {
         _battle = battle;
         _cursor.Select(0);
+        Skills = null;
         Targets = null;
     }
 
@@ -39,7 +53,18 @@ internal sealed class CommandMenu
     public BattleCommand? Update(InputFrame input)
     {
         var battle = _battle ?? throw new InvalidOperationException("Start a turn before choosing a command.");
-        return Targets is null ? ChooseFromList(battle, input) : ChooseTarget(Targets, input);
+        if (Targets is not null)
+        {
+            return ChooseTarget(Targets, input);
+        }
+
+        if (Skills is not null)
+        {
+            ChooseSkill(battle, Skills, input);
+            return null;
+        }
+
+        return ChooseFromList(battle, input);
     }
 
     private BattleCommand? ChooseFromList(BattleState battle, InputFrame input)
@@ -64,6 +89,9 @@ internal sealed class CommandMenu
             case CommandEntry.Attack:
                 Targets = new BattleTargetCursor(battle.TargetChoiceForAttack(), battle.CurrentActor);
                 return null;
+            case CommandEntry.Skills:
+                Skills = new BattleSkillChoice(battle);
+                return null;
             case CommandEntry.Defend:
                 return new DefendCommand();
             case CommandEntry.Run:
@@ -73,8 +101,35 @@ internal sealed class CommandMenu
         }
     }
 
+    // A skill without the MP says so (decision 105); one with nobody to aim at stays greyed and does nothing.
+    private void ChooseSkill(BattleState battle, BattleSkillChoice skills, InputFrame input)
+    {
+        if (input.IsPressed(GameButton.Up))
+        {
+            skills.MoveUp();
+        }
+
+        if (input.IsPressed(GameButton.Down))
+        {
+            skills.MoveDown();
+        }
+
+        if (input.IsPressed(GameButton.Cancel))
+        {
+            Skills = null;
+        }
+        else if (input.IsPressed(GameButton.Confirm) && !battle.CanAfford(skills.Selected))
+        {
+            skills.SayNotEnoughMp();
+        }
+        else if (input.IsPressed(GameButton.Confirm) && battle.CanUse(skills.Selected))
+        {
+            Targets = new BattleTargetCursor(battle.TargetChoiceFor(skills.Selected), battle.CurrentActor);
+        }
+    }
+
     // Up and Left go back along the formation, Down and Right forward (decision 56).
-    private AttackCommand? ChooseTarget(BattleTargetCursor targets, InputFrame input)
+    private BattleCommand? ChooseTarget(BattleTargetCursor targets, InputFrame input)
     {
         if (input.IsPressed(GameButton.Up) || input.IsPressed(GameButton.Left))
         {
@@ -97,7 +152,11 @@ internal sealed class CommandMenu
             return null;
         }
 
+        BattleCommand command = Skills is { } skills
+            ? new SkillCommand(skills.Selected, targets.Selected)
+            : new AttackCommand(targets.Selected[0]);
+        Skills = null;
         Targets = null;
-        return new AttackCommand(targets.Selected[0]);
+        return command;
     }
 }

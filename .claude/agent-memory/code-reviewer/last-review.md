@@ -5,7 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-20-battle/slices/C3.md, C3 (SkillDefinition.Description required, skills.json placeholder descriptions, reader test for missing field)
-Round: 1 (verdict: Ready to commit; verify all pass, 1247 tests)
+Slice: docs/plans/2026-10-20-battle/slices/B6a.md, B6a (skills in battle: TargetChoiceFor/CanAfford, BattleSkillChoice, CommandMenu 3 levels, panel skill rows, skill icon art check)
+Round: 1 (verdict: Ready to commit; verify all pass, 1259 tests)
 
-- open (Suggestion): damage descriptions say "Deals 15/20 damage" but EffectResolver runs Power through DamageFormula with defense; wording overstates (placeholder, developer to review).
+- open (Suggestion): CommandPanelView.DrawRowLabel takes a (IconFile, Label, Opacity) tuple to stay under 4 params; a named readonly record struct would read better.
+- open (Suggestion): DrawRowBacks re-derives rowCount from frame.Height; pass rowCount (callers already have it).
+- open (Suggestion): menu tests run with a one-member party, so the heal_all test can't tell "every living ally" from "the actor"; no menu test for "MP but no target: Confirm does nothing" (Core CanUse test covers the rule).

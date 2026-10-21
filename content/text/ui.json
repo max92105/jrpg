@@ -96,5 +96,7 @@
   "battle_vital_max": "/{max}",
   "battle_enemy_letter": "{name} {letter}",
   "battle_next": "NEXT",
-  "battle_defends": "{name} defends."
+  "battle_defends": "{name} defends.",
+  "battle_skill_cost": "{cost} MP",
+  "battle_not_enough_mp": "Not enough MP."
 }

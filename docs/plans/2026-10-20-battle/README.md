@@ -146,7 +146,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 5: skills and items
 
 - [x] **C3. Skill descriptions in content** (Core + Data + content, about 130 lines; decision 102) → [slices/C3.md](slices/C3.md)
-- [ ] **B6a. Skills in battle** (Core + Data + Game, about 290 lines) → [slices/B6a.md](slices/B6a.md)
+- [x] **B6a. Skills in battle** (Core + Data + Game, about 290 lines) → [slices/B6a.md](slices/B6a.md)
 - [ ] **B6b. Items in battle** (Core + Game, about 290 lines) → [slices/B6b.md](slices/B6b.md)
 
 ### Phase 6: end screens

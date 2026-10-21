@@ -6,8 +6,12 @@ using Jrpg.Game.Tests.Input;
 
 namespace Jrpg.Game.Tests.Battle;
 
+// Sarxian acts first and knows, in order: Fire Blast, Fireball, Heal, Recovery, Heal All.
 public sealed class CommandMenuTests
 {
+    private const int RecoveryRow = 3;
+    private const int HealAllRow = 4;
+
     private readonly BattleState _battle = BattleScenarios.SarxianAgainstGoblinTrio(new SeededRandom(BattleScenarios.SarxianFirstSeed));
     private readonly CommandMenu _menu = new();
 
@@ -46,7 +50,7 @@ public sealed class CommandMenuTests
     [Fact]
     public void Update_ConfirmDefend_ProducesDefend()
     {
-        _menu.Update(InputFrames.Pressing(GameButton.Down));
+        Press(GameButton.Down, times: 2);
 
         var command = _menu.Update(InputFrames.Pressing(GameButton.Confirm));
 
@@ -54,9 +58,9 @@ public sealed class CommandMenuTests
     }
 
     [Fact]
-    public void Update_MoveDown_SkipsGreyedSkillsAndItems()
+    public void Update_MoveDownFromSkills_SkipsGreyedItems()
     {
-        _menu.Update(InputFrames.Pressing(GameButton.Down));
+        Press(GameButton.Down, times: 2);
 
         Assert.Equal(CommandEntry.Defend, _menu.Selected);
     }
@@ -64,11 +68,106 @@ public sealed class CommandMenuTests
     [Fact]
     public void Update_ConfirmRun_ProducesFlee()
     {
-        _menu.Update(InputFrames.Pressing(GameButton.Down));
-        _menu.Update(InputFrames.Pressing(GameButton.Down));
+        Press(GameButton.Down, times: 3);
 
         var command = _menu.Update(InputFrames.Pressing(GameButton.Confirm));
 
         Assert.IsType<FleeCommand>(command);
+    }
+
+    [Fact]
+    public void IsEnabled_ActorWithoutSkills_GreysSkills()
+    {
+        var menu = new CommandMenu();
+
+        menu.Start(BattleScenarios.MemberAgainstGoblinTrio("jazog", new SeededRandom(BattleScenarios.SarxianFirstSeed)));
+
+        Assert.False(menu.IsEnabled(CommandEntry.Skills));
+    }
+
+    [Fact]
+    public void Update_ConfirmSkills_ListsActorSkills()
+    {
+        OpenSkills();
+
+        Assert.Equal(_battle.CurrentActor.Skills, _menu.Skills?.Skills);
+    }
+
+    [Fact]
+    public void Update_UnaffordableSkill_IsGreyedAndSaysNotEnoughMp()
+    {
+        _battle.CurrentActor.Vitals.TrySpendMp(_battle.CurrentActor.Vitals.Mp - 5);
+        OpenSkills();
+
+        _menu.Update(InputFrames.Pressing(GameButton.Confirm));
+
+        Assert.False(_menu.Skills?.IsUsable(0));
+        Assert.True(_menu.Skills?.IsSayingNotEnoughMp);
+        Assert.Null(_menu.Targets);
+    }
+
+    [Fact]
+    public void Update_ConfirmSelfSkill_ProducesCommandOnActor()
+    {
+        OpenSkills();
+        Press(GameButton.Down, times: RecoveryRow);
+        _menu.Update(InputFrames.Pressing(GameButton.Confirm));
+
+        var command = _menu.Update(InputFrames.Pressing(GameButton.Confirm));
+
+        var skill = Assert.IsType<SkillCommand>(command);
+        Assert.Equal("recovery", skill.Skill.Id);
+        Assert.Equal([_battle.CurrentActor], skill.Targets);
+    }
+
+    [Fact]
+    public void Update_AllAlliesSkill_ProducesCommandOnEveryLivingMember()
+    {
+        OpenSkills();
+        Press(GameButton.Down, times: HealAllRow);
+        _menu.Update(InputFrames.Pressing(GameButton.Confirm));
+
+        var command = _menu.Update(InputFrames.Pressing(GameButton.Confirm));
+
+        var skill = Assert.IsType<SkillCommand>(command);
+        Assert.Equal("heal_all", skill.Skill.Id);
+        Assert.Equal(_battle.LivingOn(BattleSide.Party), skill.Targets);
+    }
+
+    [Fact]
+    public void Update_CancelOnSkillList_ReturnsToCommands()
+    {
+        OpenSkills();
+
+        _menu.Update(InputFrames.Pressing(GameButton.Cancel));
+
+        Assert.Null(_menu.Skills);
+        Assert.Equal(CommandEntry.Skills, _menu.Selected);
+    }
+
+    [Fact]
+    public void Update_CancelOnSkillTargets_ReturnsToSkillList()
+    {
+        OpenSkills();
+        _menu.Update(InputFrames.Pressing(GameButton.Confirm));
+
+        _menu.Update(InputFrames.Pressing(GameButton.Cancel));
+
+        Assert.Null(_menu.Targets);
+        Assert.Equal("fire_blast", _menu.Skills?.Selected.Id);
+    }
+
+    private void OpenSkills()
+    {
+        _menu.Update(InputFrames.Pressing(GameButton.Down));
+        _menu.Update(InputFrames.Pressing(GameButton.Confirm));
+    }
+
+    private void Press(GameButton button, int times)
+    {
+        for (var press = 0; press < times; press++)
+        {
+            _menu.Update(InputFrames.Pressing(button));
+        }
     }
 }

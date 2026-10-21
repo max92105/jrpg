@@ -85,9 +85,20 @@ public sealed class BattleState
     public bool CanUse(SkillDefinition skill) =>
         CurrentActor.Skills.Contains(skill) && CanAfford(skill) && TargetChoiceFor(skill).Candidates.Count > 0;
 
-    /// <summary>Whether the current actor can use <paramref name="item"/>: a party member, an owned copy, and an effect to apply.</summary>
+    /// <summary>Who the current actor can aim <paramref name="item"/> at, in formation order.</summary>
+    /// <exception cref="ArgumentException">The item has no effect to aim.</exception>
+    public TargetChoice<Combatant> TargetChoiceFor(ItemDefinition item) =>
+        item.Effect is { } effect
+            ? ChoiceFor(effect.Targeting)
+            : throw new ArgumentException($"{item.Name} has no effect to aim.", nameof(item));
+
+    /// <summary>
+    /// Whether the current actor can use <paramref name="item"/>: a party member, an owned copy, an effect to apply and
+    /// someone to aim it at.
+    /// </summary>
     public bool CanUse(ItemDefinition item) =>
-        CurrentActor.Side == BattleSide.Party && item.Effect is not null && _inventory.QuantityOf(item.Id) > 0;
+        CurrentActor.Side == BattleSide.Party && item.Effect is { } effect && _inventory.QuantityOf(item.Id) > 0
+        && ChoiceFor(effect.Targeting).Candidates.Count > 0;
 
     /// <summary>Gives the enemies' experience to the party members still standing (developer decision 13). Call once, after a victory.</summary>
     /// <returns>The total experience and one gain per living party member, with the level steps it produced.</returns>

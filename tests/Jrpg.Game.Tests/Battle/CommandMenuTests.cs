@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Items;
 using Jrpg.Core.Randomness;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Input;
@@ -6,16 +7,22 @@ using Jrpg.Game.Tests.Input;
 
 namespace Jrpg.Game.Tests.Battle;
 
-// Sarxian acts first and knows, in order: Fire Blast, Fireball, Heal, Recovery, Heal All.
+// Sarxian acts first and knows, in order: Fire Blast, Fireball, Heal, Recovery, Heal All. The bag starts empty.
 public sealed class CommandMenuTests
 {
     private const int RecoveryRow = 3;
     private const int HealAllRow = 4;
 
-    private readonly BattleState _battle = BattleScenarios.SarxianAgainstGoblinTrio(new SeededRandom(BattleScenarios.SarxianFirstSeed));
-    private readonly CommandMenu _menu = new();
+    private readonly Inventory _inventory = new();
+    private readonly BattleState _battle;
+    private readonly CommandMenu _menu;
 
-    public CommandMenuTests() => _menu.Start(_battle);
+    public CommandMenuTests()
+    {
+        _battle = BattleScenarios.MemberAgainstGoblinTrio("sarxian", _inventory, new SeededRandom(BattleScenarios.SarxianFirstSeed));
+        _menu = new CommandMenu(_inventory, BattleScenarios.Catalog.Items);
+        _menu.Start(_battle);
+    }
 
     [Fact]
     public void Update_ConfirmAttack_OpensTargetsOnLivingEnemies()
@@ -58,7 +65,7 @@ public sealed class CommandMenuTests
     }
 
     [Fact]
-    public void Update_MoveDownFromSkills_SkipsGreyedItems()
+    public void Update_MoveDownWithEmptyBag_SkipsGreyedItems()
     {
         Press(GameButton.Down, times: 2);
 
@@ -78,9 +85,9 @@ public sealed class CommandMenuTests
     [Fact]
     public void IsEnabled_ActorWithoutSkills_GreysSkills()
     {
-        var menu = new CommandMenu();
+        var menu = new CommandMenu(_inventory, BattleScenarios.Catalog.Items);
 
-        menu.Start(BattleScenarios.MemberAgainstGoblinTrio("jazog", new SeededRandom(BattleScenarios.SarxianFirstSeed)));
+        menu.Start(BattleScenarios.MemberAgainstGoblinTrio("jazog", _inventory, new SeededRandom(BattleScenarios.SarxianFirstSeed)));
 
         Assert.False(menu.IsEnabled(CommandEntry.Skills));
     }
@@ -155,6 +162,105 @@ public sealed class CommandMenuTests
 
         Assert.Null(_menu.Targets);
         Assert.Equal("fire_blast", _menu.Skills?.Selected.Id);
+    }
+
+    [Fact]
+    public void Update_ConfirmItems_ListsOwnedConsumablesWithCounts()
+    {
+        Own(("potion", 3), ("bronze_sword", 1), ("bomb_all", 2));
+
+        OpenItems();
+
+        Assert.Equal(["potion", "bomb_all"], _menu.Items?.Items.Select(item => item.Id));
+        Assert.Equal([3, 2], _menu.Items?.Quantities);
+    }
+
+    [Fact]
+    public void Update_ReviveWithNobodyFallen_IsGreyed()
+    {
+        Own(("potion", 1), ("revive_feather", 1));
+
+        OpenItems();
+
+        Assert.True(_menu.Items?.IsUsable(0));
+        Assert.False(_menu.Items?.IsUsable(1));
+    }
+
+    [Fact]
+    public void Update_ConfirmGreyedRevive_StaysOnList()
+    {
+        Own(("potion", 1), ("revive_feather", 1));
+        OpenItems();
+        _menu.Update(InputFrames.Pressing(GameButton.Down));
+
+        var command = _menu.Update(InputFrames.Pressing(GameButton.Confirm));
+
+        Assert.Null(command);
+        Assert.Null(_menu.Targets);
+        Assert.Equal("revive_feather", _menu.Items?.Selected.Id);
+    }
+
+    [Fact]
+    public void IsEnabled_NoUsableItem_GreysItems()
+    {
+        Own(("revive_feather", 1), ("bronze_sword", 1));
+
+        Assert.False(_menu.IsEnabled(CommandEntry.Items));
+    }
+
+    [Fact]
+    public void Update_ConfirmBombAll_ProducesCommandOnEveryLivingEnemy()
+    {
+        Own(("bomb_all", 1));
+        OpenItems();
+        _menu.Update(InputFrames.Pressing(GameButton.Confirm));
+
+        var command = _menu.Update(InputFrames.Pressing(GameButton.Confirm));
+
+        var item = Assert.IsType<ItemCommand>(command);
+        Assert.Equal("bomb_all", item.Item.Id);
+        Assert.Equal(_battle.LivingOn(BattleSide.Enemies), item.Targets);
+    }
+
+    [Fact]
+    public void Update_ConfirmItemsAfterLastPotionUsed_NoLongerListsIt()
+    {
+        Own(("potion", 1), ("bomb", 1));
+        OpenItems();
+        _menu.Update(InputFrames.Pressing(GameButton.Confirm));
+        _battle.Execute(Assert.IsType<ItemCommand>(_menu.Update(InputFrames.Pressing(GameButton.Confirm))));
+        PassTheGoblinsTurns();
+        _menu.Start(_battle);
+
+        OpenItems();
+
+        Assert.Equal(["bomb"], _menu.Items?.Items.Select(item => item.Id));
+    }
+
+    // The menu reads the bag when a turn starts, so the turn is started again after filling it.
+    private void Own(params (string ItemId, int Quantity)[] entries)
+    {
+        foreach (var (itemId, quantity) in entries)
+        {
+            _inventory.Add(BattleScenarios.Catalog.Items[itemId], quantity);
+        }
+
+        _menu.Start(_battle);
+    }
+
+    // The three goblins act after Sarxian; defending passes their turns back to him without changing anything.
+    private void PassTheGoblinsTurns()
+    {
+        while (_battle.CurrentActor.Side == BattleSide.Enemies)
+        {
+            _battle.Execute(new DefendCommand());
+        }
+    }
+
+    private void OpenItems()
+    {
+        Press(GameButton.Down, times: 2);
+        _menu.Update(InputFrames.Pressing(GameButton.Confirm));
     }
 
     private void OpenSkills()

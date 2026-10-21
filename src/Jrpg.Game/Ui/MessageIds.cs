@@ -269,4 +269,7 @@ internal static class MessageIds
 
     /// <summary>The hint when Confirm is pressed on a skill the actor lacks the MP for (decision 105).</summary>
     public const string BattleNotEnoughMp = "battle_not_enough_mp";
+
+    /// <summary>Placeholder <c>{count}</c>: how many copies of an item the party owns, on its row in battle.</summary>
+    public const string BattleItemCount = "battle_item_count";
 }

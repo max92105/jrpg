@@ -11,8 +11,8 @@ namespace Jrpg.Game.Battle;
 /// <summary>
 /// The command choice (legacy <c>CommandPanel</c>, leaning toward <c>Combat9</c>): a pointed header tab with the actor's
 /// name, the rows in a thin double frame with their icons, the selected row lit with a pointer, and a one-line hint under
-/// it. The actor's skills replace the commands, each with its MP cost and its description as the hint. While a target is
-/// chosen, a pointer bobs over each selected target.
+/// it. The actor's skills or the party's consumables replace the commands, each with its MP cost or count and its
+/// description as the hint. While a target is chosen, a pointer bobs over each selected target.
 /// </summary>
 internal sealed class CommandPanelView
 {
@@ -26,7 +26,7 @@ internal sealed class CommandPanelView
     private const int IconLeft = 44;
     private const int IconSize = 24;
     private const int IconGap = 12;
-    private const int CostRight = 16;
+    private const int AmountRight = 16;
     private const int SelectionLineHeight = 2;
     private const float DisabledOpacity = 0.4f;
     private const int HintPaddingX = 16;
@@ -54,8 +54,10 @@ internal sealed class CommandPanelView
     private readonly string[] _hints;
     private readonly string _notEnoughMp;
     private MeasuredText _actorName = new(string.Empty, 0);
-    private BattleSkillChoice? _shownSkills;
-    private MeasuredText[] _skillCosts = [];
+    private IBattleListChoice? _shownList;
+    private CommandRowLabel[] _listLabels = [];
+    private MeasuredText[] _listAmounts = [];
+    private string[] _listHints = [];
     private TimeSpan _pointerTime;
 
     /// <param name="menu">The choice it shows.</param>
@@ -95,10 +97,21 @@ internal sealed class CommandPanelView
         var nameTop = header.Center.Y - (_headerFont.LineHeight / 2);
         batch.DrawString(_headerFont, _actorName.Text, new Vector2(header.Center.X - (_actorName.Width / 2), nameTop), UiTheme.TextPrimary);
 
-        var frameTop = header.Bottom + HeaderGap;
-        var frameBottom = _menu.Skills is { } skills
-            ? DrawSkills(batch, textures, skills, new Point(topLeft.X, frameTop))
-            : DrawCommands(batch, textures, new Point(topLeft.X, frameTop));
+        var frameTopLeft = new Point(topLeft.X, header.Bottom + HeaderGap);
+        if (_menu.Skills is { } skills && !ReferenceEquals(skills, _shownList))
+        {
+            FormatRowsOf(skills);
+        }
+        else if (_menu.Items is { } items && !ReferenceEquals(items, _shownList))
+        {
+            FormatRowsOf(items);
+        }
+
+        IBattleListChoice? list = (IBattleListChoice?)_menu.Skills ?? _menu.Items;
+
+        var frameBottom = list is null
+            ? DrawCommands(batch, textures, frameTopLeft)
+            : DrawList(batch, textures, list, frameTopLeft);
         DrawHint(batch, textures, new Point(topLeft.X + HeaderInset, frameBottom + HeaderGap));
         if (_menu.Targets is { } targets)
         {
@@ -157,29 +170,43 @@ internal sealed class CommandPanelView
         return frame.Bottom;
     }
 
-    /// <returns>The frame's bottom.</returns>
-    private int DrawSkills(SpriteBatch batch, TextureLibrary textures, BattleSkillChoice skills, Point topLeft)
+    // Text is formatted once per opened list, never per frame.
+    private void FormatRowsOf(BattleSkillChoice skills)
     {
-        if (!ReferenceEquals(skills, _shownSkills))
-        {
-            _shownSkills = skills;
-            _skillCosts = [.. skills.Skills.Select(skill => MeasuredText.Of(_rowFont, _messages.Format(
-                MessageIds.BattleSkillCost, new MessageArgument("cost", skill.MpCost.ToString(CultureInfo.InvariantCulture)))))];
-        }
+        _shownList = skills;
+        _listLabels = [.. skills.Skills.Select((skill, index) => new CommandRowLabel(skill.IconFile, skill.Name, OpacityOf(skills.IsUsable(index))))];
+        _listAmounts = [.. skills.Skills.Select(skill => AmountText(MessageIds.BattleSkillCost, "cost", skill.MpCost))];
+        _listHints = [.. skills.Skills.Select(skill => skill.Description)];
+    }
 
-        var rowCount = Math.Min(skills.Skills.Count, BattleSkillChoice.VisibleRows);
+    private void FormatRowsOf(BattleItemChoice items)
+    {
+        _shownList = items;
+        _listLabels = [.. items.Items.Select((item, index) => new CommandRowLabel(item.IconFile, item.Name, OpacityOf(items.IsUsable(index))))];
+        _listAmounts = [.. items.Quantities.Select(quantity => AmountText(MessageIds.BattleItemCount, "count", quantity))];
+        _listHints = [.. items.Items.Select(item => item.Description)];
+    }
+
+    private static float OpacityOf(bool isUsable) => isUsable ? 1 : DisabledOpacity;
+
+    private MeasuredText AmountText(string messageId, string placeholder, int amount) =>
+        MeasuredText.Of(_rowFont, _messages.Format(messageId, new MessageArgument(placeholder, amount.ToString(CultureInfo.InvariantCulture))));
+
+    /// <returns>The frame's bottom.</returns>
+    private int DrawList(SpriteBatch batch, TextureLibrary textures, IBattleListChoice list, Point topLeft)
+    {
+        var rowCount = Math.Min(_listLabels.Length, IBattleListChoice.VisibleRows);
         var frame = DrawFrame(batch, textures.Pixel, topLeft, rowCount);
-        DrawRowBacks(batch, textures, frame, skills.SelectedIndex - skills.FirstVisible);
+        DrawRowBacks(batch, textures, frame, list.SelectedIndex - list.FirstVisible);
         for (var visible = 0; visible < rowCount; visible++)
         {
-            var index = skills.FirstVisible + visible;
-            var skill = skills.Skills[index];
+            var index = list.FirstVisible + visible;
             var row = RowIn(frame, visible);
-            var opacity = skills.IsUsable(index) ? 1 : DisabledOpacity;
-            DrawRowLabel(batch, textures, row, new CommandRowLabel(skill.IconFile, skill.Name, opacity));
-            var cost = _skillCosts[index];
-            var costLeft = row.Right - CostRight - cost.Width;
-            batch.DrawString(_rowFont, cost.Text, new Vector2(costLeft, row.Center.Y - (_rowFont.LineHeight / 2)), UiTheme.TextPrimary * opacity);
+            var label = _listLabels[index];
+            DrawRowLabel(batch, textures, row, label);
+            var amount = _listAmounts[index];
+            var amountLeft = row.Right - AmountRight - amount.Width;
+            batch.DrawString(_rowFont, amount.Text, new Vector2(amountLeft, row.Center.Y - (_rowFont.LineHeight / 2)), UiTheme.TextPrimary * label.Opacity);
         }
 
         return frame.Bottom;
@@ -227,10 +254,10 @@ internal sealed class CommandPanelView
         batch.DrawString(_hintFont, HintText(), new Vector2(box.X + HintPaddingX, box.Y + HintPaddingY), UiTheme.TextPrimary);
     }
 
-    private string HintText() => _menu.Skills switch
+    private string HintText() => ((IBattleListChoice?)_menu.Skills ?? _menu.Items) switch
     {
-        { IsSayingNotEnoughMp: true } => _notEnoughMp,
-        { } skills => skills.Selected.Description,
+        BattleSkillChoice { IsSayingNotEnoughMp: true } => _notEnoughMp,
+        { } list => _listHints[list.SelectedIndex],
         null => _hints[CommandMenu.Entries.IndexOf(_menu.Selected)],
     };
 

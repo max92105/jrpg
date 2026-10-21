@@ -97,9 +97,10 @@ public sealed class BattleSceneTests
     // Long enough for any enemy turns and the actor's steps to play out.
     private static SceneRequest? Settle(BattleScene scene) => scene.Update(TimeSpan.FromSeconds(10), default);
 
-    // Sarxian knows skills, so Defend is two rows down: past Skills, and past the greyed Items.
+    // Sarxian knows skills and the new game's bag holds potions, so Defend is three rows down, past Skills and Items.
     private static SceneRequest? DefendAndSettle(BattleScene scene)
     {
+        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Down));
         scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Down));
         scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Down));
         scene.Update(StartMapScenarios.OneUpdate, _confirm);
@@ -111,7 +112,7 @@ public sealed class BattleSceneTests
         var session = GameSession.StartNew(catalog, new SeededRandom(1));
         Assert.True(StartMapScenarios.WalkUntilBattleRequested(StartMapScenarios.SceneOf(session.Exploration, catalog)));
         session.StartPendingBattle();
-        return (session, new BattleScene(session, RepositoryScreenText.Text, new UiTextures()));
+        return (session, new BattleScene(session, catalog.Items, RepositoryScreenText.Text, new UiTextures()));
     }
 
     // The forest encounter becomes a single goblin, changed as the test needs.

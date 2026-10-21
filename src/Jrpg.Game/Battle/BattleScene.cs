@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Items;
 using Jrpg.Core.Session;
 using Jrpg.Data.Art;
 using Jrpg.Game.Input;
@@ -27,7 +28,7 @@ internal sealed class BattleScene : IScene
     private readonly string _backgroundFile;
     private readonly PartyStatusView _partyStatus;
     private readonly EnemyTagView _enemyTags;
-    private readonly CommandMenu _commands = new();
+    private readonly CommandMenu _commands;
     private readonly CommandPanelView _commandPanel;
     private readonly BattleBanner _banner = new();
     private readonly BattleBannerView _bannerView;
@@ -38,10 +39,11 @@ internal sealed class BattleScene : IScene
     private bool _isFinished;
 
     /// <param name="session">The playthrough whose active battle this screen shows.</param>
+    /// <param name="items">Every item by id, from the catalog, for the party's items.</param>
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared code-drawn textures: the vignette, the top shade and shrunk battlers.</param>
     /// <exception cref="InvalidOperationException">The session has no active battle.</exception>
-    public BattleScene(GameSession session, ScreenText text, UiTextures ui)
+    public BattleScene(GameSession session, IReadOnlyDictionary<string, ItemDefinition> items, ScreenText text, UiTextures ui)
     {
         _session = session;
         _ui = ui;
@@ -57,6 +59,7 @@ internal sealed class BattleScene : IScene
         _enemyTags = new EnemyTagView(battle.Combatants, _sequence, text, ui);
         _backgroundFile = session.Exploration.PendingEncounter?.BackgroundFile
             ?? throw new InvalidOperationException("A battle screen needs the encounter it fights.");
+        _commands = new CommandMenu(session.Inventory, items);
         _commandPanel = new CommandPanelView(_commands, _battlers, text, ui);
         _numbers = new FloatingNumbersView(_sequence, _battlers, text);
         _impactEffects = new ImpactEffectsView(_sequence, _battlers, text);

@@ -8,11 +8,8 @@ namespace Jrpg.Game.Battle;
 /// The acting member's skills, open in place of the commands. Every row can be selected, so a greyed skill can still be
 /// read and say why it can't be used (decision 105).
 /// </summary>
-internal sealed class BattleSkillChoice
+internal sealed class BattleSkillChoice : IBattleListChoice
 {
-    /// <summary>How many rows show at once: as many as the command list, so the panel keeps its size.</summary>
-    public const int VisibleRows = 5;
-
     private readonly ListCursor _cursor;
     private readonly bool[] _isUsable;
 
@@ -21,7 +18,7 @@ internal sealed class BattleSkillChoice
     {
         Skills = battle.CurrentActor.Skills;
         _isUsable = [.. Skills.Select(battle.CanUse)];
-        _cursor = new ListCursor(Skills.Count, _ => true, VisibleRows);
+        _cursor = new ListCursor(Skills.Count, _ => true, IBattleListChoice.VisibleRows);
     }
 
     /// <summary>The actor's skills in the order they learnt them.</summary>

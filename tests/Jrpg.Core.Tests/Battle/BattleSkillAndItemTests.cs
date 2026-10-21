@@ -166,6 +166,35 @@ public sealed class BattleSkillAndItemTests
     }
 
     [Fact]
+    public void TargetChoiceFor_ItemWithoutEffect_Throws()
+    {
+        var battle = CreateBattle();
+
+        Assert.Throws<ArgumentException>(() => battle.TargetChoiceFor(new ItemDefinitionBuilder().AsWeapon(attackBonus: 5).Build()));
+    }
+
+    [Fact]
+    public void CanUse_ReviveItemWithNobodyFallen_ReturnsFalse()
+    {
+        var feather = Item("revive_feather", new Effect(EffectKind.Revive, 15, Targeting.AllFallenAllies));
+        _inventory.Add(feather, 1);
+        var battle = CreateBattle();
+
+        Assert.False(battle.CanUse(feather));
+    }
+
+    [Fact]
+    public void CanUse_ReviveItemWithAllyFallen_ReturnsTrue()
+    {
+        var feather = Item("revive_feather", new Effect(EffectKind.Revive, 15, Targeting.AllFallenAllies));
+        _inventory.Add(feather, 1);
+        _ally.Vitals.TakeDamage(999);
+        var battle = CreateBattle();
+
+        Assert.True(battle.CanUse(feather));
+    }
+
+    [Fact]
     public void Execute_ReviveItemOnFallenAlly_RevivesThem()
     {
         var feather = Item("revive_feather", new Effect(EffectKind.Revive, 15, Targeting.AllFallenAllies));

@@ -98,5 +98,6 @@
   "battle_next": "NEXT",
   "battle_defends": "{name} defends.",
   "battle_skill_cost": "{cost} MP",
-  "battle_not_enough_mp": "Not enough MP."
+  "battle_not_enough_mp": "Not enough MP.",
+  "battle_item_count": "x{count}"
 }

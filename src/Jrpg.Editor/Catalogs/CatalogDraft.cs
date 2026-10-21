@@ -79,6 +79,10 @@ internal sealed partial class CatalogDraft : ObservableObject
         }
     }
 
+    /// <summary>The tiles the next undo would remove, so it can be refused while one is in use; empty when it removes none.</summary>
+    public IReadOnlyList<int> TilesRemovedByUndo() =>
+        _history.NextUndo is { } edit ? [.. Current.Tiles.Keys.Except(edit.Revert(Current).Tiles.Keys).Order()] : [];
+
     /// <summary>Takes back the newest catalog step; nothing when there is none.</summary>
     public void Undo()
     {

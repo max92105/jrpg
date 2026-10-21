@@ -13,6 +13,9 @@ internal sealed class UndoJournal
 
     public bool CanRedo => _undone.Count > 0;
 
+    /// <summary>The history the next undo goes to; null when there is nothing to undo.</summary>
+    public UndoTarget? NextUndo => _done.Count > 0 ? _done[^1] : null;
+
     /// <summary>A step was recorded in one history; undone steps can no longer be redone, as in each history.</summary>
     public void Record(UndoTarget step)
     {

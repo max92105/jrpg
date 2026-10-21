@@ -75,7 +75,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 - [x] **E4a. Blocked tiles: Mark blocked** (Editor, about 180 lines) → [slices/E4a.md](slices/E4a.md)
 - [x] **E4b1. Ctrl+Z undoes catalog changes** (Editor, about 320 lines) → [slices/E4b1.md](slices/E4b1.md)
-- [ ] **E4b2. An undo that would remove a used tile is refused** (Editor, about 150 lines) → [slices/E4b2.md](slices/E4b2.md)
+- [x] **E4b2. An undo that would remove a used tile is refused** (Editor, about 150 lines) → [slices/E4b2.md](slices/E4b2.md)
 
 ### Phase 4: sheets
 

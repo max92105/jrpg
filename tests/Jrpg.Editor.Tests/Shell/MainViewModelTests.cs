@@ -236,6 +236,43 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
+    public void Undo_NewBlockedTileUsedOnAnotherMap_RefusesAndNamesTheMap()
+    {
+        var viewModel = Open(CopyOfRepositoryContent());
+        var cell = ChooseCellNotATile(viewModel);
+        viewModel.Content!.AddBlockedTile(cell);
+        var tileId = viewModel.Content.TileAt(cell)!.Id;
+        viewModel.Painting!.StartPainting(new GridCell(0, 0));
+        viewModel.Painting.EndStroke();
+        var paintedMapId = viewModel.CurrentMap!.Map.Id;
+        viewModel.SaveCommand.Execute(null);
+        viewModel.TryOpenMap(viewModel.MapIds.First(id => id != paintedMapId));
+
+        viewModel.UndoCommand.Execute(null);
+
+        Assert.Equal($"Can't undo: tile {tileId} is used on map {paintedMapId}.", viewModel.UndoRefusal);
+        Assert.NotNull(viewModel.Content.TileAt(cell));
+        Assert.False(viewModel.RedoCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void Undo_RefusedThenAnEdit_ClearsTheRefusal()
+    {
+        var viewModel = Open(CopyOfRepositoryContent());
+        var cell = ChooseCellNotATile(viewModel);
+        viewModel.Content!.AddBlockedTile(cell);
+        viewModel.Painting!.StartPainting(new GridCell(0, 0));
+        viewModel.Painting.EndStroke();
+        viewModel.SaveCommand.Execute(null);
+        viewModel.TryOpenMap(viewModel.MapIds.First(id => id != viewModel.CurrentMap!.Map.Id));
+        viewModel.UndoCommand.Execute(null);
+
+        BlockFirstWalkableTile(viewModel);
+
+        Assert.Null(viewModel.UndoRefusal);
+    }
+
+    [Fact]
     public void Undo_CatalogStepAfterSwitchingMaps_UndoesIt()
     {
         var viewModel = Open(_repositoryContent);

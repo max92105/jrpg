@@ -126,6 +126,10 @@ internal sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     public partial bool IsGridShown { get; set; } = true;
 
+    /// <summary>Why the last undo was refused: a tile it would remove is still in use; null after any other undo, redo or edit.</summary>
+    [ObservableProperty]
+    public partial string? UndoRefusal { get; private set; }
+
     /// <summary>What the status bar says about the cell under the cursor; empty when the cursor is off the map.</summary>
     [ObservableProperty]
     public partial string CursorStatus { get; private set; } = "";
@@ -244,6 +248,12 @@ internal sealed partial class MainViewModel : ObservableObject
             return;
         }
 
+        UndoRefusal = _journal.NextUndo == UndoTarget.Catalogs ? RefusalOfCatalogUndo() : null;
+        if (UndoRefusal is not null)
+        {
+            return;
+        }
+
         if (_journal.Undo() == UndoTarget.Map)
         {
             CurrentMap!.UndoCommand.Execute(null);
@@ -265,6 +275,8 @@ internal sealed partial class MainViewModel : ObservableObject
             return;
         }
 
+        UndoRefusal = null;
+
         if (_journal.Redo() == UndoTarget.Map)
         {
             CurrentMap!.RedoCommand.Execute(null);
@@ -277,6 +289,20 @@ internal sealed partial class MainViewModel : ObservableObject
         NotifyUndoRedoChanged();
     }
 
+    // The first tile the undo would remove that something still uses, named with its first user (decision 117).
+    private string? RefusalOfCatalogUndo()
+    {
+        foreach (var tileId in Content!.TilesRemovedByUndo())
+        {
+            if (CatalogUsage.UsersOfTile(tileId, Content.Current, CurrentMap?.Map.Layout) is [var user, ..])
+            {
+                return $"Can't undo: tile {tileId} is used on {user}.";
+            }
+        }
+
+        return null;
+    }
+
     private bool CanUndo() => _journal.CanUndo;
 
     private bool CanRedo() => _journal.CanRedo;
@@ -285,6 +311,7 @@ internal sealed partial class MainViewModel : ObservableObject
 
     private void RecordStep(UndoTarget step)
     {
+        UndoRefusal = null;
         _journal.Record(step);
         NotifyUndoRedoChanged();
     }

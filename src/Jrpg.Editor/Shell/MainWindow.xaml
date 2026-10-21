@@ -110,6 +110,7 @@
     </ToolBar>
     <StatusBar DockPanel.Dock="Bottom">
       <StatusBarItem Content="{Binding CursorStatus}" />
+      <StatusBarItem Content="{Binding UndoRefusal}" Foreground="DarkRed" />
       <StatusBarItem Content="Unsaved changes"
                      Visibility="{Binding HasUnsavedChanges, Converter={StaticResource VisibleWhenTrue}}" />
       <StatusBarItem x:Name="ZoomStatus" HorizontalAlignment="Right" />

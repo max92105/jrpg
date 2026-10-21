@@ -18,6 +18,9 @@ internal sealed class CatalogHistory
 
     public bool IsDirty => _savedDepth != _done.Count;
 
+    /// <summary>The edit the next undo reverts; null when there is none.</summary>
+    public CatalogEdit? NextUndo => _done.Count > 0 ? _done.Peek() : null;
+
     /// <summary>Records an edit already applied; any undone edits can no longer be redone.</summary>
     public void Push(CatalogEdit appliedEdit)
     {

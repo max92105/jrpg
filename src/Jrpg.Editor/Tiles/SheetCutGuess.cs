@@ -4,6 +4,7 @@ namespace Jrpg.Editor.Tiles;
 internal static class SheetCutGuess
 {
     // Legacy TilesetManagerWindow.GuessTileSize: the map's 48 px cell first, then the usual sizes of bought tilesheets.
+    // Legacy's order is kept, so 64 never wins: 32 divides whatever 64 does (a 64 px sheet is corrected in the Cut panel).
     private static readonly int[] _commonSizes = [48, 32, 16, 64, 24];
 
     /// <returns>The first common size that divides both sides of the image, else 48.</returns>

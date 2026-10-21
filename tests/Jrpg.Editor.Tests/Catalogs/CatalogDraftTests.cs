@@ -154,7 +154,7 @@ public sealed class CatalogDraftTests
     {
         _draft.SetTilesheet(Grass3);
 
-        Assert.Same(Grass3, _draft.Current.Tilesheets["grass_3"]);
+        Assert.Equal(Grass3, _draft.Current.Tilesheets["grass_3"]);
         Assert.True(_draft.IsDirty);
     }
 

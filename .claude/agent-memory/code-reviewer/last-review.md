@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-21-editor/slices/E5a.md, E5a (every sheet image is listed)
-Round: 1 (verdict: Ready to commit; verify all pass, 1384 tests)
+Slice: docs/plans/2026-10-21-editor/slices/E5b1.md, E5b1 (set up a sheet with the guessed cut; commit 96be6ef + uncommitted test fix)
+Round: 1 (verdict: Ready to commit; verify all pass, 1399 tests)
 
-- open (Warning): choosing an image not set up keeps SelectedCell from the previous sheet (HasChoice true), so map clicks still paint it while ChoiceText only says "Not set up yet"; append the held brush to the text or clear the brush, and pin it in SelectCellAt_ImageNotSetUp_ChoosesNothing.
-- open (Suggestion): Select(tileId) uses First(); a sheet whose file isn't in the image list (not .png, subfolder) throws InvalidOperationException; ChoicesOf could append unmatched sheets.
-- open (Follow-up): ArtFoldersTests pins 34 images, so adding any tilesheet PNG breaks a Data test.
+- open (Suggestion): SheetCutGuess's 64 can never be chosen (any multiple of 64 divides by 32, which comes first); developer's call whether to reorder or drop it, else note it in the comment.
+- open (Suggestion): TilesheetIds on a file name with no letters or digits (".png", "-.png") gives "" or "_", an id the writer accepts; untested edge, low odds.
+- open (Follow-up): MainViewModel.cs is 476 lines (467 before); split the undo/refusal logic out.

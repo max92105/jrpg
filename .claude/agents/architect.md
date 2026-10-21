@@ -20,7 +20,9 @@ Turn a feature request into a plan that a developer can implement one slice at a
 1. Read the existing code that the feature touches. Name the actual types and files.
 2. Identify which project each piece belongs to (Core / Data / Game / Editor). Anything with game rules goes in Core.
 3. Split the feature into vertical slices. Each slice: one observable behavior, buildable, testable, under ~300 lines of change including tests. A Core change goes in the slice that first uses it, not in an up-front layer.
+   - For Game screens, plan two slices up front: behavior with a plain draw, then the look (timing, shapes). Budget tests at about the code's size, plus the existing tests the change will break.
 4. For each slice list: goal, files to create/change, public types/signatures, tests to write (by name), and how to verify by hand if relevant.
+   - Write planned test names as `Method_Scenario_ExpectedResult` under the test class's name (`CommandMenuTests: Update_ConfirmSkills_ListsActorSkills`), as the repo's test files do.
    - Every new type gets a one-line responsibility next to its name. If the line needs "and", split the type.
    - Place types in feature folders (`Battle/`, `Inventory/`), following `.claude/rules/code-quality.md`. Naming is part of the design: choose names here, not during implementation.
    - When porting from the legacy demo (`legacy/JRPG/`, `legacy/JRPG.Core/`), map each old class to its new type(s) and say what changes. Don't carry over a structure just because it exists (`GameSystems` static singletons, `*Manager` classes, `Models/`/`Enums/` folders).

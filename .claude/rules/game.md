@@ -10,6 +10,7 @@ paths:
 - Use a fixed timestep for simulation updates; rendering may interpolate.
 - Pixel art: point sampling (`SamplerState.PointClamp`), integer scaling, no blurry filtering.
 - Load assets through the content pipeline or one asset loader class; never load files ad hoc inside draw code.
+- A shape or texture that `UiTextures` bakes lives in `Ui/`, never in a feature folder: `Ui` must not depend on `Battle`, `Menus` or `Title`.
 - No allocations in `Update`/`Draw` hot paths (no LINQ, no `new` of lists per frame, no string concatenation per frame).
 
 ## UI look

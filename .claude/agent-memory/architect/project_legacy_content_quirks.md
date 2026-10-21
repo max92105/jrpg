@@ -11,7 +11,7 @@ Verified 2026-10-17/18 against the files:
 - `Tilesheets.json`: configures only 2 (16 px FG_Forest_Fall, 64 px Floor) of ~10 referenced sheets; rest relied on a 48 px code default.
 - Live maps: single-line camelCase, accidental `usedTileIds`/`abovePlayerZoneZ`, id-0 placeholder tiles, negative z, `zOverrides` empty everywhere.
 - `Assets/Maps/Back/*`: older format, dropped (decision 39).
-- Battle VFX are GIFs (AttackPlayer/AttackEnemy, ~120 px square frames, now in content/art/effects-source) - MonoGame can't load them. Legacy UI icons are XAML vector geometries in JRPG/UI/Styles/Art.xaml (no PNGs). `player.png` rows are Down, Left, Right, Up (new `Facing` enum order differs).
+- Legacy UI icons are XAML vector geometries in JRPG/UI/Styles/Art.xaml (no PNGs). `player.png` rows are Down, Left, Right, Up (new `Facing` enum order differs).
 - Legacy battle and menus are mouse-driven; the intro cutscene is reachable only via F1.
 - Checked 2026-10-20: party `battlers/*.png` are 1024 px painted portraits (not sprites); `Goblin.png` battler is ~256 px pixel art. Enemy `portraitFile` "goblin.png" vs file `Goblin.png` (case). `icons/TargetArrow.png` may have an opaque grey background. Skills heal/recovery/heal_all have empty `iconFile`. Legacy Defend did nothing (TODO) and Run always succeeded.
 

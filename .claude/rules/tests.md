@@ -12,3 +12,5 @@ paths:
 - Prefer small builders (`new PartyBuilder().WithHero(level: 5).Build()`) over large fixture files.
 - Simulations in `tests/Jrpg.Simulations` assert on aggregate outcomes (win rate within a range, average turns), and print a short summary table.
 - Never weaken or delete an existing assertion to make a test pass. If the expected value is wrong, say so and explain why.
+- Every guard that turns an input into a no-op (a greyed entry, input before an entrance ends) has a test that presses it and asserts nothing happened.
+- UI tests pick an entry by what it is (a helper that moves until `Selected` is the wanted entry), not by a fixed count of presses.

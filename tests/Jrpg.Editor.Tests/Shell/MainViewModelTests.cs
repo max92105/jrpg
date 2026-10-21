@@ -1,5 +1,7 @@
 using Jrpg.Core.Geometry;
+using Jrpg.Data.Art;
 using Jrpg.Data.Content;
+using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Maps.Editing;
 using Jrpg.Editor.Shell;
 
@@ -151,6 +153,38 @@ public sealed class MainViewModelTests : IDisposable
 
         Assert.StartsWith("map-layouts/forest.json: ", viewModel.SaveError, StringComparison.Ordinal);
         Assert.True(forest.IsDirty);
+    }
+
+    [Fact]
+    public void Save_MapPaintedWithNewTile_WritesTileAndMapThatLoadBack()
+    {
+        var viewModel = Open(CopyOfRepositoryContent());
+        var cell = ChooseCellNotATile(viewModel);
+        viewModel.Painting!.StartPainting(new GridCell(0, 0));
+        viewModel.Painting.EndStroke();
+
+        viewModel.SaveCommand.Execute(null);
+
+        Assert.Null(viewModel.SaveError);
+        var loaded = ContentCatalogLoader.Load(_contentCopy);
+        var tile = loaded.Tiles.Values.Single(tile => new SheetCell(tile.SheetId, tile.Column, tile.Row) == cell);
+        var layer = loaded.Maps["forest"].Layout.Layers.Single(layer => layer.Z == viewModel.Layer.Z);
+        Assert.Equal(tile.Id, layer.TileIdAt(new GridCell(0, 0)));
+    }
+
+    [Fact]
+    public void Save_CatalogTheArtCheckRefuses_ShowsMessageAndWritesNothing()
+    {
+        var viewModel = Open(CopyOfRepositoryContent());
+        var filesBefore = TilesAndForestBytes();
+        viewModel.Content!.AddTile(new SheetCell(viewModel.Catalog!.Tilesheets.Keys.First(), 9999, 0));
+        PaintTopLeft(viewModel);
+
+        viewModel.SaveCommand.Execute(null);
+
+        Assert.Contains("lies outside", viewModel.SaveError, StringComparison.Ordinal);
+        Assert.Equal(filesBefore, TilesAndForestBytes());
+        Assert.True(viewModel.CurrentMap!.IsDirty);
     }
 
     [Fact]
@@ -375,6 +409,23 @@ public sealed class MainViewModelTests : IDisposable
         map.Do(new SetTilesEdit(ground.Z, [new TileChange(new GridCell(0, 0), before, after)]));
         return after;
     }
+
+    // Clicks the first cell of the shown sheet that isn't a tile yet, sized by its image in the content copy.
+    private SheetCell ChooseCellNotATile(MainViewModel viewModel)
+    {
+        var browser = viewModel.Painting!.Browser;
+        var sheet = browser.SelectedSheet!;
+        var (width, height) = PngSize.Read(Path.Combine(ArtFolders.RootIn(_contentCopy), ArtFolders.Tilesheets, sheet.File));
+        var cell = (from row in Enumerable.Range(0, sheet.RowsIn(height))
+                    from column in Enumerable.Range(0, sheet.ColumnsIn(width))
+                    select new SheetCell(sheet.Id, column, row)).First(cell => viewModel.Content!.TileAt(cell) is null);
+        browser.SelectCellAt(sheet.CellLeft(cell.Column), sheet.CellTop(cell.Row));
+        return cell;
+    }
+
+    private byte[] TilesAndForestBytes() =>
+        [.. File.ReadAllBytes(Path.Combine(_contentCopy, "tiles.json")),
+         .. File.ReadAllBytes(Path.Combine(_contentCopy, "map-layouts", "forest.json"))];
 
     private string CopyOfRepositoryContent()
     {

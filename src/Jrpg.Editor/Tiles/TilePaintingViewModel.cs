@@ -10,13 +10,15 @@ namespace Jrpg.Editor.Tiles;
 
 /// <summary>
 /// Painting tiles on the open map: the chosen tile, tool and brush size, and what each tool does on the chosen layer.
-/// Every change is one undo step; nothing is painted until a tile is chosen.
+/// Every change is one undo step; nothing is painted until a cell is chosen, and a cell that isn't a tile yet becomes one
+/// the first time it is painted (decision 113).
 /// </summary>
 internal sealed partial class TilePaintingViewModel : ObservableObject
 {
     // Legacy brush sizes, in cells; [ and ] step through them.
     private static readonly int[] _brushSizes = [1, 2, 3, 4, 5, 7, 9];
 
+    private readonly CatalogDraft _catalog;
     private readonly LayerChoiceViewModel _layer;
 
     /// <param name="catalog">The sheets and tiles.</param>
@@ -25,6 +27,7 @@ internal sealed partial class TilePaintingViewModel : ObservableObject
     public TilePaintingViewModel(CatalogDraft catalog, LayerChoiceViewModel layer, Func<string, (int Width, int Height)> imageSizeOf)
     {
         Browser = new TileBrowserViewModel(catalog, imageSizeOf);
+        _catalog = catalog;
         _layer = layer;
     }
 
@@ -50,9 +53,9 @@ internal sealed partial class TilePaintingViewModel : ObservableObject
 
     public void StartPainting(GridCell cell)
     {
-        if (Browser.SelectedTileId is { } tileId)
+        if (OpenMap is { } open && TryTakeChosenTile(out var tileId))
         {
-            OpenMap?.StartStroke(new TileBrush(_layer.Z, tileId, BrushSize), cell);
+            open.StartStroke(new TileBrush(_layer.Z, tileId, BrushSize), cell);
         }
     }
 
@@ -101,13 +104,26 @@ internal sealed partial class TilePaintingViewModel : ObservableObject
 
     private void PutChosenTile(IEnumerable<GridCell> cells)
     {
-        if (Browser.SelectedTileId is { } tileId)
+        if (OpenMap is not null && TryTakeChosenTile(out var tileId))
         {
             PutTiles(tileId, cells);
         }
     }
 
     private void PutTiles(int tileId, IEnumerable<GridCell> cells) => OpenMap?.PutTiles(_layer.Z, tileId, cells);
+
+    // The chosen cell's tile, made a tile first if it isn't one yet; false when no cell is chosen.
+    private bool TryTakeChosenTile(out int tileId)
+    {
+        tileId = TileLayer.EmptyTileId;
+        if (Browser.SelectedCell is not { } cell)
+        {
+            return false;
+        }
+
+        tileId = _catalog.TileAt(cell)?.Id ?? _catalog.AddTile(cell);
+        return true;
+    }
 
     private void StepBrushSize(int steps)
     {

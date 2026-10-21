@@ -18,17 +18,22 @@ public sealed class TileBrowserViewModelTests
         ["Forest.png"] = (96, 48),
     };
 
-    private readonly TileBrowserViewModel _browser = new(
-        new CatalogDraft(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")) with
+    private readonly CatalogDraft _draft = new(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")) with
+    {
+        Tilesheets = new Dictionary<string, TilesheetDefinition> { ["forest"] = _forest, ["dungeon"] = _dungeon },
+        Tiles = new Dictionary<int, TileDefinition>
         {
-            Tilesheets = new Dictionary<string, TilesheetDefinition> { ["forest"] = _forest, ["dungeon"] = _dungeon },
-            Tiles = new Dictionary<int, TileDefinition>
-            {
-                [7] = new() { Id = 7, IsWalkable = true, SheetId = "dungeon", Column = 1, Row = 0 },
-                [8] = new() { Id = 8, IsWalkable = true, SheetId = "forest", Column = 0, Row = 0 },
-            },
-        }),
-        file => _imageSizes[file]);
+            [7] = new() { Id = 7, IsWalkable = true, SheetId = "dungeon", Column = 1, Row = 0 },
+            [8] = new() { Id = 8, IsWalkable = true, SheetId = "forest", Column = 0, Row = 0 },
+        },
+    });
+
+    private readonly TileBrowserViewModel _browser;
+
+    public TileBrowserViewModelTests()
+    {
+        _browser = new TileBrowserViewModel(_draft, file => _imageSizes[file]);
+    }
 
     [Fact]
     public void Constructor_SheetsSortedById_ShowsTheFirst()
@@ -89,6 +94,20 @@ public sealed class TileBrowserViewModelTests
         _browser.SelectCellAt(40, 5);
 
         Assert.Equal("Cell (2, 0): not a tile yet", _browser.ChoiceText);
+    }
+
+    [Fact]
+    public void AddTile_ChosenCell_NamesTheNewTileAndMarksIt()
+    {
+        _browser.SelectCellAt(40, 5);
+        var changed = new List<string?>();
+        _browser.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+        _draft.AddTile(_browser.SelectedCell!.Value);
+
+        Assert.Equal("Cell (2, 0): tile 9", _browser.ChoiceText);
+        Assert.Contains(nameof(TileBrowserViewModel.ChoiceText), changed);
+        Assert.Contains(nameof(TileBrowserViewModel.SheetTiles), changed);
     }
 
     [Fact]

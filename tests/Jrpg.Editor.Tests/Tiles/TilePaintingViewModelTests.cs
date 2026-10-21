@@ -13,12 +13,13 @@ public sealed class TilePaintingViewModelTests
 {
     private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
+    private readonly CatalogDraft _draft = new(_catalog);
     private readonly LayerChoiceViewModel _layer = new();
     private readonly TilePaintingViewModel _painting;
 
     public TilePaintingViewModelTests()
     {
-        _painting = new TilePaintingViewModel(new CatalogDraft(_catalog), _layer, _ => (1000, 1000)) { OpenMap = new MapViewModel(_catalog.Maps["forest"]) };
+        _painting = new TilePaintingViewModel(_draft, _layer, _ => (1000, 1000)) { OpenMap = new MapViewModel(_catalog.Maps["forest"]) };
     }
 
     private MapViewModel Map => _painting.OpenMap!;
@@ -46,6 +47,55 @@ public sealed class TilePaintingViewModelTests
         _painting.EndStroke();
 
         Assert.False(Map.IsDirty);
+    }
+
+    [Fact]
+    public void StartPainting_CellNotATile_AddsTileAndPaintsIt()
+    {
+        var tilesBefore = _draft.Current.Tiles.Count;
+        ChooseCellNotATile();
+
+        _painting.StartPainting(new GridCell(4, 4));
+        _painting.EndStroke();
+
+        var ground = Map.Layers.Single(layer => layer.Z == _layer.Z);
+        Assert.Equal(tilesBefore + 1, _draft.Current.Tiles.Count);
+        Assert.Equal(_draft.TileAt(_painting.Browser.SelectedCell!.Value)!.Id, ground.TileIdAt(new GridCell(4, 4)));
+    }
+
+    [Fact]
+    public void StartPainting_CellAlreadyATile_AddsNoTile()
+    {
+        _painting.PickTileAt(new GridCell(0, 0));
+        var tilesBefore = _draft.Current.Tiles.Count;
+
+        _painting.StartPainting(new GridCell(4, 4));
+        _painting.EndStroke();
+
+        Assert.Equal(tilesBefore, _draft.Current.Tiles.Count);
+        Assert.False(_draft.IsDirty);
+    }
+
+    [Fact]
+    public void StartPainting_NoOpenMap_AddsNoTile()
+    {
+        ChooseCellNotATile();
+        _painting.OpenMap = null;
+
+        _painting.StartPainting(new GridCell(4, 4));
+
+        Assert.False(_draft.IsDirty);
+    }
+
+    [Fact]
+    public void FillLayerCommand_CellNotATile_AddsOneTile()
+    {
+        var tilesBefore = _draft.Current.Tiles.Count;
+        ChooseCellNotATile();
+
+        _painting.FillLayerCommand.Execute(null);
+
+        Assert.Equal(tilesBefore + 1, _draft.Current.Tiles.Count);
     }
 
     [Fact]
@@ -164,6 +214,16 @@ public sealed class TilePaintingViewModelTests
         _painting.ShrinkBrush();
 
         Assert.Equal(1, _painting.BrushSize);
+    }
+
+    // The first cell of the shown sheet that isn't a tile yet; every sheet image is 1000 pixels square here.
+    private void ChooseCellNotATile()
+    {
+        var sheet = _painting.Browser.SelectedSheet!;
+        var cell = (from row in Enumerable.Range(0, sheet.RowsIn(1000))
+                    from column in Enumerable.Range(0, sheet.ColumnsIn(1000))
+                    select new SheetCell(sheet.Id, column, row)).First(cell => _draft.TileAt(cell) is null);
+        _painting.Browser.SelectCellAt(sheet.CellLeft(cell.Column), sheet.CellTop(cell.Row));
     }
 
     // The forest's top-left tile, painted on the given layer.

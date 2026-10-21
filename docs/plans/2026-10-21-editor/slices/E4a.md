@@ -38,3 +38,4 @@ Part of [the editor plan](../README.md). Design: [design.md](../design.md), "Wha
     - [ ] On `city`, turn on Mark blocked, click wall cells: red crosses; click one again: it clears. With the toggle off, clicks choose cells again.
     - [ ] "Unsaved changes" shows; switch maps: no question, crosses still there; close: asked.
     - [ ] Ctrl+S, F5: the player can't walk onto a cell painted with a blocked tile.
+- **From E3d's review:** marking a tile blocked changes no map, so closing the editor or leaving the map must also ask when `CatalogDraft.IsDirty` (today `ConfirmLeaveCurrentMap` and `ConfirmClose` look only at `CurrentMap.IsDirty`).

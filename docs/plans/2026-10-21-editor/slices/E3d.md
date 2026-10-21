@@ -19,9 +19,11 @@ Part of [the editor plan](../README.md). Design: [design.md](../design.md), "Key
   - **Tests:**
     - `CatalogDraftTests`: `AddTile_EmptyCell_AddsWalkableTileAboveHighestId`, `AddTile_EmptyCell_MarksDirty`, `TileAt_CellWithoutTile_ReturnsNull`, `MarkSaved_AfterAddTile_IsClean`.
     - `TilePaintingViewModelTests`: `StartPainting_CellNotATile_AddsTileAndPaintsIt`, `StartPainting_CellAlreadyATile_AddsNoTile`, `FillLayerCommand_CellNotATile_AddsOneTile`.
-    - `MainViewModelTests`: `Save_MapPaintedWithNewTile_WritesTilesThenMap` (loads the saved folder back), `Save_CatalogTheArtCheckRefuses_ShowsMessageAndWritesNothing`.
+    - `MainViewModelTests`: `Save_MapPaintedWithNewTile_WritesTileAndMapThatLoadBack` (loads the saved folder back), `Save_CatalogTheArtCheckRefuses_ShowsMessageAndWritesNothing`.
   - **Verify by hand:**
     - [ ] The developer's check: click any cell of any set-up sheet, paint it on the map: it shows at once; the cell is now marked as a tile. Repeat on two other sheets.
     - [ ] Undo: the paint goes, the tile mark stays.
     - [ ] Ctrl+S: `git diff` shows the new tiles at the end of `tiles.json` (CRLF), the map change, and nothing else.
     - [ ] **Above the player:** choose "Above player (roofs, treetops)" (z 5), paint a row of leaves across a path; Ctrl+S; F5: walk along the path: the leaves are drawn over the player. Paint on "Ground detail" (z -4): it is drawn under the player.
+- **Done, with deviations:** `TileImages` needed no change (it already read `CatalogDraft.Current` since E3a; a cached crop only goes stale when a tile is re-cut, E6). The browser refreshes its tiles, choice and line when the draft changes, tested by `AddTile_ChosenCell_NamesTheNewTileAndMarksIt` (the E3b follow-up). The tile lookup moved from the browser to `CatalogDraft.TileAt`.
+- **Review follow-up:** the save test is named `..._WritesTileAndMapThatLoadBack` (the order is pinned by the refusal test); `StartPainting_NoOpenMap_AddsNoTile` added. Closing or leaving a map asks only about `CurrentMap.IsDirty`, not `CatalogDraft.IsDirty`: handed to E4a.

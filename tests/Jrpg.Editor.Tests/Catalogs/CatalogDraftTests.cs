@@ -30,4 +30,43 @@ public sealed class CatalogDraftTests
 
         Assert.Same(renamed, _draft.Current.Maps["forest"]);
     }
+
+    [Fact]
+    public void AddTile_EmptyCell_AddsWalkableTileAboveHighestId()
+    {
+        var highest = _draft.Current.Tiles.Keys.Max();
+
+        var id = _draft.AddTile(EmptyCell);
+
+        Assert.Equal(highest + 1, id);
+        Assert.Equal(new TileDefinition { Id = id, IsWalkable = true, SheetId = EmptyCell.SheetId, Column = EmptyCell.Column, Row = EmptyCell.Row }, _draft.Current.Tiles[id]);
+        Assert.Equal(id, _draft.TileAt(EmptyCell)?.Id);
+    }
+
+    [Fact]
+    public void AddTile_EmptyCell_MarksDirty()
+    {
+        _draft.AddTile(EmptyCell);
+
+        Assert.True(_draft.IsDirty);
+    }
+
+    [Fact]
+    public void TileAt_CellWithoutTile_ReturnsNull()
+    {
+        Assert.Null(_draft.TileAt(EmptyCell));
+    }
+
+    [Fact]
+    public void MarkSaved_AfterAddTile_IsClean()
+    {
+        _draft.AddTile(EmptyCell);
+
+        _draft.MarkSaved();
+
+        Assert.False(_draft.IsDirty);
+    }
+
+    // Far past any sheet's last cell, so no tile of the repository's content is cut from it.
+    private SheetCell EmptyCell => new(_draft.Current.Tilesheets.Keys.First(), 999, 999);
 }

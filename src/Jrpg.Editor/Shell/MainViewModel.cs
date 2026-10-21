@@ -212,7 +212,7 @@ internal sealed partial class MainViewModel : ObservableObject
     [RelayCommand]
     private void Save()
     {
-        if (CurrentMap is null)
+        if (CurrentMap is null || Content is not { } content)
         {
             return;
         }
@@ -220,7 +220,14 @@ internal sealed partial class MainViewModel : ObservableObject
         var map = CurrentMap.Map;
         try
         {
-            _writer.WriteMap(map, Catalog!);
+            // The catalogs first, so a saved map never names a tile the game doesn't know.
+            if (content.IsDirty)
+            {
+                _writer.WriteMapCatalogs(content.Current);
+                content.MarkSaved();
+            }
+
+            _writer.WriteMap(map, content.Current);
         }
         catch (Exception exception) when (exception is ContentValidationException or IOException or UnauthorizedAccessException)
         {
@@ -228,8 +235,8 @@ internal sealed partial class MainViewModel : ObservableObject
             return;
         }
 
-        Content!.AddSavedMap(map);
-        ShowMapList(Content.Current);
+        content.AddSavedMap(map);
+        ShowMapList(content.Current);
 
         CurrentMap.MarkSaved();
         SaveError = null;

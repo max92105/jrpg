@@ -33,7 +33,7 @@ internal sealed partial class TileBrowserView : UserControl
 
     private void OnBrowserChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(TileBrowserViewModel.SelectedSheet) or nameof(TileBrowserViewModel.SelectedCell))
+        if (e.PropertyName is nameof(TileBrowserViewModel.SelectedSheet) or nameof(TileBrowserViewModel.SelectedCell) or nameof(TileBrowserViewModel.SheetTiles))
         {
             DrawSheet();
         }

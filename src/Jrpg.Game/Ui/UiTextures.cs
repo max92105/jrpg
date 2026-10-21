@@ -31,6 +31,8 @@ internal sealed class UiTextures
     private Texture2D? _battleVignette;
     private Texture2D? _topShade;
     private Texture2D? _commandHeader;
+    private Texture2D? _rewardBar;
+    private Texture2D? _cardHeader;
     private readonly Dictionary<(string File, int Size), Texture2D> _diamondPortraits = [];
     private readonly Dictionary<(string Folder, string File, int Size), Texture2D> _shrunk = [];
     private readonly Dictionary<DiamondShape, Texture2D> _diamonds = [];
@@ -78,6 +80,20 @@ internal sealed class UiTextures
             CommandHeaderShape.Width,
             CommandHeaderShape.Height,
             CommandHeaderShape.Pixels(GradientStrip.Colors(UiTheme.Selection, CommandHeaderShape.Width), UiTheme.SelectionStroke));
+
+    /// <summary>A victory reward row, pointed on the left and fading out to the right.</summary>
+    public Texture2D RewardBar(TextureLibrary textures) =>
+        _rewardBar ??= textures.Create(
+            PointedBarShape.RewardBarWidth,
+            PointedBarShape.RewardBarHeight,
+            PointedBarShape.RewardBar(GradientStrip.Colors(UiTheme.RewardBar, PointedBarShape.RewardBarWidth)));
+
+    /// <summary>A victory card's name tab, pointed at both ends, with a faint outline.</summary>
+    public Texture2D CardHeader(TextureLibrary textures) =>
+        _cardHeader ??= textures.Create(
+            PointedBarShape.CardHeaderWidth,
+            PointedBarShape.CardHeaderHeight,
+            PointedBarShape.CardHeader(GradientStrip.Colors(UiTheme.CardHeader, PointedBarShape.CardHeaderWidth), UiTheme.Stroke));
 
     /// <summary>
     /// <paramref name="source"/>'s shape in plain white, made once per texture: drawn over a sprite, it lights it white the

@@ -33,6 +33,26 @@ internal static class OutlinedShape
         return pixels;
     }
 
+    /// <summary>The same shape filled with no outline, as a legacy path drawn without a stroke.</summary>
+    /// <param name="corners">The path's corners, in fractions of the size (0 to 1).</param>
+    /// <param name="size">The image's width and height in pixels.</param>
+    /// <param name="fill">One color per column, left to right.</param>
+    /// <returns>Premultiplied pixels, row by row.</returns>
+    public static Color[] Filled(IReadOnlyList<Point2D> corners, Point size, IReadOnlyList<Color> fill)
+    {
+        var inside = CanopyMask.Build([corners], size.X, size.Y);
+        var pixels = new Color[inside.Length];
+        for (var index = 0; index < inside.Length; index++)
+        {
+            if (inside[index])
+            {
+                pixels[index] = fill[index % size.X];
+            }
+        }
+
+        return pixels;
+    }
+
     // Inside, with a neighbor outside the shape or past the image's border.
     private static bool IsEdge(bool[] inside, Point size, int x, int y) =>
         !IsInside(inside, size, x - 1, y) || !IsInside(inside, size, x + 1, y) || !IsInside(inside, size, x, y - 1) || !IsInside(inside, size, x, y + 1);

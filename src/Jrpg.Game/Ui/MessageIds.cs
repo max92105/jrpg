@@ -276,8 +276,8 @@ internal static class MessageIds
     /// <summary>The title of the victory screen.</summary>
     public const string BattleVictory = "battle_victory";
 
-    /// <summary>Placeholder <c>{amount}</c>: the experience the defeated enemies gave, before the split.</summary>
-    public const string BattleExperienceEarned = "battle_experience_earned";
+    /// <summary>The small label before a member's level on a victory card.</summary>
+    public const string BattleLevelLabel = "battle_level_label";
 
     /// <summary>Shown on the victory screen by a member whose bar filled a level.</summary>
     public const string BattleLevelUp = "battle_level_up";

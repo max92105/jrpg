@@ -181,6 +181,16 @@ internal static class UiTheme
     /// <summary>Legacy <c>Brush.Bar.EnemyHP</c>: an enemy's HP bar under its name.</summary>
     public static ImmutableArray<GradientStop> EnemyHpBar { get; } = [new(0, FromLegacy(0xFF8A2A2A)), new(1, FromLegacy(0xFFE0524A))];
 
+    /// <summary>Legacy <c>Brush.Bar.EXP</c>: a member's experience bar on the victory screen, one flat gold.</summary>
+    public static ImmutableArray<GradientStop> BattleXpBar { get; } = [new(0, FromLegacy(0xFFE3C17E)), new(1, FromLegacy(0xFFE3C17E))];
+
+    /// <summary>Legacy <c>Brush.RewardBar</c>: a victory reward row, pale on its pointed end and fading out to the right.</summary>
+    public static ImmutableArray<GradientStop> RewardBar { get; } =
+        [new(0, FromLegacy(0x99C8CCD4)), new(0.6f, FromLegacy(0x59A8ACB4)), new(1, FromLegacy(0x00A8ACB4))];
+
+    /// <summary>Legacy <c>Brush.CardHeader</c>: a victory card's name tab, dark and lighter to the right.</summary>
+    public static ImmutableArray<GradientStop> CardHeader { get; } = [new(0, FromLegacy(0xE6101014)), new(1, FromLegacy(0x99101014))];
+
     /// <summary>Legacy <c>BattleBarStyle</c>'s track: the battle bars sit straight on the background.</summary>
     public static Color BattleBarTrack { get; } = FromLegacy(0x80000000);
 

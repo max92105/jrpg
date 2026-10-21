@@ -39,6 +39,7 @@ internal sealed class BattleScene : IScene
     private (int Turn, TurnStage Stage) _shown;
     private bool _isFinished;
     private VictoryScreen? _victory;
+    private VictoryScreenView? _victoryView;
 
     /// <param name="session">The playthrough whose active battle this screen shows.</param>
     /// <param name="items">Every item by id, from the catalog, for the party's items.</param>
@@ -111,19 +112,22 @@ internal sealed class BattleScene : IScene
     {
         DrawBackdrop(batch, textures);
         _battlers.Draw(batch, textures);
+        if (_victoryView is { } victoryView)
+        {
+            victoryView.Draw(batch, textures);
+            return;
+        }
+
         _enemyTags.Draw(batch, textures);
         _impactEffects.Draw(batch, textures);
         _numbers.Draw(batch, textures);
         _turnOrder.Draw(batch, textures);
         _bannerView.Draw(batch, textures);
-        var isAwaitingCommand = !_isFinished && _sequence.IsAwaitingCommand;
         _partyStatus.Draw(batch, textures, _sequence.IsOver ? null : _sequence.Actor);
-        if (isAwaitingCommand)
+        if (!_isFinished && _sequence.IsAwaitingCommand)
         {
             _commandPanel.Draw(batch, textures, _sequence.Actor);
         }
-
-        _victory?.Draw(batch, textures);
     }
 
     // Text is formatted at stage changes, never per frame: the vitals once an action lands, the order when a turn starts.
@@ -160,7 +164,8 @@ internal sealed class BattleScene : IScene
         var outcome = _battle.Phase;
         if (_session.FinishBattle() is { } rewards)
         {
-            _victory = new VictoryScreen(rewards, _text, _ui);
+            _victory = new VictoryScreen(rewards);
+            _victoryView = new VictoryScreenView(_victory, _text, _ui);
             return null;
         }
 

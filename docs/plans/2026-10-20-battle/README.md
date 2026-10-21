@@ -94,7 +94,7 @@ The design leaves seams in Core (commands, events, targeting, tactics, turn orde
   - content: enemy gold and drop tables;
   - Core: gold in the session, drops into the inventory;
   - the save format changes (gold), so an ADR;
-  - the victory screen gains reward bars. `VictoryRewards` and the victory view are built so this is an addition (B7b).
+  - the victory screen gains reward bars. `VictoryRewards` and the victory view are built so this is an addition (B7b1).
 - **Battle sprites with animation frames** (decision 100), its own plan. Pixel-art sprites at a whole multiple of their native size, idle and attack frames on a sheet. Needs a format decision (ADR).
 - **Battles started by events** (decision 30). `BattleRequested` and `GameSession.StartPendingBattle` are the entry such a step would use.
 - **New mechanics.** None of these are built:
@@ -152,7 +152,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 6: end screens
 
 - [x] **B7a. Victory: experience fill** (Game, about 270 lines) → [slices/B7a.md](slices/B7a.md)
-- [ ] **B7b. Victory look** (Game, about 260 lines) → [slices/B7b.md](slices/B7b.md)
+- [x] **B7b1. Victory layout** (Game, about 300 lines; split from B7b) → [slices/B7b1.md](slices/B7b1.md)
+- [ ] **B7b2. Victory timing** (Game, about 180 lines; split from B7b) → [slices/B7b2.md](slices/B7b2.md)
 - [ ] **B8a. Escaped** (Game, about 110 lines) → [slices/B8a.md](slices/B8a.md)
 - [ ] **C4. A battle with nobody standing is lost at once** (Core, about 90 lines; decision 97) → [slices/C4.md](slices/C4.md)
 - [ ] **B8b. Defeat** (Game, about 290 lines; decision 65) → [slices/B8b.md](slices/B8b.md)

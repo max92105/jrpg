@@ -5,12 +5,9 @@ using Jrpg.Game.Battle;
 using Jrpg.Game.Input;
 using Jrpg.Game.Scenes;
 using Jrpg.Game.Tests.Input;
-using Jrpg.Game.Tests.Ui;
-using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Tests.Battle;
 
-[Collection(RepositoryScreenText.CollectionName)]
 public sealed class VictoryScreenTests
 {
     private static readonly InputFrame _confirm = InputFrames.Pressing(GameButton.Confirm);
@@ -18,9 +15,7 @@ public sealed class VictoryScreenTests
 
     // Sarxian's 60 experience fill half of a 120-point level: 0.55 s.
     private readonly VictoryScreen _screen = new(
-        new VictoryRewards(60, [new ExperienceGain(Sarxian(), 60, [new LevelProgressStep(1, 0, 60, 120)])]),
-        RepositoryScreenText.Text,
-        new UiTextures());
+        new VictoryRewards(60, [new ExperienceGain(Sarxian(), 60, [new LevelProgressStep(1, 0, 60, 120)])]));
 
     [Fact]
     public void Update_ConfirmWhilePlaying_SkipsToEnd()

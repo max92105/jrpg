@@ -14,7 +14,7 @@ Legacy values unless said otherwise. "Where" is where the value lives, so it cha
 | vignette, top shade | `Ui/UiTheme` | radial `#00000000` at 0.45 to `#B3000000`; top 320 px `#99000000` to clear | Legacy `Brush.BattleVignette`, `BattleTopShade`. | B2a |
 | party status | `Battle/PartyStatusView` | 400 px wide at the top right, margins 24 and 40 px. HP 30 px, MP 24 px, max values 17 and 15 px. Bars 3 px; the HP bar is 250 px, the MP bar 190 px. 64 px diamond portrait. The acting member's panel slides 36 px left. A fallen member's panel shows at 55 % with HP in red. | Legacy `CharacterPanel`. | B3a |
 | enemy tag | `Battle/EnemyTagView` | 160 px wide, name 16 px, 4 px red bar, 38 px under the sprite; letters A, B, C... when several enemies share a name | Legacy `EnemyTag`; decision 99. | B3b |
-| battle bar colors | `Ui/UiTheme` | HP `#3E7F5A` to `#7FD39A`, MP `#3E5C9A` to `#8FB4F0`, enemy HP `#8A2A2A` to `#E0524A`, track `#80000000`, EXP `#E3C17E` | Legacy `BattleStyles.xaml`. | B3a, B7b |
+| battle bar colors | `Ui/UiTheme` | HP `#3E7F5A` to `#7FD39A`, MP `#3E5C9A` to `#8FB4F0`, enemy HP `#8A2A2A` to `#E0524A`, track `#80000000`, EXP `#E3C17E` | Legacy `BattleStyles.xaml`. | B3a, B7b1 |
 | turn order | `Battle/TurnOrderView` | current 140 px diamond, then the next 8 of the repeating cycle at 66 px, touching (-6 px), with a "NEXT" label and a 760 px line. Enemies have a red lower half. Non-targets dim to 35 % while targeting. | Legacy `TurnOrderBar`; decision 104. | B3c, B4c |
 | command panel | `Battle/CommandPanelView` | 360 px wide; header tab 300 x 32; rows 46 px, icons 24 px, text 20 px, hint 16 px. 40 px left of the actor; top at least 260 and at most 1080 - 420. | Legacy `CommandPanel`. | B4c |
 | target pointer | `Battle/PointerBob` | 44 px, bobs 8 px over 0.45 s each way (sine); code-drawn if `TargetArrow.png` isn't transparent | Decision 56. | B4c |
@@ -25,8 +25,8 @@ Legacy values unless said otherwise. "Where" is where the value lives, so it cha
 | defeated enemy | `Battle/ActionPlayback` | white tint for 1.0 s, then a 1.0 s fade | Legacy `AnimateDeath` (no shader). | B5c |
 | effect strip | `Battle/EffectStrip` | 0.08 s per frame, 96 px, 30 px below the target's top; damage only | Decisions 57, 101. | B5d |
 | placeholder cue | `Battle/PlaceholderCue` | the action's name over each target: 0.15 s in, 0.3 s shown, 0.15 s out | Decision 101; question 106. | B5d |
-| victory | `Battle/VictoryScreen` | the title slides 60 px in 0.45 s; the reward bar comes after 0.25 s; the first card after 0.45 s, then 0.1 s apart; a 0.5 s pause. A full bar fills in 1.1 s, with 0.2 s minimum per level. "Level Up!" pops to 1.5x over 0.35 s. | Legacy `VictoryScreen`, `ExpGainRow`. | B7a, B7b |
-| victory layout | `Battle/VictoryScreenView` | "Victory!" 96 px at (104, 112), line at y 226; one reward bar per reward, 800 x 64 from (88, 268); cards in 2 columns, 880 px wide at (104, 420); 100 px footer | Legacy `VictoryScreen.xaml`. | B7b |
+| victory | `Battle/VictoryScreen` | the title slides 60 px in 0.45 s; the reward bar comes after 0.25 s; the first card after 0.45 s, then 0.1 s apart; a 0.5 s pause. A full bar fills in 1.1 s, with 0.2 s minimum per level. "Level Up!" pops to 1.5x over 0.35 s. | Legacy `VictoryScreen`, `ExpGainRow`. | B7a, B7b1, B7b2 |
+| victory layout | `Battle/VictoryScreenView` | "Victory!" 96 px at (104, 112), line at y 226; one reward bar per reward, 800 x 64 from (88, 268); cards in 2 columns, 880 px wide at (104, 420); 100 px footer | Legacy `VictoryScreen.xaml`. | B7b1 |
 | escaped | `Battle/EscapedNotice` | "Escaped" at 64 px on the banner for 1.5 s, or until Confirm | Legacy `EscapedScreen`. | B8a |
 | defeat | `Battle/DefeatScreen` | red "Defeat" fades in over 0.6 s; choices appear after 0.7 s | Legacy `DefeatScreen`; decision 65. | B8b |
 
@@ -113,7 +113,7 @@ Jrpg.Game/
             CommandPanelView, CommandPanelPlacement, CommandHeaderShape, PointerBob (B4c);
             TurnStage, BattlePacing (B5a); ActionPlayback, PlaybackBeat, BattleBanner (B5b); FloatingNumber (B5c);
             EffectStrip, PlaceholderCue (B5d); ExperienceBarAnimation, VictoryScreen (B7a);
-            VictoryScreenView, PointedBarShape (B7b); EscapedNotice (B8a); DefeatEntry, DefeatMenu, DefeatScreen (B8b)
+            VictoryScreenView, PointedBarShape (B7b1); VictoryEntrance (B7b2); EscapedNotice (B8a); DefeatEntry, DefeatMenu, DefeatScreen (B8b)
   Ui/       Vignette; UiTextures.BattleVignette, TopShade (B2a); UiTextures.Battler (B2b); UiTheme battle tokens (B3a)
 ```
 No type is named after its folder. `Jrpg.Game.Battle` sits beside `Jrpg.Core.Battle`, as `Exploration` already does.
@@ -205,7 +205,7 @@ No type is named after its folder. `Jrpg.Game.Battle` sits beside `Jrpg.Core.Bat
 | `AnimateStepForward`, `AnimateStepBack`, delays | `BattleTurnSequence` stages, `BattlePacing`, `ActionPlayback` beats | B5a, B5b |
 | `BattleBanner`, `FloatingText`, `AnimateDeath` | `Battle/BattleBanner`, `FloatingNumber`, `ActionPlayback` | B5b, B5c |
 | `PlayVFX` (GIF) | `Battle/EffectStrip` (damage only), `PlaceholderCue` | B5d |
-| `VictoryScreen`, `ExpGainRow` | `Battle/VictoryScreen`, `ExperienceBarAnimation`, `VictoryScreenView` | B7a, B7b |
+| `VictoryScreen`, `ExpGainRow` | `Battle/VictoryScreen`, `ExperienceBarAnimation`, `VictoryScreenView` | B7a, B7b1, B7b2 |
 | `ShowEscaped` | `Battle/EscapedNotice` | B8a |
 | `DefeatScreen` | `Battle/DefeatMenu`, `DefeatScreen` over `Saving/SaveFilesPanel` | B8b |
 

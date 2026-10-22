@@ -8,15 +8,15 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// The text on the menu's header bar, as legacy <c>MenuHeader</c>: the page title on the left; the current map's name
-/// and the ticking play time on the right. Text is measured only when it changes.
+/// The text on the menu's header bar: the page title on the left; the current map's name and the ticking play time on
+/// the right. Text is measured only when it changes.
 /// </summary>
 internal sealed class MenuHeader
 {
-    /// <summary>The header bar's height (legacy <c>GameMenuControl</c>'s first row).</summary>
+    /// <summary>The header bar's height (placeholder).</summary>
     public const int Height = 80;
 
-    // Legacy DockPanel margin 48; Text.Title 28 px; Text.Secondary and Text.Number 18 px; 40 px between location and time.
+    // Placeholder layout (decision 82): a 48 px margin, a 28 px title, 18 px location and time, 40 px between them.
     private const int SideMargin = 48;
     private const int TitleTextPixels = 28;
     private const int InfoTextPixels = 18;

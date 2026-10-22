@@ -4,7 +4,7 @@ namespace Jrpg.Game.Dialogue;
 
 /// <summary>
 /// The pages of one message being read, one message box each, typed out one character at a time. Confirm completes a
-/// page still typing, then turns it (legacy <c>DialogManager</c>, developer decision 54).
+/// page still typing, then turns it (decision 54).
 /// </summary>
 internal sealed class SpeechPlayback
 {

@@ -9,7 +9,7 @@ namespace Jrpg.Game.Exploration;
 /// </summary>
 internal sealed class MapDrawList
 {
-    // The sprite is one cell tall and centered on the player's position, so the feet are half a cell below it (legacy MapRenderer).
+    // The sprite is one cell tall and centered on the player's position, so the feet are half a cell below it.
     private const double PlayerFeetBelowPosition = 0.5;
 
     private static readonly IComparer<Drawable> _byDrawOrder = Comparer<Drawable>.Create((left, right) => left.Key.CompareTo(right.Key));

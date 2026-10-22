@@ -14,8 +14,8 @@ namespace Jrpg.Game.Exploration;
 
 /// <summary>
 /// Shows the running map event's current step and continues it once shown (ADR 0006): a warp fades to black, moves the
-/// player while the screen is black, and fades back in (legacy <c>GameManager.WarpAsync</c>); a dialogue shows its lines
-/// one page per Confirm, and a found item its message as one page.
+/// player while the screen is black, and fades back in; a dialogue shows its lines one page per Confirm, and a found
+/// item its message as one page.
 /// </summary>
 internal sealed class EventPresenter
 {
@@ -24,7 +24,7 @@ internal sealed class EventPresenter
     private readonly UiMessages _messages;
     private readonly DialogueBox _messageBox;
 
-    // Legacy SceneManager.TransitionAsync for warps.
+    // The fade for warps (placeholder timing).
     private readonly ScreenFade _warpFade = new(TimeSpan.FromSeconds(0.25), TimeSpan.FromSeconds(0.08), TimeSpan.FromSeconds(0.25));
 
     // The pages of the step being read; null when no message is on screen.

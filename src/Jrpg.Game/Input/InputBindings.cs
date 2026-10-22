@@ -4,9 +4,8 @@ using Microsoft.Xna.Framework.Input;
 namespace Jrpg.Game.Input;
 
 /// <summary>
-/// Which keys and controller buttons press which game button: the legacy keys (arrows, E/Space/Enter, Esc, F1), WASD and
-/// Backspace (developer decision 50), and a standard controller layout. Legacy menus were mouse-driven, so the tab
-/// buttons have no key yet (question 92).
+/// Which keys and controller buttons press which game button: arrows, E/Space/Enter, Esc, F1, WASD and Backspace
+/// (decision 50), and a standard controller layout. The tab buttons have no key yet (question 92).
 /// </summary>
 internal static class InputBindings
 {
@@ -24,7 +23,7 @@ internal static class InputBindings
         (Keys.Space, GameButton.Confirm),
         (Keys.Enter, GameButton.Confirm),
 
-        // Legacy Esc both opened the menu on the map and closed whatever was open.
+        // Esc both opens the menu on the map and closes whatever is open (Cancel wins when nested).
         (Keys.Escape, GameButton.Cancel),
         (Keys.Escape, GameButton.Menu),
         (Keys.Back, GameButton.Cancel),

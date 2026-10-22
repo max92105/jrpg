@@ -11,13 +11,13 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Exploration;
 
 /// <summary>
-/// The player walking the current map; the scene a new game starts in. It shows the tile layers, the animated player and
-/// objects in depth order, canopies and roofs over the player, with the camera easing after the player, and leaves map
-/// events to <see cref="EventPresenter"/>.
+/// The player walking the current map; the scene a new game starts in. It shows the tile layers, the animated player
+/// and objects in depth order, canopies and roofs over the player, with the camera easing after the player, and leaves
+/// map events to <see cref="EventPresenter"/>.
 /// </summary>
 internal sealed class ExplorationScene : IScene
 {
-    // Legacy GameManager: the camera catches up quickly while the player walks and settles gently once they stop.
+    // The camera catches up quickly while walking and settles gently once stopped (placeholder shares, decision 86).
     private const double WalkingCameraShare = 0.35;
     private const double StandingCameraShare = 0.1;
 
@@ -157,7 +157,7 @@ internal sealed class ExplorationScene : IScene
         }
     }
 
-    // The sprite is one cell square, centered on the player's position (legacy MapRenderer).
+    // The sprite is one cell square, centered on the player's position.
     private void DrawPlayer(SpriteBatch batch, TextureLibrary textures, Vector2 origin)
     {
         const int size = MapView.CellPixels;

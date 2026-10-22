@@ -18,7 +18,7 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class SavePage : ISaveFilesPage
 {
-    // The notice sits on the heading's line, at the page's right margin (legacy SaveLoadView's 28 x 20 margin).
+    // The notice sits on the heading's line, at the page's 28 px right margin.
     private const int NoticeMargin = 28;
     private const int NoticeTop = 20;
     private const int NoticePixels = 18;

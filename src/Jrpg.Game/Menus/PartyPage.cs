@@ -11,10 +11,10 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// The menu's Party page (legacy <c>PartyView</c>): the active party with its count on the left, the reserve on the
-/// right, one card per member. Confirm brings a reserve member in; on an active member it offers "Change order" (pick
-/// the place to swap with) or "To reserve". Core keeps the leader first, refuses a full party and never leaves the active
-/// party entirely fallen; the page asks it what a member may do and says why it refused.
+/// The menu's Party page: the active party with its count on the left, the reserve on the right, one card per member.
+/// Confirm brings a reserve member in; on an active member it offers "Change order" (pick the place to swap with) or
+/// "To reserve". Core keeps the leader first, refuses a full party and never leaves the active party entirely fallen;
+/// the page asks it what a member may do and says why it refused.
 /// </summary>
 internal sealed class PartyPage : IMenuPage
 {

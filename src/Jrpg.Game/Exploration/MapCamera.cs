@@ -7,11 +7,11 @@ namespace Jrpg.Game.Exploration;
 
 /// <summary>
 /// Which part of the map the screen shows. A map smaller than the screen sits centered; a larger one follows its target
-/// but never shows past its edges (legacy <c>CameraManager</c>).
+/// but never shows past its edges.
 /// </summary>
 internal sealed class MapCamera
 {
-    // Legacy eased once per 60 Hz update; the share is applied per that tick so the feel doesn't depend on the frame rate.
+    // The share is defined per 60 Hz tick and applied per that tick, so the feel doesn't depend on the frame rate.
     private const double TicksPerSecond = 60;
 
     // Kept unrounded so small easing steps add up instead of rounding away.
@@ -30,8 +30,8 @@ internal sealed class MapCamera
 
     /// <summary>
     /// Eases toward showing <paramref name="target"/> (in cells): each 1/60 s closes <paramref name="sharePerTick"/> of
-    /// the gap, so over <paramref name="delta"/> it closes <c>1 - (1 - share)^(delta × 60)</c>, and two half ticks equal
-    /// one tick (developer decision 86). The share is 0..1; legacy used 0.35 while walking and 0.1 standing.
+    /// the gap, so over <paramref name="delta"/> it closes <c>1 - (1 - share)^(delta × 60)</c>, and two half ticks
+    /// equal one tick (developer decision 86). The share is 0..1.
     /// </summary>
     public void Follow(Point2D target, MapLayout layout, TimeSpan delta, double sharePerTick)
     {

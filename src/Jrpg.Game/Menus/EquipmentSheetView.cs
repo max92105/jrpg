@@ -9,14 +9,14 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Draws the Equipment page's sheet (legacy <c>EquipmentView</c>): the member's name, what they wear in each slot, the
-/// "Remove all" action, their parameters with the preview of a change, and why the last change didn't happen.
+/// Draws the Equipment page's sheet: the member's name, what they wear in each slot, the "Remove all" action, their
+/// parameters with the preview of a change, and why the last change didn't happen.
 /// </summary>
 internal sealed class EquipmentSheetView
 {
-    // Legacy EquipmentView: a 28 x 20 margin, the member's name as Text.Heading, section titles over a hairline, 44 px
-    // ListRows (a 26 px icon in a 40 px column, the slot name, then what's worn), a hairline 10 px above "Remove all",
-    // and the parameters as two columns of 36 px lines 40 px apart.
+    // Placeholder layout (decision 82): a 28 x 20 margin, the member's name as a heading, section titles over a
+    // hairline, 44 px rows (a 26 px icon in a 40 px column, the slot name, then what's worn), a hairline 10 px above
+    // "Remove all", and the parameters as two columns of 36 px lines 40 px apart.
     private const int Margin = 28;
     private const int TopMargin = 20;
     private const int HeadingPixels = 22;
@@ -126,7 +126,7 @@ internal sealed class EquipmentSheetView
         batch.DrawString(_bodyFont, _labels.RemoveAll, new Vector2(row.Area.X + RowInset + IconColumn, textTop), UiTheme.TextPrimary * opacity);
     }
 
-    // Legacy StatsPanel: Max HP and Max MP, then Attack and Defense, two to a line.
+    // Max HP and Max MP, then Attack and Defense, two to a line.
     private void DrawParameters(SpriteBatch batch, TextureLibrary textures, ParametersPlace place, float opacity)
     {
         var section = place.Section;
@@ -146,7 +146,7 @@ internal sealed class EquipmentSheetView
         }
     }
 
-    // Legacy StatLine's preview: an arrow, drawn as a small diamond since the font lacks ▸, then the new value colored by
+    // The preview: an arrow, drawn as a small diamond since the font lacks ▸, then the new value colored by
     // whether it goes up or down. The choice only opens once the menu has faded in, so it draws at full opacity.
     private void DrawPreview(SpriteBatch batch, TextureLibrary textures, Vector2 position, StatPreviewText.PreviewValue value)
     {

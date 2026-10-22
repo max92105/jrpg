@@ -11,17 +11,17 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// The game menu over the map (legacy <c>GameMenuControl</c>, decision 81): tabs down the left, Confirm enters the
-/// selected tab's page and Cancel comes back. Esc is Cancel and Menu at once, so inside a page it only goes back to the
-/// tabs; on the tabs either closes the menu.
+/// The game menu over the map (decision 81): tabs down the left, Confirm enters the selected tab's page and Cancel
+/// comes back. Esc is Cancel and Menu at once, so inside a page it only goes back to the tabs; on the tabs either
+/// closes the menu.
 /// </summary>
 internal sealed class GameMenuScene : IScene
 {
-    // Legacy GameMenuControl.OpenDuration; opacity only.
+    // Decision 81's opening fade; opacity only.
     private static readonly TimeSpan _openFade = TimeSpan.FromSeconds(0.15);
 
-    // Legacy layout: the header, the body 40 px below it, the tabs 14 px apart, the page 24 px right of them, 40 px
-    // from the right edge, and 32 px above the 64 px footer.
+    // Placeholder layout (decision 82): the header, the body 40 px below it, the tabs 14 px apart, the page 24 px right
+    // of them, 40 px from the right edge, and 32 px above the 64 px footer.
     private const int FooterHeight = 64;
     private const int BodyTop = MenuHeader.Height + 40;
     private const int TabPitch = NavTabShape.Height + 14;
@@ -29,11 +29,11 @@ internal sealed class GameMenuScene : IScene
     private static readonly Rectangle _pageArea = new(PageLeft, BodyTop, VirtualScreen.Width - 40 - PageLeft, VirtualScreen.Height - FooterHeight - 32 - BodyTop);
     private static readonly Rectangle _screen = new(0, 0, VirtualScreen.Width, VirtualScreen.Height);
 
-    // Legacy NavTabStyle: the selected tab's label slides 14 px right, over a 2 px bright line along its bottom.
+    // The selected tab's label slides 14 px right, over a 2 px bright line along its bottom.
     private const int SelectedLabelSlide = 14;
     private const int SelectionLineThickness = 2;
 
-    // Legacy footer: the hint starts 40 px in.
+    // The footer's hint starts 40 px in.
     private const int FooterTextInset = 40;
 
     // The party sidebar (question 145 placeholder, the demo's layout): a 460 px column at the page area's right, 24 px

@@ -6,8 +6,8 @@ using Jrpg.Game.Ui;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Choosing who an item is used on (legacy use popup): every member is listed, only the legal ones can be chosen, and an
-/// item that takes everyone selects them all and needs one Confirm.
+/// Choosing who an item is used on: every member is listed, only the legal ones can be chosen, and an item that takes
+/// everyone selects them all and needs one Confirm.
 /// </summary>
 internal sealed class ItemTargetPicker
 {

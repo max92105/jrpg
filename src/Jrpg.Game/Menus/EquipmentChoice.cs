@@ -6,8 +6,8 @@ using Jrpg.Game.Ui;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Choosing what goes in a slot (legacy <c>EquipmentSelectionView</c>): "Remove" first, then the owned items the member
-/// can wear there, then the items other members wear there, one row per wearer (decision 137), with a scrolling cursor.
+/// Choosing what goes in a slot: "Remove" first, then the owned items the member can wear there, then the items other
+/// members wear there, one row per wearer (decision 137), with a scrolling cursor.
 /// </summary>
 internal sealed class EquipmentChoice
 {

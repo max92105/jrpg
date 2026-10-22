@@ -3,8 +3,8 @@ using Jrpg.Core.Geometry;
 namespace Jrpg.Game.Exploration;
 
 /// <summary>
-/// Which frame of the field sprite sheet the player shows: 8 frames per row at 10 frames a second while walking, frame 0
-/// when standing (legacy <c>PlayerManager</c>, developer decision 86).
+/// Which frame of the field sprite sheet the player shows: 8 frames per row at 10 frames a second while walking, frame
+/// 0 when standing (placeholder rate, decision 86).
 /// </summary>
 internal sealed class WalkAnimation
 {
@@ -16,7 +16,7 @@ internal sealed class WalkAnimation
     /// <summary>The sheet column, 0..7.</summary>
     public int Frame { get; private set; }
 
-    /// <summary>The sheet row of a facing; the legacy sheet's rows, top to bottom, are down, left, right, up.</summary>
+    /// <summary>The sheet row of a facing; the sheet's rows, top to bottom, are down, left, right, up.</summary>
     public static int RowOf(Facing facing) => facing switch
     {
         Facing.Down => 0,
@@ -28,7 +28,7 @@ internal sealed class WalkAnimation
 
     /// <summary>
     /// Moves on by the frames <paramref name="delta"/> covers. The leftover time carries to the next call, so 60 Hz
-    /// updates still average exactly 10 frames a second (legacy dropped it and ran slow).
+    /// updates still average exactly 10 frames a second instead of running slow.
     /// </summary>
     public void Advance(TimeSpan delta)
     {

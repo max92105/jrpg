@@ -11,35 +11,35 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Title;
 
 /// <summary>
-/// The screen the game opens on, as legacy <c>MainWindow</c>'s start screen (decision 82): the picture covering the
-/// screen, the game's name at the top with a drop shadow, and the entries centered below it, each with a soft white glow
-/// that brightens and grows on the selected one (legacy <c>StartMenuButtonStyle</c>'s hover).
+/// The screen the game opens on (decision 82): the picture covering the screen, the game's name at the top with a drop
+/// shadow, and the entries centered below it, each with a soft white glow that brightens and grows on the selected one.
 /// </summary>
 internal sealed class TitleScene : IScene
 {
-    // Legacy sizes were WPF units on a 1920 x 1080 window, so they carry over 1:1 (plan, "Port the legacy look").
+    // Placeholder sizes on the 1920 x 1080 virtual screen (decision 82).
     private const int NameTextPixels = 100;
     private const int NameTop = 60;
     private const int EntryTextPixels = 48;
 
-    // Legacy entries were one line of text each, 20 px apart (the button template ignored its padding).
+    // Entries are one line of text each, 20 px apart.
     private const int EntryGap = 20;
 
-    // Legacy centered the entries in the space below the name, which ends about 180 px down.
+    // The entries are centered in the space below the name, which ends about 180 px down.
     private const int EntriesCenterY = 630;
 
-    // Legacy DropShadowEffect on the name: black at 70 %, blur 10, depth 4 at 320 degrees, which is about (3.1, 2.6).
+    // The name's drop shadow: black at 70 %, blur 10, offset 4 px at 320 degrees, which is about (3.1, 2.6).
     private const int ShadowBlur = 10;
     private static readonly Vector2 _shadowOffset = new(3, 3);
     private static readonly Color _shadow = Color.Black * 0.7f;
 
-    // Legacy glow on each entry: white at 50 % with blur 8, and at full strength with blur 15 and 110 % size when hovered.
+    // The glow on each entry: white at 50 % with blur 8; on the selected entry, full strength with blur 15 and at
+    // 110 % size.
     private const int GlowBlur = 8;
     private const int SelectedGlowBlur = 15;
     private const float SelectedScale = 1.1f;
     private static readonly Color _glow = Color.White * 0.5f;
 
-    // Legacy OverlayViewHost: the file list in a 1000 px column, #AA111111, over the dimmed title.
+    // The file list in a 1000 px column, #AA111111, over the dimmed title.
     private const int FilesWidth = 1000;
     private static readonly Rectangle _filesArea = new((VirtualScreen.Width - FilesWidth) / 2, 0, FilesWidth, VirtualScreen.Height);
 

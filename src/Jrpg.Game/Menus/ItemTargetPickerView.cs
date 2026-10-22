@@ -10,13 +10,14 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Draws an <see cref="ItemTargetPicker"/> as the legacy use popup, in <c>DialogStyle</c>'s raised band over the dimmed
-/// menu: the item's icon and "Use item", then every member's card (the Party page's), in two columns in member order.
-/// Members the item can't be used on are faded; the chosen ones are drawn selected.
+/// Draws an <see cref="ItemTargetPicker"/> in a dialog's raised band over the dimmed menu: the item's icon and "Use
+/// item", then every member's card (the Party page's), in two columns in member order. Members the item can't be used
+/// on are faded; the chosen ones are drawn selected.
 /// </summary>
 internal sealed class ItemTargetPickerView
 {
-    // Legacy DialogStyle padding 32; Text.Heading 22 px with the 32 px item icon 12 px before it and 24 px below.
+    // Placeholder layout (decision 82): padding 32; a 22 px heading with the 32 px item icon 12 px before it and
+    // 24 px below it.
     private const int BandPadding = 32;
     private const int HeadingPixels = 22;
     private const int IconSize = 32;

@@ -14,17 +14,17 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// The menu's Inventory page (legacy <c>InventoryView</c>): what the party owns, one category at a time, in pickup order,
-/// with the selected item's description under the list. The tab buttons change the category (question 92). Read-only
-/// until items can be used (P2b).
+/// The menu's Inventory page: what the party owns, one category at a time, in pickup order, with the selected item's
+/// description under the list. The tab buttons change the category (question 92).
+/// Read-only until items can be used (P2b).
 /// </summary>
 internal sealed class InventoryPage : IMenuPage
 {
     /// <summary>How many 44 px rows show at once.</summary>
     public const int VisibleRows = 10;
 
-    // Legacy InventoryView and ListRow: a 28 x 20 margin, the Text.Heading title, column titles over a hairline, 44 px rows
-    // 10 px in with a 26 px icon in a 40 px column and the quantity 16 px from the right; Text.Body 18 px.
+    // Placeholder layout (decision 82): a 28 x 20 margin, a heading title, column titles over a hairline, 44 px rows
+    // 10 px in with a 26 px icon in a 40 px column and the quantity 16 px from the right; 18 px body text.
     private const int Margin = 28;
     private const int TopMargin = 20;
     private const int HeadingPixels = 22;
@@ -40,7 +40,7 @@ internal sealed class InventoryPage : IMenuPage
     private const int DescriptionGap = 24;
     private const int RowIconSize = 26;
 
-    // Legacy CategoryRailStyle and CategoryTabStyle: a 72 px rail, 12 px from the list, with 12 px padding and 64 px tabs
+    // The category rail (placeholder layout): a 72 px rail, 12 px from the list, with 12 px padding and 64 px tabs
     // holding a 40 px icon, faint until selected; the selected tab glows inside an 8 x 4 margin.
     private const int RailWidth = 72;
     private const int RailGap = 12;
@@ -250,7 +250,7 @@ internal sealed class InventoryPage : IMenuPage
         return new ItemRow(item.Id, item.Name, item.IconFile, quantity, _bodyFont.MeasureString(quantity).X, item.Description, _session.FieldItems.CanUse(item));
     }
 
-    // Legacy SectionHeaderStyle over the rows' columns: Name after the icon column, Qty at the right.
+    // Section titles over the rows' columns: Name after the icon column, Qty at the right.
     private void DrawColumnTitles(SpriteBatch batch, TextureLibrary textures, Rectangle section, float opacity)
     {
         var color = UiTheme.TextSecondary * opacity;
@@ -278,7 +278,7 @@ internal sealed class InventoryPage : IMenuPage
         batch.DrawString(_bodyFont, item.Quantity, new Vector2(quantityLeft, textTop), textColor);
     }
 
-    // Legacy CategoryRailStyle: a dark strip with hairlines left and right, one icon tab per category.
+    // A dark strip with hairlines left and right, one icon tab per category.
     private void DrawRail(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
         var rail = new Rectangle(area.X, area.Y, RailWidth, area.Height);

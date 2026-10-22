@@ -8,13 +8,13 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Saving;
 
 /// <summary>
-/// Draws a <see cref="SaveSlotList"/> as legacy <c>SaveLoadView</c>: column titles over a hairline, then one 92 px row per
-/// file with its name, its location over the save date and play time, and the active party, the selected row lit.
+/// Draws a <see cref="SaveSlotList"/>: column titles over a hairline, then one 92 px row per file with its name, its
+/// location over the save date and play time, and the active party, the selected row lit.
 /// </summary>
 internal sealed class SaveSlotListView
 {
-    // Legacy SaveSlotPanel: 92 px rows, 16 px in, a 140 px file column; Text.Heading 22, Text.Body 18, Text.Caption and
-    // Text.Label 14.
+    // Placeholder layout (decision 82): 92 px rows, 16 px in, a 140 px file column; text at 22 px for headings, 18 px
+    // for the body, 14 px for captions and labels.
     private const int RowHeight = 92;
     private const int RowInset = 16;
     private const int FileColumnWidth = 140;
@@ -100,7 +100,7 @@ internal sealed class SaveSlotListView
 
     private static string Number(int value) => value.ToString(CultureInfo.InvariantCulture);
 
-    // Legacy SectionHeaderStyle over the same three columns as the rows.
+    // Section titles over the same three columns as the rows.
     private void DrawColumnTitles(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
         var color = UiTheme.TextSecondary * opacity;

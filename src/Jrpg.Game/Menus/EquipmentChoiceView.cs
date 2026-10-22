@@ -9,17 +9,17 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Draws an <see cref="EquipmentChoice"/> as legacy <c>EquipmentSelectionView</c> in its <c>GlassPanelStyle</c> panel at
-/// the page's right: the slot's name, Name and Qty column titles, then "Remove", each owned item with its icon and count,
-/// and each item another member wears, named with its wearer in the secondary color.
+/// Draws an <see cref="EquipmentChoice"/> in a translucent panel at the page's right: the slot's name, Name and Qty
+/// column titles, then "Remove", each owned item with its icon and count, and each item another member wears, named
+/// with its wearer in the secondary color.
 /// </summary>
 internal sealed class EquipmentChoiceView
 {
-    /// <summary>Legacy's secondary panel width.</summary>
+    /// <summary>The panel's width (placeholder).</summary>
     public const int PanelWidth = 560;
 
-    // Legacy EquipmentSelectionView: a 24 x 20 margin, Text.Heading 22 px, column titles over a hairline, then 44 px
-    // ListRows (a 26 px icon in a 40 px column, the quantity 16 px from the right).
+    // Placeholder layout (decision 82): a 24 x 20 margin, a 22 px heading, column titles over a hairline, then 44 px
+    // rows (a 26 px icon in a 40 px column, the quantity 16 px from the right).
     private const int Margin = 24;
     private const int TopMargin = 20;
     private const int HeadingPixels = 22;

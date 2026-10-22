@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-22-demo-retirement/slices/W3.md, slice W3 (remove "legacy" from Game Battle/ comments and the two entrance test headers)
+Slice: docs/plans/2026-10-22-demo-retirement/slices/W4.md, slice W4 (remove "legacy" from Game comments outside Ui/ and Battle/)
 Round: 1 (verdict: Ready to commit)
 
-- warning (open): VictoryScreenView.cs:11 summary line is 176 chars (cut joined two lines); rewrap at 120.
-- warning (open): other lines over 120: TurnDiamondView.cs:15 (128), VictoryEntrance.cs:8 (122), BattlePacing.cs:4 (121); plus ~13 short first lines after "(legacy X)" cuts left unrewrapped (BattleBanner, BattleBannerView, BattleLayout, CommandMenu, CommandPanelPlacement, DefeatScreen, DefeatScreenView, PartyStatusView, TurnDiamondView, TurnOrderView, VictoryEntrance, VictoryScreen, VitalsText, FloatingNumber, FloatingNumbersView, EnemyTagView ok).
-- suggestion (open): DefeatScreenView.cs:16 "sharing the victory screen's title and bars" - title constants are copies with equal values, only the bar shape is shared; say "matching".
-- suggestion (open): VitalRowStyle.cs:5 "in a battle panel: its HP or MP row" - "its" dangles; "the HP or MP row of a party panel".
-- follow-up: decision 56 text itself still says "legacy layout and pacing" (done plan, outside slice).
+- warning (open): TitleScene.cs:36 glow comment says "when hovered"; there is no mouse (decision 50), code applies SelectedGlowBlur/SelectedScale to _menu.Selected; say "on the selected entry".
+- warning (open): one-word tails left by the 120 rewrap: ExplorationScene.cs:22 "decision 86).", MapDrawList.cs:10 "grown.", InventoryPage.cs:20 "(P2b).", PartyColumnsView.cs:138 "moving.", StatusPage.cs:27 "section.", MapDrawListTests.cs:78 "all." and :136 "behind)."; trim a word so each fits one line.
+- suggestion (open): SavePage.cs:21 "the page's 28 x 20 right margin" -> "the page's 28 px right margin" (NoticeMargin = 28).
+- suggestion (open): PartyActionChoiceView.cs:21 "glass panel" vs its summary's "translucent panel"; ItemTargetPickerView.cs:19 and MenuHeader.cs:18 "Placeholder layout:" without "(decision 82)" unlike siblings.
+- follow-up: decision 86 text in docs/plans/2026-10-18-game-title-menu-movement.md:777 still says "legacy camera easing" (outside slice).

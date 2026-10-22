@@ -7,8 +7,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Draws the Party page's action choice (legacy <c>GlassPanelStyle</c>, one <c>ListRow</c> per action) over the right of
-/// the chosen card, with "To reserve" greyed when Core refuses it.
+/// Draws the Party page's action choice (a translucent panel, one row per action) over the right of the chosen card,
+/// with "To reserve" greyed when Core refuses it.
 /// </summary>
 internal sealed class PartyActionChoiceView
 {
@@ -18,7 +18,7 @@ internal sealed class PartyActionChoiceView
     /// <summary>How many actions the choice offers.</summary>
     public const int EntryCount = 2;
 
-    // A 240 px glass panel of 44 px rows (legacy ListRow height), 16 px in from the card's corner.
+    // A 240 px translucent panel of 44 px rows (the menus' row height), 16 px in from the card's corner.
     private const int Width = 240;
     private const int RowHeight = 44;
     private const int Inset = 16;

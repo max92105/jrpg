@@ -10,12 +10,13 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Draws the Party page's two columns (legacy <c>PartyView</c>): the active party with its count on the left, the
-/// reserve on the right, one card per member, the moving member's outline, and the notice under the active cards.
+/// Draws the Party page's two columns: the active party with its count on the left, the reserve on the right, one card
+/// per member, the moving member's outline, and the notice under the active cards.
 /// </summary>
 internal sealed class PartyColumnsView
 {
-    // Legacy PartyView: a 28 x 20 margin, two columns 40 px apart, each under a section title 12 px above its cards.
+    // Placeholder layout (decision 82): a 28 x 20 margin, two columns 40 px apart, each under a section title 12 px
+    // above its cards.
     private const int Margin = 28;
     private const int TopMargin = 20;
     private const int ColumnGap = 40;

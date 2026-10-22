@@ -9,21 +9,21 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Dialogue;
 
 /// <summary>
-/// The message box at the bottom of the map: the typed part of one page in the legacy <c>DialogueBox</c> panel, a
-/// blinking marker once the page is complete, and the speaker's name and diamond-framed portrait when the speech has
-/// them (developer, 2026-10-19: the look of the turn-order portraits in <c>docs/ui_ux_exemples</c>).
+/// The message box at the bottom of the map: the typed part of one page in a rounded panel, a blinking marker once the
+/// page is complete, and the speaker's name and diamond-framed portrait when the speech has them (developer,
+/// 2026-10-19: the look of the turn-order portraits in <c>docs/ui_ux_exemples</c>).
 /// </summary>
 internal sealed class DialogueBox
 {
-    // Legacy MainWindow placed a 600 x 120 box 20 px above the bottom; doubled for the virtual screen.
+    // A 1200 x 240 box 40 px above the bottom (placeholder).
     private const int Width = 1200;
     private const int Height = 240;
     private const int BottomMargin = 40;
 
-    // Legacy 2 px border plus 8 px padding, doubled.
+    // The 4 px border plus 16 px padding (placeholder).
     private const int TextInset = 20;
 
-    // A small diamond rather than legacy's ▶, which the font lacks; diamonds echo the reference UI.
+    // A small diamond: the font has no ▶, and diamonds echo the reference UI.
     private const int MarkerSide = 14;
 
     // The portrait's diamond fills the box's height inside the inset; a white frame shows around it.

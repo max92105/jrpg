@@ -9,12 +9,12 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Saving;
 
 /// <summary>
-/// The save files as legacy <c>SaveLoadView</c> laid them out, under a heading that says what choosing one does (Save,
-/// Load). Read from disk each time it opens, so it shows saves made since.
+/// The save files, under a heading that says what choosing one does (Save, Load). Read from disk each time it opens, so
+/// it shows saves made since.
 /// </summary>
 internal sealed class SaveFilesPanel
 {
-    // Legacy SaveLoadView: a 28 x 20 margin, the Text.Heading title, then the list below it.
+    // Placeholder layout (decision 82): a 28 x 20 margin, a heading title, then the list below it.
     private const int Margin = 28;
     private const int TopMargin = 20;
     private const int HeadingPixels = 22;

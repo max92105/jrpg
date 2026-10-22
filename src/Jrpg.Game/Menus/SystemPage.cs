@@ -10,8 +10,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// The menu's System page (legacy System sub menu): save, load, back to the title, or quit. Save and Load
-/// open the save files in the page's place; the other two ask first, since unsaved progress isn't tracked (decision 85).
+/// The menu's System page: save, load, back to the title, or quit. Save and Load open the save files in the page's
+/// place; the other two ask first, since unsaved progress isn't tracked (decision 85).
 /// </summary>
 internal sealed class SystemPage : IMenuPage
 {
@@ -32,7 +32,7 @@ internal sealed class SystemPage : IMenuPage
     public SystemPage(ScreenText text, UiTextures ui, SavePage savePage, LoadPage loadPage)
     {
         _ownHint = text.Messages.Text(MessageIds.MenuHintSystem);
-        // Legacy System menu order; Options comes in P5.
+        // Save, Load, Title, Quit (placeholder order).
         _entries =
         [
             new OpensFiles(MessageIds.SystemSave, savePage),
@@ -55,7 +55,8 @@ internal sealed class SystemPage : IMenuPage
     public bool ShowsPartySidebar => true;
 
     /// <summary>
-    /// False while a question is open, which Cancel answers No, or while the save files are open, where Cancel goes back to the entries.
+    /// False while a question is open, which Cancel answers No, or while the save files are open, where Cancel goes
+    /// back to the entries.
     /// </summary>
     public bool LeavesOnCancel => _asking is null && _openFiles is null;
 

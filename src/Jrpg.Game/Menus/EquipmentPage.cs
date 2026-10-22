@@ -13,8 +13,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// The menu's Equipment page (legacy <c>EquipmentView</c>): one member at a time, what they wear in each slot, a "Remove
-/// all" action, and their parameters. Changing what's worn comes in P3b.
+/// The menu's Equipment page: one member at a time, what they wear in each slot, a "Remove all" action, and their
+/// parameters. Changing what's worn comes in P3b.
 /// </summary>
 internal sealed class EquipmentPage : IMenuPage
 {

@@ -13,12 +13,12 @@ namespace Jrpg.Game.Exploration;
 /// </summary>
 internal sealed class MapView(MapLayout layout, Func<PlacedObject, ObjectDefinition> currentDefinitionOf, TileAtlas atlas)
 {
-    /// <summary>Screen pixels per map cell at the 1920x1080 virtual screen (decision 48, legacy <c>TileSize</c>).</summary>
+    /// <summary>Screen pixels per map cell at the 1920x1080 virtual screen (decision 48).</summary>
     public const int CellPixels = 48;
 
     /// <summary>
-    /// The cells the screen shows from <paramref name="origin"/>, with one more column and row for the partly shown ones,
-    /// clamped to the map.
+    /// The cells the screen shows from <paramref name="origin"/>, with one more column and row for the partly shown
+    /// ones, clamped to the map.
     /// </summary>
     public static CellRange VisibleCells(Vector2 origin, MapLayout layout) =>
         new(
@@ -81,7 +81,7 @@ internal sealed class MapView(MapLayout layout, Func<PlacedObject, ObjectDefinit
         }
     }
 
-    // Objects can sit between cells (legacy positions such as 2.5), so the top-left is rounded to a whole pixel once.
+    // Objects can sit between cells (positions such as 2.5), so the top-left is rounded to a whole pixel once.
     private static Rectangle ScreenAreaOf(PlacedObject placed, ObjectDefinition definition, Vector2 origin) =>
         new(
             (int)Math.Round((placed.Position.X * CellPixels) - origin.X),

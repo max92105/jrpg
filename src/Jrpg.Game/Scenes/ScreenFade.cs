@@ -1,8 +1,8 @@
 namespace Jrpg.Game.Scenes;
 
 /// <summary>
-/// A fade to black and back: out, a short hold on black (when whatever the fade hides is changed), then in (legacy
-/// <c>SceneManager.TransitionAsync</c>). Pure timing; the scene draws the black.
+/// A fade to black and back: out, a short hold on black (when whatever the fade hides is changed), then in. Pure
+/// timing; the scene draws the black.
 /// </summary>
 internal sealed class ScreenFade(TimeSpan fadeOut, TimeSpan hold, TimeSpan fadeIn)
 {

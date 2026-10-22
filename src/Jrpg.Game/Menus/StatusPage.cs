@@ -15,14 +15,14 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// The menu's Status page (legacy <c>StatusView</c>): one party member at a time, with their profile and experience
-/// beside a diamond-framed portrait, then their parameters and what they wear. Left and Right (or the tab buttons) go
-/// through the members, active ones first.
+/// The menu's Status page: one party member at a time, with their profile and experience beside a diamond-framed
+/// portrait, then their parameters and what they wear. Left and Right (or the tab buttons) go through the members,
+/// active ones first.
 /// </summary>
 internal sealed class StatusPage : IMenuPage
 {
-    // Legacy StatusView: a 28 x 20 margin, Text.Heading 22 px, Text.Body 18 px, Text.Label and Text.Caption 14 px, a
-    // 190 px portrait 32 px right of the profile, 36 px stat lines in two columns 40 px apart, 10 px in under a section.
+    // Placeholder layout (decision 82): a 28 x 20 margin, 22 px headings, 18 px body text, 14 px labels and captions;
+    // a 190 px portrait 32 px right of the profile; 36 px stat lines in two columns 40 px apart, 10 px in under titles.
     private const int Margin = 28;
     private const int TopMargin = 20;
     private const int HeadingPixels = 22;
@@ -44,8 +44,8 @@ internal sealed class StatusPage : IMenuPage
     private const int SectionHeight = 28;
     private const int ValueBelowLabel = 20;
 
-    // Legacy XpBar: 6 px tall, 12 px under the experience values, 16 px short of the profile's right edge. HP and MP get the
-    // same slim bar under their lines.
+    // The experience bar: 6 px tall, 12 px under the experience values, 16 px short of the profile's right edge. HP and
+    // MP get the same slim bar under their lines.
     private const int BarHeight = 6;
     private const int XpBarTop = ValueBelowLabel + 34;
     private const int XpBarRightGap = 16;
@@ -225,7 +225,7 @@ internal sealed class StatusPage : IMenuPage
         _xpBar.Draw(page.Batch, page.Textures, xpBar, page.Opacity);
     }
 
-    // HP and MP on the first line, attack and defense on the second, as legacy StatsPanel's two columns.
+    // HP and MP on the first line, attack and defense on the second, in two columns.
     private void DrawParameters(PageFrame page, Rectangle section)
     {
         _parametersTitle.Draw(page.Batch, page.Textures, section, page.Opacity);

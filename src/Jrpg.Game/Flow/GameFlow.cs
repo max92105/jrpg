@@ -17,7 +17,7 @@ namespace Jrpg.Game.Flow;
 /// </summary>
 internal sealed class GameFlow : IScene
 {
-    // Legacy SceneManager.TransitionAsync, for a new game, a load or the title.
+    // The fade for a new game, a load or the title (placeholder timing).
     private static readonly TimeSpan _fadeOut = TimeSpan.FromSeconds(0.5);
     private static readonly TimeSpan _blackHold = TimeSpan.FromSeconds(0.15);
     private static readonly TimeSpan _fadeIn = TimeSpan.FromSeconds(0.5);

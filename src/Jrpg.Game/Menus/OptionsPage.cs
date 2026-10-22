@@ -10,8 +10,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// The menu's Options page: the settings that exist, one per row, each changed with Left and Right and applied at once
-/// (legacy <c>OptionsView</c> was empty). Kept for this run only (question 89).
+/// The menu's Options page: the settings that exist, one per row, each changed with Left and Right and applied at once.
+/// Kept for this run only (question 89).
 /// </summary>
 internal sealed class OptionsPage : IMenuPage
 {

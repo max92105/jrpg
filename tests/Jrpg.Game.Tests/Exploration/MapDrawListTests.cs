@@ -74,7 +74,7 @@ public sealed class MapDrawListTests
     [Fact]
     public void Rebuild_LayersAndObjects_FollowZ()
     {
-        // The legacy start map: ground at -5 and -4, objects at -3, so the player stands over them; a roof layer at 5 covers all.
+        // The start map: ground at -5 and -4, objects at -3, so the player stands over them; a roof at 5 covers all.
         var layout = Layout(layers: [-5, -4, 5], Tree(y: 0, z: -3));
 
         _drawList.Rebuild(layout, PlacedDefinitionOf, new Point2D(0, 0));
@@ -87,7 +87,7 @@ public sealed class MapDrawListTests
     [Fact]
     public void Rebuild_CanopyOfObjectBelowPlayer_DrawnAfterPlayer()
     {
-        // The legacy tree: its body at -3 stays under the player, its canopy goes over (MapLayers.CanopyZOf).
+        // The tree: its body at -3 stays under the player, its canopy goes over (MapLayers.CanopyZOf).
         var layout = Layout(layers: [-5], Tree(y: 0, z: -3) with { ObjectId = "canopy_tree" });
 
         _drawList.Rebuild(layout, PlacedDefinitionOf, new Point2D(1, 1));

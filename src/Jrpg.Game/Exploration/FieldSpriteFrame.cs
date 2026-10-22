@@ -9,7 +9,9 @@ namespace Jrpg.Game.Exploration;
 /// </summary>
 internal static class FieldSpriteFrame
 {
-    /// <summary>A frame of the legacy sheet, in the image's pixels; equal to a screen cell only by coincidence (question 58).</summary>
+    /// <summary>
+    /// A frame of the field sprite sheet in image pixels, the size of a screen cell only by coincidence (question 58).
+    /// </summary>
     public const int Pixels = 48;
 
     /// <param name="facing">Picks the row (<see cref="WalkAnimation.RowOf"/>).</param>

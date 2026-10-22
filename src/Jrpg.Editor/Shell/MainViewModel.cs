@@ -61,6 +61,13 @@ internal sealed partial class MainViewModel : ObservableObject
             ShowMapList(Content.Current);
             Painting = new TilePaintingViewModel(Content, Layer, new SheetImages(() => ArtFolders.TilesheetImagesIn(ArtRoot), SheetImageSizeOf), confirm);
             Marking = new WalkabilityMarking(Content, Painting.Browser);
+            Painting.Browser.PropertyChanged += (_, e) =>
+            {
+                if (e.PropertyName == nameof(TileBrowserViewModel.SelectedCells))
+                {
+                    OnPropertyChanged(nameof(CanStartNewObject));
+                }
+            };
             Content.PropertyChanged += OnContentChanged;
             Content.StepRecorded += (_, _) => RecordStep(UndoTarget.Catalogs);
             Content.RedoDropped += (_, _) =>
@@ -187,6 +194,9 @@ internal sealed partial class MainViewModel : ObservableObject
         SaveError = null;
         return true;
     }
+
+    /// <summary>Whether Objects > New object from selection has cells to use: a rectangle chosen in the Tiles panel.</summary>
+    public bool CanStartNewObject => Painting?.Browser.SelectedCells is not null;
 
     /// <summary>The New object dialog's state for the rectangle chosen in the Tiles panel; null without one.</summary>
     public NewObjectViewModel? StartNewObject() =>

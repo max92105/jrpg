@@ -25,6 +25,19 @@ internal sealed partial class MainWindow
 
     private void OnEditShapesClicked(object sender, RoutedEventArgs e) => EditShapes(Placing.StartEditingShapes());
 
+    // A new object's shapes are drawn right away (decision 124); cancelling them keeps the object, without shapes.
+    private void OnNewObjectClicked(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel.StartNewObject() is not { } newObject
+            || new NewObjectWindow(newObject, _viewModel.CreateObject) { Owner = this }.ShowDialog() != true)
+        {
+            return;
+        }
+
+        EditingTabs.SelectedItem = ObjectsTab;
+        EditShapes(Placing.StartEditingChosenShapes());
+    }
+
     // Only a double-click on a listed object: not on the preview, a category header or the scroll bar.
     private void OnObjectBrowserDoubleClicked(object sender, MouseButtonEventArgs e)
     {

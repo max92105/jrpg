@@ -63,6 +63,7 @@
       </MenuItem>
       <MenuItem Header="Objects">
         <MenuItem Header="Edit shapes..." Click="OnEditShapesClicked" IsEnabled="{Binding Placing.CanEditShapes, FallbackValue=False}" />
+        <MenuItem Header="New object from selection..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" />
       </MenuItem>
       <MenuItem Header="Map">
         <MenuItem Header="Settings..." Click="OnMapSettingsClicked" />

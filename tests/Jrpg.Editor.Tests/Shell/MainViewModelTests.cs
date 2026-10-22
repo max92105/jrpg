@@ -366,6 +366,20 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
+    public void CanStartNewObject_RectangleChosen_IsTrue()
+    {
+        var viewModel = Open(CopyOfRepositoryContent());
+        Assert.False(viewModel.CanStartNewObject);
+        var changed = new List<string?>();
+        viewModel.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+        ChooseTwoCellsNotTiles(viewModel);
+
+        Assert.True(viewModel.CanStartNewObject);
+        Assert.Contains(nameof(MainViewModel.CanStartNewObject), changed);
+    }
+
+    [Fact]
     public void CreateObject_IdTaken_ReturnsFalseAndKeepsTheObject()
     {
         var viewModel = Open(CopyOfRepositoryContent());

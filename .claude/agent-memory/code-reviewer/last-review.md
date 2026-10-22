@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-21-editor/slices/N3.md, N3 (New NPC dialog; uncommitted)
+Slice: docs/plans/2026-10-21-editor/slices/E13a.md, E13a (layout: splitters and tool bars per mode; uncommitted)
 Round: 1 (verdict: Ready to commit; verify all pass, 1537 tests)
 
-- warning (open): NewNpcWindow preview calls TileImages.FieldSpriteFrameOf on any PNG listed; a field-sprite PNG under 48 px (or unreadable) throws on selection and crashes the editor.
-- suggestion (open): "New NPC..." menu item has no IsEnabled binding (New object has CanStartNewObject); does nothing silently without content.
-- follow-up: TileImages.Forget doesn't drop cached sprite frames (carried).
+- suggestion (open): shared + mode band share Band 0 (~1500 DIP at 150 % scaling); trailing items (Clear layer, Mark blocked) may fall into the overflow chevron; Band="1" for mode bands, or accept and check by hand.
+- suggestion (open): ToolBarTray not IsLocked; bands can be dragged/reordered, against "the shared band never moves".
 - follow-up: MainViewModel is 593 lines; split before more is added (carried, in backlog).
+- follow-up: TileImages.Forget doesn't drop cached sprite frames (carried).
 - follow-up: E12a re-cut stale SelectedCells can reach CreateObject (carried).

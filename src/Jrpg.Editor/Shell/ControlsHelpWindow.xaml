@@ -48,7 +48,7 @@
         Set up (Tiles panel or menu), on an image "(not set up)": open the Cut panel with a guessed cut; set columns, rows, margin and spacing, then Apply.<LineBreak />
         Import... (Tiles panel or menu): copy PNG images into the tilesheet art; the last one is shown, ready to set up. Not undone by Ctrl+Z.<LineBreak />
         Cut (Tiles panel or menu), on a set-up sheet: re-cut it in the Cut panel; its tiles keep their column and row.<LineBreak />
-        Mark blocked (Tiles panel or menu): while on, a click on a sheet cell flips it between walkable and blocked (red cross).<LineBreak />
+        Mark blocked (Tiles tool bar or menu): while on, a click on a sheet cell flips it between walkable and blocked (red cross).<LineBreak />
         [ and ]: smaller / larger brush.<LineBreak />
         Fill layer / Clear layer: the whole chosen layer.
       </TextBlock>

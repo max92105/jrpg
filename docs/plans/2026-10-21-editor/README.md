@@ -112,7 +112,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 8: the look
 
-- [ ] **E13a. Layout: splitters and tool bars per mode** (Editor, about 150 lines) → [slices/E13a.md](slices/E13a.md)
+- [x] **E13a. Layout: splitters and tool bars per mode** (Editor, about 150 lines) → [slices/E13a.md](slices/E13a.md)
 - [ ] **E13b. Dark theme** (Editor, about 230 lines) → [slices/E13b.md](slices/E13b.md)
 - [ ] **Z. Editor session check** (manual) → [slices/Z.md](slices/Z.md)
 

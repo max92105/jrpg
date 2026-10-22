@@ -4,10 +4,33 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:tiles="clr-namespace:Jrpg.Editor.Tiles"
         xmlns:objects="clr-namespace:Jrpg.Editor.Objects"
+        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
         Title="Jrpg map editor"
         WindowState="Maximized">
   <Window.Resources>
     <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
+    <!-- Panel sizes (design tunables): the map view takes the rest, and the splitters stop at the minimums. -->
+    <GridLength x:Key="MapListWidth">200</GridLength>
+    <sys:Double x:Key="MapListMinWidth">140</sys:Double>
+    <GridLength x:Key="SidePanelWidth">420</GridLength>
+    <sys:Double x:Key="SidePanelMinWidth">300</sys:Double>
+    <!-- A mode's tool bar shows only while its tab is open (legacy ToolBarTray bands). -->
+    <Style x:Key="TilesBand" TargetType="ToolBar">
+      <Setter Property="Visibility" Value="Collapsed" />
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Mode}" Value="Tiles">
+          <Setter Property="Visibility" Value="Visible" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="ObjectsBand" TargetType="ToolBar">
+      <Setter Property="Visibility" Value="Collapsed" />
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding Mode}" Value="Objects">
+          <Setter Property="Visibility" Value="Visible" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
     <!-- An error line takes no space until there is an error to show. -->
     <Style x:Key="ErrorLine" TargetType="TextBlock">
       <Setter Property="Foreground" Value="DarkRed" />
@@ -82,43 +105,55 @@
                Margin="8,4"
                Style="{StaticResource ErrorLine}"
                Text="{Binding SaveError, StringFormat=Not saved: {0}, TargetNullValue=''}" />
-    <ToolBar DockPanel.Dock="Top">
-      <Button Content="Save (Ctrl+S)" Command="{Binding SaveCommand}" />
-      <Button Content="Undo (Ctrl+Z)" Command="{Binding UndoCommand}" />
-      <Button Content="Redo (Ctrl+Y)" Command="{Binding RedoCommand}" />
-      <Separator />
-      <CheckBox Content="Grid" IsChecked="{Binding IsGridShown}" />
-      <CheckBox Content="Collision" IsChecked="{Binding IsCollisionShown}" ToolTip="Show what blocks the player (Ctrl+H)" />
-      <Separator />
-      <TextBlock Text="Layer" VerticalAlignment="Center" Margin="4,0" />
-      <ComboBox Width="230"
-                ItemsSource="{Binding Layer.Presets}"
-                SelectedValuePath="Z"
-                SelectedValue="{Binding Layer.Z}">
-        <ComboBox.ItemTemplate>
-          <DataTemplate>
-            <TextBlock><Run Text="{Binding Name, Mode=OneWay}" /> (<Run Text="{Binding Z, Mode=OneWay}" />)</TextBlock>
-          </DataTemplate>
-        </ComboBox.ItemTemplate>
-      </ComboBox>
-      <TextBox Width="40"
-               ToolTip="Layer z: any whole number"
-               Text="{Binding Layer.Z, UpdateSourceTrigger=PropertyChanged}" />
-      <CheckBox Content="Dim other layers" IsChecked="{Binding Layer.AreOtherLayersDimmed}" />
-      <Separator />
-      <TextBlock Text="Tool (B R F)" VerticalAlignment="Center" Margin="4,0" />
-      <ComboBox Width="90"
-                ToolTip="Brush: drag. Rectangle: drag, filled on release. Fill: click (or Shift + click with any tool). Right button erases."
-                ItemsSource="{Binding Painting.Tools}"
-                SelectedItem="{Binding Painting.Tool}" />
-      <TextBlock Text="Brush ([ ])" VerticalAlignment="Center" Margin="4,0" />
-      <ComboBox Width="50" ItemsSource="{Binding Painting.BrushSizes}" SelectedItem="{Binding Painting.BrushSize}" />
-      <Button Content="Fill layer" Command="{Binding Painting.FillLayerCommand}" />
-      <Button Content="Clear layer" Command="{Binding Painting.ClearLayerCommand}" />
-      <Separator />
-      <Button Content="Fit (Ctrl+0)" Click="OnFitClicked" />
-      <Button Content="100 % (Ctrl+1)" Click="OnActualSizeClicked" />
-    </ToolBar>
+    <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
+      <ToolBar Band="0" BandIndex="0">
+        <Button Content="Save (Ctrl+S)" Command="{Binding SaveCommand}" />
+        <Button Content="Undo (Ctrl+Z)" Command="{Binding UndoCommand}" />
+        <Button Content="Redo (Ctrl+Y)" Command="{Binding RedoCommand}" />
+        <Separator />
+        <CheckBox Content="Grid" IsChecked="{Binding IsGridShown}" />
+        <CheckBox Content="Collision" IsChecked="{Binding IsCollisionShown}" ToolTip="Show what blocks the player (Ctrl+H)" />
+        <Separator />
+        <TextBlock Text="Layer" VerticalAlignment="Center" Margin="4,0" />
+        <ComboBox Width="230"
+                  ItemsSource="{Binding Layer.Presets}"
+                  SelectedValuePath="Z"
+                  SelectedValue="{Binding Layer.Z}">
+          <ComboBox.ItemTemplate>
+            <DataTemplate>
+              <TextBlock><Run Text="{Binding Name, Mode=OneWay}" /> (<Run Text="{Binding Z, Mode=OneWay}" />)</TextBlock>
+            </DataTemplate>
+          </ComboBox.ItemTemplate>
+        </ComboBox>
+        <TextBox Width="40"
+                 ToolTip="Layer z: any whole number"
+                 Text="{Binding Layer.Z, UpdateSourceTrigger=PropertyChanged}" />
+        <CheckBox Content="Dim other layers" IsChecked="{Binding Layer.AreOtherLayersDimmed}" />
+        <Separator />
+        <Button Content="Fit (Ctrl+0)" Click="OnFitClicked" />
+        <Button Content="100 % (Ctrl+1)" Click="OnActualSizeClicked" />
+      </ToolBar>
+      <ToolBar Band="0" BandIndex="1" Style="{StaticResource TilesBand}">
+        <TextBlock Text="Tool (B R F)" VerticalAlignment="Center" Margin="4,0" />
+        <ComboBox Width="90"
+                  ToolTip="Brush: drag. Rectangle: drag, filled on release. Fill: click (or Shift + click with any tool). Right button erases."
+                  ItemsSource="{Binding Painting.Tools}"
+                  SelectedItem="{Binding Painting.Tool}" />
+        <TextBlock Text="Brush ([ ])" VerticalAlignment="Center" Margin="4,0" />
+        <ComboBox Width="50" ItemsSource="{Binding Painting.BrushSizes}" SelectedItem="{Binding Painting.BrushSize}" />
+        <Button Content="Fill layer" Command="{Binding Painting.FillLayerCommand}" />
+        <Button Content="Clear layer" Command="{Binding Painting.ClearLayerCommand}" />
+        <Separator />
+        <CheckBox Content="Mark blocked"
+                  ToolTip="While on, a click on a sheet cell flips it between walkable and blocked (red cross) instead of choosing it."
+                  IsChecked="{Binding Marking.IsMarkingBlocked}" />
+      </ToolBar>
+      <ToolBar Band="0" BandIndex="2" Style="{StaticResource ObjectsBand}">
+        <Button Content="Edit shapes..." Click="OnEditShapesClicked" IsEnabled="{Binding Placing.CanEditShapes, FallbackValue=False}" />
+        <Button Content="New object from selection..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" />
+        <Button Content="New NPC..." Click="OnNewNpcClicked" IsEnabled="{Binding CanStartNewNpc}" />
+      </ToolBar>
+    </ToolBarTray>
     <StatusBar DockPanel.Dock="Bottom">
       <StatusBarItem Content="{Binding CursorStatus}" />
       <StatusBarItem Content="{Binding UndoRefusal}" Foreground="DarkRed" />
@@ -127,91 +162,96 @@
                      Visibility="{Binding HasUnsavedChanges, Converter={StaticResource VisibleWhenTrue}}" />
       <StatusBarItem x:Name="ZoomStatus" HorizontalAlignment="Right" />
     </StatusBar>
-    <ListBox x:Name="MapList"
-             DockPanel.Dock="Left"
-             Width="180"
-             ItemsSource="{Binding MapEntries}"
-             DisplayMemberPath="Text"
-             SelectedValuePath="Id"
-             SelectionChanged="OnMapListSelectionChanged" />
-    <DockPanel DockPanel.Dock="Right" Width="420">
-      <!-- Choosing a row chooses the layer edits go to, as the toolbar's layer box does. -->
-      <ListBox DockPanel.Dock="Top"
-               Height="110"
-               ItemsSource="{Binding LayerEntries}"
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="{StaticResource MapListWidth}" MinWidth="{StaticResource MapListMinWidth}" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="{StaticResource SidePanelWidth}" MinWidth="{StaticResource SidePanelMinWidth}" />
+      </Grid.ColumnDefinitions>
+      <ListBox x:Name="MapList"
+               ItemsSource="{Binding MapEntries}"
                DisplayMemberPath="Text"
-               SelectedValuePath="Z"
-               SelectedValue="{Binding Layer.Z}" />
-      <DockPanel DockPanel.Dock="Top" Margin="0,4">
-        <Button DockPanel.Dock="Right" Content="Add layer" Click="OnAddLayerClicked" />
-        <ComboBox x:Name="NewLayerBox"
-                  IsEditable="True"
-                  ToolTip="A preset, or any whole number for the layer's z"
-                  ItemsSource="{Binding Layer.Presets}"
-                  DisplayMemberPath="Name" />
-      </DockPanel>
-      <TabControl x:Name="EditingTabs" SelectionChanged="OnEditingTabChanged">
-        <TabItem Header="Tiles">
-          <DockPanel>
-            <CheckBox DockPanel.Dock="Top"
+               SelectedValuePath="Id"
+               SelectionChanged="OnMapListSelectionChanged" />
+      <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
+      <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
+      <DockPanel Grid.Column="4">
+        <!-- Choosing a row chooses the layer edits go to, as the toolbar's layer box does. -->
+        <ListBox DockPanel.Dock="Top"
+                 Height="110"
+                 ItemsSource="{Binding LayerEntries}"
+                 DisplayMemberPath="Text"
+                 SelectedValuePath="Z"
+                 SelectedValue="{Binding Layer.Z}" />
+        <DockPanel DockPanel.Dock="Top" Margin="0,4">
+          <Button DockPanel.Dock="Right" Content="Add layer" Click="OnAddLayerClicked" />
+          <ComboBox x:Name="NewLayerBox"
+                    IsEditable="True"
+                    ToolTip="A preset, or any whole number for the layer's z"
+                    ItemsSource="{Binding Layer.Presets}"
+                    DisplayMemberPath="Name" />
+        </DockPanel>
+        <TabControl x:Name="EditingTabs" SelectionChanged="OnEditingTabChanged">
+          <TabItem Header="Tiles">
+            <DockPanel>
+              <Button DockPanel.Dock="Top"
                       Margin="0,4"
-                      Content="Mark blocked"
-                      ToolTip="While on, a click on a cell flips it between walkable and blocked (red cross) instead of choosing it."
-                      IsChecked="{Binding Marking.IsMarkingBlocked}" />
-            <Button DockPanel.Dock="Top"
-                    Margin="0,0,0,4"
-                    HorizontalAlignment="Left"
-                    Padding="8,2"
-                    Content="Import..."
-                    ToolTip="Copy PNG images into the tilesheet art; each then shows in the sheet box."
-                    Click="OnImportSheetImageClicked" />
-            <tiles:TileBrowserView x:Name="TileBrowser" DataContext="{Binding Painting.Browser}" />
-          </DockPanel>
-        </TabItem>
-        <!-- Click places the chosen object, Shift + drag moves one, right click or Delete removes, Ctrl + drag selects. -->
-        <TabItem x:Name="ObjectsTab" Header="Objects">
-          <objects:ObjectBrowserView x:Name="ObjectBrowser" DataContext="{Binding Placing.Browser}" MouseDoubleClick="OnObjectBrowserDoubleClicked" />
-        </TabItem>
-        <TabItem x:Name="EventsTab" Header="Events">
-          <TextBlock Margin="8"
-                     TextWrapping="Wrap"
-                     Text="Click an object on the map to edit its events, or a cell without an object to edit the event that runs when the player walks onto it; right click removes a cell's event. Dots on an object show its events (yellow: pressed, cyan: walked into); a cyan square marks a cell with an event." />
-        </TabItem>
-      </TabControl>
-    </DockPanel>
-    <!-- Pan: middle drag, Space + drag, arrows. Zoom: wheel, toward the cursor. Left drag paints the chosen tile,
-         right drag erases, Alt + click picks the tile and layer under the mouse. -->
-    <Border x:Name="MapViewport"
-            Background="#202020"
-            ClipToBounds="True"
-            Focusable="True"
-            PreviewMouseDown="OnViewportMouseDown"
-            PreviewMouseMove="OnViewportMouseMove"
-            PreviewMouseUp="OnViewportMouseUp"
-            MouseWheel="OnViewportMouseWheel"
-            MouseLeave="OnViewportMouseLeave"
-            LostMouseCapture="OnViewportLostMouseCapture"
-            SizeChanged="OnViewportSizeChanged">
-      <!-- A canvas gives the map its full size, so the view's bounds clip it rather than layout. -->
-      <Canvas>
-        <!-- Nearest-pixel scaling and aliased edges keep pixel art sharp and tiles seamless, as in the game. -->
-        <Grid x:Name="MapLayers"
-              RenderOptions.BitmapScalingMode="NearestNeighbor"
-              RenderOptions.EdgeMode="Aliased">
-          <Image x:Name="MapImage" Stretch="None" />
-          <Image x:Name="CollisionImage" Stretch="None" />
-          <Image x:Name="GridImage"
-                 Stretch="None"
-                 Visibility="{Binding IsGridShown, Converter={StaticResource VisibleWhenTrue}}" />
-          <Canvas IsHitTestVisible="False">
-            <Rectangle x:Name="BrushOutline" Stroke="White" Visibility="Collapsed" />
-            <Image x:Name="ObjectGhost" Stretch="None" Opacity="0.6" Visibility="Collapsed" />
-            <Canvas x:Name="SelectionMarks" />
-            <Canvas x:Name="EventMarks" />
-            <Rectangle x:Name="SelectionOutline" Stroke="Cyan" StrokeDashArray="4 2" Visibility="Collapsed" />
-          </Canvas>
-        </Grid>
-      </Canvas>
-    </Border>
+                      HorizontalAlignment="Left"
+                      Padding="8,2"
+                      Content="Import..."
+                      ToolTip="Copy PNG images into the tilesheet art; each then shows in the sheet box."
+                      Click="OnImportSheetImageClicked" />
+              <tiles:TileBrowserView x:Name="TileBrowser" DataContext="{Binding Painting.Browser}" />
+            </DockPanel>
+          </TabItem>
+          <!-- Click places the chosen object, Shift + drag moves one, right click or Delete removes, Ctrl + drag selects. -->
+          <TabItem x:Name="ObjectsTab" Header="Objects">
+            <objects:ObjectBrowserView x:Name="ObjectBrowser" DataContext="{Binding Placing.Browser}" MouseDoubleClick="OnObjectBrowserDoubleClicked" />
+          </TabItem>
+          <TabItem x:Name="EventsTab" Header="Events">
+            <TextBlock Margin="8"
+                       TextWrapping="Wrap"
+                       Text="Click an object on the map to edit its events, or a cell without an object to edit the event that runs when the player walks onto it; right click removes a cell's event. Dots on an object show its events (yellow: pressed, cyan: walked into); a cyan square marks a cell with an event." />
+          </TabItem>
+        </TabControl>
+      </DockPanel>
+      <!-- Pan: middle drag, Space + drag, arrows. Zoom: wheel, toward the cursor. Left drag paints the chosen tile,
+           right drag erases, Alt + click picks the tile and layer under the mouse. -->
+      <Border x:Name="MapViewport"
+              Grid.Column="2"
+              Background="#202020"
+              ClipToBounds="True"
+              Focusable="True"
+              PreviewMouseDown="OnViewportMouseDown"
+              PreviewMouseMove="OnViewportMouseMove"
+              PreviewMouseUp="OnViewportMouseUp"
+              MouseWheel="OnViewportMouseWheel"
+              MouseLeave="OnViewportMouseLeave"
+              LostMouseCapture="OnViewportLostMouseCapture"
+              SizeChanged="OnViewportSizeChanged">
+        <!-- A canvas gives the map its full size, so the view's bounds clip it rather than layout. -->
+        <Canvas>
+          <!-- Nearest-pixel scaling and aliased edges keep pixel art sharp and tiles seamless, as in the game. -->
+          <Grid x:Name="MapLayers"
+                RenderOptions.BitmapScalingMode="NearestNeighbor"
+                RenderOptions.EdgeMode="Aliased">
+            <Image x:Name="MapImage" Stretch="None" />
+            <Image x:Name="CollisionImage" Stretch="None" />
+            <Image x:Name="GridImage"
+                   Stretch="None"
+                   Visibility="{Binding IsGridShown, Converter={StaticResource VisibleWhenTrue}}" />
+            <Canvas IsHitTestVisible="False">
+              <Rectangle x:Name="BrushOutline" Stroke="White" Visibility="Collapsed" />
+              <Image x:Name="ObjectGhost" Stretch="None" Opacity="0.6" Visibility="Collapsed" />
+              <Canvas x:Name="SelectionMarks" />
+              <Canvas x:Name="EventMarks" />
+              <Rectangle x:Name="SelectionOutline" Stroke="Cyan" StrokeDashArray="4 2" Visibility="Collapsed" />
+            </Canvas>
+          </Grid>
+        </Canvas>
+      </Border>
+    </Grid>
   </DockPanel>
 </Window>

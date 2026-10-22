@@ -25,7 +25,7 @@ internal static class CatalogUsage
     /// <summary>The tiles cut from a sheet, used or not: a tile can't outlive its sheet, so the sheet's removal waits for theirs.</summary>
     /// <returns>Their ids, lowest first.</returns>
     public static IReadOnlyList<int> TilesCutFrom(string sheetId, ContentCatalog catalog) =>
-        [.. catalog.Tiles.Values.Where(tile => tile.SheetId == sheetId).Select(tile => tile.Id).Order()];
+        [.. TilesOf(sheetId, catalog).Select(tile => tile.Id)];
 
     /// <summary>The tiles cut from a sheet and the maps and objects drawing any of them.</summary>
     /// <param name="catalog">The tiles, the saved maps and the objects.</param>
@@ -33,10 +33,13 @@ internal static class CatalogUsage
     /// <param name="openLayout">The open map's layout, unsaved changes included; null when no map is open.</param>
     public static SheetUsage OfSheet(ContentCatalog catalog, string sheetId, MapLayout? openLayout)
     {
-        IReadOnlyList<TileDefinition> tiles = [.. catalog.Tiles.Values.Where(tile => tile.SheetId == sheetId).OrderBy(tile => tile.Id)];
+        IReadOnlyList<TileDefinition> tiles = [.. TilesOf(sheetId, catalog)];
         var tileIds = tiles.Select(tile => tile.Id).ToHashSet();
         return new SheetUsage(tiles, MapIdsUsing(tileIds, catalog, openLayout), ObjectIdsUsing(tileIds, catalog));
     }
+
+    private static IEnumerable<TileDefinition> TilesOf(string sheetId, ContentCatalog catalog) =>
+        catalog.Tiles.Values.Where(tile => tile.SheetId == sheetId).OrderBy(tile => tile.Id);
 
     private static IReadOnlyList<string> MapIdsUsing(HashSet<int> tileIds, ContentCatalog catalog, MapLayout? openLayout)
     {

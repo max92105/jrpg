@@ -83,7 +83,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **E5b1. Setting up a sheet with the guessed cut** (Editor, about 280 lines; split from E5b) → [slices/E5b1.md](slices/E5b1.md)
 - [x] **E5b2. The Cut panel: columns and rows** (Editor, about 260 lines; split from E5b) → [slices/E5b2.md](slices/E5b2.md)
 - [x] **E6a. Re-cutting a set-up sheet** (Editor, about 200 lines; split from E6) → [slices/E6a.md](slices/E6a.md)
-- [ ] **E6b. Warning before re-cutting a used sheet** (Editor, about 170 lines; split from E6) → [slices/E6b.md](slices/E6b.md)
+- [x] **E6b. Warning before re-cutting a used sheet** (Editor, about 170 lines; split from E6) → [slices/E6b.md](slices/E6b.md)
 - [ ] **E7. Importing a sheet image** (Data + Editor, about 220 lines) → [slices/E7.md](slices/E7.md)
 
 ### Phase 5: collision and above-player zones

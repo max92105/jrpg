@@ -26,3 +26,5 @@ Code-health work waiting for the next cleanup plan; `/retro` appends to it. One 
 - Editor: Space + drag pans only if the map had focus when Space was pressed (`HandleViewportKey` checks focus before setting `_isSpaceHeld`); with the Tiles panel focused, the drag paints instead (review of E2).
 - `MainViewModel` (367 lines after E4a): move the unsaved-change questions (`ConfirmClose`, `ConfirmLeaveCurrentMap`, which repeat their wording) or the map-list rebuild into their own type.
 - `MainViewModel` (467 lines after E4b2): move the undo routing (journal, `Undo`/`Redo` commands, which mirror each other, and the step event wiring) into its own type.
+- `TileBrowserViewModelTests` (345 lines after E6b): move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class (review of E6b).
+- `MainWindow.xaml.cs` (512 lines after E6a): move the catalog and map redraw handlers into their own type (review of E6a).

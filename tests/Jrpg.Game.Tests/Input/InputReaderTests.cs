@@ -88,6 +88,81 @@ public sealed class InputReaderTests
         Assert.Equal(0.6, frame.Move.Y, 6);
     }
 
+    [Fact]
+    public void Read_NothingPressed_DeviceIsKeyboard()
+    {
+        var frame = _reader.Read(new KeyboardState(), _padAtRest);
+
+        Assert.Equal(InputDevice.Keyboard, frame.Device);
+    }
+
+    [Fact]
+    public void Read_PadButtonPressed_SwitchesToController()
+    {
+        var frame = _reader.Read(new KeyboardState(), PadWith(Buttons.A));
+
+        Assert.Equal(InputDevice.Controller, frame.Device);
+    }
+
+    [Fact]
+    public void Read_StickPastDeadZone_SwitchesToController()
+    {
+        var frame = _reader.Read(new KeyboardState(), PadWith(new Vector2(StickReader.Deadzone + 0.1f, 0)));
+
+        Assert.Equal(InputDevice.Controller, frame.Device);
+    }
+
+    [Fact]
+    public void Read_StickInsideDeadZone_KeepsTheDevice()
+    {
+        var frame = _reader.Read(new KeyboardState(), PadWith(new Vector2(StickReader.Deadzone / 2, 0)));
+
+        Assert.Equal(InputDevice.Keyboard, frame.Device);
+    }
+
+    [Fact]
+    public void Read_KeyPressedAfterPad_SwitchesBackToKeyboard()
+    {
+        _reader.Read(new KeyboardState(), PadWith(Buttons.A));
+
+        var frame = _reader.Read(new KeyboardState(Keys.E), _padAtRest);
+
+        Assert.Equal(InputDevice.Keyboard, frame.Device);
+    }
+
+    [Fact]
+    public void Read_NothingPressedAfterPad_StaysController()
+    {
+        _reader.Read(new KeyboardState(), PadWith(Buttons.A));
+
+        var frame = _reader.Read(new KeyboardState(), _padAtRest);
+
+        Assert.Equal(InputDevice.Controller, frame.Device);
+    }
+
+    [Fact]
+    public void Read_StickStillHeldAfterKeyPressed_StaysKeyboard()
+    {
+        var stickRight = PadWith(new Vector2(StickReader.Deadzone + 0.1f, 0));
+        _reader.Read(new KeyboardState(), stickRight);
+        _reader.Read(new KeyboardState(Keys.E), stickRight);
+
+        var frame = _reader.Read(new KeyboardState(), stickRight);
+
+        Assert.Equal(InputDevice.Keyboard, frame.Device);
+    }
+
+    [Fact]
+    public void Read_SameButtonFromKeyThenPad_NotPressedAgain()
+    {
+        _reader.Read(new KeyboardState(Keys.E), _padAtRest);
+
+        var frame = _reader.Read(new KeyboardState(Keys.E), PadWith(Buttons.A));
+
+        Assert.False(frame.IsPressed(GameButton.Confirm));
+        Assert.Equal(InputDevice.Controller, frame.Device);
+    }
+
     private static GamePadState PadWith(Buttons button) =>
         new(new GamePadThumbSticks(), new GamePadTriggers(), new GamePadButtons(button), new GamePadDPad());
 

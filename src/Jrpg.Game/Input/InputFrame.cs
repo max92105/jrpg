@@ -20,6 +20,9 @@ internal readonly record struct InputFrame
 
     public MoveIntent Move { get; }
 
+    /// <summary>The device the player last used; the keyboard until a controller is touched.</summary>
+    public InputDevice Device { get; init; }
+
     /// <summary>True only on the update the button goes down, so holding Confirm doesn't repeat an action.</summary>
     public bool IsPressed(GameButton button) => _pressed.Contains(button);
 

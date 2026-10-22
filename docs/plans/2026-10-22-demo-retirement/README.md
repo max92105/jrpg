@@ -67,7 +67,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **0. Content tests assert entries, not totals** (Data + Editor tests, about 50 lines) → [slices/0.md](slices/0.md)
 
 ### Phase 1: the interaction prompt
-- [ ] **I1. The current input device and button names** (Game, about 150 lines) → [slices/I1.md](slices/I1.md)
+- [x] **I1. The current input device and button names** (Game, about 150 lines) → [slices/I1.md](slices/I1.md)
 - [ ] **G1a. The prompt over what the player faces: Core query and plain text** (Core + Game + content, about 250 lines) → [slices/G1a.md](slices/G1a.md)
 - [ ] **G1b. The prompt's look: key cap, panel and fade** (Game, about 170 lines) → [slices/G1b.md](slices/G1b.md)
 

@@ -12,12 +12,16 @@ internal readonly record struct ButtonSet
 
     public static ButtonSet Empty => default;
 
+    public bool IsEmpty => _bits == 0;
+
     public bool Contains(GameButton button) => (_bits & BitOf(button)) != 0;
 
     public ButtonSet With(GameButton button) => new(_bits | BitOf(button));
 
     /// <summary>The buttons in this set that <paramref name="other"/> doesn't have.</summary>
     public ButtonSet Except(ButtonSet other) => new(_bits & ~other._bits);
+
+    public ButtonSet Union(ButtonSet other) => new(_bits | other._bits);
 
     private static uint BitOf(GameButton button) => 1u << (int)button;
 }

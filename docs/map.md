@@ -52,7 +52,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Flow | The screens and the playthrough; applies scene requests | `GameFlow`, `FadeGate`, `SceneFactory`, `SessionTransitions`, `MenuTransitions`, `BattleTransitions` |
 | Scenes | The scene contract, the stack, requests, the screen fade | `IScene`, `SceneStack`, `SceneRequest` (+ records, `BattleRequested`, `BattleFinished`), `ScreenFade` |
 | Hosting | Window, settings, file locations | `PlayerSettings`, `TextSpeed`, `GamePaths`, `FullScreenShortcut` |
-| Input | Keys and pads to game buttons, per update | `InputReader`, `InputFrame`, `InputBindings`, `GameButton` |
+| Input | Keys and pads to game buttons, per update; the device in use and its button names | `InputReader`, `InputFrame`, `InputBindings`, `GameButton`, `InputDevice`, `ButtonLabels` |
 | Rendering | Textures, fonts, the virtual screen, baked map art | `TextureLibrary`, `FontLibrary`, `VirtualScreen`, `MapArt`, `TileAtlas` |
 | Exploration | The map scene: drawing (NPC objects from their field sprite), camera, walking, showing events | `ExplorationScene`, `EventPresenter`, `MapView`, `MapDrawList`, `MapCamera`, `FieldSpriteFrame` |
 | Dialogue | The message box and typing | `DialogueBox`, `SpeechPlayback`, `Typewriter`, `FoundItemText` |

@@ -34,3 +34,5 @@ Seen again in 11g (oracle variant): `ObjectBrowserViewModelTests` asserts the li
 Seen again in battle C1 (single-recipient variant): `VictoryRewards.Experience` ("before the split") tested only with a one-member party, so total == share and `Experience = Gains[0].Amount` would pass. For totals vs per-member values, ask for two recipients.
 
 Seen again in battle B1b (loop-exit variant): the flow test loops `while session.ActiveBattle is not null`, then asserts `ActiveBattle` is null and the position kept (Core forbids walking anyway), so a no-op `BattleTransitions.Finish` (battle screen never popped) passes. When asserts restate a loop's exit condition, ask what proves the screen/stack changed (e.g. the map takes input again).
+
+Seen again in demo-retirement I1 (cache variant): `ButtonLabelsTests.Of_SameButtonTwice_ReturnsTheSameString` uses `Assert.Same`, but .NET's `Enum.ToString()` already returns the same cached name instance (probed with fsi), so it passes with no cache. Reference-identity tests of a cache need a value the runtime doesn't intern.

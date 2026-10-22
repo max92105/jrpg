@@ -24,6 +24,25 @@ public sealed class EventPresetsTests
     }
 
     [Fact]
+    public void Talk_AnyObject_IsInteractDialogueWithTalkPrompt()
+    {
+        var talk = Assert.Single(EventPresets.Talk(new EventIdAllocation("villager_1", "villager", [])));
+
+        Assert.Equal(("villager_1_0", EventActivation.Interact, "Talk", false), (talk.Id, talk.Activation, talk.Prompt, talk.IsOnce));
+        Assert.IsType<DialogueStep>(Assert.Single(talk.Steps));
+    }
+
+    [Fact]
+    public void Talk_AnyObject_LeavesSpeakerAndLinesEmpty()
+    {
+        var talk = Assert.Single(EventPresets.Talk(new EventIdAllocation("villager_1", "villager", [])));
+
+        var speech = Assert.IsType<DialogueStep>(Assert.Single(talk.Steps)).Speech;
+        Assert.Null(speech.Speaker);
+        Assert.Empty(speech.Lines);
+    }
+
+    [Fact]
     public void DoorYouOpen_OpensWhileClosed_WarpsOnlyWhenOpen()
     {
         var events = EventPresets.DoorYouOpen(_door, "door_open");

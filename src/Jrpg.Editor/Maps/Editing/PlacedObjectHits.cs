@@ -7,8 +7,8 @@ namespace Jrpg.Editor.Maps.Editing;
 internal static class PlacedObjectHits
 {
     /// <summary>
-    /// The object drawn on top at a point: one of its tiles covers it (legacy), and among several, the one drawn last
-    /// in Core's <see cref="DrawOrderKey"/> order. Null when no object is there.
+    /// The object drawn on top at a point: one of its tiles covers it (legacy), or its NPC sprite does; among several,
+    /// the one drawn last in Core's <see cref="DrawOrderKey"/> order. Null when no object is there.
     /// </summary>
     public static PlacedObject? TopAt(MapLayout map, Point2D point, IReadOnlyDictionary<string, ObjectDefinition> definitions)
     {
@@ -19,7 +19,7 @@ internal static class PlacedObjectHits
             var placed = map.Objects[index];
             var definition = definitions[placed.ObjectId];
             var key = DrawOrderKey.ForSprite(placed.Z, placed.Position.Y + definition.Height, index);
-            if (CoversWithATile(placed, definition, point) && (topKey is null || key > topKey))
+            if (Covers(placed, definition, point) && (topKey is null || key > topKey))
             {
                 (top, topKey) = (placed, key);
             }
@@ -41,6 +41,13 @@ internal static class PlacedObjectHits
                 && placed.Position.Y < bottom && placed.Position.Y + definition.Height > top;
         })];
     }
+
+    // An NPC has no tiles: its sprite covers all its cells (ADR 0015).
+    private static bool Covers(PlacedObject placed, ObjectDefinition definition, Point2D point) =>
+        definition.FieldSpriteFile is not null
+            ? point.X >= placed.Position.X && point.X < placed.Position.X + definition.Width
+                && point.Y >= placed.Position.Y && point.Y < placed.Position.Y + definition.Height
+            : CoversWithATile(placed, definition, point);
 
     private static bool CoversWithATile(PlacedObject placed, ObjectDefinition definition, Point2D point) =>
         definition.Tiles.Any(tile =>

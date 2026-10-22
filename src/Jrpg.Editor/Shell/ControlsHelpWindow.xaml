@@ -79,7 +79,7 @@
 
       <TextBlock Style="{StaticResource Heading}" Text="Events" />
       <TextBlock Style="{StaticResource Lines}">
-        Click an object: edit its events.<LineBreak />
+        Click an object: edit its events. Presets: Chest, Door, Door you open, Sign, and Talk (an NPC: type its speaker and lines).<LineBreak />
         Click a cell without an object: edit the event that runs when the player walks onto it.<LineBreak />
         Right click a cell without an object: remove its event.<LineBreak />
         On the map, in every mode: a yellow dot is an event run when pressed, a cyan dot one run when walked into, a cyan square a cell with an event.

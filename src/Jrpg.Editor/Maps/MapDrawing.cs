@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Media;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Tiles;
@@ -64,10 +65,7 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
         using (var context = drawing.Open())
         {
             context.DrawRectangle(Brushes.Transparent, null, area);
-            foreach (var tile in definition.Tiles)
-            {
-                context.DrawImage(tileImages.TileImageOf(tile.TileId), CellRect(tile.X, tile.Y));
-            }
+            DrawObjectAt(context, definition, new Point2D(0, 0));
         }
 
         var image = new DrawingImage(drawing);
@@ -155,11 +153,22 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
         }
     }
 
-    private void DrawObject(DrawingContext context, PlacedObject placed)
+    private void DrawObject(DrawingContext context, PlacedObject placed) =>
+        DrawObjectAt(context, catalog.Current.Objects[placed.ObjectId], placed.Position);
+
+    // An NPC stands still facing down over its cells, as in the game (ADR 0015); other objects are drawn from their tiles.
+    private void DrawObjectAt(DrawingContext context, ObjectDefinition definition, Point2D topLeft)
     {
-        foreach (var tile in catalog.Current.Objects[placed.ObjectId].Tiles)
+        if (definition.FieldSpriteFile is { } spriteFile)
         {
-            context.DrawImage(tileImages.TileImageOf(tile.TileId), CellRect(placed.Position.X + tile.X, placed.Position.Y + tile.Y));
+            var area = new Rect(topLeft.X * CellPixels, topLeft.Y * CellPixels, definition.Width * CellPixels, definition.Height * CellPixels);
+            context.DrawImage(tileImages.FieldSpriteFrameOf(spriteFile), area);
+            return;
+        }
+
+        foreach (var tile in definition.Tiles)
+        {
+            context.DrawImage(tileImages.TileImageOf(tile.TileId), CellRect(topLeft.X + tile.X, topLeft.Y + tile.Y));
         }
     }
 

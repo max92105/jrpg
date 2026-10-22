@@ -25,6 +25,14 @@ public sealed class CollisionShapesTests
 
     private static readonly ObjectDefinition _sign = _house with { Id = "sign", Width = 1, Height = 1, CollisionPolygon = [], AbovePlayerZones = [] };
 
+    // An NPC (ADR 0015): no tiles, an outline over the lower half of its cell.
+    private static readonly ObjectDefinition _villager = _sign with
+    {
+        Id = "villager",
+        FieldSpriteFile = "npc_placeholder.png",
+        CollisionPolygon = [new Point2D(0.2, 0.5), new Point2D(0.8, 0.5), new Point2D(0.8, 1), new Point2D(0.2, 1)],
+    };
+
     private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")) with
     {
         Tiles = new Dictionary<int, TileDefinition>
@@ -32,7 +40,7 @@ public sealed class CollisionShapesTests
             [Walkable] = new() { Id = Walkable, IsWalkable = true, SheetId = "city", Column = 0, Row = 0 },
             [Blocked] = new() { Id = Blocked, IsWalkable = false, SheetId = "city", Column = 1, Row = 0 },
         },
-        Objects = new Dictionary<string, ObjectDefinition> { ["house"] = _house, ["sign"] = _sign },
+        Objects = new Dictionary<string, ObjectDefinition> { ["house"] = _house, ["sign"] = _sign, ["villager"] = _villager },
     };
 
     [Fact]
@@ -66,6 +74,14 @@ public sealed class CollisionShapesTests
         var shapes = CollisionShapes.Of(Layout(_ => Walkable, Placed("house", 4, 5)), _catalog);
 
         Assert.Equal([new Point2D(4, 5), new Point2D(6, 5), new Point2D(6, 6.5)], Assert.Single(shapes.Zones));
+    }
+
+    [Fact]
+    public void Of_FieldSpriteObject_PlacesItsOutline()
+    {
+        var shapes = CollisionShapes.Of(Layout(_ => Walkable, Placed("villager", 3, 2)), _catalog);
+
+        Assert.Equal([new Point2D(3.2, 2.5), new Point2D(3.8, 2.5), new Point2D(3.8, 3), new Point2D(3.2, 3)], Assert.Single(shapes.Outlines));
     }
 
     [Fact]

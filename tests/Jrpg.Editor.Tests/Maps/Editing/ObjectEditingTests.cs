@@ -114,6 +114,18 @@ public sealed class ObjectEditingTests
     }
 
     [Fact]
+    public void PlacedObjectHits_TopAt_FieldSpriteObject_IsHitAnywhereOnItsCell()
+    {
+        var villager = Placed("villager_1", "villager", 6, 6);
+        var npc = Definition("villager", 1, 1, []) with { FieldSpriteFile = "npc_placeholder.png" };
+        var definitions = new Dictionary<string, ObjectDefinition>(_definitions) { ["villager"] = npc };
+        var map = Layout() with { Objects = [villager] };
+
+        Assert.Equal(villager, PlacedObjectHits.TopAt(map, new Point2D(6.1, 6.2), definitions));
+        Assert.Null(PlacedObjectHits.TopAt(map, new Point2D(7.0, 6.5), definitions));
+    }
+
+    [Fact]
     public void PlacedObjectHits_TopAt_CellWithoutTheObjectsTile_MissesIt()
     {
         Assert.Null(PlacedObjectHits.TopAt(Layout(), new Point2D(2.5, 1.2), _definitions));

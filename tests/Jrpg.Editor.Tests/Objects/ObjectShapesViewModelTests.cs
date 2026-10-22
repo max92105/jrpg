@@ -19,6 +19,23 @@ public sealed class ObjectShapesViewModelTests
     };
 
     private static readonly ObjectDefinition _sign = _house with { Id = "sign", Width = 1, Height = 1, CollisionPolygon = [], AbovePlayerZones = [] };
+    private static readonly ObjectDefinition _villager = _sign with { Id = "villager", Tiles = [], FieldSpriteFile = "npc_placeholder.png" };
+
+    [Fact]
+    public void CanEditZones_FieldSpriteObject_IsFalse()
+    {
+        Assert.False(new ObjectShapesViewModel(_villager).CanEditZones);
+    }
+
+    [Fact]
+    public void IsEditingZones_SetOnFieldSpriteObject_StaysFalse()
+    {
+        var shapes = new ObjectShapesViewModel(_villager);
+
+        shapes.IsEditingZones = true;
+
+        Assert.False(shapes.IsEditingZones);
+    }
 
     [Fact]
     public void Constructor_HouseWithOutline_StartsWithItsPoints()

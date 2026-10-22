@@ -6,9 +6,9 @@ using Jrpg.Core.Maps;
 namespace Jrpg.Editor.Events;
 
 /// <summary>
-/// The legacy event dialog's presets: the usual events of a chest, a door, a door the player opens first, and a sign.
-/// What only the developer can say is left empty for the dialog to ask for: the chest's item, the door's destination,
-/// the sign's text.
+/// The legacy event dialog's presets: the usual events of a chest, a door, a door the player opens first and a sign,
+/// and an NPC who talks. What only the developer can say is left empty for the dialog to ask for: the chest's item,
+/// the door's destination, the sign's or the NPC's text.
 /// </summary>
 internal static class EventPresets
 {
@@ -16,6 +16,7 @@ internal static class EventPresets
     private const string OpenPrompt = "Open";
     private const string EnterPrompt = "Enter";
     private const string ReadPrompt = "Read";
+    private const string TalkPrompt = "Talk";
 
     // An object id containing this is taken for an "opened" object, as the legacy guess did with names.
     private const string OpenedMarker = "open";
@@ -65,6 +66,18 @@ internal static class EventPresets
             Id = target.NewEventIds(1)[0],
             Activation = EventActivation.Interact,
             Prompt = ReadPrompt,
+            Steps = [new DialogueStep(new Speech([]))],
+        },
+    ];
+
+    /// <summary>Pressed: an NPC talks (ADR 0015); the speaker and lines are left for the developer to type.</summary>
+    public static IReadOnlyList<MapEvent> Talk(EventIdAllocation target) =>
+    [
+        new MapEvent
+        {
+            Id = target.NewEventIds(1)[0],
+            Activation = EventActivation.Interact,
+            Prompt = TalkPrompt,
             Steps = [new DialogueStep(new Speech([]))],
         },
     ];

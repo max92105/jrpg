@@ -8,10 +8,18 @@ using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Tiles;
 
-/// <summary>Tilesheet images and the tiles cut from them, each loaded once and kept for the editor's lifetime.</summary>
+/// <summary>
+/// Tilesheet images, the tiles cut from them and NPCs' standing frames, each loaded once and kept for the editor's
+/// lifetime.
+/// </summary>
 internal sealed class TileImages(CatalogDraft catalog, string artRoot)
 {
+    // The game's field-sprite frame size (its FieldSpriteFrame.Pixels, which the editor can't reference): the standing
+    // frame facing down is the sheet's top-left frame.
+    private const int FieldSpriteFramePixels = 48;
+
     private readonly Dictionary<string, BitmapSource> _sheets = [];
+    private readonly Dictionary<string, ImageSource> _spriteFrames = [];
 
     // Keyed by the sheet's cut as well as the cell, so a re-cut sheet (another record) is cropped anew (design key decision 3).
     private readonly Dictionary<(TilesheetDefinition Sheet, int Column, int Row), ImageSource> _tiles = [];
@@ -30,6 +38,20 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot)
         }
 
         return image;
+    }
+
+    /// <summary>The standing frame an NPC is drawn with (ADR 0015, decision 128): the down row's first frame.</summary>
+    /// <param name="file">The file name in the field-sprite art folder.</param>
+    public ImageSource FieldSpriteFrameOf(string file)
+    {
+        if (!_spriteFrames.TryGetValue(file, out var frame))
+        {
+            frame = new CroppedBitmap(LoadImage(ArtFolders.FieldSprites, file), new Int32Rect(0, 0, FieldSpriteFramePixels, FieldSpriteFramePixels));
+            frame.Freeze();
+            _spriteFrames.Add(file, frame);
+        }
+
+        return frame;
     }
 
     /// <summary>Drops an image and the tiles cropped from it, so a file replaced by an import is read again.</summary>
@@ -52,18 +74,23 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot)
     {
         if (!_sheets.TryGetValue(file, out var sheet))
         {
-            var bitmap = new BitmapImage();
-            bitmap.BeginInit();
-            bitmap.UriSource = new Uri(Path.Combine(artRoot, ArtFolders.Tilesheets, file));
-            bitmap.CacheOption = BitmapCacheOption.OnLoad;
-            // WPF keeps decoded images by path; a file replaced by an import must be read again.
-            bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
-            bitmap.EndInit();
-            bitmap.Freeze();
-            sheet = bitmap;
+            sheet = LoadImage(ArtFolders.Tilesheets, file);
             _sheets.Add(file, sheet);
         }
 
         return sheet;
+    }
+
+    private BitmapImage LoadImage(string folder, string file)
+    {
+        var bitmap = new BitmapImage();
+        bitmap.BeginInit();
+        bitmap.UriSource = new Uri(Path.Combine(artRoot, folder, file));
+        bitmap.CacheOption = BitmapCacheOption.OnLoad;
+        // WPF keeps decoded images by path; a file replaced by an import must be read again.
+        bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
+        bitmap.EndInit();
+        bitmap.Freeze();
+        return bitmap;
     }
 }

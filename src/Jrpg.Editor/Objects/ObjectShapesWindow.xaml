@@ -15,7 +15,11 @@
                Text="Click to add a point; near an edge, to insert one. Drag a handle to move it, right click to remove it. Shift + drag: a rectangle. Wheel: zoom. Backspace or Ctrl+Z removes the last point." />
     <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
       <RadioButton Content="Collision (blocks the player)" IsChecked="{Binding IsEditingCollision}" Margin="0,0,16,0" />
-      <RadioButton Content="Over the player (leaves, roofs)" IsChecked="{Binding IsEditingZones}" />
+      <RadioButton Content="Over the player (leaves, roofs)"
+                   IsChecked="{Binding IsEditingZones}"
+                   IsEnabled="{Binding CanEditZones}"
+                   ToolTipService.ShowOnDisabled="True"
+                   ToolTip="Leaves and roofs drawn over the player (not for NPCs, which have none)." />
     </StackPanel>
     <DockPanel Margin="0,0,0,8" Visibility="{Binding IsEditingZones, Converter={StaticResource VisibleWhenTrue}}">
       <StackPanel DockPanel.Dock="Right" Margin="8,0,0,0">

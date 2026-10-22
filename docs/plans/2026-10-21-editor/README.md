@@ -107,7 +107,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 - [x] **ADR 0015: NPCs on maps** (before N1) → [slices/ADR-0015.md](slices/ADR-0015.md)
 - [x] **N1. An NPC in the game** (Core + Data + Game + content, about 250 lines) → [slices/N1.md](slices/N1.md)
-- [ ] **N2. NPCs in the editor: drawn, and a Talk preset** (Editor, about 200 lines) → [slices/N2.md](slices/N2.md)
+- [x] **N2. NPCs in the editor: drawn, and a Talk preset** (Editor, about 200 lines) → [slices/N2.md](slices/N2.md)
 - [ ] **N3. A new NPC** (Data + Editor, about 220 lines) → [slices/N3.md](slices/N3.md)
 
 ### Phase 8: the look

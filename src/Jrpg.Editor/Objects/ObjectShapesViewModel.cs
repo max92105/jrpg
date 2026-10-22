@@ -44,11 +44,23 @@ internal sealed partial class ObjectShapesViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(IsEditingCollision), nameof(ActivePoints))]
     public partial bool IsEditingZones { get; set; }
 
+    /// <summary>Whether the object can have above-player zones: an NPC can't (ADR 0015), so the validator refuses them.</summary>
+    public bool CanEditZones => _definition.FieldSpriteFile is null;
+
     /// <summary>The inverse of <see cref="IsEditingZones"/>, for the window's second radio button.</summary>
     public bool IsEditingCollision
     {
         get => !IsEditingZones;
         set => IsEditingZones = !value;
+    }
+
+    // The window greys the choice for an NPC; this keeps the rule if anything sets it anyway.
+    partial void OnIsEditingZonesChanged(bool value)
+    {
+        if (value && !CanEditZones)
+        {
+            IsEditingZones = false;
+        }
     }
 
     /// <summary>The zone the tools act on while editing zones; -1 when none is chosen.</summary>

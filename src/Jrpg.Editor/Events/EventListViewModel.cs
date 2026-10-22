@@ -83,6 +83,9 @@ internal sealed partial class EventListViewModel : ObservableObject
     [RelayCommand]
     private void ApplySignPreset() => ApplyPreset(EventPresets.Sign(IdAllocation()));
 
+    [RelayCommand]
+    private void ApplyTalkPreset() => ApplyPreset(EventPresets.Talk(IdAllocation()));
+
     // Replaces every event, as legacy did, and shows the first field the preset leaves to fill in.
     private void ApplyPreset(IReadOnlyList<MapEvent> presetEvents)
     {

@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Jrpg.Core.Geometry;
 
 namespace Jrpg.Editor.Tiles;
 
@@ -13,6 +14,9 @@ namespace Jrpg.Editor.Tiles;
 internal sealed partial class TileBrowserView : UserControl
 {
     private TileBrowserViewModel? _browser;
+
+    // Where a Shift + drag over the sheet started, in image pixels; null when none is under way.
+    private Point? _rectangleStart;
     private SheetCutViewModel? _cut;
 
     public TileBrowserView()
@@ -44,7 +48,7 @@ internal sealed partial class TileBrowserView : UserControl
             _cut?.PropertyChanged += OnCutChanged;
         }
 
-        if (e.PropertyName is nameof(TileBrowserViewModel.SelectedChoice) or nameof(TileBrowserViewModel.SelectedCell) or nameof(TileBrowserViewModel.SheetTiles) or nameof(TileBrowserViewModel.Cut))
+        if (e.PropertyName is nameof(TileBrowserViewModel.SelectedChoice) or nameof(TileBrowserViewModel.MarkedCells) or nameof(TileBrowserViewModel.SheetTiles) or nameof(TileBrowserViewModel.Cut))
         {
             DrawSheet();
         }
@@ -75,7 +79,7 @@ internal sealed partial class TileBrowserView : UserControl
         var size = new Size(image.PixelWidth, image.PixelHeight);
         var marked = _browser.Cut is { } cut ? cut.PreviewSheet : choice.Sheet;
         SheetImage.Source = image;
-        SheetMarks.Source = marked is null ? null : TilesheetMarks.Draw(marked, size, _browser.SheetTiles, _browser.SelectedCell);
+        SheetMarks.Source = marked is null ? null : TilesheetMarks.Draw(marked, size, _browser.SheetTiles, _browser.MarkedCells);
         SheetImage.Width = SheetMarks.Width = size.Width;
         SheetImage.Height = SheetMarks.Height = size.Height;
         var scale = choice.Sheet is { } sheet ? TilesheetMarks.DisplayScaleOf(sheet) : 1;
@@ -85,7 +89,12 @@ internal sealed partial class TileBrowserView : UserControl
     private void OnSheetClicked(object sender, MouseButtonEventArgs e)
     {
         var pixel = e.GetPosition(SheetView);
-        if (Marking is { IsMarkingBlocked: true })
+        if (Keyboard.Modifiers == ModifierKeys.Shift && Marking is not { IsMarkingBlocked: true })
+        {
+            _rectangleStart = pixel;
+            SheetView.CaptureMouse();
+        }
+        else if (Marking is { IsMarkingBlocked: true })
         {
             Marking.FlipCellAt(pixel.X, pixel.Y);
         }
@@ -94,4 +103,17 @@ internal sealed partial class TileBrowserView : UserControl
             _browser?.SelectCellAt(pixel.X, pixel.Y);
         }
     }
+
+    // A Shift + drag chooses the rectangle of cells between where it started and where the button is released.
+    private void OnSheetReleased(object sender, MouseButtonEventArgs e)
+    {
+        if (_rectangleStart is { } start)
+        {
+            var end = e.GetPosition(SheetView);
+            _browser?.SelectCellsBetween(new Point2D(start.X, start.Y), new Point2D(end.X, end.Y));
+            SheetView.ReleaseMouseCapture();
+        }
+    }
+
+    private void OnSheetLostMouseCapture(object sender, MouseEventArgs e) => _rectangleStart = null;
 }

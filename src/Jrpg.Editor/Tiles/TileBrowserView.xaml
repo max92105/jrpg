@@ -73,7 +73,9 @@
             HorizontalAlignment="Left"
             VerticalAlignment="Top"
             RenderOptions.BitmapScalingMode="NearestNeighbor"
-            MouseLeftButtonDown="OnSheetClicked">
+            MouseLeftButtonDown="OnSheetClicked"
+            MouseLeftButtonUp="OnSheetReleased"
+            LostMouseCapture="OnSheetLostMouseCapture">
         <Image x:Name="SheetImage" Stretch="Fill" />
         <Image x:Name="SheetMarks" Stretch="Fill" />
       </Grid>

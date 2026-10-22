@@ -23,8 +23,8 @@ internal static class TilesheetMarks
     /// <param name="sheet">How the image is cut into cells.</param>
     /// <param name="imageSize">The image's size in its own pixels.</param>
     /// <param name="tiles">The tiles cut from this sheet.</param>
-    /// <param name="selected">The chosen cell, outlined if it is on this sheet, a tile or not.</param>
-    public static DrawingImage Draw(TilesheetDefinition sheet, Size imageSize, IReadOnlyList<TileDefinition> tiles, SheetCell? selected)
+    /// <param name="selected">The chosen cells, outlined if they are on this sheet: one cell solid, a rectangle dashed.</param>
+    public static DrawingImage Draw(TilesheetDefinition sheet, Size imageSize, IReadOnlyList<TileDefinition> tiles, SheetCellRectangle? selected)
     {
         var screenPixel = 1 / DisplayScaleOf(sheet);
         var gridPen = new Pen(_gridBrush, screenPixel);
@@ -54,9 +54,17 @@ internal static class TilesheetMarks
                 }
             }
 
-            if (selected is { } cell && cell.SheetId == sheet.Id)
+            if (selected is { } cells && cells.SheetId == sheet.Id)
             {
-                context.DrawRectangle(null, new Pen(Brushes.Cyan, 3 * screenPixel), CellRect(sheet, cell.Column, cell.Row));
+                var pen = new Pen(Brushes.Cyan, 3 * screenPixel);
+                if (cells.Columns * cells.Rows > 1)
+                {
+                    pen.DashStyle = DashStyles.Dash;
+                }
+
+                var topLeft = CellRect(sheet, cells.Left, cells.Top);
+                var bottomRight = CellRect(sheet, cells.Left + cells.Columns - 1, cells.Top + cells.Rows - 1);
+                context.DrawRectangle(null, pen, Rect.Union(topLeft, bottomRight));
             }
         }
 

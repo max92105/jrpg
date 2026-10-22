@@ -5,8 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-21-editor/slices/E11b.md, E11b (rectangle, snap, zoom, dimming; uncommitted)
-Round: 1 (verdict: Ready to commit; verify all pass, 1493 tests)
+Slice: docs/plans/2026-10-21-editor/slices/E12a.md, E12a (rectangle of sheet cells; uncommitted)
+Round: 1 (verdict: Ready to commit; verify all pass, 1499 tests)
 
-- open (Suggestion): ObjectShapesWindow.OnViewportMouseWheel zooms around the scroll origin, not the mouse; on a big object the spot under the cursor slides away. Keep the point under the mouse by adjusting ScrollViewer offsets after the zoom.
-- open (Suggestion): no test pins snapping through SetRectangle / MovePoint (same Placed path as AddPoint, so low risk).
+- open (Warning): Shift + click without moving stores a 1 x 1 SelectedCells, so ChoiceText reads "Cells (3, 4) to (3, 4): 1 x 1 (paints the top-left cell)" instead of "Cell (3, 4): tile N". Store SelectedCells only when Columns * Rows > 1; add a test.
+- open (Suggestion): NearestCellTo repeats CellAt's column/row floor formula (2 copies); extract a private GridPositionOf(sheet, pixel).
+- open (Suggestion): Select(tileId) and the vanished-sheet path clearing SelectedCells are untested.
+- follow-up: TileBrowserViewModel at 295 lines; E12b should split (e.g. sheet hit-testing) rather than grow it.
+- follow-up: a re-cut to a smaller grid keeps SelectedCell/SelectedCells pointing past the new grid (predates; matters for E12b New object).

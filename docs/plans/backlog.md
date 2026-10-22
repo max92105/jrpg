@@ -29,3 +29,5 @@ Code-health work waiting for the next cleanup plan; `/retro` appends to it. One 
 - `TileBrowserViewModelTests` (345 lines after E6b): move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class (review of E6b).
 - `MainWindow.xaml.cs` (512 lines after E6a): move the catalog and map redraw handlers into their own type (review of E6a).
 - Tests: the header-only PNG writer is copied in `ArtReferenceCheckTests` and `ContentWriterTests` (Data); the Editor tests share `PngHeaderFile` (E7b). Share the Data copies on the next change there.
+- `TileBrowserViewModel` (about 300 lines after E12a): move the sheet hit-testing (`CellAt`, `NearestCellTo`, `GridPositionOf`) into its own type (review of E12a).
+- Re-cutting a sheet to a smaller grid leaves `TileBrowserViewModel.SelectedCell`/`SelectedCells` past the new grid; painting then makes a tile outside the image, which the save refuses. Clear or clamp them on a re-cut, before E12b builds objects from them (review of E12a).

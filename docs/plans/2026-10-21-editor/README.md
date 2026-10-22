@@ -99,7 +99,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 6: new objects
 
-- [ ] **E12a. A rectangle of sheet cells** (Editor, about 140 lines) → [slices/E12a.md](slices/E12a.md)
+- [x] **E12a. A rectangle of sheet cells** (Editor, about 140 lines) → [slices/E12a.md](slices/E12a.md)
 - [ ] **E12b. A new object from the rectangle** (Editor, about 260 lines) → [slices/E12b.md](slices/E12b.md)
 
 ### Phase 7: NPCs

@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Editor.Catalogs;
 
@@ -67,8 +68,16 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
 
     /// <summary>The chosen cell, on whichever sheet it is; null until one is chosen.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(SelectedTileId), nameof(ChoiceText))]
+    [NotifyPropertyChangedFor(nameof(SelectedTileId), nameof(ChoiceText), nameof(MarkedCells))]
     public partial SheetCell? SelectedCell { get; private set; }
+
+    /// <summary>The rectangle chosen with Shift + drag, whose top-left cell is <see cref="SelectedCell"/>; null after a plain click.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ChoiceText), nameof(MarkedCells))]
+    public partial SheetCellRectangle? SelectedCells { get; private set; }
+
+    /// <summary>The cells outlined on the sheet: the chosen rectangle, or the chosen cell alone.</summary>
+    public SheetCellRectangle? MarkedCells => SelectedCells ?? (SelectedCell is { } cell ? SheetCellRectangle.Between(cell, cell) : null);
 
     /// <summary>The tile the brush paints: the chosen cell's tile, or null when it isn't a tile yet.</summary>
     public int? SelectedTileId => SelectedCell is { } cell ? _catalog.TileAt(cell)?.Id : null;
@@ -82,6 +91,8 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
         ({ Sheet: null }, null) => "Not set up yet",
         ({ Sheet: null }, { } cell) => $"Not set up yet. Brush: cell ({cell.Column}, {cell.Row}) of {cell.SheetId}",
         (_, null) => "",
+        _ when SelectedCells is { } cells =>
+            $"Cells ({cells.Left}, {cells.Top}) to ({cells.Left + cells.Columns - 1}, {cells.Top + cells.Rows - 1}): {cells.Columns} x {cells.Rows} (paints the top-left cell)",
         (_, { } cell) when _catalog.TileAt(cell) is { } tile => $"Cell ({cell.Column}, {cell.Row}): tile {tile.Id}",
         (_, { } cell) => $"Cell ({cell.Column}, {cell.Row}): not a tile yet",
     };
@@ -97,8 +108,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
         }
 
         var (width, height) = _images.SizeOf(sheet.File);
-        var column = (int)Math.Floor((x - sheet.Margin) / (sheet.TileWidth + sheet.Spacing));
-        var row = (int)Math.Floor((y - sheet.Margin) / (sheet.TileHeight + sheet.Spacing));
+        var (column, row) = GridPositionOf(sheet, x, y);
         var isInGrid = column >= 0 && row >= 0 && column < sheet.ColumnsIn(width) && row < sheet.RowsIn(height);
         var isInCell = x < sheet.CellLeft(column) + sheet.TileWidth && y < sheet.CellTop(row) + sheet.TileHeight;
         return isInGrid && isInCell ? new SheetCell(sheet.Id, column, row) : null;
@@ -109,8 +119,28 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     {
         if (CellAt(x, y) is { } cell)
         {
+            SelectedCells = null;
             SelectedCell = cell;
         }
+    }
+
+    /// <summary>
+    /// Chooses the rectangle of whole cells of the shown sheet between two image pixels (Shift + drag); a corner off every
+    /// whole cell counts as the nearest one. The brush paints its top-left cell (decision 123: no stamp brush).
+    /// </summary>
+    /// <param name="corner">In the image's own pixels.</param>
+    /// <param name="oppositeCorner">In the image's own pixels.</param>
+    public void SelectCellsBetween(Point2D corner, Point2D oppositeCorner)
+    {
+        if (NearestCellTo(corner) is not { } first || NearestCellTo(oppositeCorner) is not { } second)
+        {
+            return;
+        }
+
+        // A Shift + click that didn't move chooses one cell, as a plain click does.
+        var cells = SheetCellRectangle.Between(first, second);
+        SelectedCells = cells.Columns * cells.Rows > 1 ? cells : null;
+        SelectedCell = new SheetCell(cells.SheetId, cells.Left, cells.Top);
     }
 
     /// <summary>Chooses a tile's cell and shows its sheet, as picking a tile from the map does.</summary>
@@ -118,8 +148,33 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     {
         var tile = _catalog.Current.Tiles[tileId];
         SelectedChoice = SheetChoices.First(choice => choice.Sheet?.Id == tile.SheetId);
+        SelectedCells = null;
         SelectedCell = new SheetCell(tile.SheetId, tile.Column, tile.Row);
     }
+
+    // The whole cell under a pixel, or the nearest one when the pixel is on the margin, spacing or past the last whole cell.
+    private SheetCell? NearestCellTo(Point2D pixel)
+    {
+        if (SelectedSheet is not { } sheet)
+        {
+            return null;
+        }
+
+        var (width, height) = _images.SizeOf(sheet.File);
+        var (columns, rows) = (sheet.ColumnsIn(width), sheet.RowsIn(height));
+        if (columns == 0 || rows == 0)
+        {
+            return null;
+        }
+
+        var (column, row) = GridPositionOf(sheet, pixel.X, pixel.Y);
+        return new SheetCell(sheet.Id, Math.Clamp(column, 0, columns - 1), Math.Clamp(row, 0, rows - 1));
+    }
+
+    // The cell a pixel falls in, counting each cell with the spacing after it; may be negative or past the last cell.
+    private static (int Column, int Row) GridPositionOf(TilesheetDefinition sheet, double x, double y) =>
+        ((int)Math.Floor((x - sheet.Margin) / (sheet.TileWidth + sheet.Spacing)),
+         (int)Math.Floor((y - sheet.Margin) / (sheet.TileHeight + sheet.Spacing)));
 
     /// <summary>
     /// Opens the Cut panel for the shown image, pre-filled with a guess: id from its file name (decision 118), square tiles
@@ -237,6 +292,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
             ?? SheetChoices.FirstOrDefault(choice => string.Equals(choice.File, shown?.File, StringComparison.OrdinalIgnoreCase));
         if (SelectedCell is { } cell && !_listedSheets.ContainsKey(cell.SheetId))
         {
+            SelectedCells = null;
             SelectedCell = null;
         }
     }

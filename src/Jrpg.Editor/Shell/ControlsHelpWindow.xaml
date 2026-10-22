@@ -40,6 +40,7 @@
       <TextBlock Style="{StaticResource Heading}" Text="Tiles" />
       <TextBlock Style="{StaticResource Lines}">
         Click a cell in the Tiles panel: choose it; it becomes a tile the first time it is painted.<LineBreak />
+        Shift + drag over the sheet: choose a rectangle of cells (dashed); painting uses its top-left cell.<LineBreak />
         Left drag: paint with the chosen tool. Right drag: erase.<LineBreak />
         B: brush (paints as you drag). R: rectangle (filled on release). F: fill (click).<LineBreak />
         Shift + click: fill, with any tool.<LineBreak />

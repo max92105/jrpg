@@ -1,3 +1,4 @@
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
@@ -303,6 +304,58 @@ public sealed class TileBrowserViewModelTests
 
         Assert.Equal(["Cave.png (not set up)", "dungeon", "forest", "Grass3.png (not set up)"], _browser.SheetChoices.Select(choice => choice.Label));
         Assert.Equal(new SheetChoice("Cave.png", null), _browser.SelectedChoice);
+    }
+
+    // The forest's 96 x 48 image holds 2 x 1 cells of 48 px.
+    [Fact]
+    public void SelectCellsBetween_TwoCells_ChoosesTheRectangleAndItsTopLeftCell()
+    {
+        _browser.SelectedChoice = _browser.SheetChoices[1];
+
+        _browser.SelectCellsBetween(new Point2D(60, 10), new Point2D(5, 40));
+
+        Assert.Equal(new SheetCellRectangle("forest", 0, 0, 2, 1), _browser.SelectedCells);
+        Assert.Equal(new SheetCell("forest", 0, 0), _browser.SelectedCell);
+        Assert.Equal("Cells (0, 0) to (1, 0): 2 x 1 (paints the top-left cell)", _browser.ChoiceText);
+    }
+
+    // The dungeon's last whole column is 2 (it ends at 52 of 54 pixels); 53 is past it, -3 is on the margin.
+    [Fact]
+    public void SelectCellsBetween_CornerPastLastWholeColumn_ClampsToIt()
+    {
+        _browser.SelectCellsBetween(new Point2D(-3, 5), new Point2D(53, 5));
+
+        Assert.Equal(new SheetCellRectangle("dungeon", 0, 0, 3, 1), _browser.SelectedCells);
+    }
+
+    [Fact]
+    public void SelectCellsBetween_SameCell_ChoosesOneCell()
+    {
+        _browser.SelectCellsBetween(new Point2D(19, 2), new Point2D(25, 8));
+
+        Assert.Null(_browser.SelectedCells);
+        Assert.Equal("Cell (1, 0): tile 7", _browser.ChoiceText);
+    }
+
+    [Fact]
+    public void Select_AfterRectangle_ClearsIt()
+    {
+        _browser.SelectCellsBetween(new Point2D(5, 5), new Point2D(40, 5));
+
+        _browser.Select(8);
+
+        Assert.Null(_browser.SelectedCells);
+    }
+
+    [Fact]
+    public void SelectCellAt_AfterRectangle_ClearsIt()
+    {
+        _browser.SelectCellsBetween(new Point2D(5, 5), new Point2D(40, 5));
+
+        _browser.SelectCellAt(19, 2);
+
+        Assert.Null(_browser.SelectedCells);
+        Assert.Equal(new SheetCellRectangle("dungeon", 1, 0, 1, 1), _browser.MarkedCells);
     }
 
     [Fact]

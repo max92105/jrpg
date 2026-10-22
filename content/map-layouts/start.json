@@ -4844,6 +4844,37 @@
           ]
         }
       ]
+    },
+    {
+      "uid": "villager_1",
+      "objectId": "villager",
+      "position": {
+        "x": 12,
+        "y": 4
+      },
+      "z": 1,
+      "events": [
+        {
+          "id": "villager_1_0",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "Fine weather for a walk.",
+                  "The forest path is west of the village."
+                ],
+                "speaker": "Villager",
+                "portraitFile": null
+              }
+            }
+          ]
+        }
+      ]
     }
   ],
   "cellEvents": [

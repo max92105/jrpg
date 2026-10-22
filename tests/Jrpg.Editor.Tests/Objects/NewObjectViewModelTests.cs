@@ -25,6 +25,6 @@ public sealed class NewObjectViewModelTests
 
         var newObject = new NewObjectViewModel([.. objects.Select(definition => definition.Id)], [.. objects.Select(definition => definition.Category)], _cells);
 
-        Assert.Equal(["Chests", "General", "House"], newObject.Categories);
+        Assert.Equal(["Chests", "General", "House", "NPC"], newObject.Categories);
     }
 }

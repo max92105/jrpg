@@ -12,10 +12,11 @@ namespace Jrpg.Data.Art;
 public static class ArtReferenceCheck
 {
     /// <summary>
-    /// Every tilesheet, the field sprite, every dialogue portrait, every party member's portrait, every item's icon,
-    /// every skill icon named (a skill may have none), every battle sprite, every enemy's portrait, every attack effect
-    /// and every encounter's background exist as PNGs, every tile's cell lies inside its sheet, and every effect strip is
-    /// whole square frames. Skill icons and battle art names must match their files exactly, case included.
+    /// Every tilesheet, the field sprite, every NPC object's field sprite, every dialogue portrait, every party member's
+    /// portrait, every item's icon, every skill icon named (a skill may have none), every battle sprite, every enemy's
+    /// portrait, every attack effect and every encounter's background exist as PNGs, every tile's cell lies inside its
+    /// sheet, and every effect strip is whole square frames. Skill icons, NPC sprites and battle art names must match
+    /// their files exactly, case included.
     /// </summary>
     /// <returns>One line per problem, naming the file; empty when the art is complete.</returns>
     public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string artRoot)
@@ -39,6 +40,8 @@ public static class ArtReferenceCheck
         }
 
         TryReadSize(artRoot, ArtFolders.FieldSprites, catalog.NewGame.FieldSpriteFile, problems);
+        var spriteObjects = catalog.Objects.Values.Where(definition => definition.FieldSpriteFile is not null).OrderBy(definition => definition.Id, StringComparer.Ordinal);
+        AddMissingByExactName(problems, artRoot, ArtFolders.FieldSprites, spriteObjects.Select(definition => (definition.FieldSpriteFile!, $"object '{definition.Id}'")));
         var dialoguePortraits = DialoguePortraits(catalog).Select(named => (named.PortraitFile, $"event '{named.Event.Id}' on map '{named.MapId}'"));
         AddMissing(problems, artRoot, ArtFolders.Portraits, dialoguePortraits);
         var members = catalog.PartyMembers.Values.OrderBy(member => member.Id, StringComparer.Ordinal);

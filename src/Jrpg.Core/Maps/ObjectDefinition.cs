@@ -26,6 +26,12 @@ public sealed record ObjectDefinition
     public required IReadOnlyList<ObjectTile> Tiles { get; init; }
 
     /// <summary>
+    /// The field sprite an NPC is drawn from instead of tiles (ADR 0015), a file in the field-sprite art folder laid out
+    /// like the player's; null for an object drawn from <see cref="Tiles"/>.
+    /// </summary>
+    public string? FieldSpriteFile { get; init; }
+
+    /// <summary>
     /// Outlines of the parts drawn over the player, such as a canopy or a roof, in the same 0..1 coordinates as
     /// <see cref="CollisionPolygon"/>. Empty means the whole object is drawn by depth.
     /// </summary>

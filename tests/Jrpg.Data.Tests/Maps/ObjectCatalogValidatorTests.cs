@@ -23,6 +23,17 @@ public sealed class ObjectCatalogValidatorTests
         AbovePlayerZones = [[new Point2D(0, 0), new Point2D(1, 0), new Point2D(1, 0.5)]],
     };
 
+    // An NPC (ADR 0015): drawn from a field sprite, so no tiles and no zones.
+    private static readonly ObjectDefinition _villager = _chest with
+    {
+        Id = "villager",
+        Height = 1,
+        Category = "NPC",
+        Tiles = [],
+        FieldSpriteFile = "npc_placeholder.png",
+        AbovePlayerZones = [],
+    };
+
     [Fact]
     public void Validate_ValidObjects_DoesNotThrow()
     {
@@ -78,12 +89,38 @@ public sealed class ObjectCatalogValidatorTests
     }
 
     [Fact]
-    public void Validate_NoTiles_ThrowsNamingTheObject()
+    public void Validate_NeitherTilesNorSprite_ThrowsNamingTheObject()
     {
         var exception = Assert.Throws<ContentValidationException>(
             () => ObjectCatalogValidator.Validate(FileName, [_chest with { Tiles = [] }], _tileIds));
 
-        Assert.Equal("objects.json: object 'chest': tiles must not be empty; an object without tiles draws nothing.", exception.Message);
+        Assert.Equal("objects.json: object 'chest': tiles or fieldSpriteFile must be set; an object without either draws nothing.", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_SpriteObjectWithTiles_ThrowsNamingTheObject()
+    {
+        var exception = Assert.Throws<ContentValidationException>(
+            () => ObjectCatalogValidator.Validate(FileName, [_villager with { Tiles = _chest.Tiles }], _tileIds));
+
+        Assert.Equal("objects.json: object 'villager': tiles must be empty for an object with a fieldSpriteFile; it is drawn from the sprite.", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_SpriteObjectWithZones_ThrowsNamingTheObject()
+    {
+        var exception = Assert.Throws<ContentValidationException>(
+            () => ObjectCatalogValidator.Validate(FileName, [_villager with { AbovePlayerZones = _chest.AbovePlayerZones }], _tileIds));
+
+        Assert.Equal("objects.json: object 'villager': abovePlayerZones aren't drawn for a field-sprite object.", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_SpriteObjectWithoutTiles_Passes()
+    {
+        var exception = Record.Exception(() => ObjectCatalogValidator.Validate(FileName, [_villager], _tileIds));
+
+        Assert.Null(exception);
     }
 
     [Fact]

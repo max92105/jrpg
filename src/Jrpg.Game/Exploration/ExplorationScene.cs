@@ -18,9 +18,6 @@ namespace Jrpg.Game.Exploration;
 /// </summary>
 internal sealed class ExplorationScene : IScene
 {
-    // One frame of the legacy sprite sheet, in the image's pixels; equal to a screen cell only by coincidence (question 58).
-    private const int FieldSpriteFramePixels = 48;
-
     // Legacy GameManager: the camera catches up quickly while the player walks and settles gently once they stop.
     private const double WalkingCameraShare = 0.35;
     private const double StandingCameraShare = 0.1;
@@ -160,11 +157,7 @@ internal sealed class ExplorationScene : IScene
         var position = _exploration.PlayerPosition;
         var left = (int)Math.Round((position.X * size) - (size / 2.0) - origin.X);
         var top = (int)Math.Round((position.Y * size) - (size / 2.0) - origin.Y);
-        var source = new Rectangle(
-            _walkAnimation.Frame * FieldSpriteFramePixels,
-            WalkAnimation.RowOf(_exploration.PlayerFacing) * FieldSpriteFramePixels,
-            FieldSpriteFramePixels,
-            FieldSpriteFramePixels);
+        var source = FieldSpriteFrame.SourceOf(_exploration.PlayerFacing, _walkAnimation.Frame);
         batch.Draw(textures.Get(ArtFolders.FieldSprites, _fieldSpriteFile), new Rectangle(left, top, size, size), source, Color.White);
     }
 }

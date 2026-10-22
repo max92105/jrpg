@@ -32,17 +32,27 @@ internal static class ObjectCatalogValidator
         }
 
         return FindOutlineProblem("collisionPolygon", definition.CollisionPolygon)
+            ?? FindLookProblem(definition)
             ?? FindTileProblem(definition, tileIds)
             ?? FindZoneProblem(definition.AbovePlayerZones);
     }
 
-    private static string? FindTileProblem(ObjectDefinition definition, IReadOnlySet<int> tileIds)
+    // An object is drawn from its tiles or from a field sprite (ADR 0015), never both.
+    private static string? FindLookProblem(ObjectDefinition definition)
     {
-        if (definition.Tiles.Count == 0)
+        var hasSprite = definition.FieldSpriteFile is not null;
+        if (hasSprite == (definition.Tiles.Count > 0))
         {
-            return "tiles must not be empty; an object without tiles draws nothing.";
+            return hasSprite
+                ? "tiles must be empty for an object with a fieldSpriteFile; it is drawn from the sprite."
+                : "tiles or fieldSpriteFile must be set; an object without either draws nothing.";
         }
 
+        return hasSprite && definition.AbovePlayerZones.Count > 0 ? "abovePlayerZones aren't drawn for a field-sprite object." : null;
+    }
+
+    private static string? FindTileProblem(ObjectDefinition definition, IReadOnlySet<int> tileIds)
+    {
         var usedCells = new HashSet<(int X, int Y)>();
         foreach (var tile in definition.Tiles)
         {

@@ -2221,5 +2221,32 @@
         }
       ]
     ]
+  },
+  {
+    "id": "villager",
+    "width": 1,
+    "height": 1,
+    "collisionPolygon": [
+      {
+        "x": 0.2,
+        "y": 0.5
+      },
+      {
+        "x": 0.8,
+        "y": 0.5
+      },
+      {
+        "x": 0.8,
+        "y": 1
+      },
+      {
+        "x": 0.2,
+        "y": 1
+      }
+    ],
+    "category": "NPC",
+    "tiles": [],
+    "fieldSpriteFile": "npc_placeholder.png",
+    "abovePlayerZones": []
   }
 ]

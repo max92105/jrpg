@@ -30,10 +30,21 @@ public sealed class ContentCatalogLoaderTests
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-        Assert.Equal(12, catalog.Objects.Count);
+        Assert.Equal(13, catalog.Objects.Count);
         Assert.Equal((4, 4), (catalog.Objects["tree"].Width, catalog.Objects["tree"].Height));
         Assert.Equal(9, catalog.Objects["tree"].CollisionPolygon.Count);
         Assert.Equal(new Point2D(0.4, 0.94375), catalog.Objects["tree"].CollisionPolygon[1]);
+    }
+
+    [Fact]
+    public void Load_RepositoryContent_VillagerUsesThePlaceholderSprite()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        var villager = catalog.Objects["villager"];
+        Assert.Equal("npc_placeholder.png", villager.FieldSpriteFile);
+        Assert.Empty(villager.Tiles);
+        Assert.Contains(catalog.Maps["start"].Layout.Objects, placed => placed.ObjectId == "villager");
     }
 
     [Fact]
@@ -43,7 +54,7 @@ public sealed class ContentCatalogLoaderTests
 
         Assert.Equal(["forest", "interior_1", "start"], catalog.Maps.Keys.Order(StringComparer.Ordinal));
         var start = catalog.Maps["start"];
-        Assert.Equal((45, 45, 55), (start.Layout.Width, start.Layout.Height, start.Layout.Objects.Count));
+        Assert.Equal((45, 45, 56), (start.Layout.Width, start.Layout.Height, start.Layout.Objects.Count));
         Assert.Equal("Interior1", catalog.Maps["interior_1"].Settings.DisplayName);
     }
 

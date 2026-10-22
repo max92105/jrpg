@@ -56,6 +56,13 @@ internal sealed class MapView(MapLayout layout, Func<PlacedObject, ObjectDefinit
             return;
         }
 
+        // An NPC stands still facing down (decisions 127, 128).
+        if (definition.FieldSpriteFile is { } spriteFile)
+        {
+            batch.Draw(textures.Get(ArtFolders.FieldSprites, spriteFile), area, FieldSpriteFrame.SourceOf(Facing.Down, 0), Color.White);
+            return;
+        }
+
         var tiles = definition.Tiles;
         for (var index = 0; index < tiles.Count; index++)
         {

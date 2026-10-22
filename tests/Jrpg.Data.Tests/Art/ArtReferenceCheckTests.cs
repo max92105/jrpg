@@ -75,6 +75,17 @@ public sealed class ArtReferenceCheckTests
     }
 
     [Fact]
+    public void FindProblems_MissingObjectFieldSprite_NamesTheObject()
+    {
+        var villager = _catalog.Objects["villager"] with { FieldSpriteFile = "Gone.png" };
+        var catalog = _catalog with { Objects = new Dictionary<string, ObjectDefinition>(_catalog.Objects) { ["villager"] = villager } };
+
+        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
+
+        Assert.Equal($"field-sprites/Gone.png: not found in {_artRoot}. Named by object 'villager'.", problem);
+    }
+
+    [Fact]
     public void FindProblems_MissingItemIcon_NamesTheItem()
     {
         var potion = _catalog.Items["potion"] with { IconFile = "Gone.png" };

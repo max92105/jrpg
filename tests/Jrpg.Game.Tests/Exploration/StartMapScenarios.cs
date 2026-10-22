@@ -48,6 +48,9 @@ internal static class StartMapScenarios
     public static ContentCatalog BelowTalkingChest { get; } =
         WithChestSaying(BelowChest, new DialogueStep(new Speech(["A voice from the chest.", "It falls silent."])));
 
+    /// <summary>Just below the villager at (12, 4), whose interact event talks, facing it.</summary>
+    public static ContentCatalog BelowVillager { get; } = StartingAt(new Point2D(12.5, 5.6), Facing.Up);
+
     public static InputFrame HoldingLeft { get; } =
         new(MoveIntent.FromAxes(-1, 0), ButtonSet.Empty.With(GameButton.Left), ButtonSet.Empty);
 

@@ -2,19 +2,11 @@ using Jrpg.Core.Party;
 
 namespace Jrpg.Game.Menus;
 
-/// <summary>One member's card in the menu's party sidebar, its texts formatted once.</summary>
-internal sealed record SidebarCard
+/// <summary>
+/// One member's card in the menu's party sidebar, as what it shows that can change. A new record means the card needs
+/// formatting anew; a member's max HP and MP are fixed (<c>Vitals</c> is built once from the definition), so they aren't watched.
+/// </summary>
+internal sealed record SidebarCard(PartyMember Member, int Level, int Hp, int Mp)
 {
-    public required PartyMember Member { get; init; }
-
-    public required string Name { get; init; }
-
-    /// <summary>Such as "Lv 3".</summary>
-    public required string Level { get; init; }
-
-    /// <summary>Such as "HP 45 / 60".</summary>
-    public required string Hp { get; init; }
-
-    /// <summary>Such as "MP 12 / 20".</summary>
-    public required string Mp { get; init; }
+    public static SidebarCard Of(PartyMember member) => new(member, member.Level, member.Vitals.Hp, member.Vitals.Mp);
 }

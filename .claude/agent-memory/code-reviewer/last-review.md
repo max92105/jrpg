@@ -5,12 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-22-demo-retirement/slices/P1.md, slice P1 (party sidebar: PartySidebar, SidebarCard, MenuFrame, IMenuPage.ShowsPartySidebar, GameMenuScene)
+Slice: docs/plans/2026-10-22-demo-retirement/slices/P2.md, slice P2 (party sidebar look: SidebarCard snapshot, PartySidebar.Leader, PartySidebarView, MenuFrame.SidebarView, UiTheme.SidebarPanel)
 Round: 1 (verdict: Ready to commit)
 
-- warning (open): Equipment sheet width jumps when the choice opens: narrower by 484 (sidebar) vs 560 (EquipmentChoiceView.PanelWidth), so the sheet's two columns shrink/shift ~38 px; align widths or keep the sheet width fixed.
-- suggestion (open): the sidebar ignores PageTransition offset/opacity, so it pops in at full opacity while the page slides and fades.
-- follow-up: the 6 clamped-share copies and 2 cubic ease-out copies (backlog) can move to Ui/Easing (carried from T1).
-- follow-up: MainViewModel is 593 lines (carried).
-- follow-up: TileImages.Forget doesn't drop cached sprite frames (carried).
-- follow-up: E12a re-cut stale SelectedCells can reach CreateObject (carried).
+- suggestion (open): PartySidebarView keeps two parallel lists (_formattedFrom, _cards) indexed together; one list of (SidebarCard Source, MemberCardView.Card Card) pairs removes the keep-in-sync risk.
+- suggestion (open): SidebarCard doc says "A new record means the card needs drawing anew"; the view draws every frame, it means formatting anew.
+- follow-up: P1 warning still open: Equipment sheet width jumps when the choice opens (484 vs 560).
+- follow-up: P1 suggestion (sidebar ignores PageTransition opacity) fixed by this slice.
+- follow-up: clamped-share/ease-out copies to Ui/Easing; MainViewModel 593 lines; TileImages.Forget cache; E12a stale SelectedCells (carried).

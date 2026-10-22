@@ -167,6 +167,13 @@ internal static class UiTheme
     public static ImmutableArray<GradientStop> Card { get; } =
         [new(0, FromLegacy(0xE00C0D11)), new(0.6f, FromLegacy(0x990C0D11)), new(1, FromLegacy(0x330C0D11))];
 
+    /// <summary>
+    /// The party sidebar's panel: clear where it meets the page, darkening toward the screen's edge, so the page's art shows
+    /// through (placeholder, in <see cref="Card"/>'s color).
+    /// </summary>
+    public static ImmutableArray<GradientStop> SidebarPanel { get; } =
+        [new(0, FromLegacy(0x000C0D11)), new(0.3f, FromLegacy(0x800C0D11)), new(1, FromLegacy(0xCC0C0D11))];
+
     /// <summary>Legacy <c>Brush.Surface</c>: a <c>GlassPanelStyle</c> panel, such as the equipment choice.</summary>
     public static Color Surface { get; } = FromLegacy(0xC70C0D11);
 

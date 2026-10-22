@@ -42,7 +42,7 @@ internal sealed class SceneFactory
 
     /// <param name="session">The playthrough the header reports on.</param>
     public GameMenuScene CreateGameMenu(GameSession session) =>
-        new(_text, _ui, new MenuFrame(new MenuHeader(_text, session), new PartySidebar(session.Party, _text.Messages)), [new InventoryPage(_text, _ui, session, _catalog), new PartyPage(_text, _ui, session, _catalog), new EquipmentPage(_text, _ui, session, _catalog), new StatusPage(_text, _ui, session, _catalog), new OptionsPage(_text, _ui, _settings), CreateSystemPage(session)]);
+        new(_text, _ui, CreateMenuFrame(session), [new InventoryPage(_text, _ui, session, _catalog), new PartyPage(_text, _ui, session, _catalog), new EquipmentPage(_text, _ui, session, _catalog), new StatusPage(_text, _ui, session, _catalog), new OptionsPage(_text, _ui, _settings), CreateSystemPage(session)]);
 
     /// <param name="session">The playthrough whose active battle the screen shows.</param>
     public BattleScene CreateBattle(GameSession session) => new(session, new BattleSceneSources(_catalog.Items, _saveSlots), _text, _ui);
@@ -53,6 +53,12 @@ internal sealed class SceneFactory
             _art,
             new EventPresenter(exploration, _text, _settings),
             new InteractionPromptView(_text, exploration.CurrentDefinitionOf));
+
+    private MenuFrame CreateMenuFrame(GameSession session)
+    {
+        var sidebar = new PartySidebar(session.Party);
+        return new(new MenuHeader(_text, session), sidebar, new PartySidebarView(sidebar, new MemberCardView(_text, _ui, _catalog), _ui));
+    }
 
     private SystemPage CreateSystemPage(GameSession session) =>
         new(_text, _ui, new SavePage(_saveSlots, session, _text, _ui), new LoadPage(_saveSlots, _text, _ui));

@@ -172,8 +172,13 @@ public sealed class GameMenuSceneTests
     private static GameMenuScene NewMenu(IMenuPage page) =>
         new(RepositoryScreenText.Text, new UiTextures(), FrameOf(NewSession()), [page]);
 
-    private static MenuFrame FrameOf(GameSession session) =>
-        new(new MenuHeader(RepositoryScreenText.Text, session), new PartySidebar(session.Party, RepositoryScreenText.Text.Messages));
+    private static MenuFrame FrameOf(GameSession session)
+    {
+        var sidebar = new PartySidebar(session.Party);
+        var ui = new UiTextures();
+        var cards = new MemberCardView(RepositoryScreenText.Text, ui, StartMapScenarios.BelowClosedDoor);
+        return new(new MenuHeader(RepositoryScreenText.Text, session), sidebar, new PartySidebarView(sidebar, cards, ui));
+    }
 
     private static GameSession NewSession() => GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
 }

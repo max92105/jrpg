@@ -3,11 +3,9 @@ using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Tests.Exploration;
-using Jrpg.Game.Tests.Ui;
 
 namespace Jrpg.Game.Tests.Menus;
 
-[Collection(RepositoryScreenText.CollectionName)]
 public sealed class PartySidebarTests
 {
     private readonly PartyState _party = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1)).Party;
@@ -29,19 +27,6 @@ public sealed class PartySidebarTests
         var sidebar = NewSidebar();
 
         Assert.DoesNotContain(sidebar.Cards, card => _party.ReserveMembers.Contains(card.Member));
-    }
-
-    [Fact]
-    public void Cards_Leader_ShowsLevelAndVitals()
-    {
-        var leader = _party.Leader;
-
-        var card = NewSidebar().Cards[0];
-
-        Assert.Equal(leader.Definition.Name, card.Name);
-        Assert.Equal($"Lv {leader.Level}", card.Level);
-        Assert.Equal($"HP {leader.Vitals.Hp} / {leader.Vitals.MaxHp}", card.Hp);
-        Assert.Equal($"MP {leader.Vitals.Mp} / {leader.Vitals.MaxMp}", card.Mp);
     }
 
     [Fact]
@@ -68,7 +53,7 @@ public sealed class PartySidebarTests
         sidebar.Refresh();
 
         Assert.Same(leaderCard, sidebar.Cards[0]);
-        Assert.Equal($"HP {joining.Vitals.Hp} / {joining.Vitals.MaxHp}", sidebar.Cards[1].Hp);
+        Assert.Equal(joining.Vitals.Hp, sidebar.Cards[1].Hp);
     }
 
     [Fact]
@@ -86,5 +71,5 @@ public sealed class PartySidebarTests
         Assert.Equal([_party.Leader, second, first], sidebar.Cards.Select(card => card.Member));
     }
 
-    private PartySidebar NewSidebar() => new(_party, RepositoryScreenText.Text.Messages);
+    private PartySidebar NewSidebar() => new(_party);
 }

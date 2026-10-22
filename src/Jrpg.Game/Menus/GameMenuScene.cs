@@ -37,15 +37,16 @@ internal sealed class GameMenuScene : IScene
     private const int FooterTextInset = 40;
 
     // The party sidebar (question 145 placeholder, the demo's layout): a 460 px column at the page area's right, 24 px
-    // from the page, cards 12 px apart.
+    // from the page.
     private const int SidebarWidth = 460;
     private const int SidebarGap = 24;
-    private const int SidebarCardGap = 12;
     private static readonly Rectangle _pageAreaBesideSidebar = _pageArea with { Width = _pageArea.Width - SidebarWidth - SidebarGap };
+    private static readonly Rectangle _sidebarColumn = _pageArea with { X = _pageArea.Right - SidebarWidth, Width = SidebarWidth };
 
     private readonly UiTextures _ui;
     private readonly MenuHeader _header;
     private readonly PartySidebar _sidebar;
+    private readonly PartySidebarView _sidebarView;
     private readonly string _menuTitle;
     private readonly ImmutableArray<IMenuPage> _pages;
     private readonly ListCursor _tabs;
@@ -58,13 +59,14 @@ internal sealed class GameMenuScene : IScene
 
     /// <param name="text">Messages and fonts for the tab labels.</param>
     /// <param name="ui">The shared tab and gradient textures.</param>
-    /// <param name="frame">The header bar and the party sidebar.</param>
+    /// <param name="frame">The header bar and the party sidebar with its view.</param>
     /// <param name="pages">One per tab, top to bottom.</param>
     public GameMenuScene(ScreenText text, UiTextures ui, MenuFrame frame, ImmutableArray<IMenuPage> pages)
     {
         _ui = ui;
         _header = frame.Header;
         _sidebar = frame.Sidebar;
+        _sidebarView = frame.SidebarView;
         _menuTitle = text.Messages.Text(MessageIds.MenuTitle);
         _pages = pages;
         _tabs = new ListCursor(pages.Length, _ => true);
@@ -112,27 +114,10 @@ internal sealed class GameMenuScene : IScene
 
         if (ShowsSidebar)
         {
-            DrawSidebar(batch, opacity);
+            _sidebarView.Draw(batch, textures, _sidebarColumn, opacity * _pageTransition.Opacity);
         }
 
         DrawFooterHint(batch, opacity);
-    }
-
-    // Plain text for now: name, level, HP and MP, one line each, a card under the other.
-    private void DrawSidebar(SpriteBatch batch, float opacity)
-    {
-        var left = _pageArea.Right - SidebarWidth;
-        var top = (float)_pageArea.Y;
-        var cards = _sidebar.Cards;
-        for (var index = 0; index < cards.Count; index++)
-        {
-            var card = cards[index];
-            batch.DrawString(_font, card.Name, new Vector2(left, top), UiTheme.TextPrimary * opacity);
-            batch.DrawString(_font, card.Level, new Vector2(left, top + _font.LineHeight), UiTheme.TextSecondary * opacity);
-            batch.DrawString(_font, card.Hp, new Vector2(left, top + (2 * _font.LineHeight)), UiTheme.TextPrimary * opacity);
-            batch.DrawString(_font, card.Mp, new Vector2(left, top + (3 * _font.LineHeight)), UiTheme.TextPrimary * opacity);
-            top += (4 * _font.LineHeight) + SidebarCardGap;
-        }
     }
 
     private void DrawFooterHint(SpriteBatch batch, float opacity)

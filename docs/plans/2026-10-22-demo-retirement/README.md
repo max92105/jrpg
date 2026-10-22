@@ -76,7 +76,7 @@ H1 and T1 come from the plan review, not from the developer's answers. Strike ei
 - [x] **H1. The footer hint line** (Game + content, about 180 lines) → [slices/H1.md](slices/H1.md)
 - [x] **T1. Page transition: slide and fade** (Game, about 120 lines) → [slices/T1.md](slices/T1.md)
 - [x] **P1. The party sidebar: which pages, plain cards** (Game, about 220 lines) → [slices/P1.md](slices/P1.md)
-- [ ] **P2. The party sidebar's look** (Game, about 150 lines) → [slices/P2.md](slices/P2.md)
+- [x] **P2. The party sidebar's look** (Game, about 150 lines) → [slices/P2.md](slices/P2.md)
 - [ ] **Q1. Core: what can be taken from whom, and taking it** (Core, about 170 lines) → [slices/Q1.md](slices/Q1.md)
 - [ ] **Q2. The equipment list offers one row per wearer, and Confirm takes it** (Game + content, about 200 lines) → [slices/Q2.md](slices/Q2.md)
 

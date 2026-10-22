@@ -7,13 +7,12 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// The active party's panels at the top right (legacy <c>CharacterPanel</c>): the name, large HP over its maximum and a
-/// thin bar, then a narrower MP row, beside a diamond portrait. The acting member's panel slides left; a fallen member's
-/// is dimmed, its HP in red.
+/// The active party's panels at the top right: the name, large HP over its maximum and a thin bar, then a narrower MP
+/// row, beside a diamond portrait. The acting member's panel slides left; a fallen member's is dimmed, its HP in red.
 /// </summary>
 internal sealed class PartyStatusView
 {
-    // Legacy CharacterPanel and its container, in 1920 x 1080 units.
+    // Placeholder layout on the 1920 x 1080 virtual screen (decision 56).
     private const int RightMargin = 40;
     private const int TopMargin = 24;
     private const int PanelGap = 14;

@@ -2,7 +2,7 @@ using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Battle;
 
-/// <summary>How one vital's row looks in a battle panel (legacy <c>CharacterPanel</c>'s HP or MP row).</summary>
+/// <summary>How the HP or MP row of a battle panel looks.</summary>
 /// <param name="Label">The small "HP" or "MP" font.</param>
 /// <param name="Value">The large current value's font.</param>
 /// <param name="Max">The small "/max" font.</param>

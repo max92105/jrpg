@@ -5,8 +5,8 @@ using Jrpg.Game.Scenes;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// What a won battle gave, over the frozen battle (legacy <c>VictoryScreen</c>): each standing member's bar filling level
-/// by level. Confirm skips the filling; Confirm once it's done leaves the battle. <see cref="VictoryScreenView"/> draws it.
+/// What a won battle gave, over the frozen battle: each standing member's bar filling level by level. Confirm skips the
+/// filling; Confirm once it's done leaves the battle. <see cref="VictoryScreenView"/> draws it.
 /// </summary>
 internal sealed class VictoryScreen
 {

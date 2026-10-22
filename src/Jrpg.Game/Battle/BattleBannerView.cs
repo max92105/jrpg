@@ -7,12 +7,12 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Draws the banner (legacy <c>BattleBanner</c>): centered 190 px from the top, the message on a dark band that fades out
-/// at both ends, between two bright hairlines.
+/// Draws the banner: centered 190 px from the top, the message on a dark band that fades out at both ends, between two
+/// bright hairlines.
 /// </summary>
 internal sealed class BattleBannerView
 {
-    // Legacy BattleBanner and its place in BattleUI.
+    // Placeholder layout on the 1920 x 1080 virtual screen (decision 56).
     private const int Top = 190;
     private const int PaddingX = 120;
     private const int PaddingY = 10;

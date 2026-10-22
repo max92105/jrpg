@@ -1,8 +1,8 @@
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// The ribbon at the top of the battle (legacy <c>BattleBanner</c>): a short message fades in over 0.15 s, holds 1.2 s,
-/// then fades out over 0.3 s. Pure timing; <see cref="BattleBannerView"/> draws it.
+/// The ribbon at the top of the battle: a short message fades in over 0.15 s, holds 1.2 s, then fades out over 0.3 s.
+/// Pure timing; <see cref="BattleBannerView"/> draws it.
 /// </summary>
 internal sealed class BattleBanner
 {

@@ -8,9 +8,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Draws every living battler at its spot in the formation, centered on it with its feet on the spot's bottom, the actor
-/// stepped out toward the other side. Whoever falls is lit white, then fades out, as legacy <c>AnimateDeath</c> did for any
-/// combatant.
+/// Draws every living battler at its spot in the formation, centered on it with its feet on the spot's bottom, the
+/// actor stepped out toward the other side. Whoever falls, party member or enemy, is lit white, then fades out.
 /// </summary>
 internal sealed class BattlersView
 {

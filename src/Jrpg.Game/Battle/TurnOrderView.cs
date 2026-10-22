@@ -7,12 +7,12 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// The turn order at the top left (legacy <c>TurnOrderBar</c>): the acting combatant in a big diamond with a bright
-/// second frame, then "NEXT" over the upcoming turns in small diamonds that touch, like beads on a thin line.
+/// The turn order at the top left: the acting combatant in a big diamond with a bright second frame, then "NEXT" over
+/// the upcoming turns in small diamonds that touch, like beads on a thin line.
 /// </summary>
 internal sealed class TurnOrderView
 {
-    // Legacy TurnOrderBar and its place in BattleUI, in 1920 x 1080 units.
+    // Placeholder layout on the 1920 x 1080 virtual screen (decision 56).
     private const int Left = 24;
     private const int Top = 20;
     private const int CurrentSize = 140;

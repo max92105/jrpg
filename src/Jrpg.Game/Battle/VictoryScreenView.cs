@@ -8,13 +8,13 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Draws the victory screen (legacy <c>VictoryScreen.xaml</c> and <c>ExpGainRow.xaml</c>, leaning toward
-/// <c>Victory_Menu.jpg</c>): the battle shaded dark on the left, "Victory!" over a hairline, one pointed bar per reward,
-/// then the members' cards in two columns, each with a pointed name tab, the level, "EXP n/m" and a gold bar.
+/// Draws the victory screen (leaning toward the <c>Victory_Menu.jpg</c> reference): the battle shaded dark on the left,
+/// "Victory!" over a hairline, one pointed bar per reward, then the members' cards in two columns, each with a pointed
+/// name tab, the level, "EXP n/m" and a gold bar.
 /// </summary>
 internal sealed class VictoryScreenView
 {
-    // Legacy VictoryScreen.xaml, ExpGainRow.xaml and OutcomeTitleStyle, in 1920 x 1080 units.
+    // Placeholder layout on the 1920 x 1080 virtual screen (decision 56).
     private const int TitleLeft = 104;
     private const int TitleTop = 112;
     private const int TitleLineLeft = 96;

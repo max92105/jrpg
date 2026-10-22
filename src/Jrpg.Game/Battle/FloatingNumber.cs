@@ -4,8 +4,8 @@ using Jrpg.Core.Effects;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// An amount that pops over its target when an effect lands (legacy <c>FloatingText</c>): it grows from 60 % to full size
-/// in 0.18 s, rises 50 px over 1.6 s, easing out, and fades over the second half of that.
+/// An amount that pops over its target when an effect lands: it grows from 60 % to full size in 0.18 s, rises 50 px
+/// over 1.6 s, easing out, and fades over the second half of that.
 /// </summary>
 /// <param name="Target">Who the effect landed on.</param>
 /// <param name="Text">The amount, formatted once when the playback starts.</param>

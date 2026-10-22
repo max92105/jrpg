@@ -7,10 +7,10 @@ using Jrpg.Game.Ui;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// The acting party member's command choice, from the list down to a target (legacy <c>CommandPanel</c>). Attack opens
-/// the target cursor on Core's legal targets; Skills and Items open the actor's skills or the party's consumables, and
-/// a usable one its targets; Defend and Run act at once. Cancel steps back one level; on the list it does nothing: there
-/// is no menu in battle (decision 50).
+/// The acting party member's command choice, from the list down to a target. Attack opens the target cursor on Core's
+/// legal targets; Skills and Items open the actor's skills or the party's consumables, and a usable one its targets;
+/// Defend and Run act at once. Cancel steps back one level; on the list it does nothing: there is no menu in battle
+/// (decision 50).
 /// </summary>
 internal sealed class CommandMenu
 {

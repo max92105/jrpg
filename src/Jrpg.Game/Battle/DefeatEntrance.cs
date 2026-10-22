@@ -1,9 +1,9 @@
 namespace Jrpg.Game.Battle;
 
-/// <summary>How the defeat screen comes in (legacy <c>DefeatScreen.Show</c>): the title fades in slowly, then the choices.</summary>
+/// <summary>How the defeat screen comes in: the title fades in slowly, then the choices.</summary>
 internal sealed class DefeatEntrance
 {
-    // Legacy TitleFade, ChoicesDelay and the choices' 0.3 s fade.
+    // Placeholder timing: the title's fade, the choices' delay and their 0.3 s fade.
     private static readonly TimeSpan _titleFade = TimeSpan.FromSeconds(0.6);
     private static readonly TimeSpan _choicesDelay = TimeSpan.FromSeconds(0.7);
     private static readonly TimeSpan _choicesFade = TimeSpan.FromSeconds(0.3);

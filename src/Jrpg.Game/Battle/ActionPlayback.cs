@@ -14,7 +14,7 @@ namespace Jrpg.Game.Battle;
 /// </summary>
 internal sealed class ActionPlayback
 {
-    // Legacy AnimateDeath: the fallen stay lit white for 1.0 s, then fade out over 1.0 s, easing in.
+    // Placeholder timing: the fallen stay lit white for 1.0 s, then fade out over 1.0 s, easing in.
     private static readonly TimeSpan _fallTint = TimeSpan.FromSeconds(1.0);
     private static readonly TimeSpan _fallFade = TimeSpan.FromSeconds(1.0);
 

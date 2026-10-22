@@ -10,7 +10,7 @@ namespace Jrpg.Game.Battle;
 /// <param name="IsShrunkSmoothly">Whether it is drawn from a smoothly shrunk copy rather than the source itself.</param>
 internal readonly record struct BattlerScaling(Point DrawnSize, bool IsShrunkSmoothly)
 {
-    /// <summary>The square a painting is shrunk to, the legacy sprite size.</summary>
+    /// <summary>The square a painting is shrunk to, the battle's sprite size (placeholder).</summary>
     public const int PaintingSize = BattleLayout.SpotSize;
 
     // Paintings are 1024 px and the pixel art about 256 px; anything past this is treated as painted.

@@ -5,9 +5,8 @@ using Jrpg.Game.Ui;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// One combatant's HP and MP as the battle screen writes them (legacy <c>CharacterPanel</c>): each value large, its
-/// maximum small after it as "/max". A string is formatted again only when its number changed, so refreshing every
-/// update allocates nothing.
+/// One combatant's HP and MP as the battle screen writes them: each value large, its maximum small after it as "/max".
+/// A string is formatted again only when its number changed, so refreshing every update allocates nothing.
 /// </summary>
 internal sealed class VitalsText(UiMessages messages)
 {

@@ -3,10 +3,10 @@ using Jrpg.Game.Scenes;
 
 namespace Jrpg.Game.Battle;
 
-/// <summary>"Escaped" over the battle after a successful Run (legacy <c>ShowEscaped</c>): it leaves by itself, or on Confirm.</summary>
+/// <summary>"Escaped" over the battle after a successful Run: it leaves by itself, or on Confirm.</summary>
 internal sealed class EscapedNotice
 {
-    // Legacy EscapedDisplayTime.
+    // How long it stays (placeholder).
     private static readonly TimeSpan _displayTime = TimeSpan.FromSeconds(1.5);
 
     private TimeSpan _elapsed;

@@ -1,12 +1,13 @@
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// How the victory screen comes in (legacy <c>VictoryScreen.Show</c> and <c>ExpGainRow.Appear</c>): the title slides in,
-/// then the reward bar fades in, then the cards one after another, and after a pause the bars start filling.
+/// How the victory screen comes in: the title slides in, then the reward bar fades in, then the cards one after
+/// another, and after a pause the bars start filling.
 /// </summary>
 internal sealed class VictoryEntrance
 {
-    // Legacy TitleDuration, RewardDelay, FirstCardDelay, CardStagger, PauseBeforeExp and the 0.3 s fades.
+    // Placeholder timing: the title, the reward bar's delay, the first card's delay, the stagger between cards, the
+    // pause before the bars fill, and the 0.3 s fades.
     private static readonly TimeSpan _titleTime = TimeSpan.FromSeconds(0.45);
     private static readonly TimeSpan _rewardDelay = TimeSpan.FromSeconds(0.25);
     private static readonly TimeSpan _firstCardDelay = TimeSpan.FromSeconds(0.45);
@@ -55,6 +56,6 @@ internal sealed class VictoryEntrance
 
     private static float ShareOf(TimeSpan time, TimeSpan length) => Math.Clamp((float)(time / length), 0, 1);
 
-    // Legacy CubicEase, EaseOut: fast at first, settling at the end.
+    // A cubic ease-out: fast at first, settling at the end.
     private static float EaseOut(float share) => 1 - MathF.Pow(1 - share, 3);
 }

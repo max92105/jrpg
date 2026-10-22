@@ -7,13 +7,13 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Draws the defeat screen (legacy <c>DefeatScreen.xaml</c>, in the victory screen's frame): the battle shaded dark on the
-/// left, a red "Defeat" over a hairline, "The party has fallen.", the choices on pointed bars with the selected one lit
-/// and pointed at, and the footer. The save list opens over it all.
+/// Draws the defeat screen (in the victory screen's frame): the battle shaded dark on the left, a red "Defeat" over a
+/// hairline, "The party has fallen.", the choices on pointed bars with the selected one lit and pointed at, and the
+/// footer. The save list opens over it all.
 /// </summary>
 internal sealed class DefeatScreenView
 {
-    // Legacy DefeatScreen.xaml, OutcomeTitleStyle and OutcomeChoiceStyle, in 1920 x 1080 units.
+    // Placeholder layout on the 1920 x 1080 virtual screen (decision 56), matching the victory screen's title and bars.
     private const int TitleLeft = 104;
     private const int TitleTop = 112;
     private const int TitleLineLeft = 96;

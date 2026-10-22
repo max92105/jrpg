@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-22-demo-retirement/slices/W2.md, slice W2 (remove the word "legacy" from Game Ui/ comments; FromLegacy -> FromStraightArgb; two test renames)
+Slice: docs/plans/2026-10-22-demo-retirement/slices/W3.md, slice W3 (remove "legacy" from Game Battle/ comments and the two entrance test headers)
 Round: 1 (verdict: Ready to commit)
 
-- warning (open): UiTheme.cs Highlight vs SelectedRow summaries now nearly identical ("The selected list row" / "The selected row of a menu list"); Highlight's only user is SaveSlotListView -> name the save file list.
-- suggestion (open): UiTheme.Surface "A translucent side panel, such as the equipment choice" - PartyActionChoiceView also uses it as a small panel over a card; drop "side".
-- suggestion (open): MemberCardView.cs:22 line is 130 chars (file wraps at 120); Height summary "With 12 px of padding..." doesn't say it's the card's height.
-- suggestion (open): GradientStrip/OutlinedFont/ConfirmPrompt summaries left short first lines after the cut; rewrap ("from left / to right" reads dangling).
-- follow-up: src/Jrpg.Game/Exploration/FieldSpriteFrame.cs:12 still says "legacy sheet" (later slice).
+- warning (open): VictoryScreenView.cs:11 summary line is 176 chars (cut joined two lines); rewrap at 120.
+- warning (open): other lines over 120: TurnDiamondView.cs:15 (128), VictoryEntrance.cs:8 (122), BattlePacing.cs:4 (121); plus ~13 short first lines after "(legacy X)" cuts left unrewrapped (BattleBanner, BattleBannerView, BattleLayout, CommandMenu, CommandPanelPlacement, DefeatScreen, DefeatScreenView, PartyStatusView, TurnDiamondView, TurnOrderView, VictoryEntrance, VictoryScreen, VitalsText, FloatingNumber, FloatingNumbersView, EnemyTagView ok).
+- suggestion (open): DefeatScreenView.cs:16 "sharing the victory screen's title and bars" - title constants are copies with equal values, only the bar shape is shared; say "matching".
+- suggestion (open): VitalRowStyle.cs:5 "in a battle panel: its HP or MP row" - "its" dangles; "the HP or MP row of a party panel".
+- follow-up: decision 56 text itself still says "legacy layout and pacing" (done plan, outside slice).

@@ -5,12 +5,12 @@ using Microsoft.Xna.Framework;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Where each battler stands (legacy <c>BattleUI</c>): enemies on the left, the party on the right, each row higher up
-/// and shifted sideways for depth. A spot is the square a battler stands in, feet on its bottom edge.
+/// Where each battler stands: enemies on the left, the party on the right, each row higher up and shifted sideways for
+/// depth. A spot is the square a battler stands in, feet on its bottom edge.
 /// </summary>
 internal static class BattleLayout
 {
-    // Legacy BattleUI constants, in its 1920 x 1080 units.
+    // Placeholder layout on the 1920 x 1080 virtual screen (decision 56).
     public const int SpotSize = 96;
     private const int RowSpacing = SpotSize + 40;
     private const int RowShift = 50;

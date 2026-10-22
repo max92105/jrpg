@@ -1,8 +1,8 @@
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// How long each part of a turn takes on screen (legacy <c>BattleUI</c>: <c>StepDuration</c> and its delays). Placeholders
-/// until a battle-speed option exists.
+/// How long each part of a turn takes on screen: a step and its delays. Placeholders until a battle-speed option
+/// exists.
 /// </summary>
 internal static class BattlePacing
 {

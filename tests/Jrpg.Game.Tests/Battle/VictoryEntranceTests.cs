@@ -2,7 +2,7 @@ using Jrpg.Game.Battle;
 
 namespace Jrpg.Game.Tests.Battle;
 
-// Legacy VictoryScreen: the title over 0.45 s, the reward bar after 0.25 s, the first card after 0.45 s and the next
+// The placeholder timing: the title over 0.45 s, the reward bar after 0.25 s, the first card after 0.45 s and the next
 // 0.1 s apart, each fading in over 0.3 s; the bars fill 0.5 s after one more stagger past the last card's start.
 public sealed class VictoryEntranceTests
 {

@@ -6,9 +6,9 @@ using Jrpg.Game.Ui;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// The lost battle's choices over the frozen battle (legacy <c>DefeatScreen</c>, decision 65): load the latest save, pick
-/// one from the save list, or end the session for the title. The choices take input once they have come in.
-/// <see cref="DefeatScreenView"/> draws it.
+/// The lost battle's choices over the frozen battle (decision 65): load the latest save, pick one from the save list,
+/// or end the session for the title. The choices take input once they have come in. <see cref="DefeatScreenView"/>
+/// draws it.
 /// </summary>
 internal sealed class DefeatScreen
 {

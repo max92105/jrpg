@@ -12,7 +12,7 @@ namespace Jrpg.Game.Battle;
 /// </summary>
 internal sealed class BattleVitalRow
 {
-    // Legacy margins: 10 px between the label and the value, 2 px before the maximum.
+    // Placeholder margins: 10 px between the label and the value, 2 px before the maximum.
     private const int LabelGap = 10;
     private const int MaxGap = 2;
     private const int BarHeight = 3;

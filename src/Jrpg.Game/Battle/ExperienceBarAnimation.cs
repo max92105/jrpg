@@ -3,12 +3,12 @@ using Jrpg.Core.Progression;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// One member's experience bar on the victory screen, filling through the level steps their gain produced, one after the
-/// other (legacy <c>ExpGainRow</c>).
+/// One member's experience bar on the victory screen, filling through the level steps their gain produced, one after
+/// the other.
 /// </summary>
 internal sealed class ExperienceBarAnimation
 {
-    // Legacy ExpGainRow: a full level fills in 1.1 s, and no step is quicker than 0.2 s so a small gain still shows.
+    // Placeholder timing: a full level fills in 1.1 s, and no step is quicker than 0.2 s so a small gain still shows.
     private static readonly TimeSpan _fullLevelTime = TimeSpan.FromSeconds(1.1);
     private static readonly TimeSpan _minimumStepTime = TimeSpan.FromSeconds(0.2);
 

@@ -13,13 +13,13 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// The battle screen over the map (ADR 0013): the encounter's background, the battlers, the HUD and the commands.
-/// When the battle is over it finishes it in the session once and asks the flow, once, to go back to the map (or to the
+/// The battle screen over the map (ADR 0013): the encounter's background, the battlers, the HUD and the commands. When
+/// the battle is over it finishes it in the session once and asks the flow, once, to go back to the map (or to the
 /// title after a defeat).
 /// </summary>
 internal sealed class BattleScene : IScene
 {
-    // Legacy EscapedScreen: "Escaped" at 64 px on a band padded 18 px.
+    // "Escaped" at 64 px on a band padded 18 px (placeholder look).
     private const int EscapedTextPixels = 64;
     private const int EscapedPaddingY = 18;
 
@@ -214,7 +214,7 @@ internal sealed class BattleScene : IScene
         _defeatView = new DefeatScreenView(_defeat, _text, _ui);
     }
 
-    // Legacy EscapedScreen: the battle under a scrim, and "Escaped" on a banner band across the middle of the screen.
+    // The battle under a scrim, and "Escaped" on a banner band across the middle of the screen.
     private void DrawEscaped(SpriteBatch batch, TextureLibrary textures)
     {
         batch.Draw(textures.Pixel, new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height), UiTheme.Scrim);
@@ -227,7 +227,7 @@ internal sealed class BattleScene : IScene
         batch.DrawString(_escapedFont, _escapedText.Text, new Vector2(band.Center.X - (_escapedText.Width / 2), band.Y + EscapedPaddingY), UiTheme.TextPrimary);
     }
 
-    // Legacy BattleUI's backdrop: the picture, the vignette over the whole screen, and the shade across the top.
+    // The backdrop: the picture, the vignette over the whole screen, and the shade across the top.
     private void DrawBackdrop(SpriteBatch batch, TextureLibrary textures)
     {
         CoverFit.DrawOverScreen(batch, textures.Get(ArtFolders.Backgrounds, _backgroundFile), Color.White);

@@ -7,12 +7,12 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// One combatant in a turn order diamond (legacy <c>TurnPortrait</c>, drawn on a 48 unit grid): a dark backdrop, red in
-/// its lower half for an enemy, the portrait cut to a diamond, and a hairline frame. Dimmed when the strip doesn't light it.
+/// One combatant in a turn order diamond (drawn on a 48 unit grid): a dark backdrop, red in its lower half for an
+/// enemy, the portrait cut to a diamond, and a hairline frame. Dimmed when the strip doesn't light it.
 /// </summary>
 internal sealed class TurnDiamondView
 {
-    // Legacy TurnPortrait's grid: the backdrop reaches 22 of 24 units, the portrait is 40 of 48, frames are 1 unit thick.
+    // The diamond's grid (placeholder): backdrop 22 of 24 units, portrait 40 of 48, frames 1 unit thick.
     private const float BackdropReach = 22 / 24f;
     private const float FrameThickness = 1 / 24f;
     private const float PortraitShare = 40 / 48f;

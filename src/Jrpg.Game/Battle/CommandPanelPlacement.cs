@@ -4,14 +4,14 @@ using Microsoft.Xna.Framework;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Where the command panel goes for the acting member (legacy <c>BattleUI.UpdateCommandBox</c>): left of their spot, its
-/// top a sprite's height above them, kept below the HUD and above the screen's bottom.
+/// Where the command panel goes for the acting member: left of their spot, its top a sprite's height above them, kept
+/// below the HUD and above the screen's bottom.
 /// </summary>
 internal static class CommandPanelPlacement
 {
     public const int Width = 360;
 
-    // Legacy CommandGap, CommandMinTop and CommandMaxHeight.
+    // Placeholder gap, highest top and tallest panel on the 1920 x 1080 virtual screen.
     private const int ActorGap = 40;
     private const int MinTop = 260;
     private const int MaxHeight = 420;

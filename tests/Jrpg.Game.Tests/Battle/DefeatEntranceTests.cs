@@ -2,7 +2,7 @@ using Jrpg.Game.Battle;
 
 namespace Jrpg.Game.Tests.Battle;
 
-// Legacy DefeatScreen: the title fades in over 0.6 s; the choices fade in over 0.3 s from 0.7 s.
+// The placeholder timing: the title fades in over 0.6 s; the choices fade in over 0.3 s from 0.7 s.
 public sealed class DefeatEntranceTests
 {
     private readonly DefeatEntrance _entrance = new();

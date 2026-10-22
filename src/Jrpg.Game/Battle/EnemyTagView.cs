@@ -7,12 +7,12 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Under each living enemy, its shown name and a thin red HP bar (legacy <c>EnemyTag</c>), on the left edge of its spot.
-/// A fallen enemy's tag fades out with it.
+/// Under each living enemy, its shown name and a thin red HP bar, on the left edge of its spot. A fallen enemy's tag
+/// fades out with it.
 /// </summary>
 internal sealed class EnemyTagView
 {
-    // Legacy EnemyTag and BattleUI.EnemyTagGap: the tag's bottom sits 38 px below the sprite's.
+    // Placeholder layout: the tag's bottom sits 38 px below the sprite's.
     private const int TagWidth = 160;
     private const int NamePixels = 16;
     private const int NameGap = 3;

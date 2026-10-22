@@ -1,4 +1,4 @@
-- [Migration roadmap](project_migration_roadmap.md) — parts 1-3a done; battle retro run; editor plan 2026-10-21 approved (ADR 0014-0015 reserved); next number 133, ADR 0016
+- [Migration roadmap](project_migration_roadmap.md) — parts 1-3a done; battle retro run; editor plan 2026-10-21 done (Z skipped; ADR 0014, 0015); next number 133, ADR 0016
 - [Legacy content quirks](project_legacy_content_quirks.md) — "x,y" points, keyed tileset, GIF VFX, XAML icons, 1024 px party battlers, goblin.png case
 - [Type/folder name clash](feedback_type_folder_name_clash.md) — never name a type after its feature folder (CA1724); use PartyState/BattleState
 - [Plan lessons](feedback_plan_lessons.md) — slice sizes, folder-dependency tables, no-caller APIs, presenter/draw split, packages are questions

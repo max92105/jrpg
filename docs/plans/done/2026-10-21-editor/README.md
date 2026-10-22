@@ -1,5 +1,5 @@
 # Editor: tilesheets, collision, above-player zones and NPCs
-Status: approved, in progress
+Status: done
 
 The editor plan of part 3 (the "part 3c" notes at the end of `done/2026-10-18-shell-cutover-and-map-editing.md`, slices 11k-11n and 12). Names and question numbers are reused from there where still valid (69, 70, 71).
 
@@ -116,7 +116,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **E13b. Dark theme** (Editor, about 230 lines) → [slices/E13b.md](slices/E13b.md)
 - [x] **E13c. Dark templates: combo boxes, scroll bars, tool bar overflow** (Editor, about 200 lines; split from E13b) → [slices/E13c.md](slices/E13c.md)
 - [x] **E12c. Selecting sheet cells by dragging, and making an object from them there** (Editor, about 100 lines; from the developer's feedback) → [slices/E12c.md](slices/E12c.md)
-- [ ] **Z. Editor session check** (manual) → [slices/Z.md](slices/Z.md)
+- [ ] **Z. Editor session check** (manual) → [slices/Z.md](slices/Z.md): skipped; the developer closed the plan without the hand session check (2026-10-22)
 
 ## Decisions
 Developer's answers (2026-10-21). Earlier decisions that apply: 47 `CommunityToolkit.Mvvm` (ADR 0012); 72, 73 the legacy MapEditor is reference only, under `legacy/`; placeholders still in use from part 3a: 70 (map ids fixed at creation), 71 (legacy layer presets plus a free Z).

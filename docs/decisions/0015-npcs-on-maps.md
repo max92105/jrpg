@@ -4,7 +4,7 @@ Status: accepted
 Date: 2026-10-22
 
 ## Context
-The editor plan (`docs/plans/2026-10-21-editor/`, slices N1-N3) adds NPCs: characters the player sees on a map and talks to. Nothing models them today. A map already places objects (`PlacedObject`, drawn from sheet tiles, with a collision outline). Objects already carry events, and an `Interact` event with a `Dialogue` step is a conversation. The only field sprite is `content/art/field-sprites/player.png`: 48 px frames, 8 per row, one row per facing.
+The editor plan (`docs/plans/done/2026-10-21-editor/`, slices N1-N3) adds NPCs: characters the player sees on a map and talks to. Nothing models them today. A map already places objects (`PlacedObject`, drawn from sheet tiles, with a collision outline). Objects already carry events, and an `Interact` event with a `Dialogue` step is a conversation. The only field sprite is `content/art/field-sprites/player.png`: 48 px frames, 8 per row, one row per facing.
 
 The question is **how an NPC is modelled in content**.
 

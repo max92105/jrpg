@@ -17,3 +17,4 @@ Part of [the editor plan](../README.md). Design: [design.md](../design.md).
   - [ ] **Game (F5):** the new sheet's tiles draw; the above-player layer covers the player; blocked tiles block; outlines block where drawn; canopies cover the player where drawn and nowhere else; both NPCs stand, block at their feet and say their own lines.
   - [ ] Revert the session's content changes (or keep the useful ones as their own commit).
   - [ ] Fill in "Done, with deviations" on each slice.
+- **Skipped (2026-10-22):** the developer closed the plan after the retro without this session check; its hand checks, and those left open in earlier slices, were not run.

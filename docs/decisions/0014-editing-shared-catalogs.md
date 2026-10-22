@@ -4,7 +4,7 @@ Status: accepted
 Date: 2026-10-21
 
 ## Context
-The editor plan (`docs/plans/2026-10-21-editor/`) makes the editor change the catalogs that every map shares, not only maps. Painting creates tiles in `tiles.json`, sheets are set up and re-cut in `tilesheets.json`, and objects get collision outlines and above-player zones in `objects.json`. Today the editor holds the catalog read-only (`MainViewModel.Catalog`), and only maps have unsaved state, undo (`EditHistory` per map, ADR 0012) and a validated write (`ContentWriter.WriteMap`).
+The editor plan (`docs/plans/done/2026-10-21-editor/`) makes the editor change the catalogs that every map shares, not only maps. Painting creates tiles in `tiles.json`, sheets are set up and re-cut in `tilesheets.json`, and objects get collision outlines and above-player zones in `objects.json`. Today the editor holds the catalog read-only (`MainViewModel.Catalog`), and only maps have unsaved state, undo (`EditHistory` per map, ADR 0012) and a validated write (`ContentWriter.WriteMap`).
 
 The question is **how catalog edits are held, saved and undone**. Constraints:
 - content lives only in `content/`, written through Data, and the editor never writes what the game would reject (ADR 0011);

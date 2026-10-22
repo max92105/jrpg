@@ -15,6 +15,8 @@ internal sealed class CountingMenuPage : IMenuPage
 
     public string TitleMessageId => MessageIds.MenuStatus;
 
+    public string Hint => "Counting page hint";
+
     public bool LeavesOnCancel => true;
 
     public void Open() => OpenCount++;

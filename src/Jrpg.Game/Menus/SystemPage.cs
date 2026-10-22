@@ -18,6 +18,7 @@ internal sealed class SystemPage : IMenuPage
     private readonly ImmutableArray<Entry> _entries;
     private readonly ListCursor _cursor;
     private readonly UiMessages _messages;
+    private readonly string _ownHint;
     private readonly SpriteFontBase _font;
     private readonly string[] _labels;
     private readonly ConfirmPromptView _promptView;
@@ -30,6 +31,7 @@ internal sealed class SystemPage : IMenuPage
     /// <param name="loadPage">Shown in this page's place while the player picks a save to load.</param>
     public SystemPage(ScreenText text, UiTextures ui, SavePage savePage, LoadPage loadPage)
     {
+        _ownHint = text.Messages.Text(MessageIds.MenuHintSystem);
         // Legacy System menu order; Options comes in P5.
         _entries =
         [
@@ -46,6 +48,9 @@ internal sealed class SystemPage : IMenuPage
     }
 
     public string TitleMessageId => MessageIds.MenuSystem;
+
+    /// <summary>The open save files' hint while they show in this page's place.</summary>
+    public string Hint => _openFiles?.Hint ?? _ownHint;
 
     /// <summary>
     /// False while a question is open, which Cancel answers No, or while the save files are open, where Cancel goes back to the entries.

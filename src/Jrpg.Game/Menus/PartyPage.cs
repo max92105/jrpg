@@ -40,6 +40,7 @@ internal sealed class PartyPage : IMenuPage
     /// <param name="catalog">Class names and how many members can be active.</param>
     public PartyPage(ScreenText text, UiTextures ui, GameSession session, ContentCatalog catalog)
     {
+        Hint = text.Messages.Text(MessageIds.MenuHintParty);
         _party = session.Party;
         _messages = text.Messages;
         _columnsView = new PartyColumnsView(text, ui, catalog);
@@ -49,6 +50,8 @@ internal sealed class PartyPage : IMenuPage
     }
 
     public string TitleMessageId => MessageIds.MenuParty;
+
+    public string Hint { get; }
 
     /// <summary>False while the actions are offered or a place is being picked: Cancel backs out of those first.</summary>
     public bool LeavesOnCancel => _actionChoice is null && MovingMember is null;

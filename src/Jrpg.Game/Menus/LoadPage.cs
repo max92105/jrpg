@@ -22,6 +22,8 @@ internal sealed class LoadPage(SaveSlots slots, ScreenText text, UiTextures ui) 
     /// <summary>The files as last read; empty until the page is opened.</summary>
     public IReadOnlyList<SaveSlotEntry> Entries => _panel.Entries;
 
+    public string Hint { get; } = text.Messages.Text(MessageIds.MenuHintLoad);
+
     public bool LeavesOnCancel => true;
 
     public void Open() => _panel.Open();

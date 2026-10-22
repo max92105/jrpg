@@ -82,6 +82,7 @@ internal sealed class InventoryPage : IMenuPage
     /// <param name="catalog">Item names and descriptions.</param>
     public InventoryPage(ScreenText text, UiTextures ui, GameSession session, ContentCatalog catalog)
     {
+        Hint = text.Messages.Text(MessageIds.MenuHintInventory);
         _session = session;
         _catalog = catalog;
         _ui = ui;
@@ -95,6 +96,8 @@ internal sealed class InventoryPage : IMenuPage
     }
 
     public string TitleMessageId => MessageIds.MenuInventory;
+
+    public string Hint { get; }
 
     /// <summary>False while choosing who to use an item on: Cancel closes that instead.</summary>
     public bool LeavesOnCancel => !_itemUse.IsOpen;

@@ -13,6 +13,12 @@ internal interface IMenuPage
     string TitleMessageId { get; }
 
     /// <summary>
+    /// The page's current line of help for the menu's footer, already formatted. It changes only when the page's state does,
+    /// so the menu reads it every frame without allocating.
+    /// </summary>
+    string Hint { get; }
+
+    /// <summary>
     /// Whether Cancel now goes back to the tabs. False while something inside the page, such as a confirmation, answers
     /// Cancel itself.
     /// </summary>

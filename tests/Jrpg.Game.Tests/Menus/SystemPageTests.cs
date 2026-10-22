@@ -29,6 +29,20 @@ public sealed class SystemPageTests
     }
 
     [Fact]
+    public void Hint_SaveFilesOpen_IsTheSaveHintUntilCancel()
+    {
+        var page = NewPage();
+        var messages = RepositoryScreenText.Text.Messages;
+
+        page.Update(Pressing(GameButton.Confirm));
+        var whileSaving = page.Hint;
+        page.Update(Pressing(GameButton.Cancel));
+
+        Assert.Equal(messages.Text(MessageIds.MenuHintSave), whileSaving);
+        Assert.Equal(messages.Text(MessageIds.MenuHintSystem), page.Hint);
+    }
+
+    [Fact]
     public void Update_ConfirmQuit_AsksBeforeRequesting()
     {
         var page = NewPage();

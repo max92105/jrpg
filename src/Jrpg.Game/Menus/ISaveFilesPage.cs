@@ -12,6 +12,9 @@ internal interface ISaveFilesPage
     /// <summary>False while something in the page, such as a question, answers Cancel itself.</summary>
     bool LeavesOnCancel { get; }
 
+    /// <summary>The footer's line while these files show; see <see cref="IMenuPage.Hint"/>.</summary>
+    string Hint { get; }
+
     /// <summary>Reads the files; called each time the System page opens this one.</summary>
     void Open();
 

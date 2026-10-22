@@ -72,6 +72,7 @@ internal sealed class StatusPage : IMenuPage
     /// <param name="catalog">Class names and the experience table.</param>
     public StatusPage(ScreenText text, UiTextures ui, GameSession session, ContentCatalog catalog)
     {
+        Hint = text.Messages.Text(MessageIds.MenuHintStatus);
         _catalog = catalog;
         _ui = ui;
         _party = session.Party;
@@ -94,6 +95,8 @@ internal sealed class StatusPage : IMenuPage
     public PartyMember Shown => Members[_cursor.Selected];
 
     public string TitleMessageId => MessageIds.MenuStatus;
+
+    public string Hint { get; }
 
     public bool LeavesOnCancel => true;
 

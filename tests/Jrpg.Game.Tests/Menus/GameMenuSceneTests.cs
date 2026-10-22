@@ -104,6 +104,36 @@ public sealed class GameMenuSceneTests
         Assert.Equal(2, page.OpenCount);
     }
 
+    [Fact]
+    public void Hint_NoPageOpen_IsTheMainMenuHint()
+    {
+        var menu = NewMenu(new CountingMenuPage());
+
+        Assert.Equal(RepositoryScreenText.Text.Messages.Text(MessageIds.MenuHintMain), menu.FooterHint);
+    }
+
+    [Fact]
+    public void Hint_PageOpen_IsThePagesHint()
+    {
+        var page = new CountingMenuPage();
+        var menu = NewMenu(page);
+
+        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+
+        Assert.Equal(page.Hint, menu.FooterHint);
+    }
+
+    [Fact]
+    public void Hint_PageClosed_GoesBackToTheMainMenuHint()
+    {
+        var menu = NewMenu(new CountingMenuPage());
+        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+
+        menu.Update(_oneUpdate, Pressing(GameButton.Cancel));
+
+        Assert.Equal(RepositoryScreenText.Text.Messages.Text(MessageIds.MenuHintMain), menu.FooterHint);
+    }
+
     private static GameMenuScene NewMenu()
     {
         var session = NewSession();

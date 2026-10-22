@@ -40,6 +40,7 @@ internal sealed class EquipmentPage : IMenuPage
     /// <param name="catalog">The items, to list what each slot can take.</param>
     public EquipmentPage(ScreenText text, UiTextures ui, GameSession session, ContentCatalog catalog)
     {
+        Hint = text.Messages.Text(MessageIds.MenuHintEquipment);
         _party = session.Party;
         _equipment = session.Equipment;
         _inventory = session.Inventory;
@@ -57,6 +58,8 @@ internal sealed class EquipmentPage : IMenuPage
     public PartyMember Shown => Members[_memberCursor.Selected];
 
     public string TitleMessageId => MessageIds.MenuEquipment;
+
+    public string Hint { get; }
 
     // Recruits don't change while the menu is open, so the member cursor's count still holds.
     [MemberNotNull(nameof(Members), nameof(_sheet))]

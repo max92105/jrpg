@@ -109,5 +109,14 @@
   "battle_party_fallen": "The party has fallen.",
   "battle_load_last_save": "Load last save",
   "battle_main_menu": "Main menu",
-  "battle_defeat_hint": "Choose what to do next."
+  "battle_defeat_hint": "Choose what to do next.",
+  "menu_hint_main": "Choose a menu.",
+  "menu_hint_inventory": "Choose an item to read about it. Confirm to use it.",
+  "menu_hint_party": "Choose who fights, and in what order.",
+  "menu_hint_equipment": "Choose a slot to change what is worn.",
+  "menu_hint_status": "Choose a character.",
+  "menu_hint_options": "Choose a setting.",
+  "menu_hint_system": "Choose what to do.",
+  "menu_hint_save": "Choose a file to save to.",
+  "menu_hint_load": "Choose a file to load."
 }

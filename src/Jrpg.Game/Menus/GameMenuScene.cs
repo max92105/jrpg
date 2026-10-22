@@ -33,6 +33,9 @@ internal sealed class GameMenuScene : IScene
     private const int SelectedLabelSlide = 14;
     private const int SelectionLineThickness = 2;
 
+    // Legacy footer: the hint starts 40 px in.
+    private const int FooterTextInset = 40;
+
     private readonly UiTextures _ui;
     private readonly MenuHeader _header;
     private readonly string _menuTitle;
@@ -40,6 +43,7 @@ internal sealed class GameMenuScene : IScene
     private readonly ListCursor _tabs;
     private readonly SpriteFontBase _font;
     private readonly string[] _tabLabels;
+    private readonly string _mainHint;
     private TimeSpan _sinceOpened;
     private bool _isInPage;
 
@@ -56,7 +60,11 @@ internal sealed class GameMenuScene : IScene
         _tabs = new ListCursor(pages.Length, _ => true);
         _font = text.Fonts.FontAt(UiTheme.MenuTextPixels);
         _tabLabels = [.. pages.Select(page => text.Messages.Text(page.TitleMessageId))];
+        _mainHint = text.Messages.Text(MessageIds.MenuHintMain);
     }
+
+    /// <summary>The footer's line: the open page's hint, or the tabs' own.</summary>
+    internal string FooterHint => _isInPage ? _pages[_tabs.Selected].Hint : _mainHint;
 
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
@@ -79,6 +87,14 @@ internal sealed class GameMenuScene : IScene
         {
             _pages[_tabs.Selected].Draw(batch, textures, _pageArea, opacity);
         }
+
+        DrawFooterHint(batch, opacity);
+    }
+
+    private void DrawFooterHint(SpriteBatch batch, float opacity)
+    {
+        var top = VirtualScreen.Height - FooterHeight + ((FooterHeight - _font.LineHeight) / 2);
+        batch.DrawString(_font, FooterHint, new Vector2(FooterTextInset, top), UiTheme.TextSecondary * opacity);
     }
 
     // The picture with its edges darkened, between the header and footer bars.

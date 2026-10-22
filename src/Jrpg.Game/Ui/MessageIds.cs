@@ -302,4 +302,31 @@ internal static class MessageIds
 
     /// <summary>Shown on the victory screen by a member whose bar filled a level.</summary>
     public const string BattleLevelUp = "battle_level_up";
+
+    /// <summary>The menu footer's line while the player picks a tab.</summary>
+    public const string MenuHintMain = "menu_hint_main";
+
+    /// <summary>The menu footer's line on the Inventory page.</summary>
+    public const string MenuHintInventory = "menu_hint_inventory";
+
+    /// <summary>The menu footer's line on the Party page.</summary>
+    public const string MenuHintParty = "menu_hint_party";
+
+    /// <summary>The menu footer's line on the Equipment page.</summary>
+    public const string MenuHintEquipment = "menu_hint_equipment";
+
+    /// <summary>The menu footer's line on the Status page.</summary>
+    public const string MenuHintStatus = "menu_hint_status";
+
+    /// <summary>The menu footer's line on the Options page.</summary>
+    public const string MenuHintOptions = "menu_hint_options";
+
+    /// <summary>The menu footer's line on the System page's own list.</summary>
+    public const string MenuHintSystem = "menu_hint_system";
+
+    /// <summary>The menu footer's line while the save files show inside System.</summary>
+    public const string MenuHintSave = "menu_hint_save";
+
+    /// <summary>The menu footer's line while the files to load show inside System.</summary>
+    public const string MenuHintLoad = "menu_hint_load";
 }

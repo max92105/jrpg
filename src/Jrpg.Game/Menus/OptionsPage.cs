@@ -38,6 +38,7 @@ internal sealed class OptionsPage : IMenuPage
     /// <param name="settings">What the page changes; the host and dialogue read it.</param>
     public OptionsPage(ScreenText text, UiTextures ui, PlayerSettings settings)
     {
+        Hint = text.Messages.Text(MessageIds.MenuHintOptions);
         _settings = settings;
         _ui = ui;
         _font = text.Fonts.FontAt(UiTheme.MenuTextPixels);
@@ -50,6 +51,8 @@ internal sealed class OptionsPage : IMenuPage
     }
 
     public string TitleMessageId => MessageIds.MenuOptions;
+
+    public string Hint { get; }
 
     public bool LeavesOnCancel => true;
 

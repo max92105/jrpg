@@ -39,6 +39,7 @@ internal sealed class SavePage : ISaveFilesPage
     /// <param name="ui">The shared gradient textures.</param>
     public SavePage(SaveSlots slots, GameSession session, ScreenText text, UiTextures ui)
     {
+        Hint = text.Messages.Text(MessageIds.MenuHintSave);
         _slots = slots;
         _session = session;
         _messages = text.Messages;
@@ -55,6 +56,8 @@ internal sealed class SavePage : ISaveFilesPage
 
     /// <summary>Why the last save didn't happen, or null.</summary>
     public string? Notice { get; private set; }
+
+    public string Hint { get; }
 
     /// <summary>False while the overwrite question is open: Cancel answers it No instead.</summary>
     public bool LeavesOnCancel => _asking is null;

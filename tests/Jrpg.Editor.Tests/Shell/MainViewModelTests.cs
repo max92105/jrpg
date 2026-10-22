@@ -345,6 +345,22 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
+    public void Save_ObjectOutlineChanged_LoadsBackWithTheNewOutline()
+    {
+        var viewModel = Open(CopyOfRepositoryContent());
+        var placing = viewModel.Placing!;
+        placing.Browser.SelectedObject = viewModel.Catalog!.Objects["chest"];
+        var shapes = placing.StartEditingShapes()!;
+        shapes.ClearShapeCommand.Execute(null);
+        placing.ApplyShapes(shapes);
+
+        viewModel.SaveCommand.Execute(null);
+
+        Assert.Null(viewModel.SaveError);
+        Assert.Empty(ContentCatalogLoader.Load(_contentCopy).Objects["chest"].CollisionPolygon);
+    }
+
+    [Fact]
     public void Save_CatalogChangedMapUnchanged_WritesTilesAndClearsUnsavedChanges()
     {
         var viewModel = Open(CopyOfRepositoryContent());

@@ -21,11 +21,29 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
     public ObjectPlacingViewModel(CatalogDraft catalog, LayerChoiceViewModel layer)
     {
         Browser = new ObjectBrowserViewModel(catalog);
+        Browser.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(ObjectBrowserViewModel.SelectedObject))
+            {
+                OnPropertyChanged(nameof(CanEditShapes));
+            }
+        };
         _catalog = catalog;
         _layer = layer;
     }
 
     public ObjectBrowserViewModel Browser { get; }
+
+    /// <summary>Whether Objects > Edit shapes has an object to open: the one chosen in the panel.</summary>
+    public bool CanEditShapes => Browser.SelectedObject is not null;
+
+    /// <summary>The shapes of the object chosen in the panel, to edit in the shapes window; null when none is chosen.</summary>
+    public ObjectShapesViewModel? StartEditingShapes() =>
+        Browser.SelectedObject is { } definition ? new ObjectShapesViewModel(definition) : null;
+
+    /// <summary>Puts the edited object in the catalog draft, as one undo step (nothing when unchanged).</summary>
+    /// <exception cref="InvalidOperationException">The edited shapes have a problem (<see cref="ObjectShapesViewModel.Problem"/>).</exception>
+    public void ApplyShapes(ObjectShapesViewModel edited) => _catalog.SetObject(edited.ToDefinition());
 
     /// <summary>The map objects are placed on; set by the shell when a map opens, which empties the selection.</summary>
     [ObservableProperty]

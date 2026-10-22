@@ -58,7 +58,15 @@
         Shift + drag: move an object.<LineBreak />
         Right click: remove an object.<LineBreak />
         Ctrl + drag: select objects.<LineBreak />
-        Delete: remove the selected objects, or the one under the mouse.
+        Delete: remove the selected objects, or the one under the mouse.<LineBreak />
+        Objects > Edit shapes: open the shapes window for the object chosen in the Objects panel.
+      </TextBlock>
+
+      <TextBlock Style="{StaticResource Heading}" Text="Shapes window" />
+      <TextBlock Style="{StaticResource Lines}">
+        Click: add a point to the collision outline (kept inside the object, on its pixels).<LineBreak />
+        Backspace or Ctrl+Z: remove the last point. Clear shape: no outline (the object never blocks).<LineBreak />
+        OK: apply, as one change Ctrl+Z undoes in the main window. Esc or Cancel: leave the object as it was.
       </TextBlock>
 
       <TextBlock Style="{StaticResource Heading}" Text="Events" />

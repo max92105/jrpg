@@ -23,6 +23,21 @@ internal sealed partial class MainWindow
     private (PlacedObject Placed, Vector Offset)? _movedObject;
     private ObjectDefinition? _ghostDefinition;
 
+    // OK applies the outline as one catalog step; the catalog change redraws the map and the preview.
+    private void OnEditShapesClicked(object sender, RoutedEventArgs e)
+    {
+        if (_drawing is null || Placing.StartEditingShapes() is not { } shapes)
+        {
+            return;
+        }
+
+        var picture = _drawing.DrawObject(_viewModel.Catalog!.Objects[shapes.ObjectId]);
+        if (new ObjectShapesWindow(shapes, picture) { Owner = this }.ShowDialog() == true)
+        {
+            Placing.ApplyShapes(shapes);
+        }
+    }
+
     private bool HandleObjectButton(MouseButton button, Point2D point)
     {
         if (button == MouseButton.Right)

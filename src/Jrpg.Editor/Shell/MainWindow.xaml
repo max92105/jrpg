@@ -61,6 +61,9 @@
         <MenuItem Header="Cut sheet" Command="{Binding Painting.Browser.CutSheetCommand}" />
         <MenuItem Header="Import sheet image..." Click="OnImportSheetImageClicked" />
       </MenuItem>
+      <MenuItem Header="Objects">
+        <MenuItem Header="Edit shapes..." Click="OnEditShapesClicked" IsEnabled="{Binding Placing.CanEditShapes, FallbackValue=False}" />
+      </MenuItem>
       <MenuItem Header="Map">
         <MenuItem Header="Settings..." Click="OnMapSettingsClicked" />
         <MenuItem Header="Add layer..." Click="OnAddLayerMenuClicked" />

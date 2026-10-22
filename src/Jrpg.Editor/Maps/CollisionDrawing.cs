@@ -10,12 +10,15 @@ internal static class CollisionDrawing
 {
     // Legacy ObjectEditorWindow's colors: red blocked cells, green collision outlines, blue above-player zones.
     private static readonly Brush _blockedFill = Frozen(new SolidColorBrush(Color.FromArgb(0x60, 0xFF, 0x30, 0x30)));
-    private static readonly Brush _outlineStroke = Frozen(new SolidColorBrush(Color.FromRgb(0x7C, 0xFC, 0x7C)));
-    private static readonly Brush _outlineFill = Frozen(new SolidColorBrush(Color.FromArgb(0x46, 0x00, 0xFF, 0x00)));
+    /// <summary>The collision outline's stroke, also used by the object shapes window.</summary>
+    internal static Brush OutlineStroke { get; } = Frozen(new SolidColorBrush(Color.FromRgb(0x7C, 0xFC, 0x7C)));
+    /// <summary>The collision outline's fill, also used by the object shapes window.</summary>
+    internal static Brush OutlineFill { get; } = Frozen(new SolidColorBrush(Color.FromArgb(0x46, 0x00, 0xFF, 0x00)));
     private static readonly Brush _zoneStroke = Frozen(new SolidColorBrush(Color.FromRgb(0x6E, 0xC8, 0xFF)));
     private static readonly Brush _zoneFill = Frozen(new SolidColorBrush(Color.FromArgb(0x50, 0x00, 0x96, 0xFF)));
 
-    private const double StrokeScreenPixels = 2;
+    /// <summary>How wide outlines are drawn, in screen pixels whatever the zoom; the shapes window uses it too.</summary>
+    internal const double StrokeScreenPixels = 2;
 
     /// <param name="shapes">What to draw, in map cells.</param>
     /// <param name="layout">The map, for the image's size.</param>
@@ -34,7 +37,7 @@ internal static class CollisionDrawing
             }
 
             var strokeWidth = StrokeScreenPixels * screenPixel;
-            DrawPolygons(context, shapes.Outlines, _outlineFill, new Pen(_outlineStroke, strokeWidth));
+            DrawPolygons(context, shapes.Outlines, OutlineFill, new Pen(OutlineStroke, strokeWidth));
             DrawPolygons(context, shapes.Zones, _zoneFill, new Pen(_zoneStroke, strokeWidth));
         }
 

@@ -12,16 +12,38 @@ public sealed class ObjectPlacingViewModelTests
     private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
     private readonly LayerChoiceViewModel _layer = new();
+    private readonly CatalogDraft _draft = new(_catalog);
     private readonly ObjectPlacingViewModel _placing;
 
     // The forest map open, the chest chosen to place.
     public ObjectPlacingViewModelTests()
     {
-        _placing = new ObjectPlacingViewModel(new CatalogDraft(_catalog), _layer) { OpenMap = new MapViewModel(_catalog.Maps["forest"]) };
+        _placing = new ObjectPlacingViewModel(_draft, _layer) { OpenMap = new MapViewModel(_catalog.Maps["forest"]) };
         _placing.Browser.SelectedObject = _catalog.Objects["chest"];
     }
 
     private MapViewModel Map => _placing.OpenMap!;
+
+    [Fact]
+    public void StartEditingShapes_NothingChosenOrSelected_ReturnsNull()
+    {
+        _placing.Browser.SelectedObject = null;
+
+        Assert.Null(_placing.StartEditingShapes());
+        Assert.False(_placing.CanEditShapes);
+    }
+
+    [Fact]
+    public void ApplyShapes_ChangedOutline_PutsTheObjectInTheCatalog()
+    {
+        var shapes = _placing.StartEditingShapes()!;
+        shapes.ClearShapeCommand.Execute(null);
+
+        _placing.ApplyShapes(shapes);
+
+        Assert.Empty(_draft.Current.Objects["chest"].CollisionPolygon);
+        Assert.True(_draft.CanUndo);
+    }
 
     [Fact]
     public void PlaceObjectAt_ObjectChosen_CentersItOnThePointWithTheNextUid()

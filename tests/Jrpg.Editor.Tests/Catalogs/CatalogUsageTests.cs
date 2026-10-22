@@ -1,4 +1,5 @@
 using Jrpg.Core.Content;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
@@ -70,6 +71,18 @@ public sealed class CatalogUsageTests
         Assert.Empty(usage.Tiles);
         Assert.Empty(usage.MapIds);
         Assert.Empty(usage.ObjectIds);
+    }
+
+    // A new object no saved map places, placed on the open start map only.
+    [Fact]
+    public void UsersOfObject_PlacedOnOpenMap_ListsIt()
+    {
+        var start = _catalog.Maps["start"].Layout;
+        var placed = new PlacedObject { Uid = "tree_4_1", ObjectId = "tree_4", Position = new Point2D(1, 1), Z = 1 };
+
+        var users = CatalogUsage.UsersOfObject(_catalog, "tree_4", start with { Objects = [.. start.Objects, placed] });
+
+        Assert.Equal(["map start"], users);
     }
 
     private static MapLayout WithTileAtTopLeft(MapLayout layout, int tileId)

@@ -108,6 +108,10 @@ internal sealed partial class CatalogDraft : ObservableObject
     public IReadOnlyList<int> TilesRemovedByUndo() =>
         _history.NextUndo is { } edit ? [.. Current.Tiles.Keys.Except(edit.Revert(Current).Tiles.Keys).Order()] : [];
 
+    /// <summary>The objects the next undo would remove, so it can be refused while a map places one.</summary>
+    public IReadOnlyList<string> ObjectsRemovedByUndo() =>
+        _history.NextUndo is { } edit ? [.. Current.Objects.Keys.Except(edit.Revert(Current).Objects.Keys).Order(StringComparer.Ordinal)] : [];
+
     /// <summary>The sheets the next undo would remove, so it can be refused while tiles are cut from one.</summary>
     public IReadOnlyList<string> SheetsRemovedByUndo() =>
         _history.NextUndo is { } edit ? [.. Current.Tilesheets.Keys.Except(edit.Revert(Current).Tilesheets.Keys).Order(StringComparer.Ordinal)] : [];

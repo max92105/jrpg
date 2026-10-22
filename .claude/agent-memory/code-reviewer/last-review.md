@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-21-editor/slices/E12a.md, E12a (rectangle of sheet cells; uncommitted)
-Round: 1 (verdict: Ready to commit; verify all pass, 1499 tests)
+Slice: docs/plans/2026-10-21-editor/slices/E12b1.md, E12b1 (new object rules + catalog step; uncommitted)
+Round: 1 (verdict: Ready to commit; verify all pass, 1513 tests)
 
-- open (Warning): Shift + click without moving stores a 1 x 1 SelectedCells, so ChoiceText reads "Cells (3, 4) to (3, 4): 1 x 1 (paints the top-left cell)" instead of "Cell (3, 4): tile N". Store SelectedCells only when Columns * Rows > 1; add a test.
-- open (Suggestion): NearestCellTo repeats CellAt's column/row floor formula (2 copies); extract a private GridPositionOf(sheet, pixel).
-- open (Suggestion): Select(tileId) and the vanished-sheet path clearing SelectedCells are untested.
-- follow-up: TileBrowserViewModel at 295 lines; E12b should split (e.g. sheet hit-testing) rather than grow it.
-- follow-up: a re-cut to a smaller grid keeps SelectedCell/SelectedCells pointing past the new grid (predates; matters for E12b New object).
+- open (Warning): CreateObject's refusal while IdProblem/CategoryProblem stands is untested; a taken id would make SetObject silently replace the existing object. Add CreateObject_IdTaken_ReturnsFalseAndKeepsTheObject.
+- open (Suggestion): MainViewModelTests ~line 672: old comment "Clicks the first cell..." now sits above ChooseTwoCellsNotTiles; move it back above ChooseCellNotATile.
+- open (Suggestion): ObjectIdsTests InlineData "tree-4" doesn't match the name CapitalsOrSpaces; rename to ..._OtherCharacters_... or use "tree 4".
+- follow-up: MainViewModel is 563 lines (was ~537); split before E12b2 adds more.
+- follow-up: E12a re-cut stale SelectedCells can now reach CreateObject (cells past the grid become tiles).

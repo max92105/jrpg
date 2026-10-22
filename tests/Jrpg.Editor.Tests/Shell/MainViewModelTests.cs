@@ -345,6 +345,63 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
+    public void CreateObject_CellsNotTilesYet_AddsTilesAndTheObjectThenChoosesIt()
+    {
+        var viewModel = Open(CopyOfRepositoryContent());
+        var cells = ChooseTwoCellsNotTiles(viewModel);
+        var newObject = viewModel.StartNewObject()!;
+        newObject.Id = "tree_4";
+        newObject.Category = "General";
+
+        Assert.True(viewModel.CreateObject(newObject));
+        viewModel.SaveCommand.Execute(null);
+
+        Assert.Null(viewModel.SaveError);
+        Assert.Equal(EditingMode.Objects, viewModel.Mode);
+        Assert.Equal("tree_4", viewModel.Placing!.Browser.SelectedObject?.Id);
+        var saved = ContentCatalogLoader.Load(_contentCopy);
+        var tree = saved.Objects["tree_4"];
+        Assert.Equal(("General", 2, 1), (tree.Category, tree.Width, tree.Height));
+        Assert.Equal(cells.Cells, tree.Tiles.Select(tile => saved.Tiles[tile.TileId] is var cut ? new SheetCell(cut.SheetId, cut.Column, cut.Row) : default));
+    }
+
+    [Fact]
+    public void CreateObject_IdTaken_ReturnsFalseAndKeepsTheObject()
+    {
+        var viewModel = Open(CopyOfRepositoryContent());
+        var tree = viewModel.Catalog!.Objects["tree"];
+        ChooseTwoCellsNotTiles(viewModel);
+        var newObject = viewModel.StartNewObject()!;
+        newObject.Id = "tree";
+        newObject.Category = "General";
+
+        Assert.False(viewModel.CreateObject(newObject));
+
+        Assert.Same(tree, viewModel.Catalog.Objects["tree"]);
+        Assert.False(viewModel.Content!.IsDirty);
+    }
+
+    [Fact]
+    public void Undo_NewObjectPlacedOnASavedMap_RefusesAndNamesTheMap()
+    {
+        var viewModel = Open(CopyOfRepositoryContent());
+        ChooseTwoCellsNotTiles(viewModel);
+        var newObject = viewModel.StartNewObject()!;
+        newObject.Id = "tree_4";
+        newObject.Category = "General";
+        viewModel.CreateObject(newObject);
+        viewModel.Placing!.PlaceObjectAt(new Point2D(2, 2));
+        var placedOn = viewModel.CurrentMap!.Map.Id;
+        viewModel.SaveCommand.Execute(null);
+        viewModel.TryOpenMap(viewModel.MapIds.First(id => id != placedOn));
+
+        viewModel.UndoCommand.Execute(null);
+
+        Assert.Equal($"Can't undo: object tree_4 is placed on map {placedOn}.", viewModel.UndoRefusal);
+        Assert.True(viewModel.Catalog!.Objects.ContainsKey("tree_4"));
+    }
+
+    [Fact]
     public void Save_ObjectOutlineChanged_LoadsBackWithTheNewOutline()
     {
         var viewModel = Open(CopyOfRepositoryContent());
@@ -626,6 +683,22 @@ public sealed class MainViewModelTests : IDisposable
         var after = ground.Rows.SelectMany(row => row).First(id => id != before && id != 0);
         map.Do(new SetTilesEdit(ground.Z, [new TileChange(new GridCell(0, 0), before, after)]));
         return after;
+    }
+
+    // Chooses, with Shift + drag, the first two cells side by side of the shown sheet that aren't tiles yet.
+    private SheetCellRectangle ChooseTwoCellsNotTiles(MainViewModel viewModel)
+    {
+        var browser = viewModel.Painting!.Browser;
+        var sheet = browser.SelectedSheet!;
+        var (width, height) = PngSize.Read(Path.Combine(ArtFolders.RootIn(_contentCopy), ArtFolders.Tilesheets, sheet.File));
+        var left = (from row in Enumerable.Range(0, sheet.RowsIn(height))
+                    from column in Enumerable.Range(0, sheet.ColumnsIn(width) - 1)
+                    select new SheetCell(sheet.Id, column, row))
+            .First(cell => viewModel.Content!.TileAt(cell) is null && viewModel.Content.TileAt(cell with { Column = cell.Column + 1 }) is null);
+        browser.SelectCellsBetween(
+            new Point2D(sheet.CellLeft(left.Column), sheet.CellTop(left.Row)),
+            new Point2D(sheet.CellLeft(left.Column + 1), sheet.CellTop(left.Row)));
+        return browser.SelectedCells!.Value;
     }
 
     // Clicks the first cell of the shown sheet that isn't a tile yet, sized by its image in the content copy.

@@ -188,6 +188,32 @@ internal sealed partial class MainViewModel : ObservableObject
         return true;
     }
 
+    /// <summary>The New object dialog's state for the rectangle chosen in the Tiles panel; null without one.</summary>
+    public NewObjectViewModel? StartNewObject() =>
+        Painting?.Browser.SelectedCells is { } cells
+            ? new NewObjectViewModel([.. Catalog!.Objects.Keys], [.. Catalog.Objects.Values.Select(definition => definition.Category)], cells)
+            : null;
+
+    /// <summary>
+    /// Makes the object the New object dialog describes, from its cells: those not tiles yet become tiles (decision 113),
+    /// then the object joins the catalog as one undo step. It is chosen in the Objects panel, in Objects mode.
+    /// </summary>
+    /// <returns>False when nothing was made: the id or category has a problem.</returns>
+    public bool CreateObject(NewObjectViewModel newObject)
+    {
+        if (newObject.IdProblem is not null || newObject.CategoryProblem is not null || Content is null || Placing is null)
+        {
+            return false;
+        }
+
+        var tileIds = newObject.Cells.Cells.ToDictionary(cell => cell, cell => Content.TileAt(cell)?.Id ?? Content.AddTile(cell));
+        var definition = ObjectFromCells.Build(newObject.Id, newObject.Category.Trim(), newObject.Cells, cell => tileIds[cell]);
+        Content.SetObject(definition);
+        Placing.Browser.SelectedObject = definition;
+        Mode = EditingMode.Objects;
+        return true;
+    }
+
     /// <summary>Whether the open map or the tiles changed since they were saved; the tiles' changes stay when another map opens.</summary>
     public bool HasUnsavedChanges => CurrentMap is { IsDirty: true } || Content is { IsDirty: true };
 
@@ -301,10 +327,18 @@ internal sealed partial class MainViewModel : ObservableObject
     }
 
     // The first tile the undo would remove that something still uses, named with its first user (decision 117); or the
-    // first tile cut from a sheet it would remove.
+    // first tile cut from a sheet it would remove; or the first map placing an object it would remove.
     private string? RefusalOfCatalogUndo()
     {
-        foreach (var sheetId in Content!.SheetsRemovedByUndo())
+        foreach (var objectId in Content!.ObjectsRemovedByUndo())
+        {
+            if (CatalogUsage.UsersOfObject(Content.Current, objectId, CurrentMap?.Map.Layout) is [var map, ..])
+            {
+                return $"Can't undo: object {objectId} is placed on {map}.";
+            }
+        }
+
+        foreach (var sheetId in Content.SheetsRemovedByUndo())
         {
             if (CatalogUsage.TilesCutFrom(sheetId, Content.Current) is [var cutTileId, ..])
             {

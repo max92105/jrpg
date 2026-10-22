@@ -41,18 +41,29 @@ internal static class CatalogUsage
     private static IEnumerable<TileDefinition> TilesOf(string sheetId, ContentCatalog catalog) =>
         catalog.Tiles.Values.Where(tile => tile.SheetId == sheetId).OrderBy(tile => tile.Id);
 
-    private static IReadOnlyList<string> MapIdsUsing(HashSet<int> tileIds, ContentCatalog catalog, MapLayout? openLayout)
-    {
-        var layouts = catalog.Maps.Values.Select(map => map.Layout).Where(layout => layout.Id != openLayout?.Id);
-        if (openLayout is not null)
-        {
-            layouts = layouts.Append(openLayout);
-        }
+    /// <summary>The maps placing an object, so an undo that would remove it can be refused.</summary>
+    /// <param name="catalog">The saved maps.</param>
+    /// <param name="objectId">The object looked for.</param>
+    /// <param name="openLayout">The open map's layout, unsaved changes included; null when no map is open.</param>
+    /// <returns>"map forest" style names, sorted by id; empty when no map places it.</returns>
+    public static IReadOnlyList<string> UsersOfObject(ContentCatalog catalog, string objectId, MapLayout? openLayout) =>
+        [.. LayoutsOf(catalog, openLayout)
+            .Where(layout => layout.Objects.Any(placed => placed.ObjectId == objectId))
+            .Select(layout => layout.Id)
+            .Order(StringComparer.Ordinal)
+            .Select(id => $"map {id}")];
 
-        return [.. layouts
+    private static IReadOnlyList<string> MapIdsUsing(HashSet<int> tileIds, ContentCatalog catalog, MapLayout? openLayout) =>
+        [.. LayoutsOf(catalog, openLayout)
             .Where(layout => layout.Layers.Any(layer => layer.Rows.Any(row => row.Any(tileIds.Contains))))
             .Select(layout => layout.Id)
             .Order(StringComparer.Ordinal)];
+
+    // Every map's layout, the open map's as it is on screen in place of its saved version.
+    private static IEnumerable<MapLayout> LayoutsOf(ContentCatalog catalog, MapLayout? openLayout)
+    {
+        var layouts = catalog.Maps.Values.Select(map => map.Layout).Where(layout => layout.Id != openLayout?.Id);
+        return openLayout is null ? layouts : layouts.Append(openLayout);
     }
 
     private static IReadOnlyList<string> ObjectIdsUsing(HashSet<int> tileIds, ContentCatalog catalog) =>

@@ -14,8 +14,10 @@ internal static class CollisionDrawing
     internal static Brush OutlineStroke { get; } = Frozen(new SolidColorBrush(Color.FromRgb(0x7C, 0xFC, 0x7C)));
     /// <summary>The collision outline's fill, also used by the object shapes window.</summary>
     internal static Brush OutlineFill { get; } = Frozen(new SolidColorBrush(Color.FromArgb(0x46, 0x00, 0xFF, 0x00)));
-    private static readonly Brush _zoneStroke = Frozen(new SolidColorBrush(Color.FromRgb(0x6E, 0xC8, 0xFF)));
-    private static readonly Brush _zoneFill = Frozen(new SolidColorBrush(Color.FromArgb(0x50, 0x00, 0x96, 0xFF)));
+    /// <summary>An above-player zone's stroke, also used by the object shapes window.</summary>
+    internal static Brush ZoneStroke { get; } = Frozen(new SolidColorBrush(Color.FromRgb(0x6E, 0xC8, 0xFF)));
+    /// <summary>An above-player zone's fill, also used by the object shapes window.</summary>
+    internal static Brush ZoneFill { get; } = Frozen(new SolidColorBrush(Color.FromArgb(0x50, 0x00, 0x96, 0xFF)));
 
     /// <summary>How wide outlines are drawn, in screen pixels whatever the zoom; the shapes window uses it too.</summary>
     internal const double StrokeScreenPixels = 2;
@@ -38,7 +40,7 @@ internal static class CollisionDrawing
 
             var strokeWidth = StrokeScreenPixels * screenPixel;
             DrawPolygons(context, shapes.Outlines, OutlineFill, new Pen(OutlineStroke, strokeWidth));
-            DrawPolygons(context, shapes.Zones, _zoneFill, new Pen(_zoneStroke, strokeWidth));
+            DrawPolygons(context, shapes.Zones, ZoneFill, new Pen(ZoneStroke, strokeWidth));
         }
 
         var image = new DrawingImage(drawing);

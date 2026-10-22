@@ -5,9 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-21-editor/slices/E9c.md, E9c (opening the shapes window from the map; uncommitted)
-Round: 1 (verdict: Ready to commit; verify all pass, 1469 tests)
+Slice: docs/plans/2026-10-21-editor/slices/E10.md, E10 (above-player zones in the shapes window; uncommitted)
+Round: 1 (verdict: Ready to commit; verify all pass, 1477 tests)
 
-- open (Warning): MainWindow.xaml MouseDoubleClick on the whole ObjectBrowserView: a double-click on the preview image, a group header or the list's scrollbar opens the chosen object's shapes; hook ListBoxItem (ItemContainerStyle EventSetter) instead.
-- open (Warning): Shift + double-click: the first Shift press starts an unsnapped move, so 1 px of jitter before release moves the object ~1/48 cell and leaves an undo step, contradicting the comment and the hand check "nothing is moved"; start the move only past SystemParameters.MinimumHorizontal/VerticalDragDistance.
-- open (Suggestion): placed-object-by-uid lookup now in StartEditingShapes and MoveObject; a private PlacedObjectWithUid(uid) would share it.
+- open (Warning): ObjectShapesWindow.xaml.cs OnZoneListSelectionChanged ignores -1, so Ctrl+click deselecting the chosen zone leaves the list showing none while clicks/Backspace/Clear/Delete zone still act on that zone; put the list's choice back when it goes to -1 while the view model still has one.
+- open (Suggestion): ObjectShapesWindow.xaml.cs class summary and `shapes` param doc still say "collision outline" only / "OK when the outline can be applied".
+- open (Suggestion): no test that RemoveLastPoint / ClearShapeCommand act on the chosen zone and leave the outline (slice goal names them).
+- open (Suggestion): ToDefinition's one-line zone-dropping expression; a private ZonesWithPoints() would read better.

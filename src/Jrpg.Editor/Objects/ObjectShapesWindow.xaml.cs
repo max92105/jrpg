@@ -11,8 +11,8 @@ using WpfPolygon = System.Windows.Shapes.Polygon;
 namespace Jrpg.Editor.Objects;
 
 /// <summary>
-/// The object shapes window: the object's picture with its collision outline over it. Clicks and keys go to the
-/// <see cref="ObjectShapesViewModel"/>, which holds the rules; OK closes it only when the outline can be applied.
+/// The object shapes window: the object's picture with its collision outline and above-player zones over it. Clicks and
+/// keys go to the <see cref="ObjectShapesViewModel"/>, which holds the rules; OK closes it only when the shapes can be applied.
 /// </summary>
 internal sealed partial class ObjectShapesWindow : Window
 {
@@ -25,7 +25,7 @@ internal sealed partial class ObjectShapesWindow : Window
     // One screen pixel in map pixels: the object's longer side fills the box.
     private readonly double _screenPixel;
 
-    /// <param name="shapes">The outline being edited.</param>
+    /// <param name="shapes">The shapes being edited.</param>
     /// <param name="picture">The object as the map draws it (<see cref="MapDrawing.DrawObject(Core.Maps.ObjectDefinition)"/>).</param>
     public ObjectShapesWindow(ObjectShapesViewModel shapes, ImageSource picture)
     {
@@ -37,7 +37,7 @@ internal sealed partial class ObjectShapesWindow : Window
         ObjectBox.Width = ObjectBox.Height = BoxScreenPixels;
         _screenPixel = Math.Max(ObjectArea.Width, ObjectArea.Height) / BoxScreenPixels;
         shapes.PropertyChanged += OnShapesChanged;
-        DrawOutline();
+        DrawShapes();
     }
 
     protected override void OnPreviewKeyDown(KeyEventArgs e)
@@ -52,9 +52,28 @@ internal sealed partial class ObjectShapesWindow : Window
 
     private void OnShapesChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(ObjectShapesViewModel.CollisionOutline))
+        if (e.PropertyName is nameof(ObjectShapesViewModel.ZoneEntries) or nameof(ObjectShapesViewModel.SelectedZoneIndex))
         {
-            DrawOutline();
+            ZoneList.SelectedIndex = _shapes.SelectedZoneIndex;
+        }
+
+        if (e.PropertyName == nameof(ObjectShapesViewModel.ActivePoints))
+        {
+            DrawShapes();
+        }
+    }
+
+    // The list loses its choice whenever its texts are replaced, so only a choice of a zone is passed on; a list left with
+    // none (Ctrl + click) shows the zone the tools still act on again.
+    private void OnZoneListSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (ZoneList.SelectedIndex >= 0)
+        {
+            _shapes.SelectedZoneIndex = ZoneList.SelectedIndex;
+        }
+        else if (_shapes.SelectedZoneIndex >= 0 && _shapes.SelectedZoneIndex < ZoneList.Items.Count)
+        {
+            ZoneList.SelectedIndex = _shapes.SelectedZoneIndex;
         }
     }
 
@@ -73,25 +92,36 @@ internal sealed partial class ObjectShapesWindow : Window
         }
     }
 
-    // In the overlay's green (E8), with a mark on each point so 1 or 2 points still show.
-    private void DrawOutline()
+    // In the overlay's colors (E8): every zone blue, the outline green, and a mark on each point of the active shape so
+    // 1 or 2 points still show.
+    private void DrawShapes()
     {
         OutlineCanvas.Children.Clear();
-        var points = _shapes.CollisionOutline.Select(point => new Point(point.X * ObjectArea.Width, point.Y * ObjectArea.Height)).ToList();
-        OutlineCanvas.Children.Add(new WpfPolygon
+        foreach (var zone in _shapes.Zones)
         {
-            Points = [.. points],
-            Fill = CollisionDrawing.OutlineFill,
-            Stroke = CollisionDrawing.OutlineStroke,
-            StrokeThickness = CollisionDrawing.StrokeScreenPixels * _screenPixel,
-        });
+            DrawPolygon(zone, CollisionDrawing.ZoneFill, CollisionDrawing.ZoneStroke);
+        }
+
+        DrawPolygon(_shapes.CollisionOutline, CollisionDrawing.OutlineFill, CollisionDrawing.OutlineStroke);
+        var markBrush = _shapes.IsEditingZones ? CollisionDrawing.ZoneStroke : CollisionDrawing.OutlineStroke;
         var markSize = PointMarkScreenPixels * _screenPixel;
-        foreach (var point in points)
+        foreach (var point in _shapes.ActivePoints.Select(InPixels))
         {
-            var mark = new Rectangle { Width = markSize, Height = markSize, Fill = CollisionDrawing.OutlineStroke };
+            var mark = new Rectangle { Width = markSize, Height = markSize, Fill = markBrush };
             Canvas.SetLeft(mark, point.X - (markSize / 2));
             Canvas.SetTop(mark, point.Y - (markSize / 2));
             OutlineCanvas.Children.Add(mark);
         }
     }
+
+    private void DrawPolygon(IReadOnlyList<Point2D> shape, Brush fill, Brush stroke) =>
+        OutlineCanvas.Children.Add(new WpfPolygon
+        {
+            Points = [.. shape.Select(InPixels)],
+            Fill = fill,
+            Stroke = stroke,
+            StrokeThickness = CollisionDrawing.StrokeScreenPixels * _screenPixel,
+        });
+
+    private Point InPixels(Point2D point) => new(point.X * ObjectArea.Width, point.Y * ObjectArea.Height);
 }

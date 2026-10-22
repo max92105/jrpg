@@ -7,9 +7,24 @@
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False">
+  <Window.Resources>
+    <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
+  </Window.Resources>
   <StackPanel Margin="12">
     <TextBlock Margin="0,0,0,8"
-               Text="Click to add a point to the collision outline. Backspace or Ctrl+Z removes the last point." />
+               Text="Click to add a point to the chosen shape. Backspace or Ctrl+Z removes the last point." />
+    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+      <RadioButton Content="Collision (blocks the player)" IsChecked="{Binding IsEditingCollision}" Margin="0,0,16,0" />
+      <RadioButton Content="Over the player (leaves, roofs)" IsChecked="{Binding IsEditingZones}" />
+    </StackPanel>
+    <DockPanel Margin="0,0,0,8" Visibility="{Binding IsEditingZones, Converter={StaticResource VisibleWhenTrue}}">
+      <StackPanel DockPanel.Dock="Right" Margin="8,0,0,0">
+        <Button Content="New zone" Width="90" Command="{Binding NewZoneCommand}" />
+        <Button Content="Delete zone" Width="90" Margin="0,4,0,0" Command="{Binding DeleteZoneCommand}" />
+      </StackPanel>
+      <!-- Kept in step from code: replacing the list on each point would otherwise drop the chosen zone. -->
+      <ListBox x:Name="ZoneList" Height="72" ItemsSource="{Binding ZoneEntries}" SelectionChanged="OnZoneListSelectionChanged" />
+    </DockPanel>
     <Border Background="#202020" HorizontalAlignment="Center">
       <!-- The object at its map size, scaled as a whole into the box, so a click's position is a map pixel. -->
       <Viewbox x:Name="ObjectBox" Stretch="Uniform">

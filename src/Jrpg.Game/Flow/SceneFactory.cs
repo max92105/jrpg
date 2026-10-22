@@ -48,7 +48,11 @@ internal sealed class SceneFactory
     public BattleScene CreateBattle(GameSession session) => new(session, new BattleSceneSources(_catalog.Items, _saveSlots), _text, _ui);
 
     public ExplorationScene CreateExploration(ExplorationState exploration) =>
-        new(exploration, _catalog, _art, new EventPresenter(exploration, _text, _settings));
+        new(
+            exploration,
+            _art,
+            new EventPresenter(exploration, _text, _settings),
+            new InteractionPromptView(_text, exploration.CurrentDefinitionOf));
 
     private SystemPage CreateSystemPage(GameSession session) =>
         new(_text, _ui, new SavePage(_saveSlots, session, _text, _ui), new LoadPage(_saveSlots, _text, _ui));

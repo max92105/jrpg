@@ -51,3 +51,14 @@ Part of [the demo retirement plan](../README.md). Design: [design.md](../design.
     - [ ] Open the chest: the prompt goes while the message shows, and doesn't come back if its event is "once".
     - [ ] Face the villager: "Talk". Turn away: gone. Walk along the house fronts: the prompt follows the door you face (note any flicker for G1b).
     - [ ] Through the door to `interior_1` and back: no prompt left over from the other map.
+  - **Done, with deviations:**
+    - `InteractionTarget`'s object member is `Placed`: `Object` breaks CA1720.
+    - The view's constructor is `(ScreenText, Func<PlacedObject, ObjectDefinition>)`: `Draw(batch, textures, cameraOrigin)` needs the texture library for its box, and taking the lookup in `Draw` too would make five parameters. `UiTextures` waits for G1b, its first user.
+    - `ExplorationState` refreshes the target by calling `RefreshInteraction()` at the end of each command. Walking's body moved to a private `WalkAndTrigger`, so its early returns all reach the refresh. `TryInteract` returning false changes nothing, so it doesn't refresh.
+    - The warp test is in `ExplorationWarpTests`, where the two-map fixture is.
+    - Screenshot check: "E  Talk" shows above the villager. When the player stands right above the object, the box covers the player's sprite; for G1b to weigh.
+    - Review: the refresh after `ContinueEvent` and `FinishEncounter` had no test that could fail.
+      - The warp now lands facing a cave chest, and the test asserts its uid.
+      - `InteractionInFront_RepeatableTalkEnded_IsSetAgain` (a notice board added to the state fixture) and `FinishEncounter_FacingAnObject_SetsInteractionInFront` (a post on the encounter field) are new.
+      - `InteractEventFinishingAtOnce_IsRefreshed` stays as planned, though its expected record equals the old one.
+    - The planned `WalkingAlongSameObject` test is named `WalkingTowardSameObject`, because the fixture's objects are one cell wide.

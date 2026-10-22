@@ -36,3 +36,5 @@ Seen again in battle C1 (single-recipient variant): `VictoryRewards.Experience` 
 Seen again in battle B1b (loop-exit variant): the flow test loops `while session.ActiveBattle is not null`, then asserts `ActiveBattle` is null and the position kept (Core forbids walking anyway), so a no-op `BattleTransitions.Finish` (battle screen never popped) passes. When asserts restate a loop's exit condition, ask what proves the screen/stack changed (e.g. the map takes input again).
 
 Seen again in demo-retirement I1 (cache variant): `ButtonLabelsTests.Of_SameButtonTwice_ReturnsTheSameString` uses `Assert.Same`, but .NET's `Enum.ToString()` already returns the same cached name instance (probed with fsi), so it passes with no cache. Reference-identity tests of a cache need a value the runtime doesn't intern.
+
+Seen again in demo-retirement G1a (stale-equals-expected variant): `InteractionInFront_AfterWarp_IsRefreshedOnTheNewMap` asserts null, but the value was already null from `TryInteract`, so deleting the refresh in `ContinueEvent` keeps it green. For a "refreshed" test, the expected value must differ from the stale one.

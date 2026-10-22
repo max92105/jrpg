@@ -13,7 +13,7 @@ using Jrpg.Core.World;
 namespace Jrpg.Core.Tests.Exploration;
 
 /// <summary>
-/// "field" is a 6x1 floor with random battles (1 in 2 steps after 1 grace step) and a sign cell at (5, 0).
+/// "field" is a 6x1 floor with random battles (1 in 2 steps after 1 grace step), a sign cell at (5, 0) and a post at (3, 0) that talks when faced.
 /// "house" is a 3x1 floor without battles whose cell (2, 0) warps to the field's (0, 0).
 /// </summary>
 public sealed class ExplorationEncounterTests
@@ -108,6 +108,19 @@ public sealed class ExplorationEncounterTests
     }
 
     [Fact]
+    public void FinishEncounter_FacingAnObject_SetsInteractionInFront()
+    {
+        var exploration = StartOn("field", new FixedSequenceRandom(0, 0));
+        exploration.Walk(_right, _oneStep);
+        exploration.Walk(_right, _oneStep);
+        Assert.Null(exploration.InteractionInFront);
+
+        exploration.FinishEncounter();
+
+        Assert.Equal("post@3,0", exploration.InteractionInFront?.Placed.Uid);
+    }
+
+    [Fact]
     public void FinishEncounter_NonePending_Throws()
     {
         var exploration = StartOn("field", new FixedSequenceRandom());
@@ -135,6 +148,7 @@ public sealed class ExplorationEncounterTests
         var field = new MapLayoutBuilder().WithLayer("111111").Build() with
         {
             Id = "field",
+            Objects = [new PlacedObject { Uid = "post@3,0", ObjectId = "post", Position = new Point2D(3, 0), Z = MapLayers.PlayerZ, Events = [new MapEventBuilder().WithId("post_0").WithSteps(new DialogueStep(new Speech(["A post."]))).Build()] }],
             CellEvents = [new CellEvent(new GridCell(5, 0), TouchEvent("cell_5_0", new DialogueStep(new Speech(["A sign."]))))],
         };
         var house = new MapLayoutBuilder().WithLayer("111").Build() with
@@ -143,6 +157,7 @@ public sealed class ExplorationEncounterTests
             CellEvents = [new CellEvent(new GridCell(2, 0), TouchEvent("cell_2_0", new WarpStep("field", new GridCell(0, 0))))],
         };
         var catalog = new ContentCatalogBuilder()
+            .WithObjects(new ObjectDefinition { Id = "post", Width = 1, Height = 1, CollisionPolygon = [], Category = "test", Tiles = [], AbovePlayerZones = [] })
             .WithMaps(field, house)
             .WithRandomEncounters("field", new RandomEncounterTable { OneInSteps = 2, GraceSteps = 1, EncounterIds = ["goblin_trio"] })
             .WithEncounters(_goblins)

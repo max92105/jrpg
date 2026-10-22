@@ -28,6 +28,7 @@ public sealed class ExplorationState
         _walker = new PlayerWalker(start.Position, start.Facing, context.Catalog.Rules.Exploration);
         _encounters = new RandomEncounters(context.Random);
         EnterMap(start.MapId, start.Position);
+        RefreshInteraction();
     }
 
     public MapLocation Location => new(_map.Definition.Id, _walker.Position, _walker.Facing);
@@ -64,6 +65,12 @@ public sealed class ExplorationState
     public EncounterDefinition? PendingEncounter { get; private set; }
 
     /// <summary>
+    /// What the confirm button would start on the object the player faces, for the Game's prompt; null while an event
+    /// runs or a battle is pending. The same record while the target stays the same, so the Game can compare references.
+    /// </summary>
+    public InteractionTarget? InteractionInFront { get; private set; }
+
+    /// <summary>
     /// Moves the player. Entering a new cell starts its touch event, once per entry, or else rolls for a random battle
     /// (one step). Otherwise, while moving, a touch event on the object in front starts, if the player has stood still
     /// since entering the map or since the last cell or object touch event (decision 38).
@@ -72,6 +79,64 @@ public sealed class ExplorationState
     public void Walk(MoveIntent intent, TimeSpan delta)
     {
         ThrowIfBusy();
+        WalkAndTrigger(intent, delta);
+        RefreshInteraction();
+    }
+
+    /// <summary>Starts the interact event of the object the player faces, as the confirm button does.</summary>
+    /// <returns>False when nothing in front can be interacted with.</returns>
+    /// <exception cref="InvalidOperationException">An event is running or a battle is pending.</exception>
+    public bool TryInteract()
+    {
+        ThrowIfBusy();
+        if (_finder.FindInFront(_walker.Position, _walker.Facing, EventActivation.Interact) is not { } triggered)
+        {
+            return false;
+        }
+
+        Start(triggered);
+        RefreshInteraction();
+        return true;
+    }
+
+    /// <summary>
+    /// The player has read the current step, or the Game has faded out for a warp, which then moves the player to the
+    /// center of the target cell. The event moves on to its next waiting step or ends.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">No event is running.</exception>
+    public void ContinueEvent()
+    {
+        var run = _run ?? throw new InvalidOperationException("No event is running.");
+        if (run.Current is WarpStep warp)
+        {
+            EnterMap(warp.MapId, warp.Cell.Center);
+        }
+
+        run.Continue();
+        if (run.IsFinished)
+        {
+            _run = null;
+        }
+
+        RefreshInteraction();
+    }
+
+    /// <summary>The pending battle is over, whatever its outcome; the next steps are grace steps again (decision 26).</summary>
+    /// <exception cref="InvalidOperationException">No encounter is pending.</exception>
+    public void FinishEncounter()
+    {
+        if (PendingEncounter is null)
+        {
+            throw new InvalidOperationException("No encounter is pending.");
+        }
+
+        PendingEncounter = null;
+        _encounters.ResetSteps();
+        RefreshInteraction();
+    }
+
+    private void WalkAndTrigger(MoveIntent intent, TimeSpan delta)
+    {
         _walker.Walk(intent, delta, _collision);
         if (!_walker.IsMoving)
         {
@@ -95,53 +160,23 @@ public sealed class ExplorationState
         }
     }
 
-    /// <summary>Starts the interact event of the object the player faces, as the confirm button does.</summary>
-    /// <returns>False when nothing in front can be interacted with.</returns>
-    /// <exception cref="InvalidOperationException">An event is running or a battle is pending.</exception>
-    public bool TryInteract()
+    private void RefreshInteraction()
     {
-        ThrowIfBusy();
-        var triggered = _finder.FindInFront(_walker.Position, _walker.Facing, EventActivation.Interact);
-        if (triggered is null)
+        var found = _run is null && PendingEncounter is null
+            ? _finder.FindInFront(_walker.Position, _walker.Facing, EventActivation.Interact)
+            : null;
+        if (found is not { Source: { } placed } triggered)
         {
-            return false;
+            InteractionInFront = null;
+            return;
         }
 
-        Start(triggered);
-        return true;
-    }
-
-    /// <summary>
-    /// The player has read the current step, or the Game has faded out for a warp, which then moves the player to the
-    /// center of the target cell. The event moves on to its next waiting step or ends.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">No event is running.</exception>
-    public void ContinueEvent()
-    {
-        var run = _run ?? throw new InvalidOperationException("No event is running.");
-        if (run.Current is WarpStep warp)
+        if (InteractionInFront is { } current && ReferenceEquals(current.Placed, placed) && ReferenceEquals(current.Event, triggered.Event))
         {
-            EnterMap(warp.MapId, warp.Cell.Center);
+            return;
         }
 
-        run.Continue();
-        if (run.IsFinished)
-        {
-            _run = null;
-        }
-    }
-
-    /// <summary>The pending battle is over, whatever its outcome; the next steps are grace steps again (decision 26).</summary>
-    /// <exception cref="InvalidOperationException">No encounter is pending.</exception>
-    public void FinishEncounter()
-    {
-        if (PendingEncounter is null)
-        {
-            throw new InvalidOperationException("No encounter is pending.");
-        }
-
-        PendingEncounter = null;
-        _encounters.ResetSteps();
+        InteractionInFront = new InteractionTarget(placed, triggered.Event);
     }
 
     /// <summary>

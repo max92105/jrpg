@@ -11,9 +11,13 @@ internal sealed class MapArt
     {
         Atlas = new TileAtlas(catalog);
         Canopies = new CanopyTextures(catalog.Objects, Atlas, cellPixels);
+        PlayerSpriteFile = catalog.NewGame.FieldSpriteFile;
     }
 
     public TileAtlas Atlas { get; }
 
     public CanopyTextures Canopies { get; }
+
+    /// <summary>The field sprite the player walks with, in the field-sprite art folder.</summary>
+    public string PlayerSpriteFile { get; }
 }

@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Jrpg.Core.Content;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
@@ -26,33 +25,47 @@ internal sealed class ExplorationScene : IScene
     // Built once: a method group converted on every call would allocate a delegate per frame.
     private readonly Func<PlacedObject, ObjectDefinition> _currentDefinitionOf;
     private readonly MapArt _art;
-    private readonly string _fieldSpriteFile;
     private readonly EventPresenter _presenter;
+    private readonly InteractionPromptView _prompt;
     private readonly MapCamera _camera = new();
     private readonly MapDrawList _drawList = new();
     private readonly WalkAnimation _walkAnimation = new();
     private MapDefinition _map;
     private MapView _view;
 
-    public ExplorationScene(ExplorationState exploration, ContentCatalog catalog, MapArt art, EventPresenter presenter)
+    public ExplorationScene(ExplorationState exploration, MapArt art, EventPresenter presenter, InteractionPromptView prompt)
     {
         _exploration = exploration;
         _currentDefinitionOf = exploration.CurrentDefinitionOf;
         _art = art;
-        _fieldSpriteFile = catalog.NewGame.FieldSpriteFile;
         _presenter = presenter;
+        _prompt = prompt;
         EnterCurrentMap();
     }
 
     /// <summary>
     /// Shows the running event's step; interacts, walks and opens the menu only once it and its fade are over. An
     /// interaction that starts an event waits for it like any other. While a step's encounter is pending, the player
-    /// stands.
+    /// stands. The prompt over what the player faces follows, hidden while an event shows.
     /// </summary>
     /// <returns>
     /// The menu when Menu is pressed between events; a battle on the update a step starts an encounter; otherwise null.
     /// </returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
+    {
+        var request = UpdateExploration(delta, input);
+        _prompt.Update(_presenter.IsBusy ? null : _exploration.InteractionInFront, input.Device);
+        return request;
+    }
+
+    public void Draw(SpriteBatch batch, TextureLibrary textures)
+    {
+        DrawMap(batch, textures);
+        _prompt.Draw(batch, textures, _camera.Origin);
+        _presenter.Draw(batch, textures);
+    }
+
+    private SceneRequest? UpdateExploration(TimeSpan delta, InputFrame input)
     {
         // Sampled before the presenter runs: the Confirm that closes the last message mustn't also interact again.
         var wasBusy = _presenter.IsBusy;
@@ -88,12 +101,6 @@ internal sealed class ExplorationScene : IScene
 
         WalkAndFollow(delta, input);
         return _exploration.PendingEncounter is null ? null : new BattleRequested();
-    }
-
-    public void Draw(SpriteBatch batch, TextureLibrary textures)
-    {
-        DrawMap(batch, textures);
-        _presenter.Draw(batch, textures);
     }
 
     // The one way onto a map, at the start and after each warp: the camera jumps rather than gliding across the map.
@@ -158,6 +165,6 @@ internal sealed class ExplorationScene : IScene
         var left = (int)Math.Round((position.X * size) - (size / 2.0) - origin.X);
         var top = (int)Math.Round((position.Y * size) - (size / 2.0) - origin.Y);
         var source = FieldSpriteFrame.SourceOf(_exploration.PlayerFacing, _walkAnimation.Frame);
-        batch.Draw(textures.Get(ArtFolders.FieldSprites, _fieldSpriteFile), new Rectangle(left, top, size, size), source, Color.White);
+        batch.Draw(textures.Get(ArtFolders.FieldSprites, _art.PlayerSpriteFile), new Rectangle(left, top, size, size), source, Color.White);
     }
 }

@@ -60,7 +60,11 @@ internal static class StartMapScenarios
         GameSession.StartNew(catalog, new SeededRandom(1)).Exploration;
 
     public static ExplorationScene SceneOf(ExplorationState exploration, ContentCatalog catalog) =>
-        new(exploration, catalog, new MapArt(catalog, MapView.CellPixels), new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings()));
+        new(
+            exploration,
+            new MapArt(catalog, MapView.CellPixels),
+            new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings()),
+            new InteractionPromptView(RepositoryScreenText.Text, exploration.CurrentDefinitionOf));
 
     /// <summary>Holds Left from <see cref="NextToForestWarpAlwaysRolling"/>, through the warp, until a step requests a battle.</summary>
     /// <returns>Whether a battle was requested within 10 s.</returns>

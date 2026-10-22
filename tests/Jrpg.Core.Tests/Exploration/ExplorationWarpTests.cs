@@ -13,7 +13,7 @@ namespace Jrpg.Core.Tests.Exploration;
 /// <summary>
 /// Two 4x4 floor maps. "town" has a chest at (1, 0) that gives a potion once, swaps open and warps to the cave, and a
 /// cell at (3, 3) that warps to the cave. "cave" has a cell at (2, 2) that warps back onto the town's warp cell (3, 3) and a sign
-/// cell at (1, 1) that talks.
+/// cell at (1, 1) that talks, with a chest at (1, 0) above it.
 /// </summary>
 public sealed class ExplorationWarpTests
 {
@@ -25,6 +25,8 @@ public sealed class ExplorationWarpTests
     private static readonly MapEvent _openChest = new MapEventBuilder().WithId("chest_0").AsOnce()
         .WithSteps(new GiveItemStep("potion", 1), new SwapObjectStep("chest_opened"), new WarpStep("cave", new GridCell(1, 1)))
         .Build();
+
+    private static readonly MapEvent _caveChest = new MapEventBuilder().WithId("cave_chest_0").AsOnce().WithSteps(new GiveItemStep("potion", 1)).Build();
 
     private readonly Inventory _inventory = new();
     private readonly WorldState _world = new();
@@ -40,6 +42,22 @@ public sealed class ExplorationWarpTests
 
         Assert.Equal(new MapLocation("cave", new Point2D(0.5, 3.5), Facing.Right), exploration.Location);
         Assert.False(exploration.IsEventRunning);
+    }
+
+    [Fact]
+    public void InteractionInFront_AfterWarp_IsRefreshedOnTheNewMap()
+    {
+        var exploration = StartAt(new MapLocation("town", new Point2D(1.5, 1.5), Facing.Up));
+        Assert.NotNull(exploration.InteractionInFront);
+        exploration.TryInteract();
+
+        while (exploration.IsEventRunning)
+        {
+            exploration.ContinueEvent();
+        }
+
+        Assert.Equal("cave", exploration.CurrentMap.Id);
+        Assert.Equal("chest@cave1,0", exploration.InteractionInFront?.Placed.Uid);
     }
 
     [Fact]
@@ -116,6 +134,7 @@ public sealed class ExplorationWarpTests
         var cave = new MapLayoutBuilder().WithLayer("1111", "1111", "1111", "1111").Build() with
         {
             Id = "cave",
+            Objects = [new PlacedObject { Uid = "chest@cave1,0", ObjectId = "chest", Position = new Point2D(1, 0), Z = MapLayers.PlayerZ, Events = [_caveChest] }],
             CellEvents =
             [
                 new CellEvent(new GridCell(2, 2), WarpEvent("cell_2_2", "town", new GridCell(3, 3))),

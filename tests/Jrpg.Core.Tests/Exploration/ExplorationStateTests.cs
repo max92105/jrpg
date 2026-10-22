@@ -11,7 +11,7 @@ using Jrpg.Core.World;
 namespace Jrpg.Core.Tests.Exploration;
 
 /// <summary>
-/// A 5x5 floor: a chest at (2, 0) that gives a potion once and opens, a lever at (0, 0) that only swaps, an open door
+/// A 5x5 floor: a chest at (2, 0) that gives a potion once and opens, a lever at (0, 0) that only swaps, a notice board at (4, 0) that talks every time, an open door
 /// at (4, 2) that greets on touch with a doormat cell before it at (3, 2), a sign cell at (1, 3), and a cell at (0, 2)
 /// that talks only once.
 /// </summary>
@@ -24,6 +24,7 @@ public sealed class ExplorationStateTests
     private static readonly ObjectDefinition _lever = _chest with { Id = "lever" };
     private static readonly ObjectDefinition _leverPulled = _chest with { Id = "lever_pulled" };
     private static readonly ObjectDefinition _openDoor = _chest with { Id = "door_open" };
+    private static readonly ObjectDefinition _noticeBoard = _chest with { Id = "notice_board" };
     private static readonly ItemDefinition _potion = new ItemDefinitionBuilder().WithId("potion").Build();
 
     private static readonly DialogueStep _greeting = new(new Speech(["Welcome!"]));
@@ -35,6 +36,7 @@ public sealed class ExplorationStateTests
     private static readonly MapEvent _readSign = new MapEventBuilder().WithId("cell_1_3").AsTouch().WithSteps(_greeting).Build();
     private static readonly MapEvent _rememberOnce = new MapEventBuilder().WithId("cell_0_2").AsTouch().AsOnce().WithSteps(_greeting).Build();
     private static readonly MapEvent _wipeFeet = new MapEventBuilder().WithId("cell_3_2").AsTouch().WithSteps(_greeting).Build();
+    private static readonly MapEvent _readNotice = new MapEventBuilder().WithId("notice_0").WithSteps(_greeting).Build();
 
     private readonly Inventory _inventory = new();
 
@@ -282,6 +284,90 @@ public sealed class ExplorationStateTests
         Assert.Equal(Facing.Right, exploration.PlayerFacing);
     }
 
+    [Fact]
+    public void InteractionInFront_FacingChest_ReturnsItsInteractEvent()
+    {
+        var exploration = StartAt(new Point2D(2.5, 1.5), Facing.Up);
+
+        var target = exploration.InteractionInFront;
+
+        Assert.Equal("chest@2,0", target?.Placed.Uid);
+        Assert.Same(_openChest, target?.Event);
+    }
+
+    [Fact]
+    public void InteractionInFront_FacingAway_IsNull()
+    {
+        var exploration = StartAt(new Point2D(2.5, 1.5), Facing.Down);
+
+        Assert.Null(exploration.InteractionInFront);
+    }
+
+    [Fact]
+    public void InteractionInFront_WhileEventRuns_IsNull()
+    {
+        var exploration = StartAt(new Point2D(2.5, 1.5), Facing.Up);
+
+        exploration.TryInteract();
+
+        Assert.Null(exploration.InteractionInFront);
+    }
+
+    [Fact]
+    public void InteractionInFront_OnceEventDone_IsNull()
+    {
+        var exploration = StartAt(new Point2D(2.5, 1.5), Facing.Up);
+        exploration.TryInteract();
+
+        exploration.ContinueEvent();
+
+        Assert.Null(exploration.InteractionInFront);
+    }
+
+    [Fact]
+    public void InteractionInFront_TouchEventOnly_IsNull()
+    {
+        var exploration = StartAt(new Point2D(3.5, 2.5), Facing.Right);
+
+        Assert.Null(exploration.InteractionInFront);
+    }
+
+    [Fact]
+    public void InteractionInFront_WalkingTowardSameObject_KeepsTheSameRecord()
+    {
+        var exploration = StartAt(new Point2D(2.5, 1.6), Facing.Up);
+        var step = TimeSpan.FromMilliseconds(10);
+        exploration.Walk(MoveIntent.FromAxes(0, -1), step);
+        var first = exploration.InteractionInFront;
+
+        exploration.Walk(MoveIntent.FromAxes(0, -1), step);
+
+        Assert.NotNull(first);
+        Assert.Same(first, exploration.InteractionInFront);
+    }
+
+    [Fact]
+    public void InteractionInFront_InteractEventFinishingAtOnce_IsRefreshed()
+    {
+        var exploration = StartAt(new Point2D(0.5, 1.5), Facing.Up);
+
+        exploration.TryInteract();
+
+        Assert.Equal("lever_pulled", exploration.CurrentDefinitionOf(exploration.InteractionInFront!.Placed).Id);
+        Assert.Same(_pullLever, exploration.InteractionInFront.Event);
+    }
+
+    [Fact]
+    public void InteractionInFront_RepeatableTalkEnded_IsSetAgain()
+    {
+        var exploration = StartAt(new Point2D(4.5, 1.5), Facing.Up);
+        exploration.TryInteract();
+
+        exploration.ContinueEvent();
+
+        Assert.Equal("notice@4,0", exploration.InteractionInFront?.Placed.Uid);
+    }
+
     private ExplorationState StartAt(Point2D position, Facing facing)
     {
         var layout = new MapLayoutBuilder().WithLayer("11111", "11111", "11111", "11111", "11111").Build() with
@@ -291,6 +377,7 @@ public sealed class ExplorationStateTests
                 new PlacedObject { Uid = "lever@0,0", ObjectId = "lever", Position = new Point2D(0, 0), Z = MapLayers.PlayerZ, Events = [_pullLever] },
                 new PlacedObject { Uid = "chest@2,0", ObjectId = "chest", Position = new Point2D(2, 0), Z = MapLayers.PlayerZ, Events = [_openChest] },
                 new PlacedObject { Uid = "door@4,2", ObjectId = "door_open", Position = new Point2D(4, 2), Z = MapLayers.PlayerZ, Events = [_greetAtDoor] },
+                new PlacedObject { Uid = "notice@4,0", ObjectId = "notice_board", Position = new Point2D(4, 0), Z = MapLayers.PlayerZ, Events = [_readNotice] },
             ],
             CellEvents =
             [
@@ -301,7 +388,7 @@ public sealed class ExplorationStateTests
         };
         var catalog = new ContentCatalogBuilder()
             .WithTiles(TestTiles.Walkable(1))
-            .WithObjects(_chest, _openedChest, _lever, _leverPulled, _openDoor)
+            .WithObjects(_chest, _openedChest, _lever, _leverPulled, _openDoor, _noticeBoard)
             .WithItems(_potion)
             .WithMaps(layout)
             .Build();

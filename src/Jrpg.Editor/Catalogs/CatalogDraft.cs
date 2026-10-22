@@ -88,6 +88,22 @@ internal sealed partial class CatalogDraft : ObservableObject
             catalog => before is null ? WithoutTilesheet(catalog, sheet.Id) : WithTilesheet(catalog, before)));
     }
 
+    /// <summary>
+    /// Replaces the object with its id, or adds it when the id is new, as one undo step; nothing when the record is the same.
+    /// </summary>
+    public void SetObject(ObjectDefinition definition)
+    {
+        var before = Current.Objects.GetValueOrDefault(definition.Id);
+        if (before is not null && IsSameObject(before, definition))
+        {
+            return;
+        }
+
+        Do(new CatalogEdit(
+            catalog => WithObject(catalog, definition),
+            catalog => before is null ? WithoutObject(catalog, definition.Id) : WithObject(catalog, before)));
+    }
+
     /// <summary>The tiles the next undo would remove, so it can be refused while one is in use; empty when it removes none.</summary>
     public IReadOnlyList<int> TilesRemovedByUndo() =>
         _history.NextUndo is { } edit ? [.. Current.Tiles.Keys.Except(edit.Revert(Current).Tiles.Keys).Order()] : [];
@@ -131,6 +147,21 @@ internal sealed partial class CatalogDraft : ObservableObject
 
     private static ContentCatalog WithoutTile(ContentCatalog catalog, int tileId) =>
         catalog with { Tiles = catalog.Tiles.Where(pair => pair.Key != tileId).ToDictionary() };
+
+    private static ContentCatalog WithObject(ContentCatalog catalog, ObjectDefinition definition) =>
+        catalog with { Objects = new Dictionary<string, ObjectDefinition>(catalog.Objects) { [definition.Id] = definition } };
+
+    private static ContentCatalog WithoutObject(ContentCatalog catalog, string objectId) =>
+        catalog with { Objects = catalog.Objects.Where(pair => pair.Key != objectId).ToDictionary() };
+
+    // Records compare lists by reference, so an outline edited back to the same points would otherwise count as a change:
+    // the with-copy compares every field but the lists, and the lists are compared by content below.
+    private static bool IsSameObject(ObjectDefinition before, ObjectDefinition after) =>
+        before with { CollisionPolygon = after.CollisionPolygon, Tiles = after.Tiles, AbovePlayerZones = after.AbovePlayerZones } == after
+        && before.CollisionPolygon.SequenceEqual(after.CollisionPolygon)
+        && before.Tiles.SequenceEqual(after.Tiles)
+        && before.AbovePlayerZones.Count == after.AbovePlayerZones.Count
+        && before.AbovePlayerZones.Zip(after.AbovePlayerZones).All(pair => pair.First.SequenceEqual(pair.Second));
 
     private static ContentCatalog WithTilesheet(ContentCatalog catalog, TilesheetDefinition sheet) =>
         catalog with { Tilesheets = new Dictionary<string, TilesheetDefinition>(catalog.Tilesheets) { [sheet.Id] = sheet } };

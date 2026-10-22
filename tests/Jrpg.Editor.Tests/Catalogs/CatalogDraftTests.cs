@@ -182,6 +182,40 @@ public sealed class CatalogDraftTests
         Assert.Equal(sheet, _draft.Current.Tilesheets[sheet.Id]);
     }
 
+    [Fact]
+    public void SetObject_ExistingId_ReplacesItAndMarksDirty()
+    {
+        var edited = _draft.Current.Objects["chest"] with { CollisionPolygon = [] };
+
+        _draft.SetObject(edited);
+
+        Assert.Same(edited, _draft.Current.Objects["chest"]);
+        Assert.True(_draft.IsDirty);
+    }
+
+    // The same points in new lists: no change, so no undo step and nothing unsaved.
+    [Fact]
+    public void SetObject_EqualRecord_StaysClean()
+    {
+        var chest = _draft.Current.Objects["chest"];
+
+        _draft.SetObject(chest with { CollisionPolygon = [.. chest.CollisionPolygon] });
+
+        Assert.False(_draft.IsDirty);
+        Assert.False(_draft.CanUndo);
+    }
+
+    [Fact]
+    public void Undo_AfterSetObject_RestoresTheOldOutline()
+    {
+        var chest = _draft.Current.Objects["chest"];
+        _draft.SetObject(chest with { CollisionPolygon = [] });
+
+        _draft.Undo();
+
+        Assert.Same(chest, _draft.Current.Objects["chest"]);
+    }
+
     private static TilesheetDefinition Grass3 => new() { Id = "grass_3", File = "Grass3.png", TileWidth = 48, TileHeight = 48, Margin = 0, Spacing = 0 };
 
     // Far past any sheet's last cell, so no tile of the repository's content is cut from it.

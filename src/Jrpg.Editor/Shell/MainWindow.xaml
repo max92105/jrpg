@@ -168,7 +168,7 @@
         </TabItem>
         <!-- Click places the chosen object, Shift + drag moves one, right click or Delete removes, Ctrl + drag selects. -->
         <TabItem x:Name="ObjectsTab" Header="Objects">
-          <objects:ObjectBrowserView x:Name="ObjectBrowser" DataContext="{Binding Placing.Browser}" />
+          <objects:ObjectBrowserView x:Name="ObjectBrowser" DataContext="{Binding Placing.Browser}" MouseDoubleClick="OnObjectBrowserDoubleClicked" />
         </TabItem>
         <TabItem x:Name="EventsTab" Header="Events">
           <TextBlock Margin="8"

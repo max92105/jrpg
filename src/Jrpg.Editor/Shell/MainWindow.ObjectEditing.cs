@@ -20,13 +20,28 @@ internal sealed partial class MainWindow
 
     // The drag under way, if any: a selection rectangle from a point, or an object moved with an offset from the mouse.
     private Point2D? _selectionStart;
-    private (PlacedObject Placed, Vector Offset)? _movedObject;
+    private (PlacedObject Placed, Vector Offset, Point2D From)? _movedObject;
     private ObjectDefinition? _ghostDefinition;
 
-    // OK applies the outline as one catalog step; the catalog change redraws the map and the preview.
-    private void OnEditShapesClicked(object sender, RoutedEventArgs e)
+    private void OnEditShapesClicked(object sender, RoutedEventArgs e) => EditShapes(Placing.StartEditingShapes());
+
+    // Only a double-click on a listed object: not on the preview, a category header or the scroll bar.
+    private void OnObjectBrowserDoubleClicked(object sender, MouseButtonEventArgs e)
     {
-        if (_drawing is null || Placing.StartEditingShapes() is not { } shapes)
+        for (var element = e.OriginalSource as DependencyObject; element is not null; element = VisualTreeHelper.GetParent(element))
+        {
+            if (element is ListBoxItem)
+            {
+                EditShapes(Placing.StartEditingChosenShapes());
+                return;
+            }
+        }
+    }
+
+    // OK applies the outline as one catalog step; the catalog change redraws the map and the preview.
+    private void EditShapes(ObjectShapesViewModel? shapes)
+    {
+        if (_drawing is null || shapes is null)
         {
             return;
         }
@@ -38,8 +53,16 @@ internal sealed partial class MainWindow
         }
     }
 
-    private bool HandleObjectButton(MouseButton button, Point2D point)
+    // A plain click places the chosen object, so a placed object's shapes open on Shift + double-click: a Shift click
+    // that doesn't move the object changes nothing.
+    private bool HandleObjectButton(MouseButton button, Point2D point, int clickCount)
     {
+        if (button == MouseButton.Left && clickCount == 2 && Keyboard.Modifiers == ModifierKeys.Shift)
+        {
+            EditShapes(Placing.StartEditingShapesAt(point));
+            return true;
+        }
+
         if (button == MouseButton.Right)
         {
             if (Placing.ObjectAt(point) is { } hit)
@@ -61,7 +84,7 @@ internal sealed partial class MainWindow
         }
         else if (Keyboard.Modifiers == ModifierKeys.Shift && Placing.ObjectAt(point) is { } grabbed)
         {
-            _movedObject = (grabbed, new Vector(grabbed.Position.X - point.X, grabbed.Position.Y - point.Y));
+            _movedObject = (grabbed, new Vector(grabbed.Position.X - point.X, grabbed.Position.Y - point.Y), point);
         }
         else
         {
@@ -139,10 +162,18 @@ internal sealed partial class MainWindow
         {
             Placing.SelectObjectsIn(start, point);
         }
-        else if (_movedObject is { } moved)
+        else if (_movedObject is { } moved && IsPastDragDistance(moved.From, point))
         {
             Placing.MoveObject(moved.Placed.Uid, new Point2D(point.X + moved.Offset.X, point.Y + moved.Offset.Y));
         }
+    }
+
+    // A press and release within Windows' drag distance is a click, so a Shift + double-click doesn't nudge the object.
+    private bool IsPastDragDistance(Point2D from, Point2D to)
+    {
+        var screenPixelsPerCell = MapDrawing.CellPixels * _viewport.Zoom;
+        return Math.Abs(to.X - from.X) * screenPixelsPerCell >= SystemParameters.MinimumHorizontalDragDistance
+            || Math.Abs(to.Y - from.Y) * screenPixelsPerCell >= SystemParameters.MinimumVerticalDragDistance;
     }
 
     private void CancelObjectDrag()

@@ -59,7 +59,8 @@
         Right click: remove an object.<LineBreak />
         Ctrl + drag: select objects.<LineBreak />
         Delete: remove the selected objects, or the one under the mouse.<LineBreak />
-        Objects > Edit shapes: open the shapes window for the object chosen in the Objects panel.
+        Objects > Edit shapes: open the shapes window for the one placed object selected, else the object chosen in the Objects panel.<LineBreak />
+        Shift + double-click a placed object, or double-click one in the Objects panel: open its shapes.
       </TextBlock>
 
       <TextBlock Style="{StaticResource Heading}" Text="Shapes window" />

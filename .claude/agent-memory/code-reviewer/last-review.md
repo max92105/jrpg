@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-21-editor/slices/E9b.md, E9b (object shapes window; uncommitted)
-Round: 1 (verdict: Ready to commit; verify all pass, 1466 tests)
+Slice: docs/plans/2026-10-21-editor/slices/E9c.md, E9c (opening the shapes window from the map; uncommitted)
+Round: 1 (verdict: Ready to commit; verify all pass, 1469 tests)
 
-- open (Warning): ObjectShapesWindow.DrawOutline StrokeThickness=1 and PointMarkPixels=3 are in map pixels inside the Viewbox, so a 1x1 object (chest, 48 px -> 560) gets a ~12 px stroke and ~35 px marks; divide by the Viewbox scale like CollisionDrawing's StrokeScreenPixels.
-- open (Suggestion): OnEditShapesClicked re-fetches the definition via `_viewModel.Catalog!.Objects[shapes.ObjectId]`; the picture could come from the same definition StartEditingShapes used.
-- open (Suggestion): `System.Windows.Shapes.Polygon` fully qualified next to `using System.Windows.Shapes` (Core.Geometry.Polygon clash); an alias `using WpfPolygon = ...` reads cleaner.
+- open (Warning): MainWindow.xaml MouseDoubleClick on the whole ObjectBrowserView: a double-click on the preview image, a group header or the list's scrollbar opens the chosen object's shapes; hook ListBoxItem (ItemContainerStyle EventSetter) instead.
+- open (Warning): Shift + double-click: the first Shift press starts an unsnapped move, so 1 px of jitter before release moves the object ~1/48 cell and leaves an undo step, contradicting the comment and the hand check "nothing is moved"; start the move only past SystemParameters.MinimumHorizontal/VerticalDragDistance.
+- open (Suggestion): placed-object-by-uid lookup now in StartEditingShapes and MoveObject; a private PlacedObjectWithUid(uid) would share it.

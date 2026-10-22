@@ -323,7 +323,7 @@ internal sealed partial class MainWindow : Window
         {
             e.Handled = _viewModel.Mode switch
             {
-                EditingMode.Objects => HandleObjectButton(e.ChangedButton, MapPointAt(e)),
+                EditingMode.Objects => HandleObjectButton(e.ChangedButton, MapPointAt(e), e.ClickCount),
                 EditingMode.Events => HandleEventButton(e.ChangedButton, MapPointAt(e)),
                 _ => HandlePaintButton(e.ChangedButton, CellAt(e)),
             };

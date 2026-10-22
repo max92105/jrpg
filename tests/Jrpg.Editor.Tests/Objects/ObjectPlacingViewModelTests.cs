@@ -1,5 +1,6 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Geometry;
+using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Maps;
@@ -31,6 +32,35 @@ public sealed class ObjectPlacingViewModelTests
 
         Assert.Null(_placing.StartEditingShapes());
         Assert.False(_placing.CanEditShapes);
+    }
+
+    // A tree alone on the forest map, at (2, 2), while the panel has the chest chosen.
+    [Fact]
+    public void StartEditingShapes_OnePlacedObjectSelected_EditsItsDefinition()
+    {
+        var tree = OpenForestWithOnlyATree();
+        _placing.SelectObjectsIn(TileCenterOf(tree), TileCenterOf(tree));
+
+        var shapes = _placing.StartEditingShapes();
+
+        Assert.Equal("tree", shapes?.ObjectId);
+        Assert.True(_placing.CanEditShapes);
+    }
+
+    [Fact]
+    public void StartEditingShapesAt_PlacedObjectUnderPoint_EditsItsDefinition()
+    {
+        var tree = OpenForestWithOnlyATree();
+
+        Assert.Equal("tree", _placing.StartEditingShapesAt(TileCenterOf(tree))?.ObjectId);
+    }
+
+    [Fact]
+    public void StartEditingShapesAt_EmptyCell_ReturnsNull()
+    {
+        OpenForestWithOnlyATree();
+
+        Assert.Null(_placing.StartEditingShapesAt(new Point2D(0.5, 0.5)));
     }
 
     [Fact]
@@ -146,5 +176,20 @@ public sealed class ObjectPlacingViewModelTests
         _placing.OpenMap = new MapViewModel(_catalog.Maps["start"]);
 
         Assert.Empty(_placing.SelectedObjectUids);
+    }
+
+    private PlacedObject OpenForestWithOnlyATree()
+    {
+        var forest = _catalog.Maps["forest"];
+        var tree = new PlacedObject { Uid = "tree_1", ObjectId = "tree", Position = new Point2D(2, 2), Z = 1 };
+        _placing.OpenMap = new MapViewModel(new MapDefinition(forest.Layout with { Objects = [tree] }, forest.Settings));
+        return tree;
+    }
+
+    // The middle of the object's first tile, which the object covers.
+    private static Point2D TileCenterOf(PlacedObject placed)
+    {
+        var tile = _catalog.Objects[placed.ObjectId].Tiles[0];
+        return new Point2D(placed.Position.X + tile.X + 0.5, placed.Position.Y + tile.Y + 0.5);
     }
 }

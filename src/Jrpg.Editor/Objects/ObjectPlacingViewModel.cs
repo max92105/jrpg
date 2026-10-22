@@ -34,12 +34,27 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
 
     public ObjectBrowserViewModel Browser { get; }
 
-    /// <summary>Whether Objects > Edit shapes has an object to open: the one chosen in the panel.</summary>
-    public bool CanEditShapes => Browser.SelectedObject is not null;
+    /// <summary>Whether Objects > Edit shapes has an object to open: one selected on the map, or the one chosen in the panel.</summary>
+    public bool CanEditShapes => SelectedObjectUids.Count == 1 || Browser.SelectedObject is not null;
 
-    /// <summary>The shapes of the object chosen in the panel, to edit in the shapes window; null when none is chosen.</summary>
-    public ObjectShapesViewModel? StartEditingShapes() =>
+    /// <summary>
+    /// For Objects > Edit shapes: the shapes of the one placed object selected on the map, else of the object chosen in the
+    /// panel; null when there is neither.
+    /// </summary>
+    public ObjectShapesViewModel? StartEditingShapes()
+    {
+        var selected = SelectedObjectUids.Count == 1 ? PlacedObjectWithUid(SelectedObjectUids[0]) : null;
+        return selected is not null ? new ObjectShapesViewModel(_catalog.Current.Objects[selected.ObjectId]) : StartEditingChosenShapes();
+    }
+
+    /// <summary>The shapes of the object chosen in the panel (a double-click there); null when none is chosen.</summary>
+    public ObjectShapesViewModel? StartEditingChosenShapes() =>
         Browser.SelectedObject is { } definition ? new ObjectShapesViewModel(definition) : null;
+
+    /// <summary>The shapes of the placed object on top at a map point (Shift + double-click); null when none is there.</summary>
+    /// <param name="point">In map cells.</param>
+    public ObjectShapesViewModel? StartEditingShapesAt(Point2D point) =>
+        ObjectAt(point) is { } placed ? new ObjectShapesViewModel(_catalog.Current.Objects[placed.ObjectId]) : null;
 
     /// <summary>Puts the edited object in the catalog draft, as one undo step (nothing when unchanged).</summary>
     /// <exception cref="InvalidOperationException">The edited shapes have a problem (<see cref="ObjectShapesViewModel.Problem"/>).</exception>
@@ -51,6 +66,7 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
 
     /// <summary>The placed objects chosen with a dragged rectangle, for Delete; kept to objects still on the map.</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CanEditShapes))]
     public partial IReadOnlyList<string> SelectedObjectUids { get; private set; } = [];
 
     /// <summary>
@@ -84,7 +100,7 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
     /// <param name="to">Its new top-left corner, in map cells.</param>
     public void MoveObject(string uid, Point2D to)
     {
-        var placed = OpenMap?.Map.Layout.Objects.FirstOrDefault(candidate => candidate.Uid == uid);
+        var placed = PlacedObjectWithUid(uid);
         if (placed is not null && placed.Position != to)
         {
             OpenMap!.Do(new MoveObjectEdit(uid, placed.Position, to));
@@ -128,6 +144,8 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
             SelectedObjectUids = [.. SelectedObjectUids.Where(onMap.Contains)];
         }
     }
+
+    private PlacedObject? PlacedObjectWithUid(string uid) => OpenMap?.Map.Layout.Objects.FirstOrDefault(placed => placed.Uid == uid);
 
     private void RemoveObjects(IReadOnlyCollection<string> uids)
     {

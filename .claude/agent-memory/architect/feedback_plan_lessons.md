@@ -29,6 +29,7 @@ When planning slices in this repo:
 - Reviews want splits planned up front (writer vs first user, behavior vs look, layout vs theme), not "split if it grows"; view models take lookups (image sizes) instead of reading files; one responsibility per panel VM.
 - Developer wants Ctrl+Z to cover every edit (map and catalog alike); expect "undo everything" in editor features.
 - Packages are never assumed: font package, MonoGame content pipeline and CommunityToolkit.Mvvm are open questions until the developer approves.
+- Removal/wording plans: count with Grep count mode (it counts matching lines, not occurrences), slice by folder, list each reason-carrying comment with its replacement, "don't invent a reason"; a text guard must skip itself and history paths (docs/plans, done ADRs).
 
 **Why:** part 1 split slices mid-way; the part 2 devil's advocate (2026-10-17) raised exactly these as blockers/concerns.
 

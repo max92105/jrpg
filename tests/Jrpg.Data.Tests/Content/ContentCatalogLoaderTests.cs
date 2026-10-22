@@ -17,20 +17,10 @@ public sealed class ContentCatalogLoaderTests
     }
 
     [Fact]
-    public void Load_RepositoryContent_LoadsEveryTile()
+    public void Load_RepositoryContent_TreeHasItsTileGroupSizeAndOutline()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-        Assert.Equal(283, catalog.Tiles.Count);
-        Assert.True(catalog.Tiles[1].IsWalkable);
-    }
-
-    [Fact]
-    public void Load_RepositoryContent_LoadsObjectsWithTileGroupSizes()
-    {
-        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
-
-        Assert.Equal(13, catalog.Objects.Count);
         Assert.Equal((4, 4), (catalog.Objects["tree"].Width, catalog.Objects["tree"].Height));
         Assert.Equal(9, catalog.Objects["tree"].CollisionPolygon.Count);
         Assert.Equal(new Point2D(0.4, 0.94375), catalog.Objects["tree"].CollisionPolygon[1]);
@@ -52,9 +42,9 @@ public sealed class ContentCatalogLoaderTests
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-        Assert.Equal(["forest", "interior_1", "start"], catalog.Maps.Keys.Order(StringComparer.Ordinal));
+        Assert.All(["forest", "interior_1", "start"], id => Assert.Contains(id, catalog.Maps.Keys));
         var start = catalog.Maps["start"];
-        Assert.Equal((45, 45, 56), (start.Layout.Width, start.Layout.Height, start.Layout.Objects.Count));
+        Assert.Equal((45, 45), (start.Layout.Width, start.Layout.Height));
         Assert.Equal("Interior1", catalog.Maps["interior_1"].Settings.DisplayName);
     }
 

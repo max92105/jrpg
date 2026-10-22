@@ -30,8 +30,8 @@ public sealed class MainViewModelTests : IDisposable
         var viewModel = Open(_repositoryContent);
 
         Assert.Null(viewModel.LoadError);
-        Assert.Equal(["forest", "interior_1", "start"], viewModel.MapIds);
-        Assert.Equal("forest", viewModel.CurrentMap?.Map.Id);
+        Assert.All(["forest", "interior_1", "start"], id => Assert.Contains(id, viewModel.MapIds));
+        Assert.Equal(viewModel.MapIds[0], viewModel.CurrentMap?.Map.Id);
     }
 
     [Fact]
@@ -39,9 +39,11 @@ public sealed class MainViewModelTests : IDisposable
     {
         var viewModel = Open(_repositoryContent);
 
+        string[] knownMaps = ["Forest (forest)", "Interior1 (interior_1)", "start (start)"];
+
         var texts = viewModel.MapEntries.Select(entry => entry.Text);
 
-        Assert.Equal(["Forest (forest)", "Interior1 (interior_1)", "start (start)"], texts);
+        Assert.Equal(knownMaps, texts.Where(knownMaps.Contains));
     }
 
     // interior_1 has a ground layer (z -5) and a ground detail layer (z -4); the ground is chosen at the start.
@@ -52,29 +54,34 @@ public sealed class MainViewModelTests : IDisposable
 
         viewModel.TryOpenMap("interior_1");
 
-        Assert.Equal(["Ground (z -5)", "Ground detail (z -4)"], viewModel.LayerEntries.Select(entry => entry.Text));
+        string[] knownLayers = ["Ground (z -5)", "Ground detail (z -4)"];
+        Assert.Equal(knownLayers, viewModel.LayerEntries.Select(entry => entry.Text).Where(knownLayers.Contains));
     }
 
     [Fact]
     public void LayerEntries_PaintedOnEmptyZ_DropsTheEmptyMark()
     {
         var viewModel = Open(_repositoryContent);
+        Assert.DoesNotContain(viewModel.CurrentMap!.Map.Layout.Layers, layer => layer.Z == 2);
         viewModel.Layer.Z = 2;
-        var tileId = viewModel.CurrentMap!.Map.Layout.Layers[0].TileIdAt(new GridCell(0, 0));
+        var tileId = viewModel.CurrentMap.Map.Layout.Layers[0].TileIdAt(new GridCell(0, 0));
 
         viewModel.CurrentMap.Do(new SetTilesEdit(2, [new TileChange(new GridCell(0, 0), 0, tileId)]));
 
-        Assert.Equal(["Ground (z -5)", "Layer (z 2)"], viewModel.LayerEntries.Select(entry => entry.Text));
+        var entries = viewModel.LayerEntries.Select(entry => entry.Text).ToList();
+        Assert.Contains("Layer (z 2)", entries);
+        Assert.DoesNotContain("Layer (z 2), empty", entries);
     }
 
     [Fact]
     public void LayerEntries_ChosenZWithoutLayer_ListsItAsEmpty()
     {
         var viewModel = Open(_repositoryContent);
+        Assert.DoesNotContain(viewModel.CurrentMap!.Map.Layout.Layers, layer => layer.Z == 2);
 
         viewModel.Layer.Z = 2;
 
-        Assert.Equal(["Ground (z -5)", "Layer (z 2), empty"], viewModel.LayerEntries.Select(entry => entry.Text));
+        Assert.Contains("Layer (z 2), empty", viewModel.LayerEntries.Select(entry => entry.Text));
     }
 
     [Fact]

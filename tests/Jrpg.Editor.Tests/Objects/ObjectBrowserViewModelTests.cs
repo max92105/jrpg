@@ -1,3 +1,4 @@
+using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Objects;
@@ -7,15 +8,17 @@ namespace Jrpg.Editor.Tests.Objects;
 public sealed class ObjectBrowserViewModelTests
 {
     [Fact]
-    public void Objects_RepositoryContent_SortedByCategoryThenId()
+    public void Objects_TwoCategories_SortedByCategoryThenId()
     {
-        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+        ObjectDefinition[] givenOutOfOrder = [Definition("well", "Village"), Definition("bush", "Nature"), Definition("barrel", "Village"), Definition("rock", "Nature")];
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")) with
+        {
+            Objects = givenOutOfOrder.ToDictionary(definition => definition.Id),
+        };
 
         var objects = new ObjectBrowserViewModel(new CatalogDraft(catalog)).Objects;
 
-        Assert.Equal(
-            ["chest", "chest_opened", "door_close", "door_open", "tree", "tree_2", "tree_3", "house_1", "house_2", "house_3", "house_4", "house_5", "villager"],
-            objects.Select(definition => definition.Id));
+        Assert.Equal(["bush", "rock", "barrel", "well"], objects.Select(definition => definition.Id));
     }
 
     [Fact]
@@ -57,4 +60,15 @@ public sealed class ObjectBrowserViewModelTests
 
         Assert.Same(listed, browser.Objects);
     }
+
+    private static ObjectDefinition Definition(string id, string category) => new()
+    {
+        Id = id,
+        Width = 1,
+        Height = 1,
+        CollisionPolygon = [],
+        Category = category,
+        Tiles = [],
+        AbovePlayerZones = [],
+    };
 }

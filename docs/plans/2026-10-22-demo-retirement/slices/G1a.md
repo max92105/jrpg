@@ -1,0 +1,53 @@
+# G1a. The prompt over what the player faces: Core query and plain text
+
+Part of [the demo retirement plan](../README.md). Design: [design.md](../design.md), "Core changes", "Game structure added by this plan", key decisions 1-3; tunable "prompt position"; decision 138.
+
+- **G1a. The prompt over what the player faces** (Core + Game, about 250 lines)
+  - **Goal:**
+    - Facing an object with an Interact event the player could start, the game shows the device's Confirm key, then the event's prompt, above the object: "E  Open" on the chest with the keyboard, "A  Talk" on the villager with a controller.
+    - The key follows the device in use (I1).
+    - The prompt disappears when the player turns away, while a message or warp plays, while a battle is pending, and once a "once" event is done.
+    - The look is plain (white text on a flat dark rectangle); G1b gives it the key cap, the panel and the fade.
+  - **Core:**
+    - `Exploration/TriggeredEvent` becomes `internal readonly record struct`. Callers use `is { } triggered`; no behavior change.
+    - New `Exploration/InteractionTarget` (public sealed record): the object and the event the Confirm button would start.
+      - `InteractionTarget(PlacedObject Object, MapEvent Event)`.
+    - `ExplorationState.InteractionInFront` (`InteractionTarget?`), with a private `RefreshInteraction()`:
+      - it runs at the end of every public command, `Walk`, `TryInteract`, `ContinueEvent` and `FinishEncounter`, on every return path (a `try`/`finally` around each body, or one private wrapper they all go through), and after map entry in the constructor;
+      - it is null while `_run` or `PendingEncounter` is set;
+      - it builds a new record only when the found object or event differs from the current one.
+  - **New types (Game):**
+    - `Exploration/PromptPlacement` (static, pure): where the prompt's box goes on the virtual screen.
+      - `static Rectangle BoxFor(PlacedObject placed, ObjectDefinition definition, Vector2 cameraOrigin, Point boxSize)`: centered on the object's width, its bottom 6 px above the object's top edge, in whole pixels.
+    - `Exploration/InteractionPromptView`: draws the device's Confirm key and the prompt of `ExplorationState.InteractionInFront`.
+      - `InteractionPromptView(ScreenText text, UiTextures ui)`.
+      - `Update(InteractionTarget? target, InputDevice device)`: takes the key from `ButtonLabels.Of(GameButton.Confirm, device)` and the event's `Prompt`, and measures both, only when the target (by reference) or the device changed.
+      - `Draw(SpriteBatch batch, Func<PlacedObject, ObjectDefinition> definitionOf, Vector2 cameraOrigin)`: nothing when there is no target.
+  - **Changes (Game):**
+    - `Rendering/MapArt.PlayerSpriteFile` (from `catalog.NewGame.FieldSpriteFile`).
+    - `Exploration/ExplorationScene`:
+      - the constructor becomes `(ExplorationState exploration, MapArt art, EventPresenter presenter, InteractionPromptView prompt)`;
+      - `Update` passes `InteractionInFront` (null while `_presenter.IsBusy`) and `input.Device` to the view;
+      - `Draw` draws it after the map, before the presenter.
+    - `Flow/SceneFactory.CreateExploration`: builds the view.
+    - No `ui.json` entry. The prompt word is content, the key is a key's name (key decision 3), and their order is layout.
+  - **Tests:**
+    - `ExplorationStateTests`:
+      - `InteractionInFront_FacingChest_ReturnsItsInteractEvent`;
+      - `InteractionInFront_FacingAway_IsNull`;
+      - `InteractionInFront_WhileEventRuns_IsNull`;
+      - `InteractionInFront_OnceEventDone_IsNull`;
+      - `InteractionInFront_TouchEventOnly_IsNull`;
+      - `InteractionInFront_WalkingAlongSameObject_KeepsTheSameRecord` (`Assert.Same` across two `Walk` calls);
+      - `InteractionInFront_AfterWarp_IsRefreshedOnTheNewMap`;
+      - `InteractionInFront_InteractEventFinishingAtOnce_IsRefreshed`: an Interact event made only of a swap finishes inside `TryInteract`; afterwards the target is the swapped object's event, or null.
+    - `InteractionFinderTests`: existing tests pass unchanged with the struct.
+    - `PromptPlacementTests`:
+      - `BoxFor_TwoCellObject_CentersOnItsWidth`;
+      - `BoxFor_CameraMoved_ShiftsByTheOrigin`;
+      - `BoxFor_ObjectAtRow3_BottomIs6PixelsAboveItsTop`.
+  - **Verify by hand:**
+    - [ ] F5, face the chest: "E  Open" above it, centered. Press a pad button: it becomes "A  Open". Press a key: back to "E".
+    - [ ] Open the chest: the prompt goes while the message shows, and doesn't come back if its event is "once".
+    - [ ] Face the villager: "Talk". Turn away: gone. Walk along the house fronts: the prompt follows the door you face (note any flicker for G1b).
+    - [ ] Through the door to `interior_1` and back: no prompt left over from the other map.

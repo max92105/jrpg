@@ -38,4 +38,3 @@ Code-health work waiting for the next cleanup plan; `/retro` appends to it. One 
 - `MainViewModelTests` is 770 lines: split it by area (saving, undo journal, new map/object/NPC, layer list) like the view model it tests.
 - `ObjectShapesViewModelTests` is 347 lines: move the zone tests (E10) and the point-handle tests (E11a) into their own classes.
 - `MainViewModel.CreateNpc` and `CreateObject` end with the same three lines (`SetObject`, choose it in the Objects panel, Objects mode): one private method when `MainViewModel` is split (N3 review).
-- Three tests pin repository content totals (283 tiles, the start map's object count, the forest's layers): rewrite them to assert the entries they need, so content edits made in the editor don't break them (E12c; see the retro's tests rule).

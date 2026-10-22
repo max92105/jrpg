@@ -62,7 +62,8 @@
         Delete: remove the selected objects, or the one under the mouse.<LineBreak />
         Objects > Edit shapes: open the shapes window for the one placed object selected, else the object chosen in the Objects panel.<LineBreak />
         Shift + double-click a placed object, or double-click one in the Objects panel: open its shapes.<LineBreak />
-        Objects > New object from selection: an object made from the cells chosen with Shift + drag in the Tiles panel; its shapes open next.
+        Objects > New object from selection: an object made from the cells chosen with Shift + drag in the Tiles panel; its shapes open next.<LineBreak />
+        Objects > New NPC: a one-cell NPC drawn from a field sprite (the placeholder by default); place it, then give it a Talk event.
       </TextBlock>
 
       <TextBlock Style="{StaticResource Heading}" Text="Shapes window" />

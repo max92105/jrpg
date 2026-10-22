@@ -38,6 +38,16 @@ internal sealed partial class MainWindow
         EditShapes(Placing.StartEditingChosenShapes());
     }
 
+    // A new NPC keeps its default outline (decision 129), so no shapes window opens; Edit shapes is one click away.
+    private void OnNewNpcClicked(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel.StartNewNpc() is { } newNpc
+            && new NewNpcWindow(newNpc, _viewModel.CreateNpc, _drawing!.DrawObject) { Owner = this }.ShowDialog() == true)
+        {
+            EditingTabs.SelectedItem = ObjectsTab;
+        }
+    }
+
     // Only a double-click on a listed object: not on the preview, a category header or the scroll bar.
     private void OnObjectBrowserDoubleClicked(object sender, MouseButtonEventArgs e)
     {

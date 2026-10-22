@@ -1,0 +1,40 @@
+<Window x:Class="Jrpg.Editor.Objects.NewNpcWindow"
+        x:ClassModifier="internal"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="New NPC"
+        Width="360"
+        SizeToContent="Height"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+  <StackPanel Margin="12">
+    <TextBlock Foreground="Gray"
+               TextWrapping="Wrap"
+               Text="One cell, category NPC, blocking the lower half of its cell; give it a Talk event once placed."
+               Margin="0,0,0,8" />
+
+    <TextBlock Text="Id (fixed once created; maps and saves refer to it)" />
+    <TextBox x:Name="IdBox" Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,2" />
+    <TextBlock Foreground="DarkRed" TextWrapping="Wrap" Text="{Binding IdProblem}" />
+
+    <TextBlock Text="Sprite (content/art/field-sprites/)" Margin="0,8,0,0" />
+    <DockPanel Margin="0,2,0,2">
+      <!-- The standing frame, as the map draws it. -->
+      <Image x:Name="Preview"
+             DockPanel.Dock="Right"
+             Width="48"
+             Height="48"
+             Margin="8,0,0,0"
+             RenderOptions.BitmapScalingMode="NearestNeighbor" />
+      <ComboBox VerticalAlignment="Center" ItemsSource="{Binding SpriteFiles}" SelectedItem="{Binding SpriteFile}" />
+    </DockPanel>
+    <TextBlock Foreground="DarkRed" TextWrapping="Wrap" Text="{Binding SpriteProblem}" />
+    <TextBlock x:Name="PreviewProblem" Foreground="DarkRed" TextWrapping="Wrap" />
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+      <Button Content="Create" Width="80" IsDefault="True" Click="OnCreateClicked" />
+      <Button Content="Cancel" Width="80" Margin="8,0,0,0" IsCancel="True" />
+    </StackPanel>
+  </StackPanel>
+</Window>

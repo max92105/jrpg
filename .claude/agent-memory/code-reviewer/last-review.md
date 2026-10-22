@@ -5,12 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-21-editor/slices/N2.md, N2 (NPCs in the editor: drawn, Talk preset; uncommitted)
-Round: 1 (verdict: Ready to commit; verify all pass, 1531 tests)
+Slice: docs/plans/2026-10-21-editor/slices/N3.md, N3 (New NPC dialog; uncommitted)
+Round: 1 (verdict: Ready to commit; verify all pass, 1537 tests)
 
-- suggestion (open): PlacedObjectHits NPC hit test has no miss case just outside the cell (X = Position.X + Width).
-- suggestion (open): zones radio tooltip "NPCs have no above-player zones" also shows on tile objects; bind the reason only when disabled.
-- follow-up: TileImages.FieldSpriteFrameOf crops 48x48 unchecked; a sprite smaller than 48 px throws when drawn (no validator check).
-- follow-up: TileImages.Forget doesn't drop cached sprite frames (matters once sprites can be imported).
-- follow-up: MainViewModel is 573 lines; split before more is added (carried).
+- warning (open): NewNpcWindow preview calls TileImages.FieldSpriteFrameOf on any PNG listed; a field-sprite PNG under 48 px (or unreadable) throws on selection and crashes the editor.
+- suggestion (open): "New NPC..." menu item has no IsEnabled binding (New object has CanStartNewObject); does nothing silently without content.
+- follow-up: TileImages.Forget doesn't drop cached sprite frames (carried).
+- follow-up: MainViewModel is 593 lines; split before more is added (carried, in backlog).
 - follow-up: E12a re-cut stale SelectedCells can reach CreateObject (carried).

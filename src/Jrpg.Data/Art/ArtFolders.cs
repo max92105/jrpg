@@ -27,8 +27,12 @@ public static class ArtFolders
 
     /// <summary>The PNG file names in the tilesheet folder, set up as sheets or not, sorted ordinally.</summary>
     /// <param name="artRoot">The <c>art</c> folder, from <see cref="RootIn"/>.</param>
-    public static IReadOnlyList<string> TilesheetImagesIn(string artRoot) =>
-        [.. Directory.EnumerateFiles(Path.Combine(artRoot, Tilesheets), "*.png")
-            .Select(path => Path.GetFileName(path))
-            .Order(StringComparer.Ordinal)];
+    public static IReadOnlyList<string> TilesheetImagesIn(string artRoot) => PngNamesIn(Path.Combine(artRoot, Tilesheets));
+
+    /// <summary>The PNG file names in the field-sprite folder, the player's and NPCs', sorted ordinally.</summary>
+    /// <param name="artRoot">The <c>art</c> folder, from <see cref="RootIn"/>.</param>
+    public static IReadOnlyList<string> FieldSpriteImagesIn(string artRoot) => PngNamesIn(Path.Combine(artRoot, FieldSprites));
+
+    private static IReadOnlyList<string> PngNamesIn(string folder) =>
+        [.. Directory.EnumerateFiles(folder, "*.png").Select(path => Path.GetFileName(path)).Order(StringComparer.Ordinal)];
 }

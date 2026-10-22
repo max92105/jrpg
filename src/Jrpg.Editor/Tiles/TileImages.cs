@@ -46,7 +46,10 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot)
     {
         if (!_spriteFrames.TryGetValue(file, out var frame))
         {
-            frame = new CroppedBitmap(LoadImage(ArtFolders.FieldSprites, file), new Int32Rect(0, 0, FieldSpriteFramePixels, FieldSpriteFramePixels));
+            // Nothing checks a sprite's size, so one smaller than a frame is shown whole rather than failing to crop.
+            var sprite = LoadImage(ArtFolders.FieldSprites, file);
+            var side = Math.Min(FieldSpriteFramePixels, Math.Min(sprite.PixelWidth, sprite.PixelHeight));
+            frame = new CroppedBitmap(sprite, new Int32Rect(0, 0, side, side));
             frame.Freeze();
             _spriteFrames.Add(file, frame);
         }

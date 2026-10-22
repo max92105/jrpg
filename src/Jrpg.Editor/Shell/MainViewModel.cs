@@ -204,6 +204,29 @@ internal sealed partial class MainViewModel : ObservableObject
             ? new NewObjectViewModel([.. Catalog!.Objects.Keys], [.. Catalog.Objects.Values.Select(definition => definition.Category)], cells)
             : null;
 
+    /// <summary>Whether a new NPC can be made: only once the content and its art loaded.</summary>
+    public bool CanStartNewNpc => Placing is not null;
+
+    /// <summary>The New NPC dialog's state, listing the field sprites on disk now; null when the content didn't load.</summary>
+    public NewNpcViewModel? StartNewNpc() =>
+        CanStartNewNpc ? new NewNpcViewModel([.. Catalog!.Objects.Keys], ArtFolders.FieldSpriteImagesIn(ArtRoot)) : null;
+
+    /// <summary>Makes the NPC the New NPC dialog describes, as one undo step; it is chosen in the Objects panel, in Objects mode.</summary>
+    /// <returns>False when nothing was made: the id or sprite has a problem.</returns>
+    public bool CreateNpc(NewNpcViewModel newNpc)
+    {
+        if (newNpc.IdProblem is not null || newNpc.SpriteProblem is not null || Content is null || Placing is null)
+        {
+            return false;
+        }
+
+        var definition = newNpc.ToDefinition();
+        Content.SetObject(definition);
+        Placing.Browser.SelectedObject = definition;
+        Mode = EditingMode.Objects;
+        return true;
+    }
+
     /// <summary>
     /// Makes the object the New object dialog describes, from its cells: those not tiles yet become tiles (decision 113),
     /// then the object joins the catalog as one undo step. It is chosen in the Objects panel, in Objects mode.

@@ -366,6 +366,23 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
+    public void CreateNpc_NewId_AddsItAndChoosesIt()
+    {
+        var viewModel = Open(CopyOfRepositoryContent());
+        var newNpc = viewModel.StartNewNpc()!;
+        newNpc.Id = "guard";
+
+        Assert.True(viewModel.CreateNpc(newNpc));
+        viewModel.SaveCommand.Execute(null);
+
+        Assert.Null(viewModel.SaveError);
+        Assert.Equal(EditingMode.Objects, viewModel.Mode);
+        Assert.Equal("guard", viewModel.Placing!.Browser.SelectedObject?.Id);
+        var guard = ContentCatalogLoader.Load(_contentCopy).Objects["guard"];
+        Assert.Equal(("NPC", "npc_placeholder.png"), (guard.Category, guard.FieldSpriteFile));
+    }
+
+    [Fact]
     public void CanStartNewObject_RectangleChosen_IsTrue()
     {
         var viewModel = Open(CopyOfRepositoryContent());

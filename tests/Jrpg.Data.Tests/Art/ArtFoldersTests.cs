@@ -5,6 +5,14 @@ namespace Jrpg.Data.Tests.Art;
 public sealed class ArtFoldersTests
 {
     [Fact]
+    public void FieldSpriteImagesIn_RepositoryArt_ListsPlayerAndPlaceholder()
+    {
+        var images = ArtFolders.FieldSpriteImagesIn(ArtFolders.RootIn(Path.Combine(AppContext.BaseDirectory, "content")));
+
+        Assert.Equal(["npc_placeholder.png", "player.png"], images);
+    }
+
+    [Fact]
     public void TilesheetImagesIn_RepositoryArt_ListsEveryPngSorted()
     {
         var images = ArtFolders.TilesheetImagesIn(ArtFolders.RootIn(Path.Combine(AppContext.BaseDirectory, "content")));

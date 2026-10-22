@@ -123,6 +123,18 @@ public static class ArtReferenceCheck
         where step.Speech.PortraitFile is not null
         select (map.Id, mapEvent, step.Speech.PortraitFile!);
 
+    /// <summary>The lowest tile, cut from any sheet drawn from <paramref name="file"/>, whose cell an image of this size wouldn't hold.</summary>
+    /// <param name="catalog">The sheets and tiles checked.</param>
+    /// <param name="file">The image's file name in the tilesheet art folder; sheets match it ignoring case, as Windows does.</param>
+    /// <param name="size">The new image's width and height in pixels.</param>
+    internal static TileDefinition? FirstTileOutside(ContentCatalog catalog, string file, (int Width, int Height) size)
+    {
+        var sheets = catalog.Tilesheets.Values.Where(sheet => string.Equals(sheet.File, file, StringComparison.OrdinalIgnoreCase)).ToDictionary(sheet => sheet.Id);
+        return catalog.Tiles.Values
+            .Where(tile => sheets.TryGetValue(tile.SheetId, out var sheet) && !IsCellInside(tile, sheet, size))
+            .MinBy(tile => tile.Id);
+    }
+
     private static bool IsCellInside(TileDefinition tile, TilesheetDefinition sheet, (int Width, int Height) size) =>
         sheet.CellLeft(tile.Column) + sheet.TileWidth <= size.Width && sheet.CellTop(tile.Row) + sheet.TileHeight <= size.Height;
 

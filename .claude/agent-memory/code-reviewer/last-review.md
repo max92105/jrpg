@@ -5,10 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-21-editor/slices/E6b.md, E6b (re-cut warning; code committed in 7553ade, slice note + map.md uncommitted)
-Round: 1 (verdict: Ready to commit; verify all pass, 1430 tests)
+Slice: docs/plans/2026-10-21-editor/slices/E7a.md, E7a (tilesheet image import, Data writer; uncommitted)
+Round: 1 (verdict: Ready to commit; verify all pass, 1434 tests)
 
-- open (Warning): TileBrowserViewModelTests.cs taken from 297 to 345 lines; split the Cut-panel tests (SetUp/CutSheet/ApplyCut) into TileBrowserCutTests.
-- open (Suggestion): CatalogUsage.OfSheet repeats TilesCutFrom's "tiles whose SheetId == id" filter; share one private TilesOf(sheetId).
-- open (Suggestion): Warning text in the panel goes stale while the panel is open and the open map is painted (only catalog changes refresh it); Apply recounts, so only the on-screen line is affected.
-- Follow-up: MainWindow.xaml.cs over 300 lines (from E6a).
+- open (Warning): case-insensitive sheet match in ArtReferenceCheck.FirstTileOutside untested; add a too-small import whose source name differs only in case from sheet.File.
+- open (Suggestion): FirstTileOutside has empty <param name="catalog"/> and <param name="size"/> tags; describe them or drop the param docs.
+- open (Suggestion): ContentWriterTests.TilesheetImage duplicates the private TilesheetImagePath formula; acceptable in tests, could share via ArtFolders if a third copy appears.

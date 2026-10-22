@@ -1,32 +1,24 @@
-# E7. Importing a sheet image
+# E7b. Importing a sheet image in the editor
 
-Part of [the editor plan](../README.md). Design: [design.md](../design.md), "Data changes"; decision 125. Nothing invalid may be written (review): a replacement is checked against the tiles cut from it before it is copied.
+Part of [the editor plan](../README.md). Design: [design.md](../design.md); decision 125. Builds on [E7a](E7a.md)'s writer. Split from E7 (developer, 2026-10-21).
 
-- **E7. Importing a sheet image** (Data + Editor, about 220 lines)
+- **E7b. Importing a sheet image in the editor** (Editor, about 210 lines)
   - **Goal:**
     - Tiles > **Import sheet image...** (and a button beside the sheet box) opens a file dialog for PNGs, several at once.
-    - Each is copied into `content/art/tilesheets/`.
-    - A name already there asks before replacing (decision 125). Then, if a sheet uses that file, the new image is checked against it: every tile cut from it must still lie inside the new image. If not, the import is refused, naming the tile ("Tile 57 at (11, 3) would be outside the new 320 x 256 image"), and the old file stays. Checked against the draft's catalog, so unsaved tiles count.
-    - A file that isn't a PNG is refused, naming it.
+    - Each is copied into `content/art/tilesheets/` through E7a's writer. A name already there asks before replacing (decision 125); a refused file (not a PNG, or too small for the tiles cut from it) is reported with E7a's message, and the old file stays.
     - The last imported image is shown, "(not set up)" if it has no sheet, ready for E5b's Set up.
     - An import is a file copy, not a catalog step: Ctrl+Z doesn't undo it (the status line says "Imported Forest2.png").
-  - **Data:**
-    - `Content/ContentWriter.HasTilesheetImage(string fileName)`.
-    - `Content/ContentWriter.ImportTilesheetImage(string sourcePath, ContentCatalog catalog)`: checks the header with `PngSize`; for every sheet of `catalog` whose `File` is that name, checks each of its tiles against the new size with the art check's cell rule (`ArtReferenceCheck`'s `IsCellInside`, made internal and reused, not copied); any problem throws `ContentValidationException` and copies nothing; then copies aside and moves into place; returns the file name.
+    - A replaced file's cached image and size are forgotten, so the sheet and the map show the new art.
   - **New types:**
     - `Tiles/SheetImport`: importing images into the tilesheet art through Data, asking about taken names, and reporting what was refused.
       - `SheetImport(ContentWriter writer, CatalogDraft catalog)`.
       - `TryImport(IReadOnlyList<string> paths, Func<string, bool> confirmReplace)`: returns `SheetImportResult` (record: the last imported file name, or null; the refused files' messages).
   - **Changes:**
+    - `Tiles/SheetImages`: the file list is read from the art folder when asked, so an import shows without restarting.
     - `Tiles/TileBrowserViewModel.Show(string fileName)`: refreshes `SheetChoices` from the art folder and shows that image.
-    - `Shell/MainViewModel`: owns `Import`.
+    - `Shell/MainViewModel`: owns `Import`; forgets a replaced file's cached size.
     - `Shell/MainWindow`: the menu entry, the file dialog, the replace question; `TileImages` forgets a replaced file's image.
   - **Tests:**
-    - `ContentWriterTests` (Data):
-      - `ImportTilesheetImage_Png_CopiesIntoTilesheetArt`;
-      - `ImportTilesheetImage_NotAPng_ThrowsAndCopiesNothing`;
-      - `ImportTilesheetImage_ReplacementTooSmallForItsTiles_ThrowsNamingTheTileAndKeepsTheOldFile`;
-      - `ImportTilesheetImage_ReplacementLargeEnough_ReplacesTheFile`.
     - `SheetImportTests`: `TryImport_NewImage_ReturnsItsName`, `TryImport_TakenNameDeclined_KeepsTheOldFileAndAsksNothingElse`, `TryImport_RefusedReplacement_ReportsTheMessage`.
     - `TileBrowserViewModelTests`: `Show_NewImageFile_ListsItNotSetUpAndShowsIt`.
   - **Verify by hand:**

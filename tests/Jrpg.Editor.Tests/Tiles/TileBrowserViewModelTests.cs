@@ -30,11 +30,14 @@ public sealed class TileBrowserViewModelTests
     });
 
     private readonly TileBrowserViewModel _browser;
+    private readonly List<string> _questions = [];
+    private bool _answer = true;
 
     public TileBrowserViewModelTests()
     {
         // Grass3.png has no sheet yet.
-        _browser = new TileBrowserViewModel(_draft, ["Dungeon.png", "Forest.png", "Grass3.png"], file => _imageSizes[file]);
+        var images = new SheetImages(["Dungeon.png", "Forest.png", "Grass3.png"], file => _imageSizes[file]);
+        _browser = new TileBrowserViewModel(_draft, images, Ask, () => null);
     }
 
     [Fact]
@@ -189,6 +192,45 @@ public sealed class TileBrowserViewModelTests
         Assert.Equal(8, _draft.TileAt(new SheetCell("forest", 0, 0))?.Id);
     }
 
+    // Tile 8 is cut from the forest sheet, so a re-cut asks first.
+    [Fact]
+    public void ApplyCutCommand_UserDeclinesWarning_KeepsTheCut()
+    {
+        _answer = false;
+        _browser.SelectedChoice = _browser.SheetChoices[1];
+        _browser.CutSheetCommand.Execute(null);
+        _browser.Cut!.Columns = 4;
+
+        _browser.ApplyCutCommand.Execute(null);
+
+        Assert.StartsWith("1 tile is cut from this sheet", Assert.Single(_questions));
+        Assert.Equal(_forest, _draft.Current.Tilesheets["forest"]);
+        Assert.NotNull(_browser.Cut);
+    }
+
+    [Fact]
+    public void ApplyCutCommand_UserAccepts_ReplacesTheCut()
+    {
+        _browser.SelectedChoice = _browser.SheetChoices[1];
+        _browser.CutSheetCommand.Execute(null);
+        _browser.Cut!.Columns = 4;
+
+        _browser.ApplyCutCommand.Execute(null);
+
+        Assert.Single(_questions);
+        Assert.Equal(_forest with { TileWidth = 24 }, _draft.Current.Tilesheets["forest"]);
+    }
+
+    [Fact]
+    public void ApplyCutCommand_NewSheet_AsksNothing()
+    {
+        OpenGrass3Cut();
+
+        _browser.ApplyCutCommand.Execute(null);
+
+        Assert.Empty(_questions);
+    }
+
     [Fact]
     public void ApplyCutCommand_FieldMadeWrong_AnnouncesItCannotExecute()
     {
@@ -287,6 +329,12 @@ public sealed class TileBrowserViewModelTests
         _browser.SelectCellAt(19, 2);
 
         Assert.Equal("Cell (1, 0): tile 7", _browser.ChoiceText);
+    }
+
+    private bool Ask(string question)
+    {
+        _questions.Add(question);
+        return _answer;
     }
 
     private void OpenGrass3Cut()

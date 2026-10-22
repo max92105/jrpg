@@ -13,22 +13,25 @@ namespace Jrpg.Editor.Tiles;
 internal sealed partial class TileBrowserViewModel : ObservableObject
 {
     private readonly CatalogDraft _catalog;
-    private readonly IReadOnlyList<string> _imageFiles;
-    private readonly Func<string, (int Width, int Height)> _imageSizeOf;
+    private readonly SheetImages _images;
+    private readonly Func<string, bool> _confirm;
+    private readonly Func<MapLayout?> _openLayout;
     // The sheets the choices were built from; a catalog change replaces this dictionary only when it changes a sheet.
     private IReadOnlyDictionary<string, TilesheetDefinition> _listedSheets;
 
     /// <param name="catalog">The sheets and tiles.</param>
-    /// <param name="imageFiles">Every image in the tilesheet folder, in the order the sheet box lists them.</param>
-    /// <param name="imageSizeOf">A sheet image's size in pixels, by its file name, so the browser reads no files.</param>
-    public TileBrowserViewModel(CatalogDraft catalog, IReadOnlyList<string> imageFiles, Func<string, (int Width, int Height)> imageSizeOf)
+    /// <param name="images">The tilesheet folder's images.</param>
+    /// <param name="confirm">Asks the developer a yes or no question, before a re-cut changes tiles in use.</param>
+    /// <param name="openLayout">The open map's layout, unsaved changes included, or null; for what a re-cut touches.</param>
+    public TileBrowserViewModel(CatalogDraft catalog, SheetImages images, Func<string, bool> confirm, Func<MapLayout?> openLayout)
     {
         _catalog = catalog;
-        _imageFiles = imageFiles;
-        _imageSizeOf = imageSizeOf;
+        _images = images;
+        _confirm = confirm;
+        _openLayout = openLayout;
         catalog.PropertyChanged += OnCatalogChanged;
         _listedSheets = catalog.Current.Tilesheets;
-        SheetChoices = ChoicesOf(imageFiles, _listedSheets.Values);
+        SheetChoices = ChoicesOf(images.Files, _listedSheets.Values);
         SelectedChoice = SheetChoices.Count > 0 ? SheetChoices[0] : null;
     }
 
@@ -93,7 +96,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
             return null;
         }
 
-        var (width, height) = _imageSizeOf(sheet.File);
+        var (width, height) = _images.SizeOf(sheet.File);
         var column = (int)Math.Floor((x - sheet.Margin) / (sheet.TileWidth + sheet.Spacing));
         var row = (int)Math.Floor((y - sheet.Margin) / (sheet.TileHeight + sheet.Spacing));
         var isInGrid = column >= 0 && row >= 0 && column < sheet.ColumnsIn(width) && row < sheet.RowsIn(height);
@@ -126,7 +129,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     private void SetUpSheet()
     {
         var file = SelectedChoice!.File;
-        var imageSize = _imageSizeOf(file);
+        var imageSize = _images.SizeOf(file);
         var tileSize = SheetCutGuess.TileSizeFor(imageSize.Width, imageSize.Height);
         var guess = new TilesheetDefinition
         {
@@ -137,20 +140,34 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
             Margin = 0,
             Spacing = 0,
         };
-        Cut = new SheetCutViewModel(guess, imageSize, []);
+        Cut = new SheetCutViewModel(guess, imageSize, SheetUsage.None);
     }
 
     /// <summary>Opens the Cut panel on the shown sheet's cut; applying it re-cuts the sheet, its tiles keeping their cells.</summary>
     [RelayCommand(CanExecute = nameof(CanCutSheet))]
-    private void CutSheet() => Cut = new SheetCutViewModel(SelectedSheet!, _imageSizeOf(SelectedSheet!.File), SheetTiles);
+    private void CutSheet()
+    {
+        var sheet = SelectedSheet!;
+        Cut = new SheetCutViewModel(sheet, _images.SizeOf(sheet.File), CatalogUsage.OfSheet(_catalog.Current, sheet.Id, _openLayout()));
+    }
 
-    /// <summary>Makes the sheet as the Cut panel has it, as one undo step, and closes the panel.</summary>
+    /// <summary>
+    /// Makes the sheet as the Cut panel has it, as one undo step, and closes the panel. A re-cut of a sheet with tiles asks
+    /// first with the panel's warning (decision 116), counted again here as the open map may have changed since the panel
+    /// opened; on no, the panel stays open.
+    /// </summary>
     [RelayCommand(CanExecute = nameof(CanApplyCut))]
     private void ApplyCut()
     {
-        var sheet = Cut!.ToSheet();
+        var cut = Cut!;
+        cut.Usage = CatalogUsage.OfSheet(_catalog.Current, cut.SheetId, _openLayout());
+        if (cut.Problem is not null || (cut.Warning is { } warning && !_confirm($"{warning} Re-cut it?")))
+        {
+            return;
+        }
+
         Cut = null;
-        _catalog.SetTilesheet(sheet);
+        _catalog.SetTilesheet(cut.ToSheet());
     }
 
     private bool CanApplyCut() => Cut is { Problem: null };
@@ -191,7 +208,11 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
             ListSheetsAnew();
         }
 
-        Cut?.Tiles = SheetTiles;
+        if (Cut is { } cut)
+        {
+            cut.Usage = CatalogUsage.OfSheet(_catalog.Current, cut.SheetId, _openLayout());
+        }
+
         OnPropertyChanged(nameof(SheetTiles));
         OnPropertyChanged(nameof(SelectedTileId));
         OnPropertyChanged(nameof(ChoiceText));
@@ -203,7 +224,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     {
         var shown = SelectedChoice;
         _listedSheets = _catalog.Current.Tilesheets;
-        SheetChoices = ChoicesOf(_imageFiles, _listedSheets.Values);
+        SheetChoices = ChoicesOf(_images.Files, _listedSheets.Values);
         SelectedChoice = SheetChoices.FirstOrDefault(choice => choice.Sheet is { } sheet && sheet.Id == shown?.Sheet?.Id)
             ?? SheetChoices.FirstOrDefault(choice => string.Equals(choice.File, shown?.File, StringComparison.OrdinalIgnoreCase));
         if (SelectedCell is { } cell && !_listedSheets.ContainsKey(cell.SheetId))

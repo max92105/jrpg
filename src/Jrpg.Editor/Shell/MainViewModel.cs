@@ -59,7 +59,7 @@ internal sealed partial class MainViewModel : ObservableObject
         if (Content is not null && LoadError is null)
         {
             ShowMapList(Content.Current);
-            Painting = new TilePaintingViewModel(Content, Layer, ArtFolders.TilesheetImagesIn(ArtRoot), SheetImageSizeOf);
+            Painting = new TilePaintingViewModel(Content, Layer, new SheetImages(ArtFolders.TilesheetImagesIn(ArtRoot), SheetImageSizeOf), confirm);
             Marking = new WalkabilityMarking(Content, Painting.Browser);
             Content.PropertyChanged += OnContentChanged;
             Content.StepRecorded += (_, _) => RecordStep(UndoTarget.Catalogs);

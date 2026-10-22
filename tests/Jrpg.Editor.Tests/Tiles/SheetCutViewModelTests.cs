@@ -1,4 +1,5 @@
 using Jrpg.Core.Maps;
+using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Tiles;
 
 namespace Jrpg.Editor.Tests.Tiles;
@@ -8,7 +9,7 @@ public sealed class SheetCutViewModelTests
     // A 96 x 64 image cut into 32 px tiles: 3 columns, 2 rows.
     private static readonly TilesheetDefinition _sheet = new() { Id = "grass_3", File = "Grass3.png", TileWidth = 32, TileHeight = 32, Margin = 0, Spacing = 0 };
 
-    private readonly SheetCutViewModel _cut = new(_sheet, (96, 64), []);
+    private readonly SheetCutViewModel _cut = new(_sheet, (96, 64), SheetUsage.None);
 
     [Fact]
     public void Constructor_SheetCut_ShowsItsColumnsAndRows()
@@ -92,7 +93,7 @@ public sealed class SheetCutViewModelTests
     [Fact]
     public void Problem_TileOutsideNewGrid_NamesTheTile()
     {
-        var recut = new SheetCutViewModel(_sheet, (96, 64), [new TileDefinition { Id = 9, IsWalkable = true, SheetId = "grass_3", Column = 2, Row = 1 }]);
+        var recut = new SheetCutViewModel(_sheet, (96, 64), new SheetUsage([new TileDefinition { Id = 9, IsWalkable = true, SheetId = "grass_3", Column = 2, Row = 1 }], [], []));
 
         recut.Columns = 2;
 
@@ -102,11 +103,26 @@ public sealed class SheetCutViewModelTests
     [Fact]
     public void Problem_TileBelowNewGrid_NamesTheTile()
     {
-        var recut = new SheetCutViewModel(_sheet, (96, 64), [new TileDefinition { Id = 9, IsWalkable = true, SheetId = "grass_3", Column = 0, Row = 1 }]);
+        var recut = new SheetCutViewModel(_sheet, (96, 64), new SheetUsage([new TileDefinition { Id = 9, IsWalkable = true, SheetId = "grass_3", Column = 0, Row = 1 }], [], []));
 
         recut.Rows = 1;
 
         Assert.Equal("Tile 9 at (0, 1) would be outside the 3 x 1 grid.", recut.Problem);
+    }
+
+    [Fact]
+    public void Warning_SheetWithUsedTiles_NamesMapsAndObjects()
+    {
+        TileDefinition[] tiles = [Tile(9, 0, 0), Tile(10, 1, 0)];
+        var recut = new SheetCutViewModel(_sheet, (96, 64), new SheetUsage(tiles, ["forest", "start"], ["tree"]));
+
+        Assert.Equal("2 tiles are cut from this sheet, used on 2 maps (forest, start) and by 1 object (tree); they will show other pixels.", recut.Warning);
+    }
+
+    [Fact]
+    public void Warning_SheetWithoutTiles_IsNull()
+    {
+        Assert.Null(_cut.Warning);
     }
 
     [Fact]
@@ -118,4 +134,7 @@ public sealed class SheetCutViewModelTests
 
         Assert.Equal("96 px doesn't split into 5 columns.", exception.Message);
     }
+
+    private static TileDefinition Tile(int id, int column, int row) =>
+        new() { Id = id, IsWalkable = true, SheetId = _sheet.Id, Column = column, Row = row };
 }

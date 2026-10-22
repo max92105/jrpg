@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Maps;
+using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Tiles;
 
@@ -14,12 +15,12 @@ internal sealed partial class SheetCutViewModel : ObservableObject
 
     /// <param name="sheet">The cut it starts from; its id and file are kept.</param>
     /// <param name="imageSize">The image's size in its own pixels.</param>
-    /// <param name="tiles">The tiles already cut from the sheet.</param>
-    public SheetCutViewModel(TilesheetDefinition sheet, (int Width, int Height) imageSize, IReadOnlyList<TileDefinition> tiles)
+    /// <param name="usage">The tiles already cut from the sheet and what uses them.</param>
+    public SheetCutViewModel(TilesheetDefinition sheet, (int Width, int Height) imageSize, SheetUsage usage)
     {
         _sheet = sheet;
         _imageSize = imageSize;
-        Tiles = tiles;
+        Usage = usage;
         Columns = sheet.ColumnsIn(imageSize.Width);
         Rows = sheet.RowsIn(imageSize.Height);
         Margin = sheet.Margin;
@@ -29,12 +30,20 @@ internal sealed partial class SheetCutViewModel : ObservableObject
     public string SheetId => _sheet.Id;
 
     /// <summary>
-    /// The tiles cut from the sheet, which keep their column and row (decision 116); kept current while the panel is open,
-    /// as painting can make one.
+    /// The tiles cut from the sheet, which keep their column and row (decision 116), and what uses them; kept current while
+    /// the panel is open, as painting can make a tile.
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Problem), nameof(Summary))]
-    public partial IReadOnlyList<TileDefinition> Tiles { get; set; }
+    [NotifyPropertyChangedFor(nameof(Problem), nameof(Summary), nameof(Warning))]
+    public partial SheetUsage Usage { get; set; }
+
+    /// <summary>
+    /// "12 tiles are cut from this sheet, used on 2 maps (forest, start) and by 1 object (tree); they will show other
+    /// pixels."; null for a sheet nothing is cut from.
+    /// </summary>
+    public string? Warning => Usage.Tiles.Count == 0
+        ? null
+        : $"{Counted(Usage.Tiles.Count, "tile")} {(Usage.Tiles.Count == 1 ? "is" : "are")} cut from this sheet, {UsesText()}; they will show other pixels.";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(TileWidth), nameof(Problem), nameof(Summary), nameof(PreviewSheet))]
@@ -92,6 +101,21 @@ internal sealed partial class SheetCutViewModel : ObservableObject
     public TilesheetDefinition ToSheet() =>
         Problem is { } problem ? throw new InvalidOperationException(problem) : PreviewSheet!;
 
+    private static string Counted(int count, string thing) => count == 1 ? $"1 {thing}" : $"{count} {thing}s";
+
+    private string UsesText()
+    {
+        var onMaps = Usage.MapIds.Count == 0 ? null : $"on {Counted(Usage.MapIds.Count, "map")} ({string.Join(", ", Usage.MapIds)})";
+        var byObjects = Usage.ObjectIds.Count == 0 ? null : $"by {Counted(Usage.ObjectIds.Count, "object")} ({string.Join(", ", Usage.ObjectIds)})";
+        return (onMaps, byObjects) switch
+        {
+            (null, null) => "used on no map or object",
+            ({ } maps, null) => $"used {maps}",
+            (null, { } objects) => $"used {objects}",
+            ({ } maps, { } objects) => $"used {maps} and {objects}",
+        };
+    }
+
     // The image less the margin on both sides and the spacing between cells, shared by the cells.
     private int SpanAlong(int imageLength, int cells) => imageLength - (2 * Margin) - ((cells - 1) * Spacing);
 
@@ -116,7 +140,7 @@ internal sealed partial class SheetCutViewModel : ObservableObject
 
     // A tile past the new grid would fail the art check on save, and the maps using it would no longer open.
     private string? TileOutsideProblem() =>
-        Tiles.Where(tile => tile.Column >= Columns || tile.Row >= Rows).MinBy(tile => tile.Id) is { } outside
+        Usage.Tiles.Where(tile => tile.Column >= Columns || tile.Row >= Rows).MinBy(tile => tile.Id) is { } outside
             ? $"Tile {outside.Id} at ({outside.Column}, {outside.Row}) would be outside the {Columns} x {Rows} grid."
             : null;
 }

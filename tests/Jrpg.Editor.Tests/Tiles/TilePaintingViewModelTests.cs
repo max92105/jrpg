@@ -21,7 +21,7 @@ public sealed class TilePaintingViewModelTests
 
     public TilePaintingViewModelTests()
     {
-        _painting = new TilePaintingViewModel(_draft, _layer, ArtFolders.TilesheetImagesIn(ArtFolders.RootIn(_contentRoot)), _ => (1000, 1000)) { OpenMap = new MapViewModel(_catalog.Maps["forest"]) };
+        _painting = new TilePaintingViewModel(_draft, _layer, new SheetImages(ArtFolders.TilesheetImagesIn(ArtFolders.RootIn(_contentRoot)), _ => (1000, 1000)), _ => true) { OpenMap = new MapViewModel(_catalog.Maps["forest"]) };
     }
 
     private MapViewModel Map => _painting.OpenMap!;

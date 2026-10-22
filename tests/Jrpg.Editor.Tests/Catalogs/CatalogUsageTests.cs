@@ -48,6 +48,30 @@ public sealed class CatalogUsageTests
         Assert.Empty(CatalogUsage.UsersOfTile(_catalog.Tiles.Keys.Max() + 1, _catalog, openLayout: null));
     }
 
+    // The chest's sheet, with one of its tiles also painted on the open forest.
+    [Fact]
+    public void OfSheet_SheetUsedByMapAndObject_CountsBoth()
+    {
+        var chestTile = _catalog.Tiles[_catalog.Objects["chest"].Tiles[0].TileId];
+        var forest = WithTileAtTopLeft(_catalog.Maps["forest"].Layout, chestTile.Id);
+
+        var usage = CatalogUsage.OfSheet(_catalog, chestTile.SheetId, forest);
+
+        Assert.Equal(CatalogUsage.TilesCutFrom(chestTile.SheetId, _catalog), usage.Tiles.Select(tile => tile.Id));
+        Assert.Contains("forest", usage.MapIds);
+        Assert.Contains("chest", usage.ObjectIds);
+    }
+
+    [Fact]
+    public void OfSheet_UnusedSheet_IsEmpty()
+    {
+        var usage = CatalogUsage.OfSheet(_catalog, "no_such_sheet", openLayout: null);
+
+        Assert.Empty(usage.Tiles);
+        Assert.Empty(usage.MapIds);
+        Assert.Empty(usage.ObjectIds);
+    }
+
     private static MapLayout WithTileAtTopLeft(MapLayout layout, int tileId)
     {
         var ground = layout.Layers[0];

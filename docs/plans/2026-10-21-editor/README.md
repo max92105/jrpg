@@ -105,7 +105,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 7: NPCs
 
-- [ ] **ADR 0015: NPCs on maps** (before N1) → [slices/ADR-0015.md](slices/ADR-0015.md)
+- [x] **ADR 0015: NPCs on maps** (before N1) → [slices/ADR-0015.md](slices/ADR-0015.md)
 - [ ] **N1. An NPC in the game** (Core + Data + Game + content, about 250 lines) → [slices/N1.md](slices/N1.md)
 - [ ] **N2. NPCs in the editor: drawn, and a Talk preset** (Editor, about 200 lines) → [slices/N2.md](slices/N2.md)
 - [ ] **N3. A new NPC** (Data + Editor, about 220 lines) → [slices/N3.md](slices/N3.md)
@@ -133,16 +133,17 @@ Developer's answers (2026-10-21). Earlier decisions that apply: 47 `CommunityToo
 - **125. Importing an image whose name is taken asks before replacing** (then checks it against the tiles cut from it, E7).
 - **126. "Snap to 1/4 tile" checkbox, off by default,** as legacy `ObjectEditorWindow` (E11b).
 - **69 (part). NPCs are in this plan.** No NPC art yet: one shared placeholder sprite in `content/art/` that NPCs reference by file name, so real art later is a file swap (ADR 0015, N1-N3).
+- **ADR 0015 (2026-10-22): an NPC is an object drawn from a field sprite** (option A), placed with an Interact event.
+- **127. NPCs stand still;** movement would be a later plan with its own ADR.
+- **128. A standing NPC always faces down** (the standing frame of the down row).
+- **129. NPC collision: a default outline over the lower half of the cell,** editable in the shapes window.
+- **130. The placeholder sprite is a plain silhouette** in `player.png`'s frame layout, `npc_placeholder.png` (not a copy of the player).
+- **131. One NPC object per character** (`villager`, `guard`), each naming its sprite file.
+- **132. NPCs are one cell, 48 px frames** in the player sheet's layout (8 frames by 4 facings).
 
 ## Open design questions (developer decides)
 Each slice uses the placeholder until answered. Questions and decisions share numbers.
 - **69 (rest, still open):** drop per-tile and per-object-part Z overrides, tile names and tile collision polygons?
-- **127. NPC movement:** NPCs stand still (placeholder), or wander / follow routes (a later plan, with its own ADR: positions become runtime state)?
-- **128. NPC facing:** always the standing frame facing down (placeholder), a facing chosen per placed NPC (a new `PlacedObject` field), or turning to face the player while talking?
-- **129. NPC collision:** a default outline over the lower half of the cell, editable in the shapes window (placeholder), the whole cell, or none (walk-through)?
-- **130. The placeholder NPC sprite:** a copy of `player.png` named `npc_placeholder.png` (placeholder: same frame layout, so real walk sheets drop in), or a plain silhouette you draw?
-- **131. One NPC object per character** (`villager`, `guard`; each names its sprite file; placeholder), **or one shared `npc` object** placed everywhere, whose art changes for all NPCs at once?
-- **132. NPC size and frames:** one cell, 48 px frames in the player sheet's layout (8 frames by 4 facings; placeholder), or taller NPCs (1 x 2 cells)?
 
 ## ADRs needed
 - **0014 Editing the shared catalogs** (checkbox step before E3a). The main question: **how catalog edits (sheets, tiles, objects) are held, saved and undone.**

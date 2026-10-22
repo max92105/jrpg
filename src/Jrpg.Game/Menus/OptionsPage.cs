@@ -54,6 +54,8 @@ internal sealed class OptionsPage : IMenuPage
 
     public string Hint { get; }
 
+    public bool ShowsPartySidebar => true;
+
     public bool LeavesOnCancel => true;
 
     // The values are read from the settings when drawing, so only the cursor goes back.

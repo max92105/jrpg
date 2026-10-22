@@ -98,6 +98,8 @@ internal sealed class StatusPage : IMenuPage
 
     public string Hint { get; }
 
+    public bool ShowsPartySidebar => true;
+
     public bool LeavesOnCancel => true;
 
     /// <summary>The shown member's HP, MP, Attack and Defense, as the page writes them.</summary>

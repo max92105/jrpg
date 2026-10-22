@@ -19,6 +19,12 @@ internal interface IMenuPage
     string Hint { get; }
 
     /// <summary>
+    /// Whether the menu shows the party sidebar beside the page, which then gets a narrower area. False on a page that
+    /// shows the party itself, or while it shows its own side panel.
+    /// </summary>
+    bool ShowsPartySidebar { get; }
+
+    /// <summary>
     /// Whether Cancel now goes back to the tabs. False while something inside the page, such as a confirmation, answers
     /// Cancel itself.
     /// </summary>

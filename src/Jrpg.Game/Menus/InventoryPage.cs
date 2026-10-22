@@ -99,6 +99,8 @@ internal sealed class InventoryPage : IMenuPage
 
     public string Hint { get; }
 
+    public bool ShowsPartySidebar => true;
+
     /// <summary>False while choosing who to use an item on: Cancel closes that instead.</summary>
     public bool LeavesOnCancel => !_itemUse.IsOpen;
 

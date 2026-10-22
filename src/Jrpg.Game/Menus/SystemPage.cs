@@ -52,6 +52,8 @@ internal sealed class SystemPage : IMenuPage
     /// <summary>The open save files' hint while they show in this page's place.</summary>
     public string Hint => _openFiles?.Hint ?? _ownHint;
 
+    public bool ShowsPartySidebar => true;
+
     /// <summary>
     /// False while a question is open, which Cancel answers No, or while the save files are open, where Cancel goes back to the entries.
     /// </summary>

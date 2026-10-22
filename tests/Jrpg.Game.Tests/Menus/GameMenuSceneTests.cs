@@ -134,15 +134,46 @@ public sealed class GameMenuSceneTests
         Assert.Equal(RepositoryScreenText.Text.Messages.Text(MessageIds.MenuHintMain), menu.FooterHint);
     }
 
+    [Fact]
+    public void ShowsSidebar_PageThatWantsIt_IsTrue()
+    {
+        var menu = NewMenu(new CountingMenuPage());
+
+        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+
+        Assert.True(menu.ShowsSidebar);
+    }
+
+    [Fact]
+    public void ShowsSidebar_PageThatShowsThePartyItself_IsFalse()
+    {
+        var menu = NewMenu(new CountingMenuPage { ShowsPartySidebar = false });
+
+        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+
+        Assert.False(menu.ShowsSidebar);
+    }
+
+    [Fact]
+    public void ShowsSidebar_MainMenu_IsFalse()
+    {
+        var menu = NewMenu(new CountingMenuPage());
+
+        Assert.False(menu.ShowsSidebar);
+    }
+
     private static GameMenuScene NewMenu()
     {
         var session = NewSession();
         var ui = new UiTextures();
-        return new(RepositoryScreenText.Text, ui, new MenuHeader(RepositoryScreenText.Text, session), [TestSystemPages.Create(session, ui)]);
+        return new(RepositoryScreenText.Text, ui, FrameOf(session), [TestSystemPages.Create(session, ui)]);
     }
 
     private static GameMenuScene NewMenu(IMenuPage page) =>
-        new(RepositoryScreenText.Text, new UiTextures(), new MenuHeader(RepositoryScreenText.Text, NewSession()), [page]);
+        new(RepositoryScreenText.Text, new UiTextures(), FrameOf(NewSession()), [page]);
+
+    private static MenuFrame FrameOf(GameSession session) =>
+        new(new MenuHeader(RepositoryScreenText.Text, session), new PartySidebar(session.Party, RepositoryScreenText.Text.Messages));
 
     private static GameSession NewSession() => GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
 }

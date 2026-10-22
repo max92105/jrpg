@@ -31,7 +31,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
         _openLayout = openLayout;
         catalog.PropertyChanged += OnCatalogChanged;
         _listedSheets = catalog.Current.Tilesheets;
-        SheetChoices = ChoicesOf(images.Files, _listedSheets.Values);
+        SheetChoices = ChoicesOf(images.ListFiles(), _listedSheets.Values);
         SelectedChoice = SheetChoices.Count > 0 ? SheetChoices[0] : null;
     }
 
@@ -186,6 +186,14 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     // A cut belongs to the image it was opened on.
     partial void OnSelectedChoiceChanged(SheetChoice? value) => Cut = null;
 
+    /// <summary>Lists the tilesheet folder again and shows an image in it, as after an import.</summary>
+    /// <param name="fileName">A file in the folder; its first sheet is shown, or the image alone when it isn't set up.</param>
+    public void Show(string fileName)
+    {
+        SheetChoices = ChoicesOf(_images.ListFiles(), _listedSheets.Values);
+        SelectedChoice = SheetChoices.FirstOrDefault(choice => string.Equals(choice.File, fileName, StringComparison.OrdinalIgnoreCase));
+    }
+
     // Matched ignoring case, as Windows finds the file a sheet names whatever its case.
     private static SheetChoice[] ChoicesOf(IReadOnlyList<string> imageFiles, IEnumerable<TilesheetDefinition> sheets)
     {
@@ -224,7 +232,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     {
         var shown = SelectedChoice;
         _listedSheets = _catalog.Current.Tilesheets;
-        SheetChoices = ChoicesOf(_images.Files, _listedSheets.Values);
+        SheetChoices = ChoicesOf(_images.ListFiles(), _listedSheets.Values);
         SelectedChoice = SheetChoices.FirstOrDefault(choice => choice.Sheet is { } sheet && sheet.Id == shown?.Sheet?.Id)
             ?? SheetChoices.FirstOrDefault(choice => string.Equals(choice.File, shown?.File, StringComparison.OrdinalIgnoreCase));
         if (SelectedCell is { } cell && !_listedSheets.ContainsKey(cell.SheetId))

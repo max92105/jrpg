@@ -23,7 +23,7 @@ public sealed class WalkabilityMarkingTests
 
     public WalkabilityMarkingTests()
     {
-        _marking = new WalkabilityMarking(_draft, new TileBrowserViewModel(_draft, new SheetImages(["Dungeon.png"], _ => (48, 16)), _ => true, () => null));
+        _marking = new WalkabilityMarking(_draft, new TileBrowserViewModel(_draft, new SheetImages(() => ["Dungeon.png"], _ => (48, 16)), _ => true, () => null));
     }
 
     [Fact]

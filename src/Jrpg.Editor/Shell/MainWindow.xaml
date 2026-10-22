@@ -57,6 +57,7 @@
         <MenuItem Header="Mark blocked" IsCheckable="True" IsChecked="{Binding Marking.IsMarkingBlocked}" />
         <MenuItem Header="Set up sheet" Command="{Binding Painting.Browser.SetUpSheetCommand}" />
         <MenuItem Header="Cut sheet" Command="{Binding Painting.Browser.CutSheetCommand}" />
+        <MenuItem Header="Import sheet image..." Click="OnImportSheetImageClicked" />
       </MenuItem>
       <MenuItem Header="Map">
         <MenuItem Header="Settings..." Click="OnMapSettingsClicked" />
@@ -113,6 +114,7 @@
     <StatusBar DockPanel.Dock="Bottom">
       <StatusBarItem Content="{Binding CursorStatus}" />
       <StatusBarItem Content="{Binding UndoRefusal}" Foreground="DarkRed" />
+      <StatusBarItem Content="{Binding ImportStatus}" />
       <StatusBarItem Content="Unsaved changes"
                      Visibility="{Binding HasUnsavedChanges, Converter={StaticResource VisibleWhenTrue}}" />
       <StatusBarItem x:Name="ZoomStatus" HorizontalAlignment="Right" />
@@ -148,6 +150,13 @@
                       Content="Mark blocked"
                       ToolTip="While on, a click on a cell flips it between walkable and blocked (red cross) instead of choosing it."
                       IsChecked="{Binding Marking.IsMarkingBlocked}" />
+            <Button DockPanel.Dock="Top"
+                    Margin="0,0,0,4"
+                    HorizontalAlignment="Left"
+                    Padding="8,2"
+                    Content="Import..."
+                    ToolTip="Copy PNG images into the tilesheet art; each then shows in the sheet box."
+                    Click="OnImportSheetImageClicked" />
             <tiles:TileBrowserView x:Name="TileBrowser" DataContext="{Binding Painting.Browser}" />
           </DockPanel>
         </TabItem>

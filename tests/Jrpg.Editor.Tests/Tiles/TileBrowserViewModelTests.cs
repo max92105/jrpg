@@ -31,12 +31,14 @@ public sealed class TileBrowserViewModelTests
 
     private readonly TileBrowserViewModel _browser;
     private readonly List<string> _questions = [];
+
+    // Grass3.png has no sheet yet; a test adds to the folder as an import would.
+    private readonly List<string> _imageFiles = ["Dungeon.png", "Forest.png", "Grass3.png"];
     private bool _answer = true;
 
     public TileBrowserViewModelTests()
     {
-        // Grass3.png has no sheet yet.
-        var images = new SheetImages(["Dungeon.png", "Forest.png", "Grass3.png"], file => _imageSizes[file]);
+        var images = new SheetImages(() => [.. _imageFiles], file => _imageSizes[file]);
         _browser = new TileBrowserViewModel(_draft, images, Ask, () => null);
     }
 
@@ -290,6 +292,17 @@ public sealed class TileBrowserViewModelTests
 
         Assert.Null(_browser.SelectedCell);
         Assert.Equal(new SheetChoice("Grass3.png", null), _browser.SelectedChoice);
+    }
+
+    [Fact]
+    public void Show_NewImageFile_ListsItNotSetUpAndShowsIt()
+    {
+        _imageFiles.Insert(0, "Cave.png");
+
+        _browser.Show("Cave.png");
+
+        Assert.Equal(["Cave.png (not set up)", "dungeon", "forest", "Grass3.png (not set up)"], _browser.SheetChoices.Select(choice => choice.Label));
+        Assert.Equal(new SheetChoice("Cave.png", null), _browser.SelectedChoice);
     }
 
     [Fact]

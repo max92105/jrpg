@@ -4,6 +4,8 @@ using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Maps.Editing;
 using Jrpg.Editor.Shell;
+using Jrpg.Editor.Tests.Tiles;
+using Jrpg.Editor.Tiles;
 
 namespace Jrpg.Editor.Tests.Shell;
 
@@ -270,6 +272,35 @@ public sealed class MainViewModelTests : IDisposable
 
         Assert.Equal($"Can't undo: tile {tileId} is cut from sheet grass_3.", viewModel.UndoRefusal);
         Assert.True(viewModel.Catalog!.Tilesheets.ContainsKey("grass_3"));
+    }
+
+    [Fact]
+    public void ImportSheetImages_NewImage_ShowsItAndReportsImported()
+    {
+        var viewModel = Open(CopyOfRepositoryContent());
+        var source = PngHeaderFile.Write(Path.Combine(_contentCopy, "import-source", "Cave.png"), 96, 48);
+
+        viewModel.ImportSheetImages([source]);
+
+        Assert.Equal(new SheetChoice("Cave.png", null), viewModel.Painting!.Browser.SelectedChoice);
+        Assert.Equal("Imported Cave.png.", viewModel.ImportStatus);
+    }
+
+    // Grass3.png has no sheet, so it can be replaced by any size; Set up's guess reads the size: 96 x 48 is 2 x 1 cells of 48.
+    [Fact]
+    public void ImportSheetImages_ReplacedImage_ReadsTheNewSize()
+    {
+        var viewModel = Open(CopyOfRepositoryContent(), answer: true);
+        var browser = viewModel.Painting!.Browser;
+        browser.SelectedChoice = browser.SheetChoices.First(choice => choice.File == "Grass3.png");
+        browser.SetUpSheetCommand.Execute(null);
+        browser.CancelCutCommand.Execute(null);
+        var source = PngHeaderFile.Write(Path.Combine(_contentCopy, "import-source", "Grass3.png"), 96, 48);
+
+        viewModel.ImportSheetImages([source]);
+        browser.SetUpSheetCommand.Execute(null);
+
+        Assert.Equal((2, 1), (browser.Cut!.Columns, browser.Cut.Rows));
     }
 
     [Fact]

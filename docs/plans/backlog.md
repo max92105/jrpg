@@ -28,3 +28,4 @@ Code-health work waiting for the next cleanup plan; `/retro` appends to it. One 
 - `MainViewModel` (467 lines after E4b2): move the undo routing (journal, `Undo`/`Redo` commands, which mirror each other, and the step event wiring) into its own type.
 - `TileBrowserViewModelTests` (345 lines after E6b): move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class (review of E6b).
 - `MainWindow.xaml.cs` (512 lines after E6a): move the catalog and map redraw handlers into their own type (review of E6a).
+- Tests: the header-only PNG writer is copied in `ArtReferenceCheckTests` and `ContentWriterTests` (Data); the Editor tests share `PngHeaderFile` (E7b). Share the Data copies on the next change there.

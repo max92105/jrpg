@@ -10,6 +10,7 @@ using Jrpg.Editor.Maps.Editing;
 using Jrpg.Editor.Maps.Settings;
 using Jrpg.Editor.Tiles;
 using Jrpg.Editor.Viewport;
+using Microsoft.Win32;
 
 namespace Jrpg.Editor.Shell;
 
@@ -53,6 +54,7 @@ internal sealed partial class MainWindow : Window
             TileBrowser.Marking = viewModel.Marking;
             ObjectBrowser.Drawing = _drawing;
             content.PropertyChanged += OnContentChanged;
+            viewModel.SheetImagesImported += (_, files) => RedrawImportedImages(tileImages, files);
         }
 
         DataContext = _viewModel = viewModel;
@@ -213,6 +215,28 @@ internal sealed partial class MainWindow : Window
 
     // Closing goes through OnClosing, so unsaved changes still ask.
     private void OnExitClicked(object sender, RoutedEventArgs e) => Close();
+
+    private void OnImportSheetImageClicked(object sender, RoutedEventArgs e)
+    {
+        var dialog = new OpenFileDialog { Title = "Import sheet images", Filter = "PNG images (*.png)|*.png", Multiselect = true };
+        if (dialog.ShowDialog(this) == true)
+        {
+            _viewModel.ImportSheetImages(dialog.FileNames);
+        }
+    }
+
+    // A replaced file's picture is cached by the sheet browser, the map and the object preview alike.
+    private void RedrawImportedImages(TileImages tileImages, IReadOnlyList<string> files)
+    {
+        foreach (var file in files)
+        {
+            tileImages.Forget(file);
+        }
+
+        TileBrowser.RedrawSheet();
+        DrawCurrentMap();
+        ObjectBrowser.ShowPreview();
+    }
 
     // One controls window, kept open beside the map: F1 again brings it to the front.
     private void OnControlsHelpExecuted(object sender, ExecutedRoutedEventArgs e)

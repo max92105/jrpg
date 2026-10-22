@@ -58,6 +58,9 @@ internal sealed partial class TileBrowserView : UserControl
         }
     }
 
+    /// <summary>Draws the shown image again; the window calls it when an import replaced its file.</summary>
+    public void RedrawSheet() => DrawSheet();
+
     // An image not set up has no cells to scale to the map's, so it shows at its own size, with no marks, or with the
     // Cut panel's grid while it is open; the scale stays put while the cut is typed.
     private void DrawSheet()

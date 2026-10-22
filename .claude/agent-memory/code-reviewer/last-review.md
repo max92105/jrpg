@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-21-editor/slices/E7a.md, E7a (tilesheet image import, Data writer; uncommitted)
-Round: 1 (verdict: Ready to commit; verify all pass, 1434 tests)
+Slice: docs/plans/2026-10-21-editor/slices/E7b.md, E7b (importing a sheet image in the editor; uncommitted)
+Round: 1 (verdict: Ready to commit; verify all pass, 1439 tests)
 
-- open (Warning): case-insensitive sheet match in ArtReferenceCheck.FirstTileOutside untested; add a too-small import whose source name differs only in case from sheet.File.
-- open (Suggestion): FirstTileOutside has empty <param name="catalog"/> and <param name="size"/> tags; describe them or drop the param docs.
-- open (Suggestion): ContentWriterTests.TilesheetImage duplicates the private TilesheetImagePath formula; acceptable in tests, could share via ArtFolders if a third copy appears.
+- open (Warning): MainViewModel.ImportSheetImages untested (size cache forgotten on replace, ImportStatus text, last image shown); add MainViewModelTests on a content copy.
+- open (Suggestion): SheetImagesImported raised (full redraw) even when nothing was imported; raise only when result.Imported.Count > 0.
+- open (Suggestion): ImportStatus composed with Prepend/ternary in one line; a small local function or two branches reads easier.

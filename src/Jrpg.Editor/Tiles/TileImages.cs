@@ -32,6 +32,21 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot)
         return image;
     }
 
+    /// <summary>Drops an image and the tiles cropped from it, so a file replaced by an import is read again.</summary>
+    /// <param name="file">The file name in the tilesheet art folder, in any case.</param>
+    public void Forget(string file)
+    {
+        foreach (var cached in _sheets.Keys.Where(key => string.Equals(key, file, StringComparison.OrdinalIgnoreCase)).ToList())
+        {
+            _sheets.Remove(cached);
+        }
+
+        foreach (var cropped in _tiles.Keys.Where(key => string.Equals(key.Sheet.File, file, StringComparison.OrdinalIgnoreCase)).ToList())
+        {
+            _tiles.Remove(cropped);
+        }
+    }
+
     /// <param name="file">The sheet's file name in the tilesheet art folder.</param>
     public BitmapSource SheetImageOf(string file)
     {
@@ -41,6 +56,8 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot)
             bitmap.BeginInit();
             bitmap.UriSource = new Uri(Path.Combine(artRoot, ArtFolders.Tilesheets, file));
             bitmap.CacheOption = BitmapCacheOption.OnLoad;
+            // WPF keeps decoded images by path; a file replaced by an import must be read again.
+            bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
             bitmap.EndInit();
             bitmap.Freeze();
             sheet = bitmap;

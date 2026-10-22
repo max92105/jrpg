@@ -26,7 +26,7 @@ internal sealed partial class MainViewModel : ObservableObject
 {
     private readonly ContentWriter _writer;
     private readonly Func<string, bool> _confirm;
-    private readonly Dictionary<string, (int Width, int Height)> _sheetImageSizes = [];
+    private readonly Dictionary<string, (int Width, int Height)> _sheetImageSizes = new(StringComparer.OrdinalIgnoreCase);
     private readonly UndoJournal _journal = new();
 
     /// <param name="contentRoot">The content folder to edit.</param>
@@ -59,7 +59,7 @@ internal sealed partial class MainViewModel : ObservableObject
         if (Content is not null && LoadError is null)
         {
             ShowMapList(Content.Current);
-            Painting = new TilePaintingViewModel(Content, Layer, new SheetImages(ArtFolders.TilesheetImagesIn(ArtRoot), SheetImageSizeOf), confirm);
+            Painting = new TilePaintingViewModel(Content, Layer, new SheetImages(() => ArtFolders.TilesheetImagesIn(ArtRoot), SheetImageSizeOf), confirm);
             Marking = new WalkabilityMarking(Content, Painting.Browser);
             Content.PropertyChanged += OnContentChanged;
             Content.StepRecorded += (_, _) => RecordStep(UndoTarget.Catalogs);
@@ -129,6 +129,13 @@ internal sealed partial class MainViewModel : ObservableObject
     /// <summary>Why the last undo was refused: a tile it would remove is still in use; null after any other undo, redo or edit.</summary>
     [ObservableProperty]
     public partial string? UndoRefusal { get; private set; }
+
+    /// <summary>What the last import copied and refused ("Imported Forest2.png"); empty before any import.</summary>
+    [ObservableProperty]
+    public partial string ImportStatus { get; private set; } = "";
+
+    /// <summary>The images an import copied, raised before the last is shown, so cached pictures of replaced files are dropped.</summary>
+    public event EventHandler<IReadOnlyList<string>>? SheetImagesImported;
 
     /// <summary>What the status bar says about the cell under the cursor; empty when the cursor is off the map.</summary>
     [ObservableProperty]
@@ -399,6 +406,45 @@ internal sealed partial class MainViewModel : ObservableObject
                 .ThenBy(map => map.Id, StringComparer.Ordinal)
                 .Select(map => new MapEntry(map.Id, $"{map.Settings.DisplayName} ({map.Id})")),
         ];
+    }
+
+    /// <summary>
+    /// Copies images into the tilesheet art (asking before replacing one), then shows the last one copied, "(not set up)"
+    /// if it has no sheet. A file copy, not an undo step.
+    /// </summary>
+    /// <param name="paths">The images chosen in the file dialog.</param>
+    public void ImportSheetImages(IReadOnlyList<string> paths)
+    {
+        if (Content is null || Painting is null)
+        {
+            return;
+        }
+
+        var result = new SheetImport(_writer, Content).Import(paths, file => _confirm($"{file} is already in the tilesheet art. Replace it?"));
+        foreach (var file in result.Imported)
+        {
+            _sheetImageSizes.Remove(file);
+        }
+
+        if (result.LastImported is { } last)
+        {
+            SheetImagesImported?.Invoke(this, result.Imported);
+            Painting.Browser.Show(last);
+        }
+
+        ImportStatus = ImportStatusOf(result);
+    }
+
+    // "Imported A.png, B.png. Refused: C.png: not a PNG image."
+    private static string ImportStatusOf(SheetImportResult result)
+    {
+        var refusals = result.Refusals.Select(refusal => $"Refused: {refusal}");
+        if (result.Imported.Count == 0)
+        {
+            return string.Join(" ", refusals);
+        }
+
+        return string.Join(" ", refusals.Prepend($"Imported {string.Join(", ", result.Imported)}."));
     }
 
     // Read from the PNG header once per file; the art check has already found every sheet image readable.

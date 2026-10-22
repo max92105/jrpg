@@ -78,7 +78,7 @@ H1 and T1 come from the plan review, not from the developer's answers. Strike ei
 - [x] **P1. The party sidebar: which pages, plain cards** (Game, about 220 lines) → [slices/P1.md](slices/P1.md)
 - [x] **P2. The party sidebar's look** (Game, about 150 lines) → [slices/P2.md](slices/P2.md)
 - [x] **Q1. Core: what can be taken from whom, and taking it** (Core, about 170 lines) → [slices/Q1.md](slices/Q1.md)
-- [ ] **Q2. The equipment list offers one row per wearer, and Confirm takes it** (Game + content, about 200 lines) → [slices/Q2.md](slices/Q2.md)
+- [x] **Q2. The equipment list offers one row per wearer, and Confirm takes it** (Game + content, about 200 lines) → [slices/Q2.md](slices/Q2.md)
 
 ### Phase 3: the word, area by area
 Counts are matching lines (`grep -ic`), counted on 2026-10-22; a line can hold the word more than once (`UiTheme`).

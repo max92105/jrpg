@@ -329,4 +329,10 @@ internal static class MessageIds
 
     /// <summary>The menu footer's line while the files to load show inside System.</summary>
     public const string MenuHintLoad = "menu_hint_load";
+
+    /// <summary>Placeholders <c>{item}</c> and <c>{member}</c>: an item another member wears, in the equipment choice.</summary>
+    public const string EquipmentWornRow = "equipment_worn_row";
+
+    /// <summary>Placeholder <c>{member}</c>: the footer's line while a worn item is highlighted.</summary>
+    public const string EquipmentTakeHint = "equipment_take_hint";
 }

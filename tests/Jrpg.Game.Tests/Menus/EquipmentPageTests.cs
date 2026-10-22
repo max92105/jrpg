@@ -145,6 +145,83 @@ public sealed class EquipmentPageTests
         Assert.Equal($"There's no room in the bag for {bronze.Name}.", page.Notice);
     }
 
+    [Fact]
+    public void Update_ConfirmWornRow_MovesTheItemToTheShownMember()
+    {
+        var sarxian = WearingSwordAndArmor();
+        var zanyr = ZanyrWearingIronSword();
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Confirm));
+        ChooseZanyrsIronSword(page);
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.Same(StartMapScenarios.BelowClosedDoor.Items["iron_sword"], sarxian.Weapon);
+        Assert.Null(zanyr.Weapon);
+        Assert.Equal(2, _session.Inventory.QuantityOf("bronze_sword"));
+    }
+
+    [Fact]
+    public void Update_TakeWithNoRoomForOwnItem_ShowsTheNoRoomNotice()
+    {
+        var sarxian = WearingSwordAndArmor();
+        var zanyr = ZanyrWearingIronSword();
+        var bronze = StartMapScenarios.BelowClosedDoor.Items["bronze_sword"];
+        _session.Inventory.Add(bronze, bronze.MaxStack - _session.Inventory.QuantityOf(bronze.Id));
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Confirm));
+        ChooseZanyrsIronSword(page);
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.Same(bronze, sarxian.Weapon);
+        Assert.NotNull(zanyr.Weapon);
+        Assert.Equal($"There's no room in the bag for {bronze.Name}.", page.Notice);
+    }
+
+    [Fact]
+    public void Hint_WornRowHighlighted_NamesTheWearer()
+    {
+        WearingSwordAndArmor();
+        ZanyrWearingIronSword();
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Confirm));
+
+        ChooseZanyrsIronSword(page);
+
+        Assert.Equal("Taking it leaves Zanyr without it.", page.Hint);
+    }
+
+    [Fact]
+    public void Hint_CursorLeavesTheWornRow_IsThePageHintAgain()
+    {
+        WearingSwordAndArmor();
+        ZanyrWearingIronSword();
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Confirm));
+        ChooseZanyrsIronSword(page);
+
+        page.Update(Pressing(GameButton.Up));
+
+        Assert.Equal(RepositoryScreenText.Text.Messages.Text(MessageIds.MenuHintEquipment), page.Hint);
+    }
+
+    // Zanyr, a knight in the reserve, wears the only iron sword.
+    private PartyMember ZanyrWearingIronSword()
+    {
+        var zanyr = _session.Party.MemberById("zanyr");
+        Assert.True(_session.Equipment.TryEquip(zanyr, StartMapScenarios.BelowClosedDoor.Items["iron_sword"]));
+        return zanyr;
+    }
+
+    // With the leader wearing a bronze sword and Zanyr the iron one, the weapon choice lists Remove, the other bronze
+    // sword, then Zanyr's iron sword.
+    private static void ChooseZanyrsIronSword(EquipmentPage page)
+    {
+        page.Update(Pressing(GameButton.Down));
+        page.Update(Pressing(GameButton.Down));
+    }
+
     // Starts with 2 bronze swords and 2 leather armors in the inventory; the leader, a warrior, can wear both.
     private PartyMember WearingSwordAndArmor()
     {

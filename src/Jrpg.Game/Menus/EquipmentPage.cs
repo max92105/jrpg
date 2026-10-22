@@ -23,6 +23,7 @@ internal sealed class EquipmentPage : IMenuPage
     private readonly Inventory _inventory;
     private readonly IReadOnlyDictionary<string, ItemDefinition> _items;
     private readonly UiMessages _messages;
+    private readonly string _pageHint;
     private readonly EquipmentSheetView _sheetView;
     private readonly EquipmentChoiceView _choiceView;
     private readonly ListCursor _memberCursor;
@@ -33,6 +34,8 @@ internal sealed class EquipmentPage : IMenuPage
     // The choice row the preview was built for; -1 when none was.
     private int _previewedRow = -1;
     private string? _notice;
+    // The footer's line while a worn item is highlighted, naming who would lose it; null otherwise.
+    private string? _takeHint;
 
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared textures: section lines, icons, the selected row.</param>
@@ -40,7 +43,7 @@ internal sealed class EquipmentPage : IMenuPage
     /// <param name="catalog">The items, to list what each slot can take.</param>
     public EquipmentPage(ScreenText text, UiTextures ui, GameSession session, ContentCatalog catalog)
     {
-        Hint = text.Messages.Text(MessageIds.MenuHintEquipment);
+        _pageHint = text.Messages.Text(MessageIds.MenuHintEquipment);
         _party = session.Party;
         _equipment = session.Equipment;
         _inventory = session.Inventory;
@@ -59,7 +62,7 @@ internal sealed class EquipmentPage : IMenuPage
 
     public string TitleMessageId => MessageIds.MenuEquipment;
 
-    public string Hint { get; }
+    public string Hint => _takeHint ?? _pageHint;
 
     /// <summary>False while the item choice shows in the sidebar's place.</summary>
     public bool ShowsPartySidebar => _choice is null;
@@ -164,8 +167,9 @@ internal sealed class EquipmentPage : IMenuPage
             return;
         }
 
-        _choice = new EquipmentChoice(_equipment.WearableFor(Shown, EquipmentSheet.Slots[_rowCursor.Selected], _items));
-        _choiceView.Show(_choice, _messages.Text(EquipmentSheet.LabelIdOf(EquipmentSheet.Slots[_rowCursor.Selected])), _inventory);
+        var slot = EquipmentSheet.Slots[_rowCursor.Selected];
+        _choice = new EquipmentChoice(_equipment.WearableFor(Shown, slot, _items), PartyEquipment.TakeableFor(Shown, slot, _party));
+        _choiceView.Show(_choice, _messages.Text(EquipmentSheet.LabelIdOf(slot)), _inventory);
         ShowPreview(_choice);
     }
 
@@ -198,6 +202,9 @@ internal sealed class EquipmentPage : IMenuPage
         _previewedRow = choice.SelectedRow;
         var slot = EquipmentSheet.Slots[_rowCursor.Selected];
         _preview = StatPreviewText.Of(choice.Highlighted is { } item ? StatPreview.Of(Shown, item) : StatPreview.OfRemoving(Shown, slot));
+        _takeHint = choice.HighlightedWearer is { } wearer
+            ? _messages.Format(MessageIds.EquipmentTakeHint, new MessageArgument("member", wearer.Definition.Name))
+            : null;
     }
 
     private void CloseChoice()
@@ -205,12 +212,19 @@ internal sealed class EquipmentPage : IMenuPage
         _choice = null;
         _preview = null;
         _previewedRow = -1;
+        _takeHint = null;
     }
 
     // Core refuses a change when the item it would take off has no room left in the inventory; the player is told why.
+    // A worn item is taken from its wearer (decision 137).
     private void Apply(EquipmentPick pick, EquipmentSlot slot)
     {
-        var changed = pick.Item is null ? _equipment.TryUnequip(Shown, slot) : _equipment.TryEquip(Shown, pick.Item);
+        var changed = pick switch
+        {
+            { Giver: { } giver } => _equipment.TryTakeFrom(giver, Shown, slot),
+            { Item: { } item } => _equipment.TryEquip(Shown, item),
+            _ => _equipment.TryUnequip(Shown, slot),
+        };
         if (!changed && Shown.EquippedIn(slot) is { } worn && !_inventory.HasRoomFor(worn))
         {
             _notice = _messages.Format(MessageIds.EquipmentNoRoom, new MessageArgument("item", worn.Name));

@@ -12,12 +12,12 @@ public sealed class EquipmentChoiceTests
 {
     private static readonly IReadOnlyDictionary<string, Core.Items.ItemDefinition> _items = StartMapScenarios.BelowClosedDoor.Items;
 
-    private readonly PartyMember _leader = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1)).Party.Leader;
+    private readonly PartyState _party = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1)).Party;
 
     [Fact]
     public void Update_ConfirmFirstRow_PicksRemove()
     {
-        var choice = new EquipmentChoice([_items["bronze_sword"]]);
+        var choice = new EquipmentChoice([_items["bronze_sword"]], []);
 
         var pick = choice.Update(Pressing(GameButton.Confirm));
 
@@ -28,7 +28,7 @@ public sealed class EquipmentChoiceTests
     [Fact]
     public void Update_ConfirmAfterDown_PicksTheFirstItem()
     {
-        var choice = new EquipmentChoice([_items["bronze_sword"], _items["iron_sword"]]);
+        var choice = new EquipmentChoice([_items["bronze_sword"], _items["iron_sword"]], []);
         choice.Update(Pressing(GameButton.Down));
 
         var pick = choice.Update(Pressing(GameButton.Confirm));
@@ -38,11 +38,48 @@ public sealed class EquipmentChoiceTests
     }
 
     [Fact]
+    public void Rows_WornByOthers_ListedAfterTheOwnedOnes()
+    {
+        var wearer = _party.MemberById("zanyr");
+        var choice = new EquipmentChoice([_items["bronze_sword"]], [new WornItem(wearer, _items["iron_sword"])]);
+
+        choice.Update(Pressing(GameButton.Down));
+        choice.Update(Pressing(GameButton.Down));
+
+        Assert.Equal(3, choice.RowCount);
+        Assert.Same(_items["iron_sword"], choice.Highlighted);
+        Assert.Same(wearer, choice.HighlightedWearer);
+    }
+
+    [Fact]
+    public void Update_ConfirmWornRow_PicksItWithItsWearer()
+    {
+        var wearer = _party.MemberById("zanyr");
+        var choice = new EquipmentChoice([], [new WornItem(wearer, _items["iron_sword"])]);
+        choice.Update(Pressing(GameButton.Down));
+
+        var pick = choice.Update(Pressing(GameButton.Confirm));
+
+        Assert.Equal(new EquipmentPick(_items["iron_sword"], wearer), pick);
+    }
+
+    [Fact]
+    public void Update_ConfirmOwnedRow_HasNoGiver()
+    {
+        var choice = new EquipmentChoice([_items["bronze_sword"]], [new WornItem(_party.MemberById("zanyr"), _items["iron_sword"])]);
+        choice.Update(Pressing(GameButton.Down));
+
+        var pick = choice.Update(Pressing(GameButton.Confirm));
+
+        Assert.Equal(new EquipmentPick(_items["bronze_sword"], Giver: null), pick);
+    }
+
+    [Fact]
     public void StatPreview_Of_EmptySlotItem_ShowsFullBonus()
     {
         var sword = _items["bronze_sword"];
 
-        var preview = StatPreview.Of(_leader, sword);
+        var preview = StatPreview.Of(_party.Leader, sword);
 
         Assert.Equal(sword.Equipment!.AttackBonus, preview.AttackChange);
         Assert.Equal(0, preview.DefenseChange);

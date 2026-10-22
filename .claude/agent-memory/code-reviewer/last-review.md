@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-22-demo-retirement/slices/Q1.md, slice Q1 (WornItem, PartyEquipment.TakeableFor static, PartyEquipment.TryTakeFrom; tests in PartyEquipmentTakeTests)
+Slice: docs/plans/2026-10-22-demo-retirement/slices/Q2.md, slice Q2 (EquipmentChoice worn rows, EquipmentPick.Giver, EquipmentPage take via TryTakeFrom + take hint, ui.json equipment_worn_row/equipment_take_hint)
 Round: 1 (verdict: Ready to commit)
 
-- suggestion (open): TryTakeFrom accepts a giver item with the same id the receiver already wears (TakeableFor hides it), so a direct call moves a sword and drops the receiver's identical copy in the bag; TryEquip treats same id as a no-op. Return false (or true without changes) on same id, plus a test.
-- suggestion (open): TakeableFor's Select-to-null + OfType<WornItem> reads clunky; filter wearers with an item first, then build WornItem.
-- follow-up: P2 suggestions (PartySidebarView parallel lists, SidebarCard doc wording) and older carried follow-ups unchanged.
+- suggestion (open): EquipmentChoiceTests starts two GameSessions for `_party` and `_leader`; use `_party.Leader`.
+- suggestion (open): no test that the take hint reverts to the page hint when the cursor leaves the worn row or the choice is cancelled.
+- follow-up: Q1 suggestions (same-id TryTakeFrom now documented as refused; TakeableFor shape) and older carried follow-ups unchanged.

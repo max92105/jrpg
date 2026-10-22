@@ -10,7 +10,8 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// Draws an <see cref="EquipmentChoice"/> as legacy <c>EquipmentSelectionView</c> in its <c>GlassPanelStyle</c> panel at
-/// the page's right: the slot's name, Name and Qty column titles, then "Remove" and each item with its icon and count.
+/// the page's right: the slot's name, Name and Qty column titles, then "Remove", each owned item with its icon and count,
+/// and each item another member wears, named with its wearer in the secondary color.
 /// </summary>
 internal sealed class EquipmentChoiceView
 {
@@ -34,6 +35,7 @@ internal sealed class EquipmentChoiceView
     private const int QuantityInset = 16;
 
     private readonly UiTextures _ui;
+    private readonly UiMessages _messages;
     private readonly SpriteFontBase _headingFont;
     private readonly SpriteFontBase _bodyFont;
     private readonly SpriteFontBase _labelFont;
@@ -43,12 +45,14 @@ internal sealed class EquipmentChoiceView
     private readonly float _quantityTitleWidth;
     private string _heading = string.Empty;
     private (string Text, float Width)[] _quantities = [];
+    private string[] _wornRows = [];
 
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared textures: icons, section line, selected row.</param>
     public EquipmentChoiceView(ScreenText text, UiTextures ui)
     {
         _ui = ui;
+        _messages = text.Messages;
         _headingFont = text.Fonts.FontAt(HeadingPixels);
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _labelFont = text.Fonts.FontAt(LabelPixels);
@@ -70,6 +74,10 @@ internal sealed class EquipmentChoiceView
             var quantity = inventory.QuantityOf(item.Id).ToString(CultureInfo.InvariantCulture);
             return (quantity, _bodyFont.MeasureString(quantity).X);
         })];
+        _wornRows = [.. choice.Takeable.Select(worn => _messages.Format(
+            MessageIds.EquipmentWornRow,
+            new MessageArgument("item", worn.Item.Name),
+            new MessageArgument("member", worn.Wearer.Definition.Name)))];
     }
 
     /// <param name="batch">Already begun.</param>
@@ -91,8 +99,7 @@ internal sealed class EquipmentChoiceView
         batch.DrawString(_labelFont, _quantityTitle, new Vector2(left + width - QuantityInset - _quantityTitleWidth, titlesTop), UiTheme.TextSecondary);
         batch.Draw(_ui.SectionLine(textures), new Rectangle(left, titlesTop + ColumnTitleLineGap, width, 1), Color.White);
 
-        var rowCount = choice.Items.Count + 1;
-        var last = Math.Min(rowCount, choice.FirstVisibleRow + EquipmentChoice.VisibleRows);
+        var last = Math.Min(choice.RowCount, choice.FirstVisibleRow + EquipmentChoice.VisibleRows);
         for (var index = choice.FirstVisibleRow; index < last; index++)
         {
             var row = new Rectangle(left, top + RowsTop + ((index - choice.FirstVisibleRow) * RowHeight), width, RowHeight);
@@ -115,8 +122,15 @@ internal sealed class EquipmentChoiceView
             return;
         }
 
-        var item = choice.Items[index - 1];
         var iconTop = row.Y + ((RowHeight - IconSize) / 2);
+        if (choice.WornAt(index) is { } worn)
+        {
+            batch.Draw(_ui.Icon(textures, worn.Item.IconFile, IconSize), new Vector2(row.X + RowInset, iconTop), Color.White);
+            batch.DrawString(_bodyFont, _wornRows[index - 1 - choice.Items.Count], new Vector2(nameLeft, textTop), UiTheme.TextSecondary);
+            return;
+        }
+
+        var item = choice.Items[index - 1];
         batch.Draw(_ui.Icon(textures, item.IconFile, IconSize), new Vector2(row.X + RowInset, iconTop), Color.White);
         batch.DrawString(_bodyFont, item.Name, new Vector2(nameLeft, textTop), UiTheme.TextPrimary);
         var (quantity, quantityWidth) = _quantities[index - 1];

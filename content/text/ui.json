@@ -118,5 +118,7 @@
   "menu_hint_options": "Choose a setting.",
   "menu_hint_system": "Choose what to do.",
   "menu_hint_save": "Choose a file to save to.",
-  "menu_hint_load": "Choose a file to load."
+  "menu_hint_load": "Choose a file to load.",
+  "equipment_worn_row": "{item} ({member})",
+  "equipment_take_hint": "Taking it leaves {member} without it."
 }

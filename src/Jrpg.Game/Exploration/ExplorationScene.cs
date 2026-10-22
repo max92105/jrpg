@@ -54,7 +54,7 @@ internal sealed class ExplorationScene : IScene
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
         var request = UpdateExploration(delta, input);
-        _prompt.Update(_presenter.IsBusy ? null : _exploration.InteractionInFront, input.Device);
+        _prompt.Update(_presenter.IsBusy ? null : _exploration.InteractionInFront, input.Device, delta);
         return request;
     }
 

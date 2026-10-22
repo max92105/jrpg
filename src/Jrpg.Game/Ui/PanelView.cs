@@ -37,9 +37,13 @@ internal sealed class PanelView(PanelStyle style)
         return pixels;
     }
 
-    /// <summary>Draws the panel over <c>area</c>, which must be at least two corner radii wide and high.</summary>
-    public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area)
+    /// <summary>
+    /// Draws the panel over <c>area</c>, which must be at least two corner radii wide and high, at <c>opacity</c> (0
+    /// transparent to 1 opaque).
+    /// </summary>
+    public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
+        var tint = Color.White * opacity;
         var size = SizeOf(style);
         _texture ??= textures.Create(size, size, BakePixels(style));
         for (var row = 0; row < SliceCount; row++)
@@ -50,7 +54,7 @@ internal sealed class PanelView(PanelStyle style)
             {
                 var (left, width) = DestinationSlice(area.X, area.Width, column);
                 var (sourceLeft, sourceWidth) = SourceSlice(column);
-                batch.Draw(_texture, new Rectangle(left, top, width, height), new Rectangle(sourceLeft, sourceTop, sourceWidth, sourceHeight), Color.White);
+                batch.Draw(_texture, new Rectangle(left, top, width, height), new Rectangle(sourceLeft, sourceTop, sourceWidth, sourceHeight), tint);
             }
         }
     }

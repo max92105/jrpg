@@ -31,3 +31,10 @@ Part of [the demo retirement plan](../README.md). Design: [design.md](../design.
     - [ ] Walk past the chest's edge back and forth: a soft fade, no blinking.
     - [ ] Turn from the door to the villager: the old prompt fades, the new one appears.
     - [ ] Windowed small and full screen: the text stays sharp (whole pixels).
+  - **Done, with deviations:**
+    - The theme values are grouped like the message box's: `PromptPanel` and `KeyCap` (`PanelStyle`s), plus `PromptTextPixels`, `PromptPadding` and `KeyCapText`.
+      - The text is the menus' 20 px rather than 16, since 16 reads small at 1920 x 1080. The padding is scaled to match: 10 x 4.
+    - The pill and the cap reuse `PanelView`'s 9-slice, which bakes its own texture, so `UiTextures` is unchanged and the view keeps its G1a constructor. `PanelView.Draw` gains an opacity; `DialogueBox` passes 1.
+    - `InteractionPromptView.Update` gains the update's `delta` for the fade.
+    - One extra test: with nothing shown, the prompt stays transparent.
+    - A screenshot shows "E  Talk" in the pill with a light key cap. The fade itself is for the hand check.

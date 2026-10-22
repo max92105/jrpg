@@ -83,7 +83,7 @@ internal sealed class DialogueBox
     /// <param name="reading">The playback last given to <see cref="Show"/>.</param>
     public void Draw(SpriteBatch batch, TextureLibrary textures, SpeechPlayback reading)
     {
-        _panel.Draw(batch, textures, _area);
+        _panel.Draw(batch, textures, _area, 1f);
         if (_speakerCaps is not null)
         {
             DrawSpeaker(batch, textures, _speakerCaps);

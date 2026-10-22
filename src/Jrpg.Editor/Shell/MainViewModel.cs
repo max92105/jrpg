@@ -126,6 +126,10 @@ internal sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     public partial bool IsGridShown { get; set; } = true;
 
+    /// <summary>Whether blocked cells, collision outlines and above-player zones are drawn over the map; off by default.</summary>
+    [ObservableProperty]
+    public partial bool IsCollisionShown { get; set; }
+
     /// <summary>Why the last undo was refused: a tile it would remove is still in use; null after any other undo, redo or edit.</summary>
     [ObservableProperty]
     public partial string? UndoRefusal { get; private set; }
@@ -407,6 +411,9 @@ internal sealed partial class MainViewModel : ObservableObject
                 .Select(map => new MapEntry(map.Id, $"{map.Settings.DisplayName} ({map.Id})")),
         ];
     }
+
+    [RelayCommand]
+    private void ToggleCollision() => IsCollisionShown = !IsCollisionShown;
 
     /// <summary>
     /// Copies images into the tilesheet art (asking before replacing one), then shows the last one copied, "(not set up)"

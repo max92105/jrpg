@@ -275,6 +275,18 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
+    public void ToggleCollisionCommand_ThenAnotherMap_StaysShown()
+    {
+        var viewModel = Open(_repositoryContent);
+        Assert.False(viewModel.IsCollisionShown);
+
+        viewModel.ToggleCollisionCommand.Execute(null);
+        viewModel.TryOpenMap(viewModel.MapIds.First(id => id != viewModel.CurrentMap!.Map.Id));
+
+        Assert.True(viewModel.IsCollisionShown);
+    }
+
+    [Fact]
     public void ImportSheetImages_NewImage_ShowsItAndReportsImported()
     {
         var viewModel = Open(CopyOfRepositoryContent());

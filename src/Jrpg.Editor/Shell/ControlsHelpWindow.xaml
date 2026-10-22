@@ -33,6 +33,7 @@
         Arrow keys: pan, while the map has focus.<LineBreak />
         Mouse wheel: zoom toward the mouse.<LineBreak />
         Ctrl+0: fit the map. Ctrl+1: actual size.<LineBreak />
+        Ctrl+H: show collision: cells the player can't enter (red), object outlines (green), above-player zones (blue).<LineBreak />
         The layer list chooses the layer edits go to; Add layer adds one at a preset or any z.
       </TextBlock>
 

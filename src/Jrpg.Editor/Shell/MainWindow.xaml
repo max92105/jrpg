@@ -31,6 +31,7 @@
     <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoCommand}" />
     <KeyBinding Key="Y" Modifiers="Control" Command="{Binding RedoCommand}" />
     <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}" />
+    <KeyBinding Key="H" Modifiers="Control" Command="{Binding ToggleCollisionCommand}" />
   </Window.InputBindings>
   <DockPanel>
     <!-- Not the main menu, so letting go of Alt after Alt + click (pick a tile) doesn't move the focus to the menu. -->
@@ -48,6 +49,7 @@
       </MenuItem>
       <MenuItem Header="View">
         <MenuItem Header="Grid" IsCheckable="True" IsChecked="{Binding IsGridShown}" />
+        <MenuItem Header="Show collision" IsCheckable="True" IsChecked="{Binding IsCollisionShown}" InputGestureText="Ctrl+H" />
         <MenuItem Header="Dim other layers" IsCheckable="True" IsChecked="{Binding Layer.AreOtherLayersDimmed}" />
         <Separator />
         <MenuItem Header="Fit map" Click="OnFitClicked" InputGestureText="Ctrl+0" />
@@ -81,6 +83,7 @@
       <Button Content="Redo (Ctrl+Y)" Command="{Binding RedoCommand}" />
       <Separator />
       <CheckBox Content="Grid" IsChecked="{Binding IsGridShown}" />
+      <CheckBox Content="Collision" IsChecked="{Binding IsCollisionShown}" ToolTip="Show what blocks the player (Ctrl+H)" />
       <Separator />
       <TextBlock Text="Layer" VerticalAlignment="Center" Margin="4,0" />
       <ComboBox Width="230"
@@ -191,6 +194,7 @@
               RenderOptions.BitmapScalingMode="NearestNeighbor"
               RenderOptions.EdgeMode="Aliased">
           <Image x:Name="MapImage" Stretch="None" />
+          <Image x:Name="CollisionImage" Stretch="None" />
           <Image x:Name="GridImage"
                  Stretch="None"
                  Visibility="{Binding IsGridShown, Converter={StaticResource VisibleWhenTrue}}" />

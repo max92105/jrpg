@@ -3,7 +3,7 @@ using Jrpg.Core.Geometry;
 namespace Jrpg.Core.Maps;
 
 /// <summary>Which cells of a map can be walked on, worked out once per map.</summary>
-internal sealed class WalkabilityGrid
+public sealed class WalkabilityGrid
 {
     private readonly bool[,] _isWalkable;
 

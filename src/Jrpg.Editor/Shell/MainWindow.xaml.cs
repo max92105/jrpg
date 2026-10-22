@@ -107,6 +107,9 @@ internal sealed partial class MainWindow : Window
                 ShowBrushAt(_brushCell);
                 ShowObjectDragAt(_mapPoint);
                 break;
+            case nameof(MainViewModel.IsCollisionShown):
+                DrawCollision();
+                break;
         }
     }
 
@@ -155,7 +158,14 @@ internal sealed partial class MainWindow : Window
         var layout = _shownMap?.Map.Layout;
         var focusZ = _viewModel.Layer.AreOtherLayersDimmed ? _viewModel.Layer.Z : (int?)null;
         MapImage.Source = layout is not null && _drawing is not null ? _drawing.Draw(layout, focusZ) : null;
+        DrawCollision();
     }
+
+    // Drawn with the map, so every map or catalog change and its undo shows on it; strokes follow the zoom.
+    private void DrawCollision() =>
+        CollisionImage.Source = _viewModel.IsCollisionShown && _shownMap?.Map.Layout is { } layout && _viewModel.Catalog is { } catalog
+            ? CollisionDrawing.Draw(CollisionShapes.Of(layout, catalog), layout, 1 / _viewport.Zoom)
+            : null;
 
     private void OnMapListSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
@@ -530,6 +540,7 @@ internal sealed partial class MainWindow : Window
         }
 
         GridImage.Source = MapDrawing.DrawGrid(layout, 1 / zoom);
+        DrawCollision();
         DrawSelectionMarks();
         _gridDrawnFor = (zoom, layout.Width, layout.Height);
     }

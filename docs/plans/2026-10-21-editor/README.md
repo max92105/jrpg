@@ -89,7 +89,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 5: collision and above-player zones
 
-- [ ] **E8. Collision and zones shown on the map** (Core + Editor, about 220 lines) → [slices/E8.md](slices/E8.md)
+- [x] **E8. Collision and zones shown on the map** (Core + Editor, about 220 lines) → [slices/E8.md](slices/E8.md)
 - [ ] **E9. An object's collision outline** (Editor, about 270 lines) → [slices/E9.md](slices/E9.md)
 - [ ] **E10. Above-player zones** (Editor, about 200 lines) → [slices/E10.md](slices/E10.md)
 - [ ] **E11a. Point handles: drag, insert, remove** (Editor, about 200 lines) → [slices/E11a.md](slices/E11a.md)

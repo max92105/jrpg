@@ -114,7 +114,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 - [x] **E13a. Layout: splitters and tool bars per mode** (Editor, about 150 lines) → [slices/E13a.md](slices/E13a.md)
 - [x] **E13b. Dark theme** (Editor, about 230 lines) → [slices/E13b.md](slices/E13b.md)
-- [ ] **E13c. Dark templates: combo boxes, scroll bars, tool bar overflow** (Editor, about 200 lines; split from E13b) → [slices/E13c.md](slices/E13c.md)
+- [x] **E13c. Dark templates: combo boxes, scroll bars, tool bar overflow** (Editor, about 200 lines; split from E13b) → [slices/E13c.md](slices/E13c.md)
 - [ ] **Z. Editor session check** (manual) → [slices/Z.md](slices/Z.md)
 
 ## Decisions

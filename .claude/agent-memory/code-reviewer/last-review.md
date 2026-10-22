@@ -5,13 +5,14 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-21-editor/slices/E13b.md, E13b (dark theme, Shell/EditorTheme.xaml; uncommitted; E13c split off for ComboBox/ScrollBar/overflow templates)
-Round: 1 (verdict: Fix the Criticals; verify all pass, 1537 tests)
+Slice: docs/plans/2026-10-21-editor/slices/E13c.md, E13c (dark templates in new Shell/EditorTemplates.xaml; XAML only; uncommitted)
+Round: 1 (verdict: Ready to commit; verify all pass, 1537 tests)
 
-- critical (open): EditorTheme.xaml:75 ToolBar.ComboBoxStyleKey override has no Template/BasedOn, so tool bar combos (layer, tool, brush size) lose Aero2's flat tool bar template (probed: different template, Background=WindowBrush, Foreground=WindowTextBrush) and fall back to the light normal ComboBox with #DDDDDD text; delete the override.
-- warning (open): Aero2 submenu popup SubMenuBorder hardcodes #FFF0F0F0 (probed); open menus show a light frame/separators, not in E13c's scope; add menus to E13c or accept by hand check.
-- suggestion (open): interim ComboBox Foreground uses WindowBackgroundBrush as text color (role name misused); a DarkTextBrush or a comment, goes with E13c anyway.
-- suggestion (open): EditorButton template drops the IsDefaulted look; OK/Create buttons no longer stand out.
+- suggestion (open): EditorTemplates.xaml:8/165-168 ComboBoxToggle reused as tool bar overflow at Width=14; arrow (8px + 6px right margin) doesn't fit 12px inside the border, gets clipped/off-center; rename DropDownToggle, center the arrow or widen.
+- suggestion (open): EditorTemplates.xaml:211 MenuHeader popup has no PlacementTarget, so it places against the padded Grid: drop-down opens 8px right and 3px below the header highlight; target the Frame border.
+- suggestion (open): EditorTemplates.xaml:95 ScrollThumb has no IsDragging trigger; thumb reverts color mid-drag when the mouse leaves it.
 - follow-up: MainViewModel is 593 lines (carried).
 - follow-up: TileImages.Forget doesn't drop cached sprite frames (carried).
 - follow-up: E12a re-cut stale SelectedCells can reach CreateObject (carried).
+- follow-up: tool bar Separator/CheckBox/TextBox keep Aero2 tool bar styles (ToolBar.SeparatorStyleKey not themed); check in E13c hand check.
+- E13b round-1 items resolved by E13c: ToolBar.ComboBoxStyleKey now BasedOn a full template; open menu frame/separators dark; OnLightTextBrush removed.

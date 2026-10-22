@@ -4,6 +4,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              ShutdownMode="OnMainWindowClose">
   <Application.Resources>
-    <ResourceDictionary Source="/Jrpg.Editor;component/Shell/EditorTheme.xaml" />
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="/Jrpg.Editor;component/Shell/EditorTheme.xaml" />
+        <ResourceDictionary Source="/Jrpg.Editor;component/Shell/EditorTemplates.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+    </ResourceDictionary>
   </Application.Resources>
 </Application>

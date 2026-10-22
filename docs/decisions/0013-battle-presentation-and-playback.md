@@ -4,7 +4,7 @@ Status: accepted
 Date: 2026-10-20
 
 ## Context
-The battle plan (`docs/plans/2026-10-20-battle/`) builds the battle screen in `src/Jrpg.Game`: a HUD (party vitals, enemy HP, turn order), a command panel, and each action played back over time (step forward, effects, floating numbers, step back). Core already runs a turn in one `Execute(BattleCommand)` call that applies everything and returns ordered `BattleEvent`s (ADR 0004), and the shell is a scene stack whose scenes return `SceneRequest`s (ADR 0008).
+The battle plan (`docs/plans/done/2026-10-20-battle/`) builds the battle screen in `src/Jrpg.Game`: a HUD (party vitals, enemy HP, turn order), a command panel, and each action played back over time (step forward, effects, floating numbers, step back). Core already runs a turn in one `Execute(BattleCommand)` call that applies everything and returns ordered `BattleEvent`s (ADR 0004), and the shell is a scene stack whose scenes return `SceneRequest`s (ADR 0008).
 
 The main question is **where the HUD reads its values** while an action is being played back, since Core's state has already changed when `Execute` returns. Constraints: Core owns every rule and the Game never keeps a second copy of them; no allocation in `Update`/`Draw`; events carry only what a current mechanic needs (ADR 0004); a solo developer must keep the screen easy to change.
 

@@ -32,7 +32,7 @@ Turn a feature request into a plan that a developer can implement one slice at a
 
 ## Output
 
-Write the plan as a folder `docs/plans/<yyyy-mm-dd>-<feature-slug>/` (see `docs/plans/README.md`; `docs/plans/2026-10-20-battle/` is the model), so each slice is read without the rest:
+Write the plan as a folder `docs/plans/<yyyy-mm-dd>-<feature-slug>/` (see `docs/plans/README.md`; `docs/plans/done/2026-10-20-battle/` is the model), so each slice is read without the rest:
 
 - `README.md`: `Status: draft`, Goal, Order and why, Guiding rules, Out of scope, `## Slices` as an index (phase headings, then one line per slice: `- [ ] **<id>. <name>** (<projects>, about N lines) → [slices/<id>.md](slices/<id>.md)`), Decisions, Open design questions (developer decides), ADRs needed.
 - `design.md`: Tunables and placeholders, Design overview (what exists, Core changes, structure and folder dependencies, key decisions, extension points, legacy mapping), Risks.

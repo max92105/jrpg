@@ -15,7 +15,7 @@ Older plans are single files with the same sections.
 |---|---|
 | [2026-10-21-editor](2026-10-21-editor/README.md) | approved, in progress |
 | [done/2026-10-20-menu-cleanup](done/2026-10-20-menu-cleanup/README.md) | done |
-| [2026-10-20-battle](2026-10-20-battle/README.md) | approved, in progress |
+| [done/2026-10-20-battle](done/2026-10-20-battle/README.md) | done |
 | [2026-10-18-game-title-menu-movement](2026-10-18-game-title-menu-movement.md) | approved; every slice done, play-through check Z left |
 | [done/2026-10-18-shell-cutover-and-map-editing](done/2026-10-18-shell-cutover-and-map-editing.md) | done |
 | [done/2026-10-17-world-exploration-core](done/2026-10-17-world-exploration-core.md) | done |

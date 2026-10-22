@@ -9,7 +9,7 @@ Part 1 = docs/plans/done/2026-10-17-legacy-core-migration.md (done; decisions 1-
 
 First 3b plan: docs/plans/2026-10-18-game-title-menu-movement.md (approved, all slices done by 2026-10-20 except Z hand check). Decisions 50-87 there.
 
-Second 3b plan (2026-10-20, approved after devil's advocate; all slices done but Z, retro run 2026-10-21, B7b and B8b split mid-plan into look/behavior halves): docs/plans/2026-10-20-battle/README.md — ADR 0013 (HUD reads live state, battle stacked over map, event-driven beats) + 25 slices; Core changes sit with their first user (C1 session, C2 attack targets, C3 skill descriptions, C4 nobody-standing = defeat). Decisions 94-105 answered (gold/drops and battle sprite sheets = future plans with ADRs); open: serif font, 106 placeholder cue. Still left for later 3b plans: cutscenes (7a-7c), prompt bubble, map banner, event battles (q30).
+Second 3b plan (2026-10-20, approved after devil's advocate; all slices done, Z ticked and plan moved to done/ 2026-10-21, B7b and B8b split mid-plan into look/behavior halves): docs/plans/done/2026-10-20-battle/README.md — ADR 0013 (HUD reads live state, battle stacked over map, event-driven beats) + 25 slices; Core changes sit with their first user (C1 session, C2 attack targets, C3 skill descriptions, C4 nobody-standing = defeat). Decisions 94-105 answered (gold/drops and battle sprite sheets = future plans with ADRs); open: serif font, 106 placeholder cue. Still left for later 3b plans: cutscenes (7a-7c), prompt bubble, map banner, event battles (q30).
 
 **Why:** developer wants "nothing legacy left" before new features; battle was "the last big gap" (2026-10-20), asked "ready to grow and change".
 

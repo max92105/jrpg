@@ -1,5 +1,5 @@
 # Game: battles
-Status: approved, in progress
+Status: done (retro skipped by the developer, 2026-10-21)
 
 Second plan of part 3b (game parity). It takes from the part 3b notes at the end of `2026-10-18-shell-cutover-and-map-editing.md`:
 - the battle seams in Core (note 4a);
@@ -158,7 +158,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **C4. A battle with nobody standing is lost at once** (Core, about 90 lines; decision 97) → [slices/C4.md](slices/C4.md)
 - [x] **B8b1. Defeat choices** (Game, about 300 lines; decision 65; split from B8b) → [slices/B8b1.md](slices/B8b1.md)
 - [x] **B8b2. Defeat look** (Game, about 150 lines; split from B8b) → [slices/B8b2.md](slices/B8b2.md)
-- [ ] **Z. Play-through check** (manual) → [slices/Z.md](slices/Z.md)
+- [x] **Z. Play-through check** (manual) → [slices/Z.md](slices/Z.md)
 
 ## Decisions (developer, 2026-10-20)
 Questions and decisions share numbers.

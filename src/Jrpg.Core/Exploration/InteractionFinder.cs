@@ -8,7 +8,7 @@ namespace Jrpg.Core.Exploration;
 /// <summary>Finds the object event the player can start by facing an object. Cell events are found by cell instead.</summary>
 internal sealed class InteractionFinder(ActiveMap map, ExplorationRules rules)
 {
-    /// <summary>How far around an object's bounds a probe still counts as reaching it, in tiles (legacy value).</summary>
+    /// <summary>How far around an object's bounds a probe still counts as reaching it, in tiles (placeholder).</summary>
     public const double InteractMargin = 0.1;
 
     /// <summary>

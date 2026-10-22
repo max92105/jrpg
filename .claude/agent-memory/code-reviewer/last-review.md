@@ -5,9 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-22-demo-retirement/slices/Q2.md, slice Q2 (EquipmentChoice worn rows, EquipmentPick.Giver, EquipmentPage take via TryTakeFrom + take hint, ui.json equipment_worn_row/equipment_take_hint)
+Slice: docs/plans/2026-10-22-demo-retirement/slices/W1.md, slice W1 (remove the word "legacy" from Core/Data comments and tests; two test renames)
 Round: 1 (verdict: Ready to commit)
 
-- suggestion (open): EquipmentChoiceTests starts two GameSessions for `_party` and `_leader`; use `_party.Leader`.
-- suggestion (open): no test that the take hint reverts to the page hint when the cursor leaves the worn row or the choice is cancelled.
-- follow-up: Q1 suggestions (same-id TryTakeFrom now documented as refused; TakeableFor shape) and older carried follow-ups unchanged.
+- suggestion (open): WarpArrival.cs:15-16 and FileSaveStore.cs:40/73, UnreadableSaveException.cs:3 doc lines now run well past the file's usual wrap width; rewrap.
+- follow-up: src/Jrpg.Game/Exploration/FieldSpriteFrame.cs:12 still says "legacy sheet" (Game is outside W1's area; later slice).

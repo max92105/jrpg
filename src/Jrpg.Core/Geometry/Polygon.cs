@@ -4,8 +4,8 @@ public static class Polygon
 {
     /// <summary>
     /// Whether <paramref name="point"/> lies inside the polygon, by the even-odd rule: a ray cast to the right
-    /// crosses the outline an odd number of times. Works for concave outlines. Legacy added 0.00001 to the edge's
-    /// height to avoid dividing by zero, but a horizontal edge never passes the straddle test, so it can't happen.
+    /// crosses the outline an odd number of times. Works for concave outlines. The crossing divides by the edge's
+    /// height with no guard: a horizontal edge never passes the straddle test, so the height is never zero there.
     /// </summary>
     public static bool Contains(IReadOnlyList<Point2D> vertices, Point2D point)
     {

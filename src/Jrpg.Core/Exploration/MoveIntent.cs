@@ -24,7 +24,7 @@ public readonly record struct MoveIntent
 
     /// <summary>
     /// Builds an intent from raw axes. A vector longer than 1 is scaled down to length 1, so a keyboard diagonal (1, 1)
-    /// or a stick pushed into a corner moves at full speed and never √2 faster than straight (legacy moved faster).
+    /// or a stick pushed into a corner moves at full speed and never √2 faster than straight.
     /// </summary>
     public static MoveIntent FromAxes(double x, double y)
     {

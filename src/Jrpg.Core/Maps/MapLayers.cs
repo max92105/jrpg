@@ -11,7 +11,7 @@ public static class MapLayers
 
     /// <summary>
     /// The layer an object's above-player zones draw on: over the player, or the object's own layer if that's higher
-    /// still, so a canopy never ends up under its own trunk (legacy <c>PlacedObject.AbovePlayerZoneZ</c>).
+    /// still, so a canopy never ends up under its own trunk.
     /// </summary>
     public static int CanopyZOf(int objectZ) => Math.Max(AbovePlayerZ, objectZ);
 }

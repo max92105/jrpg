@@ -9,7 +9,7 @@ using static System.FormattableString;
 namespace Jrpg.Simulations.Battle;
 
 /// <summary>
-/// The legacy new-game fight: the leader alone against the goblin trio, attacking only.
+/// The new-game fight: the leader alone against the goblin trio, attacking only.
 /// No balance target yet (developer decision 18); the summary is a baseline to compare later changes against.
 /// </summary>
 public sealed class GoblinTrioSimulation(ITestOutputHelper output)

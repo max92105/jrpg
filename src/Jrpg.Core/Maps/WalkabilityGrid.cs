@@ -13,8 +13,8 @@ public sealed class WalkabilityGrid
     }
 
     /// <summary>
-    /// A cell is walkable when it holds at least one tile and every tile in it is walkable (legacy
-    /// <c>MapManager.IsCellWalkable</c>). An unknown tile id blocks, as in legacy.
+    /// A cell is walkable when it holds at least one tile and every tile in it is walkable. An
+    /// unknown tile id blocks, so a missing tile can't open a hole in a wall.
     /// </summary>
     public static WalkabilityGrid Build(MapLayout layout, IReadOnlyDictionary<int, TileDefinition> tiles)
     {

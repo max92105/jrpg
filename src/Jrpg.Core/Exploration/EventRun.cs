@@ -23,7 +23,7 @@ internal sealed class EventRun
         _inventory = inventory;
         _items = items;
 
-        // Marked before any step, as legacy did, so a warp in the middle can't make it run twice.
+        // Marked before any step, so a warp in the middle can't make it run twice.
         if (triggered.Event.IsOnce)
         {
             map.MarkDone(triggered.Event);

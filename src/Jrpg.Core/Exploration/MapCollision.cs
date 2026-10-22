@@ -7,8 +7,8 @@ internal sealed class MapCollision(ActiveMap map)
 {
     /// <summary>
     /// A body is a square of half-width <paramref name="radius"/>. It fits when every cell under the square is
-    /// walkable and its center is outside every object's collision polygon. Like legacy, only the center is tested
-    /// against polygons.
+    /// walkable and its center is outside every object's collision polygon. Only the center is tested
+    /// against polygons (placeholder rule).
     /// </summary>
     public bool CanStandAt(Point2D center, double radius) => AreCellsWalkable(center, radius) && !IsInsideAnObject(center);
 
@@ -22,7 +22,7 @@ internal sealed class MapCollision(ActiveMap map)
     }
 
     // The body covers [center - radius, center + radius): touching a cell line isn't overlapping the next cell, so a
-    // body can stand flush against a wall or the map's right and bottom edges. Legacy floored the right edge too.
+    // body can stand flush against a wall or the map's right and bottom edges.
     private bool AreCellsWalkable(Point2D center, double radius)
     {
         var top = (int)Math.Floor(center.Y - radius);

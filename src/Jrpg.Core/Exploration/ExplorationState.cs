@@ -180,7 +180,7 @@ public sealed class ExplorationState
     }
 
     /// <summary>
-    /// The one way onto a map, for a new game, a warp and (later) a loaded save, as legacy EnterMap was. The arrival
+    /// The one way onto a map, for a new game, a warp and (later) a loaded save (ADR 0006). The arrival
     /// cell stays quiet, and object touch events wait until the player has stood still (decision 38).
     /// </summary>
     [MemberNotNull(nameof(_map), nameof(_collision), nameof(_finder))]

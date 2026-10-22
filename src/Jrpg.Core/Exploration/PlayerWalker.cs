@@ -48,7 +48,7 @@ internal sealed class PlayerWalker(Point2D position, Facing facing, ExplorationR
         }
     }
 
-    // The larger axis wins; on a tie the player faces up or down, as legacy did with two keys held.
+    // The larger axis wins; on a tie the player faces up or down, so two keys held give a stable facing.
     private static Facing FacingOf(MoveIntent intent)
     {
         if (Math.Abs(intent.Y) >= Math.Abs(intent.X))

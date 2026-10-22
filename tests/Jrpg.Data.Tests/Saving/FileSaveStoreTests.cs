@@ -85,7 +85,7 @@ public sealed class FileSaveStoreTests : IDisposable
     }
 
     [Fact]
-    public void Read_LegacySaveFile_ThrowsUnreadable()
+    public void Read_FileWithoutFormatVersion_ThrowsUnreadable()
     {
         WriteRaw("""
             { "Characters": [], "Inventory": [], "CurrentMap": "start.json", "PlayerX": 10, "PlayerY": 3,

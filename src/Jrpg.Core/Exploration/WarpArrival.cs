@@ -3,7 +3,7 @@ using Jrpg.Core.Maps;
 
 namespace Jrpg.Core.Exploration;
 
-/// <summary>Where the player lands on entering a map, so a bad warp target can't trap them in a wall (legacy FindArrivalPoint).</summary>
+/// <summary>Where the player lands on entering a map, so a bad warp target can't trap them in a wall.</summary>
 internal static class WarpArrival
 {
     /// <summary>How many cells around a blocked target are searched for a walkable one.</summary>
@@ -12,9 +12,9 @@ internal static class WarpArrival
     /// <summary>
     /// The target itself when it's on the map and its cell is walkable. Otherwise the center of the nearest walkable
     /// cell, searched ring by ring from the target's cell clamped to the map (ring 0 is that cell, so an off-map target
-    /// next to a walkable edge lands on the edge; legacy skipped it). Within a ring the smallest squared distance wins and
-    /// the first found wins a tie (legacy scan order: rows top to bottom, then columns left to right). If no cell within
-    /// <see cref="SearchRadius"/> is walkable, the center of the clamped cell.
+    /// next to a walkable edge lands on the edge, which counts as reachable). Within a ring the smallest squared distance
+    /// wins and the first found wins a tie (scan order: rows top to bottom, then columns left to right, so the result is
+    /// stable). If no cell within <see cref="SearchRadius"/> is walkable, the center of the clamped cell.
     /// </summary>
     public static Point2D Find(WalkabilityGrid grid, Point2D target)
     {

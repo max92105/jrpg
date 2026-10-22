@@ -15,8 +15,10 @@ internal sealed partial class TileBrowserView : UserControl
 {
     private TileBrowserViewModel? _browser;
 
-    // Where a Shift + drag over the sheet started, in image pixels; null when none is under way.
-    private Point? _rectangleStart;
+    // Where a press on the sheet started: in image pixels for the cells, and in the view's own units for the drag
+    // distance; null when no press is under way.
+    private (Point Pixel, Point OnView)? _press;
+    private bool _isDraggingCells;
     private SheetCutViewModel? _cut;
 
     public TileBrowserView()
@@ -89,31 +91,41 @@ internal sealed partial class TileBrowserView : UserControl
     private void OnSheetClicked(object sender, MouseButtonEventArgs e)
     {
         var pixel = e.GetPosition(SheetView);
-        if (Keyboard.Modifiers == ModifierKeys.Shift && Marking is not { IsMarkingBlocked: true })
-        {
-            _rectangleStart = pixel;
-            SheetView.CaptureMouse();
-        }
-        else if (Marking is { IsMarkingBlocked: true })
+        if (Marking is { IsMarkingBlocked: true })
         {
             Marking.FlipCellAt(pixel.X, pixel.Y);
+            return;
         }
-        else
-        {
-            _browser?.SelectCellAt(pixel.X, pixel.Y);
-        }
+
+        // A click chooses the cell under it; dragging on from it (with or without Shift) chooses a rectangle of cells.
+        _browser?.SelectCellAt(pixel.X, pixel.Y);
+        _press = (pixel, e.GetPosition(this));
+        SheetView.CaptureMouse();
     }
 
-    // A Shift + drag chooses the rectangle of cells between where it started and where the button is released.
-    private void OnSheetReleased(object sender, MouseButtonEventArgs e)
+    // Once the mouse has moved past the system's drag distance, the rectangle follows it until the button is released.
+    private void OnSheetMouseMoved(object sender, MouseEventArgs e)
     {
-        if (_rectangleStart is { } start)
+        if (_press is not { } press)
         {
-            var end = e.GetPosition(SheetView);
-            _browser?.SelectCellsBetween(new Point2D(start.X, start.Y), new Point2D(end.X, end.Y));
-            SheetView.ReleaseMouseCapture();
+            return;
+        }
+
+        var moved = e.GetPosition(this) - press.OnView;
+        _isDraggingCells |= Math.Abs(moved.X) >= SystemParameters.MinimumHorizontalDragDistance
+            || Math.Abs(moved.Y) >= SystemParameters.MinimumVerticalDragDistance;
+        if (_isDraggingCells)
+        {
+            var at = e.GetPosition(SheetView);
+            _browser?.SelectCellsBetween(new Point2D(press.Pixel.X, press.Pixel.Y), new Point2D(at.X, at.Y));
         }
     }
 
-    private void OnSheetLostMouseCapture(object sender, MouseEventArgs e) => _rectangleStart = null;
+    private void OnSheetReleased(object sender, MouseButtonEventArgs e) => SheetView.ReleaseMouseCapture();
+
+    private void OnSheetLostMouseCapture(object sender, MouseEventArgs e)
+    {
+        _press = null;
+        _isDraggingCells = false;
+    }
 }

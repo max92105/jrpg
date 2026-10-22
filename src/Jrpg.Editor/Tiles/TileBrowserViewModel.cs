@@ -71,7 +71,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(SelectedTileId), nameof(ChoiceText), nameof(MarkedCells))]
     public partial SheetCell? SelectedCell { get; private set; }
 
-    /// <summary>The rectangle chosen with Shift + drag, whose top-left cell is <see cref="SelectedCell"/>; null after a plain click.</summary>
+    /// <summary>The rectangle chosen by dragging over the sheet, whose top-left cell is <see cref="SelectedCell"/>; null after a plain click.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(ChoiceText), nameof(MarkedCells))]
     public partial SheetCellRectangle? SelectedCells { get; private set; }
@@ -92,7 +92,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
         ({ Sheet: null }, { } cell) => $"Not set up yet. Brush: cell ({cell.Column}, {cell.Row}) of {cell.SheetId}",
         (_, null) => "",
         _ when SelectedCells is { } cells =>
-            $"Cells ({cells.Left}, {cells.Top}) to ({cells.Left + cells.Columns - 1}, {cells.Top + cells.Rows - 1}): {cells.Columns} x {cells.Rows} (paints the top-left cell)",
+            $"{cells.Columns} x {cells.Rows} cells selected: the brush paints the top-left one; New object from selection makes an object of them.",
         (_, { } cell) when _catalog.TileAt(cell) is { } tile => $"Cell ({cell.Column}, {cell.Row}): tile {tile.Id}",
         (_, { } cell) => $"Cell ({cell.Column}, {cell.Row}): not a tile yet",
     };
@@ -125,7 +125,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Chooses the rectangle of whole cells of the shown sheet between two image pixels (Shift + drag); a corner off every
+    /// Chooses the rectangle of whole cells of the shown sheet between two image pixels (a drag); a corner off every
     /// whole cell counts as the nearest one. The brush paints its top-left cell (decision 123: no stamp brush).
     /// </summary>
     /// <param name="corner">In the image's own pixels.</param>
@@ -137,7 +137,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
             return;
         }
 
-        // A Shift + click that didn't move chooses one cell, as a plain click does.
+        // A drag back to its starting cell chooses that one cell, as a plain click does.
         var cells = SheetCellRectangle.Between(first, second);
         SelectedCells = cells.Columns * cells.Rows > 1 ? cells : null;
         SelectedCell = new SheetCell(cells.SheetId, cells.Left, cells.Top);

@@ -49,6 +49,7 @@ The goal is a slice the developer can commit, not a perfect one. Every round mus
 - **C#:** nullable correctness, records for data, `IReadOnlyList` for exposed collections, no `async void`, `IDisposable` handled.
 - **Performance:** allocations or LINQ in `Update`/`Draw`.
 - **Content:** hardcoded values that belong in `content/`.
+- **Editor XAML:** a `<Style TargetType=...>` in a view without `BasedOn` hides the dark theme (Warning); a test asserting a total of the repository's content (tile count, objects on a map) is a Warning: assert the entries it needs.
 - **Scope:** changes unrelated to the slice.
 
 ## Output

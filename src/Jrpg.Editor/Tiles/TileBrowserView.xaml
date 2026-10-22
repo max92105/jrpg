@@ -64,7 +64,7 @@
         </StackPanel>
       </StackPanel>
     </Expander>
-    <TextBlock DockPanel.Dock="Bottom" Margin="0,4" Text="{Binding ChoiceText}" />
+    <TextBlock DockPanel.Dock="Bottom" Margin="0,4" TextWrapping="Wrap" Text="{Binding ChoiceText}" />
     <ScrollViewer HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"
                   Background="{StaticResource ViewportBackgroundBrush}">
@@ -74,6 +74,7 @@
             VerticalAlignment="Top"
             RenderOptions.BitmapScalingMode="NearestNeighbor"
             MouseLeftButtonDown="OnSheetClicked"
+            MouseMove="OnSheetMouseMoved"
             MouseLeftButtonUp="OnSheetReleased"
             LostMouseCapture="OnSheetLostMouseCapture">
         <Image x:Name="SheetImage" Stretch="Fill" />

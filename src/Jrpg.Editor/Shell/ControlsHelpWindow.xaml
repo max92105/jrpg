@@ -41,7 +41,7 @@
       <TextBlock Style="{StaticResource Heading}" Text="Tiles" />
       <TextBlock Style="{StaticResource Lines}">
         Click a cell in the Tiles panel: choose it; it becomes a tile the first time it is painted.<LineBreak />
-        Shift + drag over the sheet: choose a rectangle of cells (dashed); painting uses its top-left cell.<LineBreak />
+        Drag over the sheet (Shift + drag works too): select a rectangle of cells (dashed); painting uses its top-left cell, and New object from selection, under the sheet, makes an object of them.<LineBreak />
         Left drag: paint with the chosen tool. Right drag: erase.<LineBreak />
         B: brush (paints as you drag). R: rectangle (filled on release). F: fill (click).<LineBreak />
         Shift + click: fill, with any tool.<LineBreak />
@@ -63,7 +63,7 @@
         Delete: remove the selected objects, or the one under the mouse.<LineBreak />
         Objects > Edit shapes: open the shapes window for the one placed object selected, else the object chosen in the Objects panel.<LineBreak />
         Shift + double-click a placed object, or double-click one in the Objects panel: open its shapes.<LineBreak />
-        Objects > New object from selection: an object made from the cells chosen with Shift + drag in the Tiles panel; its shapes open next.<LineBreak />
+        Objects > New object from selection (or the button under the sheet): an object made from the cells dragged over in the Tiles panel; its shapes open next.<LineBreak />
         Objects > New NPC: a one-cell NPC drawn from a field sprite (the placeholder by default); place it, then give it a Talk event.
       </TextBlock>
 

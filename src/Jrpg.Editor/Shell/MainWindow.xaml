@@ -204,6 +204,14 @@
                       Content="Import..."
                       ToolTip="Copy PNG images into the tilesheet art; each then shows in the sheet box."
                       Click="OnImportSheetImageClicked" />
+              <!-- Next to the cells it is made from, while several are selected; the Objects menu and tool bar have it too. -->
+              <Button DockPanel.Dock="Bottom"
+                      Margin="0,4"
+                      HorizontalAlignment="Left"
+                      Padding="8,2"
+                      Content="New object from selection..."
+                      Visibility="{Binding CanStartNewObject, Converter={StaticResource VisibleWhenTrue}}"
+                      Click="OnNewObjectClicked" />
               <tiles:TileBrowserView x:Name="TileBrowser" DataContext="{Binding Painting.Browser}" />
             </DockPanel>
           </TabItem>

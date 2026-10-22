@@ -21,6 +21,7 @@ Turn a feature request into a plan that a developer can implement one slice at a
 2. Identify which project each piece belongs to (Core / Data / Game / Editor). Anything with game rules goes in Core.
 3. Split the feature into vertical slices. Each slice: one observable behavior, buildable, testable, under ~300 lines of change including tests. A Core change goes in the slice that first uses it, not in an up-front layer.
    - For Game screens, plan two slices up front: behavior with a plain draw, then the look (timing, shapes). Budget tests at about the code's size, plus the existing tests the change will break.
+   - For Editor slices, aim at about 200 lines, not 300 (the editor plan split 8 slices at the size check): count tests as about as many lines as the code, and plan a new window or panel as two slices up front (its rules and catalog step, then the window).
 4. For each slice list: goal, files to create/change, public types/signatures, tests to write (by name), and how to verify by hand if relevant.
    - Write planned test names as `Method_Scenario_ExpectedResult` under the test class's name (`CommandMenuTests: Update_ConfirmSkills_ListsActorSkills`), as the repo's test files do.
    - Every new type gets a one-line responsibility next to its name. If the line needs "and", split the type.

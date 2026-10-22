@@ -57,7 +57,8 @@
       <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
         <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked">
           <Button.Style>
-            <Style TargetType="Button">
+            <!-- Based on the theme's button, which a local style would otherwise replace with the light Windows one. -->
+            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
               <Setter Property="IsEnabled" Value="False" />
               <Style.Triggers>
                 <DataTrigger Binding="{Binding Problem}" Value="{x:Null}">

@@ -83,7 +83,7 @@ H1 and T1 come from the plan review, not from the developer's answers. Strike ei
 ### Phase 3: the word, area by area
 Counts are matching lines (`grep -ic`), counted on 2026-10-22; a line can hold the word more than once (`UiTheme`).
 - [x] **W1. Core and Data** (Core + Data + their tests and the simulation, 23 lines in 17 files, about 35 lines changed) → [slices/W1.md](slices/W1.md)
-- [ ] **W2. Game `Ui/`** (Game + Game tests, 151 lines in 17 files, about 120 lines changed) → [slices/W2.md](slices/W2.md)
+- [x] **W2. Game `Ui/`** (Game + Game tests, 151 lines in 17 files, about 120 lines changed) → [slices/W2.md](slices/W2.md)
 - [ ] **W3. Game `Battle/`** (Game + Game tests, 50 lines in 33 files, about 60 lines changed) → [slices/W3.md](slices/W3.md)
 - [ ] **W4. Game menus, saving, title, exploration, dialogue, input, flow** (Game + Game tests, 78 lines in 38 files, about 85 lines changed) → [slices/W4.md](slices/W4.md)
 - [ ] **W5. Editor** (Editor + Editor tests, 58 lines in 37 files, about 65 lines changed) → [slices/W5.md](slices/W5.md)

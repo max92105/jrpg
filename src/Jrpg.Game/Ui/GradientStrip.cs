@@ -3,8 +3,8 @@ using Microsoft.Xna.Framework;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// The pixels of a horizontal gradient, one row, for a texture stretched over a strip (legacy <c>LinearGradientBrush</c>
-/// from left to right). Built once per texture.
+/// The pixels of a horizontal gradient, left to right, one row, for a texture stretched over a strip. Built once per
+/// texture.
 /// </summary>
 internal static class GradientStrip
 {

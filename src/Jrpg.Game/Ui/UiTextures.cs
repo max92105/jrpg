@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// The menus' code-drawn textures (legacy shapes and gradients), each baked on first use and then reused. One instance
+/// The menus' code-drawn textures (shapes and gradients), each baked on first use and then reused. One instance
 /// lives as long as the game, so reopening a menu bakes nothing.
 /// </summary>
 internal sealed class UiTextures
@@ -19,7 +19,7 @@ internal sealed class UiTextures
     private const int VignetteWidth = VirtualScreen.Width / 4;
     private const int VignetteHeight = VirtualScreen.Height / 4;
 
-    /// <summary>Legacy <c>BattleUI</c>: the top shade covers the top 320 pixels.</summary>
+    /// <summary>The battle's top shade covers the top 320 pixels.</summary>
     public const int TopShadeHeight = 320;
 
     private Texture2D? _navTab;
@@ -89,7 +89,7 @@ internal sealed class UiTextures
             PointedBarShape.RewardBarHeight,
             PointedBarShape.RewardBar(GradientStrip.Colors(UiTheme.RewardBar, PointedBarShape.RewardBarWidth)));
 
-    /// <summary>A reward bar lit as the selected choice (legacy <c>OutcomeChoiceStyle</c> under the pointer).</summary>
+    /// <summary>A reward bar lit as the selected choice.</summary>
     public Texture2D SelectedRewardBar(TextureLibrary textures) =>
         _selectedRewardBar ??= textures.Create(
             PointedBarShape.RewardBarWidth,
@@ -104,8 +104,8 @@ internal sealed class UiTextures
             PointedBarShape.CardHeader(GradientStrip.Colors(UiTheme.CardHeader, PointedBarShape.CardHeaderWidth), UiTheme.Stroke));
 
     /// <summary>
-    /// <paramref name="source"/>'s shape in plain white, made once per texture: drawn over a sprite, it lights it white the
-    /// way legacy's white glow did, with no shader.
+    /// <paramref name="source"/>'s shape in plain white, made once per texture: drawn over a sprite, it lights it white, with
+    /// no shader.
     /// </summary>
     public Texture2D WhiteSilhouette(TextureLibrary textures, Texture2D source)
     {
@@ -185,7 +185,7 @@ internal sealed class UiTextures
     }
 
     /// <summary>
-    /// The selected row of a menu list (legacy <c>ListRow</c>): the <see cref="UiTheme.SelectedRow"/> gradient between two
+    /// The selected row of a menu list: the <see cref="UiTheme.SelectedRow"/> gradient between two
     /// bright hairlines.
     /// </summary>
     /// <param name="batch">Already begun.</param>

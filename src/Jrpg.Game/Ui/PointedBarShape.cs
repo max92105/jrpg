@@ -4,9 +4,9 @@ using Microsoft.Xna.Framework;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// The victory screen's pointed bars as pixels, transparent outside: a reward row pointed on the left (legacy
-/// <c>Shape.RewardBar</c>, <c>M0,32 L30,0 H800 V64 H30 Z</c>) and a card's name tab pointed at both ends (legacy
-/// <c>Shape.CardHeader</c>, <c>M16,0 H364 L380,21 L364,42 H16 L0,21 Z</c>).
+/// The victory screen's pointed bars as pixels, transparent outside: a reward row pointed on the left (the path
+/// <c>M0,32 L30,0 H800 V64 H30 Z</c>) and a card's name tab pointed at both ends (the path
+/// <c>M16,0 H364 L380,21 L364,42 H16 L0,21 Z</c>).
 /// </summary>
 internal static class PointedBarShape
 {
@@ -24,7 +24,7 @@ internal static class PointedBarShape
     private static readonly IReadOnlyList<Point2D> _cardHeader =
         [new(CardShoulderX, 0), new(1 - CardShoulderX, 0), new(1, 0.5), new(1 - CardShoulderX, 1), new(CardShoulderX, 1), new(0, 0.5)];
 
-    /// <param name="fill">One color per column, left to right, so the fill can be a gradient; legacy draws no outline.</param>
+    /// <param name="fill">One color per column, left to right, so the fill can be a gradient; there's no outline.</param>
     /// <returns><see cref="RewardBarWidth"/> x <see cref="RewardBarHeight"/> premultiplied pixels, row by row.</returns>
     public static Color[] RewardBar(IReadOnlyList<Color> fill) =>
         OutlinedShape.Filled(_rewardBar, new Point(RewardBarWidth, RewardBarHeight), fill);

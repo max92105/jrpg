@@ -1,7 +1,7 @@
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// The play time as legacy <c>MenuHeader</c> wrote it, hh:mm:ss with hours counting past a day. The text is rebuilt only
+/// The play time as the menu header writes it, hh:mm:ss with hours counting past a day. The text is rebuilt only
 /// when the shown second changes, so a header updated every frame formats once a second.
 /// </summary>
 internal sealed class PlayTimeText

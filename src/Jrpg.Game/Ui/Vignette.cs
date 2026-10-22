@@ -3,12 +3,11 @@ using Microsoft.Xna.Framework;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// The pixels of a radial gradient centered on an area (legacy <c>RadialGradientBrush</c>), for a texture stretched over
-/// it. Built once per texture.
+/// The pixels of a radial gradient centered on an area, for a texture stretched over it. Built once per texture.
 /// </summary>
 internal static class Vignette
 {
-    // Legacy RadiusX and RadiusY of 0.75: the gradient's offset 1 lies 0.75 of the width (or height) from the center,
+    // Radii of 0.75 (placeholder): the gradient's offset 1 lies 0.75 of the width (or height) from the center,
     // so the corners stay short of the darkest stop.
     private const float Radius = 0.75f;
 

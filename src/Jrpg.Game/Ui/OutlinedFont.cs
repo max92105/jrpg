@@ -5,8 +5,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// A font for text drawn straight on a picture, with the legacy soft dark outline (<c>Effect.TextOutline</c>: black,
-/// blur 6) under it so it stays readable on any background.
+/// A font for text drawn straight on a picture, with a soft dark outline (black, blur 6) under it so it stays readable
+/// on any background.
 /// </summary>
 internal sealed class OutlinedFont(SpriteFontBase font)
 {

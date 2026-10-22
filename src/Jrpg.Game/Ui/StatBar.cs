@@ -6,11 +6,11 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// A bar showing how full a value is (legacy <c>RoundedProgressBarStyle</c>): a dark track with the filled part in a
-/// legacy gradient, which spans the filled part only, as WPF stretched the brush over the indicator.
+/// A bar showing how full a value is: a dark track with the filled part in a gradient, which spans the filled part only,
+/// so even a short bar shows the whole gradient.
 /// </summary>
 /// <param name="ui">Where the gradient's texture is made, once.</param>
-/// <param name="fill">The legacy gradient, such as <see cref="UiTheme.HpBar"/>.</param>
+/// <param name="fill">The gradient, such as <see cref="UiTheme.HpBar"/>.</param>
 /// <param name="track">The color behind the filled part, such as <see cref="UiTheme.BarTrack"/>.</param>
 internal sealed class StatBar(UiTextures ui, ImmutableArray<GradientStop> fill, Color track)
 {

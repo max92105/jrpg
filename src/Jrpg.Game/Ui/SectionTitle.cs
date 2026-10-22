@@ -6,14 +6,13 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// A section's header (legacy <c>SectionHeaderStyle</c>): a small label over a hairline that fades out to the right.
+/// A section's header: a small label over a hairline that fades out to the right.
 /// </summary>
 internal sealed class SectionTitle
 {
     /// <summary>How far below the label's top the hairline sits, in pixels; pages place their content from it.</summary>
     public const int LineGap = 20;
 
-    // Legacy Text.Label.
     private const int LabelPixels = 14;
 
     private readonly UiTextures _ui;

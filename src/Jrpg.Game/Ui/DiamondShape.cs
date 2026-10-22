@@ -3,8 +3,8 @@ using Microsoft.Xna.Framework;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// A diamond, or a diamond ring, baked into a square texture (legacy <c>TurnPortrait</c>'s backdrop and frames, drawn as
-/// WPF paths). Reaches are fractions of half the square: 1 touches its edges' middles. Edges are smoothed over a pixel.
+/// A diamond, or a diamond ring, baked into a square texture, such as the turn order's portrait backdrop and frames.
+/// Reaches are fractions of half the square: 1 touches its edges' middles. Edges are smoothed over a pixel.
 /// Equal shapes are equal records, so a shape is its own texture cache key.
 /// </summary>
 /// <param name="Size">The square's side in pixels.</param>

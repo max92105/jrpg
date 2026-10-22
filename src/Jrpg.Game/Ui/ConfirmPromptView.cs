@@ -6,13 +6,13 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// Draws a <see cref="ConfirmPrompt"/> as legacy <c>ConfirmDialog</c>: the screen dimmed, a raised band across its middle
-/// with hairlines above and below, the question, and the two buttons, the selected one in the blue selection.
+/// Draws a <see cref="ConfirmPrompt"/>: the screen dimmed, a raised band across its middle with hairlines above and
+/// below, the question, and the two buttons, the selected one in the blue selection.
 /// </summary>
 internal sealed class ConfirmPromptView
 {
-    // Legacy DialogStyle padding 40 x 32, Text.Heading 22 px with 28 px below; MenuButtonStyle 150 x 46, 8 px margins,
-    // 17 px text.
+    // The dialog's padding 40 x 32, a 22 px heading with 28 px below; buttons 150 x 46 with 8 px margins and 17 px text
+    // (placeholders).
     private const int QuestionTextPixels = 22;
     private const int ButtonTextPixels = 17;
     private const int BandPadding = 32;

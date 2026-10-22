@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// The menu tab's arrow (legacy <c>Shape.NavTab</c>, <c>M0,0 H378 L410,28 L378,56 H0 Z</c>) as pixels: filled, with a
+/// The menu tab's arrow (the path <c>M0,0 H378 L410,28 L378,56 H0 Z</c>) as pixels: filled, with a
 /// one-pixel outline, transparent outside.
 /// </summary>
 internal static class NavTabShape

@@ -5,7 +5,7 @@ using Microsoft.Xna.Framework;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// A legacy WPF path baked into pixels (such as a menu tab's arrow): filled, with a one-pixel outline, transparent outside.
+/// A vector path baked into pixels (such as a menu tab's arrow): filled, with a one-pixel outline, transparent outside.
 /// </summary>
 internal static class OutlinedShape
 {
@@ -33,7 +33,7 @@ internal static class OutlinedShape
         return pixels;
     }
 
-    /// <summary>The same shape filled with no outline, as a legacy path drawn without a stroke.</summary>
+    /// <summary>The same shape filled with no outline, as a path drawn without a stroke.</summary>
     /// <param name="corners">The path's corners, in fractions of the size (0 to 1).</param>
     /// <param name="size">The image's width and height in pixels.</param>
     /// <param name="fill">One color per column, left to right.</param>

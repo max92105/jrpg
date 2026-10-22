@@ -9,18 +9,18 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// Draws one member as a card (legacy <c>PartyMemberCard</c>): the portrait, here in the reference UI's diamond, then
+/// Draws one member as a card: the portrait, here in the reference UI's diamond, then
 /// the name with a "Leader" badge, the level at the right, the class, and the HP and MP bars with their values. The card
 /// fills the width it's given, so the same card fits a Party column or the item target picker's.
 /// </summary>
 internal sealed class MemberCardView
 {
-    /// <summary>Legacy <c>CardStyle</c> padding 12 above and below the portrait and text block.</summary>
+    /// <summary>The card's height, with 12 px of padding above and below the portrait and text block.</summary>
     public const int Height = 120;
 
-    // Legacy PartyMemberCard: 16 x 12 padding, an 80 px portrait, 16 px before the text, Text.Heading names, Text.Caption
-    // level and class (8 px above the bars), 22 px bar rows of a 32 px label, a 6 px bar and a 100 px value; a badge
-    // 10 px after the name with 4 px padding.
+    // The card's layout (placeholders): 16 x 12 padding, an 80 px portrait, 16 px before the text, heading-size names,
+    // caption-size level and class (8 px above the bars), 22 px bar rows of a 32 px label, a 6 px bar and a 100 px
+    // value; a badge 10 px after the name with 4 px padding.
     private const int PaddingX = 16;
     private const int PaddingY = 12;
     private const int PortraitSize = 80;
@@ -124,7 +124,7 @@ internal sealed class MemberCardView
             return;
         }
 
-        // Legacy BadgeStyle: a small label in a thin box beside the name.
+        // A small label in a thin box beside the name.
         var badgeWidth = (int)_leaderBadge.Width + (2 * BadgePadding);
         var badgeHeight = (int)_badgeFont.LineHeight + 2;
         var badge = new Rectangle((int)(text.X + card.Name.Width + BadgeGap), (int)(text.Y + ((_nameFont.LineHeight - badgeHeight) / 2)), badgeWidth, badgeHeight);

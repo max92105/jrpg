@@ -50,6 +50,15 @@ internal static class ShapeEditing
         return nearest;
     }
 
+    /// <summary>
+    /// A point moved to the nearest quarter of the object's cells (legacy "Snap to 1/4 tile", decision 126).
+    /// </summary>
+    /// <param name="point">In 0..1 over the object.</param>
+    /// <param name="width">The object's width in cells.</param>
+    /// <param name="height">The object's height in cells.</param>
+    public static Point2D SnapToQuarterCell(Point2D point, int width, int height) =>
+        new(Math.Round(point.X * width * 4) / (width * 4), Math.Round(point.Y * height * 4) / (height * 4));
+
     private static double Distance(Point2D a, Point2D b) => Math.Sqrt(((a.X - b.X) * (a.X - b.X)) + ((a.Y - b.Y) * (a.Y - b.Y)));
 
     // The distance to the nearest point of the segment: the projection clamped onto it.

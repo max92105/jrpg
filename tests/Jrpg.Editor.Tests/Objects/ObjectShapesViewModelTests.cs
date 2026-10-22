@@ -60,6 +60,48 @@ public sealed class ObjectShapesViewModelTests
         Assert.Equal([new Point2D(24.0 / 48, 24.0 / 48)], shapes.CollisionOutline);
     }
 
+    // On the 1-cell sign, quarter cells are quarters of the object: (0.3, 0.6) is nearest (0.25, 0.5).
+    [Fact]
+    public void AddPoint_Snapping_SnapsToQuarterCell()
+    {
+        var shapes = new ObjectShapesViewModel(_sign) { IsSnapping = true };
+
+        shapes.AddPoint(new Point2D(0.3, 0.6));
+
+        Assert.Equal([new Point2D(0.25, 0.5)], shapes.CollisionOutline);
+    }
+
+    [Fact]
+    public void SetRectangle_TwoCorners_MakesFourPointsClockwise()
+    {
+        var shapes = new ObjectShapesViewModel(_sign);
+
+        shapes.SetRectangle(new Point2D(0.75, 1), new Point2D(0.25, 0.5));
+
+        Assert.Equal([new Point2D(0.25, 0.5), new Point2D(0.75, 0.5), new Point2D(0.75, 1), new Point2D(0.25, 1)], shapes.CollisionOutline);
+    }
+
+    [Fact]
+    public void SetRectangle_Snapping_PutsTheCornersOnQuarterCells()
+    {
+        var shapes = new ObjectShapesViewModel(_sign) { IsSnapping = true };
+
+        shapes.SetRectangle(new Point2D(0.1, 0.2), new Point2D(0.6, 0.9));
+
+        Assert.Equal([new Point2D(0, 0.25), new Point2D(0.5, 0.25), new Point2D(0.5, 1), new Point2D(0, 1)], shapes.CollisionOutline);
+    }
+
+    [Fact]
+    public void CoverWholeObjectCommand_EditingZones_MakesTheChosenZoneTheUnitSquare()
+    {
+        var shapes = new ObjectShapesViewModel(_house) { IsEditingZones = true, SelectedZoneIndex = 0 };
+
+        shapes.CoverWholeObjectCommand.Execute(null);
+
+        Assert.Equal([new Point2D(0, 0), new Point2D(1, 0), new Point2D(1, 1), new Point2D(0, 1)], shapes.Zones[0]);
+        Assert.Equal(_house.CollisionPolygon, shapes.CollisionOutline);
+    }
+
     [Fact]
     public void MovePoint_OutsideTheObject_ClampsToTheEdge()
     {

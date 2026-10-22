@@ -69,6 +69,8 @@
         New zone / Delete zone: zones are the parts drawn over the player (leaves, roofs); a click with no zone chosen starts one.<LineBreak />
         Click: add a point to the chosen shape (kept inside the object, on its pixels); near an edge, insert one there.<LineBreak />
         Drag a handle: move its point. Right click a handle: remove its point. The yellow handle is the last point.<LineBreak />
+        Shift + drag: make the chosen shape a rectangle. Whole object: the full object. Snap to 1/4 tile: points land on quarter cells.<LineBreak />
+        Mouse wheel: zoom (0.5x to 12x). Shapes not being edited are drawn faint.<LineBreak />
         Backspace or Ctrl+Z: remove the last point. Clear shape: no outline (the object never blocks).<LineBreak />
         OK: apply, as one change Ctrl+Z undoes in the main window. Esc or Cancel: leave the object as it was.
       </TextBlock>

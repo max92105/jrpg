@@ -95,7 +95,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **E9c. Opening the shapes window from the map** (Editor, about 120 lines; split from E9) → [slices/E9c.md](slices/E9c.md)
 - [x] **E10. Above-player zones** (Editor, about 200 lines) → [slices/E10.md](slices/E10.md)
 - [x] **E11a. Point handles: drag, insert, remove** (Editor, about 200 lines) → [slices/E11a.md](slices/E11a.md)
-- [ ] **E11b. Rectangle, snap, zoom and dimming** (Editor, about 190 lines) → [slices/E11b.md](slices/E11b.md)
+- [x] **E11b. Rectangle, snap, zoom and dimming** (Editor, about 190 lines) → [slices/E11b.md](slices/E11b.md)
 
 ### Phase 6: new objects
 

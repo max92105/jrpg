@@ -12,7 +12,7 @@
   </Window.Resources>
   <StackPanel Margin="12">
     <TextBlock Margin="0,0,0,8" MaxWidth="560" TextWrapping="Wrap" HorizontalAlignment="Left"
-               Text="Click to add a point; near an edge, to insert one. Drag a handle to move it, right click to remove it. Backspace or Ctrl+Z removes the last point." />
+               Text="Click to add a point; near an edge, to insert one. Drag a handle to move it, right click to remove it. Shift + drag: a rectangle. Wheel: zoom. Backspace or Ctrl+Z removes the last point." />
     <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
       <RadioButton Content="Collision (blocks the player)" IsChecked="{Binding IsEditingCollision}" Margin="0,0,16,0" />
       <RadioButton Content="Over the player (leaves, roofs)" IsChecked="{Binding IsEditingZones}" />
@@ -25,24 +25,30 @@
       <!-- Kept in step from code: replacing the list on each point would otherwise drop the chosen zone. -->
       <ListBox x:Name="ZoneList" Height="72" ItemsSource="{Binding ZoneEntries}" SelectionChanged="OnZoneListSelectionChanged" />
     </DockPanel>
-    <Border Background="#202020" HorizontalAlignment="Center">
-      <!-- The object at its map size, scaled as a whole into the box, so a click's position is a map pixel. -->
-      <Viewbox x:Name="ObjectBox" Stretch="Uniform">
-        <Grid x:Name="ObjectArea"
-              Background="Transparent"
-              RenderOptions.BitmapScalingMode="NearestNeighbor"
-              MouseDown="OnObjectMouseDown"
-              MouseMove="OnObjectMouseMove"
-              MouseUp="OnObjectMouseUp"
-              LostMouseCapture="OnObjectLostMouseCapture">
-          <Image x:Name="Picture" Stretch="Fill" />
-          <Canvas x:Name="OutlineCanvas" IsHitTestVisible="False" />
-        </Grid>
-      </Viewbox>
-    </Border>
+    <!-- The object at its map size, scaled as a whole by the zoom, so a click's position is a map pixel. -->
+    <ScrollViewer MaxWidth="760"
+                  MaxHeight="600"
+                  HorizontalAlignment="Center"
+                  HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto"
+                  Background="#202020"
+                  PreviewMouseWheel="OnViewportMouseWheel">
+      <Grid x:Name="ObjectArea"
+            Background="Transparent"
+            RenderOptions.BitmapScalingMode="NearestNeighbor"
+            MouseDown="OnObjectMouseDown"
+            MouseMove="OnObjectMouseMove"
+            MouseUp="OnObjectMouseUp"
+            LostMouseCapture="OnObjectLostMouseCapture">
+        <Image x:Name="Picture" Stretch="Fill" />
+        <Canvas x:Name="OutlineCanvas" IsHitTestVisible="False" />
+      </Grid>
+    </ScrollViewer>
     <TextBlock Margin="0,8,0,0" Foreground="DarkRed" TextWrapping="Wrap" Text="{Binding Problem}" />
     <DockPanel Margin="0,12,0,0">
       <Button Content="Clear shape" Width="90" Command="{Binding ClearShapeCommand}" />
+      <Button Content="Whole object" Width="90" Margin="8,0,0,0" Command="{Binding CoverWholeObjectCommand}" />
+      <CheckBox Content="Snap to 1/4 tile" Margin="8,0,0,0" VerticalAlignment="Center" IsChecked="{Binding IsSnapping}" />
       <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
         <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked">
           <Button.Style>

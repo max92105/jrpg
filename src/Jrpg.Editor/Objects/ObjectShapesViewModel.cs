@@ -57,6 +57,10 @@ internal sealed partial class ObjectShapesViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(DeleteZoneCommand))]
     public partial int SelectedZoneIndex { get; set; } = -1;
 
+    /// <summary>Whether placed points land on quarter cells of the object (legacy "Snap to 1/4 tile", decision 126); off at first.</summary>
+    [ObservableProperty]
+    public partial bool IsSnapping { get; set; }
+
     /// <summary>"Zone 1 (6 points)", one per zone.</summary>
     public IReadOnlyList<string> ZoneEntries => [.. Zones.Select((zone, index) => $"Zone {index + 1} ({zone.Count} points)")];
 
@@ -96,6 +100,20 @@ internal sealed partial class ObjectShapesViewModel : ObservableObject
     {
         ThrowIfNotAPoint(index);
         SetActivePoints([.. ActivePoints.Select((existing, at) => at == index ? Placed(point) : existing)]);
+    }
+
+    /// <summary>
+    /// Makes the active shape the rectangle between two corners (Shift + drag), clockwise from its top left; each corner is
+    /// placed as an added point is.
+    /// </summary>
+    /// <param name="corner">In 0..1 over the object.</param>
+    /// <param name="oppositeCorner">In 0..1 over the object.</param>
+    public void SetRectangle(Point2D corner, Point2D oppositeCorner)
+    {
+        var (first, second) = (Placed(corner), Placed(oppositeCorner));
+        var (left, right) = (Math.Min(first.X, second.X), Math.Max(first.X, second.X));
+        var (top, bottom) = (Math.Min(first.Y, second.Y), Math.Max(first.Y, second.Y));
+        SetActivePoints([new Point2D(left, top), new Point2D(right, top), new Point2D(right, bottom), new Point2D(left, bottom)]);
     }
 
     /// <summary>Puts a point on the edge that starts at <paramref name="afterIndex"/> (a click near it), clamped and rounded.</summary>
@@ -138,7 +156,7 @@ internal sealed partial class ObjectShapesViewModel : ObservableObject
     private static double OnPixelGrid(double fraction, int cells)
     {
         var pixels = cells * MapDrawing.CellPixels;
-        return Math.Round(Math.Clamp(fraction, 0, 1) * pixels) / pixels;
+        return Math.Round(fraction * pixels) / pixels;
     }
 
     // A handle's index comes from the shape on screen; one past it would start an empty zone instead.
@@ -148,8 +166,14 @@ internal sealed partial class ObjectShapesViewModel : ObservableObject
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, ActivePoints.Count);
     }
 
-    // Clamped into the object, as the validator refuses points outside, and rounded to its map pixels.
-    private Point2D Placed(Point2D point) => new(OnPixelGrid(point.X, Width), OnPixelGrid(point.Y, Height));
+    // Clamped into the object, as the validator refuses points outside; snapped when asked; then rounded to its map pixels,
+    // which a quarter cell already is.
+    private Point2D Placed(Point2D point)
+    {
+        var clamped = new Point2D(Math.Clamp(point.X, 0, 1), Math.Clamp(point.Y, 0, 1));
+        var snapped = IsSnapping ? ShapeEditing.SnapToQuarterCell(clamped, Width, Height) : clamped;
+        return new Point2D(OnPixelGrid(snapped.X, Width), OnPixelGrid(snapped.Y, Height));
+    }
 
     private void SetActivePoints(IReadOnlyList<Point2D> points)
     {
@@ -177,6 +201,10 @@ internal sealed partial class ObjectShapesViewModel : ObservableObject
             SetActivePoints([]);
         }
     }
+
+    /// <summary>Makes the active shape the whole object (legacy "Whole object").</summary>
+    [RelayCommand]
+    private void CoverWholeObject() => SetRectangle(new Point2D(0, 0), new Point2D(1, 1));
 
     [RelayCommand]
     private void NewZone()

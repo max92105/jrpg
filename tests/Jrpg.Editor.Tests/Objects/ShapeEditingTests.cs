@@ -33,6 +33,13 @@ public sealed class ShapeEditingTests
         Assert.Equal(0, ShapeEditing.EdgeAt(_square, new Point2D(50, -4), distance: 8));
     }
 
+    // Across 2 cells, quarters of a cell are eighths of the object: 0.30 is nearest 2/8.
+    [Fact]
+    public void SnapToQuarterCell_TwoCellWideObject_RoundsToEighths()
+    {
+        Assert.Equal(new Point2D(0.25, 0.5), ShapeEditing.SnapToQuarterCell(new Point2D(0.30, 0.5), width: 2, height: 1));
+    }
+
     [Fact]
     public void EdgeAt_MouseFarFromEveryEdge_ReturnsNull()
     {

@@ -28,7 +28,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Geometry | Positions and shapes | `Point2D`, `GridCell`, `Facing`, `Polygon` |
 | Items | Items and the inventory | `ItemDefinition`, `Inventory`, `EquipmentSlot` |
 | Maps | Map content and draw order | `MapDefinition`, `MapLayout`, `PlacedObject`, `ObjectDefinition`, `DrawOrderKey`, `WalkabilityGrid` |
-| Party | Members, the active party, equipment, field item use | `PartyState`, `PartyMember`, `PartyEquipment`, `FieldItemUse` |
+| Party | Members, the active party, equipment (taking it from another member too), field item use | `PartyState`, `PartyMember`, `PartyEquipment`, `WornItem`, `FieldItemUse` |
 | Progression | Experience and levels | `ExperienceTable`, `LevelProgressStep` |
 | Randomness | Seeded randomness | `IRandom`, `SeededRandom` |
 | Saving / Session / World | The save record; one playthrough (starts and finishes its battles); what the player changed in the world | `SaveGame`, `GameSession`, `WorldState` |

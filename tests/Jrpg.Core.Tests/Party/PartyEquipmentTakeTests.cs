@@ -1,0 +1,185 @@
+using Jrpg.Core.Items;
+using Jrpg.Core.Party;
+using Jrpg.Core.Tests.Builders;
+
+namespace Jrpg.Core.Tests.Party;
+
+/// <summary>
+/// Taking equipment from another member (decision 137). Sarxian, Jazog and Teelle are warriors, Zaruk is a mage; Teelle
+/// waits in the reserve.
+/// </summary>
+public sealed class PartyEquipmentTakeTests
+{
+    private readonly Inventory _inventory = new();
+    private readonly PartyEquipment _equipment;
+    private readonly PartyMember _sarxian = new PartyMemberBuilder().WithId("sarxian").WithClass("warrior").Build();
+    private readonly PartyMember _jazog = new PartyMemberBuilder().WithId("jazog").WithClass("warrior").Build();
+    private readonly PartyMember _zaruk = new PartyMemberBuilder().WithId("zaruk").WithClass("mage").Build();
+    private readonly PartyMember _teelle = new PartyMemberBuilder().WithId("teelle").WithClass("warrior").Build();
+    private readonly ItemDefinition _bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5, "warrior").Build();
+    private readonly ItemDefinition _ironSword = new ItemDefinitionBuilder().WithId("iron_sword").AsWeapon(8, "warrior").Build();
+    private readonly ItemDefinition _staff = new ItemDefinitionBuilder().WithId("magic_staff").AsWeapon(6, "mage").Build();
+    private readonly ItemDefinition _chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6, "warrior").Build();
+    private readonly PartyState _party;
+
+    public PartyEquipmentTakeTests()
+    {
+        _equipment = new PartyEquipment(_inventory);
+        _party = new PartyState([_sarxian, _teelle, _jazog, _zaruk], [_sarxian, _jazog, _zaruk], new PartyRules(MaxActiveMembers: 4));
+    }
+
+    [Fact]
+    public void TakeableFor_TwoOthersWearIt_ListsOneEntryPerWearer()
+    {
+        Dress(_jazog, _ironSword);
+        Dress(_teelle, _ironSword);
+
+        var takeable = PartyEquipment.TakeableFor(_sarxian, EquipmentSlot.Weapon, _party);
+
+        Assert.Equal([new WornItem(_jazog, _ironSword), new WornItem(_teelle, _ironSword)], takeable);
+    }
+
+    [Fact]
+    public void TakeableFor_ReserveMemberWearsIt_ListsThem()
+    {
+        Dress(_teelle, _ironSword);
+
+        var takeable = PartyEquipment.TakeableFor(_sarxian, EquipmentSlot.Weapon, _party);
+
+        Assert.Equal([new WornItem(_teelle, _ironSword)], takeable);
+    }
+
+    [Fact]
+    public void TakeableFor_ClassCantWearIt_LeavesItOut()
+    {
+        Dress(_zaruk, _staff);
+
+        var takeable = PartyEquipment.TakeableFor(_sarxian, EquipmentSlot.Weapon, _party);
+
+        Assert.Empty(takeable);
+    }
+
+    [Fact]
+    public void TakeableFor_MemberAlreadyWearsIt_LeavesItOut()
+    {
+        Dress(_sarxian, _ironSword);
+        Dress(_jazog, _ironSword);
+
+        var takeable = PartyEquipment.TakeableFor(_sarxian, EquipmentSlot.Weapon, _party);
+
+        Assert.Empty(takeable);
+    }
+
+    [Fact]
+    public void TakeableFor_OtherSlot_LeavesItOut()
+    {
+        Dress(_jazog, _chainMail);
+
+        var takeable = PartyEquipment.TakeableFor(_sarxian, EquipmentSlot.Weapon, _party);
+
+        Assert.Empty(takeable);
+    }
+
+    [Fact]
+    public void TakeableFor_InPartyOrder_ActiveThenReserve()
+    {
+        Dress(_teelle, _bronzeSword);
+        Dress(_jazog, _ironSword);
+
+        var takeable = PartyEquipment.TakeableFor(_sarxian, EquipmentSlot.Weapon, _party);
+
+        Assert.Equal([_jazog, _teelle], takeable.Select(worn => worn.Wearer));
+    }
+
+    [Fact]
+    public void TryTakeFrom_GiverWearsIt_MovesItAndEmptiesTheGiversSlot()
+    {
+        Dress(_jazog, _ironSword);
+
+        var taken = _equipment.TryTakeFrom(_jazog, _sarxian, EquipmentSlot.Weapon);
+
+        Assert.True(taken);
+        Assert.Same(_ironSword, _sarxian.Weapon);
+        Assert.Null(_jazog.Weapon);
+        Assert.Equal(0, _inventory.QuantityOf("iron_sword"));
+    }
+
+    [Fact]
+    public void TryTakeFrom_ReceiverWearsSomething_PutsItInTheBag()
+    {
+        Dress(_jazog, _ironSword);
+        Dress(_sarxian, _bronzeSword);
+
+        _equipment.TryTakeFrom(_jazog, _sarxian, EquipmentSlot.Weapon);
+
+        Assert.Same(_ironSword, _sarxian.Weapon);
+        Assert.Equal(1, _inventory.QuantityOf("bronze_sword"));
+    }
+
+    [Fact]
+    public void TryTakeFrom_NoRoomForReceiversItem_ChangesNothing()
+    {
+        var bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").WithMaxStack(1).AsWeapon(5, "warrior").Build();
+        Dress(_jazog, _ironSword);
+        Dress(_sarxian, bronzeSword);
+        _inventory.Add(bronzeSword, 1);
+
+        var taken = _equipment.TryTakeFrom(_jazog, _sarxian, EquipmentSlot.Weapon);
+
+        Assert.False(taken);
+        Assert.Same(_ironSword, _jazog.Weapon);
+        Assert.Same(bronzeSword, _sarxian.Weapon);
+        Assert.Equal(1, _inventory.QuantityOf("bronze_sword"));
+    }
+
+    [Fact]
+    public void TryTakeFrom_ReceiverClassCantWearIt_ChangesNothing()
+    {
+        Dress(_zaruk, _staff);
+
+        var taken = _equipment.TryTakeFrom(_zaruk, _sarxian, EquipmentSlot.Weapon);
+
+        Assert.False(taken);
+        Assert.Same(_staff, _zaruk.Weapon);
+        Assert.Null(_sarxian.Weapon);
+    }
+
+    [Fact]
+    public void TryTakeFrom_ReceiverWearsTheSameItem_ChangesNothing()
+    {
+        Dress(_jazog, _ironSword);
+        Dress(_sarxian, _ironSword);
+
+        var taken = _equipment.TryTakeFrom(_jazog, _sarxian, EquipmentSlot.Weapon);
+
+        Assert.False(taken);
+        Assert.Same(_ironSword, _jazog.Weapon);
+        Assert.Equal(0, _inventory.QuantityOf("iron_sword"));
+    }
+
+    [Fact]
+    public void TryTakeFrom_GiverSlotEmpty_ReturnsFalse()
+    {
+        var taken = _equipment.TryTakeFrom(_jazog, _sarxian, EquipmentSlot.Weapon);
+
+        Assert.False(taken);
+    }
+
+    [Fact]
+    public void TryTakeFrom_SameMember_ReturnsFalse()
+    {
+        Dress(_sarxian, _ironSword);
+
+        var taken = _equipment.TryTakeFrom(_sarxian, _sarxian, EquipmentSlot.Weapon);
+
+        Assert.False(taken);
+        Assert.Same(_ironSword, _sarxian.Weapon);
+    }
+
+    // Puts the item on through the bag, as the game does.
+    private void Dress(PartyMember member, ItemDefinition item)
+    {
+        _inventory.Add(item, 1);
+        Assert.True(_equipment.TryEquip(member, item));
+    }
+}

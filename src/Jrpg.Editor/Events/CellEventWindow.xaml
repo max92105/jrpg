@@ -1,5 +1,6 @@
 <Window x:Class="Jrpg.Editor.Events.CellEventWindow"
         x:ClassModifier="internal"
+        Style="{StaticResource EditorWindow}"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Jrpg.Editor.Events"
@@ -13,12 +14,12 @@
       <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked" />
       <Button Content="Cancel" Width="80" Margin="8,0,0,0" IsCancel="True" />
     </StackPanel>
-    <TextBlock x:Name="ProblemText" DockPanel.Dock="Bottom" Foreground="DarkRed" TextWrapping="Wrap" Margin="0,8,0,0" />
+    <TextBlock x:Name="ProblemText" DockPanel.Dock="Bottom" Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Margin="0,8,0,0" />
 
     <!-- The cell's one event: always run when the player walks onto the cell. -->
     <DockPanel DataContext="{Binding Event}">
       <StackPanel DockPanel.Dock="Top">
-        <TextBlock Text="{Binding Id, StringFormat=Event id: {0} (runs when the player walks onto the cell)}" Foreground="Gray" />
+        <TextBlock Text="{Binding Id, StringFormat=Event id: {0} (runs when the player walks onto the cell)}" Foreground="{StaticResource MutedTextBrush}" />
         <CheckBox Content="Only once per playthrough (remembered in saves)" IsChecked="{Binding IsOnce}" Margin="0,6,0,8" />
         <TextBlock Text="Steps, run in order" FontWeight="Bold" />
       </StackPanel>

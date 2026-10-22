@@ -33,7 +33,7 @@ Everything is saved through Data (`ContentWriter`), checked by the loader's vali
 6. **Collision and zones (E8-E11b).** The overlay first, so every later shape edit is checked on the map; then the shapes window with a plain behavior (collision, then zones), then its tools, then its look.
 7. **New objects (E12a, E12b)** from sheet cells, ending in the shapes window.
 8. **NPCs (ADR 0015, N1-N3)** reuse objects, events and the shapes window: first in the game, then in the editor.
-9. **The look (E13a, E13b),** last, over a window whose behavior is settled; then the session check (Z).
+9. **The look (E13a, E13b, E13c),** last, over a window whose behavior is settled; then the session check (Z).
 
 ## Guiding rules
 - **Rules stay in Core (ADR 0001).** What blocks the player is Core's `WalkabilityGrid` and `MapCollision` rule; the overlay draws Core's answer, it never re-implements it. Shapes keep Core's 0..1 coordinates over the object's cells.
@@ -113,7 +113,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 8: the look
 
 - [x] **E13a. Layout: splitters and tool bars per mode** (Editor, about 150 lines) → [slices/E13a.md](slices/E13a.md)
-- [ ] **E13b. Dark theme** (Editor, about 230 lines) → [slices/E13b.md](slices/E13b.md)
+- [x] **E13b. Dark theme** (Editor, about 230 lines) → [slices/E13b.md](slices/E13b.md)
+- [ ] **E13c. Dark templates: combo boxes, scroll bars, tool bar overflow** (Editor, about 200 lines; split from E13b) → [slices/E13c.md](slices/E13c.md)
 - [ ] **Z. Editor session check** (manual) → [slices/Z.md](slices/Z.md)
 
 ## Decisions

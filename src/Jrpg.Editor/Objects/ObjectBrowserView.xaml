@@ -10,7 +10,7 @@
     </CollectionViewSource>
   </UserControl.Resources>
   <DockPanel>
-    <Border DockPanel.Dock="Bottom" Height="220" Background="#202020">
+    <Border DockPanel.Dock="Bottom" Height="220" Background="{StaticResource ViewportBackgroundBrush}">
       <Image x:Name="Preview"
              Stretch="Uniform"
              StretchDirection="DownOnly"

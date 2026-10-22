@@ -1,5 +1,6 @@
 <Window x:Class="Jrpg.Editor.Events.ObjectEventsWindow"
         x:ClassModifier="internal"
+        Style="{StaticResource EditorWindow}"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Jrpg.Editor.Events"
@@ -13,7 +14,7 @@
       <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked" />
       <Button Content="Cancel" Width="80" Margin="8,0,0,0" IsCancel="True" />
     </StackPanel>
-    <TextBlock x:Name="ProblemText" DockPanel.Dock="Bottom" Foreground="DarkRed" TextWrapping="Wrap" Margin="0,8,0,0" />
+    <TextBlock x:Name="ProblemText" DockPanel.Dock="Bottom" Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Margin="0,8,0,0" />
 
     <!-- The object's events, in the order they're tried. -->
     <DockPanel DockPanel.Dock="Left" Width="300">
@@ -39,7 +40,7 @@
     <!-- The chosen event: when it runs, then its steps. -->
     <DockPanel Margin="12,0,0,0" DataContext="{Binding SelectedEvent}">
       <StackPanel DockPanel.Dock="Top">
-        <TextBlock Text="{Binding Id, StringFormat=Event id: {0}}" Foreground="Gray" />
+        <TextBlock Text="{Binding Id, StringFormat=Event id: {0}}" Foreground="{StaticResource MutedTextBrush}" />
         <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
           <TextBlock Text="Starts when the player" Width="160" VerticalAlignment="Center" />
           <ComboBox Width="120"

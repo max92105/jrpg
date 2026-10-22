@@ -1,5 +1,6 @@
 <Window x:Class="Jrpg.Editor.Maps.Settings.MapSettingsWindow"
         x:ClassModifier="internal"
+        Style="{StaticResource EditorWindow}"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Map settings"
@@ -23,8 +24,8 @@
       <TextBlock Text=" x " VerticalAlignment="Center" />
       <TextBox Width="60" Text="{Binding HeightText, UpdateSourceTrigger=PropertyChanged}" />
     </StackPanel>
-    <TextBlock Foreground="DarkRed" TextWrapping="Wrap" Text="{Binding SizeProblem}" />
-    <TextBlock Foreground="DarkOrange"
+    <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Text="{Binding SizeProblem}" />
+    <TextBlock Foreground="{StaticResource WarningTextBrush}"
                TextWrapping="Wrap"
                Text="Shrinking drops the tiles, objects and cell events outside the new size (you're asked first)."
                Visibility="{Binding IsShrinking, Converter={StaticResource VisibleWhenTrue}}" />
@@ -50,7 +51,7 @@
         </ListBox.ItemTemplate>
       </ListBox>
     </StackPanel>
-    <TextBlock Foreground="DarkRed" TextWrapping="Wrap" Text="{Binding OddsProblem}" />
+    <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Text="{Binding OddsProblem}" />
 
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
       <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked" />

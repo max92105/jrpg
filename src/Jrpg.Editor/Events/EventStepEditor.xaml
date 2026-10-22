@@ -48,6 +48,6 @@
       <TextBox Width="40" Text="{Binding CellYText, UpdateSourceTrigger=PropertyChanged}" />
       <TextBlock Text=")" VerticalAlignment="Center" />
     </StackPanel>
-    <TextBlock Foreground="DarkRed" TextWrapping="Wrap" Text="{Binding Problem}" />
+    <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Text="{Binding Problem}" />
   </StackPanel>
 </UserControl>

@@ -56,8 +56,8 @@
           <TextBox Grid.Row="1" Grid.Column="3" Margin="0,2" Text="{Binding Spacing, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
         <TextBlock Margin="0,4,0,0" Text="{Binding Summary}" />
-        <TextBlock Margin="0,4,0,0" Foreground="DarkGoldenrod" TextWrapping="Wrap" Text="{Binding Warning}" />
-        <TextBlock Margin="0,4,0,0" Foreground="Firebrick" TextWrapping="Wrap" Text="{Binding Problem}" />
+        <TextBlock Margin="0,4,0,0" Foreground="{StaticResource WarningTextBrush}" TextWrapping="Wrap" Text="{Binding Warning}" />
+        <TextBlock Margin="0,4,0,0" Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Text="{Binding Problem}" />
         <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
           <Button Padding="8,2" Content="Apply" Command="{Binding DataContext.ApplyCutCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
           <Button Padding="8,2" Margin="4,0,0,0" Content="Cancel" Command="{Binding DataContext.CancelCutCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
@@ -67,7 +67,7 @@
     <TextBlock DockPanel.Dock="Bottom" Margin="0,4" Text="{Binding ChoiceText}" />
     <ScrollViewer HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"
-                  Background="#202020">
+                  Background="{StaticResource ViewportBackgroundBrush}">
       <!-- Sized in the sheet's own pixels and scaled as a whole, so a click's position is a sheet pixel. -->
       <Grid x:Name="SheetView"
             HorizontalAlignment="Left"

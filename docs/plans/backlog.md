@@ -14,7 +14,7 @@ Code-health work waiting for the next cleanup plan; `/retro` appends to it. One 
 
 ## From the battle plan (2026-10-20)
 
-- **The clamped time share `Math.Clamp((float)(elapsed / length), 0, 1)` is copied 6 times** (`ActionPlayback`, `FloatingNumber` twice, `LevelUpPop`, `VictoryEntrance`, `DefeatEntrance`), and the cubic ease-out twice (`LevelUpPop`, `VictoryEntrance`). One small shared `Ui` timing helper.
+- **The clamped time share `Math.Clamp((float)(elapsed / length), 0, 1)` is copied 6 times** (`ActionPlayback`, `FloatingNumber` twice, `LevelUpPop`, `VictoryEntrance`, `DefeatEntrance`), and the cubic ease-out twice (`LevelUpPop`, `VictoryEntrance`). `Ui/Easing` (plan 2026-10-22, T1) now has both (`ShareOf`, `CubicOut`); these copies can move to it.
 - **The footer bar with its hairline is drawn 3 times** (`GameMenuScene`, `VictoryScreenView`, `DefeatScreenView`; the two outcome screens also share the left shade and the title hairline). A shared `Ui` footer, and an outcome frame for the two battle screens.
 - **`Ui/MessageIds.cs` is 305 lines** of constants. Split it by feature (menu, battle, title) or group the battle ids.
 - **More invariant number formatting inline** (`ToString(CultureInfo.InvariantCulture)` in `ActionPlayback`, `CommandPanelView`, `VictoryScreenView`, `VitalsText`), on top of the copies listed above.

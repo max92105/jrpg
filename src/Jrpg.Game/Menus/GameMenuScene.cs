@@ -44,6 +44,7 @@ internal sealed class GameMenuScene : IScene
     private readonly SpriteFontBase _font;
     private readonly string[] _tabLabels;
     private readonly string _mainHint;
+    private readonly PageTransition _pageTransition = new();
     private TimeSpan _sinceOpened;
     private bool _isInPage;
 
@@ -69,6 +70,7 @@ internal sealed class GameMenuScene : IScene
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
         _sinceOpened += delta;
+        _pageTransition.Update(delta);
         _header.Update();
         return _isInPage ? UpdatePage(input) : UpdateTabs(input);
     }
@@ -85,7 +87,8 @@ internal sealed class GameMenuScene : IScene
 
         if (_isInPage)
         {
-            _pages[_tabs.Selected].Draw(batch, textures, _pageArea, opacity);
+            var area = _pageArea with { X = _pageArea.X + _pageTransition.Offset };
+            _pages[_tabs.Selected].Draw(batch, textures, area, opacity * _pageTransition.Opacity);
         }
 
         DrawFooterHint(batch, opacity);
@@ -148,6 +151,7 @@ internal sealed class GameMenuScene : IScene
         if (input.IsPressed(GameButton.Confirm))
         {
             _pages[_tabs.Selected].Open();
+            _pageTransition.Start();
             _isInPage = true;
         }
 

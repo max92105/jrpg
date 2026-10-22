@@ -61,6 +61,56 @@ public sealed class ObjectShapesViewModelTests
     }
 
     [Fact]
+    public void MovePoint_OutsideTheObject_ClampsToTheEdge()
+    {
+        var shapes = new ObjectShapesViewModel(_house);
+
+        shapes.MovePoint(0, new Point2D(-0.5, 0.75));
+
+        Assert.Equal([new Point2D(0, 0.75), .. _house.CollisionPolygon.Skip(1)], shapes.CollisionOutline);
+    }
+
+    [Fact]
+    public void InsertPoint_AfterIndex_PutsItBetweenItsNeighbours()
+    {
+        var shapes = new ObjectShapesViewModel(_house);
+
+        shapes.InsertPoint(0, new Point2D(0.5, 0.5));
+
+        Assert.Equal([_house.CollisionPolygon[0], new Point2D(0.5, 0.5), .. _house.CollisionPolygon.Skip(1)], shapes.CollisionOutline);
+    }
+
+    [Fact]
+    public void RemovePoint_MiddlePoint_KeepsTheOthersInOrder()
+    {
+        var shapes = new ObjectShapesViewModel(_house);
+
+        shapes.RemovePoint(1);
+
+        Assert.Equal([_house.CollisionPolygon[0], _house.CollisionPolygon[2], _house.CollisionPolygon[3]], shapes.CollisionOutline);
+    }
+
+    [Fact]
+    public void RemovePoint_EditingZones_RemovesFromTheChosenZone()
+    {
+        var shapes = new ObjectShapesViewModel(_house) { IsEditingZones = true, SelectedZoneIndex = 0 };
+
+        shapes.RemovePoint(0);
+
+        Assert.Equal(_house.AbovePlayerZones[0].Skip(1), shapes.Zones[0]);
+        Assert.Equal(_house.CollisionPolygon, shapes.CollisionOutline);
+    }
+
+    [Fact]
+    public void MovePoint_NoSuchPoint_Throws()
+    {
+        var shapes = new ObjectShapesViewModel(_house) { IsEditingZones = true };
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => shapes.MovePoint(0, new Point2D(0, 0)));
+        Assert.Single(shapes.Zones);
+    }
+
+    [Fact]
     public void RemoveLastPoint_ThreePoints_RemovesTheNewest()
     {
         var shapes = new ObjectShapesViewModel(_sign);

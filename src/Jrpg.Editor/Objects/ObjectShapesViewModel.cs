@@ -87,8 +87,33 @@ internal sealed partial class ObjectShapesViewModel : ObservableObject
     /// is clamped into the object, as the validator refuses points outside, and rounded to the object's map pixels.
     /// </summary>
     /// <param name="point">In 0..1 over the object's width and height.</param>
-    public void AddPoint(Point2D point) =>
-        SetActivePoints([.. ActivePoints, new Point2D(OnPixelGrid(point.X, Width), OnPixelGrid(point.Y, Height))]);
+    public void AddPoint(Point2D point) => SetActivePoints([.. ActivePoints, Placed(point)]);
+
+    /// <summary>Moves a point of the active shape (a dragged handle), clamped and rounded as an added one.</summary>
+    /// <param name="index">The point's index in <see cref="ActivePoints"/>.</param>
+    /// <param name="point">In 0..1 over the object.</param>
+    public void MovePoint(int index, Point2D point)
+    {
+        ThrowIfNotAPoint(index);
+        SetActivePoints([.. ActivePoints.Select((existing, at) => at == index ? Placed(point) : existing)]);
+    }
+
+    /// <summary>Puts a point on the edge that starts at <paramref name="afterIndex"/> (a click near it), clamped and rounded.</summary>
+    /// <param name="afterIndex">The index in <see cref="ActivePoints"/> the edge starts from; the new point comes after it.</param>
+    /// <param name="point">In 0..1 over the object.</param>
+    public void InsertPoint(int afterIndex, Point2D point)
+    {
+        ThrowIfNotAPoint(afterIndex);
+        SetActivePoints([.. ActivePoints.Take(afterIndex + 1), Placed(point), .. ActivePoints.Skip(afterIndex + 1)]);
+    }
+
+    /// <summary>Removes a point of the active shape (a right click on its handle).</summary>
+    /// <param name="index">The point's index in <see cref="ActivePoints"/>.</param>
+    public void RemovePoint(int index)
+    {
+        ThrowIfNotAPoint(index);
+        SetActivePoints([.. ActivePoints.Where((_, at) => at != index)]);
+    }
 
     /// <summary>Takes back the active shape's newest point (legacy Backspace); nothing when it has none.</summary>
     public void RemoveLastPoint()
@@ -115,6 +140,16 @@ internal sealed partial class ObjectShapesViewModel : ObservableObject
         var pixels = cells * MapDrawing.CellPixels;
         return Math.Round(Math.Clamp(fraction, 0, 1) * pixels) / pixels;
     }
+
+    // A handle's index comes from the shape on screen; one past it would start an empty zone instead.
+    private void ThrowIfNotAPoint(int index)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(index);
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, ActivePoints.Count);
+    }
+
+    // Clamped into the object, as the validator refuses points outside, and rounded to its map pixels.
+    private Point2D Placed(Point2D point) => new(OnPixelGrid(point.X, Width), OnPixelGrid(point.Y, Height));
 
     private void SetActivePoints(IReadOnlyList<Point2D> points)
     {

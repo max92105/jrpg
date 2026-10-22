@@ -11,8 +11,8 @@
     <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
   </Window.Resources>
   <StackPanel Margin="12">
-    <TextBlock Margin="0,0,0,8"
-               Text="Click to add a point to the chosen shape. Backspace or Ctrl+Z removes the last point." />
+    <TextBlock Margin="0,0,0,8" MaxWidth="560" TextWrapping="Wrap" HorizontalAlignment="Left"
+               Text="Click to add a point; near an edge, to insert one. Drag a handle to move it, right click to remove it. Backspace or Ctrl+Z removes the last point." />
     <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
       <RadioButton Content="Collision (blocks the player)" IsChecked="{Binding IsEditingCollision}" Margin="0,0,16,0" />
       <RadioButton Content="Over the player (leaves, roofs)" IsChecked="{Binding IsEditingZones}" />
@@ -31,7 +31,10 @@
         <Grid x:Name="ObjectArea"
               Background="Transparent"
               RenderOptions.BitmapScalingMode="NearestNeighbor"
-              MouseLeftButtonDown="OnObjectClicked">
+              MouseDown="OnObjectMouseDown"
+              MouseMove="OnObjectMouseMove"
+              MouseUp="OnObjectMouseUp"
+              LostMouseCapture="OnObjectLostMouseCapture">
           <Image x:Name="Picture" Stretch="Fill" />
           <Canvas x:Name="OutlineCanvas" IsHitTestVisible="False" />
         </Grid>

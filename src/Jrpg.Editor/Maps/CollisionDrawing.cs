@@ -19,6 +19,9 @@ internal static class CollisionDrawing
     /// <summary>An above-player zone's fill, also used by the object shapes window.</summary>
     internal static Brush ZoneFill { get; } = Frozen(new SolidColorBrush(Color.FromArgb(0x50, 0x00, 0x96, 0xFF)));
 
+    /// <summary>The shapes window's handle on a shape's last point, so the next click's edge is clear (legacy yellow).</summary>
+    internal static Brush LastPointHandle { get; } = Brushes.Yellow;
+
     /// <summary>How wide outlines are drawn, in screen pixels whatever the zoom; the shapes window uses it too.</summary>
     internal const double StrokeScreenPixels = 2;
 

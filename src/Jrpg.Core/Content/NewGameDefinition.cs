@@ -6,10 +6,11 @@ namespace Jrpg.Core.Content;
 /// <summary>The state a new playthrough starts from.</summary>
 public sealed record NewGameDefinition
 {
-    public required IReadOnlyList<string> RecruitedMemberIds { get; init; }
-
-    /// <summary>The active party in order; the first is the leader.</summary>
-    public required IReadOnlyList<string> ActiveMemberIds { get; init; }
+    /// <summary>
+    /// The characters the player may choose to lead, in the order the choice lists them. The chosen one starts alone; the
+    /// others join through the story (decision 163).
+    /// </summary>
+    public required IReadOnlyList<LeaderChoice> LeaderChoices { get; init; }
 
     public required IReadOnlyList<InventoryEntry> StartingItems { get; init; }
 

@@ -4,6 +4,7 @@ using Jrpg.Core.Events;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Party;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Data.Content;
@@ -57,7 +58,19 @@ internal static class StartMapScenarios
     public static TimeSpan OneUpdate { get; } = TimeSpan.FromSeconds(1.0 / 60);
 
     public static ExplorationState StartExploring(ContentCatalog catalog) =>
-        GameSession.StartNew(catalog, new SeededRandom(1)).Exploration;
+        GameSession.StartNew(catalog, "sarxian", new SeededRandom(1)).Exploration;
+
+    /// <summary>
+    /// A new game led by Sarxian with the other characters recruited into the reserve, as every new game began before
+    /// decision 163: the party the menu tests page through. They join through a save, the only way in until recruiting.
+    /// </summary>
+    public static GameSession StartWithWholeParty(ContentCatalog catalog)
+    {
+        var save = GameSession.StartNew(catalog, "sarxian", new SeededRandom(1)).Capture(DateTimeOffset.UnixEpoch);
+        string[] recruitIds = ["jazog", "teelle", "zaruk", "zanyr", "thaali", "kamilia"];
+        var recruits = recruitIds.Select(id => PartyMember.Recruit(catalog.PartyMembers[id], catalog.Skills).CaptureProgress());
+        return GameSession.Restore(save with { Members = [.. save.Members, .. recruits] }, catalog, new SeededRandom(1));
+    }
 
     public static ExplorationScene SceneOf(ExplorationState exploration, ContentCatalog catalog) =>
         new(

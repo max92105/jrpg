@@ -21,7 +21,7 @@ public sealed class GameSessionBattleTests
     [Fact]
     public void StartPendingBattle_NoEncounterPending_Throws()
     {
-        var session = GameSession.StartNew(Catalog(), new FixedSequenceRandom());
+        var session = GameSession.StartNew(Catalog(), "sarxian", new FixedSequenceRandom());
 
         Assert.Throws<InvalidOperationException>(session.StartPendingBattle);
     }
@@ -112,7 +112,7 @@ public sealed class GameSessionBattleTests
 
     private static GameSession SessionWithEncounterPending()
     {
-        var session = GameSession.StartNew(Catalog(), new FixedSequenceRandom(_encounterThenSarxianFirst));
+        var session = GameSession.StartNew(Catalog(), "sarxian", new FixedSequenceRandom(_encounterThenSarxianFirst));
         session.Exploration.Walk(MoveIntent.FromAxes(1, 0), TimeSpan.FromSeconds(1.0 / 3));
         session.Exploration.Walk(MoveIntent.FromAxes(1, 0), TimeSpan.FromSeconds(1.0 / 3));
         Assert.NotNull(session.Exploration.PendingEncounter);
@@ -127,8 +127,7 @@ public sealed class GameSessionBattleTests
         .WithEncounters(new EncounterDefinition { Id = "goblin_trio", EnemyIds = ["goblin", "goblin", "goblin"], BackgroundFile = "Forest.png" })
         .WithNewGame(new NewGameDefinition
         {
-            RecruitedMemberIds = ["sarxian"],
-            ActiveMemberIds = ["sarxian"],
+            LeaderChoices = [new LeaderChoice { MemberId = "sarxian" }],
             StartingItems = [],
             StartLocation = new MapLocation("field", new Point2D(0.5, 0.5), Facing.Right),
             FieldSpriteFile = "player.png",

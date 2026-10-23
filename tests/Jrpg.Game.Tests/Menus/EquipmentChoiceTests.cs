@@ -1,6 +1,4 @@
 using Jrpg.Core.Party;
-using Jrpg.Core.Randomness;
-using Jrpg.Core.Session;
 using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Tests.Exploration;
@@ -12,7 +10,7 @@ public sealed class EquipmentChoiceTests
 {
     private static readonly IReadOnlyDictionary<string, Core.Items.ItemDefinition> _items = StartMapScenarios.BelowClosedDoor.Items;
 
-    private readonly PartyState _party = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1)).Party;
+    private readonly PartyState _party = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor).Party;
 
     [Fact]
     public void Update_ConfirmFirstRow_PicksRemove()
@@ -88,7 +86,7 @@ public sealed class EquipmentChoiceTests
     [Fact]
     public void StatPreview_Of_StrongerWeapon_ShowsPositiveAttack()
     {
-        var session = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
+        var session = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);
         var leader = session.Party.Leader;
         session.Equipment.TryEquip(leader, _items["bronze_sword"]);
 
@@ -101,7 +99,7 @@ public sealed class EquipmentChoiceTests
     [Fact]
     public void StatPreview_OfRemoving_WornWeapon_ShowsTheBonusLost()
     {
-        var session = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
+        var session = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);
         var leader = session.Party.Leader;
         session.Equipment.TryEquip(leader, _items["bronze_sword"]);
 

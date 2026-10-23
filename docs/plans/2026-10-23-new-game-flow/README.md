@@ -86,7 +86,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **T2. The defeat screen hides the loads it can't use** (Game, about 80 lines) → [slices/T2.md](slices/T2.md)
 
 ### Phase 2: the flow, end to end
-- [ ] **L1. A new game starts with the chosen leader alone; the party may hold 5** (Core + Data + content, about 300 lines, plus about 50 one-argument call-site edits) → [slices/L1.md](slices/L1.md)
+- [x] **L1. A new game starts with the chosen leader alone; the party may hold 5** (Core + Data + content, about 300 lines, plus about 50 one-argument call-site edits) → [slices/L1.md](slices/L1.md)
 - [ ] **S1. New Game opens the character choice** (Game, about 280 lines) → [slices/S1.md](slices/S1.md)
 - [ ] **S1b. Choosing asks "Begin as X?" first** (Game + content, about 90 lines) → [slices/S1b.md](slices/S1b.md)
 - [ ] **ADR 0016: Intro cinematics** (before K1) → [slices/ADR-0016.md](slices/ADR-0016.md)

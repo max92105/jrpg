@@ -1,5 +1,4 @@
 using Jrpg.Core.Party;
-using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
@@ -13,7 +12,7 @@ namespace Jrpg.Game.Tests.Menus;
 [Collection(RepositoryScreenText.CollectionName)]
 public sealed class EquipmentPageTests
 {
-    private readonly GameSession _session = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
+    private readonly GameSession _session = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);
 
     [Fact]
     public void Update_NextMemberOnLastMember_WrapsToFirst()

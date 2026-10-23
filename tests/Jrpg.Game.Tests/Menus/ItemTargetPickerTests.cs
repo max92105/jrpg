@@ -1,7 +1,5 @@
 using Jrpg.Core.Effects;
 using Jrpg.Core.Party;
-using Jrpg.Core.Randomness;
-using Jrpg.Core.Session;
 using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Tests.Exploration;
@@ -12,7 +10,7 @@ namespace Jrpg.Game.Tests.Menus;
 public sealed class ItemTargetPickerTests
 {
     private readonly IReadOnlyList<PartyMember> _members =
-        GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1)).Party.Members;
+        StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor).Party.Members;
 
     [Fact]
     public void Update_ConfirmOnTakesAllChoice_GivesEveryCandidate()

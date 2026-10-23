@@ -28,15 +28,25 @@ public sealed class GameSessionTests
             new PartyMemberBuilder().WithId("teelle").BuildDefinition());
 
     [Fact]
-    public void StartNew_ActiveMembers_FollowDefinitionOrder()
+    public void StartNew_ChosenLeader_LeadsAlone()
     {
-        var catalog = _catalog.WithNewGame(NewGame(recruited: ["sarxian", "jazog", "teelle"], active: ["teelle", "sarxian"])).Build();
+        var catalog = _catalog.WithNewGame(NewGame()).Build();
 
-        var session = GameSession.StartNew(catalog, new SeededRandom(0));
+        var session = GameSession.StartNew(catalog, "jazog", new SeededRandom(0));
 
-        Assert.Equal(["teelle", "sarxian"], session.Party.ActiveMembers.Select(member => member.Id));
-        Assert.Equal("teelle", session.Party.Leader.Id);
-        Assert.Equal(["sarxian", "jazog", "teelle"], session.Party.Members.Select(member => member.Id));
+        Assert.Equal("jazog", session.Party.Leader.Id);
+        Assert.Equal(["jazog"], session.Party.Members.Select(member => member.Id));
+        Assert.Equal(["jazog"], session.Party.ActiveMembers.Select(member => member.Id));
+    }
+
+    [Fact]
+    public void StartNew_LeaderNotAmongChoices_Throws()
+    {
+        var catalog = _catalog.WithNewGame(NewGame() with { LeaderChoices = [Choice("sarxian")] }).Build();
+
+        var exception = Assert.Throws<ArgumentException>(() => GameSession.StartNew(catalog, "teelle", new SeededRandom(0)));
+
+        Assert.Contains("'teelle'", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -46,10 +56,10 @@ public sealed class GameSessionTests
         var bomb = new ItemDefinitionBuilder().WithId("bomb").Build();
         var catalog = _catalog
             .WithItems(potion, bomb)
-            .WithNewGame(NewGame(recruited: ["sarxian"], active: ["sarxian"], new InventoryEntry("potion", 5), new InventoryEntry("bomb", 3)))
+            .WithNewGame(NewGame(new InventoryEntry("potion", 5), new InventoryEntry("bomb", 3)))
             .Build();
 
-        var session = GameSession.StartNew(catalog, new SeededRandom(0));
+        var session = GameSession.StartNew(catalog, "sarxian", new SeededRandom(0));
 
         Assert.Equal([new InventoryEntry("potion", 5), new InventoryEntry("bomb", 3)], session.Inventory.Entries);
     }
@@ -57,9 +67,9 @@ public sealed class GameSessionTests
     [Fact]
     public void StartNew_MemberWithSkillIds_KnowsTheResolvedSkills()
     {
-        var catalog = _catalog.WithNewGame(NewGame(recruited: ["sarxian"], active: ["sarxian"])).Build();
+        var catalog = _catalog.WithNewGame(NewGame()).Build();
 
-        var session = GameSession.StartNew(catalog, new SeededRandom(0));
+        var session = GameSession.StartNew(catalog, "sarxian", new SeededRandom(0));
 
         Assert.Equal([_heal], session.Party.Leader.Skills);
     }
@@ -70,9 +80,9 @@ public sealed class GameSessionTests
         var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5, "warrior").Build();
         var catalog = _catalog
             .WithItems(sword)
-            .WithNewGame(NewGame(recruited: ["sarxian"], active: ["sarxian"], new InventoryEntry("bronze_sword", 1)))
+            .WithNewGame(NewGame(new InventoryEntry("bronze_sword", 1)))
             .Build();
-        var session = GameSession.StartNew(catalog, new SeededRandom(0));
+        var session = GameSession.StartNew(catalog, "sarxian", new SeededRandom(0));
 
         var equipped = session.Equipment.TryEquip(session.Party.Leader, sword);
 
@@ -80,6 +90,8 @@ public sealed class GameSessionTests
         Assert.Equal(0, session.Inventory.QuantityOf(sword.Id));
     }
 
-    private static NewGameDefinition NewGame(string[] recruited, string[] active, params InventoryEntry[] items) =>
-        new() { RecruitedMemberIds = recruited, ActiveMemberIds = active, StartingItems = items, StartLocation = ContentCatalogBuilder.DefaultStart, FieldSpriteFile = "player.png" };
+    private static NewGameDefinition NewGame(params InventoryEntry[] items) =>
+        new() { LeaderChoices = [Choice("sarxian"), Choice("jazog"), Choice("teelle")], StartingItems = items, StartLocation = ContentCatalogBuilder.DefaultStart, FieldSpriteFile = "player.png" };
+
+    private static LeaderChoice Choice(string memberId) => new() { MemberId = memberId };
 }

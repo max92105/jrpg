@@ -101,7 +101,7 @@ public sealed class TitleSceneTests : IDisposable
 
     private void SaveWithPlayTime(int slot, TimeSpan playTime)
     {
-        var session = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
+        var session = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, "sarxian", new SeededRandom(1));
         session.AddPlayTime(playTime);
         _slots.Write(slot, session);
     }

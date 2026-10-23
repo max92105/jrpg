@@ -21,7 +21,7 @@ internal sealed class ContentCatalogBuilder
     /// </summary>
     public static readonly MapLocation DefaultStart = new("test_map", new Point2D(0.5, 0.5), Facing.Down);
 
-    private NewGameDefinition _newGame = new() { RecruitedMemberIds = [], ActiveMemberIds = [], StartingItems = [], StartLocation = DefaultStart, FieldSpriteFile = "player.png" };
+    private NewGameDefinition _newGame = new() { LeaderChoices = [], StartingItems = [], StartLocation = DefaultStart, FieldSpriteFile = "player.png" };
     private TileDefinition[] _tiles = [TestTiles.Walkable(1)];
     private ObjectDefinition[] _objects = [];
     private MapLayout[] _maps = [new MapLayoutBuilder().WithLayer("1").Build()];
@@ -87,6 +87,13 @@ internal sealed class ContentCatalogBuilder
     public ContentCatalogBuilder WithNewGame(NewGameDefinition newGame)
     {
         _newGame = newGame;
+        return this;
+    }
+
+    /// <summary>Makes <paramref name="memberId"/> the new game's only leader choice, so <c>StartNew</c> can start led by them.</summary>
+    public ContentCatalogBuilder WithLeader(string memberId)
+    {
+        _newGame = _newGame with { LeaderChoices = [new LeaderChoice { MemberId = memberId }] };
         return this;
     }
 

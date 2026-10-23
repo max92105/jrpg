@@ -1,6 +1,12 @@
 {
-  "recruitedMemberIds": ["sarxian", "jazog", "teelle", "zaruk", "zanyr", "thaali", "kamilia"],
-  "activeMemberIds": ["sarxian"],
+  "leaderChoices": [
+    { "memberId": "sarxian" },
+    { "memberId": "jazog" },
+    { "memberId": "teelle" },
+    { "memberId": "zaruk" },
+    { "memberId": "zanyr" },
+    { "memberId": "thaali" }
+  ],
   "startingItems": [
     { "itemId": "potion", "quantity": 5 },
     { "itemId": "hi_potion", "quantity": 2 },

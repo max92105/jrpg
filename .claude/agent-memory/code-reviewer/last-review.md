@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-new-game-flow/slices/T2.md, slice T2 (defeat screen hides the loads it can't use)
+Slice: docs/plans/2026-10-23-new-game-flow/slices/L1.md, slice L1 (new game starts with the chosen leader alone; party of 5)
 Round: 1 (verdict: Ready to commit)
 
-- No findings.
+- Follow-up: StartMapScenarios.StartWithWholeParty hardcodes "kamilia"; C2 must drop her there (open, outside slice).

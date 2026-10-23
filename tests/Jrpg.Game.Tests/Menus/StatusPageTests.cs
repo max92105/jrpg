@@ -1,5 +1,4 @@
 using Jrpg.Core.Progression;
-using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
@@ -121,7 +120,7 @@ public sealed class StatusPageTests
         Assert.Equal((1, 1), progress);
     }
 
-    private static GameSession NewSession() => GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
+    private static GameSession NewSession() => StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);
 
     private static StatusPage NewPage(GameSession session) =>
         new(RepositoryScreenText.Text, new UiTextures(), session, StartMapScenarios.BelowClosedDoor);

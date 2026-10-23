@@ -46,7 +46,7 @@ public sealed class LoadPageTests : IDisposable
     [Fact]
     public void Update_ConfirmSavedSlot_RequestsLoadingIt()
     {
-        var session = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
+        var session = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, "sarxian", new SeededRandom(1));
         session.AddPlayTime(TimeSpan.FromMinutes(12));
         _slots.Write(2, session);
         var page = NewPage();
@@ -62,7 +62,7 @@ public sealed class LoadPageTests : IDisposable
     [Fact]
     public void Update_FileDamagedSinceTheListOpened_RequestsNothingAndShowsItDamaged()
     {
-        _slots.Write(1, GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1)));
+        _slots.Write(1, GameSession.StartNew(StartMapScenarios.BelowClosedDoor, "sarxian", new SeededRandom(1)));
         var page = NewPage();
         page.Open();
         File.WriteAllText(Path.Combine(_directory, "slot_01.json"), "{ not json");

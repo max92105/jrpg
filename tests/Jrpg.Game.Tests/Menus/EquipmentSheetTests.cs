@@ -1,6 +1,5 @@
 using System.Globalization;
 using Jrpg.Core.Items;
-using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Tests.Exploration;
@@ -10,7 +9,7 @@ namespace Jrpg.Game.Tests.Menus;
 /// <summary>On the repository's new game: the leader, a warrior, starts wearing nothing, with bronze swords in the bag.</summary>
 public sealed class EquipmentSheetTests
 {
-    private readonly GameSession _session = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
+    private readonly GameSession _session = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);
 
     [Fact]
     public void Of_WearingBronzeSword_PutsItInTheWeaponSlot()

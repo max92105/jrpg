@@ -48,14 +48,21 @@ public sealed class GameSession
     /// <summary>Everything since the playthrough began, menus, battles and pause included (developer decision 35).</summary>
     public TimeSpan PlayTime { get; private set; }
 
-    /// <summary>Starts a playthrough. The catalog is assumed validated by Data.</summary>
+    /// <summary>Starts a playthrough led by the chosen character, alone in the party (decision 163).</summary>
     /// <param name="catalog">Validated content; the new game starts from its <see cref="ContentCatalog.NewGame"/>.</param>
+    /// <param name="leaderId">The member chosen to lead; one of the new game's leader choices.</param>
     /// <param name="random">The seeded source for everything random in the playthrough, such as battle rolls.</param>
-    public static GameSession StartNew(ContentCatalog catalog, IRandom random)
+    /// <exception cref="ArgumentException">No leader choice has <paramref name="leaderId"/>.</exception>
+    public static GameSession StartNew(ContentCatalog catalog, string leaderId, IRandom random)
     {
         var newGame = catalog.NewGame;
-        var members = newGame.RecruitedMemberIds.Select(id => PartyMember.Recruit(catalog.PartyMembers[id], catalog.Skills)).ToList();
-        var party = new PartyState(members, ActiveOrder(members, newGame.ActiveMemberIds), catalog.Rules.Party);
+        if (!newGame.LeaderChoices.Any(choice => choice.MemberId == leaderId))
+        {
+            throw new ArgumentException($"'{leaderId}' isn't one of the new game's leader choices.", nameof(leaderId));
+        }
+
+        var leader = PartyMember.Recruit(catalog.PartyMembers[leaderId], catalog.Skills);
+        var party = new PartyState([leader], [leader], catalog.Rules.Party);
         var inventory = InventoryHolding(newGame.StartingItems, catalog);
         return new GameSession(party, new ExplorationContext(catalog, inventory, new WorldState(), random), newGame.StartLocation);
     }

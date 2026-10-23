@@ -1,5 +1,5 @@
 {
-  "party": { "maxActiveMembers": 4 },
+  "party": { "maxActiveMembers": 5 },
   "exploration": { "walkSpeed": 3.0, "playerRadius": 0.1, "interactReach": 0.6 },
   "experience": {
     "experienceToNextLevel": [

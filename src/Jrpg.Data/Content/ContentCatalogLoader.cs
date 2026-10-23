@@ -61,7 +61,7 @@ public static class ContentCatalogLoader
         var maps = MapFolderReader.Read(contentRoot, mapContent);
         var mapsById = maps.ToFrozenDictionary(map => map.Id);
         var newGameReferences = new NewGameReferences(
-            members.Select(member => member.Id).ToFrozenSet(), items.ToFrozenDictionary(item => item.Id), rules.Party, mapsById);
+            members.Select(member => member.Id).ToFrozenSet(), items.ToFrozenDictionary(item => item.Id), mapsById);
         var newGame = ReadValidated<NewGameDefinition>(
             contentRoot, NewGameFile, (file, definition) => NewGameValidator.Validate(file, definition, newGameReferences));
 

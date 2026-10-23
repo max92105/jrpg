@@ -1,6 +1,4 @@
 using Jrpg.Core.Party;
-using Jrpg.Core.Randomness;
-using Jrpg.Core.Session;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Tests.Exploration;
 
@@ -9,7 +7,7 @@ namespace Jrpg.Game.Tests.Menus;
 /// <summary>On the repository's new game: Sarxian leads alone, six recruits wait in the reserve, and four can be active.</summary>
 public sealed class PartyCursorTests
 {
-    private readonly PartyState _party = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1)).Party;
+    private readonly PartyState _party = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor).Party;
 
     [Fact]
     public void MoveInColumn_DownOnLastCard_WrapsToFirst()

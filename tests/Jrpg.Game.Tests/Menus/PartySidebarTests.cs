@@ -1,6 +1,4 @@
 using Jrpg.Core.Party;
-using Jrpg.Core.Randomness;
-using Jrpg.Core.Session;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Tests.Exploration;
 
@@ -8,7 +6,7 @@ namespace Jrpg.Game.Tests.Menus;
 
 public sealed class PartySidebarTests
 {
-    private readonly PartyState _party = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1)).Party;
+    private readonly PartyState _party = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor).Party;
 
     [Fact]
     public void Cards_ActiveMembers_InPartyOrder()

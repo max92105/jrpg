@@ -103,7 +103,7 @@ public sealed class SystemPageTests
         {
             var catalog = StartMapScenarios.BelowClosedDoor;
             var slots = new SaveSlots(new FileSaveStore(directory, catalog), catalog, () => DateTimeOffset.UnixEpoch);
-            var session = GameSession.StartNew(catalog, new SeededRandom(1));
+            var session = GameSession.StartNew(catalog, "sarxian", new SeededRandom(1));
             slots.Write(1, session);
             var ui = new UiTextures();
             var text = RepositoryScreenText.Text;
@@ -127,7 +127,7 @@ public sealed class SystemPageTests
     private static SystemPage NewPage()
     {
         var ui = new UiTextures();
-        var session = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
+        var session = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, "sarxian", new SeededRandom(1));
         return TestSystemPages.Create(session, ui);
     }
 }

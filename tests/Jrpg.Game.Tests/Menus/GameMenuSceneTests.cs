@@ -1,4 +1,3 @@
-using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
@@ -218,5 +217,5 @@ public sealed class GameMenuSceneTests
         return new(new MenuHeader(RepositoryScreenText.Text, session), sidebar, new PartySidebarView(sidebar, cards, RepositoryScreenText.Text, ui));
     }
 
-    private static GameSession NewSession() => GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
+    private static GameSession NewSession() => StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);
 }

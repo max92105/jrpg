@@ -12,13 +12,13 @@ internal sealed class SessionTransitions(ContentCatalog catalog, SceneStack scen
 {
     /// <summary>
     /// Starts a new game on its own seed, taken from the clock and written to the debug output so a run can be replayed
-    /// (ADR 0008). Its map replaces every scene on show.
+    /// (ADR 0008). Its map replaces every scene on show. Until the leader choice screen exists, the first choice leads.
     /// </summary>
     public GameSession StartNewGame()
     {
         var seed = Environment.TickCount;
         Debug.WriteLine($"New game seed: {seed}");
-        var session = GameSession.StartNew(catalog, new SeededRandom(seed));
+        var session = GameSession.StartNew(catalog, catalog.NewGame.LeaderChoices[0].MemberId, new SeededRandom(seed));
         scenes.ReplaceAll(factory.CreateExploration(session.Exploration));
         return session;
     }

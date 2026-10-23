@@ -4,6 +4,7 @@ using Jrpg.Core.Session;
 using Jrpg.Data.Content;
 using Jrpg.Data.Saving;
 using Jrpg.Game.Saving;
+using Jrpg.Game.Tests.Exploration;
 
 namespace Jrpg.Game.Tests.Saving;
 
@@ -46,7 +47,7 @@ public sealed class SaveSlotsTests : IDisposable
     [Fact]
     public void Write_ThenReadAll_SlotShowsMapNameAndPlayTime()
     {
-        var session = GameSession.StartNew(_catalog, new SeededRandom(1));
+        var session = StartMapScenarios.StartWithWholeParty(_catalog);
         session.AddPlayTime(TimeSpan.FromMinutes(75));
         session.Party.TryAddToActive(session.Party.MemberById("teelle"));
 
@@ -75,7 +76,7 @@ public sealed class SaveSlotsTests : IDisposable
     [Fact]
     public void ReadAll_FileHeldOpenElsewhere_GivesDamagedEntryForItOnly()
     {
-        _slots.Write(4, GameSession.StartNew(_catalog, new SeededRandom(1)));
+        _slots.Write(4, GameSession.StartNew(_catalog, "sarxian", new SeededRandom(1)));
         using var lockedByAnotherProgram = new FileStream(Path.Combine(_directory, "slot_04.json"), FileMode.Open, FileAccess.Read, FileShare.None);
 
         var entries = _slots.ReadAll();
@@ -87,7 +88,7 @@ public sealed class SaveSlotsTests : IDisposable
     [Fact]
     public void Load_SavedSlot_GivesTheSave()
     {
-        var session = GameSession.StartNew(_catalog, new SeededRandom(1));
+        var session = GameSession.StartNew(_catalog, "sarxian", new SeededRandom(1));
         session.AddPlayTime(TimeSpan.FromMinutes(3));
         _slots.Write(7, session);
 
@@ -111,7 +112,7 @@ public sealed class SaveSlotsTests : IDisposable
     [Fact]
     public void MostRecent_PicksLatestSavedAt()
     {
-        var session = GameSession.StartNew(_catalog, new SeededRandom(1));
+        var session = GameSession.StartNew(_catalog, "sarxian", new SeededRandom(1));
         _slots.Write(2, session);
         var later = new SaveSlots(new FileSaveStore(_directory, _catalog), _catalog, () => _now.AddDays(1));
         later.Write(9, session);

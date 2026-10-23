@@ -20,7 +20,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Folder | Purpose | Key types |
 |---|---|---|
 | Battle | One battle: turn order, commands, events, enemy AI, rewards | `BattleState`, `BattleCommand`, `BattleEvent`, `TurnOrder`, `EnemyTactics`, `VictoryRewards` |
-| Content | The loaded catalog and global rules | `ContentCatalog`, `GameRules`, `NewGameDefinition` |
+| Content | The loaded catalog and global rules | `ContentCatalog`, `GameRules`, `NewGameDefinition`, `LeaderChoice` |
 | Dialogue | What a speaker says | `Speech` |
 | Effects | What skills and items do, targeting, damage formula | `Effect`, `EffectResolver`, `Targeting`, `TargetChoice`, `DamageFormula` |
 | Events | Map event definitions and their steps | `MapEvent`, `EventStep` (+ `DialogueStep`, `GiveItemStep`, `SwapObjectStep`, `WarpStep`) |

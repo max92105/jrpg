@@ -68,14 +68,14 @@ public sealed class SaveGameRepairTests
     [Fact]
     public void Repair_TooManyActiveMembers_MovesExtraToReserve()
     {
-        string[] ids = ["sarxian", "jazog", "teelle", "zaruk", "zanyr"];
+        string[] ids = ["sarxian", "jazog", "teelle", "zaruk", "zanyr", "thaali"];
         var members = ids.Select(id => _jazog with { Id = id, ArmorId = null }).ToList();
 
         var repaired = Repair(_save with { Members = members, ActiveMemberIds = ids });
 
-        Assert.Equal(ids.Take(4), repaired.Save.ActiveMemberIds);
-        Assert.Equal(5, repaired.Save.Members.Count);
-        Assert.Contains("moved 'zanyr' to the reserve; the active party holds 4.", repaired.Changes);
+        Assert.Equal(ids.Take(5), repaired.Save.ActiveMemberIds);
+        Assert.Equal(6, repaired.Save.Members.Count);
+        Assert.Contains("moved 'thaali' to the reserve; the active party holds 5.", repaired.Changes);
     }
 
     [Fact]

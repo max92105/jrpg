@@ -5,6 +5,7 @@ using Jrpg.Core.Exploration;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
 using Jrpg.Core.Session;
 using Jrpg.Core.Tests.Builders;
@@ -64,7 +65,7 @@ public sealed class GameSessionSaveTests
     [Fact]
     public void CaptureThenRestore_ActiveOrderFollowsSavedIds()
     {
-        var session = StartNew();
+        var session = StartWithRecruits("jazog", "teelle");
         session.Party.TryAddToActive(session.Party.MemberById("teelle"));
         session.Party.TryAddToActive(session.Party.MemberById("jazog"));
 
@@ -152,7 +153,7 @@ public sealed class GameSessionSaveTests
     public void Capture_WhileEncounterPending_Throws()
     {
         var session = GameSession.StartNew(
-            Catalog(new MapLocation("field", new Point2D(0.5, 0.5), Facing.Right)), new FixedSequenceRandom(0, 0));
+            Catalog(new MapLocation("field", new Point2D(0.5, 0.5), Facing.Right)), "sarxian", new FixedSequenceRandom(0, 0));
         session.Exploration.Walk(MoveIntent.FromAxes(1, 0), TimeSpan.FromSeconds(1.0 / 3));
         session.Exploration.Walk(MoveIntent.FromAxes(1, 0), TimeSpan.FromSeconds(1.0 / 3));
         Assert.NotNull(session.Exploration.PendingEncounter);
@@ -160,7 +161,16 @@ public sealed class GameSessionSaveTests
         Assert.Throws<InvalidOperationException>(() => session.Capture(_savedAt));
     }
 
-    private static GameSession StartNew() => GameSession.StartNew(Catalog(_belowChest), new FixedSequenceRandom());
+    private static GameSession StartNew() => GameSession.StartNew(Catalog(_belowChest), "sarxian", new FixedSequenceRandom());
+
+    // Recruiting happens only through a save for now: the new game starts with its leader alone (decision 163).
+    private static GameSession StartWithRecruits(params string[] memberIds)
+    {
+        var catalog = Catalog(_belowChest);
+        var save = StartNew().Capture(_savedAt);
+        var recruits = memberIds.Select(id => PartyMember.Recruit(catalog.PartyMembers[id], catalog.Skills).CaptureProgress());
+        return GameSession.Restore(save with { Members = [.. save.Members, .. recruits] }, catalog, new FixedSequenceRandom());
+    }
 
     private static GameSession SaveAndRestore(GameSession session) =>
         GameSession.Restore(session.Capture(_savedAt), Catalog(_belowChest), new FixedSequenceRandom());
@@ -175,8 +185,7 @@ public sealed class GameSessionSaveTests
         var field = new MapLayoutBuilder().WithLayer("1111").Build() with { Id = "field" };
         var newGame = new NewGameDefinition
         {
-            RecruitedMemberIds = ["sarxian", "jazog", "teelle"],
-            ActiveMemberIds = ["sarxian"],
+            LeaderChoices = [new LeaderChoice { MemberId = "sarxian" }],
             StartingItems = [new InventoryEntry("potion", 3), new InventoryEntry("bronze_sword", 1), new InventoryEntry("chain_mail", 1)],
             StartLocation = start,
             FieldSpriteFile = "player.png",

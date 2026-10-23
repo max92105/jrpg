@@ -1,5 +1,4 @@
 using Jrpg.Core.Party;
-using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
@@ -14,7 +13,7 @@ namespace Jrpg.Game.Tests.Menus;
 [Collection(RepositoryScreenText.CollectionName)]
 public sealed class PartyPageTests
 {
-    private readonly GameSession _session = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
+    private readonly GameSession _session = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);
 
     [Fact]
     public void Update_ConfirmReserveMember_AddsToParty()
@@ -33,11 +32,11 @@ public sealed class PartyPageTests
     {
         var page = NewPage();
         page.Update(Pressing(GameButton.Right));
-        AddSelectedReserveMembers(page, count: 3);
+        AddSelectedReserveMembers(page, count: 4);
 
         page.Update(Pressing(GameButton.Confirm));
 
-        Assert.Equal(4, _session.Party.ActiveMembers.Count);
+        Assert.Equal(5, _session.Party.ActiveMembers.Count);
         Assert.Equal("The party is full.", page.Notice);
     }
 

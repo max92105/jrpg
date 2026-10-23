@@ -35,7 +35,7 @@ public sealed class ContentWriter(string contentRoot)
 
         // The new game starts on a map, so changing that map can move the start position off it.
         var maps = catalog.Maps.Values.Where(other => other.Id != map.Id).Append(map).ToDictionary(other => other.Id);
-        var newGameReferences = new NewGameReferences(catalog.PartyMembers.Keys.ToHashSet(), catalog.Items, catalog.Rules.Party, maps);
+        var newGameReferences = new NewGameReferences(catalog.PartyMembers.Keys.ToHashSet(), catalog.Items, maps);
         NewGameValidator.Validate(ContentCatalogLoader.NewGameFile, catalog.NewGame, newGameReferences);
 
         WriteAll([PlanWrite(MapFolderReader.LayoutFile(map.Id), map.Layout), PlanWrite(settingsFile, map.Settings)]);

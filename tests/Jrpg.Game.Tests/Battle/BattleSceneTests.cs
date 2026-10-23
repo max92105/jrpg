@@ -165,7 +165,7 @@ public sealed class BattleSceneTests
     // beforeBattle changes the session once the encounter is pending, before the battle starts.
     private static (GameSession Session, BattleScene Scene) StartForestBattleScene(ContentCatalog catalog, Action<GameSession> beforeBattle)
     {
-        var session = GameSession.StartNew(catalog, new SeededRandom(1));
+        var session = GameSession.StartNew(catalog, "sarxian", new SeededRandom(1));
         Assert.True(StartMapScenarios.WalkUntilBattleRequested(StartMapScenarios.SceneOf(session.Exploration, catalog)));
         beforeBattle(session);
         session.StartPendingBattle();

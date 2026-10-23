@@ -134,7 +134,7 @@ public sealed class SavePageTests : IDisposable
         Assert.NotNull(page.Entries[0].Summary);
     }
 
-    private static GameSession NewSession() => GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
+    private static GameSession NewSession() => GameSession.StartNew(StartMapScenarios.BelowClosedDoor, "sarxian", new SeededRandom(1));
 
     private SaveSlots NewSlots()
     {

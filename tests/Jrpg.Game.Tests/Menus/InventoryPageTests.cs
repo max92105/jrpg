@@ -1,4 +1,3 @@
-using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
@@ -319,7 +318,7 @@ public sealed class InventoryPageTests
 
     private static string Hint(string messageId) => RepositoryScreenText.Text.Messages.Text(messageId);
 
-    private static GameSession NewSession() => GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
+    private static GameSession NewSession() => StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);
 
     private static InventoryPage NewPage(GameSession? session = null) =>
         new(RepositoryScreenText.Text, new UiTextures(), session ?? NewSession(), StartMapScenarios.BelowClosedDoor);

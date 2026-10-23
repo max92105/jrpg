@@ -1,6 +1,4 @@
 using Jrpg.Core.Party;
-using Jrpg.Core.Randomness;
-using Jrpg.Core.Session;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Tests.Exploration;
 
@@ -9,7 +7,7 @@ namespace Jrpg.Game.Tests.Menus;
 public sealed class PartyOrderEditTests
 {
     private readonly List<PartyMember> _members =
-        GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1)).Party.Members.Take(4).ToList();
+        StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor).Party.Members.Take(4).ToList();
 
     [Fact]
     public void Swap_TwoMembers_SwapsTheirPlaces()

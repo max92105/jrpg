@@ -9,6 +9,7 @@
   "title_load": "Load Game",
   "title_quit": "Quit",
   "leader_choice_title": "Choose your leader",
+  "leader_choice_confirm": "Begin as {name}?",
   "menu_title": "Menu",
   "menu_inventory": "Inventory",
   "menu_equipment": "Equipment",

@@ -41,7 +41,7 @@ internal sealed class SceneFactory
 
     public TitleScene CreateTitle() => new(_text, _saveSlots, _ui);
 
-    public LeaderChoiceScene CreateLeaderChoice() => new(_text, _catalog);
+    public LeaderChoiceScene CreateLeaderChoice() => new(_text, _ui, _catalog);
 
     /// <param name="session">The playthrough the header reports on.</param>
     public GameMenuScene CreateGameMenu(GameSession session) =>

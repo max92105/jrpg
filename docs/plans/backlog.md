@@ -8,6 +8,7 @@ The code health plan (`done/2026-10-23-code-health`) did the lines it covered; t
 
 These waited at the 2026-10-23 code health review. Do each one with the next change to its file, or when a plan needs it. Each says why it can wait.
 
+- **An open yes/no question is held and drawn the same way in 3 screens** (`SavePage`, `SystemPage`, `NewGame/LeaderChoiceScene`: a `ConfirmPrompt?` field, a `ConfirmPromptView`, drawn while open, cleared when answered). Each copy is a few lines, and what Yes does differs per screen. Pull it into a small shared `Ui` type when a fourth screen needs it. (new-game-flow S1b review)
 - `MainViewModel` (489 lines after E3): the sheet image-size cache (`SheetImageSizes`) and the import status text (`SheetImportResult.Summary`) could leave it.
 - **Centering the hint in a footer is written 3 times** (`GameMenuScene.DrawFooterHint`, `VictoryScreenView.Draw`, `DefeatScreenView.DrawFooter`). It could become `FooterBar.TextTop(height, lineHeight)`. The menu rounds to whole pixels and the outcome screens don't, so merging them moves the menu hint by up to a pixel; do it with the next footer change, checked by screenshot. (U6 review)
 - **`Directory.Build.props`:** merge `src/` and `tests/` into a root file. Decision 144 keeps two files for now; the developer didn't choose to merge. When it happens, use the standard form:

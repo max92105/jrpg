@@ -97,6 +97,7 @@ public sealed class GameFlowTests : IDisposable
         flow.Update(_wholeFade, default);
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        AnswerYes(flow);
 
         flow.Update(_fadeOut, default);
 
@@ -306,11 +307,19 @@ public sealed class GameFlowTests : IDisposable
     }
 
     // New Game is the title's first entry with no save, so Confirm alone picks it; the choice takes input once the fade
-    // is over, and Confirm takes the leader the cursor starts on.
+    // is over, and Confirm takes the leader the cursor starts on, answering Yes to "Begin as X?".
     private static void ConfirmNewGameAndLeader(GameFlow flow)
     {
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_wholeFade, default);
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        AnswerYes(flow);
+    }
+
+    // "Begin as X?" starts on No, so a stray Confirm changes nothing: Left moves to Yes.
+    private static void AnswerYes(GameFlow flow)
+    {
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Left));
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
     }
 

@@ -22,3 +22,8 @@ Part of [the new-game flow plan](../README.md). Design: [design.md](../design.md
     - `Update_CancelInPrompt_ClosesPromptOnly`
     - S1's confirm tests answer Yes.
   - **Verify by hand:** Confirm on Omer asks "Begin as Omer?"; No goes back to the list on Omer; Yes starts the game.
+  - **Done, with deviations:**
+    - The question's Yes and No are switched with Left and Right (`ConfirmPrompt`'s keys, as on the Save page), not Up and Down as the goal said. It starts on No, so a stray Confirm changes nothing. While it is open, the list takes no input (`Update_DownWhileAsking_KeepsTheCursor`).
+    - The scene now takes `UiTextures` for the prompt's panel. The tests and the flow helper answer Yes with Left, then Confirm.
+    - Added beyond the plan: `Update_DownWhileAsking_KeepsTheCursor`. `Update_ConfirmTwice_RequestsLeaderOnce` became `Update_ConfirmAfterYes_RequestsNothingMore`.
+    - Review: the scene keeps only the names it shows, keyed by member id, not the whole member catalog. The third copy of holding an open yes/no question has a backlog line.

@@ -33,6 +33,9 @@ internal static class MessageIds
     /// <summary>The heading of the screen where a new game's leader is chosen.</summary>
     public const string LeaderChoiceTitle = "leader_choice_title";
 
+    /// <summary>Placeholder <c>{name}</c>: asked before a new game starts led by that character.</summary>
+    public const string LeaderChoiceConfirm = "leader_choice_confirm";
+
     /// <summary>The menu header's title while no page is open.</summary>
     public const string MenuTitle = "menu_title";
 

@@ -17,11 +17,11 @@ public sealed class MainViewModelUndoTests : IDisposable
         var blockedId = EditorTestContent.BlockFirstWalkableTile(viewModel);
         EditorTestContent.PaintTopLeft(viewModel);
 
-        viewModel.UndoCommand.Execute(null);
+        viewModel.History!.UndoCommand.Execute(null);
 
         Assert.False(viewModel.CurrentMap!.IsDirty);
         Assert.False(viewModel.Catalog!.Tiles[blockedId].IsWalkable);
-        viewModel.UndoCommand.Execute(null);
+        viewModel.History!.UndoCommand.Execute(null);
         Assert.True(viewModel.Catalog!.Tiles[blockedId].IsWalkable);
         Assert.False(viewModel.HasUnsavedChanges);
     }
@@ -32,14 +32,14 @@ public sealed class MainViewModelUndoTests : IDisposable
         var viewModel = _content.Open(_content.RepositoryContent);
         var blockedId = EditorTestContent.BlockFirstWalkableTile(viewModel);
         EditorTestContent.PaintTopLeft(viewModel);
-        viewModel.UndoCommand.Execute(null);
-        viewModel.UndoCommand.Execute(null);
+        viewModel.History!.UndoCommand.Execute(null);
+        viewModel.History!.UndoCommand.Execute(null);
 
-        viewModel.RedoCommand.Execute(null);
+        viewModel.History!.RedoCommand.Execute(null);
 
         Assert.False(viewModel.Catalog!.Tiles[blockedId].IsWalkable);
         Assert.False(viewModel.CurrentMap!.IsDirty);
-        viewModel.RedoCommand.Execute(null);
+        viewModel.History!.RedoCommand.Execute(null);
         Assert.True(viewModel.CurrentMap.IsDirty);
     }
 
@@ -48,12 +48,12 @@ public sealed class MainViewModelUndoTests : IDisposable
     {
         var viewModel = _content.Open(_content.CopyOfRepositoryContent());
         viewModel.Content!.AddBlockedTile(new SheetCell(viewModel.Catalog!.Tilesheets.Keys.First(), 999, 999));
-        viewModel.UndoCommand.Execute(null);
+        viewModel.History!.UndoCommand.Execute(null);
         _content.ChooseCellNotATile(viewModel);
 
         viewModel.Painting!.PaintRectangle(new GridCell(-5, -5), new GridCell(-4, -4));
 
-        Assert.False(viewModel.RedoCommand.CanExecute(null));
+        Assert.False(viewModel.History!.RedoCommand.CanExecute(null));
     }
 
     [Fact]
@@ -69,11 +69,11 @@ public sealed class MainViewModelUndoTests : IDisposable
         viewModel.SaveCommand.Execute(null);
         viewModel.TryOpenMap(viewModel.MapIds.First(id => id != paintedMapId));
 
-        viewModel.UndoCommand.Execute(null);
+        viewModel.History!.UndoCommand.Execute(null);
 
-        Assert.Equal($"Can't undo: tile {tileId} is used on map {paintedMapId}.", viewModel.UndoRefusal);
+        Assert.Equal($"Can't undo: tile {tileId} is used on map {paintedMapId}.", viewModel.History!.Refusal);
         Assert.NotNull(viewModel.Content.TileAt(cell));
-        Assert.False(viewModel.RedoCommand.CanExecute(null));
+        Assert.False(viewModel.History!.RedoCommand.CanExecute(null));
     }
 
     [Fact]
@@ -87,9 +87,9 @@ public sealed class MainViewModelUndoTests : IDisposable
         browser.SelectCellAt(1, 1);
         var tileId = viewModel.Content!.AddTile(browser.SelectedCell!.Value);
 
-        viewModel.UndoCommand.Execute(null);
+        viewModel.History!.UndoCommand.Execute(null);
 
-        Assert.Equal($"Can't undo: tile {tileId} is cut from sheet grass_3.", viewModel.UndoRefusal);
+        Assert.Equal($"Can't undo: tile {tileId} is cut from sheet grass_3.", viewModel.History!.Refusal);
         Assert.True(viewModel.Catalog!.Tilesheets.ContainsKey("grass_3"));
     }
 
@@ -103,11 +103,11 @@ public sealed class MainViewModelUndoTests : IDisposable
         viewModel.Painting.EndStroke();
         viewModel.SaveCommand.Execute(null);
         viewModel.TryOpenMap(viewModel.MapIds.First(id => id != viewModel.CurrentMap!.Map.Id));
-        viewModel.UndoCommand.Execute(null);
+        viewModel.History!.UndoCommand.Execute(null);
 
         EditorTestContent.BlockFirstWalkableTile(viewModel);
 
-        Assert.Null(viewModel.UndoRefusal);
+        Assert.Null(viewModel.History!.Refusal);
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public sealed class MainViewModelUndoTests : IDisposable
         var blockedId = EditorTestContent.BlockFirstWalkableTile(viewModel);
         viewModel.TryOpenMap(viewModel.MapIds.First(id => id != viewModel.CurrentMap!.Map.Id));
 
-        viewModel.UndoCommand.Execute(null);
+        viewModel.History!.UndoCommand.Execute(null);
 
         Assert.True(viewModel.Catalog!.Tiles[blockedId].IsWalkable);
     }
@@ -136,9 +136,9 @@ public sealed class MainViewModelUndoTests : IDisposable
         viewModel.SaveCommand.Execute(null);
         viewModel.TryOpenMap(viewModel.MapIds.First(id => id != placedOn));
 
-        viewModel.UndoCommand.Execute(null);
+        viewModel.History!.UndoCommand.Execute(null);
 
-        Assert.Equal($"Can't undo: object tree_4 is placed on map {placedOn}.", viewModel.UndoRefusal);
+        Assert.Equal($"Can't undo: object tree_4 is placed on map {placedOn}.", viewModel.History!.Refusal);
         Assert.True(viewModel.Catalog!.Objects.ContainsKey("tree_4"));
     }
 }

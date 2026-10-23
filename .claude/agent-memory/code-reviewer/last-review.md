@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-code-health/slices/E1a.md, slice E1a (MainViewModelTests split: EditorTestContent, MainViewModelSaveTests, MainViewModelUndoTests)
+Slice: docs/plans/2026-10-23-code-health/slices/E2.md, slice E2 (CombinedHistory: undo routing out of MainViewModel)
 Round: 1 (verdict: Ready to commit)
 
-- No findings. All 50 test bodies verified identical to HEAD after reversing the `_content.`/`EditorTestContent.` prefixes (sed + awk per-method diff); the 7 helpers identical apart from private->public and two added param docs.
+- No findings. Moved members verified identical apart from Content!/CurrentMap -> _catalog/_openMap and UndoRefusal -> Refusal; subscription order in the ctor and in OnCurrentMapChanged preserved; no leftover string bindings to UndoCommand/RedoCommand/UndoRefusal in XAML.

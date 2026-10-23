@@ -52,8 +52,8 @@
     <CommandBinding Command="Help" Executed="OnControlsHelpExecuted" />
   </Window.CommandBindings>
   <Window.InputBindings>
-    <KeyBinding Key="Z" Modifiers="Control" Command="{Binding UndoCommand}" />
-    <KeyBinding Key="Y" Modifiers="Control" Command="{Binding RedoCommand}" />
+    <KeyBinding Key="Z" Modifiers="Control" Command="{Binding History.UndoCommand}" />
+    <KeyBinding Key="Y" Modifiers="Control" Command="{Binding History.RedoCommand}" />
     <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}" />
     <KeyBinding Key="H" Modifiers="Control" Command="{Binding ToggleCollisionCommand}" />
   </Window.InputBindings>
@@ -67,8 +67,8 @@
         <MenuItem Header="Exit" Click="OnExitClicked" />
       </MenuItem>
       <MenuItem Header="Edit">
-        <MenuItem Header="Undo" Command="{Binding UndoCommand}" InputGestureText="Ctrl+Z" />
-        <MenuItem Header="Redo" Command="{Binding RedoCommand}" InputGestureText="Ctrl+Y" />
+        <MenuItem Header="Undo" Command="{Binding History.UndoCommand}" InputGestureText="Ctrl+Z" />
+        <MenuItem Header="Redo" Command="{Binding History.RedoCommand}" InputGestureText="Ctrl+Y" />
         <MenuItem Header="Delete selected objects" Command="{Binding Placing.DeleteSelectedObjectsCommand}" InputGestureText="Del" />
       </MenuItem>
       <MenuItem Header="View">
@@ -109,8 +109,8 @@
     <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
       <ToolBar Band="0" BandIndex="0">
         <Button Content="Save (Ctrl+S)" Command="{Binding SaveCommand}" />
-        <Button Content="Undo (Ctrl+Z)" Command="{Binding UndoCommand}" />
-        <Button Content="Redo (Ctrl+Y)" Command="{Binding RedoCommand}" />
+        <Button Content="Undo (Ctrl+Z)" Command="{Binding History.UndoCommand}" />
+        <Button Content="Redo (Ctrl+Y)" Command="{Binding History.RedoCommand}" />
         <Separator />
         <CheckBox Content="Grid" IsChecked="{Binding IsGridShown}" />
         <CheckBox Content="Collision" IsChecked="{Binding IsCollisionShown}" ToolTip="Show what blocks the player (Ctrl+H)" />
@@ -157,7 +157,7 @@
     </ToolBarTray>
     <StatusBar DockPanel.Dock="Bottom">
       <StatusBarItem Content="{Binding CursorStatus}" />
-      <StatusBarItem Content="{Binding UndoRefusal}" Foreground="{StaticResource ProblemTextBrush}" />
+      <StatusBarItem Content="{Binding History.Refusal}" Foreground="{StaticResource ProblemTextBrush}" />
       <StatusBarItem Content="{Binding ImportStatus}" />
       <StatusBarItem Content="Unsaved changes"
                      Visibility="{Binding HasUnsavedChanges, Converter={StaticResource VisibleWhenTrue}}" />

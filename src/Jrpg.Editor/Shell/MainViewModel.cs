@@ -27,7 +27,6 @@ internal sealed partial class MainViewModel : ObservableObject
     private readonly ContentWriter _writer;
     private readonly Func<string, bool> _confirm;
     private readonly Dictionary<string, (int Width, int Height)> _sheetImageSizes = new(StringComparer.OrdinalIgnoreCase);
-    private readonly UndoJournal _journal = new();
 
     /// <param name="contentRoot">The content folder to edit.</param>
     /// <param name="confirm">Asks the user a yes or no question, such as whether to drop unsaved changes; true for yes.</param>
@@ -69,12 +68,7 @@ internal sealed partial class MainViewModel : ObservableObject
                 }
             };
             Content.PropertyChanged += OnContentChanged;
-            Content.StepRecorded += (_, _) => RecordStep(UndoTarget.Catalogs);
-            Content.RedoDropped += (_, _) =>
-            {
-                _journal.ForgetUndoneCatalogSteps();
-                NotifyUndoRedoChanged();
-            };
+            History = new CombinedHistory(Content);
             Placing = new ObjectPlacingViewModel(Content, Layer);
             EventEditing = new EventEditingViewModel(Content) { MapIds = MapIds };
             if (MapIds.Count > 0)
@@ -110,6 +104,9 @@ internal sealed partial class MainViewModel : ObservableObject
     /// <summary>The layer tiles are painted and objects placed on.</summary>
     public LayerChoiceViewModel Layer { get; } = new();
 
+    /// <summary>Undo and Redo over the open map and the catalogs; null when the content or its art didn't load.</summary>
+    public CombinedHistory? History { get; }
+
     /// <summary>Null when the content or its art didn't load.</summary>
     public TilePaintingViewModel? Painting { get; }
 
@@ -136,10 +133,6 @@ internal sealed partial class MainViewModel : ObservableObject
     /// <summary>Whether blocked cells, collision outlines and above-player zones are drawn over the map; off by default.</summary>
     [ObservableProperty]
     public partial bool IsCollisionShown { get; set; }
-
-    /// <summary>Why the last undo was refused: a tile it would remove is still in use; null after any other undo, redo or edit.</summary>
-    [ObservableProperty]
-    public partial string? UndoRefusal { get; private set; }
 
     /// <summary>What the last import copied and refused ("Imported Forest2.png"); empty before any import.</summary>
     [ObservableProperty]
@@ -307,108 +300,6 @@ internal sealed partial class MainViewModel : ObservableObject
         return true;
     }
 
-    /// <summary>Undoes the newest step, whether it went to the open map or to the catalogs (decision 117).</summary>
-    [RelayCommand(CanExecute = nameof(CanUndo))]
-    private void Undo()
-    {
-        // A stroke still being dragged is the newest step.
-        CurrentMap?.EndStroke();
-        if (!_journal.CanUndo)
-        {
-            return;
-        }
-
-        UndoRefusal = _journal.NextUndo == UndoTarget.Catalogs ? RefusalOfCatalogUndo() : null;
-        if (UndoRefusal is not null)
-        {
-            return;
-        }
-
-        if (_journal.Undo() == UndoTarget.Map)
-        {
-            CurrentMap!.UndoCommand.Execute(null);
-        }
-        else
-        {
-            Content!.Undo();
-        }
-
-        NotifyUndoRedoChanged();
-    }
-
-    [RelayCommand(CanExecute = nameof(CanRedo))]
-    private void Redo()
-    {
-        CurrentMap?.EndStroke();
-        if (!_journal.CanRedo)
-        {
-            return;
-        }
-
-        UndoRefusal = null;
-
-        if (_journal.Redo() == UndoTarget.Map)
-        {
-            CurrentMap!.RedoCommand.Execute(null);
-        }
-        else
-        {
-            Content!.Redo();
-        }
-
-        NotifyUndoRedoChanged();
-    }
-
-    // The first tile the undo would remove that something still uses, named with its first user (decision 117); or the
-    // first tile cut from a sheet it would remove; or the first map placing an object it would remove.
-    private string? RefusalOfCatalogUndo()
-    {
-        foreach (var objectId in Content!.ObjectsRemovedByUndo())
-        {
-            if (CatalogUsage.UsersOfObject(Content.Current, objectId, CurrentMap?.Map.Layout) is [var map, ..])
-            {
-                return $"Can't undo: object {objectId} is placed on {map}.";
-            }
-        }
-
-        foreach (var sheetId in Content.SheetsRemovedByUndo())
-        {
-            if (CatalogUsage.TilesCutFrom(sheetId, Content.Current) is [var cutTileId, ..])
-            {
-                return $"Can't undo: tile {cutTileId} is cut from sheet {sheetId}.";
-            }
-        }
-
-        foreach (var tileId in Content.TilesRemovedByUndo())
-        {
-            if (CatalogUsage.UsersOfTile(tileId, Content.Current, CurrentMap?.Map.Layout) is [var user, ..])
-            {
-                return $"Can't undo: tile {tileId} is used on {user}.";
-            }
-        }
-
-        return null;
-    }
-
-    private bool CanUndo() => _journal.CanUndo;
-
-    private bool CanRedo() => _journal.CanRedo;
-
-    private void OnMapStepRecorded(object? sender, EventArgs e) => RecordStep(UndoTarget.Map);
-
-    private void RecordStep(UndoTarget step)
-    {
-        UndoRefusal = null;
-        _journal.Record(step);
-        NotifyUndoRedoChanged();
-    }
-
-    private void NotifyUndoRedoChanged()
-    {
-        UndoCommand.NotifyCanExecuteChanged();
-        RedoCommand.NotifyCanExecuteChanged();
-    }
-
     /// <summary>Saves the open map if the game would load it; otherwise keeps it unsaved and shows why.</summary>
     [RelayCommand]
     private void Save()
@@ -449,10 +340,7 @@ internal sealed partial class MainViewModel : ObservableObject
     {
         oldValue?.PropertyChanged -= OnOpenMapChanged;
         newValue?.PropertyChanged += OnOpenMapChanged;
-        oldValue?.StepRecorded -= OnMapStepRecorded;
-        newValue?.StepRecorded += OnMapStepRecorded;
-        _journal.ForgetMapSteps();
-        NotifyUndoRedoChanged();
+        History?.OpenMap = newValue;
         Painting?.OpenMap = newValue;
         Placing?.OpenMap = newValue;
         EventEditing?.OpenMap = newValue;

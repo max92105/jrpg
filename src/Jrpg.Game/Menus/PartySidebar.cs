@@ -10,7 +10,10 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class PartySidebar
 {
-    /// <summary>How many cards show at once (placeholder): 6 cards of 120 px, 12 px apart, fill the 864 px page.</summary>
+    /// <summary>
+    /// How many cards show at once (placeholder): 6 cards of 120 px, 12 px apart, with the scroll cues and the reserve
+    /// caption, fit the 864 px page (<see cref="PartySidebarView"/>).
+    /// </summary>
     public const int VisibleCards = 6;
 
     private readonly PartyState _party;

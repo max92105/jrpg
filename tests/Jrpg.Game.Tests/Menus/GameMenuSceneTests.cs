@@ -215,7 +215,7 @@ public sealed class GameMenuSceneTests
     {
         var ui = new UiTextures();
         var cards = new MemberCardView(RepositoryScreenText.Text, ui, StartMapScenarios.BelowClosedDoor);
-        return new(new MenuHeader(RepositoryScreenText.Text, session), sidebar, new PartySidebarView(sidebar, cards, ui));
+        return new(new MenuHeader(RepositoryScreenText.Text, session), sidebar, new PartySidebarView(sidebar, cards, RepositoryScreenText.Text, ui));
     }
 
     private static GameSession NewSession() => GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));

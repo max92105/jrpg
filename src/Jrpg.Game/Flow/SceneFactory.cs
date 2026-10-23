@@ -57,7 +57,7 @@ internal sealed class SceneFactory
     private MenuFrame CreateMenuFrame(GameSession session)
     {
         var sidebar = new PartySidebar(session.Party);
-        return new(new MenuHeader(_text, session), sidebar, new PartySidebarView(sidebar, new MemberCardView(_text, _ui, _catalog), _ui));
+        return new(new MenuHeader(_text, session), sidebar, new PartySidebarView(sidebar, new MemberCardView(_text, _ui, _catalog), _text, _ui));
     }
 
     private SystemPage CreateSystemPage(GameSession session) =>

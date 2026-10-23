@@ -86,6 +86,9 @@ internal static class UiTheme
     /// </summary>
     public const float DimmedSelectionOpacity = 0.5f;
 
+    /// <summary>A reserve member's card in the party sidebar, unless it is the one shown (question 154 placeholder).</summary>
+    public const float ReserveCardOpacity = 0.6f;
+
     /// <summary>The selected tab, deep blue glowing out to the right.</summary>
     public static ImmutableArray<GradientStop> Selection { get; } =
     [

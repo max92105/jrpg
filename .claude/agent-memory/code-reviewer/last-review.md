@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-code-health/slices/X1.md, slice X1 (ExplorationStateTests split: ExplorationInteractionTests, ExplorationTouchEventTests, TestExplorationMap)
+Slice: docs/plans/2026-10-23-code-health/slices/E1a.md, slice E1a (MainViewModelTests split: EditorTestContent, MainViewModelSaveTests, MainViewModelUndoTests)
 Round: 1 (verdict: Ready to commit)
 
-- No findings. All 29 test bodies verified identical to HEAD after the mechanical renames (sed + awk per-method diff).
+- No findings. All 50 test bodies verified identical to HEAD after reversing the `_content.`/`EditorTestContent.` prefixes (sed + awk per-method diff); the 7 helpers identical apart from private->public and two added param docs.

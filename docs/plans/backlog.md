@@ -23,7 +23,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - **Why Core refused an equipment change:** `EquipmentPage.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. `PartyEquipment.ItemWithoutRoom` and `UnequipAll` would own both. It can wait because it is correct today, and nothing planned changes equipment.
 - **Easing copies:** the clamped time share `Math.Clamp((float)(elapsed / length), 0, 1)` is copied 6 times (`ActionPlayback`, `FloatingNumber` twice, `LevelUpPop`, `VictoryEntrance`, `DefeatEntrance`), and the cubic ease-out twice (`LevelUpPop`, `VictoryEntrance`). They should use `Ui/Easing`. It can wait because each copy is one line.
 - **`Ui/MessageIds.cs` is 338 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
-- **`MainViewModelTests`, part 2:** move the new content tests (`CreateObject_*`, `CreateNpc_*`, `CanStartNewObject_*`, `TryCreateMap_*`) and the map settings tests (`TryApplySettings_*`) into their own classes, on E1a's `EditorTestContent`.
+- **`MainViewModelTests`, part 2 (449 lines after E1a):** move the new content tests (`CreateObject_*`, `CreateNpc_*`, `CanStartNewObject_*`, `TryCreateMap_*`) and the map settings tests (`TryApplySettings_*`) into their own classes, on E1a's `EditorTestContent`.
 - **`MainViewModel`:** the sheet image-size cache (`SheetImageSizes`) and the import status text (`SheetImportResult.Summary`) could leave it.
 - **`MainWindow.xaml.cs` (547 lines):** move the viewport (pan, zoom, fit) and the tile painting handlers into partial files, as `.EventEditing` and `.ObjectEditing` already are.
 - **`TileBrowserViewModelTests` (410 lines):** move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class.
@@ -51,7 +51,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the editor plan (2026-10-22 retro)
 
-- `MainViewModelTests` is 770 lines: split it by area (saving, undo journal, new map/object/NPC, layer list) like the view model it tests. (plan 2026-10-23, E1a; part 2 under "When next touched")
 - `MainViewModel.CreateNpc` and `CreateObject` end with the same three lines (`SetObject`, choose it in the Objects panel, Objects mode): one private method when `MainViewModel` is split (N3 review). (plan 2026-10-23, E3)
 
 ## From the demo retirement plan (2026-10-23)

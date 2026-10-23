@@ -21,3 +21,4 @@ Part of [the code health plan](../README.md). Design: [design.md](../design.md),
     - `docs/plans/backlog.md`: the `MainViewModelTests` line becomes the part-2 line under "When next touched" (new content, map settings).
   - **Tests:** none new.
   - **Verify by hand:** the `Jrpg.Editor.Tests` count before and after, written here.
+- **Done, with deviations:** `Jrpg.Editor.Tests`: 402 tests before, 402 after. Split by a script like X1's (each test put in its class by its name, in its old order); moved bodies changed only by the prefix: `_content.` for `Open`, `Questions`, `ContentCopy`, `RepositoryContent`, `CopyOfRepositoryContent` and the three helpers that read the copy, `EditorTestContent.` for the two static helpers (`PaintTopLeft`, `BlockFirstWalkableTile`). Sizes: `MainViewModelTests` 449 (was 777), `MainViewModelSaveTests` 132, `MainViewModelUndoTests` 144, `EditorTestContent` 101. Review: no findings; every moved body matches HEAD apart from the prefix.

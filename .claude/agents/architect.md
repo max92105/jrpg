@@ -26,7 +26,7 @@ Turn a feature request into a plan that a developer can implement one slice at a
    - Write planned test names as `Method_Scenario_ExpectedResult` under the test class's name (`CommandMenuTests: Update_ConfirmSkills_ListsActorSkills`), as the repo's test files do.
    - Every new type gets a one-line responsibility next to its name. If the line needs "and", split the type.
    - Place types in feature folders (`Battle/`, `Inventory/`), following `.claude/rules/code-quality.md`. Naming is part of the design: choose names here, not during implementation.
-   - When porting from the legacy demo (`legacy/JRPG/`, `legacy/JRPG.Core/`), map each old class to its new type(s) and say what changes. Don't carry over a structure just because it exists (`GameSystems` static singletons, `*Manager` classes, `Models/`/`Enums/` folders).
+   - Don't carry over a structure just because it exists (static singletons, `*Manager` classes, `Models/`/`Enums/` folders).
 5. List open questions that are game-design decisions. Do not answer them yourself; they belong to the developer.
 6. List risks: coupling, performance, determinism, save-format impact.
 7. If a decision has real alternatives, note "ADR needed: <topic>".
@@ -36,7 +36,7 @@ Turn a feature request into a plan that a developer can implement one slice at a
 Write the plan as a folder `docs/plans/<yyyy-mm-dd>-<feature-slug>/` (see `docs/plans/README.md`; `docs/plans/done/2026-10-20-battle/` is the model), so each slice is read without the rest:
 
 - `README.md`: `Status: draft`, Goal, Order and why, Guiding rules, Out of scope, `## Slices` as an index (phase headings, then one line per slice: `- [ ] **<id>. <name>** (<projects>, about N lines) → [slices/<id>.md](slices/<id>.md)`), Decisions, Open design questions (developer decides), ADRs needed.
-- `design.md`: Tunables and placeholders, Design overview (what exists, Core changes, structure and folder dependencies, key decisions, extension points, legacy mapping), Risks.
+- `design.md`: Tunables and placeholders, Design overview (what exists, Core changes, structure and folder dependencies, key decisions, extension points, replacement mapping: which existing code each new type replaces), Risks.
 - `slices/<id>.md`: the slice's goal, new types with one-line responsibilities, changes, tests by name, verify by hand. Point to the `design.md` section it builds on rather than repeating it.
 
 Add the plan to the table in `docs/plans/README.md`. Then return a 5-line summary and the folder path.

@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-22-demo-retirement/slices/W5.md, slice W5 (remove "legacy" from Editor C#/XAML and Editor tests)
+Slice: docs/plans/2026-10-22-demo-retirement/slices/W6.md, slice W6 (docs indexes, rules, agent memory; rename one done plan; close the 2026-10-18 plan)
 Round: 1 (verdict: Ready to commit)
 
-- suggestion (open): ResizeMapEdit.cs:139-140 "an object reaching past an edge stays, as some placed objects do" is circular now; state the reason (e.g. "since some objects on the repository's maps reach past an edge") or drop the clause.
-- suggestion (open): EventListViewModel.cs:11 "(placeholder)" sits after "Check" only; both defaults (pressed and the prompt) are placeholders -> "start pressed, with the prompt "Check" (placeholders)".
-- suggestion (open): ObjectPlacingViewModel.cs:289-290 and LayerPresets.cs:199, EditorTheme.xaml:401 were shortened but not rebalanced (first line ends well short of 120); cosmetic.
+- warning (open): architect/project_content_quirks.md:10,15 keeps the stale "portraitFile goblin.png vs Goblin.png" fact (fixed in 8111383; enemies.json says Goblin.png) and its Why says lookups "must not depend on case", the opposite of ArtReferenceCheck's exact-case rule; rewrite as "battle art is matched by exact case (ArtReferenceCheck)" and update the MEMORY.md hook.
+- suggestion (open): architect.md:39 and plans/README.md:9 keep a "port mapping" design.md section, but the bullet defining what goes in it was removed; say what it maps or drop it.
+- follow-up: done/2026-10-17-core-migration.md links ../decisions/000[2-4] (resolve to docs/plans/decisions/), broken before this slice.

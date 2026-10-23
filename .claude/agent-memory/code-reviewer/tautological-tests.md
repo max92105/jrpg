@@ -19,11 +19,11 @@ Seen again in slice 7 (identical-inputs variant): `Start_PartyAndEnemies_Creates
 
 Seen again in slice 8: `FieldItemUse.CanUse`'s `item.Effect is not null` clause can be deleted with every test passing (no test uses a menu-usable item without an effect, and the validator doesn't forbid one).
 
-Seen again in part 2 slice 1b (converter): `TileConversion` rejects Sprite, Frames or CollisionPolygon but only CollisionPolygon is tested; `LegacyFileReader`'s strict options (unmapped members disallowed) have no test. Multi-clause `||` guards and serializer option flags are the usual blind spot: ask for a theory per clause.
+Seen again in part 2 slice 1b (converter): `TileConversion` rejects Sprite, Frames or CollisionPolygon but only CollisionPolygon is tested; the converter's file reader's strict options (unmapped members disallowed) have no test. Multi-clause `||` guards and serializer option flags are the usual blind spot: ask for a theory per clause.
 
 Seen again in the 1b re-review (fixed the clauses above): `id <= EmptyTileId` tested only with 0, so `==` would pass; and `Convert_RepositoryAssets_WritesTilesAndReport` only asserts `File.Exists`. Boundary comparisons need a value past the boundary; file-writing tests need a content check. For generated content, ask for a drift test (convert to temp, compare to the committed `content/generated/`).
 
-Seen again in 1c and 1d (converter error branches): each slice adds `ConversionException` throws "none exist today" (meta, duplicate legacy id, null object) and tests only some. In 1d raised as one Critical listing the untested throws. Grep every new `throw` in the diff and match it to a test message.
+Seen again in 1c and 1d (converter error branches): each slice adds `ConversionException` throws "none exist today" (meta, duplicate source id, null object) and tests only some. In 1d raised as one Critical listing the untested throws. Grep every new `throw` in the diff and match it to a test message.
 
 Seen again in part 2 slice 4a (fixture variant): `ContinueEvent_WarpOntoTouchCell_DoesNotFireArrivalCell` warps to town (3, 2), but the fixture's touch cell is (3, 3), so it never arrives on a touch cell. When a test name claims a scenario, trace the fixture coordinates and check the scenario actually happens.
 

@@ -24,4 +24,4 @@ paths:
   - small labels (`HP`, `SP`, `LV`, `NEXT TURN` in spaced caps) next to large numbers; thin colored bars (HP green, SP blue, EXP orange);
   - an elegant serif for big titles (logo, "Victory!"), a clean sans for the rest; white or pale text;
   - diamond-framed portraits (turn order); lots of empty space, so the art shows through.
-- Legacy XAML (`legacy/JRPG/UI/Styles/`) gives starting values and layouts, and was already inspired by this game. Where it's plainer than the examples, lean toward the examples. Ask the developer before departing from both.
+- `Ui/UiTheme` holds the starting values and layouts. Where they're plainer than the examples, lean toward the examples. Ask the developer before departing from both.

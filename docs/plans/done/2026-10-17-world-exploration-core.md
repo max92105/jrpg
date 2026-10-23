@@ -4,7 +4,7 @@ Status: approved
 ## Goal
 Port the legacy demo's world rules into `src/Jrpg.Core`, headless and deterministic, with the map, tile and object content converted from `Assets/` into validated `content/` JSON. At the end of this plan a test can: start a new game on the start map, walk the player with game-loop deltas and an analog direction, open the chest (and find the potion in the inventory), go through the door into the house and back, walk the forest until a seeded random encounter hands a `goblin_trio` to the battle code from part 1, save to a file, and load it back into an equivalent session, even after content has changed. Nothing is drawn: the MonoGame side is part 3.
 
-Scope comes from part 1 ([2026-10-17-legacy-core-migration.md](2026-10-17-legacy-core-migration.md)): the "Follow-up plans" section, every inventory row marked P2, decision 20, and the deviation notes (`PartyState.MemberById` is deferred to save/load). After the review, cutscenes, event-started battles and render-only content move to part 3 (see "Moved to part 3").
+Scope comes from part 1 ([2026-10-17-legacy-core-migration.md](2026-10-17-core-migration.md)): the "Follow-up plans" section, every inventory row marked P2, decision 20, and the deviation notes (`PartyState.MemberById` is deferred to save/load). After the review, cutscenes, event-started battles and render-only content move to part 3 (see "Moved to part 3").
 
 ## Guiding rule (same as part 1): port mechanisms, not design
 - Port each **mechanism** (walking, collision, walkability, events, warps, encounters, saves) in its simplest working form.

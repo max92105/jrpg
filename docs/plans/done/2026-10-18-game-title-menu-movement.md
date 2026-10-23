@@ -1,5 +1,5 @@
 # Game: walking, title screen and game menu
-Status: approved
+Status: done (check Z folded into 2026-10-22-demo-retirement)
 
 First plan of part 3b (game parity). It takes from the part 3b notes at the end of `2026-10-18-shell-cutover-and-map-editing.md`:
 - walking and map events (notes 3c-3e);
@@ -746,7 +746,7 @@ P4 was split in two before it started (developer, 2026-10-20): it came out at ab
     - [ ] Toggle full screen from the menu.
     - [ ] Change the text speed, then read the sign.
 
-- [ ] **Z. Play-through check** (manual)
+- [ ] **Z. Play-through check** (manual). Folded into `2026-10-22-demo-retirement` Z; retro skipped (developer, decision 143, 2026-10-22).
   - [ ] Title, New game.
   - [ ] Walk, open the chest and the door, warp to the forest and back.
   - [ ] Every menu tab: Status, use a potion, equip, reorder the party, Options.

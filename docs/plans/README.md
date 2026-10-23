@@ -6,7 +6,7 @@ Code-health work found along the way (big files, copies, open follow-ups) waits 
 
 **Layout of a plan** (from the battle plan on): a folder `YYYY-MM-DD-name/` with
 - `README.md`: status, goal, order, guiding rules, out of scope, the slice index (one line and a checkbox per slice), the developer's decisions, open questions, ADRs needed. Read for every slice.
-- `design.md`: tunables, design overview (what exists, Core changes, structure, key decisions, legacy mapping) and risks. Read when a slice points to it.
+- `design.md`: tunables, design overview (what exists, Core changes, structure, key decisions, replacement mapping) and risks. Read when a slice points to it.
 - `slices/<id>.md`: one slice's goal, types, tests, hand checks, and once done its "Done, with deviations" note.
 
 Older plans are single files with the same sections.
@@ -17,7 +17,7 @@ Older plans are single files with the same sections.
 | [done/2026-10-21-editor](done/2026-10-21-editor/README.md) | done (session check Z skipped) |
 | [done/2026-10-20-menu-cleanup](done/2026-10-20-menu-cleanup/README.md) | done |
 | [done/2026-10-20-battle](done/2026-10-20-battle/README.md) | done |
-| [2026-10-18-game-title-menu-movement](2026-10-18-game-title-menu-movement.md) | approved; every slice done, play-through check Z left |
+| [done/2026-10-18-game-title-menu-movement](done/2026-10-18-game-title-menu-movement.md) | done (check Z folded into 2026-10-22-demo-retirement) |
 | [done/2026-10-18-shell-cutover-and-map-editing](done/2026-10-18-shell-cutover-and-map-editing.md) | done |
 | [done/2026-10-17-world-exploration-core](done/2026-10-17-world-exploration-core.md) | done |
-| [done/2026-10-17-legacy-core-migration](done/2026-10-17-legacy-core-migration.md) | done |
+| [done/2026-10-17-core-migration](done/2026-10-17-core-migration.md) | done |

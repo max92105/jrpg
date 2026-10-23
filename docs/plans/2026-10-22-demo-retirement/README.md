@@ -87,7 +87,7 @@ Counts are matching lines (`grep -ic`), counted on 2026-10-22; a line can hold t
 - [x] **W3. Game `Battle/`** (Game + Game tests, 50 lines in 33 files, about 60 lines changed) → [slices/W3.md](slices/W3.md)
 - [x] **W4. Game menus, saving, title, exploration, dialogue, input, flow** (Game + Game tests, 78 lines in 38 files, about 85 lines changed) → [slices/W4.md](slices/W4.md)
 - [x] **W5. Editor** (Editor + Editor tests, 58 lines in 37 files, about 65 lines changed) → [slices/W5.md](slices/W5.md)
-- [ ] **W6. Docs indexes, rules and agent memory; rename one done plan; close the 2026-10-18 plan** (docs + `.claude`, 22 lines in 10 files plus renames, about 70 lines changed) → [slices/W6.md](slices/W6.md)
+- [x] **W6. Docs indexes, rules and agent memory; rename one done plan; close the 2026-10-18 plan** (docs + `.claude`, 22 lines in 10 files plus renames, about 70 lines changed) → [slices/W6.md](slices/W6.md)
 
 ### Phase 4: deletion and guard
 - [ ] **X1. Tag, then delete `legacy/` and every pointer to it; the F1 debug button and unused art go too** (repository + Game, about 45 hand-written lines, plus the folder's 209 files and 2 images deleted) → [slices/X1.md](slices/X1.md)

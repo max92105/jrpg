@@ -14,6 +14,7 @@ using Jrpg.Game.Ui;
 string contentRoot;
 UiMessages messages;
 FontLibrary fonts;
+
 try
 {
     contentRoot = ContentRootLocator.Find(args, typeof(JrpgGame).Assembly);

@@ -13,7 +13,7 @@ Older plans are single files with the same sections.
 
 | Plan | Status |
 |---|---|
-| [2026-10-22-demo-retirement](2026-10-22-demo-retirement/README.md) | approved |
+| [done/2026-10-22-demo-retirement](done/2026-10-22-demo-retirement/README.md) | done |
 | [done/2026-10-21-editor](done/2026-10-21-editor/README.md) | done (session check Z skipped) |
 | [done/2026-10-20-menu-cleanup](done/2026-10-20-menu-cleanup/README.md) | done |
 | [done/2026-10-20-battle](done/2026-10-20-battle/README.md) | done |

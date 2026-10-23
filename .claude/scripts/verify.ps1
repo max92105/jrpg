@@ -77,7 +77,6 @@ $checkedRoots = 'src', 'tests', 'content', 'docs', '.claude', 'CLAUDE.md', 'READ
     '.gitignore', '.gitattributes', 'Directory.Packages.props', 'Jrpg.slnx', 'Jrpg.slnLaunch', 'global.json'
 $history = @(
     'docs/plans/done/',                                    # finished plans keep their text (decision 134)
-    'docs/plans/2026-10-22-demo-retirement/',              # the plan that retires the word: remove when it moves to done/
     # ADRs written before decision 134 keep their text; listed by name so that ADR 0016 on is checked.
     'docs/decisions/0001-engine-free-architecture.md',
     'docs/decisions/0002-content-schema-mapping.md',

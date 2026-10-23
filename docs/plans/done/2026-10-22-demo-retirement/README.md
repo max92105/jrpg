@@ -1,5 +1,5 @@
 # Retiring the WPF demo: last gaps, the word "legacy", the `legacy/` folder
-Status: approved
+Status: done (closed at the retro on 2026-10-23 at the developer's word; session check Z not ticked)
 
 Developer's request (2026-10-22, lightly translated): "The next plan is to remove the term legacy everywhere. What we have is our base now. At the end of it, I want the term 'legacy' removed from everywhere and the legacy folder deleted altogether. So find all the big gaps left between the two versions, make steps to address and fix them, and after that we start with real new systems and features. The modernisation and new direction in code and tech is all good."
 
@@ -92,7 +92,7 @@ Counts are matching lines (`grep -ic`), counted on 2026-10-22; a line can hold t
 ### Phase 4: deletion and guard
 - [x] **X1. Tag, then delete `legacy/` and every pointer to it; the F1 debug button and unused art go too** (repository + Game, about 45 hand-written lines, plus the folder's 209 files and 2 images deleted) → [slices/X1.md](slices/X1.md)
 - [x] **X2. The guard: `verify.ps1` fails on the word** (script + docs, about 45 lines) → [slices/X2.md](slices/X2.md)
-- [ ] **Z. Session check** (manual) → [slices/Z.md](slices/Z.md)
+- [x] **Z. Session check** (manual; closed at the retro without the hand checks, developer's call) → [slices/Z.md](slices/Z.md)
 
 Dropped while planning:
 - Q2a (the wearer choice) and Q2b (the "Equipped by" strip): Q2 replaces both, with each worn row naming its wearer (decision 137);

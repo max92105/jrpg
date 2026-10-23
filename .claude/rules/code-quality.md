@@ -40,6 +40,7 @@ The bar: a professional reviewer reads the diff and understands the intent from 
 
 - Comments explain *why* (a non-obvious rule, a trade-off, a source for a formula). Never *what*; rename or extract instead.
 - No commented-out code, no narration (`// Loop through enemies`), no section banners, no "Step 1/Step 2".
+- When you change a comment or summary, rewrap its whole block to 120 columns: no line over it, no one- or two-word last line (`perl .claude/scripts/reflow-comments.pl <file>` rewraps the blocks changed since HEAD). If removing a name leaves two neighboring summaries saying the same thing, say what tells them apart.
 - No `TODO` without a plan reference: `// TODO(plan 2026-10-20-status-effects, slice 3): ...`.
 - XML docs only where the signature can't carry the meaning: units, ranges, invariants, formula sources. Never restate the name (`/// Gets the HP.`).
 

@@ -4,7 +4,7 @@ Code-health work waiting for the next cleanup plan; `/retro` appends to it. One 
 
 ## From the menu cleanup plan (2026-10-20)
 
-- **`InventoryPage` is 326 lines and `StatusPage` 289**, neither split yet. Split them like `EquipmentPage` and `PartyPage`: a pure part, views, and a page that keeps input.
+- **`InventoryPage` is 331 lines and `StatusPage` 294** (after the demo retirement plan), neither split yet. Split them like `EquipmentPage` and `PartyPage`: a pure part, views, and a page that keeps input.
 - **The private `Number(int)` invariant formatter is copied about 6 times** (`EquipmentSheet`, `StatPreviewText`, `StatusPage`, `SaveSlotListView`, `MemberCardView`, the count in `PartyColumnsView`). One shared `Ui` formatter would replace them.
 - **Text stored next to its width by hand** in `InventoryPage.ItemRow`, `InventoryLabels`, `SaveSlotListView`, `ConfirmPromptView`, `MenuHeader` and `EquipmentChoiceView`. Use `Ui/MeasuredText`.
 - **Column titles over a hairline are copied 3 times** (`InventoryPage.DrawColumnTitles`, `EquipmentChoiceView`, `Saving/SaveSlotListView`). A shared `Ui/ColumnTitles`.
@@ -16,7 +16,7 @@ Code-health work waiting for the next cleanup plan; `/retro` appends to it. One 
 
 - **The clamped time share `Math.Clamp((float)(elapsed / length), 0, 1)` is copied 6 times** (`ActionPlayback`, `FloatingNumber` twice, `LevelUpPop`, `VictoryEntrance`, `DefeatEntrance`), and the cubic ease-out twice (`LevelUpPop`, `VictoryEntrance`). `Ui/Easing` (plan 2026-10-22, T1) now has both (`ShareOf`, `CubicOut`); these copies can move to it.
 - **The footer bar with its hairline is drawn 3 times** (`GameMenuScene`, `VictoryScreenView`, `DefeatScreenView`; the two outcome screens also share the left shade and the title hairline). A shared `Ui` footer, and an outcome frame for the two battle screens.
-- **`Ui/MessageIds.cs` is 305 lines** of constants. Split it by feature (menu, battle, title) or group the battle ids.
+- **`Ui/MessageIds.cs` is 338 lines** (after the demo retirement plan) of constants. Split it by feature (menu, battle, title) or group the battle ids.
 - **More invariant number formatting inline** (`ToString(CultureInfo.InvariantCulture)` in `ActionPlayback`, `CommandPanelView`, `VictoryScreenView`, `VitalsText`), on top of the copies listed above.
 - **Victory screen at the maximum level** shows "EXP 0/0" and an empty bar; hide the EXP row instead (B7a, B7b1 reviews).
 - **Victory cards have no row limit**: more than 6 active members reach the footer line (B7b1 review).
@@ -42,3 +42,5 @@ Code-health work waiting for the next cleanup plan; `/retro` appends to it. One 
 ## From the demo retirement plan (2026-10-23)
 
 - Merge `src/` and `tests/` `Directory.Build.props` at the root, now that nothing at the root escapes them (decision 144).
+- `ExplorationStateTests` is 398 lines: move the interaction-target tests (G1a: `InteractionInFront_*`) into their own class.
+- Equipment page: opening a slot's choice hides the party sidebar (484 px) but the choice panel is 560 px, so the sheet narrows by 76 px while it is open (P1/Q2; layout is question 145's placeholder).

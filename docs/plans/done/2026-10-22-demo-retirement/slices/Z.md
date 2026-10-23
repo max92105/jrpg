@@ -18,4 +18,5 @@ Part of [the demo retirement plan](../README.md). Includes the play-through chec
     - [ ] `verify.ps1`: every step passes, the guard included.
     - [ ] `legacy/` is gone; `git tag -n1 wpf-demo-final` shows the tag.
     - [ ] Fill in "Done, with deviations" on each slice. The plan goes to `retro pending`.
-    - [ ] At the retro, when the plan moves to `done/`, remove its folder from the guard's skip list (X2).
+    - [x] At the retro, when the plan moves to `done/`, remove its folder from the guard's skip list (X2).
+- **Done, with deviations:** the developer closed the plan at the retro (2026-10-23) without the hand checks above being ticked; only the guard's skip entry was removed. `verify.ps1` passes.

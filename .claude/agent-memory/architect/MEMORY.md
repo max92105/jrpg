@@ -1,4 +1,4 @@
-- [Migration roadmap](project_migration_roadmap.md) — parts 1-3a done; battle retro run; editor plan done; demo-retirement plan 2026-10-22 approved; next number 148, ADR 0016
+- [Migration roadmap](project_migration_roadmap.md) — migration finished (tag wpf-demo-final); next number 148, ADR 0016; open 145-147; list of next new-system plans
 - [Content quirks](project_content_quirks.md) — 1024 px party battlers, exact-case art names, player.png row order, empty skill icons
 - [Type/folder name clash](feedback_type_folder_name_clash.md) — never name a type after its feature folder (CA1724); use PartyState/BattleState
 - [Plan lessons](feedback_plan_lessons.md) — slice sizes, folder-dependency tables, no-caller APIs, presenter/draw split, packages are questions, wording-removal plans

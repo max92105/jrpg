@@ -15,3 +15,4 @@ paths:
 - Every guard that turns an input into a no-op (a greyed entry, input before an entrance ends) has a test that presses it and asserts nothing happened.
 - UI tests pick an entry by what it is (a helper that moves until `Selected` is the wanted entry), not by a fixed count of presses.
 - Tests on the repository's content assert the entries they need (an id is there, a named layer exists), never totals of a whole catalog or map: content changes in the editor every day.
+- A test that a value is refreshed or cached starts from a state where the old value differs from the expected one, and checks a value the runtime doesn't already share (not an enum name or a string literal).

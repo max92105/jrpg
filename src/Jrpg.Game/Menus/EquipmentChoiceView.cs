@@ -25,8 +25,7 @@ internal sealed class EquipmentChoiceView
     private const int BodyPixels = 18;
     private const int LabelPixels = 14;
     private const int ColumnTitlesTop = 48;
-    private const int ColumnTitleLineGap = 20;
-    private const int RowsTop = ColumnTitlesTop + 28;
+    private const int RowsTop = ColumnTitlesTop + ColumnTitles.Height;
     private const int RowHeight = 44;
     private const int RowInset = 10;
     private const int IconColumn = 40;
@@ -37,11 +36,8 @@ internal sealed class EquipmentChoiceView
     private readonly UiMessages _messages;
     private readonly SpriteFontBase _headingFont;
     private readonly SpriteFontBase _bodyFont;
-    private readonly SpriteFontBase _labelFont;
     private readonly string _remove;
-    private readonly string _nameTitle;
-    private readonly string _quantityTitle;
-    private readonly float _quantityTitleWidth;
+    private readonly ColumnTitles _columnTitles;
     private string _heading = string.Empty;
     private (string Text, float Width)[] _quantities = [];
     private string[] _wornRows = [];
@@ -54,11 +50,15 @@ internal sealed class EquipmentChoiceView
         _messages = text.Messages;
         _headingFont = text.Fonts.FontAt(HeadingPixels);
         _bodyFont = text.Fonts.FontAt(BodyPixels);
-        _labelFont = text.Fonts.FontAt(LabelPixels);
         _remove = text.Messages.Text(MessageIds.EquipmentRemove);
-        _nameTitle = text.Messages.Text(MessageIds.InventoryColumnName);
-        _quantityTitle = text.Messages.Text(MessageIds.InventoryColumnQuantity);
-        _quantityTitleWidth = _labelFont.MeasureString(_quantityTitle).X;
+        var labelFont = text.Fonts.FontAt(LabelPixels);
+        _columnTitles = new ColumnTitles(
+            labelFont,
+            ui,
+            [
+                ColumnTitle.FromLeft(MeasuredText.Of(labelFont, text.Messages.Text(MessageIds.InventoryColumnName)), RowInset + IconColumn),
+                ColumnTitle.FromRight(MeasuredText.Of(labelFont, text.Messages.Text(MessageIds.InventoryColumnQuantity)), QuantityInset),
+            ]);
     }
 
     /// <summary>Builds the text once, when the choice opens.</summary>
@@ -93,10 +93,7 @@ internal sealed class EquipmentChoiceView
         var top = panel.Y + TopMargin;
         var width = panel.Width - (2 * Margin);
         batch.DrawString(_headingFont, _heading, new Vector2(left, top), UiTheme.TextPrimary);
-        var titlesTop = top + ColumnTitlesTop;
-        batch.DrawString(_labelFont, _nameTitle, new Vector2(left + RowInset + IconColumn, titlesTop), UiTheme.TextSecondary);
-        batch.DrawString(_labelFont, _quantityTitle, new Vector2(left + width - QuantityInset - _quantityTitleWidth, titlesTop), UiTheme.TextSecondary);
-        batch.Draw(_ui.SectionLine(textures), new Rectangle(left, titlesTop + ColumnTitleLineGap, width, 1), Color.White);
+        _columnTitles.Draw(batch, textures, new Rectangle(left, top + ColumnTitlesTop, width, 0), opacity: 1);
 
         var last = Math.Min(choice.RowCount, choice.FirstVisibleRow + EquipmentChoice.VisibleRows);
         for (var index = choice.FirstVisibleRow; index < last; index++)

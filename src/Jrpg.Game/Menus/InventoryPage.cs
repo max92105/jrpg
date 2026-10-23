@@ -29,8 +29,7 @@ internal sealed class InventoryPage : IMenuPage
     private const int BodyPixels = 18;
     private const int LabelPixels = 14;
     private const int ColumnTitlesTop = 48;
-    private const int ColumnTitleLineGap = 20;
-    private const int RowsTop = ColumnTitlesTop + 28;
+    private const int RowsTop = ColumnTitlesTop + ColumnTitles.Height;
     private const int RowHeight = 44;
     private const int RowInset = 10;
     private const int IconColumn = 40;
@@ -48,7 +47,7 @@ internal sealed class InventoryPage : IMenuPage
     private readonly CategoryRailView _railView;
     private readonly SpriteFontBase _headingFont;
     private readonly SpriteFontBase _bodyFont;
-    private readonly SpriteFontBase _labelFont;
+    private readonly ColumnTitles _columnTitles;
     private readonly InventoryLabels _labels;
     private readonly string[] _categoryNames;
     private readonly string _listHint;
@@ -74,8 +73,15 @@ internal sealed class InventoryPage : IMenuPage
         _railView = new CategoryRailView(ui);
         _headingFont = text.Fonts.FontAt(HeadingPixels);
         _bodyFont = text.Fonts.FontAt(BodyPixels);
-        _labelFont = text.Fonts.FontAt(LabelPixels);
-        _labels = InventoryLabels.From(text.Messages, _labelFont, _bodyFont);
+        var labelFont = text.Fonts.FontAt(LabelPixels);
+        _columnTitles = new ColumnTitles(
+            labelFont,
+            ui,
+            [
+                ColumnTitle.FromLeft(MeasuredText.Of(labelFont, text.Messages.Text(MessageIds.InventoryColumnName)), RowInset + IconColumn),
+                ColumnTitle.FromRight(MeasuredText.Of(labelFont, text.Messages.Text(MessageIds.InventoryColumnQuantity)), QuantityInset),
+            ]);
+        _labels = InventoryLabels.From(text.Messages, _bodyFont);
         _categoryNames = [.. _rail.Tabs.Select(tab => text.Messages.Text(tab.LabelId))];
         _itemUse = new ItemUseDialog(session, text, ui, catalog);
         ShowRowsFrom(0);
@@ -232,7 +238,7 @@ internal sealed class InventoryPage : IMenuPage
         var top = area.Y + TopMargin;
         var width = area.Right - Margin - left;
         batch.DrawString(_headingFont, _categoryNames[_rail.Selected], new Vector2(left, top), UiTheme.TextPrimary * opacity);
-        DrawColumnTitles(batch, textures, new Rectangle(left, top + ColumnTitlesTop, width, 0), opacity);
+        _columnTitles.Draw(batch, textures, new Rectangle(left, top + ColumnTitlesTop, width, 0), opacity);
 
         var rowsTop = top + RowsTop;
         var descriptionPosition = new Vector2(left + RowInset, rowsTop + (VisibleRows * RowHeight) + DescriptionGap);
@@ -278,17 +284,6 @@ internal sealed class InventoryPage : IMenuPage
         return new ItemRow(item.Id, item.Name, item.IconFile, quantity, _bodyFont.MeasureString(quantity).X, item.Description, _session.FieldItems.CanUse(item));
     }
 
-    // Section titles over the rows' columns: Name after the icon column, Qty at the right.
-    private void DrawColumnTitles(SpriteBatch batch, TextureLibrary textures, Rectangle section, float opacity)
-    {
-        var color = UiTheme.TextSecondary * opacity;
-        batch.DrawString(_labelFont, _labels.Name, new Vector2(section.X + RowInset + IconColumn, section.Y), color);
-        var quantityLeft = section.Right - QuantityInset - _labels.QuantityWidth;
-        batch.DrawString(_labelFont, _labels.Quantity, new Vector2(quantityLeft, section.Y), color);
-        var line = new Rectangle(section.X, section.Y + ColumnTitleLineGap, section.Width, 1);
-        batch.Draw(_ui.SectionLine(textures), line, Color.White * opacity);
-    }
-
     private void DrawRow(SpriteBatch batch, TextureLibrary textures, Rectangle row, int index, float opacity)
     {
         // The pointer marks the row while the list has the cursor; while the rail has it, the row stays chosen, dimmed.
@@ -316,18 +311,12 @@ internal sealed class InventoryPage : IMenuPage
     private sealed record ItemRow(string ItemId, string Name, string IconFile, string Quantity, float QuantityWidth, string Description, bool IsUsable);
 
     // The page's fixed text.
-    private sealed record InventoryLabels(string Name, string Quantity, float QuantityWidth, string Empty, float EmptyWidth)
+    private sealed record InventoryLabels(string Empty, float EmptyWidth)
     {
-        public static InventoryLabels From(UiMessages messages, SpriteFontBase labelFont, SpriteFontBase bodyFont)
+        public static InventoryLabels From(UiMessages messages, SpriteFontBase bodyFont)
         {
-            var quantity = messages.Text(MessageIds.InventoryColumnQuantity);
             var empty = messages.Text(MessageIds.InventoryEmpty);
-            return new InventoryLabels(
-                messages.Text(MessageIds.InventoryColumnName),
-                quantity,
-                labelFont.MeasureString(quantity).X,
-                empty,
-                bodyFont.MeasureString(empty).X);
+            return new InventoryLabels(empty, bodyFont.MeasureString(empty).X);
         }
     }
 }

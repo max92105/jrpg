@@ -35,7 +35,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 ## From the menu cleanup plan (2026-10-20)
 
 - **Text stored next to its width by hand** in `InventoryPage.ItemRow`, `InventoryLabels`, `SaveSlotListView`, `ConfirmPromptView`, `MenuHeader` and `EquipmentChoiceView`. Use `Ui/MeasuredText`. (plan 2026-10-23, U3; `InventoryPage` waits with its split)
-- **Column titles over a hairline are copied 3 times** (`InventoryPage.DrawColumnTitles`, `EquipmentChoiceView`, `Saving/SaveSlotListView`). A shared `Ui/ColumnTitles`. (plan 2026-10-23, U2)
 - **Item target picker layout** (question 112, placeholder kept): with an odd member count the last card sits alone in the left column, and 14 or more members (8 rows) don't fit 1080 px.
 
 ## From the battle plan (2026-10-20)

@@ -21,9 +21,7 @@ internal sealed class SaveSlotListView
     private const int HeadingPixels = 22;
     private const int BodyPixels = 18;
     private const int CaptionPixels = 14;
-    private const int ColumnTitlesHeight = 28;
     private const int DetailsGap = 2;
-    private const int ColumnTitleLineGap = 20;
     private const string DateFormat = "yyyy-MM-dd HH:mm";
 
     private readonly SaveSlotList _list;
@@ -32,8 +30,7 @@ internal sealed class SaveSlotListView
     private readonly SpriteFontBase _headingFont;
     private readonly SpriteFontBase _bodyFont;
     private readonly SpriteFontBase _captionFont;
-    private readonly string[] _columnTitles;
-    private readonly float _partyTitleWidth;
+    private readonly ColumnTitles _columnTitles;
     private IReadOnlyList<SaveSlotEntry>? _shownEntries;
     private RowText[] _rows = [];
 
@@ -48,13 +45,14 @@ internal sealed class SaveSlotListView
         _headingFont = text.Fonts.FontAt(HeadingPixels);
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _captionFont = text.Fonts.FontAt(CaptionPixels);
-        _columnTitles =
-        [
-            _messages.Text(MessageIds.SaveColumnFile),
-            _messages.Text(MessageIds.SaveColumnLocation),
-            _messages.Text(MessageIds.SaveColumnParty),
-        ];
-        _partyTitleWidth = _captionFont.MeasureString(_columnTitles[2]).X;
+        _columnTitles = new ColumnTitles(
+            _captionFont,
+            ui,
+            [
+                ColumnTitle.FromLeft(MeasuredText.Of(_captionFont, _messages.Text(MessageIds.SaveColumnFile)), RowInset),
+                ColumnTitle.FromLeft(MeasuredText.Of(_captionFont, _messages.Text(MessageIds.SaveColumnLocation)), RowInset + FileColumnWidth),
+                ColumnTitle.FromRight(MeasuredText.Of(_captionFont, _messages.Text(MessageIds.SaveColumnParty)), RowInset),
+            ]);
     }
 
     /// <param name="batch">Already begun.</param>
@@ -69,8 +67,8 @@ internal sealed class SaveSlotListView
             _rows = [.. _shownEntries.Select(TextOf)];
         }
 
-        DrawColumnTitles(batch, textures, area, opacity);
-        var rowsTop = area.Y + ColumnTitlesHeight;
+        _columnTitles.Draw(batch, textures, area, opacity);
+        var rowsTop = area.Y + ColumnTitles.Height;
         var last = Math.Min(_rows.Length, _list.FirstVisible + SaveSlotList.VisibleRows);
         for (var index = _list.FirstVisible; index < last; index++)
         {
@@ -96,17 +94,6 @@ internal sealed class SaveSlotListView
         var party = string.Join("   ", summary.ActiveParty.Select(member =>
             _messages.Format(MessageIds.SaveMember, new MessageArgument("name", member.Name), MessageArgument.Number("level", member.Level))));
         return new RowText(file, summary.LocationName, details, party, _bodyFont.MeasureString(party).X);
-    }
-
-    // Section titles over the same three columns as the rows.
-    private void DrawColumnTitles(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
-    {
-        var color = UiTheme.TextSecondary * opacity;
-        var left = area.X + RowInset;
-        batch.DrawString(_captionFont, _columnTitles[0], new Vector2(left, area.Y), color);
-        batch.DrawString(_captionFont, _columnTitles[1], new Vector2(left + FileColumnWidth, area.Y), color);
-        batch.DrawString(_captionFont, _columnTitles[2], new Vector2(area.Right - RowInset - _partyTitleWidth, area.Y), color);
-        batch.Draw(_ui.SectionLine(textures), new Rectangle(area.X, area.Y + ColumnTitleLineGap, area.Width, 1), Color.White * opacity);
     }
 
     private void DrawRow(SpriteBatch batch, TextureLibrary textures, Rectangle row, int index, float opacity)

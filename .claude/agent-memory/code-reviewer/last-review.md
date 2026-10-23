@@ -5,7 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-code-health/slices/U1.md, slice U1 (NumberText, MessageArgument.Number)
+Slice: docs/plans/2026-10-23-code-health/slices/U2.md, slice U2 (Ui/ColumnTitles, ColumnTitle)
 Round: 1 (verdict: Ready to commit)
 
-- Suggestion: NumberTextTests.Of_Thousands_HasNoSeparator can't fail (int "G" format never groups, any culture); drop it or pin a culture-specific case — open
+- Suggestion: ColumnTitles.LineGap is public but read only inside the class; make it private — open
+- Suggestion: the Name/Qty title pair is built identically in InventoryPage and EquipmentChoiceView constructors (2 copies) — open

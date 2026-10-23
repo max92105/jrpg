@@ -14,10 +14,6 @@ namespace Jrpg.Editor.Tiles;
 /// </summary>
 internal sealed class TileImages(CatalogDraft catalog, string artRoot)
 {
-    // The game's field-sprite frame size (its FieldSpriteFrame.Pixels, which the editor can't reference): the standing
-    // frame facing down is the sheet's top-left frame.
-    private const int FieldSpriteFramePixels = 48;
-
     private readonly Dictionary<string, BitmapSource> _sheets = [];
     private readonly Dictionary<string, ImageSource> _spriteFrames = [];
 
@@ -46,9 +42,10 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot)
     {
         if (!_spriteFrames.TryGetValue(file, out var frame))
         {
-            // Nothing checks a sprite's size, so one smaller than a frame is shown whole rather than failing to crop.
+            // The New NPC dialog can still pick a sprite smaller than a frame (the art check refuses it only on save),
+            // so one is shown whole rather than failing to crop.
             var sprite = LoadImage(ArtFolders.FieldSprites, file);
-            var side = Math.Min(FieldSpriteFramePixels, Math.Min(sprite.PixelWidth, sprite.PixelHeight));
+            var side = Math.Min(FieldSpriteLayout.FramePixels, Math.Min(sprite.PixelWidth, sprite.PixelHeight));
             frame = new CroppedBitmap(sprite, new Int32Rect(0, 0, side, side));
             frame.Freeze();
             _spriteFrames.Add(file, frame);

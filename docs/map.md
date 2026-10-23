@@ -39,7 +39,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Folder | Purpose | Key types |
 |---|---|---|
 | Content | Loading, validating and writing the catalog; where content is; an optional field added later is left out of a file while null (`AbsentWhenNullFilter`) | `ContentCatalogLoader`, `ContentWriter`, `ContentRootLocator`, `ContentValidationException` |
-| Art | Art folders and the startup art check | `ArtFolders`, `ArtReferenceCheck`, `PngSize` |
+| Art | Art folders, the field sprite frame grid and the startup art check | `ArtFolders`, `FieldSpriteLayout`, `ArtReferenceCheck`, `PngSize` |
 | Maps, Items, Party, Skills, Battle, Effects | One validator per content type | `MapLayoutValidator`, `ItemCatalogValidator`, … |
 | Messages | The UI message table | `UiMessageLoader` |
 | Saving | Save files: versioned JSON, atomic writes, repair of old or damaged saves | `FileSaveStore`, `SaveGameRepair`, `RepairedSave` |

@@ -82,7 +82,7 @@ Sizes are hand-written lines, tests included; "moved" lines are cut and pasted (
 - [x] **F1. A re-cut lets go of a chosen cell past the new grid** (Editor, about 60 lines) → [slices/F1.md](slices/F1.md)
 - [x] **F2. Space + drag pans whichever panel has focus** (Editor, about 15 lines; hand reproduction) → [slices/F2.md](slices/F2.md)
 - [x] **F4. The victory card at the highest level shows a full bar and "Max"** (Core + Game, about 130 lines) → [slices/F4.md](slices/F4.md)
-- [ ] **F5a. Field sprites must hold the walk frames; the Data tests share one PNG writer** (Data + Game + Editor, about 190 lines) → [slices/F5a.md](slices/F5a.md)
+- [x] **F5a. Field sprites must hold the walk frames; the Data tests share one PNG writer** (Data + Game + Editor, about 190 lines) → [slices/F5a.md](slices/F5a.md)
 
 ### Phase 2: the menu feedback
 - [ ] **A1. The inventory category rail takes the cursor: Left to the rail, Up/Down filter, Right back** (Game + content, about 220 lines) → [slices/A1.md](slices/A1.md)

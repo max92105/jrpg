@@ -1,10 +1,10 @@
-using System.Buffers.Binary;
 using Jrpg.Core.Content;
 using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
 using Jrpg.Data.Content;
+using Jrpg.Data.Tests.Art;
 
 namespace Jrpg.Data.Tests.Content;
 
@@ -167,7 +167,7 @@ public sealed class ContentWriterTests : IDisposable
     [Fact]
     public void ImportTilesheetImage_Png_CopiesIntoTilesheetArt()
     {
-        var source = WritePngHeader("Forest2.png", width: 96, height: 48);
+        var source = PngHeaderFile.Write(ImportSource("Forest2.png"), width: 96, height: 48);
         Assert.False(_writer.HasTilesheetImage("Forest2.png"));
 
         var imported = _writer.ImportTilesheetImage(source, _catalog);
@@ -196,7 +196,7 @@ public sealed class ContentWriterTests : IDisposable
     {
         var (sheet, outside) = SheetWithATilePastItsFirstCell();
         var oldBytes = File.ReadAllBytes(TilesheetImage(sheet.File));
-        var source = WritePngHeader(sheet.File, width: sheet.TileWidth, height: sheet.TileHeight);
+        var source = PngHeaderFile.Write(ImportSource(sheet.File), width: sheet.TileWidth, height: sheet.TileHeight);
 
         var exception = Assert.Throws<ContentValidationException>(() => _writer.ImportTilesheetImage(source, _catalog));
 
@@ -211,7 +211,7 @@ public sealed class ContentWriterTests : IDisposable
     public void ImportTilesheetImage_ReplacementNamedInOtherCase_StillChecksItsTiles()
     {
         var (sheet, outside) = SheetWithATilePastItsFirstCell();
-        var source = WritePngHeader(sheet.File.ToUpperInvariant(), width: sheet.TileWidth, height: sheet.TileHeight);
+        var source = PngHeaderFile.Write(ImportSource(sheet.File.ToUpperInvariant()), width: sheet.TileWidth, height: sheet.TileHeight);
 
         var exception = Assert.Throws<ContentValidationException>(() => _writer.ImportTilesheetImage(source, _catalog));
 
@@ -223,7 +223,7 @@ public sealed class ContentWriterTests : IDisposable
     {
         var (sheet, _) = SheetWithATilePastItsFirstCell();
         var (width, height) = PngSize.Read(TilesheetImage(sheet.File));
-        var source = WritePngHeader(sheet.File, width, height);
+        var source = PngHeaderFile.Write(ImportSource(sheet.File), width, height);
 
         _writer.ImportTilesheetImage(source, _catalog);
 
@@ -239,17 +239,8 @@ public sealed class ContentWriterTests : IDisposable
 
     private string TilesheetImage(string fileName) => Path.Combine(ArtFolders.RootIn(_contentRoot), ArtFolders.Tilesheets, fileName);
 
-    // Only the header: PngSize, and so the import's checks, read nothing past it.
-    private string WritePngHeader(string fileName, int width, int height)
-    {
-        var path = Path.Combine(_contentRoot, "import-source", fileName);
-        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        byte[] header = [0x89, (byte)'P', (byte)'N', (byte)'G', 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 13, (byte)'I', (byte)'H', (byte)'D', (byte)'R', 0, 0, 0, 0, 0, 0, 0, 0];
-        BinaryPrimitives.WriteInt32BigEndian(header.AsSpan(16), width);
-        BinaryPrimitives.WriteInt32BigEndian(header.AsSpan(20), height);
-        File.WriteAllBytes(path, header);
-        return path;
-    }
+    // Where a test puts an image before importing it: outside the art folder, as a file the developer picked would be.
+    private string ImportSource(string fileName) => Path.Combine(_contentRoot, "import-source", fileName);
 
     // A tile on the first sheet that isn't in the catalog yet.
     private TileDefinition NewTile() => new()

@@ -136,6 +136,8 @@ public sealed class ContentWriter(string contentRoot)
             throw;
         }
 
+        // The moves aren't atomic across files: a failure between two leaves some files new and some old, and the next
+        // save writes them all again.
         foreach (var (path, _) in files)
         {
             File.Move(path + TemporarySuffix, path, overwrite: true);

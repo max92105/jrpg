@@ -46,11 +46,9 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - **Enemy attack strips are drawn unmirrored over the party**; no flip rule is decided (B5d). A design question for the developer.
 - **"Load the latest save" and the save-list overlay are written twice** (`TitleScene`, `DefeatScreen`/`DefeatScreenView`). Share them in the **autosave plan**, which is likely to add the third copy.
 - **The banner band is drawn twice** (`BattleBannerView`, `BattleScene.DrawEscaped`). Share it in the **map name banner plan**, the third copy.
-- `ContentWriter.WriteAll`: the final moves aren't atomic across files, and the cleanup's `File.Delete` can hide the first error when a folder is missing (review of E3c). (plan 2026-10-23, F5a comments the moves; the hidden error was dropped because no valid content reaches it)
 - `MainViewModel` (596 lines after N3; 367 after E4a): move the unsaved-change questions (`ConfirmClose`, `ConfirmLeaveCurrentMap`, which repeat their wording) into one method. (plan 2026-10-23, E3)
 - `MainViewModel` (596 lines after N3; 467 after E4b2): move the undo routing (journal, `Undo`/`Redo` commands, which mirror each other, and the step event wiring) into its own type. (plan 2026-10-23, E2)
-- Tests: the header-only PNG writer is copied in `ArtReferenceCheckTests` and `ContentWriterTests` (Data); the Editor tests share `PngHeaderFile` (E7b). Share the Data copies on the next change there. (plan 2026-10-23, F5a)
-- Editor `TileImages.FieldSpriteFrameOf`: a sprite smaller than a frame is now shown whole (N3), but nothing validates a field sprite's frame layout; `Forget` keeps cached sprite frames (matters once sprites can be imported). From N2's review. (plan 2026-10-23, F5a validates; `Forget` stays)
+- `TileImages.Forget` keeps cached field-sprite frames; drop them too once field sprites can be imported (no import yet).
 
 ## From the editor plan (2026-10-22 retro)
 

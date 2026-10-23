@@ -1,4 +1,3 @@
-using System.Buffers.Binary;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Core.Dialogue;
@@ -158,7 +157,7 @@ public sealed class ArtReferenceCheckTests
         var artRoot = Path.Combine(Path.GetTempPath(), $"jrpg-art-{Guid.NewGuid():N}");
         try
         {
-            WritePngHeader(Path.Combine(artRoot, ArtFolders.Effects, "Partial.png"), width: 300, height: 128);
+            PngHeaderFile.Write(Path.Combine(artRoot, ArtFolders.Effects, "Partial.png"), width: 300, height: 128);
             var jazog = _catalog.PartyMembers["jazog"] with { AttackEffectFile = "Partial.png" };
             var catalog = _catalog with { PartyMembers = new Dictionary<string, PartyMemberDefinition>(_catalog.PartyMembers) { ["jazog"] = jazog } };
 
@@ -170,6 +169,54 @@ public sealed class ArtReferenceCheckTests
         {
             Directory.Delete(artRoot, recursive: true);
         }
+    }
+
+    // Only the sprite is in the art root, so the rest of the art is reported missing too; the test looks for its own line.
+    [Fact]
+    public void FindProblems_FieldSpriteSmallerThanTheWalkFrames_NamesItAndTheNeededSize()
+    {
+        var artRoot = Path.Combine(Path.GetTempPath(), $"jrpg-art-{Guid.NewGuid():N}");
+        try
+        {
+            PngHeaderFile.Write(Path.Combine(artRoot, ArtFolders.FieldSprites, "Small.png"), width: 48, height: 48);
+            var catalog = _catalog with { NewGame = _catalog.NewGame with { FieldSpriteFile = "Small.png" } };
+
+            var problems = ArtReferenceCheck.FindProblems(catalog, artRoot);
+
+            Assert.Contains("field-sprites/Small.png: a 48x48 sprite doesn't hold 8 x 4 frames of 48 px (384x192). Named by the new game.", problems);
+        }
+        finally
+        {
+            Directory.Delete(artRoot, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void FindProblems_NpcSpriteSmallerThanTheWalkFrames_NamesTheObject()
+    {
+        var artRoot = Path.Combine(Path.GetTempPath(), $"jrpg-art-{Guid.NewGuid():N}");
+        try
+        {
+            PngHeaderFile.Write(Path.Combine(artRoot, ArtFolders.FieldSprites, "Small.png"), width: 384, height: 144);
+            var villager = _catalog.Objects["villager"] with { FieldSpriteFile = "Small.png" };
+            var catalog = _catalog with { Objects = new Dictionary<string, ObjectDefinition>(_catalog.Objects) { ["villager"] = villager } };
+
+            var problems = ArtReferenceCheck.FindProblems(catalog, artRoot);
+
+            Assert.Contains("field-sprites/Small.png: a 384x144 sprite doesn't hold 8 x 4 frames of 48 px (384x192). Named by object 'villager'.", problems);
+        }
+        finally
+        {
+            Directory.Delete(artRoot, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void FindProblems_RepositoryArt_HasNoFieldSpriteProblem()
+    {
+        var problems = ArtReferenceCheck.FindProblems(_catalog, _artRoot);
+
+        Assert.DoesNotContain(problems, problem => problem.StartsWith($"{ArtFolders.FieldSprites}/", StringComparison.Ordinal));
     }
 
     [Fact]
@@ -207,15 +254,5 @@ public sealed class ArtReferenceCheckTests
     {
         var trio = _catalog.Encounters["goblin_trio"] with { BackgroundFile = file };
         return _catalog with { Encounters = new Dictionary<string, EncounterDefinition>(_catalog.Encounters) { ["goblin_trio"] = trio } };
-    }
-
-    // Only the header: the art check reads a PNG's size from it (PngSize).
-    private static void WritePngHeader(string path, int width, int height)
-    {
-        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        byte[] header = [0x89, (byte)'P', (byte)'N', (byte)'G', 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 13, (byte)'I', (byte)'H', (byte)'D', (byte)'R', 0, 0, 0, 0, 0, 0, 0, 0];
-        BinaryPrimitives.WriteInt32BigEndian(header.AsSpan(16), width);
-        BinaryPrimitives.WriteInt32BigEndian(header.AsSpan(20), height);
-        File.WriteAllBytes(path, header);
     }
 }

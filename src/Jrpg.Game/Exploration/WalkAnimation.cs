@@ -1,4 +1,5 @@
 using Jrpg.Core.Geometry;
+using Jrpg.Data.Art;
 
 namespace Jrpg.Game.Exploration;
 
@@ -8,7 +9,6 @@ namespace Jrpg.Game.Exploration;
 /// </summary>
 internal sealed class WalkAnimation
 {
-    private const int FrameCount = 8;
     private static readonly TimeSpan _frameDuration = TimeSpan.FromSeconds(0.1);
 
     private TimeSpan _sinceLastFrame;
@@ -35,7 +35,7 @@ internal sealed class WalkAnimation
         _sinceLastFrame += delta;
         var frames = (int)(_sinceLastFrame.Ticks / _frameDuration.Ticks);
         _sinceLastFrame -= _frameDuration * frames;
-        Frame = (Frame + frames) % FrameCount;
+        Frame = (Frame + frames) % FieldSpriteLayout.WalkFrames;
     }
 
     public void Stand()

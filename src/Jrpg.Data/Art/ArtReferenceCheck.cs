@@ -12,11 +12,12 @@ namespace Jrpg.Data.Art;
 public static class ArtReferenceCheck
 {
     /// <summary>
-    /// Every tilesheet, the field sprite, every NPC object's field sprite, every dialogue portrait, every party member's
+    /// Every tilesheet, the player's and every NPC object's field sprite, every dialogue portrait, every party member's
     /// portrait, every item's icon, every skill icon named (a skill may have none), every battle sprite, every enemy's
     /// portrait, every attack effect and every encounter's background exist as PNGs, every tile's cell lies inside its
-    /// sheet, and every effect strip is whole square frames. Skill icons, NPC sprites and battle art names must match
-    /// their files exactly, case included.
+    /// sheet, every effect strip is whole square frames, and every field sprite holds the walk frames of
+    /// <see cref="FieldSpriteLayout"/>. The names of skill icons, NPC sprites and battle art must match their files
+    /// exactly, case included.
     /// </summary>
     /// <returns>One line per problem, naming the file; empty when the art is complete.</returns>
     public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string artRoot)
@@ -40,8 +41,11 @@ public static class ArtReferenceCheck
         }
 
         TryReadSize(artRoot, ArtFolders.FieldSprites, catalog.NewGame.FieldSpriteFile, problems);
-        var spriteObjects = catalog.Objects.Values.Where(definition => definition.FieldSpriteFile is not null).OrderBy(definition => definition.Id, StringComparer.Ordinal);
-        AddMissingByExactName(problems, artRoot, ArtFolders.FieldSprites, spriteObjects.Select(definition => (definition.FieldSpriteFile!, $"object '{definition.Id}'")));
+        var npcSprites = catalog.Objects.Values.Where(definition => definition.FieldSpriteFile is not null).OrderBy(definition => definition.Id, StringComparer.Ordinal)
+            .Select(definition => (File: definition.FieldSpriteFile!, NamedBy: $"object '{definition.Id}'"))
+            .ToList();
+        AddMissingByExactName(problems, artRoot, ArtFolders.FieldSprites, npcSprites);
+        AddSpritesWithoutWalkFrames(problems, artRoot, npcSprites.Prepend((catalog.NewGame.FieldSpriteFile, "the new game")));
         var dialoguePortraits = DialoguePortraits(catalog).Select(named => (named.PortraitFile, $"event '{named.Event.Id}' on map '{named.MapId}'"));
         AddMissing(problems, artRoot, ArtFolders.Portraits, dialoguePortraits);
         var members = catalog.PartyMembers.Values.OrderBy(member => member.Id, StringComparer.Ordinal);
@@ -62,6 +66,21 @@ public static class ArtReferenceCheck
         var encounters = catalog.Encounters.Values.OrderBy(encounter => encounter.Id, StringComparer.Ordinal);
         AddMissingByExactName(problems, artRoot, ArtFolders.Backgrounds, encounters.Select(encounter => (encounter.BackgroundFile, $"encounter '{encounter.Id}'")));
         return problems;
+    }
+
+    // The walk animation reads every frame of the grid, so a smaller sprite would be cropped past its edge.
+    private static void AddSpritesWithoutWalkFrames(List<string> problems, string artRoot, IEnumerable<(string File, string NamedBy)> sprites)
+    {
+        const int neededWidth = FieldSpriteLayout.WalkFrames * FieldSpriteLayout.FramePixels;
+        const int neededHeight = FieldSpriteLayout.Rows * FieldSpriteLayout.FramePixels;
+        foreach (var (file, namedBy) in sprites)
+        {
+            if (ReadSize(artRoot, ArtFolders.FieldSprites, file).Size is { } size && !FieldSpriteLayout.Holds(size))
+            {
+                problems.Add(
+                    $"{ShownPath(ArtFolders.FieldSprites, file)}: a {size.Width}x{size.Height} sprite doesn't hold {FieldSpriteLayout.WalkFrames} x {FieldSpriteLayout.Rows} frames of {FieldSpriteLayout.FramePixels} px ({neededWidth}x{neededHeight}). Named by {namedBy}.");
+            }
+        }
     }
 
     // An effect strip is square frames side by side (decision 57), so its width must be a whole number of its heights.

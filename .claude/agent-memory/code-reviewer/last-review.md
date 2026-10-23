@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-code-health/slices/F4.md, slice F4 (victory card at the highest level shows a full bar and "Max")
+Slice: docs/plans/2026-10-23-code-health/slices/F5a.md, slice F5a (field sprites must hold the walk frames; shared Data PngHeaderFile)
 Round: 1 (verdict: Ready to commit)
 
-- Suggestion, open: ExperienceGain.cs:7-9 empty `<param>` tags for Member/Amount/Steps (only ones in src); fill them or fold IsAtMaxLevel into the summary.
+- Suggestion, open: FieldSpriteLayout.cs `WalkFrames` is the only constant without a one-line summary ("A column per walk frame; the walk animation cycles through them").

@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-new-game-flow/slices/T1.md, slice T1 (title shows only usable entries)
+Slice: docs/plans/2026-10-23-new-game-flow/slices/T2.md, slice T2 (defeat screen hides the loads it can't use)
 Round: 1 (verdict: Ready to commit)
 
-- Suggestion: TitleSceneTests `Select` helper loops forever if the entry isn't listed (e.g. Load with no save); bound it by a press count and assert, so a wrong entry list fails instead of hanging — open
+- No findings.

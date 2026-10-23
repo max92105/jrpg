@@ -55,7 +55,7 @@ internal sealed class DefeatScreenView
         _title = text.Messages.Text(MessageIds.BattleDefeat);
         _subtitle = text.Messages.Text(MessageIds.BattlePartyFallen);
         _footer = text.Messages.Text(MessageIds.BattleDefeatHint);
-        _labels = [.. DefeatMenu.Entries.Select(entry => text.Messages.Text(LabelIdOf(entry)))];
+        _labels = [.. screen.Menu.Entries.Select(entry => text.Messages.Text(LabelIdOf(entry)))];
     }
 
     /// <param name="batch">Already begun.</param>
@@ -89,8 +89,7 @@ internal sealed class DefeatScreenView
         var menu = _screen.Menu;
         for (var index = 0; index < _labels.Length; index++)
         {
-            var entry = DefeatMenu.Entries[index];
-            var isSelected = entry == menu.Selected;
+            var isSelected = menu.Entries[index] == menu.Selected;
             var bar = new Rectangle(ChoicesLeft, ChoicesTop + (index * (PointedBarShape.RewardBarHeight + ChoiceGap)), PointedBarShape.RewardBarWidth, PointedBarShape.RewardBarHeight);
             batch.Draw(isSelected ? _ui.SelectedRewardBar(textures) : _ui.RewardBar(textures), bar, Color.White * opacity);
             if (isSelected)
@@ -98,9 +97,8 @@ internal sealed class DefeatScreenView
                 new Diamond(new Vector2(bar.X + ChoicePointerLeft + ChoicePointerSide, bar.Center.Y), ChoicePointerSide).Draw(batch, textures.Pixel, Color.White * opacity);
             }
 
-            var color = menu.IsEnabled(entry) ? UiTheme.TextPrimary : UiTheme.TextDisabled;
             var labelTop = bar.Center.Y - (_choiceFont.Font.LineHeight / 2f);
-            _choiceFont.Draw(batch, _labels[index], new Vector2(bar.X + ChoiceLabelLeft, labelTop), color * opacity);
+            _choiceFont.Draw(batch, _labels[index], new Vector2(bar.X + ChoiceLabelLeft, labelTop), UiTheme.TextPrimary * opacity);
         }
     }
 

@@ -83,7 +83,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 1: the title
 - [x] **T1. The title shows only usable entries; Continue first and selected with a save** (Game, about 170 lines) → [slices/T1.md](slices/T1.md)
-- [ ] **T2. The defeat screen hides the loads it can't use** (Game, about 80 lines) → [slices/T2.md](slices/T2.md)
+- [x] **T2. The defeat screen hides the loads it can't use** (Game, about 80 lines) → [slices/T2.md](slices/T2.md)
 
 ### Phase 2: the flow, end to end
 - [ ] **L1. A new game starts with the chosen leader alone; the party may hold 5** (Core + Data + content, about 300 lines, plus about 50 one-argument call-site edits) → [slices/L1.md](slices/L1.md)

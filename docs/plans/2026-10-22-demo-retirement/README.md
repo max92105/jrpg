@@ -91,7 +91,7 @@ Counts are matching lines (`grep -ic`), counted on 2026-10-22; a line can hold t
 
 ### Phase 4: deletion and guard
 - [x] **X1. Tag, then delete `legacy/` and every pointer to it; the F1 debug button and unused art go too** (repository + Game, about 45 hand-written lines, plus the folder's 209 files and 2 images deleted) → [slices/X1.md](slices/X1.md)
-- [ ] **X2. The guard: `verify.ps1` fails on the word** (script + docs, about 45 lines) → [slices/X2.md](slices/X2.md)
+- [x] **X2. The guard: `verify.ps1` fails on the word** (script + docs, about 45 lines) → [slices/X2.md](slices/X2.md)
 - [ ] **Z. Session check** (manual) → [slices/Z.md](slices/Z.md)
 
 Dropped while planning:

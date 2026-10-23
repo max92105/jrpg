@@ -27,7 +27,7 @@ Dependency direction: Game → Data → Core; Editor → Data → Core. Never th
 
 ## Commands
 
-- All checks at once (build, tests, format, Core and naming rules; one line per check): `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/scripts/verify.ps1` (`-Fix` formats first). Prefer it to the commands below.
+- All checks at once (build, tests, format, Core and naming rules, no retired word outside history; one line per check): `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/scripts/verify.ps1` (`-Fix` formats first). Prefer it to the commands below.
 - Build: `dotnet build Jrpg.slnx --nologo -v q`
 - Test: `dotnet test --solution Jrpg.slnx`
 - Format check: `dotnet format Jrpg.slnx --verify-no-changes`

@@ -1,4 +1,3 @@
-using System.Globalization;
 using Jrpg.Core.Stats;
 using Jrpg.Game.Ui;
 
@@ -39,7 +38,7 @@ internal sealed class VitalsText(UiMessages messages)
         }
 
         shown = value;
-        return value.ToString(CultureInfo.InvariantCulture);
+        return NumberText.Of(value);
     }
 
     private string MaxIfChanged(ref int? shown, int value, string current)
@@ -50,6 +49,6 @@ internal sealed class VitalsText(UiMessages messages)
         }
 
         shown = value;
-        return messages.Format(MessageIds.BattleVitalMax, new MessageArgument("max", value.ToString(CultureInfo.InvariantCulture)));
+        return messages.Format(MessageIds.BattleVitalMax, MessageArgument.Number("max", value));
     }
 }

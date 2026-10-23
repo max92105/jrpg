@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Globalization;
 using FontStashSharp;
 
 namespace Jrpg.Game.Ui;
@@ -41,8 +40,8 @@ internal sealed class VitalMeter
         _shown = (value, max);
         var formatted = _messages.Format(
             MessageIds.StatValueOfMax,
-            new MessageArgument("value", value.ToString(CultureInfo.InvariantCulture)),
-            new MessageArgument("max", max.ToString(CultureInfo.InvariantCulture)));
+            MessageArgument.Number("value", value),
+            MessageArgument.Number("max", max));
         Value = MeasuredText.Of(_valueFont, formatted);
     }
 }

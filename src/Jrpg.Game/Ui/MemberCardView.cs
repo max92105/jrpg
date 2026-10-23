@@ -1,4 +1,3 @@
-using System.Globalization;
 using FontStashSharp;
 using Jrpg.Core.Content;
 using Jrpg.Core.Party;
@@ -73,7 +72,7 @@ internal sealed class MemberCardView
     {
         var vitals = new MemberVitalBars(_text, _ui, ValuePixels);
         vitals.Show(member.Vitals);
-        var level = _messages.Format(MessageIds.PartyLevel, new MessageArgument("level", Number(member.Level)));
+        var level = _messages.Format(MessageIds.PartyLevel, MessageArgument.Number("level", member.Level));
         return new Card(
             MeasuredText.Of(_nameFont, member.Definition.Name),
             member == leader,
@@ -110,8 +109,6 @@ internal sealed class MemberCardView
         DrawBarRow(batch, textures, card.Vitals.Hp, new BarRow(_hpLabel, text.X, barsTop, text.Width), opacity);
         DrawBarRow(batch, textures, card.Vitals.Mp, new BarRow(_mpLabel, text.X, barsTop + BarRowHeight, text.Width), opacity);
     }
-
-    private static string Number(int value) => value.ToString(CultureInfo.InvariantCulture);
 
     // The name, the leader's badge after it, and the level at the right.
     private void DrawHeadline(SpriteBatch batch, TextureLibrary textures, Card card, Rectangle text, float opacity)

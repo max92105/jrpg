@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using FontStashSharp;
 using Jrpg.Core.Content;
 using Jrpg.Core.Party;
@@ -172,12 +171,12 @@ internal sealed class StatusPage : IMemberPage
             member.Definition.Name,
             _catalog.Classes[member.Definition.ClassId].Name,
             member.Definition.PortraitFile,
-            [Number(member.Level), Number(member.Experience), nextLevel],
+            [NumberText.Of(member.Level), NumberText.Of(member.Experience), nextLevel],
             [
                 shownVitals.Hp.Value.Text,
                 shownVitals.Mp.Value.Text,
-                Number(stats.Attack),
-                Number(stats.Defense),
+                NumberText.Of(stats.Attack),
+                NumberText.Of(stats.Defense),
             ],
             [member.Weapon?.Name ?? _labels.Empty, member.Armor?.Name ?? _labels.Empty]);
     }
@@ -188,7 +187,7 @@ internal sealed class StatusPage : IMemberPage
     /// <param name="table">How much each level takes.</param>
     /// <param name="maxLevelText">Shown when there is no next level.</param>
     internal static string ToNextLevelText(int level, int experience, ExperienceTable table, string maxLevelText) =>
-        table.IsMaxLevel(level) ? maxLevelText : Number(table.ExperienceToReachNext(level) - experience);
+        table.IsMaxLevel(level) ? maxLevelText : NumberText.Of(table.ExperienceToReachNext(level) - experience);
 
     /// <summary>How far the member is through their level, for the experience bar; all the way at the highest level.</summary>
     /// <param name="level">The member's level.</param>
@@ -196,8 +195,6 @@ internal sealed class StatusPage : IMemberPage
     /// <param name="table">How much each level takes.</param>
     internal static (int Earned, int Needed) ExperienceProgress(int level, int experience, ExperienceTable table) =>
         table.IsMaxLevel(level) ? (1, 1) : (experience, table.ExperienceToReachNext(level));
-
-    private static string Number(int value) => value.ToString(CultureInfo.InvariantCulture);
 
     // A diamond like the dialogue's, framed by a slightly larger pale diamond behind it.
     private void DrawPortrait(PageFrame page, Vector2 center)

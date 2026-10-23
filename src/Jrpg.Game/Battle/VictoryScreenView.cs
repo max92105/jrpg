@@ -1,4 +1,3 @@
-using System.Globalization;
 using Jrpg.Core.Battle;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Ui;
@@ -105,7 +104,7 @@ internal sealed class VictoryScreenView
         _title = text.Messages.Text(MessageIds.BattleVictory);
         var rewardRows = RewardRows(screen.Rewards);
         _rewardLabels = [.. rewardRows.Select(row => text.Messages.Text(row.LabelId))];
-        _rewardValues = [.. rewardRows.Select(row => row.Amount.ToString(CultureInfo.InvariantCulture))];
+        _rewardValues = [.. rewardRows.Select(row => NumberText.Of(row.Amount))];
         _names = [.. screen.Rewards.Gains.Select(gain => gain.Member.Definition.Name)];
         _levelLabel = MeasuredText.Of(_smallFont.Font, text.Messages.Text(MessageIds.BattleLevelLabel));
         _experienceLabel = text.Messages.Text(MessageIds.StatusExp);
@@ -223,7 +222,7 @@ internal sealed class VictoryScreenView
 
         if (_shown[index].Level != bar.Level)
         {
-            _levelTexts[index] = MeasuredText.Of(_levelFont.Font, bar.Level.ToString(CultureInfo.InvariantCulture));
+            _levelTexts[index] = MeasuredText.Of(_levelFont.Font, NumberText.Of(bar.Level));
         }
 
         if (isAtMaxLevel)
@@ -242,11 +241,11 @@ internal sealed class VictoryScreenView
     {
         if (_shown[index].Needed != bar.ExperienceToNextLevel)
         {
-            var needed = _messages.Format(MessageIds.BattleVitalMax, new MessageArgument("max", bar.ExperienceToNextLevel.ToString(CultureInfo.InvariantCulture)));
+            var needed = _messages.Format(MessageIds.BattleVitalMax, MessageArgument.Number("max", bar.ExperienceToNextLevel));
             _nextLevelTexts[index] = MeasuredText.Of(_smallFont.Font, needed);
         }
 
-        _experienceTexts[index] = MeasuredText.Of(_experienceFont.Font, bar.Experience.ToString(CultureInfo.InvariantCulture));
+        _experienceTexts[index] = MeasuredText.Of(_experienceFont.Font, NumberText.Of(bar.Experience));
         _bars[index].Show(bar.Experience, bar.ExperienceToNextLevel);
     }
 

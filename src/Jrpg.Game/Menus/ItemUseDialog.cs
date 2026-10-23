@@ -1,4 +1,3 @@
-using System.Globalization;
 using Jrpg.Core.Content;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
@@ -97,7 +96,7 @@ internal sealed class ItemUseDialog
             : _messages.Format(
                 messageId,
                 new MessageArgument("member", target.Definition.Name),
-                new MessageArgument("amount", amount.ToString(CultureInfo.InvariantCulture)));
+                MessageArgument.Number("amount", amount));
     }
 
     // The item being used and the picker choosing who for; set and cleared together.

@@ -1,4 +1,3 @@
-using System.Globalization;
 using FontStashSharp;
 using Jrpg.Core.Content;
 using Jrpg.Core.Party;
@@ -57,8 +56,8 @@ internal sealed class PartyColumnsView
     {
         var count = _messages.Format(
             MessageIds.PartyCount,
-            new MessageArgument("count", party.ActiveMembers.Count.ToString(CultureInfo.InvariantCulture)),
-            new MessageArgument("max", _maxActive.ToString(CultureInfo.InvariantCulture)));
+            MessageArgument.Number("count", party.ActiveMembers.Count),
+            MessageArgument.Number("max", _maxActive));
         return new PartyColumns(
             [.. party.ActiveMembers],
             [.. party.ReserveMembers],

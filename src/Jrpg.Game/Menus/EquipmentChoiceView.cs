@@ -1,4 +1,3 @@
-using System.Globalization;
 using FontStashSharp;
 using Jrpg.Core.Items;
 using Jrpg.Game.Rendering;
@@ -71,7 +70,7 @@ internal sealed class EquipmentChoiceView
         _heading = slotName;
         _quantities = [.. choice.Items.Select(item =>
         {
-            var quantity = inventory.QuantityOf(item.Id).ToString(CultureInfo.InvariantCulture);
+            var quantity = NumberText.Of(inventory.QuantityOf(item.Id));
             return (quantity, _bodyFont.MeasureString(quantity).X);
         })];
         _wornRows = [.. choice.Takeable.Select(worn => _messages.Format(

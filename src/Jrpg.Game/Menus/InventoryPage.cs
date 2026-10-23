@@ -1,4 +1,3 @@
-using System.Globalization;
 using FontStashSharp;
 using Jrpg.Core.Content;
 using Jrpg.Core.Items;
@@ -275,7 +274,7 @@ internal sealed class InventoryPage : IMenuPage
     private ItemRow RowOf(InventoryEntry entry)
     {
         var item = _catalog.Items[entry.ItemId];
-        var quantity = entry.Quantity.ToString(CultureInfo.InvariantCulture);
+        var quantity = NumberText.Of(entry.Quantity);
         return new ItemRow(item.Id, item.Name, item.IconFile, quantity, _bodyFont.MeasureString(quantity).X, item.Description, _session.FieldItems.CanUse(item));
     }
 

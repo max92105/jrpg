@@ -1,4 +1,3 @@
-using System.Globalization;
 using Jrpg.Core.Exploration;
 using Jrpg.Game.Ui;
 
@@ -13,7 +12,7 @@ internal static class FoundItemText
     public static string Of(ItemReceipt receipt, UiMessages messages)
     {
         var lost = receipt.Lost > 0
-            ? messages.Format(MessageIds.ItemFoundLost, new MessageArgument("lost", Count(receipt.Lost)))
+            ? messages.Format(MessageIds.ItemFoundLost, MessageArgument.Number("lost", receipt.Lost))
             : null;
         if (receipt.Added == 0)
         {
@@ -26,9 +25,7 @@ internal static class FoundItemText
             : messages.Format(
                 MessageIds.ItemFoundMany,
                 new MessageArgument("item", receipt.Item.Name),
-                new MessageArgument("count", Count(receipt.Added)));
+                MessageArgument.Number("count", receipt.Added));
         return lost is null ? found : $"{found} {lost}";
     }
-
-    private static string Count(int copies) => copies.ToString(CultureInfo.InvariantCulture);
 }

@@ -82,7 +82,7 @@ internal sealed class SaveSlotListView
     // Built once per read of the files, so drawing formats nothing.
     private RowText TextOf(SaveSlotEntry entry)
     {
-        var file = _messages.Format(MessageIds.SaveFile, new MessageArgument("number", Number(entry.Number)));
+        var file = _messages.Format(MessageIds.SaveFile, MessageArgument.Number("number", entry.Number));
         if (entry.Summary is not { } summary)
         {
             var state = _messages.Text(entry.IsDamaged ? MessageIds.SaveDamaged : MessageIds.SaveEmpty);
@@ -94,11 +94,9 @@ internal sealed class SaveSlotListView
             new MessageArgument("date", summary.SavedAt.ToLocalTime().ToString(DateFormat, CultureInfo.InvariantCulture)),
             new MessageArgument("time", PlayTimeText.Format(summary.PlayTime)));
         var party = string.Join("   ", summary.ActiveParty.Select(member =>
-            _messages.Format(MessageIds.SaveMember, new MessageArgument("name", member.Name), new MessageArgument("level", Number(member.Level)))));
+            _messages.Format(MessageIds.SaveMember, new MessageArgument("name", member.Name), MessageArgument.Number("level", member.Level))));
         return new RowText(file, summary.LocationName, details, party, _bodyFont.MeasureString(party).X);
     }
-
-    private static string Number(int value) => value.ToString(CultureInfo.InvariantCulture);
 
     // Section titles over the same three columns as the rows.
     private void DrawColumnTitles(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)

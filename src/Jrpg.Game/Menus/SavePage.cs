@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Globalization;
 using FontStashSharp;
 using Jrpg.Core.Session;
 using Jrpg.Game.Input;
@@ -145,5 +144,5 @@ internal sealed class SavePage : ISaveFilesPage
     }
 
     private static MessageArgument FileNumber(int number) =>
-        new("number", number.ToString(CultureInfo.InvariantCulture));
+        MessageArgument.Number("number", number);
 }

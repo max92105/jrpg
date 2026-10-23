@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using System.Globalization;
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Game.Ui;
@@ -21,7 +20,7 @@ internal sealed record EquipmentSheet(string Name, ImmutableArray<ItemDefinition
         return new EquipmentSheet(
             member.Definition.Name,
             [.. Slots.Select(member.EquippedIn)],
-            [Number(member.Vitals.MaxHp), Number(member.Vitals.MaxMp), Number(stats.Attack), Number(stats.Defense)]);
+            [NumberText.Of(member.Vitals.MaxHp), NumberText.Of(member.Vitals.MaxMp), NumberText.Of(stats.Attack), NumberText.Of(stats.Defense)]);
     }
 
     public static string LabelIdOf(EquipmentSlot slot) => slot switch
@@ -30,6 +29,4 @@ internal sealed record EquipmentSheet(string Name, ImmutableArray<ItemDefinition
         EquipmentSlot.Armor => MessageIds.SlotArmor,
         _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, null),
     };
-
-    private static string Number(int value) => value.ToString(CultureInfo.InvariantCulture);
 }

@@ -1,4 +1,3 @@
-using System.Globalization;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
 using Jrpg.Game.Ui;
@@ -119,7 +118,7 @@ internal sealed class ActionPlayback
     // An action without one, an attack, only ever lands damage.
     private void AddLanding(EffectApplied effect)
     {
-        _numbers.Add(new FloatingNumber(effect.Target, effect.Amount.ToString(CultureInfo.InvariantCulture), effect.Kind));
+        _numbers.Add(new FloatingNumber(effect.Target, NumberText.Of(effect.Amount), effect.Kind));
         if (effect.Kind == EffectKind.Damage && _attackEffectFile is { } file)
         {
             _strips.Add(new EffectOnTarget(effect.Target, file));

@@ -1,4 +1,3 @@
-using System.Globalization;
 using FontStashSharp;
 using Jrpg.Core.Battle;
 using Jrpg.Game.Rendering;
@@ -190,7 +189,7 @@ internal sealed class CommandPanelView
     private static float OpacityOf(bool isUsable) => isUsable ? 1 : DisabledOpacity;
 
     private MeasuredText AmountText(string messageId, string placeholder, int amount) =>
-        MeasuredText.Of(_rowFont, _messages.Format(messageId, new MessageArgument(placeholder, amount.ToString(CultureInfo.InvariantCulture))));
+        MeasuredText.Of(_rowFont, _messages.Format(messageId, MessageArgument.Number(placeholder, amount)));
 
     /// <returns>The frame's bottom.</returns>
     private int DrawList(SpriteBatch batch, TextureLibrary textures, IBattleListChoice list, Point topLeft)

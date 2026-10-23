@@ -14,10 +14,6 @@ namespace Jrpg.Game.Battle;
 internal sealed class DefeatScreenView
 {
     // Placeholder layout on the 1920 x 1080 virtual screen (decision 56), matching the victory screen's title and bars.
-    private const int TitleLeft = 104;
-    private const int TitleTop = 112;
-    private const int TitleLineLeft = 96;
-    private const int TitleLineTop = 226;
     private const int SubtitleLeft = 110;
     private const int SubtitleTop = 246;
     private const int ChoicesLeft = 88;
@@ -26,8 +22,6 @@ internal sealed class DefeatScreenView
     private const int ChoicePointerLeft = 40;
     private const int ChoicePointerSide = 12;
     private const int ChoiceLabelLeft = 96;
-    private const int FooterHeight = 100;
-    private const int FooterLineAbove = 170;
     private const int FooterTextLeft = 70;
     private const int TitleTextPixels = 96;
     private const int SubtitleTextPixels = 24;
@@ -68,13 +62,11 @@ internal sealed class DefeatScreenView
     /// <param name="textures">Where the plain pixel and gradients come from.</param>
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
-        // Decision 52: the battle is dimmed, not blurred.
-        batch.Draw(_ui.MenuScrim(textures), new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height), Color.White);
-        _titleFont.Draw(batch, _title, new Vector2(TitleLeft, TitleTop), UiTheme.Danger * _screen.Entrance.TitleOpacity);
-        batch.Draw(textures.Pixel, new Rectangle(TitleLineLeft, TitleLineTop, VirtualScreen.Width - TitleLineLeft, 1), UiTheme.BarLine);
+        OutcomeFrame.DrawBackdrop(batch, textures, _ui);
+        _titleFont.Draw(batch, _title, new Vector2(OutcomeFrame.TitleLeft, OutcomeFrame.TitleTop), UiTheme.Danger * _screen.Entrance.TitleOpacity);
         _subtitleFont.Draw(batch, _subtitle, new Vector2(SubtitleLeft, SubtitleTop), UiTheme.TextSecondary);
         DrawChoices(batch, textures);
-        DrawFooter(batch, textures);
+        DrawFooter(batch, textures.Pixel);
         if (_screen.IsChoosingFile)
         {
             batch.Draw(textures.Pixel, new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height), UiTheme.Scrim);
@@ -112,13 +104,11 @@ internal sealed class DefeatScreenView
         }
     }
 
-    private void DrawFooter(SpriteBatch batch, TextureLibrary textures)
+    private void DrawFooter(SpriteBatch batch, Texture2D pixel)
     {
-        var footerTop = VirtualScreen.Height - FooterHeight;
-        batch.Draw(textures.Pixel, new Rectangle(0, VirtualScreen.Height - FooterLineAbove, VirtualScreen.Width, 1), UiTheme.BarLine);
-        batch.Draw(textures.Pixel, new Rectangle(0, footerTop, VirtualScreen.Width, FooterHeight), UiTheme.Bar);
-        batch.Draw(textures.Pixel, new Rectangle(0, footerTop, VirtualScreen.Width, 1), UiTheme.BarLine);
-        var textTop = footerTop + ((FooterHeight - _footerFont.LineHeight) / 2f);
+        OutcomeFrame.DrawFooter(batch, pixel);
+        var footer = FooterBar.Area(OutcomeFrame.FooterHeight);
+        var textTop = footer.Y + ((footer.Height - _footerFont.LineHeight) / 2f);
         batch.DrawString(_footerFont, _footer, new Vector2(FooterTextLeft, textTop), UiTheme.TextPrimary);
     }
 }

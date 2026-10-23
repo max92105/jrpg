@@ -38,7 +38,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the battle plan (2026-10-20)
 
-- **The footer bar with its hairline is drawn 3 times** (`GameMenuScene`, `VictoryScreenView`, `DefeatScreenView`; the two outcome screens also share the left shade and the title hairline). A shared `Ui` footer, and an outcome frame for the two battle screens. (plan 2026-10-23, U6)
 - **Enemy attack strips are drawn unmirrored over the party**; no flip rule is decided (B5d). A design question for the developer.
 - **"Load the latest save" and the save-list overlay are written twice** (`TitleScene`, `DefeatScreen`/`DefeatScreenView`). Share them in the **autosave plan**, which is likely to add the third copy.
 - **The banner band is drawn twice** (`BattleBannerView`, `BattleScene.DrawEscaped`). Share it in the **map name banner plan**, the third copy.

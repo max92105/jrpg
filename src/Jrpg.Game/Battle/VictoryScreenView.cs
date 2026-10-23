@@ -14,10 +14,6 @@ namespace Jrpg.Game.Battle;
 internal sealed class VictoryScreenView
 {
     // Placeholder layout on the 1920 x 1080 virtual screen (decision 56).
-    private const int TitleLeft = 104;
-    private const int TitleTop = 112;
-    private const int TitleLineLeft = 96;
-    private const int TitleLineTop = 226;
     private const int RewardLeft = 88;
     private const int RewardTop = 268;
     private const int RewardGap = 12;
@@ -37,8 +33,6 @@ internal sealed class VictoryScreenView
     private const int LevelLabelGap = 4;
     private const int LevelUpRight = 8;
     private const int LevelUpTop = -34;
-    private const int FooterHeight = 100;
-    private const int FooterLineAbove = 170;
     private const int NextHintRight = 70;
     private const int TitlePixels = 96;
     private const int RewardLabelPixels = 22;
@@ -54,7 +48,7 @@ internal sealed class VictoryScreenView
     internal const int CardHeight = CardBarTop + CardBarHeight;
 
     /// <summary>The hairline above the footer, which the cards must end above.</summary>
-    internal const int FooterLineTop = VirtualScreen.Height - FooterLineAbove;
+    internal const int FooterLineTop = OutcomeFrame.FooterLineTop;
 
     private readonly VictoryScreen _screen;
     private readonly UiTextures _ui;
@@ -135,11 +129,10 @@ internal sealed class VictoryScreenView
     /// <param name="textures">Where the plain pixel comes from.</param>
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
-        // Decision 52: the battle is dimmed, not blurred.
-        batch.Draw(_ui.MenuScrim(textures), new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height), Color.White);
+        OutcomeFrame.DrawBackdrop(batch, textures, _ui);
         var entrance = _screen.Entrance;
-        _titleFont.Draw(batch, _title, new Vector2(TitleLeft + entrance.TitleOffset, TitleTop), UiTheme.TextPrimary * entrance.TitleOpacity);
-        batch.Draw(textures.Pixel, new Rectangle(TitleLineLeft, TitleLineTop, VirtualScreen.Width - TitleLineLeft, 1), UiTheme.BarLine);
+        var titleLeft = OutcomeFrame.TitleLeft + entrance.TitleOffset;
+        _titleFont.Draw(batch, _title, new Vector2(titleLeft, OutcomeFrame.TitleTop), UiTheme.TextPrimary * entrance.TitleOpacity);
         DrawRewards(batch, textures);
         for (var index = 0; index < _names.Length; index++)
         {
@@ -148,13 +141,11 @@ internal sealed class VictoryScreenView
             DrawCard(batch, textures, index, topLeft);
         }
 
-        var footerTop = VirtualScreen.Height - FooterHeight;
-        batch.Draw(textures.Pixel, new Rectangle(0, FooterLineTop, VirtualScreen.Width, 1), UiTheme.BarLine);
-        batch.Draw(textures.Pixel, new Rectangle(0, footerTop, VirtualScreen.Width, FooterHeight), UiTheme.Bar);
-        batch.Draw(textures.Pixel, new Rectangle(0, footerTop, VirtualScreen.Width, 1), UiTheme.BarLine);
+        OutcomeFrame.DrawFooter(batch, textures.Pixel);
         if (_screen.IsComplete)
         {
-            var hintTop = footerTop + ((FooterHeight - _nextHintFont.Font.LineHeight) / 2f);
+            var footer = FooterBar.Area(OutcomeFrame.FooterHeight);
+            var hintTop = footer.Y + ((footer.Height - _nextHintFont.Font.LineHeight) / 2f);
             _nextHintFont.Draw(batch, _nextHint.Text, new Vector2(VirtualScreen.Width - NextHintRight - _nextHint.Width, hintTop), UiTheme.TextPrimary);
         }
     }

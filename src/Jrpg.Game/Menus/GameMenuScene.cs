@@ -122,7 +122,8 @@ internal sealed class GameMenuScene : IScene
 
     private void DrawFooterHint(SpriteBatch batch, float opacity)
     {
-        var top = VirtualScreen.Height - FooterHeight + ((FooterHeight - _font.LineHeight) / 2);
+        var footer = FooterBar.Area(FooterHeight);
+        var top = footer.Y + ((footer.Height - _font.LineHeight) / 2);
         batch.DrawString(_font, FooterHint, new Vector2(FooterTextInset, top), UiTheme.TextSecondary * opacity);
     }
 
@@ -133,11 +134,9 @@ internal sealed class GameMenuScene : IScene
         CoverFit.DrawOverScreen(batch, textures.Get(ArtFolders.Backgrounds, UiArtFiles.Backgrounds.Menu), tint);
         batch.Draw(_ui.MenuScrim(textures), _screen, tint);
 
-        var footerTop = VirtualScreen.Height - FooterHeight;
         batch.Draw(textures.Pixel, new Rectangle(0, 0, VirtualScreen.Width, MenuHeader.Height), UiTheme.Bar * opacity);
         batch.Draw(textures.Pixel, new Rectangle(0, MenuHeader.Height - 1, VirtualScreen.Width, 1), UiTheme.BarLine * opacity);
-        batch.Draw(textures.Pixel, new Rectangle(0, footerTop, VirtualScreen.Width, FooterHeight), UiTheme.Bar * opacity);
-        batch.Draw(textures.Pixel, new Rectangle(0, footerTop, VirtualScreen.Width, 1), UiTheme.BarLine * opacity);
+        FooterBar.Draw(batch, textures.Pixel, FooterHeight, opacity);
     }
 
     private void DrawTab(SpriteBatch batch, TextureLibrary textures, int index, float opacity)

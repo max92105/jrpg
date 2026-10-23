@@ -82,7 +82,7 @@ At the end of this plan, a new game plays from the title to the map like this:
 One line per slice; each slice's goal, types, tests and hand checks are in its file under `slices/`. Tick the box here when a slice is done, and write its deviations in the slice file. Tunables, design overview and risks: [design.md](design.md).
 
 ### Phase 1: the title
-- [ ] **T1. The title shows only usable entries; Continue first and selected with a save** (Game, about 170 lines) → [slices/T1.md](slices/T1.md)
+- [x] **T1. The title shows only usable entries; Continue first and selected with a save** (Game, about 170 lines) → [slices/T1.md](slices/T1.md)
 - [ ] **T2. The defeat screen hides the loads it can't use** (Game, about 80 lines) → [slices/T2.md](slices/T2.md)
 
 ### Phase 2: the flow, end to end

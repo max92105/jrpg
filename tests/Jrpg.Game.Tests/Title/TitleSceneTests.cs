@@ -36,13 +36,12 @@ public sealed class TitleSceneTests : IDisposable
     }
 
     [Fact]
-    public void Update_ConfirmContinue_RequestsMostRecentSlot()
+    public void Update_ConfirmWithReadableSave_RequestsMostRecentSlot()
     {
         SaveWithPlayTime(3, TimeSpan.FromMinutes(30));
         _now = _now.AddHours(1);
         SaveWithPlayTime(1, TimeSpan.FromMinutes(10));
         var scene = NewScene();
-        scene.Update(_oneUpdate, Pressing(GameButton.Down));
 
         var request = scene.Update(_oneUpdate, Pressing(GameButton.Confirm));
 
@@ -55,8 +54,7 @@ public sealed class TitleSceneTests : IDisposable
     {
         SaveWithPlayTime(1, TimeSpan.Zero);
         var scene = NewScene();
-        scene.Update(_oneUpdate, Pressing(GameButton.Down));
-        scene.Update(_oneUpdate, Pressing(GameButton.Down));
+        Select(scene, TitleEntry.Load);
 
         scene.Update(_oneUpdate, Pressing(GameButton.Confirm));
 
@@ -68,8 +66,7 @@ public sealed class TitleSceneTests : IDisposable
     {
         SaveWithPlayTime(1, TimeSpan.Zero);
         var scene = NewScene();
-        scene.Update(_oneUpdate, Pressing(GameButton.Down));
-        scene.Update(_oneUpdate, Pressing(GameButton.Down));
+        Select(scene, TitleEntry.Load);
         scene.Update(_oneUpdate, Pressing(GameButton.Confirm));
 
         scene.Update(_oneUpdate, Pressing(GameButton.Cancel));
@@ -82,8 +79,7 @@ public sealed class TitleSceneTests : IDisposable
     {
         SaveWithPlayTime(1, TimeSpan.FromMinutes(5));
         var scene = NewScene();
-        scene.Update(_oneUpdate, Pressing(GameButton.Down));
-        scene.Update(_oneUpdate, Pressing(GameButton.Down));
+        Select(scene, TitleEntry.Load);
         scene.Update(_oneUpdate, Pressing(GameButton.Confirm));
 
         var request = scene.Update(_oneUpdate, Pressing(GameButton.Confirm));
@@ -97,7 +93,6 @@ public sealed class TitleSceneTests : IDisposable
         SaveWithPlayTime(1, TimeSpan.Zero);
         var scene = NewScene();
         File.WriteAllText(Path.Combine(_directory, "slot_01.json"), "{ not json");
-        scene.Update(_oneUpdate, Pressing(GameButton.Down));
 
         var request = scene.Update(_oneUpdate, Pressing(GameButton.Confirm));
 
@@ -112,4 +107,15 @@ public sealed class TitleSceneTests : IDisposable
     }
 
     private TitleScene NewScene() => new(RepositoryScreenText.Text, _slots, new UiTextures());
+
+    // Bounded by the number of entries, so an entry that isn't listed fails the test instead of looping forever.
+    private static void Select(TitleScene scene, TitleEntry entry)
+    {
+        for (var presses = 0; presses < Enum.GetValues<TitleEntry>().Length && scene.SelectedEntry != entry; presses++)
+        {
+            scene.Update(_oneUpdate, Pressing(GameButton.Down));
+        }
+
+        Assert.Equal(entry, scene.SelectedEntry);
+    }
 }

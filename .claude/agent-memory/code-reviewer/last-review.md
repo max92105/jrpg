@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-code-health/slices/U6.md, slice U6 (FooterBar and OutcomeFrame)
+Slice: docs/plans/2026-10-23-new-game-flow/slices/T1.md, slice T1 (title shows only usable entries)
 Round: 1 (verdict: Ready to commit)
 
-- Suggestion: hint vertical centring `footer.Y + (footer.Height - lineHeight) / 2` written 3 times (GameMenuScene, VictoryScreenView, DefeatScreenView); a `FooterBar.TextTop(height, lineHeight)` would hold it once (menu uses int division, outcome screens float) — open
+- Suggestion: TitleSceneTests `Select` helper loops forever if the entry isn't listed (e.g. Load with no save); bound it by a press count and assert, so a wrong entry list fails instead of hanging — open

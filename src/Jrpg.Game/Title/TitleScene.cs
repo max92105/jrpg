@@ -69,7 +69,7 @@ internal sealed class TitleScene : IScene
         _name = text.Messages.Text(MessageIds.GameTitle);
         _namePosition = new Vector2((VirtualScreen.Width - _nameFont.MeasureString(_name).X) / 2f, NameTop);
 
-        _labels = [.. TitleMenu.Entries.Select(entry => text.Messages.Text(LabelIdOf(entry)))];
+        _labels = [.. _menu.Entries.Select(entry => text.Messages.Text(LabelIdOf(entry)))];
         var pitch = _entryFont.LineHeight + EntryGap;
         var firstCenterY = EntriesCenterY - ((_labels.Length - 1) * pitch / 2f);
         _labelCenters = [.. _labels.Select((_, index) => new Vector2(VirtualScreen.Width / 2f, firstCenterY + (index * pitch)))];
@@ -78,6 +78,9 @@ internal sealed class TitleScene : IScene
 
     /// <summary>Whether the file list is open over the title, after Load.</summary>
     public bool IsChoosingFile { get; private set; }
+
+    /// <summary>The entry the cursor is on, so tests can pick entries by what they are.</summary>
+    internal TitleEntry SelectedEntry => _menu.Selected;
 
     public SceneRequest? Update(TimeSpan delta, InputFrame input) => IsChoosingFile ? ChooseFile(input) : Choose(_menu.Update(input));
 
@@ -127,7 +130,7 @@ internal sealed class TitleScene : IScene
         }
     }
 
-    // Continue is enabled only with a readable save; a file broken since the title read it is logged and changes nothing.
+    // Continue is listed only with a readable save; a file broken since the title read it is logged and changes nothing.
     private LoadRequested? ContinueLatest() =>
         SaveSlots.MostRecent(_saves) is { } latest && _slots.Load(latest.Number) is { } save ? new LoadRequested(save) : null;
 
@@ -145,14 +148,7 @@ internal sealed class TitleScene : IScene
     // Drawn around its center, so the selected entry grows in place.
     private void DrawEntry(SpriteBatch batch, int index)
     {
-        var entry = TitleMenu.Entries[index];
-        if (!_menu.IsEnabled(entry))
-        {
-            batch.DrawString(_entryFont, _labels[index], _labelCenters[index], UiTheme.TextDisabled, origin: _labelOrigins[index]);
-            return;
-        }
-
-        var isSelected = entry == _menu.Selected;
+        var isSelected = _menu.Entries[index] == _menu.Selected;
         var scale = new Vector2(isSelected ? SelectedScale : 1);
         var label = _labels[index];
         var center = _labelCenters[index];

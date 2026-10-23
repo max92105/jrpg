@@ -2,7 +2,7 @@ namespace Jrpg.Game.Ui;
 
 /// <summary>
 /// The selected entry of a vertical list. It wraps from one end to the other and passes over disabled entries, such as
-/// Continue with no save to continue from.
+/// a member an item can't be used on.
 /// </summary>
 internal sealed class ListCursor
 {

@@ -7,27 +7,49 @@ namespace Jrpg.Game.Tests.Title;
 public sealed class TitleMenuTests
 {
     [Fact]
-    public void Update_ConfirmFirstEntry_ReturnsNewGame()
+    public void Entries_ReadableSave_ListsContinueNewGameLoadQuit()
     {
         var menu = new TitleMenu(hasReadableSave: true);
 
-        var entry = menu.Update(Pressing(GameButton.Confirm));
-
-        Assert.Equal(TitleEntry.NewGame, entry);
+        Assert.Equal([TitleEntry.Continue, TitleEntry.NewGame, TitleEntry.Load, TitleEntry.Quit], menu.Entries);
     }
 
     [Fact]
-    public void Constructor_NoReadableSave_ContinueAndLoadDisabled()
+    public void Entries_NoReadableSave_ListsNewGameAndQuit()
     {
         var menu = new TitleMenu(hasReadableSave: false);
 
-        Assert.False(menu.IsEnabled(TitleEntry.Continue));
-        Assert.False(menu.IsEnabled(TitleEntry.Load));
-        Assert.True(menu.IsEnabled(TitleEntry.Quit));
+        Assert.Equal([TitleEntry.NewGame, TitleEntry.Quit], menu.Entries);
     }
 
     [Fact]
-    public void Update_DownWithoutReadableSave_SkipsToQuit()
+    public void Selected_ReadableSave_IsContinue()
+    {
+        var menu = new TitleMenu(hasReadableSave: true);
+
+        Assert.Equal(TitleEntry.Continue, menu.Selected);
+    }
+
+    [Fact]
+    public void Selected_NoReadableSave_IsNewGame()
+    {
+        var menu = new TitleMenu(hasReadableSave: false);
+
+        Assert.Equal(TitleEntry.NewGame, menu.Selected);
+    }
+
+    [Fact]
+    public void Update_DownFromContinue_SelectsNewGame()
+    {
+        var menu = new TitleMenu(hasReadableSave: true);
+
+        menu.Update(Pressing(GameButton.Down));
+
+        Assert.Equal(TitleEntry.NewGame, menu.Selected);
+    }
+
+    [Fact]
+    public void Update_DownWithoutReadableSave_SelectsQuit()
     {
         var menu = new TitleMenu(hasReadableSave: false);
 
@@ -37,13 +59,13 @@ public sealed class TitleMenuTests
     }
 
     [Fact]
-    public void Update_DownWithReadableSave_SelectsContinue()
+    public void Update_UpFromContinue_WrapsToQuit()
     {
         var menu = new TitleMenu(hasReadableSave: true);
 
-        menu.Update(Pressing(GameButton.Down));
+        menu.Update(Pressing(GameButton.Up));
 
-        Assert.Equal(TitleEntry.Continue, menu.Selected);
+        Assert.Equal(TitleEntry.Quit, menu.Selected);
     }
 
     [Fact]
@@ -52,6 +74,26 @@ public sealed class TitleMenuTests
         var menu = new TitleMenu(hasReadableSave: true);
 
         Assert.Null(menu.Update(default));
-        Assert.Equal(TitleEntry.NewGame, menu.Selected);
+        Assert.Equal(TitleEntry.Continue, menu.Selected);
+    }
+
+    [Fact]
+    public void Update_ConfirmWithReadableSave_ReturnsContinue()
+    {
+        var menu = new TitleMenu(hasReadableSave: true);
+
+        var entry = menu.Update(Pressing(GameButton.Confirm));
+
+        Assert.Equal(TitleEntry.Continue, entry);
+    }
+
+    [Fact]
+    public void Update_ConfirmWithoutReadableSave_ReturnsNewGame()
+    {
+        var menu = new TitleMenu(hasReadableSave: false);
+
+        var entry = menu.Update(Pressing(GameButton.Confirm));
+
+        Assert.Equal(TitleEntry.NewGame, entry);
     }
 }

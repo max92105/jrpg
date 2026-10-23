@@ -2,45 +2,64 @@
 
 Code-health work waiting for the next cleanup plan; `/retro` appends to it. One line per item, with where it came from. A cleanup plan (`/plan-feature`) starts from this list and removes the lines it covers.
 
+The code health plan (`2026-10-23-code-health`) covers the lines marked "(plan 2026-10-23, slice X)". Each of those slices removes or rewrites its line. The plan's review moved the rest to "When next touched" below.
+
+## When next touched
+
+These waited at the 2026-10-23 code health review. Do each one with the next change to its file, or when a plan needs it. Each says why it can wait.
+
+- **`Directory.Build.props`:** merge `src/` and `tests/` into a root file. Decision 144 keeps two files for now; the developer didn't choose to merge. When it happens, use the standard form:
+  - the gates go in a root `Directory.Build.props`;
+  - `tests/Directory.Build.props` keeps its two test-only settings (`IsPackable=false`, `using Xunit`) and imports the root file through `$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))`;
+  - no path condition.
+
+  The file is protected, so ask the developer first.
+- **`InventoryPage` split, the part left after A1/A2:**
+  - rows (`InventoryRow`) and a list view, like `EquipmentPage`;
+  - its `ItemRow.Quantity`/`InventoryLabels.Empty` widths move to `Ui/MeasuredText` with it.
+
+  It can wait because it works, and A1/A2 already take the rail out.
+- **`StatusPage` split** (294 lines): a pure `StatusSheet`, a `StatusSheetView` and the page keeping its input. Its slot labels then come from `EquipmentSheet.Slots` and `EquipmentSheet.LabelIdOf`. It can wait because nothing planned changes the Status page's content.
+- **Why Core refused an equipment change:** `EquipmentPage.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. `PartyEquipment.ItemWithoutRoom` and `UnequipAll` would own both. It can wait because it is correct today, and nothing planned changes equipment.
+- **Easing copies:** the clamped time share `Math.Clamp((float)(elapsed / length), 0, 1)` is copied 6 times (`ActionPlayback`, `FloatingNumber` twice, `LevelUpPop`, `VictoryEntrance`, `DefeatEntrance`), and the cubic ease-out twice (`LevelUpPop`, `VictoryEntrance`). They should use `Ui/Easing`. It can wait because each copy is one line.
+- **`Ui/MessageIds.cs` is 338 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
+- **`MainViewModelTests`, part 2:** move the new content tests (`CreateObject_*`, `CreateNpc_*`, `CanStartNewObject_*`, `TryCreateMap_*`) and the map settings tests (`TryApplySettings_*`) into their own classes, on E1a's `EditorTestContent`.
+- **`MainViewModel`:** the sheet image-size cache (`SheetImageSizes`) and the import status text (`SheetImportResult.Summary`) could leave it.
+- **`MainWindow.xaml.cs` (547 lines):** move the viewport (pan, zoom, fit) and the tile painting handlers into partial files, as `.EventEditing` and `.ObjectEditing` already are.
+- **`TileBrowserViewModelTests` (410 lines):** move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class.
+- **`TileBrowserViewModel` (about 300 lines):** move the sheet hit-testing (`CellAt`, `NearestCellTo`, `GridPositionOf`, F1's grid check) into a `Tiles/SheetGrid`.
+- **`ObjectShapesViewModelTests` (347 lines):** move the zone tests (E10) and the point-editing tests (E11a) into their own classes.
+- **The New NPC dialog** doesn't check that the chosen sprite holds the walk frames. The startup and save check (plan 2026-10-23, F5a) refuses such a sprite, and `NewNpcViewModel.SpriteProblem` could say so in the dialog, through a size lookup.
+
 ## From the menu cleanup plan (2026-10-20)
 
-- **`InventoryPage` is 331 lines and `StatusPage` 294** (after the demo retirement plan), neither split yet. Split them like `EquipmentPage` and `PartyPage`: a pure part, views, and a page that keeps input.
-- **The private `Number(int)` invariant formatter is copied about 6 times** (`EquipmentSheet`, `StatPreviewText`, `StatusPage`, `SaveSlotListView`, `MemberCardView`, the count in `PartyColumnsView`). One shared `Ui` formatter would replace them.
-- **Text stored next to its width by hand** in `InventoryPage.ItemRow`, `InventoryLabels`, `SaveSlotListView`, `ConfirmPromptView`, `MenuHeader` and `EquipmentChoiceView`. Use `Ui/MeasuredText`.
-- **Column titles over a hairline are copied 3 times** (`InventoryPage.DrawColumnTitles`, `EquipmentChoiceView`, `Saving/SaveSlotListView`). A shared `Ui/ColumnTitles`.
-- **`StatusPage`'s own slot labels** could use `EquipmentSheet.Slots` and `EquipmentSheet.LabelIdOf`.
-- **Why Core refused an equipment change**: `EquipmentPage.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. A Core result should own both.
+- **The private `Number(int)` invariant formatter is copied about 6 times** (`EquipmentSheet`, `StatPreviewText`, `StatusPage`, `SaveSlotListView`, `MemberCardView`, the count in `PartyColumnsView`). One shared `Ui` formatter would replace them. (plan 2026-10-23, U1)
+- **Text stored next to its width by hand** in `InventoryPage.ItemRow`, `InventoryLabels`, `SaveSlotListView`, `ConfirmPromptView`, `MenuHeader` and `EquipmentChoiceView`. Use `Ui/MeasuredText`. (plan 2026-10-23, U3; `InventoryPage` waits with its split)
+- **Column titles over a hairline are copied 3 times** (`InventoryPage.DrawColumnTitles`, `EquipmentChoiceView`, `Saving/SaveSlotListView`). A shared `Ui/ColumnTitles`. (plan 2026-10-23, U2)
 - **Item target picker layout** (question 112, placeholder kept): with an odd member count the last card sits alone in the left column, and 14 or more members (8 rows) don't fit 1080 px.
 
 ## From the battle plan (2026-10-20)
 
-- **The clamped time share `Math.Clamp((float)(elapsed / length), 0, 1)` is copied 6 times** (`ActionPlayback`, `FloatingNumber` twice, `LevelUpPop`, `VictoryEntrance`, `DefeatEntrance`), and the cubic ease-out twice (`LevelUpPop`, `VictoryEntrance`). `Ui/Easing` (plan 2026-10-22, T1) now has both (`ShareOf`, `CubicOut`); these copies can move to it.
-- **The footer bar with its hairline is drawn 3 times** (`GameMenuScene`, `VictoryScreenView`, `DefeatScreenView`; the two outcome screens also share the left shade and the title hairline). A shared `Ui` footer, and an outcome frame for the two battle screens.
-- **`Ui/MessageIds.cs` is 338 lines** (after the demo retirement plan) of constants. Split it by feature (menu, battle, title) or group the battle ids.
-- **More invariant number formatting inline** (`ToString(CultureInfo.InvariantCulture)` in `ActionPlayback`, `CommandPanelView`, `VictoryScreenView`, `VitalsText`), on top of the copies listed above.
-- **Victory screen at the maximum level** shows "EXP 0/0" and an empty bar; hide the EXP row instead (B7a, B7b1 reviews).
-- **Victory cards have no row limit**: more than 6 active members reach the footer line (B7b1 review).
+- **The footer bar with its hairline is drawn 3 times** (`GameMenuScene`, `VictoryScreenView`, `DefeatScreenView`; the two outcome screens also share the left shade and the title hairline). A shared `Ui` footer, and an outcome frame for the two battle screens. (plan 2026-10-23, U6)
+- **More invariant number formatting inline** (`ToString(CultureInfo.InvariantCulture)` in `ActionPlayback`, `CommandPanelView`, `VictoryScreenView`, `VitalsText`), on top of the copies listed above. (plan 2026-10-23, U1)
+- **Victory screen at the maximum level** shows "EXP 0/0" and an empty bar. Show a full bar and "Max", like the Status page (decision 148). (plan 2026-10-23, F4)
+- **Victory cards have no row limit**: more than 6 active members reach the footer line (B7b1 review). (plan 2026-10-23, N1: Data caps the party at 5, decision 149)
 - **Enemy attack strips are drawn unmirrored over the party**; no flip rule is decided (B5d). A design question for the developer.
-- **"Load the latest save" and the save-list overlay are written twice** (`TitleScene`, `DefeatScreen`/`DefeatScreenView`), and the banner band twice (`BattleBannerView`, `BattleScene.DrawEscaped`). Share each on a third copy.
-- `ContentWriter.WriteAll`: the final moves aren't atomic across files, and the cleanup's `File.Delete` can hide the first error when a folder is missing (review of E3c).
-- Editor: Space + drag pans only if the map had focus when Space was pressed (`HandleViewportKey` checks focus before setting `_isSpaceHeld`); with the Tiles panel focused, the drag paints instead (review of E2).
-- `MainViewModel` (596 lines after N3; 367 after E4a): move the unsaved-change questions (`ConfirmClose`, `ConfirmLeaveCurrentMap`, which repeat their wording) or the map-list rebuild into their own type.
-- `MainViewModel` (596 lines after N3; 467 after E4b2): move the undo routing (journal, `Undo`/`Redo` commands, which mirror each other, and the step event wiring) into its own type.
-- `TileBrowserViewModelTests` (345 lines after E6b): move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class (review of E6b).
-- `MainWindow.xaml.cs` (547 lines after E12c; 512 after E6a): move the catalog and map redraw handlers into their own type (review of E6a).
-- Tests: the header-only PNG writer is copied in `ArtReferenceCheckTests` and `ContentWriterTests` (Data); the Editor tests share `PngHeaderFile` (E7b). Share the Data copies on the next change there.
-- `TileBrowserViewModel` (about 300 lines after E12a): move the sheet hit-testing (`CellAt`, `NearestCellTo`, `GridPositionOf`) into its own type (review of E12a).
-- Re-cutting a sheet to a smaller grid leaves `TileBrowserViewModel.SelectedCell`/`SelectedCells` past the new grid; painting then makes a tile outside the image, which the save refuses. Clear or clamp them on a re-cut, before E12b builds objects from them (review of E12a).
-- Editor `TileImages.FieldSpriteFrameOf`: a sprite smaller than a frame is now shown whole (N3), but nothing validates a field sprite's frame layout; `Forget` keeps cached sprite frames (matters once sprites can be imported). From N2's review.
+- **"Load the latest save" and the save-list overlay are written twice** (`TitleScene`, `DefeatScreen`/`DefeatScreenView`). Share them in the **autosave plan**, which is likely to add the third copy.
+- **The banner band is drawn twice** (`BattleBannerView`, `BattleScene.DrawEscaped`). Share it in the **map name banner plan**, the third copy.
+- `ContentWriter.WriteAll`: the final moves aren't atomic across files, and the cleanup's `File.Delete` can hide the first error when a folder is missing (review of E3c). (plan 2026-10-23, F5a comments the moves; the hidden error was dropped because no valid content reaches it)
+- Editor: Space + drag pans only if the map had focus when Space was pressed (`HandleViewportKey` checks focus before setting `_isSpaceHeld`); with the Tiles panel focused, the drag paints instead (review of E2). (plan 2026-10-23, F2)
+- `MainViewModel` (596 lines after N3; 367 after E4a): move the unsaved-change questions (`ConfirmClose`, `ConfirmLeaveCurrentMap`, which repeat their wording) into one method. (plan 2026-10-23, E3)
+- `MainViewModel` (596 lines after N3; 467 after E4b2): move the undo routing (journal, `Undo`/`Redo` commands, which mirror each other, and the step event wiring) into its own type. (plan 2026-10-23, E2)
+- Tests: the header-only PNG writer is copied in `ArtReferenceCheckTests` and `ContentWriterTests` (Data); the Editor tests share `PngHeaderFile` (E7b). Share the Data copies on the next change there. (plan 2026-10-23, F5a)
+- Editor `TileImages.FieldSpriteFrameOf`: a sprite smaller than a frame is now shown whole (N3), but nothing validates a field sprite's frame layout; `Forget` keeps cached sprite frames (matters once sprites can be imported). From N2's review. (plan 2026-10-23, F5a validates; `Forget` stays)
 
 ## From the editor plan (2026-10-22 retro)
 
-- `MainViewModelTests` is 770 lines: split it by area (saving, undo journal, new map/object/NPC, layer list) like the view model it tests.
-- `ObjectShapesViewModelTests` is 347 lines: move the zone tests (E10) and the point-handle tests (E11a) into their own classes.
-- `MainViewModel.CreateNpc` and `CreateObject` end with the same three lines (`SetObject`, choose it in the Objects panel, Objects mode): one private method when `MainViewModel` is split (N3 review).
+- `MainViewModelTests` is 770 lines: split it by area (saving, undo journal, new map/object/NPC, layer list) like the view model it tests. (plan 2026-10-23, E1a; part 2 under "When next touched")
+- `MainViewModel.CreateNpc` and `CreateObject` end with the same three lines (`SetObject`, choose it in the Objects panel, Objects mode): one private method when `MainViewModel` is split (N3 review). (plan 2026-10-23, E3)
 
 ## From the demo retirement plan (2026-10-23)
 
-- Merge `src/` and `tests/` `Directory.Build.props` at the root, now that nothing at the root escapes them (decision 144).
-- `ExplorationStateTests` is 398 lines: move the interaction-target tests (G1a: `InteractionInFront_*`) into their own class.
-- Equipment page: opening a slot's choice hides the party sidebar (484 px) but the choice panel is 560 px, so the sheet narrows by 76 px while it is open (P1/Q2; layout is question 145's placeholder).
+- `ExplorationStateTests` is 398 lines: move the interaction-target tests (G1a: `InteractionInFront_*`) into their own class. (plan 2026-10-23, X1)
+- Equipment page: opening a slot's choice hides the party sidebar (484 px) but the choice panel is 560 px, so the sheet narrows by 76 px while it is open (P1/Q2). Waits for question 153, the sidebar's placement.

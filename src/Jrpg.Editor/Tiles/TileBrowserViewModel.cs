@@ -107,11 +107,15 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
             return null;
         }
 
-        var (width, height) = _images.SizeOf(sheet.File);
         var (column, row) = GridPositionOf(sheet, x, y);
-        var isInGrid = column >= 0 && row >= 0 && column < sheet.ColumnsIn(width) && row < sheet.RowsIn(height);
         var isInCell = x < sheet.CellLeft(column) + sheet.TileWidth && y < sheet.CellTop(row) + sheet.TileHeight;
-        return isInGrid && isInCell ? new SheetCell(sheet.Id, column, row) : null;
+        return IsInGrid(sheet, column, row) && isInCell ? new SheetCell(sheet.Id, column, row) : null;
+    }
+
+    private bool IsInGrid(TilesheetDefinition sheet, int column, int row)
+    {
+        var (width, height) = _images.SizeOf(sheet.File);
+        return column >= 0 && row >= 0 && column < sheet.ColumnsIn(width) && row < sheet.RowsIn(height);
     }
 
     /// <summary>Chooses the cell under an image pixel of the shown sheet; a pixel off every whole cell keeps the choice.</summary>
@@ -281,8 +285,8 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
         OnPropertyChanged(nameof(ChoiceText));
     }
 
-    // The same image stays shown, by its sheet if that is still there, else by its file. A chosen cell whose sheet is gone
-    // is let go, so painting never makes a tile on a sheet that doesn't exist.
+    // The same image stays shown, by its sheet if that is still there, else by its file. A chosen cell whose sheet is gone,
+    // or that a re-cut leaves past the grid, is let go, so painting never makes a tile the save would refuse.
     private void ListSheetsAnew()
     {
         var shown = SelectedChoice;
@@ -290,10 +294,17 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
         SheetChoices = ChoicesOf(_images.ListFiles(), _listedSheets.Values);
         SelectedChoice = SheetChoices.FirstOrDefault(choice => choice.Sheet is { } sheet && sheet.Id == shown?.Sheet?.Id)
             ?? SheetChoices.FirstOrDefault(choice => string.Equals(choice.File, shown?.File, StringComparison.OrdinalIgnoreCase));
-        if (SelectedCell is { } cell && !_listedSheets.ContainsKey(cell.SheetId))
+        if (SelectedCell is { } cell && !IsChoiceInGrid(cell))
         {
             SelectedCells = null;
             SelectedCell = null;
         }
+    }
+
+    // A rectangle's top-left cell is never past its far corner, so checking the far corner covers the whole rectangle.
+    private bool IsChoiceInGrid(SheetCell cell)
+    {
+        var (column, row) = SelectedCells is { } cells ? (cells.Left + cells.Columns - 1, cells.Top + cells.Rows - 1) : (cell.Column, cell.Row);
+        return _listedSheets.TryGetValue(cell.SheetId, out var sheet) && IsInGrid(sheet, column, row);
     }
 }

@@ -29,6 +29,16 @@ When planning slices in this repo:
 - Reviews want splits planned up front (writer vs first user, behavior vs look, layout vs theme), not "split if it grows"; view models take lookups (image sizes) instead of reading files; one responsibility per panel VM.
 - Developer wants Ctrl+Z to cover every edit (map and catalog alike); expect "undo everything" in editor features.
 - Packages are never assumed: font package, MonoGame content pipeline and CommunityToolkit.Mvvm are open questions until the developer approves.
+- Code-health plans:
+  - check each backlog line against the code;
+  - put a bug slice before the refactor of the same file;
+  - keep it lean: only the slices the next plans touch, and the rest go to backlog "When next touched" with a reason (the 2026-10-23 review cut 26 slices to 13);
+  - keep fixes at bug size, with no new type just to test window code;
+  - before planning a failing-first test, check that it can actually fail (F3 couldn't);
+  - test splits allow a mechanical prefix edit, guarded by test counts before and after, with no permanent forwarders;
+  - verify the direction of a decision before citing it (144 was cited backwards).
+- Prefer a Core record field (ExperienceGain.IsAtMaxLevel) over handing a catalog to a scene.
+- UI feedback: look at the input bindings first (the inventory rail had no keyboard key); read docs/ui_ux_exemples (the .webp files open with Read).
 - Removal/wording plans: count with Grep count mode (it counts matching lines, not occurrences), slice by folder, list each reason-carrying comment with its replacement, "don't invent a reason"; a text guard must skip itself and history paths (docs/plans, done ADRs).
 
 **Why:** part 1 split slices mid-way; the part 2 devil's advocate (2026-10-17) raised exactly these as blockers/concerns.

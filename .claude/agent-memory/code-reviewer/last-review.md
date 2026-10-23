@@ -5,7 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-22-demo-retirement/slices/X2.md, slice X2 (verify.ps1 step 6, the retired-word guard)
+Slice: docs/plans/2026-10-23-code-health/slices/F1.md, slice F1 (re-cut lets go of a chosen cell past the grid)
 Round: 1 (verdict: Ready to commit)
 
-- Warning, open: verify.ps1 Get-CheckedPaths walks gitignored .claude/worktrees/ (Claude Code worktrees, full repo copies), .claude/settings.local.json and .claude/agent-memory-local/; history regex is anchored at the root, so a worktree's done plans fail the step. Prune worktrees (or list files via git ls-files --cached --others --exclude-standard).
+- Suggestion, open: IsChoiceStillCut could be IsChoiceInGrid (the check is about the grid, "cut" is ambiguous with the Cut panel).
+- Suggestion, open: no redo test; redo goes through the same ListSheetsAnew path, so low risk.
+- Follow-up: NearestCellTo repeats the SizeOf + ColumnsIn/RowsIn lookup; goes with the SheetGrid split already in backlog.

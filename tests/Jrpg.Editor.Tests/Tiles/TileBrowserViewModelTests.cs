@@ -195,6 +195,82 @@ public sealed class TileBrowserViewModelTests
         Assert.Equal(8, _draft.TileAt(new SheetCell("forest", 0, 0))?.Id);
     }
 
+    // The forest's 2 x 1 cells of 48 px become one 96 px cell: column 1 is past the new grid.
+    [Fact]
+    public void ApplyCutCommand_ReCutSmallerThanChosenCell_LetsTheChoiceGo()
+    {
+        _browser.SelectedChoice = _browser.SheetChoices[1];
+        _browser.SelectCellAt(60, 10);
+        Assert.Equal(new SheetCell("forest", 1, 0), _browser.SelectedCell);
+        _browser.CutSheetCommand.Execute(null);
+        _browser.Cut!.Columns = 1;
+
+        _browser.ApplyCutCommand.Execute(null);
+
+        Assert.Null(_browser.SelectedCell);
+    }
+
+    // The rectangle's top-left cell (0, 0) is still in the one-cell grid; its far corner (1, 0) is not.
+    [Fact]
+    public void ApplyCutCommand_ReCutSmallerThanChosenRectangle_LetsTheRectangleGo()
+    {
+        _browser.SelectedChoice = _browser.SheetChoices[1];
+        _browser.SelectCellsBetween(new Point2D(5, 10), new Point2D(60, 10));
+        Assert.NotNull(_browser.SelectedCells);
+        _browser.CutSheetCommand.Execute(null);
+        _browser.Cut!.Columns = 1;
+
+        _browser.ApplyCutCommand.Execute(null);
+
+        Assert.Null(_browser.SelectedCells);
+        Assert.Null(_browser.SelectedCell);
+    }
+
+    [Fact]
+    public void ApplyCutCommand_ReCutStillHoldingChosenCell_KeepsIt()
+    {
+        _browser.SelectedChoice = _browser.SheetChoices[1];
+        _browser.SelectCellAt(5, 5);
+        _browser.CutSheetCommand.Execute(null);
+        _browser.Cut!.Columns = 1;
+
+        _browser.ApplyCutCommand.Execute(null);
+
+        Assert.Equal(new SheetCell("forest", 0, 0), _browser.SelectedCell);
+    }
+
+    // The re-cut makes 4 columns of 24 px; undoing it brings back 2, so column 3 is past the grid again.
+    [Fact]
+    public void Undo_ReCutThatGrewTheGrid_LetsGoOfACellInTheNewArea()
+    {
+        _browser.SelectedChoice = _browser.SheetChoices[1];
+        _browser.CutSheetCommand.Execute(null);
+        _browser.Cut!.Columns = 4;
+        _browser.ApplyCutCommand.Execute(null);
+        _browser.SelectCellAt(80, 10);
+        Assert.Equal(new SheetCell("forest", 3, 0), _browser.SelectedCell);
+
+        _draft.Undo();
+
+        Assert.Null(_browser.SelectedCell);
+    }
+
+    [Fact]
+    public void Redo_ReCutSmallerThanChosenCell_LetsTheChoiceGo()
+    {
+        _browser.SelectedChoice = _browser.SheetChoices[1];
+        _browser.CutSheetCommand.Execute(null);
+        _browser.Cut!.Columns = 1;
+        _browser.ApplyCutCommand.Execute(null);
+        _draft.Undo();
+        _browser.SelectCellAt(60, 10);
+        Assert.Equal(new SheetCell("forest", 1, 0), _browser.SelectedCell);
+
+        _draft.Redo();
+
+        Assert.Null(_browser.SelectedCell);
+    }
+
     // Tile 8 is cut from the forest sheet, so a re-cut asks first.
     [Fact]
     public void ApplyCutCommand_UserDeclinesWarning_KeepsTheCut()

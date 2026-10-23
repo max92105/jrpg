@@ -3,7 +3,7 @@ using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Objects;
 
-/// <summary>The object a rectangle of sheet cells makes (legacy <c>TileGroupObjectCreator</c>).</summary>
+/// <summary>The object a rectangle of sheet cells makes.</summary>
 internal static class ObjectFromCells
 {
     /// <summary>

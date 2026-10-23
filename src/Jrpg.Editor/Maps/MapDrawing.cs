@@ -8,16 +8,16 @@ using Jrpg.Editor.Tiles;
 namespace Jrpg.Editor.Maps;
 
 /// <summary>
-/// Draws a map as the game does (ADR 0012): tile layers, objects and their canopies in Core's <see cref="DrawOrderKey"/>
-/// order, at the game's 48 pixels per cell. Canopies are the object's tiles again, clipped to its above-player zones, as
-/// the legacy editor did.
+/// Draws a map as the game does (ADR 0012): tile layers, objects and their canopies in Core's
+/// <see cref="DrawOrderKey"/> order, at the game's 48 pixels per cell. Canopies are the object's tiles again, clipped
+/// to its above-player zones.
 /// </summary>
 internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
 {
     /// <summary>Pixels per map cell at 100 % zoom, the same as the game's virtual screen.</summary>
     public const double CellPixels = 48;
 
-    // Legacy "dim other layers": faint enough to tell apart, clear enough to paint against.
+    // The other layers, dimmed: faint enough to tell apart, clear enough to paint against.
     private const double DimmedOpacity = 0.3;
 
     // Faint enough to read the tiles through.

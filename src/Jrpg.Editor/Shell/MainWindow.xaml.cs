@@ -21,7 +21,7 @@ namespace Jrpg.Editor.Shell;
 /// </summary>
 internal sealed partial class MainWindow : Window
 {
-    // Legacy MapEditor steps: 15 % per wheel notch, 150 screen pixels per arrow press.
+    // Placeholder steps: 15 % per wheel notch, 150 screen pixels per arrow press.
     private const double WheelZoomStep = 1.15;
     private const double ArrowPanStep = 150;
 
@@ -131,7 +131,7 @@ internal sealed partial class MainWindow : Window
             DrawSelectionMarks();
             DrawEventMarks();
 
-            // A resize, or its undo: show the whole map at its new size, as the legacy editor did.
+            // A resize, or its undo: show the whole map at its new size.
             if (_gridDrawnFor is { } grid && _shownMap!.Map.Layout is var layout && (grid.Width, grid.Height) != (layout.Width, layout.Height))
             {
                 RefitMap();
@@ -344,7 +344,7 @@ internal sealed partial class MainWindow : Window
             return true;
         }
 
-        // Shift + click fills with any tool, as in the legacy editor.
+        // Shift + click fills with any tool.
         if (button == MouseButton.Left && (Keyboard.Modifiers == ModifierKeys.Shift || Painting.Tool == TileTool.Fill))
         {
             Painting.FloodFill(cell);

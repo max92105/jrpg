@@ -8,13 +8,13 @@ using Jrpg.Core.Geometry;
 namespace Jrpg.Editor.Events;
 
 /// <summary>
-/// One step in the event dialog: the fields of its kind and its one-line label (legacy <c>Describe</c>). Numbers are
-/// kept as typed, so a box left empty is reported by <see cref="Problem"/> instead of keeping a stray value; ids are
-/// picked from lists, and the game's checks run on save.
+/// One step in the event dialog: the fields of its kind and its one-line label. Numbers are kept as typed, so a box
+/// left empty is reported by <see cref="Problem"/> instead of keeping a stray value; ids are picked from lists, and the
+/// game's checks run on save.
 /// </summary>
 internal sealed partial class EventStepViewModel : ObservableObject
 {
-    // The legacy label's limit on a dialogue's first line.
+    // The label's limit on a dialogue's first line (placeholder).
     private const int LabelLineLength = 30;
 
     private EventStepViewModel(EventStepKind kind)

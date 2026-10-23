@@ -1,7 +1,7 @@
 namespace Jrpg.Editor.Maps.Editing;
 
 /// <summary>
-/// Tiles changed on one layer as a single undo step: a whole brush stroke or fill undoes at once, as in the legacy editor.
+/// Tiles changed on one layer as a single undo step: a whole brush stroke or fill undoes at once.
 /// </summary>
 /// <param name="LayerZ">The layer's Z.</param>
 /// <param name="Changes">Each cell at most once, with the tile it had before.</param>

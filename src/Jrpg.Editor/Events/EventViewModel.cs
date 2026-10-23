@@ -45,7 +45,7 @@ internal sealed partial class EventViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(RemoveStepCommand), nameof(MoveStepUpCommand), nameof(MoveStepDownCommand))]
     public partial EventStepViewModel? SelectedStep { get; set; }
 
-    /// <summary>The legacy one-line summary, such as <c>Press "Open" if door_close: 1 step(s), once</c>.</summary>
+    /// <summary>The one-line summary, such as <c>Press "Open" if door_close: 1 step(s), once</c>.</summary>
     public string Label
     {
         get

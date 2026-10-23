@@ -8,7 +8,7 @@ namespace Jrpg.Editor.Maps.Settings;
 /// </summary>
 internal static class TypedCounts
 {
-    /// <summary>The largest width or height a map can have (legacy MapPropertiesWindow limit).</summary>
+    /// <summary>The largest width or height a map can have (placeholder limit).</summary>
     public const int MaxMapSide = 1000;
 
     public static string MapSizeProblem { get; } = $"Width and height must be whole numbers from 1 to {MaxMapSide}.";

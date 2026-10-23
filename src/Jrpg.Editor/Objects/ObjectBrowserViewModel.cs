@@ -5,7 +5,7 @@ using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Objects;
 
-/// <summary>Choosing the object to place: every object definition, listed by category as in the legacy browser.</summary>
+/// <summary>Choosing the object to place: every object definition, listed by category.</summary>
 internal sealed partial class ObjectBrowserViewModel : ObservableObject
 {
     private readonly CatalogDraft _catalog;

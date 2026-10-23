@@ -9,7 +9,7 @@ namespace Jrpg.Editor.Events;
 
 /// <summary>
 /// The event dialog for one placed object: its events in order, edited apart from the map until OK. New events get the
-/// next id the object hasn't used (<see cref="EventIds"/>) and start like the legacy editor's: pressed, prompt "Check".
+/// next id the object hasn't used (<see cref="EventIds"/>) and start pressed, with the prompt "Check" (placeholders).
 /// </summary>
 internal sealed partial class EventListViewModel : ObservableObject
 {
@@ -86,7 +86,7 @@ internal sealed partial class EventListViewModel : ObservableObject
     [RelayCommand]
     private void ApplyTalkPreset() => ApplyPreset(EventPresets.Talk(IdAllocation()));
 
-    // Replaces every event, as legacy did, and shows the first field the preset leaves to fill in.
+    // Replaces every event, and shows the first field the preset leaves to fill in.
     private void ApplyPreset(IReadOnlyList<MapEvent> presetEvents)
     {
         Events.Clear();

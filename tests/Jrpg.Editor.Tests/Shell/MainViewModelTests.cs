@@ -514,7 +514,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void ShowCursorAt_CellWithoutTiles_SaysSo()
     {
-        // The start map's one hole, left by the legacy editor (seen in slice 3a).
+        // The start map's one hole (seen in slice 3a).
         var viewModel = Open(_repositoryContent);
         viewModel.TryOpenMap("start");
 

@@ -8,7 +8,7 @@ internal sealed partial class LayerChoiceViewModel : ObservableObject
 {
     public IReadOnlyList<LayerPreset> Presets { get; } = LayerPresets.All;
 
-    /// <summary>Picked from <see cref="Presets"/> or typed in; the ground by default, as in the legacy editor.</summary>
+    /// <summary>Picked from <see cref="Presets"/> or typed in; the ground by default.</summary>
     [ObservableProperty]
     public partial int Z { get; set; } = LayerPresets.GroundZ;
 

@@ -4,7 +4,7 @@ namespace Jrpg.Editor.Maps.Editing;
 
 /// <summary>
 /// One drag of the brush or the eraser. It changes the draft as the mouse moves, so the map shows each cell at once,
-/// and becomes a single undo step when the button is released (legacy).
+/// and becomes a single undo step when the button is released.
 /// </summary>
 internal sealed class TileStroke(MapDraft draft, TileBrush brush)
 {

@@ -4,9 +4,9 @@ using Jrpg.Core.Maps;
 namespace Jrpg.Editor.Maps.Editing;
 
 /// <summary>
-/// Changes a map's size, keeping cell (0, 0) where it is, as the legacy editor did. Tiles and cell events on cells
-/// outside the new size are dropped, and objects that no longer overlap the map at all; an object reaching past an
-/// edge stays, as some legacy objects do. Undo puts back the map exactly as it was.
+/// Changes a map's size, keeping cell (0, 0) where it is. Tiles and cell events on cells outside the new size are
+/// dropped, and objects that no longer overlap the map at all; an object reaching past an edge stays, since some
+/// objects on the existing maps already do. Undo puts back the map exactly as it was.
 /// </summary>
 internal sealed class ResizeMapEdit : IMapEdit
 {

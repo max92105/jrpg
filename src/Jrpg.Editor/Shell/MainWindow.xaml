@@ -15,7 +15,7 @@
     <sys:Double x:Key="MapListMinWidth">140</sys:Double>
     <GridLength x:Key="SidePanelWidth">420</GridLength>
     <sys:Double x:Key="SidePanelMinWidth">300</sys:Double>
-    <!-- A mode's tool bar shows only while its tab is open (legacy ToolBarTray bands). -->
+    <!-- A mode's tool bar shows only while its tab is open. -->
     <Style x:Key="TilesBand" TargetType="ToolBar" BasedOn="{StaticResource {x:Type ToolBar}}">
       <Setter Property="Visibility" Value="Collapsed" />
       <Style.Triggers>

@@ -10,7 +10,7 @@ using Jrpg.Editor.Maps.Editing;
 namespace Jrpg.Editor.Objects;
 
 /// <summary>
-/// Placing, moving and removing objects on the open map, as in the legacy editor. Every change is one undo step;
+/// Placing, moving and removing objects on the open map. Every change is one undo step;
 /// nothing is placed until an object is chosen.
 /// </summary>
 internal sealed partial class ObjectPlacingViewModel : ObservableObject
@@ -70,8 +70,8 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
     public partial IReadOnlyList<string> SelectedObjectUids { get; private set; } = [];
 
     /// <summary>
-    /// Places the chosen object centered on a point, on the chosen layer, as in the legacy editor. A point off the map
-    /// places nothing, since the map is drawn clipped and the object couldn't be seen.
+    /// Places the chosen object centered on a point, on the chosen layer. A point off the map places nothing, since the
+    /// map is drawn clipped and the object couldn't be seen.
     /// </summary>
     /// <param name="center">In map cells; positions aren't snapped to the grid.</param>
     public void PlaceObjectAt(Point2D center)

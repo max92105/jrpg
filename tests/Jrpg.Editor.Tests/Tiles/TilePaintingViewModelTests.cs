@@ -141,7 +141,7 @@ public sealed class TilePaintingViewModelTests
     [Fact]
     public void PickTileAt_CellWithoutTiles_KeepsTheChoice()
     {
-        // The start map's one hole, left by the legacy editor (seen in slice 3a).
+        // The start map's one hole (seen in slice 3a).
         _painting.OpenMap = new MapViewModel(_catalog.Maps["start"]);
         _layer.Z = -3;
 

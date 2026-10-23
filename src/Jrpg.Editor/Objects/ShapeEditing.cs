@@ -3,8 +3,8 @@ using Jrpg.Core.Geometry;
 namespace Jrpg.Editor.Objects;
 
 /// <summary>
-/// Where a mouse gesture lands on a shape in the shapes window (legacy <c>ObjectEditorWindow</c>). Points are screen
-/// positions, so the tolerances stay in screen pixels whatever the scale and the object's proportions.
+/// Where a mouse gesture lands on a shape in the shapes window. Points are screen positions, so the tolerances stay in
+/// screen pixels whatever the scale and the object's proportions.
 /// </summary>
 internal static class ShapeEditing
 {
@@ -51,7 +51,7 @@ internal static class ShapeEditing
     }
 
     /// <summary>
-    /// A point moved to the nearest quarter of the object's cells (legacy "Snap to 1/4 tile", decision 126).
+    /// A point moved to the nearest quarter of the object's cells (decision 126).
     /// </summary>
     /// <param name="point">In 0..1 over the object.</param>
     /// <param name="width">The object's width in cells.</param>

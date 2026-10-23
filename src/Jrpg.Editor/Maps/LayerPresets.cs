@@ -3,7 +3,7 @@ using Jrpg.Core.Maps;
 namespace Jrpg.Editor.Maps;
 
 /// <summary>
-/// The layers offered for painting, from the legacy editor; any other Z can still be typed in (question 71). Below
+/// The layers offered for painting (placeholders); any other Z can still be typed in (question 71). Below
 /// <see cref="MapLayers.PlayerZ"/> draws under the player, at it depth-sorts with the player, and above it draws over.
 /// </summary>
 internal static class LayerPresets

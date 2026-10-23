@@ -6,19 +6,19 @@ using Jrpg.Core.Maps;
 namespace Jrpg.Editor.Events;
 
 /// <summary>
-/// The legacy event dialog's presets: the usual events of a chest, a door, a door the player opens first and a sign,
-/// and an NPC who talks. What only the developer can say is left empty for the dialog to ask for: the chest's item,
-/// the door's destination, the sign's or the NPC's text.
+/// The event dialog's presets: the usual events of a chest, a door, a door the player opens first and a sign, and an
+/// NPC who talks. What only the developer can say is left empty for the dialog to ask for: the chest's item, the door's
+/// destination, the sign's or the NPC's text.
 /// </summary>
 internal static class EventPresets
 {
-    // The legacy presets' prompts.
+    // The presets' prompts (placeholders).
     private const string OpenPrompt = "Open";
     private const string EnterPrompt = "Enter";
     private const string ReadPrompt = "Read";
     private const string TalkPrompt = "Talk";
 
-    // An object id containing this is taken for an "opened" object, as the legacy guess did with names.
+    // An object id containing this is taken for an "opened" object.
     private const string OpenedMarker = "open";
 
     /// <summary>Pressed once: gives an item, then turns into the opened chest.</summary>
@@ -84,7 +84,7 @@ internal static class EventPresets
 
     /// <summary>
     /// The likely "opened" version of an object, such as <c>chest_opened</c> for <c>chest</c>: another object whose id
-    /// contains "open", one in the same category first (legacy <c>GuessOpenVersion</c>); the object itself when none.
+    /// contains "open", one in the same category first; the object itself when none.
     /// </summary>
     public static string GuessOpenedObject(string objectId, IReadOnlyDictionary<string, ObjectDefinition> definitions)
     {

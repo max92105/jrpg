@@ -7,8 +7,8 @@ namespace Jrpg.Editor.Maps.Editing;
 internal static class PlacedObjectHits
 {
     /// <summary>
-    /// The object drawn on top at a point: one of its tiles covers it (legacy), or its NPC sprite does; among several,
-    /// the one drawn last in Core's <see cref="DrawOrderKey"/> order. Null when no object is there.
+    /// The object drawn on top at a point: one of its tiles covers it, or its NPC sprite does; among several, the one
+    /// drawn last in Core's <see cref="DrawOrderKey"/> order. Null when no object is there.
     /// </summary>
     public static PlacedObject? TopAt(MapLayout map, Point2D point, IReadOnlyDictionary<string, ObjectDefinition> definitions)
     {

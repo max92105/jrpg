@@ -16,9 +16,9 @@ namespace Jrpg.Editor.Objects;
 /// </summary>
 internal sealed partial class ObjectShapesWindow : Window
 {
-    // Design tunables (legacy ObjectEditorWindow): the object's longer side opens at 560 screen px, between 1x and 6x its
-    // map pixels; the wheel zooms 1.2x a notch between 0.5x and 12x. Handles are 10 screen px; a click within 8 of an
-    // edge inserts a point; shapes not being edited are drawn at 35 %.
+    // Design tunables (placeholders): the object's longer side opens at 560 screen px, between 1x and 6x its map
+    // pixels; the wheel zooms 1.2x a notch between 0.5x and 12x. Handles are 10 screen px; a click within 8 of an edge
+    // inserts a point; shapes not being edited are drawn at 35 %.
     private const double OpeningScreenPixels = 560;
     private const double MinOpeningZoom = 1;
     private const double MaxOpeningZoom = 6;
@@ -100,7 +100,7 @@ internal sealed partial class ObjectShapesWindow : Window
         }
     }
 
-    // Legacy controls: Shift + drag draws a rectangle; a handle is dragged, or removed by a right click; a click near an
+    // The controls: Shift + drag draws a rectangle; a handle is dragged, or removed by a right click; a click near an
     // edge inserts a point there; any other click adds one at the end.
     private void OnObjectMouseDown(object sender, MouseButtonEventArgs e)
     {

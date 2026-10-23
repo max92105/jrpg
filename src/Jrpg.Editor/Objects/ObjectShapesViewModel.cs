@@ -39,7 +39,7 @@ internal sealed partial class ObjectShapesViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(ZoneEntries), nameof(Problem), nameof(ActivePoints))]
     public partial IReadOnlyList<IReadOnlyList<Point2D>> Zones { get; private set; }
 
-    /// <summary>Whether clicks draw the chosen zone rather than the collision outline (legacy's shape choice).</summary>
+    /// <summary>Whether clicks draw the chosen zone rather than the collision outline.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsEditingCollision), nameof(ActivePoints))]
     public partial bool IsEditingZones { get; set; }
@@ -69,7 +69,7 @@ internal sealed partial class ObjectShapesViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(DeleteZoneCommand))]
     public partial int SelectedZoneIndex { get; set; } = -1;
 
-    /// <summary>Whether placed points land on quarter cells of the object (legacy "Snap to 1/4 tile", decision 126); off at first.</summary>
+    /// <summary>Whether placed points land on quarter cells of the object (decision 126); off at first.</summary>
     [ObservableProperty]
     public partial bool IsSnapping { get; set; }
 
@@ -99,8 +99,8 @@ internal sealed partial class ObjectShapesViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Adds a point after the last one of the active shape; editing zones with none chosen starts a new zone (legacy). It
-    /// is clamped into the object, as the validator refuses points outside, and rounded to the object's map pixels.
+    /// Adds a point after the last one of the active shape; editing zones with none chosen starts a new zone. It is
+    /// clamped into the object, as the validator refuses points outside, and rounded to the object's map pixels.
     /// </summary>
     /// <param name="point">In 0..1 over the object's width and height.</param>
     public void AddPoint(Point2D point) => SetActivePoints([.. ActivePoints, Placed(point)]);
@@ -145,7 +145,7 @@ internal sealed partial class ObjectShapesViewModel : ObservableObject
         SetActivePoints([.. ActivePoints.Where((_, at) => at != index)]);
     }
 
-    /// <summary>Takes back the active shape's newest point (legacy Backspace); nothing when it has none.</summary>
+    /// <summary>Takes back the active shape's newest point (Backspace); nothing when it has none.</summary>
     public void RemoveLastPoint()
     {
         if (ActivePoints.Count > 0)
@@ -214,7 +214,7 @@ internal sealed partial class ObjectShapesViewModel : ObservableObject
         }
     }
 
-    /// <summary>Makes the active shape the whole object (legacy "Whole object").</summary>
+    /// <summary>Makes the active shape the whole object ("Whole object").</summary>
     [RelayCommand]
     private void CoverWholeObject() => SetRectangle(new Point2D(0, 0), new Point2D(1, 1));
 

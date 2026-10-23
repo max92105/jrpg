@@ -5,14 +5,14 @@ namespace Jrpg.Editor.Viewport;
 
 /// <summary>
 /// Where the map sits in the editor's view: a zoom and the screen position of the map's top-left pixel. Pure, so the
-/// pan and zoom rules are tested without a window (legacy MapEditor camera).
+/// pan and zoom rules are tested without a window.
 /// </summary>
 internal sealed class ViewportTransform
 {
     public const double MinZoom = 0.1;
     public const double MaxZoom = 8;
 
-    // Fit leaves a margin around the map, as legacy did, so its edges are visible.
+    // Fit leaves a margin around the map, so its edges are visible.
     private const double FitMargin = 0.95;
 
     public double Zoom { get; private set; } = 1;

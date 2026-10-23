@@ -13,7 +13,7 @@ public sealed class EventEditingViewModelTests
 
     private readonly EventEditingViewModel _eventEditing = new(new CatalogDraft(_catalog)) { OpenMap = new MapViewModel(_catalog.Maps["start"]), MapIds = ["forest", "start"] };
 
-    // The start map's chest, which gives a potion and turns into an opened chest (converted from the legacy demo).
+    // The start map's chest, which gives a potion and turns into an opened chest.
     private Point2D ChestCenter
     {
         get

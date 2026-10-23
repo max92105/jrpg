@@ -8,7 +8,7 @@ namespace Jrpg.Editor.Maps;
 /// <summary>Draws <see cref="CollisionShapes"/> as one image over the map, in the map image's pixels.</summary>
 internal static class CollisionDrawing
 {
-    // Legacy ObjectEditorWindow's colors: red blocked cells, green collision outlines, blue above-player zones.
+    // Colors by meaning: red blocked cells, green collision outlines, blue above-player zones.
     private static readonly Brush _blockedFill = Frozen(new SolidColorBrush(Color.FromArgb(0x60, 0xFF, 0x30, 0x30)));
     /// <summary>The collision outline's stroke, also used by the object shapes window.</summary>
     internal static Brush OutlineStroke { get; } = Frozen(new SolidColorBrush(Color.FromRgb(0x7C, 0xFC, 0x7C)));
@@ -19,7 +19,9 @@ internal static class CollisionDrawing
     /// <summary>An above-player zone's fill, also used by the object shapes window.</summary>
     internal static Brush ZoneFill { get; } = Frozen(new SolidColorBrush(Color.FromArgb(0x50, 0x00, 0x96, 0xFF)));
 
-    /// <summary>The shapes window's handle on a shape's last point, so the next click's edge is clear (legacy yellow).</summary>
+    /// <summary>
+    /// The handle on a shape's last point in the shapes window, yellow so the next click's edge is clear.
+    /// </summary>
     internal static Brush LastPointHandle { get; } = Brushes.Yellow;
 
     /// <summary>How wide outlines are drawn, in screen pixels whatever the zoom; the shapes window uses it too.</summary>

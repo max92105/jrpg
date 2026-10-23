@@ -5,8 +5,8 @@ using Jrpg.Editor.Maps.Editing;
 namespace Jrpg.Editor.Maps.Settings;
 
 /// <summary>
-/// The new map dialog: a name and a size (the legacy dialog's "New Map", 30 x 17, to start). The id the map will get
-/// is shown as the name is typed, since it can't change afterwards (question 70).
+/// The new map dialog: a name and a size ("New Map", 30 x 17, to start). The id the map will get is shown as the name
+/// is typed, since it can't change afterwards (question 70).
 /// </summary>
 internal sealed partial class NewMapViewModel : ObservableObject
 {

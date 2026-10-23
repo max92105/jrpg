@@ -10,13 +10,13 @@ using Jrpg.Editor.Maps;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// The window's event mode: a click on an object opens its events, a click on a cell without one opens the cell's, and a
-/// right click removes a cell's. Events carry the legacy markers in every mode: one dot per object event along the
+/// The window's event mode: a click on an object opens its events, a click on a cell without one opens the cell's, and
+/// a right click removes a cell's. Events carry their markers in every mode: one dot per object event along the
 /// object's top edge from the right, yellow when pressed, cyan when walked into, and a cyan square on a cell with one.
 /// </summary>
 internal sealed partial class MainWindow
 {
-    // Legacy marker size and spacing, in map pixels.
+    // Marker size and spacing, in map pixels (placeholders).
     private const double CellMarkerSize = 10;
     private const double CellMarkerInset = 2;
     private const double MarkerRadius = 6;
@@ -77,7 +77,7 @@ internal sealed partial class MainWindow
         }
     }
 
-    // Legacy trigger marker: a small square in the cell's top-right corner, cyan since a cell event is always walked into.
+    // The trigger marker: a small square in the cell's top-right corner, cyan since a cell event is always walked into.
     private void DrawCellEventMarks()
     {
         foreach (var cellEvent in _viewModel.CurrentMap?.Map.Layout.CellEvents ?? [])

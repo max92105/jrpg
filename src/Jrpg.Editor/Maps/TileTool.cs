@@ -1,6 +1,6 @@
 namespace Jrpg.Editor.Maps;
 
-/// <summary>What a left click or drag on the map does with the chosen tile (legacy tools, keys B, R and F).</summary>
+/// <summary>What a left click or drag on the map does with the chosen tile (keys B, R and F).</summary>
 internal enum TileTool
 {
     /// <summary>Drag to paint with the square brush.</summary>

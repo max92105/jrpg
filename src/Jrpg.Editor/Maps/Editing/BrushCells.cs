@@ -2,7 +2,7 @@ using Jrpg.Core.Geometry;
 
 namespace Jrpg.Editor.Maps.Editing;
 
-/// <summary>The cells a brush stroke or a rectangle covers (legacy MapEditor <c>BrushCells</c> and <c>LineCells</c>).</summary>
+/// <summary>The cells a brush stroke or a rectangle covers.</summary>
 internal static class BrushCells
 {
     /// <summary>The square brush around a cell; even sizes reach one cell further right and down. It may reach off the map.</summary>

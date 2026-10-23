@@ -15,7 +15,7 @@ namespace Jrpg.Editor.Tiles;
 /// </summary>
 internal sealed partial class TilePaintingViewModel : ObservableObject
 {
-    // Legacy brush sizes, in cells; [ and ] step through them.
+    // Brush sizes in cells (placeholder); [ and ] step through them.
     private static readonly int[] _brushSizes = [1, 2, 3, 4, 5, 7, 9];
 
     private readonly CatalogDraft _catalog;

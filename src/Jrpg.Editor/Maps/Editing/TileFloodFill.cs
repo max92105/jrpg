@@ -4,9 +4,9 @@ using Jrpg.Core.Maps;
 namespace Jrpg.Editor.Maps.Editing;
 
 /// <summary>
-/// The cells a flood fill reaches (legacy <c>FillTileCommand</c>): from a start cell, every cell joined to it by edges
-/// that holds the same tile on one layer. Empty cells count as a tile of their own, so a fill on an empty area or a
-/// layer the map doesn't have yet covers the connected empty cells.
+/// The cells a flood fill reaches: from a start cell, every cell joined to it by edges that holds the same tile on one
+/// layer. Empty cells count as a tile of their own, so a fill on an empty area or a layer the map doesn't have yet
+/// covers the connected empty cells.
 /// </summary>
 internal static class TileFloodFill
 {

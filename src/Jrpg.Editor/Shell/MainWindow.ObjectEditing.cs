@@ -11,8 +11,8 @@ using Jrpg.Editor.Objects;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// The window's object mode (legacy controls): a click places the chosen object centered on the mouse, Shift + drag
-/// moves an object, a right click removes one, Ctrl + drag selects objects for Delete.
+/// The window's object mode: a click places the chosen object centered on the mouse, Shift + drag moves an object, a
+/// right click removes one, Ctrl + drag selects objects for Delete.
 /// </summary>
 internal sealed partial class MainWindow
 {

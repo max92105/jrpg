@@ -129,7 +129,7 @@ internal sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     public partial string? SaveError { get; private set; }
 
-    /// <summary>Whether the cell grid is drawn over the map; on by default, as in the legacy editor.</summary>
+    /// <summary>Whether the cell grid is drawn over the map; on by default.</summary>
     [ObservableProperty]
     public partial bool IsGridShown { get; set; } = true;
 

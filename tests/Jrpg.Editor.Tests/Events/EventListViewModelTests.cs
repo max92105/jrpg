@@ -48,7 +48,7 @@ public sealed class EventListViewModelTests
     }
 
     [Fact]
-    public void AddEventCommand_GivesTheNextIdAndTheLegacyDefaults()
+    public void AddEventCommand_GivesTheNextIdAndTheDefaults()
     {
         _list.AddEventCommand.Execute(null);
 

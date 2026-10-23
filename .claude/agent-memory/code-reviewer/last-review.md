@@ -5,8 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-code-health/slices/A2.md, slice A2 (MenuPointer, CategoryRailView, dimmed selection)
+Slice: docs/plans/2026-10-23-code-health/slices/P1.md, slice P1 (sidebar lists active + reserve, marks shown member, scrolls)
 Round: 1 (verdict: Ready to commit)
 
-- Suggestion, open: InventoryPage.DrawRow tests `index == _rowCursor?.Selected` twice; one `if` holding highlight + pointer (pointer under `!_rail.HasCursor`).
-- Follow-up, open: DefeatScreenView and CommandPanelView draw their in-row pointer diamonds by hand; could adopt a shared pointer once its placement fits.
+- Suggestion, open: GameMenuSceneTests new NewMenu(session, sidebar, pages) repeats FrameOf's body; FrameOf(session, sidebar) overload.
+- Suggestion, open: FirstVisible survives a switch to a page with no shown member (Status scrolled to 7th -> Inventory shows cards 2-7, leader hidden); reset to 0 when shown is null, or ask the developer.
+- Suggestion, open: IMemberPage.Shown has no summary; one line ("the member on screen now") would help the next implementer.

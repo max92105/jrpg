@@ -19,7 +19,7 @@ namespace Jrpg.Game.Menus;
 /// portrait, then their parameters and what they wear. Left and Right (or the tab buttons) go through the members,
 /// active ones first.
 /// </summary>
-internal sealed class StatusPage : IMenuPage
+internal sealed class StatusPage : IMemberPage
 {
     // Placeholder layout (decision 82): a 28 x 20 margin, 22 px headings, 18 px body text, 14 px labels and captions;
     // a 190 px portrait 32 px right of the profile; 36 px stat lines in two columns 40 px apart, 10 px in under titles.

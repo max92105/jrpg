@@ -16,7 +16,7 @@ namespace Jrpg.Game.Menus;
 /// The menu's Equipment page: one member at a time, what they wear in each slot, a "Remove all" action, and their
 /// parameters. Changing what's worn comes in P3b.
 /// </summary>
-internal sealed class EquipmentPage : IMenuPage
+internal sealed class EquipmentPage : IMemberPage
 {
     private readonly PartyState _party;
     private readonly PartyEquipment _equipment;

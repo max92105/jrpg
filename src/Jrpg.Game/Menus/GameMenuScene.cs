@@ -89,7 +89,7 @@ internal sealed class GameMenuScene : IScene
         var request = _isInPage ? UpdatePage(input) : UpdateTabs(input);
         if (_isInPage)
         {
-            _sidebar.Refresh();
+            _sidebar.Refresh((_pages[_tabs.Selected] as IMemberPage)?.Shown);
         }
 
         return request;

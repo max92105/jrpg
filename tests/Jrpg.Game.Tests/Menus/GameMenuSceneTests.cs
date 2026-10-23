@@ -162,6 +162,43 @@ public sealed class GameMenuSceneTests
         Assert.False(menu.ShowsSidebar);
     }
 
+    // Status shows the first member when it opens; Right shows the next, active then reserve.
+    [Fact]
+    public void Update_RightOnStatus_SidebarMarksTheNextMember()
+    {
+        var session = NewSession();
+        var sidebar = new PartySidebar(session.Party);
+        var menu = NewMenu(session, sidebar, new StatusPage(RepositoryScreenText.Text, new UiTextures(), session, StartMapScenarios.BelowClosedDoor));
+        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+        Assert.Equal(0, sidebar.ShownIndex);
+
+        menu.Update(_oneUpdate, Pressing(GameButton.Right));
+
+        Assert.Equal(1, sidebar.ShownIndex);
+    }
+
+    // The menu's tabs are Status then Inventory: Status marks its member, then Inventory, which shows no one, marks none.
+    [Fact]
+    public void Update_InventoryOpen_SidebarMarksNoMember()
+    {
+        var session = NewSession();
+        var sidebar = new PartySidebar(session.Party);
+        var ui = new UiTextures();
+        var status = new StatusPage(RepositoryScreenText.Text, ui, session, StartMapScenarios.BelowClosedDoor);
+        var menu = NewMenu(session, sidebar, status, new InventoryPage(RepositoryScreenText.Text, ui, session, StartMapScenarios.BelowClosedDoor));
+        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+        Assert.Equal(0, sidebar.ShownIndex);
+        menu.Update(_oneUpdate, Pressing(GameButton.Cancel));
+        menu.Update(_oneUpdate, Pressing(GameButton.Down));
+
+        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+
+        Assert.Null(sidebar.ShownIndex);
+    }
+
+    private static GameMenuScene NewMenu(GameSession session, PartySidebar sidebar, params IMenuPage[] pages) =>
+        new(RepositoryScreenText.Text, new UiTextures(), FrameOf(session, sidebar), [.. pages]);
+
     private static GameMenuScene NewMenu()
     {
         var session = NewSession();
@@ -172,9 +209,10 @@ public sealed class GameMenuSceneTests
     private static GameMenuScene NewMenu(IMenuPage page) =>
         new(RepositoryScreenText.Text, new UiTextures(), FrameOf(NewSession()), [page]);
 
-    private static MenuFrame FrameOf(GameSession session)
+    private static MenuFrame FrameOf(GameSession session) => FrameOf(session, new PartySidebar(session.Party));
+
+    private static MenuFrame FrameOf(GameSession session, PartySidebar sidebar)
     {
-        var sidebar = new PartySidebar(session.Party);
         var ui = new UiTextures();
         var cards = new MemberCardView(RepositoryScreenText.Text, ui, StartMapScenarios.BelowClosedDoor);
         return new(new MenuHeader(RepositoryScreenText.Text, session), sidebar, new PartySidebarView(sidebar, cards, ui));

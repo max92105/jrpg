@@ -37,10 +37,13 @@ internal sealed class PartySidebarView
     {
         FormatChangedCards();
         batch.Draw(_ui.Gradient(textures, UiTheme.SidebarPanel), column, Color.White * opacity);
-        for (var index = 0; index < _cards.Count; index++)
+        var last = Math.Min(_cards.Count, _sidebar.FirstVisible + PartySidebar.VisibleCards);
+        for (var index = _sidebar.FirstVisible; index < last; index++)
         {
-            var area = new Rectangle(column.X, column.Y + (index * (MemberCardView.Height + CardGap)), column.Width, MemberCardView.Height);
-            _cardView.Draw(batch, textures, new MemberCardView.Place(_cards[index].Card, area, IsSelected: false), opacity);
+            var top = column.Y + ((index - _sidebar.FirstVisible) * (MemberCardView.Height + CardGap));
+            var area = new Rectangle(column.X, top, column.Width, MemberCardView.Height);
+            var place = new MemberCardView.Place(_cards[index].Card, area, IsSelected: index == _sidebar.ShownIndex);
+            _cardView.Draw(batch, textures, place, opacity);
         }
     }
 

@@ -86,7 +86,7 @@ Sizes are hand-written lines, tests included; "moved" lines are cut and pasted (
 
 ### Phase 2: the menu feedback
 - [x] **A1. The inventory category rail takes the cursor: Left to the rail, Up/Down filter, Right back** (Game + content, about 220 lines) → [slices/A1.md](slices/A1.md)
-- [ ] **A2. The rail's look: pointer on the focused side, its own view** (Game, about 140 lines) → [slices/A2.md](slices/A2.md)
+- [x] **A2. The rail's look: pointer on the focused side, its own view** (Game, about 140 lines) → [slices/A2.md](slices/A2.md)
 - [ ] **P1. The party sidebar lists active and reserve, marks the shown member, scrolls to it** (Game + content, about 250 lines) → [slices/P1.md](slices/P1.md)
 - [ ] **P2. The party sidebar's look: shown member lit, reserve set apart, scroll cues** (Game + content, about 150 lines) → [slices/P2.md](slices/P2.md)
 

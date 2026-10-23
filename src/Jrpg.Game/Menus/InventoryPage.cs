@@ -39,21 +39,14 @@ internal sealed class InventoryPage : IMenuPage
     private const int DescriptionGap = 24;
     private const int RowIconSize = 26;
 
-    // The category rail (placeholder layout): a 72 px rail, 12 px from the list, with 12 px padding and 64 px tabs
-    // holding a 40 px icon, faint until selected; the selected tab glows inside an 8 x 4 margin.
-    private const int RailWidth = 72;
+    // The list starts 12 px right of the category rail (placeholder).
     private const int RailGap = 12;
-    private const int RailPadding = 12;
-    private const int RailTabHeight = 64;
-    private const int RailIconSize = 40;
-    private const int RailGlowInsetX = 8;
-    private const int RailGlowInsetY = 4;
-    private const float UnselectedIconOpacity = 0.5f;
 
     private readonly GameSession _session;
     private readonly ContentCatalog _catalog;
     private readonly UiTextures _ui;
     private readonly CategoryRail _rail = new();
+    private readonly CategoryRailView _railView;
     private readonly SpriteFontBase _headingFont;
     private readonly SpriteFontBase _bodyFont;
     private readonly SpriteFontBase _labelFont;
@@ -79,6 +72,7 @@ internal sealed class InventoryPage : IMenuPage
         _session = session;
         _catalog = catalog;
         _ui = ui;
+        _railView = new CategoryRailView(ui);
         _headingFont = text.Fonts.FontAt(HeadingPixels);
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _labelFont = text.Fonts.FontAt(LabelPixels);
@@ -234,8 +228,8 @@ internal sealed class InventoryPage : IMenuPage
 
     private void DrawList(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
-        DrawRail(batch, textures, area, opacity);
-        var left = area.X + RailWidth + RailGap + Margin;
+        _railView.Draw(batch, textures, new CategoryRailView.Place(_rail, area), opacity);
+        var left = area.X + CategoryRailView.Width + RailGap + Margin;
         var top = area.Y + TopMargin;
         var width = area.Right - Margin - left;
         batch.DrawString(_headingFont, _categoryNames[_rail.Selected], new Vector2(left, top), UiTheme.TextPrimary * opacity);
@@ -298,9 +292,15 @@ internal sealed class InventoryPage : IMenuPage
 
     private void DrawRow(SpriteBatch batch, TextureLibrary textures, Rectangle row, int index, float opacity)
     {
-        if (index == _rowCursor?.Selected)
+        // The pointer marks the row while the list has the cursor; while the rail has it, the row stays chosen, dimmed.
+        if (index == _rowCursor?.Selected && _rail.HasCursor)
+        {
+            _ui.DrawSelectedRow(batch, textures, row, opacity * UiTheme.DimmedSelectionOpacity);
+        }
+        else if (index == _rowCursor?.Selected)
         {
             _ui.DrawSelectedRow(batch, textures, row, opacity);
+            MenuPointer.Draw(batch, textures.Pixel, new Vector2(row.X, row.Center.Y), opacity);
         }
 
         var item = _rows[index];
@@ -311,35 +311,6 @@ internal sealed class InventoryPage : IMenuPage
         batch.DrawString(_bodyFont, item.Name, new Vector2(row.X + RowInset + IconColumn, textTop), textColor);
         var quantityLeft = row.Right - QuantityInset - item.QuantityWidth;
         batch.DrawString(_bodyFont, item.Quantity, new Vector2(quantityLeft, textTop), textColor);
-    }
-
-    // A dark strip with hairlines left and right, one icon tab per category.
-    private void DrawRail(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
-    {
-        var rail = new Rectangle(area.X, area.Y, RailWidth, area.Height);
-        batch.Draw(textures.Pixel, rail, UiTheme.CategoryRail * opacity);
-        batch.Draw(textures.Pixel, new Rectangle(rail.X, rail.Y, 1, rail.Height), UiTheme.Stroke * opacity);
-        batch.Draw(textures.Pixel, new Rectangle(rail.Right - 1, rail.Y, 1, rail.Height), UiTheme.Stroke * opacity);
-        for (var index = 0; index < _rail.Tabs.Count; index++)
-        {
-            var tab = new Rectangle(rail.X, rail.Y + RailPadding + (index * RailTabHeight), RailWidth, RailTabHeight);
-            DrawRailTab(batch, textures, tab, index, opacity);
-        }
-    }
-
-    private void DrawRailTab(SpriteBatch batch, TextureLibrary textures, Rectangle tab, int index, float opacity)
-    {
-        var isSelected = index == _rail.Selected;
-        if (isSelected)
-        {
-            var glow = new Rectangle(tab.X + RailGlowInsetX, tab.Y + RailGlowInsetY, tab.Width - (2 * RailGlowInsetX), tab.Height - (2 * RailGlowInsetY));
-            batch.Draw(_ui.Gradient(textures, UiTheme.SelectedRow), glow, Color.White * opacity);
-            Outline.Draw(batch, textures.Pixel, glow, UiTheme.SelectionStroke * opacity);
-        }
-
-        var icon = _ui.Icon(textures, _rail.Tabs[index].IconFile, RailIconSize);
-        var corner = new Vector2(tab.Center.X - (RailIconSize / 2), tab.Center.Y - (RailIconSize / 2));
-        batch.Draw(icon, corner, Color.White * (isSelected ? opacity : opacity * UnselectedIconOpacity));
     }
 
     // One owned item's row text.

@@ -80,6 +80,12 @@ internal static class UiTheme
     /// <summary>The outline of the selected tab.</summary>
     public static Color SelectionStroke { get; } = FromStraightArgb(0xB3D6DCFF);
 
+    /// <summary>
+    /// How strongly a selection shows on the side of a page without the cursor, so the side with it stands out
+    /// (placeholder).
+    /// </summary>
+    public const float DimmedSelectionOpacity = 0.5f;
+
     /// <summary>The selected tab, deep blue glowing out to the right.</summary>
     public static ImmutableArray<GradientStop> Selection { get; } =
     [

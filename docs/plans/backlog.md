@@ -56,7 +56,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the demo retirement plan (2026-10-23)
 
-- `ExplorationStateTests` is 398 lines: move the interaction-target tests (G1a: `InteractionInFront_*`) into their own class. (plan 2026-10-23, X1)
 - Equipment page: opening a slot's choice hides the party sidebar (484 px) but the choice panel is 560 px, so the sheet narrows by 76 px while it is open (P1/Q2). Waits for question 153, the sidebar's placement.
 - Editor: with a button focused (Fit, Add layer), Space + drag pans, but releasing Space still clicks the button (WPF clicks a focused button on Space up; Space is swallowed only while the map has focus). Older than F2, easier to meet since F2 (review of F2).
 - Row pointer diamonds are drawn by hand in `DefeatScreenView` and `CommandPanelView` (inside the row); `Ui/MenuPointer` (A2) is the third. Use `MenuPointer` there when those menus are next touched, if the outside-the-line placement suits them (review of A2).

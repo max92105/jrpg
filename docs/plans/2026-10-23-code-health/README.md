@@ -94,7 +94,7 @@ Sizes are hand-written lines, tests included; "moved" lines are cut and pasted (
 - [x] **N1. Data refuses more than 5 active members; the battle screens are checked with 5** (Core + Data + Game, about 120 lines) → [slices/N1.md](slices/N1.md)
 
 ### Phase 4: the code cutscenes touch
-- [ ] **X1. `ExplorationStateTests` by area: interaction target and touch events** (Core tests, about 50 lines plus about 200 moved) → [slices/X1.md](slices/X1.md)
+- [x] **X1. `ExplorationStateTests` by area: interaction target and touch events** (Core tests, about 50 lines plus about 200 moved) → [slices/X1.md](slices/X1.md)
 - [ ] **E1a. `MainViewModelTests` by area: shared content copy, saving and undo classes** (Editor tests, about 80 lines plus about 330 moved) → [slices/E1a.md](slices/E1a.md)
 - [ ] **E2. The undo routing leaves `MainViewModel`: `CombinedHistory`** (Editor, about 300 lines; split at the size check if over) → [slices/E2.md](slices/E2.md)
 - [ ] **E3. `MainViewModel`: one discard question, one "add and choose the new object"** (Editor, about 80 lines) → [slices/E3.md](slices/E3.md)

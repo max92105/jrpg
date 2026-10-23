@@ -1,5 +1,5 @@
 - [Records with lists equality](records-with-lists-equality.md) — records with list members compare by reference; combined-field messages; tautological tests
-- [Scratch builds blocked](scratch-builds-blocked.md) — WDAC blocks scratch DLLs; fsi + repo DLL for Core probes; PowerShell 5.1 -STA for WPF theme probes
+- [Scratch builds blocked](scratch-builds-blocked.md) — WDAC blocks scratch DLLs; fsi for Core probes; PowerShell -STA for WPF; no Python (sed+awk+diff for moved code)
 - [Tautological tests](tautological-tests.md) — same-seed-twice, count==count, File.Exists-only, untested `<=` boundary; pin golden values
 - [Validator null ids](validator-null-ids.md) — null list elements AND dictionary values pass strict STJ; check null entries first (seen slices 8, 1b, 1c; nested lists too)
 - [Namespace cycles](namespace-cycles.md) — grep reverse usings for each new Core using; Content is the hub (Content<->Session seen in slice 8)

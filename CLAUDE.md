@@ -35,6 +35,7 @@ Dependency direction: Game → Data → Core; Editor → Data → Core. Never th
 - Run game: `dotnet run --project src/Jrpg.Game` (Debug reads the repository's `content/` directly, so content edits show on the next start without rebuilding; `-- --content <folder>` reads another folder). A broken content file stops the start with the file named on screen, in the console and in the Visual Studio Output window (only the console and Output window if the message table or fonts are what's broken). A Release build only finds content when published (`dotnet publish`) or given `--content`.
 - Run editor: `dotnet run --project src/Jrpg.Editor` (same content root rule as the game).
 - Visual Studio: the "Game and editor" launch profile (`Jrpg.slnLaunch`) starts both with F5; pick it in the toolbar's startup list. Without it, F5 starts `Jrpg.Game`, the default startup project (`DefaultStartup` in `Jrpg.slnx`).
+- No Python on this machine: edit with the Edit tool, or with sed/awk followed by `sed -i 's/\r*$/\r/'` to restore the CRLF line endings.
 
 ## Coding rules
 

@@ -1,4 +1,4 @@
-- [Migration roadmap](project_migration_roadmap.md) — migration done; code-health plan approved 2026-10-23; next number 156, ADR 0016; open 150-155; next plans
+- [Migration roadmap](project_migration_roadmap.md) — migration and code-health plan done 2026-10-23; next number 156, ADR 0016; open 150-155; next plans
 - [Content quirks](project_content_quirks.md) — 1024 px party battlers, exact-case art names, player.png row order, empty skill icons
 - [Type/folder name clash](feedback_type_folder_name_clash.md) — never name a type after its feature folder (CA1724); use PartyState/BattleState
 - [Plan lessons](feedback_plan_lessons.md) — slice sizes, folder-dependency tables, no-caller APIs, presenter/draw split, code-health splits, wording-removal plans

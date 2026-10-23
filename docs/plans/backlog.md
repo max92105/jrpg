@@ -2,13 +2,14 @@
 
 Code-health work waiting for the next cleanup plan; `/retro` appends to it. One line per item, with where it came from. A cleanup plan (`/plan-feature`) starts from this list and removes the lines it covers.
 
-The code health plan (`2026-10-23-code-health`) covers the lines marked "(plan 2026-10-23, slice X)". Each of those slices removes or rewrites its line. The plan's review moved the rest to "When next touched" below.
+The code health plan (`done/2026-10-23-code-health`) did the lines it covered; the ones its review moved wait under "When next touched" below.
 
 ## When next touched
 
 These waited at the 2026-10-23 code health review. Do each one with the next change to its file, or when a plan needs it. Each says why it can wait.
 
 - `MainViewModel` (489 lines after E3): the sheet image-size cache (`SheetImageSizes`) and the import status text (`SheetImportResult.Summary`) could leave it.
+- **Centering the hint in a footer is written 3 times** (`GameMenuScene.DrawFooterHint`, `VictoryScreenView.Draw`, `DefeatScreenView.DrawFooter`). It could become `FooterBar.TextTop(height, lineHeight)`. The menu rounds to whole pixels and the outcome screens don't, so merging them moves the menu hint by up to a pixel; do it with the next footer change, checked by screenshot. (U6 review)
 - **`Directory.Build.props`:** merge `src/` and `tests/` into a root file. Decision 144 keeps two files for now; the developer didn't choose to merge. When it happens, use the standard form:
   - the gates go in a root `Directory.Build.props`;
   - `tests/Directory.Build.props` keeps its two test-only settings (`IsPackable=false`, `using Xunit`) and imports the root file through `$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))`;
@@ -25,7 +26,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - **Easing copies:** the clamped time share `Math.Clamp((float)(elapsed / length), 0, 1)` is copied 6 times (`ActionPlayback`, `FloatingNumber` twice, `LevelUpPop`, `VictoryEntrance`, `DefeatEntrance`), and the cubic ease-out twice (`LevelUpPop`, `VictoryEntrance`). They should use `Ui/Easing`. It can wait because each copy is one line.
 - **`Ui/MessageIds.cs` is 338 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
 - **`MainViewModelTests`, part 2 (449 lines after E1a):** move the new content tests (`CreateObject_*`, `CreateNpc_*`, `CanStartNewObject_*`, `TryCreateMap_*`) and the map settings tests (`TryApplySettings_*`) into their own classes, on E1a's `EditorTestContent`.
-- **`MainViewModel`:** the sheet image-size cache (`SheetImageSizes`) and the import status text (`SheetImportResult.Summary`) could leave it.
 - **`MainWindow.xaml.cs` (547 lines):** move the viewport (pan, zoom, fit) and the tile painting handlers into partial files, as `.EventEditing` and `.ObjectEditing` already are.
 - **`TileBrowserViewModelTests` (410 lines):** move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class.
 - **`TileBrowserViewModel` (about 300 lines):** move the sheet hit-testing (`CellAt`, `NearestCellTo`, `GridPositionOf`, F1's grid check) into a `Tiles/SheetGrid`.

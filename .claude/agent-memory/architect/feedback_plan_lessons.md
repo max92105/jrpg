@@ -41,6 +41,8 @@ When planning slices in this repo:
 - UI feedback: look at the input bindings first (the inventory rail had no keyboard key); read docs/ui_ux_exemples (the .webp files open with Read).
 - Removal/wording plans: count with Grep count mode (it counts matching lines, not occurrences), slice by folder, list each reason-carrying comment with its replacement, "don't invent a reason"; a text guard must skip itself and history paths (docs/plans, done ADRs).
 
+- Before changing repository content (classes, members, new-game), grep the Game/Data tests that assume it (Sarxian as warrior leader, Teelle, StartNew call sites) and budget the fixes in the slice.
+
 **Why:** part 1 split slices mid-way; the part 2 devil's advocate (2026-10-17) raised exactly these as blockers/concerns.
 
 **How to apply:** check every plan against this list before handing it back. See [[migration-roadmap]].

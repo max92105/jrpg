@@ -1,0 +1,46 @@
+# A1b. The intro speaks
+
+Part of [the new-game flow plan](../README.md). Design: [design.md](../design.md), "The voice-over path" and "Risks" (audio hardware, constructor limits). ADR 0018.
+
+- **A1b. The intro speaks; with no sound device the game plays on silently** (Game, about 220 lines; decision 159)
+  - **Goal:**
+    - The intro's voice starts with the intro and stops when it ends or is skipped.
+    - With no audio device, the game says so once in the console and the debug output, and plays on silently.
+    - A voice file that fails to load is reported once, by name, and its intro plays silent.
+  - **New types (Game):**
+    - `Audio/VoiceChannel`: the voice the game wants heard now; written by scenes, read by the host. Plain C#, no MonoGame.
+      - `Play(string voiceFile)` sets `VoiceFile`.
+      - `Stop()` clears it.
+    - `Audio/SoundLibrary`: the one place the game opens sound files.
+      - `SoundLibrary(string audioRoot)`.
+      - `SoundEffect? Get(string folder, string file)` loads with `SoundEffect.FromFile` on first use and keeps the result. A file that fails to load is reported once and returns null.
+      - `IDisposable`.
+    - `Audio/VoicePlayer`: plays on the audio device what the channel asks for.
+      - `VoicePlayer(SoundLibrary sounds)`.
+      - `Follow(VoiceChannel voice)`: when the channel's file differs from the one last started (null included), it stops the current `SoundEffectInstance` and starts the new file.
+      - `IDisposable`.
+  - **Changes:**
+    - `Flow/SceneFactory` creates the one `VoiceChannel`, exposes it as `Voice` and passes it to `CinematicScene`. `Flow/GameFlow.Voice` returns it.
+    - `Cinematics/CinematicScene(CinematicDefinition cinematic, ScreenText text, VoiceChannel voice)`:
+      - `Play` on its first update;
+      - `Stop` when it ends or is skipped, before returning `CinematicFinished`.
+    - `JrpgGame(IScene rootScene, string contentRoot, PlayerSettings settings, VoiceChannel voice)`:
+      - derives the art and audio roots;
+      - in `LoadContent`, touches the audio system once (for example `SoundEffect.MasterVolume`), so a missing device shows at startup;
+      - catches only the exception the hand check finds for a disabled device, reports it once, and skips `Follow` from then on;
+      - calls `Follow` after the root scene's update;
+      - disposes the player and the library.
+    - `Program.FirstScene` returns the root scene with its channel (a fresh, silent one for the error screen) and computes `artRoot` inside.
+  - **Tests:**
+    - `VoiceChannelTests.Stop_AfterPlay_ClearsVoiceFile`
+    - `CinematicSceneTests`:
+      - `Update_First_PlaysTheCinematicsVoice`
+      - `Update_Skip_StopsTheVoice`
+      - `Update_PastAllShots_StopsTheVoice`
+    - `GameFlowTests.Update_IntroSkipped_VoiceStops`, through `flow.Voice`.
+    - `SoundLibrary`, `VoicePlayer` and the device handling need hardware: hand checks.
+  - **Verify by hand:**
+    - Choosing Ragnir plays the placeholder voice from the first still; Confirm cuts it at once.
+    - Choosing again after returning to the title plays it again from the start.
+    - **With the sound device disabled in Windows:** first note which exception arrives (then catch exactly that one). After the fix, the game starts, the intro plays silently, and the console says once that there's no audio.
+    - Replacing `Placeholder.wav` with a non-WAV file: the console names it once, and the intro plays silent.

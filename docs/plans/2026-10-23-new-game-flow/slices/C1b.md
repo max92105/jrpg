@@ -1,0 +1,51 @@
+# C1b. A member's stats come from their class at their level
+
+Part of [the new-game flow plan](../README.md). Design: [design.md](../design.md), "Tunables and placeholders" (classes), "Core changes", "Risks" (test churn, difficulty). ADR 0017.
+
+- **C1b. A member's stats come from their class at their level; members join at level 1** (Core + Data + content, about 300 lines; split at the size check if over; decisions 164, 168; questions 180, 184)
+  - **Goal:**
+    - A class has base stats at level 1 and a growth per level. A member's max HP, max MP, attack and defense are their class's at the member's level.
+    - A new member joins at level 1 with 0 XP and full HP and MP.
+    - Member definitions hold no numbers.
+  - **New types (Core):**
+    - `Party/ClassStats`: max HP, max MP, attack and defense; a class's base or its growth.
+      - `record ClassStats(int MaxHp, int MaxMp, int Attack, int Defense)`.
+    - `Party/ClassGrowth` (static, pure): the stats a class gives at a level, the one formula.
+      - `static ClassStats StatsAt(ClassDefinition characterClass, int level)` returns `base + growth × (level − 1)`.
+      - The comment cites ADR 0017: linear growth, the simplest rule that makes levels matter.
+  - **Changes:**
+    - Core:
+      - `ClassDefinition` gains `ClassStats Base` and `ClassStats Growth`.
+      - `PartyMemberDefinition` loses `Level`, `Experience`, `Hp`, `MaxHp`, `Mp`, `MaxMp`, `Attack` and `Defense`.
+      - `PartyMember` takes its `ClassDefinition`. `BaseStats` and the vitals' maxima come from `ClassGrowth.StatsAt(class, Level)`.
+      - `Recruit(definition, characterClass, skillCatalog)` starts at level 1, 0 XP, full HP and MP. `Restore` takes the class too.
+      - `GameSession` passes the class from the catalog.
+    - Data:
+      - `ClassCatalogValidator`: base max HP at least 1; base max MP, attack and defense, and every growth, at least 0. Messages name the class and the field.
+      - `PartyMemberCatalogValidator` loses its number rules.
+      - `SaveGameRepair` clamps HP and MP to the class's maxima at the saved level.
+    - Content:
+      - `classes.json`: `base` and `growth` per the design table;
+      - `party-members.json`: the numbers removed.
+    - Tests:
+      - `ClassBuilder` (test helper) builds a class with given numbers.
+      - `PartyMemberBuilder` takes a class and a level. Tests that need exact numbers give their member a test class with those numbers; tests on repository content use the real classes.
+      - Record the test count before and after.
+  - **Balance check (question 184):**
+    - Run the battle simulation with a lone level 1 leader of each class against the goblin trio, attacking only.
+    - Adjust the placeholder base HP and defense in `classes.json` until each class wins.
+    - Record the final numbers and win rates in the Done note and in design.md's table.
+  - **Tests:**
+    - `ClassGrowthTests`:
+      - `StatsAt_LevelOne_IsBase`
+      - `StatsAt_LevelFive_AddsFourGrowths`
+      - `StatsAt_LevelBelowOne_Throws`
+    - `PartyMemberTests`:
+      - `Recruit_Any_StartsAtLevelOneWithZeroExperienceAndFullVitals`
+      - `BaseStats_RestoredAtLevelThree_AreTheClassAtThree`
+    - `ClassCatalogValidatorTests.Validate_InvalidStat_ThrowsNamingTheClassAndField` (theory)
+    - `SaveGameRepairTests.Repair_HpAboveClassMaxAtSavedLevel_ClampsAndReports`
+    - `SaveGameStoreTests` (or the existing old-format test): a save made before this slice loads, and its members get their class's stats at their saved level.
+  - **Verify by hand:**
+    - A new game's leader shows level 1, 0 XP and their class's numbers on the Status page.
+    - An old save loads, and its members show their class's numbers at their level.

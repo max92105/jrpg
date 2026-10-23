@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-code-health/slices/F2.md, slice F2 (Space + drag pans whichever panel has focus)
+Slice: docs/plans/2026-10-23-code-health/slices/F4.md, slice F4 (victory card at the highest level shows a full bar and "Max")
 Round: 1 (verdict: Ready to commit)
 
-- Follow-up, open: with a Button focused (Fit, Add layer), Space + drag now pans but the Space release still clicks the button (WPF default, not swallowed outside the map); predates the diff.
+- Suggestion, open: ExperienceGain.cs:7-9 empty `<param>` tags for Member/Amount/Steps (only ones in src); fill them or fold IsAtMaxLevel into the summary.

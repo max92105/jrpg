@@ -15,7 +15,7 @@ public sealed class VictoryScreenTests
 
     // One card comes in, the bars wait 1.05 s, then Sarxian's 60 experience fill half of a 120-point level in 0.55 s.
     private readonly VictoryScreen _screen = new(
-        new VictoryRewards(60, [new ExperienceGain(Sarxian(), 60, [new LevelProgressStep(1, 0, 60, 120)])]));
+        new VictoryRewards(60, [new ExperienceGain(Sarxian(), 60, [new LevelProgressStep(1, 0, 60, 120)], IsAtMaxLevel: false)]));
 
     [Fact]
     public void Update_ConfirmWhilePlaying_SkipsToEnd()
@@ -54,6 +54,37 @@ public sealed class VictoryScreenTests
 
         Assert.IsType<BattleFinished>(first);
         Assert.Null(second);
+    }
+
+    // Already at the highest level: Core gives no steps, so the bar is complete from the start.
+    [Fact]
+    public void IsAtMaxLevel_MemberAlreadyAtMaxLevel_IsTrue()
+    {
+        var screen = new VictoryScreen(new VictoryRewards(60, [new ExperienceGain(Sarxian(), 60, [], IsAtMaxLevel: true)]));
+
+        Assert.True(screen.IsAtMaxLevel(0));
+    }
+
+    // The gain fills the last level, so the card shows "Max" only once the bar has filled it.
+    [Fact]
+    public void IsAtMaxLevel_ReachesMaxLevelWhileFilling_FalseUntilTheBarCompletes()
+    {
+        var screen = new VictoryScreen(
+            new VictoryRewards(60, [new ExperienceGain(Sarxian(), 60, [new LevelProgressStep(1, 60, 120, 120)], IsAtMaxLevel: true)]));
+        screen.Update(TimeSpan.FromSeconds(1.1), default);
+        Assert.False(screen.IsAtMaxLevel(0));
+
+        screen.Update(TimeSpan.FromSeconds(1), default);
+
+        Assert.True(screen.IsAtMaxLevel(0));
+    }
+
+    [Fact]
+    public void IsAtMaxLevel_BelowMaxLevel_IsFalse()
+    {
+        _screen.Update(TimeSpan.FromSeconds(3), default);
+
+        Assert.False(_screen.IsAtMaxLevel(0));
     }
 
     private static PartyMember Sarxian() => PartyMember.Recruit(BattleScenarios.Catalog.PartyMembers["sarxian"], BattleScenarios.Catalog.Skills);

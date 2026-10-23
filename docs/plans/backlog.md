@@ -42,7 +42,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 - **The footer bar with its hairline is drawn 3 times** (`GameMenuScene`, `VictoryScreenView`, `DefeatScreenView`; the two outcome screens also share the left shade and the title hairline). A shared `Ui` footer, and an outcome frame for the two battle screens. (plan 2026-10-23, U6)
 - **More invariant number formatting inline** (`ToString(CultureInfo.InvariantCulture)` in `ActionPlayback`, `CommandPanelView`, `VictoryScreenView`, `VitalsText`), on top of the copies listed above. (plan 2026-10-23, U1)
-- **Victory screen at the maximum level** shows "EXP 0/0" and an empty bar. Show a full bar and "Max", like the Status page (decision 148). (plan 2026-10-23, F4)
 - **Victory cards have no row limit**: more than 6 active members reach the footer line (B7b1 review). (plan 2026-10-23, N1: Data caps the party at 5, decision 149)
 - **Enemy attack strips are drawn unmirrored over the party**; no flip rule is decided (B5d). A design question for the developer.
 - **"Load the latest save" and the save-list overlay are written twice** (`TitleScene`, `DefeatScreen`/`DefeatScreenView`). Share them in the **autosave plan**, which is likely to add the third copy.

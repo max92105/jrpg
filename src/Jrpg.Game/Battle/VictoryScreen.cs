@@ -32,6 +32,12 @@ internal sealed class VictoryScreen
     /// <summary>Whether everything has come in and every bar has filled, so the footer shows "Next".</summary>
     public bool IsComplete => Entrance.IsComplete && Array.TrueForAll(_bars, bar => bar.IsComplete);
 
+    /// <summary>
+    /// Whether the card at <paramref name="index"/> shows the highest level (decision 148): only once its bar is full, so a
+    /// member who reaches it in this battle first sees the last level fill.
+    /// </summary>
+    public bool IsAtMaxLevel(int index) => _bars[index].IsComplete && Rewards.Gains[index].IsAtMaxLevel;
+
     /// <returns><see cref="BattleFinished"/> on the Confirm after the bars are full, once; null otherwise.</returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {

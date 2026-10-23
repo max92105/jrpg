@@ -31,6 +31,13 @@ internal static class BattleRewards
         }
 
         var share = SharePerMember(TotalExperience(defeated), recipients.Count);
-        return [.. recipients.Select(member => new ExperienceGain(member, share, member.GainExperience(share, table)))];
+        return [.. recipients.Select(member => GainOf(member, share, table))];
+    }
+
+    // The highest level is read after the gain, so a member who reaches it in this battle counts.
+    private static ExperienceGain GainOf(PartyMember member, int share, ExperienceTable table)
+    {
+        var steps = member.GainExperience(share, table);
+        return new ExperienceGain(member, share, steps, table.IsMaxLevel(member.Level));
     }
 }

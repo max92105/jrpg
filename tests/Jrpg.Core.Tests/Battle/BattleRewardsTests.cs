@@ -118,4 +118,36 @@ public sealed class BattleRewardsTests
         Assert.Equal(120, gain.Amount);
         Assert.Empty(gain.Steps);
     }
+
+    [Fact]
+    public void GrantExperience_MemberAlreadyAtMaxLevel_IsAtMaxLevel()
+    {
+        var veteran = new PartyMemberBuilder().AtLevel(3).Build();
+
+        var gain = Assert.Single(BattleRewards.GrantExperience(_goblinTrio, [veteran], _table));
+
+        Assert.True(gain.IsAtMaxLevel);
+    }
+
+    // 950 + 120 passes the 1000 that level 2 needs, so the member ends at level 3, the table's highest.
+    [Fact]
+    public void GrantExperience_GainReachesMaxLevel_IsAtMaxLevel()
+    {
+        var sarxian = new PartyMemberBuilder().AtLevel(2, experience: 950).Build();
+
+        var gain = Assert.Single(BattleRewards.GrantExperience(_goblinTrio, [sarxian], _table));
+
+        Assert.Equal(3, sarxian.Level);
+        Assert.True(gain.IsAtMaxLevel);
+    }
+
+    [Fact]
+    public void GrantExperience_BelowMaxLevel_IsNotAtMaxLevel()
+    {
+        var sarxian = new PartyMemberBuilder().AtLevel(1).Build();
+
+        var gain = Assert.Single(BattleRewards.GrantExperience(_goblinTrio, [sarxian], _table));
+
+        Assert.False(gain.IsAtMaxLevel);
+    }
 }

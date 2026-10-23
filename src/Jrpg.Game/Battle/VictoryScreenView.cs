@@ -72,7 +72,9 @@ internal sealed class VictoryScreenView
     private readonly MeasuredText _levelUp;
     private readonly MeasuredText _nextHint;
     private readonly StatBar[] _bars;
-    private readonly (int Level, int Experience, int Needed)[] _shown;
+    private readonly MeasuredText _maxLevel;
+    private readonly MeasuredText _noNextLevel;
+    private readonly (int Level, int Experience, int Needed, bool IsAtMaxLevel)[] _shown;
     private readonly MeasuredText[] _levelTexts;
     private readonly MeasuredText[] _experienceTexts;
     private readonly MeasuredText[] _nextLevelTexts;
@@ -103,9 +105,11 @@ internal sealed class VictoryScreenView
         _experienceLabel = text.Messages.Text(MessageIds.StatusExp);
         _levelUp = MeasuredText.Of(_nameFont.Font, text.Messages.Text(MessageIds.BattleLevelUp));
         _nextHint = MeasuredText.Of(_nextHintFont.Font, text.Messages.Text(MessageIds.BattleVictoryNext));
+        _maxLevel = MeasuredText.Of(_experienceFont.Font, text.Messages.Text(MessageIds.StatusMaxLevel));
+        _noNextLevel = MeasuredText.Of(_smallFont.Font, string.Empty);
         _bars = [.. _names.Select(_ => new StatBar(ui, UiTheme.BattleXpBar, UiTheme.BattleBarTrack))];
-        _shown = new (int, int, int)[_names.Length];
-        Array.Fill(_shown, (-1, -1, -1));
+        _shown = new (int, int, int, bool)[_names.Length];
+        Array.Fill(_shown, (-1, -1, -1, false));
         _levelTexts = new MeasuredText[_names.Length];
         _experienceTexts = new MeasuredText[_names.Length];
         _nextLevelTexts = new MeasuredText[_names.Length];
@@ -200,7 +204,8 @@ internal sealed class VictoryScreenView
     private void ShowCard(int index)
     {
         var bar = _screen.Bars[index];
-        var shown = (bar.Level, bar.Experience, bar.ExperienceToNextLevel);
+        var isAtMaxLevel = _screen.IsAtMaxLevel(index);
+        var shown = (bar.Level, bar.Experience, bar.ExperienceToNextLevel, isAtMaxLevel);
         if (_shown[index] == shown)
         {
             return;
@@ -211,6 +216,20 @@ internal sealed class VictoryScreenView
             _levelTexts[index] = MeasuredText.Of(_levelFont.Font, bar.Level.ToString(CultureInfo.InvariantCulture));
         }
 
+        if (isAtMaxLevel)
+        {
+            ShowMaxLevel(index);
+        }
+        else
+        {
+            ShowExperience(index, bar);
+        }
+
+        _shown[index] = shown;
+    }
+
+    private void ShowExperience(int index, ExperienceBarAnimation bar)
+    {
         if (_shown[index].Needed != bar.ExperienceToNextLevel)
         {
             var needed = _messages.Format(MessageIds.BattleVitalMax, new MessageArgument("max", bar.ExperienceToNextLevel.ToString(CultureInfo.InvariantCulture)));
@@ -219,6 +238,13 @@ internal sealed class VictoryScreenView
 
         _experienceTexts[index] = MeasuredText.Of(_experienceFont.Font, bar.Experience.ToString(CultureInfo.InvariantCulture));
         _bars[index].Show(bar.Experience, bar.ExperienceToNextLevel);
-        _shown[index] = shown;
+    }
+
+    // As the Status page shows the highest level: "Max" where the numbers go, and a full bar (decision 148).
+    private void ShowMaxLevel(int index)
+    {
+        _experienceTexts[index] = _maxLevel;
+        _nextLevelTexts[index] = _noNextLevel;
+        _bars[index].Show(1, 1);
     }
 }

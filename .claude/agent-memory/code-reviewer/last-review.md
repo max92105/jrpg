@@ -5,8 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-code-health/slices/P2.md, slice P2 (sidebar look: lit + pointed shown card, reserve caption and opacity, scroll cues)
+Slice: docs/plans/2026-10-23-code-health/slices/N1.md, slice N1 (party of five: PartyRules.MostActiveMembers, validator cap, layout tests)
 Round: 1 (verdict: Ready to commit)
 
-- Suggestion, open: PartySidebarView layout budget (14 + 32 + 6x120 + 5x12 + 14 = 840 of 864 px) is only implicit; one line in the layout comment stating the window still fits would keep a future CueBand/CardGap tweak honest.
-- Follow-up, open: PartySidebar.VisibleCards summary ("6 cards ... fill the 864 px page") no longer counts the cue bands and reserve caption.
+- Suggestion, open: layout tests (BattleLayoutTests party spots, VictoryScreenViewTests fifth card, validator tests) hardcode 5/6 instead of PartyRules.MostActiveMembers; raising the limit would leave them checking the old size.
+- Suggestion, open: the two new internal consts in VictoryScreenView sit in the middle of the private const block; group them at the end/start of it.

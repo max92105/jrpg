@@ -91,7 +91,7 @@ Sizes are hand-written lines, tests included; "moved" lines are cut and pasted (
 - [x] **P2. The party sidebar's look: shown member lit, reserve set apart, scroll cues** (Game + content, about 150 lines) → [slices/P2.md](slices/P2.md)
 
 ### Phase 3: the party of five
-- [ ] **N1. Data refuses more than 5 active members; the battle screens are checked with 5** (Core + Data + Game, about 120 lines) → [slices/N1.md](slices/N1.md)
+- [x] **N1. Data refuses more than 5 active members; the battle screens are checked with 5** (Core + Data + Game, about 120 lines) → [slices/N1.md](slices/N1.md)
 
 ### Phase 4: the code cutscenes touch
 - [ ] **X1. `ExplorationStateTests` by area: interaction target and touch events** (Core tests, about 50 lines plus about 200 moved) → [slices/X1.md](slices/X1.md)

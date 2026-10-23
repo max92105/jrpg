@@ -23,6 +23,26 @@ public sealed class GameRulesValidatorTests
     }
 
     [Fact]
+    public void Validate_MoreThanFiveActiveMembers_NamesTheLimit()
+    {
+        var rules = _rules with { Party = new PartyRules(MaxActiveMembers: 6) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
+
+        Assert.Equal("rules.json: party.maxActiveMembers can be at most 5 (was 6).", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_FiveActiveMembers_Passes()
+    {
+        var rules = _rules with { Party = new PartyRules(MaxActiveMembers: 5) };
+
+        var exception = Record.Exception(() => GameRulesValidator.Validate("rules.json", rules));
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void Validate_EmptyExperienceTable_ThrowsNamingTheField()
     {
         var rules = _rules with { Experience = new ExperienceTable([]) };

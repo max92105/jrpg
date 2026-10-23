@@ -51,6 +51,12 @@ internal sealed class VictoryScreenView
     private const int ExperiencePixels = 30;
     private const int NextHintPixels = 28;
 
+    /// <summary>A card's height: its header, then the experience line and its bar.</summary>
+    internal const int CardHeight = CardBarTop + CardBarHeight;
+
+    /// <summary>The hairline above the footer, which the cards must end above.</summary>
+    internal const int FooterLineTop = VirtualScreen.Height - FooterLineAbove;
+
     private readonly VictoryScreen _screen;
     private readonly UiTextures _ui;
     private readonly UiMessages _messages;
@@ -115,6 +121,13 @@ internal sealed class VictoryScreenView
         _nextLevelTexts = new MeasuredText[_names.Length];
     }
 
+    /// <summary>
+    /// Where a card stands once it has come in: two columns, row by row (decision 149: five members take three rows).
+    /// </summary>
+    /// <param name="index">The card's place in the rewards' gains, from 0.</param>
+    internal static Point CardTopLeft(int index) =>
+        new(CardsLeft + (index % 2 * (PointedBarShape.CardHeaderWidth + CardColumnGap)), CardsTop + (index / 2 * CardPitch));
+
     /// <summary>One row per thing the battle gave; only experience so far (decision 103).</summary>
     public static IReadOnlyList<VictoryRewardRow> RewardRows(VictoryRewards rewards) =>
         [new VictoryRewardRow(MessageIds.StatusExp, rewards.Experience)];
@@ -132,15 +145,12 @@ internal sealed class VictoryScreenView
         for (var index = 0; index < _names.Length; index++)
         {
             ShowCard(index);
-            var column = index % 2;
-            var topLeft = new Point(
-                CardsLeft + (column * (PointedBarShape.CardHeaderWidth + CardColumnGap)) + (int)entrance.CardOffset(index),
-                CardsTop + (index / 2 * CardPitch));
+            var topLeft = CardTopLeft(index) + new Point((int)entrance.CardOffset(index), 0);
             DrawCard(batch, textures, index, topLeft);
         }
 
         var footerTop = VirtualScreen.Height - FooterHeight;
-        batch.Draw(textures.Pixel, new Rectangle(0, VirtualScreen.Height - FooterLineAbove, VirtualScreen.Width, 1), UiTheme.BarLine);
+        batch.Draw(textures.Pixel, new Rectangle(0, FooterLineTop, VirtualScreen.Width, 1), UiTheme.BarLine);
         batch.Draw(textures.Pixel, new Rectangle(0, footerTop, VirtualScreen.Width, FooterHeight), UiTheme.Bar);
         batch.Draw(textures.Pixel, new Rectangle(0, footerTop, VirtualScreen.Width, 1), UiTheme.BarLine);
         if (_screen.IsComplete)

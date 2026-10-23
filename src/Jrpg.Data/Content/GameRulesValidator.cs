@@ -1,5 +1,6 @@
 using System.Globalization;
 using Jrpg.Core.Content;
+using Jrpg.Core.Party;
 
 namespace Jrpg.Data.Content;
 
@@ -11,6 +12,12 @@ internal static class GameRulesValidator
         {
             throw new ContentValidationException(
                 $"{fileName}: party.maxActiveMembers must be at least 1 (was {rules.Party.MaxActiveMembers}).");
+        }
+
+        if (rules.Party.MaxActiveMembers > PartyRules.MostActiveMembers)
+        {
+            throw new ContentValidationException(
+                $"{fileName}: party.maxActiveMembers can be at most {PartyRules.MostActiveMembers} (was {rules.Party.MaxActiveMembers}).");
         }
 
         ValidateExploration(fileName, rules.Exploration);

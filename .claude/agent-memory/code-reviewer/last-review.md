@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-code-health/slices/E2.md, slice E2 (CombinedHistory: undo routing out of MainViewModel)
+Slice: docs/plans/2026-10-23-code-health/slices/E3.md, slice E3 (MainViewModel: ConfirmDiscard, AddAndChoose)
 Round: 1 (verdict: Ready to commit)
 
-- No findings. Moved members verified identical apart from Content!/CurrentMap -> _catalog/_openMap and UndoRefusal -> Refusal; subscription order in the ctor and in OnCurrentMapChanged preserved; no leftover string bindings to UndoCommand/RedoCommand/UndoRefusal in XAML.
+- Suggestion: backlog.md "From the editor plan (2026-10-22 retro)" heading left empty after removing its only line — open

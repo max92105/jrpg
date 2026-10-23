@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Jrpg.Core.Content;
 using Jrpg.Core.Geometry;
+using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
@@ -213,10 +214,7 @@ internal sealed partial class MainViewModel : ObservableObject
             return false;
         }
 
-        var definition = newNpc.ToDefinition();
-        Content.SetObject(definition);
-        Placing.Browser.SelectedObject = definition;
-        Mode = EditingMode.Objects;
+        AddAndChoose(newNpc.ToDefinition());
         return true;
     }
 
@@ -233,10 +231,7 @@ internal sealed partial class MainViewModel : ObservableObject
         }
 
         var tileIds = newObject.Cells.Cells.ToDictionary(cell => cell, cell => Content.TileAt(cell)?.Id ?? Content.AddTile(cell));
-        var definition = ObjectFromCells.Build(newObject.Id, newObject.Category.Trim(), newObject.Cells, cell => tileIds[cell]);
-        Content.SetObject(definition);
-        Placing.Browser.SelectedObject = definition;
-        Mode = EditingMode.Objects;
+        AddAndChoose(ObjectFromCells.Build(newObject.Id, newObject.Category.Trim(), newObject.Cells, cell => tileIds[cell]));
         return true;
     }
 
@@ -253,7 +248,7 @@ internal sealed partial class MainViewModel : ObservableObject
 
         CurrentMap?.EndStroke();
         var unsaved = CurrentMap is { IsDirty: true } open ? $"Map '{open.Map.Id}' and the tiles have" : "The tiles have";
-        return _confirm($"{unsaved} unsaved changes. Discard them?");
+        return ConfirmDiscard(unsaved);
     }
 
     /// <param name="cell">The cell under the cursor, or null when the cursor left the view.</param>
@@ -479,6 +474,17 @@ internal sealed partial class MainViewModel : ObservableObject
     {
         CurrentMap?.EndStroke();
         return CurrentMap is not { IsDirty: true } open
-            || _confirm($"Map '{open.Map.Id}' has unsaved changes. Discard them?");
+            || ConfirmDiscard($"Map '{open.Map.Id}' has");
+    }
+
+    /// <param name="unsaved">What has unsaved changes, with its verb: "Map 'forest' has", "The tiles have".</param>
+    private bool ConfirmDiscard(string unsaved) => _confirm($"{unsaved} unsaved changes. Discard them?");
+
+    // The new object joins the catalog as one undo step, then is chosen in the Objects panel, in Objects mode.
+    private void AddAndChoose(ObjectDefinition definition)
+    {
+        Content!.SetObject(definition);
+        Placing!.Browser.SelectedObject = definition;
+        Mode = EditingMode.Objects;
     }
 }

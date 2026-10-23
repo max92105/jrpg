@@ -102,7 +102,7 @@ Sizes are hand-written lines, tests included; "moved" lines are cut and pasted (
 ### Phase 5: shared UI pieces
 - [x] **U1. Whole numbers formatted in one place** (Game, about 120 lines) → [slices/U1.md](slices/U1.md)
 - [x] **U2. `Ui/ColumnTitles`: column captions over a hairline, once** (Game, about 120 lines) → [slices/U2.md](slices/U2.md)
-- [ ] **U3. `MeasuredText` wherever text is stored next to its width (not `InventoryPage`)** (Game, about 80 lines) → [slices/U3.md](slices/U3.md)
+- [x] **U3. `MeasuredText` wherever text is stored next to its width (not `InventoryPage`)** (Game, about 80 lines) → [slices/U3.md](slices/U3.md)
 - [ ] **U6. `Ui/FooterBar` and the battle outcome screens' `OutcomeFrame`** (Game, about 130 lines) → [slices/U6.md](slices/U6.md)
 
 The review dropped B1, F3, F5b, E1b, E4, E5a, E5b, E6, C1, U4, U5, U7 and U8; `backlog.md` has them under "When next touched".

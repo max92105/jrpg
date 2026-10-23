@@ -84,7 +84,7 @@ internal sealed class SaveSlotListView
         if (entry.Summary is not { } summary)
         {
             var state = _messages.Text(entry.IsDamaged ? MessageIds.SaveDamaged : MessageIds.SaveEmpty);
-            return new RowText(file, state, null, string.Empty, 0);
+            return new RowText(file, state, null, new MeasuredText(string.Empty, 0));
         }
 
         var details = _messages.Format(
@@ -93,7 +93,7 @@ internal sealed class SaveSlotListView
             new MessageArgument("time", PlayTimeText.Format(summary.PlayTime)));
         var party = string.Join("   ", summary.ActiveParty.Select(member =>
             _messages.Format(MessageIds.SaveMember, new MessageArgument("name", member.Name), MessageArgument.Number("level", member.Level))));
-        return new RowText(file, summary.LocationName, details, party, _bodyFont.MeasureString(party).X);
+        return new RowText(file, summary.LocationName, details, MeasuredText.Of(_bodyFont, party));
     }
 
     private void DrawRow(SpriteBatch batch, TextureLibrary textures, Rectangle row, int index, float opacity)
@@ -122,10 +122,10 @@ internal sealed class SaveSlotListView
         var blockTop = middle - ((_bodyFont.LineHeight + DetailsGap + _captionFont.LineHeight) / 2f);
         batch.DrawString(_bodyFont, text.Location, new Vector2(detailsLeft, blockTop), UiTheme.TextPrimary * opacity);
         batch.DrawString(_captionFont, text.Details, new Vector2(detailsLeft, blockTop + _bodyFont.LineHeight + DetailsGap), UiTheme.TextSecondary * opacity);
-        var partyLeft = row.Right - RowInset - text.PartyWidth;
-        batch.DrawString(_bodyFont, text.Party, new Vector2(partyLeft, middle - (_bodyFont.LineHeight / 2f)), UiTheme.TextPrimary * opacity);
+        var partyLeft = row.Right - RowInset - text.Party.Width;
+        batch.DrawString(_bodyFont, text.Party.Text, new Vector2(partyLeft, middle - (_bodyFont.LineHeight / 2f)), UiTheme.TextPrimary * opacity);
     }
 
     // One row's text; Details is null for an empty or unreadable file, whose Location then says which it is.
-    private sealed record RowText(string File, string Location, string? Details, string Party, float PartyWidth);
+    private sealed record RowText(string File, string Location, string? Details, MeasuredText Party);
 }

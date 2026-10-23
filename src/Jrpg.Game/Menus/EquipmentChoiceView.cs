@@ -39,7 +39,7 @@ internal sealed class EquipmentChoiceView
     private readonly string _remove;
     private readonly ColumnTitles _columnTitles;
     private string _heading = string.Empty;
-    private (string Text, float Width)[] _quantities = [];
+    private MeasuredText[] _quantities = [];
     private string[] _wornRows = [];
 
     /// <param name="text">Messages and fonts.</param>
@@ -68,11 +68,7 @@ internal sealed class EquipmentChoiceView
     public void Show(EquipmentChoice choice, string slotName, Inventory inventory)
     {
         _heading = slotName;
-        _quantities = [.. choice.Items.Select(item =>
-        {
-            var quantity = NumberText.Of(inventory.QuantityOf(item.Id));
-            return (quantity, _bodyFont.MeasureString(quantity).X);
-        })];
+        _quantities = [.. choice.Items.Select(item => MeasuredText.Of(_bodyFont, NumberText.Of(inventory.QuantityOf(item.Id))))];
         _wornRows = [.. choice.Takeable.Select(worn => _messages.Format(
             MessageIds.EquipmentWornRow,
             new MessageArgument("item", worn.Item.Name),
@@ -129,7 +125,7 @@ internal sealed class EquipmentChoiceView
         var item = choice.Items[index - 1];
         batch.Draw(_ui.Icon(textures, item.IconFile, IconSize), new Vector2(row.X + RowInset, iconTop), Color.White);
         batch.DrawString(_bodyFont, item.Name, new Vector2(nameLeft, textTop), UiTheme.TextPrimary);
-        var (quantity, quantityWidth) = _quantities[index - 1];
-        batch.DrawString(_bodyFont, quantity, new Vector2(row.Right - QuantityInset - quantityWidth, textTop), UiTheme.TextPrimary);
+        var quantity = _quantities[index - 1];
+        batch.DrawString(_bodyFont, quantity.Text, new Vector2(row.Right - QuantityInset - quantity.Width, textTop), UiTheme.TextPrimary);
     }
 }

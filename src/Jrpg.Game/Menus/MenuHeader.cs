@@ -26,10 +26,8 @@ internal sealed class MenuHeader
     private readonly SpriteFontBase _titleFont;
     private readonly SpriteFontBase _infoFont;
     private readonly PlayTimeText _playTime = new();
-    private string _measuredPlayTime = string.Empty;
-    private float _playTimeWidth;
-    private string _measuredLocation = string.Empty;
-    private float _locationWidth;
+    private MeasuredText _shownPlayTime = new(string.Empty, 0);
+    private MeasuredText _shownLocation = new(string.Empty, 0);
 
     /// <param name="text">Fonts for the header.</param>
     /// <param name="session">Where the play time and the current map come from.</param>
@@ -45,17 +43,15 @@ internal sealed class MenuHeader
     public void Update()
     {
         _playTime.Update(_session.PlayTime);
-        if (!ReferenceEquals(_playTime.Text, _measuredPlayTime))
+        if (!ReferenceEquals(_playTime.Text, _shownPlayTime.Text))
         {
-            _measuredPlayTime = _playTime.Text;
-            _playTimeWidth = _infoFont.MeasureString(_measuredPlayTime).X;
+            _shownPlayTime = MeasuredText.Of(_infoFont, _playTime.Text);
         }
 
         var location = _session.Exploration.CurrentMap.Settings.DisplayName;
-        if (!ReferenceEquals(location, _measuredLocation))
+        if (!ReferenceEquals(location, _shownLocation.Text))
         {
-            _measuredLocation = location;
-            _locationWidth = _infoFont.MeasureString(location).X;
+            _shownLocation = MeasuredText.Of(_infoFont, location);
         }
     }
 
@@ -66,11 +62,11 @@ internal sealed class MenuHeader
     {
         batch.DrawString(_titleFont, title, new Vector2(SideMargin, CenteredTop(_titleFont)), UiTheme.TextPrimary * opacity);
 
-        var playTimeLeft = VirtualScreen.Width - SideMargin - _playTimeWidth;
+        var playTimeLeft = VirtualScreen.Width - SideMargin - _shownPlayTime.Width;
         var infoTop = CenteredTop(_infoFont);
-        batch.DrawString(_infoFont, _playTime.Text, new Vector2(playTimeLeft, infoTop), UiTheme.TextPrimary * opacity);
-        var locationLeft = playTimeLeft - LocationGap - _locationWidth;
-        batch.DrawString(_infoFont, _measuredLocation, new Vector2(locationLeft, infoTop), UiTheme.TextSecondary * opacity);
+        batch.DrawString(_infoFont, _shownPlayTime.Text, new Vector2(playTimeLeft, infoTop), UiTheme.TextPrimary * opacity);
+        var locationLeft = playTimeLeft - LocationGap - _shownLocation.Width;
+        batch.DrawString(_infoFont, _shownLocation.Text, new Vector2(locationLeft, infoTop), UiTheme.TextSecondary * opacity);
     }
 
     private static float CenteredTop(SpriteFontBase font) => (Height - font.LineHeight) / 2f;

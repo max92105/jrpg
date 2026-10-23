@@ -30,7 +30,7 @@ internal sealed class SavePage : ISaveFilesPage
     private readonly SpriteFontBase _noticeFont;
     private ConfirmPrompt? _asking;
     private int _askingFor;
-    private float _noticeWidth;
+    private MeasuredText? _notice;
 
     /// <param name="slots">The files.</param>
     /// <param name="session">What a save writes.</param>
@@ -54,7 +54,7 @@ internal sealed class SavePage : ISaveFilesPage
     public bool IsAsking => _asking is not null;
 
     /// <summary>Why the last save didn't happen, or null.</summary>
-    public string? Notice { get; private set; }
+    public string? Notice => _notice?.Text;
 
     public string Hint { get; }
 
@@ -64,7 +64,7 @@ internal sealed class SavePage : ISaveFilesPage
     public void Open()
     {
         _panel.Open();
-        Notice = null;
+        _notice = null;
         _asking = null;
     }
 
@@ -86,10 +86,10 @@ internal sealed class SavePage : ISaveFilesPage
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
         _panel.Draw(batch, textures, area, opacity);
-        if (Notice is not null)
+        if (_notice is { } notice)
         {
-            var position = new Vector2(area.Right - NoticeMargin - _noticeWidth, area.Y + NoticeTop);
-            batch.DrawString(_noticeFont, Notice, position, UiTheme.Danger * opacity);
+            var position = new Vector2(area.Right - NoticeMargin - notice.Width, area.Y + NoticeTop);
+            batch.DrawString(_noticeFont, notice.Text, position, UiTheme.Danger * opacity);
         }
 
         if (_asking is not null)
@@ -130,14 +130,13 @@ internal sealed class SavePage : ISaveFilesPage
         try
         {
             _slots.Write(number, _session);
-            Notice = null;
+            _notice = null;
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
             // The player is told the save didn't happen; the reason is for whoever debugs it.
             Debug.WriteLine($"Saving to {SaveSlots.NameOf(number)} failed: {exception.Message}");
-            Notice = _messages.Format(MessageIds.SaveFailed, FileNumber(number));
-            _noticeWidth = _noticeFont.MeasureString(Notice).X;
+            _notice = MeasuredText.Of(_noticeFont, _messages.Format(MessageIds.SaveFailed, FileNumber(number)));
         }
 
         _panel.Refresh();

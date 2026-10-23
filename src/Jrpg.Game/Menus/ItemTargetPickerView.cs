@@ -34,8 +34,7 @@ internal sealed class ItemTargetPickerView
     private readonly UiTextures _ui;
     private readonly MemberCardView _cardView;
     private readonly SpriteFontBase _headingFont;
-    private string _heading = string.Empty;
-    private float _headingWidth;
+    private MeasuredText _heading = new(string.Empty, 0);
     private string _iconFile = string.Empty;
     private MemberCardView.Card[] _cards = [];
 
@@ -67,8 +66,7 @@ internal sealed class ItemTargetPickerView
     /// <param name="leader">Who gets the cards' Leader badge.</param>
     public void Show(ItemTargetPicker picker, ItemDefinition item, PartyMember leader)
     {
-        _heading = _messages.Format(MessageIds.ItemUseTitle, new MessageArgument("item", item.Name));
-        _headingWidth = _headingFont.MeasureString(_heading).X;
+        _heading = MeasuredText.Of(_headingFont, _messages.Format(MessageIds.ItemUseTitle, new MessageArgument("item", item.Name)));
         _iconFile = item.IconFile;
         _cards = [.. picker.Members.Select(member => _cardView.CardOf(member, leader))];
     }
@@ -101,9 +99,9 @@ internal sealed class ItemTargetPickerView
     // The icon then the title, centered together.
     private void DrawHeading(SpriteBatch batch, TextureLibrary textures, int top, float opacity)
     {
-        var left = (VirtualScreen.Width - (IconSize + IconGap + _headingWidth)) / 2;
+        var left = (VirtualScreen.Width - (IconSize + IconGap + _heading.Width)) / 2;
         var iconTop = top + ((_headingFont.LineHeight - IconSize) / 2);
         batch.Draw(_ui.Icon(textures, _iconFile, IconSize), new Vector2(left, iconTop), Color.White * opacity);
-        batch.DrawString(_headingFont, _heading, new Vector2(left + IconSize + IconGap, top), UiTheme.TextPrimary * opacity);
+        batch.DrawString(_headingFont, _heading.Text, new Vector2(left + IconSize + IconGap, top), UiTheme.TextPrimary * opacity);
     }
 }

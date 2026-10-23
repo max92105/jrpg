@@ -110,7 +110,10 @@ internal sealed class GameFlow : IScene
             case null:
                 break;
             case NewGameRequested:
-                Session = _sessions.StartNewGame();
+                _sessions.ShowLeaderChoice();
+                break;
+            case LeaderChosen chosen:
+                Session = _sessions.StartNewGame(chosen.Choice);
                 break;
             case LoadRequested load:
                 Session = _sessions.Restore(load.Save);

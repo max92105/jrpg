@@ -30,6 +30,9 @@ internal static class MessageIds
     /// <summary>The title's entry that closes the game.</summary>
     public const string TitleQuit = "title_quit";
 
+    /// <summary>The heading of the screen where a new game's leader is chosen.</summary>
+    public const string LeaderChoiceTitle = "leader_choice_title";
+
     /// <summary>The menu header's title while no page is open.</summary>
     public const string MenuTitle = "menu_title";
 

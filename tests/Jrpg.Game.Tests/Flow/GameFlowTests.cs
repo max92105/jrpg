@@ -61,9 +61,52 @@ public sealed class GameFlowTests : IDisposable
     }
 
     [Fact]
-    public void Update_NewGameConfirmedFadeNotYetBlack_HasNoSession()
+    public void Update_NewGameConfirmedWholeFade_HasNoSession()
     {
-        var flow = FlowWithNewGameConfirmed();
+        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create(), new PlayerSettings());
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+
+        flow.Update(_wholeFade, default);
+
+        Assert.Null(flow.Session);
+    }
+
+    [Fact]
+    public void Update_CancelOnChoice_ReturnsToTitleWithoutSession()
+    {
+        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create(), new PlayerSettings());
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(_wholeFade, default);
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Cancel));
+        flow.Update(_wholeFade, default);
+
+        // With no save the title lists New Game and Quit: Down then Confirm quits only if the title is back.
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
+        var request = flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+
+        Assert.IsType<QuitRequested>(request);
+        Assert.Null(flow.Session);
+    }
+
+    [Fact]
+    public void Update_LeaderConfirmedFadeReachesBlack_StartsLedByThem()
+    {
+        var catalog = _catalog with { NewGame = _catalog.NewGame with { LeaderChoices = [Choice("sarxian"), Choice("zanyr")] } };
+        var flow = new GameFlow(catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create(), new PlayerSettings());
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(_wholeFade, default);
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+
+        flow.Update(_fadeOut, default);
+
+        Assert.Equal("zanyr", SessionOf(flow).Party.Leader.Id);
+    }
+
+    [Fact]
+    public void Update_LeaderConfirmedFadeNotYetBlack_HasNoSession()
+    {
+        var flow = FlowWithLeaderConfirmed();
 
         flow.Update(_fadeOut - TimeSpan.FromSeconds(0.1), default);
 
@@ -71,9 +114,9 @@ public sealed class GameFlowTests : IDisposable
     }
 
     [Fact]
-    public void Update_NewGameConfirmedFadeReachesBlack_StartsOnTheStartMap()
+    public void Update_LeaderConfirmedFadeReachesBlack_StartsOnTheStartMap()
     {
-        var flow = FlowWithNewGameConfirmed();
+        var flow = FlowWithLeaderConfirmed();
 
         flow.Update(_fadeOut, default);
 
@@ -81,9 +124,9 @@ public sealed class GameFlowTests : IDisposable
     }
 
     [Fact]
-    public void Update_NewGameConfirmedThenOneUpdateLongerThanTheFade_StillStartsNewGame()
+    public void Update_LeaderConfirmedThenOneUpdateLongerThanTheFade_StillStartsNewGame()
     {
-        var flow = FlowWithNewGameConfirmed();
+        var flow = FlowWithLeaderConfirmed();
 
         flow.Update(_wholeFade + TimeSpan.FromSeconds(1), default);
 
@@ -105,7 +148,7 @@ public sealed class GameFlowTests : IDisposable
     [Fact]
     public void Update_DuringFade_IgnoresInput()
     {
-        var flow = FlowWithNewGameConfirmed();
+        var flow = FlowWithLeaderConfirmed();
         flow.Update(_fadeOut, default);
         var start = SessionOf(flow).Exploration.PlayerPosition;
 
@@ -163,7 +206,7 @@ public sealed class GameFlowTests : IDisposable
         flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(_wholeFade, default);
 
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        ConfirmNewGameAndLeader(flow);
         flow.Update(_fadeOut, default);
 
         Assert.NotSame(first, SessionOf(flow));
@@ -251,18 +294,32 @@ public sealed class GameFlowTests : IDisposable
         Assert.Null(flow.Session);
     }
 
-    // New game is the title's first entry, so Confirm alone picks it; the fade starts on that update.
-    private static GameFlow FlowWithNewGameConfirmed(SaveSlots? slots = null, ContentCatalog? catalog = null)
+    // Sarxian is the only leader offered, so the forest tests fight with the party they count on, whatever order the
+    // content lists the choices in. The fade to the map starts on the update that confirms him.
+    private static GameFlow FlowWithLeaderConfirmed(SaveSlots? slots = null, ContentCatalog? catalog = null)
     {
-        var flow = new GameFlow(catalog ?? _catalog, RepositoryScreenText.Text, slots ?? UnwrittenSaveSlots.Create(), new PlayerSettings());
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        var content = catalog ?? _catalog;
+        var ledBySarxian = content with { NewGame = content.NewGame with { LeaderChoices = [Choice("sarxian")] } };
+        var flow = new GameFlow(ledBySarxian, RepositoryScreenText.Text, slots ?? UnwrittenSaveSlots.Create(), new PlayerSettings());
+        ConfirmNewGameAndLeader(flow);
         return flow;
     }
+
+    // New Game is the title's first entry with no save, so Confirm alone picks it; the choice takes input once the fade
+    // is over, and Confirm takes the leader the cursor starts on.
+    private static void ConfirmNewGameAndLeader(GameFlow flow)
+    {
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(_wholeFade, default);
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+    }
+
+    private static LeaderChoice Choice(string memberId) => new() { MemberId = memberId };
 
     // A new game whose fade is over, so the map gets input.
     private static GameFlow StartedFlow(SaveSlots? slots = null, ContentCatalog? catalog = null)
     {
-        var flow = FlowWithNewGameConfirmed(slots, catalog);
+        var flow = FlowWithLeaderConfirmed(slots, catalog);
         flow.Update(_fadeOut, default);
         flow.Update(_wholeFade - _fadeOut, default);
         return flow;

@@ -5,6 +5,7 @@ using Jrpg.Game.Battle;
 using Jrpg.Game.Exploration;
 using Jrpg.Game.Hosting;
 using Jrpg.Game.Menus;
+using Jrpg.Game.NewGame;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Saving;
 using Jrpg.Game.Title;
@@ -39,6 +40,8 @@ internal sealed class SceneFactory
     }
 
     public TitleScene CreateTitle() => new(_text, _saveSlots, _ui);
+
+    public LeaderChoiceScene CreateLeaderChoice() => new(_text, _catalog);
 
     /// <param name="session">The playthrough the header reports on.</param>
     public GameMenuScene CreateGameMenu(GameSession session) =>

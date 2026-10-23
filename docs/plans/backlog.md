@@ -48,7 +48,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - **"Load the latest save" and the save-list overlay are written twice** (`TitleScene`, `DefeatScreen`/`DefeatScreenView`). Share them in the **autosave plan**, which is likely to add the third copy.
 - **The banner band is drawn twice** (`BattleBannerView`, `BattleScene.DrawEscaped`). Share it in the **map name banner plan**, the third copy.
 - `ContentWriter.WriteAll`: the final moves aren't atomic across files, and the cleanup's `File.Delete` can hide the first error when a folder is missing (review of E3c). (plan 2026-10-23, F5a comments the moves; the hidden error was dropped because no valid content reaches it)
-- Editor: Space + drag pans only if the map had focus when Space was pressed (`HandleViewportKey` checks focus before setting `_isSpaceHeld`); with the Tiles panel focused, the drag paints instead (review of E2). (plan 2026-10-23, F2)
 - `MainViewModel` (596 lines after N3; 367 after E4a): move the unsaved-change questions (`ConfirmClose`, `ConfirmLeaveCurrentMap`, which repeat their wording) into one method. (plan 2026-10-23, E3)
 - `MainViewModel` (596 lines after N3; 467 after E4b2): move the undo routing (journal, `Undo`/`Redo` commands, which mirror each other, and the step event wiring) into its own type. (plan 2026-10-23, E2)
 - Tests: the header-only PNG writer is copied in `ArtReferenceCheckTests` and `ContentWriterTests` (Data); the Editor tests share `PngHeaderFile` (E7b). Share the Data copies on the next change there. (plan 2026-10-23, F5a)
@@ -63,3 +62,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 - `ExplorationStateTests` is 398 lines: move the interaction-target tests (G1a: `InteractionInFront_*`) into their own class. (plan 2026-10-23, X1)
 - Equipment page: opening a slot's choice hides the party sidebar (484 px) but the choice panel is 560 px, so the sheet narrows by 76 px while it is open (P1/Q2). Waits for question 153, the sidebar's placement.
+- Editor: with a button focused (Fit, Add layer), Space + drag pans, but releasing Space still clicks the button (WPF clicks a focused button on Space up; Space is swallowed only while the map has focus). Older than F2, easier to meet since F2 (review of F2).

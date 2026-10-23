@@ -78,6 +78,10 @@ internal sealed partial class MainWindow : Window
     protected override void OnPreviewKeyDown(KeyEventArgs e)
     {
         base.OnPreviewKeyDown(e);
+
+        // Space arms the pan whichever panel has focus, so Space + drag pans after a click in the Tiles or Objects panel;
+        // in a text box it's only a typed space.
+        _isSpaceHeld |= e.Key == Key.Space && Keyboard.FocusedElement is not TextBox;
         e.Handled = Keyboard.Modifiers == ModifierKeys.Control ? HandleZoomKey(e.Key) : HandleToolKey(e.Key) || HandleObjectKey(e.Key) || HandleViewportKey(e.Key);
     }
 
@@ -213,7 +217,6 @@ internal sealed partial class MainWindow : Window
             return true;
         }
 
-        _isSpaceHeld |= key == Key.Space;
         return key == Key.Space;
     }
 

@@ -4,7 +4,7 @@ using Microsoft.Xna.Framework.Input;
 namespace Jrpg.Game.Input;
 
 /// <summary>
-/// Which keys and controller buttons press which game button: arrows, E/Space/Enter, Esc, F1, WASD and Backspace
+/// Which keys and controller buttons press which game button: arrows, E/Space/Enter, Esc, WASD and Backspace
 /// (decision 50), and a standard controller layout. The tab buttons have no key yet (question 92).
 /// </summary>
 internal static class InputBindings
@@ -27,7 +27,6 @@ internal static class InputBindings
         (Keys.Escape, GameButton.Cancel),
         (Keys.Escape, GameButton.Menu),
         (Keys.Back, GameButton.Cancel),
-        (Keys.F1, GameButton.DebugCutscene),
     ];
 
     public static ImmutableArray<(Buttons PadButton, GameButton Button)> PadBindings { get; } =

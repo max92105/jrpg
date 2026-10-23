@@ -31,6 +31,5 @@ dotnet format Jrpg.slnx --verify-no-changes
 | `content/` | Game data (JSON) and art (`content/art/`); the only source of content. |
 | `docs/decisions/` | Architecture decision records. |
 | `docs/plans/` | Feature plans, built slice by slice. |
-| `legacy/` | The first WPF demo, kept as read-only reference; it no longer builds or runs. |
 
 `CLAUDE.md` holds the architecture rules and coding standard; `AI-SETUP.md` explains the Claude Code setup used to build it.

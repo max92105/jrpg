@@ -5,6 +5,8 @@ A 2D JRPG written from scratch in C#. Personal project, single developer.
 
 ## Architecture (non-negotiable)
 
+New code goes in `src/` and `tests/`, built by `Jrpg.slnx`.
+
 - `src/Jrpg.Core` — all game logic: stats, battle, inventory, maps, events, dialogue, save/load.
   **Must not reference MonoGame, WPF, or any UI/rendering library.** Pure .NET only.
 - `src/Jrpg.Data` — content loaders and schemas (JSON). Depends on Core only.
@@ -15,20 +17,13 @@ A 2D JRPG written from scratch in C#. Personal project, single developer.
 - `tests/Jrpg.Game.Tests` — xUnit tests for the Game's pure parts (screen fitting, scene stack, flow, presenters); nothing that needs a window.
 - `tests/Jrpg.Editor.Tests` — xUnit tests for the editor's view models and headless editing logic; nothing that needs a window.
 - `tests/Jrpg.Simulations` — headless battle/balance simulations.
-- `content/` — JSON game data (items, monsters, skills, maps, dialogue) and art (`content/art/<kind>/`, ADR 0009). The only source of truth for content (ADR 0011).
+- `content/` — JSON game data (items, monsters, skills, maps, dialogue) and art (`content/art/<kind>/`, ADR 0009). The only source of truth for content (ADR 0011). Battle effects are PNG strips of square frames in `content/art/effects/` (decision 57).
 - `docs/map.md` — the codebase map: one line per feature folder with its key types, and the patterns the code follows. Read it before exploring the code.
 - `docs/decisions/` — architecture decision records (ADRs), indexed one line each in `docs/decisions/README.md`. Read the relevant ADR before changing a design area.
 - `docs/plans/` — feature plans produced by `/plan-feature`, indexed in `docs/plans/README.md`; each plan is a folder with a slice index, a design file and one file per slice.
 - `docs/ui_ux_exemples/` — screenshots of the developer's favorite UI/UX (Octopath Traveler II), the target style for every screen. Look at them before planning or drawing UI; take inspiration, don't copy 1:1 (see `.claude/rules/game.md`, "UI look"). Reference only: never shipped.
 
 Dependency direction: Game → Data → Core; Editor → Data → Core. Never the reverse.
-
-## Current state (migration in progress)
-
-- `legacy/` holds the **legacy WPF demo** (`JRPG/`, `MapEditor/`, `JRPG.Core/`, `JRPG.sln`; decision 73). It is reference material only: read it, port behavior out of it, don't extend it. It no longer runs, since its `Assets/` folder was removed; git history has both.
-- Legacy `JRPG.Core` references WPF (`UseWPF`) for `Rect`/`ImageSource` in map types. The new `src/Jrpg.Core` must not.
-- `content/` is the only content and art (ADR 0011). Battle effects are PNG strips of square frames in `content/art/effects/` (decision 57); the legacy GIFs they came from are only in git history.
-- New code goes only in `src/` and `tests/`, built by `Jrpg.slnx`.
 
 ## Commands
 

@@ -12,5 +12,4 @@ internal enum GameButton
     Right,
     PreviousTab,
     NextTab,
-    DebugCutscene,
 }

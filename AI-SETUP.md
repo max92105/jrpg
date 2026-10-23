@@ -21,9 +21,9 @@
 
 1. Copy everything in this kit into your repository root (merge with what's there).
    - Append `.gitignore.additions` to your `.gitignore`, then delete the `.additions` file.
-   - The build props live in `src/` and `tests/` on purpose: at the repo root they would also apply to the legacy demo, whose code doesn't meet them (nullable, warnings as errors), and break its build.
+   - `src/` and `tests/` each have their own `Directory.Build.props`.
    - Delete `.github/copilot-instructions.md` (it only contains Azure rules unrelated to this project).
-   - The legacy demo (`JRPG/`, `MapEditor/`, `JRPG.Core/`, `JRPG.sln`) now sits in `legacy/` as reference only and isn't built. The Stop hook and the quality commands build `Jrpg.slnx`.
+   - The Stop hook and the quality commands build `Jrpg.slnx`.
 2. Commit: `git add -A && git commit -m "Add Claude Code setup"`.
 3. Open the repo folder in VS Code (`C:\Git\jrpg` itself, not a parent folder) and start a new Claude Code conversation. Accept the **trust this folder** prompt if asked (hooks don't run until you do).
 4. Check it loaded:
@@ -54,18 +54,6 @@ Other commands when you need them:
 - `/review-slice` — review your own hand-written code the same way.
 - `/lesson <what went wrong>` — when Claude repeats a mistake, turn it into a permanent rule.
 - "Use the balance-analyst to check if the forest boss is too hard at level 5" — data instead of gut feeling.
-
-## Suggested first session: migrating the demo
-
-```
-/plan-feature Migrate the WPF demo into the new structure: create Jrpg.slnx with
-src/Jrpg.Core, src/Jrpg.Data, src/Jrpg.Game (MonoGame), src/Jrpg.Editor (WPF) and the two test projects;
-port the demo's game logic from JRPG.Core into src/Jrpg.Core with tests, redesigned to the
-code-quality standard (no static GameSystems, no *Manager classes, feature folders);
-leave rendering for later slices.
-```
-
-The architect will read your demo code and propose the slices, including a mapping from each old class to its new type(s). Answer its design questions, then run `/slice` repeatedly. Delete a legacy file only once its behavior is ported and tested.
 
 ## Habits that matter more than the tooling
 

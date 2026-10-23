@@ -1,5 +1,5 @@
 <Project>
-  <!-- Quality gates for every project under src/ and tests/. Legacy projects at the repo root are not affected. -->
+  <!-- Quality gates for every project under src/ and tests/. -->
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
@@ -17,7 +17,7 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <NoWarn>$(NoWarn);CS1591</NoWarn>
 
-    <!-- Versions live in the root Directory.Packages.props. Enabled here rather than there so the legacy projects are unaffected. -->
+    <!-- Versions live in the root Directory.Packages.props. -->
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 

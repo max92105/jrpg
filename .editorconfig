@@ -72,7 +72,7 @@ dotnet_naming_rule.locals_and_parameters_camel.severity = warning
 dotnet_naming_symbols.locals_and_parameters.applicable_kinds = parameter, local
 dotnet_naming_style.camel.capitalization = camel_case
 
-# New code only (the legacy demo builds without these): sealed by default,
+# Code style for every project: sealed by default,
 # methods stay simple (threshold in CodeMetricsConfig.txt)
 [{src,tests}/**.cs]
 dotnet_diagnostic.CA1852.severity = warning

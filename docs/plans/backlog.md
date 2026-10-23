@@ -38,3 +38,7 @@ Code-health work waiting for the next cleanup plan; `/retro` appends to it. One 
 - `MainViewModelTests` is 770 lines: split it by area (saving, undo journal, new map/object/NPC, layer list) like the view model it tests.
 - `ObjectShapesViewModelTests` is 347 lines: move the zone tests (E10) and the point-handle tests (E11a) into their own classes.
 - `MainViewModel.CreateNpc` and `CreateObject` end with the same three lines (`SetObject`, choose it in the Objects panel, Objects mode): one private method when `MainViewModel` is split (N3 review).
+
+## From the demo retirement plan (2026-10-23)
+
+- Merge `src/` and `tests/` `Directory.Build.props` at the root, now that nothing at the root escapes them (decision 144).

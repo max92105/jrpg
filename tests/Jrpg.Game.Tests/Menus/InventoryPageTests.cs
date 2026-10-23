@@ -179,6 +179,135 @@ public sealed class InventoryPageTests
         Assert.Equal($"{StartMapScenarios.BelowClosedDoor.Items["revive_feather"].Name} was used.", page.Notice);
     }
 
+    [Fact]
+    public void Update_LeftThenDown_ShowsConsumables()
+    {
+        var page = NewPage();
+
+        page.Update(Pressing(GameButton.Left));
+        page.Update(Pressing(GameButton.Down));
+
+        Assert.Equal(InventoryCategory.Consumables, page.Category);
+    }
+
+    [Fact]
+    public void Update_LeftFromList_PutsTheCursorOnTheRail()
+    {
+        var page = NewPage();
+
+        page.Update(Pressing(GameButton.Left));
+
+        Assert.True(page.IsChoosingCategory);
+    }
+
+    [Fact]
+    public void Update_RightOnRail_ReturnsToTheListOnItsFirstRow()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Down));
+        page.Update(Pressing(GameButton.Down));
+        page.Update(Pressing(GameButton.Left));
+
+        page.Update(Pressing(GameButton.Right));
+
+        Assert.False(page.IsChoosingCategory);
+        Assert.Equal(0, page.SelectedRow);
+    }
+
+    // The list starts on the potion, which Confirm on the list would use.
+    [Fact]
+    public void Update_ConfirmOnRail_ReturnsToTheListAndUsesNothing()
+    {
+        var session = NewSession();
+        var page = NewPage(session);
+        page.Update(Pressing(GameButton.Left));
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.False(page.IsChoosingCategory);
+        Assert.False(page.IsChoosingTarget);
+        Assert.Equal(5, session.Inventory.QuantityOf("potion"));
+    }
+
+    [Fact]
+    public void Update_UpOnRailFromAll_WrapsToArmor()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Left));
+
+        page.Update(Pressing(GameButton.Up));
+
+        Assert.Equal(InventoryCategory.Armor, page.Category);
+    }
+
+    [Fact]
+    public void Update_NextTabOnRail_ChangesCategoryAndStaysOnRail()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Left));
+
+        page.Update(Pressing(GameButton.NextTab));
+
+        Assert.Equal(InventoryCategory.Consumables, page.Category);
+        Assert.True(page.IsChoosingCategory);
+    }
+
+    [Fact]
+    public void LeavesOnCancel_OnRail_IsTrue()
+    {
+        var page = NewPage();
+
+        page.Update(Pressing(GameButton.Left));
+
+        Assert.True(page.LeavesOnCancel);
+    }
+
+    [Fact]
+    public void Hint_AfterLeft_IsTheCategoryHint()
+    {
+        var page = NewPage();
+        Assert.Equal(Hint(MessageIds.MenuHintInventory), page.Hint);
+
+        page.Update(Pressing(GameButton.Left));
+
+        Assert.Equal(Hint(MessageIds.MenuHintInventoryCategories), page.Hint);
+    }
+
+    [Fact]
+    public void Hint_BackOnTheList_IsTheListHint()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Left));
+        Assert.Equal(Hint(MessageIds.MenuHintInventoryCategories), page.Hint);
+
+        page.Update(Pressing(GameButton.Right));
+
+        Assert.Equal(Hint(MessageIds.MenuHintInventory), page.Hint);
+    }
+
+    [Fact]
+    public void Open_AfterLeavingFromTheRail_StartsOnTheList()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Left));
+
+        page.Open();
+
+        Assert.False(page.IsChoosingCategory);
+    }
+
+    [Fact]
+    public void Update_LeftWhileChoosingTarget_LeavesTheRailAlone()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Confirm));
+        Assert.True(page.IsChoosingTarget);
+
+        page.Update(Pressing(GameButton.Left));
+
+        Assert.False(page.IsChoosingCategory);
+    }
+
     // The third starting item is the elixir; the target picker starts on the leader.
     private static void UseThirdItemOnLeader(InventoryPage page)
     {
@@ -187,6 +316,8 @@ public sealed class InventoryPageTests
         page.Update(Pressing(GameButton.Confirm));
         page.Update(Pressing(GameButton.Confirm));
     }
+
+    private static string Hint(string messageId) => RepositoryScreenText.Text.Messages.Text(messageId);
 
     private static GameSession NewSession() => GameSession.StartNew(StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
 

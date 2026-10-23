@@ -14,11 +14,11 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   - no path condition.
 
   The file is protected, so ask the developer first.
-- **`InventoryPage` split, the part left after A1/A2:**
+- **`InventoryPage` split (363 lines after A1), the part left after A1/A2:** A1 moved the rail's state into `CategoryRail`; A2 moves its drawing.
   - rows (`InventoryRow`) and a list view, like `EquipmentPage`;
   - its `ItemRow.Quantity`/`InventoryLabels.Empty` widths move to `Ui/MeasuredText` with it.
 
-  It can wait because it works, and A1/A2 already take the rail out.
+  It can wait because it works.
 - **`StatusPage` split** (294 lines): a pure `StatusSheet`, a `StatusSheetView` and the page keeping its input. Its slot labels then come from `EquipmentSheet.Slots` and `EquipmentSheet.LabelIdOf`. It can wait because nothing planned changes the Status page's content.
 - **Why Core refused an equipment change:** `EquipmentPage.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. `PartyEquipment.ItemWithoutRoom` and `UnequipAll` would own both. It can wait because it is correct today, and nothing planned changes equipment.
 - **Easing copies:** the clamped time share `Math.Clamp((float)(elapsed / length), 0, 1)` is copied 6 times (`ActionPlayback`, `FloatingNumber` twice, `LevelUpPop`, `VictoryEntrance`, `DefeatEntrance`), and the cubic ease-out twice (`LevelUpPop`, `VictoryEntrance`). They should use `Ui/Easing`. It can wait because each copy is one line.

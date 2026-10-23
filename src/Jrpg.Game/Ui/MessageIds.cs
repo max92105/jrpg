@@ -306,8 +306,11 @@ internal static class MessageIds
     /// <summary>The menu footer's line while the player picks a tab.</summary>
     public const string MenuHintMain = "menu_hint_main";
 
-    /// <summary>The menu footer's line on the Inventory page.</summary>
+    /// <summary>The menu footer's line on the Inventory page, while the cursor is on the list.</summary>
     public const string MenuHintInventory = "menu_hint_inventory";
+
+    /// <summary>The menu footer's line on the Inventory page, while the cursor is on the category rail.</summary>
+    public const string MenuHintInventoryCategories = "menu_hint_inventory_categories";
 
     /// <summary>The menu footer's line on the Party page.</summary>
     public const string MenuHintParty = "menu_hint_party";

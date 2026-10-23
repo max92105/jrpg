@@ -5,7 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-code-health/slices/F5a.md, slice F5a (field sprites must hold the walk frames; shared Data PngHeaderFile)
+Slice: docs/plans/2026-10-23-code-health/slices/A1.md, slice A1 (inventory category rail takes the cursor; CategoryRail/CategoryTab)
 Round: 1 (verdict: Ready to commit)
 
-- Suggestion, open: FieldSpriteLayout.cs `WalkFrames` is the only constant without a one-line summary ("A column per walk frame; the walk animation cycles through them").
+- Suggestion, open: InventoryPage.ChangeCategory returns bool "did it change" -> rename TryChangeCategory (project Try convention).
+- Suggestion, open: InventoryPage.MovesThroughList now also covers rail moves; name it for its one use (e.g. ClearsNotice / MovesACursor).
+- Suggestion, open: no test for a shoulder button while the cursor is on the rail (stays on rail, category changes).

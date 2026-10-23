@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using System.Globalization;
 using FontStashSharp;
 using Jrpg.Core.Content;
@@ -15,8 +14,8 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// The menu's Inventory page: what the party owns, one category at a time, in pickup order, with the selected item's
-/// description under the list. The tab buttons change the category (question 92).
-/// Read-only until items can be used (P2b).
+/// description under the list. Left puts the cursor on the category rail, where Up and Down choose the category
+/// (question 152); the tab buttons change it from either side (question 92). Confirm on a usable item uses it.
 /// </summary>
 internal sealed class InventoryPage : IMenuPage
 {
@@ -51,24 +50,17 @@ internal sealed class InventoryPage : IMenuPage
     private const int RailGlowInsetY = 4;
     private const float UnselectedIconOpacity = 0.5f;
 
-    // The rail, top to bottom: each category with its heading and its icon, in one place so their order can't drift.
-    private static readonly ImmutableArray<CategoryTab> _tabs =
-    [
-        new(InventoryCategory.All, MessageIds.InventoryAll, UiArtFiles.Icons.AllItems),
-        new(InventoryCategory.Consumables, MessageIds.InventoryConsumables, UiArtFiles.Icons.Consumables),
-        new(InventoryCategory.Weapons, MessageIds.InventoryWeapons, UiArtFiles.Icons.Weapons),
-        new(InventoryCategory.Armor, MessageIds.InventoryArmor, UiArtFiles.Icons.Armor),
-    ];
-
     private readonly GameSession _session;
     private readonly ContentCatalog _catalog;
     private readonly UiTextures _ui;
-    private readonly ListCursor _categoryCursor = new(_tabs.Length, _ => true);
+    private readonly CategoryRail _rail = new();
     private readonly SpriteFontBase _headingFont;
     private readonly SpriteFontBase _bodyFont;
     private readonly SpriteFontBase _labelFont;
     private readonly InventoryLabels _labels;
     private readonly string[] _categoryNames;
+    private readonly string _listHint;
+    private readonly string _railHint;
     private readonly ItemUseDialog _itemUse;
     private ListCursor? _rowCursor;
     private ItemRow[] _rows = [];
@@ -82,7 +74,8 @@ internal sealed class InventoryPage : IMenuPage
     /// <param name="catalog">Item names and descriptions.</param>
     public InventoryPage(ScreenText text, UiTextures ui, GameSession session, ContentCatalog catalog)
     {
-        Hint = text.Messages.Text(MessageIds.MenuHintInventory);
+        _listHint = text.Messages.Text(MessageIds.MenuHintInventory);
+        _railHint = text.Messages.Text(MessageIds.MenuHintInventoryCategories);
         _session = session;
         _catalog = catalog;
         _ui = ui;
@@ -90,21 +83,24 @@ internal sealed class InventoryPage : IMenuPage
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _labelFont = text.Fonts.FontAt(LabelPixels);
         _labels = InventoryLabels.From(text.Messages, _labelFont, _bodyFont);
-        _categoryNames = [.. _tabs.Select(tab => text.Messages.Text(tab.LabelId))];
+        _categoryNames = [.. _rail.Tabs.Select(tab => text.Messages.Text(tab.LabelId))];
         _itemUse = new ItemUseDialog(session, text, ui, catalog);
         ShowRowsFrom(0);
     }
 
     public string TitleMessageId => MessageIds.MenuInventory;
 
-    public string Hint { get; }
+    public string Hint => _rail.HasCursor ? _railHint : _listHint;
 
     public bool ShowsPartySidebar => true;
 
     /// <summary>False while choosing who to use an item on: Cancel closes that instead.</summary>
     public bool LeavesOnCancel => !_itemUse.IsOpen;
 
-    public InventoryCategory Category => _tabs[_categoryCursor.Selected].Category;
+    public InventoryCategory Category => _rail.Category;
+
+    /// <summary>Whether the cursor is on the category rail rather than on the list.</summary>
+    public bool IsChoosingCategory => _rail.HasCursor;
 
     /// <summary>The items on show, in order.</summary>
     public IReadOnlyList<string> ShownItemIds => [.. _rows.Select(row => row.ItemId)];
@@ -121,7 +117,7 @@ internal sealed class InventoryPage : IMenuPage
     public void Open()
     {
         _notice = null;
-        _categoryCursor.Select(0);
+        _rail.Reset();
         ShowRowsFrom(0);
     }
 
@@ -135,6 +131,18 @@ internal sealed class InventoryPage : IMenuPage
                 ShowRowsFrom(_rowCursor?.Selected ?? 0);
             }
 
+            return null;
+        }
+
+        if (MovesACursor(input))
+        {
+            _notice = null;
+        }
+
+        // The rail answers first, so Confirm there only goes back to the list and never uses an item.
+        if (_rail.HasCursor)
+        {
+            MoveOnRail(input);
             return null;
         }
 
@@ -162,27 +170,54 @@ internal sealed class InventoryPage : IMenuPage
         }
     }
 
-    private static bool MovesThroughList(InputFrame input) =>
-        input.IsPressed(GameButton.PreviousTab) || input.IsPressed(GameButton.NextTab) || input.IsPressed(GameButton.Up) || input.IsPressed(GameButton.Down);
-
-    private void MoveThroughList(InputFrame input)
+    // The tab buttons change the category from either side; on the rail, Up and Down do too.
+    private bool TryChangeCategory(InputFrame input)
     {
-        if (MovesThroughList(input))
+        if (input.IsPressed(GameButton.PreviousTab) || (_rail.HasCursor && input.IsPressed(GameButton.Up)))
         {
-            _notice = null;
+            _rail.MoveUp();
+        }
+        else if (input.IsPressed(GameButton.NextTab) || (_rail.HasCursor && input.IsPressed(GameButton.Down)))
+        {
+            _rail.MoveDown();
+        }
+        else
+        {
+            return false;
         }
 
-        if (input.IsPressed(GameButton.PreviousTab))
+        ShowRowsFrom(0);
+        return true;
+    }
+
+    private static bool MovesACursor(InputFrame input) =>
+        input.IsPressed(GameButton.PreviousTab) || input.IsPressed(GameButton.NextTab) || input.IsPressed(GameButton.Up) || input.IsPressed(GameButton.Down);
+
+    // Up and Down move the category on the rail; Right or Confirm go back to the list's first row.
+    private void MoveOnRail(InputFrame input)
+    {
+        if (TryChangeCategory(input))
         {
-            _categoryCursor.MoveUp();
-            ShowRowsFrom(0);
             return;
         }
 
-        if (input.IsPressed(GameButton.NextTab))
+        if (input.IsPressed(GameButton.Right) || input.IsPressed(GameButton.Confirm))
         {
-            _categoryCursor.MoveDown();
+            _rail.ReturnCursor();
             ShowRowsFrom(0);
+        }
+    }
+
+    private void MoveThroughList(InputFrame input)
+    {
+        if (TryChangeCategory(input))
+        {
+            return;
+        }
+
+        if (input.IsPressed(GameButton.Left))
+        {
+            _rail.TakeCursor();
             return;
         }
 
@@ -203,7 +238,7 @@ internal sealed class InventoryPage : IMenuPage
         var left = area.X + RailWidth + RailGap + Margin;
         var top = area.Y + TopMargin;
         var width = area.Right - Margin - left;
-        batch.DrawString(_headingFont, _categoryNames[_categoryCursor.Selected], new Vector2(left, top), UiTheme.TextPrimary * opacity);
+        batch.DrawString(_headingFont, _categoryNames[_rail.Selected], new Vector2(left, top), UiTheme.TextPrimary * opacity);
         DrawColumnTitles(batch, textures, new Rectangle(left, top + ColumnTitlesTop, width, 0), opacity);
 
         var rowsTop = top + RowsTop;
@@ -285,7 +320,7 @@ internal sealed class InventoryPage : IMenuPage
         batch.Draw(textures.Pixel, rail, UiTheme.CategoryRail * opacity);
         batch.Draw(textures.Pixel, new Rectangle(rail.X, rail.Y, 1, rail.Height), UiTheme.Stroke * opacity);
         batch.Draw(textures.Pixel, new Rectangle(rail.Right - 1, rail.Y, 1, rail.Height), UiTheme.Stroke * opacity);
-        for (var index = 0; index < _tabs.Length; index++)
+        for (var index = 0; index < _rail.Tabs.Count; index++)
         {
             var tab = new Rectangle(rail.X, rail.Y + RailPadding + (index * RailTabHeight), RailWidth, RailTabHeight);
             DrawRailTab(batch, textures, tab, index, opacity);
@@ -294,7 +329,7 @@ internal sealed class InventoryPage : IMenuPage
 
     private void DrawRailTab(SpriteBatch batch, TextureLibrary textures, Rectangle tab, int index, float opacity)
     {
-        var isSelected = index == _categoryCursor.Selected;
+        var isSelected = index == _rail.Selected;
         if (isSelected)
         {
             var glow = new Rectangle(tab.X + RailGlowInsetX, tab.Y + RailGlowInsetY, tab.Width - (2 * RailGlowInsetX), tab.Height - (2 * RailGlowInsetY));
@@ -302,13 +337,10 @@ internal sealed class InventoryPage : IMenuPage
             Outline.Draw(batch, textures.Pixel, glow, UiTheme.SelectionStroke * opacity);
         }
 
-        var icon = _ui.Icon(textures, _tabs[index].IconFile, RailIconSize);
+        var icon = _ui.Icon(textures, _rail.Tabs[index].IconFile, RailIconSize);
         var corner = new Vector2(tab.Center.X - (RailIconSize / 2), tab.Center.Y - (RailIconSize / 2));
         batch.Draw(icon, corner, Color.White * (isSelected ? opacity : opacity * UnselectedIconOpacity));
     }
-
-    // One category on the rail.
-    private sealed record CategoryTab(InventoryCategory Category, string LabelId, string IconFile);
 
     // One owned item's row text.
     private sealed record ItemRow(string ItemId, string Name, string IconFile, string Quantity, float QuantityWidth, string Description, bool IsUsable);

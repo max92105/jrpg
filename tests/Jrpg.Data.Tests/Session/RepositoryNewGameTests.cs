@@ -75,6 +75,17 @@ public sealed class RepositoryNewGameTests
     }
 
     [Fact]
+    public void StartNew_RepositoryContent_EveryIntroStartsWithTheVoice()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+        var arrivals = catalog.Maps["intro"].Layout.CellEvents.Select(cellEvent => cellEvent.Event).Where(mapEvent => mapEvent.Activation == EventActivation.Arrive);
+
+        var firstSteps = catalog.NewGame.LeaderChoices.Select(choice => arrivals.Single(mapEvent => mapEvent.OnlyWhenLeaderId == choice.MemberId).Steps[0]);
+
+        Assert.All(firstSteps, step => Assert.Equal(new VoiceStep("Placeholder.wav"), step));
+    }
+
+    [Fact]
     public void Restore_SaveLandingOnTheIntroMap_PlaysTheIntroAgain()
     {
         // Where a save whose map left the content is repaired to (decision 186): the intro plays again, then warps out.

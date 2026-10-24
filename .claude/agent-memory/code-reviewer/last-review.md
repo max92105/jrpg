@@ -5,10 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-new-game-flow/slices/A1a1.md, slice A1a1 (voice step, audio reference check, placeholder wav)
+Slice: docs/plans/2026-10-23-new-game-flow/slices/A1a2.md, slice A1a2 (editor voice step, intros start with the voice)
 Round: 1 (verdict: Ready to commit)
 
-- Suggestion: A1a1.md Done note path mangled ("contentudiooices", backslash escapes eaten) — open
-- Suggestion: MapEventValidatorTests blank line inside theory data, voice row splits the still rows — open
-- Suggestion: AudioReferenceCheck summary grammar "the sound content names exists" — open
-- Follow-up: ContentWriter (editor save) runs only the art check, not the audio check (developer already noted)
+- Suggestion: ToStep's trim of the voice file has no test (" Placeholder.wav " -> "Placeholder.wav") — open
+- Suggestion: RepositoryNewGameTests repeats the "arrivals" query in two tests; extract an IntroArrivals(catalog) helper if a third appears — open
+- Follow-up: editor save (ContentWriter.WriteMap) runs neither art nor audio reference check (already in backlog.md)

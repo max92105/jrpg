@@ -68,6 +68,10 @@
         <TextBox Width="300" Text="{Binding Caption, UpdateSourceTrigger=PropertyChanged}" />
       </StackPanel>
     </StackPanel>
+    <StackPanel Orientation="Horizontal" Visibility="{Binding IsVoice, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
+      <TextBlock Text="Voice file (voices folder)" Width="180" VerticalAlignment="Center" />
+      <TextBox Width="160" Text="{Binding VoiceFile, UpdateSourceTrigger=PropertyChanged}" />
+    </StackPanel>
     <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Text="{Binding Problem}" />
   </StackPanel>
 </UserControl>

@@ -36,6 +36,8 @@ internal sealed partial class EventStepViewModel : ObservableObject
 
     public bool IsRecruit => Kind == EventStepKind.Recruit;
 
+    public bool IsVoice => Kind == EventStepKind.Voice;
+
     /// <summary>One message box per line; blank lines are left out.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
@@ -90,6 +92,11 @@ internal sealed partial class EventStepViewModel : ObservableObject
     [ObservableProperty]
     public partial string Caption { get; set; } = "";
 
+    /// <summary>The voice-over's file in the voices audio folder.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
+    public partial string VoiceFile { get; set; } = "";
+
     /// <summary>The party member who joins.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
@@ -103,6 +110,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.Warp => $"Warp to: {MapId} ({CellXText}, {CellYText})",
         EventStepKind.Still => $"Still: {ImageFile}, {SecondsText} s",
         EventStepKind.Recruit => $"Recruit: {MemberId}",
+        EventStepKind.Voice => $"Voice: {VoiceFile}",
         _ => throw new UnreachableException(),
     };
 
@@ -117,6 +125,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.Still when string.IsNullOrWhiteSpace(ImageFile) => "Write the still's image file.",
         EventStepKind.Still when Seconds(SecondsText) is null => "The seconds must be a number above 0.",
         EventStepKind.Recruit when string.IsNullOrEmpty(MemberId) => "Choose the member who joins.",
+        EventStepKind.Voice when string.IsNullOrWhiteSpace(VoiceFile) => "Write the voice's file.",
         EventStepKind.GiveItem when WholeNumber(QuantityText, minimum: 1) is null => "The quantity must be a whole number of at least 1.",
         EventStepKind.Warp when WholeNumber(CellXText, minimum: 0) is null || WholeNumber(CellYText, minimum: 0) is null =>
             "The warp cell must be two whole numbers of at least 0.",
@@ -136,6 +145,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         WarpStep warp => new(EventStepKind.Warp) { MapId = warp.MapId, CellXText = Text(warp.Cell.X), CellYText = Text(warp.Cell.Y) },
         StillStep still => new(EventStepKind.Still) { ImageFile = still.ImageFile, SecondsText = Text(still.Seconds), Caption = still.Caption ?? "" },
         RecruitStep recruit => new(EventStepKind.Recruit) { MemberId = recruit.MemberId },
+        VoiceStep voice => new(EventStepKind.Voice) { VoiceFile = voice.File },
         _ => throw new ArgumentException($"Unknown step type {step.GetType().Name}.", nameof(step)),
     };
 
@@ -154,6 +164,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.Still => new StillStep(
             ImageFile.Trim(), Seconds(SecondsText) ?? throw InvalidFields(), string.IsNullOrWhiteSpace(Caption) ? null : Caption.Trim()),
         EventStepKind.Recruit => new RecruitStep(MemberId),
+        EventStepKind.Voice => new VoiceStep(VoiceFile.Trim()),
         _ => throw new UnreachableException(),
     };
 

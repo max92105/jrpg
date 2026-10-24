@@ -170,6 +170,32 @@ public sealed class EventStepViewModelTests
     }
 
     [Fact]
+    public void From_VoiceStep_KeepsTheFile()
+    {
+        var step = EventStepViewModel.From(new VoiceStep("Placeholder.wav"));
+
+        Assert.Equal("Placeholder.wav", step.VoiceFile);
+        Assert.Equal("Voice: Placeholder.wav", step.Label);
+    }
+
+    [Fact]
+    public void ToStep_VoiceFileWithSpaces_TrimsTheFile()
+    {
+        var step = EventStepViewModel.New(EventStepKind.Voice);
+        step.VoiceFile = " Placeholder.wav ";
+
+        Assert.Equal(new VoiceStep("Placeholder.wav"), step.ToStep());
+    }
+
+    [Fact]
+    public void Problem_VoiceWithoutFile_SaysSo()
+    {
+        var step = EventStepViewModel.New(EventStepKind.Voice);
+
+        Assert.Equal("Write the voice's file.", step.Problem);
+    }
+
+    [Fact]
     public void ToStep_RecruitWithMember_BuildsRecruitStep()
     {
         var step = EventStepViewModel.New(EventStepKind.Recruit);
@@ -195,5 +221,6 @@ public sealed class EventStepViewModelTests
         new StillStep("Placeholder1.png", 2.5, "Long ago."),
         new StillStep("Placeholder2.png", 4, Caption: null),
         new RecruitStep("omer"),
+        new VoiceStep("Placeholder.wav"),
     ];
 }

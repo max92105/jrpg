@@ -9,4 +9,5 @@ internal enum EventStepKind
     Warp,
     Still,
     Recruit,
+    Voice,
 }

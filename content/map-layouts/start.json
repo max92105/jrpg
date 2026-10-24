@@ -4875,6 +4875,312 @@
           ]
         }
       ]
+    },
+    {
+      "uid": "recruit_ragnir",
+      "objectId": "villager",
+      "position": {
+        "x": 12,
+        "y": 26
+      },
+      "z": 1,
+      "events": [
+        {
+          "id": "recruit_ragnir_0",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "A placeholder recruit point."
+                ],
+                "speaker": "Ragnir",
+                "portraitFile": null
+              }
+            },
+            {
+              "type": "recruit",
+              "memberId": "ragnir"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "uid": "recruit_omer",
+      "objectId": "villager",
+      "position": {
+        "x": 14,
+        "y": 26
+      },
+      "z": 1,
+      "events": [
+        {
+          "id": "recruit_omer_0",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "A placeholder recruit point."
+                ],
+                "speaker": "Omer",
+                "portraitFile": null
+              }
+            },
+            {
+              "type": "recruit",
+              "memberId": "omer"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "uid": "recruit_zanyr",
+      "objectId": "villager",
+      "position": {
+        "x": 16,
+        "y": 26
+      },
+      "z": 1,
+      "events": [
+        {
+          "id": "recruit_zanyr_0",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "A placeholder recruit point."
+                ],
+                "speaker": "Zanyr",
+                "portraitFile": null
+              }
+            },
+            {
+              "type": "recruit",
+              "memberId": "zanyr"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "uid": "recruit_lazarus",
+      "objectId": "villager",
+      "position": {
+        "x": 18,
+        "y": 26
+      },
+      "z": 1,
+      "events": [
+        {
+          "id": "recruit_lazarus_0",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "A placeholder recruit point."
+                ],
+                "speaker": "Lazarus",
+                "portraitFile": null
+              }
+            },
+            {
+              "type": "recruit",
+              "memberId": "lazarus"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "uid": "recruit_jazog",
+      "objectId": "villager",
+      "position": {
+        "x": 20,
+        "y": 26
+      },
+      "z": 1,
+      "events": [
+        {
+          "id": "recruit_jazog_0",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "A placeholder recruit point."
+                ],
+                "speaker": "Jazog",
+                "portraitFile": null
+              }
+            },
+            {
+              "type": "recruit",
+              "memberId": "jazog"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "uid": "recruit_teelle",
+      "objectId": "villager",
+      "position": {
+        "x": 22,
+        "y": 26
+      },
+      "z": 1,
+      "events": [
+        {
+          "id": "recruit_teelle_0",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "A placeholder recruit point."
+                ],
+                "speaker": "Teelle",
+                "portraitFile": null
+              }
+            },
+            {
+              "type": "recruit",
+              "memberId": "teelle"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "uid": "recruit_zaruk",
+      "objectId": "villager",
+      "position": {
+        "x": 24,
+        "y": 26
+      },
+      "z": 1,
+      "events": [
+        {
+          "id": "recruit_zaruk_0",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "A placeholder recruit point."
+                ],
+                "speaker": "Zaruk",
+                "portraitFile": null
+              }
+            },
+            {
+              "type": "recruit",
+              "memberId": "zaruk"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "uid": "recruit_sarxian",
+      "objectId": "villager",
+      "position": {
+        "x": 26,
+        "y": 26
+      },
+      "z": 1,
+      "events": [
+        {
+          "id": "recruit_sarxian_0",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "A placeholder recruit point."
+                ],
+                "speaker": "Sarxian",
+                "portraitFile": null
+              }
+            },
+            {
+              "type": "recruit",
+              "memberId": "sarxian"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "uid": "recruit_thaali",
+      "objectId": "villager",
+      "position": {
+        "x": 28,
+        "y": 26
+      },
+      "z": 1,
+      "events": [
+        {
+          "id": "recruit_thaali_0",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "A placeholder recruit point."
+                ],
+                "speaker": "Thaali",
+                "portraitFile": null
+              }
+            },
+            {
+              "type": "recruit",
+              "memberId": "thaali"
+            }
+          ]
+        }
+      ]
     }
   ],
   "cellEvents": [

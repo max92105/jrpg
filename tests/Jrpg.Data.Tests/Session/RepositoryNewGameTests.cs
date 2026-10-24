@@ -35,6 +35,22 @@ public sealed class RepositoryNewGameTests
             parties.Select(party => party.Members.Select(member => member.Id).ToArray()));
     }
 
+    // Placeholder recruit points, so any party can be put together for testing (decision 163).
+    [Fact]
+    public void StartMap_RepositoryContent_OffersEveryCharacterToRecruit()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+        var recruitSteps = catalog.Maps["start"].Layout.Objects
+            .SelectMany(placed => placed.Events)
+            .SelectMany(mapEvent => mapEvent.Steps)
+            .OfType<RecruitStep>()
+            .ToList();
+
+        var stepsPerCharacter = catalog.NewGame.LeaderChoices.Select(choice => recruitSteps.Count(step => step.MemberId == choice.MemberId));
+
+        Assert.All(stepsPerCharacter, count => Assert.Equal(1, count));
+    }
+
     [Fact]
     public void StartNew_RepositoryContent_StartsOnTheIntroWithTheLeadersIntroRunning()
     {

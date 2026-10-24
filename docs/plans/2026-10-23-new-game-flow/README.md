@@ -108,7 +108,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 4: recruiting
 - [x] **R1a. A map event can recruit a member** (Core + Data + Game + content, about 230 lines) → [slices/R1a.md](slices/R1a.md)
 - [x] **R1b. The editor authors the recruit step** (Editor, about 120 lines) → [slices/R1b.md](slices/R1b.md)
-- [ ] **R2. Placeholder recruit points on the start map** (content + tests, about 100 lines) → [slices/R2.md](slices/R2.md)
+- [x] **R2. Placeholder recruit points on the start map** (content + tests, about 100 lines) → [slices/R2.md](slices/R2.md)
 
 ### Phase 5: the voice
 - [ ] **ADR 0018: Audio files and playback** (before A1a) → [slices/ADR-0018.md](slices/ADR-0018.md)

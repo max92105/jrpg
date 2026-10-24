@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-new-game-flow/slices/R1b.md, slice R1b (the editor authors the recruit step)
+Slice: docs/plans/2026-10-23-new-game-flow/slices/R2.md, slice R2 (placeholder recruit points on the start map)
 Round: 1 (verdict: Ready to commit)
 
-- Suggestion: EventStepViewModel.Problem puts the Recruit empty-member check between the two Still checks; move it after the Still checks, before the numeric ones, or group by kind (open)
+- No findings. (start.json is LF in HEAD too, so LF is consistent; not a finding.)

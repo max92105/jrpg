@@ -1,6 +1,5 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
-using Jrpg.Core.Party;
 using Jrpg.Data.Content;
 using Jrpg.Game.Battle;
 
@@ -23,7 +22,7 @@ public sealed class BattlerArtTests
     [Fact]
     public void Of_PartyMember_UsesMemberSprite()
     {
-        var sarxian = PartyMember.Recruit(_catalog.PartyMembers["sarxian"], _catalog.Skills);
+        var sarxian = BattleScenarios.Recruit("sarxian");
 
         var art = BattlerArt.Of(Combatant.FromPartyMember(sarxian));
 

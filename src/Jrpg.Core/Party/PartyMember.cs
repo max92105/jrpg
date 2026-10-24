@@ -8,14 +8,16 @@ namespace Jrpg.Core.Party;
 /// <summary>A recruited party member's runtime state.</summary>
 public sealed class PartyMember
 {
-    private PartyMember(PartyMemberDefinition definition, IReadOnlyList<SkillDefinition> skills, PartyMemberProgress progress)
+    private PartyMember(
+        PartyMemberDefinition definition, ClassDefinition characterClass, IReadOnlyList<SkillDefinition> skills, PartyMemberProgress progress)
     {
         Definition = definition;
         Skills = [.. skills];
         Level = progress.Level;
         Experience = progress.Experience;
-        BaseStats = new CombatStats(definition.Attack, definition.Defense);
-        Vitals = new Vitals(progress.Hp, definition.MaxHp, progress.Mp, definition.MaxMp);
+        var stats = ClassGrowth.StatsAt(characterClass, progress.Level);
+        BaseStats = new CombatStats(stats.Attack, stats.Defense);
+        Vitals = new Vitals(progress.Hp, stats.MaxHp, progress.Mp, stats.MaxMp);
     }
 
     public string Id => Definition.Id;
@@ -40,21 +42,28 @@ public sealed class PartyMember
     /// <summary>Base stats plus the bonuses of everything worn.</summary>
     public CombatStats TotalStats => StatsWearing(Weapon, Armor);
 
-    /// <param name="definition">Who joins and with what starting values.</param>
+    /// <summary>A new member joins at level 1 with 0 experience and full HP and MP (decision 168).</summary>
+    /// <param name="definition">Who joins.</param>
+    /// <param name="characterClass">The member's class, which gives their stats at their level (ADR 0017).</param>
     /// <param name="skillCatalog">All skills by id; the member gets those named by <see cref="PartyMemberDefinition.SkillIds"/>, in that order.</param>
     /// <exception cref="ArgumentException">A skill id isn't in the catalog.</exception>
-    public static PartyMember Recruit(PartyMemberDefinition definition, IReadOnlyDictionary<string, SkillDefinition> skillCatalog)
+    public static PartyMember Recruit(
+        PartyMemberDefinition definition, ClassDefinition characterClass, IReadOnlyDictionary<string, SkillDefinition> skillCatalog)
     {
+        var levelOne = ClassGrowth.StatsAt(characterClass, 1);
         var starting = new PartyMemberProgress(
-            definition.Id, definition.Level, definition.Experience, definition.Hp, definition.Mp, WeaponId: null, ArmorId: null);
-        return new(definition, SkillsOf(definition, skillCatalog), starting);
+            definition.Id, Level: 1, Experience: 0, levelOne.MaxHp, levelOne.MaxMp, WeaponId: null, ArmorId: null);
+        return new(definition, characterClass, SkillsOf(definition, skillCatalog), starting);
     }
 
     /// <summary>Rebuilds a member from a save. Worn items are put on by <c>GameSession</c>, which resolves their ids.</summary>
     /// <remarks>The progress is assumed repaired against current content by Data (ADR 0007).</remarks>
     internal static PartyMember Restore(
-        PartyMemberDefinition definition, IReadOnlyDictionary<string, SkillDefinition> skillCatalog, PartyMemberProgress progress) =>
-        new(definition, SkillsOf(definition, skillCatalog), progress);
+        PartyMemberDefinition definition,
+        ClassDefinition characterClass,
+        IReadOnlyDictionary<string, SkillDefinition> skillCatalog,
+        PartyMemberProgress progress) =>
+        new(definition, characterClass, SkillsOf(definition, skillCatalog), progress);
 
     /// <summary>What a save keeps of this member.</summary>
     public PartyMemberProgress CaptureProgress() =>

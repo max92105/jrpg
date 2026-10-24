@@ -1,7 +1,5 @@
 using Jrpg.Core.Party;
-using Jrpg.Core.Progression;
 using Jrpg.Data.Content;
-using static Jrpg.Data.Content.RangeProblems;
 
 namespace Jrpg.Data.Party;
 
@@ -30,41 +28,6 @@ internal static class PartyMemberCatalogValidator
         }
 
         var repeatedSkillId = member.SkillIds.GroupBy(id => id).FirstOrDefault(group => group.Count() > 1)?.Key;
-        if (repeatedSkillId is not null)
-        {
-            return $"skillIds lists '{repeatedSkillId}' more than once.";
-        }
-
-        return AtLeast("attack", member.Attack, 0)
-            ?? AtLeast("defense", member.Defense, 0)
-            ?? FindVitalsProblem(member)
-            ?? FindProgressProblem(member, references.Experience);
-    }
-
-    private static string? FindVitalsProblem(PartyMemberDefinition member) =>
-        AtLeast("maxHp", member.MaxHp, 1)
-            ?? AtLeast("hp", member.Hp, 0)
-            ?? AtMost("hp", member.Hp, "maxHp", member.MaxHp)
-            ?? AtLeast("maxMp", member.MaxMp, 0)
-            ?? AtLeast("mp", member.Mp, 0)
-            ?? AtMost("mp", member.Mp, "maxMp", member.MaxMp);
-
-    private static string? FindProgressProblem(PartyMemberDefinition member, ExperienceTable experience)
-    {
-        var levelProblem = AtLeast("level", member.Level, 1) ?? AtMost("level", member.Level, "the experience table's maximum", experience.MaxLevel);
-        if (levelProblem is not null)
-        {
-            return levelProblem;
-        }
-
-        if (experience.IsMaxLevel(member.Level))
-        {
-            return member.Experience == 0 ? null : $"experience must be 0 at the maximum level (was {member.Experience}).";
-        }
-
-        // At or past the threshold, the first experience gain would report a step that goes backwards.
-        var threshold = experience.ExperienceToReachNext(member.Level);
-        return AtLeast("experience", member.Experience, 0)
-            ?? (member.Experience < threshold ? null : $"experience must be below {threshold}, the threshold for level {member.Level} (was {member.Experience}).");
+        return repeatedSkillId is null ? null : $"skillIds lists '{repeatedSkillId}' more than once.";
     }
 }

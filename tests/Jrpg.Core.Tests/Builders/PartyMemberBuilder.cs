@@ -58,7 +58,19 @@ internal sealed class PartyMemberBuilder
         return this;
     }
 
-    public PartyMember Build() => PartyMember.Recruit(BuildDefinition(), _skills.ToDictionary(skill => skill.Id));
+    /// <summary>
+    /// Restores rather than recruits, so a test can state any level and vitals. The member's class has the given
+    /// numbers and no growth, so they hold at any level.
+    /// </summary>
+    public PartyMember Build()
+    {
+        var characterClass = new ClassBuilder()
+            .WithId(_classId)
+            .WithBase(new ClassStats(_maxHp, _maxMp, _attack, _defense))
+            .Build();
+        var progress = new PartyMemberProgress(_id, _level, _experience, _hp, _mp, WeaponId: null, ArmorId: null);
+        return PartyMember.Restore(BuildDefinition(), characterClass, _skills.ToDictionary(skill => skill.Id), progress);
+    }
 
     public PartyMemberDefinition BuildDefinition() => new()
     {
@@ -68,14 +80,6 @@ internal sealed class PartyMemberBuilder
         PortraitFile = "portrait.png",
         BattleSpriteFile = "battle.png",
         AttackEffectFile = "slash.png",
-        Level = _level,
-        Experience = _experience,
-        Hp = _hp,
-        MaxHp = _maxHp,
-        Mp = _mp,
-        MaxMp = _maxMp,
-        Attack = _attack,
-        Defense = _defense,
         SkillIds = [.. _skills.Select(skill => skill.Id)],
     };
 }

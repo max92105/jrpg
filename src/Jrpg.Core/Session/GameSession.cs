@@ -61,7 +61,8 @@ public sealed class GameSession
             throw new ArgumentException($"'{leaderId}' isn't one of the new game's leader choices.", nameof(leaderId));
         }
 
-        var leader = PartyMember.Recruit(catalog.PartyMembers[leaderId], catalog.Skills);
+        var leaderDefinition = catalog.PartyMembers[leaderId];
+        var leader = PartyMember.Recruit(leaderDefinition, catalog.ClassOf(leaderDefinition), catalog.Skills);
         var party = new PartyState([leader], [leader], catalog.Rules.Party);
         var inventory = InventoryHolding(newGame.StartingItems, catalog);
         return new GameSession(party, new ExplorationContext(catalog, inventory, new WorldState(), random), newGame.StartLocation);
@@ -168,7 +169,8 @@ public sealed class GameSession
     // Worn items go straight onto the member: under the move model they aren't in the saved inventory (ADR 0003).
     private static PartyMember RestoreMember(PartyMemberProgress progress, ContentCatalog catalog)
     {
-        var member = PartyMember.Restore(catalog.PartyMembers[progress.Id], catalog.Skills, progress);
+        var definition = catalog.PartyMembers[progress.Id];
+        var member = PartyMember.Restore(definition, catalog.ClassOf(definition), catalog.Skills, progress);
         if (progress.WeaponId is { } weaponId)
         {
             member.Wear(EquipmentSlot.Weapon, catalog.Items[weaponId]);

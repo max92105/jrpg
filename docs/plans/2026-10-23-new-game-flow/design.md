@@ -37,7 +37,7 @@ Every value here is a placeholder until the developer decides (README, open ques
 | warlock | 160 | 70 | 22 | 4 | 14 | 7 | 3 | 1 |
 | mage | 150 | 80 | 20 | 4 | 12 | 8 | 2 | 1 |
 
-These numbers are a starting point for C1b's simulation (question 184). The forest's goblin trio deals 3 × (20 − defense) a round and has 3 × 40 HP at 2 defense. C1b adjusts the base HP and defense until a lone level 1 leader of each class wins with attacks alone, and records the win rates.
+Checked in C1b2's simulation (question 184, answered by decision 187): a lone level 1 leader of each class, attacking only, against the forest's goblin trio. With the class numbers above, five classes lost (mage, cleric and druid on every seed, the warlock on 75 % of them, the rogue on 25 %), so the goblin went from 20 attack and 40 HP to 16 and 30 instead (developer, 2026-10-24); the classes are unchanged. Every class now wins all 1,000 seeds. Average HP left: warrior 136, mage 24, cleric 86, rogue 55, barbarian 145, paladin 137, monk 85, warlock 34, druid 70.
 
 **Screens** (1920 x 1080 virtual screen)
 

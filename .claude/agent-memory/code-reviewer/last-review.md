@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-new-game-flow/slices/C1b1.md, slice C1b1 (class base stats + growth, ClassGrowth.StatsAt)
-Round: 1 (verdict: Fix the Criticals, then commit)
+Slice: docs/plans/2026-10-23-new-game-flow/slices/C1b2.md, slice C1b2 (member stats from class at level; join at level 1)
+Round: 1 (verdict: Ready to commit)
 
-- Critical: ClassGrowth.cs:7 new summary line is 126 columns; rewrap to 120 (reflow-comments.pl) (open)
-- Suggestion: ClassDefinition.cs:7-9 empty <param> tags for Id/Name/Description (only ones in src); describe Base/Growth in the summary instead and drop all param tags (open)
-- Suggestion: test lines over 120 columns (ClassGrowthTests:8, ClassCatalogValidatorTests:60); split the arguments (open)
+- Suggestion: PartyMember.cs:54 positional `1, 0` in new PartyMemberProgress; name them Level: 1, Experience: 0 (open)
+- Suggestion: SaveGameRepairTests 188/84 hard-wired to placeholder classes.json warlock numbers; next class retune breaks a repair test (open)
+- Follow-up: PartyMember.cs:166 "no stat growth until classes are designed" comment now stale; C1c replaces it

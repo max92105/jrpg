@@ -10,15 +10,18 @@ using Jrpg.Data.Saving;
 
 namespace Jrpg.Data.Tests.Saving;
 
-/// <summary>Repairs saves against the repository content: sarxian is a warrior (300 HP), jazog a mage, potions stack to 99.</summary>
+/// <summary>
+/// Repairs saves against the repository content: sarxian is a warlock (188 HP and 84 MP at level 3), jazog a barbarian
+/// (10 MP at level 1), potions stack to 99.
+/// </summary>
 public sealed class SaveGameRepairTests
 {
     private const string Slot = "slot_01";
 
     private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-    private static readonly PartyMemberProgress _sarxian = new("sarxian", Level: 3, Experience: 42, Hp: 250, Mp: 100, WeaponId: "bronze_sword", ArmorId: "chain_mail");
-    private static readonly PartyMemberProgress _jazog = new("jazog", Level: 1, Experience: 0, Hp: 100, Mp: 20, WeaponId: null, ArmorId: "wizard_robe");
+    private static readonly PartyMemberProgress _sarxian = new("sarxian", Level: 3, Experience: 42, Hp: 150, Mp: 60, WeaponId: "bronze_sword", ArmorId: "chain_mail");
+    private static readonly PartyMemberProgress _jazog = new("jazog", Level: 1, Experience: 0, Hp: 100, Mp: 5, WeaponId: null, ArmorId: "wizard_robe");
 
     private static readonly SaveGame _save = new()
     {
@@ -140,12 +143,12 @@ public sealed class SaveGameRepairTests
     }
 
     [Fact]
-    public void Repair_HpAboveMax_Clamps()
+    public void Repair_HpAboveClassMaxAtSavedLevel_ClampsAndReports()
     {
         var repaired = Repair(_save with { Members = [_sarxian with { Hp = 999, Mp = -4 }, _jazog] });
 
-        Assert.Equal((300, 0), (repaired.Save.Members[0].Hp, repaired.Save.Members[0].Mp));
-        Assert.Single(repaired.Changes);
+        Assert.Equal((188, 0), (repaired.Save.Members[0].Hp, repaired.Save.Members[0].Mp));
+        Assert.Equal(["party member 'sarxian': HP/MP 999/-4 brought within 0..188/0..84."], repaired.Changes);
     }
 
     [Fact]

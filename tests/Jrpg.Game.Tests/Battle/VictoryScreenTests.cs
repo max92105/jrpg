@@ -87,5 +87,5 @@ public sealed class VictoryScreenTests
         Assert.False(_screen.IsAtMaxLevel(0));
     }
 
-    private static PartyMember Sarxian() => PartyMember.Recruit(BattleScenarios.Catalog.PartyMembers["sarxian"], BattleScenarios.Catalog.Skills);
+    private static PartyMember Sarxian() => BattleScenarios.Recruit("sarxian");
 }

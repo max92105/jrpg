@@ -9,7 +9,10 @@ using Jrpg.Core.Skills;
 
 namespace Jrpg.Core.Tests.Builders;
 
-/// <summary>A catalog with empty defaults, so tests only state the content they rely on.</summary>
+/// <summary>
+/// A catalog with empty defaults, so tests only state the content they rely on; its one class is
+/// <see cref="ClassBuilder"/>'s "warrior", the class of every default member.
+/// </summary>
 internal sealed class ContentCatalogBuilder
 {
     private ItemDefinition[] _items = [];
@@ -100,7 +103,7 @@ internal sealed class ContentCatalogBuilder
     public ContentCatalog Build() => new()
     {
         Items = _items.ToDictionary(item => item.Id),
-        Classes = new Dictionary<string, ClassDefinition>(),
+        Classes = new Dictionary<string, ClassDefinition> { ["warrior"] = new ClassBuilder().Build() },
         Skills = _skills.ToDictionary(skill => skill.Id),
         PartyMembers = _members.ToDictionary(member => member.Id),
         Enemies = _enemies.ToDictionary(enemy => enemy.Id),

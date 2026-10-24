@@ -32,4 +32,7 @@ public sealed record ContentCatalog
     public required GameRules Rules { get; init; }
 
     public required NewGameDefinition NewGame { get; init; }
+
+    /// <summary>The class that gives a member their numbers at their level (ADR 0017).</summary>
+    public ClassDefinition ClassOf(PartyMemberDefinition member) => Classes[member.ClassId];
 }

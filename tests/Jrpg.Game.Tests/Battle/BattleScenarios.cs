@@ -19,6 +19,13 @@ internal static class BattleScenarios
     /// <summary>The repository's content, as loaded.</summary>
     public static ContentCatalog Catalog { get; } = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
+    /// <summary>A member of the repository's content as they join: level 1, with their class's numbers.</summary>
+    public static PartyMember Recruit(string memberId)
+    {
+        var definition = Catalog.PartyMembers[memberId];
+        return PartyMember.Recruit(definition, Catalog.ClassOf(definition), Catalog.Skills);
+    }
+
     /// <param name="random">Shuffles the turn order; tests that run enemy turns pass the same source to the tactics.</param>
     public static BattleState SarxianAgainstGoblinTrio(IRandom random) => MemberAgainstGoblinTrio("sarxian", new Inventory(), random);
 
@@ -27,7 +34,7 @@ internal static class BattleScenarios
     /// <param name="random">Shuffles the turn order; tests that run enemy turns pass the same source to the tactics.</param>
     public static BattleState MemberAgainstGoblinTrio(string memberId, Inventory inventory, IRandom random)
     {
-        var member = PartyMember.Recruit(Catalog.PartyMembers[memberId], Catalog.Skills);
+        var member = Recruit(memberId);
         var party = new PartyState([member], [member], Catalog.Rules.Party);
         var goblin = Catalog.Enemies["goblin"];
         return BattleState.Start(party, [goblin, goblin, goblin], inventory, random);

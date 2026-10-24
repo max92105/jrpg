@@ -57,7 +57,7 @@ public sealed class SaveSlotsTests : IDisposable
         Assert.Equal("start", summary.LocationName);
         Assert.Equal(TimeSpan.FromMinutes(75), summary.PlayTime);
         Assert.Equal(_now, summary.SavedAt);
-        Assert.Equal([new PartyMemberSummary("Sarxian", 10), new PartyMemberSummary("Teelle", 11)], summary.ActiveParty);
+        Assert.Equal([new PartyMemberSummary("Sarxian", 1), new PartyMemberSummary("Teelle", 1)], summary.ActiveParty);
     }
 
     [Fact]

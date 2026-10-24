@@ -70,24 +70,25 @@ internal sealed class SaveGameRepair
     private PartyMemberProgress RepairMember(PartyMemberProgress progress, PartyMemberDefinition definition)
     {
         var (level, experience) = RepairLevel(progress);
+        var maxima = ClassGrowth.StatsAt(_catalog.ClassOf(definition), level);
         var repaired = progress with
         {
             Level = level,
             Experience = experience,
-            Hp = Math.Clamp(progress.Hp, 0, definition.MaxHp),
-            Mp = Math.Clamp(progress.Mp, 0, definition.MaxMp),
+            Hp = Math.Clamp(progress.Hp, 0, maxima.MaxHp),
+            Mp = Math.Clamp(progress.Mp, 0, maxima.MaxMp),
             WeaponId = RepairWornItem(progress.WeaponId, EquipmentSlot.Weapon, definition),
             ArmorId = RepairWornItem(progress.ArmorId, EquipmentSlot.Armor, definition),
         };
         if ((repaired.Hp, repaired.Mp) != (progress.Hp, progress.Mp))
         {
-            _changes.Add($"party member '{progress.Id}': HP/MP {progress.Hp}/{progress.Mp} brought within 0..{definition.MaxHp}/0..{definition.MaxMp}.");
+            _changes.Add($"party member '{progress.Id}': HP/MP {progress.Hp}/{progress.Mp} brought within 0..{maxima.MaxHp}/0..{maxima.MaxMp}.");
         }
 
         return repaired;
     }
 
-    // The same rules the party member validator applies to a definition's starting level and experience.
+    // Within the experience table, with experience below the next threshold so the first gain never steps backwards.
     private (int Level, int Experience) RepairLevel(PartyMemberProgress progress)
     {
         var table = _catalog.Rules.Experience;

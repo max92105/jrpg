@@ -8,6 +8,7 @@ using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
 using Jrpg.Core.Session;
+using Jrpg.Core.Stats;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 using Jrpg.Core.World;
@@ -46,6 +47,24 @@ public sealed class GameSessionSaveTests
         Assert.Equal((2, 50), (restored.Level, restored.Experience));
         Assert.Equal((leader.Vitals.Hp, leader.Vitals.Mp), (restored.Vitals.Hp, restored.Vitals.Mp));
         Assert.Equal((leader.Vitals.MaxHp, leader.Vitals.MaxMp), (restored.Vitals.MaxHp, restored.Vitals.MaxMp));
+    }
+
+    // A save keeps only level, experience, HP and MP, so one from before classes had stats loads as is (ADR 0017).
+    [Fact]
+    public void Restore_MemberSavedAtLevelThree_HasTheClassStatsAtThree()
+    {
+        var growing = new ClassBuilder()
+            .WithBase(new ClassStats(MaxHp: 100, MaxMp: 20, Attack: 10, Defense: 5))
+            .WithGrowth(new ClassStats(MaxHp: 10, MaxMp: 2, Attack: 3, Defense: 1))
+            .Build();
+        var catalog = Catalog(_belowChest) with { Classes = new Dictionary<string, ClassDefinition> { ["warrior"] = growing } };
+        var save = StartNew().Capture(_savedAt);
+        var savedAtThree = save with { Members = [save.Members[0] with { Level = 3, Hp = 90, Mp = 12 }] };
+
+        var leader = GameSession.Restore(savedAtThree, catalog, new FixedSequenceRandom()).Party.Leader;
+
+        Assert.Equal(new CombatStats(Attack: 16, Defense: 7), leader.BaseStats);
+        Assert.Equal((90, 120, 12, 24), (leader.Vitals.Hp, leader.Vitals.MaxHp, leader.Vitals.Mp, leader.Vitals.MaxMp));
     }
 
     [Fact]
@@ -168,7 +187,9 @@ public sealed class GameSessionSaveTests
     {
         var catalog = Catalog(_belowChest);
         var save = StartNew().Capture(_savedAt);
-        var recruits = memberIds.Select(id => PartyMember.Recruit(catalog.PartyMembers[id], catalog.Skills).CaptureProgress());
+        var recruits = memberIds
+            .Select(id => catalog.PartyMembers[id])
+            .Select(definition => PartyMember.Recruit(definition, catalog.ClassOf(definition), catalog.Skills).CaptureProgress());
         return GameSession.Restore(save with { Members = [.. save.Members, .. recruits] }, catalog, new FixedSequenceRandom());
     }
 

@@ -67,8 +67,8 @@ public sealed class BattleLayoutTests
         var goblin = catalog.Enemies["goblin"];
         Combatant[] combatants =
         [
-            Combatant.FromPartyMember(PartyMember.Recruit(catalog.PartyMembers["sarxian"], catalog.Skills)),
-            Combatant.FromPartyMember(PartyMember.Recruit(catalog.PartyMembers["jazog"], catalog.Skills)),
+            Combatant.FromPartyMember(BattleScenarios.Recruit("sarxian")),
+            Combatant.FromPartyMember(BattleScenarios.Recruit("jazog")),
             Combatant.FromEnemy(goblin),
             Combatant.FromEnemy(goblin),
             Combatant.FromEnemy(goblin),

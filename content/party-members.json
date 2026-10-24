@@ -6,14 +6,6 @@
     "portraitFile": "Sarxian.png",
     "battleSpriteFile": "Sarxian.png",
     "attackEffectFile": "AttackPlayer.png",
-    "level": 10,
-    "experience": 250,
-    "hp": 200,
-    "maxHp": 300,
-    "mp": 200,
-    "maxMp": 300,
-    "attack": 15,
-    "defense": 8,
     "skillIds": ["fire_blast", "fireball", "heal", "recovery", "heal_all"]
   },
   {
@@ -23,14 +15,6 @@
     "portraitFile": "Jazog.png",
     "battleSpriteFile": "Jazog.png",
     "attackEffectFile": "AttackPlayer.png",
-    "level": 9,
-    "experience": 399,
-    "hp": 120,
-    "maxHp": 120,
-    "mp": 30,
-    "maxMp": 30,
-    "attack": 5,
-    "defense": 3,
     "skillIds": []
   },
   {
@@ -40,14 +24,6 @@
     "portraitFile": "Teelle.png",
     "battleSpriteFile": "Teelle.png",
     "attackEffectFile": "AttackPlayer.png",
-    "level": 11,
-    "experience": 300,
-    "hp": 190,
-    "maxHp": 190,
-    "mp": 300,
-    "maxMp": 300,
-    "attack": 12,
-    "defense": 5,
     "skillIds": []
   },
   {
@@ -57,14 +33,6 @@
     "portraitFile": "Zaruk.png",
     "battleSpriteFile": "Zaruk.png",
     "attackEffectFile": "AttackPlayer.png",
-    "level": 8,
-    "experience": 100,
-    "hp": 150,
-    "maxHp": 150,
-    "mp": 30,
-    "maxMp": 30,
-    "attack": 4,
-    "defense": 6,
     "skillIds": []
   },
   {
@@ -74,14 +42,6 @@
     "portraitFile": "Zanyr.png",
     "battleSpriteFile": "Zanyr.png",
     "attackEffectFile": "AttackPlayer.png",
-    "level": 12,
-    "experience": 100,
-    "hp": 300,
-    "maxHp": 300,
-    "mp": 30,
-    "maxMp": 30,
-    "attack": 18,
-    "defense": 12,
     "skillIds": []
   },
   {
@@ -91,14 +51,6 @@
     "portraitFile": "Thaali.png",
     "battleSpriteFile": "Thaali.png",
     "attackEffectFile": "AttackPlayer.png",
-    "level": 10,
-    "experience": 100,
-    "hp": 170,
-    "maxHp": 170,
-    "mp": 30,
-    "maxMp": 30,
-    "attack": 13,
-    "defense": 5,
     "skillIds": []
   },
   {
@@ -108,14 +60,6 @@
     "portraitFile": "Kamilia.png",
     "battleSpriteFile": "Kamilia.png",
     "attackEffectFile": "AttackPlayer.png",
-    "level": 10,
-    "experience": 100,
-    "hp": 170,
-    "maxHp": 170,
-    "mp": 30,
-    "maxMp": 30,
-    "attack": 13,
-    "defense": 5,
     "skillIds": []
   }
 ]

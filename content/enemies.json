@@ -6,9 +6,9 @@
     "battleSpriteFile": "Goblin.png",
     "attackEffectFile": "AttackEnemy.png",
     "isSpriteFlipped": false,
-    "maxHp": 40,
+    "maxHp": 30,
     "maxMp": 10,
-    "attack": 20,
+    "attack": 16,
     "defense": 2,
     "experienceReward": 40
   }

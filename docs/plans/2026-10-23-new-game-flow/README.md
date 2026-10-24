@@ -2,8 +2,8 @@
 Status: approved
 
 First feature plan after the migration and the code-health plan.
-- Decisions 156-178, 185 and 186 are recorded below.
-- Questions 179-184 are open; the next free number is 187.
+- Decisions 156-178 and 185-187 are recorded below.
+- Questions 179-183 are open; the next free number is 188.
 - This plan writes ADRs 0016-0018; the next ADR is 0019.
 
 Developer's request (2026-10-23, verbatim, typos kept): "OK let<s plan real new feature now and real game flow. update main menu i dont, want to see invalid option. not grayed jsut not there. continue should be the default selected when available else its new game. then new game now should move to character selection. there will be no customisation just a choice between. Ragnir - Warrior, Omer - Mage, Zanyr - Cleric, Lazarus - Rogue, Jazog - Barbarian, Kamelia - Paladin, Zarruk - Monk, Sarxian - Warlock. the selected character will be the leader 'main character' when hovering one i want be able to display information about the class and the summary of the character. When selecting we gon into a cinemtic that will show why this character is entengle in the story essentially it will be a voice over some still image that will appear and disappear. i have no budget and i have no other idea on how to make it for now. so lets start with that. i will need placeholder for now to test behavior and i will place in the repo the more official art and audio later. right now i just want this to work and run so i can test a full new game flow."
@@ -44,7 +44,7 @@ At the end of this plan, a new game plays from the title to the map like this:
 6. **The look (S3a, S3b, K4), then the final check (Z).** Behavior first, then the look, per the code-health plan's rule.
 
 ## Guiding rules
-- **Systems, not design.** Every value the developer hasn't given is a placeholder in content (design.md, "Tunables and placeholders") and, where it decides design, a numbered question. Nothing is balanced here beyond "a lone level 1 leader can win the start map's fights" (question 184).
+- **Systems, not design.** Every value the developer hasn't given is a placeholder in content (design.md, "Tunables and placeholders") and, where it decides design, a numbered question. Nothing is balanced here beyond "a lone level 1 leader can win the start map's fights" (decision 187).
 - **Content only in `content/`** (ADR 0011):
   - class stats and descriptions in `classes.json`;
   - summaries in `party-members.json`;
@@ -100,7 +100,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **ADR 0017: Stats come from the class** (before C1a) → [slices/ADR-0017.md](slices/ADR-0017.md)
 - [x] **C1a. The nine classes, with descriptions; items lose their class restriction** (Core + Data + content + Game, about 220 lines) → [slices/C1a.md](slices/C1a.md)
 - [x] **C1b1. Classes carry their base stats and growth per level; the one formula** (Core + Data + content, about 170 lines; split from C1b) → [slices/C1b1.md](slices/C1b1.md)
-- [ ] **C1b2. A member's stats come from their class at their level; members join at level 1** (Core + Data + content, about 260 lines; split from C1b) → [slices/C1b2.md](slices/C1b2.md)
+- [x] **C1b2. A member's stats come from their class at their level; members join at level 1** (Core + Data + content, about 260 lines; split from C1b) → [slices/C1b2.md](slices/C1b2.md)
 - [ ] **C1c. A level-up raises max HP, max MP, attack and defense by the class's growth** (Core + Game, about 150 lines) → [slices/C1c.md](slices/C1c.md)
 - [ ] **C2. The nine characters: Ragnir, Omer and Lazarus added, Kamilia removed, Teelle the Paladin, Thaali the Druid, summaries, generated portraits** (Core + Data + content, about 220 lines) → [slices/C2.md](slices/C2.md)
 - [ ] **S2. The choice shows the class, description, summary and level 1 stats** (Game, about 220 lines) → [slices/S2.md](slices/S2.md)
@@ -160,6 +160,7 @@ The developer's answers to the draft's questions (2026-10-23):
 - **178. Cancel on the choice** goes back to the title.
 - **185. Each leader's intro:** every new game starts on one `intro` map, which holds one arrival event per leader, each running only when that character leads (`onlyWhenLeaderId`). One place to edit, and the condition serves later story scenes (ADR 0016).
 - **186. A save repaired onto the intro map** (its map left the content) plays the leader's intro again, then warps to the start map: intro events aren't "once" (2026-10-24, from the K3 review). Only a new game and that repair reach the intro map.
+- **187. The start fight is balanced on the goblin, not the classes** (2026-10-24, from C1b2's simulation; answers question 184): the goblin goes from 20 attack and 40 HP to 16 and 30, so a lone level 1 leader of every class wins the goblin trio attacking only. Raising the weak classes instead would have given the mage more defense than the paladin.
 
 Earlier decisions that apply:
 - 35: play time counts everything since the playthrough began.
@@ -178,7 +179,6 @@ Each slice uses the placeholder until answered.
 - **181. Skills.** Placeholder: members keep their own `skillIds`. Should skills come from the class, and from which level?
 - **182. Thaali's place in the list.** Placeholder: last, after the request's eight.
 - **183. Kamilia's art files** (`Kamilia.png` in portraits and battlers). Placeholder: kept in the repository unused, since only the developer can decide to delete art.
-- **184. Difficulty for a lone leader.** The start map and the forest hold the goblin trio. Placeholder: the class numbers are tuned until a lone level 1 leader of each class wins it in the battle simulation; C1b records the win rates.
 
 Still open from earlier plans: 92, 112, 147, 151-155.
 

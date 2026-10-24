@@ -11,19 +11,33 @@ public sealed class PartyMemberTests
 {
     private readonly ExperienceTable _table = new([100, 120, 144]);
 
-    [Fact]
-    public void Recruit_Definition_CopiesStartingValues()
-    {
-        var member = new PartyMemberBuilder()
-            .AtLevel(2, experience: 30)
-            .WithVitals(hp: 40, maxHp: 100, mp: 5, maxMp: 20)
-            .WithStats(attack: 12, defense: 7)
-            .Build();
+    private static readonly ClassDefinition _growingClass = new ClassBuilder()
+        .WithBase(new ClassStats(MaxHp: 100, MaxMp: 20, Attack: 12, Defense: 7))
+        .WithGrowth(new ClassStats(MaxHp: 10, MaxMp: 3, Attack: 2, Defense: 1))
+        .Build();
 
-        Assert.Equal(2, member.Level);
-        Assert.Equal(30, member.Experience);
+    [Fact]
+    public void Recruit_Any_StartsAtLevelOneWithZeroExperienceAndFullVitals()
+    {
+        var definition = new PartyMemberBuilder().BuildDefinition();
+
+        var member = PartyMember.Recruit(definition, _growingClass, new Dictionary<string, SkillDefinition>());
+
+        Assert.Equal((1, 0), (member.Level, member.Experience));
         Assert.Equal(new CombatStats(Attack: 12, Defense: 7), member.BaseStats);
-        Assert.Equal((40, 100, 5, 20), (member.Vitals.Hp, member.Vitals.MaxHp, member.Vitals.Mp, member.Vitals.MaxMp));
+        Assert.Equal((100, 100, 20, 20), (member.Vitals.Hp, member.Vitals.MaxHp, member.Vitals.Mp, member.Vitals.MaxMp));
+    }
+
+    [Fact]
+    public void BaseStats_RestoredAtLevelThree_AreTheClassAtThree()
+    {
+        var progress = new PartyMemberProgress("test_member", 3, 0, Hp: 50, Mp: 4, WeaponId: null, ArmorId: null);
+
+        var member = PartyMember.Restore(
+            new PartyMemberBuilder().BuildDefinition(), _growingClass, new Dictionary<string, SkillDefinition>(), progress);
+
+        Assert.Equal(new CombatStats(Attack: 16, Defense: 9), member.BaseStats);
+        Assert.Equal((50, 120, 4, 26), (member.Vitals.Hp, member.Vitals.MaxHp, member.Vitals.Mp, member.Vitals.MaxMp));
     }
 
     [Fact]
@@ -31,7 +45,7 @@ public sealed class PartyMemberTests
     {
         var definition = new PartyMemberBuilder().BuildDefinition() with { SkillIds = ["heal"] };
 
-        Assert.Throws<ArgumentException>(() => PartyMember.Recruit(definition, new Dictionary<string, SkillDefinition>()));
+        Assert.Throws<ArgumentException>(() => PartyMember.Recruit(definition, _growingClass, new Dictionary<string, SkillDefinition>()));
     }
 
     [Fact]

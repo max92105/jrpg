@@ -31,6 +31,7 @@ internal static class ContentTypeDiscriminators
                 new JsonDerivedType(typeof(RecruitStep), "recruit"),
                 new JsonDerivedType(typeof(StillStep), "still"),
                 new JsonDerivedType(typeof(SwapObjectStep), "swapObject"),
+                new JsonDerivedType(typeof(VoiceStep), "voice"),
                 new JsonDerivedType(typeof(WarpStep), "warp"),
             },
         };

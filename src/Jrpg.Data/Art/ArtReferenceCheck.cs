@@ -2,6 +2,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
+using Jrpg.Data.Maps;
 
 namespace Jrpg.Data.Art;
 
@@ -36,7 +37,7 @@ public static class ArtReferenceCheck
         {
             if (sheetSizes.TryGetValue(tile.SheetId, out var size) && !IsCellInside(tile, catalog.Tilesheets[tile.SheetId], size))
             {
-                problems.Add($"{ShownPath(ArtFolders.Tilesheets, catalog.Tilesheets[tile.SheetId].File)}: tile {tile.Id}'s cell ({tile.Column}, {tile.Row}) lies outside the {size.Width}x{size.Height} image.");
+                problems.Add($"{ExactFileName.ShownPath(ArtFolders.Tilesheets, catalog.Tilesheets[tile.SheetId].File)}: tile {tile.Id}'s cell ({tile.Column}, {tile.Row}) lies outside the {size.Width}x{size.Height} image.");
             }
         }
 
@@ -46,11 +47,11 @@ public static class ArtReferenceCheck
             .ToList();
         AddMissingByExactName(problems, artRoot, ArtFolders.FieldSprites, npcSprites);
         AddSpritesWithoutWalkFrames(problems, artRoot, npcSprites.Prepend((catalog.NewGame.FieldSpriteFile, "the new game")));
-        var dialoguePortraits = from named in EventSteps<DialogueStep>(catalog)
+        var dialoguePortraits = from named in MapEventSteps.Of<DialogueStep>(catalog)
                                 where named.Step.Speech.PortraitFile is not null
                                 select (named.Step.Speech.PortraitFile!, named.NamedBy);
         AddMissing(problems, artRoot, ArtFolders.Portraits, dialoguePortraits);
-        var stills = EventSteps<StillStep>(catalog).Select(named => (named.Step.ImageFile, named.NamedBy));
+        var stills = MapEventSteps.Of<StillStep>(catalog).Select(named => (named.Step.ImageFile, named.NamedBy));
         AddMissingByExactName(problems, artRoot, ArtFolders.Cinematics, stills);
         var members = catalog.PartyMembers.Values.OrderBy(member => member.Id, StringComparer.Ordinal);
         AddMissing(problems, artRoot, ArtFolders.Portraits, members.Select(member => (member.PortraitFile, $"party member '{member.Id}'")));
@@ -82,7 +83,7 @@ public static class ArtReferenceCheck
             if (ReadSize(artRoot, ArtFolders.FieldSprites, file).Size is { } size && !FieldSpriteLayout.Holds(size))
             {
                 problems.Add(
-                    $"{ShownPath(ArtFolders.FieldSprites, file)}: a {size.Width}x{size.Height} sprite doesn't hold {FieldSpriteLayout.WalkFrames} x {FieldSpriteLayout.Rows} frames of {FieldSpriteLayout.FramePixels} px ({neededWidth}x{neededHeight}). Named by {namedBy}.");
+                    $"{ExactFileName.ShownPath(ArtFolders.FieldSprites, file)}: a {size.Width}x{size.Height} sprite doesn't hold {FieldSpriteLayout.WalkFrames} x {FieldSpriteLayout.Rows} frames of {FieldSpriteLayout.FramePixels} px ({neededWidth}x{neededHeight}). Named by {namedBy}.");
             }
         }
     }
@@ -94,39 +95,21 @@ public static class ArtReferenceCheck
         {
             if (ReadSize(artRoot, ArtFolders.Effects, file).Size is { } size && (size.Height == 0 || size.Width % size.Height != 0))
             {
-                problems.Add($"{ShownPath(ArtFolders.Effects, file)}: a {size.Width}x{size.Height} strip isn't a row of whole square frames.");
+                problems.Add($"{ExactFileName.ShownPath(ArtFolders.Effects, file)}: a {size.Width}x{size.Height} strip isn't a row of whole square frames.");
             }
         }
     }
 
-    // Battle art is matched by exact name, case included: Windows finds "goblin.png" for "Goblin.png", other systems don't.
+    // Matched by exact name, case included (see ExactFileName).
     private static void AddMissingByExactName(List<string> problems, string artRoot, string folder, IEnumerable<(string File, string NamedBy)> references)
     {
         foreach (var (file, namedBy) in references)
         {
-            if ((CaseMismatch(artRoot, folder, file) ?? ReadSize(artRoot, folder, file).Problem) is { } problem)
+            if ((ExactFileName.FindCaseMismatch(artRoot, folder, file) ?? ReadSize(artRoot, folder, file).Problem) is { } problem)
             {
                 problems.Add($"{problem} Named by {namedBy}.");
             }
         }
-    }
-
-    private static string? CaseMismatch(string artRoot, string folder, string file)
-    {
-        var directory = Path.Combine(artRoot, folder);
-        if (!Directory.Exists(directory))
-        {
-            return null;
-        }
-
-        var names = Directory.EnumerateFiles(directory).Select(Path.GetFileName).ToList();
-        if (names.Contains(file, StringComparer.Ordinal))
-        {
-            return null;
-        }
-
-        var actual = names.FirstOrDefault(name => string.Equals(name, file, StringComparison.OrdinalIgnoreCase));
-        return actual is null ? null : $"{ShownPath(folder, file)}: the file is named {actual}; names must match exactly.";
     }
 
     // One problem per named file that can't be read, saying what names it so the content can be fixed there.
@@ -140,14 +123,6 @@ public static class ArtReferenceCheck
             }
         }
     }
-
-    // Every step of one kind in the maps' events, with the event and map that hold it, in a stable order for the report.
-    private static IEnumerable<(TStep Step, string NamedBy)> EventSteps<TStep>(ContentCatalog catalog)
-        where TStep : EventStep =>
-        from map in catalog.Maps.Values.OrderBy(map => map.Id, StringComparer.Ordinal)
-        from mapEvent in map.Layout.Objects.SelectMany(placed => placed.Events).Concat(map.Layout.CellEvents.Select(cell => cell.Event))
-        from step in mapEvent.Steps.OfType<TStep>()
-        select (step, $"event '{mapEvent.Id}' on map '{map.Id}'");
 
     /// <summary>The lowest tile, cut from any sheet drawn from <paramref name="file"/>, whose cell an image of this size wouldn't hold.</summary>
     /// <param name="catalog">The sheets and tiles checked.</param>
@@ -180,7 +155,7 @@ public static class ArtReferenceCheck
         var path = Path.Combine(artRoot, folder, file);
         if (!File.Exists(path))
         {
-            return (null, $"{ShownPath(folder, file)}: not found in {artRoot}.");
+            return (null, $"{ExactFileName.ShownPath(folder, file)}: not found in {artRoot}.");
         }
 
         try
@@ -189,13 +164,11 @@ public static class ArtReferenceCheck
         }
         catch (ContentValidationException)
         {
-            return (null, $"{ShownPath(folder, file)}: not a PNG image.");
+            return (null, $"{ExactFileName.ShownPath(folder, file)}: not a PNG image.");
         }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            return (null, $"{ShownPath(folder, file)}: {exception.Message}");
+            return (null, $"{ExactFileName.ShownPath(folder, file)}: {exception.Message}");
         }
     }
-
-    private static string ShownPath(string folder, string file) => folder.Length == 0 ? file : $"{folder}/{file}";
 }

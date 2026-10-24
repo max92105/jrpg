@@ -40,7 +40,7 @@ At the end of this plan, a new game plays from the title to the map like this:
 4. **Recruiting (R1a, R1b, R2).**
    - A map event can recruit a member (Core, Data and the game), then the editor can author it.
    - Then placeholder recruit points on the start map.
-5. **The voice (ADR 0018, A1a, A1b), then a run-through (Z1).** Audio comes after the silent intro, so the intro can be tested without sound. Z1 is the developer's first full check.
+5. **The voice (ADR 0018, A1a1, A1a2, A1b), then a run-through (Z1).** Audio comes after the silent intro, so the intro can be tested without sound. Z1 is the developer's first full check.
 6. **The look (S3a, S3b, K4), then the final check (Z).** Behavior first, then the look, per the code-health plan's rule.
 
 ## Guiding rules
@@ -74,7 +74,7 @@ At the end of this plan, a new game plays from the title to the map like this:
 - **Music, sound effects and volume settings** (ADR 0018 sets where audio lives).
 - **A map sprite per leader** (question 58).
 - **The story.** Where the recruits really are, story flags and the opening event: the start map's recruit points are placeholders.
-- **Editor support** for classes, characters and the new game: they are edited as JSON. The editor does get every new event step and activation (K2b, R1b, A1a), because otherwise it can't open a map that uses one.
+- **Editor support** for classes, characters and the new game: they are edited as JSON. The editor does get every new event step and activation (K2b, R1b, A1a2), because otherwise it can't open a map that uses one.
 - **Title art.** The title keeps `StartMenu.png`.
 
 ## Slices
@@ -112,7 +112,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 5: the voice
 - [x] **ADR 0018: Audio files and playback** (accepted: option A) → [slices/ADR-0018.md](slices/ADR-0018.md)
-- [ ] **A1a. The voice step: an event starts a voice file, checked at startup; one generated placeholder voice; the editor authors it** (Core + Data + Editor + content, about 220 lines) → [slices/A1a.md](slices/A1a.md)
+- [x] **A1a1. The voice step: an event starts a voice file, checked at startup; one generated placeholder voice** (Core + Data + Game startup + content, about 280 lines; split from A1a) → [slices/A1a1.md](slices/A1a1.md)
+- [ ] **A1a2. The editor authors the voice step; every intro starts with the placeholder voice** (Editor + content, about 60 lines; split from A1a) → [slices/A1a2.md](slices/A1a2.md)
 - [ ] **A1b. The intro speaks; with no sound device the game plays on silently** (Game, about 220 lines) → [slices/A1b.md](slices/A1b.md)
 - [ ] **Z1. Run-through: the full new-game flow** (manual) → [slices/Z1.md](slices/Z1.md)
 

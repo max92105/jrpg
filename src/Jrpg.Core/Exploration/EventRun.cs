@@ -44,6 +44,12 @@ internal sealed class EventRun
     /// <summary>What the current recruit step did; null on any other step.</summary>
     public Recruitment? CurrentRecruitment { get; private set; }
 
+    /// <summary>
+    /// The voice-over this event started, which speaks on over the steps after it; null before one starts and once the
+    /// player skips, since skipping silences the cutscene.
+    /// </summary>
+    public VoiceStep? StartedVoice { get; private set; }
+
     public bool IsFinished => _index >= Steps.Count;
 
     /// <summary>The player read the current step, or the Game finished its warp fade-out.</summary>
@@ -68,6 +74,8 @@ internal sealed class EventRun
         {
             AdvanceToNextWaitingStep();
         }
+
+        StartedVoice = null;
     }
 
     private void AdvanceToNextWaitingStep()
@@ -92,6 +100,9 @@ internal sealed class EventRun
                 var source = _triggered.Source
                     ?? throw new InvalidOperationException($"Event '{_triggered.Event.Id}' swaps an object but has none.");
                 _map.SwapObject(source, swap.ObjectId);
+                return false;
+            case VoiceStep voice:
+                StartedVoice = voice;
                 return false;
             case GiveItemStep give:
                 var item = _context.Catalog.Items[give.ItemId];

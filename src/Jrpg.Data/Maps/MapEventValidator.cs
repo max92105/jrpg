@@ -140,6 +140,7 @@ internal static class MapEventValidator
         WarpStep warp when !references.Layouts[warp.MapId].Contains(warp.Cell) =>
             $"warp cell ({warp.Cell.X}, {warp.Cell.Y}) is outside map '{warp.MapId}'.",
         StillStep still => FindStillProblem(still),
+        VoiceStep voice when string.IsNullOrWhiteSpace(voice.File) => "voice must name its file.",
         _ => null,
     };
 

@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Jrpg.Data.Art;
+using Jrpg.Data.Audio;
 using Jrpg.Data.Content;
 using Jrpg.Data.Messages;
 using Jrpg.Data.Saving;
@@ -46,15 +47,17 @@ static IScene FirstScene(string contentRoot, string artRoot, ScreenText text, Pl
     try
     {
         var catalog = ContentCatalogLoader.Load(contentRoot);
-        var artProblems = ArtReferenceCheck.FindProblems(catalog, artRoot);
-        if (artProblems.Count == 0)
+        var problems = ArtReferenceCheck.FindProblems(catalog, artRoot)
+            .Concat(AudioReferenceCheck.FindProblems(catalog, AudioFolders.RootIn(contentRoot)))
+            .ToList();
+        if (problems.Count == 0)
         {
             // Saves are stamped with the real clock here, the one place the game reads it (ADR 0008).
             var saveSlots = new SaveSlots(new FileSaveStore(GamePaths.SaveDirectory, catalog), catalog, () => DateTimeOffset.Now);
             return new GameFlow(catalog, text, saveSlots, settings);
         }
 
-        reason = string.Join(Environment.NewLine, artProblems);
+        reason = string.Join(Environment.NewLine, problems);
     }
     catch (Exception exception) when (IsStartupProblem(exception))
     {

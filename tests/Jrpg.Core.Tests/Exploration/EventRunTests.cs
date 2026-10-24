@@ -71,6 +71,28 @@ public sealed class EventRunTests
     }
 
     [Fact]
+    public void Start_VoiceThenStill_RunsOnToTheStillWithTheVoiceStarted()
+    {
+        var voice = new VoiceStep("Placeholder.wav");
+
+        var run = Start(new MapEventBuilder().WithSteps(voice, _firstStill).Build());
+
+        Assert.Equal(_firstStill, run.Current);
+        Assert.Equal(voice, run.StartedVoice);
+    }
+
+    [Fact]
+    public void SkipPresentation_VoiceAndStills_StopsOnTheWarp()
+    {
+        var run = Start(new MapEventBuilder().WithSteps(new VoiceStep("Placeholder.wav"), _firstStill, _secondStill, _warpAway).Build());
+
+        run.SkipPresentation();
+
+        Assert.Equal(_warpAway, run.Current);
+        Assert.Null(run.StartedVoice);
+    }
+
+    [Fact]
     public void SkipPresentation_StillThenSwapThenStill_AppliesTheSwapAndFinishes()
     {
         var run = Start(new MapEventBuilder().WithSteps(_firstStill, _openChest, _secondStill).Build());

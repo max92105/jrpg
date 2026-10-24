@@ -72,6 +72,7 @@ public sealed class MapEventValidatorTests
         { WithChestEvent(_openChest with { Steps = [new StillStep("Still.png", -1.5, Caption: null)] }), "event 'chest@1,1_0': step 0: still seconds must be above 0 and a time the game can count (was -1.5)." },
         { WithChestEvent(_openChest with { Steps = [new StillStep("Still.png", 1e20, Caption: null)] }), "event 'chest@1,1_0': step 0: still seconds must be above 0 and a time the game can count (was 1E+20)." },
         { WithChestEvent(_openChest with { Steps = [new StillStep("Still.png", 4, " ")] }), "event 'chest@1,1_0': step 0: still caption must be null or have text." },
+        { WithChestEvent(_openChest with { Steps = [new VoiceStep(" ")] }), "event 'chest@1,1_0': step 0: voice must name its file." },
         { WithChestEvent(_openChest with { Steps = [new DialogueStep(new Speech(["Hi", null!]))] }), "event 'chest@1,1_0': a dialogue's lines hold a null entry." },
         { WithChestEvent(null!), "object 'chest@1,1': events holds a null entry." },
         { _forest with { CellEvents = [null!] }, "cellEvents holds a null entry." },

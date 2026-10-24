@@ -134,8 +134,7 @@ internal sealed class GameMenuScene : IScene
         CoverFit.DrawOverScreen(batch, textures.Get(ArtFolders.Backgrounds, UiArtFiles.Backgrounds.Menu), tint);
         batch.Draw(_ui.MenuScrim(textures), _screen, tint);
 
-        batch.Draw(textures.Pixel, new Rectangle(0, 0, VirtualScreen.Width, MenuHeader.Height), UiTheme.Bar * opacity);
-        batch.Draw(textures.Pixel, new Rectangle(0, MenuHeader.Height - 1, VirtualScreen.Width, 1), UiTheme.BarLine * opacity);
+        HeaderBar.Draw(batch, textures.Pixel, MenuHeader.Height, opacity);
         FooterBar.Draw(batch, textures.Pixel, FooterHeight, opacity);
     }
 

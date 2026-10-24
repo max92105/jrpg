@@ -11,6 +11,11 @@ internal static class FooterBar
     /// <param name="height">The bar's height in virtual pixels; each screen picks its own.</param>
     public static Rectangle Area(int height) => new(0, VirtualScreen.Height - height, VirtualScreen.Width, height);
 
+    /// <summary>Where a line of text sits so it is centered in the bar, for the hint.</summary>
+    /// <param name="height">The bar's height in virtual pixels.</param>
+    /// <param name="lineHeight">The hint font's line height.</param>
+    public static float TextTop(int height, float lineHeight) => VirtualScreen.Height - height + ((height - lineHeight) / 2f);
+
     /// <param name="batch">Already begun.</param>
     /// <param name="pixel">The plain white pixel.</param>
     /// <param name="height">The bar's height in virtual pixels.</param>

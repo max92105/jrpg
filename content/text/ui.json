@@ -12,7 +12,7 @@
   "title_quit": "Quit",
   "leader_choice_title": "Choose your leader",
   "leader_choice_confirm": "Begin as {name}?",
-  "leader_choice_row": "{name}, {class}",
+  "leader_choice_hint": "Choose who leads the journey.",
   "menu_title": "Menu",
   "menu_inventory": "Inventory",
   "menu_equipment": "Equipment",

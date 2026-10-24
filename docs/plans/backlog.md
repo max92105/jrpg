@@ -54,3 +54,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 ## From the new-game flow plan (2026-10-24)
 
 - The editor's map save (`ContentWriter.WriteMap`) doesn't check that the files a map's events name exist: still images (`ArtReferenceCheck`) and voice files (`AudioReferenceCheck`). The game's startup rejects both, so an editor save can write content the game won't start with (`editor.md`, "Validate on save").
+- The footer hint's vertical centering is written out in `GameMenuScene.DrawFooterHint`, `DefeatScreenView.DrawFooter` and `VictoryScreenView`. Move them onto `FooterBar.TextTop`, which the leader choice uses (S3a).

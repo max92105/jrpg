@@ -127,7 +127,6 @@ public sealed class LeaderChoiceSceneTests
         Select(scene, "jazog");
 
         Assert.Equal("Barbarian", scene.SelectedProfile.ClassName);
-        Assert.Equal("Jazog, Barbarian", scene.SelectedProfile.RowLabel);
     }
 
     [Fact]

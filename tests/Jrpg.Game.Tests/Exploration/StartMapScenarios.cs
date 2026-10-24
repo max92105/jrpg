@@ -49,6 +49,15 @@ internal static class StartMapScenarios
     public static ContentCatalog BelowTalkingChest { get; } =
         WithChestSaying(BelowChest, new DialogueStep(new Speech(["A voice from the chest.", "It falls silent."])));
 
+    /// <summary>
+    /// Below the chest, which now plays a short cutscene every time: two stills of 4 s with subtitles, then a line to read.
+    /// </summary>
+    public static ContentCatalog BelowChestShowingStills { get; } = WithChestSaying(
+        BelowChest,
+        new StillStep("Placeholder1.png", 4, "Long ago."),
+        new StillStep("Placeholder2.png", 4, "Far away."),
+        new DialogueStep(new Speech(["The chest falls silent."])));
+
     /// <summary>Just below the villager at (12, 4), whose interact event talks, facing it.</summary>
     public static ContentCatalog BelowVillager { get; } = StartingAt(new Point2D(12.5, 5.6), Facing.Up);
 
@@ -111,12 +120,12 @@ internal static class StartMapScenarios
     }
 
     // The chest's interact event, made repeatable, runs only this step, so the chest never swaps open.
-    private static ContentCatalog WithChestSaying(ContentCatalog catalog, EventStep step)
+    private static ContentCatalog WithChestSaying(ContentCatalog catalog, params EventStep[] steps)
     {
         var start = catalog.Maps["start"];
         var objects = start.Layout.Objects
             .Select(placed => placed.ObjectId == "chest"
-                ? placed with { Events = [placed.Events[0] with { IsOnce = false, Steps = [step] }] }
+                ? placed with { Events = [placed.Events[0] with { IsOnce = false, Steps = steps }] }
                 : placed)
             .ToList();
         var maps = new Dictionary<string, MapDefinition>(catalog.Maps)

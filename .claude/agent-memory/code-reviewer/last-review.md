@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-new-game-flow/slices/K2b.md, slice K2b (editor: arrive activation, leader condition, still step)
+Slice: docs/plans/2026-10-23-new-game-flow/slices/K2c.md, slice K2c (game shows a still step)
 Round: 1 (verdict: Ready to commit)
 
-- Suggestion: EventEditingViewModel.Choices() feeding PartyMembers into MemberIds has no test (wrong catalog key would fail nothing) (open)
-- Suggestion: Label_ArriveForOneLeader test builds a bare EventViewModel inside EventListViewModelTests with id "chest@1,1_0"; a plain id reads better (open)
-- Follow-up: MainWindow.EventEditing.cs:69 marks Arrive object events gold like Interact (Touch cyan, everything else gold) (open)
-- Follow-up: carried from K2a: SkipEventPresentation end-of-event test; huge still seconds overflow; ExplorationState.cs near 300 lines (open)
+- Warning: EventPresenter.ShowStill sets _still=null on ContinueEvent, so between two consecutive stills one frame draws the bare map (Draw sees no still); fix by starting the next still's playback in the same update or drawing black while CurrentEventStep is a StillStep (open)
+- Suggestion: StillPlayback.Still reads as `still.Still.ImageFile` at the call site; `Step` would read better (open)
+- Follow-up: StillPlayback.Opacity gives NaN for a Duration under 1 tick (validator allows Seconds > 0, e.g. 1e-9) (open)
+- Follow-up: carried from K2a/K2b: SkipEventPresentation end-of-event test; ExplorationState.cs near 300 lines; Arrive events gold in editor (open)

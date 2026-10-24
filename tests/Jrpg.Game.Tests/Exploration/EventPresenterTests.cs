@@ -36,6 +36,38 @@ public sealed class EventPresenterTests
     }
 
     [Fact]
+    public void Update_PastFirstStillsSeconds_ShowsTheSecond()
+    {
+        var (exploration, presenter) = StartStills();
+
+        presenter.Update(TimeSpan.FromSeconds(4), default);
+
+        Assert.Equal("Placeholder2.png", Assert.IsType<StillStep>(exploration.CurrentEventStep).ImageFile);
+        Assert.True(presenter.IsShowingStill);
+    }
+
+    [Fact]
+    public void Update_ConfirmDuringStill_SkipsToTheDialogue()
+    {
+        var (exploration, presenter) = StartStills();
+
+        presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+
+        Assert.IsType<DialogueStep>(exploration.CurrentEventStep);
+    }
+
+    [Fact]
+    public void Update_ConfirmRightAfterTheSkip_DoesNotEndTheDialogue()
+    {
+        var (exploration, presenter) = StartStills();
+        presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+
+        presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+
+        Assert.IsType<DialogueStep>(exploration.CurrentEventStep);
+    }
+
+    [Fact]
     public void Update_ConfirmOnFoundItem_ContinuesEvent()
     {
         var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowChest);
@@ -94,5 +126,15 @@ public sealed class EventPresenterTests
         presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
 
         Assert.IsType<GiveItemStep>(exploration.CurrentEventStep);
+    }
+
+    // The chest's cutscene started and its first still shown for one update.
+    private static (ExplorationState Exploration, EventPresenter Presenter) StartStills()
+    {
+        var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowChestShowingStills);
+        exploration.TryInteract();
+        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings());
+        presenter.Update(StartMapScenarios.OneUpdate, default);
+        return (exploration, presenter);
     }
 }

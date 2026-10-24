@@ -54,7 +54,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Hosting | Window, settings, file locations | `PlayerSettings`, `TextSpeed`, `GamePaths`, `FullScreenShortcut` |
 | Input | Keys and pads to game buttons, per update; the device in use and its button names | `InputReader`, `InputFrame`, `InputBindings`, `GameButton`, `InputDevice`, `ButtonLabels` |
 | Rendering | Textures, fonts, the virtual screen, baked map art | `TextureLibrary`, `FontLibrary`, `VirtualScreen`, `MapArt`, `TileAtlas` |
-| Exploration | The map scene: drawing (NPC objects from their field sprite), camera, walking, showing events, the interaction prompt | `ExplorationScene`, `EventPresenter`, `MapView`, `MapDrawList`, `MapCamera`, `FieldSpriteFrame`, `InteractionPromptView`, `PromptPlacement`, `PromptFade` |
+| Exploration | The map scene: drawing (NPC objects from their field sprite), camera, walking, showing events (cutscene stills included), the interaction prompt | `ExplorationScene`, `EventPresenter`, `StillPlayback`, `MapView`, `MapDrawList`, `MapCamera`, `FieldSpriteFrame`, `InteractionPromptView`, `PromptPlacement`, `PromptFade` |
 | Dialogue | The message box and typing | `DialogueBox`, `SpeechPlayback`, `Typewriter`, `FoundItemText` |
 | Title | The title screen | `TitleScene`, `TitleMenu` |
 | NewGame | The steps of a new game before the map: the leader choice | `LeaderChoiceScene`, `LeaderChoiceMenu` |

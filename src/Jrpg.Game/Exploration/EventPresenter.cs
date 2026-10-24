@@ -1,6 +1,8 @@
+using FontStashSharp;
 using Jrpg.Core.Dialogue;
 using Jrpg.Core.Events;
 using Jrpg.Core.Exploration;
+using Jrpg.Data.Art;
 using Jrpg.Game.Dialogue;
 using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
@@ -15,7 +17,8 @@ namespace Jrpg.Game.Exploration;
 /// <summary>
 /// Shows the running map event's current step and continues it once shown (ADR 0006): a warp fades to black, moves the
 /// player while the screen is black, and fades back in; a dialogue shows its lines one page per Confirm, and a found
-/// item its message as one page.
+/// item its message as one page. A cutscene still covers the screen for its seconds, and Confirm or Cancel skips the
+/// cutscene's stills (ADR 0016).
 /// </summary>
 internal sealed class EventPresenter
 {
@@ -23,12 +26,21 @@ internal sealed class EventPresenter
     private readonly PlayerSettings _settings;
     private readonly UiMessages _messages;
     private readonly DialogueBox _messageBox;
+    private readonly SpriteFontBase _captionFont;
+
+    // Subtitles at 32 px, their middle 120 px above the bottom (placeholder; K4 gives them a band).
+    private const int CaptionTextPixels = 32;
+    private const int CaptionMiddleAbove = 120;
 
     // The fade for warps (placeholder timing).
     private readonly ScreenFade _warpFade = new(TimeSpan.FromSeconds(0.25), TimeSpan.FromSeconds(0.08), TimeSpan.FromSeconds(0.25));
 
     // The pages of the step being read; null when no message is on screen.
     private SpeechPlayback? _reading;
+
+    // The still on screen and its subtitle, measured when it starts; null when no still shows.
+    private StillPlayback? _still;
+    private MeasuredText? _caption;
 
     /// <param name="exploration">The map events to show.</param>
     /// <param name="text">Messages and fonts for the message box.</param>
@@ -39,10 +51,14 @@ internal sealed class EventPresenter
         _settings = settings;
         _messages = text.Messages;
         _messageBox = new DialogueBox(text.Fonts);
+        _captionFont = text.Fonts.FontAt(CaptionTextPixels);
     }
 
     /// <summary>True while an event runs or its fade plays: the player can't walk, interact or open the menu.</summary>
     public bool IsBusy => _exploration.IsEventRunning || _warpFade.Phase != FadePhase.Idle;
+
+    /// <summary>Whether a cutscene still covers the screen.</summary>
+    internal bool IsShowingStill => _still is not null;
 
     /// <summary>How black to draw over the map, 0..1.</summary>
     public float Blackness => _warpFade.Blackness;
@@ -62,14 +78,22 @@ internal sealed class EventPresenter
             case DialogueStep or GiveItemStep:
                 ShowPages(step, delta, input);
                 break;
+            case StillStep still:
+                ShowStill(still, delta, input);
+                break;
             default:
                 throw new InvalidOperationException($"The game can't show a {step.GetType().Name} yet.");
         }
     }
 
-    /// <summary>Draws over the map: the message being read, then the fade over everything.</summary>
+    /// <summary>Draws over the map: a still, or the message being read, then the fade over everything.</summary>
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
+        if (_still is not null)
+        {
+            DrawStill(batch, textures, _still);
+        }
+
         if (_reading is not null)
         {
             _messageBox.Draw(batch, textures, _reading);
@@ -79,6 +103,58 @@ internal sealed class EventPresenter
         if (blackness > 0)
         {
             batch.Draw(textures.Pixel, new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height), Color.Black * blackness);
+        }
+    }
+
+    // Begun on the step's first update; Confirm or Cancel runs the event past its stills, so the press can't also turn the
+    // first page of a dialogue that follows.
+    private void ShowStill(StillStep still, TimeSpan delta, InputFrame input)
+    {
+        if (_still is null)
+        {
+            BeginStill(still);
+            return;
+        }
+
+        if (input.IsPressed(GameButton.Confirm) || input.IsPressed(GameButton.Cancel))
+        {
+            _still = null;
+            _exploration.SkipEventPresentation();
+            return;
+        }
+
+        _still.Update(delta);
+        if (!_still.IsOver)
+        {
+            return;
+        }
+
+        _still = null;
+        _exploration.ContinueEvent();
+
+        // The next still starts now, so this frame draws it rather than one frame of the bare map.
+        if (_exploration.CurrentEventStep is StillStep next)
+        {
+            BeginStill(next);
+        }
+    }
+
+    private void BeginStill(StillStep still)
+    {
+        _still = new StillPlayback(still);
+        _caption = still.Caption is { } caption ? MeasuredText.Of(_captionFont, caption) : null;
+    }
+
+    // Black under the still, so the map never shows through while it fades; the subtitle fades with it.
+    private void DrawStill(SpriteBatch batch, TextureLibrary textures, StillPlayback still)
+    {
+        var tint = Color.White * still.Opacity;
+        batch.Draw(textures.Pixel, new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height), Color.Black);
+        CoverFit.DrawOverScreen(batch, textures.Get(ArtFolders.Cinematics, still.Step.ImageFile), tint);
+        if (_caption is { } caption)
+        {
+            var position = new Vector2((VirtualScreen.Width - caption.Width) / 2, VirtualScreen.Height - CaptionMiddleAbove - (_captionFont.LineHeight / 2f));
+            batch.DrawString(_captionFont, caption.Text, position, UiTheme.TextPrimary * still.Opacity);
         }
     }
 

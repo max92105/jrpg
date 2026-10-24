@@ -1,5 +1,8 @@
 using Jrpg.Core.Events;
 using Jrpg.Core.Exploration;
+using Jrpg.Core.Randomness;
+using Jrpg.Core.Session;
+using Jrpg.Game.Audio;
 using Jrpg.Game.Exploration;
 using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
@@ -23,7 +26,7 @@ public sealed class EventPresenterTests
         }
 
         Assert.IsType<WarpStep>(exploration.CurrentEventStep);
-        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings());
+        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel());
         presenter.Update(StartMapScenarios.OneUpdate, default);
         presenter.Update(TimeSpan.FromSeconds(0.2), default);
         Assert.Equal("start", exploration.CurrentMap.Id);
@@ -73,7 +76,7 @@ public sealed class EventPresenterTests
         var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowChest);
         var chest = exploration.CurrentMap.Layout.Objects.Single(placed => placed.ObjectId == "chest");
         Assert.True(exploration.TryInteract());
-        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings());
+        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel());
         presenter.Update(StartMapScenarios.OneUpdate, default);
         Assert.IsType<GiveItemStep>(exploration.CurrentEventStep);
 
@@ -88,7 +91,7 @@ public sealed class EventPresenterTests
     {
         var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowTalkingChest);
         exploration.TryInteract();
-        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings());
+        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel());
         var typedOut = TimeSpan.FromSeconds(2);
         presenter.Update(StartMapScenarios.OneUpdate, default);
         presenter.Update(typedOut, default);
@@ -106,7 +109,7 @@ public sealed class EventPresenterTests
     {
         var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowTalkingChest);
         exploration.TryInteract();
-        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings { TextSpeed = TextSpeed.Instant });
+        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings { TextSpeed = TextSpeed.Instant }, new VoiceChannel());
         presenter.Update(StartMapScenarios.OneUpdate, default);
         presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
 
@@ -121,11 +124,57 @@ public sealed class EventPresenterTests
     {
         var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowChest);
         exploration.TryInteract();
-        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings());
+        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel());
 
         presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
 
         Assert.IsType<GiveItemStep>(exploration.CurrentEventStep);
+    }
+
+    [Fact]
+    public void Update_VoiceStepStarted_PlaysItsFile()
+    {
+        var (_, presenter, voice) = StartIntro();
+
+        presenter.Update(StartMapScenarios.OneUpdate, default);
+
+        Assert.Equal("Placeholder.wav", voice.VoiceFile);
+    }
+
+    [Fact]
+    public void Update_SkipDuringStills_StopsTheVoice()
+    {
+        var (_, presenter, voice) = StartIntro();
+        presenter.Update(StartMapScenarios.OneUpdate, default);
+
+        presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+
+        Assert.Null(voice.VoiceFile);
+    }
+
+    [Fact]
+    public void Update_EventEnded_StopsTheVoice()
+    {
+        var (exploration, presenter, voice) = StartIntro();
+        presenter.Update(StartMapScenarios.OneUpdate, default);
+        Assert.NotNull(voice.VoiceFile);
+
+        // Bounded: the stills' seconds, then the warp's fade, at the game's 60 updates a second.
+        for (var update = 0; update < 60 * 20 && exploration.IsEventRunning; update++)
+        {
+            presenter.Update(StartMapScenarios.OneUpdate, default);
+        }
+
+        Assert.False(exploration.IsEventRunning);
+        Assert.Null(voice.VoiceFile);
+    }
+
+    // A new game on the repository's content: Ragnir's intro opens with the voice, then three stills, then a warp.
+    private static (ExplorationState Exploration, EventPresenter Presenter, VoiceChannel Voice) StartIntro()
+    {
+        var exploration = GameSession.StartNew(StartMapScenarios.RepositoryContent, "ragnir", new SeededRandom(1)).Exploration;
+        var voice = new VoiceChannel();
+        return (exploration, new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), voice), voice);
     }
 
     // The chest's cutscene started and its first still shown for one update.
@@ -133,7 +182,7 @@ public sealed class EventPresenterTests
     {
         var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowChestShowingStills);
         exploration.TryInteract();
-        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings());
+        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel());
         presenter.Update(StartMapScenarios.OneUpdate, default);
         return (exploration, presenter);
     }

@@ -52,7 +52,8 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | (root) | Startup and the host loop | `Program`, `JrpgGame` |
 | Flow | The screens and the playthrough; applies scene requests | `GameFlow`, `FadeGate`, `SceneFactory`, `SessionTransitions`, `MenuTransitions`, `BattleTransitions` |
 | Scenes | The scene contract, the stack, requests, the screen fade | `IScene`, `SceneStack`, `SceneRequest` (+ records, `BattleRequested`, `BattleFinished`, `LeaderChosen`), `ScreenFade` |
-| Hosting | Window, settings, file locations | `PlayerSettings`, `TextSpeed`, `GamePaths`, `FullScreenShortcut` |
+| Hosting | Window, settings, file locations | `PlayerSettings`, `TextSpeed`, `GamePaths`, `FullScreenShortcut`, `DeveloperLog` (the console and debug output) |
+| Audio | The voice-over path (ADR 0018): scenes write the channel, the host plays it after each update; no device means silent | `VoiceChannel`, `SoundLibrary`, `VoicePlayer` |
 | Input | Keys and pads to game buttons, per update; the device in use and its button names | `InputReader`, `InputFrame`, `InputBindings`, `GameButton`, `InputDevice`, `ButtonLabels` |
 | Rendering | Textures, fonts, the virtual screen, baked map art | `TextureLibrary`, `FontLibrary`, `VirtualScreen`, `MapArt`, `TileAtlas` |
 | Exploration | The map scene: drawing (NPC objects from their field sprite), camera, walking, showing events (cutscene stills included), the interaction prompt | `ExplorationScene`, `EventPresenter`, `StillPlayback`, `MapView`, `MapDrawList`, `MapCamera`, `FieldSpriteFrame`, `InteractionPromptView`, `PromptPlacement`, `PromptFade` |

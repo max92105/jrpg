@@ -1,5 +1,6 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Session;
+using Jrpg.Game.Audio;
 using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
@@ -38,8 +39,12 @@ internal sealed class GameFlow : IScene
         _sessions = new SessionTransitions(catalog, _scenes, factory);
         _menus = new MenuTransitions(_scenes, factory);
         _battles = new BattleTransitions(_scenes, factory);
+        Voice = factory.Voice;
         _scenes.Push(factory.CreateTitle());
     }
+
+    /// <summary>The voice-over the game wants heard, for the host to play after each update.</summary>
+    public VoiceChannel Voice { get; }
 
     /// <summary>The playthrough, once one has started; null on the title until a game starts.</summary>
     public GameSession? Session { get; private set; }

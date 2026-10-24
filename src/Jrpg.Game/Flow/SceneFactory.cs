@@ -1,6 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Session;
+using Jrpg.Game.Audio;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Exploration;
 using Jrpg.Game.Hosting;
@@ -25,6 +26,9 @@ internal sealed class SceneFactory
     private readonly ScreenText _text;
     private readonly MapArt _art;
     private readonly UiTextures _ui = new();
+
+    /// <summary>The one voice-over channel: map events write it, the host plays it (ADR 0018).</summary>
+    public VoiceChannel Voice { get; } = new();
 
     /// <param name="catalog">The content, as loaded.</param>
     /// <param name="text">Messages and fonts for everything a scene writes.</param>
@@ -54,7 +58,7 @@ internal sealed class SceneFactory
         new(
             exploration,
             _art,
-            new EventPresenter(exploration, _text, _settings),
+            new EventPresenter(exploration, _text, _settings, Voice),
             new InteractionPromptView(_text, exploration.CurrentDefinitionOf));
 
     private MenuFrame CreateMenuFrame(GameSession session)

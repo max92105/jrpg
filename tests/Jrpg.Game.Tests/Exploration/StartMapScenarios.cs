@@ -8,6 +8,7 @@ using Jrpg.Core.Party;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Data.Content;
+using Jrpg.Game.Audio;
 using Jrpg.Game.Exploration;
 using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
@@ -21,7 +22,8 @@ namespace Jrpg.Game.Tests.Exploration;
 internal static class StartMapScenarios
 {
     // Declared first: the catalogs below are built from it, in declaration order.
-    private static readonly ContentCatalog _repositoryContent =
+    /// <summary>The repository's content, as loaded.</summary>
+    public static ContentCatalog RepositoryContent { get; } =
         ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
     /// <summary>
@@ -94,7 +96,7 @@ internal static class StartMapScenarios
         new(
             exploration,
             new MapArt(catalog, MapView.CellPixels),
-            new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings()),
+            new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel()),
             new InteractionPromptView(RepositoryScreenText.Text, exploration.CurrentDefinitionOf));
 
     /// <summary>Holds Left from <see cref="NextToForestWarpAlwaysRolling"/>, through the warp, until a step requests a battle.</summary>
@@ -112,9 +114,9 @@ internal static class StartMapScenarios
         return false;
     }
 
-    private static ContentCatalog StartingAt(Point2D position, Facing facing) => _repositoryContent with
+    private static ContentCatalog StartingAt(Point2D position, Facing facing) => RepositoryContent with
     {
-        NewGame = _repositoryContent.NewGame with { StartLocation = new MapLocation("start", position, facing) },
+        NewGame = RepositoryContent.NewGame with { StartLocation = new MapLocation("start", position, facing) },
     };
 
     private static ContentCatalog WithForestAlwaysRolling(ContentCatalog catalog)

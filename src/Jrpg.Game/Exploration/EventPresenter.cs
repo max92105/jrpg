@@ -3,6 +3,7 @@ using Jrpg.Core.Dialogue;
 using Jrpg.Core.Events;
 using Jrpg.Core.Exploration;
 using Jrpg.Data.Art;
+using Jrpg.Game.Audio;
 using Jrpg.Game.Dialogue;
 using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
@@ -18,7 +19,8 @@ namespace Jrpg.Game.Exploration;
 /// Shows the running map event's current step and continues it once shown (ADR 0006): a warp fades to black, moves the
 /// player while the screen is black, and fades back in; a dialogue shows its lines one page per Confirm, and a found
 /// item its message as one page. A cutscene still covers the screen for its seconds, and Confirm or Cancel skips the
-/// cutscene's stills (ADR 0016).
+/// cutscene's stills (ADR 0016). The event's voice-over plays through the voice channel until the event ends or is
+/// skipped (ADR 0018).
 /// </summary>
 internal sealed class EventPresenter
 {
@@ -27,6 +29,7 @@ internal sealed class EventPresenter
     private readonly UiMessages _messages;
     private readonly DialogueBox _messageBox;
     private readonly SpriteFontBase _captionFont;
+    private readonly VoiceChannel _voice;
 
     // Subtitles at 32 px, their middle 120 px above the bottom (placeholder; K4 gives them a band).
     private const int CaptionTextPixels = 32;
@@ -45,13 +48,15 @@ internal sealed class EventPresenter
     /// <param name="exploration">The map events to show.</param>
     /// <param name="text">Messages and fonts for the message box.</param>
     /// <param name="settings">Read when a dialogue starts, so a text speed changed in the menu applies to the next one.</param>
-    public EventPresenter(ExplorationState exploration, ScreenText text, PlayerSettings settings)
+    /// <param name="voice">Where the running event's voice-over is asked for.</param>
+    public EventPresenter(ExplorationState exploration, ScreenText text, PlayerSettings settings, VoiceChannel voice)
     {
         _exploration = exploration;
         _settings = settings;
         _messages = text.Messages;
         _messageBox = new DialogueBox(text.Fonts);
         _captionFont = text.Fonts.FontAt(CaptionTextPixels);
+        _voice = voice;
     }
 
     /// <summary>True while an event runs or its fade plays: the player can't walk, interact or open the menu.</summary>
@@ -84,6 +89,8 @@ internal sealed class EventPresenter
             default:
                 throw new InvalidOperationException($"The game can't show a {step.GetType().Name} yet.");
         }
+
+        FollowStartedVoice();
     }
 
     /// <summary>Draws over the map: a still, or the message being read, then the fade over everything.</summary>
@@ -167,6 +174,19 @@ internal sealed class EventPresenter
         else if (_warpFade.Phase == FadePhase.Holding)
         {
             _exploration.ContinueEvent();
+        }
+    }
+
+    // After the step: a skip or the event's end this update silences the voice at once.
+    private void FollowStartedVoice()
+    {
+        if (_exploration.StartedVoice is { } voice)
+        {
+            _voice.Play(voice.File);
+        }
+        else
+        {
+            _voice.Stop();
         }
     }
 

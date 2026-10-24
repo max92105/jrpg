@@ -1,8 +1,12 @@
+using Jrpg.Data.Art;
+using Jrpg.Data.Audio;
+using Jrpg.Game.Audio;
 using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Scenes;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
@@ -22,6 +26,8 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
 
     private readonly IScene _rootScene;
     private readonly string _artRoot;
+    private readonly string _audioRoot;
+    private readonly VoiceChannel _voice;
     private readonly PlayerSettings _settings;
     private readonly GraphicsDeviceManager _graphics;
     private readonly InputReader _input = new();
@@ -31,13 +37,20 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     private RenderTarget2D? _virtualScreen;
     private TextureLibrary? _textures;
 
+    // Null when the machine has no sound device: the game then runs silent (ADR 0018).
+    private SoundLibrary? _sounds;
+    private VoicePlayer? _voicePlayer;
+
     /// <param name="rootScene">The game flow, or the screen explaining why the game can't start.</param>
-    /// <param name="artRoot">Where <see cref="TextureLibrary"/> reads images from.</param>
+    /// <param name="contentRoot">The content folder, holding the art and audio folders.</param>
     /// <param name="settings">The player's options; the window follows <see cref="PlayerSettings.IsFullScreen"/>.</param>
-    public JrpgGame(IScene rootScene, string artRoot, PlayerSettings settings)
+    /// <param name="voice">The voice-over the root scene asks for; played after each of its updates.</param>
+    public JrpgGame(IScene rootScene, string contentRoot, PlayerSettings settings, VoiceChannel voice)
     {
         _rootScene = rootScene;
-        _artRoot = artRoot;
+        _artRoot = ArtFolders.RootIn(contentRoot);
+        _audioRoot = AudioFolders.RootIn(contentRoot);
+        _voice = voice;
         _settings = settings;
 
         // Borderless full screen (no hardware mode switch) keeps the desktop resolution, so Alt+Tab and the debugger stay quick.
@@ -59,6 +72,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
         _batch = new SpriteBatch(GraphicsDevice);
         _virtualScreen = new RenderTarget2D(GraphicsDevice, VirtualScreen.Width, VirtualScreen.Height);
         _textures = new TextureLibrary(GraphicsDevice, _artRoot);
+        StartAudio();
     }
 
     protected override void Update(GameTime gameTime)
@@ -84,6 +98,8 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
         {
             Exit();
         }
+
+        _voicePlayer?.Follow(_voice);
 
         base.Update(gameTime);
     }
@@ -112,6 +128,8 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
             _batch?.Dispose();
             _virtualScreen?.Dispose();
             _textures?.Dispose();
+            _voicePlayer?.Dispose();
+            _sounds?.Dispose();
         }
 
         base.Dispose(disposing);
@@ -121,6 +139,24 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     {
         var mode = GraphicsAdapter.DefaultAdapter.CurrentDisplayMode;
         return new Point(mode.Width, mode.Height);
+    }
+
+    // The audio system is touched once here, so a missing device shows at startup rather than mid-intro.
+    private void StartAudio()
+    {
+        try
+        {
+            // Building a sound is what opens the device (setting the master volume doesn't); one silent sample will do.
+            using var probe = new SoundEffect(new byte[2], 22050, AudioChannels.Mono);
+        }
+        catch (NoAudioHardwareException exception)
+        {
+            DeveloperLog.Report($"No sound device: {exception.Message} The game plays on silently.");
+            return;
+        }
+
+        _sounds = new SoundLibrary(_audioRoot);
+        _voicePlayer = new VoicePlayer(_sounds);
     }
 
     private Point BackBufferSize() => _settings.IsFullScreen ? ReadDisplaySize() : _windowSize;

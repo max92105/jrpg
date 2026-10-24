@@ -42,3 +42,8 @@ Part of [the new-game flow plan](../README.md). Design: [design.md](../design.md
     - Choosing again after returning to the title plays it again from the start.
     - **With the sound device disabled in Windows:** first note which exception arrives (then catch exactly that one). After the fix, the game starts, the intro plays silently, and the console says once that there's no audio.
     - Replacing `Placeholder.wav` with a non-WAV file: the console names it once, and the intro plays silent.
+- **Done, with deviations:**
+  - The no-device case catches `NoAudioHardwareException`, MonoGame's exception for it, from a silent `SoundEffect` built in `LoadContent`. The review found that setting `MasterVolume` never opens the device. The hand check with the device disabled should confirm the exception.
+  - A voice that won't load catches `ArgumentException`, `InvalidOperationException`, `NotSupportedException`, `IOException` and `UnauthorizedAccessException`. Its hand check should narrow that to what `SoundEffect.FromFile` really throws for a non-WAV file.
+  - `Program`'s reporting moved to `Hosting/DeveloperLog`, now shared with the audio code. `JrpgGame` takes the content root and derives the art and audio roots.
+  - The event-end test steps at 1/60 s: with half-second updates, the warp fade jumps past its black moment and never moves the player. The game always steps at 1/60 s (fixed timestep), so play isn't affected. Tests: 1763 before, 1769 after.

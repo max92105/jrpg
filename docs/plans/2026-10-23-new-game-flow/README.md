@@ -114,7 +114,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **ADR 0018: Audio files and playback** (accepted: option A) → [slices/ADR-0018.md](slices/ADR-0018.md)
 - [x] **A1a1. The voice step: an event starts a voice file, checked at startup; one generated placeholder voice** (Core + Data + Game startup + content, about 280 lines; split from A1a) → [slices/A1a1.md](slices/A1a1.md)
 - [x] **A1a2. The editor authors the voice step; every intro starts with the placeholder voice** (Editor + content, about 60 lines; split from A1a) → [slices/A1a2.md](slices/A1a2.md)
-- [ ] **A1b. The intro speaks; with no sound device the game plays on silently** (Game, about 220 lines) → [slices/A1b.md](slices/A1b.md)
+- [x] **A1b. The intro speaks; with no sound device the game plays on silently** (Game, about 220 lines) → [slices/A1b.md](slices/A1b.md)
 - [ ] **Z1. Run-through: the full new-game flow** (manual) → [slices/Z1.md](slices/Z1.md)
 
 ### Phase 6: the look

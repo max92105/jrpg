@@ -152,6 +152,18 @@ public sealed class GameFlowTests : IDisposable
     }
 
     [Fact]
+    public void Update_IntroSkipped_VoiceStops()
+    {
+        var flow = StartedFlow(catalog: _catalog);
+        flow.Update(_oneUpdate, default);
+        Assert.Equal("Placeholder.wav", flow.Voice.VoiceFile);
+
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+
+        Assert.Null(flow.Voice.VoiceFile);
+    }
+
+    [Fact]
     public void Update_TwoDeltasAfterStart_AddsBothToPlayTime()
     {
         var flow = StartedFlow();

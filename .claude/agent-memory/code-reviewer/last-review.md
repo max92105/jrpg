@@ -5,8 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-new-game-flow/slices/S3a.md, slice S3a (choice screen look: list on the left, header and footer bars)
+Slice: docs/plans/2026-10-23-new-game-flow/slices/S3b.md, slice S3b (choice screen information area: portrait, texts, stats, fade)
 Round: 1 (verdict: Ready to commit)
 
-- Warning: LeaderChoiceScene.DrawFrame:176-177 is the 4th copy of "center a line in FooterBar.Area" (GameMenuScene, DefeatScreenView, VictoryScreenView); add FooterBar.TextTop(height, lineHeight) and use it here — open
-- Follow-up: move the three older footer-hint copies onto FooterBar.TextTop — open
+- Warning: LeaderChoiceScene.ShowSelectedProfile (Show on selection change) has no test; scene tests read SelectedProfile from the menu, not what the view draws. Add an internal ShownIndex on the view (or scene) and a test Update_Down_ShowsTheNextProfile — open
+- Suggestion: LeaderProfileView.Update/Draw lack the one-line doc comments its Show has — open
+- Follow-up: S3a's FooterBar.TextTop finding (4 copies of footer centering) — still open from S3a

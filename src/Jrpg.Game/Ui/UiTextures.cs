@@ -169,6 +169,13 @@ internal sealed class UiTextures
     public Texture2D Battler(TextureLibrary textures, string spriteFile, int size) =>
         ShrunkOnce(textures, ArtFolders.Battlers, spriteFile, size);
 
+    /// <summary>A painted portrait resized smoothly (<see cref="SquareShrink"/>), once per file and size.</summary>
+    /// <param name="textures">Where the portrait is read and the resized one made.</param>
+    /// <param name="portraitFile">In the portraits folder.</param>
+    /// <param name="size">The drawn square's side in pixels.</param>
+    public Texture2D Portrait(TextureLibrary textures, string portraitFile, int size) =>
+        ShrunkOnce(textures, ArtFolders.Portraits, portraitFile, size);
+
     /// <summary>
     /// A gradient as one row, stretched over whatever shows it, made once per gradient. The theme's gradients are
     /// single instances, so they work as keys.

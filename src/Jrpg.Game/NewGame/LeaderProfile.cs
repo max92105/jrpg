@@ -8,7 +8,7 @@ namespace Jrpg.Game.NewGame;
 /// What the choice shows of one character: who they are, with the stats they start with (decisions 158, 168). Built
 /// once when the screen opens, so moving the cursor allocates nothing.
 /// </summary>
-internal sealed record LeaderProfile(string Name, string ClassName, string ClassDescription, string Summary, IReadOnlyList<LeaderStatLine> Stats)
+internal sealed record LeaderProfile(string Name, string PortraitFile, string ClassName, string ClassDescription, string Summary, IReadOnlyList<LeaderStatLine> Stats)
 {
     /// <param name="choice">A leader choice, naming a member of <paramref name="catalog"/>.</param>
     /// <param name="catalog">The member and their class.</param>
@@ -23,11 +23,11 @@ internal sealed record LeaderProfile(string Name, string ClassName, string Class
         LeaderStatLine[] stats =
         [
             new(messages.Text(MessageIds.StatusLevel), NumberText.Of(1)),
-            new(messages.Text(MessageIds.StatMaxHp), NumberText.Of(atLevelOne.MaxHp)),
-            new(messages.Text(MessageIds.StatMaxMp), NumberText.Of(atLevelOne.MaxMp)),
+            new(messages.Text(MessageIds.StatHp), NumberText.Of(atLevelOne.MaxHp)),
+            new(messages.Text(MessageIds.StatMp), NumberText.Of(atLevelOne.MaxMp)),
             new(messages.Text(MessageIds.StatAttack), NumberText.Of(atLevelOne.Attack)),
             new(messages.Text(MessageIds.StatDefense), NumberText.Of(atLevelOne.Defense)),
         ];
-        return new LeaderProfile(member.Name, characterClass.Name, characterClass.Description, member.Summary, stats);
+        return new LeaderProfile(member.Name, member.PortraitFile, characterClass.Name, characterClass.Description, member.Summary, stats);
     }
 }

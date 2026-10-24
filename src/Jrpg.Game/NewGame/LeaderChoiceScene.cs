@@ -1,5 +1,4 @@
 using FontStashSharp;
-using FontStashSharp.RichText;
 using Jrpg.Core.Content;
 using Jrpg.Data.Art;
 using Jrpg.Game.Input;
@@ -32,19 +31,6 @@ internal sealed class LeaderChoiceScene : IScene
     private const int NamePixels = 34;
     private const int ClassPixels = 20;
 
-    // The highlighted character's information fills the right: the class, its description, the summary, then the
-    // stats. Plain until S3b.
-    private const int InfoLeft = 760;
-    private const int InfoWidth = 1040;
-    private const int ClassTop = 140;
-    private const int DescriptionTop = 210;
-    private const int SummaryTop = 390;
-    private const int StatsTop = 620;
-    private const int StatPitch = 52;
-    private const int StatValueLeft = InfoLeft + 260;
-    private const int InfoHeadingPixels = 40;
-    private const int BodyPixels = 30;
-
     private static readonly Rectangle _screen = new(0, 0, VirtualScreen.Width, VirtualScreen.Height);
 
     private readonly LeaderChoiceMenu _menu;
@@ -52,17 +38,15 @@ internal sealed class LeaderChoiceScene : IScene
     private readonly UiTextures _ui;
     private readonly ConfirmPromptView _promptView;
     private readonly SpriteFontBase _headingFont;
-    private readonly SpriteFontBase _infoHeadingFont;
     private readonly SpriteFontBase _nameFont;
     private readonly SpriteFontBase _classFont;
-    private readonly SpriteFontBase _bodyFont;
     private readonly SpriteFontBase _hintFont;
     private readonly string _heading;
     private readonly string _hint;
     private readonly LeaderProfile[] _profiles;
     private readonly LeaderRow[] _rows;
-    private readonly RichTextLayout[] _descriptions;
-    private readonly RichTextLayout[] _summaries;
+    private readonly LeaderProfileView _profileView;
+    private int _shownIndex;
     private ConfirmPrompt? _asking;
     private bool _hasAnswered;
 
@@ -76,17 +60,14 @@ internal sealed class LeaderChoiceScene : IScene
         _ui = ui;
         _promptView = new ConfirmPromptView(text, ui);
         _headingFont = text.Fonts.FontAt(HeadingPixels);
-        _infoHeadingFont = text.Fonts.FontAt(InfoHeadingPixels);
         _nameFont = text.Fonts.FontAt(NamePixels);
         _classFont = text.Fonts.FontAt(ClassPixels);
-        _bodyFont = text.Fonts.FontAt(BodyPixels);
         _hintFont = text.Fonts.FontAt(UiTheme.MenuTextPixels);
         _heading = text.Messages.Text(MessageIds.LeaderChoiceTitle);
         _hint = text.Messages.Text(MessageIds.LeaderChoiceHint);
         _profiles = [.. _menu.Choices.Select(choice => LeaderProfile.Of(choice, catalog, text.Messages))];
         _rows = [.. _profiles.Select(RowOf)];
-        _descriptions = [.. _profiles.Select(profile => WrappedText(profile.ClassDescription, _bodyFont))];
-        _summaries = [.. _profiles.Select(profile => WrappedText(profile.Summary, _bodyFont))];
+        _profileView = new LeaderProfileView(text, ui, _profiles);
     }
 
     /// <summary>The choice the cursor is on, so tests can pick a character by who they are.</summary>
@@ -95,12 +76,16 @@ internal sealed class LeaderChoiceScene : IScene
     /// <summary>What the information area shows of the highlighted character.</summary>
     internal LeaderProfile SelectedProfile => _profiles[_menu.SelectedIndex];
 
+    /// <summary>What the information area draws: the character it shows, and how far it has faded in.</summary>
+    internal (int Index, float Opacity) ShownProfile => (_profileView.ShownIndex, _profileView.Opacity);
+
     /// <summary>Whether "Begin as X?" is open.</summary>
     internal bool IsAsking => _asking is not null;
 
     /// <returns>The chosen leader or the way back to the title, each once; then nothing.</returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
+        _profileView.Update(delta);
         if (_hasAnswered)
         {
             return null;
@@ -123,6 +108,8 @@ internal sealed class LeaderChoiceScene : IScene
             _asking = new ConfirmPrompt(_messages.Format(MessageIds.LeaderChoiceConfirm, name));
         }
 
+        ShowSelectedProfile();
+
         return null;
     }
 
@@ -134,22 +121,13 @@ internal sealed class LeaderChoiceScene : IScene
             DrawRow(batch, textures, _rows[index], index == _menu.SelectedIndex);
         }
 
-        DrawSelectedProfile(batch);
+        _profileView.Draw(batch, textures);
 
         if (_asking is not null)
         {
             _promptView.Draw(batch, textures, _asking, opacity: 1);
         }
     }
-
-    private static RichTextLayout WrappedText(string text, SpriteFontBase font) => new()
-    {
-        // Off, so a bracket or a slash in content text is never read as a FontStashSharp formatting command.
-        SupportsCommands = false,
-        Font = font,
-        Width = InfoWidth,
-        Text = text,
-    };
 
     // The name and the class under it, centered together in the row.
     private LeaderRow RowOf(LeaderProfile profile, int index)
@@ -189,18 +167,12 @@ internal sealed class LeaderChoiceScene : IScene
         _classFont.DrawText(batch, row.ClassCaps, row.ClassAt, UiTheme.TextSecondary, characterSpacing: UiTheme.SpeakerLetterSpacing);
     }
 
-    private void DrawSelectedProfile(SpriteBatch batch)
+    private void ShowSelectedProfile()
     {
-        var index = _menu.SelectedIndex;
-        var profile = _profiles[index];
-        batch.DrawString(_infoHeadingFont, profile.ClassName, new Vector2(InfoLeft, ClassTop), UiTheme.TextPrimary);
-        _descriptions[index].Draw(batch, new Vector2(InfoLeft, DescriptionTop), UiTheme.TextSecondary);
-        _summaries[index].Draw(batch, new Vector2(InfoLeft, SummaryTop), UiTheme.TextPrimary);
-        for (var line = 0; line < profile.Stats.Count; line++)
+        if (_menu.SelectedIndex != _shownIndex)
         {
-            var top = StatsTop + (line * StatPitch);
-            batch.DrawString(_bodyFont, profile.Stats[line].Label, new Vector2(InfoLeft, top), UiTheme.TextSecondary);
-            batch.DrawString(_bodyFont, profile.Stats[line].Value, new Vector2(StatValueLeft, top), UiTheme.TextPrimary);
+            _shownIndex = _menu.SelectedIndex;
+            _profileView.Show(_shownIndex);
         }
     }
 

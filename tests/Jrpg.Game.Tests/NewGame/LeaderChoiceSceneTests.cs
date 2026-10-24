@@ -141,6 +141,16 @@ public sealed class LeaderChoiceSceneTests
         Assert.Equal(expected, scene.SelectedProfile.Stats.Select(line => line.Value));
     }
 
+    [Fact]
+    public void Update_Down_ShowsTheNextProfileFadingIn()
+    {
+        var scene = NewScene();
+
+        scene.Update(_oneUpdate, Pressing(GameButton.Down));
+
+        Assert.Equal((1, 0f), scene.ShownProfile);
+    }
+
     private static LeaderChoiceScene NewScene() => new(RepositoryScreenText.Text, new UiTextures(), _catalog);
 
     // No starts selected, so a stray Confirm changes nothing: Left moves to Yes.

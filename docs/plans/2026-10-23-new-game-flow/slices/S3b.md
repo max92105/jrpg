@@ -30,3 +30,8 @@ Look at `docs/ui_ux_exemples/Menu6.webp` first: large art on the right, a name o
     - Text never runs under the portrait.
     - Moving fast leaves no flicker.
     - Lots of empty space, with the art showing through.
+- **Done, with deviations:**
+  - The portrait's left 300 px fade in over 30 thin strips of rising opacity, drawn from the one smoothly resized texture (`UiTextures.Portrait`), so no second texture is baked.
+  - The class heading draws its caps over the section line texture: `SectionTitle` takes a fixed message, and the class is per character. The info area runs from x 540 to 1160, and the portrait from 1200.
+  - The stat labels are now the Status page's (Level, HP, MP, Attack, Defense) rather than S2's "Max HP" and "Max MP". `LeaderProfile` gains `PortraitFile`.
+  - No screenshots (privacy rule): the look is the developer's hand check. The review asked for a test that moving the cursor shows the next character: `ShownProfile` (index and fade) is now read by `Update_Down_ShowsTheNextProfileFadingIn`. Tests: 1770 before, 1773 after.

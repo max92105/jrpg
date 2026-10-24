@@ -1,10 +1,10 @@
 # A1b. The intro speaks
 
-Part of [the new-game flow plan](../README.md). Design: [design.md](../design.md), "The voice-over path" and "Risks" (audio hardware, constructor limits). ADR 0018.
+Part of [the new-game flow plan](../README.md). Design: [design.md](../design.md), "The intro as a map cutscene" and "Risks" (audio hardware, constructor limits). ADR 0018.
 
 - **A1b. The intro speaks; with no sound device the game plays on silently** (Game, about 220 lines; decision 159)
   - **Goal:**
-    - The intro's voice starts with the intro and stops when it ends or is skipped.
+    - A voice step's file plays from the step on, and stops when its event ends or is skipped.
     - With no audio device, the game says so once in the console and the debug output, and plays on silently.
     - A voice file that fails to load is reported once, by name, and its intro plays silent.
   - **New types (Game):**
@@ -20,10 +20,8 @@ Part of [the new-game flow plan](../README.md). Design: [design.md](../design.md
       - `Follow(VoiceChannel voice)`: when the channel's file differs from the one last started (null included), it stops the current `SoundEffectInstance` and starts the new file.
       - `IDisposable`.
   - **Changes:**
-    - `Flow/SceneFactory` creates the one `VoiceChannel`, exposes it as `Voice` and passes it to `CinematicScene`. `Flow/GameFlow.Voice` returns it.
-    - `Cinematics/CinematicScene(CinematicDefinition cinematic, ScreenText text, VoiceChannel voice)`:
-      - `Play` on its first update;
-      - `Stop` when it ends or is skipped, before returning `CinematicFinished`.
+    - `Flow/SceneFactory` creates the one `VoiceChannel`, exposes it as `Voice`, and passes it to the exploration scene's `EventPresenter`. `Flow/GameFlow.Voice` returns it.
+    - `Exploration/EventPresenter`: follows `ExplorationState.StartedVoice`, playing the channel when it is set and stopping it when it clears (the event ended or was skipped).
     - `JrpgGame(IScene rootScene, string contentRoot, PlayerSettings settings, VoiceChannel voice)`:
       - derives the art and audio roots;
       - in `LoadContent`, touches the audio system once (for example `SoundEffect.MasterVolume`), so a missing device shows at startup;
@@ -33,10 +31,10 @@ Part of [the new-game flow plan](../README.md). Design: [design.md](../design.md
     - `Program.FirstScene` returns the root scene with its channel (a fresh, silent one for the error screen) and computes `artRoot` inside.
   - **Tests:**
     - `VoiceChannelTests.Stop_AfterPlay_ClearsVoiceFile`
-    - `CinematicSceneTests`:
-      - `Update_First_PlaysTheCinematicsVoice`
-      - `Update_Skip_StopsTheVoice`
-      - `Update_PastAllShots_StopsTheVoice`
+    - `EventPresenterTests`:
+      - `Update_VoiceStepStarted_PlaysItsFile`
+      - `Update_SkipDuringStills_StopsTheVoice`
+      - `Update_EventEnded_StopsTheVoice`
     - `GameFlowTests.Update_IntroSkipped_VoiceStops`, through `flow.Voice`.
     - `SoundLibrary`, `VoicePlayer` and the device handling need hardware: hand checks.
   - **Verify by hand:**

@@ -2,8 +2,8 @@
 Status: approved
 
 First feature plan after the migration and the code-health plan.
-- Decisions 156-178 are recorded below.
-- Questions 179-184 are open; the next free number is 185.
+- Decisions 156-178 and 185 are recorded below.
+- Questions 179-184 are open; the next free number is 186.
 - This plan writes ADRs 0016-0018; the next ADR is 0019.
 
 Developer's request (2026-10-23, verbatim, typos kept): "OK let<s plan real new feature now and real game flow. update main menu i dont, want to see invalid option. not grayed jsut not there. continue should be the default selected when available else its new game. then new game now should move to character selection. there will be no customisation just a choice between. Ragnir - Warrior, Omer - Mage, Zanyr - Cleric, Lazarus - Rogue, Jazog - Barbarian, Kamelia - Paladin, Zarruk - Monk, Sarxian - Warlock. the selected character will be the leader 'main character' when hovering one i want be able to display information about the class and the summary of the character. When selecting we gon into a cinemtic that will show why this character is entengle in the story essentially it will be a voice over some still image that will appear and disappear. i have no budget and i have no other idea on how to make it for now. so lets start with that. i will need placeholder for now to test behavior and i will place in the repo the more official art and audio later. right now i just want this to work and run so i can test a full new game flow."
@@ -31,9 +31,9 @@ At the end of this plan, a new game plays from the title to the map like this:
 
 ## Order, and why
 1. **Title (T1, T2).** Independent and small; the first thing every run shows.
-2. **The flow, end to end and silent (L1, S1, S1b, ADR 0016, K1, K2).**
-   - The leader in Core, then the choice screen and its confirmation, then the intro.
-   - After K2, title → choice → intro → map runs with today's characters. This is the developer's "just make it run".
+2. **The flow, end to end and silent (L1, S1, S1b, ADR 0016, K1, K2a, K2b, K2c, K3).**
+   - The leader in Core, then the choice screen and its confirmation, then the intro as a map cutscene (ADR 0016): an event that runs on arrival, the still step, the editor's support for both, the Game showing stills, and the intro map.
+   - After K3, title → choice → intro → map runs with today's characters. This is the developer's "just make it run".
 3. **Classes and characters (ADR 0017, C1a, C1b, C1c, C2, S2).**
    - The nine classes, then stats from the class, then growth on level-up.
    - Then the nine characters, then the choice screen showing what they are.
@@ -41,7 +41,7 @@ At the end of this plan, a new game plays from the title to the map like this:
    - A map event can recruit a member (Core, Data and the game), then the editor can author it.
    - Then placeholder recruit points on the start map.
 5. **The voice (ADR 0018, A1a, A1b), then a run-through (Z1).** Audio comes after the silent intro, so the intro can be tested without sound. Z1 is the developer's first full check.
-6. **The look (S3a, S3b, K3), then the final check (Z).** Behavior first, then the look, per the code-health plan's rule.
+6. **The look (S3a, S3b, K4), then the final check (Z).** Behavior first, then the look, per the code-health plan's rule.
 
 ## Guiding rules
 - **Systems, not design.** Every value the developer hasn't given is a placeholder in content (design.md, "Tunables and placeholders") and, where it decides design, a numbered question. Nothing is balanced here beyond "a lone level 1 leader can win the start map's fights" (question 184).
@@ -49,32 +49,32 @@ At the end of this plan, a new game plays from the title to the map like this:
   - class stats and descriptions in `classes.json`;
   - summaries in `party-members.json`;
   - the choice list in `new-game.json`;
-  - intros in `cinematics.json`;
+  - intros as arrival events on the `intro` map, one per leader (decision 185);
   - stills in `content/art/cinematics/`;
   - the voice in `content/audio/voices/`;
   - the game's own words in `content/text/ui.json` (ADR 0010).
 - **Rules in Core.** Core decides who leads, who joins, what a class gives at a level and what recruiting does. The Game only passes the choice and plays requests.
 - **Scenes return requests** (ADR 0008):
   - the choice returns `LeaderChosen` or `TitleRequested`;
-  - the intro returns `CinematicFinished`;
+  - the intro is a map event, shown by the exploration scene's `EventPresenter`;
   - each returns its request once.
 
   The update path never touches the graphics or audio device: scenes write the voice they want into a plain `VoiceChannel`, and the host plays it.
-- **Pure presenter, thin draw.** `LeaderChoiceMenu`, `CinematicPlayback` and the class stat formula are tested headless; the views are checked by hand.
+- **Pure presenter, thin draw.** `LeaderChoiceMenu`, the still step's timing and the class stat formula are tested headless; the views are checked by hand.
 - **No allocation per frame.** Texts, layouts and wrapped summaries are built when the screen opens or the cursor moves, never per frame.
-- **Look** (`.claude/rules/game.md`). Look at `docs/ui_ux_exemples/Menu6.webp` and `MainMenu.jpg` before S3a, S3b and K3. Painted art is shrunk or covered smoothly.
+- **Look** (`.claude/rules/game.md`). Look at `docs/ui_ux_exemples/Menu6.webp` and `MainMenu.jpg` before S3a, S3b and K4. Painted art is shrunk or covered smoothly.
 - **Keyboard and controller** (decision 50); no mouse.
 - **No NuGet package.** Audio uses MonoGame's own `SoundEffect` (ADR 0018).
 - **Placeholder files stay small.** There is one shared voice file, small generated stills and small generated portraits, because git keeps every version forever. The generator scripts are one-off PowerShell, run once and not added to the solution; each slice keeps the command it ran in its Done note.
 - **Mechanical test edits.** When a slice changes many test call sites (L1, C1b), it records the solution's test count before and after.
 
 ## Out of scope (follow-ups)
-- **Map cutscenes** (moves, camera, dialogue as event steps; ADR 0016 says why the intro isn't one).
+- **More cutscene steps** (moves, camera, waits): the intro starts the cutscene system (ADR 0016), and later story scenes add the steps they need.
 - **Class skills, subclasses and abilities.** A class gives stats and growth only. Skills stay on the member (`skillIds`) until a class-skills plan (question 181).
 - **Music, sound effects and volume settings** (ADR 0018 sets where audio lives).
 - **A map sprite per leader** (question 58).
 - **The story.** Where the recruits really are, story flags and the opening event: the start map's recruit points are placeholders.
-- **Editor support** for classes, characters, the new game and cinematics: they are edited as JSON. The editor does get the recruit step (R1b), because otherwise it can't open a map that uses one.
+- **Editor support** for classes, characters and the new game: they are edited as JSON. The editor does get every new event step and activation (K2b, R1b, A1a), because otherwise it can't open a map that uses one.
 - **Title art.** The title keeps `StartMenu.png`.
 
 ## Slices
@@ -89,9 +89,12 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **L1. A new game starts with the chosen leader alone; the party may hold 5** (Core + Data + content, about 300 lines, plus about 50 one-argument call-site edits) → [slices/L1.md](slices/L1.md)
 - [x] **S1. New Game opens the character choice** (Game, about 280 lines) → [slices/S1.md](slices/S1.md)
 - [x] **S1b. Choosing asks "Begin as X?" first** (Game + content, about 90 lines) → [slices/S1b.md](slices/S1b.md)
-- [ ] **ADR 0016: Intro cinematics** (before K1) → [slices/ADR-0016.md](slices/ADR-0016.md)
-- [ ] **K1. Cinematics in content, with generated placeholder stills** (Core + Data + content, about 270 lines) → [slices/K1.md](slices/K1.md)
-- [ ] **K2. The intro plays between the choice and the map, stills fading, Confirm or Cancel skipping** (Game, about 300 lines) → [slices/K2.md](slices/K2.md)
+- [x] **ADR 0016: Intro cinematics are map cutscenes** (accepted: option B) → [slices/ADR-0016.md](slices/ADR-0016.md)
+- [ ] **K1. An event can run when the player arrives on its map, only when a given character leads** (Core + Data, about 200 lines) → [slices/K1.md](slices/K1.md)
+- [ ] **K2a. The still step: show an image for a set time with a caption; skipping runs past presentation steps** (Core + Data + content, about 230 lines) → [slices/K2a.md](slices/K2a.md)
+- [ ] **K2b. The editor authors the arrival activation, the leader condition and the still step** (Editor, about 200 lines) → [slices/K2b.md](slices/K2b.md)
+- [ ] **K2c. The map shows a still step: covering the screen, fading in and out, Confirm or Cancel skipping** (Game, about 250 lines) → [slices/K2c.md](slices/K2c.md)
+- [ ] **K3. The intro map: a new game starts there, each leader's intro plays, then a warp to the start map** (content + Data + tests, about 150 lines) → [slices/K3.md](slices/K3.md)
 
 ### Phase 3: classes and characters
 - [ ] **ADR 0017: Stats come from the class** (before C1a) → [slices/ADR-0017.md](slices/ADR-0017.md)
@@ -108,14 +111,14 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 5: the voice
 - [ ] **ADR 0018: Audio files and playback** (before A1a) → [slices/ADR-0018.md](slices/ADR-0018.md)
-- [ ] **A1a. The voice file named by each intro, checked at startup; one generated placeholder voice** (Core + Data + content, about 150 lines) → [slices/A1a.md](slices/A1a.md)
+- [ ] **A1a. The voice step: an event starts a voice file, checked at startup; one generated placeholder voice; the editor authors it** (Core + Data + Editor + content, about 220 lines) → [slices/A1a.md](slices/A1a.md)
 - [ ] **A1b. The intro speaks; with no sound device the game plays on silently** (Game, about 220 lines) → [slices/A1b.md](slices/A1b.md)
 - [ ] **Z1. Run-through: the full new-game flow** (manual) → [slices/Z1.md](slices/Z1.md)
 
 ### Phase 6: the look
 - [ ] **S3a. Choice screen look: the list on the left, header and footer bars** (Game, about 170 lines) → [slices/S3a.md](slices/S3a.md)
 - [ ] **S3b. Choice screen look: the information area, portrait and stats** (Game, about 200 lines) → [slices/S3b.md](slices/S3b.md)
-- [ ] **K3. Intro look: lead-in and lead-out, caption band, skip hint** (Game, about 170 lines) → [slices/K3.md](slices/K3.md)
+- [ ] **K4. Intro look: lead-in and lead-out, caption band, skip hint** (Game, about 170 lines) → [slices/K4.md](slices/K4.md)
 - [ ] **Z. Play-through check** (manual) → [slices/Z.md](slices/Z.md)
 
 ## Decisions
@@ -154,6 +157,7 @@ The developer's answers to the draft's questions (2026-10-23):
 - **176. Party size:** 5. `rules.json`'s `maxActiveMembers` becomes 5 (L1). This answers question 150.
 - **177. Title order:** Continue comes first when there's a readable save: Continue, New Game, Load, Quit.
 - **178. Cancel on the choice** goes back to the title.
+- **185. Each leader's intro:** every new game starts on one `intro` map, which holds one arrival event per leader, each running only when that character leads (`onlyWhenLeaderId`). One place to edit, and the condition serves later story scenes (ADR 0016).
 
 Earlier decisions that apply:
 - 35: play time counts everything since the playthrough began.
@@ -177,10 +181,7 @@ Each slice uses the placeholder until answered.
 Still open from earlier plans: 92, 112, 147, 151-155.
 
 ## ADRs
-- **0016 Intro cinematics** (before K1). Is the intro the cutscene system?
-  - **A. A slideshow content type (recommended).** `cinematics.json` lists stills with seconds and captions, plus one voice file. A scene plays it over the map, as the battle stacks over it.
-  - **B. Map cutscenes on `EventRun`.**
-  - **C. Video files.** DesktopGL has no video playback.
+- **0016 Intro cinematics are map cutscenes** (accepted, option B, `docs/decisions/0016-intro-cinematics.md`). The intro is a map event: an arrival activation, a still step and a voice step, run by `EventRun`, ending with a warp to where play starts. The slideshow content type (A) and video (C) were declined.
 - **0017 Stats come from the class** (before C1a). Where do a member's max HP and MP, attack and defense come from?
   - **A. The class at the member's level (recommended).** Base at level 1 plus growth per level, as D&D classes give hit dice and features by level. The member keeps only who they are: name, art, summary, skills.
   - **B. Per member, as today, plus a per-member growth.** Every character tuned by hand: the opposite of "think of a class like D&D".

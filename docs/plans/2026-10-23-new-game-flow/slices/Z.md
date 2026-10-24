@@ -2,7 +2,7 @@
 
 Part of [the new-game flow plan](../README.md).
 
-- **Z. Play-through check** (manual, after K3)
+- **Z. Play-through check** (manual, after K4)
   - **Goal:** the developer plays the full new-game flow from Visual Studio and confirms it matches the README's goal, now with the look.
   - **Checklist:**
     1. Z1's checklist again, all of it.

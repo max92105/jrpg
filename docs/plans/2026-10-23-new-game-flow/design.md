@@ -18,7 +18,7 @@ Every value here is a placeholder until the developer decides (README, open ques
 | New characters | `party-members.json` | `ragnir`, `omer`, `lazarus`; no skills | C2. |
 | New characters' art | `art/portraits/`, `art/battlers/` | `Ragnir.png`, `Omer.png`, `Lazarus.png`: 256 px squares, generated, a flat class color with the initial | Question 166's answer; small files, replaced by the developer's art. |
 | Summaries | `party-members.json` `summary` | Two placeholder sentences per member | Decision 167. |
-| Intros | `cinematics.json` | One per leader (`ragnir_intro` ...), three shots of 4 s, each caption naming the character and the shot number | Decisions 172, 173. |
+| Intros | `content/maps/intro` | One arrival event per leader (`intro_ragnir` ...), gated on that leader: the voice, three stills of 4 s, each caption naming the character and the still's number, then a warp to `start` (10, 3) | Decisions 172, 173. |
 | Stills | `content/art/cinematics/` | `Placeholder1.png` to `Placeholder3.png`: 640 x 360, generated, dark gradients with "Still n", shared by every intro | Covered smoothly to the screen. |
 | Voice | `content/audio/voices/` | One `Placeholder.wav` shared by every intro, spoken by Windows' speech synthesizer ("Placeholder voice-over.") | A1a; replaced by per-intro files later. |
 | Recruit points | `content/maps/start.json` | One NPC per character, each with a recruit event | R2; placeholders for the story's recruits. |
@@ -49,9 +49,9 @@ These numbers are a starting point for C1b's simulation (question 184). The fore
 | `InfoLeft` | `NewGame/LeaderProfileView` (S3b) | 540 | The information area starts here and runs to the screen's right edge. |
 | `PortraitPixels` | `NewGame/LeaderProfileView` (S3b) | 720 | The portrait, shrunk smoothly, at the right of the information area. |
 | `ProfileFade` | `NewGame/LeaderProfileView` (S3b) | 0.2 s | The information fades in when the cursor moves. |
-| `ShotFade` | `Cinematics/CinematicPlayback` (K2) | 0.8 s, at most half the shot | Each still fades in and out over this ("appear and disappear"). |
-| `LeadIn`, `LeadOut` | `Cinematics/CinematicPlayback` (K3) | 0.5 s, 0.5 s | Black before the first still and after the last. |
-| `CaptionTextPixels`, `CaptionBandHeight` | `Cinematics/CinematicScene` (K3) | 32, 160 | The subtitle and the dark band behind it. |
+| `ShotFade` | `Exploration/StillPlayback` (K2c) | 0.8 s, at most half the shot | Each still fades in and out over this ("appear and disappear"). |
+| `LeadIn`, `LeadOut` | `Exploration/EventPresenter` (K4) | 0.5 s, 0.5 s | Black before the first still of a run and after the last. |
+| `CaptionTextPixels`, `CaptionBandHeight` | `Exploration/EventPresenter` (K4) | 32, 160 | The subtitle and the dark band behind it. |
 
 ## Design overview
 
@@ -94,24 +94,19 @@ These numbers are a starting point for C1b's simulation (question 184). The fore
 | Slice | Change |
 |---|---|
 | L1 | `Content/LeaderChoice` (`MemberId`). `NewGameDefinition` gains `LeaderChoices` and loses `RecruitedMemberIds` and `ActiveMemberIds`. `GameSession.StartNew(ContentCatalog catalog, string leaderId, IRandom random)`: the party is the leader alone; it throws `ArgumentException` for an id that isn't offered. |
-| K1 | `Cinematics/CinematicDefinition`, `Cinematics/CinematicShot`; `ContentCatalog.Cinematics`; `LeaderChoice.IntroCinematicId`. |
+| K1 | `EventActivation.Arrive`; `MapEvent.OnlyWhenLeaderId`, checked by `CanRunOn` with the leader; `ExplorationState` runs the first runnable arrival event when the player lands on a map. |
+| K2a | `Events/StillStep(ImageFile, Seconds, Caption)`; `EventStep.IsPresentation`; `EventRun.SkipPresentation()`. |
 | C1a | `ClassDefinition` gains `Description`. `EquipmentStats` loses `AllowedClassIds` and `CanBeWornBy`; `PartyEquipment` stops checking the class. |
 | C1b | `ClassDefinition` gains `BaseStats` and `Growth` (`Party/ClassStats`: max HP, max MP, attack, defense). `Party/ClassGrowth.StatsAt(ClassDefinition, int level)` is the one formula. `PartyMemberDefinition` loses level, experience, HP, MP and the stats. `PartyMember` takes its class and computes its maxima and base stats from its level. `Recruit` joins at level 1, 0 XP, full HP and MP. |
 | C1c | On a level-up, `PartyMember` raises its maxima and base stats, and adds the max HP and MP gained to its current HP and MP (`Vitals.RaiseMaxima`). |
 | C2 | `PartyMemberDefinition` gains `Summary`. |
 | R1a | `Events/RecruitStep(string MemberId)`. `EventRun` recruits through `PartyState.Recruit(PartyMember)`: into the active party when there's room, else the reserve. Recruiting someone already recruited does nothing. |
-| A1a | `CinematicDefinition.VoiceFile` (required). |
+| A1a | `Events/VoiceStep(File)`, a presentation step that runs on at once; `ExplorationState.StartedVoice`. |
 
-Nothing in Core plays, times or draws a cinematic. The timeline is presentation, like `Typewriter`, and lives in the Game.
+Core holds the steps and waits on them; how long a still shows is counted in the Game, as a warp's fade is (ADR 0006).
 
 ### Content format
-`new-game.json` after K1:
-```json
-"leaderChoices": [
-  { "memberId": "ragnir", "introCinematicId": "ragnir_intro" },
-  ...
-],
-```
+`new-game.json` after K3: `"leaderChoices": [ { "memberId": "ragnir" }, ... ]`, and `startLocation` on the `intro` map.
 `classes.json` after C1b:
 ```json
 { "id": "warrior", "name": "Warrior", "description": "...",
@@ -120,21 +115,25 @@ Nothing in Core plays, times or draws a cinematic. The timeline is presentation,
 ```
 `party-members.json` after C2: `id`, `name`, `classId`, `summary`, `portraitFile`, `battleSpriteFile`, `attackEffectFile` and `skillIds`, with no numbers.
 
-`cinematics.json` after A1a:
+An intro event on the `intro` map after A1a:
 ```json
-{ "id": "ragnir_intro", "voiceFile": "Placeholder.wav",
-  "shots": [ { "imageFile": "Placeholder1.png", "seconds": 4.0, "caption": "Ragnir's intro, still 1 (placeholder)." }, ... ] }
+{ "id": "intro_ragnir", "activation": "arrive", "isOnce": true, "onlyWhenLeaderId": "ragnir",
+  "steps": [
+    { "type": "voice", "file": "Placeholder.wav" },
+    { "type": "still", "imageFile": "Placeholder1.png", "seconds": 4.0, "caption": "Ragnir's intro, still 1 (placeholder)." },
+    ...,
+    { "type": "warp", "mapId": "start", "cell": { "x": 10, "y": 3 } } ] }
 ```
 A recruit step in a map event: `{ "type": "recruit", "memberId": "omer" }`.
 
 Validation (Data):
-- `leaderChoices`: at least one; no null; known, distinct member ids; known intro ids.
+- `leaderChoices`: at least one; no null; known, distinct member ids.
 - Classes: `description` not blank; base max HP and every growth at least 0, base max HP at least 1, base attack and defense at least 0.
-- Cinematics: unique ids; at least one shot; `imageFile` not blank; `seconds` above 0; `caption` null or not blank; `voiceFile` not blank.
+- Events: `onlyWhenLeaderId` a known member; an arrival event has no prompt; a still has an `imageFile`, `seconds` above 0, and a caption that is null or not blank; a voice has a `file`.
 - A recruit step names a known member.
 - Startup checks:
-  - stills by exact name in `art/cinematics/` (`ArtReferenceCheck`);
-  - voices by exact name in `audio/voices/` (`AudioReferenceCheck`).
+  - every still step's image by exact name in `art/cinematics/` (`ArtReferenceCheck`);
+  - every voice step's file by exact name in `audio/voices/` (`AudioReferenceCheck`).
 
 ### Structure
 | Project | Folder | Types |
@@ -142,13 +141,12 @@ Validation (Data):
 | Core | Content | `LeaderChoice` (one character a new game may start led by, with the intro that follows) |
 | Core | Party | `ClassStats` (max HP, max MP, attack, defense: a class's base or growth), `ClassGrowth` (the stats a class gives at a level: the one formula) |
 | Core | Events | `RecruitStep` (adds a member to the party) |
-| Core | Cinematics | `CinematicDefinition`, `CinematicShot` |
-| Data | Cinematics | `CinematicCatalogValidator` |
+| Core | Events | `EventActivation.Arrive`, `MapEvent.OnlyWhenLeaderId`, `StillStep`, `VoiceStep` |
 | Data | Audio | `AudioFolders`, `AudioReferenceCheck` (every voice file named exists by exact name) |
 | Data | Art | `ArtFolders.Cinematics`; `ArtReferenceCheck` covers stills |
-| Game | Scenes | `LeaderChosen`, `CinematicFinished` |
+| Game | Scenes | `LeaderChosen` |
 | Game | NewGame | `LeaderChoiceMenu`, `LeaderChoiceScene`, `LeaderProfileView` (S3b) |
-| Game | Cinematics | `CinematicPlayback`, `CinematicScene` |
+| Game | Exploration | `StillPlayback` (a shown still's place in its time); `EventPresenter` shows still and voice steps |
 | Game | Audio | `VoiceChannel`, `SoundLibrary`, `VoicePlayer` |
 | Game | Ui | `HeaderBar` (S3a; the game menu becomes its second user) |
 | Editor | Events | `EventStepKind.Recruit` and its fields (R1b) |
@@ -158,24 +156,29 @@ Game folder dependencies (none goes back up):
 | Folder | Uses |
 |---|---|
 | NewGame | Scenes, Input, Ui, Rendering, Core Content and Party |
-| Cinematics | Scenes, Input, Ui, Rendering, Audio (`VoiceChannel`), Data Art, Core Cinematics |
+| Exploration | adds Audio (`VoiceChannel`) and Data Art |
 | Audio | Data Audio; MonoGame Audio (`SoundLibrary`, `VoicePlayer` only) |
-| Flow | NewGame, Cinematics, Audio (through `SceneFactory`), plus what it used before |
-| Ui | unchanged: no NewGame, Cinematics or Audio |
+| Flow | NewGame, Audio (through `SceneFactory`), plus what it used before |
+| Ui | unchanged: no NewGame or Audio |
 
 ### The flow
 ```
 Title --NewGameRequested--> [fade] LeaderChoiceScene (no session)
 LeaderChoiceScene --TitleRequested--> [fade] Title
 LeaderChoiceScene: Confirm -> "Begin as X?" (ConfirmPrompt); No closes it; Yes:
-LeaderChoiceScene --LeaderChosen(choice)--> [fade, at black] Session = StartNew(choice.MemberId);
-                                               map, with the intro pushed on top (from K2)
-CinematicScene --CinematicFinished--> [fade, at black] pop the intro; the map takes input
+LeaderChoiceScene --LeaderChosen(choice)--> [fade, at black] Session = StartNew(choice.MemberId) on the intro map
+intro map: the leader's arrival event runs (voice, stills, then a warp to the start map)
 ```
 - `SessionTransitions` gains `ShowLeaderChoice()` and `StartNewGame(LeaderChoice choice)`.
-- `SceneFactory` gains `CreateLeaderChoice()` and `CreateIntro(CinematicDefinition)`.
-- The intro stacks over the map as the battle does (ADR 0013), and the map isn't updated under it.
-- **`GameFlow.ApplyRequestOnceBlack`** has 6 cases today. Whichever slice makes CA1502 fail first (S1 or K2) splits it into `ApplySessionRequest` (new game, leader chosen, load, title) and `ApplyScreenRequest` (battle, battle finished, cinematic finished).
+- `SceneFactory` gains `CreateLeaderChoice()`.
+- `GameFlow.ApplyRequestOnceBlack` has 7 cases after S1, under CA1502; the intro adds none, since it runs inside the exploration scene.
+
+### The intro as a map cutscene (ADR 0016)
+- **The trigger.** `EventActivation.Arrive` runs an event when the player lands on its map: a new game's start, a warp, a load. `onlyWhenLeaderId` gates it on the leader, so one `intro` map holds every leader's intro (decision 185), and a "once" intro never plays again after a load.
+- **The steps.** A still step shows an image for its seconds with an optional caption, and waits for the Game, as a warp waits for its fade. A voice step starts a voice-over and runs on at once. Both are presentation steps.
+- **Skipping.** Confirm or Cancel during a still calls `EventRun.SkipPresentation()`: the run goes past every presentation step to the next state-changing step (the warp, items, recruits), so a skipped intro still lands on the start map.
+- **Showing it.** The exploration scene's `EventPresenter` draws the still over the map (it already draws dialogue and the warp fade), counts its seconds in `StillPlayback`, and tells the voice channel to play or stop.
+- **The editor** learns the activation, the leader condition and both steps (K2b, A1a), since it throws on step kinds it doesn't know.
 
 ### Recruiting
 - `RecruitStep` runs at once, then shows "{name} joins the party." (a `ui.json` message) as a notice, as `GiveItemStep` shows what was received.
@@ -184,8 +187,8 @@ CinematicScene --CinematicFinished--> [fade, at black] pop the intro; the map ta
 - The recruits saved are the members saved, so no format change.
 
 ### The voice-over path (ADR 0018)
-- `SceneFactory` creates the one `VoiceChannel`, as it creates `UiTextures`, and hands it to each `CinematicScene`. `GameFlow.Voice` exposes it.
-- `CinematicScene` calls `Voice.Play(file)` on its first update and `Voice.Stop()` when it ends or is skipped.
+- `SceneFactory` creates the one `VoiceChannel`, as it creates `UiTextures`, and hands it to the exploration scene's `EventPresenter`. `GameFlow.Voice` exposes it.
+- `EventPresenter` plays the channel when the running event starts a voice (`ExplorationState.StartedVoice`), and stops it when the event ends or is skipped.
 - After each update, `JrpgGame` calls `VoicePlayer.Follow(voice)`.
   - The player compares the channel's file with the one it last started: a different file, or null after a file, stops the old one and starts the new.
   - A stop followed by a replay of the same file reads as null, then the file, because `Follow` runs every update.
@@ -193,13 +196,13 @@ CinematicScene --CinematicFinished--> [fade, at black] pop the intro; the map ta
 - A voice file that fails to load is reported once, by name, and that intro plays silent.
 
 ### Key design decisions
-1. **The intro is not the cutscene system** (ADR 0016).
-2. **The choice is a list of records in `new-game.json`.** Which characters may lead, in what order and with which intro is new-game content.
+1. **The intro is a map cutscene** (ADR 0016, the developer's choice): the first use of event steps for story scenes, which later scenes extend.
+2. **The choice is a list of records in `new-game.json`.** Which characters may lead, and in what order, is new-game content; their intros are arrival events on the `intro` map.
 3. **Core checks the leader.** `StartNew` accepts only an offered leader.
 4. **A class gives stats by level, through one formula** (ADR 0017). A member is who they are, and the class is what they can do: linear growth is the simplest rule that makes levels matter. A curve, a per-member modifier or class skills can replace the formula later without touching saves.
 5. **Recruiting is an event step**, because joining is something the story does on a map (ADR 0006's pattern). The start map's recruit points are content that the story replaces.
 6. **Timing comes from content seconds, not the voice length** (decision 173). It is deterministic and testable.
-7. **The session starts at the choice**, so the intro stacks over the map like a battle, and play time counts it (decision 174).
+7. **The session starts at the choice**, on the intro map, so the intro is ordinary play and play time counts it (decision 174).
 8. **Placeholders are generated, small and shared**, because git history keeps them forever.
 
 ### Replacement mapping

@@ -1,0 +1,34 @@
+# K2a. The still step
+
+Part of [the new-game flow plan](../README.md). Design: [design.md](../design.md), "The intro as a map cutscene". ADR 0016 (option B).
+
+- **K2a. The still step: show an image for a set time with a caption; skipping runs past presentation steps** (Core + Data + content, about 230 lines; decisions 159, 171, 172, 173)
+  - **Goal:**
+    - An event step `{ "type": "still", "imageFile": "Placeholder1.png", "seconds": 4.0, "caption": "..." }` waits until the Game has shown it for its seconds, as a warp waits for its fade.
+    - A skip runs the event on past every presentation step (stills, and voices from A1a) up to the next step that changes state (warp, give item, recruit, swap), or to the end.
+    - A missing still stops the start with the file named.
+  - **New types (Core):** `Events/StillStep(string ImageFile, double Seconds, string? Caption) : EventStep`. It shows an image over the whole screen for a time, with an optional subtitle, then waits for the Game.
+    - `Duration => TimeSpan.FromSeconds(Seconds)`.
+    - "Presentation" is a property of the step type (`EventStep.IsPresentation`, false by default, true for stills), so a skip never needs a list of types.
+  - **Changes:**
+    - Core:
+      - `Exploration/EventRun.SkipPresentation()`: advances while the current step is a presentation step, then stops on the next waiting step, as `Continue` does.
+      - `ExplorationState.SkipEventPresentation()` forwards it.
+    - Data:
+      - `ContentTypeDiscriminators` gains `still`;
+      - `MapEventValidator` checks `imageFile` not blank, `seconds` above 0, and `caption` null or not blank;
+      - `ArtFolders.Cinematics = "cinematics"` ("the stills cutscenes show");
+      - `ArtReferenceCheck` adds every still step's image by exact name, "Named by event 'intro_omer' on map 'intro'".
+    - Content: `art/cinematics/Placeholder1.png` to `Placeholder3.png`.
+      - 640 x 360, made once by a PowerShell `System.Drawing` script: a dark gradient and "Still n" in large text.
+      - Record the command in the Done note. Nothing uses them until K3; the art check only checks files that are named.
+    - `docs/plans/backlog.md`: `TextureLibrary` keeps every still for good, which matters once real full-screen stills arrive.
+  - **Tests:**
+    - `EventRunTests`:
+      - `Continue_OnStillStep_MovesToTheNextStep`
+      - `SkipPresentation_StillsThenWarp_StopsOnTheWarp`
+      - `SkipPresentation_OnlyStills_FinishesTheEvent`
+      - `SkipPresentation_OnDialogue_ChangesNothing` (a dialogue isn't presentation: the player reads it)
+    - `MapEventValidatorTests`: theory rows for a blank image, zero or negative seconds, and a blank caption.
+    - `ArtReferenceCheckTests.FindProblems_MissingStill_NamesTheEventAndMap`
+  - **Verify by hand:** the game starts with the placeholder stills in place.

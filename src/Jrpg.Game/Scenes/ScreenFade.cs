@@ -31,6 +31,14 @@ internal sealed class ScreenFade(TimeSpan fadeOut, TimeSpan hold, TimeSpan fadeI
         _timeInPhase = TimeSpan.Zero;
     }
 
+    /// <summary>Starts already black, as when the screen is black for another reason: it holds, then fades in.</summary>
+    /// <exception cref="InvalidOperationException">A fade is already playing.</exception>
+    public void StartAtBlack()
+    {
+        Start();
+        Phase = FadePhase.Holding;
+    }
+
     /// <summary>Plays on; time left over at the end of a phase carries into the next, so the total length is exact.</summary>
     public void Update(TimeSpan delta)
     {

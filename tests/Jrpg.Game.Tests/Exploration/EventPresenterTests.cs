@@ -169,6 +169,67 @@ public sealed class EventPresenterTests
         Assert.Null(voice.VoiceFile);
     }
 
+    [Fact]
+    public void Update_ConfirmOnFirstStillStep_StartsTheLeadIn()
+    {
+        var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowChestShowingStills);
+        exploration.TryInteract();
+        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel());
+
+        presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+
+        Assert.IsType<StillStep>(exploration.CurrentEventStep);
+        Assert.Equal(1f, presenter.Blackness);
+    }
+
+    [Fact]
+    public void Update_ConfirmDuringLeadIn_SkipsToTheDialogue()
+    {
+        var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowChestShowingStills);
+        exploration.TryInteract();
+        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel());
+        presenter.Update(StartMapScenarios.OneUpdate, default);
+
+        presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+
+        Assert.IsType<DialogueStep>(exploration.CurrentEventStep);
+    }
+
+    [Fact]
+    public void Update_AfterLastStillsLeadOut_ContinuesToTheWarp()
+    {
+        var (exploration, presenter, _) = StartIntro();
+        presenter.Update(StartMapScenarios.OneUpdate, default);
+        presenter.Update(EventPresenter.LeadIn, default);
+        for (var still = 0; still < 3; still++)
+        {
+            presenter.Update(TimeSpan.FromSeconds(4), default);
+        }
+
+        // Black from the last still's end until the warp has moved the player: the intro map never shows again.
+        for (var update = 0; update < 120 && exploration.CurrentMap.Id == "intro"; update++)
+        {
+            Assert.Equal(1f, presenter.Blackness);
+            presenter.Update(StartMapScenarios.OneUpdate, default);
+        }
+
+        Assert.Equal("start", exploration.CurrentMap.Id);
+        Assert.Equal(1f, presenter.Blackness);
+    }
+
+    [Fact]
+    public void Update_SkipBeforeTheWarp_StaysBlackIntoIt()
+    {
+        var (exploration, presenter, _) = StartIntro();
+        presenter.Update(StartMapScenarios.OneUpdate, default);
+        presenter.Update(EventPresenter.LeadIn, default);
+
+        presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+
+        Assert.IsType<WarpStep>(exploration.CurrentEventStep);
+        Assert.Equal(1f, presenter.Blackness);
+    }
+
     // A new game on the repository's content: Ragnir's intro opens with the voice, then three stills, then a warp.
     private static (ExplorationState Exploration, EventPresenter Presenter, VoiceChannel Voice) StartIntro()
     {
@@ -177,13 +238,53 @@ public sealed class EventPresenterTests
         return (exploration, new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), voice), voice);
     }
 
-    // The chest's cutscene started and its first still shown for one update.
+    [Fact]
+    public void Update_DuringLeadIn_ShowsNoStill()
+    {
+        var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowChestShowingStills);
+        exploration.TryInteract();
+        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel());
+
+        presenter.Update(StartMapScenarios.OneUpdate, default);
+        presenter.Update(EventPresenter.LeadIn / 2, default);
+
+        Assert.False(presenter.IsShowingStill);
+        Assert.Equal(1f, presenter.Blackness);
+    }
+
+    [Fact]
+    public void Update_FirstStillOver_SecondStartsAtOnceWithNoBlackHold()
+    {
+        var (_, presenter) = StartStills();
+
+        presenter.Update(TimeSpan.FromSeconds(4), default);
+
+        Assert.True(presenter.IsShowingStill);
+        Assert.Equal(0f, presenter.Blackness);
+    }
+
+    [Fact]
+    public void Update_LastStillOver_HoldsBlackForTheLeadOutBeforeTheDialogue()
+    {
+        var (exploration, presenter) = StartStills();
+        presenter.Update(TimeSpan.FromSeconds(4), default);
+        presenter.Update(TimeSpan.FromSeconds(4), default);
+        Assert.IsType<DialogueStep>(exploration.CurrentEventStep);
+        Assert.Equal(1f, presenter.Blackness);
+
+        presenter.Update(EventPresenter.LeadOut, default);
+
+        Assert.Equal(0f, presenter.Blackness);
+    }
+
+    // The chest's cutscene started, past its lead-in, with its first still just begun.
     private static (ExplorationState Exploration, EventPresenter Presenter) StartStills()
     {
         var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowChestShowingStills);
         exploration.TryInteract();
         var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel());
         presenter.Update(StartMapScenarios.OneUpdate, default);
+        presenter.Update(EventPresenter.LeadIn, default);
         return (exploration, presenter);
     }
 }

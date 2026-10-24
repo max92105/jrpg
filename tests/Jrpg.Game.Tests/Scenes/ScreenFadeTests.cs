@@ -7,6 +7,15 @@ public sealed class ScreenFadeTests
     private readonly ScreenFade _fade = new(TimeSpan.FromSeconds(0.2), TimeSpan.FromSeconds(0.1), TimeSpan.FromSeconds(0.2));
 
     [Fact]
+    public void StartAtBlack_Fresh_HoldsFullyBlack()
+    {
+        _fade.StartAtBlack();
+
+        Assert.Equal(FadePhase.Holding, _fade.Phase);
+        Assert.Equal(1f, _fade.Blackness);
+    }
+
+    [Fact]
     public void Update_HalfwayThroughFadeOut_IsHalfBlack()
     {
         _fade.Start();

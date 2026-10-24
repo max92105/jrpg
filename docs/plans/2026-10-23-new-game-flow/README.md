@@ -120,7 +120,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 6: the look
 - [x] **S3a. Choice screen look: the list on the left, header and footer bars** (Game, about 170 lines) → [slices/S3a.md](slices/S3a.md)
 - [x] **S3b. Choice screen look: the information area, portrait and stats** (Game, about 200 lines) → [slices/S3b.md](slices/S3b.md)
-- [ ] **K4. Intro look: lead-in and lead-out, caption band, skip hint** (Game, about 170 lines) → [slices/K4.md](slices/K4.md)
+- [x] **K4. Intro look: lead-in and lead-out, caption band, skip hint** (Game, about 170 lines) → [slices/K4.md](slices/K4.md)
 - [ ] **Z. Play-through check** (manual) → [slices/Z.md](slices/Z.md)
 
 ## Decisions

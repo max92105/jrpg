@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-new-game-flow/slices/S3b.md, slice S3b (choice screen information area: portrait, texts, stats, fade)
-Round: 1 (verdict: Ready to commit)
+Slice: docs/plans/2026-10-23-new-game-flow/slices/K4.md, slice K4 (lead-in/lead-out black, caption band, skip hint)
+Round: 1 (verdict: Fix the Criticals, then commit)
 
-- Warning: LeaderChoiceScene.ShowSelectedProfile (Show on selection change) has no test; scene tests read SelectedProfile from the menu, not what the view draws. Add an internal ShownIndex on the view (or scene) and a test Update_Down_ShowsTheNextProfile — open
-- Suggestion: LeaderProfileView.Update/Draw lack the one-line doc comments its Show has — open
-- Follow-up: S3a's FooterBar.TextTop finding (4 copies of footer centering) — still open from S3a
+- Critical: EventPresenter lead-out then warp (every intro in content/map-layouts/intro.json): lead-out ends at Blackness 0, warp fade starts from 0, so the intro map pops in at full brightness then fades out; same after a skip. Start the warp at black when coming from black; add Update_AfterLastStillsLeadOut_ContinuesToTheWarp — open
+- Warning: skip during the lead-in (RunLeadIn's IsSkipPressed) and "first update's press can't skip" have no test — open
+- Suggestion: the update the lead-out ends returns early, so one frame of bare map shows before the dialogue box's first update — open

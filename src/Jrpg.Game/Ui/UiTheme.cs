@@ -207,6 +207,9 @@ internal static class UiTheme
     /// <summary>The battle's top shade, from the top down: keeps the turn order and party numbers readable.</summary>
     public static ImmutableArray<GradientStop> BattleTopShade { get; } = [new(0, FromStraightArgb(0x99000000)), new(1, FromStraightArgb(0x00000000))];
 
+    /// <summary>The band behind a cutscene subtitle, from the top down: clear, then dark at the bottom edge.</summary>
+    public static ImmutableArray<GradientStop> CaptionBand { get; } = [new(0, FromStraightArgb(0x00000000)), new(1, FromStraightArgb(0xCC000000))];
+
     /// <summary>A party member's thin battle HP bar.</summary>
     public static ImmutableArray<GradientStop> BattleHpBar { get; } = [new(0, FromStraightArgb(0xFF3E7F5A)), new(1, FromStraightArgb(0xFF7FD39A))];
 

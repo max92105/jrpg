@@ -11,3 +11,4 @@ Part of [the new-game flow plan](../README.md).
     4. With sound disabled in Windows, the flow runs silently.
     5. Replace one placeholder still, one portrait and the voice with other files of the same names: they show and play with no code change.
   - **Done when:** every check passes and every slice's deviations are noted. The plan then goes to `retro pending`.
+- **Done, with deviations:** the developer played it through on 2026-10-24: "test manual done all good". Every check passed.

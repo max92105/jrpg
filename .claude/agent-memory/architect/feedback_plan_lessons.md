@@ -7,6 +7,8 @@ metadata:
 
 When planning slices in this repo:
 - Split Core logic and content/Data loading into separate slices up front whenever one would exceed ~300 lines; reviewers check sizes (part 2 review split 1c, 4b, 5b).
+- Estimate includes call-site and fixture churn: grep the constructor or method being changed and count the test sites (the new-game flow split C1b, about 27 test sites, and A1a, shared helpers).
+- Content that uses a new event step lands in the same slice as the editor support for it, or after: the editor throws on a step it can't open (A1a's split).
 - ADRs are checkbox steps right before the slices that depend on them.
 - Port mechanisms, keep values in content, mark undesigned rules as placeholders; tunables get a named table (name, where, placeholder value, meaning).
 - Only list tests that can fail (FixedSequenceRandom, pinned values); simulations must not claim checks their bound can't detect.

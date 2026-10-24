@@ -1,4 +1,4 @@
-- [Roadmap](project_migration_roadmap.md) — new-game-flow plan approved (decisions 156-178, open 179-184, ADRs 0016-0018); next 185/0019; later plans
+- [Roadmap](project_migration_roadmap.md) — new-game flow done 2026-10-24 (ADRs 0016-0018); next decision 188, ADR 0019; open 179-183; later plans
 - [Content quirks](project_content_quirks.md) — 1024 px party battlers, exact-case art names, player.png row order, empty skill icons
 - [Type/folder name clash](feedback_type_folder_name_clash.md) — never name a type after its feature folder (CA1724); use PartyState/BattleState
 - [Plan lessons](feedback_plan_lessons.md) — slice sizes, folder-dependency tables, no-caller APIs, presenter/draw split, code-health splits, wording-removal plans

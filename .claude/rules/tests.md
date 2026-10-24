@@ -16,3 +16,4 @@ paths:
 - UI tests pick an entry by what it is (a helper that moves until `Selected` is the wanted entry), not by a fixed count of presses.
 - Tests on the repository's content assert the entries they need (an id is there, a named layer exists), never totals of a whole catalog or map: content changes in the editor every day.
 - A test that a value is refreshed or cached starts from a state where the old value differs from the expected one, and checks a value the runtime doesn't already share (not an enum name or a string literal).
+- A timing or presentation step is tested through to the step that follows it in real content (stills then a warp, a still then a dialogue), and a hardware probe is checked against the library's source, not assumed.

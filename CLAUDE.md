@@ -27,7 +27,7 @@ Dependency direction: Game → Data → Core; Editor → Data → Core. Never th
 
 ## Commands
 
-- All checks at once (build, tests, format, Core and naming rules, no retired word outside history; one line per check): `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/scripts/verify.ps1` (`-Fix` formats first). Prefer it to the commands below.
+- All checks at once (build, tests, format, Core and naming rules, no retired word outside history, changed comments within 120 columns; one line per check): `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/scripts/verify.ps1` (`-Fix` formats first). Prefer it to the commands below.
 - Build: `dotnet build Jrpg.slnx --nologo -v q`
 - Test: `dotnet test --solution Jrpg.slnx`
 - Format check: `dotnet format Jrpg.slnx --verify-no-changes`
@@ -36,6 +36,7 @@ Dependency direction: Game → Data → Core; Editor → Data → Core. Never th
 - Run editor: `dotnet run --project src/Jrpg.Editor` (same content root rule as the game).
 - Visual Studio: the "Game and editor" launch profile (`Jrpg.slnLaunch`) starts both with F5; pick it in the toolbar's startup list. Without it, F5 starts `Jrpg.Game`, the default startup project (`DefaultStartup` in `Jrpg.slnx`).
 - No Python on this machine: edit with the Edit tool, or with sed/awk followed by `sed -i 's/\r*$/\r/'` to restore the CRLF line endings.
+- Content and source files are CRLF: perl `-0` patterns use `\r?\n`. Write prose (Done notes, docs) with the Edit tool or a quoted heredoc, never `printf`, which reads `\a` and `\v` in a path as escape characters.
 
 ## Coding rules
 

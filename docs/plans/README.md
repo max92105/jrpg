@@ -13,7 +13,7 @@ Older plans are single files with the same sections.
 
 | Plan | Status |
 |---|---|
-| [2026-10-23-new-game-flow](2026-10-23-new-game-flow/README.md) | approved |
+| [done/2026-10-23-new-game-flow](done/2026-10-23-new-game-flow/README.md) | done |
 | [done/2026-10-23-code-health](done/2026-10-23-code-health/README.md) | done |
 | [done/2026-10-22-demo-retirement](done/2026-10-22-demo-retirement/README.md) | done |
 | [done/2026-10-21-editor](done/2026-10-21-editor/README.md) | done (session check Z skipped) |

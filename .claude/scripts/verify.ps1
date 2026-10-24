@@ -126,5 +126,30 @@ $textHits = if ($textFiles) {
 }
 Report 'no retired word outside history' (-not $nameHits -and -not $textHits) (@($nameHits) + @($textHits) | Select-Object -First 20)
 
+# 7. Comment lines changed since the last commit fit in 120 columns (code-quality.md); older lines are rewrapped when
+# next touched. Counted in characters, without the line ending.
+$maxCommentColumns = 120
+$commentPattern = '^\s*//'
+$longComments = @()
+$file = $null
+$lineNumber = 0
+foreach ($line in git diff -U0 HEAD -- '*.cs') {
+    if ($line -match '^\+\+\+ b/(.+)$') { $file = $Matches[1]; continue }
+    if ($line -match '^@@ -\S+ \+(\d+)') { $lineNumber = [int]$Matches[1]; continue }
+    if ($line -match '^\+' -and $line -notmatch '^\+\+\+') {
+        $text = $line.Substring(1).TrimEnd("`r")
+        if ($text -match $commentPattern -and $text.Length -gt $maxCommentColumns) { $longComments += "${file}:$lineNumber ($($text.Length) columns)" }
+        $lineNumber++
+    }
+}
+foreach ($newFile in git ls-files --others --exclude-standard -- '*.cs') {
+    $number = 0
+    foreach ($text in [IO.File]::ReadAllLines((Join-Path $repositoryRoot $newFile))) {
+        $number++
+        if ($text -match $commentPattern -and $text.Length -gt $maxCommentColumns) { $longComments += "${newFile}:$number ($($text.Length) columns)" }
+    }
+}
+Report "changed comments fit in $maxCommentColumns columns (perl .claude/scripts/reflow-comments.pl <file>)" (-not $longComments) ($longComments | Select-Object -First 20)
+
 if ($failed) { exit 1 }
 exit 0

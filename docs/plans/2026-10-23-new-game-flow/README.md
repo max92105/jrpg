@@ -91,7 +91,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **S1b. Choosing asks "Begin as X?" first** (Game + content, about 90 lines) → [slices/S1b.md](slices/S1b.md)
 - [x] **ADR 0016: Intro cinematics are map cutscenes** (accepted: option B) → [slices/ADR-0016.md](slices/ADR-0016.md)
 - [x] **K1. An event can run when the player arrives on its map, only when a given character leads** (Core + Data, about 200 lines) → [slices/K1.md](slices/K1.md)
-- [ ] **K2a. The still step: show an image for a set time with a caption; skipping runs past presentation steps** (Core + Data + content, about 230 lines) → [slices/K2a.md](slices/K2a.md)
+- [x] **K2a. The still step: show an image for a set time with a caption; skipping runs past presentation steps** (Core + Data + content, about 230 lines) → [slices/K2a.md](slices/K2a.md)
 - [ ] **K2b. The editor authors the arrival activation, the leader condition and the still step** (Editor, about 200 lines) → [slices/K2b.md](slices/K2b.md)
 - [ ] **K2c. The map shows a still step: covering the screen, fading in and out, Confirm or Cancel skipping** (Game, about 250 lines) → [slices/K2c.md](slices/K2c.md)
 - [ ] **K3. The intro map: a new game starts there, each leader's intro plays, then a warp to the start map** (content + Data + tests, about 150 lines) → [slices/K3.md](slices/K3.md)

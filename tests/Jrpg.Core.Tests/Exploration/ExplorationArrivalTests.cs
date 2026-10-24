@@ -107,6 +107,26 @@ public sealed class ExplorationArrivalTests
     }
 
     [Fact]
+    public void SkipEventPresentation_IntroOfStillsThenWarp_StopsOnTheWarp()
+    {
+        var exploration = Start("cinema", "omer", new WorldState());
+
+        exploration.SkipEventPresentation();
+
+        Assert.IsType<WarpStep>(exploration.CurrentEventStep);
+    }
+
+    [Fact]
+    public void SkipEventPresentation_IntroOfOnlyStills_EndsTheEvent()
+    {
+        var exploration = Start("gallery", "omer", new WorldState());
+
+        exploration.SkipEventPresentation();
+
+        Assert.False(exploration.IsEventRunning);
+    }
+
+    [Fact]
     public void Walk_IntoCellWithArrivalEvent_DoesNotRunIt()
     {
         var exploration = Start("hall", "zanyr", new WorldState(), new Point2D(0.5, 1.5));
@@ -118,7 +138,8 @@ public sealed class ExplorationArrivalTests
 
     // "hall" holds Omer's and Sarxian's arrival events on its top row. "yard" and "gate" each have a sign the player
     // faces that warps to the hall; the gate's sign has a line to read after the warp. "shrine" has an arrival event, run
-    // every time, on a notice board (only while it is one) and another on a cell.
+    // every time, on a notice board (only while it is one) and another on a cell. "cinema" plays two stills on
+    // arrival, then warps to the hall. "gallery" shows one still, once, and nothing else.
     private static ExplorationState Start(string mapId, string leaderId, WorldState world, Point2D? position = null)
     {
         var hall = new MapLayoutBuilder().WithLayer("111", "111").Build() with
@@ -132,10 +153,15 @@ public sealed class ExplorationArrivalTests
         var boardArrival = new MapEventBuilder().WithId("board_0").AsArrive().OnlyWhenObjectIs("notice_board").WithSteps(_boardSpeaks).Build();
         var floorArrival = new MapEventBuilder().WithId("cell_1_1").AsArrive().WithSteps(_floorSpeaks).Build();
         var shrine = WithSign("shrine", boardArrival) with { CellEvents = [new CellEvent(new GridCell(1, 1), floorArrival)] };
+        var intro = new MapEventBuilder().WithId("cell_0_0").AsArrive()
+            .WithSteps(new StillStep("Placeholder1.png", 4, "One."), new StillStep("Placeholder2.png", 4, "Two."), warpToHall).Build();
+        var cinema = new MapLayoutBuilder().WithLayer("1").Build() with { Id = "cinema", CellEvents = [new CellEvent(new GridCell(0, 0), intro)] };
+        var stillsOnly = new MapEventBuilder().WithId("cell_0_0").AsArrive().AsOnce().WithSteps(new StillStep("Placeholder3.png", 4, Caption: null)).Build();
+        var gallery = new MapLayoutBuilder().WithLayer("1").Build() with { Id = "gallery", CellEvents = [new CellEvent(new GridCell(0, 0), stillsOnly)] };
         var catalog = new ContentCatalogBuilder()
             .WithTiles(TestTiles.Walkable(1))
             .WithObjects(TestExplorationMap.NoticeBoard, TestExplorationMap.Chest)
-            .WithMaps(hall, yard, gate, shrine)
+            .WithMaps(hall, yard, gate, shrine, cinema, gallery)
             .Build();
         var context = new ExplorationContext(catalog, new Inventory(), world, new FixedSequenceRandom());
         return new ExplorationState(context, leaderId, new MapLocation(mapId, position ?? new Point2D(0.5, 1.5), Facing.Up));

@@ -120,13 +120,19 @@ public sealed class ExplorationState
         }
 
         run.Continue();
-        if (run.IsFinished)
-        {
-            _run = null;
-            StartArrivalEvent();
-        }
+        SettleAfterEventMoved(run);
+    }
 
-        RefreshInteraction();
+    /// <summary>
+    /// The player skipped a cutscene: the event runs on past its presentation steps, such as stills, to the next step
+    /// that changes the game or waits for the player, or ends (ADR 0016).
+    /// </summary>
+    /// <exception cref="InvalidOperationException">No event is running.</exception>
+    public void SkipEventPresentation()
+    {
+        var run = _run ?? throw new InvalidOperationException("No event is running.");
+        run.SkipPresentation();
+        SettleAfterEventMoved(run);
     }
 
     /// <summary>The pending battle is over, whatever its outcome; the next steps are grace steps again (decision 26).</summary>
@@ -206,6 +212,18 @@ public sealed class ExplorationState
         _isTouchArmed = false;
         _isArrivalPending = true;
         _encounters.ResetSteps();
+    }
+
+    // After the event moved on: it ends if it's over, letting a pending arrival event start, and the prompt follows.
+    private void SettleAfterEventMoved(EventRun run)
+    {
+        if (run.IsFinished)
+        {
+            _run = null;
+            StartArrivalEvent();
+        }
+
+        RefreshInteraction();
     }
 
     // The map's arrival event runs once the player is on it and no event runs: at once on a new game or a load, and

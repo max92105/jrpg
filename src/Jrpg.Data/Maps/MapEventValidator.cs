@@ -1,3 +1,4 @@
+using System.Globalization;
 using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
 
@@ -137,8 +138,16 @@ internal static class MapEventValidator
         WarpStep warp when !references.Layouts.TryGetValue(warp.MapId, out _) => $"warp has unknown map id '{warp.MapId}'.",
         WarpStep warp when !references.Layouts[warp.MapId].Contains(warp.Cell) =>
             $"warp cell ({warp.Cell.X}, {warp.Cell.Y}) is outside map '{warp.MapId}'.",
+        StillStep still => FindStillProblem(still),
         _ => null,
     };
+
+    private static string? FindStillProblem(StillStep still) =>
+        string.IsNullOrWhiteSpace(still.ImageFile) ? "still must name its imageFile."
+        : !(still.Seconds > 0 && still.Seconds < TimeSpan.MaxValue.TotalSeconds)
+            ? $"still seconds must be above 0 and a time the game can count (was {still.Seconds.ToString(CultureInfo.InvariantCulture)})."
+        : still.Caption is not null && string.IsNullOrWhiteSpace(still.Caption) ? "still caption must be null or have text."
+        : null;
 
     private static IEnumerable<MapEvent> AllEvents(MapLayout layout) =>
         layout.Objects.SelectMany(placed => placed.Events).Concat(layout.CellEvents.Select(cellEvent => cellEvent.Event));

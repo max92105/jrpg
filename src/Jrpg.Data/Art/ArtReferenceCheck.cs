@@ -12,12 +12,12 @@ namespace Jrpg.Data.Art;
 public static class ArtReferenceCheck
 {
     /// <summary>
-    /// Every tilesheet, the player's and every NPC object's field sprite, every dialogue portrait, every party member's
-    /// portrait, every item's icon, every skill icon named (a skill may have none), every battle sprite, every enemy's
-    /// portrait, every attack effect and every encounter's background exist as PNGs, every tile's cell lies inside its
-    /// sheet, every effect strip is whole square frames, and every field sprite holds the walk frames of
-    /// <see cref="FieldSpriteLayout"/>. The names of skill icons, NPC sprites and battle art must match their files
-    /// exactly, case included.
+    /// Every tilesheet, the player's and every NPC object's field sprite, every dialogue portrait, every cutscene
+    /// still, every party member's portrait, every item's icon, every skill icon named (a skill may have none), every
+    /// battle sprite, every enemy's portrait, every attack effect and every encounter's background exist as PNGs, every
+    /// tile's cell lies inside its sheet, every effect strip is whole square frames, and every field sprite holds the
+    /// walk frames of <see cref="FieldSpriteLayout"/>. The names of skill icons, NPC sprites, stills and battle art
+    /// must match their files exactly, case included.
     /// </summary>
     /// <returns>One line per problem, naming the file; empty when the art is complete.</returns>
     public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string artRoot)
@@ -46,8 +46,12 @@ public static class ArtReferenceCheck
             .ToList();
         AddMissingByExactName(problems, artRoot, ArtFolders.FieldSprites, npcSprites);
         AddSpritesWithoutWalkFrames(problems, artRoot, npcSprites.Prepend((catalog.NewGame.FieldSpriteFile, "the new game")));
-        var dialoguePortraits = DialoguePortraits(catalog).Select(named => (named.PortraitFile, $"event '{named.Event.Id}' on map '{named.MapId}'"));
+        var dialoguePortraits = from named in EventSteps<DialogueStep>(catalog)
+                                where named.Step.Speech.PortraitFile is not null
+                                select (named.Step.Speech.PortraitFile!, named.NamedBy);
         AddMissing(problems, artRoot, ArtFolders.Portraits, dialoguePortraits);
+        var stills = EventSteps<StillStep>(catalog).Select(named => (named.Step.ImageFile, named.NamedBy));
+        AddMissingByExactName(problems, artRoot, ArtFolders.Cinematics, stills);
         var members = catalog.PartyMembers.Values.OrderBy(member => member.Id, StringComparer.Ordinal);
         AddMissing(problems, artRoot, ArtFolders.Portraits, members.Select(member => (member.PortraitFile, $"party member '{member.Id}'")));
         var items = catalog.Items.Values.OrderBy(item => item.Id, StringComparer.Ordinal);
@@ -137,13 +141,13 @@ public static class ArtReferenceCheck
         }
     }
 
-    // Every portrait a dialogue step names, with the map and event that name it, in a stable order for the report.
-    private static IEnumerable<(string MapId, MapEvent Event, string PortraitFile)> DialoguePortraits(ContentCatalog catalog) =>
+    // Every step of one kind in the maps' events, with the event and map that hold it, in a stable order for the report.
+    private static IEnumerable<(TStep Step, string NamedBy)> EventSteps<TStep>(ContentCatalog catalog)
+        where TStep : EventStep =>
         from map in catalog.Maps.Values.OrderBy(map => map.Id, StringComparer.Ordinal)
         from mapEvent in map.Layout.Objects.SelectMany(placed => placed.Events).Concat(map.Layout.CellEvents.Select(cell => cell.Event))
-        from step in mapEvent.Steps.OfType<DialogueStep>()
-        where step.Speech.PortraitFile is not null
-        select (map.Id, mapEvent, step.Speech.PortraitFile!);
+        from step in mapEvent.Steps.OfType<TStep>()
+        select (step, $"event '{mapEvent.Id}' on map '{map.Id}'");
 
     /// <summary>The lowest tile, cut from any sheet drawn from <paramref name="file"/>, whose cell an image of this size wouldn't hold.</summary>
     /// <param name="catalog">The sheets and tiles checked.</param>

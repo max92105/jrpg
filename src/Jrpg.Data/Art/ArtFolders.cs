@@ -23,6 +23,9 @@ public static class ArtFolders
     /// <summary>Full-screen pictures behind the title, the menus and battles.</summary>
     public const string Backgrounds = "backgrounds";
 
+    /// <summary>The stills cutscenes show over the whole screen (ADR 0016).</summary>
+    public const string Cinematics = "cinematics";
+
     public static string RootIn(string contentRoot) => Path.Combine(contentRoot, "art");
 
     /// <summary>The PNG file names in the tilesheet folder, set up as sheets or not, sorted ordinally.</summary>

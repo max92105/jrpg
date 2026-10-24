@@ -32,3 +32,11 @@ Part of [the new-game flow plan](../README.md). Design: [design.md](../design.md
     - `MapEventValidatorTests`: theory rows for a blank image, zero or negative seconds, and a blank caption.
     - `ArtReferenceCheckTests.FindProblems_MissingStill_NamesTheEventAndMap`
   - **Verify by hand:** the game starts with the placeholder stills in place.
+  - **Done, with deviations:**
+    - `ExplorationState.SkipEventPresentation` ends the event when the skip runs to its end, through the same tail as `ContinueEvent` (`SettleAfterEventMoved`). A pending arrival event then starts.
+    - `MapEventValidator` checks stills in its own `FindStillProblem`, to keep the step switch under CA1502. `ArtReferenceCheck`'s dialogue-portrait query became `EventSteps<TStep>`, which serves portraits and stills.
+    - Added beyond the plan: `SkipPresentation_StillThenSwapThenStill_AppliesTheSwapAndFinishes`, `SkipEventPresentation_IntroOfStillsThenWarp_StopsOnTheWarp` and `Read_ArrivalEventWithStill_LoadsTheStillAndTheActivation` (pins the JSON names).
+    - The stills were made by a PowerShell `System.Drawing` script: 640x360, a vertical gradient from a dark color to black, "Still n" in Segoe UI 48 centered, saved as PNG (about 4 KB each).
+    - The Game and the editor still throw on a still step; K2b and K2c teach them, and no content uses one yet.
+    - Review (Warning fixed): `SkipEventPresentation_IntroOfOnlyStills_EndsTheEvent` covers a skip that runs to the end. `seconds` must also stay below what a `TimeSpan` holds, so a typo like `1e20` stops the start instead of throwing when the still shows.
+    - `ExplorationState` is 289 lines, near the 300-line mark. K2c adds nothing to it; split it if a later slice grows it.

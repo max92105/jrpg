@@ -18,6 +18,9 @@ public sealed class EventRunTests
     private static readonly DialogueStep _foundSomething = new(new Speech(["Something glints inside."]));
     private static readonly GiveItemStep _givePotions = new("potion", 3);
     private static readonly SwapObjectStep _openChest = new("chest_opened");
+    private static readonly StillStep _firstStill = new("Placeholder1.png", 4, "Still one.");
+    private static readonly StillStep _secondStill = new("Placeholder2.png", 4, Caption: null);
+    private static readonly WarpStep _warpAway = new("elsewhere", new GridCell(0, 0));
 
     private readonly ActiveMap _map = new ActiveMapBuilder().WithRows("11")
         .WithObject(_chest, new Point2D(0, 0))
@@ -36,6 +39,47 @@ public sealed class EventRunTests
         var run = Start(chestEvent);
 
         Assert.True(_map.IsDone(chestEvent));
+        Assert.Equal(_foundSomething, run.Current);
+    }
+
+    [Fact]
+    public void Continue_OnStillStep_MovesToTheNextStep()
+    {
+        var run = Start(new MapEventBuilder().WithSteps(_firstStill, _secondStill).Build());
+
+        run.Continue();
+
+        Assert.Equal(_secondStill, run.Current);
+    }
+
+    [Fact]
+    public void SkipPresentation_StillsThenWarp_StopsOnTheWarp()
+    {
+        var run = Start(new MapEventBuilder().WithSteps(_firstStill, _secondStill, _warpAway).Build());
+
+        run.SkipPresentation();
+
+        Assert.Equal(_warpAway, run.Current);
+    }
+
+    [Fact]
+    public void SkipPresentation_StillThenSwapThenStill_AppliesTheSwapAndFinishes()
+    {
+        var run = Start(new MapEventBuilder().WithSteps(_firstStill, _openChest, _secondStill).Build());
+
+        run.SkipPresentation();
+
+        Assert.True(run.IsFinished);
+        Assert.Equal("chest_opened", _map.CurrentDefinitionOf(Chest).Id);
+    }
+
+    [Fact]
+    public void SkipPresentation_OnDialogue_ChangesNothing()
+    {
+        var run = Start(new MapEventBuilder().WithSteps(_foundSomething, _firstStill).Build());
+
+        run.SkipPresentation();
+
         Assert.Equal(_foundSomething, run.Current);
     }
 

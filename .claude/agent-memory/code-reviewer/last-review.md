@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-new-game-flow/slices/K1.md, slice K1 (arrival events, leader-gated events)
-Round: 1 (verdict: Fix the Criticals, then commit)
+Slice: docs/plans/2026-10-23-new-game-flow/slices/K2a.md, slice K2a (still step, skip presentation)
+Round: 1 (verdict: Ready to commit)
 
-- Critical: ArrivalEvents' object branch (objects before cells, CanRunOn on the current definition) has no test; every ExplorationArrivalTests map puts arrivals on cells (open)
-- Suggestion: no test that a non-once arrival event runs again on a second arrival (goal bullet 3) (open)
-- Follow-up: Editor EventViewModel.cs:53 describes any non-Touch event as Press "{Prompt}", so an Arrive event reads Press "" (K2b) (open)
-- Follow-up: ExplorationState.EnterMap doc still says "(later) a loaded save" (open)
+- Warning: ExplorationState.SkipEventPresentation running to the end of the event has no test; dropping its SettleAfterEventMoved call fails nothing (player stuck in a finished event) (open)
+- Suggestion: validator accepts huge seconds (e.g. 1e15) that make StillStep.Duration throw OverflowException (open)
+- Follow-up: ExplorationState.cs at 289 lines, near the ~300 split threshold (open)
+- Follow-up: K1 items still open: ArrivalEvents object branch test; EventViewModel Arrive event reads Press "" (K2b); EnterMap doc "(later) a loaded save" (open)

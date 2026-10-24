@@ -70,6 +70,24 @@ public sealed class MapFolderReaderTests : IDisposable
         Assert.Equal(new WarpStep("woods", new GridCell(1, 0)), step);
     }
 
+    [Fact]
+    public void Read_ArrivalEventWithStill_LoadsTheStillAndTheActivation()
+    {
+        WriteContent("maps/intro.json", """{ "id": "intro", "displayName": "Intro" }""");
+        WriteContent(
+            "map-layouts/intro.json",
+            """
+            { "id": "intro", "width": 1, "height": 1, "layers": [ { "z": 0, "rows": [ [ 1 ] ] } ], "objects": [],
+              "cellEvents": [ { "cell": { "x": 0, "y": 0 }, "event": { "id": "cell_0_0", "activation": "arrive",
+                "steps": [ { "type": "still", "imageFile": "Placeholder1.png", "seconds": 2.5, "caption": "Long ago." } ] } } ] }
+            """);
+
+        var mapEvent = Read().Single().Layout.CellEvents[0].Event;
+
+        Assert.Equal(EventActivation.Arrive, mapEvent.Activation);
+        Assert.Equal(new StillStep("Placeholder1.png", 2.5, "Long ago."), Assert.Single(mapEvent.Steps));
+    }
+
     private IReadOnlyList<MapDefinition> Read() =>
         MapFolderReader.Read(_contentRoot, new MapContentReferences(_tileIds, new Dictionary<string, ObjectDefinition>(), new HashSet<string>(), new HashSet<string>(), new HashSet<string>()));
 

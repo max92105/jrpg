@@ -54,6 +54,18 @@ internal sealed class EventRun
         AdvanceToNextWaitingStep();
     }
 
+    /// <summary>
+    /// Runs on past the presentation steps from the current one (ADR 0016), applying any step on the way that changes
+    /// the game, and stops on the next step that waits for the player or the Game, or at the end.
+    /// </summary>
+    public void SkipPresentation()
+    {
+        while (!IsFinished && Steps[_index].IsPresentation)
+        {
+            AdvanceToNextWaitingStep();
+        }
+    }
+
     private void AdvanceToNextWaitingStep()
     {
         CurrentReceipt = null;
@@ -81,7 +93,7 @@ internal sealed class EventRun
                 var lost = _inventory.Add(item, give.Quantity);
                 CurrentReceipt = new ItemReceipt(item, give.Quantity - lost, lost);
                 return true;
-            case DialogueStep or WarpStep:
+            case DialogueStep or WarpStep or StillStep:
                 return true;
             default:
                 throw new InvalidOperationException($"Step {step.GetType().Name} has no rule in EventRun.");

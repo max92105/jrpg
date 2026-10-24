@@ -63,6 +63,23 @@ public sealed class ArtReferenceCheckTests
     }
 
     [Fact]
+    public void FindProblems_MissingStill_NamesTheEventAndMap()
+    {
+        var start = _catalog.Maps["start"];
+        var chest = start.Layout.Objects.First(placed => placed.ObjectId == "chest");
+        var showingChest = chest with { Events = [chest.Events[0] with { Steps = [new StillStep("Gone.png", 4, Caption: null)] }] };
+        var layout = start.Layout with { Objects = [.. start.Layout.Objects.Select(placed => placed == chest ? showingChest : placed)] };
+        var catalog = _catalog with
+        {
+            Maps = new Dictionary<string, MapDefinition>(_catalog.Maps) { ["start"] = new MapDefinition(layout, start.Settings) },
+        };
+
+        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
+
+        Assert.Equal($"cinematics/Gone.png: not found in {_artRoot}. Named by event '{chest.Events[0].Id}' on map 'start'.", problem);
+    }
+
+    [Fact]
     public void FindProblems_MissingPartyPortrait_NamesTheMember()
     {
         var jazog = _catalog.PartyMembers["jazog"] with { PortraitFile = "Gone.png" };

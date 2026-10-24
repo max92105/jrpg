@@ -97,7 +97,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **K3. The intro map: a new game starts there, each leader's intro plays, then a warp to the start map** (content + Data + tests, about 150 lines) → [slices/K3.md](slices/K3.md)
 
 ### Phase 3: classes and characters
-- [ ] **ADR 0017: Stats come from the class** (before C1a) → [slices/ADR-0017.md](slices/ADR-0017.md)
+- [x] **ADR 0017: Stats come from the class** (before C1a) → [slices/ADR-0017.md](slices/ADR-0017.md)
 - [ ] **C1a. The nine classes, with descriptions; items lose their class restriction** (Core + Data + content + Game, about 220 lines) → [slices/C1a.md](slices/C1a.md)
 - [ ] **C1b. A member's stats come from their class at their level; members join at level 1** (Core + Data + content, about 300 lines; split at the size check if over) → [slices/C1b.md](slices/C1b.md)
 - [ ] **C1c. A level-up raises max HP, max MP, attack and defense by the class's growth** (Core + Game, about 150 lines) → [slices/C1c.md](slices/C1c.md)

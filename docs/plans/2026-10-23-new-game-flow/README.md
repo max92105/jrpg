@@ -111,7 +111,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **R2. Placeholder recruit points on the start map** (content + tests, about 100 lines) → [slices/R2.md](slices/R2.md)
 
 ### Phase 5: the voice
-- [ ] **ADR 0018: Audio files and playback** (before A1a) → [slices/ADR-0018.md](slices/ADR-0018.md)
+- [x] **ADR 0018: Audio files and playback** (accepted: option A) → [slices/ADR-0018.md](slices/ADR-0018.md)
 - [ ] **A1a. The voice step: an event starts a voice file, checked at startup; one generated placeholder voice; the editor authors it** (Core + Data + Editor + content, about 220 lines) → [slices/A1a.md](slices/A1a.md)
 - [ ] **A1b. The intro speaks; with no sound device the game plays on silently** (Game, about 220 lines) → [slices/A1b.md](slices/A1b.md)
 - [ ] **Z1. Run-through: the full new-game flow** (manual) → [slices/Z1.md](slices/Z1.md)
@@ -189,7 +189,7 @@ Still open from earlier plans: 92, 112, 147, 151-155.
   - **B. Per member, as today, plus a per-member growth.** Every character tuned by hand: the opposite of "think of a class like D&D".
   - **C. Class base plus a per-member modifier.** More tuning knobs than placeholders need. It can be added to A later.
   - This supersedes the part of ADR 0007 that takes max HP and MP and base stats from the member's definition. Saves still hold only level, XP, HP, MP and equipment, so no format change.
-- **0018 Audio files and playback** (before A1a).
+- **0018 Audio files and playback** (accepted 2026-10-24: A).
   - **A. WAV through MonoGame's `SoundEffect` (recommended).**
   - **B. OGG through `Song`/`MediaPlayer`.**
   - **C. A package**, which needs the developer's approval and isn't needed here.

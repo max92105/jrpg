@@ -3,6 +3,7 @@ using Jrpg.Core.Exploration;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Party;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.World;
 using Jrpg.Data.Content;
@@ -51,7 +52,10 @@ public sealed class ForestEncounterRateSimulation(ITestOutputHelper output)
     private static int WalkUntilBattle(ContentCatalog catalog, int seed)
     {
         var context = new ExplorationContext(catalog, new Inventory(), new WorldState(), new SeededRandom(seed));
-        var exploration = new ExplorationState(context, "sarxian", new MapLocation(MapId, _arrival, Facing.Right));
+        var definition = catalog.PartyMembers["sarxian"];
+        var leader = PartyMember.Recruit(definition, catalog.ClassOf(definition), catalog.Skills);
+        var party = new PartyState([leader], [leader], catalog.Rules.Party);
+        var exploration = new ExplorationState(context, party, new MapLocation(MapId, _arrival, Facing.Right));
         var turnRandom = new SeededRandom(seed + TurnSeedOffset);
         var direction = _directions[0];
         var steps = 0;

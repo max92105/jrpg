@@ -21,7 +21,7 @@ public sealed class GameSession
         Party = party;
         _context = context;
         Inventory = context.Inventory;
-        Exploration = new ExplorationState(context, party.Leader.Id, start);
+        Exploration = new ExplorationState(context, party, start);
         Equipment = new PartyEquipment(Inventory);
         FieldItems = new FieldItemUse(party, Inventory);
         EnemyTactics = new EnemyTactics(context.Random);

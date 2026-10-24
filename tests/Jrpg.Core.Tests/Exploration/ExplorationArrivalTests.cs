@@ -164,7 +164,7 @@ public sealed class ExplorationArrivalTests
             .WithMaps(hall, yard, gate, shrine, cinema, gallery)
             .Build();
         var context = new ExplorationContext(catalog, new Inventory(), world, new FixedSequenceRandom());
-        return new ExplorationState(context, leaderId, new MapLocation(mapId, position ?? new Point2D(0.5, 1.5), Facing.Up));
+        return new ExplorationState(context, TestParties.LedBy(leaderId), new MapLocation(mapId, position ?? new Point2D(0.5, 1.5), Facing.Up));
     }
 
     private static MapLayout WithSign(string mapId, MapEvent readSign) =>

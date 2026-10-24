@@ -3,6 +3,7 @@ using Jrpg.Core.Battle;
 using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Party;
 
 namespace Jrpg.Core.Exploration;
 
@@ -13,7 +14,7 @@ namespace Jrpg.Core.Exploration;
 public sealed class ExplorationState
 {
     private readonly ExplorationContext _context;
-    private readonly string _leaderId;
+    private readonly PartyState _party;
     private readonly PlayerWalker _walker;
     private readonly RandomEncounters _encounters;
     private ActiveMap _map;
@@ -25,12 +26,12 @@ public sealed class ExplorationState
     private EventRun? _run;
 
     /// <param name="context">The content, items, world and random source.</param>
-    /// <param name="leaderId">Who leads, for events gated on the leader; fixed for the playthrough (decision 107).</param>
+    /// <param name="party">Who recruit steps add to; its leader (fixed, decision 107) gates events.</param>
     /// <param name="start">Where the player lands: a new game's start, or a save's location.</param>
-    internal ExplorationState(ExplorationContext context, string leaderId, MapLocation start)
+    internal ExplorationState(ExplorationContext context, PartyState party, MapLocation start)
     {
         _context = context;
-        _leaderId = leaderId;
+        _party = party;
         _walker = new PlayerWalker(start.Position, start.Facing, context.Catalog.Rules.Exploration);
         _encounters = new RandomEncounters(context.Random);
         EnterMap(start.MapId, start.Position);
@@ -58,6 +59,9 @@ public sealed class ExplorationState
 
     /// <summary>What the current give-item step really added and lost, for its message; null on any other step.</summary>
     public ItemReceipt? CurrentItemReceipt => _run?.CurrentReceipt;
+
+    /// <summary>What the current recruit step did, for its message; null on any other step.</summary>
+    public Recruitment? CurrentRecruitment => _run?.CurrentRecruitment;
 
     /// <summary>
     /// What a placed object on the current map is now, after any swap (an opened chest or door), so the Game draws it
@@ -206,7 +210,7 @@ public sealed class ExplorationState
         var walkability = WalkabilityGrid.Build(definition.Layout, catalog.Tiles);
         _map = new ActiveMap(definition, catalog.Objects, walkability, _context.World);
         _collision = new MapCollision(_map);
-        _finder = new InteractionFinder(_map, catalog.Rules.Exploration, _leaderId);
+        _finder = new InteractionFinder(_map, catalog.Rules.Exploration, _party.Leader.Id);
         _walker.PlaceAt(WarpArrival.Find(walkability, target));
         _lastCell = _walker.Cell;
         _isTouchArmed = false;
@@ -236,7 +240,7 @@ public sealed class ExplorationState
         }
 
         _isArrivalPending = false;
-        if (ArrivalEvents.FindFirst(_map, _leaderId) is { } arrival)
+        if (ArrivalEvents.FindFirst(_map, _party.Leader.Id) is { } arrival)
         {
             Start(arrival);
         }
@@ -245,7 +249,7 @@ public sealed class ExplorationState
     private bool TryStartCellEvent(GridCell cell)
     {
         var cellEvent = _map.CellEventAt(cell);
-        if (cellEvent is null || !cellEvent.Event.IsForLeader(_leaderId) || (cellEvent.Event.IsOnce && _map.IsDone(cellEvent.Event)))
+        if (cellEvent is null || !cellEvent.Event.IsForLeader(_party.Leader.Id) || (cellEvent.Event.IsOnce && _map.IsDone(cellEvent.Event)))
         {
             return false;
         }
@@ -270,7 +274,7 @@ public sealed class ExplorationState
 
     private void Start(TriggeredEvent triggered)
     {
-        var run = new EventRun(triggered, _map, _context.Inventory, _context.Catalog.Items);
+        var run = new EventRun(triggered, _map, _context, _party);
         _run = run.IsFinished ? null : run;
     }
 

@@ -23,8 +23,8 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Content | The loaded catalog and global rules | `ContentCatalog`, `GameRules`, `NewGameDefinition`, `LeaderChoice` |
 | Dialogue | What a speaker says | `Speech` |
 | Effects | What skills and items do, targeting, damage formula | `Effect`, `EffectResolver`, `Targeting`, `TargetChoice`, `DamageFormula` |
-| Events | Map event definitions and their steps | `MapEvent`, `EventStep` (+ `DialogueStep`, `GiveItemStep`, `SwapObjectStep`, `WarpStep`, `StillStep`; presentation steps are skippable) |
-| Exploration | The player on the map: walking, collision, events (on interact, touch or arrival), random encounters, what Confirm would start | `ExplorationState`, `PlayerWalker`, `MapCollision`, `EventRun`, `ArrivalEvents`, `RandomEncounters`, `InteractionTarget` |
+| Events | Map event definitions and their steps | `MapEvent`, `EventStep` (+ `DialogueStep`, `GiveItemStep`, `SwapObjectStep`, `WarpStep`, `StillStep`, `RecruitStep`; presentation steps are skippable) |
+| Exploration | The player on the map: walking, collision, events (on interact, touch or arrival), random encounters, what Confirm would start | `ExplorationState` (takes the party, which recruit steps add to; `Recruitment` says what one did), `PlayerWalker`, `MapCollision`, `EventRun`, `ArrivalEvents`, `RandomEncounters`, `InteractionTarget` |
 | Geometry | Positions and shapes | `Point2D`, `GridCell`, `Facing`, `Polygon` |
 | Items | Items and the inventory | `ItemDefinition`, `Inventory`, `EquipmentSlot` |
 | Maps | Map content and draw order | `MapDefinition`, `MapLayout`, `PlacedObject`, `ObjectDefinition`, `DrawOrderKey`, `WalkabilityGrid` |

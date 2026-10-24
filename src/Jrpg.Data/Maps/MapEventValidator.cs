@@ -134,6 +134,7 @@ internal static class MapEventValidator
         DialogueStep dialogue when dialogue.Speech.Lines.Count == 0 => "dialogue needs at least one line.",
         GiveItemStep give when !references.Content.ItemIds.Contains(give.ItemId) => $"giveItem has unknown item id '{give.ItemId}'.",
         GiveItemStep give when give.Quantity < 1 => $"giveItem quantity must be at least 1 (was {give.Quantity}).",
+        RecruitStep recruit when !references.Content.MemberIds.Contains(recruit.MemberId) => $"recruit has unknown party member id '{recruit.MemberId}'.",
         SwapObjectStep swap when !references.Content.Objects.ContainsKey(swap.ObjectId) => $"swapObject has unknown object id '{swap.ObjectId}'.",
         WarpStep warp when !references.Layouts.TryGetValue(warp.MapId, out _) => $"warp has unknown map id '{warp.MapId}'.",
         WarpStep warp when !references.Layouts[warp.MapId].Contains(warp.Cell) =>

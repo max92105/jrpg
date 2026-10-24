@@ -29,3 +29,7 @@ Part of [the new-game flow plan](../README.md). Design: [design.md](../design.md
     - `MapEventValidatorTests`: theory row for an unknown `memberId`.
     - `SaveGameStoreTests.RoundTrip_RecruitedDuringPlay_KeepsThem`
   - **Verify by hand:** covered by R2, which puts recruit points on the start map.
+- **Done, with deviations:**
+  - `ExplorationState` takes the party instead of the leader id, since the leader is the party's fixed first member. `EventRun` takes the exploration context and the party, so neither constructor goes past 4 parameters. Test sites use a new `TestParties.LedBy(id)`.
+  - What a recruit step did is `Exploration/Recruitment(Member, HasJoined)`. Its message comes from `Dialogue/RecruitText`, beside `FoundItemText`.
+  - The save round trip is `GameSessionSaveTests.CaptureThenRestore_RecruitedDuringPlay_KeepsThem` (no `SaveGameStoreTests` exists, and the format is unchanged). Tests: 1739 before, 1746 after.

@@ -15,6 +15,12 @@ internal static class MessageIds
     /// <summary>Placeholder <c>{lost}</c>: how many copies didn't fit in their full stack and were left behind.</summary>
     public const string ItemFoundLost = "item_found_lost";
 
+    /// <summary>Placeholder <c>{name}</c>: a recruit step added that member to the party.</summary>
+    public const string MemberJoined = "member_joined";
+
+    /// <summary>Placeholder <c>{name}</c>: a recruit step named a member already in the party.</summary>
+    public const string MemberAlreadyInParty = "member_already_in_party";
+
     /// <summary>The game's name, written large on the title.</summary>
     public const string GameTitle = "game_title";
 

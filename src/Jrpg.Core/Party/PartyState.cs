@@ -8,6 +8,7 @@ namespace Jrpg.Core.Party;
 public sealed class PartyState
 {
     private readonly PartyRules _rules;
+    private readonly List<PartyMember> _members;
     private readonly List<PartyMember> _activeMembers;
     private readonly List<PartyMember> _reserveMembers = [];
 
@@ -25,13 +26,13 @@ public sealed class PartyState
         }
 
         _rules = rules;
-        Members = [.. members];
+        _members = [.. members];
         _activeMembers = [.. activeOrder];
         Leader = activeOrder[0];
         RebuildReserve();
     }
 
-    public IReadOnlyList<PartyMember> Members { get; }
+    public IReadOnlyList<PartyMember> Members => _members;
 
     public IReadOnlyList<PartyMember> ActiveMembers => _activeMembers;
 
@@ -40,6 +41,26 @@ public sealed class PartyState
     public PartyMember Leader { get; }
 
     public bool IsFull => _activeMembers.Count >= _rules.MaxActiveMembers;
+
+    public bool IsRecruited(string memberId) => _members.Exists(member => member.Id == memberId);
+
+    /// <summary>A new member joins: into the active party while it has room, else into the reserve.</summary>
+    /// <exception cref="ArgumentException">A member with that id is already recruited.</exception>
+    public void Recruit(PartyMember member)
+    {
+        if (IsRecruited(member.Id))
+        {
+            throw new ArgumentException($"'{member.Id}' is already recruited.", nameof(member));
+        }
+
+        _members.Add(member);
+        if (!IsFull)
+        {
+            _activeMembers.Add(member);
+        }
+
+        RebuildReserve();
+    }
 
     /// <exception cref="ArgumentException">No recruited member has that id.</exception>
     public PartyMember MemberById(string id) =>

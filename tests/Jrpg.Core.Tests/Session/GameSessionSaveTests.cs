@@ -49,6 +49,19 @@ public sealed class GameSessionSaveTests
         Assert.Equal((leader.Vitals.MaxHp, leader.Vitals.MaxMp), (restored.Vitals.MaxHp, restored.Vitals.MaxMp));
     }
 
+    [Fact]
+    public void CaptureThenRestore_RecruitedDuringPlay_KeepsThem()
+    {
+        var session = StartNew();
+        var catalog = Catalog(_belowChest);
+        var jazog = catalog.PartyMembers["jazog"];
+        session.Party.Recruit(PartyMember.Recruit(jazog, catalog.ClassOf(jazog), catalog.Skills));
+
+        var restored = SaveAndRestore(session).Party;
+
+        Assert.Equal(["sarxian", "jazog"], restored.ActiveMembers.Select(member => member.Id));
+    }
+
     // A save keeps only level, experience, HP and MP, so one from before classes had stats loads as is (ADR 0017).
     [Fact]
     public void Restore_MemberSavedAtLevelThree_HasTheClassStatsAtThree()

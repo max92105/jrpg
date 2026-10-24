@@ -27,6 +27,38 @@ public sealed class PartyStateTests
     }
 
     [Fact]
+    public void Recruit_RoomInActiveParty_JoinsActive()
+    {
+        var party = new PartyState([_leader], [_leader], new PartyRules(MaxActiveMembers: 2));
+
+        party.Recruit(_jazog);
+
+        Assert.Equal([_leader, _jazog], party.ActiveMembers);
+        Assert.Empty(party.ReserveMembers);
+        Assert.True(party.IsRecruited("jazog"));
+    }
+
+    [Fact]
+    public void Recruit_ActivePartyFull_JoinsReserve()
+    {
+        var party = new PartyState([_leader, _jazog], [_leader, _jazog], new PartyRules(MaxActiveMembers: 2));
+
+        party.Recruit(_lyra);
+
+        Assert.Equal([_leader, _jazog], party.ActiveMembers);
+        Assert.Equal([_lyra], party.ReserveMembers);
+    }
+
+    [Fact]
+    public void Recruit_AlreadyRecruited_Throws()
+    {
+        var party = CreateParty(maxActiveMembers: 2, _leader, _jazog);
+
+        Assert.Throws<ArgumentException>(() => party.Recruit(new PartyMemberBuilder().WithId("jazog").Build()));
+        Assert.Equal([_leader, _jazog, _lyra], party.Members);
+    }
+
+    [Fact]
     public void MemberById_UnknownId_Throws()
     {
         var party = CreateParty(maxActiveMembers: 3, _leader, _jazog);

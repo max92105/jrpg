@@ -60,6 +60,7 @@ public sealed class MapEventValidatorTests
         { WithChestEvent(_openChest with { Steps = [] }), "event 'chest@1,1_0': steps must not be empty." },
         { WithChestEvent(_openChest with { Steps = [new DialogueStep(new Speech([]))] }), "event 'chest@1,1_0': step 0: dialogue needs at least one line." },
         { WithChestEvent(_openChest with { Steps = [new GiveItemStep("potion", 0)] }), "event 'chest@1,1_0': step 0: giveItem quantity must be at least 1 (was 0)." },
+        { WithChestEvent(_openChest with { Steps = [new RecruitStep("kamilia")] }), "event 'chest@1,1_0': step 0: recruit has unknown party member id 'kamilia'." },
         { WithChestEvent(_openChest with { Steps = [new SwapObjectStep("chest_gold")] }), "event 'chest@1,1_0': step 0: swapObject has unknown object id 'chest_gold'." },
         { WithChestEvent(_openChest with { OnlyWhenObjectId = "door" }), "event 'chest@1,1_0': onlyWhenObjectId has unknown object id 'door'." },
         { WithChestEvent(_openChest with { OnlyWhenLeaderId = "nobody" }), "event 'chest@1,1_0': onlyWhenLeaderId has unknown party member id 'nobody'." },

@@ -75,7 +75,7 @@ internal sealed class EventPresenter
             case WarpStep:
                 ShowWarp();
                 break;
-            case DialogueStep or GiveItemStep:
+            case DialogueStep or GiveItemStep or RecruitStep:
                 ShowPages(step, delta, input);
                 break;
             case StillStep still:
@@ -206,8 +206,10 @@ internal sealed class EventPresenter
     {
         DialogueStep dialogue => new SpeechPlayback(dialogue.Speech, _settings.CharacterTime),
 
-        // Shown whole: there's nothing to discover in it letter by letter. Core sets a receipt on every give-item step.
+        // Shown whole: there's nothing to discover in it letter by letter. Core sets a receipt on every give-item step
+        // and a recruitment on every recruit step.
         GiveItemStep => new SpeechPlayback(new Speech([FoundItemText.Of(_exploration.CurrentItemReceipt!, _messages)]), TimeSpan.Zero),
-        _ => throw new ArgumentOutOfRangeException(nameof(step), step, "Only dialogue and found items have pages."),
+        RecruitStep => new SpeechPlayback(new Speech([RecruitText.Of(_exploration.CurrentRecruitment!, _messages)]), TimeSpan.Zero),
+        _ => throw new ArgumentOutOfRangeException(nameof(step), step, "Only dialogue, found items and recruits have pages."),
     };
 }

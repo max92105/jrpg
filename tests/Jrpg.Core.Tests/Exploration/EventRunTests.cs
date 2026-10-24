@@ -1,10 +1,14 @@
+using Jrpg.Core.Content;
 using Jrpg.Core.Dialogue;
 using Jrpg.Core.Events;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Party;
 using Jrpg.Core.Tests.Builders;
+using Jrpg.Core.Tests.Randomness;
+using Jrpg.Core.World;
 
 namespace Jrpg.Core.Tests.Exploration;
 
@@ -13,7 +17,10 @@ public sealed class EventRunTests
     private static readonly ObjectDefinition _chest = new() { Id = "chest", Width = 1, Height = 1, CollisionPolygon = [], Category = "test", Tiles = [], AbovePlayerZones = [] };
     private static readonly ObjectDefinition _openedChest = _chest with { Id = "chest_opened" };
     private static readonly ItemDefinition _potion = new ItemDefinitionBuilder().WithId("potion").WithMaxStack(99).Build();
-    private static readonly Dictionary<string, ItemDefinition> _items = new() { [_potion.Id] = _potion };
+    private static readonly ContentCatalog _catalog = new ContentCatalogBuilder()
+        .WithItems(_potion)
+        .WithMembers(new PartyMemberBuilder().WithId("omer").BuildDefinition())
+        .Build();
 
     private static readonly DialogueStep _foundSomething = new(new Speech(["Something glints inside."]));
     private static readonly GiveItemStep _givePotions = new("potion", 3);
@@ -28,6 +35,7 @@ public sealed class EventRunTests
         .Build();
 
     private readonly Inventory _inventory = new();
+    private readonly PartyState _party = TestParties.LedBy("sarxian");
 
     private PlacedObject Chest => _map.Definition.Layout.Objects[0];
 
@@ -184,8 +192,36 @@ public sealed class EventRunTests
     {
         var cellEvent = new MapEventBuilder().WithSteps(_openChest).Build();
 
-        Assert.Throws<InvalidOperationException>(() => new EventRun(new TriggeredEvent(cellEvent, Source: null), _map, _inventory, _items));
+        Assert.Throws<InvalidOperationException>(() => new EventRun(new TriggeredEvent(cellEvent, Source: null), _map, Context(), _party));
     }
 
-    private EventRun Start(MapEvent mapEvent) => new(new TriggeredEvent(mapEvent, Chest), _map, _inventory, _items);
+    [Fact]
+    public void Run_RecruitStep_AddsMemberAtLevelOne()
+    {
+        var run = Start(new MapEventBuilder().WithSteps(new RecruitStep("omer")).Build());
+
+        var omer = _party.MemberById("omer");
+        Assert.Equal((1, 0), (omer.Level, omer.Experience));
+        Assert.Equal((omer.Vitals.MaxHp, omer.Vitals.MaxMp), (omer.Vitals.Hp, omer.Vitals.Mp));
+        Assert.Contains(omer, _party.ActiveMembers);
+        Assert.Equal(new Recruitment(omer, HasJoined: true), run.CurrentRecruitment);
+    }
+
+    [Fact]
+    public void Run_RecruitStepForRecruited_ChangesNothingAndSaysSo()
+    {
+        var recruitOmer = new MapEventBuilder().WithSteps(new RecruitStep("omer")).Build();
+        Start(recruitOmer);
+        var omer = _party.MemberById("omer");
+
+        var again = Start(recruitOmer);
+
+        Assert.Equal(2, _party.Members.Count);
+        Assert.Same(omer, _party.MemberById("omer"));
+        Assert.Equal(new Recruitment(omer, HasJoined: false), again.CurrentRecruitment);
+    }
+
+    private EventRun Start(MapEvent mapEvent) => new(new TriggeredEvent(mapEvent, Chest), _map, Context(), _party);
+
+    private ExplorationContext Context() => new(_catalog, _inventory, new WorldState(), new FixedSequenceRandom());
 }

@@ -1,0 +1,31 @@
+using Jrpg.Core.Party;
+
+namespace Jrpg.Core.Tests.Party;
+
+public sealed class ClassGrowthTests
+{
+    private static readonly ClassDefinition _warrior = new(
+        "warrior",
+        "Warrior",
+        "Fights.",
+        Base: new ClassStats(MaxHp: 220, MaxMp: 20, Attack: 24, Defense: 8),
+        Growth: new ClassStats(MaxHp: 22, MaxMp: 2, Attack: 3, Defense: 1));
+
+    [Fact]
+    public void StatsAt_LevelOne_IsBase()
+    {
+        Assert.Equal(_warrior.Base, ClassGrowth.StatsAt(_warrior, level: 1));
+    }
+
+    [Fact]
+    public void StatsAt_LevelFive_AddsFourGrowths()
+    {
+        Assert.Equal(new ClassStats(MaxHp: 308, MaxMp: 28, Attack: 36, Defense: 12), ClassGrowth.StatsAt(_warrior, level: 5));
+    }
+
+    [Fact]
+    public void StatsAt_LevelBelowOne_Throws()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => ClassGrowth.StatsAt(_warrior, level: 0));
+    }
+}

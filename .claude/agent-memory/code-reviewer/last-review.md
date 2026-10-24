@@ -5,11 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-new-game-flow/slices/C1a.md, slice C1a (nine classes, items lose class restriction)
+Slice: docs/plans/2026-10-23-new-game-flow/slices/C1b1.md, slice C1b1 (class base stats + growth, ClassGrowth.StatsAt)
 Round: 1 (verdict: Fix the Criticals, then commit)
 
-- Critical: PartyEquipment.cs:76 TryTakeFrom <returns> line is 198 columns after the edit; rewrap block to 120 (reflow-comments.pl) (open)
-- Warning: EquipmentChoice.cs:19 param doc still points at PartyEquipment.WearableFor, renamed to OwnedFor by this slice (open)
-- Suggestion: IsWorthTaking keeps `item.Equipment is not null` though only worn items reach it; drop or state why (open)
-- Suggestion: SaveGameRepairTests WornItemNoLongerWearable sets jazog's armor to null; keeping wizard_robe on the barbarian and asserting it stays would pin decision 165 in repair (open)
-- Follow-up: PartyEquipment.cs lines 47, 72, 103 already over 120 columns (open)
+- Critical: ClassGrowth.cs:7 new summary line is 126 columns; rewrap to 120 (reflow-comments.pl) (open)
+- Suggestion: ClassDefinition.cs:7-9 empty <param> tags for Id/Name/Description (only ones in src); describe Base/Growth in the summary instead and drop all param tags (open)
+- Suggestion: test lines over 120 columns (ClassGrowthTests:8, ClassCatalogValidatorTests:60); split the arguments (open)

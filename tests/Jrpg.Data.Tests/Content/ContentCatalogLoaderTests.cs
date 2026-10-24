@@ -17,12 +17,13 @@ public sealed class ContentCatalogLoaderTests
     }
 
     [Fact]
-    public void Load_RepositoryContent_HasTheNineClassesWithDescriptions()
+    public void Load_RepositoryContent_HasTheNineClassesWithDescriptionsAndStats()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
         string[] classIds = ["warrior", "mage", "cleric", "rogue", "barbarian", "paladin", "monk", "warlock", "druid"];
 
         Assert.All(classIds, id => Assert.NotEmpty(catalog.Classes[id].Description));
+        Assert.All(classIds, id => Assert.True(catalog.Classes[id].Base.MaxHp > 0, $"{id} starts with no HP."));
     }
 
     [Fact]

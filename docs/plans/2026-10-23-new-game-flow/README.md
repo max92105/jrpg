@@ -34,7 +34,7 @@ At the end of this plan, a new game plays from the title to the map like this:
 2. **The flow, end to end and silent (L1, S1, S1b, ADR 0016, K1, K2a, K2b, K2c, K3).**
    - The leader in Core, then the choice screen and its confirmation, then the intro as a map cutscene (ADR 0016): an event that runs on arrival, the still step, the editor's support for both, the Game showing stills, and the intro map.
    - After K3, title → choice → intro → map runs with today's characters. This is the developer's "just make it run".
-3. **Classes and characters (ADR 0017, C1a, C1b, C1c, C2, S2).**
+3. **Classes and characters (ADR 0017, C1a, C1b1, C1b2, C1c, C2, S2).**
    - The nine classes, then stats from the class, then growth on level-up.
    - Then the nine characters, then the choice screen showing what they are.
 4. **Recruiting (R1a, R1b, R2).**
@@ -99,7 +99,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 3: classes and characters
 - [x] **ADR 0017: Stats come from the class** (before C1a) → [slices/ADR-0017.md](slices/ADR-0017.md)
 - [x] **C1a. The nine classes, with descriptions; items lose their class restriction** (Core + Data + content + Game, about 220 lines) → [slices/C1a.md](slices/C1a.md)
-- [ ] **C1b. A member's stats come from their class at their level; members join at level 1** (Core + Data + content, about 300 lines; split at the size check if over) → [slices/C1b.md](slices/C1b.md)
+- [x] **C1b1. Classes carry their base stats and growth per level; the one formula** (Core + Data + content, about 170 lines; split from C1b) → [slices/C1b1.md](slices/C1b1.md)
+- [ ] **C1b2. A member's stats come from their class at their level; members join at level 1** (Core + Data + content, about 260 lines; split from C1b) → [slices/C1b2.md](slices/C1b2.md)
 - [ ] **C1c. A level-up raises max HP, max MP, attack and defense by the class's growth** (Core + Game, about 150 lines) → [slices/C1c.md](slices/C1c.md)
 - [ ] **C2. The nine characters: Ragnir, Omer and Lazarus added, Kamilia removed, Teelle the Paladin, Thaali the Druid, summaries, generated portraits** (Core + Data + content, about 220 lines) → [slices/C2.md](slices/C2.md)
 - [ ] **S2. The choice shows the class, description, summary and level 1 stats** (Game, about 220 lines) → [slices/S2.md](slices/S2.md)

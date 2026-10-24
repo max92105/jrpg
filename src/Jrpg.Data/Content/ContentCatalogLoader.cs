@@ -36,7 +36,7 @@ public static class ContentCatalogLoader
         var classIds = classes.Select(classDefinition => classDefinition.Id).ToFrozenSet();
         var rules = ReadValidated<GameRules>(contentRoot, RulesFile, GameRulesValidator.Validate);
         var items = ReadValidated<IReadOnlyList<ItemDefinition>>(
-            contentRoot, ItemsFile, (file, list) => ItemCatalogValidator.Validate(file, list, classIds));
+            contentRoot, ItemsFile, ItemCatalogValidator.Validate);
         var skills = ReadValidated<IReadOnlyList<SkillDefinition>>(contentRoot, SkillsFile, SkillCatalogValidator.Validate);
         var memberReferences = new PartyMemberReferences(classIds, skills.Select(skill => skill.Id).ToFrozenSet(), rules.Experience);
         var members = ReadValidated<IReadOnlyList<PartyMemberDefinition>>(

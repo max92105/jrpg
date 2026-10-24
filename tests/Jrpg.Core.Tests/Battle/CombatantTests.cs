@@ -25,7 +25,7 @@ public sealed class CombatantTests
     public void FromPartyMember_EquippedMember_UsesTotalStatsOnPartySide()
     {
         var member = new PartyMemberBuilder().WithClass("warrior").WithStats(attack: 10, defense: 5).Build();
-        var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5, "warrior").Build();
+        var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build();
         var inventory = new Inventory();
         inventory.Add(sword, 1);
         new PartyEquipment(inventory).TryEquip(member, sword);

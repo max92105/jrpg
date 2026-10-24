@@ -98,7 +98,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 3: classes and characters
 - [x] **ADR 0017: Stats come from the class** (before C1a) → [slices/ADR-0017.md](slices/ADR-0017.md)
-- [ ] **C1a. The nine classes, with descriptions; items lose their class restriction** (Core + Data + content + Game, about 220 lines) → [slices/C1a.md](slices/C1a.md)
+- [x] **C1a. The nine classes, with descriptions; items lose their class restriction** (Core + Data + content + Game, about 220 lines) → [slices/C1a.md](slices/C1a.md)
 - [ ] **C1b. A member's stats come from their class at their level; members join at level 1** (Core + Data + content, about 300 lines; split at the size check if over) → [slices/C1b.md](slices/C1b.md)
 - [ ] **C1c. A level-up raises max HP, max MP, attack and defense by the class's growth** (Core + Game, about 150 lines) → [slices/C1c.md](slices/C1c.md)
 - [ ] **C2. The nine characters: Ragnir, Omer and Lazarus added, Kamilia removed, Teelle the Paladin, Thaali the Druid, summaries, generated portraits** (Core + Data + content, about 220 lines) → [slices/C2.md](slices/C2.md)

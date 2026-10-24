@@ -24,8 +24,8 @@ public sealed class GameSessionSaveTests
     private static readonly MapLocation _belowChest = new("camp", new Point2D(1.5, 1.5), Facing.Up);
 
     private static readonly ItemDefinition _potion = new ItemDefinitionBuilder().WithId("potion").Build();
-    private static readonly ItemDefinition _sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5, "warrior").Build();
-    private static readonly ItemDefinition _mail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(3, "warrior").Build();
+    private static readonly ItemDefinition _sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build();
+    private static readonly ItemDefinition _mail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(3).Build();
     private static readonly ObjectDefinition _chest = new() { Id = "chest", Width = 1, Height = 1, CollisionPolygon = [], Category = "test", Tiles = [], AbovePlayerZones = [] };
 
     private static readonly MapEvent _openChest = new MapEventBuilder().WithId("chest_0").AsOnce()

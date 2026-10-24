@@ -5,7 +5,7 @@ metadata:
   type: feedback
 ---
 
-Records that carry lists or dictionaries (`ExperienceTable`, `EquipmentStats.AllowedClassIds`, `ContentCatalog`, `GameRules`) compare those members by reference. Flagged in the slice 2 and 3a reviews and again in 4b (copying the list in made two tables from equal data unequal).
+Records that carry lists or dictionaries (`ExperienceTable`, `ContentCatalog`, `GameRules`) compare those members by reference. Flagged in the slice 2 and 3a reviews and again in 4b (copying the list in made two tables from equal data unequal).
 
 **Why:** A `record` promises value equality; a silent reference compare surprises the next test or cache. The plan's agreed workaround is "compare definitions by Id".
 

@@ -116,7 +116,7 @@ internal sealed class SaveGameRepair
             return null;
         }
 
-        if (item.Equipment is not { } equipment || equipment.Slot != slot || !equipment.CanBeWornBy(definition.ClassId))
+        if (item.Equipment is not { } equipment || equipment.Slot != slot)
         {
             _returnedItemIds.Add(itemId);
             _changes.Add($"party member '{definition.Id}': '{itemId}' can no longer be worn as {slot}, so it went back to the inventory.");

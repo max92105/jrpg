@@ -1,8 +1,11 @@
 [
-  { "id": "warrior", "name": "Warrior" },
-  { "id": "mage", "name": "Mage" },
-  { "id": "thief", "name": "Thief" },
-  { "id": "healer", "name": "Healer" },
-  { "id": "knight", "name": "Knight" },
-  { "id": "ranger", "name": "Ranger" }
+  { "id": "warrior", "name": "Warrior", "description": "A trained fighter who stands in front and wins by steel and endurance." },
+  { "id": "mage", "name": "Mage", "description": "A scholar of the arcane who bends raw magic into fire, frost and storm." },
+  { "id": "cleric", "name": "Cleric", "description": "A servant of the gods who heals allies and smites the unholy." },
+  { "id": "rogue", "name": "Rogue", "description": "A quick and cunning blade who strikes where the enemy is weakest." },
+  { "id": "barbarian", "name": "Barbarian", "description": "A fierce warrior who turns rage into raw, unstoppable strength." },
+  { "id": "paladin", "name": "Paladin", "description": "A holy knight bound by an oath, shield of the weak and bane of evil." },
+  { "id": "monk", "name": "Monk", "description": "A disciplined fighter whose body and spirit are the only weapons needed." },
+  { "id": "warlock", "name": "Warlock", "description": "A seeker who made a pact with a dark patron in exchange for power." },
+  { "id": "druid", "name": "Druid", "description": "A keeper of the wild who calls on nature and takes the shapes of beasts." }
 ]

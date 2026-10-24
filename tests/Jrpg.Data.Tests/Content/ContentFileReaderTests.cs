@@ -20,10 +20,10 @@ public sealed class ContentFileReaderTests
     public void Read_MissingRequiredField_ThrowsNamingTheFileAndField()
     {
         var exception = Assert.Throws<ContentValidationException>(
-            () => ContentFileReader.Read<IReadOnlyList<ItemDefinition>>(TestContentPath("missing-allowed-class-ids.json")));
+            () => ContentFileReader.Read<IReadOnlyList<ItemDefinition>>(TestContentPath("missing-defense-bonus.json")));
 
-        Assert.StartsWith("missing-allowed-class-ids.json at $[0].equipment:", exception.Message, StringComparison.Ordinal);
-        Assert.Contains("allowedClassIds", exception.Message, StringComparison.Ordinal);
+        Assert.StartsWith("missing-defense-bonus.json at $[0].equipment:", exception.Message, StringComparison.Ordinal);
+        Assert.Contains("defenseBonus", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]

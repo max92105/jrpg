@@ -116,13 +116,11 @@ public sealed class SaveGameRepairTests
     [Fact]
     public void Repair_WornItemNoLongerWearable_ReturnsItToInventory()
     {
-        // A mage can't wear chain mail, and a sword isn't armor.
-        var repaired = Repair(_save with { Members = [_sarxian with { ArmorId = "bronze_sword" }, _jazog with { ArmorId = "chain_mail" }] });
+        // A sword isn't armor; a barbarian keeps his wizard robe, since any class wears anything (decision 165).
+        var repaired = Repair(_save with { Members = [_sarxian with { ArmorId = "bronze_sword" }, _jazog] });
 
-        Assert.Equal([null, null], repaired.Save.Members.Select(member => member.ArmorId));
-        Assert.Equal(
-            [new InventoryEntry("potion", 4), new InventoryEntry("bronze_sword", 1), new InventoryEntry("chain_mail", 1)],
-            repaired.Save.Inventory);
+        Assert.Equal([null, "wizard_robe"], repaired.Save.Members.Select(member => member.ArmorId));
+        Assert.Equal([new InventoryEntry("potion", 4), new InventoryEntry("bronze_sword", 1)], repaired.Save.Inventory);
     }
 
     [Fact]

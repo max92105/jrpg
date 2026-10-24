@@ -9,8 +9,8 @@ public sealed class PartyEquipmentTests
     private readonly Inventory _inventory = new();
     private readonly PartyEquipment _equipment;
     private readonly PartyMember _warrior = new PartyMemberBuilder().WithId("sarxian").WithClass("warrior").Build();
-    private readonly ItemDefinition _bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5, "warrior").Build();
-    private readonly ItemDefinition _ironSword = new ItemDefinitionBuilder().WithId("iron_sword").AsWeapon(8, "warrior").Build();
+    private readonly ItemDefinition _bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build();
+    private readonly ItemDefinition _ironSword = new ItemDefinitionBuilder().WithId("iron_sword").AsWeapon(8).Build();
 
     public PartyEquipmentTests()
     {
@@ -42,16 +42,16 @@ public sealed class PartyEquipmentTests
     }
 
     [Fact]
-    public void TryEquip_ClassNotAllowed_ReturnsFalse()
+    public void TryEquip_AnyClass_WearsAnyItem()
     {
-        var staff = new ItemDefinitionBuilder().WithId("magic_staff").AsWeapon(6, "mage").Build();
+        var staff = new ItemDefinitionBuilder().WithId("magic_staff").AsWeapon(6).Build();
         _inventory.Add(staff, 1);
 
         var equipped = _equipment.TryEquip(_warrior, staff);
 
-        Assert.False(equipped);
-        Assert.Null(_warrior.Weapon);
-        Assert.Equal(1, _inventory.QuantityOf(staff.Id));
+        Assert.True(equipped);
+        Assert.Same(staff, _warrior.Weapon);
+        Assert.Equal(0, _inventory.QuantityOf(staff.Id));
     }
 
     [Fact]
@@ -96,7 +96,7 @@ public sealed class PartyEquipmentTests
     [Fact]
     public void TryEquip_ReplacedItemStackFull_ReturnsFalseAndChangesNothing()
     {
-        var bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").WithMaxStack(1).AsWeapon(5, "warrior").Build();
+        var bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").WithMaxStack(1).AsWeapon(5).Build();
         _inventory.Add(bronzeSword, 1);
         _equipment.TryEquip(_warrior, bronzeSword);
         _inventory.Add(bronzeSword, 1);
@@ -140,7 +140,7 @@ public sealed class PartyEquipmentTests
     [Fact]
     public void TryUnequip_WornArmor_ReturnsItToInventory()
     {
-        var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6, "warrior").Build();
+        var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build();
         _inventory.Add(chainMail, 1);
         _equipment.TryEquip(_warrior, chainMail);
 
@@ -162,7 +162,7 @@ public sealed class PartyEquipmentTests
     [Fact]
     public void TryUnequip_InventoryStackFull_ReturnsFalseAndKeepsItem()
     {
-        var bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").WithMaxStack(1).AsWeapon(5, "warrior").Build();
+        var bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").WithMaxStack(1).AsWeapon(5).Build();
         _inventory.Add(bronzeSword, 1);
         _equipment.TryEquip(_warrior, bronzeSword);
         _inventory.Add(bronzeSword, 1);
@@ -175,26 +175,26 @@ public sealed class PartyEquipmentTests
     }
 
     [Fact]
-    public void WearableFor_OtherClassItem_IsExcluded()
+    public void OwnedFor_WeaponSlot_ListsEveryOwnedWeaponWhateverTheClass()
     {
-        var staff = new ItemDefinitionBuilder().WithId("magic_staff").AsWeapon(6, "mage").Build();
+        var staff = new ItemDefinitionBuilder().WithId("magic_staff").AsWeapon(6).Build();
         _inventory.Add(_ironSword, 1);
         _inventory.Add(staff, 1);
         _inventory.Add(_bronzeSword, 1);
 
-        var wearable = _equipment.WearableFor(_warrior, EquipmentSlot.Weapon, Catalog(_ironSword, staff, _bronzeSword));
+        var wearable = _equipment.OwnedFor(EquipmentSlot.Weapon, Catalog(_ironSword, staff, _bronzeSword));
 
-        Assert.Equal([_ironSword, _bronzeSword], wearable);
+        Assert.Equal([_ironSword, staff, _bronzeSword], wearable);
     }
 
     [Fact]
-    public void WearableFor_ArmorSlot_ExcludesWeapons()
+    public void OwnedFor_ArmorSlot_ExcludesWeapons()
     {
-        var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6, "warrior").Build();
+        var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build();
         _inventory.Add(_bronzeSword, 1);
         _inventory.Add(chainMail, 1);
 
-        var wearable = _equipment.WearableFor(_warrior, EquipmentSlot.Armor, Catalog(_bronzeSword, chainMail));
+        var wearable = _equipment.OwnedFor(EquipmentSlot.Armor, Catalog(_bronzeSword, chainMail));
 
         Assert.Equal([chainMail], wearable);
     }

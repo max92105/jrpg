@@ -5,10 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-new-game-flow/slices/K3.md, slice K3 (the intro map)
-Round: 1 (verdict: Ready to commit)
+Slice: docs/plans/2026-10-23-new-game-flow/slices/C1a.md, slice C1a (nine classes, items lose class restriction)
+Round: 1 (verdict: Fix the Criticals, then commit)
 
-- Warning: StartMapScenarios.AfterTheIntro places at (10, 3) but the real intro warp lands on (10.5, 3.5) (cell centre); doc "where every intro ends" is false; use Point2D(10.5, 3.5) and note the half-tile shift vs the old start in the slice (open)
-- Warning: SaveGameRepair.RepairLocation sends a save whose map vanished to NewGame.StartLocation = intro; the once intro is done, so the party is stuck on the exit-less 6x3 map; ask the developer for the fallback (open)
-- Suggestion: EveryLeaderHasOneIntro could also assert each intro's last step is WarpStep("start", (10, 3)); only Thaali's warp is exercised (open)
-- Follow-up: carried from K2a-K2c: SkipEventPresentation end-of-event test; ExplorationState.cs near 300 lines; Arrive events gold in editor; StillPlayback NaN for sub-tick Duration; bare-map frame between stills (open)
+- Critical: PartyEquipment.cs:76 TryTakeFrom <returns> line is 198 columns after the edit; rewrap block to 120 (reflow-comments.pl) (open)
+- Warning: EquipmentChoice.cs:19 param doc still points at PartyEquipment.WearableFor, renamed to OwnedFor by this slice (open)
+- Suggestion: IsWorthTaking keeps `item.Equipment is not null` though only worn items reach it; drop or state why (open)
+- Suggestion: SaveGameRepairTests WornItemNoLongerWearable sets jazog's armor to null; keeping wizard_robe on the barbarian and asserting it stays would pin decision 165 in repair (open)
+- Follow-up: PartyEquipment.cs lines 47, 72, 103 already over 120 columns (open)

@@ -22,15 +22,15 @@ internal sealed class ItemDefinitionBuilder
         return this;
     }
 
-    public ItemDefinitionBuilder AsWeapon(int attackBonus, params string[] allowedClassIds)
+    public ItemDefinitionBuilder AsWeapon(int attackBonus)
     {
-        _equipment = new EquipmentStats(EquipmentSlot.Weapon, attackBonus, DefenseBonus: 0, allowedClassIds);
+        _equipment = new EquipmentStats(EquipmentSlot.Weapon, attackBonus, DefenseBonus: 0);
         return this;
     }
 
-    public ItemDefinitionBuilder AsArmor(int defenseBonus, params string[] allowedClassIds)
+    public ItemDefinitionBuilder AsArmor(int defenseBonus)
     {
-        _equipment = new EquipmentStats(EquipmentSlot.Armor, AttackBonus: 0, defenseBonus, allowedClassIds);
+        _equipment = new EquipmentStats(EquipmentSlot.Armor, AttackBonus: 0, defenseBonus);
         return this;
     }
 

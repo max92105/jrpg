@@ -38,8 +38,8 @@ public sealed class PartyMemberTests
     public void TotalStats_WithWeaponAndArmor_AddsBonuses()
     {
         var member = new PartyMemberBuilder().WithClass("warrior").WithStats(attack: 10, defense: 5).Build();
-        Equip(member, new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5, "warrior").Build());
-        Equip(member, new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6, "warrior").Build());
+        Equip(member, new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build());
+        Equip(member, new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build());
 
         var stats = member.TotalStats;
 
@@ -50,8 +50,8 @@ public sealed class PartyMemberTests
     public void StatsWithout_Weapon_DropsOnlyTheWeaponBonus()
     {
         var member = new PartyMemberBuilder().WithClass("warrior").WithStats(attack: 10, defense: 5).Build();
-        Equip(member, new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5, "warrior").Build());
-        Equip(member, new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6, "warrior").Build());
+        Equip(member, new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build());
+        Equip(member, new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build());
 
         var preview = member.StatsWithout(EquipmentSlot.Weapon);
 
@@ -63,9 +63,9 @@ public sealed class PartyMemberTests
     public void StatsWith_OtherWeapon_ReplacesCurrentWeaponBonus()
     {
         var member = new PartyMemberBuilder().WithClass("warrior").WithStats(attack: 10, defense: 5).Build();
-        Equip(member, new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5, "warrior").Build());
-        Equip(member, new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6, "warrior").Build());
-        var ironSword = new ItemDefinitionBuilder().WithId("iron_sword").AsWeapon(8, "warrior").Build();
+        Equip(member, new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build());
+        Equip(member, new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build());
+        var ironSword = new ItemDefinitionBuilder().WithId("iron_sword").AsWeapon(8).Build();
 
         var preview = member.StatsWith(ironSword);
 
@@ -77,7 +77,7 @@ public sealed class PartyMemberTests
     public void TotalStats_WeaponWithDefenseBonus_AddsItToDefense()
     {
         var member = new PartyMemberBuilder().WithClass("knight").WithStats(attack: 10, defense: 5).Build();
-        Equip(member, new ItemDefinitionBuilder().WithId("shield_sword").AsWeapon(0, "knight").WithBonuses(attack: 4, defense: 2).Build());
+        Equip(member, new ItemDefinitionBuilder().WithId("shield_sword").AsWeapon(0).WithBonuses(attack: 4, defense: 2).Build());
 
         var stats = member.TotalStats;
 
@@ -88,8 +88,8 @@ public sealed class PartyMemberTests
     public void StatsWith_OtherArmor_ReplacesCurrentArmorBonus()
     {
         var member = new PartyMemberBuilder().WithClass("warrior").WithStats(attack: 10, defense: 5).Build();
-        Equip(member, new ItemDefinitionBuilder().WithId("leather_armor").AsArmor(3, "warrior").Build());
-        var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6, "warrior").Build();
+        Equip(member, new ItemDefinitionBuilder().WithId("leather_armor").AsArmor(3).Build());
+        var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build();
 
         var preview = member.StatsWith(chainMail);
 
@@ -196,7 +196,7 @@ public sealed class PartyMemberTests
     public void EquippedIn_WornArmor_ReturnsIt()
     {
         var member = new PartyMemberBuilder().WithClass("warrior").Build();
-        var armor = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6, "warrior").Build();
+        var armor = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build();
         Equip(member, armor);
 
         var worn = member.EquippedIn(EquipmentSlot.Armor);

@@ -77,7 +77,7 @@ public sealed class GameSessionTests
     [Fact]
     public void StartNew_Equipment_UsesTheSessionInventory()
     {
-        var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5, "warrior").Build();
+        var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build();
         var catalog = _catalog
             .WithItems(sword)
             .WithNewGame(NewGame(new InventoryEntry("bronze_sword", 1)))

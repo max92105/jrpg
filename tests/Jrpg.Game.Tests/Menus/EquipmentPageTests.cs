@@ -213,15 +213,22 @@ public sealed class EquipmentPageTests
         return zanyr;
     }
 
-    // With the leader wearing a bronze sword and Zanyr the iron one, the weapon choice lists Remove, the other bronze
-    // sword, then Zanyr's iron sword.
+    // Bounded by the rows, so a choice without Zanyr's sword fails the test instead of looping forever.
     private static void ChooseZanyrsIronSword(EquipmentPage page)
     {
-        page.Update(Pressing(GameButton.Down));
-        page.Update(Pressing(GameButton.Down));
+        var choice = page.Choice!;
+        for (var presses = 0; presses < choice.RowCount && !IsZanyrsIronSword(choice); presses++)
+        {
+            page.Update(Pressing(GameButton.Down));
+        }
+
+        Assert.True(IsZanyrsIronSword(choice));
     }
 
-    // Starts with 2 bronze swords and 2 leather armors in the inventory; the leader, a warrior, can wear both.
+    private static bool IsZanyrsIronSword(EquipmentChoice choice) =>
+        choice.HighlightedWearer?.Id == "zanyr" && choice.Highlighted?.Id == "iron_sword";
+
+    // Starts with 2 bronze swords and 2 leather armors in the inventory; the leader puts one of each on.
     private PartyMember WearingSwordAndArmor()
     {
         var sarxian = _session.Party.Leader;

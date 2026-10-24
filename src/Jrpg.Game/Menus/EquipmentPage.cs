@@ -84,6 +84,9 @@ internal sealed class EquipmentPage : IMemberPage
     /// <summary>Whether the player is choosing what goes in a slot.</summary>
     public bool IsChoosing => _choice is not null;
 
+    /// <summary>The open choice, so tests can pick a row by what it holds; null while no slot is being chosen for.</summary>
+    internal EquipmentChoice? Choice => _choice;
+
     /// <summary>Why the last change didn't happen, or null.</summary>
     public string? Notice => _notice;
 
@@ -168,7 +171,7 @@ internal sealed class EquipmentPage : IMemberPage
         }
 
         var slot = EquipmentSheet.Slots[_rowCursor.Selected];
-        _choice = new EquipmentChoice(_equipment.WearableFor(Shown, slot, _items), PartyEquipment.TakeableFor(Shown, slot, _party));
+        _choice = new EquipmentChoice(_equipment.OwnedFor(slot, _items), PartyEquipment.TakeableFor(Shown, slot, _party));
         _choiceView.Show(_choice, _messages.Text(EquipmentSheet.LabelIdOf(slot)), _inventory);
         ShowPreview(_choice);
     }

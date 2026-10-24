@@ -29,3 +29,10 @@ Part of [the new-game flow plan](../README.md). Design: [design.md](../design.md
     - `PartyEquipmentTests.Equip_AnyClass_CanWearAnyItem` (a mage wears the iron sword)
     - `ContentCatalogLoaderTests.Load_RepositoryContent_HasTheNineClasses` (asserts the nine ids, not a total)
   - **Verify by hand:** the Status page shows Sarxian as "Warlock". The Equipment page offers him the swords and the robe alike.
+  - **Done, with deviations:**
+    - `PartyEquipment.WearableFor(member, slot, items)` became `OwnedFor(slot, items)`, since the member no longer matters (the build refuses an unused parameter). `ItemCatalogValidator.Validate` lost its class ids.
+    - Tests deleted with the rule: the three `EquipmentStatsTests`, the two class-list rows of `ItemCatalogValidatorTests`, and `TryTakeFrom_ReceiverClassCantWearIt_ChangesNothing`.
+    - Tests rewritten for decision 165: `TryEquip_ClassNotAllowed_ReturnsFalse` became `TryEquip_AnyClass_WearsAnyItem`, and `TakeableFor_ClassCantWearIt_LeavesItOut` became `TakeableFor_AnyClass_OffersIt`. `WearableFor_OtherClassItem_IsExcluded` became `OwnedFor_WeaponSlot_ListsEveryOwnedWeaponWhateverTheClass`, and the save repair test keeps its "a sword isn't armor" case.
+    - `EquipmentPageTests` picks Zanyr's iron sword by what it is, through a new internal `EquipmentPage.Choice`: the weapon list now holds every owned weapon, so a fixed count of presses landed elsewhere.
+    - `ContentFileReaderTests`' missing-field file is now `missing-defense-bonus.json`. Test count: 1730 to 1726. No game message mentioned classes, so none was removed.
+    - Review (Critical fixed): `TryTakeFrom`'s returns comment is rewrapped to 120 columns. Also: `EquipmentChoice`'s parameter is `owned` and its doc names `OwnedFor`. `IsWorthTaking` drops its equipment check, since a worn item always is equipment, and says why. The repair test also checks that Jazog, a barbarian, keeps his wizard robe (decision 165). Two `PartyEquipment` code lines were over 120 columns before this slice and are left as they are.

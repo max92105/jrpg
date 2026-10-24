@@ -6,6 +6,6 @@
     "iconFile": "Weapon.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "weapon", "attackBonus": 5, "defenseBonus": 0 }
+    "equipment": { "slot": "weapon", "attackBonus": 5 }
   }
 ]

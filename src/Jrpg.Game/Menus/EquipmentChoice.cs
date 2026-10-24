@@ -16,11 +16,11 @@ internal sealed class EquipmentChoice
 
     private readonly ListCursor _cursor;
 
-    /// <param name="wearable">The owned items, in pickup order (<c>PartyEquipment.WearableFor</c>).</param>
+    /// <param name="owned">The owned items for the slot, in pickup order (<c>PartyEquipment.OwnedFor</c>).</param>
     /// <param name="takeable">What other members wear there, in party order (<c>PartyEquipment.TakeableFor</c>).</param>
-    public EquipmentChoice(IReadOnlyList<ItemDefinition> wearable, IReadOnlyList<WornItem> takeable)
+    public EquipmentChoice(IReadOnlyList<ItemDefinition> owned, IReadOnlyList<WornItem> takeable)
     {
-        Items = wearable;
+        Items = owned;
         Takeable = takeable;
         _cursor = new ListCursor(RowCount, _ => true, VisibleRows);
     }

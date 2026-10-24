@@ -7,11 +7,11 @@ namespace Jrpg.Data.Items;
 
 internal static class ItemCatalogValidator
 {
-    public static void Validate(string fileName, IReadOnlyList<ItemDefinition> items, IReadOnlySet<string> classIds) =>
+    public static void Validate(string fileName, IReadOnlyList<ItemDefinition> items) =>
         new ContentListValidator<ItemDefinition>(fileName, "item", item => item.Id)
-            .Validate(items, item => FindProblem(item, classIds));
+            .Validate(items, item => FindProblem(item));
 
-    private static string? FindProblem(ItemDefinition item, IReadOnlySet<string> classIds)
+    private static string? FindProblem(ItemDefinition item)
     {
         if (string.IsNullOrWhiteSpace(item.Name))
         {
@@ -33,7 +33,7 @@ internal static class ItemCatalogValidator
             return FindEffectProblem(item.Effect, item.IsUsableFromMenu);
         }
 
-        return item.Equipment is null ? null : FindEquipmentProblem(item.Equipment, classIds);
+        return item.Equipment is null ? null : FindEquipmentProblem(item.Equipment);
     }
 
     private static string? FindEffectProblem(Effect effect, bool isUsableFromMenu)
@@ -50,24 +50,13 @@ internal static class ItemCatalogValidator
             : null;
     }
 
-    private static string? FindEquipmentProblem(EquipmentStats equipment, IReadOnlySet<string> classIds)
+    private static string? FindEquipmentProblem(EquipmentStats equipment)
     {
         if (equipment.AttackBonus < 0)
         {
             return $"equipment.attackBonus must be at least 0 (was {equipment.AttackBonus}).";
         }
 
-        if (equipment.DefenseBonus < 0)
-        {
-            return $"equipment.defenseBonus must be at least 0 (was {equipment.DefenseBonus}).";
-        }
-
-        if (equipment.AllowedClassIds.Any(string.IsNullOrWhiteSpace))
-        {
-            return "equipment.allowedClassIds must not contain a null or empty class id.";
-        }
-
-        var unknownClassId = equipment.AllowedClassIds.FirstOrDefault(id => !classIds.Contains(id));
-        return unknownClassId is null ? null : $"equipment.allowedClassIds has unknown class id '{unknownClassId}'.";
+        return equipment.DefenseBonus < 0 ? $"equipment.defenseBonus must be at least 0 (was {equipment.DefenseBonus})." : null;
     }
 }

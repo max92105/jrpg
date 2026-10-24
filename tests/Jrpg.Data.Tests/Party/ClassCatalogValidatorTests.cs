@@ -9,7 +9,7 @@ public sealed class ClassCatalogValidatorTests
     [Fact]
     public void Validate_DuplicateId_ThrowsNamingTheId()
     {
-        ClassDefinition[] classes = [new("warrior", "Warrior"), new("warrior", "Berserker")];
+        ClassDefinition[] classes = [new("warrior", "Warrior", "Fights."), new("warrior", "Berserker", "Rages.")];
 
         var exception = Assert.Throws<ContentValidationException>(() => ClassCatalogValidator.Validate("classes.json", classes));
 
@@ -20,8 +20,17 @@ public sealed class ClassCatalogValidatorTests
     public void Validate_EmptyName_ThrowsNamingTheClass()
     {
         var exception = Assert.Throws<ContentValidationException>(
-            () => ClassCatalogValidator.Validate("classes.json", [new ClassDefinition("warrior", "")]));
+            () => ClassCatalogValidator.Validate("classes.json", [new ClassDefinition("warrior", "", "Fights.")]));
 
         Assert.Equal("classes.json: class 'warrior': name must not be empty.", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_EmptyDescription_ThrowsNamingTheClass()
+    {
+        var exception = Assert.Throws<ContentValidationException>(
+            () => ClassCatalogValidator.Validate("classes.json", [new ClassDefinition("warrior", "Warrior", " ")]));
+
+        Assert.Equal("classes.json: class 'warrior': description must not be empty.", exception.Message);
     }
 }

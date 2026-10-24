@@ -60,7 +60,7 @@
     "iconFile": "Weapon.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "weapon", "attackBonus": 5, "defenseBonus": 0, "allowedClassIds": ["warrior", "knight", "thief"] }
+    "equipment": { "slot": "weapon", "attackBonus": 5, "defenseBonus": 0 }
   },
   {
     "id": "iron_sword",
@@ -69,7 +69,7 @@
     "iconFile": "Weapon.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "weapon", "attackBonus": 8, "defenseBonus": 0, "allowedClassIds": ["warrior", "knight"] }
+    "equipment": { "slot": "weapon", "attackBonus": 8, "defenseBonus": 0 }
   },
   {
     "id": "magic_staff",
@@ -78,7 +78,7 @@
     "iconFile": "Weapon.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "weapon", "attackBonus": 6, "defenseBonus": 0, "allowedClassIds": ["mage", "healer"] }
+    "equipment": { "slot": "weapon", "attackBonus": 6, "defenseBonus": 0 }
   },
   {
     "id": "leather_armor",
@@ -87,7 +87,7 @@
     "iconFile": "Armor.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 3, "allowedClassIds": ["warrior", "knight", "thief", "ranger"] }
+    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 3 }
   },
   {
     "id": "chain_mail",
@@ -96,7 +96,7 @@
     "iconFile": "Armor.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 6, "allowedClassIds": ["warrior", "knight"] }
+    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 6 }
   },
   {
     "id": "wizard_robe",
@@ -105,6 +105,6 @@
     "iconFile": "Armor.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 4, "allowedClassIds": ["mage", "healer"] }
+    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 4 }
   }
 ]

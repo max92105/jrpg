@@ -252,7 +252,7 @@ public sealed class BattleSkillAndItemTests
     [Fact]
     public void Execute_ItemWithoutEffect_Throws()
     {
-        var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5, "warrior").Build();
+        var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build();
         _inventory.Add(sword, 1);
         var battle = CreateBattle();
 

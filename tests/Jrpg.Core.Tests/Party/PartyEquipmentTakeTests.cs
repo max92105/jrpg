@@ -16,10 +16,10 @@ public sealed class PartyEquipmentTakeTests
     private readonly PartyMember _jazog = new PartyMemberBuilder().WithId("jazog").WithClass("warrior").Build();
     private readonly PartyMember _zaruk = new PartyMemberBuilder().WithId("zaruk").WithClass("mage").Build();
     private readonly PartyMember _teelle = new PartyMemberBuilder().WithId("teelle").WithClass("warrior").Build();
-    private readonly ItemDefinition _bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5, "warrior").Build();
-    private readonly ItemDefinition _ironSword = new ItemDefinitionBuilder().WithId("iron_sword").AsWeapon(8, "warrior").Build();
-    private readonly ItemDefinition _staff = new ItemDefinitionBuilder().WithId("magic_staff").AsWeapon(6, "mage").Build();
-    private readonly ItemDefinition _chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6, "warrior").Build();
+    private readonly ItemDefinition _bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build();
+    private readonly ItemDefinition _ironSword = new ItemDefinitionBuilder().WithId("iron_sword").AsWeapon(8).Build();
+    private readonly ItemDefinition _staff = new ItemDefinitionBuilder().WithId("magic_staff").AsWeapon(6).Build();
+    private readonly ItemDefinition _chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build();
     private readonly PartyState _party;
 
     public PartyEquipmentTakeTests()
@@ -50,13 +50,13 @@ public sealed class PartyEquipmentTakeTests
     }
 
     [Fact]
-    public void TakeableFor_ClassCantWearIt_LeavesItOut()
+    public void TakeableFor_AnyClass_OffersIt()
     {
         Dress(_zaruk, _staff);
 
         var takeable = PartyEquipment.TakeableFor(_sarxian, EquipmentSlot.Weapon, _party);
 
-        Assert.Empty(takeable);
+        Assert.Equal(new WornItem(_zaruk, _staff), Assert.Single(takeable));
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public sealed class PartyEquipmentTakeTests
     [Fact]
     public void TryTakeFrom_NoRoomForReceiversItem_ChangesNothing()
     {
-        var bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").WithMaxStack(1).AsWeapon(5, "warrior").Build();
+        var bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").WithMaxStack(1).AsWeapon(5).Build();
         Dress(_jazog, _ironSword);
         Dress(_sarxian, bronzeSword);
         _inventory.Add(bronzeSword, 1);
@@ -130,18 +130,6 @@ public sealed class PartyEquipmentTakeTests
         Assert.Same(_ironSword, _jazog.Weapon);
         Assert.Same(bronzeSword, _sarxian.Weapon);
         Assert.Equal(1, _inventory.QuantityOf("bronze_sword"));
-    }
-
-    [Fact]
-    public void TryTakeFrom_ReceiverClassCantWearIt_ChangesNothing()
-    {
-        Dress(_zaruk, _staff);
-
-        var taken = _equipment.TryTakeFrom(_zaruk, _sarxian, EquipmentSlot.Weapon);
-
-        Assert.False(taken);
-        Assert.Same(_staff, _zaruk.Weapon);
-        Assert.Null(_sarxian.Weapon);
     }
 
     [Fact]

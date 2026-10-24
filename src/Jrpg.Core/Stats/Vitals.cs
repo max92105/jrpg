@@ -20,11 +20,11 @@ public sealed class Vitals
 
     public int Hp { get; private set; }
 
-    public int MaxHp { get; }
+    public int MaxHp { get; private set; }
 
     public int Mp { get; private set; }
 
-    public int MaxMp { get; }
+    public int MaxMp { get; private set; }
 
     public bool IsAlive => Hp > 0;
 
@@ -82,6 +82,24 @@ public sealed class Vitals
         var restored = Math.Min(amount, MaxMp - Mp);
         Mp += restored;
         return restored;
+    }
+
+    /// <summary>
+    /// A level-up: the gains go to the maxima and to current HP and MP alike, so the member keeps the HP and MP they
+    /// had spent (ADR 0017). A fallen member stays at 0 HP: levelling up doesn't revive.
+    /// </summary>
+    internal void RaiseMaxima(int maxHpGain, int maxMpGain)
+    {
+        ArgumentOutOfRangeException.ThrowIfNegative(maxHpGain);
+        ArgumentOutOfRangeException.ThrowIfNegative(maxMpGain);
+
+        MaxHp += maxHpGain;
+        MaxMp += maxMpGain;
+        Mp += maxMpGain;
+        if (IsAlive)
+        {
+            Hp += maxHpGain;
+        }
     }
 
     private int AddHp(int amount)

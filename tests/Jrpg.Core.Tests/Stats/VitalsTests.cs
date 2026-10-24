@@ -129,4 +129,24 @@ public sealed class VitalsTests
         Assert.Equal(20, vitals.Mp);
         Assert.Equal(5, restored);
     }
+
+    [Fact]
+    public void RaiseMaxima_Alive_AddsToMaxAndCurrent()
+    {
+        var vitals = new Vitals(hp: 30, maxHp: 100, mp: 5, maxMp: 20);
+
+        vitals.RaiseMaxima(maxHpGain: 10, maxMpGain: 3);
+
+        Assert.Equal((40, 110, 8, 23), (vitals.Hp, vitals.MaxHp, vitals.Mp, vitals.MaxMp));
+    }
+
+    [Fact]
+    public void RaiseMaxima_Dead_StaysAtZeroHp()
+    {
+        var vitals = new Vitals(hp: 0, maxHp: 100, mp: 5, maxMp: 20);
+
+        vitals.RaiseMaxima(maxHpGain: 10, maxMpGain: 3);
+
+        Assert.Equal((0, 110, 8, 23), (vitals.Hp, vitals.MaxHp, vitals.Mp, vitals.MaxMp));
+    }
 }

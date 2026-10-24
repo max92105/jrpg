@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-new-game-flow/slices/C1b2.md, slice C1b2 (member stats from class at level; join at level 1)
-Round: 1 (verdict: Ready to commit)
+Slice: docs/plans/2026-10-23-new-game-flow/slices/C1c.md, slice C1c (level-up raises stats by class growth)
+Round: 1 (verdict: Fix the Criticals, then commit)
 
-- Suggestion: PartyMember.cs:54 positional `1, 0` in new PartyMemberProgress; name them Level: 1, Experience: 0 (open)
-- Suggestion: SaveGameRepairTests 188/84 hard-wired to placeholder classes.json warlock numbers; next class retune breaks a repair test (open)
-- Follow-up: PartyMember.cs:166 "no stat growth until classes are designed" comment now stale; C1c replaces it
+- Critical: Vitals.cs:88 RaiseMaxima summary line is 121 cols; rewrap with reflow-comments.pl (open)
+- Suggestion: ClassStats -> CombatStats(Attack, Defense) conversion now in PartyMember ctor and LevelUp; a private static BaseStatsOf(ClassStats) (open)
+- Suggestion: no PartyMember-level test that a fallen member levels up at 0 HP with raised max (open)

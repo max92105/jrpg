@@ -119,6 +119,41 @@ public sealed class PartyMemberTests
     }
 
     [Fact]
+    public void GainExperience_OneLevelUp_RaisesStatsByGrowth()
+    {
+        var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), _growingClass, new Dictionary<string, SkillDefinition>());
+        member.Vitals.TakeDamage(40);
+
+        member.GainExperience(100, _table);
+
+        Assert.Equal(new CombatStats(Attack: 14, Defense: 8), member.BaseStats);
+        Assert.Equal((70, 110, 23, 23), (member.Vitals.Hp, member.Vitals.MaxHp, member.Vitals.Mp, member.Vitals.MaxMp));
+    }
+
+    [Fact]
+    public void GainExperience_TwoLevelUps_RaisesByTwoGrowths()
+    {
+        var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), _growingClass, new Dictionary<string, SkillDefinition>());
+
+        member.GainExperience(220, _table);
+
+        Assert.Equal(3, member.Level);
+        Assert.Equal(new CombatStats(Attack: 16, Defense: 9), member.BaseStats);
+        Assert.Equal((120, 120, 26, 26), (member.Vitals.Hp, member.Vitals.MaxHp, member.Vitals.Mp, member.Vitals.MaxMp));
+    }
+
+    [Fact]
+    public void GainExperience_NoLevelUp_StatsUnchanged()
+    {
+        var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), _growingClass, new Dictionary<string, SkillDefinition>());
+
+        member.GainExperience(99, _table);
+
+        Assert.Equal(new CombatStats(Attack: 12, Defense: 7), member.BaseStats);
+        Assert.Equal((100, 100, 20, 20), (member.Vitals.Hp, member.Vitals.MaxHp, member.Vitals.Mp, member.Vitals.MaxMp));
+    }
+
+    [Fact]
     public void GainExperience_BelowThreshold_ReturnsOneStepWithoutLevelUp()
     {
         var member = new PartyMemberBuilder().AtLevel(1, experience: 20).Build();

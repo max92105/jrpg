@@ -8,15 +8,18 @@ namespace Jrpg.Core.Party;
 /// <summary>A recruited party member's runtime state.</summary>
 public sealed class PartyMember
 {
+    private readonly ClassDefinition _class;
+
     private PartyMember(
         PartyMemberDefinition definition, ClassDefinition characterClass, IReadOnlyList<SkillDefinition> skills, PartyMemberProgress progress)
     {
         Definition = definition;
+        _class = characterClass;
         Skills = [.. skills];
         Level = progress.Level;
         Experience = progress.Experience;
         var stats = ClassGrowth.StatsAt(characterClass, progress.Level);
-        BaseStats = new CombatStats(stats.Attack, stats.Defense);
+        BaseStats = BaseStatsOf(stats);
         Vitals = new Vitals(progress.Hp, stats.MaxHp, progress.Mp, stats.MaxMp);
     }
 
@@ -29,7 +32,7 @@ public sealed class PartyMember
     /// <summary>Experience earned toward the next level; resets to 0 on level-up.</summary>
     public int Experience { get; private set; }
 
-    public CombatStats BaseStats { get; }
+    public CombatStats BaseStats { get; private set; }
 
     public Vitals Vitals { get; }
 
@@ -148,6 +151,8 @@ public sealed class PartyMember
         return [.. definition.SkillIds.Select(id => skillCatalog[id])];
     }
 
+    private static CombatStats BaseStatsOf(ClassStats stats) => new(stats.Attack, stats.Defense);
+
     private static int AttackBonusOf(ItemDefinition? item) => item?.Equipment?.AttackBonus ?? 0;
 
     private static int DefenseBonusOf(ItemDefinition? item) => item?.Equipment?.DefenseBonus ?? 0;
@@ -164,11 +169,20 @@ public sealed class PartyMember
 
         if (step.IsLevelUp)
         {
-            // Placeholder: a level-up grants no stat growth until classes are designed (plan 2026-10-17, guiding rule).
-            Level++;
-            Experience = 0;
+            LevelUp();
         }
 
         return step;
+    }
+
+    // The class's numbers at the new level, the one formula (ADR 0017); vitals rise by what the maxima gained.
+    private void LevelUp()
+    {
+        var before = ClassGrowth.StatsAt(_class, Level);
+        Level++;
+        Experience = 0;
+        var after = ClassGrowth.StatsAt(_class, Level);
+        BaseStats = BaseStatsOf(after);
+        Vitals.RaiseMaxima(after.MaxHp - before.MaxHp, after.MaxMp - before.MaxMp);
     }
 }

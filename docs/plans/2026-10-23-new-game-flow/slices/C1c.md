@@ -21,3 +21,4 @@ Part of [the new-game flow plan](../README.md). Design: [design.md](../design.md
       - `GainExperience_TwoLevelUps_RaisesByTwoGrowths`
       - `GainExperience_NoLevelUp_StatsUnchanged`
   - **Verify by hand:** win the goblin fight with a level 1 leader. The victory card shows the level-up, and the Status page shows the higher max HP and attack.
+- **Done, with deviations:** as planned. `RaiseMaxima` is internal, since only `PartyMember` calls it. In the Game nothing cached a number: the menus read the member when they open, and the battle panel's `VitalsText` redraws when the maxima change. Tests: 1730 before, 1735 after.

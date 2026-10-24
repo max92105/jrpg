@@ -31,6 +31,12 @@
                 ItemsSource="{Binding DataContext.Choices.ItemIds, RelativeSource={RelativeSource AncestorType=Window}}"
                 SelectedItem="{Binding ItemId}" />
     </StackPanel>
+    <StackPanel Orientation="Horizontal" Visibility="{Binding IsRecruit, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
+      <TextBlock Text="Joins the party:" VerticalAlignment="Center" Margin="0,0,4,0" />
+      <ComboBox Width="200"
+                ItemsSource="{Binding DataContext.Choices.MemberIds, RelativeSource={RelativeSource AncestorType=Window}}"
+                SelectedItem="{Binding MemberId}" />
+    </StackPanel>
     <StackPanel Orientation="Horizontal" Visibility="{Binding IsSwapObject, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
       <TextBlock Text="The object becomes" VerticalAlignment="Center" Margin="0,0,4,0" />
       <ComboBox Width="200"

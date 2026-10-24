@@ -160,6 +160,33 @@ public sealed class EventStepViewModelTests
         return step;
     }
 
+    [Fact]
+    public void From_RecruitStep_KeepsTheMember()
+    {
+        var step = EventStepViewModel.From(new RecruitStep("omer"));
+
+        Assert.Equal("omer", step.MemberId);
+        Assert.Equal("Recruit: omer", step.Label);
+    }
+
+    [Fact]
+    public void ToStep_RecruitWithMember_BuildsRecruitStep()
+    {
+        var step = EventStepViewModel.New(EventStepKind.Recruit);
+        step.MemberId = "lazarus";
+
+        Assert.Null(step.Problem);
+        Assert.Equal(new RecruitStep("lazarus"), step.ToStep());
+    }
+
+    [Fact]
+    public void Problem_RecruitWithoutMember_SaysSo()
+    {
+        var step = EventStepViewModel.New(EventStepKind.Recruit);
+
+        Assert.Equal("Choose the member who joins.", step.Problem);
+    }
+
     public static TheoryData<EventStep> StepsOfEveryKind() =>
     [
         new GiveItemStep("potion", 2),
@@ -167,5 +194,6 @@ public sealed class EventStepViewModelTests
         new WarpStep("interior_1", new GridCell(2, 3)),
         new StillStep("Placeholder1.png", 2.5, "Long ago."),
         new StillStep("Placeholder2.png", 4, Caption: null),
+        new RecruitStep("omer"),
     ];
 }

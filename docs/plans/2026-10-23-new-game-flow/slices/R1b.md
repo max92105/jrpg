@@ -17,3 +17,4 @@ Part of [the new-game flow plan](../README.md). Design: [design.md](../design.md
     - `ToStep_RecruitWithMember_BuildsRecruitStep`
     - `ToStep_RecruitWithoutMember_IsInvalid`
   - **Verify by hand:** open the start map after R2 and open a recruit point's event: it shows "Recruit Omer". Change the member, save, reopen: the change is kept.
+- **Done, with deviations:** The step list reads "Recruit: omer", using the id like the other steps' labels ("Give item: potion x2"), not "Recruit Omer". Both event windows gain a "Recruit" add button. No preset: the presets are per object kind, not per step. An empty member is a `Problem` ("Choose the member who joins."), as for the other steps, and `ToStep` is not reached while a problem shows. The every-kind round-trip theory gains a recruit step. No screenshot (privacy rule); the dialog check is the developer's. Tests: 1746 before, 1750 after.

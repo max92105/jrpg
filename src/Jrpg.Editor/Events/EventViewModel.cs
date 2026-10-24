@@ -101,6 +101,9 @@ internal sealed partial class EventViewModel : ObservableObject
     [RelayCommand]
     private void AddStill() => AddStep(EventStepKind.Still);
 
+    [RelayCommand]
+    private void AddRecruit() => AddStep(EventStepKind.Recruit);
+
     // After the chosen step, or last when none is chosen.
     private void AddStep(EventStepKind kind)
     {

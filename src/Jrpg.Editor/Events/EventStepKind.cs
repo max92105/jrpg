@@ -8,4 +8,5 @@ internal enum EventStepKind
     SwapObject,
     Warp,
     Still,
+    Recruit,
 }

@@ -77,6 +77,7 @@
           <Button Content="Swap object" Width="80" Margin="4,0,0,0" Command="{Binding AddSwapObjectCommand}" />
           <Button Content="Warp" Width="60" Margin="4,0,0,0" Command="{Binding AddWarpCommand}" />
           <Button Content="Still" Width="50" Margin="4,0,0,0" Command="{Binding AddStillCommand}" />
+          <Button Content="Recruit" Width="60" Margin="4,0,0,0" Command="{Binding AddRecruitCommand}" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
           <Button Content="Remove" Width="60" Command="{Binding RemoveStepCommand}" />

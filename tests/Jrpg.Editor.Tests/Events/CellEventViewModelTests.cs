@@ -7,7 +7,7 @@ namespace Jrpg.Editor.Tests.Events;
 
 public sealed class CellEventViewModelTests
 {
-    private static readonly StepChoices _choices = new(["potion"], ["chest"], ["forest", "start"]);
+    private static readonly StepChoices _choices = new(["potion"], ["chest"], ["forest", "start"], ["omer", "sarxian"]);
 
     private static readonly CellEvent _exit = new(
         new GridCell(6, 19),
@@ -35,6 +35,30 @@ public sealed class CellEventViewModelTests
         Assert.Null(edit.Before);
         Assert.Equal((1, new GridCell(3, 4)), (edit.Index, edit.After!.Cell));
         Assert.Equal(new WarpStep("forest", new GridCell(0, 0)), Assert.Single(edit.After.Event.Steps));
+    }
+
+    [Fact]
+    public void ToEdit_ArriveForOneLeaderWithAStill_KeepsAll()
+    {
+        var cellEvent = new CellEventViewModel(new GridCell(3, 4), null, _choices);
+        cellEvent.Event.Activation = EventActivation.Arrive;
+        cellEvent.Event.OnlyWhenLeaderId = "omer";
+        cellEvent.Event.AddStillCommand.Execute(null);
+        cellEvent.Event.SelectedStep!.ImageFile = "Placeholder1.png";
+
+        var mapEvent = cellEvent.ToEdit([_exit])!.After!.Event;
+
+        Assert.Equal((EventActivation.Arrive, "omer"), (mapEvent.Activation, mapEvent.OnlyWhenLeaderId));
+        Assert.Equal(new StillStep("Placeholder1.png", 4, Caption: null), Assert.Single(mapEvent.Steps));
+    }
+
+    [Fact]
+    public void Activations_Cell_AreTouchAndArrive()
+    {
+        var cellEvent = new CellEventViewModel(new GridCell(3, 4), null, _choices);
+
+        Assert.Equal([EventActivation.Touch, EventActivation.Arrive], cellEvent.Activations);
+        Assert.Equal(["", "omer", "sarxian"], cellEvent.LeaderChoices);
     }
 
     [Fact]

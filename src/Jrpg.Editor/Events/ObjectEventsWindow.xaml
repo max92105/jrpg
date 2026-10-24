@@ -49,7 +49,7 @@
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
           <TextBlock Text="Prompt (for interact)" Width="160" VerticalAlignment="Center" />
-          <TextBox Width="160" Text="{Binding Prompt, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBox Width="160" Text="{Binding Prompt, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanHavePrompt}" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
           <TextBlock Text="Only while the object is" Width="160" VerticalAlignment="Center" />
@@ -57,6 +57,13 @@
                     ItemsSource="{Binding DataContext.OnlyWhenChoices, RelativeSource={RelativeSource AncestorType=Window}}"
                     SelectedItem="{Binding OnlyWhenObjectId}"
                     ToolTip="Empty: always" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Only while led by" Width="160" VerticalAlignment="Center" />
+          <ComboBox Width="160"
+                    ItemsSource="{Binding DataContext.LeaderChoices, RelativeSource={RelativeSource AncestorType=Window}}"
+                    SelectedItem="{Binding OnlyWhenLeaderId}"
+                    ToolTip="Empty: anyone leads" />
         </StackPanel>
         <CheckBox Content="Only once per playthrough (remembered in saves)" IsChecked="{Binding IsOnce}" Margin="0,6,0,8" />
         <TextBlock Text="Steps, run in order" FontWeight="Bold" />
@@ -69,6 +76,7 @@
           <Button Content="Give item" Width="70" Margin="4,0,0,0" Command="{Binding AddGiveItemCommand}" />
           <Button Content="Swap object" Width="80" Margin="4,0,0,0" Command="{Binding AddSwapObjectCommand}" />
           <Button Content="Warp" Width="60" Margin="4,0,0,0" Command="{Binding AddWarpCommand}" />
+          <Button Content="Still" Width="50" Margin="4,0,0,0" Command="{Binding AddStillCommand}" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
           <Button Content="Remove" Width="60" Command="{Binding RemoveStepCommand}" />

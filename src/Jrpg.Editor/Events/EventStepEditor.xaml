@@ -48,6 +48,20 @@
       <TextBox Width="40" Text="{Binding CellYText, UpdateSourceTrigger=PropertyChanged}" />
       <TextBlock Text=")" VerticalAlignment="Center" />
     </StackPanel>
+    <StackPanel Visibility="{Binding IsStill, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
+      <StackPanel Orientation="Horizontal">
+        <TextBlock Text="Image file (cinematics folder)" Width="180" VerticalAlignment="Center" />
+        <TextBox Width="160" Text="{Binding ImageFile, UpdateSourceTrigger=PropertyChanged}" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+        <TextBlock Text="Shown for (seconds)" Width="180" VerticalAlignment="Center" />
+        <TextBox Width="60" Text="{Binding SecondsText, UpdateSourceTrigger=PropertyChanged}" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+        <TextBlock Text="Subtitle (optional)" Width="180" VerticalAlignment="Center" />
+        <TextBox Width="300" Text="{Binding Caption, UpdateSourceTrigger=PropertyChanged}" />
+      </StackPanel>
+    </StackPanel>
     <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Text="{Binding Problem}" />
   </StackPanel>
 </UserControl>

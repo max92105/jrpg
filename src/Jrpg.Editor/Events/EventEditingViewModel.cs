@@ -61,5 +61,6 @@ internal sealed class EventEditingViewModel(CatalogDraft catalog)
     private StepChoices Choices() => new(
         [.. catalog.Current.Items.Keys.Order(StringComparer.Ordinal)],
         [.. catalog.Current.Objects.Keys.Order(StringComparer.Ordinal)],
-        MapIds);
+        MapIds,
+        [.. catalog.Current.PartyMembers.Keys.Order(StringComparer.Ordinal)]);
 }

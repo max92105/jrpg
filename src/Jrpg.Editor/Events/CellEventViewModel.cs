@@ -6,9 +6,9 @@ using Jrpg.Editor.Maps.Editing;
 namespace Jrpg.Editor.Events;
 
 /// <summary>
-/// The cell event dialog: the one event a cell runs when the player walks onto it, such as a warp at a map's edge.
-/// A new one gets the content's id <c>cell_{x}_{y}</c>; it is always walked into, and offers dialogue and warp steps
-/// (the game refuses swapping an object from a cell).
+/// The cell event dialog: the one event a cell runs when the player walks onto it, such as a warp at a map's edge. A
+/// new one gets the content's id <c>cell_{x}_{y}</c> and is walked into; it can run on arrival instead, as an intro
+/// does (ADR 0016). It offers dialogue, warp and still steps (the game refuses swapping an object from a cell).
 /// </summary>
 internal sealed class CellEventViewModel
 {
@@ -23,6 +23,7 @@ internal sealed class CellEventViewModel
         _cell = cell;
         _existing = existing;
         Choices = choices;
+        LeaderChoices = ["", .. choices.MemberIds];
         Event = new EventViewModel(existing?.Event ?? new MapEvent
         {
             Id = $"cell_{cell.X}_{cell.Y}",
@@ -34,6 +35,12 @@ internal sealed class CellEventViewModel
     public string Title => $"Event of cell ({_cell.X}, {_cell.Y})";
 
     public StepChoices Choices { get; }
+
+    /// <summary>What a cell event can start on: being walked onto, or the player arriving on the map.</summary>
+    public IReadOnlyList<EventActivation> Activations { get; } = [EventActivation.Touch, EventActivation.Arrive];
+
+    /// <summary>The members the event can wait to be led by; the empty one means anyone.</summary>
+    public IReadOnlyList<string> LeaderChoices { get; }
 
     public EventViewModel Event { get; }
 

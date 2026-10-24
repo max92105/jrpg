@@ -7,4 +7,5 @@ internal enum EventStepKind
     GiveItem,
     SwapObject,
     Warp,
+    Still,
 }

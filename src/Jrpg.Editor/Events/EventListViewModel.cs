@@ -19,7 +19,7 @@ internal sealed partial class EventListViewModel : ObservableObject
     private readonly string _likelyOpenedObjectId;
 
     /// <param name="placed">The object whose events are edited.</param>
-    /// <param name="choices">The ids the steps and "only while the object is" can pick from.</param>
+    /// <param name="choices">The ids the steps, "only while the object is" and "only while led by" can pick from.</param>
     /// <param name="likelyOpenedObjectId">What the chest and door presets turn the object into (<see cref="EventPresets.GuessOpenedObject"/>).</param>
     public EventListViewModel(PlacedObject placed, StepChoices choices, string likelyOpenedObjectId)
     {
@@ -28,6 +28,7 @@ internal sealed partial class EventListViewModel : ObservableObject
         Events = [.. placed.Events.Select(mapEvent => new EventViewModel(mapEvent))];
         Choices = choices;
         OnlyWhenChoices = ["", .. choices.ObjectIds];
+        LeaderChoices = ["", .. choices.MemberIds];
         SelectedEvent = Events.Count > 0 ? Events[0] : null;
     }
 
@@ -41,6 +42,9 @@ internal sealed partial class EventListViewModel : ObservableObject
 
     /// <summary>The object ids an event can be limited to; the empty one means always.</summary>
     public IReadOnlyList<string> OnlyWhenChoices { get; }
+
+    /// <summary>The members an event can wait to be led by; the empty one means anyone.</summary>
+    public IReadOnlyList<string> LeaderChoices { get; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RemoveEventCommand), nameof(MoveEventUpCommand), nameof(MoveEventDownCommand))]

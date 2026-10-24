@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:Jrpg.Editor.Events"
         Title="{Binding Title}"
         Width="560"
-        Height="460"
+        Height="520"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False">
   <DockPanel Margin="12">
@@ -16,10 +16,24 @@
     </StackPanel>
     <TextBlock x:Name="ProblemText" DockPanel.Dock="Bottom" Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Margin="0,8,0,0" />
 
-    <!-- The cell's one event: always run when the player walks onto the cell. -->
+    <!-- The cell's one event: run when the player walks onto the cell, or arrives on the map. -->
     <DockPanel DataContext="{Binding Event}">
       <StackPanel DockPanel.Dock="Top">
-        <TextBlock Text="{Binding Id, StringFormat=Event id: {0} (runs when the player walks onto the cell)}" Foreground="{StaticResource MutedTextBrush}" />
+        <TextBlock Text="{Binding Id, StringFormat=Event id: {0}}" Foreground="{StaticResource MutedTextBrush}" />
+        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+          <TextBlock Text="Starts when the player" Width="160" VerticalAlignment="Center" />
+          <ComboBox Width="120"
+                    ItemsSource="{Binding DataContext.Activations, RelativeSource={RelativeSource AncestorType=Window}}"
+                    SelectedItem="{Binding Activation}"
+                    ToolTip="Touch: walks onto the cell. Arrive: arrives on the map, such as an intro." />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Only while led by" Width="160" VerticalAlignment="Center" />
+          <ComboBox Width="160"
+                    ItemsSource="{Binding DataContext.LeaderChoices, RelativeSource={RelativeSource AncestorType=Window}}"
+                    SelectedItem="{Binding OnlyWhenLeaderId}"
+                    ToolTip="Empty: anyone leads" />
+        </StackPanel>
         <CheckBox Content="Only once per playthrough (remembered in saves)" IsChecked="{Binding IsOnce}" Margin="0,6,0,8" />
         <TextBlock Text="Steps, run in order" FontWeight="Bold" />
       </StackPanel>
@@ -28,6 +42,7 @@
         <TextBlock Text="Add" VerticalAlignment="Center" Margin="0,0,4,0" />
         <Button Content="Warp" Width="60" Command="{Binding AddWarpCommand}" />
         <Button Content="Dialogue" Width="70" Margin="4,0,0,0" Command="{Binding AddDialogueCommand}" />
+        <Button Content="Still" Width="50" Margin="4,0,0,0" Command="{Binding AddStillCommand}" />
         <Button Content="Remove" Width="60" Margin="12,0,0,0" Command="{Binding RemoveStepCommand}" />
         <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepUpCommand}" />
         <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepDownCommand}" />

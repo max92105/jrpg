@@ -66,7 +66,7 @@ internal sealed partial class MainWindow
                 {
                     Width = 2 * MarkerRadius,
                     Height = 2 * MarkerRadius,
-                    Fill = placed.Events[index].Activation == EventActivation.Touch ? Brushes.Cyan : Brushes.Gold,
+                    Fill = MarkerFill(placed.Events[index].Activation),
                     Stroke = Brushes.Black,
                     StrokeThickness = 1.5,
                 };
@@ -77,7 +77,15 @@ internal sealed partial class MainWindow
         }
     }
 
-    // The trigger marker: a small square in the cell's top-right corner, cyan since a cell event is always walked into.
+    // One color per trigger, on objects and cells alike: cyan when walked into, gold when pressed, orchid on arrival.
+    private static SolidColorBrush MarkerFill(EventActivation activation) => activation switch
+    {
+        EventActivation.Touch => Brushes.Cyan,
+        EventActivation.Arrive => Brushes.Orchid,
+        _ => Brushes.Gold,
+    };
+
+    // The trigger marker: a small square in the cell's top-right corner, colored by what starts the event.
     private void DrawCellEventMarks()
     {
         foreach (var cellEvent in _viewModel.CurrentMap?.Map.Layout.CellEvents ?? [])
@@ -86,7 +94,7 @@ internal sealed partial class MainWindow
             {
                 Width = CellMarkerSize,
                 Height = CellMarkerSize,
-                Fill = Brushes.Cyan,
+                Fill = MarkerFill(cellEvent.Event.Activation),
                 Stroke = Brushes.Black,
                 StrokeThickness = 1,
             };

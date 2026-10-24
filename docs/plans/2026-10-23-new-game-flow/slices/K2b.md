@@ -33,3 +33,10 @@ Part of [the new-game flow plan](../README.md). Design: [design.md](../design.md
     - After K3, open the `intro` map and open an intro event: it shows Arrive, the leader, and its stills.
     - Change a still's seconds, save, reopen: the change is kept.
     - Look at the dialog in the editor's dark theme.
+  - **Done, with deviations:**
+    - The cell dialog also offers Touch or Arrive, and both dialogs have "Only while led by", since K3's intros are cell events. `StepChoices` gains `MemberIds`.
+    - Switching an event to Arrive disables the prompt box (`CanHavePrompt`), and `ToEvent` drops the prompt, so the game's "arrive has no prompt" rule can't be broken from the dialog. The label reads "On arrival", with " while {leader} leads" when the event waits for a leader (the K1 review's `Press ""`).
+    - The still's seconds are typed as decimals with a dot ("2.5"); the editor checks above 0, and Data's upper bound applies on save.
+    - No editor screenshot: the capture would take the whole screen while the developer works. The dialog check is the developer's.
+    - Tests: still label, seconds problem (theory), blank caption, round trip of two stills, a cell event set to Arrive for Omer with a still, the cell's activation and leader choices, the arrival label, and the prompt dropped on Arrive.
+    - Review: a test checks that the leader picker lists the catalog's members (`StartEditingCellAt_AnyCell_OffersTheCatalogsMembersAsLeaders`), and one test event id is now neutral. The map's event markers now have one color per trigger (cyan touch, gold press, orchid arrival) on objects and cells, so arrival events are visible. The K2a items the reviewer listed as open were fixed in K2a.

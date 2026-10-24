@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-new-game-flow/slices/K2a.md, slice K2a (still step, skip presentation)
+Slice: docs/plans/2026-10-23-new-game-flow/slices/K2b.md, slice K2b (editor: arrive activation, leader condition, still step)
 Round: 1 (verdict: Ready to commit)
 
-- Warning: ExplorationState.SkipEventPresentation running to the end of the event has no test; dropping its SettleAfterEventMoved call fails nothing (player stuck in a finished event) (open)
-- Suggestion: validator accepts huge seconds (e.g. 1e15) that make StillStep.Duration throw OverflowException (open)
-- Follow-up: ExplorationState.cs at 289 lines, near the ~300 split threshold (open)
-- Follow-up: K1 items still open: ArrivalEvents object branch test; EventViewModel Arrive event reads Press "" (K2b); EnterMap doc "(later) a loaded save" (open)
+- Suggestion: EventEditingViewModel.Choices() feeding PartyMembers into MemberIds has no test (wrong catalog key would fail nothing) (open)
+- Suggestion: Label_ArriveForOneLeader test builds a bare EventViewModel inside EventListViewModelTests with id "chest@1,1_0"; a plain id reads better (open)
+- Follow-up: MainWindow.EventEditing.cs:69 marks Arrive object events gold like Interact (Touch cyan, everything else gold) (open)
+- Follow-up: carried from K2a: SkipEventPresentation end-of-event test; huge still seconds overflow; ExplorationState.cs near 300 lines (open)

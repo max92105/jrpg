@@ -43,6 +43,36 @@ public sealed class EventStepViewModelTests
     }
 
     [Fact]
+    public void Label_Still_NamesImageAndSeconds()
+    {
+        Assert.Equal("Still: Placeholder1.png, 2.5 s", EventStepViewModel.From(new StillStep("Placeholder1.png", 2.5, Caption: null)).Label);
+    }
+
+    [Theory]
+    [InlineData("0")]
+    [InlineData("-1")]
+    [InlineData("four")]
+    [InlineData("")]
+    public void Problem_StillWithSecondsNotAboveZero_SaysSo(string seconds)
+    {
+        var step = EventStepViewModel.New(EventStepKind.Still);
+        step.ImageFile = "Placeholder1.png";
+        step.SecondsText = seconds;
+
+        Assert.Equal("The seconds must be a number above 0.", step.Problem);
+    }
+
+    [Fact]
+    public void ToStep_StillWithBlankCaption_HasNoCaption()
+    {
+        var step = EventStepViewModel.New(EventStepKind.Still);
+        step.ImageFile = " Placeholder1.png ";
+        step.Caption = " ";
+
+        Assert.Equal(new StillStep("Placeholder1.png", 4, Caption: null), step.ToStep());
+    }
+
+    [Fact]
     public void ToStep_GiveItemEdited_UsesTheNewFields()
     {
         var step = EventStepViewModel.From(new GiveItemStep("potion", 2));
@@ -135,5 +165,7 @@ public sealed class EventStepViewModelTests
         new GiveItemStep("potion", 2),
         new SwapObjectStep("door_open"),
         new WarpStep("interior_1", new GridCell(2, 3)),
+        new StillStep("Placeholder1.png", 2.5, "Long ago."),
+        new StillStep("Placeholder2.png", 4, Caption: null),
     ];
 }

@@ -15,6 +15,7 @@ internal sealed partial class EventViewModel : ObservableObject
         Prompt = mapEvent.Prompt ?? "";
         IsOnce = mapEvent.IsOnce;
         OnlyWhenObjectId = mapEvent.OnlyWhenObjectId ?? "";
+        OnlyWhenLeaderId = mapEvent.OnlyWhenLeaderId ?? "";
         Steps = [.. mapEvent.Steps.Select(EventStepViewModel.From)];
         Steps.CollectionChanged += (_, _) => OnPropertyChanged(nameof(Label));
     }
@@ -24,7 +25,7 @@ internal sealed partial class EventViewModel : ObservableObject
     public ObservableCollection<EventStepViewModel> Steps { get; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Label))]
+    [NotifyPropertyChangedFor(nameof(Label), nameof(CanHavePrompt))]
     public partial EventActivation Activation { get; set; }
 
     /// <summary>The hint shown when the player can interact, such as "Open".</summary>
@@ -41,18 +42,32 @@ internal sealed partial class EventViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(Label))]
     public partial string OnlyWhenObjectId { get; set; }
 
+    /// <summary>The member who must lead for the event to run, such as an intro's character; empty for anyone.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Label))]
+    public partial string OnlyWhenLeaderId { get; set; }
+
+    /// <summary>False for an arrival event: nothing is pressed to start it, so the game refuses a prompt.</summary>
+    public bool CanHavePrompt => Activation != EventActivation.Arrive;
+
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RemoveStepCommand), nameof(MoveStepUpCommand), nameof(MoveStepDownCommand))]
     public partial EventStepViewModel? SelectedStep { get; set; }
 
-    /// <summary>The one-line summary, such as <c>Press "Open" if door_close: 1 step(s), once</c>.</summary>
+    /// <summary>The one-line summary, such as <c>Press "Open" if door_close: 1 step(s), once</c> or <c>On arrival while omer leads: 4 step(s), once</c>.</summary>
     public string Label
     {
         get
         {
-            var when = Activation == EventActivation.Touch ? "Walk into" : $"Press \"{Prompt}\"";
-            var condition = OnlyWhenObjectId.Length > 0 ? $" if {OnlyWhenObjectId}" : "";
-            return $"{when}{condition}: {Steps.Count} step(s){(IsOnce ? ", once" : "")}";
+            var when = Activation switch
+            {
+                EventActivation.Touch => "Walk into",
+                EventActivation.Arrive => "On arrival",
+                _ => $"Press \"{Prompt}\"",
+            };
+            var objectCondition = OnlyWhenObjectId.Length > 0 ? $" if {OnlyWhenObjectId}" : "";
+            var leaderCondition = OnlyWhenLeaderId.Length > 0 ? $" while {OnlyWhenLeaderId} leads" : "";
+            return $"{when}{objectCondition}{leaderCondition}: {Steps.Count} step(s){(IsOnce ? ", once" : "")}";
         }
     }
 
@@ -60,9 +75,10 @@ internal sealed partial class EventViewModel : ObservableObject
     {
         Id = Id,
         Activation = Activation,
-        Prompt = string.IsNullOrWhiteSpace(Prompt) ? null : Prompt.Trim(),
+        Prompt = !CanHavePrompt || string.IsNullOrWhiteSpace(Prompt) ? null : Prompt.Trim(),
         IsOnce = IsOnce,
         OnlyWhenObjectId = OnlyWhenObjectId.Length > 0 ? OnlyWhenObjectId : null,
+        OnlyWhenLeaderId = OnlyWhenLeaderId.Length > 0 ? OnlyWhenLeaderId : null,
         Steps = [.. Steps.Select(step => step.ToStep())],
     };
 
@@ -81,6 +97,9 @@ internal sealed partial class EventViewModel : ObservableObject
 
     [RelayCommand]
     private void AddWarp() => AddStep(EventStepKind.Warp);
+
+    [RelayCommand]
+    private void AddStill() => AddStep(EventStepKind.Still);
 
     // After the chosen step, or last when none is chosen.
     private void AddStep(EventStepKind kind)

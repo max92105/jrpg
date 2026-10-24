@@ -64,6 +64,16 @@ public sealed class EventEditingViewModelTests
     }
 
     [Fact]
+    public void StartEditingCellAt_AnyCell_OffersTheCatalogsMembersAsLeaders()
+    {
+        var cellEvent = _eventEditing.StartEditingCellAt(new GridCell(0, 0))!;
+
+        Assert.Contains("sarxian", cellEvent.LeaderChoices);
+        Assert.Contains("zanyr", cellEvent.LeaderChoices);
+        Assert.Equal("", cellEvent.LeaderChoices[0]);
+    }
+
+    [Fact]
     public void StartEditingCellAt_OffTheMap_IsNull()
     {
         Assert.Null(_eventEditing.StartEditingCellAt(new GridCell(-1, 0)));

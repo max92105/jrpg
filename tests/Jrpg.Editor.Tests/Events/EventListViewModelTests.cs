@@ -35,7 +35,7 @@ public sealed class EventListViewModelTests
         Events = [_open, _enter],
     };
 
-    private static readonly StepChoices _choices = new(["ether", "potion"], ["chest", "door_close", "door_open"], ["interior_1", "start"]);
+    private static readonly StepChoices _choices = new(["ether", "potion"], ["chest", "door_close", "door_open"], ["interior_1", "start"], ["omer", "sarxian"]);
 
     private readonly EventListViewModel _list = new(_door, _choices, "door_open");
 
@@ -45,6 +45,33 @@ public sealed class EventListViewModelTests
         Assert.Equal(["Press \"Open\" if door_close: 1 step(s)", "Walk into if door_open: 1 step(s)"], _list.Events.Select(item => item.Label));
         Assert.Same(_list.Events[0], _list.SelectedEvent);
         Assert.Equal(["", "chest", "door_close", "door_open"], _list.OnlyWhenChoices);
+    }
+
+    [Fact]
+    public void Label_ArriveForOneLeader_SaysOnArrivalWhileTheyLead()
+    {
+        var intro = new EventViewModel(new MapEvent
+        {
+            Id = "intro_0",
+            Activation = EventActivation.Arrive,
+            IsOnce = true,
+            OnlyWhenLeaderId = "omer",
+            Steps = [new StillStep("Placeholder1.png", 4, Caption: null)],
+        });
+
+        Assert.Equal("On arrival while omer leads: 1 step(s), once", intro.Label);
+    }
+
+    [Fact]
+    public void ToEvent_InteractSwitchedToArrive_DropsThePromptTheGameWouldRefuse()
+    {
+        var list = new EventListViewModel(_door, _choices, "door_open");
+        list.AddEventCommand.Execute(null);
+
+        list.SelectedEvent!.Activation = EventActivation.Arrive;
+
+        Assert.False(list.SelectedEvent.CanHavePrompt);
+        Assert.Null(list.SelectedEvent.ToEvent().Prompt);
     }
 
     [Fact]

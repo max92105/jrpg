@@ -163,7 +163,7 @@ public sealed class ExplorationEncounterTests
             .WithEncounters(_goblins)
             .Build();
         var context = new ExplorationContext(catalog, new Inventory(), new WorldState(), random);
-        return new ExplorationState(context, new MapLocation(mapId, position ?? new Point2D(0.5, 0.5), Facing.Right));
+        return new ExplorationState(context, "sarxian", new MapLocation(mapId, position ?? new Point2D(0.5, 0.5), Facing.Right));
     }
 
     private static MapEvent TouchEvent(string id, EventStep step) =>

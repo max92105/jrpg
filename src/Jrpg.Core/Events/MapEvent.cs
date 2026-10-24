@@ -17,7 +17,12 @@ public sealed record MapEvent
     /// <summary>When set, the event only runs while its object is this one, such as a closed door but not an open one.</summary>
     public string? OnlyWhenObjectId { get; init; }
 
+    /// <summary>When set, the event only runs while this member leads, such as each leader's intro (decision 185).</summary>
+    public string? OnlyWhenLeaderId { get; init; }
+
     public required IReadOnlyList<EventStep> Steps { get; init; }
 
     public bool CanRunOn(string objectId) => OnlyWhenObjectId is null || OnlyWhenObjectId == objectId;
+
+    public bool IsForLeader(string leaderId) => OnlyWhenLeaderId is null || OnlyWhenLeaderId == leaderId;
 }

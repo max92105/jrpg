@@ -66,7 +66,7 @@ internal static class MapEventValidator
         foreach (var cellEvent in layout.CellEvents)
         {
             var problem = !layout.Contains(cellEvent.Cell) ? "the cell is outside the map."
-                : cellEvent.Event.Activation != EventActivation.Touch ? "a cell event must have touch activation."
+                : cellEvent.Event.Activation == EventActivation.Interact ? "a cell event must have touch or arrive activation."
                 : cellEvent.Event.Steps.Any(step => step is SwapObjectStep) ? "swapObject only works in an object's event."
                 : FindEventProblem(cellEvent.Event, references);
             if (problem is not null)
@@ -80,14 +80,9 @@ internal static class MapEventValidator
 
     private static string? FindEventProblem(MapEvent mapEvent, MapReferences references)
     {
-        if (mapEvent.Activation == EventActivation.Interact && string.IsNullOrWhiteSpace(mapEvent.Prompt))
+        if (FindStartProblem(mapEvent, references) is { } startProblem)
         {
-            return "an interact event needs a prompt.";
-        }
-
-        if (mapEvent.OnlyWhenObjectId is { } onlyWhen && !references.Content.Objects.ContainsKey(onlyWhen))
-        {
-            return $"onlyWhenObjectId has unknown object id '{onlyWhen}'.";
+            return startProblem;
         }
 
         if (mapEvent.Steps.Count == 0)
@@ -102,6 +97,32 @@ internal static class MapEventValidator
             {
                 return $"step {index}: {problem}";
             }
+        }
+
+        return null;
+    }
+
+    // What starts the event and when it may run: its activation's prompt and its conditions.
+    private static string? FindStartProblem(MapEvent mapEvent, MapReferences references)
+    {
+        if (mapEvent.Activation == EventActivation.Interact && string.IsNullOrWhiteSpace(mapEvent.Prompt))
+        {
+            return "an interact event needs a prompt.";
+        }
+
+        if (mapEvent.Activation == EventActivation.Arrive && mapEvent.Prompt is not null)
+        {
+            return "an arrive event has no prompt: nothing is pressed to start it.";
+        }
+
+        if (mapEvent.OnlyWhenObjectId is { } onlyWhen && !references.Content.Objects.ContainsKey(onlyWhen))
+        {
+            return $"onlyWhenObjectId has unknown object id '{onlyWhen}'.";
+        }
+
+        if (mapEvent.OnlyWhenLeaderId is { } leaderId && !references.Content.MemberIds.Contains(leaderId))
+        {
+            return $"onlyWhenLeaderId has unknown party member id '{leaderId}'.";
         }
 
         return null;

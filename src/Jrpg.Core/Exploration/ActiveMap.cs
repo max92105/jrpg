@@ -28,7 +28,7 @@ internal sealed class ActiveMap(
         var cellEvents = Definition.Layout.CellEvents;
         for (var index = 0; index < cellEvents.Count; index++)
         {
-            if (cellEvents[index].Cell == cell)
+            if (cellEvents[index].Cell == cell && cellEvents[index].Event.Activation == EventActivation.Touch)
             {
                 return cellEvents[index];
             }

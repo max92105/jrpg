@@ -110,7 +110,8 @@ public sealed class ContentWriter(string contentRoot)
             catalog.Tiles.Keys.ToHashSet(),
             catalog.Objects,
             catalog.Items.Keys.ToHashSet(),
-            catalog.Encounters.Keys.ToHashSet());
+            catalog.Encounters.Keys.ToHashSet(),
+            catalog.PartyMembers.Keys.ToHashSet());
 
     private FileToWrite PlanWrite<T>(string file, T content) =>
         new(Path.Combine(contentRoot, file), path => ContentFileWriter.Write(path, content));

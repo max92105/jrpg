@@ -9,6 +9,7 @@ internal sealed class MapEventBuilder
     private EventStep[] _steps = [];
     private bool _isOnce;
     private string? _onlyWhenObjectId;
+    private string? _onlyWhenLeaderId;
 
     public MapEventBuilder WithId(string id)
     {
@@ -34,6 +35,18 @@ internal sealed class MapEventBuilder
         return this;
     }
 
+    public MapEventBuilder AsArrive()
+    {
+        _activation = EventActivation.Arrive;
+        return this;
+    }
+
+    public MapEventBuilder OnlyWhenLeaderIs(string memberId)
+    {
+        _onlyWhenLeaderId = memberId;
+        return this;
+    }
+
     public MapEventBuilder OnlyWhenObjectIs(string objectId)
     {
         _onlyWhenObjectId = objectId;
@@ -47,6 +60,7 @@ internal sealed class MapEventBuilder
         Prompt = _activation == EventActivation.Interact ? "Open" : null,
         IsOnce = _isOnce,
         OnlyWhenObjectId = _onlyWhenObjectId,
+        OnlyWhenLeaderId = _onlyWhenLeaderId,
         Steps = _steps,
     };
 }

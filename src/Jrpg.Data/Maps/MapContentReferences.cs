@@ -7,4 +7,5 @@ internal sealed record MapContentReferences(
     IReadOnlySet<int> TileIds,
     IReadOnlyDictionary<string, ObjectDefinition> Objects,
     IReadOnlySet<string> ItemIds,
-    IReadOnlySet<string> EncounterIds);
+    IReadOnlySet<string> EncounterIds,
+    IReadOnlySet<string> MemberIds);

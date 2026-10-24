@@ -24,7 +24,8 @@ public sealed class MapEventValidatorTests
         TileIds: new HashSet<int>(),
         Objects: new Dictionary<string, ObjectDefinition> { ["chest"] = _chestDefinition, ["chest_opened"] = _chestDefinition with { Id = "chest_opened" } },
         ItemIds: new HashSet<string> { "potion" },
-        EncounterIds: new HashSet<string>()),
+        EncounterIds: new HashSet<string>(),
+        MemberIds: new HashSet<string> { "omer" }),
         Layouts: new Dictionary<string, MapLayout> { ["cave"] = _cave });
 
     private static readonly MapEvent _openChest = new()
@@ -61,6 +62,8 @@ public sealed class MapEventValidatorTests
         { WithChestEvent(_openChest with { Steps = [new GiveItemStep("potion", 0)] }), "event 'chest@1,1_0': step 0: giveItem quantity must be at least 1 (was 0)." },
         { WithChestEvent(_openChest with { Steps = [new SwapObjectStep("chest_gold")] }), "event 'chest@1,1_0': step 0: swapObject has unknown object id 'chest_gold'." },
         { WithChestEvent(_openChest with { OnlyWhenObjectId = "door" }), "event 'chest@1,1_0': onlyWhenObjectId has unknown object id 'door'." },
+        { WithChestEvent(_openChest with { OnlyWhenLeaderId = "nobody" }), "event 'chest@1,1_0': onlyWhenLeaderId has unknown party member id 'nobody'." },
+        { WithChestEvent(_openChest with { Activation = EventActivation.Arrive }), "event 'chest@1,1_0': an arrive event has no prompt: nothing is pressed to start it." },
         { WithChestEvent(_openChest with { Steps = [new WarpStep("castle", new GridCell(0, 0))] }), "event 'chest@1,1_0': step 0: warp has unknown map id 'castle'." },
         { WithChestEvent(_openChest with { Steps = [null!] }), "event 'chest@1,1_0': steps holds a null entry." },
         { WithChestEvent(_openChest with { Steps = [new DialogueStep(new Speech(["Hi", null!]))] }), "event 'chest@1,1_0': a dialogue's lines hold a null entry." },
@@ -124,7 +127,17 @@ public sealed class MapEventValidatorTests
 
         var problem = MapEventValidator.FindProblem(layout, _references);
 
-        Assert.Equal("cell event 'cell_0_0' at (1, 0): a cell event must have touch activation.", problem);
+        Assert.Equal("cell event 'cell_0_0' at (1, 0): a cell event must have touch or arrive activation.", problem);
+    }
+
+    [Fact]
+    public void FindProblem_ArriveCellEventForKnownLeader_ReturnsNull()
+    {
+        var arrival = _warpToCave with { Activation = EventActivation.Arrive, OnlyWhenLeaderId = "omer" };
+
+        var problem = MapEventValidator.FindProblem(_forest with { CellEvents = [new CellEvent(new GridCell(1, 0), arrival)] }, _references);
+
+        Assert.Null(problem);
     }
 
     [Fact]

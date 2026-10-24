@@ -146,7 +146,7 @@ public sealed class ExplorationWarpTests
             .WithItems(_potion)
             .WithMaps(town, cave)
             .Build();
-        return new ExplorationState(new ExplorationContext(catalog, _inventory, _world, new FixedSequenceRandom()), start);
+        return new ExplorationState(new ExplorationContext(catalog, _inventory, _world, new FixedSequenceRandom()), "sarxian", start);
     }
 
     private static MapEvent WarpEvent(string id, string mapId, GridCell cell) =>

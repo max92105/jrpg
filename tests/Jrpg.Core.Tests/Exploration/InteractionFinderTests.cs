@@ -23,10 +23,20 @@ public sealed class InteractionFinderTests
         var openChest = new MapEventBuilder().WithSteps(_look).Build();
         var map = MapWith(_chest, openChest);
 
-        var triggered = new InteractionFinder(map, _rules).FindInFront(_belowChest, Facing.Up, EventActivation.Interact);
+        var triggered = new InteractionFinder(map, _rules, "sarxian").FindInFront(_belowChest, Facing.Up, EventActivation.Interact);
 
         Assert.Equal(openChest, triggered?.Event);
         Assert.Equal(map.Definition.Layout.Objects[0], triggered?.Source);
+    }
+
+    [Fact]
+    public void FindInFront_EventForAnotherLeader_ReturnsNull()
+    {
+        var map = MapWith(_chest, new MapEventBuilder().OnlyWhenLeaderIs("omer").WithSteps(_look).Build());
+
+        var triggered = new InteractionFinder(map, _rules, "sarxian").FindInFront(_belowChest, Facing.Up, EventActivation.Interact);
+
+        Assert.Null(triggered);
     }
 
     [Fact]
@@ -34,7 +44,7 @@ public sealed class InteractionFinderTests
     {
         var map = MapWith(_chest, new MapEventBuilder().WithSteps(_look).Build());
 
-        var triggered = new InteractionFinder(map, _rules).FindInFront(_belowChest, Facing.Down, EventActivation.Interact);
+        var triggered = new InteractionFinder(map, _rules, "sarxian").FindInFront(_belowChest, Facing.Down, EventActivation.Interact);
 
         Assert.Null(triggered);
     }
@@ -49,7 +59,7 @@ public sealed class InteractionFinderTests
             .WithObject(_chest, new Point2D(2, 1), onTop)
             .Build();
 
-        var triggered = new InteractionFinder(map, _rules).FindInFront(_belowChest, Facing.Up, EventActivation.Interact);
+        var triggered = new InteractionFinder(map, _rules, "sarxian").FindInFront(_belowChest, Facing.Up, EventActivation.Interact);
 
         Assert.Equal("on_top_0", triggered?.Event.Id);
     }
@@ -62,7 +72,7 @@ public sealed class InteractionFinderTests
         var map = MapWith(_chest, firstVisit, laterVisits);
         map.MarkDone(firstVisit);
 
-        var triggered = new InteractionFinder(map, _rules).FindInFront(_belowChest, Facing.Up, EventActivation.Interact);
+        var triggered = new InteractionFinder(map, _rules, "sarxian").FindInFront(_belowChest, Facing.Up, EventActivation.Interact);
 
         Assert.Equal("chest_1", triggered?.Event.Id);
     }
@@ -74,7 +84,7 @@ public sealed class InteractionFinderTests
         var enterOpenDoor = new MapEventBuilder().AsTouch().OnlyWhenObjectIs("door_open").WithSteps(_look).Build();
         var map = MapWith(closedDoor, enterOpenDoor);
 
-        var triggered = new InteractionFinder(map, _rules).FindInFront(_belowChest, Facing.Up, EventActivation.Touch);
+        var triggered = new InteractionFinder(map, _rules, "sarxian").FindInFront(_belowChest, Facing.Up, EventActivation.Touch);
 
         Assert.Null(triggered);
     }

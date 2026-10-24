@@ -14,6 +14,7 @@ Part of [the new-game flow plan](../README.md). Design: [design.md](../design.md
       - the activation list gains Arrive;
       - an `OnlyWhenLeaderId` field with the members to pick from (the catalog the dialog already gets);
       - the prompt field is disabled for Arrive, matching Data's rule.
+      - `EventViewModel`'s summary of an event (today `Press "{Prompt}"` for anything not Touch) reads "On arrival" for Arrive (K1 review).
     - `Events/EventStepViewModel`:
       - `EventStepKind.Still` with `ImageFile`, `SecondsText` and `Caption` fields;
       - `From(StillStep)` and `ToStep()` cases (seconds above 0, else invalid);

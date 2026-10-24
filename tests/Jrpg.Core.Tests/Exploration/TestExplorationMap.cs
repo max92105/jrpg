@@ -67,6 +67,6 @@ internal static class TestExplorationMap
             .WithMaps(layout)
             .Build();
         var context = new ExplorationContext(catalog, inventory, new WorldState(), new FixedSequenceRandom());
-        return new ExplorationState(context, new MapLocation(layout.Id, position, facing));
+        return new ExplorationState(context, "sarxian", new MapLocation(layout.Id, position, facing));
     }
 }

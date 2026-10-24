@@ -17,7 +17,8 @@ public sealed class MapLayoutValidatorTests
             ["tree"] = new() { Id = "tree", Width = 4, Height = 4, CollisionPolygon = [], Category = "General", Tiles = [new ObjectTile(0, 0, 1)], AbovePlayerZones = [] },
         },
         ItemIds: new HashSet<string>(),
-        EncounterIds: new HashSet<string>()),
+        EncounterIds: new HashSet<string>(),
+        MemberIds: new HashSet<string> { "omer" }),
         Layouts: new Dictionary<string, MapLayout>());
 
     private static readonly PlacedObject _tree = new() { Uid = "1@0,0", ObjectId = "tree", Position = new Point2D(0, 0), Z = MapLayers.PlayerZ };

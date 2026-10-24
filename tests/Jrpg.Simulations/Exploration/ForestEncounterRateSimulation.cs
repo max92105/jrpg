@@ -51,7 +51,7 @@ public sealed class ForestEncounterRateSimulation(ITestOutputHelper output)
     private static int WalkUntilBattle(ContentCatalog catalog, int seed)
     {
         var context = new ExplorationContext(catalog, new Inventory(), new WorldState(), new SeededRandom(seed));
-        var exploration = new ExplorationState(context, new MapLocation(MapId, _arrival, Facing.Right));
+        var exploration = new ExplorationState(context, "sarxian", new MapLocation(MapId, _arrival, Facing.Right));
         var turnRandom = new SeededRandom(seed + TurnSeedOffset);
         var direction = _directions[0];
         var steps = 0;

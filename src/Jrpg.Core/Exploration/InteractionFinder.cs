@@ -6,7 +6,7 @@ using Jrpg.Core.Maps;
 namespace Jrpg.Core.Exploration;
 
 /// <summary>Finds the object event the player can start by facing an object. Cell events are found by cell instead.</summary>
-internal sealed class InteractionFinder(ActiveMap map, ExplorationRules rules)
+internal sealed class InteractionFinder(ActiveMap map, ExplorationRules rules, string leaderId)
 {
     /// <summary>How far around an object's bounds a probe still counts as reaching it, in tiles (placeholder).</summary>
     public const double InteractMargin = 0.1;
@@ -14,7 +14,7 @@ internal sealed class InteractionFinder(ActiveMap map, ExplorationRules rules)
     /// <summary>
     /// Probes <c>InteractReach</c> tiles in front of the player. Among the objects whose bounds (plus the margin) hold
     /// the probe, the last placed is checked first, as it's drawn on top. The first event of that activation that can
-    /// run on the object's current definition, and isn't a "once" event already done, wins.
+    /// run on the object's current definition and for the leader, and isn't a "once" event already done, wins.
     /// </summary>
     public TriggeredEvent? FindInFront(Point2D position, Facing facing, EventActivation activation)
     {
@@ -37,7 +37,7 @@ internal sealed class InteractionFinder(ActiveMap map, ExplorationRules rules)
             for (var eventIndex = 0; eventIndex < placed.Events.Count; eventIndex++)
             {
                 var mapEvent = placed.Events[eventIndex];
-                if (mapEvent.Activation == activation && mapEvent.CanRunOn(definition.Id) && !(mapEvent.IsOnce && map.IsDone(mapEvent)))
+                if (mapEvent.Activation == activation && mapEvent.CanRunOn(definition.Id) && mapEvent.IsForLeader(leaderId) && !(mapEvent.IsOnce && map.IsDone(mapEvent)))
                 {
                     return new TriggeredEvent(mapEvent, placed);
                 }

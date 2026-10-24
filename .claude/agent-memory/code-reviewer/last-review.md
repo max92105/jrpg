@@ -5,9 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-new-game-flow/slices/S1b.md, slice S1b (Choosing asks "Begin as X?" first)
-Round: 1 (verdict: Ready to commit)
+Slice: docs/plans/2026-10-23-new-game-flow/slices/K1.md, slice K1 (arrival events, leader-gated events)
+Round: 1 (verdict: Fix the Criticals, then commit)
 
-- Suggestion: LeaderChoiceScene keeps _members only to name the chosen one; _names already holds the names (open)
-- Suggestion: the open-prompt/draw-if-asking/close-on-answer shape now appears in SavePage, SystemPage, LeaderChoiceScene; a fourth copy should get a shared holder (open)
-- Follow-up: StartMapScenarios.StartWithWholeParty hardcodes "kamilia"; C2 must drop her there (open, carried from L1, outside slice).
+- Critical: ArrivalEvents' object branch (objects before cells, CanRunOn on the current definition) has no test; every ExplorationArrivalTests map puts arrivals on cells (open)
+- Suggestion: no test that a non-once arrival event runs again on a second arrival (goal bullet 3) (open)
+- Follow-up: Editor EventViewModel.cs:53 describes any non-Touch event as Press "{Prompt}", so an Arrive event reads Press "" (K2b) (open)
+- Follow-up: ExplorationState.EnterMap doc still says "(later) a loaded save" (open)

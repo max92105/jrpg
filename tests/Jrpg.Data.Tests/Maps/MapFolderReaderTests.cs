@@ -71,7 +71,7 @@ public sealed class MapFolderReaderTests : IDisposable
     }
 
     private IReadOnlyList<MapDefinition> Read() =>
-        MapFolderReader.Read(_contentRoot, new MapContentReferences(_tileIds, new Dictionary<string, ObjectDefinition>(), new HashSet<string>(), new HashSet<string>()));
+        MapFolderReader.Read(_contentRoot, new MapContentReferences(_tileIds, new Dictionary<string, ObjectDefinition>(), new HashSet<string>(), new HashSet<string>(), new HashSet<string>()));
 
     private void WriteContent(string relativePath, string json)
     {

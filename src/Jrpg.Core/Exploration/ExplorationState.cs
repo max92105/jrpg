@@ -13,6 +13,7 @@ namespace Jrpg.Core.Exploration;
 public sealed class ExplorationState
 {
     private readonly ExplorationContext _context;
+    private readonly string _leaderId;
     private readonly PlayerWalker _walker;
     private readonly RandomEncounters _encounters;
     private ActiveMap _map;
@@ -20,14 +21,20 @@ public sealed class ExplorationState
     private InteractionFinder _finder;
     private GridCell _lastCell;
     private bool _isTouchArmed;
+    private bool _isArrivalPending;
     private EventRun? _run;
 
-    internal ExplorationState(ExplorationContext context, MapLocation start)
+    /// <param name="context">The content, items, world and random source.</param>
+    /// <param name="leaderId">Who leads, for events gated on the leader; fixed for the playthrough (decision 107).</param>
+    /// <param name="start">Where the player lands: a new game's start, or a save's location.</param>
+    internal ExplorationState(ExplorationContext context, string leaderId, MapLocation start)
     {
         _context = context;
+        _leaderId = leaderId;
         _walker = new PlayerWalker(start.Position, start.Facing, context.Catalog.Rules.Exploration);
         _encounters = new RandomEncounters(context.Random);
         EnterMap(start.MapId, start.Position);
+        StartArrivalEvent();
         RefreshInteraction();
     }
 
@@ -116,6 +123,7 @@ public sealed class ExplorationState
         if (run.IsFinished)
         {
             _run = null;
+            StartArrivalEvent();
         }
 
         RefreshInteraction();
@@ -180,8 +188,9 @@ public sealed class ExplorationState
     }
 
     /// <summary>
-    /// The one way onto a map, for a new game, a warp and (later) a loaded save (ADR 0006). The arrival
-    /// cell stays quiet, and object touch events wait until the player has stood still (decision 38).
+    /// The one way onto a map, for a new game, a warp and a loaded save (ADR 0006). The arrival cell stays quiet, and
+    /// object touch events wait until the player has stood still (decision 38); the map's arrival event waits for no
+    /// other event to run (ADR 0016).
     /// </summary>
     [MemberNotNull(nameof(_map), nameof(_collision), nameof(_finder))]
     private void EnterMap(string mapId, Point2D target)
@@ -191,17 +200,34 @@ public sealed class ExplorationState
         var walkability = WalkabilityGrid.Build(definition.Layout, catalog.Tiles);
         _map = new ActiveMap(definition, catalog.Objects, walkability, _context.World);
         _collision = new MapCollision(_map);
-        _finder = new InteractionFinder(_map, catalog.Rules.Exploration);
+        _finder = new InteractionFinder(_map, catalog.Rules.Exploration, _leaderId);
         _walker.PlaceAt(WarpArrival.Find(walkability, target));
         _lastCell = _walker.Cell;
         _isTouchArmed = false;
+        _isArrivalPending = true;
         _encounters.ResetSteps();
+    }
+
+    // The map's arrival event runs once the player is on it and no event runs: at once on a new game or a load, and
+    // after the warping event has finished its remaining steps.
+    private void StartArrivalEvent()
+    {
+        if (!_isArrivalPending || _run is not null)
+        {
+            return;
+        }
+
+        _isArrivalPending = false;
+        if (ArrivalEvents.FindFirst(_map, _leaderId) is { } arrival)
+        {
+            Start(arrival);
+        }
     }
 
     private bool TryStartCellEvent(GridCell cell)
     {
         var cellEvent = _map.CellEventAt(cell);
-        if (cellEvent is null || (cellEvent.Event.IsOnce && _map.IsDone(cellEvent.Event)))
+        if (cellEvent is null || !cellEvent.Event.IsForLeader(_leaderId) || (cellEvent.Event.IsOnce && _map.IsDone(cellEvent.Event)))
         {
             return false;
         }

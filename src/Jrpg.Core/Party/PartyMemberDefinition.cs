@@ -9,6 +9,9 @@ public sealed record PartyMemberDefinition
 
     public required string ClassId { get; init; }
 
+    /// <summary>Who the character is, shown when choosing a leader (decision 167).</summary>
+    public required string Summary { get; init; }
+
     public required string PortraitFile { get; init; }
 
     public required string BattleSpriteFile { get; init; }

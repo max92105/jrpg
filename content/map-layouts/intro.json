@@ -286,6 +286,132 @@
           }
         ]
       }
+    },
+    {
+      "cell": {
+        "x": 0,
+        "y": 1
+      },
+      "event": {
+        "id": "cell_0_1",
+        "activation": "arrive",
+        "prompt": null,
+        "isOnce": false,
+        "onlyWhenObjectId": null,
+        "onlyWhenLeaderId": "ragnir",
+        "steps": [
+          {
+            "type": "still",
+            "imageFile": "Placeholder1.png",
+            "seconds": 4,
+            "caption": "Intro of Ragnir, still 1 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder2.png",
+            "seconds": 4,
+            "caption": "Intro of Ragnir, still 2 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder3.png",
+            "seconds": 4,
+            "caption": "Intro of Ragnir, still 3 (placeholder)."
+          },
+          {
+            "type": "warp",
+            "mapId": "start",
+            "cell": {
+              "x": 10,
+              "y": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "cell": {
+        "x": 1,
+        "y": 1
+      },
+      "event": {
+        "id": "cell_1_1",
+        "activation": "arrive",
+        "prompt": null,
+        "isOnce": false,
+        "onlyWhenObjectId": null,
+        "onlyWhenLeaderId": "omer",
+        "steps": [
+          {
+            "type": "still",
+            "imageFile": "Placeholder1.png",
+            "seconds": 4,
+            "caption": "Intro of Omer, still 1 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder2.png",
+            "seconds": 4,
+            "caption": "Intro of Omer, still 2 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder3.png",
+            "seconds": 4,
+            "caption": "Intro of Omer, still 3 (placeholder)."
+          },
+          {
+            "type": "warp",
+            "mapId": "start",
+            "cell": {
+              "x": 10,
+              "y": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "cell": {
+        "x": 2,
+        "y": 1
+      },
+      "event": {
+        "id": "cell_2_1",
+        "activation": "arrive",
+        "prompt": null,
+        "isOnce": false,
+        "onlyWhenObjectId": null,
+        "onlyWhenLeaderId": "lazarus",
+        "steps": [
+          {
+            "type": "still",
+            "imageFile": "Placeholder1.png",
+            "seconds": 4,
+            "caption": "Intro of Lazarus, still 1 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder2.png",
+            "seconds": 4,
+            "caption": "Intro of Lazarus, still 2 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder3.png",
+            "seconds": 4,
+            "caption": "Intro of Lazarus, still 3 (placeholder)."
+          },
+          {
+            "type": "warp",
+            "mapId": "start",
+            "cell": {
+              "x": 10,
+              "y": 3
+            }
+          }
+        ]
+      }
     }
   ]
 }

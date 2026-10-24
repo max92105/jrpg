@@ -16,6 +16,11 @@ internal static class PartyMemberCatalogValidator
             return "name must not be empty.";
         }
 
+        if (string.IsNullOrWhiteSpace(member.Summary))
+        {
+            return "summary must not be empty.";
+        }
+
         if (!references.ClassIds.Contains(member.ClassId))
         {
             return $"classId '{member.ClassId}' is not a known class.";

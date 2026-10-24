@@ -24,7 +24,7 @@ public sealed class PartyCursorTests
     [Fact]
     public void SwitchColumn_FromLowerRowThanReserve_SelectsLastReserveCard()
     {
-        AddReserveMembersToActive(count: 3);
+        AddReserveMembersToActive(count: 4);
         var cursor = new PartyCursor(_party);
         cursor.MoveInColumn(-1);
 

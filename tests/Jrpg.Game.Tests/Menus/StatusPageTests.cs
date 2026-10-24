@@ -20,7 +20,7 @@ public sealed class StatusPageTests
 
         var page = NewPage(session);
 
-        Assert.Equal(["sarxian", "teelle", "jazog", "zaruk", "zanyr", "thaali", "kamilia"], page.Members.Select(member => member.Id));
+        Assert.Equal(["sarxian", "teelle", "jazog", "zaruk", "zanyr", "thaali", "ragnir", "omer", "lazarus"], page.Members.Select(member => member.Id));
     }
 
     [Fact]
@@ -66,7 +66,7 @@ public sealed class StatusPageTests
 
         page.Open();
 
-        Assert.Equal(["sarxian", "teelle", "jazog", "zaruk", "zanyr", "thaali", "kamilia"], page.Members.Select(member => member.Id));
+        Assert.Equal(["sarxian", "teelle", "jazog", "zaruk", "zanyr", "thaali", "ragnir", "omer", "lazarus"], page.Members.Select(member => member.Id));
     }
 
     [Fact]

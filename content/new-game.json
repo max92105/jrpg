@@ -1,10 +1,13 @@
 {
   "leaderChoices": [
-    { "memberId": "sarxian" },
+    { "memberId": "ragnir" },
+    { "memberId": "omer" },
+    { "memberId": "zanyr" },
+    { "memberId": "lazarus" },
     { "memberId": "jazog" },
     { "memberId": "teelle" },
     { "memberId": "zaruk" },
-    { "memberId": "zanyr" },
+    { "memberId": "sarxian" },
     { "memberId": "thaali" }
   ],
   "startingItems": [

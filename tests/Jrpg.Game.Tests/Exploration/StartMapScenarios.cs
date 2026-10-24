@@ -83,7 +83,7 @@ internal static class StartMapScenarios
     public static GameSession StartWithWholeParty(ContentCatalog catalog)
     {
         var save = GameSession.StartNew(catalog, "sarxian", new SeededRandom(1)).Capture(DateTimeOffset.UnixEpoch);
-        string[] recruitIds = ["jazog", "teelle", "zaruk", "zanyr", "thaali", "kamilia"];
+        string[] recruitIds = ["jazog", "teelle", "zaruk", "zanyr", "thaali", "ragnir", "omer", "lazarus"];
         var recruits = recruitIds
             .Select(id => catalog.PartyMembers[id])
             .Select(definition => PartyMember.Recruit(definition, catalog.ClassOf(definition), catalog.Skills).CaptureProgress());

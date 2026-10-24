@@ -5,9 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-new-game-flow/slices/C1c.md, slice C1c (level-up raises stats by class growth)
-Round: 1 (verdict: Fix the Criticals, then commit)
+Slice: docs/plans/2026-10-23-new-game-flow/slices/C2.md, slice C2 (the nine characters, summaries, Kamilia removed)
+Round: 1 (verdict: Ready to commit)
 
-- Critical: Vitals.cs:88 RaiseMaxima summary line is 121 cols; rewrap with reflow-comments.pl (open)
-- Suggestion: ClassStats -> CombatStats(Attack, Defense) conversion now in PartyMember ctor and LevelUp; a private static BaseStatsOf(ClassStats) (open)
-- Suggestion: no PartyMember-level test that a fallen member levels up at 0 HP with raised max (open)
+- Suggestion: content/new-game.json working copy is LF while the repo uses CRLF; restore CRLF with sed (open)
+- Suggestion: placeholder summaries invent backstory; the developer should replace them (open)

@@ -185,7 +185,7 @@ public sealed class PartyPageTests
     {
         var page = NewPage();
         page.Update(Pressing(GameButton.Right));
-        AddSelectedReserveMembers(page, count: 3);
+        AddSelectedReserveMembers(page, count: 4);
         var lastReserve = _session.Party.ReserveMembers[^1];
         page.Update(Pressing(GameButton.Left));
         page.Update(Pressing(GameButton.Up));

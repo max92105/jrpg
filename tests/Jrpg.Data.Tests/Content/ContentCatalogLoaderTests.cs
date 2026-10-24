@@ -71,6 +71,16 @@ public sealed class ContentCatalogLoaderTests
     }
 
     [Fact]
+    public void Load_RepositoryContent_LeaderChoicesAreTheNineInOrder()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        var memberIds = catalog.NewGame.LeaderChoices.Select(choice => choice.MemberId);
+
+        Assert.Equal(["ragnir", "omer", "zanyr", "lazarus", "jazog", "teelle", "zaruk", "sarxian", "thaali"], memberIds);
+    }
+
+    [Fact]
     public void Load_RepositoryContent_EveryPartyMemberCanBeRecruitedAndGainExperience()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
@@ -80,7 +90,7 @@ public sealed class ContentCatalogLoaderTests
                 .GainExperience(1, catalog.Rules.Experience))
             .ToList();
 
-        Assert.Equal(7, stepsPerMember.Count);
+        Assert.Equal(9, stepsPerMember.Count);
         Assert.All(stepsPerMember, steps => Assert.Single(steps));
     }
 

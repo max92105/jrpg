@@ -77,6 +77,7 @@ internal sealed class PartyMemberBuilder
         Id = _id,
         Name = "Test Member",
         ClassId = _classId,
+        Summary = "A test member.",
         PortraitFile = "portrait.png",
         BattleSpriteFile = "battle.png",
         AttackEffectFile = "slash.png",

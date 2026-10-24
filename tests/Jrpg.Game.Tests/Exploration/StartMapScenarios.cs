@@ -24,6 +24,13 @@ internal static class StartMapScenarios
     private static readonly ContentCatalog _repositoryContent =
         ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
+    /// <summary>
+    /// Where every intro ends: the center of the start map's cell (10, 3), facing down. Tests that play past the title
+    /// start here, since the repository's new game starts on the intro map with the leader's cutscene running (decision
+    /// 185).
+    /// </summary>
+    public static ContentCatalog AfterTheIntro { get; } = StartingAt(new Point2D(10.5, 3.5), Facing.Down);
+
     /// <summary>One cell right of the warp cell (0, 14) to the forest, facing it.</summary>
     public static ContentCatalog NextToForestWarp { get; } = StartingAt(new Point2D(1.5, 14.5), Facing.Left);
 

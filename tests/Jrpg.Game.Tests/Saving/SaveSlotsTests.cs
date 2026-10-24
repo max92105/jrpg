@@ -1,7 +1,6 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
-using Jrpg.Data.Content;
 using Jrpg.Data.Saving;
 using Jrpg.Game.Saving;
 using Jrpg.Game.Tests.Exploration;
@@ -10,7 +9,7 @@ namespace Jrpg.Game.Tests.Saving;
 
 public sealed class SaveSlotsTests : IDisposable
 {
-    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+    private static readonly ContentCatalog _catalog = StartMapScenarios.AfterTheIntro;
     private static readonly DateTimeOffset _now = new(2026, 10, 19, 21, 5, 0, TimeSpan.FromHours(-4));
 
     private readonly string _directory = Path.Combine(Path.GetTempPath(), $"jrpg-slots-{Guid.NewGuid():N}");

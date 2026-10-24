@@ -2,8 +2,8 @@
 Status: approved
 
 First feature plan after the migration and the code-health plan.
-- Decisions 156-178 and 185 are recorded below.
-- Questions 179-184 are open; the next free number is 186.
+- Decisions 156-178, 185 and 186 are recorded below.
+- Questions 179-184 are open; the next free number is 187.
 - This plan writes ADRs 0016-0018; the next ADR is 0019.
 
 Developer's request (2026-10-23, verbatim, typos kept): "OK let<s plan real new feature now and real game flow. update main menu i dont, want to see invalid option. not grayed jsut not there. continue should be the default selected when available else its new game. then new game now should move to character selection. there will be no customisation just a choice between. Ragnir - Warrior, Omer - Mage, Zanyr - Cleric, Lazarus - Rogue, Jazog - Barbarian, Kamelia - Paladin, Zarruk - Monk, Sarxian - Warlock. the selected character will be the leader 'main character' when hovering one i want be able to display information about the class and the summary of the character. When selecting we gon into a cinemtic that will show why this character is entengle in the story essentially it will be a voice over some still image that will appear and disappear. i have no budget and i have no other idea on how to make it for now. so lets start with that. i will need placeholder for now to test behavior and i will place in the repo the more official art and audio later. right now i just want this to work and run so i can test a full new game flow."
@@ -94,7 +94,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **K2a. The still step: show an image for a set time with a caption; skipping runs past presentation steps** (Core + Data + content, about 230 lines) → [slices/K2a.md](slices/K2a.md)
 - [x] **K2b. The editor authors the arrival activation, the leader condition and the still step** (Editor, about 200 lines) → [slices/K2b.md](slices/K2b.md)
 - [x] **K2c. The map shows a still step: covering the screen, fading in and out, Confirm or Cancel skipping** (Game, about 250 lines) → [slices/K2c.md](slices/K2c.md)
-- [ ] **K3. The intro map: a new game starts there, each leader's intro plays, then a warp to the start map** (content + Data + tests, about 150 lines) → [slices/K3.md](slices/K3.md)
+- [x] **K3. The intro map: a new game starts there, each leader's intro plays, then a warp to the start map** (content + Data + tests, about 150 lines) → [slices/K3.md](slices/K3.md)
 
 ### Phase 3: classes and characters
 - [ ] **ADR 0017: Stats come from the class** (before C1a) → [slices/ADR-0017.md](slices/ADR-0017.md)
@@ -158,6 +158,7 @@ The developer's answers to the draft's questions (2026-10-23):
 - **177. Title order:** Continue comes first when there's a readable save: Continue, New Game, Load, Quit.
 - **178. Cancel on the choice** goes back to the title.
 - **185. Each leader's intro:** every new game starts on one `intro` map, which holds one arrival event per leader, each running only when that character leads (`onlyWhenLeaderId`). One place to edit, and the condition serves later story scenes (ADR 0016).
+- **186. A save repaired onto the intro map** (its map left the content) plays the leader's intro again, then warps to the start map: intro events aren't "once" (2026-10-24, from the K3 review). Only a new game and that repair reach the intro map.
 
 Earlier decisions that apply:
 - 35: play time counts everything since the playthrough began.

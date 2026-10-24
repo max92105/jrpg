@@ -117,7 +117,7 @@ Core holds the steps and waits on them; how long a still shows is counted in the
 
 An intro event on the `intro` map after A1a:
 ```json
-{ "id": "intro_ragnir", "activation": "arrive", "isOnce": true, "onlyWhenLeaderId": "ragnir",
+{ "id": "cell_0_0", "activation": "arrive", "isOnce": false, "onlyWhenLeaderId": "ragnir",
   "steps": [
     { "type": "voice", "file": "Placeholder.wav" },
     { "type": "still", "imageFile": "Placeholder1.png", "seconds": 4.0, "caption": "Ragnir's intro, still 1 (placeholder)." },

@@ -67,23 +67,25 @@ public sealed class ContentWriterTests : IDisposable
     }
 
     [Fact]
-    public void WriteMap_ShrinkingStartMapPastStartLocation_ThrowsNamingNewGame()
+    public void WriteMap_ShrinkingIntroMapPastStartLocation_ThrowsNamingNewGame()
     {
-        // 10 columns still hold every warp into the start map, but not the new game's start at (10, 3).
-        var start = _catalog.Maps["start"];
-        var narrowed = new MapDefinition(ShrinkTo(start.Layout, 10, start.Layout.Height) with { CellEvents = start.Layout.CellEvents }, start.Settings);
-        var filesBefore = MapFileBytes("start");
+        // 2 columns keep the intro events on them, but not the new game's start at (2.5, 2.5).
+        var intro = _catalog.Maps["intro"];
+        var kept = intro.Layout.CellEvents.Where(cellEvent => cellEvent.Cell.X < 2).ToList();
+        var narrowed = new MapDefinition(ShrinkTo(intro.Layout, 2, intro.Layout.Height) with { CellEvents = kept }, intro.Settings);
+        var filesBefore = MapFileBytes("intro");
 
         var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMap(narrowed, _catalog));
 
         Assert.StartsWith("new-game.json: ", exception.Message, StringComparison.Ordinal);
-        Assert.Equal(filesBefore, MapFileBytes("start"));
+        Assert.Equal(filesBefore, MapFileBytes("intro"));
     }
 
     [Theory]
     [InlineData("start")]
     [InlineData("forest")]
     [InlineData("interior_1")]
+    [InlineData("intro")]
     public void WriteMap_UnchangedRepositoryMap_WritesIdenticalBytes(string mapId)
     {
         var filesBefore = MapFileBytes(mapId);

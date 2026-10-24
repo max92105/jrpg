@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-23-new-game-flow/slices/K2c.md, slice K2c (game shows a still step)
+Slice: docs/plans/2026-10-23-new-game-flow/slices/K3.md, slice K3 (the intro map)
 Round: 1 (verdict: Ready to commit)
 
-- Warning: EventPresenter.ShowStill sets _still=null on ContinueEvent, so between two consecutive stills one frame draws the bare map (Draw sees no still); fix by starting the next still's playback in the same update or drawing black while CurrentEventStep is a StillStep (open)
-- Suggestion: StillPlayback.Still reads as `still.Still.ImageFile` at the call site; `Step` would read better (open)
-- Follow-up: StillPlayback.Opacity gives NaN for a Duration under 1 tick (validator allows Seconds > 0, e.g. 1e-9) (open)
-- Follow-up: carried from K2a/K2b: SkipEventPresentation end-of-event test; ExplorationState.cs near 300 lines; Arrive events gold in editor (open)
+- Warning: StartMapScenarios.AfterTheIntro places at (10, 3) but the real intro warp lands on (10.5, 3.5) (cell centre); doc "where every intro ends" is false; use Point2D(10.5, 3.5) and note the half-tile shift vs the old start in the slice (open)
+- Warning: SaveGameRepair.RepairLocation sends a save whose map vanished to NewGame.StartLocation = intro; the once intro is done, so the party is stuck on the exit-less 6x3 map; ask the developer for the fallback (open)
+- Suggestion: EveryLeaderHasOneIntro could also assert each intro's last step is WarpStep("start", (10, 3)); only Thaali's warp is exercised (open)
+- Follow-up: carried from K2a-K2c: SkipEventPresentation end-of-event test; ExplorationState.cs near 300 lines; Arrive events gold in editor; StillPlayback NaN for sub-tick Duration; bare-map frame between stills (open)

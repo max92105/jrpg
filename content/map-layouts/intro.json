@@ -1,0 +1,291 @@
+{
+  "id": "intro",
+  "width": 6,
+  "height": 3,
+  "layers": [
+    {
+      "z": -5,
+      "rows": [
+        [
+          278,
+          278,
+          278,
+          278,
+          278,
+          278
+        ],
+        [
+          278,
+          278,
+          278,
+          278,
+          278,
+          278
+        ],
+        [
+          278,
+          278,
+          278,
+          278,
+          278,
+          278
+        ]
+      ]
+    }
+  ],
+  "objects": [],
+  "cellEvents": [
+    {
+      "cell": {
+        "x": 0,
+        "y": 0
+      },
+      "event": {
+        "id": "cell_0_0",
+        "activation": "arrive",
+        "prompt": null,
+        "isOnce": false,
+        "onlyWhenObjectId": null,
+        "onlyWhenLeaderId": "sarxian",
+        "steps": [
+          {
+            "type": "still",
+            "imageFile": "Placeholder1.png",
+            "seconds": 4,
+            "caption": "Intro of Sarxian, still 1 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder2.png",
+            "seconds": 4,
+            "caption": "Intro of Sarxian, still 2 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder3.png",
+            "seconds": 4,
+            "caption": "Intro of Sarxian, still 3 (placeholder)."
+          },
+          {
+            "type": "warp",
+            "mapId": "start",
+            "cell": {
+              "x": 10,
+              "y": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "cell": {
+        "x": 1,
+        "y": 0
+      },
+      "event": {
+        "id": "cell_1_0",
+        "activation": "arrive",
+        "prompt": null,
+        "isOnce": false,
+        "onlyWhenObjectId": null,
+        "onlyWhenLeaderId": "jazog",
+        "steps": [
+          {
+            "type": "still",
+            "imageFile": "Placeholder1.png",
+            "seconds": 4,
+            "caption": "Intro of Jazog, still 1 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder2.png",
+            "seconds": 4,
+            "caption": "Intro of Jazog, still 2 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder3.png",
+            "seconds": 4,
+            "caption": "Intro of Jazog, still 3 (placeholder)."
+          },
+          {
+            "type": "warp",
+            "mapId": "start",
+            "cell": {
+              "x": 10,
+              "y": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "cell": {
+        "x": 2,
+        "y": 0
+      },
+      "event": {
+        "id": "cell_2_0",
+        "activation": "arrive",
+        "prompt": null,
+        "isOnce": false,
+        "onlyWhenObjectId": null,
+        "onlyWhenLeaderId": "teelle",
+        "steps": [
+          {
+            "type": "still",
+            "imageFile": "Placeholder1.png",
+            "seconds": 4,
+            "caption": "Intro of Teelle, still 1 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder2.png",
+            "seconds": 4,
+            "caption": "Intro of Teelle, still 2 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder3.png",
+            "seconds": 4,
+            "caption": "Intro of Teelle, still 3 (placeholder)."
+          },
+          {
+            "type": "warp",
+            "mapId": "start",
+            "cell": {
+              "x": 10,
+              "y": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "cell": {
+        "x": 3,
+        "y": 0
+      },
+      "event": {
+        "id": "cell_3_0",
+        "activation": "arrive",
+        "prompt": null,
+        "isOnce": false,
+        "onlyWhenObjectId": null,
+        "onlyWhenLeaderId": "zaruk",
+        "steps": [
+          {
+            "type": "still",
+            "imageFile": "Placeholder1.png",
+            "seconds": 4,
+            "caption": "Intro of Zaruk, still 1 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder2.png",
+            "seconds": 4,
+            "caption": "Intro of Zaruk, still 2 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder3.png",
+            "seconds": 4,
+            "caption": "Intro of Zaruk, still 3 (placeholder)."
+          },
+          {
+            "type": "warp",
+            "mapId": "start",
+            "cell": {
+              "x": 10,
+              "y": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "cell": {
+        "x": 4,
+        "y": 0
+      },
+      "event": {
+        "id": "cell_4_0",
+        "activation": "arrive",
+        "prompt": null,
+        "isOnce": false,
+        "onlyWhenObjectId": null,
+        "onlyWhenLeaderId": "zanyr",
+        "steps": [
+          {
+            "type": "still",
+            "imageFile": "Placeholder1.png",
+            "seconds": 4,
+            "caption": "Intro of Zanyr, still 1 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder2.png",
+            "seconds": 4,
+            "caption": "Intro of Zanyr, still 2 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder3.png",
+            "seconds": 4,
+            "caption": "Intro of Zanyr, still 3 (placeholder)."
+          },
+          {
+            "type": "warp",
+            "mapId": "start",
+            "cell": {
+              "x": 10,
+              "y": 3
+            }
+          }
+        ]
+      }
+    },
+    {
+      "cell": {
+        "x": 5,
+        "y": 0
+      },
+      "event": {
+        "id": "cell_5_0",
+        "activation": "arrive",
+        "prompt": null,
+        "isOnce": false,
+        "onlyWhenObjectId": null,
+        "onlyWhenLeaderId": "thaali",
+        "steps": [
+          {
+            "type": "still",
+            "imageFile": "Placeholder1.png",
+            "seconds": 4,
+            "caption": "Intro of Thaali, still 1 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder2.png",
+            "seconds": 4,
+            "caption": "Intro of Thaali, still 2 (placeholder)."
+          },
+          {
+            "type": "still",
+            "imageFile": "Placeholder3.png",
+            "seconds": 4,
+            "caption": "Intro of Thaali, still 3 (placeholder)."
+          },
+          {
+            "type": "warp",
+            "mapId": "start",
+            "cell": {
+              "x": 10,
+              "y": 3
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

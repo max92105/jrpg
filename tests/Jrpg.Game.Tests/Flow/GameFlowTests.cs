@@ -125,6 +125,23 @@ public sealed class GameFlowTests : IDisposable
     }
 
     [Fact]
+    public void Update_RepositoryIntroSkipped_LandsOnTheStartMap()
+    {
+        var flow = FlowWithLeaderConfirmed(catalog: _catalog);
+        flow.Update(_wholeFade, default);
+        flow.Update(_oneUpdate, default);
+        Assert.Equal("intro", SessionOf(flow).Exploration.CurrentMap.Id);
+
+        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        for (var update = 0; update < 60; update++)
+        {
+            flow.Update(_oneUpdate, default);
+        }
+
+        Assert.Equal("start", SessionOf(flow).Exploration.CurrentMap.Id);
+    }
+
+    [Fact]
     public void Update_LeaderConfirmedThenOneUpdateLongerThanTheFade_StillStartsNewGame()
     {
         var flow = FlowWithLeaderConfirmed();
@@ -296,10 +313,11 @@ public sealed class GameFlowTests : IDisposable
     }
 
     // Sarxian is the only leader offered, so the forest tests fight with the party they count on, whatever order the
-    // content lists the choices in. The fade to the map starts on the update that confirms him.
+    // content lists the choices in; the game starts where the intro ends, unless a test brings its own catalog. The fade
+    // to the map starts on the update that confirms him.
     private static GameFlow FlowWithLeaderConfirmed(SaveSlots? slots = null, ContentCatalog? catalog = null)
     {
-        var content = catalog ?? _catalog;
+        var content = catalog ?? StartMapScenarios.AfterTheIntro;
         var ledBySarxian = content with { NewGame = content.NewGame with { LeaderChoices = [Choice("sarxian")] } };
         var flow = new GameFlow(ledBySarxian, RepositoryScreenText.Text, slots ?? UnwrittenSaveSlots.Create(), new PlayerSettings());
         ConfirmNewGameAndLeader(flow);

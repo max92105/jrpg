@@ -36,13 +36,54 @@ public sealed class RepositoryNewGameTests
     }
 
     [Fact]
-    public void StartNew_RepositoryContent_StartsOnStartMap()
+    public void StartNew_RepositoryContent_StartsOnTheIntroWithTheLeadersIntroRunning()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-        var session = GameSession.StartNew(catalog, "sarxian", new SeededRandom(0));
+        var exploration = GameSession.StartNew(catalog, "zanyr", new SeededRandom(0)).Exploration;
 
-        Assert.Equal(new MapLocation("start", new Point2D(10, 3), Facing.Down), session.Exploration.Location);
+        Assert.Equal("intro", exploration.CurrentMap.Id);
+        var still = Assert.IsType<StillStep>(exploration.CurrentEventStep);
+        Assert.Contains("Zanyr", still.Caption, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void StartNew_RepositoryContent_EveryLeaderHasOneIntroEndingOnTheStartMap()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+        var arrivals = catalog.Maps["intro"].Layout.CellEvents.Select(cellEvent => cellEvent.Event).Where(mapEvent => mapEvent.Activation == EventActivation.Arrive);
+
+        var introsPerLeader = catalog.NewGame.LeaderChoices.Select(choice => arrivals.Where(mapEvent => mapEvent.OnlyWhenLeaderId == choice.MemberId).ToList());
+
+        Assert.All(introsPerLeader, intros => Assert.Equal(new WarpStep("start", new GridCell(10, 3)), Assert.Single(intros).Steps[^1]));
+    }
+
+    [Fact]
+    public void Restore_SaveLandingOnTheIntroMap_PlaysTheIntroAgain()
+    {
+        // Where a save whose map left the content is repaired to (decision 186): the intro plays again, then warps out.
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+        var session = GameSession.StartNew(catalog, "zanyr", new SeededRandom(0));
+        session.Exploration.SkipEventPresentation();
+        session.Exploration.ContinueEvent();
+        var save = session.Capture(DateTimeOffset.UnixEpoch) with { Location = catalog.NewGame.StartLocation };
+
+        var restored = GameSession.Restore(save, catalog, new SeededRandom(0));
+
+        Assert.IsType<StillStep>(restored.Exploration.CurrentEventStep);
+    }
+
+    [Fact]
+    public void StartNew_RepositoryContent_SkippedIntroWarpsToTheStartMap()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+        var exploration = GameSession.StartNew(catalog, "thaali", new SeededRandom(0)).Exploration;
+
+        exploration.SkipEventPresentation();
+        exploration.ContinueEvent();
+
+        Assert.False(exploration.IsEventRunning);
+        Assert.Equal(new MapLocation("start", new Point2D(10.5, 3.5), Facing.Down), exploration.Location);
     }
 
     [Fact]

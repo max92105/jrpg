@@ -10,6 +10,7 @@
   "title_quit": "Quit",
   "leader_choice_title": "Choose your leader",
   "leader_choice_confirm": "Begin as {name}?",
+  "leader_choice_row": "{name}, {class}",
   "menu_title": "Menu",
   "menu_inventory": "Inventory",
   "menu_equipment": "Equipment",

@@ -20,6 +20,9 @@ internal sealed class LeaderChoiceMenu
 
     public LeaderChoice Selected => Choices[_cursor.Selected];
 
+    /// <summary>Where <see cref="Selected"/> is in <see cref="Choices"/>, to index what was built per choice.</summary>
+    public int SelectedIndex => _cursor.Selected;
+
     /// <returns>The choice confirmed this update, or null.</returns>
     public LeaderChoice? Update(InputFrame input)
     {

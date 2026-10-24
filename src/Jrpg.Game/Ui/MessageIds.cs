@@ -36,6 +36,9 @@ internal static class MessageIds
     /// <summary>Placeholder <c>{name}</c>: asked before a new game starts led by that character.</summary>
     public const string LeaderChoiceConfirm = "leader_choice_confirm";
 
+    /// <summary>Placeholders <c>{name}</c> and <c>{class}</c>: a row in the leader choice (decision 158).</summary>
+    public const string LeaderChoiceRow = "leader_choice_row";
+
     /// <summary>The menu header's title while no page is open.</summary>
     public const string MenuTitle = "menu_title";
 

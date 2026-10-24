@@ -1,5 +1,6 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Exploration;
+using Jrpg.Core.Party;
 using Jrpg.Data.Content;
 using Jrpg.Game.Input;
 using Jrpg.Game.NewGame;
@@ -116,6 +117,29 @@ public sealed class LeaderChoiceSceneTests
         var scene = NewScene();
 
         Assert.Null(scene.Update(_oneUpdate, default));
+    }
+
+    [Fact]
+    public void ShownClassName_CursorOnJazog_IsBarbarian()
+    {
+        var scene = NewScene();
+
+        Select(scene, "jazog");
+
+        Assert.Equal("Barbarian", scene.SelectedProfile.ClassName);
+        Assert.Equal("Jazog, Barbarian", scene.SelectedProfile.RowLabel);
+    }
+
+    [Fact]
+    public void ShownStats_CursorOnOmer_AreTheMageAtLevelOne()
+    {
+        var scene = NewScene();
+        var mage = ClassGrowth.StatsAt(_catalog.Classes["mage"], 1);
+
+        Select(scene, "omer");
+
+        string[] expected = ["1", .. new[] { mage.MaxHp, mage.MaxMp, mage.Attack, mage.Defense }.Select(NumberText.Of)];
+        Assert.Equal(expected, scene.SelectedProfile.Stats.Select(line => line.Value));
     }
 
     private static LeaderChoiceScene NewScene() => new(RepositoryScreenText.Text, new UiTextures(), _catalog);

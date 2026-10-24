@@ -103,7 +103,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **C1b2. A member's stats come from their class at their level; members join at level 1** (Core + Data + content, about 260 lines; split from C1b) → [slices/C1b2.md](slices/C1b2.md)
 - [x] **C1c. A level-up raises max HP, max MP, attack and defense by the class's growth** (Core + Game, about 150 lines) → [slices/C1c.md](slices/C1c.md)
 - [x] **C2. The nine characters: Ragnir, Omer and Lazarus added, Kamilia removed, Teelle the Paladin, Thaali the Druid, summaries, generated portraits** (Core + Data + content, about 220 lines) → [slices/C2.md](slices/C2.md)
-- [ ] **S2. The choice shows the class, description, summary and level 1 stats** (Game, about 220 lines) → [slices/S2.md](slices/S2.md)
+- [x] **S2. The choice shows the class, description, summary and level 1 stats** (Game, about 220 lines) → [slices/S2.md](slices/S2.md)
 
 ### Phase 4: recruiting
 - [ ] **R1a. A map event can recruit a member** (Core + Data + Game + content, about 230 lines) → [slices/R1a.md](slices/R1a.md)

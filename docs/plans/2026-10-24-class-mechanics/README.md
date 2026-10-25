@@ -107,7 +107,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **FT1. The fighter: stamina and a stunning bash; the screen shows statuses plainly** (content + Game, about 250 lines) → [slices/FT1.md](slices/FT1.md)
 - [x] **BB1. The barbarian: ferocity from hits taken; Taunt draws the enemies' attacks** (Core + Data + content + Game text, about 260 lines) → [slices/BB1.md](slices/BB1.md)
 - [x] **PL1. The paladin: conviction from fallen enemies and heavy hits; Smite; the cleric loses faith on heavy hits** (Core + Data + content, about 230 lines) → [slices/PL1.md](slices/PL1.md)
-- [ ] **ADR 0023: The battle formation** (before FM1) → [slices/ADR-0023.md](slices/ADR-0023.md)
+- [x] **ADR 0023: The battle formation** (before FM1) → [slices/ADR-0023.md](slices/ADR-0023.md)
 - [ ] **FM1. The party's formation in battle; Move swaps places with a neighbor** (Core, about 220 lines) → [slices/FM1.md](slices/FM1.md)
 - [ ] **FM2. The Move command on screen; battlers stand where the formation says** (Game, about 240 lines) → [slices/FM2.md](slices/FM2.md)
 - [ ] **PL2a. Guarded raises defense; combatants have current stats** (Core, about 170 lines) → [slices/PL2a.md](slices/PL2a.md)

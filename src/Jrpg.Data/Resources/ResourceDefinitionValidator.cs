@@ -25,7 +25,8 @@ internal static class ResourceDefinitionValidator
             return $"resources lists '{repeatedId}' more than once.";
         }
 
-        return resources.Select(FindProblem).FirstOrDefault(problem => problem is not null);
+        return resources.Select(FindProblem).FirstOrDefault(problem => problem is not null)
+            ?? resources.Select(resource => FindDominanceProblem(resource, resources)).FirstOrDefault(problem => problem is not null);
     }
 
     private static string? FindProblem(ResourceDefinition resource)
@@ -51,6 +52,23 @@ internal static class ResourceDefinitionValidator
             && (backfire.ChancePerPointPercent is < 1 or > 100 || backfire.DamagePercentOfMaxHp is < 1 or > 100)
             ? $"backfire percents must be within 1..100 (were {backfire.ChancePerPointPercent} and {backfire.DamagePercentOfMaxHp})."
         : null;
+
+    // Dominance is judged between two forces, so each must name the other.
+    private static string? FindDominanceProblem(ResourceDefinition resource, IReadOnlyList<ResourceDefinition> resources)
+    {
+        if (resource.Dominance is not { } rule)
+        {
+            return null;
+        }
+
+        var rival = resources.FirstOrDefault(other => other.Id == rule.Over && other != resource);
+        var problem =
+            rival is null ? $"dominance.over must name another resource of the class (was '{rule.Over}')."
+            : rival.Dominance?.Over != resource.Id ? $"dominance.over names '{rule.Over}', whose dominance doesn't name '{resource.Id}' back."
+            : rule.BonusPercent < 0 ? $"dominance.bonusPercent must be at least 0 (was {rule.BonusPercent})."
+            : null;
+        return problem is null ? null : $"resource '{resource.Id}': {problem}";
+    }
 
     // The speed gives both numbers, so a max or a start written beside it would be ignored.
     private static string? FindSpeedScalingProblem(ResourceDefinition resource, SpeedScaling scaling) =>

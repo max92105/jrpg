@@ -62,5 +62,9 @@
     "id": "druid", "name": "Druid",
     "description": "A keeper of the wild who calls on nature and takes the shapes of beasts.",
     "base": { "maxHp": 175, "attack": 19, "defense": 6, "speed": 12 },
-    "growth": { "maxHp": 16, "attack": 2, "defense": 1, "speed": 1 } }
+    "growth": { "maxHp": 16, "attack": 2, "defense": 1, "speed": 1 },
+    "skillIds": ["rejuvenate", "rot", "equilibrium"],
+    "resources": [
+      { "id": "growth", "name": "Growth", "max": 10, "startsAt": 0, "dominance": { "over": "decay", "bonusPercent": 50 } },
+      { "id": "decay", "name": "Decay", "max": 10, "startsAt": 0, "dominance": { "over": "growth", "bonusPercent": 50 } } ] }
 ]

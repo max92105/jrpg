@@ -54,4 +54,71 @@ public sealed class ResourceMetersTests
 
         Assert.Contains("'stamina'", exception.Message, StringComparison.Ordinal);
     }
+
+    [Fact]
+    public void Constructor_BothZero_NeitherDominant()
+    {
+        var meters = Forces();
+
+        Assert.Equal((false, false), (meters.IsDominant("growth"), meters.IsDominant("decay")));
+    }
+
+    [Fact]
+    public void Change_ForceGoesAbove_BecomesDominant()
+    {
+        var meters = Forces();
+
+        meters.Change("decay", 2);
+
+        Assert.Equal((false, true), (meters.IsDominant("growth"), meters.IsDominant("decay")));
+    }
+
+    [Fact]
+    public void Change_RivalTies_DominanceKept()
+    {
+        var meters = Forces();
+        meters.Change("decay", 2);
+
+        meters.Change("growth", 2);
+
+        Assert.Equal((false, true), (meters.IsDominant("growth"), meters.IsDominant("decay")));
+    }
+
+    [Fact]
+    public void Change_RivalGoesAbove_DominanceChanges()
+    {
+        var meters = Forces();
+        meters.Change("decay", 2);
+
+        meters.Change("growth", 3);
+
+        Assert.Equal((true, false), (meters.IsDominant("growth"), meters.IsDominant("decay")));
+    }
+
+    // Spending the leader below its rival hands dominance over too: the rule is about the amounts, not who changed.
+    [Fact]
+    public void Change_LeaderSpentBelowRival_DominanceChanges()
+    {
+        var meters = Forces();
+        meters.Change("decay", 4);
+        meters.Change("growth", 3);
+
+        meters.Change("decay", -3);
+
+        Assert.Equal((true, false), (meters.IsDominant("growth"), meters.IsDominant("decay")));
+    }
+
+    [Fact]
+    public void IsDominant_UnknownId_Throws()
+    {
+        var meters = Forces();
+
+        Assert.Throws<ArgumentException>(() => meters.IsDominant("mana"));
+    }
+
+    private static ResourceMeters Forces() => new(
+    [
+        ResourceStart.Fixed(new ResourceDefinition("growth", "Growth", Max: 10) { Dominance = new DominanceRule("decay", 50) }),
+        ResourceStart.Fixed(new ResourceDefinition("decay", "Decay", Max: 10) { Dominance = new DominanceRule("growth", 50) }),
+    ]);
 }

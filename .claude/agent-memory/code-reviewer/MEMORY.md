@@ -4,3 +4,4 @@
 - [Validator null ids](validator-null-ids.md) — null list elements AND dictionary values pass strict STJ; check null entries first (seen slices 8, 1b, 1c, M1b; nested lists too)
 - [Namespace cycles](namespace-cycles.md) — grep reverse usings for each new Core using; Content is the hub (Content<->Session seen in slice 8)
 - [Last review](last-review.md) — slice, round and finding status of the latest review; read first to apply re-review rules
+- [Test files past 300](test-files-past-300.md) — slices append to big test files past ~300 lines; wc -l modified tests vs HEAD

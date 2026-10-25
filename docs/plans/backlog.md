@@ -62,3 +62,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Menus/StatusPage` looks up `_catalog.Classes[member.Definition.ClassId]`. Use `ContentCatalog.ClassOf` (added in the new-game flow) when next touched.
 - The Equipment page labels its stats "Max HP" and "Max MP", the Status page and the leader choice "HP" and "MP". The developer to decide whether they should match.
 - `ScreenFade` skips its black moment when one update is longer than its fade-out plus hold (about 0.33 s), so a warp never moves the player. The fixed 1/60 s step hides it in play; tests must step at 1/60 s. Make `Update` stop on Holding if a long frame can ever reach it.
+- `BattleState.cs` is at 290 lines: split the per-command bodies before the next command path lands (DR2 review).

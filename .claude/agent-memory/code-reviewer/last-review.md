@@ -5,11 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/DR1.md, slice DR1 (poison and regen ticks)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/DR2.md, slice DR2 (druid Growth and Decay, sticky dominance)
 Round: 1 (verdict: Ready to commit)
 
-- Warning: AddTick shares one Tick beat across actor tick + a later stunned holder's tick; the skipped holder's number pops before its Stunned cue, and a fall after Skip takes the impact path (fade from 0); open
-- Warning: ActionPlaybackTests.cs taken from 281 to 318 lines; split fall/defeat tests out; open
-- Suggestion: no test that Poison ignores Exposed; open
-- Suggestion: TurnFlow comment "a holder its poison felled" reads awkwardly; open
-- Follow-up: ActionPlaybackTests' fake unknown event is named PoisonTicked, now a real concept; rename
+- Warning: ClassCatalogValidatorTests.cs taken from 288 to 320 lines; move resource-definition cases to a ResourceDefinitionValidatorTests file; open
+- Suggestion: ResourceMeters.IsDominant returns false for an unknown id while AmountOf throws; open
+- Suggestion: SkillEmpowerment.EffectOf runs for ReadyExtraTurn skills whose effect is then dropped; open
+- Follow-up: BattleState.cs at 290 lines; the next command path pushes it past 300

@@ -158,5 +158,35 @@
     "resourceChanges": [ { "resourceId": "instability", "amount": 4 } ],
     "requirements": [ { "resourceId": "instability", "atLeast": 7 } ],
     "effect": { "kind": "damage", "power": 70, "targeting": "singleEnemy" }
+  },
+  {
+    "id": "rejuvenate",
+    "name": "Rejuvenate",
+    "description": "Wakes the life in one ally, mending wounds for three of their turns. Feeds Growth. Placeholder: the developer writes the real skill.",
+    "iconFile": "",
+    "resourceChanges": [ { "resourceId": "growth", "amount": 2 } ],
+    "effect": {
+      "kind": "grantStatus", "power": 0, "targeting": "singleAlly",
+      "status": { "kind": "regen", "power": 10, "turns": 3 }
+    }
+  },
+  {
+    "id": "rot",
+    "name": "Rot",
+    "description": "Sets a creeping rot in one enemy for three of its turns. Feeds Decay. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "resourceChanges": [ { "resourceId": "decay", "amount": 2 } ],
+    "effect": {
+      "kind": "grantStatus", "power": 0, "targeting": "singleEnemy",
+      "status": { "kind": "poison", "power": 8, "turns": 3 }
+    }
+  },
+  {
+    "id": "equilibrium",
+    "name": "Equilibrium",
+    "description": "Spends Growth and Decay in balance to strike every enemy. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "resourceChanges": [ { "resourceId": "growth", "amount": -3 }, { "resourceId": "decay", "amount": -3 } ],
+    "effect": { "kind": "damage", "power": 45, "targeting": "allEnemies" }
   }
 ]

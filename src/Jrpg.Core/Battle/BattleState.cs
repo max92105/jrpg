@@ -183,6 +183,7 @@ public sealed class BattleState
         }
 
         ThrowIfIllegalTargets(command.Skill.Effect, command.Targets);
+        var effect = SkillEmpowerment.EffectOf(actor, command.Skill);
         SkillPayment.Pay(actor, command.Skill, events);
         if (command.Skill.Effect.Kind == EffectKind.ReadyExtraTurn)
         {
@@ -190,7 +191,7 @@ public sealed class BattleState
             return;
         }
 
-        EffectLanding.Land(command.Skill.Effect, command.Targets, Combatants, events);
+        EffectLanding.Land(effect, command.Targets, Combatants, events);
         _backfire.Roll(actor, command.Skill, events);
     }
 

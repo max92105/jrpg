@@ -44,3 +44,13 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
     - Rot twice; the second poison ticks for 12 once Decay leads.
     - Rejuvenate twice ties the forces at 2-2, and Decay stays dominant, so a third Rot still gets the bonus.
     - Equilibrium greys until both are at 3.
+- **Done, with deviations:**
+  - `DominanceFormula.Empowered(power, bonusPercent)` is called only when the force dominates, rather than `Power(power, isFedForceDominant, bonusPercent)`: no flag argument.
+  - The empowered effect is built in a new `Battle/SkillEmpowerment.EffectOf` rather than a private method on `BattleState`, which is at 290 lines.
+  - Extra tests:
+    - the first Rot isn't empowered;
+    - a damage skill gets the bonus on its own power;
+    - spending the leader below its rival hands dominance over;
+    - the validator rejects a dominance that isn't named back, and a negative bonus.
+  - `CommandMenuTests.IsEnabled_ActorWithoutSkills_GreysSkills` now uses Zaruk (the monk) since Thaali has skills; MO1 will need another skill-less member or a built one.
+  - After review: the dominance validator tests sit in a new `Jrpg.Data.Tests/Resources/ResourceDefinitionValidatorTests` (the class validator tests were past 300 lines), and `IsDominant` throws on an unknown id like `AmountOf`.

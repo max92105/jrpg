@@ -5,6 +5,7 @@ public sealed class ResourceMeters
 {
     private readonly Dictionary<string, int> _amounts;
     private readonly Dictionary<string, int> _maxima;
+    private readonly HashSet<string> _dominant = [];
 
     /// <param name="starts">The holder's resources, each with its max and starting amount for this battle.</param>
     public ResourceMeters(IReadOnlyList<ResourceStart> starts)
@@ -15,6 +16,16 @@ public sealed class ResourceMeters
     }
 
     public IReadOnlyList<ResourceDefinition> Definitions { get; }
+
+    /// <summary>
+    /// Whether this force leads its rival (decision 204): it went strictly above, and the rival hasn't since. At the
+    /// start neither leads, whatever the amounts (question 227).
+    /// </summary>
+    /// <exception cref="ArgumentException">The holder has no resource <paramref name="resourceId"/>.</exception>
+    public bool IsDominant(string resourceId) =>
+        _amounts.ContainsKey(resourceId)
+            ? _dominant.Contains(resourceId)
+            : throw new ArgumentException($"This combatant has no resource '{resourceId}'.", nameof(resourceId));
 
     /// <exception cref="ArgumentException">The holder has no resource <paramref name="resourceId"/>.</exception>
     public int AmountOf(string resourceId) =>
@@ -36,6 +47,29 @@ public sealed class ResourceMeters
         var before = AmountOf(resourceId);
         var after = Math.Clamp(before + amount, 0, MaxOf(resourceId));
         _amounts[resourceId] = after;
+        UpdateDominance(resourceId);
         return after - before;
+    }
+
+    // Each force of the pair names the other, so both sides are judged; a tie leaves the leader as it was.
+    private void UpdateDominance(string changedId)
+    {
+        foreach (var resource in Definitions)
+        {
+            if (resource.Dominance is not { } rule || (resource.Id != changedId && rule.Over != changedId))
+            {
+                continue;
+            }
+
+            var lead = AmountOf(resource.Id) - AmountOf(rule.Over);
+            if (lead > 0)
+            {
+                _dominant.Add(resource.Id);
+            }
+            else if (lead < 0)
+            {
+                _dominant.Remove(resource.Id);
+            }
+        }
     }
 }

@@ -5,17 +5,17 @@ using Jrpg.Core.Tests.Builders;
 namespace Jrpg.Core.Tests.Party;
 
 /// <summary>
-/// Taking equipment from another member (decision 137). Sarxian, Jazog and Teelle are warriors, Zaruk is a mage; Teelle
+/// Taking equipment from another member (decision 137). Sarxian, Jazog and Teelle are fighters, Zaruk is a mage; Teelle
 /// waits in the reserve.
 /// </summary>
 public sealed class PartyEquipmentTakeTests
 {
     private readonly Inventory _inventory = new();
     private readonly PartyEquipment _equipment;
-    private readonly PartyMember _sarxian = new PartyMemberBuilder().WithId("sarxian").WithClass("warrior").Build();
-    private readonly PartyMember _jazog = new PartyMemberBuilder().WithId("jazog").WithClass("warrior").Build();
+    private readonly PartyMember _sarxian = new PartyMemberBuilder().WithId("sarxian").WithClass("fighter").Build();
+    private readonly PartyMember _jazog = new PartyMemberBuilder().WithId("jazog").WithClass("fighter").Build();
     private readonly PartyMember _zaruk = new PartyMemberBuilder().WithId("zaruk").WithClass("mage").Build();
-    private readonly PartyMember _teelle = new PartyMemberBuilder().WithId("teelle").WithClass("warrior").Build();
+    private readonly PartyMember _teelle = new PartyMemberBuilder().WithId("teelle").WithClass("fighter").Build();
     private readonly ItemDefinition _bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build();
     private readonly ItemDefinition _ironSword = new ItemDefinitionBuilder().WithId("iron_sword").AsWeapon(8).Build();
     private readonly ItemDefinition _staff = new ItemDefinitionBuilder().WithId("magic_staff").AsWeapon(6).Build();

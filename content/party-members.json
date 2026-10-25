@@ -62,7 +62,7 @@
   {
     "id": "ragnir",
     "name": "Ragnir",
-    "classId": "warrior",
+    "classId": "fighter",
     "summary": "A sellsword who has fought for every banner and believes in none. Placeholder: the developer writes who Ragnir is.",
     "portraitFile": "Ragnir.png",
     "battleSpriteFile": "Ragnir.png",

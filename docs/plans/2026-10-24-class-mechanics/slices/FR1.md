@@ -22,3 +22,4 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
     - `git grep -i warrior -- src tests content docs/map.md` finds nothing.
     - The leader choice shows Ragnir, "FIGHTER".
     - An existing save with Ragnir loads.
+- **Done, with deviations:** as planned. Tests 1782 before, 1783 after (the new `Load_RepositoryContent_RagnirIsAFighter`). `docs/map.md` didn't name the id. Two test comments that the rename touched were already over 120 columns; I rewrapped them. Review: the new test comment no longer names the old class, so the grep finds nothing.

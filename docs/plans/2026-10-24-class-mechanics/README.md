@@ -80,7 +80,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 0: preparation
 - [x] **PT. A sturdy practice enemy, in an encounter of its own** (content + tests, about 40 lines) → [slices/PT.md](slices/PT.md)
-- [ ] **FR1. Warrior becomes Fighter: the id `fighter` everywhere** (content + tests + docs, about 110 lines, mostly mechanical) → [slices/FR1.md](slices/FR1.md)
+- [x] **FR1. Warrior becomes Fighter: the id `fighter` everywhere** (content + tests + docs, about 110 lines, mostly mechanical) → [slices/FR1.md](slices/FR1.md)
 
 ### Phase 1: skills from the class, resources and mana
 - [ ] **ADR 0019: Class battle resources** (before M1a) → [slices/ADR-0019.md](slices/ADR-0019.md)

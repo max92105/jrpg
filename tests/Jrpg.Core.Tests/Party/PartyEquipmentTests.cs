@@ -8,7 +8,7 @@ public sealed class PartyEquipmentTests
 {
     private readonly Inventory _inventory = new();
     private readonly PartyEquipment _equipment;
-    private readonly PartyMember _warrior = new PartyMemberBuilder().WithId("sarxian").WithClass("warrior").Build();
+    private readonly PartyMember _fighter = new PartyMemberBuilder().WithId("sarxian").WithClass("fighter").Build();
     private readonly ItemDefinition _bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build();
     private readonly ItemDefinition _ironSword = new ItemDefinitionBuilder().WithId("iron_sword").AsWeapon(8).Build();
 
@@ -22,10 +22,10 @@ public sealed class PartyEquipmentTests
     {
         _inventory.Add(_bronzeSword, 2);
 
-        var equipped = _equipment.TryEquip(_warrior, _bronzeSword);
+        var equipped = _equipment.TryEquip(_fighter, _bronzeSword);
 
         Assert.True(equipped);
-        Assert.Same(_bronzeSword, _warrior.Weapon);
+        Assert.Same(_bronzeSword, _fighter.Weapon);
         Assert.Equal(1, _inventory.QuantityOf(_bronzeSword.Id));
     }
 
@@ -35,7 +35,7 @@ public sealed class PartyEquipmentTests
         var potion = new ItemDefinitionBuilder().Build();
         _inventory.Add(potion, 1);
 
-        var equipped = _equipment.TryEquip(_warrior, potion);
+        var equipped = _equipment.TryEquip(_fighter, potion);
 
         Assert.False(equipped);
         Assert.Equal(1, _inventory.QuantityOf(potion.Id));
@@ -47,20 +47,20 @@ public sealed class PartyEquipmentTests
         var staff = new ItemDefinitionBuilder().WithId("magic_staff").AsWeapon(6).Build();
         _inventory.Add(staff, 1);
 
-        var equipped = _equipment.TryEquip(_warrior, staff);
+        var equipped = _equipment.TryEquip(_fighter, staff);
 
         Assert.True(equipped);
-        Assert.Same(staff, _warrior.Weapon);
+        Assert.Same(staff, _fighter.Weapon);
         Assert.Equal(0, _inventory.QuantityOf(staff.Id));
     }
 
     [Fact]
     public void TryEquip_NoCopyInInventory_ReturnsFalse()
     {
-        var equipped = _equipment.TryEquip(_warrior, _bronzeSword);
+        var equipped = _equipment.TryEquip(_fighter, _bronzeSword);
 
         Assert.False(equipped);
-        Assert.Null(_warrior.Weapon);
+        Assert.Null(_fighter.Weapon);
     }
 
     [Fact]
@@ -68,12 +68,12 @@ public sealed class PartyEquipmentTests
     {
         _inventory.Add(_bronzeSword, 1);
         _inventory.Add(_ironSword, 1);
-        _equipment.TryEquip(_warrior, _bronzeSword);
+        _equipment.TryEquip(_fighter, _bronzeSword);
 
-        var equipped = _equipment.TryEquip(_warrior, _ironSword);
+        var equipped = _equipment.TryEquip(_fighter, _ironSword);
 
         Assert.True(equipped);
-        Assert.Same(_ironSword, _warrior.Weapon);
+        Assert.Same(_ironSword, _fighter.Weapon);
         Assert.Equal(1, _inventory.QuantityOf(_bronzeSword.Id));
         Assert.Equal(0, _inventory.QuantityOf(_ironSword.Id));
     }
@@ -84,12 +84,12 @@ public sealed class PartyEquipmentTests
         var potion = new ItemDefinitionBuilder().Build();
         _inventory.Add(_bronzeSword, 2);
         _inventory.Add(potion, 3);
-        _equipment.TryEquip(_warrior, _bronzeSword);
+        _equipment.TryEquip(_fighter, _bronzeSword);
 
-        var equipped = _equipment.TryEquip(_warrior, _bronzeSword);
+        var equipped = _equipment.TryEquip(_fighter, _bronzeSword);
 
         Assert.True(equipped);
-        Assert.Same(_bronzeSword, _warrior.Weapon);
+        Assert.Same(_bronzeSword, _fighter.Weapon);
         Assert.Equal([new InventoryEntry("bronze_sword", 1), new InventoryEntry("potion", 3)], _inventory.Entries);
     }
 
@@ -98,42 +98,42 @@ public sealed class PartyEquipmentTests
     {
         var bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").WithMaxStack(1).AsWeapon(5).Build();
         _inventory.Add(bronzeSword, 1);
-        _equipment.TryEquip(_warrior, bronzeSword);
+        _equipment.TryEquip(_fighter, bronzeSword);
         _inventory.Add(bronzeSword, 1);
         _inventory.Add(_ironSword, 1);
 
-        var equipped = _equipment.TryEquip(_warrior, _ironSword);
+        var equipped = _equipment.TryEquip(_fighter, _ironSword);
 
         Assert.False(equipped);
-        Assert.Same(bronzeSword, _warrior.Weapon);
+        Assert.Same(bronzeSword, _fighter.Weapon);
         Assert.Equal(1, _inventory.QuantityOf(_ironSword.Id));
     }
 
     [Fact]
     public void TryEquip_AfterUnequipFromOtherWearer_Succeeds()
     {
-        var knight = new PartyMemberBuilder().WithId("jazog").WithClass("warrior").Build();
+        var knight = new PartyMemberBuilder().WithId("jazog").WithClass("fighter").Build();
         _inventory.Add(_bronzeSword, 1);
         _equipment.TryEquip(knight, _bronzeSword);
         _equipment.TryUnequip(knight, EquipmentSlot.Weapon);
 
-        var equipped = _equipment.TryEquip(_warrior, _bronzeSword);
+        var equipped = _equipment.TryEquip(_fighter, _bronzeSword);
 
         Assert.True(equipped);
         Assert.Null(knight.Weapon);
-        Assert.Same(_bronzeSword, _warrior.Weapon);
+        Assert.Same(_bronzeSword, _fighter.Weapon);
     }
 
     [Fact]
     public void TryUnequip_WornItem_ReturnsItToInventory()
     {
         _inventory.Add(_bronzeSword, 1);
-        _equipment.TryEquip(_warrior, _bronzeSword);
+        _equipment.TryEquip(_fighter, _bronzeSword);
 
-        var unequipped = _equipment.TryUnequip(_warrior, EquipmentSlot.Weapon);
+        var unequipped = _equipment.TryUnequip(_fighter, EquipmentSlot.Weapon);
 
         Assert.True(unequipped);
-        Assert.Null(_warrior.Weapon);
+        Assert.Null(_fighter.Weapon);
         Assert.Equal(1, _inventory.QuantityOf(_bronzeSword.Id));
     }
 
@@ -142,19 +142,19 @@ public sealed class PartyEquipmentTests
     {
         var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build();
         _inventory.Add(chainMail, 1);
-        _equipment.TryEquip(_warrior, chainMail);
+        _equipment.TryEquip(_fighter, chainMail);
 
-        var unequipped = _equipment.TryUnequip(_warrior, EquipmentSlot.Armor);
+        var unequipped = _equipment.TryUnequip(_fighter, EquipmentSlot.Armor);
 
         Assert.True(unequipped);
-        Assert.Null(_warrior.Armor);
+        Assert.Null(_fighter.Armor);
         Assert.Equal(1, _inventory.QuantityOf(chainMail.Id));
     }
 
     [Fact]
     public void TryUnequip_EmptySlot_ReturnsFalse()
     {
-        var unequipped = _equipment.TryUnequip(_warrior, EquipmentSlot.Armor);
+        var unequipped = _equipment.TryUnequip(_fighter, EquipmentSlot.Armor);
 
         Assert.False(unequipped);
     }
@@ -164,13 +164,13 @@ public sealed class PartyEquipmentTests
     {
         var bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").WithMaxStack(1).AsWeapon(5).Build();
         _inventory.Add(bronzeSword, 1);
-        _equipment.TryEquip(_warrior, bronzeSword);
+        _equipment.TryEquip(_fighter, bronzeSword);
         _inventory.Add(bronzeSword, 1);
 
-        var unequipped = _equipment.TryUnequip(_warrior, EquipmentSlot.Weapon);
+        var unequipped = _equipment.TryUnequip(_fighter, EquipmentSlot.Weapon);
 
         Assert.False(unequipped);
-        Assert.Same(bronzeSword, _warrior.Weapon);
+        Assert.Same(bronzeSword, _fighter.Weapon);
         Assert.Equal(1, _inventory.QuantityOf(bronzeSword.Id));
     }
 

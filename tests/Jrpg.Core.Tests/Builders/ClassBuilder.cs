@@ -5,7 +5,7 @@ namespace Jrpg.Core.Tests.Builders;
 /// <summary>A class with given numbers. Without a growth its stats are the same at every level.</summary>
 internal sealed class ClassBuilder
 {
-    private string _id = "warrior";
+    private string _id = "fighter";
     private ClassStats _base = new(MaxHp: 100, MaxMp: 20, Attack: 10, Defense: 5);
     private ClassStats _growth = new(0, 0, 0, 0);
 

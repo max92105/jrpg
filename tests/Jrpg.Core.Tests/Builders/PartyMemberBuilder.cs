@@ -6,7 +6,7 @@ namespace Jrpg.Core.Tests.Builders;
 internal sealed class PartyMemberBuilder
 {
     private string _id = "test_member";
-    private string _classId = "warrior";
+    private string _classId = "fighter";
     private int _level = 1;
     private int _experience;
     private int _hp = 100;

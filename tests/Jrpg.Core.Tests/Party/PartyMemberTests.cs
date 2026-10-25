@@ -51,7 +51,7 @@ public sealed class PartyMemberTests
     [Fact]
     public void TotalStats_WithWeaponAndArmor_AddsBonuses()
     {
-        var member = new PartyMemberBuilder().WithClass("warrior").WithStats(attack: 10, defense: 5).Build();
+        var member = new PartyMemberBuilder().WithClass("fighter").WithStats(attack: 10, defense: 5).Build();
         Equip(member, new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build());
         Equip(member, new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build());
 
@@ -63,7 +63,7 @@ public sealed class PartyMemberTests
     [Fact]
     public void StatsWithout_Weapon_DropsOnlyTheWeaponBonus()
     {
-        var member = new PartyMemberBuilder().WithClass("warrior").WithStats(attack: 10, defense: 5).Build();
+        var member = new PartyMemberBuilder().WithClass("fighter").WithStats(attack: 10, defense: 5).Build();
         Equip(member, new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build());
         Equip(member, new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build());
 
@@ -76,7 +76,7 @@ public sealed class PartyMemberTests
     [Fact]
     public void StatsWith_OtherWeapon_ReplacesCurrentWeaponBonus()
     {
-        var member = new PartyMemberBuilder().WithClass("warrior").WithStats(attack: 10, defense: 5).Build();
+        var member = new PartyMemberBuilder().WithClass("fighter").WithStats(attack: 10, defense: 5).Build();
         Equip(member, new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build());
         Equip(member, new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build());
         var ironSword = new ItemDefinitionBuilder().WithId("iron_sword").AsWeapon(8).Build();
@@ -101,7 +101,7 @@ public sealed class PartyMemberTests
     [Fact]
     public void StatsWith_OtherArmor_ReplacesCurrentArmorBonus()
     {
-        var member = new PartyMemberBuilder().WithClass("warrior").WithStats(attack: 10, defense: 5).Build();
+        var member = new PartyMemberBuilder().WithClass("fighter").WithStats(attack: 10, defense: 5).Build();
         Equip(member, new ItemDefinitionBuilder().WithId("leather_armor").AsArmor(3).Build());
         var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build();
 
@@ -244,7 +244,7 @@ public sealed class PartyMemberTests
     [Fact]
     public void EquippedIn_WornArmor_ReturnsIt()
     {
-        var member = new PartyMemberBuilder().WithClass("warrior").Build();
+        var member = new PartyMemberBuilder().WithClass("fighter").Build();
         var armor = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build();
         Equip(member, armor);
 

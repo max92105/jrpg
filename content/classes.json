@@ -1,6 +1,6 @@
 [
   {
-    "id": "warrior", "name": "Warrior",
+    "id": "fighter", "name": "Fighter",
     "description": "A trained fighter who stands in front and wins by steel and endurance.",
     "base": { "maxHp": 220, "maxMp": 20, "attack": 24, "defense": 8 },
     "growth": { "maxHp": 22, "maxMp": 2, "attack": 3, "defense": 1 } },
@@ -21,7 +21,7 @@
     "growth": { "maxHp": 15, "maxMp": 3, "attack": 3, "defense": 1 } },
   {
     "id": "barbarian", "name": "Barbarian",
-    "description": "A fierce warrior who turns rage into raw, unstoppable strength.",
+    "description": "A fierce brawler who turns rage into raw, unstoppable strength.",
     "base": { "maxHp": 250, "maxMp": 10, "attack": 26, "defense": 6 },
     "growth": { "maxHp": 26, "maxMp": 1, "attack": 3, "defense": 1 } },
   {

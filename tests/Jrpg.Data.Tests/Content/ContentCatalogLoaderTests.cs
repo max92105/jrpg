@@ -20,10 +20,21 @@ public sealed class ContentCatalogLoaderTests
     public void Load_RepositoryContent_HasTheNineClassesWithDescriptionsAndStats()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
-        string[] classIds = ["warrior", "mage", "cleric", "rogue", "barbarian", "paladin", "monk", "warlock", "druid"];
+        string[] classIds = ["fighter", "mage", "cleric", "rogue", "barbarian", "paladin", "monk", "warlock", "druid"];
 
         Assert.All(classIds, id => Assert.NotEmpty(catalog.Classes[id].Description));
         Assert.All(classIds, id => Assert.True(catalog.Classes[id].Base.MaxHp > 0, $"{id} starts with no HP."));
+    }
+
+    // Decision 207: the class was renamed, with no alias for its old id.
+    [Fact]
+    public void Load_RepositoryContent_RagnirIsAFighter()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        var fighter = catalog.ClassOf(catalog.PartyMembers["ragnir"]);
+
+        Assert.Equal(("fighter", "Fighter"), (fighter.Id, fighter.Name));
     }
 
     [Fact]

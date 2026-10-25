@@ -238,7 +238,7 @@ public sealed class EquipmentPageTests
         return sarxian;
     }
 
-    // The weapon choice lists Remove, then the warrior's owned weapons in pickup order: the bronze sword, the iron sword.
+    // The weapon choice lists Remove, then the fighter's owned weapons in pickup order: bronze sword, iron sword.
     private static void ChooseIronSword(EquipmentPage page)
     {
         page.Update(Pressing(GameButton.Down));

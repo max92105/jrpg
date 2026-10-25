@@ -9,14 +9,14 @@ public sealed class PartyMemberCatalogValidatorTests
     private const string FileName = "party-members.json";
 
     private static readonly PartyMemberReferences _references = new(
-        ClassIds: new HashSet<string> { "warrior" },
+        ClassIds: new HashSet<string> { "fighter" },
         SkillIds: new HashSet<string> { "heal" });
 
     private static readonly PartyMemberDefinition _sarxian = new()
     {
         Id = "sarxian",
         Name = "Sarxian",
-        ClassId = "warrior",
+        ClassId = "fighter",
         Summary = "A warlock who bargained for fire.",
         PortraitFile = "Sarxian.png",
         BattleSpriteFile = "Sarxian.png",

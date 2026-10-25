@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/PT.md, slice PT (training dummy enemy + own encounter)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/FR1.md, slice FR1 (warrior class id becomes fighter)
 Round: 1 (verdict: Ready to commit)
 
-- No findings.
+- Warning, open: ContentCatalogLoaderTests.cs:29 comment "renamed from Warrior" makes the slice's own `git grep -i warrior` hand check find a hit.

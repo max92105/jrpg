@@ -6,7 +6,9 @@ using Jrpg.Game.Tests.Exploration;
 
 namespace Jrpg.Game.Tests.Menus;
 
-/// <summary>On the repository's new game: the leader, a warrior, starts wearing nothing, with bronze swords in the bag.</summary>
+/// <summary>
+/// On the repository's new game: the leader, a fighter, starts wearing nothing, with bronze swords in the bag.
+/// </summary>
 public sealed class EquipmentSheetTests
 {
     private readonly GameSession _session = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);

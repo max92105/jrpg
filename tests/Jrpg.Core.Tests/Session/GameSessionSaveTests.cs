@@ -70,7 +70,7 @@ public sealed class GameSessionSaveTests
             .WithBase(new ClassStats(MaxHp: 100, MaxMp: 20, Attack: 10, Defense: 5))
             .WithGrowth(new ClassStats(MaxHp: 10, MaxMp: 2, Attack: 3, Defense: 1))
             .Build();
-        var catalog = Catalog(_belowChest) with { Classes = new Dictionary<string, ClassDefinition> { ["warrior"] = growing } };
+        var catalog = Catalog(_belowChest) with { Classes = new Dictionary<string, ClassDefinition> { ["fighter"] = growing } };
         var save = StartNew().Capture(_savedAt);
         var savedAtThree = save with { Members = [save.Members[0] with { Level = 3, Hp = 90, Mp = 12 }] };
 

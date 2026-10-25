@@ -22,7 +22,9 @@ public sealed class PartyMember
         BaseStats = BaseStatsOf(stats);
         Speed = stats.Speed;
         Vitals = new Vitals(progress.Hp, stats.MaxHp);
-        _lastingAmounts = characterClass.Resources.Where(resource => resource.IsLasting).ToDictionary(resource => resource.Id, resource => resource.StartsAt);
+        _lastingAmounts = characterClass.Resources
+            .Where(resource => resource.IsLasting)
+            .ToDictionary(resource => resource.Id, resource => progress.LastingAmounts.GetValueOrDefault(resource.Id, resource.StartsAt));
     }
 
     public string Id => Definition.Id;
@@ -51,7 +53,7 @@ public sealed class PartyMember
 
     /// <summary>
     /// The amount each of the class's lasting resources carries into the next battle (ADR 0024), by resource id; it
-    /// starts at the resource's starting amount.
+    /// starts at the resource's starting amount, also for one a save doesn't hold.
     /// </summary>
     public IReadOnlyDictionary<string, int> LastingAmounts => _lastingAmounts;
 
@@ -68,7 +70,7 @@ public sealed class PartyMember
     {
         var levelOne = ClassGrowth.StatsAt(characterClass, 1);
         var starting = new PartyMemberProgress(
-            definition.Id, Level: 1, Experience: 0, levelOne.MaxHp, WeaponId: null, ArmorId: null);
+            definition.Id, Level: 1, Experience: 0, levelOne.MaxHp, WeaponId: null, ArmorId: null, LastingAmounts: new Dictionary<string, int>());
         return new(definition, characterClass, SkillsOf(characterClass, skillCatalog), starting);
     }
 
@@ -83,7 +85,7 @@ public sealed class PartyMember
 
     /// <summary>What a save keeps of this member.</summary>
     public PartyMemberProgress CaptureProgress() =>
-        new(Id, Level, Experience, Vitals.Hp, Weapon?.Id, Armor?.Id);
+        new(Id, Level, Experience, Vitals.Hp, Weapon?.Id, Armor?.Id, new Dictionary<string, int>(_lastingAmounts));
 
     /// <summary>The stat preview of taking off what's worn in <paramref name="slot"/>: total stats with that slot empty.</summary>
     public CombatStats StatsWithout(EquipmentSlot slot) => slot switch

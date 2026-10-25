@@ -24,3 +24,8 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
       - `Repair_UnknownLastingId_DroppedAndReported`
       - `Repair_LastingAboveMax_Clamped`
   - **Verify by hand:** a save made after this slice keeps the lasting amounts; one made before it is refused as older.
+- **Done, with deviations:**
+  - Test names follow the existing ones: `Read_FormatTwoSave_ThrowsAsOlder` replaces the format-one case, `Write_File_HoldsTheFormatThreeEnvelope`, and `CaptureThenRestore_KeepsLastingAmounts`. The newer-format test moved to format 4.
+  - `PartyMemberProgress` compares its lasting amounts by value, since a record compares a dictionary by reference, which would break every test comparing members.
+  - Extra tests: `Restore_LastingAmountMissing_StartsAtStartsAt` and a file round trip with a lasting amount, `Read_AfterWrite_KeepsLastingAmounts`. The repository has no lasting resource until LR3, so the clamp test and the file test use a copy of the catalog in which Sarxian's class has one.
+  - After review: the clamp test is a theory over both bounds (`Repair_LastingOutOfRange_Clamped`), and the drop message says "no longer has as lasting".

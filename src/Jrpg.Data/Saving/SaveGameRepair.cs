@@ -70,7 +70,8 @@ internal sealed class SaveGameRepair
     private PartyMemberProgress RepairMember(PartyMemberProgress progress, PartyMemberDefinition definition)
     {
         var (level, experience) = RepairLevel(progress);
-        var maxima = ClassGrowth.StatsAt(_catalog.ClassOf(definition), level);
+        var characterClass = _catalog.ClassOf(definition);
+        var maxima = ClassGrowth.StatsAt(characterClass, level);
         var repaired = progress with
         {
             Level = level,
@@ -78,10 +79,34 @@ internal sealed class SaveGameRepair
             Hp = Math.Clamp(progress.Hp, 0, maxima.MaxHp),
             WeaponId = RepairWornItem(progress.WeaponId, EquipmentSlot.Weapon, definition),
             ArmorId = RepairWornItem(progress.ArmorId, EquipmentSlot.Armor, definition),
+            LastingAmounts = RepairLastingAmounts(progress, characterClass),
         };
         if (repaired.Hp != progress.Hp)
         {
             _changes.Add($"party member '{progress.Id}': HP {progress.Hp} brought within 0..{maxima.MaxHp}.");
+        }
+
+        return repaired;
+    }
+
+    // Only the class's lasting resources, each within 0..max; one the save doesn't hold starts fresh on restore.
+    private Dictionary<string, int> RepairLastingAmounts(PartyMemberProgress progress, ClassDefinition characterClass)
+    {
+        var repaired = new Dictionary<string, int>();
+        foreach (var (resourceId, amount) in progress.LastingAmounts)
+        {
+            var resource = characterClass.Resources.FirstOrDefault(resource => resource.Id == resourceId && resource.IsLasting);
+            if (resource is null)
+            {
+                _changes.Add($"party member '{progress.Id}': dropped lasting resource '{resourceId}', which the class no longer has as lasting.");
+                continue;
+            }
+
+            repaired[resourceId] = Math.Clamp(amount, 0, resource.Max);
+            if (repaired[resourceId] != amount)
+            {
+                _changes.Add($"party member '{progress.Id}': {resourceId} {amount} brought within 0..{resource.Max}.");
+            }
         }
 
         return repaired;

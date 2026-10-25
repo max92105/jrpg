@@ -3,6 +3,7 @@ using Jrpg.Core.Geometry;
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Saving;
 using Jrpg.Core.World;
 using Jrpg.Data.Content;
@@ -19,8 +20,8 @@ public sealed class SaveGameRepairTests
 
     private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-    private static readonly PartyMemberProgress _sarxian = new("sarxian", Level: 3, Experience: 42, Hp: 150, WeaponId: "bronze_sword", ArmorId: "chain_mail");
-    private static readonly PartyMemberProgress _jazog = new("jazog", Level: 1, Experience: 0, Hp: 100, WeaponId: null, ArmorId: "wizard_robe");
+    private static readonly PartyMemberProgress _sarxian = new("sarxian", Level: 3, Experience: 42, Hp: 150, WeaponId: "bronze_sword", ArmorId: "chain_mail", LastingAmounts: new Dictionary<string, int>());
+    private static readonly PartyMemberProgress _jazog = new("jazog", Level: 1, Experience: 0, Hp: 100, WeaponId: null, ArmorId: "wizard_robe", LastingAmounts: new Dictionary<string, int>());
 
     private static readonly SaveGame _save = new()
     {
@@ -43,6 +44,34 @@ public sealed class SaveGameRepairTests
         Assert.Equal(_save.Members, repaired.Save.Members);
         Assert.Equal(_save.Inventory, repaired.Save.Inventory);
         Assert.Equal(_save.Location, repaired.Save.Location);
+    }
+
+    [Fact]
+    public void Repair_UnknownLastingId_DroppedAndReported()
+    {
+        var sarxian = _sarxian with { LastingAmounts = new Dictionary<string, int> { ["ghost"] = 2 } };
+
+        var repaired = Repair(_save with { Members = [sarxian, _jazog] });
+
+        Assert.Empty(repaired.Save.Members[0].LastingAmounts);
+        Assert.Contains("party member 'sarxian': dropped lasting resource 'ghost', which the class no longer has as lasting.", repaired.Changes);
+    }
+
+    // The repository has no lasting resource yet (LR3), so Sarxian's class gets Focus (max 3) for this test.
+    [Theory]
+    [InlineData(7, 3)]
+    [InlineData(-2, 0)]
+    public void Repair_LastingOutOfRange_Clamped(int saved, int expected)
+    {
+        var classId = _catalog.PartyMembers["sarxian"].ClassId;
+        var focus = new ResourceDefinition("focus", "Focus", Max: 3, StartsAt: 3) { IsLasting = true };
+        var classes = new Dictionary<string, ClassDefinition>(_catalog.Classes) { [classId] = _catalog.Classes[classId] with { Resources = [focus] } };
+        var sarxian = _sarxian with { LastingAmounts = new Dictionary<string, int> { ["focus"] = saved } };
+
+        var repaired = SaveGameRepair.Repair(Slot, _save with { Members = [sarxian, _jazog] }, _catalog with { Classes = classes });
+
+        Assert.Equal(expected, repaired.Save.Members[0].LastingAmounts["focus"]);
+        Assert.Contains($"party member 'sarxian': focus {saved} brought within 0..3.", repaired.Changes);
     }
 
     [Fact]

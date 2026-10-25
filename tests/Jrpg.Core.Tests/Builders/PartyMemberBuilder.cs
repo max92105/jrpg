@@ -65,7 +65,7 @@ internal sealed class PartyMemberBuilder
             .WithBase(new ClassStats(_maxHp, _attack, _defense, Speed: 10))
             .WithSkills([.. _skills.Select(skill => skill.Id)])
             .Build();
-        var progress = new PartyMemberProgress(_id, _level, _experience, _hp, WeaponId: null, ArmorId: null);
+        var progress = new PartyMemberProgress(_id, _level, _experience, _hp, WeaponId: null, ArmorId: null, LastingAmounts: new Dictionary<string, int>());
         return PartyMember.Restore(BuildDefinition(), characterClass, _skills.ToDictionary(skill => skill.Id), progress);
     }
 

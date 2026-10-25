@@ -5,9 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/LR1.md, slice LR1 (lasting resources carry between battles)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/LR2.md, slice LR2 (saves keep lasting resources, format 3)
 Round: 1 (verdict: Ready to commit)
 
-- Suggestion: ResourceStarts.cs:18 one-line ternary ~150 columns mixing lasting and fixed starts; split into a guard `if (resource.IsLasting)`; open
-- Suggestion: no test of a lasting amount at max plus a positive perBattleFought (clamp through CarryBack); open
-- Follow-up: Data schema/loader for isLasting and perBattleFought belongs to LR3 (validation should forbid lasting + maxFromSpeed)
+- Suggestion: SaveGameRepair.cs:101 drop message says "which the class no longer has" also when the class still has the resource but it isn't lasting; say "no longer has as lasting"; open
+- Suggestion: no test of a negative saved lasting amount clamped to 0 (lower bound of RepairLastingAmounts); open
+- Suggestion: catalog copy giving Sarxian's class a lasting Focus is written twice (FileSaveStoreTests, SaveGameRepairTests) and Clarity twice in GameSessionSaveTests; extract a private CatalogWithLasting() per file; open
+- Follow-up: FileSaveStoreTests, SaveGameRepairTests and GameSessionSaveTests are 250-272 lines, near the ~300 limit

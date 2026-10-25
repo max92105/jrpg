@@ -7,6 +7,7 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Session;
 using Jrpg.Core.Stats;
 using Jrpg.Core.Tests.Builders;
@@ -58,6 +59,39 @@ public sealed class GameSessionSaveTests
         var restored = SaveAndRestore(session).Party;
 
         Assert.Equal(["sarxian", "jazog"], restored.ActiveMembers.Select(member => member.Id));
+    }
+
+    // Clarity (max 3, starts at 3) is lasting; the battle left 1 of it, and the save keeps that.
+    [Fact]
+    public void CaptureThenRestore_KeepsLastingAmounts()
+    {
+        var clarity = new ResourceDefinition("clarity", "Clarity", Max: 3, StartsAt: 3) { IsLasting = true };
+        var catalog = Catalog(_belowChest) with
+        {
+            Classes = new Dictionary<string, ClassDefinition> { ["fighter"] = new ClassBuilder().WithResources(clarity).Build() },
+        };
+        var session = GameSession.StartNew(catalog, "sarxian", new FixedSequenceRandom());
+        session.Party.Leader.KeepLastingAmount("clarity", 1);
+
+        var restored = GameSession.Restore(session.Capture(_savedAt), catalog, new FixedSequenceRandom()).Party.Leader;
+
+        Assert.Equal(new Dictionary<string, int> { ["clarity"] = 1 }, restored.LastingAmounts);
+    }
+
+    // A save without a lasting amount, as before the resource was lasting, starts it at its starting amount.
+    [Fact]
+    public void Restore_LastingAmountMissing_StartsAtStartsAt()
+    {
+        var clarity = new ResourceDefinition("clarity", "Clarity", Max: 3, StartsAt: 3) { IsLasting = true };
+        var catalog = Catalog(_belowChest) with
+        {
+            Classes = new Dictionary<string, ClassDefinition> { ["fighter"] = new ClassBuilder().WithResources(clarity).Build() },
+        };
+        var save = StartNew().Capture(_savedAt);
+
+        var restored = GameSession.Restore(save, catalog, new FixedSequenceRandom()).Party.Leader;
+
+        Assert.Equal(3, restored.LastingAmounts["clarity"]);
     }
 
     // A save keeps only level, experience and HP, so the stats come from the class at the saved level (ADR 0017).

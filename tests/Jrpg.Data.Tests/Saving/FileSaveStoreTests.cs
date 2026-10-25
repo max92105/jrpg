@@ -3,6 +3,7 @@ using Jrpg.Core.Geometry;
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Saving;
 using Jrpg.Core.World;
 using Jrpg.Data.Content;
@@ -21,8 +22,8 @@ public sealed class FileSaveStoreTests : IDisposable
         Location = new MapLocation("start", new Point2D(10.25, 3.5), Facing.Left),
         Members =
         [
-            new PartyMemberProgress("sarxian", Level: 3, Experience: 42, Hp: 77, WeaponId: "bronze_sword", ArmorId: null),
-            new PartyMemberProgress("jazog", Level: 1, Experience: 0, Hp: 120, WeaponId: null, ArmorId: "wizard_robe"),
+            new PartyMemberProgress("sarxian", Level: 3, Experience: 42, Hp: 77, WeaponId: "bronze_sword", ArmorId: null, LastingAmounts: new Dictionary<string, int>()),
+            new PartyMemberProgress("jazog", Level: 1, Experience: 0, Hp: 120, WeaponId: null, ArmorId: "wizard_robe", LastingAmounts: new Dictionary<string, int>()),
         ],
         ActiveMemberIds = ["sarxian", "jazog"],
         Inventory = [new InventoryEntry("potion", 4), new InventoryEntry("bomb", 3)],
@@ -66,14 +67,31 @@ public sealed class FileSaveStoreTests : IDisposable
         Assert.Empty(repaired.Changes);
     }
 
+    // The repository has no lasting resource yet (LR3), so the store reads against a copy where Sarxian's class has
+    // Focus, a lasting resource.
     [Fact]
-    public void Write_File_HoldsTheFormatTwoEnvelope()
+    public void Read_AfterWrite_KeepsLastingAmounts()
+    {
+        var classId = _catalog.PartyMembers["sarxian"].ClassId;
+        var focus = new ResourceDefinition("focus", "Focus", Max: 3, StartsAt: 3) { IsLasting = true };
+        var classes = new Dictionary<string, ClassDefinition>(_catalog.Classes) { [classId] = _catalog.Classes[classId] with { Resources = [focus] } };
+        var store = new FileSaveStore(_directory, _catalog with { Classes = classes });
+        var save = _save with { Members = [_save.Members[0] with { LastingAmounts = new Dictionary<string, int> { ["focus"] = 1 } }, _save.Members[1]] };
+        store.Write(Slot, save);
+
+        var read = store.Read(Slot)!.Save;
+
+        Assert.Equal(save.Members, read.Members);
+    }
+
+    [Fact]
+    public void Write_File_HoldsTheFormatThreeEnvelope()
     {
         _store.Write(Slot, _save);
 
         var json = File.ReadAllText(Path.Combine(_directory, "slot_01.json"));
 
-        Assert.StartsWith("{\n  \"formatVersion\": 2,\n  \"game\": {", json.ReplaceLineEndings("\n"), StringComparison.Ordinal);
+        Assert.StartsWith("{\n  \"formatVersion\": 3,\n  \"game\": {", json.ReplaceLineEndings("\n"), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -99,25 +117,26 @@ public sealed class FileSaveStoreTests : IDisposable
         Assert.Equal(Slot, exception.SlotName);
     }
 
-    // Saves before format 2 kept MP. Until the first release an older save is refused, not migrated (ADR 0022).
+    // Saves before format 3 kept no lasting resources. Until the first release an older save is refused, not migrated
+    // (ADR 0022).
     [Fact]
-    public void Read_FormatOneSave_ThrowsAsOlder()
+    public void Read_FormatTwoSave_ThrowsAsOlder()
     {
-        WriteRaw("""{ "formatVersion": 1, "game": {} }""");
+        WriteRaw("""{ "formatVersion": 2, "game": {} }""");
 
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
 
-        Assert.Equal("it was made by an older version of the game (format 1).", exception.Reason);
+        Assert.Equal("it was made by an older version of the game (format 2).", exception.Reason);
     }
 
     [Fact]
     public void Read_NewerFormatVersion_ThrowsNamingTheVersion()
     {
-        WriteRaw("""{ "formatVersion": 3, "game": {} }""");
+        WriteRaw("""{ "formatVersion": 4, "game": {} }""");
 
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
 
-        Assert.Equal("it was made by a newer version of the game (format 3).", exception.Reason);
+        Assert.Equal("it was made by a newer version of the game (format 4).", exception.Reason);
     }
 
     [Theory]
@@ -136,7 +155,7 @@ public sealed class FileSaveStoreTests : IDisposable
     [Fact]
     public void Read_MalformedJson_ThrowsNamingTheSlot()
     {
-        WriteRaw("""{ "formatVersion": 2, "game": { """);
+        WriteRaw("""{ "formatVersion": 3, "game": { """);
 
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
 
@@ -175,8 +194,8 @@ public sealed class FileSaveStoreTests : IDisposable
     public void Read_DuplicateProperty_ThrowsUnreadable(string property)
     {
         WriteRaw(property == "game"
-            ? """{ "formatVersion": 2, "game": {}, "game": {} }"""
-            : """{ "formatVersion": 2, "formatVersion": 2, "game": {} }""");
+            ? """{ "formatVersion": 3, "game": {}, "game": {} }"""
+            : """{ "formatVersion": 3, "formatVersion": 3, "game": {} }""");
 
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
 

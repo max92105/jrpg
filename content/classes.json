@@ -19,7 +19,9 @@
     "base": { "maxHp": 180, "attack": 18, "defense": 7 },
     "growth": { "maxHp": 16, "attack": 2, "defense": 1 },
     "skillIds": ["heal", "recovery", "heal_all"],
-    "resources": [ { "id": "faith", "name": "Faith", "max": 5, "startsAt": 5, "gains": { "perAllyFallen": -1 } } ] },
+    "resources": [
+      { "id": "faith", "name": "Faith", "max": 5, "startsAt": 5,
+        "gains": { "perAllyFallen": -1, "perHeavyHit": -1, "heavyHitPercent": 20 } } ] },
   {
     "id": "rogue", "name": "Rogue",
     "description": "A quick and cunning blade who strikes where the enemy is weakest.",
@@ -36,7 +38,11 @@
     "id": "paladin", "name": "Paladin",
     "description": "A holy knight bound by an oath, shield of the weak and bane of evil.",
     "base": { "maxHp": 210, "attack": 22, "defense": 9 },
-    "growth": { "maxHp": 20, "attack": 2, "defense": 2 } },
+    "growth": { "maxHp": 20, "attack": 2, "defense": 2 },
+    "skillIds": ["smite"],
+    "resources": [
+      { "id": "conviction", "name": "Conviction", "max": 10, "startsAt": 0,
+        "gains": { "perHeavyHit": 2, "heavyHitPercent": 20, "perEnemyFallen": 3 } } ] },
   {
     "id": "monk", "name": "Monk",
     "description": "A disciplined fighter whose body and spirit are the only weapons needed.",

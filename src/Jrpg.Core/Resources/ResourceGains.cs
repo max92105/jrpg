@@ -11,4 +11,16 @@ public sealed record ResourceGains
 
     /// <summary>For each hit that costs the holder HP, whatever the damage (question 208).</summary>
     public int PerHitTaken { get; init; }
+
+    /// <summary>
+    /// For a hit that takes at least <see cref="HeavyHitPercent"/> of the holder's max HP, on top of
+    /// <see cref="PerHitTaken"/>.
+    /// </summary>
+    public int PerHeavyHit { get; init; }
+
+    /// <summary>The share of max HP, 1 to 100, that makes a hit heavy (question 212).</summary>
+    public int HeavyHitPercent { get; init; }
+
+    /// <summary>Whenever a combatant on the other side falls, while the holder still stands.</summary>
+    public int PerEnemyFallen { get; init; }
 }

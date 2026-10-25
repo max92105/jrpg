@@ -83,5 +83,13 @@
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "ferocity", "amount": -6 } ],
     "effect": { "kind": "damage", "power": 70, "targeting": "singleEnemy" }
+  },
+  {
+    "id": "smite",
+    "name": "Smite",
+    "description": "A holy blow on one enemy. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "resourceChanges": [ { "resourceId": "conviction", "amount": -3 } ],
+    "effect": { "kind": "damage", "power": 40, "targeting": "singleEnemy" }
   }
 ]

@@ -35,6 +35,8 @@ internal static class ResourceDefinitionValidator
             : resource.Max < 1 ? $"max must be at least 1 (was {resource.Max})."
             : resource.StartsAt < 0 || resource.StartsAt > resource.Max
                 ? $"startsAt must be within 0..{resource.Max} (was {resource.StartsAt})."
+            : resource.Gains.PerHeavyHit != 0 && resource.Gains.HeavyHitPercent is < 1 or > 100
+                ? $"gains.heavyHitPercent must be within 1..100 when perHeavyHit is set (was {resource.Gains.HeavyHitPercent})."
             : null;
         return problem is null ? null : $"resource '{resource.Id}': {problem}";
     }

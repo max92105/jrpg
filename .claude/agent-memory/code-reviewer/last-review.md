@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/BB1.md, slice BB1 (barbarian ferocity per hit taken; Taunt draws enemy attacks)
-Round: 1 (verdict: Ready to commit; verify all pass, 1872 tests)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/PL1.md, slice PL1 (paladin conviction: heavy hits, enemy falls, Smite; cleric faith on heavy hit)
+Round: 1 (verdict: Ready to commit; verify all pass, 1881 tests)
 
-- Suggestion, open: no test pins the event order of a felling hit on a barbarian (EffectApplied, ResourceChanged, CombatantDefeated), the rule the slice note records.
-- Suggestion, open: Execute_SelfTaunt_LastsTwoOwnTurnsAfterCast could also check that an enemy turn between the hero's turns targets the taunter (end to end through EnemyTactics).
-- Follow-up: question 209 placeholder: Taunt on an enemy combatant has no effect; revisit when enemies get statuses.
+- Warning, open: no ResourceTriggers test of a light hit on a resource with PerHeavyHit set (e.g. paladin hpLost 19 of 100 -> no event); dropping the IsHeavy check would pass every test.
+- Suggestion, open: OnHitTaken_HeavyHitOnCleric_LosesFaith asserts only the amount; could pin the single ResourceChanged(-1) event like its sibling.
+- Follow-up: a felling heavy hit grants conviction to the paladin it kills (OnHitTaken runs before Fall); harmless while resources reset per battle.

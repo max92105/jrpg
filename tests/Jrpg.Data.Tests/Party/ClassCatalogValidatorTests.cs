@@ -204,6 +204,18 @@ public sealed class ClassCatalogValidatorTests
         Assert.Equal("classes.json: class 'cleric': skillIds lists 'heal_all', which needs 6 faith, above its max of 5.", exception.Message);
     }
 
+    [Fact]
+    public void Validate_HeavyHitGainWithoutPercent_Throws()
+    {
+        var conviction = Mana with { Id = "conviction", Gains = new ResourceGains { PerHeavyHit = 2 } };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("paladin") with { Resources = [conviction] }]));
+
+        Assert.Equal(
+            "classes.json: class 'paladin': resource 'conviction': gains.heavyHitPercent must be within 1..100 when perHeavyHit is set (was 0).",
+            exception.Message);
+    }
+
     private static ResourceDefinition Mana { get; } = new("mana", "Mana", Max: 10, StartsAt: 3);
 
     private static void Validate(IReadOnlyList<ClassDefinition> classes) =>

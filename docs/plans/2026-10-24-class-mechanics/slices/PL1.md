@@ -31,3 +31,9 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
   - **Verify by hand:**
     - As Teelle: +3 conviction per fallen goblin; Smite greys until 3.
     - Heavy hits: no goblin or dummy hit reaches 20 % at level 1, so the tests carry the rule. To see it on screen, set the paladin's `heavyHitPercent` to 3 locally for one run, check +2 more per hit, and revert it before committing (`git checkout content/classes.json`).
+- **Done, with deviations:** Tests 1874 before, 1882 after.
+  - `OnCombatantFallen` now walks every living combatant once, giving `PerAllyFallen` to the fallen one's side and `PerEnemyFallen` to the other side.
+  - The heavy-hit gain adds to `PerHitTaken` in one `ResourceChanged`, not two events.
+  - Two tests beyond the plan: `ClassCatalogValidatorTests.Validate_HeavyHitGainWithoutPercent_Throws`, and the heavy-hit test in `ResourceTriggersTests`.
+  - Smite's description is marked as a placeholder.
+  - From review: `OnHitTaken_LightHitOnPaladin_GainsNothing` (19 of 100 HP) pins the heavy-hit threshold from below, and the cleric's heavy-hit test pins its single `ResourceChanged`.

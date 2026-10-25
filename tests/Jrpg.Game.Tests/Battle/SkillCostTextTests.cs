@@ -12,7 +12,7 @@ public sealed class SkillCostTextTests
     private static readonly ResourceDefinition _mana = new("mana", "Mana", Max: 10, StartsAt: 3);
     private static readonly ResourceDefinition _faith = new("faith", "Faith", Max: 5, StartsAt: 3);
 
-    private readonly SkillCostText _text = new(RepositoryScreenText.Text.Messages, new ResourceMeters([_mana, _faith]));
+    private readonly SkillCostText _text = new(RepositoryScreenText.Text.Messages, new ResourceMeters([ResourceStart.Fixed(_mana), ResourceStart.Fixed(_faith)]));
 
     [Fact]
     public void CostOf_ResourceSkill_SaysAmountAndResourceName()

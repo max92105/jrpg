@@ -18,6 +18,7 @@ public sealed class PartyMember
         Experience = progress.Experience;
         var stats = ClassGrowth.StatsAt(characterClass, progress.Level);
         BaseStats = BaseStatsOf(stats);
+        Speed = stats.Speed;
         Vitals = new Vitals(progress.Hp, stats.MaxHp);
     }
 
@@ -33,6 +34,9 @@ public sealed class PartyMember
     public int Experience { get; private set; }
 
     public CombatStats BaseStats { get; private set; }
+
+    /// <summary>The class's speed at the member's level; it sets readiness charges (question 213).</summary>
+    public int Speed { get; private set; }
 
     public Vitals Vitals { get; }
 
@@ -183,6 +187,7 @@ public sealed class PartyMember
         Experience = 0;
         var after = ClassGrowth.StatsAt(Class, Level);
         BaseStats = BaseStatsOf(after);
+        Speed = after.Speed;
         Vitals.RaiseMaxima(after.MaxHp - before.MaxHp);
     }
 }

@@ -46,12 +46,26 @@ public sealed class ResourceRowsTextTests
     public void Refresh_TwoResources_FormatsBoth()
     {
         var meters = new ResourceMeters(
-            [new ResourceDefinition("growth", "Growth", Max: 10, StartsAt: 0), new ResourceDefinition("decay", "Decay", Max: 8, StartsAt: 2)]);
+        [
+            ResourceStart.Fixed(new ResourceDefinition("growth", "Growth", Max: 10, StartsAt: 0)),
+            ResourceStart.Fixed(new ResourceDefinition("decay", "Decay", Max: 8, StartsAt: 2)),
+        ]);
         var text = new ResourceRowsText(meters, RepositoryScreenText.Text.Messages);
 
         text.Refresh();
 
         Assert.Equal(("0", "/10", "2", "/8"), (text.AmountAt(0), text.MaxAt(0), text.AmountAt(1), text.MaxAt(1)));
+    }
+
+    [Fact]
+    public void Refresh_SpeedScaledResource_ShowsTheBattleMax()
+    {
+        var readiness = new ResourceDefinition("readiness", "Readiness") { MaxFromSpeed = new SpeedScaling(10) };
+        var text = new ResourceRowsText(new ResourceMeters([new ResourceStart(readiness, Max: 3, Amount: 3)]), RepositoryScreenText.Text.Messages);
+
+        text.Refresh();
+
+        Assert.Equal(("3", "/3"), (text.AmountAt(0), text.MaxAt(0)));
     }
 
     private Combatant Omer => _battle.Combatants[0];

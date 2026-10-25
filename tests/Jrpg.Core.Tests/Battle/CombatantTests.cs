@@ -2,6 +2,7 @@ using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
 using Jrpg.Core.Tests.Builders;
@@ -73,6 +74,36 @@ public sealed class CombatantTests
         var current = combatant.CurrentStats;
 
         Assert.Equal(combatant.Stats, current);
+    }
+
+    [Fact]
+    public void FromPartyMember_SpeedScaledResource_MaxAndStartFromSpeed()
+    {
+        var combatant = Combatant.FromPartyMember(Rogue(level: 1));
+
+        Assert.Equal((3, 3), (combatant.Resources.MaxOf("readiness"), combatant.Resources.AmountOf("readiness")));
+    }
+
+    // Speed 30 at level 1 and +5 a level: 40 at level 3, so 4 charges.
+    [Fact]
+    public void FromPartyMember_LevelUpRaisesSpeed_MoreCharges()
+    {
+        var combatant = Combatant.FromPartyMember(Rogue(level: 3));
+
+        Assert.Equal(4, combatant.Resources.MaxOf("readiness"));
+    }
+
+    private static PartyMember Rogue(int level)
+    {
+        var readiness = new ResourceDefinition("readiness", "Readiness") { MaxFromSpeed = new SpeedScaling(SpeedPerCharge: 10) };
+        var rogue = new ClassBuilder()
+            .WithId("rogue")
+            .WithBase(new ClassStats(MaxHp: 100, Attack: 10, Defense: 5, Speed: 30))
+            .WithGrowth(new ClassStats(MaxHp: 0, Attack: 0, Defense: 0, Speed: 5))
+            .WithResources(readiness)
+            .Build();
+        var progress = new PartyMemberProgress("lazarus", level, 0, Hp: 100, WeaponId: null, ArmorId: null);
+        return PartyMember.Restore(new PartyMemberBuilder().WithId("lazarus").BuildDefinition(), rogue, new Dictionary<string, SkillDefinition>(), progress);
     }
 
     [Fact]

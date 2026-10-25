@@ -38,3 +38,11 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
       - `Validate_ResourceWithMaxAndMaxFromSpeed_Throws`
       - `Validate_NegativeSpeed_Throws`
   - **Verify by hand:** as Lazarus, READINESS 3/3 in a fight.
+- **Done, with deviations:** Tests 1914 before, 1925 after. Beyond the plan:
+  - `ResourceDefinition`'s `Max` and `StartsAt` default to 0, so the rogue's readiness can leave them out. The validator requires either both numbers or `maxFromSpeed`, never both.
+  - `ResourceMeters.MaxOf` gives the battle's max, which `ResourceRowsText` and `PartyStatusPanel` now read instead of the definition's.
+  - The unreachable-requirement check skips speed-scaled resources, since their max is only known in battle.
+  - The test builders give classes speed 10. There is also an extra content test, `Load_RepositoryContent_RogueReadinessScalesWithSpeed`.
+  - **From review:**
+    - Three more tests: a `speedPerCharge` below 1 is rejected, the meters clamp to the battle's max, and the row shows that max.
+    - A fixed resource that leaves out `startsAt` now quietly starts at 0. That went to the backlog.

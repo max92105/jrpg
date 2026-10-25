@@ -8,8 +8,16 @@ public sealed class ClassGrowthTests
         "fighter",
         "Fighter",
         "Fights.",
-        Base: new ClassStats(MaxHp: 220, Attack: 24, Defense: 8),
-        Growth: new ClassStats(MaxHp: 22, Attack: 3, Defense: 1));
+        Base: new ClassStats(MaxHp: 220, Attack: 24, Defense: 8, Speed: 12),
+        Growth: new ClassStats(MaxHp: 22, Attack: 3, Defense: 1, Speed: 1));
+
+    [Fact]
+    public void StatsAt_LevelThree_SpeedGrowsTwice()
+    {
+        var stats = ClassGrowth.StatsAt(_fighter, level: 3);
+
+        Assert.Equal(14, stats.Speed);
+    }
 
     [Fact]
     public void StatsAt_LevelOne_IsBase()
@@ -20,7 +28,7 @@ public sealed class ClassGrowthTests
     [Fact]
     public void StatsAt_LevelFive_AddsFourGrowths()
     {
-        Assert.Equal(new ClassStats(MaxHp: 308, Attack: 36, Defense: 12), ClassGrowth.StatsAt(_fighter, level: 5));
+        Assert.Equal(new ClassStats(MaxHp: 308, Attack: 36, Defense: 12, Speed: 16), ClassGrowth.StatsAt(_fighter, level: 5));
     }
 
     [Fact]

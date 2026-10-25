@@ -75,7 +75,7 @@ public sealed class ClassCatalogValidatorTests
         { Class("fighter") with { Growth = Stats with { MaxHp = -5 } }, "growth.maxHp must be at least 0 (was -5)." },
     };
 
-    private static ClassStats Stats { get; } = new(MaxHp: 200, Attack: 20, Defense: 5);
+    private static ClassStats Stats { get; } = new(MaxHp: 200, Attack: 20, Defense: 5, Speed: 10);
 
     [Theory]
     [MemberData(nameof(InvalidStats))]
@@ -89,7 +89,7 @@ public sealed class ClassCatalogValidatorTests
     [Fact]
     public void Validate_ZeroGrowth_DoesNotThrow()
     {
-        var neverImproving = Class("fighter") with { Growth = new ClassStats(MaxHp: 0, Attack: 0, Defense: 0) };
+        var neverImproving = Class("fighter") with { Growth = new ClassStats(MaxHp: 0, Attack: 0, Defense: 0, Speed: 0) };
 
         var exception = Record.Exception(() => Validate([neverImproving]));
 
@@ -214,6 +214,34 @@ public sealed class ClassCatalogValidatorTests
         Assert.Equal(
             "classes.json: class 'paladin': resource 'conviction': gains.heavyHitPercent must be within 1..100 when perHeavyHit is set (was 0).",
             exception.Message);
+    }
+
+    [Fact]
+    public void Validate_ResourceWithMaxAndMaxFromSpeed_Throws()
+    {
+        var readiness = Mana with { Id = "readiness", MaxFromSpeed = new SpeedScaling(SpeedPerCharge: 10) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("rogue") with { Resources = [readiness] }]));
+
+        Assert.Equal("classes.json: class 'rogue': resource 'readiness': set either max and startsAt, or maxFromSpeed, not both.", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_SpeedPerChargeBelowOne_Throws()
+    {
+        var readiness = new ResourceDefinition("readiness", "Readiness") { MaxFromSpeed = new SpeedScaling(0) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("rogue") with { Resources = [readiness] }]));
+
+        Assert.Equal("classes.json: class 'rogue': resource 'readiness': maxFromSpeed.speedPerCharge must be at least 1 (was 0).", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_NegativeSpeed_Throws()
+    {
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("rogue") with { Growth = Stats with { Speed = -1 } }]));
+
+        Assert.Equal("classes.json: class 'rogue': growth.speed must be at least 0 (was -1).", exception.Message);
     }
 
     private static ResourceDefinition Mana { get; } = new("mana", "Mana", Max: 10, StartsAt: 3);

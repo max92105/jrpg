@@ -32,6 +32,7 @@ internal static class ResourceDefinitionValidator
     {
         var problem =
             string.IsNullOrWhiteSpace(resource.Name) ? "name must not be empty."
+            : resource.MaxFromSpeed is { } scaling ? FindSpeedScalingProblem(resource, scaling)
             : resource.Max < 1 ? $"max must be at least 1 (was {resource.Max})."
             : resource.StartsAt < 0 || resource.StartsAt > resource.Max
                 ? $"startsAt must be within 0..{resource.Max} (was {resource.StartsAt})."
@@ -40,4 +41,10 @@ internal static class ResourceDefinitionValidator
             : null;
         return problem is null ? null : $"resource '{resource.Id}': {problem}";
     }
+
+    // The speed gives both numbers, so a max or a start written beside it would be ignored.
+    private static string? FindSpeedScalingProblem(ResourceDefinition resource, SpeedScaling scaling) =>
+        resource.Max != 0 || resource.StartsAt != 0 ? "set either max and startsAt, or maxFromSpeed, not both."
+        : scaling.SpeedPerCharge < 1 ? $"maxFromSpeed.speedPerCharge must be at least 1 (was {scaling.SpeedPerCharge})."
+        : null;
 }

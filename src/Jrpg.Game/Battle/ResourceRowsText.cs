@@ -24,7 +24,7 @@ internal sealed class ResourceRowsText
         _shownAmounts = new int?[count];
         _amounts = new string[count];
         Array.Fill(_amounts, string.Empty);
-        _maxima = [.. meters.Definitions.Select(definition => messages.Format(MessageIds.BattleVitalMax, MessageArgument.Number("max", definition.Max)))];
+        _maxima = [.. meters.Definitions.Select(definition => messages.Format(MessageIds.BattleVitalMax, MessageArgument.Number("max", meters.MaxOf(definition.Id))))];
     }
 
     public int Count => _amounts.Length;

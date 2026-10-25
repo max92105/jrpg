@@ -27,6 +27,7 @@ internal static class ClassCatalogValidator
         stats.MaxHp < 0 ? $"{field}.maxHp must be at least 0 (was {stats.MaxHp})."
         : stats.Attack < 0 ? $"{field}.attack must be at least 0 (was {stats.Attack})."
         : stats.Defense < 0 ? $"{field}.defense must be at least 0 (was {stats.Defense})."
+        : stats.Speed < 0 ? $"{field}.speed must be at least 0 (was {stats.Speed})."
         : null;
 
     private static string? FindSkillProblem(IReadOnlyList<string> skillIds, ClassReferences references)
@@ -64,10 +65,13 @@ internal static class ClassCatalogValidator
     // A requirement above the max could never be met, so the skill would stay greyed for good.
     private static string? FindUnreachableRequirementProblem(ClassDefinition classDefinition, ClassReferences references)
     {
-        var maxima = classDefinition.Resources.ToDictionary(resource => resource.Id, resource => resource.Max);
+        // A speed-scaled max is only known in battle, so its requirements are not checked here.
+        var maxima = classDefinition.Resources
+            .Where(resource => resource.MaxFromSpeed is null)
+            .ToDictionary(resource => resource.Id, resource => resource.Max);
         var (skillId, requirement) = classDefinition.SkillIds
             .SelectMany(id => references.Skills[id].Requirements, (id, requirement) => (id, requirement))
-            .FirstOrDefault(use => use.requirement.AtLeast > maxima[use.requirement.ResourceId]);
+            .FirstOrDefault(use => maxima.TryGetValue(use.requirement.ResourceId, out var max) && use.requirement.AtLeast > max);
         if (skillId is null)
         {
             return null;

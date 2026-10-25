@@ -5,9 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/PL2b.md, slice PL2b (alliesInRange aura, Effect.Range)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/RG1.md, slice RG1 (speed stat, rogue readiness charges from speed)
 Round: 1 (verdict: Ready to commit)
 
-- Warning: EffectValidatorTests has no test for a negative range (EffectValidator.cs:23 `Range < 0`); open
-- Suggestion: split the combined range message into two (negative vs wrong targeting); open
-- Suggestion: test field naming mixes `_aura` and `FirstActsFirst` for static readonly fields in BattleFormationTests; open
+- Warning: ResourceDefinitionValidator `speedPerCharge < 1` branch has no test; it guards a DivideByZeroException in ReadinessFormula.Charges at battle start; open
+- Suggestion: no test pins ResourceMeters.Change clamping to the start's max (not the definition's Max 0) for a speed-scaled resource; open
+- Suggestion: ResourceRowsTextTests has no case where MaxOf differs from definition.Max (speed-scaled "3/3" row); open
+- Follow-up: omitting `startsAt`/`max` on a fixed resource now loads as 0 instead of failing the required-parameter check (defaults added); validator catches max only

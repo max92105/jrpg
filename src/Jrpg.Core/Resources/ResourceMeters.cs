@@ -4,14 +4,14 @@ namespace Jrpg.Core.Resources;
 public sealed class ResourceMeters
 {
     private readonly Dictionary<string, int> _amounts;
-    private readonly Dictionary<string, ResourceDefinition> _definitions;
+    private readonly Dictionary<string, int> _maxima;
 
-    /// <param name="definitions">The holder's resources; each starts at its starting amount.</param>
-    public ResourceMeters(IReadOnlyList<ResourceDefinition> definitions)
+    /// <param name="starts">The holder's resources, each with its max and starting amount for this battle.</param>
+    public ResourceMeters(IReadOnlyList<ResourceStart> starts)
     {
-        Definitions = definitions;
-        _definitions = definitions.ToDictionary(definition => definition.Id);
-        _amounts = definitions.ToDictionary(definition => definition.Id, definition => definition.StartsAt);
+        Definitions = [.. starts.Select(start => start.Definition)];
+        _maxima = starts.ToDictionary(start => start.Definition.Id, start => start.Max);
+        _amounts = starts.ToDictionary(start => start.Definition.Id, start => start.Amount);
     }
 
     public IReadOnlyList<ResourceDefinition> Definitions { get; }
@@ -22,12 +22,19 @@ public sealed class ResourceMeters
             ? amount
             : throw new ArgumentException($"This combatant has no resource '{resourceId}'.", nameof(resourceId));
 
+    /// <summary>The max for this battle, which a speed-scaled resource takes from its holder.</summary>
+    /// <exception cref="ArgumentException">The holder has no resource <paramref name="resourceId"/>.</exception>
+    public int MaxOf(string resourceId) =>
+        _maxima.TryGetValue(resourceId, out var max)
+            ? max
+            : throw new ArgumentException($"This combatant has no resource '{resourceId}'.", nameof(resourceId));
+
     /// <returns>The change applied after clamping to 0..max; 0 when the amount was already at that bound.</returns>
     /// <exception cref="ArgumentException">The holder has no resource <paramref name="resourceId"/>.</exception>
     internal int Change(string resourceId, int amount)
     {
         var before = AmountOf(resourceId);
-        var after = Math.Clamp(before + amount, 0, _definitions[resourceId].Max);
+        var after = Math.Clamp(before + amount, 0, MaxOf(resourceId));
         _amounts[resourceId] = after;
         return after - before;
     }

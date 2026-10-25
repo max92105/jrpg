@@ -38,3 +38,5 @@ Seen again in battle B1b (loop-exit variant): the flow test loops `while session
 Seen again in demo-retirement I1 (cache variant): `ButtonLabelsTests.Of_SameButtonTwice_ReturnsTheSameString` uses `Assert.Same`, but .NET's `Enum.ToString()` already returns the same cached name instance (probed with fsi), so it passes with no cache. Reference-identity tests of a cache need a value the runtime doesn't intern.
 
 Seen again in demo-retirement G1a (stale-equals-expected variant): `InteractionInFront_AfterWarp_IsRefreshedOnTheNewMap` asserts null, but the value was already null from `TryInteract`, so deleting the refresh in `ContinueEvent` keeps it green. For a "refreshed" test, the expected value must differ from the stale one.
+
+Seen again in class-mechanics PL2b and RG1 (new validator branch): `EffectValidator` negative range and `ResourceDefinitionValidator` `speedPerCharge < 1` (a divide-by-zero guard) shipped untested while sibling branches got tests. Match each new validator message in the diff to a test.

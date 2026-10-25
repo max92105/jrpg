@@ -51,7 +51,7 @@ internal sealed class PartyStatusPanel
         for (var index = 0; index < _resources.Count; index++)
         {
             var definition = meters.Definitions[index];
-            ResourceRows[index].Show(_resources.AmountAt(index), _resources.MaxAt(index), meters.AmountOf(definition.Id), definition.Max);
+            ResourceRows[index].Show(_resources.AmountAt(index), _resources.MaxAt(index), meters.AmountOf(definition.Id), meters.MaxOf(definition.Id));
         }
     }
 }

@@ -51,7 +51,7 @@ public sealed class Combatant
         new(member.Definition.Name, BattleSide.Party, member.TotalStats, member.Vitals)
         {
             Skills = member.Skills,
-            Resources = new(member.Class.Resources),
+            Resources = new(ResourceStarts.For(member)),
             Member = member,
         };
 

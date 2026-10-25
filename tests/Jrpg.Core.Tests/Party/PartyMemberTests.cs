@@ -13,8 +13,8 @@ public sealed class PartyMemberTests
     private readonly ExperienceTable _table = new([100, 120, 144]);
 
     private static readonly ClassDefinition _growingClass = new ClassBuilder()
-        .WithBase(new ClassStats(MaxHp: 100, Attack: 12, Defense: 7))
-        .WithGrowth(new ClassStats(MaxHp: 10, Attack: 2, Defense: 1))
+        .WithBase(new ClassStats(MaxHp: 100, Attack: 12, Defense: 7, Speed: 0))
+        .WithGrowth(new ClassStats(MaxHp: 10, Attack: 2, Defense: 1, Speed: 0))
         .Build();
 
     [Fact]

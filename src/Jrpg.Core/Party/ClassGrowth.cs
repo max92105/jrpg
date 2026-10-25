@@ -17,6 +17,7 @@ public static class ClassGrowth
         return new ClassStats(
             baseStats.MaxHp + (growth.MaxHp * levelsGained),
             baseStats.Attack + (growth.Attack * levelsGained),
-            baseStats.Defense + (growth.Defense * levelsGained));
+            baseStats.Defense + (growth.Defense * levelsGained),
+            baseStats.Speed + (growth.Speed * levelsGained));
     }
 }

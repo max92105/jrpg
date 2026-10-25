@@ -133,6 +133,17 @@ public sealed class ContentCatalogLoaderTests
     }
 
     [Fact]
+    public void Load_RepositoryContent_RogueReadinessScalesWithSpeed()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        var rogue = catalog.ClassOf(catalog.PartyMembers["lazarus"]);
+
+        Assert.Equal(new SpeedScaling(10), rogue.Resources.Single(resource => resource.Id == "readiness").MaxFromSpeed);
+        Assert.Equal(30, rogue.Base.Speed);
+    }
+
+    [Fact]
     public void Load_RepositoryContent_MageHasMana()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));

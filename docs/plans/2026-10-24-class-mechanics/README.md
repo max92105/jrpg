@@ -101,7 +101,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **MP3b. Members and enemies lose MP** (Core + Data + content, about 260 lines, mostly deletions and test-site edits) → [slices/MP3b.md](slices/MP3b.md)
 
 ### Phase 3: statuses, the fighter, the barbarian, the paladin and the formation
-- [ ] **ADR 0021: Status effects** (before ST1) → [slices/ADR-0021.md](slices/ADR-0021.md)
+- [x] **ADR 0021: Status effects** (before ST1) → [slices/ADR-0021.md](slices/ADR-0021.md)
 - [ ] **ST1. Statuses in Core: granted by effects, counted down from the holder's next turn, cleared on a fall** (Core + Data, about 260 lines) → [slices/ST1.md](slices/ST1.md)
 - [ ] **ST2. A stunned combatant loses its turn** (Core, about 150 lines) → [slices/ST2.md](slices/ST2.md)
 - [ ] **FT1. The fighter: stamina and a stunning bash; the screen shows statuses plainly** (content + Game, about 250 lines) → [slices/FT1.md](slices/FT1.md)

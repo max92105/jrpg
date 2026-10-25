@@ -27,7 +27,7 @@ internal sealed class ActionPlayback
     private readonly List<FloatingNumber> _numbers = [];
     private readonly List<EffectOnTarget> _strips = [];
     private readonly List<CueOnTarget> _cues = [];
-    private readonly List<Combatant> _fallen = [];
+    private readonly List<(Combatant Fallen, TimeSpan FadeStart)> _fallen = [];
     private string? _attackEffectFile;
 
     private ActionPlayback()
@@ -74,12 +74,13 @@ internal sealed class ActionPlayback
     /// <returns>How visible <paramref name="combatant"/> still is while falling, 1 to 0; null when they didn't fall here.</returns>
     public float? FallOpacityOf(Combatant combatant)
     {
-        if (!_fallen.Contains(combatant))
+        var index = _fallen.FindIndex(fall => fall.Fallen == combatant);
+        if (index < 0)
         {
             return null;
         }
 
-        var fadeShare = Math.Clamp((float)((Elapsed - _fallTint) / _fallFade), 0, 1);
+        var fadeShare = Math.Clamp((float)((Elapsed - _fallen[index].FadeStart - _fallTint) / _fallFade), 0, 1);
         return 1 - (fadeShare * fadeShare);
     }
 
@@ -110,8 +111,7 @@ internal sealed class ActionPlayback
                 AddLanding(effect);
                 break;
             case CombatantDefeated defeated:
-                AddBeatOnce(PlaybackBeatKind.Defeat, BattlePacing.DefeatHold - BattlePacing.ImpactHold);
-                _fallen.Add(defeated.Combatant);
+                AddFall(defeated.Combatant);
                 break;
             case StatusApplied applied:
                 AddBeatOnce(PlaybackBeatKind.Impact, BattlePacing.ImpactHold);
@@ -119,6 +119,9 @@ internal sealed class ActionPlayback
                 break;
             case TurnSkipped skipped:
                 AddSkipCue(skipped.Combatant, messages);
+                break;
+            case Backfired backfired:
+                AddBackfire(backfired, messages);
                 break;
             default:
                 throw new InvalidOperationException($"The battle screen can't show a {battleEvent.GetType().Name} yet.");
@@ -150,10 +153,39 @@ internal sealed class ActionPlayback
         }
     }
 
+    // A fall fades from the start of the beat that caused it: the impact, or a backfire after it. A backfire's fall
+    // gets its own defeat beat, so the caster fades after the Backfire cue rather than during it.
+    private void AddFall(Combatant fallen)
+    {
+        var cause = _beats.FindLast(beat => beat.Kind != PlaybackBeatKind.Defeat);
+        if (cause?.Kind == PlaybackBeatKind.Backfire)
+        {
+            _fallen.Add((fallen, StartOf(PlaybackBeatKind.Backfire)));
+            _beats.Add(new PlaybackBeat(PlaybackBeatKind.Defeat, BattlePacing.DefeatHold - BattlePacing.BackfireHold));
+            return;
+        }
+
+        _fallen.Add((fallen, TimeSpan.Zero));
+        AddBeatOnce(PlaybackBeatKind.Defeat, BattlePacing.DefeatHold - BattlePacing.ImpactHold);
+    }
+
+    // When a beat of this kind starts, or would start if added now: the beats before the first one of it.
+    private TimeSpan StartOf(PlaybackBeatKind kind) =>
+        _beats.TakeWhile(beat => beat.Kind != kind).Aggregate(TimeSpan.Zero, (total, beat) => total + beat.Duration);
+
+    // The backfire has its own beat after the impact; its cue and the HP it cost show when that beat starts.
+    private void AddBackfire(Backfired backfired, UiMessages messages)
+    {
+        var start = StartOf(PlaybackBeatKind.Backfire);
+        AddBeatOnce(PlaybackBeatKind.Backfire, BattlePacing.BackfireHold);
+        _cues.Add(new CueOnTarget(backfired.Caster, messages.Text(MessageIds.BattleBackfire), start));
+        _numbers.Add(new FloatingNumber(backfired.Caster, NumberText.Of(backfired.HpLost), EffectKind.Damage, start));
+    }
+
     // Every lost turn in one Execute shares one beat after the action's own, and each cue shows when it starts.
     private void AddSkipCue(Combatant combatant, UiMessages messages)
     {
-        var start = _beats.TakeWhile(beat => beat.Kind != PlaybackBeatKind.Skip).Aggregate(TimeSpan.Zero, (total, beat) => total + beat.Duration);
+        var start = StartOf(PlaybackBeatKind.Skip);
         AddBeatOnce(PlaybackBeatKind.Skip, BattlePacing.SkipHold);
         _cues.Add(new CueOnTarget(combatant, messages.Text(MessageIds.BattleTurnSkipped), start));
     }

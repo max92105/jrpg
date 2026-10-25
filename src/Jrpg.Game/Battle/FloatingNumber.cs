@@ -10,7 +10,8 @@ namespace Jrpg.Game.Battle;
 /// <param name="Target">Who the effect landed on.</param>
 /// <param name="Text">The amount, formatted once when the playback starts.</param>
 /// <param name="Kind">What the effect did, which sets the number's color.</param>
-internal readonly record struct FloatingNumber(Combatant Target, string Text, EffectKind Kind)
+/// <param name="ShowsAt">When it pops, from the impact: 0, or a later beat's start, such as a backfire.</param>
+internal readonly record struct FloatingNumber(Combatant Target, string Text, EffectKind Kind, TimeSpan ShowsAt = default)
 {
     public const float RiseDistance = 50;
 

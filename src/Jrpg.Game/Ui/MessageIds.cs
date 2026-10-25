@@ -314,6 +314,9 @@ internal static class MessageIds
     /// <summary>The cue on a combatant whose turn a stun took.</summary>
     public const string BattleTurnSkipped = "battle_turn_skipped";
 
+    /// <summary>The cue on a caster whose spell turned on them (decision 194).</summary>
+    public const string BattleBackfire = "battle_backfire";
+
     /// <summary>Placeholders <c>{status}</c>, <c>{turns}</c>: one status in a battle tag line ("STUN 1").</summary>
     public const string BattleStatusTag = "battle_status_tag";
 

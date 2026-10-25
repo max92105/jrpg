@@ -244,6 +244,41 @@ public sealed class ClassCatalogValidatorTests
         Assert.Equal("classes.json: class 'rogue': growth.speed must be at least 0 (was -1).", exception.Message);
     }
 
+    [Fact]
+    public void Validate_BackfireChanceAbove100_Throws()
+    {
+        var instability = Mana with { Id = "instability", Backfire = new BackfireRule(ChancePerPointPercent: 150, DamagePercentOfMaxHp: 10) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("warlock") with { Resources = [instability] }]));
+
+        Assert.Equal("classes.json: class 'warlock': resource 'instability': backfire percents must be within 1..100 (were 150 and 10).", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_BackfireDamageZero_Throws()
+    {
+        var instability = Mana with { Id = "instability", Backfire = new BackfireRule(ChancePerPointPercent: 5, DamagePercentOfMaxHp: 0) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("warlock") with { Resources = [instability] }]));
+
+        Assert.EndsWith("backfire percents must be within 1..100 (were 5 and 0).", exception.Message, StringComparison.Ordinal);
+    }
+
+    // A speed-scaled resource still goes through the rule checks after its amounts.
+    [Fact]
+    public void Validate_SpeedScaledResourceWithBadHeavyHitPercent_Throws()
+    {
+        var readiness = new ResourceDefinition("readiness", "Readiness")
+        {
+            MaxFromSpeed = new SpeedScaling(10),
+            Gains = new ResourceGains { PerHeavyHit = 1, HeavyHitPercent = 0 },
+        };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("rogue") with { Resources = [readiness] }]));
+
+        Assert.EndsWith("gains.heavyHitPercent must be within 1..100 when perHeavyHit is set (was 0).", exception.Message, StringComparison.Ordinal);
+    }
+
     private static ResourceDefinition Mana { get; } = new("mana", "Mana", Max: 10, StartsAt: 3);
 
     private static void Validate(IReadOnlyList<ClassDefinition> classes) =>

@@ -132,6 +132,46 @@ public sealed class ActionPlaybackTests
     }
 
     [Fact]
+    public void Start_Backfired_AddsBackfireBeatAfterImpact()
+    {
+        BattleEvent[] events =
+        [
+            new ActionStarted(_sarxian, new AttackCommand(_goblin)),
+            new EffectApplied(_goblin, EffectKind.Damage, 13),
+            new Backfired(_sarxian, "instability", 16),
+        ];
+
+        var playback = Start(events);
+
+        Assert.Equal([PlaybackBeatKind.Impact, PlaybackBeatKind.Backfire], playback.Beats.Select(beat => beat.Kind));
+        Assert.Equal(new CueOnTarget(_sarxian, "Backfire", BattlePacing.ImpactHold), playback.Cues[^1]);
+        Assert.Equal(new FloatingNumber(_sarxian, "16", EffectKind.Damage, BattlePacing.ImpactHold), playback.Numbers[^1]);
+    }
+
+    // The spell fells the goblin, then the backfire fells the caster: the caster stays lit through the Backfire beat
+    // (1.0 to 2.0 s after the impact's defeat) and fades on a defeat beat of its own after it.
+    [Fact]
+    public void Start_BackfireFellsCaster_CasterFadesAfterTheBackfireCue()
+    {
+        BattleEvent[] events =
+        [
+            new ActionStarted(_sarxian, new AttackCommand(_goblin)),
+            new EffectApplied(_goblin, EffectKind.Damage, 40),
+            new CombatantDefeated(_goblin),
+            new Backfired(_sarxian, "instability", 16),
+            new CombatantDefeated(_sarxian),
+        ];
+        var playback = Start(events);
+
+        playback.Update(TimeSpan.FromSeconds(2.5));
+
+        Assert.Equal([PlaybackBeatKind.Impact, PlaybackBeatKind.Defeat, PlaybackBeatKind.Backfire, PlaybackBeatKind.Defeat], playback.Beats.Select(beat => beat.Kind));
+        Assert.Equal(1f, playback.FallOpacityOf(_sarxian));
+        Assert.Equal(0f, playback.FallOpacityOf(_goblin));
+        Assert.Equal(TimeSpan.FromSeconds(4), playback.Duration);
+    }
+
+    [Fact]
     public void Start_Defend_HasNoHold()
     {
         var playback = Start([new ActionStarted(_sarxian, new DefendCommand())]);

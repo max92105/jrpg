@@ -56,7 +56,8 @@
     "base": { "maxHp": 160, "attack": 22, "defense": 4, "speed": 11 },
     "growth": { "maxHp": 14, "attack": 3, "defense": 1, "speed": 1 },
     "skillIds": ["eldritch_bolt", "void_rift", "chaos_lance"],
-    "resources": [ { "id": "instability", "name": "Instability", "max": 10, "startsAt": 0, "gains": { "perTurn": -1 } } ] },
+    "resources": [ { "id": "instability", "name": "Instability", "max": 10, "startsAt": 0, "gains": { "perTurn": -1 },
+        "backfire": { "chancePerPointPercent": 5, "damagePercentOfMaxHp": 10 } } ] },
   {
     "id": "druid", "name": "Druid",
     "description": "A keeper of the wild who calls on nature and takes the shapes of beasts.",

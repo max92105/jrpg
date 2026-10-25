@@ -119,7 +119,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **RG3. Ready: an extra turn right after a chosen combatant** (Core + Data, about 260 lines) → [slices/RG3.md](slices/RG3.md)
 - [x] **RG4. The rogue's kit: Ready and Expose on screen; Exposed makes every hit land harder** (Core + content + Game, about 270 lines) → [slices/RG4.md](slices/RG4.md)
 - [x] **WL1. The warlock: casting builds instability, and stronger spells need more** (content + Game + tests, about 150 lines) → [slices/WL1.md](slices/WL1.md)
-- [ ] **WL2. Instability can backfire on the caster** (Core + Data + content + Game playback, about 230 lines) → [slices/WL2.md](slices/WL2.md)
+- [x] **WL2. Instability can backfire on the caster** (Core + Data + content + Game playback, about 230 lines) → [slices/WL2.md](slices/WL2.md)
 
 ### Phase 5: forces and hits
 - [ ] **DR1. Statuses that tick: poison and regeneration at the end of the holder's turn** (Core + Game playback, about 250 lines) → [slices/DR1.md](slices/DR1.md)

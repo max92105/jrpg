@@ -43,15 +43,16 @@ internal sealed class FloatingNumbersView
             _measured = [.. playback.Numbers.Select(number => MeasuredText.Of(_font.Font, number.Text))];
         }
 
-        var look = FloatingNumber.At(playback.Elapsed);
-        if (look.Opacity <= 0)
-        {
-            return;
-        }
-
         for (var index = 0; index < _measured.Length; index++)
         {
             var number = playback.Numbers[index];
+            var sinceShown = playback.Elapsed - number.ShowsAt;
+            var look = FloatingNumber.At(sinceShown);
+            if (sinceShown < TimeSpan.Zero || look.Opacity <= 0)
+            {
+                continue;
+            }
+
             var center = new Vector2(_battlers.SpotOf(number.Target).Center.X, _battlers.TopOf(textures, number.Target) - look.Rise);
             _font.DrawCentered(batch, _measured[index], center, (ColorOf(number.Kind) * look.Opacity, look.Scale));
         }

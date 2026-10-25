@@ -5,9 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/WL1.md, slice WL1 (warlock instability, gain/need skill row text)
-Round: 1 (verdict: Ready to commit)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/WL2.md, slice WL2 (instability backfire)
+Round: 2 (verdict: Ready to commit)
 
-- Suggestion: SkillCostText.CostOf / class name now also return gains ("+2 Instability"); consider `RowTextOf` / `SkillResourceText` when next touched; open
-- Suggestion: BattleStateResourceTests.cs:23 `_bolt` declaration ~150 columns; break it like `_voidRift`; open
-- Closed (RG4): the RG4 findings were left with the developer at commit fbef16e. Don't re-raise them.
+- Critical: no-roll-after-win guard untested; fixed (Execute_SpellFellsLastEnemy_DrawsNoRandom)
+- Critical: fixed fall fade window hid a backfire-felled caster before his cue; fixed (per-fall FadeStart, own Defeat beat)
+- Suggestion: AddBackfire start should skip an existing Backfire beat; fixed (StartOf)
+- Suggestion: validator test for damagePercentOfMaxHp 0; fixed
+- Closed (WL1): WL1 suggestions were left with the developer. Don't re-raise them.

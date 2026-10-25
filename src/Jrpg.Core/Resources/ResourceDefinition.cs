@@ -13,4 +13,7 @@ public sealed record ResourceDefinition(string Id, string Name, int Max = 0, int
     /// Set when the max and starting amount are the holder's speed charges; then the numbers above go unused.
     /// </summary>
     public SpeedScaling? MaxFromSpeed { get; init; }
+
+    /// <summary>Set for a resource whose points can make a spell backfire on its caster; null when safe.</summary>
+    public BackfireRule? Backfire { get; init; }
 }

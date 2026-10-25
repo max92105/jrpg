@@ -37,3 +37,13 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
       - `Execute_SkillWithoutBackfireRule_DrawsNoRandom`
     - `ActionPlaybackTests`: `Start_Backfired_AddsBackfireBeatAfterImpact`
   - **Verify by hand:** as Sarxian against the dummy, at 7+ instability Chaos Lance now and then shows "Backfire" with an HP loss on him. At low instability it's rare.
+- **Done, with deviations:** Tests 1957 before, 1971 after. Beyond the plan:
+  - **Backfire roll:** it lives in a new internal `Battle/SkillBackfire`, not a private method, which keeps `BattleState` at 289 lines. `EffectLanding.Fall` became shared so a backfire fall clears statuses and runs triggers the same way.
+  - **No roll after a win:** a spell that has already felled the last enemy doesn't roll, so a backfire can't turn a victory into a defeat (both sides down counts as a loss).
+  - **Screen:** `FloatingNumber` gained a defaulted `ShowsAt` like `CueOnTarget`, so the HP lost pops on the Backfire beat (1.0 s, `BattlePacing.BackfireHold`).
+  - **Validator:** `ResourceDefinitionValidator` was split into amount and rule checks for the complexity limit. That also fixes a gap: a speed-scaled resource used to skip the rule checks.
+  - **Extra tests:** two more validator tests, for the backfire percents and for that gap.
+  - **From review (two rounds):**
+    - `Execute_SpellFellsLastEnemy_DrawsNoRandom` pins the no-roll-after-win rule.
+    - Each fall now fades from the start of the beat that caused it. A fall caused by a backfire gets its own Defeat beat after the Backfire beat, so the caster fades after the "Backfire" cue, not during it.
+    - A second backfire in one action shares the first's beat, and the damage percent check has its own test.

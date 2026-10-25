@@ -19,6 +19,7 @@ public sealed class BattleState
 
     private readonly TurnOrder _turnOrder;
     private readonly TurnFlow _turnFlow;
+    private readonly SkillBackfire _backfire;
     private readonly Inventory _inventory;
     private bool _isExperienceGranted;
 
@@ -27,7 +28,7 @@ public sealed class BattleState
     /// (decision 97).
     /// </param>
     /// <param name="inventory">The party's items; using one in battle consumes a copy.</param>
-    /// <param name="random">Decides the turn order.</param>
+    /// <param name="random">Decides the turn order, then whether a spell backfires.</param>
     /// <exception cref="ArgumentException">No enemy is alive, or a combatant is listed twice.</exception>
     public BattleState(IReadOnlyList<Combatant> combatants, Inventory inventory, IRandom random)
     {
@@ -46,6 +47,7 @@ public sealed class BattleState
         _inventory = inventory;
         _turnOrder = new TurnOrder(Combatants, random);
         _turnFlow = new TurnFlow(Combatants, _turnOrder);
+        _backfire = new SkillBackfire(Combatants, random);
         Phase = LivingOn(BattleSide.Party).Count == 0 ? BattlePhase.Defeat : TurnFlow.PhaseOf(CurrentActor);
     }
 
@@ -189,6 +191,7 @@ public sealed class BattleState
         }
 
         EffectLanding.Land(command.Skill.Effect, command.Targets, Combatants, events);
+        _backfire.Roll(actor, command.Skill, events);
     }
 
     private void UseItem(Combatant actor, ItemCommand command, List<BattleEvent> events)

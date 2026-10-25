@@ -42,7 +42,8 @@ internal static class EffectLanding
         }
     }
 
-    private static void Fall(Combatant fallen, IReadOnlyList<Combatant> combatants, List<BattleEvent> events)
+    /// <summary>Reports a fall, clears the fallen's statuses and runs what a fall triggers.</summary>
+    public static void Fall(Combatant fallen, IReadOnlyList<Combatant> combatants, List<BattleEvent> events)
     {
         events.Add(new CombatantDefeated(fallen));
         foreach (var status in fallen.Statuses.Clear())

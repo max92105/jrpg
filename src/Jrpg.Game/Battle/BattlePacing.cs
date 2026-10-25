@@ -20,4 +20,7 @@ internal static class BattlePacing
 
     /// <summary>How long a lost turn holds its "Stunned" cue: long enough to read it.</summary>
     public static TimeSpan SkipHold { get; } = TimeSpan.FromSeconds(0.8);
+
+    /// <summary>How long a backfire holds its cue and the HP it cost: long enough to read both.</summary>
+    public static TimeSpan BackfireHold { get; } = TimeSpan.FromSeconds(1.0);
 }

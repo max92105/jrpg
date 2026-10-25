@@ -32,15 +32,25 @@ internal static class ResourceDefinitionValidator
     {
         var problem =
             string.IsNullOrWhiteSpace(resource.Name) ? "name must not be empty."
-            : resource.MaxFromSpeed is { } scaling ? FindSpeedScalingProblem(resource, scaling)
-            : resource.Max < 1 ? $"max must be at least 1 (was {resource.Max})."
-            : resource.StartsAt < 0 || resource.StartsAt > resource.Max
-                ? $"startsAt must be within 0..{resource.Max} (was {resource.StartsAt})."
-            : resource.Gains.PerHeavyHit != 0 && resource.Gains.HeavyHitPercent is < 1 or > 100
-                ? $"gains.heavyHitPercent must be within 1..100 when perHeavyHit is set (was {resource.Gains.HeavyHitPercent})."
-            : null;
+            : FindAmountProblem(resource) ?? FindRuleProblem(resource);
         return problem is null ? null : $"resource '{resource.Id}': {problem}";
     }
+
+    // Either a fixed max and start, or both from the holder's speed.
+    private static string? FindAmountProblem(ResourceDefinition resource) =>
+        resource.MaxFromSpeed is { } scaling ? FindSpeedScalingProblem(resource, scaling)
+        : resource.Max < 1 ? $"max must be at least 1 (was {resource.Max})."
+        : resource.StartsAt < 0 || resource.StartsAt > resource.Max
+            ? $"startsAt must be within 0..{resource.Max} (was {resource.StartsAt})."
+        : null;
+
+    private static string? FindRuleProblem(ResourceDefinition resource) =>
+        resource.Gains.PerHeavyHit != 0 && resource.Gains.HeavyHitPercent is < 1 or > 100
+            ? $"gains.heavyHitPercent must be within 1..100 when perHeavyHit is set (was {resource.Gains.HeavyHitPercent})."
+        : resource.Backfire is { } backfire
+            && (backfire.ChancePerPointPercent is < 1 or > 100 || backfire.DamagePercentOfMaxHp is < 1 or > 100)
+            ? $"backfire percents must be within 1..100 (were {backfire.ChancePerPointPercent} and {backfire.DamagePercentOfMaxHp})."
+        : null;
 
     // The speed gives both numbers, so a max or a start written beside it would be ignored.
     private static string? FindSpeedScalingProblem(ResourceDefinition resource, SpeedScaling scaling) =>

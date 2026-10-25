@@ -14,4 +14,7 @@ internal enum PlaybackBeatKind
 
     /// <summary>A combatant loses its turn to a stun, after the action's other beats.</summary>
     Skip,
+
+    /// <summary>The caster's spell turns on them, after the impact (decision 194).</summary>
+    Backfire,
 }

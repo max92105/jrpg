@@ -5,8 +5,9 @@ namespace Jrpg.Game.Battle;
 
 /// <summary>
 /// Whose turn the battle screen shows and what happens next (ADR 0013): the actor steps forward, a party member waits for
-/// a command while an enemy asks Core's tactics, the command is executed and the screen holds, then the actor steps back.
-/// Time left over at the end of a stage carries into the next one.
+/// a command while an enemy asks Core's tactics, the command is executed and the screen holds, then the actor steps
+/// back, or, after a quick skill, waits forward for the next command. Time left over at the end of a stage carries into
+/// the next one.
 /// </summary>
 internal sealed class BattleTurnSequence
 {
@@ -114,6 +115,9 @@ internal sealed class BattleTurnSequence
             case TurnStage.StepForward:
                 Act(_tactics.ChooseCommand(_battle));
                 break;
+            case TurnStage.Holding when KeepsTurn:
+                Stage = TurnStage.AwaitingCommand;
+                break;
             case TurnStage.Holding:
                 Stage = TurnStage.StepBack;
                 break;
@@ -124,6 +128,10 @@ internal sealed class BattleTurnSequence
                 throw new InvalidOperationException($"The {Stage} stage doesn't end on its own.");
         }
     }
+
+    // Core goes on with the same party member, after a quick skill (decision 202) or two of their turns in a row: they
+    // stay forward for the next command.
+    private bool KeepsTurn => _battle.Phase == BattlePhase.PartyTurn && _battle.CurrentActor == Actor;
 
     private void Act(BattleCommand command)
     {

@@ -75,7 +75,7 @@ public sealed class ActionPlaybackFallTests
         playback.Update(BattlePacing.ImpactHold + BattlePacing.TickHold);
 
         Assert.Equal([PlaybackBeatKind.Impact, PlaybackBeatKind.Tick, PlaybackBeatKind.Defeat], playback.Beats.Select(beat => beat.Kind));
-        Assert.Equal(new FloatingNumber(_sarxian, "9", EffectKind.Damage, BattlePacing.ImpactHold), playback.Numbers[^1]);
+        Assert.Equal(new FloatingNumber(_sarxian, "9", FloatingNumberTone.Poison, BattlePacing.ImpactHold), playback.Numbers[^1]);
         Assert.Equal(1f, playback.FallOpacityOf(_sarxian));
         Assert.Equal(BattlePacing.ImpactHold + BattlePacing.DefeatHold, playback.Duration);
     }
@@ -120,7 +120,7 @@ public sealed class ActionPlaybackFallTests
         PlaybackBeatKind[] beats =
             [PlaybackBeatKind.Impact, PlaybackBeatKind.Tick, PlaybackBeatKind.Skip, PlaybackBeatKind.Tick, PlaybackBeatKind.Defeat];
         Assert.Equal(beats, playback.Beats.Select(beat => beat.Kind));
-        Assert.Equal(new FloatingNumber(_goblin, "9", EffectKind.Damage, TimeSpan.FromSeconds(2.6)), playback.Numbers[^1]);
+        Assert.Equal(new FloatingNumber(_goblin, "9", FloatingNumberTone.Poison, TimeSpan.FromSeconds(2.6)), playback.Numbers[^1]);
         Assert.Equal(1f, playback.FallOpacityOf(_goblin));
     }
 

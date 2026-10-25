@@ -1,4 +1,5 @@
 using Jrpg.Game.Battle;
+using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Tests.Battle;
 
@@ -28,5 +29,19 @@ public sealed class FloatingNumberTests
         var look = FloatingNumber.At(TimeSpan.FromSeconds(1.6));
 
         Assert.Equal(new FloatingNumberLook(1, FloatingNumber.RiseDistance, 0), look);
+    }
+
+    [Fact]
+    public void ColorOf_PoisonTick_IsPoisonTint()
+    {
+        Assert.Equal(UiTheme.FloatingPoison, FloatingNumber.ColorOf(FloatingNumberTone.Poison));
+    }
+
+    [Fact]
+    public void ColorOf_DamageAndHeal_KeepTheirColors()
+    {
+        Assert.Equal(
+            (UiTheme.TextPrimary, UiTheme.FloatingHeal),
+            (FloatingNumber.ColorOf(FloatingNumberTone.Damage), FloatingNumber.ColorOf(FloatingNumberTone.Heal)));
     }
 }

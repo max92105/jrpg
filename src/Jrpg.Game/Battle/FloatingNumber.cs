@@ -1,5 +1,6 @@
 using Jrpg.Core.Battle;
-using Jrpg.Core.Effects;
+using Jrpg.Game.Ui;
+using Microsoft.Xna.Framework;
 
 namespace Jrpg.Game.Battle;
 
@@ -9,11 +10,11 @@ namespace Jrpg.Game.Battle;
 /// </summary>
 /// <param name="Target">Who the effect landed on.</param>
 /// <param name="Text">The amount, formatted once when the playback starts.</param>
-/// <param name="Kind">What the effect did, which sets the number's color.</param>
+/// <param name="Tone">What the number reports, which sets its color.</param>
 /// <param name="ShowsAt">When it pops, from the impact: 0, or a later beat's start, such as a backfire.</param>
 /// <param name="Stack">How many numbers popped on the same target at the same moment before it: each one sits
 /// <see cref="StackSpacing"/> higher, so four hits read as four.</param>
-internal readonly record struct FloatingNumber(Combatant Target, string Text, EffectKind Kind, TimeSpan ShowsAt = default, int Stack = 0)
+internal readonly record struct FloatingNumber(Combatant Target, string Text, FloatingNumberTone Tone, TimeSpan ShowsAt = default, int Stack = 0)
 {
     public const float RiseDistance = 50;
 
@@ -23,6 +24,15 @@ internal readonly record struct FloatingNumber(Combatant Target, string Text, Ef
     private const float PopStartScale = 0.6f;
     private static readonly TimeSpan _pop = TimeSpan.FromSeconds(0.18);
     private static readonly TimeSpan _life = TimeSpan.FromSeconds(1.6);
+
+    /// <summary>White for damage, green for healing, purple for Poison's tick.</summary>
+    public static Color ColorOf(FloatingNumberTone tone) => tone switch
+    {
+        FloatingNumberTone.Damage => UiTheme.TextPrimary,
+        FloatingNumberTone.Heal => UiTheme.FloatingHeal,
+        FloatingNumberTone.Poison => UiTheme.FloatingPoison,
+        _ => throw new ArgumentOutOfRangeException(nameof(tone), tone, null),
+    };
 
     /// <param name="sinceShown">Time since the number appeared.</param>
     public static FloatingNumberLook At(TimeSpan sinceShown)

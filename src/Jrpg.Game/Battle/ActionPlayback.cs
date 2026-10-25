@@ -133,12 +133,19 @@ internal sealed class ActionPlayback
         }
     }
 
+    private static FloatingNumberTone ToneOf(EffectKind kind) => kind switch
+    {
+        EffectKind.Damage => FloatingNumberTone.Damage,
+        EffectKind.RestoreHp or EffectKind.Revive => FloatingNumberTone.Heal,
+        _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "An effect with no amount to show."),
+    };
+
     // Only damage has an animation so far: the attacker's strip (decision 101). Anything else gets a cue with the action's name.
     // An action without one, an attack, only ever lands damage.
     private void AddLanding(EffectApplied effect)
     {
         var stack = _numbers.Count(number => number.Target == effect.Target && number.ShowsAt == TimeSpan.Zero);
-        _numbers.Add(new FloatingNumber(effect.Target, NumberText.Of(effect.Amount), effect.Kind, Stack: stack));
+        _numbers.Add(new FloatingNumber(effect.Target, NumberText.Of(effect.Amount), ToneOf(effect.Kind), Stack: stack));
         if (effect.Kind == EffectKind.Damage && _attackEffectFile is { } file)
         {
             // A multi-hit plays one strip on its target, as its hits make one impact.
@@ -191,7 +198,7 @@ internal sealed class ActionPlayback
         var start = StartOf(PlaybackBeatKind.Backfire);
         AddBeatOnce(PlaybackBeatKind.Backfire, BattlePacing.BackfireHold);
         _cues.Add(new CueOnTarget(backfired.Caster, messages.Text(MessageIds.BattleBackfire), start));
-        _numbers.Add(new FloatingNumber(backfired.Caster, NumberText.Of(backfired.HpLost), EffectKind.Damage, start));
+        _numbers.Add(new FloatingNumber(backfired.Caster, NumberText.Of(backfired.HpLost), FloatingNumberTone.Damage, start));
     }
 
     // One holder's ticks share a beat after the beat before them; a stunned holder's come after its "Stunned" cue, so
@@ -204,8 +211,8 @@ internal sealed class ActionPlayback
         }
 
         var start = StartOfBeatAt(_beats.FindLastIndex(beat => beat.Kind == PlaybackBeatKind.Tick));
-        var kind = ticked.Status == StatusKind.Poison ? EffectKind.Damage : EffectKind.RestoreHp;
-        _numbers.Add(new FloatingNumber(ticked.Holder, NumberText.Of(ticked.Amount), kind, start));
+        var tone = ticked.Status == StatusKind.Poison ? FloatingNumberTone.Poison : FloatingNumberTone.Heal;
+        _numbers.Add(new FloatingNumber(ticked.Holder, NumberText.Of(ticked.Amount), tone, start));
     }
 
     // Every lost turn in one Execute shares one beat after the action's own, and each cue shows when it starts.

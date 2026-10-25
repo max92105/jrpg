@@ -142,7 +142,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **LK1a. Resource colors: each resource has its color, and its bar is drawn in it** (Core + Data + content + Game, about 170 lines) → [slices/LK1a.md](slices/LK1a.md)
 - [x] **LK1b. Resource look: diamond pips, spaced-caps label, lasting marker, dominant force lit, flash** (Game, about 230 lines) → [slices/LK1b.md](slices/LK1b.md)
 - [x] **LK2a. Status marks: small diamond marks with turns left, pop and fade** (Game, about 240 lines) → [slices/LK2a.md](slices/LK2a.md)
-- [ ] **LK2b. Tick numbers tinted by their status; the rogue stays forward through a quick skill** (Game, about 130 lines) → [slices/LK2b.md](slices/LK2b.md)
+- [x] **LK2b. Tick numbers tinted by their status; the rogue stays forward through a quick skill** (Game, about 130 lines) → [slices/LK2b.md](slices/LK2b.md)
 - [ ] **LK3. Formation look: battlers slide when they swap; the aura's reach and the readied turn are shown** (Game, about 200 lines) → [slices/LK3.md](slices/LK3.md)
 - [ ] **Z2. Play-through check** (manual) → [slices/Z2.md](slices/Z2.md)
 

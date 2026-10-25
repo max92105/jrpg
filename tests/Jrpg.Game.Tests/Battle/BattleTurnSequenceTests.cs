@@ -175,9 +175,9 @@ public sealed class BattleTurnSequenceTests
         Assert.Same(battle.Combatants[2], sequence.Actor);
     }
 
-    // Ready is quick, so after its banner Lazarus steps forward again for the rest of his turn.
+    // Lazarus readies on goblin A: the extra turn queues right after it, ahead of his own next cycle turn.
     [Fact]
-    public void Update_AfterReady_SameMemberStepsForwardAgain()
+    public void Update_AfterReady_ExtraTurnQueuesAfterTarget()
     {
         var random = new SeededRandom(BattleScenarios.SarxianFirstSeed);
         var battle = BattleScenarios.MemberAgainstGoblinTrio("lazarus", new Inventory(), random);
@@ -188,9 +188,26 @@ public sealed class BattleTurnSequenceTests
         sequence.Submit(new SkillCommand(BattleScenarios.Catalog.Skills["ready"], [battle.Combatants[1]]));
         sequence.Update(_longEnoughForEveryEnemyTurn);
 
-        Assert.Equal(TurnStage.AwaitingCommand, sequence.Stage);
-        Assert.Same(lazarus, sequence.Actor);
         Assert.Equal([battle.Combatants[1], lazarus], battle.UpcomingActors(2));
+    }
+
+    // The hold ends straight in the next command: no step back and forward again, and still the same turn on screen.
+    [Fact]
+    public void Update_AfterQuickSkill_StaysForwardAndAwaitsCommand()
+    {
+        var random = new SeededRandom(BattleScenarios.SarxianFirstSeed);
+        var battle = BattleScenarios.MemberAgainstGoblinTrio("lazarus", new Inventory(), random);
+        var sequence = new BattleTurnSequence(battle, new EnemyTactics(random), RepositoryScreenText.Text.Messages);
+        var lazarus = battle.CurrentActor;
+        sequence.Update(_step);
+        var turn = sequence.Turn;
+        sequence.Submit(new SkillCommand(BattleScenarios.Catalog.Skills["ready"], [battle.Combatants[1]]));
+
+        sequence.Update(sequence.Playback!.Duration);
+
+        Assert.Equal(TurnStage.AwaitingCommand, sequence.Stage);
+        Assert.Equal(1, sequence.StepShare(lazarus));
+        Assert.Equal(turn, sequence.Turn);
     }
 
     private static (BattleState Battle, BattleTurnSequence Sequence) SarxianAgainstGoblinTrio(int seed)

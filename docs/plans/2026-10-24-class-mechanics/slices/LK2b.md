@@ -15,3 +15,9 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
   - **Verify by hand:**
     - Poison ticks rise purple.
     - Lazarus stays forward after Ready.
+- **Done, with deviations:**
+  - `FloatingNumber` carries a Game-side `FloatingNumberTone` (Damage, Heal, Poison) instead of Core's `EffectKind`, and its color moved from the view to `FloatingNumber.ColorOf`. Regen keeps the existing heal green; only Poison has a new tint, `UiTheme.FloatingPoison`.
+  - Backfire numbers stay white, as damage: the slice's "tick and backfire" color is the tick's only.
+  - The two poison playback tests now expect the Poison tone.
+  - `BattleTurnSequence` keeps the actor forward when Core still has the same party member acting after the hold; the turn count on screen doesn't change.
+  - After review: the old Ready test is renamed `Update_AfterReady_ExtraTurnQueuesAfterTarget` and keeps only the queued-turn check. The actor also stays forward when Core gives the same member two turns in a row (an extra turn right before their own); that's the slice's rule, read from Core, and the comment says so. `ToneOf` throws on an effect kind with no amount, and a test pins the damage and heal colors.

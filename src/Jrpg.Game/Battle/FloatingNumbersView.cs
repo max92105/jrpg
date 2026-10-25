@@ -1,4 +1,3 @@
-using Jrpg.Core.Effects;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
@@ -7,8 +6,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Draws the last action's numbers over their targets (40 px, outlined): white for damage, green for healing and
-/// revive. Each turn's numbers are measured once, when its playback starts.
+/// Draws the last action's numbers over their targets (40 px, outlined): colored by what they report
+/// (<see cref="FloatingNumber.ColorOf"/>). Each turn's numbers are measured once, when its playback starts.
 /// </summary>
 internal sealed class FloatingNumbersView
 {
@@ -54,14 +53,7 @@ internal sealed class FloatingNumbersView
             }
 
             var center = new Vector2(_battlers.SpotOf(number.Target).Center.X, _battlers.TopOf(textures, number.Target) - look.Rise - (number.Stack * FloatingNumber.StackSpacing));
-            _font.DrawCentered(batch, _measured[index], center, (ColorOf(number.Kind) * look.Opacity, look.Scale));
+            _font.DrawCentered(batch, _measured[index], center, (FloatingNumber.ColorOf(number.Tone) * look.Opacity, look.Scale));
         }
     }
-
-    private static Color ColorOf(EffectKind kind) => kind switch
-    {
-        EffectKind.Damage => UiTheme.TextPrimary,
-        EffectKind.RestoreHp or EffectKind.Revive => UiTheme.FloatingHeal,
-        _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),
-    };
 }

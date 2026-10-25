@@ -129,7 +129,7 @@ public sealed class ActionPlaybackTests
 
         Assert.Equal([PlaybackBeatKind.Impact, PlaybackBeatKind.Backfire], playback.Beats.Select(beat => beat.Kind));
         Assert.Equal(new CueOnTarget(_sarxian, "Backfire", BattlePacing.ImpactHold), playback.Cues[^1]);
-        Assert.Equal(new FloatingNumber(_sarxian, "16", EffectKind.Damage, BattlePacing.ImpactHold), playback.Numbers[^1]);
+        Assert.Equal(new FloatingNumber(_sarxian, "16", FloatingNumberTone.Damage, BattlePacing.ImpactHold), playback.Numbers[^1]);
     }
 
     [Fact]
@@ -157,7 +157,7 @@ public sealed class ActionPlaybackTests
         var playback = Start(events);
 
         Assert.Equal([PlaybackBeatKind.Impact, PlaybackBeatKind.Tick], playback.Beats.Select(beat => beat.Kind));
-        Assert.Equal(new FloatingNumber(_sarxian, "5", EffectKind.RestoreHp, BattlePacing.ImpactHold), playback.Numbers[^1]);
+        Assert.Equal(new FloatingNumber(_sarxian, "5", FloatingNumberTone.Heal, BattlePacing.ImpactHold), playback.Numbers[^1]);
     }
 
     [Fact]
@@ -195,7 +195,7 @@ public sealed class ActionPlaybackTests
     {
         var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), new EffectApplied(_goblin, EffectKind.Damage, 13)]);
 
-        Assert.Equal([new FloatingNumber(_goblin, "13", EffectKind.Damage)], playback.Numbers);
+        Assert.Equal([new FloatingNumber(_goblin, "13", FloatingNumberTone.Damage)], playback.Numbers);
     }
 
     [Fact]

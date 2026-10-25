@@ -139,4 +139,19 @@ public sealed class CombatantTests
 
         Assert.Equal(second.Vitals.MaxHp, second.Vitals.Hp);
     }
+
+    [Fact]
+    public void FromPartyMember_LastingResource_StartsAtMembersAmount()
+    {
+        var clarity = new ResourceDefinition("clarity", "Clarity", Max: 3, StartsAt: 3) { IsLasting = true };
+        var member = PartyMember.Recruit(
+            new PartyMemberBuilder().WithId("omer").BuildDefinition(),
+            new ClassBuilder().WithId("mage").WithResources(clarity).Build(),
+            new Dictionary<string, SkillDefinition>());
+        member.KeepLastingAmount("clarity", 1);
+
+        var combatant = Combatant.FromPartyMember(member);
+
+        Assert.Equal(1, combatant.Resources.AmountOf("clarity"));
+    }
 }

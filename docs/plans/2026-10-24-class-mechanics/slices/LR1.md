@@ -30,3 +30,4 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
       - `FinishBattle_NonLastingResource_NotCarried`
       - `FinishBattle_PerBattleFought_AppliedOncePerBattle`
   - **Verify by hand:** none (no content until LR3).
+- **Done, with deviations:** as planned, with 4 more tests: clamping below 0, a non-lasting id throws, a combatant starting from the member's amount, and the carry clamping after the per-battle gain (added after review). The member tests sit in a new `PartyMemberLastingResourceTests` (`PartyMemberTests` is 307 lines). A lasting resource that is also speed-scaled would take its speed charges; nothing in content does that, and LR3's validation can forbid it.

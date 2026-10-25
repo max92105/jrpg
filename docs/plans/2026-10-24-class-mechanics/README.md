@@ -131,7 +131,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 7: lasting resources and rest
 - [x] **ADR 0024: Lasting resources and rest** (before LR1) → [slices/ADR-0024.md](slices/ADR-0024.md)
-- [ ] **LR1. Lasting resources carry from battle to battle on the member** (Core, about 240 lines) → [slices/LR1.md](slices/LR1.md)
+- [x] **LR1. Lasting resources carry from battle to battle on the member** (Core, about 240 lines) → [slices/LR1.md](slices/LR1.md)
 - [ ] **LR2. Saves keep lasting resources: format 3** (Core + Data, about 220 lines) → [slices/LR2.md](slices/LR2.md)
 - [ ] **LR3. The mage's Clarity lowers starting mana; the cleric's faith lasts** (Core + Data + content, about 200 lines) → [slices/LR3.md](slices/LR3.md)
 - [ ] **RS1. The rest step: an event rests the party** (Core + Data + Game, about 240 lines) → [slices/RS1.md](slices/RS1.md)

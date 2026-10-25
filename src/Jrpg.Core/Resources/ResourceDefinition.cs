@@ -17,6 +17,12 @@ public sealed record ResourceDefinition(string Id, string Name, int Max = 0, int
     /// <summary>Set for a resource whose points can make a spell backfire on its caster; null when safe.</summary>
     public BackfireRule? Backfire { get; init; }
 
+    /// <summary>
+    /// Set for a resource that keeps its amount on the member from battle to battle until a rest (ADR 0024); every
+    /// other resource starts each battle at <see cref="StartsAt"/>.
+    /// </summary>
+    public bool IsLasting { get; init; }
+
     /// <summary>Set for a force with a rival (the druid's Growth and Decay); null for a lone resource.</summary>
     public DominanceRule? Dominance { get; init; }
 }

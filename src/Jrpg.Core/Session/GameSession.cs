@@ -115,6 +115,7 @@ public sealed class GameSession
             throw new InvalidOperationException("Only a battle that is over can be finished.");
         }
 
+        LastingResourceCarry.CarryBack(battle);
         var rewards = battle.Phase == BattlePhase.Victory ? battle.GrantVictoryExperience(_context.Catalog.Rules.Experience) : null;
         Exploration.FinishEncounter();
         ActiveBattle = null;

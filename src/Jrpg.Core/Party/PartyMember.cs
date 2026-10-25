@@ -8,6 +8,8 @@ namespace Jrpg.Core.Party;
 /// <summary>A recruited party member's runtime state.</summary>
 public sealed class PartyMember
 {
+    private readonly Dictionary<string, int> _lastingAmounts;
+
     private PartyMember(
         PartyMemberDefinition definition, ClassDefinition characterClass, IReadOnlyList<SkillDefinition> skills, PartyMemberProgress progress)
     {
@@ -20,6 +22,7 @@ public sealed class PartyMember
         BaseStats = BaseStatsOf(stats);
         Speed = stats.Speed;
         Vitals = new Vitals(progress.Hp, stats.MaxHp);
+        _lastingAmounts = characterClass.Resources.Where(resource => resource.IsLasting).ToDictionary(resource => resource.Id, resource => resource.StartsAt);
     }
 
     public string Id => Definition.Id;
@@ -45,6 +48,12 @@ public sealed class PartyMember
     public ItemDefinition? Armor { get; private set; }
 
     public IReadOnlyList<SkillDefinition> Skills { get; }
+
+    /// <summary>
+    /// The amount each of the class's lasting resources carries into the next battle (ADR 0024), by resource id; it
+    /// starts at the resource's starting amount.
+    /// </summary>
+    public IReadOnlyDictionary<string, int> LastingAmounts => _lastingAmounts;
 
     /// <summary>Base stats plus the bonuses of everything worn.</summary>
     public CombatStats TotalStats => StatsWearing(Weapon, Armor);
@@ -122,6 +131,19 @@ public sealed class PartyMember
         EquipmentSlot.Armor => Armor,
         _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot."),
     };
+
+    /// <summary>Keeps what a battle left of a lasting resource, within 0..its max.</summary>
+    /// <exception cref="ArgumentException">The class has no lasting resource <paramref name="resourceId"/>.</exception>
+    internal void KeepLastingAmount(string resourceId, int amount)
+    {
+        if (!_lastingAmounts.ContainsKey(resourceId))
+        {
+            throw new ArgumentException($"Class '{Class.Id}' has no lasting resource '{resourceId}'.", nameof(resourceId));
+        }
+
+        var max = Class.Resources.First(resource => resource.Id == resourceId).Max;
+        _lastingAmounts[resourceId] = Math.Clamp(amount, 0, max);
+    }
 
     /// <remarks>Only <see cref="PartyEquipment"/> calls this, after moving the copy out of the inventory.</remarks>
     internal void Wear(EquipmentSlot slot, ItemDefinition item) => FillSlot(slot, item);

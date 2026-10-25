@@ -5,11 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/MO1.md, slice MO1 (monk multi-hit, chakra per hit landed)
-Round: 1 (verdict: Fix the Criticals, then commit)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/LR1.md, slice LR1 (lasting resources carry between battles)
+Round: 1 (verdict: Ready to commit)
 
-- Critical: ResourceTriggers.cs:27-31 OnHitLanded inserted between OnCombatantFallen's summary and its method; OnHitLanded has two summaries, OnCombatantFallen none; open
-- Suggestion: no test of a multi-hit damage effect with a status (grant once per target after the hits); open
-- Suggestion: ActionPlayback.AddLanding adds one attack strip per hit, so 4 identical strips play at once on one target; open
-- Follow-up: CommandMenuTests.cs at 393 lines (388 before the slice); split by entry
-- Follow-up: BattleState.cs at 292 lines
+- Suggestion: ResourceStarts.cs:18 one-line ternary ~150 columns mixing lasting and fixed starts; split into a guard `if (resource.IsLasting)`; open
+- Suggestion: no test of a lasting amount at max plus a positive perBattleFought (clamp through CarryBack); open
+- Follow-up: Data schema/loader for isLasting and perBattleFought belongs to LR3 (validation should forbid lasting + maxFromSpeed)

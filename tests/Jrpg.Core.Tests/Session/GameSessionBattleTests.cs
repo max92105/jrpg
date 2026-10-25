@@ -3,6 +3,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Session;
 using Jrpg.Core.Tests.Battle;
 using Jrpg.Core.Tests.Builders;
@@ -110,16 +111,88 @@ public sealed class GameSessionBattleTests
         Assert.Equal("field", save.Location.MapId);
     }
 
-    private static GameSession SessionWithEncounterPending()
+    // Sarxian fells the three goblins with three hits, each adding 1 focus.
+    [Fact]
+    public void FinishBattle_Victory_CarriesLastingAmountBack()
     {
-        var session = GameSession.StartNew(Catalog(), "sarxian", new FixedSequenceRandom(_encounterThenSarxianFirst));
+        var session = SessionWithEncounterPending(Lasting("focus", gains: new ResourceGains { PerHitLanded = 1 }));
+        BattleScript.AttackUntilOver(session.StartPendingBattle());
+
+        session.FinishBattle();
+
+        Assert.Equal(5, session.Party.Leader.LastingAmounts["focus"]);
+    }
+
+    [Fact]
+    public void FinishBattle_Escape_CarriesBackAndAppliesPerBattle()
+    {
+        var session = SessionWithEncounterPending(Lasting("focus", gains: new ResourceGains { PerBattleFought = -1 }));
+        session.StartPendingBattle().Execute(new FleeCommand());
+
+        session.FinishBattle();
+
+        Assert.Equal(1, session.Party.Leader.LastingAmounts["focus"]);
+    }
+
+    // Rage gains 1 per hit landed but isn't lasting, so the next battle starts it at 0 again.
+    [Fact]
+    public void FinishBattle_NonLastingResource_NotCarried()
+    {
+        var rage = new ResourceDefinition("rage", "Rage", Max: 10) { Gains = new ResourceGains { PerHitLanded = 1 } };
+        var session = SessionWithEncounterPending(rage);
+        BattleScript.AttackUntilOver(session.StartPendingBattle());
+
+        session.FinishBattle();
+
+        Assert.Empty(session.Party.Leader.LastingAmounts);
+        Assert.Equal(0, Combatant.FromPartyMember(session.Party.Leader).Resources.AmountOf("rage"));
+    }
+
+    // The victory takes several of Sarxian's turns, but the per-battle loss applies only once, at the end.
+    [Fact]
+    public void FinishBattle_PerBattleFought_AppliedOncePerBattle()
+    {
+        var session = SessionWithEncounterPending(Lasting("focus", gains: new ResourceGains { PerBattleFought = -1 }));
+        var battle = session.StartPendingBattle();
+        BattleScript.AttackUntilOver(battle);
+
+        session.FinishBattle();
+
+        Assert.Equal(1, session.Party.Leader.LastingAmounts["focus"]);
+    }
+
+    // Three hits bring focus from 2 to 5 of 5, and the per-battle gain can't take it past its max.
+    [Fact]
+    public void FinishBattle_PerBattleGainAtMax_ClampsAfterTheGain()
+    {
+        var focus = new ResourceDefinition("focus", "Focus", Max: 5, StartsAt: 2)
+        {
+            IsLasting = true,
+            Gains = new ResourceGains { PerHitLanded = 1, PerBattleFought = 1 },
+        };
+        var session = SessionWithEncounterPending(focus);
+        BattleScript.AttackUntilOver(session.StartPendingBattle());
+
+        session.FinishBattle();
+
+        Assert.Equal(5, session.Party.Leader.LastingAmounts["focus"]);
+    }
+
+    // Focus (max 10) starts at 2.
+    private static ResourceDefinition Lasting(string id, ResourceGains gains) =>
+        new(id, id, Max: 10, StartsAt: 2) { IsLasting = true, Gains = gains };
+
+    private static GameSession SessionWithEncounterPending(params ResourceDefinition[] resources)
+    {
+        var session = GameSession.StartNew(Catalog(resources), "sarxian", new FixedSequenceRandom(_encounterThenSarxianFirst));
         session.Exploration.Walk(MoveIntent.FromAxes(1, 0), TimeSpan.FromSeconds(1.0 / 3));
         session.Exploration.Walk(MoveIntent.FromAxes(1, 0), TimeSpan.FromSeconds(1.0 / 3));
         Assert.NotNull(session.Exploration.PendingEncounter);
         return session;
     }
 
-    private static ContentCatalog Catalog() => new ContentCatalogBuilder()
+    private static ContentCatalog Catalog(params ResourceDefinition[] resources) => new ContentCatalogBuilder()
+        .WithClasses(new ClassBuilder().WithResources(resources).Build())
         .WithMembers(new PartyMemberBuilder().WithId("sarxian").BuildDefinition())
         .WithMaps(new MapLayoutBuilder().WithLayer("1111").Build() with { Id = "field" })
         .WithRandomEncounters("field", new RandomEncounterTable { OneInSteps = 1, GraceSteps = 1, EncounterIds = ["goblin_trio"] })

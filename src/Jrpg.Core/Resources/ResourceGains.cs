@@ -26,4 +26,7 @@ public sealed record ResourceGains
 
     /// <summary>For each of the holder's own hits that costs its target HP, attacks included (decision 206).</summary>
     public int PerHitLanded { get; init; }
+
+    /// <summary>Once each battle ends, whatever the outcome, for a lasting resource (ADR 0024).</summary>
+    public int PerBattleFought { get; init; }
 }

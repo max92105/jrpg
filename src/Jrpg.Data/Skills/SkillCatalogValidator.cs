@@ -18,6 +18,12 @@ internal static class SkillCatalogValidator
             return "name must not be empty.";
         }
 
+        // A quick skill keeps the turn, so a free one could be used forever in one turn.
+        if (skill.IsQuick && !skill.ResourceChanges.Any(change => change.Amount < 0))
+        {
+            return "isQuick needs a resource cost in resourceChanges, or the turn would never end.";
+        }
+
         return FindResourceChangeProblem(skill.ResourceChanges)
             ?? FindRequirementProblem(skill.Requirements)
             ?? EffectValidator.FindProblem(skill.Effect);

@@ -21,3 +21,8 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
       - `Execute_QuickSkillFellsLastEnemy_BattleEnds`
     - `SkillCatalogValidatorTests`: `Validate_QuickSkillWithoutCost_Throws`
   - **Verify by hand:** none (RG4 adds the first quick skill to content).
+- **Done, with deviations:** Tests 1925 before, 1930 after. Beyond the plan:
+  - The turn flow left `BattleState` for a new internal `Battle/TurnFlow`: upkeep, outcome, advance past the stunned, and the quick skill's `KeepTurn`. It returns the phase after. The 1925 existing tests passed unchanged across the move.
+  - `BattleState` went from 319 to about 270 lines, and its backlog line is removed.
+  - `Execute`'s command switch moved into `CarryOut` for the complexity limit.
+  - From review: the no-upkeep test also checks that a held status isn't counted down after a quick skill.

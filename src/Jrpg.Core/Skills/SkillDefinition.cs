@@ -21,5 +21,8 @@ public sealed record SkillDefinition
     /// <summary>Minimums the user must hold, checked before the skill's own changes; empty when absent.</summary>
     public IReadOnlyList<ResourceRequirement> Requirements { get; init; } = [];
 
+    /// <summary>Keeps the actor's turn (decision 202): no upkeep, no advance. It must spend a resource.</summary>
+    public bool IsQuick { get; init; }
+
     public required Effect Effect { get; init; }
 }

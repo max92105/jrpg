@@ -5,10 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/RG1.md, slice RG1 (speed stat, rogue readiness charges from speed)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/RG2.md, slice RG2 (quick skills keep the turn; TurnFlow extracted from BattleState)
 Round: 1 (verdict: Ready to commit)
 
-- Warning: ResourceDefinitionValidator `speedPerCharge < 1` branch has no test; it guards a DivideByZeroException in ReadinessFormula.Charges at battle start; open
-- Suggestion: no test pins ResourceMeters.Change clamping to the start's max (not the definition's Max 0) for a speed-scaled resource; open
-- Suggestion: ResourceRowsTextTests has no case where MaxOf differs from definition.Max (speed-scaled "3/3" row); open
-- Follow-up: omitting `startsAt`/`max` on a fixed resource now loads as 0 instead of failing the required-parameter check (defaults added); validator catches max only
+- Suggestion: TurnFlow.AnyoneStandsOn re-implements BattleState.LivingOn's liveness filter (two places decide "side still standing"); open
+- Suggestion: Execute_QuickSkill_NoUpkeepRuns checks only per-turn gains, not that statuses don't count down; open
+- Follow-up: constructor sets Phase from TurnFlow.PhaseOf(CurrentActor) without the stun skip, so a battle opening on a stunned actor would give it the turn (predates diff)

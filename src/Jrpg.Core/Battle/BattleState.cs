@@ -5,7 +5,6 @@ using Jrpg.Core.Progression;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
-using Jrpg.Core.Statuses;
 
 namespace Jrpg.Core.Battle;
 
@@ -19,6 +18,7 @@ public sealed class BattleState
     private const Targeting AttackTargeting = Targeting.SingleEnemy;
 
     private readonly TurnOrder _turnOrder;
+    private readonly TurnFlow _turnFlow;
     private readonly Inventory _inventory;
     private bool _isExperienceGranted;
 
@@ -45,7 +45,8 @@ public sealed class BattleState
         Formation = new Formation([.. Combatants.Where(combatant => combatant.Side == BattleSide.Party)]);
         _inventory = inventory;
         _turnOrder = new TurnOrder(Combatants, random);
-        Phase = LivingOn(BattleSide.Party).Count == 0 ? BattlePhase.Defeat : TurnPhaseOf(CurrentActor);
+        _turnFlow = new TurnFlow(Combatants, _turnOrder);
+        Phase = LivingOn(BattleSide.Party).Count == 0 ? BattlePhase.Defeat : TurnFlow.PhaseOf(CurrentActor);
     }
 
     public BattlePhase Phase { get; private set; }
@@ -149,35 +150,14 @@ public sealed class BattleState
 
         var actor = CurrentActor;
         var events = new List<BattleEvent> { new ActionStarted(actor, command) };
-        switch (command)
+        CarryOut(actor, command, events);
+        if (!IsOver)
         {
-            case AttackCommand attack:
-                Attack(actor, attack.Target, events);
-                break;
-            case SkillCommand skill:
-                UseSkill(actor, skill, events);
-                break;
-            case ItemCommand item:
-                UseItem(actor, item, events);
-                break;
-            case DefendCommand:
-                break;
-            case FleeCommand:
-                Flee(actor, events);
-                break;
-            case MoveCommand move:
-                Move(actor, move.SwapWith, events);
-                break;
-            default:
-                throw new ArgumentException($"Unknown command {command.GetType().Name}.", nameof(command));
+            Phase = KeepsTurn(command) ? _turnFlow.KeepTurn(actor, events) : _turnFlow.EndTurn(actor, events);
         }
 
-        EndTurn(actor, events);
         return events;
     }
-
-    private static BattlePhase TurnPhaseOf(Combatant actor) =>
-        actor.Side == BattleSide.Party ? BattlePhase.PartyTurn : BattlePhase.EnemyTurn;
 
     private static TargetRelation RelationOf(Combatant actor, Combatant candidate) =>
         candidate == actor ? TargetRelation.Self
@@ -261,65 +241,32 @@ public sealed class BattleState
         events.Add(new BattleEnded(Phase));
     }
 
-    private void EndTurn(Combatant actor, List<BattleEvent> events)
+    private void CarryOut(Combatant actor, BattleCommand command, List<BattleEvent> events)
     {
-        if (IsOver)
+        switch (command)
         {
-            return;
-        }
-
-        RunUpkeep(actor, events);
-        SettleOutcome(events);
-        if (!IsOver)
-        {
-            AdvanceToNextActor(events);
+            case AttackCommand attack:
+                Attack(actor, attack.Target, events);
+                break;
+            case SkillCommand skill:
+                UseSkill(actor, skill, events);
+                break;
+            case ItemCommand item:
+                UseItem(actor, item, events);
+                break;
+            case DefendCommand:
+                break;
+            case FleeCommand:
+                Flee(actor, events);
+                break;
+            case MoveCommand move:
+                Move(actor, move.SwapWith, events);
+                break;
+            default:
+                throw new ArgumentException($"Unknown command {command.GetType().Name}.", nameof(command));
         }
     }
 
-    private void RunUpkeep(Combatant holder, List<BattleEvent> events)
-    {
-        TurnUpkeep.ApplyPerTurnGains(holder, events);
-        TurnUpkeep.CountDownStatuses(holder, Combatants, events);
-    }
-
-    // Defeat is checked first, as in the demo: if both sides fall in one turn, the party loses.
-    private void SettleOutcome(List<BattleEvent> events)
-    {
-        if (LivingOn(BattleSide.Party).Count == 0)
-        {
-            Phase = BattlePhase.Defeat;
-        }
-        else if (LivingOn(BattleSide.Enemies).Count == 0)
-        {
-            Phase = BattlePhase.Victory;
-        }
-        else
-        {
-            return;
-        }
-
-        events.Add(new BattleEnded(Phase));
-    }
-
-    // A stunned combatant's turn is skipped inside the same Execute, so the screen never sees it as the actor. The
-    // lost turn still runs its upkeep, so the stun counts down and the loop always ends (ADR 0021).
-    private void AdvanceToNextActor(List<BattleEvent> events)
-    {
-        _turnOrder.Advance();
-        while (CurrentActor.Statuses.Has(StatusKind.Stun))
-        {
-            var skipped = CurrentActor;
-            events.Add(new TurnSkipped(skipped, StatusKind.Stun));
-            RunUpkeep(skipped, events);
-            SettleOutcome(events);
-            if (IsOver)
-            {
-                return;
-            }
-
-            _turnOrder.Advance();
-        }
-
-        Phase = TurnPhaseOf(CurrentActor);
-    }
+    // A quick skill keeps the turn (decision 202), so a rogue can Ready and still act.
+    private static bool KeepsTurn(BattleCommand command) => command is SkillCommand { Skill.IsQuick: true };
 }

@@ -47,6 +47,16 @@ public sealed class SkillCatalogValidatorTests
     }
 
     [Fact]
+    public void Validate_QuickSkillWithoutCost_Throws()
+    {
+        var endless = _heal with { IsQuick = true };
+
+        var exception = Assert.Throws<ContentValidationException>(() => SkillCatalogValidator.Validate(FileName, [endless]));
+
+        Assert.Equal("skills.json: skill 'heal': isQuick needs a resource cost in resourceChanges, or the turn would never end.", exception.Message);
+    }
+
+    [Fact]
     public void Validate_ZeroResourceChange_Throws()
     {
         var idle = _heal with { ResourceChanges = [new ResourceChange("faith", 0)] };

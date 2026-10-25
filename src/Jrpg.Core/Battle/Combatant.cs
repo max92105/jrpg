@@ -2,6 +2,7 @@ using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
+using Jrpg.Core.Statuses;
 
 namespace Jrpg.Core.Battle;
 
@@ -32,6 +33,9 @@ public sealed class Combatant
 
     /// <summary>Built new for every battle, so each one starts afresh; enemies have none.</summary>
     public ResourceMeters Resources { get; private init; } = new([]);
+
+    /// <summary>Battle only, never saved (ADR 0021).</summary>
+    public StatusSet Statuses { get; } = new();
 
     /// <summary>The party member this combatant stands for; null for an enemy. Victory experience goes to them.</summary>
     public PartyMember? Member { get; private init; }

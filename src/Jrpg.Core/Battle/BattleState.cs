@@ -172,26 +172,12 @@ public sealed class BattleState
         : candidate.Side == actor.Side ? TargetRelation.Ally
         : TargetRelation.Enemy;
 
-    private void ApplyToTargets(Effect effect, IReadOnlyList<Combatant> targets, List<BattleEvent> events)
-    {
-        foreach (var target in targets)
-        {
-            var wasAlive = target.IsAlive;
-            events.Add(new EffectApplied(target, effect.Kind, EffectResolver.Apply(effect, target.Vitals, target.Stats.Defense)));
-            if (wasAlive && !target.IsAlive)
-            {
-                events.Add(new CombatantDefeated(target));
-                ResourceTriggers.OnCombatantFallen(target, Combatants, events);
-            }
-        }
-    }
-
     // An attack is a single-enemy damage effect whose power is the attacker's attack.
     private void Attack(Combatant actor, Combatant target, List<BattleEvent> events)
     {
         var effect = new Effect(EffectKind.Damage, actor.Stats.Attack, AttackTargeting);
         ThrowIfIllegalTargets(effect, [target]);
-        ApplyToTargets(effect, [target], events);
+        EffectLanding.Land(effect, [target], Combatants, events);
     }
 
     private void UseSkill(Combatant actor, SkillCommand command, List<BattleEvent> events)
@@ -203,7 +189,7 @@ public sealed class BattleState
 
         ThrowIfIllegalTargets(command.Skill.Effect, command.Targets);
         SkillPayment.Pay(actor, command.Skill, events);
-        ApplyToTargets(command.Skill.Effect, command.Targets, events);
+        EffectLanding.Land(command.Skill.Effect, command.Targets, Combatants, events);
     }
 
     private void UseItem(Combatant actor, ItemCommand command, List<BattleEvent> events)
@@ -215,7 +201,7 @@ public sealed class BattleState
 
         ThrowIfIllegalTargets(effect, command.Targets);
         _inventory.TryRemove(command.Item.Id, 1);
-        ApplyToTargets(effect, command.Targets, events);
+        EffectLanding.Land(effect, command.Targets, Combatants, events);
     }
 
     // The one rule for who the current actor may aim at, behind both the choices offered and the check in Execute.
@@ -253,6 +239,7 @@ public sealed class BattleState
         }
 
         TurnUpkeep.ApplyPerTurnGains(actor, events);
+        TurnUpkeep.CountDownStatuses(actor, Combatants, events);
 
         // Defeat is checked first, as in the demo: if both sides fall in one turn, the party loses.
         if (LivingOn(BattleSide.Party).Count == 0)

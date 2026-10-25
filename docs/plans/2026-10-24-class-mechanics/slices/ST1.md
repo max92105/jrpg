@@ -51,3 +51,9 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
       - `FindProblem_GrantStatusWithoutStatus_ReturnsProblem`
       - `FindProblem_StatusWithZeroTurns_ReturnsProblem`
   - **Verify by hand:** none (no content yet).
+- **Done, with deviations:** Tests 1833 before, 1848 after. Beyond the plan:
+  - **Fresh mark:** it means "granted during the turn now playing". At the end of every turn, the actor's statuses count down, and everyone else's fresh marks clear (`StatusSet.ClearFreshMarks`). Otherwise a status granted on another combatant's turn would last one holder turn too many, against ADR 0021's "from the turn after the one it was granted on".
+  - **`EffectLanding`:** the landing step moved out of `BattleState` into this new internal static type, since `BattleState` was at 275 lines.
+  - **`Clear` test:** with only `Stun` existing, the planned two-status test is `Clear_Active_ReturnsItAndEmpties`.
+  - **New test file:** `EffectValidatorTests` didn't exist, so it was created, with an extra passing case.
+  - **From review:** `Execute_StatusRunsOut_ReportsStatusEnded` covers the countdown's event, and the fall test pins `StatusEnded` right after `CombatantDefeated`.

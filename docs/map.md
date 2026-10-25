@@ -19,7 +19,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 
 | Folder | Purpose | Key types |
 |---|---|---|
-| Battle | One battle: turn order, commands, events, enemy AI, rewards | `BattleState`, `BattleCommand`, `BattleEvent`, `TurnOrder`, `TurnUpkeep` (the end of the holder's own turn: per-turn gains), `SkillPayment` (resource requirements and costs: can pay, what's short, pay), `ResourceTriggers` (gains that happenings trigger: an ally falling), `EnemyTactics`, `VictoryRewards` |
+| Battle | One battle: turn order, commands, events, enemy AI, rewards | `BattleState`, `BattleCommand`, `BattleEvent`, `TurnOrder`, `TurnUpkeep` (the end of the holder's own turn: per-turn gains), `SkillPayment` (resource requirements and costs: can pay, what's short, pay), `ResourceTriggers` (gains that happenings trigger: an ally falling), `EffectLanding` (an effect on its targets: the change, the status granted, a fall), `EnemyTactics`, `VictoryRewards` |
 | Content | The loaded catalog and global rules | `ContentCatalog`, `GameRules`, `NewGameDefinition`, `LeaderChoice` |
 | Dialogue | What a speaker says | `Speech` |
 | Effects | What skills and items do, targeting, damage formula | `Effect`, `EffectResolver`, `Targeting`, `TargetChoice`, `DamageFormula` |
@@ -34,6 +34,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Resources | Class battle resources (ADR 0019): definitions, gains per trigger, one combatant's amounts in a battle | `ResourceDefinition`, `ResourceGains`, `ResourceChange` (what a skill does to one resource), `ResourceRequirement` (a minimum a skill needs, never spent), `ResourceMeters` (on `Combatant.Resources`, built new each battle; changes reported as `ResourceChanged`) |
 | Saving / Session / World | The save record; one playthrough (starts and finishes its battles); what the player changed in the world | `SaveGame`, `GameSession`, `WorldState` |
 | Skills / Stats | Skill definitions; stats and HP | `SkillDefinition`, `CombatStats`, `Vitals` |
+| Statuses | Battle statuses (ADR 0021): the closed list of kinds, what an effect grants, one combatant's set | `StatusKind`, `StatusGrant`, `ActiveStatus`, `StatusSet` (on `Combatant.Statuses`; fresh until the turn it was granted on ends) |
 
 ## Jrpg.Data (content and saves on disk)
 
@@ -42,7 +43,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Content | Loading, validating and writing the catalog; where content is; an optional field added later is left out of a file while null (`AbsentWhenNullFilter`) | `ContentCatalogLoader`, `ContentWriter`, `ContentRootLocator`, `ContentValidationException` |
 | Art | Art folders, the field sprite frame grid and the startup art check | `ArtFolders`, `FieldSpriteLayout`, `ArtReferenceCheck`, `PngSize` |
 | Audio | Audio folders and the startup check that every voice file exists by exact name (ADR 0018) | `AudioFolders`, `AudioReferenceCheck`; both checks share `Content/ExactFileName` and `Maps/MapEventSteps` |
-| Maps, Items, Party, Skills, Battle, Effects, Resources | One validator per content type (a class's resources by `ResourceDefinitionValidator`, called from the class one) | `MapLayoutValidator`, `ItemCatalogValidator`, … |
+| Maps, Items, Party, Skills, Battle, Effects, Resources, Statuses | One validator per content type (a class's resources by `ResourceDefinitionValidator`, called from the class one) | `MapLayoutValidator`, `ItemCatalogValidator`, … |
 | Messages | The UI message table | `UiMessageLoader` |
 | Saving | Save files: versioned JSON (an older or newer format is refused until release, ADR 0022), atomic writes, repair against changed content | `FileSaveStore`, `SaveGameRepair`, `RepairedSave` |
 

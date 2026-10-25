@@ -1,4 +1,5 @@
 using Jrpg.Core.Effects;
+using Jrpg.Data.Statuses;
 
 namespace Jrpg.Data.Effects;
 
@@ -13,8 +14,17 @@ internal static class EffectValidator
         }
 
         // Reviving with 0 HP would leave the target fallen, and Vitals.Revive rejects it.
-        return effect.Kind == EffectKind.Revive && effect.Power < 1
-            ? $"effect.power must be at least 1 for a revive effect (was {effect.Power})."
-            : null;
+        if (effect.Kind == EffectKind.Revive && effect.Power < 1)
+        {
+            return $"effect.power must be at least 1 for a revive effect (was {effect.Power}).";
+        }
+
+        // A grantStatus effect changes nothing else, so without a status it would do nothing.
+        if (effect.Kind == EffectKind.GrantStatus && effect.Status is null)
+        {
+            return "effect.status is required for a grantStatus effect.";
+        }
+
+        return effect.Status is { } grant ? StatusGrantValidator.FindProblem(grant) : null;
     }
 }

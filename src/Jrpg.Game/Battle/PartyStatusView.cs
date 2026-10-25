@@ -33,7 +33,10 @@ internal sealed class PartyStatusView
     private readonly PartyStatusPanel[] _panels;
     private readonly StatusMarksView[] _statusMarks;
     private readonly Formation _formation;
-    private readonly int[] _drawOrder;
+    private readonly int[] _panelAtPlace;
+    private readonly FormationSlide _slide = new();
+    private int[] _tops = [];
+    private int[] _topsBefore = [];
 
     /// <param name="formation">The party's line; the panels follow it from top to bottom (ADR 0023).</param>
     /// <param name="text">Messages and fonts.</param>
@@ -55,19 +58,19 @@ internal sealed class PartyStatusView
                 text.Messages)),
         ];
         _statusMarks = [.. _panels.Select(panel => new StatusMarksView(panel.Combatant.Statuses, text, ui))];
-        _drawOrder = new int[_panels.Length];
+        _panelAtPlace = new int[_panels.Length];
         Refresh();
     }
 
     /// <summary>
-    /// Formats the numbers that changed since the last refresh, allocating nothing when none did, and orders the panels
-    /// by the formation now.
+    /// Formats the numbers that changed since the last refresh and places the panels by the formation now: panels whose
+    /// place changed slide there. Called once per stage, never per frame.
     /// </summary>
     public void Refresh()
     {
         for (var index = 0; index < _panels.Length; index++)
         {
-            _drawOrder[_formation.PositionOf(_panels[index].Combatant)] = index;
+            _panelAtPlace[_formation.PositionOf(_panels[index].Combatant)] = index;
         }
 
         for (var index = 0; index < _panels.Length; index++)
@@ -75,11 +78,14 @@ internal sealed class PartyStatusView
             _panels[index].Refresh();
             _statusMarks[index].Refresh();
         }
+
+        PlacePanels();
     }
 
-    /// <summary>Advances the resource pips'"'"' flashes.</summary>
+    /// <summary>Advances the panels' slide, the resource pips' flashes and the status marks' pop and fade.</summary>
     public void Update(TimeSpan delta)
     {
+        _slide.Update(delta);
         foreach (var panel in _panels)
         {
             panel.Resources.Update(delta);
@@ -96,15 +102,13 @@ internal sealed class PartyStatusView
     /// <param name="actor">The combatant acting on screen, whose panel slides out; null when no member acts.</param>
     public void Draw(SpriteBatch batch, TextureLibrary textures, Combatant? actor)
     {
-        var top = TopMargin;
-        foreach (var index in _drawOrder)
+        for (var index = 0; index < _panels.Length; index++)
         {
             var panel = _panels[index];
             var slide = panel.Combatant == actor ? ActiveSlide : 0;
-            var topRight = new Point(VirtualScreen.Width - RightMargin - slide, top);
+            var topRight = new Point(VirtualScreen.Width - RightMargin - slide, _slide.PositionOf(_topsBefore[index], _tops[index]));
             DrawPanel(batch, textures, panel, topRight);
             DrawStatusMarks(batch, textures, index, topRight);
-            top += HeightOf(panel) + PanelGap;
         }
     }
 
@@ -131,6 +135,27 @@ internal sealed class PartyStatusView
         var nameMiddle = topRight.Y + (int)(_nameFont.Font.LineHeight / 2);
         var topLeft = new Point((int)nameLeft - StatusMarksGap - marks.Width, nameMiddle - (StatusMarksView.MarkSize / 2));
         marks.Draw(batch, textures, topLeft, opacity);
+    }
+
+    // Each panel's top by the formation now, stacked from the top margin; a change slides from where they stood.
+    private void PlacePanels()
+    {
+        var tops = new int[_panels.Length];
+        var top = TopMargin;
+        foreach (var index in _panelAtPlace)
+        {
+            tops[index] = top;
+            top += HeightOf(_panels[index]) + PanelGap;
+        }
+
+        if (tops.SequenceEqual(_tops))
+        {
+            return;
+        }
+
+        _topsBefore = _tops.Length == 0 ? tops : [.. _topsBefore.Select((before, index) => _slide.PositionOf(before, _tops[index]))];
+        _tops = tops;
+        _slide.Restart();
     }
 
     // Never shorter than the portrait, so the diamonds of neighboring panels can't overlap.

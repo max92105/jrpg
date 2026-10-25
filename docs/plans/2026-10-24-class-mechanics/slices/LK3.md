@@ -19,3 +19,11 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
     - `BattleReadyTests`: `UpcomingTurns_Readied_FlaggedExtra`
     - `TurnOrderStripTests`: `Refresh_ExtraTurn_EntryMarkedExtra`
   - **Verify by hand:** a Move slides both battlers; aiming Aura glows the covered spots; a readied turn's diamond shows its mark.
+- **Done, with deviations:**
+  - The slide starts whenever spots or panel places change at a refresh, so `ActionPlayback` doesn't need to carry `PlacesSwapped`. `BattlersView` and `PartyStatusView` each run a `FormationSlide` clock.
+  - The floor glow lights every ally a several-ally choice would take (Aura and Wide Aura, and an all-allies heal too). It's a flat blue diamond under each spot, drawn by `BattlersView.ShowCoverage`.
+  - The extra turn's mark is a small bright diamond on the top corner of its turn diamond: a placeholder for the hourglass, since there's no icon art.
+  - Core keeps `UpcomingActors` as a projection of the new `UpcomingTurns`. The `TurnOrder.Upcoming` tests read the actors from the turns.
+  - `BattleScene.Update` was split (`ShowAimedTargets`, `AdvanceViews`) to stay under the complexity limit.
+  - A broken `'"'"'` quote left in two comments by LK1b and LK2a is fixed here.
+  - After review: `PartyStatusView`'s order array is renamed `_panelAtPlace`, since drawing no longer follows it; the `Refresh` summary no longer promises no allocation; `FormationSlide.Share` is private.

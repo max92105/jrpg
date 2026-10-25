@@ -8,7 +8,8 @@ namespace Jrpg.Game.Battle;
 
 /// <summary>
 /// The turn order at the top left: the acting combatant in a big diamond with a bright second frame, then "NEXT" over
-/// the upcoming turns in small diamonds that touch, like beads on a thin line.
+/// the upcoming turns in small diamonds that touch, like beads on a thin line; a readied extra turn has a small bright
+/// mark on top.
 /// </summary>
 internal sealed class TurnOrderView
 {
@@ -24,6 +25,10 @@ internal sealed class TurnOrderView
     private const int LabelPixels = 14;
     private const int LineLeft = 110;
     private const int LineWidth = 760;
+
+    // Placeholder for the hourglass: a small bright diamond on an extra turn's top corner.
+    private const int ExtraMarkSize = 20;
+    private static readonly DiamondShape _extraMark = new(ExtraMarkSize, 0, 1, Color.White, Color.White);
 
     private readonly TurnOrderStrip _strip;
     private readonly UiTextures _ui;
@@ -66,7 +71,13 @@ internal sealed class TurnOrderView
         var rowTop = columnTop + labelHeight + LabelGap;
         for (var index = 1; index < shown.Count; index++)
         {
-            _next.Draw(batch, textures, new Point(columnLeft + ((index - 1) * (NextSize - NextOverlap)), rowTop), shown[index]);
+            var topLeft = new Point(columnLeft + ((index - 1) * (NextSize - NextOverlap)), rowTop);
+            _next.Draw(batch, textures, topLeft, shown[index]);
+            if (_strip.IsExtraAt(index))
+            {
+                var mark = new Rectangle(topLeft.X + ((NextSize - ExtraMarkSize) / 2), topLeft.Y - (ExtraMarkSize / 3), ExtraMarkSize, ExtraMarkSize);
+                batch.Draw(_ui.Diamond(textures, _extraMark), mark, UiTheme.SelectionStroke);
+            }
         }
     }
 }

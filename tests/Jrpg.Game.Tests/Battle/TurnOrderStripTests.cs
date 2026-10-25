@@ -32,6 +32,18 @@ public sealed class TurnOrderStripTests
         Assert.Equal([lazarus, a, lazarus, b, c, lazarus, a, b, c], _strip.Shown);
     }
 
+    // The strip is Lazarus (acting), A, Lazarus's readied turn, then the cycle: only the third entry is marked.
+    [Fact]
+    public void Refresh_ExtraTurn_EntryMarkedExtra()
+    {
+        var battle = BattleScenarios.MemberAgainstGoblinTrio("lazarus", new Inventory(), new SeededRandom(BattleScenarios.SarxianFirstSeed));
+        battle.Execute(new SkillCommand(BattleScenarios.Catalog.Skills["ready"], [battle.Combatants[1]]));
+
+        _strip.Refresh(battle);
+
+        Assert.Equal([2], Enumerable.Range(0, _strip.Shown.Count).Where(_strip.IsExtraAt));
+    }
+
     [Fact]
     public void Highlight_OneTarget_DimsEveryoneElse()
     {

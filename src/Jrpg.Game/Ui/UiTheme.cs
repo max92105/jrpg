@@ -245,6 +245,9 @@ internal static class UiTheme
     /// <summary>The rim of a helpful status's mark (Guarded, Regen, Taunt): cool blue.</summary>
     public static Color StatusHelpfulRim { get; } = FromStraightArgb(0xFF5B8CFF);
 
+    /// <summary>The soft floor glow under each ally an aura being aimed would cover: cool blue, see-through.</summary>
+    public static Color AuraGlow { get; } = FromStraightArgb(0x705B8CFF);
+
     /// <summary>The dark ground inside the command list's double frame.</summary>
     public static Color CommandPanelFill { get; } = FromStraightArgb(0x99000000);
 

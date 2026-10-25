@@ -98,11 +98,8 @@ internal sealed class BattleScene : IScene
             _sequence.Submit(command);
         }
 
-        _turnOrderStrip.Highlight(_commands.Targets?.Selected ?? []);
-        _banner.Update(delta);
-        _commandPanel.Advance(delta);
-        _partyStatus.Update(delta);
-        _enemyTags.Update(delta);
+        ShowAimedTargets();
+        AdvanceViews(delta);
         _sequence.Update(delta);
         if (!ReferenceEquals(_sequence.Playback, _shownPlayback))
         {
@@ -153,6 +150,23 @@ internal sealed class BattleScene : IScene
         {
             DrawEscaped(batch, textures);
         }
+    }
+
+    // While a target is being chosen, the strip lights it and the floor glows under the allies it would cover.
+    private void ShowAimedTargets()
+    {
+        var selected = _commands.Targets?.Selected ?? [];
+        _turnOrderStrip.Highlight(selected);
+        _battlers.ShowCoverage(selected);
+    }
+
+    private void AdvanceViews(TimeSpan delta)
+    {
+        _banner.Update(delta);
+        _commandPanel.Advance(delta);
+        _partyStatus.Update(delta);
+        _battlers.Update(delta);
+        _enemyTags.Update(delta);
     }
 
     // Text is formatted at stage changes, never per frame: the vitals once an action lands, the order when a turn starts.

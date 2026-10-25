@@ -59,7 +59,7 @@ internal sealed class EnemyTagView
         }
     }
 
-    /// <summary>Advances the status marks'"'"' pop and fade.</summary>
+    /// <summary>Advances the status marks' pop and fade.</summary>
     public void Update(TimeSpan delta)
     {
         foreach (var marks in _statusMarks)

@@ -120,7 +120,7 @@ public sealed class TurnOrderTests
         var order = new TurnOrder([_first, _second, _third], new FixedSequenceRandom(2, 1));
         order.ReadyExtraTurn(_first, _second);
         order.ReadyExtraTurn(_third, _second);
-        var upcoming = order.Upcoming(4);
+        var upcoming = order.Upcoming(4).Select(turn => turn.Actor);
 
         var turns = TakeTurns(order, 5);
 
@@ -134,7 +134,7 @@ public sealed class TurnOrderTests
         var order = new TurnOrder([_first, _second, _third], new FixedSequenceRandom(2, 1));
         order.ReadyExtraTurn(_first, _second);
 
-        var upcoming = order.Upcoming(4);
+        var upcoming = order.Upcoming(4).Select(turn => turn.Actor);
 
         Assert.Equal([_second, _first, _third, _first], upcoming);
     }

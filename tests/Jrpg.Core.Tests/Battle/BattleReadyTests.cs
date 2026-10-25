@@ -41,6 +41,18 @@ public sealed class BattleReadyTests
         _battle = new BattleState([_rogue, _goblinA, _goblinB], new Inventory(), new FixedSequenceRandom(2, 1));
 
     [Fact]
+    public void UpcomingTurns_Readied_FlaggedExtra()
+    {
+        _battle.Execute(new SkillCommand(_ready, [_goblinA]));
+
+        var turns = _battle.UpcomingTurns(3);
+
+        Assert.Equal(
+            [new UpcomingTurn(_goblinA, IsExtra: false), new UpcomingTurn(_rogue, IsExtra: true), new UpcomingTurn(_goblinB, IsExtra: false)],
+            turns);
+    }
+
+    [Fact]
     public void Execute_Ready_ReportsAndSchedules()
     {
         var events = _battle.Execute(new SkillCommand(_ready, [_goblinA]));

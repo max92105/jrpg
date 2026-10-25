@@ -78,7 +78,11 @@ public sealed class BattleState
 
     /// <summary>The <paramref name="count"/> turns after the current one, as the order stands now; a fall changes it.</summary>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative.</exception>
-    public IReadOnlyList<Combatant> UpcomingActors(int count) => _turnOrder.Upcoming(count);
+    public IReadOnlyList<Combatant> UpcomingActors(int count) => [.. UpcomingTurns(count).Select(turn => turn.Actor)];
+
+    /// <summary>The same turns as <see cref="UpcomingActors"/>, each flagged when it's a readied extra turn.</summary>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative.</exception>
+    public IReadOnlyList<UpcomingTurn> UpcomingTurns(int count) => _turnOrder.Upcoming(count);
 
     public IReadOnlyList<Combatant> LivingOn(BattleSide side) =>
         [.. Combatants.Where(combatant => combatant.Side == side && combatant.IsAlive)];

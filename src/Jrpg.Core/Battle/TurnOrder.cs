@@ -41,7 +41,7 @@ internal sealed class TurnOrder
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="count"/> is negative.</exception>
     /// <exception cref="InvalidOperationException">Everyone is defeated; the battle should have ended.</exception>
-    public IReadOnlyList<Combatant> Upcoming(int count)
+    public IReadOnlyList<UpcomingTurn> Upcoming(int count)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(count);
         if (!_cycle.Any(combatant => combatant.IsAlive))
@@ -50,13 +50,13 @@ internal sealed class TurnOrder
         }
 
         var readied = new List<(Combatant Actor, Combatant After)>(_readied);
-        var upcoming = new List<Combatant>(count);
+        var upcoming = new List<UpcomingTurn>(count);
         var lastActor = Current;
         for (var index = _currentIndex; upcoming.Count < count;)
         {
             if (TakeReadiedAfter(readied, _cycle[index], lastActor) is { } extra)
             {
-                upcoming.Add(extra);
+                upcoming.Add(new UpcomingTurn(extra, IsExtra: true));
                 lastActor = extra;
                 continue;
             }
@@ -64,7 +64,7 @@ internal sealed class TurnOrder
             index = (index + 1) % _cycle.Count;
             if (_cycle[index].IsAlive)
             {
-                upcoming.Add(_cycle[index]);
+                upcoming.Add(new UpcomingTurn(_cycle[index], IsExtra: false));
                 lastActor = _cycle[index];
             }
         }

@@ -2,7 +2,7 @@
 Status: approved
 
 Second feature plan after the migration, following the new-game flow.
-- Decisions 188-207 are recorded below. Questions 208-227 are open; the next free number is 228.
+- Decisions 188-207 are recorded below. Questions 208-228 are open; the next free number is 229.
 - This plan writes ADRs 0019-0024; the next ADR is 0025.
 - It answers question 181 (where skills come from) through ADR 0020.
 
@@ -84,7 +84,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 1: skills from the class, resources and mana
 - [x] **ADR 0019: Class battle resources** (before M1a) → [slices/ADR-0019.md](slices/ADR-0019.md)
-- [ ] **ADR 0020: Skills come from the class** (before CS1; answers question 181) → [slices/ADR-0020.md](slices/ADR-0020.md)
+- [x] **ADR 0020: Skills come from the class** (before CS1; answers question 181) → [slices/ADR-0020.md](slices/ADR-0020.md)
 - [ ] **CS1. Skills come from the class; members lose `skillIds`** (Core + Data + content, about 240 lines, about 60 of them test-site edits) → [slices/CS1.md](slices/CS1.md)
 - [ ] **M1a. Combatants carry their class's resources and gain at the end of each of their turns** (Core, about 230 lines) → [slices/M1a.md](slices/M1a.md)
 - [ ] **M1b. Resources load from `classes.json`; the mage has mana; the screen accepts the new event** (Data + content + Game, about 160 lines) → [slices/M1b.md](slices/M1b.md)
@@ -226,6 +226,7 @@ Each slice uses the placeholder until answered.
 - **225. Magic damage.** Placeholder: spells use the same formula as attacks (power minus defense). Should magic have its own stat, or ignore defense?
 - **226. A practice fight.** Placeholder (PT): a Training Dummy encounter that no map uses; the developer adds it to the forest for a test session and reverts it. Should a map offer it for good?
 - **227. The druid's first dominant force.** Placeholder: at the start, neither force dominates, so neither has the bonus. The first force to go strictly above the other becomes dominant.
+- **228. Other skill sources.** The developer's direction (2026-10-24, not settled): the class is the main source, and a skill tree per class and skills granted by items may come later. Placeholder for this plan: the class's list only (ADR 0020), read through `PartyMember.Skills` so that other sources can be added to it.
 
 Still open from earlier plans: 92, 112, 147, 151-155, 179, 180, 182, 183.
 

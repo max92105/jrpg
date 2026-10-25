@@ -177,7 +177,7 @@ Earlier decisions that apply:
 Each slice uses the placeholder until answered.
 - **179. A recruit's level.** Placeholder: a recruit joins at level 1 with 0 XP, like the leader, whatever the party's level. The alternative is to join at the leader's level, or at a level set per recruit point.
 - **180. The class numbers.** Each class's level 1 stats and growth per level, in `classes.json`. Placeholder: D&D-flavored values (design.md), chosen only so a lone level 1 leader can win the start map's fights.
-- **181. Skills.** Placeholder: members keep their own `skillIds`. Should skills come from the class, and from which level?
+- **181. Skills.** Placeholder: members keep their own `skillIds`. Should skills come from the class, and from which level? **Answered (developer, 2026-10-24):** from the class, every member of it, at every level for now (ADR 0020).
 - **182. Thaali's place in the list.** Placeholder: last, after the request's eight.
 - **183. Kamilia's art files** (`Kamilia.png` in portraits and battlers). Placeholder: kept in the repository unused, since only the developer can decide to delete art.
 

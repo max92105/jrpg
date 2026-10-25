@@ -1,5 +1,5 @@
 # Battle: each class's resource and core mechanic
-Status: approved
+Status: retro pending
 
 Second feature plan after the migration, following the new-game flow.
 - Decisions 188-207, 229 and 230 are recorded below. Questions 208-220 and 222-228 are open; the next free number is 231.
@@ -143,8 +143,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **LK1b. Resource look: diamond pips, spaced-caps label, lasting marker, dominant force lit, flash** (Game, about 230 lines) → [slices/LK1b.md](slices/LK1b.md)
 - [x] **LK2a. Status marks: small diamond marks with turns left, pop and fade** (Game, about 240 lines) → [slices/LK2a.md](slices/LK2a.md)
 - [x] **LK2b. Tick numbers tinted by their status; the rogue stays forward through a quick skill** (Game, about 130 lines) → [slices/LK2b.md](slices/LK2b.md)
-- [ ] **LK3. Formation look: battlers slide when they swap; the aura's reach and the readied turn are shown** (Game, about 200 lines) → [slices/LK3.md](slices/LK3.md)
-- [ ] **Z2. Play-through check** (manual) → [slices/Z2.md](slices/Z2.md)
+- [x] **LK3. Formation look: battlers slide when they swap; the aura's reach and the readied turn are shown** (Game, about 200 lines) → [slices/LK3.md](slices/LK3.md)
+- [x] **Z2. Play-through check** (manual) → [slices/Z2.md](slices/Z2.md)
 
 ## Decisions
 Questions and decisions share numbers.

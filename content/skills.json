@@ -188,5 +188,20 @@
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "growth", "amount": -3 }, { "resourceId": "decay", "amount": -3 } ],
     "effect": { "kind": "damage", "power": 45, "targeting": "allEnemies" }
+  },
+  {
+    "id": "palm_strike",
+    "name": "Palm Strike",
+    "description": "Two quick palm blows at one enemy. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "effect": { "kind": "damage", "power": 10, "targeting": "singleEnemy", "hits": 2 }
+  },
+  {
+    "id": "flurry",
+    "name": "Flurry",
+    "description": "Four blows in a blur at one enemy. Spends chakra. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "resourceChanges": [ { "resourceId": "chakra", "amount": -3 } ],
+    "effect": { "kind": "damage", "power": 8, "targeting": "singleEnemy", "hits": 4 }
   }
 ]

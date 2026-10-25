@@ -137,10 +137,15 @@ internal sealed class ActionPlayback
     // An action without one, an attack, only ever lands damage.
     private void AddLanding(EffectApplied effect)
     {
-        _numbers.Add(new FloatingNumber(effect.Target, NumberText.Of(effect.Amount), effect.Kind));
+        var stack = _numbers.Count(number => number.Target == effect.Target && number.ShowsAt == TimeSpan.Zero);
+        _numbers.Add(new FloatingNumber(effect.Target, NumberText.Of(effect.Amount), effect.Kind, Stack: stack));
         if (effect.Kind == EffectKind.Damage && _attackEffectFile is { } file)
         {
-            _strips.Add(new EffectOnTarget(effect.Target, file));
+            // A multi-hit plays one strip on its target, as its hits make one impact.
+            if (stack == 0)
+            {
+                _strips.Add(new EffectOnTarget(effect.Target, file));
+            }
         }
         else if (BannerText is { } actionName)
         {

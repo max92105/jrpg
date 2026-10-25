@@ -9,6 +9,7 @@ internal static class EffectValidator
     public static string? FindProblem(Effect effect) =>
         FindPowerProblem(effect)
         ?? FindRangeProblem(effect)
+        ?? FindHitsProblem(effect)
         ?? FindKindProblem(effect)
         ?? (effect.Status is { } grant ? StatusGrantValidator.FindProblem(grant) : null);
 
@@ -37,6 +38,12 @@ internal static class EffectValidator
             ? $"effect.range is only for an alliesInRange effect (was {effect.Range} on {effect.Targeting})."
             : null;
     }
+
+    // Only damage is resolved per hit; a heal or a status landing again would just repeat itself.
+    private static string? FindHitsProblem(Effect effect) =>
+        effect.Hits < 1 ? $"effect.hits must be at least 1 (was {effect.Hits})."
+        : effect.Hits > 1 && effect.Kind != EffectKind.Damage ? $"effect.hits above 1 is only for a damage effect (was {effect.Hits} on {effect.Kind})."
+        : null;
 
     private static string? FindKindProblem(Effect effect)
     {

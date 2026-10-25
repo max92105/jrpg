@@ -28,3 +28,9 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
     - `EffectValidatorTests`: `FindProblem_HitsOnHeal_ReturnsProblem`
     - `ActionPlaybackTests`: `Start_FourHitsOneTarget_FourNumbersStaggered`
   - **Verify by hand:** as Zaruk against the dummy: attacks build chakra by 1; Flurry shows four rising numbers and spends 3.
+- **Done, with deviations:**
+  - The hits loop in `EffectLanding` (the landing left `BattleState` in an earlier slice). It is now a class built with the combatants, so `Land(actor, effect, targets, events)` stays at 4 parameters; `Fall` stays static.
+  - A stack of numbers is `FloatingNumber.Stack`, set by `ActionPlayback`: each number popping on the same target at the same moment sits 30 px above the one before.
+  - Extra tests: `effect.hits` of 0 is rejected.
+  - `CommandMenuTests.IsEnabled_ActorWithoutSkills_GreysSkills` builds Zaruk with his class's skill list emptied, since every class in content now has skills.
+  - After review: a multi-hit plays its attack strip once per target, and a test pins that a status is granted once, after the hits.

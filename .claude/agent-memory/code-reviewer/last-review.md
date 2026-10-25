@@ -5,10 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/DR2.md, slice DR2 (druid Growth and Decay, sticky dominance)
-Round: 1 (verdict: Ready to commit)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/MO1.md, slice MO1 (monk multi-hit, chakra per hit landed)
+Round: 1 (verdict: Fix the Criticals, then commit)
 
-- Warning: ClassCatalogValidatorTests.cs taken from 288 to 320 lines; move resource-definition cases to a ResourceDefinitionValidatorTests file; open
-- Suggestion: ResourceMeters.IsDominant returns false for an unknown id while AmountOf throws; open
-- Suggestion: SkillEmpowerment.EffectOf runs for ReadyExtraTurn skills whose effect is then dropped; open
-- Follow-up: BattleState.cs at 290 lines; the next command path pushes it past 300
+- Critical: ResourceTriggers.cs:27-31 OnHitLanded inserted between OnCombatantFallen's summary and its method; OnHitLanded has two summaries, OnCombatantFallen none; open
+- Suggestion: no test of a multi-hit damage effect with a status (grant once per target after the hits); open
+- Suggestion: ActionPlayback.AddLanding adds one attack strip per hit, so 4 identical strips play at once on one target; open
+- Follow-up: CommandMenuTests.cs at 393 lines (388 before the slice); split by entry
+- Follow-up: BattleState.cs at 292 lines

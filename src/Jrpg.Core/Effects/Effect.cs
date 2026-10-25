@@ -8,4 +8,6 @@ namespace Jrpg.Core.Effects;
 /// <param name="Targeting">Whom it may be aimed at.</param>
 /// <param name="Status">Granted to each target still standing after the effect; null when none (ADR 0021).</param>
 /// <param name="Range">For <see cref="Targeting.AlliesInRange"/> only: how many places on each side it reaches.</param>
-public sealed record Effect(EffectKind Kind, int Power, Targeting Targeting, StatusGrant? Status = null, int Range = 0);
+/// <param name="Hits">How many times it lands on each target, each hit on its own; above 1 only for damage.</param>
+public sealed record Effect(
+    EffectKind Kind, int Power, Targeting Targeting, StatusGrant? Status = null, int Range = 0, int Hits = 1);

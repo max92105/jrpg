@@ -4,32 +4,22 @@ using Jrpg.Core.Statuses;
 namespace Jrpg.Core.Battle;
 
 /// <summary>
-/// An effect landing on its targets, in order: the change itself, the status it grants to a target still standing, and
+/// An effect landing on its targets, in order: each of its hits, the status it grants to a target still standing, and
 /// what a fall sets off (ADR 0019, ADR 0021).
 /// </summary>
-internal static class EffectLanding
+/// <param name="combatants">Everyone in the battle, for the triggers a fall sets off.</param>
+internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants)
 {
+    /// <param name="actor">Who used it, for the gains a landed hit triggers.</param>
     /// <param name="effect">What lands.</param>
     /// <param name="targets">Who it lands on, already checked as legal.</param>
-    /// <param name="combatants">Everyone in the battle, for the triggers a fall sets off.</param>
     /// <param name="events">Where what happened is reported.</param>
-    public static void Land(Effect effect, IReadOnlyList<Combatant> targets, IReadOnlyList<Combatant> combatants, List<BattleEvent> events)
+    public void Land(Combatant actor, Effect effect, IReadOnlyList<Combatant> targets, List<BattleEvent> events)
     {
         foreach (var target in targets)
         {
             var wasAlive = target.IsAlive;
-            var damageTakenPercent = DamageFormula.NoChangePercent + StatusModifiers.ExtraDamageTakenPercent(target.Statuses);
-            var amount = EffectResolver.Apply(effect, target.Vitals, target.CurrentStats.Defense, damageTakenPercent);
-            if (effect.Kind != EffectKind.GrantStatus)
-            {
-                events.Add(new EffectApplied(target, effect.Kind, amount));
-            }
-
-            if (effect.Kind == EffectKind.Damage)
-            {
-                ResourceTriggers.OnHitTaken(target, amount, events);
-            }
-
+            LandHits(actor, effect, target, events);
             if (wasAlive && !target.IsAlive)
             {
                 Fall(target, combatants, events);
@@ -52,5 +42,25 @@ internal static class EffectLanding
         }
 
         ResourceTriggers.OnCombatantFallen(fallen, combatants, events);
+    }
+
+    // Each hit is resolved and reported on its own (decision 206); the hits stop once the target falls.
+    private static void LandHits(Combatant actor, Effect effect, Combatant target, List<BattleEvent> events)
+    {
+        for (var hit = 0; hit < effect.Hits && (hit == 0 || target.IsAlive); hit++)
+        {
+            var damageTakenPercent = DamageFormula.NoChangePercent + StatusModifiers.ExtraDamageTakenPercent(target.Statuses);
+            var amount = EffectResolver.Apply(effect, target.Vitals, target.CurrentStats.Defense, damageTakenPercent);
+            if (effect.Kind != EffectKind.GrantStatus)
+            {
+                events.Add(new EffectApplied(target, effect.Kind, amount));
+            }
+
+            if (effect.Kind == EffectKind.Damage)
+            {
+                ResourceTriggers.OnHitTaken(target, amount, events);
+                ResourceTriggers.OnHitLanded(actor, amount, events);
+            }
+        }
     }
 }

@@ -20,6 +20,7 @@ public sealed class BattleState
     private readonly TurnOrder _turnOrder;
     private readonly TurnFlow _turnFlow;
     private readonly SkillBackfire _backfire;
+    private readonly EffectLanding _landing;
     private readonly Inventory _inventory;
     private bool _isExperienceGranted;
 
@@ -48,6 +49,7 @@ public sealed class BattleState
         _turnOrder = new TurnOrder(Combatants, random);
         _turnFlow = new TurnFlow(Combatants, _turnOrder);
         _backfire = new SkillBackfire(Combatants, random);
+        _landing = new EffectLanding(Combatants);
         Phase = LivingOn(BattleSide.Party).Count == 0 ? BattlePhase.Defeat : TurnFlow.PhaseOf(CurrentActor);
     }
 
@@ -172,7 +174,7 @@ public sealed class BattleState
     {
         var effect = new Effect(EffectKind.Damage, actor.CurrentStats.Attack, AttackTargeting);
         ThrowIfIllegalTargets(effect, [target]);
-        EffectLanding.Land(effect, [target], Combatants, events);
+        _landing.Land(actor, effect, [target], events);
     }
 
     private void UseSkill(Combatant actor, SkillCommand command, List<BattleEvent> events)
@@ -191,7 +193,7 @@ public sealed class BattleState
             return;
         }
 
-        EffectLanding.Land(effect, command.Targets, Combatants, events);
+        _landing.Land(actor, effect, command.Targets, events);
         _backfire.Roll(actor, command.Skill, events);
     }
 
@@ -204,7 +206,7 @@ public sealed class BattleState
 
         ThrowIfIllegalTargets(effect, command.Targets);
         _inventory.TryRemove(command.Item.Id, 1);
-        EffectLanding.Land(effect, command.Targets, Combatants, events);
+        _landing.Land(actor, effect, command.Targets, events);
     }
 
     // The one rule for who the current actor may aim at, behind both the choices offered and the check in Execute.

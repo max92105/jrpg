@@ -11,9 +11,14 @@ namespace Jrpg.Game.Battle;
 /// <param name="Text">The amount, formatted once when the playback starts.</param>
 /// <param name="Kind">What the effect did, which sets the number's color.</param>
 /// <param name="ShowsAt">When it pops, from the impact: 0, or a later beat's start, such as a backfire.</param>
-internal readonly record struct FloatingNumber(Combatant Target, string Text, EffectKind Kind, TimeSpan ShowsAt = default)
+/// <param name="Stack">How many numbers popped on the same target at the same moment before it: each one sits
+/// <see cref="StackSpacing"/> higher, so four hits read as four.</param>
+internal readonly record struct FloatingNumber(Combatant Target, string Text, EffectKind Kind, TimeSpan ShowsAt = default, int Stack = 0)
 {
     public const float RiseDistance = 50;
+
+    /// <summary>Less than the 40 px text, so a stack stays close; the outline keeps the numbers apart.</summary>
+    public const float StackSpacing = 30;
 
     private const float PopStartScale = 0.6f;
     private static readonly TimeSpan _pop = TimeSpan.FromSeconds(0.18);

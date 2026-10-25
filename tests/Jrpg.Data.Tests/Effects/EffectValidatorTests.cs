@@ -25,6 +25,22 @@ public sealed class EffectValidatorTests
     }
 
     [Fact]
+    public void FindProblem_HitsOnHeal_ReturnsProblem()
+    {
+        var problem = EffectValidator.FindProblem(new Effect(EffectKind.RestoreHp, Power: 15, Targeting.SingleAlly, Hits: 2));
+
+        Assert.Equal("effect.hits above 1 is only for a damage effect (was 2 on RestoreHp).", problem);
+    }
+
+    [Fact]
+    public void FindProblem_ZeroHits_ReturnsProblem()
+    {
+        var problem = EffectValidator.FindProblem(new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, Hits: 0));
+
+        Assert.Equal("effect.hits must be at least 1 (was 0).", problem);
+    }
+
+    [Fact]
     public void FindProblem_RangeOnOtherTargeting_ReturnsProblem()
     {
         var problem = EffectValidator.FindProblem(new Effect(EffectKind.RestoreHp, Power: 15, Targeting.AllAllies, Range: 2));

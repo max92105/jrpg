@@ -24,6 +24,20 @@ internal static class ResourceTriggers
         }
     }
 
+    /// <summary>Applies <c>PerHitLanded</c> to an actor whose hit cost its target HP; a hit for 0 gives none.</summary>
+    public static void OnHitLanded(Combatant actor, int hpLost, List<BattleEvent> events)
+    {
+        if (hpLost == 0)
+        {
+            return;
+        }
+
+        foreach (var resource in actor.Resources.Definitions)
+        {
+            actor.ChangeResource(resource.Id, resource.Gains.PerHitLanded, events);
+        }
+    }
+
     /// <summary>
     /// Applies <c>PerAllyFallen</c> to each living combatant on the fallen one's side, and <c>PerEnemyFallen</c> to
     /// each living one on the other side.

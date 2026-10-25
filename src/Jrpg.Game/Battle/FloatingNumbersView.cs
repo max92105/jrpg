@@ -53,7 +53,7 @@ internal sealed class FloatingNumbersView
                 continue;
             }
 
-            var center = new Vector2(_battlers.SpotOf(number.Target).Center.X, _battlers.TopOf(textures, number.Target) - look.Rise);
+            var center = new Vector2(_battlers.SpotOf(number.Target).Center.X, _battlers.TopOf(textures, number.Target) - look.Rise - (number.Stack * FloatingNumber.StackSpacing));
             _font.DrawCentered(batch, _measured[index], center, (ColorOf(number.Kind) * look.Opacity, look.Scale));
         }
     }

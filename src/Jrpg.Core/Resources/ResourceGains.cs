@@ -23,4 +23,7 @@ public sealed record ResourceGains
 
     /// <summary>Whenever a combatant on the other side falls, while the holder still stands.</summary>
     public int PerEnemyFallen { get; init; }
+
+    /// <summary>For each of the holder's own hits that costs its target HP, attacks included (decision 206).</summary>
+    public int PerHitLanded { get; init; }
 }

@@ -133,6 +133,18 @@ public sealed class ActionPlaybackTests
     }
 
     [Fact]
+    public void Start_FourHitsOneTarget_FourNumbersStaggered()
+    {
+        var hit = new EffectApplied(_goblin, EffectKind.Damage, 6);
+
+        var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), hit, hit, hit, hit]);
+
+        Assert.Equal([0, 1, 2, 3], playback.Numbers.Select(number => number.Stack));
+        Assert.Single(playback.Strips);
+        Assert.Equal([PlaybackBeatKind.Impact], playback.Beats.Select(beat => beat.Kind));
+    }
+
+    [Fact]
     public void Start_StatusTicked_AddsTickBeatAfterImpact()
     {
         BattleEvent[] events =

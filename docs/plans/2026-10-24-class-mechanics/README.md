@@ -124,7 +124,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 5: forces and hits
 - [x] **DR1. Statuses that tick: poison and regeneration at the end of the holder's turn** (Core + Game playback, about 250 lines) → [slices/DR1.md](slices/DR1.md)
 - [x] **DR2. The druid: Growth and Decay with sticky dominance, and Equilibrium** (Core + Data + content, about 280 lines) → [slices/DR2.md](slices/DR2.md)
-- [ ] **MO1. The monk: multi-hit skills and chakra from each hit landed** (Core + Data + content + Game, about 270 lines) → [slices/MO1.md](slices/MO1.md)
+- [x] **MO1. The monk: multi-hit skills and chakra from each hit landed** (Core + Data + content + Game, about 270 lines) → [slices/MO1.md](slices/MO1.md)
 
 ### Phase 6: play-test
 - [ ] **Z1. Run-through: every class's mechanic** (manual) → [slices/Z1.md](slices/Z1.md)

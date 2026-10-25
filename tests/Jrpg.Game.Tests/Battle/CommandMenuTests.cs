@@ -84,12 +84,17 @@ public sealed class CommandMenuTests
         Assert.IsType<FleeCommand>(command);
     }
 
+    // Every class in content has skills, so the member is Zaruk with his class's skill list emptied.
     [Fact]
     public void IsEnabled_ActorWithoutSkills_GreysSkills()
     {
         var menu = new CommandMenu(_inventory, BattleScenarios.Catalog.Items);
+        var definition = BattleScenarios.Catalog.PartyMembers["zaruk"];
+        var member = PartyMember.Recruit(definition, BattleScenarios.Catalog.ClassOf(definition) with { SkillIds = [] }, BattleScenarios.Catalog.Skills);
+        var party = new PartyState([member], [member], BattleScenarios.Catalog.Rules.Party);
+        var goblin = BattleScenarios.Catalog.Enemies["goblin"];
 
-        menu.Start(BattleScenarios.MemberAgainstGoblinTrio("zaruk", _inventory, new SeededRandom(BattleScenarios.SarxianFirstSeed)));
+        menu.Start(BattleState.Start(party, [goblin], _inventory, new SeededRandom(BattleScenarios.SarxianFirstSeed)));
 
         Assert.False(menu.IsEnabled(CommandEntry.Skills));
     }

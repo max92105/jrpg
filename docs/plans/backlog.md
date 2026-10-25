@@ -27,7 +27,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - **`StatusPage` split** (294 lines): a pure `StatusSheet`, a `StatusSheetView` and the page keeping its input. Its slot labels then come from `EquipmentSheet.Slots` and `EquipmentSheet.LabelIdOf`. It can wait because nothing planned changes the Status page's content.
 - **Why Core refused an equipment change:** `EquipmentPage.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. `PartyEquipment.ItemWithoutRoom` and `UnequipAll` would own both. It can wait because it is correct today, and nothing planned changes equipment.
 - **Easing copies:** the clamped time share `Math.Clamp((float)(elapsed / length), 0, 1)` is copied 6 times (`ActionPlayback`, `FloatingNumber` twice, `LevelUpPop`, `VictoryEntrance`, `DefeatEntrance`), and the cubic ease-out twice (`LevelUpPop`, `VictoryEntrance`). They should use `Ui/Easing`. It can wait because each copy is one line.
-- **`Ui/MessageIds.cs` is 338 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
+- **`Ui/MessageIds.cs` is 397 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
 - **`MainViewModelTests`, part 2 (449 lines after E1a):** move the new content tests (`CreateObject_*`, `CreateNpc_*`, `CanStartNewObject_*`, `TryCreateMap_*`) and the map settings tests (`TryApplySettings_*`) into their own classes, on E1a's `EditorTestContent`.
 - **`MainWindow.xaml.cs` (547 lines):** move the viewport (pan, zoom, fit) and the tile painting handlers into partial files, as `.EventEditing` and `.ObjectEditing` already are.
 - **`TileBrowserViewModelTests` (410 lines):** move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class.
@@ -62,6 +62,15 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Menus/StatusPage` looks up `_catalog.Classes[member.Definition.ClassId]`. Use `ContentCatalog.ClassOf` (added in the new-game flow) when next touched.
 - The Equipment page labels its stats "Max HP" and "Max MP", the Status page and the leader choice "HP" and "MP". The developer to decide whether they should match.
 - `ScreenFade` skips its black moment when one update is longer than its fade-out plus hold (about 0.33 s), so a warp never moves the player. The fixed 1/60 s step hides it in play; tests must step at 1/60 s. Make `Update` stop on Holding if a long frame can ever reach it.
-- `BattleState.cs` is at 290 lines: split the per-command bodies before the next command path lands (DR2 review).
+- `BattleState.cs` is at 296 lines: split the per-command bodies before the next command path lands (DR2 review).
 - `tests/Jrpg.Game.Tests/Battle/CommandMenuTests.cs` is at 393 lines: split it by menu entry (MO1 review).
 - `src/Jrpg.Game/Menus/InventoryPage.cs` is at 328 lines: move the notice and description panel into a type of its own (RS3 review).
+
+## From the class mechanics plan (2026-10-25)
+
+- `tests/Jrpg.Core.Tests/Battle/BattleStateTests.cs` is 361 lines: split it by command.
+- `tests/Jrpg.Core.Tests/Party/PartyMemberTests.cs` (307) and `tests/Jrpg.Game.Tests/Exploration/EventPresenterTests.cs` (304): split by behavior when next touched.
+- `src/Jrpg.Game/Ui/UiTheme.cs` is 291 lines: the battle colors could move to a partial file, with the `MessageIds` split.
+- Core can't say whether a turn was kept: the screen keeps the actor forward both after a quick skill and when the same member gets two turns in a row (a readied turn right before their own; LK2b review). A `TurnKept` event from `TurnFlow.KeepTurn` would tell them apart.
+- `UiTheme.ColorFromHex("")` throws, and the Core test fixtures build resources without a color; a Game test that reaches them through a battle panel would fail (LK1a review). Give the test builders a color, or make the validator's rule a Core default.
+- Placeholder marks waiting on icon art: Move borrows the Run icon (FM2), and the extra turn's hourglass is a bright diamond (LK3).

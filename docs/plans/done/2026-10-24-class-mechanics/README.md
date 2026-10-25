@@ -1,5 +1,5 @@
 # Battle: each class's resource and core mechanic
-Status: retro pending
+Status: done
 
 Second feature plan after the migration, following the new-game flow.
 - Decisions 188-207, 229 and 230 are recorded below. Questions 208-220 and 222-228 are open; the next free number is 231.

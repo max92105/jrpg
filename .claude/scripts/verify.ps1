@@ -23,7 +23,19 @@ function Report($step, $ok, $details) {
 # A test host left running by an interrupted run locks the DLLs and makes the next build fail.
 Get-Process -Name 'Jrpg.*.Tests', 'Jrpg.Simulations' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 
-if ($Fix) { dotnet format $solution 2>&1 | Out-Null }
+# The C# files changed since the last commit, modified or new; deleted ones are left out.
+function Get-ChangedSourceFiles {
+    $modified = git diff --name-only HEAD -- '*.cs'
+    $added = git ls-files --others --exclude-standard -- '*.cs'
+    @($modified) + @($added) | Where-Object { $_ -and (Test-Path $_) } | Sort-Object -Unique
+}
+
+if ($Fix) {
+    dotnet format $solution 2>&1 | Out-Null
+    # Rewraps the changed comment blocks too, so step 7 rarely needs a second run.
+    $changedForReflow = @(Get-ChangedSourceFiles)
+    if ($changedForReflow) { perl .claude/scripts/reflow-comments.pl @changedForReflow 2>&1 | Out-Null }
+}
 
 # 1. Build: warnings are errors in this repository (Directory.Build.props), so the exit code covers both. MSBuild's own
 # copy-retry warnings (a file briefly locked by another build) aren't code warnings and are ignored.
@@ -150,6 +162,36 @@ foreach ($newFile in git ls-files --others --exclude-standard -- '*.cs') {
     }
 }
 Report "changed comments fit in $maxCommentColumns columns (perl .claude/scripts/reflow-comments.pl <file>)" (-not $longComments) ($longComments | Select-Object -First 20)
+
+# 8-10. Slips a shell edit leaves behind, caught before the review. The quote is the shell escape '"'"' written literally
+# (a heredoc perl script, see the class-mechanics retro); a doubled summary is a member inserted between another's doc
+# comment and its declaration; a file crossing 300 lines is a split the slice should have made (code-quality.md).
+$changedSources = @(Get-ChangedSourceFiles)
+$shellQuote = "'" + '"' + "'" + '"' + "'"
+$quoteHits = @()
+$doubledSummaries = @()
+$grownFiles = @()
+foreach ($source in $changedSources) {
+    $lines = [IO.File]::ReadAllLines((Join-Path $repositoryRoot $source))
+    $previousDocLine = $null
+    for ($number = 1; $number -le $lines.Length; $number++) {
+        $text = $lines[$number - 1]
+        if ($text.Contains($shellQuote)) { $quoteHits += "${source}:$number" }
+        if ($text -match '^\s*///') {
+            if ($text -match '^\s*///\s*<summary>' -and $previousDocLine -match '</summary>\s*$') { $doubledSummaries += "${source}:$number" }
+            $previousDocLine = $text
+        }
+        elseif ($text.Trim()) { $previousDocLine = $null }
+    }
+
+    $lineLimit = 300
+    $headLines = git show "HEAD:$source" 2>$null
+    $before = if ($LASTEXITCODE -eq 0) { @($headLines).Count } else { 0 }
+    if ($before -le $lineLimit -and $lines.Length -gt $lineLimit) { $grownFiles += "${source} ($before -> $($lines.Length) lines)" }
+}
+Report 'changed files hold no shell quote written literally' (-not $quoteHits) ($quoteHits | Select-Object -First 10)
+Report 'no member with two summaries' (-not $doubledSummaries) ($doubledSummaries | Select-Object -First 10)
+Report 'no changed file crossed 300 lines (split it)' (-not $grownFiles) ($grownFiles | Select-Object -First 10)
 
 if ($failed) { exit 1 }
 exit 0

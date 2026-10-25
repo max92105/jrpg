@@ -1,7 +1,6 @@
 - [Records with lists equality](records-with-lists-equality.md) — records with list members compare by reference; combined-field messages; tautological tests
-- [Scratch builds blocked](scratch-builds-blocked.md) — WDAC blocks scratch DLLs; fsi for Core probes and MonoGame IL walks; PowerShell -STA for WPF; no Python
+- [Scratch builds blocked](scratch-builds-blocked.md) — probe recipes: fsi for Core probes and MonoGame IL walks; PowerShell -STA for WPF; no Python
 - [Tautological tests](tautological-tests.md) — same-seed-twice, count==count, File.Exists-only, untested `<=` boundary; pin golden values
 - [Validator null ids](validator-null-ids.md) — null list elements AND dictionary values pass strict STJ; check null entries first (seen slices 8, 1b, 1c, M1b; nested lists too)
 - [Namespace cycles](namespace-cycles.md) — grep reverse usings for each new Core using; Content is the hub (Content<->Session seen in slice 8)
 - [Last review](last-review.md) — slice, round and finding status of the latest review; read first to apply re-review rules
-- [Test files past 300](test-files-past-300.md) — slices append to big test files past ~300 lines; wc -l modified tests vs HEAD

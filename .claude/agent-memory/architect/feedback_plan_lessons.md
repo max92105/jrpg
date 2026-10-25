@@ -51,3 +51,4 @@ When planning slices in this repo:
 **Why:** part 1 split slices mid-way; the part 2 devil's advocate (2026-10-17) raised exactly these as blockers/concerns.
 
 **How to apply:** check every plan against this list before handing it back. See [[migration-roadmap]].
+- A Game look slice that adds a view type costs the view (~120 lines) plus its wiring in every caller plus the tests it replaces: LK1 (est. 240, real ~400) and LK2 (220, ~375) in the class-mechanics plan each came out 1.6x their estimate and were split at the slice step; estimate them at that rate, or split them up front.

@@ -11,3 +11,4 @@ Write an Architecture Decision Record about: $ARGUMENTS
 3. If the decision hasn't been made yet, set `Status: proposed`, give your recommendation, and ask me to decide. Don't mark it accepted on my behalf.
 4. If it supersedes an older ADR, update the older one's status to `superseded by NNNN`.
 5. Keep it under one page.
+6. If the decision changes a rule a plan already states, grep that plan's slices and checklists (`docs/plans/<plan>/`) for the old rule and update them in the same change; ADR 0022 left two run-through checklists saying old saves load.

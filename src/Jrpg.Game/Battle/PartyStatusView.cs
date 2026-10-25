@@ -35,12 +35,15 @@ internal sealed class PartyStatusView
     private readonly PartyStatusPanel[] _panels;
     private readonly OutlinedFont _tagFont;
     private readonly MeasuredText[] _statusTags;
+    private readonly Formation _formation;
+    private readonly int[] _drawOrder;
 
-    /// <param name="party">The party's combatants, in active order.</param>
+    /// <param name="formation">The party's line; the panels follow it from top to bottom (ADR 0023).</param>
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">Where the bars' gradients and the diamond portraits are made, once.</param>
-    public PartyStatusView(IReadOnlyList<Combatant> party, ScreenText text, UiTextures ui)
+    public PartyStatusView(Formation formation, ScreenText text, UiTextures ui)
     {
+        _formation = formation;
         _ui = ui;
         _nameFont = new OutlinedFont(text.Fonts.FontAt(NamePixels));
         var label = new OutlinedFont(text.Fonts.FontAt(LabelPixels));
@@ -51,19 +54,28 @@ internal sealed class PartyStatusView
         _tagFont = label;
         _panels =
         [
-            .. party.Select(member => new PartyStatusPanel(
+            .. formation.Line.Select(member => new PartyStatusPanel(
                 member,
                 MeasuredText.Of(_nameFont.Font, member.Name),
                 new PartyStatusRows(new BattleVitalRow(hpStyle, hpLabel, ui, UiTheme.BattleHpBar), ResourceRowsOf(member, resourceStyle, ui)),
                 text.Messages)),
         ];
         _statusTags = [.. _panels.Select(_ => new MeasuredText(string.Empty, 0))];
+        _drawOrder = new int[_panels.Length];
         Refresh();
     }
 
-    /// <summary>Formats the numbers that changed since the last refresh; allocates nothing when none did.</summary>
+    /// <summary>
+    /// Formats the numbers that changed since the last refresh, allocating nothing when none did, and orders the panels
+    /// by the formation now.
+    /// </summary>
     public void Refresh()
     {
+        for (var index = 0; index < _panels.Length; index++)
+        {
+            _drawOrder[_formation.PositionOf(_panels[index].Combatant)] = index;
+        }
+
         for (var index = 0; index < _panels.Length; index++)
         {
             _panels[index].Refresh();
@@ -81,7 +93,7 @@ internal sealed class PartyStatusView
     public void Draw(SpriteBatch batch, TextureLibrary textures, Combatant? actor)
     {
         var top = TopMargin;
-        for (var index = 0; index < _panels.Length; index++)
+        foreach (var index in _drawOrder)
         {
             var panel = _panels[index];
             var slide = panel.Combatant == actor ? ActiveSlide : 0;

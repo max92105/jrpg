@@ -70,8 +70,8 @@ internal sealed class BattleScene : IScene
         _sequence = new BattleTurnSequence(battle, session.EnemyTactics, text.Messages);
         _bannerView = new BattleBannerView(_banner, text, ui);
         _shown = (_sequence.Turn, _sequence.Stage);
-        _battlers = new BattlersView(battle.Combatants, _sequence, ui);
-        _partyStatus = new PartyStatusView([.. battle.Combatants.Where(combatant => combatant.Side == BattleSide.Party)], text, ui);
+        _battlers = new BattlersView(battle, _sequence, ui);
+        _partyStatus = new PartyStatusView(battle.Formation, text, ui);
         _enemyTags = new EnemyTagView(battle.Combatants, _sequence, text, ui);
         _backgroundFile = session.Exploration.PendingEncounter?.BackgroundFile
             ?? throw new InvalidOperationException("A battle screen needs the encounter it fights.");
@@ -157,6 +157,7 @@ internal sealed class BattleScene : IScene
     private void ShowStage(int turn, TurnStage stage)
     {
         _shown = (turn, stage);
+        _battlers.RefreshSpots();
         _partyStatus.Refresh();
         _enemyTags.Refresh();
         if (stage is TurnStage.StepForward or TurnStage.AwaitingCommand)

@@ -31,12 +31,15 @@ internal static class BattleLayout
     }
 
     /// <param name="combatants">The party in active order, then the enemies in encounter order, as a battle lists them.</param>
-    /// <returns>Each combatant's spot, in the same order.</returns>
-    public static Rectangle[] SpotsOf(IReadOnlyList<Combatant> combatants)
+    /// <param name="formation">Where each party member stands in the line now (ADR 0023).</param>
+    /// <returns>Each combatant's spot, in the same order: party members by their place in the line.</returns>
+    public static Rectangle[] SpotsOf(IReadOnlyList<Combatant> combatants, Formation formation)
     {
-        var partyCount = combatants.Count(combatant => combatant.Side == BattleSide.Party);
+        var partyCount = formation.Line.Count;
         return [.. combatants.Select((combatant, index) =>
-            combatant.Side == BattleSide.Party ? PartySpot(index, partyCount) : EnemySpot(index - partyCount))];
+            combatant.Side == BattleSide.Party
+                ? PartySpot(formation.PositionOf(combatant), partyCount)
+                : EnemySpot(index - partyCount))];
     }
 
     private static Rectangle SpotOnRow(int left, int row) =>

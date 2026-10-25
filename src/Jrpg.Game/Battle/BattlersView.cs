@@ -14,7 +14,8 @@ namespace Jrpg.Game.Battle;
 internal sealed class BattlersView
 {
     private readonly IReadOnlyList<Combatant> _combatants;
-    private readonly Rectangle[] _spots;
+    private readonly Formation _formation;
+    private Rectangle[] _spots;
     private readonly BattlerArt[] _arts;
     // How strongly the white lies over a falling battler: bright, with its own colors still showing through.
     private const float FallenWhiteness = 0.6f;
@@ -22,17 +23,22 @@ internal sealed class BattlersView
     private readonly BattleTurnSequence _sequence;
     private readonly UiTextures _ui;
 
-    /// <param name="combatants">The battle's combatants, in its order.</param>
+    /// <param name="battle">Whose combatants it draws, and where the party stands in its formation.</param>
     /// <param name="sequence">Who is stepping out of the formation, and how far.</param>
     /// <param name="ui">Where painted battlers are shrunk, once.</param>
-    public BattlersView(IReadOnlyList<Combatant> combatants, BattleTurnSequence sequence, UiTextures ui)
+    public BattlersView(BattleState battle, BattleTurnSequence sequence, UiTextures ui)
     {
+        var combatants = battle.Combatants;
         _combatants = combatants;
+        _formation = battle.Formation;
         _sequence = sequence;
-        _spots = BattleLayout.SpotsOf(combatants);
+        _spots = BattleLayout.SpotsOf(combatants, _formation);
         _arts = [.. combatants.Select(BattlerArt.Of)];
         _ui = ui;
     }
+
+    /// <summary>Places each party member by the formation now; called as a stage starts, not per frame.</summary>
+    public void RefreshSpots() => _spots = BattleLayout.SpotsOf(_combatants, _formation);
 
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {

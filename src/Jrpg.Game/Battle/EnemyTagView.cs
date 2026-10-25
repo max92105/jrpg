@@ -37,10 +37,9 @@ internal sealed class EnemyTagView
         _sequence = sequence;
         _font = new OutlinedFont(text.Fonts.FontAt(NamePixels));
         var tagHeight = (int)_font.Font.LineHeight + NameGap + BarHeight;
-        var spots = BattleLayout.SpotsOf(combatants);
         var enemies = combatants
-            .Select((combatant, index) => (Combatant: combatant, Spot: spots[index]))
-            .Where(enemy => enemy.Combatant.Side == BattleSide.Enemies)
+            .Where(combatant => combatant.Side == BattleSide.Enemies)
+            .Select((combatant, slot) => (Combatant: combatant, Spot: BattleLayout.EnemySpot(slot)))
             .ToList();
         _enemies = [.. enemies.Select(enemy => enemy.Combatant)];
         _tagAreas = [.. enemies.Select(enemy => new Rectangle(enemy.Spot.X, enemy.Spot.Bottom + GapBelowSprite - tagHeight, TagWidth, tagHeight))];

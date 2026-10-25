@@ -150,7 +150,8 @@ public sealed class BattleSceneTests
     private static SceneRequest? Settle(BattleScene scene) => scene.Update(TimeSpan.FromSeconds(10), default);
 
     // Sarxian's class has no skills, so the cursor skips the greyed Skills; the new game's bag holds potions, so
-    // Defend is two rows down, past Items.
+    // Defend is two rows down, past Items; Move is greyed for a member alone in the line. The scene doesn't expose its
+    // menu, so the rows are counted.
     private static SceneRequest? DefendAndSettle(BattleScene scene)
     {
         scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Down));

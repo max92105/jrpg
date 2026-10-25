@@ -36,5 +36,8 @@ internal static class UiArtFiles
         public const string Defend = "Defend.png";
 
         public const string Run = "Run.png";
+
+        // Placeholder: no Move icon exists yet, so Move shows the Run icon.
+        public const string Move = "Run.png";
     }
 }

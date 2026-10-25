@@ -8,9 +8,9 @@ namespace Jrpg.Game.Battle;
 
 /// <summary>
 /// The acting party member's command choice, from the list down to a target. Attack opens the target cursor on Core's
-/// legal targets; Skills and Items open the actor's skills or the party's consumables, and a usable one its targets;
-/// Defend and Run act at once. Cancel steps back one level; on the list it does nothing: there is no menu in battle
-/// (decision 50).
+/// legal targets, and Move on the actor's neighbors in the formation; Skills and Items open the actor's skills or the
+/// party's consumables, and a usable one its targets; Defend and Run act at once. Cancel steps back one level; on the
+/// list it does nothing: there is no menu in battle (decision 50).
 /// </summary>
 internal sealed class CommandMenu
 {
@@ -20,6 +20,7 @@ internal sealed class CommandMenu
     private BattleState? _battle;
     private bool _hasSkills;
     private bool _hasUsableItem;
+    private bool _hasNeighbor;
 
     /// <param name="inventory">The party's items, as the battle uses them up.</param>
     /// <param name="items">Every item by id, from the catalog.</param>
@@ -31,7 +32,7 @@ internal sealed class CommandMenu
     }
 
     public static ImmutableArray<CommandEntry> Entries { get; } =
-        [CommandEntry.Attack, CommandEntry.Skills, CommandEntry.Items, CommandEntry.Defend, CommandEntry.Run];
+        [CommandEntry.Attack, CommandEntry.Skills, CommandEntry.Items, CommandEntry.Move, CommandEntry.Defend, CommandEntry.Run];
 
     public CommandEntry Selected => Entries[_cursor.Selected];
 
@@ -44,11 +45,15 @@ internal sealed class CommandMenu
     /// <summary>The target being picked after Attack, a skill or an item; null while a list is open.</summary>
     public BattleTargetCursor? Targets { get; private set; }
 
-    /// <summary>Skills is greyed for a member who knows none, Items when no owned item can be used now (decision 105).</summary>
+    /// <summary>
+    /// Skills is greyed for a member who knows none, Items when no owned item can be used now, and Move for a member
+    /// alone in the line (decision 105).
+    /// </summary>
     public bool IsEnabled(CommandEntry entry) => entry switch
     {
         CommandEntry.Skills => _hasSkills,
         CommandEntry.Items => _hasUsableItem,
+        CommandEntry.Move => _hasNeighbor,
         _ => true,
     };
 
@@ -58,6 +63,7 @@ internal sealed class CommandMenu
         _battle = battle;
         _hasSkills = battle.CurrentActor.Skills.Count > 0;
         _hasUsableItem = _inventory.Entries.Any(entry => battle.CanUse(_items[entry.ItemId]));
+        _hasNeighbor = battle.TargetChoiceForMove().Candidates.Count > 0;
         _cursor.Select(0);
         Skills = null;
         Items = null;
@@ -101,12 +107,13 @@ internal sealed class CommandMenu
             _cursor.MoveDown();
         }
 
-        if (!input.IsPressed(GameButton.Confirm))
-        {
-            return null;
-        }
+        return input.IsPressed(GameButton.Confirm) ? Choose(Selected, battle) : null;
+    }
 
-        switch (Selected)
+    // Attack, Skills, Items and Move open the next step; Defend and Run are the command itself.
+    private BattleCommand? Choose(CommandEntry entry, BattleState battle)
+    {
+        switch (entry)
         {
             case CommandEntry.Attack:
                 Targets = new BattleTargetCursor(battle.TargetChoiceForAttack(), battle.CurrentActor);
@@ -117,12 +124,15 @@ internal sealed class CommandMenu
             case CommandEntry.Items:
                 Items = new BattleItemChoice(battle, _inventory, _items);
                 return null;
+            case CommandEntry.Move:
+                Targets = new BattleTargetCursor(battle.TargetChoiceForMove(), battle.CurrentActor);
+                return null;
             case CommandEntry.Defend:
                 return new DefendCommand();
             case CommandEntry.Run:
                 return new FleeCommand();
             default:
-                throw new InvalidOperationException($"{Selected} can't be chosen yet.");
+                throw new InvalidOperationException($"{entry} can't be chosen yet.");
         }
     }
 
@@ -199,6 +209,7 @@ internal sealed class CommandMenu
         {
             ({ } skills, _) => new SkillCommand(skills.Selected, targets.Selected),
             (_, { } items) => new ItemCommand(items.Selected, targets.Selected),
+            _ when Selected == CommandEntry.Move => new MoveCommand(targets.Selected[0]),
             _ => new AttackCommand(targets.Selected[0]),
         };
         Skills = null;

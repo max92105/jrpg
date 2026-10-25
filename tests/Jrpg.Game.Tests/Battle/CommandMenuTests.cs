@@ -1,5 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Items;
+using Jrpg.Core.Party;
 using Jrpg.Core.Randomness;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Input;
@@ -58,7 +59,7 @@ public sealed class CommandMenuTests
     [Fact]
     public void Update_ConfirmDefend_ProducesDefend()
     {
-        Press(GameButton.Down, times: 2);
+        SelectEntry(CommandEntry.Defend);
 
         var command = _menu.Update(InputFrames.Pressing(GameButton.Confirm));
 
@@ -66,7 +67,7 @@ public sealed class CommandMenuTests
     }
 
     [Fact]
-    public void Update_MoveDownWithEmptyBag_SkipsGreyedItems()
+    public void Update_MoveDownWithEmptyBagAlone_SkipsGreyedItemsAndMove()
     {
         Press(GameButton.Down, times: 2);
 
@@ -76,7 +77,7 @@ public sealed class CommandMenuTests
     [Fact]
     public void Update_ConfirmRun_ProducesFlee()
     {
-        Press(GameButton.Down, times: 3);
+        SelectEntry(CommandEntry.Run);
 
         var command = _menu.Update(InputFrames.Pressing(GameButton.Confirm));
 
@@ -280,6 +281,73 @@ public sealed class CommandMenuTests
         menu.Update(InputFrames.Pressing(GameButton.Down));
         menu.Update(InputFrames.Pressing(GameButton.Confirm));
         return menu;
+    }
+
+    [Fact]
+    public void Update_ConfirmMove_TargetsOnlyNeighbors()
+    {
+        var (menu, battle) = TwoMembersMenu();
+        SelectEntry(menu, CommandEntry.Move);
+
+        menu.Update(InputFrames.Pressing(GameButton.Confirm));
+
+        Assert.Equal(battle.TargetChoiceForMove().Candidates, menu.Targets?.Candidates);
+    }
+
+    [Fact]
+    public void Update_ConfirmMoveTarget_ProducesMoveCommand()
+    {
+        var (menu, battle) = TwoMembersMenu();
+        SelectEntry(menu, CommandEntry.Move);
+        menu.Update(InputFrames.Pressing(GameButton.Confirm));
+
+        var command = menu.Update(InputFrames.Pressing(GameButton.Confirm));
+
+        var neighbor = Assert.Single(battle.TargetChoiceForMove().Candidates);
+        Assert.Equal(new MoveCommand(neighbor), command);
+    }
+
+    [Fact]
+    public void Update_CancelOnMoveTargets_ReturnsToCommands()
+    {
+        var (menu, _) = TwoMembersMenu();
+        SelectEntry(menu, CommandEntry.Move);
+        menu.Update(InputFrames.Pressing(GameButton.Confirm));
+
+        menu.Update(InputFrames.Pressing(GameButton.Cancel));
+
+        Assert.Null(menu.Targets);
+        Assert.Equal(CommandEntry.Move, menu.Selected);
+    }
+
+    // Zanyr and Ragnir against the goblins, who defend until one of the two acts; each is the other's one neighbor.
+    private (CommandMenu Menu, BattleState Battle) TwoMembersMenu()
+    {
+        var (zanyr, ragnir) = (BattleScenarios.Recruit("zanyr"), BattleScenarios.Recruit("ragnir"));
+        var party = new PartyState([zanyr, ragnir], [zanyr, ragnir], BattleScenarios.Catalog.Rules.Party);
+        var goblin = BattleScenarios.Catalog.Enemies["goblin"];
+        var battle = BattleState.Start(party, [goblin, goblin, goblin], _inventory, new SeededRandom(BattleScenarios.SarxianFirstSeed));
+        while (battle.CurrentActor.Side == BattleSide.Enemies)
+        {
+            battle.Execute(new DefendCommand());
+        }
+
+        var menu = new CommandMenu(_inventory, BattleScenarios.Catalog.Items);
+        menu.Start(battle);
+        return (menu, battle);
+    }
+
+    // Bounded by the entries, so a list without the entry fails the test instead of looping forever.
+    private void SelectEntry(CommandEntry entry) => SelectEntry(_menu, entry);
+
+    private static void SelectEntry(CommandMenu menu, CommandEntry entry)
+    {
+        for (var presses = 0; presses < CommandMenu.Entries.Length && menu.Selected != entry; presses++)
+        {
+            menu.Update(InputFrames.Pressing(GameButton.Down));
+        }
+
+        Assert.Equal(entry, menu.Selected);
     }
 
     // Bounded by the rows, so a list without the skill fails the test instead of looping forever.

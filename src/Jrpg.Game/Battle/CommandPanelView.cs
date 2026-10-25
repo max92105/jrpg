@@ -40,7 +40,7 @@ internal sealed class CommandPanelView
     private static readonly DiamondShape _targetPointer = new(TargetPointerSize, 0, 1, Color.Transparent, Color.White);
 
     private static readonly string[] _icons =
-        [UiArtFiles.Icons.Attack, UiArtFiles.Icons.Skills, UiArtFiles.Icons.Items, UiArtFiles.Icons.Defend, UiArtFiles.Icons.Run];
+        [UiArtFiles.Icons.Attack, UiArtFiles.Icons.Skills, UiArtFiles.Icons.Items, UiArtFiles.Icons.Move, UiArtFiles.Icons.Defend, UiArtFiles.Icons.Run];
 
     private readonly CommandMenu _menu;
     private readonly BattlersView _battlers;
@@ -122,6 +122,7 @@ internal sealed class CommandPanelView
         CommandEntry.Attack => MessageIds.BattleAttack,
         CommandEntry.Skills => MessageIds.BattleSkills,
         CommandEntry.Items => MessageIds.BattleItems,
+        CommandEntry.Move => MessageIds.BattleMove,
         CommandEntry.Defend => MessageIds.BattleDefend,
         CommandEntry.Run => MessageIds.BattleRun,
         _ => throw new ArgumentOutOfRangeException(nameof(entry), entry, null),
@@ -132,6 +133,7 @@ internal sealed class CommandPanelView
         CommandEntry.Attack => MessageIds.BattleAttackHint,
         CommandEntry.Skills => MessageIds.BattleSkillsHint,
         CommandEntry.Items => MessageIds.BattleItemsHint,
+        CommandEntry.Move => MessageIds.BattleMoveHint,
         CommandEntry.Defend => MessageIds.BattleDefendHint,
         CommandEntry.Run => MessageIds.BattleRunHint,
         _ => throw new ArgumentOutOfRangeException(nameof(entry), entry, null),

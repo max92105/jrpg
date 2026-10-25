@@ -24,3 +24,9 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
   - **Verify by hand:**
     - With three members, the middle one moves to the front: both battlers trade spots, the panels reorder, and the turn passes.
     - An end member is offered only one neighbor.
+- **Done, with deviations:** Tests 1896 before, 1901 after. Beyond the plan:
+  - **Move greyed alone:** Move is greyed for a member with no neighbour, as Skills and Items are when unusable (decision 105). So a lone member's menu skips it, and the tests fighting as one member keep their positions.
+  - **Menu tests:** they now pick Defend and Run by what they are (`SelectEntry`). The scene test still counts rows, since it can't see the menu.
+  - **Enemy tags:** `EnemyTagView` places its tags with `EnemySpot` by enemy slot, so `SpotsOf` needs the formation only for party spots.
+  - **Complexity limit:** `Choose(entry)` was split out of `CommandMenu.ChooseFromList`, and the events shown by live state are a set checked before `ActionPlayback.Read`'s switch.
+  - **Icon:** Move borrows the Run icon until it has its own.

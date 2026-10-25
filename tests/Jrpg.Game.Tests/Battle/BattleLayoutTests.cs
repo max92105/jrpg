@@ -1,5 +1,7 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Items;
 using Jrpg.Core.Party;
+using Jrpg.Core.Randomness;
 using Jrpg.Data.Content;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Rendering;
@@ -74,11 +76,31 @@ public sealed class BattleLayoutTests
             Combatant.FromEnemy(goblin),
         ];
 
-        var spots = BattleLayout.SpotsOf(combatants);
+        var battle = new BattleState(combatants, new Inventory(), new SeededRandom(0));
+
+        var spots = BattleLayout.SpotsOf(combatants, battle.Formation);
 
         Assert.Equal(
             [BattleLayout.PartySpot(0, 2), BattleLayout.PartySpot(1, 2), new Rectangle(396, 864, 96, 96), BattleLayout.EnemySpot(1), BattleLayout.EnemySpot(2)],
             spots);
+    }
+
+    // Whoever of the two members acts first moves to the other one's place; enemies defend until then.
+    [Fact]
+    public void SpotsOf_AfterSwap_MembersTradeSpots()
+    {
+        var (sarxian, jazog) = (Combatant.FromPartyMember(BattleScenarios.Recruit("sarxian")), Combatant.FromPartyMember(BattleScenarios.Recruit("jazog")));
+        var goblin = Combatant.FromEnemy(BattleScenarios.Catalog.Enemies["goblin"]);
+        var battle = new BattleState([sarxian, jazog, goblin], new Inventory(), new SeededRandom(0));
+        while (battle.CurrentActor == goblin)
+        {
+            battle.Execute(new DefendCommand());
+        }
+
+        battle.Execute(new MoveCommand(battle.CurrentActor == sarxian ? jazog : sarxian));
+
+        var spots = BattleLayout.SpotsOf(battle.Combatants, battle.Formation);
+        Assert.Equal([BattleLayout.PartySpot(1, 2), BattleLayout.PartySpot(0, 2)], spots[..2]);
     }
 
     [Fact]

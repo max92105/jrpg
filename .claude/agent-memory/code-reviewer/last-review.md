@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/FM1.md, slice FM1 (party formation line, MoveCommand, PlacesSwapped)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/FM2.md, slice FM2 (Move command on screen, spots and panels from the formation)
 Round: 1 (verdict: Ready to commit)
 
-- Warning, open: enemy-actor Move guard (InvalidOperationException, BattleState.Move) and TargetChoiceForMove's empty choice on an enemy turn have no test; Flee's equivalent guard is tested (BattleStateTests:181).
-- Suggestion, open: Formation constructor public; make it internal so only BattleState builds the line (tests see internals already, Swap is internal).
-- Suggestion, open: no Formation test for Swap of non-neighbours / unknown member / PositionOf throw at Formation level (covered only via Execute).
-- Follow-up: BattleState at 319 lines; turn flow split recorded in slice note for PL2a.
+- Suggestion, open: Update_ConfirmMove_TargetsOnlyNeighbors uses two members, so it can't tell "neighbors" from "every other ally"; three members with an end actor would.
+- Suggestion, open: ChooseTarget picks MoveCommand from the list cursor (`_ when Selected == Move`); a target cursor that remembers what opened it would drop the hidden coupling.
+- Suggestion, open: PartyStatusView's draw order is a rule inside an untested view; a small pure ordering would make it testable.
+- Follow-up: Move icon borrows Run.png (UiArtFiles) until it has its own art.

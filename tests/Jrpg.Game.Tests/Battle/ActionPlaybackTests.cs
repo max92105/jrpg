@@ -110,6 +110,17 @@ public sealed class ActionPlaybackTests
     }
 
     [Fact]
+    public void Start_MoveCommand_ShowsMoveBanner()
+    {
+        var ally = Combatant.FromPartyMember(BattleScenarios.Recruit("jazog"));
+
+        var playback = Start([new ActionStarted(_sarxian, new MoveCommand(ally)), new PlacesSwapped(_sarxian, ally)]);
+
+        Assert.Equal("Move", playback.BannerText);
+        Assert.Equal([PlaybackBeatKind.Banner], playback.Beats.Select(beat => beat.Kind));
+    }
+
+    [Fact]
     public void Start_Defend_HasNoHold()
     {
         var playback = Start([new ActionStarted(_sarxian, new DefendCommand())]);

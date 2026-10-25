@@ -6,6 +6,7 @@ internal enum CommandEntry
     Attack,
     Skills,
     Items,
+    Move,
     Defend,
     Run,
 }

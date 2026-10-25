@@ -242,6 +242,9 @@ internal static class MessageIds
     /// <summary>The battle command that opens the party's items.</summary>
     public const string BattleItems = "battle_items";
 
+    /// <summary>The battle command that trades places with an ally right beside the actor (ADR 0023).</summary>
+    public const string BattleMove = "battle_move";
+
     /// <summary>The battle command that passes the turn on guard.</summary>
     public const string BattleDefend = "battle_defend";
 
@@ -256,6 +259,9 @@ internal static class MessageIds
 
     /// <summary>The hint under the command panel while Items is selected.</summary>
     public const string BattleItemsHint = "battle_items_hint";
+
+    /// <summary>The hint under the command panel while Move is selected.</summary>
+    public const string BattleMoveHint = "battle_move_hint";
 
     /// <summary>The hint under the command panel while Defend is selected.</summary>
     public const string BattleDefendHint = "battle_defend_hint";

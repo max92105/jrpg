@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
 using Jrpg.Game.Ui;
@@ -17,6 +18,10 @@ internal sealed class ActionPlayback
     // Placeholder timing: the fallen stay lit white for 1.0 s, then fade out over 1.0 s, easing in.
     private static readonly TimeSpan _fallTint = TimeSpan.FromSeconds(1.0);
     private static readonly TimeSpan _fallFade = TimeSpan.FromSeconds(1.0);
+
+    // Panels, tags and spots read live state at the next stage change (ADR 0013), so these need no beat of their own.
+    private static readonly FrozenSet<Type> _shownByLiveState =
+        [typeof(ResourceChanged), typeof(StatusEnded), typeof(PlacesSwapped), typeof(BattleEnded)];
 
     private readonly List<PlaybackBeat> _beats = [];
     private readonly List<FloatingNumber> _numbers = [];
@@ -83,12 +88,18 @@ internal sealed class ActionPlayback
         SkillCommand skill => skill.Skill.Name,
         ItemCommand item => item.Item.Name,
         DefendCommand => messages.Format(MessageIds.BattleDefends, new MessageArgument("name", started.Actor.Name)),
+        MoveCommand => messages.Text(MessageIds.BattleMove),
         AttackCommand or FleeCommand => null,
         _ => throw new InvalidOperationException($"The battle screen can't show a {started.Command.GetType().Name} yet."),
     };
 
     private void Read(BattleEvent battleEvent, UiMessages messages)
     {
+        if (_shownByLiveState.Contains(battleEvent.GetType()))
+        {
+            return;
+        }
+
         switch (battleEvent)
         {
             case ActionStarted started:
@@ -108,12 +119,6 @@ internal sealed class ActionPlayback
                 break;
             case TurnSkipped skipped:
                 AddSkipCue(skipped.Combatant, messages);
-                break;
-
-            // Panels and tags read live amounts and statuses at the next stage change (ADR 0013), so no beat.
-            case ResourceChanged:
-            case StatusEnded:
-            case BattleEnded:
                 break;
             default:
                 throw new InvalidOperationException($"The battle screen can't show a {battleEvent.GetType().Name} yet.");

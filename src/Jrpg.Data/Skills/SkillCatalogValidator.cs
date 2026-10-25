@@ -1,3 +1,4 @@
+using Jrpg.Core.Effects;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
 using Jrpg.Data.Content;
@@ -22,6 +23,12 @@ internal static class SkillCatalogValidator
         if (skill.IsQuick && !skill.ResourceChanges.Any(change => change.Amount < 0))
         {
             return "isQuick needs a resource cost in resourceChanges, or the turn would never end.";
+        }
+
+        // Battle refuses a rest (decision 230), and a skill is only used in battle.
+        if (skill.Effect.Kind == EffectKind.Rest)
+        {
+            return "effect.kind rest is for items only; a skill is used in battle, where nobody rests.";
         }
 
         return FindResourceChangeProblem(skill.ResourceChanges)

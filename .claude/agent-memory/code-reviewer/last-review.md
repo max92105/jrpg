@@ -5,8 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/RS2.md, slice RS2 (editor authors the rest step; placeholder inn)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/RS3.md, slice RS3 (Camp Kit rest item used from the menu)
 Round: 1 (verdict: Ready to commit)
 
-- Suggestion: StartMapScenarios.cs BelowInnkeeper summary and StartMapVillagerTests comment cite "(RS2)", a plan id that rots; describe the place instead; open
-- Follow-up: StartMapScenarios BelowRestingChest summary says "until RS2 places one", stale now the Innkeeper exists; open
+- Warning: PartyMember.HasAnythingToRest lasting-resource branch untested (full HP, mana carried off StartsAt -> kit must be usable); open
+- Suggestion: ItemUseDialog.Open now may use the item without opening; consider a name like OpenOrUse / UseOrPickTarget; open
+- Suggestion: SkillCatalogValidatorTests.Validate_RestSkill_Throws uses EndsWith; pin full message like the item test; open
+- Follow-up: InventoryPage.cs is 328 lines (was 322 before diff); split candidate; open
+- Follow-up: docs/ui_ux_exemples webp swap is unrelated to RS3; commit separately; open

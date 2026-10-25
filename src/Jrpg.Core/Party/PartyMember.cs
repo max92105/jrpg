@@ -134,6 +134,10 @@ public sealed class PartyMember
         _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot."),
     };
 
+    /// <summary>Whether a rest would change anything: HP below max, or a lasting resource off its start.</summary>
+    public bool HasAnythingToRest =>
+        Vitals.Hp < Vitals.MaxHp || Class.Resources.Any(resource => resource.IsLasting && _lastingAmounts[resource.Id] != resource.StartsAt);
+
     /// <summary>
     /// A rest (decision 230): full HP, the fallen revived, and every lasting resource back at its starting amount.
     /// </summary>

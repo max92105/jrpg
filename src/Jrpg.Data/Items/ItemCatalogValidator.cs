@@ -50,6 +50,12 @@ internal static class ItemCatalogValidator
             return "effect.kind readyExtraTurn and effect.targeting otherCombatant are for skills only; an item has no turn order.";
         }
 
+        // A rest is the party's, at an inn or from the menu: battle refuses it, and it takes everyone.
+        if (effect.Kind == EffectKind.Rest && (!isUsableFromMenu || effect.Targeting != Targeting.AllAllies))
+        {
+            return "effect.kind rest needs isUsableFromMenu true and effect.targeting allAllies; a rest is used from the menu on the whole party.";
+        }
+
         // An item can be used from the menu, where there is no formation to measure a range along.
         if (effect.Targeting == Targeting.AlliesInRange)
         {

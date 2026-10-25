@@ -17,6 +17,7 @@
     { "itemId": "bomb", "quantity": 3 },
     { "itemId": "bomb_all", "quantity": 3 },
     { "itemId": "revive_feather", "quantity": 3 },
+    { "itemId": "camp_kit", "quantity": 1 },
     { "itemId": "bronze_sword", "quantity": 2 },
     { "itemId": "iron_sword", "quantity": 1 },
     { "itemId": "magic_staff", "quantity": 3 },

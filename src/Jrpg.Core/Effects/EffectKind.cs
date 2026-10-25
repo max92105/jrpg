@@ -11,4 +11,9 @@ public enum EffectKind
 
     /// <summary>Changes no HP: the user takes an extra turn after the target's next turn (decision 202).</summary>
     ReadyExtraTurn,
+
+    /// <summary>
+    /// Rests the whole party (decision 230) through <c>PartyMember.Rest</c>; an item's, used from the menu only.
+    /// </summary>
+    Rest,
 }

@@ -9,6 +9,15 @@
     "effect": { "kind": "restoreHp", "power": 15, "targeting": "singleAlly" }
   },
   {
+    "id": "camp_kit",
+    "name": "Camp Kit",
+    "description": "Rests the party.",
+    "iconFile": "Consumable.png",
+    "maxStack": 9,
+    "isUsableFromMenu": true,
+    "effect": { "kind": "rest", "power": 0, "targeting": "allAllies" }
+  },
+  {
     "id": "hi_potion",
     "name": "Hi-Potion",
     "description": "Restores a medium amount of HP.",

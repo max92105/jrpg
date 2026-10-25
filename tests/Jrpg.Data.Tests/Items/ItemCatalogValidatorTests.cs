@@ -56,6 +56,18 @@ public sealed class ItemCatalogValidatorTests
     }
 
     [Fact]
+    public void Validate_RestItemNotUsableFromMenu_Throws()
+    {
+        var kit = _potion with { Id = "camp_kit", IsUsableFromMenu = false, Effect = new Effect(EffectKind.Rest, Power: 0, Targeting.AllAllies) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [kit]));
+
+        Assert.Equal(
+            "items.json: item 'camp_kit': effect.kind rest needs isUsableFromMenu true and effect.targeting allAllies; a rest is used from the menu on the whole party.",
+            exception.Message);
+    }
+
+    [Fact]
     public void Validate_MaxStackZero_ThrowsNamingTheField()
     {
         var exception = Assert.Throws<ContentValidationException>(

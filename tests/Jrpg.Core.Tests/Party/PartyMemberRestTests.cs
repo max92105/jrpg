@@ -41,6 +41,23 @@ public sealed class PartyMemberRestTests
         Assert.Equal(3, member.LastingAmounts["clarity"]);
     }
 
+    [Fact]
+    public void HasAnythingToRest_FullHpLastingSpent_IsTrue()
+    {
+        var member = Member();
+        member.KeepLastingAmount("clarity", 1);
+
+        Assert.True(member.HasAnythingToRest);
+    }
+
+    [Fact]
+    public void HasAnythingToRest_FullHpLastingFull_IsFalse()
+    {
+        var member = Member();
+
+        Assert.False(member.HasAnythingToRest);
+    }
+
     private static PartyMember Member()
     {
         var clarity = new ResourceDefinition("clarity", "Clarity", Max: 3, StartsAt: 3) { IsLasting = true };

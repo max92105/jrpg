@@ -36,17 +36,26 @@ internal sealed class ItemUseDialog
 
     public bool IsOpen => _open is not null;
 
+    /// <summary>Opens the member picker, or uses a rest item at once: it takes the whole party.</summary>
+    /// <returns>What happened when the item was used at once; null when the picker opened.</returns>
     /// <exception cref="InvalidOperationException">The item can't be used now (<see cref="FieldItemUse.CanUse"/>).</exception>
-    public void Open(ItemDefinition item)
+    public string? UseOrPickTarget(ItemDefinition item)
     {
         if (!_fieldItems.CanUse(item))
         {
             throw new InvalidOperationException($"{item.Name} can't be used now.");
         }
 
+        if (item.Effect?.Kind == EffectKind.Rest)
+        {
+            _fieldItems.RestParty(item);
+            return _messages.Text(MessageIds.PartyRests);
+        }
+
         var picker = new ItemTargetPicker(_party.Members, _fieldItems.TargetChoiceForAnyUser(item));
         _open = new OpenUse(item, picker);
         _view.Show(picker, item, _party.Leader);
+        return null;
     }
 
     /// <summary>Cancel closes the picker; Confirm uses the item.</summary>

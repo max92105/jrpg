@@ -163,9 +163,15 @@ internal sealed class InventoryPage : IMenuPage
 
     private void OpenItemUse()
     {
-        if (_rowCursor is not null && _rows[_rowCursor.Selected].IsUsable)
+        if (_rowCursor is null || !_rows[_rowCursor.Selected].IsUsable)
         {
-            _itemUse.Open(_catalog.Items[_rows[_rowCursor.Selected].ItemId]);
+            return;
+        }
+
+        if (_itemUse.UseOrPickTarget(_catalog.Items[_rows[_rowCursor.Selected].ItemId]) is { } result)
+        {
+            _notice = result;
+            ShowRowsFrom(_rowCursor.Selected);
         }
     }
 

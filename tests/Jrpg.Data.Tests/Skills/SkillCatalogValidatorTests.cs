@@ -57,6 +57,16 @@ public sealed class SkillCatalogValidatorTests
     }
 
     [Fact]
+    public void Validate_RestSkill_Throws()
+    {
+        var rest = _heal with { Effect = new Effect(EffectKind.Rest, Power: 0, Targeting.AllAllies) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => SkillCatalogValidator.Validate(FileName, [rest]));
+
+        Assert.Equal("skills.json: skill 'heal': effect.kind rest is for items only; a skill is used in battle, where nobody rests.", exception.Message);
+    }
+
+    [Fact]
     public void Validate_ZeroResourceChange_Throws()
     {
         var idle = _heal with { ResourceChanges = [new ResourceChange("faith", 0)] };

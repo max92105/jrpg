@@ -161,6 +161,16 @@ public sealed class BattleSkillAndItemTests
     }
 
     [Fact]
+    public void CanUse_CampKitInBattle_ReturnsFalse()
+    {
+        var kit = Item("camp_kit", new Effect(EffectKind.Rest, 0, Targeting.AllAllies));
+        _inventory.Add(kit, 1);
+        var battle = CreateBattle();
+
+        Assert.False(battle.CanUse(kit));
+    }
+
+    [Fact]
     public void CanUse_ReviveItemWithAllyFallen_ReturnsTrue()
     {
         var feather = Item("revive_feather", new Effect(EffectKind.Revive, 15, Targeting.AllFallenAllies));

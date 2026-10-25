@@ -18,6 +18,8 @@ internal static class EffectResolver
         EffectKind.Revive => target.Revive(effect.Power),
         EffectKind.GrantStatus => 0,
         EffectKind.ReadyExtraTurn => 0,
+        // A rest has no single target: FieldItemUse rests every member, and battle refuses a rest item.
+        EffectKind.Rest => throw new InvalidOperationException("A rest effect never lands on one target."),
         _ => throw new ArgumentOutOfRangeException(nameof(effect), effect.Kind, "Unknown effect kind."),
     };
 }

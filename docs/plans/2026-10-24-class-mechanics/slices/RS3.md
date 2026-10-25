@@ -26,3 +26,10 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
     - `ItemCatalogValidatorTests`: `Validate_RestItemNotUsableFromMenu_Throws`
     - `ItemUseDialogTests`: `Confirm_CampKit_UsesWithoutPickingMember`
   - **Verify by hand:** wear Omer down, open Items, use the Camp Kit: the count drops, and the next fight starts at 3 mana with full HP.
+- **Done, with deviations:**
+  - `FieldItemUse.RestParty(item)` uses a rest item, and `Use` refuses one, since a rest has no chosen targets. `PartyMember.HasAnythingToRest` (HP below max, or a lasting resource off its starting amount) says whether the kit can be used.
+  - `ItemUseDialog.Open` now returns the result when it uses the item at once, and `InventoryPage` shows it as the notice.
+  - The skill validator also refuses a rest effect, which would otherwise reach `EffectResolver` in battle.
+  - The page test is `InventoryPageRestItemTests.Confirm_CampKit_UsesWithoutPickingMember`, in a new file because `InventoryPageTests` is 325 lines. There is no `ItemUseDialogTests`.
+  - Extra tests: a greyed kit uses nothing, `Use` refuses a rest item, and a rest skill is refused.
+  - After review: `ItemUseDialog.Open` is renamed `UseOrPickTarget`, since it can use the item at once; two `PartyMemberRestTests` pin the lasting half of `HasAnythingToRest`.

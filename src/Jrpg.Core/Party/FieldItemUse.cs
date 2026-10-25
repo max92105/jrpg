@@ -10,14 +10,35 @@ namespace Jrpg.Core.Party;
 public sealed class FieldItemUse(PartyState party, Inventory inventory)
 {
     /// <summary>
-    /// Usable from the menu, owned, and aimed at someone right now: a revive with nobody fallen can't be used. Any member
-    /// may be the user, so a "self" item is usable while anyone is standing.
+    /// Usable from the menu, owned, and aimed at someone right now: a revive with nobody fallen can't be used. Any
+    /// member may be the user, so a "self" item is usable while anyone is standing. A rest item aims at nobody: it is
+    /// usable while anyone has something to rest.
     /// </summary>
     public bool CanUse(ItemDefinition item) =>
         item.IsUsableFromMenu
         && item.Effect is { } effect
         && inventory.QuantityOf(item.Id) > 0
-        && party.Members.Any(member => TargetRules.CanTarget(effect.Targeting, TargetRelation.Self, member.Vitals));
+        && (effect.Kind == EffectKind.Rest
+            ? party.Members.Any(member => member.HasAnythingToRest)
+            : party.Members.Any(member => TargetRules.CanTarget(effect.Targeting, TargetRelation.Self, member.Vitals)));
+
+    /// <summary>Uses a rest item: every recruited member rests, reserves too, as at an inn (decision 230).</summary>
+    /// <exception cref="InvalidOperationException">
+    /// The item isn't a rest item, or can't be used now (<see cref="CanUse"/>).
+    /// </exception>
+    public void RestParty(ItemDefinition item)
+    {
+        if (item.Effect?.Kind != EffectKind.Rest || !CanUse(item))
+        {
+            throw new InvalidOperationException($"{item.Name} can't rest the party now (not a rest item, not owned, or nobody needs it).");
+        }
+
+        inventory.TryRemove(item.Id, 1);
+        foreach (var member in party.Members)
+        {
+            member.Rest();
+        }
+    }
 
     /// <summary>Who <paramref name="user"/> can use the item on, by the same rules <see cref="Use"/> checks.</summary>
     /// <param name="item">A consumable.</param>
@@ -68,9 +89,9 @@ public sealed class FieldItemUse(PartyState party, Inventory inventory)
     /// <exception cref="ArgumentException">The user isn't recruited, or the targets aren't legal for this item.</exception>
     public IReadOnlyList<int> Use(ItemDefinition item, PartyMember user, IReadOnlyList<PartyMember> targets)
     {
-        if (!CanUse(item) || item.Effect is not { } effect)
+        if (!CanUse(item) || item.Effect is not { } effect || effect.Kind == EffectKind.Rest)
         {
-            throw new InvalidOperationException($"{item.Name} can't be used from the menu (not usable there, not owned, or nobody it can be used on).");
+            throw new InvalidOperationException($"{item.Name} can't be used from the menu on chosen targets (not usable there, not owned, nobody it can be used on, or a rest item).");
         }
 
         var validTargets = TargetChoiceFor(item, user).Candidates.ToHashSet();

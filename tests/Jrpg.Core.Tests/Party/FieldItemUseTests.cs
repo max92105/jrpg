@@ -234,6 +234,34 @@ public sealed class FieldItemUseTests
         Assert.Equal(50, _jazog.Vitals.Hp);
     }
 
+    [Fact]
+    public void RestParty_CampKit_RestsEveryMemberAndConsumes()
+    {
+        var kit = Owned(Item("camp_kit", EffectKind.Rest, 0, Targeting.AllAllies), copies: 2);
+
+        _fieldItems.RestParty(kit);
+
+        Assert.All([_sarxian, _jazog, _reserve], member => Assert.Equal(member.Vitals.MaxHp, member.Vitals.Hp));
+        Assert.Equal(1, _inventory.QuantityOf(kit.Id));
+    }
+
+    [Fact]
+    public void CanUse_CampKitNothingToRestore_ReturnsFalse()
+    {
+        var kit = Owned(Item("camp_kit", EffectKind.Rest, 0, Targeting.AllAllies), copies: 2);
+        _fieldItems.RestParty(kit);
+
+        Assert.False(_fieldItems.CanUse(kit));
+    }
+
+    [Fact]
+    public void Use_CampKitOnChosenTargets_Throws()
+    {
+        var kit = Owned(Item("camp_kit", EffectKind.Rest, 0, Targeting.AllAllies), copies: 1);
+
+        Assert.Throws<InvalidOperationException>(() => _fieldItems.Use(kit, _sarxian, [_sarxian, _jazog, _reserve]));
+    }
+
     private static PartyMember Member(string id, int hp) =>
         new PartyMemberBuilder().WithId(id).WithVitals(hp, maxHp: 100).Build();
 

@@ -124,7 +124,7 @@ public sealed class BattleState
     /// </summary>
     public bool CanUse(ItemDefinition item) =>
         CurrentActor.Side == BattleSide.Party && item.Effect is { } effect && _inventory.QuantityOf(item.Id) > 0
-        && ChoiceFor(effect).Candidates.Count > 0;
+        && effect.Kind != EffectKind.Rest && ChoiceFor(effect).Candidates.Count > 0;
 
     /// <summary>Gives the enemies' experience to the party members still standing (developer decision 13). Call once, after a victory.</summary>
     /// <returns>The total experience and one gain per living party member, with the level steps it produced.</returns>

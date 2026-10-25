@@ -136,7 +136,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **LR3. The mage's Clarity lowers starting mana; the cleric's faith lasts** (Core + Data + content, about 200 lines) → [slices/LR3.md](slices/LR3.md)
 - [x] **RS1. The rest step: an event rests the party** (Core + Data + Game, about 240 lines) → [slices/RS1.md](slices/RS1.md)
 - [x] **RS2. The editor authors the rest step; a placeholder inn on the start map** (Editor + content, about 160 lines) → [slices/RS2.md](slices/RS2.md)
-- [ ] **RS3. A rest item, used from the menu** (Core + Data + content + Game, about 200 lines) → [slices/RS3.md](slices/RS3.md)
+- [x] **RS3. A rest item, used from the menu** (Core + Data + content + Game, about 200 lines) → [slices/RS3.md](slices/RS3.md)
 
 ### Phase 8: the look
 - [ ] **LK1. Resource look: pips or a thin bar in the resource's color, spaced-caps label** (Game + Data + content, about 240 lines) → [slices/LK1.md](slices/LK1.md)

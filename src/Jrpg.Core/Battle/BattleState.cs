@@ -5,6 +5,7 @@ using Jrpg.Core.Progression;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
+using Jrpg.Core.Statuses;
 
 namespace Jrpg.Core.Battle;
 
@@ -238,10 +239,23 @@ public sealed class BattleState
             return;
         }
 
-        TurnUpkeep.ApplyPerTurnGains(actor, events);
-        TurnUpkeep.CountDownStatuses(actor, Combatants, events);
+        RunUpkeep(actor, events);
+        SettleOutcome(events);
+        if (!IsOver)
+        {
+            AdvanceToNextActor(events);
+        }
+    }
 
-        // Defeat is checked first, as in the demo: if both sides fall in one turn, the party loses.
+    private void RunUpkeep(Combatant holder, List<BattleEvent> events)
+    {
+        TurnUpkeep.ApplyPerTurnGains(holder, events);
+        TurnUpkeep.CountDownStatuses(holder, Combatants, events);
+    }
+
+    // Defeat is checked first, as in the demo: if both sides fall in one turn, the party loses.
+    private void SettleOutcome(List<BattleEvent> events)
+    {
         if (LivingOn(BattleSide.Party).Count == 0)
         {
             Phase = BattlePhase.Defeat;
@@ -252,11 +266,31 @@ public sealed class BattleState
         }
         else
         {
-            _turnOrder.Advance();
-            Phase = TurnPhaseOf(CurrentActor);
             return;
         }
 
         events.Add(new BattleEnded(Phase));
+    }
+
+    // A stunned combatant's turn is skipped inside the same Execute, so the screen never sees it as the actor. The
+    // lost turn still runs its upkeep, so the stun counts down and the loop always ends (ADR 0021).
+    private void AdvanceToNextActor(List<BattleEvent> events)
+    {
+        _turnOrder.Advance();
+        while (CurrentActor.Statuses.Has(StatusKind.Stun))
+        {
+            var skipped = CurrentActor;
+            events.Add(new TurnSkipped(skipped, StatusKind.Stun));
+            RunUpkeep(skipped, events);
+            SettleOutcome(events);
+            if (IsOver)
+            {
+                return;
+            }
+
+            _turnOrder.Advance();
+        }
+
+        Phase = TurnPhaseOf(CurrentActor);
     }
 }

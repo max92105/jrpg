@@ -19,3 +19,10 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
       - `Execute_OnlyEnemyStunnedBeforeMember_PhaseIsPartyTurn`
       - `Execute_StunnedActorsUpkeep_GainsPerTurn` (a lost turn is still a turn)
   - **Verify by hand:** none (no content yet).
+- **Done, with deviations:** Tests 1848 before, 1853 after: 6 added, 1 deleted. Beyond the plan:
+  - `EndTurn` is split into `RunUpkeep`, `SettleOutcome` and `AdvanceToNextActor`, so the skipped turn reuses the upkeep and the outcome check.
+  - Three ST1 tests had the stunned goblin act. They now follow the skip:
+    - the fall test drops the goblin's Defend;
+    - the countdown test uses three combatants, so a turn in between can be shown not to count;
+    - `Execute_StatusRunsOut_ReportsStatusEnded` is deleted. `Execute_StunForOneTurn_EndsOnTheSkippedTurn` covers the same event, since a stun can only run out on a skipped turn.
+  - `BattleState` is now 296 lines; the next slice that touches it should move turn flow out.

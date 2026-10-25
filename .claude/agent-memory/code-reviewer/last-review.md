@@ -5,10 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/ST1.md, slice ST1 (statuses in Core)
-Round: 1 (verdict: Ready to commit; verify all pass, 1847 tests)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/ST2.md, slice ST2 (a stunned combatant loses its turn)
+Round: 1 (verdict: Ready to commit; verify all pass, 1853 tests)
 
-- Warning, open: TurnUpkeep.CountDownStatuses's StatusEnded on run-out has no battle-level test (only StatusSet.CountDown's return is tested).
-- Suggestion, open: Execute_TargetFalls_StatusesCleared uses Contains; pin CombatantDefeated -> StatusEnded order.
-- Suggestion, open: EffectValidator accepts power > 0 on a grantStatus effect, which Effect's doc says is unused.
-- Follow-up: ActionPlayback.Read throws on StatusApplied/StatusEnded (known gap, FT1).
+- Suggestion, open: Execute_StatusOnOther_CountsDownAtEndOfHolderTurn could assert the TurnSkipped for the second goblin, so the name's "holder turn" is visible in the test.
+- Follow-up: the IsOver return inside AdvanceToNextActor can't happen yet (upkeep can't kill); test it when a damage-over-time status lands.
+- Follow-up: the battle screen throws on TurnSkipped (known gap, FT1).
+- Follow-up: BattleState at 296 lines; move turn flow out on the next slice touching it (Done note).
+- ST1 findings (StatusEnded battle-level test, fall order pin): fixed by ST2's tests.

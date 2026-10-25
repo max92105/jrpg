@@ -103,7 +103,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 3: statuses, the fighter, the barbarian, the paladin and the formation
 - [x] **ADR 0021: Status effects** (before ST1) → [slices/ADR-0021.md](slices/ADR-0021.md)
 - [x] **ST1. Statuses in Core: granted by effects, counted down from the holder's next turn, cleared on a fall** (Core + Data, about 260 lines) → [slices/ST1.md](slices/ST1.md)
-- [ ] **ST2. A stunned combatant loses its turn** (Core, about 150 lines) → [slices/ST2.md](slices/ST2.md)
+- [x] **ST2. A stunned combatant loses its turn** (Core, about 150 lines) → [slices/ST2.md](slices/ST2.md)
 - [ ] **FT1. The fighter: stamina and a stunning bash; the screen shows statuses plainly** (content + Game, about 250 lines) → [slices/FT1.md](slices/FT1.md)
 - [ ] **BB1. The barbarian: ferocity from hits taken; Taunt draws the enemies' attacks** (Core + Data + content + Game text, about 260 lines) → [slices/BB1.md](slices/BB1.md)
 - [ ] **PL1. The paladin: conviction from fallen enemies and heavy hits; Smite; the cleric loses faith on heavy hits** (Core + Data + content, about 230 lines) → [slices/PL1.md](slices/PL1.md)

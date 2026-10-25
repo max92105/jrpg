@@ -1,6 +1,8 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
+using Jrpg.Core.Party;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Statuses;
 using Jrpg.Core.Tests.Builders;
@@ -9,8 +11,9 @@ using Jrpg.Core.Tests.Randomness;
 namespace Jrpg.Core.Tests.Battle;
 
 // A hero against one goblin (25 HP, defense 2); the shuffle (1) keeps the listed order, the hero first.
-// Bash deals 15 - 2 = 13 damage and stuns for 2 turns; Jab deals 3 and stuns for 1; Brace stuns the hero for 2
-// turns and changes no HP.
+// Bash deals 15 - 2 = 13 damage and stuns for 2 turns; Jab deals 3 and stuns for 1; Quake does the same to every
+// enemy; Brace stuns the hero for 2 turns and changes no HP. A stunned combatant's turn is skipped within the Execute
+// that ends the turn before it.
 public sealed class BattleStatusTests
 {
     private static readonly SkillDefinition _bash =
@@ -19,10 +22,13 @@ public sealed class BattleStatusTests
     private static readonly SkillDefinition _jab =
         Skill("jab", new Effect(EffectKind.Damage, 5, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1)));
 
+    private static readonly SkillDefinition _quake =
+        Skill("quake", new Effect(EffectKind.Damage, 5, Targeting.AllEnemies, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1)));
+
     private static readonly SkillDefinition _brace =
         Skill("brace", new Effect(EffectKind.GrantStatus, 0, Targeting.Self, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 2)));
 
-    private readonly Combatant _hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithSkills(_bash, _jab, _brace).Build());
+    private readonly Combatant _hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithSkills(_bash, _jab, _quake, _brace).Build());
 
     [Fact]
     public void Execute_DamageWithStatus_AppliesAfterDamageAndReports()
@@ -70,16 +76,20 @@ public sealed class BattleStatusTests
         Assert.Equal([new ActiveStatus(StatusKind.Stun, 0, TurnsLeft: 2, IsFresh: false)], _hero.Statuses.Active);
     }
 
+    // The second goblin is stunned on the hero's turn; the first goblin's turn in between doesn't count it down.
     [Fact]
     public void Execute_StatusOnOther_CountsDownAtEndOfHolderTurn()
     {
-        var goblin = Goblin(hp: 25);
-        var battle = Battle(goblin);
-        battle.Execute(new SkillCommand(_bash, [goblin]));
+        var (first, second) = (Goblin(hp: 25), Goblin(hp: 25));
+        var battle = new BattleState([_hero, first, second], new Inventory(), new FixedSequenceRandom(2, 1));
+        battle.Execute(new SkillCommand(_bash, [second]));
+        var turnsBeforeHolderTurn = second.Statuses.Active[0].TurnsLeft;
 
-        battle.Execute(new DefendCommand());
+        var events = battle.Execute(new DefendCommand());
 
-        Assert.Equal([new ActiveStatus(StatusKind.Stun, 0, TurnsLeft: 1, IsFresh: false)], goblin.Statuses.Active);
+        Assert.Equal(2, turnsBeforeHolderTurn);
+        Assert.Contains(new TurnSkipped(second, StatusKind.Stun), events);
+        Assert.Equal([new ActiveStatus(StatusKind.Stun, 0, TurnsLeft: 1, IsFresh: false)], second.Statuses.Active);
     }
 
     [Fact]
@@ -88,7 +98,6 @@ public sealed class BattleStatusTests
         var goblin = Goblin(hp: 25);
         var battle = Battle(goblin);
         battle.Execute(new SkillCommand(_bash, [goblin]));
-        battle.Execute(new DefendCommand());
 
         var events = battle.Execute(new SkillCommand(_bash, [goblin]));
 
@@ -98,16 +107,82 @@ public sealed class BattleStatusTests
     }
 
     [Fact]
-    public void Execute_StatusRunsOut_ReportsStatusEnded()
+    public void Execute_NextActorStunned_SkipsTurnAndReportsIt()
     {
         var goblin = Goblin(hp: 25);
         var battle = Battle(goblin);
+
+        var events = battle.Execute(new SkillCommand(_bash, [goblin]));
+
+        Assert.Contains(new TurnSkipped(goblin, StatusKind.Stun), events);
+        Assert.Equal([new ActiveStatus(StatusKind.Stun, 0, TurnsLeft: 1, IsFresh: false)], goblin.Statuses.Active);
+    }
+
+    [Fact]
+    public void Execute_StunForOneTurn_EndsOnTheSkippedTurn()
+    {
+        var goblin = Goblin(hp: 25);
+        var battle = Battle(goblin);
+
+        var events = battle.Execute(new SkillCommand(_jab, [goblin])).ToList();
+
+        var skipped = events.IndexOf(new TurnSkipped(goblin, StatusKind.Stun));
+        Assert.Equal(new StatusEnded(goblin, StatusKind.Stun), events[skipped + 1]);
+        Assert.Empty(goblin.Statuses.Active);
+    }
+
+    [Fact]
+    public void Execute_TwoStunnedInARow_SkipsBoth()
+    {
+        var (first, second) = (Goblin(hp: 25), Goblin(hp: 25));
+        var battle = new BattleState([_hero, first, second], new Inventory(), new FixedSequenceRandom(2, 1));
+
+        var events = battle.Execute(new SkillCommand(_quake, [first, second]));
+
+        Assert.Equal([first, second], events.OfType<TurnSkipped>().Select(skip => skip.Combatant));
+        Assert.Same(_hero, battle.CurrentActor);
+    }
+
+    [Fact]
+    public void Execute_StunnedSkipped_CurrentActorIsTheOneAfter()
+    {
+        var (first, second) = (Goblin(hp: 25), Goblin(hp: 25));
+        var battle = new BattleState([_hero, first, second], new Inventory(), new FixedSequenceRandom(2, 1));
+
+        battle.Execute(new SkillCommand(_jab, [first]));
+
+        Assert.Same(second, battle.CurrentActor);
+        Assert.Equal(BattlePhase.EnemyTurn, battle.Phase);
+    }
+
+    [Fact]
+    public void Execute_OnlyEnemyStunnedBeforeMember_PhaseIsPartyTurn()
+    {
+        var goblin = Goblin(hp: 25);
+        var battle = Battle(goblin);
+
         battle.Execute(new SkillCommand(_jab, [goblin]));
+
+        Assert.Same(_hero, battle.CurrentActor);
+        Assert.Equal(BattlePhase.PartyTurn, battle.Phase);
+    }
+
+    // A lost turn is still a turn: the stunned mage gains mana on it.
+    [Fact]
+    public void Execute_StunnedActorsUpkeep_GainsPerTurn()
+    {
+        var mana = new ResourceDefinition("mana", "Mana", Max: 10, StartsAt: 3) { Gains = new ResourceGains { PerTurn = 2 } };
+        var mage = Combatant.FromPartyMember(PartyMember.Recruit(
+            new PartyMemberBuilder().WithId("omer").BuildDefinition(),
+            new ClassBuilder().WithId("mage").WithResources(mana).WithSkills("brace").Build(),
+            new Dictionary<string, SkillDefinition> { ["brace"] = _brace }));
+        var battle = new BattleState([mage, Goblin(hp: 25)], new Inventory(), new FixedSequenceRandom(1));
+        battle.Execute(new SkillCommand(_brace, [mage]));
 
         var events = battle.Execute(new DefendCommand());
 
-        Assert.Contains(new StatusEnded(goblin, StatusKind.Stun), events);
-        Assert.Empty(goblin.Statuses.Active);
+        Assert.Contains(new TurnSkipped(mage, StatusKind.Stun), events);
+        Assert.Equal(7, mage.Resources.AmountOf("mana"));
     }
 
     private BattleState Battle(Combatant goblin) => new([_hero, goblin], new Inventory(), new FixedSequenceRandom(1));

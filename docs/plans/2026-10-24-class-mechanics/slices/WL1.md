@@ -32,3 +32,7 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
     - Void Rift and Chaos Lance start with "Needs ...".
     - Each Bolt nets +1 over his turn, so Void Rift unlocks on his fifth turn.
     - Instability drains when he stops casting.
+- **Done, with deviations:** Tests 1951 before, 1957 after. Beyond the plan:
+  - `SkillCostText` shows a skill's change (its cost, else its gain) and its requirement, joined by `battle_skill_change_and_need` ("{change} · {need}") when it has both. Before, a cost hid the requirement.
+  - `BattleSceneTests`' Defend presses Down three times again, now that Sarxian has skills (as CS1 predicted). No other Game test cast Sarxian's first skill.
+  - The three spells' descriptions are marked as placeholders.

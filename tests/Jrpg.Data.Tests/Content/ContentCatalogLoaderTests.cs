@@ -144,6 +144,18 @@ public sealed class ContentCatalogLoaderTests
     }
 
     [Fact]
+    public void Load_RepositoryContent_WarlockHasInstability()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        var warlock = catalog.ClassOf(catalog.PartyMembers["sarxian"]);
+
+        var instability = warlock.Resources.Single(resource => resource.Id == "instability");
+        Assert.Equal((10, 0, -1), (instability.Max, instability.StartsAt, instability.Gains.PerTurn));
+        Assert.Equal([new ResourceRequirement("instability", 7)], catalog.Skills["chaos_lance"].Requirements);
+    }
+
+    [Fact]
     public void Load_RepositoryContent_MageHasMana()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));

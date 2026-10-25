@@ -103,6 +103,8 @@
   "battle_next": "NEXT",
   "battle_defends": "{name} defends.",
   "battle_skill_resource_cost": "{amount} {resource}",
+  "battle_skill_resource_gain": "+{amount} {resource}",
+  "battle_skill_change_and_need": "{change} · {need}",
   "battle_skill_resource_needed": "Needs {amount} {resource}",
   "battle_skill_resource_level": "{resource} {amount}",
   "battle_not_enough_resource": "Not enough {resource}.",

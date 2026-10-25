@@ -20,6 +20,17 @@ public sealed class BattleStateResourceTests
     private static readonly SkillDefinition _blast = Spell("blast", manaCost: 2);
     private static readonly SkillDefinition _meteor = Spell("meteor", manaCost: 5);
 
+    private static readonly SkillDefinition _bolt = Spell("bolt", manaCost: 0) with
+    {
+        ResourceChanges = [new ResourceChange("instability", 2)],
+    };
+
+    private static readonly SkillDefinition _voidRift = Spell("void_rift", manaCost: 0) with
+    {
+        ResourceChanges = [new ResourceChange("instability", 3)],
+        Requirements = [new ResourceRequirement("instability", 4)],
+    };
+
     private readonly PartyMember _mage = PartyMember.Recruit(
         new PartyMemberBuilder().WithId("omer").BuildDefinition(),
         new ClassBuilder().WithId("mage").WithResources(_mana).WithSkills("blast", "meteor").Build(),
@@ -183,6 +194,55 @@ public sealed class BattleStateResourceTests
         Assert.IsType<EffectApplied>(events[1]);
         Assert.Equal(new ResourceChanged(barbarian, "ferocity", 2), events[2]);
         Assert.Equal(new CombatantDefeated(barbarian), events[3]);
+    }
+
+    [Fact]
+    public void Execute_WarlockTurnEnds_InstabilityFallsByOne()
+    {
+        var (warlock, battle) = WarlockAgainstGoblin();
+        warlock.Resources.Change("instability", 5);
+
+        battle.Execute(new DefendCommand());
+
+        Assert.Equal(4, warlock.Resources.AmountOf("instability"));
+    }
+
+    // Void Rift needs 4 and adds 3: at 3 it stays unusable, though casting it would leave 6.
+    [Fact]
+    public void CanUse_RequirementJudgedBeforeOwnGain_StillShortAtThree()
+    {
+        var (warlock, battle) = WarlockAgainstGoblin();
+        warlock.Resources.Change("instability", 3);
+
+        var canUse = battle.CanUse(_voidRift);
+
+        Assert.False(canUse);
+    }
+
+    // At 9 of 10, a Bolt (+2) adds only 1; the end of the turn then takes 1 off.
+    [Fact]
+    public void Execute_GainPastMax_StopsAtMax()
+    {
+        var (warlock, battle) = WarlockAgainstGoblin();
+        warlock.Resources.Change("instability", 9);
+        var goblin = battle.LivingOn(BattleSide.Enemies)[0];
+
+        var events = battle.Execute(new SkillCommand(_bolt, [goblin]));
+
+        Assert.Equal(new ResourceChanged(warlock, "instability", 1), events[1]);
+        Assert.Equal(9, warlock.Resources.AmountOf("instability"));
+    }
+
+    // A warlock with Instability (0 of 10, −1 a turn), Eldritch Bolt (+2) and Void Rift (+3, needs 4), acting first.
+    private static (Combatant Warlock, BattleState Battle) WarlockAgainstGoblin()
+    {
+        var instability = new ResourceDefinition("instability", "Instability", Max: 10, StartsAt: 0) { Gains = new ResourceGains { PerTurn = -1 } };
+        var warlock = Combatant.FromPartyMember(PartyMember.Recruit(
+            new PartyMemberBuilder().WithId("sarxian").BuildDefinition(),
+            new ClassBuilder().WithId("warlock").WithResources(instability).WithSkills("bolt", "void_rift").Build(),
+            new Dictionary<string, SkillDefinition> { ["bolt"] = _bolt, ["void_rift"] = _voidRift }));
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20, defense: 2).Build());
+        return (warlock, new BattleState([warlock, goblin], new Inventory(), new FixedSequenceRandom(1)));
     }
 
     private BattleState StartBattle()

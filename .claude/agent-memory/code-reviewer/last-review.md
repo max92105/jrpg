@@ -5,10 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/RG4.md, slice RG4 (rogue kit: Ready and Expose, Exposed status)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/WL1.md, slice WL1 (warlock instability, gain/need skill row text)
 Round: 1 (verdict: Ready to commit)
 
-- Warning: BattleTurnSequenceTests.Update_AfterReady_SameMemberStepsForwardAgain passes even if Ready is not quick (goblin acts, then readied turn awaits); pin UpcomingActors; open
-- Suggestion: EffectLanding.cs:21 ~185-column call; extract a `damageTakenPercent` local; open
-- Suggestion: CommandMenuTests name says "BothSides" but the solo-Lazarus fixture only has enemies; open
-- Closed (RG3, commit f351825): TurnOrder.Advance checks readied turns after an extra turn too (lastActor rule), and ItemCatalogValidator rejects otherCombatant targeting on items. Don't re-raise them.
+- Suggestion: SkillCostText.CostOf / class name now also return gains ("+2 Instability"); consider `RowTextOf` / `SkillResourceText` when next touched; open
+- Suggestion: BattleStateResourceTests.cs:23 `_bolt` declaration ~150 columns; break it like `_voidRift`; open
+- Closed (RG4): the RG4 findings were left with the developer at commit fbef16e. Don't re-raise them.

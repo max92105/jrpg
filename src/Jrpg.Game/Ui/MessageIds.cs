@@ -284,6 +284,12 @@ internal static class MessageIds
     /// <summary>Placeholders <c>{amount}</c>, <c>{resource}</c>: a skill's resource cost on its battle row.</summary>
     public const string BattleSkillResourceCost = "battle_skill_resource_cost";
 
+    /// <summary>Placeholders <c>{amount}</c>, <c>{resource}</c>: what a skill adds, on its battle row.</summary>
+    public const string BattleSkillResourceGain = "battle_skill_resource_gain";
+
+    /// <summary>Placeholders <c>{change}</c>, <c>{need}</c>: a skill row's change and requirement together.</summary>
+    public const string BattleSkillChangeAndNeed = "battle_skill_change_and_need";
+
     /// <summary>Placeholders <c>{amount}</c>, <c>{resource}</c>: an unmet requirement on its battle row.</summary>
     public const string BattleSkillResourceNeeded = "battle_skill_resource_needed";
 

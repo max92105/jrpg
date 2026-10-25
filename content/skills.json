@@ -132,5 +132,31 @@
       "kind": "grantStatus", "power": 0, "targeting": "singleEnemy",
       "status": { "kind": "exposed", "power": 50, "turns": 3 }
     }
+  },
+  {
+    "id": "eldritch_bolt",
+    "name": "Eldritch Bolt",
+    "description": "A bolt of raw force at one enemy. Builds instability. Placeholder: the developer writes the real spell.",
+    "iconFile": "Attack.png",
+    "resourceChanges": [ { "resourceId": "instability", "amount": 2 } ],
+    "effect": { "kind": "damage", "power": 20, "targeting": "singleEnemy" }
+  },
+  {
+    "id": "void_rift",
+    "name": "Void Rift",
+    "description": "Tears the air around every enemy. Needs some instability, and builds more. Placeholder: the developer writes the real spell.",
+    "iconFile": "Attack.png",
+    "resourceChanges": [ { "resourceId": "instability", "amount": 3 } ],
+    "requirements": [ { "resourceId": "instability", "atLeast": 4 } ],
+    "effect": { "kind": "damage", "power": 25, "targeting": "allEnemies" }
+  },
+  {
+    "id": "chaos_lance",
+    "name": "Chaos Lance",
+    "description": "A lance of chaos at one enemy. Needs a lot of instability, and builds more. Placeholder: the developer writes the real spell.",
+    "iconFile": "Attack.png",
+    "resourceChanges": [ { "resourceId": "instability", "amount": 4 } ],
+    "requirements": [ { "resourceId": "instability", "atLeast": 7 } ],
+    "effect": { "kind": "damage", "power": 70, "targeting": "singleEnemy" }
   }
 ]

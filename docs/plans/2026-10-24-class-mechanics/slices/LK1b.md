@@ -26,3 +26,11 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
     - Thaali's two rows with the dominant one lit.
     - Jazog's pips flash when hit.
     - Five members fit beside the turn-order strip, and nothing blurs.
+- **Done, with deviations:**
+  - The pips need no numbers, so `ResourceRowsText` and its tests are gone. `ResourceGaugeView` reads the meters itself.
+  - A large resource (none in content today; the largest max is 10) shows only its thin colored bar, without M3's number.
+  - Pip sizes sit in `PipRow` and label sizes in `ResourceGaugeView`, as design.md places them, rather than in `UiTheme`.
+  - Two small records join `PipRow`: `PipRowLook` and `PipFlash`. `OutlinedFont.Draw` takes an optional letter spacing for the spaced caps.
+  - The view's flash clock runs through a new `PartyStatusView.Update`, which `BattleScene` calls.
+  - Test names: `ShowsPips_*` instead of `ShapeOf_*`, since the shape is a bool. Extra tests: the force label when not dominant, and `PipFlashTests`.
+  - After review: the flashing range is `PipFlash.Between(before, after)`, tested for a rise and a drop; `LabelColor` takes only whether the resource dominates, since only a force can.

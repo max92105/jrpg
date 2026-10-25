@@ -101,6 +101,7 @@ internal sealed class BattleScene : IScene
         _turnOrderStrip.Highlight(_commands.Targets?.Selected ?? []);
         _banner.Update(delta);
         _commandPanel.Advance(delta);
+        _partyStatus.Update(delta);
         _sequence.Update(delta);
         if (!ReferenceEquals(_sequence.Playback, _shownPlayback))
         {

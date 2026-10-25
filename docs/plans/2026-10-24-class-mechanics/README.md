@@ -140,7 +140,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 8: the look
 - [x] **LK1a. Resource colors: each resource has its color, and its bar is drawn in it** (Core + Data + content + Game, about 170 lines) → [slices/LK1a.md](slices/LK1a.md)
-- [ ] **LK1b. Resource look: diamond pips, spaced-caps label, lasting marker, dominant force lit, flash** (Game, about 230 lines) → [slices/LK1b.md](slices/LK1b.md)
+- [x] **LK1b. Resource look: diamond pips, spaced-caps label, lasting marker, dominant force lit, flash** (Game, about 230 lines) → [slices/LK1b.md](slices/LK1b.md)
 - [ ] **LK2. Status look: small marks with turns left; tick and backfire pops** (Game, about 220 lines) → [slices/LK2.md](slices/LK2.md)
 - [ ] **LK3. Formation look: battlers slide when they swap; the aura's reach and the readied turn are shown** (Game, about 200 lines) → [slices/LK3.md](slices/LK3.md)
 - [ ] **Z2. Play-through check** (manual) → [slices/Z2.md](slices/Z2.md)

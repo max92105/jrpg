@@ -5,9 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/LK1a.md, slice LK1a (resource colors, tinted battle bars)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/LK1b.md, slice LK1b (resource pips, spaced-caps labels, flash)
 Round: 1 (verdict: Ready to commit)
 
-- Suggestion: UiTheme.cs:269 the "#AARRGGBB straight alpha" comment now sits above ColorFromHex instead of FromStraightArgb; move it back down; open
-- Suggestion: UiThemeTests.ColorFromHex_Valid_Parses could add a lowercase case (validator accepts a-f); open
-- Follow-up: Core tests build ResourceDefinition without Color; harmless now, but any Game test that reaches ColorFromHex with "" throws; open
+- Warning: ResourceGaugeView.cs Refresh: the flash range (min/max of old and new amount) has no test; swapping them makes Covers always false; extract PipFlash.Between(old, new) and test both directions; open
+- Suggestion: ResourceGaugeView.LabelColor `resource.Dominance is not null &&` is redundant if IsDominant is only true for forces; open

@@ -18,11 +18,13 @@ internal sealed class OutlinedFont(SpriteFontBase font)
     /// <param name="text">Formatted when its value changed, never per frame.</param>
     /// <param name="position">The text's top left.</param>
     /// <param name="color">Already faded; the outline fades with it.</param>
-    public void Draw(SpriteBatch batch, string text, Vector2 position, Color color)
+    /// <param name="characterSpacing">Extra pixels between letters, for spaced caps; 0 for plain text.</param>
+    public void Draw(SpriteBatch batch, string text, Vector2 position, Color color, float characterSpacing = 0)
     {
         var fade = color.A / 255f;
-        batch.DrawString(font, text, position, UiTheme.TextOutline * fade, effect: FontSystemEffect.Blurry, effectAmount: OutlineBlur);
-        batch.DrawString(font, text, position, color);
+        batch.DrawString(
+            font, text, position, UiTheme.TextOutline * fade, characterSpacing: characterSpacing, effect: FontSystemEffect.Blurry, effectAmount: OutlineBlur);
+        batch.DrawString(font, text, position, color, characterSpacing: characterSpacing);
     }
 
     /// <summary>Draws <paramref name="text"/> centered on a point and scaled about it, such as a number popping.</summary>

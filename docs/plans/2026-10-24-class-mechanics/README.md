@@ -127,7 +127,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **MO1. The monk: multi-hit skills and chakra from each hit landed** (Core + Data + content + Game, about 270 lines) → [slices/MO1.md](slices/MO1.md)
 
 ### Phase 6: play-test
-- [ ] **Z1. Run-through: every class's mechanic** (manual) → [slices/Z1.md](slices/Z1.md)
+- [x] **Z1. Run-through: every class's mechanic** (manual) → [slices/Z1.md](slices/Z1.md)
 
 ### Phase 7: lasting resources and rest
 - [ ] **ADR 0024: Lasting resources and rest** (before LR1) → [slices/ADR-0024.md](slices/ADR-0024.md)

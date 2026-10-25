@@ -126,7 +126,7 @@ internal sealed class CommandMenu
         }
     }
 
-    // A skill without the MP says so (decision 105); one with nobody to aim at stays greyed and does nothing.
+    // A skill the actor can't pay for says so (decision 105); one with nobody to aim at stays greyed and does nothing.
     private void ChooseSkill(BattleState battle, BattleSkillChoice skills, InputFrame input)
     {
         MoveWithin(skills, input);
@@ -136,7 +136,7 @@ internal sealed class CommandMenu
         }
         else if (input.IsPressed(GameButton.Confirm) && !battle.CanAfford(skills.Selected))
         {
-            skills.SayNotEnoughMp();
+            skills.SayCannotAfford();
         }
         else if (input.IsPressed(GameButton.Confirm) && battle.CanUse(skills.Selected))
         {

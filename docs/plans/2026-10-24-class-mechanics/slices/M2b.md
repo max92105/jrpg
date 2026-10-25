@@ -31,3 +31,7 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
     - Fire Blast on turn 1;
     - Meteor greyed with "Not enough Mana" until 9, then a big hit;
     - the next fight starts at 3 mana.
+- **Done, with deviations:** Tests 1820 before, 1826 after. Three things differ from the plan:
+  - `CommandMenuTests`' MP case already fought as Zanyr, a cleric (CS1), so only its names changed.
+  - `BattleSkillChoice` also exposes `Actor` and `LackingResourceAt`, captured when the list opens, so the panel formats every row's "not enough" line then.
+  - Meteor's description is marked as a placeholder.

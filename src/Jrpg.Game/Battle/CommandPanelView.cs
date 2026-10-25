@@ -51,12 +51,12 @@ internal sealed class CommandPanelView
     private readonly SpriteFontBase _hintFont;
     private readonly string[] _labels;
     private readonly string[] _hints;
-    private readonly string _notEnoughMp;
     private MeasuredText _actorName = new(string.Empty, 0);
     private IBattleListChoice? _shownList;
     private CommandRowLabel[] _listLabels = [];
     private MeasuredText[] _listAmounts = [];
     private string[] _listHints = [];
+    private string[] _cannotAffordHints = [];
     private TimeSpan _pointerTime;
 
     /// <param name="menu">The choice it shows.</param>
@@ -74,7 +74,6 @@ internal sealed class CommandPanelView
         _hintFont = text.Fonts.FontAt(HintTextPixels);
         _labels = [.. CommandMenu.Entries.Select(entry => text.Messages.Text(LabelIdOf(entry)))];
         _hints = [.. CommandMenu.Entries.Select(entry => text.Messages.Text(HintIdOf(entry)))];
-        _notEnoughMp = text.Messages.Text(MessageIds.BattleNotEnoughMp);
     }
 
     /// <summary>Moves the target pointer's bob on.</summary>
@@ -174,8 +173,10 @@ internal sealed class CommandPanelView
     {
         _shownList = skills;
         _listLabels = [.. skills.Skills.Select((skill, index) => new CommandRowLabel(skill.IconFile, skill.Name, OpacityOf(skills.IsUsable(index))))];
-        _listAmounts = [.. skills.Skills.Select(skill => AmountText(MessageIds.BattleSkillCost, "cost", skill.MpCost))];
+        var costs = new SkillCostText(_messages, skills.Actor.Resources);
+        _listAmounts = [.. skills.Skills.Select(skill => MeasuredText.Of(_rowFont, costs.CostOf(skill)))];
         _listHints = [.. skills.Skills.Select(skill => skill.Description)];
+        _cannotAffordHints = [.. skills.Skills.Select((_, index) => costs.CannotAffordText(skills.LackingResourceAt(index)))];
     }
 
     private void FormatRowsOf(BattleItemChoice items)
@@ -255,7 +256,7 @@ internal sealed class CommandPanelView
 
     private string HintText() => ((IBattleListChoice?)_menu.Skills ?? _menu.Items) switch
     {
-        BattleSkillChoice { IsSayingNotEnoughMp: true } => _notEnoughMp,
+        BattleSkillChoice { IsSayingCannotAfford: true } skills => _cannotAffordHints[skills.SelectedIndex],
         { } list => _listHints[list.SelectedIndex],
         null => _hints[CommandMenu.Entries.IndexOf(_menu.Selected)],
     };

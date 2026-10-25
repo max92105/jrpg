@@ -1,6 +1,7 @@
 using Jrpg.Core.Effects;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Party;
+using Jrpg.Core.Resources;
 using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Tests.Content;
@@ -126,6 +127,17 @@ public sealed class ContentCatalogLoaderTests
         var mana = catalog.ClassOf(catalog.PartyMembers["omer"]).Resources.Single(resource => resource.Id == "mana");
 
         Assert.Equal((10, 3, 2), (mana.Max, mana.StartsAt, mana.Gains.PerTurn));
+    }
+
+    [Fact]
+    public void Load_RepositoryContent_MeteorCostsNineMana()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        var meteor = catalog.Skills["meteor"];
+
+        Assert.Equal([new ResourceChange("mana", -9)], meteor.ResourceChanges);
+        Assert.Contains("meteor", catalog.Classes["mage"].SkillIds);
     }
 
     [Fact]

@@ -5,8 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/M2a.md, slice M2a (skills can spend a class resource)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/M2b.md, slice M2b (the mage's spells cost mana; the list shows it)
 Round: 1 (verdict: Ready to commit)
 
-- Warning, open: SkillCatalogValidator.cs FindResourceChangeProblem — one skill listing the same resource twice (mana -3, mana -2) passes; CanPay checks each change alone, so with 4 mana the skill is usable and costs 4 (clamped) instead of being unusable. Reject a repeated resourceId per skill.
-- Suggestion, open: SkillPaymentTests — no test that a gain at max reports no ResourceChanged (the `applied != 0` branch).
+- Suggestion, open: BattleSkillChoice.Actor has no doc and is only read for its Resources; document it or expose only what the panel needs.
+- Suggestion, open: SkillCostText.CostOf shows only the first negative change; a skill paying two resources (or mana plus MP) shows half its cost. Fine until such a skill exists.
+- Follow-up, open: M2a's repeated-resourceId-per-skill validator warning is still unaddressed.

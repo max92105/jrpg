@@ -285,8 +285,14 @@ internal static class MessageIds
     /// <summary>Placeholder <c>{cost}</c>: a skill's MP cost on its row in battle.</summary>
     public const string BattleSkillCost = "battle_skill_cost";
 
+    /// <summary>Placeholders <c>{cost}</c>, <c>{resource}</c>: a skill's resource cost on its battle row.</summary>
+    public const string BattleSkillResourceCost = "battle_skill_resource_cost";
+
     /// <summary>The hint when Confirm is pressed on a skill the actor lacks the MP for (decision 105).</summary>
     public const string BattleNotEnoughMp = "battle_not_enough_mp";
+
+    /// <summary>Placeholder <c>{resource}</c>: the hint on Confirm when the actor lacks it for the skill.</summary>
+    public const string BattleNotEnoughResource = "battle_not_enough_resource";
 
     /// <summary>Placeholder <c>{count}</c>: how many copies of an item the party owns, on its row in battle.</summary>
     public const string BattleItemCount = "battle_item_count";

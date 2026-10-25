@@ -110,8 +110,23 @@ public sealed class CommandMenuTests
         _menu.Update(InputFrames.Pressing(GameButton.Confirm));
 
         Assert.False(_menu.Skills?.IsUsable(0));
-        Assert.True(_menu.Skills?.IsSayingNotEnoughMp);
+        Assert.True(_menu.Skills?.IsSayingCannotAfford);
         Assert.Null(_menu.Targets);
+    }
+
+    [Fact]
+    public void Update_ConfirmMeteorWithThreeMana_SaysNotEnoughMana()
+    {
+        var menu = new CommandMenu(_inventory, BattleScenarios.Catalog.Items);
+        menu.Start(BattleScenarios.MemberAgainstGoblinTrio("omer", _inventory, new SeededRandom(BattleScenarios.SarxianFirstSeed)));
+        menu.Update(InputFrames.Pressing(GameButton.Down));
+        menu.Update(InputFrames.Pressing(GameButton.Confirm));
+        SelectSkill(menu, "meteor");
+
+        menu.Update(InputFrames.Pressing(GameButton.Confirm));
+
+        Assert.True(menu.Skills?.IsSayingCannotAfford);
+        Assert.Equal("Mana", menu.Skills?.LackingResourceAt(menu.Skills.SelectedIndex)?.Name);
     }
 
     [Fact]
@@ -268,6 +283,18 @@ public sealed class CommandMenuTests
     {
         _menu.Update(InputFrames.Pressing(GameButton.Down));
         _menu.Update(InputFrames.Pressing(GameButton.Confirm));
+    }
+
+    // Bounded by the rows, so a list without the skill fails the test instead of looping forever.
+    private static void SelectSkill(CommandMenu menu, string skillId)
+    {
+        var skills = menu.Skills!;
+        for (var presses = 0; presses < skills.Skills.Count && skills.Selected.Id != skillId; presses++)
+        {
+            menu.Update(InputFrames.Pressing(GameButton.Down));
+        }
+
+        Assert.Equal(skillId, skills.Selected.Id);
     }
 
     private void Press(GameButton button, int times)

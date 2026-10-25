@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
 using Jrpg.Game.Ui;
 
@@ -12,14 +13,20 @@ internal sealed class BattleSkillChoice : IBattleListChoice
 {
     private readonly ListCursor _cursor;
     private readonly bool[] _isUsable;
+    private readonly ResourceDefinition?[] _lacking;
 
     /// <param name="battle">On a party member's turn; that member knows at least one skill.</param>
     public BattleSkillChoice(BattleState battle)
     {
-        Skills = battle.CurrentActor.Skills;
+        Actor = battle.CurrentActor;
+        Skills = Actor.Skills;
         _isUsable = [.. Skills.Select(battle.CanUse)];
+        _lacking = [.. Skills.Select(battle.LackingResourceFor)];
         _cursor = new ListCursor(Skills.Count, _ => true, IBattleListChoice.VisibleRows);
     }
+
+    /// <summary>The member whose skills these are; their class resources name the costs.</summary>
+    public Combatant Actor { get; }
 
     /// <summary>The actor's skills in the order they learnt them.</summary>
     public IReadOnlyList<SkillDefinition> Skills { get; }
@@ -31,23 +38,29 @@ internal sealed class BattleSkillChoice : IBattleListChoice
     /// <summary>The index of the first row in the visible window.</summary>
     public int FirstVisible => _cursor.FirstVisible;
 
-    /// <summary>Whether Confirm was pressed on a skill the actor lacks the MP for, until the selection moves.</summary>
-    public bool IsSayingNotEnoughMp { get; private set; }
+    /// <summary>Whether Confirm was pressed on a skill the actor can't pay for, until the selection moves.</summary>
+    public bool IsSayingCannotAfford { get; private set; }
 
     /// <summary>Whether the skill at <paramref name="index"/> can be used now; the rest are greyed.</summary>
     public bool IsUsable(int index) => _isUsable[index];
 
+    /// <returns>
+    /// The class resource the actor is short of for the skill at <paramref name="index"/>; null when only MP, or
+    /// nothing, is short.
+    /// </returns>
+    public ResourceDefinition? LackingResourceAt(int index) => _lacking[index];
+
     public void MoveUp()
     {
         _cursor.MoveUp();
-        IsSayingNotEnoughMp = false;
+        IsSayingCannotAfford = false;
     }
 
     public void MoveDown()
     {
         _cursor.MoveDown();
-        IsSayingNotEnoughMp = false;
+        IsSayingCannotAfford = false;
     }
 
-    public void SayNotEnoughMp() => IsSayingNotEnoughMp = true;
+    public void SayCannotAfford() => IsSayingCannotAfford = true;
 }

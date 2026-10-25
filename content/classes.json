@@ -9,7 +9,7 @@
     "description": "A scholar of the arcane who bends raw magic into fire, frost and storm.",
     "base": { "maxHp": 150, "maxMp": 80, "attack": 20, "defense": 4 },
     "growth": { "maxHp": 12, "maxMp": 8, "attack": 2, "defense": 1 },
-    "skillIds": ["fire_blast", "fireball"],
+    "skillIds": ["fire_blast", "fireball", "meteor"],
     "resources": [ { "id": "mana", "name": "Mana", "max": 10, "startsAt": 3, "gains": { "perTurn": 2 } } ] },
   {
     "id": "cleric", "name": "Cleric",

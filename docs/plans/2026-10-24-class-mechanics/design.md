@@ -219,7 +219,7 @@ Core folders:
 
 Checked edges: Resources and Statuses reference neither Battle, Party nor Skills, so there is no cycle. Party → Resources is new, and the reverse is not allowed: `ResourceMeters` takes definitions and starting amounts, never a member.
 
-Data: `Resources/ResourceDefinitionValidator` (new), `Statuses/StatusGrantValidator` (new, called by `Effects/EffectValidator`), `Party/ClassReferences` (new), `Saving/SaveMigrations` (new, ADR 0022).
+Data: `Resources/ResourceDefinitionValidator` (new), `Statuses/StatusGrantValidator` (new, called by `Effects/EffectValidator`), `Party/ClassReferences` (new). Saves get no migration before the first release (ADR 0022).
 
 Game:
 
@@ -275,7 +275,7 @@ The Game's playback of each event (`ActionPlayback`, exhaustive switch):
 6. **Faith is a resource that skills require and nothing spends.** It reuses `ResourceRequirement` (CL1), which the warlock then shares (WL1).
 7. **Sticky dominance lives in `ResourceMeters`.** After each change, a force strictly above its rival becomes dominant; a tie keeps the current one. `DominanceFormula` stays pure: power and a flag.
 8. **Lasting resources** (ADR 0024) are on the member between battles. The combatant starts with the member's amount, and `GameSession.FinishBattle` writes the amount back and applies per-battle triggers. Saves store them by resource id.
-9. **MP goes in four steps** (ADR 0022): skills, screens, saves, then members. Each step builds and passes alone, and the save migration lands before `Vitals` loses MP, so a save never refers to a field the model lacks.
+9. **MP goes in four steps** (ADR 0022): skills, screens, saves, then members. Each step builds and passes alone, and the save format change lands before `Vitals` loses MP, so a save never refers to a field the model lacks.
 10. **Resource colors in content** (LK1). The other ways are a Game table keyed by content ids, or a palette by position that repeats colors.
 11. **Text.** Resource names are content; status names and battle phrases are `ui.json` and `MessageIds` (ADR 0010).
 
@@ -297,7 +297,7 @@ The Game's playback of each event (`ActionPlayback`, exhaustive switch):
 | `BattleSkillChoice.IsSayingNotEnoughMp` | `IsSayingCannotAfford`, with the text from `SkillCostText` (M2b) |
 | The battle panel's MP row | the resource rows (MP2 removes it, M3 adds them) |
 | MP on the Status page, sidebar, equipment sheet, member card, leader profile | gone (MP2) |
-| `PartyMemberProgress.Mp`, save format 1 | dropped by the migration to format 2 (MP3a) |
+| `PartyMemberProgress.Mp`, save format 1 | dropped in format 2, which refuses format 1 saves (MP3a) |
 | `Vitals(hp, maxHp, mp, maxMp)`, `ClassStats.MaxMp`, `EnemyDefinition.MaxMp` | `Vitals(hp, maxHp)`; `ClassStats.Speed` (MP3b, RG1) |
 | `Combatant.Stats` read by attacks | `Combatant.CurrentStats` (PL2a) |
 | Battle positions from the `Combatants` order | positions from `BattleState.Formation` (FM2) |
@@ -311,7 +311,7 @@ The Game's playback of each event (`ActionPlayback`, exhaustive switch):
   - Sarxian, a warlock, is the Game tests' battler: after CS1 he has no skills until WL1.
 - **Event order in one list.** Skipped turns, ticks and a readied turn arrive in the previous actor's list, so `ActionPlayback` splits beats by event kind (FT1, DR1 test this).
 - **MP removal touches 56 files.** The four MP slices are ordered so each builds and passes alone. A slice that would leave a screen reading `Vitals.Mp` after MP3b fails the build, which is the guard.
-- **Two save migrations** (MP3a, LR2). The first creates `SaveMigrations`. Each gets an old-format load test and a round trip, and `SaveGameRepair` clamps the new lasting amounts.
+- **Two save format changes** (MP3a, LR2). Each refuses the older format (ADR 0022) and gets a refusal test and a round trip; `SaveGameRepair` clamps the new lasting amounts.
 - **Formation and layout.** `BattleLayout.SpotsOf` assumes the `Combatants` order. FM2 changes it to read the formation, and every Game test that checks spots is re-run.
 - **Editor.** A map with a rest step can't open in an editor without it, so the placeholder inn lands in RS2 with the editor support.
 - **Determinism of upkeep order.** Ticks, gains and countdowns run in a fixed order (statuses in the order they were applied).

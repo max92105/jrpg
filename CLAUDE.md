@@ -63,7 +63,7 @@ Full standard: `.claude/rules/code-quality.md`, loaded automatically for `.cs` f
 - Every new Core behavior ships with tests in the same change.
 - Test names: `Method_Scenario_ExpectedResult`.
 - Use fixed seeds in tests. A test that passes randomly is a bug.
-- Save/load changes require a round-trip test and, if the format changed, a migration + test loading the old format.
+- Save/load changes require a round-trip test. If the format changed: until the first release, bump `formatVersion` and test that the old format is refused (ADR 0022); from the first release on, add a migration and a test loading the old format.
 
 ## How we work
 

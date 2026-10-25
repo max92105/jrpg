@@ -2,7 +2,7 @@
 Status: approved
 
 Second feature plan after the migration, following the new-game flow.
-- Decisions 188-207 are recorded below. Questions 208-228 are open; the next free number is 229.
+- Decisions 188-207 and 229 are recorded below. Questions 208-228 are open; the next free number is 230.
 - This plan writes ADRs 0019-0024; the next ADR is 0025.
 - It answers question 181 (where skills come from) through ADR 0020.
 
@@ -42,12 +42,12 @@ At the end of this plan, every class fights its own way, with two or three place
 3. **Phase 2: the cleric's faith, then MP leaves (CL1, ADR 0022, MP1, MP2, M3, MP3a, MP3b).** This comes early because it changes the battle panel's layout and the save format.
    - The cleric gets Faith first, so her heals stay gated when MP1 removes their MP cost.
    - Then skills, then the screens. M3 puts the resources where the MP row was, so the developer sees mana and faith from there on.
-   - Then saves (the first save migration), then members and enemies.
+   - Then saves (the first format change), then members and enemies.
 4. **Phase 3: statuses, fighter, barbarian, paladin, formation (ADR 0021, ST1, ST2, FT1, BB1, PL1, ADR 0023, FM1, FM2, PL2a, PL2b).** The fighter's stun needs statuses; the taunt and the aura reuse them. The aura's range needs the formation, so moving in battle comes before it.
 5. **Phase 4: tempo and risk (RG1, RG2, RG3, RG4, WL1, WL2).** Speed and the rogue's extra turn change the turn order, and the warlock's backfire adds a roll.
 6. **Phase 5: forces and hits (DR1, DR2, MO1).** Ticking statuses, the druid, then the monk's multi-hit.
 7. **Phase 6: run-through (Z1).** The developer plays every class.
-8. **Phase 7: lasting resources and rest (ADR 0024, LR1, LR2, LR3, RS1, RS2, RS3).** What a rest restores comes after the run-through, so play can shape it. It is the second save migration.
+8. **Phase 7: lasting resources and rest (ADR 0024, LR1, LR2, LR3, RS1, RS2, RS3).** What a rest restores comes after the run-through, so play can shape it. It is the second save format change.
 9. **Phase 8: the look (LK1, LK2, LK3, Z2).** Behavior first, then the look.
 
 ## Guiding rules
@@ -60,7 +60,7 @@ At the end of this plan, every class fights its own way, with two or three place
 - **Events with their mechanic** (ADR 0004). A new `BattleEvent` may land in a Core slice before the Game can show it only while no content produces it. The content lands with the playback case, because `ActionPlayback` throws on an unknown event.
 - **Formulas in one static place each** (`DamageFormula`, `HeavyHitRule`, `BackfireFormula`, `DominanceFormula`, `ReadinessFormula`), with their reasoning and tests.
 - **Determinism.** Rolls go through the battle's `IRandom`; tests use `FixedSequenceRandom`.
-- **Saves** change twice, each time with a version bump, a migration and a test loading the old format (ADR 0007, ADR 0022): MP leaves in MP3a (format 1 → 2), and lasting resources arrive in LR2 (2 → 3).
+- **Saves** change twice, each time with a version bump, a round trip and a test that the older format is refused (ADR 0022, decision 229): MP leaves in MP3a (format 1 → 2), and lasting resources arrive in LR2 (2 → 3). No migration before the first release.
 - **Slice sizes count tests at about 13 lines each**, plus the existing tests a change breaks. Mechanical slices (FR1, CS1, MP3b) record the solution's test count before and after.
 - **Temporary content edits for a hand check are reverted.** No slice commits a content change made only to see a rule.
 - **Look** (`.claude/rules/game.md`). Read `docs/ui_ux_exemples/Combat1.webp`, `Combat3.webp` and `Combat5.webp` before LK1-LK3.
@@ -93,11 +93,11 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 2: the cleric's faith; MP leaves
 - [x] **CL1. The cleric: Faith, a level that skills require; it drops when an ally falls** (Core + Data + content + Game text, about 270 lines) → [slices/CL1.md](slices/CL1.md)
-- [ ] **ADR 0022: MP leaves the game; how saves migrate** (before MP1) → [slices/ADR-0022.md](slices/ADR-0022.md)
+- [x] **ADR 0022: MP leaves the game; no save migrations before release** (before MP1) → [slices/ADR-0022.md](slices/ADR-0022.md)
 - [ ] **MP1. Skills and effects stop using MP** (Core + Data + content + Game, about 200 lines) → [slices/MP1.md](slices/MP1.md)
 - [ ] **MP2. No screen shows MP** (Game, about 230 lines) → [slices/MP2.md](slices/MP2.md)
 - [ ] **M3. The battle panel shows each member's resources where MP was, plainly** (Game, about 170 lines) → [slices/M3.md](slices/M3.md)
-- [ ] **MP3a. Saves stop keeping MP: format 2 and the first migration** (Core + Data, about 230 lines) → [slices/MP3a.md](slices/MP3a.md)
+- [ ] **MP3a. Saves stop keeping MP: format 2, older saves refused** (Core + Data, about 150 lines) → [slices/MP3a.md](slices/MP3a.md)
 - [ ] **MP3b. Members and enemies lose MP** (Core + Data + content, about 260 lines, mostly deletions and test-site edits) → [slices/MP3b.md](slices/MP3b.md)
 
 ### Phase 3: statuses, the fighter, the barbarian, the paladin and the formation
@@ -178,6 +178,7 @@ The developer's answers to the draft (2026-10-24):
 - **205. Cleric, Faith:** "they can always cast skills that have their level of faith or under, and they lose faith more and more when bad things happen, until rest." Faith is a level, never spent. A skill requires a faith; faith drops on bad events (question 217) and stays lowered until a rest.
 - **206. Monk, Chakra:** many small hits instead of one big hit. A skill's effect can hit several times. Chakra is gained per hit landed and spent on multi-hit skills (question 218).
 - **207. Warrior becomes Fighter, id included:** "everything needs to correlate and be clean, no shortcut." The class id is `fighter` everywhere, with no alias (FR1). Saves hold no class id, so no save changes.
+- **229. No save migrations before the first release** (ADR 0022): "delete existing saves, I don't care, they are test saves". Until the first release, a format change bumps `formatVersion` and refuses older saves. The developer's test save was deleted on 2026-10-24.
 
 Earlier decisions that apply:
 - 13: experience goes to the members still standing.
@@ -247,12 +248,9 @@ Each is a checkbox step right before the first slice that needs it.
     - re-applying refreshes the turns and keeps the stronger power, never stacking;
     - a fall clears a combatant's statuses;
     - all statuses end with the battle.
-- **0022 MP leaves the game; how saves migrate** (before MP1).
+- **0022 MP leaves the game; no save migrations before release** (before MP1). Accepted 2026-10-24.
   - The MP part follows decision 197.
-  - The choice is the migration mechanism for the first format change:
-    - **A. An ordered chain of JSON-node migrations in Data (`SaveMigrations`)**, one per version step, run before deserializing (recommended);
-    - **B. Tolerant deserialization** (ignore unknown fields, default missing ones), which breaks ADR 0007's version rule;
-    - **C. Versioned DTOs per format.** Heavy for a field drop.
+  - The save part is decision 229 (option D). It was chosen over a migration chain (A), tolerant reading (B) and DTOs per format (C).
 - **0023 The battle formation** (before FM1).
   - **A. The active party order is a line; Move swaps with a neighbor (recommended).** It reuses the order the party page already sets.
   - **B. Front and back rows**, Octopath-like. A second concept that ranges don't need.

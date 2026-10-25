@@ -36,3 +36,4 @@ As A, but without an envelope: a format change makes old saves unreadable.
 - Renaming or removing a `SaveGame` field is a deliberate format change, caught by the round-trip and old-format tests.
 - Repair needs the loaded content: a read save goes through a repair step against the `ContentCatalog` before `GameSession.Restore` (slice 5c), which lists what it changed so the game can tell the player (part 3).
 - The autosave slot question (decision 34, question 44) doesn't affect the format; slots are just names.
+- Migrations: until the first release, a format change refuses older saves instead of migrating them (ADR 0022).

@@ -45,8 +45,8 @@ internal sealed class BattleSkillChoice : IBattleListChoice
     public bool IsUsable(int index) => _isUsable[index];
 
     /// <returns>
-    /// The class resource the actor is short of for the skill at <paramref name="index"/>; null when only MP, or
-    /// nothing, is short.
+    /// The class resource the actor is short of for the skill at <paramref name="index"/>; null when it can be
+    /// paid.
     /// </returns>
     public ResourceDefinition? LackingResourceAt(int index) => _lacking[index];
 

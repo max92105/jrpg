@@ -30,3 +30,9 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
     - `SkillPaymentTests`: `CanPay_ClericWithNoMp_HealStillUsable` (fails before: today it needs MP)
     - `BattleStateResourceTests`: `LackingResourceFor_Unaffordable_NeverNull`
   - **Verify by hand:** as Zanyr, heals show "Faith 1" and the like, never MP. As Omer, spells show mana only.
+- **Done, with deviations:** Tests 1838 before, 1834 after: 7 MP tests deleted, 3 added. Beyond the plan:
+  - Strictness checked: `ContentJsonOptions.Strict` uses `UnmappedMemberHandling.Disallow`, so a stray `mpCost` now fails the load naming the file.
+  - The item message `item_used_mp` and `UiTheme.FloatingMp` went with `RestoreMp`.
+  - `SkillCostText.CostOf` returns an empty line for a free skill. `CannotAffordText` now takes a non-null resource, and the panel skips it for rows that can be paid.
+  - `CommandMenuTests`' MP case is merged into the Meteor test (9 mana against 3), which also checks the row is greyed and no target opens; the Omer setup is a shared `OmersSkillList` helper.
+  - `Vitals.TrySpendMp` and `RestoreMp` have no caller left outside `VitalsTests` and one battle test; MP3b removes them with the rest of `Vitals`' MP.

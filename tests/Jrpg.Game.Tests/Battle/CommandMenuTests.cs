@@ -101,32 +101,19 @@ public sealed class CommandMenuTests
         Assert.Equal(_battle.CurrentActor.Skills, _menu.Skills?.Skills);
     }
 
-    [Fact]
-    public void Update_UnaffordableSkill_IsGreyedAndSaysNotEnoughMp()
-    {
-        _battle.CurrentActor.Vitals.TrySpendMp(_battle.CurrentActor.Vitals.Mp - 5);
-        OpenSkills();
-
-        _menu.Update(InputFrames.Pressing(GameButton.Confirm));
-
-        Assert.False(_menu.Skills?.IsUsable(0));
-        Assert.True(_menu.Skills?.IsSayingCannotAfford);
-        Assert.Null(_menu.Targets);
-    }
-
+    // Omer starts with 3 mana; Meteor costs 9.
     [Fact]
     public void Update_ConfirmMeteorWithThreeMana_SaysNotEnoughMana()
     {
-        var menu = new CommandMenu(_inventory, BattleScenarios.Catalog.Items);
-        menu.Start(BattleScenarios.MemberAgainstGoblinTrio("omer", _inventory, new SeededRandom(BattleScenarios.SarxianFirstSeed)));
-        menu.Update(InputFrames.Pressing(GameButton.Down));
-        menu.Update(InputFrames.Pressing(GameButton.Confirm));
+        var menu = OmersSkillList();
         SelectSkill(menu, "meteor");
 
         menu.Update(InputFrames.Pressing(GameButton.Confirm));
 
+        Assert.False(menu.Skills?.IsUsable(menu.Skills.SelectedIndex));
         Assert.True(menu.Skills?.IsSayingCannotAfford);
         Assert.Equal("Mana", menu.Skills?.LackingResourceAt(menu.Skills.SelectedIndex)?.Name);
+        Assert.Null(menu.Targets);
     }
 
     [Fact]
@@ -283,6 +270,16 @@ public sealed class CommandMenuTests
     {
         _menu.Update(InputFrames.Pressing(GameButton.Down));
         _menu.Update(InputFrames.Pressing(GameButton.Confirm));
+    }
+
+    // Omer, a mage, acts first with Skills open.
+    private CommandMenu OmersSkillList()
+    {
+        var menu = new CommandMenu(_inventory, BattleScenarios.Catalog.Items);
+        menu.Start(BattleScenarios.MemberAgainstGoblinTrio("omer", _inventory, new SeededRandom(BattleScenarios.SarxianFirstSeed)));
+        menu.Update(InputFrames.Pressing(GameButton.Down));
+        menu.Update(InputFrames.Pressing(GameButton.Confirm));
+        return menu;
     }
 
     // Bounded by the rows, so a list without the skill fails the test instead of looping forever.

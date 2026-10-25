@@ -61,7 +61,6 @@ internal sealed class FloatingNumbersView
     {
         EffectKind.Damage => UiTheme.TextPrimary,
         EffectKind.RestoreHp or EffectKind.Revive => UiTheme.FloatingHeal,
-        EffectKind.RestoreMp => UiTheme.FloatingMp,
         _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, null),
     };
 }

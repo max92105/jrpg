@@ -302,7 +302,6 @@ public sealed class PartyMemberTests
         Name = id,
         Description = "",
         IconFile = "",
-        MpCost = 0,
         Effect = new Effect(EffectKind.RestoreHp, 10, Targeting.SingleAlly),
     };
 }

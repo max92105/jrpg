@@ -87,7 +87,6 @@ internal sealed class ItemUseDialog
         var messageId = item.Effect?.Kind switch
         {
             EffectKind.RestoreHp => MessageIds.ItemUsedHp,
-            EffectKind.RestoreMp => MessageIds.ItemUsedMp,
             EffectKind.Revive => MessageIds.ItemUsedRevive,
             _ => null,
         };

@@ -10,8 +10,8 @@ namespace Jrpg.Core.Tests.Battle;
 // The scripted shuffle (3, 2, 1) keeps the four combatants in listed order, so the mage acts first.
 public sealed class BattleSkillAndItemTests
 {
-    private static readonly SkillDefinition _fireball = Skill("fireball", mpCost: 10, new Effect(EffectKind.Damage, 20, Targeting.AllEnemies));
-    private static readonly SkillDefinition _heal = Skill("heal", mpCost: 8, new Effect(EffectKind.RestoreHp, 15, Targeting.SingleAlly));
+    private static readonly SkillDefinition _fireball = Skill("fireball", new Effect(EffectKind.Damage, 20, Targeting.AllEnemies));
+    private static readonly SkillDefinition _heal = Skill("heal", new Effect(EffectKind.RestoreHp, 15, Targeting.SingleAlly));
 
     private readonly Combatant _mage = PartyCombatant("mage", hp: 100, mp: 30, _fireball, _heal);
     private readonly Combatant _ally = PartyCombatant("ally", hp: 50, mp: 0);
@@ -34,7 +34,6 @@ public sealed class BattleSkillAndItemTests
             new EffectApplied(_otherGoblin, EffectKind.Damage, 18),
         ];
         Assert.Equal(expected, events);
-        Assert.Equal(20, _mage.Vitals.Mp);
     }
 
     [Fact]
@@ -44,26 +43,14 @@ public sealed class BattleSkillAndItemTests
 
         Assert.Throws<ArgumentException>(() => battle.Execute(new SkillCommand(_fireball, [_goblin])));
 
-        Assert.Equal(30, _mage.Vitals.Mp);
         Assert.Equal(_goblin.Vitals.MaxHp, _goblin.Vitals.Hp);
         Assert.Same(_mage, battle.CurrentActor);
     }
 
     [Fact]
-    public void Execute_SkillCommandWithoutEnoughMp_ThrowsAndChangesNothing()
-    {
-        _mage.Vitals.TrySpendMp(25);
-        var battle = CreateBattle();
-
-        Assert.False(battle.CanUse(_fireball));
-        Assert.Throws<InvalidOperationException>(() => battle.Execute(new SkillCommand(_fireball, [_goblin, _otherGoblin])));
-        Assert.Equal(5, _mage.Vitals.Mp);
-    }
-
-    [Fact]
     public void Execute_SkillTheActorDoesNotKnow_Throws()
     {
-        var unknown = Skill("thunder", mpCost: 0, new Effect(EffectKind.Damage, 5, Targeting.SingleEnemy));
+        var unknown = Skill("thunder", new Effect(EffectKind.Damage, 5, Targeting.SingleEnemy));
         var battle = CreateBattle();
 
         Assert.Throws<InvalidOperationException>(() => battle.Execute(new SkillCommand(unknown, [_goblin])));
@@ -93,25 +80,15 @@ public sealed class BattleSkillAndItemTests
     {
         var battle = CreateBattle();
 
-        var choice = battle.TargetChoiceFor(Skill("recovery", mpCost: 8, new Effect(EffectKind.RestoreHp, 30, Targeting.Self)));
+        var choice = battle.TargetChoiceFor(Skill("recovery", new Effect(EffectKind.RestoreHp, 30, Targeting.Self)));
 
         Assert.Equal([_mage], choice.Candidates);
     }
 
     [Fact]
-    public void CanAfford_NotEnoughMp_ReturnsFalse()
-    {
-        _mage.Vitals.TrySpendMp(25);
-        var battle = CreateBattle();
-
-        Assert.False(battle.CanAfford(_fireball));
-        Assert.True(battle.CanAfford(Skill("cheap", mpCost: 5, _fireball.Effect)));
-    }
-
-    [Fact]
     public void CanUse_ReviveWithNobodyFallen_ReturnsFalse()
     {
-        var raise = Skill("raise", mpCost: 8, new Effect(EffectKind.Revive, 20, Targeting.SingleFallenAlly));
+        var raise = Skill("raise", new Effect(EffectKind.Revive, 20, Targeting.SingleFallenAlly));
         var mage = PartyCombatant("mage", hp: 100, mp: 30, raise);
         var battle = new BattleState([mage, _ally, _goblin, _otherGoblin], _inventory, new FixedSequenceRandom(3, 2, 1));
 
@@ -232,7 +209,6 @@ public sealed class BattleSkillAndItemTests
 
         Assert.Throws<ArgumentException>(() => battle.Execute(new SkillCommand(_fireball, [_goblin, _goblin])));
 
-        Assert.Equal(30, _mage.Vitals.Mp);
         Assert.Equal(_goblin.Vitals.MaxHp, _goblin.Vitals.Hp);
     }
 
@@ -275,8 +251,8 @@ public sealed class BattleSkillAndItemTests
         Assert.Equal(BattlePhase.Victory, battle.Phase);
     }
 
-    private static SkillDefinition Skill(string id, int mpCost, Effect effect) =>
-        new() { Id = id, Name = id, Description = "", IconFile = "Attack.png", MpCost = mpCost, Effect = effect };
+    private static SkillDefinition Skill(string id, Effect effect) =>
+        new() { Id = id, Name = id, Description = "", IconFile = "Attack.png", Effect = effect };
 
     private static ItemDefinition Item(string id, Effect effect) =>
         new ItemDefinitionBuilder().WithId(id).WithEffect(effect).Build();

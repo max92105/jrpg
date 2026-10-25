@@ -105,6 +105,17 @@ public sealed class BattleStateResourceTests
     }
 
     [Fact]
+    public void LackingResourceFor_Unaffordable_NeverNull()
+    {
+        var battle = StartBattle();
+
+        var lacking = battle.LackingResourceFor(_meteor);
+
+        Assert.False(battle.CanAfford(_meteor));
+        Assert.Same(_mana, lacking);
+    }
+
+    [Fact]
     public void CanUse_AfterGainingTurns_CostlierSkillBecomesUsable()
     {
         var battle = StartBattle();
@@ -151,7 +162,6 @@ public sealed class BattleStateResourceTests
         Name = id,
         Description = "",
         IconFile = "",
-        MpCost = 0,
         ResourceChanges = [new ResourceChange("mana", -manaCost)],
         Effect = new Effect(EffectKind.Damage, 10, Targeting.SingleEnemy),
     };

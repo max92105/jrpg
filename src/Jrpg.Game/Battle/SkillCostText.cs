@@ -5,13 +5,12 @@ using Jrpg.Game.Ui;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// What a skill costs the actor, as its row shows it ("8 MP", "2 Mana"), and why Confirm can't use it ("Not enough
-/// Mana."). A resource cost wins over a requirement ("Faith 2", "Needs 4 Faith"), which wins over MP, which MP1
-/// retires; names come from the actor's class (ADR 0019).
+/// What a skill asks of the actor, as its row shows it ("2 Mana", "Faith 2", "Needs 4 Faith"), and why Confirm can't
+/// use it ("Not enough Mana."). A cost wins over a requirement; names come from the actor's class (ADR 0019).
 /// </summary>
 internal sealed class SkillCostText(UiMessages messages, ResourceMeters actorResources)
 {
-    /// <summary>One line per skill: its first resource cost, else its first requirement, else its MP.</summary>
+    /// <summary>One line: the first resource cost, else the first requirement, else empty for a free skill.</summary>
     public string CostOf(SkillDefinition skill)
     {
         if (skill.ResourceChanges.FirstOrDefault(change => change.Amount < 0) is { } cost)
@@ -27,13 +26,12 @@ internal sealed class SkillCostText(UiMessages messages, ResourceMeters actorRes
             return ResourceLine(messageId, requirement.ResourceId, requirement.AtLeast);
         }
 
-        return messages.Format(MessageIds.BattleSkillCost, MessageArgument.Number("cost", skill.MpCost));
+        return string.Empty;
     }
 
-    /// <param name="lacking">The resource the actor is short of; null when only MP is short.</param>
-    public string CannotAffordText(ResourceDefinition? lacking) => lacking is null
-        ? messages.Text(MessageIds.BattleNotEnoughMp)
-        : messages.Format(MessageIds.BattleNotEnoughResource, new MessageArgument("resource", lacking.Name));
+    /// <param name="lacking">The resource the actor is short of.</param>
+    public string CannotAffordText(ResourceDefinition lacking) =>
+        messages.Format(MessageIds.BattleNotEnoughResource, new MessageArgument("resource", lacking.Name));
 
     // Every resource line has the placeholders {amount} and {resource}.
     private string ResourceLine(string messageId, string resourceId, int amount)

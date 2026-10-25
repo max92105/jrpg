@@ -27,18 +27,6 @@ public sealed class EffectResolverTests
     }
 
     [Fact]
-    public void Apply_RestoreMp_RestoresMpNotHp()
-    {
-        var target = new Vitals(hp: 50, maxHp: 100, mp: 5, maxMp: 30);
-
-        var amount = EffectResolver.Apply(new Effect(EffectKind.RestoreMp, Power: 10, Targeting.Self), target, targetDefense: 0);
-
-        Assert.Equal(10, amount);
-        Assert.Equal(15, target.Mp);
-        Assert.Equal(50, target.Hp);
-    }
-
-    [Fact]
     public void Apply_ReviveOnFallenTarget_RestoresHp()
     {
         var target = new Vitals(hp: 0, maxHp: 100, mp: 0, maxMp: 0);

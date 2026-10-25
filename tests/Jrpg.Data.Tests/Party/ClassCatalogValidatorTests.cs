@@ -17,7 +17,6 @@ public sealed class ClassCatalogValidatorTests
             Name = "Heal",
             Description = "",
             IconFile = "",
-            MpCost = 8,
             Effect = new Effect(EffectKind.RestoreHp, 15, Targeting.SingleAlly),
         },
         ["heal_all"] = new()
@@ -26,7 +25,6 @@ public sealed class ClassCatalogValidatorTests
             Name = "Heal All",
             Description = "",
             IconFile = "",
-            MpCost = 0,
             Requirements = [new ResourceRequirement("faith", 6)],
             Effect = new Effect(EffectKind.RestoreHp, 50, Targeting.AllAllies),
         },
@@ -36,7 +34,6 @@ public sealed class ClassCatalogValidatorTests
             Name = "Smite",
             Description = "",
             IconFile = "",
-            MpCost = 0,
             ResourceChanges = [new ResourceChange("conviction", -4)],
             Effect = new Effect(EffectKind.Damage, 30, Targeting.SingleEnemy),
         },

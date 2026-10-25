@@ -4,7 +4,6 @@
     "name": "Fire Blast",
     "description": "Strikes one enemy with fire.",
     "iconFile": "Attack.png",
-    "mpCost": 0,
     "resourceChanges": [ { "resourceId": "mana", "amount": -2 } ],
     "effect": { "kind": "damage", "power": 15, "targeting": "singleEnemy" }
   },
@@ -13,7 +12,6 @@
     "name": "Fireball",
     "description": "Strikes every enemy with fire.",
     "iconFile": "Attack.png",
-    "mpCost": 0,
     "resourceChanges": [ { "resourceId": "mana", "amount": -5 } ],
     "effect": { "kind": "damage", "power": 20, "targeting": "allEnemies" }
   },
@@ -22,7 +20,6 @@
     "name": "Meteor",
     "description": "Calls down a falling star on one enemy. Placeholder: the developer writes the real spell.",
     "iconFile": "Attack.png",
-    "mpCost": 0,
     "resourceChanges": [ { "resourceId": "mana", "amount": -9 } ],
     "effect": { "kind": "damage", "power": 60, "targeting": "singleEnemy" }
   },
@@ -31,7 +28,6 @@
     "name": "Heal",
     "description": "Restores 15 HP to one ally.",
     "iconFile": "",
-    "mpCost": 8,
     "requirements": [ { "resourceId": "faith", "atLeast": 1 } ],
     "effect": { "kind": "restoreHp", "power": 15, "targeting": "singleAlly" }
   },
@@ -40,7 +36,6 @@
     "name": "Recovery",
     "description": "Restores 30 HP to its user.",
     "iconFile": "",
-    "mpCost": 8,
     "requirements": [ { "resourceId": "faith", "atLeast": 2 } ],
     "effect": { "kind": "restoreHp", "power": 30, "targeting": "self" }
   },
@@ -49,7 +44,6 @@
     "name": "Heal All",
     "description": "Restores 50 HP to every ally.",
     "iconFile": "",
-    "mpCost": 8,
     "requirements": [ { "resourceId": "faith", "atLeast": 4 } ],
     "effect": { "kind": "restoreHp", "power": 50, "targeting": "allAllies" }
   }

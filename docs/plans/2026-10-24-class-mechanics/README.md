@@ -94,7 +94,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 2: the cleric's faith; MP leaves
 - [x] **CL1. The cleric: Faith, a level that skills require; it drops when an ally falls** (Core + Data + content + Game text, about 270 lines) → [slices/CL1.md](slices/CL1.md)
 - [x] **ADR 0022: MP leaves the game; no save migrations before release** (before MP1) → [slices/ADR-0022.md](slices/ADR-0022.md)
-- [ ] **MP1. Skills and effects stop using MP** (Core + Data + content + Game, about 200 lines) → [slices/MP1.md](slices/MP1.md)
+- [x] **MP1. Skills and effects stop using MP** (Core + Data + content + Game, about 200 lines) → [slices/MP1.md](slices/MP1.md)
 - [ ] **MP2. No screen shows MP** (Game, about 230 lines) → [slices/MP2.md](slices/MP2.md)
 - [ ] **M3. The battle panel shows each member's resources where MP was, plainly** (Game, about 170 lines) → [slices/M3.md](slices/M3.md)
 - [ ] **MP3a. Saves stop keeping MP: format 2, older saves refused** (Core + Data, about 150 lines) → [slices/MP3a.md](slices/MP3a.md)

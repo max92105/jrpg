@@ -176,8 +176,12 @@ internal sealed class CommandPanelView
         var costs = new SkillCostText(_messages, skills.Actor.Resources);
         _listAmounts = [.. skills.Skills.Select(skill => MeasuredText.Of(_rowFont, costs.CostOf(skill)))];
         _listHints = [.. skills.Skills.Select(skill => skill.Description)];
-        _cannotAffordHints = [.. skills.Skills.Select((_, index) => costs.CannotAffordText(skills.LackingResourceAt(index)))];
+        _cannotAffordHints = [.. skills.Skills.Select((_, index) => CannotAffordHintAt(skills, costs, index))];
     }
+
+    // Only a skill the actor can't pay for ever shows this hint, and that one always lacks a resource.
+    private static string CannotAffordHintAt(BattleSkillChoice skills, SkillCostText costs, int index) =>
+        skills.LackingResourceAt(index) is { } lacking ? costs.CannotAffordText(lacking) : string.Empty;
 
     private void FormatRowsOf(BattleItemChoice items)
     {

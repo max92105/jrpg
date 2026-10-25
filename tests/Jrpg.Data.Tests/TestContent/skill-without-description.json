@@ -3,7 +3,6 @@
     "id": "heal",
     "name": "Heal",
     "iconFile": "",
-    "mpCost": 8,
     "effect": { "kind": "restoreHp", "power": 15, "targeting": "singleAlly" }
   }
 ]

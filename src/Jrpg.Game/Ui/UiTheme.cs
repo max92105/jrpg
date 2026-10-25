@@ -253,9 +253,6 @@ internal static class UiTheme
     /// <summary>The floating number on a heal or revive: the bright end of <see cref="BattleHpBar"/>.</summary>
     public static Color FloatingHeal { get; } = FromStraightArgb(0xFF7FD39A);
 
-    /// <summary>The floating number on MP restored: the bright end of <see cref="BattleMpBar"/>.</summary>
-    public static Color FloatingMp { get; } = FromStraightArgb(0xFF8FB4F0);
-
     /// <summary>The battle banner's dark band, fading out at both ends.</summary>
     public static ImmutableArray<GradientStop> Banner { get; } =
         [new(0, FromStraightArgb(0x00101320)), new(0.25f, FromStraightArgb(0xE6101320)), new(0.75f, FromStraightArgb(0xE6101320)), new(1, FromStraightArgb(0x00101320))];

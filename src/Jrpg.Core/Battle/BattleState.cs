@@ -79,12 +79,12 @@ public sealed class BattleState
     /// <summary>Who the current actor can aim <paramref name="skill"/> at, in formation order.</summary>
     public TargetChoice<Combatant> TargetChoiceFor(SkillDefinition skill) => ChoiceFor(skill.Effect.Targeting);
 
-    /// <summary>Whether the actor can pay <paramref name="skill"/>: MP, requirements, resource costs.</summary>
+    /// <summary>Whether the actor can pay <paramref name="skill"/>: its resource requirements and costs.</summary>
     public bool CanAfford(SkillDefinition skill) => SkillPayment.CanPay(CurrentActor, skill);
 
     /// <returns>
-    /// The first class resource the current actor has too little of for <paramref name="skill"/>; null when only MP, or
-    /// nothing, is short.
+    /// The first class resource the current actor has too little of for <paramref name="skill"/>; null exactly when
+    /// <see cref="CanAfford"/> is true.
     /// </returns>
     public ResourceDefinition? LackingResourceFor(SkillDefinition skill) =>
         SkillPayment.LackingResourceOf(CurrentActor, skill);

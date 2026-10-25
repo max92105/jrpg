@@ -124,6 +124,19 @@ public sealed class SkillPaymentTests
         Assert.Empty(events);
     }
 
+    [Fact]
+    public void CanPay_ClericWithNoMp_HealStillUsable()
+    {
+        var clericWithoutMp = Combatant.FromPartyMember(PartyMember.Recruit(
+            new PartyMemberBuilder().BuildDefinition(),
+            new ClassBuilder().WithId("cleric").WithBase(new ClassStats(MaxHp: 100, MaxMp: 0, Attack: 10, Defense: 5)).WithResources(_faith).Build(),
+            new Dictionary<string, SkillDefinition>()));
+
+        var canPay = SkillPayment.CanPay(clericWithoutMp, SkillNeedingFaith(1));
+
+        Assert.True(canPay);
+    }
+
     private static SkillDefinition SkillNeedingFaith(int atLeast) =>
         SkillChanging(-1) with { ResourceChanges = [], Requirements = [new ResourceRequirement("faith", atLeast)] };
 
@@ -133,7 +146,6 @@ public sealed class SkillPaymentTests
         Name = "Spell",
         Description = "",
         IconFile = "",
-        MpCost = 0,
         ResourceChanges = [new ResourceChange("mana", manaAmount)],
         Effect = new Effect(EffectKind.Damage, 10, Targeting.SingleEnemy),
     };

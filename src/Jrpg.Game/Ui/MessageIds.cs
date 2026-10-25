@@ -165,9 +165,6 @@ internal static class MessageIds
     /// <summary>Placeholders <c>{member}</c> and <c>{amount}</c> (question 91, placeholder wording).</summary>
     public const string ItemUsedHp = "item_used_hp";
 
-    /// <summary>Placeholders <c>{member}</c> and <c>{amount}</c>.</summary>
-    public const string ItemUsedMp = "item_used_mp";
-
     /// <summary>Placeholders <c>{member}</c> and <c>{amount}</c>: the HP the member comes back with.</summary>
     public const string ItemUsedRevive = "item_used_revive";
 
@@ -282,9 +279,6 @@ internal static class MessageIds
     /// <summary>Placeholder <c>{name}</c>: the banner when a combatant defends.</summary>
     public const string BattleDefends = "battle_defends";
 
-    /// <summary>Placeholder <c>{cost}</c>: a skill's MP cost on its row in battle.</summary>
-    public const string BattleSkillCost = "battle_skill_cost";
-
     /// <summary>Placeholders <c>{amount}</c>, <c>{resource}</c>: a skill's resource cost on its battle row.</summary>
     public const string BattleSkillResourceCost = "battle_skill_resource_cost";
 
@@ -293,9 +287,6 @@ internal static class MessageIds
 
     /// <summary>Placeholders <c>{amount}</c>, <c>{resource}</c>: a met requirement on its battle row.</summary>
     public const string BattleSkillResourceLevel = "battle_skill_resource_level";
-
-    /// <summary>The hint when Confirm is pressed on a skill the actor lacks the MP for (decision 105).</summary>
-    public const string BattleNotEnoughMp = "battle_not_enough_mp";
 
     /// <summary>Placeholder <c>{resource}</c>: the hint on Confirm when the actor lacks it for the skill.</summary>
     public const string BattleNotEnoughResource = "battle_not_enough_resource";

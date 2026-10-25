@@ -16,7 +16,6 @@ public sealed class GameSessionTests
         Name = "Heal",
         Description = "",
         IconFile = "",
-        MpCost = 8,
         Effect = new Effect(EffectKind.RestoreHp, 15, Targeting.SingleAlly),
     };
 

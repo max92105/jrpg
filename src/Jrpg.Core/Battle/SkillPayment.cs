@@ -3,11 +3,10 @@ using Jrpg.Core.Skills;
 
 namespace Jrpg.Core.Battle;
 
-/// <summary>What a skill asks of its user: MP, its resource requirements, and its resource costs (ADR 0019).</summary>
+/// <summary>What a skill asks of its user: its resource requirements and costs (ADR 0019, ADR 0022).</summary>
 internal static class SkillPayment
 {
-    public static bool CanPay(Combatant actor, SkillDefinition skill) =>
-        actor.Vitals.Mp >= skill.MpCost && LackingResourceOf(actor, skill) is null;
+    public static bool CanPay(Combatant actor, SkillDefinition skill) => LackingResourceOf(actor, skill) is null;
 
     /// <returns>
     /// The first resource the actor holds too little of: a requirement first, then a cost, both against the amount
@@ -25,10 +24,9 @@ internal static class SkillPayment
         return shortId is null ? null : actor.Resources.Definitions.First(definition => definition.Id == shortId);
     }
 
-    /// <summary>Spends the MP, then applies each resource change in order, reporting each one that moved.</summary>
+    /// <summary>Applies each resource change in order, reporting each one that moved.</summary>
     public static void Pay(Combatant actor, SkillDefinition skill, List<BattleEvent> events)
     {
-        actor.Vitals.TrySpendMp(skill.MpCost);
         foreach (var change in skill.ResourceChanges)
         {
             actor.ChangeResource(change.ResourceId, change.Amount, events);

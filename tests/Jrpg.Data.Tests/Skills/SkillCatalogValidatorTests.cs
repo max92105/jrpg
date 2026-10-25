@@ -16,7 +16,6 @@ public sealed class SkillCatalogValidatorTests
         Name = "Heal",
         Description = "",
         IconFile = "",
-        MpCost = 8,
         Effect = new Effect(EffectKind.RestoreHp, Power: 15, Targeting.SingleAlly),
     };
 
@@ -35,14 +34,6 @@ public sealed class SkillCatalogValidatorTests
         var exception = Record.Exception(() => SkillCatalogValidator.Validate(FileName, [_heal]));
 
         Assert.Null(exception);
-    }
-
-    [Fact]
-    public void Validate_NegativeMpCost_ThrowsNamingTheSkill()
-    {
-        var exception = Assert.Throws<ContentValidationException>(() => SkillCatalogValidator.Validate(FileName, [_heal with { MpCost = -1 }]));
-
-        Assert.Equal("skills.json: skill 'heal': mpCost must be at least 0 (was -1).", exception.Message);
     }
 
     [Fact]

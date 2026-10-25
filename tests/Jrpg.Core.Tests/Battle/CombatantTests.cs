@@ -45,7 +45,6 @@ public sealed class CombatantTests
             Name = "Heal",
             Description = "",
             IconFile = "Skill.png",
-            MpCost = 8,
             Effect = new Effect(EffectKind.RestoreHp, 15, Targeting.SingleAlly),
         };
         var member = new PartyMemberBuilder().WithSkills(heal).Build();

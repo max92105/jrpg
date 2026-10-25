@@ -18,11 +18,6 @@ internal static class SkillCatalogValidator
             return "name must not be empty.";
         }
 
-        if (skill.MpCost < 0)
-        {
-            return $"mpCost must be at least 0 (was {skill.MpCost}).";
-        }
-
         return FindResourceChangeProblem(skill.ResourceChanges)
             ?? FindRequirementProblem(skill.Requirements)
             ?? EffectValidator.FindProblem(skill.Effect);

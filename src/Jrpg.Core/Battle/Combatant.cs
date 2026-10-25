@@ -21,8 +21,11 @@ public sealed class Combatant
 
     public BattleSide Side { get; }
 
-    /// <summary>Fixed for the battle: equipment can't change mid-battle.</summary>
+    /// <summary>The base for the battle, before statuses: equipment can't change mid-battle.</summary>
     public CombatStats Stats { get; }
+
+    /// <summary>The stats with the statuses applied now; what attacks and effects read (ADR 0021).</summary>
+    public CombatStats CurrentStats => StatusModifiers.Apply(Stats, Statuses);
 
     public Vitals Vitals { get; }
 

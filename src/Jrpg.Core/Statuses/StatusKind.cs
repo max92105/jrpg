@@ -8,4 +8,7 @@ public enum StatusKind
 
     /// <summary>Every enemy attack goes to a taunting party member (question 209).</summary>
     Taunt,
+
+    /// <summary>The holder's defense rises by the status's power while it lasts (the paladin's aura).</summary>
+    Guarded,
 }

@@ -108,6 +108,7 @@
   "battle_not_enough_resource": "Not enough {resource}.",
   "status_stun": "Stun",
   "status_taunt": "Taunt",
+  "status_guarded": "Guard",
   "battle_turn_skipped": "Stunned",
   "battle_status_tag": "{status} {turns}",
   "battle_item_count": "x{count}",

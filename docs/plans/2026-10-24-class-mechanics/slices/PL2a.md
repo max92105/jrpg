@@ -24,3 +24,6 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
       - `Execute_GuardedEnds_DefenseBackToBase`
     - `CombatantTests`: `CurrentStats_NoStatus_EqualsStats`
   - **Verify by hand:** none (PL2b).
+- **Done, with deviations:** as planned. Tests 1901 before, 1906 after. Two notes:
+  - `ApplyToTargets` is now `EffectLanding.Land` (ST1), which reads the target's `CurrentStats`.
+  - The `BattleState` turn-flow move was put in `docs/plans/backlog.md`, since this slice only changes one line there.

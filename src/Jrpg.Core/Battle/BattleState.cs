@@ -187,7 +187,7 @@ public sealed class BattleState
     // An attack is a single-enemy damage effect whose power is the attacker's attack.
     private void Attack(Combatant actor, Combatant target, List<BattleEvent> events)
     {
-        var effect = new Effect(EffectKind.Damage, actor.Stats.Attack, AttackTargeting);
+        var effect = new Effect(EffectKind.Damage, actor.CurrentStats.Attack, AttackTargeting);
         ThrowIfIllegalTargets(effect, [target]);
         EffectLanding.Land(effect, [target], Combatants, events);
     }

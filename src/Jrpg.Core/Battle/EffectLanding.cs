@@ -17,7 +17,7 @@ internal static class EffectLanding
         foreach (var target in targets)
         {
             var wasAlive = target.IsAlive;
-            var amount = EffectResolver.Apply(effect, target.Vitals, target.Stats.Defense);
+            var amount = EffectResolver.Apply(effect, target.Vitals, target.CurrentStats.Defense);
             if (effect.Kind != EffectKind.GrantStatus)
             {
                 events.Add(new EffectApplied(target, effect.Kind, amount));

@@ -110,7 +110,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **ADR 0023: The battle formation** (before FM1) → [slices/ADR-0023.md](slices/ADR-0023.md)
 - [x] **FM1. The party's formation in battle; Move swaps places with a neighbor** (Core, about 220 lines) → [slices/FM1.md](slices/FM1.md)
 - [x] **FM2. The Move command on screen; battlers stand where the formation says** (Game, about 240 lines) → [slices/FM2.md](slices/FM2.md)
-- [ ] **PL2a. Guarded raises defense; combatants have current stats** (Core, about 170 lines) → [slices/PL2a.md](slices/PL2a.md)
+- [x] **PL2a. Guarded raises defense; combatants have current stats** (Core, about 170 lines) → [slices/PL2a.md](slices/PL2a.md)
 - [ ] **PL2b. The paladin's aura reaches the allies within its range in the formation** (Core + Data + content + Game, about 250 lines) → [slices/PL2b.md](slices/PL2b.md)
 
 ### Phase 4: tempo and risk

@@ -66,6 +66,16 @@ public sealed class CombatantTests
     }
 
     [Fact]
+    public void CurrentStats_NoStatus_EqualsStats()
+    {
+        var combatant = Combatant.FromPartyMember(new PartyMemberBuilder().WithStats(attack: 10, defense: 5).Build());
+
+        var current = combatant.CurrentStats;
+
+        Assert.Equal(combatant.Stats, current);
+    }
+
+    [Fact]
     public void FromEnemy_Always_HasNoResources()
     {
         var goblin = new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20, defense: 2).Build();

@@ -222,6 +222,40 @@ public sealed class BattleStatusTests
         Assert.Equal(new AttackCommand(hero), command);
     }
 
+    // The goblin hits for 20 against the hero's defense 5, so 15; while Guard (+5) lasts, 10.
+    [Fact]
+    public void Execute_AttackOnGuardedTarget_UsesRaisedDefense()
+    {
+        var (hero, battle) = GuardingHero(turns: 2);
+        battle.Execute(new SkillCommand(hero.Skills[0], [hero]));
+
+        var events = battle.Execute(new AttackCommand(hero));
+
+        Assert.Equal(new EffectApplied(hero, EffectKind.Damage, 10), events[1]);
+    }
+
+    [Fact]
+    public void Execute_GuardedEnds_DefenseBackToBase()
+    {
+        var (hero, battle) = GuardingHero(turns: 1);
+        battle.Execute(new SkillCommand(hero.Skills[0], [hero]));
+        battle.Execute(new DefendCommand());
+        battle.Execute(new DefendCommand());
+
+        var events = battle.Execute(new AttackCommand(hero));
+
+        Assert.Equal(new EffectApplied(hero, EffectKind.Damage, 15), events[1]);
+        Assert.Equal(5, hero.CurrentStats.Defense);
+    }
+
+    // The hero (defense 5) knows Guard (+5 defense, self) and acts first against a goblin with attack 20.
+    private static (Combatant Hero, BattleState Battle) GuardingHero(int turns)
+    {
+        var guard = Skill("guard", new Effect(EffectKind.GrantStatus, 0, Targeting.Self, new StatusGrant(StatusKind.Guarded, Power: 5, Turns: turns)));
+        var hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithSkills(guard).Build());
+        return (hero, new BattleState([hero, Goblin(hp: 25)], new Inventory(), new FixedSequenceRandom(1)));
+    }
+
     private BattleState Battle(Combatant goblin) => new([_hero, goblin], new Inventory(), new FixedSequenceRandom(1));
 
     private static Combatant Goblin(int hp) =>

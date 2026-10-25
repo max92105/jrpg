@@ -117,7 +117,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **RG1. Speed: a class stat; the rogue's readiness charges come from it** (Core + Data + content, about 240 lines) → [slices/RG1.md](slices/RG1.md)
 - [x] **RG2. A quick skill doesn't end the actor's turn** (Core + Data, about 140 lines) → [slices/RG2.md](slices/RG2.md)
 - [x] **RG3. Ready: an extra turn right after a chosen combatant** (Core + Data, about 260 lines) → [slices/RG3.md](slices/RG3.md)
-- [ ] **RG4. The rogue's kit: Ready and Expose on screen; Exposed makes every hit land harder** (Core + content + Game, about 270 lines) → [slices/RG4.md](slices/RG4.md)
+- [x] **RG4. The rogue's kit: Ready and Expose on screen; Exposed makes every hit land harder** (Core + content + Game, about 270 lines) → [slices/RG4.md](slices/RG4.md)
 - [ ] **WL1. The warlock: casting builds instability, and stronger spells need more** (content + Game + tests, about 150 lines) → [slices/WL1.md](slices/WL1.md)
 - [ ] **WL2. Instability can backfire on the caster** (Core + Data + content + Game playback, about 230 lines) → [slices/WL2.md](slices/WL2.md)
 

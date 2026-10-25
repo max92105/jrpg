@@ -25,4 +25,15 @@ public sealed class StatusModifiersTests
 
         Assert.Equal(_stats, current);
     }
+
+    [Fact]
+    public void ExtraDamageTakenPercent_Exposed_IsItsPower()
+    {
+        var statuses = new StatusSet();
+        statuses.Apply(new StatusGrant(StatusKind.Exposed, Power: 50, Turns: 3));
+
+        var extra = StatusModifiers.ExtraDamageTakenPercent(statuses);
+
+        Assert.Equal(50, extra);
+    }
 }

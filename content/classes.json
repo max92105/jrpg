@@ -27,6 +27,7 @@
     "description": "A quick and cunning blade who strikes where the enemy is weakest.",
     "base": { "maxHp": 170, "attack": 25, "defense": 5, "speed": 30 },
     "growth": { "maxHp": 15, "attack": 3, "defense": 1, "speed": 1 },
+    "skillIds": ["ready", "expose"],
     "resources": [ { "id": "readiness", "name": "Readiness", "maxFromSpeed": { "speedPerCharge": 10 } } ] },
   {
     "id": "barbarian", "name": "Barbarian",

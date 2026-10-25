@@ -256,6 +256,20 @@ public sealed class BattleStatusTests
         return (hero, new BattleState([hero, Goblin(hp: 25)], new Inventory(), new FixedSequenceRandom(1)));
     }
 
+    // The hero hits for 15 - 2 = 13; on an Exposed (+50 %) goblin that lands as 19, rounded down.
+    [Fact]
+    public void Execute_AttackOnExposed_DealsOneAndAHalf()
+    {
+        var goblin = Goblin(hp: 40);
+        goblin.Statuses.Apply(new StatusGrant(StatusKind.Exposed, Power: 50, Turns: 3));
+        var hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithStats(attack: 15, defense: 5).Build());
+        var battle = new BattleState([hero, goblin], new Inventory(), new FixedSequenceRandom(1));
+
+        var events = battle.Execute(new AttackCommand(goblin));
+
+        Assert.Equal(new EffectApplied(goblin, EffectKind.Damage, 19), events[1]);
+    }
+
     private BattleState Battle(Combatant goblin) => new([_hero, goblin], new Inventory(), new FixedSequenceRandom(1));
 
     private static Combatant Goblin(int hp) =>

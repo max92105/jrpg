@@ -1,4 +1,5 @@
 using Jrpg.Core.Effects;
+using Jrpg.Core.Statuses;
 
 namespace Jrpg.Core.Battle;
 
@@ -17,7 +18,8 @@ internal static class EffectLanding
         foreach (var target in targets)
         {
             var wasAlive = target.IsAlive;
-            var amount = EffectResolver.Apply(effect, target.Vitals, target.CurrentStats.Defense);
+            var damageTakenPercent = DamageFormula.NoChangePercent + StatusModifiers.ExtraDamageTakenPercent(target.Statuses);
+            var amount = EffectResolver.Apply(effect, target.Vitals, target.CurrentStats.Defense, damageTakenPercent);
             if (effect.Kind != EffectKind.GrantStatus)
             {
                 events.Add(new EffectApplied(target, effect.Kind, amount));

@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Items;
 using Jrpg.Core.Randomness;
 using Jrpg.Game.Battle;
 
@@ -17,6 +18,18 @@ public sealed class TurnOrderStripTests
         _strip.Refresh(battle);
 
         Assert.Equal([sarxian, a, b, c, sarxian, a, b, c, sarxian], _strip.Shown);
+    }
+
+    [Fact]
+    public void Refresh_ReadiedTurn_ShowsRogueAfterAnchor()
+    {
+        var battle = BattleScenarios.MemberAgainstGoblinTrio("lazarus", new Inventory(), new SeededRandom(BattleScenarios.SarxianFirstSeed));
+        var (lazarus, a, b, c) = (battle.Combatants[0], battle.Combatants[1], battle.Combatants[2], battle.Combatants[3]);
+        battle.Execute(new SkillCommand(BattleScenarios.Catalog.Skills["ready"], [a]));
+
+        _strip.Refresh(battle);
+
+        Assert.Equal([lazarus, a, lazarus, b, c, lazarus, a, b, c], _strip.Shown);
     }
 
     [Fact]

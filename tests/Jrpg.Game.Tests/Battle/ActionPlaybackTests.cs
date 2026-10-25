@@ -121,6 +121,17 @@ public sealed class ActionPlaybackTests
     }
 
     [Fact]
+    public void Start_ExtraTurnReadied_ShowsSkillBanner()
+    {
+        var ready = BattleScenarios.Catalog.Skills["ready"];
+
+        var playback = Start([new ActionStarted(_sarxian, new SkillCommand(ready, [_goblin])), new ExtraTurnReadied(_sarxian, _goblin)]);
+
+        Assert.Equal(ready.Name, playback.BannerText);
+        Assert.Equal([PlaybackBeatKind.Banner], playback.Beats.Select(beat => beat.Kind));
+    }
+
+    [Fact]
     public void Start_Defend_HasNoHold()
     {
         var playback = Start([new ActionStarted(_sarxian, new DefendCommand())]);

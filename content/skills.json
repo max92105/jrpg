@@ -113,5 +113,24 @@
       "kind": "grantStatus", "power": 0, "targeting": "alliesInRange", "range": 2,
       "status": { "kind": "guarded", "power": 3, "turns": 3 }
     }
+  },
+  {
+    "id": "ready",
+    "name": "Ready",
+    "description": "Take an extra turn right after someone else's next one. Keeps your turn. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "isQuick": true,
+    "resourceChanges": [ { "resourceId": "readiness", "amount": -1 } ],
+    "effect": { "kind": "readyExtraTurn", "power": 0, "targeting": "otherCombatant" }
+  },
+  {
+    "id": "expose",
+    "name": "Expose",
+    "description": "Opens one enemy's guard: every hit on it lands half again as hard for three of its turns. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "effect": {
+      "kind": "grantStatus", "power": 0, "targeting": "singleEnemy",
+      "status": { "kind": "exposed", "power": 50, "turns": 3 }
+    }
   }
 ]

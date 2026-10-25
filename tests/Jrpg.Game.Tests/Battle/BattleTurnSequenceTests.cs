@@ -175,6 +175,24 @@ public sealed class BattleTurnSequenceTests
         Assert.Same(battle.Combatants[2], sequence.Actor);
     }
 
+    // Ready is quick, so after its banner Lazarus steps forward again for the rest of his turn.
+    [Fact]
+    public void Update_AfterReady_SameMemberStepsForwardAgain()
+    {
+        var random = new SeededRandom(BattleScenarios.SarxianFirstSeed);
+        var battle = BattleScenarios.MemberAgainstGoblinTrio("lazarus", new Inventory(), random);
+        var sequence = new BattleTurnSequence(battle, new EnemyTactics(random), RepositoryScreenText.Text.Messages);
+        var lazarus = battle.CurrentActor;
+        sequence.Update(_step);
+
+        sequence.Submit(new SkillCommand(BattleScenarios.Catalog.Skills["ready"], [battle.Combatants[1]]));
+        sequence.Update(_longEnoughForEveryEnemyTurn);
+
+        Assert.Equal(TurnStage.AwaitingCommand, sequence.Stage);
+        Assert.Same(lazarus, sequence.Actor);
+        Assert.Equal([battle.Combatants[1], lazarus], battle.UpcomingActors(2));
+    }
+
     private static (BattleState Battle, BattleTurnSequence Sequence) SarxianAgainstGoblinTrio(int seed)
     {
         var random = new SeededRandom(seed);

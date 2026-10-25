@@ -320,6 +320,22 @@ public sealed class CommandMenuTests
         Assert.Equal(CommandEntry.Move, menu.Selected);
     }
 
+    [Fact]
+    public void Update_ConfirmReady_TargetsOthersButNotSelf()
+    {
+        var battle = BattleScenarios.MemberAgainstGoblinTrio("lazarus", _inventory, new SeededRandom(BattleScenarios.SarxianFirstSeed));
+        var menu = new CommandMenu(_inventory, BattleScenarios.Catalog.Items);
+        menu.Start(battle);
+        SelectEntry(menu, CommandEntry.Skills);
+        menu.Update(InputFrames.Pressing(GameButton.Confirm));
+        SelectSkill(menu, "ready");
+
+        menu.Update(InputFrames.Pressing(GameButton.Confirm));
+
+        Assert.Equal(battle.LivingOn(BattleSide.Enemies), menu.Targets?.Candidates);
+        Assert.DoesNotContain(battle.CurrentActor, menu.Targets!.Candidates);
+    }
+
     // Zanyr and Ragnir against the goblins, who defend until one of the two acts; each is the other's one neighbor.
     private (CommandMenu Menu, BattleState Battle) TwoMembersMenu()
     {

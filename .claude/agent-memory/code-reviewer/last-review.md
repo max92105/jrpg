@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/RG3.md, slice RG3 (Ready: extra turn after a chosen combatant)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/RG4.md, slice RG4 (rogue kit: Ready and Expose, Exposed status)
 Round: 1 (verdict: Ready to commit)
 
-- Warning: TurnOrder.Advance skips TakeReadiedAfter after an extra turn, so a second Ready on the same anchor plays a full cycle late; open
-- Warning: ItemCatalogValidator accepts targeting otherCombatant on a menu-usable item; FieldItemUse.CanUse (Self relation) is then always false; open
-- Suggestion: TurnFlow.AdvanceToNextActor comment "the lost turn still runs its upkeep, so the stun counts down" is false for a skipped extra turn; open
-- Suggestion: Execute_StunnedOnExtraTurn_TurnSkipped could pin that the stun did not count down on the lost extra turn; open
+- Warning: BattleTurnSequenceTests.Update_AfterReady_SameMemberStepsForwardAgain passes even if Ready is not quick (goblin acts, then readied turn awaits); pin UpcomingActors; open
+- Suggestion: EffectLanding.cs:21 ~185-column call; extract a `damageTakenPercent` local; open
+- Suggestion: CommandMenuTests name says "BothSides" but the solo-Lazarus fixture only has enemies; open
+- Closed (RG3, commit f351825): TurnOrder.Advance checks readied turns after an extra turn too (lastActor rule), and ItemCatalogValidator rejects otherCombatant targeting on items. Don't re-raise them.

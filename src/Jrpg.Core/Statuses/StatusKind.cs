@@ -11,4 +11,7 @@ public enum StatusKind
 
     /// <summary>The holder's defense rises by the status's power while it lasts (the paladin's aura).</summary>
     Guarded,
+
+    /// <summary>Every hit on the holder lands harder by the status's power, in percent (question 215).</summary>
+    Exposed,
 }

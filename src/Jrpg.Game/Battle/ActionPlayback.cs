@@ -21,7 +21,7 @@ internal sealed class ActionPlayback
 
     // Panels, tags and spots read live state at the next stage change (ADR 0013), so these need no beat of their own.
     private static readonly FrozenSet<Type> _shownByLiveState =
-        [typeof(ResourceChanged), typeof(StatusEnded), typeof(PlacesSwapped), typeof(BattleEnded)];
+        [typeof(ResourceChanged), typeof(StatusEnded), typeof(PlacesSwapped), typeof(ExtraTurnReadied), typeof(BattleEnded)];
 
     private readonly List<PlaybackBeat> _beats = [];
     private readonly List<FloatingNumber> _numbers = [];

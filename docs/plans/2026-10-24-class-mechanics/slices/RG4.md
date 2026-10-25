@@ -37,3 +37,13 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
     - As Lazarus with Ragnir: Ready after Ragnir. Lazarus's portrait appears after Ragnir's in the strip, and Lazarus still gets his current turn.
     - Expose a goblin, then Ragnir's hit lands 1.5 times as hard.
     - After three Readies, Ready greys with "Not enough Readiness".
+- **Done, with deviations:** Tests 1943 before, 1951 after. Beyond the plan:
+  - `StatusModifiers.ExtraDamageTakenPercent` returns only Exposed's extra percent, and `EffectLanding` adds it to `DamageFormula.NoChangePercent`. That keeps `Statuses` from depending on `Effects`, which already depends on it; the test is named `ExtraDamageTakenPercent_Exposed_IsItsPower`.
+  - `BattleTargetCursor` needed no change: it moves over any candidate list.
+  - `ExtraTurnReadied` joins the events shown by live state, so it adds no beat.
+  - With Lazarus alone, Ready's targets are the enemies; the test checks that he isn't among them.
+  - Both skills' descriptions are marked as placeholders.
+  - **From review:**
+    - The step-forward test also checks that the readied turn is still pending, so it fails if Ready isn't quick.
+    - The damage percent is a named value in `EffectLanding`.
+    - The menu test is `Update_ConfirmReady_TargetsOthersButNotSelf`.

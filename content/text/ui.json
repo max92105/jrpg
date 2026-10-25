@@ -109,6 +109,7 @@
   "status_stun": "Stun",
   "status_taunt": "Taunt",
   "status_guarded": "Guard",
+  "status_exposed": "Exposed",
   "battle_turn_skipped": "Stunned",
   "battle_status_tag": "{status} {turns}",
   "battle_item_count": "x{count}",

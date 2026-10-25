@@ -40,3 +40,5 @@ Seen again in demo-retirement I1 (cache variant): `ButtonLabelsTests.Of_SameButt
 Seen again in demo-retirement G1a (stale-equals-expected variant): `InteractionInFront_AfterWarp_IsRefreshedOnTheNewMap` asserts null, but the value was already null from `TryInteract`, so deleting the refresh in `ContinueEvent` keeps it green. For a "refreshed" test, the expected value must differ from the stale one.
 
 Seen again in class-mechanics PL2b and RG1 (new validator branch): `EffectValidator` negative range and `ResourceDefinitionValidator` `speedPerCharge < 1` (a divide-by-zero guard) shipped untested while sibling branches got tests. Match each new validator message in the diff to a test.
+
+Seen again in class-mechanics RG4 (same-end-state variant): `Update_AfterReady_SameMemberStepsForwardAgain` asserts the rogue awaits a command, but a non-quick Ready also ends there (goblin acts, then the readied turn). Ask which state differs between the two paths (`UpcomingActors`).

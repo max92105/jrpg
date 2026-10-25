@@ -1,5 +1,6 @@
 using Jrpg.Core.Party;
 using Jrpg.Data.Content;
+using Jrpg.Data.Resources;
 
 namespace Jrpg.Data.Party;
 
@@ -15,7 +16,8 @@ internal static class ClassCatalogValidator
         : classDefinition.Base.MaxHp < 1 ? $"base.maxHp must be at least 1 (was {classDefinition.Base.MaxHp})."
         : FindNegativeStat("base", classDefinition.Base)
             ?? FindNegativeStat("growth", classDefinition.Growth)
-            ?? FindSkillProblem(classDefinition.SkillIds, references);
+            ?? FindSkillProblem(classDefinition.SkillIds, references)
+            ?? ResourceDefinitionValidator.FindProblem(classDefinition.Resources);
 
     // Growth may be 0 for a stat a class never improves; a negative one would shrink it with every level.
     private static string? FindNegativeStat(string field, ClassStats stats) =>

@@ -42,7 +42,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Content | Loading, validating and writing the catalog; where content is; an optional field added later is left out of a file while null (`AbsentWhenNullFilter`) | `ContentCatalogLoader`, `ContentWriter`, `ContentRootLocator`, `ContentValidationException` |
 | Art | Art folders, the field sprite frame grid and the startup art check | `ArtFolders`, `FieldSpriteLayout`, `ArtReferenceCheck`, `PngSize` |
 | Audio | Audio folders and the startup check that every voice file exists by exact name (ADR 0018) | `AudioFolders`, `AudioReferenceCheck`; both checks share `Content/ExactFileName` and `Maps/MapEventSteps` |
-| Maps, Items, Party, Skills, Battle, Effects | One validator per content type | `MapLayoutValidator`, `ItemCatalogValidator`, … |
+| Maps, Items, Party, Skills, Battle, Effects, Resources | One validator per content type (a class's resources by `ResourceDefinitionValidator`, called from the class one) | `MapLayoutValidator`, `ItemCatalogValidator`, … |
 | Messages | The UI message table | `UiMessageLoader` |
 | Saving | Save files: versioned JSON, atomic writes, repair of old or damaged saves | `FileSaveStore`, `SaveGameRepair`, `RepairedSave` |
 

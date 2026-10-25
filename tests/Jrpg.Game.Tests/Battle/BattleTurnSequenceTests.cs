@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Items;
 using Jrpg.Core.Randomness;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Tests.Ui;
@@ -136,6 +137,24 @@ public sealed class BattleTurnSequenceTests
         Assert.Equal(TurnStage.StepForward, sequence.Stage);
         Assert.Same(secondGoblin, sequence.Actor);
         Assert.Equal(0.25f, sequence.StepShare(secondGoblin), 3);
+    }
+
+    // Omer is a mage, so ending the turn gains mana: a ResourceChanged the screen must take without a beat.
+    [Fact]
+    public void Update_OmerEndsTurn_NoThrowAndNextActorSteps()
+    {
+        var random = new SeededRandom(BattleScenarios.SarxianFirstSeed);
+        var battle = BattleScenarios.MemberAgainstGoblinTrio("omer", new Inventory(), random);
+        var sequence = new BattleTurnSequence(battle, new EnemyTactics(random), RepositoryScreenText.Text.Messages);
+        sequence.Update(_step);
+
+        sequence.Submit(new DefendCommand());
+        sequence.Update(_step);
+        sequence.Update(TimeSpan.FromSeconds(0.1));
+
+        Assert.Equal(TurnStage.StepForward, sequence.Stage);
+        Assert.Equal(BattleSide.Enemies, sequence.Actor.Side);
+        Assert.Equal(5, battle.Combatants[0].Resources.AmountOf("mana"));
     }
 
     private static (BattleState Battle, BattleTurnSequence Sequence) SarxianAgainstGoblinTrio(int seed)

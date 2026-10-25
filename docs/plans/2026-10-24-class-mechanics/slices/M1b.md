@@ -23,3 +23,4 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
     - `ActionPlaybackTests`: `Start_ResourceChanged_AddsNoBeat`
     - `BattleTurnSequenceTests`: `Update_OmerEndsTurn_NoThrowAndNextActorSteps` (repository content, fixed seed: the event reaches the screen).
   - **Verify by hand:** as Omer against the goblins: nothing visible changes, and nothing throws.
+- **Done, with deviations:** as planned. Tests 1797 before, 1806 after. The validator also rejects a null resource entry and an empty resource id; this came from review, as the reader lets a null list element through.

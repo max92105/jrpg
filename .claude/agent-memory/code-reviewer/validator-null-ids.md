@@ -19,4 +19,6 @@ Seen again in part 2 slice 1b (dictionary-value variant): the converter reads a 
 
 Related strict-reading gap (part 2 slice 5b): `JsonNode.Parse` with default options accepts duplicate keys and `JsonObject` then throws ArgumentException (not JsonException) on first access, bypassing `AllowDuplicateProperties = false` in the serializer options. Any JsonNode pre-parse (save migrations) needs `JsonDocumentOptions { AllowDuplicateProperties = false }`.
 
+Seen again in class-mechanics M1b (nested record list: `"resources": [null]` -> NRE in ResourceDefinitionValidator on `resource.Id`; ContentListValidator only guards the top-level list).
+
 Seen again in part 2 slice 5c (duplicate-entry variant): save lists aren't checked for duplicate ids. `Members: [sarxian, sarxian]` survives Read/repair, and `GameSession.ActiveOrder`'s `.Single` throws InvalidOperationException, outside the UnreadableSaveException contract. For any id-keyed list read from a file, ask: null entries, then duplicates.

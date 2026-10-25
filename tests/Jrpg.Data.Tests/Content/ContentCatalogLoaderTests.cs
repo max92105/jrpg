@@ -119,6 +119,16 @@ public sealed class ContentCatalogLoaderTests
     }
 
     [Fact]
+    public void Load_RepositoryContent_MageHasMana()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        var mana = catalog.ClassOf(catalog.PartyMembers["omer"]).Resources.Single(resource => resource.Id == "mana");
+
+        Assert.Equal((10, 3, 2), (mana.Max, mana.StartsAt, mana.Gains.PerTurn));
+    }
+
+    [Fact]
     public void Load_RepositoryContent_ClericListsHeal()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));

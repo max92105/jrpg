@@ -1,5 +1,6 @@
 using Jrpg.Core.Effects;
 using Jrpg.Core.Party;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
 using Jrpg.Data.Content;
 using Jrpg.Data.Party;
@@ -113,6 +114,59 @@ public sealed class ClassCatalogValidatorTests
 
         Assert.Null(exception);
     }
+
+    [Fact]
+    public void Validate_StartsAtAboveMax_ThrowsNamingClassAndResource()
+    {
+        var exception = Assert.Throws<ContentValidationException>(
+            () => Validate([Class("mage") with { Resources = [Mana with { StartsAt = 11 }] }]));
+
+        Assert.Equal("classes.json: class 'mage': resource 'mana': startsAt must be within 0..10 (was 11).", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_DuplicateResourceId_Throws()
+    {
+        var exception = Assert.Throws<ContentValidationException>(
+            () => Validate([Class("mage") with { Resources = [Mana, Mana with { Name = "More mana" }] }]));
+
+        Assert.Equal("classes.json: class 'mage': resources lists 'mana' more than once.", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_MaxBelowOne_Throws()
+    {
+        var exception = Assert.Throws<ContentValidationException>(
+            () => Validate([Class("mage") with { Resources = [Mana with { Max = 0, StartsAt = 0 }] }]));
+
+        Assert.Equal("classes.json: class 'mage': resource 'mana': max must be at least 1 (was 0).", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_EmptyResourceName_Throws()
+    {
+        var exception = Assert.Throws<ContentValidationException>(
+            () => Validate([Class("mage") with { Resources = [Mana with { Name = " " }] }]));
+
+        Assert.Equal("classes.json: class 'mage': resource 'mana': name must not be empty.", exception.Message);
+    }
+
+    public static TheoryData<ResourceDefinition, string> MalformedResources => new()
+    {
+        { null!, "resources must not contain a null entry." },
+        { Mana with { Id = " " }, "resources must not contain an empty id." },
+    };
+
+    [Theory]
+    [MemberData(nameof(MalformedResources))]
+    public void Validate_NullOrEmptyResourceId_Throws(ResourceDefinition resource, string problem)
+    {
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("mage") with { Resources = [resource] }]));
+
+        Assert.Equal($"classes.json: class 'mage': {problem}", exception.Message);
+    }
+
+    private static ResourceDefinition Mana { get; } = new("mana", "Mana", Max: 10, StartsAt: 3);
 
     private static void Validate(IReadOnlyList<ClassDefinition> classes) =>
         ClassCatalogValidator.Validate("classes.json", classes, _references);

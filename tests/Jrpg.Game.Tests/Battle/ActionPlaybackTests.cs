@@ -46,6 +46,15 @@ public sealed class ActionPlaybackTests
     }
 
     [Fact]
+    public void Start_ResourceChanged_AddsNoBeat()
+    {
+        var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), new ResourceChanged(_sarxian, "mana", 2)]);
+
+        Assert.Empty(playback.Beats);
+        Assert.Equal(TimeSpan.Zero, playback.Duration);
+    }
+
+    [Fact]
     public void Start_Defend_HasNoHold()
     {
         var playback = Start([new ActionStarted(_sarxian, new DefendCommand())]);

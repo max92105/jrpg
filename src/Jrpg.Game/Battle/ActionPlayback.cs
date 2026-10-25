@@ -107,6 +107,8 @@ internal sealed class ActionPlayback
                 AddBeatOnce(PlaybackBeatKind.Defeat, BattlePacing.DefeatHold - BattlePacing.ImpactHold);
                 _fallen.Add(defeated.Combatant);
                 break;
+            // The panel reads live amounts at the next stage change (ADR 0013), so a change needs no beat of its own.
+            case ResourceChanged:
             case BattleEnded:
                 break;
             default:

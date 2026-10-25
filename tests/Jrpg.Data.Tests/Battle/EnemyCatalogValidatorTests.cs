@@ -15,7 +15,6 @@ public sealed class EnemyCatalogValidatorTests
         AttackEffectFile = "AttackEnemy.png",
         IsSpriteFlipped = false,
         MaxHp = 40,
-        MaxMp = 10,
         Attack = 20,
         Defense = 2,
         ExperienceReward = 40,
@@ -25,7 +24,6 @@ public sealed class EnemyCatalogValidatorTests
     {
         { _goblin with { Name = "" }, "name must not be empty." },
         { _goblin with { MaxHp = 0 }, "maxHp must be at least 1 (was 0)." },
-        { _goblin with { MaxMp = -1 }, "maxMp must be at least 0 (was -1)." },
         { _goblin with { Attack = -1 }, "attack must be at least 0 (was -1)." },
         { _goblin with { Defense = -1 }, "defense must be at least 0 (was -1)." },
         { _goblin with { ExperienceReward = -1 }, "experienceReward must be at least 0 (was -1)." },

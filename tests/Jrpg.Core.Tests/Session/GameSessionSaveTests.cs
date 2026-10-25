@@ -33,18 +33,6 @@ public sealed class GameSessionSaveTests
         .WithSteps(new GiveItemStep("potion", 1), new SwapObjectStep("chest_opened"))
         .Build();
 
-    // Saves keep no MP (ADR 0022); MP stays in Vitals, unused, until MP3b removes it.
-    [Fact]
-    public void CaptureThenRestore_SpentMp_StartsFull()
-    {
-        var session = StartNew();
-        Assert.True(session.Party.Leader.Vitals.TrySpendMp(3));
-
-        var restored = SaveAndRestore(session).Party.Leader;
-
-        Assert.Equal(restored.Vitals.MaxMp, restored.Vitals.Mp);
-    }
-
     [Fact]
     public void CaptureThenRestore_RestoresLevelsExperienceAndVitals()
     {
@@ -77,8 +65,8 @@ public sealed class GameSessionSaveTests
     public void Restore_MemberSavedAtLevelThree_HasTheClassStatsAtThree()
     {
         var growing = new ClassBuilder()
-            .WithBase(new ClassStats(MaxHp: 100, MaxMp: 20, Attack: 10, Defense: 5))
-            .WithGrowth(new ClassStats(MaxHp: 10, MaxMp: 2, Attack: 3, Defense: 1))
+            .WithBase(new ClassStats(MaxHp: 100, Attack: 10, Defense: 5))
+            .WithGrowth(new ClassStats(MaxHp: 10, Attack: 3, Defense: 1))
             .Build();
         var catalog = Catalog(_belowChest) with { Classes = new Dictionary<string, ClassDefinition> { ["fighter"] = growing } };
         var save = StartNew().Capture(_savedAt);

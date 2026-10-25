@@ -12,7 +12,7 @@ public sealed class VitalsTextTests
     [Fact]
     public void Refresh_SameValues_KeepsSameStrings()
     {
-        var vitals = new Vitals(150, 200, 30, 40);
+        var vitals = new Vitals(150, 200);
         _text.Refresh(vitals);
         var (hp, maxHp) = (_text.Hp, _text.MaxHp);
 
@@ -25,7 +25,7 @@ public sealed class VitalsTextTests
     [Fact]
     public void Refresh_HpChanged_ReformatsHp()
     {
-        var vitals = new Vitals(150, 200, 30, 40);
+        var vitals = new Vitals(150, 200);
         _text.Refresh(vitals);
         var maxHp = _text.MaxHp;
         vitals.TakeDamage(25);
@@ -39,7 +39,7 @@ public sealed class VitalsTextTests
     [Fact]
     public void Refresh_FallenMember_HpIsZero()
     {
-        var vitals = new Vitals(10, 200, 30, 40);
+        var vitals = new Vitals(10, 200);
         vitals.TakeDamage(50);
 
         _text.Refresh(vitals);

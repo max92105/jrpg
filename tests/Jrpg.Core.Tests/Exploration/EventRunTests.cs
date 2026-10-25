@@ -224,7 +224,7 @@ public sealed class EventRunTests
 
         var omer = _party.MemberById("omer");
         Assert.Equal((1, 0), (omer.Level, omer.Experience));
-        Assert.Equal((omer.Vitals.MaxHp, omer.Vitals.MaxMp), (omer.Vitals.Hp, omer.Vitals.Mp));
+        Assert.Equal(omer.Vitals.MaxHp, omer.Vitals.Hp);
         Assert.Contains(omer, _party.ActiveMembers);
         Assert.Equal(new Recruitment(omer, HasJoined: true), run.CurrentRecruitment);
     }

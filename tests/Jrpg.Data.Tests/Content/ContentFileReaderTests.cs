@@ -1,5 +1,6 @@
 using Jrpg.Core.Events;
 using Jrpg.Core.Items;
+using Jrpg.Core.Party;
 using Jrpg.Core.Skills;
 using Jrpg.Data.Content;
 
@@ -46,6 +47,17 @@ public sealed class ContentFileReaderTests
             () => ContentFileReader.Read<IReadOnlyList<ItemDefinition>>(TestContentPath(fileName)));
 
         Assert.StartsWith($"{fileName} at {jsonPath}", exception.Message, StringComparison.Ordinal);
+    }
+
+    // MP left the game (decision 197): a class file from before it fails at load, naming the file and the field.
+    [Fact]
+    public void Read_ClassWithMaxMp_ThrowsNamingTheField()
+    {
+        var exception = Assert.Throws<ContentValidationException>(
+            () => ContentFileReader.Read<IReadOnlyList<ClassDefinition>>(TestContentPath("class-with-max-mp.json")));
+
+        Assert.StartsWith("class-with-max-mp.json", exception.Message, StringComparison.Ordinal);
+        Assert.Contains("maxMp", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]

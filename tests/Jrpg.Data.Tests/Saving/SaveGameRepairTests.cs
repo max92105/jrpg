@@ -11,8 +11,7 @@ using Jrpg.Data.Saving;
 namespace Jrpg.Data.Tests.Saving;
 
 /// <summary>
-/// Repairs saves against the repository content: sarxian is a warlock (188 HP and 84 MP at level 3), jazog a barbarian
-/// (10 MP at level 1), potions stack to 99.
+/// Repairs saves against the repository content: sarxian has 188 HP at level 3, and potions stack to 99.
 /// </summary>
 public sealed class SaveGameRepairTests
 {

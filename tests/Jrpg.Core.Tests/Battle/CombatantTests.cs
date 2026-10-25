@@ -85,7 +85,6 @@ public sealed class CombatantTests
         Assert.Equal("Goblin", combatant.Name);
         Assert.Equal(BattleSide.Enemies, combatant.Side);
         Assert.Equal(new CombatStats(Attack: 20, Defense: 2), combatant.Stats);
-        Assert.Equal(goblin.MaxMp, combatant.Vitals.Mp);
     }
 
     [Fact]

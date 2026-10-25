@@ -5,8 +5,8 @@ namespace Jrpg.Core.Tests.Effects;
 
 public sealed class TargetRulesTests
 {
-    private readonly Vitals _living = new(hp: 50, maxHp: 100, mp: 0, maxMp: 0);
-    private readonly Vitals _fallen = new(hp: 0, maxHp: 100, mp: 0, maxMp: 0);
+    private readonly Vitals _living = new(hp: 50, maxHp: 100);
+    private readonly Vitals _fallen = new(hp: 0, maxHp: 100);
 
     [Theory]
     [InlineData(Targeting.SingleEnemy, TargetRelation.Enemy, true)]

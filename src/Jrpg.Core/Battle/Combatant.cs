@@ -52,7 +52,7 @@ public sealed class Combatant
         enemy.Name,
         BattleSide.Enemies,
         new CombatStats(enemy.Attack, enemy.Defense),
-        new Vitals(enemy.MaxHp, enemy.MaxHp, enemy.MaxMp, enemy.MaxMp))
+        new Vitals(enemy.MaxHp, enemy.MaxHp))
     {
         Enemy = enemy,
     };

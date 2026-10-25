@@ -12,7 +12,7 @@ public sealed class MemberVitalBarsTests
     public void Show_HurtMember_HpShowsItsHp()
     {
         var bars = new MemberVitalBars(RepositoryScreenText.Text, new UiTextures(), ValuePixels);
-        var vitals = new Vitals(hp: 60, maxHp: 60, mp: 10, maxMp: 20);
+        var vitals = new Vitals(hp: 60, maxHp: 60);
         vitals.TakeDamage(15);
 
         bars.Show(vitals);

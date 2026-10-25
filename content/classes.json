@@ -2,50 +2,50 @@
   {
     "id": "fighter", "name": "Fighter",
     "description": "A trained fighter who stands in front and wins by steel and endurance.",
-    "base": { "maxHp": 220, "maxMp": 20, "attack": 24, "defense": 8 },
-    "growth": { "maxHp": 22, "maxMp": 2, "attack": 3, "defense": 1 } },
+    "base": { "maxHp": 220, "attack": 24, "defense": 8 },
+    "growth": { "maxHp": 22, "attack": 3, "defense": 1 } },
   {
     "id": "mage", "name": "Mage",
     "description": "A scholar of the arcane who bends raw magic into fire, frost and storm.",
-    "base": { "maxHp": 150, "maxMp": 80, "attack": 20, "defense": 4 },
-    "growth": { "maxHp": 12, "maxMp": 8, "attack": 2, "defense": 1 },
+    "base": { "maxHp": 150, "attack": 20, "defense": 4 },
+    "growth": { "maxHp": 12, "attack": 2, "defense": 1 },
     "skillIds": ["fire_blast", "fireball", "meteor"],
     "resources": [ { "id": "mana", "name": "Mana", "max": 10, "startsAt": 3, "gains": { "perTurn": 2 } } ] },
   {
     "id": "cleric", "name": "Cleric",
     "description": "A servant of the gods who heals allies and smites the unholy.",
-    "base": { "maxHp": 180, "maxMp": 60, "attack": 18, "defense": 7 },
-    "growth": { "maxHp": 16, "maxMp": 6, "attack": 2, "defense": 1 },
+    "base": { "maxHp": 180, "attack": 18, "defense": 7 },
+    "growth": { "maxHp": 16, "attack": 2, "defense": 1 },
     "skillIds": ["heal", "recovery", "heal_all"],
     "resources": [ { "id": "faith", "name": "Faith", "max": 5, "startsAt": 5, "gains": { "perAllyFallen": -1 } } ] },
   {
     "id": "rogue", "name": "Rogue",
     "description": "A quick and cunning blade who strikes where the enemy is weakest.",
-    "base": { "maxHp": 170, "maxMp": 30, "attack": 25, "defense": 5 },
-    "growth": { "maxHp": 15, "maxMp": 3, "attack": 3, "defense": 1 } },
+    "base": { "maxHp": 170, "attack": 25, "defense": 5 },
+    "growth": { "maxHp": 15, "attack": 3, "defense": 1 } },
   {
     "id": "barbarian", "name": "Barbarian",
     "description": "A fierce brawler who turns rage into raw, unstoppable strength.",
-    "base": { "maxHp": 250, "maxMp": 10, "attack": 26, "defense": 6 },
-    "growth": { "maxHp": 26, "maxMp": 1, "attack": 3, "defense": 1 } },
+    "base": { "maxHp": 250, "attack": 26, "defense": 6 },
+    "growth": { "maxHp": 26, "attack": 3, "defense": 1 } },
   {
     "id": "paladin", "name": "Paladin",
     "description": "A holy knight bound by an oath, shield of the weak and bane of evil.",
-    "base": { "maxHp": 210, "maxMp": 40, "attack": 22, "defense": 9 },
-    "growth": { "maxHp": 20, "maxMp": 4, "attack": 2, "defense": 2 } },
+    "base": { "maxHp": 210, "attack": 22, "defense": 9 },
+    "growth": { "maxHp": 20, "attack": 2, "defense": 2 } },
   {
     "id": "monk", "name": "Monk",
     "description": "A disciplined fighter whose body and spirit are the only weapons needed.",
-    "base": { "maxHp": 190, "maxMp": 30, "attack": 23, "defense": 6 },
-    "growth": { "maxHp": 18, "maxMp": 3, "attack": 3, "defense": 1 } },
+    "base": { "maxHp": 190, "attack": 23, "defense": 6 },
+    "growth": { "maxHp": 18, "attack": 3, "defense": 1 } },
   {
     "id": "warlock", "name": "Warlock",
     "description": "A seeker who made a pact with a dark patron in exchange for power.",
-    "base": { "maxHp": 160, "maxMp": 70, "attack": 22, "defense": 4 },
-    "growth": { "maxHp": 14, "maxMp": 7, "attack": 3, "defense": 1 } },
+    "base": { "maxHp": 160, "attack": 22, "defense": 4 },
+    "growth": { "maxHp": 14, "attack": 3, "defense": 1 } },
   {
     "id": "druid", "name": "Druid",
     "description": "A keeper of the wild who calls on nature and takes the shapes of beasts.",
-    "base": { "maxHp": 175, "maxMp": 60, "attack": 19, "defense": 6 },
-    "growth": { "maxHp": 16, "maxMp": 6, "attack": 2, "defense": 1 } }
+    "base": { "maxHp": 175, "attack": 19, "defense": 6 },
+    "growth": { "maxHp": 16, "attack": 2, "defense": 1 } }
 ]

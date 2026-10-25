@@ -33,7 +33,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Randomness | Seeded randomness | `IRandom`, `SeededRandom` |
 | Resources | Class battle resources (ADR 0019): definitions, gains per trigger, one combatant's amounts in a battle | `ResourceDefinition`, `ResourceGains`, `ResourceChange` (what a skill does to one resource), `ResourceRequirement` (a minimum a skill needs, never spent), `ResourceMeters` (on `Combatant.Resources`, built new each battle; changes reported as `ResourceChanged`) |
 | Saving / Session / World | The save record; one playthrough (starts and finishes its battles); what the player changed in the world | `SaveGame`, `GameSession`, `WorldState` |
-| Skills / Stats | Skill definitions; stats and HP/MP | `SkillDefinition`, `CombatStats`, `Vitals` |
+| Skills / Stats | Skill definitions; stats and HP | `SkillDefinition`, `CombatStats`, `Vitals` |
 
 ## Jrpg.Data (content and saves on disk)
 

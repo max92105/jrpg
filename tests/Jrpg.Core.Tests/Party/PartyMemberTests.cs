@@ -13,8 +13,8 @@ public sealed class PartyMemberTests
     private readonly ExperienceTable _table = new([100, 120, 144]);
 
     private static readonly ClassDefinition _growingClass = new ClassBuilder()
-        .WithBase(new ClassStats(MaxHp: 100, MaxMp: 20, Attack: 12, Defense: 7))
-        .WithGrowth(new ClassStats(MaxHp: 10, MaxMp: 3, Attack: 2, Defense: 1))
+        .WithBase(new ClassStats(MaxHp: 100, Attack: 12, Defense: 7))
+        .WithGrowth(new ClassStats(MaxHp: 10, Attack: 2, Defense: 1))
         .Build();
 
     [Fact]
@@ -26,7 +26,7 @@ public sealed class PartyMemberTests
 
         Assert.Equal((1, 0), (member.Level, member.Experience));
         Assert.Equal(new CombatStats(Attack: 12, Defense: 7), member.BaseStats);
-        Assert.Equal((100, 100, 20, 20), (member.Vitals.Hp, member.Vitals.MaxHp, member.Vitals.Mp, member.Vitals.MaxMp));
+        Assert.Equal((100, 100), (member.Vitals.Hp, member.Vitals.MaxHp));
     }
 
     [Fact]
@@ -38,7 +38,7 @@ public sealed class PartyMemberTests
             new PartyMemberBuilder().BuildDefinition(), _growingClass, new Dictionary<string, SkillDefinition>(), progress);
 
         Assert.Equal(new CombatStats(Attack: 16, Defense: 9), member.BaseStats);
-        Assert.Equal((50, 120, 26, 26), (member.Vitals.Hp, member.Vitals.MaxHp, member.Vitals.Mp, member.Vitals.MaxMp));
+        Assert.Equal((50, 120), (member.Vitals.Hp, member.Vitals.MaxHp));
     }
 
     [Fact]
@@ -150,7 +150,7 @@ public sealed class PartyMemberTests
         member.GainExperience(100, _table);
 
         Assert.Equal(new CombatStats(Attack: 14, Defense: 8), member.BaseStats);
-        Assert.Equal((70, 110, 23, 23), (member.Vitals.Hp, member.Vitals.MaxHp, member.Vitals.Mp, member.Vitals.MaxMp));
+        Assert.Equal((70, 110), (member.Vitals.Hp, member.Vitals.MaxHp));
     }
 
     [Fact]
@@ -162,7 +162,7 @@ public sealed class PartyMemberTests
 
         Assert.Equal(3, member.Level);
         Assert.Equal(new CombatStats(Attack: 16, Defense: 9), member.BaseStats);
-        Assert.Equal((120, 120, 26, 26), (member.Vitals.Hp, member.Vitals.MaxHp, member.Vitals.Mp, member.Vitals.MaxMp));
+        Assert.Equal((120, 120), (member.Vitals.Hp, member.Vitals.MaxHp));
     }
 
     [Fact]
@@ -173,7 +173,7 @@ public sealed class PartyMemberTests
         member.GainExperience(99, _table);
 
         Assert.Equal(new CombatStats(Attack: 12, Defense: 7), member.BaseStats);
-        Assert.Equal((100, 100, 20, 20), (member.Vitals.Hp, member.Vitals.MaxHp, member.Vitals.Mp, member.Vitals.MaxMp));
+        Assert.Equal((100, 100), (member.Vitals.Hp, member.Vitals.MaxHp));
     }
 
     [Fact]

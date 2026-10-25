@@ -32,7 +32,6 @@ internal sealed class EnemyDefinitionBuilder
         AttackEffectFile = "AttackEnemy.png",
         IsSpriteFlipped = false,
         MaxHp = _maxHp,
-        MaxMp = 10,
         Attack = _attack,
         Defense = _defense,
         ExperienceReward = 40,

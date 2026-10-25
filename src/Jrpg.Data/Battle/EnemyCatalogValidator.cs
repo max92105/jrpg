@@ -14,7 +14,6 @@ internal static class EnemyCatalogValidator
         string.IsNullOrWhiteSpace(enemy.Name)
             ? "name must not be empty."
             : AtLeast("maxHp", enemy.MaxHp, 1)
-                ?? AtLeast("maxMp", enemy.MaxMp, 0)
                 ?? AtLeast("attack", enemy.Attack, 0)
                 ?? AtLeast("defense", enemy.Defense, 0)
                 ?? AtLeast("experienceReward", enemy.ExperienceReward, 0);

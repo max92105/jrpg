@@ -5,7 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/MP3a.md, slice MP3a (saves stop keeping MP, format 2)
-Round: 1 (verdict: Ready to commit)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/MP3b.md, slice MP3b (members and enemies lose MP)
+Round: 1 (verdict: Ready to commit; verify all pass, 1833 tests)
 
-- Suggestion, open: GameSessionSaveTests.CaptureThenRestore_SpentMp_StartsFull ignores TrySpendMp's result; Assert.True on it (or assert Mp < MaxMp before saving) so the test can't pass with a 0-MP class.
+- Suggestion, open: SaveGameRepairTests summary "jazog a barbarian," now states nothing the tests rely on; drop it or say what it's for.
+- (MP3a's TrySpendMp suggestion is moot: that test is deleted with MP.)

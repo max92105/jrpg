@@ -1,6 +1,6 @@
 namespace Jrpg.Core.Battle;
 
-/// <summary>One enemy type. Every enemy of this type starts a battle at full HP and MP.</summary>
+/// <summary>One enemy type. Every enemy of this type starts a battle at full HP.</summary>
 public sealed record EnemyDefinition
 {
     public required string Id { get; init; }
@@ -16,8 +16,6 @@ public sealed record EnemyDefinition
     public required bool IsSpriteFlipped { get; init; }
 
     public required int MaxHp { get; init; }
-
-    public required int MaxMp { get; init; }
 
     public required int Attack { get; init; }
 

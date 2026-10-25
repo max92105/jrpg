@@ -1,30 +1,21 @@
 namespace Jrpg.Core.Stats;
 
-/// <summary>Current and maximum HP and MP. HP and MP never leave 0..max.</summary>
+/// <summary>Current and maximum HP, never outside 0..max; classes have their own battle resources, not MP.</summary>
 public sealed class Vitals
 {
-    public Vitals(int hp, int maxHp, int mp, int maxMp)
+    public Vitals(int hp, int maxHp)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(maxHp, 1);
         ArgumentOutOfRangeException.ThrowIfNegative(hp);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(hp, maxHp);
-        ArgumentOutOfRangeException.ThrowIfNegative(maxMp);
-        ArgumentOutOfRangeException.ThrowIfNegative(mp);
-        ArgumentOutOfRangeException.ThrowIfGreaterThan(mp, maxMp);
 
         Hp = hp;
         MaxHp = maxHp;
-        Mp = mp;
-        MaxMp = maxMp;
     }
 
     public int Hp { get; private set; }
 
     public int MaxHp { get; private set; }
-
-    public int Mp { get; private set; }
-
-    public int MaxMp { get; private set; }
 
     public bool IsAlive => Hp > 0;
 
@@ -62,40 +53,15 @@ public sealed class Vitals
         return AddHp(hp);
     }
 
-    public bool TrySpendMp(int cost)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegative(cost);
-        if (cost > Mp)
-        {
-            return false;
-        }
-
-        Mp -= cost;
-        return true;
-    }
-
-    /// <returns>The MP actually restored.</returns>
-    public int RestoreMp(int amount)
-    {
-        ArgumentOutOfRangeException.ThrowIfNegative(amount);
-
-        var restored = Math.Min(amount, MaxMp - Mp);
-        Mp += restored;
-        return restored;
-    }
-
     /// <summary>
-    /// A level-up: the gains go to the maxima and to current HP and MP alike, so the member keeps the HP and MP they
-    /// had spent (ADR 0017). A fallen member stays at 0 HP: levelling up doesn't revive.
+    /// A level-up: the gain goes to the maximum and to current HP alike, so the member keeps the HP they had lost
+    /// (ADR 0017). A fallen member stays at 0 HP: levelling up doesn't revive.
     /// </summary>
-    internal void RaiseMaxima(int maxHpGain, int maxMpGain)
+    internal void RaiseMaxima(int maxHpGain)
     {
         ArgumentOutOfRangeException.ThrowIfNegative(maxHpGain);
-        ArgumentOutOfRangeException.ThrowIfNegative(maxMpGain);
 
         MaxHp += maxHpGain;
-        MaxMp += maxMpGain;
-        Mp += maxMpGain;
         if (IsAlive)
         {
             Hp += maxHpGain;

@@ -98,7 +98,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **MP2. No screen shows MP** (Game, about 230 lines) → [slices/MP2.md](slices/MP2.md)
 - [x] **M3. The battle panel shows each member's resources where MP was, plainly** (Game, about 170 lines) → [slices/M3.md](slices/M3.md)
 - [x] **MP3a. Saves stop keeping MP: format 2, older saves refused** (Core + Data, about 150 lines) → [slices/MP3a.md](slices/MP3a.md)
-- [ ] **MP3b. Members and enemies lose MP** (Core + Data + content, about 260 lines, mostly deletions and test-site edits) → [slices/MP3b.md](slices/MP3b.md)
+- [x] **MP3b. Members and enemies lose MP** (Core + Data + content, about 260 lines, mostly deletions and test-site edits) → [slices/MP3b.md](slices/MP3b.md)
 
 ### Phase 3: statuses, the fighter, the barbarian, the paladin and the formation
 - [ ] **ADR 0021: Status effects** (before ST1) → [slices/ADR-0021.md](slices/ADR-0021.md)

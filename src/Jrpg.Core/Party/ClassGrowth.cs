@@ -16,7 +16,6 @@ public static class ClassGrowth
         var (baseStats, growth) = (characterClass.Base, characterClass.Growth);
         return new ClassStats(
             baseStats.MaxHp + (growth.MaxHp * levelsGained),
-            baseStats.MaxMp + (growth.MaxMp * levelsGained),
             baseStats.Attack + (growth.Attack * levelsGained),
             baseStats.Defense + (growth.Defense * levelsGained));
     }

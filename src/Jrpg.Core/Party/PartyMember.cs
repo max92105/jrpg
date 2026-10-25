@@ -18,8 +18,7 @@ public sealed class PartyMember
         Experience = progress.Experience;
         var stats = ClassGrowth.StatsAt(characterClass, progress.Level);
         BaseStats = BaseStatsOf(stats);
-        // Saves no longer keep MP, and nothing uses it (ADR 0022): it starts full until MP3b removes it.
-        Vitals = new Vitals(progress.Hp, stats.MaxHp, stats.MaxMp, stats.MaxMp);
+        Vitals = new Vitals(progress.Hp, stats.MaxHp);
     }
 
     public string Id => Definition.Id;
@@ -46,7 +45,7 @@ public sealed class PartyMember
     /// <summary>Base stats plus the bonuses of everything worn.</summary>
     public CombatStats TotalStats => StatsWearing(Weapon, Armor);
 
-    /// <summary>A new member joins at level 1 with 0 experience and full HP and MP (decision 168).</summary>
+    /// <summary>A new member joins at level 1 with 0 experience and full HP (decision 168).</summary>
     /// <param name="definition">Who joins.</param>
     /// <param name="characterClass">The member's class, which gives their stats at their level (ADR 0017).</param>
     /// <param name="skillCatalog">All skills by id; the member gets their class's, in its order (ADR 0020).</param>
@@ -184,6 +183,6 @@ public sealed class PartyMember
         Experience = 0;
         var after = ClassGrowth.StatsAt(Class, Level);
         BaseStats = BaseStatsOf(after);
-        Vitals.RaiseMaxima(after.MaxHp - before.MaxHp, after.MaxMp - before.MaxMp);
+        Vitals.RaiseMaxima(after.MaxHp - before.MaxHp);
     }
 }

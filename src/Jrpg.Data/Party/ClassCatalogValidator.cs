@@ -25,7 +25,6 @@ internal static class ClassCatalogValidator
     // Growth may be 0 for a stat a class never improves; a negative one would shrink it with every level.
     private static string? FindNegativeStat(string field, ClassStats stats) =>
         stats.MaxHp < 0 ? $"{field}.maxHp must be at least 0 (was {stats.MaxHp})."
-        : stats.MaxMp < 0 ? $"{field}.maxMp must be at least 0 (was {stats.MaxMp})."
         : stats.Attack < 0 ? $"{field}.attack must be at least 0 (was {stats.Attack})."
         : stats.Defense < 0 ? $"{field}.defense must be at least 0 (was {stats.Defense})."
         : null;

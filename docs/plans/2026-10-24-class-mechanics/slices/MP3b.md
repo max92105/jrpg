@@ -20,3 +20,7 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
     - `ClassCatalogValidatorTests`: `Validate_MaxMpField_IsRejected` (an old-style file fails, naming the class)
     - `VitalsTests`: `RaiseMaxima_Alive_AddsToMaxAndCurrentHp` (the reshaped existing test)
   - **Verify by hand:** `git grep -n "Mp\b\|maxMp\|MaxMp" -- src content` finds nothing. A new game and a continued save both play.
+- **Done, with deviations:** Tests 1840 before, 1833 after: 9 MP tests deleted, 2 added (one of them reshaped). Beyond the plan:
+  - The stray-`maxMp` test is `ContentFileReaderTests.Read_ClassWithMaxMp_ThrowsNamingTheField`, with a test file, not a `ClassCatalogValidatorTests` case. The strict reader rejects the field before the validator runs, so the message names the file and the field's path rather than the class.
+  - `SkillPaymentTests.CanPay_ClericWithNoMp_HealStillUsable` is deleted: with no MP left, it could no longer fail and only repeated `CanPay_RequirementMet`.
+  - The per-turn upkeep needs no change. `git grep "Mp\b|maxMp|MaxMp" -- src content` finds only comments saying MP is gone.

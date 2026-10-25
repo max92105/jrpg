@@ -7,13 +7,13 @@ public sealed class VitalsTests
     [Fact]
     public void Constructor_HpAboveMaxHp_Throws()
     {
-        Assert.Throws<ArgumentOutOfRangeException>(() => new Vitals(hp: 101, maxHp: 100, mp: 0, maxMp: 0));
+        Assert.Throws<ArgumentOutOfRangeException>(() => new Vitals(hp: 101, maxHp: 100));
     }
 
     [Fact]
     public void TakeDamage_MoreThanHp_ClampsToZeroAndReturnsHpLost()
     {
-        var vitals = new Vitals(hp: 30, maxHp: 100, mp: 0, maxMp: 0);
+        var vitals = new Vitals(hp: 30, maxHp: 100);
 
         var lost = vitals.TakeDamage(50);
 
@@ -24,7 +24,7 @@ public sealed class VitalsTests
     [Fact]
     public void TakeDamage_Fallen_ReturnsZero()
     {
-        var vitals = new Vitals(hp: 0, maxHp: 100, mp: 0, maxMp: 0);
+        var vitals = new Vitals(hp: 0, maxHp: 100);
 
         var lost = vitals.TakeDamage(50);
 
@@ -34,7 +34,7 @@ public sealed class VitalsTests
     [Fact]
     public void RestoreHp_AboveMax_ClampsToMaxAndReturnsHpRestored()
     {
-        var vitals = new Vitals(hp: 90, maxHp: 100, mp: 0, maxMp: 0);
+        var vitals = new Vitals(hp: 90, maxHp: 100);
 
         var restored = vitals.RestoreHp(50);
 
@@ -45,7 +45,7 @@ public sealed class VitalsTests
     [Fact]
     public void RestoreHp_Fallen_ReturnsZeroAndStaysFallen()
     {
-        var vitals = new Vitals(hp: 0, maxHp: 100, mp: 0, maxMp: 0);
+        var vitals = new Vitals(hp: 0, maxHp: 100);
 
         var restored = vitals.RestoreHp(50);
 
@@ -56,7 +56,7 @@ public sealed class VitalsTests
     [Fact]
     public void Revive_Fallen_RestoresHp()
     {
-        var vitals = new Vitals(hp: 0, maxHp: 100, mp: 0, maxMp: 0);
+        var vitals = new Vitals(hp: 0, maxHp: 100);
 
         var restored = vitals.Revive(15);
 
@@ -67,7 +67,7 @@ public sealed class VitalsTests
     [Fact]
     public void Revive_MoreThanMaxHp_ClampsToMaxHp()
     {
-        var vitals = new Vitals(hp: 0, maxHp: 100, mp: 0, maxMp: 0);
+        var vitals = new Vitals(hp: 0, maxHp: 100);
 
         var restored = vitals.Revive(150);
 
@@ -78,7 +78,7 @@ public sealed class VitalsTests
     [Fact]
     public void Revive_Living_ReturnsZero()
     {
-        var vitals = new Vitals(hp: 40, maxHp: 100, mp: 0, maxMp: 0);
+        var vitals = new Vitals(hp: 40, maxHp: 100);
 
         var restored = vitals.Revive(15);
 
@@ -87,66 +87,22 @@ public sealed class VitalsTests
     }
 
     [Fact]
-    public void TrySpendMp_EnoughMp_ReturnsTrueAndSpendsMp()
+    public void RaiseMaxima_Alive_AddsToMaxAndCurrentHp()
     {
-        var vitals = new Vitals(hp: 100, maxHp: 100, mp: 10, maxMp: 20);
+        var vitals = new Vitals(hp: 30, maxHp: 100);
 
-        var spent = vitals.TrySpendMp(4);
+        vitals.RaiseMaxima(maxHpGain: 10);
 
-        Assert.True(spent);
-        Assert.Equal(6, vitals.Mp);
-    }
-
-    [Fact]
-    public void TrySpendMp_ExactlyAllMp_ReturnsTrueAndLeavesZero()
-    {
-        var vitals = new Vitals(hp: 100, maxHp: 100, mp: 4, maxMp: 20);
-
-        var spent = vitals.TrySpendMp(4);
-
-        Assert.True(spent);
-        Assert.Equal(0, vitals.Mp);
-    }
-
-    [Fact]
-    public void TrySpendMp_NotEnoughMp_ReturnsFalseAndKeepsMp()
-    {
-        var vitals = new Vitals(hp: 100, maxHp: 100, mp: 3, maxMp: 20);
-
-        var spent = vitals.TrySpendMp(4);
-
-        Assert.False(spent);
-        Assert.Equal(3, vitals.Mp);
-    }
-
-    [Fact]
-    public void RestoreMp_AboveMax_ClampsToMaxAndReturnsMpRestored()
-    {
-        var vitals = new Vitals(hp: 100, maxHp: 100, mp: 15, maxMp: 20);
-
-        var restored = vitals.RestoreMp(10);
-
-        Assert.Equal(20, vitals.Mp);
-        Assert.Equal(5, restored);
-    }
-
-    [Fact]
-    public void RaiseMaxima_Alive_AddsToMaxAndCurrent()
-    {
-        var vitals = new Vitals(hp: 30, maxHp: 100, mp: 5, maxMp: 20);
-
-        vitals.RaiseMaxima(maxHpGain: 10, maxMpGain: 3);
-
-        Assert.Equal((40, 110, 8, 23), (vitals.Hp, vitals.MaxHp, vitals.Mp, vitals.MaxMp));
+        Assert.Equal((40, 110), (vitals.Hp, vitals.MaxHp));
     }
 
     [Fact]
     public void RaiseMaxima_Dead_StaysAtZeroHp()
     {
-        var vitals = new Vitals(hp: 0, maxHp: 100, mp: 5, maxMp: 20);
+        var vitals = new Vitals(hp: 0, maxHp: 100);
 
-        vitals.RaiseMaxima(maxHpGain: 10, maxMpGain: 3);
+        vitals.RaiseMaxima(maxHpGain: 10);
 
-        Assert.Equal((0, 110, 8, 23), (vitals.Hp, vitals.MaxHp, vitals.Mp, vitals.MaxMp));
+        Assert.Equal((0, 110), (vitals.Hp, vitals.MaxHp));
     }
 }

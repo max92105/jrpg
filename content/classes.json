@@ -39,7 +39,7 @@
     "description": "A holy knight bound by an oath, shield of the weak and bane of evil.",
     "base": { "maxHp": 210, "attack": 22, "defense": 9 },
     "growth": { "maxHp": 20, "attack": 2, "defense": 2 },
-    "skillIds": ["smite"],
+    "skillIds": ["smite", "aura_of_protection", "wide_aura"],
     "resources": [
       { "id": "conviction", "name": "Conviction", "max": 10, "startsAt": 0,
         "gains": { "perHeavyHit": 2, "heavyHitPercent": 20, "perEnemyFallen": 3 } } ] },

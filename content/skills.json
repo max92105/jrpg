@@ -91,5 +91,27 @@
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "conviction", "amount": -3 } ],
     "effect": { "kind": "damage", "power": 40, "targeting": "singleEnemy" }
+  },
+  {
+    "id": "aura_of_protection",
+    "name": "Aura of Protection",
+    "description": "Guards you and the allies beside you for three turns. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "resourceChanges": [ { "resourceId": "conviction", "amount": -4 } ],
+    "effect": {
+      "kind": "grantStatus", "power": 0, "targeting": "alliesInRange", "range": 1,
+      "status": { "kind": "guarded", "power": 5, "turns": 3 }
+    }
+  },
+  {
+    "id": "wide_aura",
+    "name": "Wide Aura",
+    "description": "Guards everyone up to two places away for three turns. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "resourceChanges": [ { "resourceId": "conviction", "amount": -6 } ],
+    "effect": {
+      "kind": "grantStatus", "power": 0, "targeting": "alliesInRange", "range": 2,
+      "status": { "kind": "guarded", "power": 3, "turns": 3 }
+    }
   }
 ]

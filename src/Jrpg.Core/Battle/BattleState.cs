@@ -86,7 +86,7 @@ public sealed class BattleState
         new(CurrentActor.Side == BattleSide.Party ? Formation.Neighbors(CurrentActor) : [], TakesAll: false);
 
     /// <summary>Who the current actor can aim <paramref name="skill"/> at, in formation order.</summary>
-    public TargetChoice<Combatant> TargetChoiceFor(SkillDefinition skill) => ChoiceFor(skill.Effect.Targeting);
+    public TargetChoice<Combatant> TargetChoiceFor(SkillDefinition skill) => ChoiceFor(skill.Effect);
 
     /// <summary>Whether the actor can pay <paramref name="skill"/>: its resource requirements and costs.</summary>
     public bool CanAfford(SkillDefinition skill) => SkillPayment.CanPay(CurrentActor, skill);
@@ -109,7 +109,7 @@ public sealed class BattleState
     /// <exception cref="ArgumentException">The item has no effect to aim.</exception>
     public TargetChoice<Combatant> TargetChoiceFor(ItemDefinition item) =>
         item.Effect is { } effect
-            ? ChoiceFor(effect.Targeting)
+            ? ChoiceFor(effect)
             : throw new ArgumentException($"{item.Name} has no effect to aim.", nameof(item));
 
     /// <summary>
@@ -118,7 +118,7 @@ public sealed class BattleState
     /// </summary>
     public bool CanUse(ItemDefinition item) =>
         CurrentActor.Side == BattleSide.Party && item.Effect is { } effect && _inventory.QuantityOf(item.Id) > 0
-        && ChoiceFor(effect.Targeting).Candidates.Count > 0;
+        && ChoiceFor(effect).Candidates.Count > 0;
 
     /// <summary>Gives the enemies' experience to the party members still standing (developer decision 13). Call once, after a victory.</summary>
     /// <returns>The total experience and one gain per living party member, with the level steps it produced.</returns>
@@ -217,13 +217,19 @@ public sealed class BattleState
     }
 
     // The one rule for who the current actor may aim at, behind both the choices offered and the check in Execute.
+    // An aura reaches the actor and the living allies within its range along the formation (ADR 0023, question 210).
+    private TargetChoice<Combatant> ChoiceFor(Effect effect) =>
+        effect.Targeting == Targeting.AlliesInRange
+            ? new([.. Formation.WithinRange(CurrentActor, effect.Range).Where(ally => ally.IsAlive)], TakesAll: true)
+            : ChoiceFor(effect.Targeting);
+
     private TargetChoice<Combatant> ChoiceFor(Targeting targeting) => new(
         [.. Combatants.Where(candidate => TargetRules.CanTarget(targeting, RelationOf(CurrentActor, candidate), candidate.Vitals))],
         TargetRules.HitsEveryValidTarget(targeting));
 
     private void ThrowIfIllegalTargets(Effect effect, IReadOnlyList<Combatant> targets)
     {
-        var validTargets = ChoiceFor(effect.Targeting).Candidates.ToHashSet();
+        var validTargets = ChoiceFor(effect).Candidates.ToHashSet();
         if (!TargetRules.IsLegalChoice(effect.Targeting, validTargets, targets))
         {
             throw new ArgumentException(

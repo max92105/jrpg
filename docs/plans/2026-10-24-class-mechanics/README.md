@@ -111,7 +111,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **FM1. The party's formation in battle; Move swaps places with a neighbor** (Core, about 220 lines) → [slices/FM1.md](slices/FM1.md)
 - [x] **FM2. The Move command on screen; battlers stand where the formation says** (Game, about 240 lines) → [slices/FM2.md](slices/FM2.md)
 - [x] **PL2a. Guarded raises defense; combatants have current stats** (Core, about 170 lines) → [slices/PL2a.md](slices/PL2a.md)
-- [ ] **PL2b. The paladin's aura reaches the allies within its range in the formation** (Core + Data + content + Game, about 250 lines) → [slices/PL2b.md](slices/PL2b.md)
+- [x] **PL2b. The paladin's aura reaches the allies within its range in the formation** (Core + Data + content + Game, about 250 lines) → [slices/PL2b.md](slices/PL2b.md)
 
 ### Phase 4: tempo and risk
 - [ ] **RG1. Speed: a class stat; the rogue's readiness charges come from it** (Core + Data + content, about 240 lines) → [slices/RG1.md](slices/RG1.md)

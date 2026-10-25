@@ -75,6 +75,16 @@ public sealed class ItemCatalogValidatorTests
     }
 
     [Fact]
+    public void Validate_ItemWithAlliesInRange_Throws()
+    {
+        var charm = _potion with { Id = "charm", Effect = new Effect(EffectKind.RestoreHp, Power: 15, Targeting.AlliesInRange, Range: 1) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [charm]));
+
+        Assert.Equal("items.json: item 'charm': effect.targeting alliesInRange is for skills only; an item has no battle formation to reach along.", exception.Message);
+    }
+
+    [Fact]
     public void Validate_EffectAndEquipment_ThrowsNamingTheItem()
     {
         var hybrid = _potion with { Equipment = new EquipmentStats(EquipmentSlot.Weapon, 1, 0) };

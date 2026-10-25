@@ -5,8 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/PL2a.md, slice PL2a (Guarded raises defense; Combatant.CurrentStats)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/PL2b.md, slice PL2b (alliesInRange aura, Effect.Range)
 Round: 1 (verdict: Ready to commit)
 
-- No findings.
-- Follow-up: BattleState turn-flow extraction (319 lines) already recorded in docs/plans/backlog.md.
+- Warning: EffectValidatorTests has no test for a negative range (EffectValidator.cs:23 `Range < 0`); open
+- Suggestion: split the combined range message into two (negative vs wrong targeting); open
+- Suggestion: test field naming mixes `_aura` and `FirstActsFirst` for static readonly fields in BattleFormationTests; open

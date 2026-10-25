@@ -32,3 +32,8 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
   - **Verify by hand:**
     - With five members, Teelle in the middle: Aura guards three ("GUARD 3"), and Wide Aura all five.
     - Move Teelle to the end and cast Aura: two guarded.
+- **Done, with deviations:** Tests 1906 before, 1914 after. Beyond the plan:
+  - `TargetRules` treats `AlliesInRange` as "every living ally" and as hitting every valid target. `BattleState.ChoiceFor(Effect)` then narrows it to `Formation.WithinRange`, so the legality check for a cast reads the same narrowed list.
+  - `BattleTargetCursor` needed no change: it already shows every candidate of a takes-all choice.
+  - Both skills' descriptions are marked as placeholders.
+  - From review: a negative range and a range on another targeting get their own messages, and `FindProblem_NegativeRange_ReturnsProblem` covers the first.

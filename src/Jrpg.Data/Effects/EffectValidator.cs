@@ -19,6 +19,17 @@ internal static class EffectValidator
             return $"effect.power must be at least 1 for a revive effect (was {effect.Power}).";
         }
 
+        if (effect.Range < 0)
+        {
+            return $"effect.range must be at least 0 (was {effect.Range}).";
+        }
+
+        // Only an aura reaches along the formation, so a range on any other targeting would be ignored.
+        if (effect.Range > 0 && effect.Targeting != Targeting.AlliesInRange)
+        {
+            return $"effect.range is only for an alliesInRange effect (was {effect.Range} on {effect.Targeting}).";
+        }
+
         // A grantStatus effect changes nothing else, so without a status it would do nothing.
         if (effect.Kind == EffectKind.GrantStatus && effect.Status is null)
         {

@@ -44,6 +44,12 @@ internal static class ItemCatalogValidator
             return problem;
         }
 
+        // An item can be used from the menu, where there is no formation to measure a range along.
+        if (effect.Targeting == Targeting.AlliesInRange)
+        {
+            return "effect.targeting alliesInRange is for skills only; an item has no battle formation to reach along.";
+        }
+
         var targetsEnemies = effect.Targeting is Targeting.SingleEnemy or Targeting.AllEnemies;
         return isUsableFromMenu && targetsEnemies
             ? $"isUsableFromMenu is true but effect.targeting is {effect.Targeting}; there are no enemies outside battle."

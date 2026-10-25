@@ -111,6 +111,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.Still => $"Still: {ImageFile}, {SecondsText} s",
         EventStepKind.Recruit => $"Recruit: {MemberId}",
         EventStepKind.Voice => $"Voice: {VoiceFile}",
+        EventStepKind.Rest => "Rest",
         _ => throw new UnreachableException(),
     };
 
@@ -146,6 +147,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         StillStep still => new(EventStepKind.Still) { ImageFile = still.ImageFile, SecondsText = Text(still.Seconds), Caption = still.Caption ?? "" },
         RecruitStep recruit => new(EventStepKind.Recruit) { MemberId = recruit.MemberId },
         VoiceStep voice => new(EventStepKind.Voice) { VoiceFile = voice.File },
+        RestStep => new(EventStepKind.Rest),
         _ => throw new ArgumentException($"Unknown step type {step.GetType().Name}.", nameof(step)),
     };
 
@@ -165,6 +167,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
             ImageFile.Trim(), Seconds(SecondsText) ?? throw InvalidFields(), string.IsNullOrWhiteSpace(Caption) ? null : Caption.Trim()),
         EventStepKind.Recruit => new RecruitStep(MemberId),
         EventStepKind.Voice => new VoiceStep(VoiceFile.Trim()),
+        EventStepKind.Rest => new RestStep(),
         _ => throw new UnreachableException(),
     };
 

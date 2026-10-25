@@ -1,4 +1,5 @@
 using Jrpg.Core.Content;
+using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
@@ -51,6 +52,22 @@ public sealed class EventEditingViewModelTests
         Assert.Equal("Search", map.Map.Layout.Objects.Single(placed => placed.Uid == "0bff6243").Events[0].Prompt);
         map.UndoCommand.Execute(null);
         Assert.False(map.IsDirty);
+    }
+
+    [Fact]
+    public void AddStep_Rest_UndoRemovesIt()
+    {
+        var events = _eventEditing.StartEditingAt(ChestCenter)!;
+        events.SelectedEvent!.AddRestCommand.Execute(null);
+        _eventEditing.Apply(events);
+        var map = _eventEditing.OpenMap!;
+        var chestSteps = () => map.Map.Layout.Objects.Single(placed => placed.Uid == "0bff6243").Events[0].Steps;
+        var stepsWithRest = chestSteps();
+
+        map.UndoCommand.Execute(null);
+
+        Assert.Contains(stepsWithRest, step => step is RestStep);
+        Assert.DoesNotContain(chestSteps(), step => step is RestStep);
     }
 
     [Fact]

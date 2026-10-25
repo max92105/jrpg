@@ -206,6 +206,23 @@ public sealed class EventStepViewModelTests
     }
 
     [Fact]
+    public void FromStep_RestStep_ShowsRestWithNoFields()
+    {
+        var step = EventStepViewModel.From(new RestStep());
+
+        Assert.Equal("Rest", step.Label);
+        Assert.Null(step.Problem);
+    }
+
+    [Fact]
+    public void ToStep_Rest_ReturnsRestStep()
+    {
+        var step = EventStepViewModel.New(EventStepKind.Rest);
+
+        Assert.Equal(new RestStep(), step.ToStep());
+    }
+
+    [Fact]
     public void Problem_RecruitWithoutMember_SaysSo()
     {
         var step = EventStepViewModel.New(EventStepKind.Recruit);
@@ -222,5 +239,6 @@ public sealed class EventStepViewModelTests
         new StillStep("Placeholder2.png", 4, Caption: null),
         new RecruitStep("omer"),
         new VoiceStep("Placeholder.wav"),
+        new RestStep(),
     ];
 }

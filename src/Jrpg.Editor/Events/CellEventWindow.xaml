@@ -45,6 +45,7 @@
         <Button Content="Still" Width="50" Margin="4,0,0,0" Command="{Binding AddStillCommand}" />
         <Button Content="Recruit" Width="60" Margin="4,0,0,0" Command="{Binding AddRecruitCommand}" />
         <Button Content="Voice" Width="50" Margin="4,0,0,0" Command="{Binding AddVoiceCommand}" />
+        <Button Content="Rest" Width="50" Margin="4,0,0,0" Command="{Binding AddRestCommand}" />
         <Button Content="Remove" Width="60" Margin="12,0,0,0" Command="{Binding RemoveStepCommand}" />
         <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepUpCommand}" />
         <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepDownCommand}" />

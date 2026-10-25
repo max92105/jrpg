@@ -19,6 +19,20 @@ public sealed class StartMapVillagerTests
         Assert.Equal("Villager", dialogue.Speech.Speaker);
     }
 
+    // The placeholder Innkeeper is a villager too: a line, then the rest.
+    [Fact]
+    public void Interact_FacingInnkeeper_ReadsALineThenRests()
+    {
+        var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowInnkeeper);
+        exploration.TryInteract();
+        var first = exploration.CurrentEventStep;
+
+        exploration.ContinueEvent();
+
+        Assert.Equal("Innkeeper", Assert.IsType<DialogueStep>(first).Speech.Speaker);
+        Assert.IsType<RestStep>(exploration.CurrentEventStep);
+    }
+
     [Fact]
     public void Move_IntoVillagersFeet_IsBlocked()
     {

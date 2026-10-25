@@ -1,4 +1,5 @@
 using Jrpg.Core.Effects;
+using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
@@ -9,6 +10,15 @@ namespace Jrpg.Data.Tests.Content;
 
 public sealed class ContentCatalogLoaderTests
 {
+    [Fact]
+    public void Load_StartMap_HasARestEvent()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        var steps = catalog.Maps["start"].Layout.Objects.SelectMany(placed => placed.Events).SelectMany(mapEvent => mapEvent.Steps);
+        Assert.Contains(steps, step => step is RestStep);
+    }
+
     [Fact]
     public void Load_RepositoryContent_Succeeds()
     {

@@ -10,4 +10,5 @@ internal enum EventStepKind
     Still,
     Recruit,
     Voice,
+    Rest,
 }

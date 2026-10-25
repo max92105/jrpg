@@ -5181,6 +5181,39 @@
           ]
         }
       ]
+    },
+    {
+      "uid": "innkeeper",
+      "objectId": "villager",
+      "position": {
+        "x": 30,
+        "y": 26
+      },
+      "z": 1,
+      "events": [
+        {
+          "id": "innkeeper_0",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "A placeholder inn. Rest here, free of charge."
+                ],
+                "speaker": "Innkeeper",
+                "portraitFile": null
+              }
+            },
+            {
+              "type": "rest"
+            }
+          ]
+        }
+      ]
     }
   ],
   "cellEvents": [

@@ -54,7 +54,7 @@ internal static class StartMapScenarios
     /// </summary>
     public static ContentCatalog BelowRepeatableChest { get; } = WithChestSaying(BelowChest, new GiveItemStep("potion", 1));
 
-    /// <summary>Below the chest, which now rests the party: the stand-in for an inn until RS2 places one.</summary>
+    /// <summary>Below the chest, which now rests the party, every time: a rest step with nothing before it.</summary>
     public static ContentCatalog BelowRestingChest { get; } = WithChestSaying(BelowChest, new RestStep());
 
     /// <summary>Below the chest, which now talks, in two lines, every time: the stand-in for a sign (no map has one).</summary>
@@ -72,6 +72,9 @@ internal static class StartMapScenarios
 
     /// <summary>Just below the villager at (12, 4), whose interact event talks, facing it.</summary>
     public static ContentCatalog BelowVillager { get; } = StartingAt(new Point2D(12.5, 5.6), Facing.Up);
+
+    /// <summary>Just below the Innkeeper at (30, 26), the end of the recruit row, facing it.</summary>
+    public static ContentCatalog BelowInnkeeper { get; } = StartingAt(new Point2D(30.5, 27.6), Facing.Up);
 
     public static InputFrame HoldingLeft { get; } =
         new(MoveIntent.FromAxes(-1, 0), ButtonSet.Empty.With(GameButton.Left), ButtonSet.Empty);

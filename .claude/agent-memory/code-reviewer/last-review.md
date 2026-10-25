@@ -5,8 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/RS1.md, slice RS1 (the rest step)
-Round: 1 (verdict: Fix the Criticals, then commit)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/RS2.md, slice RS2 (editor authors the rest step; placeholder inn)
+Round: 1 (verdict: Ready to commit)
 
-- Critical: StartMapScenarios.cs:57-61 BelowRestingChest inserted between BelowTalkingChest's summary and its property; resting chest carries two summaries (one says it talks), talking chest has none; open
-- Suggestion: EventRunTests rest test doesn't cover lasting refill at event level (covered by PartyMemberRestTests); open
+- Suggestion: StartMapScenarios.cs BelowInnkeeper summary and StartMapVillagerTests comment cite "(RS2)", a plan id that rots; describe the place instead; open
+- Follow-up: StartMapScenarios BelowRestingChest summary says "until RS2 places one", stale now the Innkeeper exists; open

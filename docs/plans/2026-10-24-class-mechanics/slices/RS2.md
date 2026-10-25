@@ -18,3 +18,7 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
   - **Verify by hand:**
     - The editor opens the start map, and the Innkeeper's event shows "Rest".
     - In the game, wear Omer's clarity down, talk to the Innkeeper, fight: mana starts at 3, and HP is full.
+- **Done, with deviations:**
+  - The Innkeeper went into `content/map-layouts/start.json` by hand rather than through the editor: Claude can't drive the editor. The new object matches the format the editor writes (a `villager` at (30, 26), the end of the recruit row, with a talk event of one line, then `rest`).
+  - `EventPresets` is unchanged: no preset needs a rest step, and the step kind, label and Add button cover authoring. The "Rest" button sits in both the cell and the object event dialogs.
+  - Extra tests: `RestStep` joins the every-kind round trip, and `StartMapVillagerTests.Interact_FacingInnkeeper_ReadsALineThenRests`, which uses a new `StartMapScenarios.BelowInnkeeper`.

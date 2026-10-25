@@ -7,7 +7,7 @@ metadata:
 
 System.Text.Json's `RespectNullableAnnotations` does not cover collection elements, so `["sarxian", null]` deserializes into an `IReadOnlyList<string>`. The common validator idiom `var unknown = ids.FirstOrDefault(id => !set.Contains(id)); return unknown is null ? null : ...` returns null both for "all known" and for "found a null id", so the null passes. `FrozenSet<string>.Contains(null)` returns false (no throw); `FrozenDictionary[null]` throws ArgumentNullException later in Core, without the file name.
 
-Verified 2026-10-17 in slice 8 (NewGameValidator recruitedMemberIds: loader accepted it, `GameSession.StartNew` threw). Same idiom pre-exists in EncounterCatalogValidator (enemyIds) and PartyMemberCatalogValidator (skillIds).
+Verified 2026-10-17 in slice 8 (NewGameValidator recruitedMemberIds: loader accepted it, `GameSession.StartNew` threw). Same idiom pre-exists in EncounterCatalogValidator (enemyIds). Seen again in class-mechanics CS1: the skillIds check moved to ClassCatalogValidator against a FrozenDictionary, where ContainsKey(null) THROWS ArgumentNullException (verified with fsi) instead of returning false.
 
 Seen again in part 2 slice 1c (nested list: `Tiles: [null]` inside a source object -> NRE in ObjectConversion.TileGroupSize, while the outer list null was guarded).
 

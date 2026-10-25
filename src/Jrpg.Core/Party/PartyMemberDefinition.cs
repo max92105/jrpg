@@ -17,7 +17,4 @@ public sealed record PartyMemberDefinition
     public required string BattleSpriteFile { get; init; }
 
     public required string AttackEffectFile { get; init; }
-
-    /// <summary>Ids of the skills the member joins with, resolved against the skill catalog.</summary>
-    public required IReadOnlyList<string> SkillIds { get; init; }
 }

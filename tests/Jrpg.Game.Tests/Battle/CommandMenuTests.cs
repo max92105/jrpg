@@ -7,11 +7,12 @@ using Jrpg.Game.Tests.Input;
 
 namespace Jrpg.Game.Tests.Battle;
 
-// Sarxian acts first and knows, in order: Fire Blast, Fireball, Heal, Recovery, Heal All. The bag starts empty.
+// Zanyr, a cleric, acts first and knows her class's skills, in order: Heal, Recovery, Heal All. The bag starts empty.
+// The seed named for Sarxian keeps the listed order whoever fights, so it puts Zanyr first too.
 public sealed class CommandMenuTests
 {
-    private const int RecoveryRow = 3;
-    private const int HealAllRow = 4;
+    private const int RecoveryRow = 1;
+    private const int HealAllRow = 2;
 
     private readonly Inventory _inventory = new();
     private readonly BattleState _battle;
@@ -19,7 +20,7 @@ public sealed class CommandMenuTests
 
     public CommandMenuTests()
     {
-        _battle = BattleScenarios.MemberAgainstGoblinTrio("sarxian", _inventory, new SeededRandom(BattleScenarios.SarxianFirstSeed));
+        _battle = BattleScenarios.MemberAgainstGoblinTrio("zanyr", _inventory, new SeededRandom(BattleScenarios.SarxianFirstSeed));
         _menu = new CommandMenu(_inventory, BattleScenarios.Catalog.Items);
         _menu.Start(_battle);
     }
@@ -161,7 +162,7 @@ public sealed class CommandMenuTests
         _menu.Update(InputFrames.Pressing(GameButton.Cancel));
 
         Assert.Null(_menu.Targets);
-        Assert.Equal("fire_blast", _menu.Skills?.Selected.Id);
+        Assert.Equal("heal", _menu.Skills?.Selected.Id);
     }
 
     [Fact]
@@ -248,7 +249,7 @@ public sealed class CommandMenuTests
         _menu.Start(_battle);
     }
 
-    // The three goblins act after Sarxian; defending passes their turns back to him without changing anything.
+    // The three goblins act after Zanyr; defending passes their turns back to her without changing anything.
     private void PassTheGoblinsTurns()
     {
         while (_battle.CurrentActor.Side == BattleSide.Enemies)

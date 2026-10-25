@@ -5,7 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/FR1.md, slice FR1 (warrior class id becomes fighter)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/CS1.md, slice CS1 (skills come from the class)
 Round: 1 (verdict: Ready to commit)
 
-- Warning, open: ContentCatalogLoaderTests.cs:29 comment "renamed from Warrior" makes the slice's own `git grep -i warrior` hand check find a hit.
+- Warning, open: ClassCatalogValidator.cs FindSkillProblem: `skillIds: ["heal", null]` -> FrozenDictionary.ContainsKey(null) throws ArgumentNullException ("Parameter 'key'"), no file name; check null/blank entries first.
+- Suggestion, open: CommandMenuTests.cs:22 uses BattleScenarios.SarxianFirstSeed for a Zanyr battle; name/doc no longer matches.
+- Suggestion, open: Skill-definition test fixtures duplicated in PartyMemberTests and ClassCatalogValidatorTests (no SkillBuilder exists yet).

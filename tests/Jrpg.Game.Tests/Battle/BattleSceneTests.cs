@@ -149,10 +149,10 @@ public sealed class BattleSceneTests
     // Long enough for any enemy turns and the actor's steps to play out.
     private static SceneRequest? Settle(BattleScene scene) => scene.Update(TimeSpan.FromSeconds(10), default);
 
-    // Sarxian knows skills and the new game's bag holds potions, so Defend is three rows down, past Skills and Items.
+    // Sarxian's class has no skills, so the cursor skips the greyed Skills; the new game's bag holds potions, so
+    // Defend is two rows down, past Items.
     private static SceneRequest? DefendAndSettle(BattleScene scene)
     {
-        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Down));
         scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Down));
         scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Down));
         scene.Update(StartMapScenarios.OneUpdate, _confirm);

@@ -6,8 +6,7 @@
     "summary": "A warlock who bargained with something old for the fire he carries. Placeholder: the developer writes who Sarxian is.",
     "portraitFile": "Sarxian.png",
     "battleSpriteFile": "Sarxian.png",
-    "attackEffectFile": "AttackPlayer.png",
-    "skillIds": ["fire_blast", "fireball", "heal", "recovery", "heal_all"]
+    "attackEffectFile": "AttackPlayer.png"
   },
   {
     "id": "jazog",
@@ -16,8 +15,7 @@
     "summary": "A barbarian from the northern clans, quick to anger and quicker to forgive. Placeholder: the developer writes who Jazog is.",
     "portraitFile": "Jazog.png",
     "battleSpriteFile": "Jazog.png",
-    "attackEffectFile": "AttackPlayer.png",
-    "skillIds": []
+    "attackEffectFile": "AttackPlayer.png"
   },
   {
     "id": "teelle",
@@ -26,8 +24,7 @@
     "summary": "A paladin sworn to a temple that no longer stands. Placeholder: the developer writes who Teelle is.",
     "portraitFile": "Teelle.png",
     "battleSpriteFile": "Teelle.png",
-    "attackEffectFile": "AttackPlayer.png",
-    "skillIds": []
+    "attackEffectFile": "AttackPlayer.png"
   },
   {
     "id": "zaruk",
@@ -36,8 +33,7 @@
     "summary": "A monk who left his order to see the world he was taught to ignore. Placeholder: the developer writes who Zaruk is.",
     "portraitFile": "Zaruk.png",
     "battleSpriteFile": "Zaruk.png",
-    "attackEffectFile": "AttackPlayer.png",
-    "skillIds": []
+    "attackEffectFile": "AttackPlayer.png"
   },
   {
     "id": "zanyr",
@@ -46,8 +42,7 @@
     "summary": "A cleric who heals the wounded on every side of a war. Placeholder: the developer writes who Zanyr is.",
     "portraitFile": "Zanyr.png",
     "battleSpriteFile": "Zanyr.png",
-    "attackEffectFile": "AttackPlayer.png",
-    "skillIds": []
+    "attackEffectFile": "AttackPlayer.png"
   },
   {
     "id": "thaali",
@@ -56,8 +51,7 @@
     "summary": "A druid who hears the forest and does not always like what it says. Placeholder: the developer writes who Thaali is.",
     "portraitFile": "Thaali.png",
     "battleSpriteFile": "Thaali.png",
-    "attackEffectFile": "AttackPlayer.png",
-    "skillIds": []
+    "attackEffectFile": "AttackPlayer.png"
   },
   {
     "id": "ragnir",
@@ -66,8 +60,7 @@
     "summary": "A sellsword who has fought for every banner and believes in none. Placeholder: the developer writes who Ragnir is.",
     "portraitFile": "Ragnir.png",
     "battleSpriteFile": "Ragnir.png",
-    "attackEffectFile": "AttackPlayer.png",
-    "skillIds": []
+    "attackEffectFile": "AttackPlayer.png"
   },
   {
     "id": "omer",
@@ -76,8 +69,7 @@
     "summary": "A scholar who learned magic from books he was told never to open. Placeholder: the developer writes who Omer is.",
     "portraitFile": "Omer.png",
     "battleSpriteFile": "Omer.png",
-    "attackEffectFile": "AttackPlayer.png",
-    "skillIds": []
+    "attackEffectFile": "AttackPlayer.png"
   },
   {
     "id": "lazarus",
@@ -86,7 +78,6 @@
     "summary": "A thief who came back from a hanging and will not say how. Placeholder: the developer writes who Lazarus is.",
     "portraitFile": "Lazarus.png",
     "battleSpriteFile": "Lazarus.png",
-    "attackEffectFile": "AttackPlayer.png",
-    "skillIds": []
+    "attackEffectFile": "AttackPlayer.png"
   }
 ]

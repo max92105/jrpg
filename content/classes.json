@@ -8,12 +8,14 @@
     "id": "mage", "name": "Mage",
     "description": "A scholar of the arcane who bends raw magic into fire, frost and storm.",
     "base": { "maxHp": 150, "maxMp": 80, "attack": 20, "defense": 4 },
-    "growth": { "maxHp": 12, "maxMp": 8, "attack": 2, "defense": 1 } },
+    "growth": { "maxHp": 12, "maxMp": 8, "attack": 2, "defense": 1 },
+    "skillIds": ["fire_blast", "fireball"] },
   {
     "id": "cleric", "name": "Cleric",
     "description": "A servant of the gods who heals allies and smites the unholy.",
     "base": { "maxHp": 180, "maxMp": 60, "attack": 18, "defense": 7 },
-    "growth": { "maxHp": 16, "maxMp": 6, "attack": 2, "defense": 1 } },
+    "growth": { "maxHp": 16, "maxMp": 6, "attack": 2, "defense": 1 },
+    "skillIds": ["heal", "recovery", "heal_all"] },
   {
     "id": "rogue", "name": "Rogue",
     "description": "A quick and cunning blade who strikes where the enemy is weakest.",

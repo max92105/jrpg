@@ -32,13 +32,16 @@ public static class ContentCatalogLoader
     /// <exception cref="ContentValidationException">A file is malformed or breaks a content rule.</exception>
     public static ContentCatalog Load(string contentRoot)
     {
-        var classes = ReadValidated<IReadOnlyList<ClassDefinition>>(contentRoot, ClassesFile, ClassCatalogValidator.Validate);
+        var skills = ReadValidated<IReadOnlyList<SkillDefinition>>(contentRoot, SkillsFile, SkillCatalogValidator.Validate);
+        var skillsById = skills.ToFrozenDictionary(skill => skill.Id);
+        var classReferences = new ClassReferences(skillsById);
+        var classes = ReadValidated<IReadOnlyList<ClassDefinition>>(
+            contentRoot, ClassesFile, (file, list) => ClassCatalogValidator.Validate(file, list, classReferences));
         var classIds = classes.Select(classDefinition => classDefinition.Id).ToFrozenSet();
         var rules = ReadValidated<GameRules>(contentRoot, RulesFile, GameRulesValidator.Validate);
         var items = ReadValidated<IReadOnlyList<ItemDefinition>>(
             contentRoot, ItemsFile, ItemCatalogValidator.Validate);
-        var skills = ReadValidated<IReadOnlyList<SkillDefinition>>(contentRoot, SkillsFile, SkillCatalogValidator.Validate);
-        var memberReferences = new PartyMemberReferences(classIds, skills.Select(skill => skill.Id).ToFrozenSet());
+        var memberReferences = new PartyMemberReferences(classIds);
         var members = ReadValidated<IReadOnlyList<PartyMemberDefinition>>(
             contentRoot, PartyMembersFile, (file, list) => PartyMemberCatalogValidator.Validate(file, list, memberReferences));
         var enemies = ReadValidated<IReadOnlyList<EnemyDefinition>>(contentRoot, EnemiesFile, EnemyCatalogValidator.Validate);
@@ -70,7 +73,7 @@ public static class ContentCatalogLoader
         {
             Items = items.ToFrozenDictionary(item => item.Id),
             Classes = classes.ToFrozenDictionary(classDefinition => classDefinition.Id),
-            Skills = skills.ToFrozenDictionary(skill => skill.Id),
+            Skills = skillsById,
             PartyMembers = members.ToFrozenDictionary(member => member.Id),
             Enemies = enemies.ToFrozenDictionary(enemy => enemy.Id),
             Encounters = encounters.ToFrozenDictionary(encounter => encounter.Id),

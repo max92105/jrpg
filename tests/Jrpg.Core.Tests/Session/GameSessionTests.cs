@@ -22,8 +22,9 @@ public sealed class GameSessionTests
 
     private readonly ContentCatalogBuilder _catalog = new ContentCatalogBuilder()
         .WithSkills(_heal)
+        .WithClasses(new ClassBuilder().Build(), new ClassBuilder().WithId("cleric").WithSkills("heal").Build())
         .WithMembers(
-            new PartyMemberBuilder().WithId("sarxian").WithSkills(_heal).BuildDefinition(),
+            new PartyMemberBuilder().WithId("sarxian").WithClass("cleric").BuildDefinition(),
             new PartyMemberBuilder().WithId("jazog").BuildDefinition(),
             new PartyMemberBuilder().WithId("teelle").BuildDefinition());
 
@@ -65,7 +66,7 @@ public sealed class GameSessionTests
     }
 
     [Fact]
-    public void StartNew_MemberWithSkillIds_KnowsTheResolvedSkills()
+    public void StartNew_LeaderOfClassWithSkills_KnowsTheResolvedSkills()
     {
         var catalog = _catalog.WithNewGame(NewGame()).Build();
 

@@ -8,13 +8,11 @@ namespace Jrpg.Core.Party;
 /// <summary>A recruited party member's runtime state.</summary>
 public sealed class PartyMember
 {
-    private readonly ClassDefinition _class;
-
     private PartyMember(
         PartyMemberDefinition definition, ClassDefinition characterClass, IReadOnlyList<SkillDefinition> skills, PartyMemberProgress progress)
     {
         Definition = definition;
-        _class = characterClass;
+        Class = characterClass;
         Skills = [.. skills];
         Level = progress.Level;
         Experience = progress.Experience;
@@ -26,6 +24,8 @@ public sealed class PartyMember
     public string Id => Definition.Id;
 
     public PartyMemberDefinition Definition { get; }
+
+    public ClassDefinition Class { get; }
 
     public int Level { get; private set; }
 
@@ -48,7 +48,7 @@ public sealed class PartyMember
     /// <summary>A new member joins at level 1 with 0 experience and full HP and MP (decision 168).</summary>
     /// <param name="definition">Who joins.</param>
     /// <param name="characterClass">The member's class, which gives their stats at their level (ADR 0017).</param>
-    /// <param name="skillCatalog">All skills by id; the member gets those named by <see cref="PartyMemberDefinition.SkillIds"/>, in that order.</param>
+    /// <param name="skillCatalog">All skills by id; the member gets their class's, in its order (ADR 0020).</param>
     /// <exception cref="ArgumentException">A skill id isn't in the catalog.</exception>
     public static PartyMember Recruit(
         PartyMemberDefinition definition, ClassDefinition characterClass, IReadOnlyDictionary<string, SkillDefinition> skillCatalog)
@@ -56,7 +56,7 @@ public sealed class PartyMember
         var levelOne = ClassGrowth.StatsAt(characterClass, 1);
         var starting = new PartyMemberProgress(
             definition.Id, Level: 1, Experience: 0, levelOne.MaxHp, levelOne.MaxMp, WeaponId: null, ArmorId: null);
-        return new(definition, characterClass, SkillsOf(definition, skillCatalog), starting);
+        return new(definition, characterClass, SkillsOf(characterClass, skillCatalog), starting);
     }
 
     /// <summary>Rebuilds a member from a save. Worn items are put on by <c>GameSession</c>, which resolves their ids.</summary>
@@ -66,7 +66,7 @@ public sealed class PartyMember
         ClassDefinition characterClass,
         IReadOnlyDictionary<string, SkillDefinition> skillCatalog,
         PartyMemberProgress progress) =>
-        new(definition, characterClass, SkillsOf(definition, skillCatalog), progress);
+        new(definition, characterClass, SkillsOf(characterClass, skillCatalog), progress);
 
     /// <summary>What a save keeps of this member.</summary>
     public PartyMemberProgress CaptureProgress() =>
@@ -140,15 +140,15 @@ public sealed class PartyMember
     }
 
     /// <exception cref="ArgumentException">A skill id isn't in the catalog.</exception>
-    private static List<SkillDefinition> SkillsOf(PartyMemberDefinition definition, IReadOnlyDictionary<string, SkillDefinition> skillCatalog)
+    private static List<SkillDefinition> SkillsOf(ClassDefinition characterClass, IReadOnlyDictionary<string, SkillDefinition> skillCatalog)
     {
-        var unknownSkillId = definition.SkillIds.FirstOrDefault(id => !skillCatalog.ContainsKey(id));
+        var unknownSkillId = characterClass.SkillIds.FirstOrDefault(id => !skillCatalog.ContainsKey(id));
         if (unknownSkillId is not null)
         {
-            throw new ArgumentException($"'{definition.Id}' has unknown skill id '{unknownSkillId}'.", nameof(skillCatalog));
+            throw new ArgumentException($"Class '{characterClass.Id}' has unknown skill id '{unknownSkillId}'.", nameof(skillCatalog));
         }
 
-        return [.. definition.SkillIds.Select(id => skillCatalog[id])];
+        return [.. characterClass.SkillIds.Select(id => skillCatalog[id])];
     }
 
     private static CombatStats BaseStatsOf(ClassStats stats) => new(stats.Attack, stats.Defense);
@@ -178,10 +178,10 @@ public sealed class PartyMember
     // The class's numbers at the new level, the one formula (ADR 0017); vitals rise by what the maxima gained.
     private void LevelUp()
     {
-        var before = ClassGrowth.StatsAt(_class, Level);
+        var before = ClassGrowth.StatsAt(Class, Level);
         Level++;
         Experience = 0;
-        var after = ClassGrowth.StatsAt(_class, Level);
+        var after = ClassGrowth.StatsAt(Class, Level);
         BaseStats = BaseStatsOf(after);
         Vitals.RaiseMaxima(after.MaxHp - before.MaxHp, after.MaxMp - before.MaxMp);
     }

@@ -57,7 +57,7 @@ public sealed class ActionPlaybackTests
     [Fact]
     public void Start_SkillCommand_ShowsSkillName()
     {
-        var skill = _sarxian.Skills[0];
+        var skill = BattleScenarios.Catalog.Skills["fire_blast"];
 
         var playback = Start([new ActionStarted(_sarxian, new SkillCommand(skill, [_goblin])), new EffectApplied(_goblin, EffectKind.Damage, 20)]);
 
@@ -71,7 +71,7 @@ public sealed class ActionPlaybackTests
         var second = Combatant.FromEnemy(BattleScenarios.Catalog.Enemies["goblin"]);
         BattleEvent[] events =
         [
-            new ActionStarted(_sarxian, new SkillCommand(_sarxian.Skills[0], [_goblin, second])),
+            new ActionStarted(_sarxian, new SkillCommand(BattleScenarios.Catalog.Skills["fireball"], [_goblin, second])),
             new EffectApplied(_goblin, EffectKind.Damage, 40),
             new CombatantDefeated(_goblin),
             new EffectApplied(second, EffectKind.Damage, 40),

@@ -21,18 +21,6 @@ internal static class PartyMemberCatalogValidator
             return "summary must not be empty.";
         }
 
-        if (!references.ClassIds.Contains(member.ClassId))
-        {
-            return $"classId '{member.ClassId}' is not a known class.";
-        }
-
-        var unknownSkillId = member.SkillIds.FirstOrDefault(id => !references.SkillIds.Contains(id));
-        if (unknownSkillId is not null)
-        {
-            return $"skillIds has unknown skill id '{unknownSkillId}'.";
-        }
-
-        var repeatedSkillId = member.SkillIds.GroupBy(id => id).FirstOrDefault(group => group.Count() > 1)?.Key;
-        return repeatedSkillId is null ? null : $"skillIds lists '{repeatedSkillId}' more than once.";
+        return references.ClassIds.Contains(member.ClassId) ? null : $"classId '{member.ClassId}' is not a known class.";
     }
 }

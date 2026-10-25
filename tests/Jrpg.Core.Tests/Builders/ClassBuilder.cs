@@ -8,6 +8,7 @@ internal sealed class ClassBuilder
     private string _id = "fighter";
     private ClassStats _base = new(MaxHp: 100, MaxMp: 20, Attack: 10, Defense: 5);
     private ClassStats _growth = new(0, 0, 0, 0);
+    private string[] _skillIds = [];
 
     public ClassBuilder WithId(string id)
     {
@@ -27,5 +28,11 @@ internal sealed class ClassBuilder
         return this;
     }
 
-    public ClassDefinition Build() => new(_id, _id, $"{_id} description", _base, _growth);
+    public ClassBuilder WithSkills(params string[] ids)
+    {
+        _skillIds = ids;
+        return this;
+    }
+
+    public ClassDefinition Build() => new(_id, _id, $"{_id} description", _base, _growth) { SkillIds = _skillIds };
 }

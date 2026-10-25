@@ -28,7 +28,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Geometry | Positions and shapes | `Point2D`, `GridCell`, `Facing`, `Polygon` |
 | Items | Items and the inventory | `ItemDefinition`, `Inventory`, `EquipmentSlot` |
 | Maps | Map content and draw order | `MapDefinition`, `MapLayout`, `PlacedObject`, `ObjectDefinition`, `DrawOrderKey`, `WalkabilityGrid` |
-| Party | Members, the active party, equipment (taking it from another member too), field item use | `PartyState`, `PartyMember` (stats from its class at its level, ADR 0017; joins at level 1), `ClassDefinition`, `ClassStats`, `ClassGrowth` (a class's stats at a level, ADR 0017), `PartyEquipment`, `WornItem`, `FieldItemUse` |
+| Party | Members, the active party, equipment (taking it from another member too), field item use | `PartyState`, `PartyMember` (stats from its class at its level, ADR 0017; joins at level 1), `ClassDefinition` (also the skills every member of it has, ADR 0020; read them through `PartyMember.Skills`), `ClassStats`, `ClassGrowth` (a class's stats at a level, ADR 0017), `PartyEquipment`, `WornItem`, `FieldItemUse` |
 | Progression | Experience and levels | `ExperienceTable`, `LevelProgressStep` |
 | Randomness | Seeded randomness | `IRandom`, `SeededRandom` |
 | Saving / Session / World | The save record; one playthrough (starts and finishes its battles); what the player changed in the world | `SaveGame`, `GameSession`, `WorldState` |

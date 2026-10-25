@@ -10,12 +10,13 @@ using Jrpg.Core.Skills;
 namespace Jrpg.Core.Tests.Builders;
 
 /// <summary>
-/// A catalog with empty defaults, so tests only state the content they rely on; its one class is
+/// A catalog with empty defaults, so tests only state the content they rely on; its one default class is
 /// <see cref="ClassBuilder"/>'s "fighter", the class of every default member.
 /// </summary>
 internal sealed class ContentCatalogBuilder
 {
     private ItemDefinition[] _items = [];
+    private ClassDefinition[] _classes = [new ClassBuilder().Build()];
     private SkillDefinition[] _skills = [];
     private PartyMemberDefinition[] _members = [];
     /// <summary>
@@ -41,6 +42,13 @@ internal sealed class ContentCatalogBuilder
     public ContentCatalogBuilder WithSkills(params SkillDefinition[] skills)
     {
         _skills = skills;
+        return this;
+    }
+
+    /// <summary>Replaces the default class; members left on the default class need a "fighter" among these.</summary>
+    public ContentCatalogBuilder WithClasses(params ClassDefinition[] classes)
+    {
+        _classes = classes;
         return this;
     }
 
@@ -103,7 +111,7 @@ internal sealed class ContentCatalogBuilder
     public ContentCatalog Build() => new()
     {
         Items = _items.ToDictionary(item => item.Id),
-        Classes = new Dictionary<string, ClassDefinition> { ["fighter"] = new ClassBuilder().Build() },
+        Classes = _classes.ToDictionary(classDefinition => classDefinition.Id),
         Skills = _skills.ToDictionary(skill => skill.Id),
         PartyMembers = _members.ToDictionary(member => member.Id),
         Enemies = _enemies.ToDictionary(enemy => enemy.Id),

@@ -1,3 +1,4 @@
+using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
@@ -41,11 +42,33 @@ public sealed class PartyMemberTests
     }
 
     [Fact]
-    public void Recruit_SkillIdNotInCatalog_Throws()
+    public void Recruit_ClassSkillIdNotInCatalog_Throws()
     {
-        var definition = new PartyMemberBuilder().BuildDefinition() with { SkillIds = ["heal"] };
+        var definition = new PartyMemberBuilder().BuildDefinition();
+        var healer = _growingClass with { SkillIds = ["heal"] };
 
-        Assert.Throws<ArgumentException>(() => PartyMember.Recruit(definition, _growingClass, new Dictionary<string, SkillDefinition>()));
+        Assert.Throws<ArgumentException>(() => PartyMember.Recruit(definition, healer, new Dictionary<string, SkillDefinition>()));
+    }
+
+    [Fact]
+    public void Recruit_ClassWithSkills_HasThemInClassOrder()
+    {
+        var healer = _growingClass with { SkillIds = ["recovery", "heal"] };
+
+        var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), healer, SkillCatalog());
+
+        Assert.Equal(["recovery", "heal"], member.Skills.Select(skill => skill.Id));
+    }
+
+    [Fact]
+    public void Restore_ClassWithSkills_HasThem()
+    {
+        var healer = _growingClass with { SkillIds = ["heal"] };
+        var progress = new PartyMemberProgress("test_member", 2, 0, Hp: 50, Mp: 4, WeaponId: null, ArmorId: null);
+
+        var member = PartyMember.Restore(new PartyMemberBuilder().BuildDefinition(), healer, SkillCatalog(), progress);
+
+        Assert.Equal(["heal"], member.Skills.Select(skill => skill.Id));
     }
 
     [Fact]
@@ -269,4 +292,17 @@ public sealed class PartyMemberTests
         inventory.Add(item, 1);
         Assert.True(new PartyEquipment(inventory).TryEquip(member, item));
     }
+
+    private static Dictionary<string, SkillDefinition> SkillCatalog() =>
+        new() { ["heal"] = Skill("heal"), ["recovery"] = Skill("recovery") };
+
+    private static SkillDefinition Skill(string id) => new()
+    {
+        Id = id,
+        Name = id,
+        Description = "",
+        IconFile = "",
+        MpCost = 0,
+        Effect = new Effect(EffectKind.RestoreHp, 10, Targeting.SingleAlly),
+    };
 }

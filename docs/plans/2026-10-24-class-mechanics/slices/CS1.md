@@ -35,3 +35,8 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
       - `Validate_NoSkillIds_Passes`
     - `ContentCatalogLoaderTests`: `Load_RepositoryContent_ClericListsHeal`
   - **Verify by hand:** as Zanyr, Skills in a fight lists Heal, Recovery and Heal All. As Sarxian, the Skills entry is greyed.
+- **Done, with deviations:** Tests 1783 before, 1787 after. Four more changes than planned:
+  - `ContentCatalogBuilder.WithClasses` was added, so `GameSessionTests` can give a class its skills.
+  - Skills now load before classes, so the editor's broken-file test breaks `skills.json` instead of `classes.json`.
+  - `BattleSceneTests`' Defend presses Down twice: Sarxian's greyed Skills entry is skipped. WL1 gives him skills again, so it will need three again then.
+  - From the review: the class validator rejects a null or blank skill id, naming the class, since the frozen lookup throws on a null key.

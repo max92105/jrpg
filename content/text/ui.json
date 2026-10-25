@@ -112,6 +112,8 @@
   "status_taunt": "Taunt",
   "status_guarded": "Guard",
   "status_exposed": "Exposed",
+  "status_poison": "Poison",
+  "status_regen": "Regen",
   "battle_turn_skipped": "Stunned",
   "battle_backfire": "Backfire",
   "battle_status_tag": "{status} {turns}",

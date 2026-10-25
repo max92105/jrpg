@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/WL2.md, slice WL2 (instability backfire)
-Round: 2 (verdict: Ready to commit)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/DR1.md, slice DR1 (poison and regen ticks)
+Round: 1 (verdict: Ready to commit)
 
-- Critical: no-roll-after-win guard untested; fixed (Execute_SpellFellsLastEnemy_DrawsNoRandom)
-- Critical: fixed fall fade window hid a backfire-felled caster before his cue; fixed (per-fall FadeStart, own Defeat beat)
-- Suggestion: AddBackfire start should skip an existing Backfire beat; fixed (StartOf)
-- Suggestion: validator test for damagePercentOfMaxHp 0; fixed
-- Closed (WL1): WL1 suggestions were left with the developer. Don't re-raise them.
+- Warning: AddTick shares one Tick beat across actor tick + a later stunned holder's tick; the skipped holder's number pops before its Stunned cue, and a fall after Skip takes the impact path (fade from 0); open
+- Warning: ActionPlaybackTests.cs taken from 281 to 318 lines; split fall/defeat tests out; open
+- Suggestion: no test that Poison ignores Exposed; open
+- Suggestion: TurnFlow comment "a holder its poison felled" reads awkwardly; open
+- Follow-up: ActionPlaybackTests' fake unknown event is named PoisonTicked, now a real concept; rename

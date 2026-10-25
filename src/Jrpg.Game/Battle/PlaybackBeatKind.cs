@@ -17,4 +17,7 @@ internal enum PlaybackBeatKind
 
     /// <summary>The caster's spell turns on them, after the impact (decision 194).</summary>
     Backfire,
+
+    /// <summary>Poison or Regen takes or restores HP at the end of its holder's turn, after the impact.</summary>
+    Tick,
 }

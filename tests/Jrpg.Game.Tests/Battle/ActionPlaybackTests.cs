@@ -31,22 +31,6 @@ public sealed class ActionPlaybackTests
     }
 
     [Fact]
-    public void Start_TargetFell_AddsDefeatBeat()
-    {
-        BattleEvent[] events =
-        [
-            new ActionStarted(_sarxian, new AttackCommand(_goblin)),
-            new EffectApplied(_goblin, EffectKind.Damage, 40),
-            new CombatantDefeated(_goblin),
-        ];
-
-        var playback = Start(events);
-
-        Assert.Equal([PlaybackBeatKind.Impact, PlaybackBeatKind.Defeat], playback.Beats.Select(beat => beat.Kind));
-        Assert.Equal(TimeSpan.FromSeconds(2), playback.Duration);
-    }
-
-    [Fact]
     public void Start_ResourceChanged_AddsNoBeat()
     {
         var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), new ResourceChanged(_sarxian, "mana", 2)]);
@@ -148,27 +132,20 @@ public sealed class ActionPlaybackTests
         Assert.Equal(new FloatingNumber(_sarxian, "16", EffectKind.Damage, BattlePacing.ImpactHold), playback.Numbers[^1]);
     }
 
-    // The spell fells the goblin, then the backfire fells the caster: the caster stays lit through the Backfire beat
-    // (1.0 to 2.0 s after the impact's defeat) and fades on a defeat beat of its own after it.
     [Fact]
-    public void Start_BackfireFellsCaster_CasterFadesAfterTheBackfireCue()
+    public void Start_StatusTicked_AddsTickBeatAfterImpact()
     {
         BattleEvent[] events =
         [
             new ActionStarted(_sarxian, new AttackCommand(_goblin)),
-            new EffectApplied(_goblin, EffectKind.Damage, 40),
-            new CombatantDefeated(_goblin),
-            new Backfired(_sarxian, "instability", 16),
-            new CombatantDefeated(_sarxian),
+            new EffectApplied(_goblin, EffectKind.Damage, 13),
+            new StatusTicked(_sarxian, StatusKind.Regen, 5),
         ];
+
         var playback = Start(events);
 
-        playback.Update(TimeSpan.FromSeconds(2.5));
-
-        Assert.Equal([PlaybackBeatKind.Impact, PlaybackBeatKind.Defeat, PlaybackBeatKind.Backfire, PlaybackBeatKind.Defeat], playback.Beats.Select(beat => beat.Kind));
-        Assert.Equal(1f, playback.FallOpacityOf(_sarxian));
-        Assert.Equal(0f, playback.FallOpacityOf(_goblin));
-        Assert.Equal(TimeSpan.FromSeconds(4), playback.Duration);
+        Assert.Equal([PlaybackBeatKind.Impact, PlaybackBeatKind.Tick], playback.Beats.Select(beat => beat.Kind));
+        Assert.Equal(new FloatingNumber(_sarxian, "5", EffectKind.RestoreHp, BattlePacing.ImpactHold), playback.Numbers[^1]);
     }
 
     [Fact]
@@ -189,25 +166,6 @@ public sealed class ActionPlaybackTests
 
         Assert.Equal(skill.Name, playback.BannerText);
         Assert.Equal([PlaybackBeatKind.Banner, PlaybackBeatKind.Impact], playback.Beats.Select(beat => beat.Kind));
-    }
-
-    [Fact]
-    public void Start_TwoTargetsFell_HoldsOneImpactAndOneDefeat()
-    {
-        var second = Combatant.FromEnemy(BattleScenarios.Catalog.Enemies["goblin"]);
-        BattleEvent[] events =
-        [
-            new ActionStarted(_sarxian, new SkillCommand(BattleScenarios.Catalog.Skills["fireball"], [_goblin, second])),
-            new EffectApplied(_goblin, EffectKind.Damage, 40),
-            new CombatantDefeated(_goblin),
-            new EffectApplied(second, EffectKind.Damage, 40),
-            new CombatantDefeated(second),
-        ];
-
-        var playback = Start(events);
-
-        Assert.Equal([PlaybackBeatKind.Banner, PlaybackBeatKind.Impact, PlaybackBeatKind.Defeat], playback.Beats.Select(beat => beat.Kind));
-        Assert.Equal(TimeSpan.FromSeconds(2), playback.Duration);
     }
 
     [Fact]
@@ -248,34 +206,17 @@ public sealed class ActionPlaybackTests
         Assert.Empty(playback.Strips);
     }
 
-    // The fallen stay lit white for 1.0 s, then fade out over 1.0 s.
-    [Fact]
-    public void Update_FallenEnemy_FadesAfterTint()
-    {
-        var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), new EffectApplied(_goblin, EffectKind.Damage, 40), new CombatantDefeated(_goblin)]);
-        playback.Update(TimeSpan.FromSeconds(0.9));
-        var duringTint = playback.FallOpacityOf(_goblin);
-
-        playback.Update(TimeSpan.FromSeconds(0.6));
-
-        Assert.Equal(1, duringTint);
-        Assert.Equal(0.75f, playback.FallOpacityOf(_goblin) ?? -1, 3); // Halfway through the fade, eased in: 1 - 0.5².
-        playback.Update(TimeSpan.FromSeconds(0.5));
-        Assert.Equal(0, playback.FallOpacityOf(_goblin));
-        Assert.Null(playback.FallOpacityOf(_sarxian));
-    }
-
     // BattleEvent stays open, unlike BattleCommand: new events come with new mechanics (ADR 0004), and the playback must
     // refuse what it can't show rather than show it silently wrong.
     [Fact]
     public void Start_UnknownEvent_Throws()
     {
-        var exception = Assert.Throws<InvalidOperationException>(() => Start([new PoisonTicked()]));
+        var exception = Assert.Throws<InvalidOperationException>(() => Start([new NotYetShownEvent()]));
 
-        Assert.Contains(nameof(PoisonTicked), exception.Message, StringComparison.Ordinal);
+        Assert.Contains(nameof(NotYetShownEvent), exception.Message, StringComparison.Ordinal);
     }
 
     private static ActionPlayback Start(IReadOnlyList<BattleEvent> events) => ActionPlayback.Start(events, RepositoryScreenText.Text.Messages);
 
-    private sealed record PoisonTicked : BattleEvent;
+    private sealed record NotYetShownEvent : BattleEvent;
 }

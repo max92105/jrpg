@@ -14,4 +14,10 @@ public enum StatusKind
 
     /// <summary>Every hit on the holder lands harder by the status's power, in percent (question 215).</summary>
     Exposed,
+
+    /// <summary>The holder loses the status's power in HP at the end of each of its turns, ignoring defense.</summary>
+    Poison,
+
+    /// <summary>The holder regains the status's power in HP at the end of each of its turns.</summary>
+    Regen,
 }

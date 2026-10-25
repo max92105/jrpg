@@ -1,6 +1,7 @@
 using System.Collections.Frozen;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
+using Jrpg.Core.Statuses;
 using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Battle;
@@ -9,9 +10,10 @@ namespace Jrpg.Game.Battle;
 /// One turn's events as the beats the screen plays (design key decision 4): a banner for a skill, an item or Defend, an
 /// impact when effects land, a defeat when someone falls, a skip when a stun takes a turn. The hold lasts as long as
 /// the beats; Defend and Run hold nothing. On the impact, each landed effect pops its amount and shows on its target,
-/// damage as the attacker's effect strip, anything else as a placeholder cue (decision 101), and a granted status
-/// shows its name; whoever fell shows white, then fades on the defeat beat. A lost turn shows "Stunned" on its beat.
-/// An event it doesn't know throws, so a new mechanic can't be shown silently wrong (ADR 0004).
+/// damage as the attacker's effect strip, anything else as a placeholder cue (decision 101), and a granted status shows
+/// its name; whoever fell shows white, then fades on the defeat beat. A lost turn shows "Stunned" on its beat, and
+/// Poison and Regen pop the HP they took or restored on a tick beat. An event it doesn't know throws, so a new mechanic
+/// can't be shown silently wrong (ADR 0004).
 /// </summary>
 internal sealed class ActionPlayback
 {
@@ -123,6 +125,9 @@ internal sealed class ActionPlayback
             case Backfired backfired:
                 AddBackfire(backfired, messages);
                 break;
+            case StatusTicked ticked:
+                AddTick(ticked);
+                break;
             default:
                 throw new InvalidOperationException($"The battle screen can't show a {battleEvent.GetType().Name} yet.");
         }
@@ -153,15 +158,15 @@ internal sealed class ActionPlayback
         }
     }
 
-    // A fall fades from the start of the beat that caused it: the impact, or a backfire after it. A backfire's fall
-    // gets its own defeat beat, so the caster fades after the Backfire cue rather than during it.
+    // A fall fades from the start of the beat that caused it: the impact, or a backfire or a tick after it. Those two
+    // give their fall its own defeat beat, so the fallen fade after the cue or the number rather than during it.
     private void AddFall(Combatant fallen)
     {
-        var cause = _beats.FindLast(beat => beat.Kind != PlaybackBeatKind.Defeat);
-        if (cause?.Kind == PlaybackBeatKind.Backfire)
+        var causeIndex = _beats.FindLastIndex(beat => beat.Kind != PlaybackBeatKind.Defeat);
+        if (causeIndex >= 0 && _beats[causeIndex].Kind is PlaybackBeatKind.Backfire or PlaybackBeatKind.Tick)
         {
-            _fallen.Add((fallen, StartOf(PlaybackBeatKind.Backfire)));
-            _beats.Add(new PlaybackBeat(PlaybackBeatKind.Defeat, BattlePacing.DefeatHold - BattlePacing.BackfireHold));
+            _fallen.Add((fallen, StartOfBeatAt(causeIndex)));
+            _beats.Add(new PlaybackBeat(PlaybackBeatKind.Defeat, BattlePacing.DefeatHold - _beats[causeIndex].Duration));
             return;
         }
 
@@ -173,6 +178,8 @@ internal sealed class ActionPlayback
     private TimeSpan StartOf(PlaybackBeatKind kind) =>
         _beats.TakeWhile(beat => beat.Kind != kind).Aggregate(TimeSpan.Zero, (total, beat) => total + beat.Duration);
 
+    private TimeSpan StartOfBeatAt(int index) => _beats.Take(index).Aggregate(TimeSpan.Zero, (total, beat) => total + beat.Duration);
+
     // The backfire has its own beat after the impact; its cue and the HP it cost show when that beat starts.
     private void AddBackfire(Backfired backfired, UiMessages messages)
     {
@@ -180,6 +187,20 @@ internal sealed class ActionPlayback
         AddBeatOnce(PlaybackBeatKind.Backfire, BattlePacing.BackfireHold);
         _cues.Add(new CueOnTarget(backfired.Caster, messages.Text(MessageIds.BattleBackfire), start));
         _numbers.Add(new FloatingNumber(backfired.Caster, NumberText.Of(backfired.HpLost), EffectKind.Damage, start));
+    }
+
+    // One holder's ticks share a beat after the beat before them; a stunned holder's come after its "Stunned" cue, so
+    // they get a Tick beat of their own. Each number shows when its beat starts.
+    private void AddTick(StatusTicked ticked)
+    {
+        if (_beats.FindLast(beat => beat.Kind != PlaybackBeatKind.Defeat)?.Kind != PlaybackBeatKind.Tick)
+        {
+            _beats.Add(new PlaybackBeat(PlaybackBeatKind.Tick, BattlePacing.TickHold));
+        }
+
+        var start = StartOfBeatAt(_beats.FindLastIndex(beat => beat.Kind == PlaybackBeatKind.Tick));
+        var kind = ticked.Status == StatusKind.Poison ? EffectKind.Damage : EffectKind.RestoreHp;
+        _numbers.Add(new FloatingNumber(ticked.Holder, NumberText.Of(ticked.Amount), kind, start));
     }
 
     // Every lost turn in one Execute shares one beat after the action's own, and each cue shows when it starts.

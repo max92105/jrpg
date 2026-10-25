@@ -23,4 +23,7 @@ internal static class BattlePacing
 
     /// <summary>How long a backfire holds its cue and the HP it cost: long enough to read both.</summary>
     public static TimeSpan BackfireHold { get; } = TimeSpan.FromSeconds(1.0);
+
+    /// <summary>How long the HP that statuses took or restored at a turn's end holds: long enough to read it.</summary>
+    public static TimeSpan TickHold { get; } = TimeSpan.FromSeconds(0.8);
 }

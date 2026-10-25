@@ -33,7 +33,14 @@ internal sealed class TurnFlow(IReadOnlyList<Combatant> combatants, TurnOrder tu
             return;
         }
 
-        TurnUpkeep.ApplyPerTurnGains(holder, events);
+        TurnUpkeep.TickStatuses(holder, combatants, events);
+        if (holder.IsAlive)
+        {
+            TurnUpkeep.ApplyPerTurnGains(holder, events);
+        }
+
+        // Runs even when the poison felled the holder: its own statuses are cleared, but the others' fresh marks still
+        // need clearing.
         TurnUpkeep.CountDownStatuses(holder, combatants, events);
     }
 

@@ -34,3 +34,4 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
       - `Start_StatusTicked_AddsTickBeatAfterImpact`
       - `Start_PoisonTickFells_AddsDefeatBeat`
   - **Verify by hand:** none (DR2).
+- **Done, with deviations:** the tick runs in `TurnFlow.RunUpkeep` (the upkeep left `BattleState` in RG2), not `BattleState.EndTurn`; a felled holder skips its gains but still clears the others' fresh marks. The tests are in a new `BattleTickingStatusTests` (`BattleStatusTests` is 280 lines), with two more than planned: Regen restoring HP, and no tick on an extra turn. Poison is not a hit, so it sets off no ferocity, faith or conviction hit trigger. A tick's fall gets its own defeat beat, like a backfire's. After review: a tick after a "Stunned" cue gets its own Tick beat, and the fall tests moved to `ActionPlaybackFallTests`.

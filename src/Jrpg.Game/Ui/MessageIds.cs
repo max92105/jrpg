@@ -311,6 +311,12 @@ internal static class MessageIds
     /// <summary>The Exposed status's name: its cue when granted, and its tag (ADR 0021).</summary>
     public const string StatusExposed = "status_exposed";
 
+    /// <summary>The Poison status's name: its cue when granted, and its tag (ADR 0021).</summary>
+    public const string StatusPoison = "status_poison";
+
+    /// <summary>The Regen status's name: its cue when granted, and its tag (ADR 0021).</summary>
+    public const string StatusRegen = "status_regen";
+
     /// <summary>The cue on a combatant whose turn a stun took.</summary>
     public const string BattleTurnSkipped = "battle_turn_skipped";
 

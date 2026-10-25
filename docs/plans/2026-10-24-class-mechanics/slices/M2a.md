@@ -39,3 +39,4 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
     - `ClassCatalogValidatorTests`: `Validate_SkillChangesForeignResource_ThrowsNamingClassSkillAndResource`
     - `SkillCatalogValidatorTests`: `Validate_ZeroResourceChange_Throws`
   - **Verify by hand:** none (no content uses it yet).
+- **Done, with deviations:** as planned. Tests 1806 before, 1820 after. The skill validator also rejects a null resource change, and a resource listed twice in one skill (from review: each cost is checked alone, so two costs of one resource could pay less than their sum). The class validator checks resources before skills, so a malformed resource never reaches the foreign-resource check.

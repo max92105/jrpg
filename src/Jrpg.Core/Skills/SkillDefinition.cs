@@ -1,8 +1,9 @@
 using Jrpg.Core.Effects;
+using Jrpg.Core.Resources;
 
 namespace Jrpg.Core.Skills;
 
-/// <summary>One skill. MP is the only skill resource until classes get their own (plan 2026-10-17, guiding rule).</summary>
+/// <summary>One skill. It may cost MP, and it may spend or gain its user's class resources (ADR 0019).</summary>
 public sealed record SkillDefinition
 {
     public required string Id { get; init; }
@@ -15,6 +16,9 @@ public sealed record SkillDefinition
     public required string IconFile { get; init; }
 
     public required int MpCost { get; init; }
+
+    /// <summary>Applied in order when the skill is used; empty when absent.</summary>
+    public IReadOnlyList<ResourceChange> ResourceChanges { get; init; } = [];
 
     public required Effect Effect { get; init; }
 }

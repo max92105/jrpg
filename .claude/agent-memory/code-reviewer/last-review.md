@@ -5,8 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/M1b.md, slice M1b (resources load from content, mage has mana, playback accepts ResourceChanged)
-Round: 1 (verdict: Fix the Criticals, then commit)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/M2a.md, slice M2a (skills can spend a class resource)
+Round: 1 (verdict: Ready to commit)
 
-- Critical, open: ResourceDefinitionValidator.cs:10 `"resources": [null]` -> NullReferenceException on `resource.Id`, no file name; check null entries first (like FindSkillProblem), and test null + blank id (empty-id branch has no test).
-- Suggestion, open: ResourceDefinitionValidator.cs:16 duplicate check could say "resources list 'mana' more than once" to match skillIds wording; taste.
+- Warning, open: SkillCatalogValidator.cs FindResourceChangeProblem — one skill listing the same resource twice (mana -3, mana -2) passes; CanPay checks each change alone, so with 4 mana the skill is usable and costs 4 (clamped) instead of being unusable. Reject a repeated resourceId per skill.
+- Suggestion, open: SkillPaymentTests — no test that a gain at max reports no ResourceChanged (the `applied != 0` branch).

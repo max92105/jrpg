@@ -88,7 +88,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **CS1. Skills come from the class; members lose `skillIds`** (Core + Data + content, about 240 lines, about 60 of them test-site edits) → [slices/CS1.md](slices/CS1.md)
 - [x] **M1a. Combatants carry their class's resources and gain at the end of each of their turns** (Core, about 230 lines) → [slices/M1a.md](slices/M1a.md)
 - [x] **M1b. Resources load from `classes.json`; the mage has mana; the screen accepts the new event** (Data + content + Game, about 160 lines) → [slices/M1b.md](slices/M1b.md)
-- [ ] **M2a. Skills can spend a class resource** (Core + Data, about 250 lines) → [slices/M2a.md](slices/M2a.md)
+- [x] **M2a. Skills can spend a class resource** (Core + Data, about 250 lines) → [slices/M2a.md](slices/M2a.md)
 - [ ] **M2b. The mage's spells cost mana; the skill list shows it** (content + Game, about 220 lines) → [slices/M2b.md](slices/M2b.md)
 
 ### Phase 2: the cleric's faith; MP leaves

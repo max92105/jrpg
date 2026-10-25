@@ -3,6 +3,7 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
 using Jrpg.Core.Randomness;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
 
 namespace Jrpg.Core.Battle;
@@ -78,11 +79,18 @@ public sealed class BattleState
     /// <summary>Who the current actor can aim <paramref name="skill"/> at, in formation order.</summary>
     public TargetChoice<Combatant> TargetChoiceFor(SkillDefinition skill) => ChoiceFor(skill.Effect.Targeting);
 
-    /// <summary>Whether the current actor has the MP for <paramref name="skill"/>.</summary>
-    public bool CanAfford(SkillDefinition skill) => CurrentActor.Vitals.Mp >= skill.MpCost;
+    /// <summary>Whether the current actor has the MP and the resources <paramref name="skill"/> costs.</summary>
+    public bool CanAfford(SkillDefinition skill) => SkillPayment.CanPay(CurrentActor, skill);
+
+    /// <returns>
+    /// The first class resource the current actor has too little of for <paramref name="skill"/>; null when only MP, or
+    /// nothing, is short.
+    /// </returns>
+    public ResourceDefinition? LackingResourceFor(SkillDefinition skill) =>
+        SkillPayment.LackingResourceOf(CurrentActor, skill);
 
     /// <summary>
-    /// Whether the current actor knows <paramref name="skill"/>, has the MP for it and has someone to aim it at. The UI
+    /// Whether the current actor knows <paramref name="skill"/>, can pay for it and has someone to aim it at. The UI
     /// greys out the rest.
     /// </summary>
     public bool CanUse(SkillDefinition skill) =>
@@ -189,11 +197,11 @@ public sealed class BattleState
     {
         if (!CanUse(command.Skill))
         {
-            throw new InvalidOperationException($"{actor.Name} can't use {command.Skill.Name} (unknown skill or not enough MP).");
+            throw new InvalidOperationException($"{actor.Name} can't use {command.Skill.Name} (unknown skill, can't pay for it, or no target).");
         }
 
         ThrowIfIllegalTargets(command.Skill.Effect, command.Targets);
-        actor.Vitals.TrySpendMp(command.Skill.MpCost);
+        SkillPayment.Pay(actor, command.Skill, events);
         ApplyToTargets(command.Skill.Effect, command.Targets, events);
     }
 

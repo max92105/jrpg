@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
@@ -9,16 +10,20 @@ using Jrpg.Core.Tests.Randomness;
 namespace Jrpg.Core.Tests.Battle;
 
 // A mage with 10 max mana, starting at 3 and gaining 2 at the end of each of the mage's turns, against one goblin.
+// Blast costs 2 mana and Meteor 5.
 // The shuffle (1) keeps the listed order: the mage, then the goblin.
 public sealed class BattleStateResourceTests
 {
     private static readonly ResourceDefinition _mana =
         new("mana", "Mana", Max: 10, StartsAt: 3) { Gains = new ResourceGains { PerTurn = 2 } };
 
+    private static readonly SkillDefinition _blast = Spell("blast", manaCost: 2);
+    private static readonly SkillDefinition _meteor = Spell("meteor", manaCost: 5);
+
     private readonly PartyMember _mage = PartyMember.Recruit(
         new PartyMemberBuilder().WithId("omer").BuildDefinition(),
-        new ClassBuilder().WithId("mage").WithResources(_mana).Build(),
-        new Dictionary<string, SkillDefinition>());
+        new ClassBuilder().WithId("mage").WithResources(_mana).WithSkills("blast", "meteor").Build(),
+        new Dictionary<string, SkillDefinition> { ["blast"] = _blast, ["meteor"] = _meteor });
 
     [Fact]
     public void Start_MemberWithResource_StartsAtStartsAt()
@@ -76,6 +81,42 @@ public sealed class BattleStateResourceTests
         Assert.Equal((5, 3), (MageIn(first).Resources.AmountOf("mana"), MageIn(second).Resources.AmountOf("mana")));
     }
 
+    [Fact]
+    public void Execute_SkillCostingResource_SpendsBeforeEffect()
+    {
+        var battle = StartBattle();
+        var mage = MageIn(battle);
+        var goblin = battle.LivingOn(BattleSide.Enemies)[0];
+
+        var events = battle.Execute(new SkillCommand(_blast, [goblin]));
+
+        Assert.Equal(new ResourceChanged(mage, "mana", -2), events[1]);
+        Assert.IsType<EffectApplied>(events[2]);
+    }
+
+    [Fact]
+    public void Execute_UnaffordableResourceSkill_Throws()
+    {
+        var battle = StartBattle();
+        var goblin = battle.LivingOn(BattleSide.Enemies)[0];
+
+        Assert.Throws<InvalidOperationException>(() => battle.Execute(new SkillCommand(_meteor, [goblin])));
+        Assert.Equal(3, MageIn(battle).Resources.AmountOf("mana"));
+    }
+
+    [Fact]
+    public void CanUse_AfterGainingTurns_CostlierSkillBecomesUsable()
+    {
+        var battle = StartBattle();
+        var usableAtStart = battle.CanUse(_meteor);
+
+        battle.Execute(new DefendCommand());
+        battle.Execute(new DefendCommand());
+
+        Assert.False(usableAtStart);
+        Assert.True(battle.CanUse(_meteor));
+    }
+
     private BattleState StartBattle()
     {
         var party = new PartyState([_mage], [_mage], new PartyRules(MaxActiveMembers: 4));
@@ -84,4 +125,15 @@ public sealed class BattleStateResourceTests
     }
 
     private static Combatant MageIn(BattleState battle) => battle.LivingOn(BattleSide.Party)[0];
+
+    private static SkillDefinition Spell(string id, int manaCost) => new()
+    {
+        Id = id,
+        Name = id,
+        Description = "",
+        IconFile = "",
+        MpCost = 0,
+        ResourceChanges = [new ResourceChange("mana", -manaCost)],
+        Effect = new Effect(EffectKind.Damage, 10, Targeting.SingleEnemy),
+    };
 }

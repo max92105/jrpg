@@ -1,4 +1,5 @@
 using Jrpg.Core.Effects;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
 using Jrpg.Data.Content;
 using Jrpg.Data.Skills;
@@ -22,6 +23,8 @@ public sealed class SkillCatalogValidatorTests
     public static TheoryData<SkillDefinition, string> InvalidSkills => new()
     {
         { _heal with { Name = "" }, "name must not be empty." },
+        { _heal with { ResourceChanges = [null!] }, "resourceChanges must not contain a null entry." },
+        { _heal with { ResourceChanges = [new ResourceChange("mana", -3), new ResourceChange("mana", -2)] }, "resourceChanges lists 'mana' more than once." },
         { _heal with { Effect = _heal.Effect with { Power = -5 } }, "effect.power must be at least 0 (was -5)." },
         { _heal with { Effect = new Effect(EffectKind.Revive, Power: 0, Targeting.SingleFallenAlly) }, "effect.power must be at least 1 for a revive effect (was 0)." },
     };
@@ -40,6 +43,16 @@ public sealed class SkillCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(() => SkillCatalogValidator.Validate(FileName, [_heal with { MpCost = -1 }]));
 
         Assert.Equal("skills.json: skill 'heal': mpCost must be at least 0 (was -1).", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_ZeroResourceChange_Throws()
+    {
+        var idle = _heal with { ResourceChanges = [new ResourceChange("faith", 0)] };
+
+        var exception = Assert.Throws<ContentValidationException>(() => SkillCatalogValidator.Validate(FileName, [idle]));
+
+        Assert.Equal("skills.json: skill 'heal': resourceChanges has a 0 amount for 'faith', which does nothing.", exception.Message);
     }
 
     [Theory]

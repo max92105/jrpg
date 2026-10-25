@@ -20,6 +20,16 @@ public sealed class ClassCatalogValidatorTests
             MpCost = 8,
             Effect = new Effect(EffectKind.RestoreHp, 15, Targeting.SingleAlly),
         },
+        ["smite"] = new()
+        {
+            Id = "smite",
+            Name = "Smite",
+            Description = "",
+            IconFile = "",
+            MpCost = 0,
+            ResourceChanges = [new ResourceChange("conviction", -4)],
+            Effect = new Effect(EffectKind.Damage, 30, Targeting.SingleEnemy),
+        },
     });
 
     [Fact]
@@ -164,6 +174,17 @@ public sealed class ClassCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("mage") with { Resources = [resource] }]));
 
         Assert.Equal($"classes.json: class 'mage': {problem}", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_SkillChangesForeignResource_ThrowsNamingClassSkillAndResource()
+    {
+        var exception = Assert.Throws<ContentValidationException>(
+            () => Validate([Class("mage") with { SkillIds = ["smite"], Resources = [Mana] }]));
+
+        Assert.Equal(
+            "classes.json: class 'mage': skillIds lists 'smite', which changes 'conviction', a resource mage doesn't have.",
+            exception.Message);
     }
 
     private static ResourceDefinition Mana { get; } = new("mana", "Mana", Max: 10, StartsAt: 3);

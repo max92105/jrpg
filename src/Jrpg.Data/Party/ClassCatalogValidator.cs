@@ -16,8 +16,9 @@ internal static class ClassCatalogValidator
         : classDefinition.Base.MaxHp < 1 ? $"base.maxHp must be at least 1 (was {classDefinition.Base.MaxHp})."
         : FindNegativeStat("base", classDefinition.Base)
             ?? FindNegativeStat("growth", classDefinition.Growth)
+            ?? ResourceDefinitionValidator.FindProblem(classDefinition.Resources)
             ?? FindSkillProblem(classDefinition.SkillIds, references)
-            ?? ResourceDefinitionValidator.FindProblem(classDefinition.Resources);
+            ?? FindForeignResourceProblem(classDefinition, references);
 
     // Growth may be 0 for a stat a class never improves; a negative one would shrink it with every level.
     private static string? FindNegativeStat(string field, ClassStats stats) =>
@@ -43,5 +44,17 @@ internal static class ClassCatalogValidator
 
         var repeatedSkillId = skillIds.GroupBy(id => id).FirstOrDefault(group => group.Count() > 1)?.Key;
         return repeatedSkillId is null ? null : $"skillIds lists '{repeatedSkillId}' more than once.";
+    }
+
+    // A class's skills only change its own resources (ADR 0020); this runs once the skill ids are known valid.
+    private static string? FindForeignResourceProblem(ClassDefinition classDefinition, ClassReferences references)
+    {
+        var ownIds = classDefinition.Resources.Select(resource => resource.Id).ToHashSet();
+        var foreign = classDefinition.SkillIds
+            .SelectMany(id => references.Skills[id].ResourceChanges, (id, change) => (SkillId: id, change.ResourceId))
+            .FirstOrDefault(use => !ownIds.Contains(use.ResourceId));
+        return foreign.SkillId is null
+            ? null
+            : $"skillIds lists '{foreign.SkillId}', which changes '{foreign.ResourceId}', a resource {classDefinition.Id} doesn't have.";
     }
 }

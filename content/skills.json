@@ -32,6 +32,7 @@
     "description": "Restores 15 HP to one ally.",
     "iconFile": "",
     "mpCost": 8,
+    "requirements": [ { "resourceId": "faith", "atLeast": 1 } ],
     "effect": { "kind": "restoreHp", "power": 15, "targeting": "singleAlly" }
   },
   {
@@ -40,6 +41,7 @@
     "description": "Restores 30 HP to its user.",
     "iconFile": "",
     "mpCost": 8,
+    "requirements": [ { "resourceId": "faith", "atLeast": 2 } ],
     "effect": { "kind": "restoreHp", "power": 30, "targeting": "self" }
   },
   {
@@ -48,6 +50,7 @@
     "description": "Restores 50 HP to every ally.",
     "iconFile": "",
     "mpCost": 8,
+    "requirements": [ { "resourceId": "faith", "atLeast": 4 } ],
     "effect": { "kind": "restoreHp", "power": 50, "targeting": "allAllies" }
   }
 ]

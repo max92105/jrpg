@@ -7,11 +7,7 @@ internal static class TurnUpkeep
     {
         foreach (var resource in actor.Resources.Definitions)
         {
-            var change = actor.Resources.Change(resource.Id, resource.Gains.PerTurn);
-            if (change != 0)
-            {
-                events.Add(new ResourceChanged(actor, resource.Id, change));
-            }
+            actor.ChangeResource(resource.Id, resource.Gains.PerTurn, events);
         }
     }
 }

@@ -46,6 +46,16 @@ public sealed class SkillCatalogValidatorTests
     }
 
     [Fact]
+    public void Validate_RequirementBelowOne_Throws()
+    {
+        var idle = _heal with { Requirements = [new ResourceRequirement("faith", 0)] };
+
+        var exception = Assert.Throws<ContentValidationException>(() => SkillCatalogValidator.Validate(FileName, [idle]));
+
+        Assert.Equal("skills.json: skill 'heal': requirements: atLeast for 'faith' must be at least 1 (was 0).", exception.Message);
+    }
+
+    [Fact]
     public void Validate_ZeroResourceChange_Throws()
     {
         var idle = _heal with { ResourceChanges = [new ResourceChange("faith", 0)] };

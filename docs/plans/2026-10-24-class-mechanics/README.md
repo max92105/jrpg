@@ -92,7 +92,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **M2b. The mage's spells cost mana; the skill list shows it** (content + Game, about 220 lines) → [slices/M2b.md](slices/M2b.md)
 
 ### Phase 2: the cleric's faith; MP leaves
-- [ ] **CL1. The cleric: Faith, a level that skills require; it drops when an ally falls** (Core + Data + content + Game text, about 270 lines) → [slices/CL1.md](slices/CL1.md)
+- [x] **CL1. The cleric: Faith, a level that skills require; it drops when an ally falls** (Core + Data + content + Game text, about 270 lines) → [slices/CL1.md](slices/CL1.md)
 - [ ] **ADR 0022: MP leaves the game; how saves migrate** (before MP1) → [slices/ADR-0022.md](slices/ADR-0022.md)
 - [ ] **MP1. Skills and effects stop using MP** (Core + Data + content + Game, about 200 lines) → [slices/MP1.md](slices/MP1.md)
 - [ ] **MP2. No screen shows MP** (Game, about 230 lines) → [slices/MP2.md](slices/MP2.md)

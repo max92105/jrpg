@@ -5,4 +5,7 @@ public sealed record ResourceGains
 {
     /// <summary>At the end of each of the holder's own turns.</summary>
     public int PerTurn { get; init; }
+
+    /// <summary>Whenever another combatant on the holder's side falls, while the holder still stands.</summary>
+    public int PerAllyFallen { get; init; }
 }

@@ -56,4 +56,14 @@ public sealed class Combatant
     {
         Enemy = enemy,
     };
+
+    /// <summary>Changes one resource within 0..max and reports it, unless clamping left nothing to change.</summary>
+    internal void ChangeResource(string resourceId, int amount, List<BattleEvent> events)
+    {
+        var applied = Resources.Change(resourceId, amount);
+        if (applied != 0)
+        {
+            events.Add(new ResourceChanged(this, resourceId, applied));
+        }
+    }
 }

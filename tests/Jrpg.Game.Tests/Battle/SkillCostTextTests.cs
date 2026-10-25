@@ -10,8 +10,9 @@ namespace Jrpg.Game.Tests.Battle;
 public sealed class SkillCostTextTests
 {
     private static readonly ResourceDefinition _mana = new("mana", "Mana", Max: 10, StartsAt: 3);
+    private static readonly ResourceDefinition _faith = new("faith", "Faith", Max: 5, StartsAt: 3);
 
-    private readonly SkillCostText _text = new(RepositoryScreenText.Text.Messages, new ResourceMeters([_mana]));
+    private readonly SkillCostText _text = new(RepositoryScreenText.Text.Messages, new ResourceMeters([_mana, _faith]));
 
     [Fact]
     public void CostOf_MpSkill_SaysMp()
@@ -27,6 +28,22 @@ public sealed class SkillCostTextTests
         var cost = _text.CostOf(Skill(mpCost: 0) with { ResourceChanges = [new ResourceChange("mana", -2)] });
 
         Assert.Equal("2 Mana", cost);
+    }
+
+    [Fact]
+    public void CostOf_RequirementShort_SaysNeeds()
+    {
+        var cost = _text.CostOf(Skill(mpCost: 8) with { Requirements = [new ResourceRequirement("faith", 4)] });
+
+        Assert.Equal("Needs 4 Faith", cost);
+    }
+
+    [Fact]
+    public void CostOf_RequirementMet_SaysLevel()
+    {
+        var cost = _text.CostOf(Skill(mpCost: 8) with { Requirements = [new ResourceRequirement("faith", 2)] });
+
+        Assert.Equal("Faith 2", cost);
     }
 
     [Fact]

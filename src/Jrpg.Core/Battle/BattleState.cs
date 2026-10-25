@@ -79,7 +79,7 @@ public sealed class BattleState
     /// <summary>Who the current actor can aim <paramref name="skill"/> at, in formation order.</summary>
     public TargetChoice<Combatant> TargetChoiceFor(SkillDefinition skill) => ChoiceFor(skill.Effect.Targeting);
 
-    /// <summary>Whether the current actor has the MP and the resources <paramref name="skill"/> costs.</summary>
+    /// <summary>Whether the actor can pay <paramref name="skill"/>: MP, requirements, resource costs.</summary>
     public bool CanAfford(SkillDefinition skill) => SkillPayment.CanPay(CurrentActor, skill);
 
     /// <returns>
@@ -172,7 +172,7 @@ public sealed class BattleState
         : candidate.Side == actor.Side ? TargetRelation.Ally
         : TargetRelation.Enemy;
 
-    private static void ApplyToTargets(Effect effect, IReadOnlyList<Combatant> targets, List<BattleEvent> events)
+    private void ApplyToTargets(Effect effect, IReadOnlyList<Combatant> targets, List<BattleEvent> events)
     {
         foreach (var target in targets)
         {
@@ -181,6 +181,7 @@ public sealed class BattleState
             if (wasAlive && !target.IsAlive)
             {
                 events.Add(new CombatantDefeated(target));
+                ResourceTriggers.OnCombatantFallen(target, Combatants, events);
             }
         }
     }

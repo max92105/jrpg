@@ -23,7 +23,9 @@ internal static class SkillCatalogValidator
             return $"mpCost must be at least 0 (was {skill.MpCost}).";
         }
 
-        return FindResourceChangeProblem(skill.ResourceChanges) ?? EffectValidator.FindProblem(skill.Effect);
+        return FindResourceChangeProblem(skill.ResourceChanges)
+            ?? FindRequirementProblem(skill.Requirements)
+            ?? EffectValidator.FindProblem(skill.Effect);
     }
 
     private static string? FindResourceChangeProblem(IReadOnlyList<ResourceChange> changes)
@@ -43,5 +45,18 @@ internal static class SkillCatalogValidator
 
         var idle = changes.FirstOrDefault(change => change.Amount == 0);
         return idle is null ? null : $"resourceChanges has a 0 amount for '{idle.ResourceId}', which does nothing.";
+    }
+
+    private static string? FindRequirementProblem(IReadOnlyList<ResourceRequirement> requirements)
+    {
+        if (requirements.Any(requirement => requirement is null))
+        {
+            return "requirements must not contain a null entry.";
+        }
+
+        var idle = requirements.FirstOrDefault(requirement => requirement.AtLeast < 1);
+        return idle is null
+            ? null
+            : $"requirements: atLeast for '{idle.ResourceId}' must be at least 1 (was {idle.AtLeast}).";
     }
 }

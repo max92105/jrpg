@@ -19,7 +19,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 
 | Folder | Purpose | Key types |
 |---|---|---|
-| Battle | One battle: turn order, commands, events, enemy AI, rewards | `BattleState`, `BattleCommand`, `BattleEvent`, `TurnOrder`, `TurnUpkeep` (the end of the holder's own turn: per-turn gains), `SkillPayment` (MP and resource costs: can pay, what's short, pay), `EnemyTactics`, `VictoryRewards` |
+| Battle | One battle: turn order, commands, events, enemy AI, rewards | `BattleState`, `BattleCommand`, `BattleEvent`, `TurnOrder`, `TurnUpkeep` (the end of the holder's own turn: per-turn gains), `SkillPayment` (MP, resource requirements and costs: can pay, what's short, pay), `ResourceTriggers` (gains that happenings trigger: an ally falling), `EnemyTactics`, `VictoryRewards` |
 | Content | The loaded catalog and global rules | `ContentCatalog`, `GameRules`, `NewGameDefinition`, `LeaderChoice` |
 | Dialogue | What a speaker says | `Speech` |
 | Effects | What skills and items do, targeting, damage formula | `Effect`, `EffectResolver`, `Targeting`, `TargetChoice`, `DamageFormula` |
@@ -31,7 +31,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Party | Members, the active party, equipment (taking it from another member too), field item use | `PartyState`, `PartyMember` (stats from its class at its level, ADR 0017; joins at level 1), `ClassDefinition` (also the skills every member of it has, ADR 0020; read them through `PartyMember.Skills`), `ClassStats`, `ClassGrowth` (a class's stats at a level, ADR 0017), `PartyEquipment`, `WornItem`, `FieldItemUse` |
 | Progression | Experience and levels | `ExperienceTable`, `LevelProgressStep` |
 | Randomness | Seeded randomness | `IRandom`, `SeededRandom` |
-| Resources | Class battle resources (ADR 0019): definitions, gains per trigger, one combatant's amounts in a battle | `ResourceDefinition`, `ResourceGains`, `ResourceChange` (what a skill does to one resource), `ResourceMeters` (on `Combatant.Resources`, built new each battle; changes reported as `ResourceChanged`) |
+| Resources | Class battle resources (ADR 0019): definitions, gains per trigger, one combatant's amounts in a battle | `ResourceDefinition`, `ResourceGains`, `ResourceChange` (what a skill does to one resource), `ResourceRequirement` (a minimum a skill needs, never spent), `ResourceMeters` (on `Combatant.Resources`, built new each battle; changes reported as `ResourceChanged`) |
 | Saving / Session / World | The save record; one playthrough (starts and finishes its battles); what the player changed in the world | `SaveGame`, `GameSession`, `WorldState` |
 | Skills / Stats | Skill definitions; stats and HP/MP | `SkillDefinition`, `CombatStats`, `Vitals` |
 

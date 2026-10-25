@@ -1,4 +1,5 @@
 using Jrpg.Core.Party;
+using Jrpg.Core.Skills;
 using Jrpg.Data.Content;
 using Jrpg.Data.Resources;
 
@@ -18,7 +19,8 @@ internal static class ClassCatalogValidator
             ?? FindNegativeStat("growth", classDefinition.Growth)
             ?? ResourceDefinitionValidator.FindProblem(classDefinition.Resources)
             ?? FindSkillProblem(classDefinition.SkillIds, references)
-            ?? FindForeignResourceProblem(classDefinition, references);
+            ?? FindForeignResourceProblem(classDefinition, references)
+            ?? FindUnreachableRequirementProblem(classDefinition, references);
 
     // Growth may be 0 for a stat a class never improves; a negative one would shrink it with every level.
     private static string? FindNegativeStat(string field, ClassStats stats) =>
@@ -46,15 +48,37 @@ internal static class ClassCatalogValidator
         return repeatedSkillId is null ? null : $"skillIds lists '{repeatedSkillId}' more than once.";
     }
 
-    // A class's skills only change its own resources (ADR 0020); this runs once the skill ids are known valid.
+    // A class's skills only use its own resources (ADR 0020); this runs once the skill ids are known valid.
     private static string? FindForeignResourceProblem(ClassDefinition classDefinition, ClassReferences references)
     {
         var ownIds = classDefinition.Resources.Select(resource => resource.Id).ToHashSet();
         var foreign = classDefinition.SkillIds
-            .SelectMany(id => references.Skills[id].ResourceChanges, (id, change) => (SkillId: id, change.ResourceId))
+            .SelectMany(
+                id => ResourceIdsUsedBy(references.Skills[id]),
+                (id, resourceId) => (SkillId: id, ResourceId: resourceId))
             .FirstOrDefault(use => !ownIds.Contains(use.ResourceId));
         return foreign.SkillId is null
             ? null
-            : $"skillIds lists '{foreign.SkillId}', which changes '{foreign.ResourceId}', a resource {classDefinition.Id} doesn't have.";
+            : $"skillIds lists '{foreign.SkillId}', which uses '{foreign.ResourceId}', a resource {classDefinition.Id} doesn't have.";
     }
+
+    // A requirement above the max could never be met, so the skill would stay greyed for good.
+    private static string? FindUnreachableRequirementProblem(ClassDefinition classDefinition, ClassReferences references)
+    {
+        var maxima = classDefinition.Resources.ToDictionary(resource => resource.Id, resource => resource.Max);
+        var (skillId, requirement) = classDefinition.SkillIds
+            .SelectMany(id => references.Skills[id].Requirements, (id, requirement) => (id, requirement))
+            .FirstOrDefault(use => use.requirement.AtLeast > maxima[use.requirement.ResourceId]);
+        if (skillId is null)
+        {
+            return null;
+        }
+
+        var (resourceId, atLeast) = (requirement.ResourceId, requirement.AtLeast);
+        return $"skillIds lists '{skillId}', which needs {atLeast} {resourceId}, above its max of {maxima[resourceId]}.";
+    }
+
+    private static IEnumerable<string> ResourceIdsUsedBy(SkillDefinition skill) =>
+        skill.ResourceChanges.Select(change => change.ResourceId)
+            .Concat(skill.Requirements.Select(requirement => requirement.ResourceId));
 }

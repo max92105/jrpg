@@ -16,7 +16,8 @@
     "description": "A servant of the gods who heals allies and smites the unholy.",
     "base": { "maxHp": 180, "maxMp": 60, "attack": 18, "defense": 7 },
     "growth": { "maxHp": 16, "maxMp": 6, "attack": 2, "defense": 1 },
-    "skillIds": ["heal", "recovery", "heal_all"] },
+    "skillIds": ["heal", "recovery", "heal_all"],
+    "resources": [ { "id": "faith", "name": "Faith", "max": 5, "startsAt": 5, "gains": { "perAllyFallen": -1 } } ] },
   {
     "id": "rogue", "name": "Rogue",
     "description": "A quick and cunning blade who strikes where the enemy is weakest.",

@@ -20,6 +20,16 @@ public sealed class ClassCatalogValidatorTests
             MpCost = 8,
             Effect = new Effect(EffectKind.RestoreHp, 15, Targeting.SingleAlly),
         },
+        ["heal_all"] = new()
+        {
+            Id = "heal_all",
+            Name = "Heal All",
+            Description = "",
+            IconFile = "",
+            MpCost = 0,
+            Requirements = [new ResourceRequirement("faith", 6)],
+            Effect = new Effect(EffectKind.RestoreHp, 50, Targeting.AllAllies),
+        },
         ["smite"] = new()
         {
             Id = "smite",
@@ -183,8 +193,19 @@ public sealed class ClassCatalogValidatorTests
             () => Validate([Class("mage") with { SkillIds = ["smite"], Resources = [Mana] }]));
 
         Assert.Equal(
-            "classes.json: class 'mage': skillIds lists 'smite', which changes 'conviction', a resource mage doesn't have.",
+            "classes.json: class 'mage': skillIds lists 'smite', which uses 'conviction', a resource mage doesn't have.",
             exception.Message);
+    }
+
+    [Fact]
+    public void Validate_RequirementAboveMax_Throws()
+    {
+        var faith = new ResourceDefinition("faith", "Faith", Max: 5, StartsAt: 5);
+
+        var exception = Assert.Throws<ContentValidationException>(
+            () => Validate([Class("cleric") with { SkillIds = ["heal_all"], Resources = [faith] }]));
+
+        Assert.Equal("classes.json: class 'cleric': skillIds lists 'heal_all', which needs 6 faith, above its max of 5.", exception.Message);
     }
 
     private static ResourceDefinition Mana { get; } = new("mana", "Mana", Max: 10, StartsAt: 3);

@@ -20,5 +20,8 @@ public sealed record SkillDefinition
     /// <summary>Applied in order when the skill is used; empty when absent.</summary>
     public IReadOnlyList<ResourceChange> ResourceChanges { get; init; } = [];
 
+    /// <summary>Minimums the user must hold, checked before the skill's own changes; empty when absent.</summary>
+    public IReadOnlyList<ResourceRequirement> Requirements { get; init; } = [];
+
     public required Effect Effect { get; init; }
 }

@@ -44,3 +44,10 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
     - As Zanyr with two recruits, let an ally fall: Heal All greys with "Needs 4 Faith".
     - Heal still works at faith 4 or lower, down to 1.
     - Faith is shown on screen from M3; until then, check the greyed skills.
+- **Done, with deviations:** Tests 1826 before, 1838 after. Beyond the plan:
+  - `SkillCostText` shows a cost before a requirement, and a requirement before MP. The heals now show "Faith 1" or "Needs 4 Faith" instead of their MP.
+  - The resource-cost message's placeholder is now `{amount}`, shared with the two new lines.
+  - The foreign-resource message now says "uses", since it covers requirements too.
+  - There are extra tests: `CostOf_RequirementMet_SaysLevel`, and `BattleStateResourceTests.Execute_AllyFallsToAnAttack_ClericLosesFaith`, which runs a fall through `Execute`.
+  - `SkillCatalogValidator` also rejects a null requirement.
+  - From review: changing a resource and reporting it is now one method, `Combatant.ChangeResource`. The per-turn gains, the skill payment and the fall trigger all call it.

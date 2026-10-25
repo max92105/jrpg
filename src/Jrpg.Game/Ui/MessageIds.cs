@@ -285,8 +285,14 @@ internal static class MessageIds
     /// <summary>Placeholder <c>{cost}</c>: a skill's MP cost on its row in battle.</summary>
     public const string BattleSkillCost = "battle_skill_cost";
 
-    /// <summary>Placeholders <c>{cost}</c>, <c>{resource}</c>: a skill's resource cost on its battle row.</summary>
+    /// <summary>Placeholders <c>{amount}</c>, <c>{resource}</c>: a skill's resource cost on its battle row.</summary>
     public const string BattleSkillResourceCost = "battle_skill_resource_cost";
+
+    /// <summary>Placeholders <c>{amount}</c>, <c>{resource}</c>: an unmet requirement on its battle row.</summary>
+    public const string BattleSkillResourceNeeded = "battle_skill_resource_needed";
+
+    /// <summary>Placeholders <c>{amount}</c>, <c>{resource}</c>: a met requirement on its battle row.</summary>
+    public const string BattleSkillResourceLevel = "battle_skill_resource_level";
 
     /// <summary>The hint when Confirm is pressed on a skill the actor lacks the MP for (decision 105).</summary>
     public const string BattleNotEnoughMp = "battle_not_enough_mp";

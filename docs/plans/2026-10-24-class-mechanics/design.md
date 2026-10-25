@@ -71,7 +71,7 @@ Content ids never change: `fire_blast`, `fireball`, `heal`, `recovery` and `heal
 |---|---|---|---|
 | Inn | `content/maps/start.json` | one placeholder NPC ("Innkeeper") with an Interact event: a line, then `rest` | RS2. |
 | Rest item | `items.json` `camp_kit` | "Camp Kit", usable from the menu only, rests the active party, stack 9 | RS3. |
-| What a rest does | Core `Party/PartyMember.Rest` | full HP, revives, refills lasting resources | Question 221. |
+| What a rest does | Core `Party/PartyMember.Rest` | full HP, revives, refills lasting resources | Decision 230. |
 
 **Screens** (1920 x 1080 virtual screen)
 

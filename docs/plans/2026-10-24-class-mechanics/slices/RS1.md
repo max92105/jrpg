@@ -1,10 +1,10 @@
 # RS1. The rest step
 
-Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Tunables and placeholders" (Rest), "Core changes" (Events). Decision 198; questions 221, 222. ADR 0024, ADR 0006.
+Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Tunables and placeholders" (Rest), "Core changes" (Events). Decisions 198, 230; question 222. ADR 0024, ADR 0006.
 
 - **RS1. The rest step: an event rests the party** (Core + Data + Game, about 240 lines)
   - **Goal:**
-    - A map event step rests the whole party, reserves included (question 221). Each member:
+    - A map event step rests the whole party, reserves included (decision 230). Each member:
       - gets full HP, and the fallen are revived;
       - has every lasting resource refilled to its starting amount.
     - The step shows "The party rests." and waits for Continue, as give-item does.

@@ -2,7 +2,7 @@
 Status: approved
 
 Second feature plan after the migration, following the new-game flow.
-- Decisions 188-207 and 229 are recorded below. Questions 208-228 are open; the next free number is 230.
+- Decisions 188-207, 229 and 230 are recorded below. Questions 208-220 and 222-228 are open; the next free number is 231.
 - This plan writes ADRs 0019-0024; the next ADR is 0025.
 - It answers question 181 (where skills come from) through ADR 0020.
 
@@ -130,7 +130,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **Z1. Run-through: every class's mechanic** (manual) → [slices/Z1.md](slices/Z1.md)
 
 ### Phase 7: lasting resources and rest
-- [ ] **ADR 0024: Lasting resources and rest** (before LR1) → [slices/ADR-0024.md](slices/ADR-0024.md)
+- [x] **ADR 0024: Lasting resources and rest** (before LR1) → [slices/ADR-0024.md](slices/ADR-0024.md)
 - [ ] **LR1. Lasting resources carry from battle to battle on the member** (Core, about 240 lines) → [slices/LR1.md](slices/LR1.md)
 - [ ] **LR2. Saves keep lasting resources: format 3** (Core + Data, about 220 lines) → [slices/LR2.md](slices/LR2.md)
 - [ ] **LR3. The mage's Clarity lowers starting mana; the cleric's faith lasts** (Core + Data + content, about 200 lines) → [slices/LR3.md](slices/LR3.md)
@@ -179,6 +179,7 @@ The developer's answers to the draft (2026-10-24):
 - **206. Monk, Chakra:** many small hits instead of one big hit. A skill's effect can hit several times. Chakra is gained per hit landed and spent on multi-hit skills (question 218).
 - **207. Warrior becomes Fighter, id included:** "everything needs to correlate and be clean, no shortcut." The class id is `fighter` everywhere, with no alias (FR1). Saves hold no class id, so no save changes.
 - **229. No save migrations before the first release** (ADR 0022): "delete existing saves, I don't care, they are test saves". Until the first release, a format change bumps `formatVersion` and refuses older saves. The developer's test save was deleted on 2026-10-24.
+- **230. What a rest restores** (ADR 0024, answers question 221): the inn and the rest item alike restore full HP, revive the fallen and refill every lasting resource, through one `PartyMember.Rest()`.
 
 Earlier decisions that apply:
 - 13: experience goes to the members still standing.
@@ -220,7 +221,6 @@ Each slice uses the placeholder until answered.
   - Warlock: Corruption: each backfire raises the starting instability until rest.
   - Druid: Attunement: each battle narrows the forces' max.
   - Monk: Balance: chakra's max lowered after each battle.
-- **221. What a rest restores.** Placeholder: an inn and a rest item both restore full HP, revive the fallen and refill every lasting resource. Alternatives: the item only refills lasting resources; the item can't revive.
 - **222. Paying for rest.** Placeholder: the inn is free (no gold exists). The rest item is found or given like any item.
 - **223. What carries between battles.** Placeholder: only lasting resources (Clarity, Faith); every other resource starts each battle at its starting amount.
 - **224. Enemies.** Placeholder: enemies have no resources and no skills; they only receive statuses.

@@ -1,6 +1,6 @@
 # RS3. A rest item
 
-Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Tunables and placeholders" (Rest item). Decision 198; question 221.
+Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Tunables and placeholders" (Rest item). Decisions 198, 230.
 
 - **RS3. A rest item, used from the menu** (Core + Data + content + Game, about 200 lines)
   - **Goal:**

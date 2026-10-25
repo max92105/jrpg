@@ -18,6 +18,9 @@ internal static class MessageIds
     /// <summary>Placeholder <c>{name}</c>: a recruit step added that member to the party.</summary>
     public const string MemberJoined = "member_joined";
 
+    /// <summary>A rest step rested the whole party (decision 230).</summary>
+    public const string PartyRests = "event_party_rests";
+
     /// <summary>Placeholder <c>{name}</c>: a recruit step named a member already in the party.</summary>
     public const string MemberAlreadyInParty = "member_already_in_party";
 

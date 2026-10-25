@@ -96,7 +96,7 @@ internal sealed class EventPresenter
             case WarpStep:
                 ShowWarp();
                 break;
-            case DialogueStep or GiveItemStep or RecruitStep:
+            case DialogueStep or GiveItemStep or RecruitStep or RestStep:
                 ShowPages(step, delta, input);
                 break;
             case StillStep still:
@@ -279,6 +279,7 @@ internal sealed class EventPresenter
         // and a recruitment on every recruit step.
         GiveItemStep => new SpeechPlayback(new Speech([FoundItemText.Of(_exploration.CurrentItemReceipt!, _messages)]), TimeSpan.Zero),
         RecruitStep => new SpeechPlayback(new Speech([RecruitText.Of(_exploration.CurrentRecruitment!, _messages)]), TimeSpan.Zero),
-        _ => throw new ArgumentOutOfRangeException(nameof(step), step, "Only dialogue, found items and recruits have pages."),
+        RestStep => new SpeechPlayback(new Speech([_messages.Text(MessageIds.PartyRests)]), TimeSpan.Zero),
+        _ => throw new ArgumentOutOfRangeException(nameof(step), step, "Only dialogue, found items, recruits and rests have pages."),
     };
 }

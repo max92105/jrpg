@@ -112,6 +112,13 @@ internal sealed class EventRun
             case RecruitStep recruit:
                 CurrentRecruitment = Recruit(recruit.MemberId);
                 return true;
+            case RestStep:
+                foreach (var member in _party.Members)
+                {
+                    member.Rest();
+                }
+
+                return true;
             case DialogueStep or WarpStep or StillStep:
                 return true;
             default:

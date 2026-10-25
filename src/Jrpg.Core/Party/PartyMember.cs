@@ -134,6 +134,26 @@ public sealed class PartyMember
         _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot."),
     };
 
+    /// <summary>
+    /// A rest (decision 230): full HP, the fallen revived, and every lasting resource back at its starting amount.
+    /// </summary>
+    public void Rest()
+    {
+        if (Vitals.IsAlive)
+        {
+            Vitals.RestoreHp(Vitals.MaxHp);
+        }
+        else
+        {
+            Vitals.Revive(Vitals.MaxHp);
+        }
+
+        foreach (var resource in Class.Resources.Where(resource => resource.IsLasting))
+        {
+            _lastingAmounts[resource.Id] = resource.StartsAt;
+        }
+    }
+
     /// <summary>Keeps what a battle left of a lasting resource, within 0..its max.</summary>
     /// <exception cref="ArgumentException">The class has no lasting resource <paramref name="resourceId"/>.</exception>
     internal void KeepLastingAmount(string resourceId, int amount)

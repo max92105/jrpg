@@ -5,8 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/LR3.md, slice LR3 (Clarity strains mana; faith lasting)
-Round: 1 (verdict: Ready to commit)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/RS1.md, slice RS1 (the rest step)
+Round: 1 (verdict: Fix the Criticals, then commit)
 
-- Suggestion: FindStrainProblem doesn't refuse a strain whose target is itself lasting; the lowering would then be carried and applied again each battle (compounding); refuse it like the other strain checks; open
-- Suggestion: ResourceStarts.For chains two Selects on one long line; a named local function (StartWithStrain) would read better; open
+- Critical: StartMapScenarios.cs:57-61 BelowRestingChest inserted between BelowTalkingChest's summary and its property; resting chest carries two summaries (one says it talks), talking chest has none; open
+- Suggestion: EventRunTests rest test doesn't cover lasting refill at event level (covered by PartyMemberRestTests); open

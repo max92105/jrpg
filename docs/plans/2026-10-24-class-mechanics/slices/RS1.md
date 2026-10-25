@@ -29,3 +29,7 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
     - `MapEventStepsTests` (or the file that round-trips steps): `ReadWrite_RestStep_RoundTrips`
     - `EventPresenterTests`: `Update_RestStep_ShowsRestLineThenContinues`
   - **Verify by hand:** none until RS2.
+- **Done, with deviations:**
+  - `rest` needed only its type discriminator in Data. Its round trip is part of `ContentFileWriterTests`' step-list test, rather than a test of its own.
+  - The `PartyMember` rest tests sit in a new `PartyMemberRestTests` (`PartyMemberTests` is 307 lines).
+  - The presenter test uses a new `StartMapScenarios.BelowRestingChest`: the chest rests the party until RS2 places an inn. It checks that the event waits on the rest line and ends on Confirm. As with the other steps, no test reads the box's text.

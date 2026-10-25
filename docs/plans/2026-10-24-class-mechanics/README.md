@@ -134,7 +134,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **LR1. Lasting resources carry from battle to battle on the member** (Core, about 240 lines) → [slices/LR1.md](slices/LR1.md)
 - [x] **LR2. Saves keep lasting resources: format 3** (Core + Data, about 220 lines) → [slices/LR2.md](slices/LR2.md)
 - [x] **LR3. The mage's Clarity lowers starting mana; the cleric's faith lasts** (Core + Data + content, about 200 lines) → [slices/LR3.md](slices/LR3.md)
-- [ ] **RS1. The rest step: an event rests the party** (Core + Data + Game, about 240 lines) → [slices/RS1.md](slices/RS1.md)
+- [x] **RS1. The rest step: an event rests the party** (Core + Data + Game, about 240 lines) → [slices/RS1.md](slices/RS1.md)
 - [ ] **RS2. The editor authors the rest step; a placeholder inn on the start map** (Editor + content, about 160 lines) → [slices/RS2.md](slices/RS2.md)
 - [ ] **RS3. A rest item, used from the menu** (Core + Data + content + Game, about 200 lines) → [slices/RS3.md](slices/RS3.md)
 

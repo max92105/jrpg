@@ -243,6 +243,26 @@ public sealed class EventRunTests
         Assert.Equal(new Recruitment(omer, HasJoined: false), again.CurrentRecruitment);
     }
 
+    [Fact]
+    public void Advance_RestStep_RestsEveryRecruitedMember()
+    {
+        Start(new MapEventBuilder().WithSteps(new RecruitStep("omer")).Build()).Continue();
+        _party.MemberById("omer").Vitals.TakeDamage(999);
+        _party.Leader.Vitals.TakeDamage(10);
+
+        Start(new MapEventBuilder().WithSteps(new RestStep()).Build());
+
+        Assert.All(_party.Members, member => Assert.Equal(member.Vitals.MaxHp, member.Vitals.Hp));
+    }
+
+    [Fact]
+    public void Advance_RestStep_WaitsForContinue()
+    {
+        var run = Start(new MapEventBuilder().WithSteps(new RestStep(), _foundSomething).Build());
+
+        Assert.IsType<RestStep>(run.Current);
+    }
+
     private EventRun Start(MapEvent mapEvent) => new(new TriggeredEvent(mapEvent, Chest), _map, Context(), _party);
 
     private ExplorationContext Context() => new(_catalog, _inventory, new WorldState(), new FixedSequenceRandom());

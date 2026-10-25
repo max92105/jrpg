@@ -87,6 +87,20 @@ public sealed class EventPresenterTests
     }
 
     [Fact]
+    public void Update_RestStep_ShowsRestLineThenContinues()
+    {
+        var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowRestingChest);
+        exploration.TryInteract();
+        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel());
+        presenter.Update(StartMapScenarios.OneUpdate, default);
+        Assert.IsType<RestStep>(exploration.CurrentEventStep);
+
+        presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+
+        Assert.False(exploration.IsEventRunning);
+    }
+
+    [Fact]
     public void Update_ConfirmOnLastPage_ContinuesEvent()
     {
         var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowTalkingChest);

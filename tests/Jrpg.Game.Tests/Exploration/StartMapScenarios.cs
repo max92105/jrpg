@@ -54,6 +54,9 @@ internal static class StartMapScenarios
     /// </summary>
     public static ContentCatalog BelowRepeatableChest { get; } = WithChestSaying(BelowChest, new GiveItemStep("potion", 1));
 
+    /// <summary>Below the chest, which now rests the party: the stand-in for an inn until RS2 places one.</summary>
+    public static ContentCatalog BelowRestingChest { get; } = WithChestSaying(BelowChest, new RestStep());
+
     /// <summary>Below the chest, which now talks, in two lines, every time: the stand-in for a sign (no map has one).</summary>
     public static ContentCatalog BelowTalkingChest { get; } =
         WithChestSaying(BelowChest, new DialogueStep(new Speech(["A voice from the chest.", "It falls silent."])));

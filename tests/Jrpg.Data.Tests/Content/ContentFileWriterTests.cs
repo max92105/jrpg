@@ -32,6 +32,7 @@ public sealed class ContentFileWriterTests : IDisposable
             new GiveItemStep("potion", 2),
             new SwapObjectStep("chest_opened"),
             new WarpStep("forest", new GridCell(1, 2)),
+            new RestStep(),
         ];
 
         ContentFileWriter.Write(_path, steps);

@@ -41,6 +41,57 @@ public sealed class ResourceDefinitionValidatorTests
         Assert.EndsWith("dominance.bonusPercent must be at least 0 (was -10).", exception.Message, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void Validate_StrainFromNonLasting_Throws()
+    {
+        var clarity = Force("clarity") with { Strain = new StrainRule("mana", 1) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("mage") with { Resources = [Force("mana"), clarity] }]));
+
+        Assert.Equal("classes.json: class 'mage': resource 'clarity': strain is only for a lasting resource.", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_StrainOnUnknownResource_Throws()
+    {
+        var clarity = Force("clarity") with { IsLasting = true, Strain = new StrainRule("mana", 1) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("mage") with { Resources = [clarity] }]));
+
+        Assert.EndsWith("strain.lowersStartOf must name another resource of the class (was 'mana').", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Validate_StrainPerPointZero_Throws()
+    {
+        var clarity = Force("clarity") with { IsLasting = true, Strain = new StrainRule("mana", 0) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("mage") with { Resources = [Force("mana"), clarity] }]));
+
+        Assert.EndsWith("strain.perMissingPoint must be at least 1 (was 0).", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Validate_StrainOnLastingResource_Throws()
+    {
+        var faith = Force("faith") with { IsLasting = true };
+        var clarity = Force("clarity") with { IsLasting = true, Strain = new StrainRule("faith", 1) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("mage") with { Resources = [faith, clarity] }]));
+
+        Assert.EndsWith("strain.lowersStartOf can't name a lasting resource ('faith'), whose lowered start would carry on and drop again.", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Validate_LastingFromSpeed_Throws()
+    {
+        var readiness = new ResourceDefinition("readiness", "Readiness") { MaxFromSpeed = new SpeedScaling(10), IsLasting = true };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("rogue") with { Resources = [readiness] }]));
+
+        Assert.EndsWith("a lasting resource can't take its max from speed, which changes with level.", exception.Message, StringComparison.Ordinal);
+    }
+
     private static ResourceDefinition Force(string id) => new(id, id, Max: 10);
 
     private static void Validate(IReadOnlyList<ClassDefinition> classes) =>

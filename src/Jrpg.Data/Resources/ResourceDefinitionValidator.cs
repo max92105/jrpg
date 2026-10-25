@@ -26,7 +26,8 @@ internal static class ResourceDefinitionValidator
         }
 
         return resources.Select(FindProblem).FirstOrDefault(problem => problem is not null)
-            ?? resources.Select(resource => FindDominanceProblem(resource, resources)).FirstOrDefault(problem => problem is not null);
+            ?? resources.Select(resource => FindDominanceProblem(resource, resources)).FirstOrDefault(problem => problem is not null)
+            ?? resources.Select(resource => FindStrainProblem(resource, resources)).FirstOrDefault(problem => problem is not null);
     }
 
     private static string? FindProblem(ResourceDefinition resource)
@@ -70,9 +71,30 @@ internal static class ResourceDefinitionValidator
         return problem is null ? null : $"resource '{resource.Id}': {problem}";
     }
 
+    // The source's missing points are what a member carries between battles, so only a lasting source has any. Its
+    // target starts each battle afresh, so the lowering stays the same rather than growing.
+    private static string? FindStrainProblem(ResourceDefinition resource, IReadOnlyList<ResourceDefinition> resources)
+    {
+        if (resource.Strain is not { } strain)
+        {
+            return null;
+        }
+
+        var problem =
+            !resource.IsLasting ? "strain is only for a lasting resource."
+            : !resources.Any(other => other.Id == strain.LowersStartOf && other != resource)
+                ? $"strain.lowersStartOf must name another resource of the class (was '{strain.LowersStartOf}')."
+            : resources.First(other => other.Id == strain.LowersStartOf).IsLasting
+                ? $"strain.lowersStartOf can't name a lasting resource ('{strain.LowersStartOf}'), whose lowered start would carry on and drop again."
+            : strain.PerMissingPoint < 1 ? $"strain.perMissingPoint must be at least 1 (was {strain.PerMissingPoint})."
+            : null;
+        return problem is null ? null : $"resource '{resource.Id}': {problem}";
+    }
+
     // The speed gives both numbers, so a max or a start written beside it would be ignored.
     private static string? FindSpeedScalingProblem(ResourceDefinition resource, SpeedScaling scaling) =>
         resource.Max != 0 || resource.StartsAt != 0 ? "set either max and startsAt, or maxFromSpeed, not both."
+        : resource.IsLasting ? "a lasting resource can't take its max from speed, which changes with level."
         : scaling.SpeedPerCharge < 1 ? $"maxFromSpeed.speedPerCharge must be at least 1 (was {scaling.SpeedPerCharge})."
         : null;
 }

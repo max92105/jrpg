@@ -12,7 +12,10 @@
     "base": { "maxHp": 150, "attack": 20, "defense": 4, "speed": 10 },
     "growth": { "maxHp": 12, "attack": 2, "defense": 1, "speed": 1 },
     "skillIds": ["fire_blast", "fireball", "meteor"],
-    "resources": [ { "id": "mana", "name": "Mana", "max": 10, "startsAt": 3, "gains": { "perTurn": 2 } } ] },
+    "resources": [
+      { "id": "mana", "name": "Mana", "max": 10, "startsAt": 3, "gains": { "perTurn": 2 } },
+      { "id": "clarity", "name": "Clarity", "max": 3, "startsAt": 3, "isLasting": true,
+        "gains": { "perBattleFought": -1 }, "strain": { "lowersStartOf": "mana", "perMissingPoint": 1 } } ] },
   {
     "id": "cleric", "name": "Cleric",
     "description": "A servant of the gods who heals allies and smites the unholy.",
@@ -20,7 +23,7 @@
     "growth": { "maxHp": 16, "attack": 2, "defense": 1, "speed": 1 },
     "skillIds": ["heal", "recovery", "heal_all"],
     "resources": [
-      { "id": "faith", "name": "Faith", "max": 5, "startsAt": 5,
+      { "id": "faith", "name": "Faith", "max": 5, "startsAt": 5, "isLasting": true,
         "gains": { "perAllyFallen": -1, "perHeavyHit": -1, "heavyHitPercent": 20 } } ] },
   {
     "id": "rogue", "name": "Rogue",

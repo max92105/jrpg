@@ -23,6 +23,9 @@ public sealed record ResourceDefinition(string Id, string Name, int Max = 0, int
     /// </summary>
     public bool IsLasting { get; init; }
 
+    /// <summary>Set for a lasting resource whose missing points lower another's start; null when none.</summary>
+    public StrainRule? Strain { get; init; }
+
     /// <summary>Set for a force with a rival (the druid's Growth and Decay); null for a lone resource.</summary>
     public DominanceRule? Dominance { get; init; }
 }

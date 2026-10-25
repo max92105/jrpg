@@ -154,4 +154,41 @@ public sealed class CombatantTests
 
         Assert.Equal(1, combatant.Resources.AmountOf("clarity"));
     }
+
+    [Fact]
+    public void FromPartyMember_TwoClarityMissing_ManaStartsTwoLower()
+    {
+        var mage = StrainedMage(clarityLeft: 1);
+
+        var combatant = Combatant.FromPartyMember(mage);
+
+        Assert.Equal(1, combatant.Resources.AmountOf("mana"));
+    }
+
+    [Fact]
+    public void FromPartyMember_StrainBeyondStart_StartsAtZero()
+    {
+        var mage = StrainedMage(clarityLeft: 0, perMissingPoint: 2);
+
+        var combatant = Combatant.FromPartyMember(mage);
+
+        Assert.Equal(0, combatant.Resources.AmountOf("mana"));
+    }
+
+    // Mana starts at 3; Clarity (max 3) lowers it by perMissingPoint for each point below its max.
+    private static PartyMember StrainedMage(int clarityLeft, int perMissingPoint = 1)
+    {
+        var mana = new ResourceDefinition("mana", "Mana", Max: 10, StartsAt: 3);
+        var clarity = new ResourceDefinition("clarity", "Clarity", Max: 3, StartsAt: 3)
+        {
+            IsLasting = true,
+            Strain = new StrainRule("mana", perMissingPoint),
+        };
+        var mage = PartyMember.Recruit(
+            new PartyMemberBuilder().WithId("omer").BuildDefinition(),
+            new ClassBuilder().WithId("mage").WithResources(mana, clarity).Build(),
+            new Dictionary<string, SkillDefinition>());
+        mage.KeepLastingAmount("clarity", clarityLeft);
+        return mage;
+    }
 }

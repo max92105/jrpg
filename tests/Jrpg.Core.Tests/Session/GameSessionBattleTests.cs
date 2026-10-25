@@ -178,6 +178,39 @@ public sealed class GameSessionBattleTests
         Assert.Equal(5, session.Party.Leader.LastingAmounts["focus"]);
     }
 
+    [Fact]
+    public void FinishBattle_MageFought_ClarityDropsByOne()
+    {
+        var mana = new ResourceDefinition("mana", "Mana", Max: 10, StartsAt: 3);
+        var clarity = new ResourceDefinition("clarity", "Clarity", Max: 3, StartsAt: 3)
+        {
+            IsLasting = true,
+            Gains = new ResourceGains { PerBattleFought = -1 },
+            Strain = new StrainRule("mana", 1),
+        };
+        var session = SessionWithEncounterPending(mana, clarity);
+        BattleScript.AttackUntilOver(session.StartPendingBattle());
+
+        session.FinishBattle();
+
+        Assert.Equal(2, session.Party.Leader.LastingAmounts["clarity"]);
+        Assert.Equal(2, Combatant.FromPartyMember(session.Party.Leader).Resources.AmountOf("mana"));
+    }
+
+    // The two goblins left after Sarxian's first blow hit three times in all before they fall; each hit costs 1 faith,
+    // and the next battle starts from what is left.
+    [Fact]
+    public void FinishBattle_FaithLostInBattle_StaysLowered()
+    {
+        var faith = Lasting("faith", gains: new ResourceGains { PerHitTaken = -1 }) with { Max = 5, StartsAt = 5 };
+        var session = SessionWithEncounterPending(faith);
+        BattleScript.AttackUntilOver(session.StartPendingBattle());
+
+        session.FinishBattle();
+
+        Assert.Equal(2, Combatant.FromPartyMember(session.Party.Leader).Resources.AmountOf("faith"));
+    }
+
     // Focus (max 10) starts at 2.
     private static ResourceDefinition Lasting(string id, ResourceGains gains) =>
         new(id, id, Max: 10, StartsAt: 2) { IsLasting = true, Gains = gains };

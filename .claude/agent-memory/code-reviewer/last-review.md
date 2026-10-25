@@ -5,10 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/LR2.md, slice LR2 (saves keep lasting resources, format 3)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/LR3.md, slice LR3 (Clarity strains mana; faith lasting)
 Round: 1 (verdict: Ready to commit)
 
-- Suggestion: SaveGameRepair.cs:101 drop message says "which the class no longer has" also when the class still has the resource but it isn't lasting; say "no longer has as lasting"; open
-- Suggestion: no test of a negative saved lasting amount clamped to 0 (lower bound of RepairLastingAmounts); open
-- Suggestion: catalog copy giving Sarxian's class a lasting Focus is written twice (FileSaveStoreTests, SaveGameRepairTests) and Clarity twice in GameSessionSaveTests; extract a private CatalogWithLasting() per file; open
-- Follow-up: FileSaveStoreTests, SaveGameRepairTests and GameSessionSaveTests are 250-272 lines, near the ~300 limit
+- Suggestion: FindStrainProblem doesn't refuse a strain whose target is itself lasting; the lowering would then be carried and applied again each battle (compounding); refuse it like the other strain checks; open
+- Suggestion: ResourceStarts.For chains two Selects on one long line; a named local function (StartWithStrain) would read better; open

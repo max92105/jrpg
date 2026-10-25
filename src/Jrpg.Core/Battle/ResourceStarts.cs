@@ -5,11 +5,27 @@ namespace Jrpg.Core.Battle;
 
 /// <summary>
 /// A member's resources as they start a battle: the definition's numbers, the amount a lasting resource carried from
-/// the last battle (ADR 0024), or the speed's charges.
+/// the last battle (ADR 0024), or the speed's charges; then lowered by any strain on it.
 /// </summary>
 internal static class ResourceStarts
 {
-    public static IReadOnlyList<ResourceStart> For(PartyMember member) => [.. member.Class.Resources.Select(resource => StartOf(resource, member))];
+    public static IReadOnlyList<ResourceStart> For(PartyMember member) => [.. member.Class.Resources.Select(resource => StrainedStart(resource, member))];
+
+    private static ResourceStart StrainedStart(ResourceDefinition resource, PartyMember member)
+    {
+        var start = StartOf(resource, member);
+        return start with { Amount = StrainedAmount(start, member) };
+    }
+
+    // A strain's source is lasting (Data checks it), so the member holds its amount.
+    private static int StrainedAmount(ResourceStart start, PartyMember member)
+    {
+        var lowering = member.Class.Resources.Sum(source =>
+            source.Strain is { } strain && strain.LowersStartOf == start.Definition.Id
+                ? (source.Max - member.LastingAmounts[source.Id]) * strain.PerMissingPoint
+                : 0);
+        return Math.Max(0, start.Amount - lowering);
+    }
 
     private static ResourceStart StartOf(ResourceDefinition resource, PartyMember member)
     {

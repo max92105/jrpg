@@ -5,9 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/PL1.md, slice PL1 (paladin conviction: heavy hits, enemy falls, Smite; cleric faith on heavy hit)
-Round: 1 (verdict: Ready to commit; verify all pass, 1881 tests)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/FM1.md, slice FM1 (party formation line, MoveCommand, PlacesSwapped)
+Round: 1 (verdict: Ready to commit)
 
-- Warning, open: no ResourceTriggers test of a light hit on a resource with PerHeavyHit set (e.g. paladin hpLost 19 of 100 -> no event); dropping the IsHeavy check would pass every test.
-- Suggestion, open: OnHitTaken_HeavyHitOnCleric_LosesFaith asserts only the amount; could pin the single ResourceChanged(-1) event like its sibling.
-- Follow-up: a felling heavy hit grants conviction to the paladin it kills (OnHitTaken runs before Fall); harmless while resources reset per battle.
+- Warning, open: enemy-actor Move guard (InvalidOperationException, BattleState.Move) and TargetChoiceForMove's empty choice on an enemy turn have no test; Flee's equivalent guard is tested (BattleStateTests:181).
+- Suggestion, open: Formation constructor public; make it internal so only BattleState builds the line (tests see internals already, Swap is internal).
+- Suggestion, open: no Formation test for Swap of non-neighbours / unknown member / PositionOf throw at Formation level (covered only via Execute).
+- Follow-up: BattleState at 319 lines; turn flow split recorded in slice note for PL2a.

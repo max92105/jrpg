@@ -42,12 +42,16 @@ public sealed class BattleState
             throw new ArgumentException("A battle needs at least one living enemy.", nameof(combatants));
         }
 
+        Formation = new Formation([.. Combatants.Where(combatant => combatant.Side == BattleSide.Party)]);
         _inventory = inventory;
         _turnOrder = new TurnOrder(Combatants, random);
         Phase = LivingOn(BattleSide.Party).Count == 0 ? BattlePhase.Defeat : TurnPhaseOf(CurrentActor);
     }
 
     public BattlePhase Phase { get; private set; }
+
+    /// <summary>The party's line in this battle, starting from the active order (ADR 0023).</summary>
+    public Formation Formation { get; }
 
     /// <summary>A battle between the active party, in party order, and <paramref name="enemies"/>, in encounter order.</summary>
     /// <exception cref="ArgumentException">There are no enemies.</exception>
@@ -76,6 +80,10 @@ public sealed class BattleState
 
     /// <summary>Who the current actor can attack: one living enemy, in formation order.</summary>
     public TargetChoice<Combatant> TargetChoiceForAttack() => ChoiceFor(AttackTargeting);
+
+    /// <summary>Whom the actor can trade places with: the allies right beside them; none on an enemy's turn.</summary>
+    public TargetChoice<Combatant> TargetChoiceForMove() =>
+        new(CurrentActor.Side == BattleSide.Party ? Formation.Neighbors(CurrentActor) : [], TakesAll: false);
 
     /// <summary>Who the current actor can aim <paramref name="skill"/> at, in formation order.</summary>
     public TargetChoice<Combatant> TargetChoiceFor(SkillDefinition skill) => ChoiceFor(skill.Effect.Targeting);
@@ -157,6 +165,9 @@ public sealed class BattleState
             case FleeCommand:
                 Flee(actor, events);
                 break;
+            case MoveCommand move:
+                Move(actor, move.SwapWith, events);
+                break;
             default:
                 throw new ArgumentException($"Unknown command {command.GetType().Name}.", nameof(command));
         }
@@ -219,6 +230,18 @@ public sealed class BattleState
                 $"Illegal targets for a {effect.Targeting} effect from {CurrentActor.Name}: {string.Join(", ", targets.Select(target => target.Name))}.",
                 nameof(targets));
         }
+    }
+
+    // Placeholder (question 211): a Move costs the mover's turn, and the ally swapped with loses nothing.
+    private void Move(Combatant actor, Combatant swapWith, List<BattleEvent> events)
+    {
+        if (actor.Side != BattleSide.Party)
+        {
+            throw new InvalidOperationException("Only the party has a formation to move in.");
+        }
+
+        Formation.Swap(actor, swapWith);
+        events.Add(new PlacesSwapped(actor, swapWith));
     }
 
     private void Flee(Combatant actor, List<BattleEvent> events)

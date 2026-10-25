@@ -35,3 +35,11 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
       - `Execute_MoveToFallenNeighbor_Swaps`
       - `Execute_Move_EndsTurn`
   - **Verify by hand:** none (FM2 shows it).
+- **Done, with deviations:** Tests 1882 before, 1896 after. Beyond the plan:
+  - One extra test, `TargetChoiceForMove_FirstInLine_OffersTheOneNeighbor`.
+  - `TargetChoiceForMove` offers nothing on an enemy's turn.
+  - `Formation.Swap` itself rejects a non-neighbour, so `Execute` gets the `ArgumentException` from it.
+  - `BattleState` is now 319 lines. The turn flow (upkeep, outcome, advance) should move into its own type in the next slice that touches it; FM2 is Game only, so PL2a is the next candidate.
+  - **From review:**
+    - `Formation`'s constructor is internal, since only the battle builds one.
+    - Three more tests: Move on an enemy's turn throws, the move choice on an enemy's turn is empty, and `Swap` rejects a non-neighbour, leaving the line as it was.

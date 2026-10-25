@@ -2,7 +2,7 @@ using Jrpg.Core.Stats;
 
 namespace Jrpg.Game.Ui;
 
-/// <summary>A member's HP and MP meters, shown from their vitals.</summary>
+/// <summary>A member's HP meter, shown from their vitals.</summary>
 internal sealed class MemberVitalBars
 {
     /// <param name="text">The format message and the values' font.</param>
@@ -11,16 +11,12 @@ internal sealed class MemberVitalBars
     public MemberVitalBars(ScreenText text, UiTextures ui, int valuePixels)
     {
         Hp = new VitalMeter(text, ui, UiTheme.HpBar, valuePixels);
-        Mp = new VitalMeter(text, ui, UiTheme.MpBar, valuePixels);
     }
 
     public VitalMeter Hp { get; }
 
-    public VitalMeter Mp { get; }
-
     public void Show(Vitals vitals)
     {
         Hp.Show(vitals.Hp, vitals.MaxHp);
-        Mp.Show(vitals.Mp, vitals.MaxMp);
     }
 }

@@ -24,3 +24,9 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
   - **Verify by hand:**
     - Battle: no MP row.
     - Status page, sidebar, equipment page and leader choice show no MP, and nothing is left with a gap or overlap.
+- **Done, with deviations:** Tests 1834 before, 1835 after: one MP test deleted, two added. Beyond the plan:
+  - The leader test is `LeaderProfileTests.Of_Character_ListsLevelHpAttackDefense`, since the method is `Of`, not `Build`.
+  - The equipment sheet takes the status page's layout: Max HP alone, then Attack and Defense. Its preview lines moved to 1 and 2, and `EquipmentSheetTests` reads Attack at index 1.
+  - The battle panel's height is never less than its portrait's, so neighbouring diamonds can't overlap now that MP is gone.
+  - Member cards keep their height: the 80 px portrait sets it, so the space below the HP bar stays empty.
+  - The `UiTheme` MP bars are removed. The skill list's hint reads "Use a skill." instead of "Skills cost MP.", and every Game comment naming MP is updated.

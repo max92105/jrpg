@@ -2,8 +2,8 @@ using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Battle;
 
-/// <summary>How the HP or MP row of a battle panel looks.</summary>
-/// <param name="Label">The small "HP" or "MP" font.</param>
+/// <summary>How a battle panel's HP row looks.</summary>
+/// <param name="Label">The small "HP" font.</param>
 /// <param name="Value">The large current value's font.</param>
 /// <param name="Max">The small "/max" font.</param>
 /// <param name="Width">The row's width, which its bar spans.</param>

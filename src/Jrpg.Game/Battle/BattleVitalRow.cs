@@ -24,7 +24,7 @@ internal sealed class BattleVitalRow
     private MeasuredText _max = new(string.Empty, 0);
 
     /// <param name="style">Fonts, width and offsets shared by every panel's row of this vital.</param>
-    /// <param name="label">"HP" or "MP", in the style's label font.</param>
+    /// <param name="label">"HP", in the style's label font.</param>
     /// <param name="ui">Where the bar's gradient is made, once.</param>
     /// <param name="fill">The bar's gradient.</param>
     public BattleVitalRow(VitalRowStyle style, MeasuredText label, UiTextures ui, ImmutableArray<GradientStop> fill)

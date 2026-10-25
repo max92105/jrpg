@@ -10,7 +10,7 @@ namespace Jrpg.Game.Battle;
 /// <summary>
 /// The command choice (leaning toward the <c>Combat9</c> reference): a pointed header tab with the actor's name, the
 /// rows in a thin double frame with their icons, the selected row lit with a pointer, and a one-line hint under it. The
-/// actor's skills or the party's consumables replace the commands, each with its MP cost or count and its description
+/// actor's skills or the party's consumables replace the commands, each with its cost or count and its description
 /// as the hint. While a target is chosen, a pointer bobs over each selected target.
 /// </summary>
 internal sealed class CommandPanelView

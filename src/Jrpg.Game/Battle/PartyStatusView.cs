@@ -7,8 +7,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// The active party's panels at the top right: the name, large HP over its maximum and a thin bar, then a narrower MP
-/// row, beside a diamond portrait. The acting member's panel slides left; a fallen member's is dimmed, its HP in red.
+/// The active party's panels at the top right: the name, then large HP over its maximum and a thin bar, beside a
+/// diamond portrait. The acting member's panel slides left; a fallen member's is dimmed, its HP in red.
 /// </summary>
 internal sealed class PartyStatusView
 {
@@ -20,13 +20,10 @@ internal sealed class PartyStatusView
     private const float FallenOpacity = 0.55f;
     private const int PortraitSize = 64;
     private const int PortraitGap = 10;
-    private const int MpRowGap = 2;
     private const int NamePixels = 22;
     private const int LabelPixels = 14;
     private const int HpPixels = 30;
     private const int MaxHpPixels = 17;
-    private const int MpPixels = 24;
-    private const int MaxMpPixels = 15;
 
     private readonly UiTextures _ui;
     private readonly OutlinedFont _nameFont;
@@ -42,19 +39,18 @@ internal sealed class PartyStatusView
         _nameFont = new OutlinedFont(text.Fonts.FontAt(NamePixels));
         var label = new OutlinedFont(text.Fonts.FontAt(LabelPixels));
         var hpStyle = new VitalRowStyle(label, new OutlinedFont(text.Fonts.FontAt(HpPixels)), new OutlinedFont(text.Fonts.FontAt(MaxHpPixels)), Width: 250, SmallTextLift: 5);
-        var mpStyle = new VitalRowStyle(label, new OutlinedFont(text.Fonts.FontAt(MpPixels)), new OutlinedFont(text.Fonts.FontAt(MaxMpPixels)), Width: 190, SmallTextLift: 4);
         var hpLabel = MeasuredText.Of(label.Font, text.Messages.Text(MessageIds.StatHp));
-        var mpLabel = MeasuredText.Of(label.Font, text.Messages.Text(MessageIds.StatMp));
         _panels =
         [
             .. party.Select(member => new PartyStatusPanel(
                 member,
                 MeasuredText.Of(_nameFont.Font, member.Name),
-                (new BattleVitalRow(hpStyle, hpLabel, ui, UiTheme.BattleHpBar), new BattleVitalRow(mpStyle, mpLabel, ui, UiTheme.BattleMpBar)),
+                new BattleVitalRow(hpStyle, hpLabel, ui, UiTheme.BattleHpBar),
                 text.Messages)),
         ];
         Refresh();
-        _panelHeight = _panels.Length == 0 ? 0 : (int)_nameFont.Font.LineHeight + _panels[0].HpRow.Height + MpRowGap + _panels[0].MpRow.Height;
+        // Never shorter than the portrait, so the diamonds of neighboring panels can't overlap.
+        _panelHeight = _panels.Length == 0 ? 0 : Math.Max(PortraitSize, (int)_nameFont.Font.LineHeight + _panels[0].HpRow.Height);
     }
 
     /// <summary>Formats the numbers that changed since the last refresh; allocates nothing when none did.</summary>
@@ -91,7 +87,5 @@ internal sealed class PartyStatusView
         _nameFont.Draw(batch, panel.Name.Text, new Vector2(textRight - panel.Name.Width, topRight.Y), UiTheme.TextPrimary * opacity);
         var hpTop = topRight.Y + (int)_nameFont.Font.LineHeight;
         panel.HpRow.Draw(batch, textures, new Point(textRight, hpTop), (isAlive ? UiTheme.TextPrimary : UiTheme.Danger) * opacity);
-        var mpTop = hpTop + panel.HpRow.Height + MpRowGap;
-        panel.MpRow.Draw(batch, textures, new Point(textRight, mpTop), UiTheme.TextPrimary * opacity);
     }
 }

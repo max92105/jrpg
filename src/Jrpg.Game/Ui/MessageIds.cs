@@ -92,9 +92,7 @@ internal static class MessageIds
 
     public const string StatHp = "stat_hp";
 
-    public const string StatMp = "stat_mp";
-
-    /// <summary>Placeholders <c>{value}</c> and <c>{max}</c>: an HP or MP value, the one format everywhere (decision 110).</summary>
+    /// <summary>Placeholders <c>{value}</c>, <c>{max}</c>: an HP value, one format everywhere (decision 110).</summary>
     public const string StatValueOfMax = "stat_value_of_max";
 
     public const string StatAttack = "stat_attack";
@@ -178,8 +176,6 @@ internal static class MessageIds
     public const string EquipmentRemoveAll = "equipment_remove_all";
 
     public const string StatMaxHp = "stat_max_hp";
-
-    public const string StatMaxMp = "stat_max_mp";
 
     /// <summary>The equipment choice's first row, which takes off what's worn in the slot.</summary>
     public const string EquipmentRemove = "equipment_remove";

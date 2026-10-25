@@ -145,9 +145,6 @@ internal static class UiTheme
     /// <summary>The menus' HP bar: pale to forest green.</summary>
     public static ImmutableArray<GradientStop> HpBar { get; } = [new(0, FromStraightArgb(0x6644AA44)), new(1, FromStraightArgb(0xFF228B22))];
 
-    /// <summary>The menus' MP bar: pale to deep blue.</summary>
-    public static ImmutableArray<GradientStop> MpBar { get; } = [new(0, FromStraightArgb(0x8899CCFF)), new(1, FromStraightArgb(0xFF3366FF))];
-
     /// <summary>The menus' experience bar: goldenrod, bright gold, then pale wheat.</summary>
     public static ImmutableArray<GradientStop> XpBar { get; } =
         [new(0, FromStraightArgb(0xFFB8860B)), new(0.5f, FromStraightArgb(0xFFFFD700)), new(1, FromStraightArgb(0xFFF5DEB3))];
@@ -212,9 +209,6 @@ internal static class UiTheme
 
     /// <summary>A party member's thin battle HP bar.</summary>
     public static ImmutableArray<GradientStop> BattleHpBar { get; } = [new(0, FromStraightArgb(0xFF3E7F5A)), new(1, FromStraightArgb(0xFF7FD39A))];
-
-    /// <summary>A party member's thin battle MP bar.</summary>
-    public static ImmutableArray<GradientStop> BattleMpBar { get; } = [new(0, FromStraightArgb(0xFF3E5C9A)), new(1, FromStraightArgb(0xFF8FB4F0))];
 
     /// <summary>An enemy's HP bar under its name.</summary>
     public static ImmutableArray<GradientStop> EnemyHpBar { get; } = [new(0, FromStraightArgb(0xFF8A2A2A)), new(1, FromStraightArgb(0xFFE0524A))];

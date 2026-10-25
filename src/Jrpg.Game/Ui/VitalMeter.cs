@@ -4,7 +4,7 @@ using FontStashSharp;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// One vital's bar and its value text, in the one HP and MP format, "45 / 60" (decision 110). The text is formatted only
+/// One vital's bar and its value text, in the one HP format, "45 / 60" (decision 110). The text is formatted only
 /// when the values change, so showing the same values again allocates nothing.
 /// </summary>
 internal sealed class VitalMeter

@@ -62,7 +62,7 @@ internal sealed class PartySidebar
         {
             var card = _cards[index];
             var member = card.Member;
-            if (card.Level != member.Level || card.Hp != member.Vitals.Hp || card.Mp != member.Vitals.Mp)
+            if (card.Level != member.Level || card.Hp != member.Vitals.Hp)
             {
                 _cards[index] = SidebarCard.Of(member, card.IsReserve);
             }

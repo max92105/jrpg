@@ -45,6 +45,20 @@ public sealed class StatusPageTests
     }
 
     [Fact]
+    public void ShownStats_Member_HasNoMp()
+    {
+        var session = NewSession();
+        var page = NewPage(session);
+        var leader = session.Party.Leader;
+        var vitals = leader.Vitals;
+
+        page.Open();
+
+        string[] expected = [$"{vitals.Hp} / {vitals.MaxHp}", NumberText.Of(leader.TotalStats.Attack), NumberText.Of(leader.TotalStats.Defense)];
+        Assert.Equal(expected, page.ShownStats);
+    }
+
+    [Fact]
     public void Open_AfterHpChanged_ShowsTheNewHp()
     {
         var session = NewSession();

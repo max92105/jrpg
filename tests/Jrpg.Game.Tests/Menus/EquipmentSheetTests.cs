@@ -39,7 +39,7 @@ public sealed class EquipmentSheetTests
 
         var sheet = EquipmentSheet.Of(leader);
 
-        Assert.Equal(leader.TotalStats.Attack.ToString(CultureInfo.InvariantCulture), sheet.Stats[2]);
+        Assert.Equal(leader.TotalStats.Attack.ToString(CultureInfo.InvariantCulture), sheet.Stats[1]);
     }
 
     private ItemDefinition WearBronzeSword()

@@ -43,8 +43,8 @@ internal sealed class StatusPage : IMemberPage
     private const int SectionHeight = 28;
     private const int ValueBelowLabel = 20;
 
-    // The experience bar: 6 px tall, 12 px under the experience values, 16 px short of the profile's right edge. HP and
-    // MP get the same slim bar under their lines.
+    // The experience bar: 6 px tall, 12 px under the experience values, 16 px short of the profile's right edge. HP
+    // gets the same slim bar under its line.
     private const int BarHeight = 6;
     private const int XpBarTop = ValueBelowLabel + 34;
     private const int XpBarRightGap = 16;
@@ -101,7 +101,7 @@ internal sealed class StatusPage : IMemberPage
 
     public bool LeavesOnCancel => true;
 
-    /// <summary>The shown member's HP, MP, Attack and Defense, as the page writes them.</summary>
+    /// <summary>The shown member's HP, Attack and Defense, as the page writes them.</summary>
     internal IReadOnlyList<string> ShownStats => _sheet.Stats;
 
     // Recruits don't change while the menu is open, so the cursor's member count still holds.
@@ -162,7 +162,7 @@ internal sealed class StatusPage : IMemberPage
         _xpBar.Show(earned, needed);
     }
 
-    // The HP and MP texts come from the meters, already showing the member.
+    // The HP text comes from the meter, already showing the member.
     private MemberSheet SheetOf(PartyMember member, MemberVitalBars shownVitals)
     {
         var nextLevel = ToNextLevelText(member.Level, member.Experience, _catalog.Rules.Experience, _labels.MaxLevel);
@@ -174,7 +174,6 @@ internal sealed class StatusPage : IMemberPage
             [NumberText.Of(member.Level), NumberText.Of(member.Experience), nextLevel],
             [
                 shownVitals.Hp.Value.Text,
-                shownVitals.Mp.Value.Text,
                 NumberText.Of(stats.Attack),
                 NumberText.Of(stats.Defense),
             ],
@@ -222,23 +221,22 @@ internal sealed class StatusPage : IMemberPage
         _xpBar.Draw(page.Batch, page.Textures, xpBar, page.Opacity);
     }
 
-    // HP and MP on the first line, attack and defense on the second, in two columns.
+    // HP alone on the first line with its bar under it, then attack and defense side by side, in two columns.
     private void DrawParameters(PageFrame page, Rectangle section)
     {
         _parametersTitle.Draw(page.Batch, page.Textures, section, page.Opacity);
         var columnWidth = (section.Width - Indent - ColumnGap) / 2;
         for (var index = 0; index < _labels.Stats.Length; index++)
         {
-            var columnLeft = section.X + Indent + (index % 2 * (columnWidth + ColumnGap));
-            var lineTop = section.Y + SectionHeight + (index / 2 * StatLineHeight);
+            var (column, line) = index == 0 ? (0, 0) : ((index - 1) % 2, 1 + ((index - 1) / 2));
+            var columnLeft = section.X + Indent + (column * (columnWidth + ColumnGap));
+            var lineTop = section.Y + SectionHeight + (line * StatLineHeight);
             DrawLine(page, new Vector2(columnLeft, lineTop), _labels.Stats[index], _sheet.Stats[index]);
         }
 
-        // HP and MP are the first line, so their bars go under its two columns.
+        // HP is the first line, so its bar goes under it.
         var hpBar = new Rectangle(section.X + Indent, section.Y + SectionHeight + VitalBarTop, columnWidth, BarHeight);
         _vitals.Hp.Bar.Draw(page.Batch, page.Textures, hpBar, page.Opacity);
-        var mpBar = hpBar with { X = hpBar.X + columnWidth + ColumnGap };
-        _vitals.Mp.Bar.Draw(page.Batch, page.Textures, mpBar, page.Opacity);
     }
 
     private void DrawEquipment(PageFrame page, Rectangle section)
@@ -284,7 +282,7 @@ internal sealed class StatusPage : IMemberPage
         public static StatusLabels From(UiMessages messages) => new(
             [messages.Text(MessageIds.StatusLevel), messages.Text(MessageIds.StatusExp), messages.Text(MessageIds.StatusNextLevel)],
             messages.Text(MessageIds.StatusMaxLevel),
-            [messages.Text(MessageIds.StatHp), messages.Text(MessageIds.StatMp), messages.Text(MessageIds.StatAttack), messages.Text(MessageIds.StatDefense)],
+            [messages.Text(MessageIds.StatHp), messages.Text(MessageIds.StatAttack), messages.Text(MessageIds.StatDefense)],
             [messages.Text(MessageIds.SlotWeapon), messages.Text(MessageIds.SlotArmor)],
             messages.Text(MessageIds.SlotEmpty));
     }

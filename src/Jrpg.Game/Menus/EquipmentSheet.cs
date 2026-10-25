@@ -7,7 +7,7 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// One member as the Equipment page shows them, formatted once when the member or what they wear changes: their name,
-/// what they wear in each of <see cref="Slots"/> (null for nothing), and their Max HP, Max MP, Attack and Defense.
+/// what they wear in each of <see cref="Slots"/> (null for nothing), and their Max HP, Attack and Defense.
 /// </summary>
 internal sealed record EquipmentSheet(string Name, ImmutableArray<ItemDefinition?> Worn, ImmutableArray<string> Stats)
 {
@@ -20,7 +20,7 @@ internal sealed record EquipmentSheet(string Name, ImmutableArray<ItemDefinition
         return new EquipmentSheet(
             member.Definition.Name,
             [.. Slots.Select(member.EquippedIn)],
-            [NumberText.Of(member.Vitals.MaxHp), NumberText.Of(member.Vitals.MaxMp), NumberText.Of(stats.Attack), NumberText.Of(stats.Defense)]);
+            [NumberText.Of(member.Vitals.MaxHp), NumberText.Of(stats.Attack), NumberText.Of(stats.Defense)]);
     }
 
     public static string LabelIdOf(EquipmentSlot slot) => slot switch

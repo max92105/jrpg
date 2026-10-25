@@ -24,7 +24,6 @@ internal sealed record LeaderProfile(string Name, string PortraitFile, string Cl
         [
             new(messages.Text(MessageIds.StatusLevel), NumberText.Of(1)),
             new(messages.Text(MessageIds.StatHp), NumberText.Of(atLevelOne.MaxHp)),
-            new(messages.Text(MessageIds.StatMp), NumberText.Of(atLevelOne.MaxMp)),
             new(messages.Text(MessageIds.StatAttack), NumberText.Of(atLevelOne.Attack)),
             new(messages.Text(MessageIds.StatDefense), NumberText.Of(atLevelOne.Defense)),
         ];

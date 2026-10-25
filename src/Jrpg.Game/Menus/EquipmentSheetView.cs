@@ -37,8 +37,8 @@ internal sealed class EquipmentSheetView
     private const int PreviewArrowSide = 6;
     private const int PreviewValueGap = 16;
     private const int NoticeGap = 24;
-    private const int AttackLine = 2;
-    private const int DefenseLine = 3;
+    private const int AttackLine = 1;
+    private const int DefenseLine = 2;
 
     private readonly UiTextures _ui;
     private readonly SpriteFontBase _headingFont;
@@ -126,7 +126,7 @@ internal sealed class EquipmentSheetView
         batch.DrawString(_bodyFont, _labels.RemoveAll, new Vector2(row.Area.X + RowInset + IconColumn, textTop), UiTheme.TextPrimary * opacity);
     }
 
-    // Max HP and Max MP, then Attack and Defense, two to a line.
+    // Max HP alone on the first line, then Attack and Defense side by side.
     private void DrawParameters(SpriteBatch batch, TextureLibrary textures, ParametersPlace place, float opacity)
     {
         var section = place.Section;
@@ -134,8 +134,9 @@ internal sealed class EquipmentSheetView
         var columnWidth = (section.Width - RowInset - ColumnGap) / 2;
         for (var index = 0; index < _labels.Stats.Length; index++)
         {
-            var columnLeft = section.X + RowInset + (index % 2 * (columnWidth + ColumnGap));
-            var position = new Vector2(columnLeft, section.Y + SectionHeight + (index / 2 * StatLineHeight));
+            var (column, line) = index == 0 ? (0, 0) : ((index - 1) % 2, 1 + ((index - 1) / 2));
+            var columnLeft = section.X + RowInset + (column * (columnWidth + ColumnGap));
+            var position = new Vector2(columnLeft, section.Y + SectionHeight + (line * StatLineHeight));
             batch.DrawString(_bodyFont, _labels.Stats[index], position, UiTheme.TextSecondary * opacity);
             batch.DrawString(_bodyFont, place.Stats[index], position + new Vector2(ValueOffset, 0), UiTheme.TextPrimary * opacity);
             if (place.Preview is { } preview && index is AttackLine or DefenseLine)
@@ -179,6 +180,6 @@ internal sealed class EquipmentSheetView
             [.. EquipmentSheet.Slots.Select(slot => messages.Text(EquipmentSheet.LabelIdOf(slot)))],
             messages.Text(MessageIds.SlotEmpty),
             messages.Text(MessageIds.EquipmentRemoveAll),
-            [messages.Text(MessageIds.StatMaxHp), messages.Text(MessageIds.StatMaxMp), messages.Text(MessageIds.StatAttack), messages.Text(MessageIds.StatDefense)]);
+            [messages.Text(MessageIds.StatMaxHp), messages.Text(MessageIds.StatAttack), messages.Text(MessageIds.StatDefense)]);
     }
 }

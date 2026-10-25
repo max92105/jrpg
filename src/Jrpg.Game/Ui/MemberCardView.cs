@@ -9,7 +9,7 @@ namespace Jrpg.Game.Ui;
 
 /// <summary>
 /// Draws one member as a card: the portrait, here in the reference UI's diamond, then
-/// the name with a "Leader" badge, the level at the right, the class, and the HP and MP bars with their values. The card
+/// the name with a "Leader" badge, the level at the right, the class, and the HP bar with its value. The card
 /// fills the width it's given, so the same card fits a Party column or the item target picker's.
 /// </summary>
 internal sealed class MemberCardView
@@ -29,7 +29,6 @@ internal sealed class MemberCardView
     private const int BadgePixels = 12;
     private const int ValuePixels = 15;
     private const int ClassGap = 8;
-    private const int BarRowHeight = 22;
     private const int BarLabelColumn = 32;
     private const int BarValueColumn = 100;
     private const int BarHeight = 6;
@@ -46,7 +45,6 @@ internal sealed class MemberCardView
     private readonly SpriteFontBase _valueFont;
     private readonly MeasuredText _leaderBadge;
     private readonly string _hpLabel;
-    private readonly string _mpLabel;
 
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared textures: portraits, the card gradient, the bars.</param>
@@ -64,7 +62,6 @@ internal sealed class MemberCardView
         var badge = text.Messages.Text(MessageIds.PartyLeader);
         _leaderBadge = MeasuredText.Of(_badgeFont, badge);
         _hpLabel = text.Messages.Text(MessageIds.StatHp);
-        _mpLabel = text.Messages.Text(MessageIds.StatMp);
     }
 
     /// <summary>Formats the member's card once, when the party changes, so drawing formats nothing.</summary>
@@ -107,7 +104,6 @@ internal sealed class MemberCardView
         batch.DrawString(_captionFont, card.ClassName, new Vector2(text.X, classTop), UiTheme.TextSecondary * opacity);
         var barsTop = (int)(classTop + _captionFont.LineHeight + ClassGap);
         DrawBarRow(batch, textures, card.Vitals.Hp, new BarRow(_hpLabel, text.X, barsTop, text.Width), opacity);
-        DrawBarRow(batch, textures, card.Vitals.Mp, new BarRow(_mpLabel, text.X, barsTop + BarRowHeight, text.Width), opacity);
     }
 
     // The name, the leader's badge after it, and the level at the right.

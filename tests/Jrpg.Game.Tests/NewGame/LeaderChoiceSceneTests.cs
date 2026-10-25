@@ -137,7 +137,7 @@ public sealed class LeaderChoiceSceneTests
 
         Select(scene, "omer");
 
-        string[] expected = ["1", .. new[] { mage.MaxHp, mage.MaxMp, mage.Attack, mage.Defense }.Select(NumberText.Of)];
+        string[] expected = ["1", .. new[] { mage.MaxHp, mage.Attack, mage.Defense }.Select(NumberText.Of)];
         Assert.Equal(expected, scene.SelectedProfile.Stats.Select(line => line.Value));
     }
 

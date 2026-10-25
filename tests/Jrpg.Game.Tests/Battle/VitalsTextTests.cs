@@ -14,14 +14,12 @@ public sealed class VitalsTextTests
     {
         var vitals = new Vitals(150, 200, 30, 40);
         _text.Refresh(vitals);
-        var (hp, maxHp, mp, maxMp) = (_text.Hp, _text.MaxHp, _text.Mp, _text.MaxMp);
+        var (hp, maxHp) = (_text.Hp, _text.MaxHp);
 
         _text.Refresh(vitals);
 
         Assert.Same(hp, _text.Hp);
         Assert.Same(maxHp, _text.MaxHp);
-        Assert.Same(mp, _text.Mp);
-        Assert.Same(maxMp, _text.MaxMp);
     }
 
     [Fact]
@@ -36,21 +34,6 @@ public sealed class VitalsTextTests
 
         Assert.Equal(("125", "/200"), (_text.Hp, _text.MaxHp));
         Assert.Same(maxHp, _text.MaxHp);
-    }
-
-    [Fact]
-    public void Refresh_MpChanged_ReformatsMpOnly()
-    {
-        var vitals = new Vitals(150, 200, 30, 40);
-        _text.Refresh(vitals);
-        var (hp, maxMp) = (_text.Hp, _text.MaxMp);
-        vitals.TrySpendMp(8);
-
-        _text.Refresh(vitals);
-
-        Assert.Equal("22", _text.Mp);
-        Assert.Same(hp, _text.Hp);
-        Assert.Same(maxMp, _text.MaxMp);
     }
 
     [Fact]

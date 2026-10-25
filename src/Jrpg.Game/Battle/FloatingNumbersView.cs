@@ -8,7 +8,7 @@ namespace Jrpg.Game.Battle;
 
 /// <summary>
 /// Draws the last action's numbers over their targets (40 px, outlined): white for damage, green for healing and
-/// revive, blue for MP. Each turn's numbers are measured once, when its playback starts.
+/// revive. Each turn's numbers are measured once, when its playback starts.
 /// </summary>
 internal sealed class FloatingNumbersView
 {

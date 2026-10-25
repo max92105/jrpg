@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using System.Globalization;
 using Microsoft.Xna.Framework;
 
 namespace Jrpg.Game.Ui;
@@ -210,8 +211,8 @@ internal static class UiTheme
     /// <summary>A party member's thin battle HP bar.</summary>
     public static ImmutableArray<GradientStop> BattleHpBar { get; } = [new(0, FromStraightArgb(0xFF3E7F5A)), new(1, FromStraightArgb(0xFF7FD39A))];
 
-    /// <summary>A class resource's thin battle bar: placeholder muted gold until resources get colors (LK1).</summary>
-    public static ImmutableArray<GradientStop> BattleResourceBar { get; } = [new(0, FromStraightArgb(0xFF7A6532)), new(1, FromStraightArgb(0xFFD9B95E))];
+    /// <summary>A class resource's thin battle bar, dim to full: tinted with the resource's own color.</summary>
+    public static ImmutableArray<GradientStop> BattleResourceShade { get; } = [new(0, FromStraightArgb(0xFF707070)), new(1, FromStraightArgb(0xFFFFFFFF))];
 
     /// <summary>An enemy's HP bar under its name.</summary>
     public static ImmutableArray<GradientStop> EnemyHpBar { get; } = [new(0, FromStraightArgb(0xFF8A2A2A)), new(1, FromStraightArgb(0xFFE0524A))];
@@ -264,6 +265,10 @@ internal static class UiTheme
             top.B + (int)(bottom.B * through),
             top.A + (int)(bottom.A * through));
     }
+
+    /// <summary>A content color, <c>#RRGGBB</c> as Data checks it, made opaque.</summary>
+    public static Color ColorFromHex(string hex) =>
+        FromStraightArgb(0xFF000000 | uint.Parse(hex.AsSpan(1), NumberStyles.HexNumber, CultureInfo.InvariantCulture));
 
     // Colors are written #AARRGGBB with straight alpha; the game draws premultiplied.
     private static Color FromStraightArgb(uint argb) => Color.FromNonPremultiplied(

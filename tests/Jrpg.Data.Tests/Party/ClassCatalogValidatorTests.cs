@@ -196,7 +196,7 @@ public sealed class ClassCatalogValidatorTests
     [Fact]
     public void Validate_RequirementAboveMax_Throws()
     {
-        var faith = new ResourceDefinition("faith", "Faith", Max: 5, StartsAt: 5);
+        var faith = new ResourceDefinition("faith", "Faith", Max: 5, StartsAt: 5) { Color = TestColor };
 
         var exception = Assert.Throws<ContentValidationException>(
             () => Validate([Class("cleric") with { SkillIds = ["heal_all"], Resources = [faith] }]));
@@ -229,7 +229,7 @@ public sealed class ClassCatalogValidatorTests
     [Fact]
     public void Validate_SpeedPerChargeBelowOne_Throws()
     {
-        var readiness = new ResourceDefinition("readiness", "Readiness") { MaxFromSpeed = new SpeedScaling(0) };
+        var readiness = new ResourceDefinition("readiness", "Readiness") { Color = TestColor, MaxFromSpeed = new SpeedScaling(0) };
 
         var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("rogue") with { Resources = [readiness] }]));
 
@@ -270,6 +270,7 @@ public sealed class ClassCatalogValidatorTests
     {
         var readiness = new ResourceDefinition("readiness", "Readiness")
         {
+            Color = TestColor,
             MaxFromSpeed = new SpeedScaling(10),
             Gains = new ResourceGains { PerHeavyHit = 1, HeavyHitPercent = 0 },
         };
@@ -279,7 +280,10 @@ public sealed class ClassCatalogValidatorTests
         Assert.EndsWith("gains.heavyHitPercent must be within 1..100 when perHeavyHit is set (was 0).", exception.Message, StringComparison.Ordinal);
     }
 
-    private static ResourceDefinition Mana { get; } = new("mana", "Mana", Max: 10, StartsAt: 3);
+    // Any valid color: these tests are about other fields.
+    private const string TestColor = "#5B8CFF";
+
+    private static ResourceDefinition Mana { get; } = new("mana", "Mana", Max: 10, StartsAt: 3) { Color = TestColor };
 
     private static void Validate(IReadOnlyList<ClassDefinition> classes) =>
         ClassCatalogValidator.Validate("classes.json", classes, _references);

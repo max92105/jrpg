@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
@@ -25,13 +24,12 @@ internal sealed class BattleVitalRow
 
     /// <param name="style">Fonts, width and offsets shared by every panel's row of this vital.</param>
     /// <param name="label">"HP", in the style's label font.</param>
-    /// <param name="ui">Where the bar's gradient is made, once.</param>
-    /// <param name="fill">The bar's gradient.</param>
-    public BattleVitalRow(VitalRowStyle style, MeasuredText label, UiTextures ui, ImmutableArray<GradientStop> fill)
+    /// <param name="bar">The thin bar under the value, in the vital's colors.</param>
+    public BattleVitalRow(VitalRowStyle style, MeasuredText label, StatBar bar)
     {
         _style = style;
         _label = label;
-        _bar = new StatBar(ui, fill, UiTheme.BattleBarTrack);
+        _bar = bar;
     }
 
     /// <summary>The row's height: the value's line and the bar under it.</summary>

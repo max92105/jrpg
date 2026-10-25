@@ -5,11 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/RS3.md, slice RS3 (Camp Kit rest item used from the menu)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/LK1a.md, slice LK1a (resource colors, tinted battle bars)
 Round: 1 (verdict: Ready to commit)
 
-- Warning: PartyMember.HasAnythingToRest lasting-resource branch untested (full HP, mana carried off StartsAt -> kit must be usable); open
-- Suggestion: ItemUseDialog.Open now may use the item without opening; consider a name like OpenOrUse / UseOrPickTarget; open
-- Suggestion: SkillCatalogValidatorTests.Validate_RestSkill_Throws uses EndsWith; pin full message like the item test; open
-- Follow-up: InventoryPage.cs is 328 lines (was 322 before diff); split candidate; open
-- Follow-up: docs/ui_ux_exemples webp swap is unrelated to RS3; commit separately; open
+- Suggestion: UiTheme.cs:269 the "#AARRGGBB straight alpha" comment now sits above ColorFromHex instead of FromStraightArgb; move it back down; open
+- Suggestion: UiThemeTests.ColorFromHex_Valid_Parses could add a lowercase case (validator accepts a-f); open
+- Follow-up: Core tests build ResourceDefinition without Color; harmless now, but any Game test that reaches ColorFromHex with "" throws; open

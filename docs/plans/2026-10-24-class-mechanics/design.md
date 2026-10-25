@@ -78,9 +78,9 @@ Content ids never change: `fire_blast`, `fireball`, `heal`, `recovery` and `heal
 | Name | Where | Placeholder | Meaning |
 |---|---|---|---|
 | Resource row | `Battle/PartyStatusView` (M3) | the MP row's style, 190 wide | One plain row per resource where MP was: name, amount over max, thin bar. |
-| `PipsUpTo` | `Battle/ResourceGaugeView` (LK1) | 10 | A resource whose max is at most this shows as pips (Octopath's BP); larger ones as a thin bar. |
-| `PipSize`, `PipGap` | `Ui/PipRow` (LK1) | 9, 4 | Diamond pips, lit or dim. |
-| Resource colors | `classes.json` resource `color` (LK1) | mana `#5B8CFF`, clarity `#B9C8FF`, stamina `#E8C25A`, ferocity `#E0533D`, conviction `#F2E6B0`, readiness `#9AD1C9`, instability `#A65BE0`, growth `#6BC46B`, decay `#7A5A8C`, faith `#FFF1C1`, chakra `#5FD3E0` | The pips' or bar's fill. |
+| `PipsUpTo` | `Battle/ResourceGaugeView` (LK1b) | 10 | A resource whose max is at most this shows as pips (Octopath's BP); larger ones as a thin bar. |
+| `PipSize`, `PipGap` | `Ui/PipRow` (LK1b) | 9, 4 | Diamond pips, lit or dim. |
+| Resource colors | `classes.json` resource `color` (LK1a) | mana `#5B8CFF`, clarity `#B9C8FF`, stamina `#E8C25A`, ferocity `#E0533D`, conviction `#F2E6B0`, readiness `#9AD1C9`, instability `#A65BE0`, growth `#6BC46B`, decay `#7A5A8C`, faith `#FFF1C1`, chakra `#5FD3E0` | The pips' or bar's fill. |
 | `StatusMarkSize` | `Battle/StatusMarksView` (LK2) | 22 | A status's small diamond mark with its turns left. |
 | `SwapSlide` | `Battle/FormationSlide` (LK3) | 0.25 s | Two battlers trading places slide instead of jumping. |
 
@@ -175,7 +175,7 @@ Content ids never change: `fire_blast`, `fireball`, `heal`, `recovery` and `heal
 - Druid: `"dominance": { "over": "decay", "bonusPercent": 50 }` on `growth`, and the mirror on `decay`.
 - Paladin: `"gains": { "perHeavyHit": 2, "heavyHitPercent": 20, "perEnemyFallen": 3 }`.
 - Rogue: `"maxFromSpeed": { "speedPerPoint": 10 }` on `readiness` instead of `max`/`startsAt`.
-- LK1 adds `"color"`.
+- LK1a adds `"color"`.
 
 `skills.json` (two shown):
 ```json
@@ -228,8 +228,8 @@ Game:
 | `SkillCostText` (M2b) | Battle | Core Skills, Resources; `Ui/UiMessages` |
 | `ResourceRowsText` (M3) | Battle | Core Battle, Resources |
 | `StatusTagsText` (FT1) | Battle | Core Statuses; `Ui/UiMessages` |
-| `ResourceGaugeView` (LK1) | Battle | `Ui/PipRow`, `Ui/StatBar` |
-| `PipRow` (LK1) | Ui | `Ui/Diamond`, `UiTextures`; never Battle |
+| `ResourceGaugeView` (LK1b) | Battle | `Ui/PipRow`, `Ui/StatBar` |
+| `PipRow` (LK1b) | Ui | `Ui/Diamond`, `UiTextures`; never Battle |
 | `StatusMarksView` (LK2) | Battle | `Ui/Diamond`, `StatusTagsText` |
 | `FormationSlide` (LK3) | Battle | Core Battle |
 
@@ -276,7 +276,7 @@ The Game's playback of each event (`ActionPlayback`, exhaustive switch):
 7. **Sticky dominance lives in `ResourceMeters`.** After each change, a force strictly above its rival becomes dominant; a tie keeps the current one. `DominanceFormula` stays pure: power and a flag.
 8. **Lasting resources** (ADR 0024) are on the member between battles. The combatant starts with the member's amount, and `GameSession.FinishBattle` writes the amount back and applies per-battle triggers. Saves store them by resource id.
 9. **MP goes in four steps** (ADR 0022): skills, screens, saves, then members. Each step builds and passes alone, and the save format change lands before `Vitals` loses MP, so a save never refers to a field the model lacks.
-10. **Resource colors in content** (LK1). The other ways are a Game table keyed by content ids, or a palette by position that repeats colors.
+10. **Resource colors in content** (LK1b). The other ways are a Game table keyed by content ids, or a palette by position that repeats colors.
 11. **Text.** Resource names are content; status names and battle phrases are `ui.json` and `MessageIds` (ADR 0010).
 
 ### Extension points

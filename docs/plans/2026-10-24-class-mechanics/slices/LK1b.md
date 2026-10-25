@@ -1,8 +1,8 @@
-# LK1. Resource look
+# LK1b. Resource look: pips
 
-Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Tunables and placeholders" (Screens), "Key design decisions" 10, "Structure" (Game). Look at `docs/ui_ux_exemples/Combat1.webp` and `Combat3.webp` first (`.claude/rules/game.md`, "UI look").
+Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Tunables and placeholders" (Screens), "Key design decisions" 10, "Structure" (Game). Look at `docs/ui_ux_exemples/combat_player_info_exemple.webp` first (`.claude/rules/game.md`, "UI look"): the BP pips beside each name. Split from LK1 on 2026-10-25; the colors are LK1a.
 
-- **LK1. Resource look: pips or a thin bar in the resource's color, spaced-caps label** (Game + Data + content, about 240 lines)
+- **LK1b. Resource look: pips or a thin bar in the resource's color, spaced-caps label** (Game, about 230 lines)
   - **Goal:** each resource reads at a glance, Octopath style:
     - **Small resources** (max ≤ `PipsUpTo`; all of today's) show as a row of small diamond pips, like Octopath's BP: lit in the resource's color per point, dim for the rest. A small spaced-caps label ("MANA") sits on the left, right-aligned with the HP row.
     - **Larger resources** keep M3's thin bar, in the resource's color.
@@ -12,23 +12,16 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
   - **New types:**
     - Game `Ui/PipRow` (internal sealed): draws N diamond pips, M lit, in a color. It's shared so a menu can reuse it, and depends only on `Ui`.
     - Game `Battle/ResourceGaugeView` (internal sealed): one member's resources (label, pips or bar, flash), reading `ResourceRowsText`.
-  - **Changes:**
-    - Core: `Resources/ResourceDefinition.Color` (string, `#RRGGBB`).
-    - Data: `ResourceDefinitionValidator`: `color` is required and is `#` with six hex digits.
-    - Content: `classes.json`: every resource's color (design.md, Screens).
-    - Game:
-      - `PartyStatusPanel` uses `ResourceGaugeView` instead of its resource `BattleVitalRow`s;
-      - `UiTheme` gets pip and label sizes and a hex parser, run once when the battle opens;
-      - `UiTheme.BattleResourceBar` goes.
+  - **Changes** (Game; the colors come from LK1a):
+    - `PartyStatusPanel` uses `ResourceGaugeView` instead of its resource `BattleVitalRow`s;
+    - `UiTheme` gets pip and label sizes.
   - **Tests:**
-    - `ClassCatalogValidatorTests`: `Validate_BadResourceColor_ThrowsNamingClassAndResource`
     - `ResourceGaugeViewTests` (pure part):
       - `ShapeOf_MaxAtPipsUpTo_IsPips`
       - `ShapeOf_MaxAbove_IsBar`
       - `FlashShare_AfterChange_FadesOverFlashTime`
       - `LabelColor_DominantForce_IsLit`
-    - `UiThemeTests`: `ColorFromHex_Valid_Parses`
-  - **Verify by hand** (Combat1 and Combat3 beside the screen):
+  - **Verify by hand** (combat_player_info_exemple beside the screen):
     - Omer's MANA as ten pips, filling as turns pass, and CLARITY with its lasting marker.
     - Thaali's two rows with the dominant one lit.
     - Jazog's pips flash when hit.

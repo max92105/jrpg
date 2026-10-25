@@ -17,6 +17,9 @@ public sealed record ResourceDefinition(string Id, string Name, int Max = 0, int
     /// <summary>Set for a resource whose points can make a spell backfire on its caster; null when safe.</summary>
     public BackfireRule? Backfire { get; init; }
 
+    /// <summary>The color its pips or bar are drawn in, as <c>#RRGGBB</c>; content gives every resource one.</summary>
+    public string Color { get; init; } = "";
+
     /// <summary>
     /// Set for a resource that keeps its amount on the member from battle to battle until a rest (ADR 0024); every
     /// other resource starts each battle at <see cref="StartsAt"/>.

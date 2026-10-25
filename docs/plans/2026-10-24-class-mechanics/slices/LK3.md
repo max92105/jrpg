@@ -1,6 +1,6 @@
 # LK3. Formation look
 
-Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Tunables and placeholders" (`SwapSlide`), "Structure" (Game). Look at `docs/ui_ux_exemples/Combat3.webp` and `Combat5.webp` first: the turn strip's diamonds and the battlers' line.
+Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Tunables and placeholders" (`SwapSlide`), "Structure" (Game). Look at `docs/ui_ux_exemples/combat_turn_order_exemple.webp` first: the turn strip's diamonds and the battlers' line.
 
 - **LK3. Formation look: battlers slide when they swap; the aura's reach and the readied turn are shown** (Game, about 200 lines)
   - **Goal:**

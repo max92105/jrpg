@@ -34,9 +34,14 @@ internal static class ResourceDefinitionValidator
     {
         var problem =
             string.IsNullOrWhiteSpace(resource.Name) ? "name must not be empty."
-            : FindAmountProblem(resource) ?? FindRuleProblem(resource);
+            : FindColorProblem(resource) ?? FindAmountProblem(resource) ?? FindRuleProblem(resource);
         return problem is null ? null : $"resource '{resource.Id}': {problem}";
     }
+
+    private static string? FindColorProblem(ResourceDefinition resource) =>
+        resource.Color is { Length: 7 } color && color[0] == '#' && color[1..].All(char.IsAsciiHexDigit)
+            ? null
+            : $"color must be # followed by six hex digits (was '{resource.Color}').";
 
     // Either a fixed max and start, or both from the holder's speed.
     private static string? FindAmountProblem(ResourceDefinition resource) =>

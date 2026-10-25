@@ -85,14 +85,40 @@ public sealed class ResourceDefinitionValidatorTests
     [Fact]
     public void Validate_LastingFromSpeed_Throws()
     {
-        var readiness = new ResourceDefinition("readiness", "Readiness") { MaxFromSpeed = new SpeedScaling(10), IsLasting = true };
+        var readiness = new ResourceDefinition("readiness", "Readiness") { Color = TestColor, MaxFromSpeed = new SpeedScaling(10), IsLasting = true };
 
         var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("rogue") with { Resources = [readiness] }]));
 
         Assert.EndsWith("a lasting resource can't take its max from speed, which changes with level.", exception.Message, StringComparison.Ordinal);
     }
 
-    private static ResourceDefinition Force(string id) => new(id, id, Max: 10);
+    [Theory]
+    [InlineData("#5B8CF")]
+    [InlineData("5B8CFFF")]
+    [InlineData("#5B8CFG")]
+    public void Validate_BadResourceColor_ThrowsNamingClassAndResource(string color)
+    {
+        var mana = Force("mana") with { Color = color };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("mage") with { Resources = [mana] }]));
+
+        Assert.Equal($"classes.json: class 'mage': resource 'mana': color must be # followed by six hex digits (was '{color}').", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_MissingResourceColor_Throws()
+    {
+        var mana = Force("mana") with { Color = "" };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("mage") with { Resources = [mana] }]));
+
+        Assert.EndsWith("color must be # followed by six hex digits (was '').", exception.Message, StringComparison.Ordinal);
+    }
+
+    // Any valid color: the other tests are about other fields.
+    private const string TestColor = "#5B8CFF";
+
+    private static ResourceDefinition Force(string id) => new(id, id, Max: 10) { Color = TestColor };
 
     private static void Validate(IReadOnlyList<ClassDefinition> classes) =>
         ClassCatalogValidator.Validate("classes.json", classes, new ClassReferences(new Dictionary<string, SkillDefinition>()));

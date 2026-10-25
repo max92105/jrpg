@@ -12,8 +12,15 @@ namespace Jrpg.Game.Ui;
 /// <param name="ui">Where the gradient's texture is made, once.</param>
 /// <param name="fill">The gradient, such as <see cref="UiTheme.HpBar"/>.</param>
 /// <param name="track">The color behind the filled part, such as <see cref="UiTheme.BarTrack"/>.</param>
-internal sealed class StatBar(UiTextures ui, ImmutableArray<GradientStop> fill, Color track)
+/// <param name="fillTint">Multiplies the gradient: white keeps it, a color turns a grey one into that color.</param>
+internal sealed class StatBar(UiTextures ui, ImmutableArray<GradientStop> fill, Color track, Color fillTint)
 {
+    /// <summary>A bar in its gradient's own colors.</summary>
+    public StatBar(UiTextures ui, ImmutableArray<GradientStop> fill, Color track)
+        : this(ui, fill, track, Color.White)
+    {
+    }
+
     /// <summary>A menu bar, on the menus' dark track.</summary>
     public StatBar(UiTextures ui, ImmutableArray<GradientStop> fill)
         : this(ui, fill, UiTheme.BarTrack)
@@ -37,7 +44,7 @@ internal sealed class StatBar(UiTextures ui, ImmutableArray<GradientStop> fill, 
         var filledWidth = Fraction > 0 ? Math.Max(1, (int)MathF.Round(area.Width * Fraction)) : 0;
         if (filledWidth > 0)
         {
-            batch.Draw(ui.Gradient(textures, fill), new Rectangle(area.X, area.Y, filledWidth, area.Height), Color.White * opacity);
+            batch.Draw(ui.Gradient(textures, fill), new Rectangle(area.X, area.Y, filledWidth, area.Height), fillTint * opacity);
         }
     }
 }

@@ -1,6 +1,6 @@
 # LK2. Status look
 
-Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Tunables and placeholders" (Screens), "When things happen in a turn" (events table). Look at `docs/ui_ux_exemples/Combat1.webp` and `Combat3.webp` first: the enemy's shield and weakness icons, and the small icons beside a member's panel.
+Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Tunables and placeholders" (Screens), "When things happen in a turn" (events table). Look at `docs/ui_ux_exemples/combat_targeting_ennemies_exemple.webp` and `combat_player_info_exemple.webp` first: the enemy's shield and weakness icons, and the small icons beside a member's panel.
 
 - **LK2. Status look: small marks with turns left; tick and backfire pops** (Game, about 220 lines)
   - **Goal:**

@@ -48,7 +48,7 @@ At the end of this plan, every class fights its own way, with two or three place
 6. **Phase 5: forces and hits (DR1, DR2, MO1).** Ticking statuses, the druid, then the monk's multi-hit.
 7. **Phase 6: run-through (Z1).** The developer plays every class.
 8. **Phase 7: lasting resources and rest (ADR 0024, LR1, LR2, LR3, RS1, RS2, RS3).** What a rest restores comes after the run-through, so play can shape it. It is the second save format change.
-9. **Phase 8: the look (LK1, LK2, LK3, Z2).** Behavior first, then the look.
+9. **Phase 8: the look (LK1a, LK1b, LK2, LK3, Z2).** Behavior first, then the look.
 
 ## Guiding rules
 - **Systems, not balance.** Every number is a placeholder in content (design.md, "Tunables and placeholders"). Every rule the developer hasn't given is a numbered question, with the placeholder used until it's answered. `GoblinTrioSimulation` keeps passing (decision 187).
@@ -63,7 +63,7 @@ At the end of this plan, every class fights its own way, with two or three place
 - **Saves** change twice, each time with a version bump, a round trip and a test that the older format is refused (ADR 0022, decision 229): MP leaves in MP3a (format 1 → 2), and lasting resources arrive in LR2 (2 → 3). No migration before the first release.
 - **Slice sizes count tests at about 13 lines each**, plus the existing tests a change breaks. Mechanical slices (FR1, CS1, MP3b) record the solution's test count before and after.
 - **Temporary content edits for a hand check are reverted.** No slice commits a content change made only to see a rule.
-- **Look** (`.claude/rules/game.md`). Read `docs/ui_ux_exemples/Combat1.webp`, `Combat3.webp` and `Combat5.webp` before LK1-LK3.
+- **Look** (`.claude/rules/game.md`). Read `docs/ui_ux_exemples/combat_player_info_exemple.webp`, `combat_targeting_ennemies_exemple.webp` and `combat_turn_order_exemple.webp` before LK1a-LK3.
 - **No NuGet package.**
 
 ## Out of scope (follow-ups)
@@ -139,7 +139,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **RS3. A rest item, used from the menu** (Core + Data + content + Game, about 200 lines) → [slices/RS3.md](slices/RS3.md)
 
 ### Phase 8: the look
-- [ ] **LK1. Resource look: pips or a thin bar in the resource's color, spaced-caps label** (Game + Data + content, about 240 lines) → [slices/LK1.md](slices/LK1.md)
+- [x] **LK1a. Resource colors: each resource has its color, and its bar is drawn in it** (Core + Data + content + Game, about 170 lines) → [slices/LK1a.md](slices/LK1a.md)
+- [ ] **LK1b. Resource look: diamond pips, spaced-caps label, lasting marker, dominant force lit, flash** (Game, about 230 lines) → [slices/LK1b.md](slices/LK1b.md)
 - [ ] **LK2. Status look: small marks with turns left; tick and backfire pops** (Game, about 220 lines) → [slices/LK2.md](slices/LK2.md)
 - [ ] **LK3. Formation look: battlers slide when they swap; the aura's reach and the readied turn are shown** (Game, about 200 lines) → [slices/LK3.md](slices/LK3.md)
 - [ ] **Z2. Play-through check** (manual) → [slices/Z2.md](slices/Z2.md)

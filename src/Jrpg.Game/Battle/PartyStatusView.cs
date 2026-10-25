@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Resources;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
@@ -57,7 +58,7 @@ internal sealed class PartyStatusView
             .. formation.Line.Select(member => new PartyStatusPanel(
                 member,
                 MeasuredText.Of(_nameFont.Font, member.Name),
-                new PartyStatusRows(new BattleVitalRow(hpStyle, hpLabel, ui, UiTheme.BattleHpBar), ResourceRowsOf(member, resourceStyle, ui)),
+                new PartyStatusRows(new BattleVitalRow(hpStyle, hpLabel, new StatBar(ui, UiTheme.BattleHpBar, UiTheme.BattleBarTrack)), ResourceRowsOf(member, resourceStyle, ui)),
                 text.Messages)),
         ];
         _statusTags = [.. _panels.Select(_ => new MeasuredText(string.Empty, 0))];
@@ -141,7 +142,11 @@ internal sealed class PartyStatusView
 
     private static List<BattleVitalRow> ResourceRowsOf(Combatant member, VitalRowStyle style, UiTextures ui) =>
         [.. member.Resources.Definitions.Select(
-            resource => new BattleVitalRow(style, MeasuredText.Of(style.Label.Font, resource.Name), ui, UiTheme.BattleResourceBar))];
+            resource => new BattleVitalRow(style, MeasuredText.Of(style.Label.Font, resource.Name), ResourceBarOf(resource, ui)))];
+
+    // One grey gradient for every resource, tinted with its color, so a battle bakes no texture per resource.
+    private static StatBar ResourceBarOf(ResourceDefinition resource, UiTextures ui) =>
+        new(ui, UiTheme.BattleResourceShade, UiTheme.BattleBarTrack, UiTheme.ColorFromHex(resource.Color));
 
     // Never shorter than the portrait, so the diamonds of neighboring panels can't overlap.
     private int HeightOf(PartyStatusPanel panel)

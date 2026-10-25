@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/MP2.md, slice MP2 (no screen shows MP)
-Round: 1 (verdict: Ready to commit)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/M3.md, slice M3 (battle panel shows resources)
+Round: 1 (verdict: Fix the Criticals, then commit)
 
-- Suggestion, open: VitalsText.cs keeps two blank lines after `MaxHp` where the MP properties were.
-- Suggestion, open: the `(column, line)` placement (HP alone, then pairs) is copied in StatusPage.DrawParameters and EquipmentSheetView.DrawParameters; share one function if a third page appears.
-- Follow-up, open: docs/map.md line 36 still says "stats and HP/MP" (Vitals keeps MP until MP3b).
+- Critical, open: PartyStatusView.cs:10 summary line starts with `//` not `///` -> CS1570, build fails.
+- Suggestion, open: PartyStatusPanel ctor packs HP + resource rows into a tuple to stay under 4 params; a small named record (or the panel building its rows) reads clearer.
+- Suggestion, open: PartyStatusPanel.Refresh re-reads AmountOf per resource that ResourceRowsText already read; could expose the amount from ResourceRowsText.

@@ -210,6 +210,9 @@ internal static class UiTheme
     /// <summary>A party member's thin battle HP bar.</summary>
     public static ImmutableArray<GradientStop> BattleHpBar { get; } = [new(0, FromStraightArgb(0xFF3E7F5A)), new(1, FromStraightArgb(0xFF7FD39A))];
 
+    /// <summary>A class resource's thin battle bar: placeholder muted gold until resources get colors (LK1).</summary>
+    public static ImmutableArray<GradientStop> BattleResourceBar { get; } = [new(0, FromStraightArgb(0xFF7A6532)), new(1, FromStraightArgb(0xFFD9B95E))];
+
     /// <summary>An enemy's HP bar under its name.</summary>
     public static ImmutableArray<GradientStop> EnemyHpBar { get; } = [new(0, FromStraightArgb(0xFF8A2A2A)), new(1, FromStraightArgb(0xFFE0524A))];
 

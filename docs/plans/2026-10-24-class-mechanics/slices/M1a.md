@@ -35,3 +35,4 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
       - `Start_SecondBattle_StartsAtStartsAgain`
     - `CombatantTests`: `FromEnemy_Always_HasNoResources`
   - **Verify by hand:** none (no content yet); `GoblinTrioSimulation` still passes.
+- **Done, with deviations:** as planned. Tests 1787 before, 1797 after. `ResourceGains` is a record whose `PerTurn` property defaults to 0, so that later triggers are added as optional fields. `EndTurn` now takes the actor.

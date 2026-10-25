@@ -152,7 +152,7 @@ public sealed class BattleState
                 throw new ArgumentException($"Unknown command {command.GetType().Name}.", nameof(command));
         }
 
-        EndTurn(events);
+        EndTurn(actor, events);
         return events;
     }
 
@@ -236,12 +236,14 @@ public sealed class BattleState
         events.Add(new BattleEnded(Phase));
     }
 
-    private void EndTurn(List<BattleEvent> events)
+    private void EndTurn(Combatant actor, List<BattleEvent> events)
     {
         if (IsOver)
         {
             return;
         }
+
+        TurnUpkeep.ApplyPerTurnGains(actor, events);
 
         // Defeat is checked first, as in the demo: if both sides fall in one turn, the party loses.
         if (LivingOn(BattleSide.Party).Count == 0)

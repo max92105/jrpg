@@ -1,4 +1,5 @@
 using Jrpg.Core.Party;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
 
@@ -29,6 +30,9 @@ public sealed class Combatant
     /// <summary>The skills this combatant can use; enemies have none yet.</summary>
     public IReadOnlyList<SkillDefinition> Skills { get; private init; } = [];
 
+    /// <summary>Built new for every battle, so each one starts afresh; enemies have none.</summary>
+    public ResourceMeters Resources { get; private init; } = new([]);
+
     /// <summary>The party member this combatant stands for; null for an enemy. Victory experience goes to them.</summary>
     public PartyMember? Member { get; private init; }
 
@@ -37,7 +41,12 @@ public sealed class Combatant
 
     /// <summary>Shares the member's <see cref="Vitals"/>, so damage and healing in battle stay after it.</summary>
     public static Combatant FromPartyMember(PartyMember member) =>
-        new(member.Definition.Name, BattleSide.Party, member.TotalStats, member.Vitals) { Skills = member.Skills, Member = member };
+        new(member.Definition.Name, BattleSide.Party, member.TotalStats, member.Vitals)
+        {
+            Skills = member.Skills,
+            Resources = new(member.Class.Resources),
+            Member = member,
+        };
 
     public static Combatant FromEnemy(EnemyDefinition enemy) => new(
         enemy.Name,

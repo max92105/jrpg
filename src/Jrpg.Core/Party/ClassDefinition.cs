@@ -1,3 +1,5 @@
+using Jrpg.Core.Resources;
+
 namespace Jrpg.Core.Party;
 
 /// <summary>
@@ -8,4 +10,7 @@ public sealed record ClassDefinition(string Id, string Name, string Description,
 {
     /// <summary>Ids of the skills every member of the class has, in menu order (ADR 0020); empty when absent.</summary>
     public IReadOnlyList<string> SkillIds { get; init; } = [];
+
+    /// <summary>The battle resources every member of the class has (ADR 0019); empty when absent.</summary>
+    public IReadOnlyList<ResourceDefinition> Resources { get; init; } = [];
 }

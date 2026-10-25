@@ -67,6 +67,16 @@ public sealed class CombatantTests
     }
 
     [Fact]
+    public void FromEnemy_Always_HasNoResources()
+    {
+        var goblin = new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20, defense: 2).Build();
+
+        var combatant = Combatant.FromEnemy(goblin);
+
+        Assert.Empty(combatant.Resources.Definitions);
+    }
+
+    [Fact]
     public void FromEnemy_Definition_UsesItsStatsOnEnemySide()
     {
         var goblin = new EnemyDefinitionBuilder().WithName("Goblin").WithStats(maxHp: 40, attack: 20, defense: 2).Build();

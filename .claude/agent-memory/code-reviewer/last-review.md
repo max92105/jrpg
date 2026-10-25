@@ -5,9 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/CS1.md, slice CS1 (skills come from the class)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/M1a.md, slice M1a (combatants carry class resources, per-turn gain)
 Round: 1 (verdict: Ready to commit)
 
-- Warning, open: ClassCatalogValidator.cs FindSkillProblem: `skillIds: ["heal", null]` -> FrozenDictionary.ContainsKey(null) throws ArgumentNullException ("Parameter 'key'"), no file name; check null/blank entries first.
-- Suggestion, open: CommandMenuTests.cs:22 uses BattleScenarios.SarxianFirstSeed for a Zanyr battle; name/doc no longer matches.
-- Suggestion, open: Skill-definition test fixtures duplicated in PartyMemberTests and ClassCatalogValidatorTests (no SkillBuilder exists yet).
+- Suggestion, open: TurnUpkeep.cs:8 `.Where(PerTurn != 0)` duplicates the `change != 0` guard; drop the filter, a plain foreach is enough.
+- Suggestion, open: ResourceMeters.cs:23 message "No resource 'x' here." is vague; say "This combatant has no resource 'x'.".

@@ -1,0 +1,46 @@
+using Jrpg.Core.Resources;
+
+namespace Jrpg.Core.Tests.Resources;
+
+public sealed class ResourceMetersTests
+{
+    private static readonly ResourceDefinition _mana = new("mana", "Mana", Max: 10, StartsAt: 3);
+
+    [Fact]
+    public void Constructor_Definitions_StartAtStartsAt()
+    {
+        var meters = new ResourceMeters([_mana, new ResourceDefinition("clarity", "Clarity", Max: 3, StartsAt: 2)]);
+
+        Assert.Equal((3, 2), (meters.AmountOf("mana"), meters.AmountOf("clarity")));
+    }
+
+    [Fact]
+    public void Change_AboveMax_ClampsAndReturnsApplied()
+    {
+        var meters = new ResourceMeters([_mana]);
+
+        var applied = meters.Change("mana", 9);
+
+        Assert.Equal((7, 10), (applied, meters.AmountOf("mana")));
+    }
+
+    [Fact]
+    public void Change_BelowZero_ClampsAndReturnsApplied()
+    {
+        var meters = new ResourceMeters([_mana]);
+
+        var applied = meters.Change("mana", -5);
+
+        Assert.Equal((-3, 0), (applied, meters.AmountOf("mana")));
+    }
+
+    [Fact]
+    public void AmountOf_UnknownId_Throws()
+    {
+        var meters = new ResourceMeters([_mana]);
+
+        var exception = Assert.Throws<ArgumentException>(() => meters.AmountOf("stamina"));
+
+        Assert.Contains("'stamina'", exception.Message, StringComparison.Ordinal);
+    }
+}

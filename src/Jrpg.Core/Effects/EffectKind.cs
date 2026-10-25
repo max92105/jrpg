@@ -8,4 +8,7 @@ public enum EffectKind
 
     /// <summary>Changes no HP: the effect only grants its status (ADR 0021).</summary>
     GrantStatus,
+
+    /// <summary>Changes no HP: the user takes an extra turn after the target's next turn (decision 202).</summary>
+    ReadyExtraTurn,
 }

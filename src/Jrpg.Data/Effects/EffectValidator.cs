@@ -6,7 +6,13 @@ namespace Jrpg.Data.Effects;
 /// <summary>Rules every effect must follow, whether a skill or an item carries it.</summary>
 internal static class EffectValidator
 {
-    public static string? FindProblem(Effect effect)
+    public static string? FindProblem(Effect effect) =>
+        FindPowerProblem(effect)
+        ?? FindRangeProblem(effect)
+        ?? FindKindProblem(effect)
+        ?? (effect.Status is { } grant ? StatusGrantValidator.FindProblem(grant) : null);
+
+    private static string? FindPowerProblem(Effect effect)
     {
         if (effect.Power < 0)
         {
@@ -14,28 +20,35 @@ internal static class EffectValidator
         }
 
         // Reviving with 0 HP would leave the target fallen, and Vitals.Revive rejects it.
-        if (effect.Kind == EffectKind.Revive && effect.Power < 1)
-        {
-            return $"effect.power must be at least 1 for a revive effect (was {effect.Power}).";
-        }
+        return effect.Kind == EffectKind.Revive && effect.Power < 1
+            ? $"effect.power must be at least 1 for a revive effect (was {effect.Power})."
+            : null;
+    }
 
+    private static string? FindRangeProblem(Effect effect)
+    {
         if (effect.Range < 0)
         {
             return $"effect.range must be at least 0 (was {effect.Range}).";
         }
 
         // Only an aura reaches along the formation, so a range on any other targeting would be ignored.
-        if (effect.Range > 0 && effect.Targeting != Targeting.AlliesInRange)
+        return effect.Range > 0 && effect.Targeting != Targeting.AlliesInRange
+            ? $"effect.range is only for an alliesInRange effect (was {effect.Range} on {effect.Targeting})."
+            : null;
+    }
+
+    private static string? FindKindProblem(Effect effect)
+    {
+        // Ready places its user's extra turn after someone else's, so it can only be aimed at another combatant.
+        if (effect.Kind == EffectKind.ReadyExtraTurn && effect.Targeting != Targeting.OtherCombatant)
         {
-            return $"effect.range is only for an alliesInRange effect (was {effect.Range} on {effect.Targeting}).";
+            return $"effect.targeting must be otherCombatant for a readyExtraTurn effect (was {effect.Targeting}).";
         }
 
         // A grantStatus effect changes nothing else, so without a status it would do nothing.
-        if (effect.Kind == EffectKind.GrantStatus && effect.Status is null)
-        {
-            return "effect.status is required for a grantStatus effect.";
-        }
-
-        return effect.Status is { } grant ? StatusGrantValidator.FindProblem(grant) : null;
+        return effect.Kind == EffectKind.GrantStatus && effect.Status is null
+            ? "effect.status is required for a grantStatus effect."
+            : null;
     }
 }

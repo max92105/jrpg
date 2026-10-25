@@ -101,6 +101,71 @@ public sealed class TurnOrderTests
         Assert.Throws<InvalidOperationException>(() => order.Upcoming(3));
     }
 
+    // The shuffle (2, 1) keeps [First, Second, Third]. First readies an extra turn after Second.
+    [Fact]
+    public void Advance_ReadiedAfterB_ActorActsRightAfterB()
+    {
+        var order = new TurnOrder([_first, _second, _third], new FixedSequenceRandom(2, 1));
+        order.ReadyExtraTurn(_first, _second);
+
+        var turns = TakeTurns(order, 5);
+
+        Assert.Equal([_first, _second, _first, _third, _first], turns);
+    }
+
+    // First and Third both ready after Second: both extra turns follow Second's next turn, one after the other.
+    [Fact]
+    public void Advance_TwoReadiedOnOneAnchor_BothRightAfterIt()
+    {
+        var order = new TurnOrder([_first, _second, _third], new FixedSequenceRandom(2, 1));
+        order.ReadyExtraTurn(_first, _second);
+        order.ReadyExtraTurn(_third, _second);
+        var upcoming = order.Upcoming(4);
+
+        var turns = TakeTurns(order, 5);
+
+        Assert.Equal([_second, _first, _third, _third], upcoming);
+        Assert.Equal([_first, _second, _first, _third, _third], turns);
+    }
+
+    [Fact]
+    public void Upcoming_ReadiedTurn_ListedAfterAnchor()
+    {
+        var order = new TurnOrder([_first, _second, _third], new FixedSequenceRandom(2, 1));
+        order.ReadyExtraTurn(_first, _second);
+
+        var upcoming = order.Upcoming(4);
+
+        Assert.Equal([_second, _first, _third, _first], upcoming);
+    }
+
+    [Fact]
+    public void Advance_AnchorFellFirst_ExtraTurnAfterNextTurn()
+    {
+        var order = new TurnOrder([_first, _second, _third], new FixedSequenceRandom(2, 1));
+        order.ReadyExtraTurn(_first, _third);
+        _third.Vitals.TakeDamage(999);
+
+        var turns = TakeTurns(order, 3);
+
+        Assert.Equal([_first, _second, _first], turns);
+    }
+
+    [Fact]
+    public void Advance_ReadiedTurn_IsExtraTurn()
+    {
+        var order = new TurnOrder([_first, _second, _third], new FixedSequenceRandom(2, 1));
+        order.ReadyExtraTurn(_first, _second);
+        order.Advance();
+        var onSecondsTurn = order.IsExtraTurn;
+
+        order.Advance();
+
+        Assert.False(onSecondsTurn);
+        Assert.True(order.IsExtraTurn);
+        Assert.False(order.HasReadiedTurn(_first));
+    }
+
     private static Combatant Enemy(string name) => Combatant.FromEnemy(new EnemyDefinitionBuilder().WithName(name).Build());
 
     private static List<Combatant> TakeTurns(TurnOrder order, int count)

@@ -43,6 +43,14 @@ public sealed class EffectValidatorTests
     }
 
     [Fact]
+    public void FindProblem_ReadyWithOtherTargeting_ReturnsProblem()
+    {
+        var problem = EffectValidator.FindProblem(new Effect(EffectKind.ReadyExtraTurn, Power: 0, Targeting.SingleEnemy));
+
+        Assert.Equal("effect.targeting must be otherCombatant for a readyExtraTurn effect (was SingleEnemy).", problem);
+    }
+
+    [Fact]
     public void FindProblem_DamageWithStatus_ReturnsNull()
     {
         var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1));

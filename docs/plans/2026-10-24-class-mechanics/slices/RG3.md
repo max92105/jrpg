@@ -44,3 +44,12 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
       - `Execute_StunnedOnExtraTurn_TurnSkipped`
     - `EffectValidatorTests`: `FindProblem_ReadyWithOtherTargeting_ReturnsProblem`
   - **Verify by hand:** none (RG4).
+- **Done, with deviations:** Tests 1930 before, 1943 after. Beyond the plan:
+  - The upkeep skip on an extra turn lives in `TurnFlow.RunUpkeep`, now that the turn flow has its own type (RG2). It also covers a stunned user losing an extra turn.
+  - A fallen anchor's extra turn fires after anyone's turn but the readying combatant's own, so it really comes after "the next turn anyone takes".
+  - `EffectValidator` was split into power, range and kind checks for the complexity limit.
+  - One extra test: `ItemCatalogValidatorTests.Validate_ItemThatReadiesATurn_Throws`.
+  - **From review:**
+    - Several readied turns on one anchor now play one after another, right after it. An extra turn counts as having just acted, and no combatant plays two readied turns in a row (`Advance_TwoReadiedOnOneAnchor_BothRightAfterIt`).
+    - Items can't target `otherCombatant` either, since the menu has no other combatant to aim at.
+    - The stun loop's comment covers a lost extra turn, and the stun test checks that the lost extra turn didn't count the stun down.

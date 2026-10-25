@@ -15,4 +15,7 @@ public enum Targeting
     /// aura. Battle only, so no item uses it.
     /// </summary>
     AlliesInRange,
+
+    /// <summary>Any one living combatant on either side but the actor: whom a Ready places its turn after.</summary>
+    OtherCombatant,
 }

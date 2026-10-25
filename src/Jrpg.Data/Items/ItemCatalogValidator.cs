@@ -44,6 +44,12 @@ internal static class ItemCatalogValidator
             return problem;
         }
 
+        // An extra turn belongs to a battle's turn order, and the menu has no other combatant to aim at.
+        if (effect.Kind == EffectKind.ReadyExtraTurn || effect.Targeting == Targeting.OtherCombatant)
+        {
+            return "effect.kind readyExtraTurn and effect.targeting otherCombatant are for skills only; an item has no turn order.";
+        }
+
         // An item can be used from the menu, where there is no formation to measure a range along.
         if (effect.Targeting == Targeting.AlliesInRange)
         {

@@ -15,6 +15,7 @@ internal static class TargetRules
         Targeting.SingleAlly or Targeting.AllAllies or Targeting.AlliesInRange => relation != TargetRelation.Enemy && candidate.IsAlive,
         Targeting.Self => relation == TargetRelation.Self && candidate.IsAlive,
         Targeting.SingleFallenAlly or Targeting.AllFallenAllies => relation != TargetRelation.Enemy && !candidate.IsAlive,
+        Targeting.OtherCombatant => relation != TargetRelation.Self && candidate.IsAlive,
         _ => throw new ArgumentOutOfRangeException(nameof(targeting), targeting, "Unknown targeting."),
     };
 

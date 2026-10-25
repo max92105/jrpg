@@ -12,7 +12,7 @@ internal sealed class TurnFlow(IReadOnlyList<Combatant> combatants, TurnOrder tu
     public static BattlePhase PhaseOf(Combatant actor) =>
         actor.Side == BattleSide.Party ? BattlePhase.PartyTurn : BattlePhase.EnemyTurn;
 
-    /// <summary>The actor's turn ends: upkeep, then the outcome, then the next actor.</summary>
+    /// <summary>The actor's turn ends: upkeep (none on an extra turn), the outcome, then the next actor.</summary>
     public BattlePhase EndTurn(Combatant actor, List<BattleEvent> events)
     {
         RunUpkeep(actor, events);
@@ -25,8 +25,14 @@ internal sealed class TurnFlow(IReadOnlyList<Combatant> combatants, TurnOrder tu
     /// </summary>
     public BattlePhase KeepTurn(Combatant actor, List<BattleEvent> events) => OutcomeOf(events) ?? PhaseOf(actor);
 
+    // A readied extra turn has no upkeep, so it can't double the per-turn gains or the countdown (question 214).
     private void RunUpkeep(Combatant holder, List<BattleEvent> events)
     {
+        if (turnOrder.IsExtraTurn)
+        {
+            return;
+        }
+
         TurnUpkeep.ApplyPerTurnGains(holder, events);
         TurnUpkeep.CountDownStatuses(holder, combatants, events);
     }
@@ -46,8 +52,9 @@ internal sealed class TurnFlow(IReadOnlyList<Combatant> combatants, TurnOrder tu
         return outcome;
     }
 
-    // A stunned combatant's turn is skipped inside the same Execute, so the screen never sees it as the actor. The
-    // lost turn still runs its upkeep, so the stun counts down and the loop always ends (ADR 0021).
+    // A stunned combatant's turn is skipped inside the same Execute, so the screen never sees it as the actor. A lost
+    // turn still runs its upkeep, so the stun counts down and the loop ends; a lost extra turn has none, but it is
+    // always followed by a cycle turn, which counts down (ADR 0021).
     private BattlePhase AdvanceToNextActor(List<BattleEvent> events)
     {
         turnOrder.Advance();

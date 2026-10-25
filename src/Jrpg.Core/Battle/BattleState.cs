@@ -100,11 +100,12 @@ public sealed class BattleState
         SkillPayment.LackingResourceOf(CurrentActor, skill);
 
     /// <summary>
-    /// Whether the current actor knows <paramref name="skill"/>, can pay for it and has someone to aim it at. The UI
-    /// greys out the rest.
+    /// Whether the current actor knows <paramref name="skill"/>, can pay for it and has someone to aim it at, and,
+    /// for a Ready, has no extra turn pending already. The UI greys out the rest.
     /// </summary>
     public bool CanUse(SkillDefinition skill) =>
-        CurrentActor.Skills.Contains(skill) && CanAfford(skill) && TargetChoiceFor(skill).Candidates.Count > 0;
+        CurrentActor.Skills.Contains(skill) && CanAfford(skill) && TargetChoiceFor(skill).Candidates.Count > 0
+        && !(skill.Effect.Kind == EffectKind.ReadyExtraTurn && _turnOrder.HasReadiedTurn(CurrentActor));
 
     /// <summary>Who the current actor can aim <paramref name="item"/> at, in formation order.</summary>
     /// <exception cref="ArgumentException">The item has no effect to aim.</exception>
@@ -181,6 +182,12 @@ public sealed class BattleState
 
         ThrowIfIllegalTargets(command.Skill.Effect, command.Targets);
         SkillPayment.Pay(actor, command.Skill, events);
+        if (command.Skill.Effect.Kind == EffectKind.ReadyExtraTurn)
+        {
+            ReadyExtraTurn(actor, command.Targets[0], events);
+            return;
+        }
+
         EffectLanding.Land(command.Skill.Effect, command.Targets, Combatants, events);
     }
 
@@ -265,6 +272,13 @@ public sealed class BattleState
             default:
                 throw new ArgumentException($"Unknown command {command.GetType().Name}.", nameof(command));
         }
+    }
+
+    // One readied turn at a time per combatant (question 214); CanUse already refused a second.
+    private void ReadyExtraTurn(Combatant actor, Combatant after, List<BattleEvent> events)
+    {
+        _turnOrder.ReadyExtraTurn(actor, after);
+        events.Add(new ExtraTurnReadied(actor, after));
     }
 
     // A quick skill keeps the turn (decision 202), so a rogue can Ready and still act.

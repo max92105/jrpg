@@ -13,6 +13,7 @@ internal static class EffectResolver
         EffectKind.RestoreHp => target.RestoreHp(effect.Power),
         EffectKind.Revive => target.Revive(effect.Power),
         EffectKind.GrantStatus => 0,
+        EffectKind.ReadyExtraTurn => 0,
         _ => throw new ArgumentOutOfRangeException(nameof(effect), effect.Kind, "Unknown effect kind."),
     };
 }

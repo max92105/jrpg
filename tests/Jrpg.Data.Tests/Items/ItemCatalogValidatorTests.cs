@@ -85,6 +85,26 @@ public sealed class ItemCatalogValidatorTests
     }
 
     [Fact]
+    public void Validate_ItemThatReadiesATurn_Throws()
+    {
+        var hourglass = _potion with { Id = "hourglass", Effect = new Effect(EffectKind.ReadyExtraTurn, Power: 0, Targeting.OtherCombatant) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [hourglass]));
+
+        Assert.Equal("items.json: item 'hourglass': effect.kind readyExtraTurn and effect.targeting otherCombatant are for skills only; an item has no turn order.", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_ItemAimedAtOtherCombatant_Throws()
+    {
+        var dart = _potion with { Id = "dart", Effect = new Effect(EffectKind.Damage, Power: 5, Targeting.OtherCombatant) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [dart]));
+
+        Assert.EndsWith("effect.kind readyExtraTurn and effect.targeting otherCombatant are for skills only; an item has no turn order.", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public void Validate_EffectAndEquipment_ThrowsNamingTheItem()
     {
         var hybrid = _potion with { Equipment = new EquipmentStats(EquipmentSlot.Weapon, 1, 0) };

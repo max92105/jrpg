@@ -20,6 +20,7 @@ internal sealed class StatusTagsText(StatusSet statuses, UiMessages messages)
     public static string NameIdOf(StatusKind kind) => kind switch
     {
         StatusKind.Stun => MessageIds.StatusStun,
+        StatusKind.Taunt => MessageIds.StatusTaunt,
         _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "A status with no name in ui.json."),
     };
 

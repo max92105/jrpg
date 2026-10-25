@@ -35,3 +35,9 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
     - As Jazog: ferocity +2 per goblin hit.
     - With a recruit: after Taunt, every goblin attacks Jazog for two of his turns.
     - Rampage greys until 6.
+- **Done, with deviations:** Tests 1863 before, 1874 after. Beyond the plan:
+  - `ResourceDefinitionValidator` needed no change, since it doesn't check gains.
+  - `CommandMenuTests`' "actor without skills" case moves from Jazog, who now has skills, to Thaali (no skills until DR2).
+  - The trigger runs on every damage hit before a fall is checked, so a felling hit still adds its ferocity.
+  - The two skills' descriptions are marked as placeholders.
+  - From review: two more tests. In `Execute_HitFellsBarbarian_GainsFerocityBeforeTheFall`, ferocity is gained before the fall. In `ChooseCommand_AfterSelfTaunt_GoblinAttacksTheTaunter`, a Taunt cast in battle pulls the enemy's own choice.

@@ -8,4 +8,7 @@ public sealed record ResourceGains
 
     /// <summary>Whenever another combatant on the holder's side falls, while the holder still stands.</summary>
     public int PerAllyFallen { get; init; }
+
+    /// <summary>For each hit that costs the holder HP, whatever the damage (question 208).</summary>
+    public int PerHitTaken { get; init; }
 }

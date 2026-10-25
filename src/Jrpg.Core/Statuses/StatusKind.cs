@@ -5,4 +5,7 @@ public enum StatusKind
 {
     /// <summary>The holder loses its next turn (ST2).</summary>
     Stun,
+
+    /// <summary>Every enemy attack goes to a taunting party member (question 209).</summary>
+    Taunt,
 }

@@ -1,5 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Items;
+using Jrpg.Core.Statuses;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -34,6 +35,60 @@ public sealed class EnemyTacticsTests
 
         Assert.Throws<InvalidOperationException>(() => tactics.ChooseCommand(battle));
     }
+
+    [Fact]
+    public void ChooseCommand_OneMemberTaunting_AttacksThem()
+    {
+        Taunt(_jazog);
+        var tactics = new EnemyTactics(new FixedSequenceRandom(0));
+
+        var command = tactics.ChooseCommand(GoblinsTurn());
+
+        Assert.Equal(new AttackCommand(_jazog), command);
+    }
+
+    [Fact]
+    public void ChooseCommand_TwoTaunting_PicksAmongThemOnly()
+    {
+        Taunt(_jazog);
+        Taunt(_teelle);
+        var tactics = new EnemyTactics(new FixedSequenceRandom(1));
+
+        var command = tactics.ChooseCommand(GoblinsTurn());
+
+        // The taunting members, in battle-list order, are [Jazog, Teelle]; index 1 is Teelle.
+        Assert.Equal(new AttackCommand(_teelle), command);
+    }
+
+    // Without a taunt, the targets are every living member and one random call picks among them, as before Taunt.
+    [Fact]
+    public void ChooseCommand_NoTaunt_SameTargetAsBeforeForSequence()
+    {
+        var tactics = new EnemyTactics(new FixedSequenceRandom(2));
+
+        var command = tactics.ChooseCommand(GoblinsTurn());
+
+        Assert.Equal(new AttackCommand(_teelle), command);
+    }
+
+    [Fact]
+    public void ChooseCommand_TaunterFallen_AttacksAnyLivingMember()
+    {
+        Taunt(_jazog);
+        _jazog.Vitals.TakeDamage(999);
+        var tactics = new EnemyTactics(new FixedSequenceRandom(1));
+
+        var command = tactics.ChooseCommand(GoblinsTurn());
+
+        // The living members are [Sarxian, Teelle]; index 1 is Teelle.
+        Assert.Equal(new AttackCommand(_teelle), command);
+    }
+
+    // Shuffle values (0, 2, 1) swap the goblin to the front, so it is the enemy's turn.
+    private BattleState GoblinsTurn() =>
+        new([_sarxian, _jazog, _teelle, _goblin], new Inventory(), new FixedSequenceRandom(0, 2, 1));
+
+    private static void Taunt(Combatant member) => member.Statuses.Apply(new StatusGrant(StatusKind.Taunt, Power: 0, Turns: 2));
 
     private static Combatant PartyCombatant(string id) => Combatant.FromPartyMember(new PartyMemberBuilder().WithId(id).Build());
 }

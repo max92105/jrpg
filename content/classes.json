@@ -29,7 +29,9 @@
     "id": "barbarian", "name": "Barbarian",
     "description": "A fierce brawler who turns rage into raw, unstoppable strength.",
     "base": { "maxHp": 250, "attack": 26, "defense": 6 },
-    "growth": { "maxHp": 26, "attack": 3, "defense": 1 } },
+    "growth": { "maxHp": 26, "attack": 3, "defense": 1 },
+    "skillIds": ["taunt", "rampage"],
+    "resources": [ { "id": "ferocity", "name": "Ferocity", "max": 10, "startsAt": 0, "gains": { "perHitTaken": 2 } } ] },
   {
     "id": "paladin", "name": "Paladin",
     "description": "A holy knight bound by an oath, shield of the weak and bane of evil.",

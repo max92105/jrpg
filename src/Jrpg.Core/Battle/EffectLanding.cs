@@ -23,6 +23,11 @@ internal static class EffectLanding
                 events.Add(new EffectApplied(target, effect.Kind, amount));
             }
 
+            if (effect.Kind == EffectKind.Damage)
+            {
+                ResourceTriggers.OnHitTaken(target, amount, events);
+            }
+
             if (wasAlive && !target.IsAlive)
             {
                 Fall(target, combatants, events);

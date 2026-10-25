@@ -147,6 +147,44 @@ public sealed class BattleStateResourceTests
         Assert.Contains(new ResourceChanged(cleric, "faith", -1), events);
     }
 
+    // The shuffle (0) puts the goblin first; its attack costs the barbarian HP, so ferocity rises by 2.
+    [Fact]
+    public void Execute_EnemyHitsBarbarian_GainsFerocity()
+    {
+        var ferocity = new ResourceDefinition("ferocity", "Ferocity", Max: 10, StartsAt: 0) { Gains = new ResourceGains { PerHitTaken = 2 } };
+        var barbarian = Combatant.FromPartyMember(PartyMember.Recruit(
+            new PartyMemberBuilder().WithId("jazog").BuildDefinition(),
+            new ClassBuilder().WithId("barbarian").WithResources(ferocity).Build(),
+            new Dictionary<string, SkillDefinition>()));
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20, defense: 2).Build());
+        var battle = new BattleState([barbarian, goblin], new Inventory(), new FixedSequenceRandom(0));
+
+        var events = battle.Execute(new AttackCommand(barbarian));
+
+        Assert.Equal(2, barbarian.Resources.AmountOf("ferocity"));
+        Assert.Contains(new ResourceChanged(barbarian, "ferocity", 2), events);
+    }
+
+    // The barbarian is down to 5 HP; the goblin's 15-damage hit fells him, and still adds its ferocity before the fall.
+    [Fact]
+    public void Execute_HitFellsBarbarian_GainsFerocityBeforeTheFall()
+    {
+        var ferocity = new ResourceDefinition("ferocity", "Ferocity", Max: 10, StartsAt: 0) { Gains = new ResourceGains { PerHitTaken = 2 } };
+        var barbarian = Combatant.FromPartyMember(PartyMember.Recruit(
+            new PartyMemberBuilder().WithId("jazog").BuildDefinition(),
+            new ClassBuilder().WithId("barbarian").WithResources(ferocity).Build(),
+            new Dictionary<string, SkillDefinition>()));
+        barbarian.Vitals.TakeDamage(barbarian.Vitals.Hp - 5);
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20, defense: 2).Build());
+        var battle = new BattleState([barbarian, goblin], new Inventory(), new FixedSequenceRandom(0));
+
+        var events = battle.Execute(new AttackCommand(barbarian));
+
+        Assert.IsType<EffectApplied>(events[1]);
+        Assert.Equal(new ResourceChanged(barbarian, "ferocity", 2), events[2]);
+        Assert.Equal(new CombatantDefeated(barbarian), events[3]);
+    }
+
     private BattleState StartBattle()
     {
         var party = new PartyState([_mage], [_mage], new PartyRules(MaxActiveMembers: 4));

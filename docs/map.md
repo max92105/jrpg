@@ -19,7 +19,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 
 | Folder | Purpose | Key types |
 |---|---|---|
-| Battle | One battle: turn order, commands, events, enemy AI, rewards | `BattleState`, `BattleCommand`, `BattleEvent`, `TurnOrder`, `TurnUpkeep` (the end of the holder's own turn: per-turn gains), `SkillPayment` (resource requirements and costs: can pay, what's short, pay), `ResourceTriggers` (gains that happenings trigger: an ally falling), `EffectLanding` (an effect on its targets: the change, the status granted, a fall), `EnemyTactics`, `VictoryRewards` |
+| Battle | One battle: turn order, commands, events, enemy AI, rewards | `BattleState`, `BattleCommand`, `BattleEvent`, `TurnOrder`, `TurnUpkeep` (the end of the holder's own turn: per-turn gains), `SkillPayment` (resource requirements and costs: can pay, what's short, pay), `ResourceTriggers` (gains that happenings trigger: a hit taken, an ally falling), `EffectLanding` (an effect on its targets: the change, the status granted, a fall), `EnemyTactics` (a random living member, or a taunting one), `VictoryRewards` |
 | Content | The loaded catalog and global rules | `ContentCatalog`, `GameRules`, `NewGameDefinition`, `LeaderChoice` |
 | Dialogue | What a speaker says | `Speech` |
 | Effects | What skills and items do, targeting, damage formula | `Effect`, `EffectResolver`, `Targeting`, `TargetChoice`, `DamageFormula` |

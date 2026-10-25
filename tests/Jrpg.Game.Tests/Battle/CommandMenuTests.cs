@@ -88,7 +88,7 @@ public sealed class CommandMenuTests
     {
         var menu = new CommandMenu(_inventory, BattleScenarios.Catalog.Items);
 
-        menu.Start(BattleScenarios.MemberAgainstGoblinTrio("jazog", _inventory, new SeededRandom(BattleScenarios.SarxianFirstSeed)));
+        menu.Start(BattleScenarios.MemberAgainstGoblinTrio("thaali", _inventory, new SeededRandom(BattleScenarios.SarxianFirstSeed)));
 
         Assert.False(menu.IsEnabled(CommandEntry.Skills));
     }

@@ -65,5 +65,23 @@
       "kind": "damage", "power": 15, "targeting": "singleEnemy",
       "status": { "kind": "stun", "power": 0, "turns": 1 }
     }
+  },
+  {
+    "id": "taunt",
+    "name": "Taunt",
+    "description": "Draws every enemy's attacks for two turns. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "effect": {
+      "kind": "grantStatus", "power": 0, "targeting": "self",
+      "status": { "kind": "taunt", "power": 0, "turns": 2 }
+    }
+  },
+  {
+    "id": "rampage",
+    "name": "Rampage",
+    "description": "A crushing blow on one enemy. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "resourceChanges": [ { "resourceId": "ferocity", "amount": -6 } ],
+    "effect": { "kind": "damage", "power": 70, "targeting": "singleEnemy" }
   }
 ]

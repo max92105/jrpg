@@ -185,6 +185,43 @@ public sealed class BattleStatusTests
         Assert.Equal(7, mage.Resources.AmountOf("mana"));
     }
 
+    // Taunt is self-granted, so the casting turn doesn't count it down: it lasts the hero's next two turns.
+    [Fact]
+    public void Execute_SelfTaunt_LastsTwoOwnTurnsAfterCast()
+    {
+        var taunt = Skill("taunt", new Effect(EffectKind.GrantStatus, 0, Targeting.Self, new StatusGrant(StatusKind.Taunt, Power: 0, Turns: 2)));
+        var hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithSkills(taunt).Build());
+        var battle = new BattleState([hero, Goblin(hp: 25)], new Inventory(), new FixedSequenceRandom(1));
+        battle.Execute(new SkillCommand(taunt, [hero]));
+        var turnsLeft = new List<bool>();
+
+        for (var round = 0; round < 3; round++)
+        {
+            battle.Execute(new DefendCommand());
+            battle.Execute(new DefendCommand());
+            turnsLeft.Add(hero.Statuses.Has(StatusKind.Taunt));
+        }
+
+        Assert.Equal([true, false, false], turnsLeft);
+    }
+
+    // The list is [ally, hero, goblin]; the shuffle (2, 0) makes the turns hero, ally, goblin. Without the taunt, the
+    // scripted pick (0) would be the ally, the first living member in the list.
+    [Fact]
+    public void ChooseCommand_AfterSelfTaunt_GoblinAttacksTheTaunter()
+    {
+        var taunt = Skill("taunt", new Effect(EffectKind.GrantStatus, 0, Targeting.Self, new StatusGrant(StatusKind.Taunt, Power: 0, Turns: 2)));
+        var hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithId("jazog").WithSkills(taunt).Build());
+        var ally = Combatant.FromPartyMember(new PartyMemberBuilder().WithId("teelle").Build());
+        var battle = new BattleState([ally, hero, Goblin(hp: 25)], new Inventory(), new FixedSequenceRandom(2, 0));
+        battle.Execute(new SkillCommand(taunt, [hero]));
+        battle.Execute(new DefendCommand());
+
+        var command = new EnemyTactics(new FixedSequenceRandom(0)).ChooseCommand(battle);
+
+        Assert.Equal(new AttackCommand(hero), command);
+    }
+
     private BattleState Battle(Combatant goblin) => new([_hero, goblin], new Inventory(), new FixedSequenceRandom(1));
 
     private static Combatant Goblin(int hp) =>

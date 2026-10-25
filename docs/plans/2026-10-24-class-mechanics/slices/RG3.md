@@ -1,0 +1,46 @@
+# RG3. Ready: an extra turn after a chosen combatant
+
+Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Key design decisions" 5, "When things happen in a turn" (steps 2, 4, 6). Decision 202; question 214.
+
+- **RG3. Ready: an extra turn right after a chosen combatant** (Core + Data, about 260 lines)
+  - **Goal:**
+    - An effect of kind "ready extra turn" lets its user pick any other living combatant; the user then takes one extra turn right after that combatant's next turn.
+    - The turn order's upcoming list shows the extra turn.
+    - The extra turn has no upkeep.
+    - One readied turn per combatant is pending at a time, so a skill with this effect is unusable while one is.
+    - If the chosen combatant falls before acting, the extra turn comes after the next turn anyone takes.
+    - A stunned user loses the extra turn like any other.
+    - **Known gap:** RG4 puts it in content and on screen.
+  - **New types:**
+    - Core `Battle/ExtraTurnReadied(Combatant Actor, Combatant After)` (BattleEvent).
+  - **Changes:**
+    - Core:
+      - `Effects/EffectKind.ReadyExtraTurn` (`EffectResolver` returns 0 for it);
+      - `Effects/Targeting.OtherCombatant`: any living combatant but the actor;
+      - `TargetRules.CanTarget` handles it.
+      - `Battle/TurnOrder`:
+        - `internal void ReadyExtraTurn(Combatant actor, Combatant after)`;
+        - `Advance` gives the readied turn right after `after` has acted;
+        - `Upcoming` lists it in place;
+        - `IsExtraTurn` (internal), so the upkeep is skipped;
+        - `HasReadiedTurn(Combatant)`.
+      - `BattleState`:
+        - `UseSkill` handles `ReadyExtraTurn` (no `EffectApplied`; `ExtraTurnReadied`);
+        - `CanUse` is false while the actor has a readied turn;
+        - `EndTurn` skips the upkeep on an extra turn.
+      - Keep `TurnOrder` under the complexity limit: the readied turns go in a small private list of (actor, after) pairs.
+    - Data: `EffectValidator`: `readyExtraTurn` must target `otherCombatant`; items can't use it.
+  - **Tests:**
+    - `TurnOrderTests`:
+      - `Advance_ReadiedAfterB_ActorActsRightAfterB`
+      - `Upcoming_ReadiedTurn_ListedAfterAnchor`
+      - `Advance_AnchorFellFirst_ExtraTurnAfterNextTurn`
+      - `Advance_ReadiedTurn_IsExtraTurn`
+    - `BattleReadyTests` (new file):
+      - `Execute_Ready_ReportsAndSchedules`
+      - `Execute_ExtraTurn_NoUpkeep`
+      - `CanUse_ReadyWhilePending_ReturnsFalse`
+      - `Execute_ReadyOnSelf_Throws`
+      - `Execute_StunnedOnExtraTurn_TurnSkipped`
+    - `EffectValidatorTests`: `FindProblem_ReadyWithOtherTargeting_ReturnsProblem`
+  - **Verify by hand:** none (RG4).

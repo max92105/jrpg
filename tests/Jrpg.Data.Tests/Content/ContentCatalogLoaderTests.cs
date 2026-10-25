@@ -94,6 +94,19 @@ public sealed class ContentCatalogLoaderTests
         Assert.All(stepsPerMember, steps => Assert.Single(steps));
     }
 
+    // A long fight for watching class resources build up (question 226); no map rolls it.
+    [Fact]
+    public void Load_RepositoryContent_HasTrainingDummyEncounter()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        var encounter = catalog.Encounters["training_dummy"];
+
+        Assert.Equal(["training_dummy"], encounter.EnemyIds);
+        Assert.Equal(400, catalog.Enemies["training_dummy"].MaxHp);
+        Assert.DoesNotContain(catalog.Maps.Values, map => map.Settings.RandomEncounters?.EncounterIds.Contains("training_dummy") == true);
+    }
+
     [Fact]
     public void Load_RepositoryContent_SarxianKnowsTheStartingSkills()
     {

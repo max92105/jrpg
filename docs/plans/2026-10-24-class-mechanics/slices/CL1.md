@@ -1,0 +1,46 @@
+# CL1. The cleric: Faith
+
+Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Tunables and placeholders" (faith row, cleric skills), "Key design decisions" 6. Decision 205; question 217.
+
+- **CL1. The cleric: Faith, a level that skills require; it drops when an ally falls** (Core + Data + content + Game text, about 270 lines)
+  - **Goal:**
+    - Zanyr has Faith (max 5, starts at 5). Nothing spends it.
+    - Heal needs faith 1, Recovery 2 and Heal All 4; a skill is usable while faith is at or above its requirement.
+    - Faith drops by 1 whenever an ally falls (question 217); the heavy-hit loss comes in PL1.
+    - Until a rest exists, faith starts each battle at 5. LR3 makes it lasting.
+    - The heals keep their MP cost until MP1 removes MP, so nothing becomes free in between.
+  - **New types:**
+    - Core `Resources/ResourceRequirement(string ResourceId, int AtLeast)` (public sealed record): a minimum of one resource a skill needs without spending it.
+    - Core `Battle/ResourceTriggers` (internal static): the resource gains that battle happenings trigger. Here `OnCombatantFallen(Combatant fallen, IReadOnlyList<Combatant> combatants, List<BattleEvent> events)` applies `PerAllyFallen` to the fallen member's living allies. BB1 and PL1 add hits and enemy falls.
+  - **Changes:**
+    - Core:
+      - `Skills/SkillDefinition.Requirements` (empty when absent);
+      - `Resources/ResourceGains.PerAllyFallen`.
+      - `Battle/SkillPayment`: `CanPay` checks requirements against the amount before the skill's own change; `LackingResourceOf` returns a short requirement.
+      - `BattleState.ApplyToTargets` calls `ResourceTriggers.OnCombatantFallen` after a `CombatantDefeated`.
+    - Data:
+      - `SkillCatalogValidator`: `atLeast` ≥ 1.
+      - `ClassCatalogValidator`: a listed skill's requirements name the class's resources, and `atLeast` ≤ that resource's max.
+    - Content:
+      - `classes.json`: the cleric gets `faith` (`perAllyFallen` −1);
+      - `skills.json`: the heals' requirements.
+    - Game:
+      - `SkillCostText` writes an unmet requirement as "Needs {amount} {resource}" and a met one as "{resource} {amount}";
+      - `ui.json` and `MessageIds`: `battle_skill_resource_needed`, `battle_skill_resource_level`.
+  - **Tests:**
+    - `SkillPaymentTests`:
+      - `CanPay_RequirementMet_ReturnsTrue`
+      - `CanPay_RequirementShort_ReturnsFalse`
+      - `LackingResourceOf_RequirementShort_ReturnsIt`
+      - `Pay_RequirementOnly_SpendsNothing`
+    - `ResourceTriggersTests`:
+      - `OnCombatantFallen_AllyFalls_LivingClericLosesFaith`
+      - `OnCombatantFallen_EnemyFalls_ClericUnchanged`
+      - `OnCombatantFallen_ClericHerselfFalls_NoChangeToHer`
+    - `ClassCatalogValidatorTests`: `Validate_RequirementAboveMax_Throws`
+    - `SkillCatalogValidatorTests`: `Validate_RequirementBelowOne_Throws`
+    - `SkillCostTextTests`: `CostOf_RequirementShort_SaysNeeds`
+  - **Verify by hand:**
+    - As Zanyr with two recruits, let an ally fall: Heal All greys with "Needs 4 Faith".
+    - Heal still works at faith 4 or lower, down to 1.
+    - Faith is shown on screen from M3; until then, check the greyed skills.

@@ -1,0 +1,46 @@
+# DR2. The druid: Growth and Decay
+
+Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Tunables and placeholders" (druid rows), "Key design decisions" 7. Decisions 195, 204; questions 212, 227.
+
+- **DR2. The druid: Growth and Decay with sticky dominance, and Equilibrium** (Core + Data + content, about 280 lines)
+  - **Goal:**
+    - Thaali has Growth and Decay (each max 10, starts at 0).
+    - Rejuvenate gives an ally Regen 10 for 3 turns and adds 2 Growth. Rot gives an enemy Poison 8 for 3 turns and adds 2 Decay.
+    - **Sticky dominance** (decision 204):
+      - after any change, a force strictly above its rival becomes dominant;
+      - a tie keeps the current one;
+      - at the start, neither dominates (question 227).
+    - A skill that feeds the dominant force gets +50 % power, judged before its own gain: the status's power for a grant, the effect's otherwise.
+    - Equilibrium needs 3 of each, spends them, and hits every enemy.
+  - **New types:**
+    - Core `Resources/DominanceRule(string Over, int BonusPercent)` (public sealed record): this resource, when dominant over `Over`, empowers the skills that feed it.
+    - Core `Resources/DominanceFormula` (public static): `Power(int power, bool isFedForceDominant, int bonusPercent)`, rounding down. The comment cites decision 195.
+  - **Changes:**
+    - Core:
+      - `ResourceDefinition.Dominance` (`DominanceRule?`);
+      - `ResourceMeters` keeps the dominant id per rival pair and updates it in `Change` (strictly above wins, a tie keeps it); `IsDominant(string resourceId)`.
+      - `BattleState.UseSkill` builds the effect to apply in a private `EmpoweredEffect(Combatant actor, SkillDefinition skill)` before paying.
+    - Data: `ResourceDefinitionValidator`: `dominance.over` names another resource of the same class, which names this one back; `bonusPercent` ≥ 0.
+    - Content:
+      - `classes.json`: the druid gets `growth`, `decay` and `skillIds` `rejuvenate`, `rot`, `equilibrium`;
+      - `skills.json`: the three skills.
+    - Game: `SkillCostText` already shows two costs (CL1, WL1); M3 shows two rows.
+  - **Tests:**
+    - `DominanceFormulaTests`:
+      - `Power_Dominant_AddsBonus`
+      - `Power_NotDominant_Unchanged`
+    - `ResourceMetersTests`:
+      - `Change_ForceGoesAbove_BecomesDominant`
+      - `Change_RivalTies_DominanceKept`
+      - `Change_RivalGoesAbove_DominanceChanges`
+      - `Constructor_BothZero_NeitherDominant`
+    - `BattleDominanceTests` (new file):
+      - `Execute_RotWhileDecayDominant_PoisonPowerRaised`
+      - `Execute_RejuvenateWhileDecayDominant_RegenAtBasePower`
+      - `Execute_Equilibrium_SpendsBothForces`
+      - `CanUse_EquilibriumOneForceShort_ReturnsFalse`
+    - `ClassCatalogValidatorTests`: `Validate_DominanceOverUnknownResource_Throws`
+  - **Verify by hand:** as Thaali against the dummy:
+    - Rot twice; the second poison ticks for 12 once Decay leads.
+    - Rejuvenate twice ties the forces at 2-2, and Decay stays dominant, so a third Rot still gets the bonus.
+    - Equilibrium greys until both are at 3.

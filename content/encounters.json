@@ -3,5 +3,10 @@
     "id": "goblin_trio",
     "enemyIds": ["goblin", "goblin", "goblin"],
     "backgroundFile": "Forest.png"
+  },
+  {
+    "id": "training_dummy",
+    "enemyIds": ["training_dummy"],
+    "backgroundFile": "Forest.png"
   }
 ]

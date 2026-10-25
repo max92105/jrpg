@@ -44,6 +44,9 @@ When planning slices in this repo:
 - Removal/wording plans: count with Grep count mode (it counts matching lines, not occurrences), slice by folder, list each reason-carrying comment with its replacement, "don't invent a reason"; a text guard must skip itself and history paths (docs/plans, done ADRs).
 
 - Before changing repository content (classes, members, new-game), grep the Game/Data tests that assume it (Sarxian as warrior leader, Teelle, StartNew call sites) and budget the fixes in the slice.
+- Devil's-advocate sizing: count ~13 lines per planned test plus broken existing tests; split Core state from content+Game up front. Fold implementation choices (timing, refresh rules) into ADRs, keep questions for real design; number decisions/questions contiguously from the free number.
+- I have no delete tool: when re-planning, reuse slice file names where possible and overwrite orphans with a "Superseded: delete this file" stub, then tell the caller which to delete.
+- Battle mechanics: a new BattleEvent's Core slice may land without Game support only if no content produces it yet (ActionPlayback throws on unknown events); the content lands with the playback case. Check mechanics are observable with repository enemies (goblin hits were 3 % of HP: heavy-hit threshold untestable) and plan a practice enemy when fights are too short.
 
 **Why:** part 1 split slices mid-way; the part 2 devil's advocate (2026-10-17) raised exactly these as blockers/concerns.
 

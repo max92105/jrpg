@@ -1,0 +1,38 @@
+# FT1. The fighter: stamina and control; statuses on screen
+
+Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Tunables and placeholders" (fighter rows), "When things happen in a turn" (events table), "Structure" (Game). Decisions 191, 200.
+
+- **FT1. The fighter: stamina and a stunning bash; the screen shows statuses plainly** (content + Game, about 250 lines)
+  - **Goal:**
+    - Ragnir has Stamina (max 6, starts at 3, +1 a turn).
+    - Power Strike (2 stamina) hits hard. Shield Bash (3 stamina) hits and stuns for 1 turn: control, the first of the fighter's controlling skills (decision 200).
+    - On screen:
+      - a granted status shows as a cue on its target;
+      - a lost turn shows as a "Stunned" cue in its own beat;
+      - statuses show as a plain line of tags ("STUN 1") under an enemy's tag and beside a member's name.
+  - **New types:**
+    - Game `Battle/StatusTagsText` (internal sealed): one combatant's statuses as short tags, re-formatted only when they change.
+  - **Changes:**
+    - Content:
+      - `classes.json`: the fighter gets `stamina` and `skillIds` `power_strike`, `shield_bash`;
+      - `skills.json`: the two skills.
+    - Game:
+      - `PlaybackBeatKind.Skip`;
+      - `ActionPlayback` handles `StatusApplied` (a cue in the impact), `StatusEnded` (no beat) and `TurnSkipped` (a `Skip` beat and a cue on that combatant);
+      - `PartyStatusPanel` and `EnemyTagView` draw `StatusTagsText`, refreshed with the vitals;
+      - `ui.json` and `MessageIds`: `status_stun` ("Stun") and `battle_turn_skipped` ("Stunned").
+  - **Tests:**
+    - `ActionPlaybackTests`:
+      - `Start_StatusApplied_AddsCueWithStatusName`
+      - `Start_TurnSkippedAfterAction_AddsSkipBeatAfterImpact`
+      - `Start_StatusEnded_AddsNoBeat`
+    - `StatusTagsTextTests`:
+      - `Refresh_StunWithOneTurn_ShowsNameAndTurns`
+      - `Refresh_StatusEnded_RemovesTag`
+      - `Refresh_Unchanged_KeepsSameString`
+    - `BattleTurnSequenceTests`: `Update_EnemyStunnedByBash_NextStageIsTheFollowingActor` (repository content, Ragnir, a fixed seed)
+    - `ContentCatalogLoaderTests`: `Load_RepositoryContent_FighterHasStamina`
+  - **Verify by hand:**
+    - As Ragnir: Shield Bash a goblin. "Stun" pops and "STUN 1" shows.
+    - Its turn shows "Stunned" and passes; the tag goes.
+    - Stamina greys Power Strike after two uses and comes back one point a turn.

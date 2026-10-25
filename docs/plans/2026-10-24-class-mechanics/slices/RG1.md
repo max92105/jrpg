@@ -1,0 +1,40 @@
+# RG1. Speed and the rogue's readiness charges
+
+Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Tunables and placeholders" (Speed, readiness row). Decision 202; question 213.
+
+- **RG1. Speed: a class stat; the rogue's readiness charges come from it** (Core + Data + content, about 240 lines)
+  - **Goal:**
+    - Every class has a speed at level 1 and a growth per level, like its other stats (ADR 0017's one formula).
+    - The rogue's Readiness has no fixed max: its max and starting amount are speed ÷ 10, rounded down, at least 1 (3 at level 1; question 213).
+    - Nothing spends readiness yet (RG3); M3's row shows "READINESS 3/3".
+  - **New types:**
+    - Core `Resources/ReadinessFormula` (public static): `Charges(int speed, int speedPerCharge)`, at least 1. The comment cites decision 202 ("X times a battle depending on speed").
+    - Core `Resources/SpeedScaling(int SpeedPerCharge)` (public sealed record): a resource whose max comes from its holder's speed.
+    - Core `Resources/ResourceStart(ResourceDefinition Definition, int Max, int Amount)` (public sealed record): a resource's max and starting amount for one battle. `ResourceMeters` now takes these, so a max can differ from the definition's; LR1 and LR3 reuse it.
+    - Core `Battle/ResourceStarts` (internal static): a member's resource starts for a battle: the definition's numbers, or the speed-based max.
+  - **Changes:**
+    - Core:
+      - `Party/ClassStats` gains `Speed` (positional, after MP3b removed `MaxMp`);
+      - `ClassGrowth` grows it;
+      - `PartyMember.Speed`;
+      - `ResourceDefinition.MaxFromSpeed` (`SpeedScaling?`), with `Max` and `StartsAt` unused when it's set;
+      - `ResourceMeters(IReadOnlyList<ResourceStart>)` and `Combatant.FromPartyMember` use `ResourceStarts`.
+    - Data:
+      - `ClassCatalogValidator`: speed ≥ 0 in base and growth;
+      - `ResourceDefinitionValidator`: either `max` or `maxFromSpeed`, and `speedPerCharge` ≥ 1.
+    - Content:
+      - `classes.json`: `speed` in every class's `base` and `growth` (design.md);
+      - the rogue gets `readiness` with `"maxFromSpeed": { "speedPerCharge": 10 }`.
+    - Tests: `new ClassStats(` sites in `ClassBuilder`, `PartyMemberBuilder`, `ClassGrowthTests`, `PartyMemberTests` and `ClassCatalogValidatorTests` gain speed (about 12 sites); `ResourceMetersTests` builds starts.
+  - **Tests:**
+    - `ReadinessFormulaTests`:
+      - `Charges_Speed30Per10_IsThree`
+      - `Charges_SpeedBelowPer_IsOne`
+    - `ClassGrowthTests`: `StatsAt_LevelThree_SpeedGrowsTwice`
+    - `CombatantTests`:
+      - `FromPartyMember_SpeedScaledResource_MaxAndStartFromSpeed`
+      - `FromPartyMember_LevelUpRaisesSpeed_MoreCharges`
+    - `ClassCatalogValidatorTests`:
+      - `Validate_ResourceWithMaxAndMaxFromSpeed_Throws`
+      - `Validate_NegativeSpeed_Throws`
+  - **Verify by hand:** as Lazarus, READINESS 3/3 in a fight.

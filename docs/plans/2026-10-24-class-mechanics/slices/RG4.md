@@ -1,0 +1,39 @@
+# RG4. The rogue's kit: Ready and Expose
+
+Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Tunables and placeholders" (rogue rows, Exposed), "When things happen in a turn" (events table). Decisions 193, 202; questions 214, 215.
+
+- **RG4. The rogue's kit: Ready and Expose on screen; Exposed makes every hit land harder** (Core + Data + content + Game, about 270 lines)
+  - **Goal:**
+    - Lazarus:
+      - Ready (1 readiness, quick) picks any other combatant; his extra turn shows in the turn-order strip after them.
+      - Expose gives an enemy Exposed for 3 of its turns: +50 % damage taken from everyone (question 215).
+    - So he readies a turn after an ally's setup, or exposes and then cuts in after the fighter's stun.
+  - **Changes:**
+    - Core:
+      - `Statuses/StatusKind.Exposed`;
+      - `StatusModifiers.DamageTakenPercent(StatusSet)` is 100 plus Exposed's power (`NoChangePercent` = 100).
+      - `Effects/DamageFormula.Calculate(int power, int defense, int damageTakenPercent = NoChangePercent)` computes max(1, (power − defense) × percent / 100), rounding down. The comment explains why the percent comes after defense: a setup multiplies what lands.
+      - `EffectResolver.Apply` gains a defaulted percent, so `FieldItemUse` and the existing tests don't change. `BattleState.ApplyToTargets` passes the target's percent.
+    - Data: nothing new.
+    - Content:
+      - `classes.json`: the rogue's `skillIds` `ready`, `expose`;
+      - `skills.json`: the two skills.
+    - Game:
+      - `CommandMenu` opens the target cursor on `TargetChoiceFor(ready)`, which spans both sides. Check `BattleTargetCursor` moves across party and enemies (it was built for one side per choice); if it can't, give it the candidates in screen order.
+      - `ActionPlayback` handles `ExtraTurnReadied` (the banner is the skill's name; no extra beat).
+      - `BattleTurnSequence` needs nothing: it reads `CurrentActor` after each hold, so a quick skill steps the same rogue forward again (LK2 keeps him forward).
+      - `ui.json` and `MessageIds`: `status_exposed` ("Exposed").
+  - **Tests:**
+    - `DamageFormulaTests`:
+      - `Calculate_Exposed50_MultipliesAfterDefense`
+      - `Calculate_ExposedOnMinimumHit_StaysAtLeastMinimum`
+    - `StatusModifiersTests`: `DamageTakenPercent_Exposed_Is100PlusPower`
+    - `BattleStatusTests`: `Execute_AttackOnExposed_DealsOneAndAHalf`
+    - `CommandMenuTests`: `Update_ConfirmReady_TargetsBothSidesButNotSelf`
+    - `ActionPlaybackTests`: `Start_ExtraTurnReadied_ShowsSkillBanner`
+    - `BattleTurnSequenceTests`: `Update_AfterReady_SameMemberStepsForwardAgain`
+    - `TurnOrderStripTests`: `Refresh_ReadiedTurn_ShowsRogueAfterAnchor`
+  - **Verify by hand:**
+    - As Lazarus with Ragnir: Ready after Ragnir. Lazarus's portrait appears after Ragnir's in the strip, and Lazarus still gets his current turn.
+    - Expose a goblin, then Ragnir's hit lands 1.5 times as hard.
+    - After three Readies, Ready greys with "Not enough Readiness".

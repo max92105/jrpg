@@ -1,0 +1,53 @@
+# ST1. Statuses in Core
+
+Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Core changes" (Statuses), "When things happen in a turn", "Key design decisions" 2. ADR 0021.
+
+- **ST1. Statuses in Core: granted by effects, counted down from the holder's next turn, cleared on a fall** (Core + Data, about 260 lines)
+  - **Goal:**
+    - A skill's effect can grant a status to each target still standing; it lasts a number of its holder's turns.
+    - A status granted during its holder's own turn (a self-granted one) isn't counted down at the end of that turn: it's marked fresh on apply, and the first countdown only clears the mark.
+    - A fall clears the fallen's statuses.
+    - Only `Stun` exists as a kind; losing the turn is ST2.
+    - **Known gap:** the screen shows the new events from FT1. No content grants a status before FT1, so nothing throws.
+  - **New types:**
+    - Core `Statuses/StatusKind` (public enum): the closed list of statuses; `Stun` here.
+    - Core `Statuses/StatusGrant(StatusKind Kind, int Power, int Turns)` (public sealed record): what an effect inflicts.
+    - Core `Statuses/ActiveStatus(StatusKind Kind, int Power, int TurnsLeft, bool IsFresh)` (public sealed record): a status on a combatant now.
+    - Core `Statuses/StatusSet` (public sealed class): the statuses on one combatant.
+      - `Active`, `Has(StatusKind)`;
+      - `internal void Apply(StatusGrant)` refreshes the turns, keeps the stronger power and marks it fresh;
+      - `internal IReadOnlyList<StatusKind> CountDown()` clears fresh marks and counts the rest down, returning the kinds that ended in applied order;
+      - `internal IReadOnlyList<StatusKind> Clear()` returns what was active.
+    - Core `Battle/StatusApplied(Combatant Target, StatusKind Status, int Turns)` (BattleEvent).
+    - Core `Battle/StatusEnded(Combatant Holder, StatusKind Status)` (BattleEvent): a status ran out or its holder fell.
+    - Data `Statuses/StatusGrantValidator` (internal static): turns ≥ 1, power ≥ 0.
+  - **Changes:**
+    - Core:
+      - `Effects/EffectKind.GrantStatus`;
+      - `Effects/Effect` gains a defaulted `StatusGrant? Status = null` (the 28 call sites stay);
+      - `EffectResolver` returns 0 for `GrantStatus`.
+      - `Battle/Combatant.Statuses`.
+      - `BattleState.ApplyToTargets` becomes an instance method:
+        - no `EffectApplied` for `GrantStatus`;
+        - after the effect, each standing target gets the grant (`StatusApplied`);
+        - after a `CombatantDefeated`, the fallen's statuses are cleared (`StatusEnded` each).
+      - `Battle/TurnUpkeep.CountDownStatuses(Combatant, List<BattleEvent>)` runs after the per-turn gains.
+    - Data: `Effects/EffectValidator` requires a `status` for `grantStatus` and calls `StatusGrantValidator`.
+  - **Tests** (about 13 lines each):
+    - `StatusSetTests`:
+      - `Apply_New_IsActiveAndFresh`
+      - `Apply_SameKindAgain_RefreshesTurnsKeepsStrongerPower`
+      - `CountDown_Fresh_ClearsMarkKeepsTurns`
+      - `CountDown_LastTurn_EndsAndReturnsKind`
+      - `Clear_TwoStatuses_ReturnsBothInAppliedOrder`
+    - `BattleStatusTests` (new file):
+      - `Execute_DamageWithStatus_AppliesAfterDamageAndReports`
+      - `Execute_StatusOnFallenTarget_GrantsNothing`
+      - `Execute_GrantStatusEffect_ReportsNoEffectApplied`
+      - `Execute_SelfGrantedStatus_NotCountedDownOnCastingTurn`
+      - `Execute_StatusOnOther_CountsDownAtEndOfHolderTurn`
+      - `Execute_TargetFalls_StatusesCleared`
+    - `EffectValidatorTests`:
+      - `FindProblem_GrantStatusWithoutStatus_ReturnsProblem`
+      - `FindProblem_StatusWithZeroTurns_ReturnsProblem`
+  - **Verify by hand:** none (no content yet).

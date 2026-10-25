@@ -1,0 +1,41 @@
+# M2a. Skills can spend a class resource
+
+Part of [the class mechanics plan](../README.md). Design: [design.md](../design.md), "Replacement mapping" (`CanAfford`), "Validation (Data)". ADR 0019.
+
+- **M2a. Skills can spend a class resource** (Core + Data, about 250 lines)
+  - **Goal:**
+    - A skill may list resource changes. A negative change is a cost: the skill is usable only with enough of that resource, and using it spends the amount, reported as `ResourceChanged`. A positive change is a gain (the warlock, WL1).
+    - MP costs still work until MP1.
+    - Data rejects a class listing a skill that touches a resource the class doesn't have.
+    - No content uses it yet (M2b).
+  - **New types:**
+    - Core `Resources/ResourceChange(string ResourceId, int Amount)` (public sealed record): what one skill does to one resource.
+    - Core `Battle/SkillPayment` (internal static): whether a combatant can pay a skill, and paying it.
+      - `CanPay(Combatant actor, SkillDefinition skill)`: MP and every negative change;
+      - `LackingResourceOf(Combatant actor, SkillDefinition skill)`: the first short `ResourceDefinition`, or null;
+      - `Pay(Combatant actor, SkillDefinition skill, List<BattleEvent> events)`.
+  - **Changes:**
+    - Core:
+      - `Skills/SkillDefinition.ResourceChanges` (empty when absent); its summary no longer says MP is the only resource.
+      - `Battle/BattleState`:
+        - `CanAfford` delegates to `SkillPayment.CanPay`;
+        - new public `ResourceDefinition? LackingResourceFor(SkillDefinition skill)` (null when only MP, or nothing, is short);
+        - `UseSkill` calls `SkillPayment.Pay`.
+    - Data:
+      - `ClassCatalogValidator`: every listed skill's changes name one of the class's resources ("class 'mage' lists 'smite', which changes 'conviction', a resource mage doesn't have").
+      - `SkillCatalogValidator`: no zero amount.
+  - **Tests:**
+    - `SkillPaymentTests`:
+      - `CanPay_EnoughResource_ReturnsTrue`
+      - `CanPay_ResourceShort_ReturnsFalse`
+      - `LackingResourceOf_ResourceShort_ReturnsIt`
+      - `LackingResourceOf_NothingShort_ReturnsNull`
+      - `Pay_ResourceCost_SpendsAndReportsChange`
+      - `Pay_PositiveChange_GainsAndReports`
+    - `BattleStateResourceTests`:
+      - `Execute_SkillCostingResource_SpendsBeforeEffect`
+      - `Execute_UnaffordableResourceSkill_Throws`
+      - `CanUse_AfterGainingTurns_CostlierSkillBecomesUsable`
+    - `ClassCatalogValidatorTests`: `Validate_SkillChangesForeignResource_ThrowsNamingClassSkillAndResource`
+    - `SkillCatalogValidatorTests`: `Validate_ZeroResourceChange_Throws`
+  - **Verify by hand:** none (no content uses it yet).

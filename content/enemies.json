@@ -11,5 +11,18 @@
     "attack": 16,
     "defense": 2,
     "experienceReward": 40
+  },
+  {
+    "id": "training_dummy",
+    "name": "Training Dummy",
+    "portraitFile": "Goblin.png",
+    "battleSpriteFile": "Goblin.png",
+    "attackEffectFile": "AttackEnemy.png",
+    "isSpriteFlipped": false,
+    "maxHp": 400,
+    "maxMp": 0,
+    "attack": 20,
+    "defense": 0,
+    "experienceReward": 10
   }
 ]

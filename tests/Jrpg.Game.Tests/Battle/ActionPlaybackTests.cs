@@ -1,6 +1,7 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Randomness;
+using Jrpg.Core.Statuses;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Tests.Ui;
 
@@ -52,6 +53,60 @@ public sealed class ActionPlaybackTests
 
         Assert.Empty(playback.Beats);
         Assert.Equal(TimeSpan.Zero, playback.Duration);
+    }
+
+    [Fact]
+    public void Start_StatusApplied_AddsCueWithStatusName()
+    {
+        var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), new StatusApplied(_goblin, StatusKind.Stun, 1)]);
+
+        Assert.Equal([new CueOnTarget(_goblin, "Stun")], playback.Cues);
+        Assert.Equal([PlaybackBeatKind.Impact], playback.Beats.Select(beat => beat.Kind));
+    }
+
+    [Fact]
+    public void Start_TurnSkippedAfterAction_AddsSkipBeatAfterImpact()
+    {
+        BattleEvent[] events =
+        [
+            new ActionStarted(_sarxian, new AttackCommand(_goblin)),
+            new EffectApplied(_goblin, EffectKind.Damage, 13),
+            new StatusApplied(_goblin, StatusKind.Stun, 1),
+            new TurnSkipped(_goblin, StatusKind.Stun),
+        ];
+
+        var playback = Start(events);
+
+        Assert.Equal([PlaybackBeatKind.Impact, PlaybackBeatKind.Skip], playback.Beats.Select(beat => beat.Kind));
+        Assert.Equal(new CueOnTarget(_goblin, "Stunned", BattlePacing.ImpactHold), playback.Cues[^1]);
+    }
+
+    [Fact]
+    public void Start_TwoTurnsSkipped_ShareOneSkipBeat()
+    {
+        var second = Combatant.FromEnemy(BattleScenarios.Catalog.Enemies["goblin"]);
+        BattleEvent[] events =
+        [
+            new ActionStarted(_sarxian, new AttackCommand(_goblin)),
+            new EffectApplied(_goblin, EffectKind.Damage, 13),
+            new TurnSkipped(_goblin, StatusKind.Stun),
+            new TurnSkipped(second, StatusKind.Stun),
+        ];
+
+        var playback = Start(events);
+
+        Assert.Equal([PlaybackBeatKind.Impact, PlaybackBeatKind.Skip], playback.Beats.Select(beat => beat.Kind));
+        Assert.All(playback.Cues, cue => Assert.Equal(BattlePacing.ImpactHold, cue.ShowsAt));
+        Assert.Equal(2, playback.Cues.Count);
+    }
+
+    [Fact]
+    public void Start_StatusEnded_AddsNoBeat()
+    {
+        var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), new StatusEnded(_goblin, StatusKind.Stun)]);
+
+        Assert.Empty(playback.Beats);
+        Assert.Empty(playback.Cues);
     }
 
     [Fact]

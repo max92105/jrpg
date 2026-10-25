@@ -10,10 +10,11 @@ internal static class PlaceholderCue
     private static readonly TimeSpan _shown = TimeSpan.FromSeconds(0.3);
     private static readonly TimeSpan _fadeOut = TimeSpan.FromSeconds(0.15);
 
-    /// <param name="sinceShown">Time since the effect landed.</param>
+    /// <param name="sinceShown">Time since the cue's moment; before it, the cue is hidden.</param>
     /// <returns>0 hidden to 1 fully shown.</returns>
     public static float OpacityAt(TimeSpan sinceShown) =>
-        sinceShown < _fadeIn ? (float)(sinceShown / _fadeIn)
+        sinceShown < TimeSpan.Zero ? 0
+        : sinceShown < _fadeIn ? (float)(sinceShown / _fadeIn)
         : sinceShown < _fadeIn + _shown ? 1
         : Math.Max(0, 1 - (float)((sinceShown - _fadeIn - _shown) / _fadeOut));
 }

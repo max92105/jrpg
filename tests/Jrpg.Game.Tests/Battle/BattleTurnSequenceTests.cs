@@ -157,6 +157,24 @@ public sealed class BattleTurnSequenceTests
         Assert.Equal(5, battle.Combatants[0].Resources.AmountOf("mana"));
     }
 
+    // Ragnir acts first; Shield Bash stuns goblin A, whose turn is skipped, so goblin B steps forward next.
+    [Fact]
+    public void Update_EnemyStunnedByBash_NextStageIsTheFollowingActor()
+    {
+        var random = new SeededRandom(BattleScenarios.SarxianFirstSeed);
+        var battle = BattleScenarios.MemberAgainstGoblinTrio("ragnir", new Inventory(), random);
+        var sequence = new BattleTurnSequence(battle, new EnemyTactics(random), RepositoryScreenText.Text.Messages);
+        sequence.Update(_step);
+
+        sequence.Submit(new SkillCommand(BattleScenarios.Catalog.Skills["shield_bash"], [battle.Combatants[1]]));
+        sequence.Update(BattlePacing.ImpactHold + BattlePacing.SkipHold + BattlePacing.Step);
+
+        sequence.Update(TimeSpan.FromSeconds(0.1));
+
+        Assert.Equal(TurnStage.StepForward, sequence.Stage);
+        Assert.Same(battle.Combatants[2], sequence.Actor);
+    }
+
     private static (BattleState Battle, BattleTurnSequence Sequence) SarxianAgainstGoblinTrio(int seed)
     {
         var random = new SeededRandom(seed);

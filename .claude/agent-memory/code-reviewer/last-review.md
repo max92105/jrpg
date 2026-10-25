@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/ST2.md, slice ST2 (a stunned combatant loses its turn)
-Round: 1 (verdict: Ready to commit; verify all pass, 1853 tests)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/FT1.md, slice FT1 (fighter stamina + Shield Bash stun; statuses on screen)
+Round: 1 (verdict: Ready to commit; verify all pass, 1861 tests)
 
-- Suggestion, open: Execute_StatusOnOther_CountsDownAtEndOfHolderTurn could assert the TurnSkipped for the second goblin, so the name's "holder turn" is visible in the test.
-- Follow-up: the IsOver return inside AdvanceToNextActor can't happen yet (upkeep can't kill); test it when a damage-over-time status lands.
-- Follow-up: the battle screen throws on TurnSkipped (known gap, FT1).
-- Follow-up: BattleState at 296 lines; move turn flow out on the next slice touching it (Done note).
-- ST1 findings (StatusEnded battle-level test, fall order pin): fixed by ST2's tests.
+- Warning, open: PartyStatusPanel.Statuses is a StatusTagsText, beside Combatant.Statuses (a StatusSet); rename StatusTags.
+- Suggestion, open: no test that two TurnSkipped in one action share one Skip beat and one ShowsAt (ActionPlayback.AddSkipCue).
+- Suggestion, open: PlaceholderCue.OpacityAt's new "before its moment is 0" branch has no test.
+- Follow-up: Shield Bash on the very next actor grants and ends the stun in one Execute, so the "STUN 1" tag never shows (hand check wording / design).
+- Follow-up (from ST2, still open): BattleState size; IsOver inside AdvanceToNextActor untested until a damage-over-time status.

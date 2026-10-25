@@ -3,7 +3,9 @@
     "id": "fighter", "name": "Fighter",
     "description": "A trained fighter who stands in front and wins by steel and endurance.",
     "base": { "maxHp": 220, "attack": 24, "defense": 8 },
-    "growth": { "maxHp": 22, "attack": 3, "defense": 1 } },
+    "growth": { "maxHp": 22, "attack": 3, "defense": 1 },
+    "skillIds": ["power_strike", "shield_bash"],
+    "resources": [ { "id": "stamina", "name": "Stamina", "max": 6, "startsAt": 3, "gains": { "perTurn": 1 } } ] },
   {
     "id": "mage", "name": "Mage",
     "description": "A scholar of the arcane who bends raw magic into fire, frost and storm.",

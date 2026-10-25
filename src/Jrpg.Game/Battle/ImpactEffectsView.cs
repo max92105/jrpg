@@ -51,11 +51,15 @@ internal sealed class ImpactEffectsView
             DrawStrip(batch, textures, playback.Strips[index], playback.Elapsed);
         }
 
-        var cueOpacity = PlaceholderCue.OpacityAt(playback.Elapsed);
-        for (var index = 0; cueOpacity > 0 && index < _cueTexts.Length; index++)
+        for (var index = 0; index < _cueTexts.Length; index++)
         {
-            var area = EffectArea(textures, playback.Cues[index].Target);
-            _cueFont.DrawCentered(batch, _cueTexts[index], area.Center.ToVector2(), (UiTheme.TextPrimary * cueOpacity, 1));
+            var cue = playback.Cues[index];
+            var opacity = PlaceholderCue.OpacityAt(playback.Elapsed - cue.ShowsAt);
+            if (opacity > 0)
+            {
+                var area = EffectArea(textures, cue.Target);
+                _cueFont.DrawCentered(batch, _cueTexts[index], area.Center.ToVector2(), (UiTheme.TextPrimary * opacity, 1));
+            }
         }
     }
 

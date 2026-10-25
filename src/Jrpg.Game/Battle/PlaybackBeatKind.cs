@@ -11,4 +11,7 @@ internal enum PlaybackBeatKind
 
     /// <summary>Someone falls.</summary>
     Defeat,
+
+    /// <summary>A combatant loses its turn to a stun, after the action's other beats.</summary>
+    Skip,
 }

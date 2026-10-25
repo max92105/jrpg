@@ -28,10 +28,13 @@ internal sealed class PartyStatusView
     private const int ResourceRowGap = 2;
     private const int ResourcePixels = 24;
     private const int MaxResourcePixels = 15;
+    private const int StatusTagGap = 12;
 
     private readonly UiTextures _ui;
     private readonly OutlinedFont _nameFont;
     private readonly PartyStatusPanel[] _panels;
+    private readonly OutlinedFont _tagFont;
+    private readonly MeasuredText[] _statusTags;
 
     /// <param name="party">The party's combatants, in active order.</param>
     /// <param name="text">Messages and fonts.</param>
@@ -45,6 +48,7 @@ internal sealed class PartyStatusView
         var resourceStyle = new VitalRowStyle(
             label, new OutlinedFont(text.Fonts.FontAt(ResourcePixels)), new OutlinedFont(text.Fonts.FontAt(MaxResourcePixels)), Width: 190, SmallTextLift: 4);
         var hpLabel = MeasuredText.Of(label.Font, text.Messages.Text(MessageIds.StatHp));
+        _tagFont = label;
         _panels =
         [
             .. party.Select(member => new PartyStatusPanel(
@@ -53,15 +57,21 @@ internal sealed class PartyStatusView
                 new PartyStatusRows(new BattleVitalRow(hpStyle, hpLabel, ui, UiTheme.BattleHpBar), ResourceRowsOf(member, resourceStyle, ui)),
                 text.Messages)),
         ];
+        _statusTags = [.. _panels.Select(_ => new MeasuredText(string.Empty, 0))];
         Refresh();
     }
 
     /// <summary>Formats the numbers that changed since the last refresh; allocates nothing when none did.</summary>
     public void Refresh()
     {
-        foreach (var panel in _panels)
+        for (var index = 0; index < _panels.Length; index++)
         {
-            panel.Refresh();
+            _panels[index].Refresh();
+            var line = _panels[index].StatusTags.Line;
+            if (!ReferenceEquals(line, _statusTags[index].Text))
+            {
+                _statusTags[index] = MeasuredText.Of(_tagFont.Font, line);
+            }
         }
     }
 
@@ -71,10 +81,13 @@ internal sealed class PartyStatusView
     public void Draw(SpriteBatch batch, TextureLibrary textures, Combatant? actor)
     {
         var top = TopMargin;
-        foreach (var panel in _panels)
+        for (var index = 0; index < _panels.Length; index++)
         {
+            var panel = _panels[index];
             var slide = panel.Combatant == actor ? ActiveSlide : 0;
-            DrawPanel(batch, textures, panel, new Point(VirtualScreen.Width - RightMargin - slide, top));
+            var topRight = new Point(VirtualScreen.Width - RightMargin - slide, top);
+            DrawPanel(batch, textures, panel, topRight);
+            DrawStatusTags(batch, _statusTags[index], panel, topRight);
             top += HeightOf(panel) + PanelGap;
         }
     }
@@ -97,6 +110,21 @@ internal sealed class PartyStatusView
             panel.ResourceRows[index].Draw(batch, textures, new Point(textRight, rowTop), UiTheme.TextPrimary * opacity);
             rowTop += panel.ResourceRows[index].Height;
         }
+    }
+
+    // Left of the name, on its line, so the rows under it keep their place.
+    private void DrawStatusTags(SpriteBatch batch, MeasuredText tags, PartyStatusPanel panel, Point topRight)
+    {
+        if (tags.Width == 0)
+        {
+            return;
+        }
+
+        var opacity = panel.Combatant.IsAlive ? 1 : FallenOpacity;
+        var nameLeft = topRight.X - PortraitSize - PortraitGap - panel.Name.Width;
+        var nameMiddle = topRight.Y + (_nameFont.Font.LineHeight / 2);
+        var position = new Vector2(nameLeft - StatusTagGap - tags.Width, nameMiddle - (_tagFont.Font.LineHeight / 2));
+        _tagFont.Draw(batch, tags.Text, position, UiTheme.TextSecondary * opacity);
     }
 
     private static List<BattleVitalRow> ResourceRowsOf(Combatant member, VitalRowStyle style, UiTextures ui) =>

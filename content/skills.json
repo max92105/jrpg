@@ -46,5 +46,24 @@
     "iconFile": "",
     "requirements": [ { "resourceId": "faith", "atLeast": 4 } ],
     "effect": { "kind": "restoreHp", "power": 50, "targeting": "allAllies" }
+  },
+  {
+    "id": "power_strike",
+    "name": "Power Strike",
+    "description": "A heavy blow on one enemy. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "resourceChanges": [ { "resourceId": "stamina", "amount": -2 } ],
+    "effect": { "kind": "damage", "power": 35, "targeting": "singleEnemy" }
+  },
+  {
+    "id": "shield_bash",
+    "name": "Shield Bash",
+    "description": "Strikes one enemy with the shield and stuns it for a turn. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "resourceChanges": [ { "resourceId": "stamina", "amount": -3 } ],
+    "effect": {
+      "kind": "damage", "power": 15, "targeting": "singleEnemy",
+      "status": { "kind": "stun", "power": 0, "turns": 1 }
+    }
   }
 ]

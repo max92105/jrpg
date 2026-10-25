@@ -7,8 +7,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Under each living enemy, its shown name and a thin red HP bar, on the left edge of its spot. A fallen enemy's tag
-/// fades out with it.
+/// Under each living enemy, its shown name and a thin red HP bar, on the left edge of its spot, and its status tags
+/// under the bar. A fallen enemy's tag fades out with it.
 /// </summary>
 internal sealed class EnemyTagView
 {
@@ -18,6 +18,7 @@ internal sealed class EnemyTagView
     private const int NameGap = 3;
     private const int BarHeight = 4;
     private const int GapBelowSprite = 38;
+    private const int StatusTagsGap = 2;
 
     private readonly BattleTurnSequence _sequence;
     private readonly OutlinedFont _font;
@@ -25,6 +26,7 @@ internal sealed class EnemyTagView
     private readonly string[] _labels;
     private readonly StatBar[] _bars;
     private readonly Rectangle[] _tagAreas;
+    private readonly StatusTagsText[] _statusTags;
 
     /// <param name="combatants">The battle's combatants, in its order.</param>
     /// <param name="sequence">Whose fall is playing, so a fallen enemy's tag fades with it.</param>
@@ -44,15 +46,17 @@ internal sealed class EnemyTagView
         _tagAreas = [.. enemies.Select(enemy => new Rectangle(enemy.Spot.X, enemy.Spot.Bottom + GapBelowSprite - tagHeight, TagWidth, tagHeight))];
         _labels = [.. EnemyLabels.Of([.. _enemies.Select(enemy => enemy.Name)], text.Messages)];
         _bars = [.. _enemies.Select(_ => new StatBar(ui, UiTheme.EnemyHpBar, UiTheme.BattleBarTrack))];
+        _statusTags = [.. _enemies.Select(enemy => new StatusTagsText(enemy.Statuses, text.Messages))];
         Refresh();
     }
 
-    /// <summary>Fills each bar to its enemy's HP now.</summary>
+    /// <summary>Fills each bar to its enemy's HP now, and writes its statuses.</summary>
     public void Refresh()
     {
         for (var index = 0; index < _enemies.Length; index++)
         {
             _bars[index].Show(_enemies[index].Vitals.Hp, _enemies[index].Vitals.MaxHp);
+            _statusTags[index].Refresh();
         }
     }
 
@@ -67,6 +71,7 @@ internal sealed class EnemyTagView
                 var area = _tagAreas[index];
                 _font.Draw(batch, _labels[index], new Vector2(area.X, area.Y), UiTheme.TextPrimary * opacity);
                 _bars[index].Draw(batch, textures, new Rectangle(area.X, area.Bottom - BarHeight, area.Width, BarHeight), opacity);
+                _font.Draw(batch, _statusTags[index].Line, new Vector2(area.X, area.Bottom + StatusTagsGap), UiTheme.TextSecondary * opacity);
             }
         }
     }

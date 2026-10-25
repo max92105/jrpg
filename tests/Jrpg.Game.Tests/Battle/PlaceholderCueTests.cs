@@ -12,6 +12,12 @@ public sealed class PlaceholderCueTests
     }
 
     [Fact]
+    public void OpacityAt_BeforeItsMoment_IsHidden()
+    {
+        Assert.Equal(0, PlaceholderCue.OpacityAt(TimeSpan.FromSeconds(-0.1)));
+    }
+
+    [Fact]
     public void OpacityAt_PastLength_IsHidden()
     {
         Assert.Equal(0, PlaceholderCue.OpacityAt(TimeSpan.FromSeconds(0.7)));

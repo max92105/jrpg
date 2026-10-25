@@ -287,6 +287,15 @@ internal static class MessageIds
     /// <summary>Placeholder <c>{resource}</c>: the hint on Confirm when the actor lacks it for the skill.</summary>
     public const string BattleNotEnoughResource = "battle_not_enough_resource";
 
+    /// <summary>The Stun status's name: its cue when granted, and its tag (ADR 0021).</summary>
+    public const string StatusStun = "status_stun";
+
+    /// <summary>The cue on a combatant whose turn a stun took.</summary>
+    public const string BattleTurnSkipped = "battle_turn_skipped";
+
+    /// <summary>Placeholders <c>{status}</c>, <c>{turns}</c>: one status in a battle tag line ("STUN 1").</summary>
+    public const string BattleStatusTag = "battle_status_tag";
+
     /// <summary>Placeholder <c>{count}</c>: how many copies of an item the party owns, on its row in battle.</summary>
     public const string BattleItemCount = "battle_item_count";
 

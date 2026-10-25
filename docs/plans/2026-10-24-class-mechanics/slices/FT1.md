@@ -36,3 +36,12 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
     - As Ragnir: Shield Bash a goblin. "Stun" pops and "STUN 1" shows.
     - Its turn shows "Stunned" and passes; the tag goes.
     - Stamina greys Power Strike after two uses and comes back one point a turn.
+- **Done, with deviations:** Tests 1853 before, 1863 after. Beyond the plan:
+  - **Cue timing:** `CueOnTarget` gains a defaulted `ShowsAt`, so the "Stunned" cue shows on its own Skip beat (0.8 s, `BattlePacing.SkipHold`) after the impact, not with it. `PlaceholderCue` hides a cue before its moment, and every lost turn in one action shares the one Skip beat.
+  - **Tag format:** `battle_status_tag` ("{status} {turns}") is a new message. The status name is capitalized in code; LK1/LK2 bring the real look.
+  - **Tag placement:** a member's tags sit left of the name on its line. An enemy's tags sit under its HP bar.
+  - **Placeholders:** the two skills' descriptions are marked as placeholders.
+  - **From review:**
+    - The panel's line is `StatusTags`, so it isn't read as the Core `StatusSet`.
+    - Two new tests: two skips share one Skip beat, and a cue is hidden before its moment.
+    - A stun on the very next actor is granted and spent inside one `Execute`, so only its cues show and the "STUN 1" tag never appears. The tag shows when the stunned enemy acts later.

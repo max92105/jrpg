@@ -2,6 +2,7 @@ using Jrpg.Core.Effects;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
+using Jrpg.Core.Statuses;
 using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Tests.Content;
@@ -117,6 +118,18 @@ public sealed class ContentCatalogLoaderTests
         Assert.Equal(["training_dummy"], encounter.EnemyIds);
         Assert.Equal(400, catalog.Enemies["training_dummy"].MaxHp);
         Assert.DoesNotContain(catalog.Maps.Values, map => map.Settings.RandomEncounters?.EncounterIds.Contains("training_dummy") == true);
+    }
+
+    [Fact]
+    public void Load_RepositoryContent_FighterHasStamina()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        var fighter = catalog.ClassOf(catalog.PartyMembers["ragnir"]);
+
+        var stamina = fighter.Resources.Single(resource => resource.Id == "stamina");
+        Assert.Equal((6, 3, 1), (stamina.Max, stamina.StartsAt, stamina.Gains.PerTurn));
+        Assert.Equal(new StatusGrant(StatusKind.Stun, 0, 1), catalog.Skills["shield_bash"].Effect.Status);
     }
 
     [Fact]

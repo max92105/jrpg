@@ -6,9 +6,10 @@ namespace Jrpg.Game.Battle;
 
 /// <summary>
 /// One turn's events as the beats the screen plays (design key decision 4): a banner for a skill, an item or Defend, an
-/// impact when effects land, a defeat when someone falls. The hold lasts as long as the beats; Defend and Run hold
-/// nothing. On the impact, each landed effect pops its amount and shows on its target, damage as the attacker's effect
-/// strip, anything else as a placeholder cue (decision 101); whoever fell shows white, then fades on the defeat beat.
+/// impact when effects land, a defeat when someone falls, a skip when a stun takes a turn. The hold lasts as long as
+/// the beats; Defend and Run hold nothing. On the impact, each landed effect pops its amount and shows on its target,
+/// damage as the attacker's effect strip, anything else as a placeholder cue (decision 101), and a granted status
+/// shows its name; whoever fell shows white, then fades on the defeat beat. A lost turn shows "Stunned" on its beat.
 /// An event it doesn't know throws, so a new mechanic can't be shown silently wrong (ADR 0004).
 /// </summary>
 internal sealed class ActionPlayback
@@ -91,13 +92,7 @@ internal sealed class ActionPlayback
         switch (battleEvent)
         {
             case ActionStarted started:
-                BannerText = BannerTextFor(started, messages);
-                _attackEffectFile = BattlerArt.Of(started.Actor).AttackEffectFile;
-                if (BannerText is not null)
-                {
-                    AddBeatOnce(PlaybackBeatKind.Banner, TimeSpan.Zero);
-                }
-
+                AddBanner(started, messages);
                 break;
             case EffectApplied effect:
                 AddBeatOnce(PlaybackBeatKind.Impact, BattlePacing.ImpactHold);
@@ -107,8 +102,17 @@ internal sealed class ActionPlayback
                 AddBeatOnce(PlaybackBeatKind.Defeat, BattlePacing.DefeatHold - BattlePacing.ImpactHold);
                 _fallen.Add(defeated.Combatant);
                 break;
-            // The panel reads live amounts at the next stage change (ADR 0013), so a change needs no beat of its own.
+            case StatusApplied applied:
+                AddBeatOnce(PlaybackBeatKind.Impact, BattlePacing.ImpactHold);
+                _cues.Add(new CueOnTarget(applied.Target, messages.Text(StatusTagsText.NameIdOf(applied.Status))));
+                break;
+            case TurnSkipped skipped:
+                AddSkipCue(skipped.Combatant, messages);
+                break;
+
+            // Panels and tags read live amounts and statuses at the next stage change (ADR 0013), so no beat.
             case ResourceChanged:
+            case StatusEnded:
             case BattleEnded:
                 break;
             default:
@@ -129,6 +133,24 @@ internal sealed class ActionPlayback
         {
             _cues.Add(new CueOnTarget(effect.Target, actionName));
         }
+    }
+
+    private void AddBanner(ActionStarted started, UiMessages messages)
+    {
+        BannerText = BannerTextFor(started, messages);
+        _attackEffectFile = BattlerArt.Of(started.Actor).AttackEffectFile;
+        if (BannerText is not null)
+        {
+            AddBeatOnce(PlaybackBeatKind.Banner, TimeSpan.Zero);
+        }
+    }
+
+    // Every lost turn in one Execute shares one beat after the action's own, and each cue shows when it starts.
+    private void AddSkipCue(Combatant combatant, UiMessages messages)
+    {
+        var start = _beats.TakeWhile(beat => beat.Kind != PlaybackBeatKind.Skip).Aggregate(TimeSpan.Zero, (total, beat) => total + beat.Duration);
+        AddBeatOnce(PlaybackBeatKind.Skip, BattlePacing.SkipHold);
+        _cues.Add(new CueOnTarget(combatant, messages.Text(MessageIds.BattleTurnSkipped), start));
     }
 
     // Effects landing together make one impact, and any falls one defeat, however many targets there are.

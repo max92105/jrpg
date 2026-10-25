@@ -17,4 +17,7 @@ internal static class BattlePacing
 
     /// <summary>The hold after an action that fells someone: long enough to see them go.</summary>
     public static TimeSpan DefeatHold { get; } = TimeSpan.FromSeconds(2.0);
+
+    /// <summary>How long a lost turn holds its "Stunned" cue: long enough to read it.</summary>
+    public static TimeSpan SkipHold { get; } = TimeSpan.FromSeconds(0.8);
 }

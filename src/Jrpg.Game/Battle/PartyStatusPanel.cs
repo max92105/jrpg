@@ -4,8 +4,8 @@ using Jrpg.Game.Ui;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// One party member's panel: the name, the HP row, one row per class resource under it, and the portrait the view
-/// draws them with.
+/// One party member's panel: the name, the HP row, one row per class resource under it, the status tags, and the
+/// portrait the view draws them with.
 /// </summary>
 internal sealed class PartyStatusPanel
 {
@@ -24,6 +24,7 @@ internal sealed class PartyStatusPanel
         PortraitFile = BattlerArt.Of(combatant).PortraitFile;
         _vitals = new VitalsText(messages);
         _resources = new ResourceRowsText(combatant.Resources, messages);
+        StatusTags = new StatusTagsText(combatant.Statuses, messages);
     }
 
     public Combatant Combatant { get; }
@@ -36,11 +37,15 @@ internal sealed class PartyStatusPanel
 
     public string PortraitFile { get; }
 
+    /// <summary>The member's statuses as a line of tags, refreshed with the rest.</summary>
+    public StatusTagsText StatusTags { get; }
+
     public void Refresh()
     {
         var vitals = Combatant.Vitals;
         _vitals.Refresh(vitals);
         HpRow.Show(_vitals.Hp, _vitals.MaxHp, vitals.Hp, vitals.MaxHp);
+        StatusTags.Refresh();
         _resources.Refresh();
         var meters = Combatant.Resources;
         for (var index = 0; index < _resources.Count; index++)

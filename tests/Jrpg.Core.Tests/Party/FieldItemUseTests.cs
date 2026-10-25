@@ -235,7 +235,7 @@ public sealed class FieldItemUseTests
     }
 
     private static PartyMember Member(string id, int hp) =>
-        new PartyMemberBuilder().WithId(id).WithVitals(hp, maxHp: 100, mp: 0, maxMp: 0).Build();
+        new PartyMemberBuilder().WithId(id).WithVitals(hp, maxHp: 100).Build();
 
     private static ItemDefinition Item(string id, EffectKind kind, int power, Targeting targeting, bool isUsableFromMenu = true) =>
         new ItemDefinitionBuilder().WithId(id).WithEffect(new Effect(kind, power, targeting)).Build() with { IsUsableFromMenu = isUsableFromMenu };

@@ -37,8 +37,8 @@ public sealed partial class FileSaveStore(string directory, ContentCatalog catal
     /// </returns>
     /// <exception cref="ArgumentException">The slot name has characters other than a-z, 0-9 and underscore.</exception>
     /// <exception cref="UnreadableSaveException">
-    /// The file is damaged, has no format version (older than versioned saves, ADR 0007) or a newer one, or none of its
-    /// active members exists anymore.
+    /// The file is damaged, has no format version (older than versioned saves, ADR 0007), an older or a newer
+    /// one (ADR 0022), or none of its active members exists anymore.
     /// </exception>
     public RepairedSave? Read(string slotName)
     {
@@ -72,7 +72,7 @@ public sealed partial class FileSaveStore(string directory, ContentCatalog catal
     }
 
     // Saves older than versioned saves (ADR 0007) have no version; a newer version may hold things this build can't know
-    // about.
+    // about; an older one is refused, not migrated, until the first release (ADR 0022).
     private static void CheckFormatVersion(string slotName, JsonObject root)
     {
         if (!root.TryGetPropertyValue(FormatVersionProperty, out var versionNode) || versionNode is null)
@@ -88,6 +88,11 @@ public sealed partial class FileSaveStore(string directory, ContentCatalog catal
         if (version > SaveFile.CurrentFormatVersion)
         {
             throw new UnreadableSaveException(slotName, $"it was made by a newer version of the game (format {version}).");
+        }
+
+        if (version < SaveFile.CurrentFormatVersion)
+        {
+            throw new UnreadableSaveException(slotName, $"it was made by an older version of the game (format {version}).");
         }
     }
 

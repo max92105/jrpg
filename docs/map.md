@@ -44,7 +44,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Audio | Audio folders and the startup check that every voice file exists by exact name (ADR 0018) | `AudioFolders`, `AudioReferenceCheck`; both checks share `Content/ExactFileName` and `Maps/MapEventSteps` |
 | Maps, Items, Party, Skills, Battle, Effects, Resources | One validator per content type (a class's resources by `ResourceDefinitionValidator`, called from the class one) | `MapLayoutValidator`, `ItemCatalogValidator`, … |
 | Messages | The UI message table | `UiMessageLoader` |
-| Saving | Save files: versioned JSON, atomic writes, repair of old or damaged saves | `FileSaveStore`, `SaveGameRepair`, `RepairedSave` |
+| Saving | Save files: versioned JSON (an older or newer format is refused until release, ADR 0022), atomic writes, repair against changed content | `FileSaveStore`, `SaveGameRepair`, `RepairedSave` |
 
 ## Jrpg.Game (MonoGame shell)
 

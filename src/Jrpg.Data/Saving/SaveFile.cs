@@ -8,6 +8,6 @@ namespace Jrpg.Data.Saving;
 /// </summary>
 internal sealed record SaveFile(int FormatVersion, SaveGame Game)
 {
-    /// <summary>The format this build writes. A change bumps it and adds a migration from the previous version.</summary>
-    public const int CurrentFormatVersion = 1;
+    /// <summary>The format this build writes; until release, older ones are refused (ADR 0022).</summary>
+    public const int CurrentFormatVersion = 2;
 }

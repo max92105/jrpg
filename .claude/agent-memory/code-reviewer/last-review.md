@@ -5,9 +5,7 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/M3.md, slice M3 (battle panel shows resources)
-Round: 1 (verdict: Fix the Criticals, then commit)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/MP3a.md, slice MP3a (saves stop keeping MP, format 2)
+Round: 1 (verdict: Ready to commit)
 
-- Critical, open: PartyStatusView.cs:10 summary line starts with `//` not `///` -> CS1570, build fails.
-- Suggestion, open: PartyStatusPanel ctor packs HP + resource rows into a tuple to stay under 4 params; a small named record (or the panel building its rows) reads clearer.
-- Suggestion, open: PartyStatusPanel.Refresh re-reads AmountOf per resource that ResourceRowsText already read; could expose the amount from ResourceRowsText.
+- Suggestion, open: GameSessionSaveTests.CaptureThenRestore_SpentMp_StartsFull ignores TrySpendMp's result; Assert.True on it (or assert Mp < MaxMp before saving) so the test can't pass with a 0-MP class.

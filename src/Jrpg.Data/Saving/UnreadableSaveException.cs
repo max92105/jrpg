@@ -2,7 +2,7 @@ namespace Jrpg.Data.Saving;
 
 /// <summary>
 /// A save file exists but can't be loaded: it's damaged, has no format version (older than versioned saves, ADR 0007), or
-/// is from a newer version.
+/// is from an older (ADR 0022) or a newer version.
 /// </summary>
 public sealed class UnreadableSaveException : Exception
 {

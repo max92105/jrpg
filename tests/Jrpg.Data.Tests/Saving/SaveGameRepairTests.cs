@@ -20,8 +20,8 @@ public sealed class SaveGameRepairTests
 
     private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-    private static readonly PartyMemberProgress _sarxian = new("sarxian", Level: 3, Experience: 42, Hp: 150, Mp: 60, WeaponId: "bronze_sword", ArmorId: "chain_mail");
-    private static readonly PartyMemberProgress _jazog = new("jazog", Level: 1, Experience: 0, Hp: 100, Mp: 5, WeaponId: null, ArmorId: "wizard_robe");
+    private static readonly PartyMemberProgress _sarxian = new("sarxian", Level: 3, Experience: 42, Hp: 150, WeaponId: "bronze_sword", ArmorId: "chain_mail");
+    private static readonly PartyMemberProgress _jazog = new("jazog", Level: 1, Experience: 0, Hp: 100, WeaponId: null, ArmorId: "wizard_robe");
 
     private static readonly SaveGame _save = new()
     {
@@ -145,10 +145,10 @@ public sealed class SaveGameRepairTests
     [Fact]
     public void Repair_HpAboveClassMaxAtSavedLevel_ClampsAndReports()
     {
-        var repaired = Repair(_save with { Members = [_sarxian with { Hp = 999, Mp = -4 }, _jazog] });
+        var repaired = Repair(_save with { Members = [_sarxian with { Hp = 999 }, _jazog] });
 
-        Assert.Equal((188, 0), (repaired.Save.Members[0].Hp, repaired.Save.Members[0].Mp));
-        Assert.Equal(["party member 'sarxian': HP/MP 999/-4 brought within 0..188/0..84."], repaired.Changes);
+        Assert.Equal(188, repaired.Save.Members[0].Hp);
+        Assert.Equal(["party member 'sarxian': HP 999 brought within 0..188."], repaired.Changes);
     }
 
     [Fact]

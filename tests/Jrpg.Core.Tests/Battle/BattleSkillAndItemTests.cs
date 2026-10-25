@@ -13,8 +13,8 @@ public sealed class BattleSkillAndItemTests
     private static readonly SkillDefinition _fireball = Skill("fireball", new Effect(EffectKind.Damage, 20, Targeting.AllEnemies));
     private static readonly SkillDefinition _heal = Skill("heal", new Effect(EffectKind.RestoreHp, 15, Targeting.SingleAlly));
 
-    private readonly Combatant _mage = PartyCombatant("mage", hp: 100, mp: 30, _fireball, _heal);
-    private readonly Combatant _ally = PartyCombatant("ally", hp: 50, mp: 0);
+    private readonly Combatant _mage = PartyCombatant("mage", hp: 100, _fireball, _heal);
+    private readonly Combatant _ally = PartyCombatant("ally", hp: 50);
     private readonly Combatant _goblin = Goblin();
     private readonly Combatant _otherGoblin = Goblin();
     private readonly Inventory _inventory = new();
@@ -89,7 +89,7 @@ public sealed class BattleSkillAndItemTests
     public void CanUse_ReviveWithNobodyFallen_ReturnsFalse()
     {
         var raise = Skill("raise", new Effect(EffectKind.Revive, 20, Targeting.SingleFallenAlly));
-        var mage = PartyCombatant("mage", hp: 100, mp: 30, raise);
+        var mage = PartyCombatant("mage", hp: 100, raise);
         var battle = new BattleState([mage, _ally, _goblin, _otherGoblin], _inventory, new FixedSequenceRandom(3, 2, 1));
 
         Assert.True(battle.CanAfford(raise));
@@ -257,10 +257,10 @@ public sealed class BattleSkillAndItemTests
     private static ItemDefinition Item(string id, Effect effect) =>
         new ItemDefinitionBuilder().WithId(id).WithEffect(effect).Build();
 
-    private static Combatant PartyCombatant(string id, int hp, int mp, params SkillDefinition[] skills) =>
+    private static Combatant PartyCombatant(string id, int hp, params SkillDefinition[] skills) =>
         Combatant.FromPartyMember(new PartyMemberBuilder()
             .WithId(id)
-            .WithVitals(hp, maxHp: 100, mp, maxMp: 30)
+            .WithVitals(hp, maxHp: 100)
             .WithSkills(skills)
             .Build());
 

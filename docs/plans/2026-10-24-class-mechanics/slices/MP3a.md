@@ -24,3 +24,13 @@ Part of [the class mechanics plan](../README.md). Design: [design.md](../design.
       - `Load_FormatThreeSave_IsRefusedAsNewer`
     - `GameSessionSaveTests`: `Capture_Restore_RoundTripsWithoutMp`
   - **Verify by hand:** a new game saved after this slice continues, keeping HP, level and equipment. (The developer's format 1 test save was deleted on 2026-10-24.)
+- **Done, with deviations:** Tests 1838 before, 1840 after. Test names follow the existing ones:
+  - `Read_FormatOneSave_ThrowsAsOlder`.
+  - `Write_File_HoldsTheFormatTwoEnvelope`, renamed from the version-envelope test.
+  - `Read_NewerFormatVersion_ThrowsNamingTheVersion`, which now uses format 3.
+  - `CaptureThenRestore_SpentMp_StartsFull`.
+
+  Other changes:
+  - The other raw-JSON store tests moved to format 2, so they still reach their own check.
+  - `PartyMemberBuilder.WithVitals` takes HP only now, and its class has 0 MP.
+  - `PartyMemberTests`' restore case expects full MP. That's the behaviour this slice sets: a restored member's MP starts full.

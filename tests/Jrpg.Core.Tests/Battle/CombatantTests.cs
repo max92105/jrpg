@@ -13,7 +13,7 @@ public sealed class CombatantTests
     [Fact]
     public void FromPartyMember_DamageInBattle_PersistsOnMember()
     {
-        var member = new PartyMemberBuilder().WithVitals(hp: 100, maxHp: 100, mp: 0, maxMp: 0).Build();
+        var member = new PartyMemberBuilder().WithVitals(hp: 100, maxHp: 100).Build();
         var combatant = Combatant.FromPartyMember(member);
 
         combatant.Vitals.TakeDamage(30);

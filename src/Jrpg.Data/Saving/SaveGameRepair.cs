@@ -76,13 +76,12 @@ internal sealed class SaveGameRepair
             Level = level,
             Experience = experience,
             Hp = Math.Clamp(progress.Hp, 0, maxima.MaxHp),
-            Mp = Math.Clamp(progress.Mp, 0, maxima.MaxMp),
             WeaponId = RepairWornItem(progress.WeaponId, EquipmentSlot.Weapon, definition),
             ArmorId = RepairWornItem(progress.ArmorId, EquipmentSlot.Armor, definition),
         };
-        if ((repaired.Hp, repaired.Mp) != (progress.Hp, progress.Mp))
+        if (repaired.Hp != progress.Hp)
         {
-            _changes.Add($"party member '{progress.Id}': HP/MP {progress.Hp}/{progress.Mp} brought within 0..{maxima.MaxHp}/0..{maxima.MaxMp}.");
+            _changes.Add($"party member '{progress.Id}': HP {progress.Hp} brought within 0..{maxima.MaxHp}.");
         }
 
         return repaired;

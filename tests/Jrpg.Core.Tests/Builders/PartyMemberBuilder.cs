@@ -11,8 +11,6 @@ internal sealed class PartyMemberBuilder
     private int _experience;
     private int _hp = 100;
     private int _maxHp = 100;
-    private int _mp = 20;
-    private int _maxMp = 20;
     private int _attack = 10;
     private int _defense = 5;
     private SkillDefinition[] _skills = [];
@@ -36,12 +34,10 @@ internal sealed class PartyMemberBuilder
         return this;
     }
 
-    public PartyMemberBuilder WithVitals(int hp, int maxHp, int mp, int maxMp)
+    public PartyMemberBuilder WithVitals(int hp, int maxHp)
     {
         _hp = hp;
         _maxHp = maxHp;
-        _mp = mp;
-        _maxMp = maxMp;
         return this;
     }
 
@@ -66,10 +62,10 @@ internal sealed class PartyMemberBuilder
     {
         var characterClass = new ClassBuilder()
             .WithId(_classId)
-            .WithBase(new ClassStats(_maxHp, _maxMp, _attack, _defense))
+            .WithBase(new ClassStats(_maxHp, MaxMp: 0, _attack, _defense))
             .WithSkills([.. _skills.Select(skill => skill.Id)])
             .Build();
-        var progress = new PartyMemberProgress(_id, _level, _experience, _hp, _mp, WeaponId: null, ArmorId: null);
+        var progress = new PartyMemberProgress(_id, _level, _experience, _hp, WeaponId: null, ArmorId: null);
         return PartyMember.Restore(BuildDefinition(), characterClass, _skills.ToDictionary(skill => skill.Id), progress);
     }
 

@@ -33,6 +33,18 @@ public sealed class GameSessionSaveTests
         .WithSteps(new GiveItemStep("potion", 1), new SwapObjectStep("chest_opened"))
         .Build();
 
+    // Saves keep no MP (ADR 0022); MP stays in Vitals, unused, until MP3b removes it.
+    [Fact]
+    public void CaptureThenRestore_SpentMp_StartsFull()
+    {
+        var session = StartNew();
+        Assert.True(session.Party.Leader.Vitals.TrySpendMp(3));
+
+        var restored = SaveAndRestore(session).Party.Leader;
+
+        Assert.Equal(restored.Vitals.MaxMp, restored.Vitals.Mp);
+    }
+
     [Fact]
     public void CaptureThenRestore_RestoresLevelsExperienceAndVitals()
     {
@@ -40,13 +52,11 @@ public sealed class GameSessionSaveTests
         var leader = session.Party.Leader;
         leader.GainExperience(150, new ExperienceTable([100, 200]));
         leader.Vitals.TakeDamage(7);
-        leader.Vitals.TrySpendMp(3);
 
         var restored = SaveAndRestore(session).Party.Leader;
 
         Assert.Equal((2, 50), (restored.Level, restored.Experience));
-        Assert.Equal((leader.Vitals.Hp, leader.Vitals.Mp), (restored.Vitals.Hp, restored.Vitals.Mp));
-        Assert.Equal((leader.Vitals.MaxHp, leader.Vitals.MaxMp), (restored.Vitals.MaxHp, restored.Vitals.MaxMp));
+        Assert.Equal((leader.Vitals.Hp, leader.Vitals.MaxHp), (restored.Vitals.Hp, restored.Vitals.MaxHp));
     }
 
     [Fact]
@@ -62,7 +72,7 @@ public sealed class GameSessionSaveTests
         Assert.Equal(["sarxian", "jazog"], restored.ActiveMembers.Select(member => member.Id));
     }
 
-    // A save keeps only level, experience, HP and MP, so one from before classes had stats loads as is (ADR 0017).
+    // A save keeps only level, experience and HP, so the stats come from the class at the saved level (ADR 0017).
     [Fact]
     public void Restore_MemberSavedAtLevelThree_HasTheClassStatsAtThree()
     {
@@ -72,12 +82,12 @@ public sealed class GameSessionSaveTests
             .Build();
         var catalog = Catalog(_belowChest) with { Classes = new Dictionary<string, ClassDefinition> { ["fighter"] = growing } };
         var save = StartNew().Capture(_savedAt);
-        var savedAtThree = save with { Members = [save.Members[0] with { Level = 3, Hp = 90, Mp = 12 }] };
+        var savedAtThree = save with { Members = [save.Members[0] with { Level = 3, Hp = 90 }] };
 
         var leader = GameSession.Restore(savedAtThree, catalog, new FixedSequenceRandom()).Party.Leader;
 
         Assert.Equal(new CombatStats(Attack: 16, Defense: 7), leader.BaseStats);
-        Assert.Equal((90, 120, 12, 24), (leader.Vitals.Hp, leader.Vitals.MaxHp, leader.Vitals.Mp, leader.Vitals.MaxMp));
+        Assert.Equal((90, 120), (leader.Vitals.Hp, leader.Vitals.MaxHp));
     }
 
     [Fact]

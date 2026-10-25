@@ -348,7 +348,7 @@ public sealed class BattleStateTests
     }
 
     private static Combatant Hero(int hp) => Combatant.FromPartyMember(
-        new PartyMemberBuilder().WithStats(attack: 15, defense: 8).WithVitals(hp, maxHp: 100, mp: 0, maxMp: 0).Build());
+        new PartyMemberBuilder().WithStats(attack: 15, defense: 8).WithVitals(hp, maxHp: 100).Build());
 
     private static Combatant Goblin(int hp) =>
         Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, attack: 20, defense: 2).Build());

@@ -18,7 +18,8 @@ public sealed class PartyMember
         Experience = progress.Experience;
         var stats = ClassGrowth.StatsAt(characterClass, progress.Level);
         BaseStats = BaseStatsOf(stats);
-        Vitals = new Vitals(progress.Hp, stats.MaxHp, progress.Mp, stats.MaxMp);
+        // Saves no longer keep MP, and nothing uses it (ADR 0022): it starts full until MP3b removes it.
+        Vitals = new Vitals(progress.Hp, stats.MaxHp, stats.MaxMp, stats.MaxMp);
     }
 
     public string Id => Definition.Id;
@@ -55,7 +56,7 @@ public sealed class PartyMember
     {
         var levelOne = ClassGrowth.StatsAt(characterClass, 1);
         var starting = new PartyMemberProgress(
-            definition.Id, Level: 1, Experience: 0, levelOne.MaxHp, levelOne.MaxMp, WeaponId: null, ArmorId: null);
+            definition.Id, Level: 1, Experience: 0, levelOne.MaxHp, WeaponId: null, ArmorId: null);
         return new(definition, characterClass, SkillsOf(characterClass, skillCatalog), starting);
     }
 
@@ -70,7 +71,7 @@ public sealed class PartyMember
 
     /// <summary>What a save keeps of this member.</summary>
     public PartyMemberProgress CaptureProgress() =>
-        new(Id, Level, Experience, Vitals.Hp, Vitals.Mp, Weapon?.Id, Armor?.Id);
+        new(Id, Level, Experience, Vitals.Hp, Weapon?.Id, Armor?.Id);
 
     /// <summary>The stat preview of taking off what's worn in <paramref name="slot"/>: total stats with that slot empty.</summary>
     public CombatStats StatsWithout(EquipmentSlot slot) => slot switch

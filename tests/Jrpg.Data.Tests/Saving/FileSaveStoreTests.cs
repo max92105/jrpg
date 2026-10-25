@@ -21,8 +21,8 @@ public sealed class FileSaveStoreTests : IDisposable
         Location = new MapLocation("start", new Point2D(10.25, 3.5), Facing.Left),
         Members =
         [
-            new PartyMemberProgress("sarxian", Level: 3, Experience: 42, Hp: 77, Mp: 5, WeaponId: "bronze_sword", ArmorId: null),
-            new PartyMemberProgress("jazog", Level: 1, Experience: 0, Hp: 120, Mp: 0, WeaponId: null, ArmorId: "wizard_robe"),
+            new PartyMemberProgress("sarxian", Level: 3, Experience: 42, Hp: 77, WeaponId: "bronze_sword", ArmorId: null),
+            new PartyMemberProgress("jazog", Level: 1, Experience: 0, Hp: 120, WeaponId: null, ArmorId: "wizard_robe"),
         ],
         ActiveMemberIds = ["sarxian", "jazog"],
         Inventory = [new InventoryEntry("potion", 4), new InventoryEntry("bomb", 3)],
@@ -67,13 +67,13 @@ public sealed class FileSaveStoreTests : IDisposable
     }
 
     [Fact]
-    public void Write_File_HoldsTheVersionEnvelope()
+    public void Write_File_HoldsTheFormatTwoEnvelope()
     {
         _store.Write(Slot, _save);
 
         var json = File.ReadAllText(Path.Combine(_directory, "slot_01.json"));
 
-        Assert.StartsWith("{\n  \"formatVersion\": 1,\n  \"game\": {", json.ReplaceLineEndings("\n"), StringComparison.Ordinal);
+        Assert.StartsWith("{\n  \"formatVersion\": 2,\n  \"game\": {", json.ReplaceLineEndings("\n"), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -99,14 +99,25 @@ public sealed class FileSaveStoreTests : IDisposable
         Assert.Equal(Slot, exception.SlotName);
     }
 
+    // Saves before format 2 kept MP. Until the first release an older save is refused, not migrated (ADR 0022).
     [Fact]
-    public void Read_NewerFormatVersion_ThrowsNamingTheVersion()
+    public void Read_FormatOneSave_ThrowsAsOlder()
     {
-        WriteRaw("""{ "formatVersion": 7, "game": {} }""");
+        WriteRaw("""{ "formatVersion": 1, "game": {} }""");
 
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
 
-        Assert.Equal("it was made by a newer version of the game (format 7).", exception.Reason);
+        Assert.Equal("it was made by an older version of the game (format 1).", exception.Reason);
+    }
+
+    [Fact]
+    public void Read_NewerFormatVersion_ThrowsNamingTheVersion()
+    {
+        WriteRaw("""{ "formatVersion": 3, "game": {} }""");
+
+        var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
+
+        Assert.Equal("it was made by a newer version of the game (format 3).", exception.Reason);
     }
 
     [Theory]
@@ -125,7 +136,7 @@ public sealed class FileSaveStoreTests : IDisposable
     [Fact]
     public void Read_MalformedJson_ThrowsNamingTheSlot()
     {
-        WriteRaw("""{ "formatVersion": 1, "game": { """);
+        WriteRaw("""{ "formatVersion": 2, "game": { """);
 
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
 
@@ -164,8 +175,8 @@ public sealed class FileSaveStoreTests : IDisposable
     public void Read_DuplicateProperty_ThrowsUnreadable(string property)
     {
         WriteRaw(property == "game"
-            ? """{ "formatVersion": 1, "game": {}, "game": {} }"""
-            : """{ "formatVersion": 1, "formatVersion": 1, "game": {} }""");
+            ? """{ "formatVersion": 2, "game": {}, "game": {} }"""
+            : """{ "formatVersion": 2, "formatVersion": 2, "game": {} }""");
 
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
 

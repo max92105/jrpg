@@ -137,7 +137,7 @@ public sealed class BattleStateResourceTests
             new PartyMemberBuilder().WithId("zanyr").BuildDefinition(),
             new ClassBuilder().WithId("cleric").WithResources(faith).Build(),
             new Dictionary<string, SkillDefinition>()));
-        var ally = Combatant.FromPartyMember(new PartyMemberBuilder().WithId("ragnir").WithVitals(hp: 1, maxHp: 100, mp: 0, maxMp: 0).Build());
+        var ally = Combatant.FromPartyMember(new PartyMemberBuilder().WithId("ragnir").WithVitals(hp: 1, maxHp: 100).Build());
         var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20, defense: 2).Build());
         var battle = new BattleState([goblin, cleric, ally], new Inventory(), new FixedSequenceRandom(2, 1));
 

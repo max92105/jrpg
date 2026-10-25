@@ -83,7 +83,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **FR1. Warrior becomes Fighter: the id `fighter` everywhere** (content + tests + docs, about 110 lines, mostly mechanical) → [slices/FR1.md](slices/FR1.md)
 
 ### Phase 1: skills from the class, resources and mana
-- [ ] **ADR 0019: Class battle resources** (before M1a) → [slices/ADR-0019.md](slices/ADR-0019.md)
+- [x] **ADR 0019: Class battle resources** (before M1a) → [slices/ADR-0019.md](slices/ADR-0019.md)
 - [ ] **ADR 0020: Skills come from the class** (before CS1; answers question 181) → [slices/ADR-0020.md](slices/ADR-0020.md)
 - [ ] **CS1. Skills come from the class; members lose `skillIds`** (Core + Data + content, about 240 lines, about 60 of them test-site edits) → [slices/CS1.md](slices/CS1.md)
 - [ ] **M1a. Combatants carry their class's resources and gain at the end of each of their turns** (Core, about 230 lines) → [slices/M1a.md](slices/M1a.md)

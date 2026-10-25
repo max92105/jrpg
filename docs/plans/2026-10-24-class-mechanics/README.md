@@ -48,7 +48,7 @@ At the end of this plan, every class fights its own way, with two or three place
 6. **Phase 5: forces and hits (DR1, DR2, MO1).** Ticking statuses, the druid, then the monk's multi-hit.
 7. **Phase 6: run-through (Z1).** The developer plays every class.
 8. **Phase 7: lasting resources and rest (ADR 0024, LR1, LR2, LR3, RS1, RS2, RS3).** What a rest restores comes after the run-through, so play can shape it. It is the second save format change.
-9. **Phase 8: the look (LK1a, LK1b, LK2, LK3, Z2).** Behavior first, then the look.
+9. **Phase 8: the look (LK1a, LK1b, LK2a, LK2b, LK3, Z2).** Behavior first, then the look.
 
 ## Guiding rules
 - **Systems, not balance.** Every number is a placeholder in content (design.md, "Tunables and placeholders"). Every rule the developer hasn't given is a numbered question, with the placeholder used until it's answered. `GoblinTrioSimulation` keeps passing (decision 187).
@@ -141,7 +141,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 8: the look
 - [x] **LK1a. Resource colors: each resource has its color, and its bar is drawn in it** (Core + Data + content + Game, about 170 lines) → [slices/LK1a.md](slices/LK1a.md)
 - [x] **LK1b. Resource look: diamond pips, spaced-caps label, lasting marker, dominant force lit, flash** (Game, about 230 lines) → [slices/LK1b.md](slices/LK1b.md)
-- [ ] **LK2. Status look: small marks with turns left; tick and backfire pops** (Game, about 220 lines) → [slices/LK2.md](slices/LK2.md)
+- [x] **LK2a. Status marks: small diamond marks with turns left, pop and fade** (Game, about 240 lines) → [slices/LK2a.md](slices/LK2a.md)
+- [ ] **LK2b. Tick numbers tinted by their status; the rogue stays forward through a quick skill** (Game, about 130 lines) → [slices/LK2b.md](slices/LK2b.md)
 - [ ] **LK3. Formation look: battlers slide when they swap; the aura's reach and the readied turn are shown** (Game, about 200 lines) → [slices/LK3.md](slices/LK3.md)
 - [ ] **Z2. Play-through check** (manual) → [slices/Z2.md](slices/Z2.md)
 

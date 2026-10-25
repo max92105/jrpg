@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Under each living enemy, its shown name and a thin red HP bar, on the left edge of its spot, and its status tags
+/// Under each living enemy, its shown name and a thin red HP bar, on the left edge of its spot, and its status marks
 /// under the bar. A fallen enemy's tag fades out with it.
 /// </summary>
 internal sealed class EnemyTagView
@@ -18,7 +18,7 @@ internal sealed class EnemyTagView
     private const int NameGap = 3;
     private const int BarHeight = 4;
     private const int GapBelowSprite = 38;
-    private const int StatusTagsGap = 2;
+    private const int StatusMarksGap = 4;
 
     private readonly BattleTurnSequence _sequence;
     private readonly OutlinedFont _font;
@@ -26,7 +26,7 @@ internal sealed class EnemyTagView
     private readonly string[] _labels;
     private readonly StatBar[] _bars;
     private readonly Rectangle[] _tagAreas;
-    private readonly StatusTagsText[] _statusTags;
+    private readonly StatusMarksView[] _statusMarks;
 
     /// <param name="combatants">The battle's combatants, in its order.</param>
     /// <param name="sequence">Whose fall is playing, so a fallen enemy's tag fades with it.</param>
@@ -45,7 +45,7 @@ internal sealed class EnemyTagView
         _tagAreas = [.. enemies.Select(enemy => new Rectangle(enemy.Spot.X, enemy.Spot.Bottom + GapBelowSprite - tagHeight, TagWidth, tagHeight))];
         _labels = [.. EnemyLabels.Of([.. _enemies.Select(enemy => enemy.Name)], text.Messages)];
         _bars = [.. _enemies.Select(_ => new StatBar(ui, UiTheme.EnemyHpBar, UiTheme.BattleBarTrack))];
-        _statusTags = [.. _enemies.Select(enemy => new StatusTagsText(enemy.Statuses, text.Messages))];
+        _statusMarks = [.. _enemies.Select(enemy => new StatusMarksView(enemy.Statuses, text, ui))];
         Refresh();
     }
 
@@ -55,7 +55,16 @@ internal sealed class EnemyTagView
         for (var index = 0; index < _enemies.Length; index++)
         {
             _bars[index].Show(_enemies[index].Vitals.Hp, _enemies[index].Vitals.MaxHp);
-            _statusTags[index].Refresh();
+            _statusMarks[index].Refresh();
+        }
+    }
+
+    /// <summary>Advances the status marks'"'"' pop and fade.</summary>
+    public void Update(TimeSpan delta)
+    {
+        foreach (var marks in _statusMarks)
+        {
+            marks.Update(delta);
         }
     }
 
@@ -70,7 +79,7 @@ internal sealed class EnemyTagView
                 var area = _tagAreas[index];
                 _font.Draw(batch, _labels[index], new Vector2(area.X, area.Y), UiTheme.TextPrimary * opacity);
                 _bars[index].Draw(batch, textures, new Rectangle(area.X, area.Bottom - BarHeight, area.Width, BarHeight), opacity);
-                _font.Draw(batch, _statusTags[index].Line, new Vector2(area.X, area.Bottom + StatusTagsGap), UiTheme.TextSecondary * opacity);
+                _statusMarks[index].Draw(batch, textures, new Point(area.X, area.Bottom + StatusMarksGap), opacity);
             }
         }
     }

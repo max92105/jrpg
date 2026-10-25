@@ -102,6 +102,7 @@ internal sealed class BattleScene : IScene
         _banner.Update(delta);
         _commandPanel.Advance(delta);
         _partyStatus.Update(delta);
+        _enemyTags.Update(delta);
         _sequence.Update(delta);
         if (!ReferenceEquals(_sequence.Playback, _shownPlayback))
         {

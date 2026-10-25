@@ -26,13 +26,12 @@ internal sealed class PartyStatusView
     private const int HpPixels = 30;
     private const int MaxHpPixels = 17;
     private const int ResourceTopGap = 4;
-    private const int StatusTagGap = 12;
+    private const int StatusMarksGap = 12;
 
     private readonly UiTextures _ui;
     private readonly OutlinedFont _nameFont;
     private readonly PartyStatusPanel[] _panels;
-    private readonly OutlinedFont _tagFont;
-    private readonly MeasuredText[] _statusTags;
+    private readonly StatusMarksView[] _statusMarks;
     private readonly Formation _formation;
     private readonly int[] _drawOrder;
 
@@ -47,7 +46,6 @@ internal sealed class PartyStatusView
         var label = new OutlinedFont(text.Fonts.FontAt(LabelPixels));
         var hpStyle = new VitalRowStyle(label, new OutlinedFont(text.Fonts.FontAt(HpPixels)), new OutlinedFont(text.Fonts.FontAt(MaxHpPixels)), Width: 250, SmallTextLift: 5);
         var hpLabel = MeasuredText.Of(label.Font, text.Messages.Text(MessageIds.StatHp));
-        _tagFont = label;
         _panels =
         [
             .. formation.Line.Select(member => new PartyStatusPanel(
@@ -56,7 +54,7 @@ internal sealed class PartyStatusView
                 new PartyStatusRows(new BattleVitalRow(hpStyle, hpLabel, new StatBar(ui, UiTheme.BattleHpBar, UiTheme.BattleBarTrack)), new ResourceGaugeView(member.Resources, label, ui)),
                 text.Messages)),
         ];
-        _statusTags = [.. _panels.Select(_ => new MeasuredText(string.Empty, 0))];
+        _statusMarks = [.. _panels.Select(panel => new StatusMarksView(panel.Combatant.Statuses, text, ui))];
         _drawOrder = new int[_panels.Length];
         Refresh();
     }
@@ -75,11 +73,7 @@ internal sealed class PartyStatusView
         for (var index = 0; index < _panels.Length; index++)
         {
             _panels[index].Refresh();
-            var line = _panels[index].StatusTags.Line;
-            if (!ReferenceEquals(line, _statusTags[index].Text))
-            {
-                _statusTags[index] = MeasuredText.Of(_tagFont.Font, line);
-            }
+            _statusMarks[index].Refresh();
         }
     }
 
@@ -89,6 +83,11 @@ internal sealed class PartyStatusView
         foreach (var panel in _panels)
         {
             panel.Resources.Update(delta);
+        }
+
+        foreach (var marks in _statusMarks)
+        {
+            marks.Update(delta);
         }
     }
 
@@ -104,7 +103,7 @@ internal sealed class PartyStatusView
             var slide = panel.Combatant == actor ? ActiveSlide : 0;
             var topRight = new Point(VirtualScreen.Width - RightMargin - slide, top);
             DrawPanel(batch, textures, panel, topRight);
-            DrawStatusTags(batch, _statusTags[index], panel, topRight);
+            DrawStatusMarks(batch, textures, index, topRight);
             top += HeightOf(panel) + PanelGap;
         }
     }
@@ -124,18 +123,14 @@ internal sealed class PartyStatusView
     }
 
     // Left of the name, on its line, so the rows under it keep their place.
-    private void DrawStatusTags(SpriteBatch batch, MeasuredText tags, PartyStatusPanel panel, Point topRight)
+    private void DrawStatusMarks(SpriteBatch batch, TextureLibrary textures, int index, Point topRight)
     {
-        if (tags.Width == 0)
-        {
-            return;
-        }
-
+        var (panel, marks) = (_panels[index], _statusMarks[index]);
         var opacity = panel.Combatant.IsAlive ? 1 : FallenOpacity;
         var nameLeft = topRight.X - PortraitSize - PortraitGap - panel.Name.Width;
-        var nameMiddle = topRight.Y + (_nameFont.Font.LineHeight / 2);
-        var position = new Vector2(nameLeft - StatusTagGap - tags.Width, nameMiddle - (_tagFont.Font.LineHeight / 2));
-        _tagFont.Draw(batch, tags.Text, position, UiTheme.TextSecondary * opacity);
+        var nameMiddle = topRight.Y + (int)(_nameFont.Font.LineHeight / 2);
+        var topLeft = new Point((int)nameLeft - StatusMarksGap - marks.Width, nameMiddle - (StatusMarksView.MarkSize / 2));
+        marks.Draw(batch, textures, topLeft, opacity);
     }
 
     // Never shorter than the portrait, so the diamonds of neighboring panels can't overlap.

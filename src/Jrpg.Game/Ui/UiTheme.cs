@@ -239,6 +239,12 @@ internal static class UiTheme
     /// <summary>The turn order's enemy tint (#CC8A1C24) laid over <see cref="TurnBackdrop"/>: an enemy's red lower half.</summary>
     public static Color TurnEnemyHalf { get; } = Over(FromStraightArgb(0xCC8A1C24), TurnBackdrop);
 
+    /// <summary>The rim of a harmful status's mark (Stun, Exposed, Poison): warm red.</summary>
+    public static Color StatusHarmfulRim { get; } = FromStraightArgb(0xFFE0533D);
+
+    /// <summary>The rim of a helpful status's mark (Guarded, Regen, Taunt): cool blue.</summary>
+    public static Color StatusHelpfulRim { get; } = FromStraightArgb(0xFF5B8CFF);
+
     /// <summary>The dark ground inside the command list's double frame.</summary>
     public static Color CommandPanelFill { get; } = FromStraightArgb(0x99000000);
 

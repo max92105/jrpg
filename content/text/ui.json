@@ -117,7 +117,6 @@
   "status_regen": "Regen",
   "battle_turn_skipped": "Stunned",
   "battle_backfire": "Backfire",
-  "battle_status_tag": "{status} {turns}",
   "battle_item_count": "x{count}",
   "battle_victory": "Victory!",
   "battle_level_label": "Lv.",

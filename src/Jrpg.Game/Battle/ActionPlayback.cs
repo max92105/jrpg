@@ -117,7 +117,7 @@ internal sealed class ActionPlayback
                 break;
             case StatusApplied applied:
                 AddBeatOnce(PlaybackBeatKind.Impact, BattlePacing.ImpactHold);
-                _cues.Add(new CueOnTarget(applied.Target, messages.Text(StatusTagsText.NameIdOf(applied.Status))));
+                _cues.Add(new CueOnTarget(applied.Target, messages.Text(StatusNames.IdOf(applied.Status))));
                 break;
             case TurnSkipped skipped:
                 AddSkipCue(skipped.Combatant, messages);

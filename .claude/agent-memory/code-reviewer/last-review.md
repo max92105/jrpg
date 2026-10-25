@@ -5,8 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/LK1b.md, slice LK1b (resource pips, spaced-caps labels, flash)
+Slice: docs/plans/2026-10-24-class-mechanics/slices/LK2a.md, slice LK2a (status marks: diamonds, pop, fade)
 Round: 1 (verdict: Ready to commit)
 
-- Warning: ResourceGaugeView.cs Refresh: the flash range (min/max of old and new amount) has no test; swapping them makes Covers always false; extract PipFlash.Between(old, new) and test both directions; open
-- Suggestion: ResourceGaugeView.LabelColor `resource.Dominance is not null &&` is redundant if IsDominant is only true for forces; open
+- Suggestion: StatusMarksViewTests IsHarmful theory skips Exposed and Taunt (Taunt-as-helpful is the non-obvious one); name `IsHarmful_Status_RimFollowsIt` doesn't state the result; open
+- Suggestion: StatusMark exposes public setters through StatusMarksView.Marks; tests only read them; open

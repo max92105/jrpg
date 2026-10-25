@@ -81,7 +81,7 @@ Content ids never change: `fire_blast`, `fireball`, `heal`, `recovery` and `heal
 | `PipsUpTo` | `Battle/ResourceGaugeView` (LK1b) | 10 | A resource whose max is at most this shows as pips (Octopath's BP); larger ones as a thin bar. |
 | `PipSize`, `PipGap` | `Ui/PipRow` (LK1b) | 9, 4 | Diamond pips, lit or dim. |
 | Resource colors | `classes.json` resource `color` (LK1a) | mana `#5B8CFF`, clarity `#B9C8FF`, stamina `#E8C25A`, ferocity `#E0533D`, conviction `#F2E6B0`, readiness `#9AD1C9`, instability `#A65BE0`, growth `#6BC46B`, decay `#7A5A8C`, faith `#FFF1C1`, chakra `#5FD3E0` | The pips' or bar's fill. |
-| `StatusMarkSize` | `Battle/StatusMarksView` (LK2) | 22 | A status's small diamond mark with its turns left. |
+| `StatusMarkSize` | `Battle/StatusMarksView` (LK2a) | 22 | A status's small diamond mark with its turns left. |
 | `SwapSlide` | `Battle/FormationSlide` (LK3) | 0.25 s | Two battlers trading places slide instead of jumping. |
 
 ## Design overview
@@ -230,7 +230,7 @@ Game:
 | `StatusTagsText` (FT1) | Battle | Core Statuses; `Ui/UiMessages` |
 | `ResourceGaugeView` (LK1b) | Battle | `Ui/PipRow`, `Ui/StatBar` |
 | `PipRow` (LK1b) | Ui | `Ui/Diamond`, `UiTextures`; never Battle |
-| `StatusMarksView` (LK2) | Battle | `Ui/Diamond`, `StatusTagsText` |
+| `StatusMarksView` (LK2a) | Battle | `Ui/Diamond`, `StatusTagsText` |
 | `FormationSlide` (LK3) | Battle | Core Battle |
 
 ### When things happen in a turn (ADR 0019, ADR 0021)

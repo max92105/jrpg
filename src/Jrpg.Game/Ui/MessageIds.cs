@@ -326,9 +326,6 @@ internal static class MessageIds
     /// <summary>The cue on a caster whose spell turned on them (decision 194).</summary>
     public const string BattleBackfire = "battle_backfire";
 
-    /// <summary>Placeholders <c>{status}</c>, <c>{turns}</c>: one status in a battle tag line ("STUN 1").</summary>
-    public const string BattleStatusTag = "battle_status_tag";
-
     /// <summary>Placeholder <c>{count}</c>: how many copies of an item the party owns, on its row in battle.</summary>
     public const string BattleItemCount = "battle_item_count";
 

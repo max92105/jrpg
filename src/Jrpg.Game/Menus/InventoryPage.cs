@@ -22,10 +22,10 @@ internal sealed class InventoryPage : IMenuPage
     // 26 px body text (placeholder, decision 82).
     private const int BodyPixels = 26;
 
-    // The party sidebar (question 145 placeholder, the demo's layout): a 520 px column at the page's right, 24 px from
-    // the list.
+    // The party sidebar (question 145 placeholder): a 520 px column at the page's right, 96 px from the list so the map
+    // shows between them, as in the reference (decision 269).
     private const int SidebarWidth = 520;
-    private const int SidebarGap = 24;
+    private const int SidebarGap = 96;
 
     private readonly GameSession _session;
     private readonly ContentCatalog _catalog;

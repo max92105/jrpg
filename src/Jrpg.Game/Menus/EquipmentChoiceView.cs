@@ -8,13 +8,13 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Draws an <see cref="EquipmentChoice"/> in a translucent panel at the page's right: the slot's name, Name and Qty
-/// column titles, then "Remove", each owned item with its icon and count, and each item another member wears, named
-/// with its wearer in the secondary color.
+/// Draws an <see cref="EquipmentChoice"/> in the page column at the page's right, which the page draws: the slot's
+/// name, Name and Qty column titles, then "Remove", each owned item with its icon and count, and each item another
+/// member wears, named with its wearer in the secondary color.
 /// </summary>
 internal sealed class EquipmentChoiceView
 {
-    /// <summary>The panel's width (placeholder).</summary>
+    /// <summary>The choice column's width (placeholder).</summary>
     public const int PanelWidth = 600;
 
     // Placeholder layout (decision 82): a 24 x 20 margin, a 30 px heading, column titles over a hairline, then 52 px
@@ -78,13 +78,9 @@ internal sealed class EquipmentChoiceView
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the shared textures are made.</param>
     /// <param name="choice">The same choice <see cref="Show"/> was given.</param>
-    /// <param name="panel">The panel's area, at the page's right.</param>
+    /// <param name="panel">The choice column's area, at the page's right.</param>
     public void Draw(SpriteBatch batch, TextureLibrary textures, EquipmentChoice choice, Rectangle panel)
     {
-        batch.Draw(textures.Pixel, panel, UiTheme.Surface);
-        batch.Draw(textures.Pixel, new Rectangle(panel.X, panel.Y, 1, panel.Height), UiTheme.Stroke);
-        batch.Draw(textures.Pixel, new Rectangle(panel.Right - 1, panel.Y, 1, panel.Height), UiTheme.Stroke);
-
         var left = panel.X + Margin;
         var top = panel.Y + TopMargin;
         var width = panel.Width - (2 * Margin);

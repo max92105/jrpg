@@ -7,8 +7,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Draws the Inventory page's list column: the category rail, the category's name, the column titles, then the list
-/// with the selected item's detail strip.
+/// Draws the Inventory page's list column: the category rail, then on a page column beside it the category's name, the
+/// column titles and the list with the selected item's detail strip.
 /// </summary>
 internal sealed class InventoryColumnView
 {
@@ -26,6 +26,7 @@ internal sealed class InventoryColumnView
 
     private readonly CategoryRailView _railView;
     private readonly InventoryListView _listView;
+    private readonly ColumnPanelView _listPanel = new(UiTheme.PageColumn);
     private readonly SpriteFontBase _headingFont;
     private readonly ColumnTitles _columnTitles;
     private readonly string[] _categoryNames;
@@ -56,6 +57,8 @@ internal sealed class InventoryColumnView
     public void Draw(SpriteBatch batch, TextureLibrary textures, Place place, float opacity)
     {
         var area = place.Area;
+        var listColumn = area with { X = area.X + CategoryRailView.Width, Width = area.Width - CategoryRailView.Width };
+        _listPanel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(listColumn), opacity);
         _railView.Draw(batch, textures, new CategoryRailView.Place(place.Rail, area), opacity);
         var left = area.X + CategoryRailView.Width + RailGap + Margin;
         var top = area.Y + TopMargin;

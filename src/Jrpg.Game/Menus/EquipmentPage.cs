@@ -14,7 +14,7 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// The menu's Equipment page: one member at a time, what they wear in each slot, a "Remove all" action, and their
-/// parameters. Changing what's worn comes in P3b.
+/// parameters. Confirm on a slot opens the items it can take in a column beside the sheet.
 /// </summary>
 internal sealed class EquipmentPage : IMemberPage
 {
@@ -26,6 +26,7 @@ internal sealed class EquipmentPage : IMemberPage
     private readonly string _pageHint;
     private readonly EquipmentSheetView _sheetView;
     private readonly EquipmentChoiceView _choiceView;
+    private readonly ColumnPanelView _panel = new(UiTheme.PageColumn);
     private readonly ListCursor _memberCursor;
     private readonly ListCursor _rowCursor = new(EquipmentSheet.Slots.Length + 1, _ => true);
     private readonly SelectionMotion _selection = new();
@@ -132,16 +133,22 @@ internal sealed class EquipmentPage : IMemberPage
         return null;
     }
 
-    // The choice opens as a panel at the right, and the sheet narrows to make room for it.
+    // The sheet's column keeps its width whether or not the choice shows (decision 290): while choosing, the choice
+    // column beside it closes the page, otherwise the sheet closes it.
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
-        var sheetWidth = _choice is null ? area.Width : area.Width - EquipmentChoiceView.PanelWidth;
-        var sheetArea = area with { Width = sheetWidth };
+        var sheetArea = area with { Width = area.Width - EquipmentChoiceView.PanelWidth };
+        _panel.Draw(batch, textures.Pixel, MenuLayout.FullHeight(sheetArea), opacity);
         _sheetView.Draw(batch, textures, new EquipmentSheetView.Place(_sheet, sheetArea, _selection, _choice is null, _preview, _notice), opacity);
-        if (_choice is not null)
+        if (_choice is null)
         {
-            _choiceView.Draw(batch, textures, _choice, new Rectangle(sheetArea.Right, area.Y, EquipmentChoiceView.PanelWidth, area.Height));
+            _panel.DrawRightEdge(batch, textures.Pixel, MenuLayout.FullHeight(sheetArea), opacity);
+            return;
         }
+
+        var choiceArea = new Rectangle(sheetArea.Right, area.Y, EquipmentChoiceView.PanelWidth, area.Height);
+        _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(choiceArea), opacity);
+        _choiceView.Draw(batch, textures, _choice, choiceArea);
     }
 
     /// <summary>

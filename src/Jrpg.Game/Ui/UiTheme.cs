@@ -163,20 +163,13 @@ internal static partial class UiTheme
     public static ImmutableArray<GradientStop> Card { get; } =
         [new(0, FromStraightArgb(0xE00C0D11)), new(0.6f, FromStraightArgb(0x990C0D11)), new(1, FromStraightArgb(0x330C0D11))];
 
-    /// <summary>
-    /// The party sidebar's panel: clear where it meets the page, darkening toward the screen's edge, so the page's art shows
-    /// through (placeholder, in <see cref="Card"/>'s color).
-    /// </summary>
-    public static ImmutableArray<GradientStop> SidebarPanel { get; } =
-        [new(0, FromStraightArgb(0x000C0D11)), new(0.3f, FromStraightArgb(0x800C0D11)), new(1, FromStraightArgb(0xCC0C0D11))];
-
     /// <summary>A page's content column (decision 269): dark enough to read over the art showing through.</summary>
     public static ColumnPanelStyle PageColumn { get; } = new(FromStraightArgb(0xB40A0C12), FromStraightArgb(0x33FFFFFF));
 
-    /// <summary>The darker strip beside a page's content, such as the member column.</summary>
+    /// <summary>The darker strip beside a page's content: member column, category rail, party sidebar.</summary>
     public static ColumnPanelStyle SideColumn { get; } = new(FromStraightArgb(0xD8060709), FromStraightArgb(0x40FFFFFF));
 
-    /// <summary>A translucent panel over a page, such as the equipment choice, and a framed window's body.</summary>
+    /// <summary>A translucent panel over a page, such as the party action choice, and a framed window's body.</summary>
     public static Color Surface { get; } = FromStraightArgb(0xC70C0D11);
 
     /// <summary>A framed window's two hairlines (<see cref="FramedWindowView"/>).</summary>
@@ -191,9 +184,6 @@ internal static partial class UiTheme
 
     /// <summary>A stat that goes down in a preview.</summary>
     public static Color Negative { get; } = FromStraightArgb(0xFF8C909A);
-
-    /// <summary>The strip behind the inventory's category icons.</summary>
-    public static Color CategoryRail { get; } = FromStraightArgb(0x80000000);
 
     /// <summary>A save that failed, a fallen member's HP in battle.</summary>
     public static Color Danger { get; } = FromStraightArgb(0xFFE0524A);

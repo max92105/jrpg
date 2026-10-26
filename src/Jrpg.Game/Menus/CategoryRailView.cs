@@ -6,8 +6,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Draws the Inventory page's category rail: a dark strip with one icon tab per category, the chosen one lit. The
-/// pointer marks it while the rail has the cursor; otherwise its band is dimmed.
+/// Draws the Inventory page's category rail: a darker column from the header to the footer with one icon tab per
+/// category, the chosen one lit. The pointer marks it while the rail has the cursor; otherwise its band is dimmed.
 /// </summary>
 internal sealed class CategoryRailView(UiTextures ui)
 {
@@ -23,6 +23,8 @@ internal sealed class CategoryRailView(UiTextures ui)
     private const int BandInsetY = 4;
     private const float UnselectedIconOpacity = 0.5f;
 
+    private readonly ColumnPanelView _panel = new(UiTheme.SideColumn);
+
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the plain pixel comes from.</param>
     /// <param name="place">The rail to draw, and the column it fills.</param>
@@ -30,9 +32,7 @@ internal sealed class CategoryRailView(UiTextures ui)
     public void Draw(SpriteBatch batch, TextureLibrary textures, Place place, float opacity)
     {
         var rail = new Rectangle(place.Area.X, place.Area.Y, Width, place.Area.Height);
-        batch.Draw(textures.Pixel, rail, UiTheme.CategoryRail * opacity);
-        batch.Draw(textures.Pixel, new Rectangle(rail.X, rail.Y, 1, rail.Height), UiTheme.Stroke * opacity);
-        batch.Draw(textures.Pixel, new Rectangle(rail.Right - 1, rail.Y, 1, rail.Height), UiTheme.Stroke * opacity);
+        _panel.Draw(batch, textures.Pixel, MenuLayout.FullHeight(rail), opacity);
         for (var index = 0; index < place.Rail.Tabs.Count; index++)
         {
             var tab = new Rectangle(rail.X, rail.Y + Padding + (index * TabHeight), Width, TabHeight);

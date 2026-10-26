@@ -22,20 +22,19 @@ internal sealed class PartySidebarView
     private const int CaptionHeight = SectionTitle.LineGap + CardGap;
 
     private readonly PartySidebar _sidebar;
+    private readonly ColumnPanelView _panel = new(UiTheme.SideColumn);
     private readonly MemberCardView _cardView;
-    private readonly UiTextures _ui;
     private readonly SectionTitle _reserveTitle;
     private readonly List<(SidebarCard Source, MemberCardView.Card Card)> _cards = [];
 
     /// <param name="sidebar">The cards to draw.</param>
     /// <param name="cardView">Formats and draws one member's card.</param>
     /// <param name="text">The reserve caption's message and font.</param>
-    /// <param name="ui">The panel's gradient and the caption's hairline.</param>
+    /// <param name="ui">The reserve caption's hairline.</param>
     public PartySidebarView(PartySidebar sidebar, MemberCardView cardView, ScreenText text, UiTextures ui)
     {
         _sidebar = sidebar;
         _cardView = cardView;
-        _ui = ui;
         _reserveTitle = new SectionTitle(text, ui, MessageIds.PartyReserve);
     }
 
@@ -47,7 +46,7 @@ internal sealed class PartySidebarView
     {
         var column = place.Column;
         FormatChangedCards();
-        batch.Draw(_ui.Gradient(textures, UiTheme.SidebarPanel), column, Color.White * opacity);
+        _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(column), opacity);
         var last = Math.Min(_cards.Count, _sidebar.FirstVisible + PartySidebar.VisibleCards);
         var top = column.Y + CueBand;
         for (var index = _sidebar.FirstVisible; index < last; index++)

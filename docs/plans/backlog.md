@@ -40,7 +40,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the demo retirement plan (2026-10-23)
 
-- Equipment page: opening a slot's choice hides the party sidebar (484 px) but the choice panel is 560 px, so the sheet narrows by 76 px while it is open (P1/Q2). Waits for question 153, the sidebar's placement.
 - Editor: with a button focused (Fit, Add layer), Space + drag pans, but releasing Space still clicks the button (WPF clicks a focused button on Space up; Space is swallowed only while the map has focus). Older than F2, easier to meet since F2 (review of F2).
 
 ## From the new-game flow plan (2026-10-24)

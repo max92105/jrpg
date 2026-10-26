@@ -1,3 +1,5 @@
+using Jrpg.Game.Ui;
+
 namespace Jrpg.Game.Battle;
 
 /// <summary>"Level Up!" popping in on a victory card: drawn 1.5x large, settling to its size.</summary>
@@ -10,8 +12,7 @@ internal static class LevelUpPop
     /// <returns>The text's scale: 1.5 at the level-up, easing out to 1.</returns>
     public static float ScaleAt(TimeSpan sinceLevelUp)
     {
-        var share = Math.Clamp((float)(sinceLevelUp / _length), 0, 1);
-        var eased = 1 - MathF.Pow(1 - share, 3);
+        var eased = Easing.CubicOut(Easing.ShareOf(sinceLevelUp, _length));
         return StartScale + ((1 - StartScale) * eased);
     }
 }

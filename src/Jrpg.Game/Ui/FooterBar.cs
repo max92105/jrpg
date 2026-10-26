@@ -7,14 +7,14 @@ namespace Jrpg.Game.Ui;
 /// <summary>The bar along the bottom of the screen, under a hairline, that a screen writes its one-line hint on.</summary>
 internal static class FooterBar
 {
-    /// <summary>The bar's place on the virtual screen, for placing the hint.</summary>
+    /// <summary>The bar's place on the virtual screen.</summary>
     /// <param name="height">The bar's height in virtual pixels; each screen picks its own.</param>
     public static Rectangle Area(int height) => new(0, VirtualScreen.Height - height, VirtualScreen.Width, height);
 
-    /// <summary>Where a line of text sits so it is centered in the bar, for the hint.</summary>
+    /// <summary>Where a line of text sits so it is centered in the bar, on a whole pixel so it stays crisp.</summary>
     /// <param name="height">The bar's height in virtual pixels.</param>
     /// <param name="lineHeight">The hint font's line height.</param>
-    public static float TextTop(int height, float lineHeight) => VirtualScreen.Height - height + ((height - lineHeight) / 2f);
+    public static float TextTop(int height, float lineHeight) => VirtualScreen.Height - height + MathF.Floor((height - lineHeight) / 2);
 
     /// <param name="batch">Already begun.</param>
     /// <param name="pixel">The plain white pixel.</param>

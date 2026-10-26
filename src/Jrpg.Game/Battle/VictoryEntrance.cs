@@ -1,3 +1,5 @@
+using Jrpg.Game.Ui;
+
 namespace Jrpg.Game.Battle;
 
 /// <summary>
@@ -30,17 +32,17 @@ internal sealed class VictoryEntrance
     /// <summary>How long the bars have been filling: the time past the pause, 0 before it.</summary>
     public TimeSpan BarTime => IsComplete ? _elapsed - _barsStart : TimeSpan.Zero;
 
-    public float TitleOpacity => ShareOf(_elapsed, _titleTime);
+    public float TitleOpacity => Easing.ShareOf(_elapsed, _titleTime);
 
     /// <summary>How far left of its place the title still is, in pixels; it slows down as it arrives.</summary>
-    public float TitleOffset => -TitleSlide * (1 - EaseOut(ShareOf(_elapsed, _titleTime)));
+    public float TitleOffset => -TitleSlide * (1 - Easing.CubicOut(Easing.ShareOf(_elapsed, _titleTime)));
 
-    public float RewardOpacity => ShareOf(_elapsed - _rewardDelay, _fadeTime);
+    public float RewardOpacity => Easing.ShareOf(_elapsed - _rewardDelay, _fadeTime);
 
-    public float CardOpacity(int index) => ShareOf(_elapsed - CardDelay(index), _fadeTime);
+    public float CardOpacity(int index) => Easing.ShareOf(_elapsed - CardDelay(index), _fadeTime);
 
     /// <summary>How far left of its place a card still is, in pixels.</summary>
-    public float CardOffset(int index) => -CardSlide * (1 - EaseOut(ShareOf(_elapsed - CardDelay(index), _fadeTime)));
+    public float CardOffset(int index) => -CardSlide * (1 - Easing.CubicOut(Easing.ShareOf(_elapsed - CardDelay(index), _fadeTime)));
 
     public void Update(TimeSpan delta) => _elapsed += delta;
 
@@ -53,9 +55,4 @@ internal sealed class VictoryEntrance
     }
 
     private static TimeSpan CardDelay(int index) => _firstCardDelay + (_cardStagger * index);
-
-    private static float ShareOf(TimeSpan time, TimeSpan length) => Math.Clamp((float)(time / length), 0, 1);
-
-    // A cubic ease-out: fast at first, settling at the end.
-    private static float EaseOut(float share) => 1 - MathF.Pow(1 - share, 3);
 }

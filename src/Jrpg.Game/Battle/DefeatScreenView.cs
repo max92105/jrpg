@@ -104,8 +104,7 @@ internal sealed class DefeatScreenView
     private void DrawFooter(SpriteBatch batch, Texture2D pixel)
     {
         OutcomeFrame.DrawFooter(batch, pixel);
-        var footer = FooterBar.Area(OutcomeFrame.FooterHeight);
-        var textTop = footer.Y + ((footer.Height - _footerFont.LineHeight) / 2f);
+        var textTop = FooterBar.TextTop(OutcomeFrame.FooterHeight, _footerFont.LineHeight);
         batch.DrawString(_footerFont, _footer, new Vector2(FooterTextLeft, textTop), UiTheme.TextPrimary);
     }
 }

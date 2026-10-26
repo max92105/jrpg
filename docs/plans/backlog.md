@@ -12,7 +12,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - **`TextureLibrary` keeps every texture it loads for good**, cutscene stills included. That is fine with the 4 KB placeholder stills, but full-screen real stills (about 8 MB of video memory each, 3 per intro) would stay loaded after the intro. Drop a still once its event ends when real art arrives. (new-game-flow K2a)
 - **An open yes/no question is held and drawn the same way in 3 screens** (`SavePage`, `SystemPage`, `NewGame/LeaderChoiceScene`: a `ConfirmPrompt?` field, a `ConfirmPromptView`, drawn while open, cleared when answered). Each copy is a few lines, and what Yes does differs per screen. Pull it into a small shared `Ui` type when a fourth screen needs it. (new-game-flow S1b review)
 - `MainViewModel` (489 lines after E3): the sheet image-size cache (`SheetImageSizes`) and the import status text (`SheetImportResult.Summary`) could leave it.
-- **Centering the hint in a footer is written 3 times** (`GameMenuScene.DrawFooterHint`, `VictoryScreenView.Draw`, `DefeatScreenView.DrawFooter`). It could become `FooterBar.TextTop(height, lineHeight)`. The menu rounds to whole pixels and the outcome screens don't, so merging them moves the menu hint by up to a pixel; do it with the next footer change, checked by screenshot. (U6 review)
 - **`Directory.Build.props`:** merge `src/` and `tests/` into a root file. Decision 144 keeps two files for now; the developer didn't choose to merge. When it happens, use the standard form:
   - the gates go in a root `Directory.Build.props`;
   - `tests/Directory.Build.props` keeps its two test-only settings (`IsPackable=false`, `using Xunit`) and imports the root file through `$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))`;
@@ -20,7 +19,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
   The file is protected, so ask the developer first.
 - **Why Core refused an equipment change:** `EquipmentPage.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. `PartyEquipment.ItemWithoutRoom` and `UnequipAll` would own both. It can wait because it is correct today, and nothing planned changes equipment.
-- **Easing copies:** the clamped time share `Math.Clamp((float)(elapsed / length), 0, 1)` is copied 6 times (`ActionPlayback`, `FloatingNumber` twice, `LevelUpPop`, `VictoryEntrance`, `DefeatEntrance`), and the cubic ease-out twice (`LevelUpPop`, `VictoryEntrance`). They should use `Ui/Easing`. It can wait because each copy is one line.
 - **`Ui/MessageIds.cs` is 397 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
 - **`MainViewModelTests`, part 2 (449 lines after E1a):** move the new content tests (`CreateObject_*`, `CreateNpc_*`, `CanStartNewObject_*`, `TryCreateMap_*`) and the map settings tests (`TryApplySettings_*`) into their own classes, on E1a's `EditorTestContent`.
 - **`MainWindow.xaml.cs` (547 lines):** move the viewport (pan, zoom, fit) and the tile painting handlers into partial files, as `.EventEditing` and `.ObjectEditing` already are.
@@ -48,7 +46,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 ## From the new-game flow plan (2026-10-24)
 
 - The editor's map save (`ContentWriter.WriteMap`) doesn't check that the files a map's events name exist: still images (`ArtReferenceCheck`) and voice files (`AudioReferenceCheck`). The game's startup rejects both, so an editor save can write content the game won't start with (`editor.md`, "Validate on save").
-- The footer hint's vertical centering is written out in `GameMenuScene.DrawFooterHint`, `DefeatScreenView.DrawFooter` and `VictoryScreenView`. Move them onto `FooterBar.TextTop`, which the leader choice uses (S3a).
 - `Core/Exploration/ExplorationState.cs` (296) is near 300. The next feature touching it should split it first: starting events (arrival, cell, touch) apart from walking.
 - Test files over 300 lines: `GameFlowTests` (369), `InventoryPageTests` (325), `PartyStateTests` (322). Split by behavior when next touched.
 - Comment lines over 120 columns from before the rule was enforced: `ExplorationState` (5), `GameSession` (8), `ArtReferenceCheck` (2), `MessageIds` (1). Rewrap when next touched.

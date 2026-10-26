@@ -12,4 +12,12 @@ public sealed class FooterBarTests
 
         Assert.Equal(VirtualScreen.Height - 64 + 22, top);
     }
+
+    [Fact]
+    public void TextTop_OddGap_StaysOnAWholePixel()
+    {
+        var top = FooterBar.TextTop(height: 64, lineHeight: 21);
+
+        Assert.Equal(VirtualScreen.Height - 64 + 21, top);
+    }
 }

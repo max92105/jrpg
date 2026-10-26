@@ -13,20 +13,18 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// The menu's Inventory page: what the party owns, one category at a time, in pickup order, with the selected item's
-/// description under the list. Left puts the cursor on the category rail, where Up and Down choose the category
-/// (question 152); the tab buttons change it from either side (question 92). Confirm on a usable item uses it.
+/// description (or the last use's notice) in a strip under its row. Left puts the cursor on the category rail, where Up
+/// and Down choose the category (question 152); the tab buttons change it from either side (question 92). Confirm on a
+/// usable item uses it.
 /// </summary>
 internal sealed class InventoryPage : IMenuPage
 {
-    // Placeholder layout (decision 82): a 28 x 20 margin, a heading title, column titles over a hairline, then the
-    // rows, with the description 24 px under them.
+    // Placeholder layout (decision 82): a 28 x 20 margin, a heading title, then the list (its column titles, then its
+    // rows) 60 px below it.
     private const int Margin = 28;
     private const int TopMargin = 20;
     private const int HeadingPixels = 30;
-    private const int LabelPixels = 18;
-    private const int ColumnTitlesTop = 60;
-    private const int RowsTop = ColumnTitlesTop + ColumnTitles.Height;
-    private const int DescriptionGap = 24;
+    private const int ListTop = 60;
 
     // The list starts 12 px right of the category rail (placeholder).
     private const int RailGap = 12;
@@ -36,8 +34,6 @@ internal sealed class InventoryPage : IMenuPage
     private readonly CategoryRail _rail = new();
     private readonly CategoryRailView _railView;
     private readonly SpriteFontBase _headingFont;
-    private readonly SpriteFontBase _bodyFont;
-    private readonly ColumnTitles _columnTitles;
     private readonly InventoryListView _listView;
     private readonly string[] _categoryNames;
     private readonly string _listHint;
@@ -49,8 +45,8 @@ internal sealed class InventoryPage : IMenuPage
     // The selected row's band glides between rows (decision 262); a new category or a used item puts it in place.
     private readonly SelectionGlide _glide = new(0);
 
-    // What the last item used did; shown in the description's place until the player moves on.
-    private string? _notice;
+    // The strip under the selected item: the last use's notice until the player moves on, or the description.
+    private readonly ItemDetailLine _detail = new();
 
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared gradient textures.</param>
@@ -64,15 +60,6 @@ internal sealed class InventoryPage : IMenuPage
         _catalog = catalog;
         _railView = new CategoryRailView(ui);
         _headingFont = text.Fonts.FontAt(HeadingPixels);
-        _bodyFont = text.Fonts.FontAt(InventoryListView.BodyPixels);
-        var labelFont = text.Fonts.FontAt(LabelPixels);
-        _columnTitles = new ColumnTitles(
-            labelFont,
-            ui,
-            [
-                ColumnTitle.FromLeft(MeasuredText.Of(labelFont, text.Messages.Text(MessageIds.InventoryColumnName)), InventoryListView.NameLeft),
-                ColumnTitle.FromRight(MeasuredText.Of(labelFont, text.Messages.Text(MessageIds.InventoryColumnQuantity)), InventoryListView.QuantityInset),
-            ]);
         _listView = new InventoryListView(text, ui);
         _categoryNames = [.. _rail.Tabs.Select(tab => text.Messages.Text(tab.LabelId))];
         _itemUse = new ItemUseDialog(session, text, ui, catalog);
@@ -100,7 +87,7 @@ internal sealed class InventoryPage : IMenuPage
     public int? SelectedRow => _rowCursor?.Selected;
 
     /// <summary>The last use's result, until the player moves on; null otherwise.</summary>
-    public string? Notice => _notice;
+    public string? Notice => _detail.Notice;
 
     /// <summary>Whether the player is choosing who to use an item on.</summary>
     public bool IsChoosingTarget => _itemUse.IsOpen;
@@ -112,7 +99,7 @@ internal sealed class InventoryPage : IMenuPage
 
     public void Open()
     {
-        _notice = null;
+        _detail.ClearNotice();
         _rail.Reset();
         ShowRowsFrom(0);
     }
@@ -123,7 +110,7 @@ internal sealed class InventoryPage : IMenuPage
         {
             if (_itemUse.Update(input) is { } result)
             {
-                _notice = result;
+                _detail.ShowNotice(result);
                 ShowRowsFrom(_rowCursor?.Selected ?? 0);
             }
 
@@ -132,7 +119,7 @@ internal sealed class InventoryPage : IMenuPage
 
         if (MovesACursor(input))
         {
-            _notice = null;
+            _detail.ClearNotice();
         }
 
         // The rail answers first, so Confirm there only goes back to the list and never uses an item.
@@ -167,7 +154,7 @@ internal sealed class InventoryPage : IMenuPage
 
         if (_itemUse.UseOrPickTarget(_catalog.Items[_rows[_rowCursor.Selected].ItemId]) is { } result)
         {
-            _notice = result;
+            _detail.ShowNotice(result);
             ShowRowsFrom(_rowCursor.Selected);
         }
     }
@@ -246,21 +233,8 @@ internal sealed class InventoryPage : IMenuPage
         var top = area.Y + TopMargin;
         var width = area.Right - Margin - left;
         batch.DrawString(_headingFont, _categoryNames[_rail.Selected], new Vector2(left, top), UiTheme.TextPrimary * opacity);
-        _columnTitles.Draw(batch, textures, new Rectangle(left, top + ColumnTitlesTop, width, 0), opacity);
-
-        var rowsTop = top + RowsTop;
-        var descriptionPosition = new Vector2(left + InventoryListView.RowInset, rowsTop + InventoryListView.Height + DescriptionGap);
-        if (_notice is not null)
-        {
-            batch.DrawString(_bodyFont, _notice, descriptionPosition, UiTheme.TextPrimary * opacity);
-        }
-
-        var list = new InventoryListView.Place(new Rectangle(left, rowsTop, width, InventoryListView.Height), _rows, _rowCursor, _glide, !_rail.HasCursor);
-        _listView.Draw(batch, textures, list, opacity);
-        if (_notice is null && _rowCursor is not null)
-        {
-            batch.DrawString(_bodyFont, _rows[_rowCursor.Selected].Description, descriptionPosition, UiTheme.TextSecondary * opacity);
-        }
+        var list = new Rectangle(left, top + ListTop, width, InventoryListView.Height);
+        _listView.Draw(batch, textures, new InventoryListView.Place(list, _rows, _rowCursor, _glide, !_rail.HasCursor, _detail), opacity);
     }
 
     // Built when the category or the items change, so drawing formats nothing. The cursor stays on the same row, or the

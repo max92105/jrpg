@@ -28,6 +28,9 @@ internal static partial class UiTheme
     /// <summary>Menu text starts 48 px in from its row's left edge.</summary>
     public const int MenuTextInset = 48;
 
+    /// <summary>Extra pixels between the letters of a list's spaced-caps column titles (docs/ui-reference).</summary>
+    public const float ColumnTitleLetterSpacing = 2;
+
     /// <summary>The header and footer bars.</summary>
     public static Color Bar { get; } = FromStraightArgb(0xEB000000);
 

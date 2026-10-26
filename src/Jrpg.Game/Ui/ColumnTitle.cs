@@ -6,14 +6,15 @@ namespace Jrpg.Game.Ui;
 /// </summary>
 internal readonly record struct ColumnTitle
 {
-    private ColumnTitle(MeasuredText text, int offset, bool isFromRight)
+    private ColumnTitle(string text, int offset, bool isFromRight)
     {
         Text = text;
         Offset = offset;
         IsFromRight = isFromRight;
     }
 
-    public MeasuredText Text { get; }
+    /// <summary>The caption as written in the messages; <see cref="ColumnTitles"/> shows it in spaced caps.</summary>
+    public string Text { get; }
 
     /// <summary>Pixels from the row's left edge to the caption's start, or from its end to the row's right edge.</summary>
     public int Offset { get; }
@@ -22,9 +23,9 @@ internal readonly record struct ColumnTitle
 
     /// <param name="text">The caption.</param>
     /// <param name="offset">Pixels from the row's left edge to the caption's start.</param>
-    public static ColumnTitle FromLeft(MeasuredText text, int offset) => new(text, offset, isFromRight: false);
+    public static ColumnTitle FromLeft(string text, int offset) => new(text, offset, isFromRight: false);
 
-    /// <param name="text">The caption, measured, since its width places it.</param>
+    /// <param name="text">The caption.</param>
     /// <param name="offset">Pixels from the caption's end to the row's right edge.</param>
-    public static ColumnTitle FromRight(MeasuredText text, int offset) => new(text, offset, isFromRight: true);
+    public static ColumnTitle FromRight(string text, int offset) => new(text, offset, isFromRight: true);
 }

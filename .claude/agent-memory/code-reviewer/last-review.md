@@ -5,10 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/MO2b.md, slice MO2b (page lists glide and bob)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/M4.md, slice M4 (inventory look: column titles, detail strip)
 Round: 1 (verdict: Fix the Criticals, then commit)
 
-- C1 InventoryPageTests.cs:311 — new test inserted between UseThirdItemOnLeader and its "third starting item is the elixir" comment; comment now describes the wrong method; open
-- W1 band + pointer draw (rect at Position*RowHeight, DrawSelectedRow, MenuPointer at X - PointerShift) copied in 5 views; propose one Ui method taking glide/band, dim flag split into two methods; open
-- S1 SaveFilesPanel.SelectionPosition public only for SavePage's test accessor; could read _panel's list via Entries-like accessor; open
-- F1 TitleScene keeps its own bob clock while SelectionGlide now has one (recorded in Done note); follow-up
+- C1 InventoryPage.cs:15-16 class summary still says "the selected item's description under the list"; now a strip under the selected row; open
+- S1 ColumnTitles: ImmutableArray of (ColumnTitle, MeasuredText) tuples; a plain array or keeping the measured caps beside the offset is enough; open
+- F1 band + pointer draw still copied across list views (MO2b W1); follow-up

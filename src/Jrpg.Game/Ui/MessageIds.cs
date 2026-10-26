@@ -156,7 +156,7 @@ internal static class MessageIds
 
     public const string InventoryArmor = "inventory_armor";
 
-    public const string InventoryColumnName = "inventory_column_name";
+    public const string InventoryColumnItem = "inventory_column_item";
 
     public const string InventoryColumnQuantity = "inventory_column_quantity";
 

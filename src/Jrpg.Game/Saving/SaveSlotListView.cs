@@ -49,9 +49,9 @@ internal sealed class SaveSlotListView
             _captionFont,
             ui,
             [
-                ColumnTitle.FromLeft(MeasuredText.Of(_captionFont, _messages.Text(MessageIds.SaveColumnFile)), RowInset),
-                ColumnTitle.FromLeft(MeasuredText.Of(_captionFont, _messages.Text(MessageIds.SaveColumnLocation)), RowInset + FileColumnWidth),
-                ColumnTitle.FromRight(MeasuredText.Of(_captionFont, _messages.Text(MessageIds.SaveColumnParty)), RowInset),
+                ColumnTitle.FromLeft(_messages.Text(MessageIds.SaveColumnFile), RowInset),
+                ColumnTitle.FromLeft(_messages.Text(MessageIds.SaveColumnLocation), RowInset + FileColumnWidth),
+                ColumnTitle.FromRight(_messages.Text(MessageIds.SaveColumnParty), RowInset),
             ]);
     }
 

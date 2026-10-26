@@ -101,10 +101,11 @@ internal sealed class OptionsPage : IMenuPage
 
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
-        _ui.DrawGlidingSelection(batch, textures, _selection.RowIn(RowAt(area, 0)), opacity);
+        var column = MenuLayout.SingleColumn(area);
+        _ui.DrawGlidingSelection(batch, textures, _selection.RowIn(RowAt(column, 0)), opacity);
         for (var row = 0; row < RowCount; row++)
         {
-            DrawRow(batch, textures, new RowPlace(row, RowAt(area, row)), opacity);
+            DrawRow(batch, textures, new RowPlace(row, RowAt(column, row)), opacity);
         }
     }
 

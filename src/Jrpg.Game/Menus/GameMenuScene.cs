@@ -17,12 +17,8 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class GameMenuScene : IScene
 {
-    // Placeholder layout (decision 82): the header, the body 40 px below it, the page 24 px right of the tabs, 40 px
-    // from the right edge, and 32 px above the 72 px footer.
-    private const int FooterHeight = 72;
-    private const int BodyTop = MenuHeader.Height + 40;
-    private const int PageLeft = NavTabShape.Width + 24;
-    private static readonly Rectangle _pageArea = new(PageLeft, BodyTop, VirtualScreen.Width - 40 - PageLeft, VirtualScreen.Height - FooterHeight - 32 - BodyTop);
+    // The tabs don't move yet, so the page area beside them is the same every frame.
+    private static readonly Rectangle _pageArea = MenuLayout.PageArea(NavTabShape.Width);
     private static readonly Rectangle _screen = new(0, 0, VirtualScreen.Width, VirtualScreen.Height);
 
     // The footer's hint starts 40 px in.
@@ -72,7 +68,7 @@ internal sealed class GameMenuScene : IScene
         _tabs = new ListCursor(pages.Length, _ => true);
         _font = text.Fonts.FontAt(UiTheme.MenuTextPixels);
         _tabLabels = [.. pages.Select(page => text.Messages.Text(page.TitleMessageId))];
-        _tabsView = new MenuTabsView(ui, _font, [.. pages.Select((page, index) => new MenuTabsView.Tab(_tabLabels[index], page.Glyph))], BodyTop);
+        _tabsView = new MenuTabsView(ui, _font, [.. pages.Select((page, index) => new MenuTabsView.Tab(_tabLabels[index], page.Glyph))], MenuLayout.BodyTop);
         _memberColumnView = new MemberColumnView(ui);
         _mainHint = text.Messages.Text(MessageIds.MenuHintMain);
     }
@@ -149,7 +145,7 @@ internal sealed class GameMenuScene : IScene
 
     private void DrawFooterHint(SpriteBatch batch, float opacity)
     {
-        var top = FooterBar.TextTop(FooterHeight, _font.LineHeight);
+        var top = FooterBar.TextTop(MenuLayout.FooterHeight, _font.LineHeight);
         batch.DrawString(_font, FooterHint, new Vector2(FooterTextInset, top), UiTheme.TextSecondary * opacity);
     }
 
@@ -161,7 +157,7 @@ internal sealed class GameMenuScene : IScene
         batch.Draw(_ui.MenuScrim(textures), _screen, tint);
 
         HeaderBar.Draw(batch, textures.Pixel, MenuHeader.Height, opacity);
-        FooterBar.Draw(batch, textures.Pixel, FooterHeight, opacity);
+        FooterBar.Draw(batch, textures.Pixel, MenuLayout.FooterHeight, opacity);
     }
 
     // A member page gets the member column at its left and narrows by it; both slide in with the page transition.

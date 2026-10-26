@@ -94,7 +94,7 @@ internal sealed class StatusPage : IMemberPage
     }
 
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity) =>
-        _view.Draw(batch, textures, new StatusSheetView.Place(_sheet, area), opacity);
+        _view.Draw(batch, textures, new StatusSheetView.Place(_sheet, MenuLayout.SingleColumn(area)), opacity);
 
     // The text and bars are set when the member changes, so drawing only reads them.
     [MemberNotNull(nameof(_sheet))]

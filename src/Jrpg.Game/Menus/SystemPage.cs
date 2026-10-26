@@ -85,23 +85,24 @@ internal sealed class SystemPage : IMenuPage
 
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
+        var column = MenuLayout.SingleColumn(area);
         if (_openFiles is not null)
         {
-            _openFiles.Draw(batch, textures, area, opacity);
+            _openFiles.Draw(batch, textures, column, opacity);
             return;
         }
 
         for (var index = 0; index < _labels.Length; index++)
         {
-            var rowTop = area.Y + (index * UiTheme.MenuRowHeight);
+            var rowTop = column.Y + (index * UiTheme.MenuRowHeight);
             var isSelected = index == _cursor.Selected;
             if (isSelected)
             {
-                DrawSelectedEntry(batch, textures, new Rectangle(area.X, rowTop, area.Width, UiTheme.MenuRowHeight), opacity);
+                DrawSelectedEntry(batch, textures, new Rectangle(column.X, rowTop, column.Width, UiTheme.MenuRowHeight), opacity);
             }
 
             var color = isSelected ? UiTheme.TextPrimary : UiTheme.TextSecondary;
-            var position = new Vector2(area.X + UiTheme.MenuTextInset, rowTop + ((UiTheme.MenuRowHeight - _font.LineHeight) / 2f));
+            var position = new Vector2(column.X + UiTheme.MenuTextInset, rowTop + ((UiTheme.MenuRowHeight - _font.LineHeight) / 2f));
             batch.DrawString(_font, _labels[index], position, color * opacity);
         }
 

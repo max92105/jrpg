@@ -92,17 +92,14 @@ internal sealed class PartySidebar
         return true;
     }
 
+    // In the order an item's picker lists the members, so the pointer lands on the card it names.
     private void RebuildAll()
     {
         _cards.Clear();
-        foreach (var member in _party.ActiveMembers)
+        var members = MemberOrder.ActiveThenReserve(_party);
+        for (var index = 0; index < members.Count; index++)
         {
-            _cards.Add(SidebarCard.Of(member, isReserve: false));
-        }
-
-        foreach (var member in _party.ReserveMembers)
-        {
-            _cards.Add(SidebarCard.Of(member, isReserve: true));
+            _cards.Add(SidebarCard.Of(members[index], isReserve: index >= _party.ActiveMembers.Count));
         }
     }
 

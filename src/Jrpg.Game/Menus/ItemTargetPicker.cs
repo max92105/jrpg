@@ -6,15 +6,15 @@ using Jrpg.Game.Ui;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Choosing who an item is used on: every member is listed, only the legal ones can be chosen, and an item that takes
-/// everyone selects them all and needs one Confirm.
+/// Choosing who an item is used on, among the party sidebar's cards (decision 267): every member is listed, only the
+/// legal ones can be chosen, and an item that takes everyone selects them all and needs one Confirm.
 /// </summary>
 internal sealed class ItemTargetPicker
 {
     private readonly TargetChoice<PartyMember> _choice;
     private readonly ListCursor _cursor;
 
-    /// <param name="members">Everyone shown, in party order.</param>
+    /// <param name="members">Everyone shown, in the sidebar's order: the active party, then the reserve.</param>
     /// <param name="choice">Who the item can be used on; at least one.</param>
     public ItemTargetPicker(IReadOnlyList<PartyMember> members, TargetChoice<PartyMember> choice)
     {
@@ -29,6 +29,9 @@ internal sealed class ItemTargetPicker
 
     public bool IsSelected(PartyMember member) => _choice.TakesAll ? IsCandidate(member) : member == Members[_cursor.Selected];
 
+    /// <summary>The member the pointer is on; null when the item takes everyone, which needs no pointer.</summary>
+    public PartyMember? Pointed => _choice.TakesAll ? null : Members[_cursor.Selected];
+
     /// <returns>The targets confirmed this update, or null.</returns>
     public IReadOnlyList<PartyMember>? Update(InputFrame input)
     {
@@ -37,13 +40,13 @@ internal sealed class ItemTargetPicker
             return input.IsPressed(GameButton.Confirm) ? _choice.Candidates : null;
         }
 
-        // The cards sit side by side, so Left and Right move as well as Up and Down.
-        if (input.IsPressed(GameButton.Up) || input.IsPressed(GameButton.Left))
+        // The cards are one column, so only Up and Down move; Left and Right do nothing.
+        if (input.IsPressed(GameButton.Up))
         {
             _cursor.MoveUp();
         }
 
-        if (input.IsPressed(GameButton.Down) || input.IsPressed(GameButton.Right))
+        if (input.IsPressed(GameButton.Down))
         {
             _cursor.MoveDown();
         }

@@ -45,23 +45,42 @@ public sealed class ItemTargetPickerTests
         Assert.True(picker.IsSelected(_members[1]));
     }
 
+    // The cards are one column (decision 267), so Left and Right keep the target, and Left never reaches the rail.
     [Fact]
-    public void Update_Right_MovesLikeDown()
+    public void Update_Right_KeepsTheTarget()
     {
         var picker = new ItemTargetPicker(_members, new TargetChoice<PartyMember>([_members[0], _members[2]], TakesAll: false));
 
         picker.Update(Pressing(GameButton.Right));
 
-        Assert.True(picker.IsSelected(_members[2]));
+        Assert.True(picker.IsSelected(_members[0]));
     }
 
     [Fact]
-    public void Update_Left_MovesLikeUp()
+    public void Update_Left_KeepsTheTarget()
     {
         var picker = new ItemTargetPicker(_members, new TargetChoice<PartyMember>([_members[0], _members[2]], TakesAll: false));
 
         picker.Update(Pressing(GameButton.Left));
 
-        Assert.True(picker.IsSelected(_members[2]));
+        Assert.True(picker.IsSelected(_members[0]));
+    }
+
+    [Fact]
+    public void Pointed_TakesAllChoice_IsNull()
+    {
+        var picker = new ItemTargetPicker(_members, new TargetChoice<PartyMember>([_members[0], _members[2]], TakesAll: true));
+
+        Assert.Null(picker.Pointed);
+    }
+
+    [Fact]
+    public void Pointed_AfterDown_IsTheNextCandidate()
+    {
+        var picker = new ItemTargetPicker(_members, new TargetChoice<PartyMember>([_members[0], _members[2]], TakesAll: false));
+
+        picker.Update(Pressing(GameButton.Down));
+
+        Assert.Same(_members[2], picker.Pointed);
     }
 }

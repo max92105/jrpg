@@ -55,7 +55,7 @@ internal static partial class UiTheme
     /// </summary>
     public const float DimmedSelectionOpacity = 0.5f;
 
-    /// <summary>A reserve member's card in the party sidebar, unless it is the one shown (question 154 placeholder).</summary>
+    /// <summary>A reserve member's card in the party sidebar while no item is aimed (question 154).</summary>
     public const float ReserveCardOpacity = 0.6f;
 
     /// <summary>The battle's command header, deep blue glowing out to the right (decision 272).</summary>
@@ -99,9 +99,6 @@ internal static partial class UiTheme
 
     /// <summary>Dims everything behind a dialog.</summary>
     public static Color Scrim { get; } = FromStraightArgb(0xB3000000);
-
-    /// <summary>The raised band of the item target picker over the dimmed menu.</summary>
-    public static Color RaisedSurface { get; } = FromStraightArgb(0xF2141620);
 
     /// <summary>A button's outline, and the line between list rows.</summary>
     public static Color Stroke { get; } = FromStraightArgb(0x2EFFFFFF);

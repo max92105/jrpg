@@ -6,10 +6,10 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Draws the party sidebar: the members' cards as the Party page draws them, on a dark panel that fades out toward the
-/// page. The shown member's card is lit and pointed at; the reserve follows under its own caption, dimmed (question
-/// 154); a small diamond at the top or bottom says cards are scrolled out of view. A card is formatted again only when
-/// the sidebar replaced it.
+/// Draws the party sidebar: the members' cards as the Party page draws them, on a darker column. The reserve follows
+/// under its own caption, dimmed (question 154); a small diamond at the top or bottom says cards are scrolled out of
+/// view. While an item is aimed (decision 267) the cards it can go to are lit at full opacity, reserve or not, the
+/// others faded, and the pointer is on the pointed card. A card is formatted again only when the sidebar replaced it.
 /// </summary>
 internal sealed class PartySidebarView
 {
@@ -20,6 +20,9 @@ internal sealed class PartySidebarView
     private const int CueBand = 14;
     private const int CueDiagonal = 10;
     private const int CaptionHeight = SectionTitle.LineGap + CardGap;
+
+    // While aiming, a card the item can't go to is faded (placeholder).
+    private const float UnavailableOpacity = 0.4f;
 
     private readonly PartySidebar _sidebar;
     private readonly ColumnPanelView _panel = new(UiTheme.SideColumn);
@@ -40,7 +43,7 @@ internal sealed class PartySidebarView
 
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the shared textures are made.</param>
-    /// <param name="place">The sidebar's column, and whether it points at the shown card.</param>
+    /// <param name="place">The sidebar's column, and the item being aimed, if any.</param>
     /// <param name="opacity">0 to 1, while the menu or the page fades in.</param>
     public void Draw(SpriteBatch batch, TextureLibrary textures, Place place, float opacity)
     {
@@ -57,7 +60,7 @@ internal sealed class PartySidebarView
                 top += CaptionHeight;
             }
 
-            DrawCard(batch, textures, new CardSlot(index, new Rectangle(column.X, top, column.Width, MemberCardView.Height), place.PointsAtShown), opacity);
+            DrawCard(batch, textures, new CardSlot(index, new Rectangle(column.X, top, column.Width, MemberCardView.Height), place.Picker), opacity);
             top += MemberCardView.Height + CardGap;
         }
 
@@ -66,14 +69,21 @@ internal sealed class PartySidebarView
 
     private bool IsFirstReserve(int index) => _sidebar.Cards[index].IsReserve && (index == 0 || !_sidebar.Cards[index - 1].IsReserve);
 
-    // The shown member's card is lit, pointed at unless the page points at its own row, and never dimmed, even in the
-    // reserve.
+    // Not aiming, the reserve is dimmed. Aiming, the item's candidates are lit at full opacity, reserve or not, the
+    // others faded, and the pointed card gets the pointer.
     private void DrawCard(SpriteBatch batch, TextureLibrary textures, CardSlot slot, float opacity)
     {
-        var isShown = slot.Index == _sidebar.PointedIndex;
-        var cardOpacity = _sidebar.Cards[slot.Index].IsReserve && !isShown ? opacity * UiTheme.ReserveCardOpacity : opacity;
-        _cardView.Draw(batch, textures, new MemberCardView.Place(_cards[slot.Index].Card, slot.Area, isShown), cardOpacity);
-        if (isShown && slot.PointsAtShown)
+        var card = _sidebar.Cards[slot.Index];
+        if (slot.Picker is not { } picker)
+        {
+            var restingOpacity = card.IsReserve ? opacity * UiTheme.ReserveCardOpacity : opacity;
+            _cardView.Draw(batch, textures, new MemberCardView.Place(_cards[slot.Index].Card, slot.Area, IsSelected: false), restingOpacity);
+            return;
+        }
+
+        var aimedOpacity = picker.IsCandidate(card.Member) ? opacity : opacity * UnavailableOpacity;
+        _cardView.Draw(batch, textures, new MemberCardView.Place(_cards[slot.Index].Card, slot.Area, picker.IsSelected(card.Member)), aimedOpacity);
+        if (slot.Index == _sidebar.PointedIndex)
         {
             MenuPointer.Draw(batch, textures.Pixel, new Vector2(slot.Area.X, slot.Area.Center.Y), opacity);
         }
@@ -115,13 +125,11 @@ internal sealed class PartySidebarView
         }
     }
 
-    // One card's index in the sidebar, where it's drawn, and whether the shown card gets the pointer.
-    private readonly record struct CardSlot(int Index, Rectangle Area, bool PointsAtShown);
+    // One card's index in the sidebar, where it's drawn, and the item being aimed, if any.
+    private readonly record struct CardSlot(int Index, Rectangle Area, ItemTargetPicker? Picker);
 
     /// <summary>Where the sidebar goes this frame.</summary>
     /// <param name="Column">The sidebar's column, in virtual-screen pixels.</param>
-    /// <param name="PointsAtShown">
-    /// False on a page that points at a row of its own, so only one pointer shows (decision 252).
-    /// </param>
-    public readonly record struct Place(Rectangle Column, bool PointsAtShown);
+    /// <param name="Picker">Who the item being used can go to; null while no item is aimed.</param>
+    public readonly record struct Place(Rectangle Column, ItemTargetPicker? Picker);
 }

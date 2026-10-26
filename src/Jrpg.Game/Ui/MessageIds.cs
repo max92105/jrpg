@@ -175,9 +175,6 @@ internal static class MessageIds
     /// <summary>Shown when the party owns nothing in the category.</summary>
     public const string InventoryEmpty = "inventory_empty";
 
-    /// <summary>Placeholder <c>{item}</c>: the heading over the item target picker.</summary>
-    public const string ItemUseTitle = "item_use_title";
-
     /// <summary>Placeholders <c>{member}</c> and <c>{amount}</c> (question 91, placeholder wording).</summary>
     public const string ItemUsedHp = "item_used_hp";
 
@@ -380,6 +377,9 @@ internal static class MessageIds
 
     /// <summary>The menu footer's line on the Inventory page, while the cursor is on the category rail.</summary>
     public const string MenuHintInventoryCategories = "menu_hint_inventory_categories";
+
+    /// <summary>Placeholder <c>{item}</c>: the Inventory page's footer line while choosing who gets an item.</summary>
+    public const string MenuHintInventoryTarget = "menu_hint_inventory_target";
 
     /// <summary>The menu footer's line on the Party page.</summary>
     public const string MenuHintParty = "menu_hint_party";

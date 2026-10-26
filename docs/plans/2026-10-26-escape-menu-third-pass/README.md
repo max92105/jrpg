@@ -55,7 +55,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **PC2. Two-column pages: Inventory's rail, list and sidebar; Equipment's sheet and choice** (Game, about 160 lines) → [slices/PC2.md](slices/PC2.md)
 - [x] **TB1a. The tabs fold into an icon rail inside a page: the motion, and the page following it** (Game, about 230 lines) → [slices/TB1a.md](slices/TB1a.md)
 - [x] **TB1b. The icon rail's look: icons centered in the rail, labels gone by halfway, the selected tab on the rail** (Game, about 120 lines) → [slices/TB1b.md](slices/TB1b.md)
-- [ ] **IT1. Using an item aims at the sidebar's cards; the "Use item" band goes** (Game, about 220 lines) → [slices/IT1.md](slices/IT1.md)
+- [x] **IT1. Using an item aims at the sidebar's cards; the "Use item" band goes** (Game, about 220 lines) → [slices/IT1.md](slices/IT1.md)
 - [ ] **IT2. The pointer stays on the sidebar while the item has copies left** (Game, about 140 lines) → [slices/IT2.md](slices/IT2.md)
 - [ ] **IT3. The aimed cards show HP now and after (`FieldItemUse.HpAfterUse`)** (Core + Game, about 210 lines) → [slices/IT3.md](slices/IT3.md)
 - [ ] **C2. Dialog buttons: `ConfirmPromptView`'s button drawing moves to `Ui/DialogButtonView`** (Game, mechanical, about 80 lines) → [slices/C2.md](slices/C2.md)

@@ -87,7 +87,7 @@ internal sealed class InventoryListView
         var area = place.Area;
         if (place.Detail is { } notice)
         {
-            DrawStrip(batch, textures, new DetailStrip(notice, StripAt(area, area.Y + EmptyLineTop - StripPaddingY)), opacity);
+            DrawStrip(batch, textures, new DetailStrip(notice, StripAt(area, area.Y + EmptyLineTop - StripPaddingY), ForegroundShare: 1), opacity);
             return;
         }
 
@@ -95,7 +95,8 @@ internal sealed class InventoryListView
         batch.DrawString(_bodyFont, _empty.Text, new Vector2(emptyLeft, area.Y + EmptyLineTop), UiTheme.TextSecondary * opacity);
     }
 
-    // The strip follows the gliding highlight, over the rows below it, and dims with it while the rail has the cursor.
+    // The strip follows the gliding highlight, over the rows below it. Its text dims with the highlight while the
+    // cursor is elsewhere; its fill doesn't, so the row under it never shows through.
     private void DrawDetail(SpriteBatch batch, TextureLibrary textures, Place place, float opacity)
     {
         if (place.Detail is not { } detail)
@@ -105,8 +106,8 @@ internal sealed class InventoryListView
 
         var selected = place.Selection.RowIn(RowArea(place.Area, 0)).Area;
         var top = ItemDetailLine.TopFor(selected, place.Area.Bottom, _stripHeight);
-        var stripOpacity = place.HasCursor ? opacity : opacity * UiTheme.DimmedSelectionOpacity;
-        DrawStrip(batch, textures, new DetailStrip(detail, StripAt(place.Area, top)), stripOpacity);
+        var foregroundShare = place.HasCursor ? 1 : UiTheme.DimmedSelectionOpacity;
+        DrawStrip(batch, textures, new DetailStrip(detail, StripAt(place.Area, top), foregroundShare), opacity);
     }
 
     // From just left of the name column to the list's right edge.
@@ -118,8 +119,9 @@ internal sealed class InventoryListView
     {
         var area = strip.Area;
         batch.Draw(textures.Pixel, area, UiTheme.CommandHintFill * opacity);
-        batch.Draw(_ui.Gradient(textures, UiTheme.HighlightLine), area with { Y = area.Bottom - 1, Height = 1 }, Color.White * opacity);
-        batch.DrawString(_bodyFont, strip.Text, new Vector2(area.X + StripPaddingX, area.Y + StripPaddingY), UiTheme.TextPrimary * opacity);
+        var foregroundOpacity = opacity * strip.ForegroundShare;
+        batch.Draw(_ui.Gradient(textures, UiTheme.HighlightLine), area with { Y = area.Bottom - 1, Height = 1 }, Color.White * foregroundOpacity);
+        batch.DrawString(_bodyFont, strip.Text, new Vector2(area.X + StripPaddingX, area.Y + StripPaddingY), UiTheme.TextPrimary * foregroundOpacity);
     }
 
     // The pointer marks the row while the list has the cursor; while the rail has it, the row stays chosen, dimmed.
@@ -156,6 +158,6 @@ internal sealed class InventoryListView
     public readonly record struct Place(
         IReadOnlyList<InventoryRow> Rows, ListCursor? Cursor, bool HasCursor, SelectionMotion Selection, Rectangle Area, string? Detail);
 
-    // The detail strip's text and its area.
-    private readonly record struct DetailStrip(string Text, Rectangle Area);
+    // The detail strip's text, its area, and how much of the page's fade its text and hairline keep.
+    private readonly record struct DetailStrip(string Text, Rectangle Area, float ForegroundShare);
 }

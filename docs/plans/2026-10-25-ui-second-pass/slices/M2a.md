@@ -15,3 +15,9 @@ Question 265's placeholder: the party sidebar stays on the right.
     - `Refresh_ShownBelowTheView_ScrollsToIt`
     - `Refresh_SameOrder_KeepsTheScroll`
   - **Verify by hand:** nothing visible yet.
+- **Done, with deviations:**
+  - **`IMemberPage.Members`:** both member pages had it, so the interface now names it.
+  - **The menu refreshes the column with the sidebar** (`GameMenuScene.RefreshMemberViews`), every update a member page is open; nothing draws it until M2b.
+  - **A new order resets the scroll to the top** before scrolling to the shown member; the same order keeps it (`PartySidebar`'s rule, compared in place since it runs every update).
+  - **The scroll rule is `Ui/ListScroll.KeepInView`** (after review: it was the third copy, beside `ListCursor` and `PartySidebar`, which the backlog now names to move onto it).
+  - **Tests:** the four planned, and `Refresh_ShownAboveTheView_ScrollsBackToIt` for the other side of the scroll rule; the scroll tests recruit 12 members of their own rather than hang on today's party size (2162 in all).

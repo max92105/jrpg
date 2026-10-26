@@ -51,6 +51,7 @@ internal sealed class GameMenuScene : IScene
     private readonly string[] _tabLabels;
     private readonly string _mainHint;
     private readonly PageTransition _pageTransition = new();
+    private readonly MemberColumn _memberColumn = new();
 
     // Decision 262: the menu slides in, and fades out before it closes.
     private readonly MenuMotion _motion = new();
@@ -108,7 +109,7 @@ internal sealed class GameMenuScene : IScene
 
         if (_isInPage)
         {
-            _sidebar.Refresh((_pages[_tabs.Selected] as IMemberPage)?.Shown);
+            RefreshMemberViews(_pages[_tabs.Selected] as IMemberPage);
         }
 
         return request;
@@ -209,6 +210,16 @@ internal sealed class GameMenuScene : IScene
             _pages[_tabs.Selected].Open();
             _pageTransition.Start();
             _isInPage = true;
+        }
+    }
+
+    // The sidebar marks the member a page shows; on a member page, the member column follows the page too.
+    private void RefreshMemberViews(IMemberPage? memberPage)
+    {
+        _sidebar.Refresh(memberPage?.Shown);
+        if (memberPage is not null)
+        {
+            _memberColumn.Refresh(memberPage.Members, memberPage.Shown);
         }
     }
 

@@ -52,4 +52,48 @@ public sealed class EncounterFlashTests
         Assert.False(flash.IsPlaying);
         Assert.Equal(0, flash.Whiteness);
     }
+
+    [Fact]
+    public void IsPastPeak_BeforeStart_IsFalse()
+    {
+        var flash = new EncounterFlash();
+
+        flash.Advance(_wholeFlash);
+
+        Assert.False(flash.IsPastPeak);
+    }
+
+    [Fact]
+    public void IsPastPeak_JustBeforeThePeak_IsFalse()
+    {
+        var flash = new EncounterFlash();
+        flash.Start();
+
+        flash.Advance(_rise - TimeSpan.FromMilliseconds(1));
+
+        Assert.False(flash.IsPastPeak);
+    }
+
+    [Fact]
+    public void IsPastPeak_AtThePeak_IsTrue()
+    {
+        var flash = new EncounterFlash();
+        flash.Start();
+
+        flash.Advance(_rise);
+
+        Assert.True(flash.IsPastPeak);
+    }
+
+    // The shards stay up through the fade, after the flash.
+    [Fact]
+    public void IsPastPeak_AfterTheFlash_StaysTrue()
+    {
+        var flash = new EncounterFlash();
+        flash.Start();
+
+        flash.Advance(_wholeFlash + TimeSpan.FromSeconds(1));
+
+        Assert.True(flash.IsPastPeak);
+    }
 }

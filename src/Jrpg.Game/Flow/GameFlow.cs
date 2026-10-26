@@ -34,6 +34,17 @@ internal sealed class GameFlow : IScene, IFreezesFrame
     private BattleRequested? _flashingBattle;
     private Texture2D? _frozenFrame;
 
+    // From the flash's peak the frozen frame is drawn broken into shards; each encounter breaks it its own way (a
+    // placeholder seed plus the encounters started so far).
+    private const int ShatterSeed = 258;
+    private static readonly Point _impact = new(VirtualScreen.Width / 2, VirtualScreen.Height / 2);
+    private int _encountersStarted;
+    private ShatterLayout? _shatter;
+
+    // One for the game's lifetime, made on the first draw that needs it; the graphics device frees its effects when the
+    // game closes, so the flow, which tests make by the hundred without a device, needn't be disposable.
+    private ShatterView? _shatterView;
+
     /// <param name="catalog">The content, as loaded.</param>
     /// <param name="text">Messages and fonts.</param>
     /// <param name="saveSlots">The player's save files.</param>
@@ -108,6 +119,7 @@ internal sealed class GameFlow : IScene, IFreezesFrame
         {
             case BattleRequested battle:
                 _flashingBattle = battle;
+                _encountersStarted++;
                 _flash.Start();
                 break;
             case MenuRequested:
@@ -122,7 +134,11 @@ internal sealed class GameFlow : IScene, IFreezesFrame
         }
     }
 
-    public void FreezeFrame(Texture2D frame) => _frozenFrame = frame;
+    public void FreezeFrame(Texture2D frame)
+    {
+        _frozenFrame = frame;
+        _shatter = ShatterLayout.Break(_impact, ShatterSeed + _encountersStarted);
+    }
 
     // The screen changes while the fade plays and while an encounter flashes: the scenes get no input meanwhile.
     private bool IsChanging => _fade.IsFading || _flashingBattle is not null;
@@ -148,8 +164,28 @@ internal sealed class GameFlow : IScene, IFreezesFrame
         }
 
         var screen = new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height);
-        batch.Draw(_frozenFrame, screen, Color.White);
+        if (_flash.IsPastPeak && _shatter is not null)
+        {
+            PrepareShatterView(batch.GraphicsDevice, _shatter).Draw(batch, _frozenFrame);
+        }
+        else
+        {
+            batch.Draw(_frozenFrame, screen, Color.White);
+        }
+
         batch.Draw(textures.Pixel, screen, Color.White * _flash.Whiteness);
+    }
+
+    // Made on the first draw that needs it, since only drawing has the device; its vertices are built once per layout.
+    private ShatterView PrepareShatterView(GraphicsDevice device, ShatterLayout layout)
+    {
+        _shatterView ??= new ShatterView(device);
+        if (!_shatterView.IsBuiltFor(layout))
+        {
+            _shatterView.BuildVertices(layout, _impact.ToVector2());
+        }
+
+        return _shatterView;
     }
 
     private void ApplyRequestOnceBlack()
@@ -173,6 +209,7 @@ internal sealed class GameFlow : IScene, IFreezesFrame
                 break;
             case BattleRequested:
                 _frozenFrame = null;
+                _shatter = null;
                 _battles.Start(Session ?? throw new InvalidOperationException("A battle started with no game started."));
                 break;
             case BattleFinished:

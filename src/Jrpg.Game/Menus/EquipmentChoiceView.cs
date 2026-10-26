@@ -56,8 +56,8 @@ internal sealed class EquipmentChoiceView
             labelFont,
             ui,
             [
-                ColumnTitle.FromLeft(MeasuredText.Of(labelFont, text.Messages.Text(MessageIds.InventoryColumnName)), RowInset + IconColumn),
-                ColumnTitle.FromRight(MeasuredText.Of(labelFont, text.Messages.Text(MessageIds.InventoryColumnQuantity)), QuantityInset),
+                ColumnTitle.FromLeft(text.Messages.Text(MessageIds.InventoryColumnItem), RowInset + IconColumn),
+                ColumnTitle.FromRight(text.Messages.Text(MessageIds.InventoryColumnQuantity), QuantityInset),
             ]);
     }
 

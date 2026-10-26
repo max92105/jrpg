@@ -57,7 +57,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `ScreenFade` skips its black moment when one update is longer than its fade-out plus hold (about 0.33 s), so a warp never moves the player. The fixed 1/60 s step hides it in play; tests must step at 1/60 s. Make `Update` stop on Holding if a long frame can ever reach it.
 - `BattleState.cs` is at 296 lines: split the per-command bodies before the next command path lands (DR2 review).
 - `tests/Jrpg.Game.Tests/Battle/CommandMenuTests.cs` is at 393 lines: split it by menu entry (MO1 review).
-- `src/Jrpg.Game/Menus/InventoryPage.cs` is at 273 lines after C5: move the notice and description panel into a type of its own (RS3 review).
+- The tip strip (dark `UiTheme.CommandHintFill` fill, highlight hairline, padded text) is drawn twice: `Battle/CommandPanelView.DrawHint` and `Menus/InventoryListView.DrawStrip`. Move it into one drawer in `Ui` when a third appears (M4 review).
 
 ## From the class mechanics plan (2026-10-25)
 

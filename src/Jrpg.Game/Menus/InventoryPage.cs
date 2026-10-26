@@ -18,8 +18,8 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class InventoryPage : IMenuPage
 {
-    // Placeholder layout (decision 82): a 28 x 20 margin, a heading title, column titles over a hairline, the list, and
-    // the description 24 px under it; 26 px body text.
+    // Placeholder layout (decision 82): a 28 x 20 margin, a heading title, column titles over a hairline, then the
+    // list; 26 px body text.
     private const int Margin = 28;
     private const int TopMargin = 20;
     private const int HeadingPixels = 30;
@@ -27,7 +27,6 @@ internal sealed class InventoryPage : IMenuPage
     private const int LabelPixels = 18;
     private const int ColumnTitlesTop = 60;
     private const int RowsTop = ColumnTitlesTop + ColumnTitles.Height;
-    private const int DescriptionGap = 24;
 
     // The list starts 12 px right of the category rail (placeholder).
     private const int RailGap = 12;
@@ -48,8 +47,7 @@ internal sealed class InventoryPage : IMenuPage
     private ListCursor? _rowCursor;
     private InventoryRow[] _rows = [];
 
-    // What the last item used did; shown in the description's place until the player moves on.
-    private string? _notice;
+    private readonly ItemDetailLine _detail = new();
 
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared gradient textures.</param>
@@ -70,8 +68,8 @@ internal sealed class InventoryPage : IMenuPage
             labelFont,
             ui,
             [
-                ColumnTitle.FromLeft(MeasuredText.Of(labelFont, text.Messages.Text(MessageIds.InventoryColumnName)), InventoryListView.NameLeft),
-                ColumnTitle.FromRight(MeasuredText.Of(labelFont, text.Messages.Text(MessageIds.InventoryColumnQuantity)), InventoryListView.QuantityInset),
+                ColumnTitle.FromLeft(text.Messages.Text(MessageIds.InventoryColumnItem), InventoryListView.NameLeft),
+                ColumnTitle.FromRight(text.Messages.Text(MessageIds.InventoryColumnQuantity), InventoryListView.QuantityInset),
             ]);
         _categoryNames = [.. _rail.Tabs.Select(tab => text.Messages.Text(tab.LabelId))];
         _itemUse = new ItemUseDialog(session, text, ui, catalog);
@@ -99,7 +97,7 @@ internal sealed class InventoryPage : IMenuPage
     public int? SelectedRow => _rowCursor?.Selected;
 
     /// <summary>The last use's result, until the player moves on; null otherwise.</summary>
-    public string? Notice => _notice;
+    public string? Notice => _detail.Notice;
 
     /// <summary>Whether the player is choosing who to use an item on.</summary>
     public bool IsChoosingTarget => _itemUse.IsOpen;
@@ -109,7 +107,7 @@ internal sealed class InventoryPage : IMenuPage
 
     public void Open()
     {
-        _notice = null;
+        _detail.ClearNotice();
         _rail.Reset();
         ShowRowsFrom(0);
     }
@@ -122,7 +120,7 @@ internal sealed class InventoryPage : IMenuPage
         {
             if (_itemUse.Update(input) is { } result)
             {
-                _notice = result;
+                _detail.ShowNotice(result);
                 ShowRowsFrom(_rowCursor?.Selected ?? 0);
             }
 
@@ -131,7 +129,7 @@ internal sealed class InventoryPage : IMenuPage
 
         if (MovesACursor(input))
         {
-            _notice = null;
+            _detail.ClearNotice();
         }
 
         // The rail answers first, so Confirm there only goes back to the list and never uses an item.
@@ -166,7 +164,7 @@ internal sealed class InventoryPage : IMenuPage
 
         if (_itemUse.UseOrPickTarget(_catalog.Items[_rows[_rowCursor.Selected].ItemId]) is { } result)
         {
-            _notice = result;
+            _detail.ShowNotice(result);
             ShowRowsFrom(_rowCursor.Selected);
         }
     }
@@ -250,22 +248,10 @@ internal sealed class InventoryPage : IMenuPage
         _columnTitles.Draw(batch, textures, new Rectangle(left, top + ColumnTitlesTop, width, 0), opacity);
 
         var rows = new Rectangle(left, top + RowsTop, width, InventoryListView.Height);
-        _listView.Draw(batch, textures, new InventoryListView.Place(_rows, _rowCursor, !_rail.HasCursor, _selection, rows), opacity);
-        DrawDescription(batch, new Vector2(left + InventoryListView.RowInset, rows.Bottom + DescriptionGap), opacity);
+        _listView.Draw(batch, textures, new InventoryListView.Place(_rows, _rowCursor, !_rail.HasCursor, _selection, rows, DetailText()), opacity);
     }
 
-    // The last use's result replaces the selected item's description until the player moves on.
-    private void DrawDescription(SpriteBatch batch, Vector2 position, float opacity)
-    {
-        if (_notice is not null)
-        {
-            batch.DrawString(_bodyFont, _notice, position, UiTheme.TextPrimary * opacity);
-        }
-        else if (_rowCursor is not null)
-        {
-            batch.DrawString(_bodyFont, _rows[_rowCursor.Selected].Description, position, UiTheme.TextSecondary * opacity);
-        }
-    }
+    private string? DetailText() => _detail.TextFor(_rowCursor is null ? null : _rows[_rowCursor.Selected]);
 
     // Built when the category or the items change, so drawing formats nothing. The cursor stays on the same row, or the
     // last one once the list got shorter, and the highlight jumps there.

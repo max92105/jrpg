@@ -17,8 +17,6 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class GameMenuScene : IScene
 {
-    // The tabs don't move yet, so the page area beside them is the same every frame.
-    private static readonly Rectangle _pageArea = MenuLayout.PageArea(NavTabShape.Width);
     private static readonly Rectangle _screen = new(0, 0, VirtualScreen.Width, VirtualScreen.Height);
 
     // The footer's hint starts 40 px in.
@@ -42,6 +40,9 @@ internal sealed class GameMenuScene : IScene
 
     // The selected tab's glow glides between tabs (decision 262).
     private readonly SelectionGlide _tabGlide = new(0);
+
+    // The tabs fold into their icon rail while a page is open, and the page moves left with them (decision 286).
+    private readonly TabFold _tabFold = new();
     private bool _hasRequestedClose;
     private bool _isInPage;
 
@@ -66,6 +67,9 @@ internal sealed class GameMenuScene : IScene
     /// <summary>The footer's line: the open page's hint, or the tabs' own.</summary>
     internal string FooterHint => _isInPage ? _pages[_tabs.Selected].Hint : _mainHint;
 
+    /// <summary>Where the open page draws, beside the tabs as far as they have folded; it moves as they fold.</summary>
+    internal Rectangle PageArea => MenuLayout.PageArea(NavTabShape.Width - _tabFold.HiddenWidth);
+
     /// <summary>The members a member page goes through and the one it shows, kept current while it is open.</summary>
     internal MemberColumn MemberColumn { get; } = new();
 
@@ -73,6 +77,7 @@ internal sealed class GameMenuScene : IScene
     {
         _motion.Advance(delta);
         _tabGlide.Advance(delta);
+        _tabFold.Advance(delta);
         if (_motion.IsClosing)
         {
             return RequestClosedOnceFaded();
@@ -105,7 +110,7 @@ internal sealed class GameMenuScene : IScene
         _motion.MarkDrawn();
         DrawFrame(batch, textures, opacity);
         _header.Draw(batch, _isInPage ? _tabLabels[_tabs.Selected] : _menuTitle, opacity);
-        _tabsView.Draw(batch, textures, new MenuTabsView.Place(_motion, _tabs.Selected, _tabGlide.Position));
+        _tabsView.Draw(batch, textures, new MenuTabsView.Place(_motion, _tabs.Selected, _tabGlide.Position, _tabFold));
         if (_isInPage)
         {
             DrawPage(batch, textures, opacity * _pageTransition.Opacity);
@@ -143,7 +148,8 @@ internal sealed class GameMenuScene : IScene
     // page transition.
     private void DrawPage(SpriteBatch batch, TextureLibrary textures, float opacity)
     {
-        var area = _pageArea with { X = _pageArea.X + _pageTransition.Offset };
+        var pageArea = PageArea;
+        var area = pageArea with { X = pageArea.X + _pageTransition.Offset };
         var page = _pages[_tabs.Selected];
         if (page is IMemberPage memberPage)
         {
@@ -182,6 +188,7 @@ internal sealed class GameMenuScene : IScene
             _pages[_tabs.Selected].Open();
             _pageTransition.Start();
             _isInPage = true;
+            _tabFold.Fold();
         }
     }
 
@@ -203,6 +210,7 @@ internal sealed class GameMenuScene : IScene
         if (input.IsPressed(GameButton.Cancel) && page.LeavesOnCancel)
         {
             _isInPage = false;
+            _tabFold.Unfold();
             return null;
         }
 

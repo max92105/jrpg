@@ -26,6 +26,9 @@ internal sealed class MenuTabsView
     private const int IconSize = TabGlyphShape.Size * IconScale;
     private const int IconGap = 12;
 
+    // Folded, each icon sits midway along the rail's flat part, between the screen's edge and the tab's shoulder.
+    private const int FoldedIconCenter = (NavTabShape.ShoulderPixels - (NavTabShape.Width - TabFold.RailWidth)) / 2;
+
     private readonly UiTextures _ui;
     private readonly SpriteFontBase _font;
     private readonly IReadOnlyList<Tab> _tabs;
@@ -45,18 +48,18 @@ internal sealed class MenuTabsView
 
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the tab textures are made.</param>
-    /// <param name="place">The selected tab, where its glow has glided to, and the slide-in.</param>
+    /// <param name="place">The selected tab, where its glow has glided to, the slide-in and the fold.</param>
     public void Draw(SpriteBatch batch, TextureLibrary textures, Place place)
     {
         var motion = place.Motion;
         for (var index = 0; index < _tabs.Count; index++)
         {
-            batch.Draw(_ui.NavTab(textures), new Vector2(TabLeft(motion, index), _top + (index * Pitch)), Color.White * motion.TabOpacity(index));
+            batch.Draw(_ui.NavTab(textures), new Vector2(TabLeft(place, index), _top + (index * Pitch)), Color.White * motion.TabOpacity(index));
         }
 
         var selected = place.Selected;
         var tint = Color.White * motion.TabOpacity(selected);
-        var glowLeft = TabLeft(motion, selected);
+        var glowLeft = TabLeft(place, selected);
         var glowTop = _top + (int)Math.Round(place.GlidePosition * Pitch);
         batch.Draw(_ui.SelectedNavTab(textures), new Vector2(glowLeft, glowTop), tint);
         var line = new Rectangle(glowLeft, glowTop + NavTabShape.Height - SelectedTabLineThickness, NavTabShape.ShoulderPixels, SelectedTabLineThickness);
@@ -68,27 +71,35 @@ internal sealed class MenuTabsView
         }
     }
 
-    // The icon then the label, both sliding right on the selected tab.
+    // The icon then the label, both sliding right on the selected tab. As the tabs fold, the icon moves onto the rail
+    // and the label fades, so nothing is carried off the screen.
     private void DrawIconAndLabel(SpriteBatch batch, TextureLibrary textures, Place place, int index)
     {
         var opacity = place.Motion.TabOpacity(index);
-        var left = TabLeft(place.Motion, index) + UiTheme.MenuTextInset + (index == place.Selected ? SelectedTabSlide : 0);
+        var slideIn = SlideInLeft(place.Motion, index);
+        var unfoldedLeft = slideIn + UiTheme.MenuTextInset + (index == place.Selected ? SelectedTabSlide : 0);
+        var foldedLeft = slideIn + FoldedIconCenter - (IconSize / 2);
+        var left = (int)Math.Round(MathHelper.Lerp(unfoldedLeft, foldedLeft, place.Fold.Share));
         var tabTop = _top + (index * Pitch);
         var icon = new Rectangle(left, tabTop + ((NavTabShape.Height - IconSize) / 2), IconSize, IconSize);
         batch.Draw(_ui.TabIcon(textures, _tabs[index].Glyph), icon, Color.White * opacity);
         var labelTop = tabTop + ((NavTabShape.Height - _font.LineHeight) / 2f);
-        batch.DrawString(_font, _tabs[index].Label, new Vector2(icon.Right + IconGap, labelTop), UiTheme.TextPrimary * opacity);
+        batch.DrawString(_font, _tabs[index].Label, new Vector2(icon.Right + IconGap, labelTop), UiTheme.TextPrimary * (opacity * (1 - place.Fold.Share)));
     }
 
+    // A tab's left edge, pushed off the screen as far as the tabs have folded.
+    private static int TabLeft(Place place, int index) => SlideInLeft(place.Motion, index) - place.Fold.HiddenWidth;
+
     // One pixel left of the screen, so the shape's outlined first column is never seen: the tabs run off the screen's
-    // edge, as the reference's do (decision 271).
-    private static int TabLeft(MenuMotion motion, int index) => -OffScreenEdge - (int)Math.Round(motion.TabOffset(index));
+    // edge, as the reference's do (decision 271). The slide-in starts further left.
+    private static int SlideInLeft(MenuMotion motion, int index) => -OffScreenEdge - (int)Math.Round(motion.TabOffset(index));
 
     /// <summary>What the tabs draw this frame.</summary>
     /// <param name="Motion">The slide-in: each tab's offset and fade.</param>
     /// <param name="Selected">The selected tab.</param>
     /// <param name="GlidePosition">Where the selected glow has glided to, in tabs.</param>
-    public readonly record struct Place(MenuMotion Motion, int Selected, float GlidePosition);
+    /// <param name="Fold">How far the tabs have folded into their icon rail.</param>
+    public readonly record struct Place(MenuMotion Motion, int Selected, float GlidePosition, TabFold Fold);
 
     /// <summary>One tab's name and its icon.</summary>
     public readonly record struct Tab(string Label, TabGlyph Glyph);

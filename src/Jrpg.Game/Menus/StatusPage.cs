@@ -58,6 +58,15 @@ internal sealed class StatusPage : IMemberPage
     /// <summary>The shown member's HP, Attack and Defense, as the page writes them.</summary>
     internal IReadOnlyList<string> ShownStats => _sheet.Stats;
 
+    /// <summary>The shown member's speed, as the page writes it.</summary>
+    internal string ShownSpeed => _sheet.Speed;
+
+    /// <summary>The shown member's resources, each with its max or its lasting amount.</summary>
+    internal IReadOnlyList<StatusLine> ShownResources => _sheet.Resources;
+
+    /// <summary>The shown member's skills, each with its description.</summary>
+    internal IReadOnlyList<StatusLine> ShownSkills => _sheet.Skills;
+
     // Recruits don't change while the menu is open, so the cursor's member count still holds.
     [MemberNotNull(nameof(Members), nameof(_sheet))]
     public void Open()

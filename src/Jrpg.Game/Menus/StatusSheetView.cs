@@ -27,13 +27,17 @@ internal sealed class StatusSheetView
     private const int ColumnGap = 40;
     private const int ValueOffset = 200;
 
-    // Rows, down from the page's top margin: the profile, then each section's title and its lines.
+    // Rows, down from the page's top margin: the profile, then each section's title and its lines, 18 px apart. The
+    // equipment and the resources share a row, in two columns; the skills follow, a name over its description each.
     private const int ClassTop = 42;
     private const int ExperienceTop = 84;
-    private const int ParametersTop = PortraitSize + 18;
-    private const int EquipmentTop = ParametersTop + SectionHeight + (2 * StatLineHeight) + 18;
+    private const int ParametersTop = PortraitSize + SectionGap;
+    private const int EquipmentTop = ParametersTop + SectionHeight + (3 * StatLineHeight) + SectionGap;
     private const int SectionHeight = 36;
+    private const int SectionGap = 18;
     private const int ValueBelowLabel = 26;
+    private const int SkillPitch = 60;
+    private const int DescriptionBelowName = 30;
 
     // The experience bar: 6 px tall, 12 px under the experience values, 16 px short of the profile's right edge. HP
     // gets the same slim bar under its line.
@@ -50,6 +54,8 @@ internal sealed class StatusSheetView
     private readonly SectionTitle _experienceTitle;
     private readonly SectionTitle _parametersTitle;
     private readonly SectionTitle _equipmentTitle;
+    private readonly SectionTitle _resourcesTitle;
+    private readonly SectionTitle _skillsTitle;
     private readonly StatBar _xpBar;
     private StatusSheet? _sheet;
 
@@ -66,6 +72,8 @@ internal sealed class StatusSheetView
         _experienceTitle = new SectionTitle(text, ui, MessageIds.StatusExperience);
         _parametersTitle = new SectionTitle(text, ui, MessageIds.StatusParameters);
         _equipmentTitle = new SectionTitle(text, ui, MessageIds.StatusEquipment);
+        _resourcesTitle = new SectionTitle(text, ui, MessageIds.StatusResources);
+        _skillsTitle = new SectionTitle(text, ui, MessageIds.StatusSkills);
         Vitals = new MemberVitalBars(text, ui, BodyPixels);
         _xpBar = new StatBar(ui, UiTheme.XpBar);
     }
@@ -96,7 +104,13 @@ internal sealed class StatusSheetView
         page.Write(_labelFont, sheet.ClassName, new Vector2(left, top + ClassTop), UiTheme.TextSecondary);
         DrawExperience(page, new Rectangle(left, top + ExperienceTop, profileWidth, 0));
         DrawParameters(page, new Rectangle(left, top + ParametersTop, fullWidth, 0));
-        DrawEquipment(page, new Rectangle(left, top + EquipmentTop, fullWidth, 0));
+
+        var halfWidth = (fullWidth - ColumnGap) / 2;
+        DrawEquipment(page, new Rectangle(left, top + EquipmentTop, halfWidth, 0));
+        DrawResources(page, new Rectangle(left + halfWidth + ColumnGap, top + EquipmentTop, halfWidth, 0));
+        var sharedRows = Math.Max(sheet.Worn.Length, sheet.Resources.Length);
+        var skillsTop = top + EquipmentTop + SectionHeight + (sharedRows * StatLineHeight) + SectionGap;
+        DrawSkills(page, new Rectangle(left, skillsTop, fullWidth, area.Bottom - skillsTop));
     }
 
     // A diamond like the dialogue's, framed by a slightly larger pale diamond behind it.
@@ -125,7 +139,7 @@ internal sealed class StatusSheetView
         _xpBar.Draw(page.Batch, page.Textures, xpBar, page.Opacity);
     }
 
-    // HP alone on the first line with its bar under it, then attack and defense side by side, in two columns.
+    // HP alone on the first line with its bar under it, then attack and defense side by side, then speed alone.
     private void DrawParameters(PageFrame page, Rectangle section)
     {
         _parametersTitle.Draw(page.Batch, page.Textures, section, page.Opacity);
@@ -138,9 +152,37 @@ internal sealed class StatusSheetView
             DrawLine(page, new Vector2(columnLeft, lineTop), _labels.Stats[index], page.Sheet.Stats[index]);
         }
 
+        var speedTop = section.Y + SectionHeight + (2 * StatLineHeight);
+        DrawLine(page, new Vector2(section.X + Indent, speedTop), _labels.Speed, page.Sheet.Speed);
+
         // HP is the first line, so its bar goes under it.
         var hpBar = new Rectangle(section.X + Indent, section.Y + SectionHeight + VitalBarTop, columnWidth, BarHeight);
         Vitals.Hp.Bar.Draw(page.Batch, page.Textures, hpBar, page.Opacity);
+    }
+
+    private void DrawResources(PageFrame page, Rectangle section)
+    {
+        _resourcesTitle.Draw(page.Batch, page.Textures, section, page.Opacity);
+        for (var index = 0; index < page.Sheet.Resources.Length; index++)
+        {
+            var lineTop = section.Y + SectionHeight + (index * StatLineHeight);
+            var resource = page.Sheet.Resources[index];
+            DrawLine(page, new Vector2(section.X + Indent, lineTop), resource.Name, resource.Detail);
+        }
+    }
+
+    // As many skills as the page's height holds; the rest wait for a scrolling list.
+    private void DrawSkills(PageFrame page, Rectangle section)
+    {
+        _skillsTitle.Draw(page.Batch, page.Textures, section, page.Opacity);
+        var fitting = Math.Min(page.Sheet.Skills.Length, (section.Height - SectionHeight) / SkillPitch);
+        for (var index = 0; index < fitting; index++)
+        {
+            var nameTop = section.Y + SectionHeight + (index * SkillPitch);
+            var skill = page.Sheet.Skills[index];
+            page.Write(_bodyFont, skill.Name, new Vector2(section.X + Indent, nameTop), UiTheme.TextPrimary);
+            page.Write(_labelFont, skill.Detail, new Vector2(section.X + Indent, nameTop + DescriptionBelowName), UiTheme.TextSecondary);
+        }
     }
 
     private void DrawEquipment(PageFrame page, Rectangle section)

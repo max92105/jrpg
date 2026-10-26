@@ -21,3 +21,10 @@ Part of [the UI second pass plan](../README.md). Decision 260. Design: [design.m
     - `Open_Member_ListsTheClassSkillsInOrder`
     - `Open_Member_ShowsSpeed`
   - **Verify by hand:** open Status for the mage, the cleric and the fighter: their resources, Clarity or Faith as an amount after a battle, their skills with descriptions; Left and Right change all of it. F12, compare with `menu-status.webp`.
+- **Done, with deviations:**
+  - **Messages:** `stat_speed` (beside `stat_attack` and `stat_defense`, rather than `status_speed`), `status_resources` and `status_skills`. A lasting amount reuses `stat_value_of_max` ("{value} / {max}", decision 110's one format), so there is no `status_lasting_amount`; `StatusLabels` formats it (`ValueOfMax`) and carries the messages to do so.
+  - **Layout:** speed is the parameters' third line; the Equipment and Resources sections share a row in two columns; Skills follow across the page, each name over its description. At SZ1's sizes 3 skills fit (every class has 3 at most today); more are cut off until a scrolling list comes.
+  - **A resource whose max comes from speed** (the rogue's Readiness) shows `ReadinessFormula.Charges` of the member's speed, as a battle starts it.
+  - **New type** `Menus/StatusLine` (name and detail), for a resource line and a skill line.
+  - **Follow-up:** skill costs aren't shown; `Battle/SkillCostText` reads a battle's `ResourceMeters`, so the Status page would need a cost text from the definition alone.
+  - **Tests:** the four planned, and after review `Open_Rogue_ShowsReadinessChargesOfSpeed`, all in `StatusPageTests` (2156 in all); the spent amount comes from a restored save.

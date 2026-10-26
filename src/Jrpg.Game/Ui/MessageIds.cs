@@ -96,6 +96,10 @@ internal static class MessageIds
 
     public const string StatusEquipment = "status_equipment";
 
+    public const string StatusResources = "status_resources";
+
+    public const string StatusSkills = "status_skills";
+
     public const string StatHp = "stat_hp";
 
     /// <summary>Placeholders <c>{value}</c>, <c>{max}</c>: an HP value, one format everywhere (decision 110).</summary>
@@ -104,6 +108,8 @@ internal static class MessageIds
     public const string StatAttack = "stat_attack";
 
     public const string StatDefense = "stat_defense";
+
+    public const string StatSpeed = "stat_speed";
 
     public const string SlotWeapon = "slot_weapon";
 

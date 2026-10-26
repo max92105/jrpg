@@ -1,4 +1,5 @@
 using Jrpg.Core.Progression;
+using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
@@ -132,6 +133,83 @@ public sealed class StatusPageTests
         var progress = StatusSheet.ExperienceProgress(table.MaxLevel, 0, table);
 
         Assert.Equal((1, 1), progress);
+    }
+
+    [Fact]
+    public void Open_Mage_ShowsManaAndClarity()
+    {
+        var page = NewPage(NewSession());
+
+        ShowMember(page, "omer");
+
+        var resources = page.Shown.Class.Resources;
+        var mana = resources.Single(resource => resource.Id == "mana");
+        var clarity = resources.Single(resource => resource.Id == "clarity");
+        Assert.Contains(new StatusLine(mana.Name, NumberText.Of(mana.Max)), page.ShownResources);
+        Assert.Contains(new StatusLine(clarity.Name, $"{clarity.StartsAt} / {clarity.Max}"), page.ShownResources);
+    }
+
+    [Fact]
+    public void Open_LastingResourceSpent_ShowsItsAmountOutOfMax()
+    {
+        var session = SessionWithLastingAmount("omer", "clarity", 1);
+        var page = NewPage(session);
+
+        ShowMember(page, "omer");
+
+        var clarity = page.Shown.Class.Resources.Single(resource => resource.Id == "clarity");
+        Assert.Contains(new StatusLine(clarity.Name, $"1 / {clarity.Max}"), page.ShownResources);
+    }
+
+    [Fact]
+    public void Open_Rogue_ShowsReadinessChargesOfSpeed()
+    {
+        var page = NewPage(NewSession());
+
+        ShowMember(page, "lazarus");
+
+        var readiness = page.Shown.Class.Resources.Single(resource => resource.Id == "readiness");
+        var charges = Math.Max(1, page.Shown.Speed / readiness.MaxFromSpeed!.SpeedPerCharge);
+        Assert.Contains(new StatusLine(readiness.Name, NumberText.Of(charges)), page.ShownResources);
+    }
+
+    [Fact]
+    public void Open_Member_ListsTheClassSkillsInOrder()
+    {
+        var page = NewPage(NewSession());
+
+        ShowMember(page, "omer");
+
+        Assert.Equal(page.Shown.Skills.Select(skill => new StatusLine(skill.Name, skill.Description)), page.ShownSkills);
+    }
+
+    [Fact]
+    public void Open_Member_ShowsSpeed()
+    {
+        var page = NewPage(NewSession());
+
+        ShowMember(page, "omer");
+
+        Assert.Equal(NumberText.Of(page.Shown.Speed), page.ShownSpeed);
+    }
+
+    // Moves right through the members until the one wanted is shown.
+    private static void ShowMember(StatusPage page, string memberId)
+    {
+        for (var step = 0; step < page.Members.Count && page.Shown.Id != memberId; step++)
+        {
+            page.Update(Pressing(GameButton.Right));
+        }
+    }
+
+    // The whole party, with one member's lasting resource left at an amount, as after a battle.
+    private static GameSession SessionWithLastingAmount(string memberId, string resourceId, int amount)
+    {
+        var save = NewSession().Capture(DateTimeOffset.UnixEpoch);
+        var members = save.Members.Select(member => member.Id == memberId
+            ? member with { LastingAmounts = new Dictionary<string, int> { [resourceId] = amount } }
+            : member);
+        return GameSession.Restore(save with { Members = [.. members] }, StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
     }
 
     private static GameSession NewSession() => StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);

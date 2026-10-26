@@ -5,9 +5,7 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/T3.md, slice T3 (title entrance and a clear selection; decision 252)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/C1.md, slice C1 (UiTheme in partial files by screen)
 Round: 1 (verdict: Ready to commit)
 
-- S1 TitleScene.DrawEntries also draws the footer; split a DrawFooter(batch, opacity) out so the name stays true; open
-- S2 Footer position recomputed every Draw; compute it once in the constructor beside _labelPositions (slice: places computed once); open
-- S3 TitleScene.cs ends with an extra blank line after the closing brace; open
+- S1 UiTheme.Dialogue.cs KeyCap summary says TextPrimary "is initialized further down"; it now lives in another file with undefined order: reword to "in another partial file, initialized in no defined order"; open

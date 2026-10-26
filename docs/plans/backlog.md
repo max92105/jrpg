@@ -68,7 +68,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 - `tests/Jrpg.Core.Tests/Battle/BattleStateTests.cs` is 361 lines: split it by command.
 - `tests/Jrpg.Core.Tests/Party/PartyMemberTests.cs` (307) and `tests/Jrpg.Game.Tests/Exploration/EventPresenterTests.cs` (304): split by behavior when next touched.
-- `src/Jrpg.Game/Ui/UiTheme.cs` is 291 lines: the battle colors could move to a partial file, with the `MessageIds` split.
 - Core can't say whether a turn was kept: the screen keeps the actor forward both after a quick skill and when the same member gets two turns in a row (a readied turn right before their own; LK2b review). A `TurnKept` event from `TurnFlow.KeepTurn` would tell them apart.
 - `UiTheme.ColorFromHex("")` throws, and the Core test fixtures build resources without a color; a Game test that reaches them through a battle panel would fail (LK1a review). Give the test builders a color, or make the validator's rule a Core default.
 - Placeholder marks waiting on icon art: Move borrows the Run icon (FM2), and the extra turn's hourglass is a bright diamond (LK3).

@@ -79,7 +79,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **T3. Title entrance and a clear selection: the screen fades in, entries in the shared selection look, a footer line** (Game, about 220 lines) → [slices/T3.md](slices/T3.md)
 
 ### Phase 3: windows and the map
-- [ ] **C1. `UiTheme` in partial files by screen** (Game, mechanical, about 300 lines moved, 30 new) → [slices/C1.md](slices/C1.md)
+- [x] **C1. `UiTheme` in partial files by screen** (Game, mechanical, about 300 lines moved, 30 new) → [slices/C1.md](slices/C1.md)
 - [ ] **W1a. The untitled framed window, first used by the battle's action name** (Game, about 200 lines) → [slices/W1a.md](slices/W1a.md)
 - [ ] **W1b. The titled framed window with its separator; yes/no prompts become a centered framed dialog** (Game, about 220 lines) → [slices/W1b.md](slices/W1b.md)
 - [ ] **W2. The dialogue box in the frame language** (Game, about 130 lines) → [slices/W2.md](slices/W2.md)

@@ -5,6 +5,7 @@ using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Scenes;
+using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
@@ -78,6 +79,10 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
         _batch = new SpriteBatch(GraphicsDevice);
         _virtualScreen = new RenderTarget2D(GraphicsDevice, VirtualScreen.Width, VirtualScreen.Height);
         _textures = new TextureLibrary(GraphicsDevice, _artRoot);
+
+        // The menu's 4096 px background takes over 200 ms to decode: on the first opening that one long frame made the
+        // fixed step catch up past the menu's fade (plan 2026-10-25-ui-second-pass, BG1). Loaded here, before play.
+        _textures.Get(ArtFolders.Backgrounds, UiArtFiles.Backgrounds.Menu);
         StartAudio();
     }
 

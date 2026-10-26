@@ -17,9 +17,6 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class GameMenuScene : IScene
 {
-    // Decision 81's opening fade; opacity only.
-    private static readonly TimeSpan _openFade = TimeSpan.FromSeconds(0.15);
-
     // Placeholder layout (decision 82): the header, the body 40 px below it, the tabs 14 px apart, the page 24 px right
     // of them, 40 px from the right edge, and 32 px above the 64 px footer.
     private const int FooterHeight = 64;
@@ -54,7 +51,9 @@ internal sealed class GameMenuScene : IScene
     private readonly string[] _tabLabels;
     private readonly string _mainHint;
     private readonly PageTransition _pageTransition = new();
-    private TimeSpan _sinceOpened;
+
+    // Decision 81's opening fade; opacity only.
+    private readonly OpeningFade _opening = new(TimeSpan.FromSeconds(0.15));
     private bool _isInPage;
 
     /// <param name="text">Messages and fonts for the tab labels.</param>
@@ -83,7 +82,7 @@ internal sealed class GameMenuScene : IScene
 
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
-        _sinceOpened += delta;
+        _opening.Update(delta);
         _pageTransition.Update(delta);
         _header.Update();
         var request = _isInPage ? UpdatePage(input) : UpdateTabs(input);
@@ -97,7 +96,8 @@ internal sealed class GameMenuScene : IScene
 
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
-        var opacity = (float)Math.Min(1, _sinceOpened / _openFade);
+        var opacity = _opening.Opacity;
+        _opening.MarkDrawn();
         DrawFrame(batch, textures, opacity);
         _header.Draw(batch, _isInPage ? _tabLabels[_tabs.Selected] : _menuTitle, opacity);
         for (var index = 0; index < _tabLabels.Length; index++)

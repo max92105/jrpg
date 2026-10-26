@@ -22,11 +22,12 @@ internal sealed class SystemPage : IMenuPage
     private readonly SpriteFontBase _font;
     private readonly string[] _labels;
     private readonly ConfirmPromptView _promptView;
+    private readonly UiTextures _ui;
     private ISaveFilesPage? _openFiles;
     private ConfirmPrompt? _asking;
 
     /// <param name="text">Messages and fonts for the entries and the question.</param>
-    /// <param name="ui">The shared selection textures the question's buttons use.</param>
+    /// <param name="ui">The shared selection textures: the selected entry's band and the question's buttons.</param>
     /// <param name="savePage">Shown in this page's place while the player saves.</param>
     /// <param name="loadPage">Shown in this page's place while the player picks a save to load.</param>
     public SystemPage(ScreenText text, UiTextures ui, SavePage savePage, LoadPage loadPage)
@@ -45,6 +46,7 @@ internal sealed class SystemPage : IMenuPage
         _font = text.Fonts.FontAt(UiTheme.MenuTextPixels);
         _labels = [.. _entries.Select(entry => text.Messages.Text(entry.LabelId))];
         _promptView = new ConfirmPromptView(text, ui);
+        _ui = ui;
     }
 
     public string TitleMessageId => MessageIds.MenuSystem;
@@ -89,8 +91,14 @@ internal sealed class SystemPage : IMenuPage
 
         for (var index = 0; index < _labels.Length; index++)
         {
-            var color = index == _cursor.Selected ? UiTheme.TextPrimary : UiTheme.TextSecondary;
             var rowTop = area.Y + (index * UiTheme.MenuRowHeight);
+            var isSelected = index == _cursor.Selected;
+            if (isSelected)
+            {
+                DrawSelectedEntry(batch, textures, new Rectangle(area.X, rowTop, area.Width, UiTheme.MenuRowHeight), opacity);
+            }
+
+            var color = isSelected ? UiTheme.TextPrimary : UiTheme.TextSecondary;
             var position = new Vector2(area.X + UiTheme.MenuTextInset, rowTop + ((UiTheme.MenuRowHeight - _font.LineHeight) / 2f));
             batch.DrawString(_font, _labels[index], position, color * opacity);
         }
@@ -99,6 +107,19 @@ internal sealed class SystemPage : IMenuPage
         {
             _promptView.Draw(batch, textures, _asking, opacity);
         }
+    }
+
+    // While a question is open the cursor is on its buttons, so the entry keeps a dimmed band and no pointer.
+    private void DrawSelectedEntry(SpriteBatch batch, TextureLibrary textures, Rectangle row, float opacity)
+    {
+        if (_asking is not null)
+        {
+            _ui.DrawSelectedRow(batch, textures, row, opacity * UiTheme.DimmedSelectionOpacity);
+            return;
+        }
+
+        _ui.DrawSelectedRow(batch, textures, row, opacity);
+        MenuPointer.Draw(batch, textures.Pixel, new Vector2(row.X, row.Center.Y), opacity);
     }
 
     private SceneRequest? UpdateFiles(ISaveFilesPage files, InputFrame input)

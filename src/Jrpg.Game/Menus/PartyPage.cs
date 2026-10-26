@@ -103,7 +103,7 @@ internal sealed class PartyPage : IMenuPage
     // The action choice is offered on an active card only, over its right.
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
-        _columnsView.Draw(batch, textures, new PartyColumnsView.Place(_columns, area, _cursor, MovingMember), opacity);
+        _columnsView.Draw(batch, textures, new PartyColumnsView.Place(_columns, area, _cursor, _actionChoice is null, MovingMember), opacity);
         if (_actionChoice is not null)
         {
             var card = PartyColumnsView.ActiveCardArea(area, _cursor.Row);

@@ -14,3 +14,15 @@ Part of [the UI second pass plan](../README.md). Decisions 252, 253. Design: [de
   - The yes/no buttons move in W1b, the title in T3.
   - **Tests:** none new (draw-only; the selection's state is already tested per list). Existing tests pass unchanged.
   - **Verify by hand:** F12 the save list, the defeat menu, the command panel, Options, Equipment, the party page's action choice: every selected row has the same band and the same diamond at its left, and only the list with the cursor shows the pointer.
+- **Done, with deviations:**
+  - **Moved onto the shared look:**
+    - the defeat menu: the band over its pointed bar, the pointer before the label;
+    - the command panel: the plain fill under the band, the pointer before the icon, inside the frame;
+    - the save list.
+  - **The pointer added** to Options, the equipment choice and the party action choice.
+  - **Not in the slice's list:**
+    - the System page drew no band at all; it now has the band and pointer, dimmed while its yes/no is open;
+    - the Equipment sheet and the Party page's cards show the pointer only while they have the cursor (a `HasCursor` on their `Place`), and the sheet dims its row while the choice panel is open, like the Inventory page.
+  - **Removed:** `UiTextures.SelectedRewardBar`, `UiTheme.Highlight`, the hand-drawn diamonds' constants and the backlog line.
+  - **Left as is:** the item target picker's chosen cards (several can be chosen at once).
+  - **Review:** the sidebar drew a second pointer on the Equipment page. With the developer's answer, `IMemberPage.HasOwnPointer` (Equipment true, Status false) tells the sidebar to light the shown card without pointing (`PartySidebarView.Place`). The Party page's selected card keeps its full band while the action choice is open.

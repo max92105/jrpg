@@ -20,13 +20,10 @@ internal sealed class CommandPanelView
     private const int HeaderGap = 6;
     private const int FrameInset = 5;
     private const int RowHeight = 52;
-    private const int RowPointerLeft = 8;
-    private const int RowPointerSide = 12;
     private const int IconLeft = 48;
     private const int IconSize = 28;
     private const int IconGap = 12;
     private const int AmountRight = 16;
-    private const int SelectionLineHeight = 2;
     private const float DisabledOpacity = 0.4f;
     private const int HintPaddingX = 16;
     private const int HintPaddingY = 10;
@@ -218,23 +215,23 @@ internal sealed class CommandPanelView
         return frame.Bottom;
     }
 
-    // Every row of the frame gets the plain fill and separator, except the selected one, lit with the pointer.
+    // Every row of the frame gets the plain fill; the others a separator, the selected one the shared selected-row band
+    // and the pointer before its icon (decision 252).
     private void DrawRowBacks(SpriteBatch batch, TextureLibrary textures, Rectangle frame, int selectedRow)
     {
         var rowCount = (frame.Height - (2 * FrameInset)) / RowHeight;
         for (var index = 0; index < rowCount; index++)
         {
             var row = RowIn(frame, index);
+            batch.Draw(textures.Pixel, row, UiTheme.CommandRowFill);
             if (index != selectedRow)
             {
-                batch.Draw(textures.Pixel, row, UiTheme.CommandRowFill);
                 batch.Draw(textures.Pixel, new Rectangle(row.X, row.Bottom - 1, row.Width, 1), UiTheme.Stroke);
                 continue;
             }
 
-            batch.Draw(_ui.Gradient(textures, UiTheme.Selection), row, Color.White);
-            batch.Draw(_ui.Gradient(textures, UiTheme.SelectionLine), new Rectangle(row.X, row.Bottom - SelectionLineHeight, row.Width, SelectionLineHeight), Color.White);
-            new Diamond(new Vector2(row.X + RowPointerLeft + RowPointerSide, row.Center.Y), RowPointerSide).Draw(batch, textures.Pixel, Color.White);
+            _ui.DrawSelectedRow(batch, textures, row, opacity: 1);
+            MenuPointer.Draw(batch, textures.Pixel, new Vector2(row.X + IconLeft, row.Center.Y), opacity: 1);
         }
     }
 

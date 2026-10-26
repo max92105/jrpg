@@ -114,7 +114,8 @@ internal sealed class GameMenuScene : IScene
 
         if (ShowsSidebar)
         {
-            _sidebarView.Draw(batch, textures, _sidebarColumn, opacity * _pageTransition.Opacity);
+            var pointsAtShown = _pages[_tabs.Selected] is not IMemberPage { HasOwnPointer: true };
+            _sidebarView.Draw(batch, textures, new PartySidebarView.Place(_sidebarColumn, pointsAtShown), opacity * _pageTransition.Opacity);
         }
 
         DrawFooterHint(batch, opacity);

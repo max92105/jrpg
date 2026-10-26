@@ -41,10 +41,11 @@ internal sealed class PartySidebarView
 
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the shared textures are made.</param>
-    /// <param name="column">The sidebar's column, in virtual-screen pixels.</param>
+    /// <param name="place">The sidebar's column, and whether it points at the shown card.</param>
     /// <param name="opacity">0 to 1, while the menu or the page fades in.</param>
-    public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle column, float opacity)
+    public void Draw(SpriteBatch batch, TextureLibrary textures, Place place, float opacity)
     {
+        var column = place.Column;
         FormatChangedCards();
         batch.Draw(_ui.Gradient(textures, UiTheme.SidebarPanel), column, Color.White * opacity);
         var last = Math.Min(_cards.Count, _sidebar.FirstVisible + PartySidebar.VisibleCards);
@@ -57,7 +58,7 @@ internal sealed class PartySidebarView
                 top += CaptionHeight;
             }
 
-            DrawCard(batch, textures, new CardSlot(index, new Rectangle(column.X, top, column.Width, MemberCardView.Height)), opacity);
+            DrawCard(batch, textures, new CardSlot(index, new Rectangle(column.X, top, column.Width, MemberCardView.Height), place.PointsAtShown), opacity);
             top += MemberCardView.Height + CardGap;
         }
 
@@ -66,13 +67,14 @@ internal sealed class PartySidebarView
 
     private bool IsFirstReserve(int index) => _sidebar.Cards[index].IsReserve && (index == 0 || !_sidebar.Cards[index - 1].IsReserve);
 
-    // The shown member's card is lit and pointed at, and never dimmed, even in the reserve.
+    // The shown member's card is lit, pointed at unless the page points at its own row, and never dimmed, even in the
+    // reserve.
     private void DrawCard(SpriteBatch batch, TextureLibrary textures, CardSlot slot, float opacity)
     {
         var isShown = slot.Index == _sidebar.ShownIndex;
         var cardOpacity = _sidebar.Cards[slot.Index].IsReserve && !isShown ? opacity * UiTheme.ReserveCardOpacity : opacity;
         _cardView.Draw(batch, textures, new MemberCardView.Place(_cards[slot.Index].Card, slot.Area, isShown), cardOpacity);
-        if (isShown)
+        if (isShown && slot.PointsAtShown)
         {
             MenuPointer.Draw(batch, textures.Pixel, new Vector2(slot.Area.X, slot.Area.Center.Y), opacity);
         }
@@ -114,6 +116,13 @@ internal sealed class PartySidebarView
         }
     }
 
-    // One card's index in the sidebar and where it's drawn.
-    private readonly record struct CardSlot(int Index, Rectangle Area);
+    // One card's index in the sidebar, where it's drawn, and whether the shown card gets the pointer.
+    private readonly record struct CardSlot(int Index, Rectangle Area, bool PointsAtShown);
+
+    /// <summary>Where the sidebar goes this frame.</summary>
+    /// <param name="Column">The sidebar's column, in virtual-screen pixels.</param>
+    /// <param name="PointsAtShown">
+    /// False on a page that points at a row of its own, so only one pointer shows (decision 252).
+    /// </param>
+    public readonly record struct Place(Rectangle Column, bool PointsAtShown);
 }

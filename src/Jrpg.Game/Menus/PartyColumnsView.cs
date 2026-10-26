@@ -84,6 +84,12 @@ internal sealed class PartyColumnsView
         var cursor = place.Cursor;
         DrawCards(batch, textures, new CardColumn(columns.Active, active, cursor.IsOnReserve ? null : cursor.Row, columns.Cards, place.Moving), opacity);
         DrawCards(batch, textures, new CardColumn(columns.Reserve, reserve, cursor.IsOnReserve ? cursor.Row : null, columns.Cards, place.Moving), opacity);
+        if (place.HasCursor)
+        {
+            var selected = CardArea(cursor.IsOnReserve ? reserve : active, cursor.Row);
+            MenuPointer.Draw(batch, textures.Pixel, new Vector2(selected.X, selected.Center.Y), opacity);
+        }
+
         if (columns.Notice is not null)
         {
             var noticeTop = active.Y + CardsTop + (_maxActive * MemberCardView.Height) + NoticeGap;
@@ -129,8 +135,9 @@ internal sealed class PartyColumnsView
     /// <param name="Columns">The page's formatted text.</param>
     /// <param name="Area">The page's area.</param>
     /// <param name="Cursor">Which card is selected.</param>
+    /// <param name="HasCursor">False while the action choice has it: the selected card then shows no pointer.</param>
     /// <param name="Moving">The member whose place is being swapped, or null.</param>
-    public readonly record struct Place(PartyColumns Columns, Rectangle Area, PartyCursor Cursor, PartyMember? Moving);
+    public readonly record struct Place(PartyColumns Columns, Rectangle Area, PartyCursor Cursor, bool HasCursor, PartyMember? Moving);
 
     // One column's members, where its cards go, the cursor's row when the cursor is in it, every card, and who is moving.
     private readonly record struct CardColumn(

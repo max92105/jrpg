@@ -101,10 +101,8 @@ internal sealed class SaveSlotListView
         var text = _rows[index];
         if (index == _list.Selected)
         {
-            batch.Draw(_ui.Gradient(textures, UiTheme.Highlight), row, Color.White * opacity);
-            var line = _ui.Gradient(textures, UiTheme.HighlightLine);
-            batch.Draw(line, new Rectangle(row.X, row.Y, row.Width, 1), Color.White * opacity);
-            batch.Draw(line, new Rectangle(row.X, row.Bottom - 1, row.Width, 1), Color.White * opacity);
+            _ui.DrawSelectedRow(batch, textures, row, opacity);
+            MenuPointer.Draw(batch, textures.Pixel, new Vector2(row.X, row.Center.Y), opacity);
         }
 
         batch.Draw(textures.Pixel, new Rectangle(row.X, row.Bottom - 1, row.Width, 1), UiTheme.Stroke * opacity);

@@ -32,7 +32,6 @@ internal sealed class UiTextures
     private Texture2D? _topShade;
     private Texture2D? _commandHeader;
     private Texture2D? _rewardBar;
-    private Texture2D? _selectedRewardBar;
     private Texture2D? _cardHeader;
     private readonly Dictionary<(string File, int Size), Texture2D> _diamondPortraits = [];
     private readonly Dictionary<(string Folder, string File, int Size), Texture2D> _shrunk = [];
@@ -88,13 +87,6 @@ internal sealed class UiTextures
             PointedBarShape.RewardBarWidth,
             PointedBarShape.RewardBarHeight,
             PointedBarShape.RewardBar(GradientStrip.Colors(UiTheme.RewardBar, PointedBarShape.RewardBarWidth)));
-
-    /// <summary>A reward bar lit as the selected choice.</summary>
-    public Texture2D SelectedRewardBar(TextureLibrary textures) =>
-        _selectedRewardBar ??= textures.Create(
-            PointedBarShape.RewardBarWidth,
-            PointedBarShape.RewardBarHeight,
-            PointedBarShape.RewardBar(GradientStrip.Colors(UiTheme.Selection, PointedBarShape.RewardBarWidth)));
 
     /// <summary>A victory card's name tab, pointed at both ends, with a faint outline.</summary>
     public Texture2D CardHeader(TextureLibrary textures) =>
@@ -192,8 +184,8 @@ internal sealed class UiTextures
     }
 
     /// <summary>
-    /// The selected row of a menu list: the <see cref="UiTheme.SelectedRow"/> gradient between two
-    /// bright hairlines.
+    /// The one selected-row look of every list (decision 252): the <see cref="UiTheme.SelectedRow"/> gradient between
+    /// two bright hairlines. The list with the cursor adds <see cref="MenuPointer"/> at the row's left.
     /// </summary>
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the gradients are made.</param>

@@ -51,6 +51,7 @@ internal sealed class PartyActionChoiceView
             if (isSelected)
             {
                 _ui.DrawSelectedRow(batch, textures, row, 1);
+                MenuPointer.Draw(batch, textures.Pixel, new Vector2(row.X, row.Center.Y), opacity: 1);
             }
 
             var textTop = row.Y + ((RowHeight - _font.LineHeight) / 2);

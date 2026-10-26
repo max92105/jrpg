@@ -60,6 +60,8 @@ internal sealed class EquipmentPage : IMemberPage
 
     public PartyMember Shown => Members[_memberCursor.Selected];
 
+    public bool HasOwnPointer => true;
+
     public string TitleMessageId => MessageIds.MenuEquipment;
 
     public string Hint => _takeHint ?? _pageHint;
@@ -125,7 +127,7 @@ internal sealed class EquipmentPage : IMemberPage
     {
         var sheetWidth = _choice is null ? area.Width : area.Width - EquipmentChoiceView.PanelWidth;
         var sheetArea = area with { Width = sheetWidth };
-        _sheetView.Draw(batch, textures, new EquipmentSheetView.Place(_sheet, sheetArea, _rowCursor.Selected, _preview, _notice), opacity);
+        _sheetView.Draw(batch, textures, new EquipmentSheetView.Place(_sheet, sheetArea, _rowCursor.Selected, _choice is null, _preview, _notice), opacity);
         if (_choice is not null)
         {
             _choiceView.Draw(batch, textures, _choice, new Rectangle(sheetArea.Right, area.Y, EquipmentChoiceView.PanelWidth, area.Height));

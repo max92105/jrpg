@@ -19,8 +19,6 @@ internal sealed class DefeatScreenView
     private const int ChoicesLeft = 88;
     private const int ChoicesTop = 320;
     private const int ChoiceGap = 14;
-    private const int ChoicePointerLeft = 40;
-    private const int ChoicePointerSide = 12;
     private const int ChoiceLabelLeft = 96;
     private const int FooterTextLeft = 70;
     private const int TitleTextPixels = 96;
@@ -91,10 +89,11 @@ internal sealed class DefeatScreenView
         {
             var isSelected = menu.Entries[index] == menu.Selected;
             var bar = new Rectangle(ChoicesLeft, ChoicesTop + (index * (PointedBarShape.RewardBarHeight + ChoiceGap)), PointedBarShape.RewardBarWidth, PointedBarShape.RewardBarHeight);
-            batch.Draw(isSelected ? _ui.SelectedRewardBar(textures) : _ui.RewardBar(textures), bar, Color.White * opacity);
+            batch.Draw(_ui.RewardBar(textures), bar, Color.White * opacity);
             if (isSelected)
             {
-                new Diamond(new Vector2(bar.X + ChoicePointerLeft + ChoicePointerSide, bar.Center.Y), ChoicePointerSide).Draw(batch, textures.Pixel, Color.White * opacity);
+                _ui.DrawSelectedRow(batch, textures, bar, opacity);
+                MenuPointer.Draw(batch, textures.Pixel, new Vector2(bar.X + ChoiceLabelLeft, bar.Center.Y), opacity);
             }
 
             var labelTop = bar.Center.Y - (_choiceFont.Font.LineHeight / 2f);

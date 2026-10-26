@@ -153,10 +153,6 @@ internal static class UiTheme
     /// <summary>An empty or unreadable save file.</summary>
     public static Color TextDisabled { get; } = FromStraightArgb(0xFF5C606B);
 
-    /// <summary>The selected save file's row, fading out to the right.</summary>
-    public static ImmutableArray<GradientStop> Highlight { get; } =
-        [new(0, FromStraightArgb(0x993D4590)), new(0.45f, FromStraightArgb(0x665A64B8)), new(1, FromStraightArgb(0x005A64B8))];
-
     /// <summary>The selected row of a menu list, fading out to the right.</summary>
     public static ImmutableArray<GradientStop> SelectedRow { get; } =
         [new(0, FromStraightArgb(0xE64A53A8)), new(0.5f, FromStraightArgb(0xB36E78C8)), new(1, FromStraightArgb(0x1A6E78C8))];

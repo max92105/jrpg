@@ -93,6 +93,8 @@ internal sealed class StatusPage : IMemberPage
 
     public PartyMember Shown => Members[_cursor.Selected];
 
+    public bool HasOwnPointer => false;
+
     public string TitleMessageId => MessageIds.MenuStatus;
 
     public string Hint { get; }

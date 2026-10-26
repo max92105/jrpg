@@ -4,8 +4,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// The menu's "you are here" mark: a small white diamond just left of the line that has the cursor, like the defeat
-/// menu's pointer.
+/// The "you are here" mark of every list (decision 252): a small white diamond just left of the line that has the
+/// cursor.
 /// </summary>
 internal static class MenuPointer
 {

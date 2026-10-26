@@ -75,13 +75,13 @@ internal sealed class EquipmentSheetView
         var rowsTop = equipment.Y + SectionHeight;
         for (var index = 0; index < EquipmentSheet.Slots.Length; index++)
         {
-            var row = new ListRow(new Rectangle(left, rowsTop + (index * RowHeight), width, RowHeight), index == place.SelectedRow);
+            var row = new ListRow(new Rectangle(left, rowsTop + (index * RowHeight), width, RowHeight), index == place.SelectedRow, place.HasCursor);
             DrawSlotRow(batch, textures, new SlotRow(row, _labels.Slots[index], place.Sheet.Worn[index]), opacity);
         }
 
         var removeAllTop = rowsTop + (EquipmentSheet.Slots.Length * RowHeight) + ActionGap;
         batch.Draw(textures.Pixel, new Rectangle(left, removeAllTop - 1, width, 1), UiTheme.Stroke * opacity);
-        var removeAll = new ListRow(new Rectangle(left, removeAllTop, width, RowHeight), place.SelectedRow == EquipmentSheet.Slots.Length);
+        var removeAll = new ListRow(new Rectangle(left, removeAllTop, width, RowHeight), place.SelectedRow == EquipmentSheet.Slots.Length, place.HasCursor);
         DrawRemoveAllRow(batch, textures, removeAll, opacity);
 
         var parameters = new Rectangle(left, removeAllTop + RowHeight + ParametersGap, width, 0);
@@ -93,13 +93,28 @@ internal sealed class EquipmentSheetView
         }
     }
 
+    // The shared selected-row look (decision 252); while the choice panel has the cursor, a dimmed band and no pointer.
+    private void DrawSelection(SpriteBatch batch, TextureLibrary textures, ListRow row, float opacity)
+    {
+        if (!row.IsSelected)
+        {
+            return;
+        }
+
+        if (!row.HasCursor)
+        {
+            _ui.DrawSelectedRow(batch, textures, row.Area, opacity * UiTheme.DimmedSelectionOpacity);
+            return;
+        }
+
+        _ui.DrawSelectedRow(batch, textures, row.Area, opacity);
+        MenuPointer.Draw(batch, textures.Pixel, new Vector2(row.Area.X, row.Area.Center.Y), opacity);
+    }
+
     private void DrawSlotRow(SpriteBatch batch, TextureLibrary textures, SlotRow slot, float opacity)
     {
         var row = slot.Row.Area;
-        if (slot.Row.IsSelected)
-        {
-            _ui.DrawSelectedRow(batch, textures, row, opacity);
-        }
+        DrawSelection(batch, textures, slot.Row, opacity);
 
         var textTop = row.Y + ((RowHeight - _bodyFont.LineHeight) / 2f);
         batch.DrawString(_bodyFont, slot.Label, new Vector2(row.X + RowInset + IconColumn, textTop), UiTheme.TextSecondary * opacity);
@@ -117,10 +132,7 @@ internal sealed class EquipmentSheetView
 
     private void DrawRemoveAllRow(SpriteBatch batch, TextureLibrary textures, ListRow row, float opacity)
     {
-        if (row.IsSelected)
-        {
-            _ui.DrawSelectedRow(batch, textures, row.Area, opacity);
-        }
+        DrawSelection(batch, textures, row, opacity);
 
         var textTop = row.Area.Y + ((RowHeight - _bodyFont.LineHeight) / 2f);
         batch.DrawString(_bodyFont, _labels.RemoveAll, new Vector2(row.Area.X + RowInset + IconColumn, textTop), UiTheme.TextPrimary * opacity);
@@ -160,12 +172,13 @@ internal sealed class EquipmentSheetView
     /// <param name="Sheet">The shown member.</param>
     /// <param name="Area">The sheet's part of the page.</param>
     /// <param name="SelectedRow">A slot's index in <see cref="EquipmentSheet.Slots"/>, or its length for "Remove all".</param>
+    /// <param name="HasCursor">False while the choice panel has it: the selected row dims, with no pointer.</param>
     /// <param name="Preview">The highlighted choice's effect on attack and defense, or null when no choice is open.</param>
     /// <param name="Notice">Why the last change didn't happen, or null.</param>
-    public readonly record struct Place(EquipmentSheet Sheet, Rectangle Area, int SelectedRow, StatPreviewText? Preview, string? Notice);
+    public readonly record struct Place(EquipmentSheet Sheet, Rectangle Area, int SelectedRow, bool HasCursor, StatPreviewText? Preview, string? Notice);
 
-    // One 52 px row and whether the cursor is on it.
-    private readonly record struct ListRow(Rectangle Area, bool IsSelected);
+    // One 52 px row, whether it is the sheet's selected row, and whether the sheet has the cursor.
+    private readonly record struct ListRow(Rectangle Area, bool IsSelected, bool HasCursor);
 
     // A slot's row: its label and what's worn there, null for nothing.
     private readonly record struct SlotRow(ListRow Row, string Label, ItemDefinition? Worn);

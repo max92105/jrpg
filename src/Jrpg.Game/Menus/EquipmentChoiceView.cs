@@ -104,6 +104,7 @@ internal sealed class EquipmentChoiceView
         if (index == choice.SelectedRow)
         {
             _ui.DrawSelectedRow(batch, textures, row, opacity: 1);
+            MenuPointer.Draw(batch, textures.Pixel, new Vector2(row.X, row.Center.Y), opacity: 1);
         }
 
         var textTop = row.Y + ((RowHeight - _bodyFont.LineHeight) / 2f);

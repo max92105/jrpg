@@ -127,6 +127,7 @@ internal sealed class OptionsPage : IMenuPage
         if (isSelected)
         {
             _ui.DrawSelectedRow(batch, textures, place.Area, opacity);
+            MenuPointer.Draw(batch, textures.Pixel, new Vector2(place.Area.X, place.Area.Center.Y), opacity);
         }
 
         var color = (isSelected ? UiTheme.TextPrimary : UiTheme.TextSecondary) * opacity;

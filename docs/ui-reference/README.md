@@ -31,3 +31,7 @@ Screenshots of the developer's favorite UI/UX, Octopath Traveler II, the target 
 | `battle-target-fallen-ally.webp` | Battle | Aiming at a fallen ally |
 | `battle-target-enemy.webp` | Battle | *Octopath I*: aiming at an enemy |
 | `battle-damage-numbers.webp` | Battle | *Octopath I*: damage numbers, the action name box |
+
+## The extracted UI
+
+[export-index.md](export-index.md) names, per screen, the few files of the developer's UI extract that show its pieces, and the idea to take from each.

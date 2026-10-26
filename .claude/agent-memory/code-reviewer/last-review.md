@@ -5,7 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/R1.md, slice R1 (docs/ui-reference rename, README, reference-only rule)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/R2.md, slice R2 (docs/ui-reference/export-index.md, README link)
 Round: 1 (verdict: Ready to commit)
 
-- Suggestion: game.md "UI look" says "never ship their images" in the first bullet and again in the new decision-264 bullet; drop the first clause; open
+- Suggestion: export-index.md:75 Save and load names 1 file where the slice asks 2-4; add one or record it in the Done note; open
+- Suggestion: design.md's table names `UiTX_Common_Footer_Base.png` (the title's footer line) but the index leaves it out; add it under Shared pieces or Title; open

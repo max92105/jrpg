@@ -35,8 +35,21 @@ internal sealed class UiTextures
     private readonly Dictionary<(string File, int Size), Texture2D> _diamondPortraits = [];
     private readonly Dictionary<(string Folder, string File, int Size), Texture2D> _shrunk = [];
     private readonly Dictionary<DiamondShape, Texture2D> _diamonds = [];
+    private readonly Dictionary<TabGlyph, Texture2D> _tabIcons = [];
     private readonly Dictionary<Texture2D, Texture2D> _silhouettes = [];
     private readonly Dictionary<ImmutableArray<GradientStop>, Texture2D> _gradients = [];
+
+    /// <summary>A tab's placeholder icon, <see cref="TabGlyphShape.Size"/> pixels square, baked on first use.</summary>
+    public Texture2D TabIcon(TextureLibrary textures, TabGlyph glyph)
+    {
+        if (!_tabIcons.TryGetValue(glyph, out var icon))
+        {
+            icon = textures.Create(TabGlyphShape.Size, TabGlyphShape.Size, TabGlyphShape.Pixels(glyph));
+            _tabIcons.Add(glyph, icon);
+        }
+
+        return icon;
+    }
 
     /// <summary>A tab that isn't selected: the arrow, dark and faintly outlined.</summary>
     public Texture2D NavTab(TextureLibrary textures) =>

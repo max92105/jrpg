@@ -65,6 +65,8 @@ internal sealed class EquipmentPage : IMemberPage
 
     public string TitleMessageId => MessageIds.MenuEquipment;
 
+    public TabGlyph Glyph => TabGlyph.Equipment;
+
     public string Hint => _takeHint ?? _pageHint;
 
     /// <summary>False while the item choice shows in the sidebar's place.</summary>

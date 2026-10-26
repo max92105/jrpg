@@ -78,6 +78,8 @@ internal sealed class InventoryPage : IMenuPage
 
     public string TitleMessageId => MessageIds.MenuInventory;
 
+    public TabGlyph Glyph => TabGlyph.Items;
+
     public string Hint => _rail.HasCursor ? _railHint : _listHint;
 
     public bool ShowsPartySidebar => true;

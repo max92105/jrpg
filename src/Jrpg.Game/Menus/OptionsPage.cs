@@ -53,6 +53,8 @@ internal sealed class OptionsPage : IMenuPage
 
     public string TitleMessageId => MessageIds.MenuOptions;
 
+    public TabGlyph Glyph => TabGlyph.Options;
+
     public string Hint { get; }
 
     public bool ShowsPartySidebar => true;

@@ -106,7 +106,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **B1c. The shards fly apart over the fade into battle** (Game, about 180 lines) → [slices/B1c.md](slices/B1c.md)
 
 ### Phase 6: clean-up and walk-through
-- [ ] **C2. Footer hints on `FooterBar.TextTop`, time shares on `Easing`** (Game, about 120 lines) → [slices/C2.md](slices/C2.md)
+- [x] **C2. Footer hints on `FooterBar.TextTop`, time shares on `Easing`** (Game, about 120 lines) → [slices/C2.md](slices/C2.md)
 - [ ] **Z. Demo walk-through against the captures and the index** (manual) → [slices/Z.md](slices/Z.md)
 
 ## Decisions

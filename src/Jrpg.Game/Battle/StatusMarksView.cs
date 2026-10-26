@@ -52,10 +52,10 @@ internal sealed class StatusMarksView
     public int Width => _marks.Count == 0 ? 0 : (_marks.Count * (MarkSize + MarkGap)) - MarkGap;
 
     /// <returns>A mark's size while it pops in: 1.3 as it appears, down to 1 after the pop.</returns>
-    public static float PopScale(TimeSpan sinceShown) => 1 + ((PopStartScale - 1) * (1 - Share(sinceShown, _popTime)));
+    public static float PopScale(TimeSpan sinceShown) => 1 + ((PopStartScale - 1) * (1 - Easing.ShareOf(sinceShown, _popTime)));
 
     /// <returns>How visible an ended mark still is: 1 as its status ends, down to 0 after the fade.</returns>
-    public static float FadeOpacity(TimeSpan sinceEnded) => 1 - Share(sinceEnded, _fadeTime);
+    public static float FadeOpacity(TimeSpan sinceEnded) => 1 - Easing.ShareOf(sinceEnded, _fadeTime);
 
     public static bool IsHarmful(StatusKind kind) => kind is StatusKind.Stun or StatusKind.Exposed or StatusKind.Poison;
 
@@ -109,8 +109,6 @@ internal sealed class StatusMarksView
             _turnsFont.Draw(batch, mark.Turns.Text, turnsTopLeft, UiTheme.TextPrimary * fade);
         }
     }
-
-    private static float Share(TimeSpan elapsed, TimeSpan duration) => Math.Clamp((float)(elapsed / duration), 0, 1);
 
     private StatusMark AddMark(StatusKind kind)
     {

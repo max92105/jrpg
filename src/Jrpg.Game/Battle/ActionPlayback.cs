@@ -82,7 +82,7 @@ internal sealed class ActionPlayback
             return null;
         }
 
-        var fadeShare = Math.Clamp((float)((Elapsed - _fallen[index].FadeStart - _fallTint) / _fallFade), 0, 1);
+        var fadeShare = Easing.ShareOf(Elapsed - _fallen[index].FadeStart - _fallTint, _fallFade);
         return 1 - (fadeShare * fadeShare);
     }
 

@@ -144,8 +144,7 @@ internal sealed class VictoryScreenView
         OutcomeFrame.DrawFooter(batch, textures.Pixel);
         if (_screen.IsComplete)
         {
-            var footer = FooterBar.Area(OutcomeFrame.FooterHeight);
-            var hintTop = footer.Y + ((footer.Height - _nextHintFont.Font.LineHeight) / 2f);
+            var hintTop = FooterBar.TextTop(OutcomeFrame.FooterHeight, _nextHintFont.Font.LineHeight);
             _nextHintFont.Draw(batch, _nextHint.Text, new Vector2(VirtualScreen.Width - NextHintRight - _nextHint.Width, hintTop), UiTheme.TextPrimary);
         }
     }

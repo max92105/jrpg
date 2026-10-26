@@ -1,3 +1,5 @@
+using Jrpg.Game.Ui;
+
 namespace Jrpg.Game.Battle;
 
 /// <summary>How the defeat screen comes in: the title fades in slowly, then the choices.</summary>
@@ -13,11 +15,9 @@ internal sealed class DefeatEntrance
     /// <summary>Whether the choices are fully shown, so they take input.</summary>
     public bool IsComplete => _elapsed >= _choicesDelay + _choicesFade;
 
-    public float TitleOpacity => ShareOf(_elapsed, _titleFade);
+    public float TitleOpacity => Easing.ShareOf(_elapsed, _titleFade);
 
-    public float ChoicesOpacity => ShareOf(_elapsed - _choicesDelay, _choicesFade);
+    public float ChoicesOpacity => Easing.ShareOf(_elapsed - _choicesDelay, _choicesFade);
 
     public void Update(TimeSpan delta) => _elapsed += delta;
-
-    private static float ShareOf(TimeSpan time, TimeSpan length) => Math.Clamp((float)(time / length), 0, 1);
 }

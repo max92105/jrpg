@@ -149,8 +149,7 @@ internal sealed class GameMenuScene : IScene
 
     private void DrawFooterHint(SpriteBatch batch, float opacity)
     {
-        var footer = FooterBar.Area(FooterHeight);
-        var top = footer.Y + ((footer.Height - _font.LineHeight) / 2);
+        var top = FooterBar.TextTop(FooterHeight, _font.LineHeight);
         batch.DrawString(_font, FooterHint, new Vector2(FooterTextInset, top), UiTheme.TextSecondary * opacity);
     }
 

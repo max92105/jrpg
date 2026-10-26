@@ -54,7 +54,7 @@ internal sealed class ResourceGaugeView
     public static bool ShowsPips(int max) => max <= PipsUpTo;
 
     /// <returns>How bright a change's flash still is: 1 as it happens, down to 0 once the flash time is over.</returns>
-    public static float FlashShare(TimeSpan sinceChange) => 1 - Math.Clamp((float)(sinceChange / _flashTime), 0, 1);
+    public static float FlashShare(TimeSpan sinceChange) => 1 - Easing.ShareOf(sinceChange, _flashTime);
 
     /// <summary>A force's name is lit while it dominates (decision 204); other names stay secondary.</summary>
     public static Color LabelColor(bool isDominant) => isDominant ? UiTheme.TextPrimary : UiTheme.TextSecondary;

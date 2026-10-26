@@ -37,8 +37,8 @@ internal readonly record struct FloatingNumber(Combatant Target, string Text, Fl
     /// <param name="sinceShown">Time since the number appeared.</param>
     public static FloatingNumberLook At(TimeSpan sinceShown)
     {
-        var popShare = Math.Clamp((float)(sinceShown / _pop), 0, 1);
-        var lifeShare = Math.Clamp((float)(sinceShown / _life), 0, 1);
+        var popShare = Easing.ShareOf(sinceShown, _pop);
+        var lifeShare = Easing.ShareOf(sinceShown, _life);
         var easedRise = 1 - ((1 - lifeShare) * (1 - lifeShare));
         var opacity = lifeShare < 0.5f ? 1 : 2 * (1 - lifeShare);
         return new FloatingNumberLook(PopStartScale + ((1 - PopStartScale) * popShare), RiseDistance * easedRise, opacity);

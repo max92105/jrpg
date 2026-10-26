@@ -6,8 +6,8 @@ namespace Jrpg.Game.Saving;
 /// <summary>The save files as a list to choose from, scrolling a window of them with the cursor.</summary>
 internal sealed class SaveSlotList
 {
-    /// <summary>How many 92 px rows fit on a menu page.</summary>
-    public const int VisibleRows = 8;
+    /// <summary>How many 112 px rows fit on a menu page.</summary>
+    public const int VisibleRows = 6;
 
     private readonly ListCursor _cursor;
 

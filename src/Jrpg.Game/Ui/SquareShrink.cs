@@ -3,8 +3,8 @@ using Microsoft.Xna.Framework;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// Shrinks a picture's centered square smoothly to a small square, once per picture: the 1024 px art drawn at 26 or 40 px
-/// with point sampling would alias badly.
+/// Shrinks a picture's centered square smoothly to a small square, once per picture: the 1024 px art drawn at 24 to 40
+/// px with point sampling would alias badly.
 /// </summary>
 internal static class SquareShrink
 {

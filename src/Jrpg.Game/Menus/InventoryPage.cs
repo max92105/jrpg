@@ -18,24 +18,24 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class InventoryPage : IMenuPage
 {
-    /// <summary>How many 44 px rows show at once.</summary>
+    /// <summary>How many 52 px rows show at once.</summary>
     public const int VisibleRows = 10;
 
-    // Placeholder layout (decision 82): a 28 x 20 margin, a heading title, column titles over a hairline, 44 px rows
-    // 10 px in with a 26 px icon in a 40 px column and the quantity 16 px from the right; 18 px body text.
+    // Placeholder layout (decision 82): a 28 x 20 margin, a heading title, column titles over a hairline, 52 px rows 10
+    // px in with a 32 px icon in a 48 px column and the quantity 16 px from the right; 26 px body text.
     private const int Margin = 28;
     private const int TopMargin = 20;
-    private const int HeadingPixels = 22;
-    private const int BodyPixels = 18;
-    private const int LabelPixels = 14;
-    private const int ColumnTitlesTop = 48;
+    private const int HeadingPixels = 30;
+    private const int BodyPixels = 26;
+    private const int LabelPixels = 18;
+    private const int ColumnTitlesTop = 60;
     private const int RowsTop = ColumnTitlesTop + ColumnTitles.Height;
-    private const int RowHeight = 44;
+    private const int RowHeight = 52;
     private const int RowInset = 10;
-    private const int IconColumn = 40;
+    private const int IconColumn = 48;
     private const int QuantityInset = 16;
     private const int DescriptionGap = 24;
-    private const int RowIconSize = 26;
+    private const int RowIconSize = 32;
 
     // The list starts 12 px right of the category rail (placeholder).
     private const int RailGap = 12;

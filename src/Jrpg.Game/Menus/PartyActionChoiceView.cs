@@ -18,11 +18,11 @@ internal sealed class PartyActionChoiceView
     /// <summary>How many actions the choice offers.</summary>
     public const int EntryCount = 2;
 
-    // A 240 px translucent panel of 44 px rows (the menus' row height), 16 px in from the card's corner.
-    private const int Width = 240;
-    private const int RowHeight = 44;
+    // A 300 px translucent panel of 52 px rows (the menu lists' row height), 16 px in from the card's corner.
+    private const int Width = 300;
+    private const int RowHeight = 52;
     private const int Inset = 16;
-    private const int BodyPixels = 18;
+    private const int BodyPixels = 26;
 
     private readonly UiTextures _ui;
     private readonly SpriteFontBase _font;

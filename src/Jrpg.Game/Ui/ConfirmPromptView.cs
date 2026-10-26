@@ -11,14 +11,14 @@ namespace Jrpg.Game.Ui;
 /// </summary>
 internal sealed class ConfirmPromptView
 {
-    // The dialog's padding 40 x 32, a 22 px heading with 28 px below; buttons 150 x 46 with 8 px margins and 17 px text
+    // The dialog's padding 40 x 32, a 30 px heading with 28 px below; buttons 190 x 56 with 8 px margins and 24 px text
     // (placeholders).
-    private const int QuestionTextPixels = 22;
-    private const int ButtonTextPixels = 17;
+    private const int QuestionTextPixels = 30;
+    private const int ButtonTextPixels = 24;
     private const int BandPadding = 32;
     private const int QuestionGap = 28;
-    private const int ButtonWidth = 150;
-    private const int ButtonHeight = 46;
+    private const int ButtonWidth = 190;
+    private const int ButtonHeight = 56;
     private const int ButtonMargin = 8;
 
     private readonly UiTextures _ui;

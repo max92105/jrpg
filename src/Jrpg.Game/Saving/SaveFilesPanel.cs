@@ -17,8 +17,8 @@ internal sealed class SaveFilesPanel
     // Placeholder layout (decision 82): a 28 x 20 margin, a heading title, then the list below it.
     private const int Margin = 28;
     private const int TopMargin = 20;
-    private const int HeadingPixels = 22;
-    private const int ListTop = 48;
+    private const int HeadingPixels = 30;
+    private const int ListTop = 60;
 
     private readonly SaveSlots _slots;
     private readonly ScreenText _text;

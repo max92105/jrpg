@@ -15,25 +15,25 @@ namespace Jrpg.Game.Menus;
 internal sealed class EquipmentSheetView
 {
     // Placeholder layout (decision 82): a 28 x 20 margin, the member's name as a heading, section titles over a
-    // hairline, 44 px rows (a 26 px icon in a 40 px column, the slot name, then what's worn), a hairline 10 px above
-    // "Remove all", and the parameters as two columns of 36 px lines 40 px apart.
+    // hairline, 52 px rows (a 32 px icon in a 48 px column, the slot name, then what's worn), a hairline 10 px above
+    // "Remove all", and the parameters as two columns of 46 px lines 40 px apart.
     private const int Margin = 28;
     private const int TopMargin = 20;
-    private const int HeadingPixels = 22;
-    private const int BodyPixels = 18;
-    private const int EquipmentTop = 44;
-    private const int SectionHeight = 28;
-    private const int RowHeight = 44;
+    private const int HeadingPixels = 30;
+    private const int BodyPixels = 26;
+    private const int EquipmentTop = 60;
+    private const int SectionHeight = 36;
+    private const int RowHeight = 52;
     private const int RowInset = 10;
-    private const int IconColumn = 40;
-    private const int IconSize = 26;
-    private const int WornColumn = 200;
+    private const int IconColumn = 48;
+    private const int IconSize = 32;
+    private const int WornColumn = 260;
     private const int ActionGap = 10;
     private const int ParametersGap = 18;
-    private const int StatLineHeight = 36;
+    private const int StatLineHeight = 46;
     private const int ColumnGap = 40;
-    private const int ValueOffset = 160;
-    private const int PreviewArrowGap = 70;
+    private const int ValueOffset = 200;
+    private const int PreviewArrowGap = 90;
     private const int PreviewArrowSide = 6;
     private const int PreviewValueGap = 16;
     private const int NoticeGap = 24;
@@ -126,7 +126,7 @@ internal sealed class EquipmentSheetView
         batch.DrawString(_bodyFont, _labels.RemoveAll, new Vector2(row.Area.X + RowInset + IconColumn, textTop), UiTheme.TextPrimary * opacity);
     }
 
-    // Max HP alone on the first line, then Attack and Defense side by side.
+    // HP (the maximum) alone on the first line, then Attack and Defense side by side.
     private void DrawParameters(SpriteBatch batch, TextureLibrary textures, ParametersPlace place, float opacity)
     {
         var section = place.Section;
@@ -164,7 +164,7 @@ internal sealed class EquipmentSheetView
     /// <param name="Notice">Why the last change didn't happen, or null.</param>
     public readonly record struct Place(EquipmentSheet Sheet, Rectangle Area, int SelectedRow, StatPreviewText? Preview, string? Notice);
 
-    // One 44 px row and whether the cursor is on it.
+    // One 52 px row and whether the cursor is on it.
     private readonly record struct ListRow(Rectangle Area, bool IsSelected);
 
     // A slot's row: its label and what's worn there, null for nothing.
@@ -180,6 +180,6 @@ internal sealed class EquipmentSheetView
             [.. EquipmentSheet.Slots.Select(slot => messages.Text(EquipmentSheet.LabelIdOf(slot)))],
             messages.Text(MessageIds.SlotEmpty),
             messages.Text(MessageIds.EquipmentRemoveAll),
-            [messages.Text(MessageIds.StatMaxHp), messages.Text(MessageIds.StatAttack), messages.Text(MessageIds.StatDefense)]);
+            [messages.Text(MessageIds.StatHp), messages.Text(MessageIds.StatAttack), messages.Text(MessageIds.StatDefense)]);
     }
 }

@@ -9,10 +9,10 @@ namespace Jrpg.Game.Ui;
 internal sealed class ColumnTitles
 {
     /// <summary>The titles' row, from the captions' top to where the list's rows start (placeholder).</summary>
-    public const int Height = 28;
+    public const int Height = 36;
 
-    // The hairline sits 20 px below the captions' top (placeholder).
-    private const int LineGap = 20;
+    // The hairline sits 26 px below the captions' top (placeholder).
+    private const int LineGap = 26;
 
     private readonly SpriteFontBase _font;
     private readonly UiTextures _ui;

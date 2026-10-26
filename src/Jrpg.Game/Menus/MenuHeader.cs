@@ -14,12 +14,12 @@ namespace Jrpg.Game.Menus;
 internal sealed class MenuHeader
 {
     /// <summary>The header bar's height (placeholder).</summary>
-    public const int Height = 80;
+    public const int Height = 88;
 
-    // Placeholder layout (decision 82): a 48 px margin, a 28 px title, 18 px location and time, 40 px between them.
+    // Placeholder layout (decision 82): a 48 px margin, a 38 px title, 24 px location and time, 40 px between them.
     private const int SideMargin = 48;
-    private const int TitleTextPixels = 28;
-    private const int InfoTextPixels = 18;
+    private const int TitleTextPixels = 38;
+    private const int InfoTextPixels = 24;
     private const int LocationGap = 40;
 
     private readonly GameSession _session;

@@ -15,7 +15,7 @@ internal sealed class PartySidebarView
 {
     // Placeholder layout: cards 12 px apart (question 146, the demo's PartySidebar), inside a 14 px band at the top and
     // the bottom that holds the 10 px scroll cues; the reserve's caption takes its label line and a card gap. With
-    // PartySidebar.VisibleCards cards that is 14 + 32 + 6 x 120 + 5 x 12 + 14 = 840 of the page's 864 px.
+    // PartySidebar.VisibleCards cards that is 14 + 38 + 5 x 132 + 4 x 12 + 14 = 774 of the page's 848 px.
     private const int CardGap = 12;
     private const int CueBand = 14;
     private const int CueDiagonal = 10;

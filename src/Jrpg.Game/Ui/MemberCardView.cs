@@ -14,23 +14,23 @@ namespace Jrpg.Game.Ui;
 /// </summary>
 internal sealed class MemberCardView
 {
-    /// <summary>The card's height, with 12 px of padding above and below the portrait and text block.</summary>
-    public const int Height = 120;
+    /// <summary>The card's height, with 14 px of padding above and below the portrait and text block.</summary>
+    public const int Height = 132;
 
-    // The card's layout (placeholders): 16 x 12 padding, an 80 px portrait, 16 px before the text, heading-size names,
-    // caption-size level and class (8 px above the bars), 22 px bar rows of a 32 px label, a 6 px bar and a 100 px
+    // The card's layout (placeholders): 16 x 14 padding, a 96 px portrait, 18 px before the text, heading-size names,
+    // caption-size level and class (8 px above the bars), bar rows of a 40 px label, a 6 px bar and a 140 px large
     // value; a badge 10 px after the name with 4 px padding.
     private const int PaddingX = 16;
-    private const int PaddingY = 12;
-    private const int PortraitSize = 80;
-    private const int TextGap = 16;
-    private const int NamePixels = 22;
-    private const int CaptionPixels = 14;
-    private const int BadgePixels = 12;
-    private const int ValuePixels = 15;
+    private const int PaddingY = 14;
+    private const int PortraitSize = 96;
+    private const int TextGap = 18;
+    private const int NamePixels = 28;
+    private const int CaptionPixels = 18;
+    private const int BadgePixels = 14;
+    private const int ValuePixels = 24;
     private const int ClassGap = 8;
-    private const int BarLabelColumn = 32;
-    private const int BarValueColumn = 100;
+    private const int BarLabelColumn = 40;
+    private const int BarValueColumn = 140;
     private const int BarHeight = 6;
     private const int BadgeGap = 10;
     private const int BadgePadding = 4;
@@ -125,10 +125,12 @@ internal sealed class MemberCardView
         batch.DrawString(_badgeFont, _leaderBadge.Text, new Vector2(badge.X + BadgePadding, badge.Y + 1), UiTheme.TextSecondary * opacity);
     }
 
+    // The label and the bar centered on the value's line, the large number beside them.
     private void DrawBarRow(SpriteBatch batch, TextureLibrary textures, VitalMeter meter, BarRow row, float opacity)
     {
-        batch.DrawString(_captionFont, row.Label, new Vector2(row.Left, row.Top), UiTheme.TextSecondary * opacity);
-        var barTop = row.Top + ((int)_captionFont.LineHeight - BarHeight) / 2;
+        var labelTop = row.Top + ((_valueFont.LineHeight - _captionFont.LineHeight) / 2);
+        batch.DrawString(_captionFont, row.Label, new Vector2(row.Left, labelTop), UiTheme.TextSecondary * opacity);
+        var barTop = row.Top + ((int)_valueFont.LineHeight - BarHeight) / 2;
         var barWidth = row.Width - BarLabelColumn - BarValueColumn;
         meter.Bar.Draw(batch, textures, new Rectangle(row.Left + BarLabelColumn, barTop, barWidth, BarHeight), opacity);
         batch.DrawString(_valueFont, meter.Value.Text, new Vector2(row.Left + row.Width - meter.Value.Width, row.Top), UiTheme.TextPrimary * opacity);

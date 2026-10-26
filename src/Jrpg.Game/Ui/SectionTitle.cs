@@ -11,9 +11,9 @@ namespace Jrpg.Game.Ui;
 internal sealed class SectionTitle
 {
     /// <summary>How far below the label's top the hairline sits, in pixels; pages place their content from it.</summary>
-    public const int LineGap = 20;
+    public const int LineGap = 26;
 
-    private const int LabelPixels = 14;
+    private const int LabelPixels = 18;
 
     private readonly UiTextures _ui;
     private readonly SpriteFontBase _font;

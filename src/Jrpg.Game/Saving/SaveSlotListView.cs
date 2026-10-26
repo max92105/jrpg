@@ -8,19 +8,19 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Saving;
 
 /// <summary>
-/// Draws a <see cref="SaveSlotList"/>: column titles over a hairline, then one 92 px row per file with its name, its
+/// Draws a <see cref="SaveSlotList"/>: column titles over a hairline, then one 112 px row per file with its name, its
 /// location over the save date and play time, and the active party, the selected row lit.
 /// </summary>
 internal sealed class SaveSlotListView
 {
-    // Placeholder layout (decision 82): 92 px rows, 16 px in, a 140 px file column; text at 22 px for headings, 18 px
-    // for the body, 14 px for captions and labels.
-    private const int RowHeight = 92;
+    // Placeholder layout (decision 82): 112 px rows, 16 px in, a 140 px file column; text at 30 px for headings, 26 px
+    // for the body, 18 px for captions and labels.
+    private const int RowHeight = 112;
     private const int RowInset = 16;
     private const int FileColumnWidth = 140;
-    private const int HeadingPixels = 22;
-    private const int BodyPixels = 18;
-    private const int CaptionPixels = 14;
+    private const int HeadingPixels = 30;
+    private const int BodyPixels = 26;
+    private const int CaptionPixels = 18;
     private const int DetailsGap = 2;
     private const string DateFormat = "yyyy-MM-dd HH:mm";
 

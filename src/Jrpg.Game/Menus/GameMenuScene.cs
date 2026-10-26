@@ -17,11 +17,11 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class GameMenuScene : IScene
 {
-    // Placeholder layout (decision 82): the header, the body 40 px below it, the tabs 14 px apart, the page 24 px right
-    // of them, 40 px from the right edge, and 32 px above the 64 px footer.
-    private const int FooterHeight = 64;
+    // Placeholder layout (decision 82): the header, the body 40 px below it, the tabs 10 px apart, the page 24 px right
+    // of them, 40 px from the right edge, and 32 px above the 72 px footer.
+    private const int FooterHeight = 72;
     private const int BodyTop = MenuHeader.Height + 40;
-    private const int TabPitch = NavTabShape.Height + 14;
+    private const int TabPitch = NavTabShape.Height + 10;
     private const int PageLeft = NavTabShape.Width + 24;
     private static readonly Rectangle _pageArea = new(PageLeft, BodyTop, VirtualScreen.Width - 40 - PageLeft, VirtualScreen.Height - FooterHeight - 32 - BodyTop);
     private static readonly Rectangle _screen = new(0, 0, VirtualScreen.Width, VirtualScreen.Height);
@@ -33,9 +33,9 @@ internal sealed class GameMenuScene : IScene
     // The footer's hint starts 40 px in.
     private const int FooterTextInset = 40;
 
-    // The party sidebar (question 145 placeholder, the demo's layout): a 460 px column at the page area's right, 24 px
+    // The party sidebar (question 145 placeholder, the demo's layout): a 520 px column at the page area's right, 24 px
     // from the page.
-    private const int SidebarWidth = 460;
+    private const int SidebarWidth = 520;
     private const int SidebarGap = 24;
     private static readonly Rectangle _pageAreaBesideSidebar = _pageArea with { Width = _pageArea.Width - SidebarWidth - SidebarGap };
     private static readonly Rectangle _sidebarColumn = _pageArea with { X = _pageArea.Right - SidebarWidth, Width = SidebarWidth };

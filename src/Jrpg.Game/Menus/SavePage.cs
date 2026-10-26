@@ -20,7 +20,7 @@ internal sealed class SavePage : ISaveFilesPage
     // The notice sits on the heading's line, at the page's 28 px right margin.
     private const int NoticeMargin = 28;
     private const int NoticeTop = 20;
-    private const int NoticePixels = 18;
+    private const int NoticePixels = 26;
 
     private readonly SaveSlots _slots;
     private readonly GameSession _session;

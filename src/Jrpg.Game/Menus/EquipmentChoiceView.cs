@@ -15,21 +15,21 @@ namespace Jrpg.Game.Menus;
 internal sealed class EquipmentChoiceView
 {
     /// <summary>The panel's width (placeholder).</summary>
-    public const int PanelWidth = 560;
+    public const int PanelWidth = 600;
 
-    // Placeholder layout (decision 82): a 24 x 20 margin, a 22 px heading, column titles over a hairline, then 44 px
-    // rows (a 26 px icon in a 40 px column, the quantity 16 px from the right).
+    // Placeholder layout (decision 82): a 24 x 20 margin, a 30 px heading, column titles over a hairline, then 52 px
+    // rows (a 32 px icon in a 48 px column, the quantity 16 px from the right).
     private const int Margin = 24;
     private const int TopMargin = 20;
-    private const int HeadingPixels = 22;
-    private const int BodyPixels = 18;
-    private const int LabelPixels = 14;
-    private const int ColumnTitlesTop = 48;
+    private const int HeadingPixels = 30;
+    private const int BodyPixels = 26;
+    private const int LabelPixels = 18;
+    private const int ColumnTitlesTop = 60;
     private const int RowsTop = ColumnTitlesTop + ColumnTitles.Height;
-    private const int RowHeight = 44;
+    private const int RowHeight = 52;
     private const int RowInset = 10;
-    private const int IconColumn = 40;
-    private const int IconSize = 26;
+    private const int IconColumn = 48;
+    private const int IconSize = 32;
     private const int QuantityInset = 16;
 
     private readonly UiTextures _ui;

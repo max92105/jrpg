@@ -19,8 +19,8 @@ internal sealed class PartyColumnsView
     private const int Margin = 28;
     private const int TopMargin = 20;
     private const int ColumnGap = 40;
-    private const int LabelPixels = 14;
-    private const int BodyPixels = 18;
+    private const int LabelPixels = 18;
+    private const int BodyPixels = 26;
     private const int CardsTop = SectionTitle.LineGap + 12;
     private const int NoticeGap = 16;
 

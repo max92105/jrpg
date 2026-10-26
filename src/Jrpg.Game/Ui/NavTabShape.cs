@@ -4,13 +4,13 @@ using Microsoft.Xna.Framework;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// The menu tab's arrow (the path <c>M0,0 H378 L410,28 L378,56 H0 Z</c>) as pixels: filled, with a
-/// one-pixel outline, transparent outside.
+/// The menu tab's arrow (the path <c>M0,0 H378 L410,32 L378,64 H0 Z</c>) as pixels: filled, with a one-pixel outline,
+/// transparent outside.
 /// </summary>
 internal static class NavTabShape
 {
     public const int Width = 410;
-    public const int Height = 56;
+    public const int Height = 64;
 
     /// <summary>Where the arrow's point starts, from the left; the selected tab's bright line stops there.</summary>
     public const int ShoulderPixels = 378;

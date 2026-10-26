@@ -20,35 +20,35 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class StatusPage : IMemberPage
 {
-    // Placeholder layout (decision 82): a 28 x 20 margin, 22 px headings, 18 px body text, 14 px labels and captions;
-    // a 190 px portrait 32 px right of the profile; 36 px stat lines in two columns 40 px apart, 10 px in under titles.
+    // Placeholder layout (decision 82): a 28 x 20 margin, 30 px headings, 26 px body text, 18 px labels and captions; a
+    // 240 px portrait 32 px right of the profile; 46 px stat lines in two columns 40 px apart, 10 px in under titles.
     private const int Margin = 28;
     private const int TopMargin = 20;
-    private const int HeadingPixels = 22;
-    private const int BodyPixels = 18;
-    private const int LabelPixels = 14;
-    private const int PortraitSize = 190;
+    private const int HeadingPixels = 30;
+    private const int BodyPixels = 26;
+    private const int LabelPixels = 18;
+    private const int PortraitSize = 240;
     private const int PortraitFrame = 2;
     private const int PortraitGap = 32;
     private const int Indent = 10;
-    private const int StatLineHeight = 36;
+    private const int StatLineHeight = 46;
     private const int ColumnGap = 40;
-    private const int ValueOffset = 160;
+    private const int ValueOffset = 200;
 
     // Rows, down from the page's top margin: the profile, then each section's title and its lines.
-    private const int ClassTop = 32;
-    private const int ExperienceTop = 64;
+    private const int ClassTop = 42;
+    private const int ExperienceTop = 84;
     private const int ParametersTop = PortraitSize + 18;
     private const int EquipmentTop = ParametersTop + SectionHeight + (2 * StatLineHeight) + 18;
-    private const int SectionHeight = 28;
-    private const int ValueBelowLabel = 20;
+    private const int SectionHeight = 36;
+    private const int ValueBelowLabel = 26;
 
     // The experience bar: 6 px tall, 12 px under the experience values, 16 px short of the profile's right edge. HP
     // gets the same slim bar under its line.
     private const int BarHeight = 6;
-    private const int XpBarTop = ValueBelowLabel + 34;
+    private const int XpBarTop = ValueBelowLabel + 44;
     private const int XpBarRightGap = 16;
-    private const int VitalBarTop = 26;
+    private const int VitalBarTop = 34;
 
     private readonly ContentCatalog _catalog;
     private readonly UiTextures _ui;

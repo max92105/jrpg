@@ -178,8 +178,6 @@ internal static class MessageIds
     /// <summary>The Equipment page's action that takes off everything the member wears.</summary>
     public const string EquipmentRemoveAll = "equipment_remove_all";
 
-    public const string StatMaxHp = "stat_max_hp";
-
     /// <summary>The equipment choice's first row, which takes off what's worn in the slot.</summary>
     public const string EquipmentRemove = "equipment_remove";
 

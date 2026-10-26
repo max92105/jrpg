@@ -16,13 +16,13 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class ItemTargetPickerView
 {
-    // Placeholder layout (decision 82): padding 32; a 22 px heading with the 32 px item icon 12 px before it and
-    // 24 px below it.
+    // Placeholder layout (decision 82): padding 32; a 30 px heading with the 40 px item icon 12 px before it and 28 px
+    // below it.
     private const int BandPadding = 32;
-    private const int HeadingPixels = 22;
-    private const int IconSize = 32;
+    private const int HeadingPixels = 30;
+    private const int IconSize = 40;
     private const int IconGap = 12;
-    private const int HeadingGap = 24;
+    private const int HeadingGap = 28;
 
     // Question 112's placeholder: two 560 px columns of cards, 16 px apart, centered.
     private const int Columns = 2;

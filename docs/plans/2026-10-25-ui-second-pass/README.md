@@ -68,7 +68,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **R2. The export index: 2-4 named files per screen and the idea to take** (docs, about 60 lines) → [slices/R2.md](slices/R2.md)
 
 ### Phase 1: sizing
-- [ ] **SZ1. Sizing pass, menus: text, numbers, rows, panels toward the reference** (Game, about 230 lines) → [slices/SZ1.md](slices/SZ1.md)
+- [x] **SZ1. Sizing pass, menus: text, numbers, rows, panels toward the reference** (Game, about 230 lines) → [slices/SZ1.md](slices/SZ1.md)
 - [ ] **SZ2. Sizing pass, title, dialogue, battle and outcomes** (Game, about 200 lines) → [slices/SZ2.md](slices/SZ2.md)
 
 ### Phase 2: fonts, pointer, title

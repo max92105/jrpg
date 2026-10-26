@@ -58,13 +58,13 @@ internal static class UiTheme
     public static Color TextSecondary { get; } = new(0xA4, 0xA8, 0xB4);
 
     /// <summary>The menu tabs' and entries' text, 1:1 on the virtual screen.</summary>
-    public const int MenuTextPixels = 20;
+    public const int MenuTextPixels = 28;
 
-    /// <summary>Menu entries are 56 px tall, like the tabs.</summary>
-    public const int MenuRowHeight = 56;
+    /// <summary>Menu entries are 64 px tall, like the tabs.</summary>
+    public const int MenuRowHeight = 64;
 
-    /// <summary>Menu text starts 44 px in from its row's left edge.</summary>
-    public const int MenuTextInset = 44;
+    /// <summary>Menu text starts 48 px in from its row's left edge.</summary>
+    public const int MenuTextInset = 48;
 
     /// <summary>The header and footer bars.</summary>
     public static Color Bar { get; } = FromStraightArgb(0xEB000000);

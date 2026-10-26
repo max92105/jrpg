@@ -20,9 +20,9 @@ internal sealed class ResourceGaugeView
     // Placeholder layout on the 1920 x 1080 virtual screen.
     private const float LabelSpacing = 2;
     private const int LabelGap = 8;
-    private const int MarkerSize = 9;
+    private const int MarkerSize = 11;
     private const float MarkerInnerReach = 0.5f;
-    private const int BarWidth = 120;
+    private const int BarWidth = 150;
     private const int BarHeight = 3;
     private const int RowGap = 2;
 

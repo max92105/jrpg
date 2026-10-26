@@ -19,12 +19,12 @@ internal sealed class PartyStatusView
     private const int PanelGap = 14;
     private const int ActiveSlide = 36;
     private const float FallenOpacity = 0.55f;
-    private const int PortraitSize = 64;
+    private const int PortraitSize = 76;
     private const int PortraitGap = 10;
-    private const int NamePixels = 22;
-    private const int LabelPixels = 14;
-    private const int HpPixels = 30;
-    private const int MaxHpPixels = 17;
+    private const int NamePixels = 28;
+    private const int LabelPixels = 16;
+    private const int HpPixels = 36;
+    private const int MaxHpPixels = 22;
     private const int ResourceTopGap = 4;
     private const int StatusMarksGap = 12;
 
@@ -47,7 +47,7 @@ internal sealed class PartyStatusView
         _ui = ui;
         _nameFont = new OutlinedFont(text.Fonts.FontAt(NamePixels));
         var label = new OutlinedFont(text.Fonts.FontAt(LabelPixels));
-        var hpStyle = new VitalRowStyle(label, new OutlinedFont(text.Fonts.FontAt(HpPixels)), new OutlinedFont(text.Fonts.FontAt(MaxHpPixels)), Width: 250, SmallTextLift: 5);
+        var hpStyle = new VitalRowStyle(label, new OutlinedFont(text.Fonts.FontAt(HpPixels)), new OutlinedFont(text.Fonts.FontAt(MaxHpPixels)), Width: 300, SmallTextLift: 6);
         var hpLabel = MeasuredText.Of(label.Font, text.Messages.Text(MessageIds.StatHp));
         _panels =
         [

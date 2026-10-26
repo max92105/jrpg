@@ -26,9 +26,9 @@ internal sealed class LeaderProfileView
     private const int StatPitch = 56;
     private const int StatValueLeft = InfoLeft + 140;
     private const int NamePixels = 48;
-    private const int ClassPixels = 16;
-    private const int BodyPixels = 24;
-    private const int StatLabelPixels = 14;
+    private const int ClassPixels = 18;
+    private const int BodyPixels = 26;
+    private const int StatLabelPixels = 18;
     private const int StatValuePixels = 32;
 
     // The portrait's square, right of the text, and the share of its width, from the left, that fades in.

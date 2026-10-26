@@ -9,8 +9,8 @@ namespace Jrpg.Game.Ui;
 /// </summary>
 internal static class UiTheme
 {
-    /// <summary>The message box's line height, 16, doubled like the box.</summary>
-    public const int MessageTextPixels = 32;
+    /// <summary>The message box's text, sized toward the reference UI (plan 2026-10-25-ui-second-pass, SZ2).</summary>
+    public const int MessageTextPixels = 36;
 
     /// <summary>
     /// The message box, doubled: <c>#AA000000</c> inside a 2 px white border with 10 px
@@ -22,13 +22,13 @@ internal static class UiTheme
 
     /// <summary>
     /// The interaction prompt: a small translucent pill with a hairline, like the menus' rows (placeholder look). Its
-    /// text is the menus' size, and the padding grows with it from the plan's 8 x 3 at 16 px.
+    /// text is a little smaller than the menus', and the padding grows with it from the plan's 8 x 3 at 16 px.
     /// </summary>
     public static PanelStyle PromptPanel { get; } = new(CornerRadius: 4, BorderWidth: 1, Fill: new Color(0, 0, 0, 0xC8), Border: FromStraightArgb(0xA0FFFFFF));
 
-    public const int PromptTextPixels = MenuTextPixels;
+    public const int PromptTextPixels = 24;
 
-    public static Point PromptPadding { get; } = new(10, 4);
+    public static Point PromptPadding { get; } = new(12, 5);
 
     /// <summary>
     /// The light key cap the confirm key sits in, before the prompt's word. Its fill is <see cref="TextPrimary"/>'s color,
@@ -40,7 +40,7 @@ internal static class UiTheme
     public static Color KeyCapText { get; } = new(0x14, 0x16, 0x20);
 
     /// <summary>The speaker's name over the message box, in spaced caps like the reference UI's "NEXT TURN" label.</summary>
-    public const int SpeakerTextPixels = 26;
+    public const int SpeakerTextPixels = 28;
 
     public const float SpeakerLetterSpacing = 3;
 

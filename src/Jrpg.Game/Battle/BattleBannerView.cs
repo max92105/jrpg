@@ -15,9 +15,9 @@ internal sealed class BattleBannerView
     // Placeholder layout on the 1920 x 1080 virtual screen (decision 56).
     private const int Top = 190;
     private const int PaddingX = 120;
-    private const int PaddingY = 10;
-    private const int MinWidth = 560;
-    private const int TextPixels = 22;
+    private const int PaddingY = 12;
+    private const int MinWidth = 640;
+    private const int TextPixels = 28;
 
     private readonly BattleBanner _banner;
     private readonly UiTextures _ui;

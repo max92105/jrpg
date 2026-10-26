@@ -19,20 +19,20 @@ internal sealed class CommandPanelView
     private const int HeaderInset = 30;
     private const int HeaderGap = 6;
     private const int FrameInset = 5;
-    private const int RowHeight = 46;
+    private const int RowHeight = 52;
     private const int RowPointerLeft = 8;
     private const int RowPointerSide = 12;
-    private const int IconLeft = 44;
-    private const int IconSize = 24;
+    private const int IconLeft = 48;
+    private const int IconSize = 28;
     private const int IconGap = 12;
     private const int AmountRight = 16;
     private const int SelectionLineHeight = 2;
     private const float DisabledOpacity = 0.4f;
     private const int HintPaddingX = 16;
     private const int HintPaddingY = 10;
-    private const int HeaderTextPixels = 20;
-    private const int RowTextPixels = 20;
-    private const int HintTextPixels = 16;
+    private const int HeaderTextPixels = 24;
+    private const int RowTextPixels = 26;
+    private const int HintTextPixels = 20;
 
     // Decision 56: a 44 px pointer, drawn as a downward triangle (the lower half of a diamond), 6 px over the target.
     private const int TargetPointerSize = 44;

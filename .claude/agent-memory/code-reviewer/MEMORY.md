@@ -3,4 +3,5 @@
 - [Tautological tests](tautological-tests.md) — same-seed-twice, count==count, File.Exists-only, untested `<=` boundary; pin golden values
 - [Validator null ids](validator-null-ids.md) — null list elements AND dictionary values pass strict STJ; check null entries first (seen slices 8, 1b, 1c, M1b; nested lists too)
 - [Namespace cycles](namespace-cycles.md) — grep reverse usings for each new Core using; Content is the hub (Content<->Session seen in slice 8)
+- [Stale size comments](stale-size-comments.md) — sizing passes leave old px values in comments of neighbouring files; grep the old value
 - [Last review](last-review.md) — slice, round and finding status of the latest review; read first to apply re-review rules

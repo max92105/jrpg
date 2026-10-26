@@ -6,12 +6,12 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Draws the last action's numbers over their targets (40 px, outlined): colored by what they report
+/// Draws the last action's numbers over their targets (48 px, outlined): colored by what they report
 /// (<see cref="FloatingNumber.ColorOf"/>). Each turn's numbers are measured once, when its playback starts.
 /// </summary>
 internal sealed class FloatingNumbersView
 {
-    private const int TextPixels = 40;
+    private const int TextPixels = 48;
 
     private readonly BattleTurnSequence _sequence;
     private readonly BattlersView _battlers;

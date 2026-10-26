@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/SZ1.md, slice SZ1 (menu sizing pass, decision 261)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/SZ2.md, slice SZ2 (sizing pass outside the menu, decision 251)
 Round: 1 (verdict: Fix the Criticals, then commit)
 
-- Critical: UiTheme.cs:63 says rows are 56 px (now 64) and :66 says the inset is 44 px (now 48); SquareShrink.cs:6 says icons are 26 or 40 px (now 24, 32, 40); open
-- Warning: StatusPage.cs:51 VitalBarTop 26 unchanged while the HP line's body text went 18->26 px; the bar starts on the Lato baseline (~25.7 px) and touches the text; set it to about 34; open
-- Suggestion: EquipmentSheetView.cs:129 comment "Max HP alone on the first line" now that the label says HP; open
+- Critical: FloatingNumber.cs:21 StackSpacing summary says "the 40 px text" (now 48 in FloatingNumbersView); open
+- Suggestion: UiTheme.cs:25 says the prompt padding "grows with it" but PromptPadding stays 10 x 4 at 24 px (12 x 5 by the 8 x 3 at 16 rule); open
+- Suggestion: Done note silent on ConfirmPromptView (30/24, unchanged), InteractionPromptView, TurnDiamondView, BattleVitalRow, all listed in Steps; open

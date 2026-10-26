@@ -69,7 +69,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 1: sizing
 - [x] **SZ1. Sizing pass, menus: text, numbers, rows, panels toward the reference** (Game, about 230 lines) → [slices/SZ1.md](slices/SZ1.md)
-- [ ] **SZ2. Sizing pass, title, dialogue, battle and outcomes** (Game, about 200 lines) → [slices/SZ2.md](slices/SZ2.md)
+- [x] **SZ2. Sizing pass, title, dialogue, battle and outcomes** (Game, about 200 lines) → [slices/SZ2.md](slices/SZ2.md)
 
 ### Phase 2: fonts, pointer, title
 - [ ] **ADR 0025: Font roles, with Cormorant Garamond for titles** (before T1) → [slices/ADR-0025.md](slices/ADR-0025.md)

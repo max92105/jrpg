@@ -15,9 +15,9 @@ namespace Jrpg.Game.Dialogue;
 /// </summary>
 internal sealed class DialogueBox
 {
-    // A 1200 x 240 box 40 px above the bottom (placeholder).
-    private const int Width = 1200;
-    private const int Height = 240;
+    // A 1320 x 260 box 40 px above the bottom (placeholder).
+    private const int Width = 1320;
+    private const int Height = 260;
     private const int BottomMargin = 40;
 
     // The 4 px border plus 16 px padding (placeholder).
@@ -32,7 +32,7 @@ internal sealed class DialogueBox
 
     // The name sits on a strip just above the box's top-left corner.
     private const int NameStripWidth = 520;
-    private const int NameStripHeight = 44;
+    private const int NameStripHeight = 48;
     private const int NameStripGap = 8;
     private const int NameInset = 24;
 

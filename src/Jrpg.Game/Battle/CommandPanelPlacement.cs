@@ -9,12 +9,12 @@ namespace Jrpg.Game.Battle;
 /// </summary>
 internal static class CommandPanelPlacement
 {
-    public const int Width = 360;
+    public const int Width = 400;
 
     // Placeholder gap, highest top and tallest panel on the 1920 x 1080 virtual screen.
     private const int ActorGap = 40;
     private const int MinTop = 260;
-    private const int MaxHeight = 420;
+    private const int MaxHeight = 470;
 
     /// <param name="actorSpot">The acting member's spot in the formation.</param>
     /// <returns>The panel's top left corner.</returns>

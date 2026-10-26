@@ -14,10 +14,10 @@ namespace Jrpg.Game.Battle;
 internal sealed class StatusMarksView
 {
     // Placeholders on the 1920 x 1080 virtual screen (design.md, StatusMarkSize).
-    public const int MarkSize = 22;
+    public const int MarkSize = 26;
     private const int MarkGap = 4;
-    private const int LetterPixels = 13;
-    private const int TurnsPixels = 11;
+    private const int LetterPixels = 15;
+    private const int TurnsPixels = 13;
     private const float RimInnerReach = 0.78f;
     private const float PopStartScale = 1.3f;
 

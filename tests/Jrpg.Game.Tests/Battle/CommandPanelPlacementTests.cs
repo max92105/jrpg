@@ -12,7 +12,8 @@ public sealed class CommandPanelPlacementTests
 
         var topLeft = CommandPanelPlacement.Place(spot);
 
-        Assert.Equal(new Point(spot.X - 40 - 360, 1080 - 420), topLeft);
+        // The 400 px panel, 40 px left of the actor, its 470 px tallest height kept on screen (SZ2 sizes).
+        Assert.Equal(new Point(spot.X - 40 - 400, 1080 - 470), topLeft);
     }
 
     [Fact]

@@ -18,8 +18,8 @@ internal readonly record struct FloatingNumber(Combatant Target, string Text, Fl
 {
     public const float RiseDistance = 50;
 
-    /// <summary>Less than the 40 px text, so a stack stays close; the outline keeps the numbers apart.</summary>
-    public const float StackSpacing = 30;
+    /// <summary>Less than the 48 px text, so a stack stays close; the outline keeps the numbers apart.</summary>
+    public const float StackSpacing = 36;
 
     private const float PopStartScale = 0.6f;
     private static readonly TimeSpan _pop = TimeSpan.FromSeconds(0.18);

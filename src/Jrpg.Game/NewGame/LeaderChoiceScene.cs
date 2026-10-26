@@ -19,10 +19,10 @@ internal sealed class LeaderChoiceScene : IScene
 {
     // Placeholder layout (decision 82), framed like the game menu: header and footer bars over the title picture under
     // the menu scrim, the list on the left (decision 169), each row the name over the class in spaced caps.
-    private const int HeaderHeight = 80;
-    private const int FooterHeight = 64;
+    private const int HeaderHeight = 88;
+    private const int FooterHeight = 72;
     private const int TextMargin = 48;
-    private const int HeadingPixels = 28;
+    private const int HeadingPixels = 38;
     private const int ListLeft = 64;
     private const int ListTop = 140;
     private const int ListWidth = 420;

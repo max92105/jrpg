@@ -13,10 +13,10 @@ namespace Jrpg.Game.Battle;
 internal sealed class EnemyTagView
 {
     // Placeholder layout: the tag's bottom sits 38 px below the sprite's.
-    private const int TagWidth = 160;
-    private const int NamePixels = 16;
+    private const int TagWidth = 190;
+    private const int NamePixels = 20;
     private const int NameGap = 3;
-    private const int BarHeight = 4;
+    private const int BarHeight = 5;
     private const int GapBelowSprite = 38;
     private const int StatusMarksGap = 4;
 

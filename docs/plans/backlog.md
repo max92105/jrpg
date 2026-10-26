@@ -77,3 +77,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 ## From the UI second pass plan (2026-10-25)
 
 - `content/art/backgrounds/GameMenu.png` is 4096 x 2838 (23 MB, about 46 MB of video memory) for a 1920 x 1080 screen: a 1920 x 1330 copy would decode about five times faster (BG1). The developer's art; ask first.
+- The battle's skill hint doesn't wrap: a long description runs past its box over the actor's portrait (`docs/captures/before/battle-skill.jpg`; SZ2).

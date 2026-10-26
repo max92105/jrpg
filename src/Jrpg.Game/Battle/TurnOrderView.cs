@@ -17,14 +17,14 @@ internal sealed class TurnOrderView
     private const int Left = 24;
     private const int Top = 20;
     private const int CurrentSize = 140;
-    private const int NextSize = 66;
+    private const int NextSize = 76;
     private const int NextOverlap = 6;
     private const int NextColumnShift = -8;
     private const int LabelInset = 20;
     private const int LabelGap = 2;
-    private const int LabelPixels = 14;
+    private const int LabelPixels = 16;
     private const int LineLeft = 110;
-    private const int LineWidth = 760;
+    private const int LineWidth = 860;
 
     // Placeholder for the hourglass: a small bright diamond on an extra turn's top corner.
     private const int ExtraMarkSize = 20;

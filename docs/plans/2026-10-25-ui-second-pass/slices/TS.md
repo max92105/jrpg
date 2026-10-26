@@ -11,3 +11,7 @@ Part of [the UI second pass plan](../README.md). Decision 262. Design: [design.m
     - `Battle/PointerBob` moves to `Ui/PointerBob` (the next slices bob the list pointer; `Ui` can't read `Battle`). It takes the distance as a parameter: `OffsetAt(TimeSpan elapsed, float distance)`; the target pointer passes its 8 px. Its tests move with it (`PointerBobTests`, if any; else none).
   - **Tests** (`GameMenuSceneTests`): `Update_PageOpen_AdvancesThePageBeforeItsInput` (`CountingMenuPage` records the order of calls).
   - **Verify by hand:** nothing visible changes; the battle's target pointer still bobs 8 px.
+- **Done, with deviations:**
+  - **A default body:** `IMenuPage.Advance` is a default interface method with an empty body rather than an empty body in each page. Six pages would otherwise carry an empty method, and the save and load pages aren't `IMenuPage`s. A page that moves implements it.
+  - **`PointerBob`:** it moved to `Ui` with the distance as a parameter. Its 3 tests moved with it and pass the 8 px, and the target pointer passes its own 8 px.
+  - **Tests:** 2128.

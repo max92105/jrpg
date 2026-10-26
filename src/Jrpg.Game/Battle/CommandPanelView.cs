@@ -31,9 +31,11 @@ internal sealed class CommandPanelView
     private const int RowTextPixels = 26;
     private const int HintTextPixels = 20;
 
-    // Decision 56: a 44 px pointer, drawn as a downward triangle (the lower half of a diamond), 6 px over the target.
+    // Decision 56: a 44 px pointer, drawn as a downward triangle (the lower half of a diamond), 6 px over the target,
+    // bobbing 8 px.
     private const int TargetPointerSize = 44;
     private const int TargetPointerGap = 6;
+    private const float TargetPointerBob = 8;
     private static readonly DiamondShape _targetPointer = new(TargetPointerSize, 0, 1, Color.Transparent, Color.White);
 
     private static readonly string[] _icons =
@@ -266,7 +268,7 @@ internal sealed class CommandPanelView
 
     private void DrawTargetPointers(SpriteBatch batch, TextureLibrary textures, IReadOnlyList<Combatant> targets)
     {
-        var bob = (int)PointerBob.OffsetAt(_pointerTime);
+        var bob = (int)PointerBob.OffsetAt(_pointerTime, TargetPointerBob);
         var pointer = _ui.Diamond(textures, _targetPointer);
         for (var index = 0; index < targets.Count; index++)
         {

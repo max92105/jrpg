@@ -235,6 +235,19 @@ public sealed class GameMenuSceneTests
         Assert.Equal(1, page.OpenCount);
     }
 
+    [Fact]
+    public void Update_PageOpen_AdvancesThePageBeforeItsInput()
+    {
+        var page = new CountingMenuPage();
+        var menu = NewMenu(page);
+        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+
+        menu.Update(_oneUpdate, default);
+
+        Assert.Equal(["Advance", "Update"], page.Calls);
+        Assert.Equal(_oneUpdate, page.LastAdvance);
+    }
+
     // The press starts the closing fade; MenuClosed comes once it has run.
     private static SceneRequest? CloseAndWait(GameMenuScene menu, InputFrame press)
     {

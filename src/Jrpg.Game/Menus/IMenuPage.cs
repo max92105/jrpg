@@ -36,6 +36,14 @@ internal interface IMenuPage
     /// </summary>
     void Open();
 
+    /// <summary>
+    /// The time since the last update, given before <see cref="Update"/> so a page can move over time (glide its
+    /// selection, bob its pointer). A page with nothing moving keeps this empty default.
+    /// </summary>
+    void Advance(TimeSpan delta)
+    {
+    }
+
     /// <returns>What the page asks the flow for, or null.</returns>
     SceneRequest? Update(InputFrame input);
 

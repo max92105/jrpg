@@ -94,6 +94,7 @@ internal sealed class GameMenuScene : IScene
         SceneRequest? request = null;
         if (_isInPage)
         {
+            _pages[_tabs.Selected].Advance(delta);
             request = UpdatePage(input);
         }
         else

@@ -5,9 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/MO1.md, slice MO1 (MenuMotion: menu slide-in and closing fade)
-Round: 1 (verdict: Ready to commit; flow checked: GameFlow pops on MenuClosed whenever it comes, SceneStack draws all scenes, FadeGate only holds during a fade, when the menu gets default input)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/TS.md, slice TS (menu pages advance with the menu's time; PointerBob to Ui)
+Round: 1 (verdict: Ready to commit; default interface method for IMenuPage.Advance judged acceptable, first DIM in the codebase)
 
-- W1 MenuMotionTests — BG1's regression test (no time counts before the first draw) went with OpeningFadeTests and has no MenuMotion replacement; add FrameOpacity_AdvanceBeforeFirstDraw_StaysClear; open
-- S1 MenuMotionTests — TabOpacity untested (fade with slide, out with closing); open
-- S2 GameMenuScene `_isClosedRequested` reads oddly; `_hasRequestedClose`; open
+- S1 GameMenuScene.Update — the early return during the closing fade skips Advance, so a page's bob/glide freezes while the menu fades out; decide when the first moving page lands; open
+- S2 CountingMenuPage — records only the call name, not the delta; Update_PageOpen test can't catch a wrong delta passed; open

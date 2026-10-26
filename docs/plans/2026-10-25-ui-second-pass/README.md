@@ -72,7 +72,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **SZ2. Sizing pass, title, dialogue, battle and outcomes** (Game, about 200 lines) → [slices/SZ2.md](slices/SZ2.md)
 
 ### Phase 2: fonts, pointer, title
-- [ ] **ADR 0025: Font roles, with Cormorant Garamond for titles** (before T1) → [slices/ADR-0025.md](slices/ADR-0025.md)
+- [x] **ADR 0025: Font roles, with Cormorant Garamond for titles** (before T1) → [slices/ADR-0025.md](slices/ADR-0025.md)
 - [ ] **T1. A title font; the game's name on the title screen in it** (Game + content font, about 160 lines) → [slices/T1.md](slices/T1.md)
 - [ ] **T2. The title font elsewhere: "Victory!", the defeat title, the leader's name** (Game, about 80 lines) → [slices/T2.md](slices/T2.md)
 - [ ] **P1a. One pointer and one selection look on every list** (Game, about 170 lines) → [slices/P1a.md](slices/P1a.md)

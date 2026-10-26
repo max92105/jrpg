@@ -57,8 +57,6 @@ internal sealed class OptionsPage : IMenuPage
 
     public string Hint { get; }
 
-    public bool ShowsPartySidebar => true;
-
     public bool LeavesOnCancel => true;
 
     /// <summary>Where the highlight is, in rows.</summary>

@@ -55,9 +55,6 @@ internal sealed class PartyPage : IMenuPage
 
     public string Hint { get; }
 
-    /// <summary>False: the page lists the party itself.</summary>
-    public bool ShowsPartySidebar => false;
-
     /// <summary>False while the actions are offered or a place is being picked: Cancel backs out of those first.</summary>
     public bool LeavesOnCancel => _actionChoice is null && MovingMember is null;
 

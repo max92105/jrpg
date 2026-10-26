@@ -89,18 +89,6 @@ public sealed class EquipmentPageTests
     }
 
     [Fact]
-    public void ShowsPartySidebar_WhileChoiceOpen_IsFalse()
-    {
-        var page = NewPage();
-        var beforeChoosing = page.ShowsPartySidebar;
-
-        page.Update(Pressing(GameButton.Confirm));
-
-        Assert.True(beforeChoosing);
-        Assert.False(page.ShowsPartySidebar);
-    }
-
-    [Fact]
     public void Update_ConfirmRemove_UnequipsSlot()
     {
         var sarxian = WearingSwordAndArmor();

@@ -23,8 +23,6 @@ internal sealed class CountingMenuPage : IMenuPage
 
     public string Hint => "Counting page hint";
 
-    public bool ShowsPartySidebar { get; init; } = true;
-
     public bool LeavesOnCancel => true;
 
     public void Open() => OpenCount++;

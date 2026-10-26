@@ -4,10 +4,10 @@ using Jrpg.Game.Ui;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// The menu's party sidebar: one card per recruit, the active members in party order, then the reserve (decision 146).
-/// Refreshed every update a page is open, it replaces only the cards whose shown values changed, so a page's own changes
-/// (a potion, a new order) show at once and the view formats again only what changed. It marks the member a page shows
-/// and scrolls so that card stays in view.
+/// The Inventory's party sidebar (decision 266): one card per recruit, the active members in party order, then the
+/// reserve (decision 146). Refreshed when the page opens and every update while it is open, it replaces only the cards
+/// whose shown values changed, so a change (a potion, a new order on the Party page) shows at once and the view formats
+/// again only what changed. It marks the card an item's pointer is on and scrolls so that card stays in view.
 /// </summary>
 internal sealed class PartySidebar
 {
@@ -31,18 +31,18 @@ internal sealed class PartySidebar
     /// <summary>The member whose card carries the leader's badge.</summary>
     public PartyMember Leader => _party.Leader;
 
-    /// <summary>The card of the member the open page shows; null on a page that shows no one member.</summary>
-    public int? ShownIndex { get; private set; }
+    /// <summary>The card the item's pointer is on; null while nothing is being aimed at.</summary>
+    public int? PointedIndex { get; private set; }
 
     /// <summary>The first card in view; it moves only when the marked card would leave the view.</summary>
     public int FirstVisible { get; private set; }
 
     /// <summary>
-    /// Rebuilds every card if the recruits' order or who is in the reserve changed, else only the cards whose values did;
-    /// then marks <paramref name="shown"/>'s card and scrolls to it.
+    /// Rebuilds every card if the recruits' order or who is in the reserve changed, else only the cards whose values
+    /// did; then marks <paramref name="pointed"/>'s card and scrolls to it.
     /// </summary>
-    /// <param name="shown">The member the open page shows; null on other pages.</param>
-    public void Refresh(PartyMember? shown)
+    /// <param name="pointed">The member the item's pointer is on; null while nothing is being aimed at.</param>
+    public void Refresh(PartyMember? pointed)
     {
         if (IsSameOrder())
         {
@@ -53,8 +53,8 @@ internal sealed class PartySidebar
             RebuildAll();
         }
 
-        ShownIndex = shown is null ? null : IndexOf(shown);
-        KeepShownInView();
+        PointedIndex = pointed is null ? null : IndexOf(pointed);
+        KeepPointedInView();
     }
 
     private void ReplaceChangedCards()
@@ -119,8 +119,8 @@ internal sealed class PartySidebar
         return null;
     }
 
-    private void KeepShownInView() =>
-        FirstVisible = ShownIndex is { } shown
-            ? ScrollWindow.KeepInView(FirstVisible, shown, _cards.Count, VisibleCards)
+    private void KeepPointedInView() =>
+        FirstVisible = PointedIndex is { } pointed
+            ? ScrollWindow.KeepInView(FirstVisible, pointed, _cards.Count, VisibleCards)
             : ScrollWindow.Clamp(FirstVisible, _cards.Count, VisibleCards);
 }

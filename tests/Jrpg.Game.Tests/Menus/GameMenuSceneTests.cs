@@ -135,77 +135,15 @@ public sealed class GameMenuSceneTests
     }
 
     [Fact]
-    public void ShowsSidebar_PageThatWantsIt_IsTrue()
-    {
-        var menu = NewMenu(new CountingMenuPage());
-
-        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
-
-        Assert.True(menu.ShowsSidebar);
-    }
-
-    [Fact]
-    public void ShowsSidebar_PageThatShowsThePartyItself_IsFalse()
-    {
-        var menu = NewMenu(new CountingMenuPage { ShowsPartySidebar = false });
-
-        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
-
-        Assert.False(menu.ShowsSidebar);
-    }
-
-    [Fact]
-    public void ShowsSidebar_MainMenu_IsFalse()
-    {
-        var menu = NewMenu(new CountingMenuPage());
-
-        Assert.False(menu.ShowsSidebar);
-    }
-
-    // Status shows the first member when it opens; Right shows the next, active then reserve.
-    [Fact]
-    public void Update_RightOnStatus_SidebarMarksTheNextMember()
-    {
-        var session = NewSession();
-        var sidebar = new PartySidebar(session.Party);
-        var menu = NewMenu(session, sidebar, new StatusPage(RepositoryScreenText.Text, new UiTextures(), session, StartMapScenarios.BelowClosedDoor));
-        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
-        Assert.Equal(0, sidebar.ShownIndex);
-
-        menu.Update(_oneUpdate, Pressing(GameButton.Right));
-
-        Assert.Equal(1, sidebar.ShownIndex);
-    }
-
-    [Fact]
     public void Update_RightOnStatus_MemberColumnShowsTheNextMember()
     {
         var session = NewSession();
-        var menu = NewMenu(session, new PartySidebar(session.Party), new StatusPage(RepositoryScreenText.Text, new UiTextures(), session, StartMapScenarios.BelowClosedDoor));
+        var menu = NewMenu(session, new StatusPage(RepositoryScreenText.Text, new UiTextures(), session, StartMapScenarios.BelowClosedDoor));
         menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
 
         menu.Update(_oneUpdate, Pressing(GameButton.Right));
 
         Assert.Equal(1, menu.MemberColumn.ShownIndex);
-    }
-
-    // The menu's tabs are Status then Inventory: Status marks its member, then Inventory, which shows no one, marks none.
-    [Fact]
-    public void Update_InventoryOpen_SidebarMarksNoMember()
-    {
-        var session = NewSession();
-        var sidebar = new PartySidebar(session.Party);
-        var ui = new UiTextures();
-        var status = new StatusPage(RepositoryScreenText.Text, ui, session, StartMapScenarios.BelowClosedDoor);
-        var menu = NewMenu(session, sidebar, status, new InventoryPage(RepositoryScreenText.Text, ui, session, StartMapScenarios.BelowClosedDoor));
-        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
-        Assert.Equal(0, sidebar.ShownIndex);
-        menu.Update(_oneUpdate, Pressing(GameButton.Cancel));
-        menu.Update(_oneUpdate, Pressing(GameButton.Down));
-
-        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
-
-        Assert.Null(sidebar.ShownIndex);
     }
 
     [Fact]
@@ -267,27 +205,20 @@ public sealed class GameMenuSceneTests
         return menu.Update(_closingFade, default);
     }
 
-    private static GameMenuScene NewMenu(GameSession session, PartySidebar sidebar, params IMenuPage[] pages) =>
-        new(RepositoryScreenText.Text, new UiTextures(), FrameOf(session, sidebar), [.. pages]);
+    private static GameMenuScene NewMenu(GameSession session, params IMenuPage[] pages) =>
+        new(RepositoryScreenText.Text, new UiTextures(), HeaderOf(session), [.. pages]);
 
     private static GameMenuScene NewMenu()
     {
         var session = NewSession();
         var ui = new UiTextures();
-        return new(RepositoryScreenText.Text, ui, FrameOf(session), [TestSystemPages.Create(session, ui)]);
+        return new(RepositoryScreenText.Text, ui, HeaderOf(session), [TestSystemPages.Create(session, ui)]);
     }
 
     private static GameMenuScene NewMenu(IMenuPage page) =>
-        new(RepositoryScreenText.Text, new UiTextures(), FrameOf(NewSession()), [page]);
+        new(RepositoryScreenText.Text, new UiTextures(), HeaderOf(NewSession()), [page]);
 
-    private static MenuFrame FrameOf(GameSession session) => FrameOf(session, new PartySidebar(session.Party));
-
-    private static MenuFrame FrameOf(GameSession session, PartySidebar sidebar)
-    {
-        var ui = new UiTextures();
-        var cards = new MemberCardView(RepositoryScreenText.Text, ui, StartMapScenarios.BelowClosedDoor);
-        return new(new MenuHeader(RepositoryScreenText.Text, session), sidebar, new PartySidebarView(sidebar, cards, RepositoryScreenText.Text, ui));
-    }
+    private static MenuHeader HeaderOf(GameSession session) => new(RepositoryScreenText.Text, session);
 
     private static GameSession NewSession() => StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);
 }

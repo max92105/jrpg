@@ -53,8 +53,6 @@ internal sealed class StatusPage : IMemberPage
 
     public string Hint { get; }
 
-    public bool ShowsPartySidebar => true;
-
     public bool LeavesOnCancel => true;
 
     /// <summary>Everything the page shows of the member, as text.</summary>

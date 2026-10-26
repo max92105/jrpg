@@ -24,19 +24,10 @@ internal sealed class GameMenuScene : IScene
     // The footer's hint starts 40 px in.
     private const int FooterTextInset = 40;
 
-    // The party sidebar (question 145 placeholder, the demo's layout): a 520 px column at the page area's right, 24 px
-    // from the page.
-    private const int SidebarWidth = 520;
-    private const int SidebarGap = 24;
-    private static readonly Rectangle _pageAreaBesideSidebar = _pageArea with { Width = _pageArea.Width - SidebarWidth - SidebarGap };
-    private static readonly Rectangle _sidebarColumn = _pageArea with { X = _pageArea.Right - SidebarWidth, Width = SidebarWidth };
-
     private readonly UiTextures _ui;
     private readonly MenuTabsView _tabsView;
     private readonly MemberColumnView _memberColumnView;
     private readonly MenuHeader _header;
-    private readonly PartySidebar _sidebar;
-    private readonly PartySidebarView _sidebarView;
     private readonly string _menuTitle;
     private readonly ImmutableArray<IMenuPage> _pages;
     private readonly ListCursor _tabs;
@@ -55,14 +46,12 @@ internal sealed class GameMenuScene : IScene
 
     /// <param name="text">Messages and fonts for the tab labels.</param>
     /// <param name="ui">The shared tab and gradient textures.</param>
-    /// <param name="frame">The header bar and the party sidebar with its view.</param>
+    /// <param name="header">The header bar: the page title, the place and the play time.</param>
     /// <param name="pages">One per tab, top to bottom.</param>
-    public GameMenuScene(ScreenText text, UiTextures ui, MenuFrame frame, ImmutableArray<IMenuPage> pages)
+    public GameMenuScene(ScreenText text, UiTextures ui, MenuHeader header, ImmutableArray<IMenuPage> pages)
     {
         _ui = ui;
-        _header = frame.Header;
-        _sidebar = frame.Sidebar;
-        _sidebarView = frame.SidebarView;
+        _header = header;
         _menuTitle = text.Messages.Text(MessageIds.MenuTitle);
         _pages = pages;
         _tabs = new ListCursor(pages.Length, _ => true);
@@ -75,9 +64,6 @@ internal sealed class GameMenuScene : IScene
 
     /// <summary>The footer's line: the open page's hint, or the tabs' own.</summary>
     internal string FooterHint => _isInPage ? _pages[_tabs.Selected].Hint : _mainHint;
-
-    /// <summary>Whether the party sidebar shows: only beside an open page that wants it.</summary>
-    internal bool ShowsSidebar => _isInPage && _pages[_tabs.Selected].ShowsPartySidebar;
 
     /// <summary>The members a member page goes through and the one it shows, kept current while it is open.</summary>
     internal MemberColumn MemberColumn { get; } = new();
@@ -106,7 +92,7 @@ internal sealed class GameMenuScene : IScene
 
         if (_isInPage)
         {
-            RefreshMemberViews();
+            RefreshMemberColumn();
         }
 
         return request;
@@ -124,20 +110,12 @@ internal sealed class GameMenuScene : IScene
             DrawPage(batch, textures, opacity * _pageTransition.Opacity);
         }
 
-        if (ShowsSidebar)
-        {
-            var pointsAtShown = _pages[_tabs.Selected] is not IMemberPage { HasOwnPointer: true };
-            _sidebarView.Draw(batch, textures, new PartySidebarView.Place(_sidebarColumn, pointsAtShown), opacity * _pageTransition.Opacity);
-        }
-
         DrawFooterHint(batch, opacity);
     }
 
-    private void RefreshMemberViews()
+    private void RefreshMemberColumn()
     {
-        var memberPage = _pages[_tabs.Selected] as IMemberPage;
-        _sidebar.Refresh(memberPage?.Shown);
-        if (memberPage is not null)
+        if (_pages[_tabs.Selected] is IMemberPage memberPage)
         {
             MemberColumn.Refresh(memberPage.Members, memberPage.Shown);
         }
@@ -163,8 +141,7 @@ internal sealed class GameMenuScene : IScene
     // A member page gets the member column at its left and narrows by it; both slide in with the page transition.
     private void DrawPage(SpriteBatch batch, TextureLibrary textures, float opacity)
     {
-        var pageArea = ShowsSidebar ? _pageAreaBesideSidebar : _pageArea;
-        var area = pageArea with { X = pageArea.X + _pageTransition.Offset };
+        var area = _pageArea with { X = _pageArea.X + _pageTransition.Offset };
         var page = _pages[_tabs.Selected];
         if (page is IMemberPage memberPage)
         {

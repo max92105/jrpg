@@ -38,31 +38,31 @@ public sealed class PartySidebarTests
     }
 
     [Fact]
-    public void Refresh_ShownMember_MarksItsCard()
+    public void Refresh_PointedMember_MarksItsCard()
     {
         var sidebar = NewSidebar();
-        var shown = _party.ReserveMembers[1];
+        var pointed = _party.ReserveMembers[1];
 
-        sidebar.Refresh(shown);
+        sidebar.Refresh(pointed);
 
-        Assert.Same(shown, sidebar.Cards[sidebar.ShownIndex ?? -1].Member);
+        Assert.Same(pointed, sidebar.Cards[sidebar.PointedIndex ?? -1].Member);
     }
 
     [Fact]
-    public void Refresh_NoShownMember_MarksNone()
+    public void Refresh_NoPointedMember_MarksNone()
     {
         var sidebar = NewSidebar();
         sidebar.Refresh(_party.Leader);
-        Assert.Equal(0, sidebar.ShownIndex);
+        Assert.Equal(0, sidebar.PointedIndex);
 
         sidebar.Refresh(null);
 
-        Assert.Null(sidebar.ShownIndex);
+        Assert.Null(sidebar.PointedIndex);
     }
 
-    // The start has more recruits than cards in view, so showing the last one scrolls the view to end on it.
+    // The start has more recruits than cards in view, so pointing at the last one scrolls the view to end on it.
     [Fact]
-    public void Refresh_ShownMemberBelowTheWindow_ScrollsToShowIt()
+    public void Refresh_PointedMemberBelowTheWindow_ScrollsToShowIt()
     {
         var sidebar = NewSidebar();
         Assert.True(sidebar.Cards.Count > PartySidebar.VisibleCards, "The test needs more recruits than cards in view.");
@@ -74,7 +74,7 @@ public sealed class PartySidebarTests
     }
 
     [Fact]
-    public void Refresh_ShownMemberAlreadyVisible_KeepsTheWindow()
+    public void Refresh_PointedMemberAlreadyVisible_KeepsTheWindow()
     {
         var sidebar = NewSidebar();
         sidebar.Refresh(_party.ReserveMembers[^1]);

@@ -13,18 +13,25 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// The menu's Inventory page: what the party owns, one category at a time, in pickup order, with the selected item's
-/// description under the list. Left puts the cursor on the category rail, where Up and Down choose the category
-/// (question 152); the tab buttons change it from either side (question 92). Confirm on a usable item uses it.
+/// description under the list and the party's cards at its right (decision 266). Left puts the cursor on the category
+/// rail, where Up and Down choose the category (question 152); the tab buttons change it from either side too (question
+/// 92). Confirm on a usable item uses it.
 /// </summary>
 internal sealed class InventoryPage : IMenuPage
 {
     // 26 px body text (placeholder, decision 82).
     private const int BodyPixels = 26;
 
+    // The party sidebar (question 145 placeholder, the demo's layout): a 520 px column at the page's right, 24 px from
+    // the list.
+    private const int SidebarWidth = 520;
+    private const int SidebarGap = 24;
+
     private readonly GameSession _session;
     private readonly ContentCatalog _catalog;
     private readonly CategoryRail _rail = new();
     private readonly InventoryColumnView _columnView;
+    private readonly PartySidebarView _sidebarView;
     private readonly SpriteFontBase _bodyFont;
     private readonly string _listHint;
     private readonly string _railHint;
@@ -47,6 +54,8 @@ internal sealed class InventoryPage : IMenuPage
         _catalog = catalog;
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _columnView = new InventoryColumnView(text, ui, _bodyFont, _rail.Tabs);
+        Sidebar = new PartySidebar(session.Party);
+        _sidebarView = new PartySidebarView(Sidebar, new MemberCardView(text, ui, catalog), text, ui);
         _itemUse = new ItemUseDialog(session, text, ui, catalog);
         ShowRowsFrom(0);
     }
@@ -56,8 +65,6 @@ internal sealed class InventoryPage : IMenuPage
     public TabGlyph Glyph => TabGlyph.Items;
 
     public string Hint => _rail.HasCursor ? _railHint : _listHint;
-
-    public bool ShowsPartySidebar => true;
 
     /// <summary>False while choosing who to use an item on: Cancel closes that instead.</summary>
     public bool LeavesOnCancel => !_itemUse.IsOpen;
@@ -82,16 +89,39 @@ internal sealed class InventoryPage : IMenuPage
     /// <summary>Where the list's highlight is, in rows from the top of the visible window.</summary>
     internal float SelectionPosition => _selection.Position;
 
+    /// <summary>The party's cards beside the list (decision 266).</summary>
+    internal PartySidebar Sidebar { get; }
+
     public void Open()
     {
         _detail.ClearNotice();
         _rail.Reset();
         ShowRowsFrom(0);
+
+        // The party may have changed on another page since the last update here.
+        Sidebar.Refresh(pointed: null);
     }
 
     public void Advance(TimeSpan delta) => _selection.Advance(delta);
 
     public SceneRequest? Update(InputFrame input)
+    {
+        UpdateInput(input);
+        Sidebar.Refresh(pointed: null);
+        return null;
+    }
+
+    public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
+    {
+        var listArea = area with { Width = area.Width - SidebarWidth - SidebarGap };
+        var column = new InventoryColumnView.Place(_rail, _rows, _rowCursor, !_rail.HasCursor, _selection, listArea, DetailText());
+        _columnView.Draw(batch, textures, column, opacity);
+        var sidebar = area with { X = area.Right - SidebarWidth, Width = SidebarWidth };
+        _sidebarView.Draw(batch, textures, new PartySidebarView.Place(sidebar, PointsAtShown: true), opacity);
+        _itemUse.Draw(batch, textures, opacity);
+    }
+
+    private void UpdateInput(InputFrame input)
     {
         if (_itemUse.IsOpen)
         {
@@ -101,7 +131,7 @@ internal sealed class InventoryPage : IMenuPage
                 ShowRowsFrom(_rowCursor?.Selected ?? 0);
             }
 
-            return null;
+            return;
         }
 
         if (MovesACursor(input))
@@ -113,24 +143,16 @@ internal sealed class InventoryPage : IMenuPage
         if (_rail.HasCursor)
         {
             MoveOnRail(input);
-            return null;
+            return;
         }
 
         if (input.IsPressed(GameButton.Confirm))
         {
             OpenItemUse();
-            return null;
+            return;
         }
 
         MoveThroughList(input);
-        return null;
-    }
-
-    public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
-    {
-        var column = new InventoryColumnView.Place(_rail, _rows, _rowCursor, !_rail.HasCursor, _selection, area, DetailText());
-        _columnView.Draw(batch, textures, column, opacity);
-        _itemUse.Draw(batch, textures, opacity);
     }
 
     private void OpenItemUse()

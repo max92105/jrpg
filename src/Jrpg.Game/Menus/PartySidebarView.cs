@@ -71,7 +71,7 @@ internal sealed class PartySidebarView
     // reserve.
     private void DrawCard(SpriteBatch batch, TextureLibrary textures, CardSlot slot, float opacity)
     {
-        var isShown = slot.Index == _sidebar.ShownIndex;
+        var isShown = slot.Index == _sidebar.PointedIndex;
         var cardOpacity = _sidebar.Cards[slot.Index].IsReserve && !isShown ? opacity * UiTheme.ReserveCardOpacity : opacity;
         _cardView.Draw(batch, textures, new MemberCardView.Place(_cards[slot.Index].Card, slot.Area, isShown), cardOpacity);
         if (isShown && slot.PointsAtShown)

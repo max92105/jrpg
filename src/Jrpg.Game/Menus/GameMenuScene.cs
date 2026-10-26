@@ -85,8 +85,10 @@ internal sealed class GameMenuScene : IScene
     /// <summary>The footer's line: the open page's hint, or the tabs' own.</summary>
     internal string FooterHint => _isInPage ? _pages[_tabs.Selected].Hint : _mainHint;
 
-    /// <summary>Whether the party sidebar shows: only beside an open page that wants it.</summary>
-    internal bool ShowsSidebar => _isInPage && _pages[_tabs.Selected].ShowsPartySidebar;
+    /// <summary>
+    /// Whether the party sidebar shows: beside an open page that wants it, never beside a member page (decision 266).
+    /// </summary>
+    internal bool ShowsSidebar => _isInPage && _pages[_tabs.Selected] is not IMemberPage && _pages[_tabs.Selected].ShowsPartySidebar;
 
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
@@ -112,7 +114,7 @@ internal sealed class GameMenuScene : IScene
 
         if (_isInPage)
         {
-            RefreshMemberViews(_pages[_tabs.Selected] as IMemberPage);
+            RefreshMemberViews(_pages[_tabs.Selected]);
         }
 
         return request;
@@ -133,8 +135,7 @@ internal sealed class GameMenuScene : IScene
 
         if (ShowsSidebar)
         {
-            var pointsAtShown = _pages[_tabs.Selected] is not IMemberPage { HasOwnPointer: true };
-            _sidebarView.Draw(batch, textures, new PartySidebarView.Place(_sidebarColumn, pointsAtShown), opacity * _pageTransition.Opacity);
+            _sidebarView.Draw(batch, textures, _sidebarColumn, opacity * _pageTransition.Opacity);
         }
 
         DrawFooterHint(batch, opacity);
@@ -199,13 +200,16 @@ internal sealed class GameMenuScene : IScene
         }
     }
 
-    // The sidebar marks the member a page shows; on a member page, the member column follows the page too.
-    private void RefreshMemberViews(IMemberPage? memberPage)
+    // A member page has the member column, which follows the member it shows; any other page may have the sidebar.
+    private void RefreshMemberViews(IMenuPage page)
     {
-        _sidebar.Refresh(memberPage?.Shown);
-        if (memberPage is not null)
+        if (page is IMemberPage memberPage)
         {
             _memberColumn.Refresh(memberPage.Members, memberPage.Shown);
+        }
+        else if (page.ShowsPartySidebar)
+        {
+            _sidebar.Refresh();
         }
     }
 

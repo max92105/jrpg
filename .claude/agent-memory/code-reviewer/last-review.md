@@ -5,9 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/M2b.md, slice M2b (MemberColumnView drawn on member pages)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/M2c.md, slice M2c (party sidebar's shown-member marking removed)
 Round: 1 (verdict: Ready to commit)
 
-- S1 GameMenuScene.DrawPage picks the column layout by `page is IMemberPage` while the sidebar draws on ShowsPartySidebar; a member page returning true would overlap both; say in IMemberPage's doc that member pages never show the sidebar (or derive it); open
-- S2 StatusPage.ShowsPartySidebar flip (decision 266) has no test, unlike Equipment's; open
-- F1 IMenuPage.ShowsPartySidebar and the sidebar's shown-member marking: M2c cleanup; follow-up
+- W1 PartySidebar.cs:7 summary still says "Refreshed every update a page is open"; now only while a page that shows it is open (GameMenuScene.RefreshMemberViews); open
+- S1 GameMenuScene.ShowsSidebar could add `is not IMemberPage` so a member page overriding the DIM can't show both columns; open

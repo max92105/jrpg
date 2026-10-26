@@ -99,7 +99,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **M2a. The member column: which members a page goes through, which one is shown** (Game, about 130 lines) → [slices/M2a.md](slices/M2a.md)
 - [x] **M2b0. The menu's tabs drawn by `MenuTabsView`** (Game, mechanical, about 120 lines moved) → [slices/M2b0.md](slices/M2b0.md)
 - [x] **M2b. The member column drawn between the tabs and member pages** (Game, about 210 lines) → [slices/M2b.md](slices/M2b.md)
-- [ ] **M2c. The party sidebar's unused shown-member marking removed** (Game, about 100 lines removed) → [slices/M2c.md](slices/M2c.md)
+- [x] **M2c. The party sidebar's unused shown-member marking removed** (Game, about 100 lines removed) → [slices/M2c.md](slices/M2c.md)
 - [ ] **M1. Tab icons: placeholder glyphs we draw** (Game, about 230 lines) → [slices/M1.md](slices/M1.md)
 
 ### Phase 5: the encounter
@@ -145,7 +145,7 @@ Earlier decisions that apply:
 - 81, 82: the game menu's tabs, its opening fade and the placeholder layouts.
 - 84: images no content file names are listed in `Ui/UiArtFiles`.
 - 101: only damage has an animation; anything else shows a cue with the action's name.
-- 146: the party sidebar marks the member a page shows.
+- 146: the party sidebar marks the member a page shows; since decision 266 no page that shows the sidebar shows one member, so M2c removed the marking.
 
 ## Open design questions (developer decides)
 Each slice uses the placeholder until answered.

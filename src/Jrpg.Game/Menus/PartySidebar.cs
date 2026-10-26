@@ -4,9 +4,9 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// The menu's party sidebar: one card per recruit, the active members in party order, then the reserve (decision 146).
-/// Refreshed every update a page is open, it replaces only the cards whose shown values changed, so a page's own changes
-/// (a potion, a new order) show at once and the view formats again only what changed. It marks the member a page shows
-/// and scrolls so that card stays in view.
+/// Refreshed every update a page that shows it is open, it replaces only the cards whose shown values changed, so a
+/// page's own changes (a potion) show at once and the view formats again only what changed. The cards past
+/// <see cref="VisibleCards"/> stay out of view, since no page that shows the sidebar shows one member (decision 266).
 /// </summary>
 internal sealed class PartySidebar
 {
@@ -30,18 +30,10 @@ internal sealed class PartySidebar
     /// <summary>The member whose card carries the leader's badge.</summary>
     public PartyMember Leader => _party.Leader;
 
-    /// <summary>The card of the member the open page shows; null on a page that shows no one member.</summary>
-    public int? ShownIndex { get; private set; }
-
-    /// <summary>The first card in view; it moves only when the marked card would leave the view.</summary>
-    public int FirstVisible { get; private set; }
-
     /// <summary>
-    /// Rebuilds every card if the recruits' order or who is in the reserve changed, else only the cards whose values did;
-    /// then marks <paramref name="shown"/>'s card and scrolls to it.
+    /// Rebuilds all the cards when the recruits' order or the reserve changed, else only those whose values did.
     /// </summary>
-    /// <param name="shown">The member the open page shows; null on other pages.</param>
-    public void Refresh(PartyMember? shown)
+    public void Refresh()
     {
         if (IsSameOrder())
         {
@@ -51,9 +43,6 @@ internal sealed class PartySidebar
         {
             RebuildAll();
         }
-
-        ShownIndex = shown is null ? null : IndexOf(shown);
-        KeepShownInView();
     }
 
     private void ReplaceChangedCards()
@@ -102,37 +91,6 @@ internal sealed class PartySidebar
         foreach (var member in _party.ReserveMembers)
         {
             _cards.Add(SidebarCard.Of(member, isReserve: true));
-        }
-    }
-
-    private int? IndexOf(PartyMember member)
-    {
-        for (var index = 0; index < _cards.Count; index++)
-        {
-            if (ReferenceEquals(_cards[index].Member, member))
-            {
-                return index;
-            }
-        }
-
-        return null;
-    }
-
-    private void KeepShownInView()
-    {
-        FirstVisible = Math.Min(FirstVisible, Math.Max(0, _cards.Count - VisibleCards));
-        if (ShownIndex is not { } shown)
-        {
-            return;
-        }
-
-        if (shown < FirstVisible)
-        {
-            FirstVisible = shown;
-        }
-        else if (shown >= FirstVisible + VisibleCards)
-        {
-            FirstVisible = shown - VisibleCards + 1;
         }
     }
 }

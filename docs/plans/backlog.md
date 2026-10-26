@@ -69,4 +69,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `content/art/backgrounds/GameMenu.png` is 4096 x 2838 (23 MB, about 46 MB of video memory) for a 1920 x 1080 screen: a 1920 x 1330 copy would decode about five times faster (BG1). The developer's art; ask first.
 - The battle's skill hint doesn't wrap: a long description runs past its box over the actor's portrait (`docs/captures/before/battle-skill.jpg`; SZ2).
 - `Menus/EquipmentSheetView` draws its parameter rows the old way (a 200 px value offset in the body font), while the Status page's rows have spaced-caps labels, right-aligned large values and hairlines since M3b. Give the Equipment page the same row look when it is next touched.
-- `Ui/ListCursor.ScrollToSelected` and `Menus/PartySidebar.KeepShownInView` keep their own copy of the keep-in-view scroll rule; `Ui/ListScroll.KeepInView` (M2a) holds it now. Move both onto it when next touched.
+- `Ui/ListCursor.ScrollToSelected` keeps its own copy of the keep-in-view scroll rule; `Ui/ListScroll.KeepInView` (M2a) holds it now. Move it onto it when next touched (`PartySidebar`'s copy went with M2c).

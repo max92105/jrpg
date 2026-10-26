@@ -14,6 +14,6 @@ internal interface IMemberPage : IMenuPage
     /// <summary>The member the page shows now; Left and Right change it.</summary>
     PartyMember Shown { get; }
 
-    /// <summary>Whether the page points at a row of its own; the sidebar then only lights the shown member.</summary>
-    bool HasOwnPointer { get; }
+    /// <summary>False: the member column shows who is shown instead of the sidebar (decision 266).</summary>
+    bool IMenuPage.ShowsPartySidebar => false;
 }

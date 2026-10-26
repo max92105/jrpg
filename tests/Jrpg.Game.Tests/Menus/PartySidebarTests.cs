@@ -38,55 +38,6 @@ public sealed class PartySidebarTests
     }
 
     [Fact]
-    public void Refresh_ShownMember_MarksItsCard()
-    {
-        var sidebar = NewSidebar();
-        var shown = _party.ReserveMembers[1];
-
-        sidebar.Refresh(shown);
-
-        Assert.Same(shown, sidebar.Cards[sidebar.ShownIndex ?? -1].Member);
-    }
-
-    [Fact]
-    public void Refresh_NoShownMember_MarksNone()
-    {
-        var sidebar = NewSidebar();
-        sidebar.Refresh(_party.Leader);
-        Assert.Equal(0, sidebar.ShownIndex);
-
-        sidebar.Refresh(null);
-
-        Assert.Null(sidebar.ShownIndex);
-    }
-
-    // The start has more recruits than cards in view, so showing the last one scrolls the view to end on it.
-    [Fact]
-    public void Refresh_ShownMemberBelowTheWindow_ScrollsToShowIt()
-    {
-        var sidebar = NewSidebar();
-        Assert.True(sidebar.Cards.Count > PartySidebar.VisibleCards, "The test needs more recruits than cards in view.");
-        Assert.Equal(0, sidebar.FirstVisible);
-
-        sidebar.Refresh(_party.ReserveMembers[^1]);
-
-        Assert.Equal(sidebar.Cards.Count - PartySidebar.VisibleCards, sidebar.FirstVisible);
-    }
-
-    [Fact]
-    public void Refresh_ShownMemberAlreadyVisible_KeepsTheWindow()
-    {
-        var sidebar = NewSidebar();
-        sidebar.Refresh(_party.ReserveMembers[^1]);
-        var scrolled = sidebar.FirstVisible;
-        Assert.NotEqual(0, scrolled);
-
-        sidebar.Refresh(_party.ReserveMembers[^2]);
-
-        Assert.Equal(scrolled, sidebar.FirstVisible);
-    }
-
-    [Fact]
     public void Refresh_MemberMovedToReserve_ListsItAfterTheActive()
     {
         var leaving = _party.ReserveMembers[0];
@@ -95,7 +46,7 @@ public sealed class PartySidebarTests
         Assert.False(sidebar.Cards[1].IsReserve);
 
         _party.TryMoveToReserve(leaving);
-        sidebar.Refresh(null);
+        sidebar.Refresh();
 
         var card = sidebar.Cards.Single(card => ReferenceEquals(card.Member, leaving));
         Assert.True(card.IsReserve);
@@ -108,7 +59,7 @@ public sealed class PartySidebarTests
         var sidebar = NewSidebar();
         var before = sidebar.Cards[0];
 
-        sidebar.Refresh(null);
+        sidebar.Refresh();
 
         Assert.Same(before, sidebar.Cards[0]);
     }
@@ -123,7 +74,7 @@ public sealed class PartySidebarTests
         var leaderCard = sidebar.Cards[0];
 
         joining.Vitals.RestoreHp(5);
-        sidebar.Refresh(null);
+        sidebar.Refresh();
 
         Assert.Same(leaderCard, sidebar.Cards[0]);
         Assert.Equal(joining.Vitals.Hp, sidebar.Cards[1].Hp);
@@ -139,7 +90,7 @@ public sealed class PartySidebarTests
         var sidebar = NewSidebar();
 
         _party.Reorder([_party.Leader, second, first]);
-        sidebar.Refresh(null);
+        sidebar.Refresh();
 
         Assert.Equal([_party.Leader, second, first], sidebar.Cards.Take(_party.ActiveMembers.Count).Select(card => card.Member));
     }

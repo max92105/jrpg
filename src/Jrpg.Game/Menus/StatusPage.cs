@@ -45,14 +45,9 @@ internal sealed class StatusPage : IMemberPage
 
     public PartyMember Shown => Members[_cursor.Selected];
 
-    public bool HasOwnPointer => false;
-
     public string TitleMessageId => MessageIds.MenuStatus;
 
     public string Hint { get; }
-
-    /// <summary>False: the member column shows who is shown instead (decision 266).</summary>
-    public bool ShowsPartySidebar => false;
 
     public bool LeavesOnCancel => true;
 

@@ -23,6 +23,7 @@ internal sealed class SystemPage : IMenuPage
     private readonly string[] _labels;
     private readonly ConfirmPromptView _promptView;
     private readonly UiTextures _ui;
+    private readonly ColumnPanelView _panel = new(UiTheme.PageColumn);
     private ISaveFilesPage? _openFiles;
     private ConfirmPrompt? _asking;
 
@@ -84,6 +85,7 @@ internal sealed class SystemPage : IMenuPage
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
         var column = MenuLayout.SingleColumn(area);
+        _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(column), opacity);
         if (_openFiles is not null)
         {
             _openFiles.Draw(batch, textures, column, opacity);

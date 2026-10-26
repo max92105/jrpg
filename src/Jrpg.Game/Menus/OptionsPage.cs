@@ -27,6 +27,7 @@ internal sealed class OptionsPage : IMenuPage
 
     private readonly PlayerSettings _settings;
     private readonly UiTextures _ui;
+    private readonly ColumnPanelView _panel = new(UiTheme.PageColumn);
     private readonly SpriteFontBase _font;
     private readonly string[] _labels;
     private readonly MeasuredText[] _onOff;
@@ -100,6 +101,7 @@ internal sealed class OptionsPage : IMenuPage
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
         var column = MenuLayout.SingleColumn(area);
+        _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(column), opacity);
         _ui.DrawGlidingSelection(batch, textures, _selection.RowIn(RowAt(column, 0)), opacity);
         for (var row = 0; row < RowCount; row++)
         {

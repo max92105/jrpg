@@ -170,6 +170,12 @@ internal static partial class UiTheme
     public static ImmutableArray<GradientStop> SidebarPanel { get; } =
         [new(0, FromStraightArgb(0x000C0D11)), new(0.3f, FromStraightArgb(0x800C0D11)), new(1, FromStraightArgb(0xCC0C0D11))];
 
+    /// <summary>A page's content column (decision 269): dark enough to read over the art showing through.</summary>
+    public static ColumnPanelStyle PageColumn { get; } = new(FromStraightArgb(0xB40A0C12), FromStraightArgb(0x33FFFFFF));
+
+    /// <summary>The darker strip beside a page's content, such as the member column.</summary>
+    public static ColumnPanelStyle SideColumn { get; } = new(FromStraightArgb(0xD8060709), FromStraightArgb(0x40FFFFFF));
+
     /// <summary>A translucent panel over a page, such as the equipment choice, and a framed window's body.</summary>
     public static Color Surface { get; } = FromStraightArgb(0xC70C0D11);
 

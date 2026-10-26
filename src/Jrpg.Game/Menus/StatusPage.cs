@@ -23,6 +23,7 @@ internal sealed class StatusPage : IMemberPage
     private readonly ListCursor _cursor;
     private readonly StatusLabels _labels;
     private readonly StatusSheetView _view;
+    private readonly ColumnPanelView _panel = new(UiTheme.PageColumn);
     private StatusSheet _sheet;
 
     /// <param name="text">Messages and fonts.</param>
@@ -91,8 +92,12 @@ internal sealed class StatusPage : IMemberPage
         return null;
     }
 
-    public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity) =>
-        _view.Draw(batch, textures, new StatusSheetView.Place(_sheet, MenuLayout.SingleColumn(area)), opacity);
+    public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
+    {
+        var column = MenuLayout.SingleColumn(area);
+        _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(column), opacity);
+        _view.Draw(batch, textures, new StatusSheetView.Place(_sheet, column), opacity);
+    }
 
     // The text and bars are set when the member changes, so drawing only reads them.
     [MemberNotNull(nameof(_sheet))]

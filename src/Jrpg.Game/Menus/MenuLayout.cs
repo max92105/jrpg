@@ -37,4 +37,11 @@ internal static class MenuLayout
 
     /// <returns><paramref name="area"/>, at most <see cref="SingleColumnWidth"/> wide, its left edge kept.</returns>
     public static Rectangle SingleColumn(Rectangle area) => area with { Width = Math.Min(area.Width, SingleColumnWidth) };
+
+    /// <returns>
+    /// <paramref name="area"/> stretched from the header's bottom to the footer's top, its left and width kept: a
+    /// column panel runs the screen's height (decision 269).
+    /// </returns>
+    public static Rectangle FullHeight(Rectangle area) =>
+        area with { Y = MenuHeader.Height, Height = VirtualScreen.Height - FooterHeight - MenuHeader.Height };
 }

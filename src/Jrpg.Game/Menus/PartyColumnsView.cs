@@ -81,6 +81,8 @@ internal sealed class PartyColumnsView
         _activeTitle.Draw(batch, textures, active, opacity);
         batch.DrawString(_labelFont, columns.Count.Text, new Vector2(active.Right - columns.Count.Width, active.Y), UiTheme.TextSecondary * opacity);
         _reserveTitle.Draw(batch, textures, reserve, opacity);
+        var divider = new Rectangle(active.Right + (ColumnGap / 2), active.Y, 1, place.Area.Bottom - active.Y);
+        batch.Draw(textures.Pixel, divider, UiTheme.PageColumn.Edge * opacity);
         var cursor = place.Cursor;
         DrawCards(batch, textures, new CardColumn(columns.Active, active, cursor.IsOnReserve ? null : cursor.Row, columns.Cards, place.Moving), opacity);
         DrawCards(batch, textures, new CardColumn(columns.Reserve, reserve, cursor.IsOnReserve ? cursor.Row : null, columns.Cards, place.Moving), opacity);

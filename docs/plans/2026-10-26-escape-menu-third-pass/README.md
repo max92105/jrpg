@@ -49,7 +49,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **C1. `InventoryPage` split: the list column's drawing moves to `InventoryColumnView`** (Game, mechanical, about 170 lines moved, 30 new) → [slices/C1.md](slices/C1.md)
 - [x] **ML1. `MenuLayout`: the page area beside the tabs' right edge; single-column pages capped at about 1100 px** (Game, about 140 lines) → [slices/ML1.md](slices/ML1.md)
 - [x] **SB1. The party sidebar only on Inventory: the page owns it, the menu forgets it** (Game, about 220 lines) → [slices/SB1.md](slices/SB1.md)
-- [ ] **PC1. Column panels: `ColumnPanelView`; Status, Party, Options, System and the member column on them** (Game, about 170 lines) → [slices/PC1.md](slices/PC1.md)
+- [x] **PC1. Column panels: `ColumnPanelView`; Status, Party, Options, System and the member column on them** (Game, about 170 lines) → [slices/PC1.md](slices/PC1.md)
 
 ### Phase 2: tabs and pages
 - [ ] **PC2. Two-column pages: Inventory's rail, list and sidebar; Equipment's sheet and choice** (Game, about 160 lines) → [slices/PC2.md](slices/PC2.md)

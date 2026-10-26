@@ -27,6 +27,7 @@ internal sealed class GameMenuScene : IScene
     private readonly UiTextures _ui;
     private readonly MenuTabsView _tabsView;
     private readonly MemberColumnView _memberColumnView;
+    private readonly ColumnPanelView _memberStrip = new(UiTheme.SideColumn);
     private readonly MenuHeader _header;
     private readonly string _menuTitle;
     private readonly ImmutableArray<IMenuPage> _pages;
@@ -138,7 +139,8 @@ internal sealed class GameMenuScene : IScene
         FooterBar.Draw(batch, textures.Pixel, MenuLayout.FooterHeight, opacity);
     }
 
-    // A member page gets the member column at its left and narrows by it; both slide in with the page transition.
+    // A member page gets the member column at its left, on its darker strip, and narrows by it; both slide in with the
+    // page transition.
     private void DrawPage(SpriteBatch batch, TextureLibrary textures, float opacity)
     {
         var area = _pageArea with { X = _pageArea.X + _pageTransition.Offset };
@@ -146,6 +148,7 @@ internal sealed class GameMenuScene : IScene
         if (page is IMemberPage memberPage)
         {
             var column = area with { Width = MemberColumnView.Width };
+            _memberStrip.Draw(batch, textures.Pixel, MenuLayout.FullHeight(column), opacity);
             _memberColumnView.Draw(batch, textures, new MemberColumnView.Place(MemberColumn, column, !memberPage.HasOwnPointer), opacity);
             area = area with { X = column.Right, Width = area.Width - MemberColumnView.Width };
         }

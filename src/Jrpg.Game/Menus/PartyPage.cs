@@ -21,6 +21,7 @@ internal sealed class PartyPage : IMenuPage
     private readonly PartyState _party;
     private readonly UiMessages _messages;
     private readonly PartyColumnsView _columnsView;
+    private readonly ColumnPanelView _panel = new(UiTheme.PageColumn);
     private readonly PartyActionChoiceView _choiceView;
     private readonly PartyCursor _cursor;
     private PartyColumns _columns;
@@ -102,6 +103,7 @@ internal sealed class PartyPage : IMenuPage
     // The action choice is offered on an active card only, over its right.
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
+        _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(area), opacity);
         _columnsView.Draw(batch, textures, new PartyColumnsView.Place(_columns, area, _cursor, _actionChoice is null, MovingMember), opacity);
         if (_actionChoice is not null)
         {

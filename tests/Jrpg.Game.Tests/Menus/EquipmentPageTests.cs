@@ -238,6 +238,17 @@ public sealed class EquipmentPageTests
         return sarxian;
     }
 
+    [Fact]
+    public void Advance_AfterMovingDown_SelectionReachesTheNextSlot()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Down));
+
+        page.Advance(TimeSpan.FromSeconds(1));
+
+        Assert.Equal(1, page.SelectionPosition);
+    }
+
     // The weapon choice lists Remove, then the fighter's owned weapons in pickup order: bronze sword, iron sword.
     private static void ChooseIronSword(EquipmentPage page)
     {

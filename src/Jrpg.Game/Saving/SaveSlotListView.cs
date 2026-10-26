@@ -69,11 +69,14 @@ internal sealed class SaveSlotListView
 
         _columnTitles.Draw(batch, textures, area, opacity);
         var rowsTop = area.Y + ColumnTitles.Height;
+        var band = _list.Selection.BandOver(new Rectangle(area.X, rowsTop, area.Width, RowHeight));
+        _ui.DrawSelectedRow(batch, textures, band, opacity);
+        MenuPointer.Draw(batch, textures.Pixel, _list.Selection.PointerAt(band), opacity);
         var last = Math.Min(_rows.Length, _list.FirstVisible + SaveSlotList.VisibleRows);
         for (var index = _list.FirstVisible; index < last; index++)
         {
             var row = new Rectangle(area.X, rowsTop + ((index - _list.FirstVisible) * RowHeight), area.Width, RowHeight);
-            DrawRow(batch, textures, row, index, opacity);
+            DrawRow(batch, textures.Pixel, row, _rows[index], opacity);
         }
     }
 
@@ -96,16 +99,9 @@ internal sealed class SaveSlotListView
         return new RowText(file, summary.LocationName, details, MeasuredText.Of(_bodyFont, party));
     }
 
-    private void DrawRow(SpriteBatch batch, TextureLibrary textures, Rectangle row, int index, float opacity)
+    private void DrawRow(SpriteBatch batch, Texture2D pixel, Rectangle row, RowText text, float opacity)
     {
-        var text = _rows[index];
-        if (index == _list.Selected)
-        {
-            _ui.DrawSelectedRow(batch, textures, row, opacity);
-            MenuPointer.Draw(batch, textures.Pixel, new Vector2(row.X, row.Center.Y), opacity);
-        }
-
-        batch.Draw(textures.Pixel, new Rectangle(row.X, row.Bottom - 1, row.Width, 1), UiTheme.Stroke * opacity);
+        batch.Draw(pixel, new Rectangle(row.X, row.Bottom - 1, row.Width, 1), UiTheme.Stroke * opacity);
         var middle = row.Y + (RowHeight / 2f);
         var left = row.X + RowInset;
         batch.DrawString(_headingFont, text.File, new Vector2(left, middle - (_headingFont.LineHeight / 2f)), UiTheme.TextPrimary * opacity);

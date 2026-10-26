@@ -61,6 +61,11 @@ internal sealed class SavePage : ISaveFilesPage
     /// <summary>False while the overwrite question is open: Cancel answers it No instead.</summary>
     public bool LeavesOnCancel => _asking is null;
 
+    /// <summary>Where the selected file's band is, in rows, as it glides.</summary>
+    internal float SelectionPosition => _panel.SelectionPosition;
+
+    public void Advance(TimeSpan delta) => _panel.Advance(delta);
+
     public void Open()
     {
         _panel.Open();

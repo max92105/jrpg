@@ -28,6 +28,8 @@ internal sealed class LoadPage(SaveSlots slots, ScreenText text, UiTextures ui) 
 
     public void Open() => _panel.Open();
 
+    public void Advance(TimeSpan delta) => _panel.Advance(delta);
+
     public SceneRequest? Update(InputFrame input)
     {
         return _panel.ChooseToLoad(input) is { } save ? new LoadRequested(save) : null;

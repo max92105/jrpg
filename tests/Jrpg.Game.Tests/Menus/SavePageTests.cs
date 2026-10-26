@@ -134,6 +134,18 @@ public sealed class SavePageTests : IDisposable
         Assert.NotNull(page.Entries[0].Summary);
     }
 
+    [Fact]
+    public void Advance_AfterMovingDown_SelectionReachesTheNextFile()
+    {
+        var page = NewPage();
+        page.Open();
+        page.Update(Pressing(GameButton.Down));
+
+        page.Advance(TimeSpan.FromSeconds(1));
+
+        Assert.Equal(1, page.SelectionPosition);
+    }
+
     private static GameSession NewSession() => GameSession.StartNew(StartMapScenarios.BelowClosedDoor, "sarxian", new SeededRandom(1));
 
     private SaveSlots NewSlots()

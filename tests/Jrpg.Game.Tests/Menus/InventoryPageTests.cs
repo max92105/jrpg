@@ -307,6 +307,17 @@ public sealed class InventoryPageTests
         Assert.False(page.IsChoosingCategory);
     }
 
+    [Fact]
+    public void Advance_AfterMovingDown_SelectionReachesTheNextRow()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Down));
+
+        page.Advance(TimeSpan.FromSeconds(1));
+
+        Assert.Equal(1, page.SelectionPosition);
+    }
+
     // The third starting item is the elixir; the target picker starts on the leader.
     private static void UseThirdItemOnLeader(InventoryPage page)
     {

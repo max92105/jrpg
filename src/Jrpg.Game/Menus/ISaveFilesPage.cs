@@ -18,6 +18,9 @@ internal interface ISaveFilesPage
     /// <summary>Reads the files; called each time the System page opens this one.</summary>
     void Open();
 
+    /// <summary>Moves the list's selection on by one update's time, while these files show.</summary>
+    void Advance(TimeSpan delta);
+
     /// <returns>What choosing a file asks the flow for, or null.</returns>
     SceneRequest? Update(InputFrame input);
 

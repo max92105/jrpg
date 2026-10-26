@@ -92,5 +92,16 @@ public sealed class OptionsPageTests
         Assert.Equal(TextSpeed.Slow, _settings.TextSpeed);
     }
 
+    [Fact]
+    public void Advance_AfterMovingDown_SelectionReachesTheNextOption()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Down));
+
+        page.Advance(TimeSpan.FromSeconds(1));
+
+        Assert.Equal(1, page.SelectionPosition);
+    }
+
     private OptionsPage NewPage() => new(RepositoryScreenText.Text, new UiTextures(), _settings);
 }

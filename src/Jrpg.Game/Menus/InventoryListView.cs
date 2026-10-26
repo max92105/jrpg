@@ -62,23 +62,27 @@ internal sealed class InventoryListView
             return;
         }
 
+        DrawSelection(batch, textures, place, opacity);
         var last = Math.Min(place.Rows.Count, cursor.FirstVisible + VisibleRows);
         for (var index = cursor.FirstVisible; index < last; index++)
         {
             var row = new Rectangle(place.Area.X, place.Area.Y + ((index - cursor.FirstVisible) * RowHeight), place.Area.Width, RowHeight);
-            // The list with the cursor marks the row with the pointer; with the rail, the row stays chosen, dimmed.
-            if (index == cursor.Selected)
-            {
-                _ui.DrawSelectedRow(batch, textures, row, place.HasCursor ? opacity : opacity * UiTheme.DimmedSelectionOpacity);
-            }
-
-            if (index == cursor.Selected && place.HasCursor)
-            {
-                MenuPointer.Draw(batch, textures.Pixel, new Vector2(row.X, row.Center.Y), opacity);
-            }
-
             DrawRow(batch, textures, row, place.Rows[index], opacity);
         }
+    }
+
+    // The list with the cursor marks the row with the pointer; with the rail, the row stays chosen, dimmed.
+    private void DrawSelection(SpriteBatch batch, TextureLibrary textures, Place place, float opacity)
+    {
+        var band = place.Selection.BandOver(place.Area with { Height = RowHeight });
+        if (!place.HasCursor)
+        {
+            _ui.DrawSelectedRow(batch, textures, band, opacity * UiTheme.DimmedSelectionOpacity);
+            return;
+        }
+
+        _ui.DrawSelectedRow(batch, textures, band, opacity);
+        MenuPointer.Draw(batch, textures.Pixel, place.Selection.PointerAt(band), opacity);
     }
 
     private void DrawRow(SpriteBatch batch, TextureLibrary textures, Rectangle row, InventoryRow item, float opacity)
@@ -96,6 +100,7 @@ internal sealed class InventoryListView
     /// <param name="Area">The rows' box: its top is the first row's, its width every row's.</param>
     /// <param name="Rows">Every row of the category, the hidden ones included.</param>
     /// <param name="Cursor">The selected row and the first visible one; null when the category is empty.</param>
+    /// <param name="Selection">Where the selected row's band is, by its row in the visible window.</param>
     /// <param name="HasCursor">Whether the list has the cursor, rather than the category rail.</param>
-    public readonly record struct Place(Rectangle Area, IReadOnlyList<InventoryRow> Rows, ListCursor? Cursor, bool HasCursor);
+    public readonly record struct Place(Rectangle Area, IReadOnlyList<InventoryRow> Rows, ListCursor? Cursor, SelectionGlide Selection, bool HasCursor);
 }

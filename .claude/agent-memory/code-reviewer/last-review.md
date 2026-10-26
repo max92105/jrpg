@@ -5,9 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/C5.md, slice C5 (InventoryPage split: InventoryRow, InventoryListView)
-Round: 1 (verdict: Ready to commit)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/MO2b.md, slice MO2b (page lists glide and bob)
+Round: 1 (verdict: Fix the Criticals, then commit)
 
-- S1 InventoryPage/InventoryListView — BodyPixels = 26 now declared in both; description and rows can drift apart; expose one const from the view; open
-- S2 InventoryListView.Measure — name doesn't say which font; MeasureInRowFont or a doc tying it to the quantity column; open
-- S3 InventoryListView.Place — `internal` while every other view's Place is `public`; open
+- C1 InventoryPageTests.cs:311 — new test inserted between UseThirdItemOnLeader and its "third starting item is the elixir" comment; comment now describes the wrong method; open
+- W1 band + pointer draw (rect at Position*RowHeight, DrawSelectedRow, MenuPointer at X - PointerShift) copied in 5 views; propose one Ui method taking glide/band, dim flag split into two methods; open
+- S1 SaveFilesPanel.SelectionPosition public only for SavePage's test accessor; could read _panel's list via Entries-like accessor; open
+- F1 TitleScene keeps its own bob clock while SelectionGlide now has one (recorded in Done note); follow-up

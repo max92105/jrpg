@@ -18,6 +18,9 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class EquipmentPage : IMemberPage
 {
+    // The slots, then "Remove all".
+    private static readonly int _rowCount = EquipmentSheet.Slots.Length + 1;
+
     private readonly PartyState _party;
     private readonly PartyEquipment _equipment;
     private readonly Inventory _inventory;
@@ -27,7 +30,10 @@ internal sealed class EquipmentPage : IMemberPage
     private readonly EquipmentSheetView _sheetView;
     private readonly EquipmentChoiceView _choiceView;
     private readonly ListCursor _memberCursor;
-    private readonly ListCursor _rowCursor = new(EquipmentSheet.Slots.Length + 1, _ => true);
+    private readonly ListCursor _rowCursor = new(_rowCount, _ => true);
+
+    // The sheet's selected row glides between rows (decision 262); the choice has its own.
+    private readonly SelectionGlide _rowGlide = new(0);
     private EquipmentSheet _sheet;
     private EquipmentChoice? _choice;
     private StatPreviewText? _preview;
@@ -76,6 +82,7 @@ internal sealed class EquipmentPage : IMemberPage
         Members = MemberOrder.ActiveThenReserve(_party);
         _memberCursor.Select(0);
         _rowCursor.Select(0);
+        _rowGlide.JumpTo(0);
         _sheet = EquipmentSheet.Of(Shown);
         _notice = null;
     }
@@ -91,6 +98,15 @@ internal sealed class EquipmentPage : IMemberPage
 
     /// <summary>Why the last change didn't happen, or null.</summary>
     public string? Notice => _notice;
+
+    /// <summary>Where the sheet's selected row band is, in rows, as it glides.</summary>
+    internal float SelectionPosition => _rowGlide.Position;
+
+    public void Advance(TimeSpan delta)
+    {
+        _rowGlide.Advance(delta);
+        _choice?.Selection.Advance(delta);
+    }
 
     public SceneRequest? Update(InputFrame input)
     {
@@ -127,7 +143,7 @@ internal sealed class EquipmentPage : IMemberPage
     {
         var sheetWidth = _choice is null ? area.Width : area.Width - EquipmentChoiceView.PanelWidth;
         var sheetArea = area with { Width = sheetWidth };
-        _sheetView.Draw(batch, textures, new EquipmentSheetView.Place(_sheet, sheetArea, _rowCursor.Selected, _choice is null, _preview, _notice), opacity);
+        _sheetView.Draw(batch, textures, new EquipmentSheetView.Place(_sheet, sheetArea, _rowGlide, _choice is null, _preview, _notice), opacity);
         if (_choice is not null)
         {
             _choiceView.Draw(batch, textures, _choice, new Rectangle(sheetArea.Right, area.Y, EquipmentChoiceView.PanelWidth, area.Height));
@@ -159,6 +175,8 @@ internal sealed class EquipmentPage : IMemberPage
         {
             _rowCursor.MoveDown();
         }
+
+        _rowGlide.Follow(_rowCursor.Selected, _rowCount);
 
         if (!input.IsPressed(GameButton.Confirm))
         {

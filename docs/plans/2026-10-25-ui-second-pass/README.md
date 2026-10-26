@@ -91,7 +91,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **TS. Menu pages advance with the menu's time** (Game, about 130 lines) → [slices/TS.md](slices/TS.md)
 - [x] **MO2a. The selection glides and the pointer bobs: the menu tabs and the title** (Game, about 210 lines) → [slices/MO2a.md](slices/MO2a.md)
 - [x] **C5. `InventoryPage` split: `InventoryRow` and `InventoryListView`** (Game, mostly moved, about 200 lines) → [slices/C5.md](slices/C5.md)
-- [ ] **MO2b. Page lists glide and bob: items, equipment, options, save files** (Game, about 200 lines) → [slices/MO2b.md](slices/MO2b.md)
+- [x] **MO2b. Page lists glide and bob: items, equipment, options, save files** (Game, about 200 lines) → [slices/MO2b.md](slices/MO2b.md)
 - [ ] **M4. Inventory look: column titles, the description under the selected row** (Game, about 210 lines) → [slices/M4.md](slices/M4.md)
 - [ ] **C4. `StatusPage` split: `StatusSheet` and `StatusSheetView`** (Game, mostly moved: about 300 lines moved, 40 new) → [slices/C4.md](slices/C4.md)
 - [ ] **M3a. Status page content: level, class, speed, resources and skills** (Game, about 230 lines) → [slices/M3a.md](slices/M3a.md)

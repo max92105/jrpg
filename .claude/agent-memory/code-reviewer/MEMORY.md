@@ -5,3 +5,4 @@
 - [Namespace cycles](namespace-cycles.md) — grep reverse usings for each new Core using; Content is the hub (Content<->Session seen in slice 8)
 - [Stale size comments](stale-size-comments.md) — sizing passes leave old px values in comments of neighbouring files; grep the old value
 - [Last review](last-review.md) — slice, round and finding status of the latest review; read first to apply re-review rules
+- [Detached comments](detached-comments.md) — new test/member inserted under an existing helper's comment leaves it describing the wrong code

@@ -113,4 +113,30 @@ public sealed class SelectionGlideTests
 
         Assert.Equal(1, glide.Position);
     }
+
+    [Fact]
+    public void FollowShown_AScrollKeepingTheScreenRow_StaysStill()
+    {
+        var cursor = new ListCursor(8, _ => true, visibleRows: 3);
+        cursor.Select(2);
+        var glide = new SelectionGlide(2);
+
+        cursor.MoveDown();
+        glide.FollowShown(cursor);
+
+        Assert.Equal(2, glide.Position);
+    }
+
+    [Fact]
+    public void FollowShown_AWrapToTheTop_JumpsToTheFirstScreenRow()
+    {
+        var cursor = new ListCursor(8, _ => true, visibleRows: 3);
+        cursor.Select(7);
+        var glide = new SelectionGlide(2);
+
+        cursor.MoveDown();
+        glide.FollowShown(cursor);
+
+        Assert.Equal(0, glide.Position);
+    }
 }

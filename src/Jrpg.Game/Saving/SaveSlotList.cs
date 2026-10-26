@@ -25,6 +25,9 @@ internal sealed class SaveSlotList
 
     public int FirstVisible => _cursor.FirstVisible;
 
+    /// <summary>Where the selected row's band is drawn as it glides, by its row in the visible window.</summary>
+    public SelectionGlide Selection { get; } = new(0);
+
     /// <returns>The entry confirmed this update, or null.</returns>
     public SaveSlotEntry? Update(InputFrame input)
     {
@@ -37,6 +40,8 @@ internal sealed class SaveSlotList
         {
             _cursor.MoveDown();
         }
+
+        Selection.FollowShown(_cursor);
 
         return input.IsPressed(GameButton.Confirm) ? Entries[Selected] : null;
     }

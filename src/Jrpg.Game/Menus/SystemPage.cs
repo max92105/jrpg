@@ -65,6 +65,8 @@ internal sealed class SystemPage : IMenuPage
     // The save files read themselves when their own page opens, so only the cursor goes back.
     public void Open() => _cursor.Select(0);
 
+    public void Advance(TimeSpan delta) => _openFiles?.Advance(delta);
+
     public SceneRequest? Update(InputFrame input)
     {
         if (_openFiles is not null)

@@ -46,6 +46,9 @@ internal sealed class InventoryPage : IMenuPage
     private ListCursor? _rowCursor;
     private InventoryRow[] _rows = [];
 
+    // The selected row's band glides between rows (decision 262); a new category or a used item puts it in place.
+    private readonly SelectionGlide _glide = new(0);
+
     // What the last item used did; shown in the description's place until the player moves on.
     private string? _notice;
 
@@ -101,6 +104,11 @@ internal sealed class InventoryPage : IMenuPage
 
     /// <summary>Whether the player is choosing who to use an item on.</summary>
     public bool IsChoosingTarget => _itemUse.IsOpen;
+
+    /// <summary>Where the selected row's band is, in rows of the visible window, as it glides.</summary>
+    internal float SelectionPosition => _glide.Position;
+
+    public void Advance(TimeSpan delta) => _glide.Advance(delta);
 
     public void Open()
     {
@@ -224,6 +232,11 @@ internal sealed class InventoryPage : IMenuPage
         {
             _rowCursor?.MoveDown();
         }
+
+        if (_rowCursor is not null)
+        {
+            _glide.FollowShown(_rowCursor);
+        }
     }
 
     private void DrawList(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
@@ -242,7 +255,7 @@ internal sealed class InventoryPage : IMenuPage
             batch.DrawString(_bodyFont, _notice, descriptionPosition, UiTheme.TextPrimary * opacity);
         }
 
-        var list = new InventoryListView.Place(new Rectangle(left, rowsTop, width, InventoryListView.Height), _rows, _rowCursor, !_rail.HasCursor);
+        var list = new InventoryListView.Place(new Rectangle(left, rowsTop, width, InventoryListView.Height), _rows, _rowCursor, _glide, !_rail.HasCursor);
         _listView.Draw(batch, textures, list, opacity);
         if (_notice is null && _rowCursor is not null)
         {
@@ -258,6 +271,7 @@ internal sealed class InventoryPage : IMenuPage
         _rows = [.. shown.Select(RowOf)];
         _rowCursor = _rows.Length == 0 ? null : new ListCursor(_rows.Length, _ => true, InventoryListView.VisibleRows);
         _rowCursor?.Select(selectedRow);
+        _glide.JumpTo(_rowCursor is null ? 0 : _rowCursor.Selected - _rowCursor.FirstVisible);
     }
 
     private InventoryRow RowOf(InventoryEntry entry)

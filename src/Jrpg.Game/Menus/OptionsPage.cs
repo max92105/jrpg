@@ -33,6 +33,9 @@ internal sealed class OptionsPage : IMenuPage
     private readonly MeasuredText[] _speeds;
     private readonly ListCursor _cursor = new(RowCount, _ => true);
 
+    // The selected row's band glides between rows (decision 262).
+    private readonly SelectionGlide _glide = new(0);
+
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared textures: the selected row.</param>
     /// <param name="settings">What the page changes; the host and dialogue read it.</param>
@@ -58,8 +61,17 @@ internal sealed class OptionsPage : IMenuPage
 
     public bool LeavesOnCancel => true;
 
+    /// <summary>Where the selected row's band is, in rows, as it glides.</summary>
+    internal float SelectionPosition => _glide.Position;
+
     // The values are read from the settings when drawing, so only the cursor goes back.
-    public void Open() => _cursor.Select(0);
+    public void Open()
+    {
+        _cursor.Select(0);
+        _glide.JumpTo(0);
+    }
+
+    public void Advance(TimeSpan delta) => _glide.Advance(delta);
 
     public SceneRequest? Update(InputFrame input)
     {
@@ -72,6 +84,8 @@ internal sealed class OptionsPage : IMenuPage
         {
             _cursor.MoveDown();
         }
+
+        _glide.Follow(_cursor.Selected, RowCount);
 
         if (input.IsPressed(GameButton.Right))
         {
@@ -88,10 +102,13 @@ internal sealed class OptionsPage : IMenuPage
 
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
+        var band = _glide.BandOver(area with { Height = UiTheme.MenuRowHeight });
+        _ui.DrawSelectedRow(batch, textures, band, opacity);
+        MenuPointer.Draw(batch, textures.Pixel, _glide.PointerAt(band), opacity);
         for (var row = 0; row < RowCount; row++)
         {
             var rowArea = new Rectangle(area.X, area.Y + (row * UiTheme.MenuRowHeight), area.Width, UiTheme.MenuRowHeight);
-            DrawRow(batch, textures, new RowPlace(row, rowArea), opacity);
+            DrawRow(batch, textures.Pixel, new RowPlace(row, rowArea), opacity);
         }
     }
 
@@ -121,15 +138,9 @@ internal sealed class OptionsPage : IMenuPage
         _ => throw new ArgumentOutOfRangeException(nameof(speed), speed, null),
     };
 
-    private void DrawRow(SpriteBatch batch, TextureLibrary textures, RowPlace place, float opacity)
+    private void DrawRow(SpriteBatch batch, Texture2D pixel, RowPlace place, float opacity)
     {
         var isSelected = place.Index == _cursor.Selected;
-        if (isSelected)
-        {
-            _ui.DrawSelectedRow(batch, textures, place.Area, opacity);
-            MenuPointer.Draw(batch, textures.Pixel, new Vector2(place.Area.X, place.Area.Center.Y), opacity);
-        }
-
         var color = (isSelected ? UiTheme.TextPrimary : UiTheme.TextSecondary) * opacity;
         var textTop = place.Area.Y + ((UiTheme.MenuRowHeight - _font.LineHeight) / 2f);
         var labelLeft = place.Area.X + UiTheme.MenuTextInset;
@@ -141,8 +152,8 @@ internal sealed class OptionsPage : IMenuPage
         if (isSelected)
         {
             var middle = textTop + (_font.LineHeight / 2f);
-            new Diamond(new Vector2(valueLeft - ArrowGap, middle), ArrowSide).Draw(batch, textures.Pixel, color);
-            new Diamond(new Vector2(valueLeft + value.Width + ArrowGap, middle), ArrowSide).Draw(batch, textures.Pixel, color);
+            new Diamond(new Vector2(valueLeft - ArrowGap, middle), ArrowSide).Draw(batch, pixel, color);
+            new Diamond(new Vector2(valueLeft + value.Width + ArrowGap, middle), ArrowSide).Draw(batch, pixel, color);
         }
     }
 

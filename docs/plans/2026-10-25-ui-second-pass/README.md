@@ -2,7 +2,7 @@
 Status: approved
 
 Third feature plan after the migration, following the class mechanics plan.
-- Decisions 231-235 and 249-264 are recorded below. Questions 236-248 are answered (decisions 249-263); question 265 is open; the next free number is 266.
+- Decisions 231-235 and 249-266 are recorded below. Questions 236-248 are answered (decisions 249-263), and 265 (decision 266); the next free number is 267.
 - This plan writes ADR 0025 (font roles); the next ADR is 0026.
 
 Developer's request (2026-10-25, translated): "a second pass on UI and clean-up". The larger direction, for later plans: an investor demo, "something I can show to people to get funding for an artist to come in and clean up": clean code, clean UI/UX, some animation, music, a playable Act 1 with no bugs.
@@ -97,7 +97,9 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **M3a. Status page content: level, class, speed, resources and skills** (Game, about 230 lines) → [slices/M3a.md](slices/M3a.md)
 - [x] **M3b. Status page look: spaced-caps labels beside large numbers, hairline rows** (Game, about 170 lines) → [slices/M3b.md](slices/M3b.md)
 - [x] **M2a. The member column: which members a page goes through, which one is shown** (Game, about 130 lines) → [slices/M2a.md](slices/M2a.md)
+- [x] **M2b0. The menu's tabs drawn by `MenuTabsView`** (Game, mechanical, about 120 lines moved) → [slices/M2b0.md](slices/M2b0.md)
 - [ ] **M2b. The member column drawn between the tabs and member pages** (Game, about 210 lines) → [slices/M2b.md](slices/M2b.md)
+- [ ] **M2c. The party sidebar's unused shown-member marking removed** (Game, about 100 lines removed) → [slices/M2c.md](slices/M2c.md)
 - [ ] **M1. Tab icons: placeholder glyphs we draw** (Game, about 230 lines) → [slices/M1.md](slices/M1.md)
 
 ### Phase 5: the encounter
@@ -136,6 +138,7 @@ The developer's answers to the draft (2026-10-25):
 - **262. "Make the animation smooth"** (answers 247): menu motion as planned, the selection glide kept, and pages get a time step so page lists glide and pointers bob too; motion is the same on tabs, title and page lists (TS, MO2a, MO2b).
 - **263. The screenshot folder becomes `docs/ui-reference/`** (answers 248): one rename in R1, updating CLAUDE.md, `.claude/rules/game.md`, this README and the code comments that name it.
 - **264. Other games' assets are reference only** (devil's advocate, replaces the drafted ADR 0025 on reference material): never committed, loaded or shipped; one line in `.claude/rules/game.md` "UI look" (R1).
+- **266. On member pages the member column replaces the party sidebar** (answers 265, 2026-10-26): Status and Equipment hide the sidebar, so the page takes its width back; the other pages keep it. M2b draws it; M2c removes the sidebar's shown-member marking, which no page uses any more.
 
 Earlier decisions that apply:
 - 56: the target pointer bobs.
@@ -146,7 +149,7 @@ Earlier decisions that apply:
 
 ## Open design questions (developer decides)
 Each slice uses the placeholder until answered.
-- **265. The party sidebar beside the member column** (reopens 153 for M2b). Placeholder: the sidebar stays on the right on member pages and the column sits between the tabs and the page, so the page narrows by the column's width. Alternatives: the column replaces the sidebar's marking on member pages; the sidebar shows only on item use.
+None open.
 
 Still open from earlier plans: 92, 112, 147, 151-155, 179, 180, 182, 183, 208-220, 222-228.
 

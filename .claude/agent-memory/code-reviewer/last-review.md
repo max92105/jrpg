@@ -5,8 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/M2a.md, slice M2a (MemberColumn model: members, shown, scroll)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/M2b0.md, slice M2b0 (tab drawing moved to MenuTabsView)
 Round: 1 (verdict: Ready to commit)
 
-- W1 MemberColumn.KeepShownInView is the third copy of the keep-in-view scroll rule (ListCursor:84-88, PartySidebar:129-135); propose one shared Ui type/function; open
-- S1 Refresh_ShownMember_IsMarked asserts Same(page.Shown, Members[ShownIndex]); pin ShownIndex == 1 after one Right; open
+- S1 MenuTabsView.TabPitch is public with no user outside the class; make it private until one needs it; open
+- S2 MenuTabsView takes string[] labels (shares the scene's array); IReadOnlyList<string> states read-only intent; open

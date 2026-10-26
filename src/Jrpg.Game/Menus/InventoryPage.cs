@@ -18,43 +18,33 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class InventoryPage : IMenuPage
 {
-    /// <summary>How many 52 px rows show at once.</summary>
-    public const int VisibleRows = 10;
-
-    // Placeholder layout (decision 82): a 28 x 20 margin, a heading title, column titles over a hairline, 52 px rows 10
-    // px in with a 32 px icon in a 48 px column and the quantity 16 px from the right; 26 px body text.
+    // Placeholder layout (decision 82): a 28 x 20 margin, a heading title, column titles over a hairline, then the
+    // rows, with the description 24 px under them.
     private const int Margin = 28;
     private const int TopMargin = 20;
     private const int HeadingPixels = 30;
-    private const int BodyPixels = 26;
     private const int LabelPixels = 18;
     private const int ColumnTitlesTop = 60;
     private const int RowsTop = ColumnTitlesTop + ColumnTitles.Height;
-    private const int RowHeight = 52;
-    private const int RowInset = 10;
-    private const int IconColumn = 48;
-    private const int QuantityInset = 16;
     private const int DescriptionGap = 24;
-    private const int RowIconSize = 32;
 
     // The list starts 12 px right of the category rail (placeholder).
     private const int RailGap = 12;
 
     private readonly GameSession _session;
     private readonly ContentCatalog _catalog;
-    private readonly UiTextures _ui;
     private readonly CategoryRail _rail = new();
     private readonly CategoryRailView _railView;
     private readonly SpriteFontBase _headingFont;
     private readonly SpriteFontBase _bodyFont;
     private readonly ColumnTitles _columnTitles;
-    private readonly InventoryLabels _labels;
+    private readonly InventoryListView _listView;
     private readonly string[] _categoryNames;
     private readonly string _listHint;
     private readonly string _railHint;
     private readonly ItemUseDialog _itemUse;
     private ListCursor? _rowCursor;
-    private ItemRow[] _rows = [];
+    private InventoryRow[] _rows = [];
 
     // What the last item used did; shown in the description's place until the player moves on.
     private string? _notice;
@@ -69,19 +59,18 @@ internal sealed class InventoryPage : IMenuPage
         _railHint = text.Messages.Text(MessageIds.MenuHintInventoryCategories);
         _session = session;
         _catalog = catalog;
-        _ui = ui;
         _railView = new CategoryRailView(ui);
         _headingFont = text.Fonts.FontAt(HeadingPixels);
-        _bodyFont = text.Fonts.FontAt(BodyPixels);
+        _bodyFont = text.Fonts.FontAt(InventoryListView.BodyPixels);
         var labelFont = text.Fonts.FontAt(LabelPixels);
         _columnTitles = new ColumnTitles(
             labelFont,
             ui,
             [
-                ColumnTitle.FromLeft(MeasuredText.Of(labelFont, text.Messages.Text(MessageIds.InventoryColumnName)), RowInset + IconColumn),
-                ColumnTitle.FromRight(MeasuredText.Of(labelFont, text.Messages.Text(MessageIds.InventoryColumnQuantity)), QuantityInset),
+                ColumnTitle.FromLeft(MeasuredText.Of(labelFont, text.Messages.Text(MessageIds.InventoryColumnName)), InventoryListView.NameLeft),
+                ColumnTitle.FromRight(MeasuredText.Of(labelFont, text.Messages.Text(MessageIds.InventoryColumnQuantity)), InventoryListView.QuantityInset),
             ]);
-        _labels = InventoryLabels.From(text.Messages, _bodyFont);
+        _listView = new InventoryListView(text, ui);
         _categoryNames = [.. _rail.Tabs.Select(tab => text.Messages.Text(tab.LabelId))];
         _itemUse = new ItemUseDialog(session, text, ui, catalog);
         ShowRowsFrom(0);
@@ -247,27 +236,15 @@ internal sealed class InventoryPage : IMenuPage
         _columnTitles.Draw(batch, textures, new Rectangle(left, top + ColumnTitlesTop, width, 0), opacity);
 
         var rowsTop = top + RowsTop;
-        var descriptionPosition = new Vector2(left + RowInset, rowsTop + (VisibleRows * RowHeight) + DescriptionGap);
+        var descriptionPosition = new Vector2(left + InventoryListView.RowInset, rowsTop + InventoryListView.Height + DescriptionGap);
         if (_notice is not null)
         {
             batch.DrawString(_bodyFont, _notice, descriptionPosition, UiTheme.TextPrimary * opacity);
         }
 
-        if (_rowCursor is null)
-        {
-            var emptyLeft = left + ((width - _labels.EmptyWidth) / 2f);
-            batch.DrawString(_bodyFont, _labels.Empty, new Vector2(emptyLeft, rowsTop + DescriptionGap), UiTheme.TextSecondary * opacity);
-            return;
-        }
-
-        var last = Math.Min(_rows.Length, _rowCursor.FirstVisible + VisibleRows);
-        for (var index = _rowCursor.FirstVisible; index < last; index++)
-        {
-            var row = new Rectangle(left, rowsTop + ((index - _rowCursor.FirstVisible) * RowHeight), width, RowHeight);
-            DrawRow(batch, textures, row, index, opacity);
-        }
-
-        if (_notice is null)
+        var list = new InventoryListView.Place(new Rectangle(left, rowsTop, width, InventoryListView.Height), _rows, _rowCursor, !_rail.HasCursor);
+        _listView.Draw(batch, textures, list, opacity);
+        if (_notice is null && _rowCursor is not null)
         {
             batch.DrawString(_bodyFont, _rows[_rowCursor.Selected].Description, descriptionPosition, UiTheme.TextSecondary * opacity);
         }
@@ -279,50 +256,14 @@ internal sealed class InventoryPage : IMenuPage
     {
         var shown = InventoryFilter.Select(Category, _session.Inventory.Entries, _catalog.Items);
         _rows = [.. shown.Select(RowOf)];
-        _rowCursor = _rows.Length == 0 ? null : new ListCursor(_rows.Length, _ => true, VisibleRows);
+        _rowCursor = _rows.Length == 0 ? null : new ListCursor(_rows.Length, _ => true, InventoryListView.VisibleRows);
         _rowCursor?.Select(selectedRow);
     }
 
-    private ItemRow RowOf(InventoryEntry entry)
+    private InventoryRow RowOf(InventoryEntry entry)
     {
         var item = _catalog.Items[entry.ItemId];
-        var quantity = NumberText.Of(entry.Quantity);
-        return new ItemRow(item.Id, item.Name, item.IconFile, quantity, _bodyFont.MeasureString(quantity).X, item.Description, _session.FieldItems.CanUse(item));
-    }
-
-    private void DrawRow(SpriteBatch batch, TextureLibrary textures, Rectangle row, int index, float opacity)
-    {
-        // The pointer marks the row while the list has the cursor; while the rail has it, the row stays chosen, dimmed.
-        if (index == _rowCursor?.Selected && _rail.HasCursor)
-        {
-            _ui.DrawSelectedRow(batch, textures, row, opacity * UiTheme.DimmedSelectionOpacity);
-        }
-        else if (index == _rowCursor?.Selected)
-        {
-            _ui.DrawSelectedRow(batch, textures, row, opacity);
-            MenuPointer.Draw(batch, textures.Pixel, new Vector2(row.X, row.Center.Y), opacity);
-        }
-
-        var item = _rows[index];
-        var textColor = (item.IsUsable ? UiTheme.TextPrimary : UiTheme.TextDisabled) * opacity;
-        var textTop = row.Y + ((RowHeight - _bodyFont.LineHeight) / 2f);
-        var iconTop = row.Y + ((RowHeight - RowIconSize) / 2);
-        batch.Draw(_ui.Icon(textures, item.IconFile, RowIconSize), new Vector2(row.X + RowInset, iconTop), Color.White * opacity);
-        batch.DrawString(_bodyFont, item.Name, new Vector2(row.X + RowInset + IconColumn, textTop), textColor);
-        var quantityLeft = row.Right - QuantityInset - item.QuantityWidth;
-        batch.DrawString(_bodyFont, item.Quantity, new Vector2(quantityLeft, textTop), textColor);
-    }
-
-    // One owned item's row text.
-    private sealed record ItemRow(string ItemId, string Name, string IconFile, string Quantity, float QuantityWidth, string Description, bool IsUsable);
-
-    // The page's fixed text.
-    private sealed record InventoryLabels(string Empty, float EmptyWidth)
-    {
-        public static InventoryLabels From(UiMessages messages, SpriteFontBase bodyFont)
-        {
-            var empty = messages.Text(MessageIds.InventoryEmpty);
-            return new InventoryLabels(empty, bodyFont.MeasureString(empty).X);
-        }
+        var quantity = _listView.MeasureQuantity(NumberText.Of(entry.Quantity));
+        return new InventoryRow(item.Id, item.Name, item.IconFile, quantity, item.Description, _session.FieldItems.CanUse(item));
     }
 }

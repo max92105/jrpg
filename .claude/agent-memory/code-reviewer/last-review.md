@@ -5,10 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/MO2a.md, slice MO2a (SelectionGlide on tabs and title; title pointer bob)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/C5.md, slice C5 (InventoryPage split: InventoryRow, InventoryListView)
 Round: 1 (verdict: Ready to commit)
 
-- W1 SelectionGlide.Follow — the doc says "jumps on a wrap" but the code jumps on any move of more than one row; a ListCursor skipping a disabled row (MO2b lists) would jump instead of gliding; fix doc or make Follow wrap-aware before MO2b; open
-- W2 SelectionGlideTests — no test that Follow(same row) mid-glide leaves the glide running (called every update; removing the guard freezes the highlight); open
-- S1 TitleScene — row pitch EntryRowHeight + EntryGap now computed in two places; a RowPitch const; open
-- S2 SelectionGlideTests — missing blank line before Follow_NeighbouringRow_Glides; open
+- S1 InventoryPage/InventoryListView — BodyPixels = 26 now declared in both; description and rows can drift apart; expose one const from the view; open
+- S2 InventoryListView.Measure — name doesn't say which font; MeasureInRowFont or a doc tying it to the quantity column; open
+- S3 InventoryListView.Place — `internal` while every other view's Place is `public`; open

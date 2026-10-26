@@ -19,11 +19,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   - no path condition.
 
   The file is protected, so ask the developer first.
-- **`InventoryPage` split (363 lines after A1), the part left after A1/A2:** A1 moved the rail's state into `CategoryRail`; A2 moves its drawing.
-  - rows (`InventoryRow`) and a list view, like `EquipmentPage`;
-  - its `ItemRow.Quantity`/`InventoryLabels.Empty` widths move to `Ui/MeasuredText` with it.
-
-  It can wait because it works.
 - **`StatusPage` split** (294 lines): a pure `StatusSheet`, a `StatusSheetView` and the page keeping its input. Its slot labels then come from `EquipmentSheet.Slots` and `EquipmentSheet.LabelIdOf`. It can wait because nothing planned changes the Status page's content.
 - **Why Core refused an equipment change:** `EquipmentPage.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. `PartyEquipment.ItemWithoutRoom` and `UnequipAll` would own both. It can wait because it is correct today, and nothing planned changes equipment.
 - **Easing copies:** the clamped time share `Math.Clamp((float)(elapsed / length), 0, 1)` is copied 6 times (`ActionPlayback`, `FloatingNumber` twice, `LevelUpPop`, `VictoryEntrance`, `DefeatEntrance`), and the cubic ease-out twice (`LevelUpPop`, `VictoryEntrance`). They should use `Ui/Easing`. It can wait because each copy is one line.
@@ -62,7 +57,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `ScreenFade` skips its black moment when one update is longer than its fade-out plus hold (about 0.33 s), so a warp never moves the player. The fixed 1/60 s step hides it in play; tests must step at 1/60 s. Make `Update` stop on Holding if a long frame can ever reach it.
 - `BattleState.cs` is at 296 lines: split the per-command bodies before the next command path lands (DR2 review).
 - `tests/Jrpg.Game.Tests/Battle/CommandMenuTests.cs` is at 393 lines: split it by menu entry (MO1 review).
-- `src/Jrpg.Game/Menus/InventoryPage.cs` is at 328 lines: move the notice and description panel into a type of its own (RS3 review).
+- `src/Jrpg.Game/Menus/InventoryPage.cs` is at 271 lines after C5: move the notice and description panel into a type of its own (RS3 review).
 
 ## From the class mechanics plan (2026-10-25)
 

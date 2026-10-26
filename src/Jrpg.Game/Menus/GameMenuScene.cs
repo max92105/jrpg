@@ -54,6 +54,9 @@ internal sealed class GameMenuScene : IScene
 
     // Decision 262: the menu slides in, and fades out before it closes.
     private readonly MenuMotion _motion = new();
+
+    // The selected tab's glow glides between tabs (decision 262).
+    private readonly SelectionGlide _tabGlide = new(0);
     private bool _hasRequestedClose;
     private bool _isInPage;
 
@@ -84,6 +87,7 @@ internal sealed class GameMenuScene : IScene
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
         _motion.Advance(delta);
+        _tabGlide.Advance(delta);
         if (_motion.IsClosing)
         {
             return RequestClosedOnceFaded();
@@ -116,10 +120,7 @@ internal sealed class GameMenuScene : IScene
         _motion.MarkDrawn();
         DrawFrame(batch, textures, opacity);
         _header.Draw(batch, _isInPage ? _tabLabels[_tabs.Selected] : _menuTitle, opacity);
-        for (var index = 0; index < _tabLabels.Length; index++)
-        {
-            DrawTab(batch, textures, index);
-        }
+        DrawTabs(batch, textures);
 
         if (_isInPage)
         {
@@ -155,25 +156,32 @@ internal sealed class GameMenuScene : IScene
         FooterBar.Draw(batch, textures.Pixel, FooterHeight, opacity);
     }
 
-    // Each tab at its own place in the slide-in, and its own fade.
-    private void DrawTab(SpriteBatch batch, TextureLibrary textures, int index)
+    // The plain tabs, the selected glow over them where the glide has it, then every label on top. Each tab sits at its
+    // own place in the slide-in, with its own fade; the glow takes the selected tab's.
+    private void DrawTabs(SpriteBatch batch, TextureLibrary textures)
     {
-        var opacity = _motion.TabOpacity(index);
-        var tint = Color.White * opacity;
-        var left = -(int)Math.Round(_motion.TabOffset(index));
-        var top = BodyTop + (index * TabPitch);
-        var isSelected = index == _tabs.Selected;
-        batch.Draw(isSelected ? _ui.SelectedNavTab(textures) : _ui.NavTab(textures), new Vector2(left, top), tint);
-        if (isSelected)
+        for (var index = 0; index < _tabLabels.Length; index++)
         {
-            var line = new Rectangle(left, top + NavTabShape.Height - SelectionLineThickness, NavTabShape.ShoulderPixels, SelectionLineThickness);
-            batch.Draw(_ui.SelectionLine(textures), line, tint);
+            batch.Draw(_ui.NavTab(textures), new Vector2(TabLeft(index), BodyTop + (index * TabPitch)), Color.White * _motion.TabOpacity(index));
         }
 
-        var labelLeft = left + UiTheme.MenuTextInset + (isSelected ? SelectedLabelSlide : 0);
-        var labelTop = top + ((NavTabShape.Height - _font.LineHeight) / 2f);
-        batch.DrawString(_font, _tabLabels[index], new Vector2(labelLeft, labelTop), UiTheme.TextPrimary * opacity);
+        var selected = _tabs.Selected;
+        var tint = Color.White * _motion.TabOpacity(selected);
+        var glowLeft = TabLeft(selected);
+        var glowTop = BodyTop + (int)Math.Round(_tabGlide.Position * TabPitch);
+        batch.Draw(_ui.SelectedNavTab(textures), new Vector2(glowLeft, glowTop), tint);
+        var line = new Rectangle(glowLeft, glowTop + NavTabShape.Height - SelectionLineThickness, NavTabShape.ShoulderPixels, SelectionLineThickness);
+        batch.Draw(_ui.SelectionLine(textures), line, tint);
+
+        for (var index = 0; index < _tabLabels.Length; index++)
+        {
+            var labelLeft = TabLeft(index) + UiTheme.MenuTextInset + (index == selected ? SelectedLabelSlide : 0);
+            var labelTop = BodyTop + (index * TabPitch) + ((NavTabShape.Height - _font.LineHeight) / 2f);
+            batch.DrawString(_font, _tabLabels[index], new Vector2(labelLeft, labelTop), UiTheme.TextPrimary * _motion.TabOpacity(index));
+        }
     }
+
+    private int TabLeft(int index) => -(int)Math.Round(_motion.TabOffset(index));
 
     // Input works during the slide-in, so a quick player isn't slowed; Cancel or Menu starts the closing fade.
     private void UpdateTabs(InputFrame input)
@@ -193,6 +201,8 @@ internal sealed class GameMenuScene : IScene
         {
             _tabs.MoveDown();
         }
+
+        _tabGlide.Follow(_tabs.Selected, _tabLabels.Length);
 
         if (input.IsPressed(GameButton.Confirm))
         {

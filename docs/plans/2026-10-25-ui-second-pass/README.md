@@ -89,7 +89,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 4: the menu
 - [x] **MO1. The menu slides in and fades out (`MenuMotion`)** (Game, about 240 lines) → [slices/MO1.md](slices/MO1.md)
 - [x] **TS. Menu pages advance with the menu's time** (Game, about 130 lines) → [slices/TS.md](slices/TS.md)
-- [ ] **MO2a. The selection glides and the pointer bobs: the menu tabs and the title** (Game, about 210 lines) → [slices/MO2a.md](slices/MO2a.md)
+- [x] **MO2a. The selection glides and the pointer bobs: the menu tabs and the title** (Game, about 210 lines) → [slices/MO2a.md](slices/MO2a.md)
 - [ ] **C5. `InventoryPage` split: `InventoryRow` and `InventoryListView`** (Game, mostly moved, about 200 lines) → [slices/C5.md](slices/C5.md)
 - [ ] **MO2b. Page lists glide and bob: items, equipment, options, save files** (Game, about 200 lines) → [slices/MO2b.md](slices/MO2b.md)
 - [ ] **M4. Inventory look: column titles, the description under the selected row** (Game, about 210 lines) → [slices/M4.md](slices/M4.md)

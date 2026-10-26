@@ -25,6 +25,9 @@ internal sealed class TitleMenu
 
     public TitleEntry Selected => Entries[_cursor.Selected];
 
+    /// <summary>The selected entry's place in <see cref="Entries"/>.</summary>
+    public int SelectedIndex => _cursor.Selected;
+
     /// <returns>The entry confirmed this update, or null.</returns>
     public TitleEntry? Update(InputFrame input)
     {

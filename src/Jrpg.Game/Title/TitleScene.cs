@@ -26,6 +26,10 @@ internal sealed class TitleScene : IScene
     private const int EntryRowHeight = 56;
     private const int EntryGap = 6;
     private const int BandPadding = 90;
+    private const int EntryPitch = EntryRowHeight + EntryGap;
+
+    // The pointer bobs 4 px left and back (decision 262).
+    private const float PointerBobDistance = 4;
 
     // The footer line, centered 40 px above the bottom.
     private const int FooterTextPixels = 22;
@@ -49,6 +53,10 @@ internal sealed class TitleScene : IScene
     private readonly SaveFilesPanel _files;
     private readonly UiTextures _ui;
     private readonly TitleEntrance _entrance = new();
+    private readonly SelectionGlide _glide = new(0);
+
+    // How long the screen has shown, for the pointer's bob.
+    private TimeSpan _shown;
     private readonly SpriteFontBase _nameFont;
     private readonly SpriteFontBase _entryFont;
     private readonly string _name;
@@ -93,7 +101,16 @@ internal sealed class TitleScene : IScene
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
         _entrance.Advance(delta);
-        return IsChoosingFile ? ChooseFile(input) : Choose(_menu.Update(input));
+        _glide.Advance(delta);
+        _shown += delta;
+        if (IsChoosingFile)
+        {
+            return ChooseFile(input);
+        }
+
+        var chosen = _menu.Update(input);
+        _glide.Follow(_menu.SelectedIndex, _menu.Entries.Count);
+        return Choose(chosen);
     }
 
     public void Draw(SpriteBatch batch, TextureLibrary textures)
@@ -162,26 +179,23 @@ internal sealed class TitleScene : IScene
     private static Rectangle[] EntryBands(float longestEntry, int count)
     {
         var width = (int)longestEntry + (2 * BandPadding);
-        var pitch = EntryRowHeight + EntryGap;
-        var firstTop = EntriesCenterY - (((count * pitch) - EntryGap) / 2);
-        return [.. Enumerable.Range(0, count).Select(index => new Rectangle((VirtualScreen.Width - width) / 2, firstTop + (index * pitch), width, EntryRowHeight))];
+        var firstTop = EntriesCenterY - (((count * EntryPitch) - EntryGap) / 2);
+        return [.. Enumerable.Range(0, count).Select(index => new Rectangle((VirtualScreen.Width - width) / 2, firstTop + (index * EntryPitch), width, EntryRowHeight))];
     }
 
     private static Vector2 CenteredIn(Rectangle band, Vector2 size) =>
         new(band.Center.X - (size.X / 2f), band.Center.Y - (size.Y / 2f));
 
-    // Plain white entries, the selected one in the shared band with the pointer.
+    // Plain white entries over the shared band, which glides to the selected one with its bobbing pointer.
     private void DrawEntries(SpriteBatch batch, TextureLibrary textures, float opacity)
     {
+        var band = _bands[0];
+        band.Y += (int)Math.Round(_glide.Position * EntryPitch);
+        _ui.DrawSelectedRow(batch, textures, band, opacity);
+        var bob = PointerBob.OffsetAt(_shown, PointerBobDistance);
+        MenuPointer.Draw(batch, textures.Pixel, new Vector2(band.X - bob, band.Center.Y), opacity);
         for (var index = 0; index < _labels.Length; index++)
         {
-            if (_menu.Entries[index] == _menu.Selected)
-            {
-                var band = _bands[index];
-                _ui.DrawSelectedRow(batch, textures, band, opacity);
-                MenuPointer.Draw(batch, textures.Pixel, new Vector2(band.X, band.Center.Y), opacity);
-            }
-
             batch.DrawString(_entryFont, _labels[index], _labelPositions[index], Color.White * opacity);
         }
     }

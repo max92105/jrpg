@@ -23,3 +23,8 @@ Developer: "make the animation smooth."
     - `Select_DuringAGlide_StartsFromTheCurrentPosition`
     - `JumpTo_DuringAGlide_IsAtTheRowAtOnce` (`void JumpTo(int row)`, which the callers use when the cursor wraps; two methods, no flag argument)
   - **Verify by hand:** hold Down on the tabs and on the title: the glow travels smoothly, never lags more than a row; the title's diamond bobs gently.
+- **Done, with deviations:**
+  - **`MenuPointer.Draw` keeps its parameters:** a caller bobs the pointer by shifting the line start it passes left, so no fifth parameter, and the callers without a clock change nothing.
+  - **`SelectionGlide.Follow(row, rowCount)`:** does nothing if the row is unchanged, jumps on a wrap (a move of more than half the list, so a skipped disabled row still glides), and glides otherwise. Both callers run it after each update's input, so the wrap rule lives in one place; 4 more tests (10 in all, 2138 in the solution), two of them after review.
+  - **The tabs:** drawn as plain backs, then the glow at the glide's place (with the selected tab's slide offset and fade), then the labels on top.
+  - **The title:** its band is the first band moved by the glide; `TitleMenu.SelectedIndex` is new.

@@ -5,9 +5,7 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/W1b.md, slice W1b (titled framed window, centered yes/no dialog)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/W2.md, slice W2 (dialogue box in the framed-window look)
 Round: 1 (verdict: Ready to commit)
 
-- S1 ConfirmPromptTests.cs:59 and FramedWindowLayoutTests.cs:38 — new [Fact] directly after the previous test's closing brace, no blank line; open
-- S2 Titled_Body_StartsBelowTheSeparator / Titled_TitleCenter_IsAboveTheSeparator assert only ordering; pin Body.Top == SeparatorY + 15 so the 14 px gaps are held; open
-- F1 UiTheme.RaisedSurface summary "A dialog's band." — its only user now is ItemTargetPickerView; follow-up
+- S1 DialogueBox.cs:40-42 — window built from Width/Height minus the layout's padding only so Untitled can add it back; _window.Body (32/24 padding) is unused, and the text uses TextInset 20; a one-line comment saying the box sizes the frame, not the body, would stop a reader from placing text in Body; open

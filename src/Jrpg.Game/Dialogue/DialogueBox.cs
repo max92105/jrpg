@@ -9,9 +9,10 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Dialogue;
 
 /// <summary>
-/// The message box at the bottom of the map: the typed part of one page in a rounded panel, a blinking marker once the
-/// page is complete, and the speaker's name and diamond-framed portrait when the speech has them (developer,
-/// 2026-10-19: the look of the turn-order portraits in <c>docs/ui-reference</c>).
+/// The message box at the bottom of the map: the typed part of one page in a framed window
+/// (<see cref="FramedWindowView"/>), a blinking marker once the page is complete, and the speaker's name and
+/// diamond-framed portrait when the speech has them (developer, 2026-10-19: the look of the turn-order portraits in
+/// <c>docs/ui-reference</c>).
 /// </summary>
 internal sealed class DialogueBox
 {
@@ -20,13 +21,13 @@ internal sealed class DialogueBox
     private const int Height = 260;
     private const int BottomMargin = 40;
 
-    // The 4 px border plus 16 px padding (placeholder).
+    // Inside the window's inner hairline, which sits 4 px in, with 15 px to spare (placeholder).
     private const int TextInset = 20;
 
     // A small diamond: the font has no ▶, and diamonds echo the reference UI.
     private const int MarkerSide = 14;
 
-    // The portrait's diamond fills the box's height inside the inset; a white frame shows around it.
+    // The portrait's diamond fills the box's height inside the inset, framed in the window's hairline color.
     private const int PortraitSize = Height - (2 * TextInset);
     private const int PortraitFrame = 3;
 
@@ -36,12 +37,16 @@ internal sealed class DialogueBox
     private const int NameStripGap = 8;
     private const int NameInset = 24;
 
-    private static readonly Rectangle _area = new((VirtualScreen.Width - Width) / 2, VirtualScreen.Height - BottomMargin - Height, Width, Height);
+    // The box sets the frame's size; its content sits TextInset in from the frame, not in the layout's padded Body.
+    private static readonly FramedWindowLayout _window = FramedWindowLayout.Untitled(
+        new Point(VirtualScreen.Width / 2, VirtualScreen.Height - BottomMargin - (Height / 2)),
+        new Point(Width - (2 * FramedWindowLayout.PaddingX), Height - (2 * FramedWindowLayout.PaddingY)));
+
+    private static readonly Rectangle _area = _window.Frame;
     private static readonly Vector2 _markerCenter = new(_area.Right - TextInset - MarkerSide, _area.Bottom - TextInset - MarkerSide);
     private static readonly Vector2 _portraitCenter = new(_area.X + TextInset + (PortraitSize / 2f), _area.Y + (Height / 2f));
     private static readonly Rectangle _nameStrip = new(_area.X, _area.Y - NameStripGap - NameStripHeight, NameStripWidth, NameStripHeight);
 
-    private readonly PanelView _panel = new(UiTheme.MessagePanel);
     private readonly SpriteFontBase _font;
     private readonly SpriteFontBase _speakerFont;
     private readonly RichTextLayout _layout;
@@ -79,11 +84,11 @@ internal sealed class DialogueBox
     }
 
     /// <param name="batch">The begun batch.</param>
-    /// <param name="textures">For the panel, the portrait and the marker.</param>
+    /// <param name="textures">For the window, the portrait and the marker.</param>
     /// <param name="reading">The playback last given to <see cref="Show"/>.</param>
     public void Draw(SpriteBatch batch, TextureLibrary textures, SpeechPlayback reading)
     {
-        _panel.Draw(batch, textures, _area, 1f);
+        FramedWindowView.DrawFrame(batch, textures.Pixel, _window, opacity: 1);
         if (_speakerCaps is not null)
         {
             DrawSpeaker(batch, textures, _speakerCaps);
@@ -111,7 +116,7 @@ internal sealed class DialogueBox
 
     private void DrawPortrait(SpriteBatch batch, TextureLibrary textures, string portraitFile)
     {
-        Diamond.WithDiagonal(_portraitCenter, PortraitSize + (2 * PortraitFrame)).Draw(batch, textures.Pixel, UiTheme.MessageText);
+        Diamond.WithDiagonal(_portraitCenter, PortraitSize + (2 * PortraitFrame)).Draw(batch, textures.Pixel, UiTheme.WindowLine);
         var corner = new Point((int)_portraitCenter.X - (PortraitSize / 2), (int)_portraitCenter.Y - (PortraitSize / 2));
         batch.Draw(PortraitOf(portraitFile, textures), new Rectangle(corner, new Point(PortraitSize)), Color.White);
     }

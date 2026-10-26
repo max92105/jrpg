@@ -10,12 +10,6 @@ internal static partial class UiTheme
     /// <summary>The message box's text, sized toward the reference UI (plan 2026-10-25-ui-second-pass, SZ2).</summary>
     public const int MessageTextPixels = 36;
 
-    /// <summary>
-    /// The message box, doubled: <c>#AA000000</c> inside a 2 px white border with 10 px corners. Black stays black when
-    /// premultiplied, so the fill is written as is.
-    /// </summary>
-    public static PanelStyle MessagePanel { get; } = new(CornerRadius: 20, BorderWidth: 4, Fill: new Color(0, 0, 0, 0xAA), Border: Color.White);
-
     public static Color MessageText => Color.White;
 
     /// <summary>

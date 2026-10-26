@@ -24,7 +24,23 @@ internal sealed class FramedWindowView(UiTextures ui)
     /// <param name="opacity">0 to 1, the window's fade.</param>
     public void Draw(SpriteBatch batch, TextureLibrary textures, FramedWindowLayout layout, float opacity)
     {
-        var pixel = textures.Pixel;
+        DrawFrame(batch, textures.Pixel, layout, opacity);
+        if (layout.HasTitle)
+        {
+            DrawSeparator(batch, textures, layout, opacity);
+        }
+    }
+
+    /// <summary>
+    /// The body and both hairlines, without a title's separator: all an untitled window needs, from the plain pixel
+    /// alone.
+    /// </summary>
+    /// <param name="batch">Already begun.</param>
+    /// <param name="pixel">The plain white pixel, tinted.</param>
+    /// <param name="layout">Where the window's parts go.</param>
+    /// <param name="opacity">0 to 1, the window's fade.</param>
+    public static void DrawFrame(SpriteBatch batch, Texture2D pixel, FramedWindowLayout layout, float opacity)
+    {
         batch.Draw(pixel, layout.Frame, UiTheme.Surface * opacity);
         var line = UiTheme.WindowLine * opacity;
         Outline.Draw(batch, pixel, layout.Frame, line);
@@ -35,10 +51,6 @@ internal sealed class FramedWindowView(UiTextures ui)
         batch.Draw(pixel, new Rectangle(inner.X + CornerGap, inner.Bottom - 1, across, 1), line);
         batch.Draw(pixel, new Rectangle(inner.X, inner.Y + CornerGap, 1, down), line);
         batch.Draw(pixel, new Rectangle(inner.Right - 1, inner.Y + CornerGap, 1, down), line);
-        if (layout.HasTitle)
-        {
-            DrawSeparator(batch, textures, layout, opacity);
-        }
     }
 
     // As wide as the body, so it lines up with the content under it.

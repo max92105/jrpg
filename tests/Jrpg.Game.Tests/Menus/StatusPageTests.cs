@@ -14,6 +14,16 @@ namespace Jrpg.Game.Tests.Menus;
 public sealed class StatusPageTests
 {
     [Fact]
+    public void ShowsPartySidebar_MemberPage_IsFalse()
+    {
+        var page = NewPage(NewSession());
+
+        var showsSidebar = page.ShowsPartySidebar;
+
+        Assert.False(showsSidebar);
+    }
+
+    [Fact]
     public void Members_SecondMemberMadeActive_ListedBeforeTheReserve()
     {
         var session = NewSession();

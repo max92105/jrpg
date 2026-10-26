@@ -89,14 +89,14 @@ public sealed class EquipmentPageTests
     }
 
     [Fact]
-    public void ShowsPartySidebar_WhileChoiceOpen_IsFalse()
+    public void ShowsPartySidebar_BeforeAndWhileChoosing_IsFalse()
     {
         var page = NewPage();
         var beforeChoosing = page.ShowsPartySidebar;
 
         page.Update(Pressing(GameButton.Confirm));
 
-        Assert.True(beforeChoosing);
+        Assert.False(beforeChoosing);
         Assert.False(page.ShowsPartySidebar);
     }
 

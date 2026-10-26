@@ -72,8 +72,8 @@ internal sealed class EquipmentPage : IMemberPage
 
     public string Hint => _takeHint ?? _pageHint;
 
-    /// <summary>False while the item choice shows in the sidebar's place.</summary>
-    public bool ShowsPartySidebar => _choice is null;
+    /// <summary>False: the member column shows who is shown instead (decision 266).</summary>
+    public bool ShowsPartySidebar => false;
 
     // Recruits don't change while the menu is open, so the member cursor's count still holds.
     [MemberNotNull(nameof(Members), nameof(_sheet))]

@@ -35,6 +35,10 @@ internal sealed class GameMenuScene : IScene
     private static readonly Rectangle _pageAreaBesideSidebar = _pageArea with { Width = _pageArea.Width - SidebarWidth - SidebarGap };
     private static readonly Rectangle _sidebarColumn = _pageArea with { X = _pageArea.Right - SidebarWidth, Width = SidebarWidth };
 
+    // On a member page the member column takes the page area's left (decision 266), and the page the rest.
+    private static readonly Rectangle _memberColumnArea = _pageArea with { Width = MemberColumnView.Width };
+    private static readonly Rectangle _pageAreaBesideColumn = _pageArea with { X = _pageArea.X + MemberColumnView.Width, Width = _pageArea.Width - MemberColumnView.Width };
+
     private readonly UiTextures _ui;
     private readonly MenuHeader _header;
     private readonly PartySidebar _sidebar;
@@ -48,6 +52,7 @@ internal sealed class GameMenuScene : IScene
     private readonly string _mainHint;
     private readonly PageTransition _pageTransition = new();
     private readonly MemberColumn _memberColumn = new();
+    private readonly MemberColumnView _memberColumnView;
 
     // Decision 262: the menu slides in, and fades out before it closes.
     private readonly MenuMotion _motion = new();
@@ -73,6 +78,7 @@ internal sealed class GameMenuScene : IScene
         _font = text.Fonts.FontAt(UiTheme.MenuTextPixels);
         _tabLabels = [.. pages.Select(page => text.Messages.Text(page.TitleMessageId))];
         _tabsView = new MenuTabsView(ui, _font, _tabLabels);
+        _memberColumnView = new MemberColumnView(_memberColumn, ui);
         _mainHint = text.Messages.Text(MessageIds.MenuHintMain);
     }
 
@@ -122,9 +128,7 @@ internal sealed class GameMenuScene : IScene
 
         if (_isInPage)
         {
-            var pageArea = ShowsSidebar ? _pageAreaBesideSidebar : _pageArea;
-            var area = pageArea with { X = pageArea.X + _pageTransition.Offset };
-            _pages[_tabs.Selected].Draw(batch, textures, area, opacity * _pageTransition.Opacity);
+            DrawPage(batch, textures, opacity * _pageTransition.Opacity);
         }
 
         if (ShowsSidebar)
@@ -134,6 +138,18 @@ internal sealed class GameMenuScene : IScene
         }
 
         DrawFooterHint(batch, opacity);
+    }
+
+    // The page slides in with its transition; a member page brings the member column with it, at its left.
+    private void DrawPage(SpriteBatch batch, TextureLibrary textures, float opacity)
+    {
+        var page = _pages[_tabs.Selected];
+        var pageArea = page is IMemberPage ? _pageAreaBesideColumn : ShowsSidebar ? _pageAreaBesideSidebar : _pageArea;
+        page.Draw(batch, textures, pageArea with { X = pageArea.X + _pageTransition.Offset }, opacity);
+        if (page is IMemberPage)
+        {
+            _memberColumnView.Draw(batch, textures, _memberColumnArea with { X = _memberColumnArea.X + _pageTransition.Offset }, opacity);
+        }
     }
 
     private void DrawFooterHint(SpriteBatch batch, float opacity)

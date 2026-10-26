@@ -98,7 +98,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **M3b. Status page look: spaced-caps labels beside large numbers, hairline rows** (Game, about 170 lines) → [slices/M3b.md](slices/M3b.md)
 - [x] **M2a. The member column: which members a page goes through, which one is shown** (Game, about 130 lines) → [slices/M2a.md](slices/M2a.md)
 - [x] **M2b0. The menu's tabs drawn by `MenuTabsView`** (Game, mechanical, about 120 lines moved) → [slices/M2b0.md](slices/M2b0.md)
-- [ ] **M2b. The member column drawn between the tabs and member pages** (Game, about 210 lines) → [slices/M2b.md](slices/M2b.md)
+- [x] **M2b. The member column drawn between the tabs and member pages** (Game, about 210 lines) → [slices/M2b.md](slices/M2b.md)
 - [ ] **M2c. The party sidebar's unused shown-member marking removed** (Game, about 100 lines removed) → [slices/M2c.md](slices/M2c.md)
 - [ ] **M1. Tab icons: placeholder glyphs we draw** (Game, about 230 lines) → [slices/M1.md](slices/M1.md)
 

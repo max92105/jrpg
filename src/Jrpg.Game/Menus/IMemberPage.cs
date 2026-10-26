@@ -2,7 +2,10 @@ using Jrpg.Core.Party;
 
 namespace Jrpg.Game.Menus;
 
-/// <summary>A menu page that shows one party member at a time, which the party sidebar marks (decision 146).</summary>
+/// <summary>
+/// A menu page that shows one party member at a time, which the member column marks; it never shows the party sidebar
+/// (decision 266).
+/// </summary>
 internal interface IMemberPage : IMenuPage
 {
     /// <summary>The members the page goes through, in its order; the member column lists them (decision 255).</summary>

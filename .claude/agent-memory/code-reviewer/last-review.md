@@ -5,8 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/M2b0.md, slice M2b0 (tab drawing moved to MenuTabsView)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/M2b.md, slice M2b (MemberColumnView drawn on member pages)
 Round: 1 (verdict: Ready to commit)
 
-- S1 MenuTabsView.TabPitch is public with no user outside the class; make it private until one needs it; open
-- S2 MenuTabsView takes string[] labels (shares the scene's array); IReadOnlyList<string> states read-only intent; open
+- S1 GameMenuScene.DrawPage picks the column layout by `page is IMemberPage` while the sidebar draws on ShowsPartySidebar; a member page returning true would overlap both; say in IMemberPage's doc that member pages never show the sidebar (or derive it); open
+- S2 StatusPage.ShowsPartySidebar flip (decision 266) has no test, unlike Equipment's; open
+- F1 IMenuPage.ShowsPartySidebar and the sidebar's shown-member marking: M2c cleanup; follow-up

@@ -8,3 +8,4 @@ Part of [the UI second pass plan](../README.md). Decision 266. Split from M2b on
     - The sidebar's summary and decision 146's mention in this plan's README ("146: the party sidebar marks the member a page shows") updated.
   - **Tests:** remove the tests on the removed behavior (`PartySidebarTests` on `ShownIndex`, `GameMenuSceneTests` on the sidebar's shown index); record which and the count before and after.
   - **Verify by hand:** the Items, Options and System pages show the sidebar as before; Status and Equipment show the member column and no sidebar.
+  - From M2b's review: the scene picks the column layout from `IMemberPage` but the sidebar from `ShowsPartySidebar`; once the marking is gone, derive the sidebar from the page kind (`IMemberPage` never shows it) or drop the member pages' `ShowsPartySidebar`, so the two can't disagree.

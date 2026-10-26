@@ -51,7 +51,8 @@ internal sealed class StatusPage : IMemberPage
 
     public string Hint { get; }
 
-    public bool ShowsPartySidebar => true;
+    /// <summary>False: the member column shows who is shown instead (decision 266).</summary>
+    public bool ShowsPartySidebar => false;
 
     public bool LeavesOnCancel => true;
 

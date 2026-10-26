@@ -11,3 +11,8 @@ Decision 266 (answers 265): on member pages the column replaces the party sideba
     - BG1's warm-up includes the column's portrait size.
   - **Tests:** none new for the column (draw-only; M2a tests the model). The tests that a member page shows the sidebar change to say it doesn't; record which.
   - **Verify by hand:** Status and Equipment show the column and no sidebar; Left/Right move the marked portrait and the page together; with more members than fit, the column scrolls; other pages show no column; the page's content still fits after SZ1 (F12, compare with `menu-status.webp`).
+- **Done, with deviations:**
+  - **Decision 266:** `StatusPage` and `EquipmentPage` no longer show the sidebar, so a member page's area is the whole page area right of the 80 px column; the Equipment page's item choice opens at the right of that area as before.
+  - **The column slides and fades with the page** (`GameMenuScene.DrawPage`): the page transition's offset and opacity apply to both.
+  - **No portrait warm-up added:** BG1 only preloads the menu's background; portraits (the sidebar's 96 px ones too) are baked on first draw, as before.
+  - **Tests:** none new; `EquipmentPageTests.ShowsPartySidebar_WhileChoiceOpen_IsFalse` became `ShowsPartySidebar_BeforeAndWhileChoosing_IsFalse` (decision 266), and after review `StatusPageTests.ShowsPartySidebar_MemberPage_IsFalse` covers the Status page (2163). `IMemberPage`'s summary says a member page never shows the sidebar.

@@ -26,25 +26,14 @@ internal sealed class EventPresenter
     private readonly PlayerSettings _settings;
     private readonly UiMessages _messages;
     private readonly DialogueBox _messageBox;
-    private readonly StillView _stillView;
+    private readonly StillRun _stills;
     private readonly VoiceChannel _voice;
-
-    // Black before a run of stills and after it, so the map never flashes on either side of the cutscene (placeholder).
-    internal static readonly TimeSpan LeadIn = TimeSpan.FromSeconds(0.5);
-    internal static readonly TimeSpan LeadOut = TimeSpan.FromSeconds(0.5);
 
     // The fade for warps (placeholder timing).
     private readonly ScreenFade _warpFade = new(TimeSpan.FromSeconds(0.25), TimeSpan.FromSeconds(0.08), TimeSpan.FromSeconds(0.25));
 
     // The pages of the step being read; null when no message is on screen.
     private SpeechPlayback? _reading;
-
-    // The still on screen; null when no still shows.
-    private StillPlayback? _still;
-
-    // The black before the first still of a run (null when not waiting on one), and the black after the last.
-    private TimeSpan? _leadInLeft;
-    private TimeSpan _leadOutLeft;
 
     /// <param name="exploration">The map events to show.</param>
     /// <param name="text">Messages and fonts for the message box.</param>
@@ -56,29 +45,27 @@ internal sealed class EventPresenter
         _settings = settings;
         _messages = text.Messages;
         _messageBox = new DialogueBox(text.Fonts);
-        _stillView = new StillView(text);
+        _stills = new StillRun(exploration, new StillView(text));
         _voice = voice;
     }
 
     /// <summary>True while an event runs or its fade plays: the player can't walk, interact or open the menu.</summary>
-    public bool IsBusy => _exploration.IsEventRunning || _warpFade.Phase != FadePhase.Idle || IsLeadingOut;
+    public bool IsBusy => _exploration.IsEventRunning || _warpFade.Phase != FadePhase.Idle || _stills.IsLeadingOut;
 
     /// <summary>Whether a cutscene still covers the screen.</summary>
-    internal bool IsShowingStill => _still is not null;
+    internal bool IsShowingStill => _stills.IsShowing;
 
     /// <summary>How black to draw over the map, 0..1.</summary>
-    public float Blackness => _leadInLeft is not null || IsLeadingOut ? 1 : _warpFade.Blackness;
-
-    private bool IsLeadingOut => _leadOutLeft > TimeSpan.Zero;
+    public float Blackness => Math.Max(_stills.Blackness, _warpFade.Blackness);
 
     /// <exception cref="InvalidOperationException">The current step is of a type the game can't show yet.</exception>
     public void Update(TimeSpan delta, InputFrame input)
     {
         _warpFade.Update(delta);
-        if (IsLeadingOut)
+        if (_stills.IsLeadingOut)
         {
-            _leadOutLeft -= delta;
-            if (IsLeadingOut)
+            _stills.AdvanceLeadOut(delta);
+            if (_stills.IsLeadingOut)
             {
                 FollowStartedVoice();
                 return;
@@ -112,10 +99,7 @@ internal sealed class EventPresenter
     /// <summary>Draws over the map: a still, or the message being read, then the fade over everything.</summary>
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
-        if (_still is not null)
-        {
-            _stillView.Draw(batch, textures, _still);
-        }
+        _stills.Draw(batch, textures);
 
         if (_reading is not null)
         {
@@ -129,80 +113,14 @@ internal sealed class EventPresenter
         }
     }
 
-    // Confirm or Cancel runs the event past its stills at any time, the lead-in included, and cuts straight to what
-    // follows; the step's first update only starts the lead-in, so the press that started the event can't skip it.
+    // A skip ends the run at once: what follows shows this same update, already black if it's a warp.
     private void ShowStill(StillStep still, TimeSpan delta, InputFrame input)
     {
-        _stillView.Follow(input.Device);
-        if (_still is null)
+        _stills.Show(still, delta, input);
+        if (!_stills.IsRunning)
         {
-            RunLeadIn(still, delta, input);
-            return;
+            StayBlackIntoAWarp();
         }
-
-        if (IsSkipPressed(input))
-        {
-            Skip();
-            return;
-        }
-
-        _still.Update(delta);
-        if (!_still.IsOver)
-        {
-            return;
-        }
-
-        _still = null;
-        _exploration.ContinueEvent();
-
-        // The next still starts now over the same black, so the map never shows between two stills; after the last, the
-        // screen stays black a moment before whatever follows.
-        if (_exploration.CurrentEventStep is StillStep next)
-        {
-            BeginStill(next);
-        }
-        else
-        {
-            _leadOutLeft = LeadOut;
-        }
-    }
-
-    private void RunLeadIn(StillStep still, TimeSpan delta, InputFrame input)
-    {
-        if (_leadInLeft is not { } left)
-        {
-            _leadInLeft = LeadIn;
-            return;
-        }
-
-        if (IsSkipPressed(input))
-        {
-            Skip();
-            return;
-        }
-
-        left -= delta;
-        _leadInLeft = left > TimeSpan.Zero ? left : null;
-        if (_leadInLeft is null)
-        {
-            BeginStill(still);
-        }
-    }
-
-    private static bool IsSkipPressed(InputFrame input) => input.IsPressed(GameButton.Confirm) || input.IsPressed(GameButton.Cancel);
-
-    private void Skip()
-    {
-        _still = null;
-        _leadInLeft = null;
-        _exploration.SkipEventPresentation();
-        StayBlackIntoAWarp();
-    }
-
-    private void BeginStill(StillStep still)
-    {
-        _still = new StillPlayback(still);
-        _stillView.Begin(still);
     }
 
     // A warp right after the cutscene's black starts its fade already black, so the map it leaves never shows again.

@@ -214,7 +214,7 @@ public sealed class EventPresenterTests
     {
         var (exploration, presenter, _) = StartIntro();
         presenter.Update(StartMapScenarios.OneUpdate, default);
-        presenter.Update(EventPresenter.LeadIn, default);
+        presenter.Update(StillRun.LeadIn, default);
         for (var still = 0; still < 3; still++)
         {
             presenter.Update(TimeSpan.FromSeconds(4), default);
@@ -236,7 +236,7 @@ public sealed class EventPresenterTests
     {
         var (exploration, presenter, _) = StartIntro();
         presenter.Update(StartMapScenarios.OneUpdate, default);
-        presenter.Update(EventPresenter.LeadIn, default);
+        presenter.Update(StillRun.LeadIn, default);
 
         presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
 
@@ -260,7 +260,7 @@ public sealed class EventPresenterTests
         var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel());
 
         presenter.Update(StartMapScenarios.OneUpdate, default);
-        presenter.Update(EventPresenter.LeadIn / 2, default);
+        presenter.Update(StillRun.LeadIn / 2, default);
 
         Assert.False(presenter.IsShowingStill);
         Assert.Equal(1f, presenter.Blackness);
@@ -286,7 +286,7 @@ public sealed class EventPresenterTests
         Assert.IsType<DialogueStep>(exploration.CurrentEventStep);
         Assert.Equal(1f, presenter.Blackness);
 
-        presenter.Update(EventPresenter.LeadOut, default);
+        presenter.Update(StillRun.LeadOut, default);
 
         Assert.Equal(0f, presenter.Blackness);
     }
@@ -298,7 +298,7 @@ public sealed class EventPresenterTests
         exploration.TryInteract();
         var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel());
         presenter.Update(StartMapScenarios.OneUpdate, default);
-        presenter.Update(EventPresenter.LeadIn, default);
+        presenter.Update(StillRun.LeadIn, default);
         return (exploration, presenter);
     }
 }

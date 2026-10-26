@@ -145,8 +145,8 @@ public sealed class StatusPageTests
         var resources = page.Shown.Class.Resources;
         var mana = resources.Single(resource => resource.Id == "mana");
         var clarity = resources.Single(resource => resource.Id == "clarity");
-        Assert.Contains(new StatusLine(mana.Name, NumberText.Of(mana.Max)), page.ShownResources);
-        Assert.Contains(new StatusLine(clarity.Name, $"{clarity.StartsAt} / {clarity.Max}"), page.ShownResources);
+        Assert.Contains(new StatusLine(mana.Name.ToUpperInvariant(), NumberText.Of(mana.Max)), page.ShownResources);
+        Assert.Contains(new StatusLine(clarity.Name.ToUpperInvariant(), $"{clarity.StartsAt} / {clarity.Max}"), page.ShownResources);
     }
 
     [Fact]
@@ -158,7 +158,7 @@ public sealed class StatusPageTests
         ShowMember(page, "omer");
 
         var clarity = page.Shown.Class.Resources.Single(resource => resource.Id == "clarity");
-        Assert.Contains(new StatusLine(clarity.Name, $"1 / {clarity.Max}"), page.ShownResources);
+        Assert.Contains(new StatusLine(clarity.Name.ToUpperInvariant(), $"1 / {clarity.Max}"), page.ShownResources);
     }
 
     [Fact]
@@ -170,7 +170,7 @@ public sealed class StatusPageTests
 
         var readiness = page.Shown.Class.Resources.Single(resource => resource.Id == "readiness");
         var charges = Math.Max(1, page.Shown.Speed / readiness.MaxFromSpeed!.SpeedPerCharge);
-        Assert.Contains(new StatusLine(readiness.Name, NumberText.Of(charges)), page.ShownResources);
+        Assert.Contains(new StatusLine(readiness.Name.ToUpperInvariant(), NumberText.Of(charges)), page.ShownResources);
     }
 
     [Fact]
@@ -192,6 +192,19 @@ public sealed class StatusPageTests
 
         Assert.Equal(NumberText.Of(page.Shown.Speed), page.ShownSpeed);
     }
+
+    [Fact]
+    public void Open_FirstMember_LabelsAreInCaps()
+    {
+        var page = NewPage(NewSession());
+
+        page.Open();
+
+        Assert.All(page.ShownLabels, label => Assert.Equal(label.ToUpperInvariant(), label));
+        Assert.Contains(Text(MessageIds.StatAttack).ToUpperInvariant(), page.ShownLabels);
+    }
+
+    private static string Text(string messageId) => RepositoryScreenText.Text.Messages.Text(messageId);
 
     // Moves right through the members until the one wanted is shown.
     private static void ShowMember(StatusPage page, string memberId)

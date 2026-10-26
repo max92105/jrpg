@@ -58,6 +58,9 @@ internal sealed class StatusPage : IMemberPage
     /// <summary>The shown member's HP, Attack and Defense, as the page writes them.</summary>
     internal IReadOnlyList<string> ShownStats => _sheet.Stats;
 
+    /// <summary>The parameters' and the shown member's resources' labels, as the page writes them.</summary>
+    internal IReadOnlyList<string> ShownLabels => [.. _labels.Stats, _labels.Speed, .. _sheet.Resources.Select(resource => resource.Name)];
+
     /// <summary>The shown member's speed, as the page writes it.</summary>
     internal string ShownSpeed => _sheet.Speed;
 

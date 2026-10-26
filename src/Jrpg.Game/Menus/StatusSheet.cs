@@ -18,8 +18,8 @@ namespace Jrpg.Game.Menus;
 /// <param name="Worn">What they wear in each of <see cref="EquipmentSheet.Slots"/>, or the empty slot's text.</param>
 /// <param name="Experience">How far they are through their level, for the experience bar.</param>
 /// <param name="Speed">Their speed.</param>
-/// <param name="Resources">Each of the class's resources: its name, and its max, or for a lasting one its amount out of
-/// its max (ADR 0024).</param>
+/// <param name="Resources">Each of the class's resources: its name in caps, and its max, or for a lasting one its
+/// amount out of its max (ADR 0024).</param>
 /// <param name="Skills">Each skill they have, in menu order: its name, and its description.</param>
 internal sealed record StatusSheet(
     string Name,
@@ -50,7 +50,7 @@ internal sealed record StatusSheet(
             [.. EquipmentSheet.Slots.Select(slot => member.EquippedIn(slot)?.Name ?? labels.Empty)],
             ExperienceProgress(member.Level, member.Experience, table),
             NumberText.Of(member.Speed),
-            [.. member.Class.Resources.Select(resource => new StatusLine(resource.Name, AmountText(member, resource, labels)))],
+            [.. member.Class.Resources.Select(resource => new StatusLine(resource.Name.ToUpperInvariant(), AmountText(member, resource, labels)))],
             [.. member.Skills.Select(skill => new StatusLine(skill.Name, skill.Description))]);
     }
 

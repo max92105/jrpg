@@ -19,7 +19,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   - no path condition.
 
   The file is protected, so ask the developer first.
-- **`StatusPage` split** (294 lines): a pure `StatusSheet`, a `StatusSheetView` and the page keeping its input. Its slot labels then come from `EquipmentSheet.Slots` and `EquipmentSheet.LabelIdOf`. It can wait because nothing planned changes the Status page's content.
 - **Why Core refused an equipment change:** `EquipmentPage.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. `PartyEquipment.ItemWithoutRoom` and `UnequipAll` would own both. It can wait because it is correct today, and nothing planned changes equipment.
 - **Easing copies:** the clamped time share `Math.Clamp((float)(elapsed / length), 0, 1)` is copied 6 times (`ActionPlayback`, `FloatingNumber` twice, `LevelUpPop`, `VictoryEntrance`, `DefeatEntrance`), and the cubic ease-out twice (`LevelUpPop`, `VictoryEntrance`). They should use `Ui/Easing`. It can wait because each copy is one line.
 - **`Ui/MessageIds.cs` is 397 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
@@ -53,7 +52,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Core/Exploration/ExplorationState.cs` (296) is near 300. The next feature touching it should split it first: starting events (arrival, cell, touch) apart from walking.
 - Test files over 300 lines: `GameFlowTests` (369), `InventoryPageTests` (325), `PartyStateTests` (322). Split by behavior when next touched.
 - Comment lines over 120 columns from before the rule was enforced: `ExplorationState` (5), `GameSession` (8), `ArtReferenceCheck` (2), `MessageIds` (1). Rewrap when next touched.
-- `Menus/StatusPage` looks up `_catalog.Classes[member.Definition.ClassId]`. Use `ContentCatalog.ClassOf` (added in the new-game flow) when next touched.
 - `ScreenFade` skips its black moment when one update is longer than its fade-out plus hold (about 0.33 s), so a warp never moves the player. The fixed 1/60 s step hides it in play; tests must step at 1/60 s. Make `Update` stop on Holding if a long frame can ever reach it.
 - `BattleState.cs` is at 296 lines: split the per-command bodies before the next command path lands (DR2 review).
 - `tests/Jrpg.Game.Tests/Battle/CommandMenuTests.cs` is at 393 lines: split it by menu entry (MO1 review).

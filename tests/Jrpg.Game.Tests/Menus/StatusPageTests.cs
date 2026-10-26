@@ -99,7 +99,7 @@ public sealed class StatusPageTests
     {
         var table = new ExperienceTable([100, 250, 400]);
 
-        var text = StatusPage.ToNextLevelText(2, 70, table, "Max");
+        var text = StatusSheet.ToNextLevelText(2, 70, table, "Max");
 
         Assert.Equal("180", text);
     }
@@ -109,7 +109,7 @@ public sealed class StatusPageTests
     {
         var table = new ExperienceTable([100, 250, 400]);
 
-        var text = StatusPage.ToNextLevelText(table.MaxLevel, 0, table, "Max");
+        var text = StatusSheet.ToNextLevelText(table.MaxLevel, 0, table, "Max");
 
         Assert.Equal("Max", text);
     }
@@ -119,7 +119,7 @@ public sealed class StatusPageTests
     {
         var table = new ExperienceTable([100, 250, 400]);
 
-        var progress = StatusPage.ExperienceProgress(2, 70, table);
+        var progress = StatusSheet.ExperienceProgress(2, 70, table);
 
         Assert.Equal((70, 250), progress);
     }
@@ -129,7 +129,7 @@ public sealed class StatusPageTests
     {
         var table = new ExperienceTable([100, 250, 400]);
 
-        var progress = StatusPage.ExperienceProgress(table.MaxLevel, 0, table);
+        var progress = StatusSheet.ExperienceProgress(table.MaxLevel, 0, table);
 
         Assert.Equal((1, 1), progress);
     }

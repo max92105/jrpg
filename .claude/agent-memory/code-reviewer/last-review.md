@@ -5,9 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/M4.md, slice M4 (inventory look: column titles, detail strip)
-Round: 1 (verdict: Fix the Criticals, then commit)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/C4.md, slice C4 (StatusPage split: StatusSheet, StatusSheetView, StatusLabels)
+Round: 1 (verdict: Ready to commit)
 
-- C1 InventoryPage.cs:15-16 class summary still says "the selected item's description under the list"; now a strip under the selected row; open
-- S1 ColumnTitles: ImmutableArray of (ColumnTitle, MeasuredText) tuples; a plain array or keeping the measured caps beside the offset is enough; open
-- F1 band + pointer draw still copied across list views (MO2b W1); follow-up
+- S1 StatusSheet's ToNextLevelText/ExperienceProgress tests still live in StatusPageTests; move to StatusSheetTests when M3a adds sheet tests; open
+- F1 StatusSheetView.Vitals is public so the page sequences show-vitals / build / show; M3a could let Show take the vitals; follow-up

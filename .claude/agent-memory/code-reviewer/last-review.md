@@ -5,8 +5,7 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/BG1.md, slice BG1 (first menu opening stall: LoadContent preload + Scenes/OpeningFade)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/R1.md, slice R1 (docs/ui-reference rename, README, reference-only rule)
 Round: 1 (verdict: Ready to commit)
 
-- Suggestion: OpeningFade.Update has no summary while its siblings do; a short "counts only after the first MarkDrawn" line; open
-- Follow-up: other large art (title, battle backgrounds) could stall a first draw the same way; open
+- Suggestion: game.md "UI look" says "never ship their images" in the first bullet and again in the new decision-264 bullet; drop the first clause; open

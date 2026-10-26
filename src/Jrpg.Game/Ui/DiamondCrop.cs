@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// Cuts a picture into a diamond, the frame the reference UI gives portraits (<c>docs/ui_ux_exemples</c>): the centered
+/// Cuts a picture into a diamond, the frame the reference UI gives portraits (<c>docs/ui-reference</c>): the centered
 /// square of the image, shrunk to <c>size</c> (<see cref="SquareShrink"/>), with the corners outside the diamond made
 /// transparent. Done once per picture, since SpriteBatch can't clip to a diamond.
 /// </summary>

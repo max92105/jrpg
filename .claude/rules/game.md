@@ -15,13 +15,15 @@ paths:
 
 ## UI look
 
-- **Look at `docs/ui_ux_exemples/` before designing or drawing any screen** (title, menus, message box, battle HUD, victory). They are the developer's favorite UI/UX (Octopath Traveler II): beautiful, modern, the target style. Take inspiration from them, don't copy them pixel for pixel, and never ship their images or the game's art.
+- **Look at `docs/ui-reference/` (its README says what each shot shows) before designing or drawing any screen** (title, menus, message box, battle HUD, victory). They are the developer's favorite UI/UX (Octopath Traveler II): beautiful, modern, the target style. Take inspiration from them, don't copy them pixel for pixel.
 - What they do:
   - full-screen art with dark scrims and vignettes; the UI floats over it in translucent dark layers, not opaque boxed windows;
   - a thin dark header bar with the page title at top left, and a footer bar with a one-line hint;
-  - vertical arrow-shaped tabs with an icon and a label; the selected one has a deep blue gradient glowing out to the right and a bright hairline; sub-entries open beside it; a pointing-hand cursor;
+  - vertical arrow-shaped tabs with an icon and a label; the selected one has a deep blue gradient glowing out to the right and a bright hairline; sub-entries open beside it; a pointing-hand cursor, where ours is a diamond (decision 253: take the vibe, not a one-for-one copy);
   - panels and rows fade out horizontally instead of having hard borders; hairline separators;
   - small labels (`HP`, `SP`, `LV`, `NEXT TURN` in spaced caps) next to large numbers; thin colored bars (HP green, SP blue, EXP orange);
   - an elegant serif for big titles (logo, "Victory!"), a clean sans for the rest; white or pale text;
   - diamond-framed portraits (turn order); lots of empty space, so the art shows through.
 - `Ui/UiTheme` holds the starting values and layouts. Where they're plainer than the examples, lean toward the examples. Ask the developer before departing from both.
+- One selection look everywhere (decision 252): every selected row is `UiTextures.DrawSelectedRow` with `MenuPointer`'s diamond at its left; no screen draws its own.
+- Other games' assets are reference only (decision 264): the extracted UI export is never committed, and nothing from another game (the screenshots in `docs/ui-reference/` included) is loaded or shipped. The game draws its own versions.

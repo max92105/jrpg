@@ -40,7 +40,7 @@ When planning slices in this repo:
   - test splits allow a mechanical prefix edit, guarded by test counts before and after, with no permanent forwarders;
   - verify the direction of a decision before citing it (144 was cited backwards).
 - Prefer a Core record field (ExperienceGain.IsAtMaxLevel) over handing a catalog to a scene.
-- UI feedback: look at the input bindings first (the inventory rail had no keyboard key); read docs/ui_ux_exemples (the .webp files open with Read).
+- UI feedback: look at the input bindings first (the inventory rail had no keyboard key); read docs/ui-reference (the .webp files open with Read).
 - Removal/wording plans: count with Grep count mode (it counts matching lines, not occurrences), slice by folder, list each reason-carrying comment with its replacement, "don't invent a reason"; a text guard must skip itself and history paths (docs/plans, done ADRs).
 
 - Before changing repository content (classes, members, new-game), grep the Game/Data tests that assume it (Sarxian as warrior leader, Teelle, StartNew call sites) and budget the fixes in the slice.

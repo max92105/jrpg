@@ -21,7 +21,7 @@ New code goes in `src/` and `tests/`, built by `Jrpg.slnx`.
 - `docs/map.md` — the codebase map: one line per feature folder with its key types, and the patterns the code follows. Read it before exploring the code.
 - `docs/decisions/` — architecture decision records (ADRs), indexed one line each in `docs/decisions/README.md`. Read the relevant ADR before changing a design area.
 - `docs/plans/` — feature plans produced by `/plan-feature`, indexed in `docs/plans/README.md`; each plan is a folder with a slice index, a design file and one file per slice.
-- `docs/ui_ux_exemples/` — screenshots of the developer's favorite UI/UX (Octopath Traveler II), the target style for every screen. Look at them before planning or drawing UI; take inspiration, don't copy 1:1 (see `.claude/rules/game.md`, "UI look"). Reference only: never shipped.
+- `docs/ui-reference/` — screenshots of the developer's favorite UI/UX (Octopath Traveler II), the target style for every screen; its README says what each shot shows. Look at them before planning or drawing UI; take inspiration, don't copy 1:1 (see `.claude/rules/game.md`, "UI look"). Reference only: never shipped.
 
 Dependency direction: Game → Data → Core; Editor → Data → Core. Never the reverse.
 

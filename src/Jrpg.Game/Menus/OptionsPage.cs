@@ -20,7 +20,7 @@ internal sealed class OptionsPage : IMenuPage
     private const int RowCount = 2;
 
     // Values sit in a column right of the labels, with a small diamond either side of the selected one: the reference
-    // UI's sign that Left and Right change it (docs/ui_ux_exemples).
+    // UI's sign that Left and Right change it (docs/ui-reference).
     private const int ValueColumn = 320;
     private const int ArrowGap = 16;
     private const int ArrowSide = 6;

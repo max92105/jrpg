@@ -7,9 +7,9 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Draws the victory screen (leaning toward the <c>Victory_Menu.jpg</c> reference): the battle shaded dark on the left,
-/// "Victory!" over a hairline, one pointed bar per reward, then the members' cards in two columns, each with a pointed
-/// name tab, the level, "EXP n/m" and a gold bar.
+/// Draws the victory screen (leaning toward the <c>battle-victory.jpg</c> reference): the battle shaded dark on the
+/// left, "Victory!" over a hairline, one pointed bar per reward, then the members' cards in two columns, each with a
+/// pointed name tab, the level, "EXP n/m" and a gold bar.
 /// </summary>
 internal sealed class VictoryScreenView
 {

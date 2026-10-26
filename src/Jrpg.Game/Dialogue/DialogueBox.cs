@@ -11,7 +11,7 @@ namespace Jrpg.Game.Dialogue;
 /// <summary>
 /// The message box at the bottom of the map: the typed part of one page in a rounded panel, a blinking marker once the
 /// page is complete, and the speaker's name and diamond-framed portrait when the speech has them (developer,
-/// 2026-10-19: the look of the turn-order portraits in <c>docs/ui_ux_exemples</c>).
+/// 2026-10-19: the look of the turn-order portraits in <c>docs/ui-reference</c>).
 /// </summary>
 internal sealed class DialogueBox
 {

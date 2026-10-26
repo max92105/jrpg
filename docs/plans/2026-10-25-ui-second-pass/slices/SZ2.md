@@ -1,0 +1,10 @@
+# SZ2. Sizing pass, title, dialogue, battle and outcomes
+
+Part of [the UI second pass plan](../README.md). Decision 251. Design: [design.md](../design.md), "Tunables and placeholders" (sizing targets). After SZ1. Look at `docs/ui-reference/battle-command-menu-1.webp`, `battle-command-menu-4.webp`, `battle-party-panel.webp`, `battle-victory.jpg`, `title-screen.jpg` and S0's captures of the same screens first.
+
+- **SZ2. Sizing pass, title, dialogue, battle and outcomes** (Game, about 200 lines)
+  - **Goal:** the same proportions outside the menu: the dialogue box's text and speaker, the interaction prompt, the yes/no prompt, the battle's party panel (names, HP numbers, labels, pips), the command panel's rows and hint, enemy tags, the turn order's diamonds, the banner, floating numbers, the victory and defeat screens, the leader choice. The title's entries wait for T3, which redraws them.
+  - **Steps:** as SZ1: measure, change the constants in place (`UiTheme`'s dialogue and prompt sizes, `Battle/PartyStatusView`, `BattleVitalRow`, `ResourceGaugeView`, `StatusMarksView`, `CommandPanelView`, `CommandPanelPlacement`, `EnemyTagView`, `TurnDiamondView`, `BattleBannerView`, `FloatingNumbersView`, `VictoryScreenView`, `DefeatScreenView`, `NewGame/LeaderProfileView`, `ConfirmPromptView`, `Exploration/InteractionPromptView`), then fix what no longer fits (the party panel's stacking for 4 members, the command panel's placement beside the actor, the victory cards' widths).
+  - `CommandPanelView` is at 282 lines: values only; if a fix adds lines, move the target pointer drawing out first and say so.
+  - **Tests:** none new. Budget the tests that pin places (`PromptPlacementTests`, battle layout tests such as `BattleLayout` spots, `PointedBarShapeTests` if the reward bar grows), about 25 lines.
+  - **Verify by hand:** F12 a dialogue, a battle (commands, a skill list, aiming, numbers), victory, defeat, the leader choice; compare with the reference and the before captures: larger, nothing clipped, the party panel still fits 4 members with their statuses.

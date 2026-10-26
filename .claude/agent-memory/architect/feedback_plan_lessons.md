@@ -51,4 +51,7 @@ When planning slices in this repo:
 **Why:** part 1 split slices mid-way; the part 2 devil's advocate (2026-10-17) raised exactly these as blockers/concerns.
 
 **How to apply:** check every plan against this list before handing it back. See [[migration-roadmap]].
+- Game UI facts that shape plans: `IMenuPage.Update` gets no delta (no time-based motion inside pages without changing the contract); `SceneStack` draws every scene, so a closing menu fades over the map; verify fails a changed file crossing 300 lines, so list files at 280+ and split before the slice that grows them.
+- The export of the reference game's UI is huge: plan slices by named subfolder, never "scan it all".
+- UI plans (developer, 2026-10-25): "coherent with itself everywhere" (one selection look, a rule every look slice follows); take the vibe, not one-for-one (kept the diamond, not the hand); everything was too small (plan a sizing pass early); plan a capture key first so look slices are specced from real screens; extend an interface with `Advance(delta)` rather than changing `Update`'s signature (170 test sites).
 - A Game look slice that adds a view type costs the view (~120 lines) plus its wiring in every caller plus the tests it replaces: LK1 (est. 240, real ~400) and LK2 (220, ~375) in the class-mechanics plan each came out 1.6x their estimate and were split at the slice step; estimate them at that rate, or split them up front.

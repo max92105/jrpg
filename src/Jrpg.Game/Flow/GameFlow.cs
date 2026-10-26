@@ -16,7 +16,7 @@ namespace Jrpg.Game.Flow;
 /// Owns the screens and the one playthrough (ADR 0008), and changes screens behind a fade to black when a scene asks.
 /// Its update never touches the graphics device, so it can run headless in tests; drawing is separate.
 /// </summary>
-internal sealed class GameFlow : IScene
+internal sealed class GameFlow : IScene, IFreezesFrame
 {
     // The fade for a new game, a load or the title (placeholder timing).
     private static readonly TimeSpan _fadeOut = TimeSpan.FromSeconds(0.5);
@@ -28,6 +28,11 @@ internal sealed class GameFlow : IScene
     private readonly SessionTransitions _sessions;
     private readonly MenuTransitions _menus;
     private readonly BattleTransitions _battles;
+
+    // A battle asked for waits through the flash over the frozen field, then goes behind the fade (decision 258).
+    private readonly EncounterFlash _flash = new();
+    private BattleRequested? _flashingBattle;
+    private Texture2D? _frozenFrame;
 
     /// <param name="catalog">The content, as loaded.</param>
     /// <param name="text">Messages and fonts.</param>
@@ -49,6 +54,9 @@ internal sealed class GameFlow : IScene
     /// <summary>The playthrough, once one has started; null on the title until a game starts.</summary>
     public GameSession? Session { get; private set; }
 
+    /// <summary>Whether an encounter's flash waits for a copy of the field's last frame to show still.</summary>
+    public bool WantsFrozenFrame => _flashingBattle is not null && _frozenFrame is null;
+
     /// <summary>
     /// Play time counts every update while a game is on, menus and pause included (developer decision 35). The scenes
     /// get no input while the fade plays, and a request one returns meanwhile waits for the fade to end.
@@ -57,6 +65,7 @@ internal sealed class GameFlow : IScene
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
         Session?.AddPlayTime(delta);
+        AdvanceFlash(delta);
         _fade.Update(delta);
         ApplyRequestOnceBlack();
         if (_fade.TakeReleased() is { } released)
@@ -64,13 +73,13 @@ internal sealed class GameFlow : IScene
             Start(released);
         }
 
-        var request = _scenes.Update(delta, _fade.IsFading ? default : input);
+        var request = _scenes.Update(delta, IsChanging ? default : input);
         if (request is null or QuitRequested)
         {
             return request;
         }
 
-        if (_fade.IsFading)
+        if (IsChanging)
         {
             _fade.Hold(request);
         }
@@ -85,6 +94,7 @@ internal sealed class GameFlow : IScene
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
         _scenes.Draw(batch, textures);
+        DrawFrozenFrame(batch, textures);
         var blackness = _fade.Blackness;
         if (blackness > 0)
         {
@@ -96,6 +106,10 @@ internal sealed class GameFlow : IScene
     {
         switch (request)
         {
+            case BattleRequested battle:
+                _flashingBattle = battle;
+                _flash.Start();
+                break;
             case MenuRequested:
                 _menus.Open(Session ?? throw new InvalidOperationException("The menu opened with no game started."));
                 break;
@@ -106,6 +120,36 @@ internal sealed class GameFlow : IScene
                 _fade.StartBehindFade(request);
                 break;
         }
+    }
+
+    public void FreezeFrame(Texture2D frame) => _frozenFrame = frame;
+
+    // The screen changes while the fade plays and while an encounter flashes: the scenes get no input meanwhile.
+    private bool IsChanging => _fade.IsFading || _flashingBattle is not null;
+
+    // Before the fade's own update, so the fade starts on the update the flash ends and one long update runs both.
+    private void AdvanceFlash(TimeSpan delta)
+    {
+        _flash.Advance(delta);
+        if (_flashingBattle is { } battle && !_flash.IsPlaying)
+        {
+            _flashingBattle = null;
+            _fade.StartBehindFade(battle);
+        }
+    }
+
+    // The field, still, from the encounter until the battle starts at black, under the flash and the fade. The white
+    // waits for the copy: with two updates before the first draw the flash is already lit, and the copy would keep it.
+    private void DrawFrozenFrame(SpriteBatch batch, TextureLibrary textures)
+    {
+        if (_frozenFrame is null)
+        {
+            return;
+        }
+
+        var screen = new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height);
+        batch.Draw(_frozenFrame, screen, Color.White);
+        batch.Draw(textures.Pixel, screen, Color.White * _flash.Whiteness);
     }
 
     private void ApplyRequestOnceBlack()
@@ -128,6 +172,7 @@ internal sealed class GameFlow : IScene
                 Session = null;
                 break;
             case BattleRequested:
+                _frozenFrame = null;
                 _battles.Start(Session ?? throw new InvalidOperationException("A battle started with no game started."));
                 break;
             case BattleFinished:

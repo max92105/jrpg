@@ -52,8 +52,8 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Folder | Purpose | Key types |
 |---|---|---|
 | (root) | Startup and the host loop | `Program`, `JrpgGame` |
-| Flow | The screens and the playthrough; applies scene requests | `GameFlow`, `FadeGate`, `SceneFactory`, `SessionTransitions`, `MenuTransitions`, `BattleTransitions` |
-| Scenes | The scene contract, the stack, requests, the screen fade | `IScene`, `SceneStack`, `SceneRequest` (+ records, `BattleRequested`, `BattleFinished`, `LeaderChosen`), `ScreenFade` |
+| Flow | The screens and the playthrough; applies scene requests | `GameFlow`, `EncounterFlash`, `FadeGate`, `SceneFactory`, `SessionTransitions`, `MenuTransitions`, `BattleTransitions` |
+| Scenes | The scene contract, the stack, requests, the screen fade | `IScene`, `IFreezesFrame` (the host copies the drawn frame for it), `SceneStack`, `SceneRequest` (+ records, `BattleRequested`, `BattleFinished`, `LeaderChosen`), `ScreenFade` |
 | Hosting | Window, settings, file locations | `PlayerSettings`, `TextSpeed`, `GamePaths`, `FullScreenShortcut`, `DeveloperLog` (the console and debug output), `CaptureFiles` (Debug: F12 saves the 1920 x 1080 screen to `docs/captures`; other builds `%LocalAppData%/Jrpg/Captures`) |
 | Audio | The voice-over path (ADR 0018): scenes write the channel, the host plays it after each update; no device means silent | `VoiceChannel`, `SoundLibrary`, `VoicePlayer` |
 | Input | Keys and pads to game buttons, per update; the device in use and its button names | `InputReader`, `InputFrame`, `InputBindings`, `GameButton`, `InputDevice`, `ButtonLabels` |

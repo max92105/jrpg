@@ -15,3 +15,9 @@ Part of [the UI second pass plan](../README.md). Decision 258. Design: [design.m
       - `IsPlaying_AfterTheFlash_IsFalse`
     - A new `GameFlowEncounterTests` class (`GameFlowTests` is at 369 lines): `Update_BattleRequested_FlashesBeforeTheFade`, `Update_BattleRequested_WantsAFrozenFrame`. The existing battle-start tests in `GameFlowTests` step through the flash if they stop at a fixed time; they stay seed-independent.
   - **Verify by hand:** walk in the forest until an encounter: the field freezes, flashes white, fades, the battle starts; no flash when a battle ends, on a warp or when the menu opens.
+- **Done, with deviations:**
+  - **A seam for the host:** `JrpgGame` knows its root scene only as an `IScene`, so the new `Scenes/IFreezesFrame` (`WantsFrozenFrame`, `FreezeFrame`) is what it checks after drawing; `GameFlow` implements it.
+  - **The flash runs before the fade's update** (`GameFlow.AdvanceFlash`), so the fade starts on the update the flash ends and one long update (the headless tests' 10 s steps) still reaches the battle; the existing battle tests pass unchanged.
+  - **The white waits for the copy** (after review): with two fixed-step updates before the first draw the flash is already lit, so the flow draws the white only over the frozen frame, which the copy never contains.
+  - **The host keeps its copy target** once made (about 8 MB), rather than freeing it after each transition; the flow drops its reference when the battle starts at black.
+  - **Tests:** the three planned `EncounterFlashTests` and a fourth (halfway down); `GameFlowEncounterTests` has the two planned and `Update_FlashOver_NoLongerWantsAFrozenFrame`, reusing `GameFlowTests.StartedFlow` and `SessionOf` (now internal). 2166 in all.

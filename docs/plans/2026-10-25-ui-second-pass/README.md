@@ -103,7 +103,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **M1. Tab icons: placeholder glyphs we draw** (Game, about 230 lines) → [slices/M1.md](slices/M1.md)
 
 ### Phase 5: the encounter
-- [ ] **B1a. The encounter freezes the field's last frame and flashes before the fade** (Game, about 200 lines) → [slices/B1a.md](slices/B1a.md)
+- [x] **B1a. The encounter freezes the field's last frame and flashes before the fade** (Game, about 200 lines) → [slices/B1a.md](slices/B1a.md)
 - [ ] **B1b. The frozen frame breaks into shards (`ShatterLayout`)** (Game, about 240 lines) → [slices/B1b.md](slices/B1b.md)
 - [ ] **B1c. The shards fly apart over the fade into battle** (Game, about 180 lines) → [slices/B1c.md](slices/B1c.md)
 

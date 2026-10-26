@@ -36,6 +36,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     private Point _windowSize = new(StartingWindowWidth, StartingWindowHeight);
     private SpriteBatch? _batch;
     private RenderTarget2D? _virtualScreen;
+    private RenderTarget2D? _frozenFrame;
     private TextureLibrary? _textures;
 
 #if DEBUG
@@ -129,6 +130,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
 #if DEBUG
         SaveAskedCapture();
 #endif
+        FreezeFrameIfWanted(batch);
 
         GraphicsDevice.SetRenderTarget(null);
         GraphicsDevice.Clear(Color.Black);
@@ -144,12 +146,30 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
         {
             _batch?.Dispose();
             _virtualScreen?.Dispose();
+            _frozenFrame?.Dispose();
             _textures?.Dispose();
             _voicePlayer?.Dispose();
             _sounds?.Dispose();
         }
 
         base.Dispose(disposing);
+    }
+
+    // A still copy of the frame just drawn, for a root scene that shows it (the field breaking into a battle); the
+    // target is made once and kept, about 8 MB of video memory.
+    private void FreezeFrameIfWanted(SpriteBatch batch)
+    {
+        if (_rootScene is not IFreezesFrame { WantsFrozenFrame: true } freezing)
+        {
+            return;
+        }
+
+        _frozenFrame ??= new RenderTarget2D(GraphicsDevice, VirtualScreen.Width, VirtualScreen.Height);
+        GraphicsDevice.SetRenderTarget(_frozenFrame);
+        batch.Begin(samplerState: SamplerState.PointClamp);
+        batch.Draw(_virtualScreen, Vector2.Zero, Color.White);
+        batch.End();
+        freezing.FreezeFrame(_frozenFrame);
     }
 
     private static Point ReadDisplaySize()

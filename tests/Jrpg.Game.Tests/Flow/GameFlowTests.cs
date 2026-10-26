@@ -356,7 +356,7 @@ public sealed class GameFlowTests : IDisposable
     private static LeaderChoice Choice(string memberId) => new() { MemberId = memberId };
 
     // A new game whose fade is over, so the map gets input.
-    private static GameFlow StartedFlow(SaveSlots? slots = null, ContentCatalog? catalog = null)
+    internal static GameFlow StartedFlow(SaveSlots? slots = null, ContentCatalog? catalog = null)
     {
         var flow = FlowWithLeaderConfirmed(slots, catalog);
         flow.Update(_fadeOut, default);
@@ -364,6 +364,6 @@ public sealed class GameFlowTests : IDisposable
         return flow;
     }
 
-    private static GameSession SessionOf(GameFlow flow) =>
+    internal static GameSession SessionOf(GameFlow flow) =>
         flow.Session ?? throw new InvalidOperationException("The flow has no session yet.");
 }

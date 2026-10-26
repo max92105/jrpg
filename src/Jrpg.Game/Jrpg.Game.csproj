@@ -23,6 +23,8 @@
   <!-- Debug reads the repository's content/ directly, so an edit shows on the next start without rebuilding (plan 3a, decision 77). -->
   <ItemGroup Condition="'$(Configuration)' == 'Debug'">
     <AssemblyMetadata Include="ContentRoot" Value="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\content'))" />
+    <!-- The F12 captures go in the repository, so they travel with it between machines (plan 2026-10-25-ui-second-pass, S0). -->
+    <AssemblyMetadata Include="CaptureRoot" Value="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\docs\captures'))" />
   </ItemGroup>
 
   <!-- A published build carries its own copy of content/. -->

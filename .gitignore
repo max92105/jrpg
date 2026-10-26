@@ -57,3 +57,6 @@ CLAUDE.local.md
 .claude/worktrees/
 # Keep committed: CLAUDE.md, .claude/settings.json, .claude/agents/, .claude/skills/,
 # .claude/rules/, .claude/hooks/, .claude/agent-memory/ (shared reviewer/architect memory)
+
+# Raw F12 captures; the kept sets are converted to JPEG in subfolders (plan 2026-10-25-ui-second-pass, S0).
+docs/captures/*.png

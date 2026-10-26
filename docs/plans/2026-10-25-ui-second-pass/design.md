@@ -27,7 +27,7 @@ Every value is a placeholder. Screen values are named constants in the type that
 
 | Name | Where | Placeholder | Meaning | Slice |
 |---|---|---|---|---|
-| Capture key | `JrpgGame` (Debug only) | F12; files `capture-<yyyyMMdd-HHmmss>-<n>.png` in `%USERPROFILE%\Pictures\jrpg-captures\` | Today's screens for specs and hand checks | S0 |
+| Capture key | `JrpgGame` (Debug only) | F12; files `capture-<yyyyMMdd-HHmmss>-<n>.png` in the repository's `docs/captures/` (Debug builds) | Today's screens for specs and hand checks | S0 |
 | Title font | `content/art/fonts/titles/` | Cormorant Garamond SemiBold (decision 250) | | T1 |
 | Title name size | `Title/TitleScene` | 120 px | | T1 |
 | Selection look | `UiTextures.DrawSelectedRow` + `MenuPointer` | today's `UiTheme.SelectedRow`, `HighlightLine`, 14 px diamond | Decision 252 | P1a |

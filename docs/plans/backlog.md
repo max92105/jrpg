@@ -69,3 +69,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `content/art/backgrounds/GameMenu.png` is 4096 x 2838 (23 MB, about 46 MB of video memory) for a 1920 x 1080 screen: a 1920 x 1330 copy would decode about five times faster (BG1). The developer's art; ask first.
 - The battle's skill hint doesn't wrap: a long description runs past its box over the actor's portrait (`docs/captures/before/battle-skill.jpg`; SZ2).
 - **Centering a line of text in a row is written about 10 times**, as `row.Y + ((RowHeight - font.LineHeight) / 2f)`: `EquipmentChoiceView`, `EquipmentSheetView` (twice), `InventoryListView`, `OptionsPage`, `SystemPage`, `PartyActionChoiceView` (integer division), `ConfirmPromptView` and others. A small `Ui` helper could hold it, as `FooterBar.TextTop` does for footers. It can wait because each copy is one line. (C2 review)
+
+## From the escape menu third pass plan (2026-10-26)
+
+- Two refusals are still red lines while the Party page's open the OK dialog (`Ui/NoticeDialog`, decision 268): Equipment's notice under its parameters (`EquipmentSheetView`, `UiTheme.Danger`) and the save page's failure line (`SavePage`). Kept as they are by decision 284; move them to `NoticeDialog` if the developer asks for it.

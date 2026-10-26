@@ -1,8 +1,8 @@
 # UI second pass and clean-up
-Status: approved
+Status: retro pending
 
 Third feature plan after the migration, following the class mechanics plan.
-- Decisions 231-235 and 249-264 are recorded below. Questions 236-248 are answered (decisions 249-263); question 265 is open; the next free number is 266.
+- Decisions 231-235 and 249-264 are recorded below. Questions 236-248 are answered (decisions 249-263); question 265 was answered by decision 266 in [the escape menu third pass plan](../2026-10-26-escape-menu-third-pass/README.md).
 - This plan writes ADR 0025 (font roles); the next ADR is 0026.
 
 Developer's request (2026-10-25, translated): "a second pass on UI and clean-up". The larger direction, for later plans: an investor demo, "something I can show to people to get funding for an artist to come in and clean up": clean code, clean UI/UX, some animation, music, a playable Act 1 with no bugs.
@@ -107,7 +107,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 6: clean-up and walk-through
 - [x] **C2. Footer hints on `FooterBar.TextTop`, time shares on `Easing`** (Game, about 120 lines) → [slices/C2.md](slices/C2.md)
-- [ ] **Z. Demo walk-through against the captures and the index** (manual) → [slices/Z.md](slices/Z.md)
+- [x] **Z. Demo walk-through against the captures and the index** (manual) → [slices/Z.md](slices/Z.md)
+  - Done 2026-10-26: the developer's walk-through of the menu produced the nine findings now planned in [the escape menu third pass plan](../2026-10-26-escape-menu-third-pass/README.md) (captures in `docs/captures/2026-10-26-menu/`).
 
 ## Decisions
 Questions and decisions share numbers.

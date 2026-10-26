@@ -1,0 +1,17 @@
+# PC1. Column panels, and the single-column pages on them
+
+Part of [the escape menu third pass plan](../README.md). Decisions 269, 285. Design: [design.md](../design.md), "Tunables and placeholders" (layout and columns), "Key decisions" (pages draw their own columns; left edges, the page closes the last). After SB1. Look at `docs/ui-reference/menu-inventory-description.webp`, `menu-status.webp` and `menu-equipment.webp` first: the columns run from the header to the footer, darker than the map, with a hairline at each side; the member column is a darker strip.
+
+- **PC1. Column panels: `ColumnPanelView`; Status, Party, Options, System and the member column on them** (Game, about 170 lines with the 1.6x for a new view)
+  - **Goal:** Status, Party, Options and System (with its save and load files) sit on a dark translucent column from the header to the footer; the member column beside Status and Equipment is a darker strip of the same height.
+  - **New types:**
+    - Game `Ui/ColumnPanelStyle` (internal sealed record): a column panel's look: its flat fill and its edge hairline. `ColumnPanelStyle(Color Fill, Color Edge)`.
+    - Game `Ui/ColumnPanelView` (internal sealed): draws a column panel: its fill and its left edge, from the plain pixel; the page closes its last column. `ColumnPanelView(ColumnPanelStyle style)`; `Draw(SpriteBatch batch, Texture2D pixel, Rectangle column, float opacity)`; `DrawRightEdge(SpriteBatch batch, Texture2D pixel, Rectangle column, float opacity)`.
+  - **Changes (Game):**
+    - `Menus/MenuLayout`: `FullHeight(Rectangle area)`: the same left and width, from the header's bottom to the footer's top.
+    - `Ui/UiTheme`: `PageColumn` and `SideColumn` (flat; a gradient only if Z asks for one).
+    - `Menus/GameMenuScene`: the member column's strip on `SideColumn` at full height before `MemberColumnView`; the page's column draws its own left edge beside it.
+    - `Menus/StatusPage`, `OptionsPage`, `SystemPage`: `PageColumn` over the full height of their single column, then its right edge. `SystemPage` draws it before its early return to the open files, so Save and Load sit on it.
+    - `Menus/PartyPage`: `PageColumn` over its whole area's full height, closed on the right. `PartyColumnsView`: a 1 px divider in `PageColumn`'s edge color between the active and reserve columns, from the section titles down. `PartyPage` is at 258: it gains a field and two lines.
+  - **Tests:** none new (draw-only; `FullHeight` only restates two constants). `GameMenuSceneTests`, `MenuLayoutTests` and every page's tests pass unchanged.
+  - **Verify by hand:** F12 on Status, Party, Options, System, Save and Load: the content on one dark column with faint side lines, header to footer, sliding in with the page; the map on the right of the single columns; the member column a darker strip whose edge is the page column's divider; nothing clipped. Compare with the reference shots above and the 2026-10-26 captures.

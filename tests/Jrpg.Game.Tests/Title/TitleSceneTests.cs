@@ -99,6 +99,17 @@ public sealed class TitleSceneTests : IDisposable
         Assert.Null(request);
     }
 
+    [Fact]
+    public void Update_ConfirmDuringEntrance_ChoosesTheEntry()
+    {
+        var scene = NewScene();
+        Select(scene, TitleEntry.NewGame);
+
+        var request = scene.Update(_oneUpdate, Pressing(GameButton.Confirm));
+
+        Assert.IsType<NewGameRequested>(request);
+    }
+
     private void SaveWithPlayTime(int slot, TimeSpan playTime)
     {
         var session = GameSession.StartNew(StartMapScenarios.BelowClosedDoor, "sarxian", new SeededRandom(1));

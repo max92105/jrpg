@@ -39,6 +39,9 @@ internal static class MessageIds
     /// <summary>The title's entry that closes the game.</summary>
     public const string TitleQuit = "title_quit";
 
+    /// <summary>The line at the bottom of the title screen.</summary>
+    public const string TitleFooter = "title_footer";
+
     /// <summary>The heading of the screen where a new game's leader is chosen.</summary>
     public const string LeaderChoiceTitle = "leader_choice_title";
 

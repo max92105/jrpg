@@ -11,6 +11,7 @@
   "title_continue": "Continue",
   "title_load": "Load Game",
   "title_quit": "Quit",
+  "title_footer": "Prototype build",
   "leader_choice_title": "Choose your leader",
   "leader_choice_confirm": "Begin as {name}?",
   "leader_choice_hint": "Choose who leads the journey.",

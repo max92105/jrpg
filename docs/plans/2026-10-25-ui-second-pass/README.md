@@ -76,7 +76,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **T1. A title font; the game's name on the title screen in it** (Game + content font, about 160 lines) → [slices/T1.md](slices/T1.md)
 - [x] **T2. The title font elsewhere: "Victory!", the defeat title, the leader's name** (Game, about 80 lines) → [slices/T2.md](slices/T2.md)
 - [x] **P1a. One pointer and one selection look on every list** (Game, about 170 lines) → [slices/P1a.md](slices/P1a.md)
-- [ ] **T3. Title entrance and a clear selection: the screen fades in, entries in the shared selection look, a footer line** (Game, about 220 lines) → [slices/T3.md](slices/T3.md)
+- [x] **T3. Title entrance and a clear selection: the screen fades in, entries in the shared selection look, a footer line** (Game, about 220 lines) → [slices/T3.md](slices/T3.md)
 
 ### Phase 3: windows and the map
 - [ ] **C1. `UiTheme` in partial files by screen** (Game, mechanical, about 300 lines moved, 30 new) → [slices/C1.md](slices/C1.md)

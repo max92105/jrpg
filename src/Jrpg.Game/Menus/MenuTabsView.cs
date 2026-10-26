@@ -84,7 +84,7 @@ internal sealed class MenuTabsView
         var icon = new Rectangle(left, tabTop + ((NavTabShape.Height - IconSize) / 2), IconSize, IconSize);
         batch.Draw(_ui.TabIcon(textures, _tabs[index].Glyph), icon, Color.White * opacity);
         var labelTop = tabTop + ((NavTabShape.Height - _font.LineHeight) / 2f);
-        batch.DrawString(_font, _tabs[index].Label, new Vector2(icon.Right + IconGap, labelTop), UiTheme.TextPrimary * (opacity * (1 - place.Fold.Share)));
+        batch.DrawString(_font, _tabs[index].Label, new Vector2(icon.Right + IconGap, labelTop), UiTheme.TextPrimary * (opacity * place.Fold.LabelOpacity));
     }
 
     // A tab's left edge, pushed off the screen as far as the tabs have folded.

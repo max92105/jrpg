@@ -15,6 +15,13 @@ internal sealed class TabFold
     /// <summary>How much of each tab stays on screen once folded: its point and its icon (placeholder).</summary>
     public const int RailWidth = 120;
 
+    // The labels fade twice as fast as the tabs fold: gone by the fold's middle, back over the unfold's last half. That
+    // last stretch starts where a full unfold's eased share is (1 - progress)³, so the labels land with the tabs.
+    private const float LabelFadeSpeed = 2;
+    private const float LabelsReturnProgress = 1 - (1 / LabelFadeSpeed);
+    private const float LabelsReturnShare =
+        (1 - LabelsReturnProgress) * (1 - LabelsReturnProgress) * (1 - LabelsReturnProgress);
+
     // The raw share of the way toward the current target, 0 to 1; Share eases it in the direction of travel.
     private float _progress = 1;
     private bool _isFolding;
@@ -24,6 +31,12 @@ internal sealed class TabFold
 
     /// <summary>How far each tab is pushed off the screen's left edge, in virtual pixels.</summary>
     public int HiddenWidth => (int)Math.Round(Share * (NavTabShape.Width - RailWidth));
+
+    /// <summary>
+    /// How visible the tab labels are, 0 to 1, so no half-word shows at the screen's edge. It moves on its own rather
+    /// than following <see cref="Share"/>, so turning back mid-way never makes the labels pop.
+    /// </summary>
+    public float LabelOpacity { get; private set; } = 1;
 
     public void Fold()
     {
@@ -49,7 +62,19 @@ internal sealed class TabFold
         _progress = ProgressToward(share);
     }
 
-    public void Advance(TimeSpan delta) => _progress = Math.Min(1, _progress + (float)(delta / Duration));
+    public void Advance(TimeSpan delta)
+    {
+        var step = (float)(delta / Duration);
+        _progress = Math.Min(1, _progress + step);
+        if (_isFolding)
+        {
+            LabelOpacity = Math.Max(0, LabelOpacity - (step * LabelFadeSpeed));
+        }
+        else if (Share <= LabelsReturnShare)
+        {
+            LabelOpacity = Math.Min(1, LabelOpacity + (step * LabelFadeSpeed));
+        }
+    }
 
     // The progress at which the eased share has left `remaining` of the way to go: CubicOut's inverse, 1 - (1 - p)³ =
     // 1 - remaining.

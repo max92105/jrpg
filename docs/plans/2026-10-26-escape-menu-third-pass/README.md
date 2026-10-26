@@ -1,7 +1,7 @@
 # Escape menu third pass
 Status: approved
 
-Fourth feature plan after the migration, following the UI second pass (`2026-10-25-ui-second-pass`, now retro pending).
+Fourth feature plan after the migration, following the UI second pass (`done/2026-10-25-ui-second-pass`, retro skipped).
 - Decisions 266-272 and 282-290 are recorded below. Questions 273-281 are answered (decisions 282-290); none is open; the next free number is 291.
 - No ADR is needed; the next ADR is still 0026.
 

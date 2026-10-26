@@ -1,5 +1,5 @@
 # UI second pass and clean-up
-Status: retro pending
+Status: done (retro skipped)
 
 Third feature plan after the migration, following the class mechanics plan.
 - Decisions 231-235 and 249-264 are recorded below. Questions 236-248 are answered (decisions 249-263); question 265 was answered by decision 266 in [the escape menu third pass plan](../2026-10-26-escape-menu-third-pass/README.md).

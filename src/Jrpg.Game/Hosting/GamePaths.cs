@@ -6,4 +6,8 @@ internal static class GamePaths
     /// <summary><c>%LocalAppData%/Jrpg/Saves</c> (decision 64).</summary>
     public static string SaveDirectory { get; } =
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Jrpg", "Saves");
+
+    /// <summary><c>%UserProfile%/Pictures/jrpg-captures</c>: the debug captures, kept out of the repository.</summary>
+    public static string CaptureDirectory { get; } =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyPictures), "jrpg-captures");
 }

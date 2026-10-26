@@ -62,7 +62,7 @@ At the end of this plan:
 One line per slice; each slice's goal, types, tests and hand checks are in its file under `slices/`. Tick the box here when a slice is done, and write its deviations in the slice file. Tunables, design overview, clean-up selection and risks: [design.md](design.md).
 
 ### Phase 0: capture, bug, reference
-- [ ] **S0. A debug key saves the 1920 x 1080 screen as a PNG outside the repo; the developer captures today's screens** (Game, about 110 lines) → [slices/S0.md](slices/S0.md)
+- [x] **S0. A debug key saves the 1920 x 1080 screen as a PNG outside the repo; the developer captures today's screens** (Game, about 110 lines) → [slices/S0.md](slices/S0.md)
 - [ ] **BG1. The first menu opening stalls and skips its fade: find the cause, warm it up, test it** (Game, about 150 lines) → [slices/BG1.md](slices/BG1.md)
 - [ ] **R1. `docs/ui-reference/`: the folder renamed, the screenshots renamed, a README; the reference-only rule** (docs + comments, about 90 lines) → [slices/R1.md](slices/R1.md)
 - [ ] **R2. The export index: 2-4 named files per screen and the idea to take** (docs, about 60 lines) → [slices/R2.md](slices/R2.md)

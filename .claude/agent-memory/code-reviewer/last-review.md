@@ -5,9 +5,7 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-24-class-mechanics/slices/LK3.md, slice LK3 (formation slide, aura floor glow, extra-turn mark)
-Round: 1 (verdict: Fix the Criticals, then commit)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/S0.md, slice S0 (F12 debug capture, CaptureFiles)
+Round: 1 (verdict: Ready to commit)
 
-- Critical: PartyStatusView `_drawOrder` no longer the draw order (Draw iterates by panel index; field only feeds PlacePanels stacking); rename e.g. `_panelAtPlace`; open
-- Warning: PartyStatusView.Refresh summary "allocating nothing when none did" now false: PlacePanels allocates `new int[]` each refresh; reuse a scratch array or fix the summary; open
-- Suggestion: FormationSlide.Share public with no outside reader; make private; open
+- Suggestion: CaptureFiles.Directory property shadows System.IO.Directory inside the class; consider `Folder`; open

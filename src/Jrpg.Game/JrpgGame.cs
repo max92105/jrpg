@@ -37,6 +37,12 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     private RenderTarget2D? _virtualScreen;
     private TextureLibrary? _textures;
 
+#if DEBUG
+    // F12 is a developer tool, not a game action, so it is read here rather than through the input bindings.
+    private readonly CaptureFiles _captures = new(GamePaths.CaptureDirectory);
+    private bool _isCaptureAsked;
+#endif
+
     // Null when the machine has no sound device: the game then runs silent (ADR 0018).
     private SoundLibrary? _sounds;
     private VoicePlayer? _voicePlayer;
@@ -79,6 +85,9 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     {
         var keyboard = Keyboard.GetState();
         var isShortcutPressed = IsActive && FullScreenShortcut.IsPressed(_previousKeyboard, keyboard);
+#if DEBUG
+        _isCaptureAsked |= IsActive && keyboard.IsKeyDown(Keys.F12) && _previousKeyboard.IsKeyUp(Keys.F12);
+#endif
         _previousKeyboard = keyboard;
         if (isShortcutPressed)
         {
@@ -112,6 +121,9 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
         batch.Begin(samplerState: SamplerState.PointClamp);
         _rootScene.Draw(batch, _textures!);
         batch.End();
+#if DEBUG
+        SaveAskedCapture();
+#endif
 
         GraphicsDevice.SetRenderTarget(null);
         GraphicsDevice.Clear(Color.Black);
@@ -158,6 +170,27 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
         _sounds = new SoundLibrary(_audioRoot);
         _voicePlayer = new VoicePlayer(_sounds);
     }
+
+#if DEBUG
+    // The virtual screen, so a capture is 1920 x 1080 whatever the window's size.
+    private void SaveAskedCapture()
+    {
+        if (!_isCaptureAsked)
+        {
+            return;
+        }
+
+        _isCaptureAsked = false;
+        Directory.CreateDirectory(_captures.Folder);
+        var path = _captures.NextPath(DateTime.Now);
+        using (var file = File.Create(path))
+        {
+            _virtualScreen!.SaveAsPng(file, VirtualScreen.Width, VirtualScreen.Height);
+        }
+
+        DeveloperLog.Report($"Capture saved: {path}");
+    }
+#endif
 
     private Point BackBufferSize() => _settings.IsFullScreen ? ReadDisplaySize() : _windowSize;
 

@@ -36,6 +36,10 @@ internal sealed class GameFlow : IScene
     private readonly EncounterFlash _flash = new();
     private readonly ShatterView _shatterView = new();
 
+    // How far the shards have flown, over the fade-out. A fresh one per encounter: the last one has flown all the way,
+    // and its full share would show the next break's shards already faded away.
+    private EncounterShatter _shatter = new(_fadeOut);
+
     // The battle asked for, held while the flash plays (decision 258), then handed to the fade.
     private BattleRequested? _encounter;
 
@@ -84,6 +88,7 @@ internal sealed class GameFlow : IScene
         // The flash first, so an update that ends it also runs the fade it starts.
         AdvanceEncounterFlash(delta);
         _fade.Update(delta);
+        FlyShards(delta);
         ApplyRequestOnceBlack();
         if (_fade.TakeReleased() is { } released)
         {
@@ -147,6 +152,7 @@ internal sealed class GameFlow : IScene
             case BattleRequested battle:
                 _encounter = battle;
                 _encounterCount++;
+                _shatter = new EncounterShatter(_fadeOut);
                 _flash.Start();
                 break;
             default:
@@ -155,7 +161,7 @@ internal sealed class GameFlow : IScene
         }
     }
 
-    // When the flash has played, the battle goes behind the usual fade, still over the frozen frame.
+    // When the flash has played, the battle goes behind the usual fade and the shards start flying apart over it.
     private void AdvanceEncounterFlash(TimeSpan delta)
     {
         if (_encounter is null)
@@ -167,8 +173,21 @@ internal sealed class GameFlow : IScene
         if (!_flash.IsPlaying)
         {
             _fade.StartBehindFade(_encounter);
+            _shatter.Start();
             _encounter = null;
         }
+    }
+
+    // The shards fly while the frozen frame shows, from the fade's start; the update moves them, so drawing only draws.
+    private void FlyShards(TimeSpan delta)
+    {
+        if (_frozenFrame is null)
+        {
+            return;
+        }
+
+        _shatter.Advance(delta);
+        _shatterView.Fly(_shatter);
     }
 
     // The frame cracks into shards at the flash's peak. The white is drawn only over the frozen frame, so the frame the

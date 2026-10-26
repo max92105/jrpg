@@ -57,6 +57,38 @@ public sealed class ShatterLayoutTests
         Assert.InRange(layout.Shards.Count, 20, 28);
     }
 
+    [Fact]
+    public void Break_EachShard_FliesAwayFromTheImpact()
+    {
+        var layout = ShatterLayout.Break(_center, seed: 7);
+        var impact = _center.ToVector2();
+
+        Assert.All(layout.Shards, shard => Assert.True(
+            Vector2.Distance(shard.Center + shard.OffsetAt(seconds: 0.5f), impact) > Vector2.Distance(shard.Center, impact)));
+    }
+
+    [Fact]
+    public void Break_EachShard_FliesWithinTheSpeedAndSpinLimits()
+    {
+        var layout = ShatterLayout.Break(_center, seed: 7);
+
+        Assert.All(layout.Shards, shard =>
+        {
+            Assert.InRange(shard.Velocity.Length(), 300f - 0.01f, 900f + 0.01f);
+            Assert.InRange(Math.Abs(shard.Spin), 0f, (1.5f * MathF.Tau) + 0.01f);
+        });
+    }
+
+    [Fact]
+    public void Break_SameSeed_GivesTheSameFlights()
+    {
+        var first = ShatterLayout.Break(_center, seed: 7);
+
+        var second = ShatterLayout.Break(_center, seed: 7);
+
+        Assert.Equal(first.Shards.Select(shard => (shard.OffsetAt(0.5f), shard.RotationAt(0.5f))), second.Shards.Select(shard => (shard.OffsetAt(0.5f), shard.RotationAt(0.5f))));
+    }
+
     private static bool IsOnTheBorder(Vector2 corner) =>
         corner.X == 0 || corner.Y == 0 || corner.X == VirtualScreen.Width || corner.Y == VirtualScreen.Height;
 

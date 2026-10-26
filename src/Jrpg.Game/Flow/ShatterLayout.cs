@@ -7,7 +7,8 @@ namespace Jrpg.Game.Flow;
 /// The frozen frame broken into glass shards around an impact point (decision 258). Eight rays run from the impact to
 /// the screen's edge: to the four corners, and to a jittered point on each edge, so the outermost shards end exactly on
 /// the screen's border. One jittered ring crosses them. The ring and the impact make a fan of 8 shards, and the
-/// quads between the ring and the border split into 16 more: 24 in all, tiling the screen exactly.
+/// quads between the ring and the border split into 16 more: 24 in all, tiling the screen exactly. Each flies outward
+/// from the impact at its own speed and spin.
 /// </summary>
 internal sealed class ShatterLayout
 {
@@ -18,6 +19,11 @@ internal sealed class ShatterLayout
     private const float RingShareMin = 0.35f;
     private const float EdgeShareMin = 0.25f;
     private const float EdgeShareMax = 0.75f;
+
+    // Placeholder flight: outward from the impact at 300 to 900 px/s, turning up to 1.5 turns a second either way.
+    private const float SpeedMin = 300;
+    private const float SpeedMax = 900;
+    private const float SpinMax = 1.5f * MathF.Tau;
 
     private ShatterLayout(Vector2 impact, IReadOnlyList<Shard> shards)
     {
@@ -42,12 +48,18 @@ internal sealed class ShatterLayout
         var border = BorderPoints(random);
         var ring = border.Select(point => Vector2.Lerp(center, point, Between(random, RingShareMin, RingShareMax))).ToArray();
         var shards = new List<Shard>();
+        void Add(Vector2 a, Vector2 b, Vector2 c)
+        {
+            var velocity = Vector2.Normalize(((a + b + c) / 3f) - center) * Between(random, SpeedMin, SpeedMax);
+            shards.Add(new Shard(a, b, c, velocity, Between(random, -SpinMax, SpinMax)));
+        }
+
         for (var ray = 0; ray < border.Length; ray++)
         {
             var next = (ray + 1) % border.Length;
-            shards.Add(new Shard(center, ring[ray], ring[next]));
-            shards.Add(new Shard(ring[ray], ring[next], border[next]));
-            shards.Add(new Shard(ring[ray], border[next], border[ray]));
+            Add(center, ring[ray], ring[next]);
+            Add(ring[ray], ring[next], border[next]);
+            Add(ring[ray], border[next], border[ray]);
         }
 
         return new ShatterLayout(center, shards);

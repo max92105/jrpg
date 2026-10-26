@@ -43,7 +43,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 - **Enemy attack strips are drawn unmirrored over the party**; no flip rule is decided (B5d). A design question for the developer.
 - **"Load the latest save" and the save-list overlay are written twice** (`TitleScene`, `DefeatScreen`/`DefeatScreenView`). Share them in the **autosave plan**, which is likely to add the third copy.
-- **The banner band is drawn twice** (`BattleBannerView`, `BattleScene.DrawEscaped`). Share it in the **map name banner plan**, the third copy.
+- **The banner band** is drawn only by `BattleScene.DrawEscaped` now (the action name moved into a framed window in W1a). Share it with the **map name banner plan** when that plan draws the second one.
 - `TileImages.Forget` keeps cached field-sprite frames; drop them too once field sprites can be imported (no import yet).
 
 ## From the demo retirement plan (2026-10-23)

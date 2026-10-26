@@ -7,28 +7,26 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Draws the banner: centered 190 px from the top, the message on a dark band that fades out at both ends, between two
-/// bright hairlines.
+/// Draws the banner: the action's name in a small framed window (<see cref="FramedWindowView"/>), its top 190 px down,
+/// centered across the screen, under the turn order.
 /// </summary>
 internal sealed class BattleBannerView
 {
-    // Placeholder layout on the 1920 x 1080 virtual screen (decision 56).
+    // Placeholder layout on the 1920 x 1080 virtual screen (decision 56): the window's top, its narrowest body.
     private const int Top = 190;
-    private const int PaddingX = 120;
-    private const int PaddingY = 12;
-    private const int MinWidth = 640;
+    private const int MinBodyWidth = 300 - (2 * FramedWindowLayout.PaddingX);
     private const int TextPixels = 28;
 
     private readonly BattleBanner _banner;
-    private readonly UiTextures _ui;
     private readonly SpriteFontBase _font;
-    private MeasuredText _text = new(string.Empty, 0);
+    private MeasuredText _text;
+    private FramedWindowLayout _window;
 
-    public BattleBannerView(BattleBanner banner, ScreenText text, UiTextures ui)
+    public BattleBannerView(BattleBanner banner, ScreenText text)
     {
         _banner = banner;
-        _ui = ui;
         _font = text.Fonts.FontAt(TextPixels);
+        Measure(string.Empty);
     }
 
     public void Draw(SpriteBatch batch, TextureLibrary textures)
@@ -41,16 +39,20 @@ internal sealed class BattleBannerView
 
         if (!ReferenceEquals(_text.Text, _banner.Text))
         {
-            _text = MeasuredText.Of(_font, _banner.Text);
+            Measure(_banner.Text);
         }
 
-        var width = Math.Max(MinWidth, (int)_text.Width + (2 * PaddingX));
-        var band = new Rectangle((VirtualScreen.Width - width) / 2, Top, width, (int)_font.LineHeight + (2 * PaddingY));
-        var tint = Color.White * opacity;
-        batch.Draw(_ui.Gradient(textures, UiTheme.Banner), band, tint);
-        var line = _ui.Gradient(textures, UiTheme.HighlightLine);
-        batch.Draw(line, new Rectangle(band.X, band.Y, band.Width, 1), tint);
-        batch.Draw(line, new Rectangle(band.X, band.Bottom - 1, band.Width, 1), tint);
-        batch.DrawString(_font, _text.Text, new Vector2(band.Center.X - (_text.Width / 2), band.Y + PaddingY), UiTheme.TextPrimary * opacity);
+        FramedWindowView.Draw(batch, textures.Pixel, _window, opacity);
+        var body = _window.Body;
+        batch.DrawString(_font, _text.Text, new Vector2(body.Center.X - (_text.Width / 2), body.Y), UiTheme.TextPrimary * opacity);
+    }
+
+    // Measured and laid out only when the text changes, never per frame.
+    private void Measure(string text)
+    {
+        _text = MeasuredText.Of(_font, text);
+        var body = new Point(Math.Max(MinBodyWidth, (int)Math.Ceiling(_text.Width)), (int)_font.LineHeight);
+        var frameHeight = body.Y + (2 * FramedWindowLayout.PaddingY);
+        _window = FramedWindowLayout.Untitled(new Point(VirtualScreen.Width / 2, Top + (frameHeight / 2)), body);
     }
 }

@@ -20,3 +20,8 @@ The titled variant and its separator are W1b's (the devil's advocate's split).
     - `Untitled_Body_IsInsideTheInnerFrame`
     - `Untitled_InnerFrame_IsInsetFromTheFrame`
   - **Verify by hand:** in a battle, each action's name shows in a small framed box near the top, fading like the old band; long names widen it; it doesn't cover the turn order. F12, compare with the before capture and `battle-damage-numbers.webp`.
+- **Done, with deviations:**
+  - **Placement:** the window's top is 190 px, not 150. The turn order reaches about 160 px down and spans to x 994, so a centered window at 150 would cover its end; 190 is where the band was.
+  - **The view:** `FramedWindowView` is a static helper like `Outline` and `HeaderBar`, since it holds no state.
+  - **Colors:** the body reuses `UiTheme.Surface`, which is the design's `#C70C0D11`, so only `WindowLine` is new.
+  - **Cleanup:** `BattleBannerView` no longer needs `UiTextures`.

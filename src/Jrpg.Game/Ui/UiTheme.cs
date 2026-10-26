@@ -139,8 +139,11 @@ internal static partial class UiTheme
     public static ImmutableArray<GradientStop> SidebarPanel { get; } =
         [new(0, FromStraightArgb(0x000C0D11)), new(0.3f, FromStraightArgb(0x800C0D11)), new(1, FromStraightArgb(0xCC0C0D11))];
 
-    /// <summary>A translucent panel over a page, such as the equipment choice.</summary>
+    /// <summary>A translucent panel over a page, such as the equipment choice, and a framed window's body.</summary>
     public static Color Surface { get; } = FromStraightArgb(0xC70C0D11);
+
+    /// <summary>A framed window's two hairlines (<see cref="FramedWindowView"/>).</summary>
+    public static Color WindowLine { get; } = FromStraightArgb(0x66FFFFFF);
 
     /// <summary>A stat that goes up in a preview.</summary>
     public static Color Positive { get; } = FromStraightArgb(0xFF6FD3E0);

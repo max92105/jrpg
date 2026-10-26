@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/B1b.md, slice B1b (frozen frame breaks into shards: Shard, ShatterLayout, ShatterView, EncounterFlash.IsPastPeak, GameFlow seed/lazy view)
-Round: 1 (verdict: Fix the Criticals, then commit)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/B1c.md, slice B1c (shards fly apart: Shard flight, EncounterShatter, ShatterView.PlaceShards, GameFlow black under shards)
+Round: 1 (verdict: Ready to commit)
 
-- C1 EncounterFlash.IsPastPeak has no test though EncounterFlashTests exists; add before-start false, just-under-rise false, at-rise true, after-flash-ends still true; open
-- S1 GameFlow.ShatterViewFor is a noun phrase; name it PrepareShatterView or similar; open
-- S2 ShatterView.Show builds vertices rather than showing; BuildVertices/Shows -> IsBuiltFor would read closer to what it does; open
-- S3 Break_ShardCount_IsAboutTheTarget InRange(20,28) on a layout that is always 24; pin Equal(24); open
+- W1 EncounterShatter.Length 0.5 s copies GameFlow._fadeOut; pass the fade-out length into EncounterShatter's constructor; open
+- W2 ShatterView.PlaceShards recomputes Normalize(center - _impact), which is Shard.Direction; use shard.Direction * CrackWidth, drop _impact field and BuildVertices' impact parameter; open
+- S1 Shard's empty <param name="A/B/C"></param> tags; drop or describe "a corner"; open
+- S2 Speed 300-900 and spin +-1.5 bounds untested; optional InRange test over the shards; open

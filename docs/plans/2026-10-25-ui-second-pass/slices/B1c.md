@@ -17,3 +17,8 @@ Part of [the UI second pass plan](../README.md). Decision 258. Design: [design.m
       - `Share_AtStart_IsZero`
       - `Share_AfterTheFadeOut_IsOne`
   - **Verify by hand:** several encounters: the glass breaks and flies apart, differently each time (the encounter count changes the seed), at a steady frame rate; the battle fades in cleanly; nothing of the shards stays on the battle screen.
+- **Done, with deviations:**
+  - **The flight:** each `Shard` carries its direction (from the impact through its center), speed (300-900 px/s) and spin (up to 1.5 turns/s either way), drawn by the layout from its seed; `OffsetAt` and `RotationAt` give where it is after so many seconds.
+  - **`EncounterShatter`** eases its flight out (`Share`, `FlightSeconds`) over a length the flow gives it, the fade-out's (after review, so the two can't drift); its clock runs only once started, and the flow makes a new one for each encounter, so the shards hold their places between the crack and the fade (a test pins it).
+  - **The view** pushes each shard 4 px along its own direction (after review: no second copy of the impact), and moves, turns and shrinks (to 70 %) each shard about its center into the vertex arrays built once, and fades the shards and their edges with the effects' alpha; the flow draws black under them, so the field flies away into the dark, and the fade's black covers all at the end.
+  - **Tests:** the four planned, plus `EncounterShatterTests.Share_BeforeStart_IsZero` and `Share_Halfway_IsPastHalf`, and after review `ShatterLayoutTests.Break_EachShard_FliesAtTheSpeedAndSpinRange`: 2182 in all.

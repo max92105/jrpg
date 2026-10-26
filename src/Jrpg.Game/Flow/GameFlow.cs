@@ -41,6 +41,9 @@ internal sealed class GameFlow : IScene, IFreezesFrame
     private int _encountersStarted;
     private ShatterLayout? _shatter;
 
+    // The shards fly apart over the fade-out, from the update the fade starts; a new flight for each encounter.
+    private EncounterShatter _shatterFlight = new(_fadeOut);
+
     // One for the game's lifetime, made on the first draw that needs it; the graphics device frees its effects when the
     // game closes, so the flow, which tests make by the hundred without a device, needn't be disposable.
     private ShatterView? _shatterView;
@@ -120,6 +123,7 @@ internal sealed class GameFlow : IScene, IFreezesFrame
             case BattleRequested battle:
                 _flashingBattle = battle;
                 _encountersStarted++;
+                _shatterFlight = new EncounterShatter(_fadeOut);
                 _flash.Start();
                 break;
             case MenuRequested:
@@ -147,15 +151,18 @@ internal sealed class GameFlow : IScene, IFreezesFrame
     private void AdvanceFlash(TimeSpan delta)
     {
         _flash.Advance(delta);
+        _shatterFlight.Advance(delta);
         if (_flashingBattle is { } battle && !_flash.IsPlaying)
         {
             _flashingBattle = null;
             _fade.StartBehindFade(battle);
+            _shatterFlight.Start();
         }
     }
 
-    // The field, still, from the encounter until the battle starts at black, under the flash and the fade. The white
-    // waits for the copy: with two updates before the first draw the flash is already lit, and the copy would keep it.
+    // The field, still, from the encounter until the battle starts at black, under the flash and the fade; once broken,
+    // its shards fly apart over black, so the field flies away into the dark. The white waits for the copy: with two
+    // updates before the first draw the flash is already lit, and the copy would keep it.
     private void DrawFrozenFrame(SpriteBatch batch, TextureLibrary textures)
     {
         if (_frozenFrame is null)
@@ -166,7 +173,8 @@ internal sealed class GameFlow : IScene, IFreezesFrame
         var screen = new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height);
         if (_flash.IsPastPeak && _shatter is not null)
         {
-            PrepareShatterView(batch.GraphicsDevice, _shatter).Draw(batch, _frozenFrame);
+            batch.Draw(textures.Pixel, screen, Color.Black);
+            PrepareShatterView(batch.GraphicsDevice, _shatter).Draw(batch, _frozenFrame, _shatterFlight);
         }
         else
         {
@@ -182,7 +190,7 @@ internal sealed class GameFlow : IScene, IFreezesFrame
         _shatterView ??= new ShatterView(device);
         if (!_shatterView.IsBuiltFor(layout))
         {
-            _shatterView.BuildVertices(layout, _impact.ToVector2());
+            _shatterView.BuildVertices(layout);
         }
 
         return _shatterView;

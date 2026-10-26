@@ -7,8 +7,8 @@ namespace Jrpg.Game.Flow;
 /// The frozen frame broken like glass around an impact point (decision 258). Rays run from the impact to the screen's
 /// four corners and to one jittered point on each side; a jittered ring crosses them. Each sector between two rays is a
 /// triangle at the impact and a quad outside the ring cut in two, so neighbors share edges and the shards tile the
-/// screen exactly: 24 shards. The randomness is the Game's own, from a seed, never the battle's (design, key
-/// decisions).
+/// screen exactly: 24 shards, each flying outward at its own speed and spin. The randomness is the Game's own, from a
+/// seed, never the battle's (design, key decisions).
 /// </summary>
 internal sealed class ShatterLayout
 {
@@ -17,6 +17,11 @@ internal sealed class ShatterLayout
     private const float SidePointSpread = 0.4f;
     private const float RingMin = 0.33f;
     private const float RingSpread = 0.24f;
+
+    // Each shard flies at 300-900 px a second and spins up to 1.5 turns a second either way (placeholders).
+    private const float SpeedMin = 300;
+    private const float SpeedSpread = 600;
+    private const float MaxSpin = 1.5f;
 
     private ShatterLayout(IReadOnlyList<Shard> shards) => Shards = shards;
 
@@ -34,12 +39,21 @@ internal sealed class ShatterLayout
         for (var ray = 0; ray < edges.Length; ray++)
         {
             var next = (ray + 1) % edges.Length;
-            shards.Add(new Shard(center, ring[ray], ring[next]));
-            shards.Add(new Shard(ring[ray], edges[next], ring[next]));
-            shards.Add(new Shard(ring[ray], edges[ray], edges[next]));
+            shards.Add(Launch(new Triangle(center, ring[ray], ring[next]), center, random));
+            shards.Add(Launch(new Triangle(ring[ray], edges[next], ring[next]), center, random));
+            shards.Add(Launch(new Triangle(ring[ray], edges[ray], edges[next]), center, random));
         }
 
         return new ShatterLayout(shards);
+    }
+
+    private static Shard Launch(Triangle triangle, Vector2 impact, Random random)
+    {
+        var middle = (triangle.A + triangle.B + triangle.C) / 3;
+        var direction = Vector2.Normalize(middle - impact);
+        var speed = SpeedMin + (SpeedSpread * random.NextSingle());
+        var spin = MaxSpin * ((2 * random.NextSingle()) - 1);
+        return new Shard(triangle.A, triangle.B, triangle.C, direction, speed, spin);
     }
 
     // The screen's corners, so consecutive rays always meet the border on one side, and a point along each side.
@@ -60,4 +74,6 @@ internal sealed class ShatterLayout
             new(0, height * Along()),
         ];
     }
+
+    private readonly record struct Triangle(Vector2 A, Vector2 B, Vector2 C);
 }

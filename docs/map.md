@@ -52,7 +52,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Folder | Purpose | Key types |
 |---|---|---|
 | (root) | Startup and the host loop | `Program`, `JrpgGame` |
-| Flow | The screens and the playthrough; applies scene requests | `GameFlow`, `EncounterFlash`, `ShatterLayout`/`Shard`/`ShatterView` (the encounter's broken glass), `FadeGate`, `SceneFactory`, `SessionTransitions`, `MenuTransitions`, `BattleTransitions` |
+| Flow | The screens and the playthrough; applies scene requests | `GameFlow`, `EncounterFlash`, `ShatterLayout`/`Shard`/`ShatterView`/`EncounterShatter` (the encounter's broken glass and its flight), `FadeGate`, `SceneFactory`, `SessionTransitions`, `MenuTransitions`, `BattleTransitions` |
 | Scenes | The scene contract, the stack, requests, the screen fade | `IScene`, `IFreezesFrame` (the host copies the drawn frame for it), `SceneStack`, `SceneRequest` (+ records, `BattleRequested`, `BattleFinished`, `LeaderChosen`), `ScreenFade` |
 | Hosting | Window, settings, file locations | `PlayerSettings`, `TextSpeed`, `GamePaths`, `FullScreenShortcut`, `DeveloperLog` (the console and debug output), `CaptureFiles` (Debug: F12 saves the 1920 x 1080 screen to `docs/captures`; other builds `%LocalAppData%/Jrpg/Captures`) |
 | Audio | The voice-over path (ADR 0018): scenes write the channel, the host plays it after each update; no device means silent | `VoiceChannel`, `SoundLibrary`, `VoicePlayer` |

@@ -58,4 +58,39 @@ public sealed class ShatterLayoutTests
 
         Assert.Equal(24, layout.Shards.Count);
     }
+
+    [Fact]
+    public void Break_EachShard_FliesAwayFromTheImpact()
+    {
+        var layout = ShatterLayout.Break(_center, seed: 7);
+        var impact = _center.ToVector2();
+
+        var gains = layout.Shards.Select(shard => Vector2.Distance(shard.Center + shard.OffsetAt(0.1f), impact) - Vector2.Distance(shard.Center, impact));
+
+        Assert.All(gains, gain => Assert.True(gain > 0, $"A shard came {-gain} px closer to the impact."));
+    }
+
+    [Fact]
+    public void Break_SameSeed_GivesTheSameFlights()
+    {
+        var first = ShatterLayout.Break(_center, seed: 7);
+
+        var second = ShatterLayout.Break(_center, seed: 7);
+
+        Assert.Equal(first.Shards.Select(shard => (shard.Speed, shard.Spin)), second.Shards.Select(shard => (shard.Speed, shard.Spin)));
+    }
+
+    [Fact]
+    public void Break_EachShard_FliesAtTheSpeedAndSpinRange()
+    {
+        var layout = ShatterLayout.Break(_center, seed: 7);
+
+        var flights = layout.Shards.Select(shard => (shard.Speed, shard.Spin));
+
+        Assert.All(flights, flight =>
+        {
+            Assert.InRange(flight.Speed, 300, 900);
+            Assert.InRange(flight.Spin, -1.5f, 1.5f);
+        });
+    }
 }

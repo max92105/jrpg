@@ -41,6 +41,7 @@ internal sealed class DefeatScreen
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
         Entrance.Update(delta);
+        Files.Advance(delta);
         if (_hasLeft || !Entrance.IsComplete)
         {
             return null;

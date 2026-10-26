@@ -50,6 +50,13 @@ internal sealed class SaveFilesPanel
         _view = new SaveSlotListView(_list, _text, _ui);
     }
 
+    /// <summary>Where the list's highlight is, in rows from the top of the visible window.</summary>
+    /// <exception cref="InvalidOperationException">The panel wasn't opened.</exception>
+    public float SelectionPosition => OpenList().Selection.Position;
+
+    /// <summary>Moves the list's highlight and pointer on; nothing before the panel is opened.</summary>
+    public void Advance(TimeSpan delta) => _list?.Selection.Advance(delta);
+
     /// <summary>Reads the files again, after one changed; the cursor stays.</summary>
     /// <exception cref="InvalidOperationException">The panel wasn't opened.</exception>
     public void Refresh() => OpenList().Refresh(_slots.ReadAll());

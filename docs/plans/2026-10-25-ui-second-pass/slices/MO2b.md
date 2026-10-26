@@ -17,3 +17,10 @@ Part of [the UI second pass plan](../README.md). Decision 262. Design: [design.m
     - `OptionsPageTests`: `Advance_AfterMovingDown_SelectionReachesTheNextOption`
     - `SavePageTests`: `Advance_AfterMovingDown_SelectionReachesTheNextFile`
   - **Verify by hand:** on each page, hold Down: the band glides, the diamond bobs, a scroll doesn't make the band fly across the list.
+- **Done, with deviations:**
+  - **`Ui/SelectionMotion`** holds a list's `SelectionGlide` and its bob clock, so the five lists don't each copy them. It follows a `ListCursor` by its row in the visible window (`ListCursor.VisibleRow`, `VisibleCount`, new), so a scroll that keeps that row in place doesn't glide and a wrap jumps. `MenuPointer.BobDistance` (4 px) replaces the title's own constant. Review: `SelectionMotion.RowIn`/`At` give a `GlidingRow` (the band's place and the bob) and `UiTextures.DrawGlidingSelection` draws it, so the five views don't copy the band and the bobbing pointer. 4 tests in `SelectionMotionTests`.
+  - **Who owns it:** `InventoryPage`, `EquipmentPage` (the sheet) and `OptionsPage` own one; `EquipmentChoice` and `SaveSlotList` own theirs as `Selection`. The highlight jumps when the inventory's list is rebuilt (a category change, an item used) and when a page or a choice opens.
+  - **The save files glide everywhere:** `SaveFilesPanel.Advance` is called by the Save and Load pages, and by the title's and the defeat screen's file lists too, which share the panel.
+  - **Equipment:** the highlight crosses the gap above "Remove all" on its way there.
+  - **Tests:** the inventory's test is in a new `InventoryPageSelectionTests`, since `InventoryPageTests` is over 300 lines. 2146 tests (8 new).
+  - **Still jumping:** the party page's columns and the party sidebar (their cursor moves in two dimensions), and the item use's target picker (not in this slice).

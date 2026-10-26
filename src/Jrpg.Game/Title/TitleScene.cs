@@ -28,9 +28,6 @@ internal sealed class TitleScene : IScene
     private const int BandPadding = 90;
     private const int EntryPitch = EntryRowHeight + EntryGap;
 
-    // The pointer bobs 4 px left and back (decision 262).
-    private const float PointerBobDistance = 4;
-
     // The footer line, centered 40 px above the bottom.
     private const int FooterTextPixels = 22;
     private const int FooterBottomMargin = 40;
@@ -102,6 +99,7 @@ internal sealed class TitleScene : IScene
     {
         _entrance.Advance(delta);
         _glide.Advance(delta);
+        _files.Advance(delta);
         _shown += delta;
         if (IsChoosingFile)
         {
@@ -192,7 +190,7 @@ internal sealed class TitleScene : IScene
         var band = _bands[0];
         band.Y += (int)Math.Round(_glide.Position * EntryPitch);
         _ui.DrawSelectedRow(batch, textures, band, opacity);
-        var bob = PointerBob.OffsetAt(_shown, PointerBobDistance);
+        var bob = PointerBob.OffsetAt(_shown, MenuPointer.BobDistance);
         MenuPointer.Draw(batch, textures.Pixel, new Vector2(band.X - bob, band.Center.Y), opacity);
         for (var index = 0; index < _labels.Length; index++)
         {

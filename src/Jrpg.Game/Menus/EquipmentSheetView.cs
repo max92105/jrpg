@@ -65,57 +65,57 @@ internal sealed class EquipmentSheetView
     /// <param name="opacity">0 to 1, while the menu fades in.</param>
     public void Draw(SpriteBatch batch, TextureLibrary textures, Place place, float opacity)
     {
-        var left = place.Area.X + Margin;
-        var top = place.Area.Y + TopMargin;
-        var width = place.Area.Right - Margin - left;
-        batch.DrawString(_headingFont, place.Sheet.Name, new Vector2(left, top), UiTheme.TextPrimary * opacity);
+        var rows = FirstRowOf(place.Area);
+        batch.DrawString(_headingFont, place.Sheet.Name, new Vector2(rows.X, place.Area.Y + TopMargin), UiTheme.TextPrimary * opacity);
+        _equipmentTitle.Draw(batch, textures, rows with { Y = rows.Y - SectionHeight, Height = 0 }, opacity);
 
-        var equipment = new Rectangle(left, top + EquipmentTop, width, 0);
-        _equipmentTitle.Draw(batch, textures, equipment, opacity);
-        var rowsTop = equipment.Y + SectionHeight;
-        for (var index = 0; index < EquipmentSheet.Slots.Length; index++)
+        // The shared selected-row look (decision 252); while the choice panel has the cursor, dimmed with no pointer.
+        var selected = place.Selection.At(RowAt(rows, place.Selection.Position));
+        if (place.HasCursor)
         {
-            var row = new ListRow(new Rectangle(left, rowsTop + (index * RowHeight), width, RowHeight), index == place.SelectedRow, place.HasCursor);
-            DrawSlotRow(batch, textures, new SlotRow(row, _labels.Slots[index], place.Sheet.Worn[index]), opacity);
+            _ui.DrawGlidingSelection(batch, textures, selected, opacity);
+        }
+        else
+        {
+            _ui.DrawSelectedRow(batch, textures, selected.Area, opacity * UiTheme.DimmedSelectionOpacity);
         }
 
-        var removeAllTop = rowsTop + (EquipmentSheet.Slots.Length * RowHeight) + ActionGap;
-        batch.Draw(textures.Pixel, new Rectangle(left, removeAllTop - 1, width, 1), UiTheme.Stroke * opacity);
-        var removeAll = new ListRow(new Rectangle(left, removeAllTop, width, RowHeight), place.SelectedRow == EquipmentSheet.Slots.Length, place.HasCursor);
-        DrawRemoveAllRow(batch, textures, removeAll, opacity);
+        for (var index = 0; index < EquipmentSheet.Slots.Length; index++)
+        {
+            DrawSlotRow(batch, textures, new SlotRow(RowAt(rows, index), _labels.Slots[index], place.Sheet.Worn[index]), opacity);
+        }
 
-        var parameters = new Rectangle(left, removeAllTop + RowHeight + ParametersGap, width, 0);
+        var removeAll = RowAt(rows, EquipmentSheet.Slots.Length);
+        batch.Draw(textures.Pixel, removeAll with { Y = removeAll.Y - 1, Height = 1 }, UiTheme.Stroke * opacity);
+        DrawRemoveAllRow(batch, removeAll, opacity);
+
+        var parameters = removeAll with { Y = removeAll.Bottom + ParametersGap, Height = 0 };
         DrawParameters(batch, textures, new ParametersPlace(parameters, place.Sheet.Stats, place.Preview), opacity);
         if (place.Notice is not null)
         {
             var noticeTop = parameters.Y + SectionHeight + (2 * StatLineHeight) + NoticeGap;
-            batch.DrawString(_bodyFont, place.Notice, new Vector2(left + RowInset, noticeTop), UiTheme.Danger * opacity);
+            batch.DrawString(_bodyFont, place.Notice, new Vector2(rows.X + RowInset, noticeTop), UiTheme.Danger * opacity);
         }
     }
 
-    // The shared selected-row look (decision 252); while the choice panel has the cursor, a dimmed band and no pointer.
-    private void DrawSelection(SpriteBatch batch, TextureLibrary textures, ListRow row, float opacity)
+    // The first slot's row: under the heading and the equipment title, inside the margins.
+    private static Rectangle FirstRowOf(Rectangle area)
     {
-        if (!row.IsSelected)
-        {
-            return;
-        }
+        var left = area.X + Margin;
+        return new Rectangle(left, area.Y + TopMargin + EquipmentTop + SectionHeight, area.Right - Margin - left, RowHeight);
+    }
 
-        if (!row.HasCursor)
-        {
-            _ui.DrawSelectedRow(batch, textures, row.Area, opacity * UiTheme.DimmedSelectionOpacity);
-            return;
-        }
-
-        _ui.DrawSelectedRow(batch, textures, row.Area, opacity);
-        MenuPointer.Draw(batch, textures.Pixel, new Vector2(row.Area.X, row.Area.Center.Y), opacity);
+    // A row's place, whole or between two while the highlight glides: "Remove all" sits a gap below the slots, so the
+    // highlight crosses that gap on its way there.
+    private static Rectangle RowAt(Rectangle firstRow, float row)
+    {
+        var gapCrossed = Math.Clamp(row - (EquipmentSheet.Slots.Length - 1), 0, 1) * ActionGap;
+        return firstRow with { Y = firstRow.Y + (int)Math.Round((row * RowHeight) + gapCrossed) };
     }
 
     private void DrawSlotRow(SpriteBatch batch, TextureLibrary textures, SlotRow slot, float opacity)
     {
-        var row = slot.Row.Area;
-        DrawSelection(batch, textures, slot.Row, opacity);
-
+        var row = slot.Row;
         var textTop = row.Y + ((RowHeight - _bodyFont.LineHeight) / 2f);
         batch.DrawString(_bodyFont, slot.Label, new Vector2(row.X + RowInset + IconColumn, textTop), UiTheme.TextSecondary * opacity);
         var wornLeft = row.X + RowInset + IconColumn + WornColumn;
@@ -130,12 +130,10 @@ internal sealed class EquipmentSheetView
         batch.DrawString(_bodyFont, worn.Name, new Vector2(wornLeft, textTop), UiTheme.TextPrimary * opacity);
     }
 
-    private void DrawRemoveAllRow(SpriteBatch batch, TextureLibrary textures, ListRow row, float opacity)
+    private void DrawRemoveAllRow(SpriteBatch batch, Rectangle row, float opacity)
     {
-        DrawSelection(batch, textures, row, opacity);
-
-        var textTop = row.Area.Y + ((RowHeight - _bodyFont.LineHeight) / 2f);
-        batch.DrawString(_bodyFont, _labels.RemoveAll, new Vector2(row.Area.X + RowInset + IconColumn, textTop), UiTheme.TextPrimary * opacity);
+        var textTop = row.Y + ((RowHeight - _bodyFont.LineHeight) / 2f);
+        batch.DrawString(_bodyFont, _labels.RemoveAll, new Vector2(row.X + RowInset + IconColumn, textTop), UiTheme.TextPrimary * opacity);
     }
 
     // HP (the maximum) alone on the first line, then Attack and Defense side by side.
@@ -171,17 +169,17 @@ internal sealed class EquipmentSheetView
     /// <summary>What to draw this frame, and where.</summary>
     /// <param name="Sheet">The shown member.</param>
     /// <param name="Area">The sheet's part of the page.</param>
-    /// <param name="SelectedRow">A slot's index in <see cref="EquipmentSheet.Slots"/>, or its length for "Remove all".</param>
+    /// <param name="Selection">
+    /// Where the highlight is, in rows: a slot's index in <see cref="EquipmentSheet.Slots"/>, or its length for "Remove
+    /// all".
+    /// </param>
     /// <param name="HasCursor">False while the choice panel has it: the selected row dims, with no pointer.</param>
     /// <param name="Preview">The highlighted choice's effect on attack and defense, or null when no choice is open.</param>
     /// <param name="Notice">Why the last change didn't happen, or null.</param>
-    public readonly record struct Place(EquipmentSheet Sheet, Rectangle Area, int SelectedRow, bool HasCursor, StatPreviewText? Preview, string? Notice);
+    public readonly record struct Place(EquipmentSheet Sheet, Rectangle Area, SelectionMotion Selection, bool HasCursor, StatPreviewText? Preview, string? Notice);
 
-    // One 52 px row, whether it is the sheet's selected row, and whether the sheet has the cursor.
-    private readonly record struct ListRow(Rectangle Area, bool IsSelected, bool HasCursor);
-
-    // A slot's row: its label and what's worn there, null for nothing.
-    private readonly record struct SlotRow(ListRow Row, string Label, ItemDefinition? Worn);
+    // A slot's 52 px row: its label and what's worn there, null for nothing.
+    private readonly record struct SlotRow(Rectangle Row, string Label, ItemDefinition? Worn);
 
     // The parameters section: where it goes, the values in the labels' order, and the preview if a choice is open.
     private readonly record struct ParametersPlace(Rectangle Section, ImmutableArray<string> Stats, StatPreviewText? Preview);

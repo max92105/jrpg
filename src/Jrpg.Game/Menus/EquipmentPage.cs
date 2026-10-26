@@ -28,6 +28,7 @@ internal sealed class EquipmentPage : IMemberPage
     private readonly EquipmentChoiceView _choiceView;
     private readonly ListCursor _memberCursor;
     private readonly ListCursor _rowCursor = new(EquipmentSheet.Slots.Length + 1, _ => true);
+    private readonly SelectionMotion _selection = new();
     private EquipmentSheet _sheet;
     private EquipmentChoice? _choice;
     private StatPreviewText? _preview;
@@ -76,8 +77,18 @@ internal sealed class EquipmentPage : IMemberPage
         Members = MemberOrder.ActiveThenReserve(_party);
         _memberCursor.Select(0);
         _rowCursor.Select(0);
+        _selection.JumpTo(_rowCursor);
         _sheet = EquipmentSheet.Of(Shown);
         _notice = null;
+    }
+
+    /// <summary>Where the sheet's highlight is, in rows.</summary>
+    internal float SelectionPosition => _selection.Position;
+
+    public void Advance(TimeSpan delta)
+    {
+        _selection.Advance(delta);
+        _choice?.Selection.Advance(delta);
     }
 
     /// <summary>False while choosing what goes in a slot: Cancel closes that instead.</summary>
@@ -127,7 +138,7 @@ internal sealed class EquipmentPage : IMemberPage
     {
         var sheetWidth = _choice is null ? area.Width : area.Width - EquipmentChoiceView.PanelWidth;
         var sheetArea = area with { Width = sheetWidth };
-        _sheetView.Draw(batch, textures, new EquipmentSheetView.Place(_sheet, sheetArea, _rowCursor.Selected, _choice is null, _preview, _notice), opacity);
+        _sheetView.Draw(batch, textures, new EquipmentSheetView.Place(_sheet, sheetArea, _selection, _choice is null, _preview, _notice), opacity);
         if (_choice is not null)
         {
             _choiceView.Draw(batch, textures, _choice, new Rectangle(sheetArea.Right, area.Y, EquipmentChoiceView.PanelWidth, area.Height));
@@ -160,6 +171,7 @@ internal sealed class EquipmentPage : IMemberPage
             _rowCursor.MoveDown();
         }
 
+        _selection.Follow(_rowCursor);
         if (!input.IsPressed(GameButton.Confirm))
         {
             return;

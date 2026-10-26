@@ -228,6 +228,17 @@ public sealed class EquipmentPageTests
     private static bool IsZanyrsIronSword(EquipmentChoice choice) =>
         choice.HighlightedWearer?.Id == "zanyr" && choice.Highlighted?.Id == "iron_sword";
 
+    [Fact]
+    public void Advance_AfterMovingDown_SelectionReachesTheNextSlot()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Down));
+
+        page.Advance(TimeSpan.FromSeconds(1));
+
+        Assert.Equal(1, page.SelectionPosition);
+    }
+
     // Starts with 2 bronze swords and 2 leather armors in the inventory; the leader puts one of each on.
     private PartyMember WearingSwordAndArmor()
     {

@@ -38,6 +38,9 @@ internal sealed class EquipmentChoice
 
     public int FirstVisibleRow => _cursor.FirstVisible;
 
+    /// <summary>Where the gliding highlight and the bobbing pointer are; on "Remove" at first.</summary>
+    public SelectionMotion Selection { get; } = new();
+
     /// <summary>The item under the cursor, owned or worn; null on "Remove".</summary>
     public ItemDefinition? Highlighted => WornAt(SelectedRow)?.Item ?? (SelectedRow == 0 ? null : Items[SelectedRow - 1]);
 
@@ -60,6 +63,7 @@ internal sealed class EquipmentChoice
             _cursor.MoveDown();
         }
 
+        Selection.Follow(_cursor);
         return input.IsPressed(GameButton.Confirm) ? new EquipmentPick(Highlighted, HighlightedWearer) : null;
     }
 }

@@ -42,6 +42,12 @@ internal sealed class ListCursor
     /// <summary>The index of the first entry in the visible window.</summary>
     public int FirstVisible { get; private set; }
 
+    /// <summary>The selected entry's row in the visible window, 0 at its top.</summary>
+    public int VisibleRow => Selected - FirstVisible;
+
+    /// <summary>How many rows the visible window shows: all the entries when they fit.</summary>
+    public int VisibleCount => Math.Min(_count, _visibleRows);
+
     /// <summary>Selects the entry at <paramref name="index"/>, or the last one when the list got shorter; it must be enabled.</summary>
     /// <exception cref="ArgumentException">That entry is disabled.</exception>
     public void Select(int index)

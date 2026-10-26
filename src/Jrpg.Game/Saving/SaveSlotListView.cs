@@ -68,14 +68,17 @@ internal sealed class SaveSlotListView
         }
 
         _columnTitles.Draw(batch, textures, area, opacity);
-        var rowsTop = area.Y + ColumnTitles.Height;
+        var rows = new Rectangle(area.X, area.Y + ColumnTitles.Height, area.Width, RowHeight);
+        _ui.DrawGlidingSelection(batch, textures, _list.Selection.RowIn(rows), opacity);
         var last = Math.Min(_rows.Length, _list.FirstVisible + SaveSlotList.VisibleRows);
         for (var index = _list.FirstVisible; index < last; index++)
         {
-            var row = new Rectangle(area.X, rowsTop + ((index - _list.FirstVisible) * RowHeight), area.Width, RowHeight);
-            DrawRow(batch, textures, row, index, opacity);
+            DrawRow(batch, textures, new ShownRow(RowAt(rows, index - _list.FirstVisible), _rows[index]), opacity);
         }
     }
+
+    private static Rectangle RowAt(Rectangle firstRow, int visibleRow) =>
+        firstRow with { Y = firstRow.Y + (visibleRow * RowHeight) };
 
     // Built once per read of the files, so drawing formats nothing.
     private RowText TextOf(SaveSlotEntry entry)
@@ -96,15 +99,9 @@ internal sealed class SaveSlotListView
         return new RowText(file, summary.LocationName, details, MeasuredText.Of(_bodyFont, party));
     }
 
-    private void DrawRow(SpriteBatch batch, TextureLibrary textures, Rectangle row, int index, float opacity)
+    private void DrawRow(SpriteBatch batch, TextureLibrary textures, ShownRow shown, float opacity)
     {
-        var text = _rows[index];
-        if (index == _list.Selected)
-        {
-            _ui.DrawSelectedRow(batch, textures, row, opacity);
-            MenuPointer.Draw(batch, textures.Pixel, new Vector2(row.X, row.Center.Y), opacity);
-        }
-
+        var (row, text) = shown;
         batch.Draw(textures.Pixel, new Rectangle(row.X, row.Bottom - 1, row.Width, 1), UiTheme.Stroke * opacity);
         var middle = row.Y + (RowHeight / 2f);
         var left = row.X + RowInset;
@@ -126,4 +123,7 @@ internal sealed class SaveSlotListView
 
     // One row's text; Details is null for an empty or unreadable file, whose Location then says which it is.
     private sealed record RowText(string File, string Location, string? Details, MeasuredText Party);
+
+    // A visible row: where it goes, and its text.
+    private readonly record struct ShownRow(Rectangle Area, RowText Text);
 }

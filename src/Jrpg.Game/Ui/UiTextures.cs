@@ -195,6 +195,20 @@ internal sealed class UiTextures
         batch.Draw(line, new Rectangle(row.X, row.Bottom - 1, row.Width, 1), tint);
     }
 
+    /// <summary>
+    /// A page list's selected row, the same on every list (decision 262): the band where the highlight has glided to,
+    /// and the pointer bobbing at its left.
+    /// </summary>
+    /// <param name="batch">Already begun.</param>
+    /// <param name="textures">Where the gradients and the plain pixel come from.</param>
+    /// <param name="row">From the list's <see cref="SelectionMotion"/>.</param>
+    /// <param name="opacity">0 to 1, while the menu fades in.</param>
+    public void DrawGlidingSelection(SpriteBatch batch, TextureLibrary textures, GlidingRow row, float opacity)
+    {
+        DrawSelectedRow(batch, textures, row.Area, opacity);
+        MenuPointer.Draw(batch, textures.Pixel, new Vector2(row.Area.X - row.PointerOffset, row.Area.Center.Y), opacity);
+    }
+
     private Texture2D ShrunkOnce(TextureLibrary textures, string folder, string file, int size)
     {
         if (!_shrunk.TryGetValue((folder, file, size), out var baked))

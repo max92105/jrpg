@@ -68,6 +68,11 @@ internal sealed class SavePage : ISaveFilesPage
         _asking = null;
     }
 
+    /// <summary>Where the files' highlight is, in rows from the top of the visible window.</summary>
+    internal float SelectionPosition => _panel.SelectionPosition;
+
+    public void Advance(TimeSpan delta) => _panel.Advance(delta);
+
     /// <returns>Null: saving asks the flow for nothing.</returns>
     public SceneRequest? Update(InputFrame input)
     {

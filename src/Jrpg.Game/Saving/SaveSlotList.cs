@@ -25,6 +25,9 @@ internal sealed class SaveSlotList
 
     public int FirstVisible => _cursor.FirstVisible;
 
+    /// <summary>Where the gliding highlight and the bobbing pointer are; on the first file at first.</summary>
+    public SelectionMotion Selection { get; } = new();
+
     /// <returns>The entry confirmed this update, or null.</returns>
     public SaveSlotEntry? Update(InputFrame input)
     {
@@ -38,6 +41,7 @@ internal sealed class SaveSlotList
             _cursor.MoveDown();
         }
 
+        Selection.Follow(_cursor);
         return input.IsPressed(GameButton.Confirm) ? Entries[Selected] : null;
     }
 

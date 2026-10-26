@@ -32,6 +32,7 @@ internal sealed class OptionsPage : IMenuPage
     private readonly MeasuredText[] _onOff;
     private readonly MeasuredText[] _speeds;
     private readonly ListCursor _cursor = new(RowCount, _ => true);
+    private readonly SelectionMotion _selection = new();
 
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared textures: the selected row.</param>
@@ -58,8 +59,17 @@ internal sealed class OptionsPage : IMenuPage
 
     public bool LeavesOnCancel => true;
 
+    /// <summary>Where the highlight is, in rows.</summary>
+    internal float SelectionPosition => _selection.Position;
+
     // The values are read from the settings when drawing, so only the cursor goes back.
-    public void Open() => _cursor.Select(0);
+    public void Open()
+    {
+        _cursor.Select(0);
+        _selection.JumpTo(_cursor);
+    }
+
+    public void Advance(TimeSpan delta) => _selection.Advance(delta);
 
     public SceneRequest? Update(InputFrame input)
     {
@@ -73,6 +83,7 @@ internal sealed class OptionsPage : IMenuPage
             _cursor.MoveDown();
         }
 
+        _selection.Follow(_cursor);
         if (input.IsPressed(GameButton.Right))
         {
             Change(1);
@@ -88,12 +99,15 @@ internal sealed class OptionsPage : IMenuPage
 
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
+        _ui.DrawGlidingSelection(batch, textures, _selection.RowIn(RowAt(area, 0)), opacity);
         for (var row = 0; row < RowCount; row++)
         {
-            var rowArea = new Rectangle(area.X, area.Y + (row * UiTheme.MenuRowHeight), area.Width, UiTheme.MenuRowHeight);
-            DrawRow(batch, textures, new RowPlace(row, rowArea), opacity);
+            DrawRow(batch, textures, new RowPlace(row, RowAt(area, row)), opacity);
         }
     }
+
+    private static Rectangle RowAt(Rectangle area, int row) =>
+        new(area.X, area.Y + (row * UiTheme.MenuRowHeight), area.Width, UiTheme.MenuRowHeight);
 
     // Full screen flips either way; the text speed steps through the list and stops at either end.
     private void Change(int step)
@@ -124,12 +138,6 @@ internal sealed class OptionsPage : IMenuPage
     private void DrawRow(SpriteBatch batch, TextureLibrary textures, RowPlace place, float opacity)
     {
         var isSelected = place.Index == _cursor.Selected;
-        if (isSelected)
-        {
-            _ui.DrawSelectedRow(batch, textures, place.Area, opacity);
-            MenuPointer.Draw(batch, textures.Pixel, new Vector2(place.Area.X, place.Area.Center.Y), opacity);
-        }
-
         var color = (isSelected ? UiTheme.TextPrimary : UiTheme.TextSecondary) * opacity;
         var textTop = place.Area.Y + ((UiTheme.MenuRowHeight - _font.LineHeight) / 2f);
         var labelLeft = place.Area.X + UiTheme.MenuTextInset;

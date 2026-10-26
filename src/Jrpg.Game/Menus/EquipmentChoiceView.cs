@@ -91,22 +91,20 @@ internal sealed class EquipmentChoiceView
         batch.DrawString(_headingFont, _heading, new Vector2(left, top), UiTheme.TextPrimary);
         _columnTitles.Draw(batch, textures, new Rectangle(left, top + ColumnTitlesTop, width, 0), opacity: 1);
 
+        var rows = new Rectangle(left, top + RowsTop, width, RowHeight);
+        _ui.DrawGlidingSelection(batch, textures, choice.Selection.RowIn(rows), opacity: 1);
         var last = Math.Min(choice.RowCount, choice.FirstVisibleRow + EquipmentChoice.VisibleRows);
         for (var index = choice.FirstVisibleRow; index < last; index++)
         {
-            var row = new Rectangle(left, top + RowsTop + ((index - choice.FirstVisibleRow) * RowHeight), width, RowHeight);
-            DrawRow(batch, textures, choice, row, index);
+            DrawRow(batch, textures, choice, RowAt(rows, index - choice.FirstVisibleRow), index);
         }
     }
 
+    private static Rectangle RowAt(Rectangle firstRow, int visibleRow) =>
+        firstRow with { Y = firstRow.Y + (visibleRow * RowHeight) };
+
     private void DrawRow(SpriteBatch batch, TextureLibrary textures, EquipmentChoice choice, Rectangle row, int index)
     {
-        if (index == choice.SelectedRow)
-        {
-            _ui.DrawSelectedRow(batch, textures, row, opacity: 1);
-            MenuPointer.Draw(batch, textures.Pixel, new Vector2(row.X, row.Center.Y), opacity: 1);
-        }
-
         var textTop = row.Y + ((RowHeight - _bodyFont.LineHeight) / 2f);
         var nameLeft = row.X + RowInset + IconColumn;
         if (index == 0)

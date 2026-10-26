@@ -9,6 +9,9 @@ namespace Jrpg.Game.Ui;
 /// </summary>
 internal static class MenuPointer
 {
+    /// <summary>How far a list's pointer bobs left and back, in pixels, everywhere it bobs (decision 262).</summary>
+    public const float BobDistance = 4;
+
     // Placeholder size: a 14 px diamond whose right corner stops 4 px short of the line.
     private const float Diagonal = 14;
     private const float Gap = 4;

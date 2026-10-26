@@ -44,6 +44,7 @@ internal sealed class InventoryPage : IMenuPage
     private readonly string _listHint;
     private readonly string _railHint;
     private readonly ItemUseDialog _itemUse;
+    private readonly SelectionMotion _selection = new();
     private ListCursor? _rowCursor;
     private InventoryRow[] _rows = [];
 
@@ -103,12 +104,17 @@ internal sealed class InventoryPage : IMenuPage
     /// <summary>Whether the player is choosing who to use an item on.</summary>
     public bool IsChoosingTarget => _itemUse.IsOpen;
 
+    /// <summary>Where the list's highlight is, in rows from the top of the visible window.</summary>
+    internal float SelectionPosition => _selection.Position;
+
     public void Open()
     {
         _notice = null;
         _rail.Reset();
         ShowRowsFrom(0);
     }
+
+    public void Advance(TimeSpan delta) => _selection.Advance(delta);
 
     public SceneRequest? Update(InputFrame input)
     {
@@ -216,15 +222,22 @@ internal sealed class InventoryPage : IMenuPage
             return;
         }
 
+        if (_rowCursor is not { } cursor)
+        {
+            return;
+        }
+
         if (input.IsPressed(GameButton.Up))
         {
-            _rowCursor?.MoveUp();
+            cursor.MoveUp();
         }
 
         if (input.IsPressed(GameButton.Down))
         {
-            _rowCursor?.MoveDown();
+            cursor.MoveDown();
         }
+
+        _selection.Follow(cursor);
     }
 
     private void DrawList(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
@@ -237,7 +250,7 @@ internal sealed class InventoryPage : IMenuPage
         _columnTitles.Draw(batch, textures, new Rectangle(left, top + ColumnTitlesTop, width, 0), opacity);
 
         var rows = new Rectangle(left, top + RowsTop, width, InventoryListView.Height);
-        _listView.Draw(batch, textures, new InventoryListView.Place(_rows, _rowCursor, !_rail.HasCursor, rows), opacity);
+        _listView.Draw(batch, textures, new InventoryListView.Place(_rows, _rowCursor, !_rail.HasCursor, _selection, rows), opacity);
         DrawDescription(batch, new Vector2(left + InventoryListView.RowInset, rows.Bottom + DescriptionGap), opacity);
     }
 
@@ -255,13 +268,20 @@ internal sealed class InventoryPage : IMenuPage
     }
 
     // Built when the category or the items change, so drawing formats nothing. The cursor stays on the same row, or the
-    // last one once the list got shorter.
+    // last one once the list got shorter, and the highlight jumps there.
     private void ShowRowsFrom(int selectedRow)
     {
         var shown = InventoryFilter.Select(Category, _session.Inventory.Entries, _catalog.Items);
         _rows = [.. shown.Select(RowOf)];
-        _rowCursor = _rows.Length == 0 ? null : new ListCursor(_rows.Length, _ => true, InventoryListView.VisibleRows);
-        _rowCursor?.Select(selectedRow);
+        if (_rows.Length == 0)
+        {
+            _rowCursor = null;
+            return;
+        }
+
+        _rowCursor = new ListCursor(_rows.Length, _ => true, InventoryListView.VisibleRows);
+        _rowCursor.Select(selectedRow);
+        _selection.JumpTo(_rowCursor);
     }
 
     private InventoryRow RowOf(InventoryEntry entry)

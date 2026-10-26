@@ -7,7 +7,7 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// Draws the Inventory page's category rail: a dark strip with one icon tab per category, the chosen one lit. The
-/// pointer marks it while the rail has the cursor; otherwise its glow is dimmed.
+/// pointer marks it while the rail has the cursor; otherwise its band is dimmed.
 /// </summary>
 internal sealed class CategoryRailView(UiTextures ui)
 {
@@ -15,12 +15,12 @@ internal sealed class CategoryRailView(UiTextures ui)
     public const int Width = 72;
 
     // Placeholder layout: 12 px padding and 64 px tabs holding a 40 px icon, faint until selected; the selected tab
-    // glows inside an 8 x 4 margin.
+    // shows the shared selected-row band inside an 8 x 4 margin.
     private const int Padding = 12;
     private const int TabHeight = 64;
     private const int IconSize = 40;
-    private const int GlowInsetX = 8;
-    private const int GlowInsetY = 4;
+    private const int BandInsetX = 8;
+    private const int BandInsetY = 4;
     private const float UnselectedIconOpacity = 0.5f;
 
     /// <param name="batch">Already begun.</param>
@@ -46,10 +46,9 @@ internal sealed class CategoryRailView(UiTextures ui)
         var isSelected = index == rail.Selected;
         if (isSelected)
         {
-            var glowOpacity = rail.HasCursor ? opacity : opacity * UiTheme.DimmedSelectionOpacity;
-            var glow = new Rectangle(tab.X + GlowInsetX, tab.Y + GlowInsetY, tab.Width - (2 * GlowInsetX), tab.Height - (2 * GlowInsetY));
-            batch.Draw(ui.Gradient(textures, UiTheme.SelectedRow), glow, Color.White * glowOpacity);
-            Outline.Draw(batch, textures.Pixel, glow, UiTheme.SelectionStroke * glowOpacity);
+            var bandOpacity = rail.HasCursor ? opacity : opacity * UiTheme.DimmedSelectionOpacity;
+            var band = new Rectangle(tab.X + BandInsetX, tab.Y + BandInsetY, tab.Width - (2 * BandInsetX), tab.Height - (2 * BandInsetY));
+            ui.DrawSelectedRow(batch, textures, band, bandOpacity);
         }
 
         if (isSelected && rail.HasCursor)

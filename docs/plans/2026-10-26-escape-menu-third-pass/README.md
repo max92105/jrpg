@@ -1,5 +1,5 @@
 # Escape menu third pass
-Status: approved
+Status: approved, in progress
 
 Fourth feature plan after the migration, following the UI second pass (`done/2026-10-25-ui-second-pass`, retro skipped).
 - Decisions 266-272 and 282-290 are recorded below. Questions 273-281 are answered (decisions 282-290); none is open; the next free number is 291.
@@ -45,7 +45,7 @@ At the end of this plan:
 One line per slice; each slice's goal, types, tests and hand checks are in its file under `slices/`. Tick the box here when a slice is done, and write its deviations in the slice file. Tunables, design overview and risks: [design.md](design.md).
 
 ### Phase 1: the shared look
-- [ ] **LK1. The selection retuned (navy to black, a fixed glow by the pointer); tab-only colors; the tabs 1 px off-screen** (Game, about 110 lines) → [slices/LK1.md](slices/LK1.md)
+- [x] **LK1. The selection retuned (navy to black, a fixed glow by the pointer); tab-only colors; the tabs 1 px off-screen** (Game, about 110 lines) → [slices/LK1.md](slices/LK1.md)
 - [ ] **C1. `InventoryPage` split: the list column's drawing moves to `InventoryColumnView`** (Game, mechanical, about 170 lines moved, 30 new) → [slices/C1.md](slices/C1.md)
 - [ ] **ML1. `MenuLayout`: the page area beside the tabs' right edge; single-column pages capped at about 1100 px** (Game, about 140 lines) → [slices/ML1.md](slices/ML1.md)
 - [ ] **SB1. The party sidebar only on Inventory: the page owns it, the menu forgets it** (Game, about 220 lines) → [slices/SB1.md](slices/SB1.md)

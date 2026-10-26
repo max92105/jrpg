@@ -19,7 +19,7 @@ paths:
 - What they do:
   - full-screen art with dark scrims and vignettes; the UI floats over it in translucent dark layers, not opaque boxed windows;
   - a thin dark header bar with the page title at top left, and a footer bar with a one-line hint;
-  - vertical arrow-shaped tabs with an icon and a label; the selected one has a deep blue gradient glowing out to the right and a bright hairline; sub-entries open beside it; a pointing-hand cursor, where ours is a diamond (decision 253: take the vibe, not a one-for-one copy);
+  - vertical arrow-shaped tabs with an icon and a label; the selected one is deep navy fading to black, with a soft white glow near the pointer and faint hairlines (decision 270); sub-entries open beside it; a pointing-hand cursor, where ours is a diamond (decision 253: take the vibe, not a one-for-one copy);
   - panels and rows fade out horizontally instead of having hard borders; hairline separators;
   - small labels (`HP`, `SP`, `LV`, `NEXT TURN` in spaced caps) next to large numbers; thin colored bars (HP green, SP blue, EXP orange);
   - an elegant serif for big titles (logo, "Victory!"), a clean sans for the rest; white or pale text;

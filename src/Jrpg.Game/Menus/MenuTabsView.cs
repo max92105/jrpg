@@ -16,9 +16,10 @@ internal sealed class MenuTabsView
     // From one tab's top to the next one's: the tab and a 10 px gap (placeholder).
     private const int Pitch = NavTabShape.Height + 10;
 
-    // The selected tab's icon and label slide 14 px right, over a 2 px bright line along its bottom.
+    // The selected tab's icon and label slide 14 px right, over a 2 px soft line along its bottom.
     private const int SelectedTabSlide = 14;
-    private const int SelectionLineThickness = 2;
+    private const int SelectedTabLineThickness = 2;
+    private const int OffScreenEdge = 1;
 
     // Each tab's icon, its 12 px mask at 2x (24 px), then the label 12 px after it (decision 254, placeholder).
     private const int IconScale = 2;
@@ -58,8 +59,8 @@ internal sealed class MenuTabsView
         var glowLeft = TabLeft(motion, selected);
         var glowTop = _top + (int)Math.Round(place.GlidePosition * Pitch);
         batch.Draw(_ui.SelectedNavTab(textures), new Vector2(glowLeft, glowTop), tint);
-        var line = new Rectangle(glowLeft, glowTop + NavTabShape.Height - SelectionLineThickness, NavTabShape.ShoulderPixels, SelectionLineThickness);
-        batch.Draw(_ui.SelectionLine(textures), line, tint);
+        var line = new Rectangle(glowLeft, glowTop + NavTabShape.Height - SelectedTabLineThickness, NavTabShape.ShoulderPixels, SelectedTabLineThickness);
+        batch.Draw(_ui.SelectedTabLine(textures), line, tint);
 
         for (var index = 0; index < _tabs.Count; index++)
         {
@@ -79,7 +80,9 @@ internal sealed class MenuTabsView
         batch.DrawString(_font, _tabs[index].Label, new Vector2(icon.Right + IconGap, labelTop), UiTheme.TextPrimary * opacity);
     }
 
-    private static int TabLeft(MenuMotion motion, int index) => -(int)Math.Round(motion.TabOffset(index));
+    // One pixel left of the screen, so the shape's outlined first column is never seen: the tabs run off the screen's
+    // edge, as the reference's do (decision 271).
+    private static int TabLeft(MenuMotion motion, int index) => -OffScreenEdge - (int)Math.Round(motion.TabOffset(index));
 
     /// <summary>What the tabs draw this frame.</summary>
     /// <param name="Motion">The slide-in: each tab's offset and fade.</param>

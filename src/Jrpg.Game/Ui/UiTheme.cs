@@ -40,8 +40,14 @@ internal static partial class UiTheme
     /// <summary>The outline of a tab that isn't selected.</summary>
     public static Color NavStroke { get; } = FromStraightArgb(0x40FFFFFF);
 
-    /// <summary>The outline of the selected tab.</summary>
+    /// <summary>
+    /// The bright outline of the battle's command header, the turn order's current diamond and extra-turn mark, and the
+    /// party member being moved. The selected tab has its own, <see cref="SelectedTabStroke"/>.
+    /// </summary>
     public static Color SelectionStroke { get; } = FromStraightArgb(0xB3D6DCFF);
+
+    /// <summary>The outline of the selected tab, faint so the band's own glow at the point carries it.</summary>
+    public static Color SelectedTabStroke { get; } = FromStraightArgb(0x59D6DCFF);
 
     /// <summary>
     /// How strongly a selection shows on the side of a page without the cursor, so the side with it stands out
@@ -52,7 +58,7 @@ internal static partial class UiTheme
     /// <summary>A reserve member's card in the party sidebar, unless it is the one shown (question 154 placeholder).</summary>
     public const float ReserveCardOpacity = 0.6f;
 
-    /// <summary>The selected tab, deep blue glowing out to the right.</summary>
+    /// <summary>The battle's command header, deep blue glowing out to the right (decision 272).</summary>
     public static ImmutableArray<GradientStop> Selection { get; } =
     [
         new(0, FromStraightArgb(0xF01A1F5C)),
@@ -61,12 +67,24 @@ internal static partial class UiTheme
         new(1, FromStraightArgb(0x66C8CEFF)),
     ];
 
-    /// <summary>The bright line under the selected tab.</summary>
-    public static ImmutableArray<GradientStop> SelectionLine { get; } =
+    /// <summary>
+    /// The selected tab (decision 270): deep navy almost to its point, then a glow at the point, as the reference's.
+    /// The tab's width is fixed, so the glow can sit at a share of it.
+    /// </summary>
+    public static ImmutableArray<GradientStop> SelectedTab { get; } =
+    [
+        new(0, FromStraightArgb(0xF00A0D1E)),
+        new(0.55f, FromStraightArgb(0xF0141A3C)),
+        new(0.88f, FromStraightArgb(0xE03A4472)),
+        new(1, FromStraightArgb(0xB08C96C8)),
+    ];
+
+    /// <summary>The line under the selected tab, softened with the band (decision 270).</summary>
+    public static ImmutableArray<GradientStop> SelectedTabLine { get; } =
     [
         new(0, FromStraightArgb(0x00E6EAFF)),
-        new(0.35f, FromStraightArgb(0xFFE6EAFF)),
-        new(0.75f, FromStraightArgb(0xFFFFFFFF)),
+        new(0.35f, FromStraightArgb(0xB3E6EAFF)),
+        new(0.75f, FromStraightArgb(0xB3FFFFFF)),
         new(1, FromStraightArgb(0x00FFFFFF)),
     ];
 
@@ -109,11 +127,30 @@ internal static partial class UiTheme
     /// <summary>An empty or unreadable save file.</summary>
     public static Color TextDisabled { get; } = FromStraightArgb(0xFF5C606B);
 
-    /// <summary>The selected row of a menu list, fading out to the right.</summary>
+    /// <summary>The selected row of every list (decision 270): deep navy fading to black, then out.</summary>
     public static ImmutableArray<GradientStop> SelectedRow { get; } =
-        [new(0, FromStraightArgb(0xE64A53A8)), new(0.5f, FromStraightArgb(0xB36E78C8)), new(1, FromStraightArgb(0x1A6E78C8))];
+        [new(0, FromStraightArgb(0xD90E1430)), new(0.3f, FromStraightArgb(0xC0141A3C)), new(0.75f, FromStraightArgb(0x700A0D20)), new(1, FromStraightArgb(0x000A0D20))];
 
-    /// <summary>The thin lines above and below the selected row.</summary>
+    /// <summary>
+    /// The soft white glow by the pointer, over the selected row's left <see cref="SelectionGlowWidth"/> pixels, so it
+    /// is the same size on a short button and a long row.
+    /// </summary>
+    public static ImmutableArray<GradientStop> SelectionGlow { get; } =
+        [new(0, FromStraightArgb(0x00FFFFFF)), new(0.35f, FromStraightArgb(0x40FFFFFF)), new(1, FromStraightArgb(0x00FFFFFF))];
+
+    /// <summary>How far the glow reaches from the selected row's left, in pixels (placeholder).</summary>
+    public const int SelectionGlowWidth = 160;
+
+    /// <summary>The faint lines above and below the selected row, brightest by the pointer.</summary>
+    public static ImmutableArray<GradientStop> SelectionHairline { get; } =
+    [
+        new(0, FromStraightArgb(0x00FFFFFF)),
+        new(0.08f, FromStraightArgb(0x80E6EAFF)),
+        new(0.5f, FromStraightArgb(0x33E6EAFF)),
+        new(1, FromStraightArgb(0x00FFFFFF)),
+    ];
+
+    /// <summary>The bright line under a tip strip and the battle's boxes.</summary>
     public static ImmutableArray<GradientStop> HighlightLine { get; } =
     [
         new(0, FromStraightArgb(0x00FFFFFF)),

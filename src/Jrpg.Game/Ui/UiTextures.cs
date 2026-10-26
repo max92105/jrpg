@@ -25,7 +25,7 @@ internal sealed class UiTextures
     private Texture2D? _navTab;
     private Texture2D? _selectedNavTab;
     private Texture2D? _menuScrim;
-    private Texture2D? _selectionLine;
+    private Texture2D? _selectedTabLine;
     private Texture2D? _sectionLine;
     private Texture2D? _battleVignette;
     private Texture2D? _topShade;
@@ -55,20 +55,20 @@ internal sealed class UiTextures
     public Texture2D NavTab(TextureLibrary textures) =>
         _navTab ??= textures.Create(NavTabShape.Width, NavTabShape.Height, NavTabShape.Pixels(SolidRow(UiTheme.NavFill, NavTabShape.Width), UiTheme.NavStroke));
 
-    /// <summary>The selected tab: the arrow in the blue selection gradient, brightly outlined.</summary>
+    /// <summary>The selected tab: the arrow in its navy band, glowing at the point (decision 270).</summary>
     public Texture2D SelectedNavTab(TextureLibrary textures) =>
         _selectedNavTab ??= textures.Create(
             NavTabShape.Width,
             NavTabShape.Height,
-            NavTabShape.Pixels(GradientStrip.Colors(UiTheme.Selection, NavTabShape.Width), UiTheme.SelectionStroke));
+            NavTabShape.Pixels(GradientStrip.Colors(UiTheme.SelectedTab, NavTabShape.Width), UiTheme.SelectedTabStroke));
 
     /// <summary>One row, stretched over the whole screen.</summary>
     public Texture2D MenuScrim(TextureLibrary textures) =>
         _menuScrim ??= textures.Create(VirtualScreen.Width, 1, GradientStrip.Colors(UiTheme.MenuScrim, VirtualScreen.Width));
 
     /// <summary>One row, as wide as the tab up to its point; stretched to the line's thickness.</summary>
-    public Texture2D SelectionLine(TextureLibrary textures) =>
-        _selectionLine ??= textures.Create(NavTabShape.ShoulderPixels, 1, GradientStrip.Colors(UiTheme.SelectionLine, NavTabShape.ShoulderPixels));
+    public Texture2D SelectedTabLine(TextureLibrary textures) =>
+        _selectedTabLine ??= textures.Create(NavTabShape.ShoulderPixels, 1, GradientStrip.Colors(UiTheme.SelectedTabLine, NavTabShape.ShoulderPixels));
 
     /// <summary>One row, stretched under a section title.</summary>
     public Texture2D SectionLine(TextureLibrary textures) =>
@@ -192,8 +192,9 @@ internal sealed class UiTextures
     }
 
     /// <summary>
-    /// The one selected-row look of every list (decision 252): the <see cref="UiTheme.SelectedRow"/> gradient between
-    /// two bright hairlines. The list with the cursor adds <see cref="MenuPointer"/> at the row's left.
+    /// The one selected-row look of every list (decisions 252, 270): the <see cref="UiTheme.SelectedRow"/> navy band, a
+    /// soft glow at its left, between two faint hairlines. The list with the cursor adds <see cref="MenuPointer"/> at
+    /// the row's left, where the glow is.
     /// </summary>
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the gradients are made.</param>
@@ -203,9 +204,10 @@ internal sealed class UiTextures
     {
         var tint = Color.White * opacity;
         batch.Draw(Gradient(textures, UiTheme.SelectedRow), row, tint);
-        var line = Gradient(textures, UiTheme.HighlightLine);
-        batch.Draw(line, new Rectangle(row.X, row.Y, row.Width, 1), tint);
-        batch.Draw(line, new Rectangle(row.X, row.Bottom - 1, row.Width, 1), tint);
+        batch.Draw(Gradient(textures, UiTheme.SelectionGlow), row with { Width = Math.Min(row.Width, UiTheme.SelectionGlowWidth) }, tint);
+        var line = Gradient(textures, UiTheme.SelectionHairline);
+        batch.Draw(line, row with { Height = 1 }, tint);
+        batch.Draw(line, row with { Y = row.Bottom - 1, Height = 1 }, tint);
     }
 
     /// <summary>

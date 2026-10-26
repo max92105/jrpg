@@ -57,4 +57,25 @@ public sealed class ConfirmPromptTests
         Assert.Null(answer);
         Assert.False(prompt.IsYesSelected);
     }
+
+    [Fact]
+    public void Update_Up_SelectsYes()
+    {
+        var prompt = new ConfirmPrompt("Quit?");
+
+        prompt.Update(Pressing(GameButton.Up));
+
+        Assert.True(prompt.IsYesSelected);
+    }
+
+    [Fact]
+    public void Update_DownAfterUp_SelectsNo()
+    {
+        var prompt = new ConfirmPrompt("Quit?");
+        prompt.Update(Pressing(GameButton.Up));
+
+        prompt.Update(Pressing(GameButton.Down));
+
+        Assert.False(prompt.IsYesSelected);
+    }
 }

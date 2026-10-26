@@ -68,7 +68,7 @@ internal sealed class BattleScene : IScene
         _turnOrder = new TurnOrderView(_turnOrderStrip, battle.Combatants, text, ui);
         _turnOrderStrip.Refresh(battle);
         _sequence = new BattleTurnSequence(battle, session.EnemyTactics, text.Messages);
-        _bannerView = new BattleBannerView(_banner, text);
+        _bannerView = new BattleBannerView(_banner, text, ui);
         _shown = (_sequence.Turn, _sequence.Stage);
         _battlers = new BattlersView(battle, _sequence, ui);
         _partyStatus = new PartyStatusView(battle.Formation, text, ui);

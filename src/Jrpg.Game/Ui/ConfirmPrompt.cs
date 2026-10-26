@@ -3,8 +3,8 @@ using Jrpg.Game.Input;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// A yes or no question: Yes on the left, No on the right, and No selected at first so a stray Confirm changes nothing.
-/// Cancel answers No.
+/// A yes or no question: Yes above No, and No selected at first so a stray Confirm changes nothing. Up or Left selects
+/// Yes, Down or Right selects No (Left and Right from when they sat side by side); Cancel answers No.
 /// </summary>
 /// <param name="question">What is asked, already in the player's language.</param>
 internal sealed class ConfirmPrompt(string question)
@@ -21,12 +21,12 @@ internal sealed class ConfirmPrompt(string question)
             return ConfirmAnswer.No;
         }
 
-        if (input.IsPressed(GameButton.Left))
+        if (input.IsPressed(GameButton.Up) || input.IsPressed(GameButton.Left))
         {
             IsYesSelected = true;
         }
 
-        if (input.IsPressed(GameButton.Right))
+        if (input.IsPressed(GameButton.Down) || input.IsPressed(GameButton.Right))
         {
             IsYesSelected = false;
         }

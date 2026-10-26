@@ -81,7 +81,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 3: windows and the map
 - [x] **C1. `UiTheme` in partial files by screen** (Game, mechanical, about 300 lines moved, 30 new) → [slices/C1.md](slices/C1.md)
 - [x] **W1a. The untitled framed window, first used by the battle's action name** (Game, about 200 lines) → [slices/W1a.md](slices/W1a.md)
-- [ ] **W1b. The titled framed window with its separator; yes/no prompts become a centered framed dialog** (Game, about 220 lines) → [slices/W1b.md](slices/W1b.md)
+- [x] **W1b. The titled framed window with its separator; yes/no prompts become a centered framed dialog** (Game, about 220 lines) → [slices/W1b.md](slices/W1b.md)
 - [ ] **W2. The dialogue box in the frame language** (Game, about 130 lines) → [slices/W2.md](slices/W2.md)
 - [ ] **C3. `EventPresenter` split: the run of stills moves out** (Game, mechanical, about 220 lines) → [slices/C3.md](slices/C3.md)
 - [ ] **X1. The inn fades to black, holds, then says the party rests** (Game, about 170 lines) → [slices/X1.md](slices/X1.md)

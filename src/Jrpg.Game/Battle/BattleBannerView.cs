@@ -19,12 +19,14 @@ internal sealed class BattleBannerView
 
     private readonly BattleBanner _banner;
     private readonly SpriteFontBase _font;
+    private readonly FramedWindowView _windowView;
     private MeasuredText _text;
     private FramedWindowLayout _window;
 
-    public BattleBannerView(BattleBanner banner, ScreenText text)
+    public BattleBannerView(BattleBanner banner, ScreenText text, UiTextures ui)
     {
         _banner = banner;
+        _windowView = new FramedWindowView(ui);
         _font = text.Fonts.FontAt(TextPixels);
         Measure(string.Empty);
     }
@@ -42,7 +44,7 @@ internal sealed class BattleBannerView
             Measure(_banner.Text);
         }
 
-        FramedWindowView.Draw(batch, textures.Pixel, _window, opacity);
+        _windowView.Draw(batch, textures, _window, opacity);
         var body = _window.Body;
         batch.DrawString(_font, _text.Text, new Vector2(body.Center.X - (_text.Width / 2), body.Y), UiTheme.TextPrimary * opacity);
     }

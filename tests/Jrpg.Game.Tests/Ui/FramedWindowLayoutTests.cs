@@ -7,6 +7,7 @@ public sealed class FramedWindowLayoutTests
 {
     private static readonly Point _center = new(960, 300);
     private static readonly Point _bodySize = new(200, 40);
+    private const float TitleLineHeight = 36;
 
     [Fact]
     public void Untitled_Frame_IsTheBodyPlusPaddingAroundTheCenter()
@@ -34,5 +35,40 @@ public sealed class FramedWindowLayoutTests
         var expected = layout.Frame;
         expected.Inflate(-4, -4);
         Assert.Equal(expected, layout.InnerFrame);
+    }
+
+    [Fact]
+    public void Untitled_HasTitle_IsFalse()
+    {
+        var layout = FramedWindowLayout.Untitled(_center, _bodySize);
+
+        Assert.False(layout.HasTitle);
+    }
+
+    [Fact]
+    public void Titled_Body_StartsBelowTheSeparator()
+    {
+        var layout = FramedWindowLayout.Titled(_center, _bodySize, TitleLineHeight);
+
+        Assert.Equal(layout.SeparatorY + 1 + 14, layout.Body.Top);
+        Assert.Equal(_bodySize, layout.Body.Size);
+    }
+
+    [Fact]
+    public void Titled_TitleCenter_IsAboveTheSeparator()
+    {
+        var layout = FramedWindowLayout.Titled(_center, _bodySize, TitleLineHeight);
+
+        // The title's line starts 24 px into the frame, and the separator is 14 px under it.
+        Assert.Equal(layout.Frame.Y + 24 + (TitleLineHeight / 2), layout.TitleCenter.Y);
+        Assert.Equal(layout.Frame.Y + 24 + (int)TitleLineHeight + 14, layout.SeparatorY);
+    }
+
+    [Fact]
+    public void Titled_Frame_IsCenteredOnTheCenter()
+    {
+        var layout = FramedWindowLayout.Titled(_center, _bodySize, TitleLineHeight);
+
+        Assert.Equal(_center, layout.Frame.Center);
     }
 }

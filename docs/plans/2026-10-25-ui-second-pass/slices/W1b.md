@@ -21,3 +21,9 @@ Part of [the UI second pass plan](../README.md). Decision 252. Design: [design.m
       - `Update_Up_SelectsYes`
       - `Update_DownAfterUp_SelectsNo`
   - **Verify by hand:** each yes/no asks in the centered window with its title and separator; Up/Down and Left/Right move the band and the diamond; Yes and No do what they did; Esc answers No. F12, compare with `dialog-confirm.webp`.
+- **Done, with deviations:**
+  - **The view is a class again:** `FramedWindowView` (static in W1a) holds `UiTextures`, because the separator's fade is a baked gradient. `BattleBannerView` takes `UiTextures` back.
+  - **The separator:** as wide as the body, at 60 % white, with a 10 px diamond in the text color at its middle.
+  - **Buttons:** the one not selected keeps a faint outline (`UiTheme.Stroke`) and the secondary text color.
+  - **Removed:** `UiTextures.SelectionFill`, `UiTheme.Accent` and `UiTheme.ButtonFill`, which had no user left.
+  - **Tests:** one more layout test, `Titled_Frame_IsCenteredOnTheCenter` (2113 in all).

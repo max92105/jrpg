@@ -5,9 +5,9 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/W1a.md, slice W1a (untitled framed window, battle action name)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/W1b.md, slice W1b (titled framed window, centered yes/no dialog)
 Round: 1 (verdict: Ready to commit)
 
-- S1 BattleBannerView.Measure re-derives the frame height from FramedWindowLayout.PaddingY to turn a top into a center: give the layout a top-anchored factory or keep the arithmetic in the layout; open
-- S2 BattleBannerView _window is default (zero rects, negative inner line widths) until the first Measure; an empty banner text shown visible would skip Measure: call Measure(string.Empty) in the constructor; open
-- S3 BattleBannerView summary "centered 190 px from the top" reads as vertical centering; say "its top 190 px down, centered across"; open
+- S1 ConfirmPromptTests.cs:59 and FramedWindowLayoutTests.cs:38 — new [Fact] directly after the previous test's closing brace, no blank line; open
+- S2 Titled_Body_StartsBelowTheSeparator / Titled_TitleCenter_IsAboveTheSeparator assert only ordering; pin Body.Top == SeparatorY + 15 so the 14 px gaps are held; open
+- F1 UiTheme.RaisedSurface summary "A dialog's band." — its only user now is ItemTargetPickerView; follow-up

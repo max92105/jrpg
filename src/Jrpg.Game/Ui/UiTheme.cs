@@ -82,14 +82,8 @@ internal static partial class UiTheme
     /// <summary>Dims everything behind a dialog.</summary>
     public static Color Scrim { get; } = FromStraightArgb(0xB3000000);
 
-    /// <summary>A dialog's band.</summary>
+    /// <summary>The raised band of the item target picker over the dimmed menu.</summary>
     public static Color RaisedSurface { get; } = FromStraightArgb(0xF2141620);
-
-    /// <summary>The outline of a dialog's main button.</summary>
-    public static Color Accent { get; } = FromStraightArgb(0xFFD6DCFF);
-
-    /// <summary>A menu button's faint white fill.</summary>
-    public static Color ButtonFill { get; } = FromStraightArgb(0x1AFFFFFF);
 
     /// <summary>A button's outline, and the line between list rows.</summary>
     public static Color Stroke { get; } = FromStraightArgb(0x2EFFFFFF);
@@ -144,6 +138,10 @@ internal static partial class UiTheme
 
     /// <summary>A framed window's two hairlines (<see cref="FramedWindowView"/>).</summary>
     public static Color WindowLine { get; } = FromStraightArgb(0x66FFFFFF);
+
+    /// <summary>A titled window's line under its title, fading out at both ends.</summary>
+    public static ImmutableArray<GradientStop> WindowSeparator { get; } =
+        [new(0, FromStraightArgb(0x00FFFFFF)), new(0.3f, FromStraightArgb(0x99FFFFFF)), new(0.7f, FromStraightArgb(0x99FFFFFF)), new(1, FromStraightArgb(0x00FFFFFF))];
 
     /// <summary>A stat that goes up in a preview.</summary>
     public static Color Positive { get; } = FromStraightArgb(0xFF6FD3E0);

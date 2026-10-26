@@ -26,7 +26,6 @@ internal sealed class UiTextures
     private Texture2D? _selectedNavTab;
     private Texture2D? _menuScrim;
     private Texture2D? _selectionLine;
-    private Texture2D? _selectionFill;
     private Texture2D? _sectionLine;
     private Texture2D? _battleVignette;
     private Texture2D? _topShade;
@@ -57,10 +56,6 @@ internal sealed class UiTextures
     /// <summary>One row, as wide as the tab up to its point; stretched to the line's thickness.</summary>
     public Texture2D SelectionLine(TextureLibrary textures) =>
         _selectionLine ??= textures.Create(NavTabShape.ShoulderPixels, 1, GradientStrip.Colors(UiTheme.SelectionLine, NavTabShape.ShoulderPixels));
-
-    /// <summary>The blue selection gradient as one row, stretched over a selected button.</summary>
-    public Texture2D SelectionFill(TextureLibrary textures) =>
-        _selectionFill ??= textures.Create(NavTabShape.Width, 1, GradientStrip.Colors(UiTheme.Selection, NavTabShape.Width));
 
     /// <summary>One row, stretched under a section title.</summary>
     public Texture2D SectionLine(TextureLibrary textures) =>

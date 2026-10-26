@@ -1,6 +1,7 @@
 using Jrpg.Data.Art;
 using Jrpg.Data.Audio;
 using Jrpg.Game.Audio;
+using Jrpg.Game.Flow;
 using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
@@ -26,6 +27,9 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     private const int StartingWindowHeight = VirtualScreen.Height * 2 / 3;
 
     private readonly IScene _rootScene;
+
+    // The root scene when it is the game flow, which may ask for the field's frozen frame; null on the error screen.
+    private readonly GameFlow? _flow;
     private readonly string _artRoot;
     private readonly string _audioRoot;
     private readonly VoiceChannel _voice;
@@ -36,6 +40,9 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     private Point _windowSize = new(StartingWindowWidth, StartingWindowHeight);
     private SpriteBatch? _batch;
     private RenderTarget2D? _virtualScreen;
+
+    // The field's last frame before a battle (decision 258), copied from the virtual screen; created on first use.
+    private RenderTarget2D? _frozenFrame;
     private TextureLibrary? _textures;
 
 #if DEBUG
@@ -55,6 +62,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     public JrpgGame(IScene rootScene, string contentRoot, PlayerSettings settings, VoiceChannel voice)
     {
         _rootScene = rootScene;
+        _flow = rootScene as GameFlow;
         _artRoot = ArtFolders.RootIn(contentRoot);
         _audioRoot = AudioFolders.RootIn(contentRoot);
         _voice = voice;
@@ -129,6 +137,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
 #if DEBUG
         SaveAskedCapture();
 #endif
+        FreezeFrameIfWanted(batch);
 
         GraphicsDevice.SetRenderTarget(null);
         GraphicsDevice.Clear(Color.Black);
@@ -144,12 +153,30 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
         {
             _batch?.Dispose();
             _virtualScreen?.Dispose();
+            _frozenFrame?.Dispose();
             _textures?.Dispose();
             _voicePlayer?.Dispose();
             _sounds?.Dispose();
         }
 
         base.Dispose(disposing);
+    }
+
+    // Copies the frame just drawn, in the draw so the update never touches the device. The virtual screen is never set
+    // as the target again this frame: a render target discards its contents when set.
+    private void FreezeFrameIfWanted(SpriteBatch batch)
+    {
+        if (_flow is not { WantsFrozenFrame: true })
+        {
+            return;
+        }
+
+        _frozenFrame ??= new RenderTarget2D(GraphicsDevice, VirtualScreen.Width, VirtualScreen.Height);
+        GraphicsDevice.SetRenderTarget(_frozenFrame);
+        batch.Begin(samplerState: SamplerState.PointClamp);
+        batch.Draw(_virtualScreen, Vector2.Zero, Color.White);
+        batch.End();
+        _flow.FreezeFrame(_frozenFrame);
     }
 
     private static Point ReadDisplaySize()

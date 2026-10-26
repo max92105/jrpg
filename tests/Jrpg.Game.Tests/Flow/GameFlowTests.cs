@@ -1,7 +1,6 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Geometry;
-using Jrpg.Core.Session;
 using Jrpg.Data.Content;
 using Jrpg.Data.Saving;
 using Jrpg.Game.Flow;
@@ -13,6 +12,7 @@ using Jrpg.Game.Tests.Exploration;
 using Jrpg.Game.Tests.Input;
 using Jrpg.Game.Tests.Saving;
 using Jrpg.Game.Tests.Ui;
+using static Jrpg.Game.Tests.Flow.FlowStarts;
 
 namespace Jrpg.Game.Tests.Flow;
 
@@ -20,11 +20,6 @@ namespace Jrpg.Game.Tests.Flow;
 public sealed class GameFlowTests : IDisposable
 {
     private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
-
-    // The flow's screen-change fade: 0.5 s out, 0.15 s on black, 0.5 s in.
-    private static readonly TimeSpan _fadeOut = TimeSpan.FromSeconds(0.5);
-    private static readonly TimeSpan _wholeFade = TimeSpan.FromSeconds(1.15);
-    private static readonly TimeSpan _oneUpdate = TimeSpan.FromSeconds(1.0 / 60);
 
     private static readonly InputFrame _holdingRight =
         new(MoveIntent.FromAxes(1, 0), ButtonSet.Empty.With(GameButton.Right), ButtonSet.Empty);
@@ -44,7 +39,7 @@ public sealed class GameFlowTests : IDisposable
     {
         var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create(), new PlayerSettings());
 
-        flow.Update(_wholeFade, default);
+        flow.Update(WholeFade, default);
 
         Assert.Null(flow.Session);
     }
@@ -53,9 +48,9 @@ public sealed class GameFlowTests : IDisposable
     public void Update_QuitConfirmed_ReturnsQuitRequest()
     {
         var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create(), new PlayerSettings());
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Down));
 
-        var request = flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        var request = flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
 
         Assert.IsType<QuitRequested>(request);
     }
@@ -64,9 +59,9 @@ public sealed class GameFlowTests : IDisposable
     public void Update_NewGameConfirmedWholeFade_HasNoSession()
     {
         var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create(), new PlayerSettings());
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
 
-        flow.Update(_wholeFade, default);
+        flow.Update(WholeFade, default);
 
         Assert.Null(flow.Session);
     }
@@ -75,14 +70,14 @@ public sealed class GameFlowTests : IDisposable
     public void Update_CancelOnChoice_ReturnsToTitleWithoutSession()
     {
         var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create(), new PlayerSettings());
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
-        flow.Update(_wholeFade, default);
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Cancel));
-        flow.Update(_wholeFade, default);
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(WholeFade, default);
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Cancel));
+        flow.Update(WholeFade, default);
 
         // With no save the title lists New Game and Quit: Down then Confirm quits only if the title is back.
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
-        var request = flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Down));
+        var request = flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
 
         Assert.IsType<QuitRequested>(request);
         Assert.Null(flow.Session);
@@ -93,13 +88,13 @@ public sealed class GameFlowTests : IDisposable
     {
         var catalog = _catalog with { NewGame = _catalog.NewGame with { LeaderChoices = [Choice("sarxian"), Choice("zanyr")] } };
         var flow = new GameFlow(catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create(), new PlayerSettings());
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
-        flow.Update(_wholeFade, default);
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(WholeFade, default);
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Down));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
         AnswerYes(flow);
 
-        flow.Update(_fadeOut, default);
+        flow.Update(FadeOut, default);
 
         Assert.Equal("zanyr", SessionOf(flow).Party.Leader.Id);
     }
@@ -109,7 +104,7 @@ public sealed class GameFlowTests : IDisposable
     {
         var flow = FlowWithLeaderConfirmed();
 
-        flow.Update(_fadeOut - TimeSpan.FromSeconds(0.1), default);
+        flow.Update(FadeOut - TimeSpan.FromSeconds(0.1), default);
 
         Assert.Null(flow.Session);
     }
@@ -119,7 +114,7 @@ public sealed class GameFlowTests : IDisposable
     {
         var flow = FlowWithLeaderConfirmed();
 
-        flow.Update(_fadeOut, default);
+        flow.Update(FadeOut, default);
 
         Assert.Equal("start", flow.Session?.Exploration.Location.MapId);
     }
@@ -128,14 +123,14 @@ public sealed class GameFlowTests : IDisposable
     public void Update_RepositoryIntroSkipped_LandsOnTheStartMap()
     {
         var flow = FlowWithLeaderConfirmed(catalog: _catalog);
-        flow.Update(_wholeFade, default);
-        flow.Update(_oneUpdate, default);
+        flow.Update(WholeFade, default);
+        flow.Update(OneUpdate, default);
         Assert.Equal("intro", SessionOf(flow).Exploration.CurrentMap.Id);
 
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
         for (var update = 0; update < 60; update++)
         {
-            flow.Update(_oneUpdate, default);
+            flow.Update(OneUpdate, default);
         }
 
         Assert.Equal("start", SessionOf(flow).Exploration.CurrentMap.Id);
@@ -146,7 +141,7 @@ public sealed class GameFlowTests : IDisposable
     {
         var flow = FlowWithLeaderConfirmed();
 
-        flow.Update(_wholeFade + TimeSpan.FromSeconds(1), default);
+        flow.Update(WholeFade + TimeSpan.FromSeconds(1), default);
 
         Assert.NotNull(flow.Session);
     }
@@ -155,10 +150,10 @@ public sealed class GameFlowTests : IDisposable
     public void Update_IntroSkipped_VoiceStops()
     {
         var flow = StartedFlow(catalog: _catalog);
-        flow.Update(_oneUpdate, default);
+        flow.Update(OneUpdate, default);
         Assert.Equal("Placeholder.wav", flow.Voice.VoiceFile);
 
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
 
         Assert.Null(flow.Voice.VoiceFile);
     }
@@ -179,7 +174,7 @@ public sealed class GameFlowTests : IDisposable
     public void Update_DuringFade_IgnoresInput()
     {
         var flow = FlowWithLeaderConfirmed();
-        flow.Update(_fadeOut, default);
+        flow.Update(FadeOut, default);
         var start = SessionOf(flow).Exploration.PlayerPosition;
 
         flow.Update(TimeSpan.FromSeconds(0.1), _holdingRight);
@@ -205,17 +200,17 @@ public sealed class GameFlowTests : IDisposable
     public void Update_TitleRequested_EndsSession()
     {
         var flow = StartedFlow();
-        flow.Update(_oneUpdate, InputFrames.PressingEscape);
+        flow.Update(OneUpdate, InputFrames.PressingEscape);
         // System is the last tab: Up wraps to it from the first.
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Up));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Left));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Up));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Down));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Down));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Left));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
 
-        flow.Update(_fadeOut, default);
+        flow.Update(FadeOut, default);
 
         Assert.Null(flow.Session);
     }
@@ -225,19 +220,19 @@ public sealed class GameFlowTests : IDisposable
     {
         var flow = StartedFlow();
         var first = SessionOf(flow);
-        flow.Update(_oneUpdate, InputFrames.PressingEscape);
+        flow.Update(OneUpdate, InputFrames.PressingEscape);
         // System is the last tab: Up wraps to it from the first.
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Up));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Left));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
-        flow.Update(_wholeFade, default);
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Up));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Down));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Down));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Left));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(WholeFade, default);
 
         ConfirmNewGameAndLeader(flow);
-        flow.Update(_fadeOut, default);
+        flow.Update(FadeOut, default);
 
         Assert.NotSame(first, SessionOf(flow));
     }
@@ -254,14 +249,14 @@ public sealed class GameFlowTests : IDisposable
         flow.Update(TimeSpan.FromSeconds(0.3), _holdingRight);
         Assert.NotEqual(savedPosition, SessionOf(flow).Exploration.PlayerPosition);
 
-        flow.Update(_oneUpdate, InputFrames.PressingEscape);
+        flow.Update(OneUpdate, InputFrames.PressingEscape);
         // System is the last tab: Up wraps to it from the first.
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Up));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Down));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
-        flow.Update(_fadeOut, default);
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Up));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Down));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(FadeOut, default);
 
         var loaded = SessionOf(flow);
         Assert.NotSame(saved, loaded);
@@ -278,20 +273,20 @@ public sealed class GameFlowTests : IDisposable
         var session = SessionOf(flow);
         for (var update = 0; update < 600 && session.ActiveBattle is null; update++)
         {
-            flow.Update(_oneUpdate, StartMapScenarios.HoldingLeft);
+            flow.Update(OneUpdate, StartMapScenarios.HoldingLeft);
         }
 
         Assert.NotNull(session.ActiveBattle);
         var battlePosition = session.Exploration.PlayerPosition;
         flow.Update(TimeSpan.FromSeconds(10), default);
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Up));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Up));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
         flow.Update(TimeSpan.FromSeconds(0.5), default);
         Assert.Null(session.ActiveBattle);
 
         // "Escaped" shows for 1.5 s before the fade back to the map.
         flow.Update(TimeSpan.FromSeconds(1.5), default);
-        flow.Update(_wholeFade, default);
+        flow.Update(WholeFade, default);
         Assert.Equal(battlePosition, session.Exploration.PlayerPosition);
 
         flow.Update(TimeSpan.FromSeconds(0.1), StartMapScenarios.HoldingLeft);
@@ -309,7 +304,7 @@ public sealed class GameFlowTests : IDisposable
         session.Party.Leader.Vitals.TakeDamage(9999);
         for (var update = 0; update < 600 && session.Exploration.PendingEncounter is null; update++)
         {
-            flow.Update(_oneUpdate, StartMapScenarios.HoldingLeft);
+            flow.Update(OneUpdate, StartMapScenarios.HoldingLeft);
         }
 
         // The battle starts at the fade's black and, lost already, ends on the screen's first update.
@@ -317,53 +312,10 @@ public sealed class GameFlowTests : IDisposable
         flow.Update(TimeSpan.FromSeconds(10), default);
         Assert.Null(session.Exploration.PendingEncounter);
         flow.Update(TimeSpan.FromSeconds(1), default); // The defeat screen's choices come in before they take input.
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
 
-        flow.Update(_wholeFade, default);
+        flow.Update(WholeFade, default);
 
         Assert.Null(flow.Session);
     }
-
-    // Sarxian is the only leader offered, so the forest tests fight with the party they count on, whatever order the
-    // content lists the choices in; the game starts where the intro ends, unless a test brings its own catalog. The fade
-    // to the map starts on the update that confirms him.
-    private static GameFlow FlowWithLeaderConfirmed(SaveSlots? slots = null, ContentCatalog? catalog = null)
-    {
-        var content = catalog ?? StartMapScenarios.AfterTheIntro;
-        var ledBySarxian = content with { NewGame = content.NewGame with { LeaderChoices = [Choice("sarxian")] } };
-        var flow = new GameFlow(ledBySarxian, RepositoryScreenText.Text, slots ?? UnwrittenSaveSlots.Create(), new PlayerSettings());
-        ConfirmNewGameAndLeader(flow);
-        return flow;
-    }
-
-    // New Game is the title's first entry with no save, so Confirm alone picks it; the choice takes input once the fade
-    // is over, and Confirm takes the leader the cursor starts on, answering Yes to "Begin as X?".
-    private static void ConfirmNewGameAndLeader(GameFlow flow)
-    {
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
-        flow.Update(_wholeFade, default);
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
-        AnswerYes(flow);
-    }
-
-    // "Begin as X?" starts on No, so a stray Confirm changes nothing: Left moves to Yes.
-    private static void AnswerYes(GameFlow flow)
-    {
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Left));
-        flow.Update(_oneUpdate, InputFrames.Pressing(GameButton.Confirm));
-    }
-
-    private static LeaderChoice Choice(string memberId) => new() { MemberId = memberId };
-
-    // A new game whose fade is over, so the map gets input.
-    private static GameFlow StartedFlow(SaveSlots? slots = null, ContentCatalog? catalog = null)
-    {
-        var flow = FlowWithLeaderConfirmed(slots, catalog);
-        flow.Update(_fadeOut, default);
-        flow.Update(_wholeFade - _fadeOut, default);
-        return flow;
-    }
-
-    private static GameSession SessionOf(GameFlow flow) =>
-        flow.Session ?? throw new InvalidOperationException("The flow has no session yet.");
 }

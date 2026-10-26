@@ -56,6 +56,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `BattleState.cs` is at 296 lines: split the per-command bodies before the next command path lands (DR2 review).
 - `tests/Jrpg.Game.Tests/Battle/CommandMenuTests.cs` is at 393 lines: split it by menu entry (MO1 review).
 - The tip strip (dark `UiTheme.CommandHintFill` fill, highlight hairline, padded text) is drawn twice: `Battle/CommandPanelView.DrawHint` and `Menus/InventoryListView.DrawStrip`. Move it into one drawer in `Ui` when a third appears (M4 review).
+- `SectionHeight = 36` (a `SectionTitle`'s height) is copied in `EquipmentSheetView`, `StatusSheetView` and `StatusSkillsView`: expose it from `Ui/SectionTitle` (M3b review).
 
 ## From the class mechanics plan (2026-10-25)
 

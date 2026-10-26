@@ -13,8 +13,8 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// The menu's Status page: one party member at a time, with their profile and experience beside a diamond-framed
-/// portrait, then their parameters and what they wear. Left and Right (or the tab buttons) go through the members,
-/// active ones first.
+/// portrait, then their parameters, what they wear beside their class resources, and their skills. Left and Right (or
+/// the tab buttons) go through the members, active ones first.
 /// </summary>
 internal sealed class StatusPage : IMemberPage
 {
@@ -57,6 +57,9 @@ internal sealed class StatusPage : IMemberPage
 
     /// <summary>Everything the page shows of the member, as text.</summary>
     internal StatusSheet ShownSheet => _sheet;
+
+    /// <summary>The captions the page shows beside the sheet's values.</summary>
+    internal StatusLabels ShownLabels => _labels;
 
     // Recruits don't change while the menu is open, so the cursor's member count still holds.
     [MemberNotNull(nameof(Members), nameof(_sheet))]

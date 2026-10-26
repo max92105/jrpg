@@ -157,7 +157,7 @@ public sealed class StatusPageTests
         var resources = page.Shown.Class.Resources;
         var mana = resources.Single(resource => resource.Id == "mana");
         var clarity = resources.Single(resource => resource.Id == "clarity");
-        StatusSheet.Line[] expected = [new(mana.Name, NumberText.Of(mana.Max)), new(clarity.Name, $"{clarity.StartsAt}/{clarity.Max}")];
+        StatusSheet.Line[] expected = [new(mana.Name.ToUpperInvariant(), NumberText.Of(mana.Max)), new(clarity.Name.ToUpperInvariant(), $"{clarity.StartsAt}/{clarity.Max}")];
         Assert.Equal(expected, page.ShownSheet.Resources);
     }
 
@@ -170,7 +170,7 @@ public sealed class StatusPageTests
         ShowMemberOfClass(page, "mage");
 
         var clarity = page.Shown.Class.Resources.Single(resource => resource.Id == "clarity");
-        Assert.Contains(new StatusSheet.Line(clarity.Name, $"1/{clarity.Max}"), page.ShownSheet.Resources);
+        Assert.Contains(new StatusSheet.Line(clarity.Name.ToUpperInvariant(), $"1/{clarity.Max}"), page.ShownSheet.Resources);
     }
 
     [Fact]
@@ -182,7 +182,7 @@ public sealed class StatusPageTests
 
         var readiness = page.Shown.Class.Resources.Single(resource => resource.Id == "readiness");
         var charges = ReadinessFormula.Charges(page.Shown.Speed, readiness.MaxFromSpeed!.SpeedPerCharge);
-        Assert.Equal(new StatusSheet.Line(readiness.Name, NumberText.Of(charges)), page.ShownSheet.Resources[0]);
+        Assert.Equal(new StatusSheet.Line(readiness.Name.ToUpperInvariant(), NumberText.Of(charges)), page.ShownSheet.Resources[0]);
     }
 
     [Fact]
@@ -195,6 +195,20 @@ public sealed class StatusPageTests
 
         var expected = session.Party.Leader.Skills.Select(skill => new StatusSheet.Line(skill.Name, skill.Description));
         Assert.Equal(expected, page.ShownSheet.Skills);
+    }
+
+    [Fact]
+    public void Open_FirstMember_LabelsAreInCaps()
+    {
+        var page = NewPage(NewSession());
+
+        page.Open();
+
+        var messages = RepositoryScreenText.Text.Messages;
+        Assert.Equal(messages.Text(MessageIds.StatAttack).ToUpperInvariant(), page.ShownLabels.Stats[1]);
+        Assert.Equal(messages.Text(MessageIds.StatusSpeed).ToUpperInvariant(), page.ShownLabels.Speed);
+        Assert.Equal(messages.Text(MessageIds.StatusLevelShort).ToUpperInvariant(), page.ShownLabels.Progress[0]);
+        Assert.Equal(messages.Text(MessageIds.StatusNextLevel).ToUpperInvariant(), page.ShownLabels.Progress[2]);
     }
 
     // Goes through the members with Right until one of the class shows.

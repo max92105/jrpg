@@ -11,3 +11,9 @@ Part of [the UI second pass plan](../README.md). Decisions 252, 261. Design: [de
     - `Menus/StatusSheetView`: label and value fonts (SZ1's sizes), letter spacing 2 for labels (`DrawText(..., characterSpacing:)`), the hairline in `UiTheme.Stroke`.
   - **Tests** (`StatusPageTests`): `Open_FirstMember_LabelsAreInCaps` (through `ShownLabels`, like `ShownStats`).
   - **Verify by hand:** compare with `menu-status.webp`: small caps labels, large numbers on their right edge, hairlines between rows, nothing overlapping for the longest class, skill and item names; numbers change when equipment changes.
+- **Done, with deviations:**
+  - **Where the caps and widths are made:** the fixed captions are uppercased once in `StatusLabels`, which the page exposes as `ShownLabels`. Resource names come from content, so `StatusSheet` uppercases them. The values are measured in the 32 px value font by `StatusSheetView.Show` when the member changes, which keeps the sheet free of fonts.
+  - **Rows:** 50 px rows with the label at 16 px, letter spacing 2, and the value at 32 px on the column's right edge. HP's bar takes the place of its row's hairline. Equipment items and resource amounts use the same rows. "LV" plus the level sits beside the name; Experience keeps EXP and NEXT over the bar.
+  - **Messages:** new `status_level_short` ("Lv"), because `status_level` ("Level") is also the leader choice's caption. `status_next_level` is shortened to "Next".
+  - **Skills:** moved into `Menus/StatusSkillsView` to keep `StatusSheetView` well under 300 lines (232). Each skill now has a hairline under its description; about 2 of 3 fit with today's placeholder descriptions.
+  - **Tests:** 1 new; the M3a resource tests now expect caps names. 2159 in the solution.

@@ -85,6 +85,9 @@ internal static class MessageIds
 
     public const string StatusLevel = "status_level";
 
+    /// <summary>The level's short caption, "Lv", beside a number.</summary>
+    public const string StatusLevelShort = "status_level_short";
+
     public const string StatusExp = "status_exp";
 
     public const string StatusNextLevel = "status_next_level";

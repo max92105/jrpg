@@ -2,7 +2,10 @@ using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Menus;
 
-/// <summary>The Status page's fixed text, in the order <see cref="StatusSheet"/>'s arrays use.</summary>
+/// <summary>
+/// The Status page's fixed text, in the order <see cref="StatusSheet"/>'s arrays use. The captions are in caps, like
+/// the reference's small labels ("HP", "LV"), uppercased once here.
+/// </summary>
 /// <param name="Progress">Level, experience, and experience to the next level.</param>
 /// <param name="MaxLevel">Shown instead of the experience to the next level at the highest level.</param>
 /// <param name="Stats">HP, Attack, Defense.</param>
@@ -19,14 +22,18 @@ internal sealed record StatusLabels(
     string Empty,
     UiMessages Messages)
 {
-    public static StatusLabels From(UiMessages messages) => new(
-        [messages.Text(MessageIds.StatusLevel), messages.Text(MessageIds.StatusExp), messages.Text(MessageIds.StatusNextLevel)],
-        messages.Text(MessageIds.StatusMaxLevel),
-        [messages.Text(MessageIds.StatHp), messages.Text(MessageIds.StatAttack), messages.Text(MessageIds.StatDefense)],
-        messages.Text(MessageIds.StatusSpeed),
-        [messages.Text(MessageIds.SlotWeapon), messages.Text(MessageIds.SlotArmor)],
-        messages.Text(MessageIds.SlotEmpty),
-        messages);
+    public static StatusLabels From(UiMessages messages)
+    {
+        string Caps(string messageId) => messages.Text(messageId).ToUpperInvariant();
+        return new(
+            [Caps(MessageIds.StatusLevelShort), Caps(MessageIds.StatusExp), Caps(MessageIds.StatusNextLevel)],
+            messages.Text(MessageIds.StatusMaxLevel),
+            [Caps(MessageIds.StatHp), Caps(MessageIds.StatAttack), Caps(MessageIds.StatDefense)],
+            Caps(MessageIds.StatusSpeed),
+            [Caps(MessageIds.SlotWeapon), Caps(MessageIds.SlotArmor)],
+            messages.Text(MessageIds.SlotEmpty),
+            messages);
+    }
 
     /// <summary>A lasting resource's amount out of its max, as "2/3".</summary>
     public string LastingAmountText(int amount, int max) =>

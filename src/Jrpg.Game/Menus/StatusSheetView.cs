@@ -1,5 +1,4 @@
 using FontStashSharp;
-using FontStashSharp.RichText;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
@@ -8,61 +7,65 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Draws a <see cref="StatusSheet"/>: the profile and experience beside a diamond-framed portrait, then the
-/// parameters, what the member wears beside their class resources, and their skills.
+/// Draws a <see cref="StatusSheet"/>: the profile, level and experience beside a diamond-framed portrait, then the
+/// parameters, what the member wears beside their class resources, and their skills. Each row reads like the
+/// reference's: a small spaced-caps label, a large value on the column's right edge, a hairline under it.
 /// </summary>
 internal sealed class StatusSheetView
 {
-    // Placeholder layout (decision 82): a 28 x 20 margin, 30 px headings, 26 px body text, 18 px labels and captions; a
-    // 240 px portrait 32 px right of the profile; 46 px stat lines in two columns 40 px apart, 10 px in under titles.
+    // Placeholder layout (decision 82): a 28 x 20 margin; 30 px name, 18 px class, 16 px labels 2 px apart, 32 px
+    // values (SZ1's large numbers); a 240 px portrait 32 px right of the profile; 50 px rows in two columns 40 px
+    // apart, 10 px in under titles.
     private const int Margin = 28;
     private const int TopMargin = 20;
-    private const int HeadingPixels = 30;
-    private const int BodyPixels = 26;
-    private const int LabelPixels = 18;
+    private const int NamePixels = 30;
+    private const int ClassPixels = 18;
+    private const int LabelPixels = 16;
+    private const int ValuePixels = 32;
+    private const float LabelSpacing = 2;
     private const int PortraitSize = 240;
     private const int PortraitFrame = 2;
     private const int PortraitGap = 32;
     private const int Indent = 10;
-    private const int StatLineHeight = 46;
+    private const int RowHeight = 50;
     private const int ColumnGap = 40;
-    private const int ValueOffset = 200;
 
-    // Rows, down from the page's top margin: the profile, then each section's title and its lines. Equipment and the
+    // Rows, down from the page's top margin: the profile, then each section's title and its rows. Equipment and the
     // resources share a row, half the width each; the skills fill what is left of the page.
+    private const int LevelGap = 24;
     private const int ClassTop = 42;
     private const int ExperienceTop = 84;
     private const int ParametersTop = PortraitSize + 18;
-    private const int EquipmentTop = ParametersTop + SectionHeight + (2 * StatLineHeight) + 18;
-    private const int SkillsTop = EquipmentTop + SectionHeight + (2 * StatLineHeight) + 18;
+    private const int EquipmentTop = ParametersTop + SectionHeight + (2 * RowHeight) + 18;
+    private const int SkillsTop = EquipmentTop + SectionHeight + (2 * RowHeight) + 18;
     private const int SectionHeight = 36;
-    private const int ValueBelowLabel = 26;
+    private const int ValueBelowLabel = 22;
 
-    // A skill: its name, then its description wrapped to the sheet's width 32 px under it, then a 12 px gap.
-    private const int DescriptionBelowName = 32;
-    private const int SkillGap = 12;
-
-    // The experience bar: 6 px tall, 12 px under the experience values, 16 px short of the profile's right edge. HP
-    // gets the same slim bar under its line.
+    // The experience bar: 6 px tall, under the experience values, 16 px short of the profile's right edge. HP's bar
+    // takes its row's hairline.
     private const int BarHeight = 6;
-    private const int XpBarTop = ValueBelowLabel + 44;
+    private const int XpBarTop = ValueBelowLabel + 48;
     private const int XpBarRightGap = 16;
-    private const int VitalBarTop = 34;
+
+    // Where each parameter sits, in the order the values come (HP, Attack, Defense, Speed): HP and Speed on the first
+    // line, Attack and Defense on the second.
+    private static readonly (int Column, int Line)[] _parameterCells = [(0, 0), (0, 1), (1, 1), (1, 0)];
 
     private readonly UiTextures _ui;
     private readonly StatusLabels _labels;
-    private readonly SpriteFontBase _headingFont;
-    private readonly SpriteFontBase _bodyFont;
+    private readonly string[] _parameterLabels;
+    private readonly SpriteFontBase _nameFont;
+    private readonly SpriteFontBase _classFont;
     private readonly SpriteFontBase _labelFont;
+    private readonly SpriteFontBase _valueFont;
+    private readonly float _levelLabelWidth;
     private readonly SectionTitle _experienceTitle;
     private readonly SectionTitle _parametersTitle;
     private readonly SectionTitle _equipmentTitle;
     private readonly SectionTitle _resourcesTitle;
-    private readonly SectionTitle _skillsTitle;
+    private readonly StatusSkillsView _skills;
     private readonly StatBar _xpBar;
-    private StatusSheet? _wrappedSheet;
-    private int _wrappedWidth;
-    private RichTextLayout[] _skillDescriptions = [];
+    private MeasuredSheet? _shown;
 
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared textures: section lines and baked portraits.</param>
@@ -71,15 +74,18 @@ internal sealed class StatusSheetView
     {
         _ui = ui;
         _labels = labels;
-        _headingFont = text.Fonts.FontAt(HeadingPixels);
-        _bodyFont = text.Fonts.FontAt(BodyPixels);
+        _parameterLabels = [.. labels.Stats, labels.Speed];
+        _nameFont = text.Fonts.FontAt(NamePixels);
+        _classFont = text.Fonts.FontAt(ClassPixels);
         _labelFont = text.Fonts.FontAt(LabelPixels);
+        _valueFont = text.Fonts.FontAt(ValuePixels);
+        _levelLabelWidth = _labelFont.MeasureString(labels.Progress[0], characterSpacing: LabelSpacing).X;
         _experienceTitle = new SectionTitle(text, ui, MessageIds.StatusExperience);
         _parametersTitle = new SectionTitle(text, ui, MessageIds.StatusParameters);
         _equipmentTitle = new SectionTitle(text, ui, MessageIds.StatusEquipment);
         _resourcesTitle = new SectionTitle(text, ui, MessageIds.StatusResources);
-        _skillsTitle = new SectionTitle(text, ui, MessageIds.StatusSkills);
-        Vitals = new MemberVitalBars(text, ui, BodyPixels);
+        _skills = new StatusSkillsView(text, ui);
+        Vitals = new MemberVitalBars(text, ui, ValuePixels);
         _xpBar = new StatBar(ui, UiTheme.XpBar);
     }
 
@@ -88,33 +94,48 @@ internal sealed class StatusSheetView
     /// </summary>
     public MemberVitalBars Vitals { get; }
 
-    /// <summary>Sets the experience bar to the sheet's member, when the shown member changes.</summary>
-    public void Show(StatusSheet sheet) => _xpBar.Show(sheet.Experience.Earned, sheet.Experience.Needed);
+    /// <summary>Measures the sheet's values and sets the experience bar, when the shown member changes.</summary>
+    public void Show(StatusSheet sheet)
+    {
+        _xpBar.Show(sheet.Experience.Earned, sheet.Experience.Needed);
+        _shown = new MeasuredSheet(
+            _nameFont.MeasureString(sheet.Name).X,
+            [.. sheet.Stats.Append(sheet.Speed).Select(Measured)],
+            [.. sheet.Worn.Select(Measured)],
+            [.. sheet.Resources.Select(resource => resource.Name)],
+            [.. sheet.Resources.Select(resource => Measured(resource.Text))]);
+    }
 
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the plain pixel, section lines and portraits come from.</param>
     /// <param name="place">The sheet, and the page's area.</param>
     /// <param name="opacity">0 to 1, while the menu fades in.</param>
+    /// <exception cref="InvalidOperationException">No sheet was shown yet.</exception>
     public void Draw(SpriteBatch batch, TextureLibrary textures, Place place, float opacity)
     {
+        var shown = _shown ?? throw new InvalidOperationException("Show a sheet before drawing it.");
         var area = place.Area;
         var left = area.X + Margin;
         var top = area.Y + TopMargin;
         var portraitLeft = area.Right - Margin - PortraitSize;
-        var profileWidth = portraitLeft - PortraitGap - left;
         var fullWidth = area.Right - Margin - left;
+        var halfWidth = (fullWidth - ColumnGap) / 2;
         var page = new PageFrame(batch, textures, opacity, place.Sheet);
 
         DrawPortrait(page, new Vector2(portraitLeft + (PortraitSize / 2f), top + (PortraitSize / 2f)));
-        page.Write(_headingFont, place.Sheet.Name, new Vector2(left, top), UiTheme.TextPrimary);
-        page.Write(_labelFont, place.Sheet.ClassName, new Vector2(left, top + ClassTop), UiTheme.TextSecondary);
-        DrawExperience(page, new Rectangle(left, top + ExperienceTop, profileWidth, 0));
-        DrawParameters(page, new Rectangle(left, top + ParametersTop, fullWidth, 0));
-        var halfWidth = (fullWidth - ColumnGap) / 2;
-        DrawEquipment(page, new Rectangle(left, top + EquipmentTop, halfWidth, 0));
-        DrawResources(page, new Rectangle(left + halfWidth + ColumnGap, top + EquipmentTop, halfWidth, 0));
-        DrawSkills(page, new Rectangle(left, top + SkillsTop, fullWidth, area.Bottom - (top + SkillsTop)));
+        page.Write(_nameFont, place.Sheet.Name, new Vector2(left, top), UiTheme.TextPrimary);
+        DrawLevel(page, new Vector2(left + shown.NameWidth + LevelGap, top));
+        page.Write(_classFont, place.Sheet.ClassName, new Vector2(left, top + ClassTop), UiTheme.TextSecondary);
+        DrawExperience(page, new Rectangle(left, top + ExperienceTop, portraitLeft - PortraitGap - left, 0));
+        DrawParameters(page, new Rectangle(left, top + ParametersTop, fullWidth, 0), shown.Parameters);
+        DrawRows(page, new Rectangle(left, top + EquipmentTop, halfWidth, 0), new RowsSection(_equipmentTitle, _labels.Slots, shown.Worn));
+        var resources = new RowsSection(_resourcesTitle, shown.ResourceNames, shown.Resources);
+        DrawRows(page, new Rectangle(left + halfWidth + ColumnGap, top + EquipmentTop, halfWidth, 0), resources);
+        var skills = new Rectangle(left, top + SkillsTop, fullWidth, area.Bottom - (top + SkillsTop));
+        _skills.Draw(batch, textures, new StatusSkillsView.Place(place.Sheet, skills), opacity);
     }
+
+    private MeasuredText Measured(string value) => MeasuredText.Of(_valueFont, value);
 
     // A diamond like the dialogue's, framed by a slightly larger pale diamond behind it.
     private void DrawPortrait(PageFrame page, Vector2 center)
@@ -125,112 +146,65 @@ internal sealed class StatusSheetView
         page.Batch.Draw(portrait, corner, Color.White * page.Opacity);
     }
 
-    // Level, experience and experience to the next level, each a small label over its value, in three columns.
+    // "LV" small, then the level large, beside the name; the label centered on the number's line.
+    private void DrawLevel(PageFrame page, Vector2 position)
+    {
+        var labelTop = position.Y + ((_valueFont.LineHeight - _labelFont.LineHeight) / 2f);
+        page.WriteLabel(_labelFont, _labels.Progress[0], new Vector2(position.X, labelTop));
+        page.Write(_valueFont, page.Sheet.Progress[0], position + new Vector2(_levelLabelWidth + Indent, 0), UiTheme.TextPrimary);
+    }
+
+    // Experience and experience to the next level, each a small label over its value, in two columns, over the bar.
     private void DrawExperience(PageFrame page, Rectangle section)
     {
         _experienceTitle.Draw(page.Batch, page.Textures, section, page.Opacity);
-        var columnWidth = (section.Width - Indent) / 3;
+        var columnWidth = (section.Width - Indent) / 2;
         var labelsTop = section.Y + SectionHeight;
-        for (var column = 0; column < 3; column++)
+        for (var column = 0; column < 2; column++)
         {
             var columnLeft = section.X + Indent + (column * columnWidth);
-            page.Write(_labelFont, _labels.Progress[column], new Vector2(columnLeft, labelsTop), UiTheme.TextSecondary);
-            page.Write(_headingFont, page.Sheet.Progress[column], new Vector2(columnLeft, labelsTop + ValueBelowLabel), UiTheme.TextPrimary);
+            page.WriteLabel(_labelFont, _labels.Progress[column + 1], new Vector2(columnLeft, labelsTop));
+            page.Write(_valueFont, page.Sheet.Progress[column + 1], new Vector2(columnLeft, labelsTop + ValueBelowLabel), UiTheme.TextPrimary);
         }
 
         var xpBar = new Rectangle(section.X + Indent, labelsTop + XpBarTop, section.Width - Indent - XpBarRightGap, BarHeight);
         _xpBar.Draw(page.Batch, page.Textures, xpBar, page.Opacity);
     }
 
-    // HP on the first line with its bar under it and speed beside it, then attack and defense, in two columns.
-    private void DrawParameters(PageFrame page, Rectangle section)
+    // HP and speed on the first line, attack and defense on the second; HP's bar takes the place of its hairline.
+    private void DrawParameters(PageFrame page, Rectangle section, MeasuredText[] values)
     {
         _parametersTitle.Draw(page.Batch, page.Textures, section, page.Opacity);
         var columnWidth = (section.Width - Indent - ColumnGap) / 2;
         var firstLineTop = section.Y + SectionHeight;
-        for (var index = 0; index < _labels.Stats.Length; index++)
+        for (var index = 0; index < values.Length; index++)
         {
-            var (column, line) = index == 0 ? (0, 0) : ((index - 1) % 2, 1 + ((index - 1) / 2));
+            var (column, line) = _parameterCells[index];
             var columnLeft = section.X + Indent + (column * (columnWidth + ColumnGap));
-            DrawLine(page, new Vector2(columnLeft, firstLineTop + (line * StatLineHeight)), _labels.Stats[index], page.Sheet.Stats[index]);
+            DrawRow(page, new Rectangle(columnLeft, firstLineTop + (line * RowHeight), columnWidth, RowHeight), _parameterLabels[index], values[index]);
         }
 
-        var speedLeft = section.X + Indent + columnWidth + ColumnGap;
-        DrawLine(page, new Vector2(speedLeft, firstLineTop), _labels.Speed, page.Sheet.Speed);
-
-        // HP is the first line, so its bar goes under it.
-        var hpBar = new Rectangle(section.X + Indent, firstLineTop + VitalBarTop, columnWidth, BarHeight);
+        var hpBar = new Rectangle(section.X + Indent, firstLineTop + RowHeight - BarHeight, columnWidth, BarHeight);
         Vitals.Hp.Bar.Draw(page.Batch, page.Textures, hpBar, page.Opacity);
     }
 
-    private void DrawEquipment(PageFrame page, Rectangle section)
+    private void DrawRows(PageFrame page, Rectangle section, RowsSection rows)
     {
-        _equipmentTitle.Draw(page.Batch, page.Textures, section, page.Opacity);
-        for (var index = 0; index < _labels.Slots.Length; index++)
+        rows.Title.Draw(page.Batch, page.Textures, section, page.Opacity);
+        for (var index = 0; index < rows.Values.Count; index++)
         {
-            var lineTop = section.Y + SectionHeight + (index * StatLineHeight);
-            DrawLine(page, new Vector2(section.X + Indent, lineTop), _labels.Slots[index], page.Sheet.Worn[index]);
+            var row = new Rectangle(section.X + Indent, section.Y + SectionHeight + (index * RowHeight), section.Width - Indent, RowHeight);
+            DrawRow(page, row, rows.Labels[index], rows.Values[index]);
         }
     }
 
-    // Each class resource with its max, or a lasting one's amount out of its max; no class has more than two today.
-    private void DrawResources(PageFrame page, Rectangle section)
+    // The label small on the left, the value large on the right edge, both centered on the row; a hairline under it.
+    private void DrawRow(PageFrame page, Rectangle row, string label, MeasuredText value)
     {
-        _resourcesTitle.Draw(page.Batch, page.Textures, section, page.Opacity);
-        for (var index = 0; index < page.Sheet.Resources.Count; index++)
-        {
-            var resource = page.Sheet.Resources[index];
-            var lineTop = section.Y + SectionHeight + (index * StatLineHeight);
-            DrawLine(page, new Vector2(section.X + Indent, lineTop), resource.Name, resource.Text);
-        }
-    }
-
-    // Each skill's name with its wrapped description under it, as many whole skills as fit; the page doesn't scroll.
-    private void DrawSkills(PageFrame page, Rectangle section)
-    {
-        _skillsTitle.Draw(page.Batch, page.Textures, section, page.Opacity);
-        var left = section.X + Indent;
-        WrapSkillDescriptions(page.Sheet, section.Width - Indent);
-        var nameTop = section.Y + SectionHeight;
-        for (var index = 0; index < page.Sheet.Skills.Count; index++)
-        {
-            var description = _skillDescriptions[index];
-            var descriptionTop = nameTop + DescriptionBelowName;
-            if (descriptionTop + description.Size.Y > section.Bottom)
-            {
-                return;
-            }
-
-            page.Write(_bodyFont, page.Sheet.Skills[index].Name, new Vector2(left, nameTop), UiTheme.TextPrimary);
-            description.Draw(page.Batch, new Vector2(left, descriptionTop), UiTheme.TextSecondary * page.Opacity);
-            nameTop = descriptionTop + description.Size.Y + SkillGap;
-        }
-    }
-
-    // Wrapped again only when the shown sheet or the width changes, so drawing lays out nothing new each frame.
-    private void WrapSkillDescriptions(StatusSheet sheet, int width)
-    {
-        if (ReferenceEquals(sheet, _wrappedSheet) && width == _wrappedWidth)
-        {
-            return;
-        }
-
-        _wrappedSheet = sheet;
-        _wrappedWidth = width;
-        _skillDescriptions = [.. sheet.Skills.Select(skill => new RichTextLayout
-        {
-            // Off, so a bracket or a slash in content text is never read as a FontStashSharp formatting command.
-            SupportsCommands = false,
-            Font = _labelFont,
-            Width = width,
-            Text = skill.Text,
-        })];
-    }
-
-    private void DrawLine(PageFrame page, Vector2 position, string label, string value)
-    {
-        page.Write(_bodyFont, label, position, UiTheme.TextSecondary);
-        page.Write(_bodyFont, value, position + new Vector2(ValueOffset, 0), UiTheme.TextPrimary);
+        var middle = row.Y + (row.Height / 2f);
+        page.WriteLabel(_labelFont, label, new Vector2(row.X, middle - (_labelFont.LineHeight / 2f)));
+        page.Write(_valueFont, value.Text, new Vector2(row.Right - value.Width, middle - (_valueFont.LineHeight / 2f)), UiTheme.TextPrimary);
+        page.Batch.Draw(page.Textures.Pixel, new Rectangle(row.X, row.Bottom - 1, row.Width, 1), UiTheme.Stroke * page.Opacity);
     }
 
     /// <summary>What the view draws, and where.</summary>
@@ -243,5 +217,16 @@ internal sealed class StatusSheetView
     {
         public void Write(SpriteFontBase font, string text, Vector2 position, Color color) =>
             Batch.DrawString(font, text, position, color * Opacity);
+
+        // A small label in spaced caps and the secondary color.
+        public void WriteLabel(SpriteFontBase font, string text, Vector2 position) =>
+            Batch.DrawString(font, text, position, UiTheme.TextSecondary * Opacity, characterSpacing: LabelSpacing);
     }
+
+    // A section of label and value rows.
+    private readonly record struct RowsSection(SectionTitle Title, IReadOnlyList<string> Labels, IReadOnlyList<MeasuredText> Values);
+
+    // The shown sheet's values, measured once when it is shown: the name's width places the level beside it.
+    private sealed record MeasuredSheet(
+        float NameWidth, MeasuredText[] Parameters, MeasuredText[] Worn, string[] ResourceNames, MeasuredText[] Resources);
 }

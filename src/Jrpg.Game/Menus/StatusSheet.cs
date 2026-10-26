@@ -64,7 +64,7 @@ internal sealed record StatusSheet(
         var text = resource.IsLasting
             ? labels.LastingAmountText(member.LastingAmounts[resource.Id], start.Max)
             : NumberText.Of(start.Max);
-        return new Line(resource.Name, text);
+        return new Line(resource.Name.ToUpperInvariant(), text);
     }
 
     /// <summary>

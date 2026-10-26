@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Jrpg.Game.Rendering;
 
@@ -11,6 +12,12 @@ internal static class VirtualScreen
 {
     public const int Width = 1920;
     public const int Height = 1080;
+
+    /// <summary>
+    /// Begins the batch that draws the scenes onto the virtual screen: point-sampled, so pixel art stays crisp. A view
+    /// that ends it midway, as the shatter does, begins it again with this.
+    /// </summary>
+    public static void BeginBatch(SpriteBatch batch) => batch.Begin(samplerState: SamplerState.PointClamp);
 
     /// <summary>Where the virtual screen lands in the window, centered.</summary>
     public static Rectangle DestinationIn(Rectangle window)

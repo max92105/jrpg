@@ -40,6 +40,28 @@ public sealed class EncounterFlashTests
     }
 
     [Fact]
+    public void IsPastPeak_JustBeforeThePeak_IsFalse()
+    {
+        var flash = new EncounterFlash();
+        flash.Start();
+
+        flash.Advance(_rise - TimeSpan.FromSeconds(0.01));
+
+        Assert.False(flash.IsPastPeak);
+    }
+
+    [Fact]
+    public void IsPastPeak_AtThePeak_IsTrue()
+    {
+        var flash = new EncounterFlash();
+        flash.Start();
+
+        flash.Advance(_rise);
+
+        Assert.True(flash.IsPastPeak);
+    }
+
+    [Fact]
     public void IsPlaying_DuringTheFlash_IsTrue()
     {
         var flash = new EncounterFlash();

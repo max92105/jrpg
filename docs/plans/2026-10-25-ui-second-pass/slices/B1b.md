@@ -19,3 +19,9 @@ Developer: "a fade, ideally a screen break, like glass shattering."
     - `Break_Shards_AllHaveACornerAtOrAroundTheImpactRing` (shards radiate from the impact)
     - `Break_ShardCount_IsAboutTheTarget`
   - **Verify by hand:** an encounter: the flash, then the field visibly cracked into glass shards from the center, then the fade. F12 during the crack.
+- **Done, with deviations:**
+  - **Layout:** 8 rays (the 4 corners and a jittered point on each edge, 25-75 % along) crossed by one ring at a jittered 35-55 % of each ray. The fan around the impact gives 8 shards and the ring-to-border quads 16 more, 24 in all. With the corners included, the outer border is the screen itself, so the shards tile it exactly; the area test checks that. `Shard` is a record of its three corners and its center; the flights come in B1c.
+  - **View:** `ShatterView` uses `DrawUserPrimitives` (a plain triangle list, so no index buffer, not the slice's `DrawUserIndexedPrimitives`) through a `BasicEffect` made on the first draw and kept for the game's life. Each shard is pushed 3 px out from the impact, so dark cracks open, and white hairlines at 55 % are drawn by the sprite batch, which it begins again the same way the host does. Vertices and hairlines are built once per layout.
+  - **Flow:** `FreezeFrame` breaks the layout (seed 258 plus the encounters so far), and the shards replace the plain frozen frame from `EncounterFlash.IsPastPeak` on. 227 lines.
+  - **Review:** the host's scene batch and the view's restart share `Rendering/VirtualScreen.BeginBatch`. The radiating test now requires each shard to have a corner off the screen's border, meaning the impact or a ring point. The seed's comment says 258 is arbitrary.
+  - **Tests:** 5 in `ShatterLayoutTests` and 2 in `EncounterFlashTests` (just before and at the peak). 2187 in the solution.

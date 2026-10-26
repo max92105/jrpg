@@ -17,6 +17,9 @@ internal sealed class EncounterFlash
 
     public bool IsPlaying => _elapsed < _rise + _fall;
 
+    /// <summary>From the flash's peak on, when the frame cracks; also true when no flash plays.</summary>
+    public bool IsPastPeak => _elapsed >= _rise;
+
     /// <summary>0 clear to <see cref="PeakWhiteness"/>.</summary>
     public float Whiteness
     {

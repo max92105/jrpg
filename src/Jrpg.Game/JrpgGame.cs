@@ -131,7 +131,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
         var batch = _batch!;
         GraphicsDevice.SetRenderTarget(_virtualScreen);
         GraphicsDevice.Clear(Color.Black);
-        batch.Begin(samplerState: SamplerState.PointClamp);
+        VirtualScreen.BeginBatch(batch);
         _rootScene.Draw(batch, _textures!);
         batch.End();
 #if DEBUG

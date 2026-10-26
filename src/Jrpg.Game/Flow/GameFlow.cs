@@ -23,18 +23,25 @@ internal sealed class GameFlow : IScene
     private static readonly TimeSpan _blackHold = TimeSpan.FromSeconds(0.15);
     private static readonly TimeSpan _fadeIn = TimeSpan.FromSeconds(0.5);
 
+    // The shatter (decision 258) breaks from the screen's center. Its seed is an arbitrary number plus the encounters
+    // so far, so each break differs.
+    private const int ShatterSeed = 258;
+    private static readonly Point _screenCenter = new(VirtualScreen.Width / 2, VirtualScreen.Height / 2);
+
     private readonly SceneStack _scenes = new();
     private readonly FadeGate _fade = new(new ScreenFade(_fadeOut, _blackHold, _fadeIn));
     private readonly SessionTransitions _sessions;
     private readonly MenuTransitions _menus;
     private readonly BattleTransitions _battles;
     private readonly EncounterFlash _flash = new();
+    private readonly ShatterView _shatterView = new();
 
     // The battle asked for, held while the flash plays (decision 258), then handed to the fade.
     private BattleRequested? _encounter;
 
     // The field's last frame, from the host; shown instead of the scenes until the battle starts at black.
     private Texture2D? _frozenFrame;
+    private int _encounterCount;
 
     /// <param name="catalog">The content, as loaded.</param>
     /// <param name="text">Messages and fonts.</param>
@@ -107,8 +114,15 @@ internal sealed class GameFlow : IScene
         return null;
     }
 
-    /// <summary>Keeps <paramref name="frame"/> as the frozen field until the battle starts; the host owns it.</summary>
-    public void FreezeFrame(Texture2D frame) => _frozenFrame = frame;
+    /// <summary>
+    /// Keeps <paramref name="frame"/> as the frozen field until the battle starts, and breaks it into the shards it
+    /// shows from the flash's peak; the host owns the frame.
+    /// </summary>
+    public void FreezeFrame(Texture2D frame)
+    {
+        _frozenFrame = frame;
+        _shatterView.Show(ShatterLayout.Break(_screenCenter, ShatterSeed + _encounterCount));
+    }
 
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
@@ -132,6 +146,7 @@ internal sealed class GameFlow : IScene
                 break;
             case BattleRequested battle:
                 _encounter = battle;
+                _encounterCount++;
                 _flash.Start();
                 break;
             default:
@@ -156,7 +171,8 @@ internal sealed class GameFlow : IScene
         }
     }
 
-    // The white is drawn only over the frozen frame, so the frame the host copies never holds any of it.
+    // The frame cracks into shards at the flash's peak. The white is drawn only over the frozen frame, so the frame the
+    // host copies never holds any of it.
     private void DrawScenesOrFrozenFrame(SpriteBatch batch, TextureLibrary textures)
     {
         if (_frozenFrame is null)
@@ -166,7 +182,15 @@ internal sealed class GameFlow : IScene
         }
 
         var screen = new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height);
-        batch.Draw(_frozenFrame, screen, Color.White);
+        if (_flash.IsPastPeak)
+        {
+            _shatterView.Draw(batch, _frozenFrame, textures.Pixel);
+        }
+        else
+        {
+            batch.Draw(_frozenFrame, screen, Color.White);
+        }
+
         batch.Draw(textures.Pixel, screen, Color.White * _flash.Whiteness);
     }
 

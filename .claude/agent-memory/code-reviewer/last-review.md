@@ -5,9 +5,7 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/T1.md, slice T1 (title font, ADR 0025)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/T2.md, slice T2 (title font on victory, defeat, leader name; ADR 0025)
 Round: 1 (verdict: Ready to commit)
 
-- Suggestion: FontLibraryTests.cs Load_RepositoryContent_GivesATitleFont asserts NotNull only; TitleFontAt wired to _body would pass; compare a measured width against FontAt(120); open
-- Suggestion: FontLibrary.SystemOf is not a verb phrase; CreateFontSystem; open
-- Suggestion: FontLibraryTests.cs:62 no blank line between the previous test and the new [Fact]; open
+- No findings. Follow-up only: OutcomeFrame title hairline at fixed TitleLineTop 226 assumes the old line height; hand check; open

@@ -61,7 +61,7 @@ internal sealed class LeaderProfileView
     {
         _ui = ui;
         _profiles = profiles;
-        _nameFont = text.Fonts.FontAt(NamePixels);
+        _nameFont = text.Fonts.TitleFontAt(NamePixels);
         _classFont = text.Fonts.FontAt(ClassPixels);
         _statLabelFont = text.Fonts.FontAt(StatLabelPixels);
         _statValueFont = text.Fonts.FontAt(StatValuePixels);

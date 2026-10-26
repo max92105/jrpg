@@ -48,7 +48,7 @@ internal sealed class DefeatScreenView
     {
         _screen = screen;
         _ui = ui;
-        _titleFont = new OutlinedFont(text.Fonts.FontAt(TitleTextPixels));
+        _titleFont = new OutlinedFont(text.Fonts.TitleFontAt(TitleTextPixels));
         _subtitleFont = new OutlinedFont(text.Fonts.FontAt(SubtitleTextPixels));
         _choiceFont = new OutlinedFont(text.Fonts.FontAt(ChoiceTextPixels));
         _footerFont = text.Fonts.FontAt(FooterTextPixels);

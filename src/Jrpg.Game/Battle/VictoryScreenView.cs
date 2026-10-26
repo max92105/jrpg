@@ -86,7 +86,7 @@ internal sealed class VictoryScreenView
         _screen = screen;
         _ui = ui;
         _messages = text.Messages;
-        _titleFont = new OutlinedFont(text.Fonts.FontAt(TitlePixels));
+        _titleFont = new OutlinedFont(text.Fonts.TitleFontAt(TitlePixels));
         _rewardLabelFont = new OutlinedFont(text.Fonts.FontAt(RewardLabelPixels));
         _rewardValueFont = new OutlinedFont(text.Fonts.FontAt(RewardValuePixels));
         _nameFont = new OutlinedFont(text.Fonts.FontAt(NamePixels));

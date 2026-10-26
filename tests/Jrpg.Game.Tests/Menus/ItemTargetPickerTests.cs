@@ -83,4 +83,25 @@ public sealed class ItemTargetPickerTests
 
         Assert.Same(_members[2], picker.Pointed);
     }
+
+    [Fact]
+    public void PointAt_Candidate_PointsAtIt()
+    {
+        var picker = new ItemTargetPicker(_members, new TargetChoice<PartyMember>([_members[0], _members[2]], TakesAll: false));
+
+        picker.PointAt(_members[2]);
+
+        Assert.Same(_members[2], picker.Pointed);
+    }
+
+    // After a use, a member who can't take the item any more keeps the pointer where the new choice starts it.
+    [Fact]
+    public void PointAt_NonCandidate_KeepsThePointer()
+    {
+        var picker = new ItemTargetPicker(_members, new TargetChoice<PartyMember>([_members[0], _members[2]], TakesAll: false));
+
+        picker.PointAt(_members[1]);
+
+        Assert.Same(_members[0], picker.Pointed);
+    }
 }

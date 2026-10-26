@@ -9,7 +9,8 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// Using a consumable from the inventory: pick who it's for among the members Core allows, on the party sidebar's cards
-/// (decision 267), have Core use it, and say what happened. The page draws the aiming; this holds it.
+/// (decision 267), have Core use it, and say what happened. Aiming goes on after a use while copies are left and
+/// someone can take the item (decision 288). The page draws the aiming; this holds it.
 /// </summary>
 internal sealed class ItemUse
 {
@@ -51,7 +52,7 @@ internal sealed class ItemUse
             return _messages.Text(MessageIds.PartyRests);
         }
 
-        var picker = new ItemTargetPicker(MemberOrder.ActiveThenReserve(_party), _fieldItems.TargetChoiceForAnyUser(item));
+        var picker = PickerFor(item);
         var hint = _messages.Format(MessageIds.MenuHintInventoryTarget, new MessageArgument("item", item.Name));
         _aim = new Aim(item, picker, hint);
         return null;
@@ -72,15 +73,35 @@ internal sealed class ItemUse
             return null;
         }
 
-        return _aim.Picker.Update(input) is { } targets ? Use(_aim.Item, targets) : null;
+        return _aim.Picker.Update(input) is { } targets ? Use(_aim, targets) : null;
     }
 
-    private string Use(ItemDefinition item, IReadOnlyList<PartyMember> targets)
+    private string Use(Aim aim, IReadOnlyList<PartyMember> targets)
     {
+        var item = aim.Item;
         var amounts = _fieldItems.UseOn(item, targets);
-        _aim = null;
+        AimAgainOrStop(aim, targets[0]);
         return targets.Count == 1 ? ResultFor(item, targets[0], amounts[0]) : _messages.Format(MessageIds.ItemUsed, new MessageArgument("item", item.Name));
     }
+
+    // Decision 288: while copies are left and someone can take the item, aiming goes on, on the same member when they
+    // still can, else on the first who can; otherwise it ends and the cursor is back on the list.
+    private void AimAgainOrStop(Aim aim, PartyMember lastTarget)
+    {
+        if (!_fieldItems.CanUse(aim.Item))
+        {
+            _aim = null;
+            return;
+        }
+
+        var picker = PickerFor(aim.Item);
+        picker.PointAt(lastTarget);
+        _aim = aim with { Picker = picker };
+    }
+
+    // In the party sidebar's order, so the pointer lands on the card it names.
+    private ItemTargetPicker PickerFor(ItemDefinition item) =>
+        new(MemberOrder.ActiveThenReserve(_party), _fieldItems.TargetChoiceForAnyUser(item));
 
     private string ResultFor(ItemDefinition item, PartyMember target, int amount)
     {

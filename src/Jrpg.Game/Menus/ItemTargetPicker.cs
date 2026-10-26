@@ -32,6 +32,24 @@ internal sealed class ItemTargetPicker
     /// <summary>The member the pointer is on; null when the item takes everyone, which needs no pointer.</summary>
     public PartyMember? Pointed => _choice.TakesAll ? null : Members[_cursor.Selected];
 
+    /// <summary>Points at <paramref name="member"/> if they can take the item; otherwise the pointer stays.</summary>
+    public void PointAt(PartyMember member)
+    {
+        if (!IsCandidate(member))
+        {
+            return;
+        }
+
+        for (var index = 0; index < Members.Count; index++)
+        {
+            if (Members[index] == member)
+            {
+                _cursor.Select(index);
+                return;
+            }
+        }
+    }
+
     /// <returns>The targets confirmed this update, or null.</returns>
     public IReadOnlyList<PartyMember>? Update(InputFrame input)
     {

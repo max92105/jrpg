@@ -81,6 +81,84 @@ public sealed class InventoryPageAimTests
         Assert.Null(page.Sidebar.PointedIndex);
     }
 
+    // Decision 288: copies are left and the healed member can still take a potion, so the pointer stays on them.
+    [Fact]
+    public void Update_UsePotionWithCopiesLeft_KeepsAimingAtTheSameMember()
+    {
+        var session = NewSession();
+        var page = NewOpenPage(session);
+        page.Update(Pressing(GameButton.Confirm));
+        page.Update(Pressing(GameButton.Down));
+        var potions = session.Inventory.QuantityOf("potion");
+        var target = PointedMember(page);
+        Assert.Same(MemberOrder.ActiveThenReserve(session.Party)[1], target);
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.True(page.IsChoosingTarget);
+        Assert.Same(target, PointedMember(page));
+        Assert.Equal(potions - 1, session.Inventory.QuantityOf("potion"));
+        Assert.NotNull(page.Notice);
+    }
+
+    [Fact]
+    public void Update_UseLastPotion_ReturnsToTheList()
+    {
+        var session = NewSession();
+        Assert.True(session.Inventory.TryRemove("potion", session.Inventory.QuantityOf("potion") - 1));
+        var page = NewOpenPage(session);
+        page.Update(Pressing(GameButton.Confirm));
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.False(page.IsChoosingTarget);
+        Assert.Null(page.Sidebar.PointedIndex);
+        Assert.DoesNotContain("potion", page.ShownItemIds);
+    }
+
+    // The feather revives every fallen member at once, so with one fallen nobody is left for it, copies or not.
+    [Fact]
+    public void Update_ReviveTheOnlyFallenWithCopiesLeft_ReturnsToTheList()
+    {
+        var session = NewSession();
+        var fallen = MemberOrder.ActiveThenReserve(session.Party)[1];
+        fallen.Vitals.TakeDamage(fallen.Vitals.MaxHp);
+        var page = NewOpenPage(session);
+        SelectRow(page, "revive_feather");
+        page.Update(Pressing(GameButton.Confirm));
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.True(fallen.Vitals.IsAlive);
+        Assert.True(session.Inventory.QuantityOf("revive_feather") > 0, "The test needs feathers left after the use.");
+        Assert.False(page.IsChoosingTarget);
+    }
+
+    [Fact]
+    public void Update_CancelAfterAUse_ReturnsToTheListAndUsesNothingMore()
+    {
+        var session = NewSession();
+        var page = NewOpenPage(session);
+        page.Update(Pressing(GameButton.Confirm));
+        page.Update(Pressing(GameButton.Confirm));
+        Assert.True(page.IsChoosingTarget);
+        var potionsAfterOne = session.Inventory.QuantityOf("potion");
+
+        page.Update(Pressing(GameButton.Cancel));
+
+        Assert.False(page.IsChoosingTarget);
+        Assert.Equal(potionsAfterOne, session.Inventory.QuantityOf("potion"));
+        Assert.Null(page.Sidebar.PointedIndex);
+    }
+
+    private static void SelectRow(InventoryPage page, string itemId)
+    {
+        while (page.ShownItemIds[page.SelectedRow!.Value] != itemId)
+        {
+            page.Update(Pressing(GameButton.Down));
+        }
+    }
+
     private static PartyMember? PointedMember(InventoryPage page) =>
         page.Sidebar.PointedIndex is { } index ? page.Sidebar.Cards[index].Member : null;
 

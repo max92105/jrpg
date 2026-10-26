@@ -79,16 +79,5 @@ internal sealed class ListCursor
         ScrollToSelected();
     }
 
-    // The window moves only as far as it must, so it scrolls a row at a time and jumps only when the cursor wraps.
-    private void ScrollToSelected()
-    {
-        if (Selected < FirstVisible)
-        {
-            FirstVisible = Selected;
-        }
-        else if (Selected >= FirstVisible + _visibleRows)
-        {
-            FirstVisible = Selected - _visibleRows + 1;
-        }
-    }
+    private void ScrollToSelected() => FirstVisible = ScrollWindow.KeepInView(FirstVisible, Selected, _count, _visibleRows);
 }

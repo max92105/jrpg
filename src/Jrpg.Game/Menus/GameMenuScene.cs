@@ -84,6 +84,9 @@ internal sealed class GameMenuScene : IScene
     /// <summary>Whether the party sidebar shows: only beside an open page that wants it.</summary>
     internal bool ShowsSidebar => _isInPage && _pages[_tabs.Selected].ShowsPartySidebar;
 
+    /// <summary>The members a member page goes through and the one it shows, kept current while it is open.</summary>
+    internal MemberColumn MemberColumn { get; } = new();
+
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
         _motion.Advance(delta);
@@ -108,7 +111,7 @@ internal sealed class GameMenuScene : IScene
 
         if (_isInPage)
         {
-            _sidebar.Refresh((_pages[_tabs.Selected] as IMemberPage)?.Shown);
+            RefreshMemberViews();
         }
 
         return request;
@@ -136,6 +139,16 @@ internal sealed class GameMenuScene : IScene
         }
 
         DrawFooterHint(batch, opacity);
+    }
+
+    private void RefreshMemberViews()
+    {
+        var memberPage = _pages[_tabs.Selected] as IMemberPage;
+        _sidebar.Refresh(memberPage?.Shown);
+        if (memberPage is not null)
+        {
+            MemberColumn.Refresh(memberPage.Members, memberPage.Shown);
+        }
     }
 
     private void DrawFooterHint(SpriteBatch batch, float opacity)

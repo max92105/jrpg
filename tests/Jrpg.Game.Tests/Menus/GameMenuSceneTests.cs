@@ -177,6 +177,18 @@ public sealed class GameMenuSceneTests
         Assert.Equal(1, sidebar.ShownIndex);
     }
 
+    [Fact]
+    public void Update_RightOnStatus_MemberColumnShowsTheNextMember()
+    {
+        var session = NewSession();
+        var menu = NewMenu(session, new PartySidebar(session.Party), new StatusPage(RepositoryScreenText.Text, new UiTextures(), session, StartMapScenarios.BelowClosedDoor));
+        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+
+        menu.Update(_oneUpdate, Pressing(GameButton.Right));
+
+        Assert.Equal(1, menu.MemberColumn.ShownIndex);
+    }
+
     // The menu's tabs are Status then Inventory: Status marks its member, then Inventory, which shows no one, marks none.
     [Fact]
     public void Update_InventoryOpen_SidebarMarksNoMember()

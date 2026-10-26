@@ -1,4 +1,5 @@
 using Jrpg.Core.Party;
+using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Menus;
 
@@ -118,21 +119,8 @@ internal sealed class PartySidebar
         return null;
     }
 
-    private void KeepShownInView()
-    {
-        FirstVisible = Math.Min(FirstVisible, Math.Max(0, _cards.Count - VisibleCards));
-        if (ShownIndex is not { } shown)
-        {
-            return;
-        }
-
-        if (shown < FirstVisible)
-        {
-            FirstVisible = shown;
-        }
-        else if (shown >= FirstVisible + VisibleCards)
-        {
-            FirstVisible = shown - VisibleCards + 1;
-        }
-    }
+    private void KeepShownInView() =>
+        FirstVisible = ShownIndex is { } shown
+            ? ScrollWindow.KeepInView(FirstVisible, shown, _cards.Count, VisibleCards)
+            : ScrollWindow.Clamp(FirstVisible, _cards.Count, VisibleCards);
 }

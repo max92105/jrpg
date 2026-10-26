@@ -1,4 +1,6 @@
 using Jrpg.Core.Progression;
+using Jrpg.Core.Randomness;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Session;
 using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
@@ -55,7 +57,7 @@ public sealed class StatusPageTests
         page.Open();
 
         string[] expected = [$"{vitals.Hp} / {vitals.MaxHp}", NumberText.Of(leader.TotalStats.Attack), NumberText.Of(leader.TotalStats.Defense)];
-        Assert.Equal(expected, page.ShownStats);
+        Assert.Equal(expected, page.ShownSheet.Stats);
     }
 
     [Fact]
@@ -68,7 +70,7 @@ public sealed class StatusPageTests
 
         page.Open();
 
-        Assert.Equal($"{vitals.Hp} / {vitals.MaxHp}", page.ShownStats[0]);
+        Assert.Equal($"{vitals.Hp} / {vitals.MaxHp}", page.ShownSheet.Stats[0]);
     }
 
     [Fact]
@@ -132,6 +134,87 @@ public sealed class StatusPageTests
         var progress = StatusSheet.ExperienceProgress(table.MaxLevel, 0, table);
 
         Assert.Equal((1, 1), progress);
+    }
+
+    [Fact]
+    public void Open_Member_ShowsSpeed()
+    {
+        var session = NewSession();
+        var page = NewPage(session);
+
+        page.Open();
+
+        Assert.Equal(NumberText.Of(session.Party.Leader.Speed), page.ShownSheet.Speed);
+    }
+
+    [Fact]
+    public void Open_Mage_ShowsManaAndClarity()
+    {
+        var page = NewPage(NewSession());
+
+        ShowMemberOfClass(page, "mage");
+
+        var resources = page.Shown.Class.Resources;
+        var mana = resources.Single(resource => resource.Id == "mana");
+        var clarity = resources.Single(resource => resource.Id == "clarity");
+        StatusSheet.Line[] expected = [new(mana.Name, NumberText.Of(mana.Max)), new(clarity.Name, $"{clarity.StartsAt}/{clarity.Max}")];
+        Assert.Equal(expected, page.ShownSheet.Resources);
+    }
+
+    [Fact]
+    public void Open_LastingResourceSpent_ShowsItsAmountOutOfMax()
+    {
+        var mageId = NewSession().Party.Members.First(member => member.Class.Id == "mage").Id;
+        var page = NewPage(SessionWithLastingAmount(mageId, "clarity", 1));
+
+        ShowMemberOfClass(page, "mage");
+
+        var clarity = page.Shown.Class.Resources.Single(resource => resource.Id == "clarity");
+        Assert.Contains(new StatusSheet.Line(clarity.Name, $"1/{clarity.Max}"), page.ShownSheet.Resources);
+    }
+
+    [Fact]
+    public void Open_Rogue_ShowsReadinessMaxFromSpeed()
+    {
+        var page = NewPage(NewSession());
+
+        ShowMemberOfClass(page, "rogue");
+
+        var readiness = page.Shown.Class.Resources.Single(resource => resource.Id == "readiness");
+        var charges = ReadinessFormula.Charges(page.Shown.Speed, readiness.MaxFromSpeed!.SpeedPerCharge);
+        Assert.Equal(new StatusSheet.Line(readiness.Name, NumberText.Of(charges)), page.ShownSheet.Resources[0]);
+    }
+
+    [Fact]
+    public void Open_Member_ListsTheClassSkillsInOrder()
+    {
+        var session = NewSession();
+        var page = NewPage(session);
+
+        page.Open();
+
+        var expected = session.Party.Leader.Skills.Select(skill => new StatusSheet.Line(skill.Name, skill.Description));
+        Assert.Equal(expected, page.ShownSheet.Skills);
+    }
+
+    // Goes through the members with Right until one of the class shows.
+    private static void ShowMemberOfClass(StatusPage page, string classId)
+    {
+        page.Open();
+        while (page.Shown.Class.Id != classId)
+        {
+            page.Update(Pressing(GameButton.Right));
+        }
+    }
+
+    // The save's way in: Core keeps lasting amounts only through a battle or a save.
+    private static GameSession SessionWithLastingAmount(string memberId, string resourceId, int amount)
+    {
+        var save = NewSession().Capture(DateTimeOffset.UnixEpoch);
+        var members = save.Members.Select(member => member.Id == memberId
+            ? member with { LastingAmounts = new Dictionary<string, int> { [resourceId] = amount } }
+            : member);
+        return GameSession.Restore(save with { Members = [.. members] }, StartMapScenarios.BelowClosedDoor, new SeededRandom(1));
     }
 
     private static GameSession NewSession() => StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);

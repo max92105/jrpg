@@ -55,8 +55,8 @@ internal sealed class StatusPage : IMemberPage
 
     public bool LeavesOnCancel => true;
 
-    /// <summary>The shown member's HP, Attack and Defense, as the page writes them.</summary>
-    internal IReadOnlyList<string> ShownStats => _sheet.Stats;
+    /// <summary>Everything the page shows of the member, as text.</summary>
+    internal StatusSheet ShownSheet => _sheet;
 
     // Recruits don't change while the menu is open, so the cursor's member count still holds.
     [MemberNotNull(nameof(Members), nameof(_sheet))]

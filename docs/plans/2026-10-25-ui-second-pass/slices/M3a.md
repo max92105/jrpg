@@ -21,3 +21,9 @@ Part of [the UI second pass plan](../README.md). Decision 260. Design: [design.m
     - `Open_Member_ListsTheClassSkillsInOrder`
     - `Open_Member_ShowsSpeed`
   - **Verify by hand:** open Status for the mage, the cleric and the fighter: their resources, Clarity or Faith as an amount after a battle, their skills with descriptions; Left and Right change all of it. F12, compare with `menu-status.webp`.
+- **Done, with deviations:**
+  - **One Core change, the developer's choice (2026-10-26):** `Core/Battle/ResourceStarts` is public, with no rule change, because the Rogue's Readiness takes its max from speed. The sheet reads each max from it, so the Status page and battles can't disagree. A lasting resource shows the member's `LastingAmounts` out of that max.
+  - **Layout:** speed sits beside HP in Parameters. Equipment and Resources share a row, half the width each (no class has more than two resources). Skills fill the rest of the page. Review: each description wraps to the sheet's width (built when the sheet or the width changes) and skills stack by their real height, as many whole ones as fit. With today's two-line placeholder descriptions that is about 2 of a class's 3; shorter real descriptions fit 3. No scrolling.
+  - **Accessors:** the page has one read accessor, `ShownSheet`, which replaces `ShownStats`. The speed caption and the lasting-amount format (`StatusLabels.LastingAmountText`) live in `StatusLabels`.
+  - **Tests:** 5 new in `StatusPageTests`, including the Rogue's speed-scaled max. The spent-Clarity test goes through a save, since Core keeps lasting amounts only through a battle or a save. 2158 in the solution.
+  - **Follow-up:** skill costs aren't shown, because `Battle/SkillCostText` reads a battle's `ResourceMeters`.

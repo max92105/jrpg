@@ -5,10 +5,12 @@ namespace Jrpg.Core.Battle;
 
 /// <summary>
 /// A member's resources as they start a battle: the definition's numbers, the amount a lasting resource carried from
-/// the last battle (ADR 0024), or the speed's charges; then lowered by any strain on it.
+/// the last battle (ADR 0024), or the speed's charges; then lowered by any strain on it. Public so a screen
+/// outside battle (the Status page) shows the same maxes.
 /// </summary>
-internal static class ResourceStarts
+public static class ResourceStarts
 {
+    /// <returns>One start per class resource, in the class's order.</returns>
     public static IReadOnlyList<ResourceStart> For(PartyMember member) => [.. member.Class.Resources.Select(resource => StrainedStart(resource, member))];
 
     private static ResourceStart StrainedStart(ResourceDefinition resource, PartyMember member)

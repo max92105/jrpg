@@ -96,6 +96,15 @@ internal static class MessageIds
 
     public const string StatusEquipment = "status_equipment";
 
+    public const string StatusSpeed = "status_speed";
+
+    public const string StatusResources = "status_resources";
+
+    public const string StatusSkills = "status_skills";
+
+    /// <summary>A lasting resource's amount out of its max: {amount}, {max}.</summary>
+    public const string StatusLastingAmount = "status_lasting_amount";
+
     public const string StatHp = "stat_hp";
 
     /// <summary>Placeholders <c>{value}</c>, <c>{max}</c>: an HP value, one format everywhere (decision 110).</summary>

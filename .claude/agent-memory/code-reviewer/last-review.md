@@ -5,8 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/C3.md, slice C3 (EventPresenter split: StillRun moves out)
-Round: 1 (verdict: Ready to commit; all six paths traced identical)
+Slice: docs/plans/2026-10-25-ui-second-pass/slices/X1.md, slice X1 (inn rest fade in EventPresenter)
+Round: 1 (verdict: Ready to commit; flag can't stick: RestStep isn't a presentation step and only ShowPages continues it)
 
-- S1 EventPresenter.cs ShowStill — "!IsRunning after Show means a skip" is an implicit protocol; Show could return whether it skipped (bool) so the presenter doesn't infer it; open
-- S2 StillRun.cs IsLeadingOut/AdvanceLeadOut — public members without a summary while the others have one; open
+- W1 EventPresenter.cs ShowRest `_isRestFadeStarted = false` — no test; a second inn visit in the same scene would skip the fade; test: rest, TryInteract again, fade plays; open
+- S1 EventPresenterRestTests IsBusy_DuringRestFade_IsTrue — passes without the fade (event running alone makes it true); open

@@ -84,7 +84,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **W1b. The titled framed window with its separator; yes/no prompts become a centered framed dialog** (Game, about 220 lines) → [slices/W1b.md](slices/W1b.md)
 - [x] **W2. The dialogue box in the frame language** (Game, about 130 lines) → [slices/W2.md](slices/W2.md)
 - [x] **C3. `EventPresenter` split: the run of stills moves out** (Game, mechanical, about 220 lines) → [slices/C3.md](slices/C3.md)
-- [ ] **X1. The inn fades to black, holds, then says the party rests** (Game, about 170 lines) → [slices/X1.md](slices/X1.md)
+- [x] **X1. The inn fades to black, holds, then says the party rests** (Game, about 170 lines) → [slices/X1.md](slices/X1.md)
 
 ### Phase 4: the menu
 - [ ] **MO1. The menu slides in and fades out (`MenuMotion`)** (Game, about 240 lines) → [slices/MO1.md](slices/MO1.md)

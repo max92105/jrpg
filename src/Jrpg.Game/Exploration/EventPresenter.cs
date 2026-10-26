@@ -16,9 +16,9 @@ namespace Jrpg.Game.Exploration;
 /// <summary>
 /// Shows the running map event's current step and continues it once shown (ADR 0006): a warp fades to black, moves the
 /// player while the screen is black, and fades back in; a dialogue shows its lines one page per Confirm, and a found
-/// item its message as one page. A cutscene still covers the screen for its seconds, and Confirm or Cancel skips the
-/// cutscene's stills (ADR 0016). The event's voice-over plays through the voice channel until the event ends or is
-/// skipped (ADR 0018).
+/// item its message as one page. A rest fades to black and back before its message (decision 257). A cutscene still
+/// covers the screen for its seconds, and Confirm or Cancel skips the cutscene's stills (ADR 0016). The event's
+/// voice-over plays through the voice channel until the event ends or is skipped (ADR 0018).
 /// </summary>
 internal sealed class EventPresenter
 {
@@ -31,6 +31,12 @@ internal sealed class EventPresenter
 
     // The fade for warps (placeholder timing).
     private readonly ScreenFade _warpFade = new(TimeSpan.FromSeconds(0.25), TimeSpan.FromSeconds(0.08), TimeSpan.FromSeconds(0.25));
+
+    // The inn's beat (decision 257): out, a second of black, back in, then the party rests (placeholder timing).
+    private readonly ScreenFade _restFade = new(TimeSpan.FromSeconds(0.5), TimeSpan.FromSeconds(1.0), TimeSpan.FromSeconds(0.5));
+
+    // Whether the current rest step has started its fade, so its page's own updates don't start it again.
+    private bool _isRestFadeStarted;
 
     // The pages of the step being read; null when no message is on screen.
     private SpeechPlayback? _reading;
@@ -55,13 +61,17 @@ internal sealed class EventPresenter
     /// <summary>Whether a cutscene still covers the screen.</summary>
     internal bool IsShowingStill => _stills.IsShowing;
 
+    /// <summary>Whether a message (a dialogue page, a found item, a rest) is on screen.</summary>
+    internal bool IsShowingMessage => _reading is not null;
+
     /// <summary>How black to draw over the map, 0..1.</summary>
-    public float Blackness => Math.Max(_stills.Blackness, _warpFade.Blackness);
+    public float Blackness => Math.Max(_stills.Blackness, Math.Max(_warpFade.Blackness, _restFade.Blackness));
 
     /// <exception cref="InvalidOperationException">The current step is of a type the game can't show yet.</exception>
     public void Update(TimeSpan delta, InputFrame input)
     {
         _warpFade.Update(delta);
+        _restFade.Update(delta);
         if (_stills.IsLeadingOut)
         {
             _stills.AdvanceLeadOut(delta);
@@ -83,11 +93,14 @@ internal sealed class EventPresenter
             case WarpStep:
                 ShowWarp();
                 break;
-            case DialogueStep or GiveItemStep or RecruitStep or RestStep:
+            case DialogueStep or GiveItemStep or RecruitStep:
                 ShowPages(step, delta, input);
                 break;
             case StillStep still:
                 ShowStill(still, delta, input);
+                break;
+            case RestStep:
+                ShowRest(step, delta, input);
                 break;
             default:
                 throw new InvalidOperationException($"The game can't show a {step.GetType().Name} yet.");
@@ -129,6 +142,28 @@ internal sealed class EventPresenter
         if (_exploration.CurrentEventStep is WarpStep && _warpFade.Phase == FadePhase.Idle)
         {
             _warpFade.StartAtBlack();
+        }
+    }
+
+    // The step's first update starts the fade; its message shows once the screen is back, as any page does.
+    private void ShowRest(EventStep step, TimeSpan delta, InputFrame input)
+    {
+        if (!_isRestFadeStarted)
+        {
+            _restFade.Start();
+            _isRestFadeStarted = true;
+            return;
+        }
+
+        if (_restFade.Phase != FadePhase.Idle)
+        {
+            return;
+        }
+
+        ShowPages(step, delta, input);
+        if (_reading is null)
+        {
+            _isRestFadeStarted = false;
         }
     }
 

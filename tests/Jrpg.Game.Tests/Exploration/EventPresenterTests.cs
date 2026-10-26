@@ -94,6 +94,7 @@ public sealed class EventPresenterTests
         var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel());
         presenter.Update(StartMapScenarios.OneUpdate, default);
         Assert.IsType<RestStep>(exploration.CurrentEventStep);
+        presenter.Update(TimeSpan.FromSeconds(2), default);
 
         presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
 

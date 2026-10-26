@@ -57,6 +57,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `tests/Jrpg.Game.Tests/Battle/CommandMenuTests.cs` is at 393 lines: split it by menu entry (MO1 review).
 - The tip strip (dark `UiTheme.CommandHintFill` fill, highlight hairline, padded text) is drawn twice: `Battle/CommandPanelView.DrawHint` and `Menus/InventoryListView.DrawStrip`. Move it into one drawer in `Ui` when a third appears (M4 review).
 - `SectionHeight = 36` (a `SectionTitle`'s height) is copied in `EquipmentSheetView`, `StatusSheetView` and `StatusSkillsView`: expose it from `Ui/SectionTitle` (M3b review).
+- The scroll cues above and below a list are drawn twice: `PartySidebarView.DrawScrollCues` and `MemberColumnView.DrawScrollMarks`. Move them into one `Ui` drawer if a third list needs them (M2b review).
 
 ## From the class mechanics plan (2026-10-25)
 

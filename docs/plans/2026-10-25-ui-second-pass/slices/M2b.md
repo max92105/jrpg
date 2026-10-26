@@ -11,3 +11,9 @@ Question 265's placeholder: the party sidebar stays on the right; the page narro
     - BG1's warm-up includes the column's portrait size.
   - **Tests:** none new (draw-only; M2a tests the model). `GameMenuSceneTests` pass unchanged.
   - **Verify by hand:** Status and Equipment show the column; Left/Right move the marked portrait and the page together; with more members than fit, the column scrolls; other pages show no column; the page's content still fits after SZ1 (F12, compare with `menu-status.webp`).
+- **Done, with deviations:**
+  - **`Menus/MenuTabsView`** takes the tab drawing out of `GameMenuScene` first, unchanged, since the scene would have passed 260 lines (now 236). M1 draws its icons there.
+  - **Column:** `MemberColumnView` draws the members in view as 56 px diamond portraits, 72 px apart. The shown one sits on a 64 px band in the shared selection look (`DrawSelectedRow` and the diamond pointer, which doesn't bob). Small diamonds above and below mark members out of view. It is drawn at the member page area's left (80 px), with the page's slide and fade, and the page narrows by it. The sidebar stays on the right (question 265's placeholder).
+  - **Review:** on a page with its own pointer (Equipment), the column shows the band without a pointer (`Place.PointsAtShown`, as the sidebar does), so only one pointer shows (decision 252). The scroll marks match the sidebar's 10 px cues.
+  - **No warm-up added:** BG1 found a diamond portrait bakes in under 20 ms, so it warmed none. The first Status opening bakes up to 8 small portraits once. Worth watching in the hand check.
+  - **Tests:** none new; 2170 unchanged.

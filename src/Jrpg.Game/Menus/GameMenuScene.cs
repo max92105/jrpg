@@ -17,18 +17,13 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class GameMenuScene : IScene
 {
-    // Placeholder layout (decision 82): the header, the body 40 px below it, the tabs 10 px apart, the page 24 px right
-    // of them, 40 px from the right edge, and 32 px above the 72 px footer.
+    // Placeholder layout (decision 82): the header, the body 40 px below it, the page 24 px right of the tabs, 40 px
+    // from the right edge, and 32 px above the 72 px footer.
     private const int FooterHeight = 72;
     private const int BodyTop = MenuHeader.Height + 40;
-    private const int TabPitch = NavTabShape.Height + 10;
     private const int PageLeft = NavTabShape.Width + 24;
     private static readonly Rectangle _pageArea = new(PageLeft, BodyTop, VirtualScreen.Width - 40 - PageLeft, VirtualScreen.Height - FooterHeight - 32 - BodyTop);
     private static readonly Rectangle _screen = new(0, 0, VirtualScreen.Width, VirtualScreen.Height);
-
-    // The selected tab's label slides 14 px right, over a 2 px bright line along its bottom.
-    private const int SelectedLabelSlide = 14;
-    private const int SelectionLineThickness = 2;
 
     // The footer's hint starts 40 px in.
     private const int FooterTextInset = 40;
@@ -41,6 +36,8 @@ internal sealed class GameMenuScene : IScene
     private static readonly Rectangle _sidebarColumn = _pageArea with { X = _pageArea.Right - SidebarWidth, Width = SidebarWidth };
 
     private readonly UiTextures _ui;
+    private readonly MenuTabsView _tabsView;
+    private readonly MemberColumnView _memberColumnView;
     private readonly MenuHeader _header;
     private readonly PartySidebar _sidebar;
     private readonly PartySidebarView _sidebarView;
@@ -75,6 +72,8 @@ internal sealed class GameMenuScene : IScene
         _tabs = new ListCursor(pages.Length, _ => true);
         _font = text.Fonts.FontAt(UiTheme.MenuTextPixels);
         _tabLabels = [.. pages.Select(page => text.Messages.Text(page.TitleMessageId))];
+        _tabsView = new MenuTabsView(ui, _font, _tabLabels, BodyTop);
+        _memberColumnView = new MemberColumnView(ui);
         _mainHint = text.Messages.Text(MessageIds.MenuHintMain);
     }
 
@@ -123,13 +122,10 @@ internal sealed class GameMenuScene : IScene
         _motion.MarkDrawn();
         DrawFrame(batch, textures, opacity);
         _header.Draw(batch, _isInPage ? _tabLabels[_tabs.Selected] : _menuTitle, opacity);
-        DrawTabs(batch, textures);
-
+        _tabsView.Draw(batch, textures, new MenuTabsView.Place(_motion, _tabs.Selected, _tabGlide.Position));
         if (_isInPage)
         {
-            var pageArea = ShowsSidebar ? _pageAreaBesideSidebar : _pageArea;
-            var area = pageArea with { X = pageArea.X + _pageTransition.Offset };
-            _pages[_tabs.Selected].Draw(batch, textures, area, opacity * _pageTransition.Opacity);
+            DrawPage(batch, textures, opacity * _pageTransition.Opacity);
         }
 
         if (ShowsSidebar)
@@ -169,32 +165,21 @@ internal sealed class GameMenuScene : IScene
         FooterBar.Draw(batch, textures.Pixel, FooterHeight, opacity);
     }
 
-    // The plain tabs, the selected glow over them where the glide has it, then every label on top. Each tab sits at its
-    // own place in the slide-in, with its own fade; the glow takes the selected tab's.
-    private void DrawTabs(SpriteBatch batch, TextureLibrary textures)
+    // A member page gets the member column at its left and narrows by it; both slide in with the page transition.
+    private void DrawPage(SpriteBatch batch, TextureLibrary textures, float opacity)
     {
-        for (var index = 0; index < _tabLabels.Length; index++)
+        var pageArea = ShowsSidebar ? _pageAreaBesideSidebar : _pageArea;
+        var area = pageArea with { X = pageArea.X + _pageTransition.Offset };
+        var page = _pages[_tabs.Selected];
+        if (page is IMemberPage memberPage)
         {
-            batch.Draw(_ui.NavTab(textures), new Vector2(TabLeft(index), BodyTop + (index * TabPitch)), Color.White * _motion.TabOpacity(index));
+            var column = area with { Width = MemberColumnView.Width };
+            _memberColumnView.Draw(batch, textures, new MemberColumnView.Place(MemberColumn, column, !memberPage.HasOwnPointer), opacity);
+            area = area with { X = column.Right, Width = area.Width - MemberColumnView.Width };
         }
 
-        var selected = _tabs.Selected;
-        var tint = Color.White * _motion.TabOpacity(selected);
-        var glowLeft = TabLeft(selected);
-        var glowTop = BodyTop + (int)Math.Round(_tabGlide.Position * TabPitch);
-        batch.Draw(_ui.SelectedNavTab(textures), new Vector2(glowLeft, glowTop), tint);
-        var line = new Rectangle(glowLeft, glowTop + NavTabShape.Height - SelectionLineThickness, NavTabShape.ShoulderPixels, SelectionLineThickness);
-        batch.Draw(_ui.SelectionLine(textures), line, tint);
-
-        for (var index = 0; index < _tabLabels.Length; index++)
-        {
-            var labelLeft = TabLeft(index) + UiTheme.MenuTextInset + (index == selected ? SelectedLabelSlide : 0);
-            var labelTop = BodyTop + (index * TabPitch) + ((NavTabShape.Height - _font.LineHeight) / 2f);
-            batch.DrawString(_font, _tabLabels[index], new Vector2(labelLeft, labelTop), UiTheme.TextPrimary * _motion.TabOpacity(index));
-        }
+        page.Draw(batch, textures, area, opacity);
     }
-
-    private int TabLeft(int index) => -(int)Math.Round(_motion.TabOffset(index));
 
     // Input works during the slide-in, so a quick player isn't slowed; Cancel or Menu starts the closing fade.
     private void UpdateTabs(InputFrame input)

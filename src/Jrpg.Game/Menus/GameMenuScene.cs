@@ -77,7 +77,7 @@ internal sealed class GameMenuScene : IScene
         _tabs = new ListCursor(pages.Length, _ => true);
         _font = text.Fonts.FontAt(UiTheme.MenuTextPixels);
         _tabLabels = [.. pages.Select(page => text.Messages.Text(page.TitleMessageId))];
-        _tabsView = new MenuTabsView(ui, _font, _tabLabels);
+        _tabsView = new MenuTabsView(ui, _font, _tabLabels, [.. pages.Select(page => page.Glyph)]);
         _memberColumnView = new MemberColumnView(_memberColumn, ui);
         _mainHint = text.Messages.Text(MessageIds.MenuHintMain);
     }

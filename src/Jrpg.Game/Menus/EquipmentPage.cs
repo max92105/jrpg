@@ -68,6 +68,8 @@ internal sealed class EquipmentPage : IMemberPage
 
     public string TitleMessageId => MessageIds.MenuEquipment;
 
+    public TabGlyph Glyph => TabGlyph.Equipment;
+
     public string Hint => _takeHint ?? _pageHint;
 
     // Recruits don't change while the menu is open, so the member cursor's count still holds.

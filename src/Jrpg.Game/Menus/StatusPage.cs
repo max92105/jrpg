@@ -47,6 +47,8 @@ internal sealed class StatusPage : IMemberPage
 
     public string TitleMessageId => MessageIds.MenuStatus;
 
+    public TabGlyph Glyph => TabGlyph.Status;
+
     public string Hint { get; }
 
     public bool LeavesOnCancel => true;

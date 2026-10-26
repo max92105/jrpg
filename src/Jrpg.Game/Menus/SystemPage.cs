@@ -51,6 +51,8 @@ internal sealed class SystemPage : IMenuPage
 
     public string TitleMessageId => MessageIds.MenuSystem;
 
+    public TabGlyph Glyph => TabGlyph.System;
+
     /// <summary>The open save files' hint while they show in this page's place.</summary>
     public string Hint => _openFiles?.Hint ?? _ownHint;
 

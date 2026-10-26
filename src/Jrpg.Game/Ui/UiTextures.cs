@@ -33,6 +33,7 @@ internal sealed class UiTextures
     private Texture2D? _rewardBar;
     private Texture2D? _cardHeader;
     private readonly Dictionary<(string File, int Size), Texture2D> _diamondPortraits = [];
+    private readonly Dictionary<TabGlyph, Texture2D> _tabGlyphs = [];
     private readonly Dictionary<(string Folder, string File, int Size), Texture2D> _shrunk = [];
     private readonly Dictionary<DiamondShape, Texture2D> _diamonds = [];
     private readonly Dictionary<Texture2D, Texture2D> _silhouettes = [];
@@ -41,6 +42,18 @@ internal sealed class UiTextures
     /// <summary>A tab that isn't selected: the arrow, dark and faintly outlined.</summary>
     public Texture2D NavTab(TextureLibrary textures) =>
         _navTab ??= textures.Create(NavTabShape.Width, NavTabShape.Height, NavTabShape.Pixels(SolidRow(UiTheme.NavFill, NavTabShape.Width), UiTheme.NavStroke));
+
+    /// <summary>A tab's placeholder icon, white, baked on first use (decision 254).</summary>
+    public Texture2D TabGlyph(TextureLibrary textures, TabGlyph glyph)
+    {
+        if (!_tabGlyphs.TryGetValue(glyph, out var baked))
+        {
+            baked = textures.Create(TabGlyphShape.Size, TabGlyphShape.Size, TabGlyphShape.Pixels(glyph));
+            _tabGlyphs.Add(glyph, baked);
+        }
+
+        return baked;
+    }
 
     /// <summary>The selected tab: the arrow in the blue selection gradient, brightly outlined.</summary>
     public Texture2D SelectedNavTab(TextureLibrary textures) =>

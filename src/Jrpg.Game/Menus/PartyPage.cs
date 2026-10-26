@@ -51,6 +51,8 @@ internal sealed class PartyPage : IMenuPage
 
     public string TitleMessageId => MessageIds.MenuParty;
 
+    public TabGlyph Glyph => TabGlyph.Party;
+
     public string Hint { get; }
 
     /// <summary>False: the page lists the party itself.</summary>

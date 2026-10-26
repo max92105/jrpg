@@ -19,6 +19,8 @@ internal sealed class CountingMenuPage : IMenuPage
 
     public string TitleMessageId => MessageIds.MenuStatus;
 
+    public TabGlyph Glyph => TabGlyph.Status;
+
     public string Hint => "Counting page hint";
 
     public bool ShowsPartySidebar { get; init; } = true;

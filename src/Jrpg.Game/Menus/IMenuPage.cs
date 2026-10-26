@@ -1,6 +1,7 @@
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Scenes;
+using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -11,6 +12,9 @@ internal interface IMenuPage
 {
     /// <summary>The message id of the page's name, shown on its tab.</summary>
     string TitleMessageId { get; }
+
+    /// <summary>The placeholder icon before the page's name on its tab (decision 254).</summary>
+    TabGlyph Glyph { get; }
 
     /// <summary>
     /// The page's current line of help for the menu's footer, already formatted. It changes only when the page's state does,

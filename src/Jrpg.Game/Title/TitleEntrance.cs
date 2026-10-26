@@ -4,8 +4,8 @@ namespace Jrpg.Game.Title;
 
 /// <summary>
 /// The title screen coming in from black: the picture, then the game's name, then the entries, each fading in over its
-/// own window of time. Timed from the first drawn frame, like <see cref="Scenes.OpeningFade"/>, so a slow first frame
-/// can't use the entrance up before it shows.
+/// own window of time. Timed from the first drawn frame, like the menu's opening (BG1), so a slow first frame can't use
+/// the entrance up before it shows.
 /// </summary>
 internal sealed class TitleEntrance
 {

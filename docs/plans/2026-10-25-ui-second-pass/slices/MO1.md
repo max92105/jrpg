@@ -27,3 +27,10 @@ Part of [the UI second pass plan](../README.md). Decision 262. Design: [design.m
       - `Update_ConfirmDuringSlideIn_OpensThePage`
       - The three tests that expect `MenuClosed` on the press (`Update_CancelOnTabs_RequestsMenuClosed`, `Update_MenuOnTabs_RequestsMenuClosed`, `Update_EscapeInPage_ReturnsToTabsWithoutClosing`) step past the closing through a helper `CloseAndWait(menu, button)`: about 30 lines.
   - **Verify by hand:** Esc on the map: the tabs slide in; Esc again: the menu fades out over the map, then walking works; opening and closing quickly never leaves the menu half-drawn; Back to title still fades to the title.
+- **Done, with deviations:**
+  - **Timing:** `MenuMotion` times the opening from the first drawn frame (`MarkDrawn`, BG1's fix) and the closing from `StartClosing`, so the scene tests, which never draw, still see the menu close.
+  - **`OpeningFade` removed:** BG1's type lost its only user, so it and its 3 tests are gone (2127 tests in all).
+  - **Tests:**
+    - three more: `StartClosing_SecondCall_KeepsTheFadeGoing`; after review, `FrameOpacity_AdvanceBeforeFirstDraw_StaysClear` (BG1's regression test, which failed with the guard removed) and `TabOpacity_AtOpeningAndAfterClosing_IsZero`;
+    - each tab fades in with its slide (`TabOpacity`).
+  - **Size:** `GameMenuScene` is 227 lines.

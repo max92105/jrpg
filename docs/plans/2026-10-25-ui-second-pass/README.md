@@ -87,7 +87,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **X1. The inn fades to black, holds, then says the party rests** (Game, about 170 lines) → [slices/X1.md](slices/X1.md)
 
 ### Phase 4: the menu
-- [ ] **MO1. The menu slides in and fades out (`MenuMotion`)** (Game, about 240 lines) → [slices/MO1.md](slices/MO1.md)
+- [x] **MO1. The menu slides in and fades out (`MenuMotion`)** (Game, about 240 lines) → [slices/MO1.md](slices/MO1.md)
 - [ ] **TS. Menu pages advance with the menu's time** (Game, about 130 lines) → [slices/TS.md](slices/TS.md)
 - [ ] **MO2a. The selection glides and the pointer bobs: the menu tabs and the title** (Game, about 210 lines) → [slices/MO2a.md](slices/MO2a.md)
 - [ ] **C5. `InventoryPage` split: `InventoryRow` and `InventoryListView`** (Game, mostly moved, about 200 lines) → [slices/C5.md](slices/C5.md)

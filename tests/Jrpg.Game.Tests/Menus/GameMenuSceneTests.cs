@@ -13,13 +13,14 @@ namespace Jrpg.Game.Tests.Menus;
 public sealed class GameMenuSceneTests
 {
     private static readonly TimeSpan _oneUpdate = TimeSpan.FromSeconds(1.0 / 60);
+    private static readonly TimeSpan _closingFade = TimeSpan.FromSeconds(0.12);
 
     [Fact]
     public void Update_CancelOnTabs_RequestsMenuClosed()
     {
         var menu = NewMenu();
 
-        var request = menu.Update(_oneUpdate, Pressing(GameButton.Cancel));
+        var request = CloseAndWait(menu, Pressing(GameButton.Cancel));
 
         Assert.IsType<MenuClosed>(request);
     }
@@ -29,7 +30,7 @@ public sealed class GameMenuSceneTests
     {
         var menu = NewMenu();
 
-        var request = menu.Update(_oneUpdate, Pressing(GameButton.Menu));
+        var request = CloseAndWait(menu, Pressing(GameButton.Menu));
 
         Assert.IsType<MenuClosed>(request);
     }
@@ -57,7 +58,7 @@ public sealed class GameMenuSceneTests
         menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
 
         var leaving = menu.Update(_oneUpdate, PressingEscape);
-        var onTabs = menu.Update(_oneUpdate, Pressing(GameButton.Cancel));
+        var onTabs = CloseAndWait(menu, Pressing(GameButton.Cancel));
 
         Assert.Null(leaving);
         Assert.IsType<MenuClosed>(onTabs);
@@ -193,6 +194,52 @@ public sealed class GameMenuSceneTests
         menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
 
         Assert.Null(sidebar.ShownIndex);
+    }
+
+    [Fact]
+    public void Update_CancelOnTabs_RequestsMenuClosedOnceFaded()
+    {
+        var menu = NewMenu();
+
+        var onPress = menu.Update(_oneUpdate, Pressing(GameButton.Cancel));
+        var faded = menu.Update(_closingFade, default);
+        var after = menu.Update(_oneUpdate, default);
+
+        Assert.Null(onPress);
+        Assert.IsType<MenuClosed>(faded);
+        Assert.Null(after);
+    }
+
+    [Fact]
+    public void Update_ConfirmWhileClosing_DoesNothing()
+    {
+        var page = new CountingMenuPage();
+        var menu = NewMenu(page);
+        menu.Update(_oneUpdate, Pressing(GameButton.Cancel));
+
+        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+        var faded = menu.Update(_closingFade, default);
+
+        Assert.Equal(0, page.OpenCount);
+        Assert.IsType<MenuClosed>(faded);
+    }
+
+    [Fact]
+    public void Update_ConfirmDuringSlideIn_OpensThePage()
+    {
+        var page = new CountingMenuPage();
+        var menu = NewMenu(page);
+
+        menu.Update(_oneUpdate, Pressing(GameButton.Confirm));
+
+        Assert.Equal(1, page.OpenCount);
+    }
+
+    // The press starts the closing fade; MenuClosed comes once it has run.
+    private static SceneRequest? CloseAndWait(GameMenuScene menu, InputFrame press)
+    {
+        menu.Update(_oneUpdate, press);
+        return menu.Update(_closingFade, default);
     }
 
     private static GameMenuScene NewMenu(GameSession session, PartySidebar sidebar, params IMenuPage[] pages) =>

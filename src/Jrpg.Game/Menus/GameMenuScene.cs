@@ -52,8 +52,9 @@ internal sealed class GameMenuScene : IScene
     private readonly string _mainHint;
     private readonly PageTransition _pageTransition = new();
 
-    // Decision 81's opening fade; opacity only.
-    private readonly OpeningFade _opening = new(TimeSpan.FromSeconds(0.15));
+    // Decision 262: the menu slides in, and fades out before it closes.
+    private readonly MenuMotion _motion = new();
+    private bool _hasRequestedClose;
     private bool _isInPage;
 
     /// <param name="text">Messages and fonts for the tab labels.</param>
@@ -82,10 +83,24 @@ internal sealed class GameMenuScene : IScene
 
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
-        _opening.Update(delta);
+        _motion.Advance(delta);
+        if (_motion.IsClosing)
+        {
+            return RequestClosedOnceFaded();
+        }
+
         _pageTransition.Update(delta);
         _header.Update();
-        var request = _isInPage ? UpdatePage(input) : UpdateTabs(input);
+        SceneRequest? request = null;
+        if (_isInPage)
+        {
+            request = UpdatePage(input);
+        }
+        else
+        {
+            UpdateTabs(input);
+        }
+
         if (_isInPage)
         {
             _sidebar.Refresh((_pages[_tabs.Selected] as IMemberPage)?.Shown);
@@ -96,13 +111,13 @@ internal sealed class GameMenuScene : IScene
 
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
-        var opacity = _opening.Opacity;
-        _opening.MarkDrawn();
+        var opacity = _motion.FrameOpacity;
+        _motion.MarkDrawn();
         DrawFrame(batch, textures, opacity);
         _header.Draw(batch, _isInPage ? _tabLabels[_tabs.Selected] : _menuTitle, opacity);
         for (var index = 0; index < _tabLabels.Length; index++)
         {
-            DrawTab(batch, textures, index, opacity);
+            DrawTab(batch, textures, index);
         }
 
         if (_isInPage)
@@ -139,28 +154,33 @@ internal sealed class GameMenuScene : IScene
         FooterBar.Draw(batch, textures.Pixel, FooterHeight, opacity);
     }
 
-    private void DrawTab(SpriteBatch batch, TextureLibrary textures, int index, float opacity)
+    // Each tab at its own place in the slide-in, and its own fade.
+    private void DrawTab(SpriteBatch batch, TextureLibrary textures, int index)
     {
+        var opacity = _motion.TabOpacity(index);
         var tint = Color.White * opacity;
+        var left = -(int)Math.Round(_motion.TabOffset(index));
         var top = BodyTop + (index * TabPitch);
         var isSelected = index == _tabs.Selected;
-        batch.Draw(isSelected ? _ui.SelectedNavTab(textures) : _ui.NavTab(textures), new Vector2(0, top), tint);
+        batch.Draw(isSelected ? _ui.SelectedNavTab(textures) : _ui.NavTab(textures), new Vector2(left, top), tint);
         if (isSelected)
         {
-            var line = new Rectangle(0, top + NavTabShape.Height - SelectionLineThickness, NavTabShape.ShoulderPixels, SelectionLineThickness);
+            var line = new Rectangle(left, top + NavTabShape.Height - SelectionLineThickness, NavTabShape.ShoulderPixels, SelectionLineThickness);
             batch.Draw(_ui.SelectionLine(textures), line, tint);
         }
 
-        var labelLeft = UiTheme.MenuTextInset + (isSelected ? SelectedLabelSlide : 0);
+        var labelLeft = left + UiTheme.MenuTextInset + (isSelected ? SelectedLabelSlide : 0);
         var labelTop = top + ((NavTabShape.Height - _font.LineHeight) / 2f);
         batch.DrawString(_font, _tabLabels[index], new Vector2(labelLeft, labelTop), UiTheme.TextPrimary * opacity);
     }
 
-    private MenuClosed? UpdateTabs(InputFrame input)
+    // Input works during the slide-in, so a quick player isn't slowed; Cancel or Menu starts the closing fade.
+    private void UpdateTabs(InputFrame input)
     {
         if (input.IsPressed(GameButton.Cancel) || input.IsPressed(GameButton.Menu))
         {
-            return new MenuClosed();
+            _motion.StartClosing();
+            return;
         }
 
         if (input.IsPressed(GameButton.Up))
@@ -179,8 +199,18 @@ internal sealed class GameMenuScene : IScene
             _pageTransition.Start();
             _isInPage = true;
         }
+    }
 
-        return null;
+    // While closing nothing reads input; the flow hears MenuClosed once, on the update the fade ends.
+    private MenuClosed? RequestClosedOnceFaded()
+    {
+        if (!_motion.IsClosingDone || _hasRequestedClose)
+        {
+            return null;
+        }
+
+        _hasRequestedClose = true;
+        return new MenuClosed();
     }
 
     private SceneRequest? UpdatePage(InputFrame input)

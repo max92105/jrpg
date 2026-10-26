@@ -59,4 +59,45 @@ public sealed class FontLibraryTests : IDisposable
 
         Assert.Equal("art/fonts/cut.ttf: not a readable font.", exception.Message);
     }
+
+    [Fact]
+    public void Load_RepositoryContent_TitleFaceDiffersFromBody()
+    {
+        using var fonts = FontLibrary.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        var title = fonts.TitleFontAt(120).MeasureString("Victory");
+        var body = fonts.FontAt(120).MeasureString("Victory");
+
+        Assert.NotEqual(body, title);
+    }
+
+    [Fact]
+    public void Load_NoTitleFont_ThrowsNamingTheTitlesFolder()
+    {
+        CopyBodyFont();
+
+        var exception = Assert.Throws<ContentValidationException>(() => FontLibrary.Load(_contentRoot));
+
+        Assert.Equal("art/fonts/titles: there's no .ttf font.", exception.Message);
+    }
+
+    [Fact]
+    public void Load_TitleFileThatIsNotAFont_ThrowsNamingTheFile()
+    {
+        CopyBodyFont();
+        var titlesFolder = Path.Combine(_contentRoot, "art", "fonts", "titles");
+        Directory.CreateDirectory(titlesFolder);
+        File.WriteAllText(Path.Combine(titlesFolder, "bad.ttf"), "<html>not a font</html>");
+
+        var exception = Assert.Throws<ContentValidationException>(() => FontLibrary.Load(_contentRoot));
+
+        Assert.Equal("art/fonts/titles/bad.ttf: not a readable font.", exception.Message);
+    }
+
+    private void CopyBodyFont()
+    {
+        var fontsFolder = Path.Combine(_contentRoot, "art", "fonts");
+        Directory.CreateDirectory(fontsFolder);
+        File.Copy(Path.Combine(AppContext.BaseDirectory, "content", "art", "fonts", "Lato-Regular.ttf"), Path.Combine(fontsFolder, "Lato-Regular.ttf"));
+    }
 }

@@ -57,7 +57,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 | Hosting | Window, settings, file locations | `PlayerSettings`, `TextSpeed`, `GamePaths`, `FullScreenShortcut`, `DeveloperLog` (the console and debug output), `CaptureFiles` (Debug: F12 saves the 1920 x 1080 screen to `docs/captures`; other builds `%LocalAppData%/Jrpg/Captures`) |
 | Audio | The voice-over path (ADR 0018): scenes write the channel, the host plays it after each update; no device means silent | `VoiceChannel`, `SoundLibrary`, `VoicePlayer` |
 | Input | Keys and pads to game buttons, per update; the device in use and its button names | `InputReader`, `InputFrame`, `InputBindings`, `GameButton`, `InputDevice`, `ButtonLabels` |
-| Rendering | Textures, fonts, the virtual screen, baked map art | `TextureLibrary`, `FontLibrary`, `VirtualScreen`, `MapArt`, `TileAtlas` |
+| Rendering | Textures, fonts, the virtual screen, baked map art | `TextureLibrary`, `FontLibrary` (body and title faces, ADR 0025), `VirtualScreen`, `MapArt`, `TileAtlas` |
 | Exploration | The map scene: drawing (NPC objects from their field sprite), camera, walking, showing events (cutscene stills included), the interaction prompt | `ExplorationScene`, `EventPresenter` (stills open and close on black), `StillPlayback`, `StillView` (a still with its subtitle band and skip hint), `MapView`, `MapDrawList`, `MapCamera`, `FieldSpriteFrame`, `InteractionPromptView`, `PromptPlacement`, `PromptFade` |
 | Dialogue | The message box and typing | `DialogueBox`, `SpeechPlayback`, `Typewriter`, `FoundItemText` |
 | Title | The title screen | `TitleScene`, `TitleMenu` |

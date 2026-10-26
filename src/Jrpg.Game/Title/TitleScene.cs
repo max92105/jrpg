@@ -17,7 +17,7 @@ namespace Jrpg.Game.Title;
 internal sealed class TitleScene : IScene
 {
     // Placeholder sizes on the 1920 x 1080 virtual screen (decision 82).
-    private const int NameTextPixels = 100;
+    private const int NameTextPixels = 120;
     private const int NameTop = 60;
     private const int EntryTextPixels = 48;
 
@@ -64,7 +64,7 @@ internal sealed class TitleScene : IScene
         _saves = slots.ReadAll();
         _menu = new TitleMenu(SaveSlots.MostRecent(_saves) is not null);
         _files = new SaveFilesPanel(slots, MessageIds.TitleLoad, text, ui);
-        _nameFont = text.Fonts.FontAt(NameTextPixels);
+        _nameFont = text.Fonts.TitleFontAt(NameTextPixels);
         _entryFont = text.Fonts.FontAt(EntryTextPixels);
         _name = text.Messages.Text(MessageIds.GameTitle);
         _namePosition = new Vector2((VirtualScreen.Width - _nameFont.MeasureString(_name).X) / 2f, NameTop);

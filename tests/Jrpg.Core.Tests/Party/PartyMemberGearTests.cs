@@ -89,6 +89,21 @@ public sealed class PartyMemberGearTests
         Assert.Equal(200, member.Sheet.MaxHp);
     }
 
+    // A second ring previewed in the second ring slot keeps the first ring on: the page's second ring row compares
+    // against that slot, not the first.
+    [Fact]
+    public void SheetWith_RingInTheSecondSlot_KeepsTheFirstRing()
+    {
+        var member = NewMember();
+        var ring = new ItemDefinitionBuilder().WithId("power_ring").AsWorn(EquipmentKind.Ring).WithBonuses(new StatBonuses(new Dictionary<StatKind, int> { [StatKind.Power] = 5 })).Build();
+        _inventory.Add(ring, 1);
+        Assert.True(new PartyEquipment(_inventory).TryEquip(member, ring, EquipmentSlot.FirstRing));
+
+        var sheet = member.SheetWith(ring, EquipmentSlot.SecondRing);
+
+        Assert.Equal(member.Sheet.Primaries.Power + 5, sheet.Primaries.Power);
+    }
+
     [Fact]
     public void SheetWith_NotEquipment_Throws()
     {

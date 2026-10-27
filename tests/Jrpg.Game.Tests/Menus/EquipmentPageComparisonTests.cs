@@ -34,6 +34,27 @@ public sealed class EquipmentPageComparisonTests
         Assert.Contains(changes, change => change.Kind == StatKind.SlashingResistance && change.After > change.Before);
     }
 
+    // The power ring stays in the first ring slot: the sage ring's preview in the second adds Intelligence and takes no
+    // Power away.
+    [Fact]
+    public void Update_ChoiceOnSecondRingWithTheFirstWorn_ComparesAgainstTheSecondSlot()
+    {
+        var items = StartMapScenarios.BelowClosedDoor.Items;
+        Assert.True(_session.Equipment.TryEquip(_session.Party.Leader, items["power_ring"], EquipmentSlot.FirstRing));
+        var page = NewPage();
+        EquipmentPageRows.MoveDown(page, EquipmentPageRows.Of(EquipmentSlot.SecondRing));
+        page.Update(Pressing(GameButton.Confirm));
+
+        while (page.Choice!.Highlighted?.Id != "sage_ring")
+        {
+            page.Update(Pressing(GameButton.Down));
+        }
+
+        var changes = page.Comparison!.Changes;
+        Assert.Contains(changes, change => change.Kind == StatKind.Intelligence && change.After > change.Before);
+        Assert.DoesNotContain(changes, change => change.Kind == StatKind.Power);
+    }
+
     [Fact]
     public void Update_SlotHighlighted_ShowsWhatTheWornItemGives()
     {

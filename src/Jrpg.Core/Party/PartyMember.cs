@@ -105,7 +105,16 @@ public sealed class PartyMember
     /// first ring slot).
     /// </summary>
     /// <exception cref="ArgumentException"><paramref name="item"/> isn't equipment.</exception>
-    public StatSheet SheetWith(ItemDefinition item) => SheetWearing(_worn.With(SlotOf(item), item));
+    public StatSheet SheetWith(ItemDefinition item) => SheetWith(item, SlotOf(item));
+
+    /// <summary>The sheet if <paramref name="item"/> replaced whatever is worn in <paramref name="slot"/>.</summary>
+    /// <exception cref="ArgumentException">
+    /// <paramref name="item"/> isn't equipment whose kind fits the slot.
+    /// </exception>
+    public StatSheet SheetWith(ItemDefinition item, EquipmentSlot slot) =>
+        item.Equipment is { } equipment && EquipmentFit.Fits(equipment.Kind, slot)
+            ? SheetWearing(_worn.With(slot, item))
+            : throw new ArgumentException($"Item '{item.Id}' can't be worn in the {slot} slot.", nameof(item));
 
     /// <returns>One step per level the experience passes through; empty at the maximum level.</returns>
     public IReadOnlyList<LevelProgressStep> GainExperience(int amount, ExperienceTable table)
@@ -190,7 +199,7 @@ public sealed class PartyMember
     private int RestAmountOf(ResourceDefinition resource) =>
         resource.StartsAt == resource.Max ? LastingMaxOf(resource) : Math.Min(resource.StartsAt, LastingMaxOf(resource));
 
-    // The first slot the item's kind fits: a ring's first ring slot. The Equipment page names the slot itself (G1c).
+    // The first slot the item's kind fits: a ring's first ring slot. The Equipment page names the slot itself.
     private static EquipmentSlot SlotOf(ItemDefinition item) =>
         item.Equipment is { } equipment
             ? EquipmentFit.SlotsFor(equipment.Kind)[0]

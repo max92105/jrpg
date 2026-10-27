@@ -19,7 +19,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
   The file is protected, so ask the developer first.
 - **Why Core refused an equipment change:** `EquipmentPage.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. `PartyEquipment.ItemWithoutRoom` and `UnequipAll` would own both. It can wait because it is correct today, and nothing planned changes equipment.
-- **`Ui/MessageIds.cs` is 397 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
+- **`Ui/MessageIds.cs` is 410 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
 - **`MainViewModelTests`, part 2 (449 lines after E1a):** move the new content tests (`CreateObject_*`, `CreateNpc_*`, `CanStartNewObject_*`, `TryCreateMap_*`) and the map settings tests (`TryApplySettings_*`) into their own classes, on E1a's `EditorTestContent`.
 - **`MainWindow.xaml.cs` (547 lines):** move the viewport (pan, zoom, fit) and the tile painting handlers into partial files, as `.EventEditing` and `.ObjectEditing` already are.
 - **`TileBrowserViewModelTests` (410 lines):** move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class.
@@ -64,6 +64,8 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `content/art/backgrounds/GameMenu.png` is 4096 x 2838 (23 MB, about 46 MB of video memory) for a 1920 x 1080 screen: a 1920 x 1330 copy would decode about five times faster (BG1). The developer's art; ask first.
 - The battle's skill hint doesn't wrap: a long description runs past its box over the actor's portrait (`docs/captures/before/battle-skill.jpg`; SZ2).
 - **Centering a line of text in a row is written about 10 times**, as `row.Y + ((RowHeight - font.LineHeight) / 2f)`: `EquipmentChoiceView`, `EquipmentSheetView` (twice), `InventoryListView`, `OptionsPage`, `SystemPage`, `PartyActionChoiceView` (integer division), `ConfirmPromptView` and others. A small `Ui` helper could hold it, as `FooterBar.TextTop` does for footers. It can wait because each copy is one line. (C2 review)
+- `src/Jrpg.Game/Battle/CommandPanelView.cs` is at 281 lines: split it before the next change that grows it (retro on the other machine).
+- No debug way to start on a given map and cell: Z's automated walk (on the other machine) couldn't reach the inn or the forest, so those hand checks fell back to the developer. A Debug-only `--start <map> <x> <y>` beside `--content` would let `play-game.ps1` reach any screen.
 
 ## From the escape menu third pass plan (2026-10-26)
 

@@ -1,5 +1,5 @@
 # UI second pass and clean-up
-Status: done (retro skipped)
+Status: done (retro skipped here; the other machine, which built this plan a second time, ran one, and its rule, skill and script changes came in with the 2026-10-27 merge)
 
 Third feature plan after the migration, following the class mechanics plan.
 - Decisions 231-235 and 249-264 are recorded below. Questions 236-248 are answered (decisions 249-263); question 265 was answered by decision 266 in [the escape menu third pass plan](../2026-10-26-escape-menu-third-pass/README.md).

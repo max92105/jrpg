@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/I1.md, slice I1 (GrantScaling: status percent and extra
-turns, never Stun's turns; StunChancePermille against crowd control resistance; StatusResisted; "Resisted" cue)
-Round: 1 (verdict: Ready to commit; verify all pass, 2522 tests)
+Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/I2.md, slice I2 (EnemyTactics rolls crowd control
+resistance against Taunt; status grants on fire_blast, recovery, palm_strike, eldritch_bolt)
+Round: 1 (verdict: Ready to commit; verify all pass, 2526 tests)
 
-- S1 docs/map.md Battle row: EffectScaling still "Power raises damage and healing", no mention it now shapes the grant; open (suggestion)
-- S2 EffectLanding.cs:97 Grant computes StunChancePermille for every grant, Stun or not; compute it only in the Stun branch; open (suggestion)
-- S3 EffectScalingTests.cs:10 field `Twenty` names a number, not what it is; `TwentyPercentMorePower`; open (suggestion)
+- S1 EnemyTacticsTests.cs:63 "With one, the builder's goblin resists nothing" sits on the NoTaunt test but describes the taunt tests above; move it to ChooseCommand_OneMemberTaunting_AttacksThem; open (suggestion)
+- S2 EnemyTacticsTests.cs:126 StubbornGoblinsTurn copies GoblinsTurn; one GoblinsTurn(Combatant goblin) or a resistance parameter; open (suggestion)
+- S3 EnemyTactics.cs:29 new ChanceRolls per taunted choice; a `private readonly ChanceRolls _rolls = new(random);` field; open (suggestion)

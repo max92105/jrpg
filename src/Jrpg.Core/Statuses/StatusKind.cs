@@ -9,7 +9,10 @@ public enum StatusKind
     /// </summary>
     Stun,
 
-    /// <summary>Every enemy attack goes to a taunting party member (question 209).</summary>
+    /// <summary>
+    /// Every enemy attack goes to a taunting party member (question 209), unless the enemy's crowd control resistance
+    /// shrugs it off (decision 324).
+    /// </summary>
     Taunt,
 
     /// <summary>

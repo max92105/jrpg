@@ -2,10 +2,13 @@
   {
     "id": "fire_blast",
     "name": "Fire Blast",
-    "description": "Strikes one enemy with fire.",
+    "description": "Strikes one enemy with fire and leaves it burning for two of its turns.",
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "mana", "amount": -2 } ],
-    "effect": { "kind": "damage", "damageType": "fire", "power": 15, "targeting": "singleEnemy" }
+    "effect": {
+      "kind": "damage", "damageType": "fire", "power": 15, "targeting": "singleEnemy",
+      "status": { "kind": "poison", "power": 5, "turns": 2 }
+    }
   },
   {
     "id": "fireball",
@@ -34,10 +37,13 @@
   {
     "id": "recovery",
     "name": "Recovery",
-    "description": "Restores 30 HP to its user.",
+    "description": "Restores 30 HP to its user, then keeps mending them for two turns.",
     "iconFile": "",
     "requirements": [ { "resourceId": "faith", "atLeast": 2 } ],
-    "effect": { "kind": "restoreHp", "power": 30, "targeting": "self" }
+    "effect": {
+      "kind": "restoreHp", "power": 30, "targeting": "self",
+      "status": { "kind": "regen", "power": 6, "turns": 2 }
+    }
   },
   {
     "id": "heal_all",
@@ -136,10 +142,13 @@
   {
     "id": "eldritch_bolt",
     "name": "Eldritch Bolt",
-    "description": "A bolt of raw force at one enemy. Builds instability. Placeholder: the developer writes the real spell.",
+    "description": "A bolt of raw force at one enemy that opens its guard for two of its turns. Builds instability. Placeholder: the developer writes the real spell.",
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "instability", "amount": 2 } ],
-    "effect": { "kind": "damage", "damageType": "dark", "power": 20, "targeting": "singleEnemy" }
+    "effect": {
+      "kind": "damage", "damageType": "dark", "power": 20, "targeting": "singleEnemy",
+      "status": { "kind": "exposed", "power": 20, "turns": 2 }
+    }
   },
   {
     "id": "void_rift",
@@ -192,9 +201,12 @@
   {
     "id": "palm_strike",
     "name": "Palm Strike",
-    "description": "Two quick palm blows at one enemy. Placeholder: the developer writes the real skill.",
+    "description": "Two quick palm blows at one enemy that may leave it reeling for a turn. Placeholder: the developer writes the real skill.",
     "iconFile": "Attack.png",
-    "effect": { "kind": "damage", "damageType": "blunt", "power": 10, "targeting": "singleEnemy", "hits": 2 }
+    "effect": {
+      "kind": "damage", "damageType": "blunt", "power": 10, "targeting": "singleEnemy", "hits": 2,
+      "status": { "kind": "stun", "power": 30, "turns": 1 }
+    }
   },
   {
     "id": "flurry",

@@ -36,6 +36,7 @@ public sealed class EnemyTacticsTests
         Assert.Throws<InvalidOperationException>(() => tactics.ChooseCommand(battle));
     }
 
+    // The builder's goblin resists nothing, so a taunt costs it no draw: the one value is the target's.
     [Fact]
     public void ChooseCommand_OneMemberTaunting_AttacksThem()
     {
@@ -84,9 +85,49 @@ public sealed class EnemyTacticsTests
         Assert.Equal(new AttackCommand(_teelle), command);
     }
 
+    // The goblin resists half the taunts: a draw of 499 shrugs one off, 500 doesn't; then the target draw.
+    [Fact]
+    public void ChooseCommand_TauntResisted_TargetsAnyLivingMember()
+    {
+        Taunt(_jazog);
+        var tactics = new EnemyTactics(new FixedSequenceRandom(499, 2));
+
+        var command = tactics.ChooseCommand(GoblinsTurn(StubbornGoblin()));
+
+        // The living members are [Sarxian, Jazog, Teelle]; index 2 is Teelle.
+        Assert.Equal(new AttackCommand(_teelle), command);
+    }
+
+    [Fact]
+    public void ChooseCommand_TauntNotResisted_TargetsTheTaunter()
+    {
+        Taunt(_jazog);
+        var tactics = new EnemyTactics(new FixedSequenceRandom(500, 0));
+
+        var command = tactics.ChooseCommand(GoblinsTurn(StubbornGoblin()));
+
+        Assert.Equal(new AttackCommand(_jazog), command);
+    }
+
+    // Without a taunt there is nothing to resist, so even a stubborn goblin draws only for its target.
+    [Fact]
+    public void ChooseCommand_NoTauntAgainstResistantEnemy_DrawsOnlyForTheTarget()
+    {
+        var tactics = new EnemyTactics(new FixedSequenceRandom(2));
+
+        var command = tactics.ChooseCommand(GoblinsTurn(StubbornGoblin()));
+
+        Assert.Equal(new AttackCommand(_teelle), command);
+    }
+
     // Shuffle values (0, 2, 1) swap the goblin to the front, so it is the enemy's turn.
-    private BattleState GoblinsTurn() =>
-        new([_sarxian, _jazog, _teelle, _goblin], new Inventory(), new FixedSequenceRandom(0, 2, 1));
+    private BattleState GoblinsTurn() => GoblinsTurn(_goblin);
+
+    private BattleState GoblinsTurn(Combatant goblin) =>
+        new([_sarxian, _jazog, _teelle, goblin], new Inventory(), new FixedSequenceRandom(0, 2, 1));
+
+    private static Combatant StubbornGoblin() =>
+        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithCrowdControlResistance(50).Build());
 
     private static void Taunt(Combatant member) => member.Statuses.Apply(new StatusGrant(StatusKind.Taunt, Power: 0, Turns: 2));
 

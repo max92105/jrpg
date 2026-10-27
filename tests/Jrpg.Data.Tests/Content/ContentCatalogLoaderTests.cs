@@ -232,7 +232,18 @@ public sealed class ContentCatalogLoaderTests
 
         var recovery = catalog.Skills["recovery"].Effect;
 
-        // Developer decision 22: Recovery heals 30 HP on its user; it does not restore MP.
-        Assert.Equal(new Effect(EffectKind.RestoreHp, Power: 30, Targeting.Self), recovery);
+        // Developer decision 22: Recovery heals 30 HP on its user; it does not restore MP. Decision 320 adds its Regen.
+        Assert.Equal(new Effect(EffectKind.RestoreHp, Power: 30, Targeting.Self, new StatusGrant(StatusKind.Regen, Power: 6, Turns: 2)), recovery);
+    }
+
+    // Decision 320: Intelligence shapes a status, so every class but the rogue, whose Power acts through its attack,
+    // has a skill that grants one.
+    [Fact]
+    public void Load_RepositoryClasses_EachButTheRogueHasASkillGrantingAStatus()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+        var classes = catalog.Classes.Values.Where(characterClass => characterClass.Id != "rogue");
+
+        Assert.All(classes, characterClass => Assert.Contains(characterClass.SkillIds, id => catalog.Skills[id].Effect.Status is not null));
     }
 }

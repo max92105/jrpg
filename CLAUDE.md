@@ -36,6 +36,8 @@ Dependency direction: Game → Data → Core; Editor → Data → Core. Never th
 - Run editor: `dotnet run --project src/Jrpg.Editor` (same content root rule as the game).
 - Visual Studio: the "Game and editor" launch profile (`Jrpg.slnLaunch`) starts both with F5; pick it in the toolbar's startup list. Without it, F5 starts `Jrpg.Game`, the default startup project (`DefaultStartup` in `Jrpg.slnx`).
 - No Python on this machine: edit with the Edit tool, or with sed/awk followed by `sed -i 's/\r*$/\r/'` to restore the CRLF line endings.
+- Bash heredocs over about 70 lines fail to parse here ("unexpected EOF while looking for matching quote"): write a long script or file with the Write tool, then run it.
+- The simulations' tables: `dotnet test` hides them; after a build, run `tests/Jrpg.Simulations/bin/Debug/net10.0/Jrpg.Simulations.exe -showLiveOutput`.
 - Content and source files are CRLF: perl `-0` patterns use `\r?\n`. Write prose (Done notes, docs) with the Edit tool or a quoted heredoc, never `printf`, which reads `\a` and `\v` in a path as escape characters.
 
 ## Coding rules

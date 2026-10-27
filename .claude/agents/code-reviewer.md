@@ -50,7 +50,8 @@ The goal is a slice the developer can commit, not a perfect one. Every round mus
 - **Performance:** allocations or LINQ in `Update`/`Draw`.
 - **Motion:** a new `MenuPointer.Draw` at a cursor's row rather than a `SelectionMotion` position, or a page hosting another page without passing it `Advance`, is a Warning (decision 336).
 - **Content:** hardcoded values that belong in `content/`.
-- **Editor XAML:** a `<Style TargetType=...>` in a view without `BasedOn` hides the dark theme (Warning); a test asserting a total of the repository's content (tile count, objects on a map) is a Warning: assert the entries it needs.
+- **Editor XAML:** a `<Style TargetType=...>` in a view without `BasedOn` hides the dark theme (Warning).
+- **Tests on content and screens:** a test in any project asserting a total or the whole list of the repository's content (tile count, objects on a map, every item on a tab) is a Warning: assert the entries it needs (G2). A UI test that reaches a row by a fixed count of Down or Up presses is a Warning: it moves until the wanted entry is selected (`.claude/rules/tests.md`; G1c's rows moved and one such test looped forever).
 - **Scope:** changes unrelated to the slice.
 
 ## Output

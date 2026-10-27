@@ -29,7 +29,7 @@ Turn a feature request into a plan that a developer can implement one slice at a
    - Don't carry over a structure just because it exists (static singletons, `*Manager` classes, `Models/`/`Enums/` folders).
 5. List open questions that are game-design decisions. Do not answer them yourself; they belong to the developer.
 6. List risks: coupling, performance, determinism, save-format impact.
-7. If a decision has real alternatives, note "ADR needed: <topic>".
+7. If a decision has real alternatives, note "ADR needed: <topic>". An ADR step whose option the developer already chose in the planning session says "write it from the README's entry", not "with `/adr`": there is nothing left to ask (the stats plan's three ADRs).
 
 ## Output
 

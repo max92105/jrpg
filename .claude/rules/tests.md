@@ -19,3 +19,5 @@ paths:
 - A timing or presentation step is tested through to the step that follows it in real content (stills then a warp, a still then a dialogue), and a hardware probe is checked against the library's source, not assumed.
 - A rule with two sides (an `||`, a lower and an upper bound, a rise and a drop) gets one test per side; the class-mechanics reviews found the untested side four times.
 - A test that needs a member without something (no skills, no lasting resource) builds one with a test class; it never picks a repository member that happens to lack it today, since content changes (the "actor without skills" test moved member three times).
+- A value copied from one record into another (a sheet stat into `CombatStats`, a definition's number into a battle start) gets a test whose fixture differs from the destination's default: when the neutral test rules give the default, deleting the copy line passes every test (the H1 and H2 reviews).
+- A new list or dictionary in a save or content record gets a null-entry test: the strict serializer lets a null element or value through, and the null surfaces as a crash later (five slices, last G1b).

@@ -1,4 +1,5 @@
-# Rewraps to 120 columns the /// <summary> blocks and // blocks of C# files that changed since HEAD, keeping CRLF.
+# Rewraps to 120 columns the /// <summary> blocks and // blocks of C# files that changed since HEAD, keeping CRLF; a new
+# one-line /// <summary>, <returns>, <param> or <exception> past 120 columns becomes a block.
 # A tag such as <see cref="X"/> is one word, so it is never split. Usage: perl .claude/scripts/reflow-comments.pl file...
 use strict; use warnings;
 my $width = 120;
@@ -11,6 +12,9 @@ for my $file (@ARGV) {
   my @out;
   for (my $i = 0; $i < @lines; $i++) {
     my ($open, $prefix, $body_re, $end);
+    if ($lines[$i] =~ /^(\s*)\/\/\/ (<(summary|returns|param|exception)[^>]*>)(.+)(<\/\3>)$/ && length($lines[$i]) > $width && !$old{$lines[$i]}) {
+      push @out, "$1/// $2", wrap("$1/// ", $4), "$1/// $5"; next;
+    }
     if ($lines[$i] =~ /^(\s*)\/\/\/ <summary>$/) {
       push @out, $lines[$i];
       $prefix = "$1/// ";

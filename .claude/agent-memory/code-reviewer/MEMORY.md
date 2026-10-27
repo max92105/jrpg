@@ -1,9 +1,7 @@
 - [Records with lists equality](records-with-lists-equality.md) — records with list members compare by reference; combined-field messages; tautological tests
 - [Scratch builds blocked](scratch-builds-blocked.md) — probe recipes: fsi for Core probes and MonoGame IL walks; PowerShell -STA for WPF; no Python
 - [Tautological tests](tautological-tests.md) — same-seed-twice, count==count, File.Exists-only, untested `<=` boundary; pin golden values
-- [Validator null ids](validator-null-ids.md) — null list elements AND dictionary values pass strict STJ; check null entries first (seen slices 8, 1b, 1c, M1b; nested lists too)
 - [Namespace cycles](namespace-cycles.md) — grep reverse usings for each new Core using; Content is the hub (Content<->Session seen in slice 8)
 - [Stale comments](stale-size-comments.md) — sizing, moved drawing, a newly conditional call or a renamed file leave old sizes/places/names; grep old wording
 - [Last review](last-review.md) — slice, round and finding status of the latest review; read first to apply re-review rules
 - [Detached comments](detached-comments.md) — a member inserted under, or removed from under, a comment leaves it describing the wrong code
-- [Default masks copy](default-masks-copy.md) — sheet-to-CombatStats copy untested when neutral rules equal the record default (H1, H2)

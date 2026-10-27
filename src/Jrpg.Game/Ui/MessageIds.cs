@@ -230,6 +230,12 @@ internal static class MessageIds
     /// <summary>The Equipment page's action that takes off everything the member wears.</summary>
     public const string EquipmentRemoveAll = "equipment_remove_all";
 
+    /// <summary>The Equipment page's section that compares what a change would do, or what a worn item gives.</summary>
+    public const string EquipmentChanges = "equipment_changes";
+
+    /// <summary>The comparison's last line when it has more changes than it shows: "+{count} more".</summary>
+    public const string EquipmentMoreChanges = "equipment_more_changes";
+
     /// <summary>The equipment choice's first row, which takes off what's worn in the slot.</summary>
     public const string EquipmentRemove = "equipment_remove";
 

@@ -1,4 +1,3 @@
-using System.Globalization;
 using Jrpg.Core.Items;
 using Jrpg.Core.Session;
 using Jrpg.Game.Menus;
@@ -29,17 +28,6 @@ public sealed class EquipmentSheetTests
         var sheet = EquipmentSheet.Of(_session.Party.Leader);
 
         Assert.All(sheet.Worn, Assert.Null);
-    }
-
-    [Fact]
-    public void Of_WearingSword_AttackTextIsTheMembersTotalAttack()
-    {
-        WearBronzeSword();
-        var leader = _session.Party.Leader;
-
-        var sheet = EquipmentSheet.Of(leader);
-
-        Assert.Equal(leader.TotalStats.Attack.ToString(CultureInfo.InvariantCulture), sheet.Stats[1]);
     }
 
     private ItemDefinition WearBronzeSword()

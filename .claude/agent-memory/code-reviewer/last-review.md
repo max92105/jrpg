@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/L1.md, slice L1 (StatNames/StatText, StatFormula.WholePercentOf, leader choice shows LV, HP, speed, five primaries in two columns)
-Round: 1 (verdict: Ready to commit; verify all pass, 2401 tests)
+Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/E1.md, slice E1 (Equipment page Changes section: StatComparison, StatComparisonText, EquipmentComparison; PartyMember SheetWith/SheetWithout; decision 337 keeps Attack/Defense lines)
+Round: 1 (verdict: Ready to commit; verify all pass, 2417 tests)
 
-- S1 src/Jrpg.Game/Ui/StatText.cs:18 IsPercent is a Game-side "not points" list, so a new StatKind defaults to percent; the unit is Core's fact (StatSheet holds permille) -> StatKinds.IsHeldInPermille in Core; open (suggestion)
-- S2 tests/Jrpg.Core.Tests/Stats/StatFormulaTests.cs WholePercentOf_NegativeHalfPercent_... input is -25.5 %, not -0.5 %; rename e.g. WholePercentOf_MinusTwentyFiveAndAHalfPercent_IsMinusTwentySix; open (suggestion)
-- S3 src/Jrpg.Game/NewGame/LeaderProfileView.cs:33-36 two-columns comment runs into the font-size constants with no blank line; open (suggestion)
-- F1 P4b's W1-W3/F1/F3 status not rechecked here; P4b F2 (LeaderProfile second max-HP path) fixed by this slice
-- F2 stat_attack/stat_defense still in ui.json until E1/S1 (planned, M2b checks); follow-up
+- W1 src/Jrpg.Game/Menus/StatComparison.cs:21-24 lines kept when permille differs but the written whole percent doesn't (wizard robe, Will 8: Light/Dark resistance "2 % > 2 %" in rise color) -> compare what's written, or show a decimal (developer's call); open
+- W2 tests/Jrpg.Game.Tests/Menus/EquipmentChoiceTests.cs Comparison_* rebuild ShowChoice's pairing by hand; no test highlights the choice's Remove row through the page -> page test: sword worn, Confirm on weapon row, Attack After < Before; open
+- S1 src/Jrpg.Core/Party/PartyMember.cs:217,237 sheet built in RebuildStats and SheetWearing -> Sheet = SheetWearing(new Worn(Weapon, Armor)), drop WornBonuses; open (suggestion)
+- S2 src/Jrpg.Game/Menus/EquipmentSheetView.cs:32 ChangeLinesPerColumn (4) and StatComparisonText.MostLines (8) must agree -> derive one from the other; open (suggestion)
+- S3 src/Jrpg.Game/Menus/StatComparison.cs:43 Change.Before doc says StatSheet.ValueOf, but Attack/Defense come from CombatStats; open (suggestion)

@@ -2,6 +2,7 @@ using Jrpg.Core.Party;
 using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Tests.Exploration;
+using Jrpg.Game.Ui;
 using static Jrpg.Game.Tests.Input.InputFrames;
 
 namespace Jrpg.Game.Tests.Menus;
@@ -73,38 +74,49 @@ public sealed class EquipmentChoiceTests
     }
 
     [Fact]
-    public void StatPreview_Of_EmptySlotItem_ShowsFullBonus()
+    public void Comparison_SwordIntoAnEmptySlot_AddsItsWholeAttack()
     {
         var sword = _items["bronze_sword"];
+        var leader = _party.Leader;
 
-        var preview = StatPreview.Of(_party.Leader, sword);
+        var comparison = StatComparison.Between(NumbersOf(leader), new(leader.SheetWith(sword), leader.StatsWith(sword)));
 
-        Assert.Equal(sword.Equipment!.AttackBonus, preview.AttackChange);
-        Assert.Equal(0, preview.DefenseChange);
+        Assert.Equal(sword.Equipment!.AttackBonus, AttackChange(comparison));
+        Assert.DoesNotContain(comparison.Changes, change => change.NameId == MessageIds.StatDefense);
     }
 
     [Fact]
-    public void StatPreview_Of_StrongerWeapon_ShowsPositiveAttack()
+    public void Comparison_StrongerWeapon_RaisesAttack()
     {
         var session = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);
         var leader = session.Party.Leader;
         session.Equipment.TryEquip(leader, _items["bronze_sword"]);
+        var ironSword = _items["iron_sword"];
 
-        var preview = StatPreview.Of(leader, _items["iron_sword"]);
+        var comparison = StatComparison.Between(NumbersOf(leader), new(leader.SheetWith(ironSword), leader.StatsWith(ironSword)));
 
-        Assert.Equal(_items["iron_sword"].Equipment!.AttackBonus - _items["bronze_sword"].Equipment!.AttackBonus, preview.AttackChange);
-        Assert.True(preview.AttackChange > 0);
+        Assert.Equal(ironSword.Equipment!.AttackBonus - _items["bronze_sword"].Equipment!.AttackBonus, AttackChange(comparison));
+        Assert.True(AttackChange(comparison) > 0);
     }
 
     [Fact]
-    public void StatPreview_OfRemoving_WornWeapon_ShowsTheBonusLost()
+    public void Comparison_RemovingTheWornWeapon_LosesItsAttack()
     {
         var session = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);
         var leader = session.Party.Leader;
         session.Equipment.TryEquip(leader, _items["bronze_sword"]);
+        var weapon = Core.Items.EquipmentSlot.Weapon;
 
-        var preview = StatPreview.OfRemoving(leader, Core.Items.EquipmentSlot.Weapon);
+        var comparison = StatComparison.Between(NumbersOf(leader), new(leader.SheetWithout(weapon), leader.StatsWithout(weapon)));
 
-        Assert.Equal(-_items["bronze_sword"].Equipment!.AttackBonus, preview.AttackChange);
+        Assert.Equal(-_items["bronze_sword"].Equipment!.AttackBonus, AttackChange(comparison));
+    }
+
+    private static StatComparison.Numbers NumbersOf(PartyMember member) => new(member.Sheet, member.TotalStats);
+
+    private static int AttackChange(StatComparison comparison)
+    {
+        var attack = comparison.Changes.Single(change => change.NameId == MessageIds.StatAttack);
+        return attack.After - attack.Before;
     }
 }

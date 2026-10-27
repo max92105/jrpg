@@ -65,6 +65,38 @@ public sealed class PartyMemberGearTests
         Assert.Equal((242, 242), (member.Vitals.Hp, member.Vitals.MaxHp));
     }
 
+    [Fact]
+    public void SheetWithout_WornArmor_LosesItsBonuses()
+    {
+        var member = NewMember();
+        Equip(member, Armor(StatKind.Constitution, 10));
+
+        var sheet = member.SheetWithout(EquipmentSlot.Armor);
+
+        Assert.Equal((0, 200), (sheet.Primaries.Constitution, sheet.MaxHp));
+        Assert.Equal(10, member.Sheet.Primaries.Constitution);
+    }
+
+    [Fact]
+    public void SheetWith_Armor_AddsItsBonusesWithoutWearingIt()
+    {
+        var member = NewMember();
+
+        var sheet = member.SheetWith(Armor(StatKind.Constitution, 10));
+
+        Assert.Equal(220, sheet.MaxHp);
+        Assert.Null(member.Armor);
+        Assert.Equal(200, member.Sheet.MaxHp);
+    }
+
+    [Fact]
+    public void SheetWith_NotEquipment_Throws()
+    {
+        var member = NewMember();
+
+        Assert.Throws<ArgumentException>(() => member.SheetWith(new ItemDefinitionBuilder().Build()));
+    }
+
     private static PartyMember NewMember() =>
         PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), _class, new Dictionary<string, SkillDefinition>(), _rules);
 

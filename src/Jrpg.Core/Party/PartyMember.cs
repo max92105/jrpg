@@ -61,7 +61,7 @@ public sealed class PartyMember
     public IReadOnlyDictionary<string, int> LastingAmounts => _lastingAmounts;
 
     /// <summary>Base stats plus the bonuses of everything worn.</summary>
-    public CombatStats TotalStats => StatsWearing(Weapon, Armor);
+    public CombatStats TotalStats => StatsWearing(new Worn(Weapon, Armor));
 
     /// <summary>A new member joins at level 1 with 0 experience and full HP (decision 168).</summary>
     /// <param name="definition">Who joins.</param>
@@ -99,26 +99,18 @@ public sealed class PartyMember
         new(Id, Level, Experience, Vitals.Hp, Weapon?.Id, Armor?.Id, new Dictionary<string, int>(_lastingAmounts));
 
     /// <summary>The stat preview of taking off what's worn in <paramref name="slot"/>: total stats with that slot empty.</summary>
-    public CombatStats StatsWithout(EquipmentSlot slot) => slot switch
-    {
-        EquipmentSlot.Weapon => StatsWearing(null, Armor),
-        EquipmentSlot.Armor => StatsWearing(Weapon, null),
-        _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot."),
-    };
+    public CombatStats StatsWithout(EquipmentSlot slot) => StatsWearing(WornWith(slot, null));
 
     /// <summary>The stat preview: total stats if <paramref name="item"/> replaced whatever is worn in its slot.</summary>
-    public CombatStats StatsWith(ItemDefinition item)
-    {
-        var slot = item.Equipment?.Slot
-            ?? throw new ArgumentException($"Item '{item.Id}' is not equipment.", nameof(item));
+    /// <exception cref="ArgumentException"><paramref name="item"/> isn't equipment.</exception>
+    public CombatStats StatsWith(ItemDefinition item) => StatsWearing(WornWith(SlotOf(item), item));
 
-        return slot switch
-        {
-            EquipmentSlot.Weapon => StatsWearing(item, Armor),
-            EquipmentSlot.Armor => StatsWearing(Weapon, item),
-            _ => throw new ArgumentOutOfRangeException(nameof(item), slot, "Unknown equipment slot."),
-        };
-    }
+    /// <summary>The sheet with what's worn in <paramref name="slot"/> taken off, for the Equipment page.</summary>
+    public StatSheet SheetWithout(EquipmentSlot slot) => SheetWearing(WornWith(slot, null));
+
+    /// <summary>The sheet if <paramref name="item"/> replaced whatever is worn in its slot.</summary>
+    /// <exception cref="ArgumentException"><paramref name="item"/> isn't equipment.</exception>
+    public StatSheet SheetWith(ItemDefinition item) => SheetWearing(WornWith(SlotOf(item), item));
 
     /// <returns>One step per level the experience passes through; empty at the maximum level.</returns>
     public IReadOnlyList<LevelProgressStep> GainExperience(int amount, ExperienceTable table)
@@ -206,8 +198,21 @@ public sealed class PartyMember
         Vitals.ResizeMax(Sheet.MaxHp);
     }
 
-    private StatBonuses WornBonuses() =>
-        (Weapon?.Equipment?.Bonuses ?? StatBonuses.None).Plus(Armor?.Equipment?.Bonuses ?? StatBonuses.None);
+    private static StatBonuses BonusesOf(Worn worn) =>
+        (worn.Weapon?.Equipment?.Bonuses ?? StatBonuses.None).Plus(worn.Armor?.Equipment?.Bonuses ?? StatBonuses.None);
+
+    private static EquipmentSlot SlotOf(ItemDefinition item) =>
+        item.Equipment?.Slot ?? throw new ArgumentException($"Item '{item.Id}' is not equipment.", nameof(item));
+
+    // What would be worn with the slot holding the item (or nothing) and the other slot as now.
+    private Worn WornWith(EquipmentSlot slot, ItemDefinition? item) => slot switch
+    {
+        EquipmentSlot.Weapon => new Worn(item, Armor),
+        EquipmentSlot.Armor => new Worn(Weapon, item),
+        _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot."),
+    };
+
+    private StatSheet SheetWearing(Worn worn) => MemberSheet.Of(ClassGrowth.StatsAt(Class, Level), BonusesOf(worn), _rules);
 
     /// <exception cref="ArgumentException">A skill id isn't in the catalog.</exception>
     private static List<SkillDefinition> SkillsOf(ClassDefinition characterClass, IReadOnlyDictionary<string, SkillDefinition> skillCatalog)
@@ -227,16 +232,19 @@ public sealed class PartyMember
     {
         var stats = ClassGrowth.StatsAt(Class, Level);
         BaseStats = new CombatStats(stats.Attack, stats.Defense);
-        Sheet = MemberSheet.Of(stats, WornBonuses(), _rules);
+        Sheet = SheetWearing(new Worn(Weapon, Armor));
     }
 
     private static int AttackBonusOf(ItemDefinition? item) => item?.Equipment?.AttackBonus ?? 0;
 
     private static int DefenseBonusOf(ItemDefinition? item) => item?.Equipment?.DefenseBonus ?? 0;
 
-    private CombatStats StatsWearing(ItemDefinition? weapon, ItemDefinition? armor) => new(
-        BaseStats.Attack + AttackBonusOf(weapon) + AttackBonusOf(armor),
-        BaseStats.Defense + DefenseBonusOf(weapon) + DefenseBonusOf(armor));
+    private CombatStats StatsWearing(Worn worn) => new(
+        BaseStats.Attack + AttackBonusOf(worn.Weapon) + AttackBonusOf(worn.Armor),
+        BaseStats.Defense + DefenseBonusOf(worn.Weapon) + DefenseBonusOf(worn.Armor));
+
+    // The two slots' items, as worn or as a preview would have them.
+    private readonly record struct Worn(ItemDefinition? Weapon, ItemDefinition? Armor);
 
     private LevelProgressStep AdvanceTowardNextLevel(int amount, int experienceToNextLevel)
     {

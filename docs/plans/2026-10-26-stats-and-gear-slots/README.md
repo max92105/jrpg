@@ -3,7 +3,7 @@ Status: approved, in progress
 
 Fifth feature plan after the migration, following the escape menu third pass.
 - Renumbered when the two machines' histories were merged (2026-10-27): this plan was drafted on 267-308, which the escape menu third pass had taken, so every number here moved up 24. Its Game slices were drafted against the other machine's menu code (the UI second pass built twice); check each against the third pass's pages before slicing it.
-- Decisions 291-302 and 316-332 are recorded below; questions 303-315 are all answered (decisions 320-332). The next free number is 337 (333-336 went to the escape menu third pass's F1).
+- Decisions 291-302, 316-332 and 337 are recorded below; questions 303-315 are all answered (decisions 320-332). The next free number is in `docs/plans/README.md` (333-336 went to the escape menu third pass's F1).
 - This plan writes ADRs 0026 (stat model), 0027 (damage types and resistances) and 0028 (equipment slots); the next ADR is 0029.
 
 Developer's request (2026-10-26, translated): "It's time to start thinking about and implementing stats. Challenge my ideas and complement them. Gear should be more like an ARPG than a classic JRPG: I want to mash the genres, so rarity, random rolls, drop tables, more gear slots (ring, amulet…), salvage, materials and a bit of crafting. But first define enough interesting stats and growth. I haven't thought about scaling." With it, the "Character Stats V2" sheet (damage types, five primaries, derived stats). The session's challenge of the sheet gave decisions 291-302; this plan is the stat half, the loot half is the next plan.
@@ -75,7 +75,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **L1. Stat names and number formats; the leader choice shows HP, speed and the five primaries** (Game + text, about 200 lines) → [slices/L1.md](slices/L1.md)
 - [ ] **S1. The Status page shows the sheet: attributes beside a smaller portrait, combat numbers, resistances** (Game, about 240 lines) → [slices/S1.md](slices/S1.md)
 - [ ] **S2. Status page look: spaced caps, captions, weaknesses tinted** (Game, about 190 lines) → [slices/S2.md](slices/S2.md)
-- [ ] **E1. The Equipment page compares sheets: what the highlighted item changes, or what the worn one gives** (Core + Game, about 240 lines) → [slices/E1.md](slices/E1.md)
+- [x] **E1. The Equipment page compares sheets: what the highlighted item changes, or what the worn one gives** (Core + Game, about 240 lines) → [slices/E1.md](slices/E1.md)
 
 ### Phase 3: damage types and resistances
 - [ ] **D1. Every hit has a damage type; `CombatStats` becomes a sealed record** (Core + Data + content, about 245 lines) → [slices/D1.md](slices/D1.md)
@@ -149,6 +149,9 @@ Placeholders the developer accepted (2026-10-26; may be overturned later):
 - **330. One unarmed attack rule for everyone**, in `rules.json` (18 Blunt) (answers 312).
 - **331. Guarded raises all eight resistances** by its power in points (answers 313).
 - **332. The new gear comes from the new game's starting items** until the loot plan (answers 314).
+
+Taken on 2026-10-27, while slicing E1:
+- **337. Weapons and armor stay comparable on the Equipment page.** E1's comparison keeps Attack and Defense lines, read from what the battle uses, until they leave the game; M1 turns Attack into **Weapon damage** (the weapon's damage raised by Power, the unarmed damage without one), shown on the Equipment comparison and in the Status page's Combat column; M2b removes the Defense line. Without them a sword could not be told from another (a weapon's damage is not a stat kind).
 
 Earlier decisions that apply: 164 and 168 (classes, level 1 start), 165 (anyone wears anything), 137 (taking a worn item from another member), 196 (every resource number is a placeholder), 252 (one selection look), 260 (the Status page shows level, class, resources, skills), 261 ("HP" everywhere), 266 (member pages hide the sidebar).
 

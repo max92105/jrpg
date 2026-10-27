@@ -4,6 +4,7 @@ Part of [the stats and gear slots plan](../README.md). ADR 0027 (resistances rep
 
 - **M2b. Defense leaves; Guarded raises resistances; enemies deal damage, the goblin's retuned** (Core + Data + content, about 230 lines)
   - **Goal:** defense is gone from classes, items, enemies and the battle; a hit is its scaled power through resistance and Exposed. Guarded raises every resistance by its power in points (still within the cap). An enemy's `attack` becomes `damage`. After this slice nothing in the game says attack or defense.
+  - **Decision 337:** the Equipment comparison's Defense line goes with defense, with `PartyMember.StatsWith` and `StatsWithout`.
   - **Changes:**
     - `Stats/CombatStats`: loses `Defense`; `Attack` is renamed `AttackDamage`. `PartyMember.BaseStats` and `TotalStats` go: `Battle/MemberBattleStats` (D1) builds the whole line from the sheet and the worn weapon.
     - `Party/ClassStats`: loses `Defense` (`ClassGrowth`, validator, `classes.json`).

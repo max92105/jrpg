@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using FontStashSharp;
 using Jrpg.Core.Items;
 using Jrpg.Game.Rendering;
@@ -9,14 +8,15 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Draws the Equipment page's sheet: the member's name, what they wear in each slot, the "Remove all" action, their
-/// parameters with the preview of a change, and why the last change didn't happen.
+/// Draws the Equipment page's sheet: the member's name, what they wear in each slot, the "Remove all" action, the
+/// Changes a choice would make or the highlighted worn item gives (decision 337), and why the last change didn't
+/// happen.
 /// </summary>
 internal sealed class EquipmentSheetView
 {
     // Placeholder layout (decision 82): a 28 x 20 margin, the member's name as a heading, section titles as dark bands
     // (decision 335), 52 px rows (a 32 px icon in a 48 px column, the slot name, then what's worn), a hairline 10 px
-    // above "Remove all", and the parameters as two columns of 46 px lines 40 px apart.
+    // above "Remove all", and the Changes as two columns of four 46 px lines, values 320 px in (names run long).
     private const int Margin = 28;
     private const int TopMargin = 20;
     private const int HeadingPixels = 30;
@@ -29,22 +29,21 @@ internal sealed class EquipmentSheetView
     private const int IconSize = 32;
     private const int WornColumn = 260;
     private const int ActionGap = 10;
-    private const int ParametersGap = 18;
-    private const int StatLineHeight = 46;
+    private const int ChangesGap = 18;
+    private const int ChangeLineHeight = 46;
+    private const int ChangeLinesPerColumn = StatComparisonText.MostLines / 2;
     private const int ColumnGap = 40;
-    private const int ValueOffset = 200;
+    private const int ChangeValueOffset = 320;
     private const int PreviewArrowGap = 90;
     private const int PreviewArrowSide = 6;
     private const int PreviewValueGap = 16;
     private const int NoticeGap = 24;
-    private const int AttackLine = 1;
-    private const int DefenseLine = 2;
 
     private readonly UiTextures _ui;
     private readonly SpriteFontBase _headingFont;
     private readonly SpriteFontBase _bodyFont;
     private readonly SectionTitle _equipmentTitle;
-    private readonly SectionTitle _parametersTitle;
+    private readonly SectionTitle _changesTitle;
     private readonly EquipmentLabels _labels;
 
     /// <param name="text">Messages and fonts.</param>
@@ -55,7 +54,7 @@ internal sealed class EquipmentSheetView
         _headingFont = text.Fonts.FontAt(HeadingPixels);
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _equipmentTitle = new SectionTitle(text, MessageIds.StatusEquipment);
-        _parametersTitle = new SectionTitle(text, MessageIds.StatusParameters);
+        _changesTitle = new SectionTitle(text, MessageIds.EquipmentChanges);
         _labels = EquipmentLabels.From(text.Messages);
     }
 
@@ -89,11 +88,11 @@ internal sealed class EquipmentSheetView
         batch.Draw(textures.Pixel, removeAll with { Y = removeAll.Y - 1, Height = 1 }, UiTheme.Stroke * opacity);
         DrawRemoveAllRow(batch, removeAll, opacity);
 
-        var parameters = removeAll with { Y = removeAll.Bottom + ParametersGap, Height = 0 };
-        DrawParameters(batch, textures, new ParametersPlace(parameters, place.Sheet.Stats, place.Preview), opacity);
+        var changes = removeAll with { Y = removeAll.Bottom + ChangesGap, Height = 0 };
+        DrawChanges(batch, textures, new ChangesPlace(changes, place.Changes), opacity);
         if (place.Notice is not null)
         {
-            var noticeTop = parameters.Y + SectionHeight + (2 * StatLineHeight) + NoticeGap;
+            var noticeTop = changes.Y + SectionHeight + ((ChangeLinesPerColumn + 1) * ChangeLineHeight) + NoticeGap;
             batch.DrawString(_bodyFont, place.Notice, new Vector2(rows.X + RowInset, noticeTop), UiTheme.Danger * opacity);
         }
     }
@@ -136,34 +135,45 @@ internal sealed class EquipmentSheetView
         batch.DrawString(_bodyFont, _labels.RemoveAll, new Vector2(row.X + RowInset + IconColumn, textTop), UiTheme.TextPrimary * opacity);
     }
 
-    // HP (the maximum) alone on the first line, then Attack and Defense side by side.
-    private void DrawParameters(SpriteBatch batch, TextureLibrary textures, ParametersPlace place, float opacity)
+    // Each line's name, its value before, an arrow and its value after; four lines a column, "+N more" under the first.
+    private void DrawChanges(SpriteBatch batch, TextureLibrary textures, ChangesPlace place, float opacity)
     {
         var section = place.Section;
-        _parametersTitle.Draw(batch, textures, section, opacity);
-        var columnWidth = (section.Width - RowInset - ColumnGap) / 2;
-        for (var index = 0; index < _labels.Stats.Length; index++)
+        _changesTitle.Draw(batch, textures, section, opacity);
+        if (place.Changes is not { } changes)
         {
-            var (column, line) = index == 0 ? (0, 0) : ((index - 1) % 2, 1 + ((index - 1) / 2));
-            var columnLeft = section.X + RowInset + (column * (columnWidth + ColumnGap));
-            var position = new Vector2(columnLeft, section.Y + SectionHeight + (line * StatLineHeight));
-            batch.DrawString(_bodyFont, _labels.Stats[index], position, UiTheme.TextSecondary * opacity);
-            batch.DrawString(_bodyFont, place.Stats[index], position + new Vector2(ValueOffset, 0), UiTheme.TextPrimary * opacity);
-            if (place.Preview is { } preview && index is AttackLine or DefenseLine)
-            {
-                var value = index == AttackLine ? preview.Attack : preview.Defense;
-                DrawPreview(batch, textures, position + new Vector2(ValueOffset + PreviewArrowGap, 0), value);
-            }
+            return;
+        }
+
+        for (var index = 0; index < changes.Lines.Length; index++)
+        {
+            var line = changes.Lines[index];
+            var position = ChangeLineAt(section, index / ChangeLinesPerColumn, index % ChangeLinesPerColumn);
+            batch.DrawString(_bodyFont, line.Label, position, UiTheme.TextSecondary * opacity);
+            batch.DrawString(_bodyFont, line.Before, position + new Vector2(ChangeValueOffset, 0), UiTheme.TextPrimary * opacity);
+            DrawAfter(batch, textures, position + new Vector2(ChangeValueOffset + PreviewArrowGap, 0), line, opacity);
+        }
+
+        if (changes.More is { } more)
+        {
+            batch.DrawString(_bodyFont, more, ChangeLineAt(section, 0, ChangeLinesPerColumn), UiTheme.TextSecondary * opacity);
         }
     }
 
-    // The preview: an arrow, drawn as a small diamond since the font lacks ▸, then the new value colored by
-    // whether it goes up or down. The choice only opens once the menu has faded in, so it draws at full opacity.
-    private void DrawPreview(SpriteBatch batch, TextureLibrary textures, Vector2 position, StatPreviewText.PreviewValue value)
+    private static Vector2 ChangeLineAt(Rectangle section, int column, int line)
+    {
+        var columnWidth = (section.Width - RowInset - ColumnGap) / 2;
+        var left = section.X + RowInset + (column * (columnWidth + ColumnGap));
+        return new Vector2(left, section.Y + SectionHeight + (line * ChangeLineHeight));
+    }
+
+    // An arrow, drawn as a small diamond since the font lacks ▸, then the value after, colored by whether it goes up
+    // or down.
+    private void DrawAfter(SpriteBatch batch, TextureLibrary textures, Vector2 position, StatComparisonText.Line line, float opacity)
     {
         var arrowCenter = position + new Vector2(PreviewArrowSide, _bodyFont.LineHeight / 2f);
-        new Diamond(arrowCenter, PreviewArrowSide).Draw(batch, textures.Pixel, UiTheme.TextSecondary);
-        batch.DrawString(_bodyFont, value.Text, position + new Vector2(PreviewValueGap, 0), value.Color);
+        new Diamond(arrowCenter, PreviewArrowSide).Draw(batch, textures.Pixel, UiTheme.TextSecondary * opacity);
+        batch.DrawString(_bodyFont, line.After, position + new Vector2(PreviewValueGap, 0), line.Color * opacity);
     }
 
     /// <summary>What to draw this frame, and where.</summary>
@@ -174,23 +184,22 @@ internal sealed class EquipmentSheetView
     /// all".
     /// </param>
     /// <param name="HasCursor">False while the choice panel has it: the selected row dims, with no pointer.</param>
-    /// <param name="Preview">The highlighted choice's effect on attack and defense, or null when no choice is open.</param>
+    /// <param name="Changes">What a change would do, or what the highlighted worn item gives; null for nothing.</param>
     /// <param name="Notice">Why the last change didn't happen, or null.</param>
-    public readonly record struct Place(EquipmentSheet Sheet, Rectangle Area, SelectionMotion Selection, bool HasCursor, StatPreviewText? Preview, string? Notice);
+    public readonly record struct Place(EquipmentSheet Sheet, Rectangle Area, SelectionMotion Selection, bool HasCursor, StatComparisonText? Changes, string? Notice);
 
     // A slot's 52 px row: its label and what's worn there, null for nothing.
     private readonly record struct SlotRow(Rectangle Row, string Label, ItemDefinition? Worn);
 
-    // The parameters section: where it goes, the values in the labels' order, and the preview if a choice is open.
-    private readonly record struct ParametersPlace(Rectangle Section, ImmutableArray<string> Stats, StatPreviewText? Preview);
+    // The Changes section: where it goes, and what it lists.
+    private readonly record struct ChangesPlace(Rectangle Section, StatComparisonText? Changes);
 
-    // The sheet's fixed text; Slots follows EquipmentSheet.Slots, Stats the sheet's.
-    private sealed record EquipmentLabels(string[] Slots, string Empty, string RemoveAll, string[] Stats)
+    // The sheet's fixed text; Slots follows EquipmentSheet.Slots.
+    private sealed record EquipmentLabels(string[] Slots, string Empty, string RemoveAll)
     {
         public static EquipmentLabels From(UiMessages messages) => new(
             [.. EquipmentSheet.Slots.Select(slot => messages.Text(EquipmentSheet.LabelIdOf(slot)))],
             messages.Text(MessageIds.SlotEmpty),
-            messages.Text(MessageIds.EquipmentRemoveAll),
-            [messages.Text(MessageIds.StatHp), messages.Text(MessageIds.StatAttack), messages.Text(MessageIds.StatDefense)]);
+            messages.Text(MessageIds.EquipmentRemoveAll));
     }
 }

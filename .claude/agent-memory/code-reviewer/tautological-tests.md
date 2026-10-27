@@ -43,4 +43,6 @@ Seen again in class-mechanics PL2b and RG1 (new validator branch): `EffectValida
 
 Seen again in stats P3b (constant-oracle variant): clamp tests assert `Resistances.CapPercent * 10`, so changing the cap itself (a player-visible limit) keeps them green. When a constant is the rule, pin its literal value.
 
+Seen again in stats E1 (copied-wiring variant): `EquipmentChoiceTests.Comparison_*` rebuild `EquipmentComparison.ShowChoice`'s before/after pairing by hand, so a swap in the real presenter passes; same shape as 11g's oracle. When a test builds the inputs the way the code under test does, ask it to call that code.
+
 Seen again in class-mechanics RG4 (same-end-state variant): `Update_AfterReady_SameMemberStepsForwardAgain` asserts the rogue awaits a command, but a non-quick Ready also ends there (goblin acts, then the readied turn). Ask which state differs between the two paths (`UpcomingActors`).

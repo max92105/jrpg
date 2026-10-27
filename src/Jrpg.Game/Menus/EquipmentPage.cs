@@ -13,8 +13,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// The menu's Equipment page: one member at a time, what they wear in each slot, a "Remove all" action, and their
-/// parameters. Confirm on a slot opens the items it can take in a column beside the sheet.
+/// The menu's Equipment page: one member at a time, what they wear in each slot, a "Remove all" action, and the Changes
+/// an item would make (decision 337). Confirm on a slot opens the items it can take in a column beside the sheet.
 /// </summary>
 internal sealed class EquipmentPage : IMemberPage
 {
@@ -32,8 +32,8 @@ internal sealed class EquipmentPage : IMemberPage
     private readonly SelectionMotion _selection = new();
     private EquipmentSheet _sheet;
     private EquipmentChoice? _choice;
-    private StatPreviewText? _preview;
-    // The choice row the preview was built for; -1 when none was.
+    private readonly EquipmentComparison _comparison;
+    // The choice row the comparison and the hint were built for; -1 when none was.
     private int _previewedRow = -1;
     private string? _notice;
     // The footer's line while a worn item is highlighted, naming who would lose it; null otherwise.
@@ -53,6 +53,7 @@ internal sealed class EquipmentPage : IMemberPage
         _messages = text.Messages;
         _sheetView = new EquipmentSheetView(text, ui);
         _choiceView = new EquipmentChoiceView(text, ui);
+        _comparison = new EquipmentComparison(text.Messages);
         _memberCursor = new ListCursor(_party.Members.Count, _ => true);
         Open();
     }
@@ -80,7 +81,11 @@ internal sealed class EquipmentPage : IMemberPage
         _selection.JumpTo(_rowCursor);
         _sheet = EquipmentSheet.Of(Shown);
         _notice = null;
+        ShowWornComparison();
     }
+
+    /// <summary>What the Changes section compares; null when it shows nothing.</summary>
+    internal StatComparison? Comparison => _comparison.Shown;
 
     /// <summary>Where the sheet's highlight is, in rows.</summary>
     internal float SelectionPosition => _selection.Position;
@@ -126,6 +131,7 @@ internal sealed class EquipmentPage : IMemberPage
         {
             _sheet = EquipmentSheet.Of(Shown);
             _notice = null;
+            ShowWornComparison();
             return null;
         }
 
@@ -139,7 +145,7 @@ internal sealed class EquipmentPage : IMemberPage
     {
         var sheetArea = area with { Width = area.Width - EquipmentChoiceView.PanelWidth };
         _panel.Draw(batch, textures.Pixel, MenuLayout.FullHeight(sheetArea), opacity);
-        _sheetView.Draw(batch, textures, new EquipmentSheetView.Place(_sheet, sheetArea, _selection, _choice is null, _preview, _notice), opacity);
+        _sheetView.Draw(batch, textures, new EquipmentSheetView.Place(_sheet, sheetArea, _selection, _choice is null, _comparison.Text, _notice), opacity);
         if (_choice is null)
         {
             _panel.DrawRightEdge(batch, textures.Pixel, MenuLayout.FullHeight(sheetArea), opacity);
@@ -163,10 +169,12 @@ internal sealed class EquipmentPage : IMemberPage
         }
 
         _sheet = EquipmentSheet.Of(Shown);
+        ShowWornComparison();
     }
 
     private void MoveOrChoose(InputFrame input)
     {
+        var rowBefore = _rowCursor.Selected;
         if (input.IsPressed(GameButton.Up))
         {
             _rowCursor.MoveUp();
@@ -178,6 +186,11 @@ internal sealed class EquipmentPage : IMemberPage
         }
 
         _selection.Follow(_rowCursor);
+        if (_rowCursor.Selected != rowBefore)
+        {
+            ShowWornComparison();
+        }
+
         if (!input.IsPressed(GameButton.Confirm))
         {
             return;
@@ -214,7 +227,7 @@ internal sealed class EquipmentPage : IMemberPage
         ShowPreview(choice);
     }
 
-    // Rebuilt when the highlighted row changes, so drawing formats nothing; on "Remove" it previews the empty slot.
+    // Rebuilt when the highlighted row changes, so drawing formats nothing; on "Remove" it compares the empty slot.
     private void ShowPreview(EquipmentChoice choice)
     {
         if (choice.SelectedRow == _previewedRow)
@@ -224,7 +237,7 @@ internal sealed class EquipmentPage : IMemberPage
 
         _previewedRow = choice.SelectedRow;
         var slot = EquipmentSheet.Slots[_rowCursor.Selected];
-        _preview = StatPreviewText.Of(choice.Highlighted is { } item ? StatPreview.Of(Shown, item) : StatPreview.OfRemoving(Shown, slot));
+        _comparison.ShowChoice(Shown, slot, choice);
         _takeHint = choice.HighlightedWearer is { } wearer
             ? _messages.Format(MessageIds.EquipmentTakeHint, new MessageArgument("member", wearer.Definition.Name))
             : null;
@@ -233,10 +246,14 @@ internal sealed class EquipmentPage : IMemberPage
     private void CloseChoice()
     {
         _choice = null;
-        _preview = null;
         _previewedRow = -1;
         _takeHint = null;
+        ShowWornComparison();
     }
+
+    // With no choice open, Changes shows what the highlighted slot's item gives; "Remove all" shows nothing.
+    private void ShowWornComparison() =>
+        _comparison.ShowWorn(Shown, _rowCursor.Selected < EquipmentSheet.Slots.Length ? EquipmentSheet.Slots[_rowCursor.Selected] : null);
 
     // Core refuses a change when the item it would take off has no room left in the inventory; the player is told why.
     // A worn item is taken from its wearer (decision 137).

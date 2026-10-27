@@ -59,7 +59,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 0: clean-up
 - [x] **C1. `BattleState`'s target choices move to `Battle/TargetChoices`** (Core, mechanical, about 120 lines moved) → [slices/C1.md](slices/C1.md)
-- [ ] **C2. Test files split: `BattleStateTests` by command, `PartyMemberTests` by behavior, `ClassCatalogValidatorTests` stats apart** (tests, mechanical, about 200 lines moved) → [slices/C2.md](slices/C2.md)
+- [x] **C2. Test files split: `BattleStateTests` by command, `PartyMemberTests` by behavior, `ClassCatalogValidatorTests` stats apart** (tests, mechanical, about 200 lines moved) → [slices/C2.md](slices/C2.md)
 
 ### Phase 1: the stat sheet
 - [ ] **ADR 0026: The stat model** (before P1) → [slices/ADR-0026.md](slices/ADR-0026.md)

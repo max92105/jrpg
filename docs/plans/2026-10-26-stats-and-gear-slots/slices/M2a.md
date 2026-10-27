@@ -9,7 +9,7 @@ Part of [the stats and gear slots plan](../README.md). After M1, right before M2
     - `Builders/PartyMemberBuilder`: `WithStats(attack)` and `WithDefense(defense)` likewise; default defense 0.
     - Every caller (about 43 lines with `attack:`/`defense:` in 18 files, the enemy builder's 57 uses in 24 files): the defense argument goes and its value folds into the other side's attack or the effect's power, as above.
     - **Where folding can't hold** (one attacker meets two different defenses in one test), the expectation is re-pinned instead, with the reason in the commit ("defense leaves in M2b; raw power lands whole"). Candidates from a grep of the setups (M2a confirms each and lists it in the Done note):
-      - `BattleStateTests` (lines 225-354): members of defense 8 beside the builder's default 5 in one battle, hit by the same goblin (attack 20);
+      - `BattleStateOutcomeTests` (the `GrantVictoryExperience_*` tests) and `BattleStateTests` (`UpcomingActors_*`), split from `BattleStateTests` in C2: members of defense 8 beside the builder's default 5 in one battle, hit by the same goblin (attack 20);
       - `GameSessionBattleTests` (its goblin, attack 20, against the repository leader's class defense and a test member's 5);
       - a skill or item with one power hitting all enemies when the enemies were built with different defenses (`BattleSkillAndItemTests`, `BattleMultiHitTests`: check);
       - `BattleStatusTests` line 265 (a hero of defense 5 guarded by the paladin's aura): this one is about defense and keeps `WithDefense` until M2b.

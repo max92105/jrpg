@@ -18,4 +18,6 @@ export-index and pending slices (Z, the stats plan's L1) pointing at the deleted
 **How to apply:** for each changed constant's old value, grep `"<old> px"` and `<old>` in comments across the feature
 folder and `Ui/`, not only the edited lines; when something is drawn somewhere new, grep the old place's wording
 ("under the list"); when a call site gains a condition, reread the callee's summary for "every"/"always"; when a file
-is deleted or renamed (`git status` D/??), grep its old name across docs/. Related: [[tautological-tests]].
+is deleted or renamed (`git status` D/??), grep its old name across docs/. Same when tests split (C2): a pending
+slice (M2a) still cited "BattleStateTests (lines 225-354)"; grep pending slices for "<File> (line" after a split.
+Related: [[tautological-tests]].

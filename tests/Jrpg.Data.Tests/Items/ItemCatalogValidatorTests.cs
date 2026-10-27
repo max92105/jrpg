@@ -80,7 +80,7 @@ public sealed class ItemCatalogValidatorTests
     [Fact]
     public void Validate_MenuItemTargetingEnemies_ThrowsNamingTheItem()
     {
-        var bomb = _potion with { Id = "bomb", Effect = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy) };
+        var bomb = _potion with { Id = "bomb", Effect = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, DamageType: DamageType.Fire) };
 
         var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [bomb]));
 
@@ -110,7 +110,7 @@ public sealed class ItemCatalogValidatorTests
     [Fact]
     public void Validate_ItemAimedAtOtherCombatant_Throws()
     {
-        var dart = _potion with { Id = "dart", Effect = new Effect(EffectKind.Damage, Power: 5, Targeting.OtherCombatant) };
+        var dart = _potion with { Id = "dart", Effect = new Effect(EffectKind.Damage, Power: 5, Targeting.OtherCombatant, DamageType: DamageType.Fire) };
 
         var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [dart]));
 
@@ -170,6 +170,26 @@ public sealed class ItemCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [sword]));
 
         Assert.Equal("items.json: item 'gear': equipment.attackBonus must be at least 0 (was -5).", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_WeaponWithoutDamageType_NamesTheField()
+    {
+        var sword = Equipment(new EquipmentStats(EquipmentSlot.Weapon, AttackBonus: 5, DefenseBonus: 0));
+
+        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [sword]));
+
+        Assert.Equal("items.json: item 'gear': equipment.damageType is required for a weapon.", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_ArmorWithDamageType_NamesTheField()
+    {
+        var armor = Equipment(new EquipmentStats(EquipmentSlot.Armor, 0, DefenseBonus: 3) { DamageType = DamageType.Slashing });
+
+        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [armor]));
+
+        Assert.Equal("items.json: item 'gear': equipment.damageType is only for a weapon (was Slashing on Armor).", exception.Message);
     }
 
     [Fact]

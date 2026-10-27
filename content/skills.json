@@ -5,7 +5,7 @@
     "description": "Strikes one enemy with fire.",
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "mana", "amount": -2 } ],
-    "effect": { "kind": "damage", "power": 15, "targeting": "singleEnemy" }
+    "effect": { "kind": "damage", "damageType": "fire", "power": 15, "targeting": "singleEnemy" }
   },
   {
     "id": "fireball",
@@ -13,7 +13,7 @@
     "description": "Strikes every enemy with fire.",
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "mana", "amount": -5 } ],
-    "effect": { "kind": "damage", "power": 20, "targeting": "allEnemies" }
+    "effect": { "kind": "damage", "damageType": "fire", "power": 20, "targeting": "allEnemies" }
   },
   {
     "id": "meteor",
@@ -21,7 +21,7 @@
     "description": "Calls down a falling star on one enemy. Placeholder: the developer writes the real spell.",
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "mana", "amount": -9 } ],
-    "effect": { "kind": "damage", "power": 60, "targeting": "singleEnemy" }
+    "effect": { "kind": "damage", "damageType": "fire", "power": 60, "targeting": "singleEnemy" }
   },
   {
     "id": "heal",
@@ -53,7 +53,7 @@
     "description": "A heavy blow on one enemy. Placeholder: the developer writes the real skill.",
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "stamina", "amount": -2 } ],
-    "effect": { "kind": "damage", "power": 35, "targeting": "singleEnemy" }
+    "effect": { "kind": "damage", "damageType": "slashing", "power": 35, "targeting": "singleEnemy" }
   },
   {
     "id": "shield_bash",
@@ -62,7 +62,7 @@
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "stamina", "amount": -3 } ],
     "effect": {
-      "kind": "damage", "power": 15, "targeting": "singleEnemy",
+      "kind": "damage", "damageType": "blunt", "power": 15, "targeting": "singleEnemy",
       "status": { "kind": "stun", "power": 0, "turns": 1 }
     }
   },
@@ -82,7 +82,7 @@
     "description": "A crushing blow on one enemy. Placeholder: the developer writes the real skill.",
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "ferocity", "amount": -6 } ],
-    "effect": { "kind": "damage", "power": 70, "targeting": "singleEnemy" }
+    "effect": { "kind": "damage", "damageType": "blunt", "power": 70, "targeting": "singleEnemy" }
   },
   {
     "id": "smite",
@@ -90,7 +90,7 @@
     "description": "A holy blow on one enemy. Placeholder: the developer writes the real skill.",
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "conviction", "amount": -3 } ],
-    "effect": { "kind": "damage", "power": 40, "targeting": "singleEnemy" }
+    "effect": { "kind": "damage", "damageType": "light", "power": 40, "targeting": "singleEnemy" }
   },
   {
     "id": "aura_of_protection",
@@ -139,7 +139,7 @@
     "description": "A bolt of raw force at one enemy. Builds instability. Placeholder: the developer writes the real spell.",
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "instability", "amount": 2 } ],
-    "effect": { "kind": "damage", "power": 20, "targeting": "singleEnemy" }
+    "effect": { "kind": "damage", "damageType": "dark", "power": 20, "targeting": "singleEnemy" }
   },
   {
     "id": "void_rift",
@@ -148,7 +148,7 @@
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "instability", "amount": 3 } ],
     "requirements": [ { "resourceId": "instability", "atLeast": 4 } ],
-    "effect": { "kind": "damage", "power": 25, "targeting": "allEnemies" }
+    "effect": { "kind": "damage", "damageType": "dark", "power": 25, "targeting": "allEnemies" }
   },
   {
     "id": "chaos_lance",
@@ -157,7 +157,7 @@
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "instability", "amount": 4 } ],
     "requirements": [ { "resourceId": "instability", "atLeast": 7 } ],
-    "effect": { "kind": "damage", "power": 70, "targeting": "singleEnemy" }
+    "effect": { "kind": "damage", "damageType": "dark", "power": 70, "targeting": "singleEnemy" }
   },
   {
     "id": "rejuvenate",
@@ -187,14 +187,14 @@
     "description": "Spends Growth and Decay in balance to strike every enemy. Placeholder: the developer writes the real skill.",
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "growth", "amount": -3 }, { "resourceId": "decay", "amount": -3 } ],
-    "effect": { "kind": "damage", "power": 45, "targeting": "allEnemies" }
+    "effect": { "kind": "damage", "damageType": "piercing", "power": 45, "targeting": "allEnemies" }
   },
   {
     "id": "palm_strike",
     "name": "Palm Strike",
     "description": "Two quick palm blows at one enemy. Placeholder: the developer writes the real skill.",
     "iconFile": "Attack.png",
-    "effect": { "kind": "damage", "power": 10, "targeting": "singleEnemy", "hits": 2 }
+    "effect": { "kind": "damage", "damageType": "blunt", "power": 10, "targeting": "singleEnemy", "hits": 2 }
   },
   {
     "id": "flurry",
@@ -202,6 +202,6 @@
     "description": "Four blows in a blur at one enemy. Spends chakra. Placeholder: the developer writes the real skill.",
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "chakra", "amount": -3 } ],
-    "effect": { "kind": "damage", "power": 8, "targeting": "singleEnemy", "hits": 4 }
+    "effect": { "kind": "damage", "damageType": "blunt", "power": 8, "targeting": "singleEnemy", "hits": 4 }
   }
 ]

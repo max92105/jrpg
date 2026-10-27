@@ -7,4 +7,7 @@ public sealed record EquipmentStats(EquipmentSlot Slot, int AttackBonus, int Def
 {
     /// <summary>What the item adds by stat kind (ADR 0026); none when content names none.</summary>
     public StatBonuses Bonuses { get; init; } = StatBonuses.None;
+
+    /// <summary>A weapon's hits' type (ADR 0027); null for anything else.</summary>
+    public DamageType? DamageType { get; init; }
 }

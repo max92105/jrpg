@@ -78,10 +78,19 @@ internal static class ItemCatalogValidator
             return $"equipment.attackBonus must be at least 0 (was {equipment.AttackBonus}).";
         }
 
-        return equipment.DefenseBonus < 0
-            ? $"equipment.defenseBonus must be at least 0 (was {equipment.DefenseBonus})."
-            : FindBonusProblem(equipment.Bonuses);
+        if (equipment.DefenseBonus < 0)
+        {
+            return $"equipment.defenseBonus must be at least 0 (was {equipment.DefenseBonus}).";
+        }
+
+        return FindDamageTypeProblem(equipment) ?? FindBonusProblem(equipment.Bonuses);
     }
+
+    // A weapon's type is what its wearer's basic attack hits as (ADR 0027); nothing else is swung.
+    private static string? FindDamageTypeProblem(EquipmentStats equipment) =>
+        equipment.Slot == EquipmentSlot.Weapon && equipment.DamageType is null ? "equipment.damageType is required for a weapon."
+        : equipment.Slot != EquipmentSlot.Weapon && equipment.DamageType is { } type ? $"equipment.damageType is only for a weapon (was {type} on {equipment.Slot})."
+        : null;
 
     // A bonus of 0 names a stat for nothing, likely a typo; past 100 one item outweighs any class (placeholder bound).
     private static string? FindBonusProblem(StatBonuses bonuses)

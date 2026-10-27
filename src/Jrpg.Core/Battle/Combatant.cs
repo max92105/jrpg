@@ -48,7 +48,7 @@ public sealed class Combatant
 
     /// <summary>Shares the member's <see cref="Vitals"/>, so damage and healing in battle stay after it.</summary>
     public static Combatant FromPartyMember(PartyMember member) =>
-        new(member.Definition.Name, BattleSide.Party, member.TotalStats, member.Vitals)
+        new(member.Definition.Name, BattleSide.Party, MemberBattleStats.Of(member), member.Vitals)
         {
             Skills = member.Skills,
             Resources = new(ResourceStarts.For(member)),
@@ -58,7 +58,7 @@ public sealed class Combatant
     public static Combatant FromEnemy(EnemyDefinition enemy) => new(
         enemy.Name,
         BattleSide.Enemies,
-        new CombatStats(enemy.Attack, enemy.Defense),
+        new CombatStats(enemy.Attack, enemy.Defense) { AttackType = enemy.DamageType },
         new Vitals(enemy.MaxHp, enemy.MaxHp))
     {
         Enemy = enemy,

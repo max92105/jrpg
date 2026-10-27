@@ -20,7 +20,8 @@ public sealed class StatFormulaTests
         PhysicalResistancePer100Constitution: 25,
         MagicalResistancePer100Will: 25,
         StatusPercentPer100Intelligence: 100,
-        IntelligencePerExtraStatusTurn: 25);
+        IntelligencePerExtraStatusTurn: 25,
+        UnarmedDamageType: DamageType.Blunt);
 
     [Fact]
     public void MaxHp_TwentyConstitution_AddsTwentyPercent()

@@ -21,7 +21,8 @@ public sealed class AttributeCaptionsTests
         PhysicalResistancePer100Constitution: 25,
         MagicalResistancePer100Will: 25,
         StatusPercentPer100Intelligence: 100,
-        IntelligencePerExtraStatusTurn: 25);
+        IntelligencePerExtraStatusTurn: 25,
+        UnarmedDamageType: DamageType.Blunt);
 
     [Fact]
     public void Of_Primaries_SaysWhatEachGivesOverItsBase()

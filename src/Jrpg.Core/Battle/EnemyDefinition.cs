@@ -1,3 +1,5 @@
+using Jrpg.Core.Stats;
+
 namespace Jrpg.Core.Battle;
 
 /// <summary>One enemy type. Every enemy of this type starts a battle at full HP.</summary>
@@ -20,6 +22,9 @@ public sealed record EnemyDefinition
     public required int Attack { get; init; }
 
     public required int Defense { get; init; }
+
+    /// <summary>What the enemy's attack hits as (ADR 0027).</summary>
+    public required DamageType DamageType { get; init; }
 
     public required int ExperienceReward { get; init; }
 }

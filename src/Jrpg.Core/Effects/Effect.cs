@@ -1,3 +1,4 @@
+using Jrpg.Core.Stats;
 using Jrpg.Core.Statuses;
 
 namespace Jrpg.Core.Effects;
@@ -9,5 +10,15 @@ namespace Jrpg.Core.Effects;
 /// <param name="Status">Granted to each target still standing after the effect; null when none (ADR 0021).</param>
 /// <param name="Range">For <see cref="Targeting.AlliesInRange"/> only: how many places on each side it reaches.</param>
 /// <param name="Hits">How many times it lands on each target, each hit on its own; above 1 only for damage.</param>
+/// <param name="DamageType">
+/// A damage effect's type, which the target's resistance to it meets (ADR 0027); content always gives one, and only for
+/// damage. Null meets no resistance, as test effects leave it.
+/// </param>
 public sealed record Effect(
-    EffectKind Kind, int Power, Targeting Targeting, StatusGrant? Status = null, int Range = 0, int Hits = 1);
+    EffectKind Kind,
+    int Power,
+    Targeting Targeting,
+    StatusGrant? Status = null,
+    int Range = 0,
+    int Hits = 1,
+    DamageType? DamageType = null);

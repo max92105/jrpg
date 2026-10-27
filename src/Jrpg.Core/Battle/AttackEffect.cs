@@ -1,0 +1,20 @@
+using Jrpg.Core.Effects;
+
+namespace Jrpg.Core.Battle;
+
+/// <summary>A combatant's basic attack as an effect: their attack power, as their attack type, on one enemy.</summary>
+internal static class AttackEffect
+{
+    /// <summary>
+    /// Whom a basic attack can aim at: shared by <see cref="BattleState"/>'s check of the chosen target and the targets
+    /// it offers, so the two can't drift.
+    /// </summary>
+    public const Targeting Targeting = Effects.Targeting.SingleEnemy;
+
+    /// <summary>The attack as <paramref name="attacker"/>'s stats are now, statuses included.</summary>
+    public static Effect Of(Combatant attacker)
+    {
+        var stats = attacker.CurrentStats;
+        return new Effect(EffectKind.Damage, stats.Attack, Targeting, DamageType: stats.AttackType);
+    }
+}

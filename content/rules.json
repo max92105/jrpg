@@ -6,7 +6,8 @@
     "damagePercentPer100Power": 100, "critDamagePercentPer100Power": 50,
     "critChancePer100Agility": 25, "dodgePer100Agility": 20,
     "physicalResistancePer100Constitution": 25, "magicalResistancePer100Will": 25,
-    "statusPercentPer100Intelligence": 100, "intelligencePerExtraStatusTurn": 25
+    "statusPercentPer100Intelligence": 100, "intelligencePerExtraStatusTurn": 25,
+    "unarmedDamageType": "blunt"
   },
   "exploration": { "walkSpeed": 3.0, "playerRadius": 0.1, "interactReach": 0.6 },
   "experience": {

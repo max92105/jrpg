@@ -1,4 +1,5 @@
 using Jrpg.Core.Effects;
+using Jrpg.Core.Stats;
 using Jrpg.Core.Statuses;
 using Jrpg.Data.Effects;
 
@@ -15,9 +16,27 @@ public sealed class EffectValidatorTests
     }
 
     [Fact]
+    public void FindProblem_DamageWithoutType_NamesDamageType()
+    {
+        var problem = EffectValidator.FindProblem(new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy));
+
+        Assert.Equal("effect.damageType is required for a damage effect.", problem);
+    }
+
+    [Fact]
+    public void FindProblem_HealWithType_NamesDamageType()
+    {
+        var heal = new Effect(EffectKind.RestoreHp, Power: 15, Targeting.SingleAlly, DamageType: DamageType.Light);
+
+        var problem = EffectValidator.FindProblem(heal);
+
+        Assert.Equal("effect.damageType is only for a damage effect (was Light on RestoreHp).", problem);
+    }
+
+    [Fact]
     public void FindProblem_StatusWithZeroTurns_ReturnsProblem()
     {
-        var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 0));
+        var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 0), DamageType: DamageType.Blunt);
 
         var problem = EffectValidator.FindProblem(bash);
 
@@ -69,7 +88,7 @@ public sealed class EffectValidatorTests
     [Fact]
     public void FindProblem_DamageWithStatus_ReturnsNull()
     {
-        var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1));
+        var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1), DamageType: DamageType.Blunt);
 
         var problem = EffectValidator.FindProblem(bash);
 

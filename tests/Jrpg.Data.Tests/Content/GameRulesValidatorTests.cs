@@ -25,7 +25,8 @@ public sealed class GameRulesValidatorTests
             PhysicalResistancePer100Constitution: 25,
             MagicalResistancePer100Will: 25,
             StatusPercentPer100Intelligence: 100,
-            IntelligencePerExtraStatusTurn: 25));
+            IntelligencePerExtraStatusTurn: 25,
+            UnarmedDamageType: DamageType.Blunt));
 
     [Fact]
     public void Validate_NegativeHpPercentPerConstitution_NamesTheField()

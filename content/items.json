@@ -42,7 +42,7 @@
     "iconFile": "Consumable.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "effect": { "kind": "damage", "power": 15, "targeting": "singleEnemy" }
+    "effect": { "kind": "damage", "damageType": "fire", "power": 15, "targeting": "singleEnemy" }
   },
   {
     "id": "bomb_all",
@@ -51,7 +51,7 @@
     "iconFile": "Consumable.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "effect": { "kind": "damage", "power": 30, "targeting": "allEnemies" }
+    "effect": { "kind": "damage", "damageType": "fire", "power": 30, "targeting": "allEnemies" }
   },
   {
     "id": "revive_feather",
@@ -69,7 +69,7 @@
     "iconFile": "Weapon.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "weapon", "attackBonus": 5, "defenseBonus": 0 }
+    "equipment": { "slot": "weapon", "attackBonus": 5, "defenseBonus": 0, "damageType": "slashing" }
   },
   {
     "id": "iron_sword",
@@ -78,7 +78,7 @@
     "iconFile": "Weapon.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "weapon", "attackBonus": 8, "defenseBonus": 0 }
+    "equipment": { "slot": "weapon", "attackBonus": 8, "defenseBonus": 0, "damageType": "slashing" }
   },
   {
     "id": "magic_staff",
@@ -87,7 +87,7 @@
     "iconFile": "Weapon.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "weapon", "attackBonus": 6, "defenseBonus": 0, "bonuses": { "intelligence": 3 } }
+    "equipment": { "slot": "weapon", "attackBonus": 6, "defenseBonus": 0, "damageType": "blunt", "bonuses": { "intelligence": 3 } }
   },
   {
     "id": "leather_armor",

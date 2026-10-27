@@ -14,9 +14,6 @@ namespace Jrpg.Core.Battle;
 /// </summary>
 public sealed class BattleState
 {
-    // Shared by the attack Execute checks and the targets it offers, so the two can't drift.
-    private const Targeting AttackTargeting = Targeting.SingleEnemy;
-
     private readonly TurnOrder _turnOrder;
     private readonly TurnFlow _turnFlow;
     private readonly SkillBackfire _backfire;
@@ -90,7 +87,7 @@ public sealed class BattleState
         [.. Combatants.Where(combatant => combatant.Side == side && combatant.IsAlive)];
 
     /// <summary>Who the current actor can attack: one living enemy, in formation order.</summary>
-    public TargetChoice<Combatant> TargetChoiceForAttack() => _targetChoices.ChoiceFor(CurrentActor, AttackTargeting);
+    public TargetChoice<Combatant> TargetChoiceForAttack() => _targetChoices.ChoiceFor(CurrentActor, AttackEffect.Targeting);
 
     /// <summary>Whom the actor can trade places with: the allies right beside them; none on an enemy's turn.</summary>
     public TargetChoice<Combatant> TargetChoiceForMove() =>
@@ -173,7 +170,7 @@ public sealed class BattleState
     // An attack is a single-enemy damage effect whose power is the attacker's attack.
     private void Attack(Combatant actor, Combatant target, List<BattleEvent> events)
     {
-        var effect = new Effect(EffectKind.Damage, actor.CurrentStats.Attack, AttackTargeting);
+        var effect = AttackEffect.Of(actor);
         _targetChoices.ThrowIfIllegal(actor, effect, [target]);
         _landing.Land(actor, effect, [target], events);
     }

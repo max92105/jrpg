@@ -1,0 +1,14 @@
+[
+  {
+    "id": "goblin",
+    "name": "Goblin",
+    "portraitFile": "Goblin.png",
+    "battleSpriteFile": "Goblin.png",
+    "attackEffectFile": "AttackEnemy.png",
+    "isSpriteFlipped": false,
+    "maxHp": 30,
+    "attack": 16,
+    "defense": 2,
+    "experienceReward": 40
+  }
+]

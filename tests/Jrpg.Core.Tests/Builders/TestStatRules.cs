@@ -22,5 +22,6 @@ internal static class TestStatRules
         PhysicalResistancePer100Constitution: 0,
         MagicalResistancePer100Will: 0,
         StatusPercentPer100Intelligence: 0,
-        IntelligencePerExtraStatusTurn: int.MaxValue);
+        IntelligencePerExtraStatusTurn: int.MaxValue,
+        UnarmedDamageType: DamageType.Blunt);
 }

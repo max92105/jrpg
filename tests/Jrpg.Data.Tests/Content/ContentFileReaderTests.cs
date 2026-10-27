@@ -1,3 +1,4 @@
+using Jrpg.Core.Battle;
 using Jrpg.Core.Events;
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
@@ -25,6 +26,16 @@ public sealed class ContentFileReaderTests
 
         Assert.StartsWith("missing-defense-bonus.json at $[0].equipment:", exception.Message, StringComparison.Ordinal);
         Assert.Contains("defenseBonus", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Read_EnemyWithoutDamageType_ThrowsNamingTheFileAndField()
+    {
+        var exception = Assert.Throws<ContentValidationException>(
+            () => ContentFileReader.Read<IReadOnlyList<EnemyDefinition>>(TestContentPath("enemy-without-damage-type.json")));
+
+        Assert.StartsWith("enemy-without-damage-type.json at $[0]:", exception.Message, StringComparison.Ordinal);
+        Assert.Contains("damageType", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]

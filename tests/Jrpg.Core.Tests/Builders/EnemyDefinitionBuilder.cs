@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Stats;
 
 namespace Jrpg.Core.Tests.Builders;
 
@@ -8,6 +9,7 @@ internal sealed class EnemyDefinitionBuilder
     private int _maxHp = 40;
     private int _attack = 20;
     private int _defense = 2;
+    private DamageType _damageType = DamageType.Blunt;
 
     public EnemyDefinitionBuilder WithName(string name)
     {
@@ -23,6 +25,12 @@ internal sealed class EnemyDefinitionBuilder
         return this;
     }
 
+    public EnemyDefinitionBuilder WithDamageType(DamageType damageType)
+    {
+        _damageType = damageType;
+        return this;
+    }
+
     public EnemyDefinition Build() => new()
     {
         Id = _name.ToLowerInvariant(),
@@ -34,6 +42,7 @@ internal sealed class EnemyDefinitionBuilder
         MaxHp = _maxHp,
         Attack = _attack,
         Defense = _defense,
+        DamageType = _damageType,
         ExperienceReward = 40,
     };
 }

@@ -9,6 +9,7 @@
     "maxHp": 30,
     "attack": 16,
     "defense": 2,
+    "damageType": "piercing",
     "experienceReward": 40
   },
   {
@@ -21,6 +22,7 @@
     "maxHp": 400,
     "attack": 20,
     "defense": 0,
+    "damageType": "blunt",
     "experienceReward": 10
   }
 ]

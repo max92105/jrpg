@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Stats;
 using Jrpg.Data.Battle;
 using Jrpg.Data.Content;
 
@@ -17,6 +18,7 @@ public sealed class EnemyCatalogValidatorTests
         MaxHp = 40,
         Attack = 20,
         Defense = 2,
+        DamageType = DamageType.Piercing,
         ExperienceReward = 40,
     };
 

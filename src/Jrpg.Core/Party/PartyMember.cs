@@ -10,7 +10,6 @@ namespace Jrpg.Core.Party;
 public sealed class PartyMember
 {
     private readonly Dictionary<string, int> _lastingAmounts;
-    private readonly StatRules _rules;
 
     // A new member: level 1, no experience, full HP, every lasting resource at its start (decision 168).
     private PartyMember(PartyMemberDefinition definition, ClassDefinition characterClass, IReadOnlyList<SkillDefinition> skills, StatRules rules)
@@ -18,7 +17,7 @@ public sealed class PartyMember
         Definition = definition;
         Class = characterClass;
         Skills = [.. skills];
-        _rules = rules;
+        Rules = rules;
         Level = 1;
         RebuildStats();
         Vitals = new Vitals(Sheet.MaxHp, Sheet.MaxHp);
@@ -53,6 +52,9 @@ public sealed class PartyMember
     public ItemDefinition? Armor { get; private set; }
 
     public IReadOnlyList<SkillDefinition> Skills { get; }
+
+    /// <summary>The stat conversions the sheet is built with; the battle also reads the unarmed type.</summary>
+    internal StatRules Rules { get; }
 
     /// <summary>
     /// The amount each of the class's lasting resources carries into the next battle (ADR 0024), by resource id; it
@@ -212,7 +214,7 @@ public sealed class PartyMember
         _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot."),
     };
 
-    private StatSheet SheetWearing(Worn worn) => MemberSheet.Of(ClassGrowth.StatsAt(Class, Level), BonusesOf(worn), _rules);
+    private StatSheet SheetWearing(Worn worn) => MemberSheet.Of(ClassGrowth.StatsAt(Class, Level), BonusesOf(worn), Rules);
 
     /// <exception cref="ArgumentException">A skill id isn't in the catalog.</exception>
     private static List<SkillDefinition> SkillsOf(ClassDefinition characterClass, IReadOnlyDictionary<string, SkillDefinition> skillCatalog)

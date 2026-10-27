@@ -11,6 +11,7 @@ internal static class EffectValidator
         ?? FindRangeProblem(effect)
         ?? FindHitsProblem(effect)
         ?? FindKindProblem(effect)
+        ?? FindDamageTypeProblem(effect)
         ?? (effect.Status is { } grant ? StatusGrantValidator.FindProblem(grant) : null);
 
     private static string? FindPowerProblem(Effect effect)
@@ -43,6 +44,12 @@ internal static class EffectValidator
     private static string? FindHitsProblem(Effect effect) =>
         effect.Hits < 1 ? $"effect.hits must be at least 1 (was {effect.Hits})."
         : effect.Hits > 1 && effect.Kind != EffectKind.Damage ? $"effect.hits above 1 is only for a damage effect (was {effect.Hits} on {effect.Kind})."
+        : null;
+
+    // Only a hit meets a resistance (ADR 0027), so every damage effect says what it hits as and nothing else does.
+    private static string? FindDamageTypeProblem(Effect effect) =>
+        effect.Kind == EffectKind.Damage && effect.DamageType is null ? "effect.damageType is required for a damage effect."
+        : effect.Kind != EffectKind.Damage && effect.DamageType is { } type ? $"effect.damageType is only for a damage effect (was {type} on {effect.Kind})."
         : null;
 
     private static string? FindKindProblem(Effect effect)

@@ -42,6 +42,13 @@ internal sealed class ItemDefinitionBuilder
         return this;
     }
 
+    /// <remarks>Call after <see cref="AsWeapon"/>.</remarks>
+    public ItemDefinitionBuilder WithDamageType(DamageType damageType)
+    {
+        _equipment = _equipment! with { DamageType = damageType };
+        return this;
+    }
+
     /// <remarks>Call after <see cref="AsWeapon"/> or <see cref="AsArmor"/>.</remarks>
     public ItemDefinitionBuilder WithBonuses(StatBonuses bonuses)
     {

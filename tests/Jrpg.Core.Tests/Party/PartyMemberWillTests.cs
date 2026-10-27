@@ -48,13 +48,13 @@ public sealed class PartyMemberWillTests
     public void TakeOff_WillGear_ClampsFaith()
     {
         var cleric = Cleric(will: 4);
-        var amulet = new ItemDefinitionBuilder().WithId("amulet").AsArmor().WithBonuses(new StatBonuses(new Dictionary<StatKind, int> { [StatKind.Will] = 6 })).Build();
+        var amulet = new ItemDefinitionBuilder().WithId("amulet").AsChest().WithBonuses(new StatBonuses(new Dictionary<StatKind, int> { [StatKind.Will] = 6 })).Build();
         _inventory.Add(amulet, 1);
         Assert.True(new PartyEquipment(_inventory).TryEquip(cleric, amulet));
         cleric.Rest();
         Assert.Equal(6, cleric.LastingAmounts["faith"]);
 
-        Assert.True(new PartyEquipment(_inventory).TryUnequip(cleric, EquipmentSlot.Armor));
+        Assert.True(new PartyEquipment(_inventory).TryUnequip(cleric, EquipmentSlot.Chest));
 
         Assert.Equal(5, cleric.LastingAmounts["faith"]);
     }

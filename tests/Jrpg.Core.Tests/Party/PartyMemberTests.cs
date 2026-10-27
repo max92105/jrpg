@@ -183,10 +183,10 @@ public sealed class PartyMemberTests
     public void EquippedIn_WornArmor_ReturnsIt()
     {
         var member = new PartyMemberBuilder().WithClass("fighter").Build();
-        var armor = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor().Build();
+        var armor = new ItemDefinitionBuilder().WithId("chain_mail").AsChest().Build();
         Equip(member, armor);
 
-        var worn = member.EquippedIn(EquipmentSlot.Armor);
+        var worn = member.EquippedIn(EquipmentSlot.Chest);
 
         Assert.Same(armor, worn);
     }

@@ -37,7 +37,7 @@ public sealed class PartyMemberGearTests
         Equip(member, Armor(StatKind.Constitution, 10));
         member.Rest();
 
-        Assert.True(new PartyEquipment(_inventory).TryUnequip(member, EquipmentSlot.Armor));
+        Assert.True(new PartyEquipment(_inventory).TryUnequip(member, EquipmentSlot.Chest));
 
         Assert.Equal((200, 200), (member.Vitals.Hp, member.Vitals.MaxHp));
     }
@@ -71,7 +71,7 @@ public sealed class PartyMemberGearTests
         var member = NewMember();
         Equip(member, Armor(StatKind.Constitution, 10));
 
-        var sheet = member.SheetWithout(EquipmentSlot.Armor);
+        var sheet = member.SheetWithout(EquipmentSlot.Chest);
 
         Assert.Equal((0, 200), (sheet.Primaries.Constitution, sheet.MaxHp));
         Assert.Equal(10, member.Sheet.Primaries.Constitution);
@@ -85,7 +85,7 @@ public sealed class PartyMemberGearTests
         var sheet = member.SheetWith(Armor(StatKind.Constitution, 10));
 
         Assert.Equal(220, sheet.MaxHp);
-        Assert.Null(member.Armor);
+        Assert.Null(member.Chest);
         Assert.Equal(200, member.Sheet.MaxHp);
     }
 
@@ -101,7 +101,7 @@ public sealed class PartyMemberGearTests
         PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), _class, new Dictionary<string, SkillDefinition>(), _rules);
 
     private static ItemDefinition Armor(StatKind kind, int bonus) =>
-        new ItemDefinitionBuilder().WithId("test_armor").AsArmor().WithBonuses(new StatBonuses(new Dictionary<StatKind, int> { [kind] = bonus })).Build();
+        new ItemDefinitionBuilder().WithId("test_armor").AsChest().WithBonuses(new StatBonuses(new Dictionary<StatKind, int> { [kind] = bonus })).Build();
 
     private void Equip(PartyMember member, ItemDefinition item)
     {

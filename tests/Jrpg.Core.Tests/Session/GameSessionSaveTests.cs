@@ -26,7 +26,7 @@ public sealed class GameSessionSaveTests
 
     private static readonly ItemDefinition _potion = new ItemDefinitionBuilder().WithId("potion").Build();
     private static readonly ItemDefinition _sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build();
-    private static readonly ItemDefinition _mail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor().Build();
+    private static readonly ItemDefinition _mail = new ItemDefinitionBuilder().WithId("chain_mail").AsChest().Build();
     private static readonly ObjectDefinition _chest = new() { Id = "chest", Width = 1, Height = 1, CollisionPolygon = [], Category = "test", Tiles = [], AbovePlayerZones = [] };
 
     private static readonly MapEvent _openChest = new MapEventBuilder().WithId("chest_0").AsOnce()
@@ -119,7 +119,7 @@ public sealed class GameSessionSaveTests
 
         var restored = SaveAndRestore(session);
 
-        Assert.Equal((_sword, _mail), (restored.Party.Leader.Weapon, restored.Party.Leader.Armor));
+        Assert.Equal((_sword, _mail), (restored.Party.Leader.Weapon, restored.Party.Leader.Chest));
         Assert.Equal((0, 0), (restored.Inventory.QuantityOf("bronze_sword"), restored.Inventory.QuantityOf("chain_mail")));
         Assert.Equal(3, restored.Inventory.QuantityOf("potion"));
     }

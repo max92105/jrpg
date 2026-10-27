@@ -36,7 +36,7 @@ public sealed class EquipmentPageTests
         ConfirmRemoveAll(page);
 
         Assert.Null(sarxian.Weapon);
-        Assert.Null(sarxian.Armor);
+        Assert.Null(sarxian.Chest);
         Assert.Equal(2, _session.Inventory.QuantityOf("bronze_sword"));
         Assert.Equal(2, _session.Inventory.QuantityOf("leather_armor"));
     }
@@ -52,7 +52,7 @@ public sealed class EquipmentPageTests
         ConfirmRemoveAll(page);
 
         Assert.Same(sword, sarxian.Weapon);
-        Assert.Null(sarxian.Armor);
+        Assert.Null(sarxian.Chest);
     }
 
     [Fact]

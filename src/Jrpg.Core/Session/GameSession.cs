@@ -180,7 +180,7 @@ public sealed class GameSession
 
         if (progress.ArmorId is { } armorId)
         {
-            member.Wear(EquipmentSlot.Armor, catalog.Items[armorId]);
+            member.Wear(EquipmentSlot.Chest, catalog.Items[armorId]);
         }
 
         member.RestoreProgress(progress);

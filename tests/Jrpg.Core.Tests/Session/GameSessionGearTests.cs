@@ -9,7 +9,7 @@ namespace Jrpg.Core.Tests.Session;
 // The default fighter has 100 HP; at +1 % HP per Constitution point, chain mail's +10 Constitution makes it 110.
 public sealed class GameSessionGearTests
 {
-    private static readonly ItemDefinition _mail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor()
+    private static readonly ItemDefinition _mail = new ItemDefinitionBuilder().WithId("chain_mail").AsChest()
         .WithBonuses(new StatBonuses(new Dictionary<StatKind, int> { [StatKind.Constitution] = 10 }))
         .Build();
 

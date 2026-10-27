@@ -10,17 +10,16 @@ public sealed class PartyEquipment(Inventory inventory)
 {
     /// <returns>
     /// True if the member wears the item afterwards; true without changes if they already wore it.
-    /// False if the item isn't equipment, no copy is in the inventory, or the item it replaces doesn't fit back
-    /// in the inventory. Nothing changes when it returns false.
+    /// False if the item isn't equipment or fits no slot, no copy is in the inventory, or the item it replaces doesn't
+    /// fit back in the inventory. Nothing changes when it returns false.
     /// </returns>
     public bool TryEquip(PartyMember member, ItemDefinition item)
     {
-        if (item.Equipment is null)
+        if (item.Equipment is null || EquipmentFit.SlotsFor(item.Equipment.Kind) is not [var slot, ..])
         {
             return false;
         }
 
-        var slot = item.Equipment.Slot;
         var replaced = member.EquippedIn(slot);
         if (replaced?.Id == item.Id)
         {
@@ -42,12 +41,12 @@ public sealed class PartyEquipment(Inventory inventory)
     }
 
     /// <summary>What any member could put on in the slot: owned items for that slot, in pickup order.</summary>
-    /// <param name="slot">Weapon or armor.</param>
-    /// <param name="items">Every item by id, to read the owned ones' slot.</param>
+    /// <param name="slot"></param>
+    /// <param name="items">Every item by id, to read the owned ones' kind.</param>
     public IReadOnlyList<ItemDefinition> OwnedFor(EquipmentSlot slot, IReadOnlyDictionary<string, ItemDefinition> items) =>
         [.. inventory.Entries
             .Select(entry => items[entry.ItemId])
-            .Where(item => item.Equipment is { } equipment && equipment.Slot == slot)];
+            .Where(item => item.Equipment is { } equipment && EquipmentFit.Fits(equipment.Kind, slot))];
 
     /// <summary>
     /// What the member could take from another member in the slot (decision 137): each other member's item there,

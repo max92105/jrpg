@@ -120,7 +120,7 @@ public sealed class ItemCatalogValidatorTests
     [Fact]
     public void Validate_EffectAndEquipment_ThrowsNamingTheItem()
     {
-        var hybrid = _potion with { Equipment = new EquipmentStats(EquipmentSlot.Weapon) { Damage = 1 } };
+        var hybrid = _potion with { Equipment = new EquipmentStats(EquipmentKind.Weapon) { Damage = 1 } };
 
         var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [hybrid]));
 
@@ -147,9 +147,19 @@ public sealed class ItemCatalogValidatorTests
     }
 
     [Fact]
+    public void Validate_KindWithoutSlotYet_NamesTheKind()
+    {
+        var ring = Equipment(new EquipmentStats(EquipmentKind.Ring));
+
+        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [ring]));
+
+        Assert.Equal("items.json: item 'gear': equipment.kind Ring fits no slot a member has yet.", exception.Message);
+    }
+
+    [Fact]
     public void Validate_WeaponWithoutDamage_NamesTheField()
     {
-        var sword = Equipment(new EquipmentStats(EquipmentSlot.Weapon) { DamageType = DamageType.Slashing });
+        var sword = Equipment(new EquipmentStats(EquipmentKind.Weapon) { DamageType = DamageType.Slashing });
 
         var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [sword]));
 
@@ -159,17 +169,17 @@ public sealed class ItemCatalogValidatorTests
     [Fact]
     public void Validate_ArmorWithDamage_NamesTheField()
     {
-        var armor = Equipment(new EquipmentStats(EquipmentSlot.Armor) { Damage = 5 });
+        var armor = Equipment(new EquipmentStats(EquipmentKind.Chest) { Damage = 5 });
 
         var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [armor]));
 
-        Assert.Equal("items.json: item 'gear': equipment.damage is only for a weapon (was 5 on Armor).", exception.Message);
+        Assert.Equal("items.json: item 'gear': equipment.damage is only for a weapon (was 5 on Chest).", exception.Message);
     }
 
     [Fact]
     public void Validate_WeaponWithoutDamageType_NamesTheField()
     {
-        var sword = Equipment(new EquipmentStats(EquipmentSlot.Weapon) { Damage = 5 });
+        var sword = Equipment(new EquipmentStats(EquipmentKind.Weapon) { Damage = 5 });
 
         var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [sword]));
 
@@ -179,17 +189,17 @@ public sealed class ItemCatalogValidatorTests
     [Fact]
     public void Validate_ArmorWithDamageType_NamesTheField()
     {
-        var armor = Equipment(new EquipmentStats(EquipmentSlot.Armor) { DamageType = DamageType.Slashing });
+        var armor = Equipment(new EquipmentStats(EquipmentKind.Chest) { DamageType = DamageType.Slashing });
 
         var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [armor]));
 
-        Assert.Equal("items.json: item 'gear': equipment.damageType is only for a weapon (was Slashing on Armor).", exception.Message);
+        Assert.Equal("items.json: item 'gear': equipment.damageType is only for a weapon (was Slashing on Chest).", exception.Message);
     }
 
     [Fact]
     public void Validate_ZeroBonus_NamesTheStat()
     {
-        var ring = Equipment(new EquipmentStats(EquipmentSlot.Armor) { Bonuses = Bonuses((StatKind.Power, 5), (StatKind.FireResistance, 0)) });
+        var ring = Equipment(new EquipmentStats(EquipmentKind.Chest) { Bonuses = Bonuses((StatKind.Power, 5), (StatKind.FireResistance, 0)) });
 
         var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [ring]));
 
@@ -199,7 +209,7 @@ public sealed class ItemCatalogValidatorTests
     [Fact]
     public void Validate_BonusAbove100_NamesTheStat()
     {
-        var ring = Equipment(new EquipmentStats(EquipmentSlot.Armor) { Bonuses = Bonuses((StatKind.Power, 101)) });
+        var ring = Equipment(new EquipmentStats(EquipmentKind.Chest) { Bonuses = Bonuses((StatKind.Power, 101)) });
 
         var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [ring]));
 
@@ -209,7 +219,7 @@ public sealed class ItemCatalogValidatorTests
     [Fact]
     public void Validate_NegativeBonusWithinBounds_Passes()
     {
-        var cursed = Equipment(new EquipmentStats(EquipmentSlot.Armor) { Bonuses = Bonuses((StatKind.Agility, -100)) });
+        var cursed = Equipment(new EquipmentStats(EquipmentKind.Chest) { Bonuses = Bonuses((StatKind.Agility, -100)) });
 
         var exception = Record.Exception(() => ItemCatalogValidator.Validate(FileName, [cursed]));
 

@@ -25,13 +25,15 @@ internal sealed class ItemDefinitionBuilder
 
     public ItemDefinitionBuilder AsWeapon(int damage)
     {
-        _equipment = new EquipmentStats(EquipmentSlot.Weapon) { Damage = damage };
+        _equipment = new EquipmentStats(EquipmentKind.Weapon) { Damage = damage };
         return this;
     }
 
-    public ItemDefinitionBuilder AsArmor()
+    public ItemDefinitionBuilder AsChest() => AsWorn(EquipmentKind.Chest);
+
+    public ItemDefinitionBuilder AsWorn(EquipmentKind kind)
     {
-        _equipment = new EquipmentStats(EquipmentSlot.Armor);
+        _equipment = new EquipmentStats(kind);
         return this;
     }
 
@@ -42,7 +44,7 @@ internal sealed class ItemDefinitionBuilder
         return this;
     }
 
-    /// <remarks>Call after <see cref="AsWeapon"/> or <see cref="AsArmor"/>.</remarks>
+    /// <remarks>Call after <see cref="AsWeapon"/>, <see cref="AsChest"/> or <see cref="AsWorn"/>.</remarks>
     public ItemDefinitionBuilder WithBonuses(StatBonuses bonuses)
     {
         _equipment = _equipment! with { Bonuses = bonuses };

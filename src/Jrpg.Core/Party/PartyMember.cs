@@ -49,7 +49,7 @@ public sealed class PartyMember
 
     public ItemDefinition? Weapon { get; private set; }
 
-    public ItemDefinition? Armor { get; private set; }
+    public ItemDefinition? Chest { get; private set; }
 
     public IReadOnlyList<SkillDefinition> Skills { get; }
 
@@ -95,7 +95,7 @@ public sealed class PartyMember
 
     /// <summary>What a save keeps of this member.</summary>
     public PartyMemberProgress CaptureProgress() =>
-        new(Id, Level, Experience, Vitals.Hp, Weapon?.Id, Armor?.Id, new Dictionary<string, int>(_lastingAmounts));
+        new(Id, Level, Experience, Vitals.Hp, Weapon?.Id, Chest?.Id, new Dictionary<string, int>(_lastingAmounts));
 
     /// <summary>The sheet with what's worn in <paramref name="slot"/> taken off, for the Equipment page.</summary>
     public StatSheet SheetWithout(EquipmentSlot slot) => SheetWearing(WornWith(slot, null));
@@ -125,7 +125,7 @@ public sealed class PartyMember
     public ItemDefinition? EquippedIn(EquipmentSlot slot) => slot switch
     {
         EquipmentSlot.Weapon => Weapon,
-        EquipmentSlot.Armor => Armor,
+        EquipmentSlot.Chest => Chest,
         _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot."),
     };
 
@@ -179,8 +179,8 @@ public sealed class PartyMember
             case EquipmentSlot.Weapon:
                 Weapon = item;
                 break;
-            case EquipmentSlot.Armor:
-                Armor = item;
+            case EquipmentSlot.Chest:
+                Chest = item;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot.");
@@ -203,16 +203,19 @@ public sealed class PartyMember
         resource.StartsAt == resource.Max ? LastingMaxOf(resource) : Math.Min(resource.StartsAt, LastingMaxOf(resource));
 
     private static StatBonuses BonusesOf(Worn worn) =>
-        (worn.Weapon?.Equipment?.Bonuses ?? StatBonuses.None).Plus(worn.Armor?.Equipment?.Bonuses ?? StatBonuses.None);
+        (worn.Weapon?.Equipment?.Bonuses ?? StatBonuses.None).Plus(worn.Chest?.Equipment?.Bonuses ?? StatBonuses.None);
 
+    // The one slot the item's kind fits; a ring, which fits two, gets its slot named (G1a-2).
     private static EquipmentSlot SlotOf(ItemDefinition item) =>
-        item.Equipment?.Slot ?? throw new ArgumentException($"Item '{item.Id}' is not equipment.", nameof(item));
+        item.Equipment is { } equipment && EquipmentFit.SlotsFor(equipment.Kind) is [var slot, ..]
+            ? slot
+            : throw new ArgumentException($"Item '{item.Id}' is not equipment that fits a slot.", nameof(item));
 
     // What would be worn with the slot holding the item (or nothing) and the other slot as now.
     private Worn WornWith(EquipmentSlot slot, ItemDefinition? item) => slot switch
     {
-        EquipmentSlot.Weapon => new Worn(item, Armor),
-        EquipmentSlot.Armor => new Worn(Weapon, item),
+        EquipmentSlot.Weapon => new Worn(item, Chest),
+        EquipmentSlot.Chest => new Worn(Weapon, item),
         _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot."),
     };
 
@@ -233,10 +236,10 @@ public sealed class PartyMember
 
     // The class's numbers at the member's level, the one formula (ADR 0017), with what they wear.
     [MemberNotNull(nameof(Sheet))]
-    private void RebuildStats() => Sheet = SheetWearing(new Worn(Weapon, Armor));
+    private void RebuildStats() => Sheet = SheetWearing(new Worn(Weapon, Chest));
 
     // The two slots' items, as worn or as a preview would have them.
-    private readonly record struct Worn(ItemDefinition? Weapon, ItemDefinition? Armor);
+    private readonly record struct Worn(ItemDefinition? Weapon, ItemDefinition? Chest);
 
     private LevelProgressStep AdvanceTowardNextLevel(int amount, int experienceToNextLevel)
     {

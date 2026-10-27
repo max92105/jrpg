@@ -41,6 +41,20 @@ public sealed class PartyEquipmentTests
         Assert.Equal(1, _inventory.QuantityOf(potion.Id));
     }
 
+    // A ring fits no slot until G1a-2 (ADR 0028), so it stays in the bag and the member wears what they wore.
+    [Fact]
+    public void TryEquip_KindWithoutSlotYet_ReturnsFalseAndChangesNothing()
+    {
+        var ring = new ItemDefinitionBuilder().WithId("ring").AsWorn(EquipmentKind.Ring).Build();
+        _inventory.Add(ring, 1);
+
+        var equipped = _equipment.TryEquip(_fighter, ring);
+
+        Assert.False(equipped);
+        Assert.Equal(1, _inventory.QuantityOf(ring.Id));
+        Assert.Null(_fighter.Weapon);
+    }
+
     [Fact]
     public void TryEquip_AnyClass_WearsAnyItem()
     {
@@ -140,21 +154,21 @@ public sealed class PartyEquipmentTests
     [Fact]
     public void TryUnequip_WornArmor_ReturnsItToInventory()
     {
-        var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor().Build();
+        var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsChest().Build();
         _inventory.Add(chainMail, 1);
         _equipment.TryEquip(_fighter, chainMail);
 
-        var unequipped = _equipment.TryUnequip(_fighter, EquipmentSlot.Armor);
+        var unequipped = _equipment.TryUnequip(_fighter, EquipmentSlot.Chest);
 
         Assert.True(unequipped);
-        Assert.Null(_fighter.Armor);
+        Assert.Null(_fighter.Chest);
         Assert.Equal(1, _inventory.QuantityOf(chainMail.Id));
     }
 
     [Fact]
     public void TryUnequip_EmptySlot_ReturnsFalse()
     {
-        var unequipped = _equipment.TryUnequip(_fighter, EquipmentSlot.Armor);
+        var unequipped = _equipment.TryUnequip(_fighter, EquipmentSlot.Chest);
 
         Assert.False(unequipped);
     }
@@ -190,11 +204,11 @@ public sealed class PartyEquipmentTests
     [Fact]
     public void OwnedFor_ArmorSlot_ExcludesWeapons()
     {
-        var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor().Build();
+        var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsChest().Build();
         _inventory.Add(_bronzeSword, 1);
         _inventory.Add(chainMail, 1);
 
-        var wearable = _equipment.OwnedFor(EquipmentSlot.Armor, Catalog(_bronzeSword, chainMail));
+        var wearable = _equipment.OwnedFor(EquipmentSlot.Chest, Catalog(_bronzeSword, chainMail));
 
         Assert.Equal([chainMail], wearable);
     }

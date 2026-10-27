@@ -74,7 +74,7 @@ internal sealed class SaveGameRepair
         var (level, experience) = RepairLevel(progress);
         var characterClass = _catalog.ClassOf(definition);
         var weaponId = RepairWornItem(progress.WeaponId, EquipmentSlot.Weapon, definition);
-        var armorId = RepairWornItem(progress.ArmorId, EquipmentSlot.Armor, definition);
+        var armorId = RepairWornItem(progress.ArmorId, EquipmentSlot.Chest, definition);
 
         // The sheet the member will have once restored: their level's, with what they still wear; its max HP and its
         // Will bound what the save holds.
@@ -155,7 +155,7 @@ internal sealed class SaveGameRepair
             return null;
         }
 
-        if (item.Equipment is not { } equipment || equipment.Slot != slot)
+        if (item.Equipment is not { } equipment || !EquipmentFit.Fits(equipment.Kind, slot))
         {
             _returnedItemIds.Add(itemId);
             _changes.Add($"party member '{definition.Id}': '{itemId}' can no longer be worn as {slot}, so it went back to the inventory.");

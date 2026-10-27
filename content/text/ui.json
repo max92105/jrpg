@@ -84,7 +84,7 @@
   "stat_dark_resistance": "Dark resistance",
   "stat_percent": "{value} %",
   "slot_weapon": "Weapon",
-  "slot_armor": "Armor",
+  "slot_chest": "Chest",
   "slot_empty": "None",
   "save_column_file": "File",
   "save_column_location": "Location",

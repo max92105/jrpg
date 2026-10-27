@@ -21,7 +21,7 @@ public sealed class InventoryFilterTests
     ];
 
     [Fact]
-    public void Select_Weapons_KeepsOnlyWeaponSlotItems()
+    public void Select_Weapons_KeepsOnlyWeaponKindItems()
     {
         var kept = InventoryFilter.Select(InventoryCategory.Weapons, _owned, _catalog.Items);
 
@@ -37,7 +37,7 @@ public sealed class InventoryFilterTests
     }
 
     [Fact]
-    public void Select_Armor_KeepsOnlyArmorSlotItems()
+    public void Select_Armor_KeepsEveryPieceThatIsNotAWeapon()
     {
         var kept = InventoryFilter.Select(InventoryCategory.Armor, _owned, _catalog.Items);
 

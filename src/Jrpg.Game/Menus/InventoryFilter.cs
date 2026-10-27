@@ -14,13 +14,13 @@ internal static class InventoryFilter
         IReadOnlyDictionary<string, ItemDefinition> items) =>
         [.. owned.Where(entry => Keeps(category, items[entry.ItemId]))];
 
-    // A consumable is anything with an effect; weapons and armor are told apart by the slot they're worn in.
+    // A consumable is anything with an effect; the Armor tab is every piece of equipment that isn't a weapon.
     private static bool Keeps(InventoryCategory category, ItemDefinition item) => category switch
     {
         InventoryCategory.All => true,
         InventoryCategory.Consumables => item.Effect is not null,
-        InventoryCategory.Weapons => item.Equipment?.Slot == EquipmentSlot.Weapon,
-        InventoryCategory.Armor => item.Equipment?.Slot == EquipmentSlot.Armor,
+        InventoryCategory.Weapons => item.Equipment?.Kind == EquipmentKind.Weapon,
+        InventoryCategory.Armor => item.Equipment is { Kind: not EquipmentKind.Weapon },
         _ => throw new ArgumentOutOfRangeException(nameof(category), category, null),
     };
 }

@@ -10,7 +10,7 @@ using static Jrpg.Game.Tests.Input.InputFrames;
 namespace Jrpg.Game.Tests.Menus;
 
 // The Changes section (decision 337): with a choice open, what the highlighted item would change; with none, what the
-// highlighted slot's worn item gives. The rows are Weapon, Armor, then Remove all; the leader starts wearing nothing.
+// highlighted slot's worn item gives. The rows are Weapon, Chest, then Remove all; the leader starts wearing nothing.
 [Collection(RepositoryScreenText.CollectionName)]
 public sealed class EquipmentPageComparisonTests
 {

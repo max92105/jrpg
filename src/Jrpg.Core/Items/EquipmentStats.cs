@@ -3,7 +3,8 @@ using Jrpg.Core.Stats;
 namespace Jrpg.Core.Items;
 
 /// <summary>What wearing an item gives. Anyone can wear any equipment (decision 165).</summary>
-public sealed record EquipmentStats(EquipmentSlot Slot)
+/// <param name="Kind">What the item is worn as, which says the slots it fits (ADR 0028).</param>
+public sealed record EquipmentStats(EquipmentKind Kind)
 {
     /// <summary>
     /// A weapon's raw damage, which its wearer's basic attack deals before Power (decision 330); 0 for anything else.

@@ -22,10 +22,10 @@ public sealed class ContentFileReaderTests
     public void Read_MissingRequiredField_ThrowsNamingTheFileAndField()
     {
         var exception = Assert.Throws<ContentValidationException>(
-            () => ContentFileReader.Read<IReadOnlyList<ItemDefinition>>(TestContentPath("missing-slot.json")));
+            () => ContentFileReader.Read<IReadOnlyList<ItemDefinition>>(TestContentPath("missing-kind.json")));
 
-        Assert.StartsWith("missing-slot.json at $[0].equipment:", exception.Message, StringComparison.Ordinal);
-        Assert.Contains("slot", exception.Message, StringComparison.Ordinal);
+        Assert.StartsWith("missing-kind.json at $[0].equipment:", exception.Message, StringComparison.Ordinal);
+        Assert.Contains("kind", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]

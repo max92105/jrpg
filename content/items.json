@@ -69,7 +69,7 @@
     "iconFile": "Weapon.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "weapon", "damage": 24, "damageType": "slashing" }
+    "equipment": { "kind": "weapon", "damage": 24, "damageType": "slashing" }
   },
   {
     "id": "iron_sword",
@@ -78,7 +78,7 @@
     "iconFile": "Weapon.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "weapon", "damage": 30, "damageType": "slashing" }
+    "equipment": { "kind": "weapon", "damage": 30, "damageType": "slashing" }
   },
   {
     "id": "magic_staff",
@@ -87,7 +87,7 @@
     "iconFile": "Weapon.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "weapon", "damage": 20, "damageType": "blunt", "bonuses": { "intelligence": 3 } }
+    "equipment": { "kind": "weapon", "damage": 20, "damageType": "blunt", "bonuses": { "intelligence": 3 } }
   },
   {
     "id": "leather_armor",
@@ -96,7 +96,7 @@
     "iconFile": "Armor.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "armor", "bonuses": { "constitution": 2, "bluntResistance": 5, "piercingResistance": 5, "slashingResistance": 5 } }
+    "equipment": { "kind": "chest", "bonuses": { "constitution": 2, "bluntResistance": 5, "piercingResistance": 5, "slashingResistance": 5 } }
   },
   {
     "id": "chain_mail",
@@ -105,7 +105,7 @@
     "iconFile": "Armor.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "armor", "bonuses": { "constitution": 3, "bluntResistance": 5, "piercingResistance": 10, "slashingResistance": 15 } }
+    "equipment": { "kind": "chest", "bonuses": { "constitution": 3, "bluntResistance": 5, "piercingResistance": 10, "slashingResistance": 15 } }
   },
   {
     "id": "wizard_robe",
@@ -114,6 +114,6 @@
     "iconFile": "Armor.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "armor", "bonuses": { "will": 3, "fireResistance": 10, "iceResistance": 10, "lightningResistance": 10 } }
+    "equipment": { "kind": "chest", "bonuses": { "will": 3, "fireResistance": 10, "iceResistance": 10, "lightningResistance": 10 } }
   }
 ]

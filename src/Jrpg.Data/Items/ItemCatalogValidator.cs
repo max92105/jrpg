@@ -72,18 +72,22 @@ internal static class ItemCatalogValidator
     }
 
     private static string? FindEquipmentProblem(EquipmentStats equipment) =>
-        FindDamageProblem(equipment) ?? FindDamageTypeProblem(equipment) ?? FindBonusProblem(equipment.Bonuses);
+        FindKindProblem(equipment) ?? FindDamageProblem(equipment) ?? FindDamageTypeProblem(equipment) ?? FindBonusProblem(equipment.Bonuses);
+
+    // A kind no slot holds yet could be bought but never worn (ADR 0028; the slots come with G1a-2).
+    private static string? FindKindProblem(EquipmentStats equipment) =>
+        EquipmentFit.SlotsFor(equipment.Kind).IsEmpty ? $"equipment.kind {equipment.Kind} fits no slot a member has yet." : null;
 
     // A weapon's damage is its wearer's whole basic attack (decision 330), so it must hurt; nothing else is swung.
     private static string? FindDamageProblem(EquipmentStats equipment) =>
-        equipment.Slot == EquipmentSlot.Weapon && equipment.Damage < 1 ? $"equipment.damage must be at least 1 for a weapon (was {equipment.Damage})."
-        : equipment.Slot != EquipmentSlot.Weapon && equipment.Damage != 0 ? $"equipment.damage is only for a weapon (was {equipment.Damage} on {equipment.Slot})."
+        equipment.Kind == EquipmentKind.Weapon && equipment.Damage < 1 ? $"equipment.damage must be at least 1 for a weapon (was {equipment.Damage})."
+        : equipment.Kind != EquipmentKind.Weapon && equipment.Damage != 0 ? $"equipment.damage is only for a weapon (was {equipment.Damage} on {equipment.Kind})."
         : null;
 
     // A weapon's type is what its wearer's basic attack hits as (ADR 0027); nothing else is swung.
     private static string? FindDamageTypeProblem(EquipmentStats equipment) =>
-        equipment.Slot == EquipmentSlot.Weapon && equipment.DamageType is null ? "equipment.damageType is required for a weapon."
-        : equipment.Slot != EquipmentSlot.Weapon && equipment.DamageType is { } type ? $"equipment.damageType is only for a weapon (was {type} on {equipment.Slot})."
+        equipment.Kind == EquipmentKind.Weapon && equipment.DamageType is null ? "equipment.damageType is required for a weapon."
+        : equipment.Kind != EquipmentKind.Weapon && equipment.DamageType is { } type ? $"equipment.damageType is only for a weapon (was {type} on {equipment.Kind})."
         : null;
 
     // A bonus of 0 names a stat for nothing, likely a typo; past 100 one item outweighs any class (placeholder bound).

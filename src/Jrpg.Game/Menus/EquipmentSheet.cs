@@ -12,14 +12,14 @@ namespace Jrpg.Game.Menus;
 internal sealed record EquipmentSheet(string Name, ImmutableArray<ItemDefinition?> Worn)
 {
     /// <summary>The page's slot rows, in order, before "Remove all".</summary>
-    public static ImmutableArray<EquipmentSlot> Slots { get; } = [EquipmentSlot.Weapon, EquipmentSlot.Armor];
+    public static ImmutableArray<EquipmentSlot> Slots { get; } = [EquipmentSlot.Weapon, EquipmentSlot.Chest];
 
     public static EquipmentSheet Of(PartyMember member) => new(member.Definition.Name, [.. Slots.Select(member.EquippedIn)]);
 
     public static string LabelIdOf(EquipmentSlot slot) => slot switch
     {
         EquipmentSlot.Weapon => MessageIds.SlotWeapon,
-        EquipmentSlot.Armor => MessageIds.SlotArmor,
+        EquipmentSlot.Chest => MessageIds.SlotChest,
         _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, null),
     };
 }

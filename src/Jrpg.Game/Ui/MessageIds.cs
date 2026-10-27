@@ -213,7 +213,7 @@ internal static class MessageIds
 
     public const string SlotWeapon = "slot_weapon";
 
-    public const string SlotArmor = "slot_armor";
+    public const string SlotChest = "slot_chest";
 
     /// <summary>Shown for an equipment slot with nothing worn.</summary>
     public const string SlotEmpty = "slot_empty";

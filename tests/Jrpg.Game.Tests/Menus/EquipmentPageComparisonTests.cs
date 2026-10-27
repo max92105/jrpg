@@ -77,8 +77,8 @@ public sealed class EquipmentPageComparisonTests
         page.Update(Pressing(GameButton.Confirm));
 
         Assert.Null(page.Choice!.Highlighted);
-        var attack = Assert.Single(page.Comparison!.Changes, change => change.NameId == MessageIds.StatAttack);
-        Assert.True(attack.After < attack.Before);
+        var weaponDamage = Assert.Single(page.Comparison!.Changes, change => change.NameId == MessageIds.StatWeaponDamage);
+        Assert.True(weaponDamage.After < weaponDamage.Before);
     }
 
     private void WearChainMail() =>

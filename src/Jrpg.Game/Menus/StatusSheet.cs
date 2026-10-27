@@ -19,7 +19,7 @@ namespace Jrpg.Game.Menus;
 /// <param name="Experience">How far they are through their level, for the experience bar.</param>
 /// <param name="Attributes">Each primary, gear included, with what it gives, in <see cref="StatKind"/> order.</param>
 /// <param name="Combat">
-/// HP (as "value / max"), Attack and Defense while the battle uses them (decision 337), speed, accuracy, crit chance
+/// HP (as "value / max"), Weapon damage, Defense while the battle uses it (decision 337), speed, accuracy, crit chance
 /// with crit damage, dodge, crowd control resistance: each with what the member wears.
 /// </param>
 /// <param name="Resistances">One per damage type, in <see cref="DamageType"/> order.</param>
@@ -65,7 +65,7 @@ internal sealed record StatusSheet(
             ExperienceProgress(member.Level, member.Experience, table),
             AttributesOf(sheet.Primaries, catalog.Rules.Stats, messages),
             [
-                shownVitals.Hp.Value.Text, NumberText.Of(stats.Attack), NumberText.Of(stats.Defense), Value(StatKind.Speed),
+                shownVitals.Hp.Value.Text, NumberText.Of(StatFormula.WeaponDamage(stats, sheet)), NumberText.Of(stats.Defense), Value(StatKind.Speed),
                 Value(StatKind.Accuracy), crit, Value(StatKind.Dodge), Value(StatKind.CrowdControlResistance),
             ],
             [.. Enum.GetValues<DamageType>().Select(type => Value(StatKinds.ResistanceTo(type)))],

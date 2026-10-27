@@ -161,7 +161,8 @@ internal static class MessageIds
     /// <summary>Placeholders <c>{value}</c>, <c>{max}</c>: an HP value, one format everywhere (decision 110).</summary>
     public const string StatValueOfMax = "stat_value_of_max";
 
-    public const string StatAttack = "stat_attack";
+    /// <summary>A basic attack: the weapon's damage or the unarmed one, raised by Power (decision 337).</summary>
+    public const string StatWeaponDamage = "stat_weapon_damage";
 
     public const string StatDefense = "stat_defense";
 

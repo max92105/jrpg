@@ -61,7 +61,7 @@
   "status_lasting_amount": "{amount}/{max}",
   "stat_hp": "HP",
   "stat_value_of_max": "{value} / {max}",
-  "stat_attack": "Attack",
+  "stat_weapon_damage": "Weapon damage",
   "stat_defense": "Defense",
   "stat_power": "Power",
   "stat_agility": "Agility",

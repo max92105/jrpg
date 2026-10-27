@@ -1,4 +1,5 @@
 using Jrpg.Core.Effects;
+using Jrpg.Core.Stats;
 
 namespace Jrpg.Core.Battle;
 
@@ -8,15 +9,12 @@ namespace Jrpg.Core.Battle;
 /// </summary>
 internal static class EffectScaling
 {
-    private const long Whole = 1000;
-
     /// <returns>
-    /// The effect with a damage, healing or revive power of <c>power × damagePermille ÷ 1000</c>, in a <c>long</c> and
-    /// rounded down once (ADR 0027); any other effect unchanged.
+    /// A damage, healing or revive effect with its power put through <see cref="StatFormula.Scaled"/>; others as is.
     /// </returns>
     public static Effect ScaledFor(Effect effect, int damagePermille) => effect.Kind switch
     {
-        EffectKind.Damage or EffectKind.RestoreHp or EffectKind.Revive => effect with { Power = (int)((long)effect.Power * damagePermille / Whole) },
+        EffectKind.Damage or EffectKind.RestoreHp or EffectKind.Revive => effect with { Power = StatFormula.Scaled(effect.Power, damagePermille) },
         _ => effect,
     };
 }

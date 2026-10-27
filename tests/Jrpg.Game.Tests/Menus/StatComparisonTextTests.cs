@@ -21,9 +21,9 @@ public sealed class StatComparisonTextTests
     }
 
     [Fact]
-    public void Of_AttackUp_IsAPlainNumberInTheRiseColor()
+    public void Of_WeaponDamageUp_IsAPlainNumberInTheRiseColor()
     {
-        var comparison = new StatComparison([new StatComparison.Change(MessageIds.StatAttack, Kind: null, 10, 18)]);
+        var comparison = new StatComparison([new StatComparison.Change(MessageIds.StatWeaponDamage, Kind: null, 10, 18)]);
 
         var line = Assert.Single(StatComparisonText.Of(comparison, _messages).Lines);
 

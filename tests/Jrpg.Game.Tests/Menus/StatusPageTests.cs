@@ -2,6 +2,7 @@ using Jrpg.Core.Progression;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Session;
+using Jrpg.Core.Stats;
 using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Tests.Exploration;
@@ -56,7 +57,11 @@ public sealed class StatusPageTests
 
         page.Open();
 
-        string[] expected = [$"{vitals.Hp} / {vitals.MaxHp}", NumberText.Of(leader.TotalStats.Attack), NumberText.Of(leader.TotalStats.Defense)];
+        string[] expected =
+        [
+            $"{vitals.Hp} / {vitals.MaxHp}", NumberText.Of(StatFormula.Scaled(leader.TotalStats.Attack, leader.Sheet.DamagePermille)),
+            NumberText.Of(leader.TotalStats.Defense),
+        ];
         Assert.Equal(expected, page.ShownSheet.Combat.Take(3));
     }
 
@@ -205,7 +210,7 @@ public sealed class StatusPageTests
         page.Open();
 
         var messages = RepositoryScreenText.Text.Messages;
-        Assert.Equal(messages.Text(MessageIds.StatAttack).ToUpperInvariant(), page.ShownLabels.Combat[1]);
+        Assert.Equal(messages.Text(MessageIds.StatWeaponDamage).ToUpperInvariant(), page.ShownLabels.Combat[1]);
         Assert.Contains(messages.Text(MessageIds.StatusSpeed).ToUpperInvariant(), page.ShownLabels.Combat);
         Assert.Equal(messages.Text(MessageIds.StatusLevelShort).ToUpperInvariant(), page.ShownLabels.Progress[0]);
         Assert.Equal(messages.Text(MessageIds.StatusNextLevel).ToUpperInvariant(), page.ShownLabels.Progress[2]);

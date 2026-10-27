@@ -29,15 +29,27 @@ public sealed class StatComparisonTests
     }
 
     [Fact]
-    public void Between_AttackAndPower_ListsAttackFirst()
+    public void Between_WeaponDamageAndPower_ListsWeaponDamageFirst()
     {
         var before = Numbers(Sheet(power: 10, critDamagePermille: 1500));
         var after = new StatComparison.Numbers(Sheet(power: 12, critDamagePermille: 1500), _stats with { Attack = 18 });
 
         var comparison = StatComparison.Between(before, after);
 
-        Assert.Equal([MessageIds.StatAttack, MessageIds.StatPower], comparison.Changes.Select(change => change.NameId));
+        Assert.Equal([MessageIds.StatWeaponDamage, MessageIds.StatPower], comparison.Changes.Select(change => change.NameId));
         Assert.Null(comparison.Changes[0].Kind);
+    }
+
+    // A Power ring: the same 10 raw attack at 110 % then 120 % reads 11, then 12.
+    [Fact]
+    public void Between_DamagePercentAloneRaised_MovesWeaponDamage()
+    {
+        var before = Numbers(Sheet(power: 10, critDamagePermille: 1500) with { DamagePermille = 1100 });
+        var after = Numbers(Sheet(power: 10, critDamagePermille: 1500) with { DamagePermille = 1200 });
+
+        var change = Assert.Single(StatComparison.Between(before, after).Changes);
+
+        Assert.Equal((MessageIds.StatWeaponDamage, 11, 12), (change.NameId, change.Before, change.After));
     }
 
     [Fact]

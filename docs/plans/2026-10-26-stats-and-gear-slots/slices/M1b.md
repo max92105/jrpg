@@ -10,4 +10,10 @@ Part of [the stats and gear slots plan](../README.md). Decision 337. Split from 
     - `ui.json` and `MessageIds`: `stat_attack` "Attack" becomes the weapon damage's name.
   - **Tests:** the scaling place (Core); `StatComparisonTests` and `StatusPageTests` for the scaled number (a Power change alone moves Weapon damage).
   - **Verify by hand:** the Status page shows the fighter's Weapon damage; on the Equipment page, the bronze sword's line compares it with the unarmed one. F12.
-- **Done, with deviations:**
+- **Done, with deviations:** the scaling place is `StatFormula.Scaled(raw, damagePermille)`, which
+  `EffectScaling` now calls; from the review, `StatFormula.WeaponDamage(stats, sheet)` is the one query both pages call. The message id is renamed to `stat_weapon_damage` ("Weapon damage"), rather than
+  keeping `stat_attack` with new text. Tests: `StatFormulaTests.Scaled_TwentyFourAtFifteenPercentMore_IsTwentySeven`,
+  `StatComparisonTests.Between_DamagePercentAloneRaised_MovesWeaponDamage` and
+  `StatusPageSheetTests.Open_Leader_ShowsWeaponDamageRaisedByPower`. The three `EquipmentChoiceTests` on weapons now
+  expect the scaled numbers and were renamed. The longer "WEAPON DAMAGE" label in the Combat column is the developer's
+  hand check.

@@ -98,6 +98,24 @@ public sealed class StatFormulaTests
         Assert.Equal(1200, StatFormula.DamagePermille(power: 20, _rules));
     }
 
+    // 24 × 1.15 = 27.6, rounded down once.
+    [Fact]
+    public void Scaled_TwentyFourAtFifteenPercentMore_IsTwentySeven()
+    {
+        Assert.Equal(27, StatFormula.Scaled(24, damagePermille: 1150));
+    }
+
+    [Fact]
+    public void WeaponDamage_SheetAtFifteenPercentMore_RaisesTheRawAttack()
+    {
+        var sheet = new StatSheet(
+            PrimaryStats.None, MaxHp: 100, Speed: 10, AccuracyPermille: 1000, CritChancePermille: 0, CritDamagePermille: 1500,
+            DodgePermille: 0, CrowdControlResistancePermille: 0, DamagePermille: 1150, Resistances.None, StatusPermille: 1000,
+            ExtraStatusTurns: 0);
+
+        Assert.Equal(27, StatFormula.WeaponDamage(new CombatStats(Attack: 24, Defense: 0), sheet));
+    }
+
     [Fact]
     public void WholePercentOf_NinetySevenPermille_IsNine()
     {

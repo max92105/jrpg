@@ -28,6 +28,19 @@ public sealed class StatusPageSheetTests
     }
 
     [Fact]
+    public void Open_Leader_ShowsWeaponDamageRaisedByPower()
+    {
+        var page = NewPage();
+
+        page.Open();
+
+        var leader = _session.Party.Leader;
+        var shown = StatusPageTests.CombatValue(page, MessageIds.StatWeaponDamage);
+        Assert.Equal(NumberText.Of(StatFormula.Scaled(leader.TotalStats.Attack, leader.Sheet.DamagePermille)), shown);
+        Assert.NotEqual(NumberText.Of(leader.TotalStats.Attack), shown);
+    }
+
+    [Fact]
     public void Open_Member_ShowsCritChanceAndDamageAsPercents()
     {
         var page = NewPage();

@@ -85,6 +85,18 @@ public static class StatFormula
     public static int ExtraStatusTurns(int intelligence, StatRules rules) =>
         intelligence / rules.IntelligencePerExtraStatusTurn;
 
+    /// <summary>
+    /// A raw damage or healing as the member deals it, raised by their <see cref="DamagePermille"/> (decision 296): in
+    /// a <c>long</c>, rounded down once (ADR 0027), so a 24 damage weapon at 115 % deals 27.
+    /// </summary>
+    public static int Scaled(int raw, int damagePermille) => (int)((long)raw * damagePermille / PermilleOf(100));
+
+    /// <summary>
+    /// A member's basic attack as they deal it (decision 337): the raw attack of <paramref name="stats"/> raised by
+    /// <paramref name="sheet"/>'s damage percent, the one number every page shows for it.
+    /// </summary>
+    public static int WeaponDamage(CombatStats stats, StatSheet sheet) => Scaled(stats.Attack, sheet.DamagePermille);
+
     /// <summary>A whole percent as permille, the unit derived percents are held in (ADR 0026).</summary>
     public static int PermilleOf(int percent) => percent * PermillePerPercent;
 

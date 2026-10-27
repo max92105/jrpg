@@ -10,12 +10,11 @@ using Jrpg.Data.Saving;
 namespace Jrpg.Data.Tests.Saving;
 
 /// <summary>
-/// Repairs what a member wears, slot by slot (ADR 0028), on the repository content with a ring and a helm added, which
-/// it has none of yet.
+/// Repairs what a member wears, slot by slot (ADR 0028), on the repository content: its power ring and its leather cap.
 /// </summary>
 public sealed class SaveGameRepairWornTests
 {
-    private static readonly ContentCatalog _catalog = WithRingAndHelm(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")));
+    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
     [Fact]
     public void Repair_UnknownItemInRingSlot_DropsIt()
@@ -47,26 +46,6 @@ public sealed class SaveGameRepairWornTests
         Assert.Equal(worn, repaired.Save.Members[0].Worn);
         Assert.Empty(repaired.Changes);
     }
-
-    private static ContentCatalog WithRingAndHelm(ContentCatalog catalog) => catalog with
-    {
-        Items = new Dictionary<string, ItemDefinition>(catalog.Items)
-        {
-            ["power_ring"] = Gear("power_ring", EquipmentKind.Ring),
-            ["leather_cap"] = Gear("leather_cap", EquipmentKind.Head),
-        },
-    };
-
-    private static ItemDefinition Gear(string id, EquipmentKind kind) => new()
-    {
-        Id = id,
-        Name = id,
-        Description = "",
-        IconFile = "Armor.png",
-        MaxStack = 99,
-        IsUsableFromMenu = false,
-        Equipment = new EquipmentStats(kind),
-    };
 
     private static SaveGame SaveWithSarxianWearing(Dictionary<EquipmentSlot, string> worn) => new()
     {

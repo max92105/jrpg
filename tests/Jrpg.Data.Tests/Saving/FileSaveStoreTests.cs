@@ -84,18 +84,15 @@ public sealed class FileSaveStoreTests : IDisposable
         Assert.Equal(save.Members, read.Members);
     }
 
-    // The repository has no ring yet (G2), so the store reads against a copy where one exists; the slot keys are
-    // written in camelCase, like every other name in the file.
+    // The slot keys are written in camelCase, like every other name in the file.
     [Fact]
     public void SaveThenLoad_RingsInBothSlots_RoundTrips()
     {
-        var ring = new ItemDefinition { Id = "power_ring", Name = "Power Ring", Description = "", IconFile = "Armor.png", MaxStack = 99, IsUsableFromMenu = false, Equipment = new EquipmentStats(EquipmentKind.Ring) };
-        var store = new FileSaveStore(_directory, _catalog with { Items = new Dictionary<string, ItemDefinition>(_catalog.Items) { ["power_ring"] = ring } });
         var worn = new Dictionary<EquipmentSlot, string> { [EquipmentSlot.Weapon] = "bronze_sword", [EquipmentSlot.FirstRing] = "power_ring", [EquipmentSlot.SecondRing] = "power_ring" };
         var save = _save with { Members = [_save.Members[0] with { Worn = worn }, _save.Members[1]] };
-        store.Write(Slot, save);
+        _store.Write(Slot, save);
 
-        var read = store.Read(Slot)!.Save;
+        var read = _store.Read(Slot)!.Save;
 
         Assert.Equal(save.Members, read.Members);
         Assert.Contains("\"firstRing\": \"power_ring\"", File.ReadAllText(Path.Combine(_directory, "slot_01.json")), StringComparison.Ordinal);

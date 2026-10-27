@@ -115,5 +115,77 @@
     "maxStack": 99,
     "isUsableFromMenu": false,
     "equipment": { "kind": "chest", "bonuses": { "will": 3, "fireResistance": 10, "iceResistance": 10, "lightningResistance": 10 } }
+  },
+  {
+    "id": "wooden_shield",
+    "name": "Wooden Shield",
+    "description": "A round shield that turns a little of every blow: +8 % to the three physical resistances.",
+    "iconFile": "Armor.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": { "kind": "offHand", "bonuses": { "bluntResistance": 8, "piercingResistance": 8, "slashingResistance": 8 } }
+  },
+  {
+    "id": "leather_cap",
+    "name": "Leather Cap",
+    "description": "A stiff leather cap: +5 Constitution.",
+    "iconFile": "Armor.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": { "kind": "head", "bonuses": { "constitution": 5 } }
+  },
+  {
+    "id": "leather_gloves",
+    "name": "Leather Gloves",
+    "description": "Supple gloves for a surer grip: +5 % accuracy.",
+    "iconFile": "Armor.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": { "kind": "hands", "bonuses": { "accuracy": 5 } }
+  },
+  {
+    "id": "leather_boots",
+    "name": "Leather Boots",
+    "description": "Light boots for quick feet: +5 speed, +5 % dodge.",
+    "iconFile": "Armor.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": { "kind": "feet", "bonuses": { "speed": 5, "dodge": 5 } }
+  },
+  {
+    "id": "amber_amulet",
+    "name": "Amber Amulet",
+    "description": "Warm amber on a cord: +5 Will, +10 % Fire resistance.",
+    "iconFile": "Armor.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": { "kind": "amulet", "bonuses": { "will": 5, "fireResistance": 10 } }
+  },
+  {
+    "id": "power_ring",
+    "name": "Power Ring",
+    "description": "A heavy iron band: +5 Power.",
+    "iconFile": "Armor.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": { "kind": "ring", "bonuses": { "power": 5 } }
+  },
+  {
+    "id": "sage_ring",
+    "name": "Sage Ring",
+    "description": "A ring etched with old script: +5 Intelligence.",
+    "iconFile": "Armor.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": { "kind": "ring", "bonuses": { "intelligence": 5 } }
+  },
+  {
+    "id": "swift_ring",
+    "name": "Swift Ring",
+    "description": "A thin silver ring, light as air: +5 Agility.",
+    "iconFile": "Armor.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": { "kind": "ring", "bonuses": { "agility": 5 } }
   }
 ]

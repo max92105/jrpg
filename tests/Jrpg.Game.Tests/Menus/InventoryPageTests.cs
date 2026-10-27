@@ -1,3 +1,4 @@
+using Jrpg.Core.Items;
 using Jrpg.Core.Session;
 using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
@@ -81,16 +82,19 @@ public sealed class InventoryPageTests
         page.Update(Pressing(GameButton.PreviousTab));
 
         Assert.Equal(InventoryCategory.Armor, page.Category);
-        Assert.Equal(["leather_armor", "chain_mail", "wizard_robe"], page.ShownItemIds);
+        Assert.Equal(["leather_armor", "chain_mail", "wizard_robe"], page.ShownItemIds.Take(3));
+        Assert.DoesNotContain("bronze_sword", page.ShownItemIds);
+        Assert.Contains("wooden_shield", page.ShownItemIds);
     }
 
     [Fact]
     public void Update_CategoryWithNothingOwned_HasNoSelectedRow()
     {
         var session = NewSession();
-        foreach (var armor in new[] { "leather_armor", "chain_mail", "wizard_robe" })
+        var items = StartMapScenarios.BelowClosedDoor.Items;
+        foreach (var armor in session.Inventory.Entries.Where(entry => items[entry.ItemId].Equipment is { Kind: not EquipmentKind.Weapon }).ToList())
         {
-            session.Inventory.TryRemove(armor, session.Inventory.QuantityOf(armor));
+            session.Inventory.TryRemove(armor.ItemId, armor.Quantity);
         }
 
         var page = NewPage(session);

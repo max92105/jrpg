@@ -23,7 +23,15 @@
     { "itemId": "magic_staff", "quantity": 3 },
     { "itemId": "leather_armor", "quantity": 2 },
     { "itemId": "chain_mail", "quantity": 3 },
-    { "itemId": "wizard_robe", "quantity": 1 }
+    { "itemId": "wizard_robe", "quantity": 1 },
+    { "itemId": "wooden_shield", "quantity": 1 },
+    { "itemId": "leather_cap", "quantity": 1 },
+    { "itemId": "leather_gloves", "quantity": 1 },
+    { "itemId": "leather_boots", "quantity": 1 },
+    { "itemId": "amber_amulet", "quantity": 1 },
+    { "itemId": "power_ring", "quantity": 1 },
+    { "itemId": "sage_ring", "quantity": 1 },
+    { "itemId": "swift_ring", "quantity": 1 }
   ],
   "startLocation": { "mapId": "intro", "position": { "x": 2.5, "y": 2.5 }, "facing": "down" },
   "fieldSpriteFile": "player.png"

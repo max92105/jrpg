@@ -32,9 +32,7 @@ public sealed class EquipmentPageTests
     public void Update_RemoveAll_EmptiesEverySlot()
     {
         var sarxian = WearingSwordAndArmor();
-        var ring = Gear("power_ring", EquipmentKind.Ring);
-        _session.Inventory.Add(ring, 1);
-        Assert.True(_session.Equipment.TryEquip(sarxian, ring, EquipmentSlot.SecondRing));
+        Assert.True(_session.Equipment.TryEquip(sarxian, StartMapScenarios.BelowClosedDoor.Items["power_ring"], EquipmentSlot.SecondRing));
         var page = NewPage();
 
         ConfirmRemoveAll(page);
@@ -45,21 +43,18 @@ public sealed class EquipmentPageTests
         Assert.Equal(1, _session.Inventory.QuantityOf("power_ring"));
     }
 
-    // The repository has no ring until G2, so the page reads a catalog with one added; the second ring row is the last
-    // slot row.
+    // The new game's bag holds a power ring among its rings; the second ring row is the last slot row.
     [Fact]
     public void Update_ConfirmOnSecondRing_ListsOwnedRings()
     {
-        var ring = Gear("power_ring", EquipmentKind.Ring);
-        var catalog = StartMapScenarios.BelowClosedDoor with { Items = new Dictionary<string, ItemDefinition>(StartMapScenarios.BelowClosedDoor.Items) { [ring.Id] = ring } };
-        _session.Inventory.Add(ring, 1);
-        var page = new EquipmentPage(RepositoryScreenText.Text, new UiTextures(), _session, catalog);
+        var page = NewPage();
         EquipmentPageRows.MoveDown(page, EquipmentPageRows.Of(EquipmentSlot.SecondRing));
 
         page.Update(Pressing(GameButton.Confirm));
 
         Assert.True(page.IsChoosing);
-        Assert.Equal([ring], page.Choice!.Items);
+        Assert.Contains(StartMapScenarios.BelowClosedDoor.Items["power_ring"], page.Choice!.Items);
+        Assert.All(page.Choice.Items, item => Assert.Equal(EquipmentKind.Ring, item.Equipment!.Kind));
     }
 
     [Fact]
@@ -270,17 +265,6 @@ public sealed class EquipmentPageTests
         EquipmentPageRows.MoveDown(page, EquipmentPageRows.RemoveAll);
         page.Update(Pressing(GameButton.Confirm));
     }
-
-    private static ItemDefinition Gear(string id, EquipmentKind kind) => new()
-    {
-        Id = id,
-        Name = id,
-        Description = "",
-        IconFile = "Armor.png",
-        MaxStack = 99,
-        IsUsableFromMenu = false,
-        Equipment = new EquipmentStats(kind),
-    };
 
     private EquipmentPage NewPage() => new(RepositoryScreenText.Text, new UiTextures(), _session, StartMapScenarios.BelowClosedDoor);
 }

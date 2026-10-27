@@ -1,3 +1,4 @@
+| [0028](0028-equipment-slots.md) | Items | Nine equipment slots as a Core enum (Weapon, OffHand, Head, Chest, Hands, Feet, Amulet, FirstRing, SecondRing); an item declares a kind, the ring kind fits both ring slots, every other kind its own; equipping names the slot, the off-hand holds no second weapon, and saves key worn items by slot in format 4. |
 # Architecture decisions
 
 One line per ADR: what was decided. Read the ADR itself before changing that area. New ADRs come from `/adr` (template: `_template.md`); add a line here when one is written.

@@ -100,7 +100,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **W1b. Will raises Faith's max and shrinks Instability's gains** (Core + Data + content, about 170 lines) → [slices/W1b.md](slices/W1b.md)
 
 ### Phase 7: gear slots
-- [ ] **ADR 0028: Equipment slots** (before G1a-1) → [slices/ADR-0028.md](slices/ADR-0028.md)
+- [x] **ADR 0028: Equipment slots** (before G1a-1) → [slices/ADR-0028.md](slices/ADR-0028.md)
 - [ ] **G1a-1. Items have a kind; armor becomes Chest; `"slot"` becomes `"kind"`** (Core + Data + content + Game, mechanical, about 150 lines) → [slices/G1a-1.md](slices/G1a-1.md)
 - [ ] **G1a-2. Members wear nine slots, a ring kind in two; `TryEquip` names the slot** (Core + Game, about 240 lines) → [slices/G1a-2.md](slices/G1a-2.md)
 - [ ] **G1b. Saves keep all nine slots: format 4** (Core + Data, about 200 lines) → [slices/G1b.md](slices/G1b.md)

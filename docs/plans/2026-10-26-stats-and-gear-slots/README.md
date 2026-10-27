@@ -72,7 +72,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **P4b. Worn gear adds to the sheet; max HP and speed follow it** (Core + Data, about 210 lines) → [slices/P4b.md](slices/P4b.md)
 
 ### Phase 2: the pages read the sheet
-- [ ] **L1. Stat names and number formats; the leader choice shows HP, speed and the five primaries** (Game + text, about 200 lines) → [slices/L1.md](slices/L1.md)
+- [x] **L1. Stat names and number formats; the leader choice shows HP, speed and the five primaries** (Game + text, about 200 lines) → [slices/L1.md](slices/L1.md)
 - [ ] **S1. The Status page shows the sheet: attributes beside a smaller portrait, combat numbers, resistances** (Game, about 240 lines) → [slices/S1.md](slices/S1.md)
 - [ ] **S2. Status page look: spaced caps, captions, weaknesses tinted** (Game, about 190 lines) → [slices/S2.md](slices/S2.md)
 - [ ] **E1. The Equipment page compares sheets: what the highlighted item changes, or what the worn one gives** (Core + Game, about 240 lines) → [slices/E1.md](slices/E1.md)

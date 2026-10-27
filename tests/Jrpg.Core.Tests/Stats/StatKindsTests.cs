@@ -19,6 +19,18 @@ public sealed class StatKindsTests
         Assert.Equal(type, StatKinds.TypeResistedBy(StatKinds.ResistanceTo(type)));
     }
 
+    [Theory]
+    [InlineData(StatKind.Power, false)]
+    [InlineData(StatKind.MaxHp, false)]
+    [InlineData(StatKind.Speed, false)]
+    [InlineData(StatKind.Accuracy, true)]
+    [InlineData(StatKind.CritDamage, true)]
+    [InlineData(StatKind.FireResistance, true)]
+    public void IsHeldInPermille_Kind_IsTrueForPercents(StatKind kind, bool expected)
+    {
+        Assert.Equal(expected, StatKinds.IsHeldInPermille(kind));
+    }
+
     [Fact]
     public void TypeResistedBy_Power_IsNull()
     {

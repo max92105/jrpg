@@ -10,13 +10,18 @@ namespace Jrpg.Game.Tests.NewGame;
 public sealed class LeaderProfileTests
 {
     [Fact]
-    public void Of_Character_ListsLevelHpAttackDefense()
+    public void Of_Character_ListsLevelHpSpeedAndPrimaries()
     {
         var messages = RepositoryScreenText.Text.Messages;
 
         var profile = LeaderProfile.Of(new LeaderChoice { MemberId = "omer" }, BattleScenarios.Catalog, messages);
 
-        string[] expected = [.. new[] { MessageIds.StatusLevel, MessageIds.StatHp, MessageIds.StatAttack, MessageIds.StatDefense }.Select(messages.Text)];
+        string[] ids =
+        [
+            MessageIds.StatusLevel, MessageIds.StatHp, MessageIds.StatusSpeed,
+            MessageIds.StatPower, MessageIds.StatAgility, MessageIds.StatIntelligence, MessageIds.StatConstitution, MessageIds.StatWill,
+        ];
+        string[] expected = [.. ids.Select(messages.Text)];
         Assert.Equal(expected, profile.Stats.Select(line => line.Label));
     }
 }

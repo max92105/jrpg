@@ -88,6 +88,12 @@ public static class StatFormula
     /// <summary>A whole percent as permille, the unit derived percents are held in (ADR 0026).</summary>
     public static int PermilleOf(int percent) => percent * PermillePerPercent;
 
+    /// <summary>
+    /// A permille as the whole percent a screen shows, rounded down (ADR 0026), toward the lower number: 97 is 9 %, and
+    /// a weakness of -25.5 % (-255) is -26 %.
+    /// </summary>
+    public static int WholePercentOf(int permille) => (int)Math.Floor(permille / (double)PermillePerPercent);
+
     // Points at a rate per 100 points, in permille, rounded down: 3 Agility at 25 per 100 is 7 (0.75 %, shown 0 %).
     private static int PerPointPermille(int points, int ratePer100) =>
         (int)((long)points * ratePer100 * PermillePerPercent / 100);

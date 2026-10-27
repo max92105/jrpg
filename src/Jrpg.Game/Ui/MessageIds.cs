@@ -118,6 +118,45 @@ internal static class MessageIds
 
     public const string StatDefense = "stat_defense";
 
+    public const string StatPower = "stat_power";
+
+    public const string StatAgility = "stat_agility";
+
+    public const string StatIntelligence = "stat_intelligence";
+
+    public const string StatConstitution = "stat_constitution";
+
+    public const string StatWill = "stat_will";
+
+    public const string StatAccuracy = "stat_accuracy";
+
+    public const string StatCritChance = "stat_crit_chance";
+
+    public const string StatCritDamage = "stat_crit_damage";
+
+    public const string StatDodge = "stat_dodge";
+
+    public const string StatCrowdControlResistance = "stat_crowd_control_resistance";
+
+    public const string StatBluntResistance = "stat_blunt_resistance";
+
+    public const string StatPiercingResistance = "stat_piercing_resistance";
+
+    public const string StatSlashingResistance = "stat_slashing_resistance";
+
+    public const string StatFireResistance = "stat_fire_resistance";
+
+    public const string StatIceResistance = "stat_ice_resistance";
+
+    public const string StatLightningResistance = "stat_lightning_resistance";
+
+    public const string StatLightResistance = "stat_light_resistance";
+
+    public const string StatDarkResistance = "stat_dark_resistance";
+
+    /// <summary>A percent stat's value: "{value} %".</summary>
+    public const string StatPercent = "stat_percent";
+
     public const string SlotWeapon = "slot_weapon";
 
     public const string SlotArmor = "slot_armor";

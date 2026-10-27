@@ -139,7 +139,9 @@ public sealed class LeaderChoiceSceneTests
         Select(scene, "omer");
 
         var maxHp = StatFormula.MaxHp(mage.MaxHp, mage.Primaries.Constitution, _catalog.Rules.Stats);
-        string[] expected = ["1", .. new[] { maxHp, mage.Attack, mage.Defense }.Select(NumberText.Of)];
+        var primaries = mage.Primaries;
+        int[] numbers = [maxHp, mage.Speed, primaries.Power, primaries.Agility, primaries.Intelligence, primaries.Constitution, primaries.Will];
+        string[] expected = ["1", .. numbers.Select(NumberText.Of)];
         Assert.Equal(expected, scene.SelectedProfile.Stats.Select(line => line.Value));
     }
 

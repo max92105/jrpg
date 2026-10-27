@@ -28,7 +28,12 @@ internal sealed class LeaderProfileView
     private const int SummaryTop = 364;
     private const int StatsTop = 560;
     private const int StatPitch = 56;
-    private const int StatValueLeft = InfoLeft + 140;
+    private const int StatValueOffset = 140;
+
+    // Two columns of four stat lines (the plan's L1), the second 320 px right of the first, both within the text's 620.
+    private const int StatLinesPerColumn = 4;
+    private const int StatColumnPitch = 320;
+
     private const int NamePixels = 48;
     private const int ClassPixels = 18;
     private const int BodyPixels = 26;
@@ -138,10 +143,11 @@ internal sealed class LeaderProfileView
     {
         for (var line = 0; line < stats.Count; line++)
         {
-            var top = StatsTop + (line * StatPitch);
+            var left = InfoLeft + (line / StatLinesPerColumn * StatColumnPitch);
+            var top = StatsTop + (line % StatLinesPerColumn * StatPitch);
             var labelTop = top + (_statValueFont.LineHeight - _statLabelFont.LineHeight);
-            batch.DrawString(_statLabelFont, stats[line].Label, new Vector2(InfoLeft, labelTop), UiTheme.TextSecondary * opacity);
-            batch.DrawString(_statValueFont, stats[line].Value, new Vector2(StatValueLeft, top), UiTheme.TextPrimary * opacity);
+            batch.DrawString(_statLabelFont, stats[line].Label, new Vector2(left, labelTop), UiTheme.TextSecondary * opacity);
+            batch.DrawString(_statValueFont, stats[line].Value, new Vector2(left + StatValueOffset, top), UiTheme.TextPrimary * opacity);
         }
     }
 }

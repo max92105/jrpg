@@ -97,6 +97,24 @@ public sealed class StatFormulaTests
     }
 
     [Fact]
+    public void WholePercentOf_NinetySevenPermille_IsNine()
+    {
+        Assert.Equal(9, StatFormula.WholePercentOf(97));
+    }
+
+    [Fact]
+    public void WholePercentOf_MinusTwentyFiveAndAHalfPercent_IsMinusTwentySix()
+    {
+        Assert.Equal(-26, StatFormula.WholePercentOf(-255));
+    }
+
+    [Fact]
+    public void PermilleOf_TwelvePercent_IsOneHundredTwenty()
+    {
+        Assert.Equal(120, StatFormula.PermilleOf(12));
+    }
+
+    [Fact]
     public void ResistancesFrom_TwentyConstitution_RaisesPhysicalOnly()
     {
         var resistances = StatFormula.ResistancesFrom(new PrimaryStats(0, 0, 0, Constitution: 20, Will: 0), Resistances.None, _rules);

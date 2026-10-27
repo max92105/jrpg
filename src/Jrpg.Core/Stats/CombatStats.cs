@@ -13,6 +13,14 @@ public sealed record CombatStats(int AttackDamage)
     /// </summary>
     public int DamagePermille { get; init; } = 1000;
 
+    /// <summary>
+    /// The hit chance against 0 dodge, in permille (decision 297): a member's from the sheet, an enemy's from content.
+    /// </summary>
+    public int AccuracyPermille { get; init; } = 1000;
+
+    /// <summary>How much a foe's hit chance drops, in permille.</summary>
+    public int DodgePermille { get; init; }
+
     /// <summary>What the combatant's basic attack hits as (ADR 0027).</summary>
     public DamageType AttackType { get; init; } = DamageType.Blunt;
 

@@ -9,6 +9,8 @@
     "maxHp": 30,
     "damage": 9,
     "damageType": "piercing",
+    "accuracy": 75,
+    "dodge": 0,
     "resistances": { "fire": -25 },
     "experienceReward": 40
   },
@@ -22,6 +24,8 @@
     "maxHp": 400,
     "damage": 13,
     "damageType": "blunt",
+    "accuracy": 80,
+    "dodge": 0,
     "resistances": { "blunt": 25, "piercing": 25, "fire": -50 },
     "experienceReward": 10
   }

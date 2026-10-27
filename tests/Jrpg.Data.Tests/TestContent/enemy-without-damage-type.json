@@ -8,6 +8,8 @@
     "isSpriteFlipped": false,
     "maxHp": 30,
     "damage": 9,
+    "accuracy": 85,
+    "dodge": 5,
     "experienceReward": 40
   }
 ]

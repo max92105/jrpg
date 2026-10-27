@@ -6,10 +6,12 @@ namespace Jrpg.Core.Battle;
 
 /// <summary>
 /// An effect landing on its targets, in order: each of its hits, the status it grants to a target still standing, and
-/// what a fall sets off (ADR 0019, ADR 0021).
+/// what a fall sets off (ADR 0019, ADR 0021). A damaging hit rolls to land first (decision 325); one that misses is no
+/// hit at all, and a damage effect that missed every hit leaves no status behind (decision 326).
 /// </summary>
 /// <param name="combatants">Everyone in the battle, for the triggers a fall sets off.</param>
-internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants)
+/// <param name="rolls">The battle's rolls, for whether each hit lands.</param>
+internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceRolls rolls)
 {
     /// <param name="actor">Who used it, for the gains a landed hit triggers.</param>
     /// <param name="effect">What lands.</param>
@@ -20,12 +22,12 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants)
         foreach (var target in targets)
         {
             var wasAlive = target.IsAlive;
-            LandHits(actor, effect, target, events);
+            var hasLanded = LandHits(actor, effect, target, events);
             if (wasAlive && !target.IsAlive)
             {
                 Fall(target, combatants, events);
             }
-            else if (effect.Status is { } grant && target.IsAlive)
+            else if (effect.Status is { } grant && target.IsAlive && hasLanded)
             {
                 target.Statuses.Apply(grant);
                 events.Add(new StatusApplied(target, grant.Kind, grant.Turns));
@@ -58,10 +60,18 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants)
     }
 
     // Each hit is resolved and reported on its own (decision 206); the hits stop once the target falls.
-    private static void LandHits(Combatant actor, Effect effect, Combatant target, List<BattleEvent> events)
+    private bool LandHits(Combatant actor, Effect effect, Combatant target, List<BattleEvent> events)
     {
+        var hasLanded = false;
         for (var hit = 0; hit < effect.Hits && (hit == 0 || target.IsAlive); hit++)
         {
+            if (effect.Kind == EffectKind.Damage && !Lands(actor, target))
+            {
+                events.Add(new HitMissed(target));
+                continue;
+            }
+
+            hasLanded = true;
             var mitigation = MitigationOf(target, effect.DamageType);
             var amount = EffectResolver.Apply(effect, target.Vitals, mitigation);
             if (effect.Kind != EffectKind.GrantStatus)
@@ -75,5 +85,11 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants)
                 ResourceTriggers.OnHitLanded(actor, amount, events);
             }
         }
+
+        return hasLanded;
     }
+
+    // Only damage rolls (decision 325): a heal, a revive or a status alone never misses.
+    private bool Lands(Combatant actor, Combatant target) =>
+        rolls.Succeeds(HitFormula.ChancePermille(actor.CurrentStats.AccuracyPermille, target.CurrentStats.DodgePermille));
 }

@@ -159,6 +159,7 @@
   "status_regen": "Regen",
   "battle_turn_skipped": "Stunned",
   "battle_backfire": "Backfire",
+  "battle_miss": "Miss",
   "battle_weak": "Weak",
   "battle_resisted": "Resisted",
   "battle_item_count": "x{count}",

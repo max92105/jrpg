@@ -11,9 +11,9 @@ namespace Jrpg.Game.Battle;
 /// impact when effects land, a defeat when someone falls, a skip when a stun takes a turn. The hold lasts as long as
 /// the beats; Defend and Run hold nothing. On the impact, each landed effect pops its amount and shows on its target,
 /// damage as the attacker's effect strip, anything else as a placeholder cue (decision 101), and a granted status shows
-/// its name; whoever fell shows white, then fades on the defeat beat. A lost turn shows "Stunned" on its beat, and
-/// Poison and Regen pop the HP they took or restored on a tick beat. An event it doesn't know throws, so a new mechanic
-/// can't be shown silently wrong (ADR 0004).
+/// its name, and a miss "Miss"; whoever fell shows white, then fades on the defeat beat. A lost turn shows "Stunned" on
+/// its beat, and Poison and Regen pop the HP they took or restored on a tick beat. An event it doesn't know throws, so
+/// a new mechanic can't be shown silently wrong (ADR 0004).
 /// </summary>
 internal sealed class ActionPlayback
 {
@@ -62,7 +62,7 @@ internal sealed class ActionPlayback
     public static ActionPlayback Start(IReadOnlyList<BattleEvent> events, UiMessages messages)
     {
         var playback = new ActionPlayback();
-        foreach (var battleEvent in events)
+        foreach (var battleEvent in events.Where(shown => !_shownByLiveState.Contains(shown.GetType())))
         {
             playback.Read(battleEvent, messages);
         }
@@ -98,11 +98,6 @@ internal sealed class ActionPlayback
 
     private void Read(BattleEvent battleEvent, UiMessages messages)
     {
-        if (_shownByLiveState.Contains(battleEvent.GetType()))
-        {
-            return;
-        }
-
         switch (battleEvent)
         {
             case ActionStarted started:
@@ -118,6 +113,10 @@ internal sealed class ActionPlayback
             case StatusApplied applied:
                 AddBeatOnce(PlaybackBeatKind.Impact, BattlePacing.ImpactHold);
                 _cues.Add(new CueOnTarget(applied.Target, messages.Text(StatusNames.IdOf(applied.Status))));
+                break;
+            case HitMissed missed:
+                AddBeatOnce(PlaybackBeatKind.Impact, BattlePacing.ImpactHold);
+                _cues.Add(new CueOnTarget(missed.Target, messages.Text(MessageIds.BattleMiss)));
                 break;
             case TurnSkipped skipped:
                 AddSkipCue(skipped.Combatant, messages);

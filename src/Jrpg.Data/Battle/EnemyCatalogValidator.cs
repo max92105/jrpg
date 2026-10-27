@@ -7,6 +7,9 @@ namespace Jrpg.Data.Battle;
 
 internal static class EnemyCatalogValidator
 {
+    // Twice a sure hit: enough to beat any dodge under the cap and still mean something, nothing more (decision 299).
+    private const int MostAccuracy = 200;
+
     public static void Validate(string fileName, IReadOnlyList<EnemyDefinition> enemies) =>
         new ContentListValidator<EnemyDefinition>(fileName, "enemy", enemy => enemy.Id)
             .Validate(enemies, FindProblem);
@@ -16,6 +19,8 @@ internal static class EnemyCatalogValidator
             ? "name must not be empty."
             : AtLeast("maxHp", enemy.MaxHp, 1)
                 ?? AtLeast("damage", enemy.Damage, 0)
+                ?? Within("accuracy", enemy.Accuracy, 0, MostAccuracy)
+                ?? Within("dodge", enemy.Dodge, 0, StatFormula.DodgeCapPercent)
                 ?? AtLeast("experienceReward", enemy.ExperienceReward, 0)
                 ?? FindResistanceProblem(enemy.Resistances);
 

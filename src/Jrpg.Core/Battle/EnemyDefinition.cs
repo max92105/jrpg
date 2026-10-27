@@ -25,6 +25,14 @@ public sealed record EnemyDefinition
     /// <summary>What the enemy's attack hits as (ADR 0027).</summary>
     public required DamageType DamageType { get; init; }
 
+    /// <summary>Its hit chance against 0 dodge, a whole percent (decision 299): the base is already in it.</summary>
+    public required int Accuracy { get; init; }
+
+    /// <summary>
+    /// How much a member's hit chance drops, a whole percent, at most <see cref="StatFormula.DodgeCapPercent"/>.
+    /// </summary>
+    public required int Dodge { get; init; }
+
     /// <summary>The share of each damage type's hits taken off (ADR 0027); 0 for a type content leaves out.</summary>
     public Resistances Resistances { get; init; } = Resistances.None;
 

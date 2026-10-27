@@ -49,6 +49,16 @@ public sealed class ActionPlaybackTests
     }
 
     [Fact]
+    public void Start_HitMissed_AddsMissCueOnTheImpact()
+    {
+        var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), new HitMissed(_goblin)]);
+
+        Assert.Equal([new CueOnTarget(_goblin, "Miss")], playback.Cues);
+        Assert.Equal([PlaybackBeatKind.Impact], playback.Beats.Select(beat => beat.Kind));
+        Assert.Empty(playback.Numbers);
+    }
+
+    [Fact]
     public void Start_TurnSkippedAfterAction_AddsSkipBeatAfterImpact()
     {
         BattleEvent[] events =

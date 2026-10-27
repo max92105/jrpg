@@ -10,6 +10,8 @@ internal sealed class EnemyDefinitionBuilder
     private int _damage = 20;
     private DamageType _damageType = DamageType.Blunt;
     private Resistances _resistances = Resistances.None;
+    private int _dodge;
+    private int _accuracy = 100;
 
     public EnemyDefinitionBuilder WithName(string name)
     {
@@ -30,6 +32,18 @@ internal sealed class EnemyDefinitionBuilder
         return this;
     }
 
+    public EnemyDefinitionBuilder WithAccuracy(int accuracy)
+    {
+        _accuracy = accuracy;
+        return this;
+    }
+
+    public EnemyDefinitionBuilder WithDodge(int dodge)
+    {
+        _dodge = dodge;
+        return this;
+    }
+
     public EnemyDefinitionBuilder WithResistances(Resistances resistances)
     {
         _resistances = resistances;
@@ -47,6 +61,8 @@ internal sealed class EnemyDefinitionBuilder
         MaxHp = _maxHp,
         Damage = _damage,
         DamageType = _damageType,
+        Accuracy = _accuracy,
+        Dodge = _dodge,
         Resistances = _resistances,
         ExperienceReward = 40,
     };

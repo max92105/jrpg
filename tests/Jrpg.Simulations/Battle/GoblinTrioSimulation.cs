@@ -1,5 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
+using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Randomness;
@@ -46,14 +47,17 @@ public sealed class GoblinTrioSimulation(ITestOutputHelper output)
         var battle = BattleState.Start(party, enemies, new Inventory(), random);
         var tactics = new EnemyTactics(random);
 
-        var turns = 0;
+        var (turns, attacks, misses) = (0, 0, 0);
         for (; turns < TurnLimit && !battle.IsOver; turns++)
         {
             var command = battle.Phase == BattlePhase.PartyTurn ? AttackFirstLivingEnemyPolicy.ChooseCommand(battle) : tactics.ChooseCommand(battle);
-            battle.Execute(command);
+            var events = battle.Execute(command);
+            var missed = events.OfType<HitMissed>().Count();
+            attacks += events.OfType<EffectApplied>().Count(landed => landed.Kind == EffectKind.Damage) + missed;
+            misses += missed;
         }
 
-        return new BattleResult(seed, battle.Phase, turns, leader.Vitals.Hp);
+        return new BattleResult(seed, battle.Phase, turns, leader.Vitals.Hp, attacks, misses);
     }
 
     private void WriteSummary(string classId, IReadOnlyList<BattleResult> results)
@@ -64,8 +68,9 @@ public sealed class GoblinTrioSimulation(ITestOutputHelper output)
         output.WriteLine($"{EncounterId}, a level 1 {classId} alone, attack only, {Battles} seeds");
         output.WriteLine(Invariant($"  Win rate          {100.0 * wins.Count / results.Count,6:F1} %"));
         output.WriteLine(Invariant($"  Average turns     {results.Average(result => result.Turns),6:F1}"));
+        output.WriteLine(Invariant($"  Attacks missed    {100.0 * results.Sum(result => result.Misses) / results.Sum(result => result.Attacks),6:F1} % (both sides)"));
         output.WriteLine($"  Average HP left   {hpLeft,6} (wins only)");
     }
 
-    private sealed record BattleResult(int Seed, BattlePhase Phase, int Turns, int LeaderHpLeft);
+    private sealed record BattleResult(int Seed, BattlePhase Phase, int Turns, int LeaderHpLeft, int Attacks, int Misses);
 }

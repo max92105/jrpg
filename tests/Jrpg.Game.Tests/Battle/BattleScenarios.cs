@@ -3,6 +3,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Randomness;
+using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
 
 namespace Jrpg.Game.Tests.Battle;
@@ -19,11 +20,23 @@ internal static class BattleScenarios
     /// <summary>The repository's content, as loaded.</summary>
     public static ContentCatalog Catalog { get; } = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-    /// <summary>A member of the repository's content as they join: level 1, with their class's numbers.</summary>
+    /// <summary>
+    /// The repository's rules with every hit certain: accuracy 100 against the scenario goblin's 0 dodge, and no dodge
+    /// on a member, so a seeded scenario draws nothing for its hits and keeps its sequence (ADR 0026).
+    /// </summary>
+    public static StatRules CertainRules { get; } = Catalog.Rules.Stats with { BaseAccuracy = 100, BaseDodge = 0, DodgePer100Agility = 0 };
+
+    /// <summary>The repository's goblin, hitting for certain and never dodging.</summary>
+    public static EnemyDefinition Goblin { get; } = Catalog.Enemies["goblin"] with { Accuracy = 100, Dodge = 0 };
+
+    /// <summary>
+    /// A member of the repository's content as they join: level 1, with their class's numbers under
+    /// <see cref="CertainRules"/>.
+    /// </summary>
     public static PartyMember Recruit(string memberId)
     {
         var definition = Catalog.PartyMembers[memberId];
-        return PartyMember.Recruit(definition, Catalog.ClassOf(definition), Catalog.Skills, Catalog.Rules.Stats);
+        return PartyMember.Recruit(definition, Catalog.ClassOf(definition), Catalog.Skills, CertainRules);
     }
 
     /// <param name="random">Shuffles the turn order; tests that run enemy turns pass the same source to the tactics.</param>
@@ -36,7 +49,6 @@ internal static class BattleScenarios
     {
         var member = Recruit(memberId);
         var party = new PartyState([member], [member], Catalog.Rules.Party);
-        var goblin = Catalog.Enemies["goblin"];
-        return BattleState.Start(party, [goblin, goblin, goblin], inventory, random);
+        return BattleState.Start(party, [Goblin, Goblin, Goblin], inventory, random);
     }
 }

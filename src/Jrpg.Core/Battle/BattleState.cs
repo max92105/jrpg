@@ -27,7 +27,7 @@ public sealed class BattleState
     /// (decision 97).
     /// </param>
     /// <param name="inventory">The party's items; using one in battle consumes a copy.</param>
-    /// <param name="random">Decides the turn order, then whether a spell backfires.</param>
+    /// <param name="random">Decides the turn order, then whether each hit lands and whether a spell backfires.</param>
     /// <exception cref="ArgumentException">No enemy is alive, or a combatant is listed twice.</exception>
     public BattleState(IReadOnlyList<Combatant> combatants, Inventory inventory, IRandom random)
     {
@@ -47,7 +47,7 @@ public sealed class BattleState
         _turnOrder = new TurnOrder(Combatants, random);
         _turnFlow = new TurnFlow(Combatants, _turnOrder);
         _backfire = new SkillBackfire(Combatants, random);
-        _landing = new EffectLanding(Combatants);
+        _landing = new EffectLanding(Combatants, new ChanceRolls(random));
         _targetChoices = new TargetChoices(Combatants, Formation);
         Phase = LivingOn(BattleSide.Party).Count == 0 ? BattlePhase.Defeat : TurnFlow.PhaseOf(CurrentActor);
     }

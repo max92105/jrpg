@@ -5,12 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/M2b-2.md, slice M2b-2 (defense leaves members, items, pages;
-Attack -> AttackDamage on CombatStats and StatSheet; MemberSheet.Of takes int? weaponDamage)
-Round: 1 (verdict: Ready to commit; verify all pass, 2473 tests)
+Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/H1.md, slice H1 (accuracy against dodge: HitFormula,
+ChanceRolls, HitMissed, enemy accuracy/dodge in content, "Miss" cue)
+Round: 1 (verdict: Ready to commit; verify all pass, 2487 tests)
 
-- S1 StatusSheet.cs:21-23 Combat param block not rewrapped after "Defense ..." removal (85-col first line); open (suggestion)
-- S2 PartyMember.cs:39-42 Sheet summary lists primaries, max HP, speed, percents; misses attack damage; open (suggestion)
-- S3 StatusParametersView.cs:37-38 vs Draw's resources Y: same offset written twice; a ResourcesTop const; open (suggestion)
-- F1 StatusPageTests.ShownStats_Member_HasNoMp: name no longer says what it asserts (HP + weapon damage); follow-up
-- F2 docs/decisions/README.md:23 ADR 0017 line still says attack and defense come from the class; follow-up
+- W1 MemberBattleStats.cs:22 / Combatant.cs:87 accuracy copy untested: builder accuracy 100 == CombatStats default 1000, so dropping either line passes every test; open (warning)
+- S1 CombatStatsTests.cs:7 comment says "A record, not a struct"; the summary says "A class, not a struct"; open (suggestion)
+- S2 HitFormula.cs:17 CeilingPercent has no doc while FloorPercent does; open (suggestion)
+- S3 no test for a multi-hit damage effect with one hit landed and one missed still granting its status; open (suggestion)

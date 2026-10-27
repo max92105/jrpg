@@ -40,6 +40,26 @@ public sealed class StatBonusesTests
     }
 
     [Fact]
+    public void Plus_TwoItems_AddsKindByKind()
+    {
+        var ring = new StatBonuses(new Dictionary<StatKind, int> { [StatKind.Will] = 3, [StatKind.Power] = 2 });
+        var amulet = new StatBonuses(new Dictionary<StatKind, int> { [StatKind.Will] = 4 });
+
+        var both = ring.Plus(amulet);
+
+        Assert.Equal(new StatBonuses(new Dictionary<StatKind, int> { [StatKind.Will] = 7, [StatKind.Power] = 2 }), both);
+    }
+
+    [Fact]
+    public void Plus_BonusesThatCancelOut_IsNone()
+    {
+        var blessed = new StatBonuses(new Dictionary<StatKind, int> { [StatKind.Will] = 3 });
+        var cursed = new StatBonuses(new Dictionary<StatKind, int> { [StatKind.Will] = -3 });
+
+        Assert.Equal(StatBonuses.None, blessed.Plus(cursed));
+    }
+
+    [Fact]
     public void Constructor_CallersDictionaryChangedAfter_KeepsTheBonuses()
     {
         var values = new Dictionary<StatKind, int> { [StatKind.Will] = 3 };

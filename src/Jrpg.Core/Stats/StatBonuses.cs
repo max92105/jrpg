@@ -23,6 +23,16 @@ public sealed record StatBonuses
 
     public int Of(StatKind kind) => _values.GetValueOrDefault(kind);
 
+    /// <summary>
+    /// These and <paramref name="other"/> added kind by kind: what two items add together. A kind they cancel out is
+    /// left out, as it adds nothing.
+    /// </summary>
+    public StatBonuses Plus(StatBonuses other) => new(_values.Keys
+        .Union(other._values.Keys)
+        .Select(kind => (Kind: kind, Bonus: Of(kind) + other.Of(kind)))
+        .Where(entry => entry.Bonus != 0)
+        .ToDictionary(entry => entry.Kind, entry => entry.Bonus));
+
     public bool Equals(StatBonuses? other) =>
         other is not null
         && _values.Count == other._values.Count

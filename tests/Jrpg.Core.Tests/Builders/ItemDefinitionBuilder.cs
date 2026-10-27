@@ -1,5 +1,6 @@
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
+using Jrpg.Core.Stats;
 
 namespace Jrpg.Core.Tests.Builders;
 
@@ -38,6 +39,13 @@ internal sealed class ItemDefinitionBuilder
     public ItemDefinitionBuilder WithAttackAndDefense(int attack, int defense)
     {
         _equipment = _equipment! with { AttackBonus = attack, DefenseBonus = defense };
+        return this;
+    }
+
+    /// <remarks>Call after <see cref="AsWeapon"/> or <see cref="AsArmor"/>.</remarks>
+    public ItemDefinitionBuilder WithBonuses(StatBonuses bonuses)
+    {
+        _equipment = _equipment! with { Bonuses = bonuses };
         return this;
     }
 

@@ -20,8 +20,7 @@ public sealed class PartyMember
         Skills = [.. skills];
         _rules = rules;
         Level = 1;
-        var stats = ClassGrowth.StatsAt(characterClass, Level);
-        TakeClassStats(stats);
+        RebuildStats();
         Vitals = new Vitals(Sheet.MaxHp, Sheet.MaxHp);
         _lastingAmounts = characterClass.Resources
             .Where(resource => resource.IsLasting)
@@ -42,8 +41,8 @@ public sealed class PartyMember
     public CombatStats BaseStats { get; private set; }
 
     /// <summary>
-    /// The member's numbers at their level (ADR 0026): primaries, max HP, speed (it sets readiness charges, question
-    /// 213) and the derived percents. Rebuilt on level-up.
+    /// The member's numbers at their level with what they wear (ADR 0026): primaries, max HP, speed (it sets readiness
+    /// charges, question 213) and the derived percents. Rebuilt on level-up and when what they wear changes.
     /// </summary>
     public StatSheet Sheet { get; private set; }
 
@@ -76,15 +75,14 @@ public sealed class PartyMember
 
     /// <summary>
     /// Puts a saved member's progress back on a new recruit: level, experience, lasting amounts, and HP within that
-    /// level's max. Worn items are put on by <c>GameSession</c>, which resolves their ids.
+    /// level's max. <c>GameSession</c> puts the worn items on first, so the saved HP fits a max their bonuses raise.
     /// </summary>
     /// <remarks>The progress is assumed repaired against current content by Data (ADR 0007).</remarks>
     internal void RestoreProgress(PartyMemberProgress progress)
     {
         Level = progress.Level;
         Experience = progress.Experience;
-        var stats = ClassGrowth.StatsAt(Class, Level);
-        TakeClassStats(stats);
+        RebuildStats();
         Vitals.ResizeMax(Sheet.MaxHp);
 
         // A recruit is standing at full HP: fill it to the new max, then take off what the save had lost.
@@ -202,7 +200,14 @@ public sealed class PartyMember
             default:
                 throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot.");
         }
+
+        // Max HP follows the sheet, keeping HP within it (decision 328).
+        RebuildStats();
+        Vitals.ResizeMax(Sheet.MaxHp);
     }
+
+    private StatBonuses WornBonuses() =>
+        (Weapon?.Equipment?.Bonuses ?? StatBonuses.None).Plus(Armor?.Equipment?.Bonuses ?? StatBonuses.None);
 
     /// <exception cref="ArgumentException">A skill id isn't in the catalog.</exception>
     private static List<SkillDefinition> SkillsOf(ClassDefinition characterClass, IReadOnlyDictionary<string, SkillDefinition> skillCatalog)
@@ -216,12 +221,13 @@ public sealed class PartyMember
         return [.. characterClass.SkillIds.Select(id => skillCatalog[id])];
     }
 
-    // The class's numbers at the member's level, the one formula (ADR 0017).
+    // The class's numbers at the member's level, the one formula (ADR 0017), with what they wear.
     [MemberNotNull(nameof(BaseStats), nameof(Sheet))]
-    private void TakeClassStats(ClassStats stats)
+    private void RebuildStats()
     {
+        var stats = ClassGrowth.StatsAt(Class, Level);
         BaseStats = new CombatStats(stats.Attack, stats.Defense);
-        Sheet = MemberSheet.Of(stats, _rules);
+        Sheet = MemberSheet.Of(stats, WornBonuses(), _rules);
     }
 
     private static int AttackBonusOf(ItemDefinition? item) => item?.Equipment?.AttackBonus ?? 0;
@@ -246,13 +252,13 @@ public sealed class PartyMember
         return step;
     }
 
-    // Vitals rise by what the max gained, Constitution's percent included.
+    // Vitals rise by what the max gained with the same gear on: the class's gain, Constitution's percent included.
     private void LevelUp()
     {
+        var maxHpBefore = Sheet.MaxHp;
         Level++;
         Experience = 0;
-        var after = ClassGrowth.StatsAt(Class, Level);
-        TakeClassStats(after);
-        Vitals.RaiseMaxima(Sheet.MaxHp - Vitals.MaxHp);
+        RebuildStats();
+        Vitals.RaiseMaxima(Sheet.MaxHp - maxHpBefore);
     }
 }

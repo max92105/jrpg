@@ -41,9 +41,12 @@ public static class StatFormula
     public static int CritDamagePermille(int power, StatRules rules) =>
         (BaseCritDamagePercent * PermillePerPercent) + PerPointPermille(power, rules.CritDamagePercentPer100Power);
 
-    /// <summary>The base dodge plus Agility's percent, in permille, never above the cap (decision 295).</summary>
-    public static int DodgePermille(int agility, StatRules rules) => Math.Min(
-        (rules.BaseDodge * PermillePerPercent) + PerPointPermille(agility, rules.DodgePer100Agility),
+    /// <summary>
+    /// The base dodge plus Agility's percent plus gear's, in permille, never above the cap (decision 295): capped once,
+    /// after gear, so a cursed item lowers a dodge that was over the cap from where it was, not from the cap.
+    /// </summary>
+    public static int DodgePermille(int agility, int gearPercent, StatRules rules) => Math.Min(
+        ((rules.BaseDodge + gearPercent) * PermillePerPercent) + PerPointPermille(agility, rules.DodgePer100Agility),
         DodgeCapPercent * PermillePerPercent);
 
     /// <summary>
@@ -60,12 +63,13 @@ public static class StatFormula
         (100 * PermillePerPercent) + PerPointPermille(power, rules.DamagePercentPer100Power);
 
     /// <summary>
-    /// Constitution's percent on the three physical resistances, Will's on the five magical ones, in permille and
-    /// within the floor and cap (ADR 0027): the two primaries that keep a member standing, each against its kind.
+    /// Constitution's percent on the three physical resistances, Will's on the five magical ones, plus gear's, in
+    /// permille and within the floor and cap once gear is added (ADR 0027): the two primaries that keep a member
+    /// standing, each against its kind of hit.
     /// </summary>
-    public static Resistances ResistancesFrom(PrimaryStats primaries, StatRules rules) => Resistances.ByGroup(
+    public static Resistances ResistancesFrom(PrimaryStats primaries, Resistances gear, StatRules rules) => Resistances.ByGroup(
         PerPointPermille(primaries.Constitution, rules.PhysicalResistancePer100Constitution),
-        PerPointPermille(primaries.Will, rules.MagicalResistancePer100Will)).Clamped();
+        PerPointPermille(primaries.Will, rules.MagicalResistancePer100Will)).Plus(gear).Clamped();
 
     /// <summary>
     /// What a status the member grants has its power multiplied by, in permille: 100 % plus Intelligence's percent
@@ -80,6 +84,9 @@ public static class StatFormula
     /// </summary>
     public static int ExtraStatusTurns(int intelligence, StatRules rules) =>
         intelligence / rules.IntelligencePerExtraStatusTurn;
+
+    /// <summary>A whole percent as permille, the unit derived percents are held in (ADR 0026).</summary>
+    public static int PermilleOf(int percent) => percent * PermillePerPercent;
 
     // Points at a rate per 100 points, in permille, rounded down: 3 Agility at 25 per 100 is 7 (0.75 %, shown 0 %).
     private static int PerPointPermille(int points, int ratePer100) =>

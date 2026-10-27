@@ -72,15 +72,19 @@ internal sealed class SaveGameRepair
     {
         var (level, experience) = RepairLevel(progress);
         var characterClass = _catalog.ClassOf(definition);
-        var atLevel = ClassGrowth.StatsAt(characterClass, level);
-        var maxHp = StatFormula.MaxHp(atLevel.MaxHp, atLevel.Primaries.Constitution, _catalog.Rules.Stats);
+        var weaponId = RepairWornItem(progress.WeaponId, EquipmentSlot.Weapon, definition);
+        var armorId = RepairWornItem(progress.ArmorId, EquipmentSlot.Armor, definition);
+
+        // The max HP the member will have once restored: their level's, with what they still wear.
+        var worn = BonusesOf(weaponId).Plus(BonusesOf(armorId));
+        var maxHp = MemberSheet.Of(ClassGrowth.StatsAt(characterClass, level), worn, _catalog.Rules.Stats).MaxHp;
         var repaired = progress with
         {
             Level = level,
             Experience = experience,
             Hp = Math.Clamp(progress.Hp, 0, maxHp),
-            WeaponId = RepairWornItem(progress.WeaponId, EquipmentSlot.Weapon, definition),
-            ArmorId = RepairWornItem(progress.ArmorId, EquipmentSlot.Armor, definition),
+            WeaponId = weaponId,
+            ArmorId = armorId,
             LastingAmounts = RepairLastingAmounts(progress, characterClass),
         };
         if (repaired.Hp != progress.Hp)
@@ -90,6 +94,9 @@ internal sealed class SaveGameRepair
 
         return repaired;
     }
+
+    private StatBonuses BonusesOf(string? itemId) =>
+        itemId is null ? StatBonuses.None : _catalog.Items[itemId].Equipment?.Bonuses ?? StatBonuses.None;
 
     // Only the class's lasting resources, each within 0..max; one the save doesn't hold starts fresh on restore.
     private Dictionary<string, int> RepairLastingAmounts(PartyMemberProgress progress, ClassDefinition characterClass)

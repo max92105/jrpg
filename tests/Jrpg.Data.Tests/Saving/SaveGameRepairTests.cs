@@ -12,7 +12,7 @@ using Jrpg.Data.Saving;
 namespace Jrpg.Data.Tests.Saving;
 
 /// <summary>
-/// Repairs saves against the repository content: sarxian has 188 HP at level 3, and potions stack to 99.
+/// Repairs saves against the repository content: sarxian has 208 HP at level 3 in chain mail, and potions stack to 99.
 /// </summary>
 public sealed class SaveGameRepairTests
 {
@@ -175,9 +175,9 @@ public sealed class SaveGameRepairTests
     {
         var repaired = Repair(_save with { Members = [_sarxian with { Hp = 999 }, _jazog] });
 
-        // Sarxian is a warlock: 188 HP at level 3, raised 8 % by its 8 Constitution (ADR 0026).
-        Assert.Equal(203, repaired.Save.Members[0].Hp);
-        Assert.Equal(["party member 'sarxian': HP 999 brought within 0..203."], repaired.Changes);
+        // A warlock in chain mail: 188 HP at level 3, raised 11 % by 8 Constitution and the mail's 3 (ADR 0026).
+        Assert.Equal(208, repaired.Save.Members[0].Hp);
+        Assert.Equal(["party member 'sarxian': HP 999 brought within 0..208."], repaired.Changes);
     }
 
     [Fact]

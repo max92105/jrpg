@@ -10,6 +10,10 @@ public sealed record PrimaryStats(int Power, int Agility, int Intelligence, int 
     /// <summary>All five at 0: a class or a growth that gives none.</summary>
     public static PrimaryStats None { get; } = new(0, 0, 0, 0, 0);
 
+    /// <summary>These and <paramref name="other"/> added primary by primary, as gear adds to the class's.</summary>
+    public PrimaryStats Plus(PrimaryStats other) =>
+        new(Power + other.Power, Agility + other.Agility, Intelligence + other.Intelligence, Constitution + other.Constitution, Will + other.Will);
+
     /// <exception cref="ArgumentOutOfRangeException"><paramref name="kind"/> isn't a primary.</exception>
     public int ValueOf(StatKind kind) => kind switch
     {

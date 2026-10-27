@@ -20,4 +20,6 @@ folder and `Ui/`, not only the edited lines; when something is drawn somewhere n
 ("under the list"); when a call site gains a condition, reread the callee's summary for "every"/"always"; when a file
 is deleted or renamed (`git status` D/??), grep its old name across docs/. Same when tests split (C2): a pending
 slice (M2a) still cited "BattleStateTests (lines 225-354)"; grep pending slices for "<File> (line" after a split.
+Same when a type gains a new trigger (P4b): PartyMember.Sheet still said "Rebuilt on level-up" once Wear/TakeOff rebuilt it
+too; reread the summary of every property a new call site writes.
 Related: [[tautological-tests]].

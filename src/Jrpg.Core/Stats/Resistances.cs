@@ -12,8 +12,6 @@ public sealed record Resistances(int Blunt, int Piercing, int Slashing, int Fire
     /// <summary>The deepest weakness: it at most doubles a hit (ADR 0027).</summary>
     public const int FloorPercent = -100;
 
-    private const int PermillePerPercent = 10;
-
     public static Resistances None { get; } = new(0, 0, 0, 0, 0, 0, 0, 0);
 
     /// <summary>The physical value on Blunt, Piercing and Slashing, the magical one on the five others.</summary>
@@ -33,11 +31,15 @@ public sealed record Resistances(int Blunt, int Piercing, int Slashing, int Fire
         _ => throw new ArgumentOutOfRangeException(nameof(type), type, "Unknown damage type."),
     };
 
+    /// <summary>These and <paramref name="other"/> added type by type, before the limits apply.</summary>
+    public Resistances Plus(Resistances other) => From(type => Of(type) + other.Of(type));
+
     /// <summary>Every resistance kept within the floor and the cap.</summary>
     public Resistances Clamped() =>
-        From(type => Math.Clamp(Of(type), FloorPercent * PermillePerPercent, CapPercent * PermillePerPercent));
+        From(type => Math.Clamp(Of(type), StatFormula.PermilleOf(FloorPercent), StatFormula.PermilleOf(CapPercent)));
 
-    private static Resistances From(Func<DamageType, int> valueOf) => new(
+    /// <summary>A resistance for each damage type from <paramref name="valueOf"/>, as gear gives them.</summary>
+    public static Resistances From(Func<DamageType, int> valueOf) => new(
         valueOf(DamageType.Blunt),
         valueOf(DamageType.Piercing),
         valueOf(DamageType.Slashing),

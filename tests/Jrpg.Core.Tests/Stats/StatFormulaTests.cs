@@ -69,13 +69,13 @@ public sealed class StatFormulaTests
     [Fact]
     public void DodgePermille_BelowCap_FollowsAgility()
     {
-        Assert.Equal(40, StatFormula.DodgePermille(agility: 20, _rules));
+        Assert.Equal(40, StatFormula.DodgePermille(agility: 20, gearPercent: 0, _rules));
     }
 
     [Fact]
     public void DodgePermille_HighAgility_StopsAtCap()
     {
-        Assert.Equal(500, StatFormula.DodgePermille(agility: 1000, _rules));
+        Assert.Equal(500, StatFormula.DodgePermille(agility: 1000, gearPercent: 0, _rules));
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public sealed class StatFormulaTests
     [Fact]
     public void ResistancesFrom_TwentyConstitution_RaisesPhysicalOnly()
     {
-        var resistances = StatFormula.ResistancesFrom(new PrimaryStats(0, 0, 0, Constitution: 20, Will: 0), _rules);
+        var resistances = StatFormula.ResistancesFrom(new PrimaryStats(0, 0, 0, Constitution: 20, Will: 0), Resistances.None, _rules);
 
         Assert.Equal(Resistances.ByGroup(physicalPermille: 50, magicalPermille: 0), resistances);
     }
@@ -107,7 +107,7 @@ public sealed class StatFormulaTests
     [Fact]
     public void ResistancesFrom_TwentyWill_RaisesMagicalOnly()
     {
-        var resistances = StatFormula.ResistancesFrom(new PrimaryStats(0, 0, 0, Constitution: 0, Will: 20), _rules);
+        var resistances = StatFormula.ResistancesFrom(new PrimaryStats(0, 0, 0, Constitution: 0, Will: 20), Resistances.None, _rules);
 
         Assert.Equal(Resistances.ByGroup(physicalPermille: 0, magicalPermille: 50), resistances);
     }
@@ -115,7 +115,7 @@ public sealed class StatFormulaTests
     [Fact]
     public void ResistancesFrom_HugeConstitution_StopsAtCap()
     {
-        var resistances = StatFormula.ResistancesFrom(new PrimaryStats(0, 0, 0, Constitution: 1000, Will: 0), _rules);
+        var resistances = StatFormula.ResistancesFrom(new PrimaryStats(0, 0, 0, Constitution: 1000, Will: 0), Resistances.None, _rules);
 
         Assert.Equal(750, resistances.Of(DamageType.Slashing));
     }

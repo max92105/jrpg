@@ -167,12 +167,12 @@ public sealed class GameSession
         return inventory;
     }
 
-    // Worn items go straight onto the member: under the move model they aren't in the saved inventory (ADR 0003).
+    // Worn items go straight onto the member: under the move model they aren't in the saved inventory (ADR 0003). They
+    // go on before the progress, so the saved HP is set within a max their bonuses already raise.
     private static PartyMember RestoreMember(PartyMemberProgress progress, ContentCatalog catalog)
     {
         var definition = catalog.PartyMembers[progress.Id];
         var member = PartyMember.Recruit(definition, catalog.ClassOf(definition), catalog.Skills, catalog.Rules.Stats);
-        member.RestoreProgress(progress);
         if (progress.WeaponId is { } weaponId)
         {
             member.Wear(EquipmentSlot.Weapon, catalog.Items[weaponId]);
@@ -183,6 +183,7 @@ public sealed class GameSession
             member.Wear(EquipmentSlot.Armor, catalog.Items[armorId]);
         }
 
+        member.RestoreProgress(progress);
         return member;
     }
 }

@@ -1,5 +1,5 @@
 # Stats and gear slots
-Status: approved, in progress
+Status: done (walk-through by the developer on 2026-10-27; retro applied)
 
 Fifth feature plan after the migration, following the escape menu third pass.
 - Renumbered when the two machines' histories were merged (2026-10-27): this plan was drafted on 267-308, which the escape menu third pass had taken, so every number here moved up 24. Its Game slices were drafted against the other machine's menu code (the UI second pass built twice); check each against the third pass's pages before slicing it.
@@ -112,7 +112,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 9: balance and walk-through
 - [x] **B1. Goblin trio simulation with hits and crits counted; numbers recorded per class** (Simulations, about 120 lines) → [slices/B1.md](slices/B1.md)
-- [ ] **Z. Walk-through: stats, battles, gear and pages by hand** (manual) → [slices/Z.md](slices/Z.md)
+- [x] **Z. Walk-through: stats, battles, gear and pages by hand** (manual) → [slices/Z.md](slices/Z.md)
 
 ## Decisions
 Questions and decisions share numbers.

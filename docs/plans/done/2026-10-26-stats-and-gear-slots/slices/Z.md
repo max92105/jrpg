@@ -12,4 +12,4 @@ Part of [the stats and gear slots plan](../README.md). Last. Every slice done.
   - **Selection look and captures:** decision 252 on every list touched; F12 captures of the leader choice, Status and Equipment pages for the developer.
   - **Placeholders accepted at approval** (decisions 325-332): note any the walk-through makes the developer want to overturn.
   - Record what was found as follow-ups (backlog or a later plan).
-- **Done, with deviations:**
+- **Done:** walked through by the developer on 2026-10-27 after the slices landed; the hand checks listed in each slice's Done note were the developer's.

@@ -78,3 +78,12 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - The inventory hint names the Info button as "X (Y on a controller)" in `ui.json`, a copy of `InputBindings`; give the hint a `{button}` from `ButtonLabels.Of(GameButton.Info, device)` as `cinematic_skip` does, once menu pages know the device in use (F1 review).
 - Status: the Skills section starts under the longer of the gear and resource rows, so the stats plan's nine slots will push it off the page; that plan places it (F1 review).
 - Lists outside the menu still draw `MenuPointer` at the cursor's row, against the glide rule (`.claude/rules/game.md`, decision 336): the battle's command list (`CommandPanelView`), the defeat menu (`DefeatScreenView`) and the leader choice (`LeaderChoiceScene`). Glide them when next touched; the battle's look follows later anyway (decision 272).
+
+## From the stats and gear slots plan (2026-10-27)
+
+- `Menus/EquipmentPage.cs` (281) is near 300: the next change that grows it splits the choice handling (opening, picking, the notice) into its own presenter first.
+- `tests/Jrpg.Data.Tests/Saving/FileSaveStoreTests.cs` (289) and `SaveGameRepairTests.cs` (285): split by concern (the envelope and format checks apart from the round trips; members apart from inventory and world) when next touched.
+- `Battle/ActionPlayback.Read` is at the complexity limit (the H1 and I1 slices each had to fold cases to pass CA1502): the next `BattleEvent` kind needs a handler table, not another case.
+- `SaveGameRepair.RepairMember` sums worn bonuses from item ids beside `WornEquipment.Bonuses` (G1b): a public `WornEquipment` built from the catalog would let the repair use the one sum.
+- `ClassCatalogValidator.FindUnreachableRequirementProblem` checks a skill's requirement against the resource's definition max, not its max under Will (`raiseMax`); conservative today, wrong once a skill needs Faith above 5 (W1b review).
+- Labels are uppercased in three places (`StatusLabels.Caps`, `EquipmentLabels.From`, `EquipmentChangesView.Measure`): `SheetRowLook.DrawLabel` could cap once, if measuring stays out of `Draw` (E2 review).

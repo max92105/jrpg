@@ -16,7 +16,11 @@ public sealed class StatFormulaTests
         DamagePercentPer100Power: 100,
         CritDamagePercentPer100Power: 50,
         CritChancePer100Agility: 25,
-        DodgePer100Agility: 20);
+        DodgePer100Agility: 20,
+        PhysicalResistancePer100Constitution: 25,
+        MagicalResistancePer100Will: 25,
+        StatusPercentPer100Intelligence: 100,
+        IntelligencePerExtraStatusTurn: 25);
 
     [Fact]
     public void MaxHp_TwentyConstitution_AddsTwentyPercent()
@@ -71,7 +75,7 @@ public sealed class StatFormulaTests
     [Fact]
     public void DodgePermille_HighAgility_StopsAtCap()
     {
-        Assert.Equal(StatFormula.DodgeCapPercent * 10, StatFormula.DodgePermille(agility: 1000, _rules));
+        Assert.Equal(500, StatFormula.DodgePermille(agility: 1000, _rules));
     }
 
     [Fact]
@@ -90,6 +94,48 @@ public sealed class StatFormulaTests
     public void DamagePermille_TwentyPower_IsOneHundredTwenty()
     {
         Assert.Equal(1200, StatFormula.DamagePermille(power: 20, _rules));
+    }
+
+    [Fact]
+    public void ResistancesFrom_TwentyConstitution_RaisesPhysicalOnly()
+    {
+        var resistances = StatFormula.ResistancesFrom(new PrimaryStats(0, 0, 0, Constitution: 20, Will: 0), _rules);
+
+        Assert.Equal(Resistances.ByGroup(physicalPermille: 50, magicalPermille: 0), resistances);
+    }
+
+    [Fact]
+    public void ResistancesFrom_TwentyWill_RaisesMagicalOnly()
+    {
+        var resistances = StatFormula.ResistancesFrom(new PrimaryStats(0, 0, 0, Constitution: 0, Will: 20), _rules);
+
+        Assert.Equal(Resistances.ByGroup(physicalPermille: 0, magicalPermille: 50), resistances);
+    }
+
+    [Fact]
+    public void ResistancesFrom_HugeConstitution_StopsAtCap()
+    {
+        var resistances = StatFormula.ResistancesFrom(new PrimaryStats(0, 0, 0, Constitution: 1000, Will: 0), _rules);
+
+        Assert.Equal(750, resistances.Of(DamageType.Slashing));
+    }
+
+    [Fact]
+    public void ExtraStatusTurns_JustBelowBreakpoint_AddsNone()
+    {
+        Assert.Equal(0, StatFormula.ExtraStatusTurns(intelligence: 24, _rules));
+    }
+
+    [Fact]
+    public void ExtraStatusTurns_AtBreakpoint_AddsOne()
+    {
+        Assert.Equal(1, StatFormula.ExtraStatusTurns(intelligence: 25, _rules));
+    }
+
+    [Fact]
+    public void StatusPermille_TwentyIntelligence_IsOneHundredTwenty()
+    {
+        Assert.Equal(1200, StatFormula.StatusPermille(intelligence: 20, _rules));
     }
 
     [Fact]

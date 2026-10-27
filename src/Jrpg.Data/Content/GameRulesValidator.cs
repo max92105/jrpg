@@ -56,11 +56,21 @@ internal static class GameRulesValidator
             ("critDamagePercentPer100Power", stats.CritDamagePercentPer100Power),
             ("critChancePer100Agility", stats.CritChancePer100Agility),
             ("dodgePer100Agility", stats.DodgePer100Agility),
+            ("physicalResistancePer100Constitution", stats.PhysicalResistancePer100Constitution),
+            ("magicalResistancePer100Will", stats.MagicalResistancePer100Will),
+            ("statusPercentPer100Intelligence", stats.StatusPercentPer100Intelligence),
         ];
         var (negativeField, value) = fields.FirstOrDefault(field => field.Value < 0);
         if (negativeField is not null)
         {
             throw new ContentValidationException($"{fileName}: stats.{negativeField} must be at least 0 (was {value}).");
+        }
+
+        // The breakpoint divides Intelligence: 0 would divide by zero, and a negative one take turns away.
+        if (stats.IntelligencePerExtraStatusTurn < 1)
+        {
+            throw new ContentValidationException(
+                $"{fileName}: stats.intelligencePerExtraStatusTurn must be at least 1 (was {stats.IntelligencePerExtraStatusTurn}).");
         }
     }
 

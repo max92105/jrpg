@@ -59,6 +59,28 @@ public static class StatFormula
     public static int DamagePermille(int power, StatRules rules) =>
         (100 * PermillePerPercent) + PerPointPermille(power, rules.DamagePercentPer100Power);
 
+    /// <summary>
+    /// Constitution's percent on the three physical resistances, Will's on the five magical ones, in permille and
+    /// within the floor and cap (ADR 0027): the two primaries that keep a member standing, each against its kind.
+    /// </summary>
+    public static Resistances ResistancesFrom(PrimaryStats primaries, StatRules rules) => Resistances.ByGroup(
+        PerPointPermille(primaries.Constitution, rules.PhysicalResistancePer100Constitution),
+        PerPointPermille(primaries.Will, rules.MagicalResistancePer100Will)).Clamped();
+
+    /// <summary>
+    /// What a status the member grants has its power multiplied by, in permille: 100 % plus Intelligence's percent
+    /// (decision 296: Intelligence shapes what a skill leaves behind).
+    /// </summary>
+    public static int StatusPermille(int intelligence, StatRules rules) =>
+        (100 * PermillePerPercent) + PerPointPermille(intelligence, rules.StatusPercentPer100Intelligence);
+
+    /// <summary>
+    /// The turns added to a status the member grants: one per breakpoint of Intelligence, rounded down, so it grows in
+    /// steps a player can aim for. Never applied to Stun (decision 317).
+    /// </summary>
+    public static int ExtraStatusTurns(int intelligence, StatRules rules) =>
+        intelligence / rules.IntelligencePerExtraStatusTurn;
+
     // Points at a rate per 100 points, in permille, rounded down: 3 Agility at 25 per 100 is 7 (0.75 %, shown 0 %).
     private static int PerPointPermille(int points, int ratePer100) =>
         (int)((long)points * ratePer100 * PermillePerPercent / 100);

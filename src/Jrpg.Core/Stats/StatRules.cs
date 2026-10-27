@@ -13,6 +13,10 @@ namespace Jrpg.Core.Stats;
 /// <param name="CritDamagePercentPer100Power">The percent 100 Power adds to crit damage, over the base 150.</param>
 /// <param name="CritChancePer100Agility">The crit chance percent 100 Agility adds.</param>
 /// <param name="DodgePer100Agility">The dodge percent 100 Agility adds.</param>
+/// <param name="PhysicalResistancePer100Constitution">The physical resistance percent 100 Constitution adds.</param>
+/// <param name="MagicalResistancePer100Will">The magical resistance percent 100 Will adds.</param>
+/// <param name="StatusPercentPer100Intelligence">The percent 100 Intelligence adds to a granted status's power.</param>
+/// <param name="IntelligencePerExtraStatusTurn">The Intelligence each extra status turn takes (never on Stun).</param>
 public sealed record StatRules(
     int HpPercentPer100Constitution,
     int BaseAccuracy,
@@ -22,4 +26,8 @@ public sealed record StatRules(
     int DamagePercentPer100Power,
     int CritDamagePercentPer100Power,
     int CritChancePer100Agility,
-    int DodgePer100Agility);
+    int DodgePer100Agility,
+    int PhysicalResistancePer100Constitution,
+    int MagicalResistancePer100Will,
+    int StatusPercentPer100Intelligence,
+    int IntelligencePerExtraStatusTurn);

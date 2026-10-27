@@ -13,6 +13,9 @@ namespace Jrpg.Core.Stats;
 /// <param name="DodgePermille">How much a foe's hit chance drops.</param>
 /// <param name="CrowdControlResistancePermille">The chance to shrug off a stun or a taunt.</param>
 /// <param name="DamagePermille">What every raw damage and healing the member deals is multiplied by.</param>
+/// <param name="Resistances">One per damage type: Constitution raises the physical ones, Will the magical ones.</param>
+/// <param name="StatusPermille">What a status the member grants has its power multiplied by.</param>
+/// <param name="ExtraStatusTurns">The turns added to a status the member grants, except Stun (decision 317).</param>
 public sealed record StatSheet(
     PrimaryStats Primaries,
     int MaxHp,
@@ -22,4 +25,7 @@ public sealed record StatSheet(
     int CritDamagePermille,
     int DodgePermille,
     int CrowdControlResistancePermille,
-    int DamagePermille);
+    int DamagePermille,
+    Resistances Resistances,
+    int StatusPermille,
+    int ExtraStatusTurns);

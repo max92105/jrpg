@@ -5,12 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/P3a.md, slice P3a (StatSheet, MemberSheet.Of, StatFormula permille conversions, StatRules nine fields)
+Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/P3b.md, slice P3b (DamageType, DamageTypes.IsPhysical, Resistances, StatFormula.ResistancesFrom/StatusPermille/ExtraStatusTurns, four StatRules fields)
 Round: 1 (verdict: Ready to commit)
 
-- W1 src/Jrpg.Core/Party/MemberSheet.cs:44-53 positional StatSheet of 7 adjacent ints; only MaxHp, Speed, Primaries, CritChance are pinned through PartyMember; swap passes all tests; named args + one whole-sheet test; open
-- S1 tests/Jrpg.Core.Tests/Stats/StatFormulaTests.cs test prefixes CritChance_/Dodge_/CritDamage_/DamagePercent_ name methods now called ...Permille; open (suggestion)
-- S2 tests/Jrpg.Core.Tests/Stats/StatFormulaTests.cs:7-8 comment says design.md's placeholders but BaseCrowdControlResistance is 10 (design 0); open (suggestion)
-- S3 tests/Jrpg.Data.Tests/Content/GameRulesValidatorTests.cs:15 nine positional ints; named args; open (suggestion)
-- F1 src/Jrpg.Game/NewGame/LeaderProfile.cs:27 computes max HP via StatFormula.MaxHp, a second path beside MemberSheet; follow-up
-- (P2's W2 "Primaries has no reader" resolved: Primaries now on Sheet, asserted in PartyMemberStatTests)
+- W1 tests/Jrpg.Core.Tests/Stats/ResistancesTests.cs Clamped_AboveCap/BelowFloor and StatFormulaTests ResistancesFrom_HugeConstitution assert against `CapPercent * 10` / `FloorPercent * 10`, so a wrong cap (100 = immunity) passes; pin 750 / -1000; open
+- S1 src/Jrpg.Core/Stats/Resistances.cs:15 second private PermillePerPercent beside StatFormula's; open (suggestion)
+- S2 Done note doesn't record Cap/Floor named CapPercent/FloorPercent (slice and design.md:34 say Cap/Floor); open (suggestion)
+- F1 design.md:105 still lists DamagePercent, StatusPercent, PhysicalResistance, MagicalResistance; follow-up
+- F2 (carried) src/Jrpg.Game/NewGame/LeaderProfile.cs second max-HP path beside MemberSheet; follow-up

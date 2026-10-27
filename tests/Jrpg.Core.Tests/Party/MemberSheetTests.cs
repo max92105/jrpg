@@ -18,8 +18,12 @@ public sealed class MemberSheetTests
             DamagePercentPer100Power: 100,
             CritDamagePercentPer100Power: 50,
             CritChancePer100Agility: 25,
-            DodgePer100Agility: 20);
-        var primaries = new PrimaryStats(Power: 20, Agility: 20, Intelligence: 0, Constitution: 10, Will: 0);
+            DodgePer100Agility: 20,
+            PhysicalResistancePer100Constitution: 25,
+            MagicalResistancePer100Will: 25,
+            StatusPercentPer100Intelligence: 100,
+            IntelligencePerExtraStatusTurn: 25);
+        var primaries = new PrimaryStats(Power: 20, Agility: 20, Intelligence: 30, Constitution: 10, Will: 20);
         var atLevel = new ClassStats(MaxHp: 200, Attack: 10, Defense: 5, Speed: 12) { Accuracy = 5, Primaries = primaries };
 
         var sheet = MemberSheet.Of(atLevel, rules);
@@ -33,7 +37,10 @@ public sealed class MemberSheetTests
             CritDamagePermille: 1600,
             DodgePermille: 40,
             CrowdControlResistancePermille: 150,
-            DamagePermille: 1200);
+            DamagePermille: 1200,
+            Resistances: Resistances.ByGroup(physicalPermille: 25, magicalPermille: 50),
+            StatusPermille: 1300,
+            ExtraStatusTurns: 1);
         Assert.Equal(expected, sheet);
     }
 }

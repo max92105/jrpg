@@ -21,7 +21,11 @@ public sealed class GameRulesValidatorTests
             DamagePercentPer100Power: 100,
             CritDamagePercentPer100Power: 50,
             CritChancePer100Agility: 25,
-            DodgePer100Agility: 20));
+            DodgePer100Agility: 20,
+            PhysicalResistancePer100Constitution: 25,
+            MagicalResistancePer100Will: 25,
+            StatusPercentPer100Intelligence: 100,
+            IntelligencePerExtraStatusTurn: 25));
 
     [Fact]
     public void Validate_NegativeHpPercentPerConstitution_NamesTheField()
@@ -51,6 +55,16 @@ public sealed class GameRulesValidatorTests
         var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
 
         Assert.Equal("rules.json: stats.dodgePer100Agility must be at least 0 (was -1).", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_ZeroIntelligencePerExtraStatusTurn_NamesTheField()
+    {
+        var rules = _rules with { Stats = _rules.Stats with { IntelligencePerExtraStatusTurn = 0 } };
+
+        var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
+
+        Assert.Equal("rules.json: stats.intelligencePerExtraStatusTurn must be at least 1 (was 0).", exception.Message);
     }
 
     [Fact]

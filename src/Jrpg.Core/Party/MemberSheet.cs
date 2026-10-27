@@ -20,6 +20,9 @@ internal static class MemberSheet
             CritDamagePermille: StatFormula.CritDamagePermille(primaries.Power, rules),
             DodgePermille: StatFormula.DodgePermille(primaries.Agility, rules),
             CrowdControlResistancePermille: StatFormula.CrowdControlResistancePermille(rules),
-            DamagePermille: StatFormula.DamagePermille(primaries.Power, rules));
+            DamagePermille: StatFormula.DamagePermille(primaries.Power, rules),
+            Resistances: StatFormula.ResistancesFrom(primaries, rules),
+            StatusPermille: StatFormula.StatusPermille(primaries.Intelligence, rules),
+            ExtraStatusTurns: StatFormula.ExtraStatusTurns(primaries.Intelligence, rules));
     }
 }

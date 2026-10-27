@@ -13,8 +13,8 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// The menu's Status page: one party member at a time, with their profile and experience beside a diamond-framed
-/// portrait, then their parameters, what they wear beside their class resources, and their skills. Left and Right (or
-/// the tab buttons) go through the members, active ones first.
+/// portrait, then their combat numbers beside their resistances and class resources, and their skills. Left and Right
+/// (or the tab buttons) go through the members, active ones first.
 /// </summary>
 internal sealed class StatusPage : IMemberPage
 {

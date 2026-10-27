@@ -9,9 +9,8 @@ namespace Jrpg.Game.Menus;
 /// <summary>
 /// Draws a <see cref="StatusSheet"/> after the reference's Status page (decision 334): the profile beside a diamond
 /// portrait, with the experience over its bar and the experience to the next level at the bar's end; then each section
-/// under its dark band (<see cref="SectionTitle"/>): the parameters, what the member wears beside their class
-/// resources, and their skills. A row is a small spaced-caps label with its value right-aligned close to it, so the two
-/// read together.
+/// under its dark band (<see cref="SectionTitle"/>): Combat beside Resistances and Resources
+/// (<see cref="StatusParametersView"/>), then the skills.
 /// </summary>
 internal sealed class StatusSheetView
 {
@@ -37,36 +36,30 @@ internal sealed class StatusSheetView
     private const int BarHeight = 6;
     private const int XpBarTop = 40;
 
-    // The sections start under the profile, 16 px apart; each one's rows start 10 px under its band, 44 px tall, in
-    // cells 12 px in and at most 380 px wide, the value at the cell's right edge; two cells side by side, 48 px apart.
+    // Under the profile (its portrait and a 16 px gap), the middle band, 16 px, then Skills: room for three skills of
+    // about 70 px under their band (S1a's arithmetic; the skills view draws as many whole ones as fit).
     private const int ProfileHeight = 176;
     private const int SectionGap = 16;
-    private const int BelowBand = SectionTitle.Height + 10;
-    private const int RowHeight = 44;
-    private const int CellInset = 12;
-    private const int CellWidth = 380;
-    private const int ColumnGap = 48;
+    private const int SkillsHeight = SectionTitle.Height + 10 + (3 * 70);
+
+    /// <summary>
+    /// How tall the page's content is, from the area's top: what the layout test checks against the page area's height.
+    /// </summary>
+    internal const int ContentHeight = TopMargin + ProfileHeight + StatusParametersView.Height + SectionGap + SkillsHeight;
 
     // The level, the experience and the experience to the next level, in the order of both Progress arrays.
     private const int LevelIndex = 0;
     private const int ExperienceIndex = 1;
     private const int NextIndex = 2;
 
-    // Where each parameter sits, in the order the values come (HP, Attack, Defense, Speed): HP and Speed on the first
-    // line, Attack and Defense on the second.
-    private static readonly (int Column, int Line)[] _parameterCells = [(0, 0), (0, 1), (1, 1), (1, 0)];
-
     private readonly UiTextures _ui;
     private readonly StatusLabels _labels;
-    private readonly string[] _parameterLabels;
     private readonly SpriteFontBase _nameFont;
     private readonly SpriteFontBase _classFont;
     private readonly SpriteFontBase _labelFont;
     private readonly SpriteFontBase _valueFont;
     private readonly float[] _progressLabelWidths;
-    private readonly SectionTitle _parametersTitle;
-    private readonly SectionTitle _equipmentTitle;
-    private readonly SectionTitle _resourcesTitle;
+    private readonly StatusParametersView _parameters;
     private readonly StatusSkillsView _skills;
     private readonly StatBar _xpBar;
     private MeasuredSheet? _shown;
@@ -78,15 +71,12 @@ internal sealed class StatusSheetView
     {
         _ui = ui;
         _labels = labels;
-        _parameterLabels = [.. labels.Stats, labels.Speed];
         _nameFont = text.Fonts.FontAt(NamePixels);
         _classFont = text.Fonts.FontAt(ClassPixels);
         _labelFont = text.Fonts.FontAt(LabelPixels);
         _valueFont = text.Fonts.FontAt(ValuePixels);
         _progressLabelWidths = [.. labels.Progress.Select(label => _labelFont.MeasureString(label, characterSpacing: LabelSpacing).X)];
-        _parametersTitle = new SectionTitle(text, MessageIds.StatusParameters);
-        _equipmentTitle = new SectionTitle(text, MessageIds.StatusEquipment);
-        _resourcesTitle = new SectionTitle(text, MessageIds.StatusResources);
+        _parameters = new StatusParametersView(text, labels);
         _skills = new StatusSkillsView(text);
         Vitals = new MemberVitalBars(text, ui, ValuePixels);
         _xpBar = new StatBar(ui, UiTheme.XpBar);
@@ -101,13 +91,8 @@ internal sealed class StatusSheetView
     public void Show(StatusSheet sheet)
     {
         _xpBar.Show(sheet.Experience.Earned, sheet.Experience.Needed);
-        _shown = new MeasuredSheet(
-            _nameFont.MeasureString(sheet.Name).X,
-            Measured(sheet.Progress[NextIndex]),
-            [.. sheet.Stats.Append(sheet.Speed).Select(Measured)],
-            [.. sheet.Worn.Select(Measured)],
-            [.. sheet.Resources.Select(resource => resource.Name)],
-            [.. sheet.Resources.Select(resource => Measured(resource.Text))]);
+        _shown = new MeasuredSheet(_nameFont.MeasureString(sheet.Name).X, MeasuredText.Of(_valueFont, sheet.Progress[NextIndex]));
+        _parameters.Show(sheet);
     }
 
     /// <param name="batch">Already begun.</param>
@@ -123,21 +108,12 @@ internal sealed class StatusSheetView
         var page = new PageFrame(batch, textures, opacity, place.Sheet);
         DrawProfile(page, content, shown);
 
-        var halfWidth = (content.Width - ColumnGap) / 2;
-        var parametersTop = content.Y + ProfileHeight;
-        DrawParameters(page, new Rectangle(content.X, parametersTop, content.Width, 0), shown.Parameters);
-        var wornTop = parametersTop + BelowBand + (2 * RowHeight) + SectionGap;
-        DrawRows(page, new Rectangle(content.X, wornTop, halfWidth, 0), new RowsSection(_equipmentTitle, _labels.Slots, shown.Worn));
-        var resources = new RowsSection(_resourcesTitle, shown.ResourceNames, shown.Resources);
-        DrawRows(page, new Rectangle(content.X + halfWidth + ColumnGap, wornTop, halfWidth, 0), resources);
-
-        var rowCount = Math.Max(shown.Worn.Length, shown.Resources.Length);
-        var skillsTop = wornTop + BelowBand + (rowCount * RowHeight) + SectionGap;
+        var band = new Rectangle(content.X, content.Y + ProfileHeight, content.Width, StatusParametersView.Height);
+        _parameters.Draw(batch, textures, new StatusParametersView.Place(band, Vitals.Hp.Bar), opacity);
+        var skillsTop = band.Bottom + SectionGap;
         var skills = new Rectangle(content.X, skillsTop, content.Width, area.Bottom - skillsTop);
         _skills.Draw(batch, textures, new StatusSkillsView.Place(place.Sheet, skills), opacity);
     }
-
-    private MeasuredText Measured(string value) => MeasuredText.Of(_valueFont, value);
 
     // The portrait at the left; the name and level, the class under them, then the experience over its bar.
     private void DrawProfile(PageFrame page, Rectangle content, MeasuredSheet shown)
@@ -183,45 +159,6 @@ internal sealed class StatusSheetView
     // A label's top so it sits centered on the value line starting at valueTop.
     private float LabelTopOn(float valueTop) => valueTop + ((_valueFont.LineHeight - _labelFont.LineHeight) / 2f);
 
-    // HP and speed on the first line, attack and defense on the second; HP's bar runs under its cell.
-    private void DrawParameters(PageFrame page, Rectangle section, MeasuredText[] values)
-    {
-        _parametersTitle.Draw(page.Batch, page.Textures, section, page.Opacity);
-        var halfWidth = (section.Width - ColumnGap) / 2;
-        var firstLineTop = section.Y + BelowBand;
-        for (var index = 0; index < values.Length; index++)
-        {
-            var (column, line) = _parameterCells[index];
-            var cellLeft = section.X + CellInset + (column * (halfWidth + ColumnGap));
-            DrawCell(page, CellAt(cellLeft, firstLineTop + (line * RowHeight), halfWidth), _parameterLabels[index], values[index]);
-        }
-
-        var hpCell = CellAt(section.X + CellInset, firstLineTop, halfWidth);
-        Vitals.Hp.Bar.Draw(page.Batch, page.Textures, hpCell with { Y = hpCell.Bottom - BarHeight, Height = BarHeight }, page.Opacity);
-    }
-
-    private void DrawRows(PageFrame page, Rectangle section, RowsSection rows)
-    {
-        rows.Title.Draw(page.Batch, page.Textures, section, page.Opacity);
-        for (var index = 0; index < rows.Values.Count; index++)
-        {
-            var cell = CellAt(section.X + CellInset, section.Y + BelowBand + (index * RowHeight), section.Width);
-            DrawCell(page, cell, rows.Labels[index], rows.Values[index]);
-        }
-    }
-
-    // A cell at most CellWidth wide, so its value stays close to its label however wide the column is.
-    private static Rectangle CellAt(int left, int top, int columnWidth) =>
-        new(left, top, Math.Min(CellWidth, columnWidth - CellInset), RowHeight);
-
-    // The label small on the left, the value large at the cell's right edge, both centered on the row.
-    private void DrawCell(PageFrame page, Rectangle cell, string label, MeasuredText value)
-    {
-        var middle = cell.Y + (cell.Height / 2f);
-        page.WriteLabel(_labelFont, label, new Vector2(cell.X, middle - (_labelFont.LineHeight / 2f)));
-        page.Write(_valueFont, value.Text, new Vector2(cell.Right - value.Width, middle - (_valueFont.LineHeight / 2f)), UiTheme.TextPrimary);
-    }
-
     /// <summary>What the view draws, and where.</summary>
     /// <param name="Sheet">The shown member's sheet.</param>
     /// <param name="Area">The page's area.</param>
@@ -238,11 +175,7 @@ internal sealed class StatusSheetView
             Batch.DrawString(font, text, position, UiTheme.TextSecondary * Opacity, characterSpacing: LabelSpacing);
     }
 
-    // A section of label and value rows.
-    private readonly record struct RowsSection(SectionTitle Title, IReadOnlyList<string> Labels, IReadOnlyList<MeasuredText> Values);
-
     // The shown sheet's values, measured once when it is shown: the name's width places the level beside it, the
     // experience to the next level is right-aligned at the bar's end.
-    private sealed record MeasuredSheet(
-        float NameWidth, MeasuredText Next, MeasuredText[] Parameters, MeasuredText[] Worn, string[] ResourceNames, MeasuredText[] Resources);
+    private sealed record MeasuredSheet(float NameWidth, MeasuredText Next);
 }

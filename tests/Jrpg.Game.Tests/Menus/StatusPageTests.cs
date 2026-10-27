@@ -57,7 +57,7 @@ public sealed class StatusPageTests
         page.Open();
 
         string[] expected = [$"{vitals.Hp} / {vitals.MaxHp}", NumberText.Of(leader.TotalStats.Attack), NumberText.Of(leader.TotalStats.Defense)];
-        Assert.Equal(expected, page.ShownSheet.Stats);
+        Assert.Equal(expected, page.ShownSheet.Combat.Take(3));
     }
 
     [Fact]
@@ -70,7 +70,7 @@ public sealed class StatusPageTests
 
         page.Open();
 
-        Assert.Equal($"{vitals.Hp} / {vitals.MaxHp}", page.ShownSheet.Stats[0]);
+        Assert.Equal($"{vitals.Hp} / {vitals.MaxHp}", page.ShownSheet.Combat[StatusSheet.HpLine]);
     }
 
     [Fact]
@@ -144,7 +144,7 @@ public sealed class StatusPageTests
 
         page.Open();
 
-        Assert.Equal(NumberText.Of(session.Party.Leader.Sheet.Speed), page.ShownSheet.Speed);
+        Assert.Equal(NumberText.Of(session.Party.Leader.Sheet.Speed), CombatValue(page, MessageIds.StatusSpeed));
     }
 
     [Fact]
@@ -205,10 +205,17 @@ public sealed class StatusPageTests
         page.Open();
 
         var messages = RepositoryScreenText.Text.Messages;
-        Assert.Equal(messages.Text(MessageIds.StatAttack).ToUpperInvariant(), page.ShownLabels.Stats[1]);
-        Assert.Equal(messages.Text(MessageIds.StatusSpeed).ToUpperInvariant(), page.ShownLabels.Speed);
+        Assert.Equal(messages.Text(MessageIds.StatAttack).ToUpperInvariant(), page.ShownLabels.Combat[1]);
+        Assert.Contains(messages.Text(MessageIds.StatusSpeed).ToUpperInvariant(), page.ShownLabels.Combat);
         Assert.Equal(messages.Text(MessageIds.StatusLevelShort).ToUpperInvariant(), page.ShownLabels.Progress[0]);
         Assert.Equal(messages.Text(MessageIds.StatusNextLevel).ToUpperInvariant(), page.ShownLabels.Progress[2]);
+    }
+
+    // A combat line's value, found by its label rather than its place.
+    internal static string CombatValue(StatusPage page, string labelId)
+    {
+        var label = RepositoryScreenText.Text.Messages.Text(labelId).ToUpperInvariant();
+        return page.ShownSheet.Combat[Array.IndexOf(page.ShownLabels.Combat, label)];
     }
 
     // Goes through the members with Right until one of the class shows.

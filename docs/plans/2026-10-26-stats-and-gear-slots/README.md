@@ -73,8 +73,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 2: the pages read the sheet
 - [x] **L1. Stat names and number formats; the leader choice shows HP, speed and the five primaries** (Game + text, about 200 lines) → [slices/L1.md](slices/L1.md)
-- [ ] **S1. The Status page shows the sheet: attributes beside a smaller portrait, combat numbers, resistances** (Game, about 240 lines) → [slices/S1.md](slices/S1.md)
-- [ ] **S2. Status page look: spaced caps, captions, weaknesses tinted** (Game, about 190 lines) → [slices/S2.md](slices/S2.md)
+- [x] **S1a. The Status page's Combat, Resistances and Resources** (Game + text, about 230 lines; S1 revised against F1's page and split on 2026-10-27) → [slices/S1a.md](slices/S1a.md)
+- [ ] **S1b. Attributes beside the profile; weaknesses and capped resistances tinted** (Game + text, about 170 lines; holds what was S2) → [slices/S1b.md](slices/S1b.md)
 - [x] **E1. The Equipment page compares sheets: what the highlighted item changes, or what the worn one gives** (Core + Game, about 240 lines) → [slices/E1.md](slices/E1.md)
 
 ### Phase 3: damage types and resistances

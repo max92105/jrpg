@@ -3,6 +3,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
 using Jrpg.Core.Resources;
+using Jrpg.Core.Stats;
 using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Menus;
@@ -16,9 +17,11 @@ namespace Jrpg.Game.Menus;
 /// <param name="PortraitFile">Their portrait's file name.</param>
 /// <param name="Progress">Level, experience, and experience to the next level.</param>
 /// <param name="Experience">How far they are through their level, for the experience bar.</param>
-/// <param name="Stats">HP (as "value / max"), Attack, Defense.</param>
-/// <param name="Speed">Their speed.</param>
-/// <param name="Worn">What they wear in each slot, or the empty label.</param>
+/// <param name="Combat">
+/// HP (as "value / max"), Attack and Defense while the battle uses them (decision 337), speed, accuracy, crit chance
+/// with crit damage, dodge, crowd control resistance: each with what the member wears.
+/// </param>
+/// <param name="Resistances">One per damage type, in <see cref="DamageType"/> order.</param>
 /// <param name="Resources">
 /// Each class resource by name, in the class's order, with its max, or a lasting one's amount out of its max.
 /// </param>
@@ -29,29 +32,38 @@ internal sealed record StatusSheet(
     string PortraitFile,
     string[] Progress,
     (int Earned, int Needed) Experience,
-    string[] Stats,
-    string Speed,
-    string[] Worn,
+    string[] Combat,
+    string[] Resistances,
     IReadOnlyList<StatusSheet.Line> Resources,
     IReadOnlyList<StatusSheet.Line> Skills)
 {
+    /// <summary>Where HP is in <see cref="Combat"/>: its bar runs under it.</summary>
+    public const int HpLine = 0;
+
     /// <param name="member">The shown member.</param>
     /// <param name="catalog">Class names and the experience table.</param>
-    /// <param name="labels">The max-level and empty-slot texts.</param>
+    /// <param name="labels">The max-level text, and the messages the values are written with.</param>
     /// <param name="shownVitals">The HP meter, already showing the member: the HP text comes from it.</param>
     public static StatusSheet Of(PartyMember member, ContentCatalog catalog, StatusLabels labels, MemberVitalBars shownVitals)
     {
         var table = catalog.Rules.Experience;
         var stats = member.TotalStats;
+        var sheet = member.Sheet;
+        var messages = labels.Messages;
+        string Value(StatKind kind) => StatText.ValueOf(kind, sheet.ValueOf(kind), messages);
+        var crit = messages.Format(
+            MessageIds.StatusCritValue, new MessageArgument("chance", Value(StatKind.CritChance)), new MessageArgument("damage", Value(StatKind.CritDamage)));
         return new StatusSheet(
             member.Definition.Name,
             catalog.ClassOf(member.Definition).Name,
             member.Definition.PortraitFile,
             [NumberText.Of(member.Level), NumberText.Of(member.Experience), ToNextLevelText(member.Level, member.Experience, table, labels.MaxLevel)],
             ExperienceProgress(member.Level, member.Experience, table),
-            [shownVitals.Hp.Value.Text, NumberText.Of(stats.Attack), NumberText.Of(stats.Defense)],
-            NumberText.Of(member.Sheet.Speed),
-            [member.Weapon?.Name ?? labels.Empty, member.Armor?.Name ?? labels.Empty],
+            [
+                shownVitals.Hp.Value.Text, NumberText.Of(stats.Attack), NumberText.Of(stats.Defense), Value(StatKind.Speed),
+                Value(StatKind.Accuracy), crit, Value(StatKind.Dodge), Value(StatKind.CrowdControlResistance),
+            ],
+            [.. Enum.GetValues<DamageType>().Select(type => Value(StatKinds.ResistanceTo(type)))],
             [.. ResourceStarts.For(member).Select(start => ResourceLine(start, member, labels))],
             [.. member.Skills.Select(skill => new Line(skill.Name, skill.Description))]);
     }

@@ -1,6 +1,6 @@
 ---
 name: stale-size-comments
-description: Sizing, drawing moves, behavior removals or renamed files leave comments/docs stating the old size, place, rule or file name (SZ1, SZ2, M4, M2c, F1)
+description: Sizing, drawing moves, behavior removals or renamed files leave comments/docs stating the old size, place, rule or file name (SZ1, SZ2, M4, M2c, F1, S1a map.md)
 metadata:
   type: feedback
 ---
@@ -22,4 +22,5 @@ is deleted or renamed (`git status` D/??), grep its old name across docs/. Same 
 slice (M2a) still cited "BattleStateTests (lines 225-354)"; grep pending slices for "<File> (line" after a split.
 Same when a type gains a new trigger (P4b): PartyMember.Sheet still said "Rebuilt on level-up" once Wear/TakeOff rebuilt it
 too; reread the summary of every property a new call site writes.
+Same for docs/map.md (S1a): adding a type to a feature line left the neighbouring type's description listing the removed sections; reread the whole edited map line.
 Related: [[tautological-tests]].

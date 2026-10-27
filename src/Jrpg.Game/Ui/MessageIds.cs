@@ -96,7 +96,36 @@ internal static class MessageIds
     /// <summary>Shown as the experience to the next level once a member is at the highest level.</summary>
     public const string StatusMaxLevel = "status_max_level";
 
-    public const string StatusParameters = "status_parameters";
+    /// <summary>The Status page's section of the numbers a fight uses.</summary>
+    public const string StatusCombat = "status_combat";
+
+    /// <summary>The Status page's section of the eight resistances.</summary>
+    public const string StatusResistances = "status_resistances";
+
+    /// <summary>The Status page's crit line: chance and damage together.</summary>
+    public const string StatusCrit = "status_crit";
+
+    /// <summary>The crit line's value: "{chance} · {damage}".</summary>
+    public const string StatusCritValue = "status_crit_value";
+
+    /// <summary>The Status page's short label for crowd control resistance.</summary>
+    public const string StatusCrowdControl = "status_crowd_control";
+
+    public const string DamageTypeBlunt = "damage_type_blunt";
+
+    public const string DamageTypePiercing = "damage_type_piercing";
+
+    public const string DamageTypeSlashing = "damage_type_slashing";
+
+    public const string DamageTypeFire = "damage_type_fire";
+
+    public const string DamageTypeIce = "damage_type_ice";
+
+    public const string DamageTypeLightning = "damage_type_lightning";
+
+    public const string DamageTypeLight = "damage_type_light";
+
+    public const string DamageTypeDark = "damage_type_dark";
 
     public const string StatusEquipment = "status_equipment";
 

@@ -80,7 +80,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 3: damage types and resistances
 - [x] **D1. Every hit has a damage type; `CombatStats` becomes a sealed record** (Core + Data + content, about 245 lines) → [slices/D1.md](slices/D1.md)
 - [x] **D2. Resistances reduce damage of their type; enemy weaknesses in content** (Core + Data + content, about 200 lines) → [slices/D2.md](slices/D2.md)
-- [ ] **D3. "Weak" and "Resisted" cues by the floating number** (Core + Game, about 150 lines) → [slices/D3.md](slices/D3.md)
+- [x] **D3. "Weak" and "Resisted" cues by the floating number** (Core + Game, about 150 lines) → [slices/D3.md](slices/D3.md)
 
 ### Phase 4: Power, and the end of attack and defense
 - [ ] **M1. Power scales attacks and skills; weapons deal damage; attack leaves classes and items** (Core + Data + content, about 220 lines) → [slices/M1.md](slices/M1.md)

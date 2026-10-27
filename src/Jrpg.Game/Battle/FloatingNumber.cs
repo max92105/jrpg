@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Effects;
 using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
 
@@ -14,7 +15,11 @@ namespace Jrpg.Game.Battle;
 /// <param name="ShowsAt">When it pops, from the impact: 0, or a later beat's start, such as a backfire.</param>
 /// <param name="Stack">How many numbers popped on the same target at the same moment before it: each one sits
 /// <see cref="StackSpacing"/> higher, so four hits read as four.</param>
-internal readonly record struct FloatingNumber(Combatant Target, string Text, FloatingNumberTone Tone, TimeSpan ShowsAt = default, int Stack = 0)
+/// <param name="Affinity">
+/// What the target's resistance did to the hit, cued beside the number; neutral after a target's first number, so a
+/// multi-hit says it once.
+/// </param>
+internal readonly record struct FloatingNumber(Combatant Target, string Text, FloatingNumberTone Tone, TimeSpan ShowsAt = default, int Stack = 0, HitAffinity Affinity = HitAffinity.Neutral)
 {
     public const float RiseDistance = 50;
 

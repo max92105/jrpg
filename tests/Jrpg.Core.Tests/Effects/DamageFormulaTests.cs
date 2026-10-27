@@ -83,5 +83,25 @@ public sealed class DamageFormulaTests
         Assert.Equal(80, damage);
     }
 
+    [Fact]
+    public void AffinityOf_NegativeResistance_IsWeak()
+    {
+        Assert.Equal(HitAffinity.Weak, DamageFormula.AffinityOf(-1));
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(249)]
+    public void AffinityOf_FromZeroToJustBelowThreshold_IsNeutral(int resistancePermille)
+    {
+        Assert.Equal(HitAffinity.Neutral, DamageFormula.AffinityOf(resistancePermille));
+    }
+
+    [Fact]
+    public void AffinityOf_AtThreshold_IsResisted()
+    {
+        Assert.Equal(HitAffinity.Resisted, DamageFormula.AffinityOf(250));
+    }
+
     private static Mitigation Defense(int defense) => Mitigation.None with { Defense = defense };
 }

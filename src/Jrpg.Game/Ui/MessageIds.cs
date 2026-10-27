@@ -429,6 +429,12 @@ internal static class MessageIds
     /// <summary>The cue on a caster whose spell turned on them (decision 194).</summary>
     public const string BattleBackfire = "battle_backfire";
 
+    /// <summary>The cue by a hit a weakness raised (decision 323).</summary>
+    public const string BattleWeak = "battle_weak";
+
+    /// <summary>The cue by a hit a resistance big enough to count lowered (decision 323).</summary>
+    public const string BattleResisted = "battle_resisted";
+
     /// <summary>Placeholder <c>{count}</c>: how many copies of an item the party owns, on its row in battle.</summary>
     public const string BattleItemCount = "battle_item_count";
 

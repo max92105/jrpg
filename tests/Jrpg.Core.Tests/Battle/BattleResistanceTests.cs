@@ -25,7 +25,19 @@ public sealed class BattleResistanceTests
 
         var events = battle.Execute(new SkillCommand(_fireBlast, [goblin]));
 
-        Assert.Contains(new EffectApplied(goblin, EffectKind.Damage, 50), events);
+        Assert.Equal(50, events.OfType<EffectApplied>().Single().Amount);
+    }
+
+    [Fact]
+    public void Execute_FireSkillOnFireWeakEnemy_ReportsWeak()
+    {
+        var mage = Member("elena", PrimaryStats.None, TestStatRules.Neutral, _fireBlast);
+        var goblin = Goblin(Resistances.None with { Fire = -250 });
+        var battle = new BattleState([mage, goblin], new Inventory(), new FixedSequenceRandom(1));
+
+        var events = battle.Execute(new SkillCommand(_fireBlast, [goblin]));
+
+        Assert.Equal(HitAffinity.Weak, events.OfType<EffectApplied>().Single().Affinity);
     }
 
     // Slashing 50 % takes half off the sword's 40.
@@ -42,7 +54,7 @@ public sealed class BattleResistanceTests
 
         var events = battle.Execute(new AttackCommand(goblin));
 
-        Assert.Contains(new EffectApplied(goblin, EffectKind.Damage, 20), events);
+        Assert.Equal(20, events.OfType<EffectApplied>().Single().Amount);
     }
 
     // 20 Will at 100 % per 100 points is 20 % magical resistance: the 40 fire hit lands as 32.
@@ -57,7 +69,29 @@ public sealed class BattleResistanceTests
 
         var events = battle.Execute(new SkillCommand(friendlyFire, [cleric]));
 
-        Assert.Contains(new EffectApplied(cleric, EffectKind.Damage, 32), events);
+        Assert.Equal(32, events.OfType<EffectApplied>().Single().Amount);
+    }
+
+    // Content refuses a type on a heal, but the cue stays a damage rule even when a test gives one.
+    [Fact]
+    public void Execute_TypedHealOnResistantAlly_ReportsNeutral()
+    {
+        var mend = new SkillDefinition
+        {
+            Id = "mend",
+            Name = "Mend",
+            Description = "",
+            IconFile = "",
+            Effect = new Effect(EffectKind.RestoreHp, 10, Targeting.SingleAlly, DamageType: DamageType.Light),
+        };
+        var cleric = Member("mira", PrimaryStats.None, TestStatRules.Neutral, mend);
+        var willRules = TestStatRules.Neutral with { MagicalResistancePer100Will = 100 };
+        var knight = Member("aldo", PrimaryStats.None with { Will = 50 }, willRules);
+        var battle = new BattleState([cleric, knight, Goblin(Resistances.None)], new Inventory(), new FixedSequenceRandom(2, 1));
+
+        var events = battle.Execute(new SkillCommand(mend, [knight]));
+
+        Assert.Equal(HitAffinity.Neutral, events.OfType<EffectApplied>().Single().Affinity);
     }
 
     private static Combatant Member(string id, PrimaryStats primaries, StatRules rules, params SkillDefinition[] skills) =>

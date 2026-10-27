@@ -45,6 +45,9 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants)
         ResourceTriggers.OnCombatantFallen(fallen, combatants, events);
     }
 
+    private static HitAffinity AffinityOf(EffectKind kind, Mitigation mitigation) =>
+        kind == EffectKind.Damage ? DamageFormula.AffinityOf(mitigation.ResistancePermille) : HitAffinity.Neutral;
+
     // An untyped hit, which only tests build, meets no resistance.
     private static Mitigation MitigationOf(Combatant target, DamageType? type)
     {
@@ -60,10 +63,11 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants)
     {
         for (var hit = 0; hit < effect.Hits && (hit == 0 || target.IsAlive); hit++)
         {
-            var amount = EffectResolver.Apply(effect, target.Vitals, MitigationOf(target, effect.DamageType));
+            var mitigation = MitigationOf(target, effect.DamageType);
+            var amount = EffectResolver.Apply(effect, target.Vitals, mitigation);
             if (effect.Kind != EffectKind.GrantStatus)
             {
-                events.Add(new EffectApplied(target, effect.Kind, amount));
+                events.Add(new EffectApplied(target, effect.Kind, amount, AffinityOf(effect.Kind, mitigation)));
             }
 
             if (effect.Kind == EffectKind.Damage)

@@ -228,6 +228,32 @@ public sealed class ActionPlaybackTests
         Assert.Contains(nameof(NotYetShownEvent), exception.Message, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void Read_WeakHit_ShowsWeakCueByTheNumber()
+    {
+        BattleEvent[] events =
+            [new ActionStarted(_sarxian, new AttackCommand(_goblin)), new EffectApplied(_goblin, EffectKind.Damage, 13, HitAffinity.Weak)];
+
+        var playback = Start(events);
+
+        Assert.Equal(HitAffinity.Weak, Assert.Single(playback.Numbers).Affinity);
+    }
+
+    [Fact]
+    public void Read_ResistedMultiHit_CuesOnlyTheFirstNumber()
+    {
+        BattleEvent[] events =
+        [
+            new ActionStarted(_sarxian, new AttackCommand(_goblin)),
+            new EffectApplied(_goblin, EffectKind.Damage, 6, HitAffinity.Resisted),
+            new EffectApplied(_goblin, EffectKind.Damage, 6, HitAffinity.Resisted),
+        ];
+
+        var playback = Start(events);
+
+        Assert.Equal([HitAffinity.Resisted, HitAffinity.Neutral], playback.Numbers.Select(number => number.Affinity));
+    }
+
     private static ActionPlayback Start(IReadOnlyList<BattleEvent> events) => ActionPlayback.Start(events, RepositoryScreenText.Text.Messages);
 
     private sealed record NotYetShownEvent : BattleEvent;

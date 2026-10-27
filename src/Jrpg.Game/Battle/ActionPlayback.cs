@@ -145,7 +145,8 @@ internal sealed class ActionPlayback
     private void AddLanding(EffectApplied effect)
     {
         var stack = _numbers.Count(number => number.Target == effect.Target && number.ShowsAt == TimeSpan.Zero);
-        _numbers.Add(new FloatingNumber(effect.Target, NumberText.Of(effect.Amount), ToneOf(effect.Kind), Stack: stack));
+        var affinity = stack == 0 ? effect.Affinity : HitAffinity.Neutral;
+        _numbers.Add(new FloatingNumber(effect.Target, NumberText.Of(effect.Amount), ToneOf(effect.Kind), Stack: stack, Affinity: affinity));
         if (effect.Kind == EffectKind.Damage && _attackEffectFile is { } file)
         {
             // A multi-hit plays one strip on its target, as its hits make one impact.

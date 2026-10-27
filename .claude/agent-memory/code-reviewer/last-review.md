@@ -5,8 +5,7 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-26-escape-menu-third-pass/slices/IT3.md, slice IT3 (aimed cards show HP now and after; FieldItemUse.HpAfterUse)
+Slice: docs/plans/2026-10-26-escape-menu-third-pass/slices/C2.md, slice C2 (ConfirmPromptView's button drawing moves to Ui/DialogButtonView)
 Round: 1 (verdict: Ready to commit)
 
-- S1 PartySidebarView.FormatChangedPreviews — "candidates get a preview, the others none" has no test; a headless PartySidebarView test (as MemberCardViewTests builds MemberCardView) could pin it; open
-- S2 PartySidebarView — previews refresh keyed on Picker reference, relying on ItemUse building a new picker in every AimFor; comment states it; key on the aim's HP-after lookup if that ever changes; open
+- S1 slices/C2.md Done note — "Done, with deviations: as planned." contradicts itself; the dropped fields are what the slice asked for, so "Done: as planned." plus the field note; open

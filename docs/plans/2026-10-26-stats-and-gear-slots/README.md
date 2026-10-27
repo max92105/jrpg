@@ -111,7 +111,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **E2. Equipment page look: the Status row look, the comparison in two columns** (Game, about 210 lines) → [slices/E2.md](slices/E2.md)
 
 ### Phase 9: balance and walk-through
-- [ ] **B1. Goblin trio simulation with hits and crits counted; numbers recorded per class** (Simulations, about 120 lines) → [slices/B1.md](slices/B1.md)
+- [x] **B1. Goblin trio simulation with hits and crits counted; numbers recorded per class** (Simulations, about 120 lines) → [slices/B1.md](slices/B1.md)
 - [ ] **Z. Walk-through: stats, battles, gear and pages by hand** (manual) → [slices/Z.md](slices/Z.md)
 
 ## Decisions

@@ -5,9 +5,7 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-26-stats-and-gear-slots, slice E2 (Equipment page look: SheetRowLook, EquipmentChangesView, Changes/Gives caption). Round 1. Verdict: Fix the Criticals.
+Plan: 2026-10-26-stats-and-gear-slots, slice B1 (GoblinTrioSimulation: leader's miss/crit/average hit, StartingGear theory). Round 1. Verdict: Ready to commit.
 
-- Critical: slot labels and comparison line labels drawn through SheetRowLook.DrawLabel are mixed case ("Weapon", "Fire"), not spaced caps as the slice goal and the new summaries claim; uppercase once in EquipmentLabels.From and EquipmentChangesView.Measure — open
-- Warning: StatusParametersView.Measure is now a private forwarding wrapper with one caller (line 64); call _rows.Measure directly — open
-- Suggestion: caption passed as a message-id string and matched by ==; any other id silently draws "Changes" — open
-- Suggestion: MessageIds.EquipmentChanges summary still says "or what a worn item gives" (Gives has its own id now) — open
+- Suggestion: WearStartingGear ignores TryEquip's result and the comment names the items; a content change that drops a slot's item gives a partly geared run while the Done note still says all nine are worn. Assert the leader wears something in each slot instead of naming items in the comment — open
+- Suggestion: Landed == 0 prints NaN for crit/average hit; harmless today (every class hits) — open

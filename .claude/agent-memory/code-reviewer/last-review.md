@@ -5,8 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/C2.md, slice C2 (test files split: BattleStateTests, PartyMemberTests, ClassCatalogValidatorTests)
+Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/P1.md, slice P1 (PrimaryStats, ClassStats.Primaries/Accuracy, growth, validator, classes.json)
 Round: 1 (verdict: Ready to commit)
 
-- S1 ClassCatalogValidatorStatTests:8 header "the checks P1's primaries add to" describes future work, stale once P1 lands; open (suggestion)
-- F1 slices/M2a.md:12 points at "BattleStateTests (lines 225-354)", which now span BattleStateOutcomeTests/TargetTests; follow-up, open
+- S1 src/Jrpg.Core/Party/ClassStats.cs:5-6 summary says what reads Speed but not that Primaries/Accuracy are unread until P2/H1; open (suggestion)
+- (C2's S1, the stale "P1's primaries" header in ClassCatalogValidatorStatTests, is gone: fixed)

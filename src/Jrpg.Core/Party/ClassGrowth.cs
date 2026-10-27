@@ -1,3 +1,5 @@
+using Jrpg.Core.Stats;
+
 namespace Jrpg.Core.Party;
 
 /// <summary>The stats a class gives at a level: the one formula for a member's numbers (ADR 0017).</summary>
@@ -18,6 +20,18 @@ public static class ClassGrowth
             baseStats.MaxHp + (growth.MaxHp * levelsGained),
             baseStats.Attack + (growth.Attack * levelsGained),
             baseStats.Defense + (growth.Defense * levelsGained),
-            baseStats.Speed + (growth.Speed * levelsGained));
+            baseStats.Speed + (growth.Speed * levelsGained))
+        {
+            Accuracy = baseStats.Accuracy + (growth.Accuracy * levelsGained),
+            Primaries = PrimariesAt(baseStats.Primaries, growth.Primaries, levelsGained),
+        };
     }
+
+    // The same formula, primary by primary.
+    private static PrimaryStats PrimariesAt(PrimaryStats baseStats, PrimaryStats growth, int levelsGained) => new(
+        baseStats.Power + (growth.Power * levelsGained),
+        baseStats.Agility + (growth.Agility * levelsGained),
+        baseStats.Intelligence + (growth.Intelligence * levelsGained),
+        baseStats.Constitution + (growth.Constitution * levelsGained),
+        baseStats.Will + (growth.Will * levelsGained));
 }

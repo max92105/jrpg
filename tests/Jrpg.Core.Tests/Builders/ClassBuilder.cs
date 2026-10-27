@@ -1,5 +1,6 @@
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
+using Jrpg.Core.Stats;
 
 namespace Jrpg.Core.Tests.Builders;
 
@@ -11,6 +12,8 @@ internal sealed class ClassBuilder
     private ClassStats _growth = new(0, 0, 0, 0);
     private string[] _skillIds = [];
     private ResourceDefinition[] _resources = [];
+    private PrimaryStats? _basePrimaries;
+    private PrimaryStats? _growthPrimaries;
 
     public ClassBuilder WithId(string id)
     {
@@ -30,6 +33,14 @@ internal sealed class ClassBuilder
         return this;
     }
 
+    /// <summary>The primaries at level 1 and per level after, kept whatever <see cref="WithBase"/> sets.</summary>
+    public ClassBuilder WithPrimaries(PrimaryStats basePrimaries, PrimaryStats growth)
+    {
+        _basePrimaries = basePrimaries;
+        _growthPrimaries = growth;
+        return this;
+    }
+
     public ClassBuilder WithSkills(params string[] ids)
     {
         _skillIds = ids;
@@ -42,5 +53,12 @@ internal sealed class ClassBuilder
         return this;
     }
 
-    public ClassDefinition Build() => new(_id, _id, $"{_id} description", _base, _growth) { SkillIds = _skillIds, Resources = _resources };
+    public ClassDefinition Build() => new(_id, _id, $"{_id} description", WithOwnPrimaries(_base, _basePrimaries), WithOwnPrimaries(_growth, _growthPrimaries))
+    {
+        SkillIds = _skillIds,
+        Resources = _resources,
+    };
+
+    private static ClassStats WithOwnPrimaries(ClassStats stats, PrimaryStats? primaries) =>
+        primaries is null ? stats : stats with { Primaries = primaries };
 }

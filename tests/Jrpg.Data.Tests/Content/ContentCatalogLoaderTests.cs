@@ -131,6 +131,16 @@ public sealed class ContentCatalogLoaderTests
     }
 
     [Fact]
+    public void Load_RepositoryFighter_HasPrimaries()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        var fighter = catalog.ClassOf(catalog.PartyMembers["ragnir"]);
+
+        Assert.True(fighter.Base.Primaries.Power > 0, "The fighter's base Power comes from classes.json.");
+    }
+
+    [Fact]
     public void Load_RepositoryContent_FighterHasStamina()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));

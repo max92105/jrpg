@@ -1,5 +1,6 @@
 using Jrpg.Core.Party;
 using Jrpg.Core.Skills;
+using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
 using Jrpg.Data.Resources;
 
@@ -28,6 +29,15 @@ internal static class ClassCatalogValidator
         : stats.Attack < 0 ? $"{field}.attack must be at least 0 (was {stats.Attack})."
         : stats.Defense < 0 ? $"{field}.defense must be at least 0 (was {stats.Defense})."
         : stats.Speed < 0 ? $"{field}.speed must be at least 0 (was {stats.Speed})."
+        : stats.Accuracy < 0 ? $"{field}.accuracy must be at least 0 (was {stats.Accuracy})."
+        : FindNegativePrimary($"{field}.primaries", stats.Primaries);
+
+    private static string? FindNegativePrimary(string field, PrimaryStats primaries) =>
+        primaries.Power < 0 ? $"{field}.power must be at least 0 (was {primaries.Power})."
+        : primaries.Agility < 0 ? $"{field}.agility must be at least 0 (was {primaries.Agility})."
+        : primaries.Intelligence < 0 ? $"{field}.intelligence must be at least 0 (was {primaries.Intelligence})."
+        : primaries.Constitution < 0 ? $"{field}.constitution must be at least 0 (was {primaries.Constitution})."
+        : primaries.Will < 0 ? $"{field}.will must be at least 0 (was {primaries.Will})."
         : null;
 
     private static string? FindSkillProblem(IReadOnlyList<string> skillIds, ClassReferences references)

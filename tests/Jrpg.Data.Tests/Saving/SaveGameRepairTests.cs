@@ -20,8 +20,8 @@ public sealed class SaveGameRepairTests
 
     private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-    private static readonly PartyMemberProgress _sarxian = new("sarxian", Level: 3, Experience: 42, Hp: 150, WeaponId: "bronze_sword", ArmorId: "chain_mail", LastingAmounts: new Dictionary<string, int>());
-    private static readonly PartyMemberProgress _jazog = new("jazog", Level: 1, Experience: 0, Hp: 100, WeaponId: null, ArmorId: "wizard_robe", LastingAmounts: new Dictionary<string, int>());
+    private static readonly PartyMemberProgress _sarxian = new("sarxian", Level: 3, Experience: 42, Hp: 150, Wearing((EquipmentSlot.Weapon, "bronze_sword"), (EquipmentSlot.Chest, "chain_mail")), LastingAmounts: new Dictionary<string, int>());
+    private static readonly PartyMemberProgress _jazog = new("jazog", Level: 1, Experience: 0, Hp: 100, Wearing((EquipmentSlot.Chest, "wizard_robe")), LastingAmounts: new Dictionary<string, int>());
 
     private static readonly SaveGame _save = new()
     {
@@ -115,7 +115,7 @@ public sealed class SaveGameRepairTests
     public void Repair_TooManyActiveMembers_MovesExtraToReserve()
     {
         string[] ids = ["sarxian", "jazog", "teelle", "zaruk", "zanyr", "thaali"];
-        var members = ids.Select(id => _jazog with { Id = id, ArmorId = null }).ToList();
+        var members = ids.Select(id => _jazog with { Id = id, Worn = Wearing() }).ToList();
 
         var repaired = Repair(_save with { Members = members, ActiveMemberIds = ids });
 
@@ -153,9 +153,9 @@ public sealed class SaveGameRepairTests
     [Fact]
     public void Repair_UnknownWornItem_DropsIt()
     {
-        var repaired = Repair(_save with { Members = [_sarxian with { WeaponId = "excalibur" }, _jazog] });
+        var repaired = Repair(_save with { Members = [_sarxian with { Worn = Wearing((EquipmentSlot.Weapon, "excalibur"), (EquipmentSlot.Chest, "chain_mail")) }, _jazog] });
 
-        Assert.Null(repaired.Save.Members[0].WeaponId);
+        Assert.False(repaired.Save.Members[0].Worn.ContainsKey(EquipmentSlot.Weapon));
         Assert.Equal(0, repaired.Save.Inventory.Count(entry => entry.ItemId == "excalibur"));
     }
 
@@ -163,9 +163,9 @@ public sealed class SaveGameRepairTests
     public void Repair_WornItemNoLongerWearable_ReturnsItToInventory()
     {
         // A sword isn't armor; a barbarian keeps his wizard robe, since any class wears anything (decision 165).
-        var repaired = Repair(_save with { Members = [_sarxian with { ArmorId = "bronze_sword" }, _jazog] });
+        var repaired = Repair(_save with { Members = [_sarxian with { Worn = Wearing((EquipmentSlot.Weapon, "bronze_sword"), (EquipmentSlot.Chest, "bronze_sword")) }, _jazog] });
 
-        Assert.Equal([null, "wizard_robe"], repaired.Save.Members.Select(member => member.ArmorId));
+        Assert.Equal([null, "wizard_robe"], repaired.Save.Members.Select(member => member.Worn.GetValueOrDefault(EquipmentSlot.Chest)));
         Assert.Equal([new InventoryEntry("potion", 4), new InventoryEntry("bronze_sword", 1)], repaired.Save.Inventory);
     }
 
@@ -255,9 +255,9 @@ public sealed class SaveGameRepairTests
     [Fact]
     public void Repair_WornItemThatIsNotEquipment_ReturnsItToInventory()
     {
-        var repaired = Repair(_save with { Members = [_sarxian with { WeaponId = "bomb" }, _jazog] });
+        var repaired = Repair(_save with { Members = [_sarxian with { Worn = Wearing((EquipmentSlot.Weapon, "bomb"), (EquipmentSlot.Chest, "chain_mail")) }, _jazog] });
 
-        Assert.Null(repaired.Save.Members[0].WeaponId);
+        Assert.False(repaired.Save.Members[0].Worn.ContainsKey(EquipmentSlot.Weapon));
         Assert.Contains(new InventoryEntry("bomb", 1), repaired.Save.Inventory);
     }
 
@@ -279,4 +279,7 @@ public sealed class SaveGameRepairTests
     }
 
     private static RepairedSave Repair(SaveGame save) => SaveGameRepair.Repair(Slot, save, _catalog);
+
+    private static Dictionary<EquipmentSlot, string> Wearing(params (EquipmentSlot Slot, string ItemId)[] worn) =>
+        worn.ToDictionary(entry => entry.Slot, entry => entry.ItemId);
 }

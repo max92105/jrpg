@@ -13,6 +13,8 @@ Seen again in part 2 slice 1c (nested list: `Tiles: [null]` inside a source obje
 
 Seen again in part 2 slice 1b (dictionary-value variant): the converter reads a dictionary of source tile records; `{ "1": null }` passes the strict reader and `TileConversion` throws a NullReferenceException that `Program` doesn't catch (verified with `dotnet fsi` + reflection on the internal type). Dictionary values are elements too.
 
+Seen again in stats-and-gear G1b: save `Worn` dictionary values (`{ "weapon": null }`) pass strict reading; FileSaveStore.CheckNoNullEntries only checks top-level lists.
+
 **Why:** CLAUDE.md/code-quality rule: validate at boundaries with a message naming the bad field.
 
 **How to apply:** In any validator over a list of ids, check for a null/blank element first. Probe with `dotnet fsi` + a scratch copy of `content/` (see [[scratch-builds-blocked]]).

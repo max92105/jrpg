@@ -173,14 +173,9 @@ public sealed class GameSession
     {
         var definition = catalog.PartyMembers[progress.Id];
         var member = PartyMember.Recruit(definition, catalog.ClassOf(definition), catalog.Skills, catalog.Rules.Stats);
-        if (progress.WeaponId is { } weaponId)
+        foreach (var (slot, itemId) in progress.Worn)
         {
-            member.Wear(EquipmentSlot.Weapon, catalog.Items[weaponId]);
-        }
-
-        if (progress.ArmorId is { } armorId)
-        {
-            member.Wear(EquipmentSlot.Chest, catalog.Items[armorId]);
+            member.Wear(slot, catalog.Items[itemId]);
         }
 
         member.RestoreProgress(progress);

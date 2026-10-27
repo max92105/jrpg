@@ -102,7 +102,7 @@ public sealed class CombatantTests
             .WithGrowth(new ClassStats(MaxHp: 0, Speed: 5))
             .WithResources(readiness)
             .Build();
-        var progress = new PartyMemberProgress("lazarus", level, 0, Hp: 100, WeaponId: null, ArmorId: null, LastingAmounts: new Dictionary<string, int>());
+        var progress = new PartyMemberProgress("lazarus", level, 0, Hp: 100, Worn: new Dictionary<EquipmentSlot, string>(), LastingAmounts: new Dictionary<string, int>());
         var member = PartyMember.Recruit(new PartyMemberBuilder().WithId("lazarus").BuildDefinition(), rogue, new Dictionary<string, SkillDefinition>(), TestStatRules.Neutral);
         member.RestoreProgress(progress);
         return member;

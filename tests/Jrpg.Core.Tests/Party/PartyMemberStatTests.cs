@@ -28,7 +28,7 @@ public sealed class PartyMemberStatTests
     [Fact]
     public void RestoreProgress_LevelThree_MaxHpIsTheClassAtThree()
     {
-        var progress = new PartyMemberProgress("test_member", 3, 0, Hp: 50, WeaponId: null, ArmorId: null, LastingAmounts: new Dictionary<string, int>());
+        var progress = new PartyMemberProgress("test_member", 3, 0, Hp: 50, Worn: new Dictionary<EquipmentSlot, string>(), LastingAmounts: new Dictionary<string, int>());
 
         var member = PartyMember.Recruit(
             new PartyMemberBuilder().BuildDefinition(), _growingClass, new Dictionary<string, SkillDefinition>(), TestStatRules.Neutral);
@@ -94,7 +94,7 @@ public sealed class PartyMemberStatTests
     public void RestoreProgress_Constitution_KeepsTheSavedHpUnderTheRaisedMax()
     {
         var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), _sturdyClass, new Dictionary<string, SkillDefinition>(), _rules);
-        var progress = new PartyMemberProgress("test_member", 2, 0, Hp: 260, WeaponId: null, ArmorId: null, LastingAmounts: new Dictionary<string, int>());
+        var progress = new PartyMemberProgress("test_member", 2, 0, Hp: 260, Worn: new Dictionary<EquipmentSlot, string>(), LastingAmounts: new Dictionary<string, int>());
 
         member.RestoreProgress(progress);
 

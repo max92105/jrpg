@@ -95,7 +95,7 @@ public sealed class PartyMember
 
     /// <summary>What a save keeps of this member.</summary>
     public PartyMemberProgress CaptureProgress() =>
-        new(Id, Level, Experience, Vitals.Hp, Weapon?.Id, EquippedIn(EquipmentSlot.Chest)?.Id, new Dictionary<string, int>(_lastingAmounts));
+        new(Id, Level, Experience, Vitals.Hp, _worn.ItemIds, new Dictionary<string, int>(_lastingAmounts));
 
     /// <summary>The sheet with what's worn in <paramref name="slot"/> taken off, for the Equipment page.</summary>
     public StatSheet SheetWithout(EquipmentSlot slot) => SheetWearing(_worn.With(slot, null));

@@ -110,7 +110,8 @@ public sealed partial class FileSaveStore(string directory, ContentCatalog catal
         }
     }
 
-    // The serializer doesn't apply nullable annotations to collection elements, so a stray null gets here.
+    // The serializer doesn't apply nullable annotations to collection elements or dictionary values, so a stray null
+    // gets here.
     private static void CheckNoNullEntries(string slotName, SaveGame game)
     {
         var hasNullEntry = game.Members.Contains(null) || game.ActiveMemberIds.Contains(null) || game.Inventory.Contains(null)
@@ -118,6 +119,11 @@ public sealed partial class FileSaveStore(string directory, ContentCatalog catal
         if (hasNullEntry)
         {
             throw new UnreadableSaveException(slotName, "the file is damaged (a list holds a null entry).");
+        }
+
+        if (game.Members.Any(member => member.Worn.Values.Contains(null)))
+        {
+            throw new UnreadableSaveException(slotName, "the file is damaged (a worn slot holds a null item).");
         }
     }
 

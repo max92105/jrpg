@@ -73,21 +73,19 @@ internal sealed class SaveGameRepair
     {
         var (level, experience) = RepairLevel(progress);
         var characterClass = _catalog.ClassOf(definition);
-        var weaponId = RepairWornItem(progress.WeaponId, EquipmentSlot.Weapon, definition);
-        var armorId = RepairWornItem(progress.ArmorId, EquipmentSlot.Chest, definition);
+        var worn = RepairWorn(progress, definition);
 
         // The sheet the member will have once restored: their level's, with what they still wear; its max HP and its
         // Will bound what the save holds.
-        var worn = BonusesOf(weaponId).Plus(BonusesOf(armorId));
-        var weaponDamage = weaponId is null ? null : _catalog.Items[weaponId].Equipment?.Damage;
-        var sheet = MemberSheet.Of(ClassGrowth.StatsAt(characterClass, level), worn, weaponDamage, _catalog.Rules.Stats);
+        var bonuses = worn.Values.Aggregate(StatBonuses.None, (total, itemId) => total.Plus(BonusesOf(itemId)));
+        var weaponDamage = worn.TryGetValue(EquipmentSlot.Weapon, out var weaponId) ? _catalog.Items[weaponId].Equipment?.Damage : null;
+        var sheet = MemberSheet.Of(ClassGrowth.StatsAt(characterClass, level), bonuses, weaponDamage, _catalog.Rules.Stats);
         var repaired = progress with
         {
             Level = level,
             Experience = experience,
             Hp = Math.Clamp(progress.Hp, 0, sheet.MaxHp),
-            WeaponId = weaponId,
-            ArmorId = armorId,
+            Worn = worn,
             LastingAmounts = RepairLastingAmounts(progress, characterClass, sheet.Primaries.Will),
         };
         if (repaired.Hp != progress.Hp)
@@ -98,8 +96,22 @@ internal sealed class SaveGameRepair
         return repaired;
     }
 
-    private StatBonuses BonusesOf(string? itemId) =>
-        itemId is null ? StatBonuses.None : _catalog.Items[itemId].Equipment?.Bonuses ?? StatBonuses.None;
+    private StatBonuses BonusesOf(string itemId) => _catalog.Items[itemId].Equipment?.Bonuses ?? StatBonuses.None;
+
+    // Slot by slot: an item that is gone is dropped, one that no longer fits its slot goes back to the inventory.
+    private Dictionary<EquipmentSlot, string> RepairWorn(PartyMemberProgress progress, PartyMemberDefinition definition)
+    {
+        var repaired = new Dictionary<EquipmentSlot, string>();
+        foreach (var (slot, itemId) in progress.Worn)
+        {
+            if (RepairWornItem(itemId, slot, definition) is { } kept)
+            {
+                repaired[slot] = kept;
+            }
+        }
+
+        return repaired;
+    }
 
     // Only the class's lasting resources, each within 0..its max under the member's Will; one the save doesn't hold
     // starts fresh on restore.
@@ -142,13 +154,8 @@ internal sealed class SaveGameRepair
         return (level, experience);
     }
 
-    private string? RepairWornItem(string? itemId, EquipmentSlot slot, PartyMemberDefinition definition)
+    private string? RepairWornItem(string itemId, EquipmentSlot slot, PartyMemberDefinition definition)
     {
-        if (itemId is null)
-        {
-            return null;
-        }
-
         if (!_catalog.Items.TryGetValue(itemId, out var item))
         {
             _changes.Add($"party member '{definition.Id}': dropped worn item '{itemId}', which no longer exists.");

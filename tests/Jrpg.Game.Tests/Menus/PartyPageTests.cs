@@ -150,18 +150,22 @@ public sealed class PartyPageTests
 
         Assert.Equal([_session.Party.Leader], _session.Party.ActiveMembers);
         Assert.Equal($"{_session.Party.Leader.Definition.Name} leads the party and always stays in it.", page.Notice);
-        Assert.True(page.LeavesOnCancel);
     }
 
+    // Decision 268: the notice is a dialog, so Down does nothing until it is closed.
     [Fact]
-    public void Update_MovingAfterRefusal_ClearsTheNotice()
+    public void Update_DownWhileNoticeOpen_KeepsTheNoticeAndTheCursor()
     {
         var page = NewPage();
+        PartyOfThree(page);
+        page.Update(Pressing(GameButton.Up));
         page.Update(Pressing(GameButton.Confirm));
+        Assert.NotNull(page.Notice);
 
-        page.Update(Pressing(GameButton.Right));
+        page.Update(Pressing(GameButton.Down));
 
-        Assert.Null(page.Notice);
+        Assert.NotNull(page.Notice);
+        Assert.Same(_session.Party.Leader, page.Selected);
     }
 
     [Fact]

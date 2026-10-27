@@ -10,7 +10,7 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// Draws the Party page's two columns: the active party with its count on the left, the reserve on the right, one card
-/// per member, the moving member's outline, and the notice under the active cards.
+/// per member, and the moving member's outline.
 /// </summary>
 internal sealed class PartyColumnsView
 {
@@ -20,9 +20,7 @@ internal sealed class PartyColumnsView
     private const int TopMargin = 20;
     private const int ColumnGap = 40;
     private const int LabelPixels = 18;
-    private const int BodyPixels = 26;
     private const int CardsTop = SectionTitle.LineGap + 12;
-    private const int NoticeGap = 16;
 
     // The member being moved is outlined while the player picks the place to swap with.
     private const int MovingOutline = 2;
@@ -31,7 +29,6 @@ internal sealed class PartyColumnsView
     private readonly int _maxActive;
     private readonly MemberCardView _cardView;
     private readonly SpriteFontBase _labelFont;
-    private readonly SpriteFontBase _bodyFont;
     private readonly SectionTitle _activeTitle;
     private readonly SectionTitle _reserveTitle;
 
@@ -44,15 +41,13 @@ internal sealed class PartyColumnsView
         _maxActive = catalog.Rules.Party.MaxActiveMembers;
         _cardView = new MemberCardView(text, ui, catalog);
         _labelFont = text.Fonts.FontAt(LabelPixels);
-        _bodyFont = text.Fonts.FontAt(BodyPixels);
         _activeTitle = new SectionTitle(text, ui, MessageIds.PartyActive);
         _reserveTitle = new SectionTitle(text, ui, MessageIds.PartyReserve);
     }
 
     /// <summary>Formats every card and the count, once per change.</summary>
     /// <param name="party">The party as it is now.</param>
-    /// <param name="notice">The notice to keep showing, or null.</param>
-    public PartyColumns ColumnsOf(PartyState party, string? notice)
+    public PartyColumns ColumnsOf(PartyState party)
     {
         var count = _messages.Format(
             MessageIds.PartyCount,
@@ -62,8 +57,7 @@ internal sealed class PartyColumnsView
             [.. party.ActiveMembers],
             [.. party.ReserveMembers],
             party.Members.ToDictionary(member => member, member => _cardView.CardOf(member, party.Leader)),
-            MeasuredText.Of(_labelFont, count),
-            notice);
+            MeasuredText.Of(_labelFont, count));
     }
 
     /// <summary>Where the active card at <paramref name="row"/> is drawn in <paramref name="area"/>.</summary>
@@ -90,12 +84,6 @@ internal sealed class PartyColumnsView
         {
             var selected = CardArea(cursor.IsOnReserve ? reserve : active, cursor.Row);
             MenuPointer.Draw(batch, textures.Pixel, new Vector2(selected.X, selected.Center.Y), opacity);
-        }
-
-        if (columns.Notice is not null)
-        {
-            var noticeTop = active.Y + CardsTop + (_maxActive * MemberCardView.Height) + NoticeGap;
-            batch.DrawString(_bodyFont, columns.Notice, new Vector2(active.X, noticeTop), UiTheme.Danger * opacity);
         }
     }
 

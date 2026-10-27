@@ -78,6 +78,9 @@ internal static class MessageIds
     /// <summary>A confirmation's button that changes nothing.</summary>
     public const string ConfirmNo = "confirm_no";
 
+    /// <summary>A notice dialog's one button, which closes it.</summary>
+    public const string NoticeOk = "notice_ok";
+
     /// <summary>The game menu's Status tab.</summary>
     public const string MenuStatus = "menu_status";
 

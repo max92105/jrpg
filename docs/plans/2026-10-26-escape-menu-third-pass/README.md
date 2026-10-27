@@ -59,7 +59,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **IT2. The pointer stays on the sidebar while the item has copies left** (Game, about 140 lines) → [slices/IT2.md](slices/IT2.md)
 - [x] **IT3. The aimed cards show HP now and after (`FieldItemUse.HpAfterUse`)** (Core + Game, about 210 lines) → [slices/IT3.md](slices/IT3.md)
 - [x] **C2. Dialog buttons: `ConfirmPromptView`'s button drawing moves to `Ui/DialogButtonView`** (Game, mechanical, about 80 lines) → [slices/C2.md](slices/C2.md)
-- [ ] **PD1. The Party page's refusals open a titled framed dialog with one OK** (Game, about 230 lines) → [slices/PD1.md](slices/PD1.md)
+- [x] **PD1. The Party page's refusals open a titled framed dialog with one OK** (Game, about 230 lines) → [slices/PD1.md](slices/PD1.md)
 
 ### Phase 3: walk-through
 - [ ] **Z. Menu walk-through against the reference and the 2026-10-26 captures** (manual) → [slices/Z.md](slices/Z.md)

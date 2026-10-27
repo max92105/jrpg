@@ -23,4 +23,10 @@ slice (M2a) still cited "BattleStateTests (lines 225-354)"; grep pending slices 
 Same when a type gains a new trigger (P4b): PartyMember.Sheet still said "Rebuilt on level-up" once Wear/TakeOff rebuilt it
 too; reread the summary of every property a new call site writes.
 Same for docs/map.md (S1a): adding a type to a feature line left the neighbouring type's description listing the removed sections; reread the whole edited map line.
+Same for a renamed id (M1b: StatAttack -> StatWeaponDamage): test names (`Of_AttackUp_...`) and locals (`var attack`)
+kept the old word; grep the old word in the tests that use the new id.
+Same when a mechanic stops being read (M2b-1: battle stops reading defense): "until the plan's X" docs and "while the
+battle uses it" (CombatStats, StatComparison, StatusSheet) turn false; grep the slice id and "while ... uses" wording.
+Same when a record gains a field (M2b-2: StatSheet.AttackDamage): the summary listing what it holds on its owner
+(PartyMember.Sheet "primaries, max HP, speed and the derived percents") misses it; reread "X, Y and Z" summaries.
 Related: [[tautological-tests]].

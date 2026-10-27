@@ -46,3 +46,9 @@ Seen again in stats P3b (constant-oracle variant): clamp tests assert `Resistanc
 Seen again in stats E1 (copied-wiring variant): `EquipmentChoiceTests.Comparison_*` rebuild `EquipmentComparison.ShowChoice`'s before/after pairing by hand, so a swap in the real presenter passes; same shape as 11g's oracle. When a test builds the inputs the way the code under test does, ask it to call that code.
 
 Seen again in class-mechanics RG4 (same-end-state variant): `Update_AfterReady_SameMemberStepsForwardAgain` asserts the rogue awaits a command, but a non-quick Ready also ends there (goblin acts, then the readied turn). Ask which state differs between the two paths (`UpcomingActors`).
+
+Seen again in stats M1a (neutral-rules variant): `AttackEffect.Of` scales by Power, but every `AttackCommand` test runs under `TestStatRules.Neutral` (DamagePercentPer100Power 0, permille 1000), so removing the scaling keeps the suite green. When a slice adds a multiplier, check at least one test per call site runs with a non-neutral rate.
+
+Seen again in stats M2a (fixture-default variant): builder defense default 5 → 0 left
+`Execute_PoisonedActorEndsTurn_LosesPowerIgnoringDefenseAndExposed` with a defense-0 hero, so "IgnoringDefense" became
+vacuous. When a builder default changes, grep test names for the stat's word and check each still sets a non-zero value.

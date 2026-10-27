@@ -182,6 +182,15 @@ internal static partial class UiTheme
     /// <summary>A stat that goes down in a preview.</summary>
     public static Color Negative { get; } = FromStraightArgb(0xFF8C909A);
 
+    /// <summary>A previewed value's color: rising, dropping, or unchanged.</summary>
+    /// <param name="change">The previewed value minus the current one.</param>
+    public static Color PreviewColorOf(int change) => change switch
+    {
+        > 0 => Positive,
+        < 0 => Negative,
+        _ => TextPrimary,
+    };
+
     /// <summary>A save that failed, a fallen member's HP in battle.</summary>
     public static Color Danger { get; } = FromStraightArgb(0xFFE0524A);
 

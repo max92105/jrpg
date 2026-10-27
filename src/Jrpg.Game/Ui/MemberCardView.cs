@@ -8,9 +8,9 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// Draws one member as a card: the portrait, here in the reference UI's diamond, then
-/// the name with a "Leader" badge, the level at the right, the class, and the HP bar with its value. The card
-/// fills the width it's given, so the same card fits a Party column or the item target picker's.
+/// Draws one member as a card: the portrait, here in the reference UI's diamond, then the name with a "Leader" badge,
+/// the level at the right, the class, and the HP bar with its value, or the HP an aimed item would leave. The card
+/// fills the width it's given, so the same card fits a Party column or the Inventory's sidebar.
 /// </summary>
 internal sealed class MemberCardView
 {
@@ -34,6 +34,10 @@ internal sealed class MemberCardView
     private const int BarHeight = 6;
     private const int BadgeGap = 10;
     private const int BadgePadding = 4;
+
+    // An HP preview's mark between the two values: Equipment's 6 px preview diamond, its center 12 px from each value.
+    private const int PreviewMarkSide = 6;
+    private const int PreviewMarkSpacing = 12;
 
     private readonly IReadOnlyDictionary<string, ClassDefinition> _classes;
     private readonly ScreenText _text;
@@ -79,9 +83,17 @@ internal sealed class MemberCardView
             vitals);
     }
 
+    /// <summary>Measures an HP preview in the card's value font, once, when it changes.</summary>
+    /// <param name="hp">The member's HP now.</param>
+    /// <param name="hpAfter">The HP an item would leave, from Core.</param>
+    public HpPreview HpPreviewOf(int hp, int hpAfter) => new(
+        MeasuredText.Of(_valueFont, NumberText.Of(hp)),
+        MeasuredText.Of(_valueFont, NumberText.Of(hpAfter)),
+        UiTheme.PreviewColorOf(hpAfter - hp));
+
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the shared textures are made.</param>
-    /// <param name="place">The card, where it goes, and whether it's selected.</param>
+    /// <param name="place">The card, where it goes, whether it's selected, and its HP preview, if any.</param>
     /// <param name="opacity">0 to 1, while the menu fades in.</param>
     public void Draw(SpriteBatch batch, TextureLibrary textures, Place place, float opacity)
     {
@@ -103,7 +115,7 @@ internal sealed class MemberCardView
         var classTop = text.Y + _nameFont.LineHeight;
         batch.DrawString(_captionFont, card.ClassName, new Vector2(text.X, classTop), UiTheme.TextSecondary * opacity);
         var barsTop = (int)(classTop + _captionFont.LineHeight + ClassGap);
-        DrawBarRow(batch, textures, card.Vitals.Hp, new BarRow(_hpLabel, text.X, barsTop, text.Width), opacity);
+        DrawBarRow(batch, textures, new BarRow(_hpLabel, text.X, barsTop, text.Width), new BarValue(card.Vitals.Hp, place.Preview), opacity);
     }
 
     // The name, the leader's badge after it, and the level at the right.
@@ -125,19 +137,41 @@ internal sealed class MemberCardView
         batch.DrawString(_badgeFont, _leaderBadge.Text, new Vector2(badge.X + BadgePadding, badge.Y + 1), UiTheme.TextSecondary * opacity);
     }
 
-    // The label and the bar centered on the value's line, the large number beside them.
-    private void DrawBarRow(SpriteBatch batch, TextureLibrary textures, VitalMeter meter, BarRow row, float opacity)
+    // The label and the bar centered on the value's line, the large value beside them: "now / max", or with a preview
+    // "now ◆ after" in the same column, so the bar keeps its length.
+    private void DrawBarRow(SpriteBatch batch, TextureLibrary textures, BarRow row, BarValue value, float opacity)
     {
         var labelTop = row.Top + ((_valueFont.LineHeight - _captionFont.LineHeight) / 2);
         batch.DrawString(_captionFont, row.Label, new Vector2(row.Left, labelTop), UiTheme.TextSecondary * opacity);
         var barTop = row.Top + ((int)_valueFont.LineHeight - BarHeight) / 2;
         var barWidth = row.Width - BarLabelColumn - BarValueColumn;
-        meter.Bar.Draw(batch, textures, new Rectangle(row.Left + BarLabelColumn, barTop, barWidth, BarHeight), opacity);
-        batch.DrawString(_valueFont, meter.Value.Text, new Vector2(row.Left + row.Width - meter.Value.Width, row.Top), UiTheme.TextPrimary * opacity);
+        value.Meter.Bar.Draw(batch, textures, new Rectangle(row.Left + BarLabelColumn, barTop, barWidth, BarHeight), opacity);
+        var valueRight = new Vector2(row.Left + row.Width, row.Top);
+        if (value.Preview is { } preview)
+        {
+            DrawHpPreview(batch, textures.Pixel, preview, valueRight, opacity);
+            return;
+        }
+
+        batch.DrawString(_valueFont, value.Meter.Value.Text, valueRight - new Vector2(value.Meter.Value.Width, 0), UiTheme.TextPrimary * opacity);
+    }
+
+    // Right-aligned from the value column's right edge: the after value, the mark, then the current HP.
+    private void DrawHpPreview(SpriteBatch batch, Texture2D pixel, HpPreview preview, Vector2 right, float opacity)
+    {
+        var after = right - new Vector2(preview.After.Width, 0);
+        batch.DrawString(_valueFont, preview.After.Text, after, preview.Color * opacity);
+        var markCenter = new Vector2(after.X - PreviewMarkSpacing, after.Y + (_valueFont.LineHeight / 2f));
+        new Diamond(markCenter, PreviewMarkSide).Draw(batch, pixel, UiTheme.TextSecondary * opacity);
+        var now = new Vector2(markCenter.X - PreviewMarkSpacing - preview.Now.Width, right.Y);
+        batch.DrawString(_valueFont, preview.Now.Text, now, UiTheme.TextPrimary * opacity);
     }
 
     // One bar row's label and where it goes.
     private readonly record struct BarRow(string Label, int Left, int Top, int Width);
+
+    // One bar row's meter, and the preview that replaces its value, if any.
+    private readonly record struct BarValue(VitalMeter Meter, HpPreview? Preview);
 
     /// <summary>One member's card, formatted when what it shows changes.</summary>
     public sealed record Card(
@@ -148,6 +182,9 @@ internal sealed class MemberCardView
         string PortraitFile,
         MemberVitalBars Vitals);
 
-    /// <summary>Where a card goes this frame, and whether it's selected.</summary>
-    public readonly record struct Place(Card Card, Rectangle Area, bool IsSelected);
+    /// <summary>
+    /// Where a card goes this frame, whether it's selected, and the HP preview shown in place of its HP value; null
+    /// when no item is aimed at the card.
+    /// </summary>
+    public readonly record struct Place(Card Card, Rectangle Area, bool IsSelected, HpPreview? Preview);
 }

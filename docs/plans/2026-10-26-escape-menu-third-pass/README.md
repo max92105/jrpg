@@ -57,7 +57,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **TB1b. The icon rail's look: icons centered in the rail, labels gone by halfway, the selected tab on the rail** (Game, about 120 lines) → [slices/TB1b.md](slices/TB1b.md)
 - [x] **IT1. Using an item aims at the sidebar's cards; the "Use item" band goes** (Game, about 220 lines) → [slices/IT1.md](slices/IT1.md)
 - [x] **IT2. The pointer stays on the sidebar while the item has copies left** (Game, about 140 lines) → [slices/IT2.md](slices/IT2.md)
-- [ ] **IT3. The aimed cards show HP now and after (`FieldItemUse.HpAfterUse`)** (Core + Game, about 210 lines) → [slices/IT3.md](slices/IT3.md)
+- [x] **IT3. The aimed cards show HP now and after (`FieldItemUse.HpAfterUse`)** (Core + Game, about 210 lines) → [slices/IT3.md](slices/IT3.md)
 - [ ] **C2. Dialog buttons: `ConfirmPromptView`'s button drawing moves to `Ui/DialogButtonView`** (Game, mechanical, about 80 lines) → [slices/C2.md](slices/C2.md)
 - [ ] **PD1. The Party page's refusals open a titled framed dialog with one OK** (Game, about 230 lines) → [slices/PD1.md](slices/PD1.md)
 

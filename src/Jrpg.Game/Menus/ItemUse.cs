@@ -36,6 +36,13 @@ internal sealed class ItemUse
     /// <summary>The footer's line while aiming, naming the item; formatted once when aiming starts.</summary>
     public string? Hint => _aim?.Hint;
 
+    /// <summary>The HP the aimed item would leave <paramref name="member"/> with, as Core works it out.</summary>
+    /// <param name="member">One of <see cref="Picker"/>'s candidates.</param>
+    /// <exception cref="InvalidOperationException">No item is aimed.</exception>
+    /// <exception cref="KeyNotFoundException">The member can't take the item.</exception>
+    public int HpAfter(PartyMember member) =>
+        (_aim ?? throw new InvalidOperationException("No item is aimed, so there is no HP to preview.")).HpAfter[member];
+
     /// <summary>Starts aiming at the sidebar, or uses a rest item at once: it takes the whole party.</summary>
     /// <returns>What happened when the item was used at once; null when aiming started.</returns>
     /// <exception cref="InvalidOperationException">The item can't be used now (<see cref="FieldItemUse.CanUse"/>).</exception>
@@ -52,9 +59,8 @@ internal sealed class ItemUse
             return _messages.Text(MessageIds.PartyRests);
         }
 
-        var picker = PickerFor(item);
         var hint = _messages.Format(MessageIds.MenuHintInventoryTarget, new MessageArgument("item", item.Name));
-        _aim = new Aim(item, picker, hint);
+        _aim = AimFor(item, hint);
         return null;
     }
 
@@ -94,14 +100,21 @@ internal sealed class ItemUse
             return;
         }
 
-        var picker = PickerFor(aim.Item);
-        picker.PointAt(lastTarget);
-        _aim = aim with { Picker = picker };
+        var aimAgain = AimFor(aim.Item, aim.Hint);
+        aimAgain.Picker.PointAt(lastTarget);
+        _aim = aimAgain;
     }
 
-    // In the party sidebar's order, so the pointer lands on the card it names.
-    private ItemTargetPicker PickerFor(ItemDefinition item) =>
-        new(MemberOrder.ActiveThenReserve(_party), _fieldItems.TargetChoiceForAnyUser(item));
+    // In the party sidebar's order, so the pointer lands on the card it names; each candidate's HP after the item is
+    // Core's, asked once here so the previews (decision 287) follow every use.
+    private Aim AimFor(ItemDefinition item, string hint)
+    {
+        var picker = new ItemTargetPicker(MemberOrder.ActiveThenReserve(_party), _fieldItems.TargetChoiceForAnyUser(item));
+        var hpAfter = picker.Members
+            .Where(picker.IsCandidate)
+            .ToDictionary(member => member, member => FieldItemUse.HpAfterUse(item, member));
+        return new Aim(item, picker, hint, hpAfter);
+    }
 
     private string ResultFor(ItemDefinition item, PartyMember target, int amount)
     {
@@ -119,6 +132,6 @@ internal sealed class ItemUse
                 MessageArgument.Number("amount", amount));
     }
 
-    // The item being aimed, who at, and the footer's line naming it; set and cleared together.
-    private sealed record Aim(ItemDefinition Item, ItemTargetPicker Picker, string Hint);
+    // The item aimed, who at, the footer's line naming it, each candidate's HP after it; set and cleared together.
+    private sealed record Aim(ItemDefinition Item, ItemTargetPicker Picker, string Hint, IReadOnlyDictionary<PartyMember, int> HpAfter);
 }

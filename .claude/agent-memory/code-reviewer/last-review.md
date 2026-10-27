@@ -5,10 +5,8 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-25-ui-second-pass/slices/MO2a.md, slice MO2a (SelectionGlide on tabs and title; title pointer bob)
+Slice: docs/plans/2026-10-26-escape-menu-third-pass/slices/IT3.md, slice IT3 (aimed cards show HP now and after; FieldItemUse.HpAfterUse)
 Round: 1 (verdict: Ready to commit)
 
-- W1 SelectionGlide.Follow — the doc says "jumps on a wrap" but the code jumps on any move of more than one row; a ListCursor skipping a disabled row (MO2b lists) would jump instead of gliding; fix doc or make Follow wrap-aware before MO2b; open
-- W2 SelectionGlideTests — no test that Follow(same row) mid-glide leaves the glide running (called every update; removing the guard freezes the highlight); open
-- S1 TitleScene — row pitch EntryRowHeight + EntryGap now computed in two places; a RowPitch const; open
-- S2 SelectionGlideTests — missing blank line before Follow_NeighbouringRow_Glides; open
+- S1 PartySidebarView.FormatChangedPreviews — "candidates get a preview, the others none" has no test; a headless PartySidebarView test (as MemberCardViewTests builds MemberCardView) could pin it; open
+- S2 PartySidebarView — previews refresh keyed on Picker reference, relying on ItemUse building a new picker in every AimFor; comment states it; key on the aim's HP-after lookup if that ever changes; open

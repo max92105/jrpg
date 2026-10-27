@@ -7,15 +7,8 @@ namespace Jrpg.Game.Menus;
 internal sealed record StatPreviewText(StatPreviewText.PreviewValue Attack, StatPreviewText.PreviewValue Defense)
 {
     public static StatPreviewText Of(StatPreview preview) => new(
-        new PreviewValue(NumberText.Of(preview.WithItem.Attack), ColorOf(preview.AttackChange)),
-        new PreviewValue(NumberText.Of(preview.WithItem.Defense), ColorOf(preview.DefenseChange)));
-
-    private static Color ColorOf(int change) => change switch
-    {
-        > 0 => UiTheme.Positive,
-        < 0 => UiTheme.Negative,
-        _ => UiTheme.TextPrimary,
-    };
+        new PreviewValue(NumberText.Of(preview.WithItem.Attack), UiTheme.PreviewColorOf(preview.AttackChange)),
+        new PreviewValue(NumberText.Of(preview.WithItem.Defense), UiTheme.PreviewColorOf(preview.DefenseChange)));
 
     /// <summary>One previewed value and its color.</summary>
     public sealed record PreviewValue(string Text, Color Color);

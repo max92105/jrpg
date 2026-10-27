@@ -35,7 +35,6 @@ internal sealed class InventoryPage : IMenuPage
     private readonly SpriteFontBase _bodyFont;
     private readonly string _listHint;
     private readonly string _railHint;
-    private readonly ItemUse _itemUse;
     private readonly SelectionMotion _selection = new();
     private ListCursor? _rowCursor;
     private InventoryRow[] _rows = [];
@@ -56,7 +55,7 @@ internal sealed class InventoryPage : IMenuPage
         _columnView = new InventoryColumnView(text, ui, _bodyFont, _rail.Tabs);
         Sidebar = new PartySidebar(session.Party);
         _sidebarView = new PartySidebarView(Sidebar, new MemberCardView(text, ui, catalog), text, ui);
-        _itemUse = new ItemUse(session, text.Messages);
+        ItemUse = new ItemUse(session, text.Messages);
         ShowRowsFrom(0);
     }
 
@@ -64,10 +63,10 @@ internal sealed class InventoryPage : IMenuPage
 
     public TabGlyph Glyph => TabGlyph.Items;
 
-    public string Hint => _itemUse.Hint ?? (_rail.HasCursor ? _railHint : _listHint);
+    public string Hint => ItemUse.Hint ?? (_rail.HasCursor ? _railHint : _listHint);
 
     /// <summary>False while choosing who to use an item on: Cancel closes that instead.</summary>
-    public bool LeavesOnCancel => !_itemUse.IsOpen;
+    public bool LeavesOnCancel => !ItemUse.IsOpen;
 
     public InventoryCategory Category => _rail.Category;
 
@@ -84,13 +83,16 @@ internal sealed class InventoryPage : IMenuPage
     public string? Notice => _detail.Notice;
 
     /// <summary>Whether the player is choosing who to use an item on.</summary>
-    public bool IsChoosingTarget => _itemUse.IsOpen;
+    public bool IsChoosingTarget => ItemUse.IsOpen;
 
     /// <summary>Where the list's highlight is, in rows from the top of the visible window.</summary>
     internal float SelectionPosition => _selection.Position;
 
     /// <summary>The party's cards beside the list (decision 266).</summary>
     internal PartySidebar Sidebar { get; }
+
+    /// <summary>The item being used, while it aims at the sidebar's cards, and the HP it would leave each.</summary>
+    internal ItemUse ItemUse { get; }
 
     public void Open()
     {
@@ -107,24 +109,24 @@ internal sealed class InventoryPage : IMenuPage
     public SceneRequest? Update(InputFrame input)
     {
         UpdateInput(input);
-        Sidebar.Refresh(_itemUse.Picker?.Pointed);
+        Sidebar.Refresh(ItemUse.Picker?.Pointed);
         return null;
     }
 
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
         var listArea = area with { Width = area.Width - SidebarWidth - SidebarGap };
-        var column = new InventoryColumnView.Place(_rail, _rows, _rowCursor, !_rail.HasCursor && !_itemUse.IsOpen, _selection, listArea, DetailText());
+        var column = new InventoryColumnView.Place(_rail, _rows, _rowCursor, !_rail.HasCursor && !ItemUse.IsOpen, _selection, listArea, DetailText());
         _columnView.Draw(batch, textures, column, opacity);
         var sidebar = area with { X = area.Right - SidebarWidth, Width = SidebarWidth };
-        _sidebarView.Draw(batch, textures, new PartySidebarView.Place(sidebar, _itemUse.Picker), opacity);
+        _sidebarView.Draw(batch, textures, new PartySidebarView.Place(sidebar, ItemUse), opacity);
     }
 
     private void UpdateInput(InputFrame input)
     {
-        if (_itemUse.IsOpen)
+        if (ItemUse.IsOpen)
         {
-            if (_itemUse.Update(input) is { } result)
+            if (ItemUse.Update(input) is { } result)
             {
                 _detail.ShowNotice(result);
                 ShowRowsFrom(_rowCursor?.Selected ?? 0);
@@ -161,7 +163,7 @@ internal sealed class InventoryPage : IMenuPage
             return;
         }
 
-        if (_itemUse.UseOrPickTarget(_catalog.Items[_rows[_rowCursor.Selected].ItemId]) is { } result)
+        if (ItemUse.UseOrPickTarget(_catalog.Items[_rows[_rowCursor.Selected].ItemId]) is { } result)
         {
             _detail.ShowNotice(result);
             ShowRowsFrom(_rowCursor.Selected);

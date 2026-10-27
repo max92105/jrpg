@@ -115,7 +115,7 @@ internal sealed class PartyColumnsView
         {
             var card = CardArea(column.Area, index);
             var isSelected = index == column.SelectedRow;
-            _cardView.Draw(batch, textures, new MemberCardView.Place(column.Cards[members[index]], card, isSelected), opacity);
+            _cardView.Draw(batch, textures, new MemberCardView.Place(column.Cards[members[index]], card, isSelected, Preview: null), opacity);
             if (members[index] == column.Moving)
             {
                 DrawMovingOutline(batch, textures, card);

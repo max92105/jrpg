@@ -151,6 +151,48 @@ public sealed class InventoryPageAimTests
         Assert.Null(page.Sidebar.PointedIndex);
     }
 
+    [Fact]
+    public void Update_ConfirmPotionWithTheLeaderHurt_AimsWithTheLeadersHpAfter()
+    {
+        var session = NewSession();
+        var leader = session.Party.Leader;
+        leader.Vitals.TakeDamage(leader.Vitals.MaxHp / 2);
+        var page = NewOpenPage(session);
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        var hpAfter = FieldItemUse.HpAfterUse(StartMapScenarios.BelowClosedDoor.Items["potion"], leader);
+        Assert.True(hpAfter > leader.Vitals.Hp, "The test needs a potion that heals the hurt leader.");
+        Assert.Equal(hpAfter, page.ItemUse.HpAfter(leader));
+    }
+
+    [Fact]
+    public void Update_UsePotionWithCopiesLeft_HpAfterFollowsTheNewHp()
+    {
+        var session = NewSession();
+        var leader = session.Party.Leader;
+        leader.Vitals.TakeDamage(leader.Vitals.MaxHp - 1);
+        var page = NewOpenPage(session);
+        page.Update(Pressing(GameButton.Confirm));
+        var hpAfterFirst = page.ItemUse.HpAfter(leader);
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.Equal(hpAfterFirst, leader.Vitals.Hp);
+        Assert.True(leader.Vitals.Hp < leader.Vitals.MaxHp, "The test needs the leader still hurt after one potion.");
+        Assert.Equal(FieldItemUse.HpAfterUse(StartMapScenarios.BelowClosedDoor.Items["potion"], leader), page.ItemUse.HpAfter(leader));
+        Assert.True(page.ItemUse.HpAfter(leader) > hpAfterFirst);
+    }
+
+    [Fact]
+    public void HpAfter_NotAiming_Throws()
+    {
+        var session = NewSession();
+        var page = NewOpenPage(session);
+
+        Assert.Throws<InvalidOperationException>(() => page.ItemUse.HpAfter(session.Party.Leader));
+    }
+
     private static void SelectRow(InventoryPage page, string itemId)
     {
         while (page.ShownItemIds[page.SelectedRow!.Value] != itemId)

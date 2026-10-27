@@ -1,5 +1,6 @@
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
+using Jrpg.Core.Stats;
 
 namespace Jrpg.Core.Party;
 
@@ -101,8 +102,29 @@ public sealed class FieldItemUse(PartyState party, Inventory inventory)
         }
 
         inventory.TryRemove(item.Id, 1);
-        return [.. targets.Select(target => EffectResolver.Apply(effect, target.Vitals, target.TotalStats.Defense))];
+        return [.. targets.Select(target => Land(effect, target, target.Vitals))];
     }
+
+    /// <summary>
+    /// The HP <paramref name="target"/> would have after the item, without using it, so the menu can preview it. Who
+    /// may take the item isn't checked: <see cref="TargetChoiceForAnyUser"/> says that.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">The item has no effect, or is a rest item.</exception>
+    public static int HpAfterUse(ItemDefinition item, PartyMember target)
+    {
+        if (item.Effect is not { } effect || effect.Kind == EffectKind.Rest)
+        {
+            throw new InvalidOperationException($"{item.Name} lands on no single target (no effect, or a rest item).");
+        }
+
+        var preview = new Vitals(target.Vitals.Hp, target.Vitals.MaxHp);
+        Land(effect, target, preview);
+        return preview.Hp;
+    }
+
+    // Use and HpAfterUse land the effect the same way, so a preview can't drift from the use.
+    private static int Land(Effect effect, PartyMember target, Vitals vitals) =>
+        EffectResolver.Apply(effect, vitals, target.TotalStats.Defense);
 
     private static TargetRelation RelationOf(PartyMember user, PartyMember candidate) =>
         candidate == user ? TargetRelation.Self : TargetRelation.Ally;

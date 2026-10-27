@@ -18,6 +18,24 @@ public sealed class UiThemeTests
         Assert.Equal(new Color(17, 17, 21, 0xD9), UiTheme.NavFill);
     }
 
+    [Fact]
+    public void PreviewColorOf_Rise_IsPositive()
+    {
+        Assert.Equal(UiTheme.Positive, UiTheme.PreviewColorOf(1));
+    }
+
+    [Fact]
+    public void PreviewColorOf_Drop_IsNegative()
+    {
+        Assert.Equal(UiTheme.Negative, UiTheme.PreviewColorOf(-1));
+    }
+
+    [Fact]
+    public void PreviewColorOf_NoChange_IsPrimaryText()
+    {
+        Assert.Equal(UiTheme.TextPrimary, UiTheme.PreviewColorOf(0));
+    }
+
     [Theory]
     [InlineData("#5B8CFF")]
     [InlineData("#5b8cff")]

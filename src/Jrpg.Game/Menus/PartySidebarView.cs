@@ -8,8 +8,9 @@ namespace Jrpg.Game.Menus;
 /// <summary>
 /// Draws the party sidebar: the members' cards as the Party page draws them, on a darker column. The reserve follows
 /// under its own caption, dimmed (question 154); a small diamond at the top or bottom says cards are scrolled out of
-/// view. While an item is aimed (decision 267) the cards it can go to are lit at full opacity, reserve or not, the
-/// others faded, and the pointer is on the pointed card. A card is formatted again only when the sidebar replaced it.
+/// view. While an item is aimed (decision 267) the cards it can go to are lit at full opacity, reserve or not, with
+/// their HP now and after it (decision 287), the others faded, and the pointer is on the pointed card. A card is
+/// formatted again only when the sidebar replaced it, the previews only when the aim changed.
 /// </summary>
 internal sealed class PartySidebarView
 {
@@ -29,6 +30,8 @@ internal sealed class PartySidebarView
     private readonly MemberCardView _cardView;
     private readonly SectionTitle _reserveTitle;
     private readonly List<(SidebarCard Source, MemberCardView.Card Card)> _cards = [];
+    private readonly List<HpPreview?> _previews = [];
+    private ItemTargetPicker? _previewedPicker;
 
     /// <param name="sidebar">The cards to draw.</param>
     /// <param name="cardView">Formats and draws one member's card.</param>
@@ -49,6 +52,7 @@ internal sealed class PartySidebarView
     {
         var column = place.Column;
         FormatChangedCards();
+        FormatChangedPreviews(place.ItemUse);
         _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(column), opacity);
         var last = Math.Min(_cards.Count, _sidebar.FirstVisible + PartySidebar.VisibleCards);
         var top = column.Y + CueBand;
@@ -60,7 +64,7 @@ internal sealed class PartySidebarView
                 top += CaptionHeight;
             }
 
-            DrawCard(batch, textures, new CardSlot(index, new Rectangle(column.X, top, column.Width, MemberCardView.Height), place.Picker), opacity);
+            DrawCard(batch, textures, new CardSlot(index, new Rectangle(column.X, top, column.Width, MemberCardView.Height), place.ItemUse.Picker), opacity);
             top += MemberCardView.Height + CardGap;
         }
 
@@ -77,12 +81,12 @@ internal sealed class PartySidebarView
         if (slot.Picker is not { } picker)
         {
             var restingOpacity = card.IsReserve ? opacity * UiTheme.ReserveCardOpacity : opacity;
-            _cardView.Draw(batch, textures, new MemberCardView.Place(_cards[slot.Index].Card, slot.Area, IsSelected: false), restingOpacity);
+            _cardView.Draw(batch, textures, new MemberCardView.Place(_cards[slot.Index].Card, slot.Area, IsSelected: false, Preview: null), restingOpacity);
             return;
         }
 
         var aimedOpacity = picker.IsCandidate(card.Member) ? opacity : opacity * UnavailableOpacity;
-        _cardView.Draw(batch, textures, new MemberCardView.Place(_cards[slot.Index].Card, slot.Area, picker.IsSelected(card.Member)), aimedOpacity);
+        _cardView.Draw(batch, textures, new MemberCardView.Place(_cards[slot.Index].Card, slot.Area, picker.IsSelected(card.Member), _previews[slot.Index]), aimedOpacity);
         if (slot.Index == _sidebar.PointedIndex)
         {
             MenuPointer.Draw(batch, textures.Pixel, new Vector2(slot.Area.X, slot.Area.Center.Y), opacity);
@@ -125,11 +129,34 @@ internal sealed class PartySidebarView
         }
     }
 
+    // ItemUse builds a new picker when aiming starts and after each use, so a new picker means new HP to preview, on
+    // every card the item can go to (decision 287).
+    private void FormatChangedPreviews(ItemUse itemUse)
+    {
+        if (ReferenceEquals(itemUse.Picker, _previewedPicker))
+        {
+            return;
+        }
+
+        _previewedPicker = itemUse.Picker;
+        _previews.Clear();
+        if (itemUse.Picker is not { } picker)
+        {
+            return;
+        }
+
+        foreach (var card in _sidebar.Cards)
+        {
+            var member = card.Member;
+            _previews.Add(picker.IsCandidate(member) ? _cardView.HpPreviewOf(member.Vitals.Hp, itemUse.HpAfter(member)) : null);
+        }
+    }
+
     // One card's index in the sidebar, where it's drawn, and the item being aimed, if any.
     private readonly record struct CardSlot(int Index, Rectangle Area, ItemTargetPicker? Picker);
 
     /// <summary>Where the sidebar goes this frame.</summary>
     /// <param name="Column">The sidebar's column, in virtual-screen pixels.</param>
-    /// <param name="Picker">Who the item being used can go to; null while no item is aimed.</param>
-    public readonly record struct Place(Rectangle Column, ItemTargetPicker? Picker);
+    /// <param name="ItemUse">The item in use: who it can go to and the HP it would leave, while it is aimed.</param>
+    public readonly record struct Place(Rectangle Column, ItemUse ItemUse);
 }

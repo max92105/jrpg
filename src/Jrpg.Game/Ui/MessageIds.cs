@@ -215,6 +215,19 @@ internal static class MessageIds
 
     public const string SlotChest = "slot_chest";
 
+    public const string SlotOffHand = "slot_off_hand";
+
+    public const string SlotHead = "slot_head";
+
+    public const string SlotHands = "slot_hands";
+
+    public const string SlotFeet = "slot_feet";
+
+    public const string SlotAmulet = "slot_amulet";
+
+    /// <summary>Both ring slots' label (ADR 0028).</summary>
+    public const string SlotRing = "slot_ring";
+
     /// <summary>Shown for an equipment slot with nothing worn.</summary>
     public const string SlotEmpty = "slot_empty";
 

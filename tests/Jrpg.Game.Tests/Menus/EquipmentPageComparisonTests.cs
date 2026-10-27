@@ -1,3 +1,4 @@
+using Jrpg.Core.Items;
 using Jrpg.Core.Session;
 using Jrpg.Core.Stats;
 using Jrpg.Game.Input;
@@ -10,7 +11,7 @@ using static Jrpg.Game.Tests.Input.InputFrames;
 namespace Jrpg.Game.Tests.Menus;
 
 // The Changes section (decision 337): with a choice open, what the highlighted item would change; with none, what the
-// highlighted slot's worn item gives. The rows are Weapon, Chest, then Remove all; the leader starts wearing nothing.
+// highlighted slot's worn item gives. The rows are the nine slots, then Remove all; the leader starts wearing nothing.
 [Collection(RepositoryScreenText.CollectionName)]
 public sealed class EquipmentPageComparisonTests
 {
@@ -20,7 +21,7 @@ public sealed class EquipmentPageComparisonTests
     public void Update_ChoiceHighlightsChainMail_ComparesItsResistances()
     {
         var page = NewPage();
-        page.Update(Pressing(GameButton.Down));
+        EquipmentPageRows.MoveDown(page, EquipmentPageRows.Of(EquipmentSlot.Chest));
         page.Update(Pressing(GameButton.Confirm));
 
         while (page.Choice!.Highlighted?.Id != "chain_mail")
@@ -39,7 +40,7 @@ public sealed class EquipmentPageComparisonTests
         WearChainMail();
         var page = NewPage();
 
-        page.Update(Pressing(GameButton.Down));
+        EquipmentPageRows.MoveDown(page, EquipmentPageRows.Of(EquipmentSlot.Chest));
 
         var constitution = Assert.Single(page.Comparison!.Changes, change => change.Kind == StatKind.Constitution);
         Assert.Equal(StartMapScenarios.BelowClosedDoor.Items["chain_mail"].Equipment!.Bonuses.Of(StatKind.Constitution), constitution.After - constitution.Before);
@@ -60,10 +61,10 @@ public sealed class EquipmentPageComparisonTests
     {
         WearChainMail();
         var page = NewPage();
-        page.Update(Pressing(GameButton.Down));
+        EquipmentPageRows.MoveDown(page, EquipmentPageRows.Of(EquipmentSlot.Chest));
         Assert.NotNull(page.Comparison);
 
-        page.Update(Pressing(GameButton.Down));
+        EquipmentPageRows.MoveDown(page, EquipmentPageRows.RemoveAll - EquipmentPageRows.Of(EquipmentSlot.Chest));
 
         Assert.Null(page.Comparison);
     }

@@ -11,15 +11,32 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed record EquipmentSheet(string Name, ImmutableArray<ItemDefinition?> Worn)
 {
-    /// <summary>The page's slot rows, in order, before "Remove all".</summary>
-    public static ImmutableArray<EquipmentSlot> Slots { get; } = [EquipmentSlot.Weapon, EquipmentSlot.Chest];
+    /// <summary>The page's slot rows, in order, before "Remove all" (ADR 0028); both ring slots read "Ring".</summary>
+    public static ImmutableArray<EquipmentSlot> Slots { get; } =
+    [
+        EquipmentSlot.Weapon,
+        EquipmentSlot.OffHand,
+        EquipmentSlot.Head,
+        EquipmentSlot.Chest,
+        EquipmentSlot.Hands,
+        EquipmentSlot.Feet,
+        EquipmentSlot.Amulet,
+        EquipmentSlot.FirstRing,
+        EquipmentSlot.SecondRing,
+    ];
 
     public static EquipmentSheet Of(PartyMember member) => new(member.Definition.Name, [.. Slots.Select(member.EquippedIn)]);
 
     public static string LabelIdOf(EquipmentSlot slot) => slot switch
     {
         EquipmentSlot.Weapon => MessageIds.SlotWeapon,
+        EquipmentSlot.OffHand => MessageIds.SlotOffHand,
+        EquipmentSlot.Head => MessageIds.SlotHead,
         EquipmentSlot.Chest => MessageIds.SlotChest,
+        EquipmentSlot.Hands => MessageIds.SlotHands,
+        EquipmentSlot.Feet => MessageIds.SlotFeet,
+        EquipmentSlot.Amulet => MessageIds.SlotAmulet,
+        EquipmentSlot.FirstRing or EquipmentSlot.SecondRing => MessageIds.SlotRing,
         _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, null),
     };
 }

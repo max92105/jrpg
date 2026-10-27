@@ -17,3 +17,9 @@ Part of [the stats and gear slots plan](../README.md). Decisions 252, 298. Desig
   - **Size:** raw about 70 (view 45, sheet and page 10, messages 15); the view part at 1.6x (45 → 72): about 100; 3 tests about 40; changed tests about 10: about 150.
   - **Verify by hand:** nine rows and "Remove all" fit with the Changes section; the selection glides through all ten; Esc closes a choice. F12.
 - **Done, with deviations:**
+  - **Rows 40 px, not 48:** with 48 px rows the Changes section's four lines, its "+N more" line and the notice ran to about 936 px. At 40 px rows, 40 px Changes lines and a 12 px notice gap (24 before), the page ends near 842 of 848; the arithmetic is in `EquipmentSheetView`'s layout comment. E2 redoes the look anyway.
+  - **Tests pick rows by slot:** a new `EquipmentPageRows` test helper (`Of(slot)`, `RemoveAll`, `MoveDown(page, rows)`) replaced the fixed Down presses in `EquipmentPageTests` and `EquipmentPageComparisonTests`; three comparison tests had counted to the chest row, and one of them looped forever on the empty off-hand choice once the rows moved. `Update_RemoveAll_EmptiesBothSlots` became `Update_RemoveAll_EmptiesEverySlot` (a ring in the second ring slot too).
+  - **The ring test** reads a catalog copy with a test ring, since content has none until G2.
+  - **Tests:** `EquipmentSheetTests` 1, `EquipmentPageTests` 1 new and 1 widened. Count: 2,568 → 2,570.
+  - **Hand check (yours):** nine rows and "Remove all" fit with the Changes section; the selection glides through all ten; Esc closes a choice. F12 a capture: the rows are tighter than before until E2.
+  - **Follow-up (reviewer):** a hand-built `power_ring` item now lives in three test files (`EquipmentPageTests`, `FileSaveStoreTests`, `SaveGameRepairWornTests`); Core's `ItemDefinitionBuilder` can't be reached from the Game and Data test projects. G2 puts a real ring in content, so the three can read it from the catalog then.

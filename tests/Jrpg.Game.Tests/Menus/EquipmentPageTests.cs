@@ -29,17 +29,37 @@ public sealed class EquipmentPageTests
     }
 
     [Fact]
-    public void Update_RemoveAll_EmptiesBothSlots()
+    public void Update_RemoveAll_EmptiesEverySlot()
     {
         var sarxian = WearingSwordAndArmor();
+        var ring = Gear("power_ring", EquipmentKind.Ring);
+        _session.Inventory.Add(ring, 1);
+        Assert.True(_session.Equipment.TryEquip(sarxian, ring, EquipmentSlot.SecondRing));
         var page = NewPage();
 
         ConfirmRemoveAll(page);
 
-        Assert.Null(sarxian.Weapon);
-        Assert.Null(sarxian.EquippedIn(EquipmentSlot.Chest));
+        Assert.All(EquipmentSheet.Slots, slot => Assert.Null(sarxian.EquippedIn(slot)));
         Assert.Equal(2, _session.Inventory.QuantityOf("bronze_sword"));
         Assert.Equal(2, _session.Inventory.QuantityOf("leather_armor"));
+        Assert.Equal(1, _session.Inventory.QuantityOf("power_ring"));
+    }
+
+    // The repository has no ring until G2, so the page reads a catalog with one added; the second ring row is the last
+    // slot row.
+    [Fact]
+    public void Update_ConfirmOnSecondRing_ListsOwnedRings()
+    {
+        var ring = Gear("power_ring", EquipmentKind.Ring);
+        var catalog = StartMapScenarios.BelowClosedDoor with { Items = new Dictionary<string, ItemDefinition>(StartMapScenarios.BelowClosedDoor.Items) { [ring.Id] = ring } };
+        _session.Inventory.Add(ring, 1);
+        var page = new EquipmentPage(RepositoryScreenText.Text, new UiTextures(), _session, catalog);
+        EquipmentPageRows.MoveDown(page, EquipmentPageRows.Of(EquipmentSlot.SecondRing));
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.True(page.IsChoosing);
+        Assert.Equal([ring], page.Choice!.Items);
     }
 
     [Fact]
@@ -245,13 +265,22 @@ public sealed class EquipmentPageTests
         page.Update(Pressing(GameButton.Down));
     }
 
-    // The rows are Weapon, Armor, then Remove all.
     private static void ConfirmRemoveAll(EquipmentPage page)
     {
-        page.Update(Pressing(GameButton.Down));
-        page.Update(Pressing(GameButton.Down));
+        EquipmentPageRows.MoveDown(page, EquipmentPageRows.RemoveAll);
         page.Update(Pressing(GameButton.Confirm));
     }
+
+    private static ItemDefinition Gear(string id, EquipmentKind kind) => new()
+    {
+        Id = id,
+        Name = id,
+        Description = "",
+        IconFile = "Armor.png",
+        MaxStack = 99,
+        IsUsableFromMenu = false,
+        Equipment = new EquipmentStats(kind),
+    };
 
     private EquipmentPage NewPage() => new(RepositoryScreenText.Text, new UiTextures(), _session, StartMapScenarios.BelowClosedDoor);
 }

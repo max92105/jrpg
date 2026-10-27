@@ -23,6 +23,20 @@ public sealed class EquipmentSheetTests
     }
 
     [Fact]
+    public void Of_Member_ListsNineSlotsInOrder()
+    {
+        var sheet = EquipmentSheet.Of(_session.Party.Leader);
+
+        EquipmentSlot[] expected =
+        [
+            EquipmentSlot.Weapon, EquipmentSlot.OffHand, EquipmentSlot.Head, EquipmentSlot.Chest, EquipmentSlot.Hands,
+            EquipmentSlot.Feet, EquipmentSlot.Amulet, EquipmentSlot.FirstRing, EquipmentSlot.SecondRing,
+        ];
+        Assert.Equal(expected, EquipmentSheet.Slots);
+        Assert.Equal(expected.Length, sheet.Worn.Length);
+    }
+
+    [Fact]
     public void Of_NothingWorn_EverySlotIsEmpty()
     {
         var sheet = EquipmentSheet.Of(_session.Party.Leader);

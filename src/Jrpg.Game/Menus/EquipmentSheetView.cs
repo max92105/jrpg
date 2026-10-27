@@ -14,30 +14,33 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class EquipmentSheetView
 {
-    // Placeholder layout (decision 82): a 28 x 20 margin, the member's name as a heading, section titles as dark bands
-    // (decision 335), 52 px rows (a 32 px icon in a 48 px column, the slot name, then what's worn), a hairline 10 px
-    // above "Remove all", and the Changes as two columns of four 46 px lines, values 320 px in (names run long).
+    // Placeholder layout (decision 82; E2 does the look): a 28 x 20 margin, the member's name as a heading, section
+    // titles as dark bands (decision 335), 40 px rows (a 32 px icon in a 48 px column, the slot name, then what's
+    // worn), a hairline 10 px above "Remove all", and the Changes as two columns of four 40 px lines, values 320 px in
+    // (names run long). The 848 px page: 20 + 60 + 46 to the first row, nine rows 360, the gap and "Remove all" 50, 18
+    // to the Changes band (554), its 46, four lines 160 and the "+N more" line 40 (800), then 12 to the notice, which
+    // ends near 842.
     private const int Margin = 28;
     private const int TopMargin = 20;
     private const int HeadingPixels = 30;
     private const int BodyPixels = 26;
     private const int EquipmentTop = 60;
     private const int SectionHeight = SectionTitle.Height + 10;
-    private const int RowHeight = 52;
+    private const int RowHeight = 40;
     private const int RowInset = 10;
     private const int IconColumn = 48;
     private const int IconSize = 32;
     private const int WornColumn = 260;
     private const int ActionGap = 10;
     private const int ChangesGap = 18;
-    private const int ChangeLineHeight = 46;
+    private const int ChangeLineHeight = 40;
     private const int ChangeLinesPerColumn = StatComparisonText.MostLines / 2;
     private const int ColumnGap = 40;
     private const int ChangeValueOffset = 320;
     private const int PreviewArrowGap = 90;
     private const int PreviewArrowSide = 6;
     private const int PreviewValueGap = 16;
-    private const int NoticeGap = 24;
+    private const int NoticeGap = 12;
 
     private readonly UiTextures _ui;
     private readonly SpriteFontBase _headingFont;
@@ -188,7 +191,7 @@ internal sealed class EquipmentSheetView
     /// <param name="Notice">Why the last change didn't happen, or null.</param>
     public readonly record struct Place(EquipmentSheet Sheet, Rectangle Area, SelectionMotion Selection, bool HasCursor, StatComparisonText? Changes, string? Notice);
 
-    // A slot's 52 px row: its label and what's worn there, null for nothing.
+    // A slot's row: its label and what's worn there, null for nothing.
     private readonly record struct SlotRow(Rectangle Row, string Label, ItemDefinition? Worn);
 
     // The Changes section: where it goes, and what it lists.

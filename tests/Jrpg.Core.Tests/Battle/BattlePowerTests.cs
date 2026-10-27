@@ -93,7 +93,7 @@ public sealed class BattlePowerTests
 
     private static (Combatant Goblin, BattleState Battle) Battle(Combatant member, Inventory inventory)
     {
-        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 200, attack: 20, defense: 0).Build());
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 200, attack: 20).Build());
         return (goblin, new BattleState([member, goblin], inventory, new FixedSequenceRandom(1)));
     }
 

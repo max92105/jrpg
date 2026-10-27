@@ -10,20 +10,19 @@ using Jrpg.Core.Tests.Randomness;
 
 namespace Jrpg.Core.Tests.Battle;
 
-// A hero against one goblin (25 HP, defense 2); the shuffle (1) keeps the listed order, the hero first.
-// Bash deals 15 - 2 = 13 damage and stuns for 2 turns; Jab deals 3 and stuns for 1; Quake does the same to every
-// enemy; Brace stuns the hero for 2 turns and changes no HP. A stunned combatant's turn is skipped within the Execute
-// that ends the turn before it.
+// A hero against one goblin (25 HP); the shuffle (1) keeps the listed order, the hero first. Bash deals 13 damage and
+// stuns for 2 turns; Jab deals 3 and stuns for 1; Quake does the same to every enemy; Brace stuns the hero for 2 turns
+// and changes no HP. A stunned combatant's turn is skipped within the Execute that ends the turn before it.
 public sealed class BattleStatusTests
 {
     private static readonly SkillDefinition _bash =
-        Skill("bash", new Effect(EffectKind.Damage, 15, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 2)));
+        Skill("bash", new Effect(EffectKind.Damage, 13, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 2)));
 
     private static readonly SkillDefinition _jab =
-        Skill("jab", new Effect(EffectKind.Damage, 5, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1)));
+        Skill("jab", new Effect(EffectKind.Damage, 3, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1)));
 
     private static readonly SkillDefinition _quake =
-        Skill("quake", new Effect(EffectKind.Damage, 5, Targeting.AllEnemies, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1)));
+        Skill("quake", new Effect(EffectKind.Damage, 3, Targeting.AllEnemies, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1)));
 
     private static readonly SkillDefinition _brace =
         Skill("brace", new Effect(EffectKind.GrantStatus, 0, Targeting.Self, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 2)));
@@ -253,17 +252,17 @@ public sealed class BattleStatusTests
     private static (Combatant Hero, BattleState Battle) GuardingHero(int turns)
     {
         var guard = Skill("guard", new Effect(EffectKind.GrantStatus, 0, Targeting.Self, new StatusGrant(StatusKind.Guarded, Power: 5, Turns: turns)));
-        var hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithSkills(guard).Build());
+        var hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithDefense(5).WithSkills(guard).Build());
         return (hero, new BattleState([hero, Goblin(hp: 25)], new Inventory(), new FixedSequenceRandom(1)));
     }
 
-    // The hero hits for 15 - 2 = 13; on an Exposed (+50 %) goblin that lands as 19, rounded down.
+    // The hero hits for 13; on an Exposed (+50 %) goblin that lands as 19, rounded down.
     [Fact]
     public void Execute_AttackOnExposed_DealsOneAndAHalf()
     {
         var goblin = Goblin(hp: 40);
         goblin.Statuses.Apply(new StatusGrant(StatusKind.Exposed, Power: 50, Turns: 3));
-        var hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithStats(attack: 15, defense: 5).Build());
+        var hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithAttack(13).Build());
         var battle = new BattleState([hero, goblin], new Inventory(), new FixedSequenceRandom(1));
 
         var events = battle.Execute(new AttackCommand(goblin));
@@ -274,7 +273,7 @@ public sealed class BattleStatusTests
     private BattleState Battle(Combatant goblin) => new([_hero, goblin], new Inventory(), new FixedSequenceRandom(1));
 
     private static Combatant Goblin(int hp) =>
-        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, attack: 20, defense: 2).Build());
+        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, attack: 20).Build());
 
     private static SkillDefinition Skill(string id, Effect effect) =>
         new() { Id = id, Name = id, Description = "", IconFile = "", Effect = effect };

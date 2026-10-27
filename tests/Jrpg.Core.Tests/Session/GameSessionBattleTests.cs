@@ -17,7 +17,7 @@ public sealed class GameSessionBattleTests
     private static readonly int[] _encounterThenSarxianFirst = [0, 0, 3, 2, 1];
 
     // One hit from Sarxian (attack 10) fells a goblin, and three goblins can't fell Sarxian (100 HP).
-    private static readonly EnemyDefinition _goblin = new EnemyDefinitionBuilder().WithStats(maxHp: 8, attack: 20, defense: 2).Build();
+    private static readonly EnemyDefinition _goblin = new EnemyDefinitionBuilder().WithStats(maxHp: 8, attack: 20).Build();
 
     [Fact]
     public void StartPendingBattle_NoEncounterPending_Throws()

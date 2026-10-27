@@ -8,7 +8,7 @@ internal sealed class EnemyDefinitionBuilder
     private string _name = "Goblin";
     private int _maxHp = 40;
     private int _attack = 20;
-    private int _defense = 2;
+    private int _defense;
     private DamageType _damageType = DamageType.Blunt;
     private Resistances _resistances = Resistances.None;
 
@@ -18,10 +18,16 @@ internal sealed class EnemyDefinitionBuilder
         return this;
     }
 
-    public EnemyDefinitionBuilder WithStats(int maxHp, int attack, int defense)
+    public EnemyDefinitionBuilder WithStats(int maxHp, int attack)
     {
         _maxHp = maxHp;
         _attack = attack;
+        return this;
+    }
+
+    /// <summary>For the tests about defense itself, until the plan's M2b; every other enemy has none.</summary>
+    public EnemyDefinitionBuilder WithDefense(int defense)
+    {
         _defense = defense;
         return this;
     }

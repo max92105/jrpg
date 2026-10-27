@@ -10,17 +10,17 @@ using Jrpg.Core.Tests.Randomness;
 
 namespace Jrpg.Core.Tests.Battle;
 
-// A monk whose Chakra (max 10) gains 1 per hit landed, against one goblin (defense 2); the shuffle (1) keeps the monk
-// first. Flurry hits 4 times for 8 - 2 = 6 and spends 3 chakra; Palm hits twice for 10 - 2 = 8.
+// A monk whose Chakra (max 10) gains 1 per hit landed, against one goblin; the shuffle (1) keeps the monk first. Flurry
+// hits 4 times for 6 and spends 3 chakra; Palm hits twice for 8.
 public sealed class BattleMultiHitTests
 {
     private static readonly ResourceDefinition _chakra =
         new("chakra", "Chakra", Max: 10) { Gains = new ResourceGains { PerHitLanded = 1 } };
 
     private static readonly SkillDefinition _flurry =
-        Skill("flurry", new Effect(EffectKind.Damage, 8, Targeting.SingleEnemy, Hits: 4), new ResourceChange("chakra", -3));
+        Skill("flurry", new Effect(EffectKind.Damage, 6, Targeting.SingleEnemy, Hits: 4), new ResourceChange("chakra", -3));
 
-    private static readonly SkillDefinition _palm = Skill("palm", new Effect(EffectKind.Damage, 10, Targeting.SingleEnemy, Hits: 2));
+    private static readonly SkillDefinition _palm = Skill("palm", new Effect(EffectKind.Damage, 8, Targeting.SingleEnemy, Hits: 2));
 
     [Fact]
     public void Execute_FourHits_ReportsFourEffectApplied()
@@ -110,7 +110,7 @@ public sealed class BattleMultiHitTests
             TestStatRules.Neutral));
 
     private static Combatant Goblin(int hp) =>
-        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, attack: 20, defense: 2).Build());
+        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, attack: 20).Build());
 
     private static SkillDefinition Skill(string id, Effect effect, params ResourceChange[] changes) =>
         new() { Id = id, Name = id, Description = "", IconFile = "", ResourceChanges = changes, Effect = effect };

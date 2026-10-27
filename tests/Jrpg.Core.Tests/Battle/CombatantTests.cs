@@ -25,7 +25,7 @@ public sealed class CombatantTests
     [Fact]
     public void FromPartyMember_EquippedMember_UsesTotalStatsOnPartySide()
     {
-        var member = new PartyMemberBuilder().WithClass("fighter").Build();
+        var member = new PartyMemberBuilder().WithClass("fighter").WithDefense(5).Build();
         var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(15).Build();
         var inventory = new Inventory();
         inventory.Add(sword, 1);
@@ -58,7 +58,7 @@ public sealed class CombatantTests
     [Fact]
     public void FromEnemy_StartsAtFullHp()
     {
-        var goblin = new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20, defense: 2).Build();
+        var goblin = new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20).Build();
 
         var combatant = Combatant.FromEnemy(goblin);
 
@@ -69,7 +69,7 @@ public sealed class CombatantTests
     [Fact]
     public void CurrentStats_NoStatus_EqualsStats()
     {
-        var combatant = Combatant.FromPartyMember(new PartyMemberBuilder().WithStats(attack: 10, defense: 5).Build());
+        var combatant = Combatant.FromPartyMember(new PartyMemberBuilder().WithAttack(10).Build());
 
         var current = combatant.CurrentStats;
 
@@ -111,7 +111,7 @@ public sealed class CombatantTests
     [Fact]
     public void FromEnemy_Always_HasNoResources()
     {
-        var goblin = new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20, defense: 2).Build();
+        var goblin = new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20).Build();
 
         var combatant = Combatant.FromEnemy(goblin);
 
@@ -121,7 +121,7 @@ public sealed class CombatantTests
     [Fact]
     public void FromEnemy_Definition_UsesItsStatsOnEnemySide()
     {
-        var goblin = new EnemyDefinitionBuilder().WithName("Goblin").WithStats(maxHp: 40, attack: 20, defense: 2).Build();
+        var goblin = new EnemyDefinitionBuilder().WithName("Goblin").WithStats(maxHp: 40, attack: 20).WithDefense(2).Build();
 
         var combatant = Combatant.FromEnemy(goblin);
 

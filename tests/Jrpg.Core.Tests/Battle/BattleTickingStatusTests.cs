@@ -10,14 +10,15 @@ using Jrpg.Core.Tests.Randomness;
 
 namespace Jrpg.Core.Tests.Battle;
 
-// A hero (100 HP, defense 5) against one goblin (attack 20, defense 2); the shuffle (1) keeps the hero first. The
-// statuses are applied straight onto their holder, so each is fresh when its holder's turn ends: it ticks anyway.
+// A hero (100 HP) against one goblin (attack 20); the shuffle (1) keeps the hero first. The statuses are applied
+// straight onto their holder, so each is fresh when its holder's turn ends: it ticks anyway.
 public sealed class BattleTickingStatusTests
 {
     [Fact]
     public void Execute_PoisonedActorEndsTurn_LosesPowerIgnoringDefenseAndExposed()
     {
-        var (hero, _, battle) = Battle(goblinHp: 25);
+        var hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithDefense(5).Build());
+        var battle = new BattleState([hero, Goblin(hp: 25)], new Inventory(), new FixedSequenceRandom(1));
         hero.Statuses.Apply(new StatusGrant(StatusKind.Exposed, Power: 50, Turns: 3));
         hero.Statuses.Apply(new StatusGrant(StatusKind.Poison, Power: 7, Turns: 3));
 
@@ -88,11 +89,11 @@ public sealed class BattleTickingStatusTests
         Assert.Equal(85, hero.Vitals.Hp);
     }
 
-    // Jab hits for 5 - 2 = 3 and stuns for one turn, so the goblin's next turn is skipped within the same Execute.
+    // Jab hits for 3 and stuns for one turn, so the goblin's next turn is skipped within the same Execute.
     [Fact]
     public void Execute_StunnedAndPoisoned_TicksOnSkippedTurn()
     {
-        var jab = Skill("jab", new Effect(EffectKind.Damage, 5, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1)));
+        var jab = Skill("jab", new Effect(EffectKind.Damage, 3, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1)));
         var (_, goblin, battle) = Battle(goblinHp: 25, jab);
         goblin.Statuses.Apply(new StatusGrant(StatusKind.Poison, Power: 4, Turns: 3));
 
@@ -148,7 +149,7 @@ public sealed class BattleTickingStatusTests
     }
 
     private static Combatant Goblin(int hp) =>
-        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, attack: 20, defense: 2).Build());
+        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, attack: 20).Build());
 
     private static SkillDefinition Skill(string id, Effect effect) =>
         new() { Id = id, Name = id, Description = "", IconFile = "", Effect = effect };

@@ -17,3 +17,23 @@ Part of [the stats and gear slots plan](../README.md). After M1, right before M2
   - **Tests:** none new; record the solution's test count before and after (same), the folded setups by file, and every re-pinned assertion with its old and new value.
   - **Verify by hand:** none.
 - **Done, with deviations:**
+  - **Count:** 2,478 tests before and after.
+  - **Builders:** every builder's defense defaults to 0: the enemy's (was 2), the member's and `ClassBuilder`'s (were 5). The member builder's attack is `WithAttack(attack)` (it wears a test weapon since M1a), not `WithStats(attack)`.
+  - **Folded setups:**
+    - `BattleStateTests`, `BattleStateOutcomeTests`, `BattleStateTargetTests`: the hero 15 → 13 and the goblin 20 → 12.
+    - `BattleMultiHitTests`: Flurry 8 → 6, Palm 10 → 8.
+    - `BattleStatusTests`: Bash 15 → 13, Jab and Quake 5 → 3, the Exposed hero 15 → 13.
+    - `BattleTickingStatusTests`: Jab 5 → 3.
+    - `BattleSkillAndItemTests`: Fireball 20 → 18.
+    - `BattleQuickActionTests`: Dash 10 → 8.
+    - Every other `WithStats(..., defense: n)` call just lost its defense; its test didn't depend on it.
+  - **Re-pinned** (defense leaves in M2b, so raw power lands whole):
+    - `BattleDominanceTests.Execute_DamageSkillWhileItsForceDominant_EffectPowerRaised`: 28 → 30. Defense came off after the +50 %, so a folded power would have been an odd 19.
+    - `BattleDominanceTests.Execute_Equilibrium_SpendsBothForces`: 43 → 45, so its comment's "base 45" stays literal (a fold to power 43 was possible).
+  - **Kept through `WithDefense`, for M2b:**
+    - `PartyMemberStatTests`: 5 tests, summing worn defense.
+    - `CombatantTests`: `FromPartyMember_EquippedMember_UsesTotalStatsOnPartySide` (5) and `FromEnemy_Definition_UsesItsStatsOnEnemySide` (2).
+    - `BattleStatusTests.GuardingHero` (5), the two Guarded tests.
+    - `BattleTickingStatusTests.Execute_PoisonedActorEndsTurn_LosesPowerIgnoringDefenseAndExposed` (5; from the review): poison ignoring defense needs a defense to ignore.
+  - **The plan's other candidates:** none needed a re-pin. `GrantVictoryExperience_*` and `UpcomingActors_*` are covered by their file's fold. `GameSessionBattleTests` and the multi-target skills passed with the defense simply dropped.
+  - **For M2b:** `BattlePowerTests` and `BattleResistanceTests` still say "defense 0" in their header comments; clean them up when defense leaves.

@@ -100,7 +100,7 @@ public sealed class BattleBackfireTests
             new ClassBuilder().WithId("warlock").WithResources(_instability, _mana).WithSkills("bolt", "calm", "spark").Build(),
             new Dictionary<string, SkillDefinition> { ["bolt"] = _bolt, ["calm"] = _calm, ["spark"] = _spark },
             TestStatRules.Neutral));
-        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 100, attack: 20, defense: 2).Build());
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 100, attack: 20).Build());
         return (warlock, goblin, new BattleState([warlock, goblin], new Inventory(), new FixedSequenceRandom(rolls)));
     }
 

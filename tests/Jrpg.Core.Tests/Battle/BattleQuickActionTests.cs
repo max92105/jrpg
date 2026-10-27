@@ -11,7 +11,7 @@ using Jrpg.Core.Tests.Randomness;
 namespace Jrpg.Core.Tests.Battle;
 
 // A rogue with 3 readiness and a Focus that gains 1 at the end of each turn, against one goblin; the shuffle (1) keeps
-// the rogue first. Dash is quick: it spends 1 readiness and deals 10 - 2 = 8 damage.
+// the rogue first. Dash is quick: it spends 1 readiness and deals 8 damage.
 public sealed class BattleQuickActionTests
 {
     private static readonly ResourceDefinition _readiness = new("readiness", "Readiness", Max: 3, StartsAt: 3);
@@ -25,7 +25,7 @@ public sealed class BattleQuickActionTests
         IconFile = "",
         IsQuick = true,
         ResourceChanges = [new ResourceChange("readiness", -1)],
-        Effect = new Effect(EffectKind.Damage, 10, Targeting.SingleEnemy),
+        Effect = new Effect(EffectKind.Damage, 8, Targeting.SingleEnemy),
     };
 
     private readonly Combatant _rogue = Combatant.FromPartyMember(PartyMember.Recruit(
@@ -84,7 +84,7 @@ public sealed class BattleQuickActionTests
 
     private (BattleState Battle, Combatant Goblin) Battle(int goblinHp)
     {
-        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: goblinHp, attack: 20, defense: 2).Build());
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: goblinHp, attack: 20).Build());
         return (new BattleState([_rogue, goblin], new Inventory(), new FixedSequenceRandom(1)), goblin);
     }
 }

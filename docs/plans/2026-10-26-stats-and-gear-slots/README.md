@@ -85,7 +85,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 4: Power, and the end of attack and defense
 - [x] **M1a. Power scales attacks and skills; weapons deal damage; attack leaves classes and items** (Core + Data + content + tests, about 270 lines; M1 split on 2026-10-27) → [slices/M1a.md](slices/M1a.md)
 - [x] **M1b. "Weapon damage" on the Equipment comparison and the Status Combat column** (Game + a small Core query, about 90 lines; decision 337) → [slices/M1b.md](slices/M1b.md)
-- [ ] **M2a. Test fixtures fold defense into attack** (tests, mechanical, about 140 lines) → [slices/M2a.md](slices/M2a.md)
+- [x] **M2a. Test fixtures fold defense into attack** (tests, mechanical, about 140 lines) → [slices/M2a.md](slices/M2a.md)
 - [ ] **M2b. Defense leaves; Guarded raises resistances; enemies deal damage, the goblin's retuned** (Core + Data + content, about 230 lines) → [slices/M2b.md](slices/M2b.md)
 
 ### Phase 5: hits

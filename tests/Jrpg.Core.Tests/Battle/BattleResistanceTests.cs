@@ -102,7 +102,7 @@ public sealed class BattleResistanceTests
             rules));
 
     private static Combatant Goblin(Resistances resistances) =>
-        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 100, attack: 20, defense: 0).WithResistances(resistances).Build());
+        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 100, attack: 20).WithResistances(resistances).Build());
 
     private static SkillDefinition Skill(Targeting targeting) => new()
     {

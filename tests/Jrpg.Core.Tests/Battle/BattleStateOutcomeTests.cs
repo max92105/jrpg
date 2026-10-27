@@ -76,7 +76,7 @@ public sealed class BattleStateOutcomeTests
     [Fact]
     public void GrantVictoryExperience_AfterVictory_GivesEnemyExperienceToLivingMembers()
     {
-        var member = new PartyMemberBuilder().WithStats(attack: 15, defense: 8).Build();
+        var member = new PartyMemberBuilder().WithAttack(13).Build();
         var party = new PartyState([member], [member], new PartyRules(MaxActiveMembers: 4));
         var battle = BattleState.Start(party, [Enemy("Goblin", maxHp: 10)], new Inventory(), new FixedSequenceRandom(1));
         battle.Execute(new AttackCommand(battle.LivingOn(BattleSide.Enemies)[0]));
@@ -92,8 +92,8 @@ public sealed class BattleStateOutcomeTests
     [Fact]
     public void GrantVictoryExperience_ThreeGoblins_ExperienceIsSumOfRewards()
     {
-        var sarxian = new PartyMemberBuilder().WithStats(attack: 15, defense: 8).Build();
-        var jazog = new PartyMemberBuilder().WithStats(attack: 15, defense: 8).Build();
+        var sarxian = new PartyMemberBuilder().WithAttack(13).Build();
+        var jazog = new PartyMemberBuilder().WithAttack(13).Build();
         var party = new PartyState([sarxian, jazog], [sarxian, jazog], new PartyRules(MaxActiveMembers: 4));
         EnemyDefinition[] goblins = [Enemy("Goblin A", maxHp: 10), Enemy("Goblin B", maxHp: 10), Enemy("Goblin C", maxHp: 10)];
         var battle = BattleState.Start(party, goblins, new Inventory(), new FixedSequenceRandom(4, 3, 2, 1));
@@ -116,7 +116,7 @@ public sealed class BattleStateOutcomeTests
     [Fact]
     public void GrantVictoryExperience_CalledTwice_Throws()
     {
-        var member = new PartyMemberBuilder().WithStats(attack: 15, defense: 8).Build();
+        var member = new PartyMemberBuilder().WithAttack(13).Build();
         var party = new PartyState([member], [member], new PartyRules(MaxActiveMembers: 4));
         var battle = BattleState.Start(party, [Enemy("Goblin", maxHp: 10)], new Inventory(), new FixedSequenceRandom(1));
         battle.Execute(new AttackCommand(battle.LivingOn(BattleSide.Enemies)[0]));
@@ -128,11 +128,11 @@ public sealed class BattleStateOutcomeTests
     }
 
     private static EnemyDefinition Enemy(string name, int maxHp = 40) =>
-        new EnemyDefinitionBuilder().WithName(name).WithStats(maxHp, attack: 20, defense: 2).Build();
+        new EnemyDefinitionBuilder().WithName(name).WithStats(maxHp, attack: 12).Build();
 
     private static Combatant Hero(int hp) => Combatant.FromPartyMember(
-        new PartyMemberBuilder().WithStats(attack: 15, defense: 8).WithVitals(hp, maxHp: 100).Build());
+        new PartyMemberBuilder().WithAttack(13).WithVitals(hp, maxHp: 100).Build());
 
     private static Combatant Goblin(int hp) =>
-        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, attack: 20, defense: 2).Build());
+        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, attack: 12).Build());
 }

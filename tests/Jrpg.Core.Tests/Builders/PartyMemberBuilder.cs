@@ -13,7 +13,7 @@ internal sealed class PartyMemberBuilder
     private int _hp = 100;
     private int _maxHp = 100;
     private int? _weaponDamage;
-    private int _defense = 5;
+    private int _defense;
     private SkillDefinition[] _skills = [];
 
     public PartyMemberBuilder WithId(string id)
@@ -43,12 +43,18 @@ internal sealed class PartyMemberBuilder
     }
 
     /// <summary>
-    /// A class with <paramref name="defense"/>, and a test weapon worn that deals <paramref name="attack"/>: a class
-    /// has no attack (decision 330). Without it, the member hits for the neutral rules' unarmed 10.
+    /// A test weapon worn that deals <paramref name="attack"/>: a class has no attack (decision 330). Without it, the
+    /// member hits for the neutral rules' unarmed 10.
     /// </summary>
-    public PartyMemberBuilder WithStats(int attack, int defense)
+    public PartyMemberBuilder WithAttack(int attack)
     {
         _weaponDamage = attack;
+        return this;
+    }
+
+    /// <summary>For the tests about defense itself, until the plan's M2b; every other member has none.</summary>
+    public PartyMemberBuilder WithDefense(int defense)
+    {
         _defense = defense;
         return this;
     }

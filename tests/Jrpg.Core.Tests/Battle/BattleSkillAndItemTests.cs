@@ -10,7 +10,7 @@ namespace Jrpg.Core.Tests.Battle;
 // The scripted shuffle (3, 2, 1) keeps the four combatants in listed order, so the mage acts first.
 public sealed class BattleSkillAndItemTests
 {
-    private static readonly SkillDefinition _fireball = Skill("fireball", new Effect(EffectKind.Damage, 20, Targeting.AllEnemies));
+    private static readonly SkillDefinition _fireball = Skill("fireball", new Effect(EffectKind.Damage, 18, Targeting.AllEnemies));
     private static readonly SkillDefinition _heal = Skill("heal", new Effect(EffectKind.RestoreHp, 15, Targeting.SingleAlly));
 
     private readonly Combatant _mage = PartyCombatant("mage", hp: 100, _fireball, _heal);
@@ -275,7 +275,7 @@ public sealed class BattleSkillAndItemTests
             .Build());
 
     private static Combatant Goblin(int maxHp = 40) =>
-        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp, attack: 20, defense: 2).Build());
+        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp, attack: 20).Build());
 
     private BattleState CreateBattle() =>
         new([_mage, _ally, _goblin, _otherGoblin], _inventory, new FixedSequenceRandom(3, 2, 1));

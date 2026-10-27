@@ -10,9 +10,9 @@ using Jrpg.Core.Tests.Randomness;
 
 namespace Jrpg.Core.Tests.Battle;
 
-// A druid whose Growth and Decay (max 10, from 0) each dominate the other for +50 %, against one goblin (100 HP,
-// defense 2); the shuffle (1) keeps the druid first. Rot feeds Decay, Rejuvenate feeds Growth, Thorns feeds Decay
-// with damage, and Equilibrium spends 3 of each.
+// A druid whose Growth and Decay (max 10, from 0) each dominate the other for +50 %, against one goblin (100 HP); the
+// shuffle (1) keeps the druid first. Rot feeds Decay, Rejuvenate feeds Growth, Thorns feeds Decay with damage, and
+// Equilibrium spends 3 of each.
 public sealed class BattleDominanceTests
 {
     private static readonly SkillDefinition _rot = Skill(
@@ -58,7 +58,7 @@ public sealed class BattleDominanceTests
         Assert.Equal(10, druid.Statuses.Active.Single().Power);
     }
 
-    // Thorns hits for 20, raised to 30 while Decay dominates, less the goblin's defense 2.
+    // Thorns hits for 20, raised to 30 while Decay dominates.
     [Fact]
     public void Execute_DamageSkillWhileItsForceDominant_EffectPowerRaised()
     {
@@ -66,10 +66,10 @@ public sealed class BattleDominanceTests
 
         var events = battle.Execute(new SkillCommand(_thorns, [goblin]));
 
-        Assert.Contains(new EffectApplied(goblin, EffectKind.Damage, 28), events);
+        Assert.Contains(new EffectApplied(goblin, EffectKind.Damage, 30), events);
     }
 
-    // Equilibrium feeds neither force, so it lands at its base 45, less defense 2.
+    // Equilibrium feeds neither force, so it lands at its base 45.
     [Fact]
     public void Execute_Equilibrium_SpendsBothForces()
     {
@@ -78,7 +78,7 @@ public sealed class BattleDominanceTests
         var events = battle.Execute(new SkillCommand(_equilibrium, [goblin]));
 
         Assert.Equal((0, 1), (druid.Resources.AmountOf("growth"), druid.Resources.AmountOf("decay")));
-        Assert.Contains(new EffectApplied(goblin, EffectKind.Damage, 43), events);
+        Assert.Contains(new EffectApplied(goblin, EffectKind.Damage, 45), events);
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public sealed class BattleDominanceTests
             TestStatRules.Neutral));
         druid.ChangeResource("growth", growth, []);
         druid.ChangeResource("decay", decay, []);
-        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 100, attack: 20, defense: 2).Build());
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 100, attack: 20).Build());
         return (druid, goblin, new BattleState([druid, goblin], new Inventory(), new FixedSequenceRandom(1)));
     }
 

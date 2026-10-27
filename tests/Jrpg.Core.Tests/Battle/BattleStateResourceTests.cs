@@ -151,7 +151,7 @@ public sealed class BattleStateResourceTests
             new Dictionary<string, SkillDefinition>(),
             TestStatRules.Neutral));
         var ally = Combatant.FromPartyMember(new PartyMemberBuilder().WithId("ragnir").WithVitals(hp: 1, maxHp: 100).Build());
-        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20, defense: 2).Build());
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20).Build());
         var battle = new BattleState([goblin, cleric, ally], new Inventory(), new FixedSequenceRandom(2, 1));
 
         var events = battle.Execute(new AttackCommand(ally));
@@ -170,7 +170,7 @@ public sealed class BattleStateResourceTests
             new ClassBuilder().WithId("barbarian").WithResources(ferocity).Build(),
             new Dictionary<string, SkillDefinition>(),
             TestStatRules.Neutral));
-        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20, defense: 2).Build());
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20).Build());
         var battle = new BattleState([barbarian, goblin], new Inventory(), new FixedSequenceRandom(0));
 
         var events = battle.Execute(new AttackCommand(barbarian));
@@ -190,7 +190,7 @@ public sealed class BattleStateResourceTests
             new Dictionary<string, SkillDefinition>(),
             TestStatRules.Neutral));
         barbarian.Vitals.TakeDamage(barbarian.Vitals.Hp - 5);
-        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20, defense: 2).Build());
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20).Build());
         var battle = new BattleState([barbarian, goblin], new Inventory(), new FixedSequenceRandom(0));
 
         var events = battle.Execute(new AttackCommand(barbarian));
@@ -246,14 +246,14 @@ public sealed class BattleStateResourceTests
             new ClassBuilder().WithId("warlock").WithResources(instability).WithSkills("bolt", "void_rift").Build(),
             new Dictionary<string, SkillDefinition> { ["bolt"] = _bolt, ["void_rift"] = _voidRift },
             TestStatRules.Neutral));
-        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20, defense: 2).Build());
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20).Build());
         return (warlock, new BattleState([warlock, goblin], new Inventory(), new FixedSequenceRandom(1)));
     }
 
     private BattleState StartBattle()
     {
         var party = new PartyState([_mage], [_mage], new PartyRules(MaxActiveMembers: 4));
-        var goblin = new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20, defense: 2).Build();
+        var goblin = new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20).Build();
         return BattleState.Start(party, [goblin], new Inventory(), new FixedSequenceRandom(1));
     }
 

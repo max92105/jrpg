@@ -8,7 +8,7 @@ namespace Jrpg.Core.Tests.Builders;
 internal sealed class ClassBuilder
 {
     private string _id = "fighter";
-    private ClassStats _base = new(MaxHp: 100, Defense: 5, Speed: 10);
+    private ClassStats _base = new(MaxHp: 100, Defense: 0, Speed: 10);
     private ClassStats _growth = new(0, 0, 0);
     private string[] _skillIds = [];
     private ResourceDefinition[] _resources = [];

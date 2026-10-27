@@ -5,6 +5,7 @@ public sealed class ResourceMeters
 {
     private readonly Dictionary<string, int> _amounts;
     private readonly Dictionary<string, int> _maxima;
+    private readonly Dictionary<string, int> _gainLowerings;
     private readonly HashSet<string> _dominant = [];
 
     /// <param name="starts">The holder's resources, each with its max and starting amount for this battle.</param>
@@ -13,6 +14,7 @@ public sealed class ResourceMeters
         Definitions = [.. starts.Select(start => start.Definition)];
         _maxima = starts.ToDictionary(start => start.Definition.Id, start => start.Max);
         _amounts = starts.ToDictionary(start => start.Definition.Id, start => start.Amount);
+        _gainLowerings = starts.ToDictionary(start => start.Definition.Id, start => start.GainLowering);
     }
 
     public IReadOnlyList<ResourceDefinition> Definitions { get; }
@@ -31,6 +33,13 @@ public sealed class ResourceMeters
     public int AmountOf(string resourceId) =>
         _amounts.TryGetValue(resourceId, out var amount)
             ? amount
+            : throw new ArgumentException($"This combatant has no resource '{resourceId}'.", nameof(resourceId));
+
+    /// <summary>The points every gain to the resource loses to its holder's Will (decision 319); 0 for most.</summary>
+    /// <exception cref="ArgumentException">The holder has no resource <paramref name="resourceId"/>.</exception>
+    public int GainLoweringOf(string resourceId) =>
+        _gainLowerings.TryGetValue(resourceId, out var lowering)
+            ? lowering
             : throw new ArgumentException($"This combatant has no resource '{resourceId}'.", nameof(resourceId));
 
     /// <summary>The max for this battle, which a speed-scaled resource takes from its holder.</summary>

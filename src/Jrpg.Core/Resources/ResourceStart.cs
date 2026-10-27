@@ -5,4 +5,7 @@ public sealed record ResourceStart(ResourceDefinition Definition, int Max, int A
 {
     /// <summary>The definition's own max and starting amount.</summary>
     public static ResourceStart Fixed(ResourceDefinition definition) => new(definition, definition.Max, definition.StartsAt);
+
+    /// <summary>The points the holder's Will takes off every gain to the resource (decision 319); 0 for most.</summary>
+    public int GainLowering { get; init; }
 }

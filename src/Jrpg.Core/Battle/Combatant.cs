@@ -72,10 +72,13 @@ public sealed class Combatant
         Enemy = enemy,
     };
 
-    /// <summary>Changes one resource within 0..max and reports it, unless clamping left nothing to change.</summary>
+    /// <summary>
+    /// Changes one resource within 0..max, a gain lowered by the holder's Will first (decision 319), and reports it,
+    /// unless clamping left nothing to change.
+    /// </summary>
     internal void ChangeResource(string resourceId, int amount, List<BattleEvent> events)
     {
-        var applied = Resources.Change(resourceId, amount);
+        var applied = Resources.Change(resourceId, WillFormula.LoweredGain(amount, Resources.GainLoweringOf(resourceId)));
         if (applied != 0)
         {
             events.Add(new ResourceChanged(this, resourceId, applied));

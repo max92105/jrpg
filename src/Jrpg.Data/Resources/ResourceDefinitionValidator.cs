@@ -59,11 +59,12 @@ internal static class ResourceDefinitionValidator
             ? $"backfire percents must be within 1..100 (were {backfire.ChancePerPointPercent} and {backfire.DamagePercentOfMaxHp})."
         : null;
 
-    // A lasting resource's max lives on the member between battles; raising it with Will waits for W1b.
+    // A lasting resource's amount lives on the member between battles, so Will can raise its max (the member refills to
+    // it) or lower its gains, but a raised start would have nothing to raise.
     private static string? FindWillProblem(ResourceDefinition resource) =>
         resource.WillScaling is not { } scaling ? null
         : scaling.WillPerPoint < 1 ? $"willScaling.willPerPoint must be at least 1 (was {scaling.WillPerPoint})."
-        : resource.IsLasting ? "willScaling isn't for a lasting resource yet."
+        : resource.IsLasting && scaling.Effect == WillEffect.RaiseStart ? "willScaling.effect can't be raiseStart on a lasting resource, which has no start to raise."
         : null;
 
     // Dominance is judged between two forces, so each must name the other.

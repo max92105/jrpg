@@ -2,6 +2,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Saving;
 using Jrpg.Core.Stats;
 
@@ -75,22 +76,23 @@ internal sealed class SaveGameRepair
         var weaponId = RepairWornItem(progress.WeaponId, EquipmentSlot.Weapon, definition);
         var armorId = RepairWornItem(progress.ArmorId, EquipmentSlot.Armor, definition);
 
-        // The max HP the member will have once restored: their level's, with what they still wear.
+        // The sheet the member will have once restored: their level's, with what they still wear; its max HP and its
+        // Will bound what the save holds.
         var worn = BonusesOf(weaponId).Plus(BonusesOf(armorId));
         var weaponDamage = weaponId is null ? null : _catalog.Items[weaponId].Equipment?.Damage;
-        var maxHp = MemberSheet.Of(ClassGrowth.StatsAt(characterClass, level), worn, weaponDamage, _catalog.Rules.Stats).MaxHp;
+        var sheet = MemberSheet.Of(ClassGrowth.StatsAt(characterClass, level), worn, weaponDamage, _catalog.Rules.Stats);
         var repaired = progress with
         {
             Level = level,
             Experience = experience,
-            Hp = Math.Clamp(progress.Hp, 0, maxHp),
+            Hp = Math.Clamp(progress.Hp, 0, sheet.MaxHp),
             WeaponId = weaponId,
             ArmorId = armorId,
-            LastingAmounts = RepairLastingAmounts(progress, characterClass),
+            LastingAmounts = RepairLastingAmounts(progress, characterClass, sheet.Primaries.Will),
         };
         if (repaired.Hp != progress.Hp)
         {
-            _changes.Add($"party member '{progress.Id}': HP {progress.Hp} brought within 0..{maxHp}.");
+            _changes.Add($"party member '{progress.Id}': HP {progress.Hp} brought within 0..{sheet.MaxHp}.");
         }
 
         return repaired;
@@ -99,8 +101,9 @@ internal sealed class SaveGameRepair
     private StatBonuses BonusesOf(string? itemId) =>
         itemId is null ? StatBonuses.None : _catalog.Items[itemId].Equipment?.Bonuses ?? StatBonuses.None;
 
-    // Only the class's lasting resources, each within 0..max; one the save doesn't hold starts fresh on restore.
-    private Dictionary<string, int> RepairLastingAmounts(PartyMemberProgress progress, ClassDefinition characterClass)
+    // Only the class's lasting resources, each within 0..its max under the member's Will; one the save doesn't hold
+    // starts fresh on restore.
+    private Dictionary<string, int> RepairLastingAmounts(PartyMemberProgress progress, ClassDefinition characterClass, int will)
     {
         var repaired = new Dictionary<string, int>();
         foreach (var (resourceId, amount) in progress.LastingAmounts)
@@ -112,10 +115,11 @@ internal sealed class SaveGameRepair
                 continue;
             }
 
-            repaired[resourceId] = Math.Clamp(amount, 0, resource.Max);
+            var max = WillFormula.MaxUnder(resource.Max, resource.WillScaling, will);
+            repaired[resourceId] = Math.Clamp(amount, 0, max);
             if (repaired[resourceId] != amount)
             {
-                _changes.Add($"party member '{progress.Id}': {resourceId} {amount} brought within 0..{resource.Max}.");
+                _changes.Add($"party member '{progress.Id}': {resourceId} {amount} brought within 0..{max}.");
             }
         }
 

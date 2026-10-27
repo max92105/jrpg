@@ -69,6 +69,43 @@ public sealed class ResourceStartsTests
         Assert.Equal(new ResourceStart(mana, Max: 10, Amount: 0), start);
     }
 
+    // A lasting resource's amount is what the member holds (3 of a max Will runs to 7), never refilled by the start.
+    [Fact]
+    public void For_WillRaisesMaxOfLastingResource_KeepsTheHeldAmount()
+    {
+        var faith = new ResourceDefinition("faith", "Faith", Max: 5, StartsAt: 5) { IsLasting = true, WillScaling = _raiseMax };
+        var member = Member(faith);
+        member.KeepLastingAmount("faith", 3);
+
+        var start = ResourceStarts.For(member).Single();
+
+        Assert.Equal(new ResourceStart(faith, Max: 7, Amount: 3), start);
+    }
+
+    [Fact]
+    public void For_WillLowersGains_HoldsThePoints()
+    {
+        var instability = new ResourceDefinition("instability", "Instability", Max: 10, StartsAt: 0) { WillScaling = new WillScaling(WillPerPoint: 10, WillEffect.LowerGain) };
+
+        var start = ResourceStarts.For(Member(instability)).Single();
+
+        Assert.Equal(new ResourceStart(instability, Max: 10, Amount: 0) { GainLowering = 2 }, start);
+    }
+
+    // Clarity's max runs to 5 under Will; held full at 5, it is missing nothing, so mana starts unstrained at its 3.
+    [Fact]
+    public void For_FullStrainSourceAtRaisedMax_LeavesTheStartAlone()
+    {
+        var mana = new ResourceDefinition("mana", "Mana", Max: 10, StartsAt: 3);
+        var clarity = new ResourceDefinition("clarity", "Clarity", Max: 3, StartsAt: 3) { IsLasting = true, WillScaling = _raiseMax, Strain = new StrainRule("mana", PerMissingPoint: 1) };
+        var member = Member(mana, clarity);
+        member.Rest();
+
+        var start = ResourceStarts.For(member)[0];
+
+        Assert.Equal(ResourceStart.Fixed(mana), start);
+    }
+
     [Fact]
     public void For_NoWillScaling_IsTheDefinitions()
     {

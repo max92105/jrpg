@@ -74,6 +74,21 @@ public sealed class SaveGameRepairTests
         Assert.Contains($"party member 'sarxian': focus {saved} brought within 0..3.", repaired.Changes);
     }
 
+    // Sarxian's fighter has 10 Will at level 3 (8 + 2), one point at 10 per point: Focus runs to 4, not its 3.
+    [Fact]
+    public void Repair_LastingAboveRaisedMax_ClampedToTheRaisedMax()
+    {
+        var classId = _catalog.PartyMembers["sarxian"].ClassId;
+        var focus = new ResourceDefinition("focus", "Focus", Max: 3, StartsAt: 3) { IsLasting = true, WillScaling = new WillScaling(WillPerPoint: 10, WillEffect.RaiseMax) };
+        var classes = new Dictionary<string, ClassDefinition>(_catalog.Classes) { [classId] = _catalog.Classes[classId] with { Resources = [focus] } };
+        var sarxian = _sarxian with { LastingAmounts = new Dictionary<string, int> { ["focus"] = 7 } };
+
+        var repaired = SaveGameRepair.Repair(Slot, _save with { Members = [sarxian, _jazog] }, _catalog with { Classes = classes });
+
+        Assert.Equal(4, repaired.Save.Members[0].LastingAmounts["focus"]);
+        Assert.Contains("party member 'sarxian': focus 7 brought within 0..4.", repaired.Changes);
+    }
+
     [Fact]
     public void Repair_UnknownMember_DropsItFromMembersAndActiveOrder()
     {

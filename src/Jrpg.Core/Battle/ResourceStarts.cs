@@ -10,9 +10,6 @@ namespace Jrpg.Core.Battle;
 /// </summary>
 public static class ResourceStarts
 {
-    // A resource keeps at least one point of room, so Will taken away by gear never leaves nothing to fill.
-    private const int LeastMax = 1;
-
     /// <returns>One start per class resource, in the class's order.</returns>
     public static IReadOnlyList<ResourceStart> For(PartyMember member) => [.. member.Class.Resources.Select(resource => StrainedStart(resource, member))];
 
@@ -22,12 +19,13 @@ public static class ResourceStarts
         return start with { Amount = StrainedAmount(start, member) };
     }
 
-    // A strain's source is lasting (Data checks it), so the member holds its amount.
+    // A strain's source is lasting (Data checks it), so the member holds its amount, and its missing points are counted
+    // from the max its holder's Will gives it.
     private static int StrainedAmount(ResourceStart start, PartyMember member)
     {
         var lowering = member.Class.Resources.Sum(source =>
             source.Strain is { } strain && strain.LowersStartOf == start.Definition.Id
-                ? (source.Max - member.LastingAmounts[source.Id]) * strain.PerMissingPoint
+                ? (MaxUnderWill(source, member) - member.LastingAmounts[source.Id]) * strain.PerMissingPoint
                 : 0);
         return Math.Max(0, start.Amount - lowering);
     }
@@ -54,14 +52,21 @@ public static class ResourceStarts
             return start;
         }
 
-        var points = WillFormula.BonusPoints(member.Sheet.Primaries.Will, scaling.WillPerPoint);
-        var max = scaling.Effect == WillEffect.RaiseMax ? Math.Max(LeastMax, start.Max + points) : start.Max;
-        var amount = scaling.Effect switch
+        var will = member.Sheet.Primaries.Will;
+        var points = WillFormula.BonusPoints(will, scaling.WillPerPoint);
+        var max = WillFormula.MaxUnder(start.Max, scaling, will);
+        return scaling.Effect switch
         {
-            WillEffect.RaiseStart => start.Amount + points,
-            WillEffect.RaiseMax => start.Amount == start.Max ? max : start.Amount,
+            WillEffect.RaiseStart => start with { Amount = Math.Clamp(start.Amount + points, 0, max) },
+            WillEffect.RaiseMax => start with { Max = max, Amount = StartsFull(start) ? max : Math.Min(start.Amount, max) },
+            WillEffect.LowerGain => start with { GainLowering = Math.Max(0, points) },
             _ => throw new ArgumentOutOfRangeException(nameof(start), scaling.Effect, "Unknown Will effect."),
         };
-        return start with { Max = max, Amount = Math.Clamp(amount, 0, max) };
     }
+
+    private static int MaxUnderWill(ResourceDefinition resource, PartyMember member) =>
+        WillFormula.MaxUnder(resource.Max, resource.WillScaling, member.Sheet.Primaries.Will);
+
+    // A lasting resource's amount is what the member holds, already within the raised max, never a fresh fill.
+    private static bool StartsFull(ResourceStart start) => !start.Definition.IsLasting && start.Amount == start.Max;
 }

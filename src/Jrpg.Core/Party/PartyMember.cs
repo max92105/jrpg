@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Jrpg.Core.Items;
 using Jrpg.Core.Progression;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
 
@@ -23,7 +24,7 @@ public sealed class PartyMember
         Vitals = new Vitals(Sheet.MaxHp, Sheet.MaxHp);
         _lastingAmounts = characterClass.Resources
             .Where(resource => resource.IsLasting)
-            .ToDictionary(resource => resource.Id, resource => resource.StartsAt);
+            .ToDictionary(resource => resource.Id, RestAmountOf);
     }
 
     public string Id => Definition.Id;
@@ -88,7 +89,7 @@ public sealed class PartyMember
         Vitals.TakeDamage(Vitals.MaxHp - progress.Hp);
         foreach (var resource in Class.Resources.Where(resource => resource.IsLasting))
         {
-            _lastingAmounts[resource.Id] = progress.LastingAmounts.GetValueOrDefault(resource.Id, resource.StartsAt);
+            _lastingAmounts[resource.Id] = progress.LastingAmounts.GetValueOrDefault(resource.Id, RestAmountOf(resource));
         }
     }
 
@@ -128,12 +129,13 @@ public sealed class PartyMember
         _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot."),
     };
 
-    /// <summary>Whether a rest would change anything: HP below max, or a lasting resource off its start.</summary>
+    /// <summary>Whether a rest would change anything: HP below max, or a lasting resource off what a rest gives.</summary>
     public bool HasAnythingToRest =>
-        Vitals.Hp < Vitals.MaxHp || Class.Resources.Any(resource => resource.IsLasting && _lastingAmounts[resource.Id] != resource.StartsAt);
+        Vitals.Hp < Vitals.MaxHp || Class.Resources.Any(resource => resource.IsLasting && _lastingAmounts[resource.Id] != RestAmountOf(resource));
 
     /// <summary>
-    /// A rest (decision 230): full HP, the fallen revived, and every lasting resource back at its starting amount.
+    /// A rest (decision 230): full HP, the fallen revived, and every lasting resource back at its rest amount: its max
+    /// under Will for one that starts full, its start otherwise (decision 319).
     /// </summary>
     public void Rest()
     {
@@ -148,7 +150,7 @@ public sealed class PartyMember
 
         foreach (var resource in Class.Resources.Where(resource => resource.IsLasting))
         {
-            _lastingAmounts[resource.Id] = resource.StartsAt;
+            _lastingAmounts[resource.Id] = RestAmountOf(resource);
         }
     }
 
@@ -161,7 +163,7 @@ public sealed class PartyMember
             throw new ArgumentException($"Class '{Class.Id}' has no lasting resource '{resourceId}'.", nameof(resourceId));
         }
 
-        var max = Class.Resources.First(resource => resource.Id == resourceId).Max;
+        var max = LastingMaxOf(Class.Resources.First(resource => resource.Id == resourceId));
         _lastingAmounts[resourceId] = Math.Clamp(amount, 0, max);
     }
 
@@ -184,10 +186,21 @@ public sealed class PartyMember
                 throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot.");
         }
 
-        // Max HP follows the sheet, keeping HP within it (decision 328).
+        // Max HP follows the sheet, keeping HP within it (decision 328); a lasting resource's max follows Will the same
+        // way.
         RebuildStats();
         Vitals.ResizeMax(Sheet.MaxHp);
+        foreach (var resource in Class.Resources.Where(resource => resource.IsLasting))
+        {
+            _lastingAmounts[resource.Id] = Math.Min(_lastingAmounts[resource.Id], LastingMaxOf(resource));
+        }
     }
+
+    private int LastingMaxOf(ResourceDefinition resource) => WillFormula.MaxUnder(resource.Max, resource.WillScaling, Sheet.Primaries.Will);
+
+    // A rest refills a resource that starts full to its raised max (decision 319); any other start stays, within it.
+    private int RestAmountOf(ResourceDefinition resource) =>
+        resource.StartsAt == resource.Max ? LastingMaxOf(resource) : Math.Min(resource.StartsAt, LastingMaxOf(resource));
 
     private static StatBonuses BonusesOf(Worn worn) =>
         (worn.Weapon?.Equipment?.Bonuses ?? StatBonuses.None).Plus(worn.Armor?.Equipment?.Bonuses ?? StatBonuses.None);

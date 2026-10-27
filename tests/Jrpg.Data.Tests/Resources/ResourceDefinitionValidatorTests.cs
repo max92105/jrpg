@@ -126,13 +126,13 @@ public sealed class ResourceDefinitionValidatorTests
     }
 
     [Fact]
-    public void Validate_WillScalingOnLasting_Throws()
+    public void Validate_RaiseStartOnLasting_Throws()
     {
-        var faith = Force("faith") with { IsLasting = true, WillScaling = new WillScaling(WillPerPoint: 10, WillEffect.RaiseMax) };
+        var faith = Force("faith") with { IsLasting = true, WillScaling = new WillScaling(WillPerPoint: 10, WillEffect.RaiseStart) };
 
         var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("cleric") with { Resources = [faith] }]));
 
-        Assert.EndsWith("resource 'faith': willScaling isn't for a lasting resource yet.", exception.Message, StringComparison.Ordinal);
+        Assert.EndsWith("resource 'faith': willScaling.effect can't be raiseStart on a lasting resource, which has no start to raise.", exception.Message, StringComparison.Ordinal);
     }
 
     // Any valid color: the other tests are about other fields.

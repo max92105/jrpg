@@ -26,7 +26,8 @@
     "skillIds": ["heal", "recovery", "heal_all"],
     "resources": [
       { "id": "faith", "name": "Faith", "color": "#FFF1C1", "max": 5, "startsAt": 5, "isLasting": true,
-        "gains": { "perAllyFallen": -1, "perHeavyHit": -1, "heavyHitPercent": 20 } } ] },
+        "gains": { "perAllyFallen": -1, "perHeavyHit": -1, "heavyHitPercent": 20 },
+        "willScaling": { "willPerPoint": 10, "effect": "raiseMax" } } ] },
   {
     "id": "rogue", "name": "Rogue",
     "description": "A quick and cunning blade who strikes where the enemy is weakest.",
@@ -68,7 +69,8 @@
     "growth": { "maxHp": 14, "speed": 1, "accuracy": 1, "primaries": { "power": 2, "agility": 1, "intelligence": 2, "constitution": 1, "will": 2 } },
     "skillIds": ["eldritch_bolt", "void_rift", "chaos_lance"],
     "resources": [ { "id": "instability", "name": "Instability", "color": "#A65BE0", "max": 10, "startsAt": 0, "gains": { "perTurn": -1 },
-        "backfire": { "chancePerPointPercent": 5, "damagePercentOfMaxHp": 10 } } ] },
+        "backfire": { "chancePerPointPercent": 5, "damagePercentOfMaxHp": 10 },
+        "willScaling": { "willPerPoint": 10, "effect": "lowerGain" } } ] },
   {
     "id": "druid", "name": "Druid",
     "description": "A keeper of the wild who calls on nature and takes the shapes of beasts.",

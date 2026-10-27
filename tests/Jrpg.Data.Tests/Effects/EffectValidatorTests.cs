@@ -85,10 +85,24 @@ public sealed class EffectValidatorTests
         Assert.Equal("effect.targeting must be otherCombatant for a readyExtraTurn effect (was SingleEnemy).", problem);
     }
 
+    // A stun's power is its chance to land (decision 324): 0 would never land, and past 100 it would read as more than
+    // a sure stun.
+    [Theory]
+    [InlineData(0)]
+    [InlineData(101)]
+    public void FindProblem_StunPowerOutsideChance_NamesThePower(int power)
+    {
+        var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, power, Turns: 1), DamageType: DamageType.Blunt);
+
+        var problem = EffectValidator.FindProblem(bash);
+
+        Assert.Equal($"effect.status.power must be within 1..100 for a stun, its chance to land (was {power}).", problem);
+    }
+
     [Fact]
     public void FindProblem_DamageWithStatus_ReturnsNull()
     {
-        var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1), DamageType: DamageType.Blunt);
+        var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 60, Turns: 1), DamageType: DamageType.Blunt);
 
         var problem = EffectValidator.FindProblem(bash);
 

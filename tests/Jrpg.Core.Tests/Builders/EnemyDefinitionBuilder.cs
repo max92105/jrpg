@@ -12,6 +12,7 @@ internal sealed class EnemyDefinitionBuilder
     private Resistances _resistances = Resistances.None;
     private int _dodge;
     private int _critChance;
+    private int _crowdControlResistance;
     private int _accuracy = 100;
 
     public EnemyDefinitionBuilder WithName(string name)
@@ -45,6 +46,12 @@ internal sealed class EnemyDefinitionBuilder
         return this;
     }
 
+    public EnemyDefinitionBuilder WithCrowdControlResistance(int crowdControlResistance)
+    {
+        _crowdControlResistance = crowdControlResistance;
+        return this;
+    }
+
     public EnemyDefinitionBuilder WithDodge(int dodge)
     {
         _dodge = dodge;
@@ -71,6 +78,7 @@ internal sealed class EnemyDefinitionBuilder
         Accuracy = _accuracy,
         Dodge = _dodge,
         CritChance = _critChance,
+        CrowdControlResistance = _crowdControlResistance,
         Resistances = _resistances,
         ExperienceReward = 40,
     };

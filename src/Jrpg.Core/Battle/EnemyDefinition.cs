@@ -38,6 +38,9 @@ public sealed record EnemyDefinition
     /// </summary>
     public required int CritChance { get; init; }
 
+    /// <summary>Its chance to shrug off a stun or a taunt, a whole percent (decision 324).</summary>
+    public required int CrowdControlResistance { get; init; }
+
     /// <summary>The share of each damage type's hits taken off (ADR 0027); 0 for a type content leaves out.</summary>
     public Resistances Resistances { get; init; } = Resistances.None;
 

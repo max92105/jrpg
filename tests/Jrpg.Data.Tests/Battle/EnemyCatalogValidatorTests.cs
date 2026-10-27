@@ -21,6 +21,7 @@ public sealed class EnemyCatalogValidatorTests
         Accuracy = 85,
         Dodge = 5,
         CritChance = 5,
+        CrowdControlResistance = 10,
         ExperienceReward = 40,
     };
 
@@ -32,6 +33,7 @@ public sealed class EnemyCatalogValidatorTests
         { _goblin with { Accuracy = 201 }, "accuracy must be within 0..200 (was 201)." },
         { _goblin with { Dodge = 51 }, "dodge must be within 0..50 (was 51)." },
         { _goblin with { CritChance = 101 }, "critChance must be within 0..100 (was 101)." },
+        { _goblin with { CrowdControlResistance = 101 }, "crowdControlResistance must be within 0..100 (was 101)." },
         { _goblin with { ExperienceReward = -1 }, "experienceReward must be at least 0 (was -1)." },
         { _goblin with { Resistances = Resistances.None with { Fire = 760 } }, "resistances.fire must be within -100..75 (was 76)." },
         { _goblin with { Resistances = Resistances.None with { Ice = -1010 } }, "resistances.ice must be within -100..75 (was -101)." },

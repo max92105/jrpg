@@ -434,7 +434,10 @@ internal static class MessageIds
     /// <summary>The cue by a hit a weakness raised (decision 323).</summary>
     public const string BattleWeak = "battle_weak";
 
-    /// <summary>The cue by a hit a resistance big enough to count lowered (decision 323).</summary>
+    /// <summary>
+    /// The cue by a hit a resistance big enough to count lowered (decision 323), and on a target that shrugged off a
+    /// stun (decision 324).
+    /// </summary>
     public const string BattleResisted = "battle_resisted";
 
     /// <summary>Placeholder <c>{count}</c>: how many copies of an item the party owns, on its row in battle.</summary>

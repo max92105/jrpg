@@ -12,6 +12,7 @@
     "accuracy": 75,
     "dodge": 0,
     "critChance": 5,
+    "crowdControlResistance": 10,
     "resistances": { "fire": -25 },
     "experienceReward": 40
   },
@@ -28,6 +29,7 @@
     "accuracy": 80,
     "dodge": 0,
     "critChance": 0,
+    "crowdControlResistance": 50,
     "resistances": { "blunt": 25, "piercing": 25, "fire": -50 },
     "experienceReward": 10
   }

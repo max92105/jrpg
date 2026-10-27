@@ -59,6 +59,15 @@ public sealed class ActionPlaybackTests
     }
 
     [Fact]
+    public void Start_StatusResisted_AddsResistedCueOnTheImpact()
+    {
+        var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), new StatusResisted(_goblin, StatusKind.Stun)]);
+
+        Assert.Equal([new CueOnTarget(_goblin, "Resisted")], playback.Cues);
+        Assert.Equal([PlaybackBeatKind.Impact], playback.Beats.Select(beat => beat.Kind));
+    }
+
+    [Fact]
     public void Start_TurnSkippedAfterAction_AddsSkipBeatAfterImpact()
     {
         BattleEvent[] events =

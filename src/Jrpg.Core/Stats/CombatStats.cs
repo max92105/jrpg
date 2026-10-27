@@ -31,6 +31,17 @@ public sealed record CombatStats(int AttackDamage)
     /// </summary>
     public int CritDamagePermille { get; init; } = StatFormula.PermilleOf(StatFormula.BaseCritDamagePercent);
 
+    /// <summary>
+    /// What a status the combatant grants has its power multiplied by, in permille: Intelligence's for a member.
+    /// </summary>
+    public int StatusPermille { get; init; } = 1000;
+
+    /// <summary>The turns a status the combatant grants lasts longer, except Stun (decision 317).</summary>
+    public int ExtraStatusTurns { get; init; }
+
+    /// <summary>The chance to shrug off a stun or a taunt, in permille (decisions 302 and 324).</summary>
+    public int CrowdControlResistancePermille { get; init; }
+
     /// <summary>What the combatant's basic attack hits as (ADR 0027).</summary>
     public DamageType AttackType { get; init; } = DamageType.Blunt;
 

@@ -93,5 +93,5 @@ public sealed class StatusMarksViewTests
     private StatusMarksView MarksOfGoblinC() => new(GoblinC.Statuses, RepositoryScreenText.Text, new UiTextures());
 
     private void BashGoblinC() =>
-        _battle.Execute(new SkillCommand(BattleScenarios.Catalog.Skills["shield_bash"], [GoblinC]));
+        _battle.Execute(new SkillCommand(BattleScenarios.Skills["shield_bash"], [GoblinC]));
 }

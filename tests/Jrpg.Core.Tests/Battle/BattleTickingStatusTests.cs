@@ -93,7 +93,7 @@ public sealed class BattleTickingStatusTests
     [Fact]
     public void Execute_StunnedAndPoisoned_TicksOnSkippedTurn()
     {
-        var jab = Skill("jab", new Effect(EffectKind.Damage, 3, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1)));
+        var jab = Skill("jab", new Effect(EffectKind.Damage, 3, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 100, Turns: 1)));
         var (_, goblin, battle) = Battle(goblinHp: 25, jab);
         goblin.Statuses.Apply(new StatusGrant(StatusKind.Poison, Power: 4, Turns: 3));
 

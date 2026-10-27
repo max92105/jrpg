@@ -11,9 +11,9 @@ namespace Jrpg.Game.Battle;
 /// impact when effects land, a defeat when someone falls, a skip when a stun takes a turn. The hold lasts as long as
 /// the beats; Defend and Run hold nothing. On the impact, each landed effect pops its amount and shows on its target,
 /// damage as the attacker's effect strip, anything else as a placeholder cue (decision 101), and a granted status shows
-/// its name, and a miss "Miss"; whoever fell shows white, then fades on the defeat beat. A lost turn shows "Stunned" on
-/// its beat, and Poison and Regen pop the HP they took or restored on a tick beat. An event it doesn't know throws, so
-/// a new mechanic can't be shown silently wrong (ADR 0004).
+/// its name, a miss "Miss" and a resisted status "Resisted"; whoever fell shows white, then fades on the defeat beat. A
+/// lost turn shows "Stunned" on its beat, and Poison and Regen pop the HP they took or restored on a tick beat. An
+/// event it doesn't know throws, so a new mechanic can't be shown silently wrong (ADR 0004).
 /// </summary>
 internal sealed class ActionPlayback
 {
@@ -110,14 +110,6 @@ internal sealed class ActionPlayback
             case CombatantDefeated defeated:
                 AddFall(defeated.Combatant);
                 break;
-            case StatusApplied applied:
-                AddBeatOnce(PlaybackBeatKind.Impact, BattlePacing.ImpactHold);
-                _cues.Add(new CueOnTarget(applied.Target, messages.Text(StatusNames.IdOf(applied.Status))));
-                break;
-            case HitMissed missed:
-                AddBeatOnce(PlaybackBeatKind.Impact, BattlePacing.ImpactHold);
-                _cues.Add(new CueOnTarget(missed.Target, messages.Text(MessageIds.BattleMiss)));
-                break;
             case TurnSkipped skipped:
                 AddSkipCue(skipped.Combatant, messages);
                 break;
@@ -128,8 +120,23 @@ internal sealed class ActionPlayback
                 AddTick(ticked);
                 break;
             default:
-                throw new InvalidOperationException($"The battle screen can't show a {battleEvent.GetType().Name} yet.");
+                AddImpactCue(battleEvent, messages);
+                break;
         }
+    }
+
+    // A status granted, a hit missed and a status resisted each show as one word on their target at the impact.
+    private void AddImpactCue(BattleEvent battleEvent, UiMessages messages)
+    {
+        var (target, text) = battleEvent switch
+        {
+            StatusApplied applied => (applied.Target, messages.Text(StatusNames.IdOf(applied.Status))),
+            HitMissed missed => (missed.Target, messages.Text(MessageIds.BattleMiss)),
+            StatusResisted resisted => (resisted.Target, messages.Text(MessageIds.BattleResisted)),
+            _ => throw new InvalidOperationException($"The battle screen can't show a {battleEvent.GetType().Name} yet."),
+        };
+        AddBeatOnce(PlaybackBeatKind.Impact, BattlePacing.ImpactHold);
+        _cues.Add(new CueOnTarget(target, text));
     }
 
     private static FloatingNumberTone ToneOf(EffectApplied effect) => effect.Kind switch

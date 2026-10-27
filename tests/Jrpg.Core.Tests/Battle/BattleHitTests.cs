@@ -22,7 +22,7 @@ public sealed class BattleHitTests
         Name = "Double Bash",
         Description = "",
         IconFile = "",
-        Effect = new Effect(EffectKind.Damage, 13, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 2), Hits: 2),
+        Effect = new Effect(EffectKind.Damage, 13, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 100, Turns: 2), Hits: 2),
     };
 
     private static readonly SkillDefinition _shieldBash = new()
@@ -31,7 +31,7 @@ public sealed class BattleHitTests
         Name = "Shield Bash",
         Description = "",
         IconFile = "",
-        Effect = new Effect(EffectKind.Damage, 13, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 2)),
+        Effect = new Effect(EffectKind.Damage, 13, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 100, Turns: 2)),
     };
 
     [Fact]

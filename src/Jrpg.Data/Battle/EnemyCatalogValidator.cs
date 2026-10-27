@@ -23,6 +23,7 @@ internal static class EnemyCatalogValidator
                 ?? Within("accuracy", enemy.Accuracy, 0, MostAccuracy)
                 ?? Within("dodge", enemy.Dodge, 0, StatFormula.DodgeCapPercent)
                 ?? Within("critChance", enemy.CritChance, 0, WholeChance)
+                ?? Within("crowdControlResistance", enemy.CrowdControlResistance, 0, WholeChance)
                 ?? AtLeast("experienceReward", enemy.ExperienceReward, 0)
                 ?? FindResistanceProblem(enemy.Resistances);
 

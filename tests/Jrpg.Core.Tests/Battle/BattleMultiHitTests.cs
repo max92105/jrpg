@@ -50,7 +50,7 @@ public sealed class BattleMultiHitTests
     public void Execute_MultiHitWithStatus_GrantsItOnceAfterTheHits()
     {
         var stunningPalm = Skill(
-            "stunning_palm", new Effect(EffectKind.Damage, 10, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1), Hits: 2));
+            "stunning_palm", new Effect(EffectKind.Damage, 10, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 100, Turns: 1), Hits: 2));
         var (_, goblin, battle) = Battle(goblinHp: 100, chakra: 0, stunningPalm);
 
         var events = battle.Execute(new SkillCommand(stunningPalm, [goblin])).ToList();

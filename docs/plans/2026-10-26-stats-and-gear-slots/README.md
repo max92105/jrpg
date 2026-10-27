@@ -94,7 +94,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **H2. Critical hits; a critical number stands out; the overflow test** (Core + Data + content + Game, about 215 lines) → [slices/H2.md](slices/H2.md)
 
 ### Phase 6: Intelligence and Will
-- [ ] **I1. Intelligence shapes statuses (never Stun's turns); Stun's chance against crowd control resistance; enemies get it** (Core + Data + content + Game, about 245 lines) → [slices/I1.md](slices/I1.md)
+- [x] **I1. Intelligence shapes statuses (never Stun's turns); Stun's chance against crowd control resistance; enemies get it** (Core + Data + content + Game, about 245 lines) → [slices/I1.md](slices/I1.md)
 - [ ] **I2. Enemies resist Taunt; a status skill for the mage, cleric, monk and warlock** (Core + content, about 170 lines) → [slices/I2.md](slices/I2.md)
 - [ ] **W1a. Will raises a battle resource's start or max** (Core + Data + content + Game, about 180 lines) → [slices/W1a.md](slices/W1a.md)
 - [ ] **W1b. Will raises Faith's max and shrinks Instability's gains** (Core + Data + content, about 170 lines) → [slices/W1b.md](slices/W1b.md)

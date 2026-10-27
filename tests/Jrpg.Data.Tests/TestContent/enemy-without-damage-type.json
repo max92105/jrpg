@@ -11,6 +11,7 @@
     "accuracy": 85,
     "dodge": 5,
     "critChance": 5,
+    "crowdControlResistance": 10,
     "experienceReward": 40
   }
 ]

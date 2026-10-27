@@ -63,7 +63,7 @@
     "resourceChanges": [ { "resourceId": "stamina", "amount": -3 } ],
     "effect": {
       "kind": "damage", "damageType": "blunt", "power": 15, "targeting": "singleEnemy",
-      "status": { "kind": "stun", "power": 0, "turns": 1 }
+      "status": { "kind": "stun", "power": 60, "turns": 1 }
     }
   },
   {

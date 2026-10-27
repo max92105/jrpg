@@ -15,6 +15,6 @@ internal static class AttackEffect
     public static Effect Of(Combatant attacker)
     {
         var stats = attacker.CurrentStats;
-        return EffectScaling.ScaledFor(new Effect(EffectKind.Damage, stats.AttackDamage, Targeting, DamageType: stats.AttackType), stats.DamagePermille);
+        return EffectScaling.ScaledFor(new Effect(EffectKind.Damage, stats.AttackDamage, Targeting, DamageType: stats.AttackType), stats);
     }
 }

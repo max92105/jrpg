@@ -183,7 +183,7 @@ public sealed class BattleState
         }
 
         _targetChoices.ThrowIfIllegal(actor, command.Skill.Effect, command.Targets);
-        var scaled = EffectScaling.ScaledFor(command.Skill.Effect, actor.CurrentStats.DamagePermille);
+        var scaled = EffectScaling.ScaledFor(command.Skill.Effect, actor.CurrentStats);
         var effect = SkillEmpowerment.EffectOf(actor, command.Skill, scaled);
         SkillPayment.Pay(actor, command.Skill, events);
         if (command.Skill.Effect.Kind == EffectKind.ReadyExtraTurn)

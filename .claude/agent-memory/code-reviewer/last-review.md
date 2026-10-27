@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/H2.md, slice H2 (critical hits: CombatStats crit fields,
-DamageFormula crit factor, EffectLanding crit roll, EffectApplied.IsCritical, Critical tone 1.4x gold)
-Round: 1 (verdict: Ready to commit; verify all pass, 2502 tests)
+Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/I1.md, slice I1 (GrantScaling: status percent and extra
+turns, never Stun's turns; StunChancePermille against crowd control resistance; StatusResisted; "Resisted" cue)
+Round: 1 (verdict: Ready to commit; verify all pass, 2522 tests)
 
-- W1 MemberBattleStats.cs:25 CritDamagePermille copy untested: Neutral rules' CritDamagePercentPer100Power 0 gives 1500 == CombatStats default, so dropping the line passes every test; open (warning)
-- S1 DamageFormula.cs:165,167 empty <param name="power"> and <param name="mitigation"> tags (added only to satisfy CS1573); fill them; open (suggestion)
-- S2 FloatingNumberTests SizeOf_Critical_IsBiggerThanDamage asserts two things; split or pin 1.4; open (suggestion)
+- S1 docs/map.md Battle row: EffectScaling still "Power raises damage and healing", no mention it now shapes the grant; open (suggestion)
+- S2 EffectLanding.cs:97 Grant computes StunChancePermille for every grant, Stun or not; compute it only in the Stun branch; open (suggestion)
+- S3 EffectScalingTests.cs:10 field `Twenty` names a number, not what it is; `TwentyPercentMorePower`; open (suggestion)

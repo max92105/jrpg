@@ -16,16 +16,16 @@ namespace Jrpg.Core.Tests.Battle;
 public sealed class BattleStatusTests
 {
     private static readonly SkillDefinition _bash =
-        Skill("bash", new Effect(EffectKind.Damage, 13, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 2)));
+        Skill("bash", new Effect(EffectKind.Damage, 13, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 100, Turns: 2)));
 
     private static readonly SkillDefinition _jab =
-        Skill("jab", new Effect(EffectKind.Damage, 3, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1)));
+        Skill("jab", new Effect(EffectKind.Damage, 3, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 100, Turns: 1)));
 
     private static readonly SkillDefinition _quake =
-        Skill("quake", new Effect(EffectKind.Damage, 3, Targeting.AllEnemies, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1)));
+        Skill("quake", new Effect(EffectKind.Damage, 3, Targeting.AllEnemies, new StatusGrant(StatusKind.Stun, Power: 100, Turns: 1)));
 
     private static readonly SkillDefinition _brace =
-        Skill("brace", new Effect(EffectKind.GrantStatus, 0, Targeting.Self, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 2)));
+        Skill("brace", new Effect(EffectKind.GrantStatus, 0, Targeting.Self, new StatusGrant(StatusKind.Stun, Power: 100, Turns: 2)));
 
     private readonly Combatant _hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithSkills(_bash, _jab, _quake, _brace).Build());
 
@@ -72,7 +72,7 @@ public sealed class BattleStatusTests
 
         battle.Execute(new SkillCommand(_brace, [_hero]));
 
-        Assert.Equal([new ActiveStatus(StatusKind.Stun, 0, TurnsLeft: 2, IsFresh: false)], _hero.Statuses.Active);
+        Assert.Equal([new ActiveStatus(StatusKind.Stun, 100, TurnsLeft: 2, IsFresh: false)], _hero.Statuses.Active);
     }
 
     // The second goblin is stunned on the hero's turn; the first goblin's turn in between doesn't count it down.
@@ -88,7 +88,7 @@ public sealed class BattleStatusTests
 
         Assert.Equal(2, turnsBeforeHolderTurn);
         Assert.Contains(new TurnSkipped(second, StatusKind.Stun), events);
-        Assert.Equal([new ActiveStatus(StatusKind.Stun, 0, TurnsLeft: 1, IsFresh: false)], second.Statuses.Active);
+        Assert.Equal([new ActiveStatus(StatusKind.Stun, 100, TurnsLeft: 1, IsFresh: false)], second.Statuses.Active);
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public sealed class BattleStatusTests
         var events = battle.Execute(new SkillCommand(_bash, [goblin]));
 
         Assert.Contains(new TurnSkipped(goblin, StatusKind.Stun), events);
-        Assert.Equal([new ActiveStatus(StatusKind.Stun, 0, TurnsLeft: 1, IsFresh: false)], goblin.Statuses.Active);
+        Assert.Equal([new ActiveStatus(StatusKind.Stun, 100, TurnsLeft: 1, IsFresh: false)], goblin.Statuses.Active);
     }
 
     [Fact]

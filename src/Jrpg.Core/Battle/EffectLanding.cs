@@ -7,10 +7,11 @@ namespace Jrpg.Core.Battle;
 /// <summary>
 /// An effect landing on its targets, in order: each of its hits, the status it grants to a target still standing, and
 /// what a fall sets off (ADR 0019, ADR 0021). A damaging hit rolls to land first, then to crit (decision 325); one that
-/// misses is no hit at all, and a damage effect that missed every hit leaves no status behind (decision 326).
+/// misses is no hit at all, and a damage effect that missed every hit leaves no status behind (decision 326). A stun
+/// rolls against its target's crowd control resistance (decision 324).
 /// </summary>
 /// <param name="combatants">Everyone in the battle, for the triggers a fall sets off.</param>
-/// <param name="rolls">The battle's rolls, for whether each hit lands and crits.</param>
+/// <param name="rolls">The battle's rolls, for whether each hit lands and crits, and whether a stun takes.</param>
 internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceRolls rolls)
 {
     /// <param name="actor">Who used it, for the gains a landed hit triggers.</param>
@@ -29,8 +30,7 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceR
             }
             else if (effect.Status is { } grant && target.IsAlive && hasLanded)
             {
-                target.Statuses.Apply(grant);
-                events.Add(new StatusApplied(target, grant.Kind, grant.Turns));
+                Grant(grant, target, events);
             }
         }
     }
@@ -89,6 +89,20 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceR
         }
 
         return hasLanded;
+    }
+
+    // A stun rolls its chance against the target's crowd control resistance (decision 324); the other statuses land.
+    private void Grant(StatusGrant grant, Combatant target, List<BattleEvent> events)
+    {
+        if (grant.Kind == StatusKind.Stun
+            && !rolls.Succeeds(GrantScaling.StunChancePermille(grant.Power, target.CurrentStats.CrowdControlResistancePermille)))
+        {
+            events.Add(new StatusResisted(target, grant.Kind));
+            return;
+        }
+
+        target.Statuses.Apply(grant);
+        events.Add(new StatusApplied(target, grant.Kind, grant.Turns));
     }
 
     // Only damage rolls (decision 325): a heal, a revive or a status alone never misses.

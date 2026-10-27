@@ -3,7 +3,10 @@ namespace Jrpg.Core.Statuses;
 /// <summary>The closed list of statuses; each kind's rule is code with a test (ADR 0021).</summary>
 public enum StatusKind
 {
-    /// <summary>The holder loses its next turn (ST2).</summary>
+    /// <summary>
+    /// The holder loses its next turn (ST2). Its power is its chance to land, a percent, against the target's crowd
+    /// control resistance (decision 324).
+    /// </summary>
     Stun,
 
     /// <summary>Every enemy attack goes to a taunting party member (question 209).</summary>

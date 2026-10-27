@@ -3,6 +3,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Randomness;
+using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
 
@@ -34,8 +35,17 @@ internal static class BattleScenarios
         CritChancePer100Agility = 0,
     };
 
-    /// <summary>The repository's goblin, hitting for certain, never dodging and never critting.</summary>
-    public static EnemyDefinition Goblin { get; } = Catalog.Enemies["goblin"] with { Accuracy = 100, Dodge = 0, CritChance = 0 };
+    /// <summary>
+    /// The repository's goblin, hitting for certain, never dodging or critting, and shrugging off nothing.
+    /// </summary>
+    public static EnemyDefinition Goblin { get; } =
+        Catalog.Enemies["goblin"] with { Accuracy = 100, Dodge = 0, CritChance = 0, CrowdControlResistance = 0 };
+
+    /// <summary>
+    /// The repository's skills, with Shield Bash's stun a sure one, so a scenario's stun lands without a draw; a member
+    /// recruited here knows this copy, so play it from here, not from the catalog.
+    /// </summary>
+    public static IReadOnlyDictionary<string, SkillDefinition> Skills { get; } = WithSureStun(Catalog.Skills, "shield_bash");
 
     /// <summary>
     /// A member of the repository's content as they join: level 1, with their class's numbers under
@@ -44,7 +54,17 @@ internal static class BattleScenarios
     public static PartyMember Recruit(string memberId)
     {
         var definition = Catalog.PartyMembers[memberId];
-        return PartyMember.Recruit(definition, Catalog.ClassOf(definition), Catalog.Skills, CertainRules);
+        return PartyMember.Recruit(definition, Catalog.ClassOf(definition), Skills, CertainRules);
+    }
+
+    private static Dictionary<string, SkillDefinition> WithSureStun(IReadOnlyDictionary<string, SkillDefinition> skills, string skillId)
+    {
+        var skill = skills[skillId];
+        var stun = skill.Effect.Status ?? throw new InvalidOperationException($"{skillId} grants no status.");
+        return new Dictionary<string, SkillDefinition>(skills)
+        {
+            [skillId] = skill with { Effect = skill.Effect with { Status = stun with { Power = 100 } } },
+        };
     }
 
     /// <param name="random">Shuffles the turn order; tests that run enemy turns pass the same source to the tactics.</param>

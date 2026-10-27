@@ -166,7 +166,7 @@ public sealed class BattleTurnSequenceTests
         var sequence = new BattleTurnSequence(battle, new EnemyTactics(random), RepositoryScreenText.Text.Messages);
         sequence.Update(_step);
 
-        sequence.Submit(new SkillCommand(BattleScenarios.Catalog.Skills["shield_bash"], [battle.Combatants[1]]));
+        sequence.Submit(new SkillCommand(BattleScenarios.Skills["shield_bash"], [battle.Combatants[1]]));
         sequence.Update(BattlePacing.ImpactHold + BattlePacing.SkipHold + BattlePacing.Step);
 
         sequence.Update(TimeSpan.FromSeconds(0.1));

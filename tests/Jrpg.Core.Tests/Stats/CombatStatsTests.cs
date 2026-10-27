@@ -21,4 +21,12 @@ public sealed class CombatStatsTests
         Assert.Equal(0, stats.CritChancePermille);
         Assert.Equal(1500, stats.CritDamagePermille);
     }
+
+    [Fact]
+    public void New_NothingGiven_ShapesNoStatusAndShrugsOffNothing()
+    {
+        var stats = new CombatStats(AttackDamage: 10);
+
+        Assert.Equal((1000, 0, 0), (stats.StatusPermille, stats.ExtraStatusTurns, stats.CrowdControlResistancePermille));
+    }
 }

@@ -160,7 +160,7 @@ public sealed class ContentCatalogLoaderTests
 
         var stamina = fighter.Resources.Single(resource => resource.Id == "stamina");
         Assert.Equal((6, 3, 1), (stamina.Max, stamina.StartsAt, stamina.Gains.PerTurn));
-        Assert.Equal(new StatusGrant(StatusKind.Stun, 0, 1), catalog.Skills["shield_bash"].Effect.Status);
+        Assert.Equal(new StatusGrant(StatusKind.Stun, 60, 1), catalog.Skills["shield_bash"].Effect.Status);
     }
 
     [Fact]

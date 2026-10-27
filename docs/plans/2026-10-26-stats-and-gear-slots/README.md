@@ -62,7 +62,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **C2. Test files split: `BattleStateTests` by command, `PartyMemberTests` by behavior, `ClassCatalogValidatorTests` stats apart** (tests, mechanical, about 200 lines moved) → [slices/C2.md](slices/C2.md)
 
 ### Phase 1: the stat sheet
-- [ ] **ADR 0026: The stat model** (before P1) → [slices/ADR-0026.md](slices/ADR-0026.md)
+- [x] **ADR 0026: The stat model** (before P1) → [slices/ADR-0026.md](slices/ADR-0026.md)
 - [ ] **P1. Five primaries and accuracy on the class, grown by level** (Core + Data + content, about 150 lines) → [slices/P1.md](slices/P1.md)
 - [ ] **P2. Stat rules in content; Constitution raises max HP; members are built with the rules; `Vitals.ResizeMax`** (Core + Data + content, about 250 lines) → [slices/P2.md](slices/P2.md)
 - [ ] **P3a. The member's sheet: accuracy, crit chance and damage, dodge, crowd control resistance, Power's percent, in tenths** (Core + Data + content, about 200 lines) → [slices/P3a.md](slices/P3a.md)

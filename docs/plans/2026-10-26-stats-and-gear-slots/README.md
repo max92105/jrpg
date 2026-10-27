@@ -108,7 +108,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **G2. Fixed-stat gear for the new slots, in the new game's starting items** (content + tests, about 110 lines) → [slices/G2.md](slices/G2.md)
 
 ### Phase 8: look
-- [ ] **E2. Equipment page look: the Status row look, the comparison in two columns** (Game, about 210 lines) → [slices/E2.md](slices/E2.md)
+- [x] **E2. Equipment page look: the Status row look, the comparison in two columns** (Game, about 210 lines) → [slices/E2.md](slices/E2.md)
 
 ### Phase 9: balance and walk-through
 - [ ] **B1. Goblin trio simulation with hits and crits counted; numbers recorded per class** (Simulations, about 120 lines) → [slices/B1.md](slices/B1.md)

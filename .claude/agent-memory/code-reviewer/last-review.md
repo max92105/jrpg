@@ -5,8 +5,9 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-26-stats-and-gear-slots, slice G2 (fixed-stat gear for the new slots, content + tests). Round 1. Verdict: Ready to commit.
+Plan: 2026-10-26-stats-and-gear-slots, slice E2 (Equipment page look: SheetRowLook, EquipmentChangesView, Changes/Gives caption). Round 1. Verdict: Fix the Criticals.
 
-- Suggestion: EquipmentPageTests.cs ~line 268 has two blank lines where the Gear helper was removed — open
-- Suggestion: Update_PreviousCategoryFromAll_WrapsToArmor could also assert one new piece (e.g. wooden_shield) is in the Armor tab, the hand check's claim — open
-- (G1c follow-up on hand-built rings in three test projects: fixed by this slice)
+- Critical: slot labels and comparison line labels drawn through SheetRowLook.DrawLabel are mixed case ("Weapon", "Fire"), not spaced caps as the slice goal and the new summaries claim; uppercase once in EquipmentLabels.From and EquipmentChangesView.Measure — open
+- Warning: StatusParametersView.Measure is now a private forwarding wrapper with one caller (line 64); call _rows.Measure directly — open
+- Suggestion: caption passed as a message-id string and matched by ==; any other id silently draws "Changes" — open
+- Suggestion: MessageIds.EquipmentChanges summary still says "or what a worn item gives" (Gives has its own id now) — open

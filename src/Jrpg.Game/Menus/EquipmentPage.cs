@@ -108,6 +108,12 @@ internal sealed class EquipmentPage : IMemberPage
     /// <summary>Why the last change didn't happen, or null.</summary>
     public string? Notice => _notice;
 
+    /// <summary>
+    /// The comparison band's caption: "Changes" while a choice is open (what the highlighted item would change),
+    /// "Gives" otherwise (what the highlighted worn item gives).
+    /// </summary>
+    public string ChangesCaptionId => _choice is null ? MessageIds.EquipmentGives : MessageIds.EquipmentChanges;
+
     public SceneRequest? Update(InputFrame input)
     {
         if (_choice is not null)
@@ -145,7 +151,7 @@ internal sealed class EquipmentPage : IMemberPage
     {
         var sheetArea = area with { Width = area.Width - EquipmentChoiceView.PanelWidth };
         _panel.Draw(batch, textures.Pixel, MenuLayout.FullHeight(sheetArea), opacity);
-        _sheetView.Draw(batch, textures, new EquipmentSheetView.Place(_sheet, sheetArea, _selection, _choice is null, _comparison.Text, _notice), opacity);
+        _sheetView.Draw(batch, textures, new EquipmentSheetView.Place(_sheet, sheetArea, _selection, _choice is null, _comparison.Text, ChangesCaptionId, _notice), opacity);
         if (_choice is null)
         {
             _panel.DrawRightEdge(batch, textures.Pixel, MenuLayout.FullHeight(sheetArea), opacity);

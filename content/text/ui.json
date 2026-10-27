@@ -114,6 +114,7 @@
   "item_used": "{item} was used.",
   "equipment_remove_all": "Remove all",
   "equipment_changes": "Changes",
+  "equipment_gives": "Gives",
   "equipment_more_changes": "+{count} more",
   "equipment_remove": "Remove",
   "equipment_no_room": "There's no room in the bag for {item}.",

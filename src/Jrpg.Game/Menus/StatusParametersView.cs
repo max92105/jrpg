@@ -1,4 +1,3 @@
-using FontStashSharp;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
@@ -9,7 +8,8 @@ namespace Jrpg.Game.Menus;
 /// <summary>
 /// Draws the Status page's middle band (decision 334, the plan's S1a): Combat in the left half, the eight resistances
 /// in two columns of four in the right half with Resources under them. Each row is a small spaced-caps label with its
-/// value right-aligned close to it, so the two read together.
+/// value right-aligned close to it, so the two read together (<see cref="SheetRowLook"/>, which the Equipment page
+/// shares).
 /// </summary>
 internal sealed class StatusParametersView
 {
@@ -38,8 +38,7 @@ internal sealed class StatusParametersView
     private const int ResistancesAndResourcesHeight = ResourcesTop + BelowBand + (MostResources * RowHeight);
 
     private readonly StatusLabels _labels;
-    private readonly SpriteFontBase _labelFont;
-    private readonly SpriteFontBase _valueFont;
+    private readonly SheetRowLook _rows;
     private readonly SectionTitle _combatTitle;
     private readonly SectionTitle _resistancesTitle;
     private readonly SectionTitle _resourcesTitle;
@@ -50,8 +49,7 @@ internal sealed class StatusParametersView
     public StatusParametersView(ScreenText text, StatusLabels labels)
     {
         _labels = labels;
-        _labelFont = text.Fonts.FontAt(StatusSheetView.LabelPixels);
-        _valueFont = text.Fonts.FontAt(StatusSheetView.ValuePixels);
+        _rows = new SheetRowLook(text);
         _combatTitle = new SectionTitle(text, MessageIds.StatusCombat);
         _resistancesTitle = new SectionTitle(text, MessageIds.StatusResistances);
         _resourcesTitle = new SectionTitle(text, MessageIds.StatusResources);
@@ -59,11 +57,11 @@ internal sealed class StatusParametersView
 
     /// <summary>Measures the sheet's values, when the shown member changes.</summary>
     public void Show(StatusSheet sheet) => _shown = new Measured(
-        [.. sheet.Combat.Select(Measure)],
-        [.. sheet.Resistances.Select(Measure)],
+        [.. sheet.Combat.Select(_rows.Measure)],
+        [.. sheet.Resistances.Select(_rows.Measure)],
         sheet.ResistanceTones,
         [.. sheet.Resources.Select(resource => resource.Name)],
-        [.. sheet.Resources.Select(resource => Measure(resource.Text))]);
+        [.. sheet.Resources.Select(resource => _rows.Measure(resource.Text))]);
 
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the plain pixel and the bar come from.</param>
@@ -85,7 +83,7 @@ internal sealed class StatusParametersView
         _resourcesTitle.Draw(batch, textures, resources, opacity);
         for (var index = 0; index < shown.Resources.Length; index++)
         {
-            DrawCell(frame, CellAt(resources, index, resources.Width), new CellText(shown.ResourceNames[index], shown.Resources[index], UiTheme.TextPrimary));
+            _rows.Draw(frame.Batch, CellAt(resources, index, resources.Width), new SheetRowLook.Cell(shown.ResourceNames[index], shown.Resources[index], UiTheme.TextPrimary), frame.Opacity);
         }
     }
 
@@ -95,7 +93,7 @@ internal sealed class StatusParametersView
         _combatTitle.Draw(frame.Batch, frame.Textures, section, frame.Opacity);
         for (var index = 0; index < values.Length; index++)
         {
-            DrawCell(frame, CellAt(section, index, section.Width), new CellText(_labels.Combat[index], values[index], UiTheme.TextPrimary));
+            _rows.Draw(frame.Batch, CellAt(section, index, section.Width), new SheetRowLook.Cell(_labels.Combat[index], values[index], UiTheme.TextPrimary), frame.Opacity);
         }
 
         var hp = CellAt(section, StatusSheet.HpLine, section.Width);
@@ -111,7 +109,7 @@ internal sealed class StatusParametersView
         {
             var column = section with { X = section.X + (index / ResistanceRowsPerColumn * (columnWidth + ResistanceColumnGap)) };
             var cell = CellAt(column, index % ResistanceRowsPerColumn, columnWidth + CellInset);
-            DrawCell(frame, cell, new CellText(_labels.Resistances[index], values[index], ColorOf(tones[index])));
+            _rows.Draw(frame.Batch, cell, new SheetRowLook.Cell(_labels.Resistances[index], values[index], ColorOf(tones[index])), frame.Opacity);
         }
     }
 
@@ -127,26 +125,11 @@ internal sealed class StatusParametersView
         _ => UiTheme.TextPrimary,
     };
 
-    // The label small on the left, the value large at the cell's right edge, both centered on the row.
-    private void DrawCell(Frame frame, Rectangle cell, CellText text)
-    {
-        var (label, value, valueColor) = text;
-        var middle = cell.Y + (cell.Height / 2f);
-        var labelPosition = new Vector2(cell.X, middle - (_labelFont.LineHeight / 2f));
-        frame.Batch.DrawString(_labelFont, label, labelPosition, UiTheme.TextSecondary * frame.Opacity, characterSpacing: StatusSheetView.LabelSpacing);
-        var valuePosition = new Vector2(cell.Right - value.Width, middle - (_valueFont.LineHeight / 2f));
-        frame.Batch.DrawString(_valueFont, value.Text, valuePosition, valueColor * frame.Opacity);
-    }
-
-    private MeasuredText Measure(string value) => MeasuredText.Of(_valueFont, value);
 
     /// <summary>Where the band goes this frame.</summary>
     /// <param name="Band">The band's top left and width, under the profile.</param>
     /// <param name="HpBar">The shown member's HP bar.</param>
     public readonly record struct Place(Rectangle Band, StatBar HpBar);
-
-    // One cell's label, its value, and the value's color.
-    private readonly record struct CellText(string Label, MeasuredText Value, Color ValueColor);
 
     // What the drawing helpers draw with this frame.
     private readonly record struct Frame(SpriteBatch Batch, TextureLibrary Textures, float Opacity);

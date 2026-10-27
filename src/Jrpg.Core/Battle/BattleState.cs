@@ -21,6 +21,7 @@ public sealed class BattleState
     private readonly TurnFlow _turnFlow;
     private readonly SkillBackfire _backfire;
     private readonly EffectLanding _landing;
+    private readonly TargetChoices _targetChoices;
     private readonly Inventory _inventory;
     private bool _isExperienceGranted;
 
@@ -50,6 +51,7 @@ public sealed class BattleState
         _turnFlow = new TurnFlow(Combatants, _turnOrder);
         _backfire = new SkillBackfire(Combatants, random);
         _landing = new EffectLanding(Combatants);
+        _targetChoices = new TargetChoices(Combatants, Formation);
         Phase = LivingOn(BattleSide.Party).Count == 0 ? BattlePhase.Defeat : TurnFlow.PhaseOf(CurrentActor);
     }
 
@@ -88,14 +90,14 @@ public sealed class BattleState
         [.. Combatants.Where(combatant => combatant.Side == side && combatant.IsAlive)];
 
     /// <summary>Who the current actor can attack: one living enemy, in formation order.</summary>
-    public TargetChoice<Combatant> TargetChoiceForAttack() => ChoiceFor(AttackTargeting);
+    public TargetChoice<Combatant> TargetChoiceForAttack() => _targetChoices.ChoiceFor(CurrentActor, AttackTargeting);
 
     /// <summary>Whom the actor can trade places with: the allies right beside them; none on an enemy's turn.</summary>
     public TargetChoice<Combatant> TargetChoiceForMove() =>
         new(CurrentActor.Side == BattleSide.Party ? Formation.Neighbors(CurrentActor) : [], TakesAll: false);
 
     /// <summary>Who the current actor can aim <paramref name="skill"/> at, in formation order.</summary>
-    public TargetChoice<Combatant> TargetChoiceFor(SkillDefinition skill) => ChoiceFor(skill.Effect);
+    public TargetChoice<Combatant> TargetChoiceFor(SkillDefinition skill) => _targetChoices.ChoiceFor(CurrentActor, skill.Effect);
 
     /// <summary>Whether the actor can pay <paramref name="skill"/>: its resource requirements and costs.</summary>
     public bool CanAfford(SkillDefinition skill) => SkillPayment.CanPay(CurrentActor, skill);
@@ -119,7 +121,7 @@ public sealed class BattleState
     /// <exception cref="ArgumentException">The item has no effect to aim.</exception>
     public TargetChoice<Combatant> TargetChoiceFor(ItemDefinition item) =>
         item.Effect is { } effect
-            ? ChoiceFor(effect)
+            ? _targetChoices.ChoiceFor(CurrentActor, effect)
             : throw new ArgumentException($"{item.Name} has no effect to aim.", nameof(item));
 
     /// <summary>
@@ -128,7 +130,7 @@ public sealed class BattleState
     /// </summary>
     public bool CanUse(ItemDefinition item) =>
         CurrentActor.Side == BattleSide.Party && item.Effect is { } effect && _inventory.QuantityOf(item.Id) > 0
-        && effect.Kind != EffectKind.Rest && ChoiceFor(effect).Candidates.Count > 0;
+        && effect.Kind != EffectKind.Rest && _targetChoices.ChoiceFor(CurrentActor, effect).Candidates.Count > 0;
 
     /// <summary>Gives the enemies' experience to the party members still standing (developer decision 13). Call once, after a victory.</summary>
     /// <returns>The total experience and one gain per living party member, with the level steps it produced.</returns>
@@ -168,16 +170,11 @@ public sealed class BattleState
         return events;
     }
 
-    private static TargetRelation RelationOf(Combatant actor, Combatant candidate) =>
-        candidate == actor ? TargetRelation.Self
-        : candidate.Side == actor.Side ? TargetRelation.Ally
-        : TargetRelation.Enemy;
-
     // An attack is a single-enemy damage effect whose power is the attacker's attack.
     private void Attack(Combatant actor, Combatant target, List<BattleEvent> events)
     {
         var effect = new Effect(EffectKind.Damage, actor.CurrentStats.Attack, AttackTargeting);
-        ThrowIfIllegalTargets(effect, [target]);
+        _targetChoices.ThrowIfIllegal(actor, effect, [target]);
         _landing.Land(actor, effect, [target], events);
     }
 
@@ -188,7 +185,7 @@ public sealed class BattleState
             throw new InvalidOperationException($"{actor.Name} can't use {command.Skill.Name} (unknown skill, can't pay for it, or no target).");
         }
 
-        ThrowIfIllegalTargets(command.Skill.Effect, command.Targets);
+        _targetChoices.ThrowIfIllegal(actor, command.Skill.Effect, command.Targets);
         var effect = SkillEmpowerment.EffectOf(actor, command.Skill);
         SkillPayment.Pay(actor, command.Skill, events);
         if (command.Skill.Effect.Kind == EffectKind.ReadyExtraTurn)
@@ -208,31 +205,9 @@ public sealed class BattleState
             throw new InvalidOperationException($"{actor.Name} can't use {command.Item.Name} (not owned, not usable, or not a party member).");
         }
 
-        ThrowIfIllegalTargets(effect, command.Targets);
+        _targetChoices.ThrowIfIllegal(actor, effect, command.Targets);
         _inventory.TryRemove(command.Item.Id, 1);
         _landing.Land(actor, effect, command.Targets, events);
-    }
-
-    // The one rule for who the current actor may aim at, behind both the choices offered and the check in Execute.
-    // An aura reaches the actor and the living allies within its range along the formation (ADR 0023, question 210).
-    private TargetChoice<Combatant> ChoiceFor(Effect effect) =>
-        effect.Targeting == Targeting.AlliesInRange
-            ? new([.. Formation.WithinRange(CurrentActor, effect.Range).Where(ally => ally.IsAlive)], TakesAll: true)
-            : ChoiceFor(effect.Targeting);
-
-    private TargetChoice<Combatant> ChoiceFor(Targeting targeting) => new(
-        [.. Combatants.Where(candidate => TargetRules.CanTarget(targeting, RelationOf(CurrentActor, candidate), candidate.Vitals))],
-        TargetRules.HitsEveryValidTarget(targeting));
-
-    private void ThrowIfIllegalTargets(Effect effect, IReadOnlyList<Combatant> targets)
-    {
-        var validTargets = ChoiceFor(effect).Candidates.ToHashSet();
-        if (!TargetRules.IsLegalChoice(effect.Targeting, validTargets, targets))
-        {
-            throw new ArgumentException(
-                $"Illegal targets for a {effect.Targeting} effect from {CurrentActor.Name}: {string.Join(", ", targets.Select(target => target.Name))}.",
-                nameof(targets));
-        }
     }
 
     // Placeholder (question 211): a Move costs the mover's turn, and the ally swapped with loses nothing.

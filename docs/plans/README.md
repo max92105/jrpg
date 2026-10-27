@@ -15,7 +15,7 @@ Older plans are single files with the same sections.
 
 | Plan | Status |
 |---|---|
-| [2026-10-26-stats-and-gear-slots](2026-10-26-stats-and-gear-slots/README.md) | approved |
+| [2026-10-26-stats-and-gear-slots](2026-10-26-stats-and-gear-slots/README.md) | approved, in progress |
 | [done/2026-10-26-escape-menu-third-pass](done/2026-10-26-escape-menu-third-pass/README.md) | done |
 | [done/2026-10-25-ui-second-pass](done/2026-10-25-ui-second-pass/README.md) | done (retro run on the other machine) |
 | [done/2026-10-24-class-mechanics](done/2026-10-24-class-mechanics/README.md) | done |

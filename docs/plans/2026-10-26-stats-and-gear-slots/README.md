@@ -1,5 +1,5 @@
 # Stats and gear slots
-Status: approved
+Status: approved, in progress
 
 Fifth feature plan after the migration, following the escape menu third pass.
 - Renumbered when the two machines' histories were merged (2026-10-27): this plan was drafted on 267-308, which the escape menu third pass had taken, so every number here moved up 24. Its Game slices were drafted against the other machine's menu code (the UI second pass built twice); check each against the third pass's pages before slicing it.
@@ -58,7 +58,7 @@ At the end of this plan:
 One line per slice; each slice's goal, types, tests and hand checks are in its file under `slices/`. Tick the box here when a slice is done, and write its deviations in the slice file. Tunables, design overview and risks: [design.md](design.md).
 
 ### Phase 0: clean-up
-- [ ] **C1. `BattleState`'s target choices move to `Battle/TargetChoices`** (Core, mechanical, about 120 lines moved) → [slices/C1.md](slices/C1.md)
+- [x] **C1. `BattleState`'s target choices move to `Battle/TargetChoices`** (Core, mechanical, about 120 lines moved) → [slices/C1.md](slices/C1.md)
 - [ ] **C2. Test files split: `BattleStateTests` by command, `PartyMemberTests` by behavior, `ClassCatalogValidatorTests` stats apart** (tests, mechanical, about 200 lines moved) → [slices/C2.md](slices/C2.md)
 
 ### Phase 1: the stat sheet

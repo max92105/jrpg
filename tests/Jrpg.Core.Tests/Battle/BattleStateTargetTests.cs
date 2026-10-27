@@ -49,5 +49,5 @@ public sealed class BattleStateTargetTests
         new PartyMemberBuilder().WithAttack(13).WithVitals(hp, maxHp: 100).Build());
 
     private static Combatant Goblin(int hp) =>
-        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, attack: 12).Build());
+        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, damage: 12).Build());
 }

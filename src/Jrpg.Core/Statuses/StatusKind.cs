@@ -9,13 +9,15 @@ public enum StatusKind
     /// <summary>Every enemy attack goes to a taunting party member (question 209).</summary>
     Taunt,
 
-    /// <summary>The holder's defense rises by the status's power while it lasts (the paladin's aura).</summary>
+    /// <summary>
+    /// Every resistance of the holder rises by the status's power, in points, while it lasts (the paladin's aura).
+    /// </summary>
     Guarded,
 
     /// <summary>Every hit on the holder lands harder by the status's power, in percent (question 215).</summary>
     Exposed,
 
-    /// <summary>The holder loses the status's power in HP at the end of each of its turns, ignoring defense.</summary>
+    /// <summary>The holder loses the status's power in HP at the end of each of its turns, past resistances.</summary>
     Poison,
 
     /// <summary>The holder regains the status's power in HP at the end of each of its turns.</summary>

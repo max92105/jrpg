@@ -8,14 +8,26 @@ public sealed class StatusModifiersTests
     private static readonly CombatStats _stats = new(Attack: 20, Defense: 5);
 
     [Fact]
-    public void Apply_Guarded_AddsPowerToDefense()
+    public void Apply_Guarded_RaisesEveryResistance()
     {
         var statuses = new StatusSet();
-        statuses.Apply(new StatusGrant(StatusKind.Guarded, Power: 5, Turns: 3));
+        statuses.Apply(new StatusGrant(StatusKind.Guarded, Power: 20, Turns: 3));
 
-        var current = StatusModifiers.Apply(_stats, statuses);
+        var current = StatusModifiers.Apply(_stats with { Resistances = Resistances.None with { Fire = 100 } }, statuses);
 
-        Assert.Equal(new CombatStats(Attack: 20, Defense: 10), current);
+        Assert.Equal(Resistances.ByGroup(200, 200) with { Fire = 300 }, current.Resistances);
+    }
+
+    // 70 % raised by 20 would be 90 %, past the 75 % cap.
+    [Fact]
+    public void Apply_GuardedPastCap_StopsAtCap()
+    {
+        var statuses = new StatusSet();
+        statuses.Apply(new StatusGrant(StatusKind.Guarded, Power: 20, Turns: 3));
+
+        var current = StatusModifiers.Apply(_stats with { Resistances = Resistances.None with { Fire = 700 } }, statuses);
+
+        Assert.Equal(750, current.Resistances.Fire);
     }
 
     [Fact]

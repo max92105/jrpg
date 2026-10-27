@@ -5,7 +5,7 @@ namespace Jrpg.Core.Stats;
 /// 100 %, crit damage 150 %) that a struct's <c>default</c> would silently zero.
 /// </summary>
 /// <param name="Attack">The basic attack's raw damage: the weapon's, the unarmed one, or an enemy's attack.</param>
-/// <param name="Defense">Subtracted from each hit taken (until the plan's M2b).</param>
+/// <param name="Defense">Shown on the pages until the plan's M2b-2; no hit reads it.</param>
 public sealed record CombatStats(int Attack, int Defense)
 {
     /// <summary>

@@ -275,7 +275,7 @@ public sealed class BattleSkillAndItemTests
             .Build());
 
     private static Combatant Goblin(int maxHp = 40) =>
-        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp, attack: 20).Build());
+        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp, damage: 20).Build());
 
     private BattleState CreateBattle() =>
         new([_mage, _ally, _goblin, _otherGoblin], _inventory, new FixedSequenceRandom(3, 2, 1));

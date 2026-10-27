@@ -7,8 +7,7 @@ internal sealed class EnemyDefinitionBuilder
 {
     private string _name = "Goblin";
     private int _maxHp = 40;
-    private int _attack = 20;
-    private int _defense;
+    private int _damage = 20;
     private DamageType _damageType = DamageType.Blunt;
     private Resistances _resistances = Resistances.None;
 
@@ -18,17 +17,10 @@ internal sealed class EnemyDefinitionBuilder
         return this;
     }
 
-    public EnemyDefinitionBuilder WithStats(int maxHp, int attack)
+    public EnemyDefinitionBuilder WithStats(int maxHp, int damage)
     {
         _maxHp = maxHp;
-        _attack = attack;
-        return this;
-    }
-
-    /// <summary>For the tests about defense itself, until the plan's M2b; every other enemy has none.</summary>
-    public EnemyDefinitionBuilder WithDefense(int defense)
-    {
-        _defense = defense;
+        _damage = damage;
         return this;
     }
 
@@ -53,8 +45,7 @@ internal sealed class EnemyDefinitionBuilder
         AttackEffectFile = "AttackEnemy.png",
         IsSpriteFlipped = false,
         MaxHp = _maxHp,
-        Attack = _attack,
-        Defense = _defense,
+        Damage = _damage,
         DamageType = _damageType,
         Resistances = _resistances,
         ExperienceReward = 40,

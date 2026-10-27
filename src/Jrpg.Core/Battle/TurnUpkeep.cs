@@ -7,7 +7,7 @@ internal static class TurnUpkeep
 {
     /// <summary>
     /// The holder's Poison and Regen take or restore their power in HP, in the order applied; a fresh one ticks too,
-    /// only its countdown waits. Poison isn't a hit, so it ignores defense and Exposed and sets off no hit trigger.
+    /// only its countdown waits. Poison isn't a hit, so it ignores resistances and Exposed and sets off no hit trigger.
     /// </summary>
     public static void TickStatuses(Combatant holder, IReadOnlyList<Combatant> combatants, List<BattleEvent> events)
     {

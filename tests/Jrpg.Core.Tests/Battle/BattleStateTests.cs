@@ -192,7 +192,7 @@ public sealed class BattleStateTests
     }
 
     private static EnemyDefinition Enemy(string name, int maxHp = 40) =>
-        new EnemyDefinitionBuilder().WithName(name).WithStats(maxHp, attack: 12).Build();
+        new EnemyDefinitionBuilder().WithName(name).WithStats(maxHp, damage: 12).Build();
 
     // The shuffle (3, 2, 1) keeps the listed order: the hero, then the goblins. One hit fells a 10 HP goblin.
     private (BattleState Battle, Combatant[] Goblins) HeroAgainstThreeWeakGoblins()
@@ -205,7 +205,7 @@ public sealed class BattleStateTests
         new PartyMemberBuilder().WithAttack(13).WithVitals(hp, maxHp: 100).Build());
 
     private static Combatant Goblin(int hp) =>
-        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, attack: 12).Build());
+        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, damage: 12).Build());
 
     private void AssertStillHerosTurn(BattleState battle)
     {

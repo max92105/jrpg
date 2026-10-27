@@ -58,7 +58,7 @@ public sealed class CombatantTests
     [Fact]
     public void FromEnemy_StartsAtFullHp()
     {
-        var goblin = new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20).Build();
+        var goblin = new EnemyDefinitionBuilder().WithStats(maxHp: 40, damage: 20).Build();
 
         var combatant = Combatant.FromEnemy(goblin);
 
@@ -111,7 +111,7 @@ public sealed class CombatantTests
     [Fact]
     public void FromEnemy_Always_HasNoResources()
     {
-        var goblin = new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20).Build();
+        var goblin = new EnemyDefinitionBuilder().WithStats(maxHp: 40, damage: 20).Build();
 
         var combatant = Combatant.FromEnemy(goblin);
 
@@ -121,13 +121,13 @@ public sealed class CombatantTests
     [Fact]
     public void FromEnemy_Definition_UsesItsStatsOnEnemySide()
     {
-        var goblin = new EnemyDefinitionBuilder().WithName("Goblin").WithStats(maxHp: 40, attack: 20).WithDefense(2).Build();
+        var goblin = new EnemyDefinitionBuilder().WithName("Goblin").WithStats(maxHp: 40, damage: 20).Build();
 
         var combatant = Combatant.FromEnemy(goblin);
 
         Assert.Equal("Goblin", combatant.Name);
         Assert.Equal(BattleSide.Enemies, combatant.Side);
-        Assert.Equal(new CombatStats(Attack: 20, Defense: 2), combatant.Stats);
+        Assert.Equal(new CombatStats(Attack: 20, Defense: 0), combatant.Stats);
     }
 
     [Fact]

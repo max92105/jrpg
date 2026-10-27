@@ -110,7 +110,7 @@ public sealed class BattleMultiHitTests
             TestStatRules.Neutral));
 
     private static Combatant Goblin(int hp) =>
-        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, attack: 20).Build());
+        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, damage: 20).Build());
 
     private static SkillDefinition Skill(string id, Effect effect, params ResourceChange[] changes) =>
         new() { Id = id, Name = id, Description = "", IconFile = "", ResourceChanges = changes, Effect = effect };

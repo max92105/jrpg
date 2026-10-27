@@ -9,8 +9,7 @@ using Jrpg.Core.Tests.Randomness;
 
 namespace Jrpg.Core.Tests.Battle;
 
-// Every hit here has power 40 against defense 0, so a resistance alone changes what lands; the shuffle (1) keeps the
-// first member first.
+// Every hit here has power 40, so a resistance alone changes what lands; the shuffle (1) keeps the first member first.
 public sealed class BattleResistanceTests
 {
     private static readonly SkillDefinition _fireBlast = Skill(Targeting.SingleEnemy);
@@ -102,7 +101,7 @@ public sealed class BattleResistanceTests
             rules));
 
     private static Combatant Goblin(Resistances resistances) =>
-        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 100, attack: 20).WithResistances(resistances).Build());
+        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 100, damage: 20).WithResistances(resistances).Build());
 
     private static SkillDefinition Skill(Targeting targeting) => new()
     {

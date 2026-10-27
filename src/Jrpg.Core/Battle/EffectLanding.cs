@@ -53,7 +53,6 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants)
     {
         var stats = target.CurrentStats;
         return new Mitigation(
-            stats.Defense,
             type is { } hitType ? stats.Resistances.Of(hitType) : 0,
             StatFormula.PermilleOf(StatusModifiers.ExtraDamageTakenPercent(target.Statuses)));
     }

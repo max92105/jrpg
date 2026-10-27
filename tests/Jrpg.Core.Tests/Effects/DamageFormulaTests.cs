@@ -5,45 +5,34 @@ namespace Jrpg.Core.Tests.Effects;
 public sealed class DamageFormulaTests
 {
     [Fact]
-    public void Calculate_PowerAboveDefense_ReturnsDifference()
+    public void Calculate_NothingInTheWay_LandsThePower()
     {
-        var damage = DamageFormula.Calculate(power: 20, Defense(8));
+        var damage = DamageFormula.Calculate(power: 20, Mitigation.None);
 
-        Assert.Equal(12, damage);
+        Assert.Equal(20, damage);
     }
 
-    [Theory]
-    [InlineData(8, 8)]
-    [InlineData(5, 30)]
-    public void Calculate_DefenseAtOrAbovePower_ReturnsMinimumDamage(int power, int defense)
+    // A quarter of 1 at the 75 % cap would round down to 0; every hit still counts.
+    [Fact]
+    public void Calculate_OnePowerAtCap_ReturnsMinimumDamage()
     {
-        var damage = DamageFormula.Calculate(power, Defense(defense));
+        var damage = DamageFormula.Calculate(power: 1, new Mitigation(ResistancePermille: 750, ExtraTakenPermille: 0));
 
         Assert.Equal(DamageFormula.MinimumDamage, damage);
     }
 
-    // (30 - 10) = 20 gets through, and Exposed +50 % makes it 30; scaling the raw 30 first would give 35.
     [Fact]
-    public void Calculate_Exposed50_MultipliesAfterDefense()
+    public void Calculate_Exposed50_RaisesByHalf()
     {
-        var damage = DamageFormula.Calculate(power: 30, new Mitigation(Defense: 10, ResistancePermille: 0, ExtraTakenPermille: 500));
+        var damage = DamageFormula.Calculate(power: 20, new Mitigation(ResistancePermille: 0, ExtraTakenPermille: 500));
 
         Assert.Equal(30, damage);
     }
 
     [Fact]
-    public void Calculate_ExposedOnMinimumHit_StaysAtLeastMinimum()
+    public void Calculate_FiftyPercentResistance_Halves()
     {
-        var damage = DamageFormula.Calculate(power: 5, new Mitigation(Defense: 20, ResistancePermille: 0, ExtraTakenPermille: 500));
-
-        Assert.Equal(DamageFormula.MinimumDamage, damage);
-    }
-
-    // (50 - 10) = 40 gets through and 50 % of it is taken off; halving the raw 50 first would give 15.
-    [Fact]
-    public void Calculate_FiftyPercentResistance_HalvesWhatGetsThrough()
-    {
-        var damage = DamageFormula.Calculate(power: 50, new Mitigation(Defense: 10, ResistancePermille: 500, ExtraTakenPermille: 0));
+        var damage = DamageFormula.Calculate(power: 40, new Mitigation(ResistancePermille: 500, ExtraTakenPermille: 0));
 
         Assert.Equal(20, damage);
     }
@@ -51,7 +40,7 @@ public sealed class DamageFormulaTests
     [Fact]
     public void Calculate_NegativeResistance_RaisesDamage()
     {
-        var damage = DamageFormula.Calculate(power: 40, new Mitigation(Defense: 0, ResistancePermille: -250, ExtraTakenPermille: 0));
+        var damage = DamageFormula.Calculate(power: 40, new Mitigation(ResistancePermille: -250, ExtraTakenPermille: 0));
 
         Assert.Equal(50, damage);
     }
@@ -60,7 +49,7 @@ public sealed class DamageFormulaTests
     [Fact]
     public void Calculate_ResistanceAboveCap_UsesCap()
     {
-        var damage = DamageFormula.Calculate(power: 40, new Mitigation(Defense: 0, ResistancePermille: 900, ExtraTakenPermille: 0));
+        var damage = DamageFormula.Calculate(power: 40, new Mitigation(ResistancePermille: 900, ExtraTakenPermille: 0));
 
         Assert.Equal(10, damage);
     }
@@ -69,7 +58,7 @@ public sealed class DamageFormulaTests
     [Fact]
     public void Calculate_ResistanceAndExposed_RoundsDownOnce()
     {
-        var damage = DamageFormula.Calculate(power: 41, new Mitigation(Defense: 0, ResistancePermille: 250, ExtraTakenPermille: 500));
+        var damage = DamageFormula.Calculate(power: 41, new Mitigation(ResistancePermille: 250, ExtraTakenPermille: 500));
 
         Assert.Equal(46, damage);
     }
@@ -78,7 +67,7 @@ public sealed class DamageFormulaTests
     [Fact]
     public void Calculate_WeaknessBelowFloor_UsesFloor()
     {
-        var damage = DamageFormula.Calculate(power: 40, new Mitigation(Defense: 0, ResistancePermille: -1500, ExtraTakenPermille: 0));
+        var damage = DamageFormula.Calculate(power: 40, new Mitigation(ResistancePermille: -1500, ExtraTakenPermille: 0));
 
         Assert.Equal(80, damage);
     }
@@ -102,6 +91,4 @@ public sealed class DamageFormulaTests
     {
         Assert.Equal(HitAffinity.Resisted, DamageFormula.AffinityOf(250));
     }
-
-    private static Mitigation Defense(int defense) => Mitigation.None with { Defense = defense };
 }

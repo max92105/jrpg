@@ -104,7 +104,7 @@ public sealed class BattleDominanceTests
             TestStatRules.Neutral));
         druid.ChangeResource("growth", growth, []);
         druid.ChangeResource("decay", decay, []);
-        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 100, attack: 20).Build());
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 100, damage: 20).Build());
         return (druid, goblin, new BattleState([druid, goblin], new Inventory(), new FixedSequenceRandom(1)));
     }
 

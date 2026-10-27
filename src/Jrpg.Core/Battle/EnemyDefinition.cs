@@ -19,9 +19,8 @@ public sealed record EnemyDefinition
 
     public required int MaxHp { get; init; }
 
-    public required int Attack { get; init; }
-
-    public required int Defense { get; init; }
+    /// <summary>Its basic attack's raw damage (an enemy has no Power to raise it).</summary>
+    public required int Damage { get; init; }
 
     /// <summary>What the enemy's attack hits as (ADR 0027).</summary>
     public required DamageType DamageType { get; init; }

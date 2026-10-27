@@ -111,5 +111,5 @@ public sealed class BattleReadyTests
     }
 
     private static Combatant Goblin() =>
-        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20).Build());
+        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, damage: 20).Build());
 }

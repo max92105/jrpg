@@ -102,7 +102,7 @@ public sealed class FieldItemUse(PartyState party, Inventory inventory)
         }
 
         inventory.TryRemove(item.Id, 1);
-        return [.. targets.Select(target => Land(effect, target, target.Vitals))];
+        return [.. targets.Select(target => Land(effect, target.Vitals))];
     }
 
     /// <summary>
@@ -118,13 +118,13 @@ public sealed class FieldItemUse(PartyState party, Inventory inventory)
         }
 
         var preview = new Vitals(target.Vitals.Hp, target.Vitals.MaxHp);
-        Land(effect, target, preview);
+        Land(effect, preview);
         return preview.Hp;
     }
 
     // Use and HpAfterUse land the effect the same way, so a preview can't drift from the use.
-    private static int Land(Effect effect, PartyMember target, Vitals vitals) =>
-        EffectResolver.Apply(effect, vitals, Mitigation.None with { Defense = target.TotalStats.Defense });
+    private static int Land(Effect effect, Vitals vitals) =>
+        EffectResolver.Apply(effect, vitals, Mitigation.None);
 
     private static TargetRelation RelationOf(PartyMember user, PartyMember candidate) =>
         candidate == user ? TargetRelation.Self : TargetRelation.Ally;

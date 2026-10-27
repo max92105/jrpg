@@ -15,10 +15,10 @@ namespace Jrpg.Core.Tests.Battle;
 public sealed class BattleTickingStatusTests
 {
     [Fact]
-    public void Execute_PoisonedActorEndsTurn_LosesPowerIgnoringDefenseAndExposed()
+    public void Execute_PoisonedActorEndsTurn_LosesPowerIgnoringResistancesAndExposed()
     {
-        var hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithDefense(5).Build());
-        var battle = new BattleState([hero, Goblin(hp: 25)], new Inventory(), new FixedSequenceRandom(1));
+        var (hero, _, battle) = Battle(goblinHp: 25);
+        hero.Statuses.Apply(new StatusGrant(StatusKind.Guarded, Power: 50, Turns: 3));
         hero.Statuses.Apply(new StatusGrant(StatusKind.Exposed, Power: 50, Turns: 3));
         hero.Statuses.Apply(new StatusGrant(StatusKind.Poison, Power: 7, Turns: 3));
 
@@ -149,7 +149,7 @@ public sealed class BattleTickingStatusTests
     }
 
     private static Combatant Goblin(int hp) =>
-        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, attack: 20).Build());
+        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, damage: 20).Build());
 
     private static SkillDefinition Skill(string id, Effect effect) =>
         new() { Id = id, Name = id, Description = "", IconFile = "", Effect = effect };

@@ -11,7 +11,6 @@ internal static class EffectResolver
     /// <param name="mitigation">What stands between a hit and the target's HP now.</param>
     public static int Apply(Effect effect, Vitals target, Mitigation mitigation) => effect.Kind switch
     {
-        // Placeholder: defense reduces skill and item damage like an attack, as in the demo (plan 2026-10-17, guiding rule).
         EffectKind.Damage => target.TakeDamage(DamageFormula.Calculate(effect.Power, mitigation)),
         EffectKind.RestoreHp => target.RestoreHp(effect.Power),
         EffectKind.Revive => target.Revive(effect.Power),

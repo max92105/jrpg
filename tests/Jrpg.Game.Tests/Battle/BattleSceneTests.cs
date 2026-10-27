@@ -108,7 +108,7 @@ public sealed class BattleSceneTests
     [Fact]
     public void Update_PartyFallsThenMainMenu_RequestsTitle()
     {
-        var catalog = WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { Attack = 9999 });
+        var catalog = WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { Damage = 9999 });
         var (session, scene) = StartForestBattleScene(catalog);
         Settle(scene);
         if (session.ActiveBattle is not null)

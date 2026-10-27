@@ -30,7 +30,7 @@ public sealed class BattleFormationTests
 
     public BattleFormationTests()
     {
-        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20).Build());
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, damage: 20).Build());
         _battle = new BattleState([_ragnir, _teelle, _zanyr, goblin], new Inventory(), new FixedSequenceRandom(3, 2, 1));
     }
 
@@ -99,7 +99,7 @@ public sealed class BattleFormationTests
     // The shuffle (0, 2, 1) swaps the goblin to the front of the turn order.
     private BattleState GoblinFirst()
     {
-        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20).Build());
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, damage: 20).Build());
         return new BattleState([_ragnir, _teelle, _zanyr, goblin], new Inventory(), new FixedSequenceRandom(0, 2, 1));
     }
 
@@ -163,7 +163,7 @@ public sealed class BattleFormationTests
     private static (Combatant[] Line, BattleState Battle) LineOfFour(int[] shuffle)
     {
         Combatant[] line = [Knowing("ragnir"), Knowing("teelle"), Knowing("zanyr"), Knowing("omer")];
-        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20).Build());
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, damage: 20).Build());
         return (line, new BattleState([.. line, goblin], new Inventory(), new FixedSequenceRandom(shuffle)));
     }
 

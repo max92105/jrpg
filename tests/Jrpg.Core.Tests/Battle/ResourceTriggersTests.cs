@@ -43,7 +43,7 @@ public sealed class ResourceTriggersTests
     private readonly Combatant _fighter = Combatant.FromPartyMember(new PartyMemberBuilder().WithId("ragnir").Build());
 
     private readonly Combatant _goblin =
-        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20).Build());
+        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, damage: 20).Build());
 
     [Fact]
     public void OnCombatantFallen_AllyFalls_LivingClericLosesFaith()

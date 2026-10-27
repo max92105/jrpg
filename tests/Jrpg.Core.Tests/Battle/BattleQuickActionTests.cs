@@ -84,7 +84,7 @@ public sealed class BattleQuickActionTests
 
     private (BattleState Battle, Combatant Goblin) Battle(int goblinHp)
     {
-        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: goblinHp, attack: 20).Build());
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: goblinHp, damage: 20).Build());
         return (new BattleState([_rogue, goblin], new Inventory(), new FixedSequenceRandom(1)), goblin);
     }
 }

@@ -100,7 +100,7 @@
     "resourceChanges": [ { "resourceId": "conviction", "amount": -4 } ],
     "effect": {
       "kind": "grantStatus", "power": 0, "targeting": "alliesInRange", "range": 1,
-      "status": { "kind": "guarded", "power": 5, "turns": 3 }
+      "status": { "kind": "guarded", "power": 20, "turns": 3 }
     }
   },
   {
@@ -111,7 +111,7 @@
     "resourceChanges": [ { "resourceId": "conviction", "amount": -6 } ],
     "effect": {
       "kind": "grantStatus", "power": 0, "targeting": "alliesInRange", "range": 2,
-      "status": { "kind": "guarded", "power": 3, "turns": 3 }
+      "status": { "kind": "guarded", "power": 12, "turns": 3 }
     }
   },
   {

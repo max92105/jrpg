@@ -34,6 +34,9 @@ public sealed record Resistances(int Blunt, int Piercing, int Slashing, int Fire
     /// <summary>These and <paramref name="other"/> added type by type, before the limits apply.</summary>
     public Resistances Plus(Resistances other) => From(type => Of(type) + other.Of(type));
 
+    /// <summary>Every resistance raised by <paramref name="points"/> percent, then clamped.</summary>
+    public Resistances Raised(int points) => From(type => Of(type) + StatFormula.PermilleOf(points)).Clamped();
+
     /// <summary>Every resistance kept within the floor and the cap.</summary>
     public Resistances Clamped() =>
         From(type => Math.Clamp(Of(type), StatFormula.PermilleOf(FloorPercent), StatFormula.PermilleOf(CapPercent)));

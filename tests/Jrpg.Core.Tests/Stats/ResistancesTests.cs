@@ -12,6 +12,17 @@ public sealed class ResistancesTests
         Assert.Equal(120, resistances.Of(DamageType.Fire));
     }
 
+    // A weakness rises too: -20 % becomes -10 %.
+    [Fact]
+    public void Raised_TenPoints_RaisesEveryType()
+    {
+        var resistances = Resistances.None with { Fire = -200, Ice = 300 };
+
+        var raised = resistances.Raised(10);
+
+        Assert.Equal(Resistances.ByGroup(100, 100) with { Fire = -100, Ice = 400 }, raised);
+    }
+
     [Fact]
     public void ByGroup_PhysicalAndMagical_FillsEachGroup()
     {

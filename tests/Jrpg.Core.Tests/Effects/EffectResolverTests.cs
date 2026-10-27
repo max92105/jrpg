@@ -6,14 +6,14 @@ namespace Jrpg.Core.Tests.Effects;
 public sealed class EffectResolverTests
 {
     [Fact]
-    public void Apply_Damage_ReturnsDamageAfterDefense()
+    public void Apply_Damage_ReturnsTheHpLost()
     {
         var target = new Vitals(hp: 40, maxHp: 40);
 
-        var amount = EffectResolver.Apply(new Effect(EffectKind.Damage, Power: 20, Targeting.SingleEnemy), target, Mitigation.None with { Defense = 2 });
+        var amount = EffectResolver.Apply(new Effect(EffectKind.Damage, Power: 20, Targeting.SingleEnemy), target, Mitigation.None);
 
-        Assert.Equal(18, amount);
-        Assert.Equal(22, target.Hp);
+        Assert.Equal(20, amount);
+        Assert.Equal(20, target.Hp);
     }
 
     [Fact]

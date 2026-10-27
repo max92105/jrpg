@@ -10,8 +10,8 @@ using Jrpg.Core.Tests.Randomness;
 
 namespace Jrpg.Core.Tests.Battle;
 
-// A member with 20 Power at 100 % per 100 points deals 20 % more, against one goblin with defense 0; the shuffle (1)
-// keeps the member first.
+// A member with 20 Power at 100 % per 100 points deals 20 % more, against one goblin; the shuffle (1) keeps the member
+// first.
 public sealed class BattlePowerTests
 {
     private static readonly StatRules _powerRules = TestStatRules.Neutral with { DamagePercentPer100Power = 100 };
@@ -93,7 +93,7 @@ public sealed class BattlePowerTests
 
     private static (Combatant Goblin, BattleState Battle) Battle(Combatant member, Inventory inventory)
     {
-        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 200, attack: 20).Build());
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 200, damage: 20).Build());
         return (goblin, new BattleState([member, goblin], inventory, new FixedSequenceRandom(1)));
     }
 

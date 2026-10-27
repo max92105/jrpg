@@ -128,11 +128,11 @@ public sealed class BattleStateOutcomeTests
     }
 
     private static EnemyDefinition Enemy(string name, int maxHp = 40) =>
-        new EnemyDefinitionBuilder().WithName(name).WithStats(maxHp, attack: 12).Build();
+        new EnemyDefinitionBuilder().WithName(name).WithStats(maxHp, damage: 12).Build();
 
     private static Combatant Hero(int hp) => Combatant.FromPartyMember(
         new PartyMemberBuilder().WithAttack(13).WithVitals(hp, maxHp: 100).Build());
 
     private static Combatant Goblin(int hp) =>
-        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, attack: 12).Build());
+        Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, damage: 12).Build());
 }

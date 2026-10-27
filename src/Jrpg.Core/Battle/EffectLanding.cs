@@ -1,4 +1,5 @@
 using Jrpg.Core.Effects;
+using Jrpg.Core.Stats;
 using Jrpg.Core.Statuses;
 
 namespace Jrpg.Core.Battle;
@@ -44,13 +45,22 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants)
         ResourceTriggers.OnCombatantFallen(fallen, combatants, events);
     }
 
+    // An untyped hit, which only tests build, meets no resistance.
+    private static Mitigation MitigationOf(Combatant target, DamageType? type)
+    {
+        var stats = target.CurrentStats;
+        return new Mitigation(
+            stats.Defense,
+            type is { } hitType ? stats.Resistances.Of(hitType) : 0,
+            StatFormula.PermilleOf(StatusModifiers.ExtraDamageTakenPercent(target.Statuses)));
+    }
+
     // Each hit is resolved and reported on its own (decision 206); the hits stop once the target falls.
     private static void LandHits(Combatant actor, Effect effect, Combatant target, List<BattleEvent> events)
     {
         for (var hit = 0; hit < effect.Hits && (hit == 0 || target.IsAlive); hit++)
         {
-            var damageTakenPercent = DamageFormula.NoChangePercent + StatusModifiers.ExtraDamageTakenPercent(target.Statuses);
-            var amount = EffectResolver.Apply(effect, target.Vitals, target.CurrentStats.Defense, damageTakenPercent);
+            var amount = EffectResolver.Apply(effect, target.Vitals, MitigationOf(target, effect.DamageType));
             if (effect.Kind != EffectKind.GrantStatus)
             {
                 events.Add(new EffectApplied(target, effect.Kind, amount));

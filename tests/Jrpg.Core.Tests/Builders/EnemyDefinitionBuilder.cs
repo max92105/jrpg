@@ -10,6 +10,7 @@ internal sealed class EnemyDefinitionBuilder
     private int _attack = 20;
     private int _defense = 2;
     private DamageType _damageType = DamageType.Blunt;
+    private Resistances _resistances = Resistances.None;
 
     public EnemyDefinitionBuilder WithName(string name)
     {
@@ -31,6 +32,12 @@ internal sealed class EnemyDefinitionBuilder
         return this;
     }
 
+    public EnemyDefinitionBuilder WithResistances(Resistances resistances)
+    {
+        _resistances = resistances;
+        return this;
+    }
+
     public EnemyDefinition Build() => new()
     {
         Id = _name.ToLowerInvariant(),
@@ -43,6 +50,7 @@ internal sealed class EnemyDefinitionBuilder
         Attack = _attack,
         Defense = _defense,
         DamageType = _damageType,
+        Resistances = _resistances,
         ExperienceReward = 40,
     };
 }

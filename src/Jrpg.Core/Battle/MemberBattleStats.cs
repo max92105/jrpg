@@ -10,10 +10,12 @@ namespace Jrpg.Core.Battle;
 internal static class MemberBattleStats
 {
     /// <summary>
-    /// The member's stats with gear, attacking as their weapon's type, or as the rules' unarmed type without one.
+    /// The member's stats with gear, attacking as their weapon's type, or as the rules' unarmed type without one, and
+    /// resisting as their sheet does.
     /// </summary>
     public static CombatStats Of(PartyMember member) => member.TotalStats with
     {
         AttackType = member.Weapon?.Equipment?.DamageType ?? member.Rules.UnarmedDamageType,
+        Resistances = member.Sheet.Resistances,
     };
 }

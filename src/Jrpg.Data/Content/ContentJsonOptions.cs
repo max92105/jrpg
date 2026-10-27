@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using Jrpg.Data.Battle;
 using Jrpg.Data.Items;
 
 namespace Jrpg.Data.Content;
@@ -26,6 +27,7 @@ internal static class ContentJsonOptions
         };
         options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false));
         options.Converters.Add(new StatBonusesConverter());
+        options.Converters.Add(new ResistancesConverter());
 
         // Shared static instance: read-only so it isn't static mutable state.
         options.MakeReadOnly(populateMissingResolver: true);

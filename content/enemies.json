@@ -10,6 +10,7 @@
     "attack": 16,
     "defense": 2,
     "damageType": "piercing",
+    "resistances": { "fire": -25 },
     "experienceReward": 40
   },
   {
@@ -23,6 +24,7 @@
     "attack": 20,
     "defense": 0,
     "damageType": "blunt",
+    "resistances": { "blunt": 25, "piercing": 25, "fire": -50 },
     "experienceReward": 10
   }
 ]

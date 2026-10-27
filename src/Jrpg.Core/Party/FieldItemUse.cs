@@ -124,7 +124,7 @@ public sealed class FieldItemUse(PartyState party, Inventory inventory)
 
     // Use and HpAfterUse land the effect the same way, so a preview can't drift from the use.
     private static int Land(Effect effect, PartyMember target, Vitals vitals) =>
-        EffectResolver.Apply(effect, vitals, target.TotalStats.Defense);
+        EffectResolver.Apply(effect, vitals, Mitigation.None with { Defense = target.TotalStats.Defense });
 
     private static TargetRelation RelationOf(PartyMember user, PartyMember candidate) =>
         candidate == user ? TargetRelation.Self : TargetRelation.Ally;

@@ -58,7 +58,7 @@ public sealed class Combatant
     public static Combatant FromEnemy(EnemyDefinition enemy) => new(
         enemy.Name,
         BattleSide.Enemies,
-        new CombatStats(enemy.Attack, enemy.Defense) { AttackType = enemy.DamageType },
+        new CombatStats(enemy.Attack, enemy.Defense) { AttackType = enemy.DamageType, Resistances = enemy.Resistances },
         new Vitals(enemy.MaxHp, enemy.MaxHp))
     {
         Enemy = enemy,

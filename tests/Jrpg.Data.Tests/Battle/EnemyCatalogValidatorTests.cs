@@ -29,6 +29,8 @@ public sealed class EnemyCatalogValidatorTests
         { _goblin with { Attack = -1 }, "attack must be at least 0 (was -1)." },
         { _goblin with { Defense = -1 }, "defense must be at least 0 (was -1)." },
         { _goblin with { ExperienceReward = -1 }, "experienceReward must be at least 0 (was -1)." },
+        { _goblin with { Resistances = Resistances.None with { Fire = 760 } }, "resistances.fire must be within -100..75 (was 76)." },
+        { _goblin with { Resistances = Resistances.None with { Ice = -1010 } }, "resistances.ice must be within -100..75 (was -101)." },
     };
 
     [Fact]

@@ -26,5 +26,8 @@ public sealed record EnemyDefinition
     /// <summary>What the enemy's attack hits as (ADR 0027).</summary>
     public required DamageType DamageType { get; init; }
 
+    /// <summary>The share of each damage type's hits taken off (ADR 0027); 0 for a type content leaves out.</summary>
+    public Resistances Resistances { get; init; } = Resistances.None;
+
     public required int ExperienceReward { get; init; }
 }

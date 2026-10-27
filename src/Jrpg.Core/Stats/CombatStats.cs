@@ -8,4 +8,7 @@ public sealed record CombatStats(int Attack, int Defense)
 {
     /// <summary>What the combatant's basic attack hits as (ADR 0027).</summary>
     public DamageType AttackType { get; init; } = DamageType.Blunt;
+
+    /// <summary>The share of each damage type's hits taken off (ADR 0027).</summary>
+    public Resistances Resistances { get; init; } = Resistances.None;
 }

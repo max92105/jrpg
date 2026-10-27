@@ -1,24 +1,32 @@
+using Jrpg.Core.Stats;
+
 namespace Jrpg.Core.Effects;
 
 /// <summary>
-/// Placeholder ported from the demo (plan 2026-10-17, guiding rule): defense subtracts straight from power, with a
-/// minimum so every hit still counts. A target's statuses then scale what lands, such as Exposed's +50 %
-/// (question 215).
+/// Defense subtracts straight from power, the placeholder ported from the demo (plan 2026-10-17, guiding rule); the
+/// target's resistance to the hit's type and its statuses, such as Exposed's +50 % (question 215), then scale what gets
+/// through (ADR 0027). A minimum keeps every hit counting.
 /// </summary>
 internal static class DamageFormula
 {
     public const int MinimumDamage = 1;
 
-    /// <summary>The share of damage a target takes with nothing scaling it.</summary>
-    public const int NoChangePercent = 100;
+    private const long Whole = 1000;
 
-    /// <param name="power">The hit's power.</param>
-    /// <param name="defense">The target's defense now.</param>
-    /// <param name="damageTakenPercent">How much of the damage lands, 100 for all of it.</param>
     /// <returns>
-    /// <c>max(1, (power − defense) × percent ÷ 100)</c>, rounded down. The percent comes after defense, so a setup
-    /// like Exposed multiplies what actually gets through rather than the raw power.
+    /// <c>max(1, (power − defense) × (1000 − resistance) × (1000 + extra taken) ÷ 1000²)</c>, rounded down
+    /// once. Both shares come after defense, so a weakness, like Exposed, multiplies what actually gets through
+    /// rather than the raw power. The resistance is held within <see cref="Resistances.FloorPercent"/>..
+    /// <see cref="Resistances.CapPercent"/>.
     /// </returns>
-    public static int Calculate(int power, int defense, int damageTakenPercent = NoChangePercent) =>
-        Math.Max(MinimumDamage, (power - defense) * damageTakenPercent / 100);
+    public static int Calculate(int power, Mitigation mitigation)
+    {
+        var resistance = Math.Clamp(
+            mitigation.ResistancePermille,
+            StatFormula.PermilleOf(Resistances.FloorPercent),
+            StatFormula.PermilleOf(Resistances.CapPercent));
+        var throughDefense = (long)power - mitigation.Defense;
+        var damage = throughDefense * (Whole - resistance) * (Whole + mitigation.ExtraTakenPermille) / (Whole * Whole);
+        return (int)Math.Max(MinimumDamage, damage);
+    }
 }

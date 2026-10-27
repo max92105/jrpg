@@ -1,4 +1,5 @@
 using Jrpg.Core.Party;
+using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Menus;
 
@@ -16,6 +17,9 @@ internal sealed class PartyCursor(PartyState party)
 
     public PartyMember Selected => Column[Row];
 
+    /// <summary>The pointer, gliding between a column's cards and jumping to the other column (decision 262).</summary>
+    public SelectionMotion Pointer { get; } = new();
+
     private IReadOnlyList<PartyMember> Column => ColumnOf(IsOnReserve);
 
     /// <summary>Up or down in the column, wrapping at its ends.</summary>
@@ -23,6 +27,7 @@ internal sealed class PartyCursor(PartyState party)
     {
         var count = Column.Count;
         Row = (Row + step + count) % count;
+        Pointer.Follow(Row, count);
     }
 
     /// <summary>
@@ -39,6 +44,7 @@ internal sealed class PartyCursor(PartyState party)
 
         IsOnReserve = !IsOnReserve;
         Row = Math.Min(Row, other.Count - 1);
+        Pointer.JumpTo(Row);
     }
 
     /// <summary>
@@ -53,6 +59,7 @@ internal sealed class PartyCursor(PartyState party)
         }
 
         Row = Math.Min(Row, Column.Count - 1);
+        Pointer.JumpTo(Row);
     }
 
     /// <summary>
@@ -67,17 +74,30 @@ internal sealed class PartyCursor(PartyState party)
             Row = (Row + step + active.Count) % active.Count;
         }
         while (!party.CanChangePlace(active[Row]));
+        Pointer.Follow(Row, active.Count);
     }
 
     /// <summary>Back onto an active card, such as where a cancelled swap started.</summary>
     public void ReturnTo(int activeRow)
     {
+        var wasOnReserve = IsOnReserve;
         IsOnReserve = false;
         Row = activeRow;
+        if (wasOnReserve)
+        {
+            Pointer.JumpTo(Row);
+            return;
+        }
+
+        Pointer.Follow(Row, party.ActiveMembers.Count);
     }
 
-    /// <summary>Back to the leader (decision 109).</summary>
-    public void Reset() => ReturnTo(0);
+    /// <summary>Back to the leader (decision 109), the pointer with it at once.</summary>
+    public void Reset()
+    {
+        ReturnTo(0);
+        Pointer.JumpTo(0);
+    }
 
     private IReadOnlyList<PartyMember> ColumnOf(bool reserve) => reserve ? party.ReserveMembers : party.ActiveMembers;
 }

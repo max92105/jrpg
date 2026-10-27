@@ -20,6 +20,38 @@ public sealed class ItemDetailLineTests
     }
 
     [Fact]
+    public void TextFor_DescriptionHidden_IsNull()
+    {
+        var line = new ItemDetailLine();
+
+        line.ToggleDescription();
+
+        Assert.Null(line.TextFor(_potion));
+    }
+
+    [Fact]
+    public void TextFor_DescriptionHiddenThenShown_IsTheDescription()
+    {
+        var line = new ItemDetailLine();
+        line.ToggleDescription();
+
+        line.ToggleDescription();
+
+        Assert.Equal("Restores HP.", line.TextFor(_potion));
+    }
+
+    [Fact]
+    public void TextFor_NoticeWhileDescriptionHidden_IsTheNotice()
+    {
+        var line = new ItemDetailLine();
+        line.ToggleDescription();
+
+        line.ShowNotice("Potion was used.");
+
+        Assert.Equal("Potion was used.", line.TextFor(_potion));
+    }
+
+    [Fact]
     public void TextFor_AfterShowNotice_IsTheNotice()
     {
         var line = new ItemDetailLine();

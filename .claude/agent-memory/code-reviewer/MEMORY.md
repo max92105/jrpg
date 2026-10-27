@@ -3,7 +3,7 @@
 - [Tautological tests](tautological-tests.md) — same-seed-twice, count==count, File.Exists-only, untested `<=` boundary; pin golden values
 - [Validator null ids](validator-null-ids.md) — null list elements AND dictionary values pass strict STJ; check null entries first (seen slices 8, 1b, 1c, M1b; nested lists too)
 - [Namespace cycles](namespace-cycles.md) — grep reverse usings for each new Core using; Content is the hub (Content<->Session seen in slice 8)
-- [Stale comments](stale-size-comments.md) — sizing, moved drawing or a newly conditional call leave old sizes/places/rules in summaries; grep old wording
+- [Stale comments](stale-size-comments.md) — sizing, moved drawing, a newly conditional call or a renamed file leave old sizes/places/names; grep old wording
 - [Last review](last-review.md) — slice, round and finding status of the latest review; read first to apply re-review rules
 - [Detached comments](detached-comments.md) — new test/member inserted under an existing helper's comment leaves it describing the wrong code
 - [Done note wording](done-note-wording.md) — "Done, with deviations: as planned." contradicts itself; one Suggestion line (C2, PD1)

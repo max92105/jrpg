@@ -19,6 +19,10 @@ internal sealed class LeaderProfileView
     private const int TextWidth = 620;
     private const int NameTop = 110;
     private const int ClassTop = 180;
+
+    // The section line under the class, 26 px below its top.
+    private const int ClassLineGap = 26;
+
     private const int DescriptionTop = 214;
     private const int SummaryLineTop = 344;
     private const int SummaryTop = 364;
@@ -97,7 +101,7 @@ internal sealed class LeaderProfileView
         _classFont.DrawText(
             batch, _classCaps[_shown], new Vector2(InfoLeft, ClassTop), UiTheme.TextSecondary * opacity, characterSpacing: UiTheme.SpeakerLetterSpacing);
         var line = _ui.SectionLine(textures);
-        batch.Draw(line, new Rectangle(InfoLeft, ClassTop + SectionTitle.LineGap, TextWidth, 1), Color.White * opacity);
+        batch.Draw(line, new Rectangle(InfoLeft, ClassTop + ClassLineGap, TextWidth, 1), Color.White * opacity);
         _descriptions[_shown].Draw(batch, new Vector2(InfoLeft, DescriptionTop), UiTheme.TextSecondary * opacity);
         batch.Draw(line, new Rectangle(InfoLeft, SummaryLineTop, TextWidth, 1), Color.White * opacity);
         _summaries[_shown].Draw(batch, new Vector2(InfoLeft, SummaryTop), UiTheme.TextPrimary * opacity);

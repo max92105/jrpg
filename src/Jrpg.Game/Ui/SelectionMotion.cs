@@ -36,8 +36,16 @@ internal sealed class SelectionMotion
     }
 
     /// <summary>Glides to the cursor's row in the window; callers run it after each update's input.</summary>
-    public void Follow(ListCursor cursor) => _glide.Follow(cursor.VisibleRow, cursor.VisibleCount);
+    public void Follow(ListCursor cursor) => Follow(cursor.VisibleRow, cursor.VisibleCount);
+
+    /// <summary>Glides to <paramref name="visibleRow"/>, for a list without a <see cref="ListCursor"/>.</summary>
+    /// <param name="visibleRow">The selected row, from the top of the visible window.</param>
+    /// <param name="visibleCount">How many rows the window shows; a move of more than half of them jumps.</param>
+    public void Follow(int visibleRow, int visibleCount) => _glide.Follow(visibleRow, visibleCount);
 
     /// <summary>Puts the highlight on the cursor's row at once, as when the list is rebuilt.</summary>
-    public void JumpTo(ListCursor cursor) => _glide.JumpTo(cursor.VisibleRow);
+    public void JumpTo(ListCursor cursor) => JumpTo(cursor.VisibleRow);
+
+    /// <summary>Puts the highlight on <paramref name="visibleRow"/> at once.</summary>
+    public void JumpTo(int visibleRow) => _glide.JumpTo(visibleRow);
 }

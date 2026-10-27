@@ -38,6 +38,11 @@ internal sealed class PartySidebar
     public int FirstVisible { get; private set; }
 
     /// <summary>
+    /// The item's pointer, gliding between the cards in view (decision 262); on its card at once when aiming starts.
+    /// </summary>
+    public SelectionMotion Pointer { get; } = new();
+
+    /// <summary>
     /// Rebuilds every card if the recruits' order or who is in the reserve changed, else only the cards whose values
     /// did; then marks <paramref name="pointed"/>'s card and scrolls to it.
     /// </summary>
@@ -53,8 +58,10 @@ internal sealed class PartySidebar
             RebuildAll();
         }
 
+        var wasPointing = PointedIndex is not null;
         PointedIndex = pointed is null ? null : IndexOf(pointed);
         KeepPointedInView();
+        FollowPointed(wasPointing);
     }
 
     private void ReplaceChangedCards()
@@ -120,4 +127,22 @@ internal sealed class PartySidebar
         FirstVisible = PointedIndex is { } pointed
             ? ScrollWindow.KeepInView(FirstVisible, pointed, _cards.Count, VisibleCards)
             : ScrollWindow.Clamp(FirstVisible, _cards.Count, VisibleCards);
+
+    // Aiming starts with the pointer on its card at once; after that it glides to each card it moves to.
+    private void FollowPointed(bool wasPointing)
+    {
+        if (PointedIndex is not { } pointed)
+        {
+            return;
+        }
+
+        var visibleRow = pointed - FirstVisible;
+        if (!wasPointing)
+        {
+            Pointer.JumpTo(visibleRow);
+            return;
+        }
+
+        Pointer.Follow(visibleRow, Math.Min(VisibleCards, _cards.Count));
+    }
 }

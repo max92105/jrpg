@@ -4,7 +4,7 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// The Inventory page's strip under the selected item: what the last use did, until the player moves on, otherwise
-/// what the item is.
+/// what the item is, unless the player hid the descriptions with Info (decision 291).
 /// </summary>
 internal sealed class ItemDetailLine
 {
@@ -15,9 +15,14 @@ internal sealed class ItemDetailLine
 
     public void ClearNotice() => Notice = null;
 
+    /// <summary>Whether the selected item's description shows; a use's notice shows either way.</summary>
+    public bool IsDescriptionShown { get; private set; } = true;
+
+    public void ToggleDescription() => IsDescriptionShown = !IsDescriptionShown;
+
     /// <param name="selected">The selected row; null when the category is empty.</param>
-    /// <returns>The notice, else the selected item's description; null when there is neither.</returns>
-    public string? TextFor(InventoryRow? selected) => Notice ?? selected?.Description;
+    /// <returns>The notice, else the selected item's description while shown; null when there is neither.</returns>
+    public string? TextFor(InventoryRow? selected) => Notice ?? (IsDescriptionShown ? selected?.Description : null);
 
     /// <summary>
     /// Where the strip goes: right under the selected row, over the rows below, or above it when that would cross the

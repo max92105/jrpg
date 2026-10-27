@@ -29,9 +29,20 @@ internal sealed class CategoryRail
 
     public bool HasCursor { get; private set; }
 
-    public void MoveUp() => _cursor.MoveUp();
+    /// <summary>The chosen tab's highlight, gliding between tabs (decision 262).</summary>
+    public SelectionMotion Selection { get; } = new();
 
-    public void MoveDown() => _cursor.MoveDown();
+    public void MoveUp()
+    {
+        _cursor.MoveUp();
+        Selection.Follow(_cursor);
+    }
+
+    public void MoveDown()
+    {
+        _cursor.MoveDown();
+        Selection.Follow(_cursor);
+    }
 
     public void TakeCursor() => HasCursor = true;
 
@@ -41,6 +52,7 @@ internal sealed class CategoryRail
     public void Reset()
     {
         _cursor.Select(0);
+        Selection.JumpTo(_cursor);
         HasCursor = false;
     }
 }

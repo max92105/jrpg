@@ -84,8 +84,6 @@ internal static class MessageIds
     /// <summary>The game menu's Status tab.</summary>
     public const string MenuStatus = "menu_status";
 
-    public const string StatusExperience = "status_experience";
-
     public const string StatusLevel = "status_level";
 
     /// <summary>The level's short caption, "Lv", beside a number.</summary>

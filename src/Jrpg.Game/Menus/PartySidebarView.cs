@@ -16,11 +16,11 @@ internal sealed class PartySidebarView
 {
     // Placeholder layout: cards 12 px apart (question 146, the demo's PartySidebar), inside a 14 px band at the top and
     // the bottom that holds the 10 px scroll cues; the reserve's caption takes its label line and a card gap. With
-    // PartySidebar.VisibleCards cards that is 14 + 38 + 5 x 132 + 4 x 12 + 14 = 774 of the page's 848 px.
+    // PartySidebar.VisibleCards cards that is 14 + 48 + 5 x 132 + 4 x 12 + 14 = 784 of the page's 848 px.
     private const int CardGap = 12;
     private const int CueBand = 14;
     private const int CueDiagonal = 10;
-    private const int CaptionHeight = SectionTitle.LineGap + CardGap;
+    private const int CaptionHeight = SectionTitle.Height + CardGap;
 
     // While aiming, a card the item can't go to is faded (placeholder).
     private const float UnavailableOpacity = 0.4f;
@@ -31,17 +31,19 @@ internal sealed class PartySidebarView
     private readonly SectionTitle _reserveTitle;
     private readonly List<(SidebarCard Source, MemberCardView.Card Card)> _cards = [];
     private readonly List<HpPreview?> _previews = [];
+
+    // The middle of each card in view, top to bottom, as last drawn: the pointer glides between them.
+    private readonly float[] _cardMiddles = new float[PartySidebar.VisibleCards];
     private ItemTargetPicker? _previewedPicker;
 
     /// <param name="sidebar">The cards to draw.</param>
     /// <param name="cardView">Formats and draws one member's card.</param>
     /// <param name="text">The reserve caption's message and font.</param>
-    /// <param name="ui">The reserve caption's hairline.</param>
-    public PartySidebarView(PartySidebar sidebar, MemberCardView cardView, ScreenText text, UiTextures ui)
+    public PartySidebarView(PartySidebar sidebar, MemberCardView cardView, ScreenText text)
     {
         _sidebar = sidebar;
         _cardView = cardView;
-        _reserveTitle = new SectionTitle(text, ui, MessageIds.PartyReserve);
+        _reserveTitle = new SectionTitle(text, MessageIds.PartyReserve);
     }
 
     /// <param name="batch">Already begun.</param>
@@ -65,16 +67,18 @@ internal sealed class PartySidebarView
             }
 
             DrawCard(batch, textures, new CardSlot(index, new Rectangle(column.X, top, column.Width, MemberCardView.Height), place.ItemUse.Picker), opacity);
+            _cardMiddles[index - _sidebar.FirstVisible] = top + (MemberCardView.Height / 2f);
             top += MemberCardView.Height + CardGap;
         }
 
+        DrawPointer(batch, textures.Pixel, new PointerPlace(column.X, last - _sidebar.FirstVisible), opacity);
         DrawScrollCues(batch, textures.Pixel, column, opacity);
     }
 
     private bool IsFirstReserve(int index) => _sidebar.Cards[index].IsReserve && (index == 0 || !_sidebar.Cards[index - 1].IsReserve);
 
     // Not aiming, the reserve is dimmed. Aiming, the item's candidates are lit at full opacity, reserve or not, the
-    // others faded, and the pointed card gets the pointer.
+    // others faded.
     private void DrawCard(SpriteBatch batch, TextureLibrary textures, CardSlot slot, float opacity)
     {
         var card = _sidebar.Cards[slot.Index];
@@ -87,10 +91,22 @@ internal sealed class PartySidebarView
 
         var aimedOpacity = picker.IsCandidate(card.Member) ? opacity : opacity * UnavailableOpacity;
         _cardView.Draw(batch, textures, new MemberCardView.Place(_cards[slot.Index].Card, slot.Area, picker.IsSelected(card.Member), _previews[slot.Index]), aimedOpacity);
-        if (slot.Index == _sidebar.PointedIndex)
+    }
+
+    // While an item is aimed at one card at a time, the pointer glides between card middles, bobbing at their left.
+    private void DrawPointer(SpriteBatch batch, Texture2D pixel, PointerPlace place, float opacity)
+    {
+        if (_sidebar.PointedIndex is null)
         {
-            MenuPointer.Draw(batch, textures.Pixel, new Vector2(slot.Area.X, slot.Area.Center.Y), opacity);
+            return;
         }
+
+        var lastCard = place.CardsInView - 1;
+        var position = Math.Clamp(_sidebar.Pointer.Position, 0, lastCard);
+        var above = (int)position;
+        var below = Math.Min(above + 1, lastCard);
+        var middle = MathHelper.Lerp(_cardMiddles[above], _cardMiddles[below], position - above);
+        MenuPointer.Draw(batch, pixel, new Vector2(place.Left - _sidebar.Pointer.PointerOffset, middle), opacity);
     }
 
     private void DrawScrollCues(SpriteBatch batch, Texture2D pixel, Rectangle column, float opacity)
@@ -151,6 +167,9 @@ internal sealed class PartySidebarView
             _previews.Add(picker.IsCandidate(member) ? _cardView.HpPreviewOf(member.Vitals.Hp, itemUse.HpAfter(member)) : null);
         }
     }
+
+    // The cards' left edge, where the pointer bobs, and how many cards were drawn this frame.
+    private readonly record struct PointerPlace(int Left, int CardsInView);
 
     // One card's index in the sidebar, where it's drawn, and the item being aimed, if any.
     private readonly record struct CardSlot(int Index, Rectangle Area, ItemTargetPicker? Picker);

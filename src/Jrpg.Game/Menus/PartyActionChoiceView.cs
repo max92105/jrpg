@@ -44,16 +44,10 @@ internal sealed class PartyActionChoiceView
         var panel = new Rectangle(card.Right - Width - Inset, card.Y + Inset, Width, EntryCount * RowHeight);
         batch.Draw(textures.Pixel, panel, UiTheme.Surface);
         Outline.Draw(batch, textures.Pixel, panel, UiTheme.Stroke);
+        _ui.DrawGlidingSelection(batch, textures, place.Selection.RowIn(panel with { Height = RowHeight }), opacity: 1);
         for (var index = 0; index < EntryCount; index++)
         {
             var row = new Rectangle(panel.X, panel.Y + (index * RowHeight), panel.Width, RowHeight);
-            var isSelected = index == place.Choice.Selected;
-            if (isSelected)
-            {
-                _ui.DrawSelectedRow(batch, textures, row, 1);
-                MenuPointer.Draw(batch, textures.Pixel, new Vector2(row.X, row.Center.Y), opacity: 1);
-            }
-
             var textTop = row.Y + ((RowHeight - _font.LineHeight) / 2);
             batch.DrawString(_font, _labels[index], new Vector2(row.X + Inset, textTop), ColorOf(index, place));
         }
@@ -71,7 +65,8 @@ internal sealed class PartyActionChoiceView
 
     /// <summary>What to draw this frame, and over which card.</summary>
     /// <param name="Choice">Which action is highlighted.</param>
+    /// <param name="Selection">The highlight, gliding between the actions (decision 262).</param>
     /// <param name="Card">The chosen member's card.</param>
     /// <param name="IsToReserveAllowed">Whether Core lets the member leave, worked out when the choice opened.</param>
-    public readonly record struct Place(ListCursor Choice, Rectangle Card, bool IsToReserveAllowed);
+    public readonly record struct Place(ListCursor Choice, SelectionMotion Selection, Rectangle Card, bool IsToReserveAllowed);
 }

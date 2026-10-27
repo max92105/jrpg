@@ -8,18 +8,18 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Draws the Status page's Skills section: each skill's name with its description wrapped under it and a hairline
-/// below, as many whole skills as fit; the page doesn't scroll.
+/// Draws the Status page's Skills section under its dark band: each skill's name with its description wrapped under it
+/// and a hairline below, as many whole skills as fit; the page doesn't scroll.
 /// </summary>
 internal sealed class StatusSkillsView
 {
-    // Placeholder layout (decision 82): 26 px names, 18 px descriptions 32 px under the name, 10 px in under the title,
-    // a hairline 8 px under the description, then a 10 px gap.
-    private const int NamePixels = 26;
+    // Placeholder layout (decisions 82, 292): the first name 10 px under the band, 24 px names, 18 px descriptions 30
+    // px under the name, 12 px in, a hairline 8 px under the description, then a 10 px gap.
+    private const int NamePixels = 24;
     private const int DescriptionPixels = 18;
-    private const int SectionHeight = 36;
-    private const int Indent = 10;
-    private const int DescriptionBelowName = 32;
+    private const int BelowBand = SectionTitle.Height + 10;
+    private const int Indent = 12;
+    private const int DescriptionBelowName = 30;
     private const int LineBelowDescription = 8;
     private const int SkillGap = 10;
 
@@ -31,16 +31,15 @@ internal sealed class StatusSkillsView
     private RichTextLayout[] _descriptions = [];
 
     /// <param name="text">Messages and fonts.</param>
-    /// <param name="ui">Where the section line is made.</param>
-    public StatusSkillsView(ScreenText text, UiTextures ui)
+    public StatusSkillsView(ScreenText text)
     {
-        _title = new SectionTitle(text, ui, MessageIds.StatusSkills);
+        _title = new SectionTitle(text, MessageIds.StatusSkills);
         _nameFont = text.Fonts.FontAt(NamePixels);
         _descriptionFont = text.Fonts.FontAt(DescriptionPixels);
     }
 
     /// <param name="batch">Already begun.</param>
-    /// <param name="textures">Where the plain pixel and the section line come from.</param>
+    /// <param name="textures">Where the plain pixel comes from.</param>
     /// <param name="place">The sheet, and the section: its title's top left, down to the page's bottom.</param>
     /// <param name="opacity">0 to 1, while the menu fades in.</param>
     public void Draw(SpriteBatch batch, TextureLibrary textures, Place place, float opacity)
@@ -50,7 +49,7 @@ internal sealed class StatusSkillsView
         var left = section.X + Indent;
         var width = section.Width - Indent;
         Wrap(sheet, width);
-        var nameTop = section.Y + SectionHeight;
+        var nameTop = section.Y + BelowBand;
         for (var index = 0; index < sheet.Skills.Count; index++)
         {
             var description = _descriptions[index];

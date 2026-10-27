@@ -54,7 +54,7 @@ internal sealed class InventoryPage : IMenuPage
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _columnView = new InventoryColumnView(text, ui, _bodyFont, _rail.Tabs);
         Sidebar = new PartySidebar(session.Party);
-        _sidebarView = new PartySidebarView(Sidebar, new MemberCardView(text, ui, catalog), text, ui);
+        _sidebarView = new PartySidebarView(Sidebar, new MemberCardView(text, ui, catalog), text);
         ItemUse = new ItemUse(session, text.Messages);
         ShowRowsFrom(0);
     }
@@ -82,6 +82,9 @@ internal sealed class InventoryPage : IMenuPage
     /// <summary>The last use's result, until the player moves on; null otherwise.</summary>
     public string? Notice => _detail.Notice;
 
+    /// <summary>Whether the selected item's description shows under it; Info toggles it (decision 291).</summary>
+    public bool IsDescriptionShown => _detail.IsDescriptionShown;
+
     /// <summary>Whether the player is choosing who to use an item on.</summary>
     public bool IsChoosingTarget => ItemUse.IsOpen;
 
@@ -104,7 +107,12 @@ internal sealed class InventoryPage : IMenuPage
         Sidebar.Refresh(pointed: null);
     }
 
-    public void Advance(TimeSpan delta) => _selection.Advance(delta);
+    public void Advance(TimeSpan delta)
+    {
+        _selection.Advance(delta);
+        _rail.Selection.Advance(delta);
+        Sidebar.Pointer.Advance(delta);
+    }
 
     public SceneRequest? Update(InputFrame input)
     {
@@ -133,6 +141,11 @@ internal sealed class InventoryPage : IMenuPage
             }
 
             return;
+        }
+
+        if (input.IsPressed(GameButton.Info))
+        {
+            _detail.ToggleDescription();
         }
 
         if (MovesACursor(input))

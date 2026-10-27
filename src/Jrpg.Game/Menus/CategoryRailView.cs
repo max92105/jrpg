@@ -33,6 +33,7 @@ internal sealed class CategoryRailView(UiTextures ui)
     {
         var rail = new Rectangle(place.Area.X, place.Area.Y, Width, place.Area.Height);
         _panel.Draw(batch, textures.Pixel, MenuLayout.FullHeight(rail), opacity);
+        DrawSelection(batch, textures, place.Rail, new Rectangle(rail.X, rail.Y + Padding, Width, TabHeight), opacity);
         for (var index = 0; index < place.Rail.Tabs.Count; index++)
         {
             var tab = new Rectangle(rail.X, rail.Y + Padding + (index * TabHeight), Width, TabHeight);
@@ -40,22 +41,27 @@ internal sealed class CategoryRailView(UiTextures ui)
         }
     }
 
+    // The chosen tab's band glides between tabs (decision 262), inside an 8 x 4 margin. The pointer marks it while the
+    // rail has the cursor; otherwise the band is dimmed.
+    private void DrawSelection(SpriteBatch batch, TextureLibrary textures, CategoryRail rail, Rectangle firstTab, float opacity)
+    {
+        var selected = rail.Selection.RowIn(firstTab);
+        var tab = selected.Area;
+        var band = new Rectangle(tab.X + BandInsetX, tab.Y + BandInsetY, tab.Width - (2 * BandInsetX), tab.Height - (2 * BandInsetY));
+        if (!rail.HasCursor)
+        {
+            ui.DrawSelectedRow(batch, textures, band, opacity * UiTheme.DimmedSelectionOpacity);
+            return;
+        }
+
+        ui.DrawSelectedRow(batch, textures, band, opacity);
+        MenuPointer.Draw(batch, textures.Pixel, selected.PointerTip, opacity);
+    }
+
     private void DrawTab(SpriteBatch batch, TextureLibrary textures, TabPlace place, float opacity)
     {
         var (rail, tab, index) = place;
         var isSelected = index == rail.Selected;
-        if (isSelected)
-        {
-            var bandOpacity = rail.HasCursor ? opacity : opacity * UiTheme.DimmedSelectionOpacity;
-            var band = new Rectangle(tab.X + BandInsetX, tab.Y + BandInsetY, tab.Width - (2 * BandInsetX), tab.Height - (2 * BandInsetY));
-            ui.DrawSelectedRow(batch, textures, band, bandOpacity);
-        }
-
-        if (isSelected && rail.HasCursor)
-        {
-            MenuPointer.Draw(batch, textures.Pixel, new Vector2(tab.X, tab.Center.Y), opacity);
-        }
-
         var icon = ui.Icon(textures, rail.Tabs[index].IconFile, IconSize);
         var corner = new Vector2(tab.Center.X - (IconSize / 2), tab.Center.Y - (IconSize / 2));
         batch.Draw(icon, corner, Color.White * (isSelected ? opacity : opacity * UnselectedIconOpacity));

@@ -24,6 +24,7 @@ internal sealed class SystemPage : IMenuPage
     private readonly ConfirmPromptView _promptView;
     private readonly UiTextures _ui;
     private readonly ColumnPanelView _panel = new(UiTheme.PageColumn);
+    private readonly SelectionMotion _selection = new();
     private ISaveFilesPage? _openFiles;
     private ConfirmPrompt? _asking;
 
@@ -63,8 +64,22 @@ internal sealed class SystemPage : IMenuPage
     /// </summary>
     public bool LeavesOnCancel => _asking is null && _openFiles is null;
 
+    /// <summary>Where the entries' highlight is, in rows.</summary>
+    internal float SelectionPosition => _selection.Position;
+
     // The save files read themselves when their own page opens, so only the cursor goes back.
-    public void Open() => _cursor.Select(0);
+    public void Open()
+    {
+        _cursor.Select(0);
+        _selection.JumpTo(_cursor);
+    }
+
+    // The open save files glide their own selection; the entries keep theirs for when the files close.
+    public void Advance(TimeSpan delta)
+    {
+        _selection.Advance(delta);
+        _openFiles?.Advance(delta);
+    }
 
     public SceneRequest? Update(InputFrame input)
     {
@@ -92,16 +107,11 @@ internal sealed class SystemPage : IMenuPage
             return;
         }
 
+        DrawSelection(batch, textures, new Rectangle(column.X, column.Y, column.Width, UiTheme.MenuRowHeight), opacity);
         for (var index = 0; index < _labels.Length; index++)
         {
             var rowTop = column.Y + (index * UiTheme.MenuRowHeight);
-            var isSelected = index == _cursor.Selected;
-            if (isSelected)
-            {
-                DrawSelectedEntry(batch, textures, new Rectangle(column.X, rowTop, column.Width, UiTheme.MenuRowHeight), opacity);
-            }
-
-            var color = isSelected ? UiTheme.TextPrimary : UiTheme.TextSecondary;
+            var color = index == _cursor.Selected ? UiTheme.TextPrimary : UiTheme.TextSecondary;
             var position = new Vector2(column.X + UiTheme.MenuTextInset, rowTop + ((UiTheme.MenuRowHeight - _font.LineHeight) / 2f));
             batch.DrawString(_font, _labels[index], position, color * opacity);
         }
@@ -112,17 +122,18 @@ internal sealed class SystemPage : IMenuPage
         }
     }
 
-    // While a question is open the cursor is on its buttons, so the entry keeps a dimmed band and no pointer.
-    private void DrawSelectedEntry(SpriteBatch batch, TextureLibrary textures, Rectangle row, float opacity)
+    // The shared gliding selection (decision 262). While a question is open the cursor is on its buttons, so the entry
+    // keeps a dimmed band and no pointer.
+    private void DrawSelection(SpriteBatch batch, TextureLibrary textures, Rectangle firstRow, float opacity)
     {
+        var selected = _selection.RowIn(firstRow);
         if (_asking is not null)
         {
-            _ui.DrawSelectedRow(batch, textures, row, opacity * UiTheme.DimmedSelectionOpacity);
+            _ui.DrawSelectedRow(batch, textures, selected.Area, opacity * UiTheme.DimmedSelectionOpacity);
             return;
         }
 
-        _ui.DrawSelectedRow(batch, textures, row, opacity);
-        MenuPointer.Draw(batch, textures.Pixel, new Vector2(row.X, row.Center.Y), opacity);
+        _ui.DrawGlidingSelection(batch, textures, selected, opacity);
     }
 
     private SceneRequest? UpdateFiles(ISaveFilesPage files, InputFrame input)
@@ -148,6 +159,7 @@ internal sealed class SystemPage : IMenuPage
             _cursor.MoveDown();
         }
 
+        _selection.Follow(_cursor);
         if (!input.IsPressed(GameButton.Confirm))
         {
             return;

@@ -31,12 +31,17 @@ internal sealed class MemberColumnView(UiTextures ui)
         var (column, area, pointsAtShown) = place;
         var first = column.FirstVisible;
         var last = Math.Min(column.Members.Count, first + MemberColumn.VisibleCount);
-        var shownCenter = CenterOf(area, column.ShownIndex - first);
-        var band = new Rectangle(area.X, (int)shownCenter.Y - (BandHeight / 2), area.Width, BandHeight);
-        ui.DrawSelectedRow(batch, textures, band, opacity);
+
+        // The band glides between portraits (decision 262); the pointer bobs on it.
+        var shownMiddle = area.Y + (Pitch / 2f) + (column.Selection.Position * Pitch);
+        var shown = column.Selection.At(new Rectangle(area.X, (int)Math.Round(shownMiddle - (BandHeight / 2f)), area.Width, BandHeight));
         if (pointsAtShown)
         {
-            MenuPointer.Draw(batch, textures.Pixel, new Vector2(band.X, band.Center.Y), opacity);
+            ui.DrawGlidingSelection(batch, textures, shown, opacity);
+        }
+        else
+        {
+            ui.DrawSelectedRow(batch, textures, shown.Area, opacity);
         }
 
         for (var index = first; index < last; index++)

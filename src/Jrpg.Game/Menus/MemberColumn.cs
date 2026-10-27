@@ -23,6 +23,9 @@ internal sealed class MemberColumn
     /// <summary>The first member in view.</summary>
     public int FirstVisible { get; private set; }
 
+    /// <summary>The shown member's highlight, gliding between portraits (decision 262), in rows of the view.</summary>
+    public SelectionMotion Selection { get; } = new();
+
     /// <summary>Takes the page's members if their order changed, marks the shown one and scrolls to it.</summary>
     /// <param name="members">The members the page goes through, in order.</param>
     /// <param name="shown">The member the page shows; one of <paramref name="members"/>.</param>
@@ -41,6 +44,7 @@ internal sealed class MemberColumn
         }
 
         KeepShownInView();
+        Selection.Follow(ShownIndex - FirstVisible, Math.Min(VisibleCount, _members.Length));
     }
 
     // Runs every update a member page is open, so it compares in place rather than allocating.

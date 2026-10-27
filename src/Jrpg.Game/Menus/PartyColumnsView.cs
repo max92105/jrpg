@@ -20,7 +20,7 @@ internal sealed class PartyColumnsView
     private const int TopMargin = 20;
     private const int ColumnGap = 40;
     private const int LabelPixels = 18;
-    private const int CardsTop = SectionTitle.LineGap + 12;
+    private const int CardsTop = SectionTitle.Height + 12;
 
     // The member being moved is outlined while the player picks the place to swap with.
     private const int MovingOutline = 2;
@@ -33,7 +33,7 @@ internal sealed class PartyColumnsView
     private readonly SectionTitle _reserveTitle;
 
     /// <param name="text">Messages and fonts.</param>
-    /// <param name="ui">The shared textures: section lines, portraits, bars, the selected card.</param>
+    /// <param name="ui">The shared textures: portraits, bars, the selected card.</param>
     /// <param name="catalog">Class names and how many members can be active.</param>
     public PartyColumnsView(ScreenText text, UiTextures ui, ContentCatalog catalog)
     {
@@ -41,8 +41,8 @@ internal sealed class PartyColumnsView
         _maxActive = catalog.Rules.Party.MaxActiveMembers;
         _cardView = new MemberCardView(text, ui, catalog);
         _labelFont = text.Fonts.FontAt(LabelPixels);
-        _activeTitle = new SectionTitle(text, ui, MessageIds.PartyActive);
-        _reserveTitle = new SectionTitle(text, ui, MessageIds.PartyReserve);
+        _activeTitle = new SectionTitle(text, MessageIds.PartyActive);
+        _reserveTitle = new SectionTitle(text, MessageIds.PartyReserve);
     }
 
     /// <summary>Formats every card and the count, once per change.</summary>
@@ -82,8 +82,9 @@ internal sealed class PartyColumnsView
         DrawCards(batch, textures, new CardColumn(columns.Reserve, reserve, cursor.IsOnReserve ? cursor.Row : null, columns.Cards, place.Moving), opacity);
         if (place.HasCursor)
         {
-            var selected = CardArea(cursor.IsOnReserve ? reserve : active, cursor.Row);
-            MenuPointer.Draw(batch, textures.Pixel, new Vector2(selected.X, selected.Center.Y), opacity);
+            // The pointer glides between the cards (decision 262); the selected card's band stays on its card.
+            var pointed = cursor.Pointer.RowIn(CardArea(cursor.IsOnReserve ? reserve : active, 0));
+            MenuPointer.Draw(batch, textures.Pixel, pointed.PointerTip, opacity);
         }
     }
 

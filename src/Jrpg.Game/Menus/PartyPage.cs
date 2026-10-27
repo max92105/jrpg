@@ -37,6 +37,9 @@ internal sealed class PartyPage : IMenuPage
     // While an active member's actions are offered; null otherwise.
     private ListCursor? _actionChoice;
 
+    // The actions' highlight, gliding between them (decision 262).
+    private readonly SelectionMotion _actionSelection = new();
+
     // Whether Core lets the chosen member leave, worked out when the choice opens so drawing asks nothing.
     private bool _canMoveSelectedToReserve;
 
@@ -77,6 +80,9 @@ internal sealed class PartyPage : IMenuPage
     /// <summary>The open notice's message: why the last Confirm changed nothing; null when no notice is open.</summary>
     public string? Notice => _notice?.Message;
 
+    /// <summary>Where the card pointer and the actions' highlight are, in rows (decision 262).</summary>
+    internal (float Cards, float Actions) PointerPositions => (_cursor.Pointer.Position, _actionSelection.Position);
+
     /// <summary>The member's card as last formatted.</summary>
     internal MemberCardView.Card CardOf(PartyMember member) => _columns.Cards[member];
 
@@ -85,6 +91,12 @@ internal sealed class PartyPage : IMenuPage
         _notice = null;
         _cursor.Reset();
         ShowParty();
+    }
+
+    public void Advance(TimeSpan delta)
+    {
+        _cursor.Pointer.Advance(delta);
+        _actionSelection.Advance(delta);
     }
 
     public SceneRequest? Update(InputFrame input)
@@ -121,7 +133,7 @@ internal sealed class PartyPage : IMenuPage
         if (_actionChoice is not null)
         {
             var card = PartyColumnsView.ActiveCardArea(area, _cursor.Row);
-            _choiceView.Draw(batch, textures, new PartyActionChoiceView.Place(_actionChoice, card, _canMoveSelectedToReserve));
+            _choiceView.Draw(batch, textures, new PartyActionChoiceView.Place(_actionChoice, _actionSelection, card, _canMoveSelectedToReserve));
         }
 
         if (_notice is not null)
@@ -169,6 +181,7 @@ internal sealed class PartyPage : IMenuPage
             // Greyed actions stay selectable, so Confirm on one can say why (battle decision 105).
             _canMoveSelectedToReserve = _party.CanMoveToReserve(member);
             _actionChoice = new ListCursor(PartyActionChoiceView.EntryCount, _ => true);
+            _actionSelection.JumpTo(_actionChoice);
         }
     }
 
@@ -201,6 +214,8 @@ internal sealed class PartyPage : IMenuPage
         {
             choice.MoveDown();
         }
+
+        _actionSelection.Follow(choice);
 
         if (!input.IsPressed(GameButton.Confirm))
         {

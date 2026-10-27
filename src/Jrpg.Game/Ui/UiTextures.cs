@@ -221,7 +221,7 @@ internal sealed class UiTextures
     public void DrawGlidingSelection(SpriteBatch batch, TextureLibrary textures, GlidingRow row, float opacity)
     {
         DrawSelectedRow(batch, textures, row.Area, opacity);
-        MenuPointer.Draw(batch, textures.Pixel, new Vector2(row.Area.X - row.PointerOffset, row.Area.Center.Y), opacity);
+        MenuPointer.Draw(batch, textures.Pixel, row.PointerTip, opacity);
     }
 
     private Texture2D ShrunkOnce(TextureLibrary textures, string folder, string file, int size)

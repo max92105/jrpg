@@ -89,6 +89,7 @@ internal sealed class GameMenuScene : IScene
         if (_isInPage)
         {
             _pages[_tabs.Selected].Advance(delta);
+            MemberColumn.Selection.Advance(delta);
             request = UpdatePage(input);
         }
         else
@@ -186,6 +187,9 @@ internal sealed class GameMenuScene : IScene
         if (input.IsPressed(GameButton.Confirm))
         {
             _pages[_tabs.Selected].Open();
+
+            // A page opens on its first member, so the member column's highlight starts there rather than gliding.
+            MemberColumn.Selection.JumpTo(0);
             _pageTransition.Start();
             _isInPage = true;
             _tabFold.Fold();

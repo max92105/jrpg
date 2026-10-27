@@ -182,6 +182,15 @@ internal static partial class UiTheme
     /// <summary>A stat that goes down in a preview.</summary>
     public static Color Negative { get; } = FromStraightArgb(0xFF8C909A);
 
+    /// <summary>
+    /// The fill of the inventory's strip under the selected item: opaque, so the row under it never shows through its
+    /// text.
+    /// </summary>
+    public static Color ItemDetailFill { get; } = FromStraightArgb(0xFF0C0D11);
+
+    /// <summary>A section title's band (<see cref="SectionTitle"/>): darker than the columns it crosses.</summary>
+    public static Color SectionBand { get; } = FromStraightArgb(0xCC000000);
+
     /// <summary>A previewed value's color: rising, dropping, or unchanged.</summary>
     /// <param name="change">The previewed value minus the current one.</param>
     public static Color PreviewColorOf(int change) => change switch

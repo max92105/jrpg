@@ -27,7 +27,7 @@ internal sealed class StatusPage : IMemberPage
     private StatusSheet _sheet;
 
     /// <param name="text">Messages and fonts.</param>
-    /// <param name="ui">The shared textures: section lines and baked portraits.</param>
+    /// <param name="ui">The shared textures: bars and baked portraits.</param>
     /// <param name="session">Whose party is shown.</param>
     /// <param name="catalog">Class names and the experience table.</param>
     public StatusPage(ScreenText text, UiTextures ui, GameSession session, ContentCatalog catalog)

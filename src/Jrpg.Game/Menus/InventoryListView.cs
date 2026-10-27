@@ -114,11 +114,11 @@ internal sealed class InventoryListView
     private Rectangle StripAt(Rectangle list, int top) =>
         new(list.X + NameLeft - StripPaddingX, top, list.Width - NameLeft + StripPaddingX, _stripHeight);
 
-    // The battle's description box look, so both tips match: a dark fill over a bright hairline.
+    // Like the battle's description box, a dark fill over a bright hairline, but opaque: the rows under it stay hidden.
     private void DrawStrip(SpriteBatch batch, TextureLibrary textures, DetailStrip strip, float opacity)
     {
         var area = strip.Area;
-        batch.Draw(textures.Pixel, area, UiTheme.CommandHintFill * opacity);
+        batch.Draw(textures.Pixel, area, UiTheme.ItemDetailFill * opacity);
         var foregroundOpacity = opacity * strip.ForegroundShare;
         batch.Draw(_ui.Gradient(textures, UiTheme.HighlightLine), area with { Y = area.Bottom - 1, Height = 1 }, Color.White * foregroundOpacity);
         batch.DrawString(_bodyFont, strip.Text, new Vector2(area.X + StripPaddingX, area.Y + StripPaddingY), UiTheme.TextPrimary * foregroundOpacity);

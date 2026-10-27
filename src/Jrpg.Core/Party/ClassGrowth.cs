@@ -18,7 +18,6 @@ public static class ClassGrowth
         var (baseStats, growth) = (characterClass.Base, characterClass.Growth);
         return new ClassStats(
             baseStats.MaxHp + (growth.MaxHp * levelsGained),
-            baseStats.Defense + (growth.Defense * levelsGained),
             baseStats.Speed + (growth.Speed * levelsGained))
         {
             Accuracy = baseStats.Accuracy + (growth.Accuracy * levelsGained),

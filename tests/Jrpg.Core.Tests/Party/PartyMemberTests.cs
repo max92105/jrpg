@@ -3,7 +3,6 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
 using Jrpg.Core.Skills;
-using Jrpg.Core.Stats;
 using Jrpg.Core.Tests.Builders;
 
 namespace Jrpg.Core.Tests.Party;
@@ -12,10 +11,9 @@ public sealed class PartyMemberTests
 {
     private readonly ExperienceTable _table = new([100, 120, 144]);
 
-    // No class has an attack (decision 330): unarmed, a member hits for the neutral rules' 10 at every level.
     private static readonly ClassDefinition _growingClass = new ClassBuilder()
-        .WithBase(new ClassStats(MaxHp: 100, Defense: 7, Speed: 0))
-        .WithGrowth(new ClassStats(MaxHp: 10, Defense: 1, Speed: 0))
+        .WithBase(new ClassStats(MaxHp: 100, Speed: 0))
+        .WithGrowth(new ClassStats(MaxHp: 10, Speed: 0))
         .Build();
 
     [Fact]
@@ -26,7 +24,6 @@ public sealed class PartyMemberTests
         var member = PartyMember.Recruit(definition, _growingClass, new Dictionary<string, SkillDefinition>(), TestStatRules.Neutral);
 
         Assert.Equal((1, 0), (member.Level, member.Experience));
-        Assert.Equal(new CombatStats(Attack: 10, Defense: 7), member.BaseStats);
         Assert.Equal((100, 100), (member.Vitals.Hp, member.Vitals.MaxHp));
     }
 
@@ -70,7 +67,6 @@ public sealed class PartyMemberTests
 
         member.GainExperience(100, _table);
 
-        Assert.Equal(new CombatStats(Attack: 10, Defense: 8), member.BaseStats);
         Assert.Equal((70, 110), (member.Vitals.Hp, member.Vitals.MaxHp));
     }
 
@@ -82,7 +78,6 @@ public sealed class PartyMemberTests
         member.GainExperience(220, _table);
 
         Assert.Equal(3, member.Level);
-        Assert.Equal(new CombatStats(Attack: 10, Defense: 9), member.BaseStats);
         Assert.Equal((120, 120), (member.Vitals.Hp, member.Vitals.MaxHp));
     }
 
@@ -93,7 +88,6 @@ public sealed class PartyMemberTests
 
         member.GainExperience(99, _table);
 
-        Assert.Equal(new CombatStats(Attack: 10, Defense: 7), member.BaseStats);
         Assert.Equal((100, 100), (member.Vitals.Hp, member.Vitals.MaxHp));
     }
 
@@ -189,7 +183,7 @@ public sealed class PartyMemberTests
     public void EquippedIn_WornArmor_ReturnsIt()
     {
         var member = new PartyMemberBuilder().WithClass("fighter").Build();
-        var armor = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build();
+        var armor = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor().Build();
         Equip(member, armor);
 
         var worn = member.EquippedIn(EquipmentSlot.Armor);

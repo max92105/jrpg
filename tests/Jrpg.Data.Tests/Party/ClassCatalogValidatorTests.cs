@@ -67,7 +67,7 @@ public sealed class ClassCatalogValidatorTests
         Assert.Equal("classes.json: class 'fighter': description must not be empty.", exception.Message);
     }
 
-    private static ClassStats Stats { get; } = new(MaxHp: 200, Defense: 5, Speed: 10);
+    private static ClassStats Stats { get; } = new(MaxHp: 200, Speed: 10);
 
     [Fact]
     public void Validate_UnknownSkillId_ThrowsNamingClassAndSkill()

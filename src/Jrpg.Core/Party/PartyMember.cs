@@ -38,13 +38,9 @@ public sealed class PartyMember
     public int Experience { get; private set; }
 
     /// <summary>
-    /// With nothing worn: the unarmed attack (decision 330) and the class's defense at the member's level.
-    /// </summary>
-    public CombatStats BaseStats { get; private set; }
-
-    /// <summary>
     /// The member's numbers at their level with what they wear (ADR 0026): primaries, max HP, speed (it sets readiness
-    /// charges, question 213) and the derived percents. Rebuilt on level-up and when what they wear changes.
+    /// charges, question 213), the attack damage (the worn weapon's or the unarmed one) and the derived percents.
+    /// Rebuilt on level-up and when what they wear changes.
     /// </summary>
     public StatSheet Sheet { get; private set; }
 
@@ -64,11 +60,6 @@ public sealed class PartyMember
     /// starts at the resource's starting amount, also for one a save doesn't hold.
     /// </summary>
     public IReadOnlyDictionary<string, int> LastingAmounts => _lastingAmounts;
-
-    /// <summary>
-    /// Base stats with what is worn: the weapon's damage in place of the unarmed one, and every item's defense.
-    /// </summary>
-    public CombatStats TotalStats => StatsWearing(new Worn(Weapon, Armor));
 
     /// <summary>A new member joins at level 1 with 0 experience and full HP (decision 168).</summary>
     /// <param name="definition">Who joins.</param>
@@ -104,13 +95,6 @@ public sealed class PartyMember
     /// <summary>What a save keeps of this member.</summary>
     public PartyMemberProgress CaptureProgress() =>
         new(Id, Level, Experience, Vitals.Hp, Weapon?.Id, Armor?.Id, new Dictionary<string, int>(_lastingAmounts));
-
-    /// <summary>The stat preview of taking off what's worn in <paramref name="slot"/>: total stats with that slot empty.</summary>
-    public CombatStats StatsWithout(EquipmentSlot slot) => StatsWearing(WornWith(slot, null));
-
-    /// <summary>The stat preview: total stats if <paramref name="item"/> replaced whatever is worn in its slot.</summary>
-    /// <exception cref="ArgumentException"><paramref name="item"/> isn't equipment.</exception>
-    public CombatStats StatsWith(ItemDefinition item) => StatsWearing(WornWith(SlotOf(item), item));
 
     /// <summary>The sheet with what's worn in <paramref name="slot"/> taken off, for the Equipment page.</summary>
     public StatSheet SheetWithout(EquipmentSlot slot) => SheetWearing(WornWith(slot, null));
@@ -219,7 +203,8 @@ public sealed class PartyMember
         _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot."),
     };
 
-    private StatSheet SheetWearing(Worn worn) => MemberSheet.Of(ClassGrowth.StatsAt(Class, Level), BonusesOf(worn), Rules);
+    private StatSheet SheetWearing(Worn worn) =>
+        MemberSheet.Of(ClassGrowth.StatsAt(Class, Level), BonusesOf(worn), worn.Weapon?.Equipment?.Damage, Rules);
 
     /// <exception cref="ArgumentException">A skill id isn't in the catalog.</exception>
     private static List<SkillDefinition> SkillsOf(ClassDefinition characterClass, IReadOnlyDictionary<string, SkillDefinition> skillCatalog)
@@ -234,19 +219,8 @@ public sealed class PartyMember
     }
 
     // The class's numbers at the member's level, the one formula (ADR 0017), with what they wear.
-    [MemberNotNull(nameof(BaseStats), nameof(Sheet))]
-    private void RebuildStats()
-    {
-        var stats = ClassGrowth.StatsAt(Class, Level);
-        BaseStats = new CombatStats(Rules.UnarmedDamage, stats.Defense);
-        Sheet = SheetWearing(new Worn(Weapon, Armor));
-    }
-
-    private static int DefenseBonusOf(ItemDefinition? item) => item?.Equipment?.DefenseBonus ?? 0;
-
-    private CombatStats StatsWearing(Worn worn) => new(
-        worn.Weapon?.Equipment?.Damage ?? BaseStats.Attack,
-        BaseStats.Defense + DefenseBonusOf(worn.Weapon) + DefenseBonusOf(worn.Armor));
+    [MemberNotNull(nameof(Sheet))]
+    private void RebuildStats() => Sheet = SheetWearing(new Worn(Weapon, Armor));
 
     // The two slots' items, as worn or as a preview would have them.
     private readonly record struct Worn(ItemDefinition? Weapon, ItemDefinition? Armor);

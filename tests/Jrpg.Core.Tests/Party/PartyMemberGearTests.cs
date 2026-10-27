@@ -14,8 +14,8 @@ public sealed class PartyMemberGearTests
     private static readonly StatRules _rules = TestStatRules.Neutral with { HpPercentPer100Constitution = 100 };
 
     private static readonly ClassDefinition _class = new ClassBuilder()
-        .WithBase(new ClassStats(MaxHp: 200, Defense: 5, Speed: 10))
-        .WithGrowth(new ClassStats(MaxHp: 20, Defense: 0, Speed: 0))
+        .WithBase(new ClassStats(MaxHp: 200, Speed: 10))
+        .WithGrowth(new ClassStats(MaxHp: 20, Speed: 0))
         .Build();
 
     private readonly Inventory _inventory = new();
@@ -101,7 +101,7 @@ public sealed class PartyMemberGearTests
         PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), _class, new Dictionary<string, SkillDefinition>(), _rules);
 
     private static ItemDefinition Armor(StatKind kind, int bonus) =>
-        new ItemDefinitionBuilder().WithId("test_armor").AsArmor(0).WithBonuses(new StatBonuses(new Dictionary<StatKind, int> { [kind] = bonus })).Build();
+        new ItemDefinitionBuilder().WithId("test_armor").AsArmor().WithBonuses(new StatBonuses(new Dictionary<StatKind, int> { [kind] = bonus })).Build();
 
     private void Equip(PartyMember member, ItemDefinition item)
     {

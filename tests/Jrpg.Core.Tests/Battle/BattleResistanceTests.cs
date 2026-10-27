@@ -96,7 +96,7 @@ public sealed class BattleResistanceTests
     private static Combatant Member(string id, PrimaryStats primaries, StatRules rules, params SkillDefinition[] skills) =>
         Combatant.FromPartyMember(PartyMember.Recruit(
             new PartyMemberBuilder().WithId(id).BuildDefinition(),
-            new ClassBuilder().WithId(id).WithBase(new ClassStats(MaxHp: 100, Defense: 0, Speed: 10)).WithPrimaries(primaries, PrimaryStats.None).WithSkills([.. skills.Select(skill => skill.Id)]).Build(),
+            new ClassBuilder().WithId(id).WithBase(new ClassStats(MaxHp: 100, Speed: 10)).WithPrimaries(primaries, PrimaryStats.None).WithSkills([.. skills.Select(skill => skill.Id)]).Build(),
             skills.ToDictionary(skill => skill.Id),
             rules));
 

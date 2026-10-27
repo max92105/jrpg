@@ -87,7 +87,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **M1b. "Weapon damage" on the Equipment comparison and the Status Combat column** (Game + a small Core query, about 90 lines; decision 337) → [slices/M1b.md](slices/M1b.md)
 - [x] **M2a. Test fixtures fold defense into attack** (tests, mechanical, about 140 lines) → [slices/M2a.md](slices/M2a.md)
 - [x] **M2b-1. Hits ignore defense; Guarded raises resistances; enemies deal damage, the goblin retuned** (Core + Data + content + tests, about 250 lines; M2b split on 2026-10-27) → [slices/M2b-1.md](slices/M2b-1.md)
-- [ ] **M2b-2. Defense leaves members, items and the pages** (Core + Data + content + Game + tests, about 230 lines) → [slices/M2b-2.md](slices/M2b-2.md)
+- [x] **M2b-2. Defense leaves members, items and the pages** (Core + Data + content + Game + tests, about 230 lines) → [slices/M2b-2.md](slices/M2b-2.md)
 
 ### Phase 5: hits
 - [ ] **H1. Accuracy against dodge: hits can miss, and the battle screen says so** (Core + Data + content + Game, about 240 lines) → [slices/H1.md](slices/H1.md)

@@ -9,7 +9,6 @@ using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Session;
-using Jrpg.Core.Stats;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 using Jrpg.Core.World;
@@ -27,7 +26,7 @@ public sealed class GameSessionSaveTests
 
     private static readonly ItemDefinition _potion = new ItemDefinitionBuilder().WithId("potion").Build();
     private static readonly ItemDefinition _sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build();
-    private static readonly ItemDefinition _mail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(3).Build();
+    private static readonly ItemDefinition _mail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor().Build();
     private static readonly ObjectDefinition _chest = new() { Id = "chest", Width = 1, Height = 1, CollisionPolygon = [], Category = "test", Tiles = [], AbovePlayerZones = [] };
 
     private static readonly MapEvent _openChest = new MapEventBuilder().WithId("chest_0").AsOnce()
@@ -99,8 +98,8 @@ public sealed class GameSessionSaveTests
     public void Restore_MemberSavedAtLevelThree_HasTheClassStatsAtThree()
     {
         var growing = new ClassBuilder()
-            .WithBase(new ClassStats(MaxHp: 100, Defense: 5, Speed: 0))
-            .WithGrowth(new ClassStats(MaxHp: 10, Defense: 1, Speed: 0))
+            .WithBase(new ClassStats(MaxHp: 100, Speed: 0))
+            .WithGrowth(new ClassStats(MaxHp: 10, Speed: 0))
             .Build();
         var catalog = Catalog(_belowChest) with { Classes = new Dictionary<string, ClassDefinition> { ["fighter"] = growing } };
         var save = StartNew().Capture(_savedAt);
@@ -108,8 +107,6 @@ public sealed class GameSessionSaveTests
 
         var leader = GameSession.Restore(savedAtThree, catalog, new FixedSequenceRandom()).Party.Leader;
 
-        // The defense the class has at three; the attack is the unarmed one, which no level changes (decision 330).
-        Assert.Equal(new CombatStats(Attack: 10, Defense: 7), leader.BaseStats);
         Assert.Equal((90, 120), (leader.Vitals.Hp, leader.Vitals.MaxHp));
     }
 

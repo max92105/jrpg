@@ -4,19 +4,23 @@ using Jrpg.Core.Stats;
 namespace Jrpg.Core.Battle;
 
 /// <summary>
-/// A member's battle stat line from what they are and wear: kept in Battle so <see cref="PartyMember"/> doesn't grow
-/// battle rules.
+/// A member's battle stat line from their sheet and what they wear: kept in Battle so <see cref="PartyMember"/> doesn't
+/// grow battle rules.
 /// </summary>
 internal static class MemberBattleStats
 {
     /// <summary>
-    /// The member's stats with gear, attacking as their weapon's type, or as the rules' unarmed type without one, and
-    /// dealing and resisting as their sheet does.
+    /// The sheet's attack damage, damage percent and resistances, attacking as the worn weapon's type, or as the rules'
+    /// unarmed type without one.
     /// </summary>
-    public static CombatStats Of(PartyMember member) => member.TotalStats with
+    public static CombatStats Of(PartyMember member)
     {
-        AttackType = member.Weapon?.Equipment?.DamageType ?? member.Rules.UnarmedDamageType,
-        DamagePermille = member.Sheet.DamagePermille,
-        Resistances = member.Sheet.Resistances,
-    };
+        var sheet = member.Sheet;
+        return new CombatStats(sheet.AttackDamage)
+        {
+            DamagePermille = sheet.DamagePermille,
+            AttackType = member.Weapon?.Equipment?.DamageType ?? member.Rules.UnarmedDamageType,
+            Resistances = sheet.Resistances,
+        };
+    }
 }

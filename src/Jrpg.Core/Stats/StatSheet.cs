@@ -7,6 +7,9 @@ namespace Jrpg.Core.Stats;
 /// <param name="Primaries">The five primaries the other numbers come from.</param>
 /// <param name="MaxHp">The class's HP at the level, raised by Constitution.</param>
 /// <param name="Speed">The class's speed (decision 295: not from Agility).</param>
+/// <param name="AttackDamage">
+/// The basic attack's raw damage: the worn weapon's, or the unarmed one (decision 330), before Power raises it.
+/// </param>
 /// <param name="AccuracyPermille">The hit chance against 0 dodge.</param>
 /// <param name="CritChancePermille">The chance that a hit is a crit.</param>
 /// <param name="CritDamagePermille">What a crit's damage is multiplied by.</param>
@@ -20,6 +23,7 @@ public sealed record StatSheet(
     PrimaryStats Primaries,
     int MaxHp,
     int Speed,
+    int AttackDamage,
     int AccuracyPermille,
     int CritChancePermille,
     int CritDamagePermille,

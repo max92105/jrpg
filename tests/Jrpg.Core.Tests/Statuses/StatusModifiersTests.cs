@@ -5,7 +5,7 @@ namespace Jrpg.Core.Tests.Statuses;
 
 public sealed class StatusModifiersTests
 {
-    private static readonly CombatStats _stats = new(Attack: 20, Defense: 5);
+    private static readonly CombatStats _stats = new(AttackDamage: 20);
 
     [Fact]
     public void Apply_Guarded_RaisesEveryResistance()

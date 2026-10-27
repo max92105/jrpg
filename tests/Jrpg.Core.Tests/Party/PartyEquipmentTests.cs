@@ -140,7 +140,7 @@ public sealed class PartyEquipmentTests
     [Fact]
     public void TryUnequip_WornArmor_ReturnsItToInventory()
     {
-        var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build();
+        var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor().Build();
         _inventory.Add(chainMail, 1);
         _equipment.TryEquip(_fighter, chainMail);
 
@@ -190,7 +190,7 @@ public sealed class PartyEquipmentTests
     [Fact]
     public void OwnedFor_ArmorSlot_ExcludesWeapons()
     {
-        var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build();
+        var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor().Build();
         _inventory.Add(_bronzeSword, 1);
         _inventory.Add(chainMail, 1);
 

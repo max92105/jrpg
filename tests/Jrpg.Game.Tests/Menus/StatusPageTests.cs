@@ -48,7 +48,7 @@ public sealed class StatusPageTests
     }
 
     [Fact]
-    public void ShownStats_Member_HasNoMp()
+    public void ShownStats_Member_StartsWithHpThenWeaponDamage()
     {
         var session = NewSession();
         var page = NewPage(session);
@@ -59,10 +59,9 @@ public sealed class StatusPageTests
 
         string[] expected =
         [
-            $"{vitals.Hp} / {vitals.MaxHp}", NumberText.Of(StatFormula.Scaled(leader.TotalStats.Attack, leader.Sheet.DamagePermille)),
-            NumberText.Of(leader.TotalStats.Defense),
+            $"{vitals.Hp} / {vitals.MaxHp}", NumberText.Of(StatFormula.Scaled(leader.Sheet.AttackDamage, leader.Sheet.DamagePermille)),
         ];
-        Assert.Equal(expected, page.ShownSheet.Combat.Take(3));
+        Assert.Equal(expected, page.ShownSheet.Combat.Take(2));
     }
 
     [Fact]

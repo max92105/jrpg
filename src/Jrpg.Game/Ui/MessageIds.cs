@@ -164,8 +164,6 @@ internal static class MessageIds
     /// <summary>A basic attack: the weapon's damage or the unarmed one, raised by Power (decision 337).</summary>
     public const string StatWeaponDamage = "stat_weapon_damage";
 
-    public const string StatDefense = "stat_defense";
-
     public const string StatPower = "stat_power";
 
     public const string StatAgility = "stat_agility";

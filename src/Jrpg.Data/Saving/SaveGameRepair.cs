@@ -77,7 +77,8 @@ internal sealed class SaveGameRepair
 
         // The max HP the member will have once restored: their level's, with what they still wear.
         var worn = BonusesOf(weaponId).Plus(BonusesOf(armorId));
-        var maxHp = MemberSheet.Of(ClassGrowth.StatsAt(characterClass, level), worn, _catalog.Rules.Stats).MaxHp;
+        var weaponDamage = weaponId is null ? null : _catalog.Items[weaponId].Equipment?.Damage;
+        var maxHp = MemberSheet.Of(ClassGrowth.StatsAt(characterClass, level), worn, weaponDamage, _catalog.Rules.Stats).MaxHp;
         var repaired = progress with
         {
             Level = level,

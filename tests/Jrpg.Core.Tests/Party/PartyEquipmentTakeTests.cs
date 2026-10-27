@@ -19,7 +19,7 @@ public sealed class PartyEquipmentTakeTests
     private readonly ItemDefinition _bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build();
     private readonly ItemDefinition _ironSword = new ItemDefinitionBuilder().WithId("iron_sword").AsWeapon(8).Build();
     private readonly ItemDefinition _staff = new ItemDefinitionBuilder().WithId("magic_staff").AsWeapon(6).Build();
-    private readonly ItemDefinition _chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build();
+    private readonly ItemDefinition _chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor().Build();
     private readonly PartyState _party;
 
     public PartyEquipmentTakeTests()

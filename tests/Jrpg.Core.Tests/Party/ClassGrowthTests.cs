@@ -10,8 +10,8 @@ public sealed class ClassGrowthTests
         "fighter",
         "Fighter",
         "Fights.",
-        Base: new ClassStats(MaxHp: 220, Defense: 8, Speed: 12),
-        Growth: new ClassStats(MaxHp: 22, Defense: 1, Speed: 1));
+        Base: new ClassStats(MaxHp: 220, Speed: 12),
+        Growth: new ClassStats(MaxHp: 22, Speed: 1));
 
     private static readonly ClassDefinition _primaryClass = new ClassBuilder()
         .WithPrimaries(new PrimaryStats(15, 8, 6, 14, 8), new PrimaryStats(2, 1, 1, 2, 1))
@@ -34,7 +34,7 @@ public sealed class ClassGrowthTests
     [Fact]
     public void StatsAt_LevelFive_AddsFourGrowths()
     {
-        Assert.Equal(new ClassStats(MaxHp: 308, Defense: 12, Speed: 16), ClassGrowth.StatsAt(_fighter, level: 5));
+        Assert.Equal(new ClassStats(MaxHp: 308, Speed: 16), ClassGrowth.StatsAt(_fighter, level: 5));
     }
 
     [Fact]
@@ -57,8 +57,8 @@ public sealed class ClassGrowthTests
     public void StatsAt_LevelThree_GrowsAccuracy()
     {
         var characterClass = new ClassBuilder()
-            .WithBase(new ClassStats(MaxHp: 100, Defense: 5, Speed: 10) { Accuracy = 5 })
-            .WithGrowth(new ClassStats(0, 0, 0) { Accuracy = 1 })
+            .WithBase(new ClassStats(MaxHp: 100, Speed: 10) { Accuracy = 5 })
+            .WithGrowth(new ClassStats(0, 0) { Accuracy = 1 })
             .Build();
 
         var stats = ClassGrowth.StatsAt(characterClass, level: 3);

@@ -18,14 +18,16 @@ public static class MemberSheet
     /// </summary>
     /// <param name="atLevel">The class's numbers at the member's level.</param>
     /// <param name="worn">What everything worn adds together.</param>
+    /// <param name="weaponDamage">The worn weapon's damage; null without one, for the rules' unarmed damage.</param>
     /// <param name="rules">The conversions' rates and bases.</param>
-    public static StatSheet Of(ClassStats atLevel, StatBonuses worn, StatRules rules)
+    public static StatSheet Of(ClassStats atLevel, StatBonuses worn, int? weaponDamage, StatRules rules)
     {
         var primaries = atLevel.Primaries.Plus(PrimariesOf(worn));
         return new StatSheet(
             Primaries: primaries,
             MaxHp: Math.Max(LeastMaxHp, StatFormula.MaxHp(atLevel.MaxHp, primaries.Constitution, rules) + worn.Of(StatKind.MaxHp)),
             Speed: atLevel.Speed + worn.Of(StatKind.Speed),
+            AttackDamage: weaponDamage ?? rules.UnarmedDamage,
             AccuracyPermille: StatFormula.AccuracyPermille(atLevel.Accuracy + worn.Of(StatKind.Accuracy), rules),
             CritChancePermille: StatFormula.CritChancePermille(primaries.Agility, rules) + PermilleOf(worn, StatKind.CritChance),
             CritDamagePermille: StatFormula.CritDamagePermille(primaries.Power, rules) + PermilleOf(worn, StatKind.CritDamage),

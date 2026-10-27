@@ -109,11 +109,11 @@ public sealed class StatFormulaTests
     public void WeaponDamage_SheetAtFifteenPercentMore_RaisesTheRawAttack()
     {
         var sheet = new StatSheet(
-            PrimaryStats.None, MaxHp: 100, Speed: 10, AccuracyPermille: 1000, CritChancePermille: 0, CritDamagePermille: 1500,
+            PrimaryStats.None, MaxHp: 100, Speed: 10, AttackDamage: 24, AccuracyPermille: 1000, CritChancePermille: 0, CritDamagePermille: 1500,
             DodgePermille: 0, CrowdControlResistancePermille: 0, DamagePermille: 1150, Resistances.None, StatusPermille: 1000,
             ExtraStatusTurns: 0);
 
-        Assert.Equal(27, StatFormula.WeaponDamage(new CombatStats(Attack: 24, Defense: 0), sheet));
+        Assert.Equal(27, StatFormula.WeaponDamage(sheet));
     }
 
     [Fact]

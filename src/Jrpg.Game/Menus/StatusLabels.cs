@@ -29,7 +29,7 @@ internal sealed record StatusLabels(
             messages.Text(MessageIds.StatusMaxLevel),
             [.. StatKinds.Primaries.Select(kind => Caps(StatNames.IdOf(kind)))],
             [
-                Caps(MessageIds.StatHp), Caps(MessageIds.StatWeaponDamage), Caps(MessageIds.StatDefense), Caps(MessageIds.StatusSpeed),
+                Caps(MessageIds.StatHp), Caps(MessageIds.StatWeaponDamage), Caps(MessageIds.StatusSpeed),
                 Caps(MessageIds.StatAccuracy), Caps(MessageIds.StatusCrit), Caps(MessageIds.StatDodge), Caps(MessageIds.StatusCrowdControl),
             ],
             [.. Enum.GetValues<DamageType>().Select(type => Caps(DamageTypeNames.IdOf(type)))],

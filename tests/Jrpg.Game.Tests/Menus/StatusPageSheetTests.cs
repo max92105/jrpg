@@ -36,8 +36,8 @@ public sealed class StatusPageSheetTests
 
         var leader = _session.Party.Leader;
         var shown = StatusPageTests.CombatValue(page, MessageIds.StatWeaponDamage);
-        Assert.Equal(NumberText.Of(StatFormula.Scaled(leader.TotalStats.Attack, leader.Sheet.DamagePermille)), shown);
-        Assert.NotEqual(NumberText.Of(leader.TotalStats.Attack), shown);
+        Assert.Equal(NumberText.Of(StatFormula.Scaled(leader.Sheet.AttackDamage, leader.Sheet.DamagePermille)), shown);
+        Assert.NotEqual(NumberText.Of(leader.Sheet.AttackDamage), shown);
     }
 
     [Fact]

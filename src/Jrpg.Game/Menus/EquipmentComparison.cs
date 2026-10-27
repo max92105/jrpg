@@ -20,10 +20,8 @@ internal sealed class EquipmentComparison(UiMessages messages)
     /// <summary>The member against the highlighted item in <paramref name="slot"/>, or the slot emptied.</summary>
     public void ShowChoice(PartyMember member, EquipmentSlot slot, EquipmentChoice choice)
     {
-        var after = choice.Highlighted is { } item
-            ? new StatComparison.Numbers(member.SheetWith(item), member.StatsWith(item))
-            : new StatComparison.Numbers(member.SheetWithout(slot), member.StatsWithout(slot));
-        Show(StatComparison.Between(NumbersOf(member), after));
+        var after = choice.Highlighted is { } item ? member.SheetWith(item) : member.SheetWithout(slot);
+        Show(StatComparison.Between(member.Sheet, after));
     }
 
     /// <summary>What the item worn in <paramref name="slot"/> gives; nothing for an empty slot or no slot.</summary>
@@ -36,11 +34,8 @@ internal sealed class EquipmentComparison(UiMessages messages)
             return;
         }
 
-        var without = new StatComparison.Numbers(member.SheetWithout(worn), member.StatsWithout(worn));
-        Show(StatComparison.Between(without, NumbersOf(member)));
+        Show(StatComparison.Between(member.SheetWithout(worn), member.Sheet));
     }
-
-    private static StatComparison.Numbers NumbersOf(PartyMember member) => new(member.Sheet, member.TotalStats);
 
     private void Show(StatComparison comparison)
     {

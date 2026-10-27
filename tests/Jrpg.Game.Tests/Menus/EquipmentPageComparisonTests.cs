@@ -29,7 +29,7 @@ public sealed class EquipmentPageComparisonTests
         }
 
         var changes = page.Comparison!.Changes;
-        Assert.Contains(changes, change => change.NameId == MessageIds.StatDefense && change.After > change.Before);
+        Assert.Contains(changes, change => change.Kind == StatKind.Constitution && change.After > change.Before);
         Assert.Contains(changes, change => change.Kind == StatKind.SlashingResistance && change.After > change.Before);
     }
 

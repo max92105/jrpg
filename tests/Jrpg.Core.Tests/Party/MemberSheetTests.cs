@@ -27,14 +27,15 @@ public sealed class MemberSheetTests
     public void Of_ClassAtLevel_FillsEveryNumberFromItsOwnSource()
     {
         var primaries = new PrimaryStats(Power: 20, Agility: 20, Intelligence: 30, Constitution: 10, Will: 20);
-        var atLevel = new ClassStats(MaxHp: 200, Defense: 5, Speed: 12) { Accuracy = 5, Primaries = primaries };
+        var atLevel = new ClassStats(MaxHp: 200, Speed: 12) { Accuracy = 5, Primaries = primaries };
 
-        var sheet = MemberSheet.Of(atLevel, StatBonuses.None, _rules);
+        var sheet = MemberSheet.Of(atLevel, StatBonuses.None, weaponDamage: null, _rules);
 
         var expected = new StatSheet(
             Primaries: primaries,
             MaxHp: 220,
             Speed: 12,
+            AttackDamage: 18,
             AccuracyPermille: 950,
             CritChancePermille: 100,
             CritDamagePermille: 1600,
@@ -48,11 +49,19 @@ public sealed class MemberSheetTests
     }
 
     [Fact]
+    public void Of_WeaponWorn_AttackDamageIsTheWeapons()
+    {
+        var sheet = MemberSheet.Of(ClassWith(PrimaryStats.None), StatBonuses.None, weaponDamage: 24, _rules);
+
+        Assert.Equal(24, sheet.AttackDamage);
+    }
+
+    [Fact]
     public void Of_PowerBonus_RaisesPowerAndDamagePercent()
     {
         var atLevel = ClassWith(new PrimaryStats(Power: 10, Agility: 0, Intelligence: 0, Constitution: 0, Will: 0));
 
-        var sheet = MemberSheet.Of(atLevel, Bonus(StatKind.Power, 5), _rules);
+        var sheet = MemberSheet.Of(atLevel, Bonus(StatKind.Power, 5), weaponDamage: null, _rules);
 
         Assert.Equal((15, 1150), (sheet.Primaries.Power, sheet.DamagePermille));
     }
@@ -62,7 +71,7 @@ public sealed class MemberSheetTests
     {
         var atLevel = ClassWith(new PrimaryStats(Power: 0, Agility: 0, Intelligence: 0, Constitution: 0, Will: 20));
 
-        var sheet = MemberSheet.Of(atLevel, Bonus(StatKind.FireResistance, 10), _rules);
+        var sheet = MemberSheet.Of(atLevel, Bonus(StatKind.FireResistance, 10), weaponDamage: null, _rules);
 
         // 5 % from 20 Will, then the gear's 10 %; Ice has only Will's.
         Assert.Equal((150, 50), (sheet.Resistances.Fire, sheet.Resistances.Ice));
@@ -73,7 +82,7 @@ public sealed class MemberSheetTests
     {
         var atLevel = ClassWith(new PrimaryStats(Power: 0, Agility: 200, Intelligence: 0, Constitution: 0, Will: 0));
 
-        var sheet = MemberSheet.Of(atLevel, Bonus(StatKind.Dodge, 20), _rules);
+        var sheet = MemberSheet.Of(atLevel, Bonus(StatKind.Dodge, 20), weaponDamage: null, _rules);
 
         // 40 % from 200 Agility and the gear's 20 % would be 60 %; the cap is 50 %.
         Assert.Equal(500, sheet.DodgePermille);
@@ -84,7 +93,7 @@ public sealed class MemberSheetTests
     {
         var atLevel = ClassWith(new PrimaryStats(Power: 0, Agility: 300, Intelligence: 0, Constitution: 0, Will: 0));
 
-        var sheet = MemberSheet.Of(atLevel, Bonus(StatKind.Dodge, -15), _rules);
+        var sheet = MemberSheet.Of(atLevel, Bonus(StatKind.Dodge, -15), weaponDamage: null, _rules);
 
         // 60 % from 300 Agility, less the gear's 15 %: 45 %, under the cap. Capping first would leave 35 %.
         Assert.Equal(450, sheet.DodgePermille);
@@ -95,7 +104,7 @@ public sealed class MemberSheetTests
     {
         var atLevel = ClassWith(PrimaryStats.None);
 
-        var sheet = MemberSheet.Of(atLevel, Bonus(StatKind.MaxHp, -100).Plus(Bonus(StatKind.Constitution, -100)), _rules);
+        var sheet = MemberSheet.Of(atLevel, Bonus(StatKind.MaxHp, -100).Plus(Bonus(StatKind.Constitution, -100)), weaponDamage: null, _rules);
 
         Assert.Equal(1, sheet.MaxHp);
     }
@@ -105,7 +114,7 @@ public sealed class MemberSheetTests
     {
         var atLevel = ClassWith(PrimaryStats.None);
 
-        var sheet = MemberSheet.Of(atLevel, Bonus(StatKind.Constitution, 10), _rules);
+        var sheet = MemberSheet.Of(atLevel, Bonus(StatKind.Constitution, 10), weaponDamage: null, _rules);
 
         Assert.Equal(220, sheet.MaxHp);
     }
@@ -125,7 +134,7 @@ public sealed class MemberSheetTests
             [StatKind.SlashingResistance] = 8,
         });
 
-        var sheet = MemberSheet.Of(atLevel, worn, _rules);
+        var sheet = MemberSheet.Of(atLevel, worn, weaponDamage: null, _rules);
 
         // The class gives 200 HP, speed 12 and the rules' bases; each bonus lands on its own number (percents ×10).
         Assert.Equal(
@@ -135,7 +144,7 @@ public sealed class MemberSheetTests
     }
 
     private static ClassStats ClassWith(PrimaryStats primaries) =>
-        new ClassStats(MaxHp: 200, Defense: 5, Speed: 12) { Primaries = primaries };
+        new ClassStats(MaxHp: 200, Speed: 12) { Primaries = primaries };
 
     private static StatBonuses Bonus(StatKind kind, int bonus) => new(new Dictionary<StatKind, int> { [kind] = bonus });
 }

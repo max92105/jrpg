@@ -24,7 +24,7 @@ internal sealed record LeaderProfile(string Name, string PortraitFile, string Cl
         var characterClass = catalog.ClassOf(member);
 
         // Everyone starts at level 1 wearing nothing (decision 168), so the numbers are the class's base.
-        var sheet = MemberSheet.Of(ClassGrowth.StatsAt(characterClass, 1), StatBonuses.None, catalog.Rules.Stats);
+        var sheet = MemberSheet.Of(ClassGrowth.StatsAt(characterClass, 1), StatBonuses.None, weaponDamage: null, catalog.Rules.Stats);
         LeaderStatLine[] stats =
         [
             new(messages.Text(MessageIds.StatusLevel), NumberText.Of(1)),

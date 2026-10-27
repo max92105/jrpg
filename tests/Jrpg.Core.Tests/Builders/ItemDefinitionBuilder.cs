@@ -25,20 +25,13 @@ internal sealed class ItemDefinitionBuilder
 
     public ItemDefinitionBuilder AsWeapon(int damage)
     {
-        _equipment = new EquipmentStats(EquipmentSlot.Weapon, DefenseBonus: 0) { Damage = damage };
+        _equipment = new EquipmentStats(EquipmentSlot.Weapon) { Damage = damage };
         return this;
     }
 
-    public ItemDefinitionBuilder AsArmor(int defenseBonus)
+    public ItemDefinitionBuilder AsArmor()
     {
-        _equipment = new EquipmentStats(EquipmentSlot.Armor, defenseBonus);
-        return this;
-    }
-
-    /// <remarks>Call after <see cref="AsWeapon"/> or <see cref="AsArmor"/>.</remarks>
-    public ItemDefinitionBuilder WithDefenseBonus(int defense)
-    {
-        _equipment = _equipment! with { DefenseBonus = defense };
+        _equipment = new EquipmentStats(EquipmentSlot.Armor);
         return this;
     }
 

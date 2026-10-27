@@ -19,8 +19,8 @@ namespace Jrpg.Game.Menus;
 /// <param name="Experience">How far they are through their level, for the experience bar.</param>
 /// <param name="Attributes">Each primary, gear included, with what it gives, in <see cref="StatKind"/> order.</param>
 /// <param name="Combat">
-/// HP (as "value / max"), Weapon damage, Defense while the battle uses it (decision 337), speed, accuracy, crit chance
-/// with crit damage, dodge, crowd control resistance: each with what the member wears.
+/// HP (as "value / max"), Weapon damage (decision 337), speed, accuracy, crit chance with crit damage, dodge, crowd
+/// control resistance: each with what the member wears.
 /// </param>
 /// <param name="Resistances">One per damage type, in <see cref="DamageType"/> order.</param>
 /// <param name="ResistanceTones">How each resistance is tinted, in the same order: weak, capped or plain.</param>
@@ -51,7 +51,6 @@ internal sealed record StatusSheet(
     public static StatusSheet Of(PartyMember member, ContentCatalog catalog, StatusLabels labels, MemberVitalBars shownVitals)
     {
         var table = catalog.Rules.Experience;
-        var stats = member.TotalStats;
         var sheet = member.Sheet;
         var messages = labels.Messages;
         string Value(StatKind kind) => StatText.ValueOf(kind, sheet.ValueOf(kind), messages);
@@ -65,7 +64,7 @@ internal sealed record StatusSheet(
             ExperienceProgress(member.Level, member.Experience, table),
             AttributesOf(sheet.Primaries, catalog.Rules.Stats, messages),
             [
-                shownVitals.Hp.Value.Text, NumberText.Of(StatFormula.WeaponDamage(stats, sheet)), NumberText.Of(stats.Defense), Value(StatKind.Speed),
+                shownVitals.Hp.Value.Text, NumberText.Of(StatFormula.WeaponDamage(sheet)), Value(StatKind.Speed),
                 Value(StatKind.Accuracy), crit, Value(StatKind.Dodge), Value(StatKind.CrowdControlResistance),
             ],
             [.. Enum.GetValues<DamageType>().Select(type => Value(StatKinds.ResistanceTo(type)))],

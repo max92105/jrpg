@@ -13,8 +13,8 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class StatusParametersView
 {
-    /// <summary>The band's height: Combat's band and rows, taller than Resistances and Resources together.</summary>
-    public const int Height = BelowBand + (CombatRows * RowHeight);
+    /// <summary>The band's height: the taller of Combat and of Resistances with Resources under them.</summary>
+    public const int Height = CombatHeight > ResistancesAndResourcesHeight ? CombatHeight : ResistancesAndResourcesHeight;
 
     /// <summary>The most class resources the band has room for under the resistances.</summary>
     public const int MostResources = 2;
@@ -22,7 +22,7 @@ internal sealed class StatusParametersView
     // Placeholder layout (S1a's arithmetic): 34 px rows from 10 px under each band; cells 12 px in and at most 380 px
     // wide, the halves 48 px apart; the resistances in two columns of four 24 px apart; Resources 16 px under them;
     // HP's 4 px bar under its label, 12 px short of its value.
-    private const int CombatRows = 8;
+    private const int CombatRows = 7;
     private const int ResistanceRowsPerColumn = 4;
     private const int RowHeight = 34;
     private const int BelowBand = SectionTitle.Height + 10;
@@ -33,6 +33,9 @@ internal sealed class StatusParametersView
     private const int SectionGap = 16;
     private const int HpBarHeight = 4;
     private const int HpBarValueGap = 12;
+    private const int CombatHeight = BelowBand + (CombatRows * RowHeight);
+    private const int ResourcesTop = BelowBand + (ResistanceRowsPerColumn * RowHeight) + SectionGap;
+    private const int ResistancesAndResourcesHeight = ResourcesTop + BelowBand + (MostResources * RowHeight);
 
     private readonly StatusLabels _labels;
     private readonly SpriteFontBase _labelFont;
@@ -78,7 +81,7 @@ internal sealed class StatusParametersView
 
         var right = band with { X = band.X + halfWidth + HalfGap, Width = halfWidth };
         DrawResistances(frame, right, shown.Resistances, shown.ResistanceTones);
-        var resources = right with { Y = right.Y + BelowBand + (ResistanceRowsPerColumn * RowHeight) + SectionGap };
+        var resources = right with { Y = right.Y + ResourcesTop };
         _resourcesTitle.Draw(batch, textures, resources, opacity);
         for (var index = 0; index < shown.Resources.Length; index++)
         {

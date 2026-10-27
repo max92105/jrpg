@@ -13,7 +13,6 @@ internal sealed class PartyMemberBuilder
     private int _hp = 100;
     private int _maxHp = 100;
     private int? _weaponDamage;
-    private int _defense;
     private SkillDefinition[] _skills = [];
 
     public PartyMemberBuilder WithId(string id)
@@ -52,13 +51,6 @@ internal sealed class PartyMemberBuilder
         return this;
     }
 
-    /// <summary>For the tests about defense itself, until the plan's M2b; every other member has none.</summary>
-    public PartyMemberBuilder WithDefense(int defense)
-    {
-        _defense = defense;
-        return this;
-    }
-
     public PartyMemberBuilder WithSkills(params SkillDefinition[] skills)
     {
         _skills = skills;
@@ -73,7 +65,7 @@ internal sealed class PartyMemberBuilder
     {
         var characterClass = new ClassBuilder()
             .WithId(_classId)
-            .WithBase(new ClassStats(_maxHp, _defense, Speed: 10))
+            .WithBase(new ClassStats(_maxHp, Speed: 10))
             .WithSkills([.. _skills.Select(skill => skill.Id)])
             .Build();
         var progress = new PartyMemberProgress(_id, _level, _experience, _hp, WeaponId: null, ArmorId: null, LastingAmounts: new Dictionary<string, int>());

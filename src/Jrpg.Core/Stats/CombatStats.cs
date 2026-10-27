@@ -4,9 +4,8 @@ namespace Jrpg.Core.Stats;
 /// A combatant's battle stat line. A class, not a struct: the stats later slices add have neutral defaults (accuracy
 /// 100 %, crit damage 150 %) that a struct's <c>default</c> would silently zero.
 /// </summary>
-/// <param name="Attack">The basic attack's raw damage: the weapon's, the unarmed one, or an enemy's attack.</param>
-/// <param name="Defense">Shown on the pages until the plan's M2b-2; no hit reads it.</param>
-public sealed record CombatStats(int Attack, int Defense)
+/// <param name="AttackDamage">The basic attack's raw damage: the weapon's, the unarmed one, or an enemy's.</param>
+public sealed record CombatStats(int AttackDamage)
 {
     /// <summary>
     /// What the combatant's raw damage and healing are multiplied by, in permille: Power's for a member (decision 296),

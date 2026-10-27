@@ -6,6 +6,6 @@
     "iconFile": "Weapon.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "weapon", "damage": 5 }
+    "equipment": { "damage": 5, "damageType": "slashing" }
   }
 ]

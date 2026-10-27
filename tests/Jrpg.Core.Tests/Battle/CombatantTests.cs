@@ -23,9 +23,9 @@ public sealed class CombatantTests
     }
 
     [Fact]
-    public void FromPartyMember_EquippedMember_UsesTotalStatsOnPartySide()
+    public void FromPartyMember_SwordWorn_AttackDamageIsSword()
     {
-        var member = new PartyMemberBuilder().WithClass("fighter").WithDefense(5).Build();
+        var member = new PartyMemberBuilder().WithClass("fighter").Build();
         var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(15).Build();
         var inventory = new Inventory();
         inventory.Add(sword, 1);
@@ -34,7 +34,7 @@ public sealed class CombatantTests
         var combatant = Combatant.FromPartyMember(member);
 
         Assert.Equal(BattleSide.Party, combatant.Side);
-        Assert.Equal(new CombatStats(Attack: 15, Defense: 5), combatant.Stats);
+        Assert.Equal(new CombatStats(AttackDamage: 15), combatant.Stats);
     }
 
     [Fact]
@@ -98,8 +98,8 @@ public sealed class CombatantTests
         var readiness = new ResourceDefinition("readiness", "Readiness") { MaxFromSpeed = new SpeedScaling(SpeedPerCharge: 10) };
         var rogue = new ClassBuilder()
             .WithId("rogue")
-            .WithBase(new ClassStats(MaxHp: 100, Defense: 5, Speed: 30))
-            .WithGrowth(new ClassStats(MaxHp: 0, Defense: 0, Speed: 5))
+            .WithBase(new ClassStats(MaxHp: 100, Speed: 30))
+            .WithGrowth(new ClassStats(MaxHp: 0, Speed: 5))
             .WithResources(readiness)
             .Build();
         var progress = new PartyMemberProgress("lazarus", level, 0, Hp: 100, WeaponId: null, ArmorId: null, LastingAmounts: new Dictionary<string, int>());
@@ -127,7 +127,7 @@ public sealed class CombatantTests
 
         Assert.Equal("Goblin", combatant.Name);
         Assert.Equal(BattleSide.Enemies, combatant.Side);
-        Assert.Equal(new CombatStats(Attack: 20, Defense: 0), combatant.Stats);
+        Assert.Equal(new CombatStats(AttackDamage: 20), combatant.Stats);
     }
 
     [Fact]

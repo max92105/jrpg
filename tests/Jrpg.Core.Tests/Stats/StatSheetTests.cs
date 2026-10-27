@@ -9,6 +9,7 @@ public sealed class StatSheetTests
         Primaries: new PrimaryStats(Power: 1, Agility: 2, Intelligence: 3, Constitution: 4, Will: 5),
         MaxHp: 6,
         Speed: 7,
+        AttackDamage: 99,
         AccuracyPermille: 8,
         CritChancePermille: 9,
         CritDamagePermille: 10,

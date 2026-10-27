@@ -80,10 +80,9 @@ public sealed class EquipmentChoiceTests
         var sword = _items["bronze_sword"];
         var leader = _party.Leader;
 
-        var comparison = StatComparison.Between(NumbersOf(leader), new(leader.SheetWith(sword), leader.StatsWith(sword)));
+        var comparison = StatComparison.Between(leader.Sheet, leader.SheetWith(sword));
 
-        Assert.Equal(WeaponDamage(leader, sword.Equipment!.Damage) - WeaponDamage(leader, leader.BaseStats.Attack), WeaponDamageChange(comparison));
-        Assert.DoesNotContain(comparison.Changes, change => change.NameId == MessageIds.StatDefense);
+        Assert.Equal(WeaponDamage(leader, sword.Equipment!.Damage) - WeaponDamage(leader, Unarmed), WeaponDamageChange(comparison));
     }
 
     [Fact]
@@ -94,7 +93,7 @@ public sealed class EquipmentChoiceTests
         session.Equipment.TryEquip(leader, _items["bronze_sword"]);
         var ironSword = _items["iron_sword"];
 
-        var comparison = StatComparison.Between(NumbersOf(leader), new(leader.SheetWith(ironSword), leader.StatsWith(ironSword)));
+        var comparison = StatComparison.Between(leader.Sheet, leader.SheetWith(ironSword));
 
         Assert.Equal(WeaponDamage(leader, ironSword.Equipment!.Damage) - WeaponDamage(leader, _items["bronze_sword"].Equipment!.Damage), WeaponDamageChange(comparison));
         Assert.True(WeaponDamageChange(comparison) > 0);
@@ -108,18 +107,18 @@ public sealed class EquipmentChoiceTests
         session.Equipment.TryEquip(leader, _items["bronze_sword"]);
         var weapon = Core.Items.EquipmentSlot.Weapon;
 
-        var comparison = StatComparison.Between(NumbersOf(leader), new(leader.SheetWithout(weapon), leader.StatsWithout(weapon)));
+        var comparison = StatComparison.Between(leader.Sheet, leader.SheetWithout(weapon));
 
-        Assert.Equal(WeaponDamage(leader, leader.BaseStats.Attack) - WeaponDamage(leader, _items["bronze_sword"].Equipment!.Damage), WeaponDamageChange(comparison));
+        Assert.Equal(WeaponDamage(leader, Unarmed) - WeaponDamage(leader, _items["bronze_sword"].Equipment!.Damage), WeaponDamageChange(comparison));
     }
-
-    private static StatComparison.Numbers NumbersOf(PartyMember member) => new(member.Sheet, member.TotalStats);
 
     private static int WeaponDamageChange(StatComparison comparison)
     {
         var weaponDamage = comparison.Changes.Single(change => change.NameId == MessageIds.StatWeaponDamage);
         return weaponDamage.After - weaponDamage.Before;
     }
+
+    private static int Unarmed => StartMapScenarios.BelowClosedDoor.Rules.Stats.UnarmedDamage;
 
     // The raw damage as the leader deals it: none of these swords changes Power.
     private static int WeaponDamage(PartyMember member, int raw) => StatFormula.Scaled(raw, member.Sheet.DamagePermille);

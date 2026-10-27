@@ -92,10 +92,10 @@ public static class StatFormula
     public static int Scaled(int raw, int damagePermille) => (int)((long)raw * damagePermille / PermilleOf(100));
 
     /// <summary>
-    /// A member's basic attack as they deal it (decision 337): the raw attack of <paramref name="stats"/> raised by
-    /// <paramref name="sheet"/>'s damage percent, the one number every page shows for it.
+    /// A member's basic attack as they deal it (decision 337): the sheet's attack damage raised by its damage percent,
+    /// the one number every page shows for it.
     /// </summary>
-    public static int WeaponDamage(CombatStats stats, StatSheet sheet) => Scaled(stats.Attack, sheet.DamagePermille);
+    public static int WeaponDamage(StatSheet sheet) => Scaled(sheet.AttackDamage, sheet.DamagePermille);
 
     /// <summary>A whole percent as permille, the unit derived percents are held in (ADR 0026).</summary>
     public static int PermilleOf(int percent) => percent * PermillePerPercent;

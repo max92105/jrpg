@@ -82,7 +82,7 @@ internal sealed class InventoryPage : IMenuPage
     /// <summary>The last use's result, until the player moves on; null otherwise.</summary>
     public string? Notice => _detail.Notice;
 
-    /// <summary>Whether the selected item's description shows under it; Info toggles it (decision 291).</summary>
+    /// <summary>Whether the selected item's description shows under it; Info toggles it (decision 333).</summary>
     public bool IsDescriptionShown => _detail.IsDescriptionShown;
 
     /// <summary>Whether the player is choosing who to use an item on.</summary>

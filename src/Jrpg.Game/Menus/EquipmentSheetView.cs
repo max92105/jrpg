@@ -15,7 +15,7 @@ namespace Jrpg.Game.Menus;
 internal sealed class EquipmentSheetView
 {
     // Placeholder layout (decision 82): a 28 x 20 margin, the member's name as a heading, section titles as dark bands
-    // (decision 293), 52 px rows (a 32 px icon in a 48 px column, the slot name, then what's worn), a hairline 10 px
+    // (decision 335), 52 px rows (a 32 px icon in a 48 px column, the slot name, then what's worn), a hairline 10 px
     // above "Remove all", and the parameters as two columns of 46 px lines 40 px apart.
     private const int Margin = 28;
     private const int TopMargin = 20;

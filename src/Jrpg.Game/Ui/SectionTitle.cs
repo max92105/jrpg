@@ -7,7 +7,7 @@ namespace Jrpg.Game.Ui;
 
 /// <summary>
 /// A section's header, as the reference's Status page draws them: a dark band across the section with the label in it,
-/// so each section reads as its own block (decision 293).
+/// so each section reads as its own block (decision 335).
 /// </summary>
 internal sealed class SectionTitle
 {

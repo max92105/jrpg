@@ -4,7 +4,7 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// The Inventory page's strip under the selected item: what the last use did, until the player moves on, otherwise
-/// what the item is, unless the player hid the descriptions with Info (decision 291).
+/// what the item is, unless the player hid the descriptions with Info (decision 333).
 /// </summary>
 internal sealed class ItemDetailLine
 {

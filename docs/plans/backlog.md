@@ -49,7 +49,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `BattleState.cs` is at 296 lines: split the per-command bodies before the next command path lands (DR2 review).
 - `tests/Jrpg.Game.Tests/Battle/CommandMenuTests.cs` is at 393 lines: split it by menu entry (MO1 review).
 - The tip strip (dark `UiTheme.CommandHintFill` fill, highlight hairline, padded text) is drawn twice: `Battle/CommandPanelView.DrawHint` and `Menus/InventoryListView.DrawStrip`. Move it into one drawer in `Ui` when a third appears (M4 review).
-- `SectionHeight = 36` (a `SectionTitle`'s height) is copied in `EquipmentSheetView`, `StatusSheetView` and `StatusSkillsView`: expose it from `Ui/SectionTitle` (M3b review).
+- The gap under a section title's band, `SectionTitle.Height + 10`, is written three times (`EquipmentSheetView.SectionHeight`, `StatusSheetView.BelowBand`, `StatusSkillsView.BelowBand`): give `SectionTitle` a `ContentTop` (M3b review; the band's height itself moved there in the escape menu third pass, F1).
 - The scroll cues above and below a list are drawn twice: `PartySidebarView.DrawScrollCues` and `MemberColumnView.DrawScrollMarks`. Move them into one `Ui` drawer if a third list needs them (M2b review).
 
 ## From the class mechanics plan (2026-10-25)
@@ -71,3 +71,11 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 ## From the escape menu third pass plan (2026-10-26)
 
 - Two refusals are still red lines while the Party page's open the OK dialog (`Ui/NoticeDialog`, decision 268): Equipment's notice under its parameters (`EquipmentSheetView`, `UiTheme.Danger`) and the save page's failure line (`SavePage`). Kept as they are by decision 284; move them to `NoticeDialog` if the developer asks for it.
+
+## From the escape menu third pass plan (2026-10-27)
+
+- `Menus/InventoryPage.cs` (280) and `Menus/PartyPage.cs` (275) are near 300: the next change that grows either splits it first (Inventory: the sidebar and aiming wiring into `ItemUse`; Party: the notice and the action choice into their own presenter).
+- A titled dialog's frame (the scrim, a `FramedWindowLayout.Titled` window, the centered title, measured when the dialog changes) is written twice: `ConfirmPromptView` and `NoticeDialogView`. Share it when a third dialog comes, such as Equipment's or the save page's notice (decision 284).
+- The inventory hint names the Info button as "X (Y on a controller)" in `ui.json`, a copy of `InputBindings`; give the hint a `{button}` from `ButtonLabels.Of(GameButton.Info, device)` as `cinematic_skip` does, once menu pages know the device in use (F1 review).
+- Status: the Skills section starts under the longer of the gear and resource rows, so the stats plan's nine slots will push it off the page; that plan places it (F1 review).
+- Lists outside the menu still draw `MenuPointer` at the cursor's row, against the glide rule (`.claude/rules/game.md`, decision 336): the battle's command list (`CommandPanelView`), the defeat menu (`DefeatScreenView`) and the leader choice (`LeaderChoiceScene`). Glide them when next touched; the battle's look follows later anyway (decision 272).

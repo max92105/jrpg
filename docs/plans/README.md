@@ -4,17 +4,19 @@ Feature plans from `/plan-feature`, worked through one slice at a time with `/sl
 
 Code-health work found along the way (big files, copies, open follow-ups) waits in [backlog.md](backlog.md) for the next cleanup plan.
 
+**Next free numbers:** decision 337, ADR 0029. A new decision or ADR takes its number from this line and bumps it in the same change, so two plans never share a number.
+
 **Layout of a plan** (from the battle plan on): a folder `YYYY-MM-DD-name/` with
 - `README.md`: status, goal, order, guiding rules, out of scope, the slice index (one line and a checkbox per slice), the developer's decisions, open questions, ADRs needed. Read for every slice.
 - `design.md`: tunables, design overview (what exists, Core changes, structure, key decisions, replacement mapping) and risks. Read when a slice points to it.
-- `slices/<id>.md`: one slice's goal, types, tests, hand checks, and once done its "Done, with deviations" note.
+- `slices/<id>.md`: one slice's goal, types, tests, hand checks, and once done its "Done" or "Done, with deviations" note.
 
 Older plans are single files with the same sections.
 
 | Plan | Status |
 |---|---|
-| [2026-10-26-escape-menu-third-pass](2026-10-26-escape-menu-third-pass/README.md) | approved, in progress |
 | [2026-10-26-stats-and-gear-slots](2026-10-26-stats-and-gear-slots/README.md) | approved |
+| [done/2026-10-26-escape-menu-third-pass](done/2026-10-26-escape-menu-third-pass/README.md) | done |
 | [done/2026-10-25-ui-second-pass](done/2026-10-25-ui-second-pass/README.md) | done (retro run on the other machine) |
 | [done/2026-10-24-class-mechanics](done/2026-10-24-class-mechanics/README.md) | done |
 | [done/2026-10-23-new-game-flow](done/2026-10-23-new-game-flow/README.md) | done |

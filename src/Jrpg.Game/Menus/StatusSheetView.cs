@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Draws a <see cref="StatusSheet"/> after the reference's Status page (decision 292): the profile beside a diamond
+/// Draws a <see cref="StatusSheet"/> after the reference's Status page (decision 334): the profile beside a diamond
 /// portrait, with the experience over its bar and the experience to the next level at the bar's end; then each section
 /// under its dark band (<see cref="SectionTitle"/>): the parameters, what the member wears beside their class
 /// resources, and their skills. A row is a small spaced-caps label with its value right-aligned close to it, so the two
@@ -15,7 +15,7 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class StatusSheetView
 {
-    // Placeholder layout (decisions 82, 292): a 28 x 20 margin; a 160 px portrait 32 px left of the profile's text: a
+    // Placeholder layout (decisions 82, 334): a 28 x 20 margin; a 160 px portrait 32 px left of the profile's text: a
     // 36 px name with the level 24 px after it, a 20 px class 48 px under the name's top, the experience row 92 px
     // under the name's top; 18 px labels 2 px apart, 26 px values.
     private const int Margin = 28;

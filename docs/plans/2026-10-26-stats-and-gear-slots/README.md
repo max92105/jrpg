@@ -3,7 +3,7 @@ Status: approved
 
 Fifth feature plan after the migration, following the escape menu third pass.
 - Renumbered when the two machines' histories were merged (2026-10-27): this plan was drafted on 267-308, which the escape menu third pass had taken, so every number here moved up 24. Its Game slices were drafted against the other machine's menu code (the UI second pass built twice); check each against the third pass's pages before slicing it.
-- Decisions 291-302 and 316-332 are recorded below; questions 303-315 are all answered (decisions 320-332). The next free number is 333.
+- Decisions 291-302 and 316-332 are recorded below; questions 303-315 are all answered (decisions 320-332). The next free number is 337 (333-336 went to the escape menu third pass's F1).
 - This plan writes ADRs 0026 (stat model), 0027 (damage types and resistances) and 0028 (equipment slots); the next ADR is 0029.
 
 Developer's request (2026-10-26, translated): "It's time to start thinking about and implementing stats. Challenge my ideas and complement them. Gear should be more like an ARPG than a classic JRPG: I want to mash the genres, so rarity, random rolls, drop tables, more gear slots (ring, amulet…), salvage, materials and a bit of crafting. But first define enough interesting stats and growth. I haven't thought about scaling." With it, the "Character Stats V2" sheet (damage types, five primaries, derived stats). The session's challenge of the sheet gave decisions 291-302; this plan is the stat half, the loot half is the next plan.

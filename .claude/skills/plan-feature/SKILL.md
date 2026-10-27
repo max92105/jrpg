@@ -13,4 +13,4 @@ Plan this feature: $ARGUMENTS
    - the devil's advocate Blockers and Concerns (one line each),
    - the open game-design questions I need to answer.
 4. Propose the specific edits you'd make to the plan to address the Blockers/Concerns, but **do not apply them and do not write any code**. Wait for my answers and approval.
-5. Once I approve, have the **architect** (continue the same agent, it has the plan in context) apply the edits and my decisions: decisions in the README's "Decisions", answered questions removed from "Open design questions", slices moved or split as needed, `Status: approved`, and the row in `docs/plans/README.md` updated.
+5. Once I approve, have the **architect** (continue the same agent, it has the plan in context) apply the edits and my decisions: decisions in the README's "Decisions", numbered from `docs/plans/README.md`'s "Next free numbers" line (bumped in the same change), answered questions removed from "Open design questions", slices moved or split as needed, `Status: approved`, and the row in `docs/plans/README.md` updated.

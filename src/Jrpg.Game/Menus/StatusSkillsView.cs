@@ -13,7 +13,7 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class StatusSkillsView
 {
-    // Placeholder layout (decisions 82, 292): the first name 10 px under the band, 24 px names, 18 px descriptions 30
+    // Placeholder layout (decisions 82, 334): the first name 10 px under the band, 24 px names, 18 px descriptions 30
     // px under the name, 12 px in, a hairline 8 px under the description, then a 10 px gap.
     private const int NamePixels = 24;
     private const int DescriptionPixels = 18;

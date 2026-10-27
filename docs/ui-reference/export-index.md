@@ -61,7 +61,7 @@ Screenshots: `battle-victory.jpg`.
 
 ## Game menu, Status, Equipment
 
-Screenshots: `menu-tabs.webp`, `menu-status.webp`, `menu-equipment.webp`, `menu-inventory-description.webp`.
+Screenshots: `menu-tabs.webp`, `menu-status.png`, `menu-equipment.webp`, `menu-inventory-description.webp`.
 
 - `MainMenu/Other/Texture/UiTX_MainMenu_MenuList_Base.png`: the arrow-shaped tab in four states, from dim to selected.
   - Ours already has the tab shape: `NavTabShape`.

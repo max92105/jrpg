@@ -13,6 +13,6 @@ internal enum GameButton
     PreviousTab,
     NextTab,
 
-    /// <summary>Shows or hides extra detail, such as the inventory's item description (decision 291).</summary>
+    /// <summary>Shows or hides extra detail, such as the inventory's item description (decision 333).</summary>
     Info,
 }

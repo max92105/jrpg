@@ -7,7 +7,7 @@ using static Jrpg.Game.Tests.Input.InputFrames;
 
 namespace Jrpg.Game.Tests.Menus;
 
-// Info shows or hides the selected item's description (decision 291). The list starts on the potion.
+// Info shows or hides the selected item's description (decision 333). The list starts on the potion.
 [Collection(RepositoryScreenText.CollectionName)]
 public sealed class InventoryPageDescriptionTests
 {

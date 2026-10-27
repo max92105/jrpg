@@ -12,7 +12,7 @@ Screenshots of the developer's favorite UI/UX, Octopath Traveler II, the target 
 |---|---|---|
 | `title-screen.jpg` | Title | Serif logo over art, small centered entries, footer line |
 | `menu-tabs.webp` | Game menu | Arrow tabs with icons, sub-entries, pointer |
-| `menu-status.webp` | Status | Member column, profile, sections with hairlines, character art |
+| `menu-status.png` | Status | Member column, profile, sections under dark bands, values beside their labels, character art |
 | `menu-equipment.webp` | Equipment | Slots, choice list, stat preview, parameters |
 | `menu-inventory-target.webp` | Items | Using an item on a member, the sidebar's stat preview |
 | `menu-inventory-description.webp` | Items | Category rail, the description under the selected row, sidebar vitals |

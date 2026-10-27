@@ -5,7 +5,7 @@ namespace Jrpg.Game.Input;
 
 /// <summary>
 /// Which keys and controller buttons press which game button: arrows, E/Space/Enter, Esc, WASD and Backspace
-/// (decision 50), X (Y on a controller) for Info (decision 291), and a standard controller layout. The tab buttons
+/// (decision 50), X (Y on a controller) for Info (decision 333), and a standard controller layout. The tab buttons
 /// have no key yet (question 92).
 /// </summary>
 internal static class InputBindings

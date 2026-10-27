@@ -1,8 +1,8 @@
 # Escape menu third pass
-Status: approved, in progress
+Status: done
 
 Fourth feature plan after the migration, following the UI second pass (`done/2026-10-25-ui-second-pass`, retro skipped).
-- Decisions 266-272, 282-290 and 291-294 are recorded below. Questions 273-281 are answered (decisions 282-290); none is open; the next free number is 295.
+- Decisions 266-272, 282-290 and 333-336 are recorded below. Questions 273-281 are answered (decisions 282-290); none is open; the next free number is 337 (291-332 are the stats plan's).
 - No ADR is needed; the next ADR is still 0026.
 
 Developer's request (2026-10-26): the walk-through of the game menu (slice Z of the second pass) found it "far from the reference". Nine findings, in the developer's order: the tabs show a line on their left edge; the party sidebar shows on pages that don't need it; every page's content floats on the map instead of sitting on dark columns; the Party page's leader notice is a red line; the selection look is too bright and too blue. This plan answers them.
@@ -62,10 +62,10 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **PD1. The Party page's refusals open a titled framed dialog with one OK** (Game, about 230 lines) → [slices/PD1.md](slices/PD1.md)
 
 ### Phase 2b: walk-through findings (2026-10-27)
-- [x] **F1. The developer's first look at the finished pages: the item description readable and hideable, larger section titles, the Status page redone, every menu pointer gliding** (Game, one commit at the developer's request, decisions 291-294) → [slices/F1.md](slices/F1.md)
+- [x] **F1. The developer's first look at the finished pages: the item description readable and hideable, larger section titles, the Status page redone, every menu pointer gliding** (Game, one commit at the developer's request, decisions 333-336) → [slices/F1.md](slices/F1.md)
 
 ### Phase 3: walk-through
-- [ ] **Z. Menu walk-through against the reference and the 2026-10-26 captures** (manual) → [slices/Z.md](slices/Z.md)
+- [x] **Z. Menu walk-through against the reference and the 2026-10-26 captures** (manual) → [slices/Z.md](slices/Z.md)
 
 The developer asked for the tab folding as one slice, TB1; at about 350 lines with its tests it is split up front into TB1a (behavior with a plain draw) and TB1b (the look). The pointer staying on the sidebar (decision 288) is its own slice, IT2, so IT1 stays under 250.
 
@@ -93,10 +93,10 @@ The developer's answers to the draft (2026-10-26):
 - **290. Equipment's choice column draws only while choosing** (answers 281), and the sheet's width is fixed, so nothing narrows or jumps.
 
 Taken on 2026-10-27, from the developer's first look at the finished pages before Z (F1):
-- **291. Info shows or hides the inventory's item description**: a new Info button, X on the keyboard, Y on a controller, named in the footer hint; the description starts shown, and a use's notice shows either way. The strip is opaque, so the rows under it never show through.
-- **292. The Status page is redone now**, on today's stats, after `menu-status.png`: a smaller portrait beside the profile, the experience over its bar with the experience to the next level at the bar's end, then sections under dark bands with each value right-aligned close to its label. The stats-and-gear-slots plan fills this layout.
-- **293. Section titles are dark bands** across their section with a 22 px white label (`SectionTitle`), on every page that has them: Party, Equipment, Status, the Inventory's sidebar.
-- **294. Every menu list's pointer glides** (decision 262 for all): the System entries and the save files (whose glide never ran: the System page didn't pass them the time), the category rail, the member column, the Party page's cards and actions, the Inventory's sidebar. On the cards (Party, sidebar) the diamond glides and the card keeps its band.
+- **333. Info shows or hides the inventory's item description**: a new Info button, X on the keyboard, Y on a controller, named in the footer hint; the description starts shown, and a use's notice shows either way. The strip is opaque, so the rows under it never show through.
+- **334. The Status page is redone now**, on today's stats, after `menu-status.png`: a smaller portrait beside the profile, the experience over its bar with the experience to the next level at the bar's end, then sections under dark bands with each value right-aligned close to its label. The stats-and-gear-slots plan fills this layout.
+- **335. Section titles are dark bands** across their section with a 22 px white label (`SectionTitle`), on every page that has them: Party, Equipment, Status, the Inventory's sidebar.
+- **336. Every menu list's pointer glides** (decision 262 for all): the System entries and the save files (whose glide never ran: the System page didn't pass them the time), the category rail, the member column, the Party page's cards and actions, the Inventory's sidebar. On the cards (Party, sidebar) the diamond glides and the card keeps its band.
 
 Earlier decisions that apply: 146 (the sidebar's cards; its "marks the shown member" part ends with 266), 252 and 253 (one selection look, the diamond pointer), 262 (motion), 112 (the picker's layout: gone with 267).
 

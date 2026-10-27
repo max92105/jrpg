@@ -26,4 +26,5 @@ paths:
   - diamond-framed portraits (turn order); lots of empty space, so the art shows through.
 - `Ui/UiTheme` holds the starting values and layouts. Where they're plainer than the examples, lean toward the examples. Ask the developer before departing from both.
 - One selection look everywhere (decision 252): every selected row is `UiTextures.DrawSelectedRow` with `MenuPointer`'s diamond at its left; no screen draws its own.
+- Every list's pointer glides and bobs through `SelectionMotion` (decisions 262, 336): no list draws `MenuPointer` at a row worked out from its cursor index, and a page that hosts another page or list passes it `Advance`.
 - Other games' assets are reference only (decision 264): the extracted UI export is never committed, and nothing from another game (the screenshots in `docs/ui-reference/` included) is loaded or shipped. The game draws its own versions.

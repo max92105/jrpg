@@ -10,7 +10,7 @@ Part of [the escape menu third pass plan](../README.md). Manual. After every oth
     - `menu-inventory-use` → now `menu-inventory-aim` (the pointer on the sidebar, lit cards, HP previews; `menu-inventory-target.webp`), and new `menu-inventory-aim-again` (after a use, copies left);
     - `menu-party`, `menu-party-action`, and new `menu-party-notice` (the OK dialog; `menu-skill-learned-dialog.webp`);
     - `menu-equipment`, `menu-equipment-choice` (two columns, no narrowing; `menu-equipment.webp`);
-    - `menu-status` (an 1100 px column, the map on its right, the member column strip; `menu-status.webp`);
+    - `menu-status` (an 1100 px column, the map on its right, the member column strip; `menu-status.png`);
     - new `menu-options` (missing from the 2026-10-26 set);
     - `menu-system`, `menu-save` (the yes/no prompt; `dialog-confirm.webp`);
     - new `menu-tabs-folding` (a capture mid-fold);
@@ -23,3 +23,4 @@ Part of [the escape menu third pass plan](../README.md). Manual. After every oth
     - the placeholders in design.md's tunables, kept or changed.
   - **Record:** findings with the slice each belongs to; new ones as follow-ups in the README (a bug goes before the retro).
   - Then the plan is `retro pending`.
+- **Done:** closed by the developer at the retro (2026-10-27), after their first look at the finished pages turned into F1. The hand checks listed in IT3, C2, PD1 and F1 were theirs.

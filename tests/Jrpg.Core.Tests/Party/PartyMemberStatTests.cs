@@ -1,5 +1,6 @@
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
+using Jrpg.Core.Progression;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
 using Jrpg.Core.Tests.Builders;
@@ -14,13 +15,24 @@ public sealed class PartyMemberStatTests
         .WithGrowth(new ClassStats(MaxHp: 10, Attack: 2, Defense: 1, Speed: 0))
         .Build();
 
+    // 200 HP and 20 Constitution at level 1, +20 HP and +10 Constitution a level, at +1 % HP per Constitution point.
+    private static readonly ClassDefinition _sturdyClass = new ClassBuilder()
+        .WithBase(new ClassStats(MaxHp: 200, Attack: 10, Defense: 5, Speed: 0))
+        .WithGrowth(new ClassStats(MaxHp: 20, Attack: 0, Defense: 0, Speed: 0))
+        .WithPrimaries(new PrimaryStats(0, 0, 0, 20, 0), new PrimaryStats(0, 0, 0, 10, 0))
+        .Build();
+
+    private static readonly StatRules _rules = new(HpPercentPer100Constitution: 100);
+
     [Fact]
     public void BaseStats_RestoredAtLevelThree_AreTheClassAtThree()
     {
         var progress = new PartyMemberProgress("test_member", 3, 0, Hp: 50, WeaponId: null, ArmorId: null, LastingAmounts: new Dictionary<string, int>());
 
-        var member = PartyMember.Restore(
-            new PartyMemberBuilder().BuildDefinition(), _growingClass, new Dictionary<string, SkillDefinition>(), progress);
+        var member = PartyMember.Recruit(
+            new PartyMemberBuilder().BuildDefinition(), _growingClass, new Dictionary<string, SkillDefinition>(), TestStatRules.Neutral);
+
+        member.RestoreProgress(progress);
 
         Assert.Equal(new CombatStats(Attack: 16, Defense: 9), member.BaseStats);
         Assert.Equal((50, 120), (member.Vitals.Hp, member.Vitals.MaxHp));
@@ -94,6 +106,38 @@ public sealed class PartyMemberStatTests
         var member = new PartyMemberBuilder().Build();
 
         Assert.Throws<ArgumentException>(() => member.StatsWith(new ItemDefinitionBuilder().Build()));
+    }
+
+    [Fact]
+    public void Recruit_Constitution_RaisesMaxHp()
+    {
+        var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), _sturdyClass, new Dictionary<string, SkillDefinition>(), _rules);
+
+        Assert.Equal((240, 240), (member.Vitals.Hp, member.Vitals.MaxHp));
+    }
+
+    [Fact]
+    public void GainExperience_LevelUp_MaxHpGrowsWithConstitution()
+    {
+        var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), _sturdyClass, new Dictionary<string, SkillDefinition>(), _rules);
+
+        member.GainExperience(100, new ExperienceTable([100, 100]));
+
+        // Level 2: the class's 220 HP raised 30 % by 30 Constitution.
+        Assert.Equal((286, 286), (member.Vitals.Hp, member.Vitals.MaxHp));
+        Assert.Equal(30, member.Primaries.Constitution);
+    }
+
+    [Fact]
+    public void RestoreProgress_Constitution_KeepsTheSavedHpUnderTheRaisedMax()
+    {
+        var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), _sturdyClass, new Dictionary<string, SkillDefinition>(), _rules);
+        var progress = new PartyMemberProgress("test_member", 2, 0, Hp: 260, WeaponId: null, ArmorId: null, LastingAmounts: new Dictionary<string, int>());
+
+        member.RestoreProgress(progress);
+
+        Assert.Equal((260, 286), (member.Vitals.Hp, member.Vitals.MaxHp));
+        Assert.Equal(30, member.Primaries.Constitution);
     }
 
     private static void Equip(PartyMember member, ItemDefinition item)

@@ -49,7 +49,8 @@ public sealed class BattleTickingStatusTests
         var mage = Combatant.FromPartyMember(PartyMember.Recruit(
             new PartyMemberBuilder().WithId("omer").BuildDefinition(),
             new ClassBuilder().WithId("mage").WithResources(mana).Build(),
-            new Dictionary<string, SkillDefinition>()));
+            new Dictionary<string, SkillDefinition>(),
+            TestStatRules.Neutral));
         mage.Vitals.TakeDamage(95);
         mage.Statuses.Apply(new StatusGrant(StatusKind.Poison, Power: 10, Turns: 3));
         var battle = new BattleState([mage, Goblin(hp: 25)], new Inventory(), new FixedSequenceRandom(1));
@@ -127,7 +128,8 @@ public sealed class BattleTickingStatusTests
         var paladin = Combatant.FromPartyMember(PartyMember.Recruit(
             new PartyMemberBuilder().WithId("jazog").BuildDefinition(),
             new ClassBuilder().WithId("paladin").WithResources(conviction).Build(),
-            new Dictionary<string, SkillDefinition>()));
+            new Dictionary<string, SkillDefinition>(),
+            TestStatRules.Neutral));
         var goblin = Goblin(hp: 5);
         goblin.Statuses.Apply(new StatusGrant(StatusKind.Poison, Power: 10, Turns: 3));
         var battle = new BattleState([paladin, goblin], new Inventory(), new FixedSequenceRandom(1));

@@ -64,7 +64,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 1: the stat sheet
 - [x] **ADR 0026: The stat model** (before P1) → [slices/ADR-0026.md](slices/ADR-0026.md)
 - [x] **P1. Five primaries and accuracy on the class, grown by level** (Core + Data + content, about 150 lines) → [slices/P1.md](slices/P1.md)
-- [ ] **P2. Stat rules in content; Constitution raises max HP; members are built with the rules; `Vitals.ResizeMax`** (Core + Data + content, about 250 lines) → [slices/P2.md](slices/P2.md)
+- [x] **P2. Stat rules in content; Constitution raises max HP; members are built with the rules; `Vitals.ResizeMax`** (Core + Data + content, about 250 lines) → [slices/P2.md](slices/P2.md)
 - [ ] **P3a. The member's sheet: accuracy, crit chance and damage, dodge, crowd control resistance, Power's percent, in tenths** (Core + Data + content, about 200 lines) → [slices/P3a.md](slices/P3a.md)
 - [ ] **ADR 0027: Damage types and resistances** (before P3b) → [slices/ADR-0027.md](slices/ADR-0027.md)
 - [ ] **P3b. Eight resistances from Constitution and Will; Intelligence's status percent and extra turns** (Core + Data + content, about 230 lines) → [slices/P3b.md](slices/P3b.md)

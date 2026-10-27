@@ -1,6 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
+using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Tests.Content;
@@ -10,7 +11,18 @@ public sealed class GameRulesValidatorTests
     private static readonly GameRules _rules = new(
         new PartyRules(MaxActiveMembers: 4),
         new ExperienceTable([100]),
-        new ExplorationRules { WalkSpeed = 3, PlayerRadius = 0.1, InteractReach = 0.6 });
+        new ExplorationRules { WalkSpeed = 3, PlayerRadius = 0.1, InteractReach = 0.6 },
+        new StatRules(HpPercentPer100Constitution: 100));
+
+    [Fact]
+    public void Validate_NegativeHpPercentPerConstitution_NamesTheField()
+    {
+        var rules = _rules with { Stats = new StatRules(HpPercentPer100Constitution: -1) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
+
+        Assert.Equal("rules.json: stats.hpPercentPer100Constitution must be at least 0 (was -1).", exception.Message);
+    }
 
     [Fact]
     public void Validate_ZeroMaxActiveMembers_ThrowsNamingTheField()

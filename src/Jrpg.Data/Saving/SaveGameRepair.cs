@@ -3,6 +3,7 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Saving;
+using Jrpg.Core.Stats;
 
 namespace Jrpg.Data.Saving;
 
@@ -71,19 +72,20 @@ internal sealed class SaveGameRepair
     {
         var (level, experience) = RepairLevel(progress);
         var characterClass = _catalog.ClassOf(definition);
-        var maxima = ClassGrowth.StatsAt(characterClass, level);
+        var atLevel = ClassGrowth.StatsAt(characterClass, level);
+        var maxHp = StatFormula.MaxHp(atLevel.MaxHp, atLevel.Primaries.Constitution, _catalog.Rules.Stats);
         var repaired = progress with
         {
             Level = level,
             Experience = experience,
-            Hp = Math.Clamp(progress.Hp, 0, maxima.MaxHp),
+            Hp = Math.Clamp(progress.Hp, 0, maxHp),
             WeaponId = RepairWornItem(progress.WeaponId, EquipmentSlot.Weapon, definition),
             ArmorId = RepairWornItem(progress.ArmorId, EquipmentSlot.Armor, definition),
             LastingAmounts = RepairLastingAmounts(progress, characterClass),
         };
         if (repaired.Hp != progress.Hp)
         {
-            _changes.Add($"party member '{progress.Id}': HP {progress.Hp} brought within 0..{maxima.MaxHp}.");
+            _changes.Add($"party member '{progress.Id}': HP {progress.Hp} brought within 0..{maxHp}.");
         }
 
         return repaired;

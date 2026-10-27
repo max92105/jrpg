@@ -16,12 +16,14 @@ public sealed class SkillPaymentTests
     private readonly Combatant _mage = Combatant.FromPartyMember(PartyMember.Recruit(
         new PartyMemberBuilder().BuildDefinition(),
         new ClassBuilder().WithId("mage").WithResources(_mana).Build(),
-        new Dictionary<string, SkillDefinition>()));
+        new Dictionary<string, SkillDefinition>(),
+        TestStatRules.Neutral));
 
     private readonly Combatant _cleric = Combatant.FromPartyMember(PartyMember.Recruit(
         new PartyMemberBuilder().BuildDefinition(),
         new ClassBuilder().WithId("cleric").WithResources(_faith).Build(),
-        new Dictionary<string, SkillDefinition>()));
+        new Dictionary<string, SkillDefinition>(),
+        TestStatRules.Neutral));
 
     [Fact]
     public void CanPay_EnoughResource_ReturnsTrue()

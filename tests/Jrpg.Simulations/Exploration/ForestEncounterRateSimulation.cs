@@ -53,7 +53,7 @@ public sealed class ForestEncounterRateSimulation(ITestOutputHelper output)
     {
         var context = new ExplorationContext(catalog, new Inventory(), new WorldState(), new SeededRandom(seed));
         var definition = catalog.PartyMembers["sarxian"];
-        var leader = PartyMember.Recruit(definition, catalog.ClassOf(definition), catalog.Skills);
+        var leader = PartyMember.Recruit(definition, catalog.ClassOf(definition), catalog.Skills, catalog.Rules.Stats);
         var party = new PartyState([leader], [leader], catalog.Rules.Party);
         var exploration = new ExplorationState(context, party, new MapLocation(MapId, _arrival, Facing.Right));
         var turnRandom = new SeededRandom(seed + TurnSeedOffset);

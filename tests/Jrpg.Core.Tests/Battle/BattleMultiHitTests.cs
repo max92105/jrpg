@@ -106,7 +106,8 @@ public sealed class BattleMultiHitTests
         Combatant.FromPartyMember(PartyMember.Recruit(
             new PartyMemberBuilder().WithId(id).BuildDefinition(),
             new ClassBuilder().WithId(classId).WithResources(resource).WithSkills([.. skills.Select(skill => skill.Id)]).Build(),
-            skills.ToDictionary(skill => skill.Id)));
+            skills.ToDictionary(skill => skill.Id),
+            TestStatRules.Neutral));
 
     private static Combatant Goblin(int hp) =>
         Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, attack: 20, defense: 2).Build());

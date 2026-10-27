@@ -94,7 +94,7 @@ internal static class StartMapScenarios
         string[] recruitIds = ["jazog", "teelle", "zaruk", "zanyr", "thaali", "ragnir", "omer", "lazarus"];
         var recruits = recruitIds
             .Select(id => catalog.PartyMembers[id])
-            .Select(definition => PartyMember.Recruit(definition, catalog.ClassOf(definition), catalog.Skills).CaptureProgress());
+            .Select(definition => PartyMember.Recruit(definition, catalog.ClassOf(definition), catalog.Skills, catalog.Rules.Stats).CaptureProgress());
         return GameSession.Restore(save with { Members = [.. save.Members, .. recruits] }, catalog, new SeededRandom(1));
     }
 

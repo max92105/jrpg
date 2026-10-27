@@ -39,7 +39,7 @@ public sealed class GoblinTrioSimulation(ITestOutputHelper output)
     // A fresh leader per battle: battle damage persists on a member (shared Vitals), so reusing one would leak between seeds.
     private static BattleResult RunBattle(ClassDefinition characterClass, int seed)
     {
-        var leader = PartyMember.Recruit(_catalog.PartyMembers[StandInId], characterClass, _catalog.Skills);
+        var leader = PartyMember.Recruit(_catalog.PartyMembers[StandInId], characterClass, _catalog.Skills, _catalog.Rules.Stats);
         var party = new PartyState([leader], [leader], _catalog.Rules.Party);
         var enemies = _catalog.Encounters[EncounterId].EnemyIds.Select(id => _catalog.Enemies[id]).ToList();
         var random = new SeededRandom(seed);

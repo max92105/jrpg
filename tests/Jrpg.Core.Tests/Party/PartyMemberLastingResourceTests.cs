@@ -51,6 +51,7 @@ public sealed class PartyMemberLastingResourceTests
         return PartyMember.Recruit(
             new PartyMemberBuilder().WithId("omer").BuildDefinition(),
             new ClassBuilder().WithId("mage").WithResources(clarity, mana).Build(),
-            new Dictionary<string, SkillDefinition>());
+            new Dictionary<string, SkillDefinition>(),
+            TestStatRules.Neutral);
     }
 }

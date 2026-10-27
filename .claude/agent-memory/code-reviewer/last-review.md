@@ -5,8 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/P1.md, slice P1 (PrimaryStats, ClassStats.Primaries/Accuracy, growth, validator, classes.json)
+Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/P2.md, slice P2 (StatRules, StatFormula.MaxHp, Vitals.ResizeMax, PartyMember.RestoreProgress)
 Round: 1 (verdict: Ready to commit)
 
-- S1 src/Jrpg.Core/Party/ClassStats.cs:5-6 summary says what reads Speed but not that Primaries/Accuracy are unread until P2/H1; open (suggestion)
-- (C2's S1, the stale "P1's primaries" header in ClassCatalogValidatorStatTests, is gone: fixed)
+- W1 docs/ui-reference: four PNG deletions unrelated to P2 in the working tree; keep out of the slice commit; open
+- W2 src/Jrpg.Core/Party/PartyMember.cs:48 new public Primaries has no reader and no test asserting it (recruit/restore/level-up); open
+- S1 src/Jrpg.Core/Stats/Vitals.cs:72-73 "since the maximum is" reads unclearly; open (suggestion)
+- F1 PartyMember.LevelUp raises by MaxHpOf(after) - Vitals.MaxHp: once P4's gear resizes MaxHp the "before" includes gear; follow-up for P4

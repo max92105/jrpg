@@ -120,7 +120,7 @@ internal sealed class ContentCatalogBuilder
         Tilesheets = new Dictionary<string, TilesheetDefinition> { [TestTiles.Sheet.Id] = TestTiles.Sheet },
         Objects = _objects.ToDictionary(definition => definition.Id),
         Maps = _maps.ToDictionary(layout => layout.Id, layout => new MapDefinition(layout, SettingsFor(layout.Id))),
-        Rules = new GameRules(new PartyRules(MaxActiveMembers: 4), new ExperienceTable([100]), new ExplorationRules { WalkSpeed = 3, PlayerRadius = 0.1, InteractReach = 0.6 }),
+        Rules = new GameRules(new PartyRules(MaxActiveMembers: 4), new ExperienceTable([100]), new ExplorationRules { WalkSpeed = 3, PlayerRadius = 0.1, InteractReach = 0.6 }, TestStatRules.Neutral),
         NewGame = _newGame,
     };
 

@@ -100,7 +100,8 @@ public sealed class BattleDominanceTests
         var druid = Combatant.FromPartyMember(PartyMember.Recruit(
             new PartyMemberBuilder().WithId("thaali").BuildDefinition(),
             new ClassBuilder().WithId("druid").WithResources(forces).WithSkills([.. skills.Select(skill => skill.Id)]).Build(),
-            skills.ToDictionary(skill => skill.Id)));
+            skills.ToDictionary(skill => skill.Id),
+            TestStatRules.Neutral));
         druid.ChangeResource("growth", growth, []);
         druid.ChangeResource("decay", decay, []);
         var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 100, attack: 20, defense: 2).Build());

@@ -31,7 +31,8 @@ public sealed class BattleQuickActionTests
     private readonly Combatant _rogue = Combatant.FromPartyMember(PartyMember.Recruit(
         new PartyMemberBuilder().WithId("lazarus").BuildDefinition(),
         new ClassBuilder().WithId("rogue").WithResources(_readiness, _focus).WithSkills("dash").Build(),
-        new Dictionary<string, SkillDefinition> { ["dash"] = _dash }));
+        new Dictionary<string, SkillDefinition> { ["dash"] = _dash },
+        TestStatRules.Neutral));
 
     [Fact]
     public void Execute_QuickSkill_SameActorActsAgain()

@@ -62,7 +62,7 @@ public sealed class GameSession
         }
 
         var leaderDefinition = catalog.PartyMembers[leaderId];
-        var leader = PartyMember.Recruit(leaderDefinition, catalog.ClassOf(leaderDefinition), catalog.Skills);
+        var leader = PartyMember.Recruit(leaderDefinition, catalog.ClassOf(leaderDefinition), catalog.Skills, catalog.Rules.Stats);
         var party = new PartyState([leader], [leader], catalog.Rules.Party);
         var inventory = InventoryHolding(newGame.StartingItems, catalog);
         return new GameSession(party, new ExplorationContext(catalog, inventory, new WorldState(), random), newGame.StartLocation);
@@ -171,7 +171,8 @@ public sealed class GameSession
     private static PartyMember RestoreMember(PartyMemberProgress progress, ContentCatalog catalog)
     {
         var definition = catalog.PartyMembers[progress.Id];
-        var member = PartyMember.Restore(definition, catalog.ClassOf(definition), catalog.Skills, progress);
+        var member = PartyMember.Recruit(definition, catalog.ClassOf(definition), catalog.Skills, catalog.Rules.Stats);
+        member.RestoreProgress(progress);
         if (progress.WeaponId is { } weaponId)
         {
             member.Wear(EquipmentSlot.Weapon, catalog.Items[weaponId]);

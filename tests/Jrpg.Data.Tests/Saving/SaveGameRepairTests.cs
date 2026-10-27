@@ -175,8 +175,9 @@ public sealed class SaveGameRepairTests
     {
         var repaired = Repair(_save with { Members = [_sarxian with { Hp = 999 }, _jazog] });
 
-        Assert.Equal(188, repaired.Save.Members[0].Hp);
-        Assert.Equal(["party member 'sarxian': HP 999 brought within 0..188."], repaired.Changes);
+        // Sarxian is a warlock: 188 HP at level 3, raised 8 % by its 8 Constitution (ADR 0026).
+        Assert.Equal(203, repaired.Save.Members[0].Hp);
+        Assert.Equal(["party member 'sarxian': HP 999 brought within 0..203."], repaired.Changes);
     }
 
     [Fact]

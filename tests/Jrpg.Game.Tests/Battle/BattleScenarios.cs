@@ -23,7 +23,7 @@ internal static class BattleScenarios
     public static PartyMember Recruit(string memberId)
     {
         var definition = Catalog.PartyMembers[memberId];
-        return PartyMember.Recruit(definition, Catalog.ClassOf(definition), Catalog.Skills);
+        return PartyMember.Recruit(definition, Catalog.ClassOf(definition), Catalog.Skills, Catalog.Rules.Stats);
     }
 
     /// <param name="random">Shuffles the turn order; tests that run enemy turns pass the same source to the tactics.</param>

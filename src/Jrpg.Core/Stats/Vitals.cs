@@ -68,6 +68,18 @@ public sealed class Vitals
         }
     }
 
+    /// <summary>
+    /// A new maximum, as when a restored level or worn gear changes it: HP stays as it was, within the new maximum.
+    /// The maximum is at least 1, so a living holder keeps 1 HP or more: a lost bonus never fells (decision 328).
+    /// </summary>
+    internal void ResizeMax(int maxHp)
+    {
+        ArgumentOutOfRangeException.ThrowIfLessThan(maxHp, 1);
+
+        MaxHp = maxHp;
+        Hp = Math.Min(Hp, maxHp);
+    }
+
     private int AddHp(int amount)
     {
         var added = Math.Min(amount, MaxHp - Hp);

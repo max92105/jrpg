@@ -103,7 +103,9 @@ public sealed class CombatantTests
             .WithResources(readiness)
             .Build();
         var progress = new PartyMemberProgress("lazarus", level, 0, Hp: 100, WeaponId: null, ArmorId: null, LastingAmounts: new Dictionary<string, int>());
-        return PartyMember.Restore(new PartyMemberBuilder().WithId("lazarus").BuildDefinition(), rogue, new Dictionary<string, SkillDefinition>(), progress);
+        var member = PartyMember.Recruit(new PartyMemberBuilder().WithId("lazarus").BuildDefinition(), rogue, new Dictionary<string, SkillDefinition>(), TestStatRules.Neutral);
+        member.RestoreProgress(progress);
+        return member;
     }
 
     [Fact]
@@ -147,7 +149,8 @@ public sealed class CombatantTests
         var member = PartyMember.Recruit(
             new PartyMemberBuilder().WithId("omer").BuildDefinition(),
             new ClassBuilder().WithId("mage").WithResources(clarity).Build(),
-            new Dictionary<string, SkillDefinition>());
+            new Dictionary<string, SkillDefinition>(),
+            TestStatRules.Neutral);
         member.KeepLastingAmount("clarity", 1);
 
         var combatant = Combatant.FromPartyMember(member);
@@ -187,7 +190,8 @@ public sealed class CombatantTests
         var mage = PartyMember.Recruit(
             new PartyMemberBuilder().WithId("omer").BuildDefinition(),
             new ClassBuilder().WithId("mage").WithResources(mana, clarity).Build(),
-            new Dictionary<string, SkillDefinition>());
+            new Dictionary<string, SkillDefinition>(),
+            TestStatRules.Neutral);
         mage.KeepLastingAmount("clarity", clarityLeft);
         return mage;
     }

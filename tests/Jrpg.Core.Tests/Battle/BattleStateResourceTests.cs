@@ -34,7 +34,8 @@ public sealed class BattleStateResourceTests
     private readonly PartyMember _mage = PartyMember.Recruit(
         new PartyMemberBuilder().WithId("omer").BuildDefinition(),
         new ClassBuilder().WithId("mage").WithResources(_mana).WithSkills("blast", "meteor").Build(),
-        new Dictionary<string, SkillDefinition> { ["blast"] = _blast, ["meteor"] = _meteor });
+        new Dictionary<string, SkillDefinition> { ["blast"] = _blast, ["meteor"] = _meteor },
+        TestStatRules.Neutral);
 
     [Fact]
     public void Start_MemberWithResource_StartsAtStartsAt()
@@ -147,7 +148,8 @@ public sealed class BattleStateResourceTests
         var cleric = Combatant.FromPartyMember(PartyMember.Recruit(
             new PartyMemberBuilder().WithId("zanyr").BuildDefinition(),
             new ClassBuilder().WithId("cleric").WithResources(faith).Build(),
-            new Dictionary<string, SkillDefinition>()));
+            new Dictionary<string, SkillDefinition>(),
+            TestStatRules.Neutral));
         var ally = Combatant.FromPartyMember(new PartyMemberBuilder().WithId("ragnir").WithVitals(hp: 1, maxHp: 100).Build());
         var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20, defense: 2).Build());
         var battle = new BattleState([goblin, cleric, ally], new Inventory(), new FixedSequenceRandom(2, 1));
@@ -166,7 +168,8 @@ public sealed class BattleStateResourceTests
         var barbarian = Combatant.FromPartyMember(PartyMember.Recruit(
             new PartyMemberBuilder().WithId("jazog").BuildDefinition(),
             new ClassBuilder().WithId("barbarian").WithResources(ferocity).Build(),
-            new Dictionary<string, SkillDefinition>()));
+            new Dictionary<string, SkillDefinition>(),
+            TestStatRules.Neutral));
         var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20, defense: 2).Build());
         var battle = new BattleState([barbarian, goblin], new Inventory(), new FixedSequenceRandom(0));
 
@@ -184,7 +187,8 @@ public sealed class BattleStateResourceTests
         var barbarian = Combatant.FromPartyMember(PartyMember.Recruit(
             new PartyMemberBuilder().WithId("jazog").BuildDefinition(),
             new ClassBuilder().WithId("barbarian").WithResources(ferocity).Build(),
-            new Dictionary<string, SkillDefinition>()));
+            new Dictionary<string, SkillDefinition>(),
+            TestStatRules.Neutral));
         barbarian.Vitals.TakeDamage(barbarian.Vitals.Hp - 5);
         var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20, defense: 2).Build());
         var battle = new BattleState([barbarian, goblin], new Inventory(), new FixedSequenceRandom(0));
@@ -240,7 +244,8 @@ public sealed class BattleStateResourceTests
         var warlock = Combatant.FromPartyMember(PartyMember.Recruit(
             new PartyMemberBuilder().WithId("sarxian").BuildDefinition(),
             new ClassBuilder().WithId("warlock").WithResources(instability).WithSkills("bolt", "void_rift").Build(),
-            new Dictionary<string, SkillDefinition> { ["bolt"] = _bolt, ["void_rift"] = _voidRift }));
+            new Dictionary<string, SkillDefinition> { ["bolt"] = _bolt, ["void_rift"] = _voidRift },
+            TestStatRules.Neutral));
         var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 40, attack: 20, defense: 2).Build());
         return (warlock, new BattleState([warlock, goblin], new Inventory(), new FixedSequenceRandom(1)));
     }

@@ -175,7 +175,8 @@ public sealed class BattleStatusTests
         var mage = Combatant.FromPartyMember(PartyMember.Recruit(
             new PartyMemberBuilder().WithId("omer").BuildDefinition(),
             new ClassBuilder().WithId("mage").WithResources(mana).WithSkills("brace").Build(),
-            new Dictionary<string, SkillDefinition> { ["brace"] = _brace }));
+            new Dictionary<string, SkillDefinition> { ["brace"] = _brace },
+            TestStatRules.Neutral));
         var battle = new BattleState([mage, Goblin(hp: 25)], new Inventory(), new FixedSequenceRandom(1));
         battle.Execute(new SkillCommand(_brace, [mage]));
 

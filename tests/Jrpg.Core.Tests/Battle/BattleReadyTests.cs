@@ -31,7 +31,8 @@ public sealed class BattleReadyTests
     private readonly Combatant _rogue = Combatant.FromPartyMember(PartyMember.Recruit(
         new PartyMemberBuilder().WithId("lazarus").BuildDefinition(),
         new ClassBuilder().WithId("rogue").WithResources(_readiness, _focus).WithSkills("ready").Build(),
-        new Dictionary<string, SkillDefinition> { ["ready"] = _ready }));
+        new Dictionary<string, SkillDefinition> { ["ready"] = _ready },
+        TestStatRules.Neutral));
 
     private readonly Combatant _goblinA = Goblin();
     private readonly Combatant _goblinB = Goblin();

@@ -54,7 +54,7 @@ public sealed class GameSessionSaveTests
         var session = StartNew();
         var catalog = Catalog(_belowChest);
         var jazog = catalog.PartyMembers["jazog"];
-        session.Party.Recruit(PartyMember.Recruit(jazog, catalog.ClassOf(jazog), catalog.Skills));
+        session.Party.Recruit(PartyMember.Recruit(jazog, catalog.ClassOf(jazog), catalog.Skills, catalog.Rules.Stats));
 
         var restored = SaveAndRestore(session).Party;
 
@@ -234,7 +234,7 @@ public sealed class GameSessionSaveTests
         var save = StartNew().Capture(_savedAt);
         var recruits = memberIds
             .Select(id => catalog.PartyMembers[id])
-            .Select(definition => PartyMember.Recruit(definition, catalog.ClassOf(definition), catalog.Skills).CaptureProgress());
+            .Select(definition => PartyMember.Recruit(definition, catalog.ClassOf(definition), catalog.Skills, catalog.Rules.Stats).CaptureProgress());
         return GameSession.Restore(save with { Members = [.. save.Members, .. recruits] }, catalog, new FixedSequenceRandom());
     }
 

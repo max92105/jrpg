@@ -105,4 +105,53 @@ public sealed class VitalsTests
 
         Assert.Equal((0, 110), (vitals.Hp, vitals.MaxHp));
     }
+
+    [Fact]
+    public void ResizeMax_BelowHp_ClampsHp()
+    {
+        var vitals = new Vitals(hp: 80, maxHp: 100);
+
+        vitals.ResizeMax(60);
+
+        Assert.Equal((60, 60), (vitals.Hp, vitals.MaxHp));
+    }
+
+    [Fact]
+    public void ResizeMax_AboveHp_KeepsHp()
+    {
+        var vitals = new Vitals(hp: 40, maxHp: 100);
+
+        vitals.ResizeMax(150);
+
+        Assert.Equal((40, 150), (vitals.Hp, vitals.MaxHp));
+    }
+
+    [Fact]
+    public void ResizeMax_LivingAtOneHpToOne_KeepsOne()
+    {
+        var vitals = new Vitals(hp: 1, maxHp: 100);
+
+        vitals.ResizeMax(1);
+
+        Assert.True(vitals.IsAlive);
+        Assert.Equal((1, 1), (vitals.Hp, vitals.MaxHp));
+    }
+
+    [Fact]
+    public void ResizeMax_Fallen_StaysAtZero()
+    {
+        var vitals = new Vitals(hp: 0, maxHp: 100);
+
+        vitals.ResizeMax(150);
+
+        Assert.Equal((0, 150), (vitals.Hp, vitals.MaxHp));
+    }
+
+    [Fact]
+    public void ResizeMax_Zero_Throws()
+    {
+        var vitals = new Vitals(hp: 40, maxHp: 100);
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => vitals.ResizeMax(0));
+    }
 }

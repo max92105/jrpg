@@ -22,7 +22,7 @@ public sealed class PartyMemberTests
     {
         var definition = new PartyMemberBuilder().BuildDefinition();
 
-        var member = PartyMember.Recruit(definition, _growingClass, new Dictionary<string, SkillDefinition>());
+        var member = PartyMember.Recruit(definition, _growingClass, new Dictionary<string, SkillDefinition>(), TestStatRules.Neutral);
 
         Assert.Equal((1, 0), (member.Level, member.Experience));
         Assert.Equal(new CombatStats(Attack: 12, Defense: 7), member.BaseStats);
@@ -35,7 +35,7 @@ public sealed class PartyMemberTests
         var definition = new PartyMemberBuilder().BuildDefinition();
         var healer = _growingClass with { SkillIds = ["heal"] };
 
-        Assert.Throws<ArgumentException>(() => PartyMember.Recruit(definition, healer, new Dictionary<string, SkillDefinition>()));
+        Assert.Throws<ArgumentException>(() => PartyMember.Recruit(definition, healer, new Dictionary<string, SkillDefinition>(), TestStatRules.Neutral));
     }
 
     [Fact]
@@ -43,7 +43,7 @@ public sealed class PartyMemberTests
     {
         var healer = _growingClass with { SkillIds = ["recovery", "heal"] };
 
-        var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), healer, SkillCatalog());
+        var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), healer, SkillCatalog(), TestStatRules.Neutral);
 
         Assert.Equal(["recovery", "heal"], member.Skills.Select(skill => skill.Id));
     }
@@ -54,7 +54,9 @@ public sealed class PartyMemberTests
         var healer = _growingClass with { SkillIds = ["heal"] };
         var progress = new PartyMemberProgress("test_member", 2, 0, Hp: 50, WeaponId: null, ArmorId: null, LastingAmounts: new Dictionary<string, int>());
 
-        var member = PartyMember.Restore(new PartyMemberBuilder().BuildDefinition(), healer, SkillCatalog(), progress);
+        var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), healer, SkillCatalog(), TestStatRules.Neutral);
+
+        member.RestoreProgress(progress);
 
         Assert.Equal(["heal"], member.Skills.Select(skill => skill.Id));
     }
@@ -62,7 +64,7 @@ public sealed class PartyMemberTests
     [Fact]
     public void GainExperience_OneLevelUp_RaisesStatsByGrowth()
     {
-        var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), _growingClass, new Dictionary<string, SkillDefinition>());
+        var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), _growingClass, new Dictionary<string, SkillDefinition>(), TestStatRules.Neutral);
         member.Vitals.TakeDamage(40);
 
         member.GainExperience(100, _table);
@@ -74,7 +76,7 @@ public sealed class PartyMemberTests
     [Fact]
     public void GainExperience_TwoLevelUps_RaisesByTwoGrowths()
     {
-        var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), _growingClass, new Dictionary<string, SkillDefinition>());
+        var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), _growingClass, new Dictionary<string, SkillDefinition>(), TestStatRules.Neutral);
 
         member.GainExperience(220, _table);
 
@@ -86,7 +88,7 @@ public sealed class PartyMemberTests
     [Fact]
     public void GainExperience_NoLevelUp_StatsUnchanged()
     {
-        var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), _growingClass, new Dictionary<string, SkillDefinition>());
+        var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), _growingClass, new Dictionary<string, SkillDefinition>(), TestStatRules.Neutral);
 
         member.GainExperience(99, _table);
 

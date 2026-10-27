@@ -135,7 +135,7 @@ internal sealed class EventRun
 
         var catalog = _context.Catalog;
         var definition = catalog.PartyMembers[memberId];
-        var member = PartyMember.Recruit(definition, catalog.ClassOf(definition), catalog.Skills);
+        var member = PartyMember.Recruit(definition, catalog.ClassOf(definition), catalog.Skills, catalog.Rules.Stats);
         _party.Recruit(member);
         return new Recruitment(member, HasJoined: true);
     }

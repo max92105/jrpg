@@ -22,6 +22,13 @@ internal static class GameRulesValidator
 
         ValidateExploration(fileName, rules.Exploration);
 
+        // A negative rate would take HP away for every Constitution point.
+        if (rules.Stats.HpPercentPer100Constitution < 0)
+        {
+            throw new ContentValidationException(
+                $"{fileName}: stats.hpPercentPer100Constitution must be at least 0 (was {rules.Stats.HpPercentPer100Constitution}).");
+        }
+
         var thresholds = rules.Experience.ExperienceToNextLevel;
         if (thresholds.Count == 0)
         {

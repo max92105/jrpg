@@ -16,7 +16,8 @@ public sealed class ResourceTriggersTests
     private readonly Combatant _cleric = Combatant.FromPartyMember(PartyMember.Recruit(
         new PartyMemberBuilder().WithId("zanyr").BuildDefinition(),
         new ClassBuilder().WithId("cleric").WithResources(_faith).Build(),
-        new Dictionary<string, SkillDefinition>()));
+        new Dictionary<string, SkillDefinition>(),
+        TestStatRules.Neutral));
 
     private static readonly ResourceDefinition _ferocity =
         new("ferocity", "Ferocity", Max: 10, StartsAt: 0) { Gains = new ResourceGains { PerHitTaken = 2 } };
@@ -24,7 +25,8 @@ public sealed class ResourceTriggersTests
     private readonly Combatant _barbarian = Combatant.FromPartyMember(PartyMember.Recruit(
         new PartyMemberBuilder().WithId("jazog").BuildDefinition(),
         new ClassBuilder().WithId("barbarian").WithResources(_ferocity).Build(),
-        new Dictionary<string, SkillDefinition>()));
+        new Dictionary<string, SkillDefinition>(),
+        TestStatRules.Neutral));
 
     // Conviction 0 of 10: +3 when an enemy falls, +2 for a hit of at least 20 % of max HP (100 here, so 20 HP).
     private static readonly ResourceDefinition _conviction = new("conviction", "Conviction", Max: 10, StartsAt: 0)
@@ -35,7 +37,8 @@ public sealed class ResourceTriggersTests
     private readonly Combatant _paladin = Combatant.FromPartyMember(PartyMember.Recruit(
         new PartyMemberBuilder().WithId("teelle").BuildDefinition(),
         new ClassBuilder().WithId("paladin").WithResources(_conviction).Build(),
-        new Dictionary<string, SkillDefinition>()));
+        new Dictionary<string, SkillDefinition>(),
+        TestStatRules.Neutral));
 
     private readonly Combatant _fighter = Combatant.FromPartyMember(new PartyMemberBuilder().WithId("ragnir").Build());
 
@@ -117,7 +120,8 @@ public sealed class ResourceTriggersTests
         var barbarian = Combatant.FromPartyMember(PartyMember.Recruit(
             new PartyMemberBuilder().WithId("jazog").BuildDefinition(),
             new ClassBuilder().WithId("barbarian").WithResources(ferocity).Build(),
-            new Dictionary<string, SkillDefinition>()));
+            new Dictionary<string, SkillDefinition>(),
+            TestStatRules.Neutral));
         var events = new List<BattleEvent>();
 
         ResourceTriggers.OnHitTaken(barbarian, hpLost: 20, events);
@@ -132,7 +136,8 @@ public sealed class ResourceTriggersTests
         var cleric = Combatant.FromPartyMember(PartyMember.Recruit(
             new PartyMemberBuilder().WithId("zanyr").BuildDefinition(),
             new ClassBuilder().WithId("cleric").WithResources(faith).Build(),
-            new Dictionary<string, SkillDefinition>()));
+            new Dictionary<string, SkillDefinition>(),
+            TestStatRules.Neutral));
         var events = new List<BattleEvent>();
 
         ResourceTriggers.OnHitTaken(cleric, hpLost: 25, events);

@@ -1,6 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Party;
+using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
 using Jrpg.Game.Input;
 using Jrpg.Game.NewGame;
@@ -137,7 +138,8 @@ public sealed class LeaderChoiceSceneTests
 
         Select(scene, "omer");
 
-        string[] expected = ["1", .. new[] { mage.MaxHp, mage.Attack, mage.Defense }.Select(NumberText.Of)];
+        var maxHp = StatFormula.MaxHp(mage.MaxHp, mage.Primaries.Constitution, _catalog.Rules.Stats);
+        string[] expected = ["1", .. new[] { maxHp, mage.Attack, mage.Defense }.Select(NumberText.Of)];
         Assert.Equal(expected, scene.SelectedProfile.Stats.Select(line => line.Value));
     }
 

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Jrpg.Core.Items;
 using Jrpg.Core.Progression;
 using Jrpg.Core.Skills;
@@ -9,22 +10,23 @@ namespace Jrpg.Core.Party;
 public sealed class PartyMember
 {
     private readonly Dictionary<string, int> _lastingAmounts;
+    private readonly StatRules _rules;
 
-    private PartyMember(
-        PartyMemberDefinition definition, ClassDefinition characterClass, IReadOnlyList<SkillDefinition> skills, PartyMemberProgress progress)
+    // A new member: level 1, no experience, full HP, every lasting resource at its start (decision 168).
+    private PartyMember(PartyMemberDefinition definition, ClassDefinition characterClass, IReadOnlyList<SkillDefinition> skills, StatRules rules)
     {
         Definition = definition;
         Class = characterClass;
         Skills = [.. skills];
-        Level = progress.Level;
-        Experience = progress.Experience;
-        var stats = ClassGrowth.StatsAt(characterClass, progress.Level);
-        BaseStats = BaseStatsOf(stats);
-        Speed = stats.Speed;
-        Vitals = new Vitals(progress.Hp, stats.MaxHp);
+        _rules = rules;
+        Level = 1;
+        var stats = ClassGrowth.StatsAt(characterClass, Level);
+        TakeClassStats(stats);
+        var maxHp = MaxHpOf(stats);
+        Vitals = new Vitals(maxHp, maxHp);
         _lastingAmounts = characterClass.Resources
             .Where(resource => resource.IsLasting)
-            .ToDictionary(resource => resource.Id, resource => progress.LastingAmounts.GetValueOrDefault(resource.Id, resource.StartsAt));
+            .ToDictionary(resource => resource.Id, resource => resource.StartsAt);
     }
 
     public string Id => Definition.Id;
@@ -42,6 +44,9 @@ public sealed class PartyMember
 
     /// <summary>The class's speed at the member's level; it sets readiness charges (question 213).</summary>
     public int Speed { get; private set; }
+
+    /// <summary>The class's primaries at the member's level (ADR 0026).</summary>
+    public PrimaryStats Primaries { get; private set; }
 
     public Vitals Vitals { get; }
 
@@ -64,24 +69,33 @@ public sealed class PartyMember
     /// <param name="definition">Who joins.</param>
     /// <param name="characterClass">The member's class, which gives their stats at their level (ADR 0017).</param>
     /// <param name="skillCatalog">All skills by id; the member gets their class's, in its order (ADR 0020).</param>
+    /// <param name="rules">The stat conversions, kept: max HP follows Constitution at every level (ADR 0026).</param>
     /// <exception cref="ArgumentException">A skill id isn't in the catalog.</exception>
     public static PartyMember Recruit(
-        PartyMemberDefinition definition, ClassDefinition characterClass, IReadOnlyDictionary<string, SkillDefinition> skillCatalog)
-    {
-        var levelOne = ClassGrowth.StatsAt(characterClass, 1);
-        var starting = new PartyMemberProgress(
-            definition.Id, Level: 1, Experience: 0, levelOne.MaxHp, WeaponId: null, ArmorId: null, LastingAmounts: new Dictionary<string, int>());
-        return new(definition, characterClass, SkillsOf(characterClass, skillCatalog), starting);
-    }
+        PartyMemberDefinition definition, ClassDefinition characterClass, IReadOnlyDictionary<string, SkillDefinition> skillCatalog, StatRules rules) =>
+        new(definition, characterClass, SkillsOf(characterClass, skillCatalog), rules);
 
-    /// <summary>Rebuilds a member from a save. Worn items are put on by <c>GameSession</c>, which resolves their ids.</summary>
+    /// <summary>
+    /// Puts a saved member's progress back on a new recruit: level, experience, lasting amounts, and HP within that
+    /// level's max. Worn items are put on by <c>GameSession</c>, which resolves their ids.
+    /// </summary>
     /// <remarks>The progress is assumed repaired against current content by Data (ADR 0007).</remarks>
-    internal static PartyMember Restore(
-        PartyMemberDefinition definition,
-        ClassDefinition characterClass,
-        IReadOnlyDictionary<string, SkillDefinition> skillCatalog,
-        PartyMemberProgress progress) =>
-        new(definition, characterClass, SkillsOf(characterClass, skillCatalog), progress);
+    internal void RestoreProgress(PartyMemberProgress progress)
+    {
+        Level = progress.Level;
+        Experience = progress.Experience;
+        var stats = ClassGrowth.StatsAt(Class, Level);
+        TakeClassStats(stats);
+        Vitals.ResizeMax(MaxHpOf(stats));
+
+        // A recruit is standing at full HP: fill it to the new max, then take off what the save had lost.
+        Vitals.RestoreHp(Vitals.MaxHp);
+        Vitals.TakeDamage(Vitals.MaxHp - progress.Hp);
+        foreach (var resource in Class.Resources.Where(resource => resource.IsLasting))
+        {
+            _lastingAmounts[resource.Id] = progress.LastingAmounts.GetValueOrDefault(resource.Id, resource.StartsAt);
+        }
+    }
 
     /// <summary>What a save keeps of this member.</summary>
     public PartyMemberProgress CaptureProgress() =>
@@ -203,7 +217,16 @@ public sealed class PartyMember
         return [.. characterClass.SkillIds.Select(id => skillCatalog[id])];
     }
 
-    private static CombatStats BaseStatsOf(ClassStats stats) => new(stats.Attack, stats.Defense);
+    // The class's numbers at the member's level, the one formula (ADR 0017).
+    [MemberNotNull(nameof(BaseStats), nameof(Primaries))]
+    private void TakeClassStats(ClassStats stats)
+    {
+        BaseStats = new CombatStats(stats.Attack, stats.Defense);
+        Speed = stats.Speed;
+        Primaries = stats.Primaries;
+    }
+
+    private int MaxHpOf(ClassStats stats) => StatFormula.MaxHp(stats.MaxHp, stats.Primaries.Constitution, _rules);
 
     private static int AttackBonusOf(ItemDefinition? item) => item?.Equipment?.AttackBonus ?? 0;
 
@@ -227,15 +250,13 @@ public sealed class PartyMember
         return step;
     }
 
-    // The class's numbers at the new level, the one formula (ADR 0017); vitals rise by what the maxima gained.
+    // Vitals rise by what the max gained, Constitution's percent included.
     private void LevelUp()
     {
-        var before = ClassGrowth.StatsAt(Class, Level);
         Level++;
         Experience = 0;
         var after = ClassGrowth.StatsAt(Class, Level);
-        BaseStats = BaseStatsOf(after);
-        Speed = after.Speed;
-        Vitals.RaiseMaxima(after.MaxHp - before.MaxHp);
+        TakeClassStats(after);
+        Vitals.RaiseMaxima(MaxHpOf(after) - Vitals.MaxHp);
     }
 }

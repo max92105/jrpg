@@ -55,8 +55,8 @@ internal sealed class PartyMemberBuilder
     }
 
     /// <summary>
-    /// Restores rather than recruits, so a test can state any level and vitals. The member's class has the given
-    /// numbers, the given skills and no growth, so the numbers hold at any level.
+    /// Recruits, then restores the given progress, so a test can state any level and vitals. The member's class has the
+    /// given numbers, the given skills and no growth, so the numbers hold at any level; the stat rules are neutral.
     /// </summary>
     public PartyMember Build()
     {
@@ -66,7 +66,9 @@ internal sealed class PartyMemberBuilder
             .WithSkills([.. _skills.Select(skill => skill.Id)])
             .Build();
         var progress = new PartyMemberProgress(_id, _level, _experience, _hp, WeaponId: null, ArmorId: null, LastingAmounts: new Dictionary<string, int>());
-        return PartyMember.Restore(BuildDefinition(), characterClass, _skills.ToDictionary(skill => skill.Id), progress);
+        var member = PartyMember.Recruit(BuildDefinition(), characterClass, _skills.ToDictionary(skill => skill.Id), TestStatRules.Neutral);
+        member.RestoreProgress(progress);
+        return member;
     }
 
     public PartyMemberDefinition BuildDefinition() => new()

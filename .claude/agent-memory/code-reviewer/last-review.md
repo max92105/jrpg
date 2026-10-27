@@ -5,9 +5,8 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-26-stats-and-gear-slots, slice G1a-1 (items have a kind; armor becomes Chest). Round 1. Verdict: Ready to commit.
+Plan: 2026-10-26-stats-and-gear-slots, slice G1a-2 (members wear nine slots; TryEquip names the slot). Round 1. Verdict: Ready to commit.
 
-- Warning: PartyEquipment.TryEquip / PartyMember.SlotOf refusing a kind that fits no slot (new branch) has no test; AsWorn(Ring) makes it one line — open
-- Suggestion: PartyEquipment.cs:44 `<param name="slot"></param>` left empty; delete it or say "the slot to list" — open
-- Suggestion: EquipmentPageComparisonTests.cs:13 comment still says rows "Weapon, Armor" — open
-- Suggestion: Validate_KindWithoutSlotYet_NamesTheKind sits between the private helpers and uses "items.json" instead of FileName/Assert.Equal like its neighbours — open
+- Warning: no test that two worn items outside Weapon/Chest sum (same ring twice stacks its bonus, decision 329); TryEquip_SameRingTwice_WearsBoth asserts placement only — open
+- Suggestion: PartyEquipment.cs TryEquip(member,item,slot) returns doc "isn't equipment its kind fits the slot" -> "isn't equipment whose kind fits the slot" — open
+- Follow-up: PartyEquipment.OwnedFor `<param name="slot"></param>` still empty (from G1a-1 review) — open

@@ -8,14 +8,21 @@ namespace Jrpg.Core.Party;
 /// </summary>
 public sealed class PartyEquipment(Inventory inventory)
 {
+    /// <summary>Equips the item in the first slot its kind fits: a ring in the first ring slot.</summary>
     /// <returns>
-    /// True if the member wears the item afterwards; true without changes if they already wore it.
-    /// False if the item isn't equipment or fits no slot, no copy is in the inventory, or the item it replaces doesn't
-    /// fit back in the inventory. Nothing changes when it returns false.
+    /// As <see cref="TryEquip(PartyMember, ItemDefinition, EquipmentSlot)"/>; false for a non-equipment item.
     /// </returns>
-    public bool TryEquip(PartyMember member, ItemDefinition item)
+    public bool TryEquip(PartyMember member, ItemDefinition item) =>
+        item.Equipment is { } equipment && TryEquip(member, item, EquipmentFit.SlotsFor(equipment.Kind)[0]);
+
+    /// <returns>
+    /// True if the member wears the item in the slot afterwards; true without changes if they already wore it
+    /// there. False if the item isn't equipment whose kind fits the slot (ADR 0028), no copy is in the inventory, or
+    /// the item it replaces doesn't fit back in the inventory. Nothing changes when it returns false.
+    /// </returns>
+    public bool TryEquip(PartyMember member, ItemDefinition item, EquipmentSlot slot)
     {
-        if (item.Equipment is null || EquipmentFit.SlotsFor(item.Equipment.Kind) is not [var slot, ..])
+        if (item.Equipment is null || !EquipmentFit.Fits(item.Equipment.Kind, slot))
         {
             return false;
         }
@@ -41,7 +48,7 @@ public sealed class PartyEquipment(Inventory inventory)
     }
 
     /// <summary>What any member could put on in the slot: owned items for that slot, in pickup order.</summary>
-    /// <param name="slot"></param>
+    /// <param name="slot">The slot to list for.</param>
     /// <param name="items">Every item by id, to read the owned ones' kind.</param>
     public IReadOnlyList<ItemDefinition> OwnedFor(EquipmentSlot slot, IReadOnlyDictionary<string, ItemDefinition> items) =>
         [.. inventory.Entries

@@ -11,6 +11,7 @@ namespace Jrpg.Core.Party;
 public sealed class PartyMember
 {
     private readonly Dictionary<string, int> _lastingAmounts;
+    private readonly WornEquipment _worn = new();
 
     // A new member: level 1, no experience, full HP, every lasting resource at its start (decision 168).
     private PartyMember(PartyMemberDefinition definition, ClassDefinition characterClass, IReadOnlyList<SkillDefinition> skills, StatRules rules)
@@ -47,9 +48,8 @@ public sealed class PartyMember
 
     public Vitals Vitals { get; }
 
-    public ItemDefinition? Weapon { get; private set; }
-
-    public ItemDefinition? Chest { get; private set; }
+    /// <summary>What the basic attack is dealt with; null when unarmed (decision 330).</summary>
+    public ItemDefinition? Weapon => _worn.In(EquipmentSlot.Weapon);
 
     public IReadOnlyList<SkillDefinition> Skills { get; }
 
@@ -95,14 +95,17 @@ public sealed class PartyMember
 
     /// <summary>What a save keeps of this member.</summary>
     public PartyMemberProgress CaptureProgress() =>
-        new(Id, Level, Experience, Vitals.Hp, Weapon?.Id, Chest?.Id, new Dictionary<string, int>(_lastingAmounts));
+        new(Id, Level, Experience, Vitals.Hp, Weapon?.Id, EquippedIn(EquipmentSlot.Chest)?.Id, new Dictionary<string, int>(_lastingAmounts));
 
     /// <summary>The sheet with what's worn in <paramref name="slot"/> taken off, for the Equipment page.</summary>
-    public StatSheet SheetWithout(EquipmentSlot slot) => SheetWearing(WornWith(slot, null));
+    public StatSheet SheetWithout(EquipmentSlot slot) => SheetWearing(_worn.With(slot, null));
 
-    /// <summary>The sheet if <paramref name="item"/> replaced whatever is worn in its slot.</summary>
+    /// <summary>
+    /// The sheet if <paramref name="item"/> replaced whatever is worn in the first slot its kind fits (a ring in the
+    /// first ring slot).
+    /// </summary>
     /// <exception cref="ArgumentException"><paramref name="item"/> isn't equipment.</exception>
-    public StatSheet SheetWith(ItemDefinition item) => SheetWearing(WornWith(SlotOf(item), item));
+    public StatSheet SheetWith(ItemDefinition item) => SheetWearing(_worn.With(SlotOf(item), item));
 
     /// <returns>One step per level the experience passes through; empty at the maximum level.</returns>
     public IReadOnlyList<LevelProgressStep> GainExperience(int amount, ExperienceTable table)
@@ -122,12 +125,7 @@ public sealed class PartyMember
     }
 
     /// <returns>Null when the slot is empty.</returns>
-    public ItemDefinition? EquippedIn(EquipmentSlot slot) => slot switch
-    {
-        EquipmentSlot.Weapon => Weapon,
-        EquipmentSlot.Chest => Chest,
-        _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot."),
-    };
+    public ItemDefinition? EquippedIn(EquipmentSlot slot) => _worn.In(slot);
 
     /// <summary>Whether a rest would change anything: HP below max, or a lasting resource off what a rest gives.</summary>
     public bool HasAnythingToRest =>
@@ -174,17 +172,7 @@ public sealed class PartyMember
 
     private void FillSlot(EquipmentSlot slot, ItemDefinition? item)
     {
-        switch (slot)
-        {
-            case EquipmentSlot.Weapon:
-                Weapon = item;
-                break;
-            case EquipmentSlot.Chest:
-                Chest = item;
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot.");
-        }
+        _worn.Put(slot, item);
 
         // Max HP follows the sheet, keeping HP within it (decision 328); a lasting resource's max follows Will the same
         // way.
@@ -202,25 +190,14 @@ public sealed class PartyMember
     private int RestAmountOf(ResourceDefinition resource) =>
         resource.StartsAt == resource.Max ? LastingMaxOf(resource) : Math.Min(resource.StartsAt, LastingMaxOf(resource));
 
-    private static StatBonuses BonusesOf(Worn worn) =>
-        (worn.Weapon?.Equipment?.Bonuses ?? StatBonuses.None).Plus(worn.Chest?.Equipment?.Bonuses ?? StatBonuses.None);
-
-    // The one slot the item's kind fits; a ring, which fits two, gets its slot named (G1a-2).
+    // The first slot the item's kind fits: a ring's first ring slot. The Equipment page names the slot itself (G1c).
     private static EquipmentSlot SlotOf(ItemDefinition item) =>
-        item.Equipment is { } equipment && EquipmentFit.SlotsFor(equipment.Kind) is [var slot, ..]
-            ? slot
-            : throw new ArgumentException($"Item '{item.Id}' is not equipment that fits a slot.", nameof(item));
+        item.Equipment is { } equipment
+            ? EquipmentFit.SlotsFor(equipment.Kind)[0]
+            : throw new ArgumentException($"Item '{item.Id}' is not equipment.", nameof(item));
 
-    // What would be worn with the slot holding the item (or nothing) and the other slot as now.
-    private Worn WornWith(EquipmentSlot slot, ItemDefinition? item) => slot switch
-    {
-        EquipmentSlot.Weapon => new Worn(item, Chest),
-        EquipmentSlot.Chest => new Worn(Weapon, item),
-        _ => throw new ArgumentOutOfRangeException(nameof(slot), slot, "Unknown equipment slot."),
-    };
-
-    private StatSheet SheetWearing(Worn worn) =>
-        MemberSheet.Of(ClassGrowth.StatsAt(Class, Level), BonusesOf(worn), worn.Weapon?.Equipment?.Damage, Rules);
+    private StatSheet SheetWearing(WornEquipment worn) =>
+        MemberSheet.Of(ClassGrowth.StatsAt(Class, Level), worn.Bonuses, worn.WeaponDamage, Rules);
 
     /// <exception cref="ArgumentException">A skill id isn't in the catalog.</exception>
     private static List<SkillDefinition> SkillsOf(ClassDefinition characterClass, IReadOnlyDictionary<string, SkillDefinition> skillCatalog)
@@ -236,10 +213,7 @@ public sealed class PartyMember
 
     // The class's numbers at the member's level, the one formula (ADR 0017), with what they wear.
     [MemberNotNull(nameof(Sheet))]
-    private void RebuildStats() => Sheet = SheetWearing(new Worn(Weapon, Chest));
-
-    // The two slots' items, as worn or as a preview would have them.
-    private readonly record struct Worn(ItemDefinition? Weapon, ItemDefinition? Chest);
+    private void RebuildStats() => Sheet = SheetWearing(_worn);
 
     private LevelProgressStep AdvanceTowardNextLevel(int amount, int experienceToNextLevel)
     {

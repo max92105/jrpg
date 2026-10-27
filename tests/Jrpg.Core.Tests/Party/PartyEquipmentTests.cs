@@ -41,20 +41,6 @@ public sealed class PartyEquipmentTests
         Assert.Equal(1, _inventory.QuantityOf(potion.Id));
     }
 
-    // A ring fits no slot until G1a-2 (ADR 0028), so it stays in the bag and the member wears what they wore.
-    [Fact]
-    public void TryEquip_KindWithoutSlotYet_ReturnsFalseAndChangesNothing()
-    {
-        var ring = new ItemDefinitionBuilder().WithId("ring").AsWorn(EquipmentKind.Ring).Build();
-        _inventory.Add(ring, 1);
-
-        var equipped = _equipment.TryEquip(_fighter, ring);
-
-        Assert.False(equipped);
-        Assert.Equal(1, _inventory.QuantityOf(ring.Id));
-        Assert.Null(_fighter.Weapon);
-    }
-
     [Fact]
     public void TryEquip_AnyClass_WearsAnyItem()
     {
@@ -161,7 +147,7 @@ public sealed class PartyEquipmentTests
         var unequipped = _equipment.TryUnequip(_fighter, EquipmentSlot.Chest);
 
         Assert.True(unequipped);
-        Assert.Null(_fighter.Chest);
+        Assert.Null(_fighter.EquippedIn(EquipmentSlot.Chest));
         Assert.Equal(1, _inventory.QuantityOf(chainMail.Id));
     }
 

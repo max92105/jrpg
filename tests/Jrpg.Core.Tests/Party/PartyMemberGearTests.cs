@@ -85,7 +85,7 @@ public sealed class PartyMemberGearTests
         var sheet = member.SheetWith(Armor(StatKind.Constitution, 10));
 
         Assert.Equal(220, sheet.MaxHp);
-        Assert.Null(member.Chest);
+        Assert.Null(member.EquippedIn(EquipmentSlot.Chest));
         Assert.Equal(200, member.Sheet.MaxHp);
     }
 
@@ -95,6 +95,20 @@ public sealed class PartyMemberGearTests
         var member = NewMember();
 
         Assert.Throws<ArgumentException>(() => member.SheetWith(new ItemDefinitionBuilder().Build()));
+    }
+
+    // Decision 322: an off-hand item is stats only; the basic attack stays the unarmed one.
+    [Fact]
+    public void Wear_ShieldInOffHand_AddsItsResistancesNotAnAttack()
+    {
+        var member = NewMember();
+        var shield = new ItemDefinitionBuilder().WithId("wooden_shield").AsWorn(EquipmentKind.OffHand).WithBonuses(new StatBonuses(new Dictionary<StatKind, int> { [StatKind.BluntResistance] = 8 })).Build();
+
+        Equip(member, shield);
+
+        Assert.Same(shield, member.EquippedIn(EquipmentSlot.OffHand));
+        Assert.Equal(80, member.Sheet.Resistances.Blunt);
+        Assert.Equal(_rules.UnarmedDamage, member.Sheet.AttackDamage);
     }
 
     private static PartyMember NewMember() =>

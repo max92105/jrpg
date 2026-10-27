@@ -1,3 +1,4 @@
+using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Session;
 using Jrpg.Game.Input;
@@ -36,7 +37,7 @@ public sealed class EquipmentPageTests
         ConfirmRemoveAll(page);
 
         Assert.Null(sarxian.Weapon);
-        Assert.Null(sarxian.Chest);
+        Assert.Null(sarxian.EquippedIn(EquipmentSlot.Chest));
         Assert.Equal(2, _session.Inventory.QuantityOf("bronze_sword"));
         Assert.Equal(2, _session.Inventory.QuantityOf("leather_armor"));
     }
@@ -52,7 +53,7 @@ public sealed class EquipmentPageTests
         ConfirmRemoveAll(page);
 
         Assert.Same(sword, sarxian.Weapon);
-        Assert.Null(sarxian.Chest);
+        Assert.Null(sarxian.EquippedIn(EquipmentSlot.Chest));
     }
 
     [Fact]

@@ -147,16 +147,6 @@ public sealed class ItemCatalogValidatorTests
     }
 
     [Fact]
-    public void Validate_KindWithoutSlotYet_NamesTheKind()
-    {
-        var ring = Equipment(new EquipmentStats(EquipmentKind.Ring));
-
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [ring]));
-
-        Assert.Equal("items.json: item 'gear': equipment.kind Ring fits no slot a member has yet.", exception.Message);
-    }
-
-    [Fact]
     public void Validate_WeaponWithoutDamage_NamesTheField()
     {
         var sword = Equipment(new EquipmentStats(EquipmentKind.Weapon) { DamageType = DamageType.Slashing });

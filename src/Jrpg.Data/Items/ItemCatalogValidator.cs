@@ -72,11 +72,7 @@ internal static class ItemCatalogValidator
     }
 
     private static string? FindEquipmentProblem(EquipmentStats equipment) =>
-        FindKindProblem(equipment) ?? FindDamageProblem(equipment) ?? FindDamageTypeProblem(equipment) ?? FindBonusProblem(equipment.Bonuses);
-
-    // A kind no slot holds yet could be bought but never worn (ADR 0028; the slots come with G1a-2).
-    private static string? FindKindProblem(EquipmentStats equipment) =>
-        EquipmentFit.SlotsFor(equipment.Kind).IsEmpty ? $"equipment.kind {equipment.Kind} fits no slot a member has yet." : null;
+        FindDamageProblem(equipment) ?? FindDamageTypeProblem(equipment) ?? FindBonusProblem(equipment.Bonuses);
 
     // A weapon's damage is its wearer's whole basic attack (decision 330), so it must hurt; nothing else is swung.
     private static string? FindDamageProblem(EquipmentStats equipment) =>

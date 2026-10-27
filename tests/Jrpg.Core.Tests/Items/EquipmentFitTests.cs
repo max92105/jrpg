@@ -11,15 +11,20 @@ public sealed class EquipmentFitTests
     }
 
     [Fact]
+    public void SlotsFor_Ring_IsBothRingSlots()
+    {
+        Assert.Equal([EquipmentSlot.FirstRing, EquipmentSlot.SecondRing], EquipmentFit.SlotsFor(EquipmentKind.Ring));
+    }
+
+    [Fact]
     public void Fits_WeaponInChest_IsFalse()
     {
         Assert.False(EquipmentFit.Fits(EquipmentKind.Weapon, EquipmentSlot.Chest));
     }
 
-    // The member has no ring slot until G1a-2, so a ring fits nowhere and can't be equipped.
     [Fact]
-    public void SlotsFor_RingBeforeTheRingSlots_IsEmpty()
+    public void Fits_HelmInChest_IsFalse()
     {
-        Assert.Empty(EquipmentFit.SlotsFor(EquipmentKind.Ring));
+        Assert.False(EquipmentFit.Fits(EquipmentKind.Head, EquipmentSlot.Chest));
     }
 }

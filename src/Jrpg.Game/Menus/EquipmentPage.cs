@@ -262,7 +262,7 @@ internal sealed class EquipmentPage : IMemberPage
         var changed = pick switch
         {
             { Giver: { } giver } => _equipment.TryTakeFrom(giver, Shown, slot),
-            { Item: { } item } => _equipment.TryEquip(Shown, item),
+            { Item: { } item } => _equipment.TryEquip(Shown, item, slot),
             _ => _equipment.TryUnequip(Shown, slot),
         };
         if (!changed && Shown.EquippedIn(slot) is { } worn && !_inventory.HasRoomFor(worn))

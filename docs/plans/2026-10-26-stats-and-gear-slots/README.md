@@ -102,7 +102,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 7: gear slots
 - [x] **ADR 0028: Equipment slots** (before G1a-1) → [slices/ADR-0028.md](slices/ADR-0028.md)
 - [x] **G1a-1. Items have a kind; armor becomes Chest; `"slot"` becomes `"kind"`** (Core + Data + content + Game, mechanical, about 150 lines) → [slices/G1a-1.md](slices/G1a-1.md)
-- [ ] **G1a-2. Members wear nine slots, a ring kind in two; `TryEquip` names the slot** (Core + Game, about 240 lines) → [slices/G1a-2.md](slices/G1a-2.md)
+- [x] **G1a-2. Members wear nine slots, a ring kind in two; `TryEquip` names the slot** (Core + Game, about 240 lines) → [slices/G1a-2.md](slices/G1a-2.md)
 - [ ] **G1b. Saves keep all nine slots: format 4** (Core + Data, about 200 lines) → [slices/G1b.md](slices/G1b.md)
 - [ ] **G1c. The Equipment page lists nine slots; the Armor tab lists every piece that isn't a weapon** (Game, about 150 lines) → [slices/G1c.md](slices/G1c.md)
 - [ ] **G2. Fixed-stat gear for the new slots, in the new game's starting items** (content + tests, about 110 lines) → [slices/G2.md](slices/G2.md)

@@ -24,7 +24,7 @@ At the end of this plan:
 2. **Phase 1: the stat sheet (ADR 0026, P1, P2, P3a, ADR 0027, P3b, P4).** Core first: primaries on the class, the rules in content, the derived sheet, then gear bonuses feeding it. Nothing in battle changes yet, except max HP from Constitution.
 3. **Phase 2: the pages read the sheet (L1, S1, S2, E1).** Before attack and defense leave, so no screen reads them when they go. The Status page's look follows its content at once (decision 316); the Equipment page's look waits for the nine slots.
 4. **Phase 3: damage types and resistances (D1, D2, D3).** Every hit typed, then resistances reduce it while defense still subtracts, then the "Weak" and "Resisted" cues.
-5. **Phase 4: Power, and the end of attack and defense (M1, M2a, M2b).** Power scales raw values and weapons deal damage; the test fixtures fold defense into attack (mechanical), then defense leaves and Guarded raises resistances.
+5. **Phase 4: Power, and the end of attack and defense (M1a, M1b, M2a, M2b).** Power scales raw values and weapons deal damage; the test fixtures fold defense into attack (mechanical), then defense leaves and Guarded raises resistances.
 6. **Phase 5: hits (H1, H2).** Misses, then crits, each with its battle-screen cue.
 7. **Phase 6: Intelligence and Will (I1, I2, W1a, W1b).** Intelligence and Stun's chance, then Taunt against crowd control resistance and a status skill for each class lacking one; Will on battle resources, then on Faith and Instability.
 8. **Phase 7: gear slots (ADR 0028, G1a-1, G1a-2, G1b, G1c, G2).** Item kinds (mechanical), nine slots in Core, saves format 4, the Equipment page's nine rows, then the new items.
@@ -83,7 +83,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **D3. "Weak" and "Resisted" cues by the floating number** (Core + Game, about 150 lines) → [slices/D3.md](slices/D3.md)
 
 ### Phase 4: Power, and the end of attack and defense
-- [ ] **M1. Power scales attacks and skills; weapons deal damage; attack leaves classes and items** (Core + Data + content, about 220 lines) → [slices/M1.md](slices/M1.md)
+- [x] **M1a. Power scales attacks and skills; weapons deal damage; attack leaves classes and items** (Core + Data + content + tests, about 270 lines; M1 split on 2026-10-27) → [slices/M1a.md](slices/M1a.md)
+- [ ] **M1b. "Weapon damage" on the Equipment comparison and the Status Combat column** (Game + a small Core query, about 90 lines; decision 337) → [slices/M1b.md](slices/M1b.md)
 - [ ] **M2a. Test fixtures fold defense into attack** (tests, mechanical, about 140 lines) → [slices/M2a.md](slices/M2a.md)
 - [ ] **M2b. Defense leaves; Guarded raises resistances; enemies deal damage, the goblin's retuned** (Core + Data + content, about 230 lines) → [slices/M2b.md](slices/M2b.md)
 

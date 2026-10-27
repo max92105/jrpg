@@ -1,10 +1,10 @@
-# M1. Power scales attacks and skills
+# M1a. Power scales attacks and skills
 
-Part of [the stats and gear slots plan](../README.md). Decisions 296 (Power is magnitude), 318, 321 (consumables don't scale), 330 (one unarmed rule). Design: "Formulas" (order on a skill, healing), "Replacement mapping". After D3.
+Part of [the stats and gear slots plan](../README.md). Decisions 296 (Power is magnitude), 318, 321 (consumables don't scale), 330 (one unarmed rule). Design: "Formulas" (order on a skill, healing), "Replacement mapping". After D3. Split from M1 on 2026-10-27: the pages' "Weapon damage" line (decision 337) is M1b.
 
-- **M1. Power scales attacks and skills; weapons deal damage; attack leaves classes and items** (Core + Data + content, about 225 lines)
+- **M1a. Power scales attacks and skills; weapons deal damage; attack leaves classes and items** (Core + Data + content + tests, about 270 lines)
   - **Goal:** a member's basic attack deals their weapon's damage (or the unarmed damage from `rules.json`), raised by Power's percent; every skill's raw value (damage and healing) is raised by its user's Power too. Consumables land their own numbers (decision 321). A class no longer has an attack, nor a weapon an attack bonus.
-  - **Decision 337:** the Equipment comparison's Attack line becomes **Weapon damage** (the weapon's damage raised by Power, the unarmed damage without one), and the Status page's Combat column shows the same line.
+  - **Pages:** unchanged; they build as they are, and their Attack line shows the raw weapon or unarmed damage until M1b (decision 337).
   - **New type:** Core `Battle/EffectScaling` (internal static): an effect as its user lands it: damage, healing and revive power times the user's damage permille, in a `long`, rounded down once (I1 adds the grant under Intelligence). An enemy's is 1000.
   - **Changes:**
     - `Stats/StatRules.UnarmedDamage`; `rules.json` 18; `GameRulesValidator` (at least 1).
@@ -29,3 +29,24 @@ Part of [the stats and gear slots plan](../README.md). Decisions 296 (Power is m
     there, or the type moves onto the sheet.
   - **Verify by hand:** the fighter unarmed hits a goblin for about 18 × 1.15 (minus 2 defense); with the bronze sword more; the cleric's Heal restores 15 × its Power percent. The goblin trio simulation: every class still wins every seed; record the table (the leader fights unarmed).
 - **Done, with deviations:**
+  - **Pages:** the pages' Weapon damage line is M1b (the split).
+  - **Neutral rules:** `TestStatRules.Neutral` hits unarmed for 10, the old default test class attack, so members built without `WithStats` keep their numbers.
+  - **`BaseStats`:** holds the unarmed attack and the class's defense. Five growth assertions now expect attack 10 at every level, each with a comment: four in `PartyMemberTests`, one in `GameSessionSaveTests`.
+  - **Tests about what is worn:** these build members without `WithStats`, so the builder's test weapon doesn't apply. Their swords deal 15 and 18 against the unarmed 10, so their expected numbers are unchanged (`PartyMemberStatTests`, `CombatantTests`, the `BattleResistanceTests` sword).
+  - **Validation:** `ItemDefinitionBuilder.WithAttackAndDefense` became `WithDefenseBonus`. `ItemCatalogValidator` also refuses damage on anything but a weapon (`Validate_ArmorWithDamage_NamesTheField`). `Validate_NegativeAttackBonus` became `Validate_WeaponWithoutDamage`. `GameRulesValidator` gains `Validate_ZeroUnarmedDamage_NamesTheField`.
+  - **From the review:** `BattlePowerTests.Execute_AttackByStrongMember_DealsScaledDamage` (the sword's 30 raised by Power to 36). `EffectScaling` now multiplies in a `long`.
+  - **Goblin trio simulation (1000 seeds, attack only):** every class wins 100 % in 16.5 turns. Average HP left:
+
+    | Class | HP left |
+    |---|---|
+    | Fighter | 176.6 |
+    | Mage | 43.6 |
+    | Cleric | 114.1 |
+    | Rogue | 78.1 |
+    | Barbarian | 195.6 |
+    | Paladin | 176.1 |
+    | Monk | 114.6 |
+    | Warlock | 53.6 |
+    | Druid | 94.6 |
+
+    The turns match because unarmed 18, raised by each class's Power, kills a goblin in two hits for every class.

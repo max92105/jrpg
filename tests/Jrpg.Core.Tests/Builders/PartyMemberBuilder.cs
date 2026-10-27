@@ -1,3 +1,4 @@
+using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Skills;
 
@@ -11,7 +12,7 @@ internal sealed class PartyMemberBuilder
     private int _experience;
     private int _hp = 100;
     private int _maxHp = 100;
-    private int _attack = 10;
+    private int? _weaponDamage;
     private int _defense = 5;
     private SkillDefinition[] _skills = [];
 
@@ -41,9 +42,13 @@ internal sealed class PartyMemberBuilder
         return this;
     }
 
+    /// <summary>
+    /// A class with <paramref name="defense"/>, and a test weapon worn that deals <paramref name="attack"/>: a class
+    /// has no attack (decision 330). Without it, the member hits for the neutral rules' unarmed 10.
+    /// </summary>
     public PartyMemberBuilder WithStats(int attack, int defense)
     {
-        _attack = attack;
+        _weaponDamage = attack;
         _defense = defense;
         return this;
     }
@@ -62,11 +67,16 @@ internal sealed class PartyMemberBuilder
     {
         var characterClass = new ClassBuilder()
             .WithId(_classId)
-            .WithBase(new ClassStats(_maxHp, _attack, _defense, Speed: 10))
+            .WithBase(new ClassStats(_maxHp, _defense, Speed: 10))
             .WithSkills([.. _skills.Select(skill => skill.Id)])
             .Build();
         var progress = new PartyMemberProgress(_id, _level, _experience, _hp, WeaponId: null, ArmorId: null, LastingAmounts: new Dictionary<string, int>());
         var member = PartyMember.Recruit(BuildDefinition(), characterClass, _skills.ToDictionary(skill => skill.Id), TestStatRules.Neutral);
+        if (_weaponDamage is { } damage)
+        {
+            member.Wear(EquipmentSlot.Weapon, new ItemDefinitionBuilder().WithId("test_weapon").AsWeapon(damage).Build());
+        }
+
         member.RestoreProgress(progress);
         return member;
     }

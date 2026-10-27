@@ -14,8 +14,8 @@ public sealed class PartyMemberGearTests
     private static readonly StatRules _rules = TestStatRules.Neutral with { HpPercentPer100Constitution = 100 };
 
     private static readonly ClassDefinition _class = new ClassBuilder()
-        .WithBase(new ClassStats(MaxHp: 200, Attack: 10, Defense: 5, Speed: 10))
-        .WithGrowth(new ClassStats(MaxHp: 20, Attack: 0, Defense: 0, Speed: 0))
+        .WithBase(new ClassStats(MaxHp: 200, Defense: 5, Speed: 10))
+        .WithGrowth(new ClassStats(MaxHp: 20, Defense: 0, Speed: 0))
         .Build();
 
     private readonly Inventory _inventory = new();

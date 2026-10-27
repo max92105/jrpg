@@ -69,7 +69,7 @@
     "iconFile": "Weapon.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "weapon", "attackBonus": 5, "defenseBonus": 0, "damageType": "slashing" }
+    "equipment": { "slot": "weapon", "damage": 24, "defenseBonus": 0, "damageType": "slashing" }
   },
   {
     "id": "iron_sword",
@@ -78,7 +78,7 @@
     "iconFile": "Weapon.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "weapon", "attackBonus": 8, "defenseBonus": 0, "damageType": "slashing" }
+    "equipment": { "slot": "weapon", "damage": 30, "defenseBonus": 0, "damageType": "slashing" }
   },
   {
     "id": "magic_staff",
@@ -87,7 +87,7 @@
     "iconFile": "Weapon.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "weapon", "attackBonus": 6, "defenseBonus": 0, "damageType": "blunt", "bonuses": { "intelligence": 3 } }
+    "equipment": { "slot": "weapon", "damage": 20, "defenseBonus": 0, "damageType": "blunt", "bonuses": { "intelligence": 3 } }
   },
   {
     "id": "leather_armor",
@@ -96,7 +96,7 @@
     "iconFile": "Armor.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 3, "bonuses": { "constitution": 2, "bluntResistance": 5, "piercingResistance": 5, "slashingResistance": 5 } }
+    "equipment": { "slot": "armor", "defenseBonus": 3, "bonuses": { "constitution": 2, "bluntResistance": 5, "piercingResistance": 5, "slashingResistance": 5 } }
   },
   {
     "id": "chain_mail",
@@ -105,7 +105,7 @@
     "iconFile": "Armor.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 6, "bonuses": { "constitution": 3, "bluntResistance": 5, "piercingResistance": 10, "slashingResistance": 15 } }
+    "equipment": { "slot": "armor", "defenseBonus": 6, "bonuses": { "constitution": 3, "bluntResistance": 5, "piercingResistance": 10, "slashingResistance": 15 } }
   },
   {
     "id": "wizard_robe",
@@ -114,6 +114,6 @@
     "iconFile": "Armor.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 4, "bonuses": { "will": 3, "fireResistance": 10, "iceResistance": 10, "lightningResistance": 10 } }
+    "equipment": { "slot": "armor", "defenseBonus": 4, "bonuses": { "will": 3, "fireResistance": 10, "iceResistance": 10, "lightningResistance": 10 } }
   }
 ]

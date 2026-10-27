@@ -3,8 +3,13 @@ using Jrpg.Core.Stats;
 namespace Jrpg.Core.Items;
 
 /// <summary>What wearing an item gives. Anyone can wear any equipment (decision 165).</summary>
-public sealed record EquipmentStats(EquipmentSlot Slot, int AttackBonus, int DefenseBonus)
+public sealed record EquipmentStats(EquipmentSlot Slot, int DefenseBonus)
 {
+    /// <summary>
+    /// A weapon's raw damage, which its wearer's basic attack deals before Power (decision 330); 0 for anything else.
+    /// </summary>
+    public int Damage { get; init; }
+
     /// <summary>What the item adds by stat kind (ADR 0026); none when content names none.</summary>
     public StatBonuses Bonuses { get; init; } = StatBonuses.None;
 

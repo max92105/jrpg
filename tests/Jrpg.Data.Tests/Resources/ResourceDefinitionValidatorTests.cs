@@ -125,7 +125,7 @@ public sealed class ResourceDefinitionValidatorTests
 
     private static ClassDefinition Class(string id)
     {
-        var stats = new ClassStats(MaxHp: 200, Attack: 20, Defense: 5, Speed: 10);
+        var stats = new ClassStats(MaxHp: 200, Defense: 5, Speed: 10);
         return new ClassDefinition(id, "Druid", "Tends.", stats, stats);
     }
 }

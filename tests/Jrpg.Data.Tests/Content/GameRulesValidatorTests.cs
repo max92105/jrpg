@@ -26,6 +26,7 @@ public sealed class GameRulesValidatorTests
             MagicalResistancePer100Will: 25,
             StatusPercentPer100Intelligence: 100,
             IntelligencePerExtraStatusTurn: 25,
+            UnarmedDamage: 18,
             UnarmedDamageType: DamageType.Blunt));
 
     [Fact]
@@ -66,6 +67,16 @@ public sealed class GameRulesValidatorTests
         var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
 
         Assert.Equal("rules.json: stats.intelligencePerExtraStatusTurn must be at least 1 (was 0).", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_ZeroUnarmedDamage_NamesTheField()
+    {
+        var rules = _rules with { Stats = _rules.Stats with { UnarmedDamage = 0 } };
+
+        var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
+
+        Assert.Equal("rules.json: stats.unarmedDamage must be at least 1 (was 0).", exception.Message);
     }
 
     [Fact]

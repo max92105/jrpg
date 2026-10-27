@@ -81,7 +81,7 @@ public sealed class EquipmentChoiceTests
 
         var comparison = StatComparison.Between(NumbersOf(leader), new(leader.SheetWith(sword), leader.StatsWith(sword)));
 
-        Assert.Equal(sword.Equipment!.AttackBonus, AttackChange(comparison));
+        Assert.Equal(sword.Equipment!.Damage - leader.BaseStats.Attack, AttackChange(comparison));
         Assert.DoesNotContain(comparison.Changes, change => change.NameId == MessageIds.StatDefense);
     }
 
@@ -95,7 +95,7 @@ public sealed class EquipmentChoiceTests
 
         var comparison = StatComparison.Between(NumbersOf(leader), new(leader.SheetWith(ironSword), leader.StatsWith(ironSword)));
 
-        Assert.Equal(ironSword.Equipment!.AttackBonus - _items["bronze_sword"].Equipment!.AttackBonus, AttackChange(comparison));
+        Assert.Equal(ironSword.Equipment!.Damage - _items["bronze_sword"].Equipment!.Damage, AttackChange(comparison));
         Assert.True(AttackChange(comparison) > 0);
     }
 
@@ -109,7 +109,7 @@ public sealed class EquipmentChoiceTests
 
         var comparison = StatComparison.Between(NumbersOf(leader), new(leader.SheetWithout(weapon), leader.StatsWithout(weapon)));
 
-        Assert.Equal(-_items["bronze_sword"].Equipment!.AttackBonus, AttackChange(comparison));
+        Assert.Equal(leader.BaseStats.Attack - _items["bronze_sword"].Equipment!.Damage, AttackChange(comparison));
     }
 
     private static StatComparison.Numbers NumbersOf(PartyMember member) => new(member.Sheet, member.TotalStats);

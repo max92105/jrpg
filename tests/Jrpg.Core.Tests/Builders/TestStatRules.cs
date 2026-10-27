@@ -7,7 +7,8 @@ internal static class TestStatRules
 {
     /// <summary>
     /// Every rate 0, accuracy 100, crit 0 and no extra status turn: primaries change nothing, every hit lands and none
-    /// crits, so a member's numbers are their class's and seeded battles keep their sequences (ADR 0026).
+    /// crits, so a member's numbers are their class's and seeded battles keep their sequences (ADR 0026). Unarmed, a
+    /// member hits for 10, the attack test classes had before weapons dealt damage.
     /// </summary>
     public static StatRules Neutral { get; } = new(
         HpPercentPer100Constitution: 0,
@@ -23,5 +24,6 @@ internal static class TestStatRules
         MagicalResistancePer100Will: 0,
         StatusPercentPer100Intelligence: 0,
         IntelligencePerExtraStatusTurn: int.MaxValue,
+        UnarmedDamage: 10,
         UnarmedDamageType: DamageType.Blunt);
 }

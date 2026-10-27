@@ -21,6 +21,7 @@ public sealed class StatFormulaTests
         MagicalResistancePer100Will: 25,
         StatusPercentPer100Intelligence: 100,
         IntelligencePerExtraStatusTurn: 25,
+        UnarmedDamage: 18,
         UnarmedDamageType: DamageType.Blunt);
 
     [Fact]

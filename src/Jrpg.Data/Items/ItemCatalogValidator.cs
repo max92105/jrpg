@@ -73,18 +73,19 @@ internal static class ItemCatalogValidator
 
     private static string? FindEquipmentProblem(EquipmentStats equipment)
     {
-        if (equipment.AttackBonus < 0)
-        {
-            return $"equipment.attackBonus must be at least 0 (was {equipment.AttackBonus}).";
-        }
-
         if (equipment.DefenseBonus < 0)
         {
             return $"equipment.defenseBonus must be at least 0 (was {equipment.DefenseBonus}).";
         }
 
-        return FindDamageTypeProblem(equipment) ?? FindBonusProblem(equipment.Bonuses);
+        return FindDamageProblem(equipment) ?? FindDamageTypeProblem(equipment) ?? FindBonusProblem(equipment.Bonuses);
     }
+
+    // A weapon's damage is its wearer's whole basic attack (decision 330), so it must hurt; nothing else is swung.
+    private static string? FindDamageProblem(EquipmentStats equipment) =>
+        equipment.Slot == EquipmentSlot.Weapon && equipment.Damage < 1 ? $"equipment.damage must be at least 1 for a weapon (was {equipment.Damage})."
+        : equipment.Slot != EquipmentSlot.Weapon && equipment.Damage != 0 ? $"equipment.damage is only for a weapon (was {equipment.Damage} on {equipment.Slot})."
+        : null;
 
     // A weapon's type is what its wearer's basic attack hits as (ADR 0027); nothing else is swung.
     private static string? FindDamageTypeProblem(EquipmentStats equipment) =>

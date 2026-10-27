@@ -25,8 +25,8 @@ public sealed class CombatantTests
     [Fact]
     public void FromPartyMember_EquippedMember_UsesTotalStatsOnPartySide()
     {
-        var member = new PartyMemberBuilder().WithClass("fighter").WithStats(attack: 10, defense: 5).Build();
-        var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build();
+        var member = new PartyMemberBuilder().WithClass("fighter").Build();
+        var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(15).Build();
         var inventory = new Inventory();
         inventory.Add(sword, 1);
         new PartyEquipment(inventory).TryEquip(member, sword);
@@ -98,8 +98,8 @@ public sealed class CombatantTests
         var readiness = new ResourceDefinition("readiness", "Readiness") { MaxFromSpeed = new SpeedScaling(SpeedPerCharge: 10) };
         var rogue = new ClassBuilder()
             .WithId("rogue")
-            .WithBase(new ClassStats(MaxHp: 100, Attack: 10, Defense: 5, Speed: 30))
-            .WithGrowth(new ClassStats(MaxHp: 0, Attack: 0, Defense: 0, Speed: 5))
+            .WithBase(new ClassStats(MaxHp: 100, Defense: 5, Speed: 30))
+            .WithGrowth(new ClassStats(MaxHp: 0, Defense: 0, Speed: 5))
             .WithResources(readiness)
             .Build();
         var progress = new PartyMemberProgress("lazarus", level, 0, Hp: 100, WeaponId: null, ArmorId: null, LastingAmounts: new Dictionary<string, int>());

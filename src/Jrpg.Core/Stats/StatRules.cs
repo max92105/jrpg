@@ -17,6 +17,7 @@ namespace Jrpg.Core.Stats;
 /// <param name="MagicalResistancePer100Will">The magical resistance percent 100 Will adds.</param>
 /// <param name="StatusPercentPer100Intelligence">The percent 100 Intelligence adds to a granted status's power.</param>
 /// <param name="IntelligencePerExtraStatusTurn">The Intelligence each extra status turn takes (never on Stun).</param>
+/// <param name="UnarmedDamage">A member's basic attack's raw damage with no weapon worn (decision 330).</param>
 /// <param name="UnarmedDamageType">What a member's basic attack hits as with no weapon worn (ADR 0027).</param>
 public sealed record StatRules(
     int HpPercentPer100Constitution,
@@ -32,4 +33,5 @@ public sealed record StatRules(
     int MagicalResistancePer100Will,
     int StatusPercentPer100Intelligence,
     int IntelligencePerExtraStatusTurn,
+    int UnarmedDamage,
     DamageType UnarmedDamageType);

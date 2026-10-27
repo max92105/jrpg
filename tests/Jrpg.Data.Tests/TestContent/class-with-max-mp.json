@@ -1,6 +1,6 @@
 [
   {
     "id": "mage", "name": "Mage", "description": "Bends raw magic.",
-    "base": { "maxHp": 150, "maxMp": 80, "attack": 20, "defense": 4 },
-    "growth": { "maxHp": 12, "attack": 2, "defense": 1 } }
+    "base": { "maxHp": 150, "maxMp": 80, "defense": 4 },
+    "growth": { "maxHp": 12, "defense": 1 } }
 ]

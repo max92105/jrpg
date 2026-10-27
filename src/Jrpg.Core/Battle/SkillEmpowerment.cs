@@ -10,16 +10,19 @@ namespace Jrpg.Core.Battle;
 /// </summary>
 internal static class SkillEmpowerment
 {
-    /// <returns>The skill's effect, its power raised when a force the skill feeds dominates: the granted status's power
-    /// for a grant, the effect's own otherwise.</returns>
-    public static Effect EffectOf(Combatant actor, SkillDefinition skill)
+    /// <param name="actor">Who uses the skill.</param>
+    /// <param name="skill">The skill, whose resource gains say which forces it feeds.</param>
+    /// <param name="effect">The skill's effect as its user lands it (<see cref="EffectScaling"/>), so a dominant force
+    /// raises the value Power already raised.</param>
+    /// <returns>The effect, its power raised when a force the skill feeds dominates: the granted status's power for a
+    /// grant, the effect's own otherwise.</returns>
+    public static Effect EffectOf(Combatant actor, SkillDefinition skill, Effect effect)
     {
         if (DominantFedForce(actor, skill) is not { } rule)
         {
-            return skill.Effect;
+            return effect;
         }
 
-        var effect = skill.Effect;
         return effect is { Kind: EffectKind.GrantStatus, Status: { } grant }
             ? effect with { Status = grant with { Power = DominanceFormula.Empowered(grant.Power, rule.BonusPercent) } }
             : effect with { Power = DominanceFormula.Empowered(effect.Power, rule.BonusPercent) };

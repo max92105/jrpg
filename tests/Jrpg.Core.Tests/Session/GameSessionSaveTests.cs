@@ -99,8 +99,8 @@ public sealed class GameSessionSaveTests
     public void Restore_MemberSavedAtLevelThree_HasTheClassStatsAtThree()
     {
         var growing = new ClassBuilder()
-            .WithBase(new ClassStats(MaxHp: 100, Attack: 10, Defense: 5, Speed: 0))
-            .WithGrowth(new ClassStats(MaxHp: 10, Attack: 3, Defense: 1, Speed: 0))
+            .WithBase(new ClassStats(MaxHp: 100, Defense: 5, Speed: 0))
+            .WithGrowth(new ClassStats(MaxHp: 10, Defense: 1, Speed: 0))
             .Build();
         var catalog = Catalog(_belowChest) with { Classes = new Dictionary<string, ClassDefinition> { ["fighter"] = growing } };
         var save = StartNew().Capture(_savedAt);
@@ -108,7 +108,8 @@ public sealed class GameSessionSaveTests
 
         var leader = GameSession.Restore(savedAtThree, catalog, new FixedSequenceRandom()).Party.Leader;
 
-        Assert.Equal(new CombatStats(Attack: 16, Defense: 7), leader.BaseStats);
+        // The defense the class has at three; the attack is the unarmed one, which no level changes (decision 330).
+        Assert.Equal(new CombatStats(Attack: 10, Defense: 7), leader.BaseStats);
         Assert.Equal((90, 120), (leader.Vitals.Hp, leader.Vitals.MaxHp));
     }
 

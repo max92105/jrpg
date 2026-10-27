@@ -11,10 +11,10 @@ internal static class AttackEffect
     /// </summary>
     public const Targeting Targeting = Effects.Targeting.SingleEnemy;
 
-    /// <summary>The attack as <paramref name="attacker"/>'s stats are now, statuses included.</summary>
+    /// <summary>The attack from <paramref name="attacker"/>'s stats now, statuses included, raised by Power.</summary>
     public static Effect Of(Combatant attacker)
     {
         var stats = attacker.CurrentStats;
-        return new Effect(EffectKind.Damage, stats.Attack, Targeting, DamageType: stats.AttackType);
+        return EffectScaling.ScaledFor(new Effect(EffectKind.Damage, stats.Attack, Targeting, DamageType: stats.AttackType), stats.DamagePermille);
     }
 }

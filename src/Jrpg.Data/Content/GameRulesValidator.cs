@@ -72,6 +72,12 @@ internal static class GameRulesValidator
             throw new ContentValidationException(
                 $"{fileName}: stats.intelligencePerExtraStatusTurn must be at least 1 (was {stats.IntelligencePerExtraStatusTurn}).");
         }
+
+        // An unarmed hit for nothing would make a member without a weapon unable to hurt anyone.
+        if (stats.UnarmedDamage < 1)
+        {
+            throw new ContentValidationException($"{fileName}: stats.unarmedDamage must be at least 1 (was {stats.UnarmedDamage}).");
+        }
     }
 
     private static void ValidateExploration(string fileName, ExplorationRules exploration)

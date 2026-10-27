@@ -37,6 +37,9 @@ public sealed class PartyMember
     /// <summary>Experience earned toward the next level; resets to 0 on level-up.</summary>
     public int Experience { get; private set; }
 
+    /// <summary>
+    /// With nothing worn: the unarmed attack (decision 330) and the class's defense at the member's level.
+    /// </summary>
     public CombatStats BaseStats { get; private set; }
 
     /// <summary>
@@ -62,7 +65,9 @@ public sealed class PartyMember
     /// </summary>
     public IReadOnlyDictionary<string, int> LastingAmounts => _lastingAmounts;
 
-    /// <summary>Base stats plus the bonuses of everything worn.</summary>
+    /// <summary>
+    /// Base stats with what is worn: the weapon's damage in place of the unarmed one, and every item's defense.
+    /// </summary>
     public CombatStats TotalStats => StatsWearing(new Worn(Weapon, Armor));
 
     /// <summary>A new member joins at level 1 with 0 experience and full HP (decision 168).</summary>
@@ -233,16 +238,14 @@ public sealed class PartyMember
     private void RebuildStats()
     {
         var stats = ClassGrowth.StatsAt(Class, Level);
-        BaseStats = new CombatStats(stats.Attack, stats.Defense);
+        BaseStats = new CombatStats(Rules.UnarmedDamage, stats.Defense);
         Sheet = SheetWearing(new Worn(Weapon, Armor));
     }
-
-    private static int AttackBonusOf(ItemDefinition? item) => item?.Equipment?.AttackBonus ?? 0;
 
     private static int DefenseBonusOf(ItemDefinition? item) => item?.Equipment?.DefenseBonus ?? 0;
 
     private CombatStats StatsWearing(Worn worn) => new(
-        BaseStats.Attack + AttackBonusOf(worn.Weapon) + AttackBonusOf(worn.Armor),
+        worn.Weapon?.Equipment?.Damage ?? BaseStats.Attack,
         BaseStats.Defense + DefenseBonusOf(worn.Weapon) + DefenseBonusOf(worn.Armor));
 
     // The two slots' items, as worn or as a preview would have them.

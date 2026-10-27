@@ -44,8 +44,8 @@ public sealed class BattleResistanceTests
     [Fact]
     public void Execute_AttackOnSlashingResistantEnemy_DealsLess()
     {
-        var fighter = new PartyMemberBuilder().WithStats(attack: 40, defense: 0).Build();
-        var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(0).WithDamageType(DamageType.Slashing).Build();
+        var fighter = new PartyMemberBuilder().Build();
+        var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(40).WithDamageType(DamageType.Slashing).Build();
         var inventory = new Inventory();
         inventory.Add(sword, 1);
         new PartyEquipment(inventory).TryEquip(fighter, sword);
@@ -97,7 +97,7 @@ public sealed class BattleResistanceTests
     private static Combatant Member(string id, PrimaryStats primaries, StatRules rules, params SkillDefinition[] skills) =>
         Combatant.FromPartyMember(PartyMember.Recruit(
             new PartyMemberBuilder().WithId(id).BuildDefinition(),
-            new ClassBuilder().WithId(id).WithBase(new ClassStats(MaxHp: 100, Attack: 10, Defense: 0, Speed: 10)).WithPrimaries(primaries, PrimaryStats.None).WithSkills([.. skills.Select(skill => skill.Id)]).Build(),
+            new ClassBuilder().WithId(id).WithBase(new ClassStats(MaxHp: 100, Defense: 0, Speed: 10)).WithPrimaries(primaries, PrimaryStats.None).WithSkills([.. skills.Select(skill => skill.Id)]).Build(),
             skills.ToDictionary(skill => skill.Id),
             rules));
 

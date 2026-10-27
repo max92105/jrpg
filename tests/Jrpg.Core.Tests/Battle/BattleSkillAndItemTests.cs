@@ -147,7 +147,7 @@ public sealed class BattleSkillAndItemTests
     {
         var battle = CreateBattle();
 
-        Assert.Throws<ArgumentException>(() => battle.TargetChoiceFor(new ItemDefinitionBuilder().AsWeapon(attackBonus: 5).Build()));
+        Assert.Throws<ArgumentException>(() => battle.TargetChoiceFor(new ItemDefinitionBuilder().AsWeapon(damage: 5).Build()));
     }
 
     [Fact]

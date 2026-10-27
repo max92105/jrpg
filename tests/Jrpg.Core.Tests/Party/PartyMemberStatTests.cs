@@ -7,18 +7,19 @@ using Jrpg.Core.Tests.Builders;
 
 namespace Jrpg.Core.Tests.Party;
 
-// A member's stats: their class's at their level, and what worn gear adds or would add.
+// A member's stats: their class's at their level, and what worn gear adds or would add. With no weapon, a member hits
+// for the neutral rules' unarmed 10; a weapon's damage replaces it (decision 330).
 public sealed class PartyMemberStatTests
 {
     private static readonly ClassDefinition _growingClass = new ClassBuilder()
-        .WithBase(new ClassStats(MaxHp: 100, Attack: 12, Defense: 7, Speed: 0))
-        .WithGrowth(new ClassStats(MaxHp: 10, Attack: 2, Defense: 1, Speed: 0))
+        .WithBase(new ClassStats(MaxHp: 100, Defense: 7, Speed: 0))
+        .WithGrowth(new ClassStats(MaxHp: 10, Defense: 1, Speed: 0))
         .Build();
 
     // 200 HP and 20 Constitution at level 1, +20 HP and +10 Constitution a level, at +1 % HP per Constitution point.
     private static readonly ClassDefinition _sturdyClass = new ClassBuilder()
-        .WithBase(new ClassStats(MaxHp: 200, Attack: 10, Defense: 5, Speed: 0))
-        .WithGrowth(new ClassStats(MaxHp: 20, Attack: 0, Defense: 0, Speed: 0))
+        .WithBase(new ClassStats(MaxHp: 200, Defense: 5, Speed: 0))
+        .WithGrowth(new ClassStats(MaxHp: 20, Defense: 0, Speed: 0))
         .WithPrimaries(new PrimaryStats(0, 0, 0, 20, 0), new PrimaryStats(0, 0, 0, 10, 0))
         .Build();
 
@@ -34,15 +35,15 @@ public sealed class PartyMemberStatTests
 
         member.RestoreProgress(progress);
 
-        Assert.Equal(new CombatStats(Attack: 16, Defense: 9), member.BaseStats);
+        Assert.Equal(new CombatStats(Attack: 10, Defense: 9), member.BaseStats);
         Assert.Equal((50, 120), (member.Vitals.Hp, member.Vitals.MaxHp));
     }
 
     [Fact]
     public void TotalStats_WithWeaponAndArmor_AddsBonuses()
     {
-        var member = new PartyMemberBuilder().WithClass("fighter").WithStats(attack: 10, defense: 5).Build();
-        Equip(member, new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build());
+        var member = new PartyMemberBuilder().WithClass("fighter").Build();
+        Equip(member, new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(15).Build());
         Equip(member, new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build());
 
         var stats = member.TotalStats;
@@ -53,8 +54,8 @@ public sealed class PartyMemberStatTests
     [Fact]
     public void StatsWithout_Weapon_DropsOnlyTheWeaponBonus()
     {
-        var member = new PartyMemberBuilder().WithClass("fighter").WithStats(attack: 10, defense: 5).Build();
-        Equip(member, new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build());
+        var member = new PartyMemberBuilder().WithClass("fighter").Build();
+        Equip(member, new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(15).Build());
         Equip(member, new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build());
 
         var preview = member.StatsWithout(EquipmentSlot.Weapon);
@@ -66,10 +67,10 @@ public sealed class PartyMemberStatTests
     [Fact]
     public void StatsWith_OtherWeapon_ReplacesCurrentWeaponBonus()
     {
-        var member = new PartyMemberBuilder().WithClass("fighter").WithStats(attack: 10, defense: 5).Build();
-        Equip(member, new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build());
+        var member = new PartyMemberBuilder().WithClass("fighter").Build();
+        Equip(member, new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(15).Build());
         Equip(member, new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build());
-        var ironSword = new ItemDefinitionBuilder().WithId("iron_sword").AsWeapon(8).Build();
+        var ironSword = new ItemDefinitionBuilder().WithId("iron_sword").AsWeapon(18).Build();
 
         var preview = member.StatsWith(ironSword);
 
@@ -80,8 +81,8 @@ public sealed class PartyMemberStatTests
     [Fact]
     public void TotalStats_WeaponWithDefenseBonus_AddsItToDefense()
     {
-        var member = new PartyMemberBuilder().WithClass("knight").WithStats(attack: 10, defense: 5).Build();
-        Equip(member, new ItemDefinitionBuilder().WithId("shield_sword").AsWeapon(0).WithAttackAndDefense(attack: 4, defense: 2).Build());
+        var member = new PartyMemberBuilder().WithClass("knight").Build();
+        Equip(member, new ItemDefinitionBuilder().WithId("shield_sword").AsWeapon(14).WithDefenseBonus(2).Build());
 
         var stats = member.TotalStats;
 
@@ -91,7 +92,7 @@ public sealed class PartyMemberStatTests
     [Fact]
     public void StatsWith_OtherArmor_ReplacesCurrentArmorBonus()
     {
-        var member = new PartyMemberBuilder().WithClass("fighter").WithStats(attack: 10, defense: 5).Build();
+        var member = new PartyMemberBuilder().WithClass("fighter").Build();
         Equip(member, new ItemDefinitionBuilder().WithId("leather_armor").AsArmor(3).Build());
         var chainMail = new ItemDefinitionBuilder().WithId("chain_mail").AsArmor(6).Build();
 

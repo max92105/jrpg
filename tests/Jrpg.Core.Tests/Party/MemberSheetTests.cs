@@ -20,13 +20,14 @@ public sealed class MemberSheetTests
         MagicalResistancePer100Will: 25,
         StatusPercentPer100Intelligence: 100,
         IntelligencePerExtraStatusTurn: 25,
+        UnarmedDamage: 18,
         UnarmedDamageType: DamageType.Blunt);
 
     [Fact]
     public void Of_ClassAtLevel_FillsEveryNumberFromItsOwnSource()
     {
         var primaries = new PrimaryStats(Power: 20, Agility: 20, Intelligence: 30, Constitution: 10, Will: 20);
-        var atLevel = new ClassStats(MaxHp: 200, Attack: 10, Defense: 5, Speed: 12) { Accuracy = 5, Primaries = primaries };
+        var atLevel = new ClassStats(MaxHp: 200, Defense: 5, Speed: 12) { Accuracy = 5, Primaries = primaries };
 
         var sheet = MemberSheet.Of(atLevel, StatBonuses.None, _rules);
 
@@ -134,7 +135,7 @@ public sealed class MemberSheetTests
     }
 
     private static ClassStats ClassWith(PrimaryStats primaries) =>
-        new ClassStats(MaxHp: 200, Attack: 10, Defense: 5, Speed: 12) { Primaries = primaries };
+        new ClassStats(MaxHp: 200, Defense: 5, Speed: 12) { Primaries = primaries };
 
     private static StatBonuses Bonus(StatKind kind, int bonus) => new(new Dictionary<StatKind, int> { [kind] = bonus });
 }

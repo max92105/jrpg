@@ -28,4 +28,24 @@ public sealed record StatSheet(
     int DamagePermille,
     Resistances Resistances,
     int StatusPermille,
-    int ExtraStatusTurns);
+    int ExtraStatusTurns)
+{
+    /// <summary>
+    /// The number a screen shows for <paramref name="kind"/>: whole points for a primary, max HP and speed, permille
+    /// for the percent kinds. The one place that reads a sheet by kind, so screens list stats without a switch.
+    /// </summary>
+    public int ValueOf(StatKind kind) =>
+        StatKinds.TypeResistedBy(kind) is { } type ? Resistances.Of(type) : DerivedOrPrimary(kind);
+
+    private int DerivedOrPrimary(StatKind kind) => kind switch
+    {
+        StatKind.MaxHp => MaxHp,
+        StatKind.Speed => Speed,
+        StatKind.Accuracy => AccuracyPermille,
+        StatKind.CritChance => CritChancePermille,
+        StatKind.CritDamage => CritDamagePermille,
+        StatKind.Dodge => DodgePermille,
+        StatKind.CrowdControlResistance => CrowdControlResistancePermille,
+        _ => Primaries.ValueOf(kind),
+    };
+}

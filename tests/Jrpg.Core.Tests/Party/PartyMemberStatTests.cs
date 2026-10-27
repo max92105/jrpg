@@ -81,7 +81,7 @@ public sealed class PartyMemberStatTests
     public void TotalStats_WeaponWithDefenseBonus_AddsItToDefense()
     {
         var member = new PartyMemberBuilder().WithClass("knight").WithStats(attack: 10, defense: 5).Build();
-        Equip(member, new ItemDefinitionBuilder().WithId("shield_sword").AsWeapon(0).WithBonuses(attack: 4, defense: 2).Build());
+        Equip(member, new ItemDefinitionBuilder().WithId("shield_sword").AsWeapon(0).WithAttackAndDefense(attack: 4, defense: 2).Build());
 
         var stats = member.TotalStats;
 

@@ -68,7 +68,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **P3a. The member's sheet: accuracy, crit chance and damage, dodge, crowd control resistance, Power's percent, in tenths** (Core + Data + content, about 200 lines) → [slices/P3a.md](slices/P3a.md)
 - [x] **ADR 0027: Damage types and resistances** (before P3b) → [slices/ADR-0027.md](slices/ADR-0027.md)
 - [x] **P3b. Eight resistances from Constitution and Will; Intelligence's status percent and extra turns** (Core + Data + content, about 230 lines) → [slices/P3b.md](slices/P3b.md)
-- [ ] **P4. Worn gear adds to the sheet; max HP and speed follow it; `StatSheet.ValueOf`** (Core + Data + content, about 245 lines) → [slices/P4.md](slices/P4.md)
+- [x] **P4a. Gear bonuses in content; `StatSheet.ValueOf`** (Core + Data + content, about 220 lines; P4 split in two on 2026-10-27) → [slices/P4a.md](slices/P4a.md)
+- [ ] **P4b. Worn gear adds to the sheet; max HP and speed follow it** (Core + Data, about 210 lines) → [slices/P4b.md](slices/P4b.md)
 
 ### Phase 2: the pages read the sheet
 - [ ] **L1. Stat names and number formats; the leader choice shows HP, speed and the five primaries** (Game + text, about 200 lines) → [slices/L1.md](slices/L1.md)

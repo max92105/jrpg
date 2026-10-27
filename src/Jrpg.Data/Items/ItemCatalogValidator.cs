@@ -1,5 +1,6 @@
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
+using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
 using Jrpg.Data.Effects;
 
@@ -7,6 +8,8 @@ namespace Jrpg.Data.Items;
 
 internal static class ItemCatalogValidator
 {
+    private const int MostBonus = 100;
+
     public static void Validate(string fileName, IReadOnlyList<ItemDefinition> items) =>
         new ContentListValidator<ItemDefinition>(fileName, "item", item => item.Id)
             .Validate(items, item => FindProblem(item));
@@ -75,6 +78,22 @@ internal static class ItemCatalogValidator
             return $"equipment.attackBonus must be at least 0 (was {equipment.AttackBonus}).";
         }
 
-        return equipment.DefenseBonus < 0 ? $"equipment.defenseBonus must be at least 0 (was {equipment.DefenseBonus})." : null;
+        return equipment.DefenseBonus < 0
+            ? $"equipment.defenseBonus must be at least 0 (was {equipment.DefenseBonus})."
+            : FindBonusProblem(equipment.Bonuses);
+    }
+
+    // A bonus of 0 names a stat for nothing, likely a typo; past 100 one item outweighs any class (placeholder bound).
+    private static string? FindBonusProblem(StatBonuses bonuses)
+    {
+        foreach (var (kind, bonus) in bonuses.Values)
+        {
+            if (bonus == 0 || Math.Abs(bonus) > MostBonus)
+            {
+                return $"equipment.bonuses.{StatBonusesConverter.NameOf(kind)} must be nonzero and within -{MostBonus}..{MostBonus} (was {bonus}).";
+            }
+        }
+
+        return null;
     }
 }

@@ -35,7 +35,7 @@ internal sealed class ItemDefinitionBuilder
     }
 
     /// <remarks>Call after <see cref="AsWeapon"/> or <see cref="AsArmor"/>.</remarks>
-    public ItemDefinitionBuilder WithBonuses(int attack, int defense)
+    public ItemDefinitionBuilder WithAttackAndDefense(int attack, int defense)
     {
         _equipment = _equipment! with { AttackBonus = attack, DefenseBonus = defense };
         return this;

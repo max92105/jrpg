@@ -3,6 +3,7 @@ using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
+using Jrpg.Core.Stats;
 using Jrpg.Core.Statuses;
 using Jrpg.Data.Content;
 
@@ -138,6 +139,16 @@ public sealed class ContentCatalogLoaderTests
         var fighter = catalog.ClassOf(catalog.PartyMembers["ragnir"]);
 
         Assert.True(fighter.Base.Primaries.Power > 0, "The fighter's base Power comes from classes.json.");
+    }
+
+    [Fact]
+    public void Load_RepositoryChainMail_HasConstitution()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        var chainMail = catalog.Items["chain_mail"].Equipment!;
+
+        Assert.True(chainMail.Bonuses.Of(StatKind.Constitution) > 0, "items.json gives chain mail a Constitution bonus.");
     }
 
     [Fact]

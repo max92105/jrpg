@@ -1,5 +1,6 @@
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
+using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
 using Jrpg.Data.Items;
 
@@ -172,6 +173,36 @@ public sealed class ItemCatalogValidatorTests
     }
 
     [Fact]
+    public void Validate_ZeroBonus_NamesTheStat()
+    {
+        var ring = Equipment(new EquipmentStats(EquipmentSlot.Armor, 0, 0) { Bonuses = Bonuses((StatKind.Power, 5), (StatKind.FireResistance, 0)) });
+
+        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [ring]));
+
+        Assert.Equal("items.json: item 'gear': equipment.bonuses.fireResistance must be nonzero and within -100..100 (was 0).", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_BonusAbove100_NamesTheStat()
+    {
+        var ring = Equipment(new EquipmentStats(EquipmentSlot.Armor, 0, 0) { Bonuses = Bonuses((StatKind.Power, 101)) });
+
+        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [ring]));
+
+        Assert.Equal("items.json: item 'gear': equipment.bonuses.power must be nonzero and within -100..100 (was 101).", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_NegativeBonusWithinBounds_Passes()
+    {
+        var cursed = Equipment(new EquipmentStats(EquipmentSlot.Armor, 0, 0) { Bonuses = Bonuses((StatKind.Agility, -100)) });
+
+        var exception = Record.Exception(() => ItemCatalogValidator.Validate(FileName, [cursed]));
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
     public void Validate_EmptyId_ThrowsNamingTheEntry()
     {
         var exception = Assert.Throws<ContentValidationException>(
@@ -179,6 +210,9 @@ public sealed class ItemCatalogValidatorTests
 
         Assert.Equal("items.json: entry 0 has an empty id.", exception.Message);
     }
+
+    private static StatBonuses Bonuses(params (StatKind Kind, int Bonus)[] entries) =>
+        new(entries.ToDictionary(entry => entry.Kind, entry => entry.Bonus));
 
     private static ItemDefinition Equipment(EquipmentStats stats) =>
         _potion with { Id = "gear", IsUsableFromMenu = false, Effect = null, Equipment = stats };

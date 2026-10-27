@@ -87,7 +87,7 @@
     "iconFile": "Weapon.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "weapon", "attackBonus": 6, "defenseBonus": 0 }
+    "equipment": { "slot": "weapon", "attackBonus": 6, "defenseBonus": 0, "bonuses": { "intelligence": 3 } }
   },
   {
     "id": "leather_armor",
@@ -96,7 +96,7 @@
     "iconFile": "Armor.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 3 }
+    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 3, "bonuses": { "constitution": 2, "bluntResistance": 5, "piercingResistance": 5, "slashingResistance": 5 } }
   },
   {
     "id": "chain_mail",
@@ -105,7 +105,7 @@
     "iconFile": "Armor.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 6 }
+    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 6, "bonuses": { "constitution": 3, "bluntResistance": 5, "piercingResistance": 10, "slashingResistance": 15 } }
   },
   {
     "id": "wizard_robe",
@@ -114,6 +114,6 @@
     "iconFile": "Armor.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 4 }
+    "equipment": { "slot": "armor", "attackBonus": 0, "defenseBonus": 4, "bonuses": { "will": 3, "fireResistance": 10, "iceResistance": 10, "lightningResistance": 10 } }
   }
 ]

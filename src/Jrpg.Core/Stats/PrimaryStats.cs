@@ -9,4 +9,15 @@ public sealed record PrimaryStats(int Power, int Agility, int Intelligence, int 
 {
     /// <summary>All five at 0: a class or a growth that gives none.</summary>
     public static PrimaryStats None { get; } = new(0, 0, 0, 0, 0);
+
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="kind"/> isn't a primary.</exception>
+    public int ValueOf(StatKind kind) => kind switch
+    {
+        StatKind.Power => Power,
+        StatKind.Agility => Agility,
+        StatKind.Intelligence => Intelligence,
+        StatKind.Constitution => Constitution,
+        StatKind.Will => Will,
+        _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "Not a primary."),
+    };
 }

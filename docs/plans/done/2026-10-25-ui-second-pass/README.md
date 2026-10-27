@@ -1,5 +1,5 @@
 # UI second pass and clean-up
-Status: approved
+Status: done
 
 Third feature plan after the migration, following the class mechanics plan.
 - Decisions 231-235 and 249-266 are recorded below. Questions 236-248 are answered (decisions 249-263), and 265 (decision 266); the next free number is 267.
@@ -109,7 +109,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 6: clean-up and walk-through
 - [x] **C2. Footer hints on `FooterBar.TextTop`, time shares on `Easing`** (Game, about 120 lines) → [slices/C2.md](slices/C2.md)
-- [ ] **Z. Demo walk-through against the captures and the index** (manual) → [slices/Z.md](slices/Z.md)
+- [x] **Z. Demo walk-through against the captures and the index** (manual) → [slices/Z.md](slices/Z.md)
 
 ## Decisions
 Questions and decisions share numbers.

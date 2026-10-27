@@ -19,7 +19,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
   The file is protected, so ask the developer first.
 - **Why Core refused an equipment change:** `EquipmentPage.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. `PartyEquipment.ItemWithoutRoom` and `UnequipAll` would own both. It can wait because it is correct today, and nothing planned changes equipment.
-- **`Ui/MessageIds.cs` is 397 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
+- **`Ui/MessageIds.cs` is 404 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
 - **`MainViewModelTests`, part 2 (449 lines after E1a):** move the new content tests (`CreateObject_*`, `CreateNpc_*`, `CanStartNewObject_*`, `TryCreateMap_*`) and the map settings tests (`TryApplySettings_*`) into their own classes, on E1a's `EditorTestContent`.
 - **`MainWindow.xaml.cs` (547 lines):** move the viewport (pan, zoom, fit) and the tile painting handlers into partial files, as `.EventEditing` and `.ObjectEditing` already are.
 - **`TileBrowserViewModelTests` (410 lines):** move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class.
@@ -40,14 +40,13 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the demo retirement plan (2026-10-23)
 
-- Equipment page: opening a slot's choice hides the party sidebar (484 px) but the choice panel is 560 px, so the sheet narrows by 76 px while it is open (P1/Q2). Waits for question 153, the sidebar's placement.
 - Editor: with a button focused (Fit, Add layer), Space + drag pans, but releasing Space still clicks the button (WPF clicks a focused button on Space up; Space is swallowed only while the map has focus). Older than F2, easier to meet since F2 (review of F2).
 
 ## From the new-game flow plan (2026-10-24)
 
 - The editor's map save (`ContentWriter.WriteMap`) doesn't check that the files a map's events name exist: still images (`ArtReferenceCheck`) and voice files (`AudioReferenceCheck`). The game's startup rejects both, so an editor save can write content the game won't start with (`editor.md`, "Validate on save").
 - `Core/Exploration/ExplorationState.cs` (296) is near 300. The next feature touching it should split it first: starting events (arrival, cell, touch) apart from walking.
-- Test files over 300 lines: `GameFlowTests` (369), `InventoryPageTests` (325), `PartyStateTests` (322). Split by behavior when next touched.
+- Test files over 300 lines: `GameFlowTests` (369), `InventoryPageTests` (336), `PartyStateTests` (322). Split by behavior when next touched.
 - Comment lines over 120 columns from before the rule was enforced: `ExplorationState` (5), `GameSession` (8), `ArtReferenceCheck` (2), `MessageIds` (1). Rewrap when next touched.
 - `ScreenFade` skips its black moment when one update is longer than its fade-out plus hold (about 0.33 s), so a warp never moves the player. The fixed 1/60 s step hides it in play; tests must step at 1/60 s. Make `Update` stop on Holding if a long frame can ever reach it.
 - `BattleState.cs` is at 296 lines: split the per-command bodies before the next command path lands (DR2 review).
@@ -56,7 +55,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 ## From the class mechanics plan (2026-10-25)
 
 - `tests/Jrpg.Core.Tests/Battle/BattleStateTests.cs` is 361 lines: split it by command.
-- `tests/Jrpg.Core.Tests/Party/PartyMemberTests.cs` (307) and `tests/Jrpg.Game.Tests/Exploration/EventPresenterTests.cs` (304): split by behavior when next touched.
+- `tests/Jrpg.Core.Tests/Party/PartyMemberTests.cs` (307) and `tests/Jrpg.Game.Tests/Exploration/EventPresenterTests.cs` (305): split by behavior when next touched.
 - Core can't say whether a turn was kept: the screen keeps the actor forward both after a quick skill and when the same member gets two turns in a row (a readied turn right before their own; LK2b review). A `TurnKept` event from `TurnFlow.KeepTurn` would tell them apart.
 - `UiTheme.ColorFromHex("")` throws, and the Core test fixtures build resources without a color; a Game test that reaches them through a battle panel would fail (LK1a review). Give the test builders a color, or make the validator's rule a Core default.
 - Placeholder marks waiting on icon art: Move borrows the Run icon (FM2), and the extra turn's hourglass is a bright diamond (LK3).
@@ -67,3 +66,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - The battle's skill hint doesn't wrap: a long description runs past its box over the actor's portrait (`docs/captures/before/battle-skill.jpg`; SZ2).
 - `Menus/EquipmentSheetView` draws its parameter rows the old way (a 200 px value offset in the body font), while the Status page's rows have spaced-caps labels, right-aligned large values and hairlines since M3b. Give the Equipment page the same row look when it is next touched.
 - `Ui/ListCursor.ScrollToSelected` keeps its own copy of the keep-in-view scroll rule; `Ui/ListScroll.KeepInView` (M2a) holds it now. Move it onto it when next touched (`PartySidebar`'s copy went with M2c).
+- `src/Jrpg.Game/Battle/CommandPanelView.cs` is at 281 lines: split it before the next change that grows it.
+- With the Equipment page's item choice open, the attack preview runs into the Defense column (Z, `docs/captures/after/menu-equipment-choice.jpg`).
+- No debug way to start on a given map and cell: Z's automated walk couldn't reach the inn or the forest, so those hand checks fell back to the developer. A Debug-only `--start <map> <x> <y>` beside `--content` would let `play-game.ps1` reach any screen.

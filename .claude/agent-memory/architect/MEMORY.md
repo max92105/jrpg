@@ -1,4 +1,4 @@
-- [Roadmap](project_migration_roadmap.md) — UI second pass approved 2026-10-25 (decisions 231-235, 249-264, open 265, ADR 0025 fonts); next 266 / ADR 0026; investor demo
+- [Roadmap](project_migration_roadmap.md) — UI second pass done 2026-10-26 (decisions 231-235, 249-266, ADR 0025 fonts); next 267 / ADR 0026; investor demo
 - [Content quirks](project_content_quirks.md) — 1024 px party battlers, exact-case art names, player.png row order, empty skill icons
 - [Type/folder name clash](feedback_type_folder_name_clash.md) — never name a type after its feature folder (CA1724); use PartyState/BattleState
 - [Plan lessons](feedback_plan_lessons.md) — slice sizes, folder-dependency tables, no-caller APIs, presenter/draw split, code-health splits, wording-removal plans

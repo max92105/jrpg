@@ -13,7 +13,7 @@ Older plans are single files with the same sections.
 
 | Plan | Status |
 |---|---|
-| [2026-10-25-ui-second-pass](2026-10-25-ui-second-pass/README.md) | approved |
+| [done/2026-10-25-ui-second-pass](done/2026-10-25-ui-second-pass/README.md) | done |
 | [done/2026-10-24-class-mechanics](done/2026-10-24-class-mechanics/README.md) | done |
 | [done/2026-10-23-new-game-flow](done/2026-10-23-new-game-flow/README.md) | done |
 | [done/2026-10-23-code-health](done/2026-10-23-code-health/README.md) | done |

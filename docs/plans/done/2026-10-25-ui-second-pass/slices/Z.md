@@ -23,3 +23,5 @@ Part of [the UI second pass plan](../README.md). Manual. After every other slice
     4. **Leader choice labels (coherence, M3b):** "Level", "HP", "Attack", "Defense" there are small and mixed case, unlike the Status page's spaced caps with large values. Follow-up: the same row look.
     5. **Equipment page rows (M3b):** still the old look (backlog line from M3b): the same row look as Status when touched.
     6. **Capture tooling:** `play-game.ps1`'s screen copy is black for the borderless full-screen game (it only worked while another app's bar forced the desktop to compose); the game's own F12 works. Follow-up for the retro: the script presses F12 and collects the file from `docs/captures/`, waiting for the write before it closes the game.
+- **Walk-through, part 2 (2026-10-26, by the developer):** steps 4 (the inn) and 6 (the encounter's freeze, flash and shatter, the action-name box, the command rows, victory and defeat) all good.
+  - **Findings 1, 2 and 4 kept as they are** (the developer, "all is good"). Findings 3 and 5 wait in `docs/plans/backlog.md`; finding 6 was done in the retro (`play-game.ps1` saves the game's F12 capture).

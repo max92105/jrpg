@@ -1,8 +1,14 @@
+using System.Collections.Immutable;
+
 namespace Jrpg.Core.Stats;
 
-/// <summary>Which stat kind is the resistance to which damage type, both ways, and which kinds are percents.</summary>
+/// <summary>Which kinds are the primaries and which are percents, and which kind resists which damage type.</summary>
 public static class StatKinds
 {
+    /// <summary>The five primaries, in the order every screen lists them.</summary>
+    public static ImmutableArray<StatKind> Primaries { get; } =
+        [StatKind.Power, StatKind.Agility, StatKind.Intelligence, StatKind.Constitution, StatKind.Will];
+
     public static StatKind ResistanceTo(DamageType type) => type switch
     {
         DamageType.Blunt => StatKind.BluntResistance,

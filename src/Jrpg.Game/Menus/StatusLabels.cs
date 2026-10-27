@@ -9,12 +9,14 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 /// <param name="Progress">Level, experience, and experience to the next level.</param>
 /// <param name="MaxLevel">Shown instead of the experience to the next level at the highest level.</param>
+/// <param name="Attributes">The five primaries' names, in <see cref="StatusSheet.Attributes"/>' order.</param>
 /// <param name="Combat">The Combat section's labels, in <see cref="StatusSheet.Combat"/>'s order.</param>
 /// <param name="Resistances">Each damage type's short name, in <see cref="DamageType"/> order.</param>
 /// <param name="Messages">Where <see cref="LastingAmountText"/> is formatted from.</param>
 internal sealed record StatusLabels(
     string[] Progress,
     string MaxLevel,
+    string[] Attributes,
     string[] Combat,
     string[] Resistances,
     UiMessages Messages)
@@ -25,6 +27,7 @@ internal sealed record StatusLabels(
         return new(
             [Caps(MessageIds.StatusLevelShort), Caps(MessageIds.StatusExp), Caps(MessageIds.StatusNextLevel)],
             messages.Text(MessageIds.StatusMaxLevel),
+            [.. StatKinds.Primaries.Select(kind => Caps(StatNames.IdOf(kind)))],
             [
                 Caps(MessageIds.StatHp), Caps(MessageIds.StatAttack), Caps(MessageIds.StatDefense), Caps(MessageIds.StatusSpeed),
                 Caps(MessageIds.StatAccuracy), Caps(MessageIds.StatusCrit), Caps(MessageIds.StatDodge), Caps(MessageIds.StatusCrowdControl),

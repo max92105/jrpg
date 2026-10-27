@@ -5,10 +5,11 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/S1a.md, slice S1a (Status page Combat, Resistances and Resources: StatusSheet.Combat/Resistances, StatusParametersView, DamageTypeNames; S1 split into S1a/S1b on 2026-10-27)
-Round: 1 (verdict: Ready to commit; verify all pass, 2424 tests)
+Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/S1b.md, slice S1b (Attributes column beside the Status profile with AttributeCaptions; ResistanceTone weak/capped tints; label/value font consts shared from StatusSheetView)
+Round: 1 (verdict: Ready to commit; verify all pass, 2430 tests)
 
-- W1 docs/map.md Menus line: StatusSheet/StatusSheetView still described as "profile, speed, parameters, equipment, resources, skills ... spaced-caps labels beside large values" -> "profile, Combat, Resistances, Resources, skills", drawing words move to StatusParametersView; open
-- S1 src/Jrpg.Game/Menus/StatusParametersView.cs:17 Height assumes at most 2 resources (right column 312 of 318); a third class resource draws over Skills -> derive Height from the most resources, or a test over content classes; open (suggestion)
-- S2 src/Jrpg.Game/Menus/StatusSheetView.cs:43 SkillsHeight repeats StatusSkillsView's "+ 10" band offset and guesses 70 px a skill -> read them from StatusSkillsView; open (suggestion)
-- S3 src/Jrpg.Game/Menus/StatusParametersView.cs:31-33,135 LabelPixels/ValuePixels/LabelSpacing and Frame copy StatusSheetView's -> one shared source for the page's label/value fonts; open (suggestion)
+- W1 src/Jrpg.Game/Menus/StatusSheet.cs:112 + StatusLabels.cs:30 + AttributeCaptions.Of: the five-primary order now spelled a third time (LeaderProfile._shownKinds is the first) and matched by index across three files -> one AttributeKinds list, labels via StatNames.IdOf; open
+- W2 content/text/ui.json:39-43 "+{x} %" hardcodes the plus: a negative primary (gear taking a primary below 0, which MemberSheet supports and the validator allows) reads "+-1 % magic res." -> sign in code or a signed number argument; open
+- W3 StatusSheet.ToneOf `permille < 0`: the 0 boundary is untested (fire test's Ice is positive); `<=` would tint every 0 resistance red -> a test with a resistance at exactly 0 reading Plain; open
+- S1 StatusSheetView.cs:9-13 summary and DrawProfile comment (~line 144) don't mention the Attributes column; open (suggestion)
+- S2 StatusPageSheetTests WearTestArmor one ~170-column line -> local for chain_mail; open (suggestion)

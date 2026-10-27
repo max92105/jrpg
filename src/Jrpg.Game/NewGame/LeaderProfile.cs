@@ -13,7 +13,7 @@ internal sealed record LeaderProfile(string Name, string PortraitFile, string Cl
 {
     // After the level: HP, speed and the five primaries (the plan's L1), what tells one class from another at level 1.
     private static readonly StatKind[] _shownKinds =
-        [StatKind.MaxHp, StatKind.Speed, StatKind.Power, StatKind.Agility, StatKind.Intelligence, StatKind.Constitution, StatKind.Will];
+        [StatKind.MaxHp, StatKind.Speed, .. StatKinds.Primaries];
 
     /// <param name="choice">A leader choice, naming a member of <paramref name="catalog"/>.</param>
     /// <param name="catalog">The member, their class and the stat rules.</param>

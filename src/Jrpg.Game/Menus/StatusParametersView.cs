@@ -21,7 +21,7 @@ internal sealed class StatusParametersView
 
     // Placeholder layout (S1a's arithmetic): 34 px rows from 10 px under each band; cells 12 px in and at most 380 px
     // wide, the halves 48 px apart; the resistances in two columns of four 24 px apart; Resources 16 px under them;
-    // 18 px labels 2 px apart, 26 px values; HP's 4 px bar under its label, 12 px short of its value.
+    // HP's 4 px bar under its label, 12 px short of its value.
     private const int CombatRows = 8;
     private const int ResistanceRowsPerColumn = 4;
     private const int RowHeight = 34;
@@ -31,9 +31,6 @@ internal sealed class StatusParametersView
     private const int HalfGap = 48;
     private const int ResistanceColumnGap = 24;
     private const int SectionGap = 16;
-    private const int LabelPixels = 18;
-    private const int ValuePixels = 26;
-    private const float LabelSpacing = 2;
     private const int HpBarHeight = 4;
     private const int HpBarValueGap = 12;
 
@@ -50,8 +47,8 @@ internal sealed class StatusParametersView
     public StatusParametersView(ScreenText text, StatusLabels labels)
     {
         _labels = labels;
-        _labelFont = text.Fonts.FontAt(LabelPixels);
-        _valueFont = text.Fonts.FontAt(ValuePixels);
+        _labelFont = text.Fonts.FontAt(StatusSheetView.LabelPixels);
+        _valueFont = text.Fonts.FontAt(StatusSheetView.ValuePixels);
         _combatTitle = new SectionTitle(text, MessageIds.StatusCombat);
         _resistancesTitle = new SectionTitle(text, MessageIds.StatusResistances);
         _resourcesTitle = new SectionTitle(text, MessageIds.StatusResources);
@@ -61,6 +58,7 @@ internal sealed class StatusParametersView
     public void Show(StatusSheet sheet) => _shown = new Measured(
         [.. sheet.Combat.Select(Measure)],
         [.. sheet.Resistances.Select(Measure)],
+        sheet.ResistanceTones,
         [.. sheet.Resources.Select(resource => resource.Name)],
         [.. sheet.Resources.Select(resource => Measure(resource.Text))]);
 
@@ -79,12 +77,12 @@ internal sealed class StatusParametersView
         DrawCombat(frame, combat, shown.Combat, place.HpBar);
 
         var right = band with { X = band.X + halfWidth + HalfGap, Width = halfWidth };
-        DrawResistances(frame, right, shown.Resistances);
+        DrawResistances(frame, right, shown.Resistances, shown.ResistanceTones);
         var resources = right with { Y = right.Y + BelowBand + (ResistanceRowsPerColumn * RowHeight) + SectionGap };
         _resourcesTitle.Draw(batch, textures, resources, opacity);
         for (var index = 0; index < shown.Resources.Length; index++)
         {
-            DrawCell(frame, CellAt(resources, index, resources.Width), shown.ResourceNames[index], shown.Resources[index]);
+            DrawCell(frame, CellAt(resources, index, resources.Width), new CellText(shown.ResourceNames[index], shown.Resources[index], UiTheme.TextPrimary));
         }
     }
 
@@ -94,7 +92,7 @@ internal sealed class StatusParametersView
         _combatTitle.Draw(frame.Batch, frame.Textures, section, frame.Opacity);
         for (var index = 0; index < values.Length; index++)
         {
-            DrawCell(frame, CellAt(section, index, section.Width), _labels.Combat[index], values[index]);
+            DrawCell(frame, CellAt(section, index, section.Width), new CellText(_labels.Combat[index], values[index], UiTheme.TextPrimary));
         }
 
         var hp = CellAt(section, StatusSheet.HpLine, section.Width);
@@ -102,14 +100,15 @@ internal sealed class StatusParametersView
         hpBar.Draw(frame.Batch, frame.Textures, new Rectangle(hp.X, hp.Bottom - HpBarHeight, barWidth, HpBarHeight), frame.Opacity);
     }
 
-    private void DrawResistances(Frame frame, Rectangle section, MeasuredText[] values)
+    private void DrawResistances(Frame frame, Rectangle section, MeasuredText[] values, ResistanceTone[] tones)
     {
         _resistancesTitle.Draw(frame.Batch, frame.Textures, section, frame.Opacity);
         var columnWidth = (section.Width - CellInset - ResistanceColumnGap) / 2;
         for (var index = 0; index < values.Length; index++)
         {
             var column = section with { X = section.X + (index / ResistanceRowsPerColumn * (columnWidth + ResistanceColumnGap)) };
-            DrawCell(frame, CellAt(column, index % ResistanceRowsPerColumn, columnWidth + CellInset), _labels.Resistances[index], values[index]);
+            var cell = CellAt(column, index % ResistanceRowsPerColumn, columnWidth + CellInset);
+            DrawCell(frame, cell, new CellText(_labels.Resistances[index], values[index], ColorOf(tones[index])));
         }
     }
 
@@ -117,14 +116,23 @@ internal sealed class StatusParametersView
     private static Rectangle CellAt(Rectangle section, int row, int columnWidth) => new(
         section.X + CellInset, section.Y + BelowBand + (row * RowHeight), Math.Min(CellWidth, columnWidth - CellInset), RowHeight);
 
-    // The label small on the left, the value large at the cell's right edge, both centered on the row.
-    private void DrawCell(Frame frame, Rectangle cell, string label, MeasuredText value)
+    // A weakness reads as a danger, a resistance at the cap in the accent color (S1b).
+    private static Color ColorOf(ResistanceTone tone) => tone switch
     {
+        ResistanceTone.Weak => UiTheme.Danger,
+        ResistanceTone.Capped => UiTheme.Positive,
+        _ => UiTheme.TextPrimary,
+    };
+
+    // The label small on the left, the value large at the cell's right edge, both centered on the row.
+    private void DrawCell(Frame frame, Rectangle cell, CellText text)
+    {
+        var (label, value, valueColor) = text;
         var middle = cell.Y + (cell.Height / 2f);
         var labelPosition = new Vector2(cell.X, middle - (_labelFont.LineHeight / 2f));
-        frame.Batch.DrawString(_labelFont, label, labelPosition, UiTheme.TextSecondary * frame.Opacity, characterSpacing: LabelSpacing);
+        frame.Batch.DrawString(_labelFont, label, labelPosition, UiTheme.TextSecondary * frame.Opacity, characterSpacing: StatusSheetView.LabelSpacing);
         var valuePosition = new Vector2(cell.Right - value.Width, middle - (_valueFont.LineHeight / 2f));
-        frame.Batch.DrawString(_valueFont, value.Text, valuePosition, UiTheme.TextPrimary * frame.Opacity);
+        frame.Batch.DrawString(_valueFont, value.Text, valuePosition, valueColor * frame.Opacity);
     }
 
     private MeasuredText Measure(string value) => MeasuredText.Of(_valueFont, value);
@@ -134,9 +142,13 @@ internal sealed class StatusParametersView
     /// <param name="HpBar">The shown member's HP bar.</param>
     public readonly record struct Place(Rectangle Band, StatBar HpBar);
 
+    // One cell's label, its value, and the value's color.
+    private readonly record struct CellText(string Label, MeasuredText Value, Color ValueColor);
+
     // What the drawing helpers draw with this frame.
     private readonly record struct Frame(SpriteBatch Batch, TextureLibrary Textures, float Opacity);
 
     // The shown sheet's values, measured once when it is shown.
-    private sealed record Measured(MeasuredText[] Combat, MeasuredText[] Resistances, string[] ResourceNames, MeasuredText[] Resources);
+    private sealed record Measured(
+        MeasuredText[] Combat, MeasuredText[] Resistances, ResistanceTone[] ResistanceTones, string[] ResourceNames, MeasuredText[] Resources);
 }

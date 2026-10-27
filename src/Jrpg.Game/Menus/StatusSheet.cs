@@ -17,11 +17,13 @@ namespace Jrpg.Game.Menus;
 /// <param name="PortraitFile">Their portrait's file name.</param>
 /// <param name="Progress">Level, experience, and experience to the next level.</param>
 /// <param name="Experience">How far they are through their level, for the experience bar.</param>
+/// <param name="Attributes">Each primary, gear included, with what it gives, in <see cref="StatKind"/> order.</param>
 /// <param name="Combat">
 /// HP (as "value / max"), Attack and Defense while the battle uses them (decision 337), speed, accuracy, crit chance
 /// with crit damage, dodge, crowd control resistance: each with what the member wears.
 /// </param>
 /// <param name="Resistances">One per damage type, in <see cref="DamageType"/> order.</param>
+/// <param name="ResistanceTones">How each resistance is tinted, in the same order: weak, capped or plain.</param>
 /// <param name="Resources">
 /// Each class resource by name, in the class's order, with its max, or a lasting one's amount out of its max.
 /// </param>
@@ -32,8 +34,10 @@ internal sealed record StatusSheet(
     string PortraitFile,
     string[] Progress,
     (int Earned, int Needed) Experience,
+    IReadOnlyList<StatusSheet.Attribute> Attributes,
     string[] Combat,
     string[] Resistances,
+    ResistanceTone[] ResistanceTones,
     IReadOnlyList<StatusSheet.Line> Resources,
     IReadOnlyList<StatusSheet.Line> Skills)
 {
@@ -59,11 +63,13 @@ internal sealed record StatusSheet(
             member.Definition.PortraitFile,
             [NumberText.Of(member.Level), NumberText.Of(member.Experience), ToNextLevelText(member.Level, member.Experience, table, labels.MaxLevel)],
             ExperienceProgress(member.Level, member.Experience, table),
+            AttributesOf(sheet.Primaries, catalog.Rules.Stats, messages),
             [
                 shownVitals.Hp.Value.Text, NumberText.Of(stats.Attack), NumberText.Of(stats.Defense), Value(StatKind.Speed),
                 Value(StatKind.Accuracy), crit, Value(StatKind.Dodge), Value(StatKind.CrowdControlResistance),
             ],
             [.. Enum.GetValues<DamageType>().Select(type => Value(StatKinds.ResistanceTo(type)))],
+            [.. Enum.GetValues<DamageType>().Select(type => ToneOf(sheet.Resistances.Of(type)))],
             [.. ResourceStarts.For(member).Select(start => ResourceLine(start, member, labels))],
             [.. member.Skills.Select(skill => new Line(skill.Name, skill.Description))]);
     }
@@ -99,6 +105,21 @@ internal sealed record StatusSheet(
     /// <param name="table">How much each level takes.</param>
     internal static (int Earned, int Needed) ExperienceProgress(int level, int experience, ExperienceTable table) =>
         table.IsMaxLevel(level) ? (1, 1) : (experience, table.ExperienceToReachNext(level));
+
+    private static Attribute[] AttributesOf(PrimaryStats primaries, StatRules rules, UiMessages messages)
+    {
+        var captions = AttributeCaptions.Of(primaries, rules, messages);
+        return [.. StatKinds.Primaries.Select((kind, index) => new Attribute(NumberText.Of(primaries.ValueOf(kind)), captions[index]))];
+    }
+
+    /// <summary>A weakness below 0, at the cap or above it capped, anything else plain.</summary>
+    internal static ResistanceTone ToneOf(int permille) =>
+        permille < 0 ? ResistanceTone.Weak
+        : permille >= StatFormula.PermilleOf(Core.Stats.Resistances.CapPercent) ? ResistanceTone.Capped
+        : ResistanceTone.Plain;
+
+    /// <summary>A primary's value and what it gives.</summary>
+    public sealed record Attribute(string Value, string Caption);
 
     /// <summary>A name, and the text beside or under it.</summary>
     public sealed record Line(string Name, string Text);

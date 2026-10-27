@@ -8,9 +8,10 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// Draws a <see cref="StatusSheet"/> after the reference's Status page (decision 334): the profile beside a diamond
-/// portrait, with the experience over its bar and the experience to the next level at the bar's end; then each section
-/// under its dark band (<see cref="SectionTitle"/>): Combat beside Resistances and Resources
-/// (<see cref="StatusParametersView"/>), then the skills.
+/// portrait, with the experience over its bar and the experience to the next level at the bar's end, and the five
+/// Attributes with what each gives at the band's right; then each section under its dark band
+/// (<see cref="SectionTitle"/>): Combat beside Resistances and Resources (<see cref="StatusParametersView"/>),
+/// then the skills.
 /// </summary>
 internal sealed class StatusSheetView
 {
@@ -21,9 +22,15 @@ internal sealed class StatusSheetView
     private const int TopMargin = 20;
     private const int NamePixels = 36;
     private const int ClassPixels = 20;
-    private const int LabelPixels = 18;
-    private const int ValuePixels = 26;
-    private const float LabelSpacing = 2;
+    /// <summary>The page's small spaced-caps labels' size, shared with <see cref="StatusParametersView"/>.</summary>
+    internal const int LabelPixels = 18;
+
+    /// <summary>The page's large values' size, shared with <see cref="StatusParametersView"/>.</summary>
+    internal const int ValuePixels = 26;
+
+    /// <summary>The labels' letter spacing, shared with <see cref="StatusParametersView"/>.</summary>
+    internal const float LabelSpacing = 2;
+
     private const int PortraitSize = 160;
     private const int PortraitFrame = 2;
     private const int PortraitGap = 32;
@@ -36,11 +43,24 @@ internal sealed class StatusSheetView
     private const int BarHeight = 6;
     private const int XpBarTop = 40;
 
-    // Under the profile (its portrait and a 16 px gap), the middle band, 16 px, then Skills: room for three skills of
-    // about 70 px under their band (S1a's arithmetic; the skills view draws as many whole ones as fit).
-    private const int ProfileHeight = 176;
+    // Under the profile band (as tall as Attributes) and 16 px, the middle band, 16 px, then Skills: room for three
+    // skills of about 70 px under their band (S1a's arithmetic; the skills view draws as many whole ones as fit).
+    private const int ProfileHeight = AttributesHeight + SectionGap;
     private const int SectionGap = 16;
     private const int SkillsHeight = SectionTitle.Height + 10 + (3 * 70);
+
+    // The Attributes column at the profile band's right (S1b): 480 px wide, 40 px from the profile's text, five 34 px
+    // rows 10 px under its band, each label 12 px in, its value ending 190 px in, the caption 16 px after it in 16 px
+    // type. Its height sets the profile band's: 46 + 5 x 34 = 216, taller than the 160 px portrait.
+    private const int AttributesWidth = 480;
+    private const int AttributesGap = 40;
+    private const int AttributeRowHeight = 34;
+    private const int AttributesBelowBand = SectionTitle.Height + 10;
+    private const int AttributesHeight = AttributesBelowBand + (5 * AttributeRowHeight);
+    private const int AttributeInset = 12;
+    private const int AttributeValueRight = 190;
+    private const int CaptionGap = 16;
+    private const int CaptionPixels = 16;
 
     /// <summary>
     /// How tall the page's content is, from the area's top: what the layout test checks against the page area's height.
@@ -60,6 +80,8 @@ internal sealed class StatusSheetView
     private readonly SpriteFontBase _valueFont;
     private readonly float[] _progressLabelWidths;
     private readonly StatusParametersView _parameters;
+    private readonly SectionTitle _attributesTitle;
+    private readonly SpriteFontBase _captionFont;
     private readonly StatusSkillsView _skills;
     private readonly StatBar _xpBar;
     private MeasuredSheet? _shown;
@@ -77,6 +99,8 @@ internal sealed class StatusSheetView
         _valueFont = text.Fonts.FontAt(ValuePixels);
         _progressLabelWidths = [.. labels.Progress.Select(label => _labelFont.MeasureString(label, characterSpacing: LabelSpacing).X)];
         _parameters = new StatusParametersView(text, labels);
+        _attributesTitle = new SectionTitle(text, MessageIds.StatusAttributes);
+        _captionFont = text.Fonts.FontAt(CaptionPixels);
         _skills = new StatusSkillsView(text);
         Vitals = new MemberVitalBars(text, ui, ValuePixels);
         _xpBar = new StatBar(ui, UiTheme.XpBar);
@@ -91,7 +115,10 @@ internal sealed class StatusSheetView
     public void Show(StatusSheet sheet)
     {
         _xpBar.Show(sheet.Experience.Earned, sheet.Experience.Needed);
-        _shown = new MeasuredSheet(_nameFont.MeasureString(sheet.Name).X, MeasuredText.Of(_valueFont, sheet.Progress[NextIndex]));
+        _shown = new MeasuredSheet(
+            _nameFont.MeasureString(sheet.Name).X,
+            MeasuredText.Of(_valueFont, sheet.Progress[NextIndex]),
+            [.. sheet.Attributes.Select(attribute => MeasuredText.Of(_valueFont, attribute.Value))]);
         _parameters.Show(sheet);
     }
 
@@ -115,7 +142,7 @@ internal sealed class StatusSheetView
         _skills.Draw(batch, textures, new StatusSkillsView.Place(place.Sheet, skills), opacity);
     }
 
-    // The portrait at the left; the name and level, the class under them, then the experience over its bar.
+    // The portrait at the left; name and level, the class under them, the experience over its bar; Attributes right.
     private void DrawProfile(PageFrame page, Rectangle content, MeasuredSheet shown)
     {
         DrawPortrait(page, new Vector2(content.X + (PortraitSize / 2f), content.Y + (PortraitSize / 2f)));
@@ -125,7 +152,25 @@ internal sealed class StatusSheetView
         var levelTop = content.Y + ((_nameFont.LineHeight - _valueFont.LineHeight) / 2f);
         DrawLabeledValue(page, new Vector2(levelLeft, levelTop), LevelIndex);
         page.Write(_classFont, page.Sheet.ClassName, new Vector2(textLeft, content.Y + ClassTop), UiTheme.TextSecondary);
-        DrawExperience(page, new Rectangle(textLeft, content.Y + ExperienceTop, content.Right - textLeft, 0), shown.Next);
+        var attributes = new Rectangle(content.Right - AttributesWidth, content.Y, AttributesWidth, AttributesHeight);
+        DrawExperience(page, new Rectangle(textLeft, content.Y + ExperienceTop, attributes.X - AttributesGap - textLeft, 0), shown.Next);
+        DrawAttributes(page, attributes, shown.Attributes);
+    }
+
+    // Each primary's label, its value close to it, then what it gives in the secondary color.
+    private void DrawAttributes(PageFrame page, Rectangle section, MeasuredText[] values)
+    {
+        _attributesTitle.Draw(page.Batch, page.Textures, section, page.Opacity);
+        for (var index = 0; index < values.Length; index++)
+        {
+            var left = section.X + AttributeInset;
+            var middle = section.Y + AttributesBelowBand + (index * AttributeRowHeight) + (AttributeRowHeight / 2f);
+            page.WriteLabel(_labelFont, _labels.Attributes[index], new Vector2(left, middle - (_labelFont.LineHeight / 2f)));
+            var valueLeft = left + AttributeValueRight - values[index].Width;
+            page.Write(_valueFont, values[index].Text, new Vector2(valueLeft, middle - (_valueFont.LineHeight / 2f)), UiTheme.TextPrimary);
+            var captionTop = middle - (_captionFont.LineHeight / 2f);
+            page.Write(_captionFont, page.Sheet.Attributes[index].Caption, new Vector2(left + AttributeValueRight + CaptionGap, captionTop), UiTheme.TextSecondary);
+        }
     }
 
     // A diamond like the dialogue's, framed by a slightly larger pale diamond behind it.
@@ -177,5 +222,5 @@ internal sealed class StatusSheetView
 
     // The shown sheet's values, measured once when it is shown: the name's width places the level beside it, the
     // experience to the next level is right-aligned at the bar's end.
-    private sealed record MeasuredSheet(float NameWidth, MeasuredText Next);
+    private sealed record MeasuredSheet(float NameWidth, MeasuredText Next, MeasuredText[] Attributes);
 }

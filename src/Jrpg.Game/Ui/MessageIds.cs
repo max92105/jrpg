@@ -96,6 +96,24 @@ internal static class MessageIds
     /// <summary>Shown as the experience to the next level once a member is at the highest level.</summary>
     public const string StatusMaxLevel = "status_max_level";
 
+    /// <summary>The Status page's section of the five primaries, beside the profile.</summary>
+    public const string StatusAttributes = "status_attributes";
+
+    /// <summary>What Power gives, beside it, each value signed: "{damage} % damage".</summary>
+    public const string StatusPowerGives = "status_power_gives";
+
+    /// <summary>What Agility gives: "{crit} % crit, {dodge} % dodge".</summary>
+    public const string StatusAgilityGives = "status_agility_gives";
+
+    /// <summary>What Intelligence gives: "{status} % status".</summary>
+    public const string StatusIntelligenceGives = "status_intelligence_gives";
+
+    /// <summary>What Constitution gives: "{hp} % HP, {resist} % phys. res.".</summary>
+    public const string StatusConstitutionGives = "status_constitution_gives";
+
+    /// <summary>What Will gives: "{resist} % magic res.".</summary>
+    public const string StatusWillGives = "status_will_gives";
+
     /// <summary>The Status page's section of the numbers a fight uses.</summary>
     public const string StatusCombat = "status_combat";
 

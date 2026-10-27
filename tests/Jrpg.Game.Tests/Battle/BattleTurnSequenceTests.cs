@@ -139,7 +139,8 @@ public sealed class BattleTurnSequenceTests
         Assert.Equal(0.25f, sequence.StepShare(secondGoblin), 3);
     }
 
-    // Omer is a mage, so ending the turn gains mana: a ResourceChanged the screen must take without a beat.
+    // Omer is a mage, so ending the turn gains mana: a ResourceChanged the screen must take without a beat. He starts
+    // at 3 plus the point his Will adds (W1a), and gains 2.
     [Fact]
     public void Update_OmerEndsTurn_NoThrowAndNextActorSteps()
     {
@@ -154,7 +155,7 @@ public sealed class BattleTurnSequenceTests
 
         Assert.Equal(TurnStage.StepForward, sequence.Stage);
         Assert.Equal(BattleSide.Enemies, sequence.Actor.Side);
-        Assert.Equal(5, battle.Combatants[0].Resources.AmountOf("mana"));
+        Assert.Equal(6, battle.Combatants[0].Resources.AmountOf("mana"));
     }
 
     // Ragnir acts first; Shield Bash stuns goblin A, whose turn is skipped, so goblin B steps forward next.

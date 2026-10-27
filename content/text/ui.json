@@ -41,6 +41,8 @@
   "status_intelligence_gives": "{status} % status",
   "status_constitution_gives": "{hp} % HP, {resist} % phys. res.",
   "status_will_gives": "{resist} % magic res.",
+  "status_will_gives_resource": "{points} {resource}",
+  "status_caption_separator": ", ",
   "status_combat": "Combat",
   "status_resistances": "Resistances",
   "status_crit": "Crit",

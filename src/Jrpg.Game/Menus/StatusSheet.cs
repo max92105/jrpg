@@ -62,7 +62,7 @@ internal sealed record StatusSheet(
             member.Definition.PortraitFile,
             [NumberText.Of(member.Level), NumberText.Of(member.Experience), ToNextLevelText(member.Level, member.Experience, table, labels.MaxLevel)],
             ExperienceProgress(member.Level, member.Experience, table),
-            AttributesOf(sheet.Primaries, catalog.Rules.Stats, messages),
+            AttributesOf(sheet.Primaries, catalog.Rules.Stats, member.Class.Resources, messages),
             [
                 shownVitals.Hp.Value.Text, NumberText.Of(StatFormula.WeaponDamage(sheet)), Value(StatKind.Speed),
                 Value(StatKind.Accuracy), crit, Value(StatKind.Dodge), Value(StatKind.CrowdControlResistance),
@@ -105,9 +105,9 @@ internal sealed record StatusSheet(
     internal static (int Earned, int Needed) ExperienceProgress(int level, int experience, ExperienceTable table) =>
         table.IsMaxLevel(level) ? (1, 1) : (experience, table.ExperienceToReachNext(level));
 
-    private static Attribute[] AttributesOf(PrimaryStats primaries, StatRules rules, UiMessages messages)
+    private static Attribute[] AttributesOf(PrimaryStats primaries, StatRules rules, IReadOnlyList<ResourceDefinition> resources, UiMessages messages)
     {
-        var captions = AttributeCaptions.Of(primaries, rules, messages);
+        var captions = AttributeCaptions.Of(primaries, rules, resources, messages);
         return [.. StatKinds.Primaries.Select((kind, index) => new Attribute(NumberText.Of(primaries.ValueOf(kind)), captions[index]))];
     }
 

@@ -5,7 +5,8 @@
     "base": { "maxHp": 220, "speed": 12, "accuracy": 0, "primaries": { "power": 15, "agility": 8, "intelligence": 6, "constitution": 14, "will": 8 } },
     "growth": { "maxHp": 22, "speed": 1, "accuracy": 1, "primaries": { "power": 2, "agility": 1, "intelligence": 1, "constitution": 2, "will": 1 } },
     "skillIds": ["power_strike", "shield_bash"],
-    "resources": [ { "id": "stamina", "name": "Stamina", "color": "#E8C25A", "max": 6, "startsAt": 3, "gains": { "perTurn": 1 } } ] },
+    "resources": [ { "id": "stamina", "name": "Stamina", "color": "#E8C25A", "max": 6, "startsAt": 3, "gains": { "perTurn": 1 },
+        "willScaling": { "willPerPoint": 10, "effect": "raiseStart" } } ] },
   {
     "id": "mage", "name": "Mage",
     "description": "A scholar of the arcane who bends raw magic into fire, frost and storm.",
@@ -13,7 +14,8 @@
     "growth": { "maxHp": 12, "speed": 1, "accuracy": 1, "primaries": { "power": 2, "agility": 1, "intelligence": 2, "constitution": 1, "will": 2 } },
     "skillIds": ["fire_blast", "fireball", "meteor"],
     "resources": [
-      { "id": "mana", "name": "Mana", "color": "#5B8CFF", "max": 10, "startsAt": 3, "gains": { "perTurn": 2 } },
+      { "id": "mana", "name": "Mana", "color": "#5B8CFF", "max": 10, "startsAt": 3, "gains": { "perTurn": 2 },
+        "willScaling": { "willPerPoint": 10, "effect": "raiseStart" } },
       { "id": "clarity", "name": "Clarity", "color": "#B9C8FF", "max": 3, "startsAt": 3, "isLasting": true,
         "gains": { "perBattleFought": -1 }, "strain": { "lowersStartOf": "mana", "perMissingPoint": 1 } } ] },
   {
@@ -31,14 +33,16 @@
     "base": { "maxHp": 170, "speed": 30, "accuracy": 5, "primaries": { "power": 13, "agility": 16, "intelligence": 10, "constitution": 8, "will": 6 } },
     "growth": { "maxHp": 15, "speed": 1, "accuracy": 1, "primaries": { "power": 2, "agility": 2, "intelligence": 1, "constitution": 1, "will": 1 } },
     "skillIds": ["ready", "expose"],
-    "resources": [ { "id": "readiness", "name": "Readiness", "color": "#9AD1C9", "maxFromSpeed": { "speedPerCharge": 10 } } ] },
+    "resources": [ { "id": "readiness", "name": "Readiness", "color": "#9AD1C9", "maxFromSpeed": { "speedPerCharge": 10 },
+        "willScaling": { "willPerPoint": 10, "effect": "raiseMax" } } ] },
   {
     "id": "barbarian", "name": "Barbarian",
     "description": "A fierce brawler who turns rage into raw, unstoppable strength.",
     "base": { "maxHp": 250, "speed": 11, "accuracy": 0, "primaries": { "power": 16, "agility": 8, "intelligence": 4, "constitution": 16, "will": 6 } },
     "growth": { "maxHp": 26, "speed": 1, "accuracy": 1, "primaries": { "power": 2, "agility": 1, "intelligence": 1, "constitution": 2, "will": 1 } },
     "skillIds": ["taunt", "rampage"],
-    "resources": [ { "id": "ferocity", "name": "Ferocity", "color": "#E0533D", "max": 10, "startsAt": 0, "gains": { "perHitTaken": 2 } } ] },
+    "resources": [ { "id": "ferocity", "name": "Ferocity", "color": "#E0533D", "max": 10, "startsAt": 0, "gains": { "perHitTaken": 2 },
+        "willScaling": { "willPerPoint": 10, "effect": "raiseStart" } } ] },
   {
     "id": "paladin", "name": "Paladin",
     "description": "A holy knight bound by an oath, shield of the weak and bane of evil.",
@@ -47,14 +51,16 @@
     "skillIds": ["smite", "aura_of_protection", "wide_aura"],
     "resources": [
       { "id": "conviction", "name": "Conviction", "color": "#F2E6B0", "max": 10, "startsAt": 0,
-        "gains": { "perHeavyHit": 2, "heavyHitPercent": 20, "perEnemyFallen": 3 } } ] },
+        "gains": { "perHeavyHit": 2, "heavyHitPercent": 20, "perEnemyFallen": 3 },
+        "willScaling": { "willPerPoint": 10, "effect": "raiseStart" } } ] },
   {
     "id": "monk", "name": "Monk",
     "description": "A disciplined fighter whose body and spirit are the only weapons needed.",
     "base": { "maxHp": 190, "speed": 18, "accuracy": 5, "primaries": { "power": 14, "agility": 14, "intelligence": 8, "constitution": 10, "will": 8 } },
     "growth": { "maxHp": 18, "speed": 1, "accuracy": 1, "primaries": { "power": 2, "agility": 2, "intelligence": 1, "constitution": 1, "will": 1 } },
     "skillIds": ["palm_strike", "flurry"],
-    "resources": [ { "id": "chakra", "name": "Chakra", "color": "#5FD3E0", "max": 10, "startsAt": 0, "gains": { "perHitLanded": 1 } } ] },
+    "resources": [ { "id": "chakra", "name": "Chakra", "color": "#5FD3E0", "max": 10, "startsAt": 0, "gains": { "perHitLanded": 1 },
+        "willScaling": { "willPerPoint": 10, "effect": "raiseStart" } } ] },
   {
     "id": "warlock", "name": "Warlock",
     "description": "A seeker who made a pact with a dark patron in exchange for power.",
@@ -70,6 +76,8 @@
     "growth": { "maxHp": 16, "speed": 1, "accuracy": 1, "primaries": { "power": 2, "agility": 1, "intelligence": 2, "constitution": 1, "will": 2 } },
     "skillIds": ["rejuvenate", "rot", "equilibrium"],
     "resources": [
-      { "id": "growth", "name": "Growth", "color": "#6BC46B", "max": 10, "startsAt": 0, "dominance": { "over": "decay", "bonusPercent": 50 } },
-      { "id": "decay", "name": "Decay", "color": "#7A5A8C", "max": 10, "startsAt": 0, "dominance": { "over": "growth", "bonusPercent": 50 } } ] }
+      { "id": "growth", "name": "Growth", "color": "#6BC46B", "max": 10, "startsAt": 0, "dominance": { "over": "decay", "bonusPercent": 50 },
+        "willScaling": { "willPerPoint": 10, "effect": "raiseStart" } },
+      { "id": "decay", "name": "Decay", "color": "#7A5A8C", "max": 10, "startsAt": 0, "dominance": { "over": "growth", "bonusPercent": 50 },
+        "willScaling": { "willPerPoint": 10, "effect": "raiseStart" } } ] }
 ]

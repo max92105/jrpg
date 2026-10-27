@@ -114,6 +114,14 @@ internal static class MessageIds
     /// <summary>What Will gives: "{resist} % magic res.".</summary>
     public const string StatusWillGives = "status_will_gives";
 
+    /// <summary>
+    /// Placeholders <c>{points}</c> and <c>{resource}</c>: what Will adds to one class resource (decision 319).
+    /// </summary>
+    public const string StatusWillGivesResource = "status_will_gives_resource";
+
+    /// <summary>What joins the parts of an attribute caption.</summary>
+    public const string StatusCaptionSeparator = "status_caption_separator";
+
     /// <summary>The Status page's section of the numbers a fight uses.</summary>
     public const string StatusCombat = "status_combat";
 

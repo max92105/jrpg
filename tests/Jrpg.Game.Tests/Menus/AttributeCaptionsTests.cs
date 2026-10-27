@@ -1,3 +1,4 @@
+using Jrpg.Core.Resources;
 using Jrpg.Core.Stats;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Tests.Ui;
@@ -30,10 +31,23 @@ public sealed class AttributeCaptionsTests
     {
         var primaries = new PrimaryStats(Power: 15, Agility: 20, Intelligence: 6, Constitution: 14, Will: 8);
 
-        var captions = AttributeCaptions.Of(primaries, _rules, RepositoryScreenText.Text.Messages);
+        var captions = AttributeCaptions.Of(primaries, _rules, [], RepositoryScreenText.Text.Messages);
 
         string[] expected = ["+15 % damage", "+5 % crit, +4 % dodge", "+6 % status", "+14 % HP, +3 % phys. res.", "+2 % magic res."];
         Assert.Equal(expected, captions);
+    }
+
+    // 14 Will: 3.5 % magical resistance, shown rounded down, and one point of each resource at 10 Will per point.
+    [Fact]
+    public void Of_WillWithResourcesItRaises_NamesEachWithItsPoints()
+    {
+        var primaries = new PrimaryStats(Power: 0, Agility: 0, Intelligence: 0, Constitution: 0, Will: 14);
+        var scaling = new WillScaling(WillPerPoint: 10, WillEffect.RaiseStart);
+        ResourceDefinition[] resources = [new("growth", "Growth") { WillScaling = scaling }, new("decay", "Decay") { WillScaling = scaling }];
+
+        var captions = AttributeCaptions.Of(primaries, _rules, resources, RepositoryScreenText.Text.Messages);
+
+        Assert.Equal("+3 % magic res., +1 growth, +1 decay", captions[4]);
     }
 
     [Fact]
@@ -42,7 +56,7 @@ public sealed class AttributeCaptionsTests
         // -4 Will at 25 % per 100: -1 % magic resistance, as gear that takes Will away leaves it.
         var primaries = new PrimaryStats(Power: 0, Agility: 0, Intelligence: 0, Constitution: 0, Will: -4);
 
-        var captions = AttributeCaptions.Of(primaries, _rules, RepositoryScreenText.Text.Messages);
+        var captions = AttributeCaptions.Of(primaries, _rules, [], RepositoryScreenText.Text.Messages);
 
         Assert.Equal("-1 % magic res.", captions[4]);
         Assert.Equal("+0 % damage", captions[0]);

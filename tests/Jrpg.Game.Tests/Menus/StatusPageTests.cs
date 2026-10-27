@@ -165,6 +165,17 @@ public sealed class StatusPageTests
         Assert.Equal(expected, page.ShownSheet.Resources);
     }
 
+    // The mage's Will (14 at level 1) is one point of mana at 10 per point; the caption says so beside the number.
+    [Fact]
+    public void Open_Mage_WillCaptionNamesMana()
+    {
+        var page = NewPage(NewSession());
+
+        ShowMemberOfClass(page, "mage");
+
+        Assert.EndsWith(", +1 mana", page.ShownSheet.Attributes[4].Caption, StringComparison.Ordinal);
+    }
+
     [Fact]
     public void Open_LastingResourceSpent_ShowsItsAmountOutOfMax()
     {

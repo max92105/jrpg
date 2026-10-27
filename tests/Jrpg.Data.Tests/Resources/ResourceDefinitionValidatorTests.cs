@@ -115,6 +115,26 @@ public sealed class ResourceDefinitionValidatorTests
         Assert.EndsWith("color must be # followed by six hex digits (was '').", exception.Message, StringComparison.Ordinal);
     }
 
+    [Fact]
+    public void Validate_ZeroWillPerPoint_Throws()
+    {
+        var mana = Force("mana") with { WillScaling = new WillScaling(WillPerPoint: 0, WillEffect.RaiseStart) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("mage") with { Resources = [mana] }]));
+
+        Assert.EndsWith("resource 'mana': willScaling.willPerPoint must be at least 1 (was 0).", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Validate_WillScalingOnLasting_Throws()
+    {
+        var faith = Force("faith") with { IsLasting = true, WillScaling = new WillScaling(WillPerPoint: 10, WillEffect.RaiseMax) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("cleric") with { Resources = [faith] }]));
+
+        Assert.EndsWith("resource 'faith': willScaling isn't for a lasting resource yet.", exception.Message, StringComparison.Ordinal);
+    }
+
     // Any valid color: the other tests are about other fields.
     private const string TestColor = "#5B8CFF";
 

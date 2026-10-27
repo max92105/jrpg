@@ -34,7 +34,7 @@ internal static class ResourceDefinitionValidator
     {
         var problem =
             string.IsNullOrWhiteSpace(resource.Name) ? "name must not be empty."
-            : FindColorProblem(resource) ?? FindAmountProblem(resource) ?? FindRuleProblem(resource);
+            : FindColorProblem(resource) ?? FindAmountProblem(resource) ?? FindRuleProblem(resource) ?? FindWillProblem(resource);
         return problem is null ? null : $"resource '{resource.Id}': {problem}";
     }
 
@@ -57,6 +57,13 @@ internal static class ResourceDefinitionValidator
         : resource.Backfire is { } backfire
             && (backfire.ChancePerPointPercent is < 1 or > 100 || backfire.DamagePercentOfMaxHp is < 1 or > 100)
             ? $"backfire percents must be within 1..100 (were {backfire.ChancePerPointPercent} and {backfire.DamagePercentOfMaxHp})."
+        : null;
+
+    // A lasting resource's max lives on the member between battles; raising it with Will waits for W1b.
+    private static string? FindWillProblem(ResourceDefinition resource) =>
+        resource.WillScaling is not { } scaling ? null
+        : scaling.WillPerPoint < 1 ? $"willScaling.willPerPoint must be at least 1 (was {scaling.WillPerPoint})."
+        : resource.IsLasting ? "willScaling isn't for a lasting resource yet."
         : null;
 
     // Dominance is judged between two forces, so each must name the other.

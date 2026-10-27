@@ -31,4 +31,7 @@ public sealed record ResourceDefinition(string Id, string Name, int Max = 0, int
 
     /// <summary>Set for a force with a rival (the druid's Growth and Decay); null for a lone resource.</summary>
     public DominanceRule? Dominance { get; init; }
+
+    /// <summary>Set for a resource the holder's Will raises (decision 319); null when Will leaves it alone.</summary>
+    public WillScaling? WillScaling { get; init; }
 }

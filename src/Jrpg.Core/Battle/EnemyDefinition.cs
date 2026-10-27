@@ -33,6 +33,11 @@ public sealed record EnemyDefinition
     /// </summary>
     public required int Dodge { get; init; }
 
+    /// <summary>
+    /// The chance that its landed hit is a crit, a whole percent; a crit deals the base 150 % (decision 300).
+    /// </summary>
+    public required int CritChance { get; init; }
+
     /// <summary>The share of each damage type's hits taken off (ADR 0027); 0 for a type content leaves out.</summary>
     public Resistances Resistances { get; init; } = Resistances.None;
 

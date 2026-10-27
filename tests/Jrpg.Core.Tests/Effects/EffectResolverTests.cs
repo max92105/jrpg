@@ -10,7 +10,7 @@ public sealed class EffectResolverTests
     {
         var target = new Vitals(hp: 40, maxHp: 40);
 
-        var amount = EffectResolver.Apply(new Effect(EffectKind.Damage, Power: 20, Targeting.SingleEnemy), target, Mitigation.None);
+        var amount = EffectResolver.Apply(new Effect(EffectKind.Damage, Power: 20, Targeting.SingleEnemy), target, DamageFormula.NormalHit, Mitigation.None);
 
         Assert.Equal(20, amount);
         Assert.Equal(20, target.Hp);
@@ -21,7 +21,7 @@ public sealed class EffectResolverTests
     {
         var target = new Vitals(hp: 100, maxHp: 100);
 
-        var amount = EffectResolver.Apply(new Effect(EffectKind.RestoreHp, Power: 15, Targeting.SingleAlly), target, Mitigation.None);
+        var amount = EffectResolver.Apply(new Effect(EffectKind.RestoreHp, Power: 15, Targeting.SingleAlly), target, DamageFormula.NormalHit, Mitigation.None);
 
         Assert.Equal(0, amount);
     }
@@ -31,7 +31,7 @@ public sealed class EffectResolverTests
     {
         var target = new Vitals(hp: 0, maxHp: 100);
 
-        var amount = EffectResolver.Apply(new Effect(EffectKind.Revive, Power: 15, Targeting.SingleFallenAlly), target, Mitigation.None);
+        var amount = EffectResolver.Apply(new Effect(EffectKind.Revive, Power: 15, Targeting.SingleFallenAlly), target, DamageFormula.NormalHit, Mitigation.None);
 
         Assert.Equal(15, amount);
         Assert.True(target.IsAlive);

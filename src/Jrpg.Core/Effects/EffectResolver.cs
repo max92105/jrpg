@@ -8,10 +8,13 @@ internal static class EffectResolver
     /// <returns>The amount actually applied: HP lost, restored or revived with; 0 for a status-only effect.</returns>
     /// <param name="effect">What lands.</param>
     /// <param name="target">Whose HP it changes.</param>
+    /// <param name="critPermille">
+    /// A damage hit's crit damage, or <see cref="DamageFormula.NormalHit"/>; only damage crits (decision 325).
+    /// </param>
     /// <param name="mitigation">What stands between a hit and the target's HP now.</param>
-    public static int Apply(Effect effect, Vitals target, Mitigation mitigation) => effect.Kind switch
+    public static int Apply(Effect effect, Vitals target, int critPermille, Mitigation mitigation) => effect.Kind switch
     {
-        EffectKind.Damage => target.TakeDamage(DamageFormula.Calculate(effect.Power, mitigation)),
+        EffectKind.Damage => target.TakeDamage(DamageFormula.Calculate(effect.Power, critPermille, mitigation)),
         EffectKind.RestoreHp => target.RestoreHp(effect.Power),
         EffectKind.Revive => target.Revive(effect.Power),
         EffectKind.GrantStatus => 0,

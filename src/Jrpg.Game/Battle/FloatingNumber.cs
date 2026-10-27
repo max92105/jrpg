@@ -26,18 +26,25 @@ internal readonly record struct FloatingNumber(Combatant Target, string Text, Fl
     /// <summary>Less than the 48 px text, so a stack stays close; the outline keeps the numbers apart.</summary>
     public const float StackSpacing = 36;
 
+    // Placeholder: a crit's number is drawn this much bigger than a normal one, so it stands out at a glance.
+    private const float CriticalSize = 1.4f;
+
     private const float PopStartScale = 0.6f;
     private static readonly TimeSpan _pop = TimeSpan.FromSeconds(0.18);
     private static readonly TimeSpan _life = TimeSpan.FromSeconds(1.6);
 
-    /// <summary>White for damage, green for healing, purple for Poison's tick.</summary>
+    /// <summary>White for damage, gold for a crit, green for healing, purple for Poison's tick.</summary>
     public static Color ColorOf(FloatingNumberTone tone) => tone switch
     {
         FloatingNumberTone.Damage => UiTheme.TextPrimary,
+        FloatingNumberTone.Critical => UiTheme.FloatingCritical,
         FloatingNumberTone.Heal => UiTheme.FloatingHeal,
         FloatingNumberTone.Poison => UiTheme.FloatingPoison,
         _ => throw new ArgumentOutOfRangeException(nameof(tone), tone, null),
     };
+
+    /// <summary>How much bigger than a normal number one of this tone is drawn: a crit's, else 1.</summary>
+    public static float SizeOf(FloatingNumberTone tone) => tone == FloatingNumberTone.Critical ? CriticalSize : 1;
 
     /// <param name="sinceShown">Time since the number appeared.</param>
     public static FloatingNumberLook At(TimeSpan sinceShown)

@@ -5,11 +5,10 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/H1.md, slice H1 (accuracy against dodge: HitFormula,
-ChanceRolls, HitMissed, enemy accuracy/dodge in content, "Miss" cue)
-Round: 1 (verdict: Ready to commit; verify all pass, 2487 tests)
+Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/H2.md, slice H2 (critical hits: CombatStats crit fields,
+DamageFormula crit factor, EffectLanding crit roll, EffectApplied.IsCritical, Critical tone 1.4x gold)
+Round: 1 (verdict: Ready to commit; verify all pass, 2502 tests)
 
-- W1 MemberBattleStats.cs:22 / Combatant.cs:87 accuracy copy untested: builder accuracy 100 == CombatStats default 1000, so dropping either line passes every test; open (warning)
-- S1 CombatStatsTests.cs:7 comment says "A record, not a struct"; the summary says "A class, not a struct"; open (suggestion)
-- S2 HitFormula.cs:17 CeilingPercent has no doc while FloorPercent does; open (suggestion)
-- S3 no test for a multi-hit damage effect with one hit landed and one missed still granting its status; open (suggestion)
+- W1 MemberBattleStats.cs:25 CritDamagePermille copy untested: Neutral rules' CritDamagePercentPer100Power 0 gives 1500 == CombatStats default, so dropping the line passes every test; open (warning)
+- S1 DamageFormula.cs:165,167 empty <param name="power"> and <param name="mitigation"> tags (added only to satisfy CS1573); fill them; open (suggestion)
+- S2 FloatingNumberTests SizeOf_Critical_IsBiggerThanDamage asserts two things; split or pin 1.4; open (suggestion)

@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Draws the last action's numbers over their targets (48 px, outlined): colored by what they report
+/// Draws the last action's numbers over their targets (48 px, outlined; a crit's bigger): colored by what they report
 /// (<see cref="FloatingNumber.ColorOf"/>), with a smaller "WEAK" or "RESISTED" cue beside a number its affinity marks.
 /// Each turn's numbers are measured once, when its playback starts.
 /// </summary>
@@ -64,11 +64,12 @@ internal sealed class FloatingNumbersView
                 continue;
             }
 
+            var scale = look.Scale * FloatingNumber.SizeOf(number.Tone);
             var center = new Vector2(_battlers.SpotOf(number.Target).Center.X, _battlers.TopOf(textures, number.Target) - look.Rise - (number.Stack * FloatingNumber.StackSpacing));
-            _font.DrawCentered(batch, _measured[index], center, (FloatingNumber.ColorOf(number.Tone) * look.Opacity, look.Scale));
+            _font.DrawCentered(batch, _measured[index], center, (FloatingNumber.ColorOf(number.Tone) * look.Opacity, scale));
             if (number.Affinity != HitAffinity.Neutral)
             {
-                DrawCue(batch, number.Affinity, center + new Vector2(_measured[index].Width * look.Scale / 2, 0), look);
+                DrawCue(batch, number.Affinity, center + new Vector2(_measured[index].Width * scale / 2, 0), look);
             }
         }
     }

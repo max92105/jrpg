@@ -132,11 +132,11 @@ internal sealed class ActionPlayback
         }
     }
 
-    private static FloatingNumberTone ToneOf(EffectKind kind) => kind switch
+    private static FloatingNumberTone ToneOf(EffectApplied effect) => effect.Kind switch
     {
-        EffectKind.Damage => FloatingNumberTone.Damage,
+        EffectKind.Damage => effect.IsCritical ? FloatingNumberTone.Critical : FloatingNumberTone.Damage,
         EffectKind.RestoreHp or EffectKind.Revive => FloatingNumberTone.Heal,
-        _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "An effect with no amount to show."),
+        _ => throw new ArgumentOutOfRangeException(nameof(effect), effect.Kind, "An effect with no amount to show."),
     };
 
     // Only damage has an animation so far: the attacker's strip (decision 101). Anything else gets a cue with the action's name.
@@ -145,7 +145,7 @@ internal sealed class ActionPlayback
     {
         var stack = _numbers.Count(number => number.Target == effect.Target && number.ShowsAt == TimeSpan.Zero);
         var affinity = stack == 0 ? effect.Affinity : HitAffinity.Neutral;
-        _numbers.Add(new FloatingNumber(effect.Target, NumberText.Of(effect.Amount), ToneOf(effect.Kind), Stack: stack, Affinity: affinity));
+        _numbers.Add(new FloatingNumber(effect.Target, NumberText.Of(effect.Amount), ToneOf(effect), Stack: stack, Affinity: affinity));
         if (effect.Kind == EffectKind.Damage && _attackEffectFile is { } file)
         {
             // A multi-hit plays one strip on its target, as its hits make one impact.

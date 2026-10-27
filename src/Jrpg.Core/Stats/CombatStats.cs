@@ -21,6 +21,16 @@ public sealed record CombatStats(int AttackDamage)
     /// <summary>How much a foe's hit chance drops, in permille.</summary>
     public int DodgePermille { get; init; }
 
+    /// <summary>
+    /// The chance that a landed hit is a crit, in permille: Agility's for a member, content's for an enemy.
+    /// </summary>
+    public int CritChancePermille { get; init; }
+
+    /// <summary>
+    /// What a crit's power is multiplied by, in permille: the base 150 % raised by Power for a member (decision 300).
+    /// </summary>
+    public int CritDamagePermille { get; init; } = StatFormula.PermilleOf(StatFormula.BaseCritDamagePercent);
+
     /// <summary>What the combatant's basic attack hits as (ADR 0027).</summary>
     public DamageType AttackType { get; init; } = DamageType.Blunt;
 

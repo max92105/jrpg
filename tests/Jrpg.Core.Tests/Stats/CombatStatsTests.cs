@@ -12,4 +12,13 @@ public sealed class CombatStatsTests
         Assert.Equal(1000, stats.AccuracyPermille);
         Assert.Equal(0, stats.DodgePermille);
     }
+
+    [Fact]
+    public void New_NothingGiven_NeverCritsAtTheBaseCritDamage()
+    {
+        var stats = new CombatStats(AttackDamage: 10);
+
+        Assert.Equal(0, stats.CritChancePermille);
+        Assert.Equal(1500, stats.CritDamagePermille);
+    }
 }

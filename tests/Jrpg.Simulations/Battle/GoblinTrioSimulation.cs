@@ -47,17 +47,15 @@ public sealed class GoblinTrioSimulation(ITestOutputHelper output)
         var battle = BattleState.Start(party, enemies, new Inventory(), random);
         var tactics = new EnemyTactics(random);
 
-        var (turns, attacks, misses) = (0, 0, 0);
+        var turns = 0;
+        var hits = HitTally.None;
         for (; turns < TurnLimit && !battle.IsOver; turns++)
         {
             var command = battle.Phase == BattlePhase.PartyTurn ? AttackFirstLivingEnemyPolicy.ChooseCommand(battle) : tactics.ChooseCommand(battle);
-            var events = battle.Execute(command);
-            var missed = events.OfType<HitMissed>().Count();
-            attacks += events.OfType<EffectApplied>().Count(landed => landed.Kind == EffectKind.Damage) + missed;
-            misses += missed;
+            hits = hits.Plus(HitTally.Of(battle.Execute(command)));
         }
 
-        return new BattleResult(seed, battle.Phase, turns, leader.Vitals.Hp, attacks, misses);
+        return new BattleResult(seed, battle.Phase, turns, leader.Vitals.Hp, hits);
     }
 
     private void WriteSummary(string classId, IReadOnlyList<BattleResult> results)
@@ -68,9 +66,26 @@ public sealed class GoblinTrioSimulation(ITestOutputHelper output)
         output.WriteLine($"{EncounterId}, a level 1 {classId} alone, attack only, {Battles} seeds");
         output.WriteLine(Invariant($"  Win rate          {100.0 * wins.Count / results.Count,6:F1} %"));
         output.WriteLine(Invariant($"  Average turns     {results.Average(result => result.Turns),6:F1}"));
-        output.WriteLine(Invariant($"  Attacks missed    {100.0 * results.Sum(result => result.Misses) / results.Sum(result => result.Attacks),6:F1} % (both sides)"));
+        var hits = results.Select(result => result.Hits).Aggregate(HitTally.None, (total, tally) => total.Plus(tally));
+        output.WriteLine(Invariant($"  Attacks missed    {100.0 * hits.Misses / hits.Attacks,6:F1} % (both sides)"));
+        output.WriteLine(Invariant($"  Hits critical     {100.0 * hits.Crits / (hits.Attacks - hits.Misses),6:F1} % (both sides)"));
         output.WriteLine($"  Average HP left   {hpLeft,6} (wins only)");
     }
 
-    private sealed record BattleResult(int Seed, BattlePhase Phase, int Turns, int LeaderHpLeft, int Attacks, int Misses);
+    private sealed record BattleResult(int Seed, BattlePhase Phase, int Turns, int LeaderHpLeft, HitTally Hits);
+
+    /// <summary>Both sides' attacks, the ones that missed and the landed ones that crit.</summary>
+    private sealed record HitTally(int Attacks, int Misses, int Crits)
+    {
+        public static HitTally None { get; } = new(0, 0, 0);
+
+        public static HitTally Of(IReadOnlyList<BattleEvent> events)
+        {
+            var landed = events.OfType<EffectApplied>().Where(effect => effect.Kind == EffectKind.Damage).ToList();
+            var misses = events.OfType<HitMissed>().Count();
+            return new HitTally(landed.Count + misses, misses, landed.Count(effect => effect.IsCritical));
+        }
+
+        public HitTally Plus(HitTally other) => new(Attacks + other.Attacks, Misses + other.Misses, Crits + other.Crits);
+    }
 }

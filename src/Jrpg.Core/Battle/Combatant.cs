@@ -63,6 +63,7 @@ public sealed class Combatant
             AttackType = enemy.DamageType,
             AccuracyPermille = StatFormula.PermilleOf(enemy.Accuracy),
             DodgePermille = StatFormula.PermilleOf(enemy.Dodge),
+            CritChancePermille = StatFormula.PermilleOf(enemy.CritChance),
             Resistances = enemy.Resistances,
         },
         new Vitals(enemy.MaxHp, enemy.MaxHp))

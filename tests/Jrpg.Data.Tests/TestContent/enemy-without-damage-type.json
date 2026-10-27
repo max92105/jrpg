@@ -10,6 +10,7 @@
     "damage": 9,
     "accuracy": 85,
     "dodge": 5,
+    "critChance": 5,
     "experienceReward": 40
   }
 ]

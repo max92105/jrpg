@@ -21,6 +21,8 @@ internal static class MemberBattleStats
             DamagePermille = sheet.DamagePermille,
             AccuracyPermille = sheet.AccuracyPermille,
             DodgePermille = sheet.DodgePermille,
+            CritChancePermille = sheet.CritChancePermille,
+            CritDamagePermille = sheet.CritDamagePermille,
             AttackType = member.Weapon?.Equipment?.DamageType ?? member.Rules.UnarmedDamageType,
             Resistances = sheet.Resistances,
         };

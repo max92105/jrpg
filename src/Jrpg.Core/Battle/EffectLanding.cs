@@ -6,11 +6,11 @@ namespace Jrpg.Core.Battle;
 
 /// <summary>
 /// An effect landing on its targets, in order: each of its hits, the status it grants to a target still standing, and
-/// what a fall sets off (ADR 0019, ADR 0021). A damaging hit rolls to land first (decision 325); one that misses is no
-/// hit at all, and a damage effect that missed every hit leaves no status behind (decision 326).
+/// what a fall sets off (ADR 0019, ADR 0021). A damaging hit rolls to land first, then to crit (decision 325); one that
+/// misses is no hit at all, and a damage effect that missed every hit leaves no status behind (decision 326).
 /// </summary>
 /// <param name="combatants">Everyone in the battle, for the triggers a fall sets off.</param>
-/// <param name="rolls">The battle's rolls, for whether each hit lands.</param>
+/// <param name="rolls">The battle's rolls, for whether each hit lands and crits.</param>
 internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceRolls rolls)
 {
     /// <param name="actor">Who used it, for the gains a landed hit triggers.</param>
@@ -72,11 +72,13 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceR
             }
 
             hasLanded = true;
+            var isCritical = effect.Kind == EffectKind.Damage && rolls.Succeeds(actor.CurrentStats.CritChancePermille);
             var mitigation = MitigationOf(target, effect.DamageType);
-            var amount = EffectResolver.Apply(effect, target.Vitals, mitigation);
+            var crit = isCritical ? actor.CurrentStats.CritDamagePermille : DamageFormula.NormalHit;
+            var amount = EffectResolver.Apply(effect, target.Vitals, crit, mitigation);
             if (effect.Kind != EffectKind.GrantStatus)
             {
-                events.Add(new EffectApplied(target, effect.Kind, amount, AffinityOf(effect.Kind, mitigation)));
+                events.Add(new EffectApplied(target, effect.Kind, amount, AffinityOf(effect.Kind, mitigation), isCritical));
             }
 
             if (effect.Kind == EffectKind.Damage)

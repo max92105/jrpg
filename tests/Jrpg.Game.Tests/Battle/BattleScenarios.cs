@@ -21,13 +21,21 @@ internal static class BattleScenarios
     public static ContentCatalog Catalog { get; } = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
     /// <summary>
-    /// The repository's rules with every hit certain: accuracy 100 against the scenario goblin's 0 dodge, and no dodge
-    /// on a member, so a seeded scenario draws nothing for its hits and keeps its sequence (ADR 0026).
+    /// The repository's rules with every hit certain and no crit: accuracy 100 against the scenario goblin's 0 dodge,
+    /// no dodge and no crit chance on a member, so a seeded scenario draws nothing for its hits and keeps its sequence
+    /// (ADR 0026).
     /// </summary>
-    public static StatRules CertainRules { get; } = Catalog.Rules.Stats with { BaseAccuracy = 100, BaseDodge = 0, DodgePer100Agility = 0 };
+    public static StatRules CertainRules { get; } = Catalog.Rules.Stats with
+    {
+        BaseAccuracy = 100,
+        BaseDodge = 0,
+        DodgePer100Agility = 0,
+        BaseCritChance = 0,
+        CritChancePer100Agility = 0,
+    };
 
-    /// <summary>The repository's goblin, hitting for certain and never dodging.</summary>
-    public static EnemyDefinition Goblin { get; } = Catalog.Enemies["goblin"] with { Accuracy = 100, Dodge = 0 };
+    /// <summary>The repository's goblin, hitting for certain, never dodging and never critting.</summary>
+    public static EnemyDefinition Goblin { get; } = Catalog.Enemies["goblin"] with { Accuracy = 100, Dodge = 0, CritChance = 0 };
 
     /// <summary>
     /// A member of the repository's content as they join: level 1, with their class's numbers under

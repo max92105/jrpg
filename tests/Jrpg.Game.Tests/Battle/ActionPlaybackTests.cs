@@ -209,6 +209,14 @@ public sealed class ActionPlaybackTests
     }
 
     [Fact]
+    public void Start_CriticalHit_UsesCriticalTone()
+    {
+        var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), new EffectApplied(_goblin, EffectKind.Damage, 19, IsCritical: true)]);
+
+        Assert.Equal([new FloatingNumber(_goblin, "19", FloatingNumberTone.Critical)], playback.Numbers);
+    }
+
+    [Fact]
     public void Start_AttackLanded_PlaysAttackersStripOnTarget()
     {
         var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), new EffectApplied(_goblin, EffectKind.Damage, 13)]);

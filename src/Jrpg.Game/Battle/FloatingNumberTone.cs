@@ -6,6 +6,9 @@ internal enum FloatingNumberTone
     /// <summary>HP lost to a hit or a backfire.</summary>
     Damage,
 
+    /// <summary>HP lost to a hit that crit: bigger, in the critical color.</summary>
+    Critical,
+
     /// <summary>HP restored or revived with, Regen included.</summary>
     Heal,
 

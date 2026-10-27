@@ -7,7 +7,7 @@ public sealed class DamageFormulaTests
     [Fact]
     public void Calculate_NothingInTheWay_LandsThePower()
     {
-        var damage = DamageFormula.Calculate(power: 20, Mitigation.None);
+        var damage = DamageFormula.Calculate(power: 20, DamageFormula.NormalHit, Mitigation.None);
 
         Assert.Equal(20, damage);
     }
@@ -16,7 +16,7 @@ public sealed class DamageFormulaTests
     [Fact]
     public void Calculate_OnePowerAtCap_ReturnsMinimumDamage()
     {
-        var damage = DamageFormula.Calculate(power: 1, new Mitigation(ResistancePermille: 750, ExtraTakenPermille: 0));
+        var damage = DamageFormula.Calculate(power: 1, DamageFormula.NormalHit, new Mitigation(ResistancePermille: 750, ExtraTakenPermille: 0));
 
         Assert.Equal(DamageFormula.MinimumDamage, damage);
     }
@@ -24,7 +24,7 @@ public sealed class DamageFormulaTests
     [Fact]
     public void Calculate_Exposed50_RaisesByHalf()
     {
-        var damage = DamageFormula.Calculate(power: 20, new Mitigation(ResistancePermille: 0, ExtraTakenPermille: 500));
+        var damage = DamageFormula.Calculate(power: 20, DamageFormula.NormalHit, new Mitigation(ResistancePermille: 0, ExtraTakenPermille: 500));
 
         Assert.Equal(30, damage);
     }
@@ -32,7 +32,7 @@ public sealed class DamageFormulaTests
     [Fact]
     public void Calculate_FiftyPercentResistance_Halves()
     {
-        var damage = DamageFormula.Calculate(power: 40, new Mitigation(ResistancePermille: 500, ExtraTakenPermille: 0));
+        var damage = DamageFormula.Calculate(power: 40, DamageFormula.NormalHit, new Mitigation(ResistancePermille: 500, ExtraTakenPermille: 0));
 
         Assert.Equal(20, damage);
     }
@@ -40,7 +40,7 @@ public sealed class DamageFormulaTests
     [Fact]
     public void Calculate_NegativeResistance_RaisesDamage()
     {
-        var damage = DamageFormula.Calculate(power: 40, new Mitigation(ResistancePermille: -250, ExtraTakenPermille: 0));
+        var damage = DamageFormula.Calculate(power: 40, DamageFormula.NormalHit, new Mitigation(ResistancePermille: -250, ExtraTakenPermille: 0));
 
         Assert.Equal(50, damage);
     }
@@ -49,7 +49,7 @@ public sealed class DamageFormulaTests
     [Fact]
     public void Calculate_ResistanceAboveCap_UsesCap()
     {
-        var damage = DamageFormula.Calculate(power: 40, new Mitigation(ResistancePermille: 900, ExtraTakenPermille: 0));
+        var damage = DamageFormula.Calculate(power: 40, DamageFormula.NormalHit, new Mitigation(ResistancePermille: 900, ExtraTakenPermille: 0));
 
         Assert.Equal(10, damage);
     }
@@ -58,7 +58,7 @@ public sealed class DamageFormulaTests
     [Fact]
     public void Calculate_ResistanceAndExposed_RoundsDownOnce()
     {
-        var damage = DamageFormula.Calculate(power: 41, new Mitigation(ResistancePermille: 250, ExtraTakenPermille: 500));
+        var damage = DamageFormula.Calculate(power: 41, DamageFormula.NormalHit, new Mitigation(ResistancePermille: 250, ExtraTakenPermille: 500));
 
         Assert.Equal(46, damage);
     }
@@ -67,9 +67,37 @@ public sealed class DamageFormulaTests
     [Fact]
     public void Calculate_WeaknessBelowFloor_UsesFloor()
     {
-        var damage = DamageFormula.Calculate(power: 40, new Mitigation(ResistancePermille: -1500, ExtraTakenPermille: 0));
+        var damage = DamageFormula.Calculate(power: 40, DamageFormula.NormalHit, new Mitigation(ResistancePermille: -1500, ExtraTakenPermille: 0));
 
         Assert.Equal(80, damage);
+    }
+
+    // Base crit damage (decision 300): half again.
+    [Fact]
+    public void Calculate_Crit150_RaisesHalf()
+    {
+        var damage = DamageFormula.Calculate(power: 20, critPermille: 1500, Mitigation.None);
+
+        Assert.Equal(30, damage);
+    }
+
+    // 41 × 1.5 × 0.75 = 46.125, rounded down once to 46; rounding the crit first would give 61, then 45.
+    [Fact]
+    public void Calculate_CritThenResistance_RoundsDownOnce()
+    {
+        var damage = DamageFormula.Calculate(power: 41, critPermille: 1500, new Mitigation(ResistancePermille: 250, ExtraTakenPermille: 0));
+
+        Assert.Equal(46, damage);
+    }
+
+    // The product of the four factors passes 2^31 (999 × 6495 × 2000 × 2000), so the long intermediate is what keeps
+    // 999 × 6.495 × 2 × 2 = 25,954.02 right.
+    [Fact]
+    public void Calculate_Power999CritExposedWeakness_DoesNotOverflow()
+    {
+        var damage = DamageFormula.Calculate(power: 999, critPermille: 6495, new Mitigation(ResistancePermille: -1000, ExtraTakenPermille: 1000));
+
+        Assert.Equal(25954, damage);
     }
 
     [Fact]

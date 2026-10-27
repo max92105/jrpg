@@ -11,6 +11,7 @@ internal sealed class EnemyDefinitionBuilder
     private DamageType _damageType = DamageType.Blunt;
     private Resistances _resistances = Resistances.None;
     private int _dodge;
+    private int _critChance;
     private int _accuracy = 100;
 
     public EnemyDefinitionBuilder WithName(string name)
@@ -35,6 +36,12 @@ internal sealed class EnemyDefinitionBuilder
     public EnemyDefinitionBuilder WithAccuracy(int accuracy)
     {
         _accuracy = accuracy;
+        return this;
+    }
+
+    public EnemyDefinitionBuilder WithCritChance(int critChance)
+    {
+        _critChance = critChance;
         return this;
     }
 
@@ -63,6 +70,7 @@ internal sealed class EnemyDefinitionBuilder
         DamageType = _damageType,
         Accuracy = _accuracy,
         Dodge = _dodge,
+        CritChance = _critChance,
         Resistances = _resistances,
         ExperienceReward = 40,
     };

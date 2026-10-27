@@ -70,6 +70,9 @@ internal static partial class UiTheme
     /// <summary>The floating number on a Poison tick: purple, like the druid's Decay.</summary>
     public static Color FloatingPoison { get; } = FromStraightArgb(0xFFB27AD6);
 
+    /// <summary>The floating number on a crit: warm gold (placeholder).</summary>
+    public static Color FloatingCritical { get; } = FromStraightArgb(0xFFF2C14E);
+
     /// <summary>The battle banner's dark band, fading out at both ends.</summary>
     public static ImmutableArray<GradientStop> Banner { get; } =
         [new(0, FromStraightArgb(0x00101320)), new(0.25f, FromStraightArgb(0xE6101320)), new(0.75f, FromStraightArgb(0xE6101320)), new(1, FromStraightArgb(0x00101320))];

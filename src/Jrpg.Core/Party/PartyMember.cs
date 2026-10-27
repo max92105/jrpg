@@ -22,8 +22,7 @@ public sealed class PartyMember
         Level = 1;
         var stats = ClassGrowth.StatsAt(characterClass, Level);
         TakeClassStats(stats);
-        var maxHp = MaxHpOf(stats);
-        Vitals = new Vitals(maxHp, maxHp);
+        Vitals = new Vitals(Sheet.MaxHp, Sheet.MaxHp);
         _lastingAmounts = characterClass.Resources
             .Where(resource => resource.IsLasting)
             .ToDictionary(resource => resource.Id, resource => resource.StartsAt);
@@ -42,11 +41,11 @@ public sealed class PartyMember
 
     public CombatStats BaseStats { get; private set; }
 
-    /// <summary>The class's speed at the member's level; it sets readiness charges (question 213).</summary>
-    public int Speed { get; private set; }
-
-    /// <summary>The class's primaries at the member's level (ADR 0026).</summary>
-    public PrimaryStats Primaries { get; private set; }
+    /// <summary>
+    /// The member's numbers at their level (ADR 0026): primaries, max HP, speed (it sets readiness charges, question
+    /// 213) and the derived percents. Rebuilt on level-up.
+    /// </summary>
+    public StatSheet Sheet { get; private set; }
 
     public Vitals Vitals { get; }
 
@@ -86,7 +85,7 @@ public sealed class PartyMember
         Experience = progress.Experience;
         var stats = ClassGrowth.StatsAt(Class, Level);
         TakeClassStats(stats);
-        Vitals.ResizeMax(MaxHpOf(stats));
+        Vitals.ResizeMax(Sheet.MaxHp);
 
         // A recruit is standing at full HP: fill it to the new max, then take off what the save had lost.
         Vitals.RestoreHp(Vitals.MaxHp);
@@ -218,15 +217,12 @@ public sealed class PartyMember
     }
 
     // The class's numbers at the member's level, the one formula (ADR 0017).
-    [MemberNotNull(nameof(BaseStats), nameof(Primaries))]
+    [MemberNotNull(nameof(BaseStats), nameof(Sheet))]
     private void TakeClassStats(ClassStats stats)
     {
         BaseStats = new CombatStats(stats.Attack, stats.Defense);
-        Speed = stats.Speed;
-        Primaries = stats.Primaries;
+        Sheet = MemberSheet.Of(stats, _rules);
     }
-
-    private int MaxHpOf(ClassStats stats) => StatFormula.MaxHp(stats.MaxHp, stats.Primaries.Constitution, _rules);
 
     private static int AttackBonusOf(ItemDefinition? item) => item?.Equipment?.AttackBonus ?? 0;
 
@@ -257,6 +253,6 @@ public sealed class PartyMember
         Experience = 0;
         var after = ClassGrowth.StatsAt(Class, Level);
         TakeClassStats(after);
-        Vitals.RaiseMaxima(MaxHpOf(after) - Vitals.MaxHp);
+        Vitals.RaiseMaxima(Sheet.MaxHp - Vitals.MaxHp);
     }
 }

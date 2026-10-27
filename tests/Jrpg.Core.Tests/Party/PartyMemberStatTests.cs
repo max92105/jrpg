@@ -22,7 +22,7 @@ public sealed class PartyMemberStatTests
         .WithPrimaries(new PrimaryStats(0, 0, 0, 20, 0), new PrimaryStats(0, 0, 0, 10, 0))
         .Build();
 
-    private static readonly StatRules _rules = new(HpPercentPer100Constitution: 100);
+    private static readonly StatRules _rules = TestStatRules.Neutral with { HpPercentPer100Constitution = 100 };
 
     [Fact]
     public void BaseStats_RestoredAtLevelThree_AreTheClassAtThree()
@@ -125,7 +125,7 @@ public sealed class PartyMemberStatTests
 
         // Level 2: the class's 220 HP raised 30 % by 30 Constitution.
         Assert.Equal((286, 286), (member.Vitals.Hp, member.Vitals.MaxHp));
-        Assert.Equal(30, member.Primaries.Constitution);
+        Assert.Equal(30, member.Sheet.Primaries.Constitution);
     }
 
     [Fact]
@@ -137,7 +137,21 @@ public sealed class PartyMemberStatTests
         member.RestoreProgress(progress);
 
         Assert.Equal((260, 286), (member.Vitals.Hp, member.Vitals.MaxHp));
-        Assert.Equal(30, member.Primaries.Constitution);
+        Assert.Equal(30, member.Sheet.Primaries.Constitution);
+    }
+
+    [Fact]
+    public void GainExperience_LevelUp_RaisesCritChanceWithAgility()
+    {
+        var nimbleClass = new ClassBuilder().WithPrimaries(new PrimaryStats(0, 20, 0, 0, 0), new PrimaryStats(0, 4, 0, 0, 0)).Build();
+        var rules = TestStatRules.Neutral with { CritChancePer100Agility = 25 };
+        var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), nimbleClass, new Dictionary<string, SkillDefinition>(), rules);
+        Assert.Equal(50, member.Sheet.CritChancePermille);
+
+        member.GainExperience(100, new ExperienceTable([100, 100]));
+
+        // 24 Agility at +1 % per 4 points.
+        Assert.Equal(60, member.Sheet.CritChancePermille);
     }
 
     private static void Equip(PartyMember member, ItemDefinition item)

@@ -144,7 +144,7 @@ public sealed class StatusPageTests
 
         page.Open();
 
-        Assert.Equal(NumberText.Of(session.Party.Leader.Speed), page.ShownSheet.Speed);
+        Assert.Equal(NumberText.Of(session.Party.Leader.Sheet.Speed), page.ShownSheet.Speed);
     }
 
     [Fact]
@@ -181,7 +181,7 @@ public sealed class StatusPageTests
         ShowMemberOfClass(page, "rogue");
 
         var readiness = page.Shown.Class.Resources.Single(resource => resource.Id == "readiness");
-        var charges = ReadinessFormula.Charges(page.Shown.Speed, readiness.MaxFromSpeed!.SpeedPerCharge);
+        var charges = ReadinessFormula.Charges(page.Shown.Sheet.Speed, readiness.MaxFromSpeed!.SpeedPerCharge);
         Assert.Equal(new StatusSheet.Line(readiness.Name.ToUpperInvariant(), NumberText.Of(charges)), page.ShownSheet.Resources[0]);
     }
 

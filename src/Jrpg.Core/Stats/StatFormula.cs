@@ -2,10 +2,19 @@ namespace Jrpg.Core.Stats;
 
 /// <summary>
 /// The primaries-to-derived conversions, in one place (ADR 0026). Each is a percent per point with no level divisor,
-/// applied to a base that grows, so a point keeps its worth at every level; each rounds down once, at the end.
+/// applied to a base that grows, so a point keeps its worth at every level; each rounds down once, at the end. Derived
+/// percents are in permille (tenths of a percent), so a small bonus still moves the number.
 /// </summary>
 public static class StatFormula
 {
+    /// <summary>A crit's damage before Power: half again a normal hit (decision 300).</summary>
+    public const int BaseCritDamagePercent = 150;
+
+    /// <summary>The most dodge anyone has, so no one is out of reach (decision 295).</summary>
+    public const int DodgeCapPercent = 50;
+
+    private const int PermillePerPercent = 10;
+
     // Rates are percents per 100 points, so a percent per point is rate / 100 and the whole factor is over 100 x 100.
     private const long PercentPerPointScale = 100L * 100;
 
@@ -17,4 +26,40 @@ public static class StatFormula
     /// </summary>
     public static int MaxHp(int classMaxHp, int constitution, StatRules rules) =>
         (int)(classMaxHp * (PercentPerPointScale + ((long)constitution * rules.HpPercentPer100Constitution)) / PercentPerPointScale);
+
+    /// <summary>
+    /// The rules' base accuracy plus the class's points, in permille: the hit chance against 0 dodge (decision 297).
+    /// </summary>
+    public static int AccuracyPermille(int classAccuracy, StatRules rules) =>
+        (rules.BaseAccuracy + classAccuracy) * PermillePerPercent;
+
+    /// <summary>The base crit chance plus Agility's percent, in permille: 20 Agility at 25 per 100 adds 5 %.</summary>
+    public static int CritChancePermille(int agility, StatRules rules) =>
+        (rules.BaseCritChance * PermillePerPercent) + PerPointPermille(agility, rules.CritChancePer100Agility);
+
+    /// <summary>A crit's damage, 150 % plus Power's percent, in permille (decision 300).</summary>
+    public static int CritDamagePermille(int power, StatRules rules) =>
+        (BaseCritDamagePercent * PermillePerPercent) + PerPointPermille(power, rules.CritDamagePercentPer100Power);
+
+    /// <summary>The base dodge plus Agility's percent, in permille, never above the cap (decision 295).</summary>
+    public static int DodgePermille(int agility, StatRules rules) => Math.Min(
+        (rules.BaseDodge * PermillePerPercent) + PerPointPermille(agility, rules.DodgePer100Agility),
+        DodgeCapPercent * PermillePerPercent);
+
+    /// <summary>
+    /// The chance to shrug off a stun or a taunt, in permille: the rules' base, which gear raises (decision 302).
+    /// </summary>
+    public static int CrowdControlResistancePermille(StatRules rules) =>
+        rules.BaseCrowdControlResistance * PermillePerPercent;
+
+    /// <summary>
+    /// What every raw damage and healing the member deals is multiplied by, in permille: 100 % plus Power's percent
+    /// (decision 296: Power is the universal damage stat).
+    /// </summary>
+    public static int DamagePermille(int power, StatRules rules) =>
+        (100 * PermillePerPercent) + PerPointPermille(power, rules.DamagePercentPer100Power);
+
+    // Points at a rate per 100 points, in permille, rounded down: 3 Agility at 25 per 100 is 7 (0.75 %, shown 0 %).
+    private static int PerPointPermille(int points, int ratePer100) =>
+        (int)((long)points * ratePer100 * PermillePerPercent / 100);
 }

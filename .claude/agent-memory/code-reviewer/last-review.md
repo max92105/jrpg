@@ -5,10 +5,12 @@ metadata:
   type: project
 ---
 
-Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/P2.md, slice P2 (StatRules, StatFormula.MaxHp, Vitals.ResizeMax, PartyMember.RestoreProgress)
+Slice: docs/plans/2026-10-26-stats-and-gear-slots/slices/P3a.md, slice P3a (StatSheet, MemberSheet.Of, StatFormula permille conversions, StatRules nine fields)
 Round: 1 (verdict: Ready to commit)
 
-- W1 docs/ui-reference: four PNG deletions unrelated to P2 in the working tree; keep out of the slice commit; open
-- W2 src/Jrpg.Core/Party/PartyMember.cs:48 new public Primaries has no reader and no test asserting it (recruit/restore/level-up); open
-- S1 src/Jrpg.Core/Stats/Vitals.cs:72-73 "since the maximum is" reads unclearly; open (suggestion)
-- F1 PartyMember.LevelUp raises by MaxHpOf(after) - Vitals.MaxHp: once P4's gear resizes MaxHp the "before" includes gear; follow-up for P4
+- W1 src/Jrpg.Core/Party/MemberSheet.cs:44-53 positional StatSheet of 7 adjacent ints; only MaxHp, Speed, Primaries, CritChance are pinned through PartyMember; swap passes all tests; named args + one whole-sheet test; open
+- S1 tests/Jrpg.Core.Tests/Stats/StatFormulaTests.cs test prefixes CritChance_/Dodge_/CritDamage_/DamagePercent_ name methods now called ...Permille; open (suggestion)
+- S2 tests/Jrpg.Core.Tests/Stats/StatFormulaTests.cs:7-8 comment says design.md's placeholders but BaseCrowdControlResistance is 10 (design 0); open (suggestion)
+- S3 tests/Jrpg.Data.Tests/Content/GameRulesValidatorTests.cs:15 nine positional ints; named args; open (suggestion)
+- F1 src/Jrpg.Game/NewGame/LeaderProfile.cs:27 computes max HP via StatFormula.MaxHp, a second path beside MemberSheet; follow-up
+- (P2's W2 "Primaries has no reader" resolved: Primaries now on Sheet, asserted in PartyMemberStatTests)

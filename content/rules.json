@@ -1,6 +1,11 @@
 {
   "party": { "maxActiveMembers": 5 },
-  "stats": { "hpPercentPer100Constitution": 100 },
+  "stats": {
+    "hpPercentPer100Constitution": 100,
+    "baseAccuracy": 90, "baseCritChance": 5, "baseDodge": 0, "baseCrowdControlResistance": 0,
+    "damagePercentPer100Power": 100, "critDamagePercentPer100Power": 50,
+    "critChancePer100Agility": 25, "dodgePer100Agility": 20
+  },
   "exploration": { "walkSpeed": 3.0, "playerRadius": 0.1, "interactReach": 0.6 },
   "experience": {
     "experienceToNextLevel": [

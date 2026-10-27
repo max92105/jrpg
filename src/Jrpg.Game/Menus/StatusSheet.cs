@@ -50,7 +50,7 @@ internal sealed record StatusSheet(
             [NumberText.Of(member.Level), NumberText.Of(member.Experience), ToNextLevelText(member.Level, member.Experience, table, labels.MaxLevel)],
             ExperienceProgress(member.Level, member.Experience, table),
             [shownVitals.Hp.Value.Text, NumberText.Of(stats.Attack), NumberText.Of(stats.Defense)],
-            NumberText.Of(member.Speed),
+            NumberText.Of(member.Sheet.Speed),
             [member.Weapon?.Name ?? labels.Empty, member.Armor?.Name ?? labels.Empty],
             [.. ResourceStarts.For(member).Select(start => ResourceLine(start, member, labels))],
             [.. member.Skills.Select(skill => new Line(skill.Name, skill.Description))]);

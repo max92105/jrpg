@@ -38,7 +38,7 @@ public static class ResourceStarts
                 : ResourceStart.Fixed(resource);
         }
 
-        var charges = ReadinessFormula.Charges(member.Speed, scaling.SpeedPerCharge);
+        var charges = ReadinessFormula.Charges(member.Sheet.Speed, scaling.SpeedPerCharge);
         return new ResourceStart(resource, charges, charges);
     }
 }

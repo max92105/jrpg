@@ -1,6 +1,7 @@
 using System.Globalization;
 using Jrpg.Core.Content;
 using Jrpg.Core.Party;
+using Jrpg.Core.Stats;
 
 namespace Jrpg.Data.Content;
 
@@ -22,12 +23,7 @@ internal static class GameRulesValidator
 
         ValidateExploration(fileName, rules.Exploration);
 
-        // A negative rate would take HP away for every Constitution point.
-        if (rules.Stats.HpPercentPer100Constitution < 0)
-        {
-            throw new ContentValidationException(
-                $"{fileName}: stats.hpPercentPer100Constitution must be at least 0 (was {rules.Stats.HpPercentPer100Constitution}).");
-        }
+        ValidateStats(fileName, rules.Stats);
 
         var thresholds = rules.Experience.ExperienceToNextLevel;
         if (thresholds.Count == 0)
@@ -43,6 +39,28 @@ internal static class GameRulesValidator
                 throw new ContentValidationException(
                     $"{fileName}: experience.experienceToNextLevel[{index}] must be at least 1 (was {thresholds[index]}).");
             }
+        }
+    }
+
+    // A negative rate would take something away for every point, and a negative base starts below nothing.
+    private static void ValidateStats(string fileName, StatRules stats)
+    {
+        (string Field, int Value)[] fields =
+        [
+            ("hpPercentPer100Constitution", stats.HpPercentPer100Constitution),
+            ("baseAccuracy", stats.BaseAccuracy),
+            ("baseCritChance", stats.BaseCritChance),
+            ("baseDodge", stats.BaseDodge),
+            ("baseCrowdControlResistance", stats.BaseCrowdControlResistance),
+            ("damagePercentPer100Power", stats.DamagePercentPer100Power),
+            ("critDamagePercentPer100Power", stats.CritDamagePercentPer100Power),
+            ("critChancePer100Agility", stats.CritChancePer100Agility),
+            ("dodgePer100Agility", stats.DodgePer100Agility),
+        ];
+        var (negativeField, value) = fields.FirstOrDefault(field => field.Value < 0);
+        if (negativeField is not null)
+        {
+            throw new ContentValidationException($"{fileName}: stats.{negativeField} must be at least 0 (was {value}).");
         }
     }
 

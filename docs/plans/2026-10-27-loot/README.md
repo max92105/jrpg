@@ -61,7 +61,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **G1c. The Inventory page lists each piece** (Game, about 130 lines) → [slices/G1c.md](slices/G1c.md)
 
 ### Phase 2: drops
-- [ ] **ADR 0030: Loot rolls** (before D1) → [slices/ADR-0030.md](slices/ADR-0030.md)
+- [x] **ADR 0030: Loot rolls** (before D1) → [slices/ADR-0030.md](slices/ADR-0030.md)
 - [ ] **D1. Defeated enemies drop items: `Loot/DropRoll` at `FinishBattle`, `Session/BattleSpoils`** (Core, about 250 lines) → [slices/D1.md](slices/D1.md)
 - [ ] **D2. Drop tables in content; the goblin drops** (Data + content + tests, about 200 lines) → [slices/D2.md](slices/D2.md)
 - [ ] **D3. The victory screen lists the drops** (Game, raw 140, about 220 lines at 1.6x) → [slices/D3.md](slices/D3.md)

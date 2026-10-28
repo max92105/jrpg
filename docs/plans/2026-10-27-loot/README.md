@@ -73,7 +73,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **R3b. Dropped gear rolls its rarity and affixes** (Core + content + tests, about 180 lines) → [slices/R3b.md](slices/R3b.md)
 
 ### Phase 4: pages
-- [ ] **P1a. The Inventory page shows rarity and affix lines** (Game + text, raw 150, about 240 lines at 1.6x; waits for question 362) → [slices/P1a.md](slices/P1a.md)
+- [x] **P1a. The Inventory page shows rarity and affix lines** (Game + text, raw 150, about 240 lines at 1.6x; waits for question 362) → [slices/P1a.md](slices/P1a.md)
 - [ ] **P1b. Rarity on the Equipment page and the victory drops** (Game, raw 100, about 160 lines at 1.6x) → [slices/P1b.md](slices/P1b.md)
 
 ### Phase 5: numbers and walk-through
@@ -109,10 +109,13 @@ Taken with the devil's advocate's edits (2026-10-27), the plan's behavior made e
 - **360. A saved affix value outside its content range is clamped into it and reported** as a repair change, not silently (S1b).
 - **361. A rolled piece's affix line replaces its description** in the Inventory's detail strip; a plain piece keeps its description (P1a).
 
+The developer's answer (2026-10-28):
+- **362. The tiers' colors follow the ARPG convention:** Common the body text color, Magic blue, Rare yellow-gold, Unique orange (reserved), Material a muted teal (forge plan).
+
 Earlier decisions that apply: 103 (drops join the victory screen), 137 (taking a worn item from another member), 165 (anyone wears anything), 222 (gold, still open), 252 (one selection look), 294, 329 (the same ring twice), 333 (Info shows or hides detail), 337 (the Equipment comparison).
 
 ## Open design questions (developer decides)
-- **362. The tiers' colors.** `.claude/rules/game.md` says to ask before departing from the reference look, and the reference has no rarity colors. *Proposed:* Common the body text color, Magic blue, Rare yellow-gold, Unique orange (the ARPG convention the request mashes in), Material a muted teal (forge plan). Alternative: a softer set closer to the reference's pale palette. P1a waits for the answer.
+None left in this plan.
 
 Still open from earlier plans: 92, 112, 147, 151-155, 179, 180, 182, 183, 208-220, 222-228.
 

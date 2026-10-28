@@ -1,4 +1,5 @@
 using FontStashSharp;
+using Jrpg.Core.Items;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
@@ -137,9 +138,15 @@ internal sealed class InventoryListView
         _ui.DrawGlidingSelection(batch, textures, selected, opacity);
     }
 
+    // A rolled piece's name is in its rarity's color (decision 362); anything else the menu can't use is greyed out.
+    private static Color TextColorOf(InventoryRow item) =>
+        item.Rarity != Rarity.Common ? UiTheme.RarityColorOf(item.Rarity)
+        : item.IsUsable ? UiTheme.TextPrimary
+        : UiTheme.TextDisabled;
+
     private void DrawRow(SpriteBatch batch, TextureLibrary textures, Rectangle row, InventoryRow item, float opacity)
     {
-        var textColor = (item.IsUsable ? UiTheme.TextPrimary : UiTheme.TextDisabled) * opacity;
+        var textColor = TextColorOf(item) * opacity;
         var textTop = row.Y + ((RowHeight - _bodyFont.LineHeight) / 2f);
         var iconTop = row.Y + ((RowHeight - RowIconSize) / 2);
         batch.Draw(_ui.Icon(textures, item.IconFile, RowIconSize), new Vector2(row.X + RowInset, iconTop), Color.White * opacity);

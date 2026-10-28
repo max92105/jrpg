@@ -211,6 +211,22 @@ internal static class MessageIds
     /// <summary>A percent stat's value: "{value} %".</summary>
     public const string StatPercent = "stat_percent";
 
+    /// <summary>
+    /// Placeholders <c>{value}</c> (signed, a percent with its sign) and <c>{stat}</c>: one rolled affix.
+    /// </summary>
+    public const string AffixLine = "affix_line";
+
+    /// <summary>Between a rolled piece's rarity and each of its affixes on one line.</summary>
+    public const string AffixSeparator = "affix_separator";
+
+    public const string RarityCommon = "rarity_common";
+
+    public const string RarityMagic = "rarity_magic";
+
+    public const string RarityRare = "rarity_rare";
+
+    public const string RarityUnique = "rarity_unique";
+
     public const string SlotWeapon = "slot_weapon";
 
     public const string SlotChest = "slot_chest";

@@ -1,5 +1,6 @@
 using Jrpg.Core.Items;
 using Jrpg.Core.Session;
+using Jrpg.Core.Stats;
 using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Tests.Exploration;
@@ -61,12 +62,29 @@ public sealed class InventoryPageGearTests
     public void Show_PieceRow_HasNoQuantity()
     {
         var session = NewSession();
-        var list = new InventoryList(session, StartMapScenarios.BelowClosedDoor, RepositoryScreenText.Text.Fonts.FontAt(26));
+        var list = new InventoryList(session, StartMapScenarios.BelowClosedDoor, RepositoryScreenText.Text.Fonts.FontAt(26), RepositoryScreenText.Text.Messages);
 
         list.Show(InventoryCategory.All, selectedRow: 0);
 
         Assert.Null(list.Rows.First(row => row.ItemId == "bronze_sword").Quantity);
         Assert.NotNull(list.Rows.First(row => row.ItemId == "potion").Quantity);
+    }
+
+    // A rolled piece's strip shows its rarity and affixes, not its description (decision 361); a plain one keeps it.
+    [Fact]
+    public void Show_RolledAndPlainPieces_RolledRowIsRareWithItsAffixLine()
+    {
+        var session = NewSession();
+        var rolled = GearPiece.Rolled(_bronzeSword, Rarity.Rare, [new RolledAffix("power", StatKind.Power, 4)]);
+        session.Inventory.AddGear(GearPiece.Plain(_bronzeSword));
+        session.Inventory.AddGear(rolled);
+        var list = new InventoryList(session, StartMapScenarios.BelowClosedDoor, RepositoryScreenText.Text.Fonts.FontAt(26), RepositoryScreenText.Text.Messages);
+
+        list.Show(InventoryCategory.Weapons, selectedRow: 0);
+
+        var rows = list.Rows.Where(row => row.ItemId == "bronze_sword").ToList();
+        Assert.Equal((Rarity.Rare, "Rare · +4 Power"), (rows[^1].Rarity, rows[^1].Description));
+        Assert.Equal((Rarity.Common, _bronzeSword.Description), (rows[0].Rarity, rows[0].Description));
     }
 
     // Goes through the tabs with the next-tab button until the category shows.

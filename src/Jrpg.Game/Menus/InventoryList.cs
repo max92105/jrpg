@@ -15,16 +15,19 @@ internal sealed class InventoryList
     private readonly GameSession _session;
     private readonly ContentCatalog _catalog;
     private readonly SpriteFontBase _bodyFont;
+    private readonly UiMessages _messages;
     private InventoryRow[] _rows = [];
 
     /// <param name="session">Whose inventory is listed.</param>
     /// <param name="catalog">Item names, icons and descriptions.</param>
     /// <param name="bodyFont">Measures the quantities once, when the rows are built.</param>
-    public InventoryList(GameSession session, ContentCatalog catalog, SpriteFontBase bodyFont)
+    /// <param name="messages">A rolled piece's rarity and affix names.</param>
+    public InventoryList(GameSession session, ContentCatalog catalog, SpriteFontBase bodyFont, UiMessages messages)
     {
         _session = session;
         _catalog = catalog;
         _bodyFont = bodyFont;
+        _messages = messages;
     }
 
     public IReadOnlyList<InventoryRow> Rows => _rows;
@@ -91,7 +94,12 @@ internal sealed class InventoryList
         return new InventoryRow(item.Id, item.Name, item.IconFile, quantity, item.Description, _session.FieldItems.CanUse(item));
     }
 
-    // One row per piece, so no quantity (decision 345); gear is never used from the menu.
-    private static InventoryRow RowOf(GearPiece piece) =>
-        new(piece.Base.Id, piece.Base.Name, piece.Base.IconFile, Quantity: null, piece.Base.Description, IsUsable: false);
+    // One row per piece, so no quantity (decision 345); gear is never used from the menu. A plain piece keeps its
+    // description; a rolled one shows its rarity and affixes instead (decision 361).
+    private InventoryRow RowOf(GearPiece piece)
+    {
+        var isPlain = piece.Rarity == Rarity.Common && piece.Affixes.Count == 0;
+        var description = isPlain ? piece.Base.Description : AffixText.LineOf(piece, _messages);
+        return new InventoryRow(piece.Base.Id, piece.Base.Name, piece.Base.IconFile, Quantity: null, description, IsUsable: false) { Rarity = piece.Rarity };
+    }
 }

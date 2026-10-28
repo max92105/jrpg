@@ -1,3 +1,4 @@
+using Jrpg.Core.Items;
 using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Menus;
@@ -11,6 +12,12 @@ namespace Jrpg.Game.Menus;
 /// <param name="Quantity">
 /// How many the party owns, measured for right-aligning; null for a piece, one row each (decision 345).
 /// </param>
-/// <param name="Description">What it is, shown under the list while it is selected.</param>
+/// <param name="Description">
+/// What it is, shown under the list while it is selected; a rolled piece's rarity and affixes instead (decision 361).
+/// </param>
 /// <param name="IsUsable">Whether it can be used from the menu; an unusable item is drawn greyed out.</param>
-internal sealed record InventoryRow(string ItemId, string Name, string IconFile, MeasuredText? Quantity, string Description, bool IsUsable);
+internal sealed record InventoryRow(string ItemId, string Name, string IconFile, MeasuredText? Quantity, string Description, bool IsUsable)
+{
+    /// <summary>A piece's rarity, which its name is drawn in; Common for a stack.</summary>
+    public Rarity Rarity { get; init; }
+}

@@ -44,7 +44,7 @@ internal sealed class InventoryPage : IMenuPage
         _railHint = text.Messages.Text(MessageIds.MenuHintInventoryCategories);
         _catalog = catalog;
         var bodyFont = text.Fonts.FontAt(BodyPixels);
-        _list = new InventoryList(session, catalog, bodyFont);
+        _list = new InventoryList(session, catalog, bodyFont, text.Messages);
         _columnView = new InventoryColumnView(text, ui, bodyFont, _rail.Tabs);
         Sidebar = new PartySidebar(session.Party);
         _sidebarView = new PartySidebarView(Sidebar, new MemberCardView(text, ui, catalog), text);

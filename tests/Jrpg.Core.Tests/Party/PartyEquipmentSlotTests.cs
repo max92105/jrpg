@@ -47,7 +47,7 @@ public sealed class PartyEquipmentSlotTests
 
         Assert.Equal((_ring, _ring), (_sarxian.EquippedIn(EquipmentSlot.FirstRing)?.Base, _sarxian.EquippedIn(EquipmentSlot.SecondRing)?.Base));
         Assert.Equal(powerBefore + 10, _sarxian.Sheet.Primaries.Power);
-        Assert.Equal(0, _inventory.QuantityOf(_ring.Id));
+        Assert.Equal(0, _inventory.GearCountOf(_ring.Id));
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public sealed class PartyEquipmentSlotTests
         Assert.False(_equipment.TryEquip(_sarxian, _helm, EquipmentSlot.Chest));
 
         Assert.Null(_sarxian.EquippedIn(EquipmentSlot.Chest));
-        Assert.Equal(1, _inventory.QuantityOf(_helm.Id));
+        Assert.Equal(1, _inventory.GearCountOf(_helm.Id));
     }
 
     [Fact]

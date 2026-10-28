@@ -106,5 +106,5 @@ public sealed class EquipmentPageComparisonTests
     private void WearChainMail() =>
         Assert.True(_session.Equipment.TryEquip(_session.Party.Leader, StartMapScenarios.BelowClosedDoor.Items["chain_mail"]));
 
-    private EquipmentPage NewPage() => new(RepositoryScreenText.Text, new UiTextures(), _session, StartMapScenarios.BelowClosedDoor);
+    private EquipmentPage NewPage() => new(RepositoryScreenText.Text, new UiTextures(), _session);
 }

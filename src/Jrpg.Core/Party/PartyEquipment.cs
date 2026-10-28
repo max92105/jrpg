@@ -17,8 +17,8 @@ public sealed class PartyEquipment(Inventory inventory)
 
     /// <returns>
     /// True if the member wears the item in the slot afterwards; true without changes if they already wore it
-    /// there. False if the item isn't equipment whose kind fits the slot (ADR 0028), no copy is in the inventory, or
-    /// the item it replaces doesn't fit back in the inventory. Nothing changes when it returns false.
+    /// there. False if the item isn't equipment whose kind fits the slot (ADR 0028) or no plain piece of it is owned.
+    /// Nothing changes when it returns false. Gear has no cap, so what it replaces always goes back (decision 345).
     /// </returns>
     public bool TryEquip(PartyMember member, ItemDefinition item, EquipmentSlot slot)
     {
@@ -34,27 +34,28 @@ public sealed class PartyEquipment(Inventory inventory)
             return true;
         }
 
-        if ((replaced is not null && !inventory.HasRoomFor(replaced.Base)) || !inventory.TryRemove(item.Id, 1))
+        if (!inventory.TryRemoveGear(piece))
         {
             return false;
         }
 
         if (replaced is not null)
         {
-            inventory.Add(replaced.Base, 1);
+            inventory.AddGear(replaced);
         }
 
         member.Wear(slot, piece);
         return true;
     }
 
-    /// <summary>What any member could put on in the slot: owned items for that slot, in pickup order.</summary>
-    /// <param name="slot">The slot to list for.</param>
-    /// <param name="items">Every item by id, to read the owned ones' kind.</param>
-    public IReadOnlyList<ItemDefinition> OwnedFor(EquipmentSlot slot, IReadOnlyDictionary<string, ItemDefinition> items) =>
-        [.. inventory.Entries
-            .Select(entry => items[entry.ItemId])
-            .Where(item => item.Equipment is { } equipment && EquipmentFit.Fits(equipment.Kind, slot))];
+    /// <summary>
+    /// What any member could put on in the slot: the owned pieces' base items that fit it, each once, in pickup order.
+    /// </summary>
+    public IReadOnlyList<ItemDefinition> OwnedFor(EquipmentSlot slot) =>
+        [.. inventory.Gear
+            .Where(piece => EquipmentFit.Fits(piece.Kind, slot))
+            .Select(piece => piece.Base)
+            .Distinct()];
 
     /// <summary>
     /// What the member could take from another member in the slot (decision 137): each other member's item there,
@@ -80,8 +81,8 @@ public sealed class PartyEquipment(Inventory inventory)
     /// inventory, and the giver's slot is left empty.
     /// </summary>
     /// <returns>
-    /// False if the giver is the receiver, the giver's slot is empty, the receiver already wears the same item, or the
-    /// receiver's own item doesn't fit back in the inventory. Nothing changes when it returns false.
+    /// False if the giver is the receiver, the giver's slot is empty, or the receiver already wears an equal piece.
+    /// Nothing changes when it returns false.
     /// </returns>
     public bool TryTakeFrom(PartyMember giver, PartyMember receiver, EquipmentSlot slot)
     {
@@ -91,15 +92,9 @@ public sealed class PartyEquipment(Inventory inventory)
             return false;
         }
 
-        var replaced = receiver.EquippedIn(slot);
-        if (replaced is not null && !inventory.HasRoomFor(replaced.Base))
+        if (receiver.EquippedIn(slot) is { } replaced)
         {
-            return false;
-        }
-
-        if (replaced is not null)
-        {
-            inventory.Add(replaced.Base, 1);
+            inventory.AddGear(replaced);
         }
 
         giver.TakeOff(slot);
@@ -107,16 +102,16 @@ public sealed class PartyEquipment(Inventory inventory)
         return true;
     }
 
-    /// <returns>False if the slot is empty or the item's inventory stack is full. Nothing changes when it returns false.</returns>
+    /// <returns>False if the slot is empty; nothing changes then. Gear has no cap (decision 345).</returns>
     public bool TryUnequip(PartyMember member, EquipmentSlot slot)
     {
         var worn = member.EquippedIn(slot);
-        if (worn is null || !inventory.HasRoomFor(worn.Base))
+        if (worn is null)
         {
             return false;
         }
 
-        inventory.Add(worn.Base, 1);
+        inventory.AddGear(worn);
         member.TakeOff(slot);
         return true;
     }

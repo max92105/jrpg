@@ -52,13 +52,14 @@ public sealed class InventoryPageTests
     }
 
     [Fact]
-    public void Constructor_StartingItems_ShowsAllInPickupOrder()
+    public void Constructor_StartingItems_ShowsStacksThenGearInPickupOrder()
     {
         var session = NewSession();
 
         var page = NewPage(session);
 
-        Assert.Equal(session.Inventory.Entries.Select(entry => entry.ItemId), page.ShownItemIds);
+        string[] expected = [.. session.Inventory.Entries.Select(entry => entry.ItemId), .. session.Inventory.Gear.Select(piece => piece.Base.Id).Distinct()];
+        Assert.Equal(expected, page.ShownItemIds);
     }
 
     [Fact]
@@ -78,10 +79,9 @@ public sealed class InventoryPageTests
     public void Update_CategoryWithNothingOwned_HasNoSelectedRow()
     {
         var session = NewSession();
-        var items = StartMapScenarios.BelowClosedDoor.Items;
-        foreach (var armor in session.Inventory.Entries.Where(entry => items[entry.ItemId].Equipment is { Kind: not EquipmentKind.Weapon }).ToList())
+        foreach (var armor in session.Inventory.Gear.Where(piece => piece.Kind != EquipmentKind.Weapon).ToList())
         {
-            session.Inventory.TryRemove(armor.ItemId, armor.Quantity);
+            session.Inventory.TryRemoveGear(armor);
         }
 
         var page = NewPage(session);

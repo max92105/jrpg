@@ -33,7 +33,24 @@ public sealed class GameSessionGearTests
         Assert.Equal(
             (sword, _mail, helm, ring, ring),
             (leader.Weapon?.Base, leader.EquippedIn(EquipmentSlot.Chest)?.Base, leader.EquippedIn(EquipmentSlot.Head)?.Base, leader.EquippedIn(EquipmentSlot.FirstRing)?.Base, leader.EquippedIn(EquipmentSlot.SecondRing)?.Base));
-        Assert.Equal(0, restored.Inventory.QuantityOf("power_ring"));
+        Assert.Equal(0, restored.Inventory.GearCountOf("power_ring"));
+    }
+
+    // Owned gear is saved as a count per base until saves keep pieces (S1a); it loads back plain.
+    [Fact]
+    public void CaptureThenRestore_OwnedGear_ComesBackAsPlainPieces()
+    {
+        var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build();
+        var potion = new ItemDefinitionBuilder().WithId("potion").Build();
+        var catalog = new ContentCatalogBuilder().WithMembers(new PartyMemberBuilder().WithId("sarxian").BuildDefinition()).WithItems(sword, potion).WithLeader("sarxian").Build();
+        var session = GameSession.StartNew(catalog, "sarxian", new FixedSequenceRandom());
+        session.Inventory.Add(sword, 2);
+        session.Inventory.Add(potion, 3);
+
+        var restored = GameSession.Restore(session.Capture(DateTimeOffset.UnixEpoch), catalog, new FixedSequenceRandom());
+
+        Assert.Equal([GearPiece.Plain(sword), GearPiece.Plain(sword)], restored.Inventory.Gear);
+        Assert.Equal(3, restored.Inventory.QuantityOf("potion"));
     }
 
     [Fact]

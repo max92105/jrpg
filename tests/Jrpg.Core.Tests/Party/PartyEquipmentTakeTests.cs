@@ -101,7 +101,7 @@ public sealed class PartyEquipmentTakeTests
         Assert.True(taken);
         Assert.Same(_ironSword, _sarxian.Weapon?.Base);
         Assert.Null(_jazog.Weapon);
-        Assert.Equal(0, _inventory.QuantityOf("iron_sword"));
+        Assert.Equal(0, _inventory.GearCountOf("iron_sword"));
     }
 
     [Fact]
@@ -113,23 +113,7 @@ public sealed class PartyEquipmentTakeTests
         _equipment.TryTakeFrom(_jazog, _sarxian, EquipmentSlot.Weapon);
 
         Assert.Same(_ironSword, _sarxian.Weapon?.Base);
-        Assert.Equal(1, _inventory.QuantityOf("bronze_sword"));
-    }
-
-    [Fact]
-    public void TryTakeFrom_NoRoomForReceiversItem_ChangesNothing()
-    {
-        var bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").WithMaxStack(1).AsWeapon(5).Build();
-        Dress(_jazog, _ironSword);
-        Dress(_sarxian, bronzeSword);
-        _inventory.Add(bronzeSword, 1);
-
-        var taken = _equipment.TryTakeFrom(_jazog, _sarxian, EquipmentSlot.Weapon);
-
-        Assert.False(taken);
-        Assert.Same(_ironSword, _jazog.Weapon?.Base);
-        Assert.Same(bronzeSword, _sarxian.Weapon?.Base);
-        Assert.Equal(1, _inventory.QuantityOf("bronze_sword"));
+        Assert.Equal(1, _inventory.GearCountOf("bronze_sword"));
     }
 
     [Fact]
@@ -142,7 +126,7 @@ public sealed class PartyEquipmentTakeTests
 
         Assert.False(taken);
         Assert.Same(_ironSword, _jazog.Weapon?.Base);
-        Assert.Equal(0, _inventory.QuantityOf("iron_sword"));
+        Assert.Equal(0, _inventory.GearCountOf("iron_sword"));
     }
 
     [Fact]

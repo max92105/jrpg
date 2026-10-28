@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Jrpg.Core.Content;
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Session;
@@ -37,8 +36,7 @@ internal sealed class EquipmentPage : IMemberPage
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared textures: section lines, icons, the selected row.</param>
     /// <param name="session">Whose party and inventory.</param>
-    /// <param name="catalog">The items, to list what each slot can take.</param>
-    public EquipmentPage(ScreenText text, UiTextures ui, GameSession session, ContentCatalog catalog)
+    public EquipmentPage(ScreenText text, UiTextures ui, GameSession session)
     {
         _pageHint = text.Messages.Text(MessageIds.MenuHintEquipment);
         _party = session.Party;
@@ -48,7 +46,7 @@ internal sealed class EquipmentPage : IMemberPage
         _sheetView = new EquipmentSheetView(text, ui);
         _choiceView = new EquipmentChoiceView(text, ui);
         _comparison = new EquipmentComparison(text.Messages);
-        _slotChoice = new SlotChoice(session, catalog, _comparison, text.Messages);
+        _slotChoice = new SlotChoice(session, _comparison, text.Messages);
         _memberCursor = new ListCursor(_party.Members.Count, _ => true);
         Open();
     }

@@ -147,11 +147,16 @@ public sealed class GameSession
             Location = Exploration.Location,
             Members = [.. Party.Members.Select(member => member.CaptureProgress())],
             ActiveMemberIds = [.. Party.ActiveMembers.Select(member => member.Id)],
-            Inventory = [.. Inventory.Entries],
+            Inventory = [.. Inventory.Entries, .. OwnedGearByBase()],
             CompletedEvents = _context.World.CompletedEvents,
             ObjectSwaps = _context.World.ObjectSwaps,
         };
     }
+
+    // Until saves keep pieces (loot plan, S1a), owned gear is saved as a count per base item and loads back plain;
+    // nothing rolls affixes before then.
+    private IEnumerable<InventoryEntry> OwnedGearByBase() =>
+        Inventory.Gear.GroupBy(piece => piece.Base.Id).Select(group => new InventoryEntry(group.Key, group.Count()));
 
     private static List<PartyMember> ActiveOrder(List<PartyMember> members, IReadOnlyList<string> activeIds) =>
         [.. activeIds.Select(id => members.Single(member => member.Id == id))];

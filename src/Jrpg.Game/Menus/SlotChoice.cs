@@ -1,4 +1,3 @@
-using Jrpg.Core.Content;
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Session;
@@ -15,7 +14,6 @@ namespace Jrpg.Game.Menus;
 internal sealed class SlotChoice
 {
     private readonly GameSession _session;
-    private readonly IReadOnlyDictionary<string, ItemDefinition> _items;
     private readonly EquipmentComparison _comparison;
     private readonly UiMessages _messages;
     private OpenSlot? _open;
@@ -23,13 +21,11 @@ internal sealed class SlotChoice
     private int _previewedRow = -1;
 
     /// <param name="session">The party, its equipment and the inventory.</param>
-    /// <param name="catalog">The items, to list what the slot can take.</param>
     /// <param name="comparison">The page's Changes band, which follows the highlight while the choice is open.</param>
     /// <param name="messages">The take hint and the refusal.</param>
-    public SlotChoice(GameSession session, ContentCatalog catalog, EquipmentComparison comparison, UiMessages messages)
+    public SlotChoice(GameSession session, EquipmentComparison comparison, UiMessages messages)
     {
         _session = session;
-        _items = catalog.Items;
         _comparison = comparison;
         _messages = messages;
     }
@@ -50,7 +46,7 @@ internal sealed class SlotChoice
     /// </summary>
     public EquipmentChoice Open(PartyMember member, EquipmentSlot slot)
     {
-        var choice = new EquipmentChoice(_session.Equipment.OwnedFor(slot, _items), PartyEquipment.TakeableFor(member, slot, _session.Party));
+        var choice = new EquipmentChoice(_session.Equipment.OwnedFor(slot), PartyEquipment.TakeableFor(member, slot, _session.Party));
         _open = new OpenSlot(member, slot, choice);
         Refusal = null;
         ShowPreview(_open);
@@ -107,8 +103,8 @@ internal sealed class SlotChoice
         TakeHint = null;
     }
 
-    // Core refuses a change when the item it would take off has no room left in the inventory; the player is told why.
-    // A worn item is taken from its wearer (decision 137).
+    // A worn item is taken from its wearer (decision 137). The no-room refusal can't fire since gear has no stack (loot
+    // plan, G1b-1); G1b-2 removes it.
     private void Apply(OpenSlot open, EquipmentPick pick)
     {
         var equipment = _session.Equipment;

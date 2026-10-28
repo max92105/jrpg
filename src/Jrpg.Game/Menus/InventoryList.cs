@@ -52,7 +52,7 @@ internal sealed class InventoryList
     /// </summary>
     public void Show(InventoryCategory category, int selectedRow)
     {
-        var shown = InventoryFilter.Select(category, _session.Inventory.Entries, _catalog.Items);
+        var shown = InventoryFilter.Select(category, [.. _session.Inventory.Entries, .. OwnedGearByBase()], _catalog.Items);
         _rows = [.. shown.Select(RowOf)];
         if (_rows.Length == 0)
         {
@@ -82,6 +82,10 @@ internal sealed class InventoryList
         step(cursor);
         Selection.Follow(cursor);
     }
+
+    // Until the page lists each piece (loot plan, G1c), owned gear shows as a count per base item after the stacks.
+    private IEnumerable<InventoryEntry> OwnedGearByBase() =>
+        _session.Inventory.Gear.GroupBy(piece => piece.Base.Id).Select(group => new InventoryEntry(group.Key, group.Count()));
 
     private InventoryRow RowOf(InventoryEntry entry)
     {

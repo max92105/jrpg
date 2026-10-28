@@ -87,7 +87,7 @@ public sealed class GameSessionTests
         var equipped = session.Equipment.TryEquip(session.Party.Leader, sword);
 
         Assert.True(equipped);
-        Assert.Equal(0, session.Inventory.QuantityOf(sword.Id));
+        Assert.Equal(0, session.Inventory.GearCountOf(sword.Id));
     }
 
     private static NewGameDefinition NewGame(params InventoryEntry[] items) =>

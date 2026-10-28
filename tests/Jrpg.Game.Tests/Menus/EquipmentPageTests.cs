@@ -38,9 +38,9 @@ public sealed class EquipmentPageTests
         ConfirmRemoveAll(page);
 
         Assert.All(EquipmentSheet.Slots, slot => Assert.Null(sarxian.EquippedIn(slot)));
-        Assert.Equal(2, _session.Inventory.QuantityOf("bronze_sword"));
-        Assert.Equal(2, _session.Inventory.QuantityOf("leather_armor"));
-        Assert.Equal(1, _session.Inventory.QuantityOf("power_ring"));
+        Assert.Equal(2, _session.Inventory.GearCountOf("bronze_sword"));
+        Assert.Equal(2, _session.Inventory.GearCountOf("leather_armor"));
+        Assert.Equal(1, _session.Inventory.GearCountOf("power_ring"));
     }
 
     // The new game's bag holds a power ring among its rings; the second ring row is the last slot row.
@@ -55,20 +55,6 @@ public sealed class EquipmentPageTests
         Assert.True(page.IsChoosing);
         Assert.Contains(StartMapScenarios.BelowClosedDoor.Items["power_ring"], page.Choice!.Items);
         Assert.All(page.Choice.Items, item => Assert.Equal(EquipmentKind.Ring, item.Equipment!.Kind));
-    }
-
-    [Fact]
-    public void Update_RemoveAllWithWeaponStackFull_KeepsTheWeaponWorn()
-    {
-        var sarxian = WearingSwordAndArmor();
-        var sword = StartMapScenarios.BelowClosedDoor.Items["bronze_sword"];
-        _session.Inventory.Add(sword, sword.MaxStack - _session.Inventory.QuantityOf(sword.Id));
-        var page = NewPage();
-
-        ConfirmRemoveAll(page);
-
-        Assert.Same(sword, sarxian.Weapon?.Base);
-        Assert.Null(sarxian.EquippedIn(EquipmentSlot.Chest));
     }
 
     [Fact]
@@ -115,7 +101,7 @@ public sealed class EquipmentPageTests
 
         Assert.Null(sarxian.Weapon);
         Assert.False(page.IsChoosing);
-        Assert.Equal(2, _session.Inventory.QuantityOf("bronze_sword"));
+        Assert.Equal(2, _session.Inventory.GearCountOf("bronze_sword"));
     }
 
     [Fact]
@@ -129,23 +115,7 @@ public sealed class EquipmentPageTests
         page.Update(Pressing(GameButton.Confirm));
 
         Assert.Same(StartMapScenarios.BelowClosedDoor.Items["iron_sword"], sarxian.Weapon?.Base);
-        Assert.Equal(2, _session.Inventory.QuantityOf("bronze_sword"));
-    }
-
-    [Fact]
-    public void Update_ChooseIronSwordWithBronzeStackFull_RefusesAndSaysWhy()
-    {
-        var sarxian = WearingSwordAndArmor();
-        var bronze = StartMapScenarios.BelowClosedDoor.Items["bronze_sword"];
-        _session.Inventory.Add(bronze, bronze.MaxStack - _session.Inventory.QuantityOf(bronze.Id));
-        var page = NewPage();
-        page.Update(Pressing(GameButton.Confirm));
-        ChooseIronSword(page);
-
-        page.Update(Pressing(GameButton.Confirm));
-
-        Assert.Same(bronze, sarxian.Weapon?.Base);
-        Assert.Equal($"There's no room in the bag for {bronze.Name}.", page.Notice);
+        Assert.Equal(2, _session.Inventory.GearCountOf("bronze_sword"));
     }
 
     [Fact]
@@ -161,25 +131,7 @@ public sealed class EquipmentPageTests
 
         Assert.Same(StartMapScenarios.BelowClosedDoor.Items["iron_sword"], sarxian.Weapon?.Base);
         Assert.Null(zanyr.Weapon);
-        Assert.Equal(2, _session.Inventory.QuantityOf("bronze_sword"));
-    }
-
-    [Fact]
-    public void Update_TakeWithNoRoomForOwnItem_ShowsTheNoRoomNotice()
-    {
-        var sarxian = WearingSwordAndArmor();
-        var zanyr = ZanyrWearingIronSword();
-        var bronze = StartMapScenarios.BelowClosedDoor.Items["bronze_sword"];
-        _session.Inventory.Add(bronze, bronze.MaxStack - _session.Inventory.QuantityOf(bronze.Id));
-        var page = NewPage();
-        page.Update(Pressing(GameButton.Confirm));
-        ChooseZanyrsIronSword(page);
-
-        page.Update(Pressing(GameButton.Confirm));
-
-        Assert.Same(bronze, sarxian.Weapon?.Base);
-        Assert.NotNull(zanyr.Weapon);
-        Assert.Equal($"There's no room in the bag for {bronze.Name}.", page.Notice);
+        Assert.Equal(2, _session.Inventory.GearCountOf("bronze_sword"));
     }
 
     [Fact]
@@ -266,5 +218,5 @@ public sealed class EquipmentPageTests
         page.Update(Pressing(GameButton.Confirm));
     }
 
-    private EquipmentPage NewPage() => new(RepositoryScreenText.Text, new UiTextures(), _session, StartMapScenarios.BelowClosedDoor);
+    private EquipmentPage NewPage() => new(RepositoryScreenText.Text, new UiTextures(), _session);
 }

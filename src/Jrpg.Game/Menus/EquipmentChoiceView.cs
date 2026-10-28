@@ -68,7 +68,7 @@ internal sealed class EquipmentChoiceView
     public void Show(EquipmentChoice choice, string slotName, Inventory inventory)
     {
         _heading = slotName;
-        _quantities = [.. choice.Items.Select(item => MeasuredText.Of(_bodyFont, NumberText.Of(inventory.QuantityOf(item.Id))))];
+        _quantities = [.. choice.Items.Select(item => MeasuredText.Of(_bodyFont, NumberText.Of(inventory.GearCountOf(item.Id))))];
         _wornRows = [.. choice.Takeable.Select(worn => _messages.Format(
             MessageIds.EquipmentWornRow,
             new MessageArgument("item", worn.Piece.Base.Name),

@@ -30,3 +30,4 @@ Part of [the loot plan](../README.md). ADR 0029, ADR 0022 (bump and refuse until
   - **Call sites:** `PartyMemberProgress` `Worn` dictionaries in about 11 test constructions over 8 files; gear entries in save tests' `Inventory` lists move to `Gear`; the format tests move to 5 (older 4, newer 6).
   - **Watch:** `GameSessionSaveTests` 270 (new tests in `GameSessionGearTests`); `SaveGameRepair.cs` must end below 230.
   - **Verify by hand:** delete the old test saves (refused with "made by an older version (format 4)"); save with a sword worn, a staff owned and potions, quit, load: all are back, and the file shows `worn.weapon` as an object with `itemId`, `rarity` and `affixes`, and a `gear` list.
+- **Note from G1b-1 review:** also drop `SaveGameRepair.ClampToMaxStack` on gear counts and `NewGameValidator`'s max-stack check on starting equipment here, and `GameSession.OwnedGearByBase` (the interim save bridge).

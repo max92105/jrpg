@@ -45,5 +45,5 @@ public sealed class EquipmentPageCaptionTests
         Assert.Equal(MessageIds.EquipmentGives, page.ChangesCaptionId);
     }
 
-    private EquipmentPage NewPage() => new(RepositoryScreenText.Text, new UiTextures(), _session, StartMapScenarios.BelowClosedDoor);
+    private EquipmentPage NewPage() => new(RepositoryScreenText.Text, new UiTextures(), _session);
 }

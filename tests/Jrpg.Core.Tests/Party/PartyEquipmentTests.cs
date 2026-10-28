@@ -26,7 +26,7 @@ public sealed class PartyEquipmentTests
 
         Assert.True(equipped);
         Assert.Same(_bronzeSword, _fighter.Weapon?.Base);
-        Assert.Equal(1, _inventory.QuantityOf(_bronzeSword.Id));
+        Assert.Equal(1, _inventory.GearCountOf(_bronzeSword.Id));
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public sealed class PartyEquipmentTests
 
         Assert.True(equipped);
         Assert.Same(staff, _fighter.Weapon?.Base);
-        Assert.Equal(0, _inventory.QuantityOf(staff.Id));
+        Assert.Equal(0, _inventory.GearCountOf(staff.Id));
     }
 
     [Fact]
@@ -74,8 +74,8 @@ public sealed class PartyEquipmentTests
 
         Assert.True(equipped);
         Assert.Same(_ironSword, _fighter.Weapon?.Base);
-        Assert.Equal(1, _inventory.QuantityOf(_bronzeSword.Id));
-        Assert.Equal(0, _inventory.QuantityOf(_ironSword.Id));
+        Assert.Equal(1, _inventory.GearCountOf(_bronzeSword.Id));
+        Assert.Equal(0, _inventory.GearCountOf(_ironSword.Id));
     }
 
     [Fact]
@@ -90,23 +90,8 @@ public sealed class PartyEquipmentTests
 
         Assert.True(equipped);
         Assert.Same(_bronzeSword, _fighter.Weapon?.Base);
-        Assert.Equal([new InventoryEntry("bronze_sword", 1), new InventoryEntry("potion", 3)], _inventory.Entries);
-    }
-
-    [Fact]
-    public void TryEquip_ReplacedItemStackFull_ReturnsFalseAndChangesNothing()
-    {
-        var bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").WithMaxStack(1).AsWeapon(5).Build();
-        _inventory.Add(bronzeSword, 1);
-        _equipment.TryEquip(_fighter, bronzeSword);
-        _inventory.Add(bronzeSword, 1);
-        _inventory.Add(_ironSword, 1);
-
-        var equipped = _equipment.TryEquip(_fighter, _ironSword);
-
-        Assert.False(equipped);
-        Assert.Same(bronzeSword, _fighter.Weapon?.Base);
-        Assert.Equal(1, _inventory.QuantityOf(_ironSword.Id));
+        Assert.Equal([GearPiece.Plain(_bronzeSword)], _inventory.Gear);
+        Assert.Equal([new InventoryEntry("potion", 3)], _inventory.Entries);
     }
 
     [Fact]
@@ -134,7 +119,7 @@ public sealed class PartyEquipmentTests
 
         Assert.True(unequipped);
         Assert.Null(_fighter.Weapon);
-        Assert.Equal(1, _inventory.QuantityOf(_bronzeSword.Id));
+        Assert.Equal(1, _inventory.GearCountOf(_bronzeSword.Id));
     }
 
     [Fact]
@@ -148,7 +133,7 @@ public sealed class PartyEquipmentTests
 
         Assert.True(unequipped);
         Assert.Null(_fighter.EquippedIn(EquipmentSlot.Chest));
-        Assert.Equal(1, _inventory.QuantityOf(chainMail.Id));
+        Assert.Equal(1, _inventory.GearCountOf(chainMail.Id));
     }
 
     [Fact]
@@ -159,19 +144,17 @@ public sealed class PartyEquipmentTests
         Assert.False(unequipped);
     }
 
+    // Gear has no stack to fill (decision 345): the piece goes back however many are owned.
     [Fact]
-    public void TryUnequip_InventoryStackFull_ReturnsFalseAndKeepsItem()
+    public void TryUnequip_ManyPiecesOwned_PutsPieceBack()
     {
-        var bronzeSword = new ItemDefinitionBuilder().WithId("bronze_sword").WithMaxStack(1).AsWeapon(5).Build();
-        _inventory.Add(bronzeSword, 1);
-        _equipment.TryEquip(_fighter, bronzeSword);
-        _inventory.Add(bronzeSword, 1);
+        _inventory.Add(_bronzeSword, 100);
+        Assert.True(_equipment.TryEquip(_fighter, _bronzeSword));
 
         var unequipped = _equipment.TryUnequip(_fighter, EquipmentSlot.Weapon);
 
-        Assert.False(unequipped);
-        Assert.Same(bronzeSword, _fighter.Weapon?.Base);
-        Assert.Equal(1, _inventory.QuantityOf(bronzeSword.Id));
+        Assert.True(unequipped);
+        Assert.Equal(100, _inventory.GearCountOf(_bronzeSword.Id));
     }
 
     [Fact]
@@ -182,9 +165,20 @@ public sealed class PartyEquipmentTests
         _inventory.Add(staff, 1);
         _inventory.Add(_bronzeSword, 1);
 
-        var wearable = _equipment.OwnedFor(EquipmentSlot.Weapon, Catalog(_ironSword, staff, _bronzeSword));
+        var wearable = _equipment.OwnedFor(EquipmentSlot.Weapon);
 
         Assert.Equal([_ironSword, staff, _bronzeSword], wearable);
+    }
+
+    // One row per base item until the Equipment choice lists pieces (G1b-2).
+    [Fact]
+    public void OwnedFor_TwoPiecesOfOneSword_ListsItOnce()
+    {
+        _inventory.Add(_bronzeSword, 2);
+
+        var wearable = _equipment.OwnedFor(EquipmentSlot.Weapon);
+
+        Assert.Equal([_bronzeSword], wearable);
     }
 
     [Fact]
@@ -194,10 +188,8 @@ public sealed class PartyEquipmentTests
         _inventory.Add(_bronzeSword, 1);
         _inventory.Add(chainMail, 1);
 
-        var wearable = _equipment.OwnedFor(EquipmentSlot.Chest, Catalog(_bronzeSword, chainMail));
+        var wearable = _equipment.OwnedFor(EquipmentSlot.Chest);
 
         Assert.Equal([chainMail], wearable);
     }
-
-    private static Dictionary<string, ItemDefinition> Catalog(params ItemDefinition[] items) => items.ToDictionary(item => item.Id);
 }

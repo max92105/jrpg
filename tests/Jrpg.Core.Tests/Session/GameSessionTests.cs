@@ -84,7 +84,7 @@ public sealed class GameSessionTests
             .Build();
         var session = GameSession.StartNew(catalog, "sarxian", new SeededRandom(0));
 
-        var equipped = session.Equipment.TryEquip(session.Party.Leader, sword);
+        var equipped = session.Equipment.TryEquip(session.Party.Leader, GearPiece.Plain(sword));
 
         Assert.True(equipped);
         Assert.Equal(0, session.Inventory.GearCountOf(sword.Id));

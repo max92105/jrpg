@@ -20,7 +20,7 @@ internal sealed class EquipmentComparison(UiMessages messages)
     /// <summary>The member against the highlighted item in <paramref name="slot"/>, or the slot emptied.</summary>
     public void ShowChoice(PartyMember member, EquipmentSlot slot, EquipmentChoice choice)
     {
-        var after = choice.Highlighted is { } item ? member.SheetWith(GearPiece.Plain(item), slot) : member.SheetWithout(slot);
+        var after = choice.Highlighted is { } piece ? member.SheetWith(piece, slot) : member.SheetWithout(slot);
         Show(StatComparison.Between(member.Sheet, after));
     }
 

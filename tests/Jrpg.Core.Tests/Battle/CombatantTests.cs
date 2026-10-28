@@ -29,7 +29,7 @@ public sealed class CombatantTests
         var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(15).Build();
         var inventory = new Inventory();
         inventory.Add(sword, 1);
-        new PartyEquipment(inventory).TryEquip(member, sword);
+        new PartyEquipment(inventory).TryEquip(member, GearPiece.Plain(sword));
 
         var combatant = Combatant.FromPartyMember(member);
 

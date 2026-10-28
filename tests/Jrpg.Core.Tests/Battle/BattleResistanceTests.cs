@@ -47,7 +47,7 @@ public sealed class BattleResistanceTests
         var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(40).WithDamageType(DamageType.Slashing).Build();
         var inventory = new Inventory();
         inventory.Add(sword, 1);
-        new PartyEquipment(inventory).TryEquip(fighter, sword);
+        new PartyEquipment(inventory).TryEquip(fighter, GearPiece.Plain(sword));
         var goblin = Goblin(Resistances.None with { Slashing = 500 });
         var battle = new BattleState([Combatant.FromPartyMember(fighter), goblin], inventory, new FixedSequenceRandom(1));
 

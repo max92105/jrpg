@@ -97,7 +97,7 @@ public sealed class PartyMemberGearTests
         var member = NewMember();
         var ring = new ItemDefinitionBuilder().WithId("power_ring").AsWorn(EquipmentKind.Ring).WithBonuses(new StatBonuses(new Dictionary<StatKind, int> { [StatKind.Power] = 5 })).Build();
         _inventory.Add(ring, 1);
-        Assert.True(new PartyEquipment(_inventory).TryEquip(member, ring, EquipmentSlot.FirstRing));
+        Assert.True(new PartyEquipment(_inventory).TryEquip(member, GearPiece.Plain(ring), EquipmentSlot.FirstRing));
 
         var sheet = member.SheetWith(GearPiece.Plain(ring), EquipmentSlot.SecondRing);
 
@@ -148,6 +148,6 @@ public sealed class PartyMemberGearTests
     private void Equip(PartyMember member, ItemDefinition item)
     {
         _inventory.Add(item, 1);
-        Assert.True(new PartyEquipment(_inventory).TryEquip(member, item));
+        Assert.True(new PartyEquipment(_inventory).TryEquip(member, GearPiece.Plain(item)));
     }
 }

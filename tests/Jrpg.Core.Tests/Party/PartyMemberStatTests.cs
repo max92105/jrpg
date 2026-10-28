@@ -120,6 +120,6 @@ public sealed class PartyMemberStatTests
     {
         var inventory = new Inventory();
         inventory.Add(item, 1);
-        Assert.True(new PartyEquipment(inventory).TryEquip(member, item));
+        Assert.True(new PartyEquipment(inventory).TryEquip(member, GearPiece.Plain(item)));
     }
 }

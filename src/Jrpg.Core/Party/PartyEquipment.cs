@@ -3,31 +3,28 @@ using Jrpg.Core.Items;
 namespace Jrpg.Core.Party;
 
 /// <summary>
-/// Moves equipment between the inventory and party members. A worn copy is not in the inventory
-/// (ADR 0003), so equipping takes a copy out and whatever it replaces goes back in.
+/// Moves gear pieces between the inventory and party members. A worn piece is not in the inventory (ADR 0003), so
+/// equipping takes it out and whatever it replaces goes back in, keeping its rolls (ADR 0029).
 /// </summary>
 public sealed class PartyEquipment(Inventory inventory)
 {
-    /// <summary>Equips the item in the first slot its kind fits: a ring in the first ring slot.</summary>
-    /// <returns>
-    /// As <see cref="TryEquip(PartyMember, ItemDefinition, EquipmentSlot)"/>; false for a non-equipment item.
-    /// </returns>
-    public bool TryEquip(PartyMember member, ItemDefinition item) =>
-        item.Equipment is { } equipment && TryEquip(member, item, EquipmentFit.SlotsFor(equipment.Kind)[0]);
+    /// <summary>Equips the piece in the first slot its kind fits: a ring in the first ring slot.</summary>
+    /// <returns>As <see cref="TryEquip(PartyMember, GearPiece, EquipmentSlot)"/>.</returns>
+    public bool TryEquip(PartyMember member, GearPiece piece) =>
+        TryEquip(member, piece, EquipmentFit.SlotsFor(piece.Kind)[0]);
 
     /// <returns>
-    /// True if the member wears the item in the slot afterwards; true without changes if they already wore it
-    /// there. False if the item isn't equipment whose kind fits the slot (ADR 0028) or no plain piece of it is owned.
-    /// Nothing changes when it returns false. Gear has no cap, so what it replaces always goes back (decision 345).
+    /// True if the member wears the piece in the slot afterwards; true without changes if they already wore an equal
+    /// piece there. False if the piece's kind doesn't fit the slot (ADR 0028) or no equal piece is owned. Nothing
+    /// changes when it returns false. Gear has no cap, so what it replaces always goes back (decision 345).
     /// </returns>
-    public bool TryEquip(PartyMember member, ItemDefinition item, EquipmentSlot slot)
+    public bool TryEquip(PartyMember member, GearPiece piece, EquipmentSlot slot)
     {
-        if (item.Equipment is null || !EquipmentFit.Fits(item.Equipment.Kind, slot))
+        if (!EquipmentFit.Fits(piece.Kind, slot))
         {
             return false;
         }
 
-        var piece = GearPiece.Plain(item);
         var replaced = member.EquippedIn(slot);
         if (piece.Equals(replaced))
         {
@@ -48,14 +45,9 @@ public sealed class PartyEquipment(Inventory inventory)
         return true;
     }
 
-    /// <summary>
-    /// What any member could put on in the slot: the owned pieces' base items that fit it, each once, in pickup order.
-    /// </summary>
-    public IReadOnlyList<ItemDefinition> OwnedFor(EquipmentSlot slot) =>
-        [.. inventory.Gear
-            .Where(piece => EquipmentFit.Fits(piece.Kind, slot))
-            .Select(piece => piece.Base)
-            .Distinct()];
+    /// <summary>What any member could put on in the slot: each owned piece that fits it, in pickup order.</summary>
+    public IReadOnlyList<GearPiece> OwnedFor(EquipmentSlot slot) =>
+        [.. inventory.Gear.Where(piece => EquipmentFit.Fits(piece.Kind, slot))];
 
     /// <summary>
     /// What the member could take from another member in the slot (decision 137): each other member's item there,

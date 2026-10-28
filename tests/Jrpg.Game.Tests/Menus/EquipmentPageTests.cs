@@ -32,7 +32,7 @@ public sealed class EquipmentPageTests
     public void Update_RemoveAll_EmptiesEverySlot()
     {
         var sarxian = WearingSwordAndArmor();
-        Assert.True(_session.Equipment.TryEquip(sarxian, StartMapScenarios.BelowClosedDoor.Items["power_ring"], EquipmentSlot.SecondRing));
+        Assert.True(_session.Equipment.TryEquip(sarxian, GearPiece.Plain(StartMapScenarios.BelowClosedDoor.Items["power_ring"]), EquipmentSlot.SecondRing));
         var page = NewPage();
 
         ConfirmRemoveAll(page);
@@ -53,8 +53,8 @@ public sealed class EquipmentPageTests
         page.Update(Pressing(GameButton.Confirm));
 
         Assert.True(page.IsChoosing);
-        Assert.Contains(StartMapScenarios.BelowClosedDoor.Items["power_ring"], page.Choice!.Items);
-        Assert.All(page.Choice.Items, item => Assert.Equal(EquipmentKind.Ring, item.Equipment!.Kind));
+        Assert.Contains(GearPiece.Plain(StartMapScenarios.BelowClosedDoor.Items["power_ring"]), page.Choice!.Owned);
+        Assert.All(page.Choice.Owned, piece => Assert.Equal(EquipmentKind.Ring, piece.Kind));
     }
 
     [Fact]
@@ -165,7 +165,7 @@ public sealed class EquipmentPageTests
     private PartyMember ZanyrWearingIronSword()
     {
         var zanyr = _session.Party.MemberById("zanyr");
-        Assert.True(_session.Equipment.TryEquip(zanyr, StartMapScenarios.BelowClosedDoor.Items["iron_sword"]));
+        Assert.True(_session.Equipment.TryEquip(zanyr, GearPiece.Plain(StartMapScenarios.BelowClosedDoor.Items["iron_sword"])));
         return zanyr;
     }
 
@@ -182,7 +182,7 @@ public sealed class EquipmentPageTests
     }
 
     private static bool IsZanyrsIronSword(EquipmentChoice choice) =>
-        choice.HighlightedWearer?.Id == "zanyr" && choice.Highlighted?.Id == "iron_sword";
+        choice.HighlightedWearer?.Id == "zanyr" && choice.Highlighted?.Base.Id == "iron_sword";
 
     [Fact]
     public void Advance_AfterMovingDown_SelectionReachesTheNextSlot()
@@ -200,8 +200,8 @@ public sealed class EquipmentPageTests
     {
         var sarxian = _session.Party.Leader;
         var items = StartMapScenarios.BelowClosedDoor.Items;
-        Assert.True(_session.Equipment.TryEquip(sarxian, items["bronze_sword"]));
-        Assert.True(_session.Equipment.TryEquip(sarxian, items["leather_armor"]));
+        Assert.True(_session.Equipment.TryEquip(sarxian, GearPiece.Plain(items["bronze_sword"])));
+        Assert.True(_session.Equipment.TryEquip(sarxian, GearPiece.Plain(items["leather_armor"])));
         return sarxian;
     }
 

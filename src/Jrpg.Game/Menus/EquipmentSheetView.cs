@@ -17,8 +17,7 @@ internal sealed class EquipmentSheetView
     // Placeholder layout (decision 82): a 28 x 20 margin, the member's name as a heading, section titles as dark bands
     // (decision 335), 40 px rows (the slot label 10 px in, then a 32 px icon in a 48 px column and what's worn), a 10
     // px gap above "Remove all", then the comparison. The 848 px page: 20 + 60 + 46 to the first row, nine rows 360,
-    // the gap and "Remove all" 50, 18 to the Changes band (554), the section's 246 (800), then 12 to the notice, which
-    // ends near 842.
+    // the gap and "Remove all" 50, 18 to the Changes band (554), and the section's 246, which ends at 800.
     private const int Margin = 28;
     private const int TopMargin = 20;
     private const int HeadingPixels = 30;
@@ -32,7 +31,6 @@ internal sealed class EquipmentSheetView
     private const int WornColumn = 260;
     private const int ActionGap = 10;
     private const int ChangesGap = 18;
-    private const int NoticeGap = 12;
 
     private readonly UiTextures _ui;
     private readonly SpriteFontBase _headingFont;
@@ -86,11 +84,6 @@ internal sealed class EquipmentSheetView
 
         var changes = removeAll with { Y = removeAll.Bottom + ChangesGap, Height = 0 };
         _changes.Draw(batch, textures, new EquipmentChangesView.Place(changes, place.Changes, place.ChangesCaptionId), opacity);
-        if (place.Notice is not null)
-        {
-            var noticeTop = changes.Y + EquipmentChangesView.Height + NoticeGap;
-            batch.DrawString(_bodyFont, place.Notice, new Vector2(rows.X + RowInset, noticeTop), UiTheme.Danger * opacity);
-        }
     }
 
     // The first slot's row: under the heading and the equipment title, inside the margins.
@@ -144,15 +137,13 @@ internal sealed class EquipmentSheetView
     /// <param name="HasCursor">False while the choice panel has it: the selected row dims, with no pointer.</param>
     /// <param name="Changes">What a change would do, or what the highlighted worn item gives; null for nothing.</param>
     /// <param name="ChangesCaptionId">Which of the two the comparison shows: its band's caption.</param>
-    /// <param name="Notice">Why the last change didn't happen, or null.</param>
     public readonly record struct Place(
         EquipmentSheet Sheet,
         Rectangle Area,
         SelectionMotion Selection,
         bool HasCursor,
         StatComparisonText? Changes,
-        string ChangesCaptionId,
-        string? Notice);
+        string ChangesCaptionId);
 
     // A slot's row: its label and what's worn there, null for nothing.
     private readonly record struct SlotRow(Rectangle Row, string Label, GearPiece? Worn);

@@ -117,7 +117,6 @@
   "equipment_gives": "Gives",
   "equipment_more_changes": "+{count} more",
   "equipment_remove": "Remove",
-  "equipment_no_room": "There's no room in the bag for {item}.",
   "menu_party": "Party",
   "party_active": "Active party",
   "party_count": "{count} / {max}",

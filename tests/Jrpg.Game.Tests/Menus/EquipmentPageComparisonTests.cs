@@ -24,7 +24,7 @@ public sealed class EquipmentPageComparisonTests
         EquipmentPageRows.MoveDown(page, EquipmentPageRows.Of(EquipmentSlot.Chest));
         page.Update(Pressing(GameButton.Confirm));
 
-        while (page.Choice!.Highlighted?.Id != "chain_mail")
+        while (page.Choice!.Highlighted?.Base.Id != "chain_mail")
         {
             page.Update(Pressing(GameButton.Down));
         }
@@ -40,12 +40,12 @@ public sealed class EquipmentPageComparisonTests
     public void Update_ChoiceOnSecondRingWithTheFirstWorn_ComparesAgainstTheSecondSlot()
     {
         var items = StartMapScenarios.BelowClosedDoor.Items;
-        Assert.True(_session.Equipment.TryEquip(_session.Party.Leader, items["power_ring"], EquipmentSlot.FirstRing));
+        Assert.True(_session.Equipment.TryEquip(_session.Party.Leader, GearPiece.Plain(items["power_ring"]), EquipmentSlot.FirstRing));
         var page = NewPage();
         EquipmentPageRows.MoveDown(page, EquipmentPageRows.Of(EquipmentSlot.SecondRing));
         page.Update(Pressing(GameButton.Confirm));
 
-        while (page.Choice!.Highlighted?.Id != "sage_ring")
+        while (page.Choice!.Highlighted?.Base.Id != "sage_ring")
         {
             page.Update(Pressing(GameButton.Down));
         }
@@ -93,7 +93,7 @@ public sealed class EquipmentPageComparisonTests
     [Fact]
     public void Update_ChoiceOnRemove_ShowsTheWornWeaponsAttackLost()
     {
-        Assert.True(_session.Equipment.TryEquip(_session.Party.Leader, StartMapScenarios.BelowClosedDoor.Items["bronze_sword"]));
+        Assert.True(_session.Equipment.TryEquip(_session.Party.Leader, GearPiece.Plain(StartMapScenarios.BelowClosedDoor.Items["bronze_sword"])));
         var page = NewPage();
 
         page.Update(Pressing(GameButton.Confirm));
@@ -104,7 +104,7 @@ public sealed class EquipmentPageComparisonTests
     }
 
     private void WearChainMail() =>
-        Assert.True(_session.Equipment.TryEquip(_session.Party.Leader, StartMapScenarios.BelowClosedDoor.Items["chain_mail"]));
+        Assert.True(_session.Equipment.TryEquip(_session.Party.Leader, GearPiece.Plain(StartMapScenarios.BelowClosedDoor.Items["chain_mail"])));
 
     private EquipmentPage NewPage() => new(RepositoryScreenText.Text, new UiTextures(), _session);
 }

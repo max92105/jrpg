@@ -1,3 +1,4 @@
+using Jrpg.Core.Items;
 using Jrpg.Core.Session;
 using Jrpg.Core.Stats;
 using Jrpg.Game.Menus;
@@ -62,7 +63,7 @@ public sealed class StatusPageSheetTests
         page.Open();
         var without = page.ShownSheet.Resistances[(int)DamageType.Slashing];
         var leader = _session.Party.Leader;
-        Assert.True(_session.Equipment.TryEquip(leader, StartMapScenarios.BelowClosedDoor.Items["chain_mail"]));
+        Assert.True(_session.Equipment.TryEquip(leader, GearPiece.Plain(StartMapScenarios.BelowClosedDoor.Items["chain_mail"])));
 
         page.Open();
 
@@ -90,7 +91,7 @@ public sealed class StatusPageSheetTests
         var page = NewPage();
         page.Open();
         var without = page.ShownSheet.Attributes[2];
-        Assert.True(_session.Equipment.TryEquip(_session.Party.Leader, StartMapScenarios.BelowClosedDoor.Items["magic_staff"]));
+        Assert.True(_session.Equipment.TryEquip(_session.Party.Leader, GearPiece.Plain(StartMapScenarios.BelowClosedDoor.Items["magic_staff"])));
 
         page.Open();
 
@@ -137,7 +138,7 @@ public sealed class StatusPageSheetTests
         var bonuses = new StatBonuses(new Dictionary<StatKind, int> { [kind] = bonus });
         var armor = mail with { Id = "test_armor", Equipment = mail.Equipment! with { Bonuses = bonuses } };
         _session.Inventory.Add(armor, 1);
-        Assert.True(_session.Equipment.TryEquip(_session.Party.Leader, armor));
+        Assert.True(_session.Equipment.TryEquip(_session.Party.Leader, GearPiece.Plain(armor)));
     }
 
     private StatusPage NewPage() => new(RepositoryScreenText.Text, new UiTextures(), _session, StartMapScenarios.BelowClosedDoor);

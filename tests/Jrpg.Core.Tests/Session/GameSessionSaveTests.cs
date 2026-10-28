@@ -114,8 +114,8 @@ public sealed class GameSessionSaveTests
     public void CaptureThenRestore_EquippedItemsAreWornNotInInventory()
     {
         var session = StartNew();
-        session.Equipment.TryEquip(session.Party.Leader, _sword);
-        session.Equipment.TryEquip(session.Party.Leader, _mail);
+        session.Equipment.TryEquip(session.Party.Leader, GearPiece.Plain(_sword));
+        session.Equipment.TryEquip(session.Party.Leader, GearPiece.Plain(_mail));
 
         var restored = SaveAndRestore(session);
 

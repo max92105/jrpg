@@ -1,5 +1,6 @@
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
+using Jrpg.Core.Stats;
 using Jrpg.Core.Tests.Builders;
 
 namespace Jrpg.Core.Tests.Party;
@@ -148,10 +149,26 @@ public sealed class PartyEquipmentTakeTests
         Assert.Same(_ironSword, _sarxian.Weapon?.Base);
     }
 
+    // Pieces of one base with other rolls aren't equal (ADR 0029), so the plain sword's wearer can take the rolled one.
+    [Fact]
+    public void TryTakeFrom_ReceiverWearsPlainPieceOfSameBase_TakesRolledPiece()
+    {
+        var rolled = GearPiece.Rolled(_ironSword, Rarity.Magic, [new RolledAffix("power", StatKind.Power, 3)]);
+        _inventory.AddGear(rolled);
+        Assert.True(_equipment.TryEquip(_jazog, rolled));
+        Dress(_sarxian, _ironSword);
+
+        var taken = _equipment.TryTakeFrom(_jazog, _sarxian, EquipmentSlot.Weapon);
+
+        Assert.True(taken);
+        Assert.Equal(rolled, _sarxian.Weapon);
+        Assert.Equal([GearPiece.Plain(_ironSword)], _inventory.Gear);
+    }
+
     // Puts the item on through the bag, as the game does.
     private void Dress(PartyMember member, ItemDefinition item)
     {
         _inventory.Add(item, 1);
-        Assert.True(_equipment.TryEquip(member, item));
+        Assert.True(_equipment.TryEquip(member, GearPiece.Plain(item)));
     }
 }

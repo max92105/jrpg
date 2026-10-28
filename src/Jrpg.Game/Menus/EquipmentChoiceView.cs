@@ -1,5 +1,4 @@
 using FontStashSharp;
-using Jrpg.Core.Items;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
@@ -18,7 +17,7 @@ internal sealed class EquipmentChoiceView
     public const int PanelWidth = 600;
 
     // Placeholder layout (decision 82): a 24 x 20 margin, a 30 px heading, column titles over a hairline, then 52 px
-    // rows (a 32 px icon in a 48 px column, the quantity 16 px from the right).
+    // rows (a 32 px icon in a 48 px column, then the name; one row per piece, so no quantity, decision 345).
     private const int Margin = 24;
     private const int TopMargin = 20;
     private const int HeadingPixels = 30;
@@ -30,7 +29,6 @@ internal sealed class EquipmentChoiceView
     private const int RowInset = 10;
     private const int IconColumn = 48;
     private const int IconSize = 32;
-    private const int QuantityInset = 16;
 
     private readonly UiTextures _ui;
     private readonly UiMessages _messages;
@@ -39,7 +37,6 @@ internal sealed class EquipmentChoiceView
     private readonly string _remove;
     private readonly ColumnTitles _columnTitles;
     private string _heading = string.Empty;
-    private MeasuredText[] _quantities = [];
     private string[] _wornRows = [];
 
     /// <param name="text">Messages and fonts.</param>
@@ -57,18 +54,15 @@ internal sealed class EquipmentChoiceView
             ui,
             [
                 ColumnTitle.FromLeft(text.Messages.Text(MessageIds.InventoryColumnItem), RowInset + IconColumn),
-                ColumnTitle.FromRight(text.Messages.Text(MessageIds.InventoryColumnQuantity), QuantityInset),
             ]);
     }
 
     /// <summary>Builds the text once, when the choice opens.</summary>
     /// <param name="choice">The items offered.</param>
     /// <param name="slotName">The slot's name, as the heading.</param>
-    /// <param name="inventory">How many of each item are owned.</param>
-    public void Show(EquipmentChoice choice, string slotName, Inventory inventory)
+    public void Show(EquipmentChoice choice, string slotName)
     {
         _heading = slotName;
-        _quantities = [.. choice.Items.Select(item => MeasuredText.Of(_bodyFont, NumberText.Of(inventory.GearCountOf(item.Id))))];
         _wornRows = [.. choice.Takeable.Select(worn => _messages.Format(
             MessageIds.EquipmentWornRow,
             new MessageArgument("item", worn.Piece.Base.Name),
@@ -113,14 +107,12 @@ internal sealed class EquipmentChoiceView
         if (choice.WornAt(index) is { } worn)
         {
             batch.Draw(_ui.Icon(textures, worn.Piece.Base.IconFile, IconSize), new Vector2(row.X + RowInset, iconTop), Color.White);
-            batch.DrawString(_bodyFont, _wornRows[index - 1 - choice.Items.Count], new Vector2(nameLeft, textTop), UiTheme.TextSecondary);
+            batch.DrawString(_bodyFont, _wornRows[index - 1 - choice.Owned.Count], new Vector2(nameLeft, textTop), UiTheme.TextSecondary);
             return;
         }
 
-        var item = choice.Items[index - 1];
-        batch.Draw(_ui.Icon(textures, item.IconFile, IconSize), new Vector2(row.X + RowInset, iconTop), Color.White);
-        batch.DrawString(_bodyFont, item.Name, new Vector2(nameLeft, textTop), UiTheme.TextPrimary);
-        var quantity = _quantities[index - 1];
-        batch.DrawString(_bodyFont, quantity.Text, new Vector2(row.Right - QuantityInset - quantity.Width, textTop), UiTheme.TextPrimary);
+        var owned = choice.Owned[index - 1].Base;
+        batch.Draw(_ui.Icon(textures, owned.IconFile, IconSize), new Vector2(row.X + RowInset, iconTop), Color.White);
+        batch.DrawString(_bodyFont, owned.Name, new Vector2(nameLeft, textTop), UiTheme.TextPrimary);
     }
 }

@@ -36,7 +36,7 @@ public sealed class BattlePowerTests
         var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(30).Build();
         var inventory = new Inventory();
         inventory.Add(sword, 1);
-        new PartyEquipment(inventory).TryEquip(fighter, sword);
+        new PartyEquipment(inventory).TryEquip(fighter, GearPiece.Plain(sword));
         var (goblin, battle) = Battle(Combatant.FromPartyMember(fighter), inventory);
 
         var events = battle.Execute(new AttackCommand(goblin));
@@ -52,7 +52,7 @@ public sealed class BattlePowerTests
         var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(30).Build();
         var inventory = new Inventory();
         inventory.Add(sword, 1);
-        new PartyEquipment(inventory).TryEquip(fighter, sword);
+        new PartyEquipment(inventory).TryEquip(fighter, GearPiece.Plain(sword));
         var (goblin, battle) = Battle(Combatant.FromPartyMember(fighter), inventory);
 
         var events = battle.Execute(new AttackCommand(goblin));

@@ -86,7 +86,7 @@ public sealed class GoblinTrioSimulation(ITestOutputHelper output)
         {
             var owned = equipment.OwnedFor(slot);
             Assert.True(owned.Count > 0, $"The starting gear has nothing that fits the {slot} slot.");
-            Assert.True(equipment.TryEquip(leader, owned[0], slot), $"The starting gear's {owned[0].Id} didn't go on in the {slot} slot.");
+            Assert.True(equipment.TryEquip(leader, owned[0], slot), $"The starting gear's {owned[0].Base.Id} didn't go on in the {slot} slot.");
         }
     }
 

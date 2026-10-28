@@ -69,7 +69,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the escape menu third pass plan (2026-10-26)
 
-- Two refusals are still red lines while the Party page's open the OK dialog (`Ui/NoticeDialog`, decision 268): Equipment's notice under its parameters (`EquipmentSheetView`, `UiTheme.Danger`) and the save page's failure line (`SavePage`). Kept as they are by decision 284; move them to `NoticeDialog` if the developer asks for it.
+- The save page's failure line (`SavePage`) is still a red line while the Party page's refusals open the OK dialog (`Ui/NoticeDialog`, decision 268). Kept as it is by decision 284; move it to `NoticeDialog` if the developer asks for it. (Equipment's notice left with the room rule, loot plan G1b-2.)
 
 ## From the escape menu third pass plan (2026-10-27)
 
@@ -87,3 +87,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - Labels are uppercased in three places (`StatusLabels.Caps`, `EquipmentLabels.From`, `EquipmentChangesView.Measure`): `SheetRowLook.DrawLabel` could cap once, if measuring stays out of `Draw` (E2 review).
 - A one-stat `StatBonuses` is built inline about 20 times as `new(new Dictionary<StatKind, int> { [stat] = value })` (`GearPiece.BonusOf`, `GearPieceTests.Bonus`, `MemberSheetTests.Bonus`, `PartyMemberGearTests` and others): a `StatBonuses.Of(stat, value)` factory would replace them (loot plan, G1a review).
 - Equipment's `maxStack` is no longer read since gear became pieces (loot plan, G1b-1): drop it from equipment entries in `items.json` and the validator's rule for them.
+- `Inventory.HasRoomFor` has no caller in `src/` since the room rule left (loot plan, G1b-2); only `InventoryTests` use it. Remove it, or keep it if stacks get a cap the game checks before adding.

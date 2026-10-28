@@ -50,7 +50,7 @@ public sealed class PartyMemberWillTests
         var cleric = Cleric(will: 4);
         var amulet = new ItemDefinitionBuilder().WithId("amulet").AsChest().WithBonuses(new StatBonuses(new Dictionary<StatKind, int> { [StatKind.Will] = 6 })).Build();
         _inventory.Add(amulet, 1);
-        Assert.True(new PartyEquipment(_inventory).TryEquip(cleric, amulet));
+        Assert.True(new PartyEquipment(_inventory).TryEquip(cleric, GearPiece.Plain(amulet)));
         cleric.Rest();
         Assert.Equal(6, cleric.LastingAmounts["faith"]);
 

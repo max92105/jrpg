@@ -29,7 +29,7 @@ public sealed class PartyEquipmentSlotTests
     {
         _inventory.Add(_ring, 1);
 
-        Assert.True(_equipment.TryEquip(_sarxian, _ring, EquipmentSlot.SecondRing));
+        Assert.True(_equipment.TryEquip(_sarxian, GearPiece.Plain(_ring), EquipmentSlot.SecondRing));
 
         Assert.Same(_ring, _sarxian.EquippedIn(EquipmentSlot.SecondRing)?.Base);
         Assert.Null(_sarxian.EquippedIn(EquipmentSlot.FirstRing));
@@ -42,8 +42,8 @@ public sealed class PartyEquipmentSlotTests
         var powerBefore = _sarxian.Sheet.Primaries.Power;
         _inventory.Add(_ring, 2);
 
-        Assert.True(_equipment.TryEquip(_sarxian, _ring, EquipmentSlot.FirstRing));
-        Assert.True(_equipment.TryEquip(_sarxian, _ring, EquipmentSlot.SecondRing));
+        Assert.True(_equipment.TryEquip(_sarxian, GearPiece.Plain(_ring), EquipmentSlot.FirstRing));
+        Assert.True(_equipment.TryEquip(_sarxian, GearPiece.Plain(_ring), EquipmentSlot.SecondRing));
 
         Assert.Equal((_ring, _ring), (_sarxian.EquippedIn(EquipmentSlot.FirstRing)?.Base, _sarxian.EquippedIn(EquipmentSlot.SecondRing)?.Base));
         Assert.Equal(powerBefore + 10, _sarxian.Sheet.Primaries.Power);
@@ -55,7 +55,7 @@ public sealed class PartyEquipmentSlotTests
     {
         _inventory.Add(_ring, 1);
 
-        Assert.True(_equipment.TryEquip(_sarxian, _ring));
+        Assert.True(_equipment.TryEquip(_sarxian, GearPiece.Plain(_ring)));
 
         Assert.Same(_ring, _sarxian.EquippedIn(EquipmentSlot.FirstRing)?.Base);
     }
@@ -65,7 +65,7 @@ public sealed class PartyEquipmentSlotTests
     {
         _inventory.Add(_helm, 1);
 
-        Assert.False(_equipment.TryEquip(_sarxian, _helm, EquipmentSlot.Chest));
+        Assert.False(_equipment.TryEquip(_sarxian, GearPiece.Plain(_helm), EquipmentSlot.Chest));
 
         Assert.Null(_sarxian.EquippedIn(EquipmentSlot.Chest));
         Assert.Equal(1, _inventory.GearCountOf(_helm.Id));
@@ -75,11 +75,26 @@ public sealed class PartyEquipmentSlotTests
     public void TakeableFor_SecondRing_ListsOtherMembersRings()
     {
         _inventory.Add(_ring, 1);
-        Assert.True(_equipment.TryEquip(_jazog, _ring, EquipmentSlot.SecondRing));
+        Assert.True(_equipment.TryEquip(_jazog, GearPiece.Plain(_ring), EquipmentSlot.SecondRing));
         var party = new PartyState([_sarxian, _jazog], [_sarxian, _jazog], new PartyRules(MaxActiveMembers: 4));
 
         var takeable = PartyEquipment.TakeableFor(_sarxian, EquipmentSlot.SecondRing, party);
 
         Assert.Equal([new WornItem(_jazog, GearPiece.Plain(_ring))], takeable);
+    }
+
+    // One row per piece (decision 345): two rings of one base are two entries, a rolled one apart from a plain one.
+    [Fact]
+    public void OwnedFor_Ring_ListsEachPieceInPickupOrder()
+    {
+        var rolled = GearPiece.Rolled(_ring, Rarity.Magic, [new RolledAffix("power", StatKind.Power, 2)]);
+        _inventory.Add(_ring, 1);
+        _inventory.Add(_helm, 1);
+        _inventory.AddGear(rolled);
+        _inventory.Add(_ring, 1);
+
+        var owned = _equipment.OwnedFor(EquipmentSlot.SecondRing);
+
+        Assert.Equal([GearPiece.Plain(_ring), rolled, GearPiece.Plain(_ring)], owned);
     }
 }

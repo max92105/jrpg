@@ -311,9 +311,6 @@ internal static class MessageIds
     /// <summary>The equipment choice's first row, which takes off what's worn in the slot.</summary>
     public const string EquipmentRemove = "equipment_remove";
 
-    /// <summary>Placeholder <c>{item}</c>: the worn item that can't go back in its full inventory stack.</summary>
-    public const string EquipmentNoRoom = "equipment_no_room";
-
     /// <summary>The game menu's Party tab.</summary>
     public const string MenuParty = "menu_party";
 

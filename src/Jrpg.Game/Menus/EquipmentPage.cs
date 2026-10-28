@@ -1,5 +1,4 @@
 using System.Diagnostics.CodeAnalysis;
-using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Session;
 using Jrpg.Game.Input;
@@ -19,7 +18,6 @@ internal sealed class EquipmentPage : IMemberPage
 {
     private readonly PartyState _party;
     private readonly PartyEquipment _equipment;
-    private readonly Inventory _inventory;
     private readonly UiMessages _messages;
     private readonly string _pageHint;
     private readonly EquipmentSheetView _sheetView;
@@ -31,7 +29,6 @@ internal sealed class EquipmentPage : IMemberPage
     private EquipmentSheet _sheet;
     private readonly EquipmentComparison _comparison;
     private readonly SlotChoice _slotChoice;
-    private string? _notice;
 
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared textures: section lines, icons, the selected row.</param>
@@ -41,7 +38,6 @@ internal sealed class EquipmentPage : IMemberPage
         _pageHint = text.Messages.Text(MessageIds.MenuHintEquipment);
         _party = session.Party;
         _equipment = session.Equipment;
-        _inventory = session.Inventory;
         _messages = text.Messages;
         _sheetView = new EquipmentSheetView(text, ui);
         _choiceView = new EquipmentChoiceView(text, ui);
@@ -73,7 +69,6 @@ internal sealed class EquipmentPage : IMemberPage
         _rowCursor.Select(0);
         _selection.JumpTo(_rowCursor);
         _sheet = EquipmentSheet.Of(Shown);
-        _notice = null;
         ShowWornComparison();
     }
 
@@ -97,9 +92,6 @@ internal sealed class EquipmentPage : IMemberPage
 
     /// <summary>The open choice, so tests can pick a row by what it holds; null while no slot is being chosen for.</summary>
     internal EquipmentChoice? Choice => _slotChoice.Choice;
-
-    /// <summary>Why the last change didn't happen, or null.</summary>
-    public string? Notice => _notice;
 
     /// <summary>
     /// The comparison band's caption: "Changes" while a choice is open (what the highlighted item would change),
@@ -129,7 +121,6 @@ internal sealed class EquipmentPage : IMemberPage
         if (_memberCursor.Selected != shownBefore)
         {
             _sheet = EquipmentSheet.Of(Shown);
-            _notice = null;
             ShowWornComparison();
             return null;
         }
@@ -144,7 +135,7 @@ internal sealed class EquipmentPage : IMemberPage
     {
         var sheetArea = area with { Width = area.Width - EquipmentChoiceView.PanelWidth };
         _panel.Draw(batch, textures.Pixel, MenuLayout.FullHeight(sheetArea), opacity);
-        _sheetView.Draw(batch, textures, new EquipmentSheetView.Place(_sheet, sheetArea, _selection, !_slotChoice.IsOpen, _comparison.Text, ChangesCaptionId, _notice), opacity);
+        _sheetView.Draw(batch, textures, new EquipmentSheetView.Place(_sheet, sheetArea, _selection, !_slotChoice.IsOpen, _comparison.Text, ChangesCaptionId), opacity);
         if (_slotChoice.Choice is not { } choice)
         {
             _panel.DrawRightEdge(batch, textures.Pixel, MenuLayout.FullHeight(sheetArea), opacity);
@@ -157,8 +148,7 @@ internal sealed class EquipmentPage : IMemberPage
     }
 
     /// <summary>
-    /// Takes off what the member wears, slot by slot. A worn item whose inventory stack is already full stays worn, as
-    /// <see cref="PartyEquipment.TryUnequip"/> refuses it.
+    /// Takes off what the member wears, slot by slot; every piece goes back to the inventory (decision 345).
     /// </summary>
     private void RemoveAll()
     {
@@ -195,7 +185,6 @@ internal sealed class EquipmentPage : IMemberPage
             return;
         }
 
-        _notice = null;
         if (_rowCursor.Selected == EquipmentSheet.Slots.Length)
         {
             RemoveAll();
@@ -204,7 +193,7 @@ internal sealed class EquipmentPage : IMemberPage
 
         var slot = EquipmentSheet.Slots[_rowCursor.Selected];
         var choice = _slotChoice.Open(Shown, slot);
-        _choiceView.Show(choice, _messages.Text(EquipmentSheet.LabelIdOf(slot)), _inventory);
+        _choiceView.Show(choice, _messages.Text(EquipmentSheet.LabelIdOf(slot)));
     }
 
     // Once the choice closes, the sheet shows what changed and Changes goes back to the worn item.
@@ -215,7 +204,6 @@ internal sealed class EquipmentPage : IMemberPage
             return;
         }
 
-        _notice = _slotChoice.Refusal;
         _sheet = EquipmentSheet.Of(Shown);
         ShowWornComparison();
     }

@@ -47,7 +47,7 @@ public sealed class EquipmentSheetTests
     private ItemDefinition WearBronzeSword()
     {
         var sword = StartMapScenarios.BelowClosedDoor.Items["bronze_sword"];
-        Assert.True(_session.Equipment.TryEquip(_session.Party.Leader, sword));
+        Assert.True(_session.Equipment.TryEquip(_session.Party.Leader, GearPiece.Plain(sword)));
         return sword;
     }
 }

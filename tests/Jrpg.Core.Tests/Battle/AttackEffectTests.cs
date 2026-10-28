@@ -16,7 +16,7 @@ public sealed class AttackEffectTests
         var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).WithDamageType(DamageType.Slashing).Build();
         var inventory = new Inventory();
         inventory.Add(sword, 1);
-        new PartyEquipment(inventory).TryEquip(member, sword);
+        new PartyEquipment(inventory).TryEquip(member, GearPiece.Plain(sword));
 
         var effect = AttackEffect.Of(Combatant.FromPartyMember(member));
 

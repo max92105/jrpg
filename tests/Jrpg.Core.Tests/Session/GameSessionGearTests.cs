@@ -24,7 +24,7 @@ public sealed class GameSessionGearTests
         foreach (var (item, slot) in new[] { (sword, EquipmentSlot.Weapon), (_mail, EquipmentSlot.Chest), (helm, EquipmentSlot.Head), (ring, EquipmentSlot.FirstRing), (ring, EquipmentSlot.SecondRing) })
         {
             session.Inventory.Add(item, 1);
-            Assert.True(session.Equipment.TryEquip(session.Party.Leader, item, slot));
+            Assert.True(session.Equipment.TryEquip(session.Party.Leader, GearPiece.Plain(item), slot));
         }
 
         var restored = GameSession.Restore(session.Capture(DateTimeOffset.UnixEpoch), catalog, new FixedSequenceRandom());
@@ -60,7 +60,7 @@ public sealed class GameSessionGearTests
         var catalog = built with { Rules = built.Rules with { Stats = TestStatRules.Neutral with { HpPercentPer100Constitution = 100 } } };
         var session = GameSession.StartNew(catalog, "sarxian", new FixedSequenceRandom());
         session.Inventory.Add(_mail, 1);
-        Assert.True(session.Equipment.TryEquip(session.Party.Leader, _mail));
+        Assert.True(session.Equipment.TryEquip(session.Party.Leader, GearPiece.Plain(_mail)));
         session.Party.Leader.Rest();
 
         var restored = GameSession.Restore(session.Capture(DateTimeOffset.UnixEpoch), catalog, new FixedSequenceRandom());

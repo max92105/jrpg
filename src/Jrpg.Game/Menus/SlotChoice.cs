@@ -22,7 +22,7 @@ internal sealed class SlotChoice
 
     /// <param name="session">The party, its equipment and the inventory.</param>
     /// <param name="comparison">The page's Changes band, which follows the highlight while the choice is open.</param>
-    /// <param name="messages">The take hint and the refusal.</param>
+    /// <param name="messages">The take hint.</param>
     public SlotChoice(GameSession session, EquipmentComparison comparison, UiMessages messages)
     {
         _session = session;
@@ -38,9 +38,6 @@ internal sealed class SlotChoice
     /// <summary>The footer's line while a worn item is highlighted, naming who would lose it; null otherwise.</summary>
     public string? TakeHint { get; private set; }
 
-    /// <summary>Why the last pick changed nothing; null when it went through or the choice was cancelled.</summary>
-    public string? Refusal { get; private set; }
-
     /// <summary>
     /// Opens the choice of what <paramref name="member"/> wears in <paramref name="slot"/>, and returns it.
     /// </summary>
@@ -48,7 +45,6 @@ internal sealed class SlotChoice
     {
         var choice = new EquipmentChoice(_session.Equipment.OwnedFor(slot), PartyEquipment.TakeableFor(member, slot, _session.Party));
         _open = new OpenSlot(member, slot, choice);
-        Refusal = null;
         ShowPreview(_open);
         return choice;
     }
@@ -103,22 +99,18 @@ internal sealed class SlotChoice
         TakeHint = null;
     }
 
-    // A worn item is taken from its wearer (decision 137). The no-room refusal can't fire since gear has no stack (loot
-    // plan, G1b-1); G1b-2 removes it.
+    // A worn piece is taken from its wearer (decision 137). Core refuses nothing the player needs telling about (gear
+    // has no cap, decision 345): Remove on an empty slot, or a piece equal to the worn one, just changes nothing.
     private void Apply(OpenSlot open, EquipmentPick pick)
     {
         var equipment = _session.Equipment;
         var (member, slot, _) = open;
-        var changed = pick switch
+        _ = pick switch
         {
             { Giver: { } giver } => equipment.TryTakeFrom(giver, member, slot),
-            { Item: { } item } => equipment.TryEquip(member, item, slot),
+            { Piece: { } piece } => equipment.TryEquip(member, piece, slot),
             _ => equipment.TryUnequip(member, slot),
         };
-        if (!changed && member.EquippedIn(slot) is { } worn && !_session.Inventory.HasRoomFor(worn.Base))
-        {
-            Refusal = _messages.Format(MessageIds.EquipmentNoRoom, new MessageArgument("item", worn.Base.Name));
-        }
     }
 
     private sealed record OpenSlot(PartyMember Member, EquipmentSlot Slot, EquipmentChoice Choice);

@@ -1,4 +1,4 @@
-- [Roadmap](project_migration_roadmap.md) — escape menu third pass done (266-290, 333-336), stats+gear slots approved (291-332, ADRs 0026-0028) and next; numbers from docs/plans/README.md (337 / ADR 0029); loot plan after
+- [Roadmap](project_migration_roadmap.md) — stats+gear slots done; loot approved (+ affix-stats, forge drafts); numbers from docs/plans/README.md (363 / ADR 0031)
 - [Content quirks](project_content_quirks.md) — 1024 px party battlers, exact-case art names, player.png row order, empty skill icons
 - [Type/folder name clash](feedback_type_folder_name_clash.md) — never name a type after its feature folder (CA1724); use PartyState/BattleState
 - [Plan lessons](feedback_plan_lessons.md) — slice sizes, folder-dependency tables, no-caller APIs, presenter/draw split, code-health splits, wording-removal plans

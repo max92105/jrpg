@@ -43,7 +43,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 - The editor's map save (`ContentWriter.WriteMap`) doesn't check that the files a map's events name exist: still images (`ArtReferenceCheck`) and voice files (`AudioReferenceCheck`). The game's startup rejects both, so an editor save can write content the game won't start with (`editor.md`, "Validate on save").
 - `Core/Exploration/ExplorationState.cs` (296) is near 300. The next feature touching it should split it first: starting events (arrival, cell, touch) apart from walking.
-- Test files over 300 lines: `GameFlowTests` (369), `InventoryPageTests` (325), `PartyStateTests` (322). Split by behavior when next touched.
+- Test files over 300 lines: `GameFlowTests` (369), `PartyStateTests` (322). Split by behavior when next touched.
 - Comment lines over 120 columns from before the rule was enforced: `ExplorationState` (5), `GameSession` (8), `ArtReferenceCheck` (2), `MessageIds` (1). Rewrap when next touched.
 - `ScreenFade` skips its black moment when one update is longer than its fade-out plus hold (about 0.33 s), so a warp never moves the player. The fixed 1/60 s step hides it in play; tests must step at 1/60 s. Make `Update` stop on Holding if a long frame can ever reach it.
 - `BattleState.cs` is at 296 lines: split the per-command bodies before the next command path lands (DR2 review).
@@ -73,7 +73,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the escape menu third pass plan (2026-10-27)
 
-- `Menus/InventoryPage.cs` (280) and `Menus/PartyPage.cs` (275) are near 300: the next change that grows either splits it first (Inventory: the sidebar and aiming wiring into `ItemUse`; Party: the notice and the action choice into their own presenter).
+- `Menus/PartyPage.cs` (275) is near 300: the next change that grows it splits the notice and the action choice into their own presenter first. (`InventoryPage` split its list into `InventoryList` in the loot plan, C1.)
 - A titled dialog's frame (the scrim, a `FramedWindowLayout.Titled` window, the centered title, measured when the dialog changes) is written twice: `ConfirmPromptView` and `NoticeDialogView`. Share it when a third dialog comes, such as Equipment's or the save page's notice (decision 284).
 - The inventory hint names the Info button as "X (Y on a controller)" in `ui.json`, a copy of `InputBindings`; give the hint a `{button}` from `ButtonLabels.Of(GameButton.Info, device)` as `cinematic_skip` does, once menu pages know the device in use (F1 review).
 - Status: the Skills section starts under the longer of the gear and resource rows, so the stats plan's nine slots will push it off the page; that plan places it (F1 review).

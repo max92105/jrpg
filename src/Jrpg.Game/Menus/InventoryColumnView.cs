@@ -33,7 +33,7 @@ internal sealed class InventoryColumnView
 
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared gradient textures.</param>
-    /// <param name="bodyFont">The rows' font, which the page measures their quantities with.</param>
+    /// <param name="bodyFont">The rows' font, which `InventoryList` measures their quantities with.</param>
     /// <param name="categories">The rail's tabs, whose names head the list.</param>
     public InventoryColumnView(ScreenText text, UiTextures ui, SpriteFontBase bodyFont, IReadOnlyList<CategoryTab> categories)
     {

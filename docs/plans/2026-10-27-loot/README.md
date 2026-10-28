@@ -1,5 +1,5 @@
 # Loot
-Status: approved
+Status: approved, in progress
 
 Sixth feature plan after the migration, following the stats and gear slots plan (its "Out of scope": "the next plan, loot"; decision 294).
 - Numbers: decisions 338-355, 359-361 and question 362 here; 356 goes to [the affix stats plan](../2026-10-27-affix-stats/README.md), 357 (a question) and 358 to [the forge plan](../2026-10-27-forge/README.md). ADRs 0029 and 0030. The next free numbers are in `docs/plans/README.md` (decision 363, ADR 0031).
@@ -48,7 +48,7 @@ At the end of this plan:
 One line per slice; each slice's goal, types, tests and hand checks are in its file under `slices/`. Tick the box here when a slice is done, and write its deviations in the slice file. Tunables, design overview and risks: [design.md](design.md).
 
 ### Phase 0: clean-up
-- [ ] **C1. `InventoryPage`'s list moves to `Menus/InventoryList`; `InventoryPageTests` split** (Game, mechanical, about 180 lines moved) → [slices/C1.md](slices/C1.md)
+- [x] **C1. `InventoryPage`'s list moves to `Menus/InventoryList`; `InventoryPageTests` split** (Game, mechanical, about 180 lines moved) → [slices/C1.md](slices/C1.md)
 - [ ] **C2. `EquipmentPage`'s open choice moves to `Menus/SlotChoice`** (Game, mechanical, about 110 lines moved) → [slices/C2.md](slices/C2.md)
 - [ ] **C3. Save test files split: `FileSaveStoreTests` format checks apart, `SaveGameRepairTests` inventory and world apart** (tests, mechanical, about 200 lines moved) → [slices/C3.md](slices/C3.md)
 

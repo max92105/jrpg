@@ -15,7 +15,7 @@ Older plans are single files with the same sections.
 
 | Plan | Status |
 |---|---|
-| [2026-10-27-loot](2026-10-27-loot/README.md) | approved |
+| [2026-10-27-loot](2026-10-27-loot/README.md) | approved, in progress |
 | [2026-10-27-affix-stats](2026-10-27-affix-stats/README.md) | draft (after loot) |
 | [2026-10-27-forge](2026-10-27-forge/README.md) | draft (after loot) |
 | [done/2026-10-26-stats-and-gear-slots](done/2026-10-26-stats-and-gear-slots/README.md) | done |

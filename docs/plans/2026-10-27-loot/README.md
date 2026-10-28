@@ -49,7 +49,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 0: clean-up
 - [x] **C1. `InventoryPage`'s list moves to `Menus/InventoryList`; `InventoryPageTests` split** (Game, mechanical, about 180 lines moved) → [slices/C1.md](slices/C1.md)
-- [ ] **C2. `EquipmentPage`'s open choice moves to `Menus/SlotChoice`** (Game, mechanical, about 110 lines moved) → [slices/C2.md](slices/C2.md)
+- [x] **C2. `EquipmentPage`'s open choice moves to `Menus/SlotChoice`** (Game, mechanical, about 110 lines moved) → [slices/C2.md](slices/C2.md)
 - [ ] **C3. Save test files split: `FileSaveStoreTests` format checks apart, `SaveGameRepairTests` inventory and world apart** (tests, mechanical, about 200 lines moved) → [slices/C3.md](slices/C3.md)
 
 ### Phase 1: gear pieces

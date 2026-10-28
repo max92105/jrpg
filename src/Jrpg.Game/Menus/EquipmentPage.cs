@@ -21,7 +21,6 @@ internal sealed class EquipmentPage : IMemberPage
     private readonly PartyState _party;
     private readonly PartyEquipment _equipment;
     private readonly Inventory _inventory;
-    private readonly IReadOnlyDictionary<string, ItemDefinition> _items;
     private readonly UiMessages _messages;
     private readonly string _pageHint;
     private readonly EquipmentSheetView _sheetView;
@@ -31,13 +30,9 @@ internal sealed class EquipmentPage : IMemberPage
     private readonly ListCursor _rowCursor = new(EquipmentSheet.Slots.Length + 1, _ => true);
     private readonly SelectionMotion _selection = new();
     private EquipmentSheet _sheet;
-    private EquipmentChoice? _choice;
     private readonly EquipmentComparison _comparison;
-    // The choice row the comparison and the hint were built for; -1 when none was.
-    private int _previewedRow = -1;
+    private readonly SlotChoice _slotChoice;
     private string? _notice;
-    // The footer's line while a worn item is highlighted, naming who would lose it; null otherwise.
-    private string? _takeHint;
 
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared textures: section lines, icons, the selected row.</param>
@@ -49,11 +44,11 @@ internal sealed class EquipmentPage : IMemberPage
         _party = session.Party;
         _equipment = session.Equipment;
         _inventory = session.Inventory;
-        _items = catalog.Items;
         _messages = text.Messages;
         _sheetView = new EquipmentSheetView(text, ui);
         _choiceView = new EquipmentChoiceView(text, ui);
         _comparison = new EquipmentComparison(text.Messages);
+        _slotChoice = new SlotChoice(session, catalog, _comparison, text.Messages);
         _memberCursor = new ListCursor(_party.Members.Count, _ => true);
         Open();
     }
@@ -69,7 +64,7 @@ internal sealed class EquipmentPage : IMemberPage
 
     public TabGlyph Glyph => TabGlyph.Equipment;
 
-    public string Hint => _takeHint ?? _pageHint;
+    public string Hint => _slotChoice.TakeHint ?? _pageHint;
 
     // Recruits don't change while the menu is open, so the member cursor's count still holds.
     [MemberNotNull(nameof(Members), nameof(_sheet))]
@@ -93,17 +88,17 @@ internal sealed class EquipmentPage : IMemberPage
     public void Advance(TimeSpan delta)
     {
         _selection.Advance(delta);
-        _choice?.Selection.Advance(delta);
+        _slotChoice.Choice?.Selection.Advance(delta);
     }
 
     /// <summary>False while choosing what goes in a slot: Cancel closes that instead.</summary>
-    public bool LeavesOnCancel => _choice is null;
+    public bool LeavesOnCancel => !_slotChoice.IsOpen;
 
     /// <summary>Whether the player is choosing what goes in a slot.</summary>
-    public bool IsChoosing => _choice is not null;
+    public bool IsChoosing => _slotChoice.IsOpen;
 
     /// <summary>The open choice, so tests can pick a row by what it holds; null while no slot is being chosen for.</summary>
-    internal EquipmentChoice? Choice => _choice;
+    internal EquipmentChoice? Choice => _slotChoice.Choice;
 
     /// <summary>Why the last change didn't happen, or null.</summary>
     public string? Notice => _notice;
@@ -112,13 +107,13 @@ internal sealed class EquipmentPage : IMemberPage
     /// The comparison band's caption: "Changes" while a choice is open (what the highlighted item would change),
     /// "Gives" otherwise (what the highlighted worn item gives).
     /// </summary>
-    public string ChangesCaptionId => _choice is null ? MessageIds.EquipmentGives : MessageIds.EquipmentChanges;
+    public string ChangesCaptionId => _slotChoice.IsOpen ? MessageIds.EquipmentChanges : MessageIds.EquipmentGives;
 
     public SceneRequest? Update(InputFrame input)
     {
-        if (_choice is not null)
+        if (_slotChoice.IsOpen)
         {
-            UpdateChoice(_choice, input);
+            UpdateChoice(input);
             return null;
         }
 
@@ -151,8 +146,8 @@ internal sealed class EquipmentPage : IMemberPage
     {
         var sheetArea = area with { Width = area.Width - EquipmentChoiceView.PanelWidth };
         _panel.Draw(batch, textures.Pixel, MenuLayout.FullHeight(sheetArea), opacity);
-        _sheetView.Draw(batch, textures, new EquipmentSheetView.Place(_sheet, sheetArea, _selection, _choice is null, _comparison.Text, ChangesCaptionId, _notice), opacity);
-        if (_choice is null)
+        _sheetView.Draw(batch, textures, new EquipmentSheetView.Place(_sheet, sheetArea, _selection, !_slotChoice.IsOpen, _comparison.Text, ChangesCaptionId, _notice), opacity);
+        if (_slotChoice.Choice is not { } choice)
         {
             _panel.DrawRightEdge(batch, textures.Pixel, MenuLayout.FullHeight(sheetArea), opacity);
             return;
@@ -160,7 +155,7 @@ internal sealed class EquipmentPage : IMemberPage
 
         var choiceArea = new Rectangle(sheetArea.Right, area.Y, EquipmentChoiceView.PanelWidth, area.Height);
         _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(choiceArea), opacity);
-        _choiceView.Draw(batch, textures, _choice, choiceArea);
+        _choiceView.Draw(batch, textures, choice, choiceArea);
     }
 
     /// <summary>
@@ -210,72 +205,24 @@ internal sealed class EquipmentPage : IMemberPage
         }
 
         var slot = EquipmentSheet.Slots[_rowCursor.Selected];
-        _choice = new EquipmentChoice(_equipment.OwnedFor(slot, _items), PartyEquipment.TakeableFor(Shown, slot, _party));
-        _choiceView.Show(_choice, _messages.Text(EquipmentSheet.LabelIdOf(slot)), _inventory);
-        ShowPreview(_choice);
+        var choice = _slotChoice.Open(Shown, slot);
+        _choiceView.Show(choice, _messages.Text(EquipmentSheet.LabelIdOf(slot)), _inventory);
     }
 
-    private void UpdateChoice(EquipmentChoice choice, InputFrame input)
+    // Once the choice closes, the sheet shows what changed and Changes goes back to the worn item.
+    private void UpdateChoice(InputFrame input)
     {
-        if (input.IsPressed(GameButton.Cancel))
-        {
-            CloseChoice();
-            return;
-        }
-
-        if (choice.Update(input) is { } pick)
-        {
-            Apply(pick, EquipmentSheet.Slots[_rowCursor.Selected]);
-            CloseChoice();
-            return;
-        }
-
-        ShowPreview(choice);
-    }
-
-    // Rebuilt when the highlighted row changes, so drawing formats nothing; on "Remove" it compares the empty slot.
-    private void ShowPreview(EquipmentChoice choice)
-    {
-        if (choice.SelectedRow == _previewedRow)
+        if (!_slotChoice.Update(input))
         {
             return;
         }
 
-        _previewedRow = choice.SelectedRow;
-        var slot = EquipmentSheet.Slots[_rowCursor.Selected];
-        _comparison.ShowChoice(Shown, slot, choice);
-        _takeHint = choice.HighlightedWearer is { } wearer
-            ? _messages.Format(MessageIds.EquipmentTakeHint, new MessageArgument("member", wearer.Definition.Name))
-            : null;
-    }
-
-    private void CloseChoice()
-    {
-        _choice = null;
-        _previewedRow = -1;
-        _takeHint = null;
+        _notice = _slotChoice.Refusal;
+        _sheet = EquipmentSheet.Of(Shown);
         ShowWornComparison();
     }
 
     // With no choice open, Changes shows what the highlighted slot's item gives; "Remove all" shows nothing.
     private void ShowWornComparison() =>
         _comparison.ShowWorn(Shown, _rowCursor.Selected < EquipmentSheet.Slots.Length ? EquipmentSheet.Slots[_rowCursor.Selected] : null);
-
-    // Core refuses a change when the item it would take off has no room left in the inventory; the player is told why.
-    // A worn item is taken from its wearer (decision 137).
-    private void Apply(EquipmentPick pick, EquipmentSlot slot)
-    {
-        var changed = pick switch
-        {
-            { Giver: { } giver } => _equipment.TryTakeFrom(giver, Shown, slot),
-            { Item: { } item } => _equipment.TryEquip(Shown, item, slot),
-            _ => _equipment.TryUnequip(Shown, slot),
-        };
-        if (!changed && Shown.EquippedIn(slot) is { } worn && !_inventory.HasRoomFor(worn))
-        {
-            _notice = _messages.Format(MessageIds.EquipmentNoRoom, new MessageArgument("item", worn.Name));
-        }
-
-        _sheet = EquipmentSheet.Of(Shown);
-    }
 }

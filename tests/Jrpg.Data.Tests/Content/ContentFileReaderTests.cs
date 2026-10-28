@@ -1,6 +1,7 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Events;
 using Jrpg.Core.Items;
+using Jrpg.Core.Loot;
 using Jrpg.Core.Party;
 using Jrpg.Core.Skills;
 using Jrpg.Data.Content;
@@ -56,6 +57,18 @@ public sealed class ContentFileReaderTests
     {
         var exception = Assert.Throws<ContentValidationException>(
             () => ContentFileReader.Read<IReadOnlyList<ItemDefinition>>(TestContentPath(fileName)));
+
+        Assert.StartsWith($"{fileName} at {jsonPath}", exception.Message, StringComparison.Ordinal);
+    }
+
+    // The pool's stat and kind names are enum names, refused at read time like any unknown one.
+    [Theory]
+    [InlineData("affix-with-unknown-stat.json", "$[0].stat")]
+    [InlineData("affix-with-null-kind.json", "$[0].kinds[1]")]
+    public void Read_AffixWithBadName_ThrowsNamingTheFileAndPath(string fileName, string jsonPath)
+    {
+        var exception = Assert.Throws<ContentValidationException>(
+            () => ContentFileReader.Read<IReadOnlyList<AffixDefinition>>(TestContentPath(fileName)));
 
         Assert.StartsWith($"{fileName} at {jsonPath}", exception.Message, StringComparison.Ordinal);
     }

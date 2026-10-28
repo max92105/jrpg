@@ -23,3 +23,8 @@ Part of [the loot plan](../README.md). ADR 0030, decisions 339, 340. Design: "Tu
     - `LootRulesValidatorTests: Validate_MinAffixesAboveMax_Throws`
     - `RepositoryLootTests: AffixPool_HasPowerForWeapons`
   - **Call sites:** `new GameRules(` in `ContentCatalogBuilder` (1).
+- **Done, with deviations:**
+  - An unknown stat name and a null kind are refused when the file is read, as any bad enum name is, so their tests are a `ContentFileReaderTests` theory with two fixtures (`affix-with-unknown-stat.json`, `affix-with-null-kind.json`) rather than `AffixCatalogValidatorTests`. The validator's own checks are one theory (min above max, min 0, max past 100, no kinds, weight 0).
+  - `ItemCatalogValidator.MostBonus` became internal, so an affix's range has the item bonus's bound.
+  - `LootRulesValidator` also refuses a null row (the dictionary null-entry rule). Its checks are one theory (negative weight, min above max, max above 5, Common with an affix, a Unique row) plus missing, null and all-zero tests.
+  - The review added a range crossing 0 to the refusals (a roll there could add nothing) and `GameRulesValidatorTests.Validate_NegativeRarityWeight_NamesTheField` (the table is checked with the file). Tests 2675 → 2695.

@@ -8,7 +8,10 @@ namespace Jrpg.Data.Items;
 
 internal static class ItemCatalogValidator
 {
-    private const int MostBonus = 100;
+    /// <summary>
+    /// The largest bonus an item, or an affix roll, may give in either direction (placeholder bound).
+    /// </summary>
+    internal const int MostBonus = 100;
 
     public static void Validate(string fileName, IReadOnlyList<ItemDefinition> items) =>
         new ContentListValidator<ItemDefinition>(fileName, "item", item => item.Id)

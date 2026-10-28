@@ -1,0 +1,21 @@
+[
+  { "id": "power", "stat": "power", "min": 2, "max": 5, "kinds": [ "weapon", "ring", "amulet", "hands" ], "weight": 10 },
+  { "id": "agility", "stat": "agility", "min": 2, "max": 5, "kinds": [ "ring", "hands", "feet" ], "weight": 10 },
+  { "id": "intelligence", "stat": "intelligence", "min": 2, "max": 5, "kinds": [ "ring", "amulet", "head" ], "weight": 10 },
+  { "id": "constitution", "stat": "constitution", "min": 2, "max": 5, "kinds": [ "chest", "head", "offHand" ], "weight": 10 },
+  { "id": "will", "stat": "will", "min": 2, "max": 5, "kinds": [ "amulet", "head", "chest" ], "weight": 10 },
+  { "id": "max_hp", "stat": "maxHp", "min": 10, "max": 25, "kinds": [ "chest", "offHand" ], "weight": 10 },
+  { "id": "speed", "stat": "speed", "min": 1, "max": 3, "kinds": [ "feet" ], "weight": 10 },
+  { "id": "accuracy", "stat": "accuracy", "min": 2, "max": 5, "kinds": [ "weapon", "hands" ], "weight": 10 },
+  { "id": "crit_chance", "stat": "critChance", "min": 1, "max": 3, "kinds": [ "weapon", "ring" ], "weight": 10 },
+  { "id": "crit_damage", "stat": "critDamage", "min": 5, "max": 15, "kinds": [ "weapon", "amulet" ], "weight": 10 },
+  { "id": "dodge", "stat": "dodge", "min": 1, "max": 3, "kinds": [ "feet" ], "weight": 10 },
+  { "id": "blunt_ward", "stat": "bluntResistance", "min": 4, "max": 10, "kinds": [ "chest", "offHand", "head", "feet" ], "weight": 10 },
+  { "id": "piercing_ward", "stat": "piercingResistance", "min": 4, "max": 10, "kinds": [ "chest", "offHand", "head", "feet" ], "weight": 10 },
+  { "id": "slashing_ward", "stat": "slashingResistance", "min": 4, "max": 10, "kinds": [ "chest", "offHand", "head", "feet" ], "weight": 10 },
+  { "id": "fire_ward", "stat": "fireResistance", "min": 4, "max": 10, "kinds": [ "chest", "amulet", "ring", "head" ], "weight": 10 },
+  { "id": "ice_ward", "stat": "iceResistance", "min": 4, "max": 10, "kinds": [ "chest", "amulet", "ring", "head" ], "weight": 10 },
+  { "id": "lightning_ward", "stat": "lightningResistance", "min": 4, "max": 10, "kinds": [ "chest", "amulet", "ring", "head" ], "weight": 10 },
+  { "id": "light_ward", "stat": "lightResistance", "min": 4, "max": 10, "kinds": [ "chest", "amulet", "ring", "head" ], "weight": 10 },
+  { "id": "dark_ward", "stat": "darkResistance", "min": 4, "max": 10, "kinds": [ "chest", "amulet", "ring", "head" ], "weight": 10 }
+]

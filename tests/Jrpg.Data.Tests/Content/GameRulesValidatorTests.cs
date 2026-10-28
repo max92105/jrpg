@@ -1,4 +1,6 @@
 using Jrpg.Core.Content;
+using Jrpg.Core.Items;
+using Jrpg.Core.Loot;
 using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
 using Jrpg.Core.Stats;
@@ -27,7 +29,25 @@ public sealed class GameRulesValidatorTests
             StatusPercentPer100Intelligence: 100,
             IntelligencePerExtraStatusTurn: 25,
             UnarmedDamage: 18,
-            UnarmedDamageType: DamageType.Blunt));
+            UnarmedDamageType: DamageType.Blunt),
+        new LootRules(new Dictionary<Rarity, RarityRule>
+        {
+            [Rarity.Common] = new(Weight: 650, MinAffixes: 0, MaxAffixes: 0),
+            [Rarity.Magic] = new(Weight: 280, MinAffixes: 1, MaxAffixes: 1),
+            [Rarity.Rare] = new(Weight: 70, MinAffixes: 2, MaxAffixes: 3),
+        }));
+
+    // The rarity table is checked with the rest of the file, so a broken one stops the start, not the first drop.
+    [Fact]
+    public void Validate_NegativeRarityWeight_NamesTheField()
+    {
+        var rarities = new Dictionary<Rarity, RarityRule>(_rules.Loot.Rarities) { [Rarity.Magic] = new(Weight: -1, MinAffixes: 1, MaxAffixes: 1) };
+        var rules = _rules with { Loot = new LootRules(rarities) };
+
+        var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
+
+        Assert.Equal("rules.json: loot.rarities.magic.weight must be at least 0 (was -1).", exception.Message);
+    }
 
     [Fact]
     public void Validate_NegativeHpPercentPerConstitution_NamesTheField()

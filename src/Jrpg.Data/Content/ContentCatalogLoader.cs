@@ -25,6 +25,7 @@ public static class ContentCatalogLoader
     private const string EnemiesFile = "enemies.json";
     private const string EncountersFile = "encounters.json";
     private const string DropTablesFile = "drop-tables.json";
+    private const string AffixesFile = "affixes.json";
     internal const string NewGameFile = "new-game.json";
 
     internal const string TilesheetsFile = "tilesheets.json";
@@ -45,6 +46,7 @@ public static class ContentCatalogLoader
         var items = ReadValidated<IReadOnlyList<ItemDefinition>>(
             contentRoot, ItemsFile, ItemCatalogValidator.Validate);
         var itemsById = items.ToFrozenDictionary(item => item.Id);
+        var affixes = ReadValidated<IReadOnlyList<AffixDefinition>>(contentRoot, AffixesFile, AffixCatalogValidator.Validate);
         var dropTables = ReadValidated<IReadOnlyList<DropTable>>(
             contentRoot, DropTablesFile, (file, list) => DropTableCatalogValidator.Validate(file, list, itemsById));
         var dropTableIds = dropTables.Select(table => table.Id).ToFrozenSet();
@@ -92,8 +94,7 @@ public static class ContentCatalogLoader
             Rules = rules,
             NewGame = newGame,
 
-            // Read from affixes.json once the loot plan's R3a adds it.
-            Affixes = FrozenDictionary<string, AffixDefinition>.Empty,
+            Affixes = affixes.ToFrozenDictionary(affix => affix.Id),
 
             DropTables = dropTables.ToFrozenDictionary(table => table.Id),
         };

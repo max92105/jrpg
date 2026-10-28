@@ -2,6 +2,7 @@ using System.Globalization;
 using Jrpg.Core.Content;
 using Jrpg.Core.Party;
 using Jrpg.Core.Stats;
+using Jrpg.Data.Loot;
 
 namespace Jrpg.Data.Content;
 
@@ -24,6 +25,8 @@ internal static class GameRulesValidator
         ValidateExploration(fileName, rules.Exploration);
 
         ValidateStats(fileName, rules.Stats);
+
+        LootRulesValidator.Validate(fileName, rules.Loot);
 
         var thresholds = rules.Experience.ExperienceToNextLevel;
         if (thresholds.Count == 0)

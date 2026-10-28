@@ -15,5 +15,12 @@
       100, 120, 144, 172, 206, 247, 296, 355, 426, 511,
       613, 735, 882, 1058, 1269, 1522, 1826, 2191, 2629, 3154
     ]
+  },
+  "loot": {
+    "rarities": {
+      "common": { "weight": 650, "minAffixes": 0, "maxAffixes": 0 },
+      "magic": { "weight": 280, "minAffixes": 1, "maxAffixes": 1 },
+      "rare": { "weight": 70, "minAffixes": 2, "maxAffixes": 3 }
+    }
   }
 }

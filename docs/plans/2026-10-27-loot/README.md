@@ -70,7 +70,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **R2. `Loot/GearRoll`: rarity by weight, affixes from a pool** (Core, about 230 lines) → [slices/R2.md](slices/R2.md)
 - [x] **R3a. The affix pool and the rarity table in content** (Data + content, about 220 lines) → [slices/R3a.md](slices/R3a.md)
 - [x] **S1b. A loaded piece's affixes are repaired against the pool** (Data, about 130 lines) → [slices/S1b.md](slices/S1b.md)
-- [ ] **R3b. Dropped gear rolls its rarity and affixes** (Core + content + tests, about 180 lines) → [slices/R3b.md](slices/R3b.md)
+- [x] **R3b. Dropped gear rolls its rarity and affixes** (Core + content + tests, about 180 lines) → [slices/R3b.md](slices/R3b.md)
 
 ### Phase 4: pages
 - [ ] **P1a. The Inventory page shows rarity and affix lines** (Game + text, raw 150, about 240 lines at 1.6x; waits for question 362) → [slices/P1a.md](slices/P1a.md)

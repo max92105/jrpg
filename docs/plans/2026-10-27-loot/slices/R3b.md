@@ -15,3 +15,9 @@ Part of [the loot plan](../README.md). ADR 0030, decision 344. Design: "Loot". A
   - **Seeded tests to recheck** (the budgeted 60 lines): the Core and Game tests D2 fixed for drops after a repository victory (`GameSessionBattleTests`, `BattleScenarios` users, the `GameFlow` battle tests): a gear drop now adds rarity, count and affix draws after the drop chance. Each fix asserts what the test needs rather than re-pinning a later draw; write the list in the Done note.
   - **Verify by hand:** win until a piece drops; on the Equipment page its Changes band shows its affixes' stats (a Magic Bronze Sword with +3 Power shows Power and the damage it raises). Save, quit, load: the same piece is there.
 - **Note from R2 review:** `ContentCatalog.Affixes` is a dictionary, whose `Values` order is not the file's: give `GearRoll` the pool in a fixed order (sorted by id), so a seed always picks the same affixes.
+- **Done, with deviations:**
+  - `GameSession` builds its `DropRoll` once with a `GearRoll` over the pool sorted by id (the R2 review's note) and the content's rarity table, both on the session's random.
+  - `RepositoryLootTests.GoblinGearDrops_EachHasAffixesForItsKind` checks the content instead of a seeded roll: `GearRoll` is internal to Core and the Data tests can't see it. It asserts what the seeded test was for: every gear item the goblin drops has pool affixes for its kind.
+  - The test catalog's rarity table stays Common-only; the session test that wants rolled drops copies the catalog with a Magic-only table and an affix. `DropRollTests`' six cases go through a Common-only `GearRoll`.
+  - No seeded test needed fixing: no repository test wins a battle with a gear drop and then reads the random again.
+  - Tests 2698 → 2701.

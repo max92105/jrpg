@@ -6,6 +6,7 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Session;
+using Jrpg.Core.Stats;
 using Jrpg.Core.Tests.Battle;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
@@ -36,6 +37,25 @@ public sealed class GameSessionDropTests
         Assert.Equal([new ItemDrop(_potion, 3)], drops.Stacks);
         Assert.Equal([GearPiece.Plain(_sword), GearPiece.Plain(_sword)], drops.Gear);
         Assert.Equal((3, 2), (session.Inventory.QuantityOf("potion"), session.Inventory.GearCountOf("bronze_sword")));
+    }
+
+    // A Magic-only table and one weapon affix ("power", 2..5): each sword that drops draws only its value, after its
+    // chance: 0 drops it with 1 (3 Power), 999 drops none, 0 drops one with 3 (5 Power).
+    [Fact]
+    public void FinishBattle_GearDrop_HasRarityAndAffixes()
+    {
+        var power = new AffixDefinition { Id = "power", Stat = StatKind.Power, Min = 2, Max = 5, Kinds = [EquipmentKind.Weapon], Weight = 10 };
+        var magicOnly = new LootRules(new Dictionary<Rarity, RarityRule> { [Rarity.Magic] = new(Weight: 1, MinAffixes: 1, MaxAffixes: 1) });
+        var plain = Catalog(_goblin with { DropTableId = "goblin" }, _potion);
+        var catalog = plain with { Rules = plain.Rules with { Loot = magicOnly }, Affixes = new Dictionary<string, AffixDefinition> { ["power"] = power } };
+        var session = SessionWithEncounterPending(catalog, [.. _encounterThenSarxianFirst, 0, 1, 999, 0, 3]);
+        BattleScript.AttackUntilOver(session.StartPendingBattle());
+
+        var gear = session.FinishBattle()?.Drops.Gear;
+
+        GearPiece[] expected = [Magic(power, 3), Magic(power, 5)];
+        Assert.Equal(expected, gear);
+        Assert.Equal(expected, session.Inventory.Gear);
     }
 
     // The bag already holds the two potions a stack takes, so the three dropped are lost and not listed.
@@ -78,14 +98,20 @@ public sealed class GameSessionDropTests
         Assert.True(spoils?.Drops.IsEmpty);
     }
 
-    private static GameSession SessionWithEncounterPending(EnemyDefinition goblin, int[] draws, ItemDefinition? potion = null)
+    private static GameSession SessionWithEncounterPending(EnemyDefinition goblin, int[] draws, ItemDefinition? potion = null) =>
+        SessionWithEncounterPending(Catalog(goblin, potion ?? _potion), draws);
+
+    private static GameSession SessionWithEncounterPending(ContentCatalog catalog, int[] draws)
     {
-        var session = GameSession.StartNew(Catalog(goblin, potion ?? _potion), "sarxian", new FixedSequenceRandom(draws));
+        var session = GameSession.StartNew(catalog, "sarxian", new FixedSequenceRandom(draws));
         session.Exploration.Walk(MoveIntent.FromAxes(1, 0), TimeSpan.FromSeconds(1.0 / 3));
         session.Exploration.Walk(MoveIntent.FromAxes(1, 0), TimeSpan.FromSeconds(1.0 / 3));
         Assert.NotNull(session.Exploration.PendingEncounter);
         return session;
     }
+
+    private static GearPiece Magic(AffixDefinition affix, int value) =>
+        GearPiece.Rolled(_sword, Rarity.Magic, [new RolledAffix(affix.Id, affix.Stat, value)]);
 
     private static ContentCatalog Catalog(EnemyDefinition goblin, ItemDefinition potion) => new ContentCatalogBuilder()
         .WithMembers(new PartyMemberBuilder().WithId("sarxian").BuildDefinition())

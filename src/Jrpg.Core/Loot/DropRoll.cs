@@ -5,19 +5,20 @@ namespace Jrpg.Core.Loot;
 
 /// <summary>
 /// Rolls the defeated enemies' drop tables after a victory (ADR 0030): each entry on its own, drawing only when the
-/// outcome is uncertain (ADR 0026), so a certain drop or a single quantity leaves the random sequence as it was.
+/// outcome is uncertain (ADR 0026), so a certain drop or a single quantity leaves the random sequence as it was. Each
+/// dropped copy of gear rolls its rarity and affixes; starting items and map gifts never come through here (decision
+/// 344).
 /// </summary>
-internal static class DropRoll
+/// <param name="items">Every item by id, from the catalog.</param>
+/// <param name="gearRoll">Rolls each dropped copy of gear into a piece.</param>
+/// <param name="random">The session's random source, the one <paramref name="gearRoll"/> draws from too.</param>
+internal sealed class DropRoll(IReadOnlyDictionary<string, ItemDefinition> items, GearRoll gearRoll, IRandom random)
 {
     private const int PermillePerPercent = 10;
 
     /// <param name="tables">One per defeated enemy that has one, in the enemies' order.</param>
-    /// <param name="items">Every item by id, from the catalog.</param>
-    /// <param name="random">The session's random source.</param>
-    /// <returns>
-    /// Stacks merged by item in first-drop order; equipment as plain pieces (decision 344, until gear rolls).
-    /// </returns>
-    public static Drops Roll(IReadOnlyList<DropTable> tables, IReadOnlyDictionary<string, ItemDefinition> items, IRandom random)
+    /// <returns>Stacks merged by item in first-drop order; gear as one rolled piece per copy, in drop order.</returns>
+    public Drops Roll(IReadOnlyList<DropTable> tables)
     {
         var rolls = new ChanceRolls(random);
         var stacks = new List<ItemDrop>();
@@ -33,7 +34,7 @@ internal static class DropRoll
             var quantity = RangeRoll.Within(entry.MinQuantity, entry.MaxQuantity, random);
             if (item.Equipment is not null)
             {
-                gear.AddRange(Enumerable.Repeat(GearPiece.Plain(item), quantity));
+                gear.AddRange(Enumerable.Range(0, quantity).Select(_ => gearRoll.Roll(item)));
             }
             else
             {

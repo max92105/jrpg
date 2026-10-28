@@ -16,6 +16,7 @@ public sealed class GameSession
 {
     // The catalog, inventory, world and random source shared by exploration and battles.
     private readonly ExplorationContext _context;
+    private readonly DropRoll _dropRoll;
 
     private GameSession(PartyState party, ExplorationContext context, MapLocation start)
     {
@@ -26,6 +27,7 @@ public sealed class GameSession
         Equipment = new PartyEquipment(Inventory);
         FieldItems = new FieldItemUse(party, Inventory);
         EnemyTactics = new EnemyTactics(context.Random);
+        _dropRoll = DropRollFor(context.Catalog, context.Random);
     }
 
     public PartyState Party { get; }
@@ -171,7 +173,7 @@ public sealed class GameSession
             .OfType<string>()
             .Select(tableId => catalog.DropTables[tableId])
             .ToList();
-        return new BattleSpoils(rewards, Keep(DropRoll.Roll(tables, catalog.Items, _context.Random)));
+        return new BattleSpoils(rewards, Keep(_dropRoll.Roll(tables)));
     }
 
     // Adds the drops to the inventory and returns what went in: copies past a stack's limit are lost, as found ones
@@ -194,6 +196,13 @@ public sealed class GameSession
         }
 
         return new Drops(stacks, drops.Gear);
+    }
+
+    // The pool in id order: the catalog's dictionary keeps no file order, and a seed must always pick the same affixes.
+    private static DropRoll DropRollFor(ContentCatalog catalog, IRandom random)
+    {
+        AffixDefinition[] pool = [.. catalog.Affixes.Values.OrderBy(affix => affix.Id, StringComparer.Ordinal)];
+        return new DropRoll(catalog.Items, new GearRoll(pool, catalog.Rules.Loot, random), random);
     }
 
     private static List<PartyMember> ActiveOrder(List<PartyMember> members, IReadOnlyList<string> activeIds) =>

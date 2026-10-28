@@ -53,7 +53,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **C3. Save test files split: `FileSaveStoreTests` format checks apart, `SaveGameRepairTests` inventory and world apart** (tests, mechanical, about 200 lines moved) → [slices/C3.md](slices/C3.md)
 
 ### Phase 1: gear pieces
-- [ ] **ADR 0029: Gear pieces** (before G1a) → [slices/ADR-0029.md](slices/ADR-0029.md)
+- [x] **ADR 0029: Gear pieces** (before G1a) → [slices/ADR-0029.md](slices/ADR-0029.md)
 - [ ] **G1a. Members wear gear pieces, with a rarity and affixes from birth** (Core + Game, about 250 lines) → [slices/G1a.md](slices/G1a.md)
 - [ ] **G1b-1. The inventory holds gear as a list of pieces** (Core + tests, about 200 lines) → [slices/G1b-1.md](slices/G1b-1.md)
 - [ ] **G1b-2. Equipping moves pieces; the room rule leaves; the Equipment choice lists pieces** (Core + Game, about 220 lines) → [slices/G1b-2.md](slices/G1b-2.md)

@@ -88,3 +88,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - A one-stat `StatBonuses` is built inline about 20 times as `new(new Dictionary<StatKind, int> { [stat] = value })` (`GearPiece.BonusOf`, `GearPieceTests.Bonus`, `MemberSheetTests.Bonus`, `PartyMemberGearTests` and others): a `StatBonuses.Of(stat, value)` factory would replace them (loot plan, G1a review).
 - Equipment's `maxStack` is no longer read since gear became pieces (loot plan, G1b-1): drop it from equipment entries in `items.json` and the validator's rule for them.
 - `Inventory.HasRoomFor` has no caller in `src/` since the room rule left (loot plan, G1b-2); only `InventoryTests` use it. Remove it, or keep it if stacks get a cap the game checks before adding.
+- `WholeChance = 100` is declared in three Data validators (`EnemyCatalogValidator`, `StatusGrantValidator`, `DropTableCatalogValidator`): a percent check in `RangeProblems` would hold it once (loot plan, D2 review).

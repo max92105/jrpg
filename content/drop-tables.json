@@ -1,0 +1,12 @@
+[
+  {
+    "id": "goblin",
+    "entries": [
+      { "itemId": "potion", "chance": 30 },
+      { "itemId": "bronze_sword", "chance": 6 },
+      { "itemId": "leather_cap", "chance": 4 },
+      { "itemId": "leather_boots", "chance": 4 },
+      { "itemId": "power_ring", "chance": 4 }
+    ]
+  }
+]

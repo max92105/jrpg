@@ -25,6 +25,8 @@ public sealed class EnemyCatalogValidatorTests
         ExperienceReward = 40,
     };
 
+    private static readonly HashSet<string> _goblinTable = ["goblin"];
+
     public static TheoryData<EnemyDefinition, string> InvalidEnemies => new()
     {
         { _goblin with { Name = "" }, "name must not be empty." },
@@ -42,7 +44,7 @@ public sealed class EnemyCatalogValidatorTests
     [Fact]
     public void Validate_ValidEnemy_DoesNotThrow()
     {
-        var exception = Record.Exception(() => EnemyCatalogValidator.Validate("enemies.json", [_goblin]));
+        var exception = Record.Exception(() => EnemyCatalogValidator.Validate("enemies.json", [_goblin], _goblinTable));
 
         Assert.Null(exception);
     }
@@ -51,8 +53,28 @@ public sealed class EnemyCatalogValidatorTests
     [MemberData(nameof(InvalidEnemies))]
     public void Validate_InvalidField_ThrowsNamingTheEnemyAndField(EnemyDefinition enemy, string problem)
     {
-        var exception = Assert.Throws<ContentValidationException>(() => EnemyCatalogValidator.Validate("enemies.json", [enemy]));
+        var exception = Assert.Throws<ContentValidationException>(() => EnemyCatalogValidator.Validate("enemies.json", [enemy], _goblinTable));
 
         Assert.Equal($"enemies.json: enemy 'goblin': {problem}", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_TwoEnemiesShareATable_Passes()
+    {
+        var goblin = _goblin with { DropTableId = "goblin" };
+        var chief = goblin with { Id = "goblin_chief" };
+
+        var exception = Record.Exception(() => EnemyCatalogValidator.Validate("enemies.json", [goblin, chief], _goblinTable));
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void Validate_UnknownDropTable_Throws()
+    {
+        var exception = Assert.Throws<ContentValidationException>(
+            () => EnemyCatalogValidator.Validate("enemies.json", [_goblin with { DropTableId = "slime" }], _goblinTable));
+
+        Assert.Equal("enemies.json: enemy 'goblin': dropTableId has unknown drop table id 'slime'.", exception.Message);
     }
 }

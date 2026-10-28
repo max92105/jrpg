@@ -8,6 +8,7 @@ using Jrpg.Core.Party;
 using Jrpg.Core.Skills;
 using Jrpg.Data.Battle;
 using Jrpg.Data.Items;
+using Jrpg.Data.Loot;
 using Jrpg.Data.Maps;
 using Jrpg.Data.Party;
 using Jrpg.Data.Skills;
@@ -23,6 +24,7 @@ public static class ContentCatalogLoader
     private const string PartyMembersFile = "party-members.json";
     private const string EnemiesFile = "enemies.json";
     private const string EncountersFile = "encounters.json";
+    private const string DropTablesFile = "drop-tables.json";
     internal const string NewGameFile = "new-game.json";
 
     internal const string TilesheetsFile = "tilesheets.json";
@@ -42,10 +44,15 @@ public static class ContentCatalogLoader
         var rules = ReadValidated<GameRules>(contentRoot, RulesFile, GameRulesValidator.Validate);
         var items = ReadValidated<IReadOnlyList<ItemDefinition>>(
             contentRoot, ItemsFile, ItemCatalogValidator.Validate);
+        var itemsById = items.ToFrozenDictionary(item => item.Id);
+        var dropTables = ReadValidated<IReadOnlyList<DropTable>>(
+            contentRoot, DropTablesFile, (file, list) => DropTableCatalogValidator.Validate(file, list, itemsById));
+        var dropTableIds = dropTables.Select(table => table.Id).ToFrozenSet();
         var memberReferences = new PartyMemberReferences(classIds);
         var members = ReadValidated<IReadOnlyList<PartyMemberDefinition>>(
             contentRoot, PartyMembersFile, (file, list) => PartyMemberCatalogValidator.Validate(file, list, memberReferences));
-        var enemies = ReadValidated<IReadOnlyList<EnemyDefinition>>(contentRoot, EnemiesFile, EnemyCatalogValidator.Validate);
+        var enemies = ReadValidated<IReadOnlyList<EnemyDefinition>>(
+            contentRoot, EnemiesFile, (file, list) => EnemyCatalogValidator.Validate(file, list, dropTableIds));
         var enemyIds = enemies.Select(enemy => enemy.Id).ToFrozenSet();
         var encounters = ReadValidated<IReadOnlyList<EncounterDefinition>>(
             contentRoot, EncountersFile, (file, list) => EncounterCatalogValidator.Validate(file, list, enemyIds));
@@ -66,13 +73,13 @@ public static class ContentCatalogLoader
         var maps = MapFolderReader.Read(contentRoot, mapContent);
         var mapsById = maps.ToFrozenDictionary(map => map.Id);
         var newGameReferences = new NewGameReferences(
-            members.Select(member => member.Id).ToFrozenSet(), items.ToFrozenDictionary(item => item.Id), mapsById);
+            members.Select(member => member.Id).ToFrozenSet(), itemsById, mapsById);
         var newGame = ReadValidated<NewGameDefinition>(
             contentRoot, NewGameFile, (file, definition) => NewGameValidator.Validate(file, definition, newGameReferences));
 
         return new ContentCatalog
         {
-            Items = items.ToFrozenDictionary(item => item.Id),
+            Items = itemsById,
             Classes = classes.ToFrozenDictionary(classDefinition => classDefinition.Id),
             Skills = skillsById,
             PartyMembers = members.ToFrozenDictionary(member => member.Id),
@@ -88,8 +95,7 @@ public static class ContentCatalogLoader
             // Read from affixes.json once the loot plan's R3a adds it.
             Affixes = FrozenDictionary<string, AffixDefinition>.Empty,
 
-            // Read from drop-tables.json once the loot plan's D2 adds it.
-            DropTables = FrozenDictionary<string, DropTable>.Empty,
+            DropTables = dropTables.ToFrozenDictionary(table => table.Id),
         };
     }
 

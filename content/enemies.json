@@ -14,7 +14,8 @@
     "critChance": 5,
     "crowdControlResistance": 10,
     "resistances": { "fire": -25 },
-    "experienceReward": 40
+    "experienceReward": 40,
+    "dropTableId": "goblin"
   },
   {
     "id": "training_dummy",

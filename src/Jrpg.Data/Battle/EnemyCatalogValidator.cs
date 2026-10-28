@@ -11,9 +11,17 @@ internal static class EnemyCatalogValidator
     private const int MostAccuracy = 200;
     private const int WholeChance = 100;
 
-    public static void Validate(string fileName, IReadOnlyList<EnemyDefinition> enemies) =>
+    /// <param name="fileName">The file, for messages.</param>
+    /// <param name="enemies">The deserialized list.</param>
+    /// <param name="dropTableIds">
+    /// The drop tables an enemy may name; several enemies may share one (decision 343).
+    /// </param>
+    public static void Validate(string fileName, IReadOnlyList<EnemyDefinition> enemies, IReadOnlySet<string> dropTableIds) =>
         new ContentListValidator<EnemyDefinition>(fileName, "enemy", enemy => enemy.Id)
-            .Validate(enemies, FindProblem);
+            .Validate(enemies, enemy => FindProblem(enemy) ?? FindDropTableProblem(enemy, dropTableIds));
+
+    private static string? FindDropTableProblem(EnemyDefinition enemy, IReadOnlySet<string> dropTableIds) =>
+        enemy.DropTableId is { } id && !dropTableIds.Contains(id) ? $"dropTableId has unknown drop table id '{id}'." : null;
 
     private static string? FindProblem(EnemyDefinition enemy) =>
         string.IsNullOrWhiteSpace(enemy.Name)

@@ -21,34 +21,54 @@ public sealed class InventoryFilterTests
     ];
 
     [Fact]
-    public void Select_Weapons_KeepsOnlyWeaponKindItems()
+    public void SelectStacks_Weapons_KeepsOnlyWeaponKindItems()
     {
-        var kept = InventoryFilter.Select(InventoryCategory.Weapons, _owned, _catalog.Items);
+        var kept = InventoryFilter.SelectStacks(InventoryCategory.Weapons, _owned, _catalog.Items);
 
         Assert.Equal(["bronze_sword", "iron_sword"], kept.Select(entry => entry.ItemId));
     }
 
     [Fact]
-    public void Select_Consumables_KeepsItemsWithEffect()
+    public void SelectStacks_Consumables_KeepsItemsWithEffect()
     {
-        var kept = InventoryFilter.Select(InventoryCategory.Consumables, _owned, _catalog.Items);
+        var kept = InventoryFilter.SelectStacks(InventoryCategory.Consumables, _owned, _catalog.Items);
 
         Assert.Equal(["potion", "bomb"], kept.Select(entry => entry.ItemId));
     }
 
     [Fact]
-    public void Select_Armor_KeepsEveryPieceThatIsNotAWeapon()
+    public void SelectStacks_Armor_KeepsEveryPieceThatIsNotAWeapon()
     {
-        var kept = InventoryFilter.Select(InventoryCategory.Armor, _owned, _catalog.Items);
+        var kept = InventoryFilter.SelectStacks(InventoryCategory.Armor, _owned, _catalog.Items);
 
         Assert.Equal(["leather_armor", "wizard_robe"], kept.Select(entry => entry.ItemId));
     }
 
     [Fact]
-    public void Select_All_KeepsPickupOrder()
+    public void SelectStacks_All_KeepsPickupOrder()
     {
-        var kept = InventoryFilter.Select(InventoryCategory.All, _owned, _catalog.Items);
+        var kept = InventoryFilter.SelectStacks(InventoryCategory.All, _owned, _catalog.Items);
 
         Assert.Equal(_owned, kept);
     }
+
+    [Fact]
+    public void SelectPieces_Armor_KeepsEveryPieceButWeapons()
+    {
+        GearPiece[] gear = [Piece("leather_armor"), Piece("bronze_sword"), Piece("power_ring"), Piece("wooden_shield")];
+
+        var kept = InventoryFilter.SelectPieces(InventoryCategory.Armor, gear);
+
+        Assert.Equal([Piece("leather_armor"), Piece("power_ring"), Piece("wooden_shield")], kept);
+    }
+
+    [Fact]
+    public void SelectPieces_Consumables_KeepsNone()
+    {
+        var kept = InventoryFilter.SelectPieces(InventoryCategory.Consumables, [Piece("bronze_sword")]);
+
+        Assert.Empty(kept);
+    }
+
+    private static GearPiece Piece(string itemId) => GearPiece.Plain(_catalog.Items[itemId]);
 }

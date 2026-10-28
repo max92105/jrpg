@@ -58,7 +58,7 @@ public sealed class InventoryPageTests
 
         var page = NewPage(session);
 
-        string[] expected = [.. session.Inventory.Entries.Select(entry => entry.ItemId), .. session.Inventory.Gear.Select(piece => piece.Base.Id).Distinct()];
+        string[] expected = [.. session.Inventory.Entries.Select(entry => entry.ItemId), .. session.Inventory.Gear.Select(piece => piece.Base.Id)];
         Assert.Equal(expected, page.ShownItemIds);
     }
 
@@ -70,7 +70,7 @@ public sealed class InventoryPageTests
         page.Update(Pressing(GameButton.PreviousTab));
 
         Assert.Equal(InventoryCategory.Armor, page.Category);
-        Assert.Equal(["leather_armor", "chain_mail", "wizard_robe"], page.ShownItemIds.Take(3));
+        Assert.Equal(["leather_armor", "chain_mail", "wizard_robe"], page.ShownItemIds.Distinct().Take(3));
         Assert.DoesNotContain("bronze_sword", page.ShownItemIds);
         Assert.Contains("wooden_shield", page.ShownItemIds);
     }

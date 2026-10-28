@@ -20,3 +20,4 @@ Part of [the loot plan](../README.md). Decisions 339, 342, 361; waits for questi
     - `ItemDetailLineTests: TextFor_PlainPiece_ShowsDescription`
     - `InventoryPageGearTests: Open_RarePiece_RowIsRare` (a read accessor on the row, not the color)
   - **Verify by hand:** with a rolled piece owned (win until one drops), the Inventory page's Weapons tab shows it in its color; selecting it shows its affix line; Info hides it.
+- **Note from G1c:** add `InventoryRow.Piece` (`GearPiece?`, null for a stack) here, set by `InventoryList`'s piece rows: G1c left it out because nothing read it before the rarity color and the affix lines.

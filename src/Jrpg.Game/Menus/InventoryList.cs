@@ -47,13 +47,14 @@ internal sealed class InventoryList
     public void Advance(TimeSpan delta) => Selection.Advance(delta);
 
     /// <summary>
-    /// Lists the category's items. The cursor goes to <paramref name="selectedRow"/>, or the last row once the list got
-    /// shorter, and the highlight jumps there.
+    /// Lists the category's stacks, then its pieces. The cursor goes to <paramref name="selectedRow"/>, or the last row
+    /// once the list got shorter, and the highlight jumps there.
     /// </summary>
     public void Show(InventoryCategory category, int selectedRow)
     {
-        var shown = InventoryFilter.Select(category, [.. _session.Inventory.Entries, .. OwnedGearByBase()], _catalog.Items);
-        _rows = [.. shown.Select(RowOf)];
+        var inventory = _session.Inventory;
+        var stacks = InventoryFilter.SelectStacks(category, inventory.Entries, _catalog.Items);
+        _rows = [.. stacks.Select(RowOf), .. InventoryFilter.SelectPieces(category, inventory.Gear).Select(RowOf)];
         if (_rows.Length == 0)
         {
             Cursor = null;
@@ -83,14 +84,14 @@ internal sealed class InventoryList
         Selection.Follow(cursor);
     }
 
-    // Until the page lists each piece (loot plan, G1c), owned gear shows as a count per base item after the stacks.
-    private IEnumerable<InventoryEntry> OwnedGearByBase() =>
-        _session.Inventory.Gear.GroupBy(piece => piece.Base.Id).Select(group => new InventoryEntry(group.Key, group.Count()));
-
     private InventoryRow RowOf(InventoryEntry entry)
     {
         var item = _catalog.Items[entry.ItemId];
         var quantity = MeasuredText.Of(_bodyFont, NumberText.Of(entry.Quantity));
         return new InventoryRow(item.Id, item.Name, item.IconFile, quantity, item.Description, _session.FieldItems.CanUse(item));
     }
+
+    // One row per piece, so no quantity (decision 345); gear is never used from the menu.
+    private static InventoryRow RowOf(GearPiece piece) =>
+        new(piece.Base.Id, piece.Base.Name, piece.Base.IconFile, Quantity: null, piece.Base.Description, IsUsable: false);
 }

@@ -7,8 +7,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Draws the Inventory page's list: the visible rows (icon, name, quantity), the selected row's glow and pointer, and
-/// the item's detail strip under it; or a centered line when the category holds nothing.
+/// Draws the Inventory page's list: the visible rows (icon, name, a stack's quantity), the selected row's glow and
+/// pointer, and the item's detail strip under it; or a centered line when the category holds nothing.
 /// </summary>
 internal sealed class InventoryListView
 {
@@ -144,8 +144,10 @@ internal sealed class InventoryListView
         var iconTop = row.Y + ((RowHeight - RowIconSize) / 2);
         batch.Draw(_ui.Icon(textures, item.IconFile, RowIconSize), new Vector2(row.X + RowInset, iconTop), Color.White * opacity);
         batch.DrawString(_bodyFont, item.Name, new Vector2(row.X + NameLeft, textTop), textColor);
-        var quantityLeft = row.Right - QuantityInset - item.Quantity.Width;
-        batch.DrawString(_bodyFont, item.Quantity.Text, new Vector2(quantityLeft, textTop), textColor);
+        if (item.Quantity is { } quantity)
+        {
+            batch.DrawString(_bodyFont, quantity.Text, new Vector2(row.Right - QuantityInset - quantity.Width, textTop), textColor);
+        }
     }
 
     /// <summary>What the list draws, and where.</summary>

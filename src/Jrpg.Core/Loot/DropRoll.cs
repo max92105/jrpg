@@ -30,7 +30,7 @@ internal static class DropRoll
             }
 
             var item = items[entry.ItemId];
-            var quantity = QuantityOf(entry, random);
+            var quantity = RangeRoll.Within(entry.MinQuantity, entry.MaxQuantity, random);
             if (item.Equipment is not null)
             {
                 gear.AddRange(Enumerable.Repeat(GearPiece.Plain(item), quantity));
@@ -43,12 +43,6 @@ internal static class DropRoll
 
         return new Drops(stacks, gear);
     }
-
-    // Uniform within MinQuantity..MaxQuantity, both included; a single possible quantity draws nothing.
-    private static int QuantityOf(DropEntry entry, IRandom random) =>
-        entry.MinQuantity < entry.MaxQuantity
-            ? entry.MinQuantity + random.NextBelow(entry.MaxQuantity - entry.MinQuantity + 1)
-            : entry.MinQuantity;
 
     private static void AddToStack(List<ItemDrop> stacks, ItemDefinition item, int quantity)
     {

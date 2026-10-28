@@ -199,7 +199,8 @@ public sealed class GameSession
     }
 
     // The pool in id order: the catalog's dictionary keeps no file order, and a seed must always pick the same affixes.
-    private static DropRoll DropRollFor(ContentCatalog catalog, IRandom random)
+    // Internal so the loot simulation rolls exactly what the game does.
+    internal static DropRoll DropRollFor(ContentCatalog catalog, IRandom random)
     {
         AffixDefinition[] pool = [.. catalog.Affixes.Values.OrderBy(affix => affix.Id, StringComparer.Ordinal)];
         return new DropRoll(catalog.Items, new GearRoll(pool, catalog.Rules.Loot, random), random);

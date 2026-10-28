@@ -26,7 +26,7 @@ internal static class MemberBattleStats
             StatusPermille = sheet.StatusPermille,
             ExtraStatusTurns = sheet.ExtraStatusTurns,
             CrowdControlResistancePermille = sheet.CrowdControlResistancePermille,
-            AttackType = member.Weapon?.Equipment?.DamageType ?? member.Rules.UnarmedDamageType,
+            AttackType = member.Weapon?.DamageType ?? member.Rules.UnarmedDamageType,
             Resistances = sheet.Resistances,
         };
     }

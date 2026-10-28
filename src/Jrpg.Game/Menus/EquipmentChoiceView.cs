@@ -71,7 +71,7 @@ internal sealed class EquipmentChoiceView
         _quantities = [.. choice.Items.Select(item => MeasuredText.Of(_bodyFont, NumberText.Of(inventory.QuantityOf(item.Id))))];
         _wornRows = [.. choice.Takeable.Select(worn => _messages.Format(
             MessageIds.EquipmentWornRow,
-            new MessageArgument("item", worn.Item.Name),
+            new MessageArgument("item", worn.Piece.Base.Name),
             new MessageArgument("member", worn.Wearer.Definition.Name)))];
     }
 
@@ -112,7 +112,7 @@ internal sealed class EquipmentChoiceView
         var iconTop = row.Y + ((RowHeight - IconSize) / 2);
         if (choice.WornAt(index) is { } worn)
         {
-            batch.Draw(_ui.Icon(textures, worn.Item.IconFile, IconSize), new Vector2(row.X + RowInset, iconTop), Color.White);
+            batch.Draw(_ui.Icon(textures, worn.Piece.Base.IconFile, IconSize), new Vector2(row.X + RowInset, iconTop), Color.White);
             batch.DrawString(_bodyFont, _wornRows[index - 1 - choice.Items.Count], new Vector2(nameLeft, textTop), UiTheme.TextSecondary);
             return;
         }

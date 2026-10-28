@@ -117,7 +117,7 @@ internal sealed class EquipmentSheetView
         batch.Draw(textures.Pixel, row with { Y = row.Bottom - 1, Height = 1 }, UiTheme.Stroke * opacity);
         var textTop = row.Y + ((RowHeight - _bodyFont.LineHeight) / 2f);
         var wornLeft = row.X + RowInset + IconColumn + WornColumn;
-        if (slot.Worn is not { } worn)
+        if (slot.Worn?.Base is not { } worn)
         {
             batch.DrawString(_bodyFont, _labels.Empty, new Vector2(wornLeft, textTop), UiTheme.TextDisabled * opacity);
             return;
@@ -155,7 +155,7 @@ internal sealed class EquipmentSheetView
         string? Notice);
 
     // A slot's row: its label and what's worn there, null for nothing.
-    private readonly record struct SlotRow(Rectangle Row, string Label, ItemDefinition? Worn);
+    private readonly record struct SlotRow(Rectangle Row, string Label, GearPiece? Worn);
 
     // The sheet's fixed text; Slots follows EquipmentSheet.Slots, in the caps the row look's labels are drawn in.
     private sealed record EquipmentLabels(string[] Slots, string Empty, string RemoveAll)

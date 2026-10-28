@@ -119,7 +119,7 @@ public sealed class GameSessionSaveTests
 
         var restored = SaveAndRestore(session);
 
-        Assert.Equal((_sword, _mail), (restored.Party.Leader.Weapon, restored.Party.Leader.EquippedIn(EquipmentSlot.Chest)));
+        Assert.Equal((_sword, _mail), (restored.Party.Leader.Weapon?.Base, restored.Party.Leader.EquippedIn(EquipmentSlot.Chest)?.Base));
         Assert.Equal((0, 0), (restored.Inventory.QuantityOf("bronze_sword"), restored.Inventory.QuantityOf("chain_mail")));
         Assert.Equal(3, restored.Inventory.QuantityOf("potion"));
     }

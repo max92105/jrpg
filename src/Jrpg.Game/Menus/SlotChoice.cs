@@ -119,9 +119,9 @@ internal sealed class SlotChoice
             { Item: { } item } => equipment.TryEquip(member, item, slot),
             _ => equipment.TryUnequip(member, slot),
         };
-        if (!changed && member.EquippedIn(slot) is { } worn && !_session.Inventory.HasRoomFor(worn))
+        if (!changed && member.EquippedIn(slot) is { } worn && !_session.Inventory.HasRoomFor(worn.Base))
         {
-            Refusal = _messages.Format(MessageIds.EquipmentNoRoom, new MessageArgument("item", worn.Name));
+            Refusal = _messages.Format(MessageIds.EquipmentNoRoom, new MessageArgument("item", worn.Base.Name));
         }
     }
 

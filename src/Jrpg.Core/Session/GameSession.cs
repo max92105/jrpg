@@ -175,7 +175,7 @@ public sealed class GameSession
         var member = PartyMember.Recruit(definition, catalog.ClassOf(definition), catalog.Skills, catalog.Rules.Stats);
         foreach (var (slot, itemId) in progress.Worn)
         {
-            member.Wear(slot, catalog.Items[itemId]);
+            member.Wear(slot, GearPiece.Plain(catalog.Items[itemId]));
         }
 
         member.RestoreProgress(progress);

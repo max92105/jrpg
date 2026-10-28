@@ -27,23 +27,24 @@ public sealed class PartyEquipment(Inventory inventory)
             return false;
         }
 
+        var piece = GearPiece.Plain(item);
         var replaced = member.EquippedIn(slot);
-        if (replaced?.Id == item.Id)
+        if (piece.Equals(replaced))
         {
             return true;
         }
 
-        if ((replaced is not null && !inventory.HasRoomFor(replaced)) || !inventory.TryRemove(item.Id, 1))
+        if ((replaced is not null && !inventory.HasRoomFor(replaced.Base)) || !inventory.TryRemove(item.Id, 1))
         {
             return false;
         }
 
         if (replaced is not null)
         {
-            inventory.Add(replaced, 1);
+            inventory.Add(replaced.Base, 1);
         }
 
-        member.Wear(slot, item);
+        member.Wear(slot, piece);
         return true;
     }
 
@@ -65,9 +66,9 @@ public sealed class PartyEquipment(Inventory inventory)
         var takeable = new List<WornItem>();
         foreach (var wearer in party.ActiveMembers.Concat(party.ReserveMembers))
         {
-            if (wearer != member && wearer.EquippedIn(slot) is { } item && IsWorthTaking(item, member, slot))
+            if (wearer != member && wearer.EquippedIn(slot) is { } piece && IsWorthTaking(piece, member, slot))
             {
-                takeable.Add(new WornItem(wearer, item));
+                takeable.Add(new WornItem(wearer, piece));
             }
         }
 
@@ -84,25 +85,25 @@ public sealed class PartyEquipment(Inventory inventory)
     /// </returns>
     public bool TryTakeFrom(PartyMember giver, PartyMember receiver, EquipmentSlot slot)
     {
-        var item = giver.EquippedIn(slot);
-        if (giver == receiver || item is null || !IsWorthTaking(item, receiver, slot))
+        var piece = giver.EquippedIn(slot);
+        if (giver == receiver || piece is null || !IsWorthTaking(piece, receiver, slot))
         {
             return false;
         }
 
         var replaced = receiver.EquippedIn(slot);
-        if (replaced is not null && !inventory.HasRoomFor(replaced))
+        if (replaced is not null && !inventory.HasRoomFor(replaced.Base))
         {
             return false;
         }
 
         if (replaced is not null)
         {
-            inventory.Add(replaced, 1);
+            inventory.Add(replaced.Base, 1);
         }
 
         giver.TakeOff(slot);
-        receiver.Wear(slot, item);
+        receiver.Wear(slot, piece);
         return true;
     }
 
@@ -110,18 +111,18 @@ public sealed class PartyEquipment(Inventory inventory)
     public bool TryUnequip(PartyMember member, EquipmentSlot slot)
     {
         var worn = member.EquippedIn(slot);
-        if (worn is null || !inventory.HasRoomFor(worn))
+        if (worn is null || !inventory.HasRoomFor(worn.Base))
         {
             return false;
         }
 
-        inventory.Add(worn, 1);
+        inventory.Add(worn.Base, 1);
         member.TakeOff(slot);
         return true;
     }
 
-    // Not the very item the receiver already wears there, which taking would only shuffle. A worn item is always
-    // equipment, so nothing else needs checking (decision 165: anyone can wear it).
-    private static bool IsWorthTaking(ItemDefinition item, PartyMember receiver, EquipmentSlot slot) =>
-        item.Id != receiver.EquippedIn(slot)?.Id;
+    // Not a piece equal to the one the receiver already wears there, which taking would only shuffle. A worn piece is
+    // always equipment, so nothing else needs checking (decision 165: anyone can wear it).
+    private static bool IsWorthTaking(GearPiece piece, PartyMember receiver, EquipmentSlot slot) =>
+        !piece.Equals(receiver.EquippedIn(slot));
 }

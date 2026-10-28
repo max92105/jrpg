@@ -32,7 +32,7 @@ public sealed class GameSessionGearTests
         var leader = restored.Party.Leader;
         Assert.Equal(
             (sword, _mail, helm, ring, ring),
-            (leader.Weapon, leader.EquippedIn(EquipmentSlot.Chest), leader.EquippedIn(EquipmentSlot.Head), leader.EquippedIn(EquipmentSlot.FirstRing), leader.EquippedIn(EquipmentSlot.SecondRing)));
+            (leader.Weapon?.Base, leader.EquippedIn(EquipmentSlot.Chest)?.Base, leader.EquippedIn(EquipmentSlot.Head)?.Base, leader.EquippedIn(EquipmentSlot.FirstRing)?.Base, leader.EquippedIn(EquipmentSlot.SecondRing)?.Base));
         Assert.Equal(0, restored.Inventory.QuantityOf("power_ring"));
     }
 

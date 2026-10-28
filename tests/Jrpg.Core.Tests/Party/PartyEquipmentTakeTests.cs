@@ -36,7 +36,7 @@ public sealed class PartyEquipmentTakeTests
 
         var takeable = PartyEquipment.TakeableFor(_sarxian, EquipmentSlot.Weapon, _party);
 
-        Assert.Equal([new WornItem(_jazog, _ironSword), new WornItem(_teelle, _ironSword)], takeable);
+        Assert.Equal([new WornItem(_jazog, GearPiece.Plain(_ironSword)), new WornItem(_teelle, GearPiece.Plain(_ironSword))], takeable);
     }
 
     [Fact]
@@ -46,7 +46,7 @@ public sealed class PartyEquipmentTakeTests
 
         var takeable = PartyEquipment.TakeableFor(_sarxian, EquipmentSlot.Weapon, _party);
 
-        Assert.Equal([new WornItem(_teelle, _ironSword)], takeable);
+        Assert.Equal([new WornItem(_teelle, GearPiece.Plain(_ironSword))], takeable);
     }
 
     [Fact]
@@ -56,7 +56,7 @@ public sealed class PartyEquipmentTakeTests
 
         var takeable = PartyEquipment.TakeableFor(_sarxian, EquipmentSlot.Weapon, _party);
 
-        Assert.Equal(new WornItem(_zaruk, _staff), Assert.Single(takeable));
+        Assert.Equal(new WornItem(_zaruk, GearPiece.Plain(_staff)), Assert.Single(takeable));
     }
 
     [Fact]
@@ -99,7 +99,7 @@ public sealed class PartyEquipmentTakeTests
         var taken = _equipment.TryTakeFrom(_jazog, _sarxian, EquipmentSlot.Weapon);
 
         Assert.True(taken);
-        Assert.Same(_ironSword, _sarxian.Weapon);
+        Assert.Same(_ironSword, _sarxian.Weapon?.Base);
         Assert.Null(_jazog.Weapon);
         Assert.Equal(0, _inventory.QuantityOf("iron_sword"));
     }
@@ -112,7 +112,7 @@ public sealed class PartyEquipmentTakeTests
 
         _equipment.TryTakeFrom(_jazog, _sarxian, EquipmentSlot.Weapon);
 
-        Assert.Same(_ironSword, _sarxian.Weapon);
+        Assert.Same(_ironSword, _sarxian.Weapon?.Base);
         Assert.Equal(1, _inventory.QuantityOf("bronze_sword"));
     }
 
@@ -127,8 +127,8 @@ public sealed class PartyEquipmentTakeTests
         var taken = _equipment.TryTakeFrom(_jazog, _sarxian, EquipmentSlot.Weapon);
 
         Assert.False(taken);
-        Assert.Same(_ironSword, _jazog.Weapon);
-        Assert.Same(bronzeSword, _sarxian.Weapon);
+        Assert.Same(_ironSword, _jazog.Weapon?.Base);
+        Assert.Same(bronzeSword, _sarxian.Weapon?.Base);
         Assert.Equal(1, _inventory.QuantityOf("bronze_sword"));
     }
 
@@ -141,7 +141,7 @@ public sealed class PartyEquipmentTakeTests
         var taken = _equipment.TryTakeFrom(_jazog, _sarxian, EquipmentSlot.Weapon);
 
         Assert.False(taken);
-        Assert.Same(_ironSword, _jazog.Weapon);
+        Assert.Same(_ironSword, _jazog.Weapon?.Base);
         Assert.Equal(0, _inventory.QuantityOf("iron_sword"));
     }
 
@@ -161,7 +161,7 @@ public sealed class PartyEquipmentTakeTests
         var taken = _equipment.TryTakeFrom(_sarxian, _sarxian, EquipmentSlot.Weapon);
 
         Assert.False(taken);
-        Assert.Same(_ironSword, _sarxian.Weapon);
+        Assert.Same(_ironSword, _sarxian.Weapon?.Base);
     }
 
     // Puts the item on through the bag, as the game does.

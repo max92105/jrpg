@@ -72,7 +72,7 @@ internal sealed class PartyMemberBuilder
         var member = PartyMember.Recruit(BuildDefinition(), characterClass, _skills.ToDictionary(skill => skill.Id), TestStatRules.Neutral);
         if (_weaponDamage is { } damage)
         {
-            member.Wear(EquipmentSlot.Weapon, new ItemDefinitionBuilder().WithId("test_weapon").AsWeapon(damage).Build());
+            member.Wear(EquipmentSlot.Weapon, GearPiece.Plain(new ItemDefinitionBuilder().WithId("test_weapon").AsWeapon(damage).Build()));
         }
 
         member.RestoreProgress(progress);

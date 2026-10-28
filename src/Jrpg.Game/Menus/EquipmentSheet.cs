@@ -9,7 +9,7 @@ namespace Jrpg.Game.Menus;
 /// One member as the Equipment page shows them, formatted once when the member or what they wear changes: their name,
 /// and what they wear in each of <see cref="Slots"/> (null for nothing).
 /// </summary>
-internal sealed record EquipmentSheet(string Name, ImmutableArray<ItemDefinition?> Worn)
+internal sealed record EquipmentSheet(string Name, ImmutableArray<GearPiece?> Worn)
 {
     /// <summary>The page's slot rows, in order, before "Remove all" (ADR 0028); both ring slots read "Ring".</summary>
     public static ImmutableArray<EquipmentSlot> Slots { get; } =

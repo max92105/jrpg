@@ -42,7 +42,7 @@ internal sealed class EquipmentChoice
     public SelectionMotion Selection { get; } = new();
 
     /// <summary>The item under the cursor, owned or worn; null on "Remove".</summary>
-    public ItemDefinition? Highlighted => WornAt(SelectedRow)?.Item ?? (SelectedRow == 0 ? null : Items[SelectedRow - 1]);
+    public ItemDefinition? Highlighted => WornAt(SelectedRow)?.Piece.Base ?? (SelectedRow == 0 ? null : Items[SelectedRow - 1]);
 
     /// <summary>Who wears the highlighted item; null on "Remove" and on owned items.</summary>
     public PartyMember? HighlightedWearer => WornAt(SelectedRow)?.Wearer;

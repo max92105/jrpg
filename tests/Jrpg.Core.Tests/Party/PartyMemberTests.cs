@@ -186,7 +186,7 @@ public sealed class PartyMemberTests
         var armor = new ItemDefinitionBuilder().WithId("chain_mail").AsChest().Build();
         Equip(member, armor);
 
-        var worn = member.EquippedIn(EquipmentSlot.Chest);
+        var worn = member.EquippedIn(EquipmentSlot.Chest)?.Base;
 
         Assert.Same(armor, worn);
     }

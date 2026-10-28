@@ -65,7 +65,7 @@ public sealed class PartyMemberStatTests
         Equip(member, new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(15).Build());
         var ironSword = new ItemDefinitionBuilder().WithId("iron_sword").AsWeapon(18).Build();
 
-        var preview = member.SheetWith(ironSword);
+        var preview = member.SheetWith(GearPiece.Plain(ironSword));
 
         Assert.Equal((18, 15), (preview.AttackDamage, member.Sheet.AttackDamage));
     }

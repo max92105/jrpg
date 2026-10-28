@@ -25,7 +25,7 @@ public sealed class PartyEquipmentTests
         var equipped = _equipment.TryEquip(_fighter, _bronzeSword);
 
         Assert.True(equipped);
-        Assert.Same(_bronzeSword, _fighter.Weapon);
+        Assert.Same(_bronzeSword, _fighter.Weapon?.Base);
         Assert.Equal(1, _inventory.QuantityOf(_bronzeSword.Id));
     }
 
@@ -50,7 +50,7 @@ public sealed class PartyEquipmentTests
         var equipped = _equipment.TryEquip(_fighter, staff);
 
         Assert.True(equipped);
-        Assert.Same(staff, _fighter.Weapon);
+        Assert.Same(staff, _fighter.Weapon?.Base);
         Assert.Equal(0, _inventory.QuantityOf(staff.Id));
     }
 
@@ -73,7 +73,7 @@ public sealed class PartyEquipmentTests
         var equipped = _equipment.TryEquip(_fighter, _ironSword);
 
         Assert.True(equipped);
-        Assert.Same(_ironSword, _fighter.Weapon);
+        Assert.Same(_ironSword, _fighter.Weapon?.Base);
         Assert.Equal(1, _inventory.QuantityOf(_bronzeSword.Id));
         Assert.Equal(0, _inventory.QuantityOf(_ironSword.Id));
     }
@@ -89,7 +89,7 @@ public sealed class PartyEquipmentTests
         var equipped = _equipment.TryEquip(_fighter, _bronzeSword);
 
         Assert.True(equipped);
-        Assert.Same(_bronzeSword, _fighter.Weapon);
+        Assert.Same(_bronzeSword, _fighter.Weapon?.Base);
         Assert.Equal([new InventoryEntry("bronze_sword", 1), new InventoryEntry("potion", 3)], _inventory.Entries);
     }
 
@@ -105,7 +105,7 @@ public sealed class PartyEquipmentTests
         var equipped = _equipment.TryEquip(_fighter, _ironSword);
 
         Assert.False(equipped);
-        Assert.Same(bronzeSword, _fighter.Weapon);
+        Assert.Same(bronzeSword, _fighter.Weapon?.Base);
         Assert.Equal(1, _inventory.QuantityOf(_ironSword.Id));
     }
 
@@ -121,7 +121,7 @@ public sealed class PartyEquipmentTests
 
         Assert.True(equipped);
         Assert.Null(knight.Weapon);
-        Assert.Same(_bronzeSword, _fighter.Weapon);
+        Assert.Same(_bronzeSword, _fighter.Weapon?.Base);
     }
 
     [Fact]
@@ -170,7 +170,7 @@ public sealed class PartyEquipmentTests
         var unequipped = _equipment.TryUnequip(_fighter, EquipmentSlot.Weapon);
 
         Assert.False(unequipped);
-        Assert.Same(bronzeSword, _fighter.Weapon);
+        Assert.Same(bronzeSword, _fighter.Weapon?.Base);
         Assert.Equal(1, _inventory.QuantityOf(bronzeSword.Id));
     }
 

@@ -54,7 +54,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 1: gear pieces
 - [x] **ADR 0029: Gear pieces** (before G1a) → [slices/ADR-0029.md](slices/ADR-0029.md)
-- [ ] **G1a. Members wear gear pieces, with a rarity and affixes from birth** (Core + Game, about 250 lines) → [slices/G1a.md](slices/G1a.md)
+- [x] **G1a. Members wear gear pieces, with a rarity and affixes from birth** (Core + Game, about 250 lines) → [slices/G1a.md](slices/G1a.md)
 - [ ] **G1b-1. The inventory holds gear as a list of pieces** (Core + tests, about 200 lines) → [slices/G1b-1.md](slices/G1b-1.md)
 - [ ] **G1b-2. Equipping moves pieces; the room rule leaves; the Equipment choice lists pieces** (Core + Game, about 220 lines) → [slices/G1b-2.md](slices/G1b-2.md)
 - [ ] **S1a. Saves keep every piece with its rolls: format 5** (Core + Data, about 260 lines; the `GearRepair` move first if it heads past 280) → [slices/S1a.md](slices/S1a.md)

@@ -49,7 +49,7 @@ public sealed class PartyMember
     public Vitals Vitals { get; }
 
     /// <summary>What the basic attack is dealt with; null when unarmed (decision 330).</summary>
-    public ItemDefinition? Weapon => _worn.In(EquipmentSlot.Weapon);
+    public GearPiece? Weapon => _worn.In(EquipmentSlot.Weapon);
 
     public IReadOnlyList<SkillDefinition> Skills { get; }
 
@@ -101,20 +101,17 @@ public sealed class PartyMember
     public StatSheet SheetWithout(EquipmentSlot slot) => SheetWearing(_worn.With(slot, null));
 
     /// <summary>
-    /// The sheet if <paramref name="item"/> replaced whatever is worn in the first slot its kind fits (a ring in the
+    /// The sheet if <paramref name="piece"/> replaced whatever is worn in the first slot its kind fits (a ring in the
     /// first ring slot).
     /// </summary>
-    /// <exception cref="ArgumentException"><paramref name="item"/> isn't equipment.</exception>
-    public StatSheet SheetWith(ItemDefinition item) => SheetWith(item, SlotOf(item));
+    public StatSheet SheetWith(GearPiece piece) => SheetWith(piece, EquipmentFit.SlotsFor(piece.Kind)[0]);
 
-    /// <summary>The sheet if <paramref name="item"/> replaced whatever is worn in <paramref name="slot"/>.</summary>
-    /// <exception cref="ArgumentException">
-    /// <paramref name="item"/> isn't equipment whose kind fits the slot.
-    /// </exception>
-    public StatSheet SheetWith(ItemDefinition item, EquipmentSlot slot) =>
-        item.Equipment is { } equipment && EquipmentFit.Fits(equipment.Kind, slot)
-            ? SheetWearing(_worn.With(slot, item))
-            : throw new ArgumentException($"Item '{item.Id}' can't be worn in the {slot} slot.", nameof(item));
+    /// <summary>The sheet if <paramref name="piece"/> replaced whatever is worn in <paramref name="slot"/>.</summary>
+    /// <exception cref="ArgumentException">The piece's kind doesn't fit the slot.</exception>
+    public StatSheet SheetWith(GearPiece piece, EquipmentSlot slot) =>
+        EquipmentFit.Fits(piece.Kind, slot)
+            ? SheetWearing(_worn.With(slot, piece))
+            : throw new ArgumentException($"Item '{piece.Base.Id}' can't be worn in the {slot} slot.", nameof(piece));
 
     /// <returns>One step per level the experience passes through; empty at the maximum level.</returns>
     public IReadOnlyList<LevelProgressStep> GainExperience(int amount, ExperienceTable table)
@@ -134,7 +131,7 @@ public sealed class PartyMember
     }
 
     /// <returns>Null when the slot is empty.</returns>
-    public ItemDefinition? EquippedIn(EquipmentSlot slot) => _worn.In(slot);
+    public GearPiece? EquippedIn(EquipmentSlot slot) => _worn.In(slot);
 
     /// <summary>Whether a rest would change anything: HP below max, or a lasting resource off what a rest gives.</summary>
     public bool HasAnythingToRest =>
@@ -174,14 +171,14 @@ public sealed class PartyMember
         _lastingAmounts[resourceId] = Math.Clamp(amount, 0, max);
     }
 
-    /// <remarks>Only <see cref="PartyEquipment"/> calls this, after moving the copy out of the inventory.</remarks>
-    internal void Wear(EquipmentSlot slot, ItemDefinition item) => FillSlot(slot, item);
+    /// <remarks>Only <see cref="PartyEquipment"/> calls this, after moving the piece out of the inventory.</remarks>
+    internal void Wear(EquipmentSlot slot, GearPiece piece) => FillSlot(slot, piece);
 
     internal void TakeOff(EquipmentSlot slot) => FillSlot(slot, null);
 
-    private void FillSlot(EquipmentSlot slot, ItemDefinition? item)
+    private void FillSlot(EquipmentSlot slot, GearPiece? piece)
     {
-        _worn.Put(slot, item);
+        _worn.Put(slot, piece);
 
         // Max HP follows the sheet, keeping HP within it (decision 328); a lasting resource's max follows Will the same
         // way.
@@ -198,12 +195,6 @@ public sealed class PartyMember
     // A rest refills a resource that starts full to its raised max (decision 319); any other start stays, within it.
     private int RestAmountOf(ResourceDefinition resource) =>
         resource.StartsAt == resource.Max ? LastingMaxOf(resource) : Math.Min(resource.StartsAt, LastingMaxOf(resource));
-
-    // The first slot the item's kind fits: a ring's first ring slot. The Equipment page names the slot itself.
-    private static EquipmentSlot SlotOf(ItemDefinition item) =>
-        item.Equipment is { } equipment
-            ? EquipmentFit.SlotsFor(equipment.Kind)[0]
-            : throw new ArgumentException($"Item '{item.Id}' is not equipment.", nameof(item));
 
     private StatSheet SheetWearing(WornEquipment worn) =>
         MemberSheet.Of(ClassGrowth.StatsAt(Class, Level), worn.Bonuses, worn.WeaponDamage, Rules);

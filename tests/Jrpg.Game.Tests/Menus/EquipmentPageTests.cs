@@ -67,7 +67,7 @@ public sealed class EquipmentPageTests
 
         ConfirmRemoveAll(page);
 
-        Assert.Same(sword, sarxian.Weapon);
+        Assert.Same(sword, sarxian.Weapon?.Base);
         Assert.Null(sarxian.EquippedIn(EquipmentSlot.Chest));
     }
 
@@ -128,7 +128,7 @@ public sealed class EquipmentPageTests
 
         page.Update(Pressing(GameButton.Confirm));
 
-        Assert.Same(StartMapScenarios.BelowClosedDoor.Items["iron_sword"], sarxian.Weapon);
+        Assert.Same(StartMapScenarios.BelowClosedDoor.Items["iron_sword"], sarxian.Weapon?.Base);
         Assert.Equal(2, _session.Inventory.QuantityOf("bronze_sword"));
     }
 
@@ -144,7 +144,7 @@ public sealed class EquipmentPageTests
 
         page.Update(Pressing(GameButton.Confirm));
 
-        Assert.Same(bronze, sarxian.Weapon);
+        Assert.Same(bronze, sarxian.Weapon?.Base);
         Assert.Equal($"There's no room in the bag for {bronze.Name}.", page.Notice);
     }
 
@@ -159,7 +159,7 @@ public sealed class EquipmentPageTests
 
         page.Update(Pressing(GameButton.Confirm));
 
-        Assert.Same(StartMapScenarios.BelowClosedDoor.Items["iron_sword"], sarxian.Weapon);
+        Assert.Same(StartMapScenarios.BelowClosedDoor.Items["iron_sword"], sarxian.Weapon?.Base);
         Assert.Null(zanyr.Weapon);
         Assert.Equal(2, _session.Inventory.QuantityOf("bronze_sword"));
     }
@@ -177,7 +177,7 @@ public sealed class EquipmentPageTests
 
         page.Update(Pressing(GameButton.Confirm));
 
-        Assert.Same(bronze, sarxian.Weapon);
+        Assert.Same(bronze, sarxian.Weapon?.Base);
         Assert.NotNull(zanyr.Weapon);
         Assert.Equal($"There's no room in the bag for {bronze.Name}.", page.Notice);
     }

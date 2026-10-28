@@ -1,3 +1,4 @@
+using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Stats;
 using Jrpg.Game.Input;
@@ -41,7 +42,7 @@ public sealed class EquipmentChoiceTests
     public void Rows_WornByOthers_ListedAfterTheOwnedOnes()
     {
         var wearer = _party.MemberById("zanyr");
-        var choice = new EquipmentChoice([_items["bronze_sword"]], [new WornItem(wearer, _items["iron_sword"])]);
+        var choice = new EquipmentChoice([_items["bronze_sword"]], [new WornItem(wearer, GearPiece.Plain(_items["iron_sword"]))]);
 
         choice.Update(Pressing(GameButton.Down));
         choice.Update(Pressing(GameButton.Down));
@@ -55,7 +56,7 @@ public sealed class EquipmentChoiceTests
     public void Update_ConfirmWornRow_PicksItWithItsWearer()
     {
         var wearer = _party.MemberById("zanyr");
-        var choice = new EquipmentChoice([], [new WornItem(wearer, _items["iron_sword"])]);
+        var choice = new EquipmentChoice([], [new WornItem(wearer, GearPiece.Plain(_items["iron_sword"]))]);
         choice.Update(Pressing(GameButton.Down));
 
         var pick = choice.Update(Pressing(GameButton.Confirm));
@@ -66,7 +67,7 @@ public sealed class EquipmentChoiceTests
     [Fact]
     public void Update_ConfirmOwnedRow_HasNoGiver()
     {
-        var choice = new EquipmentChoice([_items["bronze_sword"]], [new WornItem(_party.MemberById("zanyr"), _items["iron_sword"])]);
+        var choice = new EquipmentChoice([_items["bronze_sword"]], [new WornItem(_party.MemberById("zanyr"), GearPiece.Plain(_items["iron_sword"]))]);
         choice.Update(Pressing(GameButton.Down));
 
         var pick = choice.Update(Pressing(GameButton.Confirm));
@@ -80,7 +81,7 @@ public sealed class EquipmentChoiceTests
         var sword = _items["bronze_sword"];
         var leader = _party.Leader;
 
-        var comparison = StatComparison.Between(leader.Sheet, leader.SheetWith(sword));
+        var comparison = StatComparison.Between(leader.Sheet, leader.SheetWith(GearPiece.Plain(sword)));
 
         Assert.Equal(WeaponDamage(leader, sword.Equipment!.Damage) - WeaponDamage(leader, Unarmed), WeaponDamageChange(comparison));
     }
@@ -93,7 +94,7 @@ public sealed class EquipmentChoiceTests
         session.Equipment.TryEquip(leader, _items["bronze_sword"]);
         var ironSword = _items["iron_sword"];
 
-        var comparison = StatComparison.Between(leader.Sheet, leader.SheetWith(ironSword));
+        var comparison = StatComparison.Between(leader.Sheet, leader.SheetWith(GearPiece.Plain(ironSword)));
 
         Assert.Equal(WeaponDamage(leader, ironSword.Equipment!.Damage) - WeaponDamage(leader, _items["bronze_sword"].Equipment!.Damage), WeaponDamageChange(comparison));
         Assert.True(WeaponDamageChange(comparison) > 0);

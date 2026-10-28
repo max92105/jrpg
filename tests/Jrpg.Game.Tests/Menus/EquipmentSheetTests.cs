@@ -19,7 +19,7 @@ public sealed class EquipmentSheetTests
 
         var sheet = EquipmentSheet.Of(_session.Party.Leader);
 
-        Assert.Same(sword, sheet.Worn[EquipmentSheet.Slots.IndexOf(EquipmentSlot.Weapon)]);
+        Assert.Same(sword, sheet.Worn[EquipmentSheet.Slots.IndexOf(EquipmentSlot.Weapon)]?.Base);
     }
 
     [Fact]

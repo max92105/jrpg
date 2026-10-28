@@ -82,7 +82,7 @@ public sealed class PartyMemberGearTests
     {
         var member = NewMember();
 
-        var sheet = member.SheetWith(Armor(StatKind.Constitution, 10));
+        var sheet = member.SheetWith(GearPiece.Plain(Armor(StatKind.Constitution, 10)));
 
         Assert.Equal(220, sheet.MaxHp);
         Assert.Null(member.EquippedIn(EquipmentSlot.Chest));
@@ -99,17 +99,30 @@ public sealed class PartyMemberGearTests
         _inventory.Add(ring, 1);
         Assert.True(new PartyEquipment(_inventory).TryEquip(member, ring, EquipmentSlot.FirstRing));
 
-        var sheet = member.SheetWith(ring, EquipmentSlot.SecondRing);
+        var sheet = member.SheetWith(GearPiece.Plain(ring), EquipmentSlot.SecondRing);
 
         Assert.Equal(member.Sheet.Primaries.Power + 5, sheet.Primaries.Power);
     }
 
     [Fact]
-    public void SheetWith_NotEquipment_Throws()
+    public void SheetWith_RingInTheWeaponSlot_Throws()
     {
         var member = NewMember();
+        var ring = GearPiece.Plain(new ItemDefinitionBuilder().WithId("power_ring").AsWorn(EquipmentKind.Ring).Build());
 
-        Assert.Throws<ArgumentException>(() => member.SheetWith(new ItemDefinitionBuilder().Build()));
+        Assert.Throws<ArgumentException>(() => member.SheetWith(ring, EquipmentSlot.Weapon));
+    }
+
+    // A rolled piece's affixes reach the sheet as its base bonuses do (ADR 0029).
+    [Fact]
+    public void Wear_RolledRing_AffixRaisesSheet()
+    {
+        var member = NewMember();
+        var ring = new ItemDefinitionBuilder().WithId("power_ring").AsWorn(EquipmentKind.Ring).WithBonuses(new StatBonuses(new Dictionary<StatKind, int> { [StatKind.Power] = 2 })).Build();
+
+        member.Wear(EquipmentSlot.FirstRing, GearPiece.Rolled(ring, Rarity.Magic, [new RolledAffix("power", StatKind.Power, 4)]));
+
+        Assert.Equal(member.SheetWithout(EquipmentSlot.FirstRing).Primaries.Power + 6, member.Sheet.Primaries.Power);
     }
 
     // Decision 322: an off-hand item is stats only; the basic attack stays the unarmed one.
@@ -121,7 +134,7 @@ public sealed class PartyMemberGearTests
 
         Equip(member, shield);
 
-        Assert.Same(shield, member.EquippedIn(EquipmentSlot.OffHand));
+        Assert.Same(shield, member.EquippedIn(EquipmentSlot.OffHand)?.Base);
         Assert.Equal(80, member.Sheet.Resistances.Blunt);
         Assert.Equal(_rules.UnarmedDamage, member.Sheet.AttackDamage);
     }

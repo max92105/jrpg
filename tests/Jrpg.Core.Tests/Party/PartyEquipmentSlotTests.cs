@@ -31,7 +31,7 @@ public sealed class PartyEquipmentSlotTests
 
         Assert.True(_equipment.TryEquip(_sarxian, _ring, EquipmentSlot.SecondRing));
 
-        Assert.Same(_ring, _sarxian.EquippedIn(EquipmentSlot.SecondRing));
+        Assert.Same(_ring, _sarxian.EquippedIn(EquipmentSlot.SecondRing)?.Base);
         Assert.Null(_sarxian.EquippedIn(EquipmentSlot.FirstRing));
     }
 
@@ -45,7 +45,7 @@ public sealed class PartyEquipmentSlotTests
         Assert.True(_equipment.TryEquip(_sarxian, _ring, EquipmentSlot.FirstRing));
         Assert.True(_equipment.TryEquip(_sarxian, _ring, EquipmentSlot.SecondRing));
 
-        Assert.Equal((_ring, _ring), (_sarxian.EquippedIn(EquipmentSlot.FirstRing), _sarxian.EquippedIn(EquipmentSlot.SecondRing)));
+        Assert.Equal((_ring, _ring), (_sarxian.EquippedIn(EquipmentSlot.FirstRing)?.Base, _sarxian.EquippedIn(EquipmentSlot.SecondRing)?.Base));
         Assert.Equal(powerBefore + 10, _sarxian.Sheet.Primaries.Power);
         Assert.Equal(0, _inventory.QuantityOf(_ring.Id));
     }
@@ -57,7 +57,7 @@ public sealed class PartyEquipmentSlotTests
 
         Assert.True(_equipment.TryEquip(_sarxian, _ring));
 
-        Assert.Same(_ring, _sarxian.EquippedIn(EquipmentSlot.FirstRing));
+        Assert.Same(_ring, _sarxian.EquippedIn(EquipmentSlot.FirstRing)?.Base);
     }
 
     [Fact]
@@ -80,6 +80,6 @@ public sealed class PartyEquipmentSlotTests
 
         var takeable = PartyEquipment.TakeableFor(_sarxian, EquipmentSlot.SecondRing, party);
 
-        Assert.Equal([new WornItem(_jazog, _ring)], takeable);
+        Assert.Equal([new WornItem(_jazog, GearPiece.Plain(_ring))], takeable);
     }
 }

@@ -19,8 +19,8 @@ public sealed class VictoryDropsViewTests
         var rows = VictoryDropsView.RowsOf(drops, RepositoryScreenText.Text.Messages, RepositoryScreenText.Text.Fonts.FontAt(26));
 
         Assert.Equal([_potion.Name, _sword.Name], rows.Select(row => row.Name));
-        Assert.Equal("×3", rows[0].Quantity?.Text);
-        Assert.Null(rows[1].Quantity);
+        Assert.Equal("×3", rows[0].Tag?.Text);
+        Assert.Null(rows[1].Tag);
     }
 
     // One more than fits: the last row that fits counts itself and the one past it.
@@ -35,7 +35,6 @@ public sealed class VictoryDropsViewTests
         Assert.Equal(("+2 more", null), (rows[^1].Name, rows[^1].IconFile));
     }
 
-
     // Exactly as many as fit: every drop shows, with no "+n more" row.
     [Fact]
     public void RowsOf_ExactlyCapacity_ShowsEveryDrop()
@@ -46,5 +45,17 @@ public sealed class VictoryDropsViewTests
 
         Assert.Equal(VictoryDropsView.Capacity, rows.Count);
         Assert.All(rows, row => Assert.Equal(_sword.Name, row.Name));
+    }
+
+    // A rolled piece names its rarity where a stack shows its count; a plain one names nothing there.
+    [Fact]
+    public void RowsOf_RarePiece_IsRareAndNamed()
+    {
+        var drops = new Drops([], [GearPiece.Rolled(_sword, Rarity.Rare, []), GearPiece.Plain(_sword)]);
+
+        var rows = VictoryDropsView.RowsOf(drops, RepositoryScreenText.Text.Messages, RepositoryScreenText.Text.Fonts.FontAt(26));
+
+        Assert.Equal((Rarity.Rare, "Rare"), (rows[0].Rarity, rows[0].Tag?.Text));
+        Assert.Equal((Rarity.Common, null), (rows[1].Rarity, rows[1].Tag?.Text));
     }
 }

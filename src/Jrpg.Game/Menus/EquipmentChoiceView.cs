@@ -1,4 +1,5 @@
 using FontStashSharp;
+using Jrpg.Core.Items;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
@@ -38,6 +39,8 @@ internal sealed class EquipmentChoiceView
     private readonly ColumnTitles _columnTitles;
     private string _heading = string.Empty;
     private string[] _wornRows = [];
+    private Color[] _ownedColors = [];
+    private Color[] _wornColors = [];
 
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared textures: icons, section line, selected row.</param>
@@ -57,6 +60,12 @@ internal sealed class EquipmentChoiceView
             ]);
     }
 
+    /// <summary>Each owned row's name color, in the choice's order: its rarity's (decision 362).</summary>
+    internal IReadOnlyList<Color> OwnedColors => _ownedColors;
+
+    /// <summary>Each row of another member's piece: dimmed, unless it rolled and takes its rarity's color.</summary>
+    internal IReadOnlyList<Color> WornColors => _wornColors;
+
     /// <summary>Builds the text once, when the choice opens.</summary>
     /// <param name="choice">The items offered.</param>
     /// <param name="slotName">The slot's name, as the heading.</param>
@@ -67,6 +76,10 @@ internal sealed class EquipmentChoiceView
             MessageIds.EquipmentWornRow,
             new MessageArgument("item", worn.Piece.Base.Name),
             new MessageArgument("member", worn.Wearer.Definition.Name)))];
+        _ownedColors = [.. choice.Owned.Select(piece => UiTheme.RarityColorOf(piece.Rarity))];
+
+        // Another member's piece stays dimmed unless it rolled: its rarity shows whoever wears it.
+        _wornColors = [.. choice.Takeable.Select(worn => worn.Piece.Rarity == Rarity.Common ? UiTheme.TextSecondary : UiTheme.RarityColorOf(worn.Piece.Rarity))];
     }
 
     /// <param name="batch">Already begun.</param>
@@ -107,12 +120,13 @@ internal sealed class EquipmentChoiceView
         if (choice.WornAt(index) is { } worn)
         {
             batch.Draw(_ui.Icon(textures, worn.Piece.Base.IconFile, IconSize), new Vector2(row.X + RowInset, iconTop), Color.White);
-            batch.DrawString(_bodyFont, _wornRows[index - 1 - choice.Owned.Count], new Vector2(nameLeft, textTop), UiTheme.TextSecondary);
+            var wornIndex = index - 1 - choice.Owned.Count;
+            batch.DrawString(_bodyFont, _wornRows[wornIndex], new Vector2(nameLeft, textTop), _wornColors[wornIndex]);
             return;
         }
 
         var owned = choice.Owned[index - 1].Base;
         batch.Draw(_ui.Icon(textures, owned.IconFile, IconSize), new Vector2(row.X + RowInset, iconTop), Color.White);
-        batch.DrawString(_bodyFont, owned.Name, new Vector2(nameLeft, textTop), UiTheme.TextPrimary);
+        batch.DrawString(_bodyFont, owned.Name, new Vector2(nameLeft, textTop), _ownedColors[index - 1]);
     }
 }

@@ -110,15 +110,15 @@ internal sealed class EquipmentSheetView
         batch.Draw(textures.Pixel, row with { Y = row.Bottom - 1, Height = 1 }, UiTheme.Stroke * opacity);
         var textTop = row.Y + ((RowHeight - _bodyFont.LineHeight) / 2f);
         var wornLeft = row.X + RowInset + IconColumn + WornColumn;
-        if (slot.Worn?.Base is not { } worn)
+        if (slot.Worn is not { } piece)
         {
             batch.DrawString(_bodyFont, _labels.Empty, new Vector2(wornLeft, textTop), UiTheme.TextDisabled * opacity);
             return;
         }
 
         var iconTop = row.Y + ((RowHeight - IconSize) / 2);
-        batch.Draw(_ui.Icon(textures, worn.IconFile, IconSize), new Vector2(wornLeft - IconColumn, iconTop), Color.White * opacity);
-        batch.DrawString(_bodyFont, worn.Name, new Vector2(wornLeft, textTop), UiTheme.TextPrimary * opacity);
+        batch.Draw(_ui.Icon(textures, piece.Base.IconFile, IconSize), new Vector2(wornLeft - IconColumn, iconTop), Color.White * opacity);
+        batch.DrawString(_bodyFont, piece.Base.Name, new Vector2(wornLeft, textTop), UiTheme.RarityColorOf(piece.Rarity) * opacity);
     }
 
     private void DrawRemoveAllRow(SpriteBatch batch, Rectangle row, float opacity)

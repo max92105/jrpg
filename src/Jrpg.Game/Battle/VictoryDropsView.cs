@@ -1,4 +1,5 @@
 using FontStashSharp;
+using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Ui;
@@ -22,7 +23,7 @@ internal sealed class VictoryDropsView
     private const int IconLeft = 16;
     private const int IconSize = 32;
     private const int NameLeft = IconLeft + IconSize + 14;
-    private const int QuantityRight = 24;
+    private const int TagRight = 24;
     private const int HeadingPixels = 56;
     private const int NamePixels = 26;
 
@@ -54,7 +55,7 @@ internal sealed class VictoryDropsView
     {
         var rows = drops.Stacks
             .Select(stack => new VictoryDropRow(stack.Item.Name, stack.Item.IconFile, MeasuredText.Of(font, CountOf(stack, messages))))
-            .Concat(drops.Gear.Select(piece => new VictoryDropRow(piece.Base.Name, piece.Base.IconFile, Quantity: null)))
+            .Concat(drops.Gear.Select(piece => RowOf(piece, messages, font)))
             .ToList();
         if (rows.Count <= Capacity)
         {
@@ -62,7 +63,7 @@ internal sealed class VictoryDropsView
         }
 
         var more = messages.Format(MessageIds.BattleVictoryMoreDrops, MessageArgument.Number("count", rows.Count - Capacity + 1));
-        return [.. rows.Take(Capacity - 1), new VictoryDropRow(more, IconFile: null, Quantity: null)];
+        return [.. rows.Take(Capacity - 1), new VictoryDropRow(more, IconFile: null, Tag: null)];
     }
 
     /// <param name="batch">Already begun.</param>
@@ -80,6 +81,13 @@ internal sealed class VictoryDropsView
         }
     }
 
+    // A rolled piece names its rarity where a stack shows its count.
+    private static VictoryDropRow RowOf(GearPiece piece, UiMessages messages, SpriteFontBase font)
+    {
+        MeasuredText? tag = piece.Rarity == Rarity.Common ? null : MeasuredText.Of(font, messages.Text(RarityNames.IdOf(piece.Rarity)));
+        return new VictoryDropRow(piece.Base.Name, piece.Base.IconFile, tag) { Rarity = piece.Rarity };
+    }
+
     private static string CountOf(ItemDrop stack, UiMessages messages) =>
         messages.Format(MessageIds.BattleVictoryDropCount, MessageArgument.Number("count", stack.Quantity));
 
@@ -92,10 +100,11 @@ internal sealed class VictoryDropsView
         }
 
         var textTop = tab.Center.Y - (_nameFont.Font.LineHeight / 2f);
-        _nameFont.Draw(batch, row.Name, new Vector2(tab.X + NameLeft, textTop), UiTheme.TextPrimary);
-        if (row.Quantity is { } quantity)
+        var color = UiTheme.RarityColorOf(row.Rarity);
+        _nameFont.Draw(batch, row.Name, new Vector2(tab.X + NameLeft, textTop), color);
+        if (row.Tag is { } tag)
         {
-            _nameFont.Draw(batch, quantity.Text, new Vector2(tab.Right - QuantityRight - quantity.Width, textTop), UiTheme.TextPrimary);
+            _nameFont.Draw(batch, tag.Text, new Vector2(tab.Right - TagRight - tag.Width, textTop), color);
         }
     }
 }

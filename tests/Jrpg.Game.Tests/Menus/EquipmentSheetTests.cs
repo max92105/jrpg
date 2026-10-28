@@ -23,6 +23,18 @@ public sealed class EquipmentSheetTests
     }
 
     [Fact]
+    public void Of_RarePieceWorn_RowIsRare()
+    {
+        var rare = GearPiece.Rolled(StartMapScenarios.BelowClosedDoor.Items["bronze_sword"], Rarity.Rare, []);
+        _session.Inventory.AddGear(rare);
+        Assert.True(_session.Equipment.TryEquip(_session.Party.Leader, rare));
+
+        var sheet = EquipmentSheet.Of(_session.Party.Leader);
+
+        Assert.Equal(Rarity.Rare, sheet.Worn[EquipmentSheet.Slots.IndexOf(EquipmentSlot.Weapon)]?.Rarity);
+    }
+
+    [Fact]
     public void Of_Member_ListsNineSlotsInOrder()
     {
         var sheet = EquipmentSheet.Of(_session.Party.Leader);

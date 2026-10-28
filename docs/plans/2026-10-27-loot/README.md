@@ -74,7 +74,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 4: pages
 - [x] **P1a. The Inventory page shows rarity and affix lines** (Game + text, raw 150, about 240 lines at 1.6x; waits for question 362) → [slices/P1a.md](slices/P1a.md)
-- [ ] **P1b. Rarity on the Equipment page and the victory drops** (Game, raw 100, about 160 lines at 1.6x) → [slices/P1b.md](slices/P1b.md)
+- [x] **P1b. Rarity on the Equipment page and the victory drops** (Game, raw 100, about 160 lines at 1.6x) → [slices/P1b.md](slices/P1b.md)
 
 ### Phase 5: numbers and walk-through
 - [ ] **B1. Loot simulation: drops and rarities per goblin trio** (Simulations, about 120 lines) → [slices/B1.md](slices/B1.md)

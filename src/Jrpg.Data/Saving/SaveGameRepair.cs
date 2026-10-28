@@ -4,7 +4,6 @@ using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Saving;
-using Jrpg.Core.Stats;
 
 namespace Jrpg.Data.Saving;
 
@@ -17,11 +16,12 @@ internal sealed class SaveGameRepair
 {
     private readonly ContentCatalog _catalog;
     private readonly List<string> _changes = [];
-    private readonly List<string> _returnedItemIds = [];
+    private readonly GearRepair _gear;
 
     private SaveGameRepair(ContentCatalog catalog)
     {
         _catalog = catalog;
+        _gear = new GearRepair(catalog, _changes);
     }
 
     /// <exception cref="UnreadableSaveException">None of the saved active members exists anymore, so there's nobody to play.</exception>
@@ -73,13 +73,11 @@ internal sealed class SaveGameRepair
     {
         var (level, experience) = RepairLevel(progress);
         var characterClass = _catalog.ClassOf(definition);
-        var worn = RepairWorn(progress, definition);
+        var worn = _gear.RepairWorn(progress);
 
         // The sheet the member will have once restored: their level's, with what they still wear; its max HP and its
         // Will bound what the save holds.
-        var bonuses = worn.Values.Aggregate(StatBonuses.None, (total, itemId) => total.Plus(BonusesOf(itemId)));
-        var weaponDamage = worn.TryGetValue(EquipmentSlot.Weapon, out var weaponId) ? _catalog.Items[weaponId].Equipment?.Damage : null;
-        var sheet = MemberSheet.Of(ClassGrowth.StatsAt(characterClass, level), bonuses, weaponDamage, _catalog.Rules.Stats);
+        var sheet = MemberSheet.Of(ClassGrowth.StatsAt(characterClass, level), _gear.BonusesOf(worn), _gear.WeaponDamageOf(worn), _catalog.Rules.Stats);
         var repaired = progress with
         {
             Level = level,
@@ -91,23 +89,6 @@ internal sealed class SaveGameRepair
         if (repaired.Hp != progress.Hp)
         {
             _changes.Add($"party member '{progress.Id}': HP {progress.Hp} brought within 0..{sheet.MaxHp}.");
-        }
-
-        return repaired;
-    }
-
-    private StatBonuses BonusesOf(string itemId) => _catalog.Items[itemId].Equipment?.Bonuses ?? StatBonuses.None;
-
-    // Slot by slot: an item that is gone is dropped, one that no longer fits its slot goes back to the inventory.
-    private Dictionary<EquipmentSlot, string> RepairWorn(PartyMemberProgress progress, PartyMemberDefinition definition)
-    {
-        var repaired = new Dictionary<EquipmentSlot, string>();
-        foreach (var (slot, itemId) in progress.Worn)
-        {
-            if (RepairWornItem(itemId, slot, definition) is { } kept)
-            {
-                repaired[slot] = kept;
-            }
         }
 
         return repaired;
@@ -154,24 +135,6 @@ internal sealed class SaveGameRepair
         return (level, experience);
     }
 
-    private string? RepairWornItem(string itemId, EquipmentSlot slot, PartyMemberDefinition definition)
-    {
-        if (!_catalog.Items.TryGetValue(itemId, out var item))
-        {
-            _changes.Add($"party member '{definition.Id}': dropped worn item '{itemId}', which no longer exists.");
-            return null;
-        }
-
-        if (item.Equipment is not { } equipment || !EquipmentFit.Fits(equipment.Kind, slot))
-        {
-            _returnedItemIds.Add(itemId);
-            _changes.Add($"party member '{definition.Id}': '{itemId}' can no longer be worn as {slot}, so it went back to the inventory.");
-            return null;
-        }
-
-        return itemId;
-    }
-
     private List<string> RepairActiveOrder(IReadOnlyList<string> activeIds, List<PartyMemberProgress> members)
     {
         var known = new List<string>();
@@ -207,7 +170,7 @@ internal sealed class SaveGameRepair
     {
         var quantities = new Dictionary<string, int>();
         var order = new List<string>();
-        foreach (var (itemId, quantity) in entries.Select(entry => (entry.ItemId, entry.Quantity)).Concat(_returnedItemIds.Select(id => (id, 1))))
+        foreach (var (itemId, quantity) in entries.Select(entry => (entry.ItemId, entry.Quantity)).Concat(_gear.ReturnedItemIds.Select(id => (id, 1))))
         {
             if (!_catalog.Items.ContainsKey(itemId) || quantity < 1)
             {

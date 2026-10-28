@@ -53,6 +53,36 @@ public sealed class GearRepairTests
         Assert.Equal(["the inventory: dropped affix 'vampiric' from 'bronze_sword', which no longer exists."], repaired.Changes);
     }
 
+    // The pool's "power" rolls 2..5; a value saved under older numbers is clamped and reported (decision 360).
+    [Fact]
+    public void Repair_ValueAboveRange_ClampsToMaxAndReports()
+    {
+        var repaired = Repair(RepairableSave with { Gear = [new SavedGear("bronze_sword", Rarity.Magic, [new SavedAffix("power", 7)])] });
+
+        Assert.Equal([new SavedAffix("power", 5)], repaired.Save.Gear[0].Affixes);
+        Assert.Equal(["the inventory: affix 'power' on 'bronze_sword' brought within 2..5 (was 7)."], repaired.Changes);
+    }
+
+    [Fact]
+    public void Repair_ValueBelowRange_ClampsToMinAndReports()
+    {
+        var repaired = Repair(RepairableSave with { Gear = [new SavedGear("bronze_sword", Rarity.Magic, [new SavedAffix("power", 1)])] });
+
+        Assert.Equal([new SavedAffix("power", 2)], repaired.Save.Gear[0].Affixes);
+        Assert.Equal(["the inventory: affix 'power' on 'bronze_sword' brought within 2..5 (was 1)."], repaired.Changes);
+    }
+
+    [Fact]
+    public void Repair_PieceThatFits_UnchangedAndNotReported()
+    {
+        var sword = new SavedGear("bronze_sword", Rarity.Magic, [new SavedAffix("power", 5)]);
+
+        var repaired = Repair(RepairableSave with { Gear = [sword] });
+
+        Assert.Equal([sword], repaired.Save.Gear);
+        Assert.Empty(repaired.Changes);
+    }
+
     // A worn piece's affixes count toward the max the saved HP is held within: sarxian, a level 3 warlock, has 203 HP
     // with nothing worn and 221 with a +10 Constitution affix (ADR 0026). The unknown affix leaves before the sheet.
     [Fact]

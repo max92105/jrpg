@@ -9,7 +9,7 @@ namespace Jrpg.Data.Saving;
 /// The gear half of <see cref="SaveGameRepair"/>: the pieces members wear, slot by slot, and the owned ones (ADR 0029).
 /// A piece whose base no longer exists is dropped, one whose base is no longer equipment goes back to the stacks as one
 /// copy, a worn one whose kind no longer fits its slot goes back to the owned gear, and an affix the pool no longer has
-/// is dropped; each is reported in the repair's changes.
+/// is dropped and one outside its range clamped into it; each is reported in the repair's changes.
 /// </summary>
 internal sealed class GearRepair
 {
@@ -44,7 +44,7 @@ internal sealed class GearRepair
             }
             else if (item.Equipment is { } equipment && EquipmentFit.Fits(equipment.Kind, slot))
             {
-                repaired[slot] = WithKnownAffixes(saved, owner);
+                repaired[slot] = RepairAffixes(saved, owner);
             }
             else
             {
@@ -75,7 +75,7 @@ internal sealed class GearRepair
             }
             else
             {
-                repaired.Add(WithKnownAffixes(saved, owner));
+                repaired.Add(RepairAffixes(saved, owner));
             }
         }
 
@@ -101,18 +101,32 @@ internal sealed class GearRepair
         }
         else
         {
-            _takenOff.Add(WithKnownAffixes(saved, owner));
+            _takenOff.Add(RepairAffixes(saved, owner));
         }
     }
 
-    // The piece with only the affixes the pool still has; each dropped one is reported.
-    private SavedGear WithKnownAffixes(SavedGear saved, string owner)
+    // The piece with only the affixes the pool still has, each value within its affix's current range (decision 360):
+    // every change is reported, never silent.
+    private SavedGear RepairAffixes(SavedGear saved, string owner)
     {
-        foreach (var unknown in saved.Affixes.Where(affix => !_catalog.Affixes.ContainsKey(affix.AffixId)))
+        var repaired = new List<SavedAffix>();
+        foreach (var affix in saved.Affixes)
         {
-            _changes.Add($"{owner}: dropped affix '{unknown.AffixId}' from '{saved.ItemId}', which no longer exists.");
+            if (!_catalog.Affixes.TryGetValue(affix.AffixId, out var definition))
+            {
+                _changes.Add($"{owner}: dropped affix '{affix.AffixId}' from '{saved.ItemId}', which no longer exists.");
+                continue;
+            }
+
+            var value = Math.Clamp(affix.Value, definition.Min, definition.Max);
+            if (value != affix.Value)
+            {
+                _changes.Add($"{owner}: affix '{affix.AffixId}' on '{saved.ItemId}' brought within {definition.Min}..{definition.Max} (was {affix.Value}).");
+            }
+
+            repaired.Add(affix with { Value = value });
         }
 
-        return saved with { Affixes = [.. saved.Affixes.Where(affix => _catalog.Affixes.ContainsKey(affix.AffixId))] };
+        return saved with { Affixes = repaired };
     }
 }

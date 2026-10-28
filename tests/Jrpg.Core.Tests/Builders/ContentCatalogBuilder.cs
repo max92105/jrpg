@@ -2,6 +2,7 @@ using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Items;
+using Jrpg.Core.Loot;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
@@ -19,6 +20,7 @@ internal sealed class ContentCatalogBuilder
     private ClassDefinition[] _classes = [new ClassBuilder().Build()];
     private SkillDefinition[] _skills = [];
     private PartyMemberDefinition[] _members = [];
+    private AffixDefinition[] _affixes = [];
     /// <summary>
     /// The middle of the default one-cell floor map "test_map", where a default new game starts. <see cref="WithMaps"/>
     /// and <see cref="WithTiles"/> replace that map and its tile, so a test using them with a new game sets its own start.
@@ -36,6 +38,12 @@ internal sealed class ContentCatalogBuilder
     public ContentCatalogBuilder WithItems(params ItemDefinition[] items)
     {
         _items = items;
+        return this;
+    }
+
+    public ContentCatalogBuilder WithAffixes(params AffixDefinition[] affixes)
+    {
+        _affixes = affixes;
         return this;
     }
 
@@ -122,6 +130,7 @@ internal sealed class ContentCatalogBuilder
         Maps = _maps.ToDictionary(layout => layout.Id, layout => new MapDefinition(layout, SettingsFor(layout.Id))),
         Rules = new GameRules(new PartyRules(MaxActiveMembers: 4), new ExperienceTable([100]), new ExplorationRules { WalkSpeed = 3, PlayerRadius = 0.1, InteractReach = 0.6 }, TestStatRules.Neutral),
         NewGame = _newGame,
+        Affixes = _affixes.ToDictionary(affix => affix.Id),
     };
 
     private MapSettings SettingsFor(string mapId) =>

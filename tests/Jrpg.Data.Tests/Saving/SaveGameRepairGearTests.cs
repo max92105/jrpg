@@ -39,9 +39,10 @@ public sealed class SaveGameRepairGearTests
         SavedAt = new DateTimeOffset(2026, 10, 27, 12, 0, 0, TimeSpan.Zero),
         PlayTime = TimeSpan.FromMinutes(30),
         Location = new MapLocation("start", new Point2D(10, 3), Facing.Down),
-        Members = [new PartyMemberProgress("sarxian", Level: 3, Experience: 0, hp, armorId is null ? new Dictionary<EquipmentSlot, string>() : new Dictionary<EquipmentSlot, string> { [EquipmentSlot.Chest] = armorId }, LastingAmounts: new Dictionary<string, int>())],
+        Members = [new PartyMemberProgress("sarxian", Level: 3, Experience: 0, hp, armorId is null ? new Dictionary<EquipmentSlot, SavedGear>() : new Dictionary<EquipmentSlot, SavedGear> { [EquipmentSlot.Chest] = new SavedGear(armorId, Rarity.Common, []) }, LastingAmounts: new Dictionary<string, int>())],
         ActiveMemberIds = ["sarxian"],
         Inventory = [],
+        Gear = [],
         CompletedEvents = [],
         ObjectSwaps = [],
     };

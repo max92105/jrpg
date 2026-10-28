@@ -29,6 +29,7 @@ internal sealed class SaveGameRepair
     {
         var repair = new SaveGameRepair(catalog);
         var members = repair.RepairMembers(save.Members);
+        var gear = repair._gear.RepairOwned(save.Gear);
         var activeMemberIds = repair.RepairActiveOrder(save.ActiveMemberIds, members);
         if (activeMemberIds.Count == 0)
         {
@@ -40,6 +41,7 @@ internal sealed class SaveGameRepair
             Members = members,
             ActiveMemberIds = activeMemberIds,
             Inventory = repair.RepairInventory(save.Inventory),
+            Gear = gear,
             CompletedEvents = WorldStateRepair.KeepKnownEvents(save.CompletedEvents, catalog, repair._changes),
             ObjectSwaps = WorldStateRepair.KeepKnownSwaps(save.ObjectSwaps, catalog, repair._changes),
             Location = repair.RepairLocation(save.Location),
@@ -165,7 +167,8 @@ internal sealed class SaveGameRepair
         return known;
     }
 
-    // Worn items that went back are added last; duplicate entries merge, then each stack is kept within its MaxStack.
+    // Pieces whose base is no longer gear are added last; duplicate entries merge, then each stack is kept within its
+    // MaxStack.
     private List<InventoryEntry> RepairInventory(IReadOnlyList<InventoryEntry> entries)
     {
         var quantities = new Dictionary<string, int>();

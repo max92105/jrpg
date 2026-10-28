@@ -24,8 +24,11 @@ public sealed record SaveGame
     /// <summary>The active party in order; the first is the leader.</summary>
     public required IReadOnlyList<string> ActiveMemberIds { get; init; }
 
-    /// <summary>Owned items; worn equipment is in <see cref="Members"/>, not here (ADR 0003).</summary>
+    /// <summary>Owned stacks; gear is in <see cref="Gear"/>, worn gear in <see cref="Members"/> (ADR 0003).</summary>
     public required IReadOnlyList<InventoryEntry> Inventory { get; init; }
+
+    /// <summary>Owned gear, one piece each, in pickup order (ADR 0029).</summary>
+    public required IReadOnlyList<SavedGear> Gear { get; init; }
 
     public required IReadOnlyList<MapEventKey> CompletedEvents { get; init; }
 

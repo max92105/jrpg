@@ -25,8 +25,8 @@ internal sealed class WornEquipment
     public StatBonuses Bonuses =>
         _pieces.Values.Aggregate(StatBonuses.None, (total, piece) => total.Plus(piece.Bonuses));
 
-    /// <summary>Each worn item's id by its slot, as a save keeps them; empty slots absent.</summary>
-    public IReadOnlyDictionary<EquipmentSlot, string> ItemIds => _pieces.ToDictionary(entry => entry.Key, entry => entry.Value.Base.Id);
+    /// <summary>Each worn piece by its slot, as a save keeps them; empty slots absent.</summary>
+    public IReadOnlyDictionary<EquipmentSlot, SavedGear> Saved => _pieces.ToDictionary(entry => entry.Key, entry => entry.Value.ToSaved());
 
     /// <summary>The worn weapon's damage; null without one, for the rules' unarmed damage (decision 330).</summary>
     public int? WeaponDamage => In(EquipmentSlot.Weapon)?.Damage;

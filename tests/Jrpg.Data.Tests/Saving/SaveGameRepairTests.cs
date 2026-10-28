@@ -118,8 +118,8 @@ public sealed class SaveGameRepairTests
         // A sword isn't armor; a barbarian keeps his wizard robe, since any class wears anything (decision 165).
         var repaired = Repair(RepairableSave with { Members = [Sarxian with { Worn = Wearing((EquipmentSlot.Weapon, "bronze_sword"), (EquipmentSlot.Chest, "bronze_sword")) }, Jazog] });
 
-        Assert.Equal([null, "wizard_robe"], repaired.Save.Members.Select(member => member.Worn.GetValueOrDefault(EquipmentSlot.Chest)));
-        Assert.Equal([new InventoryEntry("potion", 4), new InventoryEntry("bronze_sword", 1)], repaired.Save.Inventory);
+        Assert.Equal([null, "wizard_robe"], repaired.Save.Members.Select(member => member.Worn.GetValueOrDefault(EquipmentSlot.Chest)?.ItemId));
+        Assert.Equal([Plain("bronze_sword")], repaired.Save.Gear);
     }
 
     [Fact]

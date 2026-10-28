@@ -64,14 +64,14 @@ public sealed class FileSaveStoreTests : IDisposable
     [Fact]
     public void SaveThenLoad_RingsInBothSlots_RoundTrips()
     {
-        var worn = new Dictionary<EquipmentSlot, string> { [EquipmentSlot.Weapon] = "bronze_sword", [EquipmentSlot.FirstRing] = "power_ring", [EquipmentSlot.SecondRing] = "power_ring" };
+        var worn = new Dictionary<EquipmentSlot, SavedGear> { [EquipmentSlot.Weapon] = new SavedGear("bronze_sword", Rarity.Common, []), [EquipmentSlot.FirstRing] = new SavedGear("power_ring", Rarity.Common, []), [EquipmentSlot.SecondRing] = new SavedGear("power_ring", Rarity.Common, []) };
         var save = StoredSave with { Members = [StoredSave.Members[0] with { Worn = worn }, StoredSave.Members[1]] };
         _store.Write(Slot, save);
 
         var read = _store.Read(Slot)!.Save;
 
         Assert.Equal(save.Members, read.Members);
-        Assert.Contains("\"firstRing\": \"power_ring\"", File.ReadAllText(Path.Combine(_directory, "slot_01.json")), StringComparison.Ordinal);
+        Assert.Contains("\"firstRing\": {", File.ReadAllText(Path.Combine(_directory, "slot_01.json")), StringComparison.Ordinal);
     }
 
     [Fact]

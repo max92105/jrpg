@@ -57,7 +57,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **G1a. Members wear gear pieces, with a rarity and affixes from birth** (Core + Game, about 250 lines) → [slices/G1a.md](slices/G1a.md)
 - [x] **G1b-1. The inventory holds gear as a list of pieces** (Core + tests, about 200 lines) → [slices/G1b-1.md](slices/G1b-1.md)
 - [x] **G1b-2. Equipping moves pieces; the room rule leaves; the Equipment choice lists pieces** (Core + Game, about 220 lines) → [slices/G1b-2.md](slices/G1b-2.md)
-- [ ] **S1a. Saves keep every piece with its rolls: format 5** (Core + Data, about 260 lines; the `GearRepair` move first if it heads past 280) → [slices/S1a.md](slices/S1a.md)
+- [x] **S1a. Saves keep every piece with its rolls: format 5** (Core + Data, about 260 lines; the `GearRepair` move first if it heads past 280) → [slices/S1a.md](slices/S1a.md)
 - [ ] **G1c. The Inventory page lists each piece** (Game, about 130 lines) → [slices/G1c.md](slices/G1c.md)
 
 ### Phase 2: drops

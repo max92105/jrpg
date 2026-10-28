@@ -50,7 +50,7 @@ public sealed class PartyMemberTests
     public void Restore_ClassWithSkills_HasThem()
     {
         var healer = _growingClass with { SkillIds = ["heal"] };
-        var progress = new PartyMemberProgress("test_member", 2, 0, Hp: 50, Worn: new Dictionary<EquipmentSlot, string>(), LastingAmounts: new Dictionary<string, int>());
+        var progress = new PartyMemberProgress("test_member", 2, 0, Hp: 50, Worn: new Dictionary<EquipmentSlot, SavedGear>(), LastingAmounts: new Dictionary<string, int>());
 
         var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), healer, SkillCatalog(), TestStatRules.Neutral);
 

@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Core.Items;
+using Jrpg.Core.Loot;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Skills;
@@ -83,6 +84,9 @@ public static class ContentCatalogLoader
             Maps = mapsById,
             Rules = rules,
             NewGame = newGame,
+
+            // Read from affixes.json once the loot plan's R3a adds it.
+            Affixes = FrozenDictionary<string, AffixDefinition>.Empty,
         };
     }
 

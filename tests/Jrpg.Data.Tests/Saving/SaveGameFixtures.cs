@@ -1,9 +1,11 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Items;
+using Jrpg.Core.Loot;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Saving;
+using Jrpg.Core.Stats;
 using Jrpg.Core.World;
 using Jrpg.Data.Content;
 
@@ -25,11 +27,12 @@ internal static class SaveGameFixtures
         Location = new MapLocation("start", new Point2D(10.25, 3.5), Facing.Left),
         Members =
         [
-            new PartyMemberProgress("sarxian", Level: 3, Experience: 42, Hp: 77, Worn: new Dictionary<EquipmentSlot, string> { [EquipmentSlot.Weapon] = "bronze_sword" }, LastingAmounts: new Dictionary<string, int>()),
-            new PartyMemberProgress("jazog", Level: 1, Experience: 0, Hp: 120, Worn: new Dictionary<EquipmentSlot, string> { [EquipmentSlot.Chest] = "wizard_robe" }, LastingAmounts: new Dictionary<string, int>()),
+            new PartyMemberProgress("sarxian", Level: 3, Experience: 42, Hp: 77, Worn: new Dictionary<EquipmentSlot, SavedGear> { [EquipmentSlot.Weapon] = new SavedGear("bronze_sword", Rarity.Common, []) }, LastingAmounts: new Dictionary<string, int>()),
+            new PartyMemberProgress("jazog", Level: 1, Experience: 0, Hp: 120, Worn: new Dictionary<EquipmentSlot, SavedGear> { [EquipmentSlot.Chest] = new SavedGear("wizard_robe", Rarity.Common, []) }, LastingAmounts: new Dictionary<string, int>()),
         ],
         ActiveMemberIds = ["sarxian", "jazog"],
         Inventory = [new InventoryEntry("potion", 4), new InventoryEntry("bomb", 3)],
+        Gear = [],
         CompletedEvents = [new MapEventKey("start", "0bff6243_0")],
         ObjectSwaps = [new ObjectSwap("start", "0bff6243", "chest_opened")],
     };
@@ -47,10 +50,23 @@ internal static class SaveGameFixtures
         Members = [Sarxian, Jazog],
         ActiveMemberIds = ["sarxian", "jazog"],
         Inventory = [new InventoryEntry("potion", 4)],
+        Gear = [],
         CompletedEvents = [new MapEventKey("start", "0bff6243_0")],
         ObjectSwaps = [new ObjectSwap("start", "0bff6243", "chest_opened")],
     };
 
-    public static Dictionary<EquipmentSlot, string> Wearing(params (EquipmentSlot Slot, string ItemId)[] worn) =>
-        worn.ToDictionary(entry => entry.Slot, entry => entry.ItemId);
+    /// <summary>The repository content with a one-affix pool: "power", +2..5 Power on weapons and rings.</summary>
+    public static readonly ContentCatalog CatalogWithPowerAffix = Catalog with
+    {
+        Affixes = new Dictionary<string, AffixDefinition>
+        {
+            ["power"] = new() { Id = "power", Stat = StatKind.Power, Min = 2, Max = 5, Kinds = [EquipmentKind.Weapon, EquipmentKind.Ring], Weight = 10 },
+        },
+    };
+
+    public static Dictionary<EquipmentSlot, SavedGear> Wearing(params (EquipmentSlot Slot, string ItemId)[] worn) =>
+        worn.ToDictionary(entry => entry.Slot, entry => Plain(entry.ItemId));
+
+    /// <summary>A Common piece of <paramref name="itemId"/> without affixes, as a save keeps it.</summary>
+    public static SavedGear Plain(string itemId) => new(itemId, Rarity.Common, []);
 }

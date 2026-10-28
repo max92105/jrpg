@@ -3,7 +3,7 @@ using Jrpg.Core.Items;
 namespace Jrpg.Core.Party;
 
 /// <summary>
-/// What changes about a party member during play, as a save keeps it: worn items by slot and item id, an empty slot
+/// What changes about a party member during play, as a save keeps it: worn pieces by slot (ADR 0029), an empty slot
 /// absent (ADR 0028), and each lasting resource's amount by resource id (ADR 0024). Everything else comes from content:
 /// skills from their class, max HP and base stats from it at their level (ADR 0007, ADR 0017, ADR 0020).
 /// </summary>
@@ -12,7 +12,7 @@ public sealed record PartyMemberProgress(
     int Level,
     int Experience,
     int Hp,
-    IReadOnlyDictionary<EquipmentSlot, string> Worn,
+    IReadOnlyDictionary<EquipmentSlot, SavedGear> Worn,
     IReadOnlyDictionary<string, int> LastingAmounts)
 {
     // A record compares a dictionary by reference; two progresses wearing the same and holding the same amounts are the

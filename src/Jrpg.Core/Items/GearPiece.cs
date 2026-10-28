@@ -54,6 +54,10 @@ public sealed class GearPiece : IEquatable<GearPiece>
             ? new GearPiece(item, equipment, rarity, [.. affixes])
             : throw new ArgumentException($"Item '{item.Id}' is not equipment.", nameof(item));
 
+    /// <summary>The piece as a save keeps it: the base's id, the rarity, and each affix's id and value.</summary>
+    public SavedGear ToSaved() =>
+        new(Base.Id, Rarity, [.. Affixes.Select(affix => new SavedAffix(affix.AffixId, affix.Value))]);
+
     // The base compares by id: a catalog holds one item per id.
     public bool Equals(GearPiece? other) =>
         other is not null && Base.Id == other.Base.Id && Rarity == other.Rarity && Affixes.SequenceEqual(other.Affixes);

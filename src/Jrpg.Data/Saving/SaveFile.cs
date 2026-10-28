@@ -9,5 +9,5 @@ namespace Jrpg.Data.Saving;
 internal sealed record SaveFile(int FormatVersion, SaveGame Game)
 {
     /// <summary>The format this build writes; until release, older ones are refused (ADR 0022).</summary>
-    public const int CurrentFormatVersion = 4;
+    public const int CurrentFormatVersion = 5;
 }

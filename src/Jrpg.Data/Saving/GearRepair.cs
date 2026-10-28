@@ -6,14 +6,16 @@ using Jrpg.Core.Stats;
 namespace Jrpg.Data.Saving;
 
 /// <summary>
-/// The gear half of <see cref="SaveGameRepair"/>: what each member wears, slot by slot. A worn item that no longer
-/// exists is dropped, one that no longer fits its slot goes back to the inventory; both are reported in the repair's
-/// changes.
+/// The gear half of <see cref="SaveGameRepair"/>: the pieces members wear, slot by slot, and the owned ones (ADR 0029).
+/// A piece whose base no longer exists is dropped, one whose base is no longer equipment goes back to the stacks as one
+/// copy, a worn one whose kind no longer fits its slot goes back to the owned gear, and an affix the pool no longer has
+/// is dropped; each is reported in the repair's changes.
 /// </summary>
 internal sealed class GearRepair
 {
     private readonly ContentCatalog _catalog;
     private readonly List<string> _changes;
+    private readonly List<SavedGear> _takenOff = [];
     private readonly List<string> _returnedItemIds = [];
 
     /// <param name="catalog">The content the save must fit.</param>
@@ -25,49 +27,92 @@ internal sealed class GearRepair
     }
 
     /// <summary>
-    /// The items taken off because they no longer fit their slot, one entry per copy, in repair order.
+    /// Pieces whose base is no longer equipment, worn or owned, one entry per copy in repair order: they join the
+    /// stacks.
     /// </summary>
     public IReadOnlyList<string> ReturnedItemIds => _returnedItemIds;
 
-    public Dictionary<EquipmentSlot, string> RepairWorn(PartyMemberProgress progress)
+    public Dictionary<EquipmentSlot, SavedGear> RepairWorn(PartyMemberProgress progress)
     {
-        var repaired = new Dictionary<EquipmentSlot, string>();
-        foreach (var (slot, itemId) in progress.Worn)
+        var owner = $"party member '{progress.Id}'";
+        var repaired = new Dictionary<EquipmentSlot, SavedGear>();
+        foreach (var (slot, saved) in progress.Worn)
         {
-            if (RepairWornItem(itemId, slot, progress.Id) is { } kept)
+            if (!_catalog.Items.TryGetValue(saved.ItemId, out var item))
             {
-                repaired[slot] = kept;
+                _changes.Add($"{owner}: dropped worn item '{saved.ItemId}', which no longer exists.");
+            }
+            else if (item.Equipment is { } equipment && EquipmentFit.Fits(equipment.Kind, slot))
+            {
+                repaired[slot] = WithKnownAffixes(saved, owner);
+            }
+            else
+            {
+                TakeOff(saved, item, owner);
+                _changes.Add($"{owner}: '{saved.ItemId}' can no longer be worn as {slot}, so it went back to the inventory.");
             }
         }
 
         return repaired;
     }
 
+    /// <summary>The owned pieces kept, in order, then the worn ones <see cref="RepairWorn"/> took off.</summary>
+    /// <remarks>Call it after every member's <see cref="RepairWorn"/>.</remarks>
+    public List<SavedGear> RepairOwned(IReadOnlyList<SavedGear> gear)
+    {
+        const string owner = "the inventory";
+        var repaired = new List<SavedGear>();
+        foreach (var saved in gear)
+        {
+            if (!_catalog.Items.TryGetValue(saved.ItemId, out var item))
+            {
+                _changes.Add($"{owner}: dropped gear '{saved.ItemId}', which no longer exists.");
+            }
+            else if (item.Equipment is null)
+            {
+                _returnedItemIds.Add(saved.ItemId);
+                _changes.Add($"{owner}: '{saved.ItemId}' is no longer gear, so it went back to the stacks.");
+            }
+            else
+            {
+                repaired.Add(WithKnownAffixes(saved, owner));
+            }
+        }
+
+        return [.. repaired, .. _takenOff];
+    }
+
     /// <summary>
-    /// What the repaired worn items add together, for the sheet that bounds the member's saved numbers.
+    /// What the repaired worn pieces add together, for the sheet that bounds the member's saved numbers.
     /// </summary>
-    public StatBonuses BonusesOf(IReadOnlyDictionary<EquipmentSlot, string> worn) =>
-        worn.Values.Aggregate(StatBonuses.None, (total, itemId) => total.Plus(_catalog.Items[itemId].Equipment?.Bonuses ?? StatBonuses.None));
+    public StatBonuses BonusesOf(IReadOnlyDictionary<EquipmentSlot, SavedGear> worn) =>
+        worn.Values.Aggregate(StatBonuses.None, (total, saved) => total.Plus(_catalog.PieceFrom(saved).Bonuses));
 
     /// <returns>Null without a worn weapon, for the rules' unarmed damage.</returns>
-    public int? WeaponDamageOf(IReadOnlyDictionary<EquipmentSlot, string> worn) =>
-        worn.TryGetValue(EquipmentSlot.Weapon, out var weaponId) ? _catalog.Items[weaponId].Equipment?.Damage : null;
+    public int? WeaponDamageOf(IReadOnlyDictionary<EquipmentSlot, SavedGear> worn) =>
+        worn.TryGetValue(EquipmentSlot.Weapon, out var weapon) ? _catalog.Items[weapon.ItemId].Equipment?.Damage : null;
 
-    private string? RepairWornItem(string itemId, EquipmentSlot slot, string memberId)
+    // A piece whose base is no longer equipment goes back to the stacks; one that only no longer fits joins the gear.
+    private void TakeOff(SavedGear saved, ItemDefinition item, string owner)
     {
-        if (!_catalog.Items.TryGetValue(itemId, out var item))
+        if (item.Equipment is null)
         {
-            _changes.Add($"party member '{memberId}': dropped worn item '{itemId}', which no longer exists.");
-            return null;
+            _returnedItemIds.Add(saved.ItemId);
+        }
+        else
+        {
+            _takenOff.Add(WithKnownAffixes(saved, owner));
+        }
+    }
+
+    // The piece with only the affixes the pool still has; each dropped one is reported.
+    private SavedGear WithKnownAffixes(SavedGear saved, string owner)
+    {
+        foreach (var unknown in saved.Affixes.Where(affix => !_catalog.Affixes.ContainsKey(affix.AffixId)))
+        {
+            _changes.Add($"{owner}: dropped affix '{unknown.AffixId}' from '{saved.ItemId}', which no longer exists.");
         }
 
-        if (item.Equipment is not { } equipment || !EquipmentFit.Fits(equipment.Kind, slot))
-        {
-            _returnedItemIds.Add(itemId);
-            _changes.Add($"party member '{memberId}': '{itemId}' can no longer be worn as {slot}, so it went back to the inventory.");
-            return null;
-        }
-
-        return itemId;
+        return saved with { Affixes = [.. saved.Affixes.Where(affix => _catalog.Affixes.ContainsKey(affix.AffixId))] };
     }
 }

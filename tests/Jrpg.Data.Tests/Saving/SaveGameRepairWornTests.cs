@@ -19,7 +19,7 @@ public sealed class SaveGameRepairWornTests
     [Fact]
     public void Repair_UnknownItemInRingSlot_DropsIt()
     {
-        var repaired = SaveGameRepair.Repair("slot_01", SaveWithSarxianWearing(new() { [EquipmentSlot.FirstRing] = "ghost_ring" }), _catalog);
+        var repaired = SaveGameRepair.Repair("slot_01", SaveWithSarxianWearing(new() { [EquipmentSlot.FirstRing] = new SavedGear("ghost_ring", Rarity.Common, []) }), _catalog);
 
         Assert.Empty(repaired.Save.Members[0].Worn);
         Assert.Empty(repaired.Save.Inventory);
@@ -29,17 +29,17 @@ public sealed class SaveGameRepairWornTests
     [Fact]
     public void Repair_HelmSavedInChest_ReturnsItToInventory()
     {
-        var repaired = SaveGameRepair.Repair("slot_01", SaveWithSarxianWearing(new() { [EquipmentSlot.Chest] = "leather_cap" }), _catalog);
+        var repaired = SaveGameRepair.Repair("slot_01", SaveWithSarxianWearing(new() { [EquipmentSlot.Chest] = new SavedGear("leather_cap", Rarity.Common, []) }), _catalog);
 
         Assert.Empty(repaired.Save.Members[0].Worn);
-        Assert.Equal([new InventoryEntry("leather_cap", 1)], repaired.Save.Inventory);
+        Assert.Equal([new SavedGear("leather_cap", Rarity.Common, [])], repaired.Save.Gear);
         Assert.Contains("party member 'sarxian': 'leather_cap' can no longer be worn as Chest, so it went back to the inventory.", repaired.Changes);
     }
 
     [Fact]
     public void Repair_RingInBothRingSlots_KeepsBoth()
     {
-        var worn = new Dictionary<EquipmentSlot, string> { [EquipmentSlot.FirstRing] = "power_ring", [EquipmentSlot.SecondRing] = "power_ring" };
+        var worn = new Dictionary<EquipmentSlot, SavedGear> { [EquipmentSlot.FirstRing] = new SavedGear("power_ring", Rarity.Common, []), [EquipmentSlot.SecondRing] = new SavedGear("power_ring", Rarity.Common, []) };
 
         var repaired = SaveGameRepair.Repair("slot_01", SaveWithSarxianWearing(worn), _catalog);
 
@@ -47,7 +47,7 @@ public sealed class SaveGameRepairWornTests
         Assert.Empty(repaired.Changes);
     }
 
-    private static SaveGame SaveWithSarxianWearing(Dictionary<EquipmentSlot, string> worn) => new()
+    private static SaveGame SaveWithSarxianWearing(Dictionary<EquipmentSlot, SavedGear> worn) => new()
     {
         SavedAt = new DateTimeOffset(2026, 10, 27, 12, 0, 0, TimeSpan.Zero),
         PlayTime = TimeSpan.FromMinutes(30),
@@ -55,6 +55,7 @@ public sealed class SaveGameRepairWornTests
         Members = [new PartyMemberProgress("sarxian", Level: 3, Experience: 0, Hp: 100, worn, new Dictionary<string, int>())],
         ActiveMemberIds = ["sarxian"],
         Inventory = [],
+        Gear = [],
         CompletedEvents = [],
         ObjectSwaps = [],
     };

@@ -68,7 +68,7 @@ internal sealed class PartyMemberBuilder
             .WithBase(new ClassStats(_maxHp, Speed: 10))
             .WithSkills([.. _skills.Select(skill => skill.Id)])
             .Build();
-        var progress = new PartyMemberProgress(_id, _level, _experience, _hp, Worn: new Dictionary<EquipmentSlot, string>(), LastingAmounts: new Dictionary<string, int>());
+        var progress = new PartyMemberProgress(_id, _level, _experience, _hp, Worn: new Dictionary<EquipmentSlot, SavedGear>(), LastingAmounts: new Dictionary<string, int>());
         var member = PartyMember.Recruit(BuildDefinition(), characterClass, _skills.ToDictionary(skill => skill.Id), TestStatRules.Neutral);
         if (_weaponDamage is { } damage)
         {

@@ -1,4 +1,5 @@
 using Jrpg.Core.Items;
+using Jrpg.Core.Loot;
 using Jrpg.Core.Session;
 using Jrpg.Core.Stats;
 using Jrpg.Core.Tests.Builders;
@@ -53,6 +54,29 @@ public sealed class GameSessionGearTests
         Assert.Equal(3, restored.Inventory.QuantityOf("potion"));
     }
 
+    // Each piece keeps its rarity and its affixes in roll order, worn or owned; each affix's stat comes from the pool.
+    [Fact]
+    public void CaptureThenRestore_RolledPieces_SameRollsAndOrder()
+    {
+        var sword = new ItemDefinitionBuilder().WithId("bronze_sword").AsWeapon(5).Build();
+        var ring = new ItemDefinitionBuilder().WithId("power_ring").AsWorn(EquipmentKind.Ring).Build();
+        var catalog = new ContentCatalogBuilder().WithMembers(new PartyMemberBuilder().WithId("sarxian").BuildDefinition()).WithItems(sword, ring).WithAffixes(Affix("power", StatKind.Power), Affix("crit_chance", StatKind.CritChance)).WithLeader("sarxian").Build();
+        var session = GameSession.StartNew(catalog, "sarxian", new FixedSequenceRandom());
+        var rolledSword = GearPiece.Rolled(sword, Rarity.Magic, [new RolledAffix("power", StatKind.Power, 4)]);
+        GearPiece[] owned = [GearPiece.Plain(ring), GearPiece.Rolled(ring, Rarity.Rare, [new RolledAffix("crit_chance", StatKind.CritChance, 2), new RolledAffix("power", StatKind.Power, 3)]), GearPiece.Plain(sword)];
+        foreach (var piece in owned.Prepend(rolledSword))
+        {
+            session.Inventory.AddGear(piece);
+        }
+
+        Assert.True(session.Equipment.TryEquip(session.Party.Leader, rolledSword));
+
+        var restored = GameSession.Restore(session.Capture(DateTimeOffset.UnixEpoch), catalog, new FixedSequenceRandom());
+
+        Assert.Equal(rolledSword, restored.Party.Leader.Weapon);
+        Assert.Equal(owned, restored.Inventory.Gear);
+    }
+
     [Fact]
     public void Load_HpAboveClassMaxWithConstitutionArmor_KeepsHp()
     {
@@ -68,4 +92,7 @@ public sealed class GameSessionGearTests
         var leader = restored.Party.Leader;
         Assert.Equal((110, 110), (leader.Vitals.Hp, leader.Vitals.MaxHp));
     }
+
+    private static AffixDefinition Affix(string id, StatKind stat) =>
+        new() { Id = id, Stat = stat, Min = 1, Max = 5, Kinds = [EquipmentKind.Weapon, EquipmentKind.Ring], Weight = 10 };
 }

@@ -80,6 +80,11 @@ public sealed class GameSession
         var members = save.Members.Select(progress => RestoreMember(progress, catalog)).ToList();
         var party = new PartyState(members, ActiveOrder(members, save.ActiveMemberIds), catalog.Rules.Party);
         var inventory = InventoryHolding(save.Inventory, catalog);
+        foreach (var saved in save.Gear)
+        {
+            inventory.AddGear(catalog.PieceFrom(saved));
+        }
+
         var world = new WorldState(save.CompletedEvents, save.ObjectSwaps);
         return new GameSession(party, new ExplorationContext(catalog, inventory, world, random), save.Location) { PlayTime = save.PlayTime };
     }
@@ -147,16 +152,12 @@ public sealed class GameSession
             Location = Exploration.Location,
             Members = [.. Party.Members.Select(member => member.CaptureProgress())],
             ActiveMemberIds = [.. Party.ActiveMembers.Select(member => member.Id)],
-            Inventory = [.. Inventory.Entries, .. OwnedGearByBase()],
+            Inventory = [.. Inventory.Entries],
+            Gear = [.. Inventory.Gear.Select(piece => piece.ToSaved())],
             CompletedEvents = _context.World.CompletedEvents,
             ObjectSwaps = _context.World.ObjectSwaps,
         };
     }
-
-    // Until saves keep pieces (loot plan, S1a), owned gear is saved as a count per base item and loads back plain;
-    // nothing rolls affixes before then.
-    private IEnumerable<InventoryEntry> OwnedGearByBase() =>
-        Inventory.Gear.GroupBy(piece => piece.Base.Id).Select(group => new InventoryEntry(group.Key, group.Count()));
 
     private static List<PartyMember> ActiveOrder(List<PartyMember> members, IReadOnlyList<string> activeIds) =>
         [.. activeIds.Select(id => members.Single(member => member.Id == id))];
@@ -172,15 +173,15 @@ public sealed class GameSession
         return inventory;
     }
 
-    // Worn items go straight onto the member: under the move model they aren't in the saved inventory (ADR 0003). They
-    // go on before the progress, so the saved HP is set within a max their bonuses already raise.
+    // Worn pieces go straight onto the member: under the move model they aren't in the saved gear (ADR 0003). They go
+    // on before the progress, so the saved HP is set within a max their bonuses already raise.
     private static PartyMember RestoreMember(PartyMemberProgress progress, ContentCatalog catalog)
     {
         var definition = catalog.PartyMembers[progress.Id];
         var member = PartyMember.Recruit(definition, catalog.ClassOf(definition), catalog.Skills, catalog.Rules.Stats);
-        foreach (var (slot, itemId) in progress.Worn)
+        foreach (var (slot, saved) in progress.Worn)
         {
-            member.Wear(slot, GearPiece.Plain(catalog.Items[itemId]));
+            member.Wear(slot, catalog.PieceFrom(saved));
         }
 
         member.RestoreProgress(progress);

@@ -26,13 +26,13 @@ public sealed class FileSaveStoreFormatTests : IDisposable
     }
 
     [Fact]
-    public void Write_File_HoldsTheFormatFourEnvelope()
+    public void Write_File_HoldsTheFormatFiveEnvelope()
     {
         _store.Write(Slot, StoredSave);
 
         var json = File.ReadAllText(Path.Combine(_directory, "slot_01.json"));
 
-        Assert.StartsWith("{\n  \"formatVersion\": 4,\n  \"game\": {", json.ReplaceLineEndings("\n"), StringComparison.Ordinal);
+        Assert.StartsWith("{\n  \"formatVersion\": 5,\n  \"game\": {", json.ReplaceLineEndings("\n"), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -50,26 +50,26 @@ public sealed class FileSaveStoreFormatTests : IDisposable
         Assert.Equal(Slot, exception.SlotName);
     }
 
-    // Saves before format 4 kept only a weapon and an armor (ADR 0028). Until the first release an older save is
-    // refused, not migrated (ADR 0022).
+    // Saves before format 5 kept worn and owned gear by item id only (ADR 0029). Until the first release an older save
+    // is refused, not migrated (ADR 0022).
     [Fact]
-    public void Read_FormatThreeSave_ThrowsAsOlder()
+    public void Read_FormatFour_ThrowsOlder()
     {
-        WriteRaw("""{ "formatVersion": 3, "game": {} }""");
+        WriteRaw("""{ "formatVersion": 4, "game": {} }""");
 
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
 
-        Assert.Equal("it was made by an older version of the game (format 3).", exception.Reason);
+        Assert.Equal("it was made by an older version of the game (format 4).", exception.Reason);
     }
 
     [Fact]
     public void Read_NewerFormatVersion_ThrowsNamingTheVersion()
     {
-        WriteRaw("""{ "formatVersion": 5, "game": {} }""");
+        WriteRaw("""{ "formatVersion": 6, "game": {} }""");
 
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
 
-        Assert.Equal("it was made by a newer version of the game (format 5).", exception.Reason);
+        Assert.Equal("it was made by a newer version of the game (format 6).", exception.Reason);
     }
 
     [Theory]
@@ -88,7 +88,7 @@ public sealed class FileSaveStoreFormatTests : IDisposable
     [Fact]
     public void Read_MalformedJson_ThrowsNamingTheSlot()
     {
-        WriteRaw("""{ "formatVersion": 4, "game": { """);
+        WriteRaw("""{ "formatVersion": 5, "game": { """);
 
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
 
@@ -127,15 +127,15 @@ public sealed class FileSaveStoreFormatTests : IDisposable
     public void Read_DuplicateProperty_ThrowsUnreadable(string property)
     {
         WriteRaw(property == "game"
-            ? """{ "formatVersion": 4, "game": {}, "game": {} }"""
-            : """{ "formatVersion": 4, "formatVersion": 4, "game": {} }""");
+            ? """{ "formatVersion": 5, "game": {}, "game": {} }"""
+            : """{ "formatVersion": 5, "formatVersion": 5, "game": {} }""");
 
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
 
         Assert.StartsWith("the file is damaged", exception.Reason, StringComparison.Ordinal);
     }
 
-    public static TheoryData<string> ListsWithANullEntry => ["members", "activeMemberIds", "inventory", "completedEvents", "objectSwaps"];
+    public static TheoryData<string> ListsWithANullEntry => ["members", "activeMemberIds", "inventory", "gear", "ownedAffixes", "wornAffixes", "completedEvents", "objectSwaps"];
 
     [Theory]
     [MemberData(nameof(ListsWithANullEntry))]
@@ -146,6 +146,9 @@ public sealed class FileSaveStoreFormatTests : IDisposable
             "members" => StoredSave with { Members = [StoredSave.Members[0], null!] },
             "activeMemberIds" => StoredSave with { ActiveMemberIds = ["sarxian", null!] },
             "inventory" => StoredSave with { Inventory = [StoredSave.Inventory[0], null!] },
+            "gear" => StoredSave with { Gear = [Plain("bronze_sword"), null!] },
+            "ownedAffixes" => StoredSave with { Gear = [new SavedGear("bronze_sword", Rarity.Magic, [null!])] },
+            "wornAffixes" => StoredSave with { Members = [StoredSave.Members[0] with { Worn = new Dictionary<EquipmentSlot, SavedGear> { [EquipmentSlot.Weapon] = new("bronze_sword", Rarity.Magic, [null!]) } }, StoredSave.Members[1]] },
             "completedEvents" => StoredSave with { CompletedEvents = [null!] },
             _ => StoredSave with { ObjectSwaps = [null!] },
         };
@@ -159,7 +162,7 @@ public sealed class FileSaveStoreFormatTests : IDisposable
     [Fact]
     public void Read_NullWornItem_ThrowsUnreadable()
     {
-        var worn = new Dictionary<EquipmentSlot, string> { [EquipmentSlot.Weapon] = null! };
+        var worn = new Dictionary<EquipmentSlot, SavedGear> { [EquipmentSlot.Weapon] = null! };
         _store.Write(Slot, StoredSave with { Members = [StoredSave.Members[0] with { Worn = worn }, StoredSave.Members[1]] });
 
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
@@ -173,7 +176,7 @@ public sealed class FileSaveStoreFormatTests : IDisposable
     {
         _store.Write(Slot, StoredSave);
         var path = Path.Combine(_directory, "slot_01.json");
-        File.WriteAllText(path, File.ReadAllText(path).Replace("\"weapon\": \"bronze_sword\"", "\"thirdRing\": \"bronze_sword\"", StringComparison.Ordinal));
+        File.WriteAllText(path, File.ReadAllText(path).Replace("\"weapon\": {", "\"thirdRing\": {", StringComparison.Ordinal));
 
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
 

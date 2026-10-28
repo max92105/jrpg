@@ -115,7 +115,7 @@ public sealed partial class FileSaveStore(string directory, ContentCatalog catal
     private static void CheckNoNullEntries(string slotName, SaveGame game)
     {
         var hasNullEntry = game.Members.Contains(null) || game.ActiveMemberIds.Contains(null) || game.Inventory.Contains(null)
-            || game.CompletedEvents.Contains(null) || game.ObjectSwaps.Contains(null);
+            || game.Gear.Contains(null) || game.CompletedEvents.Contains(null) || game.ObjectSwaps.Contains(null) || HasNullAffix(game);
         if (hasNullEntry)
         {
             throw new UnreadableSaveException(slotName, "the file is damaged (a list holds a null entry).");
@@ -126,6 +126,10 @@ public sealed partial class FileSaveStore(string directory, ContentCatalog catal
             throw new UnreadableSaveException(slotName, "the file is damaged (a worn slot holds a null item).");
         }
     }
+
+    // A piece's affixes, owned or worn, are a list like the others; a null piece is reported by the checks around it.
+    private static bool HasNullAffix(SaveGame game) =>
+        game.Gear.Concat(game.Members.SelectMany(member => member.Worn.Values)).Any(piece => piece?.Affixes.Contains(null) == true);
 
     private string PathOf(string slotName)
     {

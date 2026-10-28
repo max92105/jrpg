@@ -12,7 +12,8 @@
 # is the game's Debug capture key (F12), never a copy of the screen, which comes out black for the borderless
 # full-screen game anyway.
 
-param([Parameter(Mandatory)][string]$Out, [string]$Steps = '', [int]$StartSeconds = 6)
+# -Content runs the game on another content folder (its --content), such as a copy set up so a battle comes quickly.
+param([Parameter(Mandatory)][string]$Out, [string]$Steps = '', [int]$StartSeconds = 6, [string]$Content = '')
 
 Add-Type @"
 using System; using System.Runtime.InteropServices;
@@ -44,7 +45,9 @@ function Send-Key([int]$key, [int]$held) {
 
 Set-Location (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $running = @(Get-Process Jrpg.Game -ErrorAction SilentlyContinue).Id
-Start-Process dotnet -ArgumentList 'run', '--project', 'src/Jrpg.Game', '--no-build' -WindowStyle Hidden
+$gameArguments = @('run', '--project', 'src/Jrpg.Game', '--no-build')
+if ($Content) { $gameArguments += @('--', '--content', "`"$Content`"") }
+Start-Process dotnet -ArgumentList $gameArguments -WindowStyle Hidden
 Start-Sleep -Seconds $StartSeconds
 
 # Only the game this script started is driven and closed, never one the developer has open.

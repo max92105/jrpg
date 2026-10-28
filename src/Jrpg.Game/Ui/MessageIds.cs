@@ -475,6 +475,17 @@ internal static class MessageIds
     /// <summary>The victory screen's footer hint once everything has filled: Confirm leaves.</summary>
     public const string BattleVictoryNext = "battle_victory_next";
 
+    /// <summary>The victory screen's heading over what dropped (decision 355).</summary>
+    public const string BattleVictoryItems = "battle_victory_items";
+
+    /// <summary>
+    /// Placeholder <c>{count}</c>: how many copies of a stack dropped, after its name on the Items step.
+    /// </summary>
+    public const string BattleVictoryDropCount = "battle_victory_drop_count";
+
+    /// <summary>Placeholder <c>{count}</c>: the drops past what the Items step has room for.</summary>
+    public const string BattleVictoryMoreDrops = "battle_victory_more_drops";
+
     /// <summary>The banner after a successful Run.</summary>
     public const string BattleEscaped = "battle_escaped";
 

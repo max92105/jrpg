@@ -1,5 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
+using Jrpg.Core.Loot;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Game.Battle;
@@ -79,7 +80,7 @@ public sealed class BattleSceneTests
     [Fact]
     public void Update_ConfirmOnFilledVictory_RequestsBattleFinished()
     {
-        var catalog = WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { MaxHp = 1 });
+        var catalog = WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { MaxHp = 1, DropTableId = null });
         var (_, scene) = StartForestBattle(catalog);
         scene.Update(StartMapScenarios.OneUpdate, _confirm);
         scene.Update(StartMapScenarios.OneUpdate, _confirm);
@@ -89,6 +90,25 @@ public sealed class BattleSceneTests
         var request = scene.Update(StartMapScenarios.OneUpdate, _confirm);
 
         Assert.IsType<BattleFinished>(request);
+    }
+
+    // A certain potion drops, so the Confirm after the bars shows the Items step and the next one leaves.
+    [Fact]
+    public void Update_ConfirmOnFilledVictoryWithDrops_ShowsItemsThenFinishes()
+    {
+        var oneGoblin = WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { MaxHp = 1, DropTableId = "certain" });
+        var catalog = oneGoblin with { DropTables = new Dictionary<string, DropTable> { ["certain"] = new("certain", [new DropEntry("potion", 100)]) } };
+        var (_, scene) = StartForestBattle(catalog);
+        scene.Update(StartMapScenarios.OneUpdate, _confirm);
+        scene.Update(StartMapScenarios.OneUpdate, _confirm);
+        Settle(scene);
+        Settle(scene);
+
+        var onItems = scene.Update(StartMapScenarios.OneUpdate, _confirm);
+        var leaving = scene.Update(StartMapScenarios.OneUpdate, _confirm);
+
+        Assert.Null(onItems);
+        Assert.IsType<BattleFinished>(leaving);
     }
 
     [Fact]

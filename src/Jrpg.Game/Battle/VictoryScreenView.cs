@@ -9,7 +9,7 @@ namespace Jrpg.Game.Battle;
 /// <summary>
 /// Draws the victory screen (leaning toward the <c>battle-victory.jpg</c> reference): the battle shaded dark on the
 /// left, "Victory!" over a hairline, one pointed bar per reward, then the members' cards in two columns, each with a
-/// pointed name tab, the level, "EXP n/m" and a gold bar.
+/// pointed name tab, the level, "EXP n/m" and a gold bar; on the Items step, the drops in the cards' place.
 /// </summary>
 internal sealed class VictoryScreenView
 {
@@ -77,6 +77,7 @@ internal sealed class VictoryScreenView
     private readonly MeasuredText[] _levelTexts;
     private readonly MeasuredText[] _experienceTexts;
     private readonly MeasuredText[] _nextLevelTexts;
+    private readonly VictoryDropsView _drops;
 
     /// <param name="screen">The state it draws.</param>
     /// <param name="text">Messages and fonts.</param>
@@ -112,6 +113,7 @@ internal sealed class VictoryScreenView
         _levelTexts = new MeasuredText[_names.Length];
         _experienceTexts = new MeasuredText[_names.Length];
         _nextLevelTexts = new MeasuredText[_names.Length];
+        _drops = new VictoryDropsView(screen.Drops, text, ui);
     }
 
     /// <summary>
@@ -134,11 +136,13 @@ internal sealed class VictoryScreenView
         var titleLeft = OutcomeFrame.TitleLeft + entrance.TitleOffset;
         _titleFont.Draw(batch, _title, new Vector2(titleLeft, OutcomeFrame.TitleTop), UiTheme.TextPrimary * entrance.TitleOpacity);
         DrawRewards(batch, textures);
-        for (var index = 0; index < _names.Length; index++)
+        if (_screen.IsShowingDrops)
         {
-            ShowCard(index);
-            var topLeft = CardTopLeft(index) + new Point((int)entrance.CardOffset(index), 0);
-            DrawCard(batch, textures, index, topLeft);
+            _drops.Draw(batch, textures);
+        }
+        else
+        {
+            DrawCards(batch, textures);
         }
 
         OutcomeFrame.DrawFooter(batch, textures.Pixel);
@@ -146,6 +150,16 @@ internal sealed class VictoryScreenView
         {
             var hintTop = FooterBar.TextTop(OutcomeFrame.FooterHeight, _nextHintFont.Font.LineHeight);
             _nextHintFont.Draw(batch, _nextHint.Text, new Vector2(VirtualScreen.Width - NextHintRight - _nextHint.Width, hintTop), UiTheme.TextPrimary);
+        }
+    }
+
+    private void DrawCards(SpriteBatch batch, TextureLibrary textures)
+    {
+        for (var index = 0; index < _names.Length; index++)
+        {
+            ShowCard(index);
+            var topLeft = CardTopLeft(index) + new Point((int)_screen.Entrance.CardOffset(index), 0);
+            DrawCard(batch, textures, index, topLeft);
         }
     }
 

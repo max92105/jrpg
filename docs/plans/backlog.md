@@ -81,8 +81,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the stats and gear slots plan (2026-10-27)
 
-- `Menus/EquipmentPage.cs` (281) is near 300: the next change that grows it splits the choice handling (opening, picking, the notice) into its own presenter first.
-- `tests/Jrpg.Data.Tests/Saving/FileSaveStoreTests.cs` (289) and `SaveGameRepairTests.cs` (285): split by concern (the envelope and format checks apart from the round trips; members apart from inventory and world) when next touched.
 - `Battle/ActionPlayback.Read` is at the complexity limit (the H1 and I1 slices each had to fold cases to pass CA1502): the next `BattleEvent` kind needs a handler table, not another case.
 - `SaveGameRepair.RepairMember` sums worn bonuses from item ids beside `WornEquipment.Bonuses` (G1b): a public `WornEquipment` built from the catalog would let the repair use the one sum.
 - `ClassCatalogValidator.FindUnreachableRequirementProblem` checks a skill's requirement against the resource's definition max, not its max under Will (`raiseMax`); conservative today, wrong once a skill needs Faith above 5 (W1b review).

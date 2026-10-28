@@ -1,10 +1,9 @@
-using Jrpg.Core.Randomness;
-
-namespace Jrpg.Core.Battle;
+namespace Jrpg.Core.Randomness;
 
 /// <summary>
-/// The battle's percent rolls over its one random source. A certain outcome draws nothing (ADR 0026), so a fixture
-/// whose every hit lands keeps the seeded sequence it had before hits could miss.
+/// Chance rolls over one random source: the battle's hits and crits, and the loot after it (ADR 0030). A certain
+/// outcome draws nothing (ADR 0026), so a fixture whose every hit lands keeps the seeded sequence it had before hits
+/// could miss.
 /// </summary>
 internal sealed class ChanceRolls(IRandom random)
 {

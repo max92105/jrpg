@@ -1,7 +1,6 @@
-using Jrpg.Core.Battle;
-using Jrpg.Core.Tests.Randomness;
+using Jrpg.Core.Randomness;
 
-namespace Jrpg.Core.Tests.Battle;
+namespace Jrpg.Core.Tests.Randomness;
 
 // A scripted random with no values throws on any draw, so these prove a certain outcome draws nothing.
 public sealed class ChanceRollsTests

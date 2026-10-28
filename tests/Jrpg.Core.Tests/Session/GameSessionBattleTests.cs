@@ -76,7 +76,7 @@ public sealed class GameSessionBattleTests
         var session = SessionWithEncounterPending();
         BattleScript.AttackUntilOver(session.StartPendingBattle());
 
-        var rewards = session.FinishBattle();
+        var rewards = session.FinishBattle()?.Rewards;
 
         Assert.NotNull(rewards);
         Assert.Equal(120, rewards.Experience);

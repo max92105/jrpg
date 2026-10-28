@@ -45,4 +45,7 @@ public sealed record EnemyDefinition
     public Resistances Resistances { get; init; } = Resistances.None;
 
     public required int ExperienceReward { get; init; }
+
+    /// <summary>The drop table rolled when it is defeated (decision 343); null drops nothing.</summary>
+    public string? DropTableId { get; init; }
 }

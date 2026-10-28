@@ -213,9 +213,9 @@ internal sealed class BattleScene : IScene
     {
         _isFinished = true;
         var outcome = _battle.Phase;
-        if (_session.FinishBattle() is { } rewards)
+        if (_session.FinishBattle() is { } spoils)
         {
-            _victory = new VictoryScreen(rewards);
+            _victory = new VictoryScreen(spoils.Rewards);
             _victoryView = new VictoryScreenView(_victory, _text, _ui);
             return;
         }

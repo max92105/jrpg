@@ -64,7 +64,7 @@ Every value is a placeholder (decision 196's rule): B1's simulation prints what 
 
 ### Loot (ADR 0030)
 - `Loot/DropEntry(ItemId, Chance) { MinQuantity = 1, MaxQuantity = 1 }` and `Loot/DropTable(Id, Entries)` (D1): content; the chance a whole percent.
-- `Loot/DroppedStack(ItemDefinition Item, int Quantity)` and `Loot/Drops(Stacks, Gear)` (D1): what a won battle dropped, with the items themselves so the victory screen needs no catalog. `Drops.None`.
+- `Loot/ItemDrop(ItemDefinition Item, int Quantity)` (named `DroppedStack` in the plan; CA1711 refuses a `Stack` suffix, D1) and `Loot/Drops(Stacks, Gear)` (D1): what a won battle dropped, with the items themselves so the victory screen needs no catalog. `Drops.None`.
 - `Session/BattleSpoils(VictoryRewards Rewards, Drops Drops)` (D1): what a won battle gave; `GameSession.FinishBattle` returns it (null after an escape or a defeat). `VictoryRewards` stays Battle's experience record, and `Battle` never references `Loot`.
 - `Loot/DropRoll` (D1): rolls tables in enemy order: each entry's chance (through `ChanceRolls`), its quantity (`NextBelow` only when the range has two values or more), stacks merged by item. Equipment becomes plain pieces in D1 (a static `Roll(tables, items, random)`); from R3b `DropRoll` is an instance built with the items, a `GearRoll` and the random, and gear rolls through `GearRoll`.
 - `Loot/AffixDefinition(Id, Stat, Min, Max, Kinds, Weight)` (S1a, its first reader is the load; R2 rolls it), `Loot/RarityRule(Weight, MinAffixes, MaxAffixes)`, `Loot/LootRules(Rarities)` (R2): content.

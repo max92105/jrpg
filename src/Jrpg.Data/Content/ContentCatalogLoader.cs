@@ -87,6 +87,9 @@ public static class ContentCatalogLoader
 
             // Read from affixes.json once the loot plan's R3a adds it.
             Affixes = FrozenDictionary<string, AffixDefinition>.Empty,
+
+            // Read from drop-tables.json once the loot plan's D2 adds it.
+            DropTables = FrozenDictionary<string, DropTable>.Empty,
         };
     }
 

@@ -2,6 +2,7 @@ using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Items;
+using Jrpg.Core.Loot;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Randomness;
@@ -108,12 +109,13 @@ public sealed class GameSession
     }
 
     /// <summary>
-    /// Ends the active battle whatever its outcome: a victory grants its experience, and the encounter is cleared so the
-    /// grace steps restart and saving works again.
+    /// Ends the active battle whatever its outcome: a victory grants its experience and rolls the defeated enemies'
+    /// drops into the inventory (ADR 0030), and the encounter is cleared so the grace steps restart and saving works
+    /// again.
     /// </summary>
-    /// <returns>What a victory gave; null after an escape or a defeat.</returns>
+    /// <returns>What a victory gave, its drops already in the inventory; null after an escape or a defeat.</returns>
     /// <exception cref="InvalidOperationException">No battle is active, or it isn't over.</exception>
-    public VictoryRewards? FinishBattle()
+    public BattleSpoils? FinishBattle()
     {
         if (ActiveBattle is not { IsOver: true } battle)
         {
@@ -121,10 +123,10 @@ public sealed class GameSession
         }
 
         LastingResourceCarry.CarryBack(battle);
-        var rewards = battle.Phase == BattlePhase.Victory ? battle.GrantVictoryExperience(_context.Catalog.Rules.Experience) : null;
+        var spoils = battle.Phase == BattlePhase.Victory ? SpoilsOf(battle) : null;
         Exploration.FinishEncounter();
         ActiveBattle = null;
-        return rewards;
+        return spoils;
     }
 
     /// <summary>The Game adds every update's delta, so play time counts everything (developer decision 35).</summary>
@@ -157,6 +159,41 @@ public sealed class GameSession
             CompletedEvents = _context.World.CompletedEvents,
             ObjectSwaps = _context.World.ObjectSwaps,
         };
+    }
+
+    // Loot rolls after the experience, from the session's random, so no battle draw changes (ADR 0030).
+    private BattleSpoils SpoilsOf(BattleState battle)
+    {
+        var catalog = _context.Catalog;
+        var rewards = battle.GrantVictoryExperience(catalog.Rules.Experience);
+        var tables = battle.Combatants
+            .Select(combatant => combatant.Enemy?.DropTableId)
+            .OfType<string>()
+            .Select(tableId => catalog.DropTables[tableId])
+            .ToList();
+        return new BattleSpoils(rewards, Keep(DropRoll.Roll(tables, catalog.Items, _context.Random)));
+    }
+
+    // Adds the drops to the inventory and returns what went in: copies past a stack's limit are lost, as found ones
+    // are.
+    private Drops Keep(Drops drops)
+    {
+        var stacks = new List<ItemDrop>();
+        foreach (var stack in drops.Stacks)
+        {
+            var added = stack.Quantity - Inventory.Add(stack.Item, stack.Quantity);
+            if (added > 0)
+            {
+                stacks.Add(stack with { Quantity = added });
+            }
+        }
+
+        foreach (var piece in drops.Gear)
+        {
+            Inventory.AddGear(piece);
+        }
+
+        return new Drops(stacks, drops.Gear);
     }
 
     private static List<PartyMember> ActiveOrder(List<PartyMember> members, IReadOnlyList<string> activeIds) =>

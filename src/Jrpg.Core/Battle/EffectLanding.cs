@@ -1,4 +1,5 @@
 using Jrpg.Core.Effects;
+using Jrpg.Core.Randomness;
 using Jrpg.Core.Stats;
 using Jrpg.Core.Statuses;
 

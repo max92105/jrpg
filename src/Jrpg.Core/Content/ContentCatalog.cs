@@ -37,6 +37,9 @@ public sealed record ContentCatalog
     /// <summary>The affixes dropped gear may roll, by id; a saved affix's stat is read from here (ADR 0029).</summary>
     public required IReadOnlyDictionary<string, AffixDefinition> Affixes { get; init; }
 
+    /// <summary>What defeated enemies drop, by table id (ADR 0030).</summary>
+    public required IReadOnlyDictionary<string, DropTable> DropTables { get; init; }
+
     /// <summary>The class that gives a member their numbers at their level (ADR 0017).</summary>
     public ClassDefinition ClassOf(PartyMemberDefinition member) => Classes[member.ClassId];
 

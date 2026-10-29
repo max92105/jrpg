@@ -1,5 +1,5 @@
 # The forge
-Status: retro pending
+Status: done
 
 Split out of [the loot plan](../done/2026-10-27-loot/README.md) on 2026-10-27, when the developer approved it: materials, salvage and a bit of crafting (decisions 351-354), at a forge master NPC on the map (decision 353). Runs after the loot plan (done) and after [the affix stats plan](../done/2026-10-27-affix-stats/README.md): its A4a gives `GearRoll.Roll(item, luckPermille)` and `DropRoll.Roll(tables, luckPermille)`, and this plan builds on those signatures (the Forge's `GearRoll` members take no luck).
 

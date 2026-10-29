@@ -20,7 +20,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
   The file is protected, so ask the developer first.
 - **Why Core refused an equipment change:** `SlotChoice.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. `PartyEquipment.ItemWithoutRoom` and `UnequipAll` would own both. It can wait because it is correct today, and nothing planned changes equipment.
-- **`Ui/MessageIds.cs` is 580 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
+- **`Ui/MessageIds.cs` is 648 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
 - **`MainViewModelTests`, part 2 (449 lines after E1a):** move the new content tests (`CreateObject_*`, `CreateNpc_*`, `CanStartNewObject_*`, `TryCreateMap_*`) and the map settings tests (`TryApplySettings_*`) into their own classes, on E1a's `EditorTestContent`.
 - **`MainWindow.xaml.cs` (547 lines):** move the viewport (pan, zoom, fit) and the tile painting handlers into partial files, as `.EventEditing` and `.ObjectEditing` already are.
 - **`TileBrowserViewModelTests` (410 lines):** move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class.
@@ -106,3 +106,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 - The "lists 'x' more than once" check is written in six Data validators (`NewGameValidator`, `ClassCatalogValidator`, `ResourceDefinitionValidator`, `SkillCatalogValidator`, `MapEventValidator`, `CraftingRulesValidator`), and `NewGame`'s `startingItems` repeats the crafting lists' entry checks (null, known item, 1..maxStack): one helper beside `RangeProblems` (M4 review).
 - `ForgeMotion` is the third copy of the "opening counted from the first drawn frame, closing from Cancel" fade, after `MenuMotion` and `TitleEntrance` (F1d): extract one frame-fade type in `Ui/`.
+- `ForgeScene.Craft` re-derives Core's "the first equal piece is the one replaced" rule to put the highlight on the changed row (F2c): `Inventory.TryReplace` (or the Forge's `Try` methods) could return the replaced index instead.

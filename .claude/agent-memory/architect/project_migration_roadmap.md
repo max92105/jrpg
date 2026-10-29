@@ -1,17 +1,17 @@
 ---
 name: migration-roadmap
-description: Plan status after the merge of the two machines (2026-10-27); next decision/ADR numbers; open questions; later plans
+description: Plan status (forge done 2026-10-29); next decision/ADR numbers; open questions; later plans
 metadata:
   type: project
 ---
 
-Migration, code-health, new-game flow, class-mechanics, UI second pass, escape menu third pass and stats and gear slots plans are done (`docs/plans/done/`); leftovers wait in `docs/plans/backlog.md`.
+Migration, code-health, new-game flow, class-mechanics, UI second pass, escape menu third pass, stats and gear slots, loot, affix stats and forge plans are done (`docs/plans/done/`); leftovers wait in `docs/plans/backlog.md`.
 
 Escape menu third pass (`docs/plans/done/2026-10-26-escape-menu-third-pass/`, done 2026-10-27): decisions 266-272, 282-290 and 333-336 (F1, the developer's first look: Info button, section bands, Status redone, every pointer glides; first numbered 291-294 by mistake, renumbered at the retro); no ADR.
 
 Stats and gear slots (`docs/plans/done/2026-10-26-stats-and-gear-slots/`, done 2026-10-27): decisions 291-302, 316-332 and 337, ADRs 0026 (stat model), 0027 (damage types), 0028 (equipment slots). Numbers are kept in `docs/plans/README.md`'s "Next free numbers" line.
 
-Loot (`docs/plans/done/2026-10-27-loot/`, done 2026-10-29): decisions 338-355, 359-361 and 362 (tier colors: ARPG convention), ADRs 0029/0030 option A. Split off: `done/2026-10-27-affix-stats/` (done 2026-10-29: A1-A3, A4a/A4b, ST1a/ST1b; decisions 356, 363-368 and 373 (tighter Status skill rows); stone_beetle practice enemy in the forest) and `2026-10-27-forge/` (approved 2026-10-29, next: 15 slices M1-M4, F1a, E1, E2, N1, F1b-F1d, F2a-F2c; decisions 357, 358, 369-372; Core `Forge` returns `ForgeQuote`s; forge master on the start map). Tiers: Common/Magic/Rare rolled, Unique reserved, Material a color only (teal).
+Loot (`docs/plans/done/2026-10-27-loot/`, done 2026-10-29): decisions 338-355, 359-361 and 362 (tier colors: ARPG convention), ADRs 0029/0030 option A. Split off: `done/2026-10-27-affix-stats/` (done 2026-10-29: A1-A3, A4a/A4b, ST1a/ST1b; decisions 356, 363-368 and 373 (tighter Status skill rows); stone_beetle practice enemy in the forest) and `done/2026-10-27-forge/` (done 2026-10-29: M1-M4, F1a, E1, E2, N1, F1b-F1d, F2a-F2c; decisions 357, 358, 369-372; Core `Forge` returns `ForgeQuote`s, the Game formats them; forge master on the start map). Next free: decision 374, ADR 0031. Tiers: Common/Magic/Rare rolled, Unique reserved, Material a color only (teal).
 
 Direction (decision 234): an investor demo. Later: speed-based turn count (301, with enemy speed), music/SFX, Act 1 content, map banner, autosave, enemy skills (224), gold/inn prices (222), other classes' lasting costs (220), skills for dead stat dimensions (310).
 

@@ -43,6 +43,7 @@ The bar: a professional reviewer reads the diff and understands the intent from 
 - No commented-out code, no narration (`// Loop through enemies`), no section banners, no "Step 1/Step 2".
 - When you change a comment or summary, rewrap its whole block to 120 columns: no line over it, no one- or two-word last line (`perl .claude/scripts/reflow-comments.pl <file>` rewraps the blocks changed since HEAD). If removing a name leaves two neighboring summaries saying the same thing, say what tells them apart.
 - When a change resizes, moves, makes a call conditional, or deletes or renames a file, grep the old value, wording or file name ("40 px", "under the list", "every update", "menu-status.webp") in the comments of the feature folder, `Ui/` and `docs/`.
+- When a type gains a public member, or a dependency gains a second caller, reread its class summary and that dependency's param doc: a second job (the drops' roll also serving the Forge) must appear there (the forge plan's M2, M3a, M3b).
 - No `TODO` without a plan reference: `// TODO(plan 2026-10-20-status-effects, slice 3): ...`.
 - XML docs only where the signature can't carry the meaning: units, ranges, invariants, formula sources. Never restate the name (`/// Gets the HP.`).
 

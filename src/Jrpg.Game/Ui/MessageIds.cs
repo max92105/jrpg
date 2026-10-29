@@ -579,4 +579,7 @@ internal static class MessageIds
 
     /// <summary>Placeholder <c>{member}</c>: the footer's line while a worn item is highlighted.</summary>
     public const string EquipmentTakeHint = "equipment_take_hint";
+
+    /// <summary>The Forge screen's title.</summary>
+    public const string ForgeTitle = "forge_title";
 }

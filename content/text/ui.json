@@ -210,5 +210,6 @@
   "menu_hint_save": "Choose a file to save to.",
   "menu_hint_load": "Choose a file to load.",
   "equipment_worn_row": "{item} ({member})",
-  "equipment_take_hint": "Taking it leaves {member} without it."
+  "equipment_take_hint": "Taking it leaves {member} without it.",
+  "forge_title": "Forge"
 }

@@ -14,3 +14,4 @@ Part of [the forge plan](../README.md). Decisions 353 (a screen a forge master o
     - `Update_Confirm_RequestsNothing`
   - **Watch:** CA1812 (an internal class nothing in its assembly builds): `SceneFactory.CreateForge` lands in E1, its first caller; if the build flags `ForgeScene` here, it lands in this slice instead (design.md, "Risks").
   - **Verify by hand:** none until E1 (no way in yet).
+- **Done, with deviations:** CA1812 didn't flag `ForgeScene`, so `SceneFactory.CreateForge` stays in E1. `ForgeView` takes the menu header's title size and margin (38 px, 48 px) and `UiTheme.Scrim`, the battle's dimming. Not captured: nothing opens the Forge yet. Tests 2861 → 2863. The review corrected `ForgeScene`'s summary (the flow pops it in the update that asks) and moved `forge_title` after the menu ids.

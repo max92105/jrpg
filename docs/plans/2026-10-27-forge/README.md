@@ -45,7 +45,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **M4. The crafting rules in content, checked against the items** (Data + content, about 240 lines) → [slices/M4.md](slices/M4.md)
 
 ### Phase 2: the forge on the map
-- [ ] **F1a. A Forge screen that opens over the map and Cancel closes** (Game + text, raw 90, about 145 lines at 1.6x) → [slices/F1a.md](slices/F1a.md)
+- [x] **F1a. A Forge screen that opens over the map and Cancel closes** (Game + text, raw 90, about 145 lines at 1.6x) → [slices/F1a.md](slices/F1a.md)
 - [ ] **E1. The `openForge` event step opens the Forge and waits for it** (Core + Data + Game, about 210 lines) → [slices/E1.md](slices/E1.md)
 - [ ] **E2. The editor shows and adds the `openForge` step; the Forge master preset** (Editor, about 110 lines) → [slices/E2.md](slices/E2.md)
 - [ ] **N1. A forge master stands on the start map** (content + tests, about 70 lines) → [slices/N1.md](slices/N1.md)

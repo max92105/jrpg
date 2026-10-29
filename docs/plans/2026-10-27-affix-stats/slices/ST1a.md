@@ -1,0 +1,22 @@
+# ST1a. Resources move beside Skills
+
+Part of [the affix stats plan](../README.md). Decisions 316 (the page's layout), 334, 350, 368. After A4b. Reference: `docs/ui-reference/menu-status.png`. Builds on design.md's risks (skills beside Resources).
+
+- **ST1a. Resources move beside Skills** (Game, raw about 100 lines, about 160 at 1.6x: a layout pass)
+  - **Goal:** the Resources section leaves the middle band and sits at the right of the Skills row, so ST1b can put the four affix stats in its slot (decision 368). Nothing else moves. Until ST1b, the band is as tall as Combat (284) and Skills start 28 px higher: a known gap of one slice.
+  - **The arithmetic** (page area 1044 × 848 under `MenuLayout.SingleColumn`; `SectionTitle.Height` 36, so a section's rows start 46 px under its top; 34 px rows):
+    - Middle band, this slice: Combat 46 + 7 × 34 = 284; Resistances 46 + 4 × 34 = 182; height 284. `ContentHeight` = 20 + 232 + 284 + 16 + 256 = 808 of 848. After ST1b: 312 and 836 (decision 368).
+    - Skills row: Resources 300 px wide at the content's right edge, 48 px from Skills (the band's half gap); Skills 1044 − 300 − 48 = 696 px, its descriptions wrapped at 684 (12 px in). Resources: 46 + 2 × 34 = 114 tall, within the row's 256; its cells 288 wide, under `StatusParametersView`'s 380 cap, room for "INSTABILITY" and "10/10".
+    - Skills after ST1b: 848 − 580 = 268 tall, 222 under the band. A skill takes 71 px with a one-line description, 93 with two (30 to the description, 22 a line, 8, 1, 10): three one-line skills fit (213), three with one two-line description don't (235). Today's text width is 1032, so some descriptions that fit one line wrap to two at 684.
+  - **New type:**
+    - `Menus/StatusResourcesView`: draws the Status page's Resources section (its band and one row per class resource), beside Skills. Owns `MostResources` (2, moved from `StatusParametersView`) and `Height` (46 + 2 × 34).
+  - **Changes:**
+    - `Menus/StatusParametersView`: Resources leave it (`_resourcesTitle`, the resources loop, `ResourcesTop`, the resources in `Measured`); `Height` is the taller of Combat and Resistances; its summary drops "with Resources under them". `CellAt`, `RowHeight` and `BelowBand` become internal so `StatusResourcesView`'s rows line up with the band's (one place works out a row's cell).
+    - `Menus/StatusSheetView`: the Skills row splits into Skills at the left and `StatusResourcesView` at the right (`ResourcesWidth` 300, the gap 48); `SkillsHeight` becomes internal for the layout test; the class summary's section list says Resources sit beside the skills.
+    - `docs/map.md`'s Menus line: `StatusParametersView` "Combat beside Resistances" and the new `StatusResourcesView`.
+  - **Tests:**
+    - `StatusLayoutTests: Resources_EveryClassInContent_FitBesideSkills` (renamed from `Resources_EveryClassInContent_FitTheBand`, reads `StatusResourcesView.MostResources`)
+    - `StatusLayoutTests: ResourcesHeight_MostResources_FitsTheSkillsRow` (`StatusResourcesView.Height` ≤ `StatusSheetView.SkillsHeight`: fails if `MostResources` grows past 6)
+    - `StatusPageSheetTests: ContentHeight_ProfileBandAndThreeSkills_FitsThePage` passes unchanged (808).
+    - `StatusPageTests: Open_Mage_ShowsManaAndClarity` and the other resource tests pass unchanged (the sheet's `Resources` don't change, only where they're drawn).
+  - **Verify by hand:** F12 captures of the Status page before and after for every class with three skills (five in `classes.json` today; the one with the longest descriptions, `eldritch_bolt`'s, first): Resources read beside Skills, aligned with the band's rows; nothing overlaps. Count the skills shown for each class before and after: if moving Resources hides a skill that showed before, stop and ask the developer (decision 368's fork: a narrower Resources column, smaller description type, or shorter placeholder descriptions).

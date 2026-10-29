@@ -64,3 +64,15 @@ When planning slices in this repo:
   - a method that takes `ContentCatalog` lives in Content or Session, never in a feature folder Content references (S1a's planned `GearPiece.FromSaved` and B1's `DropRoll.For` would each have made a cycle);
   - when a model change gets ahead of the save format, grep the tests that save and restore (`StartMapScenarios.StartWithWholeParty`), then plan a stopgap or put the save change in the same slice (G1b-1 needed a stopgap the plan said wasn't needed);
   - before budgeting seeded-test fixes, grep which repository tests win a battle and then draw from the random or read the inventory (D2 and R3b budgeted fixes and needed none).
+- Forge review (2026-10-29):
+  - "can it be done" rules return a Core value (cost/yield + refusal reason enum) the screen only formats; never a Game-side check;
+  - a content check that needs another file (rules vs items) is called from `ContentCatalogLoader` after both load, not from the file's own validator;
+  - an event step opening a screen: `EventPresenter` once flag -> `ExplorationScene` returns the request before its busy check -> explicit `GameFlow.Start` cases (the default branch fades and throws) -> a `...Transitions` that pops and calls `ContinueEvent`; test files over 300 get a sibling file;
+  - order so a hand check exists early (bare screen, step, editor, NPC, then the list/look/actions);
+  - the 1.6x applies to Game slices that add a view type (loot README rule), still forcing screen splits: shell / list / detail / look / actions / each action.
+- My Write tool writes LF; repo docs are CRLF: tell the caller to run `sed -i 's/\r*$/\r/'` on new plan files.
+- Affix-stats review (2026-10-29):
+  - a new enum member read by a "for every kind" loop (`StatComparison` over `StatSheet.ValueOf`) needs its switch arm in the same slice; check the default arm throws;
+  - a weighted-pick boundary test must draw where the change moves the edge (a draw on an unchanged first weight can't fail);
+  - when applying a review, the developer pre-assigns decision numbers and edits `docs/plans/README.md` himself; my own picks stay unnumbered "planner's picks";
+  - the Write tool writes LF even over CRLF files and I have no shell: name the files needing `sed -i 's/\r*$/\r/'` in the report.

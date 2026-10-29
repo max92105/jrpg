@@ -54,6 +54,21 @@ public sealed class CombatantTests
     }
 
     [Fact]
+    public void FromPartyMember_PenetrationWorn_CopiedToStats()
+    {
+        var member = new PartyMemberBuilder().WithClass("fighter").Build();
+        var sword = new ItemDefinitionBuilder().WithId("sword").AsWeapon(15).Build();
+        var piece = GearPiece.Rolled(sword, Rarity.Magic, [new RolledAffix("armor_penetration", StatKind.ArmorPenetration, 6)]);
+        var inventory = new Inventory();
+        inventory.AddGear(piece);
+        new PartyEquipment(inventory).TryEquip(member, piece);
+
+        var combatant = Combatant.FromPartyMember(member);
+
+        Assert.Equal(60, combatant.Stats.ArmorPenetrationPermille);
+    }
+
+    [Fact]
     public void FromPartyMember_MemberWithSkills_CarriesThem()
     {
         var heal = new SkillDefinition

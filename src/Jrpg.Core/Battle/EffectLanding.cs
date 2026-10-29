@@ -21,15 +21,17 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceR
     /// <param name="targets">Who it lands on, already checked as legal.</param>
     /// <param name="events">Where what happened is reported.</param>
     public void Land(Combatant actor, Effect effect, IReadOnlyList<Combatant> targets, List<BattleEvent> events) =>
-        LandOn(new HitSource(actor, actor.CurrentStats.LifeStealPermille), effect, targets, events);
+        LandOn(new HitSource(actor, actor.CurrentStats.LifeStealPermille, actor.CurrentStats.ArmorPenetrationPermille), effect, targets, events);
 
-    /// <summary>Lands an item's effect: its hits carry none of the user's lifesteal (decision 321).</summary>
+    /// <summary>
+    /// Lands an item's effect: its hits carry none of the user's lifesteal or penetration (decision 321).
+    /// </summary>
     /// <param name="actor">Who used the item, for the gains a landed hit triggers.</param>
     /// <param name="effect">What lands.</param>
     /// <param name="targets">Who it lands on, already checked as legal.</param>
     /// <param name="events">Where what happened is reported.</param>
     public void LandFromItem(Combatant actor, Effect effect, IReadOnlyList<Combatant> targets, List<BattleEvent> events) =>
-        LandOn(new HitSource(actor, LifeStealPermille: 0), effect, targets, events);
+        LandOn(new HitSource(actor, LifeStealPermille: 0, PenetrationPermille: 0), effect, targets, events);
 
     /// <summary>Reports a fall, clears the fallen's statuses and runs what a fall triggers.</summary>
     public static void Fall(Combatant fallen, IReadOnlyList<Combatant> combatants, List<BattleEvent> events)
@@ -63,12 +65,13 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceR
     private static HitAffinity AffinityOf(EffectKind kind, Mitigation mitigation) =>
         kind == EffectKind.Damage ? DamageFormula.AffinityOf(mitigation.ResistancePermille) : HitAffinity.Neutral;
 
-    // An untyped hit, which only tests build, meets no resistance.
-    private static Mitigation MitigationOf(Combatant target, DamageType? type)
+    // An untyped hit, which only tests build, meets no resistance. The hitter's penetration takes its points off before
+    // the cue reads it, so a penetrated hit no longer reads "Resisted" (decision 364).
+    private static Mitigation MitigationOf(Combatant target, DamageType? type, HitSource source)
     {
         var stats = target.CurrentStats;
         return new Mitigation(
-            type is { } hitType ? stats.Resistances.Of(hitType) : 0,
+            type is { } hitType ? DamageFormula.PenetratedResistance(stats.Resistances.Of(hitType), source.PenetrationPermille) : 0,
             StatFormula.PermilleOf(StatusModifiers.ExtraDamageTakenPercent(target.Statuses)));
     }
 
@@ -87,7 +90,7 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceR
 
             hasLanded = true;
             var isCritical = effect.Kind == EffectKind.Damage && rolls.Succeeds(actor.CurrentStats.CritChancePermille);
-            var mitigation = MitigationOf(target, effect.DamageType);
+            var mitigation = MitigationOf(target, effect.DamageType, source);
             var crit = isCritical ? actor.CurrentStats.CritDamagePermille : DamageFormula.NormalHit;
             var amount = EffectResolver.Apply(effect, target.Vitals, crit, mitigation);
             if (effect.Kind != EffectKind.GrantStatus)
@@ -135,5 +138,5 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceR
         rolls.Succeeds(HitFormula.ChancePermille(actor.CurrentStats.AccuracyPermille, target.CurrentStats.DodgePermille));
 
     /// <summary>Who lands the hits, and what their hits carry from them.</summary>
-    private sealed record HitSource(Combatant Actor, int LifeStealPermille);
+    private sealed record HitSource(Combatant Actor, int LifeStealPermille, int PenetrationPermille);
 }

@@ -39,6 +39,9 @@ public sealed record StatSheet(
     /// </summary>
     public int LifeStealPermille { get; init; }
 
+    /// <summary>The percentage points the member's hits take off a positive resistance (decision 364).</summary>
+    public int ArmorPenetrationPermille { get; init; }
+
     /// <summary>
     /// The number a screen shows for <paramref name="kind"/>: whole points for a primary, max HP and speed, permille
     /// for the percent kinds. The one place that reads a sheet by kind, so screens list stats without a switch.
@@ -62,6 +65,7 @@ public sealed record StatSheet(
     private int AffixStatOf(StatKind kind) => kind switch
     {
         StatKind.LifeSteal => LifeStealPermille,
+        StatKind.ArmorPenetration => ArmorPenetrationPermille,
         _ => Primaries.ValueOf(kind),
     };
 }

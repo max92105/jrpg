@@ -89,9 +89,22 @@ public sealed class ContentCatalogLoaderTests
 
         var forestBattles = catalog.Maps["forest"].Settings.RandomEncounters;
 
-        Assert.Equal(["goblin_trio"], forestBattles?.EncounterIds);
+        Assert.Contains("goblin_trio", forestBattles?.EncounterIds ?? []);
         Assert.Null(catalog.Maps["start"].Settings.RandomEncounters);
         Assert.Null(catalog.Maps["interior_1"].Settings.RandomEncounters);
+    }
+
+    // Armor penetration only shows against a positive physical resistance, so one must be met in play (decision 363).
+    [Fact]
+    public void Load_RepositoryContent_ForestRollsAnEnemyWithAPhysicalResistance()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        var forestEnemies = catalog.Maps["forest"].Settings.RandomEncounters!.EncounterIds
+            .SelectMany(id => catalog.Encounters[id].EnemyIds)
+            .Select(id => catalog.Enemies[id].Resistances);
+
+        Assert.Contains(forestEnemies, resistances => resistances.Blunt > 0 || resistances.Piercing > 0 || resistances.Slashing > 0);
     }
 
     [Fact]

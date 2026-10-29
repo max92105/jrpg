@@ -209,6 +209,7 @@ public sealed class ItemCatalogValidatorTests
     // A base item never gives what only a roll may (ADR 0030); each affix-only stat adds its case.
     [Theory]
     [InlineData(StatKind.LifeSteal, "lifeSteal")]
+    [InlineData(StatKind.ArmorPenetration, "armorPenetration")]
     public void Validate_BonusOnAffixOnlyStat_Throws(StatKind kind, string name)
     {
         var ring = Equipment(new EquipmentStats(EquipmentKind.Ring) { Bonuses = Bonuses((kind, 5)) });

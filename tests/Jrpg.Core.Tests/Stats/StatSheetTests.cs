@@ -21,6 +21,7 @@ public sealed class StatSheetTests
         ExtraStatusTurns: 23)
     {
         LifeStealPermille = 24,
+        ArmorPenetrationPermille = 25,
     };
 
     [Theory]
@@ -45,6 +46,7 @@ public sealed class StatSheetTests
     [InlineData(StatKind.LightResistance, 20)]
     [InlineData(StatKind.DarkResistance, 21)]
     [InlineData(StatKind.LifeSteal, 24)]
+    [InlineData(StatKind.ArmorPenetration, 25)]
     public void ValueOf_EveryKind_ReadsItsField(StatKind kind, int expected)
     {
         Assert.Equal(expected, _sheet.ValueOf(kind));

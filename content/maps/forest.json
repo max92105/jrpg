@@ -5,7 +5,8 @@
     "oneInSteps": 25,
     "graceSteps": 3,
     "encounterIds": [
-      "goblin_trio"
+      "goblin_trio",
+      "stone_beetle"
     ]
   }
 }

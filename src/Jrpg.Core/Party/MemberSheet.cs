@@ -40,6 +40,7 @@ public static class MemberSheet
             ExtraStatusTurns: StatFormula.ExtraStatusTurns(primaries.Intelligence, rules))
         {
             LifeStealPermille = PermilleOf(worn, StatKind.LifeSteal),
+            ArmorPenetrationPermille = PermilleOf(worn, StatKind.ArmorPenetration),
         };
     }
 

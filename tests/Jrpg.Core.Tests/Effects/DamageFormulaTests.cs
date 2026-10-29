@@ -132,4 +132,35 @@ public sealed class DamageFormulaTests
     {
         Assert.Equal(0, DamageFormula.LifeStolen(37, 0));
     }
+
+    [Fact]
+    public void PenetratedResistance_PositiveResistance_LosesItsPoints()
+    {
+        Assert.Equal(200, DamageFormula.PenetratedResistance(250, 50));
+    }
+
+    // Held at the 75 % cap before the points come off (decision 364): 670, not 750.
+    [Fact]
+    public void PenetratedResistance_AboveTheCap_CappedFirst()
+    {
+        Assert.Equal(670, DamageFormula.PenetratedResistance(900, 80));
+    }
+
+    [Fact]
+    public void PenetratedResistance_SmallResistance_StopsAtZero()
+    {
+        Assert.Equal(0, DamageFormula.PenetratedResistance(30, 80));
+    }
+
+    [Fact]
+    public void PenetratedResistance_Weakness_Unchanged()
+    {
+        Assert.Equal(-250, DamageFormula.PenetratedResistance(-250, 80));
+    }
+
+    [Fact]
+    public void PenetratedResistance_NoPenetration_Unchanged()
+    {
+        Assert.Equal(250, DamageFormula.PenetratedResistance(250, 0));
+    }
 }

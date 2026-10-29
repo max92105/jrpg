@@ -10,16 +10,17 @@ using static System.FormattableString;
 namespace Jrpg.Simulations.Battle;
 
 /// <summary>
-/// The new-game fight: a level 1 leader alone against the goblin trio, attacking only, once for each class, since any
-/// class can lead (decision 168), bare and in the new game's starting gear (G2). A lone level 1 leader must win the
-/// start area's fights (question 184, ADR 0017). The summary counts the leader's own attacks: how many missed, how many
-/// crit, and what a landed one dealt on average.
+/// The forest's fights: a level 1 leader alone against the goblin trio, then the stone beetles (decision 363),
+/// attacking only, once for each class, since any class can lead (decision 168), bare and in the new game's starting
+/// gear (G2). A lone level 1 leader must win the start area's fights (question 184, ADR 0017). The summary counts the
+/// leader's own attacks: how many missed, how many crit, and what a landed one dealt on average.
 /// </summary>
-public sealed class GoblinTrioSimulation(ITestOutputHelper output)
+public sealed class ForestFightsSimulation(ITestOutputHelper output)
 {
     private const int Battles = 1_000;
     private const int TurnLimit = 500;
-    private const string EncounterId = "goblin_trio";
+    private const string GoblinTrioId = "goblin_trio";
+    private const string StoneBeetlesId = "stone_beetle";
 
     // The member whose skills and art the leader has; only the class's numbers matter when attacking only.
     private const string StandInId = "sarxian";
@@ -30,23 +31,33 @@ public sealed class GoblinTrioSimulation(ITestOutputHelper output)
 
     [Theory]
     [MemberData(nameof(ClassIds))]
-    public void GoblinTrio_LoneLevelOneLeaderAttackingOnly_WinsEveryBattle(string classId) => AssertEveryBattleWon(classId, Loadout.Bare);
+    public void GoblinTrio_LoneLevelOneLeaderAttackingOnly_WinsEveryBattle(string classId) => AssertEveryBattleWon(GoblinTrioId, classId, Loadout.Bare);
 
     [Theory]
     [MemberData(nameof(ClassIds))]
-    public void GoblinTrio_LoneLevelOneLeaderWithStartingGear_WinsEveryBattle(string classId) => AssertEveryBattleWon(classId, Loadout.StartingGear);
+    public void GoblinTrio_LoneLevelOneLeaderWithStartingGear_WinsEveryBattle(string classId) => AssertEveryBattleWon(GoblinTrioId, classId, Loadout.StartingGear);
 
-    private void AssertEveryBattleWon(string classId, Loadout loadout)
+    [Theory]
+    [MemberData(nameof(ClassIds))]
+    public void StoneBeetles_LoneLevelOneLeaderAttackingOnly_WinsEveryBattle(string classId) =>
+        AssertEveryBattleWon(StoneBeetlesId, classId, Loadout.Bare);
+
+    [Theory]
+    [MemberData(nameof(ClassIds))]
+    public void StoneBeetles_LoneLevelOneLeaderWithStartingGear_WinsEveryBattle(string classId) =>
+        AssertEveryBattleWon(StoneBeetlesId, classId, Loadout.StartingGear);
+
+    private void AssertEveryBattleWon(string encounterId, string classId, Loadout loadout)
     {
-        var results = Enumerable.Range(0, Battles).Select(seed => RunBattle(_catalog.Classes[classId], loadout, seed)).ToList();
+        var results = Enumerable.Range(0, Battles).Select(seed => RunBattle(encounterId, _catalog.Classes[classId], loadout, seed)).ToList();
 
-        WriteSummary(classId, loadout, results);
+        WriteSummary(encounterId, classId, loadout, results);
         var losses = results.Where(result => result.Phase != BattlePhase.Victory).Select(result => result.Seed).ToList();
-        Assert.True(losses.Count == 0, $"A level 1 {classId} ({loadout}) lost or ran out of turns on {losses.Count} of {Battles} seeds, the first {losses.FirstOrDefault()}.");
+        Assert.True(losses.Count == 0, $"A level 1 {classId} ({loadout}) against {encounterId} lost or ran out of turns on {losses.Count} of {Battles} seeds, the first {losses.FirstOrDefault()}.");
     }
 
     // A fresh leader per battle: battle damage persists on a member (shared Vitals), so reusing one would leak between seeds.
-    private static BattleResult RunBattle(ClassDefinition characterClass, Loadout loadout, int seed)
+    private static BattleResult RunBattle(string encounterId, ClassDefinition characterClass, Loadout loadout, int seed)
     {
         var leader = PartyMember.Recruit(_catalog.PartyMembers[StandInId], characterClass, _catalog.Skills, _catalog.Rules.Stats);
         if (loadout == Loadout.StartingGear)
@@ -55,7 +66,7 @@ public sealed class GoblinTrioSimulation(ITestOutputHelper output)
         }
 
         var party = new PartyState([leader], [leader], _catalog.Rules.Party);
-        var enemies = _catalog.Encounters[EncounterId].EnemyIds.Select(id => _catalog.Enemies[id]).ToList();
+        var enemies = _catalog.Encounters[encounterId].EnemyIds.Select(id => _catalog.Enemies[id]).ToList();
         var random = new SeededRandom(seed);
         var battle = BattleState.Start(party, enemies, new Inventory(), random);
         var tactics = new EnemyTactics(random);
@@ -90,14 +101,14 @@ public sealed class GoblinTrioSimulation(ITestOutputHelper output)
         }
     }
 
-    private void WriteSummary(string classId, Loadout loadout, IReadOnlyList<BattleResult> results)
+    private void WriteSummary(string encounterId, string classId, Loadout loadout, IReadOnlyList<BattleResult> results)
     {
         // Invariant culture, so a baseline copied from one machine compares with another's.
         var wins = results.Where(result => result.Phase == BattlePhase.Victory).ToList();
         var hpLeft = wins.Count == 0 ? "n/a" : Invariant($"{wins.Average(result => result.LeaderHpLeft):F1}");
         var hits = results.Select(result => result.Hits).Aggregate(HitTally.None, (total, tally) => total.Plus(tally));
         var gear = loadout == Loadout.StartingGear ? "in the starting gear" : "bare";
-        output.WriteLine($"{EncounterId}, a level 1 {classId} alone, {gear}, attack only, {Battles} seeds");
+        output.WriteLine($"{encounterId}, a level 1 {classId} alone, {gear}, attack only, {Battles} seeds");
         output.WriteLine(Invariant($"  Win rate          {100.0 * wins.Count / results.Count,6:F1} %"));
         output.WriteLine(Invariant($"  Average turns     {results.Average(result => result.Turns),6:F1}"));
         output.WriteLine(Invariant($"  Attacks missed    {100.0 * hits.Misses / hits.Attacks,6:F1} % (the leader's)"));

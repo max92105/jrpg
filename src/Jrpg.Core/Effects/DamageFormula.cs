@@ -49,6 +49,24 @@ internal static class DamageFormula
     /// <param name="permille">The hitter's lifesteal.</param>
     public static int LifeStolen(int hpTaken, int permille) => (int)((long)hpTaken * permille / Whole);
 
+    /// <returns>
+    /// A positive resistance held at the cap, then less the penetration, never below 0; a resistance at or below 0 as
+    /// it is. Points rather than a share, after the cap (decision 364, the ARPG convention), so a few points show
+    /// against any armor; a weakness isn't deepened, since penetration answers armor and isn't extra damage.
+    /// </returns>
+    /// <param name="resistancePermille">The target's resistance to the hit's type.</param>
+    /// <param name="penetrationPermille">The hitter's armor penetration.</param>
+    public static int PenetratedResistance(int resistancePermille, int penetrationPermille)
+    {
+        if (resistancePermille <= 0)
+        {
+            return resistancePermille;
+        }
+
+        var capped = Math.Min(resistancePermille, StatFormula.PermilleOf(Resistances.CapPercent));
+        return Math.Max(0, capped - penetrationPermille);
+    }
+
     /// <summary>Whether a hit meeting <paramref name="resistancePermille"/> is cued weak, resisted, or not.</summary>
     public static HitAffinity AffinityOf(int resistancePermille) => resistancePermille switch
     {

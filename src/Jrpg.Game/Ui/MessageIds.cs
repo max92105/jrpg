@@ -210,6 +210,8 @@ internal static class MessageIds
 
     public const string StatLifeSteal = "stat_life_steal";
 
+    public const string StatArmorPenetration = "stat_armor_penetration";
+
     /// <summary>A percent stat's value: "{value} %".</summary>
     public const string StatPercent = "stat_percent";
 

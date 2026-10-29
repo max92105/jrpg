@@ -18,6 +18,24 @@
     "dropTableId": "goblin"
   },
   {
+    "id": "stone_beetle",
+    "name": "Stone Beetle",
+    "portraitFile": "Goblin.png",
+    "battleSpriteFile": "Goblin.png",
+    "attackEffectFile": "AttackEnemy.png",
+    "isSpriteFlipped": false,
+    "maxHp": 30,
+    "damage": 9,
+    "damageType": "blunt",
+    "accuracy": 75,
+    "dodge": 0,
+    "critChance": 5,
+    "crowdControlResistance": 10,
+    "resistances": { "slashing": 25, "piercing": 25, "blunt": -25 },
+    "experienceReward": 40,
+    "dropTableId": "goblin"
+  },
+  {
     "id": "training_dummy",
     "name": "Training Dummy",
     "portraitFile": "Goblin.png",

@@ -5,6 +5,11 @@
     "backgroundFile": "Forest.png"
   },
   {
+    "id": "stone_beetle",
+    "enemyIds": ["stone_beetle", "stone_beetle"],
+    "backgroundFile": "Forest.png"
+  },
+  {
     "id": "training_dummy",
     "enemyIds": ["training_dummy"],
     "backgroundFile": "Forest.png"

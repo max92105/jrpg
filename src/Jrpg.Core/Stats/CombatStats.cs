@@ -53,4 +53,10 @@ public sealed record CombatStats(int AttackDamage)
     /// a member's from their gear's affixes (decision 346), 0 for an enemy.
     /// </summary>
     public int LifeStealPermille { get; init; }
+
+    /// <summary>
+    /// The percentage points the combatant's hits take off a positive resistance, in permille: a member's from their
+    /// gear's affixes (decision 364), 0 for an enemy.
+    /// </summary>
+    public int ArmorPenetrationPermille { get; init; }
 }

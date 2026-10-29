@@ -20,7 +20,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
   The file is protected, so ask the developer first.
 - **Why Core refused an equipment change:** `SlotChoice.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. `PartyEquipment.ItemWithoutRoom` and `UnequipAll` would own both. It can wait because it is correct today, and nothing planned changes equipment.
-- **`Ui/MessageIds.cs` is 410 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
+- **`Ui/MessageIds.cs` is 564 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
 - **`MainViewModelTests`, part 2 (449 lines after E1a):** move the new content tests (`CreateObject_*`, `CreateNpc_*`, `CanStartNewObject_*`, `TryCreateMap_*`) and the map settings tests (`TryApplySettings_*`) into their own classes, on E1a's `EditorTestContent`.
 - **`MainWindow.xaml.cs` (547 lines):** move the viewport (pan, zoom, fit) and the tile painting handlers into partial files, as `.EventEditing` and `.ObjectEditing` already are.
 - **`TileBrowserViewModelTests` (410 lines):** move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class.
@@ -91,3 +91,9 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `WholeChance = 100` is declared in three Data validators (`EnemyCatalogValidator`, `StatusGrantValidator`, `DropTableCatalogValidator`): a percent check in `RangeProblems` would hold it once (loot plan, D2 review).
 - `.claude/scripts/reflow-comments.pl` (run by `verify.ps1 -Fix`) sometimes turns the first line of a rewrapped `///` block into `//` or `/// //` (loot plan: S1a's `SaveGameFixtures`, P1b's `VictoryDropRow`, both blocks holding a character outside ASCII or an edited first line): the build catches it as bad XML or a doubled summary, but the script should keep the prefix.
 - "A rarity's color unless Common, else a fallback" is written twice (`InventoryListView.TextColorOf`, `EquipmentChoiceView.Show`): a third copy moves it into `UiTheme.Loot` as `RarityColorOr(rarity, fallback)` (loot plan, P1b review).
+
+## From the loot plan (2026-10-29)
+
+- The Inventory page's Weapons and Armor tabs still show the QTY column title, though each of their rows is a piece without a count (P1a).
+- `Battle/VictoryScreenView.cs` is at 263 lines since the Items step (D3): the next change that grows it moves the cards' drawing into a `VictoryCardsView` first.
+- `tests/Jrpg.Core.Tests/Session/GameSessionSaveTests.cs` is at 270 lines: the next save test goes in a new file split by concern (gear, members, world).

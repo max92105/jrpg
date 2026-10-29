@@ -13,6 +13,9 @@
 # full-screen game anyway.
 
 # -Content runs the game on another content folder (its --content), such as a copy set up so a battle comes quickly.
+# For a battle capture, copy content/ to the scratchpad and in the copy give the enemies 1 HP and 0 dodge, set
+# rules.json stats.baseAccuracy to 200 and the drop table's chances to 100: otherwise a goblin survives a missed hit
+# and the steps run out (loot plan, D3 and P1).
 param([Parameter(Mandatory)][string]$Out, [string]$Steps = '', [int]$StartSeconds = 6, [string]$Content = '')
 
 Add-Type @"

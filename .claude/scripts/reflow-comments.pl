@@ -1,5 +1,6 @@
-# Rewraps to 120 columns the /// <summary> blocks and // blocks of C# files that changed since HEAD, keeping CRLF; a new
-# one-line /// <summary>, <returns>, <param> or <exception> past 120 columns becomes a block.
+# Rewraps to 120 columns the /// <summary>, <returns>, <remarks>, <param> and <exception> blocks and the // blocks of C#
+# files that changed since HEAD, keeping CRLF; a new one-line /// <summary>, <returns>, <param> or <exception> past 120
+# columns becomes a block.
 # A tag such as <see cref="X"/> is one word, so it is never split. Usage: perl .claude/scripts/reflow-comments.pl file...
 use strict; use warnings;
 my $width = 120;
@@ -15,11 +16,11 @@ for my $file (@ARGV) {
     if ($lines[$i] =~ /^(\s*)\/\/\/ (<(summary|returns|param|exception)[^>]*>)(.+)(<\/\3>)$/ && length($lines[$i]) > $width && !$old{$lines[$i]}) {
       push @out, "$1/// $2", wrap("$1/// ", $4), "$1/// $5"; next;
     }
-    if ($lines[$i] =~ /^(\s*)\/\/\/ <summary>$/) {
+    if ($lines[$i] =~ /^(\s*)\/\/\/ <(summary|returns|remarks|param|exception)(?: [^>]*)?>$/) {
       push @out, $lines[$i];
-      $prefix = "$1/// ";
+      $prefix = "$1/// "; my $tag = $2;
       my $j = $i + 1; my @body;
-      while ($j < @lines && $lines[$j] !~ /^\s*\/\/\/ <\/summary>$/) { push @body, $lines[$j]; $j++; }
+      while ($j < @lines && $lines[$j] !~ /^\s*\/\/\/ <\/$tag>$/) { push @body, $lines[$j]; $j++; }
       if (grep { !$old{$_} } @body) { push @out, wrap($prefix, join ' ', map { (my $l = $_) =~ s/^\s*\/\/\/ ?//; $l } @body); }
       else { push @out, @body; }
       push @out, $lines[$j]; $i = $j; next;

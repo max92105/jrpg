@@ -163,13 +163,15 @@ foreach ($newFile in git ls-files --others --exclude-standard -- '*.cs') {
 }
 Report "changed comments fit in $maxCommentColumns columns (perl .claude/scripts/reflow-comments.pl <file>)" (-not $longComments) ($longComments | Select-Object -First 20)
 
-# 8-10. Slips a shell edit leaves behind, caught before the review. The quote is the shell escape '"'"' written literally
+# 8-11. Slips a shell edit leaves behind, caught before the review. The quote is the shell escape '"'"' written literally
 # (a heredoc perl script, see the class-mechanics retro); a doubled summary is a member inserted between another's doc
-# comment and its declaration; a file crossing 300 lines is a split the slice should have made (code-quality.md).
+# comment and its declaration; a broken doc line is a /// line that lost a slash (`/// //` or a lone `//` inside a
+# /// block, twice in the loot plan); a file crossing 300 lines is a split the slice should have made (code-quality.md).
 $changedSources = @(Get-ChangedSourceFiles)
 $shellQuote = "'" + '"' + "'" + '"' + "'"
 $quoteHits = @()
 $doubledSummaries = @()
+$brokenDocLines = @()
 $grownFiles = @()
 foreach ($source in $changedSources) {
     $lines = [IO.File]::ReadAllLines((Join-Path $repositoryRoot $source))
@@ -177,6 +179,8 @@ foreach ($source in $changedSources) {
     for ($number = 1; $number -le $lines.Length; $number++) {
         $text = $lines[$number - 1]
         if ($text.Contains($shellQuote)) { $quoteHits += "${source}:$number" }
+        $insideDocBlock = $number -gt 1 -and $number -lt $lines.Length -and $lines[$number - 2] -match '^\s*///' -and $lines[$number] -match '^\s*///'
+        if ($text -match '^\s*/// //' -or ($insideDocBlock -and $text -match '^\s*//(?!/)')) { $brokenDocLines += "${source}:$number" }
         if ($text -match '^\s*///') {
             if ($text -match '^\s*///\s*<summary>' -and $previousDocLine -match '</summary>\s*$') { $doubledSummaries += "${source}:$number" }
             $previousDocLine = $text
@@ -191,6 +195,7 @@ foreach ($source in $changedSources) {
 }
 Report 'changed files hold no shell quote written literally' (-not $quoteHits) ($quoteHits | Select-Object -First 10)
 Report 'no member with two summaries' (-not $doubledSummaries) ($doubledSummaries | Select-Object -First 10)
+Report 'no doc comment line lost a slash' (-not $brokenDocLines) ($brokenDocLines | Select-Object -First 10)
 Report 'no changed file crossed 300 lines (split it)' (-not $grownFiles) ($grownFiles | Select-Object -First 10)
 
 if ($failed) { exit 1 }

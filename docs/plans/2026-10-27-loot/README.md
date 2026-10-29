@@ -1,5 +1,5 @@
 # Loot
-Status: approved, in progress
+Status: approved, in progress (retro run 2026-10-29; Z left, then done)
 
 Sixth feature plan after the migration, following the stats and gear slots plan (its "Out of scope": "the next plan, loot"; decision 294).
 - Numbers: decisions 338-355, 359-361 and question 362 here; 356 goes to [the affix stats plan](../2026-10-27-affix-stats/README.md), 357 (a question) and 358 to [the forge plan](../2026-10-27-forge/README.md). ADRs 0029 and 0030. The next free numbers are in `docs/plans/README.md` (decision 363, ADR 0031).

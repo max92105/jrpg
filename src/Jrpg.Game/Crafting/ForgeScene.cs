@@ -11,9 +11,10 @@ namespace Jrpg.Game.Crafting;
 /// <summary>
 /// The Forge screen a forge master's event opens over the map (decision 353): the owned pieces, Up and Down moving the
 /// list, the highlighted piece's affixes and the materials owned beside it. Confirm on a piece opens its actions,
-/// quoted by Core; Salvage asks first (decision 354). Cancel wins when nested: the prompt, then the actions, then the
-/// Forge. It fades in when it opens and out when it closes (decision 370): Cancel starts the fade out, and the close
-/// request comes once it has run, once, since a second would make the flow pop what lies under it.
+/// quoted by Core; Salvage asks first (decision 354), an upgrade or a reroll goes at once. Cancel wins when nested: the
+/// prompt, then the actions, then the Forge. It fades in when it opens and out when it closes (decision 370): Cancel
+/// starts the fade out, and the close request comes once it has run, once, since a second would make the flow pop what
+/// lies under it.
 /// </summary>
 internal sealed class ForgeScene : IScene
 {
@@ -121,8 +122,8 @@ internal sealed class ForgeScene : IScene
         Notice = _messages.Format(MessageIds.ForgeSalvaged, new MessageArgument("materials", salvage.Materials.Text));
     }
 
-    // Cancel closes the actions before the Forge; Confirm on an available Salvage asks first, on a greyed action or an
-    // action not carried out yet (the plan's F2c) it does nothing.
+    // Cancel closes the actions before the Forge; Confirm carries out the highlighted action, or nothing on a greyed
+    // one.
     private void UpdateActions(ForgeActionChoice actions, InputFrame input)
     {
         if (input.IsPressed(GameButton.Cancel))
@@ -131,9 +132,9 @@ internal sealed class ForgeScene : IScene
             return;
         }
 
-        if (input.IsPressed(GameButton.Confirm) && actions.Selected is { Action: ForgeAction.Salvage, IsAvailable: true } && _list.SelectedRow is { } row)
+        if (input.IsPressed(GameButton.Confirm) && actions.Selected is { IsAvailable: true } action && _list.SelectedRow is { } row)
         {
-            Prompt = new ConfirmPrompt(_messages.Format(MessageIds.ForgeSalvageConfirm, new MessageArgument("name", NameOf(row))));
+            CarryOut(action.Action, row);
             return;
         }
 
@@ -146,6 +147,42 @@ internal sealed class ForgeScene : IScene
         {
             actions.MoveDown();
         }
+    }
+
+    // Salvage destroys, so it asks first (decision 354); an upgrade or a reroll only changes the piece, so it goes at
+    // once.
+    private void CarryOut(ForgeAction action, ForgeRow row)
+    {
+        switch (action)
+        {
+            case ForgeAction.Salvage:
+                Prompt = new ConfirmPrompt(_messages.Format(MessageIds.ForgeSalvageConfirm, new MessageArgument("name", NameOf(row))));
+                break;
+            case ForgeAction.Upgrade:
+                Craft(row, _session.Forge.TryUpgrade, MessageIds.ForgeUpgraded);
+                break;
+            case ForgeAction.Reroll:
+                Craft(row, _session.Forge.TryReroll, MessageIds.ForgeRerolled);
+                break;
+        }
+    }
+
+    // The piece is replaced in its place; with two equal pieces the first one changes (Inventory.TryReplace), so the
+    // highlight goes to that row, and the actions open again on the new piece with its new quotes.
+    private void Craft(ForgeRow row, Func<GearPiece, bool> tryCraft, string noticeId)
+    {
+        var gear = _session.Inventory.Gear;
+        var index = Enumerable.Range(0, gear.Count).First(candidate => gear[candidate] == row.Piece);
+        if (!tryCraft(row.Piece))
+        {
+            return;
+        }
+
+        _list.Show(index);
+        _materials.Refresh();
+        var crafted = _list.SelectedRow ?? throw new InvalidOperationException("The crafted piece left the list.");
+        Actions = new ForgeActionChoice(crafted.Piece, _session.Forge, _actionFormat);
+        Notice = _messages.Format(noticeId, new MessageArgument("name", row.Name.Text), new MessageArgument("rarity", crafted.RarityName));
     }
 
     private void UpdateList(InputFrame input)

@@ -5,9 +5,11 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-27-forge, slice F2b (salvage behind a ConfirmPrompt; ForgeScene Prompt/Notice; ForgeView and
-ForgeDetailView Place gain Notice/Prompt; ForgeSceneSalvageTests). Round 1.
-Verdict: Ready to commit. verify.ps1 all pass (2901 tests).
+Plan: 2026-10-27-forge, slice F2c (upgrade and reroll at the Forge; ForgeScene CarryOut/Craft; forge_upgraded,
+forge_rerolled; ForgeSceneCraftTests). Round 1.
+Verdict: Ready to commit. verify.ps1 all pass (2908 tests).
 
-- Warning: ForgeScene.Salvage keeps the cursor on the same row (or the last) via Show(Cursor.Selected) but no test pins it; Show(0) passes every test - open
-- Suggestion: Notice survives opening and cancelling the actions on the next piece, showing the previous salvage again; clear it when the actions open - open
+- Suggestion: CarryOut's `default: throw` guards a ForgeAction value that can't reach it (three values, all handled); drop it - open
+- Suggestion: Craft re-derives Core's "first equal piece" rule with Enumerable.Range(...).First; a Core result naming the replaced index would keep the rule in one place (test 2 pins it meanwhile) - open
+- Follow-up: F2b's Salvage cursor-stays-on-row (Show(Cursor.Selected)) still has no test - open
+- F2b Suggestion (notice survives opening next piece's actions): fixed (UpdateList Confirm clears Notice)

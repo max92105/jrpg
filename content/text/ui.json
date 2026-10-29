@@ -230,5 +230,7 @@
   "forge_refused_no_yield": "Nothing to salvage",
   "forge_salvage_confirm": "Salvage the {name}?",
   "forge_salvaged": "Salvaged: {materials}",
-  "forge_rolled_piece_name": "{rarity} {name}"
+  "forge_rolled_piece_name": "{rarity} {name}",
+  "forge_upgraded": "{name} is now {rarity}.",
+  "forge_rerolled": "{name}'s affixes were rolled again."
 }

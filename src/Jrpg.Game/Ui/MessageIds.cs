@@ -639,4 +639,10 @@ internal static class MessageIds
 
     /// <summary>Placeholders <c>{rarity}</c> and <c>{name}</c>: a rolled piece named with its rarity first.</summary>
     public const string ForgeRolledPieceName = "forge_rolled_piece_name";
+
+    /// <summary>Placeholders <c>{name}</c> and <c>{rarity}</c>: a piece raised one tier (decision 351).</summary>
+    public const string ForgeUpgraded = "forge_upgraded";
+
+    /// <summary>Placeholder <c>{name}</c>: a piece whose affixes were drawn again (decision 352).</summary>
+    public const string ForgeRerolled = "forge_rerolled";
 }

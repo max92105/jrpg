@@ -15,3 +15,4 @@ Part of [the forge plan](../README.md). Decisions 351 (a crafted Rare has two af
     - `Confirm_GreyedUpgrade_DoesNothing` (the guard: a Rare piece; nothing changes, no draw)
   - **Call sites:** none.
   - **Verify by hand:** with Scrap and Essence: upgrade a plain cap to Magic: it turns blue with one affix, Scrap falls by 3; upgrade it to Rare: gold, two affixes, then Upgrade greyed "Highest rarity"; reroll it: both lines change (or not, a fresh draw), Scrap and Essence fall by the shown cost.
+- **Done, with deviations:** one `CarryOut` switch routes the highlighted action: Salvage to the prompt, Upgrade and Reroll to a shared `Craft(row, tryCraft, noticeId)` that finds the first equal piece's index before the action, so the notice and the highlight follow the piece that changed. Not captured (unattended loop): hand check yours. Tests 2904 → 2908.

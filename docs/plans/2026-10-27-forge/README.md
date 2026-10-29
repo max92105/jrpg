@@ -1,5 +1,5 @@
 # The forge
-Status: in progress
+Status: retro pending
 
 Split out of [the loot plan](../done/2026-10-27-loot/README.md) on 2026-10-27, when the developer approved it: materials, salvage and a bit of crafting (decisions 351-354), at a forge master NPC on the map (decision 353). Runs after the loot plan (done) and after [the affix stats plan](../done/2026-10-27-affix-stats/README.md): its A4a gives `GearRoll.Roll(item, luckPermille)` and `DropRoll.Roll(tables, luckPermille)`, and this plan builds on those signatures (the Forge's `GearRoll` members take no luck).
 
@@ -58,7 +58,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 4: crafting at the Forge
 - [x] **F2a. Confirm on a piece opens its actions, with Core's costs and refusals** (Game + text, about 200 lines) → [slices/F2a.md](slices/F2a.md)
 - [x] **F2b. Salvage, behind a prompt** (Game + text, about 130 lines) → [slices/F2b.md](slices/F2b.md)
-- [ ] **F2c. Upgrade and reroll carried out; the cursor stays on the changed piece** (Game + text, about 150 lines) → [slices/F2c.md](slices/F2c.md)
+- [x] **F2c. Upgrade and reroll carried out; the cursor stays on the changed piece** (Game + text, about 150 lines) → [slices/F2c.md](slices/F2c.md)
 
 ## Decisions
 From the loot plan (2026-10-27): 339 (Material is the materials' own tier and color), 351 (crafting is upgrade and reroll), 352 (reroll rolls every affix at once), 353 (a forge master NPC, an event step with editor support), 354 (Scrap and Essence; worn pieces can't be salvaged; salvage asks to confirm), 362 (the tiers' colors; Material a muted teal).

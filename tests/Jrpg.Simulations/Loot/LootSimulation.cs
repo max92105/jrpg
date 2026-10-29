@@ -66,7 +66,9 @@ public sealed class LootSimulation(ITestOutputHelper output)
 
     // Built as the session builds it, so the numbers are the game's.
     private static List<Drops> RollEverySeed(int luckPermille) =>
-        [.. Enumerable.Range(0, Victories).Select(seed => GameSession.DropRollFor(_catalog, new SeededRandom(seed)).Roll(_tables, luckPermille))];
+        [.. Enumerable.Range(0, Victories).Select(seed => DropRollFor(new SeededRandom(seed)).Roll(_tables, luckPermille))];
+
+    private static DropRoll DropRollFor(IRandom random) => new(_catalog.Items, GameSession.GearRollFor(_catalog, random), random);
 
     private static List<DropTable> TablesOf(string encounterId) =>
     [

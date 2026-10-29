@@ -20,6 +20,32 @@ public sealed class InventoryGearTests
         Assert.Empty(_inventory.Entries);
     }
 
+    // An upgraded piece keeps its row (forge plan, M3a): the shield after it stays after it.
+    [Fact]
+    public void TryReplace_OwnedPiece_KeepsItsPlace()
+    {
+        var shield = GearPiece.Plain(new ItemDefinitionBuilder().WithId("shield").AsWorn(EquipmentKind.OffHand).Build());
+        _inventory.AddGear(GearPiece.Plain(_sword));
+        _inventory.AddGear(shield);
+        var magic = GearPiece.Rolled(_sword, Rarity.Magic, []);
+
+        var replaced = _inventory.TryReplace(GearPiece.Plain(_sword), magic);
+
+        Assert.True(replaced);
+        Assert.Equal([magic, shield], _inventory.Gear);
+    }
+
+    [Fact]
+    public void TryReplace_NotOwned_ReturnsFalseAndChangesNothing()
+    {
+        _inventory.AddGear(GearPiece.Plain(_sword));
+
+        var replaced = _inventory.TryReplace(GearPiece.Rolled(_sword, Rarity.Rare, []), GearPiece.Rolled(_sword, Rarity.Magic, []));
+
+        Assert.False(replaced);
+        Assert.Equal([GearPiece.Plain(_sword)], _inventory.Gear);
+    }
+
     [Fact]
     public void TryRemoveGear_EqualPiece_RemovesOne()
     {

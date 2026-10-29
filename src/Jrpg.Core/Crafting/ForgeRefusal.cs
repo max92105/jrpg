@@ -8,4 +8,15 @@ public enum ForgeRefusal
 
     /// <summary>A material of the yield wouldn't fit whole in its stack (decision 358).</summary>
     StackFull,
+
+    /// <summary>
+    /// The piece is Rare, the top a craft reaches, or Unique, which is never crafted (decisions 339, 351).
+    /// </summary>
+    HighestRarity,
+
+    /// <summary>The pool has no affix left for the piece's kind (decision 357).</summary>
+    NoAffixLeft,
+
+    /// <summary>The party owns fewer of a material than the action costs.</summary>
+    ShortOfMaterials,
 }

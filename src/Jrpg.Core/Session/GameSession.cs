@@ -28,8 +28,9 @@ public sealed class GameSession
         Equipment = new PartyEquipment(Inventory);
         FieldItems = new FieldItemUse(party, Inventory);
         EnemyTactics = new EnemyTactics(context.Random);
-        _dropRoll = DropRollFor(context.Catalog, context.Random);
-        Forge = new Forge(Inventory, context.Catalog.Items, context.Catalog.Rules.Crafting);
+        var gearRoll = GearRollFor(context.Catalog, context.Random);
+        _dropRoll = new DropRoll(context.Catalog.Items, gearRoll, context.Random);
+        Forge = new Forge(Inventory, context.Catalog.Items, context.Catalog.Rules.Crafting, gearRoll);
     }
 
     public PartyState Party { get; }
@@ -206,11 +207,11 @@ public sealed class GameSession
     }
 
     // The pool in id order: the catalog's dictionary keeps no file order, and a seed must always pick the same affixes.
-    // Internal so the loot simulation rolls exactly what the game does.
-    internal static DropRoll DropRollFor(ContentCatalog catalog, IRandom random)
+    // One roll for the drops and the Forge. Internal so the loot simulation rolls exactly what the game does.
+    internal static GearRoll GearRollFor(ContentCatalog catalog, IRandom random)
     {
         AffixDefinition[] pool = [.. catalog.Affixes.Values.OrderBy(affix => affix.Id, StringComparer.Ordinal)];
-        return new DropRoll(catalog.Items, new GearRoll(pool, catalog.Rules.Loot, random), random);
+        return new GearRoll(pool, catalog.Rules.Loot, random);
     }
 
     private static List<PartyMember> ActiveOrder(List<PartyMember> members, IReadOnlyList<string> activeIds) =>

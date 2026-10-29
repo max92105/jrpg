@@ -1,6 +1,8 @@
 using Jrpg.Core.Crafting;
 using Jrpg.Core.Items;
+using Jrpg.Core.Loot;
 using Jrpg.Core.Tests.Builders;
+using Jrpg.Core.Tests.Randomness;
 
 namespace Jrpg.Core.Tests.Crafting;
 
@@ -111,5 +113,5 @@ public sealed class ForgeSalvageTests
         [_scrap.Id] = _scrap,
         [_essence.Id] = _essence,
         [_sword.Id] = _sword,
-    }, _rules);
+    }, _rules, new GearRoll([], new LootRules(new Dictionary<Rarity, RarityRule>()), new FixedSequenceRandom()));
 }

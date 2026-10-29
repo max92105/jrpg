@@ -12,4 +12,10 @@ public sealed record CraftingRules
     /// </summary>
     public IReadOnlyDictionary<Rarity, IReadOnlyList<InventoryEntry>> Salvage { get; init; } =
         new Dictionary<Rarity, IReadOnlyList<InventoryEntry>>();
+
+    /// <summary>
+    /// What an upgrade costs, by the tier it reaches (Magic, Rare); a tier with no row is never reached.
+    /// </summary>
+    public IReadOnlyDictionary<Rarity, IReadOnlyList<InventoryEntry>> UpgradeCosts { get; init; } =
+        new Dictionary<Rarity, IReadOnlyList<InventoryEntry>>();
 }

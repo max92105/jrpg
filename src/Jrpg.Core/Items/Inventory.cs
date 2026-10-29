@@ -69,6 +69,23 @@ public sealed class Inventory
         return true;
     }
 
+    /// <summary>
+    /// Puts <paramref name="replacement"/> where the first owned piece equal to <paramref name="old"/> is, so it keeps
+    /// its row.
+    /// </summary>
+    /// <returns>False when no owned piece is equal to <paramref name="old"/>; nothing changes then.</returns>
+    public bool TryReplace(GearPiece old, GearPiece replacement)
+    {
+        var index = _gear.IndexOf(old);
+        if (index < 0)
+        {
+            return false;
+        }
+
+        _gear[index] = replacement;
+        return true;
+    }
+
     /// <summary>How many owned pieces have <paramref name="itemId"/> as their base, whatever they rolled.</summary>
     public int GearCountOf(string itemId) => _gear.Count(piece => piece.Base.Id == itemId);
 

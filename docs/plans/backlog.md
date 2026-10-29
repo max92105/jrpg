@@ -105,3 +105,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 ## From the forge plan (2026-10-29)
 
 - The "lists 'x' more than once" check is written in six Data validators (`NewGameValidator`, `ClassCatalogValidator`, `ResourceDefinitionValidator`, `SkillCatalogValidator`, `MapEventValidator`, `CraftingRulesValidator`), and `NewGame`'s `startingItems` repeats the crafting lists' entry checks (null, known item, 1..maxStack): one helper beside `RangeProblems` (M4 review).
+- `ForgeMotion` is the third copy of the "opening counted from the first drawn frame, closing from Cancel" fade, after `MenuMotion` and `TitleEntrance` (F1d): extract one frame-fade type in `Ui/`.

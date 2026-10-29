@@ -214,5 +214,6 @@
   "forge_title": "Forge",
   "forge_empty": "Nothing to work on.",
   "forge_materials": "Materials",
-  "forge_no_affixes": "No affixes"
+  "forge_no_affixes": "No affixes",
+  "forge_hint": "Choose a piece to work on."
 }

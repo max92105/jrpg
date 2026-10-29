@@ -27,12 +27,15 @@ internal static class MenuLayout
     private const int RightMargin = 40;
     private const int FooterGap = 32;
 
+    /// <summary>How tall the body is, from <see cref="BodyTop"/> to the gap above the footer.</summary>
+    public const int BodyHeight = VirtualScreen.Height - FooterHeight - FooterGap - BodyTop;
+
     /// <summary>The area the open page draws in, beside the tabs.</summary>
     /// <param name="tabsRight">The tabs' right edge in virtual pixels.</param>
     public static Rectangle PageArea(int tabsRight)
     {
         var left = tabsRight + TabsGap;
-        return new Rectangle(left, BodyTop, VirtualScreen.Width - RightMargin - left, VirtualScreen.Height - FooterHeight - FooterGap - BodyTop);
+        return new Rectangle(left, BodyTop, VirtualScreen.Width - RightMargin - left, BodyHeight);
     }
 
     /// <returns><paramref name="area"/>, at most <see cref="SingleColumnWidth"/> wide, its left edge kept.</returns>

@@ -5,9 +5,10 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-27-forge, slice F1c (SheetRowLook moved to Ui with its constants; ForgeRow with affix lines;
-MaterialStock/MaterialCount; ForgeView detail column; forge_materials, forge_no_affixes).
-Round 1. Verdict: Ready to commit. verify.ps1 all pass (2886 tests).
+Plan: 2026-10-27-forge, slice F1d (ForgeMotion fade, ForgeView menu frame, ForgeListView, ForgeDetailView,
+forge_hint). Round 1. Verdict: Fix the Criticals. verify.ps1 all pass (2886 tests).
 
-- Suggestion: ForgeView looks the rarity name up in Draw (keeps _messages only for it); put it in ForgeRow - open
-- Suggestion: Show_RolledPiece_RowHasItsAffixLines checks only "+4 "/"+2 " prefixes; pin AffixText.Of's whole line - open
+- Critical: ForgeDetailView.DrawPiece draws the rarity label at area.X + RowInset, the name's own x: they overlap - open
+- Suggestion: ForgeView FooterGap/BodyHeight copy MenuLayout's private PageArea arithmetic - open
+- Suggestion: docs/map.md ForgeScene still says "Cancel asks to close it, once"; now after the fade - open
+- Suggestion: ClosingFadeUpdates is a public const on ForgeSceneTests read by GameFlowForgeTests; move to a shared fixture - open

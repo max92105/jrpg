@@ -13,17 +13,23 @@ namespace Jrpg.Game.Tests.Crafting;
 [Collection(RepositoryScreenText.CollectionName)]
 public sealed class ForgeSceneTests
 {
-    // A second close request would make the flow pop what lies under the Forge.
+    /// <summary>Longer than the closing fade (0.12 s), so one run of them ends it.</summary>
+    public const int ClosingFadeUpdates = 8;
+
+    // Cancel starts the fade out; the flow hears the close once the fade has run, and once: a second request would make
+    // it pop what lies under the Forge.
     [Fact]
-    public void Update_Cancel_RequestsCloseOnce()
+    public void Update_Cancel_RequestsCloseOnceTheFadeHasRun()
     {
         var forge = NewForge(ForgeSessions.WithoutLoosePieces());
 
-        var first = forge.Update(TimeSpan.Zero, Pressing(GameButton.Cancel));
-        var second = forge.Update(TimeSpan.Zero, Pressing(GameButton.Cancel));
+        var atCancel = forge.Update(TimeSpan.Zero, Pressing(GameButton.Cancel));
+        var requests = Enumerable.Range(0, ClosingFadeUpdates).Select(_ => forge.Update(StartMapScenarios.OneUpdate, default)).ToList();
+        var afterwards = forge.Update(StartMapScenarios.OneUpdate, Pressing(GameButton.Cancel));
 
-        Assert.IsType<ForgeClosed>(first);
-        Assert.Null(second);
+        Assert.Null(atCancel);
+        Assert.Single(requests, request => request is ForgeClosed);
+        Assert.Null(afterwards);
     }
 
     [Fact]

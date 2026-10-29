@@ -75,5 +75,5 @@ public sealed class ForgeListTests
         Assert.Equal(messages.Text(MessageIds.RarityRare), list.Rows[0].RarityName);
     }
 
-    private static ForgeList NewList(Core.Session.GameSession session) => new(session.Inventory, RepositoryScreenText.Text.Messages);
+    private static ForgeList NewList(Core.Session.GameSession session) => new(session.Inventory, RepositoryScreenText.Text.Messages, RepositoryScreenText.Text.Fonts.FontAt(ForgeView.BodyPixels));
 }

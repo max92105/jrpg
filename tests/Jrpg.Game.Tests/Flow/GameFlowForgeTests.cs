@@ -7,7 +7,8 @@ using static Jrpg.Game.Tests.Flow.FlowStarts;
 
 namespace Jrpg.Game.Tests.Flow;
 
-// The chest opens the Forge, then says a line: the Forge opens and closes without the flow's fade (decision 370).
+// The chest opens the Forge, then says a line: the Forge opens and closes without the flow's fade, fading itself out
+// over the map first (decision 370).
 [Collection(RepositoryScreenText.CollectionName)]
 public sealed class GameFlowForgeTests
 {
@@ -21,6 +22,10 @@ public sealed class GameFlowForgeTests
         Assert.IsType<OpenForgeStep>(session.Exploration.CurrentEventStep);
 
         flow.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Cancel));
+        for (var update = 0; update < Crafting.ForgeSceneTests.ClosingFadeUpdates; update++)
+        {
+            flow.Update(StartMapScenarios.OneUpdate, default);
+        }
 
         Assert.IsType<DialogueStep>(session.Exploration.CurrentEventStep);
     }

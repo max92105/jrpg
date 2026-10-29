@@ -1,3 +1,4 @@
+using FontStashSharp;
 using Jrpg.Core.Items;
 using Jrpg.Game.Ui;
 
@@ -8,7 +9,10 @@ namespace Jrpg.Game.Crafting;
 /// cursor and the gliding highlight. Built when the items change, so drawing formats nothing. A row index is a gear
 /// index: the rows are <see cref="Inventory.Gear"/> as it stands.
 /// </summary>
-internal sealed class ForgeList(Inventory inventory, UiMessages messages)
+/// <param name="inventory">Whose pieces are listed.</param>
+/// <param name="messages">A piece's rarity and affix names.</param>
+/// <param name="bodyFont">Measures the names once, when the rows are built.</param>
+internal sealed class ForgeList(Inventory inventory, UiMessages messages, SpriteFontBase bodyFont)
 {
     private ForgeRow[] _rows = [];
 
@@ -41,7 +45,7 @@ internal sealed class ForgeList(Inventory inventory, UiMessages messages)
             return;
         }
 
-        Cursor = new ListCursor(_rows.Length, _ => true, ForgeView.VisibleRows);
+        Cursor = new ListCursor(_rows.Length, _ => true, ForgeListView.VisibleRows);
         Cursor.Select(selectedRow);
         Selection.JumpTo(Cursor);
     }
@@ -61,5 +65,5 @@ internal sealed class ForgeList(Inventory inventory, UiMessages messages)
         Selection.Follow(cursor);
     }
 
-    private ForgeRow RowOf(GearPiece piece) => new(piece, messages.Text(RarityNames.IdOf(piece.Rarity)), [.. piece.Affixes.Select(affix => AffixText.Of(affix, messages))]);
+    private ForgeRow RowOf(GearPiece piece) => new(piece, MeasuredText.Of(bodyFont, piece.Base.Name), messages.Text(RarityNames.IdOf(piece.Rarity)), [.. piece.Affixes.Select(affix => AffixText.Of(affix, messages))]);
 }

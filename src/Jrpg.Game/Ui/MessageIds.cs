@@ -591,4 +591,7 @@ internal static class MessageIds
 
     /// <summary>The Forge's line under a piece with no affix.</summary>
     public const string ForgeNoAffixes = "forge_no_affixes";
+
+    /// <summary>The Forge footer's line.</summary>
+    public const string ForgeHint = "forge_hint";
 }

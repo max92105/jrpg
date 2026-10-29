@@ -227,5 +227,8 @@
   "forge_refused_no_affixes": "Nothing to reroll",
   "forge_refused_short": "Short of materials",
   "forge_refused_stack_full": "A stack is full",
-  "forge_refused_no_yield": "Nothing to salvage"
+  "forge_refused_no_yield": "Nothing to salvage",
+  "forge_salvage_confirm": "Salvage the {name}?",
+  "forge_salvaged": "Salvaged: {materials}",
+  "forge_rolled_piece_name": "{rarity} {name}"
 }

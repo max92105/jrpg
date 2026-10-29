@@ -10,7 +10,7 @@ namespace Jrpg.Game.Crafting;
 /// Draws the Forge's detail column: the highlighted piece's name in its rarity's color beside its rarity, its affix
 /// lines under an Affixes band, every material owned under a Materials band (decisions 335, 370), and, while the
 /// actions are open, the Actions band with each action's materials, a refused one greyed with its reason under the
-/// rows. With no piece owned, the materials alone.
+/// rows, or what the last action gave in the reason line's place. With no piece owned, the materials alone.
 /// </summary>
 internal sealed class ForgeDetailView
 {
@@ -61,10 +61,14 @@ internal sealed class ForgeDetailView
             top = DrawPiece(batch, textures, row, place.Area with { Y = top }, opacity) + SectionGap;
         }
 
-        top = DrawMaterials(batch, textures, place, top, opacity);
+        top = DrawMaterials(batch, textures, place, top, opacity) + SectionGap;
         if (place.Actions is { } actions)
         {
-            DrawActions(batch, textures, actions, place.Area with { Y = top + SectionGap }, opacity);
+            DrawActions(batch, textures, actions, place.Area with { Y = top }, opacity);
+        }
+        else if (place.Notice is { } notice)
+        {
+            DrawLine(batch, notice, place.Area.X + RowInset, top, UiTheme.TextSecondary * opacity);
         }
     }
 
@@ -137,6 +141,9 @@ internal sealed class ForgeDetailView
     /// <param name="Row">The highlighted piece; null when none is owned.</param>
     /// <param name="Materials">Every material and how many are owned.</param>
     /// <param name="Actions">The actions open on the piece; null while the list has the cursor.</param>
+    /// <param name="Notice">
+    /// What the last action gave, shown while the actions are closed; null when nothing was done.
+    /// </param>
     /// <param name="Area">The column's area.</param>
-    public readonly record struct Place(ForgeRow? Row, IReadOnlyList<MaterialCount> Materials, ForgeActionChoice? Actions, Rectangle Area);
+    public readonly record struct Place(ForgeRow? Row, IReadOnlyList<MaterialCount> Materials, ForgeActionChoice? Actions, string? Notice, Rectangle Area);
 }

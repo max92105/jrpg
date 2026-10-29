@@ -57,7 +57,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 4: crafting at the Forge
 - [x] **F2a. Confirm on a piece opens its actions, with Core's costs and refusals** (Game + text, about 200 lines) → [slices/F2a.md](slices/F2a.md)
-- [ ] **F2b. Salvage, behind a prompt** (Game + text, about 130 lines) → [slices/F2b.md](slices/F2b.md)
+- [x] **F2b. Salvage, behind a prompt** (Game + text, about 130 lines) → [slices/F2b.md](slices/F2b.md)
 - [ ] **F2c. Upgrade and reroll carried out; the cursor stays on the changed piece** (Game + text, about 150 lines) → [slices/F2c.md](slices/F2c.md)
 
 ## Decisions

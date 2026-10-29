@@ -630,4 +630,13 @@ internal static class MessageIds
 
     /// <summary>Why salvage is refused: the piece's rarity has no yield (decision 339).</summary>
     public const string ForgeRefusedNoYield = "forge_refused_no_yield";
+
+    /// <summary>Placeholder <c>{name}</c>: the question before a salvage (decision 354).</summary>
+    public const string ForgeSalvageConfirm = "forge_salvage_confirm";
+
+    /// <summary>Placeholder <c>{materials}</c>: what a salvage gave.</summary>
+    public const string ForgeSalvaged = "forge_salvaged";
+
+    /// <summary>Placeholders <c>{rarity}</c> and <c>{name}</c>: a rolled piece named with its rarity first.</summary>
+    public const string ForgeRolledPieceName = "forge_rolled_piece_name";
 }

@@ -9,8 +9,8 @@ namespace Jrpg.Game.Crafting;
 
 /// <summary>
 /// Draws the Forge screen in the menu's frame: the map dimmed behind it, the header bar with the title, the list column
-/// at the left and the detail column at the right, and the footer with its hint. Everything fades with the Forge
-/// (decision 370).
+/// at the left and the detail column at the right, the footer with its hint, and the salvage prompt over it all.
+/// Everything fades with the Forge (decision 370).
 /// </summary>
 internal sealed class ForgeView
 {
@@ -36,6 +36,7 @@ internal sealed class ForgeView
 
     private readonly ForgeListView _list;
     private readonly ForgeDetailView _detail;
+    private readonly ConfirmPromptView _prompt;
     private readonly SpriteFontBase _titleFont;
     private readonly SpriteFontBase _bodyFont;
     private readonly string _title;
@@ -50,6 +51,7 @@ internal sealed class ForgeView
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _list = new ForgeListView(text, ui, _bodyFont);
         _detail = new ForgeDetailView(text, ui, look, _bodyFont);
+        _prompt = new ConfirmPromptView(text, ui);
         _title = text.Messages.Text(MessageIds.ForgeTitle);
         _hint = text.Messages.Text(MessageIds.ForgeHint);
     }
@@ -67,12 +69,18 @@ internal sealed class ForgeView
         batch.DrawString(_bodyFont, _hint, new Vector2(FooterTextInset, FooterBar.TextTop(MenuLayout.FooterHeight, _bodyFont.LineHeight)), UiTheme.TextSecondary * opacity);
 
         _list.Draw(batch, textures, place.List, _listArea, opacity);
-        _detail.Draw(batch, textures, new ForgeDetailView.Place(place.List.SelectedRow, place.Materials.Rows, place.Actions, _detailArea), opacity);
+        _detail.Draw(batch, textures, new ForgeDetailView.Place(place.List.SelectedRow, place.Materials.Rows, place.Actions, place.Notice, _detailArea), opacity);
+        if (place.Prompt is { } prompt)
+        {
+            _prompt.Draw(batch, textures, prompt, opacity);
+        }
     }
 
     /// <summary>What the Forge shows this frame.</summary>
     /// <param name="List">The owned pieces and the cursor on them.</param>
     /// <param name="Materials">Every material and how many are owned.</param>
     /// <param name="Actions">The actions open on the highlighted piece; null while the list has the cursor.</param>
-    public readonly record struct Place(ForgeList List, MaterialStock Materials, ForgeActionChoice? Actions);
+    /// <param name="Notice">What the last action gave; null when nothing was done since the cursor moved.</param>
+    /// <param name="Prompt">The question before a salvage; null while nothing is asked.</param>
+    public readonly record struct Place(ForgeList List, MaterialStock Materials, ForgeActionChoice? Actions, string? Notice, ConfirmPrompt? Prompt);
 }

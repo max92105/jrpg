@@ -80,6 +80,9 @@ internal static class StartMapScenarios
     /// <summary>Just below the villager at (12, 4), whose interact event talks, facing it.</summary>
     public static ContentCatalog BelowVillager { get; } = StartingAt(new Point2D(12.5, 5.6), Facing.Up);
 
+    /// <summary>Just below the forge master at (25, 14), beside the crossroads, facing them (decision 372).</summary>
+    public static ContentCatalog BelowForgeMaster { get; } = StartingAt(new Point2D(25.5, 15.6), Facing.Up);
+
     /// <summary>Just below the Innkeeper at (30, 26), the end of the recruit row, facing it.</summary>
     public static ContentCatalog BelowInnkeeper { get; } = StartingAt(new Point2D(30.5, 27.6), Facing.Up);
 

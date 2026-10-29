@@ -48,7 +48,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **F1a. A Forge screen that opens over the map and Cancel closes** (Game + text, raw 90, about 145 lines at 1.6x) → [slices/F1a.md](slices/F1a.md)
 - [x] **E1. The `openForge` event step opens the Forge and waits for it** (Core + Data + Game, about 210 lines) → [slices/E1.md](slices/E1.md)
 - [x] **E2. The editor shows and adds the `openForge` step; the Forge master preset** (Editor, about 110 lines) → [slices/E2.md](slices/E2.md)
-- [ ] **N1. A forge master stands on the start map** (content + tests, about 70 lines) → [slices/N1.md](slices/N1.md)
+- [x] **N1. A forge master stands on the start map** (content + tests, about 70 lines) → [slices/N1.md](slices/N1.md)
 
 ### Phase 3: what the Forge shows
 - [ ] **F1b. The Forge lists the owned pieces** (Game + text, about 165 lines) → [slices/F1b.md](slices/F1b.md)

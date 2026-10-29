@@ -2,11 +2,13 @@ using Jrpg.Core.Events;
 using Jrpg.Game.Input;
 using Jrpg.Game.Tests.Exploration;
 using Jrpg.Game.Tests.Input;
+using Jrpg.Game.Tests.Ui;
 using static Jrpg.Game.Tests.Flow.FlowStarts;
 
 namespace Jrpg.Game.Tests.Flow;
 
 // The chest opens the Forge, then says a line: the Forge opens and closes without the flow's fade (decision 370).
+[Collection(RepositoryScreenText.CollectionName)]
 public sealed class GameFlowForgeTests
 {
     [Fact]

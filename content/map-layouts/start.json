@@ -4877,6 +4877,39 @@
       ]
     },
     {
+      "uid": "forge_master",
+      "objectId": "villager",
+      "position": {
+        "x": 25,
+        "y": 14
+      },
+      "z": 1,
+      "events": [
+        {
+          "id": "forge_master_0",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "Bring me your gear, and the scrap to work it."
+                ],
+                "speaker": "Forge master",
+                "portraitFile": null
+              }
+            },
+            {
+              "type": "openForge"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "uid": "recruit_ragnir",
       "objectId": "villager",
       "position": {

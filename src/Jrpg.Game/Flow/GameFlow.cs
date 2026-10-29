@@ -152,7 +152,7 @@ internal sealed class GameFlow : IScene
                 _menus.Close();
                 break;
             case ForgeRequested:
-                _forges.Open();
+                _forges.Open(Session ?? throw new InvalidOperationException("The Forge opened with no game started."));
                 break;
             case ForgeClosed:
                 _forges.Close(Session ?? throw new InvalidOperationException("The Forge closed with no game started."));

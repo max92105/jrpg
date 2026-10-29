@@ -211,5 +211,6 @@
   "menu_hint_load": "Choose a file to load.",
   "equipment_worn_row": "{item} ({member})",
   "equipment_take_hint": "Taking it leaves {member} without it.",
-  "forge_title": "Forge"
+  "forge_title": "Forge",
+  "forge_empty": "Nothing to work on."
 }

@@ -18,3 +18,4 @@ Part of [the forge plan](../README.md). Decisions 369 (owned pieces only), 362 (
     - `ForgeSceneTests: Update_Down_MovesTheList` (the scene's routing)
   - **Call sites:** `CreateForge()` (1, `ForgeTransitions`), `ForgeTransitions.Open()` (1, `GameFlow`), `new ForgeScene(` in `ForgeSceneTests` (2).
   - **Verify by hand:** at the forge master: the owned pieces listed, a Magic piece in blue; a worn piece absent (leave, take one off on the Equipment page, talk again: it appears); Down and Up glide the highlight.
+- **Done, with deviations:** `ForgeScene` takes the shared textures too (`UiTextures`, for the icons and the selected row), so `SceneFactory.CreateForge` passes `_ui`. The empty line sits where the first row would. The tests start from a session with its loose starting pieces removed: a new game owns plain bronze swords, equal by value to a plain piece a test adds. Not captured (unattended loop): hand check yours. Tests 2879 → 2883.

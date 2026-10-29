@@ -9,7 +9,8 @@ namespace Jrpg.Game.Flow;
 /// </summary>
 internal sealed class ForgeTransitions(SceneStack scenes, SceneFactory factory)
 {
-    public void Open() => scenes.Push(factory.CreateForge());
+    /// <param name="session">The playthrough whose owned pieces the Forge lists.</param>
+    public void Open(GameSession session) => scenes.Push(factory.CreateForge(session));
 
     /// <param name="session">The playthrough whose event waits on the Forge step.</param>
     public void Close(GameSession session)

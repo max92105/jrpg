@@ -582,4 +582,7 @@ internal static class MessageIds
 
     /// <summary>The Forge screen's title.</summary>
     public const string ForgeTitle = "forge_title";
+
+    /// <summary>The Forge's line while the party owns no piece to work on.</summary>
+    public const string ForgeEmpty = "forge_empty";
 }

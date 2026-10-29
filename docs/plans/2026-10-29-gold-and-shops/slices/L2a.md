@@ -1,21 +1,18 @@
-# L2a. The Shop's frame and list column
+# L2a. The Shop's detail column
 
-Part of [the gold and shops plan](../README.md). Decisions 252, 269 (a page's dark column), 370. References: `docs/ui-reference/shop-sell.webp` (header with the shop name top left and the gold top right, the list with NAME / OWNED / PRICE column titles, footer hint, the map dimmed behind), `menu-equipment.webp`. After L1. The forge plan's F1d is the model. Design: [design.md](../design.md), "Tunables" (fade).
+Part of [the gold and shops plan](../README.md). Decisions 335 (section bands), 362, 385 (a stock piece's affixes). References: `docs/ui-reference/menu-inventory-description.webp` (the description under a selected item), `menu-equipment.webp` (a detail column). After B3. Design: [design.md](../design.md), "Risks" (the detail column's height).
 
-- **L2a. The Shop's frame and list column: header with gold, tabs, column titles, footer, fade** (Game, raw 125, about 200 lines at 1.6x: adds a view type)
-  - **Goal:** the Shop in the game's look: the map dimmed behind it; a header bar with the shop's name at top left and the party's gold at top right; Buy and Sell as two pointed tabs above the list (`Ui/PointedBarShape`, as the victory's Items step; the shown one bright); the list in a page column with column titles (Item, Owned, Price); a footer with its hint. It fades in and out through `Ui/OverlayFade` (the Forge's times), never through black.
+- **L2a. The detail column: name, description, owned count, a piece's affixes** (Game + text, raw 110, about 175 lines at 1.6x: adds a view type)
+  - **Goal:** beside the list, the highlighted row's name (a piece in its rarity's color), its description, "Owned 3" (the stacks' count or the pieces of its base) and, for a rolled piece on either tab, its affix lines under an Affixes band (`Ui/AffixText`, as the Forge's detail column). Room under them for L2b's preview and T1's reason or notice line.
   - **New types:**
-    - `Game/Trade/ShopListView`: draws the list column: the page column, the tabs, the column titles, the shown tab's rows, the gliding selection, the empty line.
+    - `Game/Trade/ShopDetailView`: draws the detail column: name, description wrapped once when the row changes, the owned line, the Affixes band and lines for a rolled piece, the reason or notice line (empty until T1).
   - **Changes:**
-    - `Trade/ShopView`: the scrim, header (name, gold measured when it changes), footer, and `ShopListView` at its place (below); the opacity from the scene.
-    - `Trade/ShopScene`: an `OverlayFade`; Cancel starts the fade out, and `ShopClosed` comes once it has run, once.
-    - Text `shop_hint` (footer: "Left/Right: Buy or Sell · Confirm: trade · Cancel: leave"), `shop_column_item`, `shop_column_owned`, `shop_column_price`; `MessageIds`.
-  - **Pixel arithmetic** (1920 x 1080, the menu's frame as the Forge reads it: header 88 (`MenuHeader.Height`), body from 128, footer 72 from 1008, the body 848 tall to 976 (`MenuLayout.BodyHeight`)):
-    - List column, x 40 to 1000: tabs 48 + gap 12; column titles 36; 13 visible rows x 52 (the Inventory's row) = 676. Total 772 ≤ 848: 76 px spare; more rows scroll (`ListCursor`'s window). Columns: name from 96 (after a 40 px icon), owned right-aligned at 760, price right-aligned at 960 (the widest, "9999999 G" at the body size, fits 180 px; measured in the slice).
-    - Detail column, x 1040 to 1880: L2b.
+    - `Trade/StockRow` and `Trade/SaleRow`: the description and affix lines formatted once.
+    - `Trade/ShopView`: places `ShopDetailView` in the detail column.
+    - Text `shop_owned` ("Owned {count}"); `MessageIds`.
+  - **Pixel arithmetic** (the detail column, x 1040 to 1880, 840 wide, 128 to 976: 848): name row 56; description up to 3 lines x 32 = 96 (wrapped at 840 when the row changes; the longest content description measured in the slice with the real font); owned line 40; Affixes band 46 + 3 lines x 40 = 166; reason or notice line 40; three 16 px gaps 48. Total 446, leaving 402 for L2b's preview (its arithmetic).
   - **Tests:**
-    - `ShopSceneTests: Update_Cancel_RequestsCloseOnceTheFadeHasRun` (replaces `Update_Cancel_RequestsCloseOnce`)
-    - Existing: `GameFlowShopTests` steps through the closing fade (its updates change, not its assertion).
-    - Draw-only: before and after captures (F12) instead of invented tests.
-  - **Watch:** one selection look and the menu's bands; ask before departing from both the reference and the menu. The gold in the header follows a purchase (T1) without remeasuring every frame.
-  - **Verify by hand:** at the shopkeeper, capture with F12 and compare with `shop-sell.webp`: the dimmed map, the header with the name and gold, the tabs, the columns, the footer; the Shop fades in and out over the map.
+    - `StockListTests: Rows_Item_CarriesItsDescription`
+    - `SaleListTests: Rows_RolledPiece_CarriesItsAffixLines`
+    - Draw-only: captures.
+  - **Verify by hand:** at the shopkeeper: Down through the stock shows each description and owned count; the rolled sword shows its affix lines under the band; on Sell, a Magic piece shows its affix.

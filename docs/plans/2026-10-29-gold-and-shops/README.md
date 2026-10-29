@@ -1,38 +1,39 @@
 # Gold, shops and the inn
-Status: draft
+Status: approved
 
 Open question 222 (paying for rest, from the class mechanics plan) answered as a feature on 2026-10-29: the developer wants gold, shops and a priced inn. Follows [the forge plan](../done/2026-10-27-forge/README.md), whose Forge screen (opened by an `openForge` step from a forge master NPC) is the model for the Shop screen a shopkeeper opens.
 
-Numbers: local only. Open questions are Q1, Q2... below; decisions this draft takes are listed unnumbered under "Decisions (proposed, numbered at approval)". The real numbers come at approval.
+- Numbers: decisions 374-385, ADR 0031. Runs before [the quests plan](../2026-10-29-quests/README.md) (decision 374): saves are format 6 here, 7 there.
+- Approved on 2026-10-29 with the developer's answers (374-385) and the devil's advocate's edits: the inn moves after trading so the shop shows early; no `ExplorationState` split (I1's three lines keep it at 299; the quests plan splits it); the Shop's frame and fade come from the Forge from its first slice; one transitions class and one close request for the screens an event opens; new reference sets as `init` members; CA1502 budgets named in the slices; both bounds tested for every number; no `PurseFull` refusal (gold past the cap is lost, one rule).
 
 ## Goal
-1. **Gold**: the party owns gold (`Party/Purse`), kept by saves (format 6, ADR 0022); defeated enemies drop it (a range on their drop table, rolled after the items) and the victory screen shows it; the menu header shows what is owned; a new game starts with some.
-2. **The inn**: the existing `RestStep` gains an optional price; a priced rest asks "Rest for 20 G?", Yes pays and rests, and without the gold a message says so and nothing changes.
-3. **Shops**: prices on items (`items.json` `price`), shop inventories in `shops.json` (a name and the item ids it sells), the sell share in `rules.json` `trade`; Core's `Shop` (buying) and `ItemSales` (selling) quote every action with its refusal (short of gold, stack full, not for sale, purse full), as the Forge's quotes do.
-4. **At a shopkeeper**: an `openShop` event step names a shop and opens the Shop screen over the map (editor support, a Shopkeeper preset, one placeholder shopkeeper on the start map); Buy and Sell tabs in the game's look (`docs/ui-reference/shop-sell.webp`), a refused row greyed with its reason.
+1. **Gold**: the party owns gold (`Party/Purse`), kept by saves (format 6, ADR 0022); each defeated enemy drops a range of it (`enemies.json`, decision 376), shown on the victory screen; the menu header shows what is owned, as a number with a coin icon (decision 380); a new game starts with some.
+2. **Shops**: prices on items (`items.json` `price`), a gold value on each affix (`affixes.json` `goldValue`, decision 375), shop inventories in `shops.json`, the sell share in `rules.json` `trade`. A shop's gear is rolled once into pieces like drops and kept, saved, and rerolled once the leader has gained a level (decision 385). Core's `Shop` (buying) and `ItemSales` (selling) quote every trade with its refusal, as the Forge's quotes do.
+3. **At a shopkeeper**: an `openShop` event step names a shop and opens the Shop screen over the map (editor support, a Shopkeeper preset, one placeholder shopkeeper on the start map): Buy and Sell tabs, category tabs (decision 384), a quantity picker (decision 377), the detail column with a member's stat preview (decision 383), in the game's look (`docs/ui-reference/shop-sell.webp`).
+4. **The inn**: the existing `RestStep` gains an optional price; a priced rest always asks with its price; Yes pays and rests, and without the gold the refusal shows and nothing changes (decision 382).
 
 ## Order, and why
-1. **Phase 1: gold (G1, G2, G3).** The purse and its save shape first (the loot retro: the save shape lands once, before the slice that makes the data appear in play), then gold from battles and a new game, then where the player sees it.
-2. **Phase 2: the inn (X1, I1, I2a, I2b, I3).** The smallest gold sink, and it only needs Phase 1. `ExplorationState` (296 lines) is split first, as the backlog asks; the Core rule, then the Game's question (after moving the rest's showing out of the 258-line `EventPresenter`), then the editor and the innkeeper's price (content with a new field only once the editor keeps it).
-3. **Phase 3: shops in Core (S1, S2, S3).** Buying, selling, then the content and its checks.
-4. **Phase 4: the shop on the map (H1, E1, E2, N1).** A bare Shop screen, the step that opens it, the editor support, then the shopkeeper: from N1 on every shop slice is checked by hand (the forge review's blocker 4).
-5. **Phase 5: what the Shop shows (B1, B2, L1, L2a, L2b).** The Buy list, the Sell list and the tabs, the shared overlay fade, then the look.
-6. **Phase 6: trading (T1, T2).** Buying, then selling (a piece behind a prompt).
+1. **Phase 1: gold (G1-G4).** The purse, then the format-6 save shape for everything this plan saves (gold and the shops' stocks) before either appears in play (the loot retro), then gold from battles and a new game, then where the player sees it.
+2. **Phase 2: shops in Core (S1-S6).** Buying stacks, then what a rolled piece is worth and buying one, selling, the content and its checks, the rolled stocks, then their saving and repair.
+3. **Phase 3: the shop on the map (L1, H1, E1, E2, N1).** What the Forge and the Shop share moves to `Ui/` and `Scenes/` first; the Shop screen in the menu's frame from its first slice; the step that opens it, the editor support, then the shopkeeper: from N1 on every shop slice is checked by hand (the forge review's blocker 4).
+4. **Phase 4: what the Shop shows (B1, B2, B3, L2a, L2b).** The Buy list, the tabs and the Sell list, the categories, the detail column, the stat preview.
+5. **Phase 5: trading (T1, T2, T3).** Buying a piece, buying stacks with the quantity picker, selling.
+6. **Phase 6: the inn (I1, I2a, I2b, I3).** Last, so the shop shows early (the review); it reuses T3's priced prompt.
 
 ## Guiding rules
-- **Mechanisms in code, numbers in content** (ADR 0030's pattern): prices, the sell share, gold ranges, starting gold and the inn's price are content; every number is a placeholder (design.md, "Tunables").
-- **Every "can it be done" rule is Core's** (the forge review): `Trade/Shop` and `Trade/ItemSales` return a `TradeQuote` (gold and `TradeRefusal?`) per action; `Exploration/InnStay` says what a rest costs and whether it can be paid. The screens format them and never decide.
-- **A refusal changes nothing**: every check runs before gold or an item moves.
-- **Pure presenter + thin view** (`docs/map.md`); one selection look (decision 252), every list through `SelectionMotion`; shared pieces in `Ui/` (gold text, the overlay fade, a rolled piece's name), never `Trade` → `Crafting` or `Menus`.
+- **Mechanisms in code, numbers in content** (ADR 0030's pattern): prices, affix values, the sell share, gold ranges, starting gold and the inn's price are content; every number is a placeholder (design.md, "Tunables"; decision 381).
+- **Every "can it be done" rule is Core's** (the forge review): `Shop` and `ItemSales` return a `TradeQuote` per trade and say the most that can be bought or sold (the picker's limit); `InnStay` says whether a rest can be paid. The screens format them and never decide.
+- **A refusal changes nothing**: every check runs before gold, an item or a stock piece moves. **One overflow rule**: gold past `Purse.MaxGold` is lost, from a battle or a sale.
+- **Pure presenter + thin view** (`docs/map.md`); one selection look (decision 252), every list through `SelectionMotion`. `Trade` reads `Menus` for the menu's frame (`MenuHeader.Height`, `MenuLayout`), the categories (`CategoryRail`, `InventoryFilter`) and the comparison (`EquipmentComparison`, `EquipmentChangesView`), as `Crafting` reads the frame; `Menus` never reads `Trade`. What the Forge and the Shop both draw moves to `Ui/` (design.md, "Structure").
 - **Slice sizes:** under about 250 lines, tests at about 13 lines each plus the existing tests a change breaks. A Game slice that adds a view type gives its raw estimate and the 1.6x; Editor slices aim at about 200 lines.
-- **Files near 300 lines:** split first or add sibling test files. Split in this plan: `ExplorationState` (296, X1), `EventPresenter` (258, I2a). New test files beside `EventPresenterTests` (305), `GameFlowTests` (321), `EventRunTests` (269), `ContentCatalogLoaderTests` (272), `GameSessionSaveTests` (270), `EventStepViewModelTests` (260), `EventListViewModelTests` (258), `ItemCatalogValidatorTests` (248). Watched: `VictoryScreenView` 263, `GameFlow` 254, `GameSession` 245, `SaveGameRepair` 221, `ForgeScene` 233, `Ui/MessageIds` 648 (constants; backlog says it can wait).
-- **Save format change:** one, in G1 (format 5 → 6, gold); an older save is refused (ADR 0022). **No NuGet package.**
+- **Files near 300 lines:** new test files beside `EventPresenterTests` (305), `GameFlowTests` (321), `EventRunTests` (269), `ContentCatalogLoaderTests` (272), `GameSessionSaveTests` (270), `EventStepViewModelTests` (260), `EventListViewModelTests` (258), `ItemCatalogValidatorTests` (248). Watched: `ExplorationState` 296 (I1 takes it to 299, no more), `EventPresenter` 258 (I2a moves the rest out first), `VictoryScreenView` 263 (G4 adds about 8; the backlog's `VictoryCardsView` split stays in the backlog), `GameFlow` 254, `GameSession` 245 (stocks live in `Session/ShopStocks`), `SaveGameRepair` 221, `ForgeScene` 233, `Ui/MessageIds` 648 (constants; the backlog says it can wait).
+- **Save format:** one change, in G2 (format 5 → 6: gold and the shops' stocks); an older save is refused (ADR 0022). **No NuGet package.**
 
 ## Out of scope (follow-ups)
-- **The party's stat preview in the shop** (the reference's right column, Q9): the detail column shows the item's description, owned count and a piece's affixes.
-- **Category tabs in the shop** (the reference's All / Items / Weapons rail, Q10) and a **quantity picker** (Q3).
-- **Selling worn gear**: only owned items and pieces are sold, as the Forge works owned pieces only (decision 369).
+- **Editing shops in the editor**: a new shop, its stock and prices are edited by hand in `shops.json` and `items.json`; the editor only picks a shop id for an `openShop` step.
+- **Selling worn gear**: only owned stacks and pieces are sold, as the Forge works owned pieces only (decision 369).
 - **Gold in the save list** (`Saving/SaveSlotList`) and **gold from map events** (a `giveGold` step): no caller yet.
+- **The whole party's preview at once** (the reference shows every member): one member at a time here (decision 383).
 - **Unique items** in shops (decision 339): no Unique exists.
 - **Story and maps**: the developer places the NPCs; N1's shopkeeper is a placeholder he moves.
 
@@ -41,70 +42,74 @@ Numbers: local only. Open questions are Q1, Q2... below; decisions this draft ta
 One line per slice; each slice's goal, types, tests and hand checks are in its file under `slices/`. Tick the box here when a slice is done, and write its deviations in the slice file. Tunables, design overview and risks: [design.md](design.md).
 
 ### Phase 1: gold
-- [ ] **G1. The party's purse, kept by saves (format 6)** (Core + Data, about 210 lines) → [slices/G1.md](slices/G1.md)
-- [ ] **ADR: gold and trade** (where gold drops are defined, prices on items with shop listings, the sell share; from the developer's answers to Q1, Q2, Q4), before G2
-- [ ] **G2. Enemies drop gold into the purse; a new game starts with some** (Core + Data + content, about 235 lines) → [slices/G2.md](slices/G2.md)
-- [ ] **G3. Gold on the victory screen and in the menu header** (Game + text, about 130 lines; adds no view type) → [slices/G3.md](slices/G3.md)
+- [ ] **G1. The party's purse** (Core, about 130 lines) → [slices/G1.md](slices/G1.md)
+- [ ] **G2. The format-6 save: gold and the shops' stocks** (Core + Data, about 175 lines) → [slices/G2.md](slices/G2.md)
+- [ ] **ADR 0031: gold and trade** (gold per enemy, prices on items and affixes, shops listing ids, the rolled and kept stock, the sell share): write it from the README's entries (decisions 375, 376, 378, 385), before G3
+- [ ] **G3. Each enemy drops gold; a new game starts with some** (Core + Data + content, about 215 lines) → [slices/G3.md](slices/G3.md)
+- [ ] **G4. Gold with its coin icon on the victory screen and in the menu header** (Game + art + text, raw 105, about 170 lines at 1.6x) → [slices/G4.md](slices/G4.md)
 
-### Phase 2: the inn
-- [ ] **X1. Split `ExplorationState`: starting events into `EventStarter`** (Core refactor, about 120 lines moved, tests unchanged) → [slices/X1.md](slices/X1.md)
-- [ ] **I1. A priced rest waits for payment: `InnStay`** (Core + Data, about 190 lines) → [slices/I1.md](slices/I1.md)
-- [ ] **I2a. Move the rest's showing into `RestPlayback`** (Game refactor, about 110 lines, tests unchanged) → [slices/I2a.md](slices/I2a.md)
-- [ ] **I2b. The inn asks with its price; Yes pays and rests; short of gold, a message says so** (Game + text, about 220 lines; draws an existing view) → [slices/I2b.md](slices/I2b.md)
-- [ ] **I3. The editor's rest step takes a price; the innkeeper charges** (Editor + content, about 150 lines) → [slices/I3.md](slices/I3.md)
+### Phase 2: shops in Core
+- [ ] **S1. Buying stacks in Core: prices, `Shop`, quotes with a quantity** (Core, about 220 lines) → [slices/S1.md](slices/S1.md)
+- [ ] **S2. What a rolled piece is worth; buying a stock piece** (Core + Data + content, about 225 lines) → [slices/S2.md](slices/S2.md)
+- [ ] **S3. Selling in Core: the sell share, `ItemSales`** (Core, about 235 lines) → [slices/S3.md](slices/S3.md)
+- [ ] **S4. Shops, prices and the sell share in content, checked by the loader** (Core + Data + content, about 240 lines) → [slices/S4.md](slices/S4.md)
+- [ ] **S5. The shops' stocks: rolled on first opening, rerolled after a leader level** (Core, about 160 lines) → [slices/S5.md](slices/S5.md)
+- [ ] **S6. The shops' stocks saved, restored and repaired** (Core + Data, about 180 lines) → [slices/S6.md](slices/S6.md)
 
-### Phase 3: shops in Core
-- [ ] **S1. Buying in Core: prices on items, `Shop`, its quotes and refusals** (Core, about 210 lines) → [slices/S1.md](slices/S1.md)
-- [ ] **S2. Selling in Core: the sell share, `ItemSales`** (Core, about 230 lines) → [slices/S2.md](slices/S2.md)
-- [ ] **S3. Shops, prices and the sell share in content, checked by the loader** (Core + Data + content, about 245 lines) → [slices/S3.md](slices/S3.md)
-
-### Phase 4: the shop on the map
-- [ ] **H1. A Shop screen that opens over the map and Cancel closes** (Game + text, raw 90, about 145 lines at 1.6x) → [slices/H1.md](slices/H1.md)
-- [ ] **E1. The `openShop` event step opens the named shop and waits for it** (Core + Data + Game, about 240 lines) → [slices/E1.md](slices/E1.md)
+### Phase 3: the shop on the map
+- [ ] **L1. One overlay fade and one close request for the screens an event opens** (Game refactor, about 120 lines) → [slices/L1.md](slices/L1.md)
+- [ ] **H1. A Shop screen in the menu's frame that fades in over the map and Cancel closes** (Game + text, raw 120, about 190 lines at 1.6x) → [slices/H1.md](slices/H1.md)
+- [ ] **E1. The `openShop` event step opens the named shop and waits for it** (Core + Data + Game, about 230 lines) → [slices/E1.md](slices/E1.md)
 - [ ] **E2. The editor shows and adds the `openShop` step; the Shopkeeper preset** (Editor, about 190 lines) → [slices/E2.md](slices/E2.md)
 - [ ] **N1. A shopkeeper stands on the start map** (content + tests, about 70 lines) → [slices/N1.md](slices/N1.md)
 
-### Phase 5: what the Shop shows
-- [ ] **B1. The Buy tab lists the stock with prices and owned counts** (Game + text, about 175 lines) → [slices/B1.md](slices/B1.md)
-- [ ] **B2. The Sell tab lists what can be sold; Left and Right switch tabs** (Game + text, about 210 lines) → [slices/B2.md](slices/B2.md)
-- [ ] **L1. One overlay fade in `Ui/` for the Forge and the Shop** (Game refactor, about 110 lines) → [slices/L1.md](slices/L1.md)
-- [ ] **L2a. The Shop's frame and list column: header with gold, tabs, column titles, footer, fade** (Game, raw 125, about 200 lines at 1.6x) → [slices/L2a.md](slices/L2a.md)
-- [ ] **L2b. The Shop's detail column: the highlighted item's description, owned count, a piece's affixes** (Game, raw 95, about 150 lines at 1.6x) → [slices/L2b.md](slices/L2b.md)
+### Phase 4: what the Shop shows
+- [ ] **B1. The Buy list: the stock's stacks and pieces with owned counts and prices** (Game, raw 150, about 240 lines at 1.6x) → [slices/B1.md](slices/B1.md)
+- [ ] **B2. The Buy and Sell tabs; the Sell list** (Game + text, about 230 lines; extends `ShopListView`) → [slices/B2.md](slices/B2.md)
+- [ ] **B3. Category tabs on both lists, and the column titles** (Game + text, about 190 lines) → [slices/B3.md](slices/B3.md)
+- [ ] **L2a. The detail column: name, description, owned count, a piece's affixes** (Game + text, raw 110, about 175 lines at 1.6x) → [slices/L2a.md](slices/L2a.md)
+- [ ] **L2b. A member's stat preview for gear; Left and Right switch the member** (Game + text, about 200 lines; reuses `EquipmentChangesView`) → [slices/L2b.md](slices/L2b.md)
 
-### Phase 6: trading
-- [ ] **T1. Buying at the Shop: Confirm buys one; a refused row greyed with its reason** (Game + text, about 190 lines) → [slices/T1.md](slices/T1.md)
-- [ ] **T2. Selling at the Shop: Confirm sells one; a piece asks first** (Game + text, about 210 lines) → [slices/T2.md](slices/T2.md)
+### Phase 5: trading
+- [ ] **T1. Buying a stock piece; a refused row's reason; the notice** (Game + text, about 190 lines) → [slices/T1.md](slices/T1.md)
+- [ ] **T2. The quantity picker; buying stacks with it** (Game + text, about 220 lines; drawn by `ShopDetailView`) → [slices/T2.md](slices/T2.md)
+- [ ] **T3. Selling: stacks with the picker, a piece behind a priced prompt** (Game + text, about 235 lines) → [slices/T3.md](slices/T3.md)
 
-## Decisions (proposed, numbered at approval)
-From earlier plans: 103 (gold will exist; the victory view takes it as an addition), 252 (one selection look), 257 (the inn's fade), 339 (Unique reserved), 353 (an NPC opens a screen through an event step), 358 (nothing is destroyed for less than it yields), 369 (owned pieces only), 370 (a screen over the map fades itself in, refused actions greyed with their reason).
+### Phase 6: the inn
+- [ ] **I1. A priced rest waits for payment: `InnStay`** (Core + Data, about 190 lines) → [slices/I1.md](slices/I1.md)
+- [ ] **I2a. Move the rest's showing into `RestPlayback`** (Game refactor, about 110 lines, tests unchanged) → [slices/I2a.md](slices/I2a.md)
+- [ ] **I2b. The inn asks with its price; Yes pays and rests; short of gold, the refusal shows** (Game + text, about 220 lines) → [slices/I2b.md](slices/I2b.md)
+- [ ] **I3. The editor's rest step takes a price; the innkeeper charges** (Editor + content, about 150 lines) → [slices/I3.md](slices/I3.md)
 
-Planner's picks, each marked in its slice; the developer confirms or changes them at approval:
-- **Gold is the party's**: a `Party/Purse` on `PartyState`, never negative, at most `Purse.MaxGold` (9,999,999, a fixed technical limit like a stack's cap: seven digits fit every gold field). Battle gold past the cap is lost, as drops past a stack's limit are; a sale that would pass it is refused (decision 358's spirit).
-- **Gold drops are a range on the drop table** (`drop-tables.json` `gold: { min, max }`), one roll per defeated enemy whose table has one, after every item draw, so today's seeded drops don't change (Q2).
-- **A price is the item's** (`items.json` `price`, optional): one price whatever the shop; an item without one is never bought or sold. A shop lists item ids (`shops.json`); every listed item must have a price (checked at load).
-- **Selling pays `price × sellPercent / 100`, rounded down** (`rules.json` `trade.sellPercent`, placeholder 50); a sale worth 0 is refused as not for sale. A rolled piece sells as a plain one (Q1).
-- **One item per Confirm**, buying or selling (Q3). Buying gear gives a plain Common piece (Q11).
-- **Refusal order** (shown greyed with the first reason): buying `StackFull` then `ShortOfGold` (a full stack can't take it whatever the gold); selling `NotForSale` then `PurseFull`.
-- **Selling a gear piece asks first** ("Sell the Magic Bronze Sword for 25 G?", the Forge's salvage prompt); buying and selling one copy of a stack go at once, with a notice (Q5).
-- **The Sell tab lists stacks in pickup order, then pieces in pickup order**; an unpriced one (Scrap, Essence today) is listed greyed "Not for sale" (decision 370's convention).
-- **The inn always asks**, even when the gold is short; Yes then shows "You don't have enough gold." and the event continues unrested. A free rest (no price) is unchanged: no question (Q8).
-- **The shop opens like the Forge**: no fade to black, it fades itself in (decision 370), through one shared `Ui/OverlayFade` (the backlog's third-copy extraction of `ForgeMotion`).
-- **Gold shows as "{amount} G"** (`ui.json`; Q6) in the menu header left of the map name, in the Shop's header, and as a reward row on the victory screen when the battle gave any.
-- **`EventPresenter` takes a `Ui/ScreenParts`** (the text and the shared textures, one parameter) so it can draw the inn's `ConfirmPromptView` without a fifth constructor parameter (I2b). The alternative, an inn scene opened through the flow like the Forge, costs a request pair, a transitions class and two `GameFlow` cases for one prompt.
-- **The victory view grows by one reward row only** (about 3 lines in `VictoryScreenView`, 263): the backlog's `VictoryCardsView` split waits for a change that grows the cards.
+## Decisions
+From earlier plans: 103 (gold will exist; the victory view takes it as an addition), 107 (the leader is fixed), 252 (one selection look), 257 (the inn's fade), 339 (Unique reserved), 344 (plain pieces from outside the drops; decision 385 makes shop pieces rolled), 349 (luck is a drop's), 353 (an NPC opens a screen through an event step), 358 (nothing is destroyed for less than it yields), 360 (a saved affix out of range is clamped), 369 (owned pieces only), 370 (a screen over the map fades itself in; refused actions greyed with their reason).
+
+The developer's answers (2026-10-29):
+- **374. Gold and shops runs before quests**: this plan's save format is 6, the quests plan's 7.
+- **375. A rolled piece is worth more** (question Q1): each affix carries a gold value (`affixes.json` `goldValue`, validated, placeholder numbers); a piece's price is its base item's price plus its affixes' values; a sale pays the sell share of that price. *Interpretation flagged:* "the base share plus its affixes' values" is read as the share of the whole price (base plus affixes), the same formula as buying at full price; the other reading (half the base plus the full affix values) is a one-line change in `PriceFormula`. The field is `goldValue`, not `value`: saves already use `value` for an affix's rolled stat.
+- **376. Gold is a range per enemy** (Q2): `enemies.json` `gold: { "min", "max" }` (validated 0 ≤ min ≤ max ≤ `Purse.MaxGold`), one draw per defeated enemy after the item drops, so item draws don't change; no drop luck; `BattleSpoils.Gold`.
+- **377. A quantity picker** (Q3): Confirm on a stack opens it at 1; Up and Down change the count by one (wrapping between 1 and the most), Left and Right by ten (stopping at the ends); the most is Core's: what the gold and the stack's room allow when buying, what is owned when selling. A piece is one of a kind: no picker.
+- **378. Anything with a price can be sold** (Q4); materials have no price, so they can't be.
+- **379. Only selling a gear piece asks first** (Q5); buying anything and selling stacks go at once, with a notice.
+- **380. Gold shows as a number with a coin icon beside it, no currency name** (Q6): a placeholder icon `content/art/icons/Gold.png`, checked like every UI icon by `UiArtFilesTests` (the startup `ArtReferenceCheck` covers content references only). Sentences don't write amounts: a question with a price draws it under the question with the icon (T3), and notices name the item and count while the header shows the gold.
+- **381. The placeholder numbers stay** (Q7): starting gold 100, 6 to 12 per goblin, a 50 % sell share, the inn at 20 (design.md, "Tunables").
+- **382. The inn always charges and always asks** (Q8), even when nobody needs rest or the gold is short; Yes without the gold shows the refusal.
+- **383. A stat preview in this plan** (Q9): the detail column compares one member wearing the highlighted gear, the leader first; Left and Right switch through the active party (the picker uses Up and Down), reusing `EquipmentComparison` and `EquipmentChangesView`.
+- **384. Category tabs in this plan** (Q10): the Inventory's categories (`CategoryRail`, `InventoryFilter`) on both lists, changed with the tab buttons (`PreviousTab`/`NextTab`: the shoulders, and Q and R on the keyboard, new bindings).
+- **385. A shop's gear is rolled once and kept** (Q11): when a shop is first opened, each gear entry of its list rolls into a piece through the session's shared `GearRoll` (seeded, no luck), priced at its full price (decision 375); stacks are never rolled. The stock is kept in the session and the save (format 6: shop id, the pieces, the leader level it was rolled at) and rolled again on the next opening once the leader has gained a level since. A saved stock piece with an unknown base or affix is dropped and reported. *Interpretations flagged:* "reroll shop when levelup" is read as the leader's level (the leader is fixed, decision 107); a bought piece leaves the stock until the next reroll (planner's pick: a rolled piece is one of a kind).
+
+Planner's picks, each marked in its slice (unnumbered):
+- **`Purse.MaxGold` is 9,999,999**: seven digits fit every gold field (the header, the rows, the picker). One overflow rule: gold past it is lost, from a battle or a sale.
+- **A price is the item's** (`items.json` `price`, optional): one price whatever the shop; an item without one is never bought or sold. Every item a shop lists must have a price (checked at load).
+- **Refusal order**: buying `StackFull`, then `ShortOfGold`; selling `NotForSale` only.
+- **The Shop opens on its Buy and Sell tabs** (Left and Right choose, Confirm enters the list, Cancel in the list returns to the tabs, Cancel on the tabs leaves), so Left and Right are free in the list for the member switch (decision 383).
+- **The Sell list shows stacks in pickup order, then pieces in pickup order**; an unpriced one is listed greyed "Not for sale" (decision 370).
+- **The shop opens like the Forge**: no fade to black, it fades itself in through one shared `Ui/OverlayFade`; both close through one `EventScreenClosed` and one `Flow/EventScreenTransitions`.
+- **`EventPresenter` takes an `Exploration/EventLook`** (the text and the shared textures, one parameter) so it can draw the inn's question without a fifth constructor parameter; one user, so it stays in `Exploration/`.
+- **The stock rolls without drop luck** (decision 349: luck is a drop's).
 
 ## Open design questions (developer decides)
-- **Q1. Does a rolled piece sell for more than a plain one?** Placeholder: no, every piece sells at its base price's share. Alternatives: a multiplier per rarity in `rules.json` `trade`, or a bonus per affix.
-- **Q2. Where does gold drop from, and does drop luck raise it?** Placeholder: a range on the drop table, untouched by luck. Alternative: a range on each enemy (`enemies.json`, beside `experienceReward`); the stone beetle shares the goblin table today, so it would drop the same gold.
-- **Q3. Buy and sell one at a time, or a quantity picker** (the reference's quantity window)? Placeholder: one per Confirm.
-- **Q4. What can be sold?** Placeholder: anything owned with a price; materials have none, so they can't be. Alternative: materials sell too (a price on Scrap and Essence).
-- **Q5. Which trades ask to confirm?** Placeholder: selling a gear piece only.
-- **Q6. The currency's name and look**: placeholder "G" after the amount, no icon (the reference draws a coin icon before it).
-- **Q7. The placeholder numbers** (design.md, "Tunables"): starting gold 100, goblin table 6 to 12 gold, prices, the 50 % sell share, the inn's 20. To tune once fights and prices can be compared.
-- **Q8. The inn**: does it charge when nobody needs rest (placeholder: yes, as the free rest rests anyway), and does it ask when the gold is short (placeholder: yes, then says so)?
-- **Q9. The party's stat preview in the shop** (the reference's right column, as the Equipment page compares): this plan or a follow-up? Placeholder: a follow-up.
-- **Q10. Category tabs in the shop** (All, Items, Weapons, Armor, as the reference and our Inventory rail): this plan or a follow-up? Placeholder: a follow-up; the lists are short.
-- **Q11. Does a bought piece roll** (rarity and affixes, as a drop does) or come plain? Placeholder: plain Common, as starting items and map gifts (decision 344).
+None open. The flagged interpretations in decisions 375 and 385 (the sale formula, the leader's level, a bought piece leaving the stock) are for the developer to confirm.
 
-## ADRs needed
-- **ADR needed: gold and trade.** Real alternatives: gold ranges on drop tables or on enemies (Q2); prices on items with shops listing ids, or prices per shop in `shops.json`; selling at a share of the price, or a separate sell price. Written from the README's entries once the developer answers Q1, Q2 and Q4 (a checkbox step before G2). The save format change follows ADR 0022 and needs no ADR; the `openShop` step follows ADR 0006 and the forge plan's `openForge`.
+## ADRs
+- **ADR 0031: gold and trade.** Gold ranges on each enemy rather than on drop tables; prices on items and gold values on affixes rather than per shop; shops listing ids; a shop's gear rolled once, kept in the save and rerolled after a leader level; selling at a share of the price. A checkbox step before G3, written from decisions 375, 376, 378 and 385 (nothing left to ask). The save format change follows ADR 0022 and the `openShop` step ADR 0006 and the forge plan's `openForge`: no ADR for either.

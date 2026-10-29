@@ -4,108 +4,114 @@ Part of [the gold and shops plan](README.md).
 
 ## Tunables and placeholders
 
-Every value is a placeholder (Q7): the developer tunes them once fights and prices can be compared.
+Every value is a placeholder (decision 381): the developer tunes them once fights and prices can be compared.
 
 | Name | Where | Placeholder | Meaning |
 |---|---|---|---|
-| Max gold | `Core/Party/Purse.MaxGold` (constant) | 9,999,999 | a fixed technical limit: seven digits fit every gold field |
+| Max gold | `Core/Party/Purse.MaxGold` (constant) | 9,999,999 | seven digits fit every gold field; gold past it is lost |
 | Starting gold | `new-game.json` `startingGold` | 100 | enough to try the shop and the inn on a new game |
-| Goblin gold | `drop-tables.json` `goblin.gold` | 6 to 12 | one roll per defeated enemy using the table (the stone beetle too) |
+| Goblin gold | `enemies.json` `goblin.gold` | 6 to 12 | one draw per defeated goblin (decision 376) |
+| Stone beetle gold | `enemies.json` `stone_beetle.gold` | 6 to 12 | the practice enemy, as the goblin |
+| Training dummy gold | `enemies.json` | none | no draw |
 | Sell share | `rules.json` `trade.sellPercent` | 50 | a sale pays this share of the price, rounded down |
 | Consumable prices | `items.json` `price` | potion 10, hi_potion 40, elixir 120, camp_kit 60, bomb 30, bomb_all 80, revive_feather 50 | |
-| Gear prices | `items.json` `price` | bronze_sword 50, iron_sword 120, magic_staff 90, leather_armor 60, chain_mail 150, wizard_robe 110, wooden_shield 40, leather_cap 30, leather_gloves 30, leather_boots 30, amber_amulet 100, power_ring, sage_ring, swift_ring 120 each | |
-| Material prices | `items.json` | none | Scrap and Essence can't be sold (Q4) |
-| General store | `shops.json` `general_store` ("General Store") | potion, hi_potion, revive_feather, camp_kit, bronze_sword, leather_cap, leather_boots, wooden_shield, leather_armor | |
+| Gear prices | `items.json` `price` | bronze_sword 50, iron_sword 120, magic_staff 90, leather_armor 60, chain_mail 150, wizard_robe 110, wooden_shield 40, leather_cap 30, leather_gloves 30, leather_boots 30, amber_amulet 100, power_ring, sage_ring, swift_ring 120 each | a piece's base price |
+| Material prices | `items.json` | none | Scrap and Essence can't be sold (decision 378) |
+| Affix values | `affixes.json` `goldValue` | 20 each | added to a rolled piece's price (decision 375) |
+| General store | `shops.json` `general_store` ("General Store") | potion, hi_potion, revive_feather, camp_kit, bronze_sword, leather_cap, leather_boots, wooden_shield, leather_armor | the gear entries roll into pieces (decision 385) |
 | Inn price | `map-layouts/start.json`, the innkeeper's `rest` step | 20 | |
-| Currency | `text/ui.json` `gold_amount` | "{amount} G" | Q6 |
-| Shop fade | `Ui/OverlayFade` (L1, moved from `Crafting/ForgeMotion`) | in 0.15 s, out 0.12 s | the Forge's and the menu's times (decision 370) |
+| Coin icon | `content/art/icons/Gold.png` | a copy of `Item.png` | until the developer draws one (decision 380) |
+| Quantity steps | `Trade/QuantityPicker` | 1 on Up and Down, 10 on Left and Right | decision 377 |
+| Overlay fade | `Ui/OverlayFade` (L1, from `Crafting/ForgeMotion`) | in 0.15 s, out 0.12 s | the Forge's and the menu's times (decision 370) |
 
 ## Design overview
 
 ### What exists
-- `Party/PartyState`: members, active order, reserve; built by `GameSession.StartNew` and `Restore`. `Items/Inventory`: stacks (`Add` returns what didn't fit, `HasRoomFor(item, quantity)`, `TryRemove`) and owned pieces (`TryRemoveGear`, `GearCountOf`). No gold anywhere (the demo's `SaveData.Gold` was dropped, decision 103).
-- `Session/GameSession` (245): `FinishBattle` returns `BattleSpoils(Rewards, Drops)` (4 test sites build one, all in `VictoryScreenTests`); `SpoilsOf` grants experience, then `_dropRoll.Roll(tables, luck)`, then `Keep` adds what fits. `Capture`/`Restore` map `SaveGame` (required init properties; 4 object initializers in Data tests: `SaveGameFixtures` (2), `SaveGameRepairWornTests`, `SaveGameRepairGearTests`).
-- `Data/Saving`: `SaveFile.CurrentFormatVersion = 5`; `FileSaveStore` refuses older and newer formats and null entries (`FileSaveStoreFormatTests`: `Write_File_HoldsTheFormatFiveEnvelope`, `Read_FormatFour_ThrowsOlder`).
-- `Loot/DropTable(Id, Entries)`, `DropRoll.Roll` (draws only when uncertain, `RangeRoll.Within` skips the draw on a single value), `Data/Loot/DropTableCatalogValidator`.
-- Events: `RestStep` (no fields) rests every member at once in `EventRun.ApplyAndCheckWait` and waits; `Game/Exploration/EventPresenter.ShowRest` fades (decision 257) and shows `event_party_rests`. `OpenForgeStep` waits; `EventPresenter.FollowForgeStep` sets `IsOpeningForge` once per step (4 uses in `EventPresenterForgeTests`); `ExplorationScene` returns `ForgeRequested`; `GameFlow.Start` handles `ForgeRequested`/`ForgeClosed` through `ForgeTransitions` with `Session ?? throw` (four such `??` today).
-- `Core/Exploration/ExplorationState` is 296 lines; `EventRun(triggered, map, context, party)` is at four parameters; `ExplorationContext(Catalog, Inventory, World, Random)`.
-- `Game/Exploration/EventPresenter` is 258 lines, constructor `(ExplorationState, ScreenText, PlayerSettings, VoiceChannel)` at four (16 `new EventPresenter(` sites, 15 in tests).
-- Data: `MapContentReferences` (3 sites) feeds `MapEventValidator`; `ContentTypeDiscriminators` names step types. Editor: `StepChoices(ItemIds, ObjectIds, MapIds, MemberIds)` (3 sites), `EventStepViewModel` (Label/Problem/From/ToStep per kind), `EventPresets`, `EventListViewModel.Apply...Preset`.
-- Game UI: `Menus/MenuHeader` (title left; map name and play time right, measured on change); `Battle/VictoryScreenView.RewardRows(VictoryRewards)` returns the reward rows the view loops over (one today: EXP); `Crafting/ForgeScene`, `ForgeList`, `ForgeView`/`ForgeListView`/`ForgeDetailView`, `ForgeMotion` (the third copy of the overlay fade, backlog); `Ui/ConfirmPrompt`/`ConfirmPromptView(text, ui)`, `Ui/NumberText.Of(int)` (no separators), `Ui/AffixText`, `Ui/PointedBarShape` (the victory's Items tabs).
+- `Party/PartyState`: members, active order, reserve, the fixed leader (decision 107). `Items/Inventory`: stacks (`Add` returns what didn't fit, `HasRoomFor(item, quantity)`, `TryRemove`, `QuantityOf`) and owned pieces (`TryRemoveGear`, `GearCountOf`). No gold anywhere (the demo's `SaveData.Gold` was dropped, decision 103).
+- `Session/GameSession` (245): `FinishBattle` returns `BattleSpoils(Rewards, Drops)` (4 test sites build one, all in `VictoryScreenTests`); `SpoilsOf` grants experience, then `_dropRoll.Roll(tables, luck)`, then `Keep`. One `GearRoll` from `GearRollFor(catalog, random)` (pool in id order) serves the drops and the Forge; `GearRoll.Roll(item, luckPermille)`. `Capture`/`Restore` map `SaveGame` (required init properties; 4 object initializers in Data tests: `SaveGameFixtures` (2), `SaveGameRepairWornTests`, `SaveGameRepairGearTests`).
+- `Data/Saving`: `SaveFile.CurrentFormatVersion = 5`; `FileSaveStore` refuses older and newer formats and null entries; `SaveGameRepair` with `GearRepair` (drops a piece whose base is gone, clamps affix values, decision 360) and `WorldStateRepair`.
+- `Battle/EnemyDefinition` (`ExperienceReward`, `DropTableId`); `Battle` and `Loot` reference each other in neither direction. `Loot/AffixDefinition` (3 `new AffixDefinition` sites in tests; 23 affixes in content). `Randomness/RangeRoll.Within` draws only when the range holds more than one value.
+- Events: `RestStep` (no fields) rests every member at once in `EventRun.ApplyAndCheckWait`; `EventPresenter.ShowRest` fades (decision 257). `OpenForgeStep` waits; `EventPresenter.IsOpeningForge` (4 uses in `EventPresenterForgeTests`); `ExplorationScene` returns `ForgeRequested`; `GameFlow.Start` handles `ForgeRequested`/`ForgeClosed` through `ForgeTransitions`, with four `Session ?? throw`. `ExplorationState` is 296 lines; `EventRun` and `EventPresenter` constructors are at four parameters (16 `new EventPresenter(` sites, 15 in tests).
+- Data: `MapContentReferences` (5 positional members; 5 construction sites: `ContentCatalogLoader`, `ContentWriter.ContentReferencesOf`, `MapLayoutValidatorTests`, `MapFolderReaderTests`, `MapEventValidatorTests`) feeds `MapEventValidator.FindStepProblem`. Editor: `StepChoices` (4 positional members, 3 sites), `EventStepViewModel`, `EventPresets`, `EventListViewModel.Apply...Preset`.
+- Game UI: `Menus/MenuHeader` (title; map name and play time at the right); `Battle/VictoryScreenView.RewardRows(VictoryRewards)`; the Forge (`ForgeScene`, `ForgeList`, `ForgeView`/`ForgeListView`/`ForgeDetailView`, `ForgeMotion`, `ForgeClosed`); `Menus/CategoryRail`/`CategoryRailView`/`InventoryFilter`/`InventoryCategory`, `Menus/EquipmentComparison` (`ShowChoice`, `ShowWorn`) and `EquipmentChangesView`; `Ui/ConfirmPrompt`/`ConfirmPromptView`, `HeaderBar`, `FooterBar`, `ColumnPanelView`, `ColumnTitles`, `NumberText`, `AffixText`, `PointedBarShape`, `UiArtFiles.Icons` (checked by `UiArtFilesTests`). `GameButton.PreviousTab`/`NextTab` have controller bindings only.
 
 ### Core changes
-- `Party/Purse` (G1): the party's gold. `int Gold`, `const int MaxGold`, `bool HasRoomFor(int amount)`, `int Add(int amount)` (returns what didn't fit, as `Inventory.Add`), `bool CanSpend(int amount)`, `bool TrySpend(int amount)`. `PartyState.Purse { get; } = new()`.
-- `Saving/SaveGame.Gold` (G1, required); `GameSession.Capture` writes it, `Restore` adds it to the purse.
-- `Loot/GoldRange(int Min, int Max)` and `DropTable.Gold` (G2, init, null drops none); `DropRoll.RollGold(tables)`; `BattleSpoils(Rewards, Drops, int Gold)` (what went in); `Content/NewGameDefinition.StartingGold` (init, 0).
-- `Events/RestStep.Price` (I1, `int?` init, null for a free rest); `Exploration/InnStay` (a priced rest waiting for its answer); `ExplorationState.CurrentInnStay`; `Exploration/EventStarter` (X1, moved out of `ExplorationState`).
-- `Items/ItemDefinition.Price` (S1, `int?` init). `Trade/TradeQuote(int Gold, TradeRefusal? Refusal)`, `Trade/TradeRefusal`, `Trade/Shop` (S1), `Trade/TradeRules` + `GameRules.Trade` (S2, init, default refuses every sale), `Trade/PriceFormula`, `Trade/ItemSales` + `GameSession.Sales` (S2), `Trade/ShopDefinition` + `ContentCatalog.Shops` + `GameSession.ShopFor(shopId)` (S3).
-- `Events/OpenShopStep(string ShopId)` (E1).
+- `Party/Purse` (G1) on `PartyState.Purse`.
+- `Saving/SaveGame.Gold` and `ShopStocks` (G2), `Trade/SavedShopStock` (G2).
+- `Battle/GoldRange` and `EnemyDefinition.Gold` (G3); `BattleSpoils(Rewards, Drops, Gold)`; `Content/NewGameDefinition.StartingGold` (G3).
+- `Items/ItemDefinition.Price` (S1); `Trade/ShopDefinition`, `ShopStock`, `Shop`, `TradeQuote`, `TradeRefusal` (S1); `Loot/AffixDefinition.GoldValue`, `Trade/Pricing`, `Trade/PriceFormula` (S2); `Trade/TradeRules`, `GameRules.Trade`, `Trade/ItemSales`, `GameSession.Sales` (S3); `ContentCatalog.Shops` (S4); `Session/ShopStocks`, `GameSession.ShopFor` (S5); stocks in `Capture`/`Restore` (S6).
+- `Events/OpenShopStep(ShopId)` (E1). `Events/RestStep.Price`, `Exploration/InnStay`, `ExplorationState.CurrentInnStay` (I1).
 
 ### Structure and folder dependencies
 
-Core (each edge checked against today's `using`s: `Party` uses no `Content`, `Session` or `Exploration`; `Items` and `Loot` use no `Party`, `Trade` or `Content`):
+Core (each edge checked against today's `using`s):
 
 | Folder | Depends on | New |
 |---|---|---|
 | `Party` | `Items`, `Stats`, ... (none new) | `Purse` |
-| `Trade` (new) | `Items`, `Party` (`Purse`) | `ShopDefinition`, `Shop`, `ItemSales`, `TradeQuote`, `TradeRefusal`, `TradeRules`, `PriceFormula` |
-| `Loot` | (none new) | `GoldRange` |
-| `Content` | `Trade` (new edge: `GameRules.Trade`, `ContentCatalog.Shops`), `Loot`, ... | |
-| `Session` | `Trade` (new edge: `Sales`, `ShopFor`), `Party`, `Loot`, ... | |
-| `Exploration` | `Party` (exists), `Events` | `InnStay`, `EventStarter` |
+| `Trade` (new) | `Items`, `Party` (`Purse`) | `SavedShopStock`, `ShopDefinition`, `ShopStock`, `Shop`, `ItemSales`, `TradeQuote`, `TradeRefusal`, `TradeRules`, `Pricing`, `PriceFormula` |
+| `Battle` | (none new) | `GoldRange` |
+| `Loot` | (none new) | (`AffixDefinition.GoldValue`) |
+| `Saving` | `Trade` (new edge: `SavedShopStock`) | |
+| `Content` | `Trade` (new edge: `GameRules.Trade`, `ContentCatalog.Shops`) | |
+| `Session` | `Trade` (new edge), `Loot`, `Party`, ... | `ShopStocks` |
+| `Exploration` | `Party` (exists), `Events` | `InnStay` |
 | `Events` | (none new) | `OpenShopStep` |
-| `Saving` | (none new: gold is an `int`) | |
 
-`Trade` never references `Content` or `Session`: `ShopFor(shopId)` takes the catalog, so it lives in `Session` (the loot retro's cycle rule). The folder is `Trade`, not `Shop` (a folder named after its `Shop` type clashes, CA1724).
+`Trade` never references `Content`, `Session` or `Loot`: rolling stocks and building `Pricing` take the catalog and the `GearRoll`, so they live in `Session` (the loot retro's cycle rule); `Pricing` takes the affixes' values as a plain id-to-gold map. The gold range is `Battle`'s (the enemy's), and the session rolls it: `Loot` doesn't gain a `Battle` edge. The folder is `Trade`, not `Shop` (CA1724).
 
-Data: `Data/Trade/ShopCatalogValidator` → Core `Trade`, `Items`; Data `Content` (`ContentValidationException`). `ContentCatalogLoader` → `Data/Trade` (the `Content` ↔ feature folder pair `Data/Loot` and `Data/Crafting` already have). `Data/Saving` reads `Purse.MaxGold` (Core `Party`).
+Data: `Data/Trade/ShopCatalogValidator` → Core `Trade`, `Items`; Data `Content`. The gold bounds (`Data/Items`, `Data/Battle`, `Data/Loot`, `Data/Content`, `Data/Saving`, `Data/Maps`) read `Purse.MaxGold` from Core `Party`. `Data/Saving/ShopStockRepair` → Core `Trade`, `Content`; Data `Saving` (`GearRepair`'s affix rule). `ContentCatalogLoader` → `Data/Trade` (the `Content` ↔ feature folder pair `Data/Loot` and `Data/Crafting` already have).
 
 Game:
 
 | Folder | Depends on | New |
 |---|---|---|
-| `Trade` (new) | `Ui`, `Scenes`, `Input`, `Rendering`; Core `Trade`, `Items`, `Party`, `Session` | `ShopScene`, `ShopView`, `ShopListView`, `ShopDetailView`, `StockList`, `StockRow`, `SaleList`, `SaleRow`, `ShopTab`, `TradeRefusalNames` |
-| `Flow` | `Trade` (new edge) | `ShopTransitions` |
-| `Exploration` | `Ui` (exists) | `RestPlayback` |
-| `Scenes` | (none new) | `ShopRequested`, `ShopClosed` |
-| `Ui` | never `Trade`, `Crafting`, `Menus`, `Battle` | `GoldText`, `OverlayFade` (from `Crafting/ForgeMotion`), `PieceName` (from `ForgeScene.NameOf`), `ScreenParts` |
+| `Trade` (new) | `Ui`, `Scenes`, `Input`, `Rendering`; `Menus` (the frame's `MenuHeader.Height` and `MenuLayout` as `Crafting` reads them, `CategoryRail`/`CategoryRailView`/`InventoryFilter`, `EquipmentComparison`/`EquipmentChangesView`); Core `Trade`, `Items`, `Party`, `Session` | `ShopScene`, `ShopView`, `ShopListView`, `ShopDetailView`, `StockList`, `StockRow`, `SaleList`, `SaleRow`, `ShopTab`, `QuantityPicker`, `TradeRefusalNames` |
+| `Menus` | never `Trade` | (`EquipmentComparison.ShowPiece`, `InventoryFilter.Shows`) |
+| `Flow` | `Trade` (new edge), `Crafting` | `EventScreenTransitions` (replaces `ForgeTransitions`) |
+| `Scenes` | (none new) | `ShopRequested`, `EventScreenClosed` (replaces `ForgeClosed`) |
+| `Exploration` | `Ui` (exists) | `RestPlayback`, `EventLook` |
+| `Ui` | never `Trade`, `Crafting`, `Menus`, `Battle` | `OverlayFade` (from `Crafting/ForgeMotion`), `GoldAmountView`, `PieceName` (from `ForgeScene.NameOf`); `ConfirmPrompt.Price` |
 
-`Trade` never references `Crafting` or `Menus`: what it shares with them (the fade, a rolled piece's name, gold text) moves to `Ui/` first, in the slice that makes the second user.
+`Trade` never references `Crafting`: what the Forge and the Shop share (the fade, the close request, a rolled piece's name) moves to `Ui/` or `Scenes/` in the slice that makes the second user.
 
 ### Key decisions
-- **Quotes, not booleans** (the forge review's blocker 3): `TradeQuote` carries the gold an action costs or gives and its refusal; the screen greys and explains from it. Refusal order: buying `StackFull`, then `ShortOfGold`; selling `NotForSale`, then `PurseFull`.
-- **`Shop` buys, `ItemSales` sells.** Buying depends on one shop's stock; selling is the same at every shop (one share, every priced item), so it lives on the session (`GameSession.Sales`) and the Shop screen uses both. Each constructor stays at four parameters or fewer: `Shop(ShopDefinition, IReadOnlyList<ItemDefinition> stock, Inventory, Purse)`, `ItemSales(Inventory, Purse, TradeRules)`.
-- **Gold rolls after the items** (`DropRoll.RollGold` after `Roll`), so every seeded drop stays as it is; only draws after a won battle shift.
-- **What went in**: `BattleSpoils.Gold` is the gold the purse took (past the cap it is lost), as `Drops` lists only the copies that fit.
-- **The inn's rule is Core's**: reaching a priced rest doesn't rest; `InnStay.TryPay()` pays and rests (false when short or already paid, changing nothing); continuing without paying leaves the party as it was. A free rest still rests at once (decision 257's flow unchanged).
-- **One opening-step signal**: `EventPresenter.IsOpeningForge` becomes `OpeningStep` (the Forge or shop step on the one update it first shows); `ExplorationScene` maps it to `ForgeRequested` or `ShopRequested(shopId)`.
-- **`GameFlow.Start` stays under CA1502**: E1 replaces the four `Session ?? throw` with one `RunningSession` property before adding the two shop cases (each `??` counts as a branch).
+- **Quotes, not booleans** (the forge review's blocker 3): `TradeQuote(Gold, Refusal?)` carries what a trade costs or gives and why it's refused; `Shop.MostBuyable` and `ItemSales.MostSellable` are the picker's limits. Refusal order: buying `StackFull`, then `ShortOfGold`; selling `NotForSale`.
+- **`Shop` buys, `ItemSales` sells.** Buying depends on one shop's stock; selling is the same at every shop, so it lives on the session. `Shop(ShopStock, Inventory, Purse, Pricing)`, `ItemSales(Inventory, Purse, Pricing)`: four parameters at most.
+- **What a thing is worth** is `Pricing`'s: an item's price; a piece's base price plus its affixes' gold values (decision 375); a sale's share of either (`PriceFormula`, one `long`, rounded down once).
+- **The stock** (decision 385): `Session/ShopStocks` keeps every opened shop's `ShopStock` by id; `GameSession.ShopFor(id)` rolls a missing or stale one (the leader's level above the one it was rolled at), each gear entry of the list in order through the shared `GearRoll` with no luck; stacks are resolved, never rolled. A bought piece leaves the stock. Saved as `SavedShopStock(ShopId, RolledAtLevel, Pieces)`.
+- **Gold rolls after the items**, one `RangeRoll.Within` per defeated enemy with a range, so every seeded drop stays as it is; `BattleSpoils.Gold` is what the purse took (past the cap it is lost).
+- **The inn's rule is Core's**: a priced rest doesn't rest on arrival; `InnStay.TryPay()` pays and rests (false and nothing changed when short or already paid); continuing without paying leaves the party as it was. A free rest still rests at once.
+- **One opening-step signal and one way back**: `EventPresenter.IsOpeningForge` becomes `OpeningStep`; `ExplorationScene` maps it to `ForgeRequested` or `ShopRequested(shopId)`; both screens return `EventScreenClosed`, and `EventScreenTransitions` (`OpenForge`, `OpenShop`, `Close`) pops and continues the event. `GameFlow.Start` uses one `RunningSession` helper instead of four `Session ?? throw` (CA1502).
+- **The Shop's controls**: the tabs first (Left and Right choose, Confirm enters the list); in the list Up and Down move, the tab buttons change the category, Left and Right switch the previewed member on a gear row, Confirm buys or sells (a stack through the picker: Up and Down by one, Left and Right by ten); Cancel goes back one level: the prompt, the picker, the list, then the Shop.
 
 ### Extension points
-- A quantity picker (Q3): `Shop.QuoteBuy(item, quantity)` beside the one-copy quote; the screen's prompt grows a count.
-- Rarity-priced sales (Q1): one function in `PriceFormula` and a `rules.json` `trade` table.
-- Category tabs (Q10): `StockList` and `SaleList` filter as `Menus/InventoryFilter` does.
+- The whole party's preview (the reference): `L2b`'s one-member preview repeated per active member.
+- A shop-specific price: `Pricing` takes a shop's markup.
 - Gold from events: a `giveGold` step with `Purse.Add`.
 
 ### Replacement mapping
 | Existing | Becomes | Slice |
 |---|---|---|
-| `ExplorationState`'s event starting (cell, touch, arrival, `Start`) | `Exploration/EventStarter` | X1 |
-| `EventPresenter.ShowRest` and `_restFade`, `_isRestFadeStarted` | `Exploration/RestPlayback` | I2a |
-| `EventPresenter(…, ScreenText text, …)` | `EventPresenter(…, ScreenParts parts, …)` | I2b |
+| `VictoryScreenView.RewardRows(VictoryRewards)` | `RewardRows(BattleSpoils)`: EXP, then gold when any | G4 |
+| `FileSaveStoreFormatTests.Read_FormatFour_ThrowsOlder` | `Read_FormatFive_ThrowsOlder` | G2 |
+| `Crafting/ForgeMotion` | `Ui/OverlayFade` (the Forge and the Shop) | L1 |
+| `Scenes/ForgeClosed` | `Scenes/EventScreenClosed` | L1 |
+| `Flow/ForgeTransitions` | `Flow/EventScreenTransitions` (`OpenForge`, `OpenShop`, `Close`) | E1 |
 | `EventPresenter.IsOpeningForge` | `EventPresenter.OpeningStep` | E1 |
 | `GameFlow.Start`'s four `Session ?? throw` | `RunningSession` | E1 |
-| `Crafting/ForgeMotion` | `Ui/OverlayFade` (the Forge and the Shop) | L1 |
-| `ForgeScene.NameOf` and `forge_rolled_piece_name` | `Ui/PieceName.Of` and `rolled_piece_name` | T2 |
-| `VictoryScreenView.RewardRows(VictoryRewards)` | `RewardRows(BattleSpoils)`: EXP, then gold when any | G3 |
-| `FileSaveStoreFormatTests.Read_FormatFour_ThrowsOlder` | `Read_FormatFive_ThrowsOlder` | G1 |
+| `InventoryFilter.Keeps` (private) | `InventoryFilter.Shows` (internal, the Shop's second user) | B3 |
+| `ForgeScene.NameOf` and `forge_rolled_piece_name` | `Ui/PieceName.Of` and `rolled_piece_name` | T3 |
+| `EventPresenter.ShowRest` and `_restFade`, `_isRestFadeStarted` | `Exploration/RestPlayback` | I2a |
+| `EventPresenter(…, ScreenText text, …)` | `EventPresenter(…, EventLook look, …)` | I2b |
 
 ## Risks
-- **Save format**: G1 bumps to 6 and refuses format 5 (ADR 0022): the developer's existing saves stop loading. Gold outside 0 to `MaxGold` is refused as unreadable (Core never writes it).
-- **Determinism**: gold draws after the items; a seeded test that wins against the goblins and then draws again (a second battle, the Forge) sees different numbers. G2 greps the tests that win against `goblin_trio` and then read the random or the inventory before budgeting fixes (the loot and forge plans budgeted fixes and needed none).
-- **`ExplorationState` split (X1)**: a refactor of the event-starting rules (decision 38's touch arming, ADR 0016's arrival); the guard is the unchanged Core exploration tests. If the split doesn't fit one slice, I1 can add its three lines (296 → 299) and the split waits; X1 says so.
-- **`EventPresenter` parameter change (I2b)**: 16 constructor sites change mechanically (`new ScreenParts(text, new UiTextures())` in tests).
-- **Event flow**: the Shop pauses its event as the Forge does; nothing saves while it is open (`Capture` refuses during an event). A priced rest's question is asked inside the event, so the menu can't open over it.
-- **Seeded Game tests on the start map**: N1's shopkeeper must stand off the paths the tests walk (the forge plan's list, plus the forge master at (25, 14)).
+- **Save format**: G2 bumps to 6 and refuses format 5 (ADR 0022): the developer's saves stop loading. Gold outside 0 to `MaxGold` is refused as unreadable. `ShopStocks` is in the shape from G2 but written empty until S6 (nothing rolls a stock before S5).
+- **Determinism**: gold draws after the items; a stock rolls when a shop first opens. A seeded test that wins against the goblins and then draws again sees different numbers: G3 greps the tests that win against `goblin_trio` and then read the random or the inventory before budgeting fixes (the loot and forge plans budgeted fixes and needed none).
+- **`ExplorationState` at 299 after I1**: any more lines there wait for the quests plan's split (its R1).
+- **`EventPresenter` parameter change (I2b)**: 16 constructor sites change mechanically.
+- **Event flow**: the Shop pauses its event as the Forge does; nothing saves while it is open (`Capture` refuses during an event), so a stock rolled at opening is saved at the next save after the event ends.
+- **The detail column's height** (L2a, L2b): name, description, owned, affixes, the member's preview and the reason line must fit 848 px; L2b writes the arithmetic.
+- **Seeded Game tests on the start map**: N1's shopkeeper must stand off the paths the tests walk.
 - **CA1812**: H1's `ShopScene` is first built by E1's `SceneFactory.CreateShop`; if the analyzer flags it at H1, `CreateShop` lands in H1.
-- **Content written by the editor**: a `RestStep` price added by hand before I3 would be dropped by an editor save; I3 lands the field and the innkeeper's price together.
+- **Content written by the editor**: a `RestStep` price added by hand before I3 would be dropped by an editor save; I3 lands the field and the innkeeper's price together. `ContentWriter.ContentReferencesOf` must pass the shop ids (E1), or the editor's map save refuses a map with an `openShop` step.

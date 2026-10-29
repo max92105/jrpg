@@ -594,4 +594,40 @@ internal static class MessageIds
 
     /// <summary>The Forge footer's line.</summary>
     public const string ForgeHint = "forge_hint";
+
+    /// <summary>The Forge's band over a piece's actions.</summary>
+    public const string ForgeActions = "forge_actions";
+
+    /// <summary>The action that breaks a piece into materials (decision 354).</summary>
+    public const string ForgeSalvage = "forge_salvage";
+
+    /// <summary>The action that raises a piece one tier (decision 351).</summary>
+    public const string ForgeUpgrade = "forge_upgrade";
+
+    /// <summary>The action that draws a piece's affixes again (decision 352).</summary>
+    public const string ForgeReroll = "forge_reroll";
+
+    /// <summary>Placeholders <c>{count}</c> and <c>{name}</c>: one material of a quote.</summary>
+    public const string ForgeMaterialCount = "forge_material_count";
+
+    /// <summary>Between a quote's materials on one line.</summary>
+    public const string ForgeMaterialSeparator = "forge_material_separator";
+
+    /// <summary>Why an upgrade is refused: the piece is at the top tier a craft reaches.</summary>
+    public const string ForgeRefusedHighestRarity = "forge_refused_highest_rarity";
+
+    /// <summary>Why an upgrade is refused: the pool has no affix left for the piece's kind (decision 357).</summary>
+    public const string ForgeRefusedNoAffixLeft = "forge_refused_no_affix_left";
+
+    /// <summary>Why a reroll is refused: the piece has no affix.</summary>
+    public const string ForgeRefusedNoAffixes = "forge_refused_no_affixes";
+
+    /// <summary>Why an action is refused: the party owns fewer of a material than it costs.</summary>
+    public const string ForgeRefusedShort = "forge_refused_short";
+
+    /// <summary>Why salvage is refused: a material of the yield wouldn't fit its stack (decision 358).</summary>
+    public const string ForgeRefusedStackFull = "forge_refused_stack_full";
+
+    /// <summary>Why salvage is refused: the piece's rarity has no yield (decision 339).</summary>
+    public const string ForgeRefusedNoYield = "forge_refused_no_yield";
 }

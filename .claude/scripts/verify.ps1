@@ -178,7 +178,7 @@ foreach ($source in $changedSources) {
     $previousDocLine = $null
     for ($number = 1; $number -le $lines.Length; $number++) {
         $text = $lines[$number - 1]
-        if ($text.Contains($shellQuote)) { $quoteHits += "${source}:$number" }
+        if ($text.Contains($shellQuote) -or $text.Contains('\x27')) { $quoteHits += "${source}:$number" }
         $insideDocBlock = $number -gt 1 -and $number -lt $lines.Length -and $lines[$number - 2] -match '^\s*///' -and $lines[$number] -match '^\s*///'
         if ($text -match '^\s*/// //' -or ($insideDocBlock -and $text -match '^\s*//(?!/)')) { $brokenDocLines += "${source}:$number" }
         if ($text -match '^\s*///') {
@@ -193,7 +193,7 @@ foreach ($source in $changedSources) {
     $before = if ($LASTEXITCODE -eq 0) { @($headLines).Count } else { 0 }
     if ($before -le $lineLimit -and $lines.Length -gt $lineLimit) { $grownFiles += "${source} ($before -> $($lines.Length) lines)" }
 }
-Report 'changed files hold no shell quote written literally' (-not $quoteHits) ($quoteHits | Select-Object -First 10)
+Report 'changed files hold no shell quote or \x27 escape written literally' (-not $quoteHits) ($quoteHits | Select-Object -First 10)
 Report 'no member with two summaries' (-not $doubledSummaries) ($doubledSummaries | Select-Object -First 10)
 Report 'no doc comment line lost a slash' (-not $brokenDocLines) ($brokenDocLines | Select-Object -First 10)
 Report 'no changed file crossed 300 lines (split it)' (-not $grownFiles) ($grownFiles | Select-Object -First 10)

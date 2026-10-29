@@ -49,17 +49,16 @@ internal sealed class ForgeView
         _titleFont = text.Fonts.FontAt(TitleTextPixels);
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _list = new ForgeListView(text, ui, _bodyFont);
-        _detail = new ForgeDetailView(text, look, _bodyFont);
+        _detail = new ForgeDetailView(text, ui, look, _bodyFont);
         _title = text.Messages.Text(MessageIds.ForgeTitle);
         _hint = text.Messages.Text(MessageIds.ForgeHint);
     }
 
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the plain pixel and the gradients come from.</param>
-    /// <param name="list">The owned pieces and the cursor on them.</param>
-    /// <param name="materials">Every material and how many are owned.</param>
+    /// <param name="place">What the Forge shows this frame.</param>
     /// <param name="opacity">The Forge's fade, 0 for clear to 1 for opaque.</param>
-    public void Draw(SpriteBatch batch, TextureLibrary textures, ForgeList list, MaterialStock materials, float opacity)
+    public void Draw(SpriteBatch batch, TextureLibrary textures, Place place, float opacity)
     {
         batch.Draw(textures.Pixel, _screen, UiTheme.Scrim * opacity);
         HeaderBar.Draw(batch, textures.Pixel, MenuHeader.Height, opacity);
@@ -67,7 +66,13 @@ internal sealed class ForgeView
         batch.DrawString(_titleFont, _title, new Vector2(SideMargin, (MenuHeader.Height - _titleFont.LineHeight) / 2f), UiTheme.TextPrimary * opacity);
         batch.DrawString(_bodyFont, _hint, new Vector2(FooterTextInset, FooterBar.TextTop(MenuLayout.FooterHeight, _bodyFont.LineHeight)), UiTheme.TextSecondary * opacity);
 
-        _list.Draw(batch, textures, list, _listArea, opacity);
-        _detail.Draw(batch, textures, new ForgeDetailView.Place(list.SelectedRow, materials.Rows, _detailArea), opacity);
+        _list.Draw(batch, textures, place.List, _listArea, opacity);
+        _detail.Draw(batch, textures, new ForgeDetailView.Place(place.List.SelectedRow, place.Materials.Rows, place.Actions, _detailArea), opacity);
     }
+
+    /// <summary>What the Forge shows this frame.</summary>
+    /// <param name="List">The owned pieces and the cursor on them.</param>
+    /// <param name="Materials">Every material and how many are owned.</param>
+    /// <param name="Actions">The actions open on the highlighted piece; null while the list has the cursor.</param>
+    public readonly record struct Place(ForgeList List, MaterialStock Materials, ForgeActionChoice? Actions);
 }

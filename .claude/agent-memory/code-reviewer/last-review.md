@@ -5,10 +5,11 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-27-forge, slice F1d (ForgeMotion fade, ForgeView menu frame, ForgeListView, ForgeDetailView,
-forge_hint). Round 1. Verdict: Fix the Criticals. verify.ps1 all pass (2886 tests).
+Plan: 2026-10-27-forge, slice F2a (ForgeAction, ForgeActionRow, ForgeActionChoice, ForgeActionFormat,
+MaterialListText, ForgeRefusalNames; ForgeScene actions; ForgeDetailView Actions band). Round 1.
+Verdict: Fix the Criticals. verify.ps1 all pass (2894 tests).
 
-- Critical: ForgeDetailView.DrawPiece draws the rarity label at area.X + RowInset, the name's own x: they overlap - open
-- Suggestion: ForgeView FooterGap/BodyHeight copy MenuLayout's private PageArea arithmetic - open
-- Suggestion: docs/map.md ForgeScene still says "Cancel asks to close it, once"; now after the fade - open
-- Suggestion: ClosingFadeUpdates is a public const on ForgeSceneTests read by GameFlowForgeTests; move to a shared fixture - open
+- Critical: MessageIds.cs lines 598-631, six doc comments hold a literal `\x27` for an apostrophe (perl/sed escape left by an edit; verify's shell-quote check misses it) - open
+- Suggestion: ForgeRefusalNames has three of six refusals tested (NoYield, StackFull, NoAffixLeft not reached); a theory over every ForgeRefusal value with distinct ids - open
+- Suggestion: docs/map.md ForgeScene entry still lists only Up/Down and Cancel; add "Confirm opens a piece's actions, Cancel closes them first" - open
+- Follow-up: verify.ps1's "no shell quote" check could also catch `\x27` - open

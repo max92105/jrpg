@@ -215,5 +215,17 @@
   "forge_empty": "Nothing to work on.",
   "forge_materials": "Materials",
   "forge_no_affixes": "No affixes",
-  "forge_hint": "Choose a piece to work on."
+  "forge_hint": "Choose a piece to work on.",
+  "forge_actions": "Actions",
+  "forge_salvage": "Salvage",
+  "forge_upgrade": "Upgrade",
+  "forge_reroll": "Reroll",
+  "forge_material_count": "{count} {name}",
+  "forge_material_separator": ", ",
+  "forge_refused_highest_rarity": "Highest rarity",
+  "forge_refused_no_affix_left": "No affix left for this kind",
+  "forge_refused_no_affixes": "Nothing to reroll",
+  "forge_refused_short": "Short of materials",
+  "forge_refused_stack_full": "A stack is full",
+  "forge_refused_no_yield": "Nothing to salvage"
 }

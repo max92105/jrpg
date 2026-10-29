@@ -1,7 +1,7 @@
 # The forge
 Status: draft
 
-Split out of [the loot plan](../2026-10-27-loot/README.md) on 2026-10-27, when the developer approved it: materials, salvage and a bit of crafting (decisions 351-354), at a forge master NPC on the map (decision 353). Slices M1-M3, F1 and F2 come from the loot draft (M3 and M4 merged, F4 folded into F1, F3 merged into F2); E1, E2 and N1 are new. Runs after the loot plan.
+Split out of [the loot plan](../done/2026-10-27-loot/README.md) on 2026-10-27, when the developer approved it: materials, salvage and a bit of crafting (decisions 351-354), at a forge master NPC on the map (decision 353). Slices M1-M3, F1 and F2 come from the loot draft (M3 and M4 merged, F4 folded into F1, F3 merged into F2); E1, E2 and N1 are new. Runs after the loot plan.
 
 - Numbers: decisions 339, 351-354 (from the loot plan) and 358; question 357. Take any new number from `docs/plans/README.md`'s "Next free numbers" line.
 - Draft: three slices are over the 250-line budget after the merges the developer approved (M3 about 300, F1 about 320, F2 about 370); each slice file proposes its split for review before approval.

@@ -1,11 +1,11 @@
 # Loot
-Status: approved, in progress (retro run 2026-10-29; Z left, then done)
+Status: done
 
 Sixth feature plan after the migration, following the stats and gear slots plan (its "Out of scope": "the next plan, loot"; decision 294).
-- Numbers: decisions 338-355, 359-361 and question 362 here; 356 goes to [the affix stats plan](../2026-10-27-affix-stats/README.md), 357 (a question) and 358 to [the forge plan](../2026-10-27-forge/README.md). ADRs 0029 and 0030. The next free numbers are in `docs/plans/README.md` (decision 363, ADR 0031).
+- Numbers: decisions 338-355, 359-361 and question 362 here; 356 goes to [the affix stats plan](../../2026-10-27-affix-stats/README.md), 357 (a question) and 358 to [the forge plan](../../2026-10-27-forge/README.md). ADRs 0029 and 0030. The next free numbers are in `docs/plans/README.md` (decision 363, ADR 0031).
 - The developer approved the draft on 2026-10-27 with answers to questions 339-355 and the devil's advocate's edits: the plan was split in three (this one keeps the playable loop; the four affix stats and the forge became their own plans), R1 folded into G1a, G1b split in two, the save bridge dropped so S1a follows G1b, drops returned beside the rewards (`Session/BattleSpoils`), and an affix's stat resolved from content on load.
 
-Developer's request (2026-10-26, from the stats plan's README): "Gear should be more like an ARPG than a classic JRPG: I want to mash the genres, so rarity, random rolls, drop tables, more gear slots (ring, amulet…), salvage, materials and a bit of crafting." The slots and fixed-stat items are done (stats plan, phase 7); the loot half is three plans: this one (kill, drop, roll, equip, save, show), [affix stats](../2026-10-27-affix-stats/README.md) (lifesteal, armor penetration, block, drop luck) and [the forge](../2026-10-27-forge/README.md) (materials, salvage, upgrade, reroll at a forge master).
+Developer's request (2026-10-26, from the stats plan's README): "Gear should be more like an ARPG than a classic JRPG: I want to mash the genres, so rarity, random rolls, drop tables, more gear slots (ring, amulet…), salvage, materials and a bit of crafting." The slots and fixed-stat items are done (stats plan, phase 7); the loot half is three plans: this one (kill, drop, roll, equip, save, show), [affix stats](../../2026-10-27-affix-stats/README.md) (lifesteal, armor penetration, block, drop luck) and [the forge](../../2026-10-27-forge/README.md) (materials, salvage, upgrade, reroll at a forge master).
 
 ## Goal
 At the end of this plan:
@@ -35,8 +35,8 @@ At the end of this plan:
 - **No NuGet package. No editor change** in this plan: the editor never edits items, enemies or rules; it loads them through Data and follows the new files without code.
 
 ## Out of scope (follow-ups)
-- **[Affix stats](../2026-10-27-affix-stats/README.md)** (draft): lifesteal, armor penetration, block, drop luck, and the Status page showing all twenty-four stats (decision 350).
-- **[The forge](../2026-10-27-forge/README.md)** (draft): materials and their tier, salvage, upgrade, reroll, the forge master NPC and its event step with editor support (decisions 351-354).
+- **[Affix stats](../../2026-10-27-affix-stats/README.md)** (draft): lifesteal, armor penetration, block, drop luck, and the Status page showing all twenty-four stats (decision 350).
+- **[The forge](../../2026-10-27-forge/README.md)** (draft): materials and their tier, salvage, upgrade, reroll, the forge master NPC and its event step with editor support (decisions 351-354).
 - **Unique items** (decision 339): the tier is reserved here (enum member, color, name); hand-made unique items with fixed mods and special abilities are a later plan.
 - **Item levels** (decision 341): later; the piece model stays open to them (design.md, "Extension points").
 - **Gold, shops and prices** (question 222): drops are items only.
@@ -78,7 +78,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 5: numbers and walk-through
 - [x] **B1. Loot simulation: drops and rarities per goblin trio** (Simulations, about 120 lines) → [slices/B1.md](slices/B1.md)
-- [ ] **Z. Walk-through: drops, pieces, saves and pages by hand** (manual) → [slices/Z.md](slices/Z.md)
+- [x] **Z. Walk-through: drops, pieces, saves and pages by hand** (manual) → [slices/Z.md](slices/Z.md)
 
 ## Decisions
 Questions and decisions share numbers.

@@ -15,9 +15,9 @@ Older plans are single files with the same sections.
 
 | Plan | Status |
 |---|---|
-| [2026-10-27-loot](2026-10-27-loot/README.md) | approved, in progress (retro run; Z left, then done) |
 | [2026-10-27-affix-stats](2026-10-27-affix-stats/README.md) | draft (after loot) |
 | [2026-10-27-forge](2026-10-27-forge/README.md) | draft (after loot) |
+| [done/2026-10-27-loot](done/2026-10-27-loot/README.md) | done |
 | [done/2026-10-26-stats-and-gear-slots](done/2026-10-26-stats-and-gear-slots/README.md) | done |
 | [done/2026-10-26-escape-menu-third-pass](done/2026-10-26-escape-menu-third-pass/README.md) | done |
 | [done/2026-10-25-ui-second-pass](done/2026-10-25-ui-second-pass/README.md) | done (retro run on the other machine) |

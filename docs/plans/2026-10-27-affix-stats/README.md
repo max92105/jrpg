@@ -1,7 +1,7 @@
 # Affix stats
 Status: draft
 
-Split out of [the loot plan](../2026-10-27-loot/README.md) on 2026-10-27, when the developer approved it: the four stats decision 294 named as affixes, and the Status page showing them (decision 350). Slices A1-A4 come from the loot draft; ST1 is new. Runs after the loot plan (it needs `affixes.json`, `GearRoll` and the drops).
+Split out of [the loot plan](../done/2026-10-27-loot/README.md) on 2026-10-27, when the developer approved it: the four stats decision 294 named as affixes, and the Status page showing them (decision 350). Slices A1-A4 come from the loot draft; ST1 is new. Runs after the loot plan (it needs `affixes.json`, `GearRoll` and the drops).
 
 - Numbers: decisions 294, 346-350 (from the loot plan) and 356. No ADR (ADR 0030 records these as stat kinds that only affixes give). Take any new number from `docs/plans/README.md`'s "Next free numbers" line.
 - Draft: sizes and the notes below get their review before approval.

@@ -41,6 +41,14 @@ internal static class DamageFormula
         return (int)Math.Max(MinimumDamage, damage);
     }
 
+    /// <returns>
+    /// <c>hpTaken × permille ÷ 1000</c>, rounded down: a share of what the hit really took, so overkill steals
+    /// nothing, and per hit, so a small hit can steal 0 (decision 365).
+    /// </returns>
+    /// <param name="hpTaken">The HP the hit took from its target.</param>
+    /// <param name="permille">The hitter's lifesteal.</param>
+    public static int LifeStolen(int hpTaken, int permille) => (int)((long)hpTaken * permille / Whole);
+
     /// <summary>Whether a hit meeting <paramref name="resistancePermille"/> is cued weak, resisted, or not.</summary>
     public static HitAffinity AffinityOf(int resistancePermille) => resistancePermille switch
     {

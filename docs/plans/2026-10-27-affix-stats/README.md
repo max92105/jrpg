@@ -35,7 +35,7 @@ The loot plan's, plus:
 
 ## Slices
 ### Battle stats
-- [ ] **A1. Lifesteal** (Core + Data + content + Game, about 250 lines) → [slices/A1.md](slices/A1.md)
+- [x] **A1. Lifesteal** (Core + Data + content + Game, about 250 lines) → [slices/A1.md](slices/A1.md)
 - [ ] **A2. Armor penetration, and the stone beetles in the forest** (Core + content + Data tests + Simulations, about 200 lines) → [slices/A2.md](slices/A2.md)
 - [ ] **A3. Block, with its "Blocked" cue; the shield in the goblin's drops** (Core + content + Game, about 180 lines) → [slices/A3.md](slices/A3.md)
 

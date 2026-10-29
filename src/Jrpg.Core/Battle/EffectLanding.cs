@@ -9,7 +9,8 @@ namespace Jrpg.Core.Battle;
 /// An effect landing on its targets, in order: each of its hits, the status it grants to a target still standing, and
 /// what a fall sets off (ADR 0019, ADR 0021). A damaging hit rolls to land first, then to crit (decision 325); one that
 /// misses is no hit at all, and a damage effect that missed every hit leaves no status behind (decision 326). A stun
-/// rolls against its target's crowd control resistance (decision 324).
+/// rolls against its target's crowd control resistance (decision 324). Each landed damaging hit heals its living hitter
+/// by their lifesteal's share of the HP it took (decision 346); an item's hits never do (decision 321).
 /// </summary>
 /// <param name="combatants">Everyone in the battle, for the triggers a fall sets off.</param>
 /// <param name="rolls">The battle's rolls, for whether each hit lands and crits, and whether a stun takes.</param>
@@ -19,22 +20,16 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceR
     /// <param name="effect">What lands.</param>
     /// <param name="targets">Who it lands on, already checked as legal.</param>
     /// <param name="events">Where what happened is reported.</param>
-    public void Land(Combatant actor, Effect effect, IReadOnlyList<Combatant> targets, List<BattleEvent> events)
-    {
-        foreach (var target in targets)
-        {
-            var wasAlive = target.IsAlive;
-            var hasLanded = LandHits(actor, effect, target, events);
-            if (wasAlive && !target.IsAlive)
-            {
-                Fall(target, combatants, events);
-            }
-            else if (effect.Status is { } grant && target.IsAlive && hasLanded)
-            {
-                Grant(grant, target, events);
-            }
-        }
-    }
+    public void Land(Combatant actor, Effect effect, IReadOnlyList<Combatant> targets, List<BattleEvent> events) =>
+        LandOn(new HitSource(actor, actor.CurrentStats.LifeStealPermille), effect, targets, events);
+
+    /// <summary>Lands an item's effect: its hits carry none of the user's lifesteal (decision 321).</summary>
+    /// <param name="actor">Who used the item, for the gains a landed hit triggers.</param>
+    /// <param name="effect">What lands.</param>
+    /// <param name="targets">Who it lands on, already checked as legal.</param>
+    /// <param name="events">Where what happened is reported.</param>
+    public void LandFromItem(Combatant actor, Effect effect, IReadOnlyList<Combatant> targets, List<BattleEvent> events) =>
+        LandOn(new HitSource(actor, LifeStealPermille: 0), effect, targets, events);
 
     /// <summary>Reports a fall, clears the fallen's statuses and runs what a fall triggers.</summary>
     public static void Fall(Combatant fallen, IReadOnlyList<Combatant> combatants, List<BattleEvent> events)
@@ -46,6 +41,23 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceR
         }
 
         ResourceTriggers.OnCombatantFallen(fallen, combatants, events);
+    }
+
+    private void LandOn(HitSource source, Effect effect, IReadOnlyList<Combatant> targets, List<BattleEvent> events)
+    {
+        foreach (var target in targets)
+        {
+            var wasAlive = target.IsAlive;
+            var hasLanded = LandHits(source, effect, target, events);
+            if (wasAlive && !target.IsAlive)
+            {
+                Fall(target, combatants, events);
+            }
+            else if (effect.Status is { } grant && target.IsAlive && hasLanded)
+            {
+                Grant(grant, target, events);
+            }
+        }
     }
 
     private static HitAffinity AffinityOf(EffectKind kind, Mitigation mitigation) =>
@@ -61,8 +73,9 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceR
     }
 
     // Each hit is resolved and reported on its own (decision 206); the hits stop once the target falls.
-    private bool LandHits(Combatant actor, Effect effect, Combatant target, List<BattleEvent> events)
+    private bool LandHits(HitSource source, Effect effect, Combatant target, List<BattleEvent> events)
     {
+        var actor = source.Actor;
         var hasLanded = false;
         for (var hit = 0; hit < effect.Hits && (hit == 0 || target.IsAlive); hit++)
         {
@@ -86,10 +99,21 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceR
             {
                 ResourceTriggers.OnHitTaken(target, amount, events);
                 ResourceTriggers.OnHitLanded(actor, amount, events);
+                StealLife(source, amount, events);
             }
         }
 
         return hasLanded;
+    }
+
+    // RestoreHp gives a fallen hitter nothing, and a hitter at max HP nothing more, so neither is reported.
+    private static void StealLife(HitSource source, int hpTaken, List<BattleEvent> events)
+    {
+        var healed = source.Actor.Vitals.RestoreHp(DamageFormula.LifeStolen(hpTaken, source.LifeStealPermille));
+        if (healed > 0)
+        {
+            events.Add(new LifeStolen(source.Actor, healed));
+        }
     }
 
     // A stun rolls its chance against the target's crowd control resistance (decision 324); the other statuses land.
@@ -109,4 +133,7 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceR
     // Only damage rolls (decision 325): a heal, a revive or a status alone never misses.
     private bool Lands(Combatant actor, Combatant target) =>
         rolls.Succeeds(HitFormula.ChancePermille(actor.CurrentStats.AccuracyPermille, target.CurrentStats.DodgePermille));
+
+    /// <summary>Who lands the hits, and what their hits carry from them.</summary>
+    private sealed record HitSource(Combatant Actor, int LifeStealPermille);
 }

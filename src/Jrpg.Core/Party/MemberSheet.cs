@@ -37,7 +37,10 @@ public static class MemberSheet
             DamagePermille: StatFormula.DamagePermille(primaries.Power, rules),
             Resistances: StatFormula.ResistancesFrom(primaries, ResistancesOf(worn), rules),
             StatusPermille: StatFormula.StatusPermille(primaries.Intelligence, rules),
-            ExtraStatusTurns: StatFormula.ExtraStatusTurns(primaries.Intelligence, rules));
+            ExtraStatusTurns: StatFormula.ExtraStatusTurns(primaries.Intelligence, rules))
+        {
+            LifeStealPermille = PermilleOf(worn, StatKind.LifeSteal),
+        };
     }
 
     private static PrimaryStats PrimariesOf(StatBonuses worn) => new(

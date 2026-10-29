@@ -37,6 +37,22 @@ public sealed class CombatantTests
         Assert.Equal(new CombatStats(AttackDamage: 15), combatant.Stats);
     }
 
+    // A ring rolled with 12 % lifesteal: the battle reads it in permille from the sheet.
+    [Fact]
+    public void FromPartyMember_LifeStealWorn_CopiedToStats()
+    {
+        var member = new PartyMemberBuilder().WithClass("fighter").Build();
+        var ring = new ItemDefinitionBuilder().WithId("ring").AsWorn(EquipmentKind.Ring).Build();
+        var piece = GearPiece.Rolled(ring, Rarity.Magic, [new RolledAffix("life_steal", StatKind.LifeSteal, 12)]);
+        var inventory = new Inventory();
+        inventory.AddGear(piece);
+        new PartyEquipment(inventory).TryEquip(member, piece);
+
+        var combatant = Combatant.FromPartyMember(member);
+
+        Assert.Equal(120, combatant.Stats.LifeStealPermille);
+    }
+
     [Fact]
     public void FromPartyMember_MemberWithSkills_CarriesThem()
     {

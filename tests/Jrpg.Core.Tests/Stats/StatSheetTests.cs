@@ -18,7 +18,10 @@ public sealed class StatSheetTests
         DamagePermille: 13,
         Resistances: new Resistances(Blunt: 14, Piercing: 15, Slashing: 16, Fire: 17, Ice: 18, Lightning: 19, Light: 20, Dark: 21),
         StatusPermille: 22,
-        ExtraStatusTurns: 23);
+        ExtraStatusTurns: 23)
+    {
+        LifeStealPermille = 24,
+    };
 
     [Theory]
     [InlineData(StatKind.Power, 1)]
@@ -41,6 +44,7 @@ public sealed class StatSheetTests
     [InlineData(StatKind.LightningResistance, 19)]
     [InlineData(StatKind.LightResistance, 20)]
     [InlineData(StatKind.DarkResistance, 21)]
+    [InlineData(StatKind.LifeSteal, 24)]
     public void ValueOf_EveryKind_ReadsItsField(StatKind kind, int expected)
     {
         Assert.Equal(expected, _sheet.ValueOf(kind));

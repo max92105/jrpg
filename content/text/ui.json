@@ -82,6 +82,7 @@
   "stat_lightning_resistance": "Lightning resistance",
   "stat_light_resistance": "Light resistance",
   "stat_dark_resistance": "Dark resistance",
+  "stat_life_steal": "Lifesteal",
   "stat_percent": "{value} %",
   "affix_line": "{value} {stat}",
   "affix_separator": " · ",

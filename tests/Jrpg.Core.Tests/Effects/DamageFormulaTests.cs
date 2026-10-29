@@ -119,4 +119,17 @@ public sealed class DamageFormulaTests
     {
         Assert.Equal(HitAffinity.Resisted, DamageFormula.AffinityOf(250));
     }
+
+    // 37 × 10 % is 3.7: rounded down per hit (decision 365).
+    [Fact]
+    public void LifeStolen_TenPercentOfThirtySeven_IsThree()
+    {
+        Assert.Equal(3, DamageFormula.LifeStolen(37, 100));
+    }
+
+    [Fact]
+    public void LifeStolen_NoLifeSteal_IsZero()
+    {
+        Assert.Equal(0, DamageFormula.LifeStolen(37, 0));
+    }
 }

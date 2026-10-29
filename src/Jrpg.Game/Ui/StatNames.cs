@@ -5,7 +5,7 @@ namespace Jrpg.Game.Ui;
 
 /// <summary>
 /// Each stat's name in ui.json (ADR 0010), shared by the leader choice, the Status page and the Equipment page. A table
-/// rather than a switch: twenty arms would pass the build's complexity limit.
+/// rather than a switch: an arm per stat would pass the build's complexity limit.
 /// </summary>
 internal static class StatNames
 {
@@ -31,6 +31,7 @@ internal static class StatNames
         [StatKind.LightningResistance] = MessageIds.StatLightningResistance,
         [StatKind.LightResistance] = MessageIds.StatLightResistance,
         [StatKind.DarkResistance] = MessageIds.StatDarkResistance,
+        [StatKind.LifeSteal] = MessageIds.StatLifeSteal,
     }.ToFrozenDictionary();
 
     /// <exception cref="KeyNotFoundException">A stat with no name in the table.</exception>

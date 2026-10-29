@@ -47,4 +47,10 @@ public sealed record CombatStats(int AttackDamage)
 
     /// <summary>The share of each damage type's hits taken off (ADR 0027).</summary>
     public Resistances Resistances { get; init; } = Resistances.None;
+
+    /// <summary>
+    /// The share of the HP each landed hit of an attack or a damaging skill took that heals the combatant, in permille:
+    /// a member's from their gear's affixes (decision 346), 0 for an enemy.
+    /// </summary>
+    public int LifeStealPermille { get; init; }
 }

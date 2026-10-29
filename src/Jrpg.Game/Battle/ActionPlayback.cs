@@ -119,6 +119,9 @@ internal sealed class ActionPlayback
             case StatusTicked ticked:
                 AddTick(ticked);
                 break;
+            case LifeStolen stolen:
+                AddStolenLife(stolen);
+                break;
             default:
                 AddImpactCue(battleEvent, messages);
                 break;
@@ -165,6 +168,13 @@ internal sealed class ActionPlayback
         {
             _cues.Add(new CueOnTarget(effect.Target, actionName));
         }
+    }
+
+    // The heal shows on the hitter in the impact that took the HP, above any number already on them.
+    private void AddStolenLife(LifeStolen stolen)
+    {
+        var stack = _numbers.Count(number => number.Target == stolen.Actor && number.ShowsAt == TimeSpan.Zero);
+        _numbers.Add(new FloatingNumber(stolen.Actor, NumberText.Of(stolen.Amount), FloatingNumberTone.Heal, Stack: stack));
     }
 
     private void AddBanner(ActionStarted started, UiMessages messages)

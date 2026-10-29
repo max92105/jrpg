@@ -1,8 +1,9 @@
 namespace Jrpg.Core.Stats;
 
 /// <summary>
-/// The twenty stats a sheet shows and gear can add (ADR 0026): the five primaries, the derived numbers, and one
-/// resistance per damage type (<see cref="StatKinds.ResistanceTo"/>).
+/// The stats a sheet shows and gear can add (ADR 0026): the five primaries, the derived numbers, one resistance per
+/// damage type (<see cref="StatKinds.ResistanceTo"/>), then the stats only affixes give
+/// (<see cref="StatKinds.AffixOnly"/>, ADR 0030).
 /// </summary>
 public enum StatKind
 {
@@ -26,4 +27,5 @@ public enum StatKind
     LightningResistance,
     LightResistance,
     DarkResistance,
+    LifeSteal,
 }

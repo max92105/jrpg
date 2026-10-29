@@ -35,6 +35,11 @@ public sealed record StatSheet(
     int ExtraStatusTurns)
 {
     /// <summary>
+    /// The share of the HP each landed hit of an attack or a damaging skill took that heals the member.
+    /// </summary>
+    public int LifeStealPermille { get; init; }
+
+    /// <summary>
     /// The number a screen shows for <paramref name="kind"/>: whole points for a primary, max HP and speed, permille
     /// for the percent kinds. The one place that reads a sheet by kind, so screens list stats without a switch.
     /// </summary>
@@ -50,6 +55,13 @@ public sealed record StatSheet(
         StatKind.CritDamage => CritDamagePermille,
         StatKind.Dodge => DodgePermille,
         StatKind.CrowdControlResistance => CrowdControlResistancePermille,
+        _ => AffixStatOf(kind),
+    };
+
+    // Apart from the derived stats so each switch stays under the build's complexity limit.
+    private int AffixStatOf(StatKind kind) => kind switch
+    {
+        StatKind.LifeSteal => LifeStealPermille,
         _ => Primaries.ValueOf(kind),
     };
 }

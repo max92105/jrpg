@@ -90,10 +90,16 @@ internal static class ItemCatalogValidator
         : null;
 
     // A bonus of 0 names a stat for nothing, likely a typo; past 100 one item outweighs any class (placeholder bound).
+    // The affix-only stats come from rolls alone (ADR 0030), never from a base item.
     private static string? FindBonusProblem(StatBonuses bonuses)
     {
         foreach (var (kind, bonus) in bonuses.Values)
         {
+            if (StatKinds.AffixOnly.Contains(kind))
+            {
+                return $"equipment.bonuses.{StatBonusesConverter.NameOf(kind)} is a stat only affixes give (ADR 0030).";
+            }
+
             if (bonus == 0 || Math.Abs(bonus) > MostBonus)
             {
                 return $"equipment.bonuses.{StatBonusesConverter.NameOf(kind)} must be nonzero and within -{MostBonus}..{MostBonus} (was {bonus}).";

@@ -205,7 +205,7 @@ public sealed class BattleState
 
         _targetChoices.ThrowIfIllegal(actor, effect, command.Targets);
         _inventory.TryRemove(command.Item.Id, 1);
-        _landing.Land(actor, effect, command.Targets, events);
+        _landing.LandFromItem(actor, effect, command.Targets, events);
     }
 
     // Placeholder (question 211): a Move costs the mover's turn, and the ally swapped with loses nothing.

@@ -17,5 +17,6 @@
   { "id": "ice_ward", "stat": "iceResistance", "min": 4, "max": 10, "kinds": [ "chest", "amulet", "ring", "head" ], "weight": 10 },
   { "id": "lightning_ward", "stat": "lightningResistance", "min": 4, "max": 10, "kinds": [ "chest", "amulet", "ring", "head" ], "weight": 10 },
   { "id": "light_ward", "stat": "lightResistance", "min": 4, "max": 10, "kinds": [ "chest", "amulet", "ring", "head" ], "weight": 10 },
-  { "id": "dark_ward", "stat": "darkResistance", "min": 4, "max": 10, "kinds": [ "chest", "amulet", "ring", "head" ], "weight": 10 }
+  { "id": "dark_ward", "stat": "darkResistance", "min": 4, "max": 10, "kinds": [ "chest", "amulet", "ring", "head" ], "weight": 10 },
+  { "id": "life_steal", "stat": "lifeSteal", "min": 8, "max": 15, "kinds": [ "weapon", "ring" ], "weight": 10 }
 ]

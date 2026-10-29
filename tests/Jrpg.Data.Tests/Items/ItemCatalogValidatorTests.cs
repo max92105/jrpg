@@ -206,6 +206,18 @@ public sealed class ItemCatalogValidatorTests
         Assert.Equal("items.json: item 'gear': equipment.bonuses.power must be nonzero and within -100..100 (was 101).", exception.Message);
     }
 
+    // A base item never gives what only a roll may (ADR 0030); each affix-only stat adds its case.
+    [Theory]
+    [InlineData(StatKind.LifeSteal, "lifeSteal")]
+    public void Validate_BonusOnAffixOnlyStat_Throws(StatKind kind, string name)
+    {
+        var ring = Equipment(new EquipmentStats(EquipmentKind.Ring) { Bonuses = Bonuses((kind, 5)) });
+
+        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [ring]));
+
+        Assert.Equal($"items.json: item 'gear': equipment.bonuses.{name} is a stat only affixes give (ADR 0030).", exception.Message);
+    }
+
     [Fact]
     public void Validate_NegativeBonusWithinBounds_Passes()
     {

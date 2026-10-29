@@ -26,12 +26,22 @@ public sealed class AffixCatalogValidatorTests
         { _power with { Kinds = [] }, "kinds must list at least one kind of gear." },
         { _power with { Weight = 0 }, "weight must be at least 1 (was 0)." },
         { _power with { Min = -3, Max = 2 }, "min and max must be on the same side of 0, or a roll could add nothing (was -3 and 2)." },
+        { _power with { Stat = StatKind.LifeSteal, Min = -5, Max = -1 }, "min must be above 0 for a stat only affixes give (was -5)." },
     };
 
     [Fact]
     public void Validate_ValidAffix_DoesNotThrow()
     {
         var exception = Record.Exception(() => AffixCatalogValidator.Validate("affixes.json", [_power]));
+
+        Assert.Null(exception);
+    }
+
+    // The other side of the sign rule: a primary may roll below 0, as a cursed item's bonus may.
+    [Fact]
+    public void Validate_NegativeRangeOnPrimary_DoesNotThrow()
+    {
+        var exception = Record.Exception(() => AffixCatalogValidator.Validate("affixes.json", [_power with { Min = -5, Max = -1 }]));
 
         Assert.Null(exception);
     }

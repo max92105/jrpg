@@ -15,7 +15,7 @@ Loot (`docs/plans/done/2026-10-27-loot/`, done 2026-10-29): decisions 338-355, 3
 
 Enemy skills and bosses (`docs/plans/2026-10-29-enemy-skills-and-bosses/`, draft 2026-10-29, drafted beside three other plans: local Q1-Q12, unnumbered proposed decisions, caller adds the README row): T1, T2, D1, C1, B1-B4, S1; answers question 224 once approved.
 
-Quests (`docs/plans/2026-10-29-quests/`, draft 2026-10-29, same parallel-draft rules: local Q1-Q13): QD, QL, QS, QC, QV, SV, J1, G1, E1-E3, N1, G2-G4, R1+G5 (notices, only if Q2 keeps them); two ADR candidates (condition placement; quest log vs story flags).
+Quests (`docs/plans/2026-10-29-quests/`, approved 2026-10-29, runs AFTER gold): decisions 386-398, ADRs 0032 (quest log; non-quest story state = main-quest stage, decision 398) and 0033 (conditions gate whole events, five kinds incl. reachedStage); 23 slices QD, QL, QS, R1 (ExplorationState split, unconditional), QC, QV (+ no-shadowing rule), E1-E3, N1, SV (format 7), J1, G1-G3, L1-L3, G4 (notices), QE1-QE4 (Quests editor window). Quests tab first in the menu; Active/Completed via Left/Right. Next free after it: decision 399, ADR 0034.
 
 Gold and shops (`docs/plans/2026-10-29-gold-and-shops/`, approved 2026-10-29, runs BEFORE quests): decisions 374-385, ADR 0031 (gold and trade, a step before G3); 27 slices G1-G4, S1-S6, L1, H1, E1, E2, N1, B1-B3, L2a, L2b, T1-T3, I1, I2a, I2b, I3; save format 6 (gold + rolled shop stocks), quests takes 7. Core `Trade/` (`Shop` buys, `ItemSales` sells, `Pricing`, `ShopStock` rolled once and rerolled after a leader level), `Party/Purse`; Game `Trade` may read `Menus`. Next free after it: decision 386, ADR 0032.
 

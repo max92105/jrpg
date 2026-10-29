@@ -107,3 +107,8 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - The "lists 'x' more than once" check is written in six Data validators (`NewGameValidator`, `ClassCatalogValidator`, `ResourceDefinitionValidator`, `SkillCatalogValidator`, `MapEventValidator`, `CraftingRulesValidator`), and `NewGame`'s `startingItems` repeats the crafting lists' entry checks (null, known item, 1..maxStack): one helper beside `RangeProblems` (M4 review).
 - `ForgeMotion` is the third copy of the "opening counted from the first drawn frame, closing from Cancel" fade, after `MenuMotion` and `TitleEntrance` (F1d): extract one frame-fade type in `Ui/`.
 - `ForgeScene.Craft` re-derives Core's "the first equal piece is the one replaced" rule to put the highlight on the changed row (F2c): `Inventory.TryReplace` (or the Forge's `Try` methods) could return the replaced index instead.
+
+## From the quests plan (2026-10-29, at approval)
+
+- **A page list's margins (28, 20) and row height (52) are private constants in about eight views**: `Crafting/ForgeListView`, `Menus/InventoryColumnView` and `InventoryListView`, `EquipmentChoiceView`, `EquipmentSheetView`, `PartyColumnsView`, `StatusSheetView`, `Saving/SaveFilesPanel` (and the gold plan's `Trade/ShopListView`). Once the quests plan's L1 has made `Ui/PageListLayout`, each reads it when next touched. It can wait because the copies hold the same numbers today.
+- **The pointed tabs are drawn inline twice**: `Battle/VictoryDropsView` (the Items step) and the gold plan's `Trade/ShopListView` (Buy and Sell). Once the quests plan's L2 has made `Ui/PointedTabsView`, both draw through it when next touched. It can wait because each copy is drawn once per screen and looks the same.

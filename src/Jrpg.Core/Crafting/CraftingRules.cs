@@ -18,4 +18,7 @@ public sealed record CraftingRules
     /// </summary>
     public IReadOnlyDictionary<Rarity, IReadOnlyList<InventoryEntry>> UpgradeCosts { get; init; } =
         new Dictionary<Rarity, IReadOnlyList<InventoryEntry>>();
+
+    /// <summary>What a reroll costs, whatever the piece's rarity.</summary>
+    public IReadOnlyList<InventoryEntry> RerollCost { get; init; } = [];
 }

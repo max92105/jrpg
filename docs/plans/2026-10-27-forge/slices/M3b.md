@@ -18,3 +18,4 @@ Part of [the forge plan](../README.md). Decisions 352, 369. After M3a. Was half 
     - `ForgeRerollTests: TryReroll_ShortOfMaterials_ReturnsFalseAndKeepsAll`
   - **Call sites:** none.
   - **Watch:** a piece whose saved affixes no longer roll on its kind (content changed since) rerolls into as many as the kind offers; `GearRepair` keeps such affixes today, so this is the rare case, not an error.
+- **Done, with deviations:** `TryReroll` checks the quote, then ownership, before drawing (as `TryUpgrade`); added `ForgeRerollTests.TryReroll_NotOwned_ReturnsFalseAndDrawsNothing` (the excluded case, decision 369). The refused quote names the cost (`QuoteReroll_PlainPiece_RefusedNoAffixes` asserts both). The Rare reroll's draws give the crit chance first, so the old order isn't kept either. Tests 2841 → 2847. Follow-up from the review: a Unique piece with affixes could be rerolled (salvage and upgrade refuse it); no Unique exists yet, so the Uniques plan decides.

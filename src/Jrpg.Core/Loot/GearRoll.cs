@@ -6,8 +6,9 @@ namespace Jrpg.Core.Loot;
 /// <summary>
 /// Rolls a dropped base item into a piece (ADR 0030): a rarity by weight, an affix count in that rarity's range, then
 /// that many affixes by weight among the pool's affixes for the item's kind, never one twice (decision 359), each value
-/// in its range; and adds one more affix to a piece at the Forge, drawn the same way (decision 351). Every draw is
-/// skipped when only one outcome is possible, so a Common-only table leaves the random untouched.
+/// in its range; and, at the Forge, adds one more affix to a piece or draws all of its affixes again the same way
+/// (decisions 351, 352). Every draw is skipped when only one outcome is possible, so a Common-only table leaves the
+/// random untouched.
 /// </summary>
 internal sealed class GearRoll(IReadOnlyList<AffixDefinition> pool, LootRules rules, IRandom random)
 {
@@ -36,6 +37,14 @@ internal sealed class GearRoll(IReadOnlyList<AffixDefinition> pool, LootRules ru
     /// <returns>Null, drawing nothing, when the pool has no affix left for the piece's kind (decision 357).</returns>
     public GearPiece? AddAffix(GearPiece piece, Rarity raisedTo) =>
         HasAffixLeftFor(piece) ? GearPiece.Rolled(piece.Base, raisedTo, [.. piece.Affixes, .. DrawAffixes(piece.Kind, 1, piece.Affixes)]) : null;
+
+    /// <summary>
+    /// The piece with as many affixes as it had, each drawn again among every affix for its kind, its old ones included
+    /// (decision 352); the same rarity. No luck: luck is a drop's (decision 349).
+    /// </summary>
+    /// <returns>Fewer affixes when the pool now has fewer for the kind than the piece held.</returns>
+    public GearPiece Reroll(GearPiece piece) =>
+        GearPiece.Rolled(piece.Base, piece.Rarity, DrawAffixes(piece.Kind, piece.Affixes.Count, kept: []));
 
     // Up to count affixes by weight among the kind's that aren't kept, never one twice, each value in its range.
     private List<RolledAffix> DrawAffixes(EquipmentKind kind, int count, IReadOnlyList<RolledAffix> kept)

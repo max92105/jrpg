@@ -16,8 +16,8 @@ public sealed class Forge
 
     /// <param name="inventory">The party's: where pieces are taken from and materials go.</param>
     /// <param name="items">Every item by id, to find the materials' stack sizes.</param>
-    /// <param name="rules">What salvage gives and upgrades cost.</param>
-    /// <param name="gearRoll">The drops' roll, so an upgrade draws affixes as a drop does.</param>
+    /// <param name="rules">What salvage gives and upgrades and rerolls cost.</param>
+    /// <param name="gearRoll">The drops' roll, so an upgrade or a reroll draws affixes as a drop does.</param>
     internal Forge(Inventory inventory, IReadOnlyDictionary<string, ItemDefinition> items, CraftingRules rules, GearRoll gearRoll)
     {
         _inventory = inventory;
@@ -88,6 +88,33 @@ public sealed class Forge
 
         Pay(quote.Materials);
         return _inventory.TryReplace(piece, upgraded);
+    }
+
+    /// <summary>What drawing every affix of the piece again would cost.</summary>
+    public ForgeQuote QuoteReroll(GearPiece piece)
+    {
+        var cost = _rules.RerollCost;
+        var refusal = piece.Affixes.Count == 0 ? ForgeRefusal.NoAffixes
+            : !CanPay(cost) ? ForgeRefusal.ShortOfMaterials
+            : (ForgeRefusal?)null;
+        return new ForgeQuote(cost, refusal);
+    }
+
+    /// <summary>Pays the cost and draws every affix of an owned piece again, in its place in the list.</summary>
+    /// <returns>
+    /// False when the piece isn't owned or its quote is refused; nothing changes and nothing is drawn then.
+    /// </returns>
+    public bool TryReroll(GearPiece piece)
+    {
+        var quote = QuoteReroll(piece);
+        if (quote.IsRefused || !_inventory.Gear.Contains(piece))
+        {
+            return false;
+        }
+
+        var rerolled = _gearRoll.Reroll(piece);
+        Pay(quote.Materials);
+        return _inventory.TryReplace(piece, rerolled);
     }
 
     // Common to Magic to Rare, one affix more each step (decision 351); Unique is never crafted (decision 339).

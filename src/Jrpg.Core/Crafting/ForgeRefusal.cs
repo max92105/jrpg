@@ -19,4 +19,7 @@ public enum ForgeRefusal
 
     /// <summary>The party owns fewer of a material than the action costs.</summary>
     ShortOfMaterials,
+
+    /// <summary>The piece has no affix to reroll (decisions 352, 370).</summary>
+    NoAffixes,
 }

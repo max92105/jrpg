@@ -7,41 +7,41 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// Draws the Status page's middle band (decision 334, the plan's S1a): Combat in the left half, the eight resistances
-/// in two columns of four in the right half with Resources under them. Each row is a small spaced-caps label with its
-/// value right-aligned close to it, so the two read together (<see cref="SheetRowLook"/>, which the Equipment page
-/// shares).
+/// in two columns of four in the right half (Resources sit beside the skills, decision 368). Each row is a small
+/// spaced-caps label with its value right-aligned close to it, so the two read together (<see cref="SheetRowLook"/>,
+/// which the Equipment page shares).
 /// </summary>
 internal sealed class StatusParametersView
 {
-    /// <summary>The band's height: the taller of Combat and of Resistances with Resources under them.</summary>
-    public const int Height = CombatHeight > ResistancesAndResourcesHeight ? CombatHeight : ResistancesAndResourcesHeight;
+    /// <summary>The band's height: the taller of Combat and Resistances.</summary>
+    public const int Height = CombatHeight > ResistancesHeight ? CombatHeight : ResistancesHeight;
 
-    /// <summary>The most class resources the band has room for under the resistances.</summary>
-    public const int MostResources = 2;
+    /// <summary>A row's height, shared with <see cref="StatusResourcesView"/>.</summary>
+    internal const int RowHeight = 34;
+
+    /// <summary>
+    /// How far under a section's top its first row starts, shared with <see cref="StatusResourcesView"/>.
+    /// </summary>
+    internal const int BelowBand = SectionTitle.Height + 10;
 
     // Placeholder layout (S1a's arithmetic): 34 px rows from 10 px under each band; cells 12 px in and at most 380 px
-    // wide, the halves 48 px apart; the resistances in two columns of four 24 px apart; Resources 16 px under them;
-    // HP's 4 px bar under its label, 12 px short of its value.
+    // wide, the halves 48 px apart; the resistances in two columns of four 24 px apart; HP's 4 px bar under its label,
+    // 12 px short of its value.
     private const int CombatRows = 7;
     private const int ResistanceRowsPerColumn = 4;
-    private const int RowHeight = 34;
-    private const int BelowBand = SectionTitle.Height + 10;
     private const int CellInset = 12;
     private const int CellWidth = 380;
     private const int HalfGap = 48;
     private const int ResistanceColumnGap = 24;
-    private const int SectionGap = 16;
     private const int HpBarHeight = 4;
     private const int HpBarValueGap = 12;
     private const int CombatHeight = BelowBand + (CombatRows * RowHeight);
-    private const int ResourcesTop = BelowBand + (ResistanceRowsPerColumn * RowHeight) + SectionGap;
-    private const int ResistancesAndResourcesHeight = ResourcesTop + BelowBand + (MostResources * RowHeight);
+    private const int ResistancesHeight = BelowBand + (ResistanceRowsPerColumn * RowHeight);
 
     private readonly StatusLabels _labels;
     private readonly SheetRowLook _rows;
     private readonly SectionTitle _combatTitle;
     private readonly SectionTitle _resistancesTitle;
-    private readonly SectionTitle _resourcesTitle;
     private Measured? _shown;
 
     /// <param name="text">Messages and fonts.</param>
@@ -52,16 +52,13 @@ internal sealed class StatusParametersView
         _rows = new SheetRowLook(text);
         _combatTitle = new SectionTitle(text, MessageIds.StatusCombat);
         _resistancesTitle = new SectionTitle(text, MessageIds.StatusResistances);
-        _resourcesTitle = new SectionTitle(text, MessageIds.StatusResources);
     }
 
     /// <summary>Measures the sheet's values, when the shown member changes.</summary>
     public void Show(StatusSheet sheet) => _shown = new Measured(
         [.. sheet.Combat.Select(_rows.Measure)],
         [.. sheet.Resistances.Select(_rows.Measure)],
-        sheet.ResistanceTones,
-        [.. sheet.Resources.Select(resource => resource.Name)],
-        [.. sheet.Resources.Select(resource => _rows.Measure(resource.Text))]);
+        sheet.ResistanceTones);
 
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the plain pixel and the bar come from.</param>
@@ -79,12 +76,6 @@ internal sealed class StatusParametersView
 
         var right = band with { X = band.X + halfWidth + HalfGap, Width = halfWidth };
         DrawResistances(frame, right, shown.Resistances, shown.ResistanceTones);
-        var resources = right with { Y = right.Y + ResourcesTop };
-        _resourcesTitle.Draw(batch, textures, resources, opacity);
-        for (var index = 0; index < shown.Resources.Length; index++)
-        {
-            _rows.Draw(frame.Batch, CellAt(resources, index, resources.Width), new SheetRowLook.Cell(shown.ResourceNames[index], shown.Resources[index], UiTheme.TextPrimary), frame.Opacity);
-        }
     }
 
     // Each combat line under the band; HP's bar runs under its label.
@@ -113,8 +104,10 @@ internal sealed class StatusParametersView
         }
     }
 
-    // A row's cell under a section's band: at most CellWidth wide, so its value stays close to its label.
-    private static Rectangle CellAt(Rectangle section, int row, int columnWidth) => new(
+    /// <summary>
+    /// A row's cell under a section's band: at most the cell width, so its value stays close to its label.
+    /// </summary>
+    internal static Rectangle CellAt(Rectangle section, int row, int columnWidth) => new(
         section.X + CellInset, section.Y + BelowBand + (row * RowHeight), Math.Min(CellWidth, columnWidth - CellInset), RowHeight);
 
     // A weakness reads as a danger, a resistance at the cap in the accent color (S1b).
@@ -136,5 +129,5 @@ internal sealed class StatusParametersView
 
     // The shown sheet's values, measured once when it is shown.
     private sealed record Measured(
-        MeasuredText[] Combat, MeasuredText[] Resistances, ResistanceTone[] ResistanceTones, string[] ResourceNames, MeasuredText[] Resources);
+        MeasuredText[] Combat, MeasuredText[] Resistances, ResistanceTone[] ResistanceTones);
 }

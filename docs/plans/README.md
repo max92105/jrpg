@@ -4,7 +4,7 @@ Feature plans from `/plan-feature`, worked through one slice at a time with `/sl
 
 Code-health work found along the way (big files, copies, open follow-ups) waits in [backlog.md](backlog.md) for the next cleanup plan.
 
-**Next free numbers:** decision 373, ADR 0031. A new decision or ADR takes its number from this line and bumps it in the same change, so two plans never share a number.
+**Next free numbers:** decision 374, ADR 0031. A new decision or ADR takes its number from this line and bumps it in the same change, so two plans never share a number.
 
 **Layout of a plan** (from the battle plan on): a folder `YYYY-MM-DD-name/` with
 - `README.md`: status, goal, order, guiding rules, out of scope, the slice index (one line and a checkbox per slice), the developer's decisions, open questions, ADRs needed. Read for every slice.

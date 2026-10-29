@@ -44,7 +44,7 @@ The loot plan's, plus:
 - [x] **A4b. Drop luck from gear; the simulation's luck table** (Core + content + Game text + Simulations, about 110 lines) → [slices/A4b.md](slices/A4b.md)
 
 ### Status page
-- [ ] **ST1a. Resources move beside Skills** (Game, raw about 100, about 160 at 1.6x) → [slices/ST1a.md](slices/ST1a.md)
+- [x] **ST1a. Resources move beside Skills** (Game, raw about 100, about 160 at 1.6x) → [slices/ST1a.md](slices/ST1a.md)
 - [ ] **ST1b. The Affixes section: twenty-four stats** (Game + text, raw about 80, about 130 at 1.6x) → [slices/ST1b.md](slices/ST1b.md)
 
 ## Decisions
@@ -58,6 +58,9 @@ From this plan's review (developer, 2026-10-29):
 - **366. The wooden shield joins the goblin's drop table at 4 %**, like the cap and the boots, so the off-hand `block` affix can roll in play.
 - **367. No cap on drop luck** for now (five members in full luck gear reach about +225 %).
 - **368. ST1's layout:** the four affix stats as two columns of two rows in the slot Resources holds today (under the Resistances: 198 + 46 + 2 × 34 = 312, the band's height unchanged), and Resources moves beside Skills. The page is `MenuLayout.SingleColumn` (1100 px wide, 1044 of content), `StatusSheetView.ContentHeight` is 20 + 232 + 312 + 16 + 256 = 836 of 848, so no layout that grows the band fits; `ContentHeight_ProfileBandAndThreeSkills_FitsThePage` is the guard. The new section's title is a text key (placeholder "Affixes").
+
+Taken during ST1a (developer, 2026-10-29):
+- **373. Tighter skill rows on the Status page:** the Skills band's first name 4 px under it (was 10), descriptions 28 px under their name (was 30), the hairline 6 px under them (was 8) and 7 px between skills (was 10), so three skills with two-line descriptions fit beside Resources (the warlock's and the druid's all wrap at 684 px). A three-line description would still hide the third skill; `StatusLayoutTests.Skills_EveryClassInContent_AllShowBesideResources` catches it.
 - Already decided, noted: items never steal life or penetrate (decision 321): `HitSource` gains `PenetrationPermille` in A2, set to 0 by `LandFromItem`; block works against any landed hit (348).
 
 Planner's picks (placeholders, unnumbered; the developer may change any): the beetle's other numbers (blunt attacks, the goblin's accuracy, crit, crowd control resistance, experience and drop table), two beetles per encounter, the Resources column 300 px wide beside Skills, the short label "Penetration". All in design.md's tunables.

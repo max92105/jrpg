@@ -13,15 +13,30 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class StatusSkillsView
 {
-    // Placeholder layout (decisions 82, 334): the first name 10 px under the band, 24 px names, 18 px descriptions 30
-    // px under the name, 12 px in, a hairline 8 px under the description, then a 10 px gap.
+    /// <summary>The descriptions' type size.</summary>
+    internal const int DescriptionPixels = 18;
+
+    /// <summary>How far the names and descriptions sit in from the section's left.</summary>
+    internal const int Indent = 12;
+
+    // Placeholder layout (decisions 82, 334, 373): the first name 4 px under the band, 24 px names, 18 px descriptions
+    // 28 px under the name, 12 px in, a hairline 6 px under the description, then a 7 px gap. Tight enough that three
+    // skills with two-line descriptions fit beside Resources (decision 373).
     private const int NamePixels = 24;
-    private const int DescriptionPixels = 18;
-    private const int BelowBand = SectionTitle.Height + 10;
-    private const int Indent = 12;
-    private const int DescriptionBelowName = 30;
-    private const int LineBelowDescription = 8;
-    private const int SkillGap = 10;
+    private const int BelowBand = SectionTitle.Height + 4;
+    private const int DescriptionBelowName = 28;
+    private const int LineBelowDescription = 6;
+    private const int SkillGap = 7;
+
+    // Two lines of the 18 px type, whose line height is 18: the layout test measures the real descriptions.
+    private const int TwoLineDescription = 36;
+
+    /// <summary>
+    /// The room three skills with two-line descriptions take, down to under the last hairline: what the page keeps for
+    /// the section (decision 373).
+    /// </summary>
+    internal const int RoomForThreeSkills =
+        BelowBand + (3 * (DescriptionBelowName + TwoLineDescription + LineBelowDescription)) + (2 * (1 + SkillGap)) + 1;
 
     private readonly SectionTitle _title;
     private readonly SpriteFontBase _nameFont;
@@ -29,6 +44,7 @@ internal sealed class StatusSkillsView
     private StatusSheet? _wrappedSheet;
     private int _wrappedWidth;
     private RichTextLayout[] _descriptions = [];
+    private int[] _hairlineTops = [];
 
     /// <param name="text">Messages and fonts.</param>
     public StatusSkillsView(ScreenText text)
@@ -49,22 +65,33 @@ internal sealed class StatusSkillsView
         var left = section.X + Indent;
         var width = section.Width - Indent;
         Wrap(sheet, width);
-        var nameTop = section.Y + BelowBand;
-        for (var index = 0; index < sheet.Skills.Count; index++)
+        for (var index = 0; index < sheet.Skills.Count && _hairlineTops[index] <= section.Height; index++)
         {
-            var description = _descriptions[index];
-            var lineTop = nameTop + DescriptionBelowName + description.Size.Y + LineBelowDescription;
-            if (lineTop > section.Bottom)
-            {
-                return;
-            }
-
+            var nameTop = section.Y + NameTopOf(_hairlineTops, index);
             batch.DrawString(_nameFont, sheet.Skills[index].Name, new Vector2(left, nameTop), UiTheme.TextPrimary * opacity);
-            description.Draw(batch, new Vector2(left, nameTop + DescriptionBelowName), UiTheme.TextSecondary * opacity);
-            batch.Draw(textures.Pixel, new Rectangle(left, lineTop, width, 1), UiTheme.Stroke * opacity);
-            nameTop = lineTop + 1 + SkillGap;
+            _descriptions[index].Draw(batch, new Vector2(left, nameTop + DescriptionBelowName), UiTheme.TextSecondary * opacity);
+            batch.Draw(textures.Pixel, new Rectangle(left, section.Y + _hairlineTops[index], width, 1), UiTheme.Stroke * opacity);
         }
     }
+
+    /// <summary>
+    /// Each skill's hairline, from the section's top, given its description's height: a skill shows only when its
+    /// hairline is within the section, so the page shows whole skills.
+    /// </summary>
+    /// <param name="descriptionHeights">Each description's height as wrapped, in the skills' order.</param>
+    internal static int[] HairlineTopsOf(IReadOnlyList<int> descriptionHeights)
+    {
+        var hairlineTops = new int[descriptionHeights.Count];
+        for (var index = 0; index < hairlineTops.Length; index++)
+        {
+            hairlineTops[index] = NameTopOf(hairlineTops, index) + DescriptionBelowName + descriptionHeights[index] + LineBelowDescription;
+        }
+
+        return hairlineTops;
+    }
+
+    // The first name sits under the band; each next one under the hairline before it and the gap.
+    private static int NameTopOf(int[] hairlineTops, int index) => index == 0 ? BelowBand : hairlineTops[index - 1] + 1 + SkillGap;
 
     // Wrapped again only when the shown sheet or the width changes, so drawing lays out nothing new each frame.
     private void Wrap(StatusSheet sheet, int width)
@@ -76,15 +103,22 @@ internal sealed class StatusSkillsView
 
         _wrappedSheet = sheet;
         _wrappedWidth = width;
-        _descriptions = [.. sheet.Skills.Select(skill => new RichTextLayout
-        {
-            // Off, so a bracket or a slash in content text is never read as a FontStashSharp formatting command.
-            SupportsCommands = false,
-            Font = _descriptionFont,
-            Width = width,
-            Text = skill.Text,
-        })];
+        _descriptions = [.. sheet.Skills.Select(skill => DescriptionLayout(_descriptionFont, width, skill.Text))];
+        _hairlineTops = HairlineTopsOf([.. _descriptions.Select(description => description.Size.Y)]);
     }
+
+    /// <summary>A description wrapped at the column's width, as the section draws it.</summary>
+    /// <param name="font">The descriptions' font, at <see cref="DescriptionPixels"/>.</param>
+    /// <param name="width">The text's width: the section's, less <see cref="Indent"/>.</param>
+    /// <param name="text">The description.</param>
+    internal static RichTextLayout DescriptionLayout(SpriteFontBase font, int width, string text) => new()
+    {
+        // Off, so a bracket or a slash in content text is never read as a FontStashSharp formatting command.
+        SupportsCommands = false,
+        Font = font,
+        Width = width,
+        Text = text,
+    };
 
     /// <summary>What the section draws, and where.</summary>
     /// <param name="Sheet">The shown member's sheet.</param>

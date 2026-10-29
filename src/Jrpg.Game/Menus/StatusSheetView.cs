@@ -10,8 +10,8 @@ namespace Jrpg.Game.Menus;
 /// Draws a <see cref="StatusSheet"/> after the reference's Status page (decision 334): the profile beside a diamond
 /// portrait, with the experience over its bar and the experience to the next level at the bar's end, and the five
 /// Attributes with what each gives at the band's right; then each section under its dark band
-/// (<see cref="SectionTitle"/>): Combat beside Resistances and Resources (<see cref="StatusParametersView"/>),
-/// then the skills.
+/// (<see cref="SectionTitle"/>): Combat beside Resistances (<see cref="StatusParametersView"/>), then the skills with
+/// Resources at their right (<see cref="StatusResourcesView"/>, decision 368).
 /// </summary>
 internal sealed class StatusSheetView
 {
@@ -44,10 +44,15 @@ internal sealed class StatusSheetView
     private const int XpBarTop = 40;
 
     // Under the profile band (as tall as Attributes) and 16 px, the middle band, 16 px, then Skills: room for three
-    // skills of about 70 px under their band (S1a's arithmetic; the skills view draws as many whole ones as fit).
+    // skills with two-line descriptions (decision 373; the skills view draws as many whole ones as fit, and the layout
+    // test measures every class's). Resources sit 48 px right of Skills, 300 px wide (decision 368).
     private const int ProfileHeight = AttributesHeight + SectionGap;
     private const int SectionGap = 16;
-    private const int SkillsHeight = SectionTitle.Height + 10 + (3 * 70);
+    private const int ResourcesWidth = 300;
+    private const int ResourcesGap = 48;
+
+    /// <summary>The room the page keeps for the Skills row, which the Resources beside them must fit.</summary>
+    internal const int SkillsHeight = StatusSkillsView.RoomForThreeSkills;
 
     // The Attributes column at the profile band's right (S1b): 480 px wide, 40 px from the profile's text, five 34 px
     // rows 10 px under its band, each label 12 px in, its value ending 190 px in, the caption 16 px after it in 16 px
@@ -83,6 +88,7 @@ internal sealed class StatusSheetView
     private readonly SectionTitle _attributesTitle;
     private readonly SpriteFontBase _captionFont;
     private readonly StatusSkillsView _skills;
+    private readonly StatusResourcesView _resources;
     private readonly StatBar _xpBar;
     private MeasuredSheet? _shown;
 
@@ -102,6 +108,7 @@ internal sealed class StatusSheetView
         _attributesTitle = new SectionTitle(text, MessageIds.StatusAttributes);
         _captionFont = text.Fonts.FontAt(CaptionPixels);
         _skills = new StatusSkillsView(text);
+        _resources = new StatusResourcesView(text);
         Vitals = new MemberVitalBars(text, ui, ValuePixels);
         _xpBar = new StatBar(ui, UiTheme.XpBar);
     }
@@ -120,6 +127,7 @@ internal sealed class StatusSheetView
             MeasuredText.Of(_valueFont, sheet.Progress[NextIndex]),
             [.. sheet.Attributes.Select(attribute => MeasuredText.Of(_valueFont, attribute.Value))]);
         _parameters.Show(sheet);
+        _resources.Show(sheet);
     }
 
     /// <param name="batch">Already begun.</param>
@@ -137,9 +145,19 @@ internal sealed class StatusSheetView
 
         var band = new Rectangle(content.X, content.Y + ProfileHeight, content.Width, StatusParametersView.Height);
         _parameters.Draw(batch, textures, new StatusParametersView.Place(band, Vitals.Hp.Bar), opacity);
-        var skillsTop = band.Bottom + SectionGap;
-        var skills = new Rectangle(content.X, skillsTop, content.Width, area.Bottom - skillsTop);
+        var skills = SkillsSectionIn(area);
         _skills.Draw(batch, textures, new StatusSkillsView.Place(place.Sheet, skills), opacity);
+        var resources = new Rectangle(skills.Right + ResourcesGap, skills.Y, ResourcesWidth, StatusResourcesView.Height);
+        _resources.Draw(batch, textures, resources, opacity);
+    }
+
+    /// <summary>The Skills section: under the middle band down to the page's bottom, left of Resources.</summary>
+    /// <param name="area">The page's area.</param>
+    internal static Rectangle SkillsSectionIn(Rectangle area)
+    {
+        var top = area.Y + TopMargin + ProfileHeight + StatusParametersView.Height + SectionGap;
+        var width = area.Width - (2 * Margin) - ResourcesGap - ResourcesWidth;
+        return new Rectangle(area.X + Margin, top, width, area.Bottom - top);
     }
 
     // The portrait at the left; name and level, the class under them, the experience over its bar; Attributes right.

@@ -20,7 +20,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
   The file is protected, so ask the developer first.
 - **Why Core refused an equipment change:** `SlotChoice.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. `PartyEquipment.ItemWithoutRoom` and `UnequipAll` would own both. It can wait because it is correct today, and nothing planned changes equipment.
-- **`Ui/MessageIds.cs` is 564 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
+- **`Ui/MessageIds.cs` is 580 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
 - **`MainViewModelTests`, part 2 (449 lines after E1a):** move the new content tests (`CreateObject_*`, `CreateNpc_*`, `CanStartNewObject_*`, `TryCreateMap_*`) and the map settings tests (`TryApplySettings_*`) into their own classes, on E1a's `EditorTestContent`.
 - **`MainWindow.xaml.cs` (547 lines):** move the viewport (pan, zoom, fit) and the tile painting handlers into partial files, as `.EventEditing` and `.ObjectEditing` already are.
 - **`TileBrowserViewModelTests` (410 lines):** move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class.
@@ -46,10 +46,10 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - Test files over 300 lines: `GameFlowTests` (369), `PartyStateTests` (322). Split by behavior when next touched.
 - Comment lines over 120 columns from before the rule was enforced: `ExplorationState` (5), `GameSession` (8), `ArtReferenceCheck` (2), `MessageIds` (1). Rewrap when next touched.
 - `ScreenFade` skips its black moment when one update is longer than its fade-out plus hold (about 0.33 s), so a warp never moves the player. The fixed 1/60 s step hides it in play; tests must step at 1/60 s. Make `Update` stop on Holding if a long frame can ever reach it.
-- `BattleState.cs` is at 296 lines: split the per-command bodies before the next command path lands (DR2 review).
+- `BattleState.cs` is at 269 lines (296 at DR2): split the per-command bodies before the next command path lands (DR2 review).
 - `tests/Jrpg.Game.Tests/Battle/CommandMenuTests.cs` is at 393 lines: split it by menu entry (MO1 review).
 - The tip strip (dark `UiTheme.CommandHintFill` fill, highlight hairline, padded text) is drawn twice: `Battle/CommandPanelView.DrawHint` and `Menus/InventoryListView.DrawStrip`. Move it into one drawer in `Ui` when a third appears (M4 review).
-- The gap under a section title's band, `SectionTitle.Height + 10`, is written three times (`EquipmentSheetView.SectionHeight`, `StatusSheetView.BelowBand`, `StatusSkillsView.BelowBand`): give `SectionTitle` a `ContentTop` (M3b review; the band's height itself moved there in the escape menu third pass, F1).
+- The gap under a section title's band, `SectionTitle.Height + 10`, is written three times (`EquipmentSheetView.SectionHeight`, `StatusParametersView.BelowBand`, `StatusSheetView.AttributesBelowBand`; `StatusSkillsView`'s is 4 since decision 373): give `SectionTitle` a `ContentTop` (M3b review; the band's height itself moved there in the escape menu third pass, F1).
 - The scroll cues above and below a list are drawn twice: `PartySidebarView.DrawScrollCues` and `MemberColumnView.DrawScrollMarks`. Move them into one `Ui` drawer if a third list needs them (M2b review).
 
 ## From the class mechanics plan (2026-10-25)
@@ -97,3 +97,8 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - The Inventory page's Weapons and Armor tabs still show the QTY column title, though each of their rows is a piece without a count (P1a).
 - `Battle/VictoryScreenView.cs` is at 263 lines since the Items step (D3): the next change that grows it moves the cards' drawing into a `VictoryCardsView` first.
 - `tests/Jrpg.Core.Tests/Session/GameSessionSaveTests.cs` is at 270 lines: the next save test goes in a new file split by concern (gear, members, world).
+
+## From the affix stats plan (2026-10-29)
+
+- `Battle/ActionPlayback` counts a target's numbers already shown this beat twice (`_numbers.Count(… ShowsAt == TimeSpan.Zero)`, for a hit and for stolen life, A1): a third copy extracts a `StackOf(target)`.
+- `Menus/StatusParametersView.Draw` draws the Resistances' and Affixes' section titles inline while `DrawCombat` draws its own (ST1b review): a `DrawSection(frame, title, section, cells)` would keep `Draw` at one level; it also has a doubled blank line above `Place`.

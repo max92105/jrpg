@@ -1,7 +1,7 @@
 # Affix stats
 Status: retro pending
 
-Split out of [the loot plan](../done/2026-10-27-loot/README.md) on 2026-10-27, when the developer approved it: the four stats decision 294 named as affixes, and the Status page showing them (decision 350). Runs right after the loot plan, which is done (it needs `affixes.json`, `GearRoll` and the drops); the [forge plan](../2026-10-27-forge/README.md) runs after this one. Reviewed by the devil's advocate and approved by the developer on 2026-10-29 (decisions 363-368).
+Split out of [the loot plan](../2026-10-27-loot/README.md) on 2026-10-27, when the developer approved it: the four stats decision 294 named as affixes, and the Status page showing them (decision 350). Runs right after the loot plan, which is done (it needs `affixes.json`, `GearRoll` and the drops); the [forge plan](../../2026-10-27-forge/README.md) runs after this one. Reviewed by the devil's advocate and approved by the developer on 2026-10-29 (decisions 363-368).
 
 - Numbers: decisions 294, 346-350 and 356 (from the loot plan), 363-368 (this plan's review). No ADR: ADR 0030 records these as stat kinds that only affixes give.
 - Tunables, the design overview, the folder dependencies and the risks: [design.md](design.md).

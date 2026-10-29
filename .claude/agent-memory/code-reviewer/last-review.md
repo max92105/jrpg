@@ -5,12 +5,11 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-27-loot, slice B1 (tests/Jrpg.Simulations/Loot/LootSimulation.cs: goblin trio drops over 2,000 seeds,
-rarity-set equality test, potion-rate test; Done note).
-Round 1. Verdict: Ready to commit. verify.ps1 all pass (2717 tests).
+Plan: 2026-10-27-affix-stats, slice ST1b (Affixes section on the Status page: StatusSheet.Affixes, StatusLabels.Affixes,
+StatusParametersView.DrawInTwoColumns, status_affixes/status_penetration).
+Round 1. Verdict: Ready to commit. verify.ps1 all pass (2804 tests).
 
-- Warning: LootSimulation.DropRollFor:59-65 copies GameSession.DropRollFor (private static); Simulations has
-  InternalsVisibleTo, so make the session's builder internal (or a static on DropRoll) and call it - fixed (session builder made internal, simulation calls it)
-- Suggestion: PotionRateTolerance 0.03 is absolute potions per goblin; with a quantity range it shrinks to ~1-2 sd and
-  the comment copies today's 6,000 goblins / 30 % - fixed (comment says what the bound assumes)
-- Suggestion: pool rebuilt and re-sorted per seed (2,000 times); hoist to a static field - gone with the Warning
+- Suggestion: StatusParametersView.ResistanceColumnGap now spaces the Affixes' columns too; rename ColumnGap - fixed
+- Suggestion: Draw inlines the Resistances'/Affixes' titles while DrawCombat draws its own; let DrawInTwoColumns take
+  the SectionTitle (or a DrawSection) so Draw stays at one level - moved to backlog (retro)
+- Follow-up: StatusSheetView summary (lines 12-13) "Combat beside Resistances" omits the Affixes section - fixed

@@ -1,7 +1,7 @@
 # The forge
 Status: approved (after affix stats)
 
-Split out of [the loot plan](../done/2026-10-27-loot/README.md) on 2026-10-27, when the developer approved it: materials, salvage and a bit of crafting (decisions 351-354), at a forge master NPC on the map (decision 353). Runs after the loot plan (done) and after [the affix stats plan](../2026-10-27-affix-stats/README.md): its A4a gives `GearRoll.Roll(item, luckPermille)` and `DropRoll.Roll(tables, luckPermille)`, and this plan builds on those signatures (the Forge's `GearRoll` members take no luck).
+Split out of [the loot plan](../done/2026-10-27-loot/README.md) on 2026-10-27, when the developer approved it: materials, salvage and a bit of crafting (decisions 351-354), at a forge master NPC on the map (decision 353). Runs after the loot plan (done) and after [the affix stats plan](../done/2026-10-27-affix-stats/README.md): its A4a gives `GearRoll.Roll(item, luckPermille)` and `DropRoll.Roll(tables, luckPermille)`, and this plan builds on those signatures (the Forge's `GearRoll` members take no luck).
 
 - Numbers: decisions 339, 351-354 and 362 (from the loot plan), 357, 358 and 369-372. No ADR (see "ADRs").
 - Approved on 2026-10-29 with the developer's answers (357, 369-372) and the devil's advocate's edits: Core's `Forge` says what each action costs or gives and why it is refused (the screen only formats it); the crafting rules are checked from the loader once the items are loaded; the `openForge` step is wired through `EventPresenter`, `ExplorationScene` and `GameFlow`; the forge is reachable by hand right after the screen opens; slices split to stay under about 250 lines (M2 to M4, F1a to F1d, F2a to F2c).

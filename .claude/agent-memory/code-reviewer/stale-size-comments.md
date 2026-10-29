@@ -37,4 +37,6 @@ after Apply moved to SlotChoice; grep `<OldOwner>.<MovedMember>` across docs/ fo
 C3: a new fixture summary said "split in two files" with four repair files present; backlog kept "EquipmentPage.cs (281)" after C2 cut it to 228. Recheck sizes and file counts a doc states.
 G1b-2: removing SlotChoice.Refusal left the constructor's `<param name="messages">The take hint and the refusal.`;
 when a member goes, grep its noun ("refusal", "notice") in the type's own param docs and summaries.
+ST1a: a decision changing one view's spacing (StatusSkillsView rows) left the parent's reserved height (StatusSheetView
+SkillsHeight "3 x 70", 10 px under band) on the old rows; grep the parent's arithmetic for the child's old numbers.
 Related: [[tautological-tests]].

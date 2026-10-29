@@ -15,8 +15,8 @@ Older plans are single files with the same sections.
 
 | Plan | Status |
 |---|---|
-| [2026-10-27-affix-stats](2026-10-27-affix-stats/README.md) | retro pending |
-| [2026-10-27-forge](2026-10-27-forge/README.md) | approved (after affix stats) |
+| [2026-10-27-forge](2026-10-27-forge/README.md) | approved (next) |
+| [done/2026-10-27-affix-stats](done/2026-10-27-affix-stats/README.md) | done |
 | [done/2026-10-27-loot](done/2026-10-27-loot/README.md) | done |
 | [done/2026-10-26-stats-and-gear-slots](done/2026-10-26-stats-and-gear-slots/README.md) | done |
 | [done/2026-10-26-escape-menu-third-pass](done/2026-10-26-escape-menu-third-pass/README.md) | done |

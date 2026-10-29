@@ -76,3 +76,4 @@ When planning slices in this repo:
   - a weighted-pick boundary test must draw where the change moves the edge (a draw on an unchanged first weight can't fail);
   - when applying a review, the developer pre-assigns decision numbers and edits `docs/plans/README.md` himself; my own picks stay unnumbered "planner's picks";
   - the Write tool writes LF even over CRLF files and I have no shell: name the files needing `sed -i 's/\r*$/\r/'` in the report.
+- Affix stats retro (2026-10-29): when a slice's rule names a case it doesn't apply to (items, heals, enemies, reserve members), the slice's test list names that case's test (reviews added one in A2, A3 and A4b); a layout decision that narrows a column measures the real text at the new width (a probe test with the real fonts), not only the heights (ST1a's two-line descriptions became decision 373 mid-slice).

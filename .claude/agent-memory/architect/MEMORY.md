@@ -1,4 +1,4 @@
-- [Roadmap](project_migration_roadmap.md) — loot done; affix-stats approved (2026-10-29), forge approved after it (15 slices); numbers from docs/plans/README.md
+- [Roadmap](project_migration_roadmap.md) — loot and affix-stats done (2026-10-29); forge approved and next (15 slices); numbers from docs/plans/README.md
 - [Content quirks](project_content_quirks.md) — 1024 px party battlers, exact-case art names, player.png row order, empty skill icons
 - [Type/folder name clash](feedback_type_folder_name_clash.md) — never name a type after its feature folder (CA1724); use PartyState/BattleState
 - [Plan lessons](feedback_plan_lessons.md) — slice sizes, folder-dependency tables, no-caller APIs, presenter/draw split, code-health splits, wording-removal plans

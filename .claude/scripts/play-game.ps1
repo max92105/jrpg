@@ -16,6 +16,12 @@
 # For a battle capture, copy content/ to the scratchpad and in the copy give the enemies 1 HP and 0 dodge, set
 # rules.json stats.baseAccuracy to 200 and the drop table's chances to 100: otherwise a goblin survives a missed hit
 # and the steps run out (loot plan, D3 and P1).
+#
+# The warlock's Status page from the title (16, Shift, only waits):
+#   "69:100,16:2500,87:100,16:300,87:100,16:300,69:100,16:1500,87:100,69:100,16:1500,69:100,16:5000,27:100,16:2000,
+#    83:100,16:300,83:100,16:300,83:100,16:300,69:100,16:2000"
+# E opens the leader list; W twice is Sarxian, once is Thaali; the confirm defaults to No, so W then E; E skips the
+# intro stills; Esc, S three times to Status, E (affix stats plan, ST1a).
 param([Parameter(Mandatory)][string]$Out, [string]$Steps = '', [int]$StartSeconds = 6, [string]$Content = '')
 
 Add-Type @"

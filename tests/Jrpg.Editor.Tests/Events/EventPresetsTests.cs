@@ -42,6 +42,19 @@ public sealed class EventPresetsTests
         Assert.Empty(speech.Lines);
     }
 
+    // Decision 353: the forge master's line is left for the developer, then the Forge opens.
+    [Fact]
+    public void ForgeMaster_TalksThenOpensTheForge()
+    {
+        var forgeMaster = Assert.Single(EventPresets.ForgeMaster(new EventIdAllocation("smith_1", "villager", [])));
+
+        Assert.Equal(("smith_1_0", EventActivation.Interact, "Talk"), (forgeMaster.Id, forgeMaster.Activation, forgeMaster.Prompt));
+        Assert.Collection(
+            forgeMaster.Steps,
+            step => Assert.Empty(Assert.IsType<DialogueStep>(step).Speech.Lines),
+            step => Assert.IsType<OpenForgeStep>(step));
+    }
+
     [Fact]
     public void DoorYouOpen_OpensWhileClosed_WarpsOnlyWhenOpen()
     {

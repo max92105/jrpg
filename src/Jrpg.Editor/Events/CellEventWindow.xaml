@@ -38,7 +38,8 @@
         <TextBlock Text="Steps, run in order" FontWeight="Bold" />
       </StackPanel>
 
-      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
+      <!-- Wraps: every step kind and the list buttons are wider than the window. -->
+      <WrapPanel DockPanel.Dock="Bottom" Margin="0,4,0,0">
         <TextBlock Text="Add" VerticalAlignment="Center" Margin="0,0,4,0" />
         <Button Content="Warp" Width="60" Command="{Binding AddWarpCommand}" />
         <Button Content="Dialogue" Width="70" Margin="4,0,0,0" Command="{Binding AddDialogueCommand}" />
@@ -46,10 +47,11 @@
         <Button Content="Recruit" Width="60" Margin="4,0,0,0" Command="{Binding AddRecruitCommand}" />
         <Button Content="Voice" Width="50" Margin="4,0,0,0" Command="{Binding AddVoiceCommand}" />
         <Button Content="Rest" Width="50" Margin="4,0,0,0" Command="{Binding AddRestCommand}" />
+        <Button Content="Forge" Width="50" Margin="4,0,0,0" Command="{Binding AddOpenForgeCommand}" />
         <Button Content="Remove" Width="60" Margin="12,0,0,0" Command="{Binding RemoveStepCommand}" />
         <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepUpCommand}" />
         <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepDownCommand}" />
-      </StackPanel>
+      </WrapPanel>
 
       <local:EventStepEditor DockPanel.Dock="Bottom" DataContext="{Binding SelectedStep}" Margin="0,8,0,0" />
 

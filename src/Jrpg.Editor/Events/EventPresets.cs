@@ -6,9 +6,9 @@ using Jrpg.Core.Maps;
 namespace Jrpg.Editor.Events;
 
 /// <summary>
-/// The event dialog's presets: the usual events of a chest, a door, a door the player opens first and a sign, and an
-/// NPC who talks. What only the developer can say is left empty for the dialog to ask for: the chest's item, the door's
-/// destination, the sign's or the NPC's text.
+/// The event dialog's presets: the usual events of a chest, a door, a door the player opens first and a sign, an NPC
+/// who talks, and a forge master who talks and opens the Forge (decision 353). What only the developer can say is left
+/// empty for the dialog to ask for: the chest's item, the door's destination, the sign's or the NPC's text.
 /// </summary>
 internal static class EventPresets
 {
@@ -79,6 +79,18 @@ internal static class EventPresets
             Activation = EventActivation.Interact,
             Prompt = TalkPrompt,
             Steps = [new DialogueStep(new Speech([]))],
+        },
+    ];
+
+    /// <summary>Pressed: a forge master says a line, left for the developer to type, then opens the Forge.</summary>
+    public static IReadOnlyList<MapEvent> ForgeMaster(EventIdAllocation target) =>
+    [
+        new MapEvent
+        {
+            Id = target.NewEventIds(1)[0],
+            Activation = EventActivation.Interact,
+            Prompt = TalkPrompt,
+            Steps = [new DialogueStep(new Speech([])), new OpenForgeStep()],
         },
     ];
 

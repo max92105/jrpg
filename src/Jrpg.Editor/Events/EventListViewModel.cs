@@ -90,6 +90,9 @@ internal sealed partial class EventListViewModel : ObservableObject
     [RelayCommand]
     private void ApplyTalkPreset() => ApplyPreset(EventPresets.Talk(IdAllocation()));
 
+    [RelayCommand]
+    private void ApplyForgeMasterPreset() => ApplyPreset(EventPresets.ForgeMaster(IdAllocation()));
+
     // Replaces every event, and shows the first field the preset leaves to fill in.
     private void ApplyPreset(IReadOnlyList<MapEvent> presetEvents)
     {

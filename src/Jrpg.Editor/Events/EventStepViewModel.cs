@@ -112,6 +112,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.Recruit => $"Recruit: {MemberId}",
         EventStepKind.Voice => $"Voice: {VoiceFile}",
         EventStepKind.Rest => "Rest",
+        EventStepKind.OpenForge => "Open the Forge",
         _ => throw new UnreachableException(),
     };
 
@@ -148,6 +149,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         RecruitStep recruit => new(EventStepKind.Recruit) { MemberId = recruit.MemberId },
         VoiceStep voice => new(EventStepKind.Voice) { VoiceFile = voice.File },
         RestStep => new(EventStepKind.Rest),
+        OpenForgeStep => new(EventStepKind.OpenForge),
         _ => throw new ArgumentException($"Unknown step type {step.GetType().Name}.", nameof(step)),
     };
 
@@ -168,6 +170,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.Recruit => new RecruitStep(MemberId),
         EventStepKind.Voice => new VoiceStep(VoiceFile.Trim()),
         EventStepKind.Rest => new RestStep(),
+        EventStepKind.OpenForge => new OpenForgeStep(),
         _ => throw new UnreachableException(),
     };
 

@@ -223,6 +223,21 @@ public sealed class EventStepViewModelTests
     }
 
     [Fact]
+    public void FromStep_OpenForgeStep_ShowsOpenTheForgeWithNoFields()
+    {
+        var step = EventStepViewModel.From(new OpenForgeStep());
+
+        Assert.Equal("Open the Forge", step.Label);
+        Assert.Null(step.Problem);
+    }
+
+    [Fact]
+    public void ToStep_OpenForge_ReturnsOpenForgeStep()
+    {
+        Assert.Equal(new OpenForgeStep(), EventStepViewModel.New(EventStepKind.OpenForge).ToStep());
+    }
+
+    [Fact]
     public void Problem_RecruitWithoutMember_SaysSo()
     {
         var step = EventStepViewModel.New(EventStepKind.Recruit);
@@ -240,5 +255,6 @@ public sealed class EventStepViewModelTests
         new RecruitStep("omer"),
         new VoiceStep("Placeholder.wav"),
         new RestStep(),
+        new OpenForgeStep(),
     ];
 }

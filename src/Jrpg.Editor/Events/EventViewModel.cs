@@ -110,6 +110,9 @@ internal sealed partial class EventViewModel : ObservableObject
     [RelayCommand]
     private void AddRest() => AddStep(EventStepKind.Rest);
 
+    [RelayCommand]
+    private void AddOpenForge() => AddStep(EventStepKind.OpenForge);
+
     // After the chosen step, or last when none is chosen.
     private void AddStep(EventStepKind kind)
     {

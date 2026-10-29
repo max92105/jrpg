@@ -11,4 +11,5 @@ internal enum EventStepKind
     Recruit,
     Voice,
     Rest,
+    OpenForge,
 }

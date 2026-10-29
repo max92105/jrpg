@@ -225,6 +225,27 @@ public sealed class EventListViewModelTests
     }
 
     [Fact]
+    public void ApplyForgeMasterPresetCommand_SelectsTheEmptyDialogueStep()
+    {
+        _list.ApplyForgeMasterPresetCommand.Execute(null);
+
+        var forgeMaster = Assert.Single(_list.Events);
+        Assert.Same(forgeMaster.Steps[0], forgeMaster.SelectedStep);
+        Assert.Equal("Event door_1_2, step 1: Write at least one line.", _list.Problem);
+    }
+
+    [Fact]
+    public void AddOpenForgeCommand_NoStepChosen_AddsOpenTheForgeLast()
+    {
+        var open = _list.Events[0];
+        open.SelectedStep = null;
+
+        open.AddOpenForgeCommand.Execute(null);
+
+        Assert.Equal(new OpenForgeStep(), open.ToEvent().Steps[^1]);
+    }
+
+    [Fact]
     public void MoveStepUpCommand_FirstStep_StaysFirst()
     {
         var open = _list.Events[0];

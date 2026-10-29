@@ -27,6 +27,7 @@
         <Button Content="Door you open" Width="90" Margin="4,0,0,0" Command="{Binding ApplyDoorYouOpenPresetCommand}" />
         <Button Content="Sign" Width="50" Margin="4,0,0,0" Command="{Binding ApplySignPresetCommand}" />
         <Button Content="Talk" Width="50" Margin="4,0,0,0" Command="{Binding ApplyTalkPresetCommand}" />
+        <Button Content="Forge master" Width="90" Margin="4,0,0,0" Command="{Binding ApplyForgeMasterPresetCommand}" />
       </WrapPanel>
       <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
         <Button Content="Add" Width="60" Command="{Binding AddEventCommand}" />
@@ -70,7 +71,8 @@
       </StackPanel>
 
       <StackPanel DockPanel.Dock="Bottom" Margin="0,4,0,0">
-        <StackPanel Orientation="Horizontal">
+        <!-- Wraps: a row of every step kind is wider than the steps' column. -->
+        <WrapPanel>
           <TextBlock Text="Add" VerticalAlignment="Center" Margin="0,0,4,0" />
           <Button Content="Dialogue" Width="70" Command="{Binding AddDialogueCommand}" />
           <Button Content="Give item" Width="70" Margin="4,0,0,0" Command="{Binding AddGiveItemCommand}" />
@@ -80,7 +82,8 @@
           <Button Content="Recruit" Width="60" Margin="4,0,0,0" Command="{Binding AddRecruitCommand}" />
           <Button Content="Voice" Width="50" Margin="4,0,0,0" Command="{Binding AddVoiceCommand}" />
           <Button Content="Rest" Width="50" Margin="4,0,0,0" Command="{Binding AddRestCommand}" />
-        </StackPanel>
+          <Button Content="Forge" Width="50" Margin="4,0,0,0" Command="{Binding AddOpenForgeCommand}" />
+        </WrapPanel>
         <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
           <Button Content="Remove" Width="60" Command="{Binding RemoveStepCommand}" />
           <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepUpCommand}" />

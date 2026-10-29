@@ -17,8 +17,9 @@ namespace Jrpg.Game.Exploration;
 /// Shows the running map event's current step and continues it once shown (ADR 0006): a warp fades to black, moves the
 /// player while the screen is black, and fades back in; a dialogue shows its lines one page per Confirm, and a found
 /// item its message as one page. A rest fades to black and back before its message (decision 257). A cutscene still
-/// covers the screen for its seconds, and Confirm or Cancel skips the cutscene's stills (ADR 0016). The event's
-/// voice-over plays through the voice channel until the event ends or is skipped (ADR 0018).
+/// covers the screen for its seconds, and Confirm or Cancel skips the cutscene's stills (ADR 0016). A Forge step asks
+/// the scene to open the Forge, once (decision 353). The event's voice-over plays through the voice channel until the
+/// event ends or is skipped (ADR 0018).
 /// </summary>
 internal sealed class EventPresenter
 {
@@ -37,6 +38,10 @@ internal sealed class EventPresenter
 
     // Whether the current rest step has started its fade, so its page's own updates don't start it again.
     private bool _isRestFadeStarted;
+
+    // The Forge step the Forge was opened for, so it opens once per step: a second one right after it, or one an
+    // arrival event starts in the same update, is another step and opens it again. Null on any other step.
+    private OpenForgeStep? _forgeStepAskedFor;
 
     // The pages of the step being read; null when no message is on screen.
     private SpeechPlayback? _reading;
@@ -64,6 +69,12 @@ internal sealed class EventPresenter
     /// <summary>Whether a message (a dialogue page, a found item, a rest) is on screen.</summary>
     internal bool IsShowingMessage => _reading is not null;
 
+    /// <summary>
+    /// True on the one update a Forge step first shows: the scene opens the Forge. Talking to the forge master again
+    /// runs the event again, which opens it again.
+    /// </summary>
+    public bool IsOpeningForge { get; private set; }
+
     /// <summary>How black to draw over the map, 0..1.</summary>
     public float Blackness => Math.Max(_stills.Blackness, Math.Max(_warpFade.Blackness, _restFade.Blackness));
 
@@ -86,9 +97,10 @@ internal sealed class EventPresenter
         }
 
         var step = _exploration.CurrentEventStep;
+        FollowForgeStep(step);
         switch (step)
         {
-            case null:
+            case null or OpenForgeStep:
                 break;
             case WarpStep:
                 ShowWarp();
@@ -143,6 +155,14 @@ internal sealed class EventPresenter
         {
             _warpFade.StartAtBlack();
         }
+    }
+
+    // The Forge shows itself over the map: the step only asks for it, on its first update.
+    private void FollowForgeStep(EventStep? step)
+    {
+        var forgeStep = step as OpenForgeStep;
+        IsOpeningForge = forgeStep is not null && !ReferenceEquals(forgeStep, _forgeStepAskedFor);
+        _forgeStepAskedFor = forgeStep;
     }
 
     // The step's first update starts the fade; its message shows once the screen is back, as any page does.

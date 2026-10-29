@@ -33,6 +33,7 @@ internal sealed class GameFlow : IScene
     private readonly SessionTransitions _sessions;
     private readonly MenuTransitions _menus;
     private readonly BattleTransitions _battles;
+    private readonly ForgeTransitions _forges;
     private readonly EncounterFlash _flash = new();
     private readonly ShatterView _shatterView = new();
 
@@ -57,6 +58,7 @@ internal sealed class GameFlow : IScene
         _sessions = new SessionTransitions(catalog, _scenes, factory);
         _menus = new MenuTransitions(_scenes, factory);
         _battles = new BattleTransitions(_scenes, factory);
+        _forges = new ForgeTransitions(_scenes, factory);
         Voice = factory.Voice;
         _scenes.Push(factory.CreateTitle());
     }
@@ -148,6 +150,12 @@ internal sealed class GameFlow : IScene
                 break;
             case MenuClosed:
                 _menus.Close();
+                break;
+            case ForgeRequested:
+                _forges.Open();
+                break;
+            case ForgeClosed:
+                _forges.Close(Session ?? throw new InvalidOperationException("The Forge closed with no game started."));
                 break;
             case BattleRequested battle:
                 _encounter = battle;

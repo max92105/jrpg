@@ -49,7 +49,8 @@ internal sealed class ExplorationScene : IScene
     /// stands. The prompt over what the player faces follows, hidden while an event shows.
     /// </summary>
     /// <returns>
-    /// The menu when Menu is pressed between events; a battle on the update a step starts an encounter; otherwise null.
+    /// The menu when Menu is pressed between events; a battle on the update a step starts an encounter; the Forge on
+    /// the update a Forge step first shows (decision 353); otherwise null.
     /// </returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
@@ -73,6 +74,12 @@ internal sealed class ExplorationScene : IScene
         if (!ReferenceEquals(_exploration.CurrentMap, _map))
         {
             EnterCurrentMap();
+        }
+
+        if (_presenter.IsOpeningForge)
+        {
+            _walkAnimation.Stand();
+            return new ForgeRequested();
         }
 
         // Core refuses walking and interacting until the battle the encounter started is finished.

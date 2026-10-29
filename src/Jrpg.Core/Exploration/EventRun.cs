@@ -119,7 +119,7 @@ internal sealed class EventRun
                 }
 
                 return true;
-            case DialogueStep or WarpStep or StillStep:
+            case DialogueStep or WarpStep or StillStep or OpenForgeStep:
                 return true;
             default:
                 throw new InvalidOperationException($"Step {step.GetType().Name} has no rule in EventRun.");

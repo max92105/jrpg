@@ -50,6 +50,25 @@ public sealed class ExplorationSceneTests
         Assert.Equal(1, requests);
     }
 
+    // The Forge's step stays current while the Forge is open; a second request would push a second Forge.
+    [Fact]
+    public void Update_OpenForgeStep_RequestsForgeOnce()
+    {
+        var (exploration, scene) = Start(StartMapScenarios.BelowForgeChest);
+        Assert.True(exploration.TryInteract());
+
+        var requests = 0;
+        for (var update = 0; update < 60; update++)
+        {
+            if (scene.Update(StartMapScenarios.OneUpdate, default) is ForgeRequested)
+            {
+                requests++;
+            }
+        }
+
+        Assert.Equal(1, requests);
+    }
+
     [Fact]
     public void Update_EncounterPending_DoesNotWalk()
     {

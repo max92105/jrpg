@@ -33,6 +33,7 @@ public sealed class ContentFileWriterTests : IDisposable
             new SwapObjectStep("chest_opened"),
             new WarpStep("forest", new GridCell(1, 2)),
             new RestStep(),
+            new OpenForgeStep(),
         ];
 
         ContentFileWriter.Write(_path, steps);

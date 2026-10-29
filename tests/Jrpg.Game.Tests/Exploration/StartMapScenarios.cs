@@ -57,6 +57,13 @@ internal static class StartMapScenarios
     /// <summary>Below the chest, which now rests the party, every time: a rest step with nothing before it.</summary>
     public static ContentCatalog BelowRestingChest { get; } = WithChestSaying(BelowChest, new RestStep());
 
+    /// <summary>Below the chest, which now opens the Forge and then says a line, every time.</summary>
+    public static ContentCatalog BelowForgeChest { get; } =
+        WithChestSaying(BelowChest, new OpenForgeStep(), new DialogueStep(new Speech(["Come back with more scrap."])));
+
+    /// <summary>Below the chest, which now opens the Forge twice in a row, every time.</summary>
+    public static ContentCatalog BelowDoubleForgeChest { get; } = WithChestSaying(BelowChest, new OpenForgeStep(), new OpenForgeStep());
+
     /// <summary>Below the chest, which now talks, in two lines, every time: the stand-in for a sign (no map has one).</summary>
     public static ContentCatalog BelowTalkingChest { get; } =
         WithChestSaying(BelowChest, new DialogueStep(new Speech(["A voice from the chest.", "It falls silent."])));

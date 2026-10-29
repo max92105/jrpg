@@ -103,8 +103,12 @@ public sealed class Inventory
         return index < 0 ? 0 : _entries[index].Quantity;
     }
 
-    /// <summary>Whether the item's stack can take one more; gear is never in a stack, so always true for it.</summary>
-    public bool HasRoomFor(ItemDefinition item) => QuantityOf(item.Id) < item.MaxStack;
+    /// <summary>
+    /// Whether the item's stack can take <paramref name="quantity"/> more whole; gear is never in a stack, so always
+    /// true for it.
+    /// </summary>
+    public bool HasRoomFor(ItemDefinition item, int quantity) =>
+        item.Equipment is not null || QuantityOf(item.Id) + quantity <= item.MaxStack;
 
     private int IndexOf(string itemId) => _entries.FindIndex(entry => entry.ItemId == itemId);
 }

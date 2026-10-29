@@ -1,5 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
+using Jrpg.Core.Crafting;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
@@ -28,6 +29,7 @@ public sealed class GameSession
         FieldItems = new FieldItemUse(party, Inventory);
         EnemyTactics = new EnemyTactics(context.Random);
         _dropRoll = DropRollFor(context.Catalog, context.Random);
+        Forge = new Forge(Inventory, context.Catalog.Items, context.Catalog.Rules.Crafting);
     }
 
     public PartyState Party { get; }
@@ -35,6 +37,9 @@ public sealed class GameSession
     public Inventory Inventory { get; }
 
     public PartyEquipment Equipment { get; }
+
+    /// <summary>Salvaging and crafting owned pieces with materials (decisions 351-354).</summary>
+    public Forge Forge { get; }
 
     /// <summary>Using consumables from the menu.</summary>
     public FieldItemUse FieldItems { get; }

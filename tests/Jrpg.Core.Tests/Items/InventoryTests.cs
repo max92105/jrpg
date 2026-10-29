@@ -136,7 +136,7 @@ public sealed class InventoryTests
         var potion = new ItemDefinitionBuilder().WithMaxStack(3).Build();
         _inventory.Add(potion, 2);
 
-        var hasRoom = _inventory.HasRoomFor(potion);
+        var hasRoom = _inventory.HasRoomFor(potion, 1);
 
         Assert.True(hasRoom);
     }
@@ -147,9 +147,37 @@ public sealed class InventoryTests
         var potion = new ItemDefinitionBuilder().WithMaxStack(3).Build();
         _inventory.Add(potion, 3);
 
-        var hasRoom = _inventory.HasRoomFor(potion);
+        var hasRoom = _inventory.HasRoomFor(potion, 1);
 
         Assert.False(hasRoom);
+    }
+
+    // A salvage's whole yield must fit (decision 358): 98 and 2 is past 99, 98 and 1 is exactly it.
+    [Fact]
+    public void HasRoomFor_NinetyEightOwnedTwoMore_IsFalse()
+    {
+        var scrap = new ItemDefinitionBuilder().WithId("scrap").WithMaxStack(99).AsMaterial().Build();
+        _inventory.Add(scrap, 98);
+
+        Assert.False(_inventory.HasRoomFor(scrap, 2));
+    }
+
+    [Fact]
+    public void HasRoomFor_NinetyEightOwnedOneMore_IsTrue()
+    {
+        var scrap = new ItemDefinitionBuilder().WithId("scrap").WithMaxStack(99).AsMaterial().Build();
+        _inventory.Add(scrap, 98);
+
+        Assert.True(_inventory.HasRoomFor(scrap, 1));
+    }
+
+    // Gear is one piece per row with no cap (ADR 0029), so a count past the stack size still fits.
+    [Fact]
+    public void HasRoomFor_EquipmentPastMaxStack_IsTrue()
+    {
+        var sword = new ItemDefinitionBuilder().WithId("sword").WithMaxStack(1).AsWeapon(5).Build();
+
+        Assert.True(_inventory.HasRoomFor(sword, 2));
     }
 
     [Fact]

@@ -10,6 +10,7 @@ internal sealed class ItemDefinitionBuilder
     private int _maxStack = 99;
     private EquipmentStats? _equipment;
     private Effect? _effect;
+    private bool _isMaterial;
 
     public ItemDefinitionBuilder WithId(string id)
     {
@@ -57,6 +58,12 @@ internal sealed class ItemDefinitionBuilder
         return this;
     }
 
+    public ItemDefinitionBuilder AsMaterial()
+    {
+        _isMaterial = true;
+        return this;
+    }
+
     public ItemDefinition Build() => new()
     {
         Id = _id,
@@ -67,5 +74,6 @@ internal sealed class ItemDefinitionBuilder
         IsUsableFromMenu = false,
         Effect = _effect,
         Equipment = _equipment,
+        IsMaterial = _isMaterial,
     };
 }

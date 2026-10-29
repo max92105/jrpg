@@ -26,6 +26,9 @@ public sealed class GearRollTests
 
     private static readonly LootRules _rules = Rules((Rarity.Common, 650, 0, 0), (Rarity.Magic, 280, 1, 1), (Rarity.Rare, 70, 2, 3));
 
+    // The same weights with no affixes, so a lucky roll draws its rarity only.
+    private static readonly LootRules _rarityOnly = Rules((Rarity.Common, 650, 0, 0), (Rarity.Magic, 280, 0, 0), (Rarity.Rare, 70, 0, 0));
+
     [Fact]
     public void Roll_MagicPicked_HasOneAffix()
     {
@@ -114,6 +117,25 @@ public sealed class GearRollTests
         Assert.Equal(Rarity.Magic, piece.Rarity);
     }
 
+    // +50 % luck makes 650/420/105, total 1175: 1100 lands on Rare. Without luck the total is 1000, below the draw.
+    [Fact]
+    public void Roll_DrawPastUnluckyTotal_IsRareWithLuck()
+    {
+        var piece = new GearRoll(_pool, _rarityOnly, new FixedSequenceRandom(1100)).Roll(_sword, luckPermille: 500);
+
+        Assert.Equal(Rarity.Rare, piece.Rarity);
+    }
+
+    // Common keeps its 650 under luck (decision 349), so 650 is still the first Magic draw; were Common raised, it
+    // would be Common.
+    [Fact]
+    public void Roll_DrawJustPastCommon_IsMagicWithLuck()
+    {
+        var piece = new GearRoll(_pool, _rarityOnly, new FixedSequenceRandom(650)).Roll(_sword, luckPermille: 500);
+
+        Assert.Equal(Rarity.Magic, piece.Rarity);
+    }
+
     // The scripted random holds nothing, so the refusal comes before any draw.
     [Fact]
     public void Roll_NotEquipment_Throws()
@@ -124,7 +146,7 @@ public sealed class GearRollTests
     }
 
     private static GearPiece Roll(ItemDefinition item, LootRules rules, params int[] draws) =>
-        new GearRoll(_pool, rules, new FixedSequenceRandom(draws)).Roll(item);
+        new GearRoll(_pool, rules, new FixedSequenceRandom(draws)).Roll(item, luckPermille: 0);
 
     private static LootRules Rules(params (Rarity Rarity, int Weight, int Min, int Max)[] rows) =>
         new(rows.ToDictionary(row => row.Rarity, row => new RarityRule(row.Weight, row.Min, row.Max)));

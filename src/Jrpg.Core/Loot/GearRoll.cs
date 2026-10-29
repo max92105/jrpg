@@ -12,12 +12,13 @@ namespace Jrpg.Core.Loot;
 internal sealed class GearRoll(IReadOnlyList<AffixDefinition> pool, LootRules rules, IRandom random)
 {
     /// <param name="item">A base item that is equipment.</param>
+    /// <param name="luckPermille">The party's drop luck, raising the tiers above Common (decision 349).</param>
     /// <returns>A piece with fewer affixes than its rarity asks when the pool has too few for the kind.</returns>
     /// <exception cref="ArgumentException"><paramref name="item"/> isn't equipment.</exception>
-    public GearPiece Roll(ItemDefinition item)
+    public GearPiece Roll(ItemDefinition item, int luckPermille)
     {
         var kind = item.Equipment?.Kind ?? throw new ArgumentException($"Item '{item.Id}' is not equipment.", nameof(item));
-        var rarity = RollRarity();
+        var rarity = RollRarity(luckPermille);
         var rule = rules.Rarities[rarity];
         var count = RangeRoll.Within(rule.MinAffixes, rule.MaxAffixes, random);
         var candidates = pool.Where(affix => affix.Kinds.Contains(kind)).ToList();
@@ -34,9 +35,9 @@ internal sealed class GearRoll(IReadOnlyList<AffixDefinition> pool, LootRules ru
     }
 
     // The rows in rarity order, lowest first, so a draw lands on the same tier whatever order content lists them in.
-    private Rarity RollRarity()
+    private Rarity RollRarity(int luckPermille)
     {
         var rows = rules.Rarities.OrderBy(row => row.Key).ToList();
-        return rows[WeightedPick.Pick([.. rows.Select(row => row.Value.Weight)], random)].Key;
+        return rows[WeightedPick.Pick([.. rows.Select(row => LootFormula.RarityWeight(row.Value.Weight, row.Key, luckPermille))], random)].Key;
     }
 }

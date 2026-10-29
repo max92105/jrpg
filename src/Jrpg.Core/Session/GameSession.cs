@@ -173,7 +173,8 @@ public sealed class GameSession
             .OfType<string>()
             .Select(tableId => catalog.DropTables[tableId])
             .ToList();
-        return new BattleSpoils(rewards, Keep(_dropRoll.Roll(tables)));
+        // TODO(plan 2026-10-27-affix-stats, slice A4b): the active members' drop luck.
+        return new BattleSpoils(rewards, Keep(_dropRoll.Roll(tables, luckPermille: 0)));
     }
 
     // Adds the drops to the inventory and returns what went in: copies past a stack's limit are lost, as found ones

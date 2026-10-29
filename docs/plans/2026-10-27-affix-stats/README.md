@@ -40,7 +40,7 @@ The loot plan's, plus:
 - [x] **A3. Block, with its "Blocked" cue; the shield in the goblin's drops** (Core + content + Game, about 180 lines) → [slices/A3.md](slices/A3.md)
 
 ### Drop luck
-- [ ] **A4a. Loot rolls take a luck: `LootFormula`** (Core + Simulations, about 140 lines) → [slices/A4a.md](slices/A4a.md)
+- [x] **A4a. Loot rolls take a luck: `LootFormula`** (Core + Simulations, about 140 lines) → [slices/A4a.md](slices/A4a.md)
 - [ ] **A4b. Drop luck from gear; the simulation's luck table** (Core + content + Game text + Simulations, about 110 lines) → [slices/A4b.md](slices/A4b.md)
 
 ### Status page

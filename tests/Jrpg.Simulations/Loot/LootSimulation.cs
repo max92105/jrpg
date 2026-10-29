@@ -25,7 +25,7 @@ public sealed class LootSimulation(ITestOutputHelper output)
 
     private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
     private static readonly List<DropTable> _tables = TablesOf(EncounterId);
-    private static readonly List<Drops> _drops = [.. Enumerable.Range(0, Victories).Select(seed => GameSession.DropRollFor(_catalog, new SeededRandom(seed)).Roll(_tables))];
+    private static readonly List<Drops> _drops = [.. Enumerable.Range(0, Victories).Select(seed => GameSession.DropRollFor(_catalog, new SeededRandom(seed)).Roll(_tables, luckPermille: 0))];
 
     // Unique has no row in the table, so the equality also says it never rolls (decision 339).
     [Fact]

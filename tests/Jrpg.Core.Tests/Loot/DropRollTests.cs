@@ -79,16 +79,28 @@ public sealed class DropRollTests
         var random = new FixedSequenceRandom(0, 0, 0);
         var roll = new DropRoll(_items, new GearRoll(pool, rareOnly, random), random);
 
-        var drops = roll.Roll([Table(new DropEntry("bronze_sword", 100))]);
+        var drops = roll.Roll([Table(new DropEntry("bronze_sword", 100))], luckPermille: 0);
 
         var piece = Assert.Single(drops.Gear);
         Assert.Equal(Rarity.Rare, piece.Rarity);
         Assert.Equal(["power", "crit_chance"], piece.Affixes.Select(affix => affix.AffixId));
     }
 
+    // A 30 % entry is 300 permille: 300 misses it, but +50 % luck makes it 450 (decision 349).
+    [Fact]
+    public void Roll_DrawJustAboveChance_DropsWithLuck()
+    {
+        var random = new FixedSequenceRandom(300);
+        var roll = new DropRoll(_items, new GearRoll([], _commonOnly, random), random);
+
+        var drops = roll.Roll([Table(new DropEntry("potion", 30))], luckPermille: 500);
+
+        Assert.Equal([new ItemDrop(_potion, 1)], drops.Stacks);
+    }
+
     // Every dropped piece rolls Common without a draw, so these tests' draws are the drop chances and quantities only.
     private static Drops Roll(IReadOnlyList<DropTable> tables, FixedSequenceRandom random) =>
-        new DropRoll(_items, new GearRoll([], _commonOnly, random), random).Roll(tables);
+        new DropRoll(_items, new GearRoll([], _commonOnly, random), random).Roll(tables, luckPermille: 0);
 
     private static AffixDefinition Affix(string id, StatKind stat) =>
         new() { Id = id, Stat = stat, Min = 3, Max = 3, Kinds = [EquipmentKind.Weapon], Weight = 10 };

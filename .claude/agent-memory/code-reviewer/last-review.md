@@ -5,11 +5,14 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-27-affix-stats, slice ST1b (Affixes section on the Status page: StatusSheet.Affixes, StatusLabels.Affixes,
-StatusParametersView.DrawInTwoColumns, status_affixes/status_penetration).
-Round 1. Verdict: Ready to commit. verify.ps1 all pass (2804 tests).
+Plan: 2026-10-27-forge, slice M1 (Materials: ItemDefinition.IsMaterial, validator FindMaterialProblem, RarityMaterial
+teal, InventoryRow/VictoryDropRow.IsMaterial, Materials tab, scrap/essence content, goblin drops).
+Round 1. Verdict: Ready to commit. verify.ps1 all pass (2817 tests).
 
-- Suggestion: StatusParametersView.ResistanceColumnGap now spaces the Affixes' columns too; rename ColumnGap - fixed
-- Suggestion: Draw inlines the Resistances'/Affixes' titles while DrawCombat draws its own; let DrawInTwoColumns take
-  the SectionTitle (or a DrawSection) so Draw stays at one level - moved to backlog (retro)
-- Follow-up: StatusSheetView summary (lines 12-13) "Combat beside Resistances" omits the Affixes section - fixed
+- Warning: ShowCategory/ShowMaterials tab loop now in 3 test files (InventoryPageGearTests:92, InventoryPageTests:224,
+  InventoryPageMaterialTests:52); move to one shared test support type - open
+- Warning: InventoryPageMaterialTests.Update_MaterialsTab_ListsOnlyTheScrap asserts the whole tab == ["scrap"] over the
+  content start inventory (G2); assert Contains scrap + DoesNotContain potion - open
+- Suggestion: VictoryDropsView.RowsOf stack lambda ~200 cols; extract a StackRowOf beside RowOf(GearPiece) - open
+- Suggestion: InventoryRow.IsMaterial summary says only the name is drawn in the color; the count is too - open
+- Suggestion: TextColorOf_UnusablePlainItem_IsGreyed sets Rarity = Common, the default; drop it - open

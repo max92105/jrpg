@@ -101,3 +101,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 - `Battle/ActionPlayback` counts a target's numbers already shown this beat twice (`_numbers.Count(… ShowsAt == TimeSpan.Zero)`, for a hit and for stolen life, A1): a third copy extracts a `StackOf(target)`.
 - `Menus/StatusParametersView.Draw` draws the Resistances' and Affixes' section titles inline while `DrawCombat` draws its own (ST1b review): a `DrawSection(frame, title, section, cells)` would keep `Draw` at one level; it also has a doubled blank line above `Place`.
+
+## From the forge plan (2026-10-29)
+
+- The "lists 'x' more than once" check is written in six Data validators (`NewGameValidator`, `ClassCatalogValidator`, `ResourceDefinitionValidator`, `SkillCatalogValidator`, `MapEventValidator`, `CraftingRulesValidator`), and `NewGame`'s `startingItems` repeats the crafting lists' entry checks (null, known item, 1..maxStack): one helper beside `RangeProblems` (M4 review).

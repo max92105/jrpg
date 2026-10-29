@@ -1,6 +1,7 @@
 using Jrpg.Core.Effects;
 using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
+using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Stats;
@@ -27,6 +28,15 @@ public sealed class ContentCatalogLoaderTests
 
         // content/map-layouts/start.json already refers to "potion", and ids never change once used.
         Assert.Contains("potion", catalog.Items.Keys);
+    }
+
+    // The Forge relies on Rare salvage giving the Essence the reroll and the Rare upgrade cost.
+    [Fact]
+    public void Load_RepositoryContent_RareSalvageGivesEssence()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        Assert.Contains(catalog.Rules.Crafting.Salvage[Rarity.Rare], entry => entry.ItemId == "essence");
     }
 
     [Fact]

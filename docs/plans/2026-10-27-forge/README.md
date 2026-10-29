@@ -42,7 +42,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **M2. Salvage in Core: `Crafting/Forge`, its quotes and refusals** (Core, about 220 lines) → [slices/M2.md](slices/M2.md)
 - [x] **M3a. Upgrade in Core: one more affix from the shared `GearRoll`** (Core + Simulations, about 250 lines) → [slices/M3a.md](slices/M3a.md)
 - [x] **M3b. Reroll in Core: every affix drawn again** (Core, about 120 lines) → [slices/M3b.md](slices/M3b.md)
-- [ ] **M4. The crafting rules in content, checked against the items** (Data + content, about 240 lines) → [slices/M4.md](slices/M4.md)
+- [x] **M4. The crafting rules in content, checked against the items** (Data + content, about 240 lines) → [slices/M4.md](slices/M4.md)
 
 ### Phase 2: the forge on the map
 - [ ] **F1a. A Forge screen that opens over the map and Cancel closes** (Game + text, raw 90, about 145 lines at 1.6x) → [slices/F1a.md](slices/F1a.md)

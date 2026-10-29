@@ -22,5 +22,17 @@
       "magic": { "weight": 280, "minAffixes": 1, "maxAffixes": 1 },
       "rare": { "weight": 70, "minAffixes": 2, "maxAffixes": 3 }
     }
+  },
+  "crafting": {
+    "salvage": {
+      "common": [{ "itemId": "scrap", "quantity": 1 }],
+      "magic": [{ "itemId": "scrap", "quantity": 2 }],
+      "rare": [{ "itemId": "scrap", "quantity": 2 }, { "itemId": "essence", "quantity": 1 }]
+    },
+    "upgradeCosts": {
+      "magic": [{ "itemId": "scrap", "quantity": 3 }],
+      "rare": [{ "itemId": "scrap", "quantity": 5 }, { "itemId": "essence", "quantity": 1 }]
+    },
+    "rerollCost": [{ "itemId": "scrap", "quantity": 2 }, { "itemId": "essence", "quantity": 1 }]
   }
 }

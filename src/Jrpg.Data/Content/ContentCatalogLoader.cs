@@ -7,6 +7,7 @@ using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Skills;
 using Jrpg.Data.Battle;
+using Jrpg.Data.Crafting;
 using Jrpg.Data.Items;
 using Jrpg.Data.Loot;
 using Jrpg.Data.Maps;
@@ -46,6 +47,9 @@ public static class ContentCatalogLoader
         var items = ReadValidated<IReadOnlyList<ItemDefinition>>(
             contentRoot, ItemsFile, ItemCatalogValidator.Validate);
         var itemsById = items.ToFrozenDictionary(item => item.Id);
+
+        // rules.json is read before the items, so its crafting block is checked against them only now.
+        CraftingRulesValidator.Validate(RulesFile, rules.Crafting, itemsById);
         var affixes = ReadValidated<IReadOnlyList<AffixDefinition>>(contentRoot, AffixesFile, AffixCatalogValidator.Validate);
         var dropTables = ReadValidated<IReadOnlyList<DropTable>>(
             contentRoot, DropTablesFile, (file, list) => DropTableCatalogValidator.Validate(file, list, itemsById));

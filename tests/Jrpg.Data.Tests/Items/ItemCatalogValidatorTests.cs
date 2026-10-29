@@ -211,6 +211,7 @@ public sealed class ItemCatalogValidatorTests
     [InlineData(StatKind.LifeSteal, "lifeSteal")]
     [InlineData(StatKind.ArmorPenetration, "armorPenetration")]
     [InlineData(StatKind.BlockChance, "blockChance")]
+    [InlineData(StatKind.DropLuck, "dropLuck")]
     public void Validate_BonusOnAffixOnlyStat_Throws(StatKind kind, string name)
     {
         var ring = Equipment(new EquipmentStats(EquipmentKind.Ring) { Bonuses = Bonuses((kind, 5)) });

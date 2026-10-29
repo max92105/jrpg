@@ -34,6 +34,7 @@ internal static class StatNames
         [StatKind.LifeSteal] = MessageIds.StatLifeSteal,
         [StatKind.ArmorPenetration] = MessageIds.StatArmorPenetration,
         [StatKind.BlockChance] = MessageIds.StatBlockChance,
+        [StatKind.DropLuck] = MessageIds.StatDropLuck,
     }.ToFrozenDictionary();
 
     /// <exception cref="KeyNotFoundException">A stat with no name in the table.</exception>

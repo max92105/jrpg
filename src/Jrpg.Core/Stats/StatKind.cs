@@ -30,4 +30,5 @@ public enum StatKind
     LifeSteal,
     ArmorPenetration,
     BlockChance,
+    DropLuck,
 }

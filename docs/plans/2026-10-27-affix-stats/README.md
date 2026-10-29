@@ -41,7 +41,7 @@ The loot plan's, plus:
 
 ### Drop luck
 - [x] **A4a. Loot rolls take a luck: `LootFormula`** (Core + Simulations, about 140 lines) → [slices/A4a.md](slices/A4a.md)
-- [ ] **A4b. Drop luck from gear; the simulation's luck table** (Core + content + Game text + Simulations, about 110 lines) → [slices/A4b.md](slices/A4b.md)
+- [x] **A4b. Drop luck from gear; the simulation's luck table** (Core + content + Game text + Simulations, about 110 lines) → [slices/A4b.md](slices/A4b.md)
 
 ### Status page
 - [ ] **ST1a. Resources move beside Skills** (Game, raw about 100, about 160 at 1.6x) → [slices/ST1a.md](slices/ST1a.md)

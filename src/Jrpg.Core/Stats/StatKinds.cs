@@ -13,7 +13,7 @@ public static class StatKinds
     /// The stats only affixes give (ADR 0030), in the order screens list them: a base item listing one is refused at
     /// load.
     /// </summary>
-    public static ImmutableArray<StatKind> AffixOnly { get; } = [StatKind.LifeSteal, StatKind.ArmorPenetration, StatKind.BlockChance];
+    public static ImmutableArray<StatKind> AffixOnly { get; } = [StatKind.LifeSteal, StatKind.ArmorPenetration, StatKind.BlockChance, StatKind.DropLuck];
 
     public static StatKind ResistanceTo(DamageType type) => type switch
     {

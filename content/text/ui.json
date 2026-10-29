@@ -85,6 +85,7 @@
   "stat_life_steal": "Lifesteal",
   "stat_armor_penetration": "Armor penetration",
   "stat_block_chance": "Block",
+  "stat_drop_luck": "Drop luck",
   "stat_percent": "{value} %",
   "affix_line": "{value} {stat}",
   "affix_separator": " · ",

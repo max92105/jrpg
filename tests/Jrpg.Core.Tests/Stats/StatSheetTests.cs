@@ -23,6 +23,7 @@ public sealed class StatSheetTests
         LifeStealPermille = 24,
         ArmorPenetrationPermille = 25,
         BlockChancePermille = 26,
+        DropLuckPermille = 27,
     };
 
     [Theory]
@@ -49,6 +50,7 @@ public sealed class StatSheetTests
     [InlineData(StatKind.LifeSteal, 24)]
     [InlineData(StatKind.ArmorPenetration, 25)]
     [InlineData(StatKind.BlockChance, 26)]
+    [InlineData(StatKind.DropLuck, 27)]
     public void ValueOf_EveryKind_ReadsItsField(StatKind kind, int expected)
     {
         Assert.Equal(expected, _sheet.ValueOf(kind));

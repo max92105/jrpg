@@ -66,6 +66,15 @@ public sealed class MemberSheetTests
         Assert.Equal((15, 1150), (sheet.Primaries.Power, sheet.DamagePermille));
     }
 
+    // Drop luck isn't on CombatStats (battles don't read it), so the sheet is where its copy is checked.
+    [Fact]
+    public void Of_DropLuckWorn_InPermille()
+    {
+        var sheet = MemberSheet.Of(ClassWith(PrimaryStats.None), Bonus(StatKind.DropLuck, 12), weaponDamage: null, _rules);
+
+        Assert.Equal(120, sheet.DropLuckPermille);
+    }
+
     [Fact]
     public void Of_FlatFireResistance_AddsAfterWill()
     {

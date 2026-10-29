@@ -23,9 +23,13 @@ public sealed class LootSimulation(ITestOutputHelper output)
     // the spread, so a retune that adds one may need a wider bound.
     private const double PotionRateTolerance = 0.03;
 
+    // The lucky run's drop luck: +50 %, a party wearing a few drop luck pieces (decision 349).
+    private const int LuckPermille = 500;
+
     private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
     private static readonly List<DropTable> _tables = TablesOf(EncounterId);
-    private static readonly List<Drops> _drops = [.. Enumerable.Range(0, Victories).Select(seed => GameSession.DropRollFor(_catalog, new SeededRandom(seed)).Roll(_tables, luckPermille: 0))];
+    private static readonly List<Drops> _drops = RollEverySeed(luckPermille: 0);
+    private static readonly List<Drops> _luckyDrops = RollEverySeed(LuckPermille);
 
     // Unique has no row in the table, so the equality also says it never rolls (decision 339).
     [Fact]
@@ -33,7 +37,7 @@ public sealed class LootSimulation(ITestOutputHelper output)
     {
         var gear = _drops.SelectMany(drops => drops.Gear).ToList();
 
-        WriteSummary(gear);
+        WriteSummary(_drops, "no drop luck");
         var weighted = _catalog.Rules.Loot.Rarities.Where(row => row.Value.Weight > 0).Select(row => row.Key).Order();
         Assert.Equal(weighted, gear.Select(piece => piece.Rarity).Distinct().Order());
     }
@@ -50,6 +54,20 @@ public sealed class LootSimulation(ITestOutputHelper output)
         Assert.InRange(observed, expected - PotionRateTolerance, expected + PotionRateTolerance);
     }
 
+    // The same seeds as without luck, so the two tables differ by the luck alone.
+    [Fact]
+    public void GoblinTrio_FiftyPercentLuck_DropsMoreGearPerVictory()
+    {
+        var luckyGear = _luckyDrops.Sum(drops => drops.Gear.Count);
+
+        WriteSummary(_luckyDrops, "+50 % drop luck");
+        Assert.True(luckyGear > _drops.Sum(drops => drops.Gear.Count), $"{luckyGear} pieces with luck, no more than without.");
+    }
+
+    // Built as the session builds it, so the numbers are the game's.
+    private static List<Drops> RollEverySeed(int luckPermille) =>
+        [.. Enumerable.Range(0, Victories).Select(seed => GameSession.DropRollFor(_catalog, new SeededRandom(seed)).Roll(_tables, luckPermille))];
+
     private static List<DropTable> TablesOf(string encounterId) =>
     [
         .. _catalog.Encounters[encounterId].EnemyIds
@@ -61,16 +79,17 @@ public sealed class LootSimulation(ITestOutputHelper output)
     private static int CountOf(Drops drops, string itemId) =>
         drops.Stacks.Where(stack => stack.Item.Id == itemId).Sum(stack => stack.Quantity) + drops.Gear.Count(piece => piece.Base.Id == itemId);
 
-    private void WriteSummary(List<GearPiece> gear)
+    private void WriteSummary(List<Drops> drops, string caption)
     {
+        var gear = drops.SelectMany(victory => victory.Gear).ToList();
         // Invariant culture, so a baseline copied from one machine compares with another's.
-        output.WriteLine($"{EncounterId}: drops over {Victories} victories, no battle fought");
-        output.WriteLine(Invariant($"  Items per victory    {_drops.Average(drops => drops.Stacks.Sum(stack => stack.Quantity) + drops.Gear.Count),6:F2}"));
+        output.WriteLine($"{EncounterId}: drops over {Victories} victories, {caption}, no battle fought");
+        output.WriteLine(Invariant($"  Items per victory    {drops.Average(victory => victory.Stacks.Sum(stack => stack.Quantity) + victory.Gear.Count),6:F2}"));
         output.WriteLine(Invariant($"  Gear per victory     {(double)gear.Count / Victories,6:F2}"));
         output.WriteLine(Invariant($"  Victories per piece  {(double)Victories / Math.Max(gear.Count, 1),6:F2}"));
         foreach (var itemId in _tables.SelectMany(table => table.Entries).Select(entry => entry.ItemId).Distinct())
         {
-            output.WriteLine(Invariant($"  {itemId,-20} {_drops.Average(drops => CountOf(drops, itemId)),6:F3} per victory"));
+            output.WriteLine(Invariant($"  {itemId,-20} {drops.Average(victory => CountOf(victory, itemId)),6:F3} per victory"));
         }
 
         WriteRarityShares(gear);

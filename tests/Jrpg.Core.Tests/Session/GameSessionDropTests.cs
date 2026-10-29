@@ -5,6 +5,7 @@ using Jrpg.Core.Geometry;
 using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Party;
 using Jrpg.Core.Session;
 using Jrpg.Core.Stats;
 using Jrpg.Core.Tests.Battle;
@@ -58,6 +59,52 @@ public sealed class GameSessionDropTests
         Assert.Equal(expected, session.Inventory.Gear);
     }
 
+    // The sword's 50 % is 500 permille: a draw of 600 drops it only once the leader's +50 % luck makes it 750.
+    [Fact]
+    public void FinishBattle_LeaderWithLuck_DropsAboveTheChance()
+    {
+        var session = SessionWithEncounterPending(_goblin with { DropTableId = "goblin" }, [.. _encounterThenSarxianFirst, 600, 600, 600]);
+        WearLuckRing(session, session.Party.Leader);
+        BattleScript.AttackUntilOver(session.StartPendingBattle());
+
+        var gear = session.FinishBattle()?.Drops.Gear;
+
+        Assert.Equal(3, gear?.Count);
+    }
+
+    // A fallen member still wears their luck (decision 356). The shuffle of five (4, 3, 2, 1) keeps Sarxian first; the
+    // fallen ally never acts.
+    [Fact]
+    public void FinishBattle_FallenMemberWithLuck_StillCounts()
+    {
+        var session = SessionWithEncounterPending(_goblin with { DropTableId = "goblin" }, [0, 0, 4, 3, 2, 1, 600, 600, 600]);
+        var ally = new PartyMemberBuilder().WithId("ally").Build();
+        session.Party.Recruit(ally);
+        WearLuckRing(session, ally);
+        ally.Vitals.TakeDamage(ally.Vitals.MaxHp);
+        BattleScript.AttackUntilOver(session.StartPendingBattle());
+
+        var gear = session.FinishBattle()?.Drops.Gear;
+
+        Assert.Equal(3, gear?.Count);
+    }
+
+    // Only the active members' luck counts (decision 356): an ally in the reserve wears the ring for nothing.
+    [Fact]
+    public void FinishBattle_ReserveMemberWithLuck_DoesNotCount()
+    {
+        var session = SessionWithEncounterPending(_goblin with { DropTableId = "goblin" }, [.. _encounterThenSarxianFirst, 600, 600, 600]);
+        var ally = new PartyMemberBuilder().WithId("ally").Build();
+        session.Party.Recruit(ally);
+        Assert.True(session.Party.TryMoveToReserve(ally));
+        WearLuckRing(session, ally);
+        BattleScript.AttackUntilOver(session.StartPendingBattle());
+
+        var gear = session.FinishBattle()?.Drops.Gear;
+
+        Assert.Equal(0, gear?.Count);
+    }
+
     // The bag already holds the two potions a stack takes, so the three dropped are lost and not listed.
     [Fact]
     public void FinishBattle_StackFull_ListsOnlyWhatFit()
@@ -108,6 +155,15 @@ public sealed class GameSessionDropTests
         session.Exploration.Walk(MoveIntent.FromAxes(1, 0), TimeSpan.FromSeconds(1.0 / 3));
         Assert.NotNull(session.Exploration.PendingEncounter);
         return session;
+    }
+
+    // A ring rolled with 50 % drop luck: +500 permille on its wearer's sheet.
+    private static void WearLuckRing(GameSession session, PartyMember wearer)
+    {
+        var ring = new ItemDefinitionBuilder().WithId("luck_ring").AsWorn(EquipmentKind.Ring).Build();
+        var piece = GearPiece.Rolled(ring, Rarity.Magic, [new RolledAffix("drop_luck", StatKind.DropLuck, 50)]);
+        session.Inventory.AddGear(piece);
+        Assert.True(session.Equipment.TryEquip(wearer, piece));
     }
 
     private static GearPiece Magic(AffixDefinition affix, int value) =>

@@ -46,6 +46,12 @@ public sealed record StatSheet(
     public int BlockChancePermille { get; init; }
 
     /// <summary>
+    /// How much the member raises drop chances and the tiers above Common, summed over the active members (decision
+    /// 349).
+    /// </summary>
+    public int DropLuckPermille { get; init; }
+
+    /// <summary>
     /// The number a screen shows for <paramref name="kind"/>: whole points for a primary, max HP and speed, permille
     /// for the percent kinds. The one place that reads a sheet by kind, so screens list stats without a switch.
     /// </summary>
@@ -70,6 +76,7 @@ public sealed record StatSheet(
         StatKind.LifeSteal => LifeStealPermille,
         StatKind.ArmorPenetration => ArmorPenetrationPermille,
         StatKind.BlockChance => BlockChancePermille,
+        StatKind.DropLuck => DropLuckPermille,
         _ => Primaries.ValueOf(kind),
     };
 }

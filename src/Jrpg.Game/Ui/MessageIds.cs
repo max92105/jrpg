@@ -214,6 +214,8 @@ internal static class MessageIds
 
     public const string StatBlockChance = "stat_block_chance";
 
+    public const string StatDropLuck = "stat_drop_luck";
+
     /// <summary>A percent stat's value: "{value} %".</summary>
     public const string StatPercent = "stat_percent";
 

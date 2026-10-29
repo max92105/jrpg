@@ -20,4 +20,7 @@ internal sealed record InventoryRow(string ItemId, string Name, string IconFile,
 {
     /// <summary>A piece's rarity, which its name is drawn in; Common for a stack.</summary>
     public Rarity Rarity { get; init; }
+
+    /// <summary>Whether it is a crafting material, whose name and count are drawn in the material color.</summary>
+    public bool IsMaterial { get; init; }
 }

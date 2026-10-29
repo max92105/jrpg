@@ -54,7 +54,7 @@ internal sealed class VictoryDropsView
     internal static IReadOnlyList<VictoryDropRow> RowsOf(Drops drops, UiMessages messages, SpriteFontBase font)
     {
         var rows = drops.Stacks
-            .Select(stack => new VictoryDropRow(stack.Item.Name, stack.Item.IconFile, MeasuredText.Of(font, CountOf(stack, messages))))
+            .Select(stack => RowOf(stack, messages, font))
             .Concat(drops.Gear.Select(piece => RowOf(piece, messages, font)))
             .ToList();
         if (rows.Count <= Capacity)
@@ -81,6 +81,10 @@ internal sealed class VictoryDropsView
         }
     }
 
+    // A stack shows its count; a material's is drawn in the material color.
+    private static VictoryDropRow RowOf(ItemDrop stack, UiMessages messages, SpriteFontBase font) =>
+        new(stack.Item.Name, stack.Item.IconFile, MeasuredText.Of(font, CountOf(stack, messages))) { IsMaterial = stack.Item.IsMaterial };
+
     // A rolled piece names its rarity where a stack shows its count.
     private static VictoryDropRow RowOf(GearPiece piece, UiMessages messages, SpriteFontBase font)
     {
@@ -100,7 +104,7 @@ internal sealed class VictoryDropsView
         }
 
         var textTop = tab.Center.Y - (_nameFont.Font.LineHeight / 2f);
-        var color = UiTheme.RarityColorOf(row.Rarity);
+        var color = row.IsMaterial ? UiTheme.RarityMaterial : UiTheme.RarityColorOf(row.Rarity);
         _nameFont.Draw(batch, row.Name, new Vector2(tab.X + NameLeft, textTop), color);
         if (row.Tag is { } tag)
         {

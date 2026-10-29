@@ -18,6 +18,7 @@ public sealed class InventoryFilterTests
         new("wizard_robe", 1),
         new("iron_sword", 1),
         new("bomb", 3),
+        new("scrap", 2),
     ];
 
     [Fact]
@@ -42,6 +43,14 @@ public sealed class InventoryFilterTests
         var kept = InventoryFilter.SelectStacks(InventoryCategory.Armor, _owned, _catalog.Items);
 
         Assert.Equal(["leather_armor", "wizard_robe"], kept.Select(entry => entry.ItemId));
+    }
+
+    [Fact]
+    public void SelectStacks_Materials_KeepsOnlyMaterials()
+    {
+        var kept = InventoryFilter.SelectStacks(InventoryCategory.Materials, _owned, _catalog.Items);
+
+        Assert.Equal(["scrap"], kept.Select(entry => entry.ItemId));
     }
 
     [Fact]

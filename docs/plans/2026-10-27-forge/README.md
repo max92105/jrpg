@@ -1,5 +1,5 @@
 # The forge
-Status: approved (after affix stats)
+Status: in progress
 
 Split out of [the loot plan](../done/2026-10-27-loot/README.md) on 2026-10-27, when the developer approved it: materials, salvage and a bit of crafting (decisions 351-354), at a forge master NPC on the map (decision 353). Runs after the loot plan (done) and after [the affix stats plan](../done/2026-10-27-affix-stats/README.md): its A4a gives `GearRoll.Roll(item, luckPermille)` and `DropRoll.Roll(tables, luckPermille)`, and this plan builds on those signatures (the Forge's `GearRoll` members take no luck).
 
@@ -38,7 +38,7 @@ Split out of [the loot plan](../done/2026-10-27-loot/README.md) on 2026-10-27, w
 One line per slice; each slice's goal, types, tests and hand checks are in its file under `slices/`. Tick the box here when a slice is done, and write its deviations in the slice file. Tunables, design overview and risks: [design.md](design.md).
 
 ### Phase 1: materials and crafting in Core
-- [ ] **M1. Materials: an item kind, their color, a Materials tab, Scrap and Essence that goblins drop** (Core + Data + content + Game, about 210 lines) → [slices/M1.md](slices/M1.md)
+- [x] **M1. Materials: an item kind, their color, a Materials tab, Scrap and Essence that goblins drop** (Core + Data + content + Game, about 210 lines) → [slices/M1.md](slices/M1.md)
 - [ ] **M2. Salvage in Core: `Crafting/Forge`, its quotes and refusals** (Core, about 220 lines) → [slices/M2.md](slices/M2.md)
 - [ ] **M3a. Upgrade in Core: one more affix from the shared `GearRoll`** (Core + Simulations, about 250 lines) → [slices/M3a.md](slices/M3a.md)
 - [ ] **M3b. Reroll in Core: every affix drawn again** (Core, about 120 lines) → [slices/M3b.md](slices/M3b.md)

@@ -7,4 +7,5 @@ internal enum InventoryCategory
     Consumables,
     Weapons,
     Armor,
+    Materials,
 }

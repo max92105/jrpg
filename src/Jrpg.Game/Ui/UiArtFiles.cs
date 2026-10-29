@@ -27,6 +27,9 @@ internal static class UiArtFiles
 
         public const string Armor = "Armor.png";
 
+        /// <summary>A placeholder: the item command's icon until materials get their own.</summary>
+        public const string Materials = "Item.png";
+
         public const string Attack = "Attack.png";
 
         public const string Skills = "Skill.png";

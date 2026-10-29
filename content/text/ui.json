@@ -118,6 +118,7 @@
   "inventory_consumables": "Consumables",
   "inventory_weapons": "Weapons",
   "inventory_armor": "Armor",
+  "inventory_materials": "Materials",
   "inventory_column_item": "Item",
   "inventory_column_quantity": "Qty",
   "inventory_empty": "Nothing here.",

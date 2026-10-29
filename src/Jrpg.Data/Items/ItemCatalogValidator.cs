@@ -29,6 +29,11 @@ internal static class ItemCatalogValidator
             return $"maxStack must be at least 1 (was {item.MaxStack}).";
         }
 
+        if (item.IsMaterial)
+        {
+            return FindMaterialProblem(item);
+        }
+
         if (item.Effect is not null && item.Equipment is not null)
         {
             return "an item has either an effect or equipment, not both.";
@@ -41,6 +46,13 @@ internal static class ItemCatalogValidator
 
         return item.Equipment is null ? null : FindEquipmentProblem(item.Equipment);
     }
+
+    // A material is only spent at the forge (decision 339): nothing uses it, wears it, or picks it from the menu.
+    private static string? FindMaterialProblem(ItemDefinition item) =>
+        item.Effect is not null ? "a material (isMaterial true) has no effect."
+        : item.Equipment is not null ? "a material (isMaterial true) has no equipment."
+        : item.IsUsableFromMenu ? "a material (isMaterial true) needs isUsableFromMenu false."
+        : null;
 
     private static string? FindEffectProblem(Effect effect, bool isUsableFromMenu)
     {

@@ -10,6 +10,7 @@ public sealed class VictoryDropsViewTests
 {
     private static readonly ItemDefinition _potion = BattleScenarios.Catalog.Items["potion"];
     private static readonly ItemDefinition _sword = BattleScenarios.Catalog.Items["bronze_sword"];
+    private static readonly ItemDefinition _scrap = BattleScenarios.Catalog.Items["scrap"];
 
     [Fact]
     public void RowsOf_StackAndPiece_StackHasQuantityPieceNone()
@@ -21,6 +22,16 @@ public sealed class VictoryDropsViewTests
         Assert.Equal([_potion.Name, _sword.Name], rows.Select(row => row.Name));
         Assert.Equal("×3", rows[0].Tag?.Text);
         Assert.Null(rows[1].Tag);
+    }
+
+    [Fact]
+    public void RowsOf_MaterialStack_RowIsMaterial()
+    {
+        var drops = new Drops([new ItemDrop(_scrap, 2), new ItemDrop(_potion, 1)], []);
+
+        var rows = VictoryDropsView.RowsOf(drops, RepositoryScreenText.Text.Messages, RepositoryScreenText.Text.Fonts.FontAt(26));
+
+        Assert.Equal([true, false], rows.Select(row => row.IsMaterial));
     }
 
     // One more than fits: the last row that fits counts itself and the one past it.

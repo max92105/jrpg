@@ -63,13 +63,22 @@ public sealed class InventoryPageTests
     }
 
     [Fact]
-    public void Update_PreviousCategoryFromAll_WrapsToArmor()
+    public void Update_PreviousCategoryFromAll_WrapsToMaterials()
     {
         var page = NewPage();
 
         page.Update(Pressing(GameButton.PreviousTab));
 
-        Assert.Equal(InventoryCategory.Armor, page.Category);
+        Assert.Equal(InventoryCategory.Materials, page.Category);
+    }
+
+    [Fact]
+    public void Update_ArmorCategory_ListsArmorButNoWeapon()
+    {
+        var page = NewPage();
+
+        InventoryPageTabs.Show(page, InventoryCategory.Armor);
+
         Assert.Equal(["leather_armor", "chain_mail", "wizard_robe"], page.ShownItemIds.Distinct().Take(3));
         Assert.DoesNotContain("bronze_sword", page.ShownItemIds);
         Assert.Contains("wooden_shield", page.ShownItemIds);
@@ -85,7 +94,7 @@ public sealed class InventoryPageTests
         }
 
         var page = NewPage(session);
-        page.Update(Pressing(GameButton.PreviousTab));
+        InventoryPageTabs.Show(page, InventoryCategory.Armor);
         page.Update(Pressing(GameButton.Down));
 
         Assert.Equal(InventoryCategory.Armor, page.Category);
@@ -144,14 +153,14 @@ public sealed class InventoryPageTests
     }
 
     [Fact]
-    public void Update_UpOnRailFromAll_WrapsToArmor()
+    public void Update_UpOnRailFromAll_WrapsToMaterials()
     {
         var page = NewPage();
         page.Update(Pressing(GameButton.Left));
 
         page.Update(Pressing(GameButton.Up));
 
-        Assert.Equal(InventoryCategory.Armor, page.Category);
+        Assert.Equal(InventoryCategory.Materials, page.Category);
     }
 
     [Fact]

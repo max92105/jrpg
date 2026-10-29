@@ -21,4 +21,9 @@ public sealed record ItemDefinition
     public Effect? Effect { get; init; }
 
     public EquipmentStats? Equipment { get; init; }
+
+    /// <summary>
+    /// A crafting material (decision 339): it stacks and is never used or worn. Material is not a <see cref="Rarity"/>.
+    /// </summary>
+    public bool IsMaterial { get; init; }
 }

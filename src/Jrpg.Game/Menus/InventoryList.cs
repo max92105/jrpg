@@ -91,7 +91,10 @@ internal sealed class InventoryList
     {
         var item = _catalog.Items[entry.ItemId];
         var quantity = MeasuredText.Of(_bodyFont, NumberText.Of(entry.Quantity));
-        return new InventoryRow(item.Id, item.Name, item.IconFile, quantity, item.Description, _session.FieldItems.CanUse(item));
+        return new InventoryRow(item.Id, item.Name, item.IconFile, quantity, item.Description, _session.FieldItems.CanUse(item))
+        {
+            IsMaterial = item.IsMaterial,
+        };
     }
 
     // One row per piece, so no quantity (decision 345); gear is never used from the menu. A plain piece keeps its

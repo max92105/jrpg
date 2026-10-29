@@ -3,7 +3,8 @@ using Microsoft.Xna.Framework;
 
 namespace Jrpg.Game.Ui;
 
-// The loot's colors: each rarity's, as a piece's name is drawn in it (decision 362, the ARPG convention).
+// The loot's colors: each rarity's, as a piece's name is drawn in it, and the materials' (decision 362, the ARPG
+// convention).
 internal static partial class UiTheme
 {
     /// <summary>A Magic piece's name: a clear blue.</summary>
@@ -14,6 +15,11 @@ internal static partial class UiTheme
 
     /// <summary>A Unique piece's name: orange (reserved: no unique item drops yet, decision 339).</summary>
     public static Color RarityUnique { get; } = FromStraightArgb(0xFFF08C32);
+
+    /// <summary>
+    /// A crafting material's name: a muted teal, its own tier's color though not a rarity (decision 339).
+    /// </summary>
+    public static Color RarityMaterial { get; } = FromStraightArgb(0xFF5FAFA0);
 
     /// <summary>The color a piece's name is drawn in; Common is the body text's.</summary>
     public static Color RarityColorOf(Rarity rarity) => rarity switch

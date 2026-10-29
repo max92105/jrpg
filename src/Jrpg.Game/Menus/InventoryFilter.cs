@@ -29,6 +29,7 @@ internal static class InventoryFilter
         InventoryCategory.Consumables => item.Effect is not null,
         InventoryCategory.Weapons => item.Equipment?.Kind == EquipmentKind.Weapon,
         InventoryCategory.Armor => item.Equipment is { Kind: not EquipmentKind.Weapon },
+        InventoryCategory.Materials => item.IsMaterial,
         _ => throw new ArgumentOutOfRangeException(nameof(category), category, null),
     };
 }

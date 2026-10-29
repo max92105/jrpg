@@ -138,9 +138,11 @@ internal sealed class InventoryListView
         _ui.DrawGlidingSelection(batch, textures, selected, opacity);
     }
 
-    // A rolled piece's name is in its rarity's color (decision 362); anything else the menu can't use is greyed out.
-    private static Color TextColorOf(InventoryRow item) =>
-        item.Rarity != Rarity.Common ? UiTheme.RarityColorOf(item.Rarity)
+    // A material's name is in its color and a rolled piece's in its rarity's (decision 362); anything else the menu
+    // can't use is greyed out. A material is never usable, so its color comes before the grey.
+    internal static Color TextColorOf(InventoryRow item) =>
+        item.IsMaterial ? UiTheme.RarityMaterial
+        : item.Rarity != Rarity.Common ? UiTheme.RarityColorOf(item.Rarity)
         : item.IsUsable ? UiTheme.TextPrimary
         : UiTheme.TextDisabled;
 

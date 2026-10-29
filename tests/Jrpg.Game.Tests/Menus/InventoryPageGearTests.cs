@@ -23,7 +23,7 @@ public sealed class InventoryPageGearTests
         session.Inventory.AddGear(GearPiece.Rolled(_bronzeSword, Rarity.Magic, []));
         var page = NewPage(session);
 
-        ShowCategory(page, InventoryCategory.Weapons);
+        InventoryPageTabs.Show(page, InventoryCategory.Weapons);
 
         Assert.Equal(session.Inventory.GearCountOf("bronze_sword"), page.ShownItemIds.Count(id => id == "bronze_sword"));
     }
@@ -47,7 +47,7 @@ public sealed class InventoryPageGearTests
     {
         var session = NewSession();
         var page = NewPage(session);
-        ShowCategory(page, InventoryCategory.Weapons);
+        InventoryPageTabs.Show(page, InventoryCategory.Weapons);
         var swords = session.Inventory.GearCountOf(page.ShownItemIds[0]);
 
         page.Update(Pressing(GameButton.Confirm));
@@ -85,15 +85,6 @@ public sealed class InventoryPageGearTests
         var rows = list.Rows.Where(row => row.ItemId == "bronze_sword").ToList();
         Assert.Equal((Rarity.Rare, "Rare · +4 Power"), (rows[^1].Rarity, rows[^1].Description));
         Assert.Equal((Rarity.Common, _bronzeSword.Description), (rows[0].Rarity, rows[0].Description));
-    }
-
-    // Goes through the tabs with the next-tab button until the category shows.
-    private static void ShowCategory(InventoryPage page, InventoryCategory category)
-    {
-        while (page.Category != category)
-        {
-            page.Update(Pressing(GameButton.NextTab));
-        }
     }
 
     private static GameSession NewSession() => StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);

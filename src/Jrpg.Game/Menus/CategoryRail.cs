@@ -21,7 +21,8 @@ internal sealed class CategoryRail
         new CategoryTab(InventoryCategory.All, MessageIds.InventoryAll, UiArtFiles.Icons.AllItems),
         new CategoryTab(InventoryCategory.Consumables, MessageIds.InventoryConsumables, UiArtFiles.Icons.Consumables),
         new CategoryTab(InventoryCategory.Weapons, MessageIds.InventoryWeapons, UiArtFiles.Icons.Weapons),
-        new CategoryTab(InventoryCategory.Armor, MessageIds.InventoryArmor, UiArtFiles.Icons.Armor));
+        new CategoryTab(InventoryCategory.Armor, MessageIds.InventoryArmor, UiArtFiles.Icons.Armor),
+        new CategoryTab(InventoryCategory.Materials, MessageIds.InventoryMaterials, UiArtFiles.Icons.Materials));
 
     public int Selected => _cursor.Selected;
 

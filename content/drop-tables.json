@@ -7,7 +7,9 @@
       { "itemId": "leather_cap", "chance": 4 },
       { "itemId": "leather_boots", "chance": 4 },
       { "itemId": "power_ring", "chance": 4 },
-      { "itemId": "wooden_shield", "chance": 4 }
+      { "itemId": "wooden_shield", "chance": 4 },
+      { "itemId": "scrap", "chance": 20, "minQuantity": 1, "maxQuantity": 2 },
+      { "itemId": "essence", "chance": 5 }
     ]
   }
 ]

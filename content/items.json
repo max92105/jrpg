@@ -187,5 +187,23 @@
     "maxStack": 99,
     "isUsableFromMenu": false,
     "equipment": { "kind": "ring", "bonuses": { "agility": 5 } }
+  },
+  {
+    "id": "scrap",
+    "name": "Scrap",
+    "description": "Metal scraps from broken gear. A smith can work them.",
+    "iconFile": "Item.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "isMaterial": true
+  },
+  {
+    "id": "essence",
+    "name": "Essence",
+    "description": "A shimmer drawn out of enchanted gear.",
+    "iconFile": "Item.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "isMaterial": true
   }
 ]

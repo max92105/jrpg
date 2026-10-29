@@ -15,6 +15,10 @@ Older plans are single files with the same sections.
 
 | Plan | Status |
 |---|---|
+| [2026-10-29-gold-and-shops](2026-10-29-gold-and-shops/README.md) | draft |
+| [2026-10-29-quests](2026-10-29-quests/README.md) | draft |
+| [2026-10-29-enemy-skills-and-bosses](2026-10-29-enemy-skills-and-bosses/README.md) | draft |
+| [2026-10-29-music-and-sfx](2026-10-29-music-and-sfx/README.md) | draft |
 | [done/2026-10-27-forge](done/2026-10-27-forge/README.md) | done |
 | [done/2026-10-27-affix-stats](done/2026-10-27-affix-stats/README.md) | done |
 | [done/2026-10-27-loot](done/2026-10-27-loot/README.md) | done |

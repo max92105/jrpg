@@ -70,10 +70,17 @@ When planning slices in this repo:
   - an event step opening a screen: `EventPresenter` once flag -> `ExplorationScene` returns the request before its busy check -> explicit `GameFlow.Start` cases (the default branch fades and throws) -> a `...Transitions` that pops and calls `ContinueEvent`; test files over 300 get a sibling file;
   - order so a hand check exists early (bare screen, step, editor, NPC, then the list/look/actions);
   - the 1.6x applies to Game slices that add a view type (loot README rule), still forcing screen splits: shell / list / detail / look / actions / each action.
+- Parallel drafts (2026-10-29): when several plans are drafted at once, don't touch `docs/plans/README.md`; number questions Q1.. locally and list decisions as "proposed, numbered at approval"; ADR candidates without a number.
+- Before planning a greyed-entry guard test, check `ListCursor`: it skips disabled entries, so the test asserts the cursor never selects it, not "Confirm does nothing".
 - My Write tool writes LF; repo docs are CRLF: tell the caller to run `sed -i 's/\r*$/\r/'` on new plan files.
 - Affix-stats review (2026-10-29):
   - a new enum member read by a "for every kind" loop (`StatComparison` over `StatSheet.ValueOf`) needs its switch arm in the same slice; check the default arm throws;
   - a weighted-pick boundary test must draw where the change moves the edge (a draw on an unchanged first weight can't fail);
   - when applying a review, the developer pre-assigns decision numbers and edits `docs/plans/README.md` himself; my own picks stay unnumbered "planner's picks";
   - the Write tool writes LF even over CRLF files and I have no shell: name the files needing `sed -i 's/\r*$/\r/'` in the report.
+- State with no reader yet (a list written, never read) fails the build (IDE0052): land the field with its first reader's slice, not earlier (quests QL/SV).
+- A public Core record's method taking an internal type (`QuestLog`) must itself be internal; check accessibility when a public type gains a Core-state parameter.
+- Before giving a presenter a new view or dependency, count its constructor (EventPresenter, ExplorationScene, EventRun are at 4) and GameFlow.Start's CA1502 budget (each `Session ?? throw` is a branch): plan the parameter object or the helper in the slice, not mid-slice.
+- `docs/ui-reference` has only `shop-sell.webp` for shops (no buy shot), whatever a caller says.
+- Game traps found planning audio (2026-10-29): most scenes and pages are already at 4 ctor params (BattleScene, ForgeScene, GameMenuScene, Inventory/Party/Status/System pages), so a cross-cutting output goes out as a value the flow collects (default interface member), not a new ctor dependency; `PlayerSettings` isn't persisted (question 89), so check "saved like the others" requests; `FinishBattle` runs when the outcome screen opens, so "until the battle screen closes" must read the stack, not `PendingEncounter`.
 - Affix stats retro (2026-10-29): when a slice's rule names a case it doesn't apply to (items, heals, enemies, reserve members), the slice's test list names that case's test (reviews added one in A2, A3 and A4b); a layout decision that narrows a column measures the real text at the new width (a probe test with the real fonts), not only the heights (ST1a's two-line descriptions became decision 373 mid-slice).

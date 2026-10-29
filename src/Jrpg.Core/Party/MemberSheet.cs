@@ -41,6 +41,7 @@ public static class MemberSheet
         {
             LifeStealPermille = PermilleOf(worn, StatKind.LifeSteal),
             ArmorPenetrationPermille = PermilleOf(worn, StatKind.ArmorPenetration),
+            BlockChancePermille = PermilleOf(worn, StatKind.BlockChance),
         };
     }
 

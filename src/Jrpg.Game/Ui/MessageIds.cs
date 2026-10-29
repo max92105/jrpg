@@ -212,6 +212,8 @@ internal static class MessageIds
 
     public const string StatArmorPenetration = "stat_armor_penetration";
 
+    public const string StatBlockChance = "stat_block_chance";
+
     /// <summary>A percent stat's value: "{value} %".</summary>
     public const string StatPercent = "stat_percent";
 
@@ -473,6 +475,9 @@ internal static class MessageIds
 
     /// <summary>The cue on a target a damaging hit missed (decision 326).</summary>
     public const string BattleMiss = "battle_miss";
+
+    /// <summary>The cue on a target that blocked a landed hit (decision 348).</summary>
+    public const string BattleBlocked = "battle_blocked";
 
     /// <summary>The cue by a hit a weakness raised (decision 323).</summary>
     public const string BattleWeak = "battle_weak";

@@ -33,6 +33,7 @@ internal static class StatNames
         [StatKind.DarkResistance] = MessageIds.StatDarkResistance,
         [StatKind.LifeSteal] = MessageIds.StatLifeSteal,
         [StatKind.ArmorPenetration] = MessageIds.StatArmorPenetration,
+        [StatKind.BlockChance] = MessageIds.StatBlockChance,
     }.ToFrozenDictionary();
 
     /// <exception cref="KeyNotFoundException">A stat with no name in the table.</exception>

@@ -21,23 +21,38 @@ internal static class DamageFormula
     /// </summary>
     public const int ResistedThresholdPercent = 25;
 
+    /// <summary>
+    /// What a blocked hit deals of what it would (decision 348, placeholder): its share joins the one product below
+    /// rather than rounding on its own, so a blocked crit loses no point to a step of its own.
+    /// </summary>
+    public const int BlockedDamagePercent = 50;
+
     private const long Whole = 1000;
 
+    private const long WholePercent = 100;
+
     /// <returns>
-    /// <c>max(1, power × crit × (1000 − resistance) × (1000 + extra taken) ÷ 1000³)</c>, in a <c>long</c> and
-    /// rounded down once, so a crit then a resistance never loses a point to a step of its own. The resistance is held
-    /// within <see cref="Resistances.FloorPercent"/>..<see cref="Resistances.CapPercent"/>.
+    /// <c>max(1, power × crit × (1000 − resistance) × (1000 + extra taken) × blocked share ÷ (1000³ ×
+    /// 100))</c>, in a <c>long</c> and rounded down once, so a crit then a resistance never loses a point to a step of
+    /// its own. The resistance is held within
+    /// <see cref="Resistances.FloorPercent"/>..<see cref="Resistances.CapPercent"/>; the blocked share is 100 %, or
+    /// <see cref="BlockedDamagePercent"/> for a blocked hit. The product stays far within a <c>long</c>: a power of
+    /// 10,000 at a 300 % crit against a −100 % resistance with 200 % taken comes to 1.8 × 10^16.
     /// </returns>
     /// <param name="power">The hit's power, already raised by its user's Power.</param>
     /// <param name="critPermille">The hit's crit damage, or <see cref="NormalHit"/>.</param>
-    /// <param name="mitigation">The target's resistance to the hit, and the extra share its statuses add.</param>
+    /// <param name="mitigation">
+    /// The target's resistance to the hit, the extra share its statuses add, and whether it blocked.
+    /// </param>
     public static int Calculate(int power, int critPermille, Mitigation mitigation)
     {
         var resistance = Math.Clamp(
             mitigation.ResistancePermille,
             StatFormula.PermilleOf(Resistances.FloorPercent),
             StatFormula.PermilleOf(Resistances.CapPercent));
-        var damage = (long)power * critPermille * (Whole - resistance) * (Whole + mitigation.ExtraTakenPermille) / (Whole * Whole * Whole);
+        var blockedShare = mitigation.IsBlocked ? BlockedDamagePercent : WholePercent;
+        var damage = (long)power * critPermille * (Whole - resistance) * (Whole + mitigation.ExtraTakenPermille) * blockedShare
+            / (Whole * Whole * Whole * WholePercent);
         return (int)Math.Max(MinimumDamage, damage);
     }
 

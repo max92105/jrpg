@@ -9,4 +9,7 @@ namespace Jrpg.Core.Effects;
 internal sealed record Mitigation(int ResistancePermille, int ExtraTakenPermille)
 {
     public static Mitigation None { get; } = new(ResistancePermille: 0, ExtraTakenPermille: 0);
+
+    /// <summary>Whether the target blocked the hit (decision 348): it then deals a share of what it would.</summary>
+    public bool IsBlocked { get; init; }
 }

@@ -128,13 +128,14 @@ internal sealed class ActionPlayback
         }
     }
 
-    // A status granted, a hit missed and a status resisted each show as one word on their target at the impact.
+    // A status granted, a hit missed or blocked, and a status resisted each show as one word on their target at impact.
     private void AddImpactCue(BattleEvent battleEvent, UiMessages messages)
     {
         var (target, text) = battleEvent switch
         {
             StatusApplied applied => (applied.Target, messages.Text(StatusNames.IdOf(applied.Status))),
             HitMissed missed => (missed.Target, messages.Text(MessageIds.BattleMiss)),
+            HitBlocked blocked => (blocked.Target, messages.Text(MessageIds.BattleBlocked)),
             StatusResisted resisted => (resisted.Target, messages.Text(MessageIds.BattleResisted)),
             _ => throw new InvalidOperationException($"The battle screen can't show a {battleEvent.GetType().Name} yet."),
         };

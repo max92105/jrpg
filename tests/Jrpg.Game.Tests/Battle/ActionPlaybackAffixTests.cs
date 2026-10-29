@@ -35,4 +35,21 @@ public sealed class ActionPlaybackAffixTests
         Assert.Equal(new FloatingNumber(_sarxian, "2", FloatingNumberTone.Heal), playback.Numbers[^1]);
         Assert.Equal([PlaybackBeatKind.Impact], playback.Beats.Select(beat => beat.Kind));
     }
+
+    // A goblin's blocked hit: the cue by its target, in the same impact as the halved number.
+    [Fact]
+    public void Start_HitBlocked_AddsBlockedCue()
+    {
+        BattleEvent[] events =
+        [
+            new ActionStarted(_goblin, new AttackCommand(_sarxian)),
+            new HitBlocked(_sarxian),
+            new EffectApplied(_sarxian, EffectKind.Damage, 4),
+        ];
+
+        var playback = ActionPlayback.Start(events, RepositoryScreenText.Text.Messages);
+
+        Assert.Equal([new CueOnTarget(_sarxian, "Blocked")], playback.Cues);
+        Assert.Equal([PlaybackBeatKind.Impact], playback.Beats.Select(beat => beat.Kind));
+    }
 }

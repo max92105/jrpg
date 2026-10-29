@@ -69,6 +69,21 @@ public sealed class CombatantTests
     }
 
     [Fact]
+    public void FromPartyMember_BlockWorn_CopiedToStats()
+    {
+        var member = new PartyMemberBuilder().WithClass("fighter").Build();
+        var shield = new ItemDefinitionBuilder().WithId("shield").AsWorn(EquipmentKind.OffHand).Build();
+        var piece = GearPiece.Rolled(shield, Rarity.Magic, [new RolledAffix("block", StatKind.BlockChance, 7)]);
+        var inventory = new Inventory();
+        inventory.AddGear(piece);
+        new PartyEquipment(inventory).TryEquip(member, piece);
+
+        var combatant = Combatant.FromPartyMember(member);
+
+        Assert.Equal(70, combatant.Stats.BlockChancePermille);
+    }
+
+    [Fact]
     public void FromPartyMember_MemberWithSkills_CarriesThem()
     {
         var heal = new SkillDefinition

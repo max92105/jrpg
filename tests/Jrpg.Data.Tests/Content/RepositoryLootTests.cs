@@ -38,4 +38,15 @@ public sealed class RepositoryLootTests
         Assert.NotEmpty(gear);
         Assert.All(gear, equipment => Assert.Contains(_catalog.Affixes.Values, affix => affix.Kinds.Contains(equipment.Kind)));
     }
+
+    // Block shows only on an off-hand that drops (decision 366): the goblins drop one, and the pool rolls block on it.
+    [Fact]
+    public void GoblinDrops_IncludeAnOffHandThatCanRollBlock()
+    {
+        var dropKinds = _catalog.DropTables[_catalog.Enemies["goblin"].DropTableId!].Entries
+            .Select(entry => _catalog.Items[entry.ItemId].Equipment?.Kind);
+
+        Assert.Contains(EquipmentKind.OffHand, dropKinds);
+        Assert.Contains(_catalog.Affixes.Values, affix => affix.Stat == StatKind.BlockChance && affix.Kinds.Contains(EquipmentKind.OffHand));
+    }
 }

@@ -59,4 +59,10 @@ public sealed record CombatStats(int AttackDamage)
     /// gear's affixes (decision 364), 0 for an enemy.
     /// </summary>
     public int ArmorPenetrationPermille { get; init; }
+
+    /// <summary>
+    /// The chance that a landed hit on the combatant is blocked, in permille: a member's from their gear's affixes
+    /// (decision 348), 0 for an enemy.
+    /// </summary>
+    public int BlockChancePermille { get; init; }
 }

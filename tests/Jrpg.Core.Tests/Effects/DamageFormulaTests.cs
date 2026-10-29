@@ -133,6 +133,19 @@ public sealed class DamageFormulaTests
         Assert.Equal(0, DamageFormula.LifeStolen(37, 0));
     }
 
+    // 15 × 50 % is 7.5: rounded down once with the rest of the product.
+    [Fact]
+    public void Calculate_Blocked_HalvesDamageRoundedDown()
+    {
+        Assert.Equal(7, DamageFormula.Calculate(15, DamageFormula.NormalHit, Mitigation.None with { IsBlocked = true }));
+    }
+
+    [Fact]
+    public void Calculate_BlockedOneDamage_StaysAtMinimum()
+    {
+        Assert.Equal(DamageFormula.MinimumDamage, DamageFormula.Calculate(1, DamageFormula.NormalHit, Mitigation.None with { IsBlocked = true }));
+    }
+
     [Fact]
     public void PenetratedResistance_PositiveResistance_LosesItsPoints()
     {

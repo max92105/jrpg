@@ -37,7 +37,7 @@ The loot plan's, plus:
 ### Battle stats
 - [x] **A1. Lifesteal** (Core + Data + content + Game, about 250 lines) → [slices/A1.md](slices/A1.md)
 - [x] **A2. Armor penetration, and the stone beetles in the forest** (Core + content + Data tests + Simulations, about 200 lines) → [slices/A2.md](slices/A2.md)
-- [ ] **A3. Block, with its "Blocked" cue; the shield in the goblin's drops** (Core + content + Game, about 180 lines) → [slices/A3.md](slices/A3.md)
+- [x] **A3. Block, with its "Blocked" cue; the shield in the goblin's drops** (Core + content + Game, about 180 lines) → [slices/A3.md](slices/A3.md)
 
 ### Drop luck
 - [ ] **A4a. Loot rolls take a luck: `LootFormula`** (Core + Simulations, about 140 lines) → [slices/A4a.md](slices/A4a.md)

@@ -29,4 +29,5 @@ public enum StatKind
     DarkResistance,
     LifeSteal,
     ArmorPenetration,
+    BlockChance,
 }

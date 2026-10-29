@@ -45,7 +45,7 @@ The loot plan's, plus:
 
 ### Status page
 - [x] **ST1a. Resources move beside Skills** (Game, raw about 100, about 160 at 1.6x) → [slices/ST1a.md](slices/ST1a.md)
-- [ ] **ST1b. The Affixes section: twenty-four stats** (Game + text, raw about 80, about 130 at 1.6x) → [slices/ST1b.md](slices/ST1b.md)
+- [x] **ST1b. The Affixes section: twenty-four stats** (Game + text, raw about 80, about 130 at 1.6x) → [slices/ST1b.md](slices/ST1b.md)
 
 ## Decisions
 From the loot plan (2026-10-27): 346 (lifesteal: attacks and damaging skills, not items, within max HP, not while fallen), 347 (penetration on positive resistances only; its "share" is revised by 364), 348 (block: half a landed hit, any type, members only, rolled after the crit), 349 (drop luck raises drop chances and the tiers above Common by the same percent), 350 (the Status page shows everything).

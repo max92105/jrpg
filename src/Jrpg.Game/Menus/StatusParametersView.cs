@@ -7,14 +7,14 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// Draws the Status page's middle band (decision 334, the plan's S1a): Combat in the left half, the eight resistances
-/// in two columns of four in the right half (Resources sit beside the skills, decision 368). Each row is a small
-/// spaced-caps label with its value right-aligned close to it, so the two read together (<see cref="SheetRowLook"/>,
-/// which the Equipment page shares).
+/// in two columns of four in the right half, the four stats only affixes give in two columns of two under them
+/// (decision 368; Resources sit beside the skills). Each row is a small spaced-caps label with its value right-aligned
+/// close to it, so the two read together (<see cref="SheetRowLook"/>, which the Equipment page shares).
 /// </summary>
 internal sealed class StatusParametersView
 {
-    /// <summary>The band's height: the taller of Combat and Resistances.</summary>
-    public const int Height = CombatHeight > ResistancesHeight ? CombatHeight : ResistancesHeight;
+    /// <summary>The band's height: the taller of Combat and of Resistances with Affixes under them.</summary>
+    public const int Height = CombatHeight > AffixesBottom ? CombatHeight : AffixesBottom;
 
     /// <summary>A row's height, shared with <see cref="StatusResourcesView"/>.</summary>
     internal const int RowHeight = 34;
@@ -25,40 +25,46 @@ internal sealed class StatusParametersView
     internal const int BelowBand = SectionTitle.Height + 10;
 
     // Placeholder layout (S1a's arithmetic): 34 px rows from 10 px under each band; cells 12 px in and at most 380 px
-    // wide, the halves 48 px apart; the resistances in two columns of four 24 px apart; HP's 4 px bar under its label,
-    // 12 px short of its value.
+    // wide, the halves 48 px apart; the resistances in two columns of four, the affix stats 16 px under them in two of
+    // two, both sections' columns 24 px apart; HP's 4 px bar under its label, 12 px short of its value.
     private const int CombatRows = 7;
     private const int ResistanceRowsPerColumn = 4;
+    private const int AffixRowsPerColumn = 2;
     private const int CellInset = 12;
     private const int CellWidth = 380;
     private const int HalfGap = 48;
-    private const int ResistanceColumnGap = 24;
+    private const int ColumnGap = 24;
+    private const int SectionGap = 16;
     private const int HpBarHeight = 4;
     private const int HpBarValueGap = 12;
     private const int CombatHeight = BelowBand + (CombatRows * RowHeight);
     private const int ResistancesHeight = BelowBand + (ResistanceRowsPerColumn * RowHeight);
+    private const int AffixesTop = ResistancesHeight + SectionGap;
+    private const int AffixesBottom = AffixesTop + BelowBand + (AffixRowsPerColumn * RowHeight);
 
     private readonly StatusLabels _labels;
     private readonly SheetRowLook _rows;
     private readonly SectionTitle _combatTitle;
     private readonly SectionTitle _resistancesTitle;
+    private readonly SectionTitle _affixesTitle;
     private Measured? _shown;
 
     /// <param name="text">Messages and fonts.</param>
-    /// <param name="labels">The combat and resistance labels, in the sheet's order.</param>
+    /// <param name="labels">The combat, resistance and affix labels, in the sheet's order.</param>
     public StatusParametersView(ScreenText text, StatusLabels labels)
     {
         _labels = labels;
         _rows = new SheetRowLook(text);
         _combatTitle = new SectionTitle(text, MessageIds.StatusCombat);
         _resistancesTitle = new SectionTitle(text, MessageIds.StatusResistances);
+        _affixesTitle = new SectionTitle(text, MessageIds.StatusAffixes);
     }
 
     /// <summary>Measures the sheet's values, when the shown member changes.</summary>
     public void Show(StatusSheet sheet) => _shown = new Measured(
         [.. sheet.Combat.Select(_rows.Measure)],
-        [.. sheet.Resistances.Select(_rows.Measure)],
-        sheet.ResistanceTones);
+        [.. sheet.Resistances.Select((value, index) => new SheetRowLook.Cell(_labels.Resistances[index], _rows.Measure(value), ColorOf(sheet.ResistanceTones[index])))],
+        [.. sheet.Affixes.Select((value, index) => new SheetRowLook.Cell(_labels.Affixes[index], _rows.Measure(value), UiTheme.TextPrimary))]);
 
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the plain pixel and the bar come from.</param>
@@ -75,7 +81,11 @@ internal sealed class StatusParametersView
         DrawCombat(frame, combat, shown.Combat, place.HpBar);
 
         var right = band with { X = band.X + halfWidth + HalfGap, Width = halfWidth };
-        DrawResistances(frame, right, shown.Resistances, shown.ResistanceTones);
+        _resistancesTitle.Draw(batch, textures, right, opacity);
+        DrawInTwoColumns(frame, right, shown.Resistances, ResistanceRowsPerColumn);
+        var affixes = right with { Y = right.Y + AffixesTop };
+        _affixesTitle.Draw(batch, textures, affixes, opacity);
+        DrawInTwoColumns(frame, affixes, shown.Affixes, AffixRowsPerColumn);
     }
 
     // Each combat line under the band; HP's bar runs under its label.
@@ -92,15 +102,14 @@ internal sealed class StatusParametersView
         hpBar.Draw(frame.Batch, frame.Textures, new Rectangle(hp.X, hp.Bottom - HpBarHeight, barWidth, HpBarHeight), frame.Opacity);
     }
 
-    private void DrawResistances(Frame frame, Rectangle section, MeasuredText[] values, ResistanceTone[] tones)
+    // A section's cells in two columns under its band, down the first column, then the second.
+    private void DrawInTwoColumns(Frame frame, Rectangle section, SheetRowLook.Cell[] cells, int rowsPerColumn)
     {
-        _resistancesTitle.Draw(frame.Batch, frame.Textures, section, frame.Opacity);
-        var columnWidth = (section.Width - CellInset - ResistanceColumnGap) / 2;
-        for (var index = 0; index < values.Length; index++)
+        var columnWidth = (section.Width - CellInset - ColumnGap) / 2;
+        for (var index = 0; index < cells.Length; index++)
         {
-            var column = section with { X = section.X + (index / ResistanceRowsPerColumn * (columnWidth + ResistanceColumnGap)) };
-            var cell = CellAt(column, index % ResistanceRowsPerColumn, columnWidth + CellInset);
-            _rows.Draw(frame.Batch, cell, new SheetRowLook.Cell(_labels.Resistances[index], values[index], ColorOf(tones[index])), frame.Opacity);
+            var column = section with { X = section.X + (index / rowsPerColumn * (columnWidth + ColumnGap)) };
+            _rows.Draw(frame.Batch, CellAt(column, index % rowsPerColumn, columnWidth + CellInset), cells[index], frame.Opacity);
         }
     }
 
@@ -129,5 +138,5 @@ internal sealed class StatusParametersView
 
     // The shown sheet's values, measured once when it is shown.
     private sealed record Measured(
-        MeasuredText[] Combat, MeasuredText[] Resistances, ResistanceTone[] ResistanceTones);
+        MeasuredText[] Combat, SheetRowLook.Cell[] Resistances, SheetRowLook.Cell[] Affixes);
 }

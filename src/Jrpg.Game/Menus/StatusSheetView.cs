@@ -10,8 +10,9 @@ namespace Jrpg.Game.Menus;
 /// Draws a <see cref="StatusSheet"/> after the reference's Status page (decision 334): the profile beside a diamond
 /// portrait, with the experience over its bar and the experience to the next level at the bar's end, and the five
 /// Attributes with what each gives at the band's right; then each section under its dark band
-/// (<see cref="SectionTitle"/>): Combat beside Resistances (<see cref="StatusParametersView"/>), then the skills with
-/// Resources at their right (<see cref="StatusResourcesView"/>, decision 368).
+/// (<see cref="SectionTitle"/>): Combat beside Resistances with Affixes under them
+/// (<see cref="StatusParametersView"/>), then the skills with Resources at their right
+/// (<see cref="StatusResourcesView"/>, decision 368).
 /// </summary>
 internal sealed class StatusSheetView
 {

@@ -59,6 +59,8 @@
   "status_equipment": "Equipment",
   "status_speed": "Speed",
   "status_resources": "Resources",
+  "status_affixes": "Affixes",
+  "status_penetration": "Penetration",
   "status_skills": "Skills",
   "status_lasting_amount": "{amount}/{max}",
   "stat_hp": "HP",

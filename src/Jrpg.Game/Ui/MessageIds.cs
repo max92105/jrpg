@@ -159,6 +159,11 @@ internal static class MessageIds
 
     public const string StatusResources = "status_resources";
 
+    public const string StatusAffixes = "status_affixes";
+
+    /// <summary>Armor penetration's short label on the Status page, which fits its cell.</summary>
+    public const string StatusPenetration = "status_penetration";
+
     public const string StatusSkills = "status_skills";
 
     /// <summary>A lasting resource's amount out of its max: {amount}, {max}.</summary>

@@ -124,6 +124,45 @@ public sealed class StatusPageSheetTests
         Assert.Equal(ResistanceTone.Capped, page.ShownSheet.ResistanceTones[(int)DamageType.Slashing]);
     }
 
+    // A ring rolled with 12 % lifesteal: the page reads it from the sheet and writes it as StatText does.
+    [Fact]
+    public void Open_LeaderWearingLifeSteal_ShowsItsPercent()
+    {
+        var page = NewPage();
+        page.Open();
+        var before = page.ShownSheet.Affixes[0];
+        var ring = StartMapScenarios.BelowClosedDoor.Items["power_ring"];
+        var piece = GearPiece.Rolled(ring, Rarity.Magic, [new RolledAffix("life_steal", StatKind.LifeSteal, 12)]);
+        _session.Inventory.AddGear(piece);
+        Assert.True(_session.Equipment.TryEquip(_session.Party.Leader, piece));
+
+        page.Open();
+
+        Assert.Equal(StatText.ValueOf(StatKind.LifeSteal, 120, _messages), page.ShownSheet.Affixes[0]);
+        Assert.NotEqual(before, page.ShownSheet.Affixes[0]);
+    }
+
+    // The page shows everything (decision 350): a stat no affix gives reads 0 %.
+    [Fact]
+    public void Open_NoAffixWorn_ShowsFourAffixStatsAtZero()
+    {
+        var page = NewPage();
+
+        page.Open();
+
+        Assert.Equal(Enumerable.Repeat(StatText.ValueOf(StatKind.LifeSteal, 0, _messages), 4), page.ShownSheet.Affixes);
+    }
+
+    [Fact]
+    public void Open_Member_ListsAffixLabelsInStatKindOrder()
+    {
+        var page = NewPage();
+
+        page.Open();
+
+        Assert.Equal(["LIFESTEAL", "PENETRATION", "BLOCK", "DROP LUCK"], page.ShownLabels.Affixes);
+    }
+
     [Fact]
     public void ContentHeight_ProfileBandAndThreeSkills_FitsThePage()
     {

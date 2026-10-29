@@ -24,6 +24,9 @@ namespace Jrpg.Game.Menus;
 /// </param>
 /// <param name="Resistances">One per damage type, in <see cref="DamageType"/> order.</param>
 /// <param name="ResistanceTones">How each resistance is tinted, in the same order: weak, capped or plain.</param>
+/// <param name="Affixes">
+/// Each stat only affixes give, at 0 when nothing gives it, in <see cref="StatKinds.AffixOnly"/>' order.
+/// </param>
 /// <param name="Resources">
 /// Each class resource by name, in the class's order, with its max, or a lasting one's amount out of its max.
 /// </param>
@@ -38,6 +41,7 @@ internal sealed record StatusSheet(
     string[] Combat,
     string[] Resistances,
     ResistanceTone[] ResistanceTones,
+    string[] Affixes,
     IReadOnlyList<StatusSheet.Line> Resources,
     IReadOnlyList<StatusSheet.Line> Skills)
 {
@@ -69,6 +73,7 @@ internal sealed record StatusSheet(
             ],
             [.. Enum.GetValues<DamageType>().Select(type => Value(StatKinds.ResistanceTo(type)))],
             [.. Enum.GetValues<DamageType>().Select(type => ToneOf(sheet.Resistances.Of(type)))],
+            [.. StatKinds.AffixOnly.Select(Value)],
             [.. ResourceStarts.For(member).Select(start => ResourceLine(start, member, labels))],
             [.. member.Skills.Select(skill => new Line(skill.Name, skill.Description))]);
     }

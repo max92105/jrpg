@@ -12,6 +12,10 @@ namespace Jrpg.Game.Menus;
 /// <param name="Attributes">The five primaries' names, in <see cref="StatusSheet.Attributes"/>' order.</param>
 /// <param name="Combat">The Combat section's labels, in <see cref="StatusSheet.Combat"/>'s order.</param>
 /// <param name="Resistances">Each damage type's short name, in <see cref="DamageType"/> order.</param>
+/// <param name="Affixes">
+/// Each stat only affixes give, in <see cref="StatKinds.AffixOnly"/>' order: its name, but Armor penetration's short
+/// one, which fits its cell.
+/// </param>
 /// <param name="Messages">Where <see cref="LastingAmountText"/> is formatted from.</param>
 internal sealed record StatusLabels(
     string[] Progress,
@@ -19,6 +23,7 @@ internal sealed record StatusLabels(
     string[] Attributes,
     string[] Combat,
     string[] Resistances,
+    string[] Affixes,
     UiMessages Messages)
 {
     public static StatusLabels From(UiMessages messages)
@@ -33,6 +38,7 @@ internal sealed record StatusLabels(
                 Caps(MessageIds.StatAccuracy), Caps(MessageIds.StatusCrit), Caps(MessageIds.StatDodge), Caps(MessageIds.StatusCrowdControl),
             ],
             [.. Enum.GetValues<DamageType>().Select(type => Caps(DamageTypeNames.IdOf(type)))],
+            [.. StatKinds.AffixOnly.Select(kind => Caps(kind == StatKind.ArmorPenetration ? MessageIds.StatusPenetration : StatNames.IdOf(kind)))],
             messages);
     }
 

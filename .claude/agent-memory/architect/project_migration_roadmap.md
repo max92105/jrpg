@@ -13,7 +13,7 @@ Stats and gear slots (`docs/plans/done/2026-10-26-stats-and-gear-slots/`, done 2
 
 Loot (`docs/plans/done/2026-10-27-loot/`, done 2026-10-29): decisions 338-355, 359-361 and 362 (tier colors: ARPG convention), ADRs 0029/0030 option A. Split off: `done/2026-10-27-affix-stats/` (done 2026-10-29: A1-A3, A4a/A4b, ST1a/ST1b; decisions 356, 363-368 and 373 (tighter Status skill rows); stone_beetle practice enemy in the forest) and `done/2026-10-27-forge/` (done 2026-10-29: M1-M4, F1a, E1, E2, N1, F1b-F1d, F2a-F2c; decisions 357, 358, 369-372; Core `Forge` returns `ForgeQuote`s, the Game formats them; forge master on the start map). Next free: decision 374, ADR 0031. Tiers: Common/Magic/Rare rolled, Unique reserved, Material a color only (teal).
 
-Enemy skills and bosses (`docs/plans/2026-10-29-enemy-skills-and-bosses/`, draft 2026-10-29, drafted beside three other plans: local Q1-Q12, unnumbered proposed decisions, caller adds the README row): T1, T2, D1, C1, B1-B4, S1; answers question 224 once approved.
+Enemy skills and bosses (`docs/plans/2026-10-29-enemy-skills-and-bosses/`, approved 2026-10-29): decisions 399-414, ADR 0034 (tactics option A); slices T0, T1, D1, C1, T2, T3, S1, B1, B4, B2, B3; answers question 224. Gold-and-shops and quests approved the same day (numbers before 399); music-and-sfx draft. Next free: decision 415, ADR 0035.
 
 Quests (`docs/plans/2026-10-29-quests/`, approved 2026-10-29, runs AFTER gold): decisions 386-398, ADRs 0032 (quest log; non-quest story state = main-quest stage, decision 398) and 0033 (conditions gate whole events, five kinds incl. reachedStage); 23 slices QD, QL, QS, R1 (ExplorationState split, unconditional), QC, QV (+ no-shadowing rule), E1-E3, N1, SV (format 7), J1, G1-G3, L1-L3, G4 (notices), QE1-QE4 (Quests editor window). Quests tab first in the menu; Active/Completed via Left/Right. Next free after it: decision 399, ADR 0034.
 
@@ -23,9 +23,9 @@ Music and SFX (`docs/plans/2026-10-29-music-and-sfx/`, draft 2026-10-29, same pa
 
 Rule seen at that approval: a review that adds features (pickers, previews, saved stocks) roughly doubles a plan; renumber slice ids to reuse file names, stub the orphans.
 
-Direction (decision 234): an investor demo. Later: speed-based turn count (301, with enemy speed), Act 1 content, map banner, autosave, enemy skills (224), gold/inn prices (222), other classes' lasting costs (220), skills for dead stat dimensions (310).
+Direction (decision 234): an investor demo. Later: speed-based turn count (301, with enemy speed), Act 1 content, map banner, autosave, a battle event step (decision 399), gold/inn prices (222), other classes' lasting costs (220), skills for dead stat dimensions (310).
 
-Still-open older questions: 92, 112, 147, 151-155, 179, 180, 182, 183, 208-220, 222-228.
+Still-open older questions: 92, 112, 147, 151-155, 179, 180, 182, 183, 208-220, 222, 223, 225-228 (224 answered by the enemy skills plan).
 
 **Why:** game design decisions stay the developer's; numbering must continue without gaps.
 

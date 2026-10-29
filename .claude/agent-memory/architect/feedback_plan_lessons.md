@@ -71,6 +71,7 @@ When planning slices in this repo:
   - order so a hand check exists early (bare screen, step, editor, NPC, then the list/look/actions);
   - the 1.6x applies to Game slices that add a view type (loot README rule), still forcing screen splits: shell / list / detail / look / actions / each action.
 - Parallel drafts (2026-10-29): when several plans are drafted at once, don't touch `docs/plans/README.md`; number questions Q1.. locally and list decisions as "proposed, numbered at approval"; ADR candidates without a number.
+- Enemy-skills review (2026-10-29): never put a test or boss encounter in a start-area map's random table (ADR 0017: a lone level 1 leader must win there); park it in `encounters.json` unrolled, pinned by a "no map rolls it" repository test (decisions 226, 399), hand checks edit the map locally and revert. A rule that must see every HP loss goes at one place, the end of `BattleState.Execute`, not per path in `TurnFlow`. A new playback cue gets its own beat (as `AddSkipCue`), routed through `Read`'s default arm. A boss's size comes from its art, no code flag. Check which other in-flight plans target the same near-300 test file.
 - Before planning a greyed-entry guard test, check `ListCursor`: it skips disabled entries, so the test asserts the cursor never selects it, not "Confirm does nothing".
 - My Write tool writes LF; repo docs are CRLF: tell the caller to run `sed -i 's/\r*$/\r/'` on new plan files.
 - Affix-stats review (2026-10-29):

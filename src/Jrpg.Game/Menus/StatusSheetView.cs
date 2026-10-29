@@ -23,15 +23,6 @@ internal sealed class StatusSheetView
     private const int TopMargin = 20;
     private const int NamePixels = 36;
     private const int ClassPixels = 20;
-    /// <summary>The page's small spaced-caps labels' size, shared with <see cref="StatusParametersView"/>.</summary>
-    internal const int LabelPixels = 18;
-
-    /// <summary>The page's large values' size, shared with <see cref="StatusParametersView"/>.</summary>
-    internal const int ValuePixels = 26;
-
-    /// <summary>The labels' letter spacing, shared with <see cref="StatusParametersView"/>.</summary>
-    internal const float LabelSpacing = 2;
-
     private const int PortraitSize = 160;
     private const int PortraitFrame = 2;
     private const int PortraitGap = 32;
@@ -102,15 +93,15 @@ internal sealed class StatusSheetView
         _labels = labels;
         _nameFont = text.Fonts.FontAt(NamePixels);
         _classFont = text.Fonts.FontAt(ClassPixels);
-        _labelFont = text.Fonts.FontAt(LabelPixels);
-        _valueFont = text.Fonts.FontAt(ValuePixels);
-        _progressLabelWidths = [.. labels.Progress.Select(label => _labelFont.MeasureString(label, characterSpacing: LabelSpacing).X)];
+        _labelFont = text.Fonts.FontAt(SheetRowLook.LabelPixels);
+        _valueFont = text.Fonts.FontAt(SheetRowLook.ValuePixels);
+        _progressLabelWidths = [.. labels.Progress.Select(label => _labelFont.MeasureString(label, characterSpacing: SheetRowLook.LabelSpacing).X)];
         _parameters = new StatusParametersView(text, labels);
         _attributesTitle = new SectionTitle(text, MessageIds.StatusAttributes);
         _captionFont = text.Fonts.FontAt(CaptionPixels);
         _skills = new StatusSkillsView(text);
         _resources = new StatusResourcesView(text);
-        Vitals = new MemberVitalBars(text, ui, ValuePixels);
+        Vitals = new MemberVitalBars(text, ui, SheetRowLook.ValuePixels);
         _xpBar = new StatBar(ui, UiTheme.XpBar);
     }
 
@@ -236,7 +227,7 @@ internal sealed class StatusSheetView
 
         // A small label in spaced caps and the secondary color.
         public void WriteLabel(SpriteFontBase font, string text, Vector2 position) =>
-            Batch.DrawString(font, text, position, UiTheme.TextSecondary * Opacity, characterSpacing: LabelSpacing);
+            Batch.DrawString(font, text, position, UiTheme.TextSecondary * Opacity, characterSpacing: SheetRowLook.LabelSpacing);
     }
 
     // The shown sheet's values, measured once when it is shown: the name's width places the level beside it, the

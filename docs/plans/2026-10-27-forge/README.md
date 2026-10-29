@@ -52,7 +52,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 3: what the Forge shows
 - [x] **F1b. The Forge lists the owned pieces** (Game + text, about 165 lines) → [slices/F1b.md](slices/F1b.md)
-- [ ] **F1c. The detail column: the highlighted piece's affixes and every material owned** (Game + text, about 150 lines) → [slices/F1c.md](slices/F1c.md)
+- [x] **F1c. The detail column: the highlighted piece's affixes and every material owned** (Game + text, about 150 lines) → [slices/F1c.md](slices/F1c.md)
 - [ ] **F1d. The Forge's look: bars, columns, bands and its fade** (Game, raw 150, about 240 lines at 1.6x) → [slices/F1d.md](slices/F1d.md)
 
 ### Phase 4: crafting at the Forge

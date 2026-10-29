@@ -1,23 +1,31 @@
 using FontStashSharp;
-using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
-namespace Jrpg.Game.Menus;
+namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// The row look the Status and Equipment pages share (S1b, E2): a small spaced-caps label at the row's left and a large
-/// value ending where the row says, both centered on the row, so every sheet reads one way.
+/// The row look the Status and Equipment pages and the Forge share (S1b, E2, F1c): a small spaced-caps label at the
+/// row's left and a large value ending where the row says, both centered on the row, so every sheet reads one way.
 /// </summary>
 internal sealed class SheetRowLook
 {
+    /// <summary>The small spaced-caps labels' size; the Status page's other labels share it.</summary>
+    public const int LabelPixels = 18;
+
+    /// <summary>The large values' size; the Status page's other values share it.</summary>
+    public const int ValuePixels = 26;
+
+    /// <summary>The labels' letter spacing.</summary>
+    public const float LabelSpacing = 2;
+
     private readonly SpriteFontBase _labelFont;
     private readonly SpriteFontBase _valueFont;
 
     public SheetRowLook(ScreenText text)
     {
-        _labelFont = text.Fonts.FontAt(StatusSheetView.LabelPixels);
-        _valueFont = text.Fonts.FontAt(StatusSheetView.ValuePixels);
+        _labelFont = text.Fonts.FontAt(LabelPixels);
+        _valueFont = text.Fonts.FontAt(ValuePixels);
     }
 
     public MeasuredText Measure(string value) => MeasuredText.Of(_valueFont, value);
@@ -32,7 +40,7 @@ internal sealed class SheetRowLook
     public void DrawLabel(SpriteBatch batch, Rectangle row, string label, float opacity)
     {
         var position = new Vector2(row.X, Middle(row) - (_labelFont.LineHeight / 2f));
-        batch.DrawString(_labelFont, label, position, UiTheme.TextSecondary * opacity, characterSpacing: StatusSheetView.LabelSpacing);
+        batch.DrawString(_labelFont, label, position, UiTheme.TextSecondary * opacity, characterSpacing: LabelSpacing);
     }
 
     public void DrawValue(SpriteBatch batch, Rectangle row, Value value, float opacity)

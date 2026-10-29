@@ -50,5 +50,6 @@ public sealed class ForgeSceneTests
         Assert.NotEqual(first, forge.SelectedPiece);
     }
 
-    private static ForgeScene NewForge(GameSession session) => new(RepositoryScreenText.Text, new UiTextures(), session);
+    private static ForgeScene NewForge(GameSession session) =>
+        new(RepositoryScreenText.Text, new UiTextures(), session, StartMapScenarios.BelowClosedDoor.Items);
 }

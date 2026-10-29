@@ -6,22 +6,25 @@ namespace Jrpg.Game.Crafting;
 /// <summary>
 /// The Forge's list of the owned pieces (decision 369: worn ones aren't owned), in pickup order, with their scrolling
 /// cursor and the gliding highlight. Built when the items change, so drawing formats nothing. A row index is a gear
-/// index: the pieces are <see cref="Inventory.Gear"/> as it stands.
+/// index: the rows are <see cref="Inventory.Gear"/> as it stands.
 /// </summary>
-internal sealed class ForgeList(Inventory inventory)
+internal sealed class ForgeList(Inventory inventory, UiMessages messages)
 {
-    private GearPiece[] _pieces = [];
+    private ForgeRow[] _rows = [];
 
-    public IReadOnlyList<GearPiece> Pieces => _pieces;
+    public IReadOnlyList<ForgeRow> Rows => _rows;
 
-    /// <summary>The cursor over the pieces; null when none is owned.</summary>
+    /// <summary>The cursor over the rows; null when no piece is owned.</summary>
     public ListCursor? Cursor { get; private set; }
 
     /// <summary>The highlight gliding to the cursor's row.</summary>
     public SelectionMotion Selection { get; } = new();
 
-    /// <summary>The selected row's piece; null when none is owned.</summary>
-    public GearPiece? SelectedPiece => Cursor is null ? null : _pieces[Cursor.Selected];
+    /// <summary>The selected row; null when no piece is owned.</summary>
+    public ForgeRow? SelectedRow => Cursor is null ? null : _rows[Cursor.Selected];
+
+    /// <summary>The selected row's piece; null when no piece is owned.</summary>
+    public GearPiece? SelectedPiece => SelectedRow?.Piece;
 
     public void Advance(TimeSpan delta) => Selection.Advance(delta);
 
@@ -31,14 +34,14 @@ internal sealed class ForgeList(Inventory inventory)
     /// </summary>
     public void Show(int selectedRow)
     {
-        _pieces = [.. inventory.Gear];
-        if (_pieces.Length == 0)
+        _rows = [.. inventory.Gear.Select(RowOf)];
+        if (_rows.Length == 0)
         {
             Cursor = null;
             return;
         }
 
-        Cursor = new ListCursor(_pieces.Length, _ => true, ForgeView.VisibleRows);
+        Cursor = new ListCursor(_rows.Length, _ => true, ForgeView.VisibleRows);
         Cursor.Select(selectedRow);
         Selection.JumpTo(Cursor);
     }
@@ -57,4 +60,6 @@ internal sealed class ForgeList(Inventory inventory)
         step(cursor);
         Selection.Follow(cursor);
     }
+
+    private ForgeRow RowOf(GearPiece piece) => new(piece, messages.Text(RarityNames.IdOf(piece.Rarity)), [.. piece.Affixes.Select(affix => AffixText.Of(affix, messages))]);
 }

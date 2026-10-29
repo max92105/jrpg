@@ -585,4 +585,10 @@ internal static class MessageIds
 
     /// <summary>The Forge's line while the party owns no piece to work on.</summary>
     public const string ForgeEmpty = "forge_empty";
+
+    /// <summary>The Forge's heading over the materials the party owns.</summary>
+    public const string ForgeMaterials = "forge_materials";
+
+    /// <summary>The Forge's line under a piece with no affix.</summary>
+    public const string ForgeNoAffixes = "forge_no_affixes";
 }

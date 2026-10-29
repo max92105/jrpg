@@ -49,7 +49,7 @@ internal sealed class SceneFactory
     public LeaderChoiceScene CreateLeaderChoice() => new(_text, _ui, _catalog);
 
     /// <param name="session">The playthrough whose owned pieces the Forge lists.</param>
-    public ForgeScene CreateForge(GameSession session) => new(_text, _ui, session);
+    public ForgeScene CreateForge(GameSession session) => new(_text, _ui, session, _catalog.Items);
 
     /// <param name="session">The playthrough the header reports on.</param>
     public GameMenuScene CreateGameMenu(GameSession session) =>

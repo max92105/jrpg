@@ -10,22 +10,27 @@ namespace Jrpg.Game.Crafting;
 
 /// <summary>
 /// The Forge screen a forge master's event opens over the map (decision 353): the owned pieces, Up and Down moving the
-/// list. Cancel asks to close it, once: a second request would make the flow pop what lies under it.
+/// list, the highlighted piece's affixes and the materials owned beside it. Cancel asks to close it, once: a second
+/// request would make the flow pop what lies under it.
 /// </summary>
 internal sealed class ForgeScene : IScene
 {
     private readonly ForgeList _list;
+    private readonly MaterialStock _materials;
     private readonly ForgeView _view;
     private bool _isClosing;
 
-    /// <param name="text">The title, the empty line and the rows' font.</param>
+    /// <param name="text">The title, the lines and the rows' fonts.</param>
     /// <param name="ui">The shared textures: icons, the selected row.</param>
-    /// <param name="session">Whose owned pieces are listed.</param>
-    public ForgeScene(ScreenText text, UiTextures ui, GameSession session)
+    /// <param name="session">Whose owned pieces and materials are listed.</param>
+    /// <param name="items">The catalog's items, for the materials among them.</param>
+    public ForgeScene(ScreenText text, UiTextures ui, GameSession session, IReadOnlyDictionary<string, ItemDefinition> items)
     {
-        _list = new ForgeList(session.Inventory);
+        var look = new SheetRowLook(text);
+        _list = new ForgeList(session.Inventory, text.Messages);
         _list.Show(0);
-        _view = new ForgeView(text, ui);
+        _materials = new MaterialStock(session.Inventory, items, look);
+        _view = new ForgeView(text, ui, look);
     }
 
     /// <summary>The highlighted piece; null when none is owned.</summary>
@@ -58,5 +63,5 @@ internal sealed class ForgeScene : IScene
         return null;
     }
 
-    public void Draw(SpriteBatch batch, TextureLibrary textures) => _view.Draw(batch, textures, _list);
+    public void Draw(SpriteBatch batch, TextureLibrary textures) => _view.Draw(batch, textures, _list, _materials);
 }

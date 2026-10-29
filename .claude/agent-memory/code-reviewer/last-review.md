@@ -5,10 +5,9 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-27-forge, slice F1b (ForgeList of owned pieces, ForgeScene takes text/ui/session, ForgeView rows under
-DrawGlidingSelection, forge_empty text; ForgeListTests x3, ForgeSceneTests.Update_Down_MovesTheList).
-Round 1. Verdict: Ready to commit. verify.ps1 all pass (2883 tests).
+Plan: 2026-10-27-forge, slice F1c (SheetRowLook moved to Ui with its constants; ForgeRow with affix lines;
+MaterialStock/MaterialCount; ForgeView detail column; forge_materials, forge_no_affixes).
+Round 1. Verdict: Ready to commit. verify.ps1 all pass (2886 tests).
 
-- Suggestion: NewSession (removes the new game's loose pieces) copied in ForgeListTests and ForgeSceneTests; share it
-  before F1c adds a third copy - open
-- Suggestion: Show_OwnedGear's IndexOf ordering assert repeats what Assert.Equal(Gear, Pieces) already proves - open
+- Suggestion: ForgeView looks the rarity name up in Draw (keeps _messages only for it); put it in ForgeRow - open
+- Suggestion: Show_RolledPiece_RowHasItsAffixLines checks only "+4 "/"+2 " prefixes; pin AffixText.Of's whole line - open

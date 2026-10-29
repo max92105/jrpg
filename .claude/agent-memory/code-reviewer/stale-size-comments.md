@@ -39,4 +39,8 @@ G1b-2: removing SlotChoice.Refusal left the constructor's `<param name="messages
 when a member goes, grep its noun ("refusal", "notice") in the type's own param docs and summaries.
 ST1a: a decision changing one view's spacing (StatusSkillsView rows) left the parent's reserved height (StatusSheetView
 SkillsHeight "3 x 70", 10 px under band) on the old rows; grep the parent's arithmetic for the child's old numbers.
+Forge M2/M3a: a type gaining a second job kept a class summary naming only the first (GameRules without crafting;
+GearRoll "Rolls a dropped base item" after AddAffix); reread the class summary of every type that gains a public member.
+M3b: Forge's ctor `<param name="gearRoll">` kept "so an upgrade draws" once reroll used it too; reread the param docs
+of every dependency the new member calls.
 Related: [[tautological-tests]].

@@ -5,14 +5,10 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-27-forge, slice M1 (Materials: ItemDefinition.IsMaterial, validator FindMaterialProblem, RarityMaterial
-teal, InventoryRow/VictoryDropRow.IsMaterial, Materials tab, scrap/essence content, goblin drops).
-Round 1. Verdict: Ready to commit. verify.ps1 all pass (2817 tests).
+Plan: 2026-10-27-forge, slice N1 (forge_master villager at start (25, 14) with Interact event forge_master_0: line then
+openForge; RepositoryForgeTests, StartMapForgeMasterTests, StartMapScenarios.BelowForgeMaster; GameFlowForgeTests
+gained the RepositoryScreenText collection).
+Round 1. Verdict: Ready to commit. verify.ps1 all pass (2879 tests).
 
-- Warning: ShowCategory/ShowMaterials tab loop now in 3 test files (InventoryPageGearTests:92, InventoryPageTests:224,
-  InventoryPageMaterialTests:52); move to one shared test support type - open
-- Warning: InventoryPageMaterialTests.Update_MaterialsTab_ListsOnlyTheScrap asserts the whole tab == ["scrap"] over the
-  content start inventory (G2); assert Contains scrap + DoesNotContain potion - open
-- Suggestion: VictoryDropsView.RowsOf stack lambda ~200 cols; extract a StackRowOf beside RowOf(GearPiece) - open
-- Suggestion: InventoryRow.IsMaterial summary says only the name is drawn in the color; the count is too - open
-- Suggestion: TextColorOf_UnusablePlainItem_IsGreyed sets Rarity = Common, the default; drop it - open
+- Suggestion: RepositoryForgeTests passes for any Interact event with an openForge step anywhere in it; pin the forge
+  master's shape (a dialogue step, then openForge last) - open

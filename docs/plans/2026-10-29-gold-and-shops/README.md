@@ -53,7 +53,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **S2. What a rolled piece is worth; buying a stock piece** (Core + Data + content, about 225 lines) → [slices/S2.md](slices/S2.md)
 - [x] **S3. Selling in Core: the sell share, `ItemSales`** (Core, about 235 lines) → [slices/S3.md](slices/S3.md)
 - [x] **S4. Shops, prices and the sell share in content, checked by the loader** (Core + Data + content, about 240 lines) → [slices/S4.md](slices/S4.md)
-- [ ] **S5. The shops' stocks: rolled on first opening, rerolled after a leader level** (Core, about 160 lines) → [slices/S5.md](slices/S5.md)
+- [x] **S5. The shops' stocks: rolled on first opening, rerolled after a leader level** (Core, about 160 lines) → [slices/S5.md](slices/S5.md)
 - [ ] **S6. The shops' stocks saved, restored and repaired** (Core + Data, about 180 lines) → [slices/S6.md](slices/S6.md)
 
 ### Phase 3: the shop on the map

@@ -19,6 +19,8 @@ public sealed class GameSession
     // The catalog, inventory, world and random source shared by exploration and battles.
     private readonly ExplorationContext _context;
     private readonly DropRoll _dropRoll;
+    private readonly Pricing _pricing;
+    private readonly ShopStocks _stocks;
 
     private GameSession(PartyState party, ExplorationContext context, MapLocation start)
     {
@@ -32,8 +34,9 @@ public sealed class GameSession
         var gearRoll = GearRollFor(context.Catalog, context.Random);
         _dropRoll = new DropRoll(context.Catalog.Items, gearRoll, context.Random);
         Forge = new Forge(Inventory, context.Catalog.Items, context.Catalog.Rules.Crafting, gearRoll);
-        var pricing = new Pricing(context.Catalog.Affixes.ToDictionary(affix => affix.Key, affix => affix.Value.GoldValue), context.Catalog.Rules.Trade);
-        Sales = new ItemSales(Inventory, party.Purse, pricing);
+        _pricing = new Pricing(context.Catalog.Affixes.ToDictionary(affix => affix.Key, affix => affix.Value.GoldValue), context.Catalog.Rules.Trade);
+        Sales = new ItemSales(Inventory, party.Purse, _pricing);
+        _stocks = new ShopStocks(context.Catalog, gearRoll);
     }
 
     public PartyState Party { get; }
@@ -47,6 +50,13 @@ public sealed class GameSession
 
     /// <summary>Selling owned stacks and pieces for gold, the same at every shop (ADR 0031).</summary>
     public ItemSales Sales { get; }
+
+    /// <summary>
+    /// The shop a shopkeeper opens: its stock rolls on the first opening and again once the leader has gained a level
+    /// (decision 385); a bought piece stays gone until then.
+    /// </summary>
+    /// <exception cref="KeyNotFoundException">No shop has <paramref name="shopId"/>.</exception>
+    public Shop ShopFor(string shopId) => new(_stocks.StockFor(shopId, Party.Leader.Level), Inventory, Party.Purse, _pricing);
 
     /// <summary>Using consumables from the menu.</summary>
     public FieldItemUse FieldItems { get; }
@@ -229,7 +239,8 @@ public sealed class GameSession
     }
 
     // The pool in id order: the catalog's dictionary keeps no file order, and a seed must always pick the same affixes.
-    // One roll for the drops and the Forge. Internal so the loot simulation rolls exactly what the game does.
+    // One roll for the drops, the Forge and the shops' stocks. Internal so the loot simulation rolls exactly what the
+    // game does.
     internal static GearRoll GearRollFor(ContentCatalog catalog, IRandom random)
     {
         AffixDefinition[] pool = [.. catalog.Affixes.Values.OrderBy(affix => affix.Id, StringComparer.Ordinal)];

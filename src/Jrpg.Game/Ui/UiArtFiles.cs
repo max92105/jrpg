@@ -16,7 +16,10 @@ internal static class UiArtFiles
         public const string Menu = "GameMenu.png";
     }
 
-    /// <summary>In <see cref="ArtFolders.Icons"/>: the inventory's category rail (decision 51) and the battle commands.</summary>
+    /// <summary>
+    /// In <see cref="ArtFolders.Icons"/>: the inventory's category rail (decision 51), the battle commands and the
+    /// coin.
+    /// </summary>
     public static class Icons
     {
         public const string AllItems = "All.png";
@@ -42,5 +45,8 @@ internal static class UiArtFiles
 
         // Placeholder: no Move icon exists yet, so Move shows the Run icon.
         public const string Move = "Run.png";
+
+        /// <summary>The coin before a gold amount (decision 380); a copy of the item icon until the art pass.</summary>
+        public const string Gold = "Gold.png";
     }
 }

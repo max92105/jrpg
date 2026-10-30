@@ -218,7 +218,7 @@ public sealed class GameMenuSceneTests
     private static GameMenuScene NewMenu(IMenuPage page) =>
         new(RepositoryScreenText.Text, new UiTextures(), HeaderOf(NewSession()), [page]);
 
-    private static MenuHeader HeaderOf(GameSession session) => new(RepositoryScreenText.Text, session);
+    private static MenuHeader HeaderOf(GameSession session) => new(RepositoryScreenText.Text, new UiTextures(), session);
 
     private static GameSession NewSession() => StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);
 }

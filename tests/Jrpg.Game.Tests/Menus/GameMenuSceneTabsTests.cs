@@ -53,6 +53,6 @@ public sealed class GameMenuSceneTabsTests
     private static GameMenuScene NewMenu()
     {
         var session = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);
-        return new(RepositoryScreenText.Text, new UiTextures(), new MenuHeader(RepositoryScreenText.Text, session), [new CountingMenuPage()]);
+        return new(RepositoryScreenText.Text, new UiTextures(), new MenuHeader(RepositoryScreenText.Text, new UiTextures(), session), [new CountingMenuPage()]);
     }
 }

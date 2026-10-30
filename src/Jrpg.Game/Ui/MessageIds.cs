@@ -512,6 +512,9 @@ internal static class MessageIds
     /// <summary>The victory screen's heading over what dropped (decision 355).</summary>
     public const string BattleVictoryItems = "battle_victory_items";
 
+    /// <summary>The victory screen's reward row for the gold the battle gave (decision 103).</summary>
+    public const string BattleVictoryGold = "battle_victory_gold";
+
     /// <summary>
     /// Placeholder <c>{count}</c>: how many copies of a stack dropped, after its name on the Items step.
     /// </summary>

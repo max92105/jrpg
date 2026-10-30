@@ -1,4 +1,3 @@
-using Jrpg.Core.Battle;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
@@ -16,7 +15,9 @@ internal sealed class VictoryScreenView
     // Placeholder layout on the 1920 x 1080 virtual screen (decision 56).
     private const int RewardLeft = 88;
     private const int RewardTop = 268;
-    private const int RewardGap = 12;
+    // A second reward bar stands beside the first, not under it: below, it would meet the cards' "Level Up!" and the
+    // Items heading.
+    private const int RewardColumnGap = 24;
     private const int RewardLabelLeft = 34;
     private const int RewardValueLeft = RewardLabelLeft + 200;
     private const float RewardLabelOpacity = 0.75f;
@@ -63,8 +64,8 @@ internal sealed class VictoryScreenView
     private readonly OutlinedFont _experienceFont;
     private readonly OutlinedFont _nextHintFont;
     private readonly string _title;
-    private readonly string[] _rewardLabels;
-    private readonly string[] _rewardValues;
+    private readonly ShownReward[] _rewards;
+    private readonly GoldAmountView _gold;
     private readonly string[] _names;
     private readonly MeasuredText _levelLabel;
     private readonly string _experienceLabel;
@@ -97,9 +98,8 @@ internal sealed class VictoryScreenView
         _experienceFont = new OutlinedFont(text.Fonts.FontAt(ExperiencePixels));
         _nextHintFont = new OutlinedFont(text.Fonts.FontAt(NextHintPixels));
         _title = text.Messages.Text(MessageIds.BattleVictory);
-        var rewardRows = RewardRows(screen.Rewards);
-        _rewardLabels = [.. rewardRows.Select(row => text.Messages.Text(row.LabelId))];
-        _rewardValues = [.. rewardRows.Select(row => NumberText.Of(row.Amount))];
+        _rewards = [.. RewardRows(screen).Select(row => new ShownReward(text.Messages.Text(row.LabelId), MeasuredText.Of(_rewardValueFont.Font, NumberText.Of(row.Amount)), row.IsGold))];
+        _gold = new GoldAmountView(_rewardValueFont.Font, ui);
         _names = [.. screen.Rewards.Gains.Select(gain => gain.Member.Definition.Name)];
         _levelLabel = MeasuredText.Of(_smallFont.Font, text.Messages.Text(MessageIds.BattleLevelLabel));
         _experienceLabel = text.Messages.Text(MessageIds.StatusExp);
@@ -123,9 +123,14 @@ internal sealed class VictoryScreenView
     internal static Point CardTopLeft(int index) =>
         new(CardsLeft + (index % 2 * (PointedBarShape.CardHeaderWidth + CardColumnGap)), CardsTop + (index / 2 * CardPitch));
 
-    /// <summary>One row per thing the battle gave; only experience so far (decision 103).</summary>
-    public static IReadOnlyList<VictoryRewardRow> RewardRows(VictoryRewards rewards) =>
-        [new VictoryRewardRow(MessageIds.StatusExp, rewards.Experience)];
+    /// <summary>
+    /// One row per thing the battle gave: the experience, then the gold when there was any (decision 103).
+    /// </summary>
+    public static IReadOnlyList<VictoryRewardRow> RewardRows(VictoryScreen screen)
+    {
+        var experience = new VictoryRewardRow(MessageIds.StatusExp, screen.Rewards.Experience, IsGold: false);
+        return screen.Gold > 0 ? [experience, new VictoryRewardRow(MessageIds.BattleVictoryGold, screen.Gold, IsGold: true)] : [experience];
+    }
 
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the plain pixel comes from.</param>
@@ -166,14 +171,21 @@ internal sealed class VictoryScreenView
     private void DrawRewards(SpriteBatch batch, TextureLibrary textures)
     {
         var opacity = _screen.Entrance.RewardOpacity;
-        for (var index = 0; index < _rewardLabels.Length; index++)
+        for (var index = 0; index < _rewards.Length; index++)
         {
-            var bar = new Rectangle(RewardLeft, RewardTop + (index * (PointedBarShape.RewardBarHeight + RewardGap)), PointedBarShape.RewardBarWidth, PointedBarShape.RewardBarHeight);
+            var reward = _rewards[index];
+            var bar = new Rectangle(RewardLeft + (index * (PointedBarShape.RewardBarWidth + RewardColumnGap)), RewardTop, PointedBarShape.RewardBarWidth, PointedBarShape.RewardBarHeight);
             batch.Draw(_ui.RewardBar(textures), bar, Color.White * opacity);
             var labelTop = bar.Center.Y - (_rewardLabelFont.Font.LineHeight / 2f);
-            _rewardLabelFont.Draw(batch, _rewardLabels[index], new Vector2(bar.X + RewardLabelLeft, labelTop), UiTheme.TextPrimary * (RewardLabelOpacity * opacity));
-            var valueTop = bar.Center.Y - (_rewardValueFont.Font.LineHeight / 2f);
-            _rewardValueFont.Draw(batch, _rewardValues[index], new Vector2(bar.X + RewardValueLeft, valueTop), UiTheme.TextPrimary * opacity);
+            _rewardLabelFont.Draw(batch, reward.Label, new Vector2(bar.X + RewardLabelLeft, labelTop), UiTheme.TextPrimary * (RewardLabelOpacity * opacity));
+            var valueTopLeft = new Vector2(bar.X + RewardValueLeft, bar.Center.Y - (_rewardValueFont.Font.LineHeight / 2f));
+            if (reward.IsGold)
+            {
+                _gold.Draw(batch, textures, new GoldAmountView.Place(reward.Value, valueTopLeft, UiTheme.TextPrimary), opacity);
+                continue;
+            }
+
+            _rewardValueFont.Draw(batch, reward.Value.Text, valueTopLeft, UiTheme.TextPrimary * opacity);
         }
     }
 
@@ -260,4 +272,6 @@ internal sealed class VictoryScreenView
         _nextLevelTexts[index] = _noNextLevel;
         _bars[index].Show(1, 1);
     }
+    // One reward bar as drawn: its label, its measured value, and whether the value takes the coin.
+    private readonly record struct ShownReward(string Label, MeasuredText Value, bool IsGold);
 }

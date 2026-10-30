@@ -44,6 +44,6 @@ public sealed class GameMenuSceneMemberColumnTests
     {
         var session = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);
         var status = new StatusPage(RepositoryScreenText.Text, new UiTextures(), session, StartMapScenarios.BelowClosedDoor);
-        return new(RepositoryScreenText.Text, new UiTextures(), new MenuHeader(RepositoryScreenText.Text, session), [status]);
+        return new(RepositoryScreenText.Text, new UiTextures(), new MenuHeader(RepositoryScreenText.Text, new UiTextures(), session), [status]);
     }
 }

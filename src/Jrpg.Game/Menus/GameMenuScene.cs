@@ -110,7 +110,7 @@ internal sealed class GameMenuScene : IScene
         var opacity = _motion.FrameOpacity;
         _motion.MarkDrawn();
         DrawFrame(batch, textures, opacity);
-        _header.Draw(batch, _isInPage ? _tabLabels[_tabs.Selected] : _menuTitle, opacity);
+        _header.Draw(batch, textures, _isInPage ? _tabLabels[_tabs.Selected] : _menuTitle, opacity);
         _tabsView.Draw(batch, textures, new MenuTabsView.Place(_motion, _tabs.Selected, _tabGlide.Position, _tabFold));
         if (_isInPage)
         {

@@ -16,11 +16,12 @@ internal sealed class VictoryScreen
     private readonly ExperienceBarAnimation[] _bars;
     private bool _hasLeft;
 
-    /// <param name="spoils">The won battle's experience, each standing member's gain, and the drops.</param>
+    /// <param name="spoils">The won battle's experience, each standing member's gain, the drops and the gold.</param>
     public VictoryScreen(BattleSpoils spoils)
     {
         Rewards = spoils.Rewards;
         Drops = spoils.Drops;
+        Gold = spoils.Gold;
         _bars = [.. Rewards.Gains.Select(gain => new ExperienceBarAnimation(gain.Steps, gain.Member.Level))];
         Entrance = new VictoryEntrance(_bars.Length);
     }
@@ -29,6 +30,9 @@ internal sealed class VictoryScreen
 
     /// <summary>What dropped, already in the inventory.</summary>
     public Drops Drops { get; }
+
+    /// <summary>What the purse took (ADR 0031); 0 shows no gold row.</summary>
+    public int Gold { get; }
 
     /// <summary>Whether the Items step shows instead of the members' cards.</summary>
     public bool IsShowingDrops { get; private set; }

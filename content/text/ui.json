@@ -190,6 +190,7 @@
   "battle_level_up": "Level Up!",
   "battle_victory_next": "Next",
   "battle_victory_items": "Items",
+  "battle_victory_gold": "GOLD",
   "battle_victory_drop_count": "×{count}",
   "battle_victory_more_drops": "+{count} more",
   "battle_escaped": "Escaped",

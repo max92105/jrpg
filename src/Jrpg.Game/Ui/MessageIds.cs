@@ -707,4 +707,10 @@ internal static class MessageIds
 
     /// <summary>Placeholders <c>{name}</c> and <c>{count}</c>: the notice after selling copies of a stack.</summary>
     public const string ShopSoldCount = "shop_sold_count";
+
+    /// <summary>The inn's question before a priced rest (decision 382); its price is drawn under it.</summary>
+    public const string InnQuestion = "inn_question";
+
+    /// <summary>The inn's line when Yes is answered short of gold: the party stays unrested.</summary>
+    public const string InnShortOfGold = "inn_short_of_gold";
 }

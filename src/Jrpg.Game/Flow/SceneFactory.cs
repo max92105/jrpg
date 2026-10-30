@@ -67,7 +67,7 @@ internal sealed class SceneFactory
         new(
             exploration,
             _art,
-            new EventPresenter(exploration, _text, _settings, Voice),
+            new EventPresenter(exploration, new EventLook(_text, _ui), _settings, Voice),
             new InteractionPromptView(_text, exploration.CurrentDefinitionOf));
 
     private SystemPage CreateSystemPage(GameSession session) =>

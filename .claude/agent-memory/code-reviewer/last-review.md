@@ -5,9 +5,11 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-gold-and-shops, slice I2a (pure refactor: Game/Exploration/RestPlayback out of EventPresenter).
-Round 1. Verdict: Fix the Criticals, then commit. verify.ps1 all pass (3130 tests).
+Plan: 2026-10-29-gold-and-shops, slice I2b (the inn asks with its price: RestPlayback question, EventLook).
+Round 1. Verdict: Ready to commit. verify.ps1 all pass (3136 tests).
 
-- Critical, open: docs/map.md:64 Exploration line: `RestPlayback (...)` inserted between `StillRun` and StillRun's "(a run of stills, opening and closing on black)", which now describes RestPlayback; move RestPlayback after StillRun's parenthetical
-- I1 carried items checked by grep 2026-10-30: PartyState.RestEveryone used by all three (fixed); validator accepted-bound test MapEventValidatorTests:130 (fixed); InnStay.TryPay single check (fixed); ApplyRest void (fixed)
+- I2a Critical (map.md StillRun parenthetical) checked 2026-10-30: fixed
+- Warning, open: EventPresenterInnTests short-of-gold test can't tell the refusal line from "The party rests." (deleting `LineId = InnShortOfGold` stays green); test RestPlayback.LineId directly
+- Suggestion, open: EventPresenter.Draw summary omits the inn's question (between message and fade)
+- Suggestion, open: EventPresenter class summary "an inn's asks first" -> "an inn's rest asks first"
 - Follow-up (carried): Trade/ShopScene 296 lines

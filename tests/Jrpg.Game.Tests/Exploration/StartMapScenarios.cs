@@ -15,6 +15,7 @@ using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Scenes;
 using Jrpg.Game.Tests.Ui;
+using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Tests.Exploration;
 
@@ -56,6 +57,11 @@ internal static class StartMapScenarios
 
     /// <summary>Below the chest, which now rests the party, every time: a rest step with nothing before it.</summary>
     public static ContentCatalog BelowRestingChest { get; } = WithChestSaying(BelowChest, new RestStep());
+
+    /// <summary>
+    /// Below the chest, which is now an inn charging 20 gold for the rest (decision 382), every time.
+    /// </summary>
+    public static ContentCatalog BelowInnChest { get; } = WithChestSaying(BelowChest, new RestStep { Price = 20 });
 
     /// <summary>Below the chest, which now opens the Forge and then says a line, every time.</summary>
     public static ContentCatalog BelowForgeChest { get; } =
@@ -119,7 +125,7 @@ internal static class StartMapScenarios
         new(
             exploration,
             new MapArt(catalog, MapView.CellPixels),
-            new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel()),
+            new EventPresenter(exploration, new EventLook(RepositoryScreenText.Text, new UiTextures()), new PlayerSettings(), new VoiceChannel()),
             new InteractionPromptView(RepositoryScreenText.Text, exploration.CurrentDefinitionOf));
 
     /// <summary>Holds Left from <see cref="NextToForestWarpAlwaysRolling"/>, through the warp, until a step requests a battle.</summary>

@@ -4,6 +4,7 @@ using Jrpg.Game.Audio;
 using Jrpg.Game.Exploration;
 using Jrpg.Game.Hosting;
 using Jrpg.Game.Tests.Ui;
+using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Tests.Exploration;
 
@@ -44,7 +45,7 @@ public sealed class EventPresenterForgeTests
     {
         var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowDoubleForgeChest);
         Assert.True(exploration.TryInteract());
-        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel());
+        var presenter = new EventPresenter(exploration, new EventLook(RepositoryScreenText.Text, new UiTextures()), new PlayerSettings(), new VoiceChannel());
         presenter.Update(StartMapScenarios.OneUpdate, default);
         exploration.ContinueEvent();
 
@@ -58,7 +59,7 @@ public sealed class EventPresenterForgeTests
     {
         var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowForgeChest);
         Assert.True(exploration.TryInteract());
-        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel());
+        var presenter = new EventPresenter(exploration, new EventLook(RepositoryScreenText.Text, new UiTextures()), new PlayerSettings(), new VoiceChannel());
         presenter.Update(StartMapScenarios.OneUpdate, default);
         Assert.IsType<OpenForgeStep>(presenter.OpeningStep);
         return (exploration, presenter);

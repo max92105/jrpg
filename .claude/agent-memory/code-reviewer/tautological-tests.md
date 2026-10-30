@@ -60,3 +60,6 @@ Seen again in gold B3 (reset-to-first variant): `NextTab_InTheList_..._GoesToThe
 Seen again in gold L2b (stale-equals-expected again): `Right_OnGearRow_PreviewsTheNextActiveMember` asserts `Preview` NotNull, already true from the leader's preview, so a rebuild keyed on the row alone passes. Scene caches keyed on two inputs need a test per input whose expected value differs from the stale one.
 
 Seen again in gold I1 (refusal-only variant): the rest price's validator rows test 0 and MaxGold+1 only, so a check that refuses every price passes. A range check needs a row on each accepted bound too.
+
+Seen again in gold I2b (same-observable variant): the inn's short-of-gold test asserts only `IsShowingMessage`, so the
+refusal page and "The party rests." look alike; a chosen message id needs a test that reads the id or text.

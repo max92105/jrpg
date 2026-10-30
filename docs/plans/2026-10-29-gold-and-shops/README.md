@@ -78,7 +78,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 6: the inn
 - [x] **I1. A priced rest waits for payment: `InnStay`** (Core + Data, about 190 lines) → [slices/I1.md](slices/I1.md)
 - [x] **I2a. Move the rest's showing into `RestPlayback`** (Game refactor, about 110 lines, tests unchanged) → [slices/I2a.md](slices/I2a.md)
-- [ ] **I2b. The inn asks with its price; Yes pays and rests; short of gold, the refusal shows** (Game + text, about 220 lines) → [slices/I2b.md](slices/I2b.md)
+- [x] **I2b. The inn asks with its price; Yes pays and rests; short of gold, the refusal shows** (Game + text, about 220 lines) → [slices/I2b.md](slices/I2b.md)
 - [ ] **I3. The editor's rest step takes a price; the innkeeper charges** (Editor + content, about 150 lines) → [slices/I3.md](slices/I3.md)
 
 ## Decisions

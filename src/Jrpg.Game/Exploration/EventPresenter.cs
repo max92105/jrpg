@@ -16,10 +16,11 @@ namespace Jrpg.Game.Exploration;
 /// <summary>
 /// Shows the running map event's current step and continues it once shown (ADR 0006): a warp fades to black, moves the
 /// player while the screen is black, and fades back in; a dialogue shows its lines one page per Confirm, and a found
-/// item its message as one page. A rest plays its beat through <see cref="RestPlayback"/> before its message (decision
-/// 257). A cutscene still covers the screen for its seconds, and Confirm or Cancel skips the cutscene's stills (ADR
-/// 0016). A Forge or shop step asks the scene to open its screen, once (decision 353). The event's voice-over plays
-/// through the voice channel until the event ends or is skipped (ADR 0018).
+/// item its message as one page. A rest plays through <see cref="RestPlayback"/>: an inn's rest asks first, with its
+/// price, then the beat before its message (decisions 257, 382). A cutscene still covers the screen for its seconds,
+/// and Confirm or Cancel skips the cutscene's stills (ADR 0016). A Forge or shop step asks the scene to open its
+/// screen, once (decision 353). The event's voice-over plays through the voice channel until the event ends or is
+/// skipped (ADR 0018).
 /// </summary>
 internal sealed class EventPresenter
 {
@@ -28,12 +29,12 @@ internal sealed class EventPresenter
     private readonly UiMessages _messages;
     private readonly DialogueBox _messageBox;
     private readonly StillRun _stills;
+    private readonly RestPlayback _rest;
+    private readonly ConfirmPromptView _questionView;
     private readonly VoiceChannel _voice;
 
     // The fade for warps (placeholder timing).
     private readonly ScreenFade _warpFade = new(TimeSpan.FromSeconds(0.25), TimeSpan.FromSeconds(0.08), TimeSpan.FromSeconds(0.25));
-
-    private readonly RestPlayback _rest = new();
 
     // The Forge or shop step its screen was opened for, so it opens once per step: a second one right after it, or one
     // an arrival event starts in the same update, is another step and opens it again. Null on any other step.
@@ -43,16 +44,18 @@ internal sealed class EventPresenter
     private SpeechPlayback? _reading;
 
     /// <param name="exploration">The map events to show.</param>
-    /// <param name="text">Messages and fonts for the message box.</param>
+    /// <param name="look">Messages and fonts for the message box and the pages, and the question's textures.</param>
     /// <param name="settings">Read when a dialogue starts, so a text speed changed in the menu applies to the next one.</param>
     /// <param name="voice">Where the running event's voice-over is asked for.</param>
-    public EventPresenter(ExplorationState exploration, ScreenText text, PlayerSettings settings, VoiceChannel voice)
+    public EventPresenter(ExplorationState exploration, EventLook look, PlayerSettings settings, VoiceChannel voice)
     {
         _exploration = exploration;
         _settings = settings;
-        _messages = text.Messages;
-        _messageBox = new DialogueBox(text.Fonts);
-        _stills = new StillRun(exploration, new StillView(text));
+        _messages = look.Text.Messages;
+        _messageBox = new DialogueBox(look.Text.Fonts);
+        _stills = new StillRun(exploration, new StillView(look.Text));
+        _rest = new RestPlayback(look.Text.Messages);
+        _questionView = new ConfirmPromptView(look.Text, look.Ui);
         _voice = voice;
     }
 
@@ -64,6 +67,9 @@ internal sealed class EventPresenter
 
     /// <summary>Whether a message (a dialogue page, a found item, a rest) is on screen.</summary>
     internal bool IsShowingMessage => _reading is not null;
+
+    /// <summary>The inn's question while it is open (decision 382); null otherwise.</summary>
+    internal ConfirmPrompt? Question => _rest.Question;
 
     /// <summary>
     /// The Forge or shop step on the one update it first shows, so the scene opens its screen; null otherwise. Talking
@@ -117,7 +123,10 @@ internal sealed class EventPresenter
         FollowStartedVoice();
     }
 
-    /// <summary>Draws over the map: a still, or the message being read, then the fade over everything.</summary>
+    /// <summary>
+    /// Draws over the map: a still, or the message being read, the inn's question while it is open, then the fade over
+    /// everything.
+    /// </summary>
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
         _stills.Draw(batch, textures);
@@ -125,6 +134,11 @@ internal sealed class EventPresenter
         if (_reading is not null)
         {
             _messageBox.Draw(batch, textures, _reading);
+        }
+
+        if (_rest.Question is { } question)
+        {
+            _questionView.Draw(batch, textures, question, 1f);
         }
 
         var blackness = Blackness;
@@ -161,17 +175,32 @@ internal sealed class EventPresenter
         _screenStepAskedFor = screenStep;
     }
 
-    // The step's first update starts the beat; its message shows once the screen is back, as any page does.
+    // The step's first update starts the beat, or puts the inn's question up; the question takes the presses until it
+    // is answered, and the page shows once the screen is back, as any page does. A decline continues the event
+    // unrested.
     private void ShowRest(EventStep step, TimeSpan delta, InputFrame input)
     {
         if (!_rest.IsStarted)
         {
-            _rest.Start();
+            _rest.Start(_exploration.CurrentInnStay);
+            return;
+        }
+
+        if (_rest.Question is not null)
+        {
+            _rest.Answer(input);
             return;
         }
 
         if (_rest.IsFading)
         {
+            return;
+        }
+
+        if (_rest.IsDeclined)
+        {
+            _rest.Finish();
+            _exploration.ContinueEvent();
             return;
         }
 
@@ -247,7 +276,7 @@ internal sealed class EventPresenter
         // and a recruitment on every recruit step.
         GiveItemStep => new SpeechPlayback(new Speech([FoundItemText.Of(_exploration.CurrentItemReceipt!, _messages)]), TimeSpan.Zero),
         RecruitStep => new SpeechPlayback(new Speech([RecruitText.Of(_exploration.CurrentRecruitment!, _messages)]), TimeSpan.Zero),
-        RestStep => new SpeechPlayback(new Speech([_messages.Text(MessageIds.PartyRests)]), TimeSpan.Zero),
+        RestStep => new SpeechPlayback(new Speech([_messages.Text(_rest.LineId)]), TimeSpan.Zero),
         _ => throw new ArgumentOutOfRangeException(nameof(step), step, "Only dialogue, found items, recruits and rests have pages."),
     };
 }

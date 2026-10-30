@@ -3,6 +3,7 @@ using Jrpg.Game.Audio;
 using Jrpg.Game.Exploration;
 using Jrpg.Game.Hosting;
 using Jrpg.Game.Tests.Ui;
+using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Tests.Exploration;
 
@@ -15,7 +16,7 @@ public sealed class EventPresenterShopTests
     {
         var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowShopChest);
         Assert.True(exploration.TryInteract());
-        var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel());
+        var presenter = new EventPresenter(exploration, new EventLook(RepositoryScreenText.Text, new UiTextures()), new PlayerSettings(), new VoiceChannel());
 
         presenter.Update(StartMapScenarios.OneUpdate, default);
         var first = presenter.OpeningStep;

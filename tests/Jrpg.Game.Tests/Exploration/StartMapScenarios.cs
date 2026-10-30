@@ -61,6 +61,10 @@ internal static class StartMapScenarios
     public static ContentCatalog BelowForgeChest { get; } =
         WithChestSaying(BelowChest, new OpenForgeStep(), new DialogueStep(new Speech(["Come back with more scrap."])));
 
+    /// <summary>Below the chest, which now opens the general store and then says a line, every time.</summary>
+    public static ContentCatalog BelowShopChest { get; } =
+        WithChestSaying(BelowChest, new OpenShopStep("general_store"), new DialogueStep(new Speech(["Come again."])));
+
     /// <summary>Below the chest, which now opens the Forge twice in a row, every time.</summary>
     public static ContentCatalog BelowDoubleForgeChest { get; } = WithChestSaying(BelowChest, new OpenForgeStep(), new OpenForgeStep());
 

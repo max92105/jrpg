@@ -25,7 +25,10 @@ public sealed class MapEventValidatorTests
         Objects: new Dictionary<string, ObjectDefinition> { ["chest"] = _chestDefinition, ["chest_opened"] = _chestDefinition with { Id = "chest_opened" } },
         ItemIds: new HashSet<string> { "potion" },
         EncounterIds: new HashSet<string>(),
-        MemberIds: new HashSet<string> { "omer" }),
+        MemberIds: new HashSet<string> { "omer" })
+        {
+            ShopIds = new HashSet<string> { "general_store" },
+        },
         Layouts: new Dictionary<string, MapLayout> { ["cave"] = _cave });
 
     private static readonly MapEvent _openChest = new()
@@ -95,6 +98,24 @@ public sealed class MapEventValidatorTests
         var problem = MapEventValidator.FindProblem(layout, _references);
 
         Assert.Equal("event 'chest@1,1_0': step 1: giveItem has unknown item id 'megalixir'.", problem);
+    }
+
+    [Fact]
+    public void FindProblem_OpenShopUnknownShop_NamesTheEventAndStep()
+    {
+        var layout = WithChestEvent(_openChest with { Steps = [new OpenShopStep("bazaar")] });
+
+        var problem = MapEventValidator.FindProblem(layout, _references);
+
+        Assert.Equal("event 'chest@1,1_0': step 0: openShop has unknown shop id 'bazaar'.", problem);
+    }
+
+    [Fact]
+    public void FindProblem_OpenShopKnownShop_ReturnsNull()
+    {
+        var layout = WithChestEvent(_openChest with { Steps = [new OpenShopStep("general_store")] });
+
+        Assert.Null(MapEventValidator.FindProblem(layout, _references));
     }
 
     [Fact]

@@ -111,7 +111,10 @@ public sealed class ContentWriter(string contentRoot)
             catalog.Objects,
             catalog.Items.Keys.ToHashSet(),
             catalog.Encounters.Keys.ToHashSet(),
-            catalog.PartyMembers.Keys.ToHashSet());
+            catalog.PartyMembers.Keys.ToHashSet())
+        {
+            ShopIds = catalog.Shops.Keys.ToHashSet(),
+        };
 
     private FileToWrite PlanWrite<T>(string file, T content) =>
         new(Path.Combine(contentRoot, file), path => ContentFileWriter.Write(path, content));

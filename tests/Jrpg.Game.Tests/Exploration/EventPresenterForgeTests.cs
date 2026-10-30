@@ -1,3 +1,4 @@
+using Jrpg.Core.Events;
 using Jrpg.Core.Exploration;
 using Jrpg.Game.Audio;
 using Jrpg.Game.Exploration;
@@ -17,7 +18,7 @@ public sealed class EventPresenterForgeTests
 
         presenter.Update(StartMapScenarios.OneUpdate, default);
 
-        Assert.False(presenter.IsOpeningForge);
+        Assert.Null(presenter.OpeningStep);
     }
 
     // After the Forge closes and the event ends, talking again runs a new Forge step, which opens it again.
@@ -34,7 +35,7 @@ public sealed class EventPresenterForgeTests
         Assert.True(exploration.TryInteract());
         presenter.Update(StartMapScenarios.OneUpdate, default);
 
-        Assert.True(presenter.IsOpeningForge);
+        Assert.IsType<OpenForgeStep>(presenter.OpeningStep);
     }
 
     // Two Forge steps in a row: the second is another step, so the Forge opens again rather than the event waiting.
@@ -49,7 +50,7 @@ public sealed class EventPresenterForgeTests
 
         presenter.Update(StartMapScenarios.OneUpdate, default);
 
-        Assert.True(presenter.IsOpeningForge);
+        Assert.IsType<OpenForgeStep>(presenter.OpeningStep);
     }
 
     // The first update shows the Forge step and asks for the Forge.
@@ -59,7 +60,7 @@ public sealed class EventPresenterForgeTests
         Assert.True(exploration.TryInteract());
         var presenter = new EventPresenter(exploration, RepositoryScreenText.Text, new PlayerSettings(), new VoiceChannel());
         presenter.Update(StartMapScenarios.OneUpdate, default);
-        Assert.True(presenter.IsOpeningForge);
+        Assert.IsType<OpenForgeStep>(presenter.OpeningStep);
         return (exploration, presenter);
     }
 }

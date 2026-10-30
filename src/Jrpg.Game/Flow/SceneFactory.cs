@@ -11,6 +11,7 @@ using Jrpg.Game.NewGame;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Saving;
 using Jrpg.Game.Title;
+using Jrpg.Game.Trade;
 using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Flow;
@@ -50,6 +51,10 @@ internal sealed class SceneFactory
 
     /// <param name="session">The playthrough whose owned pieces the Forge lists.</param>
     public ForgeScene CreateForge(GameSession session) => new(_text, _ui, session, _catalog.Items);
+
+    /// <param name="session">The playthrough whose gold and shop stock the Shop shows.</param>
+    /// <param name="shopId">The shop the event named.</param>
+    public ShopScene CreateShop(GameSession session, string shopId) => new(_text, _ui, session, session.ShopFor(shopId));
 
     /// <param name="session">The playthrough the header reports on.</param>
     public GameMenuScene CreateGameMenu(GameSession session) =>

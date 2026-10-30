@@ -70,6 +70,24 @@ public sealed class ExplorationSceneTests
     }
 
     [Fact]
+    public void Update_OpenShopStep_RequestsTheNamedShopOnce()
+    {
+        var (exploration, scene) = Start(StartMapScenarios.BelowShopChest);
+        Assert.True(exploration.TryInteract());
+
+        var requests = 0;
+        for (var update = 0; update < 60; update++)
+        {
+            if (scene.Update(StartMapScenarios.OneUpdate, default) is ShopRequested { ShopId: "general_store" })
+            {
+                requests++;
+            }
+        }
+
+        Assert.Equal(1, requests);
+    }
+
+    [Fact]
     public void Update_EncounterPending_DoesNotWalk()
     {
         var (exploration, scene) = Start(StartMapScenarios.NextToForestWarpAlwaysRolling);

@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Jrpg.Core.Events;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
@@ -49,8 +50,8 @@ internal sealed class ExplorationScene : IScene
     /// stands. The prompt over what the player faces follows, hidden while an event shows.
     /// </summary>
     /// <returns>
-    /// The menu when Menu is pressed between events; a battle on the update a step starts an encounter; the Forge on
-    /// the update a Forge step first shows (decision 353); otherwise null.
+    /// The menu when Menu is pressed between events; a battle on the update a step starts an encounter; the Forge or
+    /// the named shop on the update its step first shows (decision 353); otherwise null.
     /// </returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
@@ -66,6 +67,10 @@ internal sealed class ExplorationScene : IScene
         _presenter.Draw(batch, textures);
     }
 
+    // The step says which screen: a shop step names its shop, any other opening step is the Forge's.
+    private static SceneRequest ScreenRequestFor(EventStep opening) =>
+        opening is OpenShopStep shop ? new ShopRequested(shop.ShopId) : new ForgeRequested();
+
     private SceneRequest? UpdateExploration(TimeSpan delta, InputFrame input)
     {
         // Sampled before the presenter runs: the Confirm that closes the last message mustn't also interact again.
@@ -76,10 +81,10 @@ internal sealed class ExplorationScene : IScene
             EnterCurrentMap();
         }
 
-        if (_presenter.IsOpeningForge)
+        if (_presenter.OpeningStep is { } opening)
         {
             _walkAnimation.Stand();
-            return new ForgeRequested();
+            return ScreenRequestFor(opening);
         }
 
         // Core refuses walking and interacting until the battle the encounter started is finished.

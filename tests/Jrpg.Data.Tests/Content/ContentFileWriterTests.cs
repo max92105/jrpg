@@ -34,6 +34,7 @@ public sealed class ContentFileWriterTests : IDisposable
             new WarpStep("forest", new GridCell(1, 2)),
             new RestStep(),
             new OpenForgeStep(),
+            new OpenShopStep("general_store"),
         ];
 
         ContentFileWriter.Write(_path, steps);

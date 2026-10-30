@@ -29,6 +29,7 @@ internal static class ContentTypeDiscriminators
                 new JsonDerivedType(typeof(DialogueStep), "dialogue"),
                 new JsonDerivedType(typeof(GiveItemStep), "giveItem"),
                 new JsonDerivedType(typeof(OpenForgeStep), "openForge"),
+                new JsonDerivedType(typeof(OpenShopStep), "openShop"),
                 new JsonDerivedType(typeof(RecruitStep), "recruit"),
                 new JsonDerivedType(typeof(RestStep), "rest"),
                 new JsonDerivedType(typeof(StillStep), "still"),

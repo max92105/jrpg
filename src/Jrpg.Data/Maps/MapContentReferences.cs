@@ -8,4 +8,8 @@ internal sealed record MapContentReferences(
     IReadOnlyDictionary<string, ObjectDefinition> Objects,
     IReadOnlySet<string> ItemIds,
     IReadOnlySet<string> EncounterIds,
-    IReadOnlySet<string> MemberIds);
+    IReadOnlySet<string> MemberIds)
+{
+    /// <summary>The shops an <c>openShop</c> step may name (ADR 0031); empty where no shop is loaded.</summary>
+    public IReadOnlySet<string> ShopIds { get; init; } = new HashSet<string>();
+}

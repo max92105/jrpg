@@ -80,7 +80,10 @@ public static class ContentCatalogLoader
             objectsById,
             items.Select(item => item.Id).ToFrozenSet(),
             encounters.Select(encounter => encounter.Id).ToFrozenSet(),
-            members.Select(member => member.Id).ToFrozenSet());
+            members.Select(member => member.Id).ToFrozenSet())
+        {
+            ShopIds = shops.Select(shop => shop.Id).ToFrozenSet(),
+        };
         var maps = MapFolderReader.Read(contentRoot, mapContent);
         var mapsById = maps.ToFrozenDictionary(map => map.Id);
         var newGameReferences = new NewGameReferences(

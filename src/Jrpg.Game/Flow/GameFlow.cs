@@ -33,7 +33,7 @@ internal sealed class GameFlow : IScene
     private readonly SessionTransitions _sessions;
     private readonly MenuTransitions _menus;
     private readonly BattleTransitions _battles;
-    private readonly ForgeTransitions _forges;
+    private readonly EventScreenTransitions _eventScreens;
     private readonly EncounterFlash _flash = new();
     private readonly ShatterView _shatterView = new();
 
@@ -58,7 +58,7 @@ internal sealed class GameFlow : IScene
         _sessions = new SessionTransitions(catalog, _scenes, factory);
         _menus = new MenuTransitions(_scenes, factory);
         _battles = new BattleTransitions(_scenes, factory);
-        _forges = new ForgeTransitions(_scenes, factory);
+        _eventScreens = new EventScreenTransitions(_scenes, factory);
         Voice = factory.Voice;
         _scenes.Push(factory.CreateTitle());
     }
@@ -146,16 +146,19 @@ internal sealed class GameFlow : IScene
         switch (request)
         {
             case MenuRequested:
-                _menus.Open(Session ?? throw new InvalidOperationException("The menu opened with no game started."));
+                _menus.Open(RunningSession());
                 break;
             case MenuClosed:
                 _menus.Close();
                 break;
             case ForgeRequested:
-                _forges.Open(Session ?? throw new InvalidOperationException("The Forge opened with no game started."));
+                _eventScreens.OpenForge(RunningSession());
+                break;
+            case ShopRequested shop:
+                _eventScreens.OpenShop(RunningSession(), shop.ShopId);
                 break;
             case EventScreenClosed:
-                _forges.Close(Session ?? throw new InvalidOperationException("The Forge closed with no game started."));
+                _eventScreens.Close(RunningSession());
                 break;
             case BattleRequested battle:
                 _encounter = battle;
@@ -168,6 +171,9 @@ internal sealed class GameFlow : IScene
                 break;
         }
     }
+
+    // Only a scene that exists once a game runs asks for these; a request without a session is a flow bug.
+    private GameSession RunningSession() => Session ?? throw new InvalidOperationException("A screen opened or closed with no game started.");
 
     // When the flash has played, the battle goes behind the usual fade and the shards start flying apart over it.
     private void AdvanceEncounterFlash(TimeSpan delta)

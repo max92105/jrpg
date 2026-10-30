@@ -141,8 +141,12 @@ internal static class MapEventValidator
             $"warp cell ({warp.Cell.X}, {warp.Cell.Y}) is outside map '{warp.MapId}'.",
         StillStep still => FindStillProblem(still),
         VoiceStep voice when string.IsNullOrWhiteSpace(voice.File) => "voice must name its file.",
+        OpenShopStep shop => FindOpenShopProblem(shop, references),
         _ => null,
     };
+
+    private static string? FindOpenShopProblem(OpenShopStep shop, MapReferences references) =>
+        references.Content.ShopIds.Contains(shop.ShopId) ? null : $"openShop has unknown shop id '{shop.ShopId}'.";
 
     private static string? FindStillProblem(StillStep still) =>
         string.IsNullOrWhiteSpace(still.ImageFile) ? "still must name its imageFile."

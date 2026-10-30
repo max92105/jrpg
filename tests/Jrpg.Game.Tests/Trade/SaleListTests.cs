@@ -58,6 +58,20 @@ public sealed class SaleListTests
         Assert.Equal(string.Empty, row.Owned.Text);
     }
 
+    // One line per affix, as the Forge's detail column shows them (decision 361).
+    [Fact]
+    public void Rows_RolledPiece_CarriesItsAffixLines()
+    {
+        var session = ForgeSessions.WithoutLoosePieces();
+        var power = new RolledAffix("power", StatKind.Power, 4);
+        session.Inventory.AddGear(GearPiece.Rolled(_items["bronze_sword"], Rarity.Magic, [power]));
+
+        var list = NewList(session);
+
+        var row = Assert.Single(list.Rows, row => row.Piece is not null);
+        Assert.Equal([AffixText.Of(power, RepositoryScreenText.Text.Messages)], row.AffixLines);
+    }
+
     [Fact]
     public void Rows_NothingOwned_HasNoCursor()
     {
@@ -87,5 +101,5 @@ public sealed class SaleListTests
     }
 
     private static SaleList NewList(GameSession session) =>
-        new(session.Sales, session.Inventory, _items, RepositoryScreenText.Text.Fonts.FontAt(ShopView.BodyPixels));
+        new(session.Sales, session.Inventory, _items, RepositoryScreenText.Text);
 }

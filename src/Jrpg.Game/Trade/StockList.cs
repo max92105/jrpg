@@ -16,17 +16,19 @@ internal sealed class StockList
     private readonly Shop _shop;
     private readonly Inventory _inventory;
     private readonly SpriteFontBase _font;
+    private readonly UiMessages _messages;
     private TradeRow[] _rows = [];
     private InventoryCategory _category = InventoryCategory.All;
 
     /// <param name="shop">Whose stock is listed and quotes each row.</param>
     /// <param name="inventory">The party's, for what is owned.</param>
-    /// <param name="font">Measures the names and prices once, when the rows are built.</param>
-    public StockList(Shop shop, Inventory inventory, SpriteFontBase font)
+    /// <param name="text">The rows' font, which measures the names and prices once, and the affix names.</param>
+    public StockList(Shop shop, Inventory inventory, ScreenText text)
     {
         _shop = shop;
         _inventory = inventory;
-        _font = font;
+        _font = text.Fonts.FontAt(ShopView.BodyPixels);
+        _messages = text.Messages;
         Refresh();
     }
 
@@ -70,13 +72,15 @@ internal sealed class StockList
     private TradeRow StackRow(ItemDefinition item)
     {
         var quote = _shop.QuoteBuy(item, 1);
-        return new TradeRow(item, null, Measure(item.Name), Measure(NumberText.Of(_inventory.QuantityOf(item.Id))), Measure(NumberText.Of(quote.Gold)), quote.Refusal);
+        var owned = _inventory.QuantityOf(item.Id);
+        return new TradeRow(item, null, Measure(item.Name), Measure(NumberText.Of(owned)), Measure(NumberText.Of(quote.Gold)), quote.Refusal, owned, []);
     }
 
     private TradeRow PieceRow(GearPiece piece)
     {
         var quote = _shop.QuoteBuy(piece);
-        return new TradeRow(piece.Base, piece, Measure(piece.Base.Name), Measure(NumberText.Of(_inventory.GearCountOf(piece.Base.Id))), Measure(NumberText.Of(quote.Gold)), quote.Refusal);
+        var owned = _inventory.GearCountOf(piece.Base.Id);
+        return new TradeRow(piece.Base, piece, Measure(piece.Base.Name), Measure(NumberText.Of(owned)), Measure(NumberText.Of(quote.Gold)), quote.Refusal, owned, AffixText.LinesOf(piece, _messages));
     }
 
     private MeasuredText Measure(string text) => MeasuredText.Of(_font, text);

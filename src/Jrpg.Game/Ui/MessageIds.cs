@@ -672,4 +672,7 @@ internal static class MessageIds
     public const string ShopColumnOwned = "shop_column_owned";
 
     public const string ShopColumnPrice = "shop_column_price";
+
+    /// <summary>Placeholder <c>{count}</c>: the detail column's owned line.</summary>
+    public const string ShopOwned = "shop_owned";
 }

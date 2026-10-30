@@ -241,5 +241,6 @@
   "shop_nothing_to_sell": "Nothing to sell.",
   "shop_column_item": "Item",
   "shop_column_owned": "Owned",
-  "shop_column_price": "Price"
+  "shop_column_price": "Price",
+  "shop_owned": "Owned {count}"
 }

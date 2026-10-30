@@ -17,19 +17,21 @@ internal sealed class SaleList
     private readonly Inventory _inventory;
     private readonly IReadOnlyDictionary<string, ItemDefinition> _items;
     private readonly SpriteFontBase _font;
+    private readonly UiMessages _messages;
     private TradeRow[] _rows = [];
     private InventoryCategory _category = InventoryCategory.All;
 
     /// <param name="sales">The session's sales, which quote each row.</param>
     /// <param name="inventory">The party's: what can be sold.</param>
     /// <param name="items">The catalog's items, for a stack's definition.</param>
-    /// <param name="font">Measures the names and prices once, when the rows are built.</param>
-    public SaleList(ItemSales sales, Inventory inventory, IReadOnlyDictionary<string, ItemDefinition> items, SpriteFontBase font)
+    /// <param name="text">The rows' font, which measures the names and prices once, and the affix names.</param>
+    public SaleList(ItemSales sales, Inventory inventory, IReadOnlyDictionary<string, ItemDefinition> items, ScreenText text)
     {
         _sales = sales;
         _inventory = inventory;
         _items = items;
-        _font = font;
+        _font = text.Fonts.FontAt(ShopView.BodyPixels);
+        _messages = text.Messages;
         Refresh();
     }
 
@@ -64,14 +66,14 @@ internal sealed class SaleList
     {
         var item = _items[entry.ItemId];
         var quote = _sales.QuoteSale(item, 1);
-        return new TradeRow(item, null, Measure(item.Name), Measure(NumberText.Of(entry.Quantity)), Measure(NumberText.Of(quote.Gold)), quote.Refusal);
+        return new TradeRow(item, null, Measure(item.Name), Measure(NumberText.Of(entry.Quantity)), Measure(NumberText.Of(quote.Gold)), quote.Refusal, entry.Quantity, []);
     }
 
     // A piece is one of a kind: no count beside it.
     private TradeRow PieceRow(GearPiece piece)
     {
         var quote = _sales.QuoteSale(piece);
-        return new TradeRow(piece.Base, piece, Measure(piece.Base.Name), Measure(string.Empty), Measure(NumberText.Of(quote.Gold)), quote.Refusal);
+        return new TradeRow(piece.Base, piece, Measure(piece.Base.Name), Measure(string.Empty), Measure(NumberText.Of(quote.Gold)), quote.Refusal, _inventory.GearCountOf(piece.Base.Id), AffixText.LinesOf(piece, _messages));
     }
 
     private MeasuredText Measure(string text) => MeasuredText.Of(_font, text);

@@ -65,5 +65,5 @@ internal sealed class ForgeList(Inventory inventory, UiMessages messages, Sprite
         Selection.Follow(cursor);
     }
 
-    private ForgeRow RowOf(GearPiece piece) => new(piece, MeasuredText.Of(bodyFont, piece.Base.Name), messages.Text(RarityNames.IdOf(piece.Rarity)), [.. piece.Affixes.Select(affix => AffixText.Of(affix, messages))]);
+    private ForgeRow RowOf(GearPiece piece) => new(piece, MeasuredText.Of(bodyFont, piece.Base.Name), messages.Text(RarityNames.IdOf(piece.Rarity)), AffixText.LinesOf(piece, messages));
 }

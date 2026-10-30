@@ -20,6 +20,12 @@ internal static class AffixText
     }
 
     /// <summary>
+    /// One line per affix, in roll order, for the detail columns that list them under a band (decision 361).
+    /// </summary>
+    public static IReadOnlyList<string> LinesOf(GearPiece piece, UiMessages messages) =>
+        [.. piece.Affixes.Select(affix => Of(affix, messages))];
+
+    /// <summary>
     /// The piece's rarity, then each affix in roll order (decision 361: it replaces a rolled piece's description).
     /// </summary>
     public static string LineOf(GearPiece piece, UiMessages messages) =>

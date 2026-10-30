@@ -36,9 +36,8 @@ internal sealed class ShopScene : IScene
     public ShopScene(ScreenText text, UiTextures ui, GameSession session, Shop shop)
     {
         _session = session;
-        var font = text.Fonts.FontAt(ShopView.BodyPixels);
-        _stock = new StockList(shop, session.Inventory, font);
-        _sales = new SaleList(session.Sales, session.Inventory, session.Catalog.Items, font);
+        _stock = new StockList(shop, session.Inventory, text);
+        _sales = new SaleList(session.Sales, session.Inventory, session.Catalog.Items, text);
         _view = new ShopView(text, ui, shop.Name);
     }
 

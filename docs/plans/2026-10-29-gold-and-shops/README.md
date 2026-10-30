@@ -67,7 +67,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **B1. The Buy list: the stock's stacks and pieces with owned counts and prices** (Game, raw 150, about 240 lines at 1.6x) → [slices/B1.md](slices/B1.md)
 - [x] **B2. The Buy and Sell tabs; the Sell list** (Game + text, about 230 lines; extends `ShopListView`) → [slices/B2.md](slices/B2.md)
 - [x] **B3. Category tabs on both lists, and the column titles** (Game + text, about 190 lines) → [slices/B3.md](slices/B3.md)
-- [ ] **L2a. The detail column: name, description, owned count, a piece's affixes** (Game + text, raw 110, about 175 lines at 1.6x) → [slices/L2a.md](slices/L2a.md)
+- [x] **L2a. The detail column: name, description, owned count, a piece's affixes** (Game + text, raw 110, about 175 lines at 1.6x) → [slices/L2a.md](slices/L2a.md)
 - [ ] **L2b. A member's stat preview for gear; Left and Right switch the member** (Game + text, about 200 lines; reuses `EquipmentChangesView`) → [slices/L2b.md](slices/L2b.md)
 
 ### Phase 5: trading

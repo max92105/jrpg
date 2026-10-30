@@ -16,7 +16,11 @@ namespace Jrpg.Game.Trade;
 /// </param>
 /// <param name="Price">What one costs or gives, measured for right-aligning after the coin.</param>
 /// <param name="Refusal">Why Core refuses trading one; null when it can be traded (decision 370).</param>
-internal sealed record TradeRow(ItemDefinition Item, GearPiece? Piece, MeasuredText Name, MeasuredText Owned, MeasuredText Price, TradeRefusal? Refusal)
+/// <param name="OwnedCount">The owned count as a number, for the detail column's line.</param>
+/// <param name="AffixLines">
+/// A rolled piece's affixes as the player reads them, one per line (decision 361); empty otherwise.
+/// </param>
+internal sealed record TradeRow(ItemDefinition Item, GearPiece? Piece, MeasuredText Name, MeasuredText Owned, MeasuredText Price, TradeRefusal? Refusal, int OwnedCount, IReadOnlyList<string> AffixLines)
 {
     public bool IsAvailable => Refusal is null;
 }

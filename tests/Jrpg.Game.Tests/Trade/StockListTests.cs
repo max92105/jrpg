@@ -20,7 +20,7 @@ public sealed class StockListTests
         var session = NewSession();
         var shop = session.ShopFor("general_store");
 
-        var list = new StockList(shop, session.Inventory, Font());
+        var list = new StockList(shop, session.Inventory, RepositoryScreenText.Text);
 
         Assert.Equal(shop.Stock.Definition.ItemIds, list.Rows.Select(row => row.Item.Id).Distinct());
         Assert.All(list.Rows, row => Assert.Equal(row.Piece is null ? NumberText.Of(row.Item.Price!.Value) : NumberText.Of(shop.QuoteBuy(row.Piece).Gold), row.Price.Text));
@@ -33,7 +33,7 @@ public sealed class StockListTests
         var session = NewSession();
         var shop = session.ShopFor("general_store");
 
-        var list = new StockList(shop, session.Inventory, Font());
+        var list = new StockList(shop, session.Inventory, RepositoryScreenText.Text);
 
         var sword = Assert.Single(list.Rows, row => row.Item.Id == "bronze_sword");
         Assert.Equal(shop.Stock.Pieces.Single(piece => piece.Base.Id == "bronze_sword"), sword.Piece);
@@ -48,7 +48,7 @@ public sealed class StockListTests
         var before = session.Inventory.QuantityOf("potion");
         session.Inventory.Add(potion, 3);
 
-        var list = new StockList(session.ShopFor("general_store"), session.Inventory, Font());
+        var list = new StockList(session.ShopFor("general_store"), session.Inventory, RepositoryScreenText.Text);
 
         Assert.Equal(NumberText.Of(before + 3), Assert.Single(list.Rows, row => row.Item.Id == "potion").Owned.Text);
     }
@@ -62,7 +62,7 @@ public sealed class StockListTests
         session.Inventory.AddGear(GearPiece.Plain(sword));
         session.Inventory.AddGear(GearPiece.Plain(sword));
 
-        var list = new StockList(session.ShopFor("general_store"), session.Inventory, Font());
+        var list = new StockList(session.ShopFor("general_store"), session.Inventory, RepositoryScreenText.Text);
 
         Assert.Equal(NumberText.Of(before + 2), Assert.Single(list.Rows, row => row.Item.Id == "bronze_sword").Owned.Text);
     }
@@ -73,7 +73,7 @@ public sealed class StockListTests
         var session = NewSession();
         Assert.True(session.Party.Purse.TrySpend(session.Party.Purse.Gold));
 
-        var list = new StockList(session.ShopFor("general_store"), session.Inventory, Font());
+        var list = new StockList(session.ShopFor("general_store"), session.Inventory, RepositoryScreenText.Text);
 
         Assert.All(list.Rows, row => Assert.Equal(TradeRefusal.ShortOfGold, row.Refusal));
     }
@@ -83,7 +83,7 @@ public sealed class StockListTests
     {
         var session = NewSession();
         Assert.True(session.Party.Purse.TrySpend(session.Party.Purse.Gold));
-        var list = new StockList(session.ShopFor("general_store"), session.Inventory, Font());
+        var list = new StockList(session.ShopFor("general_store"), session.Inventory, RepositoryScreenText.Text);
         Assert.False(list.Rows[0].IsAvailable);
         session.Party.Purse.Add(Purse.MaxGold);
 
@@ -93,10 +93,23 @@ public sealed class StockListTests
     }
 
     [Fact]
+    public void Rows_Stack_CarriesItsOwnedCountAndNoAffixLines()
+    {
+        var session = NewSession();
+        session.Inventory.Add(StartMapScenarios.BelowClosedDoor.Items["potion"], 2);
+
+        var list = new StockList(session.ShopFor("general_store"), session.Inventory, RepositoryScreenText.Text);
+
+        var potion = Assert.Single(list.Rows, row => row.Item.Id == "potion");
+        Assert.Equal(session.Inventory.QuantityOf("potion"), potion.OwnedCount);
+        Assert.Empty(potion.AffixLines);
+    }
+
+    [Fact]
     public void Refresh_WeaponsCategory_ShowsOnlyWeapons()
     {
         var session = NewSession();
-        var list = new StockList(session.ShopFor("general_store"), session.Inventory, Font());
+        var list = new StockList(session.ShopFor("general_store"), session.Inventory, RepositoryScreenText.Text);
         list.Selection.MoveDown();
 
         list.Refresh(InventoryCategory.Weapons);
@@ -107,6 +120,4 @@ public sealed class StockListTests
     }
 
     private static GameSession NewSession() => StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);
-
-    private static FontStashSharp.SpriteFontBase Font() => RepositoryScreenText.Text.Fonts.FontAt(ShopView.BodyPixels);
 }

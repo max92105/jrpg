@@ -52,3 +52,5 @@ Seen again in stats M1a (neutral-rules variant): `AttackEffect.Of` scales by Pow
 Seen again in stats M2a (fixture-default variant): builder defense default 5 → 0 left
 `Execute_PoisonedActorEndsTurn_LosesPowerIgnoringDefenseAndExposed` with a defense-0 hero, so "IgnoringDefense" became
 vacuous. When a builder default changes, grep test names for the stat's word and check each still sets a non-zero value.
+
+Seen again in gold S2/S3 (second-overload variant): the stack overload's refusal branches are tested, the piece overload's (not in stock, unpriced base, not owned) are not. Check each overload's false paths.

@@ -8,6 +8,7 @@ using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Saving;
+using Jrpg.Core.Trade;
 using Jrpg.Core.World;
 
 namespace Jrpg.Core.Session;
@@ -31,6 +32,8 @@ public sealed class GameSession
         var gearRoll = GearRollFor(context.Catalog, context.Random);
         _dropRoll = new DropRoll(context.Catalog.Items, gearRoll, context.Random);
         Forge = new Forge(Inventory, context.Catalog.Items, context.Catalog.Rules.Crafting, gearRoll);
+        var pricing = new Pricing(context.Catalog.Affixes.ToDictionary(affix => affix.Key, affix => affix.Value.GoldValue), context.Catalog.Rules.Trade);
+        Sales = new ItemSales(Inventory, party.Purse, pricing);
     }
 
     public PartyState Party { get; }
@@ -41,6 +44,9 @@ public sealed class GameSession
 
     /// <summary>Salvaging and crafting owned pieces with materials (decisions 351-354).</summary>
     public Forge Forge { get; }
+
+    /// <summary>Selling owned stacks and pieces for gold, the same at every shop (ADR 0031).</summary>
+    public ItemSales Sales { get; }
 
     /// <summary>Using consumables from the menu.</summary>
     public FieldItemUse FieldItems { get; }

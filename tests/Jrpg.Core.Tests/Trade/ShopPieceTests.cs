@@ -20,7 +20,7 @@ public sealed class ShopPieceTests
 
     public ShopPieceTests()
     {
-        _shop = new Shop(_stock, _inventory, _purse, new Pricing(new Dictionary<string, int> { ["power"] = 20 }));
+        _shop = new Shop(_stock, _inventory, _purse, new Pricing(new Dictionary<string, int> { ["power"] = 20 }, new TradeRules()));
     }
 
     [Fact]

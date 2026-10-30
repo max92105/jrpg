@@ -35,7 +35,7 @@ public sealed class Shop
     public TradeQuote QuoteBuy(ItemDefinition item, int quantity)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(quantity, 1);
-        var total = Pricing.PriceOf(item) * quantity;
+        var total = PriceFormula.Total(Pricing.PriceOf(item), quantity);
         var refusal = !_inventory.HasRoomFor(item, quantity) ? TradeRefusal.StackFull
             : !_purse.CanSpend(total) ? TradeRefusal.ShortOfGold
             : (TradeRefusal?)null;

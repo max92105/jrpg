@@ -19,4 +19,16 @@ public static class PriceFormula
 
         return (int)Math.Min(total, Purse.MaxGold);
     }
+
+    /// <summary>
+    /// What a sale pays: the sell share of the price, rounded down once in a <see langword="long"/>; the shop keeps the
+    /// rest (the classic JRPG half, decision 375).
+    /// </summary>
+    public static int SalePrice(int price, int sellPercent) => (int)((long)price * sellPercent / 100);
+
+    /// <summary>
+    /// A quantity's total, in a <see langword="long"/> and capped at <see cref="Purse.MaxGold"/>, so no count can wrap
+    /// it.
+    /// </summary>
+    public static int Total(int each, int quantity) => (int)Math.Min((long)each * quantity, Purse.MaxGold);
 }

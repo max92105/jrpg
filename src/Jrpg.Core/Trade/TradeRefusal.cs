@@ -8,4 +8,7 @@ public enum TradeRefusal
 
     /// <summary>The purse holds less than the total.</summary>
     ShortOfGold,
+
+    /// <summary>The item has no price, or its sell share is worth nothing (decision 378).</summary>
+    NotForSale,
 }

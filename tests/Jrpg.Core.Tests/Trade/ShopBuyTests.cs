@@ -20,7 +20,7 @@ public sealed class ShopBuyTests
     public ShopBuyTests()
     {
         var stock = new ShopStock(new ShopDefinition("general", "General store", ["potion", "bomb"]), [_potion, _bomb], [], rolledAtLevel: 1);
-        _shop = new Shop(stock, _inventory, _purse, new Pricing(new Dictionary<string, int>()));
+        _shop = new Shop(stock, _inventory, _purse, new Pricing(new Dictionary<string, int>(), new TradeRules()));
     }
 
     [Fact]

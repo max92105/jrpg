@@ -56,3 +56,5 @@ vacuous. When a builder default changes, grep test names for the stat's word and
 Seen again in gold S2/S3 (second-overload variant): the stack overload's refusal branches are tested, the piece overload's (not in stock, unpriced base, not owned) are not. Check each overload's false paths.
 
 Seen again in gold B3 (reset-to-first variant): `NextTab_InTheList_..._GoesToTheFirstRow` moves Down once then checks only that the row is a consumable; with two consumables first, a kept cursor passes. A "goes to the first row" test needs the kept index to land on a different row.
+
+Seen again in gold L2b (stale-equals-expected again): `Right_OnGearRow_PreviewsTheNextActiveMember` asserts `Preview` NotNull, already true from the leader's preview, so a rebuild keyed on the row alone passes. Scene caches keyed on two inputs need a test per input whose expected value differs from the stale one.

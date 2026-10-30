@@ -675,4 +675,18 @@ internal static class MessageIds
 
     /// <summary>Placeholder <c>{count}</c>: the detail column's owned line.</summary>
     public const string ShopOwned = "shop_owned";
+
+    /// <summary>
+    /// Why a trade is refused, under the greyed row (decision 370): the purse holds less than the price.
+    /// </summary>
+    public const string ShopRefusedShortOfGold = "shop_refused_short_of_gold";
+
+    /// <summary>Why a trade is refused: the stack can't take more copies.</summary>
+    public const string ShopRefusedStackFull = "shop_refused_stack_full";
+
+    /// <summary>Why a trade is refused: the item has no price, or its sell share is worth nothing.</summary>
+    public const string ShopRefusedNotForSale = "shop_refused_not_for_sale";
+
+    /// <summary>Placeholder <c>{name}</c>: the notice after a purchase (decision 380).</summary>
+    public const string ShopBought = "shop_bought";
 }

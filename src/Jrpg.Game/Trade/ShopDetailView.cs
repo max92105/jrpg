@@ -13,8 +13,8 @@ namespace Jrpg.Game.Trade;
 /// Draws the Shop's detail column: the highlighted row's name in its rarity's color, its description wrapped at the
 /// column's width, how many the party owns, a rolled piece's affix lines under an Affixes band (decisions 335, 362),
 /// then, on a gear row, the previewed member's name and what wearing the piece would change (decision 383, the
-/// Equipment page's Changes), and a line for what a trade said or gave. The description and the owned line are laid out
-/// again only when the row changes, so drawing formats nothing.
+/// Equipment page's Changes), and the trade's line: a refused row's reason or what was bought (decision 370). The
+/// description and the owned line are laid out again only when the row changes, so drawing formats nothing.
 /// </summary>
 internal sealed class ShopDetailView
 {
@@ -135,6 +135,8 @@ internal sealed class ShopDetailView
     /// <param name="Changes">
     /// What wearing the row's piece would change for <paramref name="Member"/>; null with no preview.
     /// </param>
-    /// <param name="Notice">What a trade said or gave, under the row's parts; null for none.</param>
+    /// <param name="Notice">
+    /// A refused row's reason or the last trade's notice, under the row's parts; null for none.
+    /// </param>
     public readonly record struct Place(TradeRow? Row, PartyMember? Member, StatComparisonText? Changes, string? Notice);
 }

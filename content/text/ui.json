@@ -242,5 +242,9 @@
   "shop_column_item": "Item",
   "shop_column_owned": "Owned",
   "shop_column_price": "Price",
-  "shop_owned": "Owned {count}"
+  "shop_owned": "Owned {count}",
+  "shop_refused_short_of_gold": "Not enough gold.",
+  "shop_refused_stack_full": "You can't carry more.",
+  "shop_refused_not_for_sale": "Not for sale.",
+  "shop_bought": "Bought: {name}."
 }

@@ -71,7 +71,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **L2b. A member's stat preview for gear; Left and Right switch the member** (Game + text, about 200 lines; reuses `EquipmentChangesView`) → [slices/L2b.md](slices/L2b.md)
 
 ### Phase 5: trading
-- [ ] **T1. Buying a stock piece; a refused row's reason; the notice** (Game + text, about 190 lines) → [slices/T1.md](slices/T1.md)
+- [x] **T1. Buying a stock piece; a refused row's reason; the notice** (Game + text, about 190 lines) → [slices/T1.md](slices/T1.md)
 - [ ] **T2. The quantity picker; buying stacks with it** (Game + text, about 220 lines; drawn by `ShopDetailView`) → [slices/T2.md](slices/T2.md)
 - [ ] **T3. Selling: stacks with the picker, a piece behind a priced prompt** (Game + text, about 235 lines) → [slices/T3.md](slices/T3.md)
 

@@ -11,3 +11,5 @@ Part of [the gold and shops plan](../README.md). Decision 257 (the inn's beat). 
   - **Tests:** existing tests pass unchanged (`EventPresenterRestTests`, `EventPresenterTests`, `StartMapVillagerTests`' innkeeper); counts equal before and after. `RestPlayback` is reached through the presenter's tests (a vacuous direct test adds nothing, the plan lessons).
   - **Watch:** the fade must still start on the step's first update and the page show once the fade is idle (the same update order).
   - **Verify by hand:** talk to the innkeeper: the fade out, a second of black, back in, then "The party rests." — as before.
+
+- **Done:** as planned; `EventPresenter` 258 → 253 lines, tests unchanged at 3130.

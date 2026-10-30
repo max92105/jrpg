@@ -16,10 +16,10 @@ namespace Jrpg.Game.Exploration;
 /// <summary>
 /// Shows the running map event's current step and continues it once shown (ADR 0006): a warp fades to black, moves the
 /// player while the screen is black, and fades back in; a dialogue shows its lines one page per Confirm, and a found
-/// item its message as one page. A rest fades to black and back before its message (decision 257). A cutscene still
-/// covers the screen for its seconds, and Confirm or Cancel skips the cutscene's stills (ADR 0016). A Forge or shop
-/// step asks the scene to open its screen, once (decision 353). The event's voice-over plays through the voice channel
-/// until the event ends or is skipped (ADR 0018).
+/// item its message as one page. A rest plays its beat through <see cref="RestPlayback"/> before its message (decision
+/// 257). A cutscene still covers the screen for its seconds, and Confirm or Cancel skips the cutscene's stills (ADR
+/// 0016). A Forge or shop step asks the scene to open its screen, once (decision 353). The event's voice-over plays
+/// through the voice channel until the event ends or is skipped (ADR 0018).
 /// </summary>
 internal sealed class EventPresenter
 {
@@ -33,11 +33,7 @@ internal sealed class EventPresenter
     // The fade for warps (placeholder timing).
     private readonly ScreenFade _warpFade = new(TimeSpan.FromSeconds(0.25), TimeSpan.FromSeconds(0.08), TimeSpan.FromSeconds(0.25));
 
-    // The inn's beat (decision 257): out, a second of black, back in, then the party rests (placeholder timing).
-    private readonly ScreenFade _restFade = new(TimeSpan.FromSeconds(0.5), TimeSpan.FromSeconds(1.0), TimeSpan.FromSeconds(0.5));
-
-    // Whether the current rest step has started its fade, so its page's own updates don't start it again.
-    private bool _isRestFadeStarted;
+    private readonly RestPlayback _rest = new();
 
     // The Forge or shop step its screen was opened for, so it opens once per step: a second one right after it, or one
     // an arrival event starts in the same update, is another step and opens it again. Null on any other step.
@@ -76,13 +72,13 @@ internal sealed class EventPresenter
     public EventStep? OpeningStep { get; private set; }
 
     /// <summary>How black to draw over the map, 0..1.</summary>
-    public float Blackness => Math.Max(_stills.Blackness, Math.Max(_warpFade.Blackness, _restFade.Blackness));
+    public float Blackness => Math.Max(_stills.Blackness, Math.Max(_warpFade.Blackness, _rest.Blackness));
 
     /// <exception cref="InvalidOperationException">The current step is of a type the game can't show yet.</exception>
     public void Update(TimeSpan delta, InputFrame input)
     {
         _warpFade.Update(delta);
-        _restFade.Update(delta);
+        _rest.Advance(delta);
         if (_stills.IsLeadingOut)
         {
             _stills.AdvanceLeadOut(delta);
@@ -165,17 +161,16 @@ internal sealed class EventPresenter
         _screenStepAskedFor = screenStep;
     }
 
-    // The step's first update starts the fade; its message shows once the screen is back, as any page does.
+    // The step's first update starts the beat; its message shows once the screen is back, as any page does.
     private void ShowRest(EventStep step, TimeSpan delta, InputFrame input)
     {
-        if (!_isRestFadeStarted)
+        if (!_rest.IsStarted)
         {
-            _restFade.Start();
-            _isRestFadeStarted = true;
+            _rest.Start();
             return;
         }
 
-        if (_restFade.Phase != FadePhase.Idle)
+        if (_rest.IsFading)
         {
             return;
         }
@@ -183,7 +178,7 @@ internal sealed class EventPresenter
         ShowPages(step, delta, input);
         if (_reading is null)
         {
-            _isRestFadeStarted = false;
+            _rest.Finish();
         }
     }
 

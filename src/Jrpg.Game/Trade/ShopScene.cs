@@ -15,18 +15,19 @@ namespace Jrpg.Game.Trade;
 /// header; the Buy and Sell tabs, which the cursor starts on (Left and Right choose, Confirm enters the shown list,
 /// Cancel leaves); in a list Up and Down move the shared selection, the tab buttons change its category (decision 384,
 /// each tab keeping its own), Left and Right switch the member whose changes a gear row previews (decision 383) and
-/// Cancel returns to the tabs. Confirm on an available piece of the stock buys it at once (decision 379), the notice
-/// naming it until the cursor moves or the tab changes; a refused row shows its reason instead. It fades in when it
+/// Cancel returns to the tabs. Confirm on an available row of the stock hands it to <see cref="Purchase"/>: a piece is
+/// bought at once, a stack through the quantity picker, which takes the input while open; the notice names what was
+/// bought until the cursor moves or the tab changes, and a refused row shows its reason instead. It fades in when it
 /// opens and out when it closes (decision 370): the close request comes once the fade has run, once, since a second
 /// would make the flow pop what lies under it.
 /// </summary>
 internal sealed class ShopScene : IScene
 {
     private readonly GameSession _session;
-    private readonly Shop _shop;
     private readonly UiMessages _messages;
     private readonly StockList _stock;
     private readonly SaleList _sales;
+    private readonly Purchase _purchase;
     private readonly CategoryRail _buyRail = new();
     private readonly CategoryRail _sellRail = new();
     private readonly EquipmentComparison _comparison;
@@ -36,7 +37,6 @@ internal sealed class ShopScene : IScene
     private int _memberIndex;
     private TradeRow? _previewedRow;
     private PartyMember? _previewedMember;
-    private string? _tradeNotice;
     private bool _hasRequestedClose;
 
     /// <param name="text">The header's and the footer's fonts and lines.</param>
@@ -48,10 +48,10 @@ internal sealed class ShopScene : IScene
     public ShopScene(ScreenText text, UiTextures ui, GameSession session, Shop shop)
     {
         _session = session;
-        _shop = shop;
         _messages = text.Messages;
         _stock = new StockList(shop, session.Inventory, text);
         _sales = new SaleList(session.Sales, session.Inventory, session.Catalog.Items, text);
+        _purchase = new Purchase(shop, _stock, _sales, text.Messages);
         _comparison = new EquipmentComparison(text.Messages);
         _view = new ShopView(text, ui, shop.Name);
     }
@@ -76,11 +76,15 @@ internal sealed class ShopScene : IScene
     /// </summary>
     public StatComparisonText? Preview => _comparison.Text;
 
+    /// <summary>The picker open on the highlighted stack; null while none is.</summary>
+    public QuantityPicker? Picker => _purchase.Picker;
+
     /// <summary>
-    /// The line under the highlighted row: a refused row's reason (decision 370), else what the last trade said
-    /// (decision 380) until the cursor moves or the tab changes; null for none.
+    /// The line under the highlighted row: what the last trade said (decision 380) until the cursor moves or the tab
+    /// changes, else a refused row's reason (decision 370); null for none. The trade's line comes first since buying
+    /// the most can leave the row greyed, and the reason would hide what was just bought.
     /// </summary>
-    public string? Notice => SelectedRow?.Refusal is { } refusal ? _messages.Text(TradeRefusalNames.IdOf(refusal)) : _tradeNotice;
+    public string? Notice => _purchase.Notice ?? (SelectedRow?.Refusal is { } refusal ? _messages.Text(TradeRefusalNames.IdOf(refusal)) : null);
 
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
@@ -114,7 +118,8 @@ internal sealed class ShopScene : IScene
         _fade.MarkDrawn();
         var rows = Tab == ShopTab.Buy ? _stock.Rows : _sales.Rows;
         var list = new ShopListView.Place(Tab, ShownRail, IsOnTabs, _tabPointer, rows, ShownSelection);
-        var detail = new ShopDetailView.Place(SelectedRow, Preview is null ? null : PreviewedMember, Preview, Notice);
+        var preview = Preview is { } changes ? new ShopDetailView.MemberPreview(PreviewedMember, changes) : (ShopDetailView.MemberPreview?)null;
+        var detail = new ShopDetailView.Place(SelectedRow, preview, Notice, Picker);
         _view.Draw(batch, textures, new ShopView.Place(list, detail), opacity);
     }
 
@@ -140,51 +145,66 @@ internal sealed class ShopScene : IScene
         if (input.IsPressed(GameButton.Right))
         {
             Tab = ShopTab.Sell;
-            _tradeNotice = null;
+            _purchase.ClearNotice();
         }
 
         if (input.IsPressed(GameButton.Left))
         {
             Tab = ShopTab.Buy;
-            _tradeNotice = null;
+            _purchase.ClearNotice();
         }
     }
 
-    // Cancel wins when nested: in a list it only returns to the tabs. Confirm buys the highlighted piece, or nothing on
-    // a greyed row or a stack (T2 brings the picker). The tab buttons change the category, the cursor going to its
-    // first row; Left and Right switch the previewed member, wrapping through the active party.
+    // An open picker takes every press. Cancel wins when nested: in a list it only returns to the tabs. Confirm hands
+    // an available stock row to the purchase, nothing on a greyed one. The tab buttons change the category, the cursor
+    // going to its first row; Left and Right switch the previewed member, wrapping through the active party.
     private void UpdateList(InputFrame input)
     {
+        if (_purchase.Picker is not null)
+        {
+            _purchase.UpdatePicker(input);
+            return;
+        }
+
         if (input.IsPressed(GameButton.Cancel))
         {
             IsOnTabs = true;
             return;
         }
 
-        if (input.IsPressed(GameButton.Confirm) && Tab == ShopTab.Buy && SelectedRow is { Piece: not null, IsAvailable: true } row)
+        if (input.IsPressed(GameButton.Confirm) && Tab == ShopTab.Buy && SelectedRow is { IsAvailable: true } row)
         {
-            Buy(row);
+            _purchase.Confirm(row);
             return;
         }
 
         if (TryChangeCategory(input))
         {
-            _tradeNotice = null;
+            _purchase.ClearNotice();
             return;
         }
 
+        MoveCursor(input);
+        SwitchMember(input);
+    }
+
+    private void MoveCursor(InputFrame input)
+    {
         if (input.IsPressed(GameButton.Up))
         {
             ShownSelection.MoveUp();
-            _tradeNotice = null;
+            _purchase.ClearNotice();
         }
 
         if (input.IsPressed(GameButton.Down))
         {
             ShownSelection.MoveDown();
-            _tradeNotice = null;
+            _purchase.ClearNotice();
         }
+    }
 
+    private void SwitchMember(InputFrame input)
+    {
         var members = _session.Party.ActiveMembers.Count;
         if (input.IsPressed(GameButton.Right))
         {
@@ -195,20 +215,6 @@ internal sealed class ShopScene : IScene
         {
             _memberIndex = (_memberIndex + members - 1) % members;
         }
-    }
-
-    // The piece leaves the stock for the bag (decision 385), so both lists are built again: the cursor stays on its
-    // row, or the last; the quotes change with the gold, which can grey other rows.
-    private void Buy(TradeRow row)
-    {
-        if (!_shop.TryBuy(row.Piece!))
-        {
-            return;
-        }
-
-        _stock.Refresh();
-        _sales.Refresh();
-        _tradeNotice = _messages.Format(MessageIds.ShopBought, new MessageArgument("name", row.Name.Text));
     }
 
     // The tab buttons move the shown rail (the shoulders, Q and R); any other press isn't a category change.

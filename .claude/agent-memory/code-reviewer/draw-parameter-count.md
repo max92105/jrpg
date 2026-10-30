@@ -9,4 +9,4 @@ Draw signatures with 5 parameters slipped through B3 (`ShopListView.Draw`) and t
 
 **Why:** `.claude/rules/code-quality.md` caps parameters at 4; verify.ps1 doesn't enforce it, so only the reviewer catches it.
 
-**How to apply:** count parameters on every new or changed method signature in the diff. The usual fix: a fixed area goes to the view's constructor (the host's areas are static), or the per-frame values join one `Place` record. Older 5-parameter Draws are follow-ups.
+**How to apply:** count parameters on every new or changed method signature in the diff. Public/internal Draw at 5 = Critical. The usual fix: a fixed area goes to the view's constructor (the host's areas are static), or the per-frame values join one `Place` record. Private `DrawX(batch, textures, thing, area, opacity)` helpers at 5-6 are an established pattern (~17 in Game, T2's DrawPicker added one): Follow-up only, for consistency with past rounds. Older 5-parameter Draws are follow-ups.

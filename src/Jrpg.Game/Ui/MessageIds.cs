@@ -689,4 +689,10 @@ internal static class MessageIds
 
     /// <summary>Placeholder <c>{name}</c>: the notice after a purchase (decision 380).</summary>
     public const string ShopBought = "shop_bought";
+
+    /// <summary>Placeholders <c>{name}</c> and <c>{count}</c>: the notice after buying copies of a stack.</summary>
+    public const string ShopBoughtCount = "shop_bought_count";
+
+    /// <summary>The quantity picker's label (decision 377).</summary>
+    public const string ShopQuantity = "shop_quantity";
 }

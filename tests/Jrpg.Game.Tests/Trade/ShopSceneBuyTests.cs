@@ -83,6 +83,27 @@ public sealed class ShopSceneBuyTests
         Assert.Null(shop.Notice);
     }
 
+    // Buying with the last gold greys the next row; the purchase still shows over its reason until the cursor moves.
+    [Fact]
+    public void Notice_BoughtWithTheLastGold_StaysTheBoughtLine()
+    {
+        var session = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);
+        var store = session.ShopFor("general_store");
+        var cap = store.Stock.Pieces.First(piece => piece.Base.Id == "leather_cap");
+        Assert.True(session.Party.Purse.TrySpend(session.Party.Purse.Gold));
+        session.Party.Purse.Add(store.QuoteBuy(cap).Gold);
+        var shop = new ShopScene(RepositoryScreenText.Text, new UiTextures(), session, store);
+        shop.Update(TimeSpan.Zero, Pressing(GameButton.Confirm));
+        MoveDownUntil(shop, row => ReferenceEquals(row.Piece, cap));
+        Assert.True(shop.SelectedRow!.IsAvailable);
+
+        shop.Update(TimeSpan.Zero, Pressing(GameButton.Confirm));
+
+        Assert.Equal(0, session.Party.Purse.Gold);
+        Assert.False(shop.SelectedRow!.IsAvailable);
+        Assert.StartsWith("Bought", shop.Notice);
+    }
+
     [Fact]
     public void Right_OnTabsAfterBuying_ClearsTheNotice()
     {

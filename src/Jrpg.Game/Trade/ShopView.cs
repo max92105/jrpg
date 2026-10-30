@@ -60,7 +60,7 @@ internal sealed class ShopView
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _gold = new GoldAmountView(_infoFont, ui);
         _list = new ShopListView(text, ui, _bodyFont);
-        _detail = new ShopDetailView(text, _detailArea);
+        _detail = new ShopDetailView(text, ui, _detailArea);
         _name = name;
         _messages = text.Messages;
     }

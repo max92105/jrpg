@@ -116,3 +116,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `ForgeView` and `ShopView` draw the same frame (scrim, header, footer, the two column areas from `MenuLayout`), the second copy (gold plan H1): share it in one type once `MenuLayout`'s frame numbers live in `Ui/` (Ui can't read `Menus`).
 - `ForgeList` and `Menus/InventoryList` each hold the cursor-plus-gliding-highlight pair that `Ui/RowSelection` now packages for the Shop's lists (gold plan B2): switch them to it when next touched.
 - `StatusSkillsView.DescriptionLayout` (a wrapped-text layout) has two users, the Status page and the Shop's detail column (gold plan L2a); move it to `Ui/` and fix its doc, which still names the Status page's font size.
+- `ShopListView.Draw` and `ForgeListView.Draw` take 5 parameters (the limit is 4): pass the fixed area to their constructors, as `ShopDetailView` does (L2b review).

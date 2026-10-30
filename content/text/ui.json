@@ -234,7 +234,7 @@
   "forge_rolled_piece_name": "{rarity} {name}",
   "forge_upgraded": "{name} is now {rarity}.",
   "forge_rerolled": "{name}'s affixes were rolled again.",
-  "shop_hint": "Left and Right choose Buy or Sell; Confirm enters the list; {previous} and {next} change the category.",
+  "shop_hint": "Left and Right choose Buy or Sell; Confirm enters the list; {previous} and {next} change the category; on gear, Left and Right compare another member.",
   "shop_empty": "Nothing for sale.",
   "shop_buy": "Buy",
   "shop_sell": "Sell",

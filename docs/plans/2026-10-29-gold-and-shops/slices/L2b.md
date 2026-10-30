@@ -19,3 +19,5 @@ Part of [the gold and shops plan](../README.md). Decisions 383 (one member, the 
     - `EquipmentComparisonTests: ShowPiece_Ring_ComparesInTheFirstRingSlot` (new file)
   - **Watch:** the comparison is rebuilt only when the row or the member changes, never per frame. A one-member party: Left and Right change nothing.
   - **Verify by hand:** recruit a second member, open the shop: on the rolled sword, the leader's changes; Right: the second member's; on a potion, no preview; Down to the cap: the same member, the cap's changes.
+
+- **Done, with deviations:** `ShopScene` keeps the previewed member as an index into `Party.ActiveMembers` and rebuilds an `EquipmentComparison` (new `ShowPiece` and `Clear`) only when the row or the member changes; `ShopView.Draw` takes a `ShopDetailView.Place` built by the scene (row, member, changes, notice) instead of deriving the row itself. The fixture's recruits sit in the reserve, so the tests activate one. Review: the detail column takes its fixed area in its constructor and `ShopView.Draw` takes one `ShopView.Place` record, both Draw methods back to 4 parameters.

@@ -60,7 +60,7 @@ internal sealed class ShopView
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _gold = new GoldAmountView(_infoFont, ui);
         _list = new ShopListView(text, ui, _bodyFont);
-        _detail = new ShopDetailView(text);
+        _detail = new ShopDetailView(text, _detailArea);
         _name = name;
         _messages = text.Messages;
     }
@@ -94,9 +94,9 @@ internal sealed class ShopView
 
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the plain pixel, the coin and the gradients come from.</param>
-    /// <param name="place">The tab shown, where the cursor is, and the shown tab's rows.</param>
+    /// <param name="place">What the two columns show this frame.</param>
     /// <param name="opacity">The Shop's fade, 0 for clear to 1 for opaque.</param>
-    public void Draw(SpriteBatch batch, TextureLibrary textures, ShopListView.Place place, float opacity)
+    public void Draw(SpriteBatch batch, TextureLibrary textures, Place place, float opacity)
     {
         batch.Draw(textures.Pixel, _screen, UiTheme.Scrim * opacity);
         HeaderBar.Draw(batch, textures.Pixel, MenuHeader.Height, opacity);
@@ -106,11 +106,15 @@ internal sealed class ShopView
         _gold.Draw(batch, textures, new GoldAmountView.Place(_shownGold, new Vector2(goldLeft, CenteredTop(_infoFont)), UiTheme.TextPrimary), opacity);
         batch.DrawString(_bodyFont, _hint, new Vector2(FooterTextInset, FooterBar.TextTop(MenuLayout.FooterHeight, _bodyFont.LineHeight)), UiTheme.TextSecondary * opacity);
 
-        _list.Draw(batch, textures, place, _listArea, opacity);
+        _list.Draw(batch, textures, place.List, _listArea, opacity);
         _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(_detailArea), opacity);
-        var selected = place.Selection.SelectedIndex is { } index ? place.Rows[index] : null;
-        _detail.Draw(batch, textures, new ShopDetailView.Place(selected, null, _detailArea), opacity);
+        _detail.Draw(batch, textures, place.Detail, opacity);
     }
 
     private static float CenteredTop(SpriteFontBase font) => (MenuHeader.Height - font.LineHeight) / 2f;
+
+    /// <summary>What the Shop draws this frame.</summary>
+    /// <param name="List">The tab shown, where the cursor is, and the shown tab's rows.</param>
+    /// <param name="Detail">The highlighted row, the previewed member's changes and the trade's line.</param>
+    public readonly record struct Place(ShopListView.Place List, ShopDetailView.Place Detail);
 }

@@ -41,6 +41,9 @@ public sealed class GameSession
 
     public PartyState Party { get; }
 
+    /// <summary>The content the playthrough runs on, for the screens that name items and shops by id.</summary>
+    public ContentCatalog Catalog => _context.Catalog;
+
     public Inventory Inventory { get; }
 
     public PartyEquipment Equipment { get; }

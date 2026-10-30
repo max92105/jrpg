@@ -43,6 +43,7 @@ public sealed class ShopSceneTests
     public void Update_Down_MovesTheList()
     {
         var shop = NewShop();
+        shop.Update(TimeSpan.Zero, Pressing(GameButton.Confirm));
         var first = shop.SelectedRow;
 
         shop.Update(TimeSpan.Zero, Pressing(GameButton.Down));

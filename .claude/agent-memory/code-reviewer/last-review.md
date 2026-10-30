@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-gold-and-shops, slice B1 (the Buy list: StockRow, StockList, ShopListView, ShopScene Up/Down).
-Round 1. Verdict: Ready to commit. verify.ps1 all pass (3057 tests).
+Plan: 2026-10-29-gold-and-shops, slice B2 (Buy/Sell tabs, SaleList, TradeRow, Ui/RowSelection, GameSession.Catalog).
+Round 1. Verdict: Ready to commit. verify.ps1 all pass (3068 tests).
 
-- Warning, open: ShopListView.cs:57 rows (and the selection band) start at the column's own left edge (area.X), so the pointer tip sits on the column edge with its body outside the column; Forge/Inventory inset rows by a 28 px Margin
-- Suggestion, open: StockRow.Owned is a string measured every frame in ShopListView.DrawRow:80; make it MeasuredText like Price
-- Suggestion, open: test Rows_GearEntry_IsItsRolledPieceInRarityColor checks no color; rename (e.g. ..._IsItsRolledPieceAtItsQuote)
-- Not raised (slice note explains): one QuoteBuy per row, no Pricing parameter; refused piece greyed whole incl. rarity color; RowsTop 96 reserved for B2/B3; shop_empty text; extra Refresh test
-- Not raised: Owned counts bag pieces only (GearCountOf), consistent with decision 369 "owned pieces only"
+- Suggestion, open: ShopScene.cs:140 blank line before the class's closing brace, left by moving Draw up
+- Suggestion, open: RowSelection.Selection reads as place.Selection.Selection.RowIn; rename to Highlight; ShopView.Draw param `list` is now a Place, rename `place`
+- Suggestion, open: Down_InTheSellList_MovesItsOwnCursor does not assert the Buy list's row stayed (the "own cursor" half)
+- Carried from B1, all fixed: rows inset by Margin 28; TradeRow.Owned is MeasuredText; test renamed Rows_GearEntry_IsItsRolledPieceAtItsQuote
+- Not raised (slice note explains): TradeRow instead of SaleRow; RowSelection; CardHeader tabs with SelectionMotion.At; public GameSession.Catalog (SceneFactory has _catalog, but ShopScene ctor is at 4 params)

@@ -654,4 +654,13 @@ internal static class MessageIds
 
     /// <summary>The Shop's line while its stock holds nothing to buy.</summary>
     public const string ShopEmpty = "shop_empty";
+
+    /// <summary>The Shop's Buy tab.</summary>
+    public const string ShopBuy = "shop_buy";
+
+    /// <summary>The Shop's Sell tab.</summary>
+    public const string ShopSell = "shop_sell";
+
+    /// <summary>The Sell list's line while the party owns nothing to sell.</summary>
+    public const string ShopNothingToSell = "shop_nothing_to_sell";
 }

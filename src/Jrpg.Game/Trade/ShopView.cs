@@ -9,9 +9,9 @@ namespace Jrpg.Game.Trade;
 
 /// <summary>
 /// Draws the Shop screen in the menu's frame, as the Forge: the map dimmed behind it, the header bar with the shop's
-/// name at the left and the party's gold with its coin at the right (decision 380), the stock's list column, the detail
-/// column, and the footer with its hint. Everything fades with the Shop (decision 370). The gold is measured when it
-/// changes.
+/// name at the left and the party's gold with its coin at the right (decision 380), the tabs and the shown list in the
+/// list column, the detail column, and the footer with its hint. Everything fades with the Shop (decision 370). The
+/// gold is measured when it changes.
 /// </summary>
 internal sealed class ShopView
 {
@@ -74,9 +74,9 @@ internal sealed class ShopView
 
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the plain pixel, the coin and the gradients come from.</param>
-    /// <param name="list">The stock's rows and the cursor on them.</param>
+    /// <param name="place">The tab shown, where the cursor is, and the shown tab's rows.</param>
     /// <param name="opacity">The Shop's fade, 0 for clear to 1 for opaque.</param>
-    public void Draw(SpriteBatch batch, TextureLibrary textures, StockList list, float opacity)
+    public void Draw(SpriteBatch batch, TextureLibrary textures, ShopListView.Place place, float opacity)
     {
         batch.Draw(textures.Pixel, _screen, UiTheme.Scrim * opacity);
         HeaderBar.Draw(batch, textures.Pixel, MenuHeader.Height, opacity);
@@ -86,7 +86,7 @@ internal sealed class ShopView
         _gold.Draw(batch, textures, new GoldAmountView.Place(_shownGold, new Vector2(goldLeft, CenteredTop(_infoFont)), UiTheme.TextPrimary), opacity);
         batch.DrawString(_bodyFont, _hint, new Vector2(FooterTextInset, FooterBar.TextTop(MenuLayout.FooterHeight, _bodyFont.LineHeight)), UiTheme.TextSecondary * opacity);
 
-        _list.Draw(batch, textures, list, _listArea, opacity);
+        _list.Draw(batch, textures, place, _listArea, opacity);
         _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(_detailArea), opacity);
     }
 

@@ -11,6 +11,7 @@ internal sealed class ItemDefinitionBuilder
     private EquipmentStats? _equipment;
     private Effect? _effect;
     private bool _isMaterial;
+    private int? _price;
 
     public ItemDefinitionBuilder WithId(string id)
     {
@@ -58,6 +59,12 @@ internal sealed class ItemDefinitionBuilder
         return this;
     }
 
+    public ItemDefinitionBuilder WithPrice(int price)
+    {
+        _price = price;
+        return this;
+    }
+
     public ItemDefinitionBuilder AsMaterial()
     {
         _isMaterial = true;
@@ -75,5 +82,6 @@ internal sealed class ItemDefinitionBuilder
         Effect = _effect,
         Equipment = _equipment,
         IsMaterial = _isMaterial,
+        Price = _price,
     };
 }

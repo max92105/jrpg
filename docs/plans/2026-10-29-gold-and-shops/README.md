@@ -49,7 +49,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **G4. Gold with its coin icon on the victory screen and in the menu header** (Game + art + text, raw 105, about 170 lines at 1.6x) → [slices/G4.md](slices/G4.md)
 
 ### Phase 2: shops in Core
-- [ ] **S1. Buying stacks in Core: prices, `Shop`, quotes with a quantity** (Core, about 220 lines) → [slices/S1.md](slices/S1.md)
+- [x] **S1. Buying stacks in Core: prices, `Shop`, quotes with a quantity** (Core, about 220 lines) → [slices/S1.md](slices/S1.md)
 - [ ] **S2. What a rolled piece is worth; buying a stock piece** (Core + Data + content, about 225 lines) → [slices/S2.md](slices/S2.md)
 - [ ] **S3. Selling in Core: the sell share, `ItemSales`** (Core, about 235 lines) → [slices/S3.md](slices/S3.md)
 - [ ] **S4. Shops, prices and the sell share in content, checked by the loader** (Core + Data + content, about 240 lines) → [slices/S4.md](slices/S4.md)

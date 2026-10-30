@@ -26,4 +26,7 @@ public sealed record ItemDefinition
     /// A crafting material (decision 339): it stacks and is never used or worn. Material is not a <see cref="Rarity"/>.
     /// </summary>
     public bool IsMaterial { get; init; }
+
+    /// <summary>What it costs in a shop (ADR 0031); null is never bought nor sold.</summary>
+    public int? Price { get; init; }
 }

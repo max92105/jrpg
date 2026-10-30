@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-gold-and-shops, slice G4 (gold with its coin: Ui/GoldAmountView, MenuHeader gold, VictoryScreen.Gold,
-VictoryScreenView.RewardRows(VictoryScreen) with an IsGold row, text battle_victory_gold, Icons.Gold). Round 1.
-Verdict: Ready to commit. verify.ps1 all pass (2939 tests).
+Plan: 2026-10-29-gold-and-shops, slice S1 (buying stacks in Core: ItemDefinition.Price, Trade/ShopDefinition, ShopStock,
+TradeRefusal, TradeQuote, Shop with QuoteBuy/MostBuyable/TryBuy; ShopBuyTests 12). Round 1.
+Verdict: Ready to commit. verify.ps1 all pass (2951 tests).
 
-- Warning: VictoryScreenView.cs DrawRewards - the second reward bar (y 344-408) meets the first card row's "Level Up!" pop (center y ~399) and the Items heading (y 404) - open
-- Suggestion: RewardRows builds the EXP row twice (both ternary branches) - open
-- Suggestion: _rewardRows/_rewardLabels/_rewardValues are three parallel collections; one drawn-row record - open
-- G3 carried Critical (EnemyCatalogValidator ADR 0027 comment under FindGoldProblem) - fixed (grep: comment at line 44 above FindResistanceProblem)
+- Warning: Shop.cs:62 TryBuy's `quote.IsRefused` untested for StackFull (refused test is ShortOfGold, which TrySpend also refuses); deleting it takes the full total while Inventory.Add clamps - open
+- Suggestion: MostBuyable on an item outside the stock returns >0 while TryBuy refuses it - open
+- Suggestion: ShopDefinition record holds ItemIds list (reference equality; no equality user yet) - open
+- G4 carried items (VictoryScreenView reward bar overlap, RewardRows EXP twice, parallel collections) - not re-raised (other slice, Warning/Suggestions only)

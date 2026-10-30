@@ -640,8 +640,11 @@ internal static class MessageIds
     /// <summary>Placeholder <c>{materials}</c>: what a salvage gave.</summary>
     public const string ForgeSalvaged = "forge_salvaged";
 
-    /// <summary>Placeholders <c>{rarity}</c> and <c>{name}</c>: a rolled piece named with its rarity first.</summary>
-    public const string ForgeRolledPieceName = "forge_rolled_piece_name";
+    /// <summary>
+    /// Placeholders <c>{rarity}</c> and <c>{name}</c>: a rolled piece named with its rarity first, in the Forge's and
+    /// the Shop's questions (<c>PieceName</c>).
+    /// </summary>
+    public const string RolledPieceName = "rolled_piece_name";
 
     /// <summary>Placeholders <c>{name}</c> and <c>{rarity}</c>: a piece raised one tier (decision 351).</summary>
     public const string ForgeUpgraded = "forge_upgraded";
@@ -695,4 +698,13 @@ internal static class MessageIds
 
     /// <summary>The quantity picker's label (decision 377).</summary>
     public const string ShopQuantity = "shop_quantity";
+
+    /// <summary>Placeholder <c>{name}</c>: the question before a piece is sold (decision 379).</summary>
+    public const string ShopSellConfirm = "shop_sell_confirm";
+
+    /// <summary>Placeholder <c>{name}</c>: the notice after selling a piece.</summary>
+    public const string ShopSold = "shop_sold";
+
+    /// <summary>Placeholders <c>{name}</c> and <c>{count}</c>: the notice after selling copies of a stack.</summary>
+    public const string ShopSoldCount = "shop_sold_count";
 }

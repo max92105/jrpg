@@ -21,7 +21,6 @@ public sealed class ShopSceneBuyTests
     {
         var (shop, session, store) = ShopOnAGearRow();
         var piece = shop.SelectedRow!.Piece!;
-        var name = shop.SelectedRow.Name.Text;
         var price = store.QuoteBuy(piece).Gold;
         var gold = session.Party.Purse.Gold;
 
@@ -29,7 +28,7 @@ public sealed class ShopSceneBuyTests
 
         Assert.Equal(gold - price, session.Party.Purse.Gold);
         Assert.Contains(session.Inventory.Gear, owned => ReferenceEquals(owned, piece));
-        Assert.Equal(RepositoryScreenText.Text.Messages.Format(MessageIds.ShopBought, new MessageArgument("name", name)), shop.Notice);
+        Assert.Equal(RepositoryScreenText.Text.Messages.Format(MessageIds.ShopBought, new MessageArgument("name", PieceName.Of(piece, RepositoryScreenText.Text.Messages))), shop.Notice);
     }
 
     [Fact]
@@ -129,14 +128,14 @@ public sealed class ShopSceneBuyTests
         return (shop, session, store);
     }
 
-    // Fails rather than hangs when no row matches: Down stops moving at the last row.
+    // Fails rather than loops forever when no row matches: the cursor wraps, so coming back to the start means none.
     private static void MoveDownUntil(ShopScene shop, Func<TradeRow, bool> wanted)
     {
+        var start = shop.SelectedRow;
         while (shop.SelectedRow is not { } row || !wanted(row))
         {
-            var before = shop.SelectedRow;
             shop.Update(TimeSpan.Zero, Pressing(GameButton.Down));
-            Assert.NotSame(before, shop.SelectedRow);
+            Assert.NotSame(start, shop.SelectedRow);
         }
     }
 }

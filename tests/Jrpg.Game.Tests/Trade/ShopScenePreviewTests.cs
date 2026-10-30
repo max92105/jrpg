@@ -90,16 +90,16 @@ public sealed class ShopScenePreviewTests
         return comparison.Text!;
     }
 
-    // The stock lists its stacks first, so the first gear row is reached going down; the loop fails rather than hangs
-    // when the stock has no gear.
+    // The stock lists its stacks first, so the first gear row is reached going down; the cursor wraps, so coming back
+    // to the start fails the loop rather than running it forever when the stock has no gear.
     private static (ShopScene Shop, GameSession Session) ShopOnAGearRow()
     {
         var (shop, session) = NewShopInTheList();
+        var start = shop.SelectedRow;
         while (shop.SelectedRow?.Piece is null)
         {
-            var before = shop.SelectedRow;
             shop.Update(TimeSpan.Zero, Pressing(GameButton.Down));
-            Assert.NotSame(before, shop.SelectedRow);
+            Assert.NotSame(start, shop.SelectedRow);
         }
 
         return (shop, session);

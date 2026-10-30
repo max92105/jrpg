@@ -117,3 +117,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `ForgeList` and `Menus/InventoryList` each hold the cursor-plus-gliding-highlight pair that `Ui/RowSelection` now packages for the Shop's lists (gold plan B2): switch them to it when next touched.
 - `StatusSkillsView.DescriptionLayout` (a wrapped-text layout) has two users, the Status page and the Shop's detail column (gold plan L2a); move it to `Ui/` and fix its doc, which still names the Status page's font size.
 - `ShopListView.Draw` and `ForgeListView.Draw` take 5 parameters (the limit is 4): pass the fixed area to their constructors, as `ShopDetailView` does (L2b review).
+- `ShopScene` is at 296 lines: the next slice that adds to it splits it first (the tabs and the category rails, or the preview, into their own type).

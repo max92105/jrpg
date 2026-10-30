@@ -11,8 +11,8 @@ namespace Jrpg.Game.Trade;
 /// <summary>
 /// Draws the Shop screen in the menu's frame, as the Forge: the map dimmed behind it, the header bar with the shop's
 /// name at the left and the party's gold with its coin at the right (decision 380), the tabs and the shown list in the
-/// list column, the highlighted row's detail beside it, and the footer with its hint. Everything fades with the Shop
-/// (decision 370). The gold is measured when it changes.
+/// list column, the highlighted row's detail beside it, the footer with its hint, and the sale's question over it all.
+/// Everything fades with the Shop (decision 370). The gold is measured when it changes.
 /// </summary>
 internal sealed class ShopView
 {
@@ -39,6 +39,7 @@ internal sealed class ShopView
     private readonly ColumnPanelView _panel = new(UiTheme.PageColumn);
     private readonly ShopListView _list;
     private readonly ShopDetailView _detail;
+    private readonly ConfirmPromptView _prompt;
     private readonly GoldAmountView _gold;
     private readonly SpriteFontBase _titleFont;
     private readonly SpriteFontBase _infoFont;
@@ -61,6 +62,7 @@ internal sealed class ShopView
         _gold = new GoldAmountView(_infoFont, ui);
         _list = new ShopListView(text, ui, _bodyFont);
         _detail = new ShopDetailView(text, ui, _detailArea);
+        _prompt = new ConfirmPromptView(text, ui);
         _name = name;
         _messages = text.Messages;
     }
@@ -109,6 +111,10 @@ internal sealed class ShopView
         _list.Draw(batch, textures, place.List, _listArea, opacity);
         _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(_detailArea), opacity);
         _detail.Draw(batch, textures, place.Detail, opacity);
+        if (place.Prompt is { } prompt)
+        {
+            _prompt.Draw(batch, textures, prompt, opacity);
+        }
     }
 
     private static float CenteredTop(SpriteFontBase font) => (MenuHeader.Height - font.LineHeight) / 2f;
@@ -116,5 +122,6 @@ internal sealed class ShopView
     /// <summary>What the Shop draws this frame.</summary>
     /// <param name="List">The tab shown, where the cursor is, and the shown tab's rows.</param>
     /// <param name="Detail">The highlighted row, the previewed member's changes and the trade's line.</param>
-    public readonly record struct Place(ShopListView.Place List, ShopDetailView.Place Detail);
+    /// <param name="Prompt">The question before a piece is sold, over everything; null while nothing is asked.</param>
+    public readonly record struct Place(ShopListView.Place List, ShopDetailView.Place Detail, ConfirmPrompt? Prompt);
 }

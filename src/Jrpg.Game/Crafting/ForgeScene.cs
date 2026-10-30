@@ -156,7 +156,7 @@ internal sealed class ForgeScene : IScene
         switch (action)
         {
             case ForgeAction.Salvage:
-                Prompt = new ConfirmPrompt(_messages.Format(MessageIds.ForgeSalvageConfirm, new MessageArgument("name", NameOf(row))));
+                Prompt = new ConfirmPrompt(_messages.Format(MessageIds.ForgeSalvageConfirm, new MessageArgument("name", PieceName.Of(row.Piece, _messages))));
                 break;
             case ForgeAction.Upgrade:
                 Craft(row, _session.Forge.TryUpgrade, MessageIds.ForgeUpgraded);
@@ -212,12 +212,6 @@ internal sealed class ForgeScene : IScene
             Notice = null;
         }
     }
-
-    // A rolled piece is named with its rarity first, so the question tells it from a plain one of the same base.
-    private string NameOf(ForgeRow row) =>
-        row.Piece.Rarity == Rarity.Common && row.Piece.Affixes.Count == 0
-            ? row.Name.Text
-            : _messages.Format(MessageIds.ForgeRolledPieceName, new MessageArgument("rarity", row.RarityName), new MessageArgument("name", row.Name.Text));
 
     // While closing nothing reads input; the flow hears EventScreenClosed once, on the update the fade ends.
     private EventScreenClosed? RequestClosedOnceFaded()

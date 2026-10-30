@@ -7,3 +7,4 @@
 - [Deferred work unrecorded](deferred-work-unrecorded.md) — a Done note deferring work to another slice: check that slice's file says so
 - [Detached comments](detached-comments.md) — a member inserted under, or removed from under, a comment leaves it describing the wrong code
 - [Draw parameter count](draw-parameter-count.md) — views grow Draw to 5 params (max 4); count params on every changed signature
+- [Split open state](split-open-state.md) — picker/prompt and its Yes-continuation kept in separate fields with ?? throw guards (T2, T3)

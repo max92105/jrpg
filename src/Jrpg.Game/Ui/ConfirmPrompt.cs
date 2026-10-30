@@ -13,6 +13,11 @@ internal sealed class ConfirmPrompt(string question)
 
     public bool IsYesSelected { get; private set; }
 
+    /// <summary>
+    /// The gold the answer trades, drawn under the question with the coin (decision 380); null for none.
+    /// </summary>
+    public int? Price { get; init; }
+
     /// <returns>The answer on the update the player gives it; null while they choose.</returns>
     public ConfirmAnswer? Update(InputFrame input)
     {

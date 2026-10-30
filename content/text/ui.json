@@ -231,7 +231,7 @@
   "forge_refused_no_yield": "Nothing to salvage",
   "forge_salvage_confirm": "Salvage the {name}?",
   "forge_salvaged": "Salvaged: {materials}",
-  "forge_rolled_piece_name": "{rarity} {name}",
+  "rolled_piece_name": "{rarity} {name}",
   "forge_upgraded": "{name} is now {rarity}.",
   "forge_rerolled": "{name}'s affixes were rolled again.",
   "shop_hint": "Left and Right choose Buy or Sell; Confirm enters the list; {previous} and {next} change the category; on gear, Left and Right compare another member.",
@@ -248,5 +248,8 @@
   "shop_refused_not_for_sale": "Not for sale.",
   "shop_bought": "Bought: {name}.",
   "shop_bought_count": "Bought: {name} x{count}.",
-  "shop_quantity": "Quantity"
+  "shop_quantity": "Quantity",
+  "shop_sell_confirm": "Sell the {name}?",
+  "shop_sold": "Sold: {name}.",
+  "shop_sold_count": "Sold: {name} x{count}."
 }

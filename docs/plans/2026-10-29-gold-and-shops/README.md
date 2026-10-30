@@ -42,7 +42,7 @@ Open question 222 (paying for rest, from the class mechanics plan) answered as a
 One line per slice; each slice's goal, types, tests and hand checks are in its file under `slices/`. Tick the box here when a slice is done, and write its deviations in the slice file. Tunables, design overview and risks: [design.md](design.md).
 
 ### Phase 1: gold
-- [ ] **G1. The party's purse** (Core, about 130 lines) → [slices/G1.md](slices/G1.md)
+- [x] **G1. The party's purse** (Core, about 130 lines) → [slices/G1.md](slices/G1.md)
 - [ ] **G2. The format-6 save: gold and the shops' stocks** (Core + Data, about 175 lines) → [slices/G2.md](slices/G2.md)
 - [ ] **ADR 0031: gold and trade** (gold per enemy, prices on items and affixes, shops listing ids, the rolled and kept stock, the sell share): write it from the README's entries (decisions 375, 376, 378, 385), before G3
 - [ ] **G3. Each enemy drops gold; a new game starts with some** (Core + Data + content, about 215 lines) → [slices/G3.md](slices/G3.md)

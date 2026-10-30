@@ -1,9 +1,9 @@
 namespace Jrpg.Core.Party;
 
 /// <summary>
-/// Recruited members, the ordered active party and the reserve (recruited members not in the active party, in
-/// recruitment order). The active party never exceeds <see cref="PartyRules.MaxActiveMembers"/>, and the leader (the
-/// first member of the starting active order) is always first in it.
+/// Recruited members, the ordered active party, the reserve (recruited members not in the active party, in recruitment
+/// order) and the party's gold. The active party never exceeds <see cref="PartyRules.MaxActiveMembers"/>, and the
+/// leader (the first member of the starting active order) is always first in it.
 /// </summary>
 public sealed class PartyState
 {
@@ -39,6 +39,9 @@ public sealed class PartyState
     public IReadOnlyList<PartyMember> ReserveMembers => _reserveMembers;
 
     public PartyMember Leader { get; }
+
+    /// <summary>The party's gold, shared by every member.</summary>
+    public Purse Purse { get; } = new();
 
     public bool IsFull => _activeMembers.Count >= _rules.MaxActiveMembers;
 

@@ -1,0 +1,90 @@
+using FontStashSharp;
+using Jrpg.Game.Menus;
+using Jrpg.Game.Rendering;
+using Jrpg.Game.Ui;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+
+namespace Jrpg.Game.Trade;
+
+/// <summary>
+/// Draws the Shop screen in the menu's frame, as the Forge: the map dimmed behind it, the header bar with the shop's
+/// name at the left and the party's gold with its coin at the right (decision 380), the list and detail columns, and
+/// the footer with its hint. Everything fades with the Shop (decision 370). The gold is measured when it changes.
+/// </summary>
+internal sealed class ShopView
+{
+    // The hint's text size, the menu pages' body size.
+    private const int BodyPixels = 26;
+
+    // The menu header's title size, its side margin and its info size; the footer's hint 40 px in, as the menu's.
+    private const int TitleTextPixels = 38;
+    private const int SideMargin = 48;
+    private const int InfoTextPixels = 24;
+    private const int FooterTextInset = 40;
+
+    // The Forge's columns at 1920 (placeholder): the list from x 40 to 1000, the detail from 1040 to 1880, both the
+    // menu's body height.
+    private const int ListLeft = 40;
+    private const int ListWidth = 960;
+    private const int DetailLeft = 1040;
+    private const int DetailWidth = 840;
+
+    private static readonly Rectangle _screen = new(0, 0, VirtualScreen.Width, VirtualScreen.Height);
+    private static readonly Rectangle _listArea = new(ListLeft, MenuLayout.BodyTop, ListWidth, MenuLayout.BodyHeight);
+    private static readonly Rectangle _detailArea = new(DetailLeft, MenuLayout.BodyTop, DetailWidth, MenuLayout.BodyHeight);
+
+    private readonly ColumnPanelView _panel = new(UiTheme.PageColumn);
+    private readonly GoldAmountView _gold;
+    private readonly SpriteFontBase _titleFont;
+    private readonly SpriteFontBase _infoFont;
+    private readonly SpriteFontBase _bodyFont;
+    private readonly string _name;
+    private readonly string _hint;
+    private MeasuredText _shownGold = new(string.Empty, 0);
+    private int _shownGoldAmount = -1;
+
+    /// <param name="text">The fonts and the footer's line.</param>
+    /// <param name="ui">The shared textures: the coin, the columns.</param>
+    /// <param name="name">The shop's name, the header's title.</param>
+    public ShopView(ScreenText text, UiTextures ui, string name)
+    {
+        _titleFont = text.Fonts.FontAt(TitleTextPixels);
+        _infoFont = text.Fonts.FontAt(InfoTextPixels);
+        _bodyFont = text.Fonts.FontAt(BodyPixels);
+        _gold = new GoldAmountView(_infoFont, ui);
+        _name = name;
+        _hint = text.Messages.Text(MessageIds.ShopHint);
+    }
+
+    /// <summary>Formats the gold only when the purse changed, so drawing allocates nothing.</summary>
+    public void ShowGold(int gold)
+    {
+        if (gold == _shownGoldAmount)
+        {
+            return;
+        }
+
+        _shownGoldAmount = gold;
+        _shownGold = MeasuredText.Of(_infoFont, NumberText.Of(gold));
+    }
+
+    /// <param name="batch">Already begun.</param>
+    /// <param name="textures">Where the plain pixel, the coin and the gradients come from.</param>
+    /// <param name="opacity">The Shop's fade, 0 for clear to 1 for opaque.</param>
+    public void Draw(SpriteBatch batch, TextureLibrary textures, float opacity)
+    {
+        batch.Draw(textures.Pixel, _screen, UiTheme.Scrim * opacity);
+        HeaderBar.Draw(batch, textures.Pixel, MenuHeader.Height, opacity);
+        FooterBar.Draw(batch, textures.Pixel, MenuLayout.FooterHeight, opacity);
+        batch.DrawString(_titleFont, _name, new Vector2(SideMargin, CenteredTop(_titleFont)), UiTheme.TextPrimary * opacity);
+        var goldLeft = VirtualScreen.Width - SideMargin - _gold.WidthOf(_shownGold);
+        _gold.Draw(batch, textures, new GoldAmountView.Place(_shownGold, new Vector2(goldLeft, CenteredTop(_infoFont)), UiTheme.TextPrimary), opacity);
+        batch.DrawString(_bodyFont, _hint, new Vector2(FooterTextInset, FooterBar.TextTop(MenuLayout.FooterHeight, _bodyFont.LineHeight)), UiTheme.TextSecondary * opacity);
+
+        _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(_listArea), opacity);
+        _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(_detailArea), opacity);
+    }
+
+    private static float CenteredTop(SpriteFontBase font) => (MenuHeader.Height - font.LineHeight) / 2f;
+}

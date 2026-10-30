@@ -648,4 +648,7 @@ internal static class MessageIds
 
     /// <summary>Placeholder <c>{name}</c>: a piece whose affixes were drawn again (decision 352).</summary>
     public const string ForgeRerolled = "forge_rerolled";
+
+    /// <summary>The Shop footer's line.</summary>
+    public const string ShopHint = "shop_hint";
 }

@@ -23,6 +23,7 @@
       "rare": { "weight": 70, "minAffixes": 2, "maxAffixes": 3 }
     }
   },
+  "trade": { "sellPercent": 50 },
   "crafting": {
     "salvage": {
       "common": [{ "itemId": "scrap", "quantity": 1 }],

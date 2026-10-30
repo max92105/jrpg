@@ -1,5 +1,6 @@
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
+using Jrpg.Core.Party;
 using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
 using Jrpg.Data.Effects;
@@ -27,6 +28,12 @@ internal static class ItemCatalogValidator
         if (item.MaxStack < 1)
         {
             return $"maxStack must be at least 1 (was {item.MaxStack}).";
+        }
+
+        // A price of 0 would sell for nothing and buy for nothing (ADR 0031); an item nobody trades has none at all.
+        if (item.Price is { } price && RangeProblems.Within("price", price, 1, Purse.MaxGold) is { } priceProblem)
+        {
+            return priceProblem;
         }
 
         if (item.IsMaterial)

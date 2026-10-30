@@ -28,6 +28,12 @@ internal static class GameRulesValidator
 
         LootRulesValidator.Validate(fileName, rules.Loot);
 
+        // A share past the price would pay more than a thing costs; below 0 it would charge the seller.
+        if (RangeProblems.Within("trade.sellPercent", rules.Trade.SellPercent, 0, 100) is { } shareProblem)
+        {
+            throw new ContentValidationException($"{fileName}: {shareProblem}");
+        }
+
         var thresholds = rules.Experience.ExperienceToNextLevel;
         if (thresholds.Count == 0)
         {

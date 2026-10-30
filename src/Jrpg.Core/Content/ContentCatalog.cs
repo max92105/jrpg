@@ -4,6 +4,7 @@ using Jrpg.Core.Loot;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Skills;
+using Jrpg.Core.Trade;
 
 namespace Jrpg.Core.Content;
 
@@ -39,6 +40,9 @@ public sealed record ContentCatalog
 
     /// <summary>What defeated enemies drop, by table id (ADR 0030).</summary>
     public required IReadOnlyDictionary<string, DropTable> DropTables { get; init; }
+
+    /// <summary>The shops a shopkeeper may open, by id (ADR 0031).</summary>
+    public required IReadOnlyDictionary<string, ShopDefinition> Shops { get; init; }
 
     /// <summary>The class that gives a member their numbers at their level (ADR 0017).</summary>
     public ClassDefinition ClassOf(PartyMemberDefinition member) => Classes[member.ClassId];

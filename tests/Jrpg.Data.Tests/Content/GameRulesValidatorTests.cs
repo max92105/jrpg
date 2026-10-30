@@ -4,6 +4,7 @@ using Jrpg.Core.Loot;
 using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
 using Jrpg.Core.Stats;
+using Jrpg.Core.Trade;
 using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Tests.Content;
@@ -47,6 +48,28 @@ public sealed class GameRulesValidatorTests
         var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
 
         Assert.Equal("rules.json: loot.rarities.magic.weight must be at least 0 (was -1).", exception.Message);
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(101)]
+    public void Validate_SellPercentOutOfRange_NamesTheField(int sellPercent)
+    {
+        var rules = _rules with { Trade = new TradeRules { SellPercent = sellPercent } };
+
+        var exception = Assert.Throws<ContentValidationException>(() => GameRulesValidator.Validate("rules.json", rules));
+
+        Assert.Equal($"rules.json: trade.sellPercent must be within 0..100 (was {sellPercent}).", exception.Message);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(100)]
+    public void Validate_SellPercentAtABound_DoesNotThrow(int sellPercent)
+    {
+        var rules = _rules with { Trade = new TradeRules { SellPercent = sellPercent } };
+
+        Assert.Null(Record.Exception(() => GameRulesValidator.Validate("rules.json", rules)));
     }
 
     [Fact]

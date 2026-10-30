@@ -5,6 +5,7 @@
     "description": "Restores a small amount of HP.",
     "iconFile": "Consumable.png",
     "maxStack": 99,
+    "price": 20,
     "isUsableFromMenu": true,
     "effect": { "kind": "restoreHp", "power": 15, "targeting": "singleAlly" }
   },
@@ -14,6 +15,7 @@
     "description": "Rests the party.",
     "iconFile": "Consumable.png",
     "maxStack": 9,
+    "price": 100,
     "isUsableFromMenu": true,
     "effect": { "kind": "rest", "power": 0, "targeting": "allAllies" }
   },
@@ -23,6 +25,7 @@
     "description": "Restores a medium amount of HP.",
     "iconFile": "Consumable.png",
     "maxStack": 99,
+    "price": 60,
     "isUsableFromMenu": true,
     "effect": { "kind": "restoreHp", "power": 50, "targeting": "singleAlly" }
   },
@@ -32,6 +35,7 @@
     "description": "Restores 100 HP.",
     "iconFile": "Consumable.png",
     "maxStack": 99,
+    "price": 200,
     "isUsableFromMenu": true,
     "effect": { "kind": "restoreHp", "power": 100, "targeting": "singleAlly" }
   },
@@ -41,6 +45,7 @@
     "description": "Damage an enemy.",
     "iconFile": "Consumable.png",
     "maxStack": 99,
+    "price": 40,
     "isUsableFromMenu": false,
     "effect": { "kind": "damage", "damageType": "fire", "power": 15, "targeting": "singleEnemy" }
   },
@@ -50,6 +55,7 @@
     "description": "Damage all enemies.",
     "iconFile": "Consumable.png",
     "maxStack": 99,
+    "price": 90,
     "isUsableFromMenu": false,
     "effect": { "kind": "damage", "damageType": "fire", "power": 30, "targeting": "allEnemies" }
   },
@@ -59,6 +65,7 @@
     "description": "Revives all fallen allies.",
     "iconFile": "Consumable.png",
     "maxStack": 99,
+    "price": 150,
     "isUsableFromMenu": true,
     "effect": { "kind": "revive", "power": 15, "targeting": "allFallenAllies" }
   },
@@ -68,6 +75,7 @@
     "description": "Sword made of bronze",
     "iconFile": "Weapon.png",
     "maxStack": 99,
+    "price": 100,
     "isUsableFromMenu": false,
     "equipment": { "kind": "weapon", "damage": 24, "damageType": "slashing" }
   },
@@ -77,6 +85,7 @@
     "description": "Sword made of iron",
     "iconFile": "Weapon.png",
     "maxStack": 99,
+    "price": 250,
     "isUsableFromMenu": false,
     "equipment": { "kind": "weapon", "damage": 30, "damageType": "slashing" }
   },
@@ -86,6 +95,7 @@
     "description": "",
     "iconFile": "Weapon.png",
     "maxStack": 99,
+    "price": 220,
     "isUsableFromMenu": false,
     "equipment": { "kind": "weapon", "damage": 20, "damageType": "blunt", "bonuses": { "intelligence": 3 } }
   },
@@ -95,6 +105,7 @@
     "description": "",
     "iconFile": "Armor.png",
     "maxStack": 99,
+    "price": 120,
     "isUsableFromMenu": false,
     "equipment": { "kind": "chest", "bonuses": { "constitution": 2, "bluntResistance": 5, "piercingResistance": 5, "slashingResistance": 5 } }
   },
@@ -104,6 +115,7 @@
     "description": "",
     "iconFile": "Armor.png",
     "maxStack": 99,
+    "price": 300,
     "isUsableFromMenu": false,
     "equipment": { "kind": "chest", "bonuses": { "constitution": 3, "bluntResistance": 5, "piercingResistance": 10, "slashingResistance": 15 } }
   },
@@ -113,6 +125,7 @@
     "description": "",
     "iconFile": "Armor.png",
     "maxStack": 99,
+    "price": 180,
     "isUsableFromMenu": false,
     "equipment": { "kind": "chest", "bonuses": { "will": 3, "fireResistance": 10, "iceResistance": 10, "lightningResistance": 10 } }
   },
@@ -122,6 +135,7 @@
     "description": "A round shield that turns a little of every blow: +8 % to the three physical resistances.",
     "iconFile": "Armor.png",
     "maxStack": 99,
+    "price": 80,
     "isUsableFromMenu": false,
     "equipment": { "kind": "offHand", "bonuses": { "bluntResistance": 8, "piercingResistance": 8, "slashingResistance": 8 } }
   },
@@ -131,6 +145,7 @@
     "description": "A stiff leather cap: +5 Constitution.",
     "iconFile": "Armor.png",
     "maxStack": 99,
+    "price": 60,
     "isUsableFromMenu": false,
     "equipment": { "kind": "head", "bonuses": { "constitution": 5 } }
   },
@@ -140,6 +155,7 @@
     "description": "Supple gloves for a surer grip: +5 % accuracy.",
     "iconFile": "Armor.png",
     "maxStack": 99,
+    "price": 60,
     "isUsableFromMenu": false,
     "equipment": { "kind": "hands", "bonuses": { "accuracy": 5 } }
   },
@@ -149,6 +165,7 @@
     "description": "Light boots for quick feet: +5 speed, +5 % dodge.",
     "iconFile": "Armor.png",
     "maxStack": 99,
+    "price": 60,
     "isUsableFromMenu": false,
     "equipment": { "kind": "feet", "bonuses": { "speed": 5, "dodge": 5 } }
   },
@@ -158,6 +175,7 @@
     "description": "Warm amber on a cord: +5 Will, +10 % Fire resistance.",
     "iconFile": "Armor.png",
     "maxStack": 99,
+    "price": 200,
     "isUsableFromMenu": false,
     "equipment": { "kind": "amulet", "bonuses": { "will": 5, "fireResistance": 10 } }
   },
@@ -167,6 +185,7 @@
     "description": "A heavy iron band: +5 Power.",
     "iconFile": "Armor.png",
     "maxStack": 99,
+    "price": 250,
     "isUsableFromMenu": false,
     "equipment": { "kind": "ring", "bonuses": { "power": 5 } }
   },
@@ -176,6 +195,7 @@
     "description": "A ring etched with old script: +5 Intelligence.",
     "iconFile": "Armor.png",
     "maxStack": 99,
+    "price": 250,
     "isUsableFromMenu": false,
     "equipment": { "kind": "ring", "bonuses": { "intelligence": 5 } }
   },
@@ -185,6 +205,7 @@
     "description": "A thin silver ring, light as air: +5 Agility.",
     "iconFile": "Armor.png",
     "maxStack": 99,
+    "price": 250,
     "isUsableFromMenu": false,
     "equipment": { "kind": "ring", "bonuses": { "agility": 5 } }
   },

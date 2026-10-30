@@ -6,6 +6,7 @@ using Jrpg.Core.Loot;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Skills;
+using Jrpg.Core.Trade;
 using Jrpg.Data.Battle;
 using Jrpg.Data.Crafting;
 using Jrpg.Data.Items;
@@ -13,6 +14,7 @@ using Jrpg.Data.Loot;
 using Jrpg.Data.Maps;
 using Jrpg.Data.Party;
 using Jrpg.Data.Skills;
+using Jrpg.Data.Trade;
 
 namespace Jrpg.Data.Content;
 
@@ -27,6 +29,7 @@ public static class ContentCatalogLoader
     private const string EncountersFile = "encounters.json";
     private const string DropTablesFile = "drop-tables.json";
     private const string AffixesFile = "affixes.json";
+    private const string ShopsFile = "shops.json";
     internal const string NewGameFile = "new-game.json";
 
     internal const string TilesheetsFile = "tilesheets.json";
@@ -50,6 +53,8 @@ public static class ContentCatalogLoader
 
         // rules.json is read before the items, so its crafting block is checked against them only now.
         CraftingRulesValidator.Validate(RulesFile, rules.Crafting, itemsById);
+        var shops = ReadValidated<IReadOnlyList<ShopDefinition>>(
+            contentRoot, ShopsFile, (file, list) => ShopCatalogValidator.Validate(file, list, itemsById));
         var affixes = ReadValidated<IReadOnlyList<AffixDefinition>>(contentRoot, AffixesFile, AffixCatalogValidator.Validate);
         var dropTables = ReadValidated<IReadOnlyList<DropTable>>(
             contentRoot, DropTablesFile, (file, list) => DropTableCatalogValidator.Validate(file, list, itemsById));
@@ -101,6 +106,7 @@ public static class ContentCatalogLoader
             Affixes = affixes.ToFrozenDictionary(affix => affix.Id),
 
             DropTables = dropTables.ToFrozenDictionary(table => table.Id),
+            Shops = shops.ToFrozenDictionary(shop => shop.Id),
         };
     }
 

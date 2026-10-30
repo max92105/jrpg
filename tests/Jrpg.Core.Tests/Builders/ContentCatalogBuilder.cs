@@ -7,6 +7,7 @@ using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
 using Jrpg.Core.Skills;
+using Jrpg.Core.Trade;
 
 namespace Jrpg.Core.Tests.Builders;
 
@@ -35,6 +36,7 @@ internal sealed class ContentCatalogBuilder
     private TileDefinition[] _tiles = [TestTiles.Walkable(1)];
     private ObjectDefinition[] _objects = [];
     private MapLayout[] _maps = [new MapLayoutBuilder().WithLayer("1").Build()];
+    private ShopDefinition[] _shops = [];
     private EnemyDefinition[] _enemies = [];
     private EncounterDefinition[] _encounters = [];
     private readonly Dictionary<string, RandomEncounterTable> _randomEncounters = [];
@@ -48,6 +50,12 @@ internal sealed class ContentCatalogBuilder
     public ContentCatalogBuilder WithAffixes(params AffixDefinition[] affixes)
     {
         _affixes = affixes;
+        return this;
+    }
+
+    public ContentCatalogBuilder WithShops(params ShopDefinition[] shops)
+    {
+        _shops = shops;
         return this;
     }
 
@@ -142,6 +150,7 @@ internal sealed class ContentCatalogBuilder
         NewGame = _newGame,
         Affixes = _affixes.ToDictionary(affix => affix.Id),
         DropTables = _dropTables.ToDictionary(table => table.Id),
+        Shops = _shops.ToDictionary(shop => shop.Id),
     };
 
     private MapSettings SettingsFor(string mapId) =>

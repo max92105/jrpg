@@ -1,0 +1,7 @@
+[
+  {
+    "id": "general_store",
+    "name": "General Store",
+    "itemIds": [ "potion", "hi_potion", "bomb", "camp_kit", "bronze_sword", "leather_armor", "leather_cap", "wooden_shield" ]
+  }
+]

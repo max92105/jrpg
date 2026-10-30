@@ -11,7 +11,8 @@ keeps a memory rule "insert above doc comments"). The reverse also happens: a re
 behind on the next member (seen in D1: BattleState's AttackTargeting const moved to AttackEffect, its comment stayed
 above `_turnOrder`; and in A4a: a new test inserted between a comment and Roll_NotEquipment_Throws merged the old
 comment into the new test's; and in G3: EnemyCatalogValidator.FindGoldProblem inserted under the
-resistances' ADR 0027 comment, which was then extended instead of split).
+resistances' ADR 0027 comment, which was then extended instead of split; and in S4 of gold-and-shops: a "serializer
+nullable" comment copied from CraftingRulesValidator landed above a null-list check instead of the null-element one).
 
 **Why:** the comment then misdescribes the new member; a misleading comment counts as Critical (cheap fix).
 **How to apply:** in `git diff`, look at the context line right before each `+    [Fact]` / new member, and right after

@@ -19,7 +19,7 @@ Quests (`docs/plans/2026-10-29-quests/`, approved 2026-10-29, runs AFTER gold): 
 
 Gold and shops (`docs/plans/2026-10-29-gold-and-shops/`, approved 2026-10-29, runs BEFORE quests): decisions 374-385, ADR 0031 (gold and trade, a step before G3); 27 slices G1-G4, S1-S6, L1, H1, E1, E2, N1, B1-B3, L2a, L2b, T1-T3, I1, I2a, I2b, I3; save format 6 (gold + rolled shop stocks), quests takes 7. Core `Trade/` (`Shop` buys, `ItemSales` sells, `Pricing`, `ShopStock` rolled once and rerolled after a leader level), `Party/Purse`; Game `Trade` may read `Menus`. Next free after it: decision 386, ADR 0032.
 
-Music and SFX (`docs/plans/2026-10-29-music-and-sfx/`, draft 2026-10-29, same parallel-draft rules: local Q1-Q10): V1, C1, C2, P1-P3, E1, S1-S4, B1, B2, D1, F1, V2, V3 (only if Q1 saves settings); ADR candidates: audio names (`content/audio.json` + Data `SoundEffectIds`), how the game asks (music from flow state, scenes report effect ids via `IScene.Sounds`), music playback (looped `SoundEffectInstance` WAV vs `Song` OGG), settings file.
+Music and SFX (`docs/plans/2026-10-29-music-and-sfx/`, approved 2026-10-29): decisions 415-425, ADR 0035 (extends 0018); 18 slices V1, C1, P1-P3, E1, C2 (after the enemy plan's C1), S1-S4, D1, B1-B5, V2. Settings saved between runs = a separate small plan later (decision 415). Next free after it: decision 426, ADR 0036.
 
 Rule seen at that approval: a review that adds features (pickers, previews, saved stocks) roughly doubles a plan; renumber slice ids to reuse file names, stub the orphans.
 

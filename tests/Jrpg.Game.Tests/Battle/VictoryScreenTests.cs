@@ -15,7 +15,7 @@ public sealed class VictoryScreenTests
     private static readonly InputFrame _confirm = InputFrames.Pressing(GameButton.Confirm);
     private static readonly TimeSpan _oneUpdate = TimeSpan.FromSeconds(1.0 / 60);
 
-    private readonly VictoryScreen _screen = new(new BattleSpoils(Rewards(), Drops.None));
+    private readonly VictoryScreen _screen = new(new BattleSpoils(Rewards(), Drops.None, Gold: 0));
 
     [Fact]
     public void Update_ConfirmWhilePlaying_SkipsToEnd()
@@ -60,7 +60,7 @@ public sealed class VictoryScreenTests
     [Fact]
     public void IsAtMaxLevel_MemberAlreadyAtMaxLevel_IsTrue()
     {
-        var screen = new VictoryScreen(new BattleSpoils(new VictoryRewards(60, [new ExperienceGain(Sarxian(), 60, [], IsAtMaxLevel: true)]), Drops.None));
+        var screen = new VictoryScreen(new BattleSpoils(new VictoryRewards(60, [new ExperienceGain(Sarxian(), 60, [], IsAtMaxLevel: true)]), Drops.None, Gold: 0));
 
         Assert.True(screen.IsAtMaxLevel(0));
     }
@@ -70,7 +70,7 @@ public sealed class VictoryScreenTests
     public void IsAtMaxLevel_ReachesMaxLevelWhileFilling_FalseUntilTheBarCompletes()
     {
         var screen = new VictoryScreen(new BattleSpoils(
-            new VictoryRewards(60, [new ExperienceGain(Sarxian(), 60, [new LevelProgressStep(1, 60, 120, 120)], IsAtMaxLevel: true)]), Drops.None));
+            new VictoryRewards(60, [new ExperienceGain(Sarxian(), 60, [new LevelProgressStep(1, 60, 120, 120)], IsAtMaxLevel: true)]), Drops.None, Gold: 0));
         screen.Update(TimeSpan.FromSeconds(1.1), default);
         Assert.False(screen.IsAtMaxLevel(0));
 
@@ -137,7 +137,7 @@ public sealed class VictoryScreenTests
     private static VictoryScreen ScreenWithAPotionDropped()
     {
         var potion = BattleScenarios.Catalog.Items["potion"];
-        return new VictoryScreen(new BattleSpoils(Rewards(), new Drops([new ItemDrop(potion, 1)], [])));
+        return new VictoryScreen(new BattleSpoils(Rewards(), new Drops([new ItemDrop(potion, 1)], []), Gold: 0));
     }
 
     // One card comes in, the bars wait 1.05 s, then Sarxian's 60 experience fill half of a 120-point level in 0.55 s.

@@ -48,4 +48,7 @@ public sealed record EnemyDefinition
 
     /// <summary>The drop table rolled when it is defeated (decision 343); null drops nothing.</summary>
     public string? DropTableId { get; init; }
+
+    /// <summary>The gold it drops when defeated, drawn once (ADR 0031); null drops none.</summary>
+    public GoldRange? Gold { get; init; }
 }

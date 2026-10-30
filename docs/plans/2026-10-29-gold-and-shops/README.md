@@ -45,7 +45,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **G1. The party's purse** (Core, about 130 lines) → [slices/G1.md](slices/G1.md)
 - [x] **G2. The format-6 save: gold and the shops' stocks** (Core + Data, about 175 lines) → [slices/G2.md](slices/G2.md)
 - [x] **ADR 0031: gold and trade** (gold per enemy, prices on items and affixes, shops listing ids, the rolled and kept stock, the sell share): write it from the README's entries (decisions 375, 376, 378, 385), before G3
-- [ ] **G3. Each enemy drops gold; a new game starts with some** (Core + Data + content, about 215 lines) → [slices/G3.md](slices/G3.md)
+- [x] **G3. Each enemy drops gold; a new game starts with some** (Core + Data + content, about 215 lines) → [slices/G3.md](slices/G3.md)
 - [ ] **G4. Gold with its coin icon on the victory screen and in the menu header** (Game + art + text, raw 105, about 170 lines at 1.6x) → [slices/G4.md](slices/G4.md)
 
 ### Phase 2: shops in Core

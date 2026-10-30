@@ -15,7 +15,8 @@
     "crowdControlResistance": 10,
     "resistances": { "fire": -25 },
     "experienceReward": 40,
-    "dropTableId": "goblin"
+    "dropTableId": "goblin",
+    "gold": { "min": 6, "max": 12 }
   },
   {
     "id": "stone_beetle",
@@ -33,7 +34,8 @@
     "crowdControlResistance": 10,
     "resistances": { "slashing": 25, "piercing": 25, "blunt": -25 },
     "experienceReward": 40,
-    "dropTableId": "goblin"
+    "dropTableId": "goblin",
+    "gold": { "min": 6, "max": 12 }
   },
   {
     "id": "training_dummy",

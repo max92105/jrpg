@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Party;
 using Jrpg.Core.Stats;
 using Jrpg.Data.Battle;
 using Jrpg.Data.Content;
@@ -37,6 +38,9 @@ public sealed class EnemyCatalogValidatorTests
         { _goblin with { CritChance = 101 }, "critChance must be within 0..100 (was 101)." },
         { _goblin with { CrowdControlResistance = 101 }, "crowdControlResistance must be within 0..100 (was 101)." },
         { _goblin with { ExperienceReward = -1 }, "experienceReward must be at least 0 (was -1)." },
+        { _goblin with { Gold = new GoldRange(12, 6) }, "gold.max must be within 12..9999999 (was 6)." },
+        { _goblin with { Gold = new GoldRange(-1, 6) }, "gold.min must be within 0..9999999 (was -1)." },
+        { _goblin with { Gold = new GoldRange(0, Purse.MaxGold + 1) }, "gold.max must be within 0..9999999 (was 10000000)." },
         { _goblin with { Resistances = Resistances.None with { Fire = 760 } }, "resistances.fire must be within -100..75 (was 76)." },
         { _goblin with { Resistances = Resistances.None with { Ice = -1010 } }, "resistances.ice must be within -100..75 (was -101)." },
     };

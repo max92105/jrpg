@@ -34,5 +34,6 @@
     { "itemId": "swift_ring", "quantity": 1 }
   ],
   "startLocation": { "mapId": "intro", "position": { "x": 2.5, "y": 2.5 }, "facing": "down" },
-  "fieldSpriteFile": "player.png"
+  "fieldSpriteFile": "player.png",
+  "startingGold": 100
 }

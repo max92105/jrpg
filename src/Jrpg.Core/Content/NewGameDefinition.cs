@@ -14,6 +14,9 @@ public sealed record NewGameDefinition
 
     public required IReadOnlyList<InventoryEntry> StartingItems { get; init; }
 
+    /// <summary>The gold a new game starts with, 0 to <c>Purse.MaxGold</c> (ADR 0031).</summary>
+    public int StartingGold { get; init; }
+
     public required MapLocation StartLocation { get; init; }
 
     /// <summary>The sprite the party walks the map with, a file in the field-sprite art folder (one for everyone; question 58).</summary>

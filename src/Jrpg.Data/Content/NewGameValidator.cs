@@ -3,6 +3,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Party;
 
 namespace Jrpg.Data.Content;
 
@@ -13,6 +14,7 @@ internal static class NewGameValidator
         var problem = FindLeaderChoicesProblem(newGame.LeaderChoices, references)
             ?? FindStartingItemsProblem(newGame.StartingItems, references)
             ?? FindStartLocationProblem(newGame.StartLocation, references)
+            ?? RangeProblems.Within("startingGold", newGame.StartingGold, 0, Purse.MaxGold)
             ?? (string.IsNullOrWhiteSpace(newGame.FieldSpriteFile) ? "fieldSpriteFile must name the map sprite's file." : null);
         if (problem is not null)
         {

@@ -73,6 +73,7 @@ public sealed class GameSession
         var leaderDefinition = catalog.PartyMembers[leaderId];
         var leader = PartyMember.Recruit(leaderDefinition, catalog.ClassOf(leaderDefinition), catalog.Skills, catalog.Rules.Stats);
         var party = new PartyState([leader], [leader], catalog.Rules.Party);
+        party.Purse.Add(newGame.StartingGold);
         var inventory = InventoryHolding(newGame.StartingItems, catalog);
         return new GameSession(party, new ExplorationContext(catalog, inventory, new WorldState(), random), newGame.StartLocation);
     }
@@ -119,8 +120,8 @@ public sealed class GameSession
 
     /// <summary>
     /// Ends the active battle whatever its outcome: a victory grants its experience and rolls the defeated enemies'
-    /// drops into the inventory (ADR 0030), and the encounter is cleared so the grace steps restart and saving works
-    /// again.
+    /// drops into the inventory (ADR 0030) and the gold into the purse (ADR 0031), and the encounter is cleared so the
+    /// grace steps restart and saving works again.
     /// </summary>
     /// <returns>What a victory gave, its drops already in the inventory; null after an escape or a defeat.</returns>
     /// <exception cref="InvalidOperationException">No battle is active, or it isn't over.</exception>
@@ -184,7 +185,19 @@ public sealed class GameSession
             .ToList();
         // Luck is gear, and a fallen member still wears it (decision 356).
         var luckPermille = Party.ActiveMembers.Sum(member => member.Sheet.DropLuckPermille);
-        return new BattleSpoils(rewards, Keep(_dropRoll.Roll(tables, luckPermille)));
+        var drops = Keep(_dropRoll.Roll(tables, luckPermille));
+        return new BattleSpoils(rewards, drops, RollGold(battle));
+    }
+
+    // Gold draws after every item draw, so a seeded battle's item drops don't move (ADR 0031); the purse keeps what
+    // fits and the spoils report that.
+    private int RollGold(BattleState battle)
+    {
+        var drawn = battle.Combatants
+            .Select(combatant => combatant.Enemy?.Gold)
+            .OfType<GoldRange>()
+            .Sum(range => RangeRoll.Within(range.Min, range.Max, _context.Random));
+        return drawn - Party.Purse.Add(drawn);
     }
 
     // Adds the drops to the inventory and returns what went in: copies past a stack's limit are lost, as found ones

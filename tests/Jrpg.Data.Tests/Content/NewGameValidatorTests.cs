@@ -2,6 +2,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Party;
 using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Tests.Content;
@@ -50,6 +51,8 @@ public sealed class NewGameValidatorTests
         { _newGame with { StartLocation = _newGame.StartLocation with { Position = new Point2D(45, 3) } }, "startLocation.position (45, 3) must be inside map 'start' (45x45)." },
         { _newGame with { StartLocation = _newGame.StartLocation with { Position = new Point2D(-0.5, 3) } }, "startLocation.position (-0.5, 3) must be inside map 'start' (45x45)." },
         { _newGame with { FieldSpriteFile = " " }, "fieldSpriteFile must name the map sprite's file." },
+        { _newGame with { StartingGold = -1 }, "startingGold must be within 0..9999999 (was -1)." },
+        { _newGame with { StartingGold = Purse.MaxGold + 1 }, "startingGold must be within 0..9999999 (was 10000000)." },
     };
 
     [Fact]

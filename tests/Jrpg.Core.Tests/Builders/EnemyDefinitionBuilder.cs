@@ -10,6 +10,7 @@ internal sealed class EnemyDefinitionBuilder
     private int _damage = 20;
     private DamageType _damageType = DamageType.Blunt;
     private Resistances _resistances = Resistances.None;
+    private GoldRange? _gold;
     private int _dodge;
     private int _critChance;
     private int _crowdControlResistance;
@@ -64,6 +65,12 @@ internal sealed class EnemyDefinitionBuilder
         return this;
     }
 
+    public EnemyDefinitionBuilder WithGold(int min, int max)
+    {
+        _gold = new GoldRange(min, max);
+        return this;
+    }
+
     public EnemyDefinition Build() => new()
     {
         Id = _name.ToLowerInvariant(),
@@ -81,5 +88,6 @@ internal sealed class EnemyDefinitionBuilder
         CrowdControlResistance = _crowdControlResistance,
         Resistances = _resistances,
         ExperienceReward = 40,
+        Gold = _gold,
     };
 }

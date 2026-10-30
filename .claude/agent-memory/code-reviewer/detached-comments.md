@@ -10,7 +10,8 @@ When a diff adds a member or test just above an existing helper, check the line 
 keeps a memory rule "insert above doc comments"). The reverse also happens: a removed or moved member leaves its comment
 behind on the next member (seen in D1: BattleState's AttackTargeting const moved to AttackEffect, its comment stayed
 above `_turnOrder`; and in A4a: a new test inserted between a comment and Roll_NotEquipment_Throws merged the old
-comment into the new test's).
+comment into the new test's; and in G3: EnemyCatalogValidator.FindGoldProblem inserted under the
+resistances' ADR 0027 comment, which was then extended instead of split).
 
 **Why:** the comment then misdescribes the new member; a misleading comment counts as Critical (cheap fix).
 **How to apply:** in `git diff`, look at the context line right before each `+    [Fact]` / new member, and right after

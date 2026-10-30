@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Party;
 using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
 using static Jrpg.Data.Content.RangeProblems;
@@ -33,7 +34,12 @@ internal static class EnemyCatalogValidator
                 ?? Within("critChance", enemy.CritChance, 0, WholeChance)
                 ?? Within("crowdControlResistance", enemy.CrowdControlResistance, 0, WholeChance)
                 ?? AtLeast("experienceReward", enemy.ExperienceReward, 0)
+                ?? FindGoldProblem(enemy.Gold)
                 ?? FindResistanceProblem(enemy.Resistances);
+
+    // Both ends within the purse (ADR 0031); the max is checked from the min, so a max below it is named.
+    private static string? FindGoldProblem(GoldRange? gold) =>
+        gold is null ? null : Within("gold.min", gold.Min, 0, Purse.MaxGold) ?? Within("gold.max", gold.Max, gold.Min, Purse.MaxGold);
 
     // Content within the floor and cap reads as it plays: past them the battle would clamp it silently (ADR 0027).
     private static string? FindResistanceProblem(Resistances resistances)

@@ -1,5 +1,5 @@
 # Gold, shops and the inn
-Status: approved
+Status: retro pending
 
 Open question 222 (paying for rest, from the class mechanics plan) answered as a feature on 2026-10-29: the developer wants gold, shops and a priced inn. Follows [the forge plan](../done/2026-10-27-forge/README.md), whose Forge screen (opened by an `openForge` step from a forge master NPC) is the model for the Shop screen a shopkeeper opens.
 
@@ -79,7 +79,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **I1. A priced rest waits for payment: `InnStay`** (Core + Data, about 190 lines) → [slices/I1.md](slices/I1.md)
 - [x] **I2a. Move the rest's showing into `RestPlayback`** (Game refactor, about 110 lines, tests unchanged) → [slices/I2a.md](slices/I2a.md)
 - [x] **I2b. The inn asks with its price; Yes pays and rests; short of gold, the refusal shows** (Game + text, about 220 lines) → [slices/I2b.md](slices/I2b.md)
-- [ ] **I3. The editor's rest step takes a price; the innkeeper charges** (Editor + content, about 150 lines) → [slices/I3.md](slices/I3.md)
+- [x] **I3. The editor's rest step takes a price; the innkeeper charges** (Editor + content, about 150 lines) → [slices/I3.md](slices/I3.md)
 
 ## Decisions
 From earlier plans: 103 (gold will exist; the victory view takes it as an addition), 107 (the leader is fixed), 252 (one selection look), 257 (the inn's fade), 339 (Unique reserved), 344 (plain pieces from outside the drops; decision 385 makes shop pieces rolled), 349 (luck is a drop's), 353 (an NPC opens a screen through an event step), 358 (nothing is destroyed for less than it yields), 360 (a saved affix out of range is clamped), 369 (owned pieces only), 370 (a screen over the map fades itself in; refused actions greyed with their reason).

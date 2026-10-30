@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Dialogue;
 using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
+using Jrpg.Core.Party;
 
 namespace Jrpg.Editor.Events;
 
@@ -40,6 +41,8 @@ internal sealed partial class EventStepViewModel : ObservableObject
 
     public bool IsOpenShop => Kind == EventStepKind.OpenShop;
 
+    public bool IsRest => Kind == EventStepKind.Rest;
+
     /// <summary>One message box per line; blank lines are left out.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
@@ -62,6 +65,11 @@ internal sealed partial class EventStepViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
     public partial string ShopId { get; set; } = "";
+
+    /// <summary>The gold an inn charges for the rest (decision 382); empty for a free rest.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
+    public partial string PriceText { get; set; } = "";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
@@ -118,7 +126,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.Still => $"Still: {ImageFile}, {SecondsText} s",
         EventStepKind.Recruit => $"Recruit: {MemberId}",
         EventStepKind.Voice => $"Voice: {VoiceFile}",
-        EventStepKind.Rest => "Rest",
+        EventStepKind.Rest => IsFreeRest ? "Rest" : $"Rest for {PriceText.Trim()} gold",
         EventStepKind.OpenForge => "Open the Forge",
         EventStepKind.OpenShop => $"Open shop: {ShopId}",
         _ => throw new UnreachableException(),
@@ -136,6 +144,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.Still when Seconds(SecondsText) is null => "The seconds must be a number above 0.",
         EventStepKind.Recruit when string.IsNullOrEmpty(MemberId) => "Choose the member who joins.",
         EventStepKind.OpenShop when string.IsNullOrEmpty(ShopId) => "Choose the shop.",
+        EventStepKind.Rest when !IsFreeRest && ValidPrice() is null => $"The price must be empty or a whole number from 1 to {Purse.MaxGold}.",
         EventStepKind.Voice when string.IsNullOrWhiteSpace(VoiceFile) => "Write the voice's file.",
         EventStepKind.GiveItem when WholeNumber(QuantityText, minimum: 1) is null => "The quantity must be a whole number of at least 1.",
         EventStepKind.Warp when WholeNumber(CellXText, minimum: 0) is null || WholeNumber(CellYText, minimum: 0) is null =>
@@ -157,7 +166,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         StillStep still => new(EventStepKind.Still) { ImageFile = still.ImageFile, SecondsText = Text(still.Seconds), Caption = still.Caption ?? "" },
         RecruitStep recruit => new(EventStepKind.Recruit) { MemberId = recruit.MemberId },
         VoiceStep voice => new(EventStepKind.Voice) { VoiceFile = voice.File },
-        RestStep => new(EventStepKind.Rest),
+        RestStep rest => new(EventStepKind.Rest) { PriceText = rest.Price is { } price ? Text(price) : "" },
         OpenForgeStep => new(EventStepKind.OpenForge),
         OpenShopStep shop => new(EventStepKind.OpenShop) { ShopId = shop.ShopId },
         _ => throw new ArgumentException($"Unknown step type {step.GetType().Name}.", nameof(step)),
@@ -179,11 +188,16 @@ internal sealed partial class EventStepViewModel : ObservableObject
             ImageFile.Trim(), Seconds(SecondsText) ?? throw InvalidFields(), string.IsNullOrWhiteSpace(Caption) ? null : Caption.Trim()),
         EventStepKind.Recruit => new RecruitStep(MemberId),
         EventStepKind.Voice => new VoiceStep(VoiceFile.Trim()),
-        EventStepKind.Rest => new RestStep(),
+        EventStepKind.Rest => new RestStep { Price = IsFreeRest ? null : ValidPrice() ?? throw InvalidFields() },
         EventStepKind.OpenForge => new OpenForgeStep(),
         EventStepKind.OpenShop => string.IsNullOrEmpty(ShopId) ? throw InvalidFields() : new OpenShopStep(ShopId),
         _ => throw new UnreachableException(),
     };
+
+    private bool IsFreeRest => string.IsNullOrWhiteSpace(PriceText);
+
+    // Null for a price the step can't take; the purse's most is the ceiling, as the content validator has it.
+    private int? ValidPrice() => WholeNumber(PriceText, minimum: 1) is { } price && price <= Purse.MaxGold ? price : null;
 
     private Speech Speech() => new(
         [.. LinesText.Split('\n').Select(line => line.Trim()).Where(line => line.Length > 0)],

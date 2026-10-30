@@ -5269,14 +5269,15 @@
               "type": "dialogue",
               "speech": {
                 "lines": [
-                  "A placeholder inn. Rest here, free of charge."
+                  "A placeholder inn. Rest here for 20 gold."
                 ],
                 "speaker": "Innkeeper",
                 "portraitFile": null
               }
             },
             {
-              "type": "rest"
+              "type": "rest",
+              "price": 20
             }
           ]
         }

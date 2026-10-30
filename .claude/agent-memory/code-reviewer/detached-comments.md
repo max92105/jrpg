@@ -12,7 +12,7 @@ behind on the next member (seen in D1: BattleState's AttackTargeting const moved
 above `_turnOrder`; and in A4a: a new test inserted between a comment and Roll_NotEquipment_Throws merged the old
 comment into the new test's; and in G3: EnemyCatalogValidator.FindGoldProblem inserted under the
 resistances' ADR 0027 comment, which was then extended instead of split; and in S4 of gold-and-shops: a "serializer
-nullable" comment copied from CraftingRulesValidator landed above a null-list check instead of the null-element one; and in I2a: a type inserted into docs/map.md between `StillRun` and its parenthetical, which then described the new type).
+nullable" comment copied from CraftingRulesValidator landed above a null-list check instead of the null-element one; and in I2a: a type inserted into docs/map.md between `StillRun` and its parenthetical, which then described the new type; and in I3: EventStepViewModel IsFreeRest/Price() inserted under WholeNumber's "Digits only." comment).
 
 **Why:** the comment then misdescribes the new member; a misleading comment counts as Critical (cheap fix).
 **How to apply:** in `git diff`, look at the context line right before each `+    [Fact]` / new member, and right after

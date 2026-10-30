@@ -52,7 +52,7 @@ public sealed class RestPlaybackTests
         Assert.False(playback.IsFading);
     }
 
-    // The innkeeper's stay (20 gold) reached through the start map, the purse holding the given gold.
+    // The inn chest's stay (20 gold) reached through its event, the purse holding the given gold.
     private static (RestPlayback Playback, InnStay Stay) AskingAtTheInn(int gold)
     {
         var session = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowInnChest);

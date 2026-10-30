@@ -45,7 +45,7 @@ public sealed class GameSessionDropTests
     [Fact]
     public void FinishBattle_GearDrop_HasRarityAndAffixes()
     {
-        var power = new AffixDefinition { Id = "power", Stat = StatKind.Power, Min = 2, Max = 5, Kinds = [EquipmentKind.Weapon], Weight = 10 };
+        var power = new AffixDefinition { Id = "power", Stat = StatKind.Power, Min = 2, Max = 5, Kinds = [EquipmentKind.Weapon], Weight = 10, GoldValue = 20 };
         var magicOnly = new LootRules(new Dictionary<Rarity, RarityRule> { [Rarity.Magic] = new(Weight: 1, MinAffixes: 1, MaxAffixes: 1) });
         var plain = Catalog(_goblin with { DropTableId = "goblin" }, _potion);
         var catalog = plain with { Rules = plain.Rules with { Loot = magicOnly }, Affixes = new Dictionary<string, AffixDefinition> { ["power"] = power } };

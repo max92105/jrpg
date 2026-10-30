@@ -88,7 +88,7 @@ public sealed class GearRepairTests
     [Fact]
     public void Repair_WornAffixRaisingMaxHp_KeepsHpAndDropsTheUnknownAffix()
     {
-        var sturdy = new AffixDefinition { Id = "sturdy", Stat = StatKind.Constitution, Min = 1, Max = 10, Kinds = [EquipmentKind.Ring], Weight = 10 };
+        var sturdy = new AffixDefinition { Id = "sturdy", Stat = StatKind.Constitution, Min = 1, Max = 10, Kinds = [EquipmentKind.Ring], Weight = 10, GoldValue = 20 };
         var catalog = CatalogWithPowerAffix with { Affixes = new Dictionary<string, AffixDefinition>(CatalogWithPowerAffix.Affixes) { ["sturdy"] = sturdy } };
         var ring = new SavedGear("power_ring", Rarity.Rare, [new SavedAffix("sturdy", 10), new SavedAffix("vampiric", 3)]);
         var worn = new Dictionary<EquipmentSlot, SavedGear> { [EquipmentSlot.FirstRing] = ring };

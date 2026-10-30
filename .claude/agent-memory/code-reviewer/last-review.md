@@ -5,11 +5,12 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-gold-and-shops, slice S1 (buying stacks in Core: ItemDefinition.Price, Trade/ShopDefinition, ShopStock,
-TradeRefusal, TradeQuote, Shop with QuoteBuy/MostBuyable/TryBuy; ShopBuyTests 12). Round 1.
-Verdict: Ready to commit. verify.ps1 all pass (2951 tests).
+Plan: 2026-10-29-gold-and-shops, slice S2 (affix goldValue, Trade/PriceFormula.PieceValue, Trade/Pricing, ShopStock
+pieces + RolledAtLevel + TryTake, Shop.QuoteBuy/TryBuy(GearPiece); PriceFormulaTests 3, PricingTests 4, ShopPieceTests 5).
+Round 1. Verdict: Ready to commit. verify.ps1 all pass (2967 tests).
 
-- Warning: Shop.cs:62 TryBuy's `quote.IsRefused` untested for StackFull (refused test is ShortOfGold, which TrySpend also refuses); deleting it takes the full total while Inventory.Add clamps - open
-- Suggestion: MostBuyable on an item outside the stock returns >0 while TryBuy refuses it - open
-- Suggestion: ShopDefinition record holds ItemIds list (reference equality; no equality user yet) - open
-- G4 carried items (VictoryScreenView reward bar overlap, RewardRows EXP twice, parallel collections) - not re-raised (other slice, Warning/Suggestions only)
+- Warning: docs/map.md:31 Loot row `AffixDefinition` has two parentheticals (new field list + old one without gold value) - open
+- Suggestion: TryBuy_PieceNotInStock_ReturnsFalse doesn't assert the bag stays empty / stock unchanged - open
+- Follow-up: Pricing.PriceOf(GearPiece) throws KeyNotFoundException for an affix id missing from the map (S3 builds it) - open
+- S1 carried: TryBuy StackFull untested - fixed (ShopBuyTests.TryBuy_StackFull_ChangesNothing exists)
+- S1 suggestions (MostBuyable outside stock, ShopDefinition list equality) - not re-raised

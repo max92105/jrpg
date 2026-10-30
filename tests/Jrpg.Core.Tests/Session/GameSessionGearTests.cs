@@ -94,5 +94,5 @@ public sealed class GameSessionGearTests
     }
 
     private static AffixDefinition Affix(string id, StatKind stat) =>
-        new() { Id = id, Stat = stat, Min = 1, Max = 5, Kinds = [EquipmentKind.Weapon, EquipmentKind.Ring], Weight = 10 };
+        new() { Id = id, Stat = stat, Min = 1, Max = 5, Kinds = [EquipmentKind.Weapon, EquipmentKind.Ring], Weight = 10, GoldValue = 20 };
 }

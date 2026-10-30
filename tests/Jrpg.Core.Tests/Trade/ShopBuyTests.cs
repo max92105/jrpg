@@ -19,7 +19,8 @@ public sealed class ShopBuyTests
 
     public ShopBuyTests()
     {
-        _shop = new Shop(new ShopStock(new ShopDefinition("general", "General store", ["potion", "bomb"]), [_potion, _bomb]), _inventory, _purse);
+        var stock = new ShopStock(new ShopDefinition("general", "General store", ["potion", "bomb"]), [_potion, _bomb], [], rolledAtLevel: 1);
+        _shop = new Shop(stock, _inventory, _purse, new Pricing(new Dictionary<string, int>()));
     }
 
     [Fact]

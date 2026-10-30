@@ -1,5 +1,6 @@
 using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
+using Jrpg.Core.Party;
 using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
 using Jrpg.Data.Items;
@@ -24,7 +25,8 @@ internal static class AffixCatalogValidator
             ?? (affix.Min > affix.Max ? $"min must be at most max (was {affix.Min} and {affix.Max})." : null)
             ?? FindSignProblem(affix)
             ?? FindKindsProblem(affix.Kinds)
-            ?? AtLeast("weight", affix.Weight, 1);
+            ?? AtLeast("weight", affix.Weight, 1)
+            ?? Within("goldValue", affix.GoldValue, 0, Purse.MaxGold);
 
     // As an item's bonus: 0 would roll a line that adds nothing; past the bound one roll outweighs any item.
     private static string? FindValueProblem(string field, int value) =>

@@ -12,7 +12,7 @@ public sealed class ContentCatalogTests
     public void PieceFrom_Affix_TakesItsStatFromThePool()
     {
         var boots = new ItemDefinitionBuilder().WithId("leather_boots").AsWorn(EquipmentKind.Feet).Build();
-        var swift = new AffixDefinition { Id = "swift", Stat = StatKind.Agility, Min = 1, Max = 5, Kinds = [EquipmentKind.Feet], Weight = 10 };
+        var swift = new AffixDefinition { Id = "swift", Stat = StatKind.Agility, Min = 1, Max = 5, Kinds = [EquipmentKind.Feet], Weight = 10, GoldValue = 20 };
         var catalog = new ContentCatalogBuilder().WithItems(boots).WithAffixes(swift).Build();
 
         var piece = catalog.PieceFrom(new SavedGear("leather_boots", Rarity.Magic, [new SavedAffix("swift", 3)]));

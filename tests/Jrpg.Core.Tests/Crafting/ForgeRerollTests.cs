@@ -18,8 +18,8 @@ public sealed class ForgeRerollTests
 
     private static readonly AffixDefinition[] _pool =
     [
-        new() { Id = "power", Stat = StatKind.Power, Min = 2, Max = 5, Kinds = [EquipmentKind.Weapon], Weight = 10 },
-        new() { Id = "crit_chance", Stat = StatKind.CritChance, Min = 1, Max = 3, Kinds = [EquipmentKind.Weapon], Weight = 10 },
+        new() { Id = "power", Stat = StatKind.Power, Min = 2, Max = 5, Kinds = [EquipmentKind.Weapon], Weight = 10, GoldValue = 20 },
+        new() { Id = "crit_chance", Stat = StatKind.CritChance, Min = 1, Max = 3, Kinds = [EquipmentKind.Weapon], Weight = 10, GoldValue = 20 },
     ];
 
     private static readonly CraftingRules _rules = new() { RerollCost = [new("scrap", 2), new("essence", 1)] };

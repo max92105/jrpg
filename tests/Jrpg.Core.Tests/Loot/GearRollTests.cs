@@ -152,5 +152,5 @@ public sealed class GearRollTests
         new(rows.ToDictionary(row => row.Rarity, row => new RarityRule(row.Weight, row.Min, row.Max)));
 
     private static AffixDefinition Affix(string id, StatKind stat, int min, int max, params EquipmentKind[] kinds) =>
-        new() { Id = id, Stat = stat, Min = min, Max = max, Kinds = kinds, Weight = 10 };
+        new() { Id = id, Stat = stat, Min = min, Max = max, Kinds = kinds, Weight = 10, GoldValue = 20 };
 }

@@ -22,6 +22,8 @@ call or a rename. These cases slipped past it:
 - A removed member leaves its noun in the type's own param docs (G1b-2: "the take hint and the refusal").
 - A child's spacing change (ST1a) leaves the parent's reserved-height arithmetic on the old rows; grep the parent for the
   child's old numbers. Sizes and file counts a doc states (C3: "split in two files" with four present) need rechecking.
+- A docs/map.md entry edited by inserting a new parenthetical keeps the old one beside it (gold S2: `AffixDefinition`
+  with two field lists); verify.ps1's two-summaries check only reads code, so read every changed map.md line whole.
 
 **Why:** a comment or doc stating a wrong rule, name or number misleads the next reader.
 

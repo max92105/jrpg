@@ -141,7 +141,7 @@ public sealed class ForgeUpgradeTests
     }
 
     private static AffixDefinition Affix(string id, StatKind stat, int min, int max) =>
-        new() { Id = id, Stat = stat, Min = min, Max = max, Kinds = [EquipmentKind.Weapon], Weight = 10 };
+        new() { Id = id, Stat = stat, Min = min, Max = max, Kinds = [EquipmentKind.Weapon], Weight = 10, GoldValue = 20 };
 
     private static GearRoll NewRoll(AffixDefinition[] pool, params int[] draws) =>
         new(pool, new LootRules(new Dictionary<Rarity, RarityRule>()), new FixedSequenceRandom(draws));

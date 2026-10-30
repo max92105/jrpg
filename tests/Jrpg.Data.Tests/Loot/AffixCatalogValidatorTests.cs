@@ -1,5 +1,6 @@
 using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
+using Jrpg.Core.Party;
 using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
 using Jrpg.Data.Loot;
@@ -16,6 +17,7 @@ public sealed class AffixCatalogValidatorTests
         Max = 5,
         Kinds = [EquipmentKind.Weapon, EquipmentKind.Ring],
         Weight = 10,
+        GoldValue = 20,
     };
 
     public static TheoryData<AffixDefinition, string> InvalidAffixes => new()
@@ -25,6 +27,8 @@ public sealed class AffixCatalogValidatorTests
         { _power with { Max = 101 }, "max must be nonzero and within -100..100 (was 101)." },
         { _power with { Kinds = [] }, "kinds must list at least one kind of gear." },
         { _power with { Weight = 0 }, "weight must be at least 1 (was 0)." },
+        { _power with { GoldValue = -1 }, "goldValue must be within 0..9999999 (was -1)." },
+        { _power with { GoldValue = Purse.MaxGold + 1 }, "goldValue must be within 0..9999999 (was 10000000)." },
         { _power with { Min = -3, Max = 2 }, "min and max must be on the same side of 0, or a roll could add nothing (was -3 and 2)." },
         { _power with { Stat = StatKind.LifeSteal, Min = -5, Max = -1 }, "min must be above 0 for a stat only affixes give (was -5)." },
     };

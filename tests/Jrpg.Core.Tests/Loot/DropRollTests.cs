@@ -103,7 +103,7 @@ public sealed class DropRollTests
         new DropRoll(_items, new GearRoll([], _commonOnly, random), random).Roll(tables, luckPermille: 0);
 
     private static AffixDefinition Affix(string id, StatKind stat) =>
-        new() { Id = id, Stat = stat, Min = 3, Max = 3, Kinds = [EquipmentKind.Weapon], Weight = 10 };
+        new() { Id = id, Stat = stat, Min = 3, Max = 3, Kinds = [EquipmentKind.Weapon], Weight = 10, GoldValue = 20 };
 
     private static DropTable Table(params DropEntry[] entries) => new("table", entries);
 }

@@ -14,9 +14,9 @@ public sealed class GearRollCraftingTests
 
     private static readonly AffixDefinition[] _pool =
     [
-        new() { Id = "power", Stat = StatKind.Power, Min = 2, Max = 5, Kinds = [EquipmentKind.Weapon], Weight = 10 },
-        new() { Id = "crit_chance", Stat = StatKind.CritChance, Min = 1, Max = 3, Kinds = [EquipmentKind.Weapon], Weight = 10 },
-        new() { Id = "dodge", Stat = StatKind.Dodge, Min = 1, Max = 3, Kinds = [EquipmentKind.Feet], Weight = 10 },
+        new() { Id = "power", Stat = StatKind.Power, Min = 2, Max = 5, Kinds = [EquipmentKind.Weapon], Weight = 10, GoldValue = 20 },
+        new() { Id = "crit_chance", Stat = StatKind.CritChance, Min = 1, Max = 3, Kinds = [EquipmentKind.Weapon], Weight = 10, GoldValue = 20 },
+        new() { Id = "dodge", Stat = StatKind.Dodge, Min = 1, Max = 3, Kinds = [EquipmentKind.Feet], Weight = 10, GoldValue = 20 },
     ];
 
     // Power is held and dodge is for feet, so the crit chance is the only pick: only its value is drawn.

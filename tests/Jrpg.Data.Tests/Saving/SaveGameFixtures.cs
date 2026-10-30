@@ -65,7 +65,7 @@ internal static class SaveGameFixtures
     {
         Affixes = new Dictionary<string, AffixDefinition>
         {
-            ["power"] = new() { Id = "power", Stat = StatKind.Power, Min = 2, Max = 5, Kinds = [EquipmentKind.Weapon, EquipmentKind.Ring], Weight = 10 },
+            ["power"] = new() { Id = "power", Stat = StatKind.Power, Min = 2, Max = 5, Kinds = [EquipmentKind.Weapon, EquipmentKind.Ring], Weight = 10, GoldValue = 20 },
         },
     };
 

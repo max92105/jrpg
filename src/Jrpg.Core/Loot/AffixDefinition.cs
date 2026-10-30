@@ -24,4 +24,7 @@ public sealed record AffixDefinition
 
     /// <summary>Its chance against the other affixes a piece may roll, relative.</summary>
     public required int Weight { get; init; }
+
+    /// <summary>What the affix adds to a piece's price in a shop (ADR 0031, decision 375).</summary>
+    public required int GoldValue { get; init; }
 }

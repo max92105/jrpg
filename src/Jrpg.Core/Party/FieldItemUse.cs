@@ -35,10 +35,7 @@ public sealed class FieldItemUse(PartyState party, Inventory inventory)
         }
 
         inventory.TryRemove(item.Id, 1);
-        foreach (var member in party.Members)
-        {
-            member.Rest();
-        }
+        party.RestEveryone();
     }
 
     /// <summary>Who <paramref name="user"/> can use the item on, by the same rules <see cref="Use"/> checks.</summary>

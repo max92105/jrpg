@@ -1,6 +1,7 @@
 using System.Globalization;
 using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Party;
 
 namespace Jrpg.Data.Maps;
 
@@ -142,8 +143,12 @@ internal static class MapEventValidator
         StillStep still => FindStillProblem(still),
         VoiceStep voice when string.IsNullOrWhiteSpace(voice.File) => "voice must name its file.",
         OpenShopStep shop => FindOpenShopProblem(shop, references),
+        RestStep { Price: { } price } => FindRestPriceProblem(price),
         _ => null,
     };
+
+    private static string? FindRestPriceProblem(int price) =>
+        price >= 1 && price <= Purse.MaxGold ? null : $"rest price must be 1 to {Purse.MaxGold} (was {price}).";
 
     private static string? FindOpenShopProblem(OpenShopStep shop, MapReferences references) =>
         references.Content.ShopIds.Contains(shop.ShopId) ? null : $"openShop has unknown shop id '{shop.ShopId}'.";

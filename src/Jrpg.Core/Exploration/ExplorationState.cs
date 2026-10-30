@@ -63,6 +63,9 @@ public sealed class ExplorationState
     /// <summary>What the current recruit step did, for its message; null on any other step.</summary>
     public Recruitment? CurrentRecruitment => _run?.CurrentRecruitment;
 
+    /// <summary>The current priced rest waiting for the Game to pay (decision 382); null on any other step.</summary>
+    public InnStay? CurrentInnStay => _run?.CurrentInnStay;
+
     /// <summary>The voice-over the running event started, for the Game to play; null when none speaks.</summary>
     public VoiceStep? StartedVoice => _run?.StartedVoice;
 

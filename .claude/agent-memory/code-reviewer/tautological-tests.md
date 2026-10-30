@@ -58,3 +58,5 @@ Seen again in gold S2/S3 (second-overload variant): the stack overload's refusal
 Seen again in gold B3 (reset-to-first variant): `NextTab_InTheList_..._GoesToTheFirstRow` moves Down once then checks only that the row is a consumable; with two consumables first, a kept cursor passes. A "goes to the first row" test needs the kept index to land on a different row.
 
 Seen again in gold L2b (stale-equals-expected again): `Right_OnGearRow_PreviewsTheNextActiveMember` asserts `Preview` NotNull, already true from the leader's preview, so a rebuild keyed on the row alone passes. Scene caches keyed on two inputs need a test per input whose expected value differs from the stale one.
+
+Seen again in gold I1 (refusal-only variant): the rest price's validator rows test 0 and MaxGold+1 only, so a check that refuses every price passes. A range check needs a row on each accepted bound too.

@@ -44,6 +44,9 @@ internal sealed class EventRun
     /// <summary>What the current recruit step did; null on any other step.</summary>
     public Recruitment? CurrentRecruitment { get; private set; }
 
+    /// <summary>The current priced rest, waiting for the Game to pay (decision 382); null on any other step.</summary>
+    public InnStay? CurrentInnStay { get; private set; }
+
     /// <summary>
     /// The voice-over this event started, which speaks on over the steps after it; null before one starts and once the
     /// player skips, since skipping silences the cutscene.
@@ -82,6 +85,7 @@ internal sealed class EventRun
     {
         CurrentReceipt = null;
         CurrentRecruitment = null;
+        CurrentInnStay = null;
         for (_index++; _index < Steps.Count; _index++)
         {
             if (ApplyAndCheckWait(Steps[_index]))
@@ -112,18 +116,26 @@ internal sealed class EventRun
             case RecruitStep recruit:
                 CurrentRecruitment = Recruit(recruit.MemberId);
                 return true;
-            case RestStep:
-                foreach (var member in _party.Members)
-                {
-                    member.Rest();
-                }
-
+            case RestStep rest:
+                ApplyRest(rest);
                 return true;
             case DialogueStep or WarpStep or StillStep or OpenForgeStep or OpenShopStep:
                 return true;
             default:
                 throw new InvalidOperationException($"Step {step.GetType().Name} has no rule in EventRun.");
         }
+    }
+
+    // A free rest is given at once; an inn's waits for the Game to pay, resting nobody until then (decision 382).
+    private void ApplyRest(RestStep rest)
+    {
+        if (rest.Price is { } price)
+        {
+            CurrentInnStay = new InnStay(price, _party);
+            return;
+        }
+
+        _party.RestEveryone();
     }
 
     private Recruitment Recruit(string memberId)

@@ -2,6 +2,7 @@ using Jrpg.Core.Dialogue;
 using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Party;
 using Jrpg.Data.Maps;
 
 namespace Jrpg.Data.Tests.Maps;
@@ -76,6 +77,8 @@ public sealed class MapEventValidatorTests
         { WithChestEvent(_openChest with { Steps = [new StillStep("Still.png", 1e20, Caption: null)] }), "event 'chest@1,1_0': step 0: still seconds must be above 0 and a time the game can count (was 1E+20)." },
         { WithChestEvent(_openChest with { Steps = [new StillStep("Still.png", 4, " ")] }), "event 'chest@1,1_0': step 0: still caption must be null or have text." },
         { WithChestEvent(_openChest with { Steps = [new VoiceStep(" ")] }), "event 'chest@1,1_0': step 0: voice must name its file." },
+        { WithChestEvent(_openChest with { Steps = [new RestStep { Price = 0 }] }), "event 'chest@1,1_0': step 0: rest price must be 1 to 9999999 (was 0)." },
+        { WithChestEvent(_openChest with { Steps = [new RestStep { Price = Purse.MaxGold + 1 }] }), "event 'chest@1,1_0': step 0: rest price must be 1 to 9999999 (was 10000000)." },
         { WithChestEvent(_openChest with { Steps = [new DialogueStep(new Speech(["Hi", null!]))] }), "event 'chest@1,1_0': a dialogue's lines hold a null entry." },
         { WithChestEvent(null!), "object 'chest@1,1': events holds a null entry." },
         { _forest with { CellEvents = [null!] }, "cellEvents holds a null entry." },
@@ -114,6 +117,17 @@ public sealed class MapEventValidatorTests
     public void FindProblem_OpenShopKnownShop_ReturnsNull()
     {
         var layout = WithChestEvent(_openChest with { Steps = [new OpenShopStep("general_store")] });
+
+        Assert.Null(MapEventValidator.FindProblem(layout, _references));
+    }
+
+    // The bounds themselves are accepted: the innkeeper's price must load.
+    [Theory]
+    [InlineData(1)]
+    [InlineData(Purse.MaxGold)]
+    public void FindProblem_RestPriceAtBounds_ReturnsNull(int price)
+    {
+        var layout = WithChestEvent(_openChest with { Steps = [new RestStep { Price = price }] });
 
         Assert.Null(MapEventValidator.FindProblem(layout, _references));
     }

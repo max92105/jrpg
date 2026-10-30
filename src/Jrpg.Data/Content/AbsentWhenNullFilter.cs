@@ -17,6 +17,9 @@ internal static class AbsentWhenNullFilter
 
         // Decision 185: only the intros are gated on the leader.
         (typeof(MapEvent), "onlyWhenLeaderId"),
+
+        // Decision 382: only an inn prices a rest.
+        (typeof(RestStep), "price"),
     ];
 
     public static void SkipNullOptionalFields(JsonTypeInfo typeInfo)

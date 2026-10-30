@@ -33,6 +33,7 @@ public sealed class ContentFileWriterTests : IDisposable
             new SwapObjectStep("chest_opened"),
             new WarpStep("forest", new GridCell(1, 2)),
             new RestStep(),
+            new RestStep { Price = 20 },
             new OpenForgeStep(),
             new OpenShopStep("general_store"),
         ];
@@ -46,6 +47,15 @@ public sealed class ContentFileWriterTests : IDisposable
         Assert.Equal(["Hello."], speech.Lines);
         Assert.Equal(("Sarxian", null), (speech.Speaker, speech.PortraitFile));
         Assert.Contains("\"type\": \"giveItem\"", File.ReadAllText(_path), StringComparison.Ordinal);
+    }
+
+    // The price came after the maps were written: a free rest writes back byte for byte, without the field.
+    [Fact]
+    public void Write_FreeRest_LeavesOutThePrice()
+    {
+        ContentFileWriter.Write(_path, new EventStep[] { new RestStep() });
+
+        Assert.DoesNotContain("price", File.ReadAllText(_path), StringComparison.Ordinal);
     }
 
     [Fact]

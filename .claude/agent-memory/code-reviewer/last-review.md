@@ -5,11 +5,13 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-gold-and-shops, slice T3 (selling: stacks via picker, pieces via priced ConfirmPrompt; Purchase became ShopCounter; Ui/PieceName).
-Round 1. Verdict: Ready to commit. verify.ps1 all pass (3117 tests).
+Plan: 2026-10-29-gold-and-shops, slice I1 (RestStep.Price; Exploration/InnStay; EventRun.CurrentInnStay/ApplyRest; validator price range; AbsentWhenNullFilter price).
+Round 1. Verdict: Ready to commit. verify.ps1 all pass (3127 tests).
 
-- Suggestion, open: a sold piece's notice uses the row's base name ("Sold: Bronze Sword.") while the question names it with PieceName.Of ("Magic Bronze Sword"); use PieceName.Of in ShopCounter.Sell's notice
-- Suggestion, open: ShopCounter keeps Picker/Prompt and _settle as fields that must agree (`_settle ?? throw` guard); hold the open deal as one value
-- Follow-up: ShopScene at 296 lines; the next slice touching it crosses 300
-- Follow-up (carried): ShopListView.Draw 5 parameters; private Draw helpers (ShopDetailView.DrawRow 6, DrawPreview/DrawPicker 5) exceed max 4
-- T2 carried: notice-priority Warning fixed (deal's line first); Left-in-picker scene test fixed (Left_InPicker_StepsTheCountDownNotTheMember); Purchase _picked/Picker pairing superseded by the ShopCounter suggestion above
+- Warning, open: "rest every member" loop now in three places (FieldItemUse.RestParty, EventRun.ApplyRest, InnStay.TryPay); add PartyState.RestEveryone() and call it from all three
+- Warning, open: validator tests only the refused prices (0, MaxGold+1); an always-refusing FindRestPriceProblem passes; add an accepted-bounds test (Price 1 and Purse.MaxGold return null)
+- Suggestion, open: InnStay.TryPay checks the purse twice (CanPay then TrySpend); `_isPaid || !TrySpend(Price)`
+- Suggestion, open: no test that a free RestStep writes no "price" key (filter line deletable with suite green)
+- Suggestion, open: ApplyRest always returns true; make it void and return true at the case
+- Follow-up (carried, grep 2026-10-30): ShopScene 296 lines; ShopListView.Draw 5 params, ShopDetailView.DrawPicker/ShopListView private Draw helpers 5 params
+- T3 suggestions (sold-piece notice name, ShopCounter split open state) not re-raised: outside I1

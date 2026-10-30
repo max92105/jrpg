@@ -70,6 +70,17 @@ public sealed class PartyState
         Members.FirstOrDefault(member => member.Id == id)
         ?? throw new ArgumentException($"'{id}' is not a recruited member.", nameof(id));
 
+    /// <summary>
+    /// Rests every recruited member, the reserve included (decision 230): a rest item, a free rest, a paid inn.
+    /// </summary>
+    public void RestEveryone()
+    {
+        foreach (var member in Members)
+        {
+            member.Rest();
+        }
+    }
+
     /// <returns>False if the party is full or the member is already active.</returns>
     public bool TryAddToActive(PartyMember member)
     {

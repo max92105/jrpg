@@ -1,4 +1,5 @@
 using Jrpg.Core.Content;
+using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
 using Jrpg.Core.Trade;
 
@@ -39,11 +40,30 @@ internal sealed class ShopStocks
         return stock;
     }
 
+    /// <summary>Every opened shop's stock as a save keeps it.</summary>
+    public IReadOnlyList<SavedShopStock> Capture() => [.. _stocks.Values.Select(stock => stock.ToSaved())];
+
+    /// <summary>
+    /// The saved stocks back as stocks, each piece through the catalog (the save is assumed repaired, ADR 0007), so a
+    /// shop shows the pieces it had and draws nothing until the leader gains a level.
+    /// </summary>
+    public void Restore(IReadOnlyList<SavedShopStock> saved)
+    {
+        foreach (var stock in saved)
+        {
+            var shop = _catalog.Shops[stock.ShopId];
+            _stocks[stock.ShopId] = new ShopStock(shop, StacksOf(shop), stock.Pieces.Select(_catalog.PieceFrom), stock.RolledAtLevel);
+        }
+    }
+
     private ShopStock Roll(ShopDefinition shop, int leaderLevel)
     {
-        var items = shop.ItemIds.Select(id => _catalog.Items[id]).ToList();
-        var stacks = items.Where(item => item.Equipment is null).ToList();
-        var pieces = items.Where(item => item.Equipment is not null).Select(item => _gearRoll.Roll(item, luckPermille: 0));
-        return new ShopStock(shop, stacks, pieces, leaderLevel);
+        var pieces = ItemsOf(shop).Where(item => item.Equipment is not null).Select(item => _gearRoll.Roll(item, luckPermille: 0));
+        return new ShopStock(shop, StacksOf(shop), pieces, leaderLevel);
     }
+
+    // The stacks are the shop's items sold by the copy, never rolled: the same whenever the stock is built.
+    private List<ItemDefinition> StacksOf(ShopDefinition shop) => [.. ItemsOf(shop).Where(item => item.Equipment is null)];
+
+    private IEnumerable<ItemDefinition> ItemsOf(ShopDefinition shop) => shop.ItemIds.Select(id => _catalog.Items[id]);
 }

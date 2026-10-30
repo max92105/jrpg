@@ -113,7 +113,9 @@ public sealed class GameSession
 
         party.Purse.Add(save.Gold);
         var world = new WorldState(save.CompletedEvents, save.ObjectSwaps);
-        return new GameSession(party, new ExplorationContext(catalog, inventory, world, random), save.Location) { PlayTime = save.PlayTime };
+        var session = new GameSession(party, new ExplorationContext(catalog, inventory, world, random), save.Location) { PlayTime = save.PlayTime };
+        session._stocks.Restore(save.ShopStocks);
+        return session;
     }
 
     /// <summary>
@@ -185,7 +187,7 @@ public sealed class GameSession
             CompletedEvents = _context.World.CompletedEvents,
             ObjectSwaps = _context.World.ObjectSwaps,
             Gold = Party.Purse.Gold,
-            ShopStocks = [],
+            ShopStocks = _stocks.Capture(),
         };
     }
 

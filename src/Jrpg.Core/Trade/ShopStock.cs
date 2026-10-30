@@ -34,6 +34,9 @@ public sealed class ShopStock
     /// </summary>
     public int RolledAtLevel { get; }
 
+    /// <summary>The stock as a save keeps it: the shop's id, the roll level and each piece still for sale.</summary>
+    public SavedShopStock ToSaved() => new(Definition.Id, RolledAtLevel, [.. _pieces.Select(piece => piece.ToSaved())]);
+
     /// <summary>Takes the first piece equal to <paramref name="piece"/> out of the stock.</summary>
     /// <returns>False when the stock holds no such piece.</returns>
     internal bool TryTake(GearPiece piece) => _pieces.Remove(piece);

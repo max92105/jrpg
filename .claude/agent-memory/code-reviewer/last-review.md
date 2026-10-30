@@ -5,12 +5,10 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-gold-and-shops, slice S5 (Session/ShopStocks: StockFor(shopId, leaderLevel) rolls when missing or
-RolledAtLevel < level; GameSession._pricing/_stocks + ShopFor; ShopStocksTests 6, GameSessionShopTests 2).
-Round 1. Verdict: Ready to commit. verify.ps1 all pass (3015 tests).
+Plan: 2026-10-29-gold-and-shops, slice S6 (ShopStock.ToSaved; ShopStocks.Capture/Restore + StacksOf;
+GameSession Capture/Restore; Data/Saving/ShopStockRepair; GearRepair.RepairAffixes internal; fixture general_store).
+Round 1. Verdict: Ready to commit. verify.ps1 all pass (3025 tests).
 
-- Suggestion: GameSessionShopTests borrows ShopStocksTests.Catalog() (test class reaching into another) - open
-- Suggestion: StockFor_PieceBought_StaysGoneUntilTheReroll asserts the reroll only by count 2 - open
-- S4 carried: ShopCatalogValidator `ItemIds is null` - fixed (grep finds none)
-- S4 carried: sellPercent hand-rolled message - fixed (RangeProblems.Within)
-- S4 carried suggestions (test count, pinned share 50) - not re-raised (suggestions, previous slice)
+- Suggestion: ShopStockRepair.IsKept reports changes from inside a Where predicate (side effect hidden in a query) - open
+- Suggestion: saved RolledAtLevel not bounded by the XP table's max level: a lowered cap leaves the stock never rerolling - open
+- S5 carried suggestions (borrowed Catalog(), reroll asserted by count) - not re-raised (suggestions, previous slice)

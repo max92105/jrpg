@@ -37,7 +37,7 @@ internal static class SaveGameFixtures
         CompletedEvents = [new MapEventKey("start", "0bff6243_0")],
         ObjectSwaps = [new ObjectSwap("start", "0bff6243", "chest_opened")],
         Gold = 250,
-        ShopStocks = [new SavedShopStock("general", RolledAtLevel: 3, [new SavedGear("bronze_sword", Rarity.Magic, [new SavedAffix("power", 4)])])],
+        ShopStocks = [new SavedShopStock("general_store", RolledAtLevel: 3, [new SavedGear("bronze_sword", Rarity.Magic, [new SavedAffix("power", 4)])])],
     };
 
     public static readonly PartyMemberProgress Sarxian = new("sarxian", Level: 3, Experience: 42, Hp: 150, Wearing((EquipmentSlot.Weapon, "bronze_sword"), (EquipmentSlot.Chest, "chain_mail")), LastingAmounts: new Dictionary<string, int>());

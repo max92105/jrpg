@@ -105,9 +105,13 @@ internal sealed class GearRepair
         }
     }
 
-    // The piece with only the affixes the pool still has, each value within its affix's current range (decision 360):
-    // every change is reported, never silent.
-    private SavedGear RepairAffixes(SavedGear saved, string owner)
+    /// <summary>
+    /// The piece with only the affixes the pool still has, each value within its affix's current range (decision 360):
+    /// every change is reported, never silent. Shared with the shops' stocks, which clamp the same way.
+    /// </summary>
+    /// <param name="saved">The piece as the save keeps it.</param>
+    /// <param name="owner">Who holds it, for the report.</param>
+    internal SavedGear RepairAffixes(SavedGear saved, string owner)
     {
         var repaired = new List<SavedAffix>();
         foreach (var affix in saved.Affixes)

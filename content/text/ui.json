@@ -234,9 +234,12 @@
   "forge_rolled_piece_name": "{rarity} {name}",
   "forge_upgraded": "{name} is now {rarity}.",
   "forge_rerolled": "{name}'s affixes were rolled again.",
-  "shop_hint": "Left and Right choose Buy or Sell; Confirm enters the list.",
+  "shop_hint": "Left and Right choose Buy or Sell; Confirm enters the list; {previous} and {next} change the category.",
   "shop_empty": "Nothing for sale.",
   "shop_buy": "Buy",
   "shop_sell": "Sell",
-  "shop_nothing_to_sell": "Nothing to sell."
+  "shop_nothing_to_sell": "Nothing to sell.",
+  "shop_column_item": "Item",
+  "shop_column_owned": "Owned",
+  "shop_column_price": "Price"
 }

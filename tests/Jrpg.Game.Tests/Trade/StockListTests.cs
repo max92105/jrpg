@@ -2,6 +2,7 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Session;
 using Jrpg.Core.Trade;
+using Jrpg.Game.Menus;
 using Jrpg.Game.Tests.Exploration;
 using Jrpg.Game.Tests.Ui;
 using Jrpg.Game.Trade;
@@ -89,6 +90,20 @@ public sealed class StockListTests
         list.Refresh();
 
         Assert.All(list.Rows, row => Assert.True(row.IsAvailable));
+    }
+
+    [Fact]
+    public void Refresh_WeaponsCategory_ShowsOnlyWeapons()
+    {
+        var session = NewSession();
+        var list = new StockList(session.ShopFor("general_store"), session.Inventory, Font());
+        list.Selection.MoveDown();
+
+        list.Refresh(InventoryCategory.Weapons);
+
+        Assert.NotEmpty(list.Rows);
+        Assert.All(list.Rows, row => Assert.Equal(EquipmentKind.Weapon, row.Item.Equipment?.Kind));
+        Assert.Equal(0, list.Selection.SelectedIndex);
     }
 
     private static GameSession NewSession() => StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);

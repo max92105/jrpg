@@ -1,6 +1,7 @@
 using FontStashSharp;
 using Jrpg.Core.Items;
 using Jrpg.Core.Trade;
+using Jrpg.Game.Menus;
 using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Trade;
@@ -17,6 +18,7 @@ internal sealed class SaleList
     private readonly IReadOnlyDictionary<string, ItemDefinition> _items;
     private readonly SpriteFontBase _font;
     private TradeRow[] _rows = [];
+    private InventoryCategory _category = InventoryCategory.All;
 
     /// <param name="sales">The session's sales, which quote each row.</param>
     /// <param name="inventory">The party's: what can be sold.</param>
@@ -41,10 +43,21 @@ internal sealed class SaleList
     /// <summary>
     /// Builds the rows again; the cursor stays on its row, or the last one once the list got shorter.
     /// </summary>
-    public void Refresh()
+    public void Refresh() => Rebuild(Selection.SelectedIndex ?? 0);
+
+    /// <summary>Shows <paramref name="category"/>'s rows (decision 384), the cursor on the first.</summary>
+    public void Refresh(InventoryCategory category)
     {
-        _rows = [.. _inventory.Entries.Select(StackRow), .. _inventory.Gear.Select(PieceRow)];
-        Selection.Reset(_rows.Length, Selection.SelectedIndex ?? 0, ShopListView.VisibleRows);
+        _category = category;
+        Rebuild(0);
+    }
+
+    private void Rebuild(int selected)
+    {
+        var stacks = InventoryFilter.SelectStacks(_category, _inventory.Entries, _items);
+        var pieces = InventoryFilter.SelectPieces(_category, _inventory.Gear);
+        _rows = [.. stacks.Select(StackRow), .. pieces.Select(PieceRow)];
+        Selection.Reset(_rows.Length, selected, ShopListView.VisibleRows);
     }
 
     private TradeRow StackRow(InventoryEntry entry)

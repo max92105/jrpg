@@ -54,3 +54,5 @@ Seen again in stats M2a (fixture-default variant): builder defense default 5 →
 vacuous. When a builder default changes, grep test names for the stat's word and check each still sets a non-zero value.
 
 Seen again in gold S2/S3 (second-overload variant): the stack overload's refusal branches are tested, the piece overload's (not in stock, unpriced base, not owned) are not. Check each overload's false paths.
+
+Seen again in gold B3 (reset-to-first variant): `NextTab_InTheList_..._GoesToTheFirstRow` moves Down once then checks only that the row is a consumable; with two consumables first, a kept cursor passes. A "goes to the first row" test needs the kept index to land on a different row.

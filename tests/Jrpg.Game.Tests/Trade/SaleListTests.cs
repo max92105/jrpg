@@ -2,6 +2,7 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Session;
 using Jrpg.Core.Stats;
 using Jrpg.Core.Trade;
+using Jrpg.Game.Menus;
 using Jrpg.Game.Tests.Crafting;
 using Jrpg.Game.Tests.Exploration;
 using Jrpg.Game.Tests.Ui;
@@ -71,6 +72,18 @@ public sealed class SaleListTests
         Assert.Empty(list.Rows);
         Assert.Null(list.Selection.Cursor);
         Assert.Null(list.SelectedRow);
+    }
+
+    [Fact]
+    public void Refresh_MaterialsCategory_ShowsOnlyMaterials()
+    {
+        var session = ForgeSessions.WithoutLoosePieces();
+        session.Inventory.Add(_items["scrap"], 3);
+        var list = NewList(session);
+
+        list.Refresh(InventoryCategory.Materials);
+
+        Assert.Equal(["scrap"], list.Rows.Select(row => row.Item.Id));
     }
 
     private static SaleList NewList(GameSession session) =>

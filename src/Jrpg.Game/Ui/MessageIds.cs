@@ -649,7 +649,9 @@ internal static class MessageIds
     /// <summary>Placeholder <c>{name}</c>: a piece whose affixes were drawn again (decision 352).</summary>
     public const string ForgeRerolled = "forge_rerolled";
 
-    /// <summary>The Shop footer's line.</summary>
+    /// <summary>
+    /// Placeholders <c>{previous}</c> and <c>{next}</c> (the tab buttons' labels): the Shop footer's line.
+    /// </summary>
     public const string ShopHint = "shop_hint";
 
     /// <summary>The Shop's line while its stock holds nothing to buy.</summary>
@@ -663,4 +665,11 @@ internal static class MessageIds
 
     /// <summary>The Sell list's line while the party owns nothing to sell.</summary>
     public const string ShopNothingToSell = "shop_nothing_to_sell";
+
+    /// <summary>The Shop lists' column titles: the item, how many are owned, the price.</summary>
+    public const string ShopColumnItem = "shop_column_item";
+
+    public const string ShopColumnOwned = "shop_column_owned";
+
+    public const string ShopColumnPrice = "shop_column_price";
 }

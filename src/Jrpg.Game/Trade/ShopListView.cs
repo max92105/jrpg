@@ -8,59 +8,78 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Trade;
 
 /// <summary>
-/// Draws the Shop's list column: a page column (decision 269) with the Buy and Sell tabs above the shown tab's rows
-/// (icon, name in its rarity's color, how many are owned, the price after the coin), a refused row greyed (decision
-/// 370), under the shared selection (decision 252); or a line when the tab has nothing to show. While the cursor is on
-/// the tabs the chosen tab carries the pointer and the row below stays chosen, dimmed.
+/// Draws the Shop's list column: the category rail at its left (the Inventory's, decision 384), a page column (decision
+/// 269) with the Buy and Sell tabs, the column titles and the shown tab's rows (icon, name in its rarity's color, how
+/// many are owned, the price after the coin), a refused row greyed (decision 370), under the shared selection (decision
+/// 252); or a line when the tab has nothing to show. While the cursor is on the tabs the chosen tab carries the pointer
+/// and the row below stays chosen, dimmed.
 /// </summary>
 internal sealed class ShopListView
 {
     /// <summary>How many rows show at once; more scroll.</summary>
     public const int VisibleRows = 13;
 
-    // The list column at 1920 (the slice's arithmetic): the rows sit 28 px inside the column, as the Inventory's and
-    // the Forge's, so the pointer stays in it; the two tabs (the victory card's pointed tab) take 48 px plus a 12 px
-    // gap at the top, the column titles 36 more; then 52 px rows with a 40 px icon, the name from 96, the owned count
-    // ending at 760 and the price at 960, all from the column's left.
+    // The list column at 1920 (the slice's arithmetic): the rail takes the left, then the rows sit 28 px inside the
+    // rest of the column, as the Inventory's, so the pointer stays in it; the two tabs (the victory card's pointed tab)
+    // take 48 px plus a 12 px gap at the top, the column titles 36 more; then 52 px rows with a 40 px icon, the name
+    // after it, the owned count ending 200 px before the right edge and the price at the right edge.
+    private const int RailGap = 12;
     private const int Margin = 28;
     private const int TabsHeight = 48;
     private const int TabGap = 24;
-    private const int RowsTop = TabsHeight + 12 + 36;
+    private const int TitlesTop = TabsHeight + 12;
+    private const int RowsTop = TitlesTop + ColumnTitles.Height;
     private const int RowHeight = 52;
     private const int IconSize = 40;
-    private const int NameLeft = 96 - Margin;
-    private const int OwnedRight = 760 - Margin;
-    private const int PriceRight = 960 - Margin;
+    private const int NameLeft = IconSize + 28;
+    private const int OwnedRightInset = 200;
+    private const int LabelPixels = 18;
 
     private readonly UiTextures _ui;
     private readonly SpriteFontBase _font;
     private readonly ColumnPanelView _panel = new(UiTheme.PageColumn);
+    private readonly CategoryRailView _rail;
+    private readonly ColumnTitles _columnTitles;
     private readonly GoldAmountView _gold;
     private readonly MeasuredText[] _tabLabels;
     private readonly string[] _emptyLines;
 
-    /// <param name="text">The tabs' labels and the empty lines.</param>
-    /// <param name="ui">The shared textures: icons, the coin, the selected row, the tabs.</param>
+    /// <param name="text">The tabs' labels, the column titles and the empty lines.</param>
+    /// <param name="ui">The shared textures: icons, the coin, the selected row, the tabs, the rail.</param>
     /// <param name="font">The rows' font, which the lists measured them with.</param>
     public ShopListView(ScreenText text, UiTextures ui, SpriteFontBase font)
     {
         _ui = ui;
         _font = font;
+        _rail = new CategoryRailView(ui);
         _gold = new GoldAmountView(font, ui);
-        _tabLabels = [MeasuredText.Of(font, text.Messages.Text(MessageIds.ShopBuy)), MeasuredText.Of(font, text.Messages.Text(MessageIds.ShopSell))];
-        _emptyLines = [text.Messages.Text(MessageIds.ShopEmpty), text.Messages.Text(MessageIds.ShopNothingToSell)];
+        var messages = text.Messages;
+        _columnTitles = new ColumnTitles(
+            text.Fonts.FontAt(LabelPixels),
+            ui,
+            [
+                ColumnTitle.FromLeft(messages.Text(MessageIds.ShopColumnItem), NameLeft),
+                ColumnTitle.FromRight(messages.Text(MessageIds.ShopColumnOwned), OwnedRightInset),
+                ColumnTitle.FromRight(messages.Text(MessageIds.ShopColumnPrice), 0),
+            ]);
+        _tabLabels = [MeasuredText.Of(font, messages.Text(MessageIds.ShopBuy)), MeasuredText.Of(font, messages.Text(MessageIds.ShopSell))];
+        _emptyLines = [messages.Text(MessageIds.ShopEmpty), messages.Text(MessageIds.ShopNothingToSell)];
     }
 
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the gradients, the icons and the plain pixel come from.</param>
-    /// <param name="place">The tab shown, where the cursor is, and the shown tab's rows.</param>
-    /// <param name="area">The column's area; the panel runs the screen's height behind it.</param>
+    /// <param name="place">The tab shown, its category rail, where the cursor is, and the shown tab's rows.</param>
+    /// <param name="area">The column's area; the panels run the screen's height behind it.</param>
     /// <param name="opacity">The Shop's fade.</param>
     public void Draw(SpriteBatch batch, TextureLibrary textures, Place place, Rectangle area, float opacity)
     {
-        _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(area), opacity);
-        var inset = new Rectangle(area.X + Margin, area.Y, area.Width - (2 * Margin), area.Height);
+        var listColumn = area with { X = area.X + CategoryRailView.Width, Width = area.Width - CategoryRailView.Width };
+        _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(listColumn), opacity);
+        _rail.Draw(batch, textures, new CategoryRailView.Place(place.Rail, area), opacity);
+        var left = listColumn.X + RailGap + Margin;
+        var inset = new Rectangle(left, area.Y, listColumn.Right - Margin - left, area.Height);
         DrawTabs(batch, textures, place, inset, opacity);
+        _columnTitles.Draw(batch, textures, new Rectangle(inset.X, inset.Y + TitlesTop, inset.Width, 0), opacity);
         var firstRow = new Rectangle(inset.X, inset.Y + RowsTop, inset.Width, RowHeight);
         if (place.Selection.Cursor is not { } cursor)
         {
@@ -121,8 +140,8 @@ internal sealed class ShopListView
         var textTop = TextTop(row);
         batch.Draw(_ui.Icon(textures, entry.Item.IconFile, IconSize), new Vector2(row.X, row.Y + ((RowHeight - IconSize) / 2)), Color.White * opacity);
         batch.DrawString(_font, entry.Name.Text, new Vector2(row.X + NameLeft, textTop), nameColor);
-        batch.DrawString(_font, entry.Owned.Text, new Vector2(row.X + OwnedRight - entry.Owned.Width, textTop), textColor);
-        var priceLeft = row.X + PriceRight - _gold.WidthOf(entry.Price);
+        batch.DrawString(_font, entry.Owned.Text, new Vector2(row.Right - OwnedRightInset - entry.Owned.Width, textTop), textColor);
+        var priceLeft = row.Right - _gold.WidthOf(entry.Price);
         _gold.Draw(batch, textures, new GoldAmountView.Place(entry.Price, new Vector2(priceLeft, textTop), entry.IsAvailable ? UiTheme.TextPrimary : UiTheme.TextDisabled), opacity);
     }
 
@@ -130,9 +149,12 @@ internal sealed class ShopListView
 
     /// <summary>What the column draws this frame.</summary>
     /// <param name="Tab">The tab shown, whose rows these are.</param>
+    /// <param name="Rail">The shown tab's category rail.</param>
     /// <param name="IsOnTabs">Whether the cursor is on the tabs rather than in the list.</param>
     /// <param name="TabPointer">The pointer bobbing on the chosen tab.</param>
-    /// <param name="Rows">The shown tab's rows.</param>
-    /// <param name="Selection">The cursor over them and the gliding highlight; no cursor when the tab is empty.</param>
-    public readonly record struct Place(ShopTab Tab, bool IsOnTabs, SelectionMotion TabPointer, IReadOnlyList<TradeRow> Rows, RowSelection Selection);
+    /// <param name="Rows">The shown tab's rows, in its category.</param>
+    /// <param name="Selection">
+    /// The cursor over them and the gliding highlight; no cursor when the category is empty.
+    /// </param>
+    public readonly record struct Place(ShopTab Tab, CategoryRail Rail, bool IsOnTabs, SelectionMotion TabPointer, IReadOnlyList<TradeRow> Rows, RowSelection Selection);
 }

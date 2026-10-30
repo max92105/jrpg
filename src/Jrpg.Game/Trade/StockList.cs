@@ -1,6 +1,7 @@
 using FontStashSharp;
 using Jrpg.Core.Items;
 using Jrpg.Core.Trade;
+using Jrpg.Game.Menus;
 using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Trade;
@@ -16,6 +17,7 @@ internal sealed class StockList
     private readonly Inventory _inventory;
     private readonly SpriteFontBase _font;
     private TradeRow[] _rows = [];
+    private InventoryCategory _category = InventoryCategory.All;
 
     /// <param name="shop">Whose stock is listed and quotes each row.</param>
     /// <param name="inventory">The party's, for what is owned.</param>
@@ -38,10 +40,19 @@ internal sealed class StockList
     /// <summary>
     /// Builds the rows again; the cursor stays on its row, or the last one once the list got shorter.
     /// </summary>
-    public void Refresh()
+    public void Refresh() => Rebuild(Selection.SelectedIndex ?? 0);
+
+    /// <summary>Shows <paramref name="category"/>'s rows (decision 384), the cursor on the first.</summary>
+    public void Refresh(InventoryCategory category)
     {
-        _rows = [.. _shop.Stock.Definition.ItemIds.SelectMany(RowsOf)];
-        Selection.Reset(_rows.Length, Selection.SelectedIndex ?? 0, ShopListView.VisibleRows);
+        _category = category;
+        Rebuild(0);
+    }
+
+    private void Rebuild(int selected)
+    {
+        _rows = [.. _shop.Stock.Definition.ItemIds.SelectMany(RowsOf).Where(row => InventoryFilter.Shows(_category, row.Item))];
+        Selection.Reset(_rows.Length, selected, ShopListView.VisibleRows);
     }
 
     // A stack entry is one row; a gear entry is one row per piece still in the stock (none once all are bought).

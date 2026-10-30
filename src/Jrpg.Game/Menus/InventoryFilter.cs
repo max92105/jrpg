@@ -15,15 +15,18 @@ internal static class InventoryFilter
         InventoryCategory category,
         IReadOnlyList<InventoryEntry> owned,
         IReadOnlyDictionary<string, ItemDefinition> items) =>
-        [.. owned.Where(entry => Keeps(category, items[entry.ItemId]))];
+        [.. owned.Where(entry => Shows(category, items[entry.ItemId]))];
 
     /// <param name="category">The category on show.</param>
     /// <param name="gear">The inventory's pieces, in pickup order.</param>
     public static IReadOnlyList<GearPiece> SelectPieces(InventoryCategory category, IReadOnlyList<GearPiece> gear) =>
-        [.. gear.Where(piece => Keeps(category, piece.Base))];
+        [.. gear.Where(piece => Shows(category, piece.Base))];
 
-    // A consumable is anything with an effect; the Armor tab is every piece of equipment that isn't a weapon.
-    private static bool Keeps(InventoryCategory category, ItemDefinition item) => category switch
+    /// <summary>
+    /// Whether the category shows the item: a consumable is anything with an effect; Armor is every piece of equipment
+    /// that isn't a weapon. The Shop's lists share it (decision 384).
+    /// </summary>
+    public static bool Shows(InventoryCategory category, ItemDefinition item) => category switch
     {
         InventoryCategory.All => true,
         InventoryCategory.Consumables => item.Effect is not null,

@@ -1,4 +1,5 @@
 using FontStashSharp;
+using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Ui;
@@ -42,7 +43,9 @@ internal sealed class ShopView
     private readonly SpriteFontBase _infoFont;
     private readonly SpriteFontBase _bodyFont;
     private readonly string _name;
-    private readonly string _hint;
+    private readonly UiMessages _messages;
+    private string _hint = string.Empty;
+    private InputDevice? _hintDevice;
     private MeasuredText _shownGold = new(string.Empty, 0);
     private int _shownGoldAmount = -1;
 
@@ -57,7 +60,22 @@ internal sealed class ShopView
         _gold = new GoldAmountView(_infoFont, ui);
         _list = new ShopListView(text, ui, _bodyFont);
         _name = name;
-        _hint = text.Messages.Text(MessageIds.ShopHint);
+        _messages = text.Messages;
+    }
+
+    /// <summary>Names the tab buttons in the footer for the device in use, formatted only when it changes.</summary>
+    public void ShowDevice(InputDevice device)
+    {
+        if (device == _hintDevice)
+        {
+            return;
+        }
+
+        _hintDevice = device;
+        _hint = _messages.Format(
+            MessageIds.ShopHint,
+            new MessageArgument("previous", ButtonLabels.Of(GameButton.PreviousTab, device)),
+            new MessageArgument("next", ButtonLabels.Of(GameButton.NextTab, device)));
     }
 
     /// <summary>Formats the gold only when the purse changed, so drawing allocates nothing.</summary>

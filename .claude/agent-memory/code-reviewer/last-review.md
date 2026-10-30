@@ -5,10 +5,8 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-gold-and-shops, slice E2 (editor openShop step, StepChoices.ShopIds, Shopkeeper preset).
-Round 1. Verdict: Ready to commit. verify.ps1 all pass (3047 tests).
+Plan: 2026-10-29-gold-and-shops, slice N1 (shopkeeper on the start map at (27, 14), RepositoryShopTests, StartMapShopkeeperTests).
+Round 1. Verdict: Ready to commit. verify.ps1 all pass (3050 tests). No findings.
 
-- Suggestion: docs/map.md Events row says EventStepViewModel is "one view model per step kind"; it is one class for every kind (Kind picks the fields): reword to "one per step, its fields chosen by kind" - open
-- Fixed (carried from E1): docs/map.md Flow row no longer lists ForgeTransitions
-- Fixed (carried from E1): duplicate GameFlowShopTests.Update_LeaveTheForge_ContinuesTheEvent no longer in tests
-- Not raised (slice note explains): OpenShop ToStep throws InvalidFields() on an empty shop, unlike GiveItem/Recruit which pass the empty id through
+- Fixed (carried from E2): docs/map.md Events row now reads "one per step, its fields chosen by kind"
+- Not raised (slice note explains): line reads "Everything is priced fair" (no apostrophe, writer byte-identity); extra Interact_FacingShopkeeper_StartsWithTheirLine test

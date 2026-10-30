@@ -4910,6 +4910,40 @@
       ]
     },
     {
+      "uid": "shopkeeper",
+      "objectId": "villager",
+      "position": {
+        "x": 27,
+        "y": 14
+      },
+      "z": 1,
+      "events": [
+        {
+          "id": "shopkeeper_0",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "Have a look. Everything is priced fair."
+                ],
+                "speaker": "Shopkeeper",
+                "portraitFile": null
+              }
+            },
+            {
+              "type": "openShop",
+              "shopId": "general_store"
+            }
+          ]
+        }
+      ]
+    },
+    {
       "uid": "recruit_ragnir",
       "objectId": "villager",
       "position": {

@@ -87,6 +87,9 @@ internal static class StartMapScenarios
     /// <summary>Just below the forge master at (25, 14), beside the crossroads, facing them (decision 372).</summary>
     public static ContentCatalog BelowForgeMaster { get; } = StartingAt(new Point2D(25.5, 15.6), Facing.Up);
 
+    /// <summary>Just below the shopkeeper at (27, 14), two cells right of the forge master, facing them.</summary>
+    public static ContentCatalog BelowShopkeeper { get; } = StartingAt(new Point2D(27.5, 15.6), Facing.Up);
+
     /// <summary>Just below the Innkeeper at (30, 26), the end of the recruit row, facing it.</summary>
     public static ContentCatalog BelowInnkeeper { get; } = StartingAt(new Point2D(30.5, 27.6), Facing.Up);
 

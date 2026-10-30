@@ -5,10 +5,11 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-gold-and-shops, slice S6 (ShopStock.ToSaved; ShopStocks.Capture/Restore + StacksOf;
-GameSession Capture/Restore; Data/Saving/ShopStockRepair; GearRepair.RepairAffixes internal; fixture general_store).
-Round 1. Verdict: Ready to commit. verify.ps1 all pass (3025 tests).
+Plan: 2026-10-29-gold-and-shops, slice L1 (ForgeMotion -> Ui/OverlayFade, ForgeClosed -> Scenes/EventScreenClosed,
+OverlayFadeTests x4, backlog fade line, map.md lines).
+Round 1. Verdict: Ready to commit. verify.ps1 all pass (3029 tests).
 
-- Suggestion: ShopStockRepair.IsKept reports changes from inside a Where predicate (side effect hidden in a query) - open
-- Suggestion: saved RolledAtLevel not bounded by the XP table's max level: a lowered cap leaves the stock never rerolling - open
-- S5 carried suggestions (borrowed Catalog(), reroll asserted by count) - not re-raised (suggestions, previous slice)
+- Suggestion: no test that time before the first draw doesn't count once drawn (Advance 1 s, MarkDrawn, Advance 0.075 -> 0.5) - open
+- Follow-up: GameFlow's EventScreenClosed case still says "The Forge closed" and calls _forges.Close; for E1 - open
+- Accepted (slice note): ForgeScene keeps the `_motion` field name on OverlayFade - not raised
+- S6 suggestions (ShopStockRepair.IsKept side effect, RolledAtLevel max-level bound) - previous slice, not re-raised

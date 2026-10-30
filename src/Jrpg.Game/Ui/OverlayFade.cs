@@ -1,13 +1,11 @@
-using Jrpg.Game.Ui;
-
-namespace Jrpg.Game.Crafting;
+namespace Jrpg.Game.Ui;
 
 /// <summary>
-/// The Forge's opening and closing over time, as the menu's frame (decision 370: it fades itself in and out over the
-/// map, never through black). The opening is timed from the first drawn frame, so a slow first frame can't use it up,
-/// the closing from the moment it starts.
+/// A screen over the map (the Forge, the Shop) opening and closing over time, as the menu's frame (decision 370: it
+/// fades itself in and out over the map, never through black). The opening is timed from the first drawn frame, so a
+/// slow first frame can't use it up, the closing from the moment it starts.
 /// </summary>
-internal sealed class ForgeMotion
+internal sealed class OverlayFade
 {
     // The menu's placeholder timing (Menus/MenuMotion).
     private static readonly TimeSpan _openingFade = TimeSpan.FromSeconds(0.15);

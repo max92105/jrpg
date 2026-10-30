@@ -28,7 +28,7 @@ public sealed class ForgeSceneTests
         var afterwards = forge.Update(StartMapScenarios.OneUpdate, Pressing(GameButton.Cancel));
 
         Assert.Null(atCancel);
-        Assert.Single(requests, request => request is ForgeClosed);
+        Assert.Single(requests, request => request is EventScreenClosed);
         Assert.Null(afterwards);
     }
 

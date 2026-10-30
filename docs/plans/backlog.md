@@ -105,7 +105,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 ## From the forge plan (2026-10-29)
 
 - The "lists 'x' more than once" check is written in six Data validators (`NewGameValidator`, `ClassCatalogValidator`, `ResourceDefinitionValidator`, `SkillCatalogValidator`, `MapEventValidator`, `CraftingRulesValidator`), and `NewGame`'s `startingItems` repeats the crafting lists' entry checks (null, known item, 1..maxStack): one helper beside `RangeProblems` (M4 review).
-- `ForgeMotion` is the third copy of the "opening counted from the first drawn frame, closing from Cancel" fade, after `MenuMotion` and `TitleEntrance` (F1d): extract one frame-fade type in `Ui/`.
+- `Ui/OverlayFade` (the Forge's and the Shop's fade, gold plan L1) is the one frame fade for screens over the map; `MenuMotion` (the tabs' slide too) and `TitleEntrance` (from black) stay separate because they do more than this fade; fold them in only if a third screen needs the extra.
 - `ForgeScene.Craft` re-derives Core's "the first equal piece is the one replaced" rule to put the highlight on the changed row (F2c): `Inventory.TryReplace` (or the Forge's `Try` methods) could return the replaced index instead.
 
 ## From the quests plan (2026-10-29, at approval)

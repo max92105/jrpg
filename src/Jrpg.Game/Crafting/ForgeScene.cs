@@ -24,7 +24,7 @@ internal sealed class ForgeScene : IScene
     private readonly MaterialStock _materials;
     private readonly ForgeActionFormat _actionFormat;
     private readonly ForgeView _view;
-    private readonly ForgeMotion _motion = new();
+    private readonly OverlayFade _motion = new();
     private bool _hasRequestedClose;
 
     /// <param name="text">The title, the lines and the rows' fonts.</param>
@@ -219,8 +219,8 @@ internal sealed class ForgeScene : IScene
             ? row.Name.Text
             : _messages.Format(MessageIds.ForgeRolledPieceName, new MessageArgument("rarity", row.RarityName), new MessageArgument("name", row.Name.Text));
 
-    // While closing nothing reads input; the flow hears ForgeClosed once, on the update the fade ends.
-    private ForgeClosed? RequestClosedOnceFaded()
+    // While closing nothing reads input; the flow hears EventScreenClosed once, on the update the fade ends.
+    private EventScreenClosed? RequestClosedOnceFaded()
     {
         if (!_motion.IsClosingDone || _hasRequestedClose)
         {
@@ -228,6 +228,6 @@ internal sealed class ForgeScene : IScene
         }
 
         _hasRequestedClose = true;
-        return new ForgeClosed();
+        return new EventScreenClosed();
     }
 }

@@ -64,7 +64,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **N1. A shopkeeper stands on the start map** (content + tests, about 70 lines) → [slices/N1.md](slices/N1.md)
 
 ### Phase 4: what the Shop shows
-- [ ] **B1. The Buy list: the stock's stacks and pieces with owned counts and prices** (Game, raw 150, about 240 lines at 1.6x) → [slices/B1.md](slices/B1.md)
+- [x] **B1. The Buy list: the stock's stacks and pieces with owned counts and prices** (Game, raw 150, about 240 lines at 1.6x) → [slices/B1.md](slices/B1.md)
 - [ ] **B2. The Buy and Sell tabs; the Sell list** (Game + text, about 230 lines; extends `ShopListView`) → [slices/B2.md](slices/B2.md)
 - [ ] **B3. Category tabs on both lists, and the column titles** (Game + text, about 190 lines) → [slices/B3.md](slices/B3.md)
 - [ ] **L2a. The detail column: name, description, owned count, a piece's affixes** (Game + text, raw 110, about 175 lines at 1.6x) → [slices/L2a.md](slices/L2a.md)

@@ -651,4 +651,7 @@ internal static class MessageIds
 
     /// <summary>The Shop footer's line.</summary>
     public const string ShopHint = "shop_hint";
+
+    /// <summary>The Shop's line while its stock holds nothing to buy.</summary>
+    public const string ShopEmpty = "shop_empty";
 }

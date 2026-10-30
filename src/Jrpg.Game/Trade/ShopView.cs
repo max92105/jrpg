@@ -9,13 +9,14 @@ namespace Jrpg.Game.Trade;
 
 /// <summary>
 /// Draws the Shop screen in the menu's frame, as the Forge: the map dimmed behind it, the header bar with the shop's
-/// name at the left and the party's gold with its coin at the right (decision 380), the list and detail columns, and
-/// the footer with its hint. Everything fades with the Shop (decision 370). The gold is measured when it changes.
+/// name at the left and the party's gold with its coin at the right (decision 380), the stock's list column, the detail
+/// column, and the footer with its hint. Everything fades with the Shop (decision 370). The gold is measured when it
+/// changes.
 /// </summary>
 internal sealed class ShopView
 {
-    // The hint's text size, the menu pages' body size.
-    private const int BodyPixels = 26;
+    /// <summary>The rows' and lines' text size, the menu pages' body size.</summary>
+    public const int BodyPixels = 26;
 
     // The menu header's title size, its side margin and its info size; the footer's hint 40 px in, as the menu's.
     private const int TitleTextPixels = 38;
@@ -35,6 +36,7 @@ internal sealed class ShopView
     private static readonly Rectangle _detailArea = new(DetailLeft, MenuLayout.BodyTop, DetailWidth, MenuLayout.BodyHeight);
 
     private readonly ColumnPanelView _panel = new(UiTheme.PageColumn);
+    private readonly ShopListView _list;
     private readonly GoldAmountView _gold;
     private readonly SpriteFontBase _titleFont;
     private readonly SpriteFontBase _infoFont;
@@ -53,6 +55,7 @@ internal sealed class ShopView
         _infoFont = text.Fonts.FontAt(InfoTextPixels);
         _bodyFont = text.Fonts.FontAt(BodyPixels);
         _gold = new GoldAmountView(_infoFont, ui);
+        _list = new ShopListView(text, ui, _bodyFont);
         _name = name;
         _hint = text.Messages.Text(MessageIds.ShopHint);
     }
@@ -71,8 +74,9 @@ internal sealed class ShopView
 
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the plain pixel, the coin and the gradients come from.</param>
+    /// <param name="list">The stock's rows and the cursor on them.</param>
     /// <param name="opacity">The Shop's fade, 0 for clear to 1 for opaque.</param>
-    public void Draw(SpriteBatch batch, TextureLibrary textures, float opacity)
+    public void Draw(SpriteBatch batch, TextureLibrary textures, StockList list, float opacity)
     {
         batch.Draw(textures.Pixel, _screen, UiTheme.Scrim * opacity);
         HeaderBar.Draw(batch, textures.Pixel, MenuHeader.Height, opacity);
@@ -82,7 +86,7 @@ internal sealed class ShopView
         _gold.Draw(batch, textures, new GoldAmountView.Place(_shownGold, new Vector2(goldLeft, CenteredTop(_infoFont)), UiTheme.TextPrimary), opacity);
         batch.DrawString(_bodyFont, _hint, new Vector2(FooterTextInset, FooterBar.TextTop(MenuLayout.FooterHeight, _bodyFont.LineHeight)), UiTheme.TextSecondary * opacity);
 
-        _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(_listArea), opacity);
+        _list.Draw(batch, textures, list, _listArea, opacity);
         _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(_detailArea), opacity);
     }
 

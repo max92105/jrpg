@@ -39,6 +39,18 @@ public sealed class ShopSceneTests
         Assert.Null(shop.Update(TimeSpan.Zero, Pressing(GameButton.Confirm)));
     }
 
+    [Fact]
+    public void Update_Down_MovesTheList()
+    {
+        var shop = NewShop();
+        var first = shop.SelectedRow;
+
+        shop.Update(TimeSpan.Zero, Pressing(GameButton.Down));
+
+        Assert.NotNull(first);
+        Assert.NotEqual(first, shop.SelectedRow);
+    }
+
     private static ShopScene NewShop()
     {
         GameSession session = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowClosedDoor);

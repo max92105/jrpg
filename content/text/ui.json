@@ -234,5 +234,6 @@
   "forge_rolled_piece_name": "{rarity} {name}",
   "forge_upgraded": "{name} is now {rarity}.",
   "forge_rerolled": "{name}'s affixes were rolled again.",
-  "shop_hint": "Choose what to do."
+  "shop_hint": "Choose what to do.",
+  "shop_empty": "Nothing for sale."
 }

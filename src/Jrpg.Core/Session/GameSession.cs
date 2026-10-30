@@ -94,6 +94,7 @@ public sealed class GameSession
             inventory.AddGear(catalog.PieceFrom(saved));
         }
 
+        party.Purse.Add(save.Gold);
         var world = new WorldState(save.CompletedEvents, save.ObjectSwaps);
         return new GameSession(party, new ExplorationContext(catalog, inventory, world, random), save.Location) { PlayTime = save.PlayTime };
     }
@@ -166,6 +167,8 @@ public sealed class GameSession
             Gear = [.. Inventory.Gear.Select(piece => piece.ToSaved())],
             CompletedEvents = _context.World.CompletedEvents,
             ObjectSwaps = _context.World.ObjectSwaps,
+            Gold = Party.Purse.Gold,
+            ShopStocks = [],
         };
     }
 

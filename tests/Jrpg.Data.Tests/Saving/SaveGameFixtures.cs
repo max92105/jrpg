@@ -6,6 +6,7 @@ using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Saving;
 using Jrpg.Core.Stats;
+using Jrpg.Core.Trade;
 using Jrpg.Core.World;
 using Jrpg.Data.Content;
 
@@ -35,6 +36,8 @@ internal static class SaveGameFixtures
         Gear = [],
         CompletedEvents = [new MapEventKey("start", "0bff6243_0")],
         ObjectSwaps = [new ObjectSwap("start", "0bff6243", "chest_opened")],
+        Gold = 250,
+        ShopStocks = [new SavedShopStock("general", RolledAtLevel: 3, [new SavedGear("bronze_sword", Rarity.Magic, [new SavedAffix("power", 4)])])],
     };
 
     public static readonly PartyMemberProgress Sarxian = new("sarxian", Level: 3, Experience: 42, Hp: 150, Wearing((EquipmentSlot.Weapon, "bronze_sword"), (EquipmentSlot.Chest, "chain_mail")), LastingAmounts: new Dictionary<string, int>());
@@ -53,6 +56,8 @@ internal static class SaveGameFixtures
         Gear = [],
         CompletedEvents = [new MapEventKey("start", "0bff6243_0")],
         ObjectSwaps = [new ObjectSwap("start", "0bff6243", "chest_opened")],
+        Gold = 100,
+        ShopStocks = [],
     };
 
     /// <summary>The repository content with a one-affix pool: "power", +2..5 Power on weapons and rings.</summary>

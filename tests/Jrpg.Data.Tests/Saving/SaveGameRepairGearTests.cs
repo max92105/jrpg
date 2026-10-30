@@ -36,6 +36,8 @@ public sealed class SaveGameRepairGearTests
 
     private static SaveGame SaveWithSarxian(int hp, string? armorId) => new()
     {
+        Gold = 0,
+        ShopStocks = [],
         SavedAt = new DateTimeOffset(2026, 10, 27, 12, 0, 0, TimeSpan.Zero),
         PlayTime = TimeSpan.FromMinutes(30),
         Location = new MapLocation("start", new Point2D(10, 3), Facing.Down),

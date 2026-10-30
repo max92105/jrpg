@@ -1,6 +1,7 @@
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
+using Jrpg.Core.Trade;
 using Jrpg.Core.World;
 
 namespace Jrpg.Core.Saving;
@@ -33,4 +34,12 @@ public sealed record SaveGame
     public required IReadOnlyList<MapEventKey> CompletedEvents { get; init; }
 
     public required IReadOnlyList<ObjectSwap> ObjectSwaps { get; init; }
+
+    /// <summary>The party's gold, 0 to <see cref="Purse.MaxGold"/>.</summary>
+    public required int Gold { get; init; }
+
+    /// <summary>
+    /// Every shop opened so far with its rolled stock (decision 385); empty until a shop has been opened.
+    /// </summary>
+    public required IReadOnlyList<SavedShopStock> ShopStocks { get; init; }
 }

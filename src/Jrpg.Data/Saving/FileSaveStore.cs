@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 using Jrpg.Core.Content;
+using Jrpg.Core.Party;
 using Jrpg.Core.Saving;
 
 namespace Jrpg.Data.Saving;
@@ -52,6 +53,7 @@ public sealed partial class FileSaveStore(string directory, ContentCatalog catal
         CheckFormatVersion(slotName, root);
         var game = Deserialize(slotName, root).Game;
         CheckNoNullEntries(slotName, game);
+        CheckGoldWithinPurse(slotName, game);
         return SaveGameRepair.Repair(slotName, game, catalog);
     }
 
@@ -115,7 +117,8 @@ public sealed partial class FileSaveStore(string directory, ContentCatalog catal
     private static void CheckNoNullEntries(string slotName, SaveGame game)
     {
         var hasNullEntry = game.Members.Contains(null) || game.ActiveMemberIds.Contains(null) || game.Inventory.Contains(null)
-            || game.Gear.Contains(null) || game.CompletedEvents.Contains(null) || game.ObjectSwaps.Contains(null) || HasNullAffix(game);
+            || game.Gear.Contains(null) || game.CompletedEvents.Contains(null) || game.ObjectSwaps.Contains(null)
+            || HasNullStockEntry(game) || HasNullAffix(game);
         if (hasNullEntry)
         {
             throw new UnreadableSaveException(slotName, "the file is damaged (a list holds a null entry).");
@@ -127,9 +130,24 @@ public sealed partial class FileSaveStore(string directory, ContentCatalog catal
         }
     }
 
-    // A piece's affixes, owned or worn, are a list like the others; a null piece is reported by the checks around it.
+    // A shop's stock is a list of pieces inside a list of stocks; either level may hold the null.
+    private static bool HasNullStockEntry(SaveGame game) =>
+        game.ShopStocks.Contains(null) || game.ShopStocks.Any(stock => stock.Pieces.Contains(null));
+
+    // A piece's affixes, owned, worn or in a shop's stock, are a list like the others; a null piece is reported by the
+    // checks around it.
     private static bool HasNullAffix(SaveGame game) =>
-        game.Gear.Concat(game.Members.SelectMany(member => member.Worn.Values)).Any(piece => piece?.Affixes.Contains(null) == true);
+        game.Gear.Concat(game.Members.SelectMany(member => member.Worn.Values)).Concat(game.ShopStocks.SelectMany(stock => stock.Pieces))
+            .Any(piece => piece?.Affixes.Contains(null) == true);
+
+    // The purse never holds a negative amount or more than its cap, so a file saying so was written by something else.
+    private static void CheckGoldWithinPurse(string slotName, SaveGame game)
+    {
+        if (game.Gold < 0 || game.Gold > Purse.MaxGold)
+        {
+            throw new UnreadableSaveException(slotName, $"the file is damaged (the gold {game.Gold} is out of range).");
+        }
+    }
 
     private string PathOf(string slotName)
     {

@@ -40,6 +40,8 @@ public sealed class FileSaveStoreTests : IDisposable
         Assert.Equal(StoredSave.Inventory, read.Inventory);
         Assert.Equal(StoredSave.CompletedEvents, read.CompletedEvents);
         Assert.Equal(StoredSave.ObjectSwaps, read.ObjectSwaps);
+        Assert.Equal(StoredSave.Gold, read.Gold);
+        Assert.Equal(StoredSave.ShopStocks, read.ShopStocks);
         Assert.Empty(repaired.Changes);
     }
 

@@ -48,6 +48,7 @@
         <Button Content="Voice" Width="50" Margin="4,0,0,0" Command="{Binding AddVoiceCommand}" />
         <Button Content="Rest" Width="50" Margin="4,0,0,0" Command="{Binding AddRestCommand}" />
         <Button Content="Forge" Width="50" Margin="4,0,0,0" Command="{Binding AddOpenForgeCommand}" />
+        <Button Content="Shop" Width="50" Margin="4,0,0,0" Command="{Binding AddOpenShopCommand}" />
         <Button Content="Remove" Width="60" Margin="12,0,0,0" Command="{Binding RemoveStepCommand}" />
         <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepUpCommand}" />
         <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepDownCommand}" />

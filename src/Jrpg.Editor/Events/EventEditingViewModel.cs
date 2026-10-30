@@ -62,5 +62,8 @@ internal sealed class EventEditingViewModel(CatalogDraft catalog)
         [.. catalog.Current.Items.Keys.Order(StringComparer.Ordinal)],
         [.. catalog.Current.Objects.Keys.Order(StringComparer.Ordinal)],
         MapIds,
-        [.. catalog.Current.PartyMembers.Keys.Order(StringComparer.Ordinal)]);
+        [.. catalog.Current.PartyMembers.Keys.Order(StringComparer.Ordinal)])
+    {
+        ShopIds = [.. catalog.Current.Shops.Keys.Order(StringComparer.Ordinal)],
+    };
 }

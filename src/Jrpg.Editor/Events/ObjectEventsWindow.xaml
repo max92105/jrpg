@@ -28,6 +28,7 @@
         <Button Content="Sign" Width="50" Margin="4,0,0,0" Command="{Binding ApplySignPresetCommand}" />
         <Button Content="Talk" Width="50" Margin="4,0,0,0" Command="{Binding ApplyTalkPresetCommand}" />
         <Button Content="Forge master" Width="90" Margin="4,0,0,0" Command="{Binding ApplyForgeMasterPresetCommand}" />
+        <Button Content="Shopkeeper" Width="80" Margin="4,0,0,0" Command="{Binding ApplyShopkeeperPresetCommand}" />
       </WrapPanel>
       <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
         <Button Content="Add" Width="60" Command="{Binding AddEventCommand}" />
@@ -83,6 +84,7 @@
           <Button Content="Voice" Width="50" Margin="4,0,0,0" Command="{Binding AddVoiceCommand}" />
           <Button Content="Rest" Width="50" Margin="4,0,0,0" Command="{Binding AddRestCommand}" />
           <Button Content="Forge" Width="50" Margin="4,0,0,0" Command="{Binding AddOpenForgeCommand}" />
+          <Button Content="Shop" Width="50" Margin="4,0,0,0" Command="{Binding AddOpenShopCommand}" />
         </WrapPanel>
         <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
           <Button Content="Remove" Width="60" Command="{Binding RemoveStepCommand}" />

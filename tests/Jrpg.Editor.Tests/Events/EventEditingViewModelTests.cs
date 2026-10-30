@@ -32,6 +32,7 @@ public sealed class EventEditingViewModelTests
         Assert.Equal(["0bff6243_0"], events.Events.Select(item => item.Id));
         Assert.Equal(["forest", "start"], events.Choices.MapIds);
         Assert.Contains("potion", events.Choices.ItemIds);
+        Assert.Contains("general_store", events.Choices.ShopIds);
     }
 
     [Fact]

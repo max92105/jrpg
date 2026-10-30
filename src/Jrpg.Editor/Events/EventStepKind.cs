@@ -12,4 +12,5 @@ internal enum EventStepKind
     Voice,
     Rest,
     OpenForge,
+    OpenShop,
 }

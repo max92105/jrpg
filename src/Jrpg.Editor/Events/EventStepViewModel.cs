@@ -38,6 +38,8 @@ internal sealed partial class EventStepViewModel : ObservableObject
 
     public bool IsVoice => Kind == EventStepKind.Voice;
 
+    public bool IsOpenShop => Kind == EventStepKind.OpenShop;
+
     /// <summary>One message box per line; blank lines are left out.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
@@ -55,6 +57,11 @@ internal sealed partial class EventStepViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
     public partial string ItemId { get; set; } = "";
+
+    /// <summary>The shop an openShop step opens, picked from the loaded shops (ADR 0031).</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
+    public partial string ShopId { get; set; } = "";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
@@ -113,6 +120,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.Voice => $"Voice: {VoiceFile}",
         EventStepKind.Rest => "Rest",
         EventStepKind.OpenForge => "Open the Forge",
+        EventStepKind.OpenShop => $"Open shop: {ShopId}",
         _ => throw new UnreachableException(),
     };
 
@@ -127,6 +135,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.Still when string.IsNullOrWhiteSpace(ImageFile) => "Write the still's image file.",
         EventStepKind.Still when Seconds(SecondsText) is null => "The seconds must be a number above 0.",
         EventStepKind.Recruit when string.IsNullOrEmpty(MemberId) => "Choose the member who joins.",
+        EventStepKind.OpenShop when string.IsNullOrEmpty(ShopId) => "Choose the shop.",
         EventStepKind.Voice when string.IsNullOrWhiteSpace(VoiceFile) => "Write the voice's file.",
         EventStepKind.GiveItem when WholeNumber(QuantityText, minimum: 1) is null => "The quantity must be a whole number of at least 1.",
         EventStepKind.Warp when WholeNumber(CellXText, minimum: 0) is null || WholeNumber(CellYText, minimum: 0) is null =>
@@ -150,6 +159,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         VoiceStep voice => new(EventStepKind.Voice) { VoiceFile = voice.File },
         RestStep => new(EventStepKind.Rest),
         OpenForgeStep => new(EventStepKind.OpenForge),
+        OpenShopStep shop => new(EventStepKind.OpenShop) { ShopId = shop.ShopId },
         _ => throw new ArgumentException($"Unknown step type {step.GetType().Name}.", nameof(step)),
     };
 
@@ -171,6 +181,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.Voice => new VoiceStep(VoiceFile.Trim()),
         EventStepKind.Rest => new RestStep(),
         EventStepKind.OpenForge => new OpenForgeStep(),
+        EventStepKind.OpenShop => string.IsNullOrEmpty(ShopId) ? throw InvalidFields() : new OpenShopStep(ShopId),
         _ => throw new UnreachableException(),
     };
 

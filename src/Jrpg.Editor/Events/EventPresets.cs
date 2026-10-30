@@ -7,8 +7,9 @@ namespace Jrpg.Editor.Events;
 
 /// <summary>
 /// The event dialog's presets: the usual events of a chest, a door, a door the player opens first and a sign, an NPC
-/// who talks, and a forge master who talks and opens the Forge (decision 353). What only the developer can say is left
-/// empty for the dialog to ask for: the chest's item, the door's destination, the sign's or the NPC's text.
+/// who talks, a forge master who talks and opens the Forge, and a shopkeeper who talks and opens a shop (decision 353).
+/// What only the developer can say is left empty for the dialog to ask for: the chest's item, the door's destination,
+/// the sign's or the NPC's text, the shopkeeper's shop.
 /// </summary>
 internal static class EventPresets
 {
@@ -91,6 +92,20 @@ internal static class EventPresets
             Activation = EventActivation.Interact,
             Prompt = TalkPrompt,
             Steps = [new DialogueStep(new Speech([])), new OpenForgeStep()],
+        },
+    ];
+
+    /// <summary>
+    /// Pressed: a shopkeeper says a line, left for the developer to type, then opens a shop left for them to pick.
+    /// </summary>
+    public static IReadOnlyList<MapEvent> Shopkeeper(EventIdAllocation target) =>
+    [
+        new MapEvent
+        {
+            Id = target.NewEventIds(1)[0],
+            Activation = EventActivation.Interact,
+            Prompt = TalkPrompt,
+            Steps = [new DialogueStep(new Speech([])), new OpenShopStep(string.Empty)],
         },
     ];
 

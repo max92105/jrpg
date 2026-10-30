@@ -60,7 +60,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **L1. One overlay fade and one close request for the screens an event opens** (Game refactor, about 120 lines) → [slices/L1.md](slices/L1.md)
 - [x] **H1. A Shop screen in the menu's frame that fades in over the map and Cancel closes** (Game + text, raw 120, about 190 lines at 1.6x) → [slices/H1.md](slices/H1.md)
 - [x] **E1. The `openShop` event step opens the named shop and waits for it** (Core + Data + Game, about 230 lines) → [slices/E1.md](slices/E1.md)
-- [ ] **E2. The editor shows and adds the `openShop` step; the Shopkeeper preset** (Editor, about 190 lines) → [slices/E2.md](slices/E2.md)
+- [x] **E2. The editor shows and adds the `openShop` step; the Shopkeeper preset** (Editor, about 190 lines) → [slices/E2.md](slices/E2.md)
 - [ ] **N1. A shopkeeper stands on the start map** (content + tests, about 70 lines) → [slices/N1.md](slices/N1.md)
 
 ### Phase 4: what the Shop shows

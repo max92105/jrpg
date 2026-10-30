@@ -256,5 +256,6 @@ public sealed class EventStepViewModelTests
         new VoiceStep("Placeholder.wav"),
         new RestStep(),
         new OpenForgeStep(),
+        new OpenShopStep("general_store"),
     ];
 }

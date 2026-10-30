@@ -42,6 +42,19 @@ public sealed class EventPresetsTests
         Assert.Empty(speech.Lines);
     }
 
+    // The shopkeeper's line and shop are both the developer's: the step opens with no shop, which the dialog flags.
+    [Fact]
+    public void Shopkeeper_TalksThenOpensAShopLeftToPick()
+    {
+        var shopkeeper = Assert.Single(EventPresets.Shopkeeper(new EventIdAllocation("grocer_1", "villager", [])));
+
+        Assert.Equal(("grocer_1_0", EventActivation.Interact, "Talk"), (shopkeeper.Id, shopkeeper.Activation, shopkeeper.Prompt));
+        Assert.Collection(
+            shopkeeper.Steps,
+            step => Assert.Empty(Assert.IsType<DialogueStep>(step).Speech.Lines),
+            step => Assert.Equal(string.Empty, Assert.IsType<OpenShopStep>(step).ShopId));
+    }
+
     // Decision 353: the forge master's line is left for the developer, then the Forge opens.
     [Fact]
     public void ForgeMaster_TalksThenOpensTheForge()

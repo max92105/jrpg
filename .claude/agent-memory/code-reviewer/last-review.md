@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-gold-and-shops, slice E1 (openShop step, EventScreenTransitions replaces ForgeTransitions, OpeningStep).
-Round 1. Verdict: Ready to commit. verify.ps1 all pass (3041 tests).
+Plan: 2026-10-29-gold-and-shops, slice E2 (editor openShop step, StepChoices.ShopIds, Shopkeeper preset).
+Round 1. Verdict: Ready to commit. verify.ps1 all pass (3047 tests).
 
-- Warning: docs/map.md:58 Flow key types still list the deleted `ForgeTransitions (no fade; closing continues the event)`; replace with `EventScreenTransitions` - open
-- Suggestion: GameFlowShopTests.Update_LeaveTheForge_ContinuesTheEvent duplicates GameFlowForgeTests.Update_CancelInTheForge_ContinuesTheEvent line for line; drop it - open
-- Fixed (carried from L1/H1): GameFlow's EventScreenClosed "The Forge closed" / _forges.Close - now RunningSession + _eventScreens.Close
-- H1 suggestions (ShopView.BodyPixels public, gold check test, ShopView/ForgeView frame copy) - outside E1's diff, not re-raised
+- Suggestion: docs/map.md Events row says EventStepViewModel is "one view model per step kind"; it is one class for every kind (Kind picks the fields): reword to "one per step, its fields chosen by kind" - open
+- Fixed (carried from E1): docs/map.md Flow row no longer lists ForgeTransitions
+- Fixed (carried from E1): duplicate GameFlowShopTests.Update_LeaveTheForge_ContinuesTheEvent no longer in tests
+- Not raised (slice note explains): OpenShop ToStep throws InvalidFields() on an empty shop, unlike GiveItem/Recruit which pass the empty id through

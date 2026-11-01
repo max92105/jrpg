@@ -1,0 +1,86 @@
+<Window x:Class="Jrpg.Editor.Quests.QuestCatalogWindow"
+        x:ClassModifier="internal"
+        Style="{StaticResource EditorWindow}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Quests"
+        Width="820"
+        Height="560"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+  <Window.Resources>
+    <!-- A panel over the chosen quest or stage is greyed while none is chosen, so nothing typed is lost. -->
+    <Style x:Key="EnabledWhenChosen" TargetType="Panel">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding}" Value="{x:Null}">
+          <Setter Property="IsEnabled" Value="False" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </Window.Resources>
+  <DockPanel Margin="12">
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+      <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked" />
+      <Button Content="Cancel" Width="80" Margin="8,0,0,0" IsCancel="True" />
+    </StackPanel>
+    <TextBlock x:Name="ProblemText" DockPanel.Dock="Bottom" Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Margin="0,8,0,0" />
+
+    <!-- The draft's quests in id order, the ones added this session after them. -->
+    <DockPanel DockPanel.Dock="Left" Width="260">
+      <TextBlock DockPanel.Dock="Top" Text="Quests" FontWeight="Bold" />
+      <Button DockPanel.Dock="Bottom" Content="New quest" Width="90" HorizontalAlignment="Left" Margin="0,4,0,0" Command="{Binding AddQuestCommand}" />
+      <ListBox ItemsSource="{Binding Quests}" SelectedItem="{Binding SelectedQuest}" DisplayMemberPath="Label" Margin="0,4,0,0" />
+    </DockPanel>
+
+    <!-- The chosen quest: its id and texts, then its stages in order and the chosen stage's fields. -->
+    <DockPanel Margin="12,0,0,0" DataContext="{Binding SelectedQuest}" Style="{StaticResource EnabledWhenChosen}">
+      <StackPanel DockPanel.Dock="Top">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="Id" Width="90" VerticalAlignment="Center" />
+          <TextBox Width="240"
+                   Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}"
+                   IsEnabled="{Binding IsNew}"
+                   ToolTip="Lowercase letters, digits and _; fixed once saved, since events and saves name it" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Title" Width="90" VerticalAlignment="Center" />
+          <TextBox Width="240" Text="{Binding Title, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Text="Kind" Width="40" Margin="12,0,0,0" VerticalAlignment="Center" />
+          <ComboBox Width="90"
+                    ItemsSource="{Binding DataContext.Kinds, RelativeSource={RelativeSource AncestorType=Window}}"
+                    SelectedItem="{Binding Kind}" />
+        </StackPanel>
+        <TextBlock Text="Description" Margin="0,6,0,0" />
+        <TextBox Height="60"
+                 AcceptsReturn="True"
+                 TextWrapping="Wrap"
+                 VerticalScrollBarVisibility="Auto"
+                 Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBlock Text="Stages, in order" FontWeight="Bold" Margin="0,8,0,0" />
+      </StackPanel>
+
+      <StackPanel DockPanel.Dock="Bottom" Margin="0,8,0,0" DataContext="{Binding SelectedStage}" Style="{StaticResource EnabledWhenChosen}">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="Stage id" Width="90" VerticalAlignment="Center" />
+          <TextBox Width="240"
+                   Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}"
+                   IsEnabled="{Binding IsNew}"
+                   ToolTip="Fixed once saved, since events and saves name it" />
+        </StackPanel>
+        <TextBlock Text="Objective, as the Quests page shows it" Margin="0,4,0,0" />
+        <TextBox Height="50"
+                 AcceptsReturn="True"
+                 TextWrapping="Wrap"
+                 VerticalScrollBarVisibility="Auto"
+                 Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}" />
+      </StackPanel>
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
+        <Button Content="Add" Width="60" Command="{Binding AddStageCommand}" ToolTip="After the chosen stage" />
+        <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding RemoveStageCommand}" ToolTip="Only a stage added this session" />
+        <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveStageUpCommand}" />
+        <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveStageDownCommand}" />
+      </StackPanel>
+      <ListBox ItemsSource="{Binding Stages}" SelectedItem="{Binding SelectedStage}" DisplayMemberPath="Label" />
+    </DockPanel>
+  </DockPanel>
+</Window>

@@ -5,14 +5,14 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-quests, slice QE3 (Editor/Quests: QuestCatalogViewModel, QuestEditingViewModel, MainViewModel.QuestEditing). Round 1.
+Plan: 2026-10-29-quests, slice QE4 (Editor/Quests/QuestCatalogWindow, Shell/MainWindow.QuestEditing, Quests menu). Round 1.
 Verdict: Ready to commit.
 
-- Warning, open: QuestEditingViewModelTests.Apply_ChangedQuests edits `edited.Quests[0]` assuming content's first quest by id is placeholder_errand; pick it by id
-- Fixed (from QE2): QuestViewModelTests now build their own QuestDefinition
-- Fixed (from QE2): a removed stage unsubscribes OnStageChanged (QuestViewModel line 113)
+- Fixed (from QE3): QuestEditingViewModelTests pick placeholder_errand by id
+- Suggestion, open: right-hand quest/stage fields stay enabled with no quest or stage chosen (typing goes nowhere); IsEnabled on a null check
+- Suggestion, open: "Edit quests..." silently does nothing when QuestEditing is null (no content); bind IsEnabled
 - Follow-up (from QE2 suggestion): ObjectIds' id problem says "(like tree_4)", shown in the Quests window too
-- Follow-up (from QE1): CatalogDraft.SetQuests ToDictionary throws on duplicate ids (now guarded by QuestCatalogViewModel.Problem for the window)
+- Follow-up (from QE1): CatalogDraft.SetQuests ToDictionary throws on duplicate ids (guarded by QuestCatalogViewModel.Problem)
 - Follow-up (carried from G4): EventPresenter.IsShowingMessage summary omits the quest line
 - Follow-up (carried from L3): capacity test for three lines each of description and stage text
 - Follow-up: ResourceGaugeView.LabelSpacing (2) duplicates SheetRowLook.LabelSpacing

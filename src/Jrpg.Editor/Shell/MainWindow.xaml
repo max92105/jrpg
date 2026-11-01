@@ -90,6 +90,9 @@
         <MenuItem Header="New object from selection..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" />
         <MenuItem Header="New NPC..." Click="OnNewNpcClicked" IsEnabled="{Binding CanStartNewNpc}" />
       </MenuItem>
+      <MenuItem Header="Quests">
+        <MenuItem Header="Edit quests..." Click="OnEditQuestsClicked" IsEnabled="{Binding HasQuestEditing}" />
+      </MenuItem>
       <MenuItem Header="Map">
         <MenuItem Header="Settings..." Click="OnMapSettingsClicked" />
         <MenuItem Header="Add layer..." Click="OnAddLayerMenuClicked" />

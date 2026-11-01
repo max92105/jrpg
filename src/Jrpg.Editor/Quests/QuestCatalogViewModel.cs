@@ -27,6 +27,9 @@ internal sealed partial class QuestCatalogViewModel : ObservableObject
 
     public ObservableCollection<QuestViewModel> Quests { get; }
 
+    /// <summary>The kinds the window's box offers.</summary>
+    public IReadOnlyList<QuestKind> Kinds { get; } = Enum.GetValues<QuestKind>();
+
     [ObservableProperty]
     public partial QuestViewModel? SelectedQuest { get; set; }
 

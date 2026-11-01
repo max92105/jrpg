@@ -1,5 +1,5 @@
 # Quests and the quest log
-Status: approved, in progress
+Status: retro pending
 
 Drafted on 2026-10-29, before Act 1's content is written: the game needs quest progression and a menu page that tracks it. The developer writes the real quests, story and maps; this plan builds the mechanism, an editor window for quests, and one placeholder quest to test it all by hand.
 
@@ -78,7 +78,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **QE1. Quests in the editor's catalog draft: one undo step, saved with the catalogs, an undo removing a used quest refused** (Data + Editor, about 210 lines) → [slices/QE1.md](slices/QE1.md)
 - [x] **QE2. The Quests window's rules: one quest, its stages, their ids and problems** (Editor, about 210 lines) → [slices/QE2.md](slices/QE2.md)
 - [x] **QE3. The Quests window's list: new quests, unique ids, applied to the draft as one undo step** (Editor, about 170 lines) → [slices/QE3.md](slices/QE3.md)
-- [ ] **QE4. The Quests window** (Editor, about 160 lines) → [slices/QE4.md](slices/QE4.md)
+- [x] **QE4. The Quests window** (Editor, about 160 lines) → [slices/QE4.md](slices/QE4.md)
 
 ## Decisions
 From earlier plans and ADRs: 107 (the leader is fixed), 252 (one selection look), 253 (take the vibe), 254 (placeholder tab icons), 262 and 336 (lists glide), 355 (the victory's pointed tabs), 374 (the gold and shops plan runs first); ADR 0006 (event steps), 0010 (text), 0011 (content), 0014 (editing shared catalogs), 0016 (skipping), 0022 (saves).

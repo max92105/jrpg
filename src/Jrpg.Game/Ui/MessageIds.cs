@@ -738,4 +738,7 @@ internal static class MessageIds
 
     /// <summary>What a completed quest's detail says in place of its stage (decision 392).</summary>
     public const string QuestCompletedNote = "quest_completed_note";
+
+    /// <summary>The band over a quest's stage text in its detail (decision 392).</summary>
+    public const string QuestsObjective = "quests_objective";
 }

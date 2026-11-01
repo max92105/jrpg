@@ -12,20 +12,18 @@ namespace Jrpg.Game.Menus;
 /// <summary>
 /// The menu's Quests page, its first tab (decision 393): the Active or the Completed quests (decision 390, Left and
 /// Right switch) in the journal's order (decision 391), drawn by <see cref="QuestListView"/> under the shared gliding
-/// selection; beside them the chosen quest's detail (decision 392), plain lines until L3. Read from Core when the page
-/// opens and when the choice moves, so drawing formats nothing.
+/// selection; beside them the chosen quest's detail (decision 392) drawn by <see cref="QuestDetailView"/>. Read from
+/// Core when the page opens and when the choice moves, so drawing formats nothing.
 /// </summary>
 internal sealed class QuestsPage : IMenuPage
 {
-    // The detail follows the list column after a gap (placeholder until L3).
-    private const int DetailGap = 40;
-
     private readonly GameSession _session;
     private readonly UiMessages _messages;
     private readonly SpriteFontBase _font;
     private readonly string[] _categoryNames;
     private readonly string[] _emptyLines;
     private readonly QuestListView _listView;
+    private readonly QuestDetailView _detailView;
     private readonly QuestList _list;
     private QuestDetail? _detail;
 
@@ -40,6 +38,7 @@ internal sealed class QuestsPage : IMenuPage
         _categoryNames = [text.Messages.Text(MessageIds.QuestsActive), text.Messages.Text(MessageIds.QuestsCompleted)];
         _emptyLines = [text.Messages.Text(MessageIds.QuestsNone), text.Messages.Text(MessageIds.QuestsNoneCompleted)];
         _listView = new QuestListView(ui, _font, _categoryNames);
+        _detailView = new QuestDetailView(text);
         _list = new QuestList(title => TextEllipsis.Fit(_font, title, QuestListView.TitleWidth));
         Hint = text.Messages.Text(MessageIds.MenuHintQuests);
     }
@@ -106,27 +105,8 @@ internal sealed class QuestsPage : IMenuPage
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
         _listView.Draw(batch, textures, new QuestListView.Place(_list.Rows, _list.Cursor, _list.Selection, _list.Category, _emptyLines[(int)_list.Category], area), opacity);
-        if (_detail is { } detail)
-        {
-            var detailLeft = area.X + QuestListView.ColumnWidth + DetailGap;
-            DrawDetail(batch, detail, area with { X = detailLeft, Width = area.Right - detailLeft }, opacity);
-        }
+        _detailView.Draw(batch, textures, new QuestDetailView.Place(_detail, QuestDetailView.ColumnIn(area, QuestListView.ColumnWidth)), opacity);
     }
-
-    // The chosen quest's lines, one per row: title, kind, description, the stage's text or the completed note.
-    private void DrawDetail(SpriteBatch batch, QuestDetail detail, Rectangle area, float opacity)
-    {
-        DrawLine(batch, detail.Title, RowAt(area, 0), UiTheme.TextPrimary * opacity);
-        DrawLine(batch, detail.KindName, RowAt(area, 1), UiTheme.TextSecondary * opacity);
-        DrawLine(batch, detail.Description, RowAt(area, 2), UiTheme.TextSecondary * opacity);
-        DrawLine(batch, detail.StageText, RowAt(area, 3), UiTheme.TextPrimary * opacity);
-    }
-
-    private static Rectangle RowAt(Rectangle column, int row) =>
-        new(column.X, column.Y + PageListLayout.TopMargin + (row * PageListLayout.RowHeight), column.Width, PageListLayout.RowHeight);
-
-    private void DrawLine(SpriteBatch batch, string line, Rectangle row, Color color) =>
-        batch.DrawString(_font, line, new Vector2(row.X, row.Y + ((row.Height - _font.LineHeight) / 2f)), color);
 
     private void RefreshDetail() => _detail = _list.Selected is { } selected ? QuestDetail.Of(selected, _list.Category, _messages) : null;
 }

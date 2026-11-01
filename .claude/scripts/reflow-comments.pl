@@ -28,7 +28,7 @@ for my $file (@ARGV) {
     if ($lines[$i] =~ /^(\s*)\/\/ (?!\/)/) {
       my $indent = $1; my $j = $i; my @block;
       while ($j < @lines && $lines[$j] =~ /^\Q$indent\E\/\/ (?!\/)/) { push @block, $lines[$j]; $j++; }
-      if (@block > 1 && grep { !$old{$_} } @block) { push @out, wrap("$indent// ", join ' ', map { (my $l = $_) =~ s/^\s*\/\/ //; $l } @block); }
+      if ((@block > 1 || length($block[0]) > $width) && grep { !$old{$_} } @block) { push @out, wrap("$indent// ", join ' ', map { (my $l = $_) =~ s/^\s*\/\/ //; $l } @block); }
       else { push @out, @block; }
       $i = $j - 1; next;
     }

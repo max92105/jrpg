@@ -1,5 +1,5 @@
 # Enemy skills and bosses
-Status: retro pending
+Status: done
 
 Battle depth before Act 1 content (developer, 2026-10-29). Today every enemy only attacks (`Battle/EnemyTactics`: a random living member, or a taunting one; question 224). This plan lets enemies use the party's kind of skills, chosen by content-driven tactics, and adds a boss: an enemy the battle treats differently, with phases that change its tactics. One placeholder boss encounter, the Goblin Chief, makes it testable and visible.
 

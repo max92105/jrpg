@@ -32,7 +32,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     private readonly GameFlow? _flow;
     private readonly string _artRoot;
     private readonly string _audioRoot;
-    private readonly VoiceChannel _voice;
+    private readonly Audio.AudioChannels _audio;
     private readonly PlayerSettings _settings;
     private readonly GraphicsDeviceManager _graphics;
     private readonly InputReader _input = new();
@@ -58,14 +58,14 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     /// <param name="rootScene">The game flow, or the screen explaining why the game can't start.</param>
     /// <param name="contentRoot">The content folder, holding the art and audio folders.</param>
     /// <param name="settings">The player's options; the window follows <see cref="PlayerSettings.IsFullScreen"/>.</param>
-    /// <param name="voice">The voice-over the root scene asks for; played after each of its updates.</param>
-    public JrpgGame(IScene rootScene, string contentRoot, PlayerSettings settings, VoiceChannel voice)
+    /// <param name="audio">What the root scene asks to hear; played after each of its updates.</param>
+    public JrpgGame(IScene rootScene, string contentRoot, PlayerSettings settings, Audio.AudioChannels audio)
     {
         _rootScene = rootScene;
         _flow = rootScene as GameFlow;
         _artRoot = ArtFolders.RootIn(contentRoot);
         _audioRoot = AudioFolders.RootIn(contentRoot);
-        _voice = voice;
+        _audio = audio;
         _settings = settings;
 
         // Borderless full screen (no hardware mode switch) keeps the desktop resolution, so Alt+Tab and the debugger stay quick.
@@ -121,7 +121,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
             Exit();
         }
 
-        _voicePlayer?.Follow(_voice, VolumeLevel.GainOf(_settings.VoiceVolume));
+        _voicePlayer?.Follow(_audio.Voice, VolumeLevel.GainOf(_settings.VoiceVolume));
 
         base.Update(gameTime);
     }
@@ -191,7 +191,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
         try
         {
             // Building a sound is what opens the device (setting the master volume doesn't); one silent sample will do.
-            using var probe = new SoundEffect(new byte[2], 22050, AudioChannels.Mono);
+            using var probe = new SoundEffect(new byte[2], 22050, Microsoft.Xna.Framework.Audio.AudioChannels.Mono);
         }
         catch (NoAudioHardwareException exception)
         {

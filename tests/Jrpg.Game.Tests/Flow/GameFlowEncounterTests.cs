@@ -38,17 +38,6 @@ public sealed class GameFlowEncounterTests
         Assert.NotNull(SessionOf(flow).ActiveBattle);
     }
 
-    // Walks into the forest a step at a time until the flow starts the encounter's flash.
-    private static void WalkUntilAnEncounter(GameFlow flow)
-    {
-        for (var update = 0; update < 600 && !flow.IsFlashing; update++)
-        {
-            flow.Update(OneUpdate, StartMapScenarios.HoldingLeft);
-        }
-
-        Assert.True(flow.IsFlashing);
-    }
-
     private static void StepFor(GameFlow flow, TimeSpan length)
     {
         for (var elapsed = TimeSpan.Zero; elapsed < length; elapsed += OneUpdate)

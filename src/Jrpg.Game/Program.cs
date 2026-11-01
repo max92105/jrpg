@@ -33,15 +33,15 @@ using (fonts)
 {
     // One settings object: the host applies the window mode, the menu edits it, dialogue reads the text speed.
     var settings = new PlayerSettings();
-    var (rootScene, voice) = FirstScene(contentRoot, new ScreenText(messages, fonts), settings);
-    using var game = new JrpgGame(rootScene, contentRoot, settings, voice);
+    var (rootScene, audio) = FirstScene(contentRoot, new ScreenText(messages, fonts), settings);
+    using var game = new JrpgGame(rootScene, contentRoot, settings, audio);
     game.Run();
 }
 
 return 0;
 
-// A new game, or the reason it can't start, shown on screen as well as logged; each with the channel the host plays.
-static (IScene Scene, VoiceChannel Voice) FirstScene(string contentRoot, ScreenText text, PlayerSettings settings)
+// A new game, or the reason it can't start, shown on screen as well as logged; each with the channels the host plays.
+static (IScene Scene, AudioChannels Audio) FirstScene(string contentRoot, ScreenText text, PlayerSettings settings)
 {
     string reason;
     try
@@ -55,7 +55,7 @@ static (IScene Scene, VoiceChannel Voice) FirstScene(string contentRoot, ScreenT
             // Saves are stamped with the real clock here, the one place the game reads it (ADR 0008).
             var saveSlots = new SaveSlots(new FileSaveStore(GamePaths.SaveDirectory, catalog), catalog, () => DateTimeOffset.Now);
             var flow = new GameFlow(catalog, text, saveSlots, settings);
-            return (flow, flow.Voice);
+            return (flow, flow.Audio);
         }
 
         reason = string.Join(Environment.NewLine, problems);
@@ -67,7 +67,7 @@ static (IScene Scene, VoiceChannel Voice) FirstScene(string contentRoot, ScreenT
 
     var message = text.Messages.Format(MessageIds.StartupFailed, new MessageArgument("reason", reason));
     DeveloperLog.Report(message);
-    return (new StartupErrorScene(message, text.Fonts), new VoiceChannel());
+    return (new StartupErrorScene(message, text.Fonts), new AudioChannels());
 }
 
 static bool IsStartupProblem(Exception exception) =>

@@ -151,11 +151,11 @@ public sealed class GameFlowTests : IDisposable
     {
         var flow = StartedFlow(catalog: _catalog);
         flow.Update(OneUpdate, default);
-        Assert.Equal("Placeholder.wav", flow.Voice.VoiceFile);
+        Assert.Equal("Placeholder.wav", flow.Audio.Voice.VoiceFile);
 
         flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
 
-        Assert.Null(flow.Voice.VoiceFile);
+        Assert.Null(flow.Audio.Voice.VoiceFile);
     }
 
     [Fact]

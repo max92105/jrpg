@@ -59,12 +59,12 @@ internal sealed class GameFlow : IScene
         _menus = new MenuTransitions(_scenes, factory);
         _battles = new BattleTransitions(_scenes, factory);
         _eventScreens = new EventScreenTransitions(_scenes, factory);
-        Voice = factory.Voice;
+        Audio = factory.Audio;
         _scenes.Push(factory.CreateTitle());
     }
 
-    /// <summary>The voice-over the game wants heard, for the host to play after each update.</summary>
-    public VoiceChannel Voice { get; }
+    /// <summary>What the game wants heard, for the host to play after each update.</summary>
+    public AudioChannels Audio { get; }
 
     /// <summary>The playthrough, once one has started; null on the title until a game starts.</summary>
     public GameSession? Session { get; private set; }
@@ -85,6 +85,15 @@ internal sealed class GameFlow : IScene
     /// </summary>
     /// <returns>Quit, which only the host can do; null otherwise, since the flow handles every other request.</returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
+    {
+        var request = AdvanceTheFlow(delta, input);
+
+        // After the flow's state settled, and on the flash's updates too, when the scenes wait (ADR 0035).
+        Audio.Music.Want(MusicSelection.TrackFor(Session));
+        return request;
+    }
+
+    private SceneRequest? AdvanceTheFlow(TimeSpan delta, InputFrame input)
     {
         Session?.AddPlayTime(delta);
         // The flash first, so an update that ends it also runs the fade it starts.

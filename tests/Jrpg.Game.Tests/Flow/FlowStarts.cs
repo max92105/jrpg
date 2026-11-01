@@ -1,4 +1,5 @@
 using Jrpg.Core.Content;
+using Jrpg.Core.Maps;
 using Jrpg.Core.Session;
 using Jrpg.Game.Flow;
 using Jrpg.Game.Hosting;
@@ -61,6 +62,24 @@ internal static class FlowStarts
         flow.Update(FadeOut, default);
         flow.Update(WholeFade - FadeOut, default);
         return flow;
+    }
+
+    // Walks left, into the forest, a step at a time until the flow starts the encounter's flash.
+    public static void WalkUntilAnEncounter(GameFlow flow)
+    {
+        for (var update = 0; update < 600 && !flow.IsFlashing; update++)
+        {
+            flow.Update(OneUpdate, StartMapScenarios.HoldingLeft);
+        }
+
+        Assert.True(flow.IsFlashing);
+    }
+
+    public static ContentCatalog WithStartTrack(ContentCatalog catalog, string? file)
+    {
+        var start = catalog.Maps["start"];
+        var settings = start.Settings with { MusicFile = file };
+        return catalog with { Maps = new Dictionary<string, MapDefinition>(catalog.Maps) { ["start"] = new MapDefinition(start.Layout, settings) } };
     }
 
     public static GameSession SessionOf(GameFlow flow) =>

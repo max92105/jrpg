@@ -29,8 +29,8 @@ internal sealed class SceneFactory
     private readonly MapArt _art;
     private readonly UiTextures _ui = new();
 
-    /// <summary>The one voice-over channel: map events write it, the host plays it (ADR 0018).</summary>
-    public VoiceChannel Voice { get; } = new();
+    /// <summary>The channels the flow and the scenes write and the host plays (ADR 0018, ADR 0035).</summary>
+    public AudioChannels Audio { get; } = new();
 
     /// <param name="catalog">The content, as loaded.</param>
     /// <param name="text">Messages and fonts for everything a scene writes.</param>
@@ -67,7 +67,7 @@ internal sealed class SceneFactory
         new(
             exploration,
             _art,
-            new EventPresenter(exploration, new EventLook(_text, _ui), _settings, Voice),
+            new EventPresenter(exploration, new EventLook(_text, _ui), _settings, Audio.Voice),
             new InteractionPromptView(_text, exploration.CurrentDefinitionOf));
 
     private SystemPage CreateSystemPage(GameSession session) =>

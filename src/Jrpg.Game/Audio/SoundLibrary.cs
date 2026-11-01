@@ -4,8 +4,8 @@ using Microsoft.Xna.Framework.Audio;
 namespace Jrpg.Game.Audio;
 
 /// <summary>
-/// The one place the game opens sound files: each is loaded on first use and kept. A file that won't load is reported
-/// once, by name, and plays silent (ADR 0018).
+/// The one place the game opens sound files, voices and music alike: each is loaded on first use and kept. A file that
+/// won't load is reported once, by name, and plays silent (ADR 0018).
 /// </summary>
 internal sealed class SoundLibrary(string audioRoot) : IDisposable
 {

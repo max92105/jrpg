@@ -5,11 +5,12 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-music-and-sfx, slice P1 (music the flow calls for, headless) plus ADR 0035. Round 1.
+Plan: 2026-10-29-music-and-sfx, slice P2 (the music plays on the device). Round 1.
 Verdict: Ready to commit. No Critical, no Warning.
 
-- Fixed (from C1, Warning): MapSettingsViewModel.ToSettings now keeps MusicFile
-- Open (Suggestion): Program.cs:43 comment says "the channel the host plays"; it now returns the channels
-- Open (Suggestion): Update_DuringTheFlash passes without the flash-path write, since the update that starts the flash already wrote the theme
-- Open (Suggestion): GameFlowMusicTests and MusicSelectionTests each build the start map with a track; share one builder
-- Open (Follow-up, from V1, still in the tree): OptionsPageTests reach Text speed by one Down press (lines 53-88); PageOn(TextSpeedRow) exists
+- Open (Suggestion): JrpgGame.PlayWhatTheFlowAsked: scenes write the channels too; PlayWhatTheChannelsAsk
+- Open (Suggestion): JrpgGame.cs:54 the slice asks the comment over _sounds to name the music; unchanged, unrecorded in the Done note
+- Fixed (from P1): Program.cs comment now says "the channels the host plays"
+- Fixed (from P1): Update_DuringTheFlash now clears the channel before the update it checks
+- Dropped (from P1, Suggestion): shared start-map builder in the music tests; not carried past its slice
+- Dropped (from V1, Follow-up): OptionsPageTests Down presses; docs/plans/backlog.md lists it

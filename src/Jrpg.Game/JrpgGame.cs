@@ -51,9 +51,10 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     private bool _isCaptureAsked;
 #endif
 
-    // Null when the machine has no sound device: the game then runs silent (ADR 0018).
+    // Null when the machine has no sound device: the game then runs silent, voices and music alike (ADR 0018).
     private SoundLibrary? _sounds;
     private VoicePlayer? _voicePlayer;
+    private MusicPlayer? _musicPlayer;
 
     /// <param name="rootScene">The game flow, or the screen explaining why the game can't start.</param>
     /// <param name="contentRoot">The content folder, holding the art and audio folders.</param>
@@ -121,7 +122,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
             Exit();
         }
 
-        _voicePlayer?.Follow(_audio.Voice, VolumeLevel.GainOf(_settings.VoiceVolume));
+        PlayWhatTheChannelsAsk();
 
         base.Update(gameTime);
     }
@@ -156,6 +157,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
             _frozenFrame?.Dispose();
             _textures?.Dispose();
             _voicePlayer?.Dispose();
+            _musicPlayer?.Dispose();
             _sounds?.Dispose();
         }
 
@@ -185,6 +187,12 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
         return new Point(mode.Width, mode.Height);
     }
 
+    private void PlayWhatTheChannelsAsk()
+    {
+        _voicePlayer?.Follow(_audio.Voice, VolumeLevel.GainOf(_settings.VoiceVolume));
+        _musicPlayer?.Follow(_audio.Music, VolumeLevel.GainOf(_settings.MusicVolume));
+    }
+
     // The audio system is touched once here, so a missing device shows at startup rather than mid-intro.
     private void StartAudio()
     {
@@ -201,6 +209,11 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
 
         _sounds = new SoundLibrary(_audioRoot);
         _voicePlayer = new VoicePlayer(_sounds);
+        _musicPlayer = new MusicPlayer(_sounds);
+
+        // Loaded now, so the encounter's flash doesn't stall on the battle theme (ADR 0035).
+        _sounds.Get(AudioFolders.Music, UiSoundFiles.Music.Title);
+        _sounds.Get(AudioFolders.Music, UiSoundFiles.Music.Battle);
     }
 
 #if DEBUG

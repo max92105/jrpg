@@ -1,10 +1,18 @@
+using Jrpg.Core.Quests;
+
 namespace Jrpg.Core.World;
 
-/// <summary>What the player changed on the maps: events already done and objects swapped. Kept across map changes.</summary>
+/// <summary>
+/// What the player changed in the world: events already done, objects swapped, and the quests started (ADR 0032). Kept
+/// across map changes.
+/// </summary>
 internal sealed class WorldState
 {
     private readonly HashSet<MapEventKey> _completedEvents = [];
     private readonly Dictionary<(string MapId, string ObjectUid), string> _swappedObjectIds = [];
+
+    /// <summary>Each started quest's stage and completion, changed by the quest steps (ADR 0032).</summary>
+    public QuestLog Quests { get; } = new();
 
     public WorldState()
     {

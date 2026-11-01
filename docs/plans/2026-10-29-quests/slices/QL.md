@@ -28,3 +28,5 @@ Part of [the quests plan](../README.md). After QD and ADR 0032. Decision 388 (st
     - `WorldStateTests: Quests_NewWorld_NoQuestStarted`
   - **Call sites:** none (`new WorldState()` unchanged).
   - **Verify by hand:** nothing to see yet; the tests are the check.
+
+- **Done, with deviations:** the log's entry keeps only the stage id and the completion, not the definition: nothing reads a kept definition before QC and SV, and an unread member fails the build; QC adds it with its first reader. `AdvanceTo` resolves the stage before the completed check, so an unknown stage throws in every state. Tests 3163 → 3176 (12 log tests, one world test).

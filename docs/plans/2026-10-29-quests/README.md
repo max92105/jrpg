@@ -47,8 +47,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 1: quests in Core and content
 - [x] **QD. Quest definitions in `quests.json` with the placeholder errand, validated and in the catalog** (Core + Data + content, about 230 lines) → [slices/QD.md](slices/QD.md)
-- [ ] **ADR 0032: quest progress is its own log** (stage ids per quest in `WorldState`, rather than general flags; story state that isn't a quest is a main-quest stage for now): write it from decisions 388 and 398 and design.md "Key decisions" (nothing left to ask), before QL
-- [ ] **QL. The quest log in `WorldState`: start, advance, complete** (Core, about 230 lines) → [slices/QL.md](slices/QL.md)
+- [x] **ADR 0032: quest progress is its own log** (stage ids per quest in `WorldState`, rather than general flags; story state that isn't a quest is a main-quest stage for now): write it from decisions 388 and 398 and design.md "Key decisions" (nothing left to ask), before QL
+- [x] **QL. The quest log in `WorldState`: start, advance, complete** (Core, about 230 lines) → [slices/QL.md](slices/QL.md)
 - [ ] **QS. The `startQuest`, `advanceQuest` and `completeQuest` steps** (Core + Data, about 220 lines) → [slices/QS.md](slices/QS.md)
 - [ ] **R1. `ExplorationState` split: starting map events moves out** (Core refactor, about 160 lines moved, tests unchanged) → [slices/R1.md](slices/R1.md)
 - [ ] **ADR 0033: quest conditions gate whole events** (`onlyWhenQuest` beside the leader and object gates; the first event of an object that may start wins): write it from decisions 386 and 389 (nothing left to ask), before QC

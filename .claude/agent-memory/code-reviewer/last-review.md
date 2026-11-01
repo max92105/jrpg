@@ -5,11 +5,10 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-quests, slice QD (quest definitions in quests.json, validator, ContentCatalog.Quests). First slice.
-Round 1. Verdict: Ready to commit. verify.ps1 all pass (3163 tests).
+Plan: 2026-10-29-quests, slice QL (QuestLog in WorldState, plus ADR 0032). Round 1. Verdict: Ready to commit.
+verify.ps1 all pass (3176 tests).
 
-- I3 items checked 2026-11-01: `// Digits only.` back above WholeNumber, ValidPrice() renamed: fixed
-- Warning, open: ContentCatalogLoaderQuestTests.cs:10-23 is the fifth copy of the copied-content-root ctor/Dispose (Shop, Crafting, ContentWriter, ContentWriterShop tests); extract a shared CopiedContentRoot fixture
-- Suggestion, open: QuestCatalogValidator.cs:49 "stages[1] stage 'deliver' has no text." says stage twice
-- Suggestion, open: QuestDefinition.cs:32 Equals is one 156-column line; break at the &&
+- QD carried items checked 2026-11-01: CopiedContentRoot fixture extracted, validator "stage" message fixed: fixed
+- Suggestion, open: QuestLogTests.cs:8 the two-stage `_errand` is one ~165-column line; break per stage
+- Suggestion, open: AdvanceTo_UnknownStage_Throws covers only the never-started state; the Done note claims "every state" (completed is the one that depends on the ordering)
 - Follow-up (carried): Trade/ShopScene 296 lines

@@ -5,6 +5,15 @@ namespace Jrpg.Core.Tests.World;
 public sealed class WorldStateTests
 {
     [Fact]
+    public void Quests_NewWorld_NoQuestStarted()
+    {
+        var world = new WorldState();
+
+        Assert.Null(world.Quests.StageOf("placeholder_errand"));
+        Assert.False(world.Quests.IsCompleted("placeholder_errand"));
+    }
+
+    [Fact]
     public void IsEventDone_SameEventIdOnOtherMap_ReturnsFalse()
     {
         var world = new WorldState();

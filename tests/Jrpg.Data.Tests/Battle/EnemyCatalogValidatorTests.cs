@@ -1,5 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Party;
+using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
 using Jrpg.Data.Battle;
 using Jrpg.Data.Content;
@@ -26,7 +27,7 @@ public sealed class EnemyCatalogValidatorTests
         ExperienceReward = 40,
     };
 
-    private static readonly HashSet<string> _goblinTable = ["goblin"];
+    private static readonly EnemyReferences _references = new(new HashSet<string> { "goblin" }, new Dictionary<string, SkillDefinition>());
 
     public static TheoryData<EnemyDefinition, string> InvalidEnemies => new()
     {
@@ -48,7 +49,7 @@ public sealed class EnemyCatalogValidatorTests
     [Fact]
     public void Validate_ValidEnemy_DoesNotThrow()
     {
-        var exception = Record.Exception(() => EnemyCatalogValidator.Validate("enemies.json", [_goblin], _goblinTable));
+        var exception = Record.Exception(() => EnemyCatalogValidator.Validate("enemies.json", [_goblin], _references));
 
         Assert.Null(exception);
     }
@@ -57,7 +58,7 @@ public sealed class EnemyCatalogValidatorTests
     [MemberData(nameof(InvalidEnemies))]
     public void Validate_InvalidField_ThrowsNamingTheEnemyAndField(EnemyDefinition enemy, string problem)
     {
-        var exception = Assert.Throws<ContentValidationException>(() => EnemyCatalogValidator.Validate("enemies.json", [enemy], _goblinTable));
+        var exception = Assert.Throws<ContentValidationException>(() => EnemyCatalogValidator.Validate("enemies.json", [enemy], _references));
 
         Assert.Equal($"enemies.json: enemy 'goblin': {problem}", exception.Message);
     }
@@ -68,7 +69,7 @@ public sealed class EnemyCatalogValidatorTests
         var goblin = _goblin with { DropTableId = "goblin" };
         var chief = goblin with { Id = "goblin_chief" };
 
-        var exception = Record.Exception(() => EnemyCatalogValidator.Validate("enemies.json", [goblin, chief], _goblinTable));
+        var exception = Record.Exception(() => EnemyCatalogValidator.Validate("enemies.json", [goblin, chief], _references));
 
         Assert.Null(exception);
     }
@@ -77,7 +78,7 @@ public sealed class EnemyCatalogValidatorTests
     public void Validate_UnknownDropTable_Throws()
     {
         var exception = Assert.Throws<ContentValidationException>(
-            () => EnemyCatalogValidator.Validate("enemies.json", [_goblin with { DropTableId = "slime" }], _goblinTable));
+            () => EnemyCatalogValidator.Validate("enemies.json", [_goblin with { DropTableId = "slime" }], _references));
 
         Assert.Equal("enemies.json: enemy 'goblin': dropTableId has unknown drop table id 'slime'.", exception.Message);
     }

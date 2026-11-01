@@ -14,12 +14,12 @@ internal static class EnemyCatalogValidator
 
     /// <param name="fileName">The file, for messages.</param>
     /// <param name="enemies">The deserialized list.</param>
-    /// <param name="dropTableIds">
-    /// The drop tables an enemy may name; several enemies may share one (decision 343).
-    /// </param>
-    public static void Validate(string fileName, IReadOnlyList<EnemyDefinition> enemies, IReadOnlySet<string> dropTableIds) =>
+    /// <param name="references">What an enemy may name.</param>
+    public static void Validate(string fileName, IReadOnlyList<EnemyDefinition> enemies, EnemyReferences references) =>
         new ContentListValidator<EnemyDefinition>(fileName, "enemy", enemy => enemy.Id)
-            .Validate(enemies, enemy => FindProblem(enemy) ?? FindDropTableProblem(enemy, dropTableIds));
+            .Validate(enemies, enemy => FindProblem(enemy)
+                ?? FindDropTableProblem(enemy, references.DropTableIds)
+                ?? EnemyTacticsValidator.FindProblem(enemy.Tactics, "tactics", references.Skills));
 
     private static string? FindDropTableProblem(EnemyDefinition enemy, IReadOnlySet<string> dropTableIds) =>
         enemy.DropTableId is { } id && !dropTableIds.Contains(id) ? $"dropTableId has unknown drop table id '{id}'." : null;

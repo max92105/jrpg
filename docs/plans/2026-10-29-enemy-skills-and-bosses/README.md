@@ -48,7 +48,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **T1. Enemies choose a skill from a weighted list; nothing usable means the attack** (Core, about 245 lines) → [slices/T1.md](slices/T1.md)
 
 ### Phase 2: the Chief in content
-- [ ] **D1. `enemies.json` actions, checked against the skills** (Data, about 190 lines) → [slices/D1.md](slices/D1.md)
+- [x] **D1. `enemies.json` actions, checked against the skills** (Data, about 190 lines) → [slices/D1.md](slices/D1.md)
 - [ ] **C1. The Goblin Chief's encounter, with Attack and Cleave, rolled by no map** (content + tests, about 90 lines) → [slices/C1.md](slices/C1.md)
 
 ### Phase 3: conditions

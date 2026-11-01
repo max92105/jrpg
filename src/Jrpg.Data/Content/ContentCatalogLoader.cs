@@ -68,7 +68,7 @@ public static class ContentCatalogLoader
         var members = ReadValidated<IReadOnlyList<PartyMemberDefinition>>(
             contentRoot, PartyMembersFile, (file, list) => PartyMemberCatalogValidator.Validate(file, list, memberReferences));
         var enemies = ReadValidated<IReadOnlyList<EnemyDefinition>>(
-            contentRoot, EnemiesFile, (file, list) => EnemyCatalogValidator.Validate(file, list, dropTableIds));
+            contentRoot, EnemiesFile, (file, list) => EnemyCatalogValidator.Validate(file, list, new EnemyReferences(dropTableIds, skillsById)));
         var enemyIds = enemies.Select(enemy => enemy.Id).ToFrozenSet();
         var encounters = ReadValidated<IReadOnlyList<EncounterDefinition>>(
             contentRoot, EncountersFile, (file, list) => EncounterCatalogValidator.Validate(file, list, enemyIds));

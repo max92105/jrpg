@@ -1,19 +1,12 @@
 ---
 name: detached-comments
-description: Inserting or removing a member next to a `//` or `///` comment leaves the comment on the wrong member
+description: Inserting or removing a member next to a `//` or `///` comment, or a docs/map.md parenthetical, leaves the comment on the wrong member
 metadata:
   type: feedback
 ---
 
-When a diff adds a member or test just above an existing helper, check the line above the insertion: a `//` comment or
-`///` block that described the helper now sits above the new code (seen in MO2b, InventoryPageTests; the user also
-keeps a memory rule "insert above doc comments"). The reverse also happens: a removed or moved member leaves its comment
-behind on the next member (seen in D1: BattleState's AttackTargeting const moved to AttackEffect, its comment stayed
-above `_turnOrder`; and in A4a: a new test inserted between a comment and Roll_NotEquipment_Throws merged the old
-comment into the new test's; and in G3: EnemyCatalogValidator.FindGoldProblem inserted under the
-resistances' ADR 0027 comment, which was then extended instead of split; and in S4 of gold-and-shops: a "serializer
-nullable" comment copied from CraftingRulesValidator landed above a null-list check instead of the null-element one; and in I2a: a type inserted into docs/map.md between `StillRun` and its parenthetical, which then described the new type; and in I3: EventStepViewModel IsFreeRest/Price() inserted under WholeNumber's "Digits only." comment).
+A member inserted just above an existing one takes that one's comment (MO2b, A4a, G3, S4, I3); a member removed or moved leaves its comment on the next member (D1); a type inserted into a `docs/map.md` entry between a type and its parenthetical takes the parenthetical (I2a). Three times in the gold plan alone, so the `/slice` skill's self-review now names the check; still look.
 
 **Why:** the comment then misdescribes the new member; a misleading comment counts as Critical (cheap fix).
-**How to apply:** in `git diff`, look at the context line right before each `+    [Fact]` / new member, and right after
-each removed `-` member: a context `//` line with no `-` below it is orphaned.
+
+**How to apply:** in `git diff`, look at the context line right before each `+` member or `[Fact]` and right after each removed `-` member: a context `//`, `///` or `(...)` there with no `-` below it is orphaned. In `docs/map.md`, read every changed entry whole.

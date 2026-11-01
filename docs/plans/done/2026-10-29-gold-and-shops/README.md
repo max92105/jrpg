@@ -1,5 +1,5 @@
 # Gold, shops and the inn
-Status: retro pending
+Status: done
 
 Open question 222 (paying for rest, from the class mechanics plan) answered as a feature on 2026-10-29: the developer wants gold, shops and a priced inn. Follows [the forge plan](../done/2026-10-27-forge/README.md), whose Forge screen (opened by an `openForge` step from a forge master NPC) is the model for the Shop screen a shopkeeper opens.
 

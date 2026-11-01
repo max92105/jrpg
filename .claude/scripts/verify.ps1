@@ -198,5 +198,25 @@ Report 'no member with two summaries' (-not $doubledSummaries) ($doubledSummarie
 Report 'no doc comment line lost a slash' (-not $brokenDocLines) ($brokenDocLines | Select-Object -First 10)
 Report 'no changed file crossed 300 lines (split it)' (-not $grownFiles) ($grownFiles | Select-Object -First 10)
 
+# 12. A changed method or constructor in src declares at most 4 parameters (code-quality.md; four Draw methods slipped
+# past the gold plan's reviews). Positional records and primary constructors are data shapes and are left out, and a
+# generic argument's comma isn't a parameter. Multi-line parameter lists are joined up to their closing parenthesis.
+$maxParameters = 4
+$manyParameters = @()
+foreach ($source in $changedSources | Where-Object { $_ -like 'src/*' }) {
+    $lines = [IO.File]::ReadAllLines((Join-Path $repositoryRoot $source))
+    for ($number = 1; $number -le $lines.Length; $number++) {
+        $text = $lines[$number - 1]
+        if ($text -notmatch '^\s*(public|internal|private|protected)[^=;{(]*?\b\w+\s*\((.*)$' -or $text -match '\b(record|class|struct|interface|enum|delegate)\b') { continue }
+        $parameters = $Matches[2]
+        for ($next = $number; ($parameters -replace '[^(]', '').Length -ge ($parameters -replace '[^)]', '').Length -and $next -lt $lines.Length; $next++) { $parameters += ' ' + $lines[$next] }
+        $parameters = $parameters -replace '\).*$', ''
+        while ($parameters -match '<[^<>]*>|\([^()]*\)') { $parameters = $parameters -replace '<[^<>]*>|\([^()]*\)', '' }
+        $count = if ($parameters.Trim()) { ($parameters -split ',').Count } else { 0 }
+        if ($count -gt $maxParameters) { $manyParameters += "${source}:$number ($count parameters)" }
+    }
+}
+Report "no changed method takes more than $maxParameters parameters (a parameter object or the constructor takes the extra)" (-not $manyParameters) ($manyParameters | Select-Object -First 10)
+
 if ($failed) { exit 1 }
 exit 0

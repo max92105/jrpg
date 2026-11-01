@@ -1,65 +1,25 @@
 ---
 name: tautological-tests
-description: Recurring in Core/Data reviews - tests whose assertion can't fail (count==count, "same seed twice gives same result" that passes even with the shuffle removed)
+description: Recurring in every review - tests whose assertion can't fail; the variants seen, one line each, and the question that exposes them
 metadata:
   type: feedback
 ---
 
-Seen in slice 4b (`Select(...).ToList().Count == source.Count`) and 5a (`TurnOrder_Constructor_SameSeed_ProducesSameOrder` and `SeededRandom_..._SameSeed_ReturnsSameSequence` compare two runs with each other, so they pass with no shuffle at all and don't catch a .NET `Random` algorithm change).
+**Why:** a test that reads well but passes with the rule deleted protects nothing; the plans list such tests ("same seed, same result") because they sound right.
 
-**Why:** The plan lists "same seed -> same result" tests, and they read well, but they only prove the code is deterministic, not that it does what it should. The plan's Determinism risk says seeded expectations are a baseline, so pin them.
+**How to apply:** for each new rule, guard, branch or chosen value in the diff, ask "which test fails if I delete this line?" If none, it's a Warning (Critical when several branches ship untested). The variants seen so far:
 
-**How to apply:** For any seeded test, ask "would this pass if the randomness were removed or the algorithm changed?" If yes, Warning: pin golden values (a specific order/sequence for the seed). Related: [[records-with-lists-equality]].
+- **same-seed-twice** (5a, 5b): two runs compared with each other pass with the randomness removed; pin golden values.
+- **count==count / oracle** (4b, 11g, stats E1): the test rebuilds the production computation; pin a golden prefix instead.
+- **guard clause** (6a, 8, 1b, class-mechanics PL2b, RG1): a `||` clause, a validator message or a `throw` with no test; match each to a test (one theory row per clause).
+- **boundary** (1b re-review, gold I1): `<=` tested only at the bound, or a range tested only on rejected values (0 and max + 1); test the accepted bounds too.
+- **fixture doesn't reach the scenario** (part 2 4a, 5b, slice 7): coordinates, keys or identical inputs make the named case never happen; trace the fixture.
+- **single recipient / neutral rules / fixture default** (battle C1, stats M1a, M2a): a total equals a share, a multiplier runs at 1, a stat defaults to 0; use two recipients and a non-neutral value.
+- **stale equals expected** (demo G1a, gold L2b): the "refreshed" value was already the expected one; start from a state where it differs, one test per cache key.
+- **same observable** (gold I2b, B3): two outcomes look alike through the assertion used (`IsShowingMessage`, "a consumable row"); assert the id or value only the right outcome has.
+- **loop exit restated** (battle B1b): asserting the loop's own exit condition; ask what else differs.
+- **cache by reference** (demo I1): `Assert.Same` on a value the runtime interns anyway.
+- **constant oracle** (stats P3b): asserting `Cap * 10` keeps green when the cap changes; pin the literal.
+- **second overload** (gold S2/S3): the stack overload's false paths tested, the piece overload's not; check each overload.
 
-Seen again in 5b (`Execute_SeededBattleLoop_EndsInVictory`): stats make the hero win under any seed, and the one-member party makes `EnemyTactics`' seed irrelevant, so "Seeded" in the name promises something the test doesn't check. Also an unbounded `while (!battle.IsOver)` hangs instead of failing on a turn-advance bug; ask for a turn cap.
-
-Seen again in 6a (guard-clause variant): `ThrowIfIllegalTargets`' `Distinct` check, `CanUse(item)`'s party-side check and `ApplyToTargets`' `wasAlive` guard could each be deleted with every test still passing, and the revive test asserted only `events[1]`. For each deliberate rule the caller lists, ask "which test fails if I delete this clause?"
-
-Seen again in slice 7 (identical-inputs variant): `Start_PartyAndEnemies_CreatesCombatantsOnBothSides` builds three identical goblins, so "in encounter order" can't be checked; and the simulation's only assertion ("every battle ends") would still pass if the party never acted, since win rate is 0 %. When a test claims an order, check the inputs are distinguishable.
-
-Seen again in slice 8: `FieldItemUse.CanUse`'s `item.Effect is not null` clause can be deleted with every test passing (no test uses a menu-usable item without an effect, and the validator doesn't forbid one).
-
-Seen again in part 2 slice 1b (converter): `TileConversion` rejects Sprite, Frames or CollisionPolygon but only CollisionPolygon is tested; the converter's file reader's strict options (unmapped members disallowed) have no test. Multi-clause `||` guards and serializer option flags are the usual blind spot: ask for a theory per clause.
-
-Seen again in the 1b re-review (fixed the clauses above): `id <= EmptyTileId` tested only with 0, so `==` would pass; and `Convert_RepositoryAssets_WritesTilesAndReport` only asserts `File.Exists`. Boundary comparisons need a value past the boundary; file-writing tests need a content check. For generated content, ask for a drift test (convert to temp, compare to the committed `content/generated/`).
-
-Seen again in 1c and 1d (converter error branches): each slice adds `ConversionException` throws "none exist today" (meta, duplicate source id, null object) and tests only some. In 1d raised as one Critical listing the untested throws. Grep every new `throw` in the diff and match it to a test message.
-
-Seen again in part 2 slice 4a (fixture variant): `ContinueEvent_WarpOntoTouchCell_DoesNotFireArrivalCell` warps to town (3, 2), but the fixture's touch cell is (3, 3), so it never arrives on a touch cell. When a test name claims a scenario, trace the fixture coordinates and check the scenario actually happens.
-
-Seen again in part 2 slice 5b: `Read_MissingRequiredField_ThrowsNamingTheField` renames a key, so it tests the unmapped-member error, not the missing field; `CheckNoNullEntries` (5 `||` clauses) tested on one list only.
-
-Seen again in 11g (oracle variant): `ObjectBrowserViewModelTests` asserts the list equals the same `OrderBy(Category).ThenBy(Id)` the production code runs, so it passes for any sort bug shared by both. Pin a golden prefix instead (it did, with `Take(2)`).
-
-Seen again in battle C1 (single-recipient variant): `VictoryRewards.Experience` ("before the split") tested only with a one-member party, so total == share and `Experience = Gains[0].Amount` would pass. For totals vs per-member values, ask for two recipients.
-
-Seen again in battle B1b (loop-exit variant): the flow test loops `while session.ActiveBattle is not null`, then asserts `ActiveBattle` is null and the position kept (Core forbids walking anyway), so a no-op `BattleTransitions.Finish` (battle screen never popped) passes. When asserts restate a loop's exit condition, ask what proves the screen/stack changed (e.g. the map takes input again).
-
-Seen again in demo-retirement I1 (cache variant): `ButtonLabelsTests.Of_SameButtonTwice_ReturnsTheSameString` uses `Assert.Same`, but .NET's `Enum.ToString()` already returns the same cached name instance (probed with fsi), so it passes with no cache. Reference-identity tests of a cache need a value the runtime doesn't intern.
-
-Seen again in demo-retirement G1a (stale-equals-expected variant): `InteractionInFront_AfterWarp_IsRefreshedOnTheNewMap` asserts null, but the value was already null from `TryInteract`, so deleting the refresh in `ContinueEvent` keeps it green. For a "refreshed" test, the expected value must differ from the stale one.
-
-Seen again in class-mechanics PL2b and RG1 (new validator branch): `EffectValidator` negative range and `ResourceDefinitionValidator` `speedPerCharge < 1` (a divide-by-zero guard) shipped untested while sibling branches got tests. Match each new validator message in the diff to a test.
-
-Seen again in stats P3b (constant-oracle variant): clamp tests assert `Resistances.CapPercent * 10`, so changing the cap itself (a player-visible limit) keeps them green. When a constant is the rule, pin its literal value.
-
-Seen again in stats E1 (copied-wiring variant): `EquipmentChoiceTests.Comparison_*` rebuild `EquipmentComparison.ShowChoice`'s before/after pairing by hand, so a swap in the real presenter passes; same shape as 11g's oracle. When a test builds the inputs the way the code under test does, ask it to call that code.
-
-Seen again in class-mechanics RG4 (same-end-state variant): `Update_AfterReady_SameMemberStepsForwardAgain` asserts the rogue awaits a command, but a non-quick Ready also ends there (goblin acts, then the readied turn). Ask which state differs between the two paths (`UpcomingActors`).
-
-Seen again in stats M1a (neutral-rules variant): `AttackEffect.Of` scales by Power, but every `AttackCommand` test runs under `TestStatRules.Neutral` (DamagePercentPer100Power 0, permille 1000), so removing the scaling keeps the suite green. When a slice adds a multiplier, check at least one test per call site runs with a non-neutral rate.
-
-Seen again in stats M2a (fixture-default variant): builder defense default 5 → 0 left
-`Execute_PoisonedActorEndsTurn_LosesPowerIgnoringDefenseAndExposed` with a defense-0 hero, so "IgnoringDefense" became
-vacuous. When a builder default changes, grep test names for the stat's word and check each still sets a non-zero value.
-
-Seen again in gold S2/S3 (second-overload variant): the stack overload's refusal branches are tested, the piece overload's (not in stock, unpriced base, not owned) are not. Check each overload's false paths.
-
-Seen again in gold B3 (reset-to-first variant): `NextTab_InTheList_..._GoesToTheFirstRow` moves Down once then checks only that the row is a consumable; with two consumables first, a kept cursor passes. A "goes to the first row" test needs the kept index to land on a different row.
-
-Seen again in gold L2b (stale-equals-expected again): `Right_OnGearRow_PreviewsTheNextActiveMember` asserts `Preview` NotNull, already true from the leader's preview, so a rebuild keyed on the row alone passes. Scene caches keyed on two inputs need a test per input whose expected value differs from the stale one.
-
-Seen again in gold I1 (refusal-only variant): the rest price's validator rows test 0 and MaxGold+1 only, so a check that refuses every price passes. A range check needs a row on each accepted bound too.
-
-Seen again in gold I2b (same-observable variant): the inn's short-of-gold test asserts only `IsShowingMessage`, so the
-refusal page and "The party rests." look alike; a chosen message id needs a test that reads the id or text.
+Related: [[records-with-lists-equality]].

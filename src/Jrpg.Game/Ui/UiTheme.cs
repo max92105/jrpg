@@ -124,6 +124,13 @@ internal static partial class UiTheme
     /// <summary>An empty or unreadable save file.</summary>
     public static Color TextDisabled { get; } = FromStraightArgb(0xFF5C606B);
 
+    /// <summary>
+    /// The Quests page's mark before a main quest, a pale gold; before a side quest, dim (placeholders).
+    /// </summary>
+    public static Color QuestMainMark { get; } = FromStraightArgb(0xFFE6C56A);
+
+    public static Color QuestSideMark { get; } = FromStraightArgb(0xFF6B6F7A);
+
     /// <summary>The selected row of every list (decision 270): deep navy fading to black, then out.</summary>
     public static ImmutableArray<GradientStop> SelectedRow { get; } =
         [new(0, FromStraightArgb(0xD90E1430)), new(0.3f, FromStraightArgb(0xC0141A3C)), new(0.75f, FromStraightArgb(0x700A0D20)), new(1, FromStraightArgb(0x000A0D20))];

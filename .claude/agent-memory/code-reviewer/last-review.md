@@ -5,15 +5,16 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-quests, slice G3 (Active/Completed categories: QuestJournal.Completed, QuestCategory, QuestList columns, QuestDetail note, QuestsPage Left/Right). Round 1.
+Plan: 2026-10-29-quests, slice L1 (list column look: PageListLayout, TextEllipsis, QuestRow, QuestListView, QuestList(fitTitle)). Round 1.
 Verdict: Ready to commit.
 
-- Warning, open: QuestsPage.Update calls RefreshDetail every frame (new QuestDetail + two message lookups per frame); refresh only when a button changed the choice or category
-- Suggestion, open: QuestsPageTests.WithTheErrand(stageId, bool isCompleted) is a flag argument; two named helpers (WithTheErrandAt / WithTheErrandCompletedAt)
-- Suggestion, open: QuestDetailTests completed-note test's Assert.NotEqual("Deliver it.") is implied by the Equal above it
-- Fixed (from G1/G2): Glyph test no longer asserts LeavesOnCancel (own test now)
+- Warning, open: QuestList's new title fitting (Column.Show applies fitTitle) untested; QuestListTests only pass the identity; add Show_FitsEachTitle with a marking function
+- Suggestion, open: QuestListView.Draw loop names a QuestRow `entry` (entry.Entry.Quest) and the slot index `row`; rename to `row`/`slot`
+- Suggestion, open: TextEllipsisTests don't pin "longest start that fits" (one more character must not fit)
+- Fixed (from G3): per-frame RefreshDetail; WithTheErrand flag argument split; redundant NotEqual in QuestDetailTests
+- Follow-up: Margin 28 / RowHeight 52 still copied in ForgeListView, InventoryListView, EquipmentChoiceView and others (backlog line)
 - Follow-up (G2): Done note claims detail "at each of its stages"; only return_to_giver asserted
-- Follow-up: QuestsPage detail column 340 px with untruncated description; L1-L3 should wrap
+- Follow-up: QuestsPage detail description untruncated/unwrapped; L3 should wrap
 - Follow-up (carried from N1): giver's event order untested
 - Follow-up (carried from E3): kind-to-label pairing untested in E3's view model tests
 - Follow-up (carried from E1): EventStepViewModel.QuestStep() `_ =>` arm; EventEditingViewModel QuestStages one-liner

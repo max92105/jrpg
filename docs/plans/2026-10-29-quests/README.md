@@ -67,7 +67,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **G1. A Quests tab, first in the menu, lists the active quests** (Game + text, raw 125, about 200 lines at 1.6x) → [slices/G1.md](slices/G1.md)
 - [x] **G2. Choosing a quest shows its detail** (Game + text, about 190 lines) → [slices/G2.md](slices/G2.md)
 - [x] **G3. The Active and Completed categories, switched with Left and Right** (Core + Game + text, about 210 lines) → [slices/G3.md](slices/G3.md)
-- [ ] **L1. The list column's look: rows, kind marks, one list layout in `Ui/`** (Game, raw 120, about 190 lines at 1.6x) → [slices/L1.md](slices/L1.md)
+- [x] **L1. The list column's look: rows, kind marks, one list layout in `Ui/`** (Game, raw 120, about 190 lines at 1.6x) → [slices/L1.md](slices/L1.md)
 - [ ] **L2. The category tabs' look: `Ui/PointedTabsView`** (Game, raw 80, about 130 lines at 1.6x) → [slices/L2.md](slices/L2.md)
 - [ ] **L3. The detail column's look: serif title, wrapped texts, the Objective band** (Game, raw 125, about 200 lines at 1.6x) → [slices/L3.md](slices/L3.md)
 

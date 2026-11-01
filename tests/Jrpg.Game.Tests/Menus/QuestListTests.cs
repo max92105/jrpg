@@ -3,7 +3,8 @@ using Jrpg.Game.Menus;
 
 namespace Jrpg.Game.Tests.Menus;
 
-// The listed quests' cursor: Up and Down move it, a new showing starts on the first, no quest means no cursor.
+// The listed quests' cursor: Up and Down move it, a new showing starts on the first, no quest means no cursor. The
+// titles are fitted by the function given; the tests keep them whole.
 public sealed class QuestListTests
 {
     private static readonly QuestDefinition _errand = new("errand", "An errand", "Carry a letter.", QuestKind.Side, [new QuestStage("take", "Take the letter.")]);
@@ -13,7 +14,7 @@ public sealed class QuestListTests
     [Fact]
     public void MoveDown_TwoQuests_SelectsTheSecond()
     {
-        var list = new QuestList();
+        var list = new QuestList(title => title);
         list.Show([_errandEntry, _heistEntry], []);
 
         list.MoveDown();
@@ -24,7 +25,7 @@ public sealed class QuestListTests
     [Fact]
     public void Show_Again_BackOnTheFirst()
     {
-        var list = new QuestList();
+        var list = new QuestList(title => title);
         list.Show([_errandEntry, _heistEntry], []);
         list.MoveDown();
 
@@ -36,7 +37,7 @@ public sealed class QuestListTests
     [Fact]
     public void ShowNext_FromActive_ShowsCompleted()
     {
-        var list = new QuestList();
+        var list = new QuestList(title => title);
         list.Show([_errandEntry], [_heistEntry]);
 
         list.ShowNext();
@@ -48,7 +49,7 @@ public sealed class QuestListTests
     [Fact]
     public void ShowNext_OnCompleted_StaysOnCompleted()
     {
-        var list = new QuestList();
+        var list = new QuestList(title => title);
         list.Show([_errandEntry], [_heistEntry]);
         list.ShowNext();
 
@@ -60,7 +61,7 @@ public sealed class QuestListTests
     [Fact]
     public void ShowPrevious_BackOnActive_KeepsItsCursor()
     {
-        var list = new QuestList();
+        var list = new QuestList(title => title);
         list.Show([_errandEntry, _heistEntry], [_heistEntry]);
         list.MoveDown();
         list.ShowNext();
@@ -76,7 +77,7 @@ public sealed class QuestListTests
     [Fact]
     public void Show_NothingCompleted_CompletedHasNoCursor()
     {
-        var list = new QuestList();
+        var list = new QuestList(title => title);
         list.Show([_errandEntry], []);
 
         list.ShowNext();
@@ -88,7 +89,7 @@ public sealed class QuestListTests
     [Fact]
     public void Show_NoQuest_HasNoCursor()
     {
-        var list = new QuestList();
+        var list = new QuestList(title => title);
         list.Show([_errandEntry], []);
 
         list.Show([], []);

@@ -11,28 +11,22 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// The menu's Quests page, its first tab (decision 393): the Active or the Completed quests (decision 390, Left and
-/// Right switch, the category's name over the list) in the journal's order (decision 391) under the shared gliding
-/// selection, or a line saying the category is empty; beside them the chosen quest's detail (decision 392). Read from
-/// Core when the page opens and when the choice moves, so drawing formats nothing.
+/// Right switch) in the journal's order (decision 391), drawn by <see cref="QuestListView"/> under the shared gliding
+/// selection; beside them the chosen quest's detail (decision 392), plain lines until L3. Read from Core when the page
+/// opens and when the choice moves, so drawing formats nothing.
 /// </summary>
 internal sealed class QuestsPage : IMenuPage
 {
-    /// <summary>How many quests the list shows at once (placeholder, until L1's view owns the layout).</summary>
-    public const int VisibleRows = 11;
-
-    // The list takes the left part of the page under its category's name, the detail the rest; plain lines until L1 to
-    // L3 (placeholders).
-    private const int ListWidth = 720;
+    // The detail follows the list column after a gap (placeholder until L3).
     private const int DetailGap = 40;
 
     private readonly GameSession _session;
     private readonly UiMessages _messages;
-    private readonly UiTextures _ui;
     private readonly SpriteFontBase _font;
     private readonly string[] _categoryNames;
     private readonly string[] _emptyLines;
-    private readonly ColumnPanelView _panel = new(UiTheme.PageColumn);
-    private readonly QuestList _list = new();
+    private readonly QuestListView _listView;
+    private readonly QuestList _list;
     private QuestDetail? _detail;
 
     /// <param name="text">Messages and fonts for the titles and the lines.</param>
@@ -42,10 +36,11 @@ internal sealed class QuestsPage : IMenuPage
     {
         _session = session;
         _messages = text.Messages;
-        _ui = ui;
         _font = text.Fonts.FontAt(UiTheme.MenuTextPixels);
         _categoryNames = [text.Messages.Text(MessageIds.QuestsActive), text.Messages.Text(MessageIds.QuestsCompleted)];
         _emptyLines = [text.Messages.Text(MessageIds.QuestsNone), text.Messages.Text(MessageIds.QuestsNoneCompleted)];
+        _listView = new QuestListView(ui, _font);
+        _list = new QuestList(title => TextEllipsis.Fit(_font, title, QuestListView.TitleWidth));
         Hint = text.Messages.Text(MessageIds.MenuHintQuests);
     }
 
@@ -60,8 +55,10 @@ internal sealed class QuestsPage : IMenuPage
     /// <summary>The category shown.</summary>
     internal QuestCategory Category => _list.Category;
 
-    /// <summary>The shown category's titles, in the journal's order; empty when its empty line shows.</summary>
-    internal IReadOnlyList<string> ShownTitles => [.. _list.Entries.Select(entry => entry.Quest.Title)];
+    /// <summary>
+    /// The shown category's titles as content has them, in the journal's order; empty when its empty line shows.
+    /// </summary>
+    internal IReadOnlyList<string> ShownTitles => [.. _list.Rows.Select(row => row.Entry.Quest.Title)];
 
     /// <summary>The chosen quest's detail; null while the shown category lists no quest.</summary>
     internal QuestDetail? Detail => _detail;
@@ -108,28 +105,12 @@ internal sealed class QuestsPage : IMenuPage
 
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
-        var column = MenuLayout.SingleColumn(area);
-        _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(column), opacity);
-        var list = column with { Width = ListWidth };
-        DrawLine(batch, _categoryNames[(int)_list.Category], RowAt(list, 0), UiTheme.TextSecondary * opacity);
-        var rows = list with { Y = list.Y + UiTheme.MenuRowHeight };
-        if (_list.Cursor is not { } cursor)
-        {
-            DrawLine(batch, _emptyLines[(int)_list.Category], RowAt(rows, 0), UiTheme.TextSecondary * opacity);
-            return;
-        }
-
-        _ui.DrawGlidingSelection(batch, textures, _list.Selection.RowIn(RowAt(rows, 0)), opacity);
-        for (var row = 0; row < cursor.VisibleCount; row++)
-        {
-            var index = cursor.FirstVisible + row;
-            var color = index == cursor.Selected ? UiTheme.TextPrimary : UiTheme.TextSecondary;
-            DrawLine(batch, _list.Entries[index].Quest.Title, RowAt(rows, row), color * opacity);
-        }
-
+        var category = (int)_list.Category;
+        _listView.Draw(batch, textures, new QuestListView.Place(_list.Rows, _list.Cursor, _list.Selection, _categoryNames[category], _emptyLines[category], area), opacity);
         if (_detail is { } detail)
         {
-            DrawDetail(batch, detail, column with { X = list.Right + DetailGap, Width = column.Width - ListWidth - DetailGap }, opacity);
+            var detailLeft = area.X + QuestListView.ColumnWidth + DetailGap;
+            DrawDetail(batch, detail, area with { X = detailLeft, Width = area.Right - detailLeft }, opacity);
         }
     }
 
@@ -143,10 +124,10 @@ internal sealed class QuestsPage : IMenuPage
     }
 
     private static Rectangle RowAt(Rectangle column, int row) =>
-        new(column.X, column.Y + (row * UiTheme.MenuRowHeight), column.Width, UiTheme.MenuRowHeight);
+        new(column.X, column.Y + PageListLayout.TopMargin + (row * PageListLayout.RowHeight), column.Width, PageListLayout.RowHeight);
 
     private void DrawLine(SpriteBatch batch, string line, Rectangle row, Color color) =>
-        batch.DrawString(_font, line, new Vector2(row.X + UiTheme.MenuTextInset, row.Y + ((row.Height - _font.LineHeight) / 2f)), color);
+        batch.DrawString(_font, line, new Vector2(row.X, row.Y + ((row.Height - _font.LineHeight) / 2f)), color);
 
     private void RefreshDetail() => _detail = _list.Selected is { } selected ? QuestDetail.Of(selected, _list.Category, _messages) : null;
 }

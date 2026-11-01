@@ -52,7 +52,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **C1. The Goblin Chief's encounter, with Attack and Cleave, rolled by no map** (content + tests, about 90 lines) → [slices/C1.md](slices/C1.md)
 
 ### Phase 3: conditions
-- [ ] **T2. Conditions on actions: own HP, a living ally's HP, an ally fallen** (Core + Data, about 220 lines) → [slices/T2.md](slices/T2.md)
+- [x] **T2. Conditions on actions: own HP, a living ally's HP, an ally fallen** (Core + Data, about 220 lines) → [slices/T2.md](slices/T2.md)
 - [ ] **T3. A heal aims at the most wounded ally its condition found; the Chief's Field Dressing** (Core + content, about 110 lines) → [slices/T3.md](slices/T3.md)
 
 ### Phase 4: numbers

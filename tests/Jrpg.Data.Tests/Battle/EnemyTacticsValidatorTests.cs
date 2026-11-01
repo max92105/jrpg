@@ -114,6 +114,54 @@ public sealed class EnemyTacticsValidatorTests
             catalog.Enemies["goblin"].Tactics);
     }
 
+    [Theory]
+    [InlineData(TacticConditionKind.OwnHpBelow, 0)]
+    [InlineData(TacticConditionKind.OwnHpBelow, 100)]
+    [InlineData(TacticConditionKind.AllyHpBelow, 0)]
+    [InlineData(TacticConditionKind.AllyHpBelow, 100)]
+    public void Validate_HpConditionPercentOutOfRange_IsRefused(TacticConditionKind kind, int percent)
+    {
+        var action = new EnemyAction { Weight = 1, When = new TacticCondition(kind, percent) };
+
+        Assert.Equal($"enemies.json: enemy 'goblin': tactics[0].when.percent must be within 1..99 (was {percent}).", ProblemOf(action));
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(99)]
+    public void Validate_HpConditionPercentAtABound_IsAccepted(int percent)
+    {
+        Assert.Null(ProblemOf(new EnemyAction { Weight = 1, When = new TacticCondition(TacticConditionKind.OwnHpBelow, percent) }));
+    }
+
+    [Fact]
+    public void Validate_AllyFallenWithAPercent_IsRefused()
+    {
+        var action = new EnemyAction { Weight = 1, When = new TacticCondition(TacticConditionKind.AllyFallen, 30) };
+
+        Assert.Equal("enemies.json: enemy 'goblin': tactics[0].when.percent must be left out of allyFallen (was 30).", ProblemOf(action));
+    }
+
+    [Fact]
+    public void Validate_AllyFallenWithoutAPercent_IsAccepted()
+    {
+        Assert.Null(ProblemOf(new EnemyAction { Weight = 1, When = new TacticCondition(TacticConditionKind.AllyFallen) }));
+    }
+
+    [Fact]
+    public void Load_ActionWithACondition_ReadsTheConditionKind()
+    {
+        using var content = new CopiedContentRoot("enemy-condition");
+        content.Replace(
+            "enemies.json",
+            "\"id\": \"goblin\",",
+            "\"id\": \"goblin\", \"tactics\": [ { \"weight\": 1, \"when\": { \"kind\": \"allyHpBelow\", \"percent\": 50 } } ],");
+
+        var catalog = ContentCatalogLoader.Load(content.Path);
+
+        Assert.Equal(new TacticCondition(TacticConditionKind.AllyHpBelow, 50), catalog.Enemies["goblin"].Tactics[0].When);
+    }
+
     private static string? ProblemOf(params EnemyAction[] tactics) =>
         Record.Exception(() => EnemyCatalogValidator.Validate("enemies.json", [_goblin with { Tactics = tactics }], _references))?.Message;
 

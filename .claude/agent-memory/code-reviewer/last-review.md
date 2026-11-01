@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-enemy-skills-and-bosses, slice C1 (the Goblin Chief's content and RepositoryEncounterTests). Round 1.
+Plan: 2026-10-29-enemy-skills-and-bosses, slice T2 (conditions on enemy actions). Round 1.
 Verdict: Ready to commit.
 
-- Open (suggestion): RepositoryEncounterTests uses Contains, so the Chief's last slot (top row, uncovered) is unpinned; assert EnemyIds[^1]
-- Open (follow-up, from T1): new Dictionary<string, SkillDefinition>() repeated 9 times in EnemyTacticsTests; a small helper
-- Fixed (from D1): EnemyCatalogValidatorTests._goblinTable is gone
-- Fixed (from D1): EnemyTacticsValidatorTests._cleave is gone
+- Open (warning): no test pins the enemy-side half of an ally (Side == enemy.Side in TacticConditions.AlliesOf); a hurt or fallen party member beside a healthy ally
+- Open (suggestion): TacticConditions.MeetingIt reads vaguely; CombatantsMeeting (T3 is its next caller)
+- Fixed (from C1): RepositoryEncounterTests pins the Chief's last slot with EnemyIds[^1]
+- Fixed (follow-up from T1): EnemyTacticsTests builds its tactics through the Tactics helper

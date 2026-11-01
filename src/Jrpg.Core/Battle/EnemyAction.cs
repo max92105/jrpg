@@ -8,4 +8,7 @@ public sealed record EnemyAction
 
     /// <summary>Its share of the pick: this weight over the eligible actions' total. At least 1.</summary>
     public required int Weight { get; init; }
+
+    /// <summary>When it may be chosen (decision 402); null is always.</summary>
+    public TacticCondition? When { get; init; }
 }

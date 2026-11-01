@@ -31,8 +31,12 @@ public sealed class EnemyTactics(IRandom random, IReadOnlyDictionary<string, Ski
     private List<EnemyAction> EligibleActions(BattleState battle)
     {
         var tactics = battle.CurrentActor.Enemy?.Tactics ?? [];
-        return [.. tactics.Where(action => action.SkillId is not { } skillId || battle.CanUse(skills[skillId]))];
+        return [.. tactics.Where(action => IsEligible(action, battle))];
     }
+
+    private bool IsEligible(EnemyAction action, BattleState battle) =>
+        (action.When is not { } condition || TacticConditions.Holds(condition, battle.CurrentActor, battle))
+        && (action.SkillId is not { } skillId || battle.CanUse(skills[skillId]));
 
     private BattleCommand CommandFor(EnemyAction action, BattleState battle)
     {

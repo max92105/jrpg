@@ -20,7 +20,7 @@ public sealed class EnemyTacticsTests
         _jazog.Vitals.TakeDamage(999);
         // Shuffle values (0, 2, 1) swap the goblin to the front, so it is the enemy's turn.
         var battle = new BattleState([_sarxian, _jazog, _teelle, _goblin], new Inventory(), new FixedSequenceRandom(0, 2, 1));
-        var tactics = new EnemyTactics(new FixedSequenceRandom(1), new Dictionary<string, SkillDefinition>());
+        var tactics = Tactics(1);
 
         var command = tactics.ChooseCommand(battle);
 
@@ -32,7 +32,7 @@ public sealed class EnemyTacticsTests
     public void ChooseCommand_OnPartyTurn_Throws()
     {
         var battle = new BattleState([_sarxian, _goblin], new Inventory(), new FixedSequenceRandom(1));
-        var tactics = new EnemyTactics(new FixedSequenceRandom(0), new Dictionary<string, SkillDefinition>());
+        var tactics = Tactics(0);
 
         Assert.Throws<InvalidOperationException>(() => tactics.ChooseCommand(battle));
     }
@@ -42,7 +42,7 @@ public sealed class EnemyTacticsTests
     public void ChooseCommand_OneMemberTaunting_AttacksThem()
     {
         Taunt(_jazog);
-        var tactics = new EnemyTactics(new FixedSequenceRandom(0), new Dictionary<string, SkillDefinition>());
+        var tactics = Tactics(0);
 
         var command = tactics.ChooseCommand(GoblinsTurn());
 
@@ -54,7 +54,7 @@ public sealed class EnemyTacticsTests
     {
         Taunt(_jazog);
         Taunt(_teelle);
-        var tactics = new EnemyTactics(new FixedSequenceRandom(1), new Dictionary<string, SkillDefinition>());
+        var tactics = Tactics(1);
 
         var command = tactics.ChooseCommand(GoblinsTurn());
 
@@ -66,7 +66,7 @@ public sealed class EnemyTacticsTests
     [Fact]
     public void ChooseCommand_NoTaunt_SameTargetAsBeforeForSequence()
     {
-        var tactics = new EnemyTactics(new FixedSequenceRandom(2), new Dictionary<string, SkillDefinition>());
+        var tactics = Tactics(2);
 
         var command = tactics.ChooseCommand(GoblinsTurn());
 
@@ -78,7 +78,7 @@ public sealed class EnemyTacticsTests
     {
         Taunt(_jazog);
         _jazog.Vitals.TakeDamage(999);
-        var tactics = new EnemyTactics(new FixedSequenceRandom(1), new Dictionary<string, SkillDefinition>());
+        var tactics = Tactics(1);
 
         var command = tactics.ChooseCommand(GoblinsTurn());
 
@@ -91,7 +91,7 @@ public sealed class EnemyTacticsTests
     public void ChooseCommand_TauntResisted_TargetsAnyLivingMember()
     {
         Taunt(_jazog);
-        var tactics = new EnemyTactics(new FixedSequenceRandom(499, 2), new Dictionary<string, SkillDefinition>());
+        var tactics = Tactics(499, 2);
 
         var command = tactics.ChooseCommand(GoblinsTurn(StubbornGoblin()));
 
@@ -103,7 +103,7 @@ public sealed class EnemyTacticsTests
     public void ChooseCommand_TauntNotResisted_TargetsTheTaunter()
     {
         Taunt(_jazog);
-        var tactics = new EnemyTactics(new FixedSequenceRandom(500, 0), new Dictionary<string, SkillDefinition>());
+        var tactics = Tactics(500, 0);
 
         var command = tactics.ChooseCommand(GoblinsTurn(StubbornGoblin()));
 
@@ -114,7 +114,7 @@ public sealed class EnemyTacticsTests
     [Fact]
     public void ChooseCommand_NoTauntAgainstResistantEnemy_DrawsOnlyForTheTarget()
     {
-        var tactics = new EnemyTactics(new FixedSequenceRandom(2), new Dictionary<string, SkillDefinition>());
+        var tactics = Tactics(2);
 
         var command = tactics.ChooseCommand(GoblinsTurn(StubbornGoblin()));
 
@@ -131,6 +131,8 @@ public sealed class EnemyTacticsTests
         Combatant.FromEnemy(new EnemyDefinitionBuilder().WithCrowdControlResistance(50).Build());
 
     private static void Taunt(Combatant member) => member.Statuses.Apply(new StatusGrant(StatusKind.Taunt, Power: 0, Turns: 2));
+
+    private static EnemyTactics Tactics(params int[] draws) => new(new FixedSequenceRandom(draws), new Dictionary<string, SkillDefinition>());
 
     private static Combatant PartyCombatant(string id) => Combatant.FromPartyMember(new PartyMemberBuilder().WithId(id).Build());
 }

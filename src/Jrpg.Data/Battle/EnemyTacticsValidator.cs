@@ -29,7 +29,19 @@ internal static class EnemyTacticsValidator
     private static string? FindActionProblem(EnemyAction? action, string field, IReadOnlyDictionary<string, SkillDefinition> skills) =>
         action is null
             ? $"{field} must not be null."
-            : AtLeast($"{field}.weight", action.Weight, 1) ?? FindSkillProblem(action.SkillId, field, skills);
+            : AtLeast($"{field}.weight", action.Weight, 1)
+                ?? FindConditionProblem(action.When, $"{field}.when")
+                ?? FindSkillProblem(action.SkillId, field, skills);
+
+    // A percent of 0 or 100 would make an HP condition never or nearly always hold, so content says what it means.
+    private static string? FindConditionProblem(TacticCondition? condition, string field) =>
+        condition switch
+        {
+            null => null,
+            { Kind: TacticConditionKind.AllyFallen, Percent: not 0 } => $"{field}.percent must be left out of allyFallen (was {condition.Percent}).",
+            { Kind: TacticConditionKind.AllyFallen } => null,
+            _ => Within($"{field}.percent", condition.Percent, 1, 99),
+        };
 
     private static string? FindSkillProblem(string? skillId, string field, IReadOnlyDictionary<string, SkillDefinition> skills)
     {

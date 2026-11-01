@@ -11,24 +11,39 @@ namespace Jrpg.Data.Audio;
 /// </summary>
 public static class AudioReferenceCheck
 {
-    /// <summary>Every voice step's file is in the voices folder under exactly the name the step gives.</summary>
+    /// <summary>
+    /// Every voice step's file is in the voices folder, and every map's track in the music folder, under exactly the
+    /// name given.
+    /// </summary>
     /// <returns>One line per problem, naming the file and what names it; empty when the sound is complete.</returns>
-    public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string audioRoot)
+    public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string audioRoot) =>
+    [
+        .. MissingByExactName(audioRoot, AudioFolders.Voices, VoiceFiles(catalog)),
+        .. MissingByExactName(audioRoot, AudioFolders.Music, MapTracks(catalog)),
+    ];
+
+    private static IEnumerable<(string File, string NamedBy)> VoiceFiles(ContentCatalog catalog) =>
+        MapEventSteps.Of<VoiceStep>(catalog).Select(found => (found.Step.File, found.NamedBy));
+
+    private static IEnumerable<(string File, string NamedBy)> MapTracks(ContentCatalog catalog) =>
+        catalog.Maps.Values
+            .Where(map => map.Settings.MusicFile is not null)
+            .OrderBy(map => map.Settings.Id, StringComparer.Ordinal)
+            .Select(map => (map.Settings.MusicFile!, $"map '{map.Settings.Id}'"));
+
+    private static IEnumerable<string> MissingByExactName(string audioRoot, string folder, IEnumerable<(string File, string NamedBy)> references)
     {
-        var problems = new List<string>();
-        foreach (var (voice, namedBy) in MapEventSteps.Of<VoiceStep>(catalog))
+        foreach (var (file, namedBy) in references)
         {
-            if ((ExactFileName.FindCaseMismatch(audioRoot, AudioFolders.Voices, voice.File) ?? FindMissing(audioRoot, voice.File)) is { } problem)
+            if ((ExactFileName.FindCaseMismatch(audioRoot, folder, file) ?? FindMissing(audioRoot, folder, file)) is { } problem)
             {
-                problems.Add($"{problem} Named by {namedBy}.");
+                yield return $"{problem} Named by {namedBy}.";
             }
         }
-
-        return problems;
     }
 
-    private static string? FindMissing(string audioRoot, string file) =>
-        File.Exists(Path.Combine(audioRoot, AudioFolders.Voices, file))
+    private static string? FindMissing(string audioRoot, string folder, string file) =>
+        File.Exists(Path.Combine(audioRoot, folder, file))
             ? null
-            : $"{ExactFileName.ShownPath(AudioFolders.Voices, file)}: not found in {audioRoot}.";
+            : $"{ExactFileName.ShownPath(folder, file)}: not found in {audioRoot}.";
 }

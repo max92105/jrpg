@@ -1,6 +1,7 @@
 {
   "id": "forest",
   "displayName": "Forest",
+  "musicFile": "PlaceholderForest.wav",
   "randomEncounters": {
     "oneInSteps": 25,
     "graceSteps": 3,

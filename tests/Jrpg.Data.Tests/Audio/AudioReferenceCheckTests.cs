@@ -41,6 +41,37 @@ public sealed class AudioReferenceCheckTests
             problem);
     }
 
+    [Fact]
+    public void FindProblems_MapTrackMissing_NamesTheFileAndTheMap()
+    {
+        var problem = Assert.Single(AudioReferenceCheck.FindProblems(WithIntroTrack("Ghost.wav"), _audioRoot));
+
+        Assert.Equal($"music/Ghost.wav: not found in {_audioRoot}. Named by map 'intro'.", problem);
+    }
+
+    [Fact]
+    public void FindProblems_MapTrackInOtherCase_NamesTheMismatch()
+    {
+        var problem = Assert.Single(AudioReferenceCheck.FindProblems(WithIntroTrack("placeholdertown.wav"), _audioRoot));
+
+        Assert.Equal(
+            "music/placeholdertown.wav: the file is named PlaceholderTown.wav; names must match exactly. Named by map 'intro'.",
+            problem);
+    }
+
+    [Fact]
+    public void FindProblems_MapWithoutATrack_IsEmpty()
+    {
+        Assert.Empty(AudioReferenceCheck.FindProblems(WithIntroTrack(null), _audioRoot));
+    }
+
+    private static ContentCatalog WithIntroTrack(string? file)
+    {
+        var intro = _catalog.Maps["intro"];
+        var settings = intro.Settings with { MusicFile = file };
+        return _catalog with { Maps = new Dictionary<string, MapDefinition>(_catalog.Maps) { ["intro"] = new MapDefinition(intro.Layout, settings) } };
+    }
+
     // The intro's first event, which plays for Sarxian, opening with a voice step naming the file.
     private static ContentCatalog WithIntroVoice(string file)
     {

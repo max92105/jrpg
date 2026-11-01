@@ -46,7 +46,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **V1. Music, Effects and Voices volumes in the Options page; the voice-over follows its volume** (Game + text, about 200 lines) → [slices/V1.md](slices/V1.md)
 
 ### Phase 2: music
-- [ ] **C1. A map's track in content, checked at startup; placeholder map tracks** (Core + Data + content, about 170 lines) → [slices/C1.md](slices/C1.md)
+- [x] **C1. A map's track in content, checked at startup; placeholder map tracks** (Core + Data + content, about 170 lines) → [slices/C1.md](slices/C1.md)
 - [ ] ADR 0035: music and sound effects, extending ADR 0018. Write it from the entry under "ADRs" below (the options are chosen).
 - [ ] **P1. The music the flow calls for, headless: the title theme, the map's track, the battle theme from the flash** (Game, about 220 lines) → [slices/P1.md](slices/P1.md)
 - [ ] **P2. The music plays on the device: looped, at the music volume, cut on a change; the themes preloaded** (Game, about 110 lines) → [slices/P2.md](slices/P2.md)

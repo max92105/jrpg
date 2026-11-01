@@ -27,6 +27,9 @@ internal static class AbsentWhenNullFilter
 
         // Decision 382: only an inn prices a rest.
         (typeof(RestStep), "price"),
+
+        // Decision 419: a map without a track is silent.
+        (typeof(MapSettings), "musicFile"),
     ];
 
     public static void SkipNullOptionalFields(JsonTypeInfo typeInfo)

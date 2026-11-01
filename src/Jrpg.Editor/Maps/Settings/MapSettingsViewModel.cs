@@ -85,6 +85,9 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
     {
         Id = MapId,
         DisplayName = DisplayName.Trim(),
+
+        // The dialog can't choose a track yet (the music plan's E1); it keeps the map's.
+        MusicFile = _currentSettings.MusicFile,
         RandomEncounters = HasRandomEncounters
             ? new RandomEncounterTable
             {

@@ -25,6 +25,15 @@ public sealed class MapSettingsViewModelTests
     }
 
     [Fact]
+    public void ToSettings_MapWithATrack_KeepsIt()
+    {
+        var scored = new MapDefinition(_forest.Layout, _forest.Settings with { MusicFile = "PlaceholderForest.wav" });
+        var settings = new MapSettingsViewModel(scored, ["wolves"]) { DisplayName = "Deep forest" };
+
+        Assert.Equal("PlaceholderForest.wav", settings.ToSettings().MusicFile);
+    }
+
+    [Fact]
     public void ToSettings_NoEncounters_ProducesNullTable()
     {
         _settings.HasRandomEncounters = false;

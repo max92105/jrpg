@@ -4,52 +4,81 @@ using Jrpg.Game.Ui;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// The Quests page's listed quests in the journal's order, with their scrolling cursor and gliding highlight (decisions
-/// 252, 262). Shown again when the page opens, so drawing formats nothing.
+/// The Quests page's two lists (decision 390), the active and the completed quests in the journal's order, each with
+/// its own scrolling cursor and gliding highlight (decisions 252, 262), and which of the two is shown. Shown again when
+/// the page opens, so drawing formats nothing.
 /// </summary>
 internal sealed class QuestList
 {
-    private QuestEntry[] _entries = [];
+    private readonly Column[] _columns = [new Column(), new Column()];
 
-    public IReadOnlyList<QuestEntry> Entries => _entries;
+    public QuestCategory Category { get; private set; }
 
-    /// <summary>The cursor over the entries; null while no quest is listed.</summary>
-    public ListCursor? Cursor { get; private set; }
+    /// <summary>The shown category's quests.</summary>
+    public IReadOnlyList<QuestEntry> Entries => Current.Entries;
 
-    /// <summary>The highlight gliding to the cursor's row.</summary>
-    public SelectionMotion Selection { get; } = new();
+    /// <summary>The shown category's cursor; null while it lists no quest.</summary>
+    public ListCursor? Cursor => Current.Cursor;
 
-    /// <summary>The chosen quest; null while no quest is listed.</summary>
-    public QuestEntry? Selected => Cursor is null ? null : _entries[Cursor.Selected];
+    /// <summary>The shown category's highlight, gliding to its cursor's row.</summary>
+    public SelectionMotion Selection => Current.Selection;
 
-    public void Advance(TimeSpan delta) => Selection.Advance(delta);
+    /// <summary>The chosen quest of the shown category; null while it lists no quest.</summary>
+    public QuestEntry? Selected => Current.Cursor is { } cursor ? Current.Entries[cursor.Selected] : null;
 
-    /// <summary>Lists <paramref name="entries"/>, the cursor on the first, with the highlight jumped there.</summary>
-    public void Show(IReadOnlyList<QuestEntry> entries)
+    private Column Current => _columns[(int)Category];
+
+    public void Advance(TimeSpan delta) => Current.Selection.Advance(delta);
+
+    /// <summary>Lists both categories, the Active one shown, each cursor on its first quest.</summary>
+    public void Show(IReadOnlyList<QuestEntry> active, IReadOnlyList<QuestEntry> completed)
     {
-        _entries = [.. entries];
-        if (_entries.Length == 0)
-        {
-            Cursor = null;
-            return;
-        }
-
-        Cursor = new ListCursor(_entries.Length, _ => true, QuestsPage.VisibleRows);
-        Selection.JumpTo(Cursor);
+        Category = QuestCategory.Active;
+        _columns[(int)QuestCategory.Active].Show(active);
+        _columns[(int)QuestCategory.Completed].Show(completed);
     }
 
-    public void MoveUp() => Move(cursor => cursor.MoveUp());
+    /// <summary>Right: the Completed list; nothing past it (no wrap).</summary>
+    public void ShowNext() => Category = QuestCategory.Completed;
 
-    public void MoveDown() => Move(cursor => cursor.MoveDown());
+    /// <summary>Left: back to the Active list, whose cursor stayed where it was.</summary>
+    public void ShowPrevious() => Category = QuestCategory.Active;
 
-    private void Move(Action<ListCursor> step)
+    public void MoveUp() => Current.Move(cursor => cursor.MoveUp());
+
+    public void MoveDown() => Current.Move(cursor => cursor.MoveDown());
+
+    // One category's quests, cursor and highlight.
+    private sealed class Column
     {
-        if (Cursor is not { } cursor)
+        public QuestEntry[] Entries { get; private set; } = [];
+
+        public ListCursor? Cursor { get; private set; }
+
+        public SelectionMotion Selection { get; } = new();
+
+        public void Show(IReadOnlyList<QuestEntry> entries)
         {
-            return;
+            Entries = [.. entries];
+            if (Entries.Length == 0)
+            {
+                Cursor = null;
+                return;
+            }
+
+            Cursor = new ListCursor(Entries.Length, _ => true, QuestsPage.VisibleRows);
+            Selection.JumpTo(Cursor);
         }
 
-        step(cursor);
-        Selection.Follow(cursor);
+        public void Move(Action<ListCursor> step)
+        {
+            if (Cursor is not { } cursor)
+            {
+                return;
+            }
+
+            step(cursor);
+            Selection.Follow(cursor);
+        }
     }
 }

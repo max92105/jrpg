@@ -10,16 +10,18 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// The menu's Quests page, its first tab (decision 393): the active quests' titles in the journal's order (decisions
-/// 390, 391) under the shared gliding selection, or a line saying there are none; beside them the chosen quest's detail
-/// (decision 392). Read from Core when the page opens and when the choice moves, so drawing formats nothing.
+/// The menu's Quests page, its first tab (decision 393): the Active or the Completed quests (decision 390, Left and
+/// Right switch, the category's name over the list) in the journal's order (decision 391) under the shared gliding
+/// selection, or a line saying the category is empty; beside them the chosen quest's detail (decision 392). Read from
+/// Core when the page opens and when the choice moves, so drawing formats nothing.
 /// </summary>
 internal sealed class QuestsPage : IMenuPage
 {
     /// <summary>How many quests the list shows at once (placeholder, until L1's view owns the layout).</summary>
-    public const int VisibleRows = 12;
+    public const int VisibleRows = 11;
 
-    // The list takes the left half of the page, the detail the rest; plain lines until L1 to L3 (placeholders).
+    // The list takes the left part of the page under its category's name, the detail the rest; plain lines until L1 to
+    // L3 (placeholders).
     private const int ListWidth = 720;
     private const int DetailGap = 40;
 
@@ -27,7 +29,8 @@ internal sealed class QuestsPage : IMenuPage
     private readonly UiMessages _messages;
     private readonly UiTextures _ui;
     private readonly SpriteFontBase _font;
-    private readonly string _none;
+    private readonly string[] _categoryNames;
+    private readonly string[] _emptyLines;
     private readonly ColumnPanelView _panel = new(UiTheme.PageColumn);
     private readonly QuestList _list = new();
     private QuestDetail? _detail;
@@ -41,7 +44,8 @@ internal sealed class QuestsPage : IMenuPage
         _messages = text.Messages;
         _ui = ui;
         _font = text.Fonts.FontAt(UiTheme.MenuTextPixels);
-        _none = text.Messages.Text(MessageIds.QuestsNone);
+        _categoryNames = [text.Messages.Text(MessageIds.QuestsActive), text.Messages.Text(MessageIds.QuestsCompleted)];
+        _emptyLines = [text.Messages.Text(MessageIds.QuestsNone), text.Messages.Text(MessageIds.QuestsNoneCompleted)];
         Hint = text.Messages.Text(MessageIds.MenuHintQuests);
     }
 
@@ -53,31 +57,49 @@ internal sealed class QuestsPage : IMenuPage
 
     public bool LeavesOnCancel => true;
 
-    /// <summary>The titles listed, in the journal's order; empty when the none line shows.</summary>
+    /// <summary>The category shown.</summary>
+    internal QuestCategory Category => _list.Category;
+
+    /// <summary>The shown category's titles, in the journal's order; empty when its empty line shows.</summary>
     internal IReadOnlyList<string> ShownTitles => [.. _list.Entries.Select(entry => entry.Quest.Title)];
 
-    /// <summary>The chosen quest's detail; null while no quest is listed.</summary>
+    /// <summary>The chosen quest's detail; null while the shown category lists no quest.</summary>
     internal QuestDetail? Detail => _detail;
 
     public void Open()
     {
-        _list.Show(_session.Quests.Active);
+        _list.Show(_session.Quests.Active, _session.Quests.Completed);
         RefreshDetail();
     }
 
     public void Advance(TimeSpan delta) => _list.Advance(delta);
 
+    // The detail is rebuilt only when the choice or the category changed, never per frame.
     public SceneRequest? Update(InputFrame input)
     {
+        var before = (_list.Category, _list.Selected);
         if (input.IsPressed(GameButton.Up))
         {
             _list.MoveUp();
-            RefreshDetail();
         }
 
         if (input.IsPressed(GameButton.Down))
         {
             _list.MoveDown();
+        }
+
+        if (input.IsPressed(GameButton.Right))
+        {
+            _list.ShowNext();
+        }
+
+        if (input.IsPressed(GameButton.Left))
+        {
+            _list.ShowPrevious();
+        }
+
+        if (before != (_list.Category, _list.Selected))
+        {
             RefreshDetail();
         }
 
@@ -89,18 +111,20 @@ internal sealed class QuestsPage : IMenuPage
         var column = MenuLayout.SingleColumn(area);
         _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(column), opacity);
         var list = column with { Width = ListWidth };
+        DrawLine(batch, _categoryNames[(int)_list.Category], RowAt(list, 0), UiTheme.TextSecondary * opacity);
+        var rows = list with { Y = list.Y + UiTheme.MenuRowHeight };
         if (_list.Cursor is not { } cursor)
         {
-            DrawLine(batch, _none, RowAt(list, 0), UiTheme.TextSecondary * opacity);
+            DrawLine(batch, _emptyLines[(int)_list.Category], RowAt(rows, 0), UiTheme.TextSecondary * opacity);
             return;
         }
 
-        _ui.DrawGlidingSelection(batch, textures, _list.Selection.RowIn(RowAt(list, 0)), opacity);
+        _ui.DrawGlidingSelection(batch, textures, _list.Selection.RowIn(RowAt(rows, 0)), opacity);
         for (var row = 0; row < cursor.VisibleCount; row++)
         {
             var index = cursor.FirstVisible + row;
             var color = index == cursor.Selected ? UiTheme.TextPrimary : UiTheme.TextSecondary;
-            DrawLine(batch, _list.Entries[index].Quest.Title, RowAt(list, row), color * opacity);
+            DrawLine(batch, _list.Entries[index].Quest.Title, RowAt(rows, row), color * opacity);
         }
 
         if (_detail is { } detail)
@@ -109,7 +133,7 @@ internal sealed class QuestsPage : IMenuPage
         }
     }
 
-    // The chosen quest's lines, one per row: title, kind, description, the stage's text.
+    // The chosen quest's lines, one per row: title, kind, description, the stage's text or the completed note.
     private void DrawDetail(SpriteBatch batch, QuestDetail detail, Rectangle area, float opacity)
     {
         DrawLine(batch, detail.Title, RowAt(area, 0), UiTheme.TextPrimary * opacity);
@@ -124,5 +148,5 @@ internal sealed class QuestsPage : IMenuPage
     private void DrawLine(SpriteBatch batch, string line, Rectangle row, Color color) =>
         batch.DrawString(_font, line, new Vector2(row.X + UiTheme.MenuTextInset, row.Y + ((row.Height - _font.LineHeight) / 2f)), color);
 
-    private void RefreshDetail() => _detail = _list.Selected is { } selected ? QuestDetail.Of(selected, _messages) : null;
+    private void RefreshDetail() => _detail = _list.Selected is { } selected ? QuestDetail.Of(selected, _list.Category, _messages) : null;
 }

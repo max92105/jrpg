@@ -17,15 +17,24 @@ public sealed class QuestDetailTests
     [Fact]
     public void Of_ActiveQuest_HasItsCurrentStageText()
     {
-        var detail = QuestDetail.Of(new QuestEntry(_errand, _errand.Stage("deliver")), _messages);
+        var detail = QuestDetail.Of(new QuestEntry(_errand, _errand.Stage("deliver")), QuestCategory.Active, _messages);
 
         Assert.Equal(("An errand", "Carry a letter.", "Deliver it."), (detail.Title, detail.Description, detail.StageText));
     }
 
     [Fact]
+    public void Of_CompletedQuest_HasTheCompletedNoteNoStageText()
+    {
+        var detail = QuestDetail.Of(new QuestEntry(_errand, _errand.Stage("deliver")), QuestCategory.Completed, _messages);
+
+        Assert.Equal(_messages.Text(MessageIds.QuestCompletedNote), detail.StageText);
+        Assert.Equal(("An errand", "Carry a letter."), (detail.Title, detail.Description));
+    }
+
+    [Fact]
     public void Of_MainQuest_HasTheMainKindName()
     {
-        var detail = QuestDetail.Of(new QuestEntry(_errand with { Kind = QuestKind.Main }, _errand.FirstStage), _messages);
+        var detail = QuestDetail.Of(new QuestEntry(_errand with { Kind = QuestKind.Main }, _errand.FirstStage), QuestCategory.Active, _messages);
 
         Assert.Equal(_messages.Text(MessageIds.QuestKindMain), detail.KindName);
     }
@@ -33,7 +42,7 @@ public sealed class QuestDetailTests
     [Fact]
     public void Of_SideQuest_HasTheSideKindName()
     {
-        var detail = QuestDetail.Of(new QuestEntry(_errand, _errand.FirstStage), _messages);
+        var detail = QuestDetail.Of(new QuestEntry(_errand, _errand.FirstStage), QuestCategory.Active, _messages);
 
         Assert.Equal(_messages.Text(MessageIds.QuestKindSide), detail.KindName);
         Assert.NotEqual(_messages.Text(MessageIds.QuestKindMain), detail.KindName);

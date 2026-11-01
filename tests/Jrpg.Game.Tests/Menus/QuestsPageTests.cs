@@ -1,10 +1,12 @@
 using Jrpg.Core.Quests;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
+using Jrpg.Game.Input;
 using Jrpg.Game.Menus;
 using Jrpg.Game.Tests.Exploration;
 using Jrpg.Game.Tests.Ui;
 using Jrpg.Game.Ui;
+using static Jrpg.Game.Tests.Input.InputFrames;
 
 namespace Jrpg.Game.Tests.Menus;
 
@@ -68,6 +70,24 @@ public sealed class QuestsPageTests
     }
 
     [Fact]
+    public void Update_Right_ShowsTheCompletedErrandWithItsNote()
+    {
+        var session = WithTheErrandCompletedAt("return_to_giver");
+        var page = NewPage(session);
+        page.Open();
+        Assert.Empty(page.ShownTitles);
+
+        page.Update(Pressing(GameButton.Right));
+
+        Assert.Equal(QuestCategory.Completed, page.Category);
+        Assert.Single(page.ShownTitles);
+        Assert.Equal(RepositoryScreenText.Text.Messages.Text(MessageIds.QuestCompletedNote), page.Detail!.StageText);
+        page.Update(Pressing(GameButton.Left));
+        Assert.Equal(QuestCategory.Active, page.Category);
+        Assert.Null(page.Detail);
+    }
+
+    [Fact]
     public void Glyph_IsTheQuestsGlyph()
     {
         Assert.Equal(TabGlyph.Quests, NewPage(StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowQuestGiver)).Glyph);
@@ -81,10 +101,14 @@ public sealed class QuestsPageTests
 
     private static QuestsPage NewPage(GameSession session) => new(RepositoryScreenText.Text, new UiTextures(), session);
 
-    private static GameSession WithTheErrandAt(string stageId)
+    private static GameSession WithTheErrandAt(string stageId) => WithTheErrand(new QuestProgress("placeholder_errand", stageId, IsCompleted: false));
+
+    private static GameSession WithTheErrandCompletedAt(string stageId) => WithTheErrand(new QuestProgress("placeholder_errand", stageId, IsCompleted: true));
+
+    private static GameSession WithTheErrand(QuestProgress progress)
     {
         var session = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowQuestGiver);
-        var save = session.Capture(DateTimeOffset.UnixEpoch) with { Quests = [new QuestProgress("placeholder_errand", stageId, IsCompleted: false)] };
+        var save = session.Capture(DateTimeOffset.UnixEpoch) with { Quests = [progress] };
         return GameSession.Restore(save, StartMapScenarios.BelowQuestGiver, new SeededRandom(1));
     }
 }

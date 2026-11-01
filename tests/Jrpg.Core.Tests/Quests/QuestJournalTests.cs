@@ -55,6 +55,32 @@ public sealed class QuestJournalTests
     }
 
     [Fact]
+    public void Completed_TwoQuests_OldestFirst()
+    {
+        _log.Start(_errand);
+        _log.Start(_chores);
+        _log.Complete(_chores);
+        _log.Complete(_errand);
+
+        Assert.Equal(["errand", "chores"], new QuestJournal(_log).Completed.Select(entry => entry.Quest.Id));
+        Assert.Empty(new QuestJournal(_log).Active);
+    }
+
+    // The side quest is completed first, so only the kind order can put the main quest ahead; each stays at the stage
+    // it was completed at.
+    [Fact]
+    public void Completed_MainAndSide_MainFirstAtTheirStages()
+    {
+        _log.AdvanceTo(_errand, "deliver");
+        _log.Complete(_errand);
+        _log.Complete(_heist);
+
+        var completed = new QuestJournal(_log).Completed;
+
+        Assert.Equal([new QuestEntry(_heist, _heist.LastStage), new QuestEntry(_errand, _errand.Stage("deliver"))], completed);
+    }
+
+    [Fact]
     public void Active_NothingStarted_IsEmpty()
     {
         Assert.Empty(new QuestJournal(_log).Active);

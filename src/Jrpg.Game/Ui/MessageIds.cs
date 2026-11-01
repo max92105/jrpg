@@ -727,4 +727,15 @@ internal static class MessageIds
     public const string QuestKindMain = "quest_kind_main";
 
     public const string QuestKindSide = "quest_kind_side";
+
+    /// <summary>The Quests page's two categories (decision 390), named over the list.</summary>
+    public const string QuestsActive = "quests_active";
+
+    public const string QuestsCompleted = "quests_completed";
+
+    /// <summary>The Completed category's line while no quest is completed.</summary>
+    public const string QuestsNoneCompleted = "quests_none_completed";
+
+    /// <summary>What a completed quest's detail says in place of its stage (decision 392).</summary>
+    public const string QuestCompletedNote = "quest_completed_note";
 }

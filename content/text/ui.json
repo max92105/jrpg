@@ -255,8 +255,12 @@
   "inn_question": "Rest at the inn?",
   "inn_short_of_gold": "You don't have enough gold.",
   "menu_quests": "Quests",
-  "menu_hint_quests": "Up and Down choose a quest.",
+  "menu_hint_quests": "Up and Down choose a quest; Left and Right switch between the active and the completed ones.",
   "quests_none": "No quests yet.",
   "quest_kind_main": "Main",
-  "quest_kind_side": "Side"
+  "quest_kind_side": "Side",
+  "quests_active": "Active",
+  "quests_completed": "Completed",
+  "quests_none_completed": "No completed quests.",
+  "quest_completed_note": "Completed"
 }

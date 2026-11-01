@@ -22,9 +22,6 @@ public sealed class ForestFightsSimulation(ITestOutputHelper output)
     private const string GoblinTrioId = "goblin_trio";
     private const string StoneBeetlesId = "stone_beetle";
 
-    // The member whose skills and art the leader has; only the class's numbers matter when attacking only.
-    private const string StandInId = "sarxian";
-
     private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
     public static TheoryData<string> ClassIds => [.. _catalog.Classes.Keys];
@@ -59,7 +56,7 @@ public sealed class ForestFightsSimulation(ITestOutputHelper output)
     // A fresh leader per battle: battle damage persists on a member (shared Vitals), so reusing one would leak between seeds.
     private static BattleResult RunBattle(string encounterId, ClassDefinition characterClass, Loadout loadout, int seed)
     {
-        var leader = PartyMember.Recruit(_catalog.PartyMembers[StandInId], characterClass, _catalog.Skills, _catalog.Rules.Stats);
+        var leader = StandInLeader.Of(_catalog, characterClass);
         if (loadout == Loadout.StartingGear)
         {
             WearStartingGear(leader);

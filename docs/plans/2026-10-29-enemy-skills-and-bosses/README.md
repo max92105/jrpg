@@ -56,7 +56,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **T3. A heal aims at the most wounded ally its condition found; the Chief's Field Dressing** (Core + content, about 110 lines) → [slices/T3.md](slices/T3.md)
 
 ### Phase 4: numbers
-- [ ] **S1. A Goblin Chief fight simulation** (Simulations, about 140 lines) → [slices/S1.md](slices/S1.md)
+- [x] **S1. A Goblin Chief fight simulation** (Simulations, about 140 lines) → [slices/S1.md](slices/S1.md)
 
 ### Phase 5: the boss
 - [ ] **B1. No running from a boss: Core refuses Flee, Run is greyed** (Core + Game + content, about 170 lines) → [slices/B1.md](slices/B1.md)

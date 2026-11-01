@@ -5250,6 +5250,118 @@
       ]
     },
     {
+      "uid": "quest_giver",
+      "objectId": "villager",
+      "position": {
+        "x": 32,
+        "y": 26
+      },
+      "z": 1,
+      "events": [
+        {
+          "id": "quest_giver_0",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "onlyWhenQuest": {
+            "questId": "placeholder_errand",
+            "kind": "notStarted"
+          },
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "A placeholder errand: ask the innkeeper about the road north, then come back."
+                ],
+                "speaker": "Quest giver",
+                "portraitFile": null
+              }
+            },
+            {
+              "type": "startQuest",
+              "questId": "placeholder_errand"
+            }
+          ]
+        },
+        {
+          "id": "quest_giver_1",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "onlyWhenQuest": {
+            "questId": "placeholder_errand",
+            "kind": "completed"
+          },
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "Thanks again for the errand."
+                ],
+                "speaker": "Quest giver",
+                "portraitFile": null
+              }
+            }
+          ]
+        },
+        {
+          "id": "quest_giver_2",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "onlyWhenQuest": {
+            "questId": "placeholder_errand",
+            "kind": "reachedStage",
+            "stageId": "return_to_giver"
+          },
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "So the road north is clear. Thank you."
+                ],
+                "speaker": "Quest giver",
+                "portraitFile": null
+              }
+            },
+            {
+              "type": "completeQuest",
+              "questId": "placeholder_errand"
+            }
+          ]
+        },
+        {
+          "id": "quest_giver_3",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "onlyWhenQuest": {
+            "questId": "placeholder_errand",
+            "kind": "active"
+          },
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "The innkeeper is south of the market. Ask about the road north."
+                ],
+                "speaker": "Quest giver",
+                "portraitFile": null
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "uid": "innkeeper",
       "objectId": "villager",
       "position": {
@@ -5258,6 +5370,35 @@
       },
       "z": 1,
       "events": [
+        {
+          "id": "innkeeper_1",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "onlyWhenQuest": {
+            "questId": "placeholder_errand",
+            "kind": "atStage",
+            "stageId": "ask_innkeeper"
+          },
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "The road north? Clear as far as the mill. Tell whoever asked."
+                ],
+                "speaker": "Innkeeper",
+                "portraitFile": null
+              }
+            },
+            {
+              "type": "advanceQuest",
+              "questId": "placeholder_errand",
+              "stageId": "return_to_giver"
+            }
+          ]
+        },
         {
           "id": "innkeeper_0",
           "activation": "interact",

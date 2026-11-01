@@ -99,6 +99,11 @@ internal static class StartMapScenarios
     /// <summary>Just below the Innkeeper at (30, 26), the end of the recruit row, facing it.</summary>
     public static ContentCatalog BelowInnkeeper { get; } = StartingAt(new Point2D(30.5, 27.6), Facing.Up);
 
+    /// <summary>
+    /// Just below the placeholder quest giver (decision 397), two cells right of the innkeeper, facing them.
+    /// </summary>
+    public static ContentCatalog BelowQuestGiver { get; } = StartingAt(new Point2D(32.5, 27.6), Facing.Up);
+
     public static InputFrame HoldingLeft { get; } =
         new(MoveIntent.FromAxes(-1, 0), ButtonSet.Empty.With(GameButton.Left), ButtonSet.Empty);
 

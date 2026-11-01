@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Jrpg.Core.Content;
 using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
@@ -38,10 +39,12 @@ public sealed class ContentWriterQuestTests : IDisposable
     {
         _writer.WriteMap(WithGatedCell(new QuestCondition("placeholder_errand", QuestConditionKind.Active)), _catalog);
 
-        var json = File.ReadAllText(_content.PathOf(Path.Combine("map-layouts", "start.json")));
-        Assert.Contains("\"onlyWhenQuest\"", json, StringComparison.Ordinal);
-        Assert.Contains("\"kind\": \"active\"", json, StringComparison.Ordinal);
-        Assert.DoesNotContain("stageId", json, StringComparison.Ordinal);
+        // The map holds other gated events (the placeholder errand's), so only the written cell event's condition is
+        // read.
+        var layout = JsonNode.Parse(File.ReadAllText(_content.PathOf(Path.Combine("map-layouts", "start.json"))))!;
+        var gated = layout["cellEvents"]!.AsArray().Single(cell => (string?)cell!["event"]!["id"] == "gated_cell")!["event"]!["onlyWhenQuest"]!.AsObject();
+        Assert.Equal("active", (string?)gated["kind"]);
+        Assert.False(gated.ContainsKey("stageId"));
     }
 
     [Fact]

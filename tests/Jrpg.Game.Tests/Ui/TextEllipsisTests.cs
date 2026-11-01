@@ -17,6 +17,8 @@ public sealed class TextEllipsisTests
         Assert.EndsWith("...", fitted, StringComparison.Ordinal);
         Assert.True(font.MeasureString(fitted).X <= 200);
         Assert.True(fitted.Length < title.Length);
+        var oneMore = title[..(fitted.Length - 2)] + "...";
+        Assert.True(font.MeasureString(oneMore).X > 200, "the longest start that fits was kept");
     }
 
     [Fact]

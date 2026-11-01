@@ -86,6 +86,18 @@ public sealed class QuestListTests
         Assert.Null(list.Selected);
     }
 
+    // The fitting function is the list's only way to shorten a title; the entry stays whole for the detail.
+    [Fact]
+    public void Show_LongTitle_RowHoldsTheFittedTitle()
+    {
+        var list = new QuestList(title => "fit:" + title);
+
+        list.Show([_errandEntry], []);
+
+        Assert.Equal("fit:An errand", list.Rows[0].Title);
+        Assert.Same(_errandEntry, list.Selected);
+    }
+
     [Fact]
     public void Show_NoQuest_HasNoCursor()
     {

@@ -39,7 +39,7 @@ internal sealed class QuestsPage : IMenuPage
         _font = text.Fonts.FontAt(UiTheme.MenuTextPixels);
         _categoryNames = [text.Messages.Text(MessageIds.QuestsActive), text.Messages.Text(MessageIds.QuestsCompleted)];
         _emptyLines = [text.Messages.Text(MessageIds.QuestsNone), text.Messages.Text(MessageIds.QuestsNoneCompleted)];
-        _listView = new QuestListView(ui, _font);
+        _listView = new QuestListView(ui, _font, _categoryNames);
         _list = new QuestList(title => TextEllipsis.Fit(_font, title, QuestListView.TitleWidth));
         Hint = text.Messages.Text(MessageIds.MenuHintQuests);
     }
@@ -105,8 +105,7 @@ internal sealed class QuestsPage : IMenuPage
 
     public void Draw(SpriteBatch batch, TextureLibrary textures, Rectangle area, float opacity)
     {
-        var category = (int)_list.Category;
-        _listView.Draw(batch, textures, new QuestListView.Place(_list.Rows, _list.Cursor, _list.Selection, _categoryNames[category], _emptyLines[category], area), opacity);
+        _listView.Draw(batch, textures, new QuestListView.Place(_list.Rows, _list.Cursor, _list.Selection, _list.Category, _emptyLines[(int)_list.Category], area), opacity);
         if (_detail is { } detail)
         {
             var detailLeft = area.X + QuestListView.ColumnWidth + DetailGap;

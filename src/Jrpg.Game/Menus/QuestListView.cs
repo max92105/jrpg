@@ -8,17 +8,17 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Menus;
 
 /// <summary>
-/// Draws the Quests page's list column (decision 390): the dark page column, the category's name where L2's tabs will
-/// go, one row per quest at the shared row height with a small diamond mark before its title (pale gold for a main
-/// quest, dim for a side quest) under the shared gliding selection (decision 252), or the category's empty line.
+/// Draws the Quests page's list column (decision 390): the dark page column, the two categories as pointed tabs (the
+/// shown one lit), one row per quest at the shared row height with a small diamond mark before its title (pale gold for
+/// a main quest, dim for a side quest) under the shared gliding selection (decision 252), or the category's empty line.
 /// </summary>
 internal sealed class QuestListView
 {
     /// <summary>The list column's width (placeholder): room for a title beside the detail column.</summary>
     public const int ColumnWidth = 640;
 
-    /// <summary>Kept clear under the top margin for L2's tabs (48 px) and their gap (12 px).</summary>
-    public const int TabsReserve = 60;
+    /// <summary>The tabs' row (48 px) and its gap (12 px) under the top margin, before the rows.</summary>
+    public const int TabsReserve = PointedTabsView.Height + 12;
 
     /// <summary>
     /// How many rows fit: the body (848 px) less the top margin and the tabs' room, in rows of 52 px, is 14 (the
@@ -35,14 +35,17 @@ internal sealed class QuestListView
 
     private readonly UiTextures _ui;
     private readonly SpriteFontBase _font;
+    private readonly PointedTabsView _tabs;
     private readonly ColumnPanelView _panel = new(UiTheme.PageColumn);
 
-    /// <param name="ui">The shared selection textures.</param>
-    /// <param name="font">The rows' font, which the titles were fitted with.</param>
-    public QuestListView(UiTextures ui, SpriteFontBase font)
+    /// <param name="ui">The shared selection textures and the tabs' shape.</param>
+    /// <param name="font">The rows' font, which the titles were fitted with; the tabs' too.</param>
+    /// <param name="categoryNames">The two tabs' labels, in <see cref="QuestCategory"/> order.</param>
+    public QuestListView(UiTextures ui, SpriteFontBase font, IReadOnlyList<string> categoryNames)
     {
         _ui = ui;
         _font = font;
+        _tabs = new PointedTabsView(ui, font, categoryNames);
     }
 
     /// <param name="batch">Already begun.</param>
@@ -57,8 +60,9 @@ internal sealed class QuestListView
         _panel.DrawClosed(batch, textures.Pixel, MenuLayout.FullHeight(column), opacity);
         var left = column.X + PageListLayout.Margin;
         var top = column.Y + PageListLayout.TopMargin;
-        batch.DrawString(_font, place.CategoryName, new Vector2(left, top), UiTheme.TextSecondary * opacity);
-        var firstRow = new Rectangle(left, top + TabsReserve, column.Width - (2 * PageListLayout.Margin), PageListLayout.RowHeight);
+        var width = column.Width - (2 * PageListLayout.Margin);
+        _tabs.Draw(batch, textures, new PointedTabsView.Place(new Rectangle(left, top, width, PointedTabsView.Height), (int)place.Category), opacity);
+        var firstRow = new Rectangle(left, top + TabsReserve, width, PageListLayout.RowHeight);
         if (place.Cursor is not { } cursor)
         {
             DrawText(batch, place.EmptyLine, firstRow, UiTheme.TextSecondary * opacity);
@@ -86,8 +90,8 @@ internal sealed class QuestListView
     /// <param name="Rows">The shown category's quests with their fitted titles.</param>
     /// <param name="Cursor">The shown category's cursor; null while it lists no quest.</param>
     /// <param name="Selection">Where its highlight has glided to.</param>
-    /// <param name="CategoryName">The shown category's name, over the rows.</param>
+    /// <param name="Category">The shown category, whose tab is lit.</param>
     /// <param name="EmptyLine">What the column says while the category lists no quest.</param>
     /// <param name="Area">The page area the column starts in.</param>
-    public readonly record struct Place(IReadOnlyList<QuestRow> Rows, ListCursor? Cursor, SelectionMotion Selection, string CategoryName, string EmptyLine, Rectangle Area);
+    public readonly record struct Place(IReadOnlyList<QuestRow> Rows, ListCursor? Cursor, SelectionMotion Selection, QuestCategory Category, string EmptyLine, Rectangle Area);
 }

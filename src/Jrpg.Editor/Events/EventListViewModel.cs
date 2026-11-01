@@ -29,6 +29,7 @@ internal sealed partial class EventListViewModel : ObservableObject
         Choices = choices;
         OnlyWhenChoices = ["", .. choices.ObjectIds];
         LeaderChoices = ["", .. choices.MemberIds];
+        QuestChoices = ["", .. choices.QuestIds];
         SelectedEvent = Events.Count > 0 ? Events[0] : null;
     }
 
@@ -45,6 +46,11 @@ internal sealed partial class EventListViewModel : ObservableObject
 
     /// <summary>The members an event can wait to be led by; the empty one means anyone.</summary>
     public IReadOnlyList<string> LeaderChoices { get; }
+
+    /// <summary>The quests an event can wait on (ADR 0033); the empty one means always.</summary>
+    public IReadOnlyList<string> QuestChoices { get; }
+
+    public IReadOnlyList<QuestConditionKindChoice> ConditionKinds { get; } = QuestConditionKindChoice.All;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RemoveEventCommand), nameof(MoveEventUpCommand), nameof(MoveEventDownCommand))]

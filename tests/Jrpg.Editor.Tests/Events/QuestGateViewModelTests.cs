@@ -56,6 +56,18 @@ public sealed class QuestGateViewModelTests
         Assert.Throws<InvalidOperationException>(gate.ToCondition);
     }
 
+    // The stage box takes a pick only with a quest chosen and a stage kind, the half-set states the dialog shows.
+    [Fact]
+    public void CanChooseStage_StageKindWithoutQuest_IsFalse()
+    {
+        var gate = new QuestGateViewModel(null, _stages) { Kind = QuestConditionKind.ReachedStage };
+        Assert.False(gate.CanChooseStage);
+
+        gate.QuestId = "errand";
+
+        Assert.True(gate.CanChooseStage);
+    }
+
     [Fact]
     public void ToCondition_NoQuest_ReturnsNull()
     {

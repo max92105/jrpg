@@ -1,6 +1,7 @@
 using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Quests;
 using Jrpg.Editor.Events;
 
 namespace Jrpg.Editor.Tests.Events;
@@ -21,6 +22,15 @@ public sealed class CellEventViewModelTests
         var mapEvent = cellEvent.Event.ToEvent();
         Assert.Equal(("cell_3_4", EventActivation.Touch), (mapEvent.Id, mapEvent.Activation));
         Assert.Equal("Add at least one step.", cellEvent.Problem);
+    }
+
+    [Fact]
+    public void QuestChoices_StartWithNone()
+    {
+        var cellEvent = new CellEventViewModel(new GridCell(3, 4), null, _choices with { QuestIds = ["errand"] });
+
+        Assert.Equal(["", "errand"], cellEvent.QuestChoices);
+        Assert.Equal([QuestConditionKind.NotStarted, QuestConditionKind.Active, QuestConditionKind.AtStage, QuestConditionKind.ReachedStage, QuestConditionKind.Completed], cellEvent.ConditionKinds.Select(choice => choice.Kind));
     }
 
     [Fact]

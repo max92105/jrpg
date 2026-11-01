@@ -24,6 +24,7 @@ internal sealed class CellEventViewModel
         _existing = existing;
         Choices = choices;
         LeaderChoices = ["", .. choices.MemberIds];
+        QuestChoices = ["", .. choices.QuestIds];
         Event = new EventViewModel(existing?.Event ?? new MapEvent
         {
             Id = $"cell_{cell.X}_{cell.Y}",
@@ -41,6 +42,11 @@ internal sealed class CellEventViewModel
 
     /// <summary>The members the event can wait to be led by; the empty one means anyone.</summary>
     public IReadOnlyList<string> LeaderChoices { get; }
+
+    /// <summary>The quests the event can wait on (ADR 0033); the empty one means always.</summary>
+    public IReadOnlyList<string> QuestChoices { get; }
+
+    public IReadOnlyList<QuestConditionKindChoice> ConditionKinds { get; } = QuestConditionKindChoice.All;
 
     public EventViewModel Event { get; }
 

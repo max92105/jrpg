@@ -34,6 +34,26 @@
                     SelectedItem="{Binding OnlyWhenLeaderId}"
                     ToolTip="Empty: anyone leads" />
         </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Only while quest" Width="160" VerticalAlignment="Center" />
+          <ComboBox Width="160"
+                    ItemsSource="{Binding DataContext.QuestChoices, RelativeSource={RelativeSource AncestorType=Window}}"
+                    SelectedItem="{Binding QuestGate.QuestId}"
+                    ToolTip="Empty: always" />
+          <ComboBox Width="110"
+                    Margin="4,0,0,0"
+                    ItemsSource="{Binding DataContext.ConditionKinds, RelativeSource={RelativeSource AncestorType=Window}}"
+                    DisplayMemberPath="Label"
+                    SelectedValuePath="Kind"
+                    SelectedValue="{Binding QuestGate.Kind}"
+                    IsEnabled="{Binding QuestGate.HasQuest}" />
+          <ComboBox Width="140"
+                    Margin="4,0,0,0"
+                    ItemsSource="{Binding QuestGate.Stages}"
+                    SelectedItem="{Binding QuestGate.StageId}"
+                    IsEnabled="{Binding QuestGate.CanChooseStage}"
+                    ToolTip="The stage, for at stage and reached stage" />
+        </StackPanel>
         <CheckBox Content="Only once per playthrough (remembered in saves)" IsChecked="{Binding IsOnce}" Margin="0,6,0,8" />
         <TextBlock Text="Steps, run in order" FontWeight="Bold" />
       </StackPanel>

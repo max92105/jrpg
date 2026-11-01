@@ -19,7 +19,7 @@ metadata:
 - **same observable** (gold I2b, B3): two outcomes look alike through the assertion used (`IsShowingMessage`, "a consumable row"); assert the id or value only the right outcome has.
 - **loop exit restated** (battle B1b): asserting the loop's own exit condition; ask what else differs.
 - **cache by reference** (demo I1): `Assert.Same` on a value the runtime interns anyway.
-- **constant oracle** (stats P3b): asserting `Cap * 10` keeps green when the cap changes; pin the literal.
+- **constant oracle** (stats P3b, quests E3): asserting `Cap * 10`, or a list equal to the static it was set from, keeps green when the values change; pin the literals.
 - **second overload** (gold S2/S3): the stack overload's false paths tested, the piece overload's not; check each overload.
 
 Related: [[records-with-lists-equality]].

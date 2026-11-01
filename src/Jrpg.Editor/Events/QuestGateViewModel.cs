@@ -25,11 +25,11 @@ internal sealed partial class QuestGateViewModel : ObservableObject
 
     /// <summary>The quest the event waits on; empty for always.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Label), nameof(Problem), nameof(Stages), nameof(HasQuest))]
+    [NotifyPropertyChangedFor(nameof(Label), nameof(Problem), nameof(Stages), nameof(HasQuest), nameof(CanChooseStage))]
     public partial string QuestId { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Label), nameof(Problem), nameof(NeedsStage))]
+    [NotifyPropertyChangedFor(nameof(Label), nameof(Problem), nameof(NeedsStage), nameof(CanChooseStage))]
     public partial QuestConditionKind Kind { get; set; }
 
     /// <summary>The stage the two stage kinds name; empty until picked.</summary>
@@ -41,6 +41,9 @@ internal sealed partial class QuestGateViewModel : ObservableObject
 
     /// <summary>Whether the kind names a stage: at a stage, or reached one.</summary>
     public bool NeedsStage => Kind is QuestConditionKind.AtStage or QuestConditionKind.ReachedStage;
+
+    /// <summary>Whether the stage box takes a pick: a quest is chosen and its kind names a stage.</summary>
+    public bool CanChooseStage => HasQuest && NeedsStage;
 
     /// <summary>
     /// The chosen quest's stage ids in its order, after the empty one (none picked yet); only that one with no quest.

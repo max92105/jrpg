@@ -2,6 +2,7 @@ using Jrpg.Core.Dialogue;
 using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Quests;
 using Jrpg.Editor.Events;
 
 namespace Jrpg.Editor.Tests.Events;
@@ -26,6 +27,29 @@ public sealed class EventListViewModelQuestTests
     };
 
     private readonly EventListViewModel _list = new(_villager, _choices, "villager");
+
+    [Fact]
+    public void QuestChoices_ListTheCatalogsQuestsAfterNone()
+    {
+        Assert.Equal(["", "errand"], _list.QuestChoices);
+        Assert.Equal(
+            [(QuestConditionKind.NotStarted, "not started"), (QuestConditionKind.Active, "active"), (QuestConditionKind.AtStage, "at stage"), (QuestConditionKind.ReachedStage, "reached stage"), (QuestConditionKind.Completed, "completed")],
+            _list.ConditionKinds.Select(choice => (choice.Kind, choice.Label)));
+    }
+
+    // OK reads the list's problem: a gate without its stage is refused with the gate's words, naming the event.
+    [Fact]
+    public void Problem_GateWithoutStage_IsTheGatesProblemNamingTheEvent()
+    {
+        var talk = _list.SelectedEvent!;
+        talk.QuestGate.QuestId = "errand";
+
+        talk.QuestGate.Kind = QuestConditionKind.ReachedStage;
+
+        Assert.Equal("Event villager_0, Choose the stage the quest must have reached.", _list.Problem);
+        talk.QuestGate.StageId = "deliver";
+        Assert.Null(_list.Problem);
+    }
 
     [Fact]
     public void AddAdvanceQuestCommand_NoStepChosen_AddsItLast()

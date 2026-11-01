@@ -60,7 +60,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 5: the boss
 - [x] **B1. No running from a boss: Core refuses Flee, Run is greyed** (Core + Game + content, about 170 lines) → [slices/B1.md](slices/B1.md)
-- [ ] **B4. The Chief's own art, drawn bigger by its size** (content + test, about 40 lines) → [slices/B4.md](slices/B4.md)
+- [x] **B4. The Chief's own art, drawn bigger by its size** (content + test, about 40 lines) → [slices/B4.md](slices/B4.md)
 - [ ] **B2. Boss phases in Core, entered at the end of `Execute`** (Core, about 230 lines) → [slices/B2.md](slices/B2.md)
 - [ ] **B3. Phases in content and on screen: validated, the Chief's second phase, "Enraged!" in its own beat** (Data + Game + content + text + Simulations, about 220 lines) → [slices/B3.md](slices/B3.md)
 

@@ -59,7 +59,7 @@
     "name": "Goblin Chief",
     "isBoss": true,
     "portraitFile": "Goblin.png",
-    "battleSpriteFile": "Goblin.png",
+    "battleSpriteFile": "GoblinChief.png",
     "attackEffectFile": "AttackEnemy.png",
     "isSpriteFlipped": false,
     "maxHp": 240,

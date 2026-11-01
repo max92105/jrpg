@@ -5,11 +5,9 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-enemy-skills-and-bosses, slice B1 (no running from a boss: CanFlee, Run greyed, isBoss). Round 1.
-Verdict: Ready to commit.
+Plan: 2026-10-29-enemy-skills-and-bosses, slice B4 (the Chief's own art, 512 px, drawn at twice the goblin's size). Round 1.
+Verdict: Ready to commit. No findings in the slice's diff.
 
-- Open (suggestion): BattleFleeTests' header comment explains (0, 1), which no test uses; the two-combatant tests' (1) and (0) go unexplained
-- Open (suggestion): the boss tests that expect false don't pin that the member acts, so a turn-order shift would pass them for the wrong reason
 - Open (follow-up, from S1): PlayFight's battle setup and loop repeat ForestFightsSimulation.RunBattle; share them when a third simulation needs them
-- Fixed (from S1): the Invariant-culture comment in BossFightSimulation now sits at hpLeft
-- Fixed (from S1): BossFightSimulation's run-and-filter chain is split
+- Fixed (from B1): BattleFleeTests' header comment now explains the shuffle values the tests use
+- Fixed (from B1): the boss tests expecting false now assert the member is the current actor

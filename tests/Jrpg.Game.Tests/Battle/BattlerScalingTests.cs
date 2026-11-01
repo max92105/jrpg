@@ -1,3 +1,4 @@
+using Jrpg.Data.Art;
 using Jrpg.Game.Battle;
 using Microsoft.Xna.Framework;
 
@@ -27,5 +28,23 @@ public sealed class BattlerScalingTests
         var scaling = BattlerScaling.Of(new Point(256, 256));
 
         Assert.Equal(new BattlerScaling(new Point(128, 128), IsShrunkSmoothly: false), scaling);
+    }
+
+    // A boss looks bigger only through its art (decision 408): art past 512 px would draw as a painting and fail here.
+    [Fact]
+    public void Of_RepositoryChiefArt_IsTwiceTheGoblinsDrawnSize()
+    {
+        var chief = BattlerScaling.Of(SizeOfBattlerOf("goblin_chief"));
+        var goblin = BattlerScaling.Of(SizeOfBattlerOf("goblin"));
+
+        Assert.False(chief.IsShrunkSmoothly);
+        Assert.Equal(new Point(goblin.DrawnSize.X * 2, goblin.DrawnSize.Y * 2), chief.DrawnSize);
+    }
+
+    private static Point SizeOfBattlerOf(string enemyId)
+    {
+        var file = BattleScenarios.Catalog.Enemies[enemyId].BattleSpriteFile;
+        var (width, height) = PngSize.Read(Path.Combine(AppContext.BaseDirectory, "content", "art", "battlers", file));
+        return new Point(width, height);
     }
 }

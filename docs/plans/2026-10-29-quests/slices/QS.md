@@ -26,3 +26,5 @@ Part of [the quests plan](../README.md). After QL. ADR 0006 (a step applies when
     - `ContentFileWriterTests: Write_EveryEventStepKind_ReadsBackAsTheSameSteps`: the three steps added (the type names round trip)
   - **Known gap:** the editor's `EventStepViewModel.From` throws on these steps until E1; no content uses them before N1.
   - **Verify by hand:** nothing to see yet; the tests are the check.
+
+- **Done, with deviations:** as planned; `ApplyAndCheckWait` stayed under the complexity limit with the one combined case, so nothing else moved. The validator's helper reads the quest from `MapContentReferences.Quests` (the definitions, so the stage check needs no second lookup); `FindProblem_AdvanceQuestUnknownQuest_NamesIt` added beside the planned tests. Tests 3176 → 3186. Review: the two-stage errand the quest tests share is `TestQuests.Errand` in each test project.

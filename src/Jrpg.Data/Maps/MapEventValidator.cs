@@ -144,8 +144,29 @@ internal static class MapEventValidator
         VoiceStep voice when string.IsNullOrWhiteSpace(voice.File) => "voice must name its file.",
         OpenShopStep shop => FindOpenShopProblem(shop, references),
         RestStep { Price: { } price } => FindRestPriceProblem(price),
+        StartQuestStep or AdvanceQuestStep or CompleteQuestStep => FindQuestStepProblem(step, references),
         _ => null,
     };
+
+    // The quest, and for an advance its stage, must exist in content; the stage is looked up in the quest's own list.
+    private static string? FindQuestStepProblem(EventStep step, MapReferences references)
+    {
+        var (name, questId) = step switch
+        {
+            StartQuestStep start => ("startQuest", start.QuestId),
+            AdvanceQuestStep advance => ("advanceQuest", advance.QuestId),
+            CompleteQuestStep complete => ("completeQuest", complete.QuestId),
+            _ => throw new ArgumentOutOfRangeException(nameof(step), step, "Not a quest step."),
+        };
+        if (!references.Content.Quests.TryGetValue(questId, out var quest))
+        {
+            return $"{name} has unknown quest id '{questId}'.";
+        }
+
+        return step is AdvanceQuestStep { StageId: var stageId } && !quest.HasStage(stageId)
+            ? $"advanceQuest names stage '{stageId}', which quest '{questId}' doesn't have."
+            : null;
+    }
 
     private static string? FindRestPriceProblem(int price) =>
         price >= 1 && price <= Purse.MaxGold ? null : $"rest price must be 1 to {Purse.MaxGold} (was {price}).";

@@ -114,6 +114,7 @@ public sealed class ContentWriter(string contentRoot)
             catalog.PartyMembers.Keys.ToHashSet())
         {
             ShopIds = catalog.Shops.Keys.ToHashSet(),
+            Quests = catalog.Quests,
         };
 
     private FileToWrite PlanWrite<T>(string file, T content) =>

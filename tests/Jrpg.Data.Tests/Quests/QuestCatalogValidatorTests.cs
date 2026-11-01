@@ -9,8 +9,7 @@ public sealed class QuestCatalogValidatorTests
 {
     private const string FileName = "quests.json";
 
-    private static readonly QuestDefinition _errand = new(
-        "errand", "An errand", "Carry a letter.", QuestKind.Side, [new QuestStage("take", "Take the letter."), new QuestStage("deliver", "Deliver it.")]);
+    private static readonly QuestDefinition _errand = TestQuests.Errand;
 
     [Fact]
     public void Validate_WellFormedQuest_Passes()

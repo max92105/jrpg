@@ -36,6 +36,9 @@ public sealed class ContentFileWriterTests : IDisposable
             new RestStep { Price = 20 },
             new OpenForgeStep(),
             new OpenShopStep("general_store"),
+            new StartQuestStep("placeholder_errand"),
+            new AdvanceQuestStep("placeholder_errand", "return_to_giver"),
+            new CompleteQuestStep("placeholder_errand"),
         ];
 
         ContentFileWriter.Write(_path, steps);

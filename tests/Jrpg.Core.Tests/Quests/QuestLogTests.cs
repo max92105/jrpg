@@ -1,16 +1,12 @@
 using Jrpg.Core.Quests;
+using Jrpg.Core.Tests.Builders;
 
 namespace Jrpg.Core.Tests.Quests;
 
 // Decision 388's rules for the three quest steps in every state: not started, active, completed.
 public sealed class QuestLogTests
 {
-    private static readonly QuestDefinition _errand = new(
-        "errand",
-        "An errand",
-        "Carry a letter.",
-        QuestKind.Side,
-        [new QuestStage("take", "Take the letter."), new QuestStage("deliver", "Deliver it.")]);
+    private static readonly QuestDefinition _errand = TestQuests.Errand;
 
     private readonly QuestLog _log = new();
 

@@ -59,6 +59,7 @@ public static class ContentCatalogLoader
         var shops = ReadValidated<IReadOnlyList<ShopDefinition>>(
             contentRoot, ShopsFile, (file, list) => ShopCatalogValidator.Validate(file, list, itemsById));
         var quests = ReadValidated<IReadOnlyList<QuestDefinition>>(contentRoot, QuestsFile, QuestCatalogValidator.Validate);
+        var questsById = quests.ToFrozenDictionary(quest => quest.Id);
         var affixes = ReadValidated<IReadOnlyList<AffixDefinition>>(contentRoot, AffixesFile, AffixCatalogValidator.Validate);
         var dropTables = ReadValidated<IReadOnlyList<DropTable>>(
             contentRoot, DropTablesFile, (file, list) => DropTableCatalogValidator.Validate(file, list, itemsById));
@@ -87,6 +88,7 @@ public static class ContentCatalogLoader
             members.Select(member => member.Id).ToFrozenSet())
         {
             ShopIds = shops.Select(shop => shop.Id).ToFrozenSet(),
+            Quests = questsById,
         };
         var maps = MapFolderReader.Read(contentRoot, mapContent);
         var mapsById = maps.ToFrozenDictionary(map => map.Id);
@@ -114,7 +116,7 @@ public static class ContentCatalogLoader
 
             DropTables = dropTables.ToFrozenDictionary(table => table.Id),
             Shops = shops.ToFrozenDictionary(shop => shop.Id),
-            Quests = quests.ToFrozenDictionary(quest => quest.Id),
+            Quests = questsById,
         };
     }
 

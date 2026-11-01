@@ -26,12 +26,15 @@ internal static class ContentTypeDiscriminators
             IgnoreUnrecognizedTypeDiscriminators = false,
             DerivedTypes =
             {
+                new JsonDerivedType(typeof(AdvanceQuestStep), "advanceQuest"),
+                new JsonDerivedType(typeof(CompleteQuestStep), "completeQuest"),
                 new JsonDerivedType(typeof(DialogueStep), "dialogue"),
                 new JsonDerivedType(typeof(GiveItemStep), "giveItem"),
                 new JsonDerivedType(typeof(OpenForgeStep), "openForge"),
                 new JsonDerivedType(typeof(OpenShopStep), "openShop"),
                 new JsonDerivedType(typeof(RecruitStep), "recruit"),
                 new JsonDerivedType(typeof(RestStep), "rest"),
+                new JsonDerivedType(typeof(StartQuestStep), "startQuest"),
                 new JsonDerivedType(typeof(StillStep), "still"),
                 new JsonDerivedType(typeof(SwapObjectStep), "swapObject"),
                 new JsonDerivedType(typeof(VoiceStep), "voice"),

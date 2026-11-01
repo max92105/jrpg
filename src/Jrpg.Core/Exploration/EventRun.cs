@@ -4,9 +4,9 @@ using Jrpg.Core.Party;
 namespace Jrpg.Core.Exploration;
 
 /// <summary>
-/// One running map event, as a cursor over its steps (ADR 0006). Steps the player doesn't need to see apply at once;
-/// dialogue, a received item, a recruit and a warp stay <see cref="Current"/> until the Game calls
-/// <see cref="Continue"/>.
+/// One running map event, as a cursor over its steps (ADR 0006). Steps the player doesn't need to see apply at once,
+/// the quest steps among them (ADR 0032); dialogue, a received item, a recruit and a warp stay <see cref="Current"/>
+/// until the Game calls <see cref="Continue"/>.
 /// </summary>
 internal sealed class EventRun
 {
@@ -119,10 +119,32 @@ internal sealed class EventRun
             case RestStep rest:
                 ApplyRest(rest);
                 return true;
+            case StartQuestStep or AdvanceQuestStep or CompleteQuestStep:
+                ApplyQuestStep(step);
+                return false;
             case DialogueStep or WarpStep or StillStep or OpenForgeStep or OpenShopStep:
                 return true;
             default:
                 throw new InvalidOperationException($"Step {step.GetType().Name} has no rule in EventRun.");
+        }
+    }
+
+    // The rules for every quest state are the log's (decision 388); the step only names the quest and the stage.
+    private void ApplyQuestStep(EventStep step)
+    {
+        var quests = _context.World.Quests;
+        var catalog = _context.Catalog.Quests;
+        switch (step)
+        {
+            case StartQuestStep start:
+                quests.Start(catalog[start.QuestId]);
+                break;
+            case AdvanceQuestStep advance:
+                quests.AdvanceTo(catalog[advance.QuestId], advance.StageId);
+                break;
+            case CompleteQuestStep complete:
+                quests.Complete(catalog[complete.QuestId]);
+                break;
         }
     }
 

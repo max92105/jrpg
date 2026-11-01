@@ -46,7 +46,7 @@ public sealed class EnemyTactics(IRandom random, IReadOnlyDictionary<string, Ski
         }
 
         var skill = skills[skillId];
-        return new SkillCommand(skill, _targeting.ForSkill(battle, skill));
+        return new SkillCommand(skill, _targeting.ForSkill(battle, skill, action.When));
     }
 
     private AttackCommand Attack(BattleState battle) => new(_targeting.ForAttack(battle));

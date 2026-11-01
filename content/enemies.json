@@ -73,7 +73,8 @@
     "dropTableId": "goblin",
     "tactics": [
       { "weight": 4 },
-      { "skillId": "cleave", "weight": 2 }
+      { "skillId": "cleave", "weight": 2 },
+      { "skillId": "field_dressing", "weight": 3, "when": { "kind": "allyHpBelow", "percent": 50 } }
     ]
   }
 ]

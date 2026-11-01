@@ -5,10 +5,11 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-enemy-skills-and-bosses, slice T2 (conditions on enemy actions). Round 1.
+Plan: 2026-10-29-enemy-skills-and-bosses, slice T3 (heal aims at the most wounded ally its condition found; Field Dressing). Round 1.
 Verdict: Ready to commit.
 
-- Open (warning): no test pins the enemy-side half of an ally (Side == enemy.Side in TacticConditions.AlliesOf); a hurt or fallen party member beside a healthy ally
-- Open (suggestion): TacticConditions.MeetingIt reads vaguely; CombatantsMeeting (T3 is its next caller)
-- Fixed (from C1): RepositoryEncounterTests pins the Chief's last slot with EnemyIds[^1]
-- Fixed (follow-up from T1): EnemyTacticsTests builds its tactics through the Tactics helper
+- Open (suggestion): RepositoryEncounterTests pins the Chief's cleave but not field_dressing
+- Open (suggestion): docs/map.md's EnemyTargeting entry omits the heal's rule (decision 401)
+- Open (suggestion): T3 Done note says "as planned" but ForSkill takes the TacticCondition, not the EnemyAction
+- Fixed (from T2): enemy-side half of an ally is pinned by the AllyHpBelowOnlyAMemberHurt and OnlyAMemberFallen tests
+- Fixed (from T2): TacticConditions.MeetingIt renamed CombatantsMeeting

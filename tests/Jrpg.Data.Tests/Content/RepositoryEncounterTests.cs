@@ -13,6 +13,7 @@ public sealed class RepositoryEncounterTests
 
         Assert.Equal("goblin_chief", catalog.Encounters["goblin_chief"].EnemyIds[^1]);
         Assert.True(catalog.Enemies["goblin_chief"].NamesSkill("cleave"));
+        Assert.True(catalog.Enemies["goblin_chief"].NamesSkill("field_dressing"));
         Assert.DoesNotContain(catalog.Maps.Values, map => map.Settings.RandomEncounters?.EncounterIds.Contains("goblin_chief") == true);
     }
 }

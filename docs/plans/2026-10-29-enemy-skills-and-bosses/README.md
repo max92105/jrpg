@@ -53,7 +53,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 3: conditions
 - [x] **T2. Conditions on actions: own HP, a living ally's HP, an ally fallen** (Core + Data, about 220 lines) → [slices/T2.md](slices/T2.md)
-- [ ] **T3. A heal aims at the most wounded ally its condition found; the Chief's Field Dressing** (Core + content, about 110 lines) → [slices/T3.md](slices/T3.md)
+- [x] **T3. A heal aims at the most wounded ally its condition found; the Chief's Field Dressing** (Core + content, about 110 lines) → [slices/T3.md](slices/T3.md)
 
 ### Phase 4: numbers
 - [ ] **S1. A Goblin Chief fight simulation** (Simulations, about 140 lines) → [slices/S1.md](slices/S1.md)

@@ -222,5 +222,12 @@
     "description": "A wide swing that hits the whole party. Placeholder: the developer writes the real skill.",
     "iconFile": "Attack.png",
     "effect": { "kind": "damage", "damageType": "slashing", "power": 10, "targeting": "allEnemies" }
+  },
+  {
+    "id": "field_dressing",
+    "name": "Field Dressing",
+    "description": "Binds one ally's wounds. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "effect": { "kind": "restoreHp", "power": 25, "targeting": "singleAlly" }
   }
 ]

@@ -116,6 +116,15 @@ internal sealed partial class EventViewModel : ObservableObject
     [RelayCommand]
     private void AddOpenShop() => AddStep(EventStepKind.OpenShop);
 
+    [RelayCommand]
+    private void AddStartQuest() => AddStep(EventStepKind.StartQuest);
+
+    [RelayCommand]
+    private void AddAdvanceQuest() => AddStep(EventStepKind.AdvanceQuest);
+
+    [RelayCommand]
+    private void AddCompleteQuest() => AddStep(EventStepKind.CompleteQuest);
+
     // After the chosen step, or last when none is chosen.
     private void AddStep(EventStepKind kind)
     {

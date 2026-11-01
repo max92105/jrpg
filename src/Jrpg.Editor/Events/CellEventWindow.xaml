@@ -49,6 +49,9 @@
         <Button Content="Rest" Width="50" Margin="4,0,0,0" Command="{Binding AddRestCommand}" />
         <Button Content="Forge" Width="50" Margin="4,0,0,0" Command="{Binding AddOpenForgeCommand}" />
         <Button Content="Shop" Width="50" Margin="4,0,0,0" Command="{Binding AddOpenShopCommand}" />
+        <Button Content="Start quest" Width="80" Margin="4,0,0,0" Command="{Binding AddStartQuestCommand}" />
+        <Button Content="Advance quest" Width="95" Margin="4,0,0,0" Command="{Binding AddAdvanceQuestCommand}" />
+        <Button Content="Complete quest" Width="100" Margin="4,0,0,0" Command="{Binding AddCompleteQuestCommand}" />
         <Button Content="Remove" Width="60" Margin="12,0,0,0" Command="{Binding RemoveStepCommand}" />
         <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepUpCommand}" />
         <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepDownCommand}" />

@@ -65,5 +65,13 @@ internal sealed class EventEditingViewModel(CatalogDraft catalog)
         [.. catalog.Current.PartyMembers.Keys.Order(StringComparer.Ordinal)])
     {
         ShopIds = [.. catalog.Current.Shops.Keys.Order(StringComparer.Ordinal)],
+        QuestIds = [.. catalog.Current.Quests.Keys.Order(StringComparer.Ordinal)],
+        QuestStages = QuestStageChoices(),
     };
+
+    // Quests in id order, each quest's stages in its own order.
+    private IReadOnlyList<QuestStageChoice> QuestStageChoices() =>
+        [.. catalog.Current.Quests.Values
+            .OrderBy(quest => quest.Id, StringComparer.Ordinal)
+            .SelectMany(quest => quest.Stages.Select(stage => new QuestStageChoice(quest.Id, stage.Id)))];
 }

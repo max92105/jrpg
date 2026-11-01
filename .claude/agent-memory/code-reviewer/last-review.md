@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-quests, slice QV (quest condition validated in content; no shadowing object event). Round 1.
+Plan: 2026-10-29-quests, slice E1 (event dialogs show and add start/advance/complete quest steps). Round 1.
 Verdict: Ready to commit.
 
-- Suggestion, open: MapEventValidator.CamelCase<T> is a noun-ish name; call it JsonNameOf (siblings use NameOf)
-- Suggestion, open: FindShadowedEvent runs the Skip/FirstOrDefault search before CanAlwaysStart; guard first with `continue`
-- Follow-up: enum-to-camelCase name now written in five places (ResistancesConverter, StatBonusesConverter, Crafting/Loot validators, MapEventValidator); one shared Data helper type
-- Fixed (from QC): QuestCondition AtStage uses NamedStage(); IsMetBy_Completed_MetOnlyOnceCompleted renamed; Running() gone
+- Suggestion, open: EventStepViewModel.QuestStep() `_ =>` arm silently builds CompleteQuestStep for any kind; name CompleteQuest and keep `_ => throw new UnreachableException()`
+- Suggestion, open: EventEditingViewModel.Choices QuestStages one-liner (~200 cols); split into a private QuestStageChoices() method
+- Follow-up (carried from QV): enum-to-camelCase name written in five places in Data; one shared helper type
 - Follow-up (carried): Trade/ShopScene 296 lines
+- QV suggestions (CamelCase<T> name, FindShadowedEvent guard order) not re-raised: outside this diff

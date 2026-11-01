@@ -37,6 +37,19 @@
                 ItemsSource="{Binding DataContext.Choices.ShopIds, RelativeSource={RelativeSource AncestorType=Window}}"
                 SelectedItem="{Binding ShopId}" />
     </StackPanel>
+    <StackPanel Orientation="Horizontal" Visibility="{Binding IsQuestPick, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
+      <TextBlock Text="Quest" VerticalAlignment="Center" Margin="0,0,8,0" />
+      <ComboBox Width="200"
+                ItemsSource="{Binding DataContext.Choices.QuestIds, RelativeSource={RelativeSource AncestorType=Window}}"
+                SelectedItem="{Binding QuestId}" />
+    </StackPanel>
+    <StackPanel Orientation="Horizontal" Visibility="{Binding IsQuestStagePick, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
+      <TextBlock Text="Quest stage" VerticalAlignment="Center" Margin="0,0,8,0" />
+      <ComboBox Width="260"
+                DisplayMemberPath="Label"
+                ItemsSource="{Binding DataContext.Choices.QuestStages, RelativeSource={RelativeSource AncestorType=Window}}"
+                SelectedItem="{Binding QuestStage}" />
+    </StackPanel>
     <StackPanel Orientation="Horizontal" Visibility="{Binding IsRest, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
       <TextBlock Text="Price (empty for a free rest)" VerticalAlignment="Center" Margin="0,0,8,0" />
       <TextBox Width="80" Text="{Binding PriceText, UpdateSourceTrigger=PropertyChanged}" />

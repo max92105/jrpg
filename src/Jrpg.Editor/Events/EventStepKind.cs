@@ -13,4 +13,7 @@ internal enum EventStepKind
     Rest,
     OpenForge,
     OpenShop,
+    StartQuest,
+    AdvanceQuest,
+    CompleteQuest,
 }

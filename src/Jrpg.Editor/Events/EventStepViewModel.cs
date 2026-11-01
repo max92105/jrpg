@@ -43,6 +43,12 @@ internal sealed partial class EventStepViewModel : ObservableObject
 
     public bool IsRest => Kind == EventStepKind.Rest;
 
+    /// <summary>The steps that pick a quest: start and complete (ADR 0032).</summary>
+    public bool IsQuestPick => Kind is EventStepKind.StartQuest or EventStepKind.CompleteQuest;
+
+    /// <summary>The step that picks one of a quest's stages: advance.</summary>
+    public bool IsQuestStagePick => Kind == EventStepKind.AdvanceQuest;
+
     /// <summary>One message box per line; blank lines are left out.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
@@ -65,6 +71,16 @@ internal sealed partial class EventStepViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
     public partial string ShopId { get; set; } = "";
+
+    /// <summary>The quest a start or complete step names, picked from the loaded quests (ADR 0032).</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
+    public partial string QuestId { get; set; } = "";
+
+    /// <summary>The quest and stage an advance step moves to; null until picked.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
+    public partial QuestStageChoice? QuestStage { get; set; }
 
     /// <summary>The gold an inn charges for the rest (decision 382); empty for a free rest.</summary>
     [ObservableProperty]
@@ -129,6 +145,9 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.Rest => IsFreeRest ? "Rest" : $"Rest for {PriceText.Trim()} gold",
         EventStepKind.OpenForge => "Open the Forge",
         EventStepKind.OpenShop => $"Open shop: {ShopId}",
+        EventStepKind.StartQuest => $"Start quest: {QuestId}",
+        EventStepKind.AdvanceQuest => $"Advance quest: {QuestStage?.QuestId} to {QuestStage?.StageId}",
+        EventStepKind.CompleteQuest => $"Complete quest: {QuestId}",
         _ => throw new UnreachableException(),
     };
 
@@ -144,6 +163,8 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.Still when Seconds(SecondsText) is null => "The seconds must be a number above 0.",
         EventStepKind.Recruit when string.IsNullOrEmpty(MemberId) => "Choose the member who joins.",
         EventStepKind.OpenShop when string.IsNullOrEmpty(ShopId) => "Choose the shop.",
+        EventStepKind.StartQuest or EventStepKind.CompleteQuest when string.IsNullOrEmpty(QuestId) => "Choose the quest.",
+        EventStepKind.AdvanceQuest when QuestStage is null => "Choose the quest's stage.",
         EventStepKind.Rest when !IsFreeRest && ValidPrice() is null => $"The price must be empty or a whole number from 1 to {Purse.MaxGold}.",
         EventStepKind.Voice when string.IsNullOrWhiteSpace(VoiceFile) => "Write the voice's file.",
         EventStepKind.GiveItem when WholeNumber(QuantityText, minimum: 1) is null => "The quantity must be a whole number of at least 1.",
@@ -169,6 +190,9 @@ internal sealed partial class EventStepViewModel : ObservableObject
         RestStep rest => new(EventStepKind.Rest) { PriceText = rest.Price is { } price ? Text(price) : "" },
         OpenForgeStep => new(EventStepKind.OpenForge),
         OpenShopStep shop => new(EventStepKind.OpenShop) { ShopId = shop.ShopId },
+        StartQuestStep start => new(EventStepKind.StartQuest) { QuestId = start.QuestId },
+        AdvanceQuestStep advance => new(EventStepKind.AdvanceQuest) { QuestStage = new QuestStageChoice(advance.QuestId, advance.StageId) },
+        CompleteQuestStep complete => new(EventStepKind.CompleteQuest) { QuestId = complete.QuestId },
         _ => throw new ArgumentException($"Unknown step type {step.GetType().Name}.", nameof(step)),
     };
 
@@ -191,6 +215,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.Rest => new RestStep { Price = IsFreeRest ? null : ValidPrice() ?? throw InvalidFields() },
         EventStepKind.OpenForge => new OpenForgeStep(),
         EventStepKind.OpenShop => string.IsNullOrEmpty(ShopId) ? throw InvalidFields() : new OpenShopStep(ShopId),
+        EventStepKind.StartQuest or EventStepKind.AdvanceQuest or EventStepKind.CompleteQuest => QuestStep(),
         _ => throw new UnreachableException(),
     };
 
@@ -198,6 +223,15 @@ internal sealed partial class EventStepViewModel : ObservableObject
 
     // Null for a price the step can't take; the purse's most is the ceiling, as the content validator has it.
     private int? ValidPrice() => WholeNumber(PriceText, minimum: 1) is { } price && price <= Purse.MaxGold ? price : null;
+
+    // Apart from ToStep so that switch stays under the complexity limit (CA1502).
+    private EventStep QuestStep() => Kind switch
+    {
+        EventStepKind.AdvanceQuest => QuestStage is { } stage ? new AdvanceQuestStep(stage.QuestId, stage.StageId) : throw InvalidFields(),
+        EventStepKind.StartQuest => string.IsNullOrEmpty(QuestId) ? throw InvalidFields() : new StartQuestStep(QuestId),
+        EventStepKind.CompleteQuest => string.IsNullOrEmpty(QuestId) ? throw InvalidFields() : new CompleteQuestStep(QuestId),
+        _ => throw new UnreachableException(),
+    };
 
     private Speech Speech() => new(
         [.. LinesText.Split('\n').Select(line => line.Trim()).Where(line => line.Length > 0)],

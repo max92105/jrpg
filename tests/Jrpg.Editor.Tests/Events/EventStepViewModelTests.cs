@@ -257,5 +257,8 @@ public sealed class EventStepViewModelTests
         new RestStep(),
         new OpenForgeStep(),
         new OpenShopStep("general_store"),
+        new StartQuestStep("errand"),
+        new AdvanceQuestStep("errand", "deliver"),
+        new CompleteQuestStep("errand"),
     ];
 }

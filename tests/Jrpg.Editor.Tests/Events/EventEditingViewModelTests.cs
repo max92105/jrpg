@@ -36,6 +36,17 @@ public sealed class EventEditingViewModelTests
     }
 
     [Fact]
+    public void StartEditingAt_CatalogWithQuest_OffersItsIdAndStages()
+    {
+        var events = _eventEditing.StartEditingAt(ChestCenter)!;
+
+        Assert.Contains("placeholder_errand", events.Choices.QuestIds);
+        Assert.Equal(
+            [new QuestStageChoice("placeholder_errand", "ask_innkeeper"), new QuestStageChoice("placeholder_errand", "return_to_giver")],
+            events.Choices.QuestStages.Where(stage => stage.QuestId == "placeholder_errand"));
+    }
+
+    [Fact]
     public void StartEditingAt_NoObjectThere_IsNull()
     {
         Assert.Null(_eventEditing.StartEditingAt(new Point2D(-5, -5)));

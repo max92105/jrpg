@@ -56,7 +56,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **QV. The condition in content, and no event shadowing the later ones on its object** (Data, about 210 lines) → [slices/QV.md](slices/QV.md)
 
 ### Phase 2: authoring, the placeholder and the save
-- [ ] **E1. The event dialogs show and add the three quest steps** (Editor, about 210 lines) → [slices/E1.md](slices/E1.md)
+- [x] **E1. The event dialogs show and add the three quest steps** (Editor, about 210 lines) → [slices/E1.md](slices/E1.md)
 - [ ] **E2. The event's quest condition in the dialogs' model** (Editor, about 180 lines) → [slices/E2.md](slices/E2.md)
 - [ ] **E3. The quest, condition and stage boxes in both event dialogs** (Editor, about 110 lines) → [slices/E3.md](slices/E3.md)
 - [ ] **N1. The placeholder errand on the start map** (content + tests, about 100 lines) → [slices/N1.md](slices/N1.md)

@@ -19,3 +19,4 @@ Part of [the quests plan](../README.md). After QE1. Decision 394 (with its flagg
     - `Problem_BlankStageText_NamesTheStage`
     - `ToQuest_Edited_ReturnsTheDefinitionWithStagesInOrder`
   - **Verify by hand:** nothing to see yet (QE4).
+- **Done, with deviations:** as planned; the id rule is `Objects/ObjectIds.ProblemOf` (the one content id rule; its rename to a shared `ContentIds` is a backlog line), a repeated stage id is reported on the later stage ("Stage 2 repeats the id ..."), and a new quest defaults to a side quest (placeholder default, yours to change). Tests 3323 → 3335. Review: the tests build their own two-stage quest instead of loading the repository's errand; stage subscriptions follow the collection's changes.

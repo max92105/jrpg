@@ -12,8 +12,9 @@ namespace Jrpg.Game.Battle;
 /// the beats; Defend and Run hold nothing. On the impact, each landed effect pops its amount and shows on its target,
 /// damage as the attacker's effect strip, anything else as a placeholder cue (decision 101), and a granted status shows
 /// its name, a miss "Miss" and a resisted status "Resisted"; whoever fell shows white, then fades on the defeat beat. A
-/// lost turn shows "Stunned" on its beat, and Poison and Regen pop the HP they took or restored on a tick beat. An
-/// event it doesn't know throws, so a new mechanic can't be shown silently wrong (ADR 0004).
+/// lost turn shows "Stunned" on its beat, Poison and Regen pop the HP they took or restored on a tick beat, and an
+/// enemy entering a phase shows "Enraged!" on a beat of its own after all the others (decision 406). An event it
+/// doesn't know throws, so a new mechanic can't be shown silently wrong (ADR 0004).
 /// </summary>
 internal sealed class ActionPlayback
 {
@@ -50,7 +51,9 @@ internal sealed class ActionPlayback
     /// <summary>The attacker's effect strip on each target damage landed on.</summary>
     public IReadOnlyList<EffectOnTarget> Strips => _strips;
 
-    /// <summary>The action's name over each target an effect without an animation landed on.</summary>
+    /// <summary>
+    /// The words over targets: the action's name where an effect has no animation, and each cue this turn.
+    /// </summary>
     public IReadOnlyList<CueOnTarget> Cues => _cues;
 
     /// <summary>Time since the action landed; it runs on after the hold, while the numbers, effects and the fallen finish.</summary>
@@ -123,14 +126,21 @@ internal sealed class ActionPlayback
                 AddStolenLife(stolen);
                 break;
             default:
-                AddImpactCue(battleEvent, messages);
+                AddCue(battleEvent, messages);
                 break;
         }
     }
 
-    // A status granted, a hit missed or blocked, and a status resisted each show as one word on their target at impact.
-    private void AddImpactCue(BattleEvent battleEvent, UiMessages messages)
+    // A status granted, a hit missed or blocked, and a status resisted each show as one word on their target at impact;
+    // a phase entered has its own beat instead.
+    private void AddCue(BattleEvent battleEvent, UiMessages messages)
     {
+        if (battleEvent is EnemyPhaseEntered entered)
+        {
+            AddPhaseCue(entered.Enemy, messages);
+            return;
+        }
+
         var (target, text) = battleEvent switch
         {
             StatusApplied applied => (applied.Target, messages.Text(StatusNames.IdOf(applied.Status))),
@@ -239,6 +249,14 @@ internal sealed class ActionPlayback
         var start = StartOf(PlaybackBeatKind.Skip);
         AddBeatOnce(PlaybackBeatKind.Skip, BattlePacing.SkipHold);
         _cues.Add(new CueOnTarget(combatant, messages.Text(MessageIds.BattleTurnSkipped), start));
+    }
+
+    // Phases entered in one Execute share one beat after everything else, and each cue shows when it starts.
+    private void AddPhaseCue(Combatant enemy, UiMessages messages)
+    {
+        var start = StartOf(PlaybackBeatKind.Phase);
+        AddBeatOnce(PlaybackBeatKind.Phase, BattlePacing.PhaseHold);
+        _cues.Add(new CueOnTarget(enemy, messages.Text(MessageIds.BattleEnemyPhase), start));
     }
 
     // Effects landing together make one impact, and any falls one defeat, however many targets there are.

@@ -229,5 +229,25 @@
     "description": "Binds one ally's wounds. Placeholder: the developer writes the real skill.",
     "iconFile": "Attack.png",
     "effect": { "kind": "restoreHp", "power": 25, "targeting": "singleAlly" }
+  },
+  {
+    "id": "crushing_blow",
+    "name": "Crushing Blow",
+    "description": "A heavy blow that may stun. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "effect": {
+      "kind": "damage", "damageType": "blunt", "power": 24, "targeting": "singleEnemy",
+      "status": { "kind": "stun", "power": 40, "turns": 1 }
+    }
+  },
+  {
+    "id": "war_cry",
+    "name": "War Cry",
+    "description": "Hardens every ally for two turns. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "effect": {
+      "kind": "grantStatus", "power": 0, "targeting": "allAllies",
+      "status": { "kind": "guarded", "power": 20, "turns": 2 }
+    }
   }
 ]

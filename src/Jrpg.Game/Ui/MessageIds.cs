@@ -482,6 +482,9 @@ internal static class MessageIds
     /// <summary>The cue on a caster whose spell turned on them (decision 194).</summary>
     public const string BattleBackfire = "battle_backfire";
 
+    /// <summary>The cue on an enemy entering a phase (decision 406).</summary>
+    public const string BattleEnemyPhase = "battle_enemy_phase";
+
     /// <summary>The cue on a target a damaging hit missed (decision 326).</summary>
     public const string BattleMiss = "battle_miss";
 

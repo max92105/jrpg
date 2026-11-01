@@ -137,3 +137,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `CatalogDraft.SetQuests` builds its dictionary with `ToDictionary`, which throws on a repeated id; only `QuestCatalogViewModel.Problem` stands before it (QE1): refuse with the validator's message instead.
 - `Ui/ResourceGaugeView.LabelSpacing` (2) duplicates `SheetRowLook.LabelSpacing`, which `QuestDetailView` reads too (L3 review): one constant in `Ui/`.
 - The quests plan's out-of-scope features (the Quest giver preset, removing a saved quest or stage in the Quests window, a cell's touch event that changes with a quest, rewards, story flags, map markers) are listed in `docs/plans/done/2026-10-29-quests/README.md`, "Out of scope".
+
+## From the enemy skills and bosses plan (2026-11-01)
+
+- `BossFightSimulation.PlayFight` repeats the battle setup and loop of `ForestFightsSimulation.RunBattle`: share them when a third simulation needs them (S1 review).

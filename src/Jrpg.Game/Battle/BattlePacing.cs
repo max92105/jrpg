@@ -26,4 +26,7 @@ internal static class BattlePacing
 
     /// <summary>How long the HP that statuses took or restored at a turn's end holds: long enough to read it.</summary>
     public static TimeSpan TickHold { get; } = TimeSpan.FromSeconds(0.8);
+
+    /// <summary>How long a phase change holds its cue: long enough to read it (placeholder).</summary>
+    public static TimeSpan PhaseHold { get; } = TimeSpan.FromSeconds(1.0);
 }

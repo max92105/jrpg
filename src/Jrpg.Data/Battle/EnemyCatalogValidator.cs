@@ -19,7 +19,8 @@ internal static class EnemyCatalogValidator
         new ContentListValidator<EnemyDefinition>(fileName, "enemy", enemy => enemy.Id)
             .Validate(enemies, enemy => FindProblem(enemy)
                 ?? FindDropTableProblem(enemy, references.DropTableIds)
-                ?? EnemyTacticsValidator.FindProblem(enemy.Tactics, "tactics", references.Skills));
+                ?? EnemyTacticsValidator.FindProblem(enemy.Tactics, "tactics", references.Skills)
+                ?? EnemyTacticsValidator.FindPhasesProblem(enemy.Phases, references.Skills));
 
     private static string? FindDropTableProblem(EnemyDefinition enemy, IReadOnlySet<string> dropTableIds) =>
         enemy.DropTableId is { } id && !dropTableIds.Contains(id) ? $"dropTableId has unknown drop table id '{id}'." : null;

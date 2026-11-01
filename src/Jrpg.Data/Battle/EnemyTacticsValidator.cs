@@ -5,7 +5,9 @@ using static Jrpg.Data.Content.RangeProblems;
 
 namespace Jrpg.Data.Battle;
 
-/// <summary>An enemy's actions against the skills (decisions 411, 412).</summary>
+/// <summary>
+/// An enemy's actions and phases: their thresholds, and every action against the skills (decisions 411, 412).
+/// </summary>
 internal static class EnemyTacticsValidator
 {
     /// <param name="tactics">The actions, in content's order.</param>
@@ -23,6 +25,43 @@ internal static class EnemyTacticsValidator
         }
 
         return null;
+    }
+
+    /// <param name="phases">The phases, in content's order: strictly descending thresholds.</param>
+    /// <param name="skills">The skills their actions may name.</param>
+    /// <returns>The first problem, naming the phase by index; null when there is none.</returns>
+    public static string? FindPhasesProblem(IReadOnlyList<EnemyPhase> phases, IReadOnlyDictionary<string, SkillDefinition> skills)
+    {
+        for (var index = 0; index < phases.Count; index++)
+        {
+            if (FindPhaseProblem(phases, index, skills) is { } problem)
+            {
+                return problem;
+            }
+        }
+
+        return null;
+    }
+
+    private static string? FindPhaseProblem(IReadOnlyList<EnemyPhase> phases, int index, IReadOnlyDictionary<string, SkillDefinition> skills)
+    {
+        var field = $"phases[{index}]";
+        EnemyPhase? phase = phases[index];
+        if (phase is null)
+        {
+            return $"{field} must not be null.";
+        }
+
+        if (phase.Tactics.Count == 0)
+        {
+            return $"{field}.tactics must not be empty.";
+        }
+
+        return Within($"{field}.belowHpPercent", phase.BelowHpPercent, 1, 99)
+            ?? (index > 0 && phase.BelowHpPercent >= phases[index - 1].BelowHpPercent
+                ? $"{field}.belowHpPercent must be below the phase before it ({phases[index - 1].BelowHpPercent}, was {phase.BelowHpPercent})."
+                : null)
+            ?? FindProblem(phase.Tactics, $"{field}.tactics", skills);
     }
 
     // The strict serializer lets a null element through, so the entry's type here says it may be one.

@@ -1,5 +1,5 @@
 # Enemy skills and bosses
-Status: approved, in progress
+Status: retro pending
 
 Battle depth before Act 1 content (developer, 2026-10-29). Today every enemy only attacks (`Battle/EnemyTactics`: a random living member, or a taunting one; question 224). This plan lets enemies use the party's kind of skills, chosen by content-driven tactics, and adds a boss: an enemy the battle treats differently, with phases that change its tactics. One placeholder boss encounter, the Goblin Chief, makes it testable and visible.
 
@@ -62,7 +62,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **B1. No running from a boss: Core refuses Flee, Run is greyed** (Core + Game + content, about 170 lines) → [slices/B1.md](slices/B1.md)
 - [x] **B4. The Chief's own art, drawn bigger by its size** (content + test, about 40 lines) → [slices/B4.md](slices/B4.md)
 - [x] **B2. Boss phases in Core, entered at the end of `Execute`** (Core, about 230 lines) → [slices/B2.md](slices/B2.md)
-- [ ] **B3. Phases in content and on screen: validated, the Chief's second phase, "Enraged!" in its own beat** (Data + Game + content + text + Simulations, about 220 lines) → [slices/B3.md](slices/B3.md)
+- [x] **B3. Phases in content and on screen: validated, the Chief's second phase, "Enraged!" in its own beat** (Data + Game + content + text + Simulations, about 220 lines) → [slices/B3.md](slices/B3.md)
 
 ## Decisions
 Developer's answers (2026-10-29):

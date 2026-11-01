@@ -76,6 +76,17 @@
       { "weight": 4 },
       { "skillId": "cleave", "weight": 2 },
       { "skillId": "field_dressing", "weight": 3, "when": { "kind": "allyHpBelow", "percent": 50 } }
+    ],
+    "phases": [
+      {
+        "belowHpPercent": 50,
+        "tactics": [
+          { "weight": 2 },
+          { "skillId": "crushing_blow", "weight": 3 },
+          { "skillId": "cleave", "weight": 2 },
+          { "skillId": "war_cry", "weight": 2, "when": { "kind": "allyFallen" } }
+        ]
+      }
     ]
   }
 ]

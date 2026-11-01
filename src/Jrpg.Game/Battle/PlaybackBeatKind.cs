@@ -20,4 +20,7 @@ internal enum PlaybackBeatKind
 
     /// <summary>Poison or Regen takes or restores HP at the end of its holder's turn, after the impact.</summary>
     Tick,
+
+    /// <summary>An enemy enters a phase, after every other beat of the action (decision 406).</summary>
+    Phase,
 }

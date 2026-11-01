@@ -162,8 +162,63 @@ public sealed class EnemyTacticsValidatorTests
         Assert.Equal(new TacticCondition(TacticConditionKind.AllyHpBelow, 50), catalog.Enemies["goblin"].Tactics[0].When);
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(100)]
+    public void Validate_PhaseThresholdOutOfRange_IsRefused(int percent)
+    {
+        Assert.Equal($"enemies.json: enemy 'goblin': phases[0].belowHpPercent must be within 1..99 (was {percent}).", PhasesProblemOf(Phase(percent)));
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(99)]
+    public void Validate_PhaseThresholdAtABound_IsAccepted(int percent)
+    {
+        Assert.Null(PhasesProblemOf(Phase(percent)));
+    }
+
+    [Theory]
+    [InlineData(50)]
+    [InlineData(60)]
+    public void Validate_PhasesNotDescending_NamesTheSecond(int second)
+    {
+        Assert.Equal($"enemies.json: enemy 'goblin': phases[1].belowHpPercent must be below the phase before it (50, was {second}).", PhasesProblemOf(Phase(50), Phase(second)));
+    }
+
+    [Fact]
+    public void Validate_PhasesDescending_IsAccepted()
+    {
+        Assert.Null(PhasesProblemOf(Phase(50), Phase(49)));
+    }
+
+    [Fact]
+    public void Validate_PhaseWithoutTactics_IsRefused()
+    {
+        Assert.Equal("enemies.json: enemy 'goblin': phases[0].tactics must not be empty.", PhasesProblemOf(new EnemyPhase { BelowHpPercent = 50, Tactics = [] }));
+    }
+
+    [Fact]
+    public void Validate_PhaseActionWithUnknownSkill_NamesThePhaseField()
+    {
+        var phase = new EnemyPhase { BelowHpPercent = 50, Tactics = [new EnemyAction { Weight = 1 }, Using("slash")] };
+
+        Assert.Equal("enemies.json: enemy 'goblin': phases[0].tactics[1].skillId has unknown skill id 'slash'.", PhasesProblemOf(phase));
+    }
+
+    [Fact]
+    public void Validate_NullPhase_NamesTheIndex()
+    {
+        Assert.Equal("enemies.json: enemy 'goblin': phases[1] must not be null.", PhasesProblemOf(Phase(50), null!));
+    }
+
     private static string? ProblemOf(params EnemyAction[] tactics) =>
         Record.Exception(() => EnemyCatalogValidator.Validate("enemies.json", [_goblin with { Tactics = tactics }], _references))?.Message;
+
+    private static string? PhasesProblemOf(params EnemyPhase[] phases) =>
+        Record.Exception(() => EnemyCatalogValidator.Validate("enemies.json", [_goblin with { Phases = phases }], _references))?.Message;
+
+    private static EnemyPhase Phase(int belowHpPercent) => new() { BelowHpPercent = belowHpPercent, Tactics = [new EnemyAction { Weight = 1 }] };
 
     private static EnemyAction Using(string skillId) => new() { SkillId = skillId, Weight = 1 };
 

@@ -46,8 +46,15 @@ public sealed class BossFightSimulation(ITestOutputHelper output)
     {
         var used = FightSets().SelectMany(set => set.Fights).SelectMany(fight => fight.ChiefActions).ToHashSet();
 
-        var kit = _catalog.Enemies[ChiefId].Tactics.Select(action => action.SkillId ?? AttackName);
+        var chief = _catalog.Enemies[ChiefId];
+        var kit = chief.Tactics.Concat(chief.Phases.SelectMany(phase => phase.Tactics)).Select(action => action.SkillId ?? AttackName);
         Assert.All(kit, action => Assert.Contains(action, used));
+    }
+
+    [Fact]
+    public void Run_ChiefFights_ThePhaseIsReachedInSomeFights()
+    {
+        Assert.Contains(FightSets().SelectMany(set => set.Fights), fight => fight.IsPhaseEntered);
     }
 
     private static IEnumerable<(string Label, List<Fight> Fights)> FightSets()
@@ -91,6 +98,7 @@ public sealed class BossFightSimulation(ITestOutputHelper output)
         var battle = BattleState.Start(party, enemies, new Inventory(), random);
         var tactics = new EnemyTactics(random, _catalog.Skills);
         var chiefActions = new List<string>();
+        var isPhaseEntered = false;
 
         var turns = 0;
         for (; turns < TurnLimit && !battle.IsOver; turns++)
@@ -98,9 +106,10 @@ public sealed class BossFightSimulation(ITestOutputHelper output)
             var command = battle.Phase == BattlePhase.PartyTurn ? AttackFirstLivingEnemyPolicy.ChooseCommand(battle) : tactics.ChooseCommand(battle);
             var events = battle.Execute(command);
             chiefActions.AddRange(ChiefActionsIn(events));
+            isPhaseEntered |= events.OfType<EnemyPhaseEntered>().Any();
         }
 
-        return new Fight(seed, battle.IsOver, battle.Phase == BattlePhase.Victory, turns, members.Sum(member => member.Vitals.Hp), chiefActions);
+        return new Fight(seed, battle.IsOver, battle.Phase == BattlePhase.Victory, turns, members.Sum(member => member.Vitals.Hp), chiefActions, isPhaseEntered);
     }
 
     private static IEnumerable<string> ChiefActionsIn(IReadOnlyList<BattleEvent> events) =>
@@ -116,8 +125,8 @@ public sealed class BossFightSimulation(ITestOutputHelper output)
         var actions = fights.SelectMany(fight => fight.ChiefActions).ToList();
         var shares = actions.GroupBy(action => action).OrderBy(group => group.Key, StringComparer.Ordinal)
             .Select(group => Invariant($"{group.Key} {100.0 * group.Count() / actions.Count:F0} %"));
-        output.WriteLine(Invariant($"{label,-28} {fights.Count} fights, win {100.0 * wins.Count / fights.Count,5:F1} %, turns {fights.Average(fight => fight.Turns),5:F1}, HP left {hpLeft,6}; {string.Join(", ", shares)}"));
+        output.WriteLine(Invariant($"{label,-28} {fights.Count} fights, win {100.0 * wins.Count / fights.Count,5:F1} %, turns {fights.Average(fight => fight.Turns),5:F1}, HP left {hpLeft,6}, phase in {100.0 * fights.Count(fight => fight.IsPhaseEntered) / fights.Count,5:F1} %; {string.Join(", ", shares)}"));
     }
 
-    private sealed record Fight(int Seed, bool IsOver, bool IsWon, int Turns, int HpLeft, IReadOnlyList<string> ChiefActions);
+    private sealed record Fight(int Seed, bool IsOver, bool IsWon, int Turns, int HpLeft, IReadOnlyList<string> ChiefActions, bool IsPhaseEntered);
 }

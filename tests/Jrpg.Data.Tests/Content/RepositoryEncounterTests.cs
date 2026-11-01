@@ -25,4 +25,14 @@ public sealed class RepositoryEncounterTests
         Assert.True(catalog.Enemies["goblin_chief"].IsBoss);
         Assert.False(catalog.Enemies["goblin"].IsBoss);
     }
+
+    [Fact]
+    public void Load_RepositoryContent_GoblinChiefHasASecondPhase()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        var phase = Assert.Single(catalog.Enemies["goblin_chief"].Phases);
+        Assert.Contains(phase.Tactics, action => action.SkillId == "crushing_blow");
+        Assert.Contains(phase.Tactics, action => action.SkillId == "war_cry");
+    }
 }

@@ -5,8 +5,11 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-enemy-skills-and-bosses, slice B2 (boss phases in Core, entered at the end of Execute). Round 1.
+Plan: 2026-10-29-enemy-skills-and-bosses, slice B3 (phases in content and on screen). Round 1.
 Verdict: Ready to commit. No Critical, no Warning.
 
-- Open (suggestion): EnemyDefinition.Tactics summary still says "What it chooses from on its turn"; a phase now replaces that list
+- Fixed (from B2): EnemyDefinition.Tactics summary now says "until a phase replaces it"
+- Open (suggestion): EnemyTacticsValidator class summary doesn't name the phases
+- Open (suggestion): comment above ActionPlayback.AddCue doesn't say a phase entry goes to its own beat
+- Open (follow-up): ActionPlayback.Cues summary and CueOnTarget param docs describe only an action's or status's name
 - Open (follow-up, from S1): PlayFight's battle setup and loop repeat ForestFightsSimulation.RunBattle; share them when a third simulation needs them

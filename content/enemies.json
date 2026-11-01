@@ -53,5 +53,27 @@
     "crowdControlResistance": 50,
     "resistances": { "blunt": 25, "piercing": 25, "fire": -50 },
     "experienceReward": 10
+  },
+  {
+    "id": "goblin_chief",
+    "name": "Goblin Chief",
+    "portraitFile": "Goblin.png",
+    "battleSpriteFile": "Goblin.png",
+    "attackEffectFile": "AttackEnemy.png",
+    "isSpriteFlipped": false,
+    "maxHp": 240,
+    "damage": 12,
+    "damageType": "piercing",
+    "accuracy": 80,
+    "dodge": 0,
+    "critChance": 5,
+    "crowdControlResistance": 50,
+    "resistances": { "fire": -25 },
+    "experienceReward": 150,
+    "dropTableId": "goblin",
+    "tactics": [
+      { "weight": 4 },
+      { "skillId": "cleave", "weight": 2 }
+    ]
   }
 ]

@@ -1,0 +1,18 @@
+using Jrpg.Data.Content;
+
+namespace Jrpg.Data.Tests.Content;
+
+// The repository's boss encounter is reached only by a hand check's local edit (decision 399): this test fails when
+// that edit to a map's random table stays in a commit.
+public sealed class RepositoryEncounterTests
+{
+    [Fact]
+    public void Load_RepositoryContent_HasGoblinChiefEncounter()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        Assert.Equal("goblin_chief", catalog.Encounters["goblin_chief"].EnemyIds[^1]);
+        Assert.True(catalog.Enemies["goblin_chief"].NamesSkill("cleave"));
+        Assert.DoesNotContain(catalog.Maps.Values, map => map.Settings.RandomEncounters?.EncounterIds.Contains("goblin_chief") == true);
+    }
+}

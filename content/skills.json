@@ -215,5 +215,12 @@
     "iconFile": "Attack.png",
     "resourceChanges": [ { "resourceId": "chakra", "amount": -3 } ],
     "effect": { "kind": "damage", "damageType": "blunt", "power": 8, "targeting": "singleEnemy", "hits": 4 }
+  },
+  {
+    "id": "cleave",
+    "name": "Cleave",
+    "description": "A wide swing that hits the whole party. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "effect": { "kind": "damage", "damageType": "slashing", "power": 10, "targeting": "allEnemies" }
   }
 ]

@@ -25,6 +25,9 @@ internal sealed class QuestLog
         return log;
     }
 
+    /// <summary>Every started quest's definition, in start order: what the journal lists (decision 391).</summary>
+    public IReadOnlyList<QuestDefinition> StartedQuests => [.. _startOrder.Select(questId => _entries[questId].Quest)];
+
     /// <summary>Every started quest's progress, in start order: what a save keeps.</summary>
     public IReadOnlyList<QuestProgress> Progress =>
         [.. _startOrder.Select(questId => new QuestProgress(questId, _entries[questId].StageId, _entries[questId].IsCompleted))];

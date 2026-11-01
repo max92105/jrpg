@@ -38,6 +38,7 @@ public sealed class GameSession
         _pricing = new Pricing(context.Catalog.Affixes.ToDictionary(affix => affix.Key, affix => affix.Value.GoldValue), context.Catalog.Rules.Trade);
         Sales = new ItemSales(Inventory, party.Purse, _pricing);
         _stocks = new ShopStocks(context.Catalog, gearRoll);
+        Quests = new QuestJournal(context.World.Quests);
     }
 
     public PartyState Party { get; }
@@ -64,6 +65,9 @@ public sealed class GameSession
 
     /// <summary>Using consumables from the menu.</summary>
     public FieldItemUse FieldItems { get; }
+
+    /// <summary>The quest log as the player reads it, for the Quests page (ADR 0032).</summary>
+    public QuestJournal Quests { get; }
 
     /// <summary>The player on the current map.</summary>
     public ExplorationState Exploration { get; }

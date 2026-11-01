@@ -63,7 +63,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **SV. Quests in saves, format 7, repaired against content** (Core + Data, about 240 lines) → [slices/SV.md](slices/SV.md)
 
 ### Phase 3: the page
-- [ ] **J1. The quest journal: the active quests in Core's order** (Core, about 100 lines) → [slices/J1.md](slices/J1.md)
+- [x] **J1. The quest journal: the active quests in Core's order** (Core, about 100 lines) → [slices/J1.md](slices/J1.md)
 - [ ] **G1. A Quests tab, first in the menu, lists the active quests** (Game + text, raw 125, about 200 lines at 1.6x) → [slices/G1.md](slices/G1.md)
 - [ ] **G2. Choosing a quest shows its detail** (Game + text, about 190 lines) → [slices/G2.md](slices/G2.md)
 - [ ] **G3. The Active and Completed categories, switched with Left and Right** (Core + Game + text, about 210 lines) → [slices/G3.md](slices/G3.md)

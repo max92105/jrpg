@@ -21,5 +21,6 @@ metadata:
 - **cache by reference** (demo I1): `Assert.Same` on a value the runtime interns anyway.
 - **constant oracle** (stats P3b, quests E3): asserting `Cap * 10`, or a list equal to the static it was set from, keeps green when the values change; pin the literals.
 - **second overload** (gold S2/S3): the stack overload's false paths tested, the piece overload's not; check each overload.
+- **order already given** (quests J1): a sort test whose setup already yields the expected order by another rule (main started last, then reversed); set up the opposite order.
 
 Related: [[records-with-lists-equality]].

@@ -40,6 +40,16 @@ public sealed class GameSessionTests
     }
 
     [Fact]
+    public void Quests_NewGame_NoActiveQuest()
+    {
+        var catalog = _catalog.WithNewGame(NewGame()).Build();
+
+        var session = GameSession.StartNew(catalog, "jazog", new SeededRandom(0));
+
+        Assert.Empty(session.Quests.Active);
+    }
+
+    [Fact]
     public void StartNew_LeaderNotAmongChoices_Throws()
     {
         var catalog = _catalog.WithNewGame(NewGame() with { LeaderChoices = [Choice("sarxian")] }).Build();

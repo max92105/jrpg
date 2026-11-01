@@ -1,5 +1,5 @@
 # Music and sound effects
-Status: approved
+Status: approved, in progress
 
 Drafted on 2026-10-29 from the developer's request. Builds on ADR 0018 (voices: WAV through MonoGame's `SoundEffect`, scenes write a `VoiceChannel`, the host plays it after each update, an exact-name startup check, silent without a device), which left music and effects to "their own plan".
 
@@ -43,7 +43,7 @@ Drafted on 2026-10-29 from the developer's request. Builds on ADR 0018 (voices: 
 One line per slice; each slice's goal, types, tests and hand checks are in its file under `slices/`. Tick the box here when a slice is done, and write its deviations in the slice file. Tunables, design overview and risks: [design.md](design.md).
 
 ### Phase 1: volumes
-- [ ] **V1. Music, Effects and Voices volumes in the Options page; the voice-over follows its volume** (Game + text, about 200 lines) → [slices/V1.md](slices/V1.md)
+- [x] **V1. Music, Effects and Voices volumes in the Options page; the voice-over follows its volume** (Game + text, about 200 lines) → [slices/V1.md](slices/V1.md)
 
 ### Phase 2: music
 - [ ] **C1. A map's track in content, checked at startup; placeholder map tracks** (Core + Data + content, about 170 lines) → [slices/C1.md](slices/C1.md)

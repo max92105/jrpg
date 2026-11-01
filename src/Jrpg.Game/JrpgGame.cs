@@ -121,7 +121,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
             Exit();
         }
 
-        _voicePlayer?.Follow(_voice);
+        _voicePlayer?.Follow(_voice, VolumeLevel.GainOf(_settings.VoiceVolume));
 
         base.Update(gameTime);
     }

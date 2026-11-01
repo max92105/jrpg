@@ -380,6 +380,15 @@ internal static class MessageIds
 
     public const string OptionsTextSpeed = "options_text_speed";
 
+    /// <summary>The Options row for the music's volume.</summary>
+    public const string OptionsMusicVolume = "options_music_volume";
+
+    /// <summary>The Options row for the sound effects' volume.</summary>
+    public const string OptionsEffectsVolume = "options_effects_volume";
+
+    /// <summary>The Options row for the voice-over's volume.</summary>
+    public const string OptionsVoiceVolume = "options_voice_volume";
+
     public const string OptionsOn = "options_on";
 
     public const string OptionsOff = "options_off";

@@ -1,3 +1,4 @@
+using System.Globalization;
 using FontStashSharp;
 using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
@@ -15,9 +16,12 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class OptionsPage : IMenuPage
 {
-    private const int FullScreenRow = 0;
-    private const int TextSpeedRow = 1;
-    private const int RowCount = 2;
+    internal const int FullScreenRow = 0;
+    internal const int TextSpeedRow = 1;
+    internal const int MusicRow = 2;
+    internal const int EffectsRow = 3;
+    internal const int VoicesRow = 4;
+    private const int RowCount = 5;
 
     // Values sit in a column right of the labels, with a small diamond either side of the selected one: the reference
     // UI's sign that Left and Right change it (docs/ui-reference).
@@ -32,6 +36,7 @@ internal sealed class OptionsPage : IMenuPage
     private readonly string[] _labels;
     private readonly MeasuredText[] _onOff;
     private readonly MeasuredText[] _speeds;
+    private readonly MeasuredText[] _levels;
     private readonly ListCursor _cursor = new(RowCount, _ => true);
     private readonly SelectionMotion _selection = new();
 
@@ -45,11 +50,19 @@ internal sealed class OptionsPage : IMenuPage
         _ui = ui;
         _font = text.Fonts.FontAt(UiTheme.MenuTextPixels);
         var messages = text.Messages;
-        _labels = [messages.Text(MessageIds.OptionsFullScreen), messages.Text(MessageIds.OptionsTextSpeed)];
+        _labels =
+        [
+            messages.Text(MessageIds.OptionsFullScreen),
+            messages.Text(MessageIds.OptionsTextSpeed),
+            messages.Text(MessageIds.OptionsMusicVolume),
+            messages.Text(MessageIds.OptionsEffectsVolume),
+            messages.Text(MessageIds.OptionsVoiceVolume),
+        ];
         _onOff = [MeasuredText.Of(_font, messages.Text(MessageIds.OptionsOff)), MeasuredText.Of(_font, messages.Text(MessageIds.OptionsOn))];
 
         // Indexed by TextSpeed, so each label follows its speed whatever the enum's order.
         _speeds = [.. Enum.GetValues<TextSpeed>().Select(speed => MeasuredText.Of(_font, messages.Text(LabelIdOf(speed))))];
+        _levels = [.. Enumerable.Range(0, VolumeLevel.Max + 1).Select(level => MeasuredText.Of(_font, level.ToString(CultureInfo.InvariantCulture)))];
     }
 
     public string TitleMessageId => MessageIds.MenuOptions;
@@ -59,6 +72,9 @@ internal sealed class OptionsPage : IMenuPage
     public string Hint { get; }
 
     public bool LeavesOnCancel => true;
+
+    /// <summary>The row Left and Right change now.</summary>
+    internal int SelectedRow => _cursor.Selected;
 
     /// <summary>Where the highlight is, in rows.</summary>
     internal float SelectionPosition => _selection.Position;
@@ -112,22 +128,39 @@ internal sealed class OptionsPage : IMenuPage
     private static Rectangle RowAt(Rectangle area, int row) =>
         new(area.X, area.Y + (row * UiTheme.MenuRowHeight), area.Width, UiTheme.MenuRowHeight);
 
-    // Full screen flips either way; the text speed steps through the list and stops at either end.
+    // Full screen flips either way; the text speed and the volumes step and stop at either end.
     private void Change(int step)
     {
-        if (_cursor.Selected == FullScreenRow)
+        switch (_cursor.Selected)
         {
-            _settings.IsFullScreen = !_settings.IsFullScreen;
-            return;
+            case FullScreenRow:
+                _settings.IsFullScreen = !_settings.IsFullScreen;
+                break;
+            case TextSpeedRow:
+                _settings.TextSpeed = (TextSpeed)Math.Clamp((int)_settings.TextSpeed + step, (int)TextSpeed.Slow, (int)TextSpeed.Instant);
+                break;
+            case MusicRow:
+                _settings.MusicVolume = Stepped(_settings.MusicVolume, step);
+                break;
+            case EffectsRow:
+                _settings.EffectsVolume = Stepped(_settings.EffectsVolume, step);
+                break;
+            default:
+                _settings.VoiceVolume = Stepped(_settings.VoiceVolume, step);
+                break;
         }
-
-        var speed = Math.Clamp((int)_settings.TextSpeed + step, (int)TextSpeed.Slow, (int)TextSpeed.Instant);
-        _settings.TextSpeed = (TextSpeed)speed;
     }
 
-    private MeasuredText ValueOf(int row) => row == TextSpeedRow
-        ? _speeds[(int)_settings.TextSpeed]
-        : _onOff[_settings.IsFullScreen ? 1 : 0];
+    private static int Stepped(int level, int step) => Math.Clamp(level + step, 0, VolumeLevel.Max);
+
+    private MeasuredText ValueOf(int row) => row switch
+    {
+        FullScreenRow => _onOff[_settings.IsFullScreen ? 1 : 0],
+        TextSpeedRow => _speeds[(int)_settings.TextSpeed],
+        MusicRow => _levels[_settings.MusicVolume],
+        EffectsRow => _levels[_settings.EffectsVolume],
+        _ => _levels[_settings.VoiceVolume],
+    };
 
     private static string LabelIdOf(TextSpeed speed) => speed switch
     {

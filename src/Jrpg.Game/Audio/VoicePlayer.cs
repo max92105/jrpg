@@ -12,25 +12,33 @@ internal sealed class VoicePlayer(SoundLibrary sounds) : IDisposable
     /// <summary>
     /// Called after every update. A file other than the one last started, or none, stops what plays and starts the new
     /// one from its beginning; the same file plays on. A stop and a replay of the same file come in different updates,
-    /// so the replay starts over.
+    /// so the replay starts over. The gain is set on every call, so a change is heard mid-line.
     /// </summary>
-    public void Follow(VoiceChannel voice)
+    public void Follow(VoiceChannel voice, float gain)
     {
-        if (voice.VoiceFile == _startedFile)
+        if (voice.VoiceFile != _startedFile)
         {
-            return;
+            Start(voice.VoiceFile, gain);
         }
-
-        StopPlaying();
-        _startedFile = voice.VoiceFile;
-        if (_startedFile is not null && sounds.Get(AudioFolders.Voices, _startedFile) is { } sound)
+        else if (_playing is not null)
         {
-            _playing = sound.CreateInstance();
-            _playing.Play();
+            _playing.Volume = gain;
         }
     }
 
     public void Dispose() => StopPlaying();
+
+    private void Start(string? file, float gain)
+    {
+        StopPlaying();
+        _startedFile = file;
+        if (file is not null && sounds.Get(AudioFolders.Voices, file) is { } sound)
+        {
+            _playing = sound.CreateInstance();
+            _playing.Volume = gain;
+            _playing.Play();
+        }
+    }
 
     private void StopPlaying()
     {

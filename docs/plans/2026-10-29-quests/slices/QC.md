@@ -29,3 +29,5 @@ Part of [the quests plan](../README.md). After R1 and ADR 0033. Decisions 386 (t
     - `ExplorationQuestTests: New_ArrivalEventForQuestNotStarted_Runs` (the arrival path through the gate)
   - **Existing tests:** the leader and "once" tests of the three callers pass unchanged (the gate's refactor guard).
   - **Verify by hand:** nothing to see yet (no content); N1 checks it in play.
+
+- **Done, with deviations:** the log's entry now keeps the quest definition (its first reader, `HasReached`); `AbsentWhenNullFilter` already lists `MapEvent.onlyWhenQuest` here, not in QV, since the writer's byte-identity test runs on every map as soon as `MapEvent` has the field. `ActiveMapTests` got both sides of the gate (the quest condition unmet then met; a done "once" event and another leader refused) and `ExplorationQuestTests` the cell's and the arrival's other side too (gated on). The `ReachedStage` theory is three rows plus a test for the earlier stage; an unknown stage on `ReachedStage` and a missing stage on either stage kind throw. Tests 3186 → 3210. Review: `AtStage` without a stage was true on a quest never started (null equals null); it throws now, tested.

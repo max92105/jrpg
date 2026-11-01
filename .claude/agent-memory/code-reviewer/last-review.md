@@ -5,10 +5,12 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-quests, slice R1 (ExplorationState split: MapEventStarter, pure Core refactor). Round 1. Verdict: Ready to commit.
-verify.ps1 all pass (3186 tests, unchanged).
+Plan: 2026-10-29-quests, slice QC (events gated on a quest; ActiveMap.CanStart one gate; ADR 0033). Round 1.
+Verdict: Ready to commit.
 
-- Suggestion, open: MapEventStarter.Running() is a noun-named method; RunningOrThrow / RequireRun
-- Suggestion, open: map and finder now live in both ExplorationState and MapEventStarter, synced by the warp path's EnteredMap call (accepted deviation; QC/G4 must keep the pair)
-- QS suggestions (shared _errand fixture, IsFinished asserts): not in this diff, left to the developer
+- Warning, open: QuestCondition.IsMetBy AtStage arm doesn't use NamedStage(); AtStage with null stage on a quest not started returns true (acts as NotStarted) where ReachedStage throws
+- Suggestion, open: MapEventStarter summary writes `ActiveMap.CanStart` in backticks; XML doc uses <c> elsewhere
+- Suggestion, open: IsMetBy_CompletedWhileActive_NotMet also asserts the met side; name it IsMetBy_Completed_MetOnlyOnceCompleted
+- Follow-up: QuestLog.Entry now holds QuestDefinition; the save/restore slice must rebuild entries from the catalog
+- Follow-up (carried from R1): MapEventStarter.Running() noun-named method
 - Follow-up (carried): Trade/ShopScene 296 lines

@@ -22,5 +22,5 @@ internal static class ArrivalEvents
     }
 
     private static bool IsRunnable(MapEvent mapEvent, ActiveMap map, string leaderId) =>
-        mapEvent.Activation == EventActivation.Arrive && mapEvent.IsForLeader(leaderId) && !(mapEvent.IsOnce && map.IsDone(mapEvent));
+        mapEvent.Activation == EventActivation.Arrive && map.CanStart(mapEvent, leaderId);
 }

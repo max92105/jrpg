@@ -5,7 +5,10 @@ using Jrpg.Core.World;
 
 namespace Jrpg.Core.Exploration;
 
-/// <summary>The map the player is on, as the player changed it: swapped objects and events already done.</summary>
+/// <summary>
+/// The map the player is on, as the player changed it: swapped objects and events already done; the one gate that says
+/// whether an event may start now (ADR 0033).
+/// </summary>
 internal sealed class ActiveMap(
     MapDefinition definition,
     IReadOnlyDictionary<string, ObjectDefinition> objects,
@@ -38,6 +41,16 @@ internal sealed class ActiveMap(
     }
 
     public bool IsDone(MapEvent mapEvent) => world.IsEventDone(KeyOf(mapEvent));
+
+    /// <summary>
+    /// Whether the event may start now, whatever its trigger (ADR 0033): for this leader (decision 185), not a "once"
+    /// event already done, and its quest condition met by the world's log. The object's look is
+    /// <see cref="MapEvent.CanRunOn"/>.
+    /// </summary>
+    public bool CanStart(MapEvent mapEvent, string leaderId) =>
+        mapEvent.IsForLeader(leaderId)
+        && !(mapEvent.IsOnce && IsDone(mapEvent))
+        && (mapEvent.OnlyWhenQuest is not { } gate || gate.IsMetBy(world.Quests));
 
     public void MarkDone(MapEvent mapEvent) => world.MarkEventDone(KeyOf(mapEvent));
 

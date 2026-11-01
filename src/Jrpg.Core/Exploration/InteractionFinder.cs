@@ -37,7 +37,7 @@ internal sealed class InteractionFinder(ActiveMap map, ExplorationRules rules, s
             for (var eventIndex = 0; eventIndex < placed.Events.Count; eventIndex++)
             {
                 var mapEvent = placed.Events[eventIndex];
-                if (mapEvent.Activation == activation && mapEvent.CanRunOn(definition.Id) && mapEvent.IsForLeader(leaderId) && !(mapEvent.IsOnce && map.IsDone(mapEvent)))
+                if (mapEvent.Activation == activation && mapEvent.CanRunOn(definition.Id) && map.CanStart(mapEvent, leaderId))
                 {
                     return new TriggeredEvent(mapEvent, placed);
                 }

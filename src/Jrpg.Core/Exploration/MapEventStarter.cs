@@ -9,7 +9,8 @@ namespace Jrpg.Core.Exploration;
 /// Starts the current map's events when their trigger happens, and holds the one running (ADR 0006): the map's arrival
 /// event once the player is on it and nothing else runs; a cell's touch event on entering the cell; the touch event of
 /// the object in front, armed by standing still (decision 38); the interact event of the object in front on Confirm.
-/// Which event of a cell may start is the leader's and the "once" marks' to decide, as for an object's.
+/// Whether an event may start is one gate's to decide, <c>ActiveMap.CanStart</c> (ADR 0033), for a cell as for an
+/// object.
 /// </summary>
 internal sealed class MapEventStarter
 {
@@ -72,7 +73,7 @@ internal sealed class MapEventStarter
     public bool TryStartCellEvent(GridCell cell)
     {
         var cellEvent = _map.CellEventAt(cell);
-        if (cellEvent is null || !cellEvent.Event.IsForLeader(_party.Leader.Id) || (cellEvent.Event.IsOnce && _map.IsDone(cellEvent.Event)))
+        if (cellEvent is null || !_map.CanStart(cellEvent.Event, _party.Leader.Id))
         {
             return false;
         }

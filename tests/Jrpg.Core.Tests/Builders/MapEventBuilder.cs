@@ -1,4 +1,5 @@
 using Jrpg.Core.Events;
+using Jrpg.Core.Quests;
 
 namespace Jrpg.Core.Tests.Builders;
 
@@ -10,6 +11,7 @@ internal sealed class MapEventBuilder
     private bool _isOnce;
     private string? _onlyWhenObjectId;
     private string? _onlyWhenLeaderId;
+    private QuestCondition? _onlyWhenQuest;
 
     public MapEventBuilder WithId(string id)
     {
@@ -53,6 +55,12 @@ internal sealed class MapEventBuilder
         return this;
     }
 
+    public MapEventBuilder OnlyWhenQuest(QuestCondition condition)
+    {
+        _onlyWhenQuest = condition;
+        return this;
+    }
+
     public MapEvent Build() => new()
     {
         Id = _id,
@@ -61,6 +69,7 @@ internal sealed class MapEventBuilder
         IsOnce = _isOnce,
         OnlyWhenObjectId = _onlyWhenObjectId,
         OnlyWhenLeaderId = _onlyWhenLeaderId,
+        OnlyWhenQuest = _onlyWhenQuest,
         Steps = _steps,
     };
 }

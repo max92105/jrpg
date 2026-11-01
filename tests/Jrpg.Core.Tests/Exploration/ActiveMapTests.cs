@@ -1,6 +1,7 @@
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Quests;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.World;
 
@@ -20,6 +21,33 @@ public sealed class ActiveMapTests
     };
 
     private static readonly ObjectDefinition _openDoor = _closedDoor with { Id = "door_open", CollisionPolygon = [] };
+
+    // The one gate (ADR 0033): the quest condition is read from the world the map was built with.
+    [Fact]
+    public void CanStart_QuestConditionUnmetThenMet_FollowsTheLog()
+    {
+        var world = new WorldState();
+        var gated = new MapEventBuilder().OnlyWhenQuest(new QuestCondition("errand", QuestConditionKind.Active)).Build();
+        var map = DoorMap(world);
+        Assert.False(map.CanStart(gated, "sarxian"));
+
+        world.Quests.Start(TestQuests.Errand);
+
+        Assert.True(map.CanStart(gated, "sarxian"));
+    }
+
+    [Fact]
+    public void CanStart_OnceEventDoneOrOtherLeader_ReturnsFalse()
+    {
+        var map = DoorMap(new WorldState());
+        var once = new MapEventBuilder().AsOnce().Build();
+        Assert.True(map.CanStart(once, "sarxian"));
+
+        map.MarkDone(once);
+
+        Assert.False(map.CanStart(once, "sarxian"));
+        Assert.False(map.CanStart(new MapEventBuilder().OnlyWhenLeaderIs("omer").Build(), "sarxian"));
+    }
 
     [Fact]
     public void CurrentDefinitionOf_SwappedObject_ReturnsSwappedDefinition()

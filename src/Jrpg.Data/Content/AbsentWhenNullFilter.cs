@@ -18,6 +18,9 @@ internal static class AbsentWhenNullFilter
         // Decision 185: only the intros are gated on the leader.
         (typeof(MapEvent), "onlyWhenLeaderId"),
 
+        // ADR 0033: only quest-gated events have a condition.
+        (typeof(MapEvent), "onlyWhenQuest"),
+
         // Decision 382: only an inn prices a rest.
         (typeof(RestStep), "price"),
     ];

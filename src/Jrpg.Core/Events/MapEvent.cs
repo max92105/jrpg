@@ -1,3 +1,5 @@
+using Jrpg.Core.Quests;
+
 namespace Jrpg.Core.Events;
 
 /// <summary>What happens when the player interacts with or touches an object or a cell.</summary>
@@ -19,6 +21,11 @@ public sealed record MapEvent
 
     /// <summary>When set, the event only runs while this member leads, such as each leader's intro (decision 185).</summary>
     public string? OnlyWhenLeaderId { get; init; }
+
+    /// <summary>
+    /// Runs only while a quest meets this (ADR 0033); null for always. Checked by <c>ActiveMap.CanStart</c>.
+    /// </summary>
+    public QuestCondition? OnlyWhenQuest { get; init; }
 
     public required IReadOnlyList<EventStep> Steps { get; init; }
 

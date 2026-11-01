@@ -46,6 +46,9 @@ public sealed class Combatant
     /// <summary>The enemy type this combatant is; null for a party member. Victory experience comes from it.</summary>
     public EnemyDefinition? Enemy { get; private init; }
 
+    /// <summary>The phase an enemy has reached; null before any. Battle only, never saved.</summary>
+    public EnemyPhase? EnemyPhase { get; internal set; }
+
     /// <summary>Whether this combatant has <paramref name="skill"/> at all, whether or not it can use it now.</summary>
     public bool Knows(SkillDefinition skill) => Skills.Contains(skill) || Enemy?.NamesSkill(skill.Id) == true;
 

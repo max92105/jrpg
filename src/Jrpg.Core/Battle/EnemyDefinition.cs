@@ -55,9 +55,17 @@ public sealed record EnemyDefinition
     /// <summary>Whether the party can't run from a battle it is in (decisions 407, 414).</summary>
     public bool IsBoss { get; init; }
 
-    /// <summary>What it chooses from on its turn (ADR 0034); empty only attacks (decision 412).</summary>
+    /// <summary>
+    /// What it chooses from on its turn until a phase replaces it (ADR 0034); empty only attacks (decision 412).
+    /// </summary>
     public IReadOnlyList<EnemyAction> Tactics { get; init; } = [];
 
-    /// <summary>Whether its tactics name the skill, which is how an enemy knows a skill.</summary>
-    public bool NamesSkill(string skillId) => Tactics.Any(action => action.SkillId == skillId);
+    /// <summary>
+    /// The actions it switches to below a share of its HP (ADR 0034), thresholds descending; empty has none.
+    /// </summary>
+    public IReadOnlyList<EnemyPhase> Phases { get; init; } = [];
+
+    /// <summary>Whether its tactics or a phase's name the skill, which is how an enemy knows a skill.</summary>
+    public bool NamesSkill(string skillId) =>
+        Tactics.Concat(Phases.SelectMany(phase => phase.Tactics)).Any(action => action.SkillId == skillId);
 }

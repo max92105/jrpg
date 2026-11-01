@@ -30,7 +30,8 @@ public sealed class EnemyTactics(IRandom random, IReadOnlyDictionary<string, Ski
 
     private List<EnemyAction> EligibleActions(BattleState battle)
     {
-        var tactics = battle.CurrentActor.Enemy?.Tactics ?? [];
+        var actor = battle.CurrentActor;
+        var tactics = actor.EnemyPhase?.Tactics ?? actor.Enemy?.Tactics ?? [];
         return [.. tactics.Where(action => IsEligible(action, battle))];
     }
 

@@ -82,6 +82,20 @@ public sealed class BattleQuickActionTests
         Assert.Equal(new BattleEnded(BattlePhase.Victory), events[^1]);
     }
 
+    // A kept turn runs no upkeep or advance, yet the phase is still entered at the end of the call (ADR 0034).
+    [Fact]
+    public void Execute_QuickSkillHitsBossBelow_EntersThePhase()
+    {
+        var phase = new EnemyPhase { BelowHpPercent = 50, Tactics = [new EnemyAction { Weight = 1 }] };
+        var boss = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 10, damage: 20).WithPhases(phase).Build());
+        var battle = new BattleState([_rogue, boss], new Inventory(), new FixedSequenceRandom(1));
+
+        var events = battle.Execute(new SkillCommand(_dash, [boss]));
+
+        Assert.Equal(new EnemyPhaseEntered(boss, phase), events[^1]);
+        Assert.Same(_rogue, battle.CurrentActor);
+    }
+
     private (BattleState Battle, Combatant Goblin) Battle(int goblinHp)
     {
         var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: goblinHp, damage: 20).Build());

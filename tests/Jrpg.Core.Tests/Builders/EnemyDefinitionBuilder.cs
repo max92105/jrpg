@@ -16,6 +16,7 @@ internal sealed class EnemyDefinitionBuilder
     private int _crowdControlResistance;
     private int _accuracy = 100;
     private EnemyAction[] _tactics = [];
+    private EnemyPhase[] _phases = [];
     private bool _isBoss;
 
     public EnemyDefinitionBuilder WithName(string name)
@@ -79,6 +80,12 @@ internal sealed class EnemyDefinitionBuilder
         return this;
     }
 
+    public EnemyDefinitionBuilder WithPhases(params EnemyPhase[] phases)
+    {
+        _phases = phases;
+        return this;
+    }
+
     public EnemyDefinitionBuilder AsBoss()
     {
         _isBoss = true;
@@ -104,6 +111,7 @@ internal sealed class EnemyDefinitionBuilder
         ExperienceReward = 40,
         Gold = _gold,
         Tactics = _tactics,
+        Phases = _phases,
         IsBoss = _isBoss,
     };
 }

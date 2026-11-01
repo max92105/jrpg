@@ -151,7 +151,10 @@ public sealed class BattleState
         return new VictoryRewards(BattleRewards.TotalExperience(defeated), BattleRewards.GrantExperience(defeated, members, table));
     }
 
-    /// <summary>The current actor carries out <paramref name="command"/>, then the turn ends.</summary>
+    /// <summary>
+    /// The current actor carries out <paramref name="command"/>, then the turn ends; last, while the battle goes on,
+    /// standing enemies enter the phases their HP has reached, after every HP loss of the call (ADR 0034).
+    /// </summary>
     /// <returns>What happened, in order, starting with <see cref="ActionStarted"/>.</returns>
     /// <exception cref="InvalidOperationException">The battle is over, or the current actor can't give this command.</exception>
     /// <exception cref="ArgumentException">The command's targets are not legal targets.</exception>
@@ -168,6 +171,11 @@ public sealed class BattleState
         if (!IsOver)
         {
             Phase = KeepsTurn(command) ? _turnFlow.KeepTurn(actor, events) : _turnFlow.EndTurn(actor, events);
+        }
+
+        if (!IsOver)
+        {
+            EnemyPhases.EnterReached(Combatants, events);
         }
 
         return events;

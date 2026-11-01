@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization.Metadata;
 using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Quests;
 
 namespace Jrpg.Data.Content;
 
@@ -20,6 +21,9 @@ internal static class AbsentWhenNullFilter
 
         // ADR 0033: only quest-gated events have a condition.
         (typeof(MapEvent), "onlyWhenQuest"),
+
+        // ADR 0033: only the two stage kinds name a stage.
+        (typeof(QuestCondition), "stageId"),
 
         // Decision 382: only an inn prices a rest.
         (typeof(RestStep), "price"),

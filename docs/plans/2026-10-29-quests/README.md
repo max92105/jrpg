@@ -53,7 +53,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **R1. `ExplorationState` split: starting map events moves out** (Core refactor, about 160 lines moved, tests unchanged) → [slices/R1.md](slices/R1.md)
 - [x] **ADR 0033: quest conditions gate whole events** (`onlyWhenQuest` beside the leader and object gates; the first event of an object that may start wins): write it from decisions 386 and 389 (nothing left to ask), before QC
 - [x] **QC. Events gated on a quest, through one start gate** (Core, about 230 lines) → [slices/QC.md](slices/QC.md)
-- [ ] **QV. The condition in content, and no event shadowing the later ones on its object** (Data, about 210 lines) → [slices/QV.md](slices/QV.md)
+- [x] **QV. The condition in content, and no event shadowing the later ones on its object** (Data, about 210 lines) → [slices/QV.md](slices/QV.md)
 
 ### Phase 2: authoring, the placeholder and the save
 - [ ] **E1. The event dialogs show and add the three quest steps** (Editor, about 210 lines) → [slices/E1.md](slices/E1.md)

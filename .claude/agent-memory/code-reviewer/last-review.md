@@ -5,12 +5,11 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-quests, slice QC (events gated on a quest; ActiveMap.CanStart one gate; ADR 0033). Round 1.
+Plan: 2026-10-29-quests, slice QV (quest condition validated in content; no shadowing object event). Round 1.
 Verdict: Ready to commit.
 
-- Warning, open: QuestCondition.IsMetBy AtStage arm doesn't use NamedStage(); AtStage with null stage on a quest not started returns true (acts as NotStarted) where ReachedStage throws
-- Suggestion, open: MapEventStarter summary writes `ActiveMap.CanStart` in backticks; XML doc uses <c> elsewhere
-- Suggestion, open: IsMetBy_CompletedWhileActive_NotMet also asserts the met side; name it IsMetBy_Completed_MetOnlyOnceCompleted
-- Follow-up: QuestLog.Entry now holds QuestDefinition; the save/restore slice must rebuild entries from the catalog
-- Follow-up (carried from R1): MapEventStarter.Running() noun-named method
+- Suggestion, open: MapEventValidator.CamelCase<T> is a noun-ish name; call it JsonNameOf (siblings use NameOf)
+- Suggestion, open: FindShadowedEvent runs the Skip/FirstOrDefault search before CanAlwaysStart; guard first with `continue`
+- Follow-up: enum-to-camelCase name now written in five places (ResistancesConverter, StatBonusesConverter, Crafting/Loot validators, MapEventValidator); one shared Data helper type
+- Fixed (from QC): QuestCondition AtStage uses NamedStage(); IsMetBy_Completed_MetOnlyOnceCompleted renamed; Running() gone
 - Follow-up (carried): Trade/ShopScene 296 lines

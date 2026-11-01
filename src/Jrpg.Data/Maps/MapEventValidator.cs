@@ -1,17 +1,24 @@
 using System.Globalization;
+using System.Text.Json;
 using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
+using Jrpg.Core.Quests;
 
 namespace Jrpg.Data.Maps;
 
-/// <summary>The rules for one map's object and cell events. Each problem names the event, and the step when it's one.</summary>
+/// <summary>
+/// The rules for one map's object and cell events, their gates and their steps, and the order of an object's events (no
+/// ungated event may shadow a later one of its activation, ADR 0033). Each problem names the event, and the step when
+/// it's one.
+/// </summary>
 internal static class MapEventValidator
 {
     /// <returns>What is wrong with the map's events, or null if nothing is.</returns>
     public static string? FindProblem(MapLayout layout, MapReferences references) =>
         FindNullEntry(layout)
         ?? FindRepeatedEventId(layout)
+        ?? FindShadowedEvent(layout)
         ?? FindObjectEventProblem(layout, references)
         ?? FindCellEventProblem(layout, references);
 
@@ -45,6 +52,35 @@ internal static class MapEventValidator
         var repeatedId = AllEvents(layout).GroupBy(mapEvent => mapEvent.Id).FirstOrDefault(group => group.Count() > 1)?.Key;
         return repeatedId is null ? null : $"event id '{repeatedId}' is used more than once.";
     }
+
+    // An object event with no gate that isn't "once" always wins over the later events of its activation on the object,
+    // which could then never run (ADR 0033): content refuses the order rather than leaving it to be found in play.
+    private static string? FindShadowedEvent(MapLayout layout)
+    {
+        foreach (var placed in layout.Objects)
+        {
+            for (var index = 0; index < placed.Events.Count; index++)
+            {
+                var first = placed.Events[index];
+                if (!CanAlwaysStart(first))
+                {
+                    continue;
+                }
+
+                if (placed.Events.Skip(index + 1).FirstOrDefault(later => later.Activation == first.Activation) is { } shadowed)
+                {
+                    return $"object '{placed.Uid}': event '{first.Id}' can always start, so the later {JsonNameOf(first.Activation)} event '{shadowed.Id}' never would; gate it or make it once.";
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private static bool CanAlwaysStart(MapEvent mapEvent) =>
+        !mapEvent.IsOnce && mapEvent.OnlyWhenObjectId is null && mapEvent.OnlyWhenLeaderId is null && mapEvent.OnlyWhenQuest is null;
+
+    private static string JsonNameOf<T>(T value) where T : struct, Enum => JsonNamingPolicy.CamelCase.ConvertName(value.ToString());
 
     private static string? FindObjectEventProblem(MapLayout layout, MapReferences references)
     {
@@ -127,7 +163,26 @@ internal static class MapEventValidator
             return $"onlyWhenLeaderId has unknown party member id '{leaderId}'.";
         }
 
-        return null;
+        return mapEvent.OnlyWhenQuest is { } condition ? FindQuestConditionProblem(condition, references) : null;
+    }
+
+    // The quest must exist; the two stage kinds need a stage the quest has, the others take none (ADR 0033).
+    private static string? FindQuestConditionProblem(QuestCondition condition, MapReferences references)
+    {
+        if (!references.Content.Quests.TryGetValue(condition.QuestId, out var quest))
+        {
+            return $"onlyWhenQuest has unknown quest id '{condition.QuestId}'.";
+        }
+
+        var kind = JsonNameOf(condition.Kind);
+        if (condition.Kind is not (QuestConditionKind.AtStage or QuestConditionKind.ReachedStage))
+        {
+            return condition.StageId is null ? null : $"onlyWhenQuest kind '{kind}' names no stage; remove stageId '{condition.StageId}'.";
+        }
+
+        return condition.StageId is null ? $"onlyWhenQuest kind '{kind}' needs a stageId."
+            : !quest.HasStage(condition.StageId) ? $"onlyWhenQuest has unknown stage '{condition.StageId}' of quest '{condition.QuestId}'."
+            : null;
     }
 
     private static string? FindStepProblem(EventStep step, MapReferences references) => step switch

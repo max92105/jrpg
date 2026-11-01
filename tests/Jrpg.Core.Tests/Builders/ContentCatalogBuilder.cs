@@ -6,6 +6,7 @@ using Jrpg.Core.Loot;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
+using Jrpg.Core.Quests;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Trade;
 
@@ -37,6 +38,7 @@ internal sealed class ContentCatalogBuilder
     private ObjectDefinition[] _objects = [];
     private MapLayout[] _maps = [new MapLayoutBuilder().WithLayer("1").Build()];
     private ShopDefinition[] _shops = [];
+    private QuestDefinition[] _quests = [];
     private EnemyDefinition[] _enemies = [];
     private EncounterDefinition[] _encounters = [];
     private readonly Dictionary<string, RandomEncounterTable> _randomEncounters = [];
@@ -56,6 +58,12 @@ internal sealed class ContentCatalogBuilder
     public ContentCatalogBuilder WithShops(params ShopDefinition[] shops)
     {
         _shops = shops;
+        return this;
+    }
+
+    public ContentCatalogBuilder WithQuests(params QuestDefinition[] quests)
+    {
+        _quests = quests;
         return this;
     }
 
@@ -151,6 +159,7 @@ internal sealed class ContentCatalogBuilder
         Affixes = _affixes.ToDictionary(affix => affix.Id),
         DropTables = _dropTables.ToDictionary(table => table.Id),
         Shops = _shops.ToDictionary(shop => shop.Id),
+        Quests = _quests.ToDictionary(quest => quest.Id),
     };
 
     private MapSettings SettingsFor(string mapId) =>

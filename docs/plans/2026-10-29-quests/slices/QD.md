@@ -27,3 +27,5 @@ Part of [the quests plan](../README.md). First slice. Decision 397 (the placehol
     - `ContentCatalogLoaderQuestTests: Load_UnknownQuestKind_ThrowsNamingTheFile` (a copied content root)
   - **Call sites:** none beyond the builder.
   - **Verify by hand:** start the game; it starts as before. Break `quests.json` (an empty stage list): the start stops naming the file and the quest; put it back.
+
+- **Done, with deviations:** the builder's method is `WithQuests(params QuestDefinition[])`, the shape of its siblings, not `WithQuest`. `QuestDefinition` compares its stages by sequence (as `ShopDefinition` does its ids), tested. The validator's cases are one theory (`InvalidQuests`, a null stage list included) plus the repeated id and the well-formed quest. The errand's second stage avoids an apostrophe, which a catalog writer would escape. Tests 3146 → 3163. Review: the loader test copies the content through a shared `CopiedContentRoot` fixture (the four older copies go to the backlog).

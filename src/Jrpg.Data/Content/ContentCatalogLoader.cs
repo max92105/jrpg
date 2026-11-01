@@ -5,6 +5,7 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
+using Jrpg.Core.Quests;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Trade;
 using Jrpg.Data.Battle;
@@ -13,6 +14,7 @@ using Jrpg.Data.Items;
 using Jrpg.Data.Loot;
 using Jrpg.Data.Maps;
 using Jrpg.Data.Party;
+using Jrpg.Data.Quests;
 using Jrpg.Data.Skills;
 using Jrpg.Data.Trade;
 
@@ -30,6 +32,7 @@ public static class ContentCatalogLoader
     private const string DropTablesFile = "drop-tables.json";
     private const string AffixesFile = "affixes.json";
     private const string ShopsFile = "shops.json";
+    internal const string QuestsFile = "quests.json";
     internal const string NewGameFile = "new-game.json";
 
     internal const string TilesheetsFile = "tilesheets.json";
@@ -55,6 +58,7 @@ public static class ContentCatalogLoader
         CraftingRulesValidator.Validate(RulesFile, rules.Crafting, itemsById);
         var shops = ReadValidated<IReadOnlyList<ShopDefinition>>(
             contentRoot, ShopsFile, (file, list) => ShopCatalogValidator.Validate(file, list, itemsById));
+        var quests = ReadValidated<IReadOnlyList<QuestDefinition>>(contentRoot, QuestsFile, QuestCatalogValidator.Validate);
         var affixes = ReadValidated<IReadOnlyList<AffixDefinition>>(contentRoot, AffixesFile, AffixCatalogValidator.Validate);
         var dropTables = ReadValidated<IReadOnlyList<DropTable>>(
             contentRoot, DropTablesFile, (file, list) => DropTableCatalogValidator.Validate(file, list, itemsById));
@@ -110,6 +114,7 @@ public static class ContentCatalogLoader
 
             DropTables = dropTables.ToFrozenDictionary(table => table.Id),
             Shops = shops.ToFrozenDictionary(shop => shop.Id),
+            Quests = quests.ToFrozenDictionary(quest => quest.Id),
         };
     }
 

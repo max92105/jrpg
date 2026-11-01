@@ -1,5 +1,5 @@
 # Quests and the quest log
-Status: approved
+Status: approved, in progress
 
 Drafted on 2026-10-29, before Act 1's content is written: the game needs quest progression and a menu page that tracks it. The developer writes the real quests, story and maps; this plan builds the mechanism, an editor window for quests, and one placeholder quest to test it all by hand.
 
@@ -46,7 +46,7 @@ Drafted on 2026-10-29, before Act 1's content is written: the game needs quest p
 One line per slice; each slice's goal, types, tests and hand checks are in its file under `slices/`. Tick the box here when a slice is done, and write its deviations in the slice file. Tunables, design overview and risks: [design.md](design.md).
 
 ### Phase 1: quests in Core and content
-- [ ] **QD. Quest definitions in `quests.json` with the placeholder errand, validated and in the catalog** (Core + Data + content, about 230 lines) → [slices/QD.md](slices/QD.md)
+- [x] **QD. Quest definitions in `quests.json` with the placeholder errand, validated and in the catalog** (Core + Data + content, about 230 lines) → [slices/QD.md](slices/QD.md)
 - [ ] **ADR 0032: quest progress is its own log** (stage ids per quest in `WorldState`, rather than general flags; story state that isn't a quest is a main-quest stage for now): write it from decisions 388 and 398 and design.md "Key decisions" (nothing left to ask), before QL
 - [ ] **QL. The quest log in `WorldState`: start, advance, complete** (Core, about 230 lines) → [slices/QL.md](slices/QL.md)
 - [ ] **QS. The `startQuest`, `advanceQuest` and `completeQuest` steps** (Core + Data, about 220 lines) → [slices/QS.md](slices/QS.md)

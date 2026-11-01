@@ -3,6 +3,7 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
+using Jrpg.Core.Quests;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Trade;
 
@@ -43,6 +44,9 @@ public sealed record ContentCatalog
 
     /// <summary>The shops a shopkeeper may open, by id (ADR 0031).</summary>
     public required IReadOnlyDictionary<string, ShopDefinition> Shops { get; init; }
+
+    /// <summary>The quests the steps and conditions name, by id (ADR 0032).</summary>
+    public required IReadOnlyDictionary<string, QuestDefinition> Quests { get; init; }
 
     /// <summary>The class that gives a member their numbers at their level (ADR 0017).</summary>
     public ClassDefinition ClassOf(PartyMemberDefinition member) => Classes[member.ClassId];

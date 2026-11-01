@@ -105,6 +105,21 @@ internal static class TabGlyphShape
             "..#......#..",
             "############",
         ],
+        [TabGlyph.Quests] =
+        [
+            "............",
+            "..#######...",
+            ".#.......#..",
+            "..######.#..",
+            "..#....#.#..",
+            "..#....#.#..",
+            "..#....#.#..",
+            "..#....#.#..",
+            "..#....#.#..",
+            "..#....##...",
+            "..######....",
+            "............",
+        ],
     }.ToFrozenDictionary();
 
     /// <returns><see cref="Size"/> x <see cref="Size"/> premultiplied pixels, row by row.</returns>

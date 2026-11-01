@@ -20,4 +20,7 @@ internal enum TabGlyph
 
     /// <summary>A door, for saving, loading and quitting.</summary>
     System,
+
+    /// <summary>A scroll, for the quests (decision 393).</summary>
+    Quests,
 }

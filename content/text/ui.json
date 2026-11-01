@@ -253,5 +253,8 @@
   "shop_sold": "Sold: {name}.",
   "shop_sold_count": "Sold: {name} x{count}.",
   "inn_question": "Rest at the inn?",
-  "inn_short_of_gold": "You don't have enough gold."
+  "inn_short_of_gold": "You don't have enough gold.",
+  "menu_quests": "Quests",
+  "menu_hint_quests": "Your active quests.",
+  "quests_none": "No quests yet."
 }

@@ -13,8 +13,8 @@ public sealed class QuestJournalTests
 
     private readonly QuestLog _log = new();
 
-    [Fact]
     // The main quest is started first, so only the kind order, not newest-first, can put it ahead.
+    [Fact]
     public void Active_MainAndSideQuests_MainFirst()
     {
         _log.Start(_heist);

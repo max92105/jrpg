@@ -713,4 +713,13 @@ internal static class MessageIds
 
     /// <summary>The inn's line when Yes is answered short of gold: the party stays unrested.</summary>
     public const string InnShortOfGold = "inn_short_of_gold";
+
+    /// <summary>The Quests page's name, the menu's first tab (decision 393).</summary>
+    public const string MenuQuests = "menu_quests";
+
+    /// <summary>The Quests page's footer line.</summary>
+    public const string MenuHintQuests = "menu_hint_quests";
+
+    /// <summary>The Quests page's line while no quest is active.</summary>
+    public const string QuestsNone = "quests_none";
 }

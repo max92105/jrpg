@@ -5,15 +5,14 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-quests, slice QE2 (Editor/Quests: QuestViewModel, QuestStageViewModel and their rules). Round 1.
+Plan: 2026-10-29-quests, slice QE3 (Editor/Quests: QuestCatalogViewModel, QuestEditingViewModel, MainViewModel.QuestEditing). Round 1.
 Verdict: Ready to commit.
 
-- Warning, open: QuestViewModelTests build on content's placeholder_errand and assert its whole stage list / count 3 (G2); build a QuestDefinition in the test
-- Suggestion, open: the id problem says "(like tree_4)" (ObjectIds' object example) in the Quests window
-- Suggestion, open: a removed stage keeps its PropertyChanged subscription to OnStageChanged
-- Fixed (from QE1): CatalogUsage events copy -> Core MapLayout.AllEvents
-- Fixed (from QE1): CombinedHistory.RefusalOfCatalogUndo comment order
-- Follow-up (from QE1): CatalogDraft.SetQuests ToDictionary throws on duplicate ids before the validator names them
+- Warning, open: QuestEditingViewModelTests.Apply_ChangedQuests edits `edited.Quests[0]` assuming content's first quest by id is placeholder_errand; pick it by id
+- Fixed (from QE2): QuestViewModelTests now build their own QuestDefinition
+- Fixed (from QE2): a removed stage unsubscribes OnStageChanged (QuestViewModel line 113)
+- Follow-up (from QE2 suggestion): ObjectIds' id problem says "(like tree_4)", shown in the Quests window too
+- Follow-up (from QE1): CatalogDraft.SetQuests ToDictionary throws on duplicate ids (now guarded by QuestCatalogViewModel.Problem for the window)
 - Follow-up (carried from G4): EventPresenter.IsShowingMessage summary omits the quest line
 - Follow-up (carried from L3): capacity test for three lines each of description and stage text
 - Follow-up: ResourceGaugeView.LabelSpacing (2) duplicates SheetRowLook.LabelSpacing

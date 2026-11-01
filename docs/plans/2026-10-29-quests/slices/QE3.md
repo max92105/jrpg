@@ -17,3 +17,4 @@ Part of [the quests plan](../README.md). After QE2. Decision 394. Design: [desig
     - `QuestEditingViewModelTests: Apply_ChangedQuests_OneUndoStepInTheDraft`
     - `QuestEditingViewModelTests: Apply_Unchanged_RecordsNoStep`
   - **Verify by hand:** nothing to see yet (QE4).
+- **Done, with deviations:** as planned; the list's problem names the quest by id, or by position ("Quest #2") while a new quest has none, and a repeated id is reported before the quest's own problem. Tests 3335 → 3345. Review: the apply test picks the errand by id, not by position.

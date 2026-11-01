@@ -13,6 +13,7 @@ using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
 using Jrpg.Editor.Maps.Settings;
 using Jrpg.Editor.Objects;
+using Jrpg.Editor.Quests;
 using Jrpg.Editor.Tiles;
 
 namespace Jrpg.Editor.Shell;
@@ -72,6 +73,7 @@ internal sealed partial class MainViewModel : ObservableObject
             History = new CombinedHistory(Content);
             Placing = new ObjectPlacingViewModel(Content, Layer);
             EventEditing = new EventEditingViewModel(Content) { MapIds = MapIds };
+            QuestEditing = new QuestEditingViewModel(Content);
             if (MapIds.Count > 0)
             {
                 TryOpenMap(MapIds[0]);
@@ -119,6 +121,9 @@ internal sealed partial class MainViewModel : ObservableObject
 
     /// <summary>Null when the content or its art didn't load.</summary>
     public EventEditingViewModel? EventEditing { get; }
+
+    /// <summary>Null when the content or its art didn't load.</summary>
+    public QuestEditingViewModel? QuestEditing { get; }
 
     [ObservableProperty]
     public partial MapViewModel? CurrentMap { get; private set; }

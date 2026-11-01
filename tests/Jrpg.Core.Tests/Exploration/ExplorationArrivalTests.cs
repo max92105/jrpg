@@ -4,6 +4,7 @@ using Jrpg.Core.Exploration;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Quests;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 using Jrpg.Core.World;
@@ -44,7 +45,7 @@ public sealed class ExplorationArrivalTests
     [Fact]
     public void Start_OnceArrivalEventDone_DoesNotRunAgain()
     {
-        var world = new WorldState([new MapEventKey("hall", _sarxiansArrival.Id)], []);
+        var world = new WorldState([new MapEventKey("hall", _sarxiansArrival.Id)], [], new QuestLog());
 
         var exploration = Start("hall", "sarxian", world);
 
@@ -62,7 +63,7 @@ public sealed class ExplorationArrivalTests
     [Fact]
     public void Start_ObjectArrivalEventForSwappedObject_RunsTheCellsInstead()
     {
-        var world = new WorldState([], [new ObjectSwap("shrine", "board@0,0", "chest")]);
+        var world = new WorldState([], [new ObjectSwap("shrine", "board@0,0", "chest")], new QuestLog());
 
         var exploration = Start("shrine", "sarxian", world);
 

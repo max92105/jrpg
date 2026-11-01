@@ -28,13 +28,13 @@ public sealed class FileSaveStoreFormatTests : IDisposable
     }
 
     [Fact]
-    public void Write_File_HoldsTheFormatSixEnvelope()
+    public void Write_File_HoldsTheFormatSevenEnvelope()
     {
         _store.Write(Slot, StoredSave);
 
         var json = File.ReadAllText(Path.Combine(_directory, "slot_01.json"));
 
-        Assert.StartsWith("{\n  \"formatVersion\": 6,\n  \"game\": {", json.ReplaceLineEndings("\n"), StringComparison.Ordinal);
+        Assert.StartsWith("{\n  \"formatVersion\": 7,\n  \"game\": {", json.ReplaceLineEndings("\n"), StringComparison.Ordinal);
     }
 
     [Fact]
@@ -52,26 +52,26 @@ public sealed class FileSaveStoreFormatTests : IDisposable
         Assert.Equal(Slot, exception.SlotName);
     }
 
-    // Saves before format 6 had no gold and no shop stocks (the gold and shops plan). Until the first release an older
-    // save is refused, not migrated (ADR 0022).
+    // Saves before format 7 had no quests (the quests plan). Until the first release an older save is refused, not
+    // migrated (ADR 0022).
     [Fact]
-    public void Read_FormatFive_ThrowsOlder()
+    public void Read_FormatSix_ThrowsOlder()
     {
-        WriteRaw("""{ "formatVersion": 5, "game": {} }""");
+        WriteRaw("""{ "formatVersion": 6, "game": {} }""");
 
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
 
-        Assert.Equal("it was made by an older version of the game (format 5).", exception.Reason);
+        Assert.Equal("it was made by an older version of the game (format 6).", exception.Reason);
     }
 
     [Fact]
     public void Read_NewerFormatVersion_ThrowsNamingTheVersion()
     {
-        WriteRaw("""{ "formatVersion": 7, "game": {} }""");
+        WriteRaw("""{ "formatVersion": 8, "game": {} }""");
 
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
 
-        Assert.Equal("it was made by a newer version of the game (format 7).", exception.Reason);
+        Assert.Equal("it was made by a newer version of the game (format 8).", exception.Reason);
     }
 
     [Theory]
@@ -90,7 +90,7 @@ public sealed class FileSaveStoreFormatTests : IDisposable
     [Fact]
     public void Read_MalformedJson_ThrowsNamingTheSlot()
     {
-        WriteRaw("""{ "formatVersion": 6, "game": { """);
+        WriteRaw("""{ "formatVersion": 7, "game": { """);
 
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
 
@@ -129,15 +129,15 @@ public sealed class FileSaveStoreFormatTests : IDisposable
     public void Read_DuplicateProperty_ThrowsUnreadable(string property)
     {
         WriteRaw(property == "game"
-            ? """{ "formatVersion": 6, "game": {}, "game": {} }"""
-            : """{ "formatVersion": 6, "formatVersion": 6, "game": {} }""");
+            ? """{ "formatVersion": 7, "game": {}, "game": {} }"""
+            : """{ "formatVersion": 7, "formatVersion": 7, "game": {} }""");
 
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
 
         Assert.StartsWith("the file is damaged", exception.Reason, StringComparison.Ordinal);
     }
 
-    public static TheoryData<string> ListsWithANullEntry => ["members", "activeMemberIds", "inventory", "gear", "ownedAffixes", "wornAffixes", "completedEvents", "objectSwaps", "shopStocks", "stockPieces", "stockAffixes"];
+    public static TheoryData<string> ListsWithANullEntry => ["members", "activeMemberIds", "inventory", "gear", "ownedAffixes", "wornAffixes", "completedEvents", "objectSwaps", "shopStocks", "stockPieces", "stockAffixes", "quests"];
 
     [Theory]
     [MemberData(nameof(ListsWithANullEntry))]
@@ -155,6 +155,7 @@ public sealed class FileSaveStoreFormatTests : IDisposable
             "shopStocks" => StoredSave with { ShopStocks = [null!] },
             "stockPieces" => StoredSave with { ShopStocks = [new SavedShopStock("general", 1, [null!])] },
             "stockAffixes" => StoredSave with { ShopStocks = [new SavedShopStock("general", 1, [new SavedGear("bronze_sword", Rarity.Magic, [null!])])] },
+            "quests" => StoredSave with { Quests = [null!] },
             _ => StoredSave with { ObjectSwaps = [null!] },
         };
         _store.Write(Slot, save);

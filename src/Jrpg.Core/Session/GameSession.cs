@@ -6,6 +6,7 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
+using Jrpg.Core.Quests;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Saving;
 using Jrpg.Core.Trade;
@@ -115,7 +116,7 @@ public sealed class GameSession
         }
 
         party.Purse.Add(save.Gold);
-        var world = new WorldState(save.CompletedEvents, save.ObjectSwaps);
+        var world = new WorldState(save.CompletedEvents, save.ObjectSwaps, QuestLog.Restore(save.Quests, catalog.Quests));
         var session = new GameSession(party, new ExplorationContext(catalog, inventory, world, random), save.Location) { PlayTime = save.PlayTime };
         session._stocks.Restore(save.ShopStocks);
         return session;
@@ -191,6 +192,7 @@ public sealed class GameSession
             ObjectSwaps = _context.World.ObjectSwaps,
             Gold = Party.Purse.Gold,
             ShopStocks = _stocks.Capture(),
+            Quests = _context.World.Quests.Progress,
         };
     }
 

@@ -1,3 +1,5 @@
+using Jrpg.Core.Quests;
+using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.World;
 
 namespace Jrpg.Core.Tests.World;
@@ -27,8 +29,11 @@ public sealed class WorldStateTests
     [Fact]
     public void Constructor_SavedChanges_AreRestored()
     {
-        var world = new WorldState([new MapEventKey("camp", "chest_0")], [new ObjectSwap("camp", "chest@1,0", "chest_opened")]);
+        var quests = new QuestLog();
+        quests.Start(TestQuests.Errand);
+        var world = new WorldState([new MapEventKey("camp", "chest_0")], [new ObjectSwap("camp", "chest@1,0", "chest_opened")], quests);
 
+        Assert.Same(quests, world.Quests);
         Assert.True(world.IsEventDone(new MapEventKey("camp", "chest_0")));
         Assert.Equal("chest_opened", world.SwappedObjectId("camp", "chest@1,0"));
     }

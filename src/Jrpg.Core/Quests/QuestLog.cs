@@ -1,16 +1,33 @@
 namespace Jrpg.Core.Quests;
 
 /// <summary>
-/// Each started quest's stage and completion (ADR 0032), changed only by the three quest steps with decision 388's
-/// rules for every state: a start on a started quest does nothing; an advance on a quest not started starts it at that
-/// stage, may move back to an earlier stage, and leaves a completed quest alone; a complete on a quest not started
-/// completes it at its last stage, and a completed quest stays completed. Stages are kept by id, so content inserting a
-/// stage before the current one moves nothing; only <see cref="HasReached"/> reads positions, in the quest's current
-/// order (ADR 0033).
+/// Each started quest's stage and completion (ADR 0032), in the order the quests were started (the journal's order
+/// rides on it, decision 391), changed only by the three quest steps with decision 388's rules for every state: a start
+/// on a started quest does nothing; an advance on a quest not started starts it at that stage, may move back to an
+/// earlier stage, and leaves a completed quest alone; a complete on a quest not started completes it at its last stage,
+/// and a completed quest stays completed. Stages are kept by id, so content inserting a stage before the current one
+/// moves nothing; only <see cref="HasReached"/> reads positions, in the quest's current order (ADR 0033).
 /// </summary>
 internal sealed class QuestLog
 {
     private readonly Dictionary<string, Entry> _entries = [];
+    private readonly List<string> _startOrder = [];
+
+    /// <summary>The log a save kept; every quest and stage is known (the save was repaired against content).</summary>
+    public static QuestLog Restore(IEnumerable<QuestProgress> saved, IReadOnlyDictionary<string, QuestDefinition> quests)
+    {
+        var log = new QuestLog();
+        foreach (var progress in saved)
+        {
+            log.Put(quests[progress.QuestId], progress.StageId, progress.IsCompleted);
+        }
+
+        return log;
+    }
+
+    /// <summary>Every started quest's progress, in start order: what a save keeps.</summary>
+    public IReadOnlyList<QuestProgress> Progress =>
+        [.. _startOrder.Select(questId => new QuestProgress(questId, _entries[questId].StageId, _entries[questId].IsCompleted))];
 
     /// <returns>The stage the quest is at, or was completed at; null while it was never started.</returns>
     public string? StageOf(string questId) => _entries.GetValueOrDefault(questId)?.StageId;
@@ -39,7 +56,7 @@ internal sealed class QuestLog
     {
         if (!_entries.ContainsKey(quest.Id))
         {
-            _entries[quest.Id] = new Entry(quest, quest.FirstStage.Id, IsCompleted: false);
+            Put(quest, quest.FirstStage.Id, isCompleted: false);
         }
     }
 
@@ -54,7 +71,7 @@ internal sealed class QuestLog
             return;
         }
 
-        _entries[quest.Id] = new Entry(quest, stage.Id, IsCompleted: false);
+        Put(quest, stage.Id, isCompleted: false);
     }
 
     public void Complete(QuestDefinition quest)
@@ -64,7 +81,18 @@ internal sealed class QuestLog
             return;
         }
 
-        _entries[quest.Id] = new Entry(quest, StageOf(quest.Id) ?? quest.LastStage.Id, IsCompleted: true);
+        Put(quest, StageOf(quest.Id) ?? quest.LastStage.Id, isCompleted: true);
+    }
+
+    // A quest keeps its place in the start order however its entry changes.
+    private void Put(QuestDefinition quest, string stageId, bool isCompleted)
+    {
+        if (!_entries.ContainsKey(quest.Id))
+        {
+            _startOrder.Add(quest.Id);
+        }
+
+        _entries[quest.Id] = new Entry(quest, stageId, isCompleted);
     }
 
     private static int PositionOf(QuestDefinition quest, string stageId)

@@ -18,6 +18,31 @@ public sealed class QuestLogTests
     }
 
     [Fact]
+    public void Progress_TwoQuestsStarted_OldestFirst()
+    {
+        var heist = _errand with { Id = "heist" };
+        _log.Start(heist);
+        _log.AdvanceTo(_errand, "deliver");
+        _log.Complete(heist);
+
+        Assert.Equal([new QuestProgress("heist", "take", IsCompleted: true), new QuestProgress("errand", "deliver", IsCompleted: false)], _log.Progress);
+    }
+
+    [Fact]
+    public void Restore_FromProgress_SameStagesCompletionAndOrder()
+    {
+        var heist = _errand with { Id = "heist" };
+        IReadOnlyList<QuestProgress> saved = [new QuestProgress("heist", "deliver", IsCompleted: true), new QuestProgress("errand", "take", IsCompleted: false)];
+
+        var restored = QuestLog.Restore(saved, new Dictionary<string, QuestDefinition> { ["errand"] = _errand, ["heist"] = heist });
+
+        Assert.Equal(saved, restored.Progress);
+        Assert.True(restored.IsCompleted("heist"));
+        Assert.True(restored.HasReached("heist", "deliver"));
+        Assert.Equal("take", restored.StageOf("errand"));
+    }
+
+    [Fact]
     public void Start_NotStarted_ActiveAtFirstStage()
     {
         _log.Start(_errand);

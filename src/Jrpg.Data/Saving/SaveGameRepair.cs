@@ -46,6 +46,7 @@ internal sealed class SaveGameRepair
             ObjectSwaps = WorldStateRepair.KeepKnownSwaps(save.ObjectSwaps, catalog, repair._changes),
             Location = repair.RepairLocation(save.Location),
             ShopStocks = new ShopStockRepair(catalog, repair._gear, repair._changes).Repair(save.ShopStocks),
+            Quests = WorldStateRepair.KeepKnownQuests(save.Quests, catalog, repair._changes),
         };
         return new RepairedSave(repaired, repair._changes);
     }

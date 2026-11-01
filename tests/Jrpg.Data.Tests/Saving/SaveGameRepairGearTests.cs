@@ -38,6 +38,7 @@ public sealed class SaveGameRepairGearTests
     {
         Gold = 0,
         ShopStocks = [],
+        Quests = [],
         SavedAt = new DateTimeOffset(2026, 10, 27, 12, 0, 0, TimeSpan.Zero),
         PlayTime = TimeSpan.FromMinutes(30),
         Location = new MapLocation("start", new Point2D(10, 3), Facing.Down),

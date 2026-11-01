@@ -12,16 +12,18 @@ internal sealed class WorldState
     private readonly Dictionary<(string MapId, string ObjectUid), string> _swappedObjectIds = [];
 
     /// <summary>Each started quest's stage and completion, changed by the quest steps (ADR 0032).</summary>
-    public QuestLog Quests { get; } = new();
+    public QuestLog Quests { get; }
 
     public WorldState()
     {
+        Quests = new QuestLog();
     }
 
-    /// <summary>Restores the changes a save kept.</summary>
-    public WorldState(IEnumerable<MapEventKey> completedEvents, IEnumerable<ObjectSwap> objectSwaps)
+    /// <summary>Restores the changes a save kept, the quest log included (ADR 0032).</summary>
+    public WorldState(IEnumerable<MapEventKey> completedEvents, IEnumerable<ObjectSwap> objectSwaps, QuestLog quests)
     {
         _completedEvents = [.. completedEvents];
+        Quests = quests;
         foreach (var swap in objectSwaps)
         {
             SwapObject(swap);

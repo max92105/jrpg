@@ -117,8 +117,7 @@ public sealed partial class FileSaveStore(string directory, ContentCatalog catal
     private static void CheckNoNullEntries(string slotName, SaveGame game)
     {
         var hasNullEntry = game.Members.Contains(null) || game.ActiveMemberIds.Contains(null) || game.Inventory.Contains(null)
-            || game.Gear.Contains(null) || game.CompletedEvents.Contains(null) || game.ObjectSwaps.Contains(null)
-            || HasNullStockEntry(game) || HasNullAffix(game);
+            || game.Gear.Contains(null) || HasNullWorldEntry(game) || HasNullStockEntry(game) || HasNullAffix(game);
         if (hasNullEntry)
         {
             throw new UnreadableSaveException(slotName, "the file is damaged (a list holds a null entry).");
@@ -129,6 +128,9 @@ public sealed partial class FileSaveStore(string directory, ContentCatalog catal
             throw new UnreadableSaveException(slotName, "the file is damaged (a worn slot holds a null item).");
         }
     }
+
+    private static bool HasNullWorldEntry(SaveGame game) =>
+        game.CompletedEvents.Contains(null) || game.ObjectSwaps.Contains(null) || game.Quests.Contains(null);
 
     // A shop's stock is a list of pieces inside a list of stocks; either level may hold the null.
     private static bool HasNullStockEntry(SaveGame game) =>

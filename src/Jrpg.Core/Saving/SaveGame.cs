@@ -1,6 +1,7 @@
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
+using Jrpg.Core.Quests;
 using Jrpg.Core.Trade;
 using Jrpg.Core.World;
 
@@ -42,4 +43,9 @@ public sealed record SaveGame
     /// Every shop opened so far with its rolled stock (decision 385); empty until a shop has been opened.
     /// </summary>
     public required IReadOnlyList<SavedShopStock> ShopStocks { get; init; }
+
+    /// <summary>
+    /// Every started quest's stage and completion, in start order, which the journal reads (ADR 0032, format 7).
+    /// </summary>
+    public required IReadOnlyList<QuestProgress> Quests { get; init; }
 }

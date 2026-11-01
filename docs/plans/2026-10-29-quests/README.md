@@ -75,7 +75,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **G4. A quest step that changed the log shows a line** (Core + Game + text, about 210 lines) → [slices/G4.md](slices/G4.md)
 
 ### Phase 5: the Quests window
-- [ ] **QE1. Quests in the editor's catalog draft: one undo step, saved with the catalogs, an undo removing a used quest refused** (Data + Editor, about 210 lines) → [slices/QE1.md](slices/QE1.md)
+- [x] **QE1. Quests in the editor's catalog draft: one undo step, saved with the catalogs, an undo removing a used quest refused** (Data + Editor, about 210 lines) → [slices/QE1.md](slices/QE1.md)
 - [ ] **QE2. The Quests window's rules: one quest, its stages, their ids and problems** (Editor, about 210 lines) → [slices/QE2.md](slices/QE2.md)
 - [ ] **QE3. The Quests window's list: new quests, unique ids, applied to the draft as one undo step** (Editor, about 170 lines) → [slices/QE3.md](slices/QE3.md)
 - [ ] **QE4. The Quests window** (Editor, about 160 lines) → [slices/QE4.md](slices/QE4.md)

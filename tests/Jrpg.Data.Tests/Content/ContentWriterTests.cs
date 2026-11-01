@@ -260,7 +260,8 @@ public sealed class ContentWriterTests : IDisposable
     private byte[] CatalogFileBytes() =>
         [.. File.ReadAllBytes(Path.Combine(_contentRoot, "tilesheets.json")),
          .. File.ReadAllBytes(Path.Combine(_contentRoot, "tiles.json")),
-         .. File.ReadAllBytes(Path.Combine(_contentRoot, "objects.json"))];
+         .. File.ReadAllBytes(Path.Combine(_contentRoot, "objects.json")),
+         .. File.ReadAllBytes(Path.Combine(_contentRoot, "quests.json"))];
 
     // Both files one after the other, compared byte for byte: line endings and encoding count.
     private byte[] MapFileBytes(string mapId) =>

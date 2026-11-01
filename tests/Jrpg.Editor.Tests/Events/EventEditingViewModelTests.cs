@@ -1,6 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
+using Jrpg.Core.Quests;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Events;
@@ -12,7 +13,12 @@ public sealed class EventEditingViewModelTests
 {
     private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-    private readonly EventEditingViewModel _eventEditing = new(new CatalogDraft(_catalog)) { OpenMap = new MapViewModel(_catalog.Maps["start"]), MapIds = ["forest", "start"] };
+    private readonly CatalogDraft _draft = new(_catalog);
+
+    private readonly EventEditingViewModel _eventEditing;
+
+    public EventEditingViewModelTests() =>
+        _eventEditing = new EventEditingViewModel(_draft) { OpenMap = new MapViewModel(_catalog.Maps["start"]), MapIds = ["forest", "start"] };
 
     // The start map's chest, which gives a potion and turns into an opened chest.
     private Point2D ChestCenter
@@ -44,6 +50,19 @@ public sealed class EventEditingViewModelTests
         Assert.Equal(
             [new QuestStageChoice("placeholder_errand", "ask_innkeeper"), new QuestStageChoice("placeholder_errand", "return_to_giver")],
             events.Choices.QuestStages.Where(stage => stage.QuestId == "placeholder_errand"));
+    }
+
+    // The dialog reads the draft when it opens, so a quest made in the Quests window is offered without a restart.
+    [Fact]
+    public void StartEditingAt_QuestSetInTheDraft_OffersIt()
+    {
+        var heist = new QuestDefinition("heist", "The heist", "Case the vault.", QuestKind.Main, [new QuestStage("case", "Case the vault.")]);
+        _draft.SetQuests([.. _catalog.Quests.Values, heist]);
+
+        var events = _eventEditing.StartEditingAt(ChestCenter)!;
+
+        Assert.Contains("heist", events.Choices.QuestIds);
+        Assert.Contains(new QuestStageChoice("heist", "case"), events.Choices.QuestStages);
     }
 
     [Fact]

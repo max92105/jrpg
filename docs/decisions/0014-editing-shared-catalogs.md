@@ -52,3 +52,4 @@ The write rule: one `ContentWriter.WriteMapCatalogs` writes `tilesheets.json`, `
 - **Watch:**
   - catalog files are CRLF and sorted by id; an untouched catalog must write back byte for byte;
   - tile ids are never renumbered.
+- **2026-11-01:** `quests.json` joins the catalogs Ctrl+S writes, all or none, checked against every map's events; an undo that would remove a quest or a stage a map's event names is refused as for objects and tiles (decision 394, the quests plan's QE1).

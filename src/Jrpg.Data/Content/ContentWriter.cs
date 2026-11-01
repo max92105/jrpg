@@ -2,6 +2,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
 using Jrpg.Data.Maps;
+using Jrpg.Data.Quests;
 
 namespace Jrpg.Data.Content;
 
@@ -42,8 +43,9 @@ public sealed class ContentWriter(string contentRoot)
     }
 
     /// <summary>
-    /// Writes the tilesheet, tile and object catalogs, each sorted by id, after checking them as the loader and the art
-    /// check would, with every map's layout checked against them.
+    /// Writes the tilesheet, tile, object and quest catalogs, each sorted by id, after checking them as the loader and
+    /// the art check would, with every map's layout checked against them (the quests and stages its events name
+    /// included, decision 394).
     /// </summary>
     /// <param name="catalog">The content holding the catalogs to save; its maps are the ones checked.</param>
     /// <exception cref="ContentValidationException">The game would reject the catalogs; the message names the file, and nothing was written.</exception>
@@ -52,9 +54,11 @@ public sealed class ContentWriter(string contentRoot)
         var sheets = catalog.Tilesheets.Values.OrderBy(sheet => sheet.Id, StringComparer.Ordinal).ToList();
         var tiles = catalog.Tiles.Values.OrderBy(tile => tile.Id).ToList();
         var objects = catalog.Objects.Values.OrderBy(definition => definition.Id, StringComparer.Ordinal).ToList();
+        var quests = catalog.Quests.Values.OrderBy(quest => quest.Id, StringComparer.Ordinal).ToList();
         TilesheetCatalogValidator.Validate(ContentCatalogLoader.TilesheetsFile, sheets);
         TileCatalogValidator.Validate(ContentCatalogLoader.TilesFile, tiles, catalog.Tilesheets.Keys.ToHashSet());
         ObjectCatalogValidator.Validate(ContentCatalogLoader.ObjectsFile, objects, catalog.Tiles.Keys.ToHashSet());
+        QuestCatalogValidator.Validate(ContentCatalogLoader.QuestsFile, quests);
         var references = new MapReferences(ContentReferencesOf(catalog), catalog.Maps.Values.ToDictionary(map => map.Id, map => map.Layout));
         foreach (var layout in references.Layouts.Values)
         {
@@ -72,6 +76,7 @@ public sealed class ContentWriter(string contentRoot)
             PlanWrite(ContentCatalogLoader.TilesheetsFile, sheets),
             PlanWrite(ContentCatalogLoader.TilesFile, tiles),
             PlanWrite(ContentCatalogLoader.ObjectsFile, objects),
+            PlanWrite(ContentCatalogLoader.QuestsFile, quests),
         ]);
     }
 

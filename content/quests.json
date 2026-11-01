@@ -5,8 +5,14 @@
     "description": "A placeholder quest that walks every quest rule: carry a question to the innkeeper and bring the answer back.",
     "kind": "side",
     "stages": [
-      { "id": "ask_innkeeper", "text": "Ask the innkeeper about the road north." },
-      { "id": "return_to_giver", "text": "Bring the answer back to the quest giver." }
+      {
+        "id": "ask_innkeeper",
+        "text": "Ask the innkeeper about the road north."
+      },
+      {
+        "id": "return_to_giver",
+        "text": "Bring the answer back to the quest giver."
+      }
     ]
   }
 ]

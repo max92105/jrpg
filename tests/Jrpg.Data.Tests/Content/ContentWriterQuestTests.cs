@@ -8,7 +8,8 @@ using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Tests.Content;
 
-// A quest condition is written as content and read back whole; a kind that names no stage writes none (ADR 0033).
+// A quest condition is written as content and read back whole; a kind that names no stage writes none (ADR 0033). The
+// quests are saved with the other catalogs, checked against every map (decision 394).
 public sealed class ContentWriterQuestTests : IDisposable
 {
     private readonly CopiedContentRoot _content = new("writer-quests");
@@ -53,6 +54,32 @@ public sealed class ContentWriterQuestTests : IDisposable
         var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMap(WithGatedCell(new QuestCondition("heist", QuestConditionKind.Active)), _catalog));
 
         Assert.Contains("onlyWhenQuest has unknown quest id 'heist'.", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void WriteMapCatalogs_WritesQuestsSortedById()
+    {
+        var zed = new QuestDefinition("zed", "Zed", "Last.", QuestKind.Side, [new QuestStage("go", "Go.")]);
+        var abc = new QuestDefinition("abc", "Abc", "First.", QuestKind.Main, [new QuestStage("go", "Go.")]);
+
+        _writer.WriteMapCatalogs(_catalog with { Quests = new Dictionary<string, QuestDefinition>(_catalog.Quests) { ["zed"] = zed, ["abc"] = abc } });
+
+        var written = JsonNode.Parse(File.ReadAllText(_content.PathOf("quests.json")))!.AsArray();
+        Assert.Equal(["abc", "placeholder_errand", "zed"], written.Select(quest => (string?)quest!["id"]));
+        Assert.Equal(abc, ContentCatalogLoader.Load(_content.Path).Quests["abc"]);
+    }
+
+    [Fact]
+    public void WriteMapCatalogs_StageAnEventNamesMissing_RefusesAndWritesNothing()
+    {
+        var before = File.ReadAllBytes(_content.PathOf("quests.json"));
+        var errand = _catalog.Quests["placeholder_errand"];
+        var withoutFirstStage = _catalog with { Quests = new Dictionary<string, QuestDefinition> { ["placeholder_errand"] = errand with { Stages = [errand.Stages[1]] } } };
+
+        var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMapCatalogs(withoutFirstStage));
+
+        Assert.Contains("'ask_innkeeper'", exception.Message, StringComparison.Ordinal);
+        Assert.Equal(before, File.ReadAllBytes(_content.PathOf("quests.json")));
     }
 
     private MapDefinition WithGatedCell(QuestCondition condition)

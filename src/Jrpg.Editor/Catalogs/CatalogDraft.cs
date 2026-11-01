@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Content;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Quests;
 
 namespace Jrpg.Editor.Catalogs;
 
@@ -104,6 +105,21 @@ internal sealed partial class CatalogDraft : ObservableObject
             catalog => before is null ? WithoutObject(catalog, definition.Id) : WithObject(catalog, before)));
     }
 
+    /// <summary>
+    /// Replaces the quests as one undo step (decision 394); nothing when they are the same by content, stages included.
+    /// </summary>
+    public void SetQuests(IReadOnlyList<QuestDefinition> quests)
+    {
+        var before = Current.Quests;
+        var after = quests.ToDictionary(quest => quest.Id);
+        if (before.Count == after.Count && after.All(pair => before.TryGetValue(pair.Key, out var quest) && quest == pair.Value))
+        {
+            return;
+        }
+
+        Do(new CatalogEdit(catalog => catalog with { Quests = after }, catalog => catalog with { Quests = before }));
+    }
+
     /// <summary>The tiles the next undo would remove, so it can be refused while one is in use; empty when it removes none.</summary>
     public IReadOnlyList<int> TilesRemovedByUndo() =>
         _history.NextUndo is { } edit ? [.. Current.Tiles.Keys.Except(edit.Revert(Current).Tiles.Keys).Order()] : [];
@@ -115,6 +131,26 @@ internal sealed partial class CatalogDraft : ObservableObject
     /// <summary>The sheets the next undo would remove, so it can be refused while tiles are cut from one.</summary>
     public IReadOnlyList<string> SheetsRemovedByUndo() =>
         _history.NextUndo is { } edit ? [.. Current.Tilesheets.Keys.Except(edit.Revert(Current).Tilesheets.Keys).Order(StringComparer.Ordinal)] : [];
+
+    /// <summary>The quests the next undo would remove, so it can be refused while a map's event names one.</summary>
+    public IReadOnlyList<string> QuestsRemovedByUndo() =>
+        _history.NextUndo is { } edit ? [.. Current.Quests.Keys.Except(edit.Revert(Current).Quests.Keys).Order(StringComparer.Ordinal)] : [];
+
+    /// <summary>
+    /// The stages the next undo would take from quests it keeps, so it can be refused while a map's event names one.
+    /// </summary>
+    public IReadOnlyList<(string QuestId, string StageId)> QuestStagesRemovedByUndo()
+    {
+        if (_history.NextUndo is not { } edit)
+        {
+            return [];
+        }
+
+        var reverted = edit.Revert(Current).Quests;
+        return [.. Current.Quests.Values
+            .Where(quest => reverted.ContainsKey(quest.Id))
+            .SelectMany(quest => quest.Stages.Where(stage => !reverted[quest.Id].HasStage(stage.Id)).Select(stage => (quest.Id, stage.Id)))];
+    }
 
     /// <summary>Takes back the newest catalog step; nothing when there is none.</summary>
     public void Undo()

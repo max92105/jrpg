@@ -42,7 +42,10 @@ internal sealed partial class CombinedHistory : ObservableObject
         }
     }
 
-    /// <summary>Why the last undo was refused: a tile it would remove is still in use; null after any other undo, redo or edit.</summary>
+    /// <summary>
+    /// Why the last undo was refused: a record it would remove is still in use; null after any other undo, redo or
+    /// edit.
+    /// </summary>
     [ObservableProperty]
     public partial string? Refusal { get; private set; }
 
@@ -98,10 +101,16 @@ internal sealed partial class CombinedHistory : ObservableObject
         NotifyUndoRedoChanged();
     }
 
-    // The first tile the undo would remove that something still uses, named with its first user (decision 117); or the
-    // first tile cut from a sheet it would remove; or the first map placing an object it would remove.
+    // In the order checked: the first map whose event names a quest or a stage the undo would remove (decision 394);
+    // the first map placing an object it would remove; the first tile cut from a sheet it would remove; the first tile
+    // it would remove that something still uses, named with its first user (decision 117).
     private string? RefusalOfCatalogUndo()
     {
+        if (RefusalOfQuestUndo() is { } quest)
+        {
+            return quest;
+        }
+
         foreach (var objectId in _catalog.ObjectsRemovedByUndo())
         {
             if (CatalogUsage.UsersOfObject(_catalog.Current, objectId, _openMap?.Map.Layout) is [var map, ..])
@@ -123,6 +132,28 @@ internal sealed partial class CombinedHistory : ObservableObject
             if (CatalogUsage.UsersOfTile(tileId, _catalog.Current, _openMap?.Map.Layout) is [var user, ..])
             {
                 return $"Can't undo: tile {tileId} is used on {user}.";
+            }
+        }
+
+        return null;
+    }
+
+    private string? RefusalOfQuestUndo()
+    {
+        var openLayout = _openMap?.Map.Layout;
+        foreach (var questId in _catalog.QuestsRemovedByUndo())
+        {
+            if (CatalogUsage.UsersOfQuest(_catalog.Current, questId, null, openLayout) is [var map, ..])
+            {
+                return $"Can't undo: quest {questId} is used on {map}.";
+            }
+        }
+
+        foreach (var (questId, stageId) in _catalog.QuestStagesRemovedByUndo())
+        {
+            if (CatalogUsage.UsersOfQuest(_catalog.Current, questId, stageId, openLayout) is [var map, ..])
+            {
+                return $"Can't undo: stage {stageId} of quest {questId} is used on {map}.";
             }
         }
 

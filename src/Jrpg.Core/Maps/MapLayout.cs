@@ -1,3 +1,4 @@
+using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 
 namespace Jrpg.Core.Maps;
@@ -19,6 +20,11 @@ public sealed record MapLayout
     public required IReadOnlyList<PlacedObject> Objects { get; init; }
 
     public IReadOnlyList<CellEvent> CellEvents { get; init; } = [];
+
+    /// <summary>
+    /// Every event on the map: the placed objects' events, then the cell events (what names a quest or an item).
+    /// </summary>
+    public IEnumerable<MapEvent> AllEvents => Objects.SelectMany(placed => placed.Events).Concat(CellEvents.Select(cellEvent => cellEvent.Event));
 
     public bool Contains(GridCell cell) => cell.X >= 0 && cell.Y >= 0 && cell.X < Width && cell.Y < Height;
 }

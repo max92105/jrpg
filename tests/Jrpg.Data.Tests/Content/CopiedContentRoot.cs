@@ -10,7 +10,7 @@ internal sealed class CopiedContentRoot : IDisposable
     {
         Path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"jrpg-{purpose}-{Guid.NewGuid():N}");
         var source = System.IO.Path.Combine(AppContext.BaseDirectory, "content");
-        foreach (var file in Directory.EnumerateFiles(source, "*.json", SearchOption.AllDirectories))
+        foreach (var file in Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories))
         {
             var target = System.IO.Path.Combine(Path, System.IO.Path.GetRelativePath(source, file));
             Directory.CreateDirectory(System.IO.Path.GetDirectoryName(target)!);

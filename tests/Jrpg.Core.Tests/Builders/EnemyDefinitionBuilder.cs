@@ -15,6 +15,7 @@ internal sealed class EnemyDefinitionBuilder
     private int _critChance;
     private int _crowdControlResistance;
     private int _accuracy = 100;
+    private EnemyAction[] _tactics = [];
 
     public EnemyDefinitionBuilder WithName(string name)
     {
@@ -71,6 +72,12 @@ internal sealed class EnemyDefinitionBuilder
         return this;
     }
 
+    public EnemyDefinitionBuilder WithTactics(params EnemyAction[] actions)
+    {
+        _tactics = actions;
+        return this;
+    }
+
     public EnemyDefinition Build() => new()
     {
         Id = _name.ToLowerInvariant(),
@@ -89,5 +96,6 @@ internal sealed class EnemyDefinitionBuilder
         Resistances = _resistances,
         ExperienceReward = 40,
         Gold = _gold,
+        Tactics = _tactics,
     };
 }

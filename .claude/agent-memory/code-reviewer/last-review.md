@@ -5,8 +5,8 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-enemy-skills-and-bosses, slice T0 (ADR 0034, Battle/EnemyTargeting, EnemyTactics). Round 1.
+Plan: 2026-10-29-enemy-skills-and-bosses, slice T1 (EnemyAction, EnemyTactics pick, EnemyTargeting.ForSkill, Combatant.Knows). Round 1.
 Verdict: Ready to commit.
 
-- Open (suggestion): EnemyTargeting.ForAttack is not a verb phrase, the slice names it; ChooseForAttack if T1's siblings follow
-- Open (suggestion): docs/decisions/README.md row 0034 lacks the closing period the other rows have
+- Open (suggestion): EnemyTargeting.ForSkill draws NextBelow(1) for a Targeting.Self skill, a certain outcome; take the only candidate without a draw, with a test
+- Open (suggestion): new Dictionary<string, SkillDefinition>() repeated at 15 test call sites; a small Tactics(draws) helper in EnemyTacticsTests and in BattleTurnSequenceTests

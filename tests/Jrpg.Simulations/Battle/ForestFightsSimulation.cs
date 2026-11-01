@@ -69,7 +69,7 @@ public sealed class ForestFightsSimulation(ITestOutputHelper output)
         var enemies = _catalog.Encounters[encounterId].EnemyIds.Select(id => _catalog.Enemies[id]).ToList();
         var random = new SeededRandom(seed);
         var battle = BattleState.Start(party, enemies, new Inventory(), random);
-        var tactics = new EnemyTactics(random);
+        var tactics = new EnemyTactics(random, _catalog.Skills);
 
         var turns = 0;
         var hits = HitTally.None;

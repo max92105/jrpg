@@ -31,7 +31,7 @@ public sealed class Combatant
 
     public bool IsAlive => Vitals.IsAlive;
 
-    /// <summary>The skills this combatant can use; enemies have none yet.</summary>
+    /// <summary>A member's skills; an enemy's are named by its tactics instead, so ask <see cref="Knows"/>.</summary>
     public IReadOnlyList<SkillDefinition> Skills { get; private init; } = [];
 
     /// <summary>Built new for every battle, so each one starts afresh; enemies have none.</summary>
@@ -45,6 +45,9 @@ public sealed class Combatant
 
     /// <summary>The enemy type this combatant is; null for a party member. Victory experience comes from it.</summary>
     public EnemyDefinition? Enemy { get; private init; }
+
+    /// <summary>Whether this combatant has <paramref name="skill"/> at all, whether or not it can use it now.</summary>
+    public bool Knows(SkillDefinition skill) => Skills.Contains(skill) || Enemy?.NamesSkill(skill.Id) == true;
 
     /// <summary>Shares the member's <see cref="Vitals"/>, so damage and healing in battle stay after it.</summary>
     public static Combatant FromPartyMember(PartyMember member) =>

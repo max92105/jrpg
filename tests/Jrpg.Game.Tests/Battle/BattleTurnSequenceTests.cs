@@ -1,6 +1,7 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Items;
 using Jrpg.Core.Randomness;
+using Jrpg.Core.Skills;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Tests.Ui;
 
@@ -146,7 +147,7 @@ public sealed class BattleTurnSequenceTests
     {
         var random = new SeededRandom(BattleScenarios.SarxianFirstSeed);
         var battle = BattleScenarios.MemberAgainstGoblinTrio("omer", new Inventory(), random);
-        var sequence = new BattleTurnSequence(battle, new EnemyTactics(random), RepositoryScreenText.Text.Messages);
+        var sequence = new BattleTurnSequence(battle, new EnemyTactics(random, new Dictionary<string, SkillDefinition>()), RepositoryScreenText.Text.Messages);
         sequence.Update(_step);
 
         sequence.Submit(new DefendCommand());
@@ -164,7 +165,7 @@ public sealed class BattleTurnSequenceTests
     {
         var random = new SeededRandom(BattleScenarios.SarxianFirstSeed);
         var battle = BattleScenarios.MemberAgainstGoblinTrio("ragnir", new Inventory(), random);
-        var sequence = new BattleTurnSequence(battle, new EnemyTactics(random), RepositoryScreenText.Text.Messages);
+        var sequence = new BattleTurnSequence(battle, new EnemyTactics(random, new Dictionary<string, SkillDefinition>()), RepositoryScreenText.Text.Messages);
         sequence.Update(_step);
 
         sequence.Submit(new SkillCommand(BattleScenarios.Skills["shield_bash"], [battle.Combatants[1]]));
@@ -182,7 +183,7 @@ public sealed class BattleTurnSequenceTests
     {
         var random = new SeededRandom(BattleScenarios.SarxianFirstSeed);
         var battle = BattleScenarios.MemberAgainstGoblinTrio("lazarus", new Inventory(), random);
-        var sequence = new BattleTurnSequence(battle, new EnemyTactics(random), RepositoryScreenText.Text.Messages);
+        var sequence = new BattleTurnSequence(battle, new EnemyTactics(random, new Dictionary<string, SkillDefinition>()), RepositoryScreenText.Text.Messages);
         var lazarus = battle.CurrentActor;
         sequence.Update(_step);
 
@@ -198,7 +199,7 @@ public sealed class BattleTurnSequenceTests
     {
         var random = new SeededRandom(BattleScenarios.SarxianFirstSeed);
         var battle = BattleScenarios.MemberAgainstGoblinTrio("lazarus", new Inventory(), random);
-        var sequence = new BattleTurnSequence(battle, new EnemyTactics(random), RepositoryScreenText.Text.Messages);
+        var sequence = new BattleTurnSequence(battle, new EnemyTactics(random, new Dictionary<string, SkillDefinition>()), RepositoryScreenText.Text.Messages);
         var lazarus = battle.CurrentActor;
         sequence.Update(_step);
         var turn = sequence.Turn;
@@ -215,6 +216,6 @@ public sealed class BattleTurnSequenceTests
     {
         var random = new SeededRandom(seed);
         var battle = BattleScenarios.SarxianAgainstGoblinTrio(random);
-        return (battle, new BattleTurnSequence(battle, new EnemyTactics(random), RepositoryScreenText.Text.Messages));
+        return (battle, new BattleTurnSequence(battle, new EnemyTactics(random, new Dictionary<string, SkillDefinition>()), RepositoryScreenText.Text.Messages));
     }
 }

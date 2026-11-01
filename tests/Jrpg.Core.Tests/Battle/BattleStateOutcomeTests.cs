@@ -3,6 +3,7 @@ using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
+using Jrpg.Core.Skills;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -61,7 +62,7 @@ public sealed class BattleStateOutcomeTests
         // The hero acts first and deals 13 per hit, felling the goblin (40 HP) on its 4th turn;
         // the goblin gets 3 turns in between, dealing 12 each.
         var battle = new BattleState([_hero, _goblin], new Inventory(), new FixedSequenceRandom(1));
-        var tactics = new EnemyTactics(new FixedSequenceRandom(0, 0, 0));
+        var tactics = new EnemyTactics(new FixedSequenceRandom(0, 0, 0), new Dictionary<string, SkillDefinition>());
 
         for (var turn = 0; turn < 20 && !battle.IsOver; turn++)
         {

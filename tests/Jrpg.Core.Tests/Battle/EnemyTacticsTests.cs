@@ -1,5 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Items;
+using Jrpg.Core.Skills;
 using Jrpg.Core.Statuses;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
@@ -19,7 +20,7 @@ public sealed class EnemyTacticsTests
         _jazog.Vitals.TakeDamage(999);
         // Shuffle values (0, 2, 1) swap the goblin to the front, so it is the enemy's turn.
         var battle = new BattleState([_sarxian, _jazog, _teelle, _goblin], new Inventory(), new FixedSequenceRandom(0, 2, 1));
-        var tactics = new EnemyTactics(new FixedSequenceRandom(1));
+        var tactics = new EnemyTactics(new FixedSequenceRandom(1), new Dictionary<string, SkillDefinition>());
 
         var command = tactics.ChooseCommand(battle);
 
@@ -31,7 +32,7 @@ public sealed class EnemyTacticsTests
     public void ChooseCommand_OnPartyTurn_Throws()
     {
         var battle = new BattleState([_sarxian, _goblin], new Inventory(), new FixedSequenceRandom(1));
-        var tactics = new EnemyTactics(new FixedSequenceRandom(0));
+        var tactics = new EnemyTactics(new FixedSequenceRandom(0), new Dictionary<string, SkillDefinition>());
 
         Assert.Throws<InvalidOperationException>(() => tactics.ChooseCommand(battle));
     }
@@ -41,7 +42,7 @@ public sealed class EnemyTacticsTests
     public void ChooseCommand_OneMemberTaunting_AttacksThem()
     {
         Taunt(_jazog);
-        var tactics = new EnemyTactics(new FixedSequenceRandom(0));
+        var tactics = new EnemyTactics(new FixedSequenceRandom(0), new Dictionary<string, SkillDefinition>());
 
         var command = tactics.ChooseCommand(GoblinsTurn());
 
@@ -53,7 +54,7 @@ public sealed class EnemyTacticsTests
     {
         Taunt(_jazog);
         Taunt(_teelle);
-        var tactics = new EnemyTactics(new FixedSequenceRandom(1));
+        var tactics = new EnemyTactics(new FixedSequenceRandom(1), new Dictionary<string, SkillDefinition>());
 
         var command = tactics.ChooseCommand(GoblinsTurn());
 
@@ -65,7 +66,7 @@ public sealed class EnemyTacticsTests
     [Fact]
     public void ChooseCommand_NoTaunt_SameTargetAsBeforeForSequence()
     {
-        var tactics = new EnemyTactics(new FixedSequenceRandom(2));
+        var tactics = new EnemyTactics(new FixedSequenceRandom(2), new Dictionary<string, SkillDefinition>());
 
         var command = tactics.ChooseCommand(GoblinsTurn());
 
@@ -77,7 +78,7 @@ public sealed class EnemyTacticsTests
     {
         Taunt(_jazog);
         _jazog.Vitals.TakeDamage(999);
-        var tactics = new EnemyTactics(new FixedSequenceRandom(1));
+        var tactics = new EnemyTactics(new FixedSequenceRandom(1), new Dictionary<string, SkillDefinition>());
 
         var command = tactics.ChooseCommand(GoblinsTurn());
 
@@ -90,7 +91,7 @@ public sealed class EnemyTacticsTests
     public void ChooseCommand_TauntResisted_TargetsAnyLivingMember()
     {
         Taunt(_jazog);
-        var tactics = new EnemyTactics(new FixedSequenceRandom(499, 2));
+        var tactics = new EnemyTactics(new FixedSequenceRandom(499, 2), new Dictionary<string, SkillDefinition>());
 
         var command = tactics.ChooseCommand(GoblinsTurn(StubbornGoblin()));
 
@@ -102,7 +103,7 @@ public sealed class EnemyTacticsTests
     public void ChooseCommand_TauntNotResisted_TargetsTheTaunter()
     {
         Taunt(_jazog);
-        var tactics = new EnemyTactics(new FixedSequenceRandom(500, 0));
+        var tactics = new EnemyTactics(new FixedSequenceRandom(500, 0), new Dictionary<string, SkillDefinition>());
 
         var command = tactics.ChooseCommand(GoblinsTurn(StubbornGoblin()));
 
@@ -113,7 +114,7 @@ public sealed class EnemyTacticsTests
     [Fact]
     public void ChooseCommand_NoTauntAgainstResistantEnemy_DrawsOnlyForTheTarget()
     {
-        var tactics = new EnemyTactics(new FixedSequenceRandom(2));
+        var tactics = new EnemyTactics(new FixedSequenceRandom(2), new Dictionary<string, SkillDefinition>());
 
         var command = tactics.ChooseCommand(GoblinsTurn(StubbornGoblin()));
 

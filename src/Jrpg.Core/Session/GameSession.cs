@@ -31,7 +31,7 @@ public sealed class GameSession
         Exploration = new ExplorationState(context, party, start);
         Equipment = new PartyEquipment(Inventory);
         FieldItems = new FieldItemUse(party, Inventory);
-        EnemyTactics = new EnemyTactics(context.Random);
+        EnemyTactics = new EnemyTactics(context.Random, context.Catalog.Skills);
         var gearRoll = GearRollFor(context.Catalog, context.Random);
         _dropRoll = new DropRoll(context.Catalog.Items, gearRoll, context.Random);
         Forge = new Forge(Inventory, context.Catalog.Items, context.Catalog.Rules.Crafting, gearRoll);

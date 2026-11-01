@@ -217,7 +217,7 @@ public sealed class BattleStatusTests
         battle.Execute(new SkillCommand(taunt, [hero]));
         battle.Execute(new DefendCommand());
 
-        var command = new EnemyTactics(new FixedSequenceRandom(0)).ChooseCommand(battle);
+        var command = new EnemyTactics(new FixedSequenceRandom(0), new Dictionary<string, SkillDefinition>()).ChooseCommand(battle);
 
         Assert.Equal(new AttackCommand(hero), command);
     }

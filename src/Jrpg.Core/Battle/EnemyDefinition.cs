@@ -51,4 +51,10 @@ public sealed record EnemyDefinition
 
     /// <summary>The gold it drops when defeated, drawn once (ADR 0031); null drops none.</summary>
     public GoldRange? Gold { get; init; }
+
+    /// <summary>What it chooses from on its turn (ADR 0034); empty only attacks (decision 412).</summary>
+    public IReadOnlyList<EnemyAction> Tactics { get; init; } = [];
+
+    /// <summary>Whether its tactics name the skill, which is how an enemy knows a skill.</summary>
+    public bool NamesSkill(string skillId) => Tactics.Any(action => action.SkillId == skillId);
 }

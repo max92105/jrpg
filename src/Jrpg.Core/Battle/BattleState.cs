@@ -111,7 +111,7 @@ public sealed class BattleState
     /// for a Ready, has no extra turn pending already. The UI greys out the rest.
     /// </summary>
     public bool CanUse(SkillDefinition skill) =>
-        CurrentActor.Skills.Contains(skill) && CanAfford(skill) && TargetChoiceFor(skill).Candidates.Count > 0
+        CurrentActor.Knows(skill) && CanAfford(skill) && TargetChoiceFor(skill).Candidates.Count > 0
         && !(skill.Effect.Kind == EffectKind.ReadyExtraTurn && _turnOrder.HasReadiedTurn(CurrentActor));
 
     /// <summary>Who the current actor can aim <paramref name="item"/> at, in formation order.</summary>

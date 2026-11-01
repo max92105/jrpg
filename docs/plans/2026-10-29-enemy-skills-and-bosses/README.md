@@ -45,7 +45,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 1: the first pick
 - [x] **ADR 0034: enemy tactics and boss phases** (write it from the "ADRs" entry below: the developer's answers 402-405 chose option A)
 - [x] **T0. Move the attack's target rule into `EnemyTargeting`** (Core refactor, about 70 lines) → [slices/T0.md](slices/T0.md)
-- [ ] **T1. Enemies choose a skill from a weighted list; nothing usable means the attack** (Core, about 245 lines) → [slices/T1.md](slices/T1.md)
+- [x] **T1. Enemies choose a skill from a weighted list; nothing usable means the attack** (Core, about 245 lines) → [slices/T1.md](slices/T1.md)
 
 ### Phase 2: the Chief in content
 - [ ] **D1. `enemies.json` actions, checked against the skills** (Data, about 190 lines) → [slices/D1.md](slices/D1.md)

@@ -255,6 +255,8 @@
   "inn_question": "Rest at the inn?",
   "inn_short_of_gold": "You don't have enough gold.",
   "menu_quests": "Quests",
-  "menu_hint_quests": "Your active quests.",
-  "quests_none": "No quests yet."
+  "menu_hint_quests": "Up and Down choose a quest.",
+  "quests_none": "No quests yet.",
+  "quest_kind_main": "Main",
+  "quest_kind_side": "Side"
 }

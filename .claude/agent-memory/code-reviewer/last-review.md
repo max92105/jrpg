@@ -5,12 +5,13 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-quests, slice G1 (QuestsPage, TabGlyph.Quests, first tab, texts). Round 1.
+Plan: 2026-10-29-quests, slice G2 (QuestList, QuestDetail, QuestsPage selection + detail column). Round 1.
 Verdict: Ready to commit.
 
-- Fixed (from J1): QuestJournalTests Active_MainAndSideQuests_MainFirst now starts the main quest first
-- Warning, open: ui.json menu_hint_quests "Your active quests, newest first." contradicts the journal order (main before side) - drop "newest first"
-- Suggestion, open: QuestsPageTests Glyph_IsTheQuestsGlyph also asserts LeavesOnCancel; name doesn't say so
+- Fixed (from G1): ui.json menu_hint_quests no longer says "newest first"
+- Suggestion, open (carried from G1, now merged further): QuestsPageTests Glyph_IsTheQuestsGlyph also asserts LeavesOnCancel
+- Suggestion, open: G2 Done note says page tests check the detail "at each of its stages"; only return_to_giver's detail is asserted
+- Follow-up: QuestsPage detail column is 340 px (1100 - 720 - 40) with untruncated description; L1-L3 should wrap
 - Follow-up (carried from N1): giver's event order untested
 - Follow-up (carried from E3): kind-to-label pairing untested in E3's view model tests
 - Follow-up (carried from E1): EventStepViewModel.QuestStep() `_ =>` arm; EventEditingViewModel QuestStages one-liner

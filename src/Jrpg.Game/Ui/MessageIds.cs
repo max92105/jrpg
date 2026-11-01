@@ -722,4 +722,9 @@ internal static class MessageIds
 
     /// <summary>The Quests page's line while no quest is active.</summary>
     public const string QuestsNone = "quests_none";
+
+    /// <summary>A quest's kind as the page names it (decision 390).</summary>
+    public const string QuestKindMain = "quest_kind_main";
+
+    public const string QuestKindSide = "quest_kind_side";
 }

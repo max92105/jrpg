@@ -1,12 +1,13 @@
 using Jrpg.Core.Events;
 using Jrpg.Core.Party;
+using Jrpg.Core.Quests;
 
 namespace Jrpg.Core.Exploration;
 
 /// <summary>
-/// One running map event, as a cursor over its steps (ADR 0006). Steps the player doesn't need to see apply at once,
-/// the quest steps among them (ADR 0032); dialogue, a received item, a recruit and a warp stay <see cref="Current"/>
-/// until the Game calls <see cref="Continue"/>.
+/// One running map event, as a cursor over its steps (ADR 0006). Steps the player doesn't need to see apply at once, a
+/// quest step among them unless it changed the log, when it waits for its line (decision 387); dialogue, a received
+/// item, a recruit and a warp stay <see cref="Current"/> until the Game calls <see cref="Continue"/>.
 /// </summary>
 internal sealed class EventRun
 {
@@ -47,6 +48,9 @@ internal sealed class EventRun
     /// <summary>The current priced rest, waiting for the Game to pay (decision 382); null on any other step.</summary>
     public InnStay? CurrentInnStay { get; private set; }
 
+    /// <summary>What the current quest step changed, for its line (decision 387); null on any other step.</summary>
+    public QuestChange? CurrentQuestChange { get; private set; }
+
     /// <summary>
     /// The voice-over this event started, which speaks on over the steps after it; null before one starts and once the
     /// player skips, since skipping silences the cutscene.
@@ -86,6 +90,7 @@ internal sealed class EventRun
         CurrentReceipt = null;
         CurrentRecruitment = null;
         CurrentInnStay = null;
+        CurrentQuestChange = null;
         for (_index++; _index < Steps.Count; _index++)
         {
             if (ApplyAndCheckWait(Steps[_index]))
@@ -120,8 +125,7 @@ internal sealed class EventRun
                 ApplyRest(rest);
                 return true;
             case StartQuestStep or AdvanceQuestStep or CompleteQuestStep:
-                ApplyQuestStep(step);
-                return false;
+                return ApplyQuestStep(step);
             case DialogueStep or WarpStep or StillStep or OpenForgeStep or OpenShopStep:
                 return true;
             default:
@@ -129,23 +133,20 @@ internal sealed class EventRun
         }
     }
 
-    // The rules for every quest state are the log's (decision 388); the step only names the quest and the stage.
-    private void ApplyQuestStep(EventStep step)
+    // The rules for every quest state are the log's (decision 388); the step only names the quest and the stage. A step
+    // that changed the log waits for its line (decision 387); one that changed nothing shows nothing and doesn't wait.
+    private bool ApplyQuestStep(EventStep step)
     {
         var quests = _context.World.Quests;
         var catalog = _context.Catalog.Quests;
-        switch (step)
+        CurrentQuestChange = step switch
         {
-            case StartQuestStep start:
-                quests.Start(catalog[start.QuestId]);
-                break;
-            case AdvanceQuestStep advance:
-                quests.AdvanceTo(catalog[advance.QuestId], advance.StageId);
-                break;
-            case CompleteQuestStep complete:
-                quests.Complete(catalog[complete.QuestId]);
-                break;
-        }
+            StartQuestStep start => quests.Start(catalog[start.QuestId]),
+            AdvanceQuestStep advance => quests.AdvanceTo(catalog[advance.QuestId], advance.StageId),
+            CompleteQuestStep complete => quests.Complete(catalog[complete.QuestId]),
+            _ => throw new InvalidOperationException($"Step {step.GetType().Name} isn't a quest step."),
+        };
+        return CurrentQuestChange is not null;
     }
 
     // A free rest is given at once; an inn's waits for the Game to pay, resting nobody until then (decision 382).

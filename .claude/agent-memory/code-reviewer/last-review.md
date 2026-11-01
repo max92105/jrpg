@@ -5,15 +5,14 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-quests, slice L3 (QuestDetailView: serif title, kind caps, wrapped texts, Objective band). Round 1.
+Plan: 2026-10-29-quests, slice G4 (quest notices: QuestChange, waiting quest step, QuestNoticeText). Round 1.
 Verdict: Ready to commit.
 
-- Warning, open: QuestDetailView.cs:104 kind drawn upper-cased without characterSpacing, though slice and the type's doc say "spaced caps"; pass characterSpacing: SheetRowLook.LabelSpacing
-- Warning, open: slice's "at least three lines each of description and stage text above the footer" unpinned; fit probe checks only the errand's texts; add a capacity test (fixed parts + 6 * text line height <= BodyHeight)
-- Suggestion, open: Draw's `_description is null || _stage is null` and Show's `!` exist only for nullable flow; one nullable shown-layout record removes both
-- Suggestion, open: width-change re-wrap branch untested
-- Fixed (from L2): tabs narrowed to fit the row (commit 96b1b9c)
-- Fixed (from L2): QuestsPage detail now wrapped (this slice)
+- Suggestion, open: EventPresenter.IsShowingMessage summary "(a dialogue page, a found item, a rest)" omits the quest line; StartReading's "Core sets a receipt..." comment doesn't say why CurrentQuestChange! holds (only a changed step waits)
+- Suggestion, open: EventPresenterQuestTests builds its expected line from QuestNoticeText.Of(change) without pinning change.Kind == Started; name promises "the started line"
+- Suggestion, open: QuestLogTests don't assert AdvanceTo on a completed quest returns null, nor Complete on a not-started quest returns Completed
+- Fixed (from L3): kind caps now drawn with characterSpacing: SheetRowLook.LabelSpacing
+- Follow-up (carried from L3): capacity test for three lines each of description and stage text
 - Follow-up: ResourceGaugeView.LabelSpacing (2) duplicates SheetRowLook.LabelSpacing
 - Follow-up (carried): ShopListView.TabAt copy of PointedTabsView.TabAt (backlog)
 - Follow-up (carried): Margin 28 / RowHeight 52 copied in several list views (backlog)

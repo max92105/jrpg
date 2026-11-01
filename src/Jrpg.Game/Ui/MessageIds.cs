@@ -741,4 +741,15 @@ internal static class MessageIds
 
     /// <summary>The band over a quest's stage text in its detail (decision 392).</summary>
     public const string QuestsObjective = "quests_objective";
+
+    /// <summary>
+    /// The line a quest step shows when it started a quest (decision 387); placeholder <c>{title}</c>.
+    /// </summary>
+    public const string QuestStarted = "quest_started";
+
+    /// <summary>The line when it moved a quest to another stage; placeholder <c>{title}</c>.</summary>
+    public const string QuestUpdated = "quest_updated";
+
+    /// <summary>The line when it completed a quest; placeholder <c>{title}</c>.</summary>
+    public const string QuestCompleted = "quest_completed";
 }

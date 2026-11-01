@@ -4,6 +4,7 @@ using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
+using Jrpg.Core.Quests;
 
 namespace Jrpg.Core.Exploration;
 
@@ -65,6 +66,9 @@ public sealed class ExplorationState
 
     /// <summary>The current priced rest waiting for the Game to pay (decision 382); null on any other step.</summary>
     public InnStay? CurrentInnStay => _events.Run?.CurrentInnStay;
+
+    /// <summary>What the current quest step changed, for its line (decision 387); null on any other step.</summary>
+    public QuestChange? CurrentQuestChange => _events.Run?.CurrentQuestChange;
 
     /// <summary>The voice-over the running event started, for the Game to play; null when none speaks.</summary>
     public VoiceStep? StartedVoice => _events.Run?.StartedVoice;

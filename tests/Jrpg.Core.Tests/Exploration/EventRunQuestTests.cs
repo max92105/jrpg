@@ -11,8 +11,8 @@ using Jrpg.Core.World;
 
 namespace Jrpg.Core.Tests.Exploration;
 
-// A quest step applies when it becomes current and doesn't wait (ADR 0006; G4 makes a changed one wait for its line),
-// and skipping a cutscene applies it too (ADR 0016).
+// A quest step applies when it becomes current; one that changed the log waits for its line (decision 387), one that
+// changed nothing doesn't wait. Skipping a cutscene applies it and stops at a changed one (ADR 0016).
 public sealed class EventRunQuestTests
 {
     private static readonly ObjectDefinition _sign = new() { Id = "sign", Width = 1, Height = 1, CollisionPolygon = [], Category = "test", Tiles = [], AbovePlayerZones = [] };
@@ -27,6 +27,8 @@ public sealed class EventRunQuestTests
     {
         var run = Start(new StartQuestStep("errand"));
 
+        Assert.Equal(new QuestChange(_errand, QuestChangeKind.Started), run.CurrentQuestChange);
+        run.Continue();
         Assert.True(run.IsFinished);
         Assert.Equal("take", _world.Quests.StageOf("errand"));
         Assert.False(_world.Quests.IsCompleted("errand"));
@@ -37,7 +39,7 @@ public sealed class EventRunQuestTests
     {
         var run = Start(new AdvanceQuestStep("errand", "deliver"));
 
-        Assert.True(run.IsFinished);
+        Assert.Equal(QuestChangeKind.Started, run.CurrentQuestChange?.Kind);
         Assert.Equal("deliver", _world.Quests.StageOf("errand"));
     }
 
@@ -46,29 +48,43 @@ public sealed class EventRunQuestTests
     {
         var run = Start(new CompleteQuestStep("errand"));
 
-        Assert.True(run.IsFinished);
+        Assert.Equal(QuestChangeKind.Completed, run.CurrentQuestChange?.Kind);
         Assert.True(_world.Quests.IsCompleted("errand"));
         Assert.Equal("deliver", _world.Quests.StageOf("errand"));
     }
 
     [Fact]
-    public void Start_QuestStepBeforeDialogue_AppliedAndWaitsOnTheDialogue()
+    public void Start_QuestStepBeforeDialogue_WaitsOnTheQuestStepFirst()
     {
         var run = Start(new StartQuestStep("errand"), _thanks);
 
-        Assert.Equal(_thanks, run.Current);
+        Assert.IsType<StartQuestStep>(run.Current);
         Assert.Equal("take", _world.Quests.StageOf("errand"));
+        run.Continue();
+        Assert.Equal(_thanks, run.Current);
+        Assert.Null(run.CurrentQuestChange);
     }
 
     [Fact]
-    public void SkipPresentation_QuestStepBetweenStills_Applied()
+    public void Start_QuestStepThatChangedNothing_DoesNotWait()
+    {
+        _world.Quests.Start(_errand);
+
+        var run = Start(new StartQuestStep("errand"), _thanks);
+
+        Assert.Equal(_thanks, run.Current);
+        Assert.Null(run.CurrentQuestChange);
+    }
+
+    [Fact]
+    public void SkipPresentation_ChangingQuestStepBetweenStills_StopsAtIt()
     {
         var run = Start(new StillStep("One.png", 4, Caption: null), new CompleteQuestStep("errand"), new StillStep("Two.png", 4, Caption: null));
         Assert.False(_world.Quests.IsCompleted("errand"));
 
         run.SkipPresentation();
 
-        Assert.True(run.IsFinished);
+        Assert.IsType<CompleteQuestStep>(run.Current);
         Assert.True(_world.Quests.IsCompleted("errand"));
     }
 

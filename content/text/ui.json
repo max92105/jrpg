@@ -263,5 +263,8 @@
   "quests_completed": "Completed",
   "quests_none_completed": "No completed quests.",
   "quest_completed_note": "Completed",
-  "quests_objective": "Objective"
+  "quests_objective": "Objective",
+  "quest_started": "Quest started: {title}",
+  "quest_updated": "Quest updated: {title}",
+  "quest_completed": "Quest completed: {title}"
 }

@@ -16,11 +16,11 @@ namespace Jrpg.Game.Exploration;
 /// <summary>
 /// Shows the running map event's current step and continues it once shown (ADR 0006): a warp fades to black, moves the
 /// player while the screen is black, and fades back in; a dialogue shows its lines one page per Confirm, and a found
-/// item its message as one page. A rest plays through <see cref="RestPlayback"/>: an inn's rest asks first, with its
-/// price, then the beat before its message (decisions 257, 382). A cutscene still covers the screen for its seconds,
-/// and Confirm or Cancel skips the cutscene's stills (ADR 0016). A Forge or shop step asks the scene to open its
-/// screen, once (decision 353). The event's voice-over plays through the voice channel until the event ends or is
-/// skipped (ADR 0018).
+/// item its message as one page, as does a quest step that changed the log (decision 387). A rest plays through
+/// <see cref="RestPlayback"/>: an inn's rest asks first, with its price, then the beat before its message (decisions
+/// 257, 382). A cutscene still covers the screen for its seconds, and Confirm or Cancel skips the cutscene's stills
+/// (ADR 0016). A Forge or shop step asks the scene to open its screen, once (decision 353). The event's voice-over
+/// plays through the voice channel until the event ends or is skipped (ADR 0018).
 /// </summary>
 internal sealed class EventPresenter
 {
@@ -65,8 +65,11 @@ internal sealed class EventPresenter
     /// <summary>Whether a cutscene still covers the screen.</summary>
     internal bool IsShowingStill => _stills.IsShowing;
 
-    /// <summary>Whether a message (a dialogue page, a found item, a rest) is on screen.</summary>
+    /// <summary>Whether a message (a dialogue page, a found item, a rest, a quest line) is on screen.</summary>
     internal bool IsShowingMessage => _reading is not null;
+
+    /// <summary>The page on screen, as the test reads it; null while none shows.</summary>
+    internal string? ShownLine => _reading?.CurrentPage;
 
     /// <summary>The inn's question while it is open (decision 382); null otherwise.</summary>
     internal ConfirmPrompt? Question => _rest.Question;
@@ -107,7 +110,7 @@ internal sealed class EventPresenter
             case WarpStep:
                 ShowWarp();
                 break;
-            case DialogueStep or GiveItemStep or RecruitStep:
+            case DialogueStep or GiveItemStep or RecruitStep or StartQuestStep or AdvanceQuestStep or CompleteQuestStep:
                 ShowPages(step, delta, input);
                 break;
             case StillStep still:
@@ -273,10 +276,11 @@ internal sealed class EventPresenter
         DialogueStep dialogue => new SpeechPlayback(dialogue.Speech, _settings.CharacterTime),
 
         // Shown whole: there's nothing to discover in it letter by letter. Core sets a receipt on every give-item step
-        // and a recruitment on every recruit step.
+        // and a recruitment on every recruit step, and a quest change on every quest step that waits.
         GiveItemStep => new SpeechPlayback(new Speech([FoundItemText.Of(_exploration.CurrentItemReceipt!, _messages)]), TimeSpan.Zero),
         RecruitStep => new SpeechPlayback(new Speech([RecruitText.Of(_exploration.CurrentRecruitment!, _messages)]), TimeSpan.Zero),
+        StartQuestStep or AdvanceQuestStep or CompleteQuestStep => new SpeechPlayback(new Speech([QuestNoticeText.Of(_exploration.CurrentQuestChange!, _messages)]), TimeSpan.Zero),
         RestStep => new SpeechPlayback(new Speech([_messages.Text(_rest.LineId)]), TimeSpan.Zero),
-        _ => throw new ArgumentOutOfRangeException(nameof(step), step, "Only dialogue, found items, recruits and rests have pages."),
+        _ => throw new ArgumentOutOfRangeException(nameof(step), step, "Only dialogue, found items, recruits, rests and quest changes have pages."),
     };
 }

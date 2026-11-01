@@ -49,6 +49,7 @@ public sealed class QuestsPageTests
         Assert.Empty(page.ShownTitles);
         Assert.True(session.Exploration.TryInteract());
         session.Exploration.ContinueEvent();
+        session.Exploration.ContinueEvent();
 
         page.Open();
 

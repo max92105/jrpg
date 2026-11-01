@@ -72,7 +72,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **L3. The detail column's look: serif title, wrapped texts, the Objective band** (Game, raw 125, about 200 lines at 1.6x) → [slices/L3.md](slices/L3.md)
 
 ### Phase 4: notices
-- [ ] **G4. A quest step that changed the log shows a line** (Core + Game + text, about 210 lines) → [slices/G4.md](slices/G4.md)
+- [x] **G4. A quest step that changed the log shows a line** (Core + Game + text, about 210 lines) → [slices/G4.md](slices/G4.md)
 
 ### Phase 5: the Quests window
 - [ ] **QE1. Quests in the editor's catalog draft: one undo step, saved with the catalogs, an undo removing a used quest refused** (Data + Editor, about 210 lines) → [slices/QE1.md](slices/QE1.md)

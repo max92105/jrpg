@@ -15,6 +15,8 @@ public sealed class StartMapQuestTests
         Assert.True(exploration.TryInteract());
         var offer = Assert.IsType<DialogueStep>(exploration.CurrentEventStep);
         exploration.ContinueEvent();
+        Assert.IsType<StartQuestStep>(exploration.CurrentEventStep);
+        exploration.ContinueEvent();
         Assert.False(exploration.IsEventRunning);
 
         Assert.True(exploration.TryInteract());

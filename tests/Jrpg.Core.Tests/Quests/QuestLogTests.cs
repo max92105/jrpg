@@ -45,8 +45,9 @@ public sealed class QuestLogTests
     [Fact]
     public void Start_NotStarted_ActiveAtFirstStage()
     {
-        _log.Start(_errand);
+        var change = _log.Start(_errand);
 
+        Assert.Equal(new QuestChange(_errand, QuestChangeKind.Started), change);
         Assert.Equal("take", _log.StageOf("errand"));
         Assert.False(_log.IsCompleted("errand"));
     }
@@ -56,8 +57,9 @@ public sealed class QuestLogTests
     {
         _log.AdvanceTo(_errand, "deliver");
 
-        _log.Start(_errand);
+        var change = _log.Start(_errand);
 
+        Assert.Null(change);
         Assert.Equal("deliver", _log.StageOf("errand"));
     }
 
@@ -76,7 +78,10 @@ public sealed class QuestLogTests
     {
         _log.Start(_errand);
 
-        _log.AdvanceTo(_errand, "deliver");
+        var change = _log.AdvanceTo(_errand, "deliver");
+
+        Assert.Equal(new QuestChange(_errand, QuestChangeKind.Advanced), change);
+        Assert.Null(_log.AdvanceTo(_errand, "deliver"));
 
         Assert.Equal("deliver", _log.StageOf("errand"));
         Assert.False(_log.IsCompleted("errand"));
@@ -95,8 +100,9 @@ public sealed class QuestLogTests
     [Fact]
     public void AdvanceTo_NotStarted_StartsAtTheStage()
     {
-        _log.AdvanceTo(_errand, "deliver");
+        var change = _log.AdvanceTo(_errand, "deliver");
 
+        Assert.Equal(new QuestChange(_errand, QuestChangeKind.Started), change);
         Assert.Equal("deliver", _log.StageOf("errand"));
         Assert.False(_log.IsCompleted("errand"));
     }
@@ -107,7 +113,7 @@ public sealed class QuestLogTests
         _log.AdvanceTo(_errand, "deliver");
         _log.Complete(_errand);
 
-        _log.AdvanceTo(_errand, "take");
+        Assert.Null(_log.AdvanceTo(_errand, "take"));
 
         Assert.True(_log.IsCompleted("errand"));
         Assert.Equal("deliver", _log.StageOf("errand"));
@@ -131,7 +137,9 @@ public sealed class QuestLogTests
     {
         _log.Start(_errand);
 
-        _log.Complete(_errand);
+        var change = _log.Complete(_errand);
+
+        Assert.Equal(new QuestChange(_errand, QuestChangeKind.Completed), change);
 
         Assert.True(_log.IsCompleted("errand"));
         Assert.Equal("take", _log.StageOf("errand"));
@@ -140,7 +148,9 @@ public sealed class QuestLogTests
     [Fact]
     public void Complete_NotStarted_CompletedAtLastStage()
     {
-        _log.Complete(_errand);
+        var change = _log.Complete(_errand);
+
+        Assert.Equal(QuestChangeKind.Completed, change?.Kind);
 
         Assert.True(_log.IsCompleted("errand"));
         Assert.Equal("deliver", _log.StageOf("errand"));
@@ -152,7 +162,9 @@ public sealed class QuestLogTests
         _log.Start(_errand);
         _log.Complete(_errand);
 
-        _log.Complete(_errand);
+        var again = _log.Complete(_errand);
+
+        Assert.Null(again);
 
         Assert.True(_log.IsCompleted("errand"));
         Assert.Equal("take", _log.StageOf("errand"));

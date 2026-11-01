@@ -5,8 +5,9 @@ namespace Jrpg.Core.Quests;
 /// rides on it, decision 391), changed only by the three quest steps with decision 388's rules for every state: a start
 /// on a started quest does nothing; an advance on a quest not started starts it at that stage, may move back to an
 /// earlier stage, and leaves a completed quest alone; a complete on a quest not started completes it at its last stage,
-/// and a completed quest stays completed. Stages are kept by id, so content inserting a stage before the current one
-/// moves nothing; only <see cref="HasReached"/> reads positions, in the quest's current order (ADR 0033).
+/// and a completed quest stays completed. Each command says what it changed, or nothing (decision 387). Stages are kept
+/// by id, so content inserting a stage before the current one moves nothing; only <see cref="HasReached"/> reads
+/// positions, in the quest's current order (ADR 0033).
 /// </summary>
 internal sealed class QuestLog
 {
@@ -55,36 +56,47 @@ internal sealed class QuestLog
         return entry.IsCompleted || PositionOf(entry.Quest, entry.StageId) >= named;
     }
 
-    public void Start(QuestDefinition quest)
+    /// <returns>The start; null when the quest was started before.</returns>
+    public QuestChange? Start(QuestDefinition quest)
     {
-        if (!_entries.ContainsKey(quest.Id))
+        if (_entries.ContainsKey(quest.Id))
         {
-            Put(quest, quest.FirstStage.Id, isCompleted: false);
+            return null;
         }
+
+        Put(quest, quest.FirstStage.Id, isCompleted: false);
+        return new QuestChange(quest, QuestChangeKind.Started);
     }
 
+    /// <returns>
+    /// A start for a quest not started, the advance otherwise; null for a completed quest or the same stage.
+    /// </returns>
     /// <exception cref="ArgumentException">
     /// The quest has no such stage (content is validated, so only a bug gets here).
     /// </exception>
-    public void AdvanceTo(QuestDefinition quest, string stageId)
+    public QuestChange? AdvanceTo(QuestDefinition quest, string stageId)
     {
         var stage = quest.Stage(stageId);
-        if (IsCompleted(quest.Id))
+        var entry = _entries.GetValueOrDefault(quest.Id);
+        if (entry is { IsCompleted: true } || entry?.StageId == stage.Id)
         {
-            return;
+            return null;
         }
 
         Put(quest, stage.Id, isCompleted: false);
+        return new QuestChange(quest, entry is null ? QuestChangeKind.Started : QuestChangeKind.Advanced);
     }
 
-    public void Complete(QuestDefinition quest)
+    /// <returns>The completion; null when the quest was completed before.</returns>
+    public QuestChange? Complete(QuestDefinition quest)
     {
         if (IsCompleted(quest.Id))
         {
-            return;
+            return null;
         }
 
         Put(quest, StageOf(quest.Id) ?? quest.LastStage.Id, isCompleted: true);
+        return new QuestChange(quest, QuestChangeKind.Completed);
     }
 
     // A quest keeps its place in the start order however its entry changes.

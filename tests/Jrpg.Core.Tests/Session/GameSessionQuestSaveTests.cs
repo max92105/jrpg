@@ -23,6 +23,8 @@ public sealed class GameSessionQuestSaveTests
     {
         var session = StartNew();
         session.Exploration.Walk(MoveIntent.FromAxes(1, 0), TestExplorationMap.ThirdOfASecond);
+        Assert.IsType<AdvanceQuestStep>(session.Exploration.CurrentEventStep);
+        session.Exploration.ContinueEvent();
         Assert.IsType<DialogueStep>(session.Exploration.CurrentEventStep);
         session.Exploration.ContinueEvent();
 

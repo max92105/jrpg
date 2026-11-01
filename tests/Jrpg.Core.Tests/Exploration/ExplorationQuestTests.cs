@@ -56,6 +56,8 @@ public sealed class ExplorationQuestTests
         exploration.TryInteract();
         Assert.Equal(_offer, exploration.CurrentEventStep);
         exploration.ContinueEvent();
+        Assert.IsType<StartQuestStep>(exploration.CurrentEventStep);
+        exploration.ContinueEvent();
         Assert.False(exploration.IsEventRunning);
 
         exploration.TryInteract();
@@ -70,6 +72,7 @@ public sealed class ExplorationQuestTests
         _world.Quests.AdvanceTo(_errand, "deliver");
         var exploration = StartAtTheInn();
         exploration.TryInteract();
+        exploration.ContinueEvent();
 
         exploration.ContinueEvent();
 

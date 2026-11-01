@@ -5,10 +5,15 @@ using Jrpg.Core.Events;
 
 namespace Jrpg.Editor.Events;
 
-/// <summary>One event in the event dialog: when it runs, and its steps in order. Its id never changes.</summary>
+/// <summary>
+/// One event in the event dialog: when it runs (its activation, the object, leader and quest gates), and its steps in
+/// order. Its id never changes.
+/// </summary>
 internal sealed partial class EventViewModel : ObservableObject
 {
-    public EventViewModel(MapEvent mapEvent)
+    /// <param name="mapEvent">The event as it is.</param>
+    /// <param name="choices">The quests and stages the quest gate can pick from.</param>
+    public EventViewModel(MapEvent mapEvent, StepChoices choices)
     {
         Id = mapEvent.Id;
         Activation = mapEvent.Activation;
@@ -16,6 +21,8 @@ internal sealed partial class EventViewModel : ObservableObject
         IsOnce = mapEvent.IsOnce;
         OnlyWhenObjectId = mapEvent.OnlyWhenObjectId ?? "";
         OnlyWhenLeaderId = mapEvent.OnlyWhenLeaderId ?? "";
+        QuestGate = new QuestGateViewModel(mapEvent.OnlyWhenQuest, choices.QuestStages);
+        QuestGate.PropertyChanged += (_, _) => OnPropertyChanged(nameof(Label));
         Steps = [.. mapEvent.Steps.Select(EventStepViewModel.From)];
         Steps.CollectionChanged += (_, _) => OnPropertyChanged(nameof(Label));
     }
@@ -23,6 +30,9 @@ internal sealed partial class EventViewModel : ObservableObject
     public string Id { get; }
 
     public ObservableCollection<EventStepViewModel> Steps { get; }
+
+    /// <summary>The quest the event waits on, if any (ADR 0033).</summary>
+    public QuestGateViewModel QuestGate { get; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Label), nameof(CanHavePrompt))]
@@ -67,7 +77,7 @@ internal sealed partial class EventViewModel : ObservableObject
             };
             var objectCondition = OnlyWhenObjectId.Length > 0 ? $" if {OnlyWhenObjectId}" : "";
             var leaderCondition = OnlyWhenLeaderId.Length > 0 ? $" while {OnlyWhenLeaderId} leads" : "";
-            return $"{when}{objectCondition}{leaderCondition}: {Steps.Count} step(s){(IsOnce ? ", once" : "")}";
+            return $"{when}{objectCondition}{leaderCondition}{QuestGate.Label}: {Steps.Count} step(s){(IsOnce ? ", once" : "")}";
         }
     }
 
@@ -79,12 +89,13 @@ internal sealed partial class EventViewModel : ObservableObject
         IsOnce = IsOnce,
         OnlyWhenObjectId = OnlyWhenObjectId.Length > 0 ? OnlyWhenObjectId : null,
         OnlyWhenLeaderId = OnlyWhenLeaderId.Length > 0 ? OnlyWhenLeaderId : null,
+        OnlyWhenQuest = QuestGate.ToCondition(),
         Steps = [.. Steps.Select(step => step.ToStep())],
     };
 
-    /// <summary>Why a step can't be kept as typed, naming it; null when every step can.</summary>
+    /// <summary>Why the gate or a step can't be kept as typed, naming the step; null when all can.</summary>
     public string? Problem =>
-        Steps.Select((step, index) => step.Problem is { } problem ? $"step {index + 1}: {problem}" : null).FirstOrDefault(problem => problem is not null);
+        QuestGate.Problem ?? Steps.Select((step, index) => step.Problem is { } problem ? $"step {index + 1}: {problem}" : null).FirstOrDefault(problem => problem is not null);
 
     [RelayCommand]
     private void AddDialogue() => AddStep(EventStepKind.Dialogue);

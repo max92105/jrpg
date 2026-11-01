@@ -25,7 +25,7 @@ internal sealed partial class EventListViewModel : ObservableObject
     {
         _placed = placed;
         _likelyOpenedObjectId = likelyOpenedObjectId;
-        Events = [.. placed.Events.Select(mapEvent => new EventViewModel(mapEvent))];
+        Events = [.. placed.Events.Select(mapEvent => new EventViewModel(mapEvent, choices))];
         Choices = choices;
         OnlyWhenChoices = ["", .. choices.ObjectIds];
         LeaderChoices = ["", .. choices.MemberIds];
@@ -70,7 +70,7 @@ internal sealed partial class EventListViewModel : ObservableObject
             Activation = EventActivation.Interact,
             Prompt = NewEventPrompt,
             Steps = [],
-        });
+        }, Choices);
         Events.Add(added);
         SelectedEvent = added;
     }
@@ -102,7 +102,7 @@ internal sealed partial class EventListViewModel : ObservableObject
         Events.Clear();
         foreach (var mapEvent in presetEvents)
         {
-            Events.Add(new EventViewModel(mapEvent));
+            Events.Add(new EventViewModel(mapEvent, Choices));
         }
 
         SelectedEvent = Events.FirstOrDefault(item => item.Problem is not null) ?? Events[0];

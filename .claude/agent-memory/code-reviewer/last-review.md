@@ -5,11 +5,10 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-quests, slice E1 (event dialogs show and add start/advance/complete quest steps). Round 1.
+Plan: 2026-10-29-quests, slice E2 (QuestGateViewModel; EventViewModel keeps OnlyWhenQuest, label, problem). Round 1.
 Verdict: Ready to commit.
 
-- Suggestion, open: EventStepViewModel.QuestStep() `_ =>` arm silently builds CompleteQuestStep for any kind; name CompleteQuest and keep `_ => throw new UnreachableException()`
-- Suggestion, open: EventEditingViewModel.Choices QuestStages one-liner (~200 cols); split into a private QuestStageChoices() method
-- Follow-up (carried from QV): enum-to-camelCase name written in five places in Data; one shared helper type
+- Suggestion, open: QuestGateViewModel.Label with a stage kind and no stage reads " when errand is at " (dangling); show "?" or similar until picked
+- Follow-up (carried from E1, outside diff): EventStepViewModel.QuestStep() `_ =>` arm; EventEditingViewModel QuestStages one-liner
+- Follow-up (carried from QV): enum-to-camelCase name written in five places in Data
 - Follow-up (carried): Trade/ShopScene 296 lines
-- QV suggestions (CamelCase<T> name, FindShadowedEvent guard order) not re-raised: outside this diff

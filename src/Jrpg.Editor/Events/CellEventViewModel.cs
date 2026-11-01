@@ -29,7 +29,7 @@ internal sealed class CellEventViewModel
             Id = $"cell_{cell.X}_{cell.Y}",
             Activation = EventActivation.Touch,
             Steps = [],
-        });
+        }, choices);
     }
 
     public string Title => $"Event of cell ({_cell.X}, {_cell.Y})";

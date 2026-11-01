@@ -122,7 +122,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
             Exit();
         }
 
-        PlayWhatTheChannelsAsk();
+        PlayWhatTheChannelsAsk(gameTime.ElapsedGameTime);
 
         base.Update(gameTime);
     }
@@ -187,10 +187,10 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
         return new Point(mode.Width, mode.Height);
     }
 
-    private void PlayWhatTheChannelsAsk()
+    private void PlayWhatTheChannelsAsk(TimeSpan delta)
     {
         _voicePlayer?.Follow(_audio.Voice, VolumeLevel.GainOf(_settings.VoiceVolume));
-        _musicPlayer?.Follow(_audio.Music, VolumeLevel.GainOf(_settings.MusicVolume));
+        _musicPlayer?.Follow(_audio.Music, VolumeLevel.GainOf(_settings.MusicVolume), delta);
     }
 
     // The audio system is touched once here, so a missing device shows at startup rather than mid-intro.
@@ -209,11 +209,14 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
 
         _sounds = new SoundLibrary(_audioRoot);
         _voicePlayer = new VoicePlayer(_sounds);
-        _musicPlayer = new MusicPlayer(_sounds);
+        string[] themes = [UiSoundFiles.Music.Title, UiSoundFiles.Music.Battle];
+        _musicPlayer = new MusicPlayer(_sounds, themes);
 
         // Loaded now, so the encounter's flash doesn't stall on the battle theme (ADR 0035).
-        _sounds.Get(AudioFolders.Music, UiSoundFiles.Music.Title);
-        _sounds.Get(AudioFolders.Music, UiSoundFiles.Music.Battle);
+        foreach (var theme in themes)
+        {
+            _sounds.Get(AudioFolders.Music, theme);
+        }
     }
 
 #if DEBUG

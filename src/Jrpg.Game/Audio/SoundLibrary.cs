@@ -4,8 +4,8 @@ using Microsoft.Xna.Framework.Audio;
 namespace Jrpg.Game.Audio;
 
 /// <summary>
-/// The one place the game opens sound files, voices and music alike: each is loaded on first use and kept. A file that
-/// won't load is reported once, by name, and plays silent (ADR 0018).
+/// The one place the game opens sound files, voices and music alike: each is loaded on first use and kept until
+/// released. A file that won't load is reported once, by name, and plays silent (ADR 0018).
 /// </summary>
 internal sealed class SoundLibrary(string audioRoot) : IDisposable
 {
@@ -23,6 +23,20 @@ internal sealed class SoundLibrary(string audioRoot) : IDisposable
         }
 
         return sound;
+    }
+
+    /// <summary>
+    /// Disposes a loaded sound and forgets it, so a later <see cref="Get"/> loads it again. A file that failed stays
+    /// remembered, so it isn't reported twice.
+    /// </summary>
+    public void Release(string folder, string file)
+    {
+        var path = Path.Combine(audioRoot, folder, file);
+        if (_loaded.TryGetValue(path, out var sound) && sound is not null)
+        {
+            sound.Dispose();
+            _loaded.Remove(path);
+        }
     }
 
     public void Dispose()

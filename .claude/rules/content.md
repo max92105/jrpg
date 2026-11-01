@@ -11,3 +11,4 @@ paths:
 - Every content type has a loader + validator in Jrpg.Data. The validator checks: unknown IDs, duplicate IDs, out-of-range numbers, missing required fields.
 - A content validation test loads all of `content/` and must pass.
 - Balance numbers are game-design decisions: propose changes with reasoning, don't silently retune values.
+- A new or edited content file is laid out as `ContentWriter` writes it (one field per line in nested objects, sorted ids, CRLF, trailing newline), so the identical-bytes test passes the day the writer takes it over (quests QE1 rewrote `quests.json`).

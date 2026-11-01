@@ -12,7 +12,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - **`TextureLibrary` keeps every texture it loads for good**, cutscene stills included. That is fine with the 4 KB placeholder stills, but full-screen real stills (about 8 MB of video memory each, 3 per intro) would stay loaded after the intro. Drop a still once its event ends when real art arrives. (new-game-flow K2a)
 - **An open yes/no question is held and drawn the same way in 3 screens** (`SavePage`, `SystemPage`, `NewGame/LeaderChoiceScene`: a `ConfirmPrompt?` field, a `ConfirmPromptView`, drawn while open, cleared when answered). Each copy is a few lines, and what Yes does differs per screen. Pull it into a small shared `Ui` type when a fourth screen needs it. (new-game-flow S1b review)
 - **A dialog a menu page draws leaves the footer hint bright**: `GameMenuScene.Draw` draws the footer after the page, so the scrim of the Party notice and of the Save and System prompts dims everything but the hint. Draw page dialogs after the footer, or the footer under the page, when the walk-through or the next menu change gets to it. (escape-menu-third-pass PD1 review)
-- `MainViewModel` (489 lines after E3): the sheet image-size cache (`SheetImageSizes`) and the import status text (`SheetImportResult.Summary`) could leave it.
+- `MainViewModel` (498 lines after the quests plan's QE3): the sheet image-size cache (`SheetImageSizes`) and the import status text (`SheetImportResult.Summary`) could leave it.
 - **`Directory.Build.props`:** merge `src/` and `tests/` into a root file. Decision 144 keeps two files for now; the developer didn't choose to merge. When it happens, use the standard form:
   - the gates go in a root `Directory.Build.props`;
   - `tests/Directory.Build.props` keeps its two test-only settings (`IsPackable=false`, `using Xunit`) and imports the root file through `$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))`;
@@ -20,7 +20,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
   The file is protected, so ask the developer first.
 - **Why Core refused an equipment change:** `SlotChoice.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. `PartyEquipment.ItemWithoutRoom` and `UnequipAll` would own both. It can wait because it is correct today, and nothing planned changes equipment.
-- **`Ui/MessageIds.cs` is 716 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
+- **`Ui/MessageIds.cs` is 755 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
 - **`MainViewModelTests`, part 2 (449 lines after E1a):** move the new content tests (`CreateObject_*`, `CreateNpc_*`, `CanStartNewObject_*`, `TryCreateMap_*`) and the map settings tests (`TryApplySettings_*`) into their own classes, on E1a's `EditorTestContent`.
 - **`MainWindow.xaml.cs` (547 lines):** move the viewport (pan, zoom, fit) and the tile painting handlers into partial files, as `.EventEditing` and `.ObjectEditing` already are.
 - **`TileBrowserViewModelTests` (410 lines):** move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class.
@@ -120,7 +120,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the gold and shops plan (2026-11-01)
 
-- `Game/Exploration/EventPresenter` is at 282 lines after I2b: the next event step kind it must show moves the page reading (`ShowPages`, `StartReading`) into its own type first.
+- `Game/Exploration/EventPresenter` is at 286 lines after the quests plan's G4: the next event step kind it must show moves the page reading (`ShowPages`, `StartReading`) into its own type first.
 - The "move down until the wanted row" test helper is written three times (`ShopSceneBuyTests`, `ShopSceneSellTests`, `ShopScenePreviewTests`): one shared driver in `tests/Jrpg.Game.Tests/Trade/`.
 - Private draw helpers over four parameters: `ShopDetailView.DrawRow` (6), `DrawPreview` and `DrawPicker` (5), `ShopListView.DrawTabs`, `DrawRowSelection` and `DrawRow` (5); fold the area or the opacity into a per-frame record when each view is next touched.
 - The gold plan's out-of-scope features (editing shops in the editor, gold in the save list, a `giveGold` step, Unique items in shops, the whole party's preview at once) are listed in `docs/plans/done/2026-10-29-gold-and-shops/README.md`, "Out of scope".
@@ -128,3 +128,12 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - The "enum to its camelCase JSON name" one-liner is written five times (`ResistancesConverter`, `StatBonusesConverter`, `CraftingRulesValidator.NameOf`, `LootRulesValidator.NameOf`, `MapEventValidator.JsonNameOf`): one shared Data helper (QV review).
 - Data enumerates "a layout's events" three times (`MapEventValidator.AllEvents`, `MapEventSteps.Of`, `WorldStateRepair`); `MapLayout.AllEvents` (quests QE1) is the shared member to move them to.
 - `ObjectIds.ProblemOf` is the content id rule for any typed id (the Quests window uses it for quests and stages, QE2); rename it to a `Catalogs/ContentIds` shared by objects and quests.
+
+## From the quests plan (2026-11-01, at the retro)
+
+- `Core/Session/GameSession.cs` is at 289 lines (the quests plan added the journal and the log's capture and restore): the next member moves the save capture and restore into their own type first.
+- `tests/Jrpg.Data.Tests/Content/ContentWriterTests.cs` (289) and `tests/Jrpg.Game.Tests/Exploration/EventPresenterTests.cs` (306): new tests go in sibling files, as `ContentWriterQuestTests` and `EventPresenterQuestTests` do.
+- `Objects/ObjectIds.ProblemOf`'s message says "(like tree_4)" and the Quests window shows it for quest and stage ids (QE2): reword it with the `ContentIds` rename above.
+- `CatalogDraft.SetQuests` builds its dictionary with `ToDictionary`, which throws on a repeated id; only `QuestCatalogViewModel.Problem` stands before it (QE1): refuse with the validator's message instead.
+- `Ui/ResourceGaugeView.LabelSpacing` (2) duplicates `SheetRowLook.LabelSpacing`, which `QuestDetailView` reads too (L3 review): one constant in `Ui/`.
+- The quests plan's out-of-scope features (the Quest giver preset, removing a saved quest or stage in the Quests window, a cell's touch event that changes with a quest, rewards, story flags, map markers) are listed in `docs/plans/done/2026-10-29-quests/README.md`, "Out of scope".

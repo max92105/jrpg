@@ -78,7 +78,6 @@ When planning slices in this repo:
   - a new enum member read by a "for every kind" loop (`StatComparison` over `StatSheet.ValueOf`) needs its switch arm in the same slice; check the default arm throws;
   - a weighted-pick boundary test must draw where the change moves the edge (a draw on an unchanged first weight can't fail);
   - when applying a review, the developer pre-assigns decision numbers and edits `docs/plans/README.md` himself; my own picks stay unnumbered "planner's picks";
-  - the Write tool writes LF even over CRLF files and I have no shell: name the files needing `sed -i 's/\r*$/\r/'` in the report.
 - State with no reader yet (a list written, never read) fails the build (IDE0052): land the field with its first reader's slice, not earlier (quests QL/SV).
 - Quests review (2026-10-29): parallel plans collide on the save format number and on hot files (`ExplorationState` 299, `EventRun.ApplyAndCheckWait` CA1502, `EventStepViewModel`): read the sibling plans' slices touching them and state run order; ordered progress needs a "reached (at or past)" gate; "first event that may run wins" needs a content rule refusing an ungated event that shadows later ones; a cell holds one event (gating it only switches it off); a placeholder wired early beats an empty page; editor `Events` reads `Catalogs`, so `Catalogs` can't use `Events` types.
 - A public Core record's method taking an internal type (`QuestLog`) must itself be internal; check accessibility when a public type gains a Core-state parameter.

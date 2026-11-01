@@ -1,9 +1,9 @@
 # Quests and the quest log
-Status: retro pending
+Status: done
 
 Drafted on 2026-10-29, before Act 1's content is written: the game needs quest progression and a menu page that tracks it. The developer writes the real quests, story and maps; this plan builds the mechanism, an editor window for quests, and one placeholder quest to test it all by hand.
 
-- Numbers: decisions 386-398, ADRs 0032 and 0033. Runs after [the gold and shops plan](../done/2026-10-29-gold-and-shops/README.md) (its decision 374): that plan's save is format 6, this plan's format 7; that plan leaves `ExplorationState` at 299 lines and this plan splits it, once (R1).
+- Numbers: decisions 386-398, ADRs 0032 and 0033. Runs after [the gold and shops plan](../2026-10-29-gold-and-shops/README.md) (its decision 374): that plan's save is format 6, this plan's format 7; that plan leaves `ExplorationState` at 299 lines and this plan splits it, once (R1).
 - Approved on 2026-10-29 with the developer's answers (386-398) and the devil's advocate's edits: a "reached stage" condition with its own kind enum; the placeholder quest written from the first slice and wired on the map before the save, so the page shows a real quest; R1 unconditional, before QC; the Quest giver preset deferred, replaced by a content rule refusing an event that shadows the later ones on its object; CA1502 and null-entry budgets named; a quest editor window in this plan (decision 394); two categories on the page (decision 390); the Quests tab first (decision 393).
 
 ## Goal

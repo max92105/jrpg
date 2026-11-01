@@ -16,4 +16,13 @@ public sealed class RepositoryEncounterTests
         Assert.True(catalog.Enemies["goblin_chief"].NamesSkill("field_dressing"));
         Assert.DoesNotContain(catalog.Maps.Values, map => map.Settings.RandomEncounters?.EncounterIds.Contains("goblin_chief") == true);
     }
+
+    [Fact]
+    public void Load_RepositoryContent_GoblinChiefIsABoss()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        Assert.True(catalog.Enemies["goblin_chief"].IsBoss);
+        Assert.False(catalog.Enemies["goblin"].IsBoss);
+    }
 }

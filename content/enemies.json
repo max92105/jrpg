@@ -57,6 +57,7 @@
   {
     "id": "goblin_chief",
     "name": "Goblin Chief",
+    "isBoss": true,
     "portraitFile": "Goblin.png",
     "battleSpriteFile": "Goblin.png",
     "attackEffectFile": "AttackEnemy.png",

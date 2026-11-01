@@ -21,6 +21,7 @@ internal sealed class CommandMenu
     private bool _hasSkills;
     private bool _hasUsableItem;
     private bool _hasNeighbor;
+    private bool _canFlee;
 
     /// <param name="inventory">The party's items, as the battle uses them up.</param>
     /// <param name="items">Every item by id, from the catalog.</param>
@@ -46,14 +47,15 @@ internal sealed class CommandMenu
     public BattleTargetCursor? Targets { get; private set; }
 
     /// <summary>
-    /// Skills is greyed for a member who knows none, Items when no owned item can be used now, and Move for a member
-    /// alone in the line (decision 105).
+    /// Skills is greyed for a member who knows none, Items when no owned item can be used now, Move for a member alone
+    /// in the line (decision 105), and Run while Core refuses it (decision 407).
     /// </summary>
     public bool IsEnabled(CommandEntry entry) => entry switch
     {
         CommandEntry.Skills => _hasSkills,
         CommandEntry.Items => _hasUsableItem,
         CommandEntry.Move => _hasNeighbor,
+        CommandEntry.Run => _canFlee,
         _ => true,
     };
 
@@ -64,6 +66,7 @@ internal sealed class CommandMenu
         _hasSkills = battle.CurrentActor.Skills.Count > 0;
         _hasUsableItem = _inventory.Entries.Any(entry => battle.CanUse(_items[entry.ItemId]));
         _hasNeighbor = battle.TargetChoiceForMove().Candidates.Count > 0;
+        _canFlee = battle.CanFlee;
         _cursor.Select(0);
         Skills = null;
         Items = null;

@@ -93,6 +93,12 @@ public sealed class BattleState
     public TargetChoice<Combatant> TargetChoiceForMove() =>
         new(CurrentActor.Side == BattleSide.Party ? Formation.Neighbors(CurrentActor) : [], TakesAll: false);
 
+    /// <summary>
+    /// Whether the actor may run: a party member, with no boss in the battle, standing or fallen (decision 407).
+    /// </summary>
+    public bool CanFlee =>
+        CurrentActor.Side == BattleSide.Party && !Combatants.Any(combatant => combatant.Enemy?.IsBoss == true);
+
     /// <summary>Who the current actor can aim <paramref name="skill"/> at, in formation order.</summary>
     public TargetChoice<Combatant> TargetChoiceFor(SkillDefinition skill) => _targetChoices.ChoiceFor(CurrentActor, skill.Effect);
 
@@ -220,11 +226,11 @@ public sealed class BattleState
         events.Add(new PlacesSwapped(actor, swapWith));
     }
 
-    private void Flee(Combatant actor, List<BattleEvent> events)
+    private void Flee(List<BattleEvent> events)
     {
-        if (actor.Side != BattleSide.Party)
+        if (!CanFlee)
         {
-            throw new InvalidOperationException("Only the party can flee.");
+            throw new InvalidOperationException("Only the party can flee, and never from a boss.");
         }
 
         Phase = BattlePhase.Escaped;
@@ -247,7 +253,7 @@ public sealed class BattleState
             case DefendCommand:
                 break;
             case FleeCommand:
-                Flee(actor, events);
+                Flee(events);
                 break;
             case MoveCommand move:
                 Move(actor, move.SwapWith, events);

@@ -16,6 +16,7 @@ internal sealed class EnemyDefinitionBuilder
     private int _crowdControlResistance;
     private int _accuracy = 100;
     private EnemyAction[] _tactics = [];
+    private bool _isBoss;
 
     public EnemyDefinitionBuilder WithName(string name)
     {
@@ -78,6 +79,12 @@ internal sealed class EnemyDefinitionBuilder
         return this;
     }
 
+    public EnemyDefinitionBuilder AsBoss()
+    {
+        _isBoss = true;
+        return this;
+    }
+
     public EnemyDefinition Build() => new()
     {
         Id = _name.ToLowerInvariant(),
@@ -97,5 +104,6 @@ internal sealed class EnemyDefinitionBuilder
         ExperienceReward = 40,
         Gold = _gold,
         Tactics = _tactics,
+        IsBoss = _isBoss,
     };
 }

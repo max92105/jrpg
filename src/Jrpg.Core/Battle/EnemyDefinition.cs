@@ -52,6 +52,9 @@ public sealed record EnemyDefinition
     /// <summary>The gold it drops when defeated, drawn once (ADR 0031); null drops none.</summary>
     public GoldRange? Gold { get; init; }
 
+    /// <summary>Whether the party can't run from a battle it is in (decisions 407, 414).</summary>
+    public bool IsBoss { get; init; }
+
     /// <summary>What it chooses from on its turn (ADR 0034); empty only attacks (decision 412).</summary>
     public IReadOnlyList<EnemyAction> Tactics { get; init; } = [];
 

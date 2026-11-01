@@ -1,5 +1,5 @@
 # Enemy skills and bosses
-Status: approved
+Status: approved, in progress
 
 Battle depth before Act 1 content (developer, 2026-10-29). Today every enemy only attacks (`Battle/EnemyTactics`: a random living member, or a taunting one; question 224). This plan lets enemies use the party's kind of skills, chosen by content-driven tactics, and adds a boss: an enemy the battle treats differently, with phases that change its tactics. One placeholder boss encounter, the Goblin Chief, makes it testable and visible.
 
@@ -43,8 +43,8 @@ Battle depth before Act 1 content (developer, 2026-10-29). Today every enemy onl
 One line per slice; each slice's goal, types, tests and hand checks are in its file under `slices/`. Tick the box here when a slice is done, and write its deviations in the slice file. Tunables, design overview and risks: [design.md](design.md).
 
 ### Phase 1: the first pick
-- [ ] **ADR 0034: enemy tactics and boss phases** (write it from the "ADRs" entry below: the developer's answers 402-405 chose option A)
-- [ ] **T0. Move the attack's target rule into `EnemyTargeting`** (Core refactor, about 70 lines) → [slices/T0.md](slices/T0.md)
+- [x] **ADR 0034: enemy tactics and boss phases** (write it from the "ADRs" entry below: the developer's answers 402-405 chose option A)
+- [x] **T0. Move the attack's target rule into `EnemyTargeting`** (Core refactor, about 70 lines) → [slices/T0.md](slices/T0.md)
 - [ ] **T1. Enemies choose a skill from a weighted list; nothing usable means the attack** (Core, about 245 lines) → [slices/T1.md](slices/T1.md)
 
 ### Phase 2: the Chief in content

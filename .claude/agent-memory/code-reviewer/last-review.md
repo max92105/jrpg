@@ -5,8 +5,8 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-quests, slice QE4 (Editor/Quests/QuestCatalogWindow, Shell/MainWindow.QuestEditing, Quests menu). Round 1.
+Plan: 2026-10-29-enemy-skills-and-bosses, slice T0 (ADR 0034, Battle/EnemyTargeting, EnemyTactics). Round 1.
 Verdict: Ready to commit.
 
-- Fixed: right-hand quest and stage fields greyed while nothing is chosen
-- Fixed: "Edit quests..." disabled while the content didn't load
+- Open (suggestion): EnemyTargeting.ForAttack is not a verb phrase, the slice names it; ChooseForAttack if T1's siblings follow
+- Open (suggestion): docs/decisions/README.md row 0034 lacks the closing period the other rows have

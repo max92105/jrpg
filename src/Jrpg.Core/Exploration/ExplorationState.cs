@@ -8,8 +8,9 @@ using Jrpg.Core.Party;
 namespace Jrpg.Core.Exploration;
 
 /// <summary>
-/// The player on the current map and the map event in progress. The Game feeds it input each frame: walking, interact
-/// presses, and "continue" once the player has read a step (ADR 0006).
+/// The player on the current map: walking, the random encounters, the interaction prompt, and the map entered. The Game
+/// feeds it input each frame: walking, interact presses, and "continue" once the player has read a step (ADR 0006). The
+/// map's events are started and run by the <see cref="MapEventStarter"/>; this reads what its current step did.
 /// </summary>
 public sealed class ExplorationState
 {
@@ -17,13 +18,11 @@ public sealed class ExplorationState
     private readonly PartyState _party;
     private readonly PlayerWalker _walker;
     private readonly RandomEncounters _encounters;
+    private readonly MapEventStarter _events;
     private ActiveMap _map;
     private MapCollision _collision;
     private InteractionFinder _finder;
     private GridCell _lastCell;
-    private bool _isTouchArmed;
-    private bool _isArrivalPending;
-    private EventRun? _run;
 
     /// <param name="context">The content, items, world and random source.</param>
     /// <param name="party">Who recruit steps add to; its leader (fixed, decision 107) gates events.</param>
@@ -35,7 +34,8 @@ public sealed class ExplorationState
         _walker = new PlayerWalker(start.Position, start.Facing, context.Catalog.Rules.Exploration);
         _encounters = new RandomEncounters(context.Random);
         EnterMap(start.MapId, start.Position);
-        StartArrivalEvent();
+        _events = new MapEventStarter(context, party, _map, _finder);
+        _events.StartArrivalIfPending();
         RefreshInteraction();
     }
 
@@ -53,21 +53,21 @@ public sealed class ExplorationState
     public bool IsPlayerMoving => _walker.IsMoving;
 
     /// <summary>The event step the player is reading, or null when no event runs.</summary>
-    public EventStep? CurrentEventStep => _run?.Current;
+    public EventStep? CurrentEventStep => _events.Run?.Current;
 
-    public bool IsEventRunning => _run is not null;
+    public bool IsEventRunning => _events.Run is not null;
 
     /// <summary>What the current give-item step really added and lost, for its message; null on any other step.</summary>
-    public ItemReceipt? CurrentItemReceipt => _run?.CurrentReceipt;
+    public ItemReceipt? CurrentItemReceipt => _events.Run?.CurrentReceipt;
 
     /// <summary>What the current recruit step did, for its message; null on any other step.</summary>
-    public Recruitment? CurrentRecruitment => _run?.CurrentRecruitment;
+    public Recruitment? CurrentRecruitment => _events.Run?.CurrentRecruitment;
 
     /// <summary>The current priced rest waiting for the Game to pay (decision 382); null on any other step.</summary>
-    public InnStay? CurrentInnStay => _run?.CurrentInnStay;
+    public InnStay? CurrentInnStay => _events.Run?.CurrentInnStay;
 
     /// <summary>The voice-over the running event started, for the Game to play; null when none speaks.</summary>
-    public VoiceStep? StartedVoice => _run?.StartedVoice;
+    public VoiceStep? StartedVoice => _events.Run?.StartedVoice;
 
     /// <summary>
     /// What a placed object on the current map is now, after any swap (an opened chest or door), so the Game draws it
@@ -106,12 +106,11 @@ public sealed class ExplorationState
     public bool TryInteract()
     {
         ThrowIfBusy();
-        if (_finder.FindInFront(_walker.Position, _walker.Facing, EventActivation.Interact) is not { } triggered)
+        if (!_events.TryStartInteract(_walker.Position, _walker.Facing))
         {
             return false;
         }
 
-        Start(triggered);
         RefreshInteraction();
         return true;
     }
@@ -123,14 +122,14 @@ public sealed class ExplorationState
     /// <exception cref="InvalidOperationException">No event is running.</exception>
     public void ContinueEvent()
     {
-        var run = _run ?? throw new InvalidOperationException("No event is running.");
-        if (run.Current is WarpStep warp)
+        if (_events.Run?.Current is WarpStep warp)
         {
             EnterMap(warp.MapId, warp.Cell.Center);
+            _events.EnteredMap(_map, _finder);
         }
 
-        run.Continue();
-        SettleAfterEventMoved(run);
+        _events.Continue();
+        RefreshInteraction();
     }
 
     /// <summary>
@@ -140,9 +139,8 @@ public sealed class ExplorationState
     /// <exception cref="InvalidOperationException">No event is running.</exception>
     public void SkipEventPresentation()
     {
-        var run = _run ?? throw new InvalidOperationException("No event is running.");
-        run.SkipPresentation();
-        SettleAfterEventMoved(run);
+        _events.SkipPresentation();
+        RefreshInteraction();
     }
 
     /// <summary>The pending battle is over, whatever its outcome; the next steps are grace steps again (decision 26).</summary>
@@ -164,29 +162,25 @@ public sealed class ExplorationState
         _walker.Walk(intent, delta, _collision);
         if (!_walker.IsMoving)
         {
-            _isTouchArmed = true;
+            _events.ArmTouch();
             return;
         }
 
         if (_walker.Cell != _lastCell)
         {
             _lastCell = _walker.Cell;
-            if (TryStartCellEvent(_lastCell) || TryStartEncounter())
+            if (_events.TryStartCellEvent(_lastCell) || TryStartEncounter())
             {
                 return;
             }
         }
 
-        if (_isTouchArmed && _finder.FindInFront(_walker.Position, _walker.Facing, EventActivation.Touch) is { } touched)
-        {
-            _isTouchArmed = false;
-            Start(touched);
-        }
+        _events.StartTouchInFrontIfArmed(_walker.Position, _walker.Facing);
     }
 
     private void RefreshInteraction()
     {
-        var found = _run is null && PendingEncounter is null
+        var found = _events.Run is null && PendingEncounter is null
             ? _finder.FindInFront(_walker.Position, _walker.Facing, EventActivation.Interact)
             : null;
         if (found is not { Source: { } placed } triggered)
@@ -204,9 +198,8 @@ public sealed class ExplorationState
     }
 
     /// <summary>
-    /// The one way onto a map, for a new game, a warp and a loaded save (ADR 0006). The arrival cell stays quiet, and
-    /// object touch events wait until the player has stood still (decision 38); the map's arrival event waits for no
-    /// other event to run (ADR 0016).
+    /// The one way onto a map, for a new game, a warp and a loaded save (ADR 0006): the map, its collision and what
+    /// stands in front; the player lands on the nearest walkable cell. The caller tells the events the map was entered.
     /// </summary>
     [MemberNotNull(nameof(_map), nameof(_collision), nameof(_finder))]
     private void EnterMap(string mapId, Point2D target)
@@ -219,50 +212,7 @@ public sealed class ExplorationState
         _finder = new InteractionFinder(_map, catalog.Rules.Exploration, _party.Leader.Id);
         _walker.PlaceAt(WarpArrival.Find(walkability, target));
         _lastCell = _walker.Cell;
-        _isTouchArmed = false;
-        _isArrivalPending = true;
         _encounters.ResetSteps();
-    }
-
-    // After the event moved on: it ends if it's over, letting a pending arrival event start, and the prompt follows.
-    private void SettleAfterEventMoved(EventRun run)
-    {
-        if (run.IsFinished)
-        {
-            _run = null;
-            StartArrivalEvent();
-        }
-
-        RefreshInteraction();
-    }
-
-    // The map's arrival event runs once the player is on it and no event runs: at once on a new game or a load, and
-    // after the warping event has finished its remaining steps.
-    private void StartArrivalEvent()
-    {
-        if (!_isArrivalPending || _run is not null)
-        {
-            return;
-        }
-
-        _isArrivalPending = false;
-        if (ArrivalEvents.FindFirst(_map, _party.Leader.Id) is { } arrival)
-        {
-            Start(arrival);
-        }
-    }
-
-    private bool TryStartCellEvent(GridCell cell)
-    {
-        var cellEvent = _map.CellEventAt(cell);
-        if (cellEvent is null || !cellEvent.Event.IsForLeader(_party.Leader.Id) || (cellEvent.Event.IsOnce && _map.IsDone(cellEvent.Event)))
-        {
-            return false;
-        }
-
-        _isTouchArmed = false;
-        Start(new TriggeredEvent(cellEvent.Event, Source: null));
-        return true;
     }
 
     // Called once per new cell without a cell event: that's what counts as a step.
@@ -278,15 +228,9 @@ public sealed class ExplorationState
         return true;
     }
 
-    private void Start(TriggeredEvent triggered)
-    {
-        var run = new EventRun(triggered, _map, _context, _party);
-        _run = run.IsFinished ? null : run;
-    }
-
     private void ThrowIfBusy()
     {
-        if (_run is not null)
+        if (_events.Run is not null)
         {
             throw new InvalidOperationException("An event is running; call ContinueEvent until it ends.");
         }

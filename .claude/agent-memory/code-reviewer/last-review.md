@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-quests, slice QS (startQuest/advanceQuest/completeQuest steps, Core + Data). Round 1. Verdict: Ready to commit.
-verify.ps1 all pass (3186 tests).
+Plan: 2026-10-29-quests, slice R1 (ExplorationState split: MapEventStarter, pure Core refactor). Round 1. Verdict: Ready to commit.
+verify.ps1 all pass (3186 tests, unchanged).
 
-- Suggestion, open: the two-stage `_errand` QuestDefinition is now written out in QuestLogTests, EventRunQuestTests and MapEventValidatorQuestTests (~165-column line each); one shared test fixture, one stage per line
-- Suggestion, open: Start_AdvanceQuestStep_QuestAtThatStage / Start_CompleteQuestStep_QuestCompleted don't assert run.IsFinished (only the start test pins "doesn't wait")
-- QL suggestions (long line, AdvanceTo unknown-stage on a completed quest): not in this diff, left to the developer
+- Suggestion, open: MapEventStarter.Running() is a noun-named method; RunningOrThrow / RequireRun
+- Suggestion, open: map and finder now live in both ExplorationState and MapEventStarter, synced by the warp path's EnteredMap call (accepted deviation; QC/G4 must keep the pair)
+- QS suggestions (shared _errand fixture, IsFinished asserts): not in this diff, left to the developer
 - Follow-up (carried): Trade/ShopScene 296 lines

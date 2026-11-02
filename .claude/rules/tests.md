@@ -26,3 +26,4 @@ paths:
 - A new list or dictionary in a save or content record gets a null-entry test: the strict serializer lets a null element or value through, and the null surfaces as a crash later (five slices, last G1b).
 - A test over a catalog's entries builds its own definitions (`TestQuests.Errand`, the builders) or picks a repository entry by id, never by position or because the repository holds one of them today (quests G1, G2, QE2, QE3).
 - A line that passes something up to the host (a part's sounds to its scene, a scene's cue to the flow) gets a test through what the host reads, each parallel branch its own; a per-update clear gets a test with a second update (the music plan's S3, S4, D1, B4, B5).
+- A test that runs a presenter through a fade or a hold steps at the game's fixed 1/60 s (`StartMapScenarios.OneUpdate`), never a bigger step to save updates: a step longer than a phase jumps over it (the sound pass's FE3).

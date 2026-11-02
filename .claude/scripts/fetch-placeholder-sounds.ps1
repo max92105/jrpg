@@ -20,7 +20,14 @@ $deeds = @{
     'CC-BY-4.0' = 'https://creativecommons.org/licenses/by/4.0/'
 }
 
-if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
+# A terminal opened before winget installed ffmpeg doesn't have it on its PATH yet, so winget's own folder is looked
+# in too.
+$ffmpeg = (Get-Command ffmpeg -ErrorAction SilentlyContinue).Source
+if (-not $ffmpeg) {
+    $installed = Join-Path $env:LOCALAPPDATA 'Microsoft\WinGet\Packages\Gyan.FFmpeg*\*\bin\ffmpeg.exe'
+    $ffmpeg = (Get-ChildItem $installed -ErrorAction SilentlyContinue | Select-Object -First 1).FullName
+}
+if (-not $ffmpeg) {
     throw 'ffmpeg is missing: run `winget install Gyan.FFmpeg`, then open a new terminal.'
 }
 
@@ -41,7 +48,7 @@ foreach ($sound in $manifest.sounds) {
 # Windows PowerShell turns a native command's stderr lines into errors under 'Stop', and ffmpeg logs everything there.
 function Invoke-Ffmpeg([string[]]$arguments) {
     $ErrorActionPreference = 'Continue'
-    $output = & ffmpeg -hide_banner -nostats -y @arguments 2>&1 | ForEach-Object { "$_" }
+    $output = & $ffmpeg -hide_banner -nostats -y @arguments 2>&1 | ForEach-Object { "$_" }
     if ($LASTEXITCODE -ne 0) { throw "ffmpeg failed:`n$($output -join "`n")" }
     return $output
 }

@@ -1,0 +1,57 @@
+{
+  "peakDb": -10.5,
+  "tunes": [
+    "effects/PlaceholderDefeat.wav",
+    "effects/PlaceholderVictory.wav"
+  ],
+  "sounds": [
+    {
+      "file": "effects/PlaceholderMenuCancel.wav",
+      "freesoundId": 320181,
+      "name": "hint.wav",
+      "author": "dland",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/320181/",
+      "preview": "https://cdn.freesound.org/previews/320/320181_274531-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.2,
+      "fadeOutSeconds": 0.03
+    },
+    {
+      "file": "effects/PlaceholderMenuConfirm.wav",
+      "freesoundId": 396193,
+      "name": "UI Cute Select Major 6th",
+      "author": "plasterbrain",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/396193/",
+      "preview": "https://cdn.freesound.org/previews/396/396193_4284968-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.25,
+      "fadeOutSeconds": 0.02
+    },
+    {
+      "file": "effects/PlaceholderMenuMove.wav",
+      "freesoundId": 736912,
+      "name": "menu_click",
+      "author": "jackosnb",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/736912/",
+      "preview": "https://cdn.freesound.org/previews/736/736912_8594774-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.08,
+      "fadeOutSeconds": 0.02
+    },
+    {
+      "file": "effects/PlaceholderTextTyping.wav",
+      "freesoundId": 160678,
+      "name": "typewriter.wav",
+      "author": "BMacZero",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/160678/",
+      "preview": "https://cdn.freesound.org/previews/160/160678_1554918-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.04,
+      "gainDb": -4
+    }
+  ]
+}

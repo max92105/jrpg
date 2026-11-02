@@ -46,7 +46,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 1: the pipeline
 - [x] ADR 0036: third-party placeholder audio. Write it from the entry under "ADRs" below (the options are chosen).
-- [ ] **P1. The manifest, the fetch script and the credits; the four interface sounds from freesound; the content rule amended** (script + content, about 240 lines) → [slices/P1.md](slices/P1.md)
+- [x] **P1. The manifest, the fetch script and the credits; the four interface sounds from freesound; the content rule amended** (script + content, about 240 lines) → [slices/P1.md](slices/P1.md)
 
 ### Phase 2: battle and skill sounds
 - [ ] **B1. The battle's start and its impact sounds from freesound: hit, critical, miss, block, resisted, status, heal, fall** (content, about 140 lines) → [slices/B1.md](slices/B1.md)

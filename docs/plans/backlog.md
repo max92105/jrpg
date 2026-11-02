@@ -155,5 +155,5 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Menus/OptionsPage.DrawRow` is 25 lines since the volume pips (V2): extract the pips' drawing when the page is next touched.
 - `UiArtFilesTests` checks with `File.Exists`, which ignores case on Windows; `UiSoundFilesTests` compares exact names: do the same for the art (P1).
 - `InventoryPageSoundTests` and the older Inventory tests lean on the list opening on the potion: a small helper that moves to an item by id (S4 review).
-- The effects other than the two outcome jingles are still plain generated tones (`new-placeholder-tone.ps1`): give them the chip voices of `new-placeholder-tune.pl` if they grate too.
+- The effects other than the two outcome jingles and the four interface sounds are still plain generated tones (`new-placeholder-tone.ps1`): being replaced by freesound placeholders (plan 2026-11-02-sound-pass; K1 deletes this line with the tone script).
 - The music plan's out-of-scope features (settings kept between runs, composed music, crossfades, streaming, field sounds, a `playMusic` step, pausing on lost focus) are listed in `docs/plans/done/2026-10-29-music-and-sfx/README.md`, "Out of scope".

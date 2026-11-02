@@ -154,6 +154,8 @@ sub measure {
   local $/;
   my $bytes = <$in>;
   close $in;
+  # The rate is the file's own: the freesound placeholders are 44 100 Hz, the tunes 22 050 Hz (ADR 0036).
+  my $fileRate = unpack('V', substr($bytes, 24, 4));
   my @samples = unpack('s<*', substr($bytes, 44));
   my ($peak, $sum, $jump) = (0, 0, 0);
   for my $index (0 .. $#samples) {
@@ -162,7 +164,7 @@ sub measure {
     my $step = abs($samples[$index] - $samples[$index - 1]);
     $jump = $step if $step > $jump;
   }
-  printf "%-42s %5.1f s  peak %.3f  loudness %.3f  biggest jump %.3f  loop jump %.3f\n", $path, @samples / $rate, $peak / 32767,
+  printf "%-42s %5.2f s  peak %.3f  loudness %.3f  biggest jump %.3f  loop jump %.3f\n", $path, @samples / $fileRate, $peak / 32767,
     sqrt($sum / @samples) / 32767, $jump / 32767, abs($samples[0] - $samples[-1]) / 32767;
 }
 

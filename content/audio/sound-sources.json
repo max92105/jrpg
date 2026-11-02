@@ -6,6 +6,18 @@
   ],
   "sounds": [
     {
+      "file": "effects/PlaceholderBackfire.wav",
+      "freesoundId": 136542,
+      "name": "ELECTRIC_ZAP_001.wav",
+      "author": "JoelAudio",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/136542/",
+      "preview": "https://cdn.freesound.org/previews/136/136542_1206321-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.6,
+      "fadeOutSeconds": 0.15
+    },
+    {
       "file": "effects/PlaceholderBattleStart.wav",
       "freesoundId": 221528,
       "name": "Glass Break",
@@ -42,6 +54,54 @@
       "fadeOutSeconds": 0.15
     },
     {
+      "file": "effects/PlaceholderDefend.wav",
+      "freesoundId": 407481,
+      "name": "equip.mp3",
+      "author": "Loyalty_Freak_Music",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/407481/",
+      "preview": "https://cdn.freesound.org/previews/407/407481_7947620-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.4,
+      "fadeOutSeconds": 0.05
+    },
+    {
+      "file": "effects/PlaceholderEnraged.wav",
+      "freesoundId": 132874,
+      "name": "Monster Short Roar.wav",
+      "author": "ecfike",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/132874/",
+      "preview": "https://cdn.freesound.org/previews/132/132874_2337290-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 1.2,
+      "fadeOutSeconds": 0.3
+    },
+    {
+      "file": "effects/PlaceholderEscape.wav",
+      "freesoundId": 316923,
+      "name": "Footsteps Running Away Fading 1",
+      "author": "Rudmer_Rotteveel",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/316923/",
+      "preview": "https://cdn.freesound.org/previews/316/316923_4921277-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 1,
+      "fadeOutSeconds": 0.4
+    },
+    {
+      "file": "effects/PlaceholderExtraTurn.wav",
+      "freesoundId": 352975,
+      "name": "Swoosh test C",
+      "author": "cabled_mess",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/352975/",
+      "preview": "https://cdn.freesound.org/previews/352/352975_5450487-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.5,
+      "fadeOutSeconds": 0.1
+    },
+    {
       "file": "effects/PlaceholderFall.wav",
       "freesoundId": 417994,
       "name": "Body fall.wav",
@@ -76,6 +136,18 @@
       "fetched": "2026-11-02",
       "maxSeconds": 0.3,
       "fadeOutSeconds": 0.05
+    },
+    {
+      "file": "effects/PlaceholderItemUse.wav",
+      "freesoundId": 392624,
+      "name": "Champagne Cork",
+      "author": "KenRT",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/392624/",
+      "preview": "https://cdn.freesound.org/previews/392/392624_5440319-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.5,
+      "fadeOutSeconds": 0.1
     },
     {
       "file": "effects/PlaceholderMenuCancel.wav",
@@ -126,6 +198,43 @@
       "fadeOutSeconds": 0.05
     },
     {
+      "file": "effects/PlaceholderMove.wav",
+      "freesoundId": 320144,
+      "name": "Blanket Movement 6",
+      "author": "OwlStorm",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/320144/",
+      "preview": "https://cdn.freesound.org/previews/320/320144_140737-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.4,
+      "fadeOutSeconds": 0.1
+    },
+    {
+      "file": "effects/PlaceholderPoisonTick.wav",
+      "freesoundId": 96124,
+      "name": "Bubbles_Single1.wav",
+      "author": "BMacZero",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/96124/",
+      "preview": "https://cdn.freesound.org/previews/96/96124_1554918-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.4,
+      "fadeOutSeconds": 0.1
+    },
+    {
+      "file": "effects/PlaceholderRegenTick.wav",
+      "freesoundId": 174718,
+      "name": "Single Water Drop",
+      "author": "paespedro",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/174718/",
+      "preview": "https://cdn.freesound.org/previews/174/174718_1850811-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.3,
+      "fadeOutSeconds": 0.1,
+      "gainDb": -3
+    },
+    {
       "file": "effects/PlaceholderResisted.wav",
       "freesoundId": 619803,
       "name": "Error fizzle.wav",
@@ -138,6 +247,19 @@
       "fadeOutSeconds": 0.1
     },
     {
+      "file": "effects/PlaceholderResourceGain.wav",
+      "freesoundId": 328120,
+      "name": "PowerUp.wav",
+      "author": "kianda",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/328120/",
+      "preview": "https://cdn.freesound.org/previews/328/328120_5668811-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.3,
+      "fadeOutSeconds": 0.05,
+      "gainDb": -4
+    },
+    {
       "file": "effects/PlaceholderStatusApplied.wav",
       "freesoundId": 189630,
       "name": "Spark",
@@ -148,6 +270,30 @@
       "fetched": "2026-11-02",
       "maxSeconds": 0.5,
       "fadeOutSeconds": 0.05
+    },
+    {
+      "file": "effects/PlaceholderStatusEnded.wav",
+      "freesoundId": 215850,
+      "name": "Puff blow 01.MP3",
+      "author": "VKProduktion",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/215850/",
+      "preview": "https://cdn.freesound.org/previews/215/215850_4034520-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.4,
+      "fadeOutSeconds": 0.1
+    },
+    {
+      "file": "effects/PlaceholderStunned.wav",
+      "freesoundId": 458572,
+      "name": "Bonk.wav",
+      "author": "facklere",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/458572/",
+      "preview": "https://cdn.freesound.org/previews/458/458572_9571654-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.6,
+      "fadeOutSeconds": 0.15
     },
     {
       "file": "effects/PlaceholderTextTyping.wav",

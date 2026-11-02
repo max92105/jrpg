@@ -55,7 +55,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **P2. The manifest's check: every effect sourced or a tune, licenses allowed, every entry credited; Phase 2's listening** (Data tests, about 80 lines) → [slices/P2.md](slices/P2.md)
 
 ### Phase 3: the Shop
-- [ ] **SH1. The Shop's gear preview moves into `Trade/GearPreview`** (Game refactor, about 110 lines) → [slices/SH1.md](slices/SH1.md)
+- [x] **SH1. The Shop's gear preview moves into `Trade/GearPreview`** (Game refactor, about 110 lines) → [slices/SH1.md](slices/SH1.md)
 - [ ] **SH2. The Shop's move, confirm and cancel sounds on the tabs and in the lists** (Game, about 190 lines) → [slices/SH2.md](slices/SH2.md)
 - [ ] **SH3. A deal's sound as a purchase, a sale or the Forge's salvage goes through; the picker's count ticks** (Game + content, about 210 lines) → [slices/SH3.md](slices/SH3.md)
 

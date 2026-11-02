@@ -14,12 +14,12 @@ namespace Jrpg.Game.Trade;
 /// The Shop screen a shopkeeper's event opens over the map (decision 353): the shop's name and the party's gold in the
 /// header; the Buy and Sell tabs, which the cursor starts on (Left and Right choose, Confirm enters the shown list,
 /// Cancel leaves); in a list Up and Down move the shared selection, the tab buttons change its category (decision 384,
-/// each tab keeping its own), Left and Right switch the member whose changes a gear row previews (decision 383) and
-/// Cancel returns to the tabs. Confirm on an available row hands it to the <see cref="ShopCounter"/>, which takes the
-/// input while its picker or its question is open; the notice names what was dealt until the cursor moves or the tab
-/// changes, and a refused row shows its reason instead. It fades in when it opens and out when it closes (decision
-/// 370): the close request comes once the fade has run, once, since a second would make the flow pop what lies under
-/// it.
+/// each tab keeping its own), Left and Right switch the member whose changes a gear row previews (a
+/// <see cref="GearPreview"/>, decision 383) and Cancel returns to the tabs. Confirm on an available row hands it to the
+/// <see cref="ShopCounter"/>, which takes the input while its picker or its question is open; the notice names what was
+/// dealt until the cursor moves or the tab changes, and a refused row shows its reason instead. It fades in when it
+/// opens and out when it closes (decision 370): the close request comes once the fade has run, once, since a second
+/// would make the flow pop what lies under it.
 /// </summary>
 internal sealed class ShopScene : IScene
 {
@@ -28,13 +28,10 @@ internal sealed class ShopScene : IScene
     private readonly ShopCounter _counter;
     private readonly CategoryRail _buyRail = new();
     private readonly CategoryRail _sellRail = new();
-    private readonly EquipmentComparison _comparison;
+    private readonly GearPreview _preview;
     private readonly ShopView _view;
     private readonly OverlayFade _fade = new();
     private readonly SelectionMotion _tabPointer = new();
-    private int _memberIndex;
-    private TradeRow? _previewedRow;
-    private PartyMember? _previewedMember;
     private bool _hasRequestedClose;
 
     /// <param name="text">The header's and the footer's fonts and lines.</param>
@@ -48,7 +45,7 @@ internal sealed class ShopScene : IScene
         _session = session;
         _messages = text.Messages;
         _counter = new ShopCounter(shop, session, text);
-        _comparison = new EquipmentComparison(text.Messages);
+        _preview = new GearPreview(session.Party, text.Messages);
         _view = new ShopView(text, ui, shop.Name);
     }
 
@@ -65,12 +62,12 @@ internal sealed class ShopScene : IScene
     public TradeRow? SelectedRow => Tab == ShopTab.Buy ? _counter.Stock.SelectedRow : _counter.Sales.SelectedRow;
 
     /// <summary>The active member whose changes a gear row previews; the leader first (decision 383).</summary>
-    public PartyMember PreviewedMember => _session.Party.ActiveMembers[_memberIndex];
+    public PartyMember PreviewedMember => _preview.Member;
 
     /// <summary>
     /// What wearing the highlighted piece would change for <see cref="PreviewedMember"/>; null on other rows.
     /// </summary>
-    public StatComparisonText? Preview => _comparison.Text;
+    public StatComparisonText? Preview => _preview.Changes;
 
     /// <summary>The picker open on the highlighted stack; null while none is.</summary>
     public QuantityPicker? Picker => _counter.Picker;
@@ -107,7 +104,7 @@ internal sealed class ShopScene : IScene
             UpdateList(input);
         }
 
-        RefreshPreview();
+        _preview.Follow(SelectedRow);
         return null;
     }
 
@@ -184,7 +181,7 @@ internal sealed class ShopScene : IScene
         }
 
         MoveCursor(input);
-        SwitchMember(input);
+        _preview.SwitchMember(input);
     }
 
     private void Deal(TradeRow row)
@@ -211,20 +208,6 @@ internal sealed class ShopScene : IScene
         {
             ShownSelection.MoveDown();
             _counter.ClearNotice();
-        }
-    }
-
-    private void SwitchMember(InputFrame input)
-    {
-        var members = _session.Party.ActiveMembers.Count;
-        if (input.IsPressed(GameButton.Right))
-        {
-            _memberIndex = (_memberIndex + 1) % members;
-        }
-
-        if (input.IsPressed(GameButton.Left))
-        {
-            _memberIndex = (_memberIndex + members - 1) % members;
         }
     }
 
@@ -257,28 +240,6 @@ internal sealed class ShopScene : IScene
         else
         {
             _counter.Sales.Refresh(ShownRail.Category);
-        }
-    }
-
-    // Rebuilt only when the row or the member changes, never per frame; a stack or a material has no preview.
-    private void RefreshPreview()
-    {
-        var row = SelectedRow;
-        var member = PreviewedMember;
-        if (ReferenceEquals(row, _previewedRow) && ReferenceEquals(member, _previewedMember))
-        {
-            return;
-        }
-
-        _previewedRow = row;
-        _previewedMember = member;
-        if (row?.Piece is { } piece)
-        {
-            _comparison.ShowPiece(member, piece);
-        }
-        else
-        {
-            _comparison.Clear();
         }
     }
 

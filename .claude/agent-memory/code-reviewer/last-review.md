@@ -5,13 +5,10 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-music-and-sfx, slice B1 (the impact's sounds, each at its beat). Round 1.
-Verdict: Fix the Criticals, then commit. 1 Critical, 0 Warnings, 3 Suggestions.
+Plan: 2026-10-29-music-and-sfx, slice B2 (every other battle event kind sounds). Round 1.
+Verdict: Fix the Criticals, then commit. 1 Critical, 0 Warnings, 1 Suggestion.
 
-- Open (Critical): PlaybackSoundQueue.cs:21 `At <= Elapsed` has no test; every Follow test uses Hit(), whose sound is at zero; the slice's Follow_TimeNotYetReached_AsksNothing is missing and the Done note doesn't record it; fixture [StatusTicked, EffectApplied] puts the hit at TickHold
-- Open (Suggestion): BattleSounds.cs:35 `EffectApplied or LifeStolen` gives any non-damage kind the heal; name RestoreHp and Revive so the rest reach the throw
-- Open (Suggestion): BattleSceneSoundTests.cs:13 "A battle lost at the start, so no seed matters" sits over a test of a battle not lost; move it to LostBattle
-- Open (Suggestion): TimedSound.cs:4 `File` param doc "The file." restates the name; move "in the effects folder" onto it
-- Note: hand check is the developer's
-- Fixed (from D1): ExplorationScene AskAll covered by ExplorationSceneSoundTests; `lastMultiple > 0` gone; voice param doc mentions the typing; map's Exploration row lists TypingSound; Menu press's confirm sound tested
-- Dropped (from D1, committed): tick spacing at Normal (developer's call on decision 422); TypingSound clock test and IsDue test Suggestions
+- Open (Critical): BattleSounds.cs:49-50 startOf(kind) gives the first beat of a kind, but Tick and Defeat can each have two beats: [Impact, Defeat, Backfire, Defeat] drops the caster's fall (dedup; should be at 3.0 s), [Impact, Tick, Skip, Tick, Defeat] puts the goblin's PoisonTick at 1.0 s, its number at 2.6 s; fixtures in ActionPlaybackFallTests:44 and :105; no test
+- Open (Suggestion): BattleSounds.cs:47 OtherSoundOf names nothing; SoundAtItsBeat pairs with SoundAtTheStartOf
+- Note: hand check is the developer's; plan checkbox is ticked after review
+- Fixed (from B1): Follow_TimeNotYetReached_AsksNothing exists; RestoreHp and Revive named; LostBattle's comment moved onto it; TimedSound File doc says the effects folder

@@ -44,5 +44,29 @@ internal static class UiSoundFiles
         public const string StatusApplied = "PlaceholderStatusApplied.wav";
 
         public const string Heal = "PlaceholderHeal.wav";
+
+        public const string Fall = "PlaceholderFall.wav";
+
+        public const string PoisonTick = "PlaceholderPoisonTick.wav";
+
+        public const string RegenTick = "PlaceholderRegenTick.wav";
+
+        public const string Backfire = "PlaceholderBackfire.wav";
+
+        public const string Stunned = "PlaceholderStunned.wav";
+
+        public const string ResourceGain = "PlaceholderResourceGain.wav";
+
+        public const string StatusEnded = "PlaceholderStatusEnded.wav";
+
+        public const string Move = "PlaceholderMove.wav";
+
+        public const string ExtraTurn = "PlaceholderExtraTurn.wav";
+
+        public const string ItemUse = "PlaceholderItemUse.wav";
+
+        public const string Defend = "PlaceholderDefend.wav";
+
+        public const string Enraged = "PlaceholderEnraged.wav";
     }
 }

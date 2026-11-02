@@ -63,7 +63,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 4: battle sounds
 - [x] **B1. A turn's impact sounds its hits, critical hits, misses, blocks, resists, statuses and heals, each at its beat** (Game, about 245 lines) → [slices/B1.md](slices/B1.md)
-- [ ] **B2. Every other battle event kind sounds at its beat: falls, ticks, backfires, stuns, gains, moves, items, Defend** (Game, about 200 lines) → [slices/B2.md](slices/B2.md)
+- [x] **B2. Every other battle event kind sounds at its beat: falls, ticks, backfires, stuns, gains, moves, items, Defend** (Game, about 200 lines) → [slices/B2.md](slices/B2.md)
 - [ ] **B3. Every skill names its sound, checked at load and startup, played as its action starts** (Core + Data + Game + content, about 190 lines) → [slices/B3.md](slices/B3.md)
 - [ ] **B4. The battle-start sound at the flash; victory's fanfare over silence, then the map's track; defeat and escape** (Game, about 230 lines) → [slices/B4.md](slices/B4.md)
 - [ ] **B5. Sounds on the battle's commands, skill and item lists and target cursor** (Game, about 140 lines) → [slices/B5.md](slices/B5.md)

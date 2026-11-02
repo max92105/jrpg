@@ -34,6 +34,11 @@ internal sealed class ActionPlayback
     private readonly List<(Combatant Fallen, TimeSpan FadeStart)> _fallen = [];
     private string? _attackEffectFile;
 
+    // When the beat showing a fall or a tick starts, by the event's place in the turn: a turn may hold two beats of
+    // those kinds, so its kind alone doesn't say which. Places, since two equal events would collide as keys.
+    private readonly Dictionary<int, TimeSpan> _beatStartOfEvent = [];
+    private int _readingIndex;
+
     private ActionPlayback()
     {
     }
@@ -69,13 +74,17 @@ internal sealed class ActionPlayback
     public static ActionPlayback Start(IReadOnlyList<BattleEvent> events, UiMessages messages)
     {
         var playback = new ActionPlayback();
-        foreach (var battleEvent in events.Where(shown => !_shownByLiveState.Contains(shown.GetType())))
+        for (var index = 0; index < events.Count; index++)
         {
-            playback.Read(battleEvent, messages);
+            playback._readingIndex = index;
+            if (!_shownByLiveState.Contains(events[index].GetType()))
+            {
+                playback.Read(events[index], messages);
+            }
         }
 
         playback.Duration = playback._beats.Aggregate(TimeSpan.Zero, (total, beat) => total + beat.Duration);
-        playback.Sounds = BattleSounds.Of(events, playback.StartOf);
+        playback.Sounds = BattleSounds.Of(events, playback.StartOfBeatShowing);
         return playback;
     }
 
@@ -212,12 +221,19 @@ internal sealed class ActionPlayback
         {
             _fallen.Add((fallen, StartOfBeatAt(causeIndex)));
             _beats.Add(new PlaybackBeat(PlaybackBeatKind.Defeat, BattlePacing.DefeatHold - _beats[causeIndex].Duration));
-            return;
+        }
+        else
+        {
+            _fallen.Add((fallen, TimeSpan.Zero));
+            AddBeatOnce(PlaybackBeatKind.Defeat, BattlePacing.DefeatHold - BattlePacing.ImpactHold);
         }
 
-        _fallen.Add((fallen, TimeSpan.Zero));
-        AddBeatOnce(PlaybackBeatKind.Defeat, BattlePacing.DefeatHold - BattlePacing.ImpactHold);
+        _beatStartOfEvent[_readingIndex] = StartOfBeatAt(_beats.FindLastIndex(beat => beat.Kind == PlaybackBeatKind.Defeat));
     }
+
+    // The fall or the tick's own beat, else the turn's one beat of that kind.
+    private TimeSpan StartOfBeatShowing(int eventIndex, PlaybackBeatKind kind) =>
+        _beatStartOfEvent.TryGetValue(eventIndex, out var start) ? start : StartOf(kind);
 
     // When a beat of this kind starts, or would start if added now: the beats before the first one of it.
     private TimeSpan StartOf(PlaybackBeatKind kind) =>
@@ -244,6 +260,7 @@ internal sealed class ActionPlayback
         }
 
         var start = StartOfBeatAt(_beats.FindLastIndex(beat => beat.Kind == PlaybackBeatKind.Tick));
+        _beatStartOfEvent[_readingIndex] = start;
         var tone = ticked.Status == StatusKind.Poison ? FloatingNumberTone.Poison : FloatingNumberTone.Heal;
         _numbers.Add(new FloatingNumber(ticked.Holder, NumberText.Of(ticked.Amount), tone, start));
     }

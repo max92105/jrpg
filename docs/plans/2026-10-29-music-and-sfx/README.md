@@ -1,5 +1,5 @@
 # Music and sound effects
-Status: approved, in progress
+Status: retro pending
 
 Drafted on 2026-10-29 from the developer's request. Builds on ADR 0018 (voices: WAV through MonoGame's `SoundEffect`, scenes write a `VoiceChannel`, the host plays it after each update, an exact-name startup check, silent without a device), which left music and effects to "their own plan".
 
@@ -69,7 +69,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **B5. Sounds on the battle's commands, skill and item lists and target cursor** (Game, about 140 lines) → [slices/B5.md](slices/B5.md)
 
 ### Phase 5: the look
-- [ ] **V2. The volume rows as diamond pips** (Game, raw 70, about 110 lines at 1.6x) → [slices/V2.md](slices/V2.md)
+- [x] **V2. The volume rows as diamond pips** (Game, raw 70, about 110 lines at 1.6x) → [slices/V2.md](slices/V2.md)
 
 ## Decisions
 - **415. Settings are saved between runs, in a separate small plan after this one** (volumes, full screen, text speed); until then the volumes work for the run, as the other options.

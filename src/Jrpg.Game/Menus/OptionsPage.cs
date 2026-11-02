@@ -29,6 +29,9 @@ internal sealed class OptionsPage : IMenuPage
     private const int ArrowGap = 16;
     private const int ArrowSide = 6;
 
+    // Keeps a volume's number clear of its pips (decision 424).
+    private const int PipsToNumberGap = 14;
+
     private readonly PlayerSettings _settings;
     private readonly UiTextures _ui;
     private readonly ColumnPanelView _panel = new(UiTheme.PageColumn);
@@ -39,16 +42,18 @@ internal sealed class OptionsPage : IMenuPage
     private readonly MeasuredText[] _levels;
     private readonly ListCursor _cursor = new(RowCount, _ => true);
     private readonly SelectionMotion _selection = new();
+    private readonly PipRow _pips;
     private readonly AskedSounds _sounds = new();
 
     /// <param name="text">Messages and fonts.</param>
-    /// <param name="ui">The shared textures: the selected row.</param>
+    /// <param name="ui">The shared textures: the selected row and the volumes' pips.</param>
     /// <param name="settings">What the page changes; the host and dialogue read it.</param>
     public OptionsPage(ScreenText text, UiTextures ui, PlayerSettings settings)
     {
         Hint = text.Messages.Text(MessageIds.MenuHintOptions);
         _settings = settings;
         _ui = ui;
+        _pips = new PipRow(ui);
         _font = text.Fonts.FontAt(UiTheme.MenuTextPixels);
         var messages = text.Messages;
         _labels =
@@ -170,13 +175,23 @@ internal sealed class OptionsPage : IMenuPage
 
     private static int Stepped(int level, int step) => Math.Clamp(level + step, 0, VolumeLevel.Max);
 
-    private MeasuredText ValueOf(int row) => row switch
+    private MeasuredText ValueOf(int row)
     {
-        FullScreenRow => _onOff[_settings.IsFullScreen ? 1 : 0],
-        TextSpeedRow => _speeds[(int)_settings.TextSpeed],
-        MusicRow => _levels[_settings.MusicVolume],
-        EffectsRow => _levels[_settings.EffectsVolume],
-        _ => _levels[_settings.VoiceVolume],
+        if (LevelOf(row) is { } level)
+        {
+            return _levels[level];
+        }
+
+        return row == TextSpeedRow ? _speeds[(int)_settings.TextSpeed] : _onOff[_settings.IsFullScreen ? 1 : 0];
+    }
+
+    // The level a volume row draws as pips; null for the two rows that stay text.
+    private int? LevelOf(int row) => row switch
+    {
+        MusicRow => _settings.MusicVolume,
+        EffectsRow => _settings.EffectsVolume,
+        VoicesRow => _settings.VoiceVolume,
+        _ => null,
     };
 
     private static string LabelIdOf(TextSpeed speed) => speed switch
@@ -191,19 +206,28 @@ internal sealed class OptionsPage : IMenuPage
     private void DrawRow(SpriteBatch batch, TextureLibrary textures, RowPlace place, float opacity)
     {
         var isSelected = place.Index == _cursor.Selected;
-        var color = (isSelected ? UiTheme.TextPrimary : UiTheme.TextSecondary) * opacity;
+        var tone = isSelected ? UiTheme.TextPrimary : UiTheme.TextSecondary;
+        var color = tone * opacity;
         var textTop = place.Area.Y + ((UiTheme.MenuRowHeight - _font.LineHeight) / 2f);
         var labelLeft = place.Area.X + UiTheme.MenuTextInset;
         batch.DrawString(_font, _labels[place.Index], new Vector2(labelLeft, textTop), color);
 
         var value = ValueOf(place.Index);
         var valueLeft = labelLeft + ValueColumn;
-        batch.DrawString(_font, value.Text, new Vector2(valueLeft, textTop), color);
+        var middle = textTop + (_font.LineHeight / 2f);
+        var numberLeft = (float)valueLeft;
+        if (LevelOf(place.Index) is { } level)
+        {
+            var pipsAt = new Point(valueLeft, (int)(middle - (PipRow.PipSize / 2f)));
+            _pips.Draw(batch, textures, pipsAt, new PipRowLook(VolumeLevel.Max, level, tone, opacity, default));
+            numberLeft += PipRow.WidthOf(VolumeLevel.Max) + PipsToNumberGap;
+        }
+
+        batch.DrawString(_font, value.Text, new Vector2(numberLeft, textTop), color);
         if (isSelected)
         {
-            var middle = textTop + (_font.LineHeight / 2f);
             new Diamond(new Vector2(valueLeft - ArrowGap, middle), ArrowSide).Draw(batch, textures.Pixel, color);
-            new Diamond(new Vector2(valueLeft + value.Width + ArrowGap, middle), ArrowSide).Draw(batch, textures.Pixel, color);
+            new Diamond(new Vector2(numberLeft + value.Width + ArrowGap, middle), ArrowSide).Draw(batch, textures.Pixel, color);
         }
     }
 

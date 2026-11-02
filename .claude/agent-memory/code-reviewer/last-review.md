@@ -5,14 +5,13 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-music-and-sfx, slice B5 (sounds on the battle's commands, lists and target cursor). Round 1.
-Verdict: Fix the Criticals, then commit. 1 Critical, 2 Warnings, 1 Suggestion.
+Plan: 2026-10-29-music-and-sfx, slice V2 (the volume rows as diamond pips). Round 1.
+Verdict: Ready to commit. 0 Critical, 3 Warnings, 2 Suggestions.
 
-- Open (Critical): CommandMenu.cs:170 ChooseSkill's confirm on a usable skill has no test; add Update_ConfirmOnAUsableSkill_AsksTheConfirmSound
-- Open (Warning): CommandMenu.cs:221 target cursor's silent side has no test (single candidate or take-all choice)
-- Open (Warning): CommandMenuSoundTests.cs:139 reaches revive_feather by one fixed Down press (tests.md)
-- Open (Suggestion): BattleSceneSoundTests.cs:14 class comment names outcome screens and turns, not the commands it now also covers
-- Note: first verify run failed (3 test hosts exit -1, total 3664, no test named); the next two test runs passed 3681, cause not established
-- Note: hand check is the developer's; plan checkbox is ticked after review
-- Fixed (from B4): GameFlowMusicTests.Update_BattleLost_AsksForSilence; victory test uses CertainRules; WithOneGoblin shared; UiSoundFiles Battle summary
-- Dropped (from B4): fixed Up press to Run in BattleSceneSoundTests, listed in docs/plans/backlog.md
+- Open (Warning): slices/V2.md:12 Done note says "as planned" but the pips are PipRow's fixed 9 px gauge size, not "sized to the menu's text" (28 px); record the deviation or size them
+- Open (Warning): OptionsPage.cs:189 LevelOf repeats ValueOf's three row-to-setting arms (lines 183-185); make ValueOf read LevelOf
+- Open (Warning): OptionsPage.cs:50 ui param doc names only the selected row; the pips now use it too
+- Open (Suggestion): OptionsPage.cs:206 DrawRow's body is 25 lines; extract the volume pips
+- Open (Suggestion): OptionsPage.cs:32 comment copies 126, 520 and 1100 px from PipRow and MenuLayout; the slice note already holds the arithmetic
+- Note: hand check and captures are the developer's; plan checkbox is ticked after review
+- Fixed (from B5): Update_ConfirmOnAUsableSkill test; target cursor's silent side test; revive_feather reached by moving until selected; BattleSceneSoundTests class comment

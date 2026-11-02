@@ -36,6 +36,7 @@ internal sealed class LeaderChoiceScene : IScene
     private readonly LeaderChoiceMenu _menu;
     private readonly UiMessages _messages;
     private readonly UiTextures _ui;
+    private readonly AskedSounds _sounds = new();
     private readonly ConfirmPromptView _promptView;
     private readonly SpriteFontBase _headingFont;
     private readonly SpriteFontBase _nameFont;
@@ -70,6 +71,8 @@ internal sealed class LeaderChoiceScene : IScene
         _profileView = new LeaderProfileView(text, ui, _profiles);
     }
 
+    public IReadOnlyList<string> Sounds => _sounds.Files;
+
     /// <summary>The choice the cursor is on, so tests can pick a character by who they are.</summary>
     internal LeaderChoice Selected => _menu.Selected;
 
@@ -85,6 +88,7 @@ internal sealed class LeaderChoiceScene : IScene
     /// <returns>The chosen leader or the way back to the title, each once; then nothing.</returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
+        _sounds.Clear();
         _profileView.Update(delta);
         if (_hasAnswered)
         {
@@ -99,11 +103,16 @@ internal sealed class LeaderChoiceScene : IScene
         if (input.IsPressed(GameButton.Cancel))
         {
             _hasAnswered = true;
+            _sounds.Ask(UiSoundFiles.Effects.MenuCancel);
             return new TitleRequested();
         }
 
-        if (_menu.Update(input) is not null)
+        var before = _menu.SelectedIndex;
+        var chosen = _menu.Update(input);
+        _sounds.AskMoveIfChanged(before, _menu.SelectedIndex);
+        if (chosen is not null)
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
             var name = new MessageArgument("name", SelectedProfile.Name);
             _asking = new ConfirmPrompt(_messages.Format(MessageIds.LeaderChoiceConfirm, name));
         }

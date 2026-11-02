@@ -25,6 +25,7 @@ internal sealed class ForgeScene : IScene
     private readonly ForgeActionFormat _actionFormat;
     private readonly ForgeView _view;
     private readonly OverlayFade _motion = new();
+    private readonly AskedSounds _sounds = new();
     private bool _hasRequestedClose;
 
     /// <param name="text">The title, the lines and the rows' fonts.</param>
@@ -59,8 +60,11 @@ internal sealed class ForgeScene : IScene
     /// </summary>
     public string? Notice { get; private set; }
 
+    public IReadOnlyList<string> Sounds => _sounds.Files;
+
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
+        _sounds.Clear();
         _list.Advance(delta);
         Actions?.Advance(delta);
         _motion.Advance(delta);
@@ -128,6 +132,7 @@ internal sealed class ForgeScene : IScene
     {
         if (input.IsPressed(GameButton.Cancel))
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuCancel);
             Actions = null;
             return;
         }
@@ -138,6 +143,7 @@ internal sealed class ForgeScene : IScene
             return;
         }
 
+        var before = actions.SelectedIndex;
         if (input.IsPressed(GameButton.Up))
         {
             actions.MoveUp();
@@ -147,6 +153,8 @@ internal sealed class ForgeScene : IScene
         {
             actions.MoveDown();
         }
+
+        _sounds.AskMoveIfChanged(before, actions.SelectedIndex);
     }
 
     // Salvage destroys, so it asks first (decision 354); an upgrade or a reroll only changes the piece, so it goes at
@@ -178,6 +186,7 @@ internal sealed class ForgeScene : IScene
             return;
         }
 
+        _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
         _list.Show(index);
         _materials.Refresh();
         var crafted = _list.SelectedRow ?? throw new InvalidOperationException("The crafted piece left the list.");
@@ -189,17 +198,20 @@ internal sealed class ForgeScene : IScene
     {
         if (input.IsPressed(GameButton.Cancel))
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuCancel);
             _motion.StartClosing();
             return;
         }
 
         if (input.IsPressed(GameButton.Confirm) && _list.SelectedPiece is { } piece)
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
             Actions = new ForgeActionChoice(piece, _session.Forge, _actionFormat);
             Notice = null;
             return;
         }
 
+        var before = _list.Cursor?.Selected ?? 0;
         if (input.IsPressed(GameButton.Up))
         {
             _list.MoveUp();
@@ -211,6 +223,8 @@ internal sealed class ForgeScene : IScene
             _list.MoveDown();
             Notice = null;
         }
+
+        _sounds.AskMoveIfChanged(before, _list.Cursor?.Selected ?? 0);
     }
 
     // While closing nothing reads input; the flow hears EventScreenClosed once, on the update the fade ends.

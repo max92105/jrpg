@@ -14,6 +14,7 @@ internal sealed class DefeatScreen
 {
     private readonly SaveSlots _slots;
     private readonly IReadOnlyList<SaveSlotEntry> _saves;
+    private readonly AskedSounds _sounds = new();
     private bool _hasLeft;
 
     /// <param name="slots">The save files, read once when the battle is lost.</param>
@@ -34,12 +35,16 @@ internal sealed class DefeatScreen
 
     public DefeatEntrance Entrance { get; } = new();
 
+    /// <summary>What the last update asks to hear, from the choices or the save list.</summary>
+    public IReadOnlyList<string> Sounds => _sounds.Files;
+
     /// <summary>Whether the save list is open over the choices, after Load.</summary>
     public bool IsChoosingFile { get; private set; }
 
     /// <returns><see cref="LoadRequested"/> or <see cref="TitleRequested"/> once, on the update a choice is made; null otherwise.</returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
+        _sounds.Clear();
         Entrance.Update(delta);
         Files.Advance(delta);
         if (_hasLeft || !Entrance.IsComplete)
@@ -47,8 +52,23 @@ internal sealed class DefeatScreen
             return null;
         }
 
-        var request = IsChoosingFile ? ChooseFile(input) : Choose(Menu.Update(input));
+        var request = IsChoosingFile ? ChooseFile(input) : ChooseFromMenu(input);
         _hasLeft = request is not null;
+        return request;
+    }
+
+    private SceneRequest? ChooseFromMenu(InputFrame input)
+    {
+        var entry = Menu.Update(input);
+        _sounds.AskAll(Menu.Sounds);
+        var request = Choose(entry);
+
+        // A load whose file broke since the screen read it changes nothing, so it is silent (decision 421).
+        if (entry is DefeatEntry.LoadLastSave ? request is not null : entry is not null)
+        {
+            _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
+        }
+
         return request;
     }
 
@@ -78,9 +98,12 @@ internal sealed class DefeatScreen
         if (input.IsPressed(GameButton.Cancel))
         {
             IsChoosingFile = false;
+            _sounds.Ask(UiSoundFiles.Effects.MenuCancel);
             return null;
         }
 
-        return Files.ChooseToLoad(input) is { } save ? new LoadRequested(save) : null;
+        var save = Files.ChooseToLoad(input);
+        _sounds.AskAll(Files.Sounds);
+        return save is null ? null : new LoadRequested(save);
     }
 }

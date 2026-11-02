@@ -5,11 +5,12 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-music-and-sfx, slice S1 (the effect path and the title's sounds). Round 1.
-Verdict: Ready to commit. No Critical, 2 Warnings, 1 Suggestion.
+Plan: 2026-10-29-music-and-sfx, slice S2 (sounds on the leader choice, the defeat menu and the Forge). Round 1.
+Verdict: Ready to commit. No Critical, no Warning, 2 Suggestions.
 
-- Open (Warning): TitleScene.Update asks the confirm sound on Continue even when ContinueLatest refuses a file broken since the title read it; no test
-- Open (Warning): TitleSceneSoundTests.Update_ConfirmOnAnEmptySlot_AsksNothing reaches the row by a fixed Down press; a save in slot 2 leaves row 1 empty with no press
-- Open (Suggestion): S1's Done note omits that Cancel is asked by the panel's host, not SaveFilesPanel as the slice says; S2 and S3 rely on the panel's sounds
-- Note: content/audio/effects/ is untracked; the commit must include it
-- Note: the hand check (ticks, Cancel lower, empty slot silent, Effects at 0) is still the developer's
+- Open (Suggestion): ForgeSceneSoundTests.Update_YesInTheSalvagePrompt_AsksNothing never shows the Yes was carried out; Prompt is null after a No too; assert Actions null or the piece gone
+- Open (Suggestion): ForgeScene's two AskMoveIfChanged calls follow a closing brace with no blank line, unlike DefeatMenu and LeaderChoiceScene
+- Fixed (from S1): the title's Continue is silent when its file broke (TitleScene, tested)
+- Fixed (from S1): the empty-slot test reaches the row with a save in slot 2, no fixed Down
+- Fixed (from S1): S2's note records that Cancel is asked by the panel's host
+- Note: the hand check (leader choice, defeat menu, Forge, silent prompt and greyed action) is the developer's

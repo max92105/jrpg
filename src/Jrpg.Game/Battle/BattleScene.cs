@@ -47,6 +47,7 @@ internal sealed class BattleScene : IScene
     private bool _isFinished;
     private VictoryScreen? _victory;
     private VictoryScreenView? _victoryView;
+    private readonly AskedSounds _sounds = new();
     private DefeatScreen? _defeat;
     private DefeatScreenView? _defeatView;
     private EscapedNotice? _escaped;
@@ -82,12 +83,15 @@ internal sealed class BattleScene : IScene
         _impactEffects = new ImpactEffectsView(_sequence, _battlers, text);
     }
 
+    public IReadOnlyList<string> Sounds => _sounds.Files;
+
     /// <returns>
     /// <see cref="BattleFinished"/> when the victory screen or the escaped notice is left; <see cref="LoadRequested"/> or
     /// <see cref="TitleRequested"/> from the defeat screen's choice. Null otherwise.
     /// </returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
+        _sounds.Clear();
         if (_isFinished)
         {
             return UpdateOutcomeScreen(delta, input);
@@ -205,7 +209,19 @@ internal sealed class BattleScene : IScene
             return victory.Update(delta, input);
         }
 
-        return _escaped is { } escaped ? escaped.Update(delta, input) : _defeat?.Update(delta, input);
+        return _escaped is { } escaped ? escaped.Update(delta, input) : UpdateDefeat(delta, input);
+    }
+
+    private SceneRequest? UpdateDefeat(TimeSpan delta, InputFrame input)
+    {
+        if (_defeat is not { } defeat)
+        {
+            return null;
+        }
+
+        var request = defeat.Update(delta, input);
+        _sounds.AskAll(defeat.Sounds);
+        return request;
     }
 
     // Each outcome stays on this screen for its own: a victory's rewards, an escape's notice, a defeat's choices.

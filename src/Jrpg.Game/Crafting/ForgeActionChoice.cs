@@ -34,6 +34,9 @@ internal sealed class ForgeActionChoice
 
     public ForgeActionRow Selected => _rows[_cursor.Selected];
 
+    /// <summary>The selected row's place in <see cref="Rows"/>.</summary>
+    public int SelectedIndex => _cursor.Selected;
+
     /// <summary>The highlight gliding to the cursor's row.</summary>
     public SelectionMotion Selection { get; } = new();
 

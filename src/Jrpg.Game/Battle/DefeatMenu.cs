@@ -10,6 +10,7 @@ namespace Jrpg.Game.Battle;
 internal sealed class DefeatMenu
 {
     private readonly ListCursor _cursor;
+    private readonly AskedSounds _sounds = new();
 
     /// <param name="hasReadableSave">Whether any save file can be loaded.</param>
     public DefeatMenu(bool hasReadableSave)
@@ -23,9 +24,16 @@ internal sealed class DefeatMenu
 
     public DefeatEntry Selected => Entries[_cursor.Selected];
 
+    /// <summary>
+    /// What the last update asks to hear: a move. Whether a choice went through is the screen's to say.
+    /// </summary>
+    public IReadOnlyList<string> Sounds => _sounds.Files;
+
     /// <returns>The entry confirmed this update, or null.</returns>
     public DefeatEntry? Update(InputFrame input)
     {
+        _sounds.Clear();
+        var before = _cursor.Selected;
         if (input.IsPressed(GameButton.Up))
         {
             _cursor.MoveUp();
@@ -36,6 +44,7 @@ internal sealed class DefeatMenu
             _cursor.MoveDown();
         }
 
+        _sounds.AskMoveIfChanged(before, _cursor.Selected);
         return input.IsPressed(GameButton.Confirm) ? Selected : null;
     }
 }

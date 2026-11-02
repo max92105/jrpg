@@ -10,7 +10,8 @@ namespace Jrpg.Game.Exploration;
 /// and the fade back in (decision 257); an inn's stay asks first, its price under the question (decisions 380, 382),
 /// and Yes pays through Core before the beat, or shows the refusal line without it when the gold is short, while No
 /// declines. The step's line may show once the screen is back, and reading it finishes the playback so the next rest
-/// starts its own.
+/// starts its own. The rest's sound is asked, in the list the presenter passes, as the fade to black starts: the
+/// question, its No and a refusal are silent (decisions 421, 435).
 /// </summary>
 /// <param name="messages">The question's and the lines' text.</param>
 internal sealed class RestPlayback(UiMessages messages)
@@ -44,14 +45,14 @@ internal sealed class RestPlayback(UiMessages messages)
     /// <summary>
     /// Starts the rest: a free one (<paramref name="stay"/> null) fades at once; an inn's asks first.
     /// </summary>
-    public void Start(InnStay? stay)
+    public void Start(InnStay? stay, AskedSounds sounds)
     {
         IsStarted = true;
         IsDeclined = false;
         LineId = MessageIds.PartyRests;
         if (stay is null)
         {
-            _fade.Start();
+            StartBeat(sounds);
             return;
         }
 
@@ -59,7 +60,7 @@ internal sealed class RestPlayback(UiMessages messages)
     }
 
     /// <summary>The open question's input; Yes pays and fades, or refuses; No declines.</summary>
-    public void Answer(InputFrame input)
+    public void Answer(InputFrame input, AskedSounds sounds)
     {
         var (stay, question) = _asking ?? throw new InvalidOperationException("No question is open.");
         if (question.Update(input) is not { } answer)
@@ -74,7 +75,7 @@ internal sealed class RestPlayback(UiMessages messages)
         }
         else if (stay.TryPay())
         {
-            _fade.Start();
+            StartBeat(sounds);
         }
         else
         {
@@ -83,6 +84,12 @@ internal sealed class RestPlayback(UiMessages messages)
     }
 
     public void Advance(TimeSpan delta) => _fade.Update(delta);
+
+    private void StartBeat(AskedSounds sounds)
+    {
+        _fade.Start();
+        sounds.Ask(UiSoundFiles.Field.Rest);
+    }
 
     /// <summary>The rest's line was read, or the stay declined: the next rest starts its own.</summary>
     public void Finish() => IsStarted = false;

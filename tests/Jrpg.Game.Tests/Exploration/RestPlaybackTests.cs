@@ -17,8 +17,8 @@ public sealed class RestPlaybackTests
     {
         var (playback, _) = AskingAtTheInn(gold: 20);
 
-        playback.Answer(Pressing(GameButton.Up));
-        playback.Answer(Pressing(GameButton.Confirm));
+        playback.Answer(Pressing(GameButton.Up), new AskedSounds());
+        playback.Answer(Pressing(GameButton.Confirm), new AskedSounds());
 
         Assert.Null(playback.Question);
         Assert.True(playback.IsFading);
@@ -30,8 +30,8 @@ public sealed class RestPlaybackTests
     {
         var (playback, stay) = AskingAtTheInn(gold: 19);
 
-        playback.Answer(Pressing(GameButton.Up));
-        playback.Answer(Pressing(GameButton.Confirm));
+        playback.Answer(Pressing(GameButton.Up), new AskedSounds());
+        playback.Answer(Pressing(GameButton.Confirm), new AskedSounds());
 
         Assert.Null(playback.Question);
         Assert.False(playback.IsFading);
@@ -45,7 +45,7 @@ public sealed class RestPlaybackTests
     {
         var (playback, _) = AskingAtTheInn(gold: 20);
 
-        playback.Answer(Pressing(GameButton.Confirm));
+        playback.Answer(Pressing(GameButton.Confirm), new AskedSounds());
 
         Assert.Null(playback.Question);
         Assert.True(playback.IsDeclined);
@@ -61,7 +61,7 @@ public sealed class RestPlaybackTests
         session.Exploration.TryInteract();
         var stay = session.Exploration.CurrentInnStay!;
         var playback = new RestPlayback(RepositoryScreenText.Text.Messages);
-        playback.Start(stay);
+        playback.Start(stay, new AskedSounds());
         Assert.NotNull(playback.Question);
         return (playback, stay);
     }

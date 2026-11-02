@@ -320,6 +320,18 @@
       "gainDb": -4
     },
     {
+      "file": "effects/PlaceholderRest.wav",
+      "freesoundId": 271370,
+      "name": "singing bowl strike sound",
+      "author": "inoshirodesign",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/271370/",
+      "preview": "https://cdn.freesound.org/previews/271/271370_5159066-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.8,
+      "fadeOutSeconds": 0.4
+    },
+    {
       "file": "effects/PlaceholderSkillBlunt.wav",
       "freesoundId": 60006,
       "name": "Swoosh Metal Rod Swing Sound made with Bamboo Stick",
@@ -474,6 +486,18 @@
       "fetched": "2026-11-02",
       "maxSeconds": 0.04,
       "gainDb": -4
+    },
+    {
+      "file": "effects/PlaceholderWarp.wav",
+      "freesoundId": 432922,
+      "name": "Transition whoosh sound.wav",
+      "author": "SKsemi",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/432922/",
+      "preview": "https://cdn.freesound.org/previews/432/432922_8683387-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.6,
+      "fadeOutSeconds": 0.15
     }
   ]
 }

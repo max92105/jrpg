@@ -34,7 +34,7 @@ internal static class UiSoundFiles
     }
 
     /// <summary>
-    /// In <see cref="AudioFolders.Effects"/>: what the field's events sound like (decisions 430, 433).
+    /// In <see cref="AudioFolders.Effects"/>: what the field's events sound like (decisions 430, 433, 434).
     /// </summary>
     public static class Field
     {
@@ -45,6 +45,10 @@ internal static class UiSoundFiles
         public const string QuestUpdated = "PlaceholderQuestUpdated.wav";
 
         public const string QuestCompleted = "PlaceholderQuestCompleted.wav";
+
+        public const string Warp = "PlaceholderWarp.wav";
+
+        public const string Rest = "PlaceholderRest.wav";
     }
 
     /// <summary>

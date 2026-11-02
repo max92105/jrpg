@@ -120,7 +120,8 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the gold and shops plan (2026-11-01)
 
-- `Game/Exploration/EventPresenter` is at 273 lines after the sound pass's FE1 (its page reading left for `MessageReading`); the next growth past about 300 lines moves the rest's handling (`ShowRest` and the rest's line in `StartReading`) beside `RestPlayback` first.
+- `Game/Exploration/EventPresenter` is at 293 lines after the sound pass's FE3 (its page reading left for `MessageReading` in FE1); the next growth past about 300 lines moves the rest's handling (`ShowRest` and the rest's line in `StartReading`) beside `RestPlayback` first.
+- `Scenes/ScreenFade`: one update longer than the 0.08 s hold at black jumps over it, so `EventPresenter.ShowWarp` never sees `Holding`, the warp's fade runs out and in over the old map, then starts again with its sound (found by a test stepping 0.1 s in the sound pass's FE3). The fixed 1/60 s step hides it; a long frame would show it: let a fade report a hold it passed.
 - The "move down until the wanted row" test helper is written three times (`ShopSceneBuyTests`, `ShopSceneSellTests`, `ShopScenePreviewTests`): `Trade/ShopDriver.MoveDownUntil` (the sound pass, SH2) is the shared one they can switch to.
 - Private draw helpers over four parameters: `ShopDetailView.DrawRow` (6), `DrawPreview` and `DrawPicker` (5), `ShopListView.DrawTabs`, `DrawRowSelection` and `DrawRow` (5); fold the area or the opacity into a per-frame record when each view is next touched.
 - The gold plan's out-of-scope features (editing shops in the editor, gold in the save list, a `giveGold` step, Unique items in shops, the whole party's preview at once) are listed in `docs/plans/done/2026-10-29-gold-and-shops/README.md`, "Out of scope".

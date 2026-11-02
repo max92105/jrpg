@@ -22,7 +22,9 @@ namespace Jrpg.Game.Exploration;
 /// (ADR 0016). A Forge or shop step asks the scene to open its screen, once (decision 353). The event's voice-over
 /// plays through the voice channel until the event ends or is skipped (ADR 0018). The pages show through a
 /// <see cref="MessageReading"/>, whose typing ticks the presenter asks; a found item, a recruit and a quest's change
-/// sound as their line shows, a found item only when something was carried (decisions 421, 433).
+/// sound as their line shows, a found item only when something was carried (decisions 421, 433); a warp from the map
+/// sounds as its fade starts, never one out of a cutscene's black (decision 434), and a rest as
+/// <see cref="RestPlayback"/> asks.
 /// </summary>
 internal sealed class EventPresenter
 {
@@ -187,13 +189,13 @@ internal sealed class EventPresenter
     {
         if (!_rest.IsStarted)
         {
-            _rest.Start(_exploration.CurrentInnStay);
+            _rest.Start(_exploration.CurrentInnStay, _sounds);
             return;
         }
 
         if (_rest.Question is not null)
         {
-            _rest.Answer(input);
+            _rest.Answer(input, _sounds);
             return;
         }
 
@@ -221,6 +223,7 @@ internal sealed class EventPresenter
         if (_warpFade.Phase == FadePhase.Idle)
         {
             _warpFade.Start();
+            _sounds.Ask(UiSoundFiles.Field.Warp);
         }
         else if (_warpFade.Phase == FadePhase.Holding)
         {

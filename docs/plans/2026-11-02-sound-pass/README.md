@@ -45,7 +45,7 @@ The developer says "go" per phase, so Phases 1 and 2 (content and the script onl
 One line per slice; each slice's goal, types, tests and hand checks are in its file under `slices/`. Tick the box here when a slice is done, and write its deviations in the slice file. Tunables, design overview and risks: [design.md](design.md).
 
 ### Phase 1: the pipeline
-- [ ] ADR 0036: third-party placeholder audio. Write it from the entry under "ADRs" below (the options are chosen).
+- [x] ADR 0036: third-party placeholder audio. Write it from the entry under "ADRs" below (the options are chosen).
 - [ ] **P1. The manifest, the fetch script and the credits; the four interface sounds from freesound; the content rule amended** (script + content, about 240 lines) → [slices/P1.md](slices/P1.md)
 
 ### Phase 2: battle and skill sounds

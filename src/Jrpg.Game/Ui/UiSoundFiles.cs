@@ -15,4 +15,14 @@ internal static class UiSoundFiles
 
         public const string Battle = "PlaceholderBattle.wav";
     }
+
+    /// <summary>In <see cref="AudioFolders.Effects"/>: the interface's sounds (decision 421).</summary>
+    public static class Effects
+    {
+        public const string MenuMove = "PlaceholderMenuMove.wav";
+
+        public const string MenuConfirm = "PlaceholderMenuConfirm.wav";
+
+        public const string MenuCancel = "PlaceholderMenuCancel.wav";
+    }
 }

@@ -25,6 +25,7 @@ internal sealed class SaveFilesPanel
     private readonly UiTextures _ui;
     private readonly SpriteFontBase _headingFont;
     private readonly string _heading;
+    private readonly AskedSounds _sounds = new();
     private SaveSlotList? _list;
     private SaveSlotListView? _view;
 
@@ -43,6 +44,11 @@ internal sealed class SaveFilesPanel
 
     /// <summary>The files as last read; empty until the panel is opened.</summary>
     public IReadOnlyList<SaveSlotEntry> Entries => _list?.Entries ?? [];
+
+    /// <summary>
+    /// What the last <see cref="Update"/> or <see cref="ChooseToLoad"/> asks to hear: a move, a file loaded.
+    /// </summary>
+    public IReadOnlyList<string> Sounds => _sounds.Files;
 
     public void Open()
     {
@@ -63,7 +69,15 @@ internal sealed class SaveFilesPanel
 
     /// <returns>The file confirmed this update, or null.</returns>
     /// <exception cref="InvalidOperationException">The panel wasn't opened.</exception>
-    public SaveSlotEntry? Update(InputFrame input) => OpenList().Update(input);
+    public SaveSlotEntry? Update(InputFrame input)
+    {
+        _sounds.Clear();
+        var list = OpenList();
+        var before = list.Selected;
+        var chosen = list.Update(input);
+        _sounds.AskMoveIfChanged(before, list.Selected);
+        return chosen;
+    }
 
     /// <summary>
     /// Moves through the files and loads the readable one confirmed. A file that turned unreadable since the list was
@@ -82,6 +96,10 @@ internal sealed class SaveFilesPanel
         if (save is null)
         {
             Refresh();
+        }
+        else
+        {
+            _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
         }
 
         return save;

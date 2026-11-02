@@ -95,6 +95,7 @@ internal sealed class GameFlow : IScene
 
     private SceneRequest? AdvanceTheFlow(TimeSpan delta, InputFrame input)
     {
+        Audio.Effects.Clear();
         Session?.AddPlayTime(delta);
         // The flash first, so an update that ends it also runs the fade it starts.
         AdvanceEncounterFlash(delta);
@@ -113,6 +114,10 @@ internal sealed class GameFlow : IScene
         }
 
         var request = _scenes.Update(delta, _fade.IsFading ? default : input);
+
+        // Before the request is applied: it may push another scene or hold behind the fade, and the sound would be
+        // lost.
+        Audio.Effects.PlayAll(_scenes.TopSounds);
         if (request is null or QuitRequested)
         {
             return request;

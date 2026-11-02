@@ -8,4 +8,6 @@ internal sealed class AudioChannels
     public VoiceChannel Voice { get; } = new();
 
     public MusicChannel Music { get; } = new();
+
+    public EffectChannel Effects { get; } = new();
 }

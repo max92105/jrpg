@@ -55,7 +55,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **C2. An encounter's own theme: the Goblin Chief's boss theme** (Core + Data + Game + content, about 110 lines; after the enemy plan's C1) → [slices/C2.md](slices/C2.md)
 
 ### Phase 3: sound effects on the screens
-- [ ] **S1. The effect path, and the title's move, confirm and cancel sounds** (Game, about 240 lines) → [slices/S1.md](slices/S1.md)
+- [x] **S1. The effect path, and the title's move, confirm and cancel sounds** (Game, about 240 lines) → [slices/S1.md](slices/S1.md)
 - [ ] **S2. Sounds on the leader choice, the defeat menu and the Forge** (Game, about 200 lines) → [slices/S2.md](slices/S2.md)
 - [ ] **S3. Sounds on the game menu's opening and tabs, the Options page and the System page** (Game, about 210 lines) → [slices/S3.md](slices/S3.md)
 - [ ] **S4. Sounds on the Inventory, Equipment, Party and Status pages** (Game, about 230 lines) → [slices/S4.md](slices/S4.md)

@@ -45,6 +45,9 @@ internal sealed class SceneStack
     /// <returns>The top scene's request; null when it has none or the stack is empty.</returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input) => _scenes.Count > 0 ? _scenes[^1].Update(delta, input) : null;
 
+    /// <summary>The top scene's <see cref="IScene.Sounds"/>; none with an empty stack.</summary>
+    public IReadOnlyList<string> TopSounds => _scenes.Count > 0 ? _scenes[^1].Sounds : [];
+
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
         for (var index = 0; index < _scenes.Count; index++)

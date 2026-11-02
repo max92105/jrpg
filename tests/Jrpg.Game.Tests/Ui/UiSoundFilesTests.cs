@@ -11,6 +11,7 @@ public sealed class UiSoundFilesTests
     // Compared with the folder's list, since File.Exists ignores case on Windows and the release may not.
     [Theory]
     [InlineData(typeof(UiSoundFiles.Music), AudioFolders.Music)]
+    [InlineData(typeof(UiSoundFiles.Effects), AudioFolders.Effects)]
     public void EveryConstant_ExistsInItsFolder(Type group, string folder)
     {
         var files = group.GetFields(BindingFlags.Public | BindingFlags.Static)
@@ -26,6 +27,6 @@ public sealed class UiSoundFilesTests
     [Fact]
     public void EveryGroup_IsCheckedAbove()
     {
-        Assert.Single(typeof(UiSoundFiles).GetNestedTypes());
+        Assert.Equal(2, typeof(UiSoundFiles).GetNestedTypes().Length);
     }
 }

@@ -55,6 +55,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     private SoundLibrary? _sounds;
     private VoicePlayer? _voicePlayer;
     private MusicPlayer? _musicPlayer;
+    private SoundEffectPlayer? _effectPlayer;
 
     /// <param name="rootScene">The game flow, or the screen explaining why the game can't start.</param>
     /// <param name="contentRoot">The content folder, holding the art and audio folders.</param>
@@ -191,6 +192,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
     {
         _voicePlayer?.Follow(_audio.Voice, VolumeLevel.GainOf(_settings.VoiceVolume));
         _musicPlayer?.Follow(_audio.Music, VolumeLevel.GainOf(_settings.MusicVolume), delta);
+        _effectPlayer?.Play(_audio.Effects, VolumeLevel.GainOf(_settings.EffectsVolume));
     }
 
     // The audio system is touched once here, so a missing device shows at startup rather than mid-intro.
@@ -211,6 +213,7 @@ internal sealed class JrpgGame : Microsoft.Xna.Framework.Game
         _voicePlayer = new VoicePlayer(_sounds);
         string[] themes = [UiSoundFiles.Music.Title, UiSoundFiles.Music.Battle];
         _musicPlayer = new MusicPlayer(_sounds, themes);
+        _effectPlayer = new SoundEffectPlayer(_sounds);
 
         // Loaded now, so the encounter's flash doesn't stall on the battle theme (ADR 0035).
         foreach (var theme in themes)

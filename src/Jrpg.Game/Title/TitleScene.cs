@@ -51,6 +51,7 @@ internal sealed class TitleScene : IScene
     private readonly UiTextures _ui;
     private readonly TitleEntrance _entrance = new();
     private readonly SelectionGlide _glide = new(0);
+    private readonly AskedSounds _sounds = new();
 
     // How long the screen has shown, for the pointer's bob.
     private TimeSpan _shown;
@@ -95,8 +96,11 @@ internal sealed class TitleScene : IScene
     /// <summary>The entry the cursor is on, so tests can pick entries by what they are.</summary>
     internal TitleEntry SelectedEntry => _menu.Selected;
 
+    public IReadOnlyList<string> Sounds => _sounds.Files;
+
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
+        _sounds.Clear();
         _entrance.Advance(delta);
         _glide.Advance(delta);
         _files.Advance(delta);
@@ -106,9 +110,19 @@ internal sealed class TitleScene : IScene
             return ChooseFile(input);
         }
 
+        var before = _menu.SelectedIndex;
         var chosen = _menu.Update(input);
+        _sounds.AskMoveIfChanged(before, _menu.SelectedIndex);
         _glide.Follow(_menu.SelectedIndex, _menu.Entries.Count);
-        return Choose(chosen);
+        var request = Choose(chosen);
+
+        // A Continue whose file broke since the title read it changes nothing, so it is silent (decision 421).
+        if (chosen is TitleEntry.Continue ? request is not null : chosen is not null)
+        {
+            _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
+        }
+
+        return request;
     }
 
     public void Draw(SpriteBatch batch, TextureLibrary textures)
@@ -167,10 +181,13 @@ internal sealed class TitleScene : IScene
         if (input.IsPressed(GameButton.Cancel))
         {
             IsChoosingFile = false;
+            _sounds.Ask(UiSoundFiles.Effects.MenuCancel);
             return null;
         }
 
-        return _files.ChooseToLoad(input) is { } save ? new LoadRequested(save) : null;
+        var save = _files.ChooseToLoad(input);
+        _sounds.AskAll(_files.Sounds);
+        return save is null ? null : new LoadRequested(save);
     }
 
     // One band per entry, all as wide as the longest, stacked and centered in the space below the name.

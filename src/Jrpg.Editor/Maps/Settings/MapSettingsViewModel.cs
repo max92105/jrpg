@@ -5,22 +5,32 @@ using Jrpg.Core.Maps;
 namespace Jrpg.Editor.Maps.Settings;
 
 /// <summary>
-/// The map settings dialog: display name, size and random battles, edited apart from the map until applied. The id
-/// can't change (question 70), since saves and warps refer to it. Numbers are kept as typed (<see cref="TypedCounts"/>).
+/// The map settings dialog: display name, track, size and random battles, edited apart from the map until applied. The
+/// id can't change (question 70), since saves and warps refer to it. Numbers are kept as typed
+/// (<see cref="TypedCounts"/>).
 /// </summary>
 internal sealed partial class MapSettingsViewModel : ObservableObject
 {
+    /// <summary>The Music box's first entry: a silent map (decision 419).</summary>
+    public const string NoMusic = "(none)";
+
     private readonly (int Width, int Height) _currentSize;
     private readonly MapSettings _currentSettings;
 
     /// <param name="map">The map as it is.</param>
     /// <param name="encounterIds">Every encounter random battles can pick from.</param>
-    public MapSettingsViewModel(MapDefinition map, IEnumerable<string> encounterIds)
+    /// <param name="musicFiles">The tracks in the music folder, so only a file that exists can be chosen.</param>
+    public MapSettingsViewModel(MapDefinition map, IEnumerable<string> encounterIds, IReadOnlyList<string> musicFiles)
     {
         MapId = map.Id;
         _currentSettings = map.Settings;
         _currentSize = (map.Layout.Width, map.Layout.Height);
         DisplayName = map.Settings.DisplayName;
+        var track = map.Settings.MusicFile;
+
+        // A track no longer in the folder stays listed, so opening the dialog never changes the map.
+        MusicChoices = track is null || musicFiles.Contains(track) ? [NoMusic, .. musicFiles] : [NoMusic, track, .. musicFiles];
+        SelectedMusic = track ?? NoMusic;
         WidthText = Text(map.Layout.Width);
         HeightText = Text(map.Layout.Height);
         var table = map.Settings.RandomEncounters;
@@ -35,6 +45,11 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
     public string MapId { get; }
 
     public IReadOnlyList<EncounterChoice> Encounters { get; }
+
+    public IReadOnlyList<string> MusicChoices { get; }
+
+    [ObservableProperty]
+    public partial string SelectedMusic { get; set; }
 
     [ObservableProperty]
     public partial string DisplayName { get; set; }
@@ -77,7 +92,7 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
             ? "The battle odds and the steps without battles must be whole numbers of at least 1."
             : null;
 
-    /// <summary>Whether the name or the random battles differ from the map's.</summary>
+    /// <summary>Whether the name, the track or the random battles differ from the map's.</summary>
     public bool AreSettingsChanged => !AreSame(ToSettings(), _currentSettings);
 
     /// <summary>The settings as edited, once <see cref="OddsProblem"/> is null; the encounter list is checked when the map is saved.</summary>
@@ -86,8 +101,7 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
         Id = MapId,
         DisplayName = DisplayName.Trim(),
 
-        // The dialog can't choose a track yet (the music plan's E1); it keeps the map's.
-        MusicFile = _currentSettings.MusicFile,
+        MusicFile = SelectedMusic == NoMusic ? null : SelectedMusic,
         RandomEncounters = HasRandomEncounters
             ? new RandomEncounterTable
             {
@@ -103,6 +117,7 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
     // Records compare lists by reference, so the encounters are compared as sets: their order means nothing to the game.
     private static bool AreSame(MapSettings edited, MapSettings current) =>
         edited.DisplayName == current.DisplayName
+        && edited.MusicFile == current.MusicFile
         && (edited.RandomEncounters, current.RandomEncounters) switch
         {
             (null, null) => true,

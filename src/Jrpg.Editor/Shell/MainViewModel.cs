@@ -6,6 +6,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
+using Jrpg.Data.Audio;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Events;
@@ -27,6 +28,7 @@ namespace Jrpg.Editor.Shell;
 internal sealed partial class MainViewModel : ObservableObject
 {
     private readonly ContentWriter _writer;
+    private readonly string _audioRoot;
     private readonly Func<string, bool> _confirm;
     private readonly Dictionary<string, (int Width, int Height)> _sheetImageSizes = new(StringComparer.OrdinalIgnoreCase);
 
@@ -44,6 +46,7 @@ internal sealed partial class MainViewModel : ObservableObject
             }
         };
         ArtRoot = ArtFolders.RootIn(contentRoot);
+        _audioRoot = AudioFolders.RootIn(contentRoot);
         try
         {
             var loaded = ContentCatalogLoader.Load(contentRoot);
@@ -276,11 +279,12 @@ internal sealed partial class MainViewModel : ObservableObject
     public void ShowPaintHint() => CursorStatus = "Choose a tile in the Tiles panel";
 
     /// <summary>The settings dialog's state for the open map; null when no map is open.</summary>
-    public MapSettingsViewModel? StartEditingSettings() => CurrentMap is { } open ? new(open.Map, Catalog!.Encounters.Keys) : null;
+    public MapSettingsViewModel? StartEditingSettings() =>
+        CurrentMap is { } open ? new(open.Map, Catalog!.Encounters.Keys, AudioFolders.FilesIn(_audioRoot, AudioFolders.Music)) : null;
 
     /// <summary>
-    /// Applies the settings dialog to the open map: the new size first, asking before it drops anything, then the name
-    /// and random battles. Each is one undo step.
+    /// Applies the settings dialog to the open map: the new size first, asking before it drops anything, then the name,
+    /// the track and the random battles. Each is one undo step.
     /// </summary>
     /// <returns>False when nothing was applied: a number is invalid or the user kept the old size.</returns>
     public bool TryApplySettings(MapSettingsViewModel edited)

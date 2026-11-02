@@ -10,4 +10,13 @@ public static class AudioFolders
     public const string Music = "music";
 
     public static string RootIn(string contentRoot) => Path.Combine(contentRoot, "audio");
+
+    /// <returns>The <c>.wav</c> names in a folder, by exact name, sorted; empty when the folder is missing.</returns>
+    public static IReadOnlyList<string> FilesIn(string audioRoot, string folder)
+    {
+        var path = Path.Combine(audioRoot, folder);
+        return Directory.Exists(path)
+            ? [.. Directory.EnumerateFiles(path, "*.wav").Select(file => Path.GetFileName(file)).Order(StringComparer.Ordinal)]
+            : [];
+    }
 }

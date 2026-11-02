@@ -5,12 +5,14 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-music-and-sfx, slice P3 (the map's track pauses and resumes). Round 1.
-Verdict: Ready to commit. No Critical, one Warning.
+Plan: 2026-10-29-music-and-sfx, slice E1 (the map's track in the editor). Round 1.
+Verdict: Ready to commit. No Critical, no Warning.
 
-- Open (Warning): SoundLibrary.cs:7 summary says each sound is "loaded on first use and kept"; Release makes that false
-- Open (Suggestion): MusicPlayer.Follow's `_mix.Paused != wasPaused` clause can't decide anything: Paused only changes with Playing
-- Open (Suggestion): MusicPlayer.cs:50 foreach header is 140 columns; extract the dropped tracks to a named method
-- Open (Suggestion): JrpgGame.StartAudio lists the two themes twice, as keptLoaded and as preloads; share one list
-- Fixed (from P2, Suggestion): JrpgGame is now PlayWhatTheChannelsAsk
-- Fixed (from P2, Suggestion): the comment over _sounds now names voices and music
+- Open (Suggestion): MainViewModel.cs:286 and SetMapSettingsEdit.cs:5 list the name and random battles but not the track
+- Open (Suggestion): AudioFoldersTests sort test passes without Order on NTFS; a temp folder with a.wav, B.wav, notes.txt pins sort and filter
+- Open (Suggestion): no test that StartEditingSettings passes the music folder's files to the dialog
+- Note: first verify run failed the tests step (total 3486, error 1, exit -1, no named test); 9 later runs passed 3487; cause unknown
+- Fixed (from P3, Warning): SoundLibrary summary now says kept until released
+- Fixed (from P3, Suggestion): MusicPlayer no longer has the `_mix.Paused != wasPaused` clause
+- Fixed (from P3, Suggestion): MusicPlayer foreach now uses TracksLeavingTheMix
+- Fixed (from P3, Suggestion): JrpgGame passes one themes list to MusicPlayer

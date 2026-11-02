@@ -14,7 +14,7 @@ public sealed class MapSettingsViewModelTests
             RandomEncounters = new RandomEncounterTable { OneInSteps = 25, GraceSteps = 3, EncounterIds = ["wolves", "goblin_trio"] },
         });
 
-    private readonly MapSettingsViewModel _settings = new(_forest, ["wolves", "bats", "goblin_trio"]);
+    private readonly MapSettingsViewModel _settings = new(_forest, ["wolves", "bats", "goblin_trio"], []);
 
     [Fact]
     public void Constructor_MapWithBattles_TicksItsEncounters()
@@ -25,12 +25,68 @@ public sealed class MapSettingsViewModelTests
     }
 
     [Fact]
-    public void ToSettings_MapWithATrack_KeepsIt()
+    public void Constructor_MapWithATrack_SelectsIt()
     {
-        var scored = new MapDefinition(_forest.Layout, _forest.Settings with { MusicFile = "PlaceholderForest.wav" });
-        var settings = new MapSettingsViewModel(scored, ["wolves"]) { DisplayName = "Deep forest" };
+        var settings = Scored("Forest.wav", ["Forest.wav", "Town.wav"]);
 
-        Assert.Equal("PlaceholderForest.wav", settings.ToSettings().MusicFile);
+        Assert.Equal("Forest.wav", settings.SelectedMusic);
+        Assert.Equal([MapSettingsViewModel.NoMusic, "Forest.wav", "Town.wav"], settings.MusicChoices);
+        Assert.False(settings.AreSettingsChanged);
+    }
+
+    [Fact]
+    public void Constructor_MapWithoutATrack_SelectsNone()
+    {
+        Assert.Equal(MapSettingsViewModel.NoMusic, Scored(null, ["Town.wav"]).SelectedMusic);
+    }
+
+    [Fact]
+    public void Constructor_TrackNotInTheFolder_KeepsItSelected()
+    {
+        var settings = Scored("Gone.wav", ["Town.wav"]);
+
+        Assert.Equal([MapSettingsViewModel.NoMusic, "Gone.wav", "Town.wav"], settings.MusicChoices);
+        Assert.Equal("Gone.wav", settings.ToSettings().MusicFile);
+        Assert.False(settings.AreSettingsChanged);
+    }
+
+    [Fact]
+    public void ToSettings_MapWithATrack_KeepsItWhenRenamed()
+    {
+        var settings = Scored("Forest.wav", ["Forest.wav"]);
+        settings.DisplayName = "Deep forest";
+
+        Assert.Equal("Forest.wav", settings.ToSettings().MusicFile);
+    }
+
+    [Fact]
+    public void ToSettings_TrackChosen_IsTheTrack()
+    {
+        var settings = Scored("Forest.wav", ["Forest.wav", "Town.wav"]);
+
+        settings.SelectedMusic = "Town.wav";
+
+        Assert.Equal("Town.wav", settings.ToSettings().MusicFile);
+    }
+
+    [Fact]
+    public void ToSettings_NoneChosen_HasNoMusicFile()
+    {
+        var settings = Scored("Forest.wav", ["Forest.wav"]);
+
+        settings.SelectedMusic = MapSettingsViewModel.NoMusic;
+
+        Assert.Null(settings.ToSettings().MusicFile);
+    }
+
+    [Fact]
+    public void AreSettingsChanged_OnlyMusicChanged_IsTrue()
+    {
+        var settings = Scored("Forest.wav", ["Forest.wav", "Town.wav"]);
+
+        settings.SelectedMusic = "Town.wav";
+
+        Assert.True(settings.AreSettingsChanged);
     }
 
     [Fact]
@@ -116,4 +172,7 @@ public sealed class MapSettingsViewModelTests
 
         Assert.Null(_settings.OddsProblem);
     }
+
+    private static MapSettingsViewModel Scored(string? track, IReadOnlyList<string> files) =>
+        new(new MapDefinition(_forest.Layout, _forest.Settings with { MusicFile = track }), ["wolves", "goblin_trio"], files);
 }

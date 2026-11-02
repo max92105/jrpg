@@ -18,6 +18,9 @@
     <TextBlock Text="Name shown to the player" />
     <TextBox x:Name="NameBox" Text="{Binding DisplayName, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,8" />
 
+    <TextBlock Text="Music" />
+    <ComboBox ItemsSource="{Binding MusicChoices}" SelectedItem="{Binding SelectedMusic}" Margin="0,2,0,8" />
+
     <TextBlock Text="Size in cells (width x height)" />
     <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
       <TextBox Width="60" Text="{Binding WidthText, UpdateSourceTrigger=PropertyChanged}" />

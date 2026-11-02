@@ -1,5 +1,5 @@
 # Sound pass: freesound placeholders and the places still silent
-Status: approved
+Status: done
 
 Drafted on 2026-11-02 from the developer's request: "Make another plan to make another pass on sound, and use https://freesound.org/ as a reference: find there sounds as placeholders. If you need other placeholders in the future, use this platform." Builds on the music and sound effects plan (`docs/plans/done/2026-10-29-music-and-sfx/`), ADR 0018 and ADR 0035, and on the backlog's lines from that plan (`docs/plans/backlog.md`, "From the music and sound effects plan").
 
@@ -68,7 +68,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **V1. The victory screen sounds a level-up, the drops and leaving** (Game + content, about 170 lines) → [slices/V1.md](slices/V1.md)
 
 ### Phase 6: levels
-- [ ] **L1. Levels evened out across every sound; the sounds still vetoed replaced** (content, hand check only) → [slices/L1.md](slices/L1.md)
+- [x] **L1. Levels evened out across every sound; the sounds still vetoed replaced** (content, hand check only) → [slices/L1.md](slices/L1.md)
 
 ## Decisions
 - **426. Placeholder effects come through a manifest and a script.** `content/audio/sound-sources.json` names each placeholder effect's freesound source and the conversion's settings; `.claude/scripts/fetch-placeholder-sounds.ps1` downloads each preview with `curl`, converts it with ffmpeg into the named WAV and writes `content/audio/CREDITS.md` from the manifest. Swapping a sound is one manifest line and a rerun. No API key. The technical choices (format, trim, fades, credits, the unique key) are ADR 0036's.

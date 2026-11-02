@@ -120,6 +120,7 @@ internal sealed class ForgeScene : IScene
             return;
         }
 
+        _sounds.Ask(UiSoundFiles.Effects.Deal);
         Actions = null;
         _list.Show(_list.Cursor?.Selected ?? 0);
         _materials.Refresh();

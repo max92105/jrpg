@@ -101,9 +101,10 @@ public sealed class ForgeSceneSoundTests
         Assert.Equal([UiSoundFiles.Effects.MenuConfirm], forge.Sounds);
     }
 
-    // Opening the prompt, and its Yes, are both silent: "Yes" starts on No, so Left moves to it.
+    // Opening the prompt is silent; its Yes sounds the deal once the salvage went through (decision 435, which replaced
+    // the music plan's silent Yes). "Yes" starts on No, so Left moves to it.
     [Fact]
-    public void Update_YesInTheSalvagePrompt_AsksNothing()
+    public void Update_YesInTheSalvagePrompt_AsksTheDealSound()
     {
         var forge = ForgeOn(TwoPieces(), ForgeAction.Salvage);
 
@@ -113,7 +114,7 @@ public sealed class ForgeSceneSoundTests
         forge.Update(TimeSpan.Zero, Pressing(GameButton.Confirm));
 
         Assert.Empty(atTheQuestion);
-        Assert.Empty(forge.Sounds);
+        Assert.Equal([UiSoundFiles.Effects.Deal], forge.Sounds);
         Assert.Null(forge.Prompt);
 
         // A salvage closes the actions, a No would keep them open.

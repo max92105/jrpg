@@ -116,7 +116,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `ForgeList` and `Menus/InventoryList` each hold the cursor-plus-gliding-highlight pair that `Ui/RowSelection` now packages for the Shop's lists (gold plan B2): switch them to it when next touched.
 - `StatusSkillsView.DescriptionLayout` (a wrapped-text layout) has two users, the Status page and the Shop's detail column (gold plan L2a); move it to `Ui/` and fix its doc, which still names the Status page's font size.
 - `ShopListView.Draw` and `ForgeListView.Draw` take 5 parameters (the limit is 4): pass the fixed area to their constructors, as `ShopDetailView` does (L2b review).
-- `ShopScene` is at 296 lines: the next slice that adds to it splits it first (the tabs and the category rails, or the preview, into their own type).
+- `ShopScene` is at 286 lines after the sound pass's SH3 (the preview left in SH1): the next slice that adds to it splits the list's input (moves, category changes and their sounds) into its own type first.
 
 ## From the gold and shops plan (2026-11-01)
 
@@ -149,7 +149,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 - `OptionsPageTests` (lines 53-88): the older text speed tests reach their row with one Down press; `PageOn(OptionsPage.TextSpeedRow)` now exists (V1 review).
 - `SystemPageTests`' older tests (`Update_ConfirmQuit_AsksBeforeRequesting`, `Update_YesToQuit_RequestsQuit`, `Update_YesToTitleScreen_RequestsTitle`, `Update_AnswerNo_StaysInPage`) and the new `Update_ConfirmQuit_AsksNothing` reach rows by fixed presses: `SystemPage` exposes no selected entry (S3 review).
-- `Trade/ShopScene` and its lists play no sounds: the music plan's slices predate the Shop, and `ShopScene` is at 296 lines, so its tabs or preview split out first, then it asks move, confirm and cancel as the Forge does (S4).
 - `BattleSceneTests` and `BattleSceneSoundTests` reach command rows by fixed presses (Up wrapping to Run, Down counted to Defend), since `BattleScene` doesn't expose its menu's selection (B4 review).
 - `Battle/BattleScene` is at 288 lines after the music plan's B5: the next change that grows it moves its outcome screens' update and finish into their own type first.
 - `Menus/OptionsPage.DrawRow` is 25 lines since the volume pips (V2): extract the pips' drawing when the page is next touched.

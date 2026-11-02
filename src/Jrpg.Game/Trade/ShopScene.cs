@@ -84,7 +84,9 @@ internal sealed class ShopScene : IScene
     public string? Notice => _counter.Notice ?? (SelectedRow?.Refusal is { } refusal ? _messages.Text(TradeRefusalNames.IdOf(refusal)) : null);
 
     /// <summary>
-    /// Move, confirm and cancel as the cursor moves, enters or leaves a list, or leaves the Shop (decision 421).
+    /// Move, confirm and cancel as the cursor moves, enters or leaves a list, or leaves the Shop (decision 421); and,
+    /// through the counter, the picker's opening, ticks and cancel, and the coins once a deal went through (decision
+    /// 435).
     /// </summary>
     public IReadOnlyList<string> Sounds => _sounds.Files;
 
@@ -175,7 +177,7 @@ internal sealed class ShopScene : IScene
     {
         if (_counter.IsOpen)
         {
-            _counter.Update(input);
+            _counter.Update(input, _sounds);
             return;
         }
 
@@ -212,11 +214,11 @@ internal sealed class ShopScene : IScene
     {
         if (Tab == ShopTab.Buy)
         {
-            _counter.Buy(row);
+            _counter.Buy(row, _sounds);
         }
         else
         {
-            _counter.Sell(row);
+            _counter.Sell(row, _sounds);
         }
     }
 

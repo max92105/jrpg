@@ -57,7 +57,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 3: the Shop
 - [x] **SH1. The Shop's gear preview moves into `Trade/GearPreview`** (Game refactor, about 110 lines) → [slices/SH1.md](slices/SH1.md)
 - [x] **SH2. The Shop's move, confirm and cancel sounds on the tabs and in the lists** (Game, about 190 lines) → [slices/SH2.md](slices/SH2.md)
-- [ ] **SH3. A deal's sound as a purchase, a sale or the Forge's salvage goes through; the picker's count ticks** (Game + content, about 210 lines) → [slices/SH3.md](slices/SH3.md)
+- [x] **SH3. A deal's sound as a purchase, a sale or the Forge's salvage goes through; the picker's count ticks** (Game + content, about 210 lines) → [slices/SH3.md](slices/SH3.md)
 
 ### Phase 4: the field's events
 - [ ] **FE1. The event presenter's page reading moves into `Exploration/MessageReading`** (Game refactor, about 140 lines) → [slices/FE1.md](slices/FE1.md)

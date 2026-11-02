@@ -12,7 +12,9 @@ namespace Jrpg.Game.Trade;
 /// stack, bought or sold, goes through the <see cref="QuantityPicker"/>; a piece is sold only after a question with its
 /// price under it (decisions 379, 380), as destroying one asks at the Forge. While the picker or the question is open
 /// the counter takes every press. Both lists are built again after a deal, since the quotes follow the gold and the
-/// bag; the notice names what was dealt until the Shop clears it.
+/// bag; the notice names what was dealt until the Shop clears it. It asks its sounds in the list the scene passes each
+/// call (decision 435): the coins once Core dealt, however it was confirmed; the picker, a value chosen, ticks on a
+/// change and sounds its Cancel; the sale question is silent, its No included.
 /// </summary>
 internal sealed class ShopCounter
 {
@@ -52,19 +54,24 @@ internal sealed class ShopCounter
     public void ClearNotice() => Notice = null;
 
     /// <summary>Confirm on <paramref name="row"/>, an available row of the Buy list.</summary>
-    public void Buy(TradeRow row)
+    public void Buy(TradeRow row, AskedSounds sounds)
     {
         if (row.Piece is { } piece)
         {
-            Settle(_shop.TryBuy(piece), Named(MessageIds.ShopBought, piece));
+            if (Settle(_shop.TryBuy(piece), Named(MessageIds.ShopBought, piece)))
+            {
+                sounds.Ask(UiSoundFiles.Effects.Deal);
+            }
+
             return;
         }
 
+        sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
         OpenPicker(_shop.MostBuyable(row.Item), count => _shop.QuoteBuy(row.Item, count), count => Settle(_shop.TryBuy(row.Item, count), Counted(MessageIds.ShopBoughtCount, row, count)));
     }
 
     /// <summary>Confirm on <paramref name="row"/>, an available row of the Sell list.</summary>
-    public void Sell(TradeRow row)
+    public void Sell(TradeRow row, AskedSounds sounds)
     {
         if (row.Piece is { } piece)
         {
@@ -74,27 +81,46 @@ internal sealed class ShopCounter
             return;
         }
 
+        sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
         OpenPicker(_sales.MostSellable(row.Item), count => _sales.QuoteSale(row.Item, count), count => Settle(_sales.TrySell(row.Item, count), Counted(MessageIds.ShopSoldCount, row, count)));
     }
 
     /// <summary>The open picker's or question's input: Yes settles the deal, No or Cancel drops it.</summary>
-    public void Update(InputFrame input)
+    public void Update(InputFrame input, AskedSounds sounds)
     {
         var deal = _open ?? throw new InvalidOperationException("Nothing is open.");
+        var count = deal.Picker?.Count ?? 0;
         if (deal.Answer(input) is not { } given)
         {
+            sounds.AskMoveIfChanged(count, deal.Picker?.Count ?? 0);
             return;
         }
 
         _open = null;
+        Close(deal, given, sounds);
+    }
+
+    // The coins only once Core dealt; the picker's No is its Cancel, the question's No is silent (decision 435).
+    private static void Close(OpenDeal deal, ConfirmAnswer given, AskedSounds sounds)
+    {
         if (given == ConfirmAnswer.Yes)
         {
-            deal.Settle();
+            if (deal.Settle())
+            {
+                sounds.Ask(UiSoundFiles.Effects.Deal);
+            }
+
+            return;
+        }
+
+        if (deal.Picker is not null)
+        {
+            sounds.Ask(UiSoundFiles.Effects.MenuCancel);
         }
     }
 
     // The count is read when the player confirms, not when the picker opens.
-    private void OpenPicker(int most, Func<int, TradeQuote> quote, Action<int> settle)
+    private void OpenPicker(int most, Func<int, TradeQuote> quote, Func<int, bool> settle)
     {
         var picker = new QuantityPicker(most, quote);
         _open = new OpenDeal(picker, null, () => settle(picker.Count));
@@ -102,16 +128,17 @@ internal sealed class ShopCounter
 
     // Core refusing here means the quote changed under the open deal; the row's new quote shows instead of a notice.
     // The cursor stays on its row, or the last once a dealt piece's row is gone.
-    private void Settle(bool dealt, string notice)
+    private bool Settle(bool dealt, string notice)
     {
         if (!dealt)
         {
-            return;
+            return false;
         }
 
         Stock.Refresh();
         Sales.Refresh();
         Notice = notice;
+        return true;
     }
 
     // A piece is named as the question names it, with its rarity.
@@ -121,7 +148,7 @@ internal sealed class ShopCounter
         _messages.Format(noticeId, new MessageArgument("name", row.Name.Text), MessageArgument.Number("count", count));
 
     // The picker or the question that takes the presses, and what Yes does; one of the two is open.
-    private sealed record OpenDeal(QuantityPicker? Picker, ConfirmPrompt? Prompt, Action Settle)
+    private sealed record OpenDeal(QuantityPicker? Picker, ConfirmPrompt? Prompt, Func<bool> Settle)
     {
         public ConfirmAnswer? Answer(InputFrame input) => Prompt is { } prompt ? prompt.Update(input) : Picker!.Update(input);
     }

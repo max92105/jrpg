@@ -16,7 +16,10 @@ internal static class UiSoundFiles
         public const string Battle = "PlaceholderBattle.wav";
     }
 
-    /// <summary>In <see cref="AudioFolders.Effects"/>: the interface's sounds (decision 421).</summary>
+    /// <summary>
+    /// In <see cref="AudioFolders.Effects"/>: the interface's sounds (decision 421), and a deal or a salvage gone
+    /// through (decision 435).
+    /// </summary>
     public static class Effects
     {
         public const string MenuMove = "PlaceholderMenuMove.wav";
@@ -26,6 +29,8 @@ internal static class UiSoundFiles
         public const string MenuCancel = "PlaceholderMenuCancel.wav";
 
         public const string TextTyping = "PlaceholderTextTyping.wav";
+
+        public const string Deal = "PlaceholderDeal.wav";
     }
 
     /// <summary>

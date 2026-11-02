@@ -54,6 +54,18 @@
       "fadeOutSeconds": 0.15
     },
     {
+      "file": "effects/PlaceholderDeal.wav",
+      "freesoundId": 121990,
+      "name": "coinBag.wav",
+      "author": "tomf_",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/121990/",
+      "preview": "https://cdn.freesound.org/previews/121/121990_943560-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.6,
+      "fadeOutSeconds": 0.1
+    },
+    {
       "file": "effects/PlaceholderDefend.wav",
       "freesoundId": 407481,
       "name": "equip.mp3",

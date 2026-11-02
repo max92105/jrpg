@@ -16,12 +16,15 @@ public sealed class SkillCatalogValidatorTests
         Name = "Heal",
         Description = "",
         IconFile = "",
+        SoundFile = "Mend.wav",
         Effect = new Effect(EffectKind.RestoreHp, Power: 15, Targeting.SingleAlly),
     };
 
     public static TheoryData<SkillDefinition, string> InvalidSkills => new()
     {
         { _heal with { Name = "" }, "name must not be empty." },
+        { _heal with { SoundFile = "" }, "soundFile must name a sound." },
+        { _heal with { SoundFile = "  " }, "soundFile must name a sound." },
         { _heal with { ResourceChanges = [null!] }, "resourceChanges must not contain a null entry." },
         { _heal with { ResourceChanges = [new ResourceChange("mana", -3), new ResourceChange("mana", -2)] }, "resourceChanges lists 'mana' more than once." },
         { _heal with { Effect = _heal.Effect with { Power = -5 } }, "effect.power must be at least 0 (was -5)." },

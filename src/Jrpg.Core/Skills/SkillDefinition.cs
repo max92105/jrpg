@@ -15,6 +15,11 @@ public sealed record SkillDefinition
 
     public required string IconFile { get; init; }
 
+    /// <summary>
+    /// The file in the effects folder played as its action starts (decision 423); content always names one.
+    /// </summary>
+    public string SoundFile { get; init; } = "";
+
     /// <summary>Applied in order when the skill is used; empty when absent.</summary>
     public IReadOnlyList<ResourceChange> ResourceChanges { get; init; } = [];
 

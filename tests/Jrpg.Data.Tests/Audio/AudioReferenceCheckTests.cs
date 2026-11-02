@@ -2,6 +2,7 @@ using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Skills;
 using Jrpg.Data.Audio;
 using Jrpg.Data.Content;
 
@@ -76,6 +77,27 @@ public sealed class AudioReferenceCheckTests
 
         Assert.Equal($"music/Ghost.wav: not found in {_audioRoot}. Named by encounter 'goblin_trio'.", problem);
     }
+
+    [Fact]
+    public void FindProblems_SkillSoundMissing_NamesTheSkill()
+    {
+        var problem = Assert.Single(AudioReferenceCheck.FindProblems(WithHealSound("Ghost.wav"), _audioRoot));
+
+        Assert.Equal($"effects/Ghost.wav: not found in {_audioRoot}. Named by skill 'heal'.", problem);
+    }
+
+    [Fact]
+    public void FindProblems_SkillSoundInOtherCase_NamesTheMismatch()
+    {
+        var problem = Assert.Single(AudioReferenceCheck.FindProblems(WithHealSound("placeholderskillmend.wav"), _audioRoot));
+
+        Assert.Equal(
+            "effects/placeholderskillmend.wav: the file is named PlaceholderSkillMend.wav; names must match exactly. Named by skill 'heal'.",
+            problem);
+    }
+
+    private static ContentCatalog WithHealSound(string file) =>
+        _catalog with { Skills = new Dictionary<string, SkillDefinition>(_catalog.Skills) { ["heal"] = _catalog.Skills["heal"] with { SoundFile = file } } };
 
     private static ContentCatalog WithIntroTrack(string? file)
     {

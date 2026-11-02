@@ -60,11 +60,12 @@ internal static class BattleSounds
     };
 
     // These have no beat of their own: the action starting, and what shows by live state. A resource's cost is silent,
-    // as the skill's own sound covers spending; an outcome sounds on its own screen.
+    // as the skill's own sound covers spending; a test skill names none; an outcome sounds on its own screen.
     private static TimedSound? SoundAtTheStartOf(BattleEvent battleEvent)
     {
         var file = battleEvent switch
         {
+            ActionStarted { Command: SkillCommand { Skill.SoundFile: { Length: > 0 } skillSound } } => skillSound,
             ActionStarted { Command: ItemCommand } => UiSoundFiles.Battle.ItemUse,
             ActionStarted { Command: DefendCommand } => UiSoundFiles.Battle.Defend,
             ResourceChanged { Change: > 0 } => UiSoundFiles.Battle.ResourceGain,

@@ -101,7 +101,7 @@ public sealed class EnemyTacticsValidatorTests
         content.Replace(
             "skills.json",
             "\"id\": \"fire_blast\"",
-            "\"id\": \"test_strike\", \"name\": \"Strike\", \"description\": \"\", \"iconFile\": \"Attack.png\", \"effect\": { \"kind\": \"damage\", \"damageType\": \"blunt\", \"power\": 5, \"targeting\": \"singleEnemy\" } }, { \"id\": \"fire_blast\"");
+            "\"id\": \"test_strike\", \"name\": \"Strike\", \"description\": \"\", \"iconFile\": \"Attack.png\", \"soundFile\": \"PlaceholderSkillStrike.wav\", \"effect\": { \"kind\": \"damage\", \"damageType\": \"blunt\", \"power\": 5, \"targeting\": \"singleEnemy\" } }, { \"id\": \"fire_blast\"");
         content.Replace(
             "enemies.json",
             "\"id\": \"goblin\",",

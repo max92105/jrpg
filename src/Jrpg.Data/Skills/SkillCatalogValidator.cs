@@ -33,7 +33,8 @@ internal static class SkillCatalogValidator
 
         return FindResourceChangeProblem(skill.ResourceChanges)
             ?? FindRequirementProblem(skill.Requirements)
-            ?? EffectValidator.FindProblem(skill.Effect);
+            ?? EffectValidator.FindProblem(skill.Effect)
+            ?? (string.IsNullOrWhiteSpace(skill.SoundFile) ? "soundFile must name a sound." : null);
     }
 
     private static string? FindResourceChangeProblem(IReadOnlyList<ResourceChange> changes)

@@ -1,5 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
+using Jrpg.Core.Skills;
 using Jrpg.Core.Statuses;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Tests.Exploration;
@@ -188,10 +189,42 @@ public sealed class BattleSoundsTests
     }
 
     [Fact]
+    public void Of_SkillUsed_IsItsOwnSoundAtTheStart()
+    {
+        var sounds = SoundsOf(new ActionStarted(_goblin, new SkillCommand(Skill("Own.wav"), [_goblin])));
+
+        Assert.Equal([new TimedSound("Own.wav", TimeSpan.Zero)], sounds);
+    }
+
+    [Fact]
+    public void Of_SkillWithoutASound_IsSilent()
+    {
+        Assert.Empty(SoundsOf(new ActionStarted(_goblin, new SkillCommand(Skill(""), [_goblin]))));
+    }
+
+    [Fact]
+    public void Of_SkillThatHits_IsItsOwnSoundThenTheHit()
+    {
+        var sounds = SoundsOf(new ActionStarted(_goblin, new SkillCommand(Skill("Own.wav"), [_goblin])), new EffectApplied(_goblin, EffectKind.Damage, 13));
+
+        Assert.Equal([new TimedSound("Own.wav", TimeSpan.Zero), new TimedSound(UiSoundFiles.Battle.Hit, _impact)], sounds);
+    }
+
+    [Fact]
     public void Of_EventItDoesNotKnow_Throws()
     {
         Assert.Throws<InvalidOperationException>(() => SoundsOf(new UnknownEvent()));
     }
+
+    private static SkillDefinition Skill(string soundFile) => new()
+    {
+        Id = "own",
+        Name = "Own",
+        Description = "",
+        IconFile = "",
+        SoundFile = soundFile,
+        Effect = new Effect(EffectKind.Damage, 5, Targeting.SingleEnemy),
+    };
 
     private static IReadOnlyList<TimedSound> SoundsOf(params BattleEvent[] events) =>
         BattleSounds.Of(events, (_, kind) => StartOf(kind));

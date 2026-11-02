@@ -12,8 +12,8 @@ namespace Jrpg.Data.Audio;
 public static class AudioReferenceCheck
 {
     /// <summary>
-    /// Every voice step's file is in the voices folder, and every map's track and encounter's theme in the music
-    /// folder, under exactly the name given.
+    /// Every voice step's file is in the voices folder, every map's track and encounter's theme in the music folder,
+    /// and every skill's sound in the effects folder, under exactly the name given.
     /// </summary>
     /// <returns>One line per problem, naming the file and what names it; empty when the sound is complete.</returns>
     public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string audioRoot) =>
@@ -21,6 +21,7 @@ public static class AudioReferenceCheck
         .. MissingByExactName(audioRoot, AudioFolders.Voices, VoiceFiles(catalog)),
         .. MissingByExactName(audioRoot, AudioFolders.Music, MapTracks(catalog)),
         .. MissingByExactName(audioRoot, AudioFolders.Music, EncounterThemes(catalog)),
+        .. MissingByExactName(audioRoot, AudioFolders.Effects, SkillSounds(catalog)),
     ];
 
     private static IEnumerable<(string File, string NamedBy)> VoiceFiles(ContentCatalog catalog) =>
@@ -37,6 +38,11 @@ public static class AudioReferenceCheck
             .Where(encounter => encounter.MusicFile is not null)
             .OrderBy(encounter => encounter.Id, StringComparer.Ordinal)
             .Select(encounter => (encounter.MusicFile!, $"encounter '{encounter.Id}'"));
+
+    private static IEnumerable<(string File, string NamedBy)> SkillSounds(ContentCatalog catalog) =>
+        catalog.Skills.Values
+            .OrderBy(skill => skill.Id, StringComparer.Ordinal)
+            .Select(skill => (skill.SoundFile, $"skill '{skill.Id}'"));
 
     private static IEnumerable<string> MissingByExactName(string audioRoot, string folder, IEnumerable<(string File, string NamedBy)> references)
     {

@@ -1947,21 +1947,21 @@
   },
   {
     "id": 279,
-    "isWalkable": true,
+    "isWalkable": false,
     "sheetId": "city",
     "column": 1,
     "row": 7
   },
   {
     "id": 280,
-    "isWalkable": true,
+    "isWalkable": false,
     "sheetId": "city",
     "column": 0,
     "row": 7
   },
   {
     "id": 281,
-    "isWalkable": true,
+    "isWalkable": false,
     "sheetId": "city",
     "column": 2,
     "row": 7
@@ -2042,5 +2042,166 @@
     "sheetId": "city",
     "column": 0,
     "row": 6
+  },
+  {
+    "id": 293,
+    "isWalkable": true,
+    "sheetId": "ra_ground_tiles",
+    "column": 6,
+    "row": 13
+  },
+  {
+    "id": 294,
+    "isWalkable": true,
+    "sheetId": "ra_ground_tiles",
+    "column": 14,
+    "row": 5
+  },
+  {
+    "id": 295,
+    "isWalkable": true,
+    "sheetId": "ra_ground_tiles",
+    "column": 10,
+    "row": 5
+  },
+  {
+    "id": 296,
+    "isWalkable": true,
+    "sheetId": "ra_ground_tiles",
+    "column": 18,
+    "row": 5
+  },
+  {
+    "id": 297,
+    "isWalkable": false,
+    "sheetId": "fg_forest_fall",
+    "column": 24,
+    "row": 18
+  },
+  {
+    "id": 298,
+    "isWalkable": false,
+    "sheetId": "fg_forest_fall",
+    "column": 26,
+    "row": 18
+  },
+  {
+    "id": 299,
+    "isWalkable": true,
+    "sheetId": "fg_forest_fall",
+    "column": 22,
+    "row": 22
+  },
+  {
+    "id": 300,
+    "isWalkable": true,
+    "sheetId": "fg_forest_fall",
+    "column": 22,
+    "row": 23
+  },
+  {
+    "id": 301,
+    "isWalkable": true,
+    "sheetId": "fg_forest_fall",
+    "column": 23,
+    "row": 20
+  },
+  {
+    "id": 302,
+    "isWalkable": true,
+    "sheetId": "fg_forest_fall",
+    "column": 23,
+    "row": 21
+  },
+  {
+    "id": 303,
+    "isWalkable": true,
+    "sheetId": "fg_forest_fall",
+    "column": 25,
+    "row": 20
+  },
+  {
+    "id": 304,
+    "isWalkable": true,
+    "sheetId": "fg_forest_fall",
+    "column": 25,
+    "row": 21
+  },
+  {
+    "id": 305,
+    "isWalkable": true,
+    "sheetId": "city",
+    "column": 13,
+    "row": 1
+  },
+  {
+    "id": 306,
+    "isWalkable": true,
+    "sheetId": "city",
+    "column": 12,
+    "row": 0
+  },
+  {
+    "id": 307,
+    "isWalkable": true,
+    "sheetId": "city",
+    "column": 13,
+    "row": 0
+  },
+  {
+    "id": 308,
+    "isWalkable": true,
+    "sheetId": "city",
+    "column": 12,
+    "row": 1
+  },
+  {
+    "id": 309,
+    "isWalkable": true,
+    "sheetId": "city",
+    "column": 14,
+    "row": 0
+  },
+  {
+    "id": 310,
+    "isWalkable": true,
+    "sheetId": "city",
+    "column": 14,
+    "row": 1
+  },
+  {
+    "id": 311,
+    "isWalkable": true,
+    "sheetId": "city",
+    "column": 1,
+    "row": 13
+  },
+  {
+    "id": 312,
+    "isWalkable": true,
+    "sheetId": "ra_jungle",
+    "column": 12,
+    "row": 31
+  },
+  {
+    "id": 313,
+    "isWalkable": true,
+    "sheetId": "ra_jungle",
+    "column": 13,
+    "row": 31
+  },
+  {
+    "id": 314,
+    "isWalkable": true,
+    "sheetId": "ra_jungle",
+    "column": 14,
+    "row": 31
+  },
+  {
+    "id": 315,
+    "isWalkable": false,
+    "sheetId": "ra_jungle",
+    "column": 22,
+    "row": 31
   }
 ]

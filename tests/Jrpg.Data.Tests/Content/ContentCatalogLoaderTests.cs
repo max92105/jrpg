@@ -66,8 +66,8 @@ public sealed class ContentCatalogLoaderTests
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
         Assert.Equal((4, 4), (catalog.Objects["tree"].Width, catalog.Objects["tree"].Height));
-        Assert.Equal(9, catalog.Objects["tree"].CollisionPolygon.Count);
-        Assert.Equal(new Point2D(0.4, 0.94375), catalog.Objects["tree"].CollisionPolygon[1]);
+        Assert.Equal(6, catalog.Objects["tree"].CollisionPolygon.Count);
+        Assert.Equal(new Point2D(0.59375, 0.9270833333333334), catalog.Objects["tree"].CollisionPolygon[1]);
     }
 
     [Fact]

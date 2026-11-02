@@ -106,9 +106,9 @@ public sealed class EventEditingViewModelTests
     {
         _eventEditing.OpenMap = new MapViewModel(_catalog.Maps["interior_1"]);
 
-        var cellEvent = _eventEditing.StartEditingCellAt(new GridCell(6, 19))!;
+        var cellEvent = _eventEditing.StartEditingCellAt(new GridCell(4, 9))!;
 
-        Assert.Equal("cell_6_19", cellEvent.Event.Id);
+        Assert.Equal("cell_4_9", cellEvent.Event.Id);
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public sealed class EventEditingViewModelTests
         var map = _eventEditing.OpenMap = new MapViewModel(_catalog.Maps["interior_1"]);
         var before = map.Map.Layout.CellEvents.Count;
 
-        _eventEditing.RemoveCellEventAt(new GridCell(6, 19));
+        _eventEditing.RemoveCellEventAt(new GridCell(4, 9));
 
         Assert.Equal(before - 1, map.Map.Layout.CellEvents.Count);
         map.UndoCommand.Execute(null);

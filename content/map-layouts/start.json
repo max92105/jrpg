@@ -4837,8 +4837,8 @@
               "type": "warp",
               "mapId": "interior_1",
               "cell": {
-                "x": 0,
-                "y": 0
+                "x": 4,
+                "y": 6
               }
             }
           ]
@@ -5442,8 +5442,8 @@
             "type": "warp",
             "mapId": "forest",
             "cell": {
-              "x": 1,
-              "y": 1
+              "x": 28,
+              "y": 7
             }
           }
         ]
@@ -5465,8 +5465,8 @@
             "type": "warp",
             "mapId": "forest",
             "cell": {
-              "x": 1,
-              "y": 1
+              "x": 28,
+              "y": 8
             }
           }
         ]

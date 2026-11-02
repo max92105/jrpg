@@ -57,13 +57,13 @@ public sealed class ContentWriterTests : IDisposable
     [Fact]
     public void WriteMap_ShrinkingAMapAnotherMapWarpsInto_ThrowsNamingTheOtherMap()
     {
-        // interior_1's door leads back into the start map, well inside its 45x45 cells.
+        // The forest's east exit leads back into the start map, well inside its 45x45 cells.
         var start = _catalog.Maps["start"];
         var shrunk = new MapDefinition(ShrinkTo(start.Layout, 1, 1), start.Settings);
 
         var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMap(shrunk, _catalog));
 
-        Assert.StartsWith("map-layouts/interior_1.json: ", exception.Message, StringComparison.Ordinal);
+        Assert.StartsWith("map-layouts/forest.json: ", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]

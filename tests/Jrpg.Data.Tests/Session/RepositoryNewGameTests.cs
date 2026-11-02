@@ -71,7 +71,7 @@ public sealed class RepositoryNewGameTests
 
         var introsPerLeader = catalog.NewGame.LeaderChoices.Select(choice => arrivals.Where(mapEvent => mapEvent.OnlyWhenLeaderId == choice.MemberId).ToList());
 
-        Assert.All(introsPerLeader, intros => Assert.Equal(new WarpStep("start", new GridCell(10, 3)), Assert.Single(intros).Steps[^1]));
+        Assert.All(introsPerLeader, intros => Assert.Equal(new WarpStep("start", new GridCell(23, 20)), Assert.Single(intros).Steps[^1]));
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public sealed class RepositoryNewGameTests
         exploration.ContinueEvent();
 
         Assert.False(exploration.IsEventRunning);
-        Assert.Equal(new MapLocation("start", new Point2D(10.5, 3.5), Facing.Down), exploration.Location);
+        Assert.Equal(new MapLocation("start", new Point2D(23.5, 20.5), Facing.Down), exploration.Location);
     }
 
     [Fact]

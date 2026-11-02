@@ -16,10 +16,13 @@ public sealed class ObjectPlacingViewModelTests
     private readonly CatalogDraft _draft = new(_catalog);
     private readonly ObjectPlacingViewModel _placing;
 
-    // The forest map open, the chest chosen to place.
+    // The forest map open without its placed objects, so the cells the tests place on are empty whatever the developer
+    // puts in the forest; the chest chosen to place.
     public ObjectPlacingViewModelTests()
     {
-        _placing = new ObjectPlacingViewModel(_draft, _layer) { OpenMap = new MapViewModel(_catalog.Maps["forest"]) };
+        var forest = _catalog.Maps["forest"];
+        var emptyForest = new MapDefinition(forest.Layout with { Objects = [] }, forest.Settings);
+        _placing = new ObjectPlacingViewModel(_draft, _layer) { OpenMap = new MapViewModel(emptyForest) };
         _placing.Browser.SelectedObject = _catalog.Objects["chest"];
     }
 

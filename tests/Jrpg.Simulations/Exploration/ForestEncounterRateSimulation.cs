@@ -32,12 +32,12 @@ public sealed class ForestEncounterRateSimulation(ITestOutputHelper output)
         [MoveIntent.FromAxes(1, 0), MoveIntent.FromAxes(0, 1), MoveIntent.FromAxes(-1, 0), MoveIntent.FromAxes(0, -1)];
 
     // The forest's arrival cell from the start map's warp tiles.
-    private static readonly Point2D _arrival = new GridCell(1, 1).Center;
+    private static readonly Point2D _arrival = new GridCell(28, 7).Center;
 
     [Fact]
     public void ForestEncounters_StraightWalk_AverageStepsNearConfiguredOdds()
     {
-        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+        var catalog = WithoutForestCellEvents(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")));
         var table = catalog.Maps[MapId].Settings.RandomEncounters!;
 
         var stepsToBattle = Enumerable.Range(0, Seeds).Select(seed => WalkUntilBattle(catalog, seed)).ToList();
@@ -83,6 +83,15 @@ public sealed class ForestEncounterRateSimulation(ITestOutputHelper output)
         }
 
         return StepLimit + 1;
+    }
+
+    // The forest's exits are warp tiles a random walk steps on, which would end the walk in another map; the odds being
+    // measured don't depend on them.
+    private static ContentCatalog WithoutForestCellEvents(ContentCatalog catalog)
+    {
+        var forest = catalog.Maps[MapId];
+        var withoutExits = new MapDefinition(forest.Layout with { CellEvents = [] }, forest.Settings);
+        return catalog with { Maps = new Dictionary<string, MapDefinition>(catalog.Maps) { [MapId] = withoutExits } };
     }
 
     private void WriteSummary(List<int> stepsToBattle, int expected)

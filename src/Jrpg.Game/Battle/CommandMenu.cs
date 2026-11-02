@@ -15,6 +15,7 @@ namespace Jrpg.Game.Battle;
 internal sealed class CommandMenu
 {
     private readonly ListCursor _cursor;
+    private readonly AskedSounds _sounds = new();
     private readonly Inventory _inventory;
     private readonly IReadOnlyDictionary<string, ItemDefinition> _items;
     private BattleState? _battle;
@@ -36,6 +37,9 @@ internal sealed class CommandMenu
         [CommandEntry.Attack, CommandEntry.Skills, CommandEntry.Items, CommandEntry.Move, CommandEntry.Defend, CommandEntry.Run];
 
     public CommandEntry Selected => Entries[_cursor.Selected];
+
+    /// <summary>What the last update asks to hear; a refused choice is silent (decision 421).</summary>
+    public IReadOnlyList<string> Sounds => _sounds.Files;
 
     /// <summary>The actor's skills after Skills, until one is used or Cancel; null while the command list shows.</summary>
     public BattleSkillChoice? Skills { get; private set; }
@@ -78,6 +82,7 @@ internal sealed class CommandMenu
     public BattleCommand? Update(InputFrame input)
     {
         var battle = _battle ?? throw new InvalidOperationException("Start a turn before choosing a command.");
+        _sounds.Clear();
         if (Targets is not null)
         {
             return ChooseTarget(Targets, input);
@@ -100,6 +105,7 @@ internal sealed class CommandMenu
 
     private BattleCommand? ChooseFromList(BattleState battle, InputFrame input)
     {
+        var before = _cursor.Selected;
         if (input.IsPressed(GameButton.Up))
         {
             _cursor.MoveUp();
@@ -110,7 +116,14 @@ internal sealed class CommandMenu
             _cursor.MoveDown();
         }
 
-        return input.IsPressed(GameButton.Confirm) ? Choose(Selected, battle) : null;
+        _sounds.AskMoveIfChanged(before, _cursor.Selected);
+        if (!input.IsPressed(GameButton.Confirm))
+        {
+            return null;
+        }
+
+        _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
+        return Choose(Selected, battle);
     }
 
     // Attack, Skills, Items and Move open the next step; Defend and Run are the command itself.
@@ -145,6 +158,7 @@ internal sealed class CommandMenu
         MoveWithin(skills, input);
         if (input.IsPressed(GameButton.Cancel))
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuCancel);
             Skills = null;
         }
         else if (input.IsPressed(GameButton.Confirm) && !battle.CanAfford(skills.Selected))
@@ -153,6 +167,7 @@ internal sealed class CommandMenu
         }
         else if (input.IsPressed(GameButton.Confirm) && battle.CanUse(skills.Selected))
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
             Targets = new BattleTargetCursor(battle.TargetChoiceFor(skills.Selected), battle.CurrentActor);
         }
     }
@@ -163,16 +178,19 @@ internal sealed class CommandMenu
         MoveWithin(items, input);
         if (input.IsPressed(GameButton.Cancel))
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuCancel);
             Items = null;
         }
         else if (input.IsPressed(GameButton.Confirm) && battle.CanUse(items.Selected))
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
             Targets = new BattleTargetCursor(battle.TargetChoiceFor(items.Selected), battle.CurrentActor);
         }
     }
 
-    private static void MoveWithin(IBattleListChoice list, InputFrame input)
+    private void MoveWithin(IBattleListChoice list, InputFrame input)
     {
+        var before = list.SelectedIndex;
         if (input.IsPressed(GameButton.Up))
         {
             list.MoveUp();
@@ -182,11 +200,14 @@ internal sealed class CommandMenu
         {
             list.MoveDown();
         }
+
+        _sounds.AskMoveIfChanged(before, list.SelectedIndex);
     }
 
     // Up and Left go back along the formation, Down and Right forward (decision 56).
     private BattleCommand? ChooseTarget(BattleTargetCursor targets, InputFrame input)
     {
+        var before = targets.Selected[0];
         if (input.IsPressed(GameButton.Up) || input.IsPressed(GameButton.Left))
         {
             targets.MovePrevious();
@@ -197,8 +218,14 @@ internal sealed class CommandMenu
             targets.MoveNext();
         }
 
+        if (targets.Selected[0] != before)
+        {
+            _sounds.Ask(UiSoundFiles.Effects.MenuMove);
+        }
+
         if (input.IsPressed(GameButton.Cancel))
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuCancel);
             Targets = null;
             return null;
         }
@@ -208,6 +235,7 @@ internal sealed class CommandMenu
             return null;
         }
 
+        _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
         BattleCommand command = (Skills, Items) switch
         {
             ({ } skills, _) => new SkillCommand(skills.Selected, targets.Selected),

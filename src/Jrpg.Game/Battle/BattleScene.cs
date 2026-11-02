@@ -103,9 +103,14 @@ internal sealed class BattleScene : IScene
             return UpdateOutcomeScreen(delta, input);
         }
 
-        if (_sequence.IsAwaitingCommand && _commands.Update(input) is { } command)
+        if (_sequence.IsAwaitingCommand)
         {
-            _sequence.Submit(command);
+            var command = _commands.Update(input);
+            _sounds.AskAll(_commands.Sounds);
+            if (command is not null)
+            {
+                _sequence.Submit(command);
+            }
         }
 
         ShowAimedTargets();

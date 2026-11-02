@@ -66,7 +66,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **B2. Every other battle event kind sounds at its beat: falls, ticks, backfires, stuns, gains, moves, items, Defend** (Game, about 200 lines) → [slices/B2.md](slices/B2.md)
 - [x] **B3. Every skill names its sound, checked at load and startup, played as its action starts** (Core + Data + Game + content, about 190 lines) → [slices/B3.md](slices/B3.md)
 - [x] **B4. The battle-start sound at the flash; victory's fanfare over silence, then the map's track; defeat and escape** (Game, about 230 lines) → [slices/B4.md](slices/B4.md)
-- [ ] **B5. Sounds on the battle's commands, skill and item lists and target cursor** (Game, about 140 lines) → [slices/B5.md](slices/B5.md)
+- [x] **B5. Sounds on the battle's commands, skill and item lists and target cursor** (Game, about 140 lines) → [slices/B5.md](slices/B5.md)
 
 ### Phase 5: the look
 - [ ] **V2. The volume rows as diamond pips** (Game, raw 70, about 110 lines at 1.6x) → [slices/V2.md](slices/V2.md)

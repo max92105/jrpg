@@ -11,7 +11,7 @@ using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Tests.Battle;
 
-// The scene passes up what its outcome screens and its turns ask to hear.
+// The scene passes up what its command menu, its turns and its outcome screens ask to hear.
 [Collection(RepositoryScreenText.CollectionName)]
 public sealed class BattleSceneSoundTests
 {
@@ -97,6 +97,17 @@ public sealed class BattleSceneSoundTests
 
         Assert.Contains(UiSoundFiles.Battle.Defeat, scene.Sounds);
         Assert.Equal(BattleMusicCue.Silence, scene.MusicCue);
+    }
+
+    [Fact]
+    public void Update_DownOnTheCommands_AsksTheMoveSound()
+    {
+        var scene = NewBattle(_ => { });
+        scene.Update(TimeSpan.FromSeconds(10), default);
+
+        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Down));
+
+        Assert.Contains(UiSoundFiles.Effects.MenuMove, scene.Sounds);
     }
 
     [Fact]

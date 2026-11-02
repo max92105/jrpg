@@ -17,8 +17,8 @@ Every value is a placeholder for the developer to tune by ear.
 | Fanfare hold | `Battle/BattleMusic.FanfareHold` (B4) | 3.0 s | silence under the victory fanfare before the map's track returns; the placeholder fanfare's length |
 | Typing tick | `Dialogue/TypingTicks.CharactersPerTick` (D1) | 2 | decision 422 |
 | Typing gap | `Dialogue/TypingTicks.MinimumGap` (D1) | 60 ms | decision 422 |
-| Title theme | `Ui/UiSoundFiles.Music.Title` (P1) | `PlaceholderTitle.wav` | a slow two-note chord, 4 s loop |
-| Battle theme | `UiSoundFiles.Music.Battle` (P1) | `PlaceholderBattle.wav` | a faster pulse, 4 s loop |
+| Title theme | `Ui/UiSoundFiles.Music.Title` (P1) | `PlaceholderTitle.wav` | a short old-console tune, about 22 s loop (`new-placeholder-tune.pl`) |
+| Battle theme | `UiSoundFiles.Music.Battle` (P1) | `PlaceholderBattle.wav` | a short old-console tune, about 13 s loop (`new-placeholder-tune.pl`) |
 | Town track | `maps/start.json`, `maps/interior_1.json` `musicFile` (C1) | `PlaceholderTown.wav` | shared, so the door between them keeps it playing |
 | Forest track | `maps/forest.json` `musicFile` (C1) | `PlaceholderForest.wav` | |
 | Intro map | `maps/intro.json` | none | silent (decision 419); its voice-over plays |
@@ -27,6 +27,7 @@ Every value is a placeholder for the developer to tune by ear.
 | Battle sounds | `UiSoundFiles.Battle` (B1, B2, B4) | one `Placeholder<Name>.wav` each | design "Key decisions" 5 lists them |
 | Skill sounds | `skills.json` `soundFile` (B3) | `PlaceholderSkillStrike.wav` (damage), `PlaceholderSkillMend.wav` (healing), `PlaceholderSkillCharm.wav` (anything else) | shared by kind until each skill gets its own |
 | Placeholder format | `.claude/scripts/new-placeholder-tone.ps1` (C1) | 16-bit PCM mono 22 050 Hz WAV | music: whole sine cycles per loop, no fades, so the loop has no seam; effects: 5 ms fades at each end |
+| Placeholder tunes | `.claude/scripts/new-placeholder-tune.pl` | the five music tracks, the victory fanfare and the defeat sound | the developer found the plain chords painful (2026-11-01), so these are short tunes in pulse and triangle voices, low-passed and at half the loudness; the notes live in the script, since the game can't play MIDI |
 
 ## Design overview
 

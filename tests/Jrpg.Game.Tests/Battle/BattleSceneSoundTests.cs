@@ -3,6 +3,7 @@ using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Input;
+using Jrpg.Game.Scenes;
 using Jrpg.Game.Tests.Exploration;
 using Jrpg.Game.Tests.Input;
 using Jrpg.Game.Tests.Saving;
@@ -53,6 +54,25 @@ public sealed class BattleSceneSoundTests
         }
 
         Assert.Contains(asked, file => file is UiSoundFiles.Battle.Hit or UiSoundFiles.Battle.Critical or UiSoundFiles.Battle.Miss);
+    }
+
+    // The victory screen's own sounds reach the flow through the scene; leaving needs no level-up or drop, so it holds
+    // whatever the fixture's experience.
+    [Fact]
+    public void Update_VictoryConfirmLeaves_SceneAsksTheConfirmSound()
+    {
+        var catalog = BattleScenarios.WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { MaxHp = 1, Dodge = 0, DropTableId = null });
+        var scene = NewBattle(catalog with { Rules = catalog.Rules with { Stats = BattleScenarios.CertainRules } }, _ => { });
+        scene.Update(TimeSpan.FromSeconds(10), default);
+        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        scene.Update(TimeSpan.FromSeconds(10), default);
+        scene.Update(TimeSpan.FromSeconds(10), default);
+
+        var request = scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+
+        Assert.IsType<BattleFinished>(request);
+        Assert.Equal([UiSoundFiles.Effects.MenuConfirm], scene.Sounds);
     }
 
     // One goblin a single certain hit fells, so no balance or seed matters.

@@ -101,5 +101,7 @@ internal static class UiSoundFiles
         public const string Defeat = "PlaceholderDefeat.wav";
 
         public const string Escape = "PlaceholderEscape.wav";
+
+        public const string LevelUp = "PlaceholderLevelUp.wav";
     }
 }

@@ -65,7 +65,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **FE3. A warp from the map and a rest sound as their fade starts** (Game + content, about 170 lines) → [slices/FE3.md](slices/FE3.md)
 
 ### Phase 5: the victory screen
-- [ ] **V1. The victory screen sounds a level-up, the drops and leaving** (Game + content, about 170 lines) → [slices/V1.md](slices/V1.md)
+- [x] **V1. The victory screen sounds a level-up, the drops and leaving** (Game + content, about 170 lines) → [slices/V1.md](slices/V1.md)
 
 ### Phase 6: levels
 - [ ] **L1. Levels evened out across every sound; the sounds still vetoed replaced** (content, hand check only) → [slices/L1.md](slices/L1.md)

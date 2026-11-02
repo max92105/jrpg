@@ -218,7 +218,9 @@ internal sealed class BattleScene : IScene
     {
         if (_victory is { } victory)
         {
-            return victory.Update(delta, input);
+            var request = victory.Update(delta, input);
+            _sounds.AskAll(victory.Sounds);
+            return request;
         }
 
         return _escaped is { } escaped ? escaped.Update(delta, input) : UpdateDefeat(delta, input);

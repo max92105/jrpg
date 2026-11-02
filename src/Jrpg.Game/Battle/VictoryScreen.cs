@@ -3,17 +3,21 @@ using Jrpg.Core.Loot;
 using Jrpg.Core.Session;
 using Jrpg.Game.Input;
 using Jrpg.Game.Scenes;
+using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Battle;
 
 /// <summary>
 /// What a won battle gave, over the frozen battle: each standing member's bar filling level by level, then what dropped
 /// (decision 355). Confirm skips the filling; Confirm once it's done shows the drops, or leaves the battle when nothing
-/// dropped; Confirm on the drops leaves. <see cref="VictoryScreenView"/> draws it.
+/// dropped; Confirm on the drops leaves. A level filled sounds as its "Level Up!" shows, by the bar or the skip; the
+/// drops showing sound the field's found item, and leaving the confirm (decisions 430, 432).
+/// <see cref="VictoryScreenView"/> draws it.
 /// </summary>
 internal sealed class VictoryScreen
 {
     private readonly ExperienceBarAnimation[] _bars;
+    private readonly AskedSounds _sounds = new();
     private bool _hasLeft;
 
     /// <param name="spoils">The won battle's experience, each standing member's gain, the drops and the gold.</param>
@@ -40,6 +44,9 @@ internal sealed class VictoryScreen
     /// <summary>How the title, the reward bar and the cards come in, before the bars fill.</summary>
     public VictoryEntrance Entrance { get; }
 
+    /// <summary>The effects the last update asked for.</summary>
+    public IReadOnlyList<string> Sounds => _sounds.Files;
+
     /// <summary>One bar per gain, in the same order.</summary>
     public IReadOnlyList<ExperienceBarAnimation> Bars => _bars;
 
@@ -58,6 +65,7 @@ internal sealed class VictoryScreen
     /// </returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
+        _sounds.Clear();
         if (_hasLeft)
         {
             return null;
@@ -67,10 +75,13 @@ internal sealed class VictoryScreen
         var barTimeBefore = Entrance.BarTime;
         Entrance.Update(delta);
         var barDelta = Entrance.BarTime - barTimeBefore;
+        var levelUpsBeforeFill = LevelUps();
         foreach (var bar in _bars)
         {
             bar.Update(barDelta);
         }
+
+        AskLevelUpIfAny(levelUpsBeforeFill);
 
         if (!input.IsPressed(GameButton.Confirm))
         {
@@ -79,18 +90,42 @@ internal sealed class VictoryScreen
 
         if (!IsComplete)
         {
+            var levelUpsBeforeSkip = LevelUps();
             Entrance.Skip();
             Array.ForEach(_bars, bar => bar.Skip());
+            AskLevelUpIfAny(levelUpsBeforeSkip);
             return null;
         }
 
         if (!IsShowingDrops && !Drops.IsEmpty)
         {
             IsShowingDrops = true;
+            _sounds.Ask(UiSoundFiles.Field.ItemGot);
             return null;
         }
 
         _hasLeft = true;
+        _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
         return new BattleFinished();
+    }
+
+    // Two members levelling in one update ask it once.
+    private void AskLevelUpIfAny(int levelUpsBefore)
+    {
+        if (LevelUps() > levelUpsBefore)
+        {
+            _sounds.Ask(UiSoundFiles.Battle.LevelUp);
+        }
+    }
+
+    private int LevelUps()
+    {
+        var levelUps = 0;
+        foreach (var bar in _bars)
+        {
+            levelUps += bar.LevelUps;
+        }
+
+        return levelUps;
     }
 }

@@ -5,8 +5,9 @@ metadata:
   type: project
 ---
 
-Plan: 2026-10-29-music-and-sfx, slice V2 (the volume rows as diamond pips). Round 1.
-Verdict: Ready to commit. 0 Critical, 3 Warnings, 2 Suggestions.
+Plan: 2026-11-02-sound-pass, slice V1 (victory screen: level-up, drops and leaving sounds). Round 1.
+Verdict: Ready to commit. 0 Critical, 0 Warnings, 2 Suggestions.
 
-- Fixed: V2's Done note records the pips' size; ValueOf reads LevelOf; the ui param doc names the pips; the comment no longer copies sizes
-- Moved to the backlog: OptionsPage.DrawRow's length
+- open (Suggestion): VictoryScreenSoundTests copies VictoryScreenTests' private Sarxian/half-a-level/potion builders though the slice said to reuse them; share them (e.g. a VictoryScreenScenarios) or note the copy in the Done note
+- open (Suggestion): VictoryScreen.Update's `levelUps` local reads as a count, beside `beforeSkip`; name them alike (levelUpsBeforeFill / levelUpsBeforeSkip)
+- fixed (from FE3): the warp test is now Update_WarpUnderway_AsksNothing; the cutscene-skip Suggestion was the developer's call, dropped

@@ -25,6 +25,8 @@ call or a rename. These cases slipped past it:
 - A docs/map.md entry edited by inserting a new parenthetical keeps the old one beside it (gold S2: `AffixDefinition`
   with two field lists); verify.ps1's two-summaries check only reads code, so read every changed map.md line whole. E1 (gold)
   added `EventScreenTransitions` to the Flow line but left the deleted `ForgeTransitions` in its key types.
+- A part that starts writing into its host's list (sound SH3: ShopCounter asking coins into ShopScene's AskedSounds) leaves the
+  host's `Sounds` summary listing only the host's own asks; reread the host's summary.
 
 **Why:** a comment or doc stating a wrong rule, name or number misleads the next reader.
 

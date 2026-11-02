@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Plan status lives in `docs/plans/README.md`, each plan's decisions and ADRs in its own README, and leftovers in `docs/plans/backlog.md`. Quests (save format 7), the enemy skills and bosses plan and the music and SFX plan were all done on 2026-11-01; settings kept between runs (decision 415) is the next known plan.
+Plan status lives in `docs/plans/README.md`, each plan's decisions and ADRs in its own README, and leftovers in `docs/plans/backlog.md`. Quests (save format 7), the enemy skills and bosses plan and the music and SFX plan were all done on 2026-11-01; settings kept between runs (decision 415) is the next known plan. The sound pass (freesound placeholders, `2026-11-02-sound-pass`) was done on 2026-11-02 (the developer heard every sound and kept them all); the developer wants every future placeholder sound from freesound.org (`.claude/rules/content.md`).
 
 Rule seen at that approval: a review that adds features (pickers, previews, saved stocks) roughly doubles a plan; renumber slice ids to reuse file names, stub the orphans.
 

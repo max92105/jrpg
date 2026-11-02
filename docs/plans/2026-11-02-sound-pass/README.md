@@ -61,7 +61,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 4: the field's events
 - [x] **FE1. The event presenter's page reading moves into `Exploration/MessageReading`** (Game refactor, about 140 lines) → [slices/FE1.md](slices/FE1.md)
-- [ ] **FE2. A found item, a recruit and a quest's start, advance or completion sound as their line shows** (Game + content, about 235 lines) → [slices/FE2.md](slices/FE2.md)
+- [x] **FE2. A found item, a recruit and a quest's start, advance or completion sound as their line shows** (Game + content, about 235 lines) → [slices/FE2.md](slices/FE2.md)
 - [ ] **FE3. A warp from the map and a rest sound as their fade starts** (Game + content, about 170 lines) → [slices/FE3.md](slices/FE3.md)
 
 ### Phase 5: the victory screen

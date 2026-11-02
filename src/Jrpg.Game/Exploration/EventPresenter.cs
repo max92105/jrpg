@@ -21,7 +21,8 @@ namespace Jrpg.Game.Exploration;
 /// 257, 382). A cutscene still covers the screen for its seconds, and Confirm or Cancel skips the cutscene's stills
 /// (ADR 0016). A Forge or shop step asks the scene to open its screen, once (decision 353). The event's voice-over
 /// plays through the voice channel until the event ends or is skipped (ADR 0018). The pages show through a
-/// <see cref="MessageReading"/>, whose typing ticks the presenter asks.
+/// <see cref="MessageReading"/>, whose typing ticks the presenter asks; a found item, a recruit and a quest's change
+/// sound as their line shows, a found item only when something was carried (decisions 421, 433).
 /// </summary>
 internal sealed class EventPresenter
 {
@@ -247,6 +248,7 @@ internal sealed class EventPresenter
         if (!_reading.IsShowing)
         {
             _reading.Show(StartReading(step));
+            AskStepSound(step);
             return;
         }
 
@@ -255,6 +257,22 @@ internal sealed class EventPresenter
         if (!_reading.IsShowing)
         {
             _exploration.ContinueEvent();
+        }
+    }
+
+    private void AskStepSound(EventStep step)
+    {
+        var file = step switch
+        {
+            GiveItemStep when _exploration.CurrentItemReceipt!.Added > 0 => UiSoundFiles.Field.ItemGot,
+            RecruitStep when _exploration.CurrentRecruitment!.HasJoined => UiSoundFiles.Field.Recruit,
+            StartQuestStep or AdvanceQuestStep => UiSoundFiles.Field.QuestUpdated,
+            CompleteQuestStep => UiSoundFiles.Field.QuestCompleted,
+            _ => null,
+        };
+        if (file is not null)
+        {
+            _sounds.Ask(file);
         }
     }
 

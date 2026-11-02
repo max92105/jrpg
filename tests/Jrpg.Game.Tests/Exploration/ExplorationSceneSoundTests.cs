@@ -26,6 +26,19 @@ public sealed class ExplorationSceneSoundTests
         Assert.Contains(UiSoundFiles.Effects.TextTyping, asked);
     }
 
+    // The chest's found item: the presenter's step sound reaches the flow through the scene, as its ticks do.
+    [Fact]
+    public void Update_ChestEventShows_SceneAsksTheItemSound()
+    {
+        var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowChest);
+        var scene = StartMapScenarios.SceneOf(exploration, StartMapScenarios.BelowChest);
+        Assert.True(exploration.TryInteract());
+
+        scene.Update(StartMapScenarios.OneUpdate, default);
+
+        Assert.Contains(UiSoundFiles.Field.ItemGot, scene.Sounds);
+    }
+
     [Fact]
     public void Update_MenuPressed_AsksTheConfirmSound()
     {

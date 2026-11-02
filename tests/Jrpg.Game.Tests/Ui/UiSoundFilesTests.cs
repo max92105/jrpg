@@ -13,6 +13,7 @@ public sealed class UiSoundFilesTests
     [InlineData(typeof(UiSoundFiles.Music), AudioFolders.Music)]
     [InlineData(typeof(UiSoundFiles.Effects), AudioFolders.Effects)]
     [InlineData(typeof(UiSoundFiles.Battle), AudioFolders.Effects)]
+    [InlineData(typeof(UiSoundFiles.Field), AudioFolders.Effects)]
     public void EveryConstant_ExistsInItsFolder(Type group, string folder)
     {
         var files = group.GetFields(BindingFlags.Public | BindingFlags.Static)
@@ -28,6 +29,6 @@ public sealed class UiSoundFilesTests
     [Fact]
     public void EveryGroup_IsCheckedAbove()
     {
-        Assert.Equal(3, typeof(UiSoundFiles).GetNestedTypes().Length);
+        Assert.Equal(4, typeof(UiSoundFiles).GetNestedTypes().Length);
     }
 }

@@ -150,6 +150,18 @@
       "fadeOutSeconds": 0.05
     },
     {
+      "file": "effects/PlaceholderItemGot.wav",
+      "freesoundId": 563465,
+      "name": "ItemPickup.wav",
+      "author": "nicholasdaryl",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/563465/",
+      "preview": "https://cdn.freesound.org/previews/563/563465_10415593-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.5,
+      "fadeOutSeconds": 0.1
+    },
+    {
       "file": "effects/PlaceholderItemUse.wav",
       "freesoundId": 392624,
       "name": "Champagne Cork",
@@ -232,6 +244,42 @@
       "fetched": "2026-11-02",
       "maxSeconds": 0.4,
       "fadeOutSeconds": 0.1
+    },
+    {
+      "file": "effects/PlaceholderQuestCompleted.wav",
+      "freesoundId": 148849,
+      "name": "1ring",
+      "author": "iluppai",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/148849/",
+      "preview": "https://cdn.freesound.org/previews/148/148849_1558892-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.8,
+      "fadeOutSeconds": 0.3
+    },
+    {
+      "file": "effects/PlaceholderQuestUpdated.wav",
+      "freesoundId": 346835,
+      "name": "PageTurn.wav",
+      "author": "yatoimtop",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/346835/",
+      "preview": "https://cdn.freesound.org/previews/346/346835_2816123-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.6,
+      "fadeOutSeconds": 0.15
+    },
+    {
+      "file": "effects/PlaceholderRecruit.wav",
+      "freesoundId": 486140,
+      "name": "taiko.wav",
+      "author": "Anuj_Shrestha1",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/486140/",
+      "preview": "https://cdn.freesound.org/previews/486/486140_7543744-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.8,
+      "fadeOutSeconds": 0.3
     },
     {
       "file": "effects/PlaceholderRegenTick.wav",

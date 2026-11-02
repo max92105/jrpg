@@ -17,8 +17,8 @@ internal static class MusicSelection
         }
 
         // Pending from the encounter's flash until the session finishes the battle (decision 416).
-        return session.Exploration.PendingEncounter is not null
-            ? UiSoundFiles.Music.Battle
+        return session.Exploration.PendingEncounter is { } encounter
+            ? encounter.MusicFile ?? UiSoundFiles.Music.Battle
             : session.Exploration.CurrentMap.Settings.MusicFile;
     }
 }

@@ -39,6 +39,18 @@ public sealed class MusicSelectionTests
         Assert.Equal(UiSoundFiles.Music.Battle, MusicSelection.TrackFor(SessionOf(flow)));
     }
 
+    // Every encounter names the theme, so whichever the forest rolls has it.
+    [Fact]
+    public void TrackFor_EncounterWithItsOwnTheme_IsThatTheme()
+    {
+        var catalog = StartMapScenarios.NextToForestWarpAlwaysRolling;
+        var themed = catalog.Encounters.ToDictionary(pair => pair.Key, pair => pair.Value with { MusicFile = "Own.wav" });
+        var flow = StartedFlow(catalog: catalog with { Encounters = themed });
+        WalkUntilAnEncounter(flow);
+
+        Assert.Equal("Own.wav", MusicSelection.TrackFor(SessionOf(flow)));
+    }
+
     private static GameSession SessionOn(ContentCatalog catalog) => GameSession.StartNew(catalog, "sarxian", new SeededRandom(1));
 
 }

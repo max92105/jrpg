@@ -35,4 +35,12 @@ public sealed class RepositoryEncounterTests
         Assert.Contains(phase.Tactics, action => action.SkillId == "crushing_blow");
         Assert.Contains(phase.Tactics, action => action.SkillId == "war_cry");
     }
+
+    [Fact]
+    public void Load_RepositoryContent_GoblinChiefNamesTheBossTheme()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        Assert.Equal("PlaceholderBoss.wav", catalog.Encounters["goblin_chief"].MusicFile);
+    }
 }

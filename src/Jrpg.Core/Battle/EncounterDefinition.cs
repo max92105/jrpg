@@ -8,4 +8,9 @@ public sealed record EncounterDefinition
     public required IReadOnlyList<string> EnemyIds { get; init; }
 
     public required string BackgroundFile { get; init; }
+
+    /// <summary>
+    /// The encounter's own theme, in the music folder, a boss's; null for the battle theme (decision 420).
+    /// </summary>
+    public string? MusicFile { get; init; }
 }

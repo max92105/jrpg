@@ -52,7 +52,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **P2. The music plays on the device: looped, at the music volume, cut on a change; the themes preloaded** (Game, about 110 lines) → [slices/P2.md](slices/P2.md)
 - [x] **P3. The map's track pauses for a battle and resumes where it was with a short fade-in; a track left is released** (Game, about 220 lines) → [slices/P3.md](slices/P3.md)
 - [x] **E1. The editor's map settings choose the map's track** (Editor + Data, about 170 lines) → [slices/E1.md](slices/E1.md)
-- [ ] **C2. An encounter's own theme: the Goblin Chief's boss theme** (Core + Data + Game + content, about 110 lines; after the enemy plan's C1) → [slices/C2.md](slices/C2.md)
+- [x] **C2. An encounter's own theme: the Goblin Chief's boss theme** (Core + Data + Game + content, about 110 lines; after the enemy plan's C1) → [slices/C2.md](slices/C2.md)
 
 ### Phase 3: sound effects on the screens
 - [ ] **S1. The effect path, and the title's move, confirm and cancel sounds** (Game, about 240 lines) → [slices/S1.md](slices/S1.md)

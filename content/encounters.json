@@ -17,6 +17,7 @@
   {
     "id": "goblin_chief",
     "enemyIds": ["goblin", "goblin", "goblin_chief"],
-    "backgroundFile": "Forest.png"
+    "backgroundFile": "Forest.png",
+    "musicFile": "PlaceholderBoss.wav"
   }
 ]

@@ -1,3 +1,4 @@
+using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
@@ -63,6 +64,17 @@ public sealed class AudioReferenceCheckTests
     public void FindProblems_MapWithoutATrack_IsEmpty()
     {
         Assert.Empty(AudioReferenceCheck.FindProblems(WithIntroTrack(null), _audioRoot));
+    }
+
+    [Fact]
+    public void FindProblems_EncounterThemeMissing_NamesTheEncounter()
+    {
+        var encounter = _catalog.Encounters["goblin_trio"] with { MusicFile = "Ghost.wav" };
+        var catalog = _catalog with { Encounters = new Dictionary<string, EncounterDefinition>(_catalog.Encounters) { ["goblin_trio"] = encounter } };
+
+        var problem = Assert.Single(AudioReferenceCheck.FindProblems(catalog, _audioRoot));
+
+        Assert.Equal($"music/Ghost.wav: not found in {_audioRoot}. Named by encounter 'goblin_trio'.", problem);
     }
 
     private static ContentCatalog WithIntroTrack(string? file)

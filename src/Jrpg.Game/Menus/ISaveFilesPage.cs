@@ -24,6 +24,9 @@ internal interface ISaveFilesPage
     /// <returns>What choosing a file asks the flow for, or null.</returns>
     SceneRequest? Update(InputFrame input);
 
+    /// <summary>The effect files the last update asks for (ADR 0035).</summary>
+    IReadOnlyList<string> Sounds { get; }
+
     /// <param name="batch">Already begun.</param>
     /// <param name="textures">Where the plain pixel and gradients come from.</param>
     /// <param name="area">The menu's page area.</param>

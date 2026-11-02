@@ -25,6 +25,7 @@ internal sealed class SystemPage : IMenuPage
     private readonly UiTextures _ui;
     private readonly ColumnPanelView _panel = new(UiTheme.PageColumn);
     private readonly SelectionMotion _selection = new();
+    private readonly AskedSounds _sounds = new();
     private ISaveFilesPage? _openFiles;
     private ConfirmPrompt? _asking;
 
@@ -64,6 +65,8 @@ internal sealed class SystemPage : IMenuPage
     /// </summary>
     public bool LeavesOnCancel => _asking is null && _openFiles is null;
 
+    public IReadOnlyList<string> Sounds => _sounds.Files;
+
     /// <summary>Where the entries' highlight is, in rows.</summary>
     internal float SelectionPosition => _selection.Position;
 
@@ -83,6 +86,7 @@ internal sealed class SystemPage : IMenuPage
 
     public SceneRequest? Update(InputFrame input)
     {
+        _sounds.Clear();
         if (_openFiles is not null)
         {
             return UpdateFiles(_openFiles, input);
@@ -140,15 +144,19 @@ internal sealed class SystemPage : IMenuPage
     {
         if (input.IsPressed(GameButton.Cancel) && files.LeavesOnCancel)
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuCancel);
             _openFiles = null;
             return null;
         }
 
-        return files.Update(input);
+        var request = files.Update(input);
+        _sounds.AskAll(files.Sounds);
+        return request;
     }
 
     private void MoveOrChoose(InputFrame input)
     {
+        var before = _cursor.Selected;
         if (input.IsPressed(GameButton.Up))
         {
             _cursor.MoveUp();
@@ -160,6 +168,7 @@ internal sealed class SystemPage : IMenuPage
         }
 
         _selection.Follow(_cursor);
+        _sounds.AskMoveIfChanged(before, _cursor.Selected);
         if (!input.IsPressed(GameButton.Confirm))
         {
             return;
@@ -168,6 +177,7 @@ internal sealed class SystemPage : IMenuPage
         switch (_entries[_cursor.Selected])
         {
             case OpensFiles opens:
+                _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
                 opens.Page.Open();
                 _openFiles = opens.Page;
                 break;

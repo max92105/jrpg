@@ -34,4 +34,17 @@ public sealed class GameFlowSoundTests
 
         Assert.Empty(_flow.Audio.Effects.Played);
     }
+
+    [Fact]
+    public void Update_SceneAsksAndOpensTheMenu_PlaysItsSound()
+    {
+        var flow = StartedFlow();
+
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Menu));
+        var whenOpening = flow.Audio.Effects.Played.ToList();
+        flow.Update(OneUpdate, default);
+
+        Assert.Equal([UiSoundFiles.Effects.MenuConfirm], whenOpening);
+        Assert.Empty(flow.Audio.Effects.Played);
+    }
 }

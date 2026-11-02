@@ -22,6 +22,7 @@ internal sealed class GameMenuScene : IScene
     // The footer's hint starts 40 px in.
     private const int FooterTextInset = 40;
 
+    private readonly AskedSounds _sounds = new();
     private readonly UiTextures _ui;
     private readonly MenuTabsView _tabsView;
     private readonly MemberColumnView _memberColumnView;
@@ -73,8 +74,11 @@ internal sealed class GameMenuScene : IScene
     /// <summary>The members a member page goes through and the one it shows, kept current while it is open.</summary>
     internal MemberColumn MemberColumn { get; } = new();
 
+    public IReadOnlyList<string> Sounds => _sounds.Files;
+
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
+        _sounds.Clear();
         _motion.Advance(delta);
         _tabGlide.Advance(delta);
         _tabFold.Advance(delta);
@@ -168,10 +172,12 @@ internal sealed class GameMenuScene : IScene
     {
         if (input.IsPressed(GameButton.Cancel) || input.IsPressed(GameButton.Menu))
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuCancel);
             _motion.StartClosing();
             return;
         }
 
+        var before = _tabs.Selected;
         if (input.IsPressed(GameButton.Up))
         {
             _tabs.MoveUp();
@@ -182,10 +188,12 @@ internal sealed class GameMenuScene : IScene
             _tabs.MoveDown();
         }
 
+        _sounds.AskMoveIfChanged(before, _tabs.Selected);
         _tabGlide.Follow(_tabs.Selected, _tabLabels.Length);
 
         if (input.IsPressed(GameButton.Confirm))
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
             _pages[_tabs.Selected].Open();
 
             // A page opens on its first member, so the member column's highlight starts there rather than gliding.
@@ -213,11 +221,14 @@ internal sealed class GameMenuScene : IScene
         var page = _pages[_tabs.Selected];
         if (input.IsPressed(GameButton.Cancel) && page.LeavesOnCancel)
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuCancel);
             _isInPage = false;
             _tabFold.Unfold();
             return null;
         }
 
-        return page.Update(input);
+        var request = page.Update(input);
+        _sounds.AskAll(page.Sounds);
+        return request;
     }
 }

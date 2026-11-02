@@ -6,6 +6,7 @@ using Jrpg.Data.Art;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Scenes;
+using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -27,6 +28,7 @@ internal sealed class ExplorationScene : IScene
     private readonly Func<PlacedObject, ObjectDefinition> _currentDefinitionOf;
     private readonly MapArt _art;
     private readonly EventPresenter _presenter;
+    private readonly AskedSounds _sounds = new();
     private readonly InteractionPromptView _prompt;
     private readonly MapCamera _camera = new();
     private readonly MapDrawList _drawList = new();
@@ -44,6 +46,8 @@ internal sealed class ExplorationScene : IScene
         EnterCurrentMap();
     }
 
+    public IReadOnlyList<string> Sounds => _sounds.Files;
+
     /// <summary>
     /// Shows the running event's step; interacts, walks and opens the menu only once it and its fade are over. An
     /// interaction that starts an event waits for it like any other. While a step's encounter is pending, the player
@@ -55,6 +59,7 @@ internal sealed class ExplorationScene : IScene
     /// </returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
+        _sounds.Clear();
         var request = UpdateExploration(delta, input);
         _prompt.Update(_presenter.IsBusy ? null : _exploration.InteractionInFront, input.Device, delta);
         return request;
@@ -108,6 +113,7 @@ internal sealed class ExplorationScene : IScene
         if (input.IsPressed(GameButton.Menu))
         {
             _walkAnimation.Stand();
+            _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
             return new MenuRequested();
         }
 

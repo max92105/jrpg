@@ -39,6 +39,7 @@ internal sealed class OptionsPage : IMenuPage
     private readonly MeasuredText[] _levels;
     private readonly ListCursor _cursor = new(RowCount, _ => true);
     private readonly SelectionMotion _selection = new();
+    private readonly AskedSounds _sounds = new();
 
     /// <param name="text">Messages and fonts.</param>
     /// <param name="ui">The shared textures: the selected row.</param>
@@ -71,6 +72,8 @@ internal sealed class OptionsPage : IMenuPage
 
     public string Hint { get; }
 
+    public IReadOnlyList<string> Sounds => _sounds.Files;
+
     public bool LeavesOnCancel => true;
 
     /// <summary>The row Left and Right change now.</summary>
@@ -90,6 +93,8 @@ internal sealed class OptionsPage : IMenuPage
 
     public SceneRequest? Update(InputFrame input)
     {
+        _sounds.Clear();
+        var before = _cursor.Selected;
         if (input.IsPressed(GameButton.Up))
         {
             _cursor.MoveUp();
@@ -101,14 +106,15 @@ internal sealed class OptionsPage : IMenuPage
         }
 
         _selection.Follow(_cursor);
+        _sounds.AskMoveIfChanged(before, _cursor.Selected);
         if (input.IsPressed(GameButton.Right))
         {
-            Change(1);
+            ChangeAndSound(1);
         }
 
         if (input.IsPressed(GameButton.Left))
         {
-            Change(-1);
+            ChangeAndSound(-1);
         }
 
         return null;
@@ -127,6 +133,17 @@ internal sealed class OptionsPage : IMenuPage
 
     private static Rectangle RowAt(Rectangle area, int row) =>
         new(area.X, area.Y + (row * UiTheme.MenuRowHeight), area.Width, UiTheme.MenuRowHeight);
+
+    // A value at its end doesn't change, so it stays silent.
+    private void ChangeAndSound(int step)
+    {
+        var shown = ValueOf(_cursor.Selected);
+        Change(step);
+        if (ValueOf(_cursor.Selected) != shown)
+        {
+            _sounds.Ask(UiSoundFiles.Effects.MenuMove);
+        }
+    }
 
     // Full screen flips either way; the text speed and the volumes step and stop at either end.
     private void Change(int step)

@@ -124,6 +124,61 @@ public sealed class SystemPageTests
         }
     }
 
+    [Fact]
+    public void Update_ConfirmOnSave_AsksTheConfirmSound()
+    {
+        var page = NewPage();
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.Equal([UiSoundFiles.Effects.MenuConfirm], page.Sounds);
+    }
+
+    [Fact]
+    public void Update_DownOnTheEntries_AsksTheMoveSound()
+    {
+        var page = NewPage();
+
+        page.Update(Pressing(GameButton.Down));
+
+        Assert.Equal([UiSoundFiles.Effects.MenuMove], page.Sounds);
+    }
+
+    [Fact]
+    public void Update_CancelInTheFiles_AsksTheCancelSound()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Confirm));
+
+        page.Update(Pressing(GameButton.Cancel));
+
+        Assert.Equal([UiSoundFiles.Effects.MenuCancel], page.Sounds);
+    }
+
+    [Fact]
+    public void Update_DownInTheFiles_AsksTheMoveSound()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Confirm));
+
+        page.Update(Pressing(GameButton.Down));
+
+        Assert.Equal([UiSoundFiles.Effects.MenuMove], page.Sounds);
+    }
+
+    // The Up from the first entry wraps to the last, which asks first: the question is silent (decision 421).
+    [Fact]
+    public void Update_ConfirmQuit_AsksNothing()
+    {
+        var page = NewPage();
+        page.Update(Pressing(GameButton.Up));
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.Empty(page.Sounds);
+        Assert.False(page.LeavesOnCancel);
+    }
+
     private static SystemPage NewPage()
     {
         var ui = new UiTextures();

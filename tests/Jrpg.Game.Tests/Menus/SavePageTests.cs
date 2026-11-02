@@ -146,6 +146,62 @@ public sealed class SavePageTests : IDisposable
         Assert.Equal(1, page.SelectionPosition);
     }
 
+    [Fact]
+    public void Update_ConfirmEmptySlot_AsksTheConfirmSound()
+    {
+        var page = NewPage();
+        page.Open();
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.Equal([UiSoundFiles.Effects.MenuConfirm], page.Sounds);
+    }
+
+    [Fact]
+    public void Update_Down_AsksTheMoveSound()
+    {
+        var page = NewPage();
+        page.Open();
+
+        page.Update(Pressing(GameButton.Down));
+
+        Assert.Equal([UiSoundFiles.Effects.MenuMove], page.Sounds);
+    }
+
+    [Fact]
+    public void Update_WriteFails_AsksNothing()
+    {
+        // A file where the save folder should be: the folder can't be created, so writing throws.
+        File.WriteAllText(_directory, "not a folder");
+        var page = NewPage();
+        page.Open();
+
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.NotNull(page.Notice);
+        Assert.Empty(page.Sounds);
+    }
+
+    // The question and its Yes are both silent, though the save is written (decision 421).
+    [Fact]
+    public void Update_OverwriteAnsweredYes_AsksNothing()
+    {
+        var slots = NewSlots();
+        slots.Write(1, NewSession());
+        var page = NewPage(slots);
+        page.Open();
+        _now = _now.AddDays(1);
+
+        page.Update(Pressing(GameButton.Confirm));
+        var atTheQuestion = page.Sounds.ToList();
+        page.Update(Pressing(GameButton.Left));
+        page.Update(Pressing(GameButton.Confirm));
+
+        Assert.Empty(atTheQuestion);
+        Assert.Empty(page.Sounds);
+        Assert.Equal(_now, page.Entries[0].Summary?.SavedAt);
+    }
+
     private static GameSession NewSession() => GameSession.StartNew(StartMapScenarios.BelowClosedDoor, "sarxian", new SeededRandom(1));
 
     private SaveSlots NewSlots()

@@ -73,5 +73,16 @@ public sealed class LoadPageTests : IDisposable
         Assert.True(page.Entries[0].IsDamaged);
     }
 
+    [Fact]
+    public void Update_Down_AsksTheMoveSound()
+    {
+        var page = NewPage();
+        page.Open();
+
+        page.Update(Pressing(GameButton.Down));
+
+        Assert.Equal([UiSoundFiles.Effects.MenuMove], page.Sounds);
+    }
+
     private LoadPage NewPage() => new(_slots, RepositoryScreenText.Text, new UiTextures());
 }

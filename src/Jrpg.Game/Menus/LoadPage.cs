@@ -26,6 +26,8 @@ internal sealed class LoadPage(SaveSlots slots, ScreenText text, UiTextures ui) 
 
     public bool LeavesOnCancel => true;
 
+    public IReadOnlyList<string> Sounds => _panel.Sounds;
+
     public void Open() => _panel.Open();
 
     public void Advance(TimeSpan delta) => _panel.Advance(delta);

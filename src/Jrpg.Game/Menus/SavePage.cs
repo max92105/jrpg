@@ -26,6 +26,7 @@ internal sealed class SavePage : ISaveFilesPage
     private readonly GameSession _session;
     private readonly UiMessages _messages;
     private readonly SaveFilesPanel _panel;
+    private readonly AskedSounds _sounds = new();
     private readonly ConfirmPromptView _promptView;
     private readonly SpriteFontBase _noticeFont;
     private ConfirmPrompt? _asking;
@@ -58,6 +59,8 @@ internal sealed class SavePage : ISaveFilesPage
 
     public string Hint { get; }
 
+    public IReadOnlyList<string> Sounds => _sounds.Files;
+
     /// <summary>False while the overwrite question is open: Cancel answers it No instead.</summary>
     public bool LeavesOnCancel => _asking is null;
 
@@ -76,11 +79,16 @@ internal sealed class SavePage : ISaveFilesPage
     /// <returns>Null: saving asks the flow for nothing.</returns>
     public SceneRequest? Update(InputFrame input)
     {
+        _sounds.Clear();
         if (_asking is not null)
         {
             Answer(_asking, input);
+            return null;
         }
-        else if (_panel.Update(input) is { } chosen)
+
+        var chosen = _panel.Update(input);
+        _sounds.AskAll(_panel.Sounds);
+        if (chosen is not null)
         {
             Choose(chosen);
         }
@@ -108,11 +116,22 @@ internal sealed class SavePage : ISaveFilesPage
         if (chosen.IsEmpty)
         {
             Write(chosen.Number);
+            AskConfirmIfWritten();
             return;
         }
 
         _asking = new ConfirmPrompt(_messages.Format(MessageIds.SaveOverwrite, FileNumber(chosen.Number)));
         _askingFor = chosen.Number;
+    }
+
+    // A failed write says so in its notice, with no buzzer; an overwrite was answered in a prompt, which stays silent
+    // (decision 421).
+    private void AskConfirmIfWritten()
+    {
+        if (_notice is null)
+        {
+            _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
+        }
     }
 
     private void Answer(ConfirmPrompt asking, InputFrame input)

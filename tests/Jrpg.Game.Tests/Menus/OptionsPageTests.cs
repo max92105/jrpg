@@ -172,6 +172,38 @@ public sealed class OptionsPageTests
         Assert.Equal(VolumeLevel.Max, _settings.VoiceVolume);
     }
 
+    [Fact]
+    public void Update_DownToTheNextRow_AsksTheMoveSound()
+    {
+        var page = NewPage();
+
+        page.Update(Pressing(GameButton.Down));
+
+        Assert.Equal([UiSoundFiles.Effects.MenuMove], page.Sounds);
+    }
+
+    [Fact]
+    public void Update_RightOnMusic_AsksTheMoveSound()
+    {
+        _settings.MusicVolume = 3;
+        var page = PageOn(OptionsPage.MusicRow);
+
+        page.Update(Pressing(GameButton.Right));
+
+        Assert.Equal([UiSoundFiles.Effects.MenuMove], page.Sounds);
+    }
+
+    [Fact]
+    public void Update_RightOnVoicesAtMax_AsksNothing()
+    {
+        _settings.VoiceVolume = VolumeLevel.Max;
+        var page = PageOn(OptionsPage.VoicesRow);
+
+        page.Update(Pressing(GameButton.Right));
+
+        Assert.Empty(page.Sounds);
+    }
+
     private OptionsPage PageOn(int row)
     {
         var page = NewPage();

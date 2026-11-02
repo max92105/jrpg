@@ -32,6 +32,7 @@ internal sealed class ShopScene : IScene
     private readonly ShopView _view;
     private readonly OverlayFade _fade = new();
     private readonly SelectionMotion _tabPointer = new();
+    private readonly AskedSounds _sounds = new();
     private bool _hasRequestedClose;
 
     /// <param name="text">The header's and the footer's fonts and lines.</param>
@@ -82,8 +83,14 @@ internal sealed class ShopScene : IScene
     /// </summary>
     public string? Notice => _counter.Notice ?? (SelectedRow?.Refusal is { } refusal ? _messages.Text(TradeRefusalNames.IdOf(refusal)) : null);
 
+    /// <summary>
+    /// Move, confirm and cancel as the cursor moves, enters or leaves a list, or leaves the Shop (decision 421).
+    /// </summary>
+    public IReadOnlyList<string> Sounds => _sounds.Files;
+
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
+        _sounds.Clear();
         _fade.Advance(delta);
         _tabPointer.Advance(delta);
         ShownSelection.Advance(delta);
@@ -123,21 +130,31 @@ internal sealed class ShopScene : IScene
 
     private CategoryRail ShownRail => Tab == ShopTab.Buy ? _buyRail : _sellRail;
 
-    // Left and Right choose without wrapping; Confirm enters the shown list; Cancel leaves the Shop.
+    // Left and Right choose without wrapping, so a press at the end is silent; Confirm enters the shown list; Cancel
+    // leaves the Shop.
     private void UpdateTabs(InputFrame input)
     {
         if (input.IsPressed(GameButton.Cancel))
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuCancel);
             _fade.StartClosing();
             return;
         }
 
         if (input.IsPressed(GameButton.Confirm))
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
             IsOnTabs = false;
             return;
         }
 
+        var shown = Tab;
+        ChooseTab(input);
+        _sounds.AskMoveIfChanged((int)shown, (int)Tab);
+    }
+
+    private void ChooseTab(InputFrame input)
+    {
         if (input.IsPressed(GameButton.Right))
         {
             Tab = ShopTab.Sell;
@@ -164,6 +181,7 @@ internal sealed class ShopScene : IScene
 
         if (input.IsPressed(GameButton.Cancel))
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuCancel);
             IsOnTabs = true;
             return;
         }
@@ -181,7 +199,13 @@ internal sealed class ShopScene : IScene
         }
 
         MoveCursor(input);
+        // The member shows only beside a gear row's changes, so a switch elsewhere is silent: nothing on screen moved.
+        var previewed = _preview.Member;
         _preview.SwitchMember(input);
+        if (SelectedRow?.Piece is not null && !ReferenceEquals(previewed, _preview.Member))
+        {
+            _sounds.Ask(UiSoundFiles.Effects.MenuMove);
+        }
     }
 
     private void Deal(TradeRow row)
@@ -198,6 +222,7 @@ internal sealed class ShopScene : IScene
 
     private void MoveCursor(InputFrame input)
     {
+        var selected = ShownSelection.SelectedIndex ?? 0;
         if (input.IsPressed(GameButton.Up))
         {
             ShownSelection.MoveUp();
@@ -209,11 +234,14 @@ internal sealed class ShopScene : IScene
             ShownSelection.MoveDown();
             _counter.ClearNotice();
         }
+
+        _sounds.AskMoveIfChanged(selected, ShownSelection.SelectedIndex ?? 0);
     }
 
     // The tab buttons move the shown rail (the shoulders, Q and R); any other press isn't a category change.
     private bool TryChangeCategory(InputFrame input)
     {
+        var category = ShownRail.Selected;
         if (input.IsPressed(GameButton.PreviousTab))
         {
             ShownRail.MoveUp();
@@ -227,6 +255,7 @@ internal sealed class ShopScene : IScene
             return false;
         }
 
+        _sounds.AskMoveIfChanged(category, ShownRail.Selected);
         ShowCategoryFirstRow();
         return true;
     }

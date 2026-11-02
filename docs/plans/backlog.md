@@ -121,7 +121,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 ## From the gold and shops plan (2026-11-01)
 
 - `Game/Exploration/EventPresenter` is at 296 lines after the music plan's D1: the next event step kind it must show moves the page reading (`ShowPages`, `StartReading`) into its own type first.
-- The "move down until the wanted row" test helper is written three times (`ShopSceneBuyTests`, `ShopSceneSellTests`, `ShopScenePreviewTests`): one shared driver in `tests/Jrpg.Game.Tests/Trade/`.
+- The "move down until the wanted row" test helper is written three times (`ShopSceneBuyTests`, `ShopSceneSellTests`, `ShopScenePreviewTests`): `Trade/ShopDriver.MoveDownUntil` (the sound pass, SH2) is the shared one they can switch to.
 - Private draw helpers over four parameters: `ShopDetailView.DrawRow` (6), `DrawPreview` and `DrawPicker` (5), `ShopListView.DrawTabs`, `DrawRowSelection` and `DrawRow` (5); fold the area or the opacity into a per-frame record when each view is next touched.
 - The gold plan's out-of-scope features (editing shops in the editor, gold in the save list, a `giveGold` step, Unique items in shops, the whole party's preview at once) are listed in `docs/plans/done/2026-10-29-gold-and-shops/README.md`, "Out of scope".
 - The copied-content-root fixture (`CopiedContentRoot`, quests QD) exists; `ContentCatalogLoaderShopTests`, `ContentCatalogLoaderCraftingTests`, `ContentWriterTests` and `ContentWriterShopTests` still copy the content themselves: switch them when next touched.

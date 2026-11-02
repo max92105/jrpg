@@ -1,0 +1,13 @@
+# FE1. The event presenter's page reading moves into `Exploration/MessageReading`
+
+Part of [the sound pass plan](../README.md). Phase 4's first slice, after the developer's go. The backlog's line on `EventPresenter` (the next growth moves the page reading out first). Design: [design.md](../design.md), "Key decisions" 5, "Replacement mapping".
+
+- **FE1. The event presenter's page reading moves into `Exploration/MessageReading`** (Game refactor, about 140 lines; no behavior change)
+  - **Goal:** `EventPresenter` (296 lines) leaves room for the step sounds (FE2, FE3) by handing the message on screen to its own type.
+  - **New types:**
+    - `Exploration/MessageReading`: the message box being read over the map: a step's pages shown, typed out with their ticks (`TypingSound`), turned by Confirm, judged on the page as last seen (decision 54). Built with the `EventLook` (the box's fonts) and the `VoiceChannel` (which mutes the ticks).
+      - `bool IsShowing`; `string? ShownLine`; `IReadOnlyList<string> Sounds` (the ticks of its last update); `void Show(SpeechPlayback pages)`; `void Update(TimeSpan delta, InputFrame input)` (types or turns; closes itself after the last page, so `IsShowing` turns false); `void Draw(SpriteBatch batch, TextureLibrary textures)`.
+  - **Changes:**
+    - `Exploration/EventPresenter` (296 → about 255): `_messageBox`, `_reading` and `_typing` leave; `ShowPages` becomes: not showing → `Show(StartReading(step))`; else `Update`, and `ContinueEvent` once it stopped showing. `StartReading` stays (it maps a step to its pages and reads the presenter's rest line). `IsShowingMessage` and `ShownLine` read the reading. `Sounds` becomes the presenter's own `AskedSounds`, cleared as `Update` starts, the reading's ticks copied in after its update (FE2 and FE3 add to it). The class summary points to `MessageReading` for the pages.
+  - **Tests:** existing tests pass unchanged (the guard): `EventPresenterTests`, `EventPresenterSoundTests` (the ticks, muted under a voice), `EventPresenterQuestTests`, `EventPresenterRestTests`, `EventPresenterInnTests`, `ExplorationSceneSoundTests`. No new test: the move adds no behavior.
+  - **Verify by hand:** talk to a villager (pages type with ticks, Confirm completes then turns), open a chest (the found item's line), rest at the inn (the line after the black): all as before. Screenshots (F12) of a dialogue before and after match.

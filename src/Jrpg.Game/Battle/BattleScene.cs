@@ -48,6 +48,7 @@ internal sealed class BattleScene : IScene
     private VictoryScreen? _victory;
     private VictoryScreenView? _victoryView;
     private readonly AskedSounds _sounds = new();
+    private readonly PlaybackSoundQueue _soundQueue = new();
     private DefeatScreen? _defeat;
     private DefeatScreenView? _defeatView;
     private EscapedNotice? _escaped;
@@ -105,6 +106,7 @@ internal sealed class BattleScene : IScene
         ShowAimedTargets();
         AdvanceViews(delta);
         _sequence.Update(delta);
+        _soundQueue.Follow(_sequence.Playback, _sounds);
         if (!ReferenceEquals(_sequence.Playback, _shownPlayback))
         {
             ShowPlayback(_sequence.Playback);

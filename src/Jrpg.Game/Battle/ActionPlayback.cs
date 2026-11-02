@@ -14,7 +14,8 @@ namespace Jrpg.Game.Battle;
 /// its name, a miss "Miss" and a resisted status "Resisted"; whoever fell shows white, then fades on the defeat beat. A
 /// lost turn shows "Stunned" on its beat, Poison and Regen pop the HP they took or restored on a tick beat, and an
 /// enemy entering a phase shows "Enraged!" on a beat of its own after all the others (decision 406). An event it
-/// doesn't know throws, so a new mechanic can't be shown silently wrong (ADR 0004).
+/// doesn't know throws, so a new mechanic can't be shown silently wrong (ADR 0004). Its sounds follow the beats
+/// (<see cref="BattleSounds"/>).
 /// </summary>
 internal sealed class ActionPlayback
 {
@@ -56,6 +57,9 @@ internal sealed class ActionPlayback
     /// </summary>
     public IReadOnlyList<CueOnTarget> Cues => _cues;
 
+    /// <summary>What this turn sounds like and when, sorted by time.</summary>
+    public IReadOnlyList<TimedSound> Sounds { get; private set; } = [];
+
     /// <summary>Time since the action landed; it runs on after the hold, while the numbers, effects and the fallen finish.</summary>
     public TimeSpan Elapsed { get; private set; }
 
@@ -71,6 +75,7 @@ internal sealed class ActionPlayback
         }
 
         playback.Duration = playback._beats.Aggregate(TimeSpan.Zero, (total, beat) => total + beat.Duration);
+        playback.Sounds = BattleSounds.Of(events, playback.StartOf);
         return playback;
     }
 

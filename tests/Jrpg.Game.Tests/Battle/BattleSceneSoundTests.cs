@@ -10,7 +10,7 @@ using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Tests.Battle;
 
-// A battle lost at the start (decision 97), so no seed matters; with no save the defeat menu lists one choice.
+// The scene passes up what its outcome screens and its turns ask to hear.
 [Collection(RepositoryScreenText.CollectionName)]
 public sealed class BattleSceneSoundTests
 {
@@ -35,17 +35,42 @@ public sealed class BattleSceneSoundTests
         Assert.Empty(scene.Sounds);
     }
 
-    // Long enough for the defeat screen to come in and take input.
+    // An attack can land, crit or miss, so any of the three proves the turn's sounds reach the scene.
+    [Fact]
+    public void Update_AttackPlaysOut_AsksItsImpactSound()
+    {
+        var scene = NewBattle(_ => { });
+        scene.Update(TimeSpan.FromSeconds(10), default);
+        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        var asked = new List<string>();
+
+        for (var update = 0; update < 120; update++)
+        {
+            scene.Update(StartMapScenarios.OneUpdate, default);
+            asked.AddRange(scene.Sounds);
+        }
+
+        Assert.Contains(asked, file => file is UiSoundFiles.Battle.Hit or UiSoundFiles.Battle.Critical or UiSoundFiles.Battle.Miss);
+    }
+
+    // Lost at the start (decision 97), so no seed matters; with no save the defeat menu lists one choice. The two long
+    // updates let the defeat screen come in and take input.
     private static BattleScene LostBattle()
+    {
+        var scene = NewBattle(session => session.Party.Leader.Vitals.TakeDamage(9999));
+        scene.Update(TimeSpan.FromSeconds(10), default);
+        scene.Update(TimeSpan.FromSeconds(10), default);
+        return scene;
+    }
+
+    private static BattleScene NewBattle(Action<GameSession> beforeTheBattle)
     {
         var catalog = StartMapScenarios.NextToForestWarpAlwaysRolling;
         var session = GameSession.StartNew(catalog, "sarxian", new SeededRandom(1));
         Assert.True(StartMapScenarios.WalkUntilBattleRequested(StartMapScenarios.SceneOf(session.Exploration, catalog)));
-        session.Party.Leader.Vitals.TakeDamage(9999);
+        beforeTheBattle(session);
         session.StartPendingBattle();
-        var scene = new BattleScene(session, new BattleSceneSources(catalog.Items, UnwrittenSaveSlots.Create()), RepositoryScreenText.Text, new UiTextures());
-        scene.Update(TimeSpan.FromSeconds(10), default);
-        scene.Update(TimeSpan.FromSeconds(10), default);
-        return scene;
+        return new BattleScene(session, new BattleSceneSources(catalog.Items, UnwrittenSaveSlots.Create()), RepositoryScreenText.Text, new UiTextures());
     }
 }

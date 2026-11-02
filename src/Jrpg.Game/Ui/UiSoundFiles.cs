@@ -27,4 +27,22 @@ internal static class UiSoundFiles
 
         public const string TextTyping = "PlaceholderTextTyping.wav";
     }
+
+    /// <summary>In <see cref="AudioFolders.Effects"/>: what a battle's events sound like (decision 423).</summary>
+    public static class Battle
+    {
+        public const string Hit = "PlaceholderHit.wav";
+
+        public const string Critical = "PlaceholderCritical.wav";
+
+        public const string Miss = "PlaceholderMiss.wav";
+
+        public const string Block = "PlaceholderBlock.wav";
+
+        public const string Resisted = "PlaceholderResisted.wav";
+
+        public const string StatusApplied = "PlaceholderStatusApplied.wav";
+
+        public const string Heal = "PlaceholderHeal.wav";
+    }
 }

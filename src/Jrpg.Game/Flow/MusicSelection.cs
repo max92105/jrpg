@@ -1,4 +1,5 @@
 using Jrpg.Core.Session;
+using Jrpg.Game.Battle;
 using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Flow;
@@ -9,11 +10,22 @@ namespace Jrpg.Game.Flow;
 internal static class MusicSelection
 {
     /// <param name="session">The playthrough; null while no game is on, on the title and the leader choice.</param>
-    public static string? TrackFor(GameSession? session)
+    /// <param name="battleCue">What the battle screen on top calls for; null when none is.</param>
+    public static string? TrackFor(GameSession? session, BattleMusicCue? battleCue)
     {
         if (session is null)
         {
             return UiSoundFiles.Music.Title;
+        }
+
+        if (battleCue == BattleMusicCue.Silence)
+        {
+            return null;
+        }
+
+        if (battleCue == BattleMusicCue.Field)
+        {
+            return session.Exploration.CurrentMap.Settings.MusicFile;
         }
 
         // Pending from the encounter's flash until the session finishes the battle (decision 416).

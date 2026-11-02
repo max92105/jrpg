@@ -44,4 +44,21 @@ public sealed class GameFlowMusicTests
 
         Assert.Equal("Own.wav", flow.Audio.Music.Track);
     }
+
+    // The forest has a track, so only the battle screen's cue can give silence here (decision 418).
+    [Fact]
+    public void Update_BattleLost_AsksForSilence()
+    {
+        var flow = StartedFlow(catalog: StartMapScenarios.NextToForestWarpAlwaysRolling);
+        WalkUntilAnEncounter(flow);
+        SessionOf(flow).Party.Leader.Vitals.TakeDamage(9999);
+        Assert.NotNull(SessionOf(flow).Exploration.CurrentMap.Settings.MusicFile);
+
+        for (var update = 0; update < 300; update++)
+        {
+            flow.Update(OneUpdate, default);
+        }
+
+        Assert.Null(flow.Audio.Music.Track);
+    }
 }

@@ -67,6 +67,18 @@ internal static class BattleScenarios
         };
     }
 
+    /// <summary>The forest's encounter as a single goblin, changed as the test needs.</summary>
+    public static ContentCatalog WithOneGoblin(ContentCatalog catalog, Func<EnemyDefinition, EnemyDefinition> change)
+    {
+        var goblin = change(catalog.Enemies["goblin"]);
+        var trio = catalog.Encounters["goblin_trio"] with { EnemyIds = ["goblin"] };
+        return catalog with
+        {
+            Enemies = new Dictionary<string, EnemyDefinition>(catalog.Enemies) { ["goblin"] = goblin },
+            Encounters = new Dictionary<string, EncounterDefinition>(catalog.Encounters) { ["goblin_trio"] = trio },
+        };
+    }
+
     /// <param name="random">Shuffles the turn order; tests that run enemy turns pass the same source to the tactics.</param>
     public static BattleState SarxianAgainstGoblinTrio(IRandom random) => MemberAgainstGoblinTrio("sarxian", new Inventory(), random);
 

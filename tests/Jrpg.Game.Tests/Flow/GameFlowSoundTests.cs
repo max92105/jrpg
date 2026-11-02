@@ -47,4 +47,26 @@ public sealed class GameFlowSoundTests
         Assert.Equal([UiSoundFiles.Effects.MenuConfirm], whenOpening);
         Assert.Empty(flow.Audio.Effects.Played);
     }
+
+    [Fact]
+    public void Update_EncounterStarts_PlaysTheBattleStartOnce()
+    {
+        var flow = StartedFlow(catalog: StartMapScenarios.NextToForestWarpAlwaysRolling);
+
+        WalkUntilAnEncounter(flow);
+
+        Assert.Contains(UiSoundFiles.Battle.Start, flow.Audio.Effects.Played);
+    }
+
+    [Fact]
+    public void Update_DuringTheFlash_PlaysNoEffect()
+    {
+        var flow = StartedFlow(catalog: StartMapScenarios.NextToForestWarpAlwaysRolling);
+        WalkUntilAnEncounter(flow);
+
+        flow.Update(OneUpdate, default);
+
+        Assert.True(flow.IsFlashing);
+        Assert.Empty(flow.Audio.Effects.Played);
+    }
 }

@@ -1,6 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Session;
 using Jrpg.Game.Audio;
+using Jrpg.Game.Battle;
 using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
@@ -89,7 +90,7 @@ internal sealed class GameFlow : IScene
         var request = AdvanceTheFlow(delta, input);
 
         // After the flow's state settled, and on the flash's updates too, when the scenes wait (ADR 0035).
-        Audio.Music.Want(MusicSelection.TrackFor(Session));
+        Audio.Music.Want(MusicSelection.TrackFor(Session, (_scenes.Top as BattleScene)?.MusicCue));
         return request;
     }
 
@@ -176,6 +177,7 @@ internal sealed class GameFlow : IScene
                 break;
             case BattleRequested battle:
                 _encounter = battle;
+                Audio.Effects.Play(UiSoundFiles.Battle.Start);
                 _encounterCount++;
                 _shatter = new EncounterShatter(_fadeOut);
                 _flash.Start();

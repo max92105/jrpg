@@ -64,7 +64,7 @@ public sealed class BattleSceneTests
     [Fact]
     public void Update_AttackUntilOver_FinishesBattleAndShowsVictory()
     {
-        var catalog = WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { MaxHp = 1 });
+        var catalog = BattleScenarios.WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { MaxHp = 1 });
         var (session, scene) = StartForestBattle(catalog);
         var experienceBefore = session.Party.Leader.Experience;
         scene.Update(StartMapScenarios.OneUpdate, _confirm);
@@ -80,7 +80,7 @@ public sealed class BattleSceneTests
     [Fact]
     public void Update_ConfirmOnFilledVictory_RequestsBattleFinished()
     {
-        var catalog = WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { MaxHp = 1, DropTableId = null });
+        var catalog = BattleScenarios.WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { MaxHp = 1, DropTableId = null });
         var (_, scene) = StartForestBattle(catalog);
         scene.Update(StartMapScenarios.OneUpdate, _confirm);
         scene.Update(StartMapScenarios.OneUpdate, _confirm);
@@ -96,7 +96,7 @@ public sealed class BattleSceneTests
     [Fact]
     public void Update_ConfirmOnFilledVictoryWithDrops_ShowsItemsThenFinishes()
     {
-        var oneGoblin = WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { MaxHp = 1, DropTableId = "certain" });
+        var oneGoblin = BattleScenarios.WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { MaxHp = 1, DropTableId = "certain" });
         var catalog = oneGoblin with { DropTables = new Dictionary<string, DropTable> { ["certain"] = new("certain", [new DropEntry("potion", 100)]) } };
         var (_, scene) = StartForestBattle(catalog);
         scene.Update(StartMapScenarios.OneUpdate, _confirm);
@@ -128,7 +128,7 @@ public sealed class BattleSceneTests
     [Fact]
     public void Update_PartyFallsThenMainMenu_RequestsTitle()
     {
-        var catalog = WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { Damage = 9999 });
+        var catalog = BattleScenarios.WithOneGoblin(StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { Damage = 9999 });
         var (session, scene) = StartForestBattleScene(catalog);
         Settle(scene);
         if (session.ActiveBattle is not null)
@@ -192,17 +192,5 @@ public sealed class BattleSceneTests
         beforeBattle(session);
         session.StartPendingBattle();
         return (session, new BattleScene(session, new BattleSceneSources(catalog.Items, UnwrittenSaveSlots.Create()), RepositoryScreenText.Text, new UiTextures()));
-    }
-
-    // The forest encounter becomes a single goblin, changed as the test needs.
-    private static ContentCatalog WithOneGoblin(ContentCatalog catalog, Func<EnemyDefinition, EnemyDefinition> change)
-    {
-        var goblin = change(catalog.Enemies["goblin"]);
-        var trio = catalog.Encounters["goblin_trio"] with { EnemyIds = ["goblin"] };
-        return catalog with
-        {
-            Enemies = new Dictionary<string, EnemyDefinition>(catalog.Enemies) { ["goblin"] = goblin },
-            Encounters = new Dictionary<string, EncounterDefinition>(catalog.Encounters) { ["goblin_trio"] = trio },
-        };
     }
 }

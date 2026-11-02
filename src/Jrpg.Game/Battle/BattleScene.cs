@@ -49,6 +49,7 @@ internal sealed class BattleScene : IScene
     private VictoryScreenView? _victoryView;
     private readonly AskedSounds _sounds = new();
     private readonly PlaybackSoundQueue _soundQueue = new();
+    private readonly BattleMusic _music = new();
     private DefeatScreen? _defeat;
     private DefeatScreenView? _defeatView;
     private EscapedNotice? _escaped;
@@ -86,6 +87,9 @@ internal sealed class BattleScene : IScene
 
     public IReadOnlyList<string> Sounds => _sounds.Files;
 
+    /// <summary>What the battle screen calls for from the music as its outcome shows (decision 418).</summary>
+    public BattleMusicCue MusicCue => _music.Cue;
+
     /// <returns>
     /// <see cref="BattleFinished"/> when the victory screen or the escaped notice is left; <see cref="LoadRequested"/> or
     /// <see cref="TitleRequested"/> from the defeat screen's choice. Null otherwise.
@@ -93,6 +97,7 @@ internal sealed class BattleScene : IScene
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
         _sounds.Clear();
+        _music.Advance(delta);
         if (_isFinished)
         {
             return UpdateOutcomeScreen(delta, input);
@@ -233,6 +238,8 @@ internal sealed class BattleScene : IScene
         var outcome = _battle.Phase;
         if (_session.FinishBattle() is { } spoils)
         {
+            _music.ShowVictory();
+            _sounds.Ask(UiSoundFiles.Battle.Victory);
             _victory = new VictoryScreen(spoils);
             _victoryView = new VictoryScreenView(_victory, _text, _ui);
             return;
@@ -240,11 +247,15 @@ internal sealed class BattleScene : IScene
 
         if (outcome == BattlePhase.Escaped)
         {
+            _music.ShowEscape();
+            _sounds.Ask(UiSoundFiles.Battle.Escape);
             _escaped = new EscapedNotice();
             _escapedText = MeasuredText.Of(_escapedFont, _text.Messages.Text(MessageIds.BattleEscaped));
             return;
         }
 
+        _music.ShowDefeat();
+        _sounds.Ask(UiSoundFiles.Battle.Defeat);
         _defeat = new DefeatScreen(_saves, _text, _ui);
         _defeatView = new DefeatScreenView(_defeat, _text, _ui);
     }

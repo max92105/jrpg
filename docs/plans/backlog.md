@@ -150,3 +150,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `OptionsPageTests` (lines 53-88): the older text speed tests reach their row with one Down press; `PageOn(OptionsPage.TextSpeedRow)` now exists (V1 review).
 - `SystemPageTests`' older tests (`Update_ConfirmQuit_AsksBeforeRequesting`, `Update_YesToQuit_RequestsQuit`, `Update_YesToTitleScreen_RequestsTitle`, `Update_AnswerNo_StaysInPage`) and the new `Update_ConfirmQuit_AsksNothing` reach rows by fixed presses: `SystemPage` exposes no selected entry (S3 review).
 - `Trade/ShopScene` and its lists play no sounds: the music plan's slices predate the Shop, and `ShopScene` is at 296 lines, so its tabs or preview split out first, then it asks move, confirm and cancel as the Forge does (S4).
+- `BattleSceneTests` and `BattleSceneSoundTests` reach command rows by fixed presses (Up wrapping to Run, Down counted to Defend), since `BattleScene` doesn't expose its menu's selection (B4 review).

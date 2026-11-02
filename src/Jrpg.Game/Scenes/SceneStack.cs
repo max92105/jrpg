@@ -45,6 +45,9 @@ internal sealed class SceneStack
     /// <returns>The top scene's request; null when it has none or the stack is empty.</returns>
     public SceneRequest? Update(TimeSpan delta, InputFrame input) => _scenes.Count > 0 ? _scenes[^1].Update(delta, input) : null;
 
+    /// <summary>The scene on top; null with an empty stack.</summary>
+    public IScene? Top => _scenes.Count > 0 ? _scenes[^1] : null;
+
     /// <summary>The top scene's <see cref="IScene.Sounds"/>; none with an empty stack.</summary>
     public IReadOnlyList<string> TopSounds => _scenes.Count > 0 ? _scenes[^1].Sounds : [];
 

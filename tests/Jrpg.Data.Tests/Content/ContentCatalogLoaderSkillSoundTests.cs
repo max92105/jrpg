@@ -6,9 +6,9 @@ namespace Jrpg.Data.Tests.Content;
 public sealed class ContentCatalogLoaderSkillSoundTests
 {
     [Theory]
-    [InlineData("fire_blast", "PlaceholderSkillStrike.wav")]
+    [InlineData("fire_blast", "PlaceholderSkillFire.wav")]
     [InlineData("heal", "PlaceholderSkillMend.wav")]
-    [InlineData("taunt", "PlaceholderSkillCharm.wav")]
+    [InlineData("taunt", "PlaceholderSkillShout.wav")]
     public void Load_RepositorySkills_NameTheirSounds(string skillId, string soundFile)
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
@@ -20,7 +20,7 @@ public sealed class ContentCatalogLoaderSkillSoundTests
     public void Load_SkillWithoutASound_ThrowsNamingTheSkillAndField()
     {
         using var content = new CopiedContentRoot("skill-sound");
-        content.Replace("skills.json", "\"soundFile\": \"PlaceholderSkillStrike.wav\",", "");
+        content.Replace("skills.json", "\"soundFile\": \"PlaceholderSkillFire.wav\",", "");
 
         var exception = Assert.Throws<ContentValidationException>(() => ContentCatalogLoader.Load(content.Path));
 

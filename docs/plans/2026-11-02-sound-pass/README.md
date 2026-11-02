@@ -51,7 +51,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 2: battle and skill sounds
 - [x] **B1. The battle's start and its impact sounds from freesound: hit, critical, miss, block, resisted, status, heal, fall** (content, about 140 lines) → [slices/B1.md](slices/B1.md)
 - [x] **B2. Every other battle sound from freesound: ticks, backfire, stun, gain, status ended, move, extra turn, item, Defend, enraged, escape** (content, about 180 lines) → [slices/B2.md](slices/B2.md)
-- [ ] **K1. Skill sounds in nine families from freesound; the tone script retired** (content + Data tests, about 180 lines) → [slices/K1.md](slices/K1.md)
+- [x] **K1. Skill sounds in nine families from freesound; the tone script retired** (content + Data tests, about 180 lines) → [slices/K1.md](slices/K1.md)
 - [ ] **P2. The manifest's check: every effect sourced or a tune, licenses allowed, every entry credited; Phase 2's listening** (Data tests, about 80 lines) → [slices/P2.md](slices/P2.md)
 
 ### Phase 3: the Shop

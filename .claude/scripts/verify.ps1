@@ -20,6 +20,10 @@ function Report($step, $ok, $details) {
     if (-not $ok) { $script:failed = $true }
 }
 
+# Only one run at a time: the line below would kill another run's tests (the stop hook's and a reviewer's met).
+$verifyLock = New-Object System.Threading.Mutex($false, 'JrpgVerify')
+try { [void]$verifyLock.WaitOne() } catch [System.Threading.AbandonedMutexException] { }
+
 # A test host left running by an interrupted run locks the DLLs and makes the next build fail.
 Get-Process -Name 'Jrpg.*.Tests', 'Jrpg.Simulations' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 

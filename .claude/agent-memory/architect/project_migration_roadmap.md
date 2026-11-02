@@ -5,7 +5,7 @@ metadata:
   type: project
 ---
 
-Plan status lives in `docs/plans/README.md`, each plan's decisions and ADRs in its own README, and leftovers in `docs/plans/backlog.md`. Quests (save format 7) and the enemy skills and bosses plan were done on 2026-11-01; the music and SFX plan is approved and not started.
+Plan status lives in `docs/plans/README.md`, each plan's decisions and ADRs in its own README, and leftovers in `docs/plans/backlog.md`. Quests (save format 7), the enemy skills and bosses plan and the music and SFX plan were all done on 2026-11-01; settings kept between runs (decision 415) is the next known plan.
 
 Rule seen at that approval: a review that adds features (pickers, previews, saved stocks) roughly doubles a plan; renumber slice ids to reuse file names, stub the orphans.
 

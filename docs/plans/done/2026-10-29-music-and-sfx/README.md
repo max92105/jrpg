@@ -1,5 +1,5 @@
 # Music and sound effects
-Status: retro pending
+Status: done
 
 Drafted on 2026-10-29 from the developer's request. Builds on ADR 0018 (voices: WAV through MonoGame's `SoundEffect`, scenes write a `VoiceChannel`, the host plays it after each update, an exact-name startup check, silent without a device), which left music and effects to "their own plan".
 

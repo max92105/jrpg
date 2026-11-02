@@ -15,7 +15,7 @@ Older plans are single files with the same sections.
 
 | Plan | Status |
 |---|---|
-| [2026-10-29-music-and-sfx](2026-10-29-music-and-sfx/README.md) | retro pending |
+| [done/2026-10-29-music-and-sfx](done/2026-10-29-music-and-sfx/README.md) | done |
 | [done/2026-10-29-enemy-skills-and-bosses](done/2026-10-29-enemy-skills-and-bosses/README.md) | done |
 | [done/2026-10-29-quests](done/2026-10-29-quests/README.md) | done |
 | [done/2026-10-29-gold-and-shops](done/2026-10-29-gold-and-shops/README.md) | done |

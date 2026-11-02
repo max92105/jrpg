@@ -12,6 +12,7 @@ paths:
 - Load assets through the content pipeline or one asset loader class; never load files ad hoc inside draw code.
 - A shape or texture that `UiTextures` bakes lives in `Ui/`, never in a feature folder: `Ui` must not depend on `Battle`, `Menus` or `Title`.
 - No allocations in `Update`/`Draw` hot paths (no LINQ, no `new` of lists per frame, no string concatenation per frame).
+- A sound is asked where the action went through, never at the press: a refusal stays silent (decision 421; the music plan's S1, S2).
 
 ## UI look
 

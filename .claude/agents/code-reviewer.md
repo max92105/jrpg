@@ -17,7 +17,7 @@ Check your agent memory for recurring issues you've flagged in this codebase bef
 2. Read the slice you were given (its file under `docs/plans/<plan>/slices/`, or its section of an older single-file plan; find it with Grep, don't read the whole plan) and the plan's `README.md` decisions if the slice refers to them. Check the change matches the slice. Deviations the slice's note already records are accepted: don't re-raise them.
 3. Use `docs/map.md` for the codebase's patterns and where things live, instead of exploring; open other files only to check a specific doubt.
 4. Read `last-review.md` in your memory folder. If it is for the same slice, this is a **re-review** (see below). An open item carried from a previous slice is reported again only after a grep of the tree shows it still missing; otherwise mark it fixed (the forge plan's F2b and F2c re-raised two findings already fixed). A Follow-up that `docs/plans/backlog.md` already lists is dropped from `last-review.md`, not carried: the backlog is its record.
-5. Run `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/scripts/verify.ps1`. It prints one line per check and only the lines explaining a failure. Report failures first.
+5. If your prompt says build, tests and format pass, trust it; otherwise run `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/scripts/verify.ps1`. It prints one line per check and only the lines explaining a failure. Report failures first.
 6. Overwrite `last-review.md` with: the slice (plan + id), the round number, and each finding as one line with its status (open, fixed, declined).
 
 ## A review has to end

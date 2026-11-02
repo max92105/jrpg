@@ -12,7 +12,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - **`TextureLibrary` keeps every texture it loads for good**, cutscene stills included. That is fine with the 4 KB placeholder stills, but full-screen real stills (about 8 MB of video memory each, 3 per intro) would stay loaded after the intro. Drop a still once its event ends when real art arrives. (new-game-flow K2a)
 - **An open yes/no question is held and drawn the same way in 3 screens** (`SavePage`, `SystemPage`, `NewGame/LeaderChoiceScene`: a `ConfirmPrompt?` field, a `ConfirmPromptView`, drawn while open, cleared when answered). Each copy is a few lines, and what Yes does differs per screen. Pull it into a small shared `Ui` type when a fourth screen needs it. (new-game-flow S1b review)
 - **A dialog a menu page draws leaves the footer hint bright**: `GameMenuScene.Draw` draws the footer after the page, so the scrim of the Party notice and of the Save and System prompts dims everything but the hint. Draw page dialogs after the footer, or the footer under the page, when the walk-through or the next menu change gets to it. (escape-menu-third-pass PD1 review)
-- `MainViewModel` (498 lines after the quests plan's QE3): the sheet image-size cache (`SheetImageSizes`) and the import status text (`SheetImportResult.Summary`) could leave it.
+- `MainViewModel` (502 lines after the music plan's E1): the sheet image-size cache (`SheetImageSizes`) and the import status text (`SheetImportResult.Summary`) could leave it.
 - **`Directory.Build.props`:** merge `src/` and `tests/` into a root file. Decision 144 keeps two files for now; the developer didn't choose to merge. When it happens, use the standard form:
   - the gates go in a root `Directory.Build.props`;
   - `tests/Directory.Build.props` keeps its two test-only settings (`IsPackable=false`, `using Xunit`) and imports the root file through `$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))`;
@@ -20,7 +20,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
   The file is protected, so ask the developer first.
 - **Why Core refused an equipment change:** `SlotChoice.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. `PartyEquipment.ItemWithoutRoom` and `UnequipAll` would own both. It can wait because it is correct today, and nothing planned changes equipment.
-- **`Ui/MessageIds.cs` is 758 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
+- **`Ui/MessageIds.cs` is 767 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
 - **`MainViewModelTests`, part 2 (449 lines after E1a):** move the new content tests (`CreateObject_*`, `CreateNpc_*`, `CanStartNewObject_*`, `TryCreateMap_*`) and the map settings tests (`TryApplySettings_*`) into their own classes, on E1a's `EditorTestContent`.
 - **`MainWindow.xaml.cs` (547 lines):** move the viewport (pan, zoom, fit) and the tile painting handlers into partial files, as `.EventEditing` and `.ObjectEditing` already are.
 - **`TileBrowserViewModelTests` (410 lines):** move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class.
@@ -120,7 +120,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the gold and shops plan (2026-11-01)
 
-- `Game/Exploration/EventPresenter` is at 286 lines after the quests plan's G4: the next event step kind it must show moves the page reading (`ShowPages`, `StartReading`) into its own type first.
+- `Game/Exploration/EventPresenter` is at 296 lines after the music plan's D1: the next event step kind it must show moves the page reading (`ShowPages`, `StartReading`) into its own type first.
 - The "move down until the wanted row" test helper is written three times (`ShopSceneBuyTests`, `ShopSceneSellTests`, `ShopScenePreviewTests`): one shared driver in `tests/Jrpg.Game.Tests/Trade/`.
 - Private draw helpers over four parameters: `ShopDetailView.DrawRow` (6), `DrawPreview` and `DrawPicker` (5), `ShopListView.DrawTabs`, `DrawRowSelection` and `DrawRow` (5); fold the area or the opacity into a per-frame record when each view is next touched.
 - The gold plan's out-of-scope features (editing shops in the editor, gold in the save list, a `giveGold` step, Unique items in shops, the whole party's preview at once) are listed in `docs/plans/done/2026-10-29-gold-and-shops/README.md`, "Out of scope".
@@ -141,7 +141,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 ## From the enemy skills and bosses plan (2026-11-01)
 
 - `BossFightSimulation.PlayFight` repeats the battle setup and loop of `ForestFightsSimulation.RunBattle`: share them when a third simulation needs them (S1 review).
-- `Battle/ActionPlayback` is at 267 lines; `Read` kept its case count only by sending `EnemyPhaseEntered` through its default arm into `AddCue` (B3): the next event kind brings the handler table the `ActionPlayback.Read` line asks for.
+- `Battle/ActionPlayback` is at 292 lines after the music plan's B2; `Read` kept its case count only by sending `EnemyPhaseEntered` through its default arm into `AddCue` (B3): the next event kind brings the handler table the `ActionPlayback.Read` line asks for.
 - `BattleTurnSequenceTests` writes `new EnemyTactics(random, new Dictionary<string, SkillDefinition>())` five times (T1): a small helper, as `EnemyTacticsTests` has.
 - The enemy plan's out-of-scope features (a battle event step and a boss beaten for good, more conditions, enemy resources, cooldowns, phases that change stats or art, a boss banner, skills for the goblin and the beetle) are listed in `docs/plans/done/2026-10-29-enemy-skills-and-bosses/README.md`, "Out of scope".
 
@@ -151,3 +151,9 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `SystemPageTests`' older tests (`Update_ConfirmQuit_AsksBeforeRequesting`, `Update_YesToQuit_RequestsQuit`, `Update_YesToTitleScreen_RequestsTitle`, `Update_AnswerNo_StaysInPage`) and the new `Update_ConfirmQuit_AsksNothing` reach rows by fixed presses: `SystemPage` exposes no selected entry (S3 review).
 - `Trade/ShopScene` and its lists play no sounds: the music plan's slices predate the Shop, and `ShopScene` is at 296 lines, so its tabs or preview split out first, then it asks move, confirm and cancel as the Forge does (S4).
 - `BattleSceneTests` and `BattleSceneSoundTests` reach command rows by fixed presses (Up wrapping to Run, Down counted to Defend), since `BattleScene` doesn't expose its menu's selection (B4 review).
+- `Battle/BattleScene` is at 288 lines after the music plan's B5: the next change that grows it moves its outcome screens' update and finish into their own type first.
+- `Menus/OptionsPage.DrawRow` is 25 lines since the volume pips (V2): extract the pips' drawing when the page is next touched.
+- `UiArtFilesTests` checks with `File.Exists`, which ignores case on Windows; `UiSoundFilesTests` compares exact names: do the same for the art (P1).
+- `InventoryPageSoundTests` and the older Inventory tests lean on the list opening on the potion: a small helper that moves to an item by id (S4 review).
+- The effects other than the two outcome jingles are still plain generated tones (`new-placeholder-tone.ps1`): give them the chip voices of `new-placeholder-tune.pl` if they grate too.
+- The music plan's out-of-scope features (settings kept between runs, composed music, crossfades, streaming, field sounds, a `playMusic` step, pausing on lost focus) are listed in `docs/plans/done/2026-10-29-music-and-sfx/README.md`, "Out of scope".

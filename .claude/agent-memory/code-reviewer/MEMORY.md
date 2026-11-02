@@ -5,4 +5,3 @@
 - [Stale comments](stale-size-comments.md) — sizing, moved drawing, a newly conditional call or a renamed file leave old sizes/places/names; grep old wording
 - [Last review](last-review.md) — slice, round and finding status of the latest review; read first to apply re-review rules
 - [Detached comments](detached-comments.md) — a member inserted under, or removed from under, a comment leaves it describing the wrong code
-- [Sound ask coverage](sound-ask-coverage.md) — screens gaining sounds leave Ask lines and Clear unasserted; map each to a test

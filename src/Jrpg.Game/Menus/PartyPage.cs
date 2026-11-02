@@ -19,6 +19,7 @@ namespace Jrpg.Game.Menus;
 internal sealed class PartyPage : IMenuPage
 {
     private readonly PartyState _party;
+    private readonly AskedSounds _sounds = new();
     private readonly UiMessages _messages;
     private readonly PartyColumnsView _columnsView;
     private readonly ColumnPanelView _panel = new(UiTheme.PageColumn);
@@ -71,6 +72,8 @@ internal sealed class PartyPage : IMenuPage
     /// </summary>
     public bool LeavesOnCancel => _notice is null && _actionChoice is null && MovingMember is null;
 
+    public IReadOnlyList<string> Sounds => _sounds.Files;
+
     /// <summary>The member under the cursor.</summary>
     public PartyMember Selected => _cursor.Selected;
 
@@ -101,6 +104,8 @@ internal sealed class PartyPage : IMenuPage
 
     public SceneRequest? Update(InputFrame input)
     {
+        _sounds.Clear();
+        var before = (_cursor.IsOnReserve, _cursor.Row);
         if (_notice is not null)
         {
             // The press that closes the notice does nothing else, so it can't confirm the member again.
@@ -120,6 +125,11 @@ internal sealed class PartyPage : IMenuPage
         else
         {
             UpdateBrowsing(input);
+        }
+
+        if (_sounds.Files.Count == 0 && (_cursor.IsOnReserve, _cursor.Row) != before)
+        {
+            _sounds.Ask(UiSoundFiles.Effects.MenuMove);
         }
 
         return null;
@@ -142,6 +152,7 @@ internal sealed class PartyPage : IMenuPage
         }
     }
 
+    // Refusals and their notices stay silent (decision 421), so whatever sounds is asked where it went through.
     private void UpdateBrowsing(InputFrame input)
     {
         if (input.IsPressed(GameButton.Up))
@@ -178,6 +189,8 @@ internal sealed class PartyPage : IMenuPage
         }
         else
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
+
             // Greyed actions stay selectable, so Confirm on one can say why (battle decision 105).
             _canMoveSelectedToReserve = _party.CanMoveToReserve(member);
             _actionChoice = new ListCursor(PartyActionChoiceView.EntryCount, _ => true);
@@ -193,6 +206,7 @@ internal sealed class PartyPage : IMenuPage
             return;
         }
 
+        _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
         ShowParty();
         _cursor.KeepOnACard();
     }
@@ -201,10 +215,12 @@ internal sealed class PartyPage : IMenuPage
     {
         if (input.IsPressed(GameButton.Cancel))
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuCancel);
             _actionChoice = null;
             return;
         }
 
+        var before = choice.Selected;
         if (input.IsPressed(GameButton.Up))
         {
             choice.MoveUp();
@@ -216,6 +232,7 @@ internal sealed class PartyPage : IMenuPage
         }
 
         _actionSelection.Follow(choice);
+        _sounds.AskMoveIfChanged(before, choice.Selected);
 
         if (!input.IsPressed(GameButton.Confirm))
         {
@@ -225,6 +242,7 @@ internal sealed class PartyPage : IMenuPage
         _actionChoice = null;
         if (choice.Selected == PartyActionChoiceView.ChangeOrderEntry)
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
             MovingMember = Selected;
             _movingFromRow = _cursor.Row;
             return;
@@ -236,6 +254,7 @@ internal sealed class PartyPage : IMenuPage
             return;
         }
 
+        _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
         ShowParty();
         _cursor.KeepOnACard();
     }
@@ -244,6 +263,7 @@ internal sealed class PartyPage : IMenuPage
     {
         if (input.IsPressed(GameButton.Cancel))
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuCancel);
             MovingMember = null;
             _cursor.ReturnTo(_movingFromRow);
             return;
@@ -261,6 +281,7 @@ internal sealed class PartyPage : IMenuPage
 
         if (input.IsPressed(GameButton.Confirm))
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
             _party.Reorder(PartyOrderEdit.Swap(_party.ActiveMembers, moving, Selected));
             MovingMember = null;
             ShowParty();

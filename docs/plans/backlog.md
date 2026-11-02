@@ -72,7 +72,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the escape menu third pass plan (2026-10-27)
 
-- `Menus/PartyPage.cs` (275) is near 300: the next change that grows it splits the notice and the action choice into their own presenter first. (`InventoryPage` split its list into `InventoryList` in the loot plan, C1.)
+- `Menus/PartyPage.cs` (296 after the music plan's S4) is at the limit: the next change that grows it splits the notice and the action choice into their own presenter first. (`InventoryPage` split its list into `InventoryList` in the loot plan, C1.)
 - A titled dialog's frame (the scrim, a `FramedWindowLayout.Titled` window, the centered title, measured when the dialog changes) is written twice: `ConfirmPromptView` and `NoticeDialogView`. Share it when a third dialog comes, such as Equipment's or the save page's notice (decision 284).
 - The inventory hint names the Info button as "X (Y on a controller)" in `ui.json`, a copy of `InputBindings`; give the hint a `{button}` from `ButtonLabels.Of(GameButton.Info, device)` as `cinematic_skip` does, once menu pages know the device in use (F1 review).
 - Status: the Skills section starts under the longer of the gear and resource rows, so the stats plan's nine slots will push it off the page; that plan places it (F1 review).
@@ -149,3 +149,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 - `OptionsPageTests` (lines 53-88): the older text speed tests reach their row with one Down press; `PageOn(OptionsPage.TextSpeedRow)` now exists (V1 review).
 - `SystemPageTests`' older tests (`Update_ConfirmQuit_AsksBeforeRequesting`, `Update_YesToQuit_RequestsQuit`, `Update_YesToTitleScreen_RequestsTitle`, `Update_AnswerNo_StaysInPage`) and the new `Update_ConfirmQuit_AsksNothing` reach rows by fixed presses: `SystemPage` exposes no selected entry (S3 review).
+- `Trade/ShopScene` and its lists play no sounds: the music plan's slices predate the Shop, and `ShopScene` is at 296 lines, so its tabs or preview split out first, then it asks move, confirm and cancel as the Forge does (S4).

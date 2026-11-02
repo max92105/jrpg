@@ -18,6 +18,7 @@ namespace Jrpg.Game.Menus;
 internal sealed class QuestsPage : IMenuPage
 {
     private readonly GameSession _session;
+    private readonly AskedSounds _sounds = new();
     private readonly UiMessages _messages;
     private readonly SpriteFontBase _font;
     private readonly string[] _categoryNames;
@@ -51,6 +52,8 @@ internal sealed class QuestsPage : IMenuPage
 
     public bool LeavesOnCancel => true;
 
+    public IReadOnlyList<string> Sounds => _sounds.Files;
+
     /// <summary>The category shown.</summary>
     internal QuestCategory Category => _list.Category;
 
@@ -73,6 +76,7 @@ internal sealed class QuestsPage : IMenuPage
     // The detail is rebuilt only when the choice or the category changed, never per frame.
     public SceneRequest? Update(InputFrame input)
     {
+        _sounds.Clear();
         var before = (_list.Category, _list.Selected);
         if (input.IsPressed(GameButton.Up))
         {
@@ -96,6 +100,7 @@ internal sealed class QuestsPage : IMenuPage
 
         if (before != (_list.Category, _list.Selected))
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuMove);
             RefreshDetail();
         }
 

@@ -42,10 +42,8 @@ internal interface IMenuPage
     {
     }
 
-    /// <summary>
-    /// The effect files the page's last update asks for (ADR 0035); a silent page keeps this default.
-    /// </summary>
-    IReadOnlyList<string> Sounds => [];
+    /// <summary>The effect files the page's last update asks for (ADR 0035).</summary>
+    IReadOnlyList<string> Sounds { get; }
 
     /// <returns>What the page asks the flow for, or null.</returns>
     SceneRequest? Update(InputFrame input);

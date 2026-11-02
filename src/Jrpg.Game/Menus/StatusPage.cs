@@ -19,6 +19,7 @@ namespace Jrpg.Game.Menus;
 internal sealed class StatusPage : IMemberPage
 {
     private readonly ContentCatalog _catalog;
+    private readonly AskedSounds _sounds = new();
     private readonly PartyState _party;
     private readonly ListCursor _cursor;
     private readonly StatusLabels _labels;
@@ -56,6 +57,8 @@ internal sealed class StatusPage : IMemberPage
 
     public bool LeavesOnCancel => true;
 
+    public IReadOnlyList<string> Sounds => _sounds.Files;
+
     /// <summary>Everything the page shows of the member, as text.</summary>
     internal StatusSheet ShownSheet => _sheet;
 
@@ -73,6 +76,7 @@ internal sealed class StatusPage : IMemberPage
 
     public SceneRequest? Update(InputFrame input)
     {
+        _sounds.Clear();
         var before = _cursor.Selected;
         if (input.IsPressed(GameButton.Left) || input.IsPressed(GameButton.PreviousTab))
         {
@@ -86,6 +90,7 @@ internal sealed class StatusPage : IMemberPage
 
         if (_cursor.Selected != before)
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuMove);
             ShowMember();
         }
 

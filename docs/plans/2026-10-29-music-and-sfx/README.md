@@ -58,7 +58,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **S1. The effect path, and the title's move, confirm and cancel sounds** (Game, about 240 lines) → [slices/S1.md](slices/S1.md)
 - [x] **S2. Sounds on the leader choice, the defeat menu and the Forge** (Game, about 200 lines) → [slices/S2.md](slices/S2.md)
 - [x] **S3. Sounds on the game menu's opening and tabs, the Options page and the System page** (Game, about 210 lines) → [slices/S3.md](slices/S3.md)
-- [ ] **S4. Sounds on the Inventory, Equipment, Party and Status pages** (Game, about 230 lines) → [slices/S4.md](slices/S4.md)
+- [x] **S4. Sounds on the Inventory, Equipment, Party and Status pages** (Game, about 230 lines) → [slices/S4.md](slices/S4.md)
 - [ ] **D1. Dialogue typing ticks, spaced and muted under a voice** (Game, about 170 lines) → [slices/D1.md](slices/D1.md)
 
 ### Phase 4: battle sounds

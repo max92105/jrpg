@@ -1,4 +1,5 @@
 using Jrpg.Core.Content;
+using Jrpg.Core.Party;
 using Jrpg.Core.Session;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
@@ -26,6 +27,7 @@ internal sealed class InventoryPage : IMenuPage
     private const int SidebarGap = 96;
 
     private readonly ContentCatalog _catalog;
+    private readonly AskedSounds _sounds = new();
     private readonly CategoryRail _rail = new();
     private readonly InventoryList _list;
     private readonly InventoryColumnView _columnView;
@@ -60,6 +62,8 @@ internal sealed class InventoryPage : IMenuPage
 
     /// <summary>False while choosing who to use an item on: Cancel closes that instead.</summary>
     public bool LeavesOnCancel => !ItemUse.IsOpen;
+
+    public IReadOnlyList<string> Sounds => _sounds.Files;
 
     public InventoryCategory Category => _rail.Category;
 
@@ -109,7 +113,14 @@ internal sealed class InventoryPage : IMenuPage
 
     public SceneRequest? Update(InputFrame input)
     {
+        _sounds.Clear();
+        var before = SelectionNow;
         UpdateInput(input);
+        if (_sounds.Files.Count == 0 && SelectionNow != before)
+        {
+            _sounds.Ask(UiSoundFiles.Effects.MenuMove);
+        }
+
         Sidebar.Refresh(ItemUse.Picker?.Pointed);
         return null;
     }
@@ -123,14 +134,23 @@ internal sealed class InventoryPage : IMenuPage
         _sidebarView.Draw(batch, textures, new PartySidebarView.Place(sidebar, ItemUse), opacity);
     }
 
+    // Where the page's cursors are: any change is a move, unless the input carried something out.
+    private (InventoryCategory Category, bool IsOnRail, int? Row, PartyMember? Pointed) SelectionNow =>
+        (Category, _rail.HasCursor, SelectedRow, ItemUse.Picker?.Pointed);
+
     private void UpdateInput(InputFrame input)
     {
         if (ItemUse.IsOpen)
         {
             if (ItemUse.Update(input) is { } result)
             {
+                _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
                 _detail.ShowNotice(result);
                 _list.Refresh(Category);
+            }
+            else if (!ItemUse.IsOpen)
+            {
+                _sounds.Ask(UiSoundFiles.Effects.MenuCancel);
             }
 
             return;
@@ -169,6 +189,7 @@ internal sealed class InventoryPage : IMenuPage
             return;
         }
 
+        _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
         if (ItemUse.UseOrPickTarget(_catalog.Items[row.ItemId]) is { } result)
         {
             _detail.ShowNotice(result);

@@ -13,6 +13,8 @@ internal sealed class CountingMenuPage : IMenuPage
 {
     public int OpenCount { get; private set; }
 
+    public IReadOnlyList<string> Sounds => [];
+
     public List<string> Calls { get; } = [];
 
     public TimeSpan LastAdvance { get; private set; }

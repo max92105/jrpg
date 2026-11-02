@@ -17,6 +17,7 @@ namespace Jrpg.Game.Menus;
 internal sealed class EquipmentPage : IMemberPage
 {
     private readonly PartyState _party;
+    private readonly AskedSounds _sounds = new();
     private readonly PartyEquipment _equipment;
     private readonly UiMessages _messages;
     private readonly string _pageHint;
@@ -87,6 +88,8 @@ internal sealed class EquipmentPage : IMemberPage
     /// <summary>False while choosing what goes in a slot: Cancel closes that instead.</summary>
     public bool LeavesOnCancel => !_slotChoice.IsOpen;
 
+    public IReadOnlyList<string> Sounds => _sounds.Files;
+
     /// <summary>Whether the player is choosing what goes in a slot.</summary>
     public bool IsChoosing => _slotChoice.IsOpen;
 
@@ -101,9 +104,10 @@ internal sealed class EquipmentPage : IMemberPage
 
     public SceneRequest? Update(InputFrame input)
     {
-        if (_slotChoice.IsOpen)
+        _sounds.Clear();
+        if (_slotChoice.Choice is { } open)
         {
-            UpdateChoice(input);
+            UpdateChoice(open, input);
             return null;
         }
 
@@ -120,6 +124,7 @@ internal sealed class EquipmentPage : IMemberPage
 
         if (_memberCursor.Selected != shownBefore)
         {
+            _sounds.Ask(UiSoundFiles.Effects.MenuMove);
             _sheet = EquipmentSheet.Of(Shown);
             ShowWornComparison();
             return null;
@@ -175,6 +180,7 @@ internal sealed class EquipmentPage : IMemberPage
         }
 
         _selection.Follow(_rowCursor);
+        _sounds.AskMoveIfChanged(rowBefore, _rowCursor.Selected);
         if (_rowCursor.Selected != rowBefore)
         {
             ShowWornComparison();
@@ -185,6 +191,7 @@ internal sealed class EquipmentPage : IMemberPage
             return;
         }
 
+        _sounds.Ask(UiSoundFiles.Effects.MenuConfirm);
         if (_rowCursor.Selected == EquipmentSheet.Slots.Length)
         {
             RemoveAll();
@@ -197,12 +204,16 @@ internal sealed class EquipmentPage : IMemberPage
     }
 
     // Once the choice closes, the sheet shows what changed and Changes goes back to the worn item.
-    private void UpdateChoice(InputFrame input)
+    private void UpdateChoice(EquipmentChoice choice, InputFrame input)
     {
+        var rowBefore = choice.SelectedRow;
         if (!_slotChoice.Update(input))
         {
+            _sounds.AskMoveIfChanged(rowBefore, choice.SelectedRow);
             return;
         }
+
+        _sounds.Ask(input.IsPressed(GameButton.Cancel) ? UiSoundFiles.Effects.MenuCancel : UiSoundFiles.Effects.MenuConfirm);
 
         _sheet = EquipmentSheet.Of(Shown);
         ShowWornComparison();

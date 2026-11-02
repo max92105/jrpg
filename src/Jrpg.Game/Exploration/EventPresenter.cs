@@ -20,20 +20,20 @@ namespace Jrpg.Game.Exploration;
 /// <see cref="RestPlayback"/>: an inn's rest asks first, with its price, then the beat before its message (decisions
 /// 257, 382). A cutscene still covers the screen for its seconds, and Confirm or Cancel skips the cutscene's stills
 /// (ADR 0016). A Forge or shop step asks the scene to open its screen, once (decision 353). The event's voice-over
-/// plays through the voice channel until the event ends or is skipped (ADR 0018). A page typing out asks its ticks
-/// (<see cref="TypingSound"/>).
+/// plays through the voice channel until the event ends or is skipped (ADR 0018). The pages show through a
+/// <see cref="MessageReading"/>, whose typing ticks the presenter asks.
 /// </summary>
 internal sealed class EventPresenter
 {
     private readonly ExplorationState _exploration;
     private readonly PlayerSettings _settings;
     private readonly UiMessages _messages;
-    private readonly DialogueBox _messageBox;
+    private readonly MessageReading _reading;
     private readonly StillRun _stills;
     private readonly RestPlayback _rest;
     private readonly ConfirmPromptView _questionView;
     private readonly VoiceChannel _voice;
-    private readonly TypingSound _typing;
+    private readonly AskedSounds _sounds = new();
 
     // The fade for warps (placeholder timing).
     private readonly ScreenFade _warpFade = new(TimeSpan.FromSeconds(0.25), TimeSpan.FromSeconds(0.08), TimeSpan.FromSeconds(0.25));
@@ -41,9 +41,6 @@ internal sealed class EventPresenter
     // The Forge or shop step its screen was opened for, so it opens once per step: a second one right after it, or one
     // an arrival event starts in the same update, is another step and opens it again. Null on any other step.
     private EventStep? _screenStepAskedFor;
-
-    // The pages of the step being read; null when no message is on screen.
-    private SpeechPlayback? _reading;
 
     /// <param name="exploration">The map events to show.</param>
     /// <param name="look">Messages and fonts for the message box and the pages, and the question's textures.</param>
@@ -56,27 +53,26 @@ internal sealed class EventPresenter
         _exploration = exploration;
         _settings = settings;
         _messages = look.Text.Messages;
-        _messageBox = new DialogueBox(look.Text.Fonts);
+        _reading = new MessageReading(look.Text.Fonts, voice);
         _stills = new StillRun(exploration, new StillView(look.Text));
         _rest = new RestPlayback(look.Text.Messages);
         _questionView = new ConfirmPromptView(look.Text, look.Ui);
         _voice = voice;
-        _typing = new TypingSound(voice);
     }
 
     /// <summary>True while an event runs or its fade plays: the player can't walk, interact or open the menu.</summary>
     public bool IsBusy => _exploration.IsEventRunning || _warpFade.Phase != FadePhase.Idle || _stills.IsLeadingOut;
 
-    public IReadOnlyList<string> Sounds => _typing.Sounds;
+    public IReadOnlyList<string> Sounds => _sounds.Files;
 
     /// <summary>Whether a cutscene still covers the screen.</summary>
     internal bool IsShowingStill => _stills.IsShowing;
 
     /// <summary>Whether a message (a dialogue page, a found item, a rest, a quest line) is on screen.</summary>
-    internal bool IsShowingMessage => _reading is not null;
+    internal bool IsShowingMessage => _reading.IsShowing;
 
     /// <summary>The page on screen, as the test reads it; null while none shows.</summary>
-    internal string? ShownLine => _reading?.CurrentPage;
+    internal string? ShownLine => _reading.ShownLine;
 
     /// <summary>The inn's question while it is open (decision 382); null otherwise.</summary>
     internal ConfirmPrompt? Question => _rest.Question;
@@ -93,7 +89,7 @@ internal sealed class EventPresenter
     /// <exception cref="InvalidOperationException">The current step is of a type the game can't show yet.</exception>
     public void Update(TimeSpan delta, InputFrame input)
     {
-        _typing.Clear();
+        _sounds.Clear();
         _warpFade.Update(delta);
         _rest.Advance(delta);
         if (_stills.IsLeadingOut)
@@ -142,10 +138,7 @@ internal sealed class EventPresenter
     {
         _stills.Draw(batch, textures);
 
-        if (_reading is not null)
-        {
-            _messageBox.Draw(batch, textures, _reading);
-        }
+        _reading.Draw(batch, textures);
 
         if (_rest.Question is { } question)
         {
@@ -216,7 +209,7 @@ internal sealed class EventPresenter
         }
 
         ShowPages(step, delta, input);
-        if (_reading is null)
+        if (!_reading.IsShowing)
         {
             _rest.Finish();
         }
@@ -251,33 +244,17 @@ internal sealed class EventPresenter
     // it can't also complete the first page.
     private void ShowPages(EventStep step, TimeSpan delta, InputFrame input)
     {
-        if (_reading is null)
+        if (!_reading.IsShowing)
         {
-            _reading = StartReading(step);
-            _messageBox.Show(_reading);
+            _reading.Show(StartReading(step));
             return;
         }
 
-        // Confirm is judged on the page as the player last saw it, so a press on the update the last character would
-        // appear completes the page rather than turning it (decision 54).
-        if (!input.IsPressed(GameButton.Confirm))
+        _reading.Update(delta, input);
+        _sounds.AskAll(_reading.Sounds);
+        if (!_reading.IsShowing)
         {
-            var before = _reading.VisibleLength;
-            _reading.Update(delta);
-            _typing.Follow(_reading.CurrentPage, before, _reading.VisibleLength, delta);
-            return;
-        }
-
-        var shownPage = _reading.PageIndex;
-        _reading.Confirm();
-        if (_reading.IsFinished)
-        {
-            _reading = null;
             _exploration.ContinueEvent();
-        }
-        else if (_reading.PageIndex != shownPage)
-        {
-            _messageBox.Show(_reading);
         }
     }
 

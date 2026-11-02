@@ -60,7 +60,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **SH3. A deal's sound as a purchase, a sale or the Forge's salvage goes through; the picker's count ticks** (Game + content, about 210 lines) → [slices/SH3.md](slices/SH3.md)
 
 ### Phase 4: the field's events
-- [ ] **FE1. The event presenter's page reading moves into `Exploration/MessageReading`** (Game refactor, about 140 lines) → [slices/FE1.md](slices/FE1.md)
+- [x] **FE1. The event presenter's page reading moves into `Exploration/MessageReading`** (Game refactor, about 140 lines) → [slices/FE1.md](slices/FE1.md)
 - [ ] **FE2. A found item, a recruit and a quest's start, advance or completion sound as their line shows** (Game + content, about 235 lines) → [slices/FE2.md](slices/FE2.md)
 - [ ] **FE3. A warp from the map and a rest sound as their fade starts** (Game + content, about 170 lines) → [slices/FE3.md](slices/FE3.md)
 

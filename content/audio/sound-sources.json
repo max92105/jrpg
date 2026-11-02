@@ -6,6 +6,78 @@
   ],
   "sounds": [
     {
+      "file": "effects/PlaceholderBattleStart.wav",
+      "freesoundId": 221528,
+      "name": "Glass Break",
+      "author": "unfa",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/221528/",
+      "preview": "https://cdn.freesound.org/previews/221/221528_1038806-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 1,
+      "fadeOutSeconds": 0.3
+    },
+    {
+      "file": "effects/PlaceholderBlock.wav",
+      "freesoundId": 370203,
+      "name": "shield guard",
+      "author": "nekoninja",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/370203/",
+      "preview": "https://cdn.freesound.org/previews/370/370203_4682356-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.4,
+      "fadeOutSeconds": 0.1
+    },
+    {
+      "file": "effects/PlaceholderCritical.wav",
+      "freesoundId": 244983,
+      "name": "ANI Big Pipe Hit",
+      "author": "ani_music",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/244983/",
+      "preview": "https://cdn.freesound.org/previews/244/244983_3008343-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.5,
+      "fadeOutSeconds": 0.15
+    },
+    {
+      "file": "effects/PlaceholderFall.wav",
+      "freesoundId": 417994,
+      "name": "Body fall.wav",
+      "author": "DylanTheFish",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/417994/",
+      "preview": "https://cdn.freesound.org/previews/417/417994_7482766-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.8,
+      "fadeOutSeconds": 0.25
+    },
+    {
+      "file": "effects/PlaceholderHeal.wav",
+      "freesoundId": 483608,
+      "name": "Improvement/Healing Chime",
+      "author": "Raclure",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/483608/",
+      "preview": "https://cdn.freesound.org/previews/483/483608_6436863-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.8,
+      "fadeOutSeconds": 0.2
+    },
+    {
+      "file": "effects/PlaceholderHit.wav",
+      "freesoundId": 458867,
+      "name": "Damage sound effect",
+      "author": "Raclure",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/458867/",
+      "preview": "https://cdn.freesound.org/previews/458/458867_6436863-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.3,
+      "fadeOutSeconds": 0.05
+    },
+    {
       "file": "effects/PlaceholderMenuCancel.wav",
       "freesoundId": 320181,
       "name": "hint.wav",
@@ -40,6 +112,42 @@
       "fetched": "2026-11-02",
       "maxSeconds": 0.08,
       "fadeOutSeconds": 0.02
+    },
+    {
+      "file": "effects/PlaceholderMiss.wav",
+      "freesoundId": 353046,
+      "name": "g_whiff_2.mp3",
+      "author": "deleted_user_6479820",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/353046/",
+      "preview": "https://cdn.freesound.org/previews/353/353046_6479820-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.25,
+      "fadeOutSeconds": 0.05
+    },
+    {
+      "file": "effects/PlaceholderResisted.wav",
+      "freesoundId": 619803,
+      "name": "Error fizzle.wav",
+      "author": "Teh_Bucket",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/619803/",
+      "preview": "https://cdn.freesound.org/previews/619/619803_2492921-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.4,
+      "fadeOutSeconds": 0.1
+    },
+    {
+      "file": "effects/PlaceholderStatusApplied.wav",
+      "freesoundId": 189630,
+      "name": "Spark",
+      "author": "elliott.klein",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/189630/",
+      "preview": "https://cdn.freesound.org/previews/189/189630_2816253-hq.mp3",
+      "fetched": "2026-11-02",
+      "maxSeconds": 0.5,
+      "fadeOutSeconds": 0.05
     },
     {
       "file": "effects/PlaceholderTextTyping.wav",

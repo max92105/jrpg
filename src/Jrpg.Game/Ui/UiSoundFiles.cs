@@ -24,5 +24,7 @@ internal static class UiSoundFiles
         public const string MenuConfirm = "PlaceholderMenuConfirm.wav";
 
         public const string MenuCancel = "PlaceholderMenuCancel.wav";
+
+        public const string TextTyping = "PlaceholderTextTyping.wav";
     }
 }

@@ -81,6 +81,7 @@ internal sealed class ExplorationScene : IScene
         // Sampled before the presenter runs: the Confirm that closes the last message mustn't also interact again.
         var wasBusy = _presenter.IsBusy;
         _presenter.Update(delta, input);
+        _sounds.AskAll(_presenter.Sounds);
         if (!ReferenceEquals(_exploration.CurrentMap, _map))
         {
             EnterCurrentMap();

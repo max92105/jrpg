@@ -20,7 +20,8 @@ namespace Jrpg.Game.Exploration;
 /// <see cref="RestPlayback"/>: an inn's rest asks first, with its price, then the beat before its message (decisions
 /// 257, 382). A cutscene still covers the screen for its seconds, and Confirm or Cancel skips the cutscene's stills
 /// (ADR 0016). A Forge or shop step asks the scene to open its screen, once (decision 353). The event's voice-over
-/// plays through the voice channel until the event ends or is skipped (ADR 0018).
+/// plays through the voice channel until the event ends or is skipped (ADR 0018). A page typing out asks its ticks
+/// (<see cref="TypingSound"/>).
 /// </summary>
 internal sealed class EventPresenter
 {
@@ -32,6 +33,7 @@ internal sealed class EventPresenter
     private readonly RestPlayback _rest;
     private readonly ConfirmPromptView _questionView;
     private readonly VoiceChannel _voice;
+    private readonly TypingSound _typing;
 
     // The fade for warps (placeholder timing).
     private readonly ScreenFade _warpFade = new(TimeSpan.FromSeconds(0.25), TimeSpan.FromSeconds(0.08), TimeSpan.FromSeconds(0.25));
@@ -46,7 +48,9 @@ internal sealed class EventPresenter
     /// <param name="exploration">The map events to show.</param>
     /// <param name="look">Messages and fonts for the message box and the pages, and the question's textures.</param>
     /// <param name="settings">Read when a dialogue starts, so a text speed changed in the menu applies to the next one.</param>
-    /// <param name="voice">Where the running event's voice-over is asked for.</param>
+    /// <param name="voice">
+    /// Where the running event's voice-over is asked for, which also mutes the typing ticks.
+    /// </param>
     public EventPresenter(ExplorationState exploration, EventLook look, PlayerSettings settings, VoiceChannel voice)
     {
         _exploration = exploration;
@@ -57,10 +61,13 @@ internal sealed class EventPresenter
         _rest = new RestPlayback(look.Text.Messages);
         _questionView = new ConfirmPromptView(look.Text, look.Ui);
         _voice = voice;
+        _typing = new TypingSound(voice);
     }
 
     /// <summary>True while an event runs or its fade plays: the player can't walk, interact or open the menu.</summary>
     public bool IsBusy => _exploration.IsEventRunning || _warpFade.Phase != FadePhase.Idle || _stills.IsLeadingOut;
+
+    public IReadOnlyList<string> Sounds => _typing.Sounds;
 
     /// <summary>Whether a cutscene still covers the screen.</summary>
     internal bool IsShowingStill => _stills.IsShowing;
@@ -86,6 +93,7 @@ internal sealed class EventPresenter
     /// <exception cref="InvalidOperationException">The current step is of a type the game can't show yet.</exception>
     public void Update(TimeSpan delta, InputFrame input)
     {
+        _typing.Clear();
         _warpFade.Update(delta);
         _rest.Advance(delta);
         if (_stills.IsLeadingOut)
@@ -254,7 +262,9 @@ internal sealed class EventPresenter
         // appear completes the page rather than turning it (decision 54).
         if (!input.IsPressed(GameButton.Confirm))
         {
+            var before = _reading.VisibleLength;
             _reading.Update(delta);
+            _typing.Follow(_reading.CurrentPage, before, _reading.VisibleLength, delta);
             return;
         }
 

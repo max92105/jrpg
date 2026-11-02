@@ -165,7 +165,7 @@ internal static class StartMapScenarios
     }
 
     // The chest's interact event, made repeatable, runs only this step, so the chest never swaps open.
-    private static ContentCatalog WithChestSaying(ContentCatalog catalog, params EventStep[] steps)
+    public static ContentCatalog WithChestSaying(ContentCatalog catalog, params EventStep[] steps)
     {
         var start = catalog.Maps["start"];
         var objects = start.Layout.Objects

@@ -30,3 +30,5 @@ Size: about 75 lines of code, 11 tests (about 200).
 
 ## Verify by hand
 Nothing to see yet (AI2).
+
+- **Done, with deviations:** a file whose root isn't `<tileset>`, and a frame without a whole-number `tileid` or `duration`, are refused like the missing attributes; the short-animation refusal reads "tile 2: an animation needs at least 2 frames (has 1)."; one test more, `Read_FramesEndingOnTheRowsLastColumn_AreRead` (the row bound accepted). The valid animations are read even when another is refused (the import refuses the whole file on `Refusal`). From the review: a tile size, column count or frame time below 1 is refused with the file named (no division by zero later), a tile animated twice is a refusal, and the missing image, a root other than `<tileset>` and a frame without its duration have tests.

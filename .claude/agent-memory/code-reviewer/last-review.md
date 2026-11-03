@@ -5,12 +5,14 @@ metadata:
   type: project
 ---
 
-Plan: 2026-11-03-object-composer-and-animated-tiles, slice AN2 (the game draws animated tiles). Round 1.
+Plan: 2026-11-03-object-composer-and-animated-tiles, slice AI1 (TiledTilesetReader). Round 1.
 Verdict: Ready to commit.
 
-- open (Suggestion): TileAtlasTests ImageAt_StillTile_IsItsCellAtAnyTime takes Tiles.Values.First() and 12 345 ms,
-  which is frame 0 of a 4 x 140 ms animation too; pick First(t => t.Animation is null)
-- open (Suggestion): ExplorationScene.Update comment says "the water moves"; say "the animated tiles move"
-- open (Follow-up, from CO4a): StartNew's column clip still untested (only StartNew_RectangleTallerThanMaxCells_...)
-- dropped: AN1's three Suggestions (verify.ps1 blank line, ArtReferenceCheck lone line, ADR 0039 option B name)
-  belong to AN1's committed diff; not carried
+- open (Warning): TiledTilesetReader accepts duration="0" (TileAnimation of 0 ms, Refusal null; FrameAt divides by
+  zero) and columns="0" (DivideByZeroException at id % columns, not ContentValidationException)
+- open (Warning): the missing <image source>, non-<tileset> root and frame-without-tileid/duration throws are untested
+- open (Suggestion): duplicate animated <tile id> -> Dictionary.Add ArgumentException, not ContentValidationException
+- open (Suggestion): empty <animation/> refusal says "one frame is a still tile" for 0 frames
+- open (Suggestion): docs/map.md Art row has a stray space before the comma: "`PngSize` , `TiledTilesetReader`"
+- fixed: AN2's two Suggestions (TileAtlasTests First(), "the water moves" comment), grep finds neither
+- dropped: CO4a StartNew column-clip Follow-up, listed in docs/plans/backlog.md

@@ -161,3 +161,10 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 - Tests build an `EventPresenter` by hand 20 times in 9 files (`new EventPresenter(exploration, new EventLook(RepositoryScreenText.Text, new UiTextures()), new PlayerSettings(), new VoiceChannel())`): one test builder beside `StartMapScenarios`.
 - `VictoryScreenSoundTests` copies `VictoryScreenTests`' spoils builders (Sarxian, half a level, a potion): share them when a third victory test file comes.
+
+## From the Mana Seed reset plan (2026-11-03, at approval)
+
+- The plan's out-of-scope features (removing a sheet's unused tiles while the sheet stays, decision 450; an autotile or Wang brush; animated tiles; Mana Seed characters and monsters against `FieldSpriteLayout`'s 48 px frames; the lighting layer, decision 445; map removal in the editor; deleting an image from the editor; Import writing the art manifest entry, decision 448; a release check refusing placeholder art; undoing the purge) are listed in `docs/plans/2026-11-03-mana-seed-reset/README.md`, "Out of scope".
+- `SaveGameRepair` checks only that a saved map still exists (decision 186): a save on a rebuilt map with the same id loads at its old position, maybe in a wall or past a shrunk edge. Repair a position outside the map or on a blocked cell to the new game's start, or the map's arrival, when saves outlive a map rebuild (after the first release).
+- `SoundSourcesTests` reads the test output's copy of `content/`, which keeps a deleted file until a clean build (`PreserveNewest` never deletes): read the repository's folder through the `ContentRoot` metadata the Mana Seed plan's AS1 stamps into `Jrpg.Data.Tests`, as `ArtSourcesTests` does.
+- The `MainViewModel` line above (image-size cache, import status) is done by the Mana Seed plan's X1, which needs the room.

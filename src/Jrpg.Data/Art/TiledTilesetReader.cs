@@ -31,7 +31,6 @@ public static class TiledTilesetReader
             TileHeight = PositiveNumberOf(tileset, "tileheight", fileName),
             Margin = OptionalNumberOf(tileset, "margin", fileName),
             Spacing = OptionalNumberOf(tileset, "spacing", fileName),
-            Columns = columns,
             Animations = animations,
             Refusal = refusal,
         };

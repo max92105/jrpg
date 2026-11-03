@@ -88,6 +88,7 @@
         <MenuItem Header="Set up sheet" Command="{Binding Painting.Browser.SetUpSheetCommand}" />
         <MenuItem Header="Cut sheet" Command="{Binding Painting.Browser.CutSheetCommand}" />
         <MenuItem Header="Import sheet image..." Click="OnImportSheetImageClicked" />
+        <MenuItem Header="Import animations..." Click="OnImportAnimationsClicked" IsEnabled="{Binding CanStartNewObject}" ToolTip="Read a Tiled .tsx file: every animated tile of the set-up sheet with its image gets its frames and time. Ctrl+Z undoes the import." />
       </MenuItem>
       <MenuItem Header="Objects">
         <MenuItem Header="Edit shapes..." Click="OnEditShapesClicked" IsEnabled="{Binding Placing.CanEditShapes, FallbackValue=False}" />
@@ -173,6 +174,7 @@
       <StatusBarItem Content="{Binding CursorStatus}" />
       <StatusBarItem Content="{Binding History.Refusal}" Foreground="{StaticResource ProblemTextBrush}" />
       <StatusBarItem Content="{Binding ImportStatus}" />
+      <StatusBarItem Content="{Binding AnimationImport.Status}" />
       <StatusBarItem Content="Unsaved changes"
                      Visibility="{Binding HasUnsavedChanges, Converter={StaticResource VisibleWhenTrue}}" />
       <StatusBarItem x:Name="ZoomStatus" HorizontalAlignment="Right" />

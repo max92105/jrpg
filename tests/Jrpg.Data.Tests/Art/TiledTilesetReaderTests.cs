@@ -29,7 +29,7 @@ public sealed class TiledTilesetReaderTests : IDisposable
             },
             tileset.Animations);
         Assert.Null(tileset.Refusal);
-        Assert.Equal((16, 16, 12, 1, 2), (tileset.TileWidth, tileset.TileHeight, tileset.Columns, tileset.Margin, tileset.Spacing));
+        Assert.Equal((16, 16, 1, 2), (tileset.TileWidth, tileset.TileHeight, tileset.Margin, tileset.Spacing));
     }
 
     [Fact]

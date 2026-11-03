@@ -18,8 +18,6 @@ public sealed record TiledTileset
     /// <summary>Pixels between cells; 0 when the file doesn't say.</summary>
     public required int Spacing { get; init; }
 
-    public required int Columns { get; init; }
-
     /// <summary>Each animated tile's frame count and time, by its cell.</summary>
     public required IReadOnlyDictionary<(int Column, int Row), TileAnimation> Animations { get; init; }
 

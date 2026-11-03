@@ -105,6 +105,23 @@ internal sealed partial class CatalogDraft : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Sets each tile's animation, null making it still, as one undo step (ADR 0039); nothing when every tile already
+    /// has what it would get. An import sets many at once (decision 469), the Animate panel one.
+    /// </summary>
+    /// <param name="animations">By tile id; every id is a tile.</param>
+    public void SetTileAnimations(IReadOnlyDictionary<int, TileAnimation?> animations)
+    {
+        var before = animations.Keys.Select(id => Current.Tiles[id]).ToList();
+        var after = before.Select(tile => tile with { Animation = animations[tile.Id] }).ToList();
+        if (before.SequenceEqual(after))
+        {
+            return;
+        }
+
+        Do(new CatalogEdit(catalog => WithTiles(catalog, after), catalog => WithTiles(catalog, before)));
+    }
+
     /// <summary>Adds a sheet, or replaces the one with its id, as one undo step.</summary>
     public void SetTilesheet(TilesheetDefinition sheet)
     {
@@ -128,30 +145,6 @@ internal sealed partial class CatalogDraft : ObservableObject
         Do(new CatalogEdit(
             catalog => WithObject(catalog, definition),
             catalog => before is null ? WithoutObject(catalog, definition.Id) : WithObject(catalog, before)));
-    }
-
-    /// <summary>
-    /// Takes a sheet and every tile cut from it out as one undo step (decision 443); the caller has checked nothing
-    /// uses the tiles.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">No sheet has the id.</exception>
-    public void RemoveTilesheet(string sheetId)
-    {
-        var sheet = Current.Tilesheets.GetValueOrDefault(sheetId) ?? throw new InvalidOperationException($"No sheet '{sheetId}' to remove.");
-        var tiles = Current.Tiles.Values.Where(tile => tile.SheetId == sheetId).ToList();
-        Do(new CatalogEdit(
-            catalog => WithoutTilesheet(catalog, sheetId) with { Tiles = catalog.Tiles.Where(pair => pair.Value.SheetId != sheetId).ToDictionary() },
-            catalog => WithTilesheet(catalog, sheet) with { Tiles = catalog.Tiles.Values.Concat(tiles).ToDictionary(tile => tile.Id) }));
-    }
-
-    /// <summary>
-    /// Takes an object definition out as one undo step (decision 443); the caller has checked nothing uses it.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">No object has the id.</exception>
-    public void RemoveObject(string objectId)
-    {
-        var before = Current.Objects.GetValueOrDefault(objectId) ?? throw new InvalidOperationException($"No object '{objectId}' to remove.");
-        Do(new CatalogEdit(catalog => WithoutObject(catalog, objectId), catalog => WithObject(catalog, before)));
     }
 
     /// <summary>
@@ -245,6 +238,17 @@ internal sealed partial class CatalogDraft : ObservableObject
 
     private static ContentCatalog WithTile(ContentCatalog catalog, TileDefinition tile) =>
         catalog with { Tiles = new Dictionary<int, TileDefinition>(catalog.Tiles) { [tile.Id] = tile } };
+
+    private static ContentCatalog WithTiles(ContentCatalog catalog, IEnumerable<TileDefinition> tiles)
+    {
+        var changed = new Dictionary<int, TileDefinition>(catalog.Tiles);
+        foreach (var tile in tiles)
+        {
+            changed[tile.Id] = tile;
+        }
+
+        return catalog with { Tiles = changed };
+    }
 
     private static ContentCatalog WithoutTile(ContentCatalog catalog, int tileId) =>
         catalog with { Tiles = catalog.Tiles.Where(pair => pair.Key != tileId).ToDictionary() };

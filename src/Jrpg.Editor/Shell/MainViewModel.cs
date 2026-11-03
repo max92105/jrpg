@@ -77,6 +77,7 @@ internal sealed partial class MainViewModel : ObservableObject
             History = new CombinedHistory(Content);
             Placing = new ObjectPlacingViewModel(Content, Layer);
             Composing = new ObjectComposing(Content, Placing.Browser, Painting.Browser);
+            AnimationImport = new AnimationImport(Content);
             EventEditing = new EventEditingViewModel(Content) { MapIds = MapIds };
             QuestEditing = new QuestEditingViewModel(Content);
             if (MapIds.Count > 0)
@@ -131,6 +132,9 @@ internal sealed partial class MainViewModel : ObservableObject
 
     /// <summary>Objects > New object and Edit object (decision 455); null when the content didn't load.</summary>
     public ObjectComposing? Composing { get; }
+
+    /// <summary>Tiles > Import animations (decision 469); null when the content didn't load.</summary>
+    public AnimationImport? AnimationImport { get; }
 
     /// <summary>Null when the content or its art didn't load.</summary>
     public ObjectPlacingViewModel? Placing { get; }

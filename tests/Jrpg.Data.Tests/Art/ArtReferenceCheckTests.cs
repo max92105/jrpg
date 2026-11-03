@@ -11,15 +11,19 @@ using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Tests.Art;
 
+// The check's mechanism runs on the frozen test world (ADR 0037), whose sheets, tiles and objects the tests name; the
+// two repository tests read the live content.
 public sealed class ArtReferenceCheckTests
 {
-    private static readonly string _artRoot = ArtFolders.RootIn(Path.Combine(AppContext.BaseDirectory, "content"));
-    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+    private static readonly string _artRoot = ArtFolders.RootIn(Path.Combine(AppContext.BaseDirectory, "test-world"));
+    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
+    private static readonly string _repositoryArtRoot = ArtFolders.RootIn(Path.Combine(AppContext.BaseDirectory, "content"));
+    private static readonly ContentCatalog _repository = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
     [Fact]
     public void FindProblems_RepositoryContent_FindsNone()
     {
-        Assert.Empty(ArtReferenceCheck.FindProblems(_catalog, _artRoot));
+        Assert.Empty(ArtReferenceCheck.FindProblems(_repository, _repositoryArtRoot));
     }
 
     [Fact]
@@ -231,7 +235,7 @@ public sealed class ArtReferenceCheckTests
     [Fact]
     public void FindProblems_RepositoryArt_HasNoFieldSpriteProblem()
     {
-        var problems = ArtReferenceCheck.FindProblems(_catalog, _artRoot);
+        var problems = ArtReferenceCheck.FindProblems(_repository, _repositoryArtRoot);
 
         Assert.DoesNotContain(problems, problem => problem.StartsWith($"{ArtFolders.FieldSprites}/", StringComparison.Ordinal));
     }

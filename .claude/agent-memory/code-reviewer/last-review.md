@@ -5,13 +5,13 @@ metadata:
   type: project
 ---
 
-Plan: 2026-11-03-object-composer-and-animated-tiles, slice CO4a (ObjectComposing). Round 1.
+Plan: 2026-11-03-object-composer-and-animated-tiles, slice CO4b (ObjectCanvasDrawing, TileImages.CellImageOf). Round 1.
 Verdict: Ready to commit.
 
-- open (Warning): StartEdit throws ArgumentOutOfRangeException (ObjectCanvas.Of) for an object over 32 cells either
-  way (Replace cells / New object from selection accept any rectangle) while CanEdit says true; cap CanEdit + test
-- open (Warning): TryApply on an unchanged edit chooses `definition`, a fresh record not in the browser's Objects
-  (SetObject no-op); choose _catalog.Current.Objects[definition.Id] + Assert.Same test
-- open (Suggestion): StartNew's column clip (Math.Min on Columns) untested; only rows are pinned
-- fixed (carried from CO3): OnPartChanged arms tested, edit-own-id test, Title tested
-- fixed (carried from CO1/CO3 follow-up): StartNew clips a rectangle over 32 to its top-left 32
+- open (Warning): ObjectCanvasDrawing.GridLines copies MapDrawing.DrawGrid's line loops; share a
+  MapDrawing.GridLines(columns, rows) geometry (GridBrush could then stay private or be one GridPen)
+- open (Suggestion): Draw's cell placement (CellArea) untested; pin a cell at (2,1) drawn at (96,48)
+- open (Suggestion): TileImages._tiles now caches any cell; rename _cells
+- fixed (carried from CO4a): CanEdit capped at MaxCells (test CanEdit_ObjectTallerThanMaxCells_IsFalse)
+- fixed (carried from CO4a): TryApply chooses _catalog.Current.Objects[id] (test TryApply_EditWithNoChange_...)
+- open (Follow-up, from CO4a): StartNew's column clip still untested (only StartNew_RectangleTallerThanMaxCells_...)

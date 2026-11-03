@@ -20,8 +20,10 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
     // The other layers, dimmed: faint enough to tell apart, clear enough to paint against.
     private const double DimmedOpacity = 0.3;
 
-    // Faint enough to read the tiles through.
-    private static readonly SolidColorBrush _gridBrush = CreateGridBrush();
+    /// <summary>
+    /// The lines between cells, faint enough to read the tiles through; the object composer's canvas shares them.
+    /// </summary>
+    public static SolidColorBrush GridBrush { get; } = CreateGridBrush();
 
     private static readonly IComparer<MapPart> _byDrawOrder = Comparer<MapPart>.Create((left, right) => left.Key.CompareTo(right.Key));
 
@@ -78,22 +80,29 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
     /// <param name="lineWidth">In map pixels; one screen pixel is 1 / zoom, so the lines stay visible when zoomed out.</param>
     public static DrawingImage DrawGrid(MapLayout layout, double lineWidth)
     {
-        var width = layout.Width * CellPixels;
-        var height = layout.Height * CellPixels;
+        var image = new DrawingImage(new GeometryDrawing(null, new Pen(GridBrush, lineWidth), GridLines(layout.Width, layout.Height)));
+        image.Freeze();
+        return image;
+    }
+
+    /// <summary>
+    /// The lines around and between cells, at <see cref="CellPixels"/>: the map's grid and the composer's canvas.
+    /// </summary>
+    public static GeometryGroup GridLines(int columns, int rows)
+    {
+        var (width, height) = (columns * CellPixels, rows * CellPixels);
         var lines = new GeometryGroup();
-        for (var x = 0; x <= layout.Width; x++)
+        for (var x = 0; x <= columns; x++)
         {
             lines.Children.Add(new LineGeometry(new Point(x * CellPixels, 0), new Point(x * CellPixels, height)));
         }
 
-        for (var y = 0; y <= layout.Height; y++)
+        for (var y = 0; y <= rows; y++)
         {
             lines.Children.Add(new LineGeometry(new Point(0, y * CellPixels), new Point(width, y * CellPixels)));
         }
 
-        var image = new DrawingImage(new GeometryDrawing(null, new Pen(_gridBrush, lineWidth), lines));
-        image.Freeze();
-        return image;
+        return lines;
     }
 
     private List<MapPart> PartsInDrawOrder(MapLayout layout)

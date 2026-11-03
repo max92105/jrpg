@@ -9,9 +9,10 @@ using Jrpg.Editor.Catalogs;
 namespace Jrpg.Editor.Tiles;
 
 /// <summary>
-/// Tilesheet images, the tiles cut from them and NPCs' standing frames, each loaded once and kept for the editor's
-/// lifetime. A tile of a sheet whose image is missing, a tile past its image's edge, and an NPC without a sprite draw
-/// as <see cref="MissingArtMark"/> (decision 442), never cached, so an import that brings the file back draws the art.
+/// Tilesheet images, the tiles and cells cut from them and NPCs' standing frames, each loaded once and kept for the
+/// editor's lifetime. A tile or cell of a sheet whose image is missing, one past its image's edge, and an NPC without a
+/// sprite draw as <see cref="MissingArtMark"/> (decision 442), never cached, so an import that brings the file back
+/// draws the art.
 /// </summary>
 /// <param name="catalog">The tiles, sheets and objects drawn.</param>
 /// <param name="artRoot">The <c>art</c> folder.</param>
@@ -22,31 +23,39 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<Miss
     private readonly Dictionary<string, ImageSource> _spriteFrames = [];
 
     // Keyed by the sheet's cut as well as the cell, so a re-cut sheet (another record) is cropped anew (design key decision 3).
-    private readonly Dictionary<(TilesheetDefinition Sheet, int Column, int Row), ImageSource> _tiles = [];
+    private readonly Dictionary<(TilesheetDefinition Sheet, int Column, int Row), ImageSource> _cells = [];
 
     public ImageSource TileImageOf(int tileId)
     {
         var tile = catalog.Current.Tiles[tileId];
-        var sheet = catalog.Current.Tilesheets[tile.SheetId];
+        return CellImageOf(new SheetCell(tile.SheetId, tile.Column, tile.Row));
+    }
+
+    /// <summary>
+    /// A sheet cell's image whether or not a tile is cut from it yet, as the object composer's canvas needs.
+    /// </summary>
+    public ImageSource CellImageOf(SheetCell cell)
+    {
+        var sheet = catalog.Current.Tilesheets[cell.SheetId];
         if (missingArt().IsSheetMissing(sheet.Id))
         {
             return MissingArtMark.Picture;
         }
 
-        var key = (sheet, tile.Column, tile.Row);
-        if (!_tiles.TryGetValue(key, out var image))
+        var key = (sheet, cell.Column, cell.Row);
+        if (!_cells.TryGetValue(key, out var image))
         {
-            var cell = new Int32Rect(sheet.CellLeft(tile.Column), sheet.CellTop(tile.Row), sheet.TileWidth, sheet.TileHeight);
+            var area = new Int32Rect(sheet.CellLeft(cell.Column), sheet.CellTop(cell.Row), sheet.TileWidth, sheet.TileHeight);
             var sheetImage = SheetImageOf(sheet.File);
-            if (cell.X + cell.Width > sheetImage.PixelWidth || cell.Y + cell.Height > sheetImage.PixelHeight)
+            if (area.X + area.Width > sheetImage.PixelWidth || area.Y + area.Height > sheetImage.PixelHeight)
             {
                 // A smaller image was imported over the sheet's; the cell lies past it.
                 return MissingArtMark.Picture;
             }
 
-            image = new CroppedBitmap(sheetImage, cell);
+            image = new CroppedBitmap(sheetImage, area);
             image.Freeze();
-            _tiles.Add(key, image);
+            _cells.Add(key, image);
         }
 
         return image;
@@ -84,9 +93,9 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<Miss
             _sheets.Remove(cached);
         }
 
-        foreach (var cropped in _tiles.Keys.Where(key => string.Equals(key.Sheet.File, file, StringComparison.OrdinalIgnoreCase)).ToList())
+        foreach (var cropped in _cells.Keys.Where(key => string.Equals(key.Sheet.File, file, StringComparison.OrdinalIgnoreCase)).ToList())
         {
-            _tiles.Remove(cropped);
+            _cells.Remove(cropped);
         }
     }
 

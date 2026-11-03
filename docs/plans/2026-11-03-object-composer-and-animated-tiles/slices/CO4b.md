@@ -22,3 +22,5 @@ Size: about 45 lines of code, 5 tests (about 110).
 
 ## Verify by hand
 Nothing to see yet (CO5).
+
+- **Done, with deviations:** the canvas's grid shares the map's line color: `MapDrawing`'s private grid brush became `MapDrawing.GridBrush`, rather than a second copy of the color. From the review: the grid's lines are `MapDrawing.GridLines`, shared with the map's grid; a test checks where a cell is drawn.

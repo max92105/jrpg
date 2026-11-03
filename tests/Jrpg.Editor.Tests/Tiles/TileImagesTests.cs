@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Media.Imaging;
 using Jrpg.Core.Content;
 using Jrpg.Core.Maps;
@@ -49,6 +50,37 @@ public sealed class TileImagesTests
         var images = new TileImages(new CatalogDraft(catalog), ArtFolders.RootIn(_root), () => MissingArt.None);
 
         Assert.Same(MissingArtMark.Picture, images.TileImageOf(outside.Id));
+    }
+
+    [Fact]
+    public void CellImageOf_CellOfASheetWithoutItsImage_IsTheMark()
+    {
+        var images = new TileImages(new CatalogDraft(_catalog), ArtFolders.RootIn(_root), () => _cityMissing);
+
+        Assert.Same(MissingArtMark.Picture, images.CellImageOf(new SheetCell("city", 3, 3)));
+    }
+
+    // City.png is 1536 px, 32 cells of 48 px each way.
+    [Fact]
+    public void CellImageOf_CellPastTheImage_IsTheMark()
+    {
+        var images = new TileImages(new CatalogDraft(_catalog), ArtFolders.RootIn(_root), () => MissingArt.None);
+
+        Assert.Same(MissingArtMark.Picture, images.CellImageOf(new SheetCell("city", 32, 0)));
+    }
+
+    [Fact]
+    public void CellImageOf_CellNotATileYet_IsCropped()
+    {
+        var images = new TileImages(new CatalogDraft(_catalog), ArtFolders.RootIn(_root), () => MissingArt.None);
+        var cell = (from row in Enumerable.Range(0, 32)
+                    from column in Enumerable.Range(0, 32)
+                    select new SheetCell("city", column, row))
+            .First(cell => !_catalog.Tiles.Values.Any(tile => (tile.SheetId, tile.Column, tile.Row) == (cell.SheetId, cell.Column, cell.Row)));
+
+        var image = Assert.IsType<CroppedBitmap>(images.CellImageOf(cell));
+
+        Assert.Equal(new Int32Rect(cell.Column * 48, cell.Row * 48, 48, 48), image.SourceRect);
     }
 
     [Fact]

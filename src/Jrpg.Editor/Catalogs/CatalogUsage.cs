@@ -42,17 +42,23 @@ internal static class CatalogUsage
     private static IEnumerable<TileDefinition> TilesOf(string sheetId, ContentCatalog catalog) =>
         catalog.Tiles.Values.Where(tile => tile.SheetId == sheetId).OrderBy(tile => tile.Id);
 
-    /// <summary>The maps placing an object, so an undo that would remove it can be refused.</summary>
+    /// <summary>
+    /// The maps placing an object, or whose events swap to it (a swap to an unknown object fails the save, so the
+    /// object can't leave while one names it), so an undo or a removal that would take it away can be refused.
+    /// </summary>
     /// <param name="catalog">The saved maps.</param>
     /// <param name="objectId">The object looked for.</param>
     /// <param name="openLayout">The open map's layout, unsaved changes included; null when no map is open.</param>
-    /// <returns>"map forest" style names, sorted by id; empty when no map places it.</returns>
+    /// <returns>"map forest" style names, sorted by id; empty when no map uses it.</returns>
     public static IReadOnlyList<string> UsersOfObject(ContentCatalog catalog, string objectId, MapLayout? openLayout) =>
         [.. LayoutsOf(catalog, openLayout)
-            .Where(layout => layout.Objects.Any(placed => placed.ObjectId == objectId))
+            .Where(layout => layout.Objects.Any(placed => placed.ObjectId == objectId) || SwapsTo(layout, objectId))
             .Select(layout => layout.Id)
             .Order(StringComparer.Ordinal)
             .Select(id => $"map {id}")];
+
+    private static bool SwapsTo(MapLayout layout, string objectId) =>
+        layout.AllEvents.Any(mapEvent => mapEvent.Steps.Any(step => step is SwapObjectStep swap && swap.ObjectId == objectId));
 
     /// <summary>
     /// The maps whose events name a quest, in a step or a condition, or name one of its stages when

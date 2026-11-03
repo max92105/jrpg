@@ -22,3 +22,5 @@ None.
 
 ## Verify by hand
 - Make a new object, add a swap step to it on a scratch map's chest event, Ctrl+Z past the event to the object's creation: refused, "is used on map ...".
+
+- **Done, with deviations:** no cell-event test: the validator refuses a swap on a cell event ("swapObject only works in an object's event"), so that use can't exist in saved content; the usage tests put the swap on a placed object's event instead, with a saved-map case in place of the open-map-only one (the open map case is the first test). The tests went into `CatalogUsageTests` (95 lines) rather than a sibling.

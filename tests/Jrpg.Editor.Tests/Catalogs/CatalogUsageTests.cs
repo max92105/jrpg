@@ -1,4 +1,5 @@
 using Jrpg.Core.Content;
+using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
@@ -83,6 +84,43 @@ public sealed class CatalogUsageTests
         var users = CatalogUsage.UsersOfObject(_catalog, "tree_4", start with { Objects = [.. start.Objects, placed] });
 
         Assert.Equal(["map start"], users);
+    }
+
+    // A swap only works in an object's event (the validator refuses it on a cell), so the start map's first placed
+    // object gets one; the new object is placed nowhere.
+    [Fact]
+    public void UsersOfObject_SwapStepNamesIt_NamesTheMap()
+    {
+        var users = CatalogUsage.UsersOfObject(_catalog, "tree_4", WithSwapOnFirstObject(_catalog.Maps["start"].Layout, "tree_4"));
+
+        Assert.Equal(["map start"], users);
+    }
+
+    [Fact]
+    public void UsersOfObject_AnotherObjectSwappedTo_IsEmpty()
+    {
+        var users = CatalogUsage.UsersOfObject(_catalog, "tree_4", WithSwapOnFirstObject(_catalog.Maps["start"].Layout, "tree_5"));
+
+        Assert.Empty(users);
+    }
+
+    [Fact]
+    public void UsersOfObject_SwapOnlyInASavedMap_NamesTheMap()
+    {
+        var forest = _catalog.Maps["forest"];
+        var swapping = new MapDefinition(WithSwapOnFirstObject(forest.Layout, "tree_4"), forest.Settings);
+        var saved = _catalog with { Maps = new Dictionary<string, MapDefinition>(_catalog.Maps) { ["forest"] = swapping } };
+
+        var users = CatalogUsage.UsersOfObject(saved, "tree_4", openLayout: null);
+
+        Assert.Equal(["map forest"], users);
+    }
+
+    private static MapLayout WithSwapOnFirstObject(MapLayout layout, string objectId)
+    {
+        var first = layout.Objects[0];
+        var swapping = new MapEvent { Id = $"{first.Uid}_swap", Activation = EventActivation.Interact, Steps = [new SwapObjectStep(objectId)] };
+        return layout with { Objects = [first with { Events = [.. first.Events, swapping] }, .. layout.Objects.Skip(1)] };
     }
 
     private static MapLayout WithTileAtTopLeft(MapLayout layout, int tileId)

@@ -138,7 +138,7 @@ public sealed class MainViewModelUndoTests : IDisposable
 
         viewModel.History!.UndoCommand.Execute(null);
 
-        Assert.Equal($"Can't undo: object tree_4 is placed on map {placedOn}.", viewModel.History!.Refusal);
+        Assert.Equal($"Can't undo: object tree_4 is used on map {placedOn}.", viewModel.History!.Refusal);
         Assert.True(viewModel.Catalog!.Objects.ContainsKey("tree_4"));
     }
 }

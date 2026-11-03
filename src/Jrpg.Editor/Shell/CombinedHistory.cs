@@ -102,8 +102,8 @@ internal sealed partial class CombinedHistory : ObservableObject
     }
 
     // In the order checked: the first map whose event names a quest or a stage the undo would remove (decision 394);
-    // the first map placing an object it would remove; the first tile cut from a sheet it would remove; the first tile
-    // it would remove that something still uses, named with its first user (decision 117).
+    // the first map placing or swapping to an object it would remove; the first tile cut from a sheet it would remove;
+    // the first tile it would remove that something still uses, named with its first user (decision 117).
     private string? RefusalOfCatalogUndo()
     {
         if (RefusalOfQuestUndo() is { } quest)
@@ -115,7 +115,7 @@ internal sealed partial class CombinedHistory : ObservableObject
         {
             if (CatalogUsage.UsersOfObject(_catalog.Current, objectId, _openMap?.Map.Layout) is [var map, ..])
             {
-                return $"Can't undo: object {objectId} is placed on {map}.";
+                return $"Can't undo: object {objectId} is used on {map}.";
             }
         }
 

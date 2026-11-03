@@ -21,9 +21,27 @@ public sealed class SheetCutViewModelTests
     [Fact]
     public void Columns_ImageSplitsEvenly_SetsTileWidth()
     {
+        _cut.Columns = 6;
+        _cut.Rows = 4;
+
+        Assert.Equal(16, _cut.TileWidth);
+        Assert.Null(_cut.Problem);
+    }
+
+    [Fact]
+    public void Problem_NonSquareTiles_SaysTilesMustBeSquare()
+    {
         _cut.Columns = 2;
 
-        Assert.Equal(48, _cut.TileWidth);
+        Assert.Equal("Tiles must be square: columns and rows give 48 x 32 px tiles.", _cut.Problem);
+    }
+
+    [Fact]
+    public void Problem_SquareTiles_IsNull()
+    {
+        _cut.Columns = 6;
+        _cut.Rows = 4;
+
         Assert.Null(_cut.Problem);
     }
 
@@ -58,11 +76,12 @@ public sealed class SheetCutViewModelTests
     }
 
     [Fact]
-    public void ToSheet_ColumnsChanged_KeepsIdAndFile()
+    public void ToSheet_CutChanged_KeepsIdAndFile()
     {
-        _cut.Columns = 2;
+        _cut.Columns = 6;
+        _cut.Rows = 4;
 
-        Assert.Equal(_sheet with { TileWidth = 48 }, _cut.ToSheet());
+        Assert.Equal(_sheet with { TileWidth = 16, TileHeight = 16 }, _cut.ToSheet());
     }
 
     // 96 px in 8 columns past a 12 px margin: 9 px tiles, but 12 + 9 * 9 = 93 fits a ninth whole column.

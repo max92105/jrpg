@@ -21,6 +21,11 @@ internal static class TilesheetCatalogValidator
             return $"tileWidth and tileHeight must be at least 1 (was {sheet.TileWidth} x {sheet.TileHeight}).";
         }
 
+        if (sheet.TileWidth != sheet.TileHeight)
+        {
+            return $"tiles must be square, since the map draws each into a square cell (was {sheet.TileWidth} x {sheet.TileHeight}).";
+        }
+
         return sheet.Margin < 0 || sheet.Spacing < 0
             ? $"margin and spacing must not be negative (was {sheet.Margin} and {sheet.Spacing})."
             : null;

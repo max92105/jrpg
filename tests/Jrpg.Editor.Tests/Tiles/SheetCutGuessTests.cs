@@ -4,16 +4,23 @@ namespace Jrpg.Editor.Tests.Tiles;
 
 public sealed class SheetCutGuessTests
 {
+    // A Mana Seed sheet: both sides multiples of 16, neither of 48.
     [Fact]
-    public void TileSizeFor_DivisibleBy48_Is48()
+    public void TileSizeFor_ManaSeedSheet_Is16()
     {
-        Assert.Equal(48, SheetCutGuess.TileSizeFor(384, 96));
+        Assert.Equal(16, SheetCutGuess.TileSizeFor(256, 400));
     }
 
     [Fact]
-    public void TileSizeFor_DivisibleBy32Only_Is32()
+    public void TileSizeFor_DivisibleBy48And16_Is16()
     {
-        Assert.Equal(32, SheetCutGuess.TileSizeFor(160, 64));
+        Assert.Equal(16, SheetCutGuess.TileSizeFor(96, 48));
+    }
+
+    [Fact]
+    public void TileSizeFor_DivisibleBy24Only_Is24()
+    {
+        Assert.Equal(24, SheetCutGuess.TileSizeFor(72, 24));
     }
 
     [Fact]

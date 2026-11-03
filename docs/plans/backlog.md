@@ -171,3 +171,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `CopiedContentRoot` takes its source folder since T2c; the older copy loops (`ContentWriterTests.CopyFolder`, `ContentWriterShopTests`, the shop and crafting loader tests, `EditorTestContent`) could move onto it.
 - `ContentCatalogLoaderTests.Load_RepositoryContent_Succeeds` says the start layout refers to "potion"; once the maps are rebuilt (C2), restate the reason by an id or drop the comment.
 - `SoundSourcesTests` reads its manifest with its own loose options (camelCase, unmapped members disallowed): a missing field reads as a default; switch it to `ContentJsonOptions.Strict` as `ArtSourcesManifest` does (AS1 review).
+- `tests/Jrpg.Editor.Tests/Tiles/TileBrowserViewModelTests.cs` is about 500 lines: split it along the Cut-panel tests and the hit-test tests (M1 review).

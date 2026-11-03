@@ -16,7 +16,7 @@ public sealed class TileBrowserViewModelTests
     private static readonly Dictionary<string, (int Width, int Height)> _imageSizes = new()
     {
         ["Dungeon.png"] = (54, 19),
-        ["Forest.png"] = (96, 48),
+        ["Forest.png"] = (96, 96),
         ["Grass3.png"] = (96, 64),
     };
 
@@ -107,7 +107,7 @@ public sealed class TileBrowserViewModelTests
         Assert.Equal(7, _browser.SelectedTileId);
     }
 
-    // 96 x 64: 32 is the first common size that divides both sides, so 3 columns and 2 rows.
+    // 96 x 64: 16 is the first common size that divides both sides (the Mana Seed cut), so 6 columns and 4 rows.
     [Fact]
     public void SetUpSheetCommand_ImageNotSetUp_OpensCutWithGuessedColumnsAndRows()
     {
@@ -115,7 +115,7 @@ public sealed class TileBrowserViewModelTests
 
         _browser.SetUpSheetCommand.Execute(null);
 
-        Assert.Equal(("grass_3", 3, 2), (_browser.Cut!.SheetId, _browser.Cut.Columns, _browser.Cut.Rows));
+        Assert.Equal(("grass_3", 6, 4), (_browser.Cut!.SheetId, _browser.Cut.Columns, _browser.Cut.Rows));
         Assert.False(_draft.Current.Tilesheets.ContainsKey("grass_3"));
     }
 
@@ -123,11 +123,12 @@ public sealed class TileBrowserViewModelTests
     public void ApplyCutCommand_NewSheet_AddsItAndShowsTheGrid()
     {
         OpenGrass3Cut();
-        _browser.Cut!.Columns = 2;
+        _browser.Cut!.Columns = 3;
+        _browser.Cut.Rows = 2;
 
         _browser.ApplyCutCommand.Execute(null);
 
-        var expected = new TilesheetDefinition { Id = "grass_3", File = "Grass3.png", TileWidth = 48, TileHeight = 32, Margin = 0, Spacing = 0 };
+        var expected = new TilesheetDefinition { Id = "grass_3", File = "Grass3.png", TileWidth = 32, TileHeight = 32, Margin = 0, Spacing = 0 };
         Assert.Equal(expected, _draft.Current.Tilesheets["grass_3"]);
         Assert.Equal(expected, _browser.SelectedSheet);
         Assert.Null(_browser.Cut);
@@ -165,37 +166,38 @@ public sealed class TileBrowserViewModelTests
         Assert.False(_browser.CutSheetCommand.CanExecute(null));
     }
 
-    // Dungeon cell (2, 0) becomes a tile while the panel is open; 2 columns would leave it outside.
+    // Forest cell (1, 0) becomes a tile while the panel is open; one 96 px cell would leave it outside.
     [Fact]
     public void ApplyCutCommand_TileMadeWhileOpenOutsideNewGrid_CannotExecute()
     {
+        _browser.SelectedChoice = _browser.SheetChoices[1];
         _browser.CutSheetCommand.Execute(null);
-        _browser.Cut!.Columns = 2;
-        _browser.Cut.Margin = 0;
-        _browser.Cut.Spacing = 0;
+        _browser.Cut!.Columns = 1;
+        _browser.Cut.Rows = 1;
         Assert.True(_browser.ApplyCutCommand.CanExecute(null));
 
-        _draft.AddTile(new SheetCell("dungeon", 2, 0));
+        _draft.AddTile(new SheetCell("forest", 1, 0));
 
         Assert.False(_browser.ApplyCutCommand.CanExecute(null));
     }
 
-    // The forest's 96 x 48 image in 4 columns: 24 px wide tiles; tile 8 keeps its cell (0, 0).
+    // The forest's 96 x 96 image in 4 columns and rows: 24 px tiles; tile 8 keeps its cell (0, 0).
     [Fact]
     public void ApplyCutCommand_ReCut_ReplacesTheCut()
     {
         _browser.SelectedChoice = _browser.SheetChoices[1];
         _browser.CutSheetCommand.Execute(null);
         _browser.Cut!.Columns = 4;
+        _browser.Cut.Rows = 4;
 
         _browser.ApplyCutCommand.Execute(null);
 
-        Assert.Equal(_forest with { TileWidth = 24 }, _draft.Current.Tilesheets["forest"]);
-        Assert.Equal(_forest with { TileWidth = 24 }, _browser.SelectedSheet);
+        Assert.Equal(_forest with { TileWidth = 24, TileHeight = 24 }, _draft.Current.Tilesheets["forest"]);
+        Assert.Equal(_forest with { TileWidth = 24, TileHeight = 24 }, _browser.SelectedSheet);
         Assert.Equal(8, _draft.TileAt(new SheetCell("forest", 0, 0))?.Id);
     }
 
-    // The forest's 2 x 1 cells of 48 px become one 96 px cell: column 1 is past the new grid.
+    // The forest's 2 x 2 cells of 48 px become one 96 px cell: column 1 is past the new grid.
     [Fact]
     public void ApplyCutCommand_ReCutSmallerThanChosenCell_LetsTheChoiceGo()
     {
@@ -204,6 +206,7 @@ public sealed class TileBrowserViewModelTests
         Assert.Equal(new SheetCell("forest", 1, 0), _browser.SelectedCell);
         _browser.CutSheetCommand.Execute(null);
         _browser.Cut!.Columns = 1;
+        _browser.Cut.Rows = 1;
 
         _browser.ApplyCutCommand.Execute(null);
 
@@ -219,6 +222,7 @@ public sealed class TileBrowserViewModelTests
         Assert.NotNull(_browser.SelectedCells);
         _browser.CutSheetCommand.Execute(null);
         _browser.Cut!.Columns = 1;
+        _browser.Cut.Rows = 1;
 
         _browser.ApplyCutCommand.Execute(null);
 
@@ -233,19 +237,21 @@ public sealed class TileBrowserViewModelTests
         _browser.SelectCellAt(5, 5);
         _browser.CutSheetCommand.Execute(null);
         _browser.Cut!.Columns = 1;
+        _browser.Cut.Rows = 1;
 
         _browser.ApplyCutCommand.Execute(null);
 
         Assert.Equal(new SheetCell("forest", 0, 0), _browser.SelectedCell);
     }
 
-    // The re-cut makes 4 columns of 24 px; undoing it brings back 2, so column 3 is past the grid again.
+    // The re-cut makes 4 columns and rows of 24 px; undoing it brings back 2, so column 3 is past the grid again.
     [Fact]
     public void Undo_ReCutThatGrewTheGrid_LetsGoOfACellInTheNewArea()
     {
         _browser.SelectedChoice = _browser.SheetChoices[1];
         _browser.CutSheetCommand.Execute(null);
         _browser.Cut!.Columns = 4;
+        _browser.Cut.Rows = 4;
         _browser.ApplyCutCommand.Execute(null);
         _browser.SelectCellAt(80, 10);
         Assert.Equal(new SheetCell("forest", 3, 0), _browser.SelectedCell);
@@ -261,6 +267,7 @@ public sealed class TileBrowserViewModelTests
         _browser.SelectedChoice = _browser.SheetChoices[1];
         _browser.CutSheetCommand.Execute(null);
         _browser.Cut!.Columns = 1;
+        _browser.Cut.Rows = 1;
         _browser.ApplyCutCommand.Execute(null);
         _draft.Undo();
         _browser.SelectCellAt(60, 10);
@@ -279,6 +286,7 @@ public sealed class TileBrowserViewModelTests
         _browser.SelectedChoice = _browser.SheetChoices[1];
         _browser.CutSheetCommand.Execute(null);
         _browser.Cut!.Columns = 4;
+        _browser.Cut.Rows = 4;
 
         _browser.ApplyCutCommand.Execute(null);
 
@@ -293,11 +301,12 @@ public sealed class TileBrowserViewModelTests
         _browser.SelectedChoice = _browser.SheetChoices[1];
         _browser.CutSheetCommand.Execute(null);
         _browser.Cut!.Columns = 4;
+        _browser.Cut.Rows = 4;
 
         _browser.ApplyCutCommand.Execute(null);
 
         Assert.Single(_questions);
-        Assert.Equal(_forest with { TileWidth = 24 }, _draft.Current.Tilesheets["forest"]);
+        Assert.Equal(_forest with { TileWidth = 24, TileHeight = 24 }, _draft.Current.Tilesheets["forest"]);
     }
 
     [Fact]
@@ -382,7 +391,7 @@ public sealed class TileBrowserViewModelTests
         Assert.Equal(new SheetChoice("Cave.png", null), _browser.SelectedChoice);
     }
 
-    // The forest's 96 x 48 image holds 2 x 1 cells of 48 px.
+    // The forest's 96 x 96 image holds 2 x 2 cells of 48 px; the drag stays in the top row.
     [Fact]
     public void SelectCellsBetween_TwoCells_ChoosesTheRectangleAndItsTopLeftCell()
     {

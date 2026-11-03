@@ -36,6 +36,15 @@ public sealed class TilesheetCatalogValidatorTests
     }
 
     [Fact]
+    public void Validate_NonSquareTiles_ThrowsNamingTheSheet()
+    {
+        var exception = Assert.Throws<ContentValidationException>(
+            () => TilesheetCatalogValidator.Validate(FileName, [_city with { TileWidth = 16, TileHeight = 32 }]));
+
+        Assert.Equal("tilesheets.json: tilesheet 'city': tiles must be square, since the map draws each into a square cell (was 16 x 32).", exception.Message);
+    }
+
+    [Fact]
     public void Validate_EmptyFile_ThrowsNamingTheSheet()
     {
         var exception = Assert.Throws<ContentValidationException>(

@@ -190,7 +190,7 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     // In the test world, Grass3.png has no sheet, so it can be replaced by any size; Set up's guess reads the size: 96
-    // x 48 is 2 x 1 cells of 48.
+    // x 48 is 6 x 3 cells of 16.
     [Fact]
     public void ImportSheetImages_ReplacedImage_ReadsTheNewSize()
     {
@@ -204,7 +204,7 @@ public sealed class MainViewModelTests : IDisposable
         viewModel.ImportSheetImages([source]);
         browser.SetUpSheetCommand.Execute(null);
 
-        Assert.Equal((2, 1), (browser.Cut!.Columns, browser.Cut.Rows));
+        Assert.Equal((6, 3), (browser.Cut!.Columns, browser.Cut.Rows));
     }
 
     [Fact]

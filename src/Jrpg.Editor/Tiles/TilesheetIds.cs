@@ -7,15 +7,26 @@ namespace Jrpg.Editor.Tiles;
 /// <summary>A new sheet's id, from its image's file name (decision 118).</summary>
 internal static class TilesheetIds
 {
+    private const string NamelessId = "sheet";
+
     /// <summary>
-    /// The file name without its extension in snake case, digits split from letters (<c>Grass3.png</c> -> <c>grass_3</c>,
-    /// <c>RA_Jungle.png</c> -> <c>ra_jungle</c>); <c>_2</c>, <c>_3</c>... appended while the id is taken.
+    /// The file name without its extension in snake case, digits split from letters (<c>Grass3.png</c> ->
+    /// <c>grass_3</c>, <c>RA_Jungle.png</c> -> <c>ra_jungle</c>), runs of underscores collapsed and none at either end
+    /// (a pack's <c>autumn trees (bare) 80x112.png</c> -> <c>autumn_trees_bare_80_x_112</c>); <c>_2</c>, <c>_3</c>...
+    /// appended while the id is taken.
     /// </summary>
     /// <param name="file">The image's file name in the tilesheet folder.</param>
     /// <param name="takenIds">The sheet ids already in the catalog.</param>
     public static string FromFile(string file, IReadOnlyCollection<string> takenIds)
     {
+        // A name with no ASCII letter or digit would give an empty id, which the catalog save refuses and the Cut panel
+        // can't edit.
         var id = SnakeCaseOf(Path.GetFileNameWithoutExtension(file));
+        if (id.Length == 0)
+        {
+            id = NamelessId;
+        }
+
         var unique = id;
         for (var number = 2; takenIds.Contains(unique); number++)
         {
@@ -25,21 +36,26 @@ internal static class TilesheetIds
         return unique;
     }
 
-    // Anything but a letter or digit becomes an underscore, as ids hold only those.
+    // Anything but a letter or digit becomes an underscore, as ids hold only those; a space before a bracket, or a
+    // bracket at the end, would otherwise leave doubled or trailing ones.
     private static string SnakeCaseOf(string name)
     {
         var id = new StringBuilder();
         for (var index = 0; index < name.Length; index++)
         {
-            if (index > 0 && StartsWord(name, index) && id[^1] != '_')
+            var isSeparator = !char.IsAsciiLetterOrDigit(name[index]);
+            if ((isSeparator || (index > 0 && StartsWord(name, index))) && id.Length > 0 && id[^1] != '_')
             {
                 id.Append('_');
             }
 
-            id.Append(char.IsAsciiLetterOrDigit(name[index]) ? char.ToLowerInvariant(name[index]) : '_');
+            if (!isSeparator)
+            {
+                id.Append(char.ToLowerInvariant(name[index]));
+            }
         }
 
-        return id.ToString();
+        return id.ToString().TrimEnd('_');
     }
 
     // "Grass3" splits before the digit, "tree02s" before and after it, "DarkCave" before "C", "RAJungle" before "J".

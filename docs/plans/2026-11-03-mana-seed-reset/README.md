@@ -62,7 +62,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **AS1. `content/art/art-sources.json` and `content/art/CREDITS.md` with every current art file; the Data test, reading the source tree, that keeps files, entries, sources, licenses and credits in step; the content rules** (content + Data test, about 180 lines plus the manifest) → [slices/AS1.md](slices/AS1.md)
 
 ### Phase 4: the editor
-- [ ] **M1. Mana Seed cuts: the Set up guess tries 16 px first, ids from pack file names lose doubled underscores, non-square tiles are refused** (Editor + Data, about 140 lines) → [slices/M1.md](slices/M1.md)
+- [x] **M1. Mana Seed cuts: the Set up guess tries 16 px first, ids from pack file names lose doubled underscores, non-square tiles are refused** (Editor + Data, about 140 lines) → [slices/M1.md](slices/M1.md)
 - [ ] **X1. The editor opens with missing art: a warning in the status band, tiles and NPCs it can't draw marked on the map, in objects and canopies; `MainViewModel` makes room first** (Editor, about 240 lines with a 25-line move) → [slices/X1.md](slices/X1.md)
 - [ ] **X2. Sheets with a missing image: listed as "image missing", re-imported under their file name, named by the cursor status; the catalogs save with art missing** (Editor + Data, about 230 lines) → [slices/X2.md](slices/X2.md)
 - [ ] **E1a. A swap step naming an object counts as a use** (Editor, about 90 lines) → [slices/E1a.md](slices/E1a.md)

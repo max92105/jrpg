@@ -84,7 +84,7 @@ internal sealed partial class SheetCutViewModel : ObservableObject
                 return "Margin and spacing must not be negative.";
             }
 
-            return ProblemAlong(_imageSize.Width, Columns, "columns") ?? ProblemAlong(_imageSize.Height, Rows, "rows") ?? MarginProblem() ?? TileOutsideProblem();
+            return ProblemAlong(_imageSize.Width, Columns, "columns") ?? ProblemAlong(_imageSize.Height, Rows, "rows") ?? MarginProblem() ?? TileOutsideProblem() ?? SquareProblem();
         }
     }
 
@@ -137,6 +137,10 @@ internal sealed partial class SheetCutViewModel : ObservableObject
         PreviewSheet is { } cut && (cut.ColumnsIn(_imageSize.Width) != Columns || cut.RowsIn(_imageSize.Height) != Rows)
             ? $"A {Margin} px margin leaves room for another cell; make it smaller than a cell."
             : null;
+
+    // The map draws every tile into a square cell; Data refuses a non-square sheet on save, so the panel refuses first.
+    private string? SquareProblem() =>
+        TileWidth != TileHeight ? $"Tiles must be square: columns and rows give {TileWidth} x {TileHeight} px tiles." : null;
 
     // A tile past the new grid would fail the art check on save, and the maps using it would no longer open.
     private string? TileOutsideProblem() =>

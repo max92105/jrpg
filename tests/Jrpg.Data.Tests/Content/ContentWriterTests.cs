@@ -114,16 +114,16 @@ public sealed class ContentWriterTests : IDisposable
         Assert.Empty(Directory.EnumerateFiles(_contentRoot, "*.saving", SearchOption.AllDirectories));
     }
 
+    // Art is the game's startup check (decision 442,
+    // `ArtReferenceCheckTests.FindProblems_CellOutsideSheet_NamesTheTile`).
     [Fact]
-    public void WriteMapCatalogs_TileOutsideItsImage_ThrowsNamingTheTileAndWritesNothing()
+    public void WriteMapCatalogs_TileOutsideItsImage_Writes()
     {
         var tile = NewTile() with { Column = 9999 };
-        var filesBefore = CatalogFileBytes();
 
-        var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMapCatalogs(WithTile(tile)));
+        _writer.WriteMapCatalogs(WithTile(tile));
 
-        Assert.Contains($"tile {tile.Id}'s cell", exception.Message, StringComparison.Ordinal);
-        Assert.Equal(filesBefore, CatalogFileBytes());
+        Assert.Equal(tile, ContentCatalogLoader.Load(_contentRoot).Tiles[tile.Id]);
     }
 
     [Fact]

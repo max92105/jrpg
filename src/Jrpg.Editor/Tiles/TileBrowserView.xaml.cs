@@ -71,7 +71,7 @@ internal sealed partial class TileBrowserView : UserControl
     // Cut panel's grid while it is open; the scale stays put while the cut is typed.
     private void DrawSheet()
     {
-        if (_browser?.SelectedChoice is not { } choice || Images is null)
+        if (_browser?.SelectedChoice is not { IsImageMissing: false } choice || Images is null)
         {
             SheetImage.Source = SheetMarks.Source = null;
             return;

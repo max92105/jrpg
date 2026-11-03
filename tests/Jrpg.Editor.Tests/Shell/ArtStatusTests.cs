@@ -47,6 +47,28 @@ public sealed class ArtStatusTests : IDisposable
         Assert.False(status.Missing.IsSheetMissing("city"));
     }
 
+    [Fact]
+    public void NoteFor_TileOfAMissingSheet_NamesTheSheet()
+    {
+        var root = _content.CopyOfTestWorld();
+        File.Delete(TilesheetImage(root, "City.png"));
+        var catalog = ContentCatalogLoader.Load(root);
+        var cityTile = catalog.Tiles.Values.First(tile => tile.SheetId == "city");
+
+        var note = StatusOf(root).NoteFor(cityTile.Id);
+
+        Assert.Equal("   (sheet city: image missing)", note);
+    }
+
+    [Fact]
+    public void NoteFor_TileOfAWholeSheet_IsEmpty()
+    {
+        var catalog = ContentCatalogLoader.Load(_content.TestWorld);
+        var cityTile = catalog.Tiles.Values.First(tile => tile.SheetId == "city");
+
+        Assert.Equal("", StatusOf(_content.TestWorld).NoteFor(cityTile.Id));
+    }
+
     private static ArtStatus StatusOf(string contentRoot) =>
         new(new CatalogDraft(ContentCatalogLoader.Load(contentRoot)), ArtFolders.RootIn(contentRoot));
 

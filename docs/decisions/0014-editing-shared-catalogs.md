@@ -42,7 +42,7 @@ A `Catalogs/CatalogDraft` holds the whole working catalog; every panel and the m
 - **115:** a sheet's cut is entered as columns and rows and stored as tile size, so the content format doesn't change.
 - **117:** Ctrl+S saves the catalogs and the map together, and Ctrl+Z undoes catalog changes too. An undo that would remove a tile, sheet or object still in use is refused, naming where it's used.
 
-The write rule: one `ContentWriter.WriteMapCatalogs` writes `tilesheets.json`, `tiles.json` and `objects.json` after the catalog validators, every map's layout check and the art check. It writes all three or none.
+The write rule: one `ContentWriter.WriteMapCatalogs` writes `tilesheets.json`, `tiles.json` and `objects.json` after the catalog validators, every map's layout check. It writes all three or none. (The art check ran here too until decision 442 moved it to the game's startup: the editor saves with art missing and warns.)
 
 ## Consequences
 - **Easier:** a new kind of catalog change is one `CatalogDraft` method that builds an undoable edit. Saving, validation, undo and redrawing come with it, and each catalog rule has one home.

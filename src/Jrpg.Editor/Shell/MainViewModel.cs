@@ -65,7 +65,8 @@ internal sealed partial class MainViewModel : ObservableObject
         if (Content is not null)
         {
             ShowMapList(Content.Current);
-            Painting = new TilePaintingViewModel(Content, Layer, new SheetImages(() => ArtFolders.TilesheetImagesIn(ArtRoot), _sheetImageSizes.SizeOf), confirm);
+            var images = new SheetImages(() => [.. ArtFolders.TilesheetImagesIn(ArtRoot).Where(_sheetImageSizes.IsReadable)], _sheetImageSizes.SizeOf);
+            Painting = new TilePaintingViewModel(Content, Layer, images, confirm);
             Marking = new WalkabilityMarking(Content, Painting.Browser);
             Painting.Browser.PropertyChanged += (_, e) =>
             {
@@ -279,7 +280,9 @@ internal sealed partial class MainViewModel : ObservableObject
         }
 
         var position = $"Cell ({at.X}, {at.Y})";
-        CursorStatus = CurrentMap.TopTileAt(at) is { } tile ? $"{position}   Tile {tile.TileId} on layer z {tile.LayerZ}" : $"{position}   No tile";
+        CursorStatus = CurrentMap.TopTileAt(at) is { } tile
+            ? $"{position}   Tile {tile.TileId} on layer z {tile.LayerZ}{Art!.NoteFor(tile.TileId)}"
+            : $"{position}   No tile";
     }
 
     /// <summary>Says in the status bar why a click on the map painted nothing: no cell is chosen in the Tiles panel.</summary>
@@ -346,6 +349,7 @@ internal sealed partial class MainViewModel : ObservableObject
 
         CurrentMap.MarkSaved();
         SaveError = null;
+        Art!.Refresh();
     }
 
     partial void OnMapIdsChanged(IReadOnlyList<string> value) => EventEditing?.MapIds = value;
@@ -404,6 +408,7 @@ internal sealed partial class MainViewModel : ObservableObject
 
         if (result.LastImported is { } last)
         {
+            Art!.Refresh();
             SheetImagesImported?.Invoke(this, result.Imported);
             Painting.Browser.Show(last);
         }

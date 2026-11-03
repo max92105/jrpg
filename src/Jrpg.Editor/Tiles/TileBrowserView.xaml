@@ -65,6 +65,13 @@
       </StackPanel>
     </Expander>
     <TextBlock DockPanel.Dock="Bottom" Margin="0,4" TextWrapping="Wrap" Text="{Binding ChoiceText}" />
+    <!-- A sheet without a readable image shows this in place of the image (decision 442). -->
+    <TextBlock DockPanel.Dock="Top"
+               Margin="0,4"
+               TextWrapping="Wrap"
+               Foreground="{StaticResource WarningTextBrush}"
+               Text="Image missing: re-import it under this name or remove the sheet."
+               Visibility="{Binding SelectedChoice.IsImageMissing, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}" />
     <ScrollViewer HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"
                   Background="{StaticResource ViewportBackgroundBrush}">

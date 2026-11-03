@@ -28,4 +28,26 @@ public static class PngSize
 
         return (BinaryPrimitives.ReadInt32BigEndian(header[16..20]), BinaryPrimitives.ReadInt32BigEndian(header[20..24]));
     }
+
+    /// <summary>
+    /// Whether the file is there and its PNG header reads: the one answer the editor's sheet box and its drawing share,
+    /// so a copy cut short or another format renamed counts as missing in both (decision 442).
+    /// </summary>
+    public static bool IsReadable(string path)
+    {
+        if (!File.Exists(path))
+        {
+            return false;
+        }
+
+        try
+        {
+            Read(path);
+            return true;
+        }
+        catch (Exception exception) when (exception is ContentValidationException or IOException or UnauthorizedAccessException)
+        {
+            return false;
+        }
+    }
 }

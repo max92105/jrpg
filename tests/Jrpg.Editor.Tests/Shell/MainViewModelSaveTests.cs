@@ -85,19 +85,19 @@ public sealed class MainViewModelSaveTests : IDisposable
         Assert.Equal(tile.Id, layer.TileIdAt(new GridCell(0, 0)));
     }
 
+    // Art is the game's startup check (decision 442): the save goes through and the status band warns.
     [Fact]
-    public void Save_CatalogTheArtCheckRefuses_ShowsMessageAndWritesNothing()
+    public void Save_CatalogTheArtCheckRefuses_SavesAndWarns()
     {
         var viewModel = _content.Open(_content.CopyOfTestWorld());
-        var filesBefore = _content.TilesAndForestBytes();
         viewModel.Content!.AddTile(new SheetCell(viewModel.Catalog!.Tilesheets.Keys.First(), 9999, 0));
         EditorTestContent.PaintTopLeft(viewModel);
 
         viewModel.SaveCommand.Execute(null);
 
-        Assert.Contains("lies outside", viewModel.SaveError, StringComparison.Ordinal);
-        Assert.Equal(filesBefore, _content.TilesAndForestBytes());
-        Assert.True(viewModel.CurrentMap!.IsDirty);
+        Assert.Null(viewModel.SaveError);
+        Assert.False(viewModel.CurrentMap!.IsDirty);
+        Assert.Contains("lies outside", viewModel.Art!.Warning, StringComparison.Ordinal);
     }
 
     [Fact]

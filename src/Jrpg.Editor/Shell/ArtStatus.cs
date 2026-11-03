@@ -4,7 +4,6 @@ using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
-using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Shell;
@@ -49,28 +48,18 @@ internal sealed partial class ArtStatus : ObservableObject
         Warning = problems.Count == 0 ? null : string.Join(Environment.NewLine, problems);
         Missing = MissingArt.Of(
             catalog,
-            file => IsReadablePng(Path.Combine(_artRoot, ArtFolders.Tilesheets, file)),
-            file => IsReadablePng(Path.Combine(_artRoot, ArtFolders.FieldSprites, file)));
+            file => PngSize.IsReadable(Path.Combine(_artRoot, ArtFolders.Tilesheets, file)),
+            file => PngSize.IsReadable(Path.Combine(_artRoot, ArtFolders.FieldSprites, file)));
     }
 
-    // A file that exists but can't be decoded (a copy cut short, another format renamed) would crash the drawing, so it
-    // counts as missing and draws the mark; the warning names it as "not a PNG image".
-    private static bool IsReadablePng(string path)
+    /// <summary>
+    /// The cursor status's note for a tile the drawing marks: three spaces, then "(sheet city: image missing)"; empty
+    /// for any other.
+    /// </summary>
+    public string NoteFor(int tileId)
     {
-        if (!File.Exists(path))
-        {
-            return false;
-        }
-
-        try
-        {
-            PngSize.Read(path);
-            return true;
-        }
-        catch (Exception exception) when (exception is ContentValidationException or IOException or UnauthorizedAccessException)
-        {
-            return false;
-        }
+        var sheetId = _catalog.Current.Tiles[tileId].SheetId;
+        return Missing.IsSheetMissing(sheetId) ? $"   (sheet {sheetId}: image missing)" : "";
     }
 
     // Only the sheets and objects name art; a painted tile replaces the catalog too, and needs no file read.

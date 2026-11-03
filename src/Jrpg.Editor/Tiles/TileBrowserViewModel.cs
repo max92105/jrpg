@@ -20,6 +20,9 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     // The sheets the choices were built from; a catalog change replaces this dictionary only when it changes a sheet.
     private IReadOnlyDictionary<string, TilesheetDefinition> _listedSheets;
 
+    // The images the choices were built from; a sheet whose file isn't among them has no image to hit-test or size.
+    private HashSet<string> _listedFiles = new(StringComparer.OrdinalIgnoreCase);
+
     /// <param name="catalog">The sheets and tiles.</param>
     /// <param name="images">The tilesheet folder's images.</param>
     /// <param name="confirm">Asks the developer a yes or no question, before a re-cut changes tiles in use.</param>
@@ -32,11 +35,14 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
         _openLayout = openLayout;
         catalog.PropertyChanged += OnCatalogChanged;
         _listedSheets = catalog.Current.Tilesheets;
-        SheetChoices = ChoicesOf(images.ListFiles(), _listedSheets.Values);
+        SheetChoices = ListChoices();
         SelectedChoice = SheetChoices.Count > 0 ? SheetChoices[0] : null;
     }
 
-    /// <summary>Every image, each set-up sheet by its id; an image cut into two sheets is listed twice.</summary>
+    /// <summary>
+    /// Every image, each set-up sheet by its id (an image cut into two sheets is listed twice), then each sheet whose
+    /// image is missing.
+    /// </summary>
     [ObservableProperty]
     public partial IReadOnlyList<SheetChoice> SheetChoices { get; private set; }
 
@@ -49,10 +55,12 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     public TilesheetDefinition? SelectedSheet => SelectedChoice?.Sheet;
 
     /// <summary>Whether the shown image has no sheet yet and no Cut panel open, so Set up can start one.</summary>
-    public bool CanSetUpSheet => SelectedChoice is { Sheet: null } && Cut is null;
+    public bool CanSetUpSheet => SelectedChoice is { Sheet: null, IsImageMissing: false } && Cut is null;
 
-    /// <summary>Whether the shown image is a sheet and no Cut panel is open, so Cut can re-cut it.</summary>
-    public bool CanCutSheet => SelectedChoice is { Sheet: not null } && Cut is null;
+    /// <summary>
+    /// Whether the shown image is a sheet with an image and no Cut panel is open, so Cut can re-cut it.
+    /// </summary>
+    public bool CanCutSheet => SelectedChoice is { Sheet: not null, IsImageMissing: false } && Cut is null;
 
     /// <summary>The open Cut panel, for the shown image; null when closed.</summary>
     [ObservableProperty]
@@ -112,8 +120,14 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
         return IsInGrid(sheet, column, row) && isInCell ? new SheetCell(sheet.Id, column, row) : null;
     }
 
+    // A sheet whose image is missing has no grid: nothing is in it, and its size is never asked.
     private bool IsInGrid(TilesheetDefinition sheet, int column, int row)
     {
+        if (!_listedFiles.Contains(sheet.File))
+        {
+            return false;
+        }
+
         var (width, height) = _images.SizeOf(sheet.File);
         return column >= 0 && row >= 0 && column < sheet.ColumnsIn(width) && row < sheet.RowsIn(height);
     }
@@ -148,18 +162,13 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Chooses a tile's cell and shows its sheet, as picking a tile from the map does; nothing when the sheet isn't in
-    /// the box (its image is missing, decision 442), so the choice stays as it was.
+    /// Chooses a tile's cell and shows its sheet, as picking a tile from the map does; a sheet whose image is missing
+    /// is shown as such (decision 442), since every catalog sheet is in the box.
     /// </summary>
     public void Select(int tileId)
     {
         var tile = _catalog.Current.Tiles[tileId];
-        if (SheetChoices.FirstOrDefault(choice => choice.Sheet?.Id == tile.SheetId) is not { } choice)
-        {
-            return;
-        }
-
-        SelectedChoice = choice;
+        SelectedChoice = SheetChoices.First(choice => choice.Sheet?.Id == tile.SheetId);
         SelectedCells = null;
         SelectedCell = new SheetCell(tile.SheetId, tile.Column, tile.Row);
     }
@@ -167,7 +176,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     // The whole cell under a pixel, or the nearest one when the pixel is on the margin, spacing or past the last whole cell.
     private SheetCell? NearestCellTo(Point2D pixel)
     {
-        if (SelectedSheet is not { } sheet)
+        if (SelectedSheet is not { } sheet || !_listedFiles.Contains(sheet.File))
         {
             return null;
         }
@@ -257,17 +266,15 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     /// <param name="fileName">A file in the folder; its first sheet is shown, or the image alone when it isn't set up.</param>
     public void Show(string fileName)
     {
-        SheetChoices = ChoicesOf(_images.ListFiles(), _listedSheets.Values);
+        SheetChoices = ListChoices();
         SelectedChoice = SheetChoices.FirstOrDefault(choice => string.Equals(choice.File, fileName, StringComparison.OrdinalIgnoreCase));
     }
 
-    // Matched ignoring case, as Windows finds the file a sheet names whatever its case.
-    private static SheetChoice[] ChoicesOf(IReadOnlyList<string> imageFiles, IEnumerable<TilesheetDefinition> sheets)
+    private IReadOnlyList<SheetChoice> ListChoices()
     {
-        var sheetsByFile = sheets.OrderBy(sheet => sheet.Id, StringComparer.Ordinal).ToLookup(sheet => sheet.File, StringComparer.OrdinalIgnoreCase);
-        return [.. imageFiles.SelectMany(file => sheetsByFile.Contains(file)
-            ? sheetsByFile[file].Select(sheet => new SheetChoice(sheet.File, sheet))
-            : [new SheetChoice(file, null)])];
+        var imageFiles = _images.ListFiles();
+        _listedFiles = imageFiles.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        return Tiles.SheetChoices.Of(imageFiles, _listedSheets.Values);
     }
 
     // A tile made by painting is marked on the sheet, and named under it, at once; a sheet set up or undone is listed anew.
@@ -299,7 +306,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     {
         var shown = SelectedChoice;
         _listedSheets = _catalog.Current.Tilesheets;
-        SheetChoices = ChoicesOf(_images.ListFiles(), _listedSheets.Values);
+        SheetChoices = ListChoices();
         SelectedChoice = SheetChoices.FirstOrDefault(choice => choice.Sheet is { } sheet && sheet.Id == shown?.Sheet?.Id)
             ?? SheetChoices.FirstOrDefault(choice => string.Equals(choice.File, shown?.File, StringComparison.OrdinalIgnoreCase));
         if (SelectedCell is { } cell && !IsChoiceInGrid(cell))

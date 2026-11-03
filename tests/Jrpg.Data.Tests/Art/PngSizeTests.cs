@@ -37,4 +37,24 @@ public sealed class PngSizeTests : IDisposable
 
         Assert.Equal($"{Path.GetFileName(_path)}: not a PNG image.", exception.Message);
     }
+
+    [Fact]
+    public void IsReadable_RepositoryFieldSprite_IsTrue()
+    {
+        Assert.True(PngSize.IsReadable(Path.Combine(AppContext.BaseDirectory, "content", "art", "field-sprites", "player.png")));
+    }
+
+    [Fact]
+    public void IsReadable_NotAPng_IsFalse()
+    {
+        File.WriteAllText(_path, "GIF89a, not a PNG at all");
+
+        Assert.False(PngSize.IsReadable(_path));
+    }
+
+    [Fact]
+    public void IsReadable_NoSuchFile_IsFalse()
+    {
+        Assert.False(PngSize.IsReadable(_path));
+    }
 }

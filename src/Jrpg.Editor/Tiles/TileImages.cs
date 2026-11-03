@@ -63,8 +63,8 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<Miss
 
         if (!_spriteFrames.TryGetValue(file, out var frame))
         {
-            // The New NPC dialog can still pick a sprite smaller than a frame (the art check refuses it only on save),
-            // so one is shown whole rather than failing to crop.
+            // The New NPC dialog can still pick a sprite smaller than a frame (only the game's startup refuses it; the
+            // status band warns), so one is shown whole rather than failing to crop.
             var sprite = LoadImage(ArtFolders.FieldSprites, file);
             var side = Math.Min(FieldSpriteLayout.FramePixels, Math.Min(sprite.PixelWidth, sprite.PixelHeight));
             frame = new CroppedBitmap(sprite, new Int32Rect(0, 0, side, side));

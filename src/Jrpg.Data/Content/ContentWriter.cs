@@ -43,9 +43,9 @@ public sealed class ContentWriter(string contentRoot)
     }
 
     /// <summary>
-    /// Writes the tilesheet, tile, object and quest catalogs, each sorted by id, after checking them as the loader and
-    /// the art check would, with every map's layout checked against them (the quests and stages its events name
-    /// included, decision 394).
+    /// Writes the tilesheet, tile, object and quest catalogs, each sorted by id, after checking them as the loader
+    /// would, with every map's layout checked against them (the quests and stages its events name included, decision
+    /// 394). Missing art doesn't stop a save: the editor warns and the game's startup refuses (decision 442).
     /// </summary>
     /// <param name="catalog">The content holding the catalogs to save; its maps are the ones checked.</param>
     /// <exception cref="ContentValidationException">The game would reject the catalogs; the message names the file, and nothing was written.</exception>
@@ -63,12 +63,6 @@ public sealed class ContentWriter(string contentRoot)
         foreach (var layout in references.Layouts.Values)
         {
             MapLayoutValidator.Validate(MapFolderReader.LayoutFile(layout.Id), layout, references);
-        }
-
-        var artProblems = ArtReferenceCheck.FindProblems(catalog, ArtFolders.RootIn(contentRoot));
-        if (artProblems.Count > 0)
-        {
-            throw new ContentValidationException(string.Join(Environment.NewLine, artProblems));
         }
 
         WriteAll(

@@ -401,7 +401,7 @@ public sealed class TileBrowserViewModelTests
 
         Assert.Equal(new SheetCellRectangle("forest", 0, 0, 2, 1), _browser.SelectedCells);
         Assert.Equal(new SheetCell("forest", 0, 0), _browser.SelectedCell);
-        Assert.Equal("2 x 1 cells selected: the brush paints the top-left one; New object from selection makes an object of them.", _browser.ChoiceText);
+        Assert.Equal("2 x 1 cells selected: the brush paints the top-left one; New object starts from them.", _browser.ChoiceText);
     }
 
     // The dungeon's last whole column is 2 (it ends at 52 of 54 pixels); 53 is past it, -3 is on the margin.

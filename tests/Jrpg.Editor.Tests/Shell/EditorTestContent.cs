@@ -76,6 +76,15 @@ internal sealed class EditorTestContent : IDisposable
         return cell;
     }
 
+    // Objects > New object over the cells chosen in the Tiles panel, saved with this id in the General category.
+    public static void ComposeObject(MainViewModel viewModel, string id)
+    {
+        var composer = viewModel.Composing!.StartNew();
+        composer.Naming.Id = id;
+        composer.Naming.Category = "General";
+        Assert.True(viewModel.Composing.TryApply(composer));
+    }
+
     public static int BlockFirstWalkableTile(MainViewModel viewModel)
     {
         var tileId = viewModel.Catalog!.Tiles.Values.First(tile => tile.IsWalkable).Id;

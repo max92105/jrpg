@@ -7,6 +7,7 @@ using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Objects;
+using Jrpg.Editor.Objects.Composing;
 
 namespace Jrpg.Editor.Shell;
 
@@ -25,17 +26,23 @@ internal sealed partial class MainWindow
 
     private void OnEditShapesClicked(object sender, RoutedEventArgs e) => EditShapes(Placing.StartEditingShapes());
 
-    // A new object's shapes are drawn right away (decision 124); cancelling them keeps the object, without shapes.
-    private void OnNewObjectClicked(object sender, RoutedEventArgs e)
+    private void OnNewObjectClicked(object sender, RoutedEventArgs e) => Compose(_viewModel.Composing?.StartNew());
+
+    // A new object's shapes are drawn right away (decision 124), an edited one's when its size changed (decision 462);
+    // cancelling them keeps the object as saved.
+    private void Compose(ObjectComposerViewModel? composer)
     {
-        if (_viewModel.StartNewObject() is not { } newObject
-            || new NewObjectWindow(newObject, _viewModel.CreateObject) { Owner = this }.ShowDialog() != true)
+        if (composer is null || TileBrowser.Images is not { } images
+            || new ObjectComposerWindow(composer, images, _viewModel.Composing!.TryApply) { Owner = this }.ShowDialog() != true)
         {
             return;
         }
 
         EditingTabs.SelectedItem = ObjectsTab;
-        EditShapes(Placing.StartEditingChosenShapes());
+        if (composer.ShouldOpenShapesAfterSave)
+        {
+            EditShapes(Placing.StartEditingChosenShapes());
+        }
     }
 
     // A new NPC keeps its default outline (decision 129), so no shapes window opens; Edit shapes is one click away.

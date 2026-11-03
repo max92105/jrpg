@@ -100,7 +100,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
         ({ Sheet: null }, { } cell) => $"Not set up yet. Brush: cell ({cell.Column}, {cell.Row}) of {cell.SheetId}",
         (_, null) => "",
         _ when SelectedCells is { } cells =>
-            $"{cells.Columns} x {cells.Rows} cells selected: the brush paints the top-left one; New object from selection makes an object of them.",
+            $"{cells.Columns} x {cells.Rows} cells selected: the brush paints the top-left one; New object starts from them.",
         (_, { } cell) when _catalog.TileAt(cell) is { } tile => $"Cell ({cell.Column}, {cell.Row}): tile {tile.Id}",
         (_, { } cell) => $"Cell ({cell.Column}, {cell.Row}): not a tile yet",
     };

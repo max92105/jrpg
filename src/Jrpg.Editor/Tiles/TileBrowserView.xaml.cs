@@ -38,6 +38,10 @@ internal sealed partial class TileBrowserView : UserControl
         _browser?.PropertyChanged -= OnBrowserChanged;
         _browser = DataContext as TileBrowserViewModel;
         _browser?.PropertyChanged += OnBrowserChanged;
+        // An open Cut panel is let go with its browser: the object composer's picker drops its browser on close.
+        _cut?.PropertyChanged -= OnCutChanged;
+        _cut = _browser?.Cut;
+        _cut?.PropertyChanged += OnCutChanged;
         DrawSheet();
     }
 

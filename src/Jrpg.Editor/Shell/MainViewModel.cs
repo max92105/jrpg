@@ -70,13 +70,6 @@ internal sealed partial class MainViewModel : ObservableObject
             Painting = new TilePaintingViewModel(Content, Layer, images, confirm);
             Marking = new WalkabilityMarking(Content, Painting.Browser);
             Removal = new SheetRemoval(Content, Painting.Browser, () => CurrentMap, _writer);
-            Painting.Browser.PropertyChanged += (_, e) =>
-            {
-                if (e.PropertyName == nameof(TileBrowserViewModel.SelectedCells))
-                {
-                    OnPropertyChanged(nameof(CanStartNewObject));
-                }
-            };
             Content.PropertyChanged += OnContentChanged;
             // The purge wrote the content at once: the open map shows it from the written content, with no history,
             // before the catalogs change (the window redraws on that change).
@@ -226,14 +219,8 @@ internal sealed partial class MainViewModel : ObservableObject
         return true;
     }
 
-    /// <summary>Whether Objects > New object from selection has cells to use: a rectangle chosen in the Tiles panel.</summary>
-    public bool CanStartNewObject => Painting?.Browser.SelectedCells is not null;
-
-    /// <summary>The New object dialog's state for the rectangle chosen in the Tiles panel; null without one.</summary>
-    public NewObjectViewModel? StartNewObject() =>
-        Painting?.Browser.SelectedCells is { } cells
-            ? new NewObjectViewModel([.. Catalog!.Objects.Keys], [.. Catalog.Objects.Values.Select(definition => definition.Category)], cells)
-            : null;
+    /// <summary>Whether Objects > New object can open the composer: once the content loaded.</summary>
+    public bool CanStartNewObject => Composing is not null;
 
     /// <summary>Whether a new NPC can be made: only once the content and its art loaded.</summary>
     public bool CanStartNewNpc => Placing is not null;
@@ -252,23 +239,6 @@ internal sealed partial class MainViewModel : ObservableObject
         }
 
         AddAndChoose(newNpc.ToDefinition());
-        return true;
-    }
-
-    /// <summary>
-    /// Makes the object the New object dialog describes, from its cells: those not tiles yet become tiles (decision 113),
-    /// then the object joins the catalog as one undo step. It is chosen in the Objects panel, in Objects mode.
-    /// </summary>
-    /// <returns>False when nothing was made: the id or category has a problem.</returns>
-    public bool CreateObject(NewObjectViewModel newObject)
-    {
-        if (newObject.IdProblem is not null || newObject.CategoryProblem is not null || Content is null || Placing is null)
-        {
-            return false;
-        }
-
-        var tileIds = Content.TileIdsOf(newObject.Cells.Cells);
-        AddAndChoose(ObjectFromCells.Build(newObject.Id, newObject.Category.Trim(), newObject.Cells, cell => tileIds[cell]));
         return true;
     }
 

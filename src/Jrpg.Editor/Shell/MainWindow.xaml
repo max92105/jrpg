@@ -91,7 +91,7 @@
       </MenuItem>
       <MenuItem Header="Objects">
         <MenuItem Header="Edit shapes..." Click="OnEditShapesClicked" IsEnabled="{Binding Placing.CanEditShapes, FallbackValue=False}" />
-        <MenuItem Header="New object from selection..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" />
+        <MenuItem Header="New object..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" ToolTip="Paint an object in the composer from cells of any sheet; a rectangle chosen in the Tiles panel starts it." />
         <MenuItem Header="New NPC..." Click="OnNewNpcClicked" IsEnabled="{Binding CanStartNewNpc}" />
         <!-- Keeps the object's id, events and placements, so the chest and the doors keep working with new art (decision 449). -->
         <MenuItem Header="Replace cells of the chosen object" Command="{Binding Reskinning.ReskinCommand}" ToolTip="The object chosen in the Objects panel takes the cells chosen in the Tiles panel; Ctrl+Z puts the old cells back." />
@@ -164,7 +164,7 @@
       </ToolBar>
       <ToolBar Band="0" BandIndex="2" Style="{StaticResource ObjectsBand}">
         <Button Content="Edit shapes..." Click="OnEditShapesClicked" IsEnabled="{Binding Placing.CanEditShapes, FallbackValue=False}" />
-        <Button Content="New object from selection..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" />
+        <Button Content="New object..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" />
         <Button Content="New NPC..." Click="OnNewNpcClicked" IsEnabled="{Binding CanStartNewNpc}" />
       </ToolBar>
     </ToolBarTray>
@@ -217,14 +217,6 @@
                       Content="Import..."
                       ToolTip="Copy PNG images into the tilesheet art; each then shows in the sheet box."
                       Click="OnImportSheetImageClicked" />
-              <!-- Next to the cells it is made from, while several are selected; the Objects menu and tool bar have it too. -->
-              <Button DockPanel.Dock="Bottom"
-                      Margin="0,4"
-                      HorizontalAlignment="Left"
-                      Padding="8,2"
-                      Content="New object from selection..."
-                      Visibility="{Binding CanStartNewObject, Converter={StaticResource VisibleWhenTrue}}"
-                      Click="OnNewObjectClicked" />
               <!-- Refused while a map or an object uses one of the sheet's tiles (decision 443); the line says which. -->
               <StackPanel DockPanel.Dock="Bottom" Margin="0,4">
                 <Button HorizontalAlignment="Left"

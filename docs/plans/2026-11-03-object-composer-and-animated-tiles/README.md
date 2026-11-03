@@ -53,7 +53,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **CO3. `ObjectComposerViewModel` and `ObjectNaming`: the composer's id, category, problem and the object it makes, new or edited** (Editor, about 190 lines) → [slices/CO3.md](slices/CO3.md)
 - [x] **CO4a. `ObjectComposing`: New starts from the chosen rectangle or an empty canvas, Edit from the chosen object; Save makes the missing tiles and the object as one undo step** (Editor, about 200 lines) → [slices/CO4a.md](slices/CO4a.md)
 - [x] **CO4b. The canvas's picture: `ObjectCanvasDrawing` and `TileImages.CellImageOf`** (Editor, about 110 lines) → [slices/CO4b.md](slices/CO4b.md)
-- [ ] **CO5. The composer window; Objects > New object opens it and then the Shapes window; New object from selection leaves** (Editor, about 200 lines) → [slices/CO5.md](slices/CO5.md)
+- [x] **CO5. The composer window; Objects > New object opens it and then the Shapes window; New object from selection leaves** (Editor, about 200 lines) → [slices/CO5.md](slices/CO5.md)
 - [ ] **CO6. Objects > Edit object opens the composer on the chosen object, the Shapes window after a size change; Replace cells leaves** (Editor, about 130 lines) → [slices/CO6.md](slices/CO6.md)
 
 ### Phase 2: animated tiles in content and the game

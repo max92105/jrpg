@@ -16,10 +16,7 @@ public sealed class CombinedHistoryObjectTests : IDisposable
     {
         var viewModel = _content.Open(_content.CopyOfTestWorld());
         _content.ChooseTwoCellsNotTiles(viewModel);
-        var newObject = viewModel.StartNewObject()!;
-        newObject.Id = "tree_4";
-        newObject.Category = "General";
-        viewModel.CreateObject(newObject);
+        EditorTestContent.ComposeObject(viewModel, "tree_4");
         var map = viewModel.CurrentMap!;
         // An object with no events yet, so the new interact event isn't shadowed by an earlier one that always starts.
         var bare = map.Map.Layout.Objects.First(placed => placed.Events.Count == 0);
@@ -41,10 +38,7 @@ public sealed class CombinedHistoryObjectTests : IDisposable
     {
         var viewModel = _content.Open(_content.CopyOfTestWorld());
         _content.ChooseTwoCellsNotTiles(viewModel);
-        var newObject = viewModel.StartNewObject()!;
-        newObject.Id = "tree_4";
-        newObject.Category = "General";
-        viewModel.CreateObject(newObject);
+        EditorTestContent.ComposeObject(viewModel, "tree_4");
         var browser = viewModel.Placing!.Browser;
         browser.SelectedObject = browser.Objects.First(definition => definition.Id == "tree_4");
         browser.RemoveSelectedCommand.Execute(null);

@@ -1,6 +1,5 @@
 using Jrpg.Core.Geometry;
 using Jrpg.Data.Content;
-using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Maps.Editing;
 using Jrpg.Editor.Shell;
 using Jrpg.Editor.Tests.Tiles;
@@ -208,27 +207,6 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
-    public void CreateObject_CellsNotTilesYet_AddsTilesAndTheObjectThenChoosesIt()
-    {
-        var viewModel = _content.Open(_content.CopyOfTestWorld());
-        var cells = _content.ChooseTwoCellsNotTiles(viewModel);
-        var newObject = viewModel.StartNewObject()!;
-        newObject.Id = "tree_4";
-        newObject.Category = "General";
-
-        Assert.True(viewModel.CreateObject(newObject));
-        viewModel.SaveCommand.Execute(null);
-
-        Assert.Null(viewModel.SaveError);
-        Assert.Equal(EditingMode.Objects, viewModel.Mode);
-        Assert.Equal("tree_4", viewModel.Placing!.Browser.SelectedObject?.Id);
-        var saved = ContentCatalogLoader.Load(_content.ContentCopy);
-        var tree = saved.Objects["tree_4"];
-        Assert.Equal(("General", 2, 1), (tree.Category, tree.Width, tree.Height));
-        Assert.Equal(cells.Cells, tree.Tiles.Select(tile => saved.Tiles[tile.TileId] is var cut ? new SheetCell(cut.SheetId, cut.Column, cut.Row) : default));
-    }
-
-    [Fact]
     public void CreateNpc_NewId_AddsItAndChoosesIt()
     {
         var viewModel = _content.Open(_content.CopyOfTestWorld());
@@ -246,34 +224,7 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
-    public void CanStartNewObject_RectangleChosen_IsTrue()
-    {
-        var viewModel = _content.Open(_content.CopyOfTestWorld());
-        Assert.False(viewModel.CanStartNewObject);
-        var changed = new List<string?>();
-        viewModel.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
-
-        _content.ChooseTwoCellsNotTiles(viewModel);
-
-        Assert.True(viewModel.CanStartNewObject);
-        Assert.Contains(nameof(MainViewModel.CanStartNewObject), changed);
-    }
-
-    [Fact]
-    public void CreateObject_IdTaken_ReturnsFalseAndKeepsTheObject()
-    {
-        var viewModel = _content.Open(_content.CopyOfTestWorld());
-        var tree = viewModel.Catalog!.Objects["tree"];
-        _content.ChooseTwoCellsNotTiles(viewModel);
-        var newObject = viewModel.StartNewObject()!;
-        newObject.Id = "tree";
-        newObject.Category = "General";
-
-        Assert.False(viewModel.CreateObject(newObject));
-
-        Assert.Same(tree, viewModel.Catalog.Objects["tree"]);
-        Assert.False(viewModel.Content!.IsDirty);
-    }
+    public void CanStartNewObject_ContentLoaded_IsTrue() => Assert.True(_content.Open(_content.TestWorld).CanStartNewObject);
 
     [Fact]
     public void ShowCursorAt_CellOnTheMap_NamesTheCellAndItsTopTile()

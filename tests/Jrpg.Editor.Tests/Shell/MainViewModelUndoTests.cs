@@ -127,10 +127,7 @@ public sealed class MainViewModelUndoTests : IDisposable
     {
         var viewModel = _content.Open(_content.CopyOfTestWorld());
         _content.ChooseTwoCellsNotTiles(viewModel);
-        var newObject = viewModel.StartNewObject()!;
-        newObject.Id = "tree_4";
-        newObject.Category = "General";
-        viewModel.CreateObject(newObject);
+        EditorTestContent.ComposeObject(viewModel, "tree_4");
         viewModel.Placing!.PlaceObjectAt(new Point2D(2, 2));
         var placedOn = viewModel.CurrentMap!.Map.Id;
         viewModel.SaveCommand.Execute(null);

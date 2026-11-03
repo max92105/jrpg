@@ -48,6 +48,9 @@ internal sealed class ExplorationScene : IScene
 
     public IReadOnlyList<string> Sounds => _sounds.Files;
 
+    /// <summary>The open map's animation time, for the tests (decision 464).</summary>
+    internal TimeSpan TileAnimationTime => _view.AnimationTime;
+
     /// <summary>
     /// Shows the running event's step; interacts, walks and opens the menu only once it and its fade are over. An
     /// interaction that starts an event waits for it like any other. While a step's encounter is pending, the player
@@ -60,6 +63,8 @@ internal sealed class ExplorationScene : IScene
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
         _sounds.Clear();
+        // First, so the animated tiles move on whatever the update then does: an event, an encounter's pause, a warp.
+        _view.Advance(delta);
         var request = UpdateExploration(delta, input);
         _prompt.Update(_presenter.IsBusy ? null : _exploration.InteractionInFront, input.Device, delta);
         return request;

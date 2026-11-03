@@ -9,12 +9,16 @@ namespace Jrpg.Game.Exploration;
 
 /// <summary>
 /// Draws one map's tile layers, only the cells on screen, and its placed objects as they are now (an opened door draws
-/// open).
+/// open). It holds the time its animated tiles show (decision 464): from zero on entering the map, moved on by the
+/// scene.
 /// </summary>
 internal sealed class MapView(MapLayout layout, Func<PlacedObject, ObjectDefinition> currentDefinitionOf, TileAtlas atlas)
 {
     /// <summary>Screen pixels per map cell at the 1920x1080 virtual screen (decision 48).</summary>
     public const int CellPixels = 48;
+
+    /// <summary>How long the map has run, for its animated tiles; every copy of a tile shows the same frame.</summary>
+    public TimeSpan AnimationTime { get; private set; }
 
     /// <summary>
     /// The cells the screen shows from <paramref name="origin"/>, with one more column and row for the partly shown
@@ -26,6 +30,8 @@ internal sealed class MapView(MapLayout layout, Func<PlacedObject, ObjectDefinit
             Math.Max(0, (int)MathF.Floor(origin.Y / CellPixels)),
             Math.Min(layout.Width, (int)MathF.Floor((origin.X + VirtualScreen.Width) / CellPixels) + 1),
             Math.Min(layout.Height, (int)MathF.Floor((origin.Y + VirtualScreen.Height) / CellPixels) + 1));
+
+    public void Advance(TimeSpan delta) => AnimationTime += delta;
 
     /// <summary>Draws the layer's cells on screen as seen from the camera's <paramref name="origin"/>, in map pixels.</summary>
     public void DrawLayer(SpriteBatch batch, TextureLibrary textures, TileLayer layer, Vector2 origin)
@@ -94,7 +100,7 @@ internal sealed class MapView(MapLayout layout, Func<PlacedObject, ObjectDefinit
 
     private void DrawTile(SpriteBatch batch, TextureLibrary textures, int tileId, Point screenTopLeft)
     {
-        var image = atlas.ImageOf(tileId);
+        var image = atlas.ImageAt(tileId, AnimationTime);
         var destination = new Rectangle(screenTopLeft.X, screenTopLeft.Y, CellPixels, CellPixels);
         batch.Draw(textures.Get(ArtFolders.Tilesheets, image.SheetFile), destination, image.Source, Color.White);
     }

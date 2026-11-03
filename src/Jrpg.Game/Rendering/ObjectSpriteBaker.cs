@@ -6,9 +6,10 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Rendering;
 
 /// <summary>
-/// Bakes each object's canopy: its tiles composed at screen size, keeping only the pixels inside its above-player zones,
-/// so drawing the canopy over the player needs no clipping or shader (plan 3a, key decision 4). It works because every
-/// object draws on one layer: an object tile has no Z of its own.
+/// Bakes each object's canopy: its tiles composed at screen size, keeping only the pixels inside its above-player
+/// zones, so drawing the canopy over the player needs no clipping or shader (plan 3a, key decision 4). It works because
+/// every object draws on one layer: an object tile has no Z of its own. An animated tile is baked from its first frame,
+/// so a canopy stands still (decision 465).
 /// </summary>
 internal static class ObjectSpriteBaker
 {

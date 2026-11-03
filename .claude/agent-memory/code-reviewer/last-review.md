@@ -5,12 +5,12 @@ metadata:
   type: project
 ---
 
-Plan: 2026-11-03-object-composer-and-animated-tiles, slice AN1 (TileAnimation in content; FrameAt, ColumnShownAt). Round 1.
+Plan: 2026-11-03-object-composer-and-animated-tiles, slice AN2 (the game draws animated tiles). Round 1.
 Verdict: Ready to commit.
 
-- open (Suggestion): .claude/scripts/verify.ps1:2 stray blank line splits the header comment's first sentence; delete it
-- open (Suggestion): ArtReferenceCheck.cs LastFrameColumn comment leaves a lone "cell." line; reword to fit one line
-- open (Suggestion): ADR 0039 option B "A time per frame" reads like the chosen "one time for every frame"; name it
-  "A different time for each frame"
+- open (Suggestion): TileAtlasTests ImageAt_StillTile_IsItsCellAtAnyTime takes Tiles.Values.First() and 12 345 ms,
+  which is frame 0 of a 4 x 140 ms animation too; pick First(t => t.Animation is null)
+- open (Suggestion): ExplorationScene.Update comment says "the water moves"; say "the animated tiles move"
 - open (Follow-up, from CO4a): StartNew's column clip still untested (only StartNew_RectangleTallerThanMaxCells_...)
-- fixed (from CO6): CanEdit_AfterTheChosenObjectIsRemoved_IsFalse now sits with the other CanEdit_* tests
+- dropped: AN1's three Suggestions (verify.ps1 blank line, ArtReferenceCheck lone line, ADR 0039 option B name)
+  belong to AN1's committed diff; not carried

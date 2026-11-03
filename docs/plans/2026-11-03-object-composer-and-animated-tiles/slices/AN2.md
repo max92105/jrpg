@@ -28,3 +28,5 @@ Size: about 45 lines of code, 6 tests (about 170). No view type is added, so the
 
 ## Verify by hand
 - Locally (revert after): set up the waterfall B sheet in the editor if it isn't yet, paint one of its row-4 tiles on an overlay layer over a cliff, save; in `content/tiles.json`, give that tile `"animation": { "frameCount": 4, "frameMilliseconds": 140 }`. Run the game: every painted copy cycles in step; it keeps moving under a message, stands under the menu and carries on after. Set `frameCount` to run past the sheet's right edge: the game refuses to start, naming the tile. Take the `animation` back out (AI2's import sets it properly); the painted tile and map stay.
+
+- **Done, with deviations:** the scene tests sit in a new `Game.Tests/Exploration/ExplorationSceneAnimationTests` beside `ExplorationSceneTests` (182 lines); `MapView.AnimationTime` is a public read on the internal class. The hand check below is yours (agents don't open the Mana Seed sheets).

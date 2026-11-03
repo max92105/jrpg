@@ -15,7 +15,8 @@ Older plans are single files with the same sections.
 
 | Plan | Status |
 |---|---|
-| [2026-11-03-mana-seed-reset](2026-11-03-mana-seed-reset/README.md) | approved, in progress (C2, the developer painting the maps, left) |
+| [2026-11-03-object-composer-and-animated-tiles](2026-11-03-object-composer-and-animated-tiles/README.md) | draft |
+| [done/2026-11-03-mana-seed-reset](done/2026-11-03-mana-seed-reset/README.md) | done (the maps painted after it, as content work) |
 | [done/2026-11-02-sound-pass](done/2026-11-02-sound-pass/README.md) | done |
 | [done/2026-10-29-music-and-sfx](done/2026-10-29-music-and-sfx/README.md) | done |
 | [done/2026-10-29-enemy-skills-and-bosses](done/2026-10-29-enemy-skills-and-bosses/README.md) | done |

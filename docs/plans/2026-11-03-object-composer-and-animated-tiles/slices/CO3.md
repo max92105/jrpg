@@ -31,3 +31,5 @@ Size: about 80 lines of code, 12 tests (about 190).
 
 ## Verify by hand
 Nothing to see yet (CO5).
+
+- **Done, with deviations:** a blank category stops Save while editing too (the category is editable there; the slice named only the new object's naming problems); one test more, `Problem_IdTypedAfterAProblem_IsRaised` (the window binds `Problem`). From the review: `Problem` is tested raised for a stroke, a size typo and a cleared category, and an edited object keeps an id `ObjectIds` would refuse (`Problem_EditOfAnIdThePatternRefuses_IsNull`).

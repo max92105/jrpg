@@ -27,3 +27,5 @@ Size: about 85 lines of code (Data about 25), 9 tests (about 200).
 
 ## Verify by hand
 None: no screen yet (E3c's hand check covers it).
+
+- **Done, with deviations:** the refusal also covers an event gated on an object that would go (`onlyWhenObjectId`, which the save refuses as it does a swap); one more test for it. `SheetPurge` has `RefusalOf` and `Purge` (which throws when refused) rather than one result with an optional reason. `ContentWriter.WriteMapCatalogs` and the new `WriteMapCatalogsAndMaps` share one private `CheckedCatalogWrites`; the named maps' settings are checked and written too (unchanged by a purge, so the same bytes).

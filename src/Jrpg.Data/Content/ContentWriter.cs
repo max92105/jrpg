@@ -49,7 +49,39 @@ public sealed class ContentWriter(string contentRoot)
     /// </summary>
     /// <param name="catalog">The content holding the catalogs to save; its maps are the ones checked.</param>
     /// <exception cref="ContentValidationException">The game would reject the catalogs; the message names the file, and nothing was written.</exception>
-    public void WriteMapCatalogs(ContentCatalog catalog)
+    public void WriteMapCatalogs(ContentCatalog catalog) => WriteAll(CheckedCatalogWrites(catalog));
+
+    /// <summary>
+    /// Writes the catalogs and the named maps in one go, all or none, after the checks of
+    /// <see cref="WriteMapCatalogs"/> and each map's settings and the new game's start: for a change that spans both,
+    /// the editor's sheet purge (decision 442).
+    /// </summary>
+    /// <param name="catalog">
+    /// The content holding the catalogs and the maps to save; every map is checked against it.
+    /// </param>
+    /// <param name="mapIds">The maps whose files are written; the others are only checked.</param>
+    /// <exception cref="ContentValidationException">
+    /// The game would reject the content; the message names the file, and nothing was written.
+    /// </exception>
+    public void WriteMapCatalogsAndMaps(ContentCatalog catalog, IReadOnlyCollection<string> mapIds)
+    {
+        var writes = CheckedCatalogWrites(catalog);
+        var encounterIds = catalog.Encounters.Keys.ToHashSet();
+        foreach (var map in mapIds.Select(id => catalog.Maps[id]))
+        {
+            var settingsFile = MapFolderReader.SettingsFile(map.Id);
+            MapSettingsValidator.Validate(settingsFile, map.Settings, encounterIds);
+            writes.Add(PlanWrite(MapFolderReader.LayoutFile(map.Id), map.Layout));
+            writes.Add(PlanWrite(settingsFile, map.Settings));
+        }
+
+        var newGameReferences = new NewGameReferences(catalog.PartyMembers.Keys.ToHashSet(), catalog.Items, catalog.Maps);
+        NewGameValidator.Validate(ContentCatalogLoader.NewGameFile, catalog.NewGame, newGameReferences);
+        WriteAll(writes);
+    }
+
+    // The catalog files, each sorted by id, once they and every map's layout pass the loader's checks.
+    private List<FileToWrite> CheckedCatalogWrites(ContentCatalog catalog)
     {
         var sheets = catalog.Tilesheets.Values.OrderBy(sheet => sheet.Id, StringComparer.Ordinal).ToList();
         var tiles = catalog.Tiles.Values.OrderBy(tile => tile.Id).ToList();
@@ -65,13 +97,13 @@ public sealed class ContentWriter(string contentRoot)
             MapLayoutValidator.Validate(MapFolderReader.LayoutFile(layout.Id), layout, references);
         }
 
-        WriteAll(
+        return
         [
             PlanWrite(ContentCatalogLoader.TilesheetsFile, sheets),
             PlanWrite(ContentCatalogLoader.TilesFile, tiles),
             PlanWrite(ContentCatalogLoader.ObjectsFile, objects),
             PlanWrite(ContentCatalogLoader.QuestsFile, quests),
-        ]);
+        ];
     }
 
     /// <param name="fileName">A file name in the tilesheet art folder.</param>

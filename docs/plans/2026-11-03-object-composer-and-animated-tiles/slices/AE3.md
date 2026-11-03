@@ -1,28 +1,29 @@
-# AE3. The Animate panel in the Tiles panel
+# AE3. The Objects panel's preview and the composer's canvas animate
 
-Builds on design.md, "Key decisions" 6 and 9, and the README's pick 13.
+Builds on design.md, "Key decisions" 6 and 8, and decisions 466 and 470.
 
 ## Goal
-Tiles > Animate tile... (the menu) and an "Animate" button in the Tiles tab, enabled by `Animating.CanOpen`, open the Animate panel under the sheet view: the frames count and status line, the time box, a live preview at the map's cell size, Remove last frame, Apply, Remove animation, Close, and the problem line. While it is open, a click on the sheet adds the cell under it as the next frame (instead of choosing it), and the frames are numbered over the sheet (1, 2, 3 in their cells). The preview cycles with the editor's view timer, which this slice adds (AE4 reuses it for the map).
+The small pictures animate on the render tick: the Objects panel's preview of the chosen object, and the composer's canvas while it is open, show each animated tile's frame for the editor's animation time, redrawn only when `TileAnimationTime.FramesChanged` says a frame changed. The editor's map, the placing ghost and the Shapes window keep the first frame (decision 466; the animated map is a backlog line).
 
 ## New types
-- `Editor/Tiles/AnimationFrameMarks` (static): the open panel's frames numbered over the sheet. `static DrawingImage? Draw(TilesheetDefinition sheet, Size imageSize, IReadOnlyList<SheetCell> frames)` (null with no panel open), in the screen-pixel line widths `TilesheetMarks` uses.
-- `Editor/Shell/MainWindow.TileAnimation.cs` (partial): the view timer moving the editor's animation time on: one `DispatcherTimer` at 50 ms adding its interval to a `TimeSpan`, showing the panel's preview (`TileImages.CellImageOf(Animating.PreviewCellAt(time))`). View only.
+None.
 
 ## Changes
-- `Editor/Tiles/TileBrowserView.xaml(.cs)`: `TileAnimationViewModel? Animating` (set by the window, as `Marking`); while `Animating.IsOpen`, a click calls `Animating.AddFrameAt` with the browser's `CellAt` and no drag starts; a third image layer `FrameMarks` redrawn when the frames change (about +25 lines of code-behind).
-- `Editor/Shell/MainWindow.xaml`: the panel in the Tiles tab (bound to `Animating`, under the Remove sheet block), the Animate button, Tiles > Animate tile....
-- `Editor/Shell/MainWindow.xaml.cs`: sets `TileBrowser.Animating` and starts the timer (2 lines; the file is at 569, its split is in the backlog).
-- `Editor/Shell/MainViewModel`: `public TileAnimationViewModel? Animating { get; }`, built beside `Marking` (+3 lines after phase 1's −40).
-- `Editor/Shell/ControlsHelpWindow`: "With the Animate panel open, a click on the sheet adds a frame."
+- `Editor/Tiles/TileImages`: `ImageSource CellImageAt(SheetCell cell, TimeSpan elapsed)` (the cell's tile's frame when the cell is an animated tile's own, through `TileDefinition.ColumnShownAt`; the cell itself otherwise) and `TileImageAt(int tileId, TimeSpan elapsed)`; both reuse `CellImageOf`'s cache.
+- `Editor/Maps/MapDrawing.DrawObject(ObjectDefinition definition, TimeSpan elapsed)`: the previews' overload drawing each tile with `TileImageAt`; the existing `DrawObject(definition)` (the ghost, the Shapes window) keeps the first frame (about +5 lines, 211).
+- `Editor/Objects/ObjectBrowserView.xaml.cs`: redraws `Preview` on `FramesChanged` while the chosen object has an animated tile (the window gives it the `TileAnimationTime`, as it gives `Drawing`).
+- `Editor/Objects/Composing/ObjectComposerWindow`: built with the `TileAnimationTime` too; redraws the canvas with `cell => images.CellImageAt(cell, time.Elapsed)` on `FramesChanged`, unsubscribing on `Closed` beside the picker's release (CO5).
+- `Editor/Shell/MainWindow.ObjectEditing.cs`: passes `AnimationTime` to the composer.
 
 ## Tests
-- `Tiles/AnimationFrameMarksTests` (new): `Draw_NoFrames_IsNull`; `Draw_ThreeFrames_IsClippedToTheImage` (the drawing's bounds equal the image's, as `TilesheetMarks` pins).
-- The panel's behavior is AE1's and AE2's tests; the rest is the hand check.
+- `TileImagesTests: CellImageAt_AnimatedTilesCellAtTheFrameTime_IsTheNextCellsImage` (the same cached instance as `CellImageOf` of the cell to the right).
+- `TileImagesTests: CellImageAt_StillCell_IsItsOwnImage`.
+- `TileImagesTests: CellImageAt_AnimationFrameOfAnotherTile_IsItsOwnImage` (the second frame's cell isn't animated itself: it stays still where painted).
+- `MapDrawingTests` (new): `DrawObject_AtTheFrameTime_DrawsTheSecondFrame` (an object of one animated tile; the drawing's image source is `CellImageOf` of the next cell).
 
-Size: about 60 lines of XAML, 70 of code-behind and drawing, 10 elsewhere, 2 tests (about 200).
+Size: about 50 lines of code, 4 tests (about 130).
 
 ## Verify by hand
-- Choose the first frame cell of a Mana Seed water or waterfall sheet in the Tiles panel, click Animate: the panel opens with frame 1 marked on it. Click the next cells in order: 2, 3, 4 appear; the preview cycles. Type 300: it slows down. Click a cell of another sheet (switch the sheet box): the status says frames must be on the tile's own sheet. Remove last frame takes 4 off; the first can't be removed. Apply: the panel closes; Ctrl+Z undoes it, Ctrl+Y redoes it. Open it again on that cell: the frames and time come back. Remove animation makes it still.
-- Save, run the game with the tile painted on a map: it animates there (AN2).
-- With the panel closed, clicks choose cells as before; Mark blocked still flips cells. F1 lists the panel's gesture.
+- Compose an object with an animated cell (a waterfall tile among cliff parts) and Save: the Objects panel's preview cycles; the composer's canvas cycled while painting. The placing ghost and the map show the first frame; the game animates it (AN2).
+- Choose a still object: the preview doesn't redraw (no flicker, no CPU in Task Manager beyond idle).
+- Close the composer and choose another object: no lag (the closed window let go of the tick).

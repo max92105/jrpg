@@ -1,9 +1,11 @@
 # CO6. Objects > Edit object; Replace cells leaves
 
-Builds on decision 449, design.md, "Key decisions" 2, and the README's picks 1 and 8.
+Builds on decision 449, design.md, "Key decisions" 2, and decisions 455 and 462.
 
 ## Goal
-Objects > Edit object... (the menu, the Objects tool bar, enabled while `Composing.CanEdit`) opens the composer on the object chosen in the Objects panel: its cells painted, its id shown fixed, its category editable. Save replaces its picture, size and category as one undo step, keeping its id, outline, zones (stretched with a new size), placements and events; the Shapes window opens when its size changed. Objects > Replace cells of the chosen object leaves: Edit does what it did, with any cells from anywhere. Double-click in the Objects panel keeps opening the Shapes window.
+Objects > Edit object... (the menu, the Objects tool bar, enabled while `Composing.CanEdit`) opens the composer on the object chosen in the Objects panel: its cells painted, its id shown fixed, its category editable. Save replaces its picture, size and category as one undo step, keeping its id, outline, zones (stretched with a new size), placements and events; the Shapes window opens when its size changed. Objects > Replace cells of the chosen object leaves. Double-click in the Objects panel keeps opening the Shapes window.
+
+What goes with Replace cells: its one-click path (a rectangle chosen in the Tiles panel, one menu entry, the picture and size replaced at once). Edit does the same with a size typed, the rectangle stamped and Save (decision 455). That is acceptable: a re-skin happens once per object after an art change, the developer is rebuilding with composed objects anyway (parts from anywhere, which Replace cells couldn't do), and keeping both would leave two ways to the same edit with different rules.
 
 ## New types
 None.
@@ -23,5 +25,7 @@ None.
 Size: about 30 lines of code and XAML, 1 test; about 150 lines and six files removed (about 130 counted).
 
 ## Verify by hand
-- Choose `chest` (or a re-skinned Mana Seed object) in the Objects panel, Objects > Edit object...: its cells show on the canvas, its id is fixed. Repaint one cell with a part from another sheet, Save: every placed chest shows it; in the game the chest still gives its item and opens. Edit again, add a column, Save: the Shapes window opens with the outline stretched; adjust, OK. Ctrl+Z twice in the main window: the outline, then the old picture come back.
+The repository's chest went with the old art (commit 7e2d1b94), so the check uses the object CO5's hand check made (`composer_check`, placed on the start map), or any object composed since:
+- Give the placed `composer_check` a talk event in the Events tab and save the map. Choose `composer_check` in the Objects panel, Objects > Edit object...: its cells show on the canvas, its id is fixed. Repaint one cell with a part from another sheet, Save: the placed copy shows it and still has its event (Events tab; in the game, interacting still talks). Edit again, add a column, Save: the Shapes window opens with the outline stretched; adjust, OK. Ctrl+Z twice in the main window: the outline, then the old picture come back.
 - Choose an NPC: Edit object is greyed. The Objects menu no longer lists Replace cells.
+- Remove `composer_check` (its placement first, then Remove in the Objects panel) and save, unless the developer keeps it.

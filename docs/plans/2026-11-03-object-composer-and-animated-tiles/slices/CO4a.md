@@ -1,6 +1,6 @@
-# CO4. ObjectComposing: starting the composer and applying it
+# CO4a. ObjectComposing: starting the composer and applying it
 
-Builds on design.md, "Key decisions" 1 and 2, and the README's picks 1, 5 and 7.
+Builds on design.md, "Key decisions" 1 and 2, and decisions 455, 459 and 461.
 
 ## Goal
 The menu entries' view model, still headless: New starts the composer from the rectangle chosen in the Tiles panel (sized to it and painted with it), or from an empty 3 x 3 canvas; Edit starts it on the object chosen in the Objects panel (not an NPC: it has no cells). Save makes the canvas's cells tiles where they aren't yet (walkable, outside the history, decision 113), then sets the object as one undo step and chooses it in the Objects panel. Edit keeps every placement and event (they name the object by id). `MainViewModel` holds it.

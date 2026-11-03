@@ -1,6 +1,6 @@
 # CO1. ObjectCanvas: an object's picture as sheet cells on a grid
 
-Builds on design.md, "Key decisions" 1 and the README's picks 2, 4 and 6.
+Builds on design.md, "Key decisions" 1, and decisions 456, 458 and 460.
 
 ## Goal
 The composer's rules for a picture, with no window yet: a canvas of a size, each cell empty or showing a sheet cell; a rectangle of sheet cells stamped with its top-left on a canvas cell (clipped, replacing what was there); a cell erased; the canvas resized (cells keep their place from the top-left, those outside drop); a canvas read from a rectangle (New object from the chosen cells) or from an existing object; the painted cells made into object tiles. `CatalogDraft.TileIdsOf` takes any cells, so the composer can make tiles of scattered cells.

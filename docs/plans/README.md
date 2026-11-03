@@ -4,7 +4,7 @@ Feature plans from `/plan-feature`, worked through one slice at a time with `/sl
 
 Code-health work found along the way (big files, copies, open follow-ups) waits in [backlog.md](backlog.md) for the next cleanup plan.
 
-**Next free numbers:** decision 455, ADR 0039. A new decision or ADR takes its number from this line and bumps it in the same change, so two plans never share a number.
+**Next free numbers:** decision 472, ADR 0040. A new decision or ADR takes its number from this line and bumps it in the same change, so two plans never share a number.
 
 **Layout of a plan** (from the battle plan on): a folder `YYYY-MM-DD-name/` with
 - `README.md`: status, goal, order, guiding rules, out of scope, the slice index (one line and a checkbox per slice), the developer's decisions, open questions, ADRs needed. Read for every slice.
@@ -15,7 +15,7 @@ Older plans are single files with the same sections.
 
 | Plan | Status |
 |---|---|
-| [2026-11-03-object-composer-and-animated-tiles](2026-11-03-object-composer-and-animated-tiles/README.md) | draft |
+| [2026-11-03-object-composer-and-animated-tiles](2026-11-03-object-composer-and-animated-tiles/README.md) | approved |
 | [done/2026-11-03-mana-seed-reset](done/2026-11-03-mana-seed-reset/README.md) | done (the maps painted after it, as content work) |
 | [done/2026-11-02-sound-pass](done/2026-11-02-sound-pass/README.md) | done |
 | [done/2026-10-29-music-and-sfx](done/2026-10-29-music-and-sfx/README.md) | done |

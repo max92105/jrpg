@@ -1,6 +1,6 @@
 # CO2. CanvasPainting: strokes, the typed size, the composer's own undo
 
-Builds on design.md, "Key decisions" 3 and 4, and the README's picks 4, 6 and 7.
+Builds on design.md, "Key decisions" 3 and 4, and decisions 457, 458, 460 and 461.
 
 ## Goal
 The composer's painting, headless: a stroke (press, moves, release) stamps the Tiles panel's chosen cell or rectangle at each canvas cell it passes, or erases them (the right button, or the Erase toggle); the size is typed in two boxes and applied while valid; each stroke and each resize is one step of the composer's own undo and redo. Cells of a sheet whose image is missing are refused, as Replace cells refused them (decision 442).

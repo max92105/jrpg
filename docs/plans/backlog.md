@@ -173,5 +173,11 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `SoundSourcesTests` reads its manifest with its own loose options (camelCase, unmapped members disallowed): a missing field reads as a default; switch it to `ContentJsonOptions.Strict` as `ArtSourcesManifest` does (AS1 review).
 - `tests/Jrpg.Editor.Tests/Tiles/TileBrowserViewModelTests.cs` is about 500 lines: split it along the Cut-panel tests and the hit-test tests (M1 review).
 - The start map has no door into `interior_1` (decision 454): place one (a door object from the half-timber sheet, the event panel's door preset warping to `interior_1`), then remove the `Skip` on `RepositoryNewGameTests.StartMap_RepositoryContent_HasADoorIntoAnInterior`.
+
+## From the object composer and animated tiles plan (2026-11-03, at approval)
+
+- Several tiles on one object cell (decision 456): its own plan, with an ADR on the object tile format, if the half-timber house's doors or windows turn out to be transparent overlays on wall cells.
+- The editor's map animating (the plan's former AE4, decision 466): one shared, unfrozen `ImageBrush` per animated tile, swapped on `TileAnimationTime.FramesChanged`; `MapDrawing` paints those cells with it and leaves such a drawing unfrozen (design.md, "Extension points").
+- The other out-of-scope items (an explicit frame list or per-frame times, per-cell start offsets, the tall grass effect, a free pixel rectangle from an image without a cut, animated canopies, an animated tile's mark on the sheet, the re-cut warning counting frames) are listed in `docs/plans/2026-11-03-object-composer-and-animated-tiles/README.md`, "Out of scope".
 - `tests/Jrpg.Game.Tests/Flow/GameFlowTests.cs` (321 lines) and `Exploration/EventPresenterTests.cs` (306) crossed 300 before the Mana Seed plan; split each by scenario when next touched (reset retro).
 - `src/Jrpg.Editor/Shell/MainWindow.xaml.cs` is 569 lines: the sheet import, the removal question and the map settings handlers could join the `.ObjectEditing`/`.EventEditing` partial files (reset retro).

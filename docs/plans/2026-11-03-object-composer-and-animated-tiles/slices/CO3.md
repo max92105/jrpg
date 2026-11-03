@@ -1,13 +1,13 @@
 # CO3. ObjectComposerViewModel and ObjectNaming: what Save makes
 
-Builds on design.md, "Key decisions" 2, and the README's picks 1, 5 and 8.
+Builds on design.md, "Key decisions" 2, and decisions 455, 459 and 462.
 
 ## Goal
 The composer's state around the painting: for a new object, the id and category typed in the composer itself; for an edited one, its id shown fixed and its category editable; what stops Save (the size, the id, the category, nothing painted), and the object Save makes: a new one with no outline and no zones, or the original with its new size, tiles and category, keeping its id, outline and zones. Whether the Shapes window should open after Save: always for a new object, for an edited one only when its size changed.
 
 ## New types
 - `Editor/Objects/ObjectNaming` (`internal sealed partial class : ObservableObject`): the id and category typed for a new object, with their problems. `NewObjectViewModel`'s rules without its cells: `ObjectNaming(IReadOnlyCollection<string> takenIds, IReadOnlyList<string> categories)`, `Id`, `Category`, `Categories`, `IdProblem` (`ObjectIds.ProblemOf`), `CategoryProblem`. `NewObjectViewModel` stays until CO5 removes it with its window (a two-slice overlap, not a copy kept).
-- `Editor/Objects/Composing/ObjectComposerViewModel` (`internal sealed class`): the composer window's state: the painting, the naming of a new object or the edited original, what stops Save, and the object it makes.
+- `Editor/Objects/Composing/ObjectComposerViewModel` (`internal sealed partial class : ObservableObject`, since the window binds `Problem`): the composer window's state: the painting, the naming of a new object or the edited original, what stops Save, and the object it makes.
   - `static ObjectComposerViewModel ForNew(CanvasPainting painting, ObjectNaming naming)`; `static ObjectComposerViewModel ForEdit(CanvasPainting painting, ObjectDefinition original, IReadOnlyList<string> categories)` (its naming holds the original's category, its id fixed).
   - `CanvasPainting Painting`; `ObjectNaming Naming`; `ObjectDefinition? Original`; `bool IsIdEditable`; `string Title` ("New object", "Edit object 'chest'").
   - `string? Problem` (first of `Painting.SizeProblem`, the naming's problems while new, "Paint at least one cell."), raised when any of them changes.

@@ -10,7 +10,7 @@ metadata:
 **How to apply:** for each new rule, guard, branch or chosen value in the diff, ask "which test fails if I delete this line?" If none, it's a Warning (Critical when several branches ship untested). The variants seen so far:
 
 - **same-seed-twice** (5a, 5b): two runs compared with each other pass with the randomness removed; pin golden values.
-- **count==count / oracle** (4b, 11g, stats E1): the test rebuilds the production computation; pin a golden prefix instead.
+- **count==count / oracle** (4b, 11g, stats E1, mana T2b): the test rebuilds the production computation; pin a golden prefix instead.
 - **guard clause** (6a, 8, 1b, class-mechanics PL2b, RG1): a `||` clause, a validator message or a `throw` with no test; match each to a test (one theory row per clause).
 - **boundary** (1b re-review, gold I1): `<=` tested only at the bound, or a range tested only on rejected values (0 and max + 1); test the accepted bounds too.
 - **fixture doesn't reach the scenario** (part 2 4a, 5b, slice 7): coordinates, keys or identical inputs make the named case never happen; trace the fixture.

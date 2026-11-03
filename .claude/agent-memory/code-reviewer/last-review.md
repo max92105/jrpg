@@ -5,9 +5,12 @@ metadata:
   type: project
 ---
 
-Plan: 2026-11-02-sound-pass, slice V1 (victory screen: level-up, drops and leaving sounds). Round 1.
-Verdict: Ready to commit. 0 Critical, 0 Warnings, 2 Suggestions.
+Plan: 2026-11-03-mana-seed-reset, slice O1 (Re-skin an object, decision 449). Round 1.
+Verdict: Ready to commit.
 
-- open (Suggestion): VictoryScreenSoundTests copies VictoryScreenTests' private Sarxian/half-a-level/potion builders though the slice said to reuse them; share them (e.g. a VictoryScreenScenarios) or note the copy in the Done note
-- open (Suggestion): VictoryScreen.Update's `levelUps` local reads as a count, beside `beforeSkip`; name them alike (levelUpsBeforeFill / levelUpsBeforeSkip)
-- fixed (from FE3): the warp test is now Update_WarpUnderway_AsksNothing; the cutscene-skip Suggestion was the developer's call, dropped
+- open (Warning): ObjectReskinning.CanReskin checks IsImageMissing on the shown SelectedChoice, not on MarkedCells' sheet
+  (a sheet change keeps SelectedCell); check the marked cells' sheet and test the missing-image clause
+- open (Warning): ObjectReskin.Reskin copies ObjectFromCells.Build's Tiles projection; Reskin's tileIds line copies
+  MainViewModel.CreateObject (third TileAt ?? AddTile); share ObjectFromCells.TilesOf + one CatalogDraft call
+- open (Suggestion): Reskin_PlacedObjectWithEvents_KeepsThePlacementsAndEvents asserts no events; assert or rename
+- fixed (carried from E3c): E3c.md Done note records the Rewritten -> Rewriting rename (line 32)

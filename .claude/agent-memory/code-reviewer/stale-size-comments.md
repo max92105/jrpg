@@ -15,6 +15,10 @@ call or a rename. These cases slipped past it:
   files and design.md citing the old name; grep the next slices and design.md for the planned name. Same after a test
   split (C2): a pending slice still cited "BattleStateTests (lines 225-354)".
 - A renamed id (M1b: StatAttack -> StatWeaponDamage) leaves test names and locals with the old word; grep it in the tests.
+  Same when tests switch their data source (mana-seed T2a: content -> test-world left `EveryRepositoryTile`,
+  `RepositoryTree`, `RepositoryIntroSkipped`): grep test names for the old source's word, not only comments. A shared
+  fixture switching source (T2c: `SaveGameFixtures.Catalog` -> test-world) leaves its users' unchanged summaries saying
+  "against the repository content": grep the fixture's users, not only the diff.
 - A record gaining a field (M2b-2: StatSheet.AttackDamage) is missed by its owner's "X, Y and Z" summary; a mechanic no
   longer read (M2b-1) turns "while the battle uses it" docs false; grep "while ... uses" and the slice id.
 - A responsibility moved to a new type (C1) leaves a neighbour's param doc naming the old owner; C2 left the backlog with
@@ -27,6 +31,9 @@ call or a rename. These cases slipped past it:
   added `EventScreenTransitions` to the Flow line but left the deleted `ForgeTransitions` in its key types.
 - A part that starts writing into its host's list (sound SH3: ShopCounter asking coins into ShopScene's AskedSounds) leaves the
   host's `Sounds` summary listing only the host's own asks; reread the host's summary.
+- A check moved out of one layer (mana-seed X2: the writer's art check now only at game startup) leaves comments
+  elsewhere saying where it refuses ("refuses it only on save" in TileImages) and summaries describing the old fallback
+  (`Select`: "nothing when the sheet isn't in the box"); grep the check's name and "on save" across the feature folders.
 
 **Why:** a comment or doc stating a wrong rule, name or number misleads the next reader.
 

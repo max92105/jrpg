@@ -10,14 +10,6 @@
       "isPlaceholder": false
     },
     {
-      "id": "elv-rogue-adventure",
-      "name": "Rogue Adventure Jungle",
-      "author": "ELV Games",
-      "url": "https://elvgames.itch.io/rogue-adventure-jungle",
-      "license": "LicenseRef-ElvGames",
-      "isPlaceholder": false
-    },
-    {
       "id": "generated",
       "name": "AI-generated placeholders",
       "author": "the developer, with an image generator",
@@ -31,6 +23,14 @@
       "url": "https://www.latofonts.com/",
       "license": "OFL-1.1",
       "licenseFile": "fonts/OFL.txt",
+      "isPlaceholder": false
+    },
+    {
+      "id": "mana-seed",
+      "name": "Mana Seed",
+      "author": "Seliel the Shaper",
+      "url": "https://seliel-the-shaper.itch.io/",
+      "license": "LicenseRef-ManaSeed",
       "isPlaceholder": false
     },
     {
@@ -231,40 +231,52 @@
       "sourceId": "generated"
     },
     {
-      "path": "tilesheets/Grass1.png",
-      "sourceId": "unrecorded"
+      "path": "tilesheets/autumn 16x16.png",
+      "sourceId": "mana-seed"
     },
     {
-      "path": "tilesheets/Grass2.png",
-      "sourceId": "unrecorded"
+      "path": "tilesheets/autumn 16x32.png",
+      "sourceId": "mana-seed"
     },
     {
-      "path": "tilesheets/Ground.png",
-      "sourceId": "unrecorded"
+      "path": "tilesheets/autumn 32x32.png",
+      "sourceId": "mana-seed"
     },
     {
-      "path": "tilesheets/RA_Ground_Tiles.png",
-      "sourceId": "elv-rogue-adventure"
+      "path": "tilesheets/autumn 48x32.png",
+      "sourceId": "mana-seed"
     },
     {
-      "path": "tilesheets/RA_Jungle.png",
-      "sourceId": "elv-rogue-adventure"
+      "path": "tilesheets/autumn forest (bare).png",
+      "sourceId": "mana-seed"
     },
     {
-      "path": "tilesheets/RA_Jungle_Animations.png",
-      "sourceId": "elv-rogue-adventure"
+      "path": "tilesheets/autumn forest (clean).png",
+      "sourceId": "mana-seed"
     },
     {
-      "path": "tilesheets/Water1.png",
-      "sourceId": "unrecorded"
+      "path": "tilesheets/autumn forest (leaves).png",
+      "sourceId": "mana-seed"
     },
     {
-      "path": "tilesheets/Water2.png",
-      "sourceId": "unrecorded"
+      "path": "tilesheets/autumn forest wang tiles.png",
+      "sourceId": "mana-seed"
     },
     {
-      "path": "tilesheets/tree01_s_01_animation.png",
-      "sourceId": "unrecorded"
+      "path": "tilesheets/autumn trees (bare) 80x112.png",
+      "sourceId": "mana-seed"
+    },
+    {
+      "path": "tilesheets/autumn trees (clean) 80x112.png",
+      "sourceId": "mana-seed"
+    },
+    {
+      "path": "tilesheets/autumn trees (leaves) 80x112.png",
+      "sourceId": "mana-seed"
+    },
+    {
+      "path": "tilesheets/home exteriors, half-timber v1.png",
+      "sourceId": "mana-seed"
     }
   ]
 }

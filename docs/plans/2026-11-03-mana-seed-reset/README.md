@@ -74,9 +74,9 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 5: the rebuild (the developer's content work)
 Q6 and Q8 were answered on 2026-11-03 (decisions 451, 452).
-- [ ] **C1.** Import the Forest Autumn sheets the maps use (cut at 16 px), add each one's manifest line (AS1's test names a missing one), build the trees and props as objects with their outlines and above-player zones; re-skin `chest`, `chest_opened`, `door_close` and `door_open` (O1) so their events stay.
+- [x] **C1.** Done 2026-11-03 by a one-off tool at the developer's request (decision 453): the eleven Forest Autumn sheets and the developer's Half-Timber Home exteriors set up at 16 px, with their manifest lines and credits; the developer builds objects from them. Planned: Import the Forest Autumn sheets the maps use (cut at 16 px), add each one's manifest line (AS1's test names a missing one), build the trees and props as objects with their outlines and above-player zones; re-skin `chest`, `chest_opened`, `door_close` and `door_open` (O1) so their events stay.
 - [ ] **C2.** Rebuild each map in the editor on its id: erase the old layers (Erase rectangle per layer), remove the old decor objects (rectangle select, Delete), resize, paint, place the new objects; **move the NPCs, chest and doors with their events, never delete and recreate them** (their uids are what R1's and the quest tests read, decision 447); the intro's tiles are erased or repainted. R1's tests pass after each saved map; the hand check is walking every map in the game.
-- [ ] **C3.** Remove, in the editor, the old objects (E1b), then each old sheet with its tiles (E3a), once nothing uses them; save. Delete the development saves made before the rebuild (design.md, "Risks").
+- [x] **C3.** Done 2026-11-03 with C1 (decision 453): every map's cells erased, every tile-built object without events removed with its placements, nine old images deleted; kept until re-skinned: chest, chest_opened (FG_Forest_Fall), door_close, door_open (City), and the signposts direction_2, direction_3. Planned: Remove, in the editor, the old objects (E1b), then each old sheet with its tiles (E3a), once nothing uses them; save. Delete the development saves made before the rebuild (design.md, "Risks").
 
 ### Phase 6: the old art leaves
 - [ ] **L1. The old tilesheet images no sheet names are deleted, with their manifest entries** (content, about 30 lines) → [slices/L1.md](slices/L1.md)
@@ -100,6 +100,7 @@ Planner's picks (not numbered; design.md records them): the test world freezes `
 
 - **451. The repository is private and stays so** (Q6): the imported Mana Seed sheets are committed under `content/art/tilesheets/`.
 - **452. Every art file in the repository today is an AI-generated placeholder** (Q8), except the Lato and Cormorant Garamond fonts (OFL) and the three Rogue Adventure sheets (ELV Games, bought); the seven old tilesheets whose origin nobody recorded go under an unrecorded placeholder source until L1 deletes them.
+- **453. Start over rather than paint over** (the developer, 2026-11-03): the old art is wiped from every map at once, keeping the NPCs, every event, warp and cutscene, and the objects that carry events or that events name (chest, door, signposts) until the developer re-skins them; the developer paints blank maps. Until then the game is not playable past the intro; the repository tests stay green, since they read events, not pictures.
 
 ## Open design questions (developer decides)
 None open.

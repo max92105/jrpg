@@ -55,7 +55,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **T2c. Data tests and the encounter-rate simulation on the test world; the cell-pinned new game tests move there** (tests only, about 150 lines) → [slices/T2c.md](slices/T2c.md)
 
 ### Phase 2: the cell pins restated
-- [ ] **R1. The intros end with a warp to the start map, which has a door into an interior and an exit to a map with random battles, with no cell named** (Data tests, about 70 lines) → [slices/R1.md](slices/R1.md)
+- [x] **R1. The intros end with a warp to the start map, which has a door into an interior and an exit to a map with random battles, with no cell named** (Data tests, about 70 lines) → [slices/R1.md](slices/R1.md)
 
 ### Phase 3: art sources
 - [ ] ADR 0038: art sources manifest. Write it from the entry under "ADRs" below (decision 440).

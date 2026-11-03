@@ -10,9 +10,13 @@ namespace Jrpg.Editor.Tiles;
 
 /// <summary>
 /// Tilesheet images, the tiles cut from them and NPCs' standing frames, each loaded once and kept for the editor's
-/// lifetime.
+/// lifetime. A tile of a sheet whose image is missing, a tile past its image's edge, and an NPC without a sprite draw
+/// as <see cref="MissingArtMark"/> (decision 442), never cached, so an import that brings the file back draws the art.
 /// </summary>
-internal sealed class TileImages(CatalogDraft catalog, string artRoot)
+/// <param name="catalog">The tiles, sheets and objects drawn.</param>
+/// <param name="artRoot">The <c>art</c> folder.</param>
+/// <param name="missingArt">What the art folder lacks right now, from the shell's art status.</param>
+internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<MissingArt> missingArt)
 {
     private readonly Dictionary<string, BitmapSource> _sheets = [];
     private readonly Dictionary<string, ImageSource> _spriteFrames = [];
@@ -24,11 +28,23 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot)
     {
         var tile = catalog.Current.Tiles[tileId];
         var sheet = catalog.Current.Tilesheets[tile.SheetId];
+        if (missingArt().IsSheetMissing(sheet.Id))
+        {
+            return MissingArtMark.Picture;
+        }
+
         var key = (sheet, tile.Column, tile.Row);
         if (!_tiles.TryGetValue(key, out var image))
         {
             var cell = new Int32Rect(sheet.CellLeft(tile.Column), sheet.CellTop(tile.Row), sheet.TileWidth, sheet.TileHeight);
-            image = new CroppedBitmap(SheetImageOf(sheet.File), cell);
+            var sheetImage = SheetImageOf(sheet.File);
+            if (cell.X + cell.Width > sheetImage.PixelWidth || cell.Y + cell.Height > sheetImage.PixelHeight)
+            {
+                // A smaller image was imported over the sheet's; the cell lies past it.
+                return MissingArtMark.Picture;
+            }
+
+            image = new CroppedBitmap(sheetImage, cell);
             image.Freeze();
             _tiles.Add(key, image);
         }
@@ -40,6 +56,11 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot)
     /// <param name="file">The file name in the field-sprite art folder.</param>
     public ImageSource FieldSpriteFrameOf(string file)
     {
+        if (missingArt().IsSpriteMissing(file))
+        {
+            return MissingArtMark.Picture;
+        }
+
         if (!_spriteFrames.TryGetValue(file, out var frame))
         {
             // The New NPC dialog can still pick a sprite smaller than a frame (the art check refuses it only on save),

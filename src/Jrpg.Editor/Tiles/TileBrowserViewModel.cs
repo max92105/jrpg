@@ -147,11 +147,19 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
         SelectedCell = new SheetCell(cells.SheetId, cells.Left, cells.Top);
     }
 
-    /// <summary>Chooses a tile's cell and shows its sheet, as picking a tile from the map does.</summary>
+    /// <summary>
+    /// Chooses a tile's cell and shows its sheet, as picking a tile from the map does; nothing when the sheet isn't in
+    /// the box (its image is missing, decision 442), so the choice stays as it was.
+    /// </summary>
     public void Select(int tileId)
     {
         var tile = _catalog.Current.Tiles[tileId];
-        SelectedChoice = SheetChoices.First(choice => choice.Sheet?.Id == tile.SheetId);
+        if (SheetChoices.FirstOrDefault(choice => choice.Sheet?.Id == tile.SheetId) is not { } choice)
+        {
+            return;
+        }
+
+        SelectedChoice = choice;
         SelectedCells = null;
         SelectedCell = new SheetCell(tile.SheetId, tile.Column, tile.Row);
     }

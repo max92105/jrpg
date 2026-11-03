@@ -142,7 +142,7 @@ internal sealed partial class SheetCutViewModel : ObservableObject
     private string? SquareProblem() =>
         TileWidth != TileHeight ? $"Tiles must be square: columns and rows give {TileWidth} x {TileHeight} px tiles." : null;
 
-    // A tile past the new grid would fail the art check on save, and the maps using it would no longer open.
+    // A tile past the new grid would fail the game's art check at startup, and draw as the missing-art mark here.
     private string? TileOutsideProblem() =>
         Usage.Tiles.Where(tile => tile.Column >= Columns || tile.Row >= Rows).MinBy(tile => tile.Id) is { } outside
             ? $"Tile {outside.Id} at ({outside.Column}, {outside.Row}) would be outside the {Columns} x {Rows} grid."

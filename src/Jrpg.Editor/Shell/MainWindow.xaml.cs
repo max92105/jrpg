@@ -48,7 +48,7 @@ internal sealed partial class MainWindow : Window
         InitializeComponent();
         if (viewModel.Content is { } content)
         {
-            var tileImages = new TileImages(content, viewModel.ArtRoot);
+            var tileImages = new TileImages(content, viewModel.ArtRoot, () => viewModel.Art!.Missing);
             _drawing = new MapDrawing(content, tileImages);
             TileBrowser.Images = tileImages;
             TileBrowser.Marking = viewModel.Marking;

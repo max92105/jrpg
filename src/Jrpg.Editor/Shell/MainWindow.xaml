@@ -45,6 +45,10 @@
         </DataTrigger>
       </Style.Triggers>
     </Style>
+    <!-- Missing art is a warning, not a lockout (decision 442): the maps stay open and show what they can't draw. -->
+    <Style x:Key="WarningLine" TargetType="TextBlock" BasedOn="{StaticResource ErrorLine}">
+      <Setter Property="Foreground" Value="{StaticResource WarningTextBrush}" />
+    </Style>
   </Window.Resources>
   <!-- New is Ctrl+N and Help is F1 by WPF's own key gestures, and the menu shows them. -->
   <Window.CommandBindings>
@@ -105,6 +109,10 @@
                Margin="8"
                Style="{StaticResource ErrorLine}"
                Text="{Binding LoadError}" />
+    <TextBlock DockPanel.Dock="Top"
+               Margin="8,4"
+               Style="{StaticResource WarningLine}"
+               Text="{Binding Art.Warning, StringFormat=Art problems: {0}, TargetNullValue=''}" />
     <TextBlock DockPanel.Dock="Top"
                Margin="8,4"
                Style="{StaticResource ErrorLine}"

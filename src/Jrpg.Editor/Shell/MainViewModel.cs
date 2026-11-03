@@ -30,7 +30,7 @@ internal sealed partial class MainViewModel : ObservableObject
     private readonly ContentWriter _writer;
     private readonly string _audioRoot;
     private readonly Func<string, bool> _confirm;
-    private readonly Dictionary<string, (int Width, int Height)> _sheetImageSizes = new(StringComparer.OrdinalIgnoreCase);
+    private readonly SheetImageSizes _sheetImageSizes;
 
     /// <param name="contentRoot">The content folder to edit.</param>
     /// <param name="confirm">Asks the user a yes or no question, such as whether to drop unsaved changes; true for yes.</param>
@@ -47,23 +47,25 @@ internal sealed partial class MainViewModel : ObservableObject
         };
         ArtRoot = ArtFolders.RootIn(contentRoot);
         _audioRoot = AudioFolders.RootIn(contentRoot);
+        _sheetImageSizes = new SheetImageSizes(ArtRoot);
         try
         {
-            var loaded = ContentCatalogLoader.Load(contentRoot);
-            Content = new CatalogDraft(loaded);
-            var artProblems = ArtReferenceCheck.FindProblems(loaded, ArtRoot);
-            LoadError = artProblems.Count == 0 ? null : string.Join(Environment.NewLine, artProblems);
+            // Both or neither: the window reads the art status whenever the content is there.
+            var content = new CatalogDraft(ContentCatalogLoader.Load(contentRoot));
+            Art = new ArtStatus(content, ArtRoot);
+            Content = content;
         }
         catch (Exception exception) when (exception is ContentValidationException or IOException or UnauthorizedAccessException)
         {
             LoadError = exception.Message;
         }
 
-        // Maps, tiles and objects only show when their content and art are whole, since drawing reads both.
-        if (Content is not null && LoadError is null)
+        // Maps, tiles and objects show whenever the content loaded: missing art is a warning, and the drawing marks
+        // what it can't show (decision 442).
+        if (Content is not null)
         {
             ShowMapList(Content.Current);
-            Painting = new TilePaintingViewModel(Content, Layer, new SheetImages(() => ArtFolders.TilesheetImagesIn(ArtRoot), SheetImageSizeOf), confirm);
+            Painting = new TilePaintingViewModel(Content, Layer, new SheetImages(() => ArtFolders.TilesheetImagesIn(ArtRoot), _sheetImageSizes.SizeOf), confirm);
             Marking = new WalkabilityMarking(Content, Painting.Browser);
             Painting.Browser.PropertyChanged += (_, e) =>
             {
@@ -94,6 +96,11 @@ internal sealed partial class MainViewModel : ObservableObject
 
     /// <summary>Why the content can't be edited, naming the file; null when it loaded.</summary>
     public string? LoadError { get; }
+
+    /// <summary>
+    /// The art problems, as a warning, and what the drawing can't show; null when the content didn't load.
+    /// </summary>
+    public ArtStatus? Art { get; }
 
     /// <summary>The saved maps, by id; a new map joins when it is first saved.</summary>
     [ObservableProperty]
@@ -392,7 +399,7 @@ internal sealed partial class MainViewModel : ObservableObject
         var result = new SheetImport(_writer, Content).Import(paths, file => _confirm($"{file} is already in the tilesheet art. Replace it?"));
         foreach (var file in result.Imported)
         {
-            _sheetImageSizes.Remove(file);
+            _sheetImageSizes.Forget(file);
         }
 
         if (result.LastImported is { } last)
@@ -401,31 +408,7 @@ internal sealed partial class MainViewModel : ObservableObject
             Painting.Browser.Show(last);
         }
 
-        ImportStatus = ImportStatusOf(result);
-    }
-
-    // "Imported A.png, B.png. Refused: C.png: not a PNG image."
-    private static string ImportStatusOf(SheetImportResult result)
-    {
-        var refusals = result.Refusals.Select(refusal => $"Refused: {refusal}");
-        if (result.Imported.Count == 0)
-        {
-            return string.Join(" ", refusals);
-        }
-
-        return string.Join(" ", refusals.Prepend($"Imported {string.Join(", ", result.Imported)}."));
-    }
-
-    // Read from the PNG header once per file; the art check has already found every sheet image readable.
-    private (int Width, int Height) SheetImageSizeOf(string file)
-    {
-        if (!_sheetImageSizes.TryGetValue(file, out var size))
-        {
-            size = PngSize.Read(Path.Combine(ArtRoot, ArtFolders.Tilesheets, file));
-            _sheetImageSizes.Add(file, size);
-        }
-
-        return size;
+        ImportStatus = result.Summary;
     }
 
     private void OnContentChanged(object? sender, PropertyChangedEventArgs e)

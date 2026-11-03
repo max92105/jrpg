@@ -30,3 +30,5 @@ Ask the developer where each folder's files came from (Q8): `backgrounds/`, `bat
 
 ## Verify by hand
 - Copy any non-Mana Seed PNG into `content/art/tilesheets/` and run the Data tests (no rebuild needed: the test reads the source tree): `Manifest_EveryImageAndFont_HasAnEntry` fails naming it. Delete it.
+
+- **Done, with deviations:** 56 file entries under five sources (Lato, Cormorant Garamond, the three Rogue Adventure sheets by ELV Games, the AI-generated placeholders, and seven old tilesheets of unrecorded origin; decision 452). `LicenseRef-ElvGames` joins the allowed licenses, since those sheets were bought. Stamping `ContentRoot` into the test assembly moved `ContentRootLocatorTests`' no-metadata case onto the Data assembly. Checked by hand: a stray PNG in `tilesheets/` fails `Manifest_EveryImageAndFont_HasAnEntry` by name without a rebuild.

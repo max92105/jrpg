@@ -58,8 +58,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **R1. The intros end with a warp to the start map, which has a door into an interior and an exit to a map with random battles, with no cell named** (Data tests, about 70 lines) → [slices/R1.md](slices/R1.md)
 
 ### Phase 3: art sources
-- [ ] ADR 0038: art sources manifest. Write it from the entry under "ADRs" below (decision 440).
-- [ ] **AS1. `content/art/art-sources.json` and `content/art/CREDITS.md` with every current art file; the Data test, reading the source tree, that keeps files, entries, sources, licenses and credits in step; the content rules** (content + Data test, about 180 lines plus the manifest) → [slices/AS1.md](slices/AS1.md)
+- [x] ADR 0038: art sources manifest. Write it from the entry under "ADRs" below (decision 440).
+- [x] **AS1. `content/art/art-sources.json` and `content/art/CREDITS.md` with every current art file; the Data test, reading the source tree, that keeps files, entries, sources, licenses and credits in step; the content rules** (content + Data test, about 180 lines plus the manifest) → [slices/AS1.md](slices/AS1.md)
 
 ### Phase 4: the editor
 - [ ] **M1. Mana Seed cuts: the Set up guess tries 16 px first, ids from pack file names lose doubled underscores, non-square tiles are refused** (Editor + Data, about 140 lines) → [slices/M1.md](slices/M1.md)
@@ -73,7 +73,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [ ] **O1. Re-skin an object: its cells replaced from the sheet, its id, events, outline and zones kept** (Editor, about 170 lines) → [slices/O1.md](slices/O1.md)
 
 ### Phase 5: the rebuild (the developer's content work)
-Before C1, the developer answers Q6 (the repository's visibility); before AS1, Q8 (where the current art came from).
+Q6 and Q8 were answered on 2026-11-03 (decisions 451, 452).
 - [ ] **C1.** Import the Forest Autumn sheets the maps use (cut at 16 px), add each one's manifest line (AS1's test names a missing one), build the trees and props as objects with their outlines and above-player zones; re-skin `chest`, `chest_opened`, `door_close` and `door_open` (O1) so their events stay.
 - [ ] **C2.** Rebuild each map in the editor on its id: erase the old layers (Erase rectangle per layer), remove the old decor objects (rectangle select, Delete), resize, paint, place the new objects; **move the NPCs, chest and doors with their events, never delete and recreate them** (their uids are what R1's and the quest tests read, decision 447); the intro's tiles are erased or repainted. R1's tests pass after each saved map; the hand check is walking every map in the game.
 - [ ] **C3.** Remove, in the editor, the old objects (E1b), then each old sheet with its tiles (E3a), once nothing uses them; save. Delete the development saves made before the rebuild (design.md, "Risks").
@@ -98,10 +98,11 @@ Before C1, the developer answers Q6 (the repository's visibility); before AS1, Q
 
 Planner's picks (not numbered; design.md records them): the test world freezes `new-game.json` with the maps (design.md, "Key decisions" 1); a swap step naming an object counts as a use, closing the undo refusal's gap too; cuts are 16 px and every bigger Mana Seed prop is an object built from cells; the guess drops 48 px first; E3c's purge is not undoable (a file operation like Import, asked first, refused while anything is unsaved; making it undoable would need saved maps written from the catalog draft, about one more slice); the interior is told from the wild by the door being an object's interact event (an edge exit is a cell's touch event).
 
+- **451. The repository is private and stays so** (Q6): the imported Mana Seed sheets are committed under `content/art/tilesheets/`.
+- **452. Every art file in the repository today is an AI-generated placeholder** (Q8), except the Lato and Cormorant Garamond fonts (OFL) and the three Rogue Adventure sheets (ELV Games, bought); the seven old tilesheets whose origin nobody recorded go under an unrecorded placeholder source until L1 deletes them.
+
 ## Open design questions (developer decides)
-Both are data the developer gives, not design forks:
-- **Q6. Is the repository private, and will it stay so?** Imported Mana Seed sheets are committed under `content/art/tilesheets/`; a public repository would redistribute them, which the license forbids. If it may go public, the imported sheets need another home (git-ignored and copied per PC, like the packs). Needed **before C1**.
-- **Q8. Where the current art came from:** the portraits and battlers, icons, backgrounds, effects, cutscene stills, field sprites and `FG_Forest_Fall.png`. AS1 needs one source per file; anything unknown goes under an "origin not recorded" placeholder source. Needed **before AS1**.
+None open.
 
 ## ADRs
 - **ADR 0037: tests run on a frozen test world** (written before T1 from this entry; decision 446):

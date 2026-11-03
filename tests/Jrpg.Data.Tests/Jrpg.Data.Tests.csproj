@@ -19,6 +19,11 @@
     <None Update="TestContent\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- The repository's content, for the tests that read the source tree itself (the art manifest, ADR 0038): a deleted file never haunts them from a stale output copy. -->
+    <AssemblyMetadata Include="ContentRoot" Value="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\content'))" />
+  </ItemGroup>
+
   <Import Project="..\TestWorld\TestWorld.props" />
 
 </Project>

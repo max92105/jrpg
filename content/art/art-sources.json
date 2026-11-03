@@ -1,0 +1,270 @@
+{
+  "sources": [
+    {
+      "id": "cormorant-garamond",
+      "name": "Cormorant Garamond",
+      "author": "the Cormorant Project Authors (Christian Thalmann)",
+      "url": "https://github.com/CatharsisFonts/Cormorant",
+      "license": "OFL-1.1",
+      "licenseFile": "fonts/titles/OFL.txt",
+      "isPlaceholder": false
+    },
+    {
+      "id": "elv-rogue-adventure",
+      "name": "Rogue Adventure Jungle",
+      "author": "ELV Games",
+      "url": "https://elvgames.itch.io/rogue-adventure-jungle",
+      "license": "LicenseRef-ElvGames",
+      "isPlaceholder": false
+    },
+    {
+      "id": "generated",
+      "name": "AI-generated placeholders",
+      "author": "the developer, with an image generator",
+      "license": "LicenseRef-Generated",
+      "isPlaceholder": true
+    },
+    {
+      "id": "lato",
+      "name": "Lato",
+      "author": "tyPoland Lukasz Dziedzic",
+      "url": "https://www.latofonts.com/",
+      "license": "OFL-1.1",
+      "licenseFile": "fonts/OFL.txt",
+      "isPlaceholder": false
+    },
+    {
+      "id": "unrecorded",
+      "name": "Origin not recorded",
+      "author": "unknown",
+      "license": "LicenseRef-Unrecorded",
+      "isPlaceholder": true
+    }
+  ],
+  "files": [
+    {
+      "path": "backgrounds/Forest.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "backgrounds/GameMenu.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "backgrounds/StartMenu.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "battlers/Goblin.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "battlers/GoblinChief.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "battlers/Jazog.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "battlers/Kamilia.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "battlers/Lazarus.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "battlers/Omer.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "battlers/Ragnir.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "battlers/Sarxian.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "battlers/Teelle.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "battlers/Thaali.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "battlers/Zanyr.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "battlers/Zaruk.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "cinematics/Placeholder1.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "cinematics/Placeholder2.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "cinematics/Placeholder3.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "effects/AttackEnemy.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "effects/AttackPlayer.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "field-sprites/npc_placeholder.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "field-sprites/player.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "fonts/Lato-Regular.ttf",
+      "sourceId": "lato"
+    },
+    {
+      "path": "fonts/titles/CormorantGaramond-SemiBold.ttf",
+      "sourceId": "cormorant-garamond"
+    },
+    {
+      "path": "icons/All.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "icons/Armor.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "icons/Attack.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "icons/Consumable.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "icons/Defend.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "icons/Gold.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "icons/Item.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "icons/Run.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "icons/Skill.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "icons/Weapon.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "portraits/Goblin.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "portraits/Jazog.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "portraits/Kamilia.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "portraits/Lazarus.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "portraits/Omer.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "portraits/Ragnir.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "portraits/Sarxian.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "portraits/Teelle.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "portraits/Thaali.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "portraits/Zanyr.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "portraits/Zaruk.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "tilesheets/City.png",
+      "sourceId": "unrecorded"
+    },
+    {
+      "path": "tilesheets/FG_Forest_Fall.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "tilesheets/Grass1.png",
+      "sourceId": "unrecorded"
+    },
+    {
+      "path": "tilesheets/Grass2.png",
+      "sourceId": "unrecorded"
+    },
+    {
+      "path": "tilesheets/Ground.png",
+      "sourceId": "unrecorded"
+    },
+    {
+      "path": "tilesheets/RA_Ground_Tiles.png",
+      "sourceId": "elv-rogue-adventure"
+    },
+    {
+      "path": "tilesheets/RA_Jungle.png",
+      "sourceId": "elv-rogue-adventure"
+    },
+    {
+      "path": "tilesheets/RA_Jungle_Animations.png",
+      "sourceId": "elv-rogue-adventure"
+    },
+    {
+      "path": "tilesheets/Water1.png",
+      "sourceId": "unrecorded"
+    },
+    {
+      "path": "tilesheets/Water2.png",
+      "sourceId": "unrecorded"
+    },
+    {
+      "path": "tilesheets/tree01_s_01_animation.png",
+      "sourceId": "unrecorded"
+    }
+  ]
+}

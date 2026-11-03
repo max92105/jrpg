@@ -27,8 +27,9 @@ public sealed class ContentRootLocatorTests
     [Fact]
     public void Find_NoArgumentNoMetadata_UsesBaseDirectory()
     {
-        // This test assembly carries no ContentRoot metadata, like a published app.
-        var root = ContentRootLocator.Find([], typeof(ContentRootLocatorTests).Assembly);
+        // The Data assembly carries no ContentRoot metadata, like a published app (this test assembly does, for the art
+        // manifest tests).
+        var root = ContentRootLocator.Find([], typeof(ContentRootLocator).Assembly);
 
         Assert.Equal(Path.Combine(AppContext.BaseDirectory, "content"), root);
     }

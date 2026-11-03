@@ -217,7 +217,8 @@ Report 'no changed file crossed 300 lines (split it)' (-not $grownFiles) ($grown
 
 # 12. A changed method or constructor in src declares at most 4 parameters (code-quality.md; four Draw methods slipped
 # past the gold plan's reviews). Positional records and primary constructors are data shapes and are left out, and a
-# generic argument's comma isn't a parameter. Multi-line parameter lists are joined up to their closing parenthesis.
+# generic argument's or a tuple type's comma isn't a parameter: nested groups go before the list is cut at its close.
+# Multi-line parameter lists are joined up to their closing parenthesis.
 $maxParameters = 4
 $manyParameters = @()
 foreach ($source in $changedSources | Where-Object { $_ -like 'src/*' }) {
@@ -227,8 +228,8 @@ foreach ($source in $changedSources | Where-Object { $_ -like 'src/*' }) {
         if ($text -notmatch '^\s*(public|internal|private|protected)[^=;{(]*?\b\w+\s*\((.*)$' -or $text -match '\b(record|class|struct|interface|enum|delegate)\b') { continue }
         $parameters = $Matches[2]
         for ($next = $number; ($parameters -replace '[^(]', '').Length -ge ($parameters -replace '[^)]', '').Length -and $next -lt $lines.Length; $next++) { $parameters += ' ' + $lines[$next] }
-        $parameters = $parameters -replace '\).*$', ''
         while ($parameters -match '<[^<>]*>|\([^()]*\)') { $parameters = $parameters -replace '<[^<>]*>|\([^()]*\)', '' }
+        $parameters = $parameters -replace '\).*$', ''
         $count = if ($parameters.Trim()) { ($parameters -split ',').Count } else { 0 }
         if ($count -gt $maxParameters) { $manyParameters += "${source}:$number ($count parameters)" }
     }

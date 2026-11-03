@@ -64,4 +64,28 @@ public sealed class TileCatalogValidatorTests
 
         Assert.Equal($"tiles.json: tile '1': column and row must not be negative (was {column}, {row}).", exception.Message);
     }
+
+    [Fact]
+    public void Validate_AnimationAtTheBounds_DoesNotThrow() =>
+        TileCatalogValidator.Validate(FileName, [_grass with { Animation = new TileAnimation { FrameCount = 2, FrameMilliseconds = 1 } }], _sheetIds);
+
+    public static TheoryData<int, int, string> InvalidAnimations => new()
+    {
+        { 1, 100, "animation.frameCount must be at least 2 (was 1)." },
+        { 0, 100, "animation.frameCount must be at least 2 (was 0)." },
+        { 4, 0, "animation.frameMilliseconds must be at least 1 (was 0)." },
+        { 4, -5, "animation.frameMilliseconds must be at least 1 (was -5)." },
+    };
+
+    [Theory]
+    [MemberData(nameof(InvalidAnimations))]
+    public void Validate_InvalidAnimations_ThrowNamingTheTile(int frameCount, int frameMilliseconds, string problem)
+    {
+        var animation = new TileAnimation { FrameCount = frameCount, FrameMilliseconds = frameMilliseconds };
+
+        var exception = Assert.Throws<ContentValidationException>(
+            () => TileCatalogValidator.Validate(FileName, [_grass with { Animation = animation }], _sheetIds));
+
+        Assert.Equal($"tiles.json: tile '1': {problem}", exception.Message);
+    }
 }

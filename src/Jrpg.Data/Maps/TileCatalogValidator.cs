@@ -22,8 +22,22 @@ internal static class TileCatalogValidator
             return $"sheetId '{tile.SheetId}' isn't a tilesheet.";
         }
 
-        return tile.Column < 0 || tile.Row < 0
-            ? $"column and row must not be negative (was {tile.Column}, {tile.Row})."
-            : null;
+        if (tile.Column < 0 || tile.Row < 0)
+        {
+            return $"column and row must not be negative (was {tile.Column}, {tile.Row}).";
+        }
+
+        return tile.Animation is { } animation ? FindAnimationProblem(animation) : null;
+    }
+
+    // ADR 0039: whether its last frame lies inside the image is the startup art check's (ArtReferenceCheck).
+    private static string? FindAnimationProblem(TileAnimation animation)
+    {
+        if (animation.FrameCount < TileAnimation.MinFrames)
+        {
+            return $"animation.frameCount must be at least {TileAnimation.MinFrames} (was {animation.FrameCount}).";
+        }
+
+        return animation.FrameMilliseconds < 1 ? $"animation.frameMilliseconds must be at least 1 (was {animation.FrameMilliseconds})." : null;
     }
 }

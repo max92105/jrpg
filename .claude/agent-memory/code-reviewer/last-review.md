@@ -5,11 +5,12 @@ metadata:
   type: project
 ---
 
-Plan: 2026-11-03-object-composer-and-animated-tiles, slice CO6 (Objects > Edit object; Replace cells leaves). Round 1.
+Plan: 2026-11-03-object-composer-and-animated-tiles, slice AN1 (TileAnimation in content; FrameAt, ColumnShownAt). Round 1.
 Verdict: Ready to commit.
 
-- open (Suggestion): ObjectComposingTests.cs:121 CanEdit_AfterTheChosenObjectIsRemoved_IsFalse sits among TryApply_*;
-  move it next to the other CanEdit_* tests (after line 96)
+- open (Suggestion): .claude/scripts/verify.ps1:2 stray blank line splits the header comment's first sentence; delete it
+- open (Suggestion): ArtReferenceCheck.cs LastFrameColumn comment leaves a lone "cell." line; reword to fit one line
+- open (Suggestion): ADR 0039 option B "A time per frame" reads like the chosen "one time for every frame"; name it
+  "A different time for each frame"
 - open (Follow-up, from CO4a): StartNew's column clip still untested (only StartNew_RectangleTallerThanMaxCells_...)
-- fixed (from CO5): composer canvas takes focus on press (CanvasImage.Focus); MainViewModel double blank line gone;
-  backlog's CanStartNewObject_* name is real again (MainViewModelTests:227); TileBrowserView lets _cut go with its browser
+- fixed (from CO6): CanEdit_AfterTheChosenObjectIsRemoved_IsFalse now sits with the other CanEdit_* tests

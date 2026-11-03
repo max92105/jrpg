@@ -15,4 +15,12 @@ public sealed record TileDefinition
 
     /// <summary>The cell's row in the sheet's grid, from 0.</summary>
     public required int Row { get; init; }
+
+    /// <summary>
+    /// Null for a still tile. The frames are the tile's own cell and the cells to its right on the same row (ADR 0039).
+    /// </summary>
+    public TileAnimation? Animation { get; init; }
+
+    /// <summary>The column drawn after <paramref name="elapsed"/>: <see cref="Column"/> for a still tile.</summary>
+    public int ColumnShownAt(TimeSpan elapsed) => Column + (Animation?.FrameAt(elapsed) ?? 0);
 }

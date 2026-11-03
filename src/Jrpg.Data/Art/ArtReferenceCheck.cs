@@ -16,9 +16,9 @@ public static class ArtReferenceCheck
     /// Every tilesheet, the player's and every NPC object's field sprite, every dialogue portrait, every cutscene
     /// still, every party member's portrait, every item's icon, every skill icon named (a skill may have none), every
     /// battle sprite, every enemy's portrait, every attack effect and every encounter's background exist as PNGs, every
-    /// tile's cell lies inside its sheet, every effect strip is whole square frames, and every field sprite holds the
-    /// walk frames of <see cref="FieldSpriteLayout"/>. The names of skill icons, NPC sprites, stills and battle art
-    /// must match their files exactly, case included.
+    /// tile's cell and its animation's last frame lie inside its sheet, every effect strip is whole square frames, and
+    /// every field sprite holds the walk frames of <see cref="FieldSpriteLayout"/>. The names of skill icons, NPC
+    /// sprites, stills and battle art must match their files exactly, case included.
     /// </summary>
     /// <returns>One line per problem, naming the file; empty when the art is complete.</returns>
     public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string artRoot)
@@ -33,14 +33,7 @@ public static class ArtReferenceCheck
             }
         }
 
-        foreach (var tile in catalog.Tiles.Values.OrderBy(tile => tile.Id))
-        {
-            if (sheetSizes.TryGetValue(tile.SheetId, out var size) && !IsCellInside(tile, catalog.Tilesheets[tile.SheetId], size))
-            {
-                problems.Add($"{ExactFileName.ShownPath(ArtFolders.Tilesheets, catalog.Tilesheets[tile.SheetId].File)}: tile {tile.Id}'s cell ({tile.Column}, {tile.Row}) lies outside the {size.Width}x{size.Height} image.");
-            }
-        }
-
+        AddTilesOutside(problems, catalog, sheetSizes);
         TryReadSize(artRoot, ArtFolders.FieldSprites, catalog.NewGame.FieldSpriteFile, problems);
         var npcSprites = catalog.Objects.Values.Where(definition => definition.FieldSpriteFile is not null).OrderBy(definition => definition.Id, StringComparer.Ordinal)
             .Select(definition => (File: definition.FieldSpriteFile!, NamedBy: $"object '{definition.Id}'"))
@@ -71,6 +64,29 @@ public static class ArtReferenceCheck
         var encounters = catalog.Encounters.Values.OrderBy(encounter => encounter.Id, StringComparer.Ordinal);
         AddMissingByExactName(problems, artRoot, ArtFolders.Backgrounds, encounters.Select(encounter => (encounter.BackgroundFile, $"encounter '{encounter.Id}'")));
         return problems;
+    }
+
+    // A tile's cell, then its animation's last frame (ADR 0039): either past the image would be cropped past its edge.
+    private static void AddTilesOutside(List<string> problems, ContentCatalog catalog, Dictionary<string, (int Width, int Height)> sheetSizes)
+    {
+        foreach (var tile in catalog.Tiles.Values.OrderBy(tile => tile.Id))
+        {
+            if (!sheetSizes.TryGetValue(tile.SheetId, out var size))
+            {
+                continue;
+            }
+
+            var sheet = catalog.Tilesheets[tile.SheetId];
+            var shownPath = ExactFileName.ShownPath(ArtFolders.Tilesheets, sheet.File);
+            if (!IsCellInside(tile.Column, tile.Row, sheet, size))
+            {
+                problems.Add($"{shownPath}: tile {tile.Id}'s cell ({tile.Column}, {tile.Row}) lies outside the {size.Width}x{size.Height} image.");
+            }
+            else if (!IsCellInside(LastFrameColumn(tile), tile.Row, sheet, size))
+            {
+                problems.Add($"{shownPath}: tile {tile.Id}'s last animation frame ({LastFrameColumn(tile)}, {tile.Row}) lies outside the {size.Width}x{size.Height} image.");
+            }
+        }
     }
 
     // The walk animation reads every frame of the grid, so a smaller sprite would be cropped past its edge.
@@ -124,7 +140,10 @@ public static class ArtReferenceCheck
         }
     }
 
-    /// <summary>The lowest tile, cut from any sheet drawn from <paramref name="file"/>, whose cell an image of this size wouldn't hold.</summary>
+    /// <summary>
+    /// The lowest tile, cut from any sheet drawn from <paramref name="file"/>, whose cell or last animation frame an
+    /// image of this size wouldn't hold.
+    /// </summary>
     /// <param name="catalog">The sheets and tiles checked.</param>
     /// <param name="file">The image's file name in the tilesheet art folder; sheets match it ignoring case, as Windows does.</param>
     /// <param name="size">The new image's width and height in pixels.</param>
@@ -132,12 +151,15 @@ public static class ArtReferenceCheck
     {
         var sheets = catalog.Tilesheets.Values.Where(sheet => string.Equals(sheet.File, file, StringComparison.OrdinalIgnoreCase)).ToDictionary(sheet => sheet.Id);
         return catalog.Tiles.Values
-            .Where(tile => sheets.TryGetValue(tile.SheetId, out var sheet) && !IsCellInside(tile, sheet, size))
+            .Where(tile => sheets.TryGetValue(tile.SheetId, out var sheet) && !IsCellInside(LastFrameColumn(tile), tile.Row, sheet, size))
             .MinBy(tile => tile.Id);
     }
 
-    private static bool IsCellInside(TileDefinition tile, TilesheetDefinition sheet, (int Width, int Height) size) =>
-        sheet.CellLeft(tile.Column) + sheet.TileWidth <= size.Width && sheet.CellTop(tile.Row) + sheet.TileHeight <= size.Height;
+    private static bool IsCellInside(int column, int row, TilesheetDefinition sheet, (int Width, int Height) size) =>
+        sheet.CellLeft(column) + sheet.TileWidth <= size.Width && sheet.CellTop(row) + sheet.TileHeight <= size.Height;
+
+    // Frames run rightward on the tile's row, so the last is the furthest right; a still tile's is its own cell.
+    private static int LastFrameColumn(TileDefinition tile) => tile.Column + (tile.Animation?.FrameCount ?? 1) - 1;
 
     private static (int Width, int Height)? TryReadSize(string artRoot, string folder, string file, List<string> problems)
     {

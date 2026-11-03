@@ -57,8 +57,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **CO6. Objects > Edit object opens the composer on the chosen object, the Shapes window after a size change; Replace cells leaves** (Editor, about 130 lines) → [slices/CO6.md](slices/CO6.md)
 
 ### Phase 2: animated tiles in content and the game
-- [ ] ADR 0039: animated tiles. Write it from the entry under "ADRs" below (decisions 463-471).
-- [ ] **AN1. `TileAnimation` on `TileDefinition`: frame count and frame time in `tiles.json`, validated, the last frame inside the image at startup, written back; `FrameAt` and `ColumnShownAt` in Core** (Core + Data, about 190 lines) → [slices/AN1.md](slices/AN1.md)
+- [x] ADR 0039: animated tiles. Write it from the entry under "ADRs" below (decisions 463-471).
+- [x] **AN1. `TileAnimation` on `TileDefinition`: frame count and frame time in `tiles.json`, validated, the last frame inside the image at startup, written back; `FrameAt` and `ColumnShownAt` in Core** (Core + Data, about 190 lines) → [slices/AN1.md](slices/AN1.md)
 - [ ] **AN2. The game draws the frame the time calls for: `TileAtlas` keeps each tile's frames, `MapView` advances its time with the update; canopies keep the first frame** (Game, about 170 lines) → [slices/AN2.md](slices/AN2.md)
 
 ### Phase 3: animated tiles in the editor

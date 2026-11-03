@@ -50,3 +50,5 @@ Size: about 60 lines of code, 15 tests and rows (about 190).
 
 ## Verify by hand
 None in the game yet (the first frame shows as before). The game still starts on the repository content.
+
+- **Done, with deviations:** the last-frame tests sit in a new `Data.Tests/Art/ArtReferenceCheckAnimationTests` (`ArtReferenceCheckTests` is at 279 lines); the writer test looks for the `"animation"` field, since a test-world sheet id holds the word. `verify.ps1`'s parameter count read a tuple type's comma as a parameter (it flagged `ArtReferenceCheck`'s four-parameter methods once the file changed): nested groups are now dropped before the list is cut at its close. ADR 0039 written.

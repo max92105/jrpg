@@ -1334,38 +1334,7 @@
       ]
     }
   ],
-  "objects": [
-    {
-      "uid": "direction_3_1",
-      "objectId": "direction_3",
-      "position": {
-        "x": 8.037202144091754,
-        "y": 8.501897714000041
-      },
-      "z": -4,
-      "events": [
-        {
-          "id": "direction_3_1_0",
-          "activation": "interact",
-          "prompt": "Read",
-          "isOnce": false,
-          "onlyWhenObjectId": null,
-          "steps": [
-            {
-              "type": "dialogue",
-              "speech": {
-                "lines": [
-                  "To Elys\u0027s Crypt"
-                ],
-                "speaker": null,
-                "portraitFile": null
-              }
-            }
-          ]
-        }
-      ]
-    }
-  ],
+  "objects": [],
   "cellEvents": [
     {
       "cell": {

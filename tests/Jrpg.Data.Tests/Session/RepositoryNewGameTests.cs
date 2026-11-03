@@ -114,7 +114,7 @@ public sealed class RepositoryNewGameTests
     }
 
     // A door is a placed object's event; an interior has no random battles. Nothing else tells an interior apart.
-    [Fact]
+    [Fact(Skip = "Decision 454: the developer places the start map's new door later; remove this Skip then.")]
     public void StartMap_RepositoryContent_HasADoorIntoAnInterior()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));

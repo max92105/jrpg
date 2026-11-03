@@ -32,13 +32,6 @@
       "url": "https://seliel-the-shaper.itch.io/",
       "license": "LicenseRef-ManaSeed",
       "isPlaceholder": false
-    },
-    {
-      "id": "unrecorded",
-      "name": "Origin not recorded",
-      "author": "unknown",
-      "license": "LicenseRef-Unrecorded",
-      "isPlaceholder": true
     }
   ],
   "files": [
@@ -220,14 +213,6 @@
     },
     {
       "path": "portraits/Zaruk.png",
-      "sourceId": "generated"
-    },
-    {
-      "path": "tilesheets/City.png",
-      "sourceId": "unrecorded"
-    },
-    {
-      "path": "tilesheets/FG_Forest_Fall.png",
       "sourceId": "generated"
     },
     {

@@ -172,3 +172,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `ContentCatalogLoaderTests.Load_RepositoryContent_Succeeds` says the start layout refers to "potion"; once the maps are rebuilt (C2), restate the reason by an id or drop the comment.
 - `SoundSourcesTests` reads its manifest with its own loose options (camelCase, unmapped members disallowed): a missing field reads as a default; switch it to `ContentJsonOptions.Strict` as `ArtSourcesManifest` does (AS1 review).
 - `tests/Jrpg.Editor.Tests/Tiles/TileBrowserViewModelTests.cs` is about 500 lines: split it along the Cut-panel tests and the hit-test tests (M1 review).
+- The start map has no door into `interior_1` (decision 454): place one (a door object from the half-timber sheet, the event panel's door preset warping to `interior_1`), then remove the `Skip` on `RepositoryNewGameTests.StartMap_RepositoryContent_HasADoorIntoAnInterior`.

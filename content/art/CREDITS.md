@@ -23,5 +23,4 @@ redistribution, credit not required. The Forest Autumn sheets (`tilesheets/autum
 ## Placeholders (replace before release)
 
 - **AI-generated placeholders** by the developer, with an image generator: the backgrounds, battlers, cutscene stills,
-  attack effects, field sprites, icons and portraits, and `tilesheets/FG_Forest_Fall.png` (the chest, until re-skinned).
-- **Origin not recorded**, author unknown: `tilesheets/City.png` (the door, until re-skinned).
+  attack effects, field sprites, icons and portraits.

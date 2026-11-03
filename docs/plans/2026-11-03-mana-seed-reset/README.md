@@ -79,7 +79,7 @@ Q6 and Q8 were answered on 2026-11-03 (decisions 451, 452).
 - [x] **C3.** Done 2026-11-03 with C1 (decision 453): every map's cells erased, every tile-built object without events removed with its placements, nine old images deleted; kept until re-skinned: chest, chest_opened (FG_Forest_Fall), door_close, door_open (City), and the signposts direction_2, direction_3. Planned: Remove, in the editor, the old objects (E1b), then each old sheet with its tiles (E3a), once nothing uses them; save. Delete the development saves made before the rebuild (design.md, "Risks").
 
 ### Phase 6: the old art leaves
-- [ ] **L1. The old tilesheet images no sheet names are deleted, with their manifest entries** (content, about 30 lines) → [slices/L1.md](slices/L1.md)
+- [x] **L1. The old tilesheet images no sheet names are deleted, with their manifest entries** (content, about 30 lines) → [slices/L1.md](slices/L1.md)
 
 ## Decisions
 - **438. Mana Seed is the art family** for tiles, props, characters and monsters from now on. The developer bought the packs knowing the license: one product per purchase, no redistribution, no credit needed, and a "No GenAI" clause whose risk the developer accepts. Agents never open a Mana Seed image (AS1's content rule).
@@ -101,6 +101,7 @@ Planner's picks (not numbered; design.md records them): the test world freezes `
 - **451. The repository is private and stays so** (Q6): the imported Mana Seed sheets are committed under `content/art/tilesheets/`.
 - **452. Every art file in the repository today is an AI-generated placeholder** (Q8), except the Lato and Cormorant Garamond fonts (OFL) and the three Rogue Adventure sheets (ELV Games, bought); the seven old tilesheets whose origin nobody recorded go under an unrecorded placeholder source until L1 deletes them.
 - **453. Start over rather than paint over** (the developer, 2026-11-03): the old art is wiped from every map at once, keeping the NPCs, every event, warp and cutscene, and the objects that carry events or that events name (chest, door, signposts) until the developer re-skins them; the developer paints blank maps. Until then the game is not playable past the intro; the repository tests stay green, since they read events, not pictures.
+- **454. The start map's door into the interior waits** (the developer, 2026-11-03): the old door went with the old art and a new one is placed later; until then the interior can't be reached from the start map, and `RepositoryNewGameTests.StartMap_RepositoryContent_HasADoorIntoAnInterior` is skipped with this decision as its reason. Decision 441's door stands: the Skip comes off when the door is back (backlog).
 
 ## Open design questions (developer decides)
 None open.

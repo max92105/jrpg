@@ -17,7 +17,7 @@ public sealed class CombinedHistoryQuestTests : IDisposable
     [Fact]
     public void Undo_RemovesAStageAnEventNames_RefusedNamingIt()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         var errand = viewModel.Catalog!.Quests["placeholder_errand"];
         viewModel.Content!.SetQuests([errand with { Stages = [.. errand.Stages, new QuestStage("extra", "One more.")] }]);
         var mapId = SaveWithCellEvent(viewModel, new AdvanceQuestStep("placeholder_errand", "extra"));
@@ -31,7 +31,7 @@ public sealed class CombinedHistoryQuestTests : IDisposable
     [Fact]
     public void Undo_RemovesAQuestAnEventNames_RefusedNamingIt()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         var heist = new QuestDefinition("heist", "The heist", "Case the vault.", QuestKind.Main, [new QuestStage("case", "Case the vault.")]);
         viewModel.Content!.SetQuests([.. viewModel.Catalog!.Quests.Values, heist]);
         var mapId = SaveWithCellEvent(viewModel, new StartQuestStep("heist"));

@@ -20,7 +20,7 @@ public sealed class TileBrowserViewModelTests
         ["Grass3.png"] = (96, 64),
     };
 
-    private readonly CatalogDraft _draft = new(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")) with
+    private readonly CatalogDraft _draft = new(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")) with
     {
         Tilesheets = new Dictionary<string, TilesheetDefinition> { ["forest"] = _forest, ["dungeon"] = _dungeon },
         Tiles = new Dictionary<int, TileDefinition>

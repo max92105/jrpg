@@ -8,9 +8,9 @@ public sealed class MainViewModelMusicTests : IDisposable
     public void Dispose() => _content.Dispose();
 
     [Fact]
-    public void StartEditingSettings_RepositoryContent_OffersTheMusicFolder()
+    public void StartEditingSettings_TestWorld_OffersTheMusicFolder()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
 
         Assert.Contains("PlaceholderTown.wav", viewModel.StartEditingSettings()!.MusicChoices);
     }

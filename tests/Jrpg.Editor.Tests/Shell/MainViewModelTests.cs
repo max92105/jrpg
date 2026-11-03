@@ -18,9 +18,9 @@ public sealed class MainViewModelTests : IDisposable
     public void Dispose() => _content.Dispose();
 
     [Fact]
-    public void Constructor_RepositoryContent_ListsMapsAndOpensTheFirst()
+    public void Constructor_TestWorld_ListsMapsAndOpensTheFirst()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
 
         Assert.Null(viewModel.LoadError);
         Assert.All(["forest", "interior_1", "start"], id => Assert.Contains(id, viewModel.MapIds));
@@ -28,9 +28,9 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
-    public void MapEntries_RepositoryContent_ShowsNameThenIdSortedByName()
+    public void MapEntries_TestWorld_ShowsNameThenIdSortedByName()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
 
         string[] knownMaps = ["Forest (forest)", "Interior1 (interior_1)", "start (start)"];
 
@@ -43,7 +43,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void LayerEntries_MapWithTwoLayers_ListsThemBottomFirstWithNames()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
 
         viewModel.TryOpenMap("interior_1");
 
@@ -54,7 +54,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void LayerEntries_PaintedOnEmptyZ_DropsTheEmptyMark()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         Assert.DoesNotContain(viewModel.CurrentMap!.Map.Layout.Layers, layer => layer.Z == 2);
         viewModel.Layer.Z = 2;
         var tileId = viewModel.CurrentMap.Map.Layout.Layers[0].TileIdAt(new GridCell(0, 0));
@@ -69,7 +69,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void LayerEntries_ChosenZWithoutLayer_ListsItAsEmpty()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         Assert.DoesNotContain(viewModel.CurrentMap!.Map.Layout.Layers, layer => layer.Z == 2);
 
         viewModel.Layer.Z = 2;
@@ -80,7 +80,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void TryOpenMap_NoUnsavedChanges_OpensItWithoutAsking()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
 
         Assert.True(viewModel.TryOpenMap("start"));
 
@@ -91,7 +91,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void TryOpenMap_UnsavedChangesAndUserKeepsThem_StaysOnTheMap()
     {
-        var viewModel = _content.Open(_content.RepositoryContent, answer: false);
+        var viewModel = _content.Open(_content.TestWorld, answer: false);
         EditorTestContent.PaintTopLeft(viewModel);
 
         Assert.False(viewModel.TryOpenMap("start"));
@@ -103,7 +103,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void TryOpenMap_UnsavedChangesAndUserDiscards_OpensTheOther()
     {
-        var viewModel = _content.Open(_content.RepositoryContent, answer: true);
+        var viewModel = _content.Open(_content.TestWorld, answer: true);
         EditorTestContent.PaintTopLeft(viewModel);
 
         Assert.True(viewModel.TryOpenMap("start"));
@@ -114,7 +114,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void ConfirmClose_UnsavedChanges_AsksTheUser()
     {
-        var viewModel = _content.Open(_content.RepositoryContent, answer: false);
+        var viewModel = _content.Open(_content.TestWorld, answer: false);
         EditorTestContent.PaintTopLeft(viewModel);
 
         Assert.False(viewModel.ConfirmClose());
@@ -124,7 +124,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void ConfirmClose_MidStroke_AsksTheUser()
     {
-        var viewModel = _content.Open(_content.RepositoryContent, answer: false);
+        var viewModel = _content.Open(_content.TestWorld, answer: false);
         viewModel.Painting!.StartErasing(new GridCell(0, 0));
 
         Assert.False(viewModel.ConfirmClose());
@@ -134,7 +134,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void ConfirmClose_UnsavedCatalogChange_AsksTheUser()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         EditorTestContent.BlockFirstWalkableTile(viewModel);
 
         Assert.False(viewModel.ConfirmClose());
@@ -144,7 +144,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void ConfirmClose_UnsavedMapAndCatalogChanges_AsksOnceNamingBoth()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         EditorTestContent.BlockFirstWalkableTile(viewModel);
         EditorTestContent.PaintTopLeft(viewModel);
 
@@ -155,7 +155,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void TryOpenMap_UnsavedCatalogChangeOnly_OpensWithoutAsking()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         EditorTestContent.BlockFirstWalkableTile(viewModel);
         var otherMapId = viewModel.MapIds.First(id => id != viewModel.CurrentMap!.Map.Id);
 
@@ -168,7 +168,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void ToggleCollisionCommand_ThenAnotherMap_StaysShown()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         Assert.False(viewModel.IsCollisionShown);
 
         viewModel.ToggleCollisionCommand.Execute(null);
@@ -180,7 +180,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void ImportSheetImages_NewImage_ShowsItAndReportsImported()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         var source = PngHeaderFile.Write(Path.Combine(_content.ContentCopy, "import-source", "Cave.png"), 96, 48);
 
         viewModel.ImportSheetImages([source]);
@@ -189,11 +189,12 @@ public sealed class MainViewModelTests : IDisposable
         Assert.Equal("Imported Cave.png.", viewModel.ImportStatus);
     }
 
-    // Grass3.png has no sheet, so it can be replaced by any size; Set up's guess reads the size: 96 x 48 is 2 x 1 cells of 48.
+    // In the test world, Grass3.png has no sheet, so it can be replaced by any size; Set up's guess reads the size: 96
+    // x 48 is 2 x 1 cells of 48.
     [Fact]
     public void ImportSheetImages_ReplacedImage_ReadsTheNewSize()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent(), answer: true);
+        var viewModel = _content.Open(_content.CopyOfTestWorld(), answer: true);
         var browser = viewModel.Painting!.Browser;
         browser.SelectedChoice = browser.SheetChoices.First(choice => choice.File == "Grass3.png");
         browser.SetUpSheetCommand.Execute(null);
@@ -209,7 +210,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void CreateObject_CellsNotTilesYet_AddsTilesAndTheObjectThenChoosesIt()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         var cells = _content.ChooseTwoCellsNotTiles(viewModel);
         var newObject = viewModel.StartNewObject()!;
         newObject.Id = "tree_4";
@@ -230,7 +231,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void CreateNpc_NewId_AddsItAndChoosesIt()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         var newNpc = viewModel.StartNewNpc()!;
         newNpc.Id = "guard";
 
@@ -247,7 +248,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void CanStartNewObject_RectangleChosen_IsTrue()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         Assert.False(viewModel.CanStartNewObject);
         var changed = new List<string?>();
         viewModel.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
@@ -261,7 +262,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void CreateObject_IdTaken_ReturnsFalseAndKeepsTheObject()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         var tree = viewModel.Catalog!.Objects["tree"];
         _content.ChooseTwoCellsNotTiles(viewModel);
         var newObject = viewModel.StartNewObject()!;
@@ -277,7 +278,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void ShowCursorAt_CellOnTheMap_NamesTheCellAndItsTopTile()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         var tile = viewModel.CurrentMap!.TopTileAt(new GridCell(3, 2))!.Value;
 
         viewModel.ShowCursorAt(new GridCell(3, 2));
@@ -289,7 +290,7 @@ public sealed class MainViewModelTests : IDisposable
     public void ShowCursorAt_CellWithoutTiles_SaysSo()
     {
         // The start map's one hole (seen in slice 3a).
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         viewModel.TryOpenMap("start");
 
         viewModel.ShowCursorAt(new GridCell(5, 13));
@@ -300,7 +301,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void ShowCursorAt_CellOffTheMap_ClearsTheStatus()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         viewModel.ShowCursorAt(new GridCell(3, 2));
 
         viewModel.ShowCursorAt(new GridCell(-1, 2));
@@ -311,7 +312,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void TryOpenMap_AnotherMap_HandsItToPaintingAndPlacing()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
 
         viewModel.TryOpenMap("start");
 
@@ -322,7 +323,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void TryApplySettings_ShrinkRefused_KeepsTheMapAsItIs()
     {
-        var viewModel = _content.Open(_content.RepositoryContent, answer: false);
+        var viewModel = _content.Open(_content.TestWorld, answer: false);
         var settings = viewModel.StartEditingSettings()!;
         settings.WidthText = "1";
         settings.DisplayName = "Small forest";
@@ -336,7 +337,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void TryApplySettings_ShrinkAccepted_ResizesAndRenamesAsTwoUndoSteps()
     {
-        var viewModel = _content.Open(_content.RepositoryContent, answer: true);
+        var viewModel = _content.Open(_content.TestWorld, answer: true);
         var settings = viewModel.StartEditingSettings()!;
         settings.WidthText = "1";
         settings.DisplayName = "Small forest";
@@ -354,7 +355,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void TryApplySettings_Grow_ResizesWithoutAsking()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         var settings = viewModel.StartEditingSettings()!;
         settings.HeightText = "100";
 
@@ -367,7 +368,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void TryApplySettings_NothingChanged_AddsNoUndoStep()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
 
         Assert.True(viewModel.TryApplySettings(viewModel.StartEditingSettings()!));
 
@@ -377,7 +378,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void TryApplySettings_EmptySizeBox_AppliesNothing()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         var settings = viewModel.StartEditingSettings()!;
         settings.HeightText = "";
 
@@ -388,7 +389,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void TryCreateMap_ValidFields_OpensItUnsavedOutsideTheList()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         var newMap = viewModel.StartNewMap()!;
         newMap.Name = "Old Mill";
 
@@ -402,7 +403,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void TryCreateMap_UnsavedChangesKept_StaysOnTheOpenMap()
     {
-        var viewModel = _content.Open(_content.RepositoryContent, answer: false);
+        var viewModel = _content.Open(_content.TestWorld, answer: false);
         EditorTestContent.PaintTopLeft(viewModel);
 
         Assert.False(viewModel.TryCreateMap(viewModel.StartNewMap()!));
@@ -413,7 +414,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void TryCreateMap_InvalidSize_OpensNothing()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         var newMap = viewModel.StartNewMap()!;
         newMap.WidthText = "0";
 
@@ -425,7 +426,7 @@ public sealed class MainViewModelTests : IDisposable
     [Fact]
     public void TryCreateMap_BlankName_OpensNothing()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         var newMap = viewModel.StartNewMap()!;
         newMap.Name = "";
 

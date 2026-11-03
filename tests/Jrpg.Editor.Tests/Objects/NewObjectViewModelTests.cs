@@ -19,9 +19,9 @@ public sealed class NewObjectViewModelTests
     }
 
     [Fact]
-    public void Categories_RepositoryObjects_AreDistinctAndSorted()
+    public void Categories_TestWorldObjects_AreDistinctAndSorted()
     {
-        var objects = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")).Objects.Values;
+        var objects = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")).Objects.Values;
 
         var newObject = new NewObjectViewModel([.. objects.Select(definition => definition.Id)], [.. objects.Select(definition => definition.Category)], _cells);
 

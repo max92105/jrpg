@@ -7,12 +7,12 @@ using Jrpg.Editor.Shell;
 namespace Jrpg.Editor.Tests.Shell;
 
 /// <summary>
-/// The main view model tests' content: a temporary copy of the repository's content, deleted on dispose, the questions
-/// the view model asked, and the editing steps several tests share.
+/// The main view model tests' content: the test world (ADR 0037), or a temporary copy of it deleted on dispose, the
+/// questions the view model asked, and the editing steps several tests share.
 /// </summary>
 internal sealed class EditorTestContent : IDisposable
 {
-    public string RepositoryContent { get; } = Path.Combine(AppContext.BaseDirectory, "content");
+    public string TestWorld { get; } = Path.Combine(AppContext.BaseDirectory, "test-world");
 
     public string ContentCopy { get; } = Path.Combine(Path.GetTempPath(), $"jrpg-editor-{Guid.NewGuid():N}");
 
@@ -27,7 +27,7 @@ internal sealed class EditorTestContent : IDisposable
         }
     }
 
-    /// <param name="contentRoot">The repository's content, or <see cref="ContentCopy"/> for a test that saves.</param>
+    /// <param name="contentRoot">The test world, or <see cref="ContentCopy"/> for a test that saves.</param>
     /// <param name="answer">What the user answers to every question.</param>
     public MainViewModel Open(string contentRoot, bool answer = false) =>
         new(contentRoot, question =>
@@ -87,11 +87,11 @@ internal sealed class EditorTestContent : IDisposable
         [.. File.ReadAllBytes(Path.Combine(ContentCopy, "tiles.json")),
          .. File.ReadAllBytes(Path.Combine(ContentCopy, "map-layouts", "forest.json"))];
 
-    public string CopyOfRepositoryContent()
+    public string CopyOfTestWorld()
     {
-        foreach (var file in Directory.EnumerateFiles(RepositoryContent, "*", SearchOption.AllDirectories))
+        foreach (var file in Directory.EnumerateFiles(TestWorld, "*", SearchOption.AllDirectories))
         {
-            var target = Path.Combine(ContentCopy, Path.GetRelativePath(RepositoryContent, file));
+            var target = Path.Combine(ContentCopy, Path.GetRelativePath(TestWorld, file));
             Directory.CreateDirectory(Path.GetDirectoryName(target)!);
             File.Copy(file, target);
         }

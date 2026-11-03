@@ -8,7 +8,7 @@ namespace Jrpg.Editor.Tests.Catalogs;
 
 public sealed class CatalogUsageTests
 {
-    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
     [Fact]
     public void UsersOfTile_TileOnSavedMapAndOpenMap_ListsBoth()

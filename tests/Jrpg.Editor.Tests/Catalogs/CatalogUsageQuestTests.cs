@@ -9,11 +9,11 @@ using Jrpg.Editor.Catalogs;
 namespace Jrpg.Editor.Tests.Catalogs;
 
 // The maps whose events name a quest, in a step or a condition, on a cell or on an object, so an undo removing the
-// quest or one of its stages can be refused (decision 394). The repository's maps name only the placeholder errand, so
+// quest or one of its stages can be refused (decision 394). The test world's maps name only the placeholder errand, so
 // the tests add a heist.
 public sealed class CatalogUsageQuestTests
 {
-    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
     [Fact]
     public void UsersOfQuest_StepOnASavedMapAndConditionOnTheOpenMap_ListsBoth()

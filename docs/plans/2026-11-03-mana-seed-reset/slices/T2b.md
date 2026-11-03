@@ -18,3 +18,6 @@ None new: the guard is the Editor test count before and after, and every test pa
 
 ## Verify by hand
 - `git status` shows the 23 sheets deleted with the slice; the editor opens on the repository's content (the ten named sheets stay).
+
+- **Done, with deviations:** 513 Editor tests before and after, every one passing. Switched one more file than listed, `Catalogs/CatalogUsageQuestTests` (it gates events on the start and forest layouts); `Events/EventPresetsTests` switched too (it reads the objects). `Quests/QuestEditingViewModelTests` and `Catalogs/CatalogDraftQuestTests` stay on `content`: quests only. Test names saying "Repository" for data now read from the test world say "TestWorld" (the T2a review's rule).
+  One Data test moved early: `Art/ArtFoldersTests.TilesheetImagesIn_...` counted the 34 repository images and listed the last tree sheet, so it reads the test world now, with its count derived from the folder (never a total, `tests.md`).

@@ -12,7 +12,7 @@ namespace Jrpg.Editor.Tests.Tiles;
 
 public sealed class TilePaintingViewModelTests
 {
-    private static readonly string _contentRoot = Path.Combine(AppContext.BaseDirectory, "content");
+    private static readonly string _contentRoot = Path.Combine(AppContext.BaseDirectory, "test-world");
     private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(_contentRoot);
 
     private readonly CatalogDraft _draft = new(_catalog);

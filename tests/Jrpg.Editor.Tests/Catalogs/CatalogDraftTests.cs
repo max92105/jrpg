@@ -6,7 +6,7 @@ namespace Jrpg.Editor.Tests.Catalogs;
 
 public sealed class CatalogDraftTests
 {
-    private readonly CatalogDraft _draft = new(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")));
+    private readonly CatalogDraft _draft = new(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));
 
     [Fact]
     public void AddSavedMap_NewMap_JoinsCurrent()
@@ -218,6 +218,6 @@ public sealed class CatalogDraftTests
 
     private static TilesheetDefinition Grass3 => new() { Id = "grass_3", File = "Grass3.png", TileWidth = 48, TileHeight = 48, Margin = 0, Spacing = 0 };
 
-    // Far past any sheet's last cell, so no tile of the repository's content is cut from it.
+    // Far past any sheet's last cell, so no tile of the test world's content is cut from it.
     private SheetCell EmptyCell => new(_draft.Current.Tilesheets.Keys.First(), 999, 999);
 }

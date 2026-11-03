@@ -7,9 +7,9 @@ namespace Jrpg.Editor.Tests.Tiles;
 
 public sealed class SheetImportTests : IDisposable
 {
-    // The repository's catalog, written into an empty content folder: only the tilesheet art is touched.
+    // The test world's catalog, written into an empty content folder: only the tilesheet art is touched.
     private readonly string _root = Path.Combine(Path.GetTempPath(), $"jrpg-import-{Guid.NewGuid():N}");
-    private readonly CatalogDraft _draft = new(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")));
+    private readonly CatalogDraft _draft = new(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));
     private readonly SheetImport _import;
     private readonly List<string> _questions = [];
 

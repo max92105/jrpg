@@ -23,7 +23,7 @@ public sealed class MapViewModelTests
     [Fact]
     public void Constructor_LayersOutOfZOrder_ExposesThemBottomFirst()
     {
-        var start = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")).Maps["start"];
+        var start = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")).Maps["start"];
         var reversed = new MapDefinition(start.Layout with { Layers = [.. start.Layout.Layers.Reverse()] }, start.Settings);
 
         var viewModel = new MapViewModel(reversed);

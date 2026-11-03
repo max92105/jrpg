@@ -10,7 +10,7 @@ public sealed class WalkabilityMarkingTests
     // One 16-pixel sheet, 48 x 16: three cells in a row, a blocked tile 7 in the middle one.
     private static readonly TilesheetDefinition _sheet = new() { Id = "dungeon", File = "Dungeon.png", TileWidth = 16, TileHeight = 16, Margin = 0, Spacing = 0 };
 
-    private readonly CatalogDraft _draft = new(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")) with
+    private readonly CatalogDraft _draft = new(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")) with
     {
         Tilesheets = new Dictionary<string, TilesheetDefinition> { ["dungeon"] = _sheet },
         Tiles = new Dictionary<int, TileDefinition>

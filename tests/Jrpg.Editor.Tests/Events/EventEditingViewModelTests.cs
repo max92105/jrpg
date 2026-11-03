@@ -11,7 +11,7 @@ namespace Jrpg.Editor.Tests.Events;
 
 public sealed class EventEditingViewModelTests
 {
-    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
     private readonly CatalogDraft _draft = new(_catalog);
 

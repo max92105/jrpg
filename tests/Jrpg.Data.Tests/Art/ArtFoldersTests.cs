@@ -13,15 +13,15 @@ public sealed class ArtFoldersTests
     }
 
     [Fact]
-    public void TilesheetImagesIn_RepositoryArt_ListsEveryPngSorted()
+    public void TilesheetImagesIn_TestWorldArt_ListsEveryPngSorted()
     {
-        var images = ArtFolders.TilesheetImagesIn(ArtFolders.RootIn(Path.Combine(AppContext.BaseDirectory, "content")));
+        var artRoot = ArtFolders.RootIn(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
-        // 34 images; ordinal order puts every capitalised name before the lower-case tree sheets.
-        Assert.Equal(34, images.Count);
-        Assert.Equal("City.png", images[0]);
-        Assert.Contains("Grass3.png", images);
-        Assert.Equal("tree06_s_03_animation.png", images[^1]);
-        Assert.Equal(images.Order(StringComparer.Ordinal), images);
+        var images = ArtFolders.TilesheetImagesIn(artRoot);
+
+        // The frozen world's eleven images (ADR 0037); ordinal order puts every capitalised name before the tree sheet.
+        Assert.Equal(
+            ["City.png", "FG_Forest_Fall.png", "Grass1.png", "Grass2.png", "Grass3.png", "Ground.png", "RA_Ground_Tiles.png", "RA_Jungle.png", "Water1.png", "Water2.png", "tree01_s_01_animation.png"],
+            images);
     }
 }

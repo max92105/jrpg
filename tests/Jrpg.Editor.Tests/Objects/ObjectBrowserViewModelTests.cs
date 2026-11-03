@@ -11,7 +11,7 @@ public sealed class ObjectBrowserViewModelTests
     public void Objects_TwoCategories_SortedByCategoryThenId()
     {
         ObjectDefinition[] givenOutOfOrder = [Definition("well", "Village"), Definition("bush", "Nature"), Definition("barrel", "Village"), Definition("rock", "Nature")];
-        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")) with
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")) with
         {
             Objects = givenOutOfOrder.ToDictionary(definition => definition.Id),
         };
@@ -24,7 +24,7 @@ public sealed class ObjectBrowserViewModelTests
     [Fact]
     public void Objects_AfterSetObject_ListsTheNewRecordAndKeepsTheSelection()
     {
-        var draft = new CatalogDraft(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")));
+        var draft = new CatalogDraft(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));
         var browser = new ObjectBrowserViewModel(draft);
         browser.SelectedObject = browser.Objects.First(definition => definition.Id == "tree");
         var edited = browser.SelectedObject with { CollisionPolygon = [] };
@@ -38,7 +38,7 @@ public sealed class ObjectBrowserViewModelTests
     [Fact]
     public void Objects_ChosenObjectUndoneAway_ChoosesNothing()
     {
-        var draft = new CatalogDraft(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")));
+        var draft = new CatalogDraft(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));
         var browser = new ObjectBrowserViewModel(draft);
         draft.SetObject(draft.Current.Objects["tree"] with { Id = "tree_new" });
         browser.SelectedObject = browser.Objects.Single(definition => definition.Id == "tree_new");
@@ -52,7 +52,7 @@ public sealed class ObjectBrowserViewModelTests
     [Fact]
     public void Objects_TileChange_KeepsTheList()
     {
-        var draft = new CatalogDraft(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")));
+        var draft = new CatalogDraft(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));
         var browser = new ObjectBrowserViewModel(draft);
         var listed = browser.Objects;
 

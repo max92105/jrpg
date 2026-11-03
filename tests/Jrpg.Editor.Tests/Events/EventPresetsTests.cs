@@ -9,7 +9,7 @@ namespace Jrpg.Editor.Tests.Events;
 
 public sealed class EventPresetsTests
 {
-    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
     // A closed door that already used ids door_1_0 and door_1_1.
     private static readonly EventIdAllocation _door = new("door_1", "door_close", ["door_1_0", "door_1_1"]);
@@ -100,7 +100,7 @@ public sealed class EventPresetsTests
 
     [Theory]
     [InlineData("door_close", "door_open")]
-    public void GuessOpenedObject_RepositoryObjects_FindsTheOpenedOne(string objectId, string expected)
+    public void GuessOpenedObject_TestWorldObjects_FindsTheOpenedOne(string objectId, string expected)
     {
         Assert.Equal(expected, EventPresets.GuessOpenedObject(objectId, _catalog.Objects));
     }

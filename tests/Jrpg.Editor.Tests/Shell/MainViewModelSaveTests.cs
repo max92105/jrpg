@@ -6,7 +6,7 @@ using Jrpg.Editor.Shell;
 
 namespace Jrpg.Editor.Tests.Shell;
 
-/// <summary>Saving maps and catalogs from the editor, on a copy of the repository's content.</summary>
+/// <summary>Saving maps and catalogs from the editor, on a copy of the test world.</summary>
 public sealed class MainViewModelSaveTests : IDisposable
 {
     private readonly EditorTestContent _content = new();
@@ -16,7 +16,7 @@ public sealed class MainViewModelSaveTests : IDisposable
     [Fact]
     public void Save_ValidEdit_WritesTheMapAndClearsUnsavedChanges()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         var painted = EditorTestContent.PaintTopLeft(viewModel);
 
         viewModel.SaveCommand.Execute(null);
@@ -29,7 +29,7 @@ public sealed class MainViewModelSaveTests : IDisposable
     [Fact]
     public void Save_MapTheGameWouldReject_ShowsTheLoaderMessageAndStaysUnsaved()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         var forest = viewModel.CurrentMap!;
         forest.Do(new SetTilesEdit(forest.Map.Layout.Layers[0].Z, [new TileChange(new GridCell(0, 0), forest.Map.Layout.Layers[0].TileIdAt(new GridCell(0, 0)), 99_999)]));
 
@@ -42,7 +42,7 @@ public sealed class MainViewModelSaveTests : IDisposable
     [Fact]
     public void Save_ObjectOutlineChanged_LoadsBackWithTheNewOutline()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         var placing = viewModel.Placing!;
         placing.Browser.SelectedObject = viewModel.Catalog!.Objects["chest"];
         var shapes = placing.StartEditingShapes()!;
@@ -58,7 +58,7 @@ public sealed class MainViewModelSaveTests : IDisposable
     [Fact]
     public void Save_CatalogChangedMapUnchanged_WritesTilesAndClearsUnsavedChanges()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         var blockedId = EditorTestContent.BlockFirstWalkableTile(viewModel);
 
         viewModel.SaveCommand.Execute(null);
@@ -71,7 +71,7 @@ public sealed class MainViewModelSaveTests : IDisposable
     [Fact]
     public void Save_MapPaintedWithNewTile_WritesTileAndMapThatLoadBack()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         var cell = _content.ChooseCellNotATile(viewModel);
         viewModel.Painting!.StartPainting(new GridCell(0, 0));
         viewModel.Painting.EndStroke();
@@ -88,7 +88,7 @@ public sealed class MainViewModelSaveTests : IDisposable
     [Fact]
     public void Save_CatalogTheArtCheckRefuses_ShowsMessageAndWritesNothing()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         var filesBefore = _content.TilesAndForestBytes();
         viewModel.Content!.AddTile(new SheetCell(viewModel.Catalog!.Tilesheets.Keys.First(), 9999, 0));
         EditorTestContent.PaintTopLeft(viewModel);
@@ -103,7 +103,7 @@ public sealed class MainViewModelSaveTests : IDisposable
     [Fact]
     public void Save_NewMap_WritesItAndAddsItToTheList()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         var newMap = viewModel.StartNewMap()!;
         newMap.Name = "Old Mill";
         viewModel.TryCreateMap(newMap);
@@ -121,7 +121,7 @@ public sealed class MainViewModelSaveTests : IDisposable
     [Fact]
     public void Save_NewMap_AddsItsEntry()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         var newMap = viewModel.StartNewMap()!;
         newMap.Name = "Old Mill";
         viewModel.TryCreateMap(newMap);

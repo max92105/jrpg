@@ -3,7 +3,7 @@ using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Tests.Shell;
 
-/// <summary>Undo and redo across map and catalog edits, on a copy of the repository's content.</summary>
+/// <summary>Undo and redo across map and catalog edits, on a copy of the test world.</summary>
 public sealed class MainViewModelUndoTests : IDisposable
 {
     private readonly EditorTestContent _content = new();
@@ -13,7 +13,7 @@ public sealed class MainViewModelUndoTests : IDisposable
     [Fact]
     public void Undo_BlockedTileMarkThenPaint_UndoesThePaintFirst()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         var blockedId = EditorTestContent.BlockFirstWalkableTile(viewModel);
         EditorTestContent.PaintTopLeft(viewModel);
 
@@ -29,7 +29,7 @@ public sealed class MainViewModelUndoTests : IDisposable
     [Fact]
     public void Redo_AfterUndoingMarkAndPaint_RedoesTheMarkFirst()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         var blockedId = EditorTestContent.BlockFirstWalkableTile(viewModel);
         EditorTestContent.PaintTopLeft(viewModel);
         viewModel.History!.UndoCommand.Execute(null);
@@ -46,7 +46,7 @@ public sealed class MainViewModelUndoTests : IDisposable
     [Fact]
     public void Redo_NewTilePaintedOffTheMapAfterUndo_HasNothingToRedo()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         viewModel.Content!.AddBlockedTile(new SheetCell(viewModel.Catalog!.Tilesheets.Keys.First(), 999, 999));
         viewModel.History!.UndoCommand.Execute(null);
         _content.ChooseCellNotATile(viewModel);
@@ -59,7 +59,7 @@ public sealed class MainViewModelUndoTests : IDisposable
     [Fact]
     public void Undo_NewBlockedTileUsedOnAnotherMap_RefusesAndNamesTheMap()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         var cell = _content.ChooseCellNotATile(viewModel);
         viewModel.Content!.AddBlockedTile(cell);
         var tileId = viewModel.Content.TileAt(cell)!.Id;
@@ -79,7 +79,7 @@ public sealed class MainViewModelUndoTests : IDisposable
     [Fact]
     public void Undo_SetUpSheetWithTilesCut_RefusesNamingTheTile()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         var browser = viewModel.Painting!.Browser;
         browser.SelectedChoice = browser.SheetChoices.First(choice => choice.File == "Grass3.png");
         browser.SetUpSheetCommand.Execute(null);
@@ -96,7 +96,7 @@ public sealed class MainViewModelUndoTests : IDisposable
     [Fact]
     public void Undo_RefusedThenAnEdit_ClearsTheRefusal()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         var cell = _content.ChooseCellNotATile(viewModel);
         viewModel.Content!.AddBlockedTile(cell);
         viewModel.Painting!.StartPainting(new GridCell(0, 0));
@@ -113,7 +113,7 @@ public sealed class MainViewModelUndoTests : IDisposable
     [Fact]
     public void Undo_CatalogStepAfterSwitchingMaps_UndoesIt()
     {
-        var viewModel = _content.Open(_content.RepositoryContent);
+        var viewModel = _content.Open(_content.TestWorld);
         var blockedId = EditorTestContent.BlockFirstWalkableTile(viewModel);
         viewModel.TryOpenMap(viewModel.MapIds.First(id => id != viewModel.CurrentMap!.Map.Id));
 
@@ -125,7 +125,7 @@ public sealed class MainViewModelUndoTests : IDisposable
     [Fact]
     public void Undo_NewObjectPlacedOnASavedMap_RefusesAndNamesTheMap()
     {
-        var viewModel = _content.Open(_content.CopyOfRepositoryContent());
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
         _content.ChooseTwoCellsNotTiles(viewModel);
         var newObject = viewModel.StartNewObject()!;
         newObject.Id = "tree_4";

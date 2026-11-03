@@ -33,7 +33,7 @@ public sealed class CollisionShapesTests
         CollisionPolygon = [new Point2D(0.2, 0.5), new Point2D(0.8, 0.5), new Point2D(0.8, 1), new Point2D(0.2, 1)],
     };
 
-    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")) with
+    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")) with
     {
         Tiles = new Dictionary<int, TileDefinition>
         {

@@ -10,7 +10,7 @@ namespace Jrpg.Editor.Tests.Objects;
 
 public sealed class ObjectPlacingViewModelTests
 {
-    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
     private readonly LayerChoiceViewModel _layer = new();
     private readonly CatalogDraft _draft = new(_catalog);

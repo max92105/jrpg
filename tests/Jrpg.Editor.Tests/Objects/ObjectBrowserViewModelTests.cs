@@ -16,7 +16,7 @@ public sealed class ObjectBrowserViewModelTests
             Objects = givenOutOfOrder.ToDictionary(definition => definition.Id),
         };
 
-        var objects = new ObjectBrowserViewModel(new CatalogDraft(catalog)).Objects;
+        var objects = new ObjectBrowserViewModel(new CatalogDraft(catalog), () => null).Objects;
 
         Assert.Equal(["bush", "rock", "barrel", "well"], objects.Select(definition => definition.Id));
     }
@@ -25,7 +25,7 @@ public sealed class ObjectBrowserViewModelTests
     public void Objects_AfterSetObject_ListsTheNewRecordAndKeepsTheSelection()
     {
         var draft = new CatalogDraft(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));
-        var browser = new ObjectBrowserViewModel(draft);
+        var browser = new ObjectBrowserViewModel(draft, () => null);
         browser.SelectedObject = browser.Objects.First(definition => definition.Id == "tree");
         var edited = browser.SelectedObject with { CollisionPolygon = [] };
 
@@ -39,7 +39,7 @@ public sealed class ObjectBrowserViewModelTests
     public void Objects_ChosenObjectUndoneAway_ChoosesNothing()
     {
         var draft = new CatalogDraft(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));
-        var browser = new ObjectBrowserViewModel(draft);
+        var browser = new ObjectBrowserViewModel(draft, () => null);
         draft.SetObject(draft.Current.Objects["tree"] with { Id = "tree_new" });
         browser.SelectedObject = browser.Objects.Single(definition => definition.Id == "tree_new");
 
@@ -53,7 +53,7 @@ public sealed class ObjectBrowserViewModelTests
     public void Objects_TileChange_KeepsTheList()
     {
         var draft = new CatalogDraft(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));
-        var browser = new ObjectBrowserViewModel(draft);
+        var browser = new ObjectBrowserViewModel(draft, () => null);
         var listed = browser.Objects;
 
         draft.SetWalkable(draft.Current.Tiles.Keys.First(), isWalkable: false);

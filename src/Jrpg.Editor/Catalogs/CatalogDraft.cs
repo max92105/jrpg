@@ -106,6 +106,16 @@ internal sealed partial class CatalogDraft : ObservableObject
     }
 
     /// <summary>
+    /// Takes an object definition out as one undo step (decision 443); the caller has checked nothing uses it.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">No object has the id.</exception>
+    public void RemoveObject(string objectId)
+    {
+        var before = Current.Objects.GetValueOrDefault(objectId) ?? throw new InvalidOperationException($"No object '{objectId}' to remove.");
+        Do(new CatalogEdit(catalog => WithoutObject(catalog, objectId), catalog => WithObject(catalog, before)));
+    }
+
+    /// <summary>
     /// Replaces the quests as one undo step (decision 394); nothing when they are the same by content, stages included.
     /// </summary>
     public void SetQuests(IReadOnlyList<QuestDefinition> quests)

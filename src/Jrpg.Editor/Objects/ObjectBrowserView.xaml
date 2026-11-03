@@ -16,6 +16,15 @@
              StretchDirection="DownOnly"
              RenderOptions.BitmapScalingMode="NearestNeighbor" />
     </Border>
+    <!-- Removal is refused while a map places the object or an event swaps to it (decision 443); the line says which. -->
+    <StackPanel DockPanel.Dock="Bottom" Margin="0,4">
+      <Button HorizontalAlignment="Left"
+              Padding="8,2"
+              Content="Remove"
+              ToolTip="Take the chosen object out of the catalog; refused while a map uses it. Ctrl+Z puts it back."
+              Command="{Binding RemoveSelectedCommand}" />
+      <TextBlock Margin="0,4,0,0" TextWrapping="Wrap" Text="{Binding RemovalStatus}" />
+    </StackPanel>
     <ListBox ItemsSource="{Binding Source={StaticResource ObjectsByCategory}}"
              SelectedItem="{Binding SelectedObject}"
              DisplayMemberPath="Id">

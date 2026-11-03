@@ -20,7 +20,7 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
 
     public ObjectPlacingViewModel(CatalogDraft catalog, LayerChoiceViewModel layer)
     {
-        Browser = new ObjectBrowserViewModel(catalog);
+        Browser = new ObjectBrowserViewModel(catalog, () => OpenMap?.Map.Layout);
         Browser.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(ObjectBrowserViewModel.SelectedObject))

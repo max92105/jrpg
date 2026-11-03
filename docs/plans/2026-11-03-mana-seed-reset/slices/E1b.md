@@ -27,3 +27,5 @@ Each test builds its catalog and maps (test-world copies or in-memory layouts), 
 
 ## Verify by hand
 - Objects panel: choose `direction_3` (placed only on the forest): Remove says it is used on map forest. Make an object, don't place it, Remove: it leaves the list; Ctrl+Z brings it back. The button is visible under the list.
+
+- **Done, with deviations:** two more tests than listed: `RemoveObject_UnknownId_Throws` and an undo after a remove-then-set of the same id (the removed record comes back), and the browser's "nothing chosen" and "status cleared on a new choice" cases. The button sits under the list, above the preview. Hand check (yours): the look of the button and the line.

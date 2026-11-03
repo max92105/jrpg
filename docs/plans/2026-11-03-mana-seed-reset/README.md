@@ -66,7 +66,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **X1. The editor opens with missing art: a warning in the status band, tiles and NPCs it can't draw marked on the map, in objects and canopies; `MainViewModel` makes room first** (Editor, about 240 lines with a 25-line move) → [slices/X1.md](slices/X1.md)
 - [x] **X2. Sheets with a missing image: listed as "image missing", re-imported under their file name, named by the cursor status; the catalogs save with art missing** (Editor + Data, about 230 lines) → [slices/X2.md](slices/X2.md)
 - [x] **E1a. A swap step naming an object counts as a use** (Editor, about 90 lines) → [slices/E1a.md](slices/E1a.md)
-- [ ] **E1b. Remove an object definition nothing uses** (Editor, about 160 lines) → [slices/E1b.md](slices/E1b.md)
+- [x] **E1b. Remove an object definition nothing uses** (Editor, about 160 lines) → [slices/E1b.md](slices/E1b.md)
 - [ ] **E3a. Remove a sheet with its tiles when none is used; tile ids never reused in a session** (Editor, about 200 lines) → [slices/E3a.md](slices/E3a.md)
 - [ ] **E3b. The purge: a sheet and everything drawn from it, worked out, and the writer for catalogs with maps** (Editor + Data, about 200 lines) → [slices/E3b.md](slices/E3b.md)
 - [ ] **E3c. Remove a sheet whose image is missing, asked first with the counts, written at once** (Editor, about 175 lines) → [slices/E3c.md](slices/E3c.md)

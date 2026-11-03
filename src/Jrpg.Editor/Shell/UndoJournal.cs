@@ -29,11 +29,14 @@ internal sealed class UndoJournal
     /// <returns>The history whose newest undone step to redo.</returns>
     public UndoTarget Redo() => Move(_undone, _done);
 
-    /// <summary>Another map opened: the closed map's history, and so its steps here, are gone.</summary>
+    /// <summary>
+    /// Another map opened: the closed map's history, and so its steps here, are gone. Every redo goes too: a catalog
+    /// redo (a removal) could take away what the closed map, saved since, now uses, and nothing could check it.
+    /// </summary>
     public void ForgetMapSteps()
     {
         _done.RemoveAll(step => step == UndoTarget.Map);
-        _undone.RemoveAll(step => step == UndoTarget.Map);
+        _undone.Clear();
     }
 
     /// <summary>The catalogs dropped their undone steps outside any recorded step; the map's stay redoable.</summary>

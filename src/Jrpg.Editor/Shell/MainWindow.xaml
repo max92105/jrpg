@@ -223,6 +223,15 @@
                       Content="New object from selection..."
                       Visibility="{Binding CanStartNewObject, Converter={StaticResource VisibleWhenTrue}}"
                       Click="OnNewObjectClicked" />
+              <!-- Refused while a map or an object uses one of the sheet's tiles (decision 443); the line says which. -->
+              <StackPanel DockPanel.Dock="Bottom" Margin="0,4">
+                <Button HorizontalAlignment="Left"
+                        Padding="8,2"
+                        Content="Remove sheet"
+                        ToolTip="Take the shown sheet and its tiles out of the catalog; refused while a map or object uses one. The image stays in the folder. Ctrl+Z puts it back."
+                        Command="{Binding Removal.RemoveSheetCommand}" />
+                <TextBlock Margin="0,4,0,0" TextWrapping="Wrap" Text="{Binding Removal.Status}" />
+              </StackPanel>
               <tiles:TileBrowserView x:Name="TileBrowser" DataContext="{Binding Painting.Browser}" />
             </DockPanel>
           </TabItem>

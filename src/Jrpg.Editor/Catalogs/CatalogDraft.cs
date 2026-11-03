@@ -14,8 +14,16 @@ internal sealed partial class CatalogDraft : ObservableObject
 {
     private readonly CatalogHistory _history = new();
 
+    // The highest tile id seen this session: loaded, or made here. A removed sheet's tiles may come back by undo, so a
+    // new tile never takes an id below it (design key decision 3).
+    private int _highestTileId;
+
     /// <param name="loaded">The content as the loader validated it.</param>
-    public CatalogDraft(ContentCatalog loaded) => Current = loaded;
+    public CatalogDraft(ContentCatalog loaded)
+    {
+        Current = loaded;
+        _highestTileId = loaded.Tiles.Keys.Append(TileLayer.EmptyTileId).Max();
+    }
 
     /// <summary>A catalog change became an undo step.</summary>
     public event EventHandler? StepRecorded;
@@ -42,8 +50,9 @@ internal sealed partial class CatalogDraft : ObservableObject
             .MinBy(tile => tile.Id);
 
     /// <summary>
-    /// Makes a sheet cell a tile, walkable (decision 114), with the id one above the highest; tiles are never renumbered.
-    /// Not an undo step (decision 113): undoing the paint that made it keeps it.
+    /// Makes a sheet cell a tile, walkable (decision 114), with the id one above the highest seen this session; tiles
+    /// are never renumbered and an id is never reused. Not an undo step (decision 113): undoing the paint that made it
+    /// keeps it.
     /// </summary>
     /// <returns>The new tile's id.</returns>
     public int AddTile(SheetCell cell)
@@ -103,6 +112,20 @@ internal sealed partial class CatalogDraft : ObservableObject
         Do(new CatalogEdit(
             catalog => WithObject(catalog, definition),
             catalog => before is null ? WithoutObject(catalog, definition.Id) : WithObject(catalog, before)));
+    }
+
+    /// <summary>
+    /// Takes a sheet and every tile cut from it out as one undo step (decision 443); the caller has checked nothing
+    /// uses the tiles.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">No sheet has the id.</exception>
+    public void RemoveTilesheet(string sheetId)
+    {
+        var sheet = Current.Tilesheets.GetValueOrDefault(sheetId) ?? throw new InvalidOperationException($"No sheet '{sheetId}' to remove.");
+        var tiles = Current.Tiles.Values.Where(tile => tile.SheetId == sheetId).ToList();
+        Do(new CatalogEdit(
+            catalog => WithoutTilesheet(catalog, sheetId) with { Tiles = catalog.Tiles.Where(pair => pair.Value.SheetId != sheetId).ToDictionary() },
+            catalog => WithTilesheet(catalog, sheet) with { Tiles = catalog.Tiles.Values.Concat(tiles).ToDictionary(tile => tile.Id) }));
     }
 
     /// <summary>
@@ -219,14 +242,19 @@ internal sealed partial class CatalogDraft : ObservableObject
     private static ContentCatalog WithoutTilesheet(ContentCatalog catalog, string sheetId) =>
         catalog with { Tilesheets = catalog.Tilesheets.Where(pair => pair.Key != sheetId).ToDictionary() };
 
-    private TileDefinition NewTileAt(SheetCell cell, bool isWalkable) => new()
+    private TileDefinition NewTileAt(SheetCell cell, bool isWalkable)
     {
-        Id = Current.Tiles.Keys.Append(TileLayer.EmptyTileId).Max() + 1,
-        IsWalkable = isWalkable,
-        SheetId = cell.SheetId,
-        Column = cell.Column,
-        Row = cell.Row,
-    };
+        _highestTileId++;
+        return new()
+        {
+            Id = _highestTileId,
+            IsWalkable = isWalkable,
+            SheetId = cell.SheetId,
+            Column = cell.Column,
+            Row = cell.Row,
+        };
+    }
+
 
     private void Do(CatalogEdit edit)
     {

@@ -31,3 +31,6 @@ Size: about 70 lines of code, 10 tests (about 200).
 
 ## Verify by hand
 - In a test copy of the content, on a sheet used by one scratch map: Remove sheet refuses naming the map; erase the map's tiles, Remove sheet: the sheet leaves and its image shows "(not set up)"; paint a tile from another sheet; Ctrl+Z twice: the painted cell is undone and the sheet comes back with its tiles, the painted tile kept; Ctrl+S, restart the editor: it opens.
+
+- **Done, with deviations:** the Remove sheet button and its line sit in the Tiles panel beside "New object from selection" (bound to `MainViewModel.Removal`), not inside `TileBrowserView`, whose DataContext is the browser. The high-water mark is raised only by `NewTileAt` (a tile brought back by undo was made earlier, so it is never above the mark). One more test each side: an unknown sheet id throws; the users line with maps and an object together. `MainViewModel` ends at 494 lines.
+  After review: opening another map now drops every redo (`UndoJournal.ForgetMapSteps`), catalog steps included, so a removal undone, then a save and a map switch, can't be redone over what the closed map uses; this closes the same gap for E1b's object removal, and makes design key decision 3's "a redo can't remove something used since" hold. The id mark is the only source of new tile ids.

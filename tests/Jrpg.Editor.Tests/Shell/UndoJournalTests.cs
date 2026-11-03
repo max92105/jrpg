@@ -15,6 +15,18 @@ public sealed class UndoJournalTests
         Assert.Equal([UndoTarget.Catalogs, UndoTarget.Map], [_journal.Undo(), _journal.Undo()]);
     }
 
+    // A catalog redo (a removal) could take what the closed map, saved since, now uses; nothing could check it.
+    [Fact]
+    public void ForgetMapSteps_UndoneCatalogStep_CanNoLongerBeRedone()
+    {
+        _journal.Record(UndoTarget.Catalogs);
+        _journal.Undo();
+
+        _journal.ForgetMapSteps();
+
+        Assert.False(_journal.CanRedo);
+    }
+
     [Fact]
     public void Undo_AfterAnotherMapOpened_SkipsTheClosedMapsSteps()
     {

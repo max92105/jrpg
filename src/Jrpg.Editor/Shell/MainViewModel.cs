@@ -68,6 +68,7 @@ internal sealed partial class MainViewModel : ObservableObject
             var images = new SheetImages(() => [.. ArtFolders.TilesheetImagesIn(ArtRoot).Where(_sheetImageSizes.IsReadable)], _sheetImageSizes.SizeOf);
             Painting = new TilePaintingViewModel(Content, Layer, images, confirm);
             Marking = new WalkabilityMarking(Content, Painting.Browser);
+            Removal = new SheetRemoval(Content, Painting.Browser, () => CurrentMap);
             Painting.Browser.PropertyChanged += (_, e) =>
             {
                 if (e.PropertyName == nameof(TileBrowserViewModel.SelectedCells))
@@ -126,6 +127,9 @@ internal sealed partial class MainViewModel : ObservableObject
 
     /// <summary>Null when the content or its art didn't load.</summary>
     public WalkabilityMarking? Marking { get; }
+
+    /// <summary>Remove sheet in the Tiles panel (decision 443); null when the content didn't load.</summary>
+    public SheetRemoval? Removal { get; }
 
     /// <summary>Null when the content or its art didn't load.</summary>
     public ObjectPlacingViewModel? Placing { get; }

@@ -34,4 +34,25 @@ public sealed class CombinedHistoryObjectTests : IDisposable
         Assert.Equal($"Can't undo: object tree_4 is used on map {map.Map.Id}.", viewModel.History.Refusal);
         Assert.True(viewModel.Catalog!.Objects.ContainsKey("tree_4"));
     }
+
+    // The removal undone, then another map opened: the closed map may use the object again since, so no redo is left.
+    [Fact]
+    public void Redo_RemovalUndoneThenAnotherMapOpened_CannotExecute()
+    {
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
+        _content.ChooseTwoCellsNotTiles(viewModel);
+        var newObject = viewModel.StartNewObject()!;
+        newObject.Id = "tree_4";
+        newObject.Category = "General";
+        viewModel.CreateObject(newObject);
+        var browser = viewModel.Placing!.Browser;
+        browser.SelectedObject = browser.Objects.First(definition => definition.Id == "tree_4");
+        browser.RemoveSelectedCommand.Execute(null);
+        viewModel.History!.UndoCommand.Execute(null);
+        Assert.True(viewModel.History.RedoCommand.CanExecute(null));
+
+        viewModel.TryOpenMap(viewModel.MapIds.First(id => id != viewModel.CurrentMap!.Map.Id));
+
+        Assert.False(viewModel.History.RedoCommand.CanExecute(null));
+    }
 }

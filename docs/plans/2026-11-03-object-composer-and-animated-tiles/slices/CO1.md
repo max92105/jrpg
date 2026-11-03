@@ -33,3 +33,5 @@ Size: about 80 lines of code, 11 tests (about 190).
 
 ## Verify by hand
 Nothing to see yet: the composer's window comes in CO5. New object from selection and Replace cells still work (the `TileIdsOf` switch).
+
+- **Done, with deviations:** two tests more than listed: `Resize_OutsideOneToMaxCells_Throws` and `CatalogDraftTests.TileIdsOf_SameCellTwice_MakesOneTile` (the distinct cells). `TilesOf`'s comment names the row-by-row order without a link to `ObjectFromCells`, which CO6 removes.

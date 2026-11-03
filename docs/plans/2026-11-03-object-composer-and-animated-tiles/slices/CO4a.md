@@ -31,3 +31,5 @@ Size: about 70 lines of code, 12 tests (about 200).
 
 ## Verify by hand
 Nothing to see yet (CO5).
+
+- **From CO1's review:** a rectangle wider or taller than `ObjectCanvas.MaxCells` makes `ObjectCanvas.Of` throw, while today's New object from selection accepts it: `StartNew` must not pass one through.

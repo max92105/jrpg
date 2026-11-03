@@ -52,6 +52,17 @@ public sealed class CatalogDraftTests
     }
 
     [Fact]
+    public void TileIdsOf_SameCellTwice_MakesOneTile()
+    {
+        var tileCount = _draft.Current.Tiles.Count;
+
+        var tileIds = _draft.TileIdsOf([EmptyCell, EmptyCell]);
+
+        Assert.Equal(_draft.TileAt(EmptyCell)?.Id, tileIds[EmptyCell]);
+        Assert.Equal(tileCount + 1, _draft.Current.Tiles.Count);
+    }
+
+    [Fact]
     public void TileAt_CellWithoutTile_ReturnsNull()
     {
         Assert.Null(_draft.TileAt(EmptyCell));

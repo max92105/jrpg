@@ -262,7 +262,7 @@ internal sealed partial class MainViewModel : ObservableObject
             return false;
         }
 
-        var tileIds = Content.TileIdsOf(newObject.Cells);
+        var tileIds = Content.TileIdsOf(newObject.Cells.Cells);
         AddAndChoose(ObjectFromCells.Build(newObject.Id, newObject.Category.Trim(), newObject.Cells, cell => tileIds[cell]));
         return true;
     }

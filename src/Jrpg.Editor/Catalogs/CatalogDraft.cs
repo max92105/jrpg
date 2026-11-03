@@ -84,8 +84,8 @@ internal sealed partial class CatalogDraft : ObservableObject
     /// Each cell's tile, the cells not tiles yet made walkable tiles first (as <see cref="AddTile"/>, not undo steps):
     /// what an object built from the cells needs.
     /// </summary>
-    public IReadOnlyDictionary<SheetCell, int> TileIdsOf(SheetCellRectangle cells) =>
-        cells.Cells.ToDictionary(cell => cell, cell => TileAt(cell)?.Id ?? AddTile(cell));
+    public IReadOnlyDictionary<SheetCell, int> TileIdsOf(IReadOnlyCollection<SheetCell> cells) =>
+        cells.Distinct().ToDictionary(cell => cell, cell => TileAt(cell)?.Id ?? AddTile(cell));
 
     /// <summary>Makes a sheet cell a blocked tile, as one undo step: undoing it removes the tile.</summary>
     public void AddBlockedTile(SheetCell cell)

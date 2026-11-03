@@ -40,7 +40,7 @@ internal sealed partial class ObjectReskinning : ObservableObject
     private void Reskin()
     {
         var cells = _tiles.MarkedCells!.Value;
-        var tileIds = _catalog.TileIdsOf(cells);
+        var tileIds = _catalog.TileIdsOf(cells.Cells);
         _catalog.SetObject(ObjectReskin.Reskin(_objects.SelectedObject!, cells, cell => tileIds[cell]));
     }
 

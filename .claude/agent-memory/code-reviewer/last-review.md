@@ -5,12 +5,13 @@ metadata:
   type: project
 ---
 
-Plan: 2026-11-03-mana-seed-reset, slice O1 (Re-skin an object, decision 449). Round 1.
+Plan: 2026-11-03-object-composer-and-animated-tiles, slice CO1 (ObjectCanvas; TileIdsOf takes any cells). Round 1.
 Verdict: Ready to commit.
 
-- open (Warning): ObjectReskinning.CanReskin checks IsImageMissing on the shown SelectedChoice, not on MarkedCells' sheet
-  (a sheet change keeps SelectedCell); check the marked cells' sheet and test the missing-image clause
-- open (Warning): ObjectReskin.Reskin copies ObjectFromCells.Build's Tiles projection; Reskin's tileIds line copies
-  MainViewModel.CreateObject (third TileAt ?? AddTile); share ObjectFromCells.TilesOf + one CatalogDraft call
-- open (Suggestion): Reskin_PlacedObjectWithEvents_KeepsThePlacementsAndEvents asserts no events; assert or rename
-- fixed (carried from E3c): E3c.md Done note records the Rewritten -> Rewriting rename (line 32)
+- open (Suggestion): ObjectCanvas.Of(SheetCellRectangle) and Of(ObjectDefinition) don't name the
+  ArgumentOutOfRangeException a size over MaxCells throws, as Empty and Resize do
+- open (Follow-up, CO5): a Shift+drag rectangle over 32 columns or rows makes ObjectCanvas.Of throw when New object
+  from selection opens the composer; clamp, refuse, or say so in CO5
+- fixed (carried from O1): CanReskin checks the marked cells' sheet (ObjectReskinning.cs:34)
+- fixed (carried from O1): ObjectReskin shares ObjectFromCells.TilesOf; one CatalogDraft.TileIdsOf call
+- fixed (carried from O1): Reskin_PlacedObjectWithEvents asserts NotEmpty events and compares them

@@ -3,8 +3,9 @@ using System.Globalization;
 namespace Jrpg.Editor.Maps.Settings;
 
 /// <summary>
-/// Whole numbers typed into the map dialogs' boxes. The dialogs keep the text as typed and parse it here, so a box
-/// left empty or holding a typo is refused instead of keeping the last number that happened to parse.
+/// Whole numbers typed into the editor's boxes (the map dialogs, the object composer's size). The boxes keep the text
+/// as typed and parse it here, so a box left empty or holding a typo is refused instead of keeping the last number that
+/// happened to parse.
 /// </summary>
 internal static class TypedCounts
 {

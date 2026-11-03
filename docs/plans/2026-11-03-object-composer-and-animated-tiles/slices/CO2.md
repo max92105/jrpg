@@ -33,3 +33,5 @@ Size: about 90 lines of code, 10 tests (about 200).
 
 ## Verify by hand
 Nothing to see yet (CO5).
+
+- **Done:** as planned; the typed size is read with `Maps/Settings/TypedCounts.Parse`, as the map dialogs read theirs. From the review: a stroke that leaves the same picture (erasing an empty cell) records no undo step, and the Rows box has its own tests.

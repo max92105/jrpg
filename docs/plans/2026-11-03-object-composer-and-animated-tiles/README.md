@@ -49,7 +49,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 1: the object composer
 - [x] **CO1. `ObjectCanvas`: an object's picture as sheet cells on a grid: stamp, erase, resize, read from an object, made into tiles** (Editor, about 190 lines) → [slices/CO1.md](slices/CO1.md)
-- [ ] **CO2. `CanvasPainting`: strokes stamp the Tiles panel's chosen cells or erase, the size is typed, strokes undo inside the composer** (Editor, about 200 lines) → [slices/CO2.md](slices/CO2.md)
+- [x] **CO2. `CanvasPainting`: strokes stamp the Tiles panel's chosen cells or erase, the size is typed, strokes undo inside the composer** (Editor, about 200 lines) → [slices/CO2.md](slices/CO2.md)
 - [ ] **CO3. `ObjectComposerViewModel` and `ObjectNaming`: the composer's id, category, problem and the object it makes, new or edited** (Editor, about 190 lines) → [slices/CO3.md](slices/CO3.md)
 - [ ] **CO4a. `ObjectComposing`: New starts from the chosen rectangle or an empty canvas, Edit from the chosen object; Save makes the missing tiles and the object as one undo step** (Editor, about 200 lines) → [slices/CO4a.md](slices/CO4a.md)
 - [ ] **CO4b. The canvas's picture: `ObjectCanvasDrawing` and `TileImages.CellImageOf`** (Editor, about 110 lines) → [slices/CO4b.md](slices/CO4b.md)

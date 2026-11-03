@@ -68,7 +68,7 @@ internal sealed partial class MainViewModel : ObservableObject
             var images = new SheetImages(() => [.. ArtFolders.TilesheetImagesIn(ArtRoot).Where(_sheetImageSizes.IsReadable)], _sheetImageSizes.SizeOf);
             Painting = new TilePaintingViewModel(Content, Layer, images, confirm);
             Marking = new WalkabilityMarking(Content, Painting.Browser);
-            Removal = new SheetRemoval(Content, Painting.Browser, () => CurrentMap);
+            Removal = new SheetRemoval(Content, Painting.Browser, () => CurrentMap, _writer);
             Painting.Browser.PropertyChanged += (_, e) =>
             {
                 if (e.PropertyName == nameof(TileBrowserViewModel.SelectedCells))
@@ -77,6 +77,9 @@ internal sealed partial class MainViewModel : ObservableObject
                 }
             };
             Content.PropertyChanged += OnContentChanged;
+            // The purge wrote the content at once: the open map shows it from the written content, with no history,
+            // before the catalogs change (the window redraws on that change).
+            Content.Rewriting += (_, written) => CurrentMap = CurrentMap is { } open ? new MapViewModel(written.Maps[open.Map.Id]) : null;
             History = new CombinedHistory(Content);
             Placing = new ObjectPlacingViewModel(Content, Layer);
             EventEditing = new EventEditingViewModel(Content) { MapIds = MapIds };

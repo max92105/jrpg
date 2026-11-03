@@ -69,7 +69,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **E1b. Remove an object definition nothing uses** (Editor, about 160 lines) → [slices/E1b.md](slices/E1b.md)
 - [x] **E3a. Remove a sheet with its tiles when none is used; tile ids never reused in a session** (Editor, about 200 lines) → [slices/E3a.md](slices/E3a.md)
 - [x] **E3b. The purge: a sheet and everything drawn from it, worked out, and the writer for catalogs with maps** (Editor + Data, about 200 lines) → [slices/E3b.md](slices/E3b.md)
-- [ ] **E3c. Remove a sheet whose image is missing, asked first with the counts, written at once** (Editor, about 175 lines) → [slices/E3c.md](slices/E3c.md)
+- [x] **E3c. Remove a sheet whose image is missing, asked first with the counts, written at once** (Editor, about 175 lines) → [slices/E3c.md](slices/E3c.md)
 - [ ] **O1. Re-skin an object: its cells replaced from the sheet, its id, events, outline and zones kept** (Editor, about 170 lines) → [slices/O1.md](slices/O1.md)
 
 ### Phase 5: the rebuild (the developer's content work)

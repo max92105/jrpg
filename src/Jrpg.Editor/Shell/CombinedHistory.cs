@@ -26,6 +26,11 @@ internal sealed partial class CombinedHistory : ObservableObject
             _journal.ForgetUndoneCatalogSteps();
             NotifyUndoRedoChanged();
         };
+        catalog.Rewriting += (_, _) =>
+        {
+            _journal.Clear();
+            NotifyUndoRedoChanged();
+        };
     }
 
     /// <summary>The map whose steps share the order; another map starts with none of the old one's steps.</summary>

@@ -119,7 +119,7 @@ public sealed class SheetRemovalTests
         var images = new SheetImages(() => files, _ => (1000, 1000));
         var browser = new TileBrowserViewModel(draft, images, _ => true, () => openMap?.Map.Layout);
         browser.SelectedChoice = browser.SheetChoices.First(choice => choice.Sheet?.Id == "scratch");
-        return (new SheetRemoval(draft, browser, () => openMap), browser);
+        return (new SheetRemoval(draft, browser, () => openMap, new ContentWriter(Path.Combine(Path.GetTempPath(), "jrpg-never-written"))), browser);
     }
 
     private static ContentCatalog WithTilePaintedOnSavedForest(ContentCatalog catalog)

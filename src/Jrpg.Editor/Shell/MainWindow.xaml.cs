@@ -62,12 +62,31 @@ internal sealed partial class MainWindow : Window
         viewModel.Layer.PropertyChanged += (_, _) => DrawCurrentMap();
         viewModel.Painting?.PropertyChanged += (_, _) => ShowBrushAt(_brushCell);
         viewModel.Placing?.PropertyChanged += (_, _) => DrawSelectionMarks();
+        viewModel.Removal?.PropertyChanged += OnRemovalChanged;
         OpenCurrentMap();
     }
 
     /// <summary>The yes or no questions <see cref="MainViewModel"/> asks, such as before unsaved changes are dropped.</summary>
     public static bool Ask(string question) =>
         MessageBox.Show(question, "Map editor", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.Yes;
+
+    // Remove sheet on a sheet whose image is missing waits for this answer before it writes (decision 442).
+    private void OnRemovalChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(SheetRemoval.PurgeQuestion) || sender is not SheetRemoval { PurgeQuestion: { } question } removal)
+        {
+            return;
+        }
+
+        if (Ask(question.Text))
+        {
+            removal.ApplyPurge();
+        }
+        else
+        {
+            removal.DropPurge();
+        }
+    }
 
     protected override void OnClosing(CancelEventArgs e)
     {

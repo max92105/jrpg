@@ -31,6 +31,15 @@ internal sealed partial class CatalogDraft : ObservableObject
     /// <summary>A change outside the history (a tile made by painting) dropped the undone steps, which can't be redone now.</summary>
     public event EventHandler? RedoDropped;
 
+    /// <summary>
+    /// The content was written straight away and is about to replace <see cref="Current"/> (the sheet purge), given as
+    /// the argument: the open map and every history start afresh. Raised before <see cref="Current"/> changes, so the
+    /// open map is replaced first and nothing ever draws an old layout against the new catalogs (it would name tiles
+    /// and objects that are gone); the new layout is a subset of the old, so drawing it against the old catalogs is
+    /// safe.
+    /// </summary>
+    public event EventHandler<ContentCatalog>? Rewriting;
+
     /// <summary>An immutable snapshot, replaced whole by each change, as <c>MapViewModel.Map</c> is for maps.</summary>
     [ObservableProperty]
     public partial ContentCatalog Current { get; private set; }
@@ -203,6 +212,18 @@ internal sealed partial class CatalogDraft : ObservableObject
             Current = _history.Redo().Apply(Current);
             OnPropertyChanged(nameof(IsDirty));
         }
+    }
+
+    /// <summary>
+    /// Takes content already written as the current one, with nothing to undo and nothing unsaved (decision 442's
+    /// purge, which can't be undone); the tile id mark keeps its value, so no id is reused.
+    /// </summary>
+    public void ReplaceAfterRewrite(ContentCatalog written)
+    {
+        Rewriting?.Invoke(this, written);
+        _history.StartAfresh();
+        Current = written;
+        OnPropertyChanged(nameof(IsDirty));
     }
 
     public void MarkSaved()

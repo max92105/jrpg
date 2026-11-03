@@ -39,6 +39,15 @@ internal sealed class UndoJournal
         _undone.Clear();
     }
 
+    /// <summary>
+    /// The content was rewritten outside every history (the sheet purge): no step is left to undo or redo.
+    /// </summary>
+    public void Clear()
+    {
+        _done.Clear();
+        _undone.Clear();
+    }
+
     /// <summary>The catalogs dropped their undone steps outside any recorded step; the map's stay redoable.</summary>
     public void ForgetUndoneCatalogSteps() => _undone.RemoveAll(step => step == UndoTarget.Catalogs);
 

@@ -61,4 +61,15 @@ internal sealed class CatalogHistory
     }
 
     public void MarkSaved() => _savedDepth = _done.Count;
+
+    /// <summary>
+    /// The content was rewritten outside the history (the sheet purge): nothing before it can be undone, and it is
+    /// saved.
+    /// </summary>
+    public void StartAfresh()
+    {
+        _done.Clear();
+        _undone.Clear();
+        _savedDepth = 0;
+    }
 }

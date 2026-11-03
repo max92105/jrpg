@@ -54,6 +54,7 @@ internal sealed partial class MainWindow : Window
             CompositionTarget.Rendering += OnRendering;
             TileBrowser.Marking = viewModel.Marking;
             ObjectBrowser.Drawing = _drawing;
+            ObjectBrowser.AnimationTime = viewModel.AnimationTime;
             content.PropertyChanged += OnContentChanged;
             viewModel.SheetImagesImported += (_, files) => RedrawImportedImages(tileImages, files);
         }

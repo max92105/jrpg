@@ -1,5 +1,5 @@
 # Object composer and animated tiles
-Status: approved
+Status: retro pending
 
 Drafted on 2026-11-03 from two requests the developer made while painting the first Mana Seed maps (the Mana Seed reset plan's C2):
 
@@ -66,7 +66,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **AI2. Tiles > Import animations...: the `.tsx`'s sheet found by its image's file name, every animated tile set as one undo step; `CatalogDraft` moves its removals into a partial file first** (Editor, about 205 lines with a 30-line move) → [slices/AI2.md](slices/AI2.md)
 - [x] **AE1. `TileAnimationViewModel`: the Animate panel's frames to the right and time for the chosen cell, its problems and the preview's cell** (Editor, about 180 lines) → [slices/AE1.md](slices/AE1.md)
 - [x] **AE2. The Animate panel in the Tiles panel: Apply and Remove animation as one undo step, a live preview on the render tick (`TileAnimationTime`); Tiles > Animate tile** (Editor, about 205 lines) → [slices/AE2.md](slices/AE2.md)
-- [ ] **AE3. The Objects panel's preview and the composer's canvas animate** (Editor, about 130 lines) → [slices/AE3.md](slices/AE3.md)
+- [x] **AE3. The Objects panel's preview and the composer's canvas animate** (Editor, about 130 lines) → [slices/AE3.md](slices/AE3.md)
 
 ## Decisions
 - **455. One composer for New and Edit**, a modal window; it replaces Objects > New object from selection (`NewObjectViewModel`, `NewObjectWindow`) and Objects > Replace cells of the chosen object (`ObjectReskinning`, `ObjectReskin`). Decision 449 still holds: Edit keeps the id, category, outline, zones, placements and events. Replace cells' one-click path (a rectangle chosen, one menu entry, picture and size replaced) becomes Edit, a size typed, the rectangle stamped, Save: a re-skin happens once per object after an art change, and the composer does it with parts from anywhere.

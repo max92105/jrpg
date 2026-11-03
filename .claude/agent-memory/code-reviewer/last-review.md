@@ -5,14 +5,12 @@ metadata:
   type: project
 ---
 
-Plan: 2026-11-03-object-composer-and-animated-tiles, slice AE2 (Animate panel, Apply/Remove, TileAnimationTime). Round 1.
+Plan: 2026-11-03-object-composer-and-animated-tiles, slice AE3 (animated Objects preview and composer canvas). Round 1.
 Verdict: Ready to commit.
 
-- open (Warning): MainWindow.xaml 283 -> 309 lines; move the Animate panel into a Tiles/ UserControl
-- open (Warning): RemoveAnimationCommand CanExecute not re-raised on CatalogDraft.Current change (Ctrl+Z/Ctrl+Y while
-  open leaves it stale); notify in OnCatalogChanged, add a test
-- open (Suggestion): TileAnimationTime.Advance runs Select/OfType/Distinct over every tile each render tick; cache
-  the distinct animations on Current change
-- open (Suggestion): no test raises CanExecuteChanged for Apply/Remove on Open or a typed box
-- fixed (AE1): ProblemOf overflow (subtracted), Close test, panel closes when its sheet leaves the catalog
-- dropped (AE1): ArtReferenceCheck.LastFrameColumn follow-up is in backlog.md; CanOpen SheetChoices arm suggestion
+- open (Warning): MapDrawing.IsAnimated untested (gates the Objects preview redraw); add true/false cases to MapDrawingTests
+- open (Suggestion): ObjectBrowserView.AnimationTime setter subscribes without unsubscribing the old value
+- open (Suggestion): composer canvas calls CatalogDraft.TileAt (linear scan) per painted cell per FramesChanged
+- open (Suggestion): docs/map.md ObjectCanvasDrawing line still says CellImageOf; tests' magic `Column <= 28`
+- fixed (AE2): Animate panel moved to Tiles/TileAnimationPanel (MainWindow.xaml 296); RemoveAnimationCommand
+  re-raised in OnCatalogChanged; TileAnimationTime caches distinct animations per Current change

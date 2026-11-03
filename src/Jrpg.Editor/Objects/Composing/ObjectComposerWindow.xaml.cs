@@ -16,22 +16,27 @@ internal sealed partial class ObjectComposerWindow : Window
 {
     private readonly ObjectComposerViewModel _composer;
     private readonly TileImages _images;
+    private readonly TileAnimationTime _animationTime;
     private readonly Func<ObjectComposerViewModel, bool> _tryApply;
     private MouseButton? _strokeButton;
     private GridCell? _lastStrokeCell;
 
     /// <param name="composer">The composer's state, edited here.</param>
     /// <param name="images">The main window's sheet images, shared by the picker and the canvas.</param>
+    /// <param name="animationTime">
+    /// The editor's animation time, which the canvas's animated cells follow (decision 470).
+    /// </param>
     /// <param name="tryApply">Makes the object; false when it didn't.</param>
-    public ObjectComposerWindow(ObjectComposerViewModel composer, TileImages images, Func<ObjectComposerViewModel, bool> tryApply)
+    public ObjectComposerWindow(ObjectComposerViewModel composer, TileImages images, TileAnimationTime animationTime, Func<ObjectComposerViewModel, bool> tryApply)
     {
         InitializeComponent();
         DataContext = _composer = composer;
-        (_images, _tryApply) = (images, tryApply);
+        (_images, _animationTime, _tryApply) = (images, animationTime, tryApply);
         // The picker draws its sheet as soon as it has a view model, so it needs its images first.
         Picker.Images = images;
         Picker.DataContext = composer.Painting.Picker;
         composer.Painting.PropertyChanged += OnPaintingChanged;
+        animationTime.FramesChanged += OnFramesChanged;
         Closed += OnClosed;
         Loaded += (_, _) => IdBox.Focus();
         DrawCanvas();
@@ -45,7 +50,10 @@ internal sealed partial class ObjectComposerWindow : Window
         }
     }
 
-    private void DrawCanvas() => CanvasImage.Source = ObjectCanvasDrawing.Draw(_composer.Painting.Canvas, _images.CellImageOf);
+    private void OnFramesChanged(object? sender, EventArgs e) => DrawCanvas();
+
+    private void DrawCanvas() =>
+        CanvasImage.Source = ObjectCanvasDrawing.Draw(_composer.Painting.Canvas, cell => _images.CellImageAt(cell, _animationTime.Elapsed));
 
     private void OnCanvasPressed(object sender, MouseButtonEventArgs e)
     {
@@ -123,6 +131,7 @@ internal sealed partial class ObjectComposerWindow : Window
     private void OnClosed(object? sender, EventArgs e)
     {
         _composer.Painting.PropertyChanged -= OnPaintingChanged;
+        _animationTime.FramesChanged -= OnFramesChanged;
         Picker.DataContext = null;
     }
 }

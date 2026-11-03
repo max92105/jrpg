@@ -35,7 +35,7 @@ internal sealed partial class MainWindow
     private void Compose(ObjectComposerViewModel? composer)
     {
         if (composer is null || TileBrowser.Images is not { } images
-            || new ObjectComposerWindow(composer, images, _viewModel.Composing!.TryApply) { Owner = this }.ShowDialog() != true)
+            || new ObjectComposerWindow(composer, images, _viewModel.AnimationTime!, _viewModel.Composing!.TryApply) { Owner = this }.ShowDialog() != true)
         {
             return;
         }

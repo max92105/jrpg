@@ -27,3 +27,5 @@ Size: about 50 lines of code, 4 tests (about 130).
 - Compose an object with an animated cell (a waterfall tile among cliff parts) and Save: the Objects panel's preview cycles; the composer's canvas cycled while painting. The placing ghost and the map show the first frame; the game animates it (AN2).
 - Choose a still object: the preview doesn't redraw (no flicker, no CPU in Task Manager beyond idle).
 - Close the composer and choose another object: no lag (the closed window let go of the tick).
+
+- **Done, with deviations:** the cell tests sit in a new `Tiles/TileImagesAnimationTests`; `MapDrawing.IsAnimated(definition)` tells the Objects panel whether its preview moves, so a still object is never redrawn; the composer's canvas redraws on every `FramesChanged` (a small picture); `MainWindow.xaml.cs` took one line (`ObjectBrowser.AnimationTime`), 571 lines. The pictures moving are your hand check. From the review: `IsAnimated` has its two tests; `TileImages` finds animated cells through a lookup built once per catalog change (the canvas asks for every cell on each redraw); the Objects panel's time setter lets go of an earlier time.

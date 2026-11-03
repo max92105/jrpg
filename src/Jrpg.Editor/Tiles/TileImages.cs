@@ -2,6 +2,7 @@ using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Jrpg.Core.Content;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
 using Jrpg.Editor.Catalogs;
@@ -24,6 +25,10 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<Miss
 
     // Keyed by the sheet's cut as well as the cell, so a re-cut sheet (another record) is cropped anew (design key decision 3).
     private readonly Dictionary<(TilesheetDefinition Sheet, int Column, int Row), ImageSource> _cells = [];
+
+    // The animated tiles by their own cell, for the canvas's many cells per redraw; rebuilt when the catalog changes.
+    private Dictionary<SheetCell, int> _animatedTileIds = [];
+    private ContentCatalog? _animatedTilesOf;
 
     public ImageSource TileImageOf(int tileId)
     {
@@ -59,6 +64,37 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<Miss
         }
 
         return image;
+    }
+
+    /// <summary>
+    /// A tile's frame <paramref name="elapsed"/> into the editor's animation time (ADR 0039); a still tile's own cell.
+    /// </summary>
+    public ImageSource TileImageAt(int tileId, TimeSpan elapsed)
+    {
+        var tile = catalog.Current.Tiles[tileId];
+        return CellImageOf(new SheetCell(tile.SheetId, tile.ColumnShownAt(elapsed), tile.Row));
+    }
+
+    /// <summary>
+    /// A sheet cell's picture <paramref name="elapsed"/> into the editor's animation time: an animated tile's own cell
+    /// shows its frame, any other cell itself (a frame's cell isn't animated where it is painted).
+    /// </summary>
+    public ImageSource CellImageAt(SheetCell cell, TimeSpan elapsed) =>
+        AnimatedTileIds().TryGetValue(cell, out var tileId) ? TileImageAt(tileId, elapsed) : CellImageOf(cell);
+
+    // Two tiles may share a cell; the lowest id is the one drawn, as CatalogDraft.TileAt finds it.
+    private Dictionary<SheetCell, int> AnimatedTileIds()
+    {
+        if (!ReferenceEquals(_animatedTilesOf, catalog.Current))
+        {
+            _animatedTilesOf = catalog.Current;
+            _animatedTileIds = catalog.Current.Tiles.Values.OrderBy(tile => tile.Id)
+                .GroupBy(tile => new SheetCell(tile.SheetId, tile.Column, tile.Row))
+                .Where(group => group.First().Animation is not null)
+                .ToDictionary(group => group.Key, group => group.First().Id);
+        }
+
+        return _animatedTileIds;
     }
 
     /// <summary>The standing frame an NPC is drawn with (ADR 0015, decision 128): the down row's first frame.</summary>

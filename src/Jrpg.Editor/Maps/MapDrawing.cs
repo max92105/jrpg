@@ -59,21 +59,34 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
         return image;
     }
 
-    /// <summary>One object on its own, at the map's scale: the browser's preview and the outline of where it would go.</summary>
-    public DrawingImage DrawObject(ObjectDefinition definition)
+    /// <summary>
+    /// One object on its own, at the map's scale, its tiles' first frames: the placing ghost and the Shapes window.
+    /// </summary>
+    public DrawingImage DrawObject(ObjectDefinition definition) => DrawObject(definition, TimeSpan.Zero);
+
+    /// <summary>
+    /// One object on its own, at the map's scale, each animated tile at its frame <paramref name="elapsed"/> into the
+    /// editor's animation time (decision 470): the Objects panel's preview.
+    /// </summary>
+    public DrawingImage DrawObject(ObjectDefinition definition, TimeSpan elapsed)
     {
         var area = new Rect(0, 0, definition.Width * CellPixels, definition.Height * CellPixels);
         var drawing = new DrawingGroup { ClipGeometry = new RectangleGeometry(area) };
         using (var context = drawing.Open())
         {
             context.DrawRectangle(Brushes.Transparent, null, area);
-            DrawObjectAt(context, definition, new Point2D(0, 0));
+            DrawObjectAt(context, definition, new Point2D(0, 0), tileId => tileImages.TileImageAt(tileId, elapsed));
         }
 
         var image = new DrawingImage(drawing);
         image.Freeze();
         return image;
     }
+
+    /// <summary>
+    /// Whether one of the object's tiles is animated, so its preview changes with the animation time.
+    /// </summary>
+    public bool IsAnimated(ObjectDefinition definition) => definition.Tiles.Any(tile => catalog.Current.Tiles[tile.TileId].Animation is not null);
 
     /// <summary>Lines between the map's cells, drawn over the map when the grid is shown.</summary>
     /// <param name="layout">The map whose cells are outlined.</param>
@@ -163,10 +176,10 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
     }
 
     private void DrawObject(DrawingContext context, PlacedObject placed) =>
-        DrawObjectAt(context, catalog.Current.Objects[placed.ObjectId], placed.Position);
+        DrawObjectAt(context, catalog.Current.Objects[placed.ObjectId], placed.Position, tileImages.TileImageOf);
 
     // An NPC stands still facing down over its cells, as in the game (ADR 0015); other objects are drawn from their tiles.
-    private void DrawObjectAt(DrawingContext context, ObjectDefinition definition, Point2D topLeft)
+    private void DrawObjectAt(DrawingContext context, ObjectDefinition definition, Point2D topLeft, Func<int, ImageSource> tileImageOf)
     {
         if (definition.FieldSpriteFile is { } spriteFile)
         {
@@ -177,7 +190,7 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
 
         foreach (var tile in definition.Tiles)
         {
-            context.DrawImage(tileImages.TileImageOf(tile.TileId), CellRect(topLeft.X + tile.X, topLeft.Y + tile.Y));
+            context.DrawImage(tileImageOf(tile.TileId), CellRect(topLeft.X + tile.X, topLeft.Y + tile.Y));
         }
     }
 

@@ -116,7 +116,7 @@ public sealed class TileAnimationApplyTests : IDisposable
     private (MainViewModel ViewModel, TileDefinition Tile) OpenOnStillTile()
     {
         var viewModel = _content.Open(_content.CopyOfTestWorld());
-        var tile = viewModel.Catalog!.Tiles.Values.First(tile => tile.SheetId == "fg_forest_fall" && tile.Column <= 28);
+        var tile = viewModel.Catalog!.Tiles.Values.First(tile => tile.SheetId == "fg_forest_fall" && tile.Column + 4 <= 32);
         viewModel.Painting!.Browser.Select(tile.Id);
         Opened(viewModel);
         return (viewModel, tile);
@@ -125,7 +125,7 @@ public sealed class TileAnimationApplyTests : IDisposable
     private (MainViewModel ViewModel, TileDefinition Tile) OpenOnAnimatedTile()
     {
         var viewModel = _content.Open(_content.CopyOfTestWorld());
-        var tile = viewModel.Catalog!.Tiles.Values.First(tile => tile.SheetId == "fg_forest_fall" && tile.Column <= 28);
+        var tile = viewModel.Catalog!.Tiles.Values.First(tile => tile.SheetId == "fg_forest_fall" && tile.Column + 4 <= 32);
         viewModel.Content!.SetTileAnimations(new Dictionary<int, TileAnimation?> { [tile.Id] = new TileAnimation { FrameCount = 3, FrameMilliseconds = 100 } });
         viewModel.Painting!.Browser.Select(tile.Id);
         Opened(viewModel);

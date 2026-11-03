@@ -6,5 +6,5 @@
 - [Last review](last-review.md) — slice, round and finding status of the latest review; read first to apply re-review rules
 - [Detached comments](detached-comments.md) — a member inserted under, or removed from under, a comment leaves it describing the wrong code
 - [Lax test JSON readers](lax-test-json-readers.md) — test-only manifest readers skip required/nullable checks; ContentJsonOptions.Strict exists
-- [Untested notify arms](untested-notify-arms.md) — PropertyChanged relay filters ship with one arm tested; check the arm that gates Save
+- [Untested notify arms](untested-notify-arms.md) — relay arms and NotifyCanExecuteChangedFor ship untested; catalog-reading CanExecute not re-raised
 - [Int overflow in bounds](int-overflow-bounds.md) — start + count > limit wraps on typed ints; ask for count > limit - start

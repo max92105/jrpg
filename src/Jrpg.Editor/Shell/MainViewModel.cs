@@ -70,6 +70,7 @@ internal sealed partial class MainViewModel : ObservableObject
             Painting = new TilePaintingViewModel(Content, Layer, images, confirm);
             Marking = new WalkabilityMarking(Content, Painting.Browser);
             Animating = new TileAnimationViewModel(Content, Painting.Browser, images);
+            AnimationTime = new TileAnimationTime(Content);
             Removal = new SheetRemoval(Content, Painting.Browser, () => CurrentMap, _writer);
             Content.PropertyChanged += OnContentChanged;
             // The purge wrote the content at once: the open map shows it from the written content, with no history,
@@ -130,6 +131,9 @@ internal sealed partial class MainViewModel : ObservableObject
 
     /// <summary>The Animate panel (decision 467); null when the content didn't load.</summary>
     public TileAnimationViewModel? Animating { get; }
+
+    /// <summary>The editor's animation time, moved on by the window's render tick (decision 470).</summary>
+    public TileAnimationTime? AnimationTime { get; }
 
     /// <summary>Remove sheet in the Tiles panel (decision 443); null when the content didn't load.</summary>
     public SheetRemoval? Removal { get; }

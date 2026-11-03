@@ -88,6 +88,7 @@
         <MenuItem Header="Set up sheet" Command="{Binding Painting.Browser.SetUpSheetCommand}" />
         <MenuItem Header="Cut sheet" Command="{Binding Painting.Browser.CutSheetCommand}" />
         <MenuItem Header="Import sheet image..." Click="OnImportSheetImageClicked" />
+        <MenuItem Header="Animate tile..." Command="{Binding Animating.OpenCommand}" ToolTip="Open the Animate panel on the cell chosen in the Tiles panel." />
         <MenuItem Header="Import animations..." Click="OnImportAnimationsClicked" IsEnabled="{Binding CanStartNewObject}" ToolTip="Read a Tiled .tsx file: every animated tile of the set-up sheet with its image gets its frames and time. Ctrl+Z undoes the import." />
       </MenuItem>
       <MenuItem Header="Objects">
@@ -227,8 +228,20 @@
                         Content="Remove sheet"
                         ToolTip="Take the shown sheet and its tiles out of the catalog; refused while a map or object uses one. The image stays in the folder. Ctrl+Z puts it back."
                         Command="{Binding Removal.RemoveSheetCommand}" />
+                <Button HorizontalAlignment="Left"
+                        Margin="0,4,0,0"
+                        Padding="8,2"
+                        Content="Animate"
+                        ToolTip="Animate the cell chosen on the sheet: its frames run to its right (ADR 0039)."
+                        Command="{Binding Animating.OpenCommand}" />
                 <TextBlock Margin="0,4,0,0" TextWrapping="Wrap" Text="{Binding Removal.Status}" />
               </StackPanel>
+              <!-- The Animate panel (decision 467); its preview cycles on the render tick. -->
+              <tiles:TileAnimationPanel x:Name="AnimationPanel"
+                                        DockPanel.Dock="Bottom"
+                                        Margin="0,4"
+                                        DataContext="{Binding Animating}"
+                                        Visibility="{Binding IsOpen, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}" />
               <tiles:TileBrowserView x:Name="TileBrowser" DataContext="{Binding Painting.Browser}" />
             </DockPanel>
           </TabItem>

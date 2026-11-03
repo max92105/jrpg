@@ -9,7 +9,7 @@ namespace Jrpg.Editor.Tiles;
 
 /// <summary>
 /// The Animate panel (decision 467): the frames to the right and the time typed for the cell chosen in the Tiles panel,
-/// what stops Apply, and the preview's cell at a time (ADR 0039).
+/// what stops Apply, and the preview's cell at a time (ADR 0039); applied or removed as one undo step.
 /// </summary>
 internal sealed partial class TileAnimationViewModel : ObservableObject
 {
@@ -40,20 +40,28 @@ internal sealed partial class TileAnimationViewModel : ObservableObject
     /// <summary>The cell the panel opened on, its animation's first frame; null while closed.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsOpen), nameof(Problem))]
+    [NotifyCanExecuteChangedFor(nameof(ApplyCommand), nameof(RemoveAnimationCommand))]
     public partial SheetCell? Cell { get; private set; }
 
     public bool IsOpen => Cell is not null;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Problem))]
+    [NotifyCanExecuteChangedFor(nameof(ApplyCommand))]
     public partial string FrameCountText { get; set; } = "";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Problem))]
+    [NotifyCanExecuteChangedFor(nameof(ApplyCommand))]
     public partial string FrameMillisecondsText { get; set; } = "";
 
     /// <summary>What stops Apply; null when the typed animation fits the sheet.</summary>
     public string? Problem => Cell is { } cell ? ProblemOf(cell) : null;
+
+    public bool CanApply => IsOpen && TypedAnimation() is not null;
+
+    /// <summary>The opened cell is an animated tile.</summary>
+    public bool CanRemoveAnimation => Cell is { } cell && _catalog.TileAt(cell)?.Animation is not null;
 
     /// <summary>
     /// The cell shown <paramref name="elapsed"/> into the typed animation; the opened cell while a problem stands.
@@ -77,6 +85,23 @@ internal sealed partial class TileAnimationViewModel : ObservableObject
 
     [RelayCommand]
     private void Close() => Cell = null;
+
+    // A cell not a tile yet becomes a walkable one first, outside the history (decision 113), as painting makes it.
+    [RelayCommand(CanExecute = nameof(CanApply))]
+    private void Apply()
+    {
+        var cell = Cell!.Value;
+        var tileId = _catalog.TileAt(cell)?.Id ?? _catalog.AddTile(cell);
+        _catalog.SetTileAnimations(new Dictionary<int, TileAnimation?> { [tileId] = TypedAnimation() });
+        Cell = null;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanRemoveAnimation))]
+    private void RemoveAnimation()
+    {
+        _catalog.SetTileAnimations(new Dictionary<int, TileAnimation?> { [_catalog.TileAt(Cell!.Value)!.Id] = null });
+        Cell = null;
+    }
 
     // The typed animation; null while a problem stands.
     private TileAnimation? TypedAnimation() =>
@@ -105,13 +130,21 @@ internal sealed partial class TileAnimationViewModel : ObservableObject
         return frames > columns - cell.Column ? $"{frames} frames from column {cell.Column} run past the sheet's {columns} columns." : null;
     }
 
-    // An undone Set up or a removed sheet takes the cell's sheet away: the panel closes rather than read it.
+    // An undo or redo can animate or still the opened tile; an undone Set up or a removed sheet takes its sheet away,
+    // and the panel closes rather than read it.
     private void OnCatalogChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(CatalogDraft.Current) && Cell is { } cell && !_catalog.Current.Tilesheets.ContainsKey(cell.SheetId))
+        if (e.PropertyName != nameof(CatalogDraft.Current))
+        {
+            return;
+        }
+
+        if (Cell is { } cell && !_catalog.Current.Tilesheets.ContainsKey(cell.SheetId))
         {
             Cell = null;
         }
+
+        RemoveAnimationCommand.NotifyCanExecuteChanged();
     }
 
     private void OnTilesChanged(object? sender, PropertyChangedEventArgs e)

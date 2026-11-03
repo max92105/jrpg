@@ -51,6 +51,7 @@ internal sealed partial class MainWindow : Window
             var tileImages = new TileImages(content, viewModel.ArtRoot, () => viewModel.Art!.Missing);
             _drawing = new MapDrawing(content, tileImages);
             TileBrowser.Images = tileImages;
+            CompositionTarget.Rendering += OnRendering;
             TileBrowser.Marking = viewModel.Marking;
             ObjectBrowser.Drawing = _drawing;
             content.PropertyChanged += OnContentChanged;

@@ -65,7 +65,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **AI1. `TiledTilesetReader`: a Tiled `.tsx` file's image, cut and animations, each turned into a frame count and time or refused naming the tile** (Data, about 200 lines) → [slices/AI1.md](slices/AI1.md)
 - [x] **AI2. Tiles > Import animations...: the `.tsx`'s sheet found by its image's file name, every animated tile set as one undo step; `CatalogDraft` moves its removals into a partial file first** (Editor, about 205 lines with a 30-line move) → [slices/AI2.md](slices/AI2.md)
 - [x] **AE1. `TileAnimationViewModel`: the Animate panel's frames to the right and time for the chosen cell, its problems and the preview's cell** (Editor, about 180 lines) → [slices/AE1.md](slices/AE1.md)
-- [ ] **AE2. The Animate panel in the Tiles panel: Apply and Remove animation as one undo step, a live preview on the render tick (`TileAnimationTime`); Tiles > Animate tile** (Editor, about 205 lines) → [slices/AE2.md](slices/AE2.md)
+- [x] **AE2. The Animate panel in the Tiles panel: Apply and Remove animation as one undo step, a live preview on the render tick (`TileAnimationTime`); Tiles > Animate tile** (Editor, about 205 lines) → [slices/AE2.md](slices/AE2.md)
 - [ ] **AE3. The Objects panel's preview and the composer's canvas animate** (Editor, about 130 lines) → [slices/AE3.md](slices/AE3.md)
 
 ## Decisions

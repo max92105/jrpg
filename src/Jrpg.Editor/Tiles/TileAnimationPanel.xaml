@@ -1,0 +1,21 @@
+<UserControl x:Class="Jrpg.Editor.Tiles.TileAnimationPanel"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Bound to a TileAnimationViewModel; the window shows the preview's frame on its render tick. -->
+  <StackPanel>
+    <StackPanel Orientation="Horizontal">
+      <TextBlock Text="Frames to the right" VerticalAlignment="Center" />
+      <TextBox Width="40" Margin="4,0,12,0" Text="{Binding FrameCountText, UpdateSourceTrigger=PropertyChanged}" />
+      <TextBlock Text="ms each" VerticalAlignment="Center" />
+      <TextBox Width="50" Margin="4,0,12,0" Text="{Binding FrameMillisecondsText, UpdateSourceTrigger=PropertyChanged}" />
+      <Image x:Name="Preview" Width="48" Height="48" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+    </StackPanel>
+    <TextBlock Margin="0,4,0,0" TextWrapping="Wrap" Foreground="{StaticResource ProblemTextBrush}" Text="{Binding Problem}" />
+    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+      <Button Padding="8,2" Content="Apply" ToolTip="Animate the cell, as one change Ctrl+Z undoes." Command="{Binding ApplyCommand}" />
+      <Button Padding="8,2" Margin="4,0,0,0" Content="Remove animation" ToolTip="Make the tile still again; Ctrl+Z undoes it." Command="{Binding RemoveAnimationCommand}" />
+      <Button Padding="8,2" Margin="4,0,0,0" Content="Close" Command="{Binding CloseCommand}" />
+    </StackPanel>
+  </StackPanel>
+</UserControl>

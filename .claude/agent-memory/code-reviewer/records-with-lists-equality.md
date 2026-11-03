@@ -16,3 +16,7 @@ Seen again in part 2 slice 1a (`MapLayout`, `TileLayer` rows-of-rows, `ObjectDef
 Seen in editor slice 11i-1: "unchanged?" checks (dialog ToEdit null -> no undo step) need structural compare (`MapEventComparison`); check the test data actually exercises the nested-list branch (content had no dialogue steps, so the Speech.Lines path was untested -> Warning).
 
 Also watch for, seen in 4b: validator messages that combine two fields ("attack and defense must be...") when the item validator uses one field per message. And loader tests whose only assertion can't fail (`Select(...).ToList().Count == source.Count`).
+
+Seen in CO4a (2026-11-03): `_objects.SelectedObject = definition` after a `SetObject` that was a no-op (unchanged
+edit) chooses a fresh `ObjectDefinition` not in the browser's list; WPF's `Items.Contains` uses record equality, so
+the list-member compare fails. Choose the catalog's stored instance by id instead.

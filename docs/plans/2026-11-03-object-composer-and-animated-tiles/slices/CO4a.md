@@ -33,3 +33,5 @@ Size: about 70 lines of code, 12 tests (about 200).
 Nothing to see yet (CO5).
 
 - **From CO1's review:** a rectangle wider or taller than `ObjectCanvas.MaxCells` makes `ObjectCanvas.Of` throw, while today's New object from selection accepts it: `StartNew` must not pass one through.
+
+- **Done, with deviations:** a chosen rectangle over 32 cells either way starts the canvas with its top-left 32 (`StartNew_RectangleTallerThanMaxCells_StartsWithItsTopCells`; CO1's review); `TryApply` chooses the object but leaves the editing mode to the shell (CO5 switches to the Objects tab), since `MainViewModel.Mode` isn't its to set; `StartNew` doesn't check the sheet's image, since a rectangle is only dragged on a sheet with its image. `CanEdit_TileObjectChosen_IsTrueAndRaised` also checks the notification. From the review: Edit is greyed for an object over 32 cells either way (made before the composer), and a Save that changed nothing keeps the stored object chosen.

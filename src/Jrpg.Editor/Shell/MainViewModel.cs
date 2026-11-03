@@ -14,6 +14,7 @@ using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
 using Jrpg.Editor.Maps.Settings;
 using Jrpg.Editor.Objects;
+using Jrpg.Editor.Objects.Composing;
 using Jrpg.Editor.Quests;
 using Jrpg.Editor.Tiles;
 
@@ -83,6 +84,7 @@ internal sealed partial class MainViewModel : ObservableObject
             History = new CombinedHistory(Content);
             Placing = new ObjectPlacingViewModel(Content, Layer);
             Reskinning = new ObjectReskinning(Content, Placing.Browser, Painting.Browser);
+            Composing = new ObjectComposing(Content, Placing.Browser, Painting.Browser);
             EventEditing = new EventEditingViewModel(Content) { MapIds = MapIds };
             QuestEditing = new QuestEditingViewModel(Content);
             if (MapIds.Count > 0)
@@ -139,6 +141,9 @@ internal sealed partial class MainViewModel : ObservableObject
     /// Objects > Replace cells of the chosen object (decision 449); null when the content didn't load.
     /// </summary>
     public ObjectReskinning? Reskinning { get; }
+
+    /// <summary>Objects > New object and Edit object (decision 455); null when the content didn't load.</summary>
+    public ObjectComposing? Composing { get; }
 
     /// <summary>Null when the content or its art didn't load.</summary>
     public ObjectPlacingViewModel? Placing { get; }

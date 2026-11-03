@@ -5,14 +5,13 @@ metadata:
   type: project
 ---
 
-Plan: 2026-11-03-object-composer-and-animated-tiles, slice CO3 (ObjectComposerViewModel, ObjectNaming). Round 1.
+Plan: 2026-11-03-object-composer-and-animated-tiles, slice CO4a (ObjectComposing). Round 1.
 Verdict: Ready to commit.
 
-- open (Warning): OnPartChanged's Canvas/SizeProblem/CategoryProblem arms untested; only the IdProblem arm is pinned,
-  so dropping nameof(CanvasPainting.Canvas) leaves "Paint at least one cell." up after the first stroke
-- open (Suggestion): Problem_EditWithItsOwnId_IsNull doesn't test the IsIdEditable gate (ForEdit hands naming no
-  taken ids); drop the gate or say it guards an older id that fails ObjectIds' pattern
-- open (Suggestion): Title has no test ("New object" / "Edit object 'chest'")
-- fixed (carried from CO2): EndStroke same-picture check, RowsText tests, TypedCounts summary
-- open (Follow-up, CO5): a Shift+drag rectangle over 32 columns or rows makes ObjectCanvas.Of throw when the
-  composer opens from it; CO5's slice still doesn't say how it's clamped or refused
+- open (Warning): StartEdit throws ArgumentOutOfRangeException (ObjectCanvas.Of) for an object over 32 cells either
+  way (Replace cells / New object from selection accept any rectangle) while CanEdit says true; cap CanEdit + test
+- open (Warning): TryApply on an unchanged edit chooses `definition`, a fresh record not in the browser's Objects
+  (SetObject no-op); choose _catalog.Current.Objects[definition.Id] + Assert.Same test
+- open (Suggestion): StartNew's column clip (Math.Min on Columns) untested; only rows are pinned
+- fixed (carried from CO3): OnPartChanged arms tested, edit-own-id test, Title tested
+- fixed (carried from CO1/CO3 follow-up): StartNew clips a rectangle over 32 to its top-left 32

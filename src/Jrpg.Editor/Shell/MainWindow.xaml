@@ -93,6 +93,8 @@
         <MenuItem Header="Edit shapes..." Click="OnEditShapesClicked" IsEnabled="{Binding Placing.CanEditShapes, FallbackValue=False}" />
         <MenuItem Header="New object from selection..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" />
         <MenuItem Header="New NPC..." Click="OnNewNpcClicked" IsEnabled="{Binding CanStartNewNpc}" />
+        <!-- Keeps the object's id, events and placements, so the chest and the doors keep working with new art (decision 449). -->
+        <MenuItem Header="Replace cells of the chosen object" Command="{Binding Reskinning.ReskinCommand}" ToolTip="The object chosen in the Objects panel takes the cells chosen in the Tiles panel; Ctrl+Z puts the old cells back." />
       </MenuItem>
       <MenuItem Header="Quests">
         <MenuItem Header="Edit quests..." Click="OnEditQuestsClicked" IsEnabled="{Binding HasQuestEditing}" />

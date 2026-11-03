@@ -20,8 +20,17 @@ internal static class ObjectFromCells
         Category = category,
         Width = cells.Columns,
         Height = cells.Rows,
-        Tiles = [.. cells.Cells.Select(cell => new ObjectTile(cell.Column - cells.Left, cell.Row - cells.Top, tileIdOf(cell)))],
+        Tiles = TilesOf(cells, tileIdOf),
         CollisionPolygon = [],
         AbovePlayerZones = [],
     };
+
+    /// <summary>
+    /// Each cell's tile at its column and row within the rectangle; New object and Replace cells (decision 449) share
+    /// it.
+    /// </summary>
+    /// <param name="cells">The rectangle of sheet cells.</param>
+    /// <param name="tileIdOf">The tile cut from each cell; every cell is a tile by now.</param>
+    public static IReadOnlyList<ObjectTile> TilesOf(SheetCellRectangle cells, Func<SheetCell, int> tileIdOf) =>
+        [.. cells.Cells.Select(cell => new ObjectTile(cell.Column - cells.Left, cell.Row - cells.Top, tileIdOf(cell)))];
 }

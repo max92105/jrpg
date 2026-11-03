@@ -61,9 +61,9 @@ public sealed class ContentCatalogLoaderTests
     }
 
     [Fact]
-    public void Load_RepositoryContent_TreeHasItsTileGroupSizeAndOutline()
+    public void Load_TestWorld_TreeHasItsTileGroupSizeAndOutline()
     {
-        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
         Assert.Equal((4, 4), (catalog.Objects["tree"].Width, catalog.Objects["tree"].Height));
         Assert.Equal(6, catalog.Objects["tree"].CollisionPolygon.Count);
@@ -71,9 +71,9 @@ public sealed class ContentCatalogLoaderTests
     }
 
     [Fact]
-    public void Load_RepositoryContent_VillagerUsesThePlaceholderSprite()
+    public void Load_TestWorld_VillagerUsesThePlaceholderSprite()
     {
-        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
         var villager = catalog.Objects["villager"];
         Assert.Equal("npc_placeholder.png", villager.FieldSpriteFile);
@@ -82,9 +82,9 @@ public sealed class ContentCatalogLoaderTests
     }
 
     [Fact]
-    public void Load_RepositoryContent_ComposesTheThreeLiveMaps()
+    public void Load_TestWorld_ComposesTheThreeFrozenMaps()
     {
-        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
         Assert.All(["forest", "interior_1", "start"], id => Assert.Contains(id, catalog.Maps.Keys));
         var start = catalog.Maps["start"];

@@ -16,7 +16,7 @@ public sealed class ContentWriterTests : IDisposable
 
     public ContentWriterTests()
     {
-        CopyFolder(Path.Combine(AppContext.BaseDirectory, "content"), _contentRoot);
+        CopyFolder(Path.Combine(AppContext.BaseDirectory, "test-world"), _contentRoot);
         _catalog = ContentCatalogLoader.Load(_contentRoot);
         _writer = new ContentWriter(_contentRoot);
     }
@@ -81,20 +81,6 @@ public sealed class ContentWriterTests : IDisposable
         Assert.Equal(filesBefore, MapFileBytes("intro"));
     }
 
-    [Theory]
-    [InlineData("start")]
-    [InlineData("forest")]
-    [InlineData("interior_1")]
-    [InlineData("intro")]
-    public void WriteMap_UnchangedRepositoryMap_WritesIdenticalBytes(string mapId)
-    {
-        var filesBefore = MapFileBytes(mapId);
-
-        _writer.WriteMap(_catalog.Maps[mapId], _catalog);
-
-        Assert.Equal(filesBefore, MapFileBytes(mapId));
-    }
-
     [Fact]
     public void WriteMap_NewMap_AddsBothFiles()
     {
@@ -104,16 +90,6 @@ public sealed class ContentWriterTests : IDisposable
         _writer.WriteMap(copy, _catalog);
 
         Assert.Equal("forest_2", ContentCatalogLoader.Load(_contentRoot).Maps["forest_2"].Settings.Id);
-    }
-
-    [Fact]
-    public void WriteMapCatalogs_UnchangedRepositoryCatalogs_WritesIdenticalBytes()
-    {
-        var filesBefore = CatalogFileBytes();
-
-        _writer.WriteMapCatalogs(_catalog);
-
-        Assert.Equal(filesBefore, CatalogFileBytes());
     }
 
     [Fact]

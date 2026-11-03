@@ -21,10 +21,10 @@ public sealed class SaveAndLoadTests : IDisposable
     }
 
     [Fact]
-    public void SaveToFileAndRestore_RepositoryContent_ContinuesWhereSaved()
+    public void SaveToFileAndRestore_TestWorld_ContinuesWhereSaved()
     {
         // Below the chest at (19.0, 20.05) on start, facing it.
-        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
         var belowChest = new MapLocation("start", new Point2D(19.5, 21.5), Facing.Up);
         var session = GameSession.StartNew(catalog with { NewGame = catalog.NewGame with { StartLocation = belowChest } }, "sarxian", new SeededRandom(1));
         session.Exploration.TryInteract();
@@ -47,7 +47,7 @@ public sealed class SaveAndLoadTests : IDisposable
     [Fact]
     public void SaveToFileAndRestore_OpenedChest_StaysOpen()
     {
-        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
         var belowChest = new MapLocation("start", new Point2D(19.5, 21.5), Facing.Up);
         var session = GameSession.StartNew(catalog with { NewGame = catalog.NewGame with { StartLocation = belowChest } }, "sarxian", new SeededRandom(1));
         session.Exploration.TryInteract();

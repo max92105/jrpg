@@ -31,13 +31,14 @@ public sealed class ForestEncounterRateSimulation(ITestOutputHelper output)
     private static readonly MoveIntent[] _directions =
         [MoveIntent.FromAxes(1, 0), MoveIntent.FromAxes(0, 1), MoveIntent.FromAxes(-1, 0), MoveIntent.FromAxes(0, -1)];
 
-    // The forest's arrival cell from the start map's warp tiles.
+    // The frozen forest's arrival cell from the test world's start map (ADR 0037): the rule is measured against the
+    // configured odds, not the repository's geography.
     private static readonly Point2D _arrival = new GridCell(28, 7).Center;
 
     [Fact]
     public void ForestEncounters_StraightWalk_AverageStepsNearConfiguredOdds()
     {
-        var catalog = WithoutForestCellEvents(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")));
+        var catalog = WithoutForestCellEvents(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));
         var table = catalog.Maps[MapId].Settings.RandomEncounters!;
 
         var stepsToBattle = Enumerable.Range(0, Seeds).Select(seed => WalkUntilBattle(catalog, seed)).ToList();

@@ -1,15 +1,19 @@
 namespace Jrpg.Data.Tests.Content;
 
 /// <summary>
-/// A copy of the repository's content JSON in a temporary folder, so a test can break one file and prove the loader
-/// refuses it by name without touching the shared content. Deleted with the test.
+/// A copy of a content root (the test world, ADR 0037, or the repository's) in a temporary folder, so a test can break
+/// one file and prove the loader refuses it by name without touching the shared content. Deleted with the test.
 /// </summary>
 internal sealed class CopiedContentRoot : IDisposable
 {
-    public CopiedContentRoot(string purpose)
+    /// <param name="purpose">Names the temporary folder.</param>
+    /// <param name="sourceFolder">
+    /// The content root copied, under the test output: the test world, or the repository's content.
+    /// </param>
+    public CopiedContentRoot(string purpose, string sourceFolder)
     {
         Path = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"jrpg-{purpose}-{Guid.NewGuid():N}");
-        var source = System.IO.Path.Combine(AppContext.BaseDirectory, "content");
+        var source = System.IO.Path.Combine(AppContext.BaseDirectory, sourceFolder);
         foreach (var file in Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories))
         {
             var target = System.IO.Path.Combine(Path, System.IO.Path.GetRelativePath(source, file));

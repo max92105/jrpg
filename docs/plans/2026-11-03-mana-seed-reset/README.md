@@ -52,7 +52,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **T1. The test world: today's maps, tiles, sheets, objects, new game and tilesheet images frozen in `tests/TestWorld/`, overlaid on the live content in each test output** (props + Data test, about 70 lines plus the copied files) → [slices/T1.md](slices/T1.md)
 - [x] **T2a. Game tests on the test world** (tests only, mechanical, about 70 lines) → [slices/T2a.md](slices/T2a.md)
 - [x] **T2b. Editor tests on the test world; the deleted tilesheets staged** (tests only, mechanical, about 100 lines) → [slices/T2b.md](slices/T2b.md)
-- [ ] **T2c. Data tests and the encounter-rate simulation on the test world; the cell-pinned new game tests move there** (tests only, about 150 lines) → [slices/T2c.md](slices/T2c.md)
+- [x] **T2c. Data tests and the encounter-rate simulation on the test world; the cell-pinned new game tests move there** (tests only, about 150 lines) → [slices/T2c.md](slices/T2c.md)
 
 ### Phase 2: the cell pins restated
 - [ ] **R1. The intros end with a warp to the start map, which has a door into an interior and an exit to a map with random battles, with no cell named** (Data tests, about 70 lines) → [slices/R1.md](slices/R1.md)

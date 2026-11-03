@@ -12,7 +12,7 @@ namespace Jrpg.Data.Tests.Content;
 // quests are saved with the other catalogs, checked against every map (decision 394).
 public sealed class ContentWriterQuestTests : IDisposable
 {
-    private readonly CopiedContentRoot _content = new("writer-quests");
+    private readonly CopiedContentRoot _content = new("writer-quests", "test-world");
     private readonly ContentCatalog _catalog;
     private readonly ContentWriter _writer;
 

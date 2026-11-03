@@ -14,12 +14,12 @@ using Jrpg.Data.Content;
 namespace Jrpg.Data.Tests.Saving;
 
 /// <summary>
-/// The saves the store and repair tests share. Both saves fit the repository content, so reading or repairing them
+/// The saves the store and repair tests share. Both saves fit the test world (ADR 0037), so reading or repairing them
 /// unchanged reports nothing.
 /// </summary>
 internal static class SaveGameFixtures
 {
-    public static readonly ContentCatalog Catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+    public static readonly ContentCatalog Catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
     /// <summary>The save the store tests write and read back.</summary>
     public static readonly SaveGame StoredSave = new()
@@ -63,7 +63,7 @@ internal static class SaveGameFixtures
         Quests = [],
     };
 
-    /// <summary>The repository content with a one-affix pool: "power", +2..5 Power on weapons and rings.</summary>
+    /// <summary>The test world with a one-affix pool: "power", +2..5 Power on weapons and rings.</summary>
     public static readonly ContentCatalog CatalogWithPowerAffix = Catalog with
     {
         Affixes = new Dictionary<string, AffixDefinition>

@@ -97,7 +97,7 @@ public sealed class EnemyTacticsValidatorTests
     [Fact]
     public void Load_EnemyWithTactics_ReadsTheActions()
     {
-        using var content = new CopiedContentRoot("enemy-tactics");
+        using var content = new CopiedContentRoot("enemy-tactics", "test-world");
         content.Replace(
             "skills.json",
             "\"id\": \"fire_blast\"",
@@ -151,7 +151,7 @@ public sealed class EnemyTacticsValidatorTests
     [Fact]
     public void Load_ActionWithACondition_ReadsTheConditionKind()
     {
-        using var content = new CopiedContentRoot("enemy-condition");
+        using var content = new CopiedContentRoot("enemy-condition", "test-world");
         content.Replace(
             "enemies.json",
             "\"id\": \"goblin\",",

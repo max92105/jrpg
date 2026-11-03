@@ -7,7 +7,7 @@ namespace Jrpg.Data.Tests.Content;
 // a copy of the content with an unknown quest kind proves the loader refuses the file by name.
 public sealed class ContentCatalogLoaderQuestTests : IDisposable
 {
-    private readonly CopiedContentRoot _content = new("quests");
+    private readonly CopiedContentRoot _content = new("quests", "test-world");
 
     public void Dispose() => _content.Dispose();
 

@@ -16,7 +16,7 @@ public sealed class ContentWriterShopTests : IDisposable
 
     public ContentWriterShopTests()
     {
-        var source = Path.Combine(AppContext.BaseDirectory, "content");
+        var source = Path.Combine(AppContext.BaseDirectory, "test-world");
         foreach (var file in Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories))
         {
             var target = Path.Combine(_contentRoot, Path.GetRelativePath(source, file));

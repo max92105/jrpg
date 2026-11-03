@@ -9,7 +9,7 @@ using static Jrpg.Data.Tests.Saving.SaveGameFixtures;
 namespace Jrpg.Data.Tests.Saving;
 
 /// <summary>
-/// Repairs the inventory, the location and the world's events and swaps of a save against the repository content:
+/// Repairs the inventory, the location and the world's events and swaps of a save against the test world (ADR 0037):
 /// potions stack to 99.
 /// </summary>
 public sealed class SaveGameRepairInventoryTests

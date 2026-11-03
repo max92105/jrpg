@@ -19,7 +19,7 @@ public sealed class ContentCatalogLoaderSkillSoundTests
     [Fact]
     public void Load_SkillWithoutASound_ThrowsNamingTheSkillAndField()
     {
-        using var content = new CopiedContentRoot("skill-sound");
+        using var content = new CopiedContentRoot("skill-sound", "test-world");
         content.Replace("skills.json", "\"soundFile\": \"PlaceholderSkillFire.wav\",", "");
 
         var exception = Assert.Throws<ContentValidationException>(() => ContentCatalogLoader.Load(content.Path));

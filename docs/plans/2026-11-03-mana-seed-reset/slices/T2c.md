@@ -23,3 +23,5 @@ Moved, not new: `TestWorldNewGameTests: StartNew_TestWorld_SkippedIntroWarpsToTh
 
 ## Verify by hand
 - Temporarily move the forest's exit cell event in `content/map-layouts/start.json` one cell down: the Data tests and simulations pass. Revert.
+
+- **Done, with deviations:** Data tests 640 before, 641 after (the `to_aslas_1` case); simulations 43 and 43. `Maps/MapFolderReaderTests` loads no content folder, and the save repair tests pin only the map id, so they stay; `SaveGameFixtures` switched, since its saves stand on the start map's cells. `ContentCatalogLoaderShopTests` and `ContentCatalogLoaderCraftingTests` stay on `content` (shops and crafting only). The repository tests of `ContentCatalogLoaderTests` that pin only map ids (`OnlyTheForestHasRandomBattles`, the rest event, the forest's resistant enemy) stay.

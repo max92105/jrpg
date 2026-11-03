@@ -7,7 +7,7 @@ namespace Jrpg.Data.Tests.Content;
 // A map's track in its settings file (decision 419): written when it has one, left out when it hasn't.
 public sealed class ContentWriterMusicTests : IDisposable
 {
-    private readonly CopiedContentRoot _content = new("writer-music");
+    private readonly CopiedContentRoot _content = new("writer-music", "test-world");
     private readonly ContentCatalog _catalog;
     private readonly ContentWriter _writer;
 

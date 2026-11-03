@@ -92,3 +92,4 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 - A screen → `Jrpg.Game/<Feature>`; its tests in `tests/Jrpg.Game.Tests/<Feature>`.
 - Text the player reads → `content/text/ui.json` and `Ui/MessageIds`.
 - A design decision → `docs/decisions/README.md`; a feature's plan → `docs/plans/README.md`.
+- A map a test walks → `tests/TestWorld` (frozen, ADR 0037); what the repository must hold → the repository tests on `content`.

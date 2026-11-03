@@ -45,11 +45,11 @@ Drafted on 2026-11-03 from the developer's request: every system is in, the next
 One line per slice; each slice's goal, types, tests and hand checks are in its file under `slices/`. Tick the box here when a slice is done, and write its deviations in the slice file. Tunables, design overview and risks: [design.md](design.md).
 
 ### Step 0: before any slice
-- [ ] **S0. The developer** moves `content/art/tilesheets/Forest Autumn/` out of the repository (to `C:\git_perso\art-packs\mana-seed\Forest Autumn\` or anywhere outside it, copied to both PCs), and runs `git restore content/art/tilesheets/` so the 23 deleted sheets are back until T2b stages their deletion. Nothing to commit.
+- [x] **S0. The developer** moves `content/art/tilesheets/Forest Autumn/` out of the repository (to `C:\git_perso\art-packs\mana-seed\Forest Autumn\` or anywhere outside it, copied to both PCs), and runs `git restore content/art/tilesheets/` so the 23 deleted sheets are back until T2b stages their deletion. Nothing to commit.
 
 ### Phase 1: tests off the old maps
-- [ ] ADR 0037: tests run on a frozen test world. Write it from the entry under "ADRs" below (decision 446).
-- [ ] **T1. The test world: today's maps, tiles, sheets, objects, new game and tilesheet images frozen in `tests/TestWorld/`, overlaid on the live content in each test output** (props + Data test, about 70 lines plus the copied files) → [slices/T1.md](slices/T1.md)
+- [x] ADR 0037: tests run on a frozen test world. Write it from the entry under "ADRs" below (decision 446).
+- [x] **T1. The test world: today's maps, tiles, sheets, objects, new game and tilesheet images frozen in `tests/TestWorld/`, overlaid on the live content in each test output** (props + Data test, about 70 lines plus the copied files) → [slices/T1.md](slices/T1.md)
 - [ ] **T2a. Game tests on the test world** (tests only, mechanical, about 70 lines) → [slices/T2a.md](slices/T2a.md)
 - [ ] **T2b. Editor tests on the test world; the deleted tilesheets staged** (tests only, mechanical, about 100 lines) → [slices/T2b.md](slices/T2b.md)
 - [ ] **T2c. Data tests and the encounter-rate simulation on the test world; the cell-pinned new game tests move there** (tests only, about 150 lines) → [slices/T2c.md](slices/T2c.md)

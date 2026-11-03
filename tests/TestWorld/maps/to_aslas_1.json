@@ -1,0 +1,13 @@
+{
+  "id": "to_aslas_1",
+  "displayName": "to_Aslas_1",
+  "musicFile": "PlaceholderForest.wav",
+  "randomEncounters": {
+    "oneInSteps": 15,
+    "graceSteps": 5,
+    "encounterIds": [
+      "goblin_chief",
+      "goblin_trio"
+    ]
+  }
+}

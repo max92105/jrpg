@@ -1,0 +1,39 @@
+{
+  "leaderChoices": [
+    { "memberId": "ragnir" },
+    { "memberId": "omer" },
+    { "memberId": "zanyr" },
+    { "memberId": "lazarus" },
+    { "memberId": "jazog" },
+    { "memberId": "teelle" },
+    { "memberId": "zaruk" },
+    { "memberId": "sarxian" },
+    { "memberId": "thaali" }
+  ],
+  "startingItems": [
+    { "itemId": "potion", "quantity": 5 },
+    { "itemId": "hi_potion", "quantity": 2 },
+    { "itemId": "elixir", "quantity": 1 },
+    { "itemId": "bomb", "quantity": 3 },
+    { "itemId": "bomb_all", "quantity": 3 },
+    { "itemId": "revive_feather", "quantity": 3 },
+    { "itemId": "camp_kit", "quantity": 1 },
+    { "itemId": "bronze_sword", "quantity": 2 },
+    { "itemId": "iron_sword", "quantity": 1 },
+    { "itemId": "magic_staff", "quantity": 3 },
+    { "itemId": "leather_armor", "quantity": 2 },
+    { "itemId": "chain_mail", "quantity": 3 },
+    { "itemId": "wizard_robe", "quantity": 1 },
+    { "itemId": "wooden_shield", "quantity": 1 },
+    { "itemId": "leather_cap", "quantity": 1 },
+    { "itemId": "leather_gloves", "quantity": 1 },
+    { "itemId": "leather_boots", "quantity": 1 },
+    { "itemId": "amber_amulet", "quantity": 1 },
+    { "itemId": "power_ring", "quantity": 1 },
+    { "itemId": "sage_ring", "quantity": 1 },
+    { "itemId": "swift_ring", "quantity": 1 }
+  ],
+  "startLocation": { "mapId": "intro", "position": { "x": 2.5, "y": 2.5 }, "facing": "down" },
+  "fieldSpriteFile": "player.png",
+  "startingGold": 100
+}

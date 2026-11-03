@@ -1,0 +1,21 @@
+<Project>
+  <!--
+    The test world (ADR 0037): a whole content root, test-world/, in the test output. The live content/ without its map
+    side, then the frozen map side from this folder. A test that walks a map loads test-world; a test of what the
+    repository holds loads content.
+  -->
+  <PropertyGroup>
+    <!-- Normalized first: a glob that starts at $(MSBuildThisFileDirectory) and then goes up with ".." expands to nothing. -->
+    <LiveContentDir>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '..', '..', 'content'))</LiveContentDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(LiveContentDir)**"
+          Exclude="$(LiveContentDir)maps\**;$(LiveContentDir)map-layouts\**;$(LiveContentDir)tiles.json;$(LiveContentDir)tilesheets.json;$(LiveContentDir)objects.json;$(LiveContentDir)new-game.json;$(LiveContentDir)art\tilesheets\**"
+          LinkBase="test-world"
+          CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(MSBuildThisFileDirectory)**"
+          Exclude="$(MSBuildThisFileDirectory)README.md;$(MSBuildThisFileDirectory)TestWorld.props"
+          LinkBase="test-world"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

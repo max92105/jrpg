@@ -19,4 +19,6 @@
     <None Update="TestContent\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <Import Project="..\TestWorld\TestWorld.props" />
+
 </Project>

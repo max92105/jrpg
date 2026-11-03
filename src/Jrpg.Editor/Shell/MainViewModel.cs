@@ -69,6 +69,7 @@ internal sealed partial class MainViewModel : ObservableObject
             var images = new SheetImages(() => [.. ArtFolders.TilesheetImagesIn(ArtRoot).Where(_sheetImageSizes.IsReadable)], _sheetImageSizes.SizeOf);
             Painting = new TilePaintingViewModel(Content, Layer, images, confirm);
             Marking = new WalkabilityMarking(Content, Painting.Browser);
+            Animating = new TileAnimationViewModel(Content, Painting.Browser, images);
             Removal = new SheetRemoval(Content, Painting.Browser, () => CurrentMap, _writer);
             Content.PropertyChanged += OnContentChanged;
             // The purge wrote the content at once: the open map shows it from the written content, with no history,
@@ -126,6 +127,9 @@ internal sealed partial class MainViewModel : ObservableObject
 
     /// <summary>Null when the content or its art didn't load.</summary>
     public WalkabilityMarking? Marking { get; }
+
+    /// <summary>The Animate panel (decision 467); null when the content didn't load.</summary>
+    public TileAnimationViewModel? Animating { get; }
 
     /// <summary>Remove sheet in the Tiles panel (decision 443); null when the content didn't load.</summary>
     public SheetRemoval? Removal { get; }

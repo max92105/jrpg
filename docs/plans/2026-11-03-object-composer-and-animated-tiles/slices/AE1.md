@@ -28,3 +28,5 @@ Size: about 70 lines of code, 10 tests and rows (about 180).
 
 ## Verify by hand
 Nothing to see yet (AE2).
+
+- **Done, with deviations:** `IsOpen` is read from `Cell` (null while closed); `PreviewCellAt` throws while closed; one test more, `PreviewCellAt_WithAProblem_IsTheOpenedCell`; `CanOpen_CellOfASetUpSheet_IsTrueAndRaised` also checks the notification. The "sheet with its image" query is the second of its kind (`CanvasPainting.PaintAt` holds the other, in `Objects/Composing`, which `Tiles` doesn't reference); a third would move it onto `TileBrowserViewModel`. From the review: the column bound subtracts (a count near the int limit wrapped the sum), `Close` has its test, and the panel closes when its sheet leaves the catalog (an undone Set up, Remove sheet), so the preview never reads a missing sheet.

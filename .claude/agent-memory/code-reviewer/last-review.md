@@ -5,12 +5,15 @@ metadata:
   type: project
 ---
 
-Plan: 2026-11-03-object-composer-and-animated-tiles, slice AI2 (AnimationImport, SetTileAnimations). Round 1.
-Verdict: Ready to commit.
+Plan: 2026-11-03-object-composer-and-animated-tiles, slice AE1 (TileAnimationViewModel). Round 1.
+Verdict: Fix the Criticals, then commit.
 
-- open (Warning): AnimationImport.Apply picks MinBy(id) among sheets sharing the image, then refuses on its cut even
-  when another sheet on that image has the .tsx's cut (SheetChoices allows several sheets per image); untested
-- open (Suggestion): "Animated 1 tiles of x." for a single animated tile
-- open (Follow-up): TiledTileset.Columns is set by the reader but read nowhere (AI1 code)
-- fixed: all AI1 findings (duration/columns 0 now PositiveNumberOf, throws tested, "animated twice" refusal,
-  empty animation message, map.md stray space)
+- open (Critical): ProblemOf `cell.Column + frames > columns` overflows (column 3, frames 2147483647 -> no problem);
+  write `frames > columns - cell.Column`, add a row
+- open (Critical): Close and IsOpen have no test; add Close_OpenPanel_IsNotOpen (IsOpen false, Cell null)
+- open (Warning): panel stays open when its sheet leaves the catalog (Ctrl+Z of Set up, Remove sheet); Problem and
+  PreviewCellAt then throw KeyNotFoundException; close on catalog change or record for AE2
+- open (Suggestion): CanOpen's SheetChoices notify arm untested
+- open (Follow-up): ArtReferenceCheck.LastFrameColumn overflows the same way for a hand-edited frameCount
+- fixed (AI2): MinBy sheet pick now tries every sheet on the image for a matching cut; "1 tile" singular;
+  TiledTileset.Columns removed

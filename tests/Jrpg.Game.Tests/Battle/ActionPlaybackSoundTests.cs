@@ -12,7 +12,7 @@ namespace Jrpg.Game.Tests.Battle;
 [Collection(RepositoryScreenText.CollectionName)]
 public sealed class ActionPlaybackSoundTests
 {
-    private readonly Combatant _goblin = Combatant.FromEnemy(StartMapScenarios.RepositoryContent.Enemies["goblin"]);
+    private readonly Combatant _goblin = Combatant.FromEnemy(StartMapScenarios.TestWorld.Enemies["goblin"]);
 
     [Fact]
     public void Start_DamageLanded_SoundsTheHit()
@@ -40,7 +40,7 @@ public sealed class ActionPlaybackSoundTests
     [Fact]
     public void Start_TwoFallsOnTwoDefeatBeats_SoundsEachAtItsOwn()
     {
-        var caster = Combatant.FromEnemy(StartMapScenarios.RepositoryContent.Enemies["goblin"]);
+        var caster = Combatant.FromEnemy(StartMapScenarios.TestWorld.Enemies["goblin"]);
         var playback = ActionPlayback.Start(
             [
                 new ActionStarted(caster, new AttackCommand(_goblin)),
@@ -60,7 +60,7 @@ public sealed class ActionPlaybackSoundTests
     [Fact]
     public void Start_TicksOnTwoTickBeats_SoundsEachAtItsOwn()
     {
-        var actor = Combatant.FromEnemy(StartMapScenarios.RepositoryContent.Enemies["goblin"]);
+        var actor = Combatant.FromEnemy(StartMapScenarios.TestWorld.Enemies["goblin"]);
         var playback = ActionPlayback.Start(
             [
                 new ActionStarted(actor, new AttackCommand(_goblin)),

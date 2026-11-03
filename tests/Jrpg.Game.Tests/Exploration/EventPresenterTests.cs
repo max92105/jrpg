@@ -246,10 +246,10 @@ public sealed class EventPresenterTests
         Assert.Equal(1f, presenter.Blackness);
     }
 
-    // A new game on the repository's content: Ragnir's intro opens with the voice, then three stills, then a warp.
+    // A new game on the test world's content: Ragnir's intro opens with the voice, then three stills, then a warp.
     private static (ExplorationState Exploration, EventPresenter Presenter, VoiceChannel Voice) StartIntro()
     {
-        var exploration = GameSession.StartNew(StartMapScenarios.RepositoryContent, "ragnir", new SeededRandom(1)).Exploration;
+        var exploration = GameSession.StartNew(StartMapScenarios.TestWorld, "ragnir", new SeededRandom(1)).Exploration;
         var voice = new VoiceChannel();
         return (exploration, new EventPresenter(exploration, new EventLook(RepositoryScreenText.Text, new UiTextures()), new PlayerSettings(), voice), voice);
     }

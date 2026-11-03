@@ -126,7 +126,7 @@ public sealed class EventPresenterFadeSoundTests
     // than the warp's 0.08 s hold at black would jump over it and fade twice.
     private static List<string> SoundsThroughTheIntro(Func<EventPresenter, InputFrame> inputFor)
     {
-        var exploration = GameSession.StartNew(StartMapScenarios.RepositoryContent, "ragnir", new SeededRandom(1)).Exploration;
+        var exploration = GameSession.StartNew(StartMapScenarios.TestWorld, "ragnir", new SeededRandom(1)).Exploration;
         var presenter = NewPresenter(exploration);
         var asked = new List<string>();
         for (var update = 0; update < 5000 && exploration.CurrentMap.Id == "intro"; update++)

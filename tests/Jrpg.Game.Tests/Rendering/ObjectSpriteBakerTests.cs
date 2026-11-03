@@ -9,7 +9,7 @@ namespace Jrpg.Game.Tests.Rendering;
 
 public sealed class ObjectSpriteBakerTests
 {
-    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
     [Fact]
     public void CanopyPixels_TopHalfZone_CopiesTopRowsAndClearsTheRest()
@@ -28,7 +28,7 @@ public sealed class ObjectSpriteBakerTests
     }
 
     [Fact]
-    public void CanopyPixels_RepositoryTree_HasSomeCanopyAndSomeClearPixels()
+    public void CanopyPixels_TestWorldTree_HasSomeCanopyAndSomeClearPixels()
     {
         var tree = _catalog.Objects["tree"];
 

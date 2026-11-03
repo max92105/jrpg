@@ -5,7 +5,7 @@ using Jrpg.Game.Tests.Exploration;
 namespace Jrpg.Game.Tests.Menus;
 
 // Every menu list's pointer glides between its entries (decision 262): the category rail, the member column, the Party
-// page's cards and the Inventory's sidebar. On the repository's start with the whole party: Sarxian leads alone.
+// page's cards and the Inventory's sidebar. On the test world's start with the whole party: Sarxian leads alone.
 public sealed class MenuListMotionTests
 {
     private static readonly TimeSpan _glideDone = TimeSpan.FromSeconds(1);

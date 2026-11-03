@@ -7,10 +7,10 @@ namespace Jrpg.Game.Tests.Rendering;
 
 public sealed class TileAtlasTests
 {
-    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
     [Fact]
-    public void ImageOf_EveryRepositoryTile_IsACellOfItsSheet()
+    public void ImageOf_EveryTestWorldTile_IsACellOfItsSheet()
     {
         var atlas = new TileAtlas(_catalog);
 

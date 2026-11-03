@@ -14,7 +14,7 @@ public sealed class BattleSoundsTests
 {
     private static readonly TimeSpan _impact = StartOf(PlaybackBeatKind.Impact);
 
-    private readonly Combatant _goblin = Combatant.FromEnemy(StartMapScenarios.RepositoryContent.Enemies["goblin"]);
+    private readonly Combatant _goblin = Combatant.FromEnemy(StartMapScenarios.TestWorld.Enemies["goblin"]);
 
     [Fact]
     public void Of_DamageLanded_IsTheHitAtTheImpactsStart()
@@ -163,7 +163,7 @@ public sealed class BattleSoundsTests
     [Fact]
     public void Of_ItemUsed_IsTheItemSound()
     {
-        var potion = StartMapScenarios.RepositoryContent.Items["potion"];
+        var potion = StartMapScenarios.TestWorld.Items["potion"];
 
         Assert.Equal([new TimedSound(UiSoundFiles.Battle.ItemUse, TimeSpan.Zero)], SoundsOf(new ActionStarted(_goblin, new ItemCommand(potion, [_goblin]))));
     }

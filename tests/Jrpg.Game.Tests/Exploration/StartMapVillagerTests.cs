@@ -5,7 +5,7 @@ using Jrpg.Core.Maps;
 
 namespace Jrpg.Game.Tests.Exploration;
 
-/// <summary>The start map's villager (ADR 0015), an NPC placed in the repository's content.</summary>
+/// <summary>The start map's villager (ADR 0015), an NPC placed in the test world's content.</summary>
 public sealed class StartMapVillagerTests
 {
     [Fact]

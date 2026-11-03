@@ -18,3 +18,5 @@ None new: the guard is the Game test count before and after (state both in the D
 
 ## Verify by hand
 - Temporarily move a placed object in `content/map-layouts/start.json` (the shopkeeper), run the Game tests: they pass. Revert.
+
+- **Done, with deviations:** 1390 Game tests before and after, every one passing. `Battle/BattleScenarios` stays on `content`: it reads enemies, skills, rules and members, never the map side, so the battle screen's tests keep following the live balance. The leader choice, inventory filter and quest detail tests stay for the same reason. Switched: `StartMapScenarios` (renamed `TestWorld`, 8 call sites), `GameFlowTests`, `TileAtlasTests`, `ObjectSpriteBakerTests`.

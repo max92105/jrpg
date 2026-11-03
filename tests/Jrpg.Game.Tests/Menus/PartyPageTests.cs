@@ -9,7 +9,9 @@ using static Jrpg.Game.Tests.Input.InputFrames;
 
 namespace Jrpg.Game.Tests.Menus;
 
-/// <summary>On the repository's new game: Sarxian leads alone, six recruits wait in the reserve, and four can be active.</summary>
+/// <summary>
+/// On the test world's new game: Sarxian leads alone, six recruits wait in the reserve, and four can be active.
+/// </summary>
 [Collection(RepositoryScreenText.CollectionName)]
 public sealed class PartyPageTests
 {

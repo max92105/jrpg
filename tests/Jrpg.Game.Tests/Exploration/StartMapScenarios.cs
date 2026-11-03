@@ -19,17 +19,17 @@ using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Tests.Exploration;
 
-/// <summary>The repository's content with the new game starting at a chosen place on the start map.</summary>
+/// <summary>The test world (ADR 0037) with the new game starting at a chosen place on its start map.</summary>
 internal static class StartMapScenarios
 {
     // Declared first: the catalogs below are built from it, in declaration order.
-    /// <summary>The repository's content, as loaded.</summary>
-    public static ContentCatalog RepositoryContent { get; } =
-        ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+    /// <summary>The test world, as loaded: the live systems under the frozen maps.</summary>
+    public static ContentCatalog TestWorld { get; } =
+        ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
     /// <summary>
     /// Where every intro ends: the center of the start map's cell (10, 3), facing down. Tests that play past the title
-    /// start here, since the repository's new game starts on the intro map with the leader's cutscene running (decision
+    /// start here, since the test world's new game starts on the intro map with the leader's cutscene running (decision
     /// 185).
     /// </summary>
     public static ContentCatalog AfterTheIntro { get; } = StartingAt(new Point2D(10.5, 3.5), Facing.Down);
@@ -148,9 +148,9 @@ internal static class StartMapScenarios
         return false;
     }
 
-    private static ContentCatalog StartingAt(Point2D position, Facing facing) => RepositoryContent with
+    private static ContentCatalog StartingAt(Point2D position, Facing facing) => TestWorld with
     {
-        NewGame = RepositoryContent.NewGame with { StartLocation = new MapLocation("start", position, facing) },
+        NewGame = TestWorld.NewGame with { StartLocation = new MapLocation("start", position, facing) },
     };
 
     private static ContentCatalog WithForestAlwaysRolling(ContentCatalog catalog)

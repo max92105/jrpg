@@ -19,7 +19,7 @@ namespace Jrpg.Game.Tests.Flow;
 [Collection(RepositoryScreenText.CollectionName)]
 public sealed class GameFlowTests : IDisposable
 {
-    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
     private static readonly InputFrame _holdingRight =
         new(MoveIntent.FromAxes(1, 0), ButtonSet.Empty.With(GameButton.Right), ButtonSet.Empty);
@@ -120,7 +120,7 @@ public sealed class GameFlowTests : IDisposable
     }
 
     [Fact]
-    public void Update_RepositoryIntroSkipped_LandsOnTheStartMap()
+    public void Update_TestWorldIntroSkipped_LandsOnTheStartMap()
     {
         var flow = FlowWithLeaderConfirmed(catalog: _catalog);
         flow.Update(WholeFade, default);

@@ -36,7 +36,7 @@ public sealed class CanvasPaintingTests : IDisposable
         Assert.False(painting.CanUndo);
     }
 
-    // A city cell chosen with City.png gone: Replace cells refused it the same way.
+    // A city cell chosen with City.png gone (decision 442).
     [Fact]
     public void PaintAt_CellsOfASheetWithoutItsImage_ChangesNothing()
     {

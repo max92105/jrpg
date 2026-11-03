@@ -93,8 +93,8 @@
         <MenuItem Header="Edit shapes..." Click="OnEditShapesClicked" IsEnabled="{Binding Placing.CanEditShapes, FallbackValue=False}" />
         <MenuItem Header="New object..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" ToolTip="Paint an object in the composer from cells of any sheet; a rectangle chosen in the Tiles panel starts it." />
         <MenuItem Header="New NPC..." Click="OnNewNpcClicked" IsEnabled="{Binding CanStartNewNpc}" />
-        <!-- Keeps the object's id, events and placements, so the chest and the doors keep working with new art (decision 449). -->
-        <MenuItem Header="Replace cells of the chosen object" Command="{Binding Reskinning.ReskinCommand}" ToolTip="The object chosen in the Objects panel takes the cells chosen in the Tiles panel; Ctrl+Z puts the old cells back." />
+        <!-- Keeps the object's id, outline, zones, events and placements, so the doors keep working with new art (decision 449). -->
+        <MenuItem Header="Edit object..." Click="OnEditObjectClicked" IsEnabled="{Binding Composing.CanEdit, FallbackValue=False}" ToolTip="Repaint the chosen object; its id, outline, zones, placements and events stay. Ctrl+Z puts the old picture back." />
       </MenuItem>
       <MenuItem Header="Quests">
         <MenuItem Header="Edit quests..." Click="OnEditQuestsClicked" IsEnabled="{Binding HasQuestEditing}" />
@@ -165,6 +165,7 @@
       <ToolBar Band="0" BandIndex="2" Style="{StaticResource ObjectsBand}">
         <Button Content="Edit shapes..." Click="OnEditShapesClicked" IsEnabled="{Binding Placing.CanEditShapes, FallbackValue=False}" />
         <Button Content="New object..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" />
+        <Button Content="Edit object..." Click="OnEditObjectClicked" IsEnabled="{Binding Composing.CanEdit, FallbackValue=False}" />
         <Button Content="New NPC..." Click="OnNewNpcClicked" IsEnabled="{Binding CanStartNewNpc}" />
       </ToolBar>
     </ToolBarTray>

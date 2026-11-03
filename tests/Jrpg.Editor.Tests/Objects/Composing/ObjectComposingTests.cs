@@ -105,6 +105,21 @@ public sealed class ObjectComposingTests : IDisposable
         Assert.Null(viewModel.Composing.StartEdit());
     }
 
+    // A new object nothing uses yet, so Remove takes it out (decision 443).
+    [Fact]
+    public void CanEdit_AfterTheChosenObjectIsRemoved_IsFalse()
+    {
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
+        _content.ChooseTwoCellsNotTiles(viewModel);
+        EditorTestContent.ComposeObject(viewModel, "tree_4");
+        Assert.True(viewModel.Composing!.CanEdit);
+
+        viewModel.Placing!.Browser.RemoveSelectedCommand.Execute(null);
+
+        Assert.False(viewModel.Catalog!.Objects.ContainsKey("tree_4"));
+        Assert.False(viewModel.Composing.CanEdit);
+    }
+
     [Fact]
     public void TryApply_EditWithNoChange_KeepsTheStoredObjectChosen()
     {

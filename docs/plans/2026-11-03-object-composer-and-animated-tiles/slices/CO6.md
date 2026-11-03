@@ -29,3 +29,5 @@ The repository's chest went with the old art (commit 7e2d1b94), so the check use
 - Give the placed `composer_check` a talk event in the Events tab and save the map. Choose `composer_check` in the Objects panel, Objects > Edit object...: its cells show on the canvas, its id is fixed. Repaint one cell with a part from another sheet, Save: the placed copy shows it and still has its event (Events tab; in the game, interacting still talks). Edit again, add a column, Save: the Shapes window opens with the outline stretched; adjust, OK. Ctrl+Z twice in the main window: the outline, then the old picture come back.
 - Choose an NPC: Edit object is greyed. The Objects menu no longer lists Replace cells.
 - Remove `composer_check` (its placement first, then Remove in the Objects panel) and save, unless the developer keeps it.
+
+- **Done, with deviations:** F1 also lists Objects > Edit object (a menu entry, as Edit shapes is listed). Edit opens through CO5's `Compose` step, so its Shapes window follows only a size change.

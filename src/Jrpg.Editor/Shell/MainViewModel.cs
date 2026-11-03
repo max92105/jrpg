@@ -76,7 +76,6 @@ internal sealed partial class MainViewModel : ObservableObject
             Content.Rewriting += (_, written) => CurrentMap = CurrentMap is { } open ? new MapViewModel(written.Maps[open.Map.Id]) : null;
             History = new CombinedHistory(Content);
             Placing = new ObjectPlacingViewModel(Content, Layer);
-            Reskinning = new ObjectReskinning(Content, Placing.Browser, Painting.Browser);
             Composing = new ObjectComposing(Content, Placing.Browser, Painting.Browser);
             EventEditing = new EventEditingViewModel(Content) { MapIds = MapIds };
             QuestEditing = new QuestEditingViewModel(Content);
@@ -129,11 +128,6 @@ internal sealed partial class MainViewModel : ObservableObject
 
     /// <summary>Remove sheet in the Tiles panel (decision 443); null when the content didn't load.</summary>
     public SheetRemoval? Removal { get; }
-
-    /// <summary>
-    /// Objects > Replace cells of the chosen object (decision 449); null when the content didn't load.
-    /// </summary>
-    public ObjectReskinning? Reskinning { get; }
 
     /// <summary>Objects > New object and Edit object (decision 455); null when the content didn't load.</summary>
     public ObjectComposing? Composing { get; }

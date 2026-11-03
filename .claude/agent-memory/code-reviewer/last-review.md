@@ -5,13 +5,11 @@ metadata:
   type: project
 ---
 
-Plan: 2026-11-03-object-composer-and-animated-tiles, slice CO5 (ObjectComposerWindow, New object opens it). Round 1.
-Verdict: Fix the Criticals, then commit.
+Plan: 2026-11-03-object-composer-and-animated-tiles, slice CO6 (Objects > Edit object; Replace cells leaves). Round 1.
+Verdict: Ready to commit.
 
-- open (Critical): ObjectComposerWindow focuses IdBox on Loaded and the canvas Image takes no focus, so Ctrl+Z/Ctrl+Y
-  reach the TextBox's own undo (typed id reverts, stroke stays); fix: Focusable canvas + Focus() in OnCanvasPressed
-- open (Suggestion): MainViewModel.cs:242-243 double blank line left where CreateObject was removed
-- open (Suggestion): docs/plans/backlog.md:24 still names CreateObject_* / CanStartNewObject_* tests (removed/renamed)
-- open (Follow-up): TileBrowserView.OnDataContextChanged keeps _cut subscribed when DataContext goes null (picker can open Cut)
+- open (Suggestion): ObjectComposingTests.cs:121 CanEdit_AfterTheChosenObjectIsRemoved_IsFalse sits among TryApply_*;
+  move it next to the other CanEdit_* tests (after line 96)
 - open (Follow-up, from CO4a): StartNew's column clip still untested (only StartNew_RectangleTallerThanMaxCells_...)
-- fixed (from CO4b): GridLines shared (MapDrawing.GridLines); TileImages field renamed _cells; Draw_CellAtTwoOne test added
+- fixed (from CO5): composer canvas takes focus on press (CanvasImage.Focus); MainViewModel double blank line gone;
+  backlog's CanStartNewObject_* name is real again (MainViewModelTests:227); TileBrowserView lets _cut go with its browser

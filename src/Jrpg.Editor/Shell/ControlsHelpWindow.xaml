@@ -64,6 +64,7 @@
         Objects > Edit shapes: open the shapes window for the one placed object selected, else the object chosen in the Objects panel.<LineBreak />
         Shift + double-click a placed object, or double-click one in the Objects panel: open its shapes.<LineBreak />
         Objects > New object: the composer; choose cells on its sheet, click or drag on the canvas to stamp them, right click or drag to erase (or the Erase toggle), Ctrl+Z and Ctrl+Y undo strokes; Save, then its shapes open.<LineBreak />
+        Objects > Edit object: the composer on the object chosen in the Objects panel (not an NPC); Save keeps its id, outline, zones, placements and events, and opens its shapes when its size changed.<LineBreak />
         Objects > New NPC: a one-cell NPC drawn from a field sprite (the placeholder by default); place it, then give it a Talk event.
       </TextBlock>
 

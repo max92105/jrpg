@@ -27,18 +27,27 @@ try { [void]$verifyLock.WaitOne() } catch [System.Threading.AbandonedMutexExcept
 # A test host left running by an interrupted run locks the DLLs and makes the next build fail.
 Get-Process -Name 'Jrpg.*.Tests', 'Jrpg.Simulations' -ErrorAction SilentlyContinue | Stop-Process -Force -ErrorAction SilentlyContinue
 
-# The C# files changed since the last commit, modified or new; deleted ones are left out.
-function Get-ChangedSourceFiles {
-    $modified = git diff --name-only HEAD -- '*.cs'
-    $added = git ls-files --others --exclude-standard -- '*.cs'
+# The files changed since the last commit, modified or new, of the given kinds; deleted ones are left out.
+function Get-ChangedFiles([string[]]$patterns) {
+    $modified = git diff --name-only HEAD -- @patterns
+    $added = git ls-files --others --exclude-standard -- @patterns
     @($modified) + @($added) | Where-Object { $_ -and (Test-Path $_) } | Sort-Object -Unique
 }
+
+function Get-ChangedSourceFiles { Get-ChangedFiles @('*.cs') }
 
 if ($Fix) {
     dotnet format $solution 2>&1 | Out-Null
     # Rewraps the changed comment blocks too, so step 7 rarely needs a second run.
     $changedForReflow = @(Get-ChangedSourceFiles)
     if ($changedForReflow) { perl .claude/scripts/reflow-comments.pl @changedForReflow 2>&1 | Out-Null }
+    # Files written by an agent's tool come with LF endings; the repository is CRLF (CLAUDE.md), written without a BOM.
+    $utf8 = New-Object System.Text.UTF8Encoding($false)
+    foreach ($file in Get-ChangedFiles @('*.cs', '*.xaml', '*.md', '*.json', '*.props', '*.csproj', '*.pl', '*.ps1')) {
+        $text = [System.IO.File]::ReadAllText($file)
+        $normalized = $text -replace "`r?`n", "`r`n"
+        if ($normalized -ne $text) { [System.IO.File]::WriteAllText($file, $normalized, $utf8) }
+    }
 }
 
 # 1. Build: warnings are errors in this repository (Directory.Build.props), so the exit code covers both. MSBuild's own
@@ -46,6 +55,10 @@ if ($Fix) {
 $build = dotnet build $solution --nologo -v q 2>&1 | Out-String
 $buildOk = $LASTEXITCODE -eq 0
 $buildLines = ($build -split "`r?`n") | Where-Object { $_ -match ': error ' } | Sort-Object -Unique | Select-Object -First 20
+# The editor started from Visual Studio locks its own DLLs; the raw copy errors hide that one cause.
+if (-not $buildOk -and $build -match 'MSB302[17]:.*Jrpg\.Editor') {
+    $buildLines = @('the editor is running (started from Visual Studio) and locks its files: close it and rerun')
+}
 Report 'build' $buildOk $buildLines
 
 # 2. Tests: names ending in _Bug are known bugs the QA agent wrote; they're reported but don't fail the step.

@@ -12,3 +12,4 @@ paths:
 - The editor never references Jrpg.Game.
 - A local or keyed style on a control the theme styles is `BasedOn="{StaticResource {x:Type X}}"`; otherwise it replaces the dark theme (`Shell/EditorTheme.xaml`, `Shell/EditorTemplates.xaml`) with the light Windows look.
 - A feature reached by a modifier gesture (Shift + drag) also gets a visible control where it is used (a button beside the panel, a menu entry); the slice's hand check says how the developer finds it, not only that it works.
+- A view model that replaces a whole catalog or map the window draws (the sheet purge's `CatalogDraft.Rewriting`) raises its event with the new value before the replacement, so listeners swap what they hold first; raised after, the window drew the old map against the new catalogs and crashed with the files already written (the reset's E3c).

@@ -1,5 +1,5 @@
 # Object composer and animated tiles
-Status: retro pending
+Status: done
 
 Drafted on 2026-11-03 from two requests the developer made while painting the first Mana Seed maps (the Mana Seed reset plan's C2):
 

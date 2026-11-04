@@ -53,6 +53,7 @@ The bar: a professional reviewer reads the diff and understands the intent from 
 - Inside Core, trust non-nullable types. Don't add null checks the compiler already guarantees.
 - Never swallow exceptions. A `catch` handles, translates with context, or isn't there.
 - Throw specific exceptions (`ArgumentOutOfRangeException`, `InvalidOperationException`), never bare `Exception`.
+- A bound on a typed or loaded count is written `count > limit - start`, never `start + count > limit`, and gets a test with `int.MaxValue` (the composer plan's AE1, AN1).
 
 ## What AI-generated code tends to add — don't
 

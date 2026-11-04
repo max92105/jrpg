@@ -213,6 +213,16 @@ foreach ($source in $changedSources) {
 Report 'changed files hold no shell quote or \x27 escape written literally' (-not $quoteHits) ($quoteHits | Select-Object -First 10)
 Report 'no member with two summaries' (-not $doubledSummaries) ($doubledSummaries | Select-Object -First 10)
 Report 'no doc comment line lost a slash' (-not $brokenDocLines) ($brokenDocLines | Select-Object -First 10)
+
+# A view's markup grows with its panels: the same 300-line limit (the composer plan's AE2 reached 309 in MainWindow.xaml).
+$lineLimit = 300
+foreach ($view in @(Get-ChangedFiles @('*.xaml'))) {
+    $viewLines = [IO.File]::ReadAllLines((Join-Path $repositoryRoot $view)).Length
+    $headLines = git show "HEAD:$view" 2>$null
+    $before = if ($LASTEXITCODE -eq 0) { @($headLines).Count } else { 0 }
+    if ($before -le $lineLimit -and $viewLines -gt $lineLimit) { $grownFiles += "${view} ($before -> $viewLines lines)" }
+}
+
 Report 'no changed file crossed 300 lines (split it)' (-not $grownFiles) ($grownFiles | Select-Object -First 10)
 
 # 12. A changed method or constructor in src declares at most 4 parameters (code-quality.md; four Draw methods slipped

@@ -7,9 +7,8 @@ using Jrpg.Editor.Maps;
 namespace Jrpg.Editor.Objects.Composing;
 
 /// <summary>
-/// The composer's canvas as a picture with its grid: each painted cell's image at the map's cell size, which the window
-/// scales to the canvas's zoom (decision 484), levels from the base up, those above the chosen one faded (decision
-/// 479).
+/// The composer's canvas as a picture with its grid: each painted cell at the map's cell size (the window scales it to
+/// the canvas's zoom, decision 484), levels from the base up, the ones above the chosen level faded (decision 479).
 /// </summary>
 internal static class ObjectCanvasDrawing
 {

@@ -1,0 +1,15 @@
+<UserControl x:Class="Jrpg.Editor.Viewport.CellZoomBar"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- Bound to a CellZoom; the buttons grey at its bounds (decision 483). -->
+  <StackPanel Orientation="Horizontal">
+    <Button Content="−" Width="28" ToolTip="Smaller cells (Ctrl + wheel down over the picture)" Command="{Binding ZoomOutCommand}" />
+    <Button Content="{Binding CellPixelsText}"
+            MinWidth="56"
+            Margin="4,0"
+            ToolTip="A cell's size on screen; click to go back to the size it opened at"
+            Command="{Binding ResetCommand}" />
+    <Button Content="+" Width="28" ToolTip="Bigger cells (Ctrl + wheel up over the picture)" Command="{Binding ZoomInCommand}" />
+  </StackPanel>
+</UserControl>

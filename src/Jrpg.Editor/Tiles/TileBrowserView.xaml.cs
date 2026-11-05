@@ -4,12 +4,13 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Jrpg.Core.Geometry;
+using Jrpg.Editor.Viewport;
 
 namespace Jrpg.Editor.Tiles;
 
 /// <summary>
-/// Shows the <see cref="TileBrowserViewModel"/>'s sheet, scaled so its cells match the map's, with the cells that are
-/// tiles marked; a click chooses the whole cell under it.
+/// Shows the <see cref="TileBrowserViewModel"/>'s sheet, its cells at the zoom's size, with the cells that are tiles
+/// marked; a click chooses the whole cell under it, Ctrl + wheel zooms toward the mouse.
 /// </summary>
 internal sealed partial class TileBrowserView : UserControl
 {
@@ -20,6 +21,11 @@ internal sealed partial class TileBrowserView : UserControl
     private (Point Pixel, Point OnView)? _press;
     private bool _isDraggingCells;
     private SheetCutViewModel? _cut;
+    private CellZoom? _zoom;
+    private double _scale = 1;
+
+    // Where Ctrl + wheel left the mouse, which the next zoom keeps in place; the viewer's center for the bar's buttons.
+    private Point? _zoomAnchor;
 
     public TileBrowserView()
     {
@@ -42,6 +48,9 @@ internal sealed partial class TileBrowserView : UserControl
         _cut?.PropertyChanged -= OnCutChanged;
         _cut = _browser?.Cut;
         _cut?.PropertyChanged += OnCutChanged;
+        _zoom?.PropertyChanged -= OnZoomChanged;
+        _zoom = _browser?.Zoom;
+        _zoom?.PropertyChanged += OnZoomChanged;
         DrawSheet();
     }
 
@@ -68,11 +77,42 @@ internal sealed partial class TileBrowserView : UserControl
         }
     }
 
+    private void OnZoomChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(CellZoom.CellPixels))
+        {
+            return;
+        }
+
+        var oldScale = _scale;
+        DrawSheet();
+        var anchor = _zoomAnchor ?? new Point(SheetScroller.ViewportWidth / 2, SheetScroller.ViewportHeight / 2);
+        _zoomAnchor = null;
+        ZoomScrolling.KeepAnchor(SheetScroller, anchor, oldScale, _scale);
+    }
+
+    // The plain wheel scrolls as before; a command at its bound doesn't run (the toolkit's Execute doesn't check).
+    private void OnSheetMouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Control) || _zoom is null)
+        {
+            return;
+        }
+
+        e.Handled = true;
+        var command = e.Delta > 0 ? _zoom.ZoomInCommand : _zoom.ZoomOutCommand;
+        if (command.CanExecute(null))
+        {
+            _zoomAnchor = e.GetPosition(SheetScroller);
+            command.Execute(null);
+        }
+    }
+
     /// <summary>Draws the shown image again; the window calls it when an import replaced its file.</summary>
     public void RedrawSheet() => DrawSheet();
 
-    // An image not set up has no cells to scale to the map's, so it shows at its own size, with no marks, or with the
-    // Cut panel's grid while it is open; the scale stays put while the cut is typed.
+    // An image not set up has no cells to scale, so it shows at the zoom over the map's cell size, with no marks, or
+    // with the Cut panel's grid while it is open; the scale stays put while the cut is typed.
     private void DrawSheet()
     {
         if (_browser?.SelectedChoice is not { IsImageMissing: false } choice || Images is null)
@@ -85,11 +125,11 @@ internal sealed partial class TileBrowserView : UserControl
         var size = new Size(image.PixelWidth, image.PixelHeight);
         var marked = _browser.Cut is { } cut ? cut.PreviewSheet : choice.Sheet;
         SheetImage.Source = image;
-        SheetMarks.Source = marked is null ? null : TilesheetMarks.Draw(marked, size, _browser.SheetTiles, _browser.MarkedCells);
+        _scale = TilesheetMarks.ShownScaleOf(choice.Sheet, _browser.Zoom);
+        SheetMarks.Source = marked is null ? null : TilesheetMarks.Draw(new ShownSheet(marked, size, _scale), _browser.SheetTiles, _browser.MarkedCells);
         SheetImage.Width = SheetMarks.Width = size.Width;
         SheetImage.Height = SheetMarks.Height = size.Height;
-        var scale = choice.Sheet is { } sheet ? TilesheetMarks.DisplayScaleOf(sheet) : 1;
-        SheetView.LayoutTransform = new ScaleTransform(scale, scale);
+        SheetView.LayoutTransform = new ScaleTransform(_scale, _scale);
     }
 
     private void OnSheetClicked(object sender, MouseButtonEventArgs e)

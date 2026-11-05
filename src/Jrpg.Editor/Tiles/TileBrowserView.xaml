@@ -1,7 +1,8 @@
 <UserControl x:Class="Jrpg.Editor.Tiles.TileBrowserView"
              x:ClassModifier="internal"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:viewport="clr-namespace:Jrpg.Editor.Viewport">
   <UserControl.Resources>
     <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
   </UserControl.Resources>
@@ -72,7 +73,10 @@
                Foreground="{StaticResource WarningTextBrush}"
                Text="Image missing: re-import it under this name or remove the sheet."
                Visibility="{Binding SelectedChoice.IsImageMissing, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}" />
-    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+    <viewport:CellZoomBar DockPanel.Dock="Top" Margin="0,0,0,4" HorizontalAlignment="Left" DataContext="{Binding Zoom}" />
+    <ScrollViewer x:Name="SheetScroller"
+                  PreviewMouseWheel="OnSheetMouseWheel"
+                  HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"
                   Background="{StaticResource ViewportBackgroundBrush}">
       <!-- Sized in the sheet's own pixels and scaled as a whole, so a click's position is a sheet pixel. -->

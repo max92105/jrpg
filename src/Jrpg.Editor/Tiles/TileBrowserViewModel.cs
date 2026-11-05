@@ -4,6 +4,8 @@ using CommunityToolkit.Mvvm.Input;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Maps;
+using Jrpg.Editor.Viewport;
 
 namespace Jrpg.Editor.Tiles;
 
@@ -53,6 +55,11 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
 
     /// <summary>How the shown image is cut; null when it isn't set up yet.</summary>
     public TilesheetDefinition? SelectedSheet => SelectedChoice?.Sheet;
+
+    /// <summary>
+    /// The sheet's zoom, the panel's for the session and shared with the composer's picker (decision 482).
+    /// </summary>
+    public CellZoom Zoom { get; } = new((int)MapDrawing.CellPixels);
 
     /// <summary>Whether the shown image has no sheet yet and no Cut panel open, so Set up can start one.</summary>
     public bool CanSetUpSheet => SelectedChoice is { Sheet: null, IsImageMissing: false } && Cut is null;

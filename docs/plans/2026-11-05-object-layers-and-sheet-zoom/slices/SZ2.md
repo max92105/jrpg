@@ -2,6 +2,8 @@
 
 Builds on design.md, "What exists" (the sheet view and its hit tests), "Key decisions" 6-8; decisions 481-483, 485 and 487.
 
+- **Done, with deviations:** `TileBrowserViewModel.Zoom` starts at `(int)MapDrawing.CellPixels` (a `double` constant; `CellZoom`'s steps are whole pixels); the wheel checks `CanExecute` before running a command, since the toolkit's `Execute` doesn't (SZ1 review); `TileBrowserZoomTests` builds its browser on the test world with every image 512 px square; `ZoomScrolling` reads both offsets before `UpdateLayout`, which clamps them to the new extent (the plan said the other order).
+
 ## Goal
 Over the sheet in the Tiles panel, a zoom bar: −, the shown cell size ("48 px"; a click goes back to 48) and +, greyed at the bounds. Ctrl + wheel over the sheet zooms toward the mouse; the plain wheel still scrolls. Clicks, drags, Mark blocked and the Cut panel's grid stay right at every size, and the marks' lines stay one screen pixel wide ("one screen pixel" is one WPF unit, a DIP: exact at 100 % Windows scaling, not at 125 % or 150 %, as today). The zoom is the panel's for the session and stays when another sheet is chosen; the composer's picker, the same view over the same view model, shares it.
 

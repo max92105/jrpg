@@ -3,13 +3,14 @@ using System.Windows.Media;
 using Jrpg.Core.Maps;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Maps;
+using Jrpg.Editor.Viewport;
 
 namespace Jrpg.Editor.Tiles;
 
 /// <summary>
 /// Drawn over a tilesheet in the tile browser: its grid, the cells that are tiles (crossed out when blocked), and the
-/// chosen cell. The browser shows a sheet's cells at the map's cell size, so line widths are set in screen pixels at that
-/// scale.
+/// chosen cell. The browser shows a sheet's cells at its zoom's size (decision 481), so line widths are set in screen
+/// pixels at the shown scale.
 /// </summary>
 internal static class TilesheetMarks
 {
@@ -17,16 +18,19 @@ internal static class TilesheetMarks
     private static readonly Brush _tileFill = Frozen(new SolidColorBrush(Color.FromArgb(0x30, 0x00, 0xFF, 0x00)));
     private static readonly Brush _blockedBrush = Frozen(new SolidColorBrush(Color.FromArgb(0xC0, 0xFF, 0x30, 0x30)));
 
-    /// <summary>How much the browser scales a sheet's image, so its cells show at the map's cell size.</summary>
-    public static double DisplayScaleOf(TilesheetDefinition sheet) => MapDrawing.CellPixels / sheet.TileWidth;
+    /// <summary>
+    /// How much the browser scales a sheet's image, so its cells show at the zoom's size; an image not set up has no
+    /// cells, so it shows at the zoom over the map's cell size, its own size at the start.
+    /// </summary>
+    public static double ShownScaleOf(TilesheetDefinition? sheet, CellZoom zoom) => zoom.ScaleFor(sheet?.TileWidth ?? MapDrawing.CellPixels);
 
-    /// <param name="sheet">How the image is cut into cells.</param>
-    /// <param name="imageSize">The image's size in its own pixels.</param>
+    /// <param name="shown">The cut the marks follow, the image's size and the view's scale.</param>
     /// <param name="tiles">The tiles cut from this sheet.</param>
     /// <param name="selected">The chosen cells, outlined if they are on this sheet: one cell solid, a rectangle dashed.</param>
-    public static DrawingImage Draw(TilesheetDefinition sheet, Size imageSize, IReadOnlyList<TileDefinition> tiles, SheetCellRectangle? selected)
+    public static DrawingImage Draw(ShownSheet shown, IReadOnlyList<TileDefinition> tiles, SheetCellRectangle? selected)
     {
-        var screenPixel = 1 / DisplayScaleOf(sheet);
+        var (sheet, imageSize, scale) = shown;
+        var screenPixel = 1 / scale;
         var gridPen = new Pen(_gridBrush, screenPixel);
         // Clipped to the image, so lines on its edges don't widen the drawing and shift it against the image.
         var drawing = new DrawingGroup { ClipGeometry = new RectangleGeometry(new Rect(imageSize)) };

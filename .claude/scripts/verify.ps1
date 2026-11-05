@@ -160,25 +160,50 @@ Report 'no retired word outside history' (-not $nameHits -and -not $textHits) (@
 $maxCommentColumns = 120
 $commentPattern = '^\s*//'
 $longComments = @()
+$addedLines = @{}
 $file = $null
 $lineNumber = 0
 foreach ($line in git diff -U0 HEAD -- '*.cs') {
-    if ($line -match '^\+\+\+ b/(.+)$') { $file = $Matches[1]; continue }
+    if ($line -match '^\+\+\+ b/(.+)$') { $file = $Matches[1]; $addedLines[$file] = @{}; continue }
     if ($line -match '^@@ -\S+ \+(\d+)') { $lineNumber = [int]$Matches[1]; continue }
     if ($line -match '^\+' -and $line -notmatch '^\+\+\+') {
         $text = $line.Substring(1).TrimEnd("`r")
         if ($text -match $commentPattern -and $text.Length -gt $maxCommentColumns) { $longComments += "${file}:$lineNumber ($($text.Length) columns)" }
+        $addedLines[$file][$lineNumber] = $true
         $lineNumber++
     }
 }
 foreach ($newFile in git ls-files --others --exclude-standard -- '*.cs') {
     $number = 0
+    $addedLines[$newFile] = @{}
     foreach ($text in [IO.File]::ReadAllLines((Join-Path $repositoryRoot $newFile))) {
         $number++
         if ($text -match $commentPattern -and $text.Length -gt $maxCommentColumns) { $longComments += "${newFile}:$number ($($text.Length) columns)" }
+        $addedLines[$newFile][$number] = $true
     }
 }
 Report "changed comments fit in $maxCommentColumns columns (perl .claude/scripts/reflow-comments.pl <file>)" (-not $longComments) ($longComments | Select-Object -First 20)
+
+# 7b. A changed comment block of two or more lines doesn't end on a one- or two-word line (code-quality.md); the -Fix
+# rewrap left two in the levels plan's SZ3. A line of prose only: an XML tag line or a list item doesn't count.
+function Get-CommentProse([string]$text) {
+    if ($text -match '^\s*(///?)\s?(.*)$' -and $Matches[2] -notmatch '^\s*(<|-\s|$)') { return @($Matches[1], $Matches[2].Trim()) }
+    return $null
+}
+$shortLastLines = @()
+foreach ($changed in $addedLines.Keys) {
+    $path = Join-Path $repositoryRoot $changed
+    if (-not (Test-Path $path)) { continue }
+    $lines = [IO.File]::ReadAllLines($path)
+    foreach ($number in $addedLines[$changed].Keys) {
+        $prose = Get-CommentProse $lines[$number - 1]
+        $previous = if ($number -ge 2) { Get-CommentProse $lines[$number - 2] } else { $null }
+        $next = if ($number -lt $lines.Count) { Get-CommentProse $lines[$number] } else { $null }
+        $isLastOfBlock = $prose -and $previous -and $previous[0] -eq $prose[0] -and -not ($next -and $next[0] -eq $prose[0])
+        if ($isLastOfBlock -and @($prose[1] -split '\s+').Count -le 2) { $shortLastLines += "${changed}:$number ('$($prose[1])')" }
+    }
+}
+Report 'changed comments end on more than two words (perl .claude/scripts/reflow-comments.pl <file>, then reword)' (-not $shortLastLines) ($shortLastLines | Select-Object -First 20)
 
 # 8-11. Slips a shell edit leaves behind, caught before the review. The quote is the shell escape '"'"' written literally
 # (a heredoc perl script, see the class-mechanics retro); a doubled summary is a member inserted between another's doc

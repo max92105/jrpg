@@ -1,5 +1,5 @@
 # Object levels and sheet zoom
-Status: retro pending
+Status: done
 
 Drafted on 2026-11-05 from two requests the developer made while painting objects with the composer:
 

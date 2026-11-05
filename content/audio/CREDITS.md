@@ -2,8 +2,8 @@
 
 Written by `.claude/scripts/fetch-placeholder-sounds.ps1` from `sound-sources.json`: edit that file and rerun
 the script, never this one. Every sound below is a placeholder from [freesound.org](https://freesound.org/)
-(ADR 0036), modified as the table says. The music and the victory and defeat jingles are rendered by
-`.claude/scripts/new-placeholder-tune.pl` and need no credit.
+(ADR 0036), modified as the table says. The victory and defeat jingles are rendered by
+`.claude/scripts/new-placeholder-tune.pl` and need no credit; the music is the developer's own.
 
 | File | Sound | Author | License | Modified | Fetched |
 |---|---|---|---|---|---|

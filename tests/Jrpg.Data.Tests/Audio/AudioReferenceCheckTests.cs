@@ -51,13 +51,14 @@ public sealed class AudioReferenceCheckTests
         Assert.Equal($"music/Ghost.wav: not found in {_audioRoot}. Named by map 'intro'.", problem);
     }
 
+    // The track's folder is part of the name checked, so a case slip in it is found too (decision 496).
     [Fact]
     public void FindProblems_MapTrackInOtherCase_NamesTheMismatch()
     {
-        var problem = Assert.Single(AudioReferenceCheck.FindProblems(WithIntroTrack("placeholdertown.wav"), _audioRoot));
+        var problem = Assert.Single(AudioReferenceCheck.FindProblems(WithIntroTrack("Town/loop.wav"), _audioRoot));
 
         Assert.Equal(
-            "music/placeholdertown.wav: the file is named PlaceholderTown.wav; names must match exactly. Named by map 'intro'.",
+            "music/Town/loop.wav: the file is named town/loop.wav; names must match exactly. Named by map 'intro'.",
             problem);
     }
 

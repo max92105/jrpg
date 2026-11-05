@@ -48,3 +48,15 @@ A, played through `SoundEffect`.
   `DynamicSoundEffectInstance`, which changes only `MusicPlayer` and `SoundLibrary`; not to `Song`.
 - A looped instance loops the whole file, so a track whose end doesn't meet its start clicks: real tracks must be cut to
   loop.
+
+## Amendment (2026-11-05): the developer's tracks, with fades (decision 496)
+The placeholder tunes are replaced by the developer's own tracks, one folder each under `music/`: the content names the
+loop (`"musicFile": "town/loop.wav"`, the folder part of the name checked case and all), and an `intro.wav` or an
+`outro.wav` beside the loop is found by the player (`Audio/MusicTrack`), never named by content. Only the title theme
+has them: it opens with the intro, loops, and ends with the outro when the game leaves the title, with no fade and no
+pause, since the outro ends it; wanted again it starts over from the intro. Every other track is a bare loop, so the
+mix fades it in over one second and fades it out when it leaves (a cross-fade with the track coming in); the change
+that was a cut at full gain (decision 416) is now that fade. The tracks are 48 kHz WAV, 6 to 23 MB each, held whole in
+memory as before: streaming is the follow-up above if that weighs. The intro hands over to the loop when the player sees
+its instance stopped, once per update: up to a frame of silence at the join, plus the device's start delay. If the
+developer hears it, a `DynamicSoundEffectInstance` fed the intro's samples then the loop's closes the gap.

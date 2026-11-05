@@ -12,6 +12,15 @@ public sealed class MainViewModelMusicTests : IDisposable
     {
         var viewModel = _content.Open(_content.TestWorld);
 
-        Assert.Contains("PlaceholderTown.wav", viewModel.StartEditingSettings()!.MusicChoices);
+        Assert.Contains("town/loop.wav", viewModel.StartEditingSettings()!.MusicChoices);
+    }
+
+    // The title's intro and outro are the player's to find beside its loop, never a map's track (decision 496).
+    [Fact]
+    public void StartEditingSettings_TestWorld_LeavesOutTheTitlesIntro()
+    {
+        var viewModel = _content.Open(_content.TestWorld);
+
+        Assert.DoesNotContain("titlescreen/intro.wav", viewModel.StartEditingSettings()!.MusicChoices);
     }
 }

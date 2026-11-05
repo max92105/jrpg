@@ -198,3 +198,8 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 - The Ctrl + wheel handler and the zoom-changed block (old scale, redraw, anchor or the viewer's center, `ZoomScrolling.KeepAnchor`) are copied in `Tiles/TileBrowserView.xaml.cs` and `Objects/Composing/ObjectComposerWindow.xaml.cs`: a third zooming view moves both into a view-side type in `Viewport/` taking a `ScrollViewer`, a `CellZoom` and a redraw callback (SZ3 review).
 - `Game/Rendering/ObjectSpriteBaker.Over` copies `Ui/UiTheme.Over` (`Rendering` doesn't reference `Ui`): a third user moves it into a shared rendering helper (OL2).
+
+## From the music tracks change (2026-11-05, decision 496)
+
+- The title's intro hands over to its loop when `MusicPlayer.FollowIntros` sees the intro's instance stopped, once per update: up to a frame of silence at the join, plus the device's start delay. If it is heard, a `DynamicSoundEffectInstance` fed the intro's samples then the loop's closes the gap (ADR 0035 amendment).
+- The loops are 6 to 23 MB of 48 kHz WAV each, loaded whole by `SoundEffect.FromFile` on a map change, which can stall a frame: streaming through `DynamicSoundEffectInstance` is the ADR 0035 follow-up if it does.

@@ -40,6 +40,6 @@ public sealed class RepositoryEncounterTests
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-        Assert.Equal("PlaceholderBoss.wav", catalog.Encounters["goblin_chief"].MusicFile);
+        Assert.Equal("boss/loop.wav", catalog.Encounters["goblin_chief"].MusicFile);
     }
 }

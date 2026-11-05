@@ -18,6 +18,6 @@
     "id": "goblin_chief",
     "enemyIds": ["goblin", "goblin", "goblin_chief"],
     "backgroundFile": "Forest.png",
-    "musicFile": "PlaceholderBoss.wav"
+    "musicFile": "boss/loop.wav"
   }
 ]

@@ -34,8 +34,8 @@ public sealed class ContentWriterMusicTests : IDisposable
     {
         var start = _catalog.Maps["start"];
 
-        _writer.WriteMap(new MapDefinition(start.Layout, start.Settings with { MusicFile = "PlaceholderForest.wav" }), _catalog);
+        _writer.WriteMap(new MapDefinition(start.Layout, start.Settings with { MusicFile = "forest/loop.wav" }), _catalog);
 
-        Assert.Equal("PlaceholderForest.wav", ContentCatalogLoader.Load(_content.Path).Maps["start"].Settings.MusicFile);
+        Assert.Equal("forest/loop.wav", ContentCatalogLoader.Load(_content.Path).Maps["start"].Settings.MusicFile);
     }
 }

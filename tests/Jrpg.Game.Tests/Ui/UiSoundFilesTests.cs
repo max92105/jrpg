@@ -20,7 +20,7 @@ public sealed class UiSoundFilesTests
             .Where(field => field.IsLiteral)
             .Select(field => (string)field.GetRawConstantValue()!)
             .ToList();
-        var present = Directory.GetFiles(Path.Combine(_audioRoot, folder)).Select(Path.GetFileName).ToList();
+        var present = AudioFolders.FilesIn(_audioRoot, folder);
 
         Assert.NotEmpty(files);
         Assert.All(files, file => Assert.True(present.Contains(file), $"content/audio/{folder} has no '{file}'."));

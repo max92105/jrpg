@@ -1,6 +1,6 @@
 {
   "id": "start",
   "displayName": "start",
-  "musicFile": "PlaceholderTown.wav",
+  "musicFile": "town/loop.wav",
   "randomEncounters": null
 }

@@ -284,7 +284,7 @@ internal sealed partial class MainViewModel : ObservableObject
 
     /// <summary>The settings dialog's state for the open map; null when no map is open.</summary>
     public MapSettingsViewModel? StartEditingSettings() =>
-        CurrentMap is { } open ? new(open.Map, Catalog!.Encounters.Keys, AudioFolders.FilesIn(_audioRoot, AudioFolders.Music)) : null;
+        CurrentMap is { } open ? new(open.Map, Catalog!.Encounters.Keys, AudioFolders.TracksIn(_audioRoot)) : null;
 
     /// <summary>
     /// Applies the settings dialog to the open map: the new size first, asking before it drops anything, then the name,

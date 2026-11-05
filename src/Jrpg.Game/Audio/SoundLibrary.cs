@@ -25,6 +25,9 @@ internal sealed class SoundLibrary(string audioRoot) : IDisposable
         return sound;
     }
 
+    /// <summary>Whether the file is there to open, without opening or reporting it.</summary>
+    public bool Exists(string folder, string file) => File.Exists(Path.Combine(audioRoot, folder, file));
+
     /// <summary>
     /// Disposes a loaded sound and forgets it, so a later <see cref="Get"/> loads it again. A file that failed stays
     /// remembered, so it isn't reported twice.

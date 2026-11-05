@@ -18,7 +18,8 @@ internal static class ExactFileName
             return null;
         }
 
-        var names = Directory.EnumerateFiles(directory).Select(Path.GetFileName).ToList();
+        // Under the folder, since a music track sits in a folder of its own (decision 496).
+        var names = Directory.EnumerateFiles(directory, "*", SearchOption.AllDirectories).Select(path => NameUnder(directory, path)).ToList();
         if (names.Contains(file, StringComparer.Ordinal))
         {
             return null;
@@ -27,6 +28,9 @@ internal static class ExactFileName
         var actual = names.FirstOrDefault(name => string.Equals(name, file, StringComparison.OrdinalIgnoreCase));
         return actual is null ? null : $"{ShownPath(folder, file)}: the file is named {actual}; names must match exactly.";
     }
+
+    /// <summary>A file's name under a folder, with <c>/</c> whatever the system, as the content names it.</summary>
+    public static string NameUnder(string folder, string file) => Path.GetRelativePath(folder, file).Replace('\\', '/');
 
     /// <summary>The file as a problem names it: under its folder, or alone when it sits at the root.</summary>
     public static string ShownPath(string folder, string file) => folder.Length == 0 ? file : $"{folder}/{file}";

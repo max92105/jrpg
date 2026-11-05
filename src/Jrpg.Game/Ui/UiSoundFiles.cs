@@ -8,12 +8,12 @@ namespace Jrpg.Game.Ui;
 /// </summary>
 internal static class UiSoundFiles
 {
-    /// <summary>In <see cref="AudioFolders.Music"/>.</summary>
+    /// <summary>In <see cref="AudioFolders.Music"/>: each track's loop, in its own folder (decision 496).</summary>
     public static class Music
     {
-        public const string Title = "PlaceholderTitle.wav";
+        public const string Title = "titlescreen/loop.wav";
 
-        public const string Battle = "PlaceholderBattle.wav";
+        public const string Battle = "battle/loop.wav";
     }
 
     /// <summary>

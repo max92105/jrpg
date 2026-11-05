@@ -1,5 +1,5 @@
 # Free levels and the picker's width
-Status: retro pending
+Status: done
 
 Drafted on 2026-11-05 from what the developer asked after trying the object levels and the sheet zoom:
 

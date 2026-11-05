@@ -31,6 +31,7 @@ Turn a feature request into a plan that a developer can implement one slice at a
 5. List open questions that are game-design decisions. Do not answer them yourself; they belong to the developer.
 6. List risks: coupling, performance, determinism, save-format impact.
 6b. A step the developer does by hand (importing art, rebuilding maps) is written click by click in the editor's own words, menus and buttons named; when the step is mechanical, the plan offers a one-off tool instead (the Mana Seed reset's C1-C3 left the developer stuck, and a tool did them in one run).
+6c. A rule that limits what the developer can pick in an editor tool (only the next level, a clamp on undo, a fixed order) is an open question, never a pick taken by default: the levels plan's "one empty level on top" (decision 478) was reversed after the developer's first hand try, which cost a whole follow-up plan (decisions 488-495).
 7. If a decision has real alternatives, note "ADR needed: <topic>". An ADR step whose option the developer already chose in the planning session says "write it from the README's entry", not "with `/adr`": there is nothing left to ask (the stats plan's three ADRs).
 
 ## Output

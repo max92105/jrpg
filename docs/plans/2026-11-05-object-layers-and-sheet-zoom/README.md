@@ -46,8 +46,8 @@ The phases don't depend on each other. If the developer wants the zoom sooner, p
 One line per slice; each slice's goal, types, tests and hand checks are in its file under `slices/`. Tick the box here when a slice is done, and write its deviations in the slice file. Tunables, design overview and risks: [design.md](design.md).
 
 ### Phase 1: levels inside an object
-- [ ] ADR 0040: object tile levels. Write it from the entry under "ADRs" below (decisions 472-476).
-- [ ] **OL1. `ObjectTile.Level`: a tile's level on its cell in `objects.json`, left out at 0; one tile per cell and level, listed bottom level first, levels 0 to 7; written back** (Core + Data, about 175 lines) → [slices/OL1.md](slices/OL1.md)
+- [x] ADR 0040: object tile levels. Write it from the entry under "ADRs" below (decisions 472-476).
+- [x] **OL1. `ObjectTile.Level`: a tile's level on its cell in `objects.json`, left out at 0; one tile per cell and level, listed bottom level first, levels 0 to 7; written back** (Core + Data, about 175 lines) → [slices/OL1.md](slices/OL1.md)
 - [ ] **OL2. The stack drawn bottom first: the game's canopy bake lays each tile over the one under it; the editor's object pictures pinned on a stacked object** (Game + Editor, about 110 lines) → [slices/OL2.md](slices/OL2.md)
 - [ ] **OL3. The composer's levels: `ObjectCanvas` keyed by cell and level, `CanvasPainting.Level` and its choices (one empty level on top), Save and Edit with a stack** (Editor, about 235 lines, 25 of them one-token call-site churn) → [slices/OL3.md](slices/OL3.md)
 - [ ] **OL4. The composer window's Level box; the levels above the chosen one faded; the first stacked object made, zoned and seen in the game** (Editor, about 90 lines) → [slices/OL4.md](slices/OL4.md)

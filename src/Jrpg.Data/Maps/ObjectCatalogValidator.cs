@@ -33,7 +33,7 @@ internal static class ObjectCatalogValidator
 
         return FindOutlineProblem("collisionPolygon", definition.CollisionPolygon)
             ?? FindLookProblem(definition)
-            ?? FindTileProblem(definition, tileIds)
+            ?? FindTileListProblem(definition, tileIds)
             ?? FindZoneProblem(definition.AbovePlayerZones);
     }
 
@@ -51,28 +51,51 @@ internal static class ObjectCatalogValidator
         return hasSprite && definition.AbovePlayerZones.Count > 0 ? "abovePlayerZones aren't drawn for a field-sprite object." : null;
     }
 
-    private static string? FindTileProblem(ObjectDefinition definition, IReadOnlySet<int> tileIds)
+    // Tiles are listed bottom level first, one per cell and level (ADR 0040): drawing the list in order draws each
+    // stack bottom first, so no drawer sorts.
+    private static string? FindTileListProblem(ObjectDefinition definition, IReadOnlySet<int> tileIds)
     {
-        var usedCells = new HashSet<(int X, int Y)>();
+        var usedCells = new HashSet<(int X, int Y, int Level)>();
+        var previousLevel = 0;
         foreach (var tile in definition.Tiles)
         {
-            if (!tileIds.Contains(tile.TileId))
+            var problem = FindSingleTileProblem(definition, tile, tileIds);
+            if (problem is not null)
             {
-                return $"tile ({tile.X}, {tile.Y}) has tile id {tile.TileId}, which isn't a tile.";
+                return problem;
             }
 
-            if (tile.X < 0 || tile.Y < 0 || tile.X >= definition.Width || tile.Y >= definition.Height)
+            if (tile.Level < previousLevel)
             {
-                return $"tile ({tile.X}, {tile.Y}) must be inside the object's {definition.Width}x{definition.Height} cells.";
+                return $"tile ({tile.X}, {tile.Y}) on level {tile.Level} is listed after a tile on level {previousLevel}; tiles are listed bottom level first, the order they are drawn in.";
             }
 
-            if (!usedCells.Add((tile.X, tile.Y)))
+            if (!usedCells.Add((tile.X, tile.Y, tile.Level)))
             {
-                return $"tile ({tile.X}, {tile.Y}) is listed more than once; an object has one tile per cell.";
+                return $"tile ({tile.X}, {tile.Y}) on level {tile.Level} is listed more than once; an object has one tile per cell on each level.";
             }
+
+            previousLevel = tile.Level;
         }
 
         return null;
+    }
+
+    private static string? FindSingleTileProblem(ObjectDefinition definition, ObjectTile tile, IReadOnlySet<int> tileIds)
+    {
+        if (!tileIds.Contains(tile.TileId))
+        {
+            return $"tile ({tile.X}, {tile.Y}) has tile id {tile.TileId}, which isn't a tile.";
+        }
+
+        if (tile.X < 0 || tile.Y < 0 || tile.X >= definition.Width || tile.Y >= definition.Height)
+        {
+            return $"tile ({tile.X}, {tile.Y}) must be inside the object's {definition.Width}x{definition.Height} cells.";
+        }
+
+        return tile.Level is < 0 or > ObjectTile.MaxLevel
+            ? $"tile ({tile.X}, {tile.Y}) has level {tile.Level}; levels run from 0 to {ObjectTile.MaxLevel}."
+            : null;
     }
 
     private static string? FindZoneProblem(IReadOnlyList<IReadOnlyList<Point2D>> zones)

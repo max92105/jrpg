@@ -145,12 +145,69 @@ public sealed class ObjectCatalogValidatorTests
     }
 
     [Fact]
-    public void Validate_TwoTilesOnOneCell_ThrowsNamingTheObject()
+    public void Validate_TwoTilesOnOneCellAndLevel_ThrowsNamingTheObject()
     {
         var exception = Assert.Throws<ContentValidationException>(
             () => ObjectCatalogValidator.Validate(FileName, [_chest with { Tiles = [new ObjectTile(0, 1, 1), new ObjectTile(0, 1, 2)] }], _tileIds));
 
-        Assert.Equal("objects.json: object 'chest': tile (0, 1) is listed more than once; an object has one tile per cell.", exception.Message);
+        Assert.Equal("objects.json: object 'chest': tile (0, 1) on level 0 is listed more than once; an object has one tile per cell on each level.", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_TwoTilesOnOneCellOnTwoLevels_Passes()
+    {
+        var chest = _chest with { Tiles = [new ObjectTile(0, 1, 1), new ObjectTile(0, 1, 2, Level: 1)] };
+
+        var exception = Record.Exception(() => ObjectCatalogValidator.Validate(FileName, [chest], _tileIds));
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void Validate_UpperLevelOnACellWithoutABaseTile_Passes()
+    {
+        var chest = _chest with { Tiles = [new ObjectTile(0, 0, 1), new ObjectTile(0, 1, 2, Level: 1)] };
+
+        var exception = Record.Exception(() => ObjectCatalogValidator.Validate(FileName, [chest], _tileIds));
+
+        Assert.Null(exception);
+    }
+
+    [Theory]
+    [InlineData(-1)]
+    [InlineData(8)]
+    [InlineData(int.MaxValue)]
+    public void Validate_TileLevelOutsideTheRange_ThrowsNamingTheTile(int level)
+    {
+        var chest = _chest with { Tiles = [new ObjectTile(0, 1, 1, level)] };
+
+        var exception = Assert.Throws<ContentValidationException>(() => ObjectCatalogValidator.Validate(FileName, [chest], _tileIds));
+
+        Assert.Equal($"objects.json: object 'chest': tile (0, 1) has level {level}; levels run from 0 to 7.", exception.Message);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(7)]
+    public void Validate_TileLevelAtEachBound_Passes(int level)
+    {
+        var chest = _chest with { Tiles = [new ObjectTile(0, 1, 1, level)] };
+
+        var exception = Record.Exception(() => ObjectCatalogValidator.Validate(FileName, [chest], _tileIds));
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void Validate_HigherLevelListedFirst_ThrowsNamingTheTile()
+    {
+        var chest = _chest with { Tiles = [new ObjectTile(0, 0, 1, Level: 1), new ObjectTile(0, 1, 2)] };
+
+        var exception = Assert.Throws<ContentValidationException>(() => ObjectCatalogValidator.Validate(FileName, [chest], _tileIds));
+
+        Assert.Equal(
+            "objects.json: object 'chest': tile (0, 1) on level 0 is listed after a tile on level 1; tiles are listed bottom level first, the order they are drawn in.",
+            exception.Message);
     }
 
     [Fact]

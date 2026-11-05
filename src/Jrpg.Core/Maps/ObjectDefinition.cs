@@ -22,7 +22,10 @@ public sealed record ObjectDefinition
     /// <summary>The group the editor's object browser lists it under, such as "House".</summary>
     public required string Category { get; init; }
 
-    /// <summary>The tiles that draw the object, each on its own cell within <see cref="Width"/> x <see cref="Height"/>.</summary>
+    /// <summary>
+    /// The tiles that draw the object, each on its own cell and level within <see cref="Width"/> x
+    /// <see cref="Height"/>, listed bottom level first: the order they are drawn in.
+    /// </summary>
     public required IReadOnlyList<ObjectTile> Tiles { get; init; }
 
     /// <summary>

@@ -2,6 +2,8 @@
 
 Builds on design.md, "Core changes" and "Key decisions" 1-2; decisions 472-475. ADR 0040 is written first (README, "ADRs").
 
+- **Done:** as planned.
+
 ## Goal
 An object's tile carries its level on its cell, read from and written to `objects.json` as `level`, left out while 0. Data refuses two tiles on one cell and level, a level outside 0 to 7, and a tile listed after one on a higher level, naming the tile. Every existing object (all level 0) loads and writes back byte for byte.
 

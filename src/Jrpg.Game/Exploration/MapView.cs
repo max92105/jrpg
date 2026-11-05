@@ -69,6 +69,7 @@ internal sealed class MapView(MapLayout layout, Func<PlacedObject, ObjectDefinit
             return;
         }
 
+        // Listed bottom level first (ADR 0040): drawing the list in order draws each stack.
         var tiles = definition.Tiles;
         for (var index = 0; index < tiles.Count; index++)
         {

@@ -188,6 +188,7 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
             return;
         }
 
+        // Listed bottom level first (ADR 0040): drawing the list in order draws each stack.
         foreach (var tile in definition.Tiles)
         {
             context.DrawImage(tileImageOf(tile.TileId), CellRect(topLeft.X + tile.X, topLeft.Y + tile.Y));

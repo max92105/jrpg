@@ -39,6 +39,51 @@ public sealed class ObjectSpriteBakerTests
         Assert.Contains(Color.Transparent, pixels);
     }
 
+    [Fact]
+    public void CanopyPixels_TransparentPixelOnTheUpperLevel_KeepsTheBaseTilesPixel()
+    {
+        var (definition, atlas, sheet) = StackedObject(upper: Color.Transparent);
+
+        var pixels = ObjectSpriteBaker.CanopyPixels(definition, atlas, _ => sheet, cellPixels: 1);
+
+        Assert.Equal(Color.Red, pixels[0]);
+    }
+
+    [Fact]
+    public void CanopyPixels_OpaquePixelOnTheUpperLevel_CoversTheBaseTile()
+    {
+        var (definition, atlas, sheet) = StackedObject(upper: Color.Blue);
+
+        var pixels = ObjectSpriteBaker.CanopyPixels(definition, atlas, _ => sheet, cellPixels: 1);
+
+        Assert.Equal(Color.Blue, pixels[0]);
+    }
+
+    [Fact]
+    public void CanopyPixels_HalfTransparentPixelOnTheUpperLevel_BlendsOverTheBaseTile()
+    {
+        // Premultiplied half-alpha grey over opaque red 200: 128 + 200 x (1 - 128 / 255) = 227 red, 128 green and blue.
+        var (definition, atlas, sheet) = StackedObject(upper: new Color(128, 128, 128, 128), lower: new Color(200, 0, 0, 255));
+
+        var pixels = ObjectSpriteBaker.CanopyPixels(definition, atlas, _ => sheet, cellPixels: 1);
+
+        Assert.Equal((227, 128, 128), (pixels[0].R, pixels[0].G, pixels[0].B));
+        Assert.InRange(pixels[0].A, 254, 255);
+    }
+
+    // One wholly zoned cell: the sheet's left pixel is tile 1, on the base; its right pixel is tile 2, on level 1.
+    private static (ObjectDefinition Definition, TileAtlas Atlas, SheetPixels Sheet) StackedObject(Color upper, Color? lower = null)
+    {
+        var (catalog, _) = OneTileCatalog(cellWidth: 1);
+        var definition = catalog.Objects["rock"] with
+        {
+            Tiles = [new ObjectTile(0, 0, 1), new ObjectTile(0, 0, 2, Level: 1)],
+            AbovePlayerZones = [[new Point2D(0, 0), new Point2D(1, 0), new Point2D(1, 1), new Point2D(0, 1)]],
+        };
+        var tiles = new Dictionary<int, TileDefinition>(catalog.Tiles) { [2] = catalog.Tiles[1] with { Id = 2, Column = 1 } };
+        return (definition, new TileAtlas(catalog with { Tiles = tiles }), new SheetPixels([lower ?? Color.Red, upper], 2));
+    }
+
     // Every tilesheet as solid white, big enough for any cell; the canopy then shows exactly where the mask is.
     private static SheetPixels Opaque(ContentCatalog catalog, string file)
     {

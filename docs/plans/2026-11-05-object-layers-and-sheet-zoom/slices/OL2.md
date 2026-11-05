@@ -2,6 +2,8 @@
 
 Builds on design.md, "What exists" (both shells draw the list in order) and "Key decisions" 3; decisions 474 and 476.
 
+- **Done, with deviations:** the game's "over" is a private copy of `UiTheme.Over` in `ObjectSpriteBaker` (`Rendering` doesn't reference `Ui`); the half-transparent test pins red, green and blue, and alpha within 254-255 (float rounding).
+
 ## Goal
 A stacked object looks right everywhere. The game's `MapView` and the editor's `MapDrawing` already draw an object's tiles in list order, which OL1 made the bottom-first order: they change by a comment only, and the editor's object picture gets a test that pins it. The game's canopy bake, which overwrote every pixel, now lays each tile over the pixels under it, so a window's clear pixels show the wall under it in the canopy too. (`SheetPurge`, `CatalogUsage` and `PlacedObjectHits` ask "any tile" of an object and need nothing.)
 

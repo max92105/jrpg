@@ -36,6 +36,19 @@ public sealed class MapDrawingTests
     }
 
     [Fact]
+    public void DrawObject_StackedObject_DrawsTheUpperLevelLast()
+    {
+        var still = _draft.Current.Tiles.Values.Where(tile => tile.Animation is null && tile.SheetId == _tile.SheetId).Take(2).ToList();
+        var stacked = OneTileObject(still[0].Id) with { Tiles = [new ObjectTile(0, 0, still[0].Id), new ObjectTile(0, 0, still[1].Id, Level: 1)] };
+
+        var drawing = (DrawingGroup)_drawing.DrawObject(stacked).Drawing;
+
+        var drawn = drawing.Children.OfType<ImageDrawing>().ToList();
+        Assert.Equal(2, drawn.Count);
+        Assert.Same(_images.CellImageOf(new SheetCell(still[1].SheetId, still[1].Column, still[1].Row)), drawn[1].ImageSource);
+    }
+
+    [Fact]
     public void IsAnimated_ObjectWithAnAnimatedTile_IsTrue() => Assert.True(_drawing.IsAnimated(OneTileObject(_tile.Id)));
 
     [Fact]

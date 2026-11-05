@@ -7,9 +7,10 @@ namespace Jrpg.Game.Rendering;
 
 /// <summary>
 /// Bakes each object's canopy: its tiles composed at screen size, keeping only the pixels inside its above-player
-/// zones, so drawing the canopy over the player needs no clipping or shader (plan 3a, key decision 4). It works because
-/// every object draws on one layer: an object tile has no Z of its own. An animated tile is baked from its first frame,
-/// so a canopy stands still (decision 465).
+/// zones, so drawing the canopy over the player needs no clipping or shader (plan 3a, key decision 4). An object still
+/// draws on one map layer; its tiles are listed bottom level first (ADR 0040) and each is laid over the pixels under
+/// it, so a window's clear pixels keep the wall under it. An animated tile is baked from its first frame, so a canopy
+/// stands still (decision 465).
 /// </summary>
 internal static class ObjectSpriteBaker
 {
@@ -75,10 +76,22 @@ internal static class ObjectSpriteBaker
                 var index = ((topLeft.Y + dy) * canopy.Width) + topLeft.X + dx;
                 if (canopy.Mask[index])
                 {
-                    canopy.Pixels[index] = sheet.Pixels[(sourceRow * sheet.Width) + source.X + (dx * source.Width / canopy.CellPixels)];
+                    var top = sheet.Pixels[(sourceRow * sheet.Width) + source.X + (dx * source.Width / canopy.CellPixels)];
+                    canopy.Pixels[index] = Over(top, canopy.Pixels[index]);
                 }
             }
         }
+    }
+
+    // Premultiplied "over", as SpriteBatch blends: the top color, then what shows through it of the bottom one.
+    private static Color Over(Color top, Color bottom)
+    {
+        var through = 1 - (top.A / 255f);
+        return new Color(
+            top.R + (int)(bottom.R * through),
+            top.G + (int)(bottom.G * through),
+            top.B + (int)(bottom.B * through),
+            top.A + (int)(bottom.A * through));
     }
 
     private readonly record struct CanopyTarget(Color[] Pixels, bool[] Mask, int Width, int CellPixels);

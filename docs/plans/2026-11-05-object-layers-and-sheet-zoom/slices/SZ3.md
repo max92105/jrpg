@@ -2,6 +2,8 @@
 
 Builds on design.md, "Key decisions" 6 and 7; decision 484. Reuses SZ2's `CellZoomBar` and `ZoomScrolling`.
 
+- **Done, with deviations:** `CanvasZoom` starts at `(int)MapDrawing.CellPixels`, as SZ2's zoom; the wheel checks `CanExecute` before running a command (SZ1 and SZ2 reviews).
+
 ## Goal
 The composer's canvas gets its own zoom bar over it and Ctrl + wheel toward the mouse, starting at the map's 48 px each time the composer opens. Its pixels are drawn sharp and square at every size (today `CanvasImage` sets no scaling mode, so WPF would smooth them once scaled). Strokes land on the cell under the mouse at every size; the grid lines stay one screen pixel wide (one WPF unit, a DIP: exact at 100 % Windows scaling, not at 125 % or 150 %, as today).
 

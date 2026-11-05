@@ -4,6 +4,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:tiles="clr-namespace:Jrpg.Editor.Tiles"
+        xmlns:viewport="clr-namespace:Jrpg.Editor.Viewport"
         Title="{Binding Title}"
         Width="1100"
         Height="720"
@@ -76,8 +77,14 @@
                  TextWrapping="Wrap"
                  Margin="0,0,0,4"
                  Text="Choose a cell or drag a rectangle on the sheet, then click or drag on the canvas to stamp it on the chosen level; right click or drag erases." />
-      <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+      <viewport:CellZoomBar DockPanel.Dock="Top" Margin="0,0,0,4" HorizontalAlignment="Left" DataContext="{Binding CanvasZoom}" />
+      <ScrollViewer x:Name="CanvasScroller"
+                    PreviewMouseWheel="OnCanvasMouseWheel"
+                    HorizontalScrollBarVisibility="Auto"
+                    VerticalScrollBarVisibility="Auto">
+        <!-- Scaled to the canvas's zoom as a layout transform, its pixels kept sharp (decision 484). -->
         <Image x:Name="CanvasImage"
+               RenderOptions.BitmapScalingMode="NearestNeighbor"
                Focusable="True"
                Stretch="None"
                HorizontalAlignment="Left"

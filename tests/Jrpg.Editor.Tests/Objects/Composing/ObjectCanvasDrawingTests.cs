@@ -16,7 +16,7 @@ public sealed class ObjectCanvasDrawingTests
     [Fact]
     public void Draw_TwoByThreeCanvas_IsTheCanvasSizeInMapPixels()
     {
-        var image = ObjectCanvasDrawing.Draw(ObjectCanvas.Empty(2, 3), 0, _ => MissingArtMark.Picture);
+        var image = ObjectCanvasDrawing.Draw(ObjectCanvas.Empty(2, 3), 0, _ => MissingArtMark.Picture, 1);
 
         Assert.Equal((2 * MapDrawing.CellPixels, 3 * MapDrawing.CellPixels), (image.Width, image.Height));
     }
@@ -33,9 +33,17 @@ public sealed class ObjectCanvasDrawingTests
         {
             asked.Add(cell);
             return MissingArtMark.Picture;
-        });
+        }, 1);
 
         Assert.Equal(new HashSet<SheetCell> { new("forest", 4, 1), new("house", 0, 2) }, asked.ToHashSet());
+    }
+
+    [Fact]
+    public void Draw_GridLineWidth_IsTheWidthGiven()
+    {
+        var drawing = (DrawingGroup)ObjectCanvasDrawing.Draw(ObjectCanvas.Empty(2, 2), 0, _ => MissingArtMark.Picture, 0.5).Drawing;
+
+        Assert.Equal(0.5, drawing.Children.OfType<GeometryDrawing>().Single(grid => grid.Pen is not null).Pen.Thickness);
     }
 
     // The dictionary keeps the order cells were painted in: the overlay first here.
@@ -51,7 +59,7 @@ public sealed class ObjectCanvasDrawingTests
         {
             asked.Add(cell);
             return MissingArtMark.Picture;
-        });
+        }, 1);
 
         Assert.Equal([new SheetCell("house", 0, 0), new SheetCell("house", 3, 2)], asked);
     }
@@ -61,7 +69,7 @@ public sealed class ObjectCanvasDrawingTests
     {
         var canvas = ObjectCanvas.Empty(3, 3).Stamp(0, new GridCell(2, 1), new SheetCellRectangle("forest", 4, 1, 1, 1));
 
-        var drawing = (DrawingGroup)ObjectCanvasDrawing.Draw(canvas, 0, _ => MissingArtMark.Picture).Drawing;
+        var drawing = (DrawingGroup)ObjectCanvasDrawing.Draw(canvas, 0, _ => MissingArtMark.Picture, 1).Drawing;
 
         var cell = Assert.Single(drawing.Children.OfType<ImageDrawing>());
         Assert.Equal(new Rect(2 * MapDrawing.CellPixels, MapDrawing.CellPixels, MapDrawing.CellPixels, MapDrawing.CellPixels), cell.Rect);
@@ -72,7 +80,7 @@ public sealed class ObjectCanvasDrawingTests
     {
         var images = new Dictionary<SheetCell, ImageSource>();
 
-        var drawing = (DrawingGroup)ObjectCanvasDrawing.Draw(WallWithWindow(), 0, cell => ImageOf(images, cell)).Drawing;
+        var drawing = (DrawingGroup)ObjectCanvasDrawing.Draw(WallWithWindow(), 0, cell => ImageOf(images, cell), 1).Drawing;
 
         var faded = Assert.Single(drawing.Children.OfType<DrawingGroup>());
         Assert.Equal(0.4, faded.Opacity);
@@ -84,7 +92,7 @@ public sealed class ObjectCanvasDrawingTests
     {
         var images = new Dictionary<SheetCell, ImageSource>();
 
-        var drawing = (DrawingGroup)ObjectCanvasDrawing.Draw(WallWithWindow(), 1, cell => ImageOf(images, cell)).Drawing;
+        var drawing = (DrawingGroup)ObjectCanvasDrawing.Draw(WallWithWindow(), 1, cell => ImageOf(images, cell), 1).Drawing;
 
         Assert.Empty(drawing.Children.OfType<DrawingGroup>());
         Assert.Equal([images[_wall], images[_window]], drawing.Children.OfType<ImageDrawing>().Select(drawn => drawn.ImageSource));

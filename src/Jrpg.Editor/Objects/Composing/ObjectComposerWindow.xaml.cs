@@ -1,9 +1,11 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using Jrpg.Core.Geometry;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Tiles;
+using Jrpg.Editor.Viewport;
 
 namespace Jrpg.Editor.Objects.Composing;
 
@@ -20,6 +22,10 @@ internal sealed partial class ObjectComposerWindow : Window
     private readonly Func<ObjectComposerViewModel, bool> _tryApply;
     private MouseButton? _strokeButton;
     private GridCell? _lastStrokeCell;
+    private double _scale = 1;
+
+    // Where Ctrl + wheel left the mouse, which the next zoom keeps in place; the viewer's center for the bar's buttons.
+    private Point? _zoomAnchor;
 
     /// <param name="composer">The composer's state, edited here.</param>
     /// <param name="images">The main window's sheet images, shared by the picker and the canvas.</param>
@@ -36,6 +42,7 @@ internal sealed partial class ObjectComposerWindow : Window
         Picker.Images = images;
         Picker.DataContext = composer.Painting.Picker;
         composer.Painting.PropertyChanged += OnPaintingChanged;
+        composer.CanvasZoom.PropertyChanged += OnCanvasZoomChanged;
         animationTime.FramesChanged += OnFramesChanged;
         Closed += OnClosed;
         Loaded += (_, _) => IdBox.Focus();
@@ -52,8 +59,43 @@ internal sealed partial class ObjectComposerWindow : Window
 
     private void OnFramesChanged(object? sender, EventArgs e) => DrawCanvas();
 
-    private void DrawCanvas() =>
-        CanvasImage.Source = ObjectCanvasDrawing.Draw(_composer.Painting.Canvas, _composer.Painting.Level, cell => _images.CellImageAt(cell, _animationTime.Elapsed));
+    private void DrawCanvas()
+    {
+        _scale = _composer.CanvasZoom.ScaleFor(MapDrawing.CellPixels);
+        CanvasImage.Source = ObjectCanvasDrawing.Draw(_composer.Painting.Canvas, _composer.Painting.Level, cell => _images.CellImageAt(cell, _animationTime.Elapsed), 1 / _scale);
+        CanvasImage.LayoutTransform = new ScaleTransform(_scale, _scale);
+    }
+
+    private void OnCanvasZoomChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(CellZoom.CellPixels))
+        {
+            return;
+        }
+
+        var oldScale = _scale;
+        DrawCanvas();
+        var anchor = _zoomAnchor ?? new Point(CanvasScroller.ViewportWidth / 2, CanvasScroller.ViewportHeight / 2);
+        _zoomAnchor = null;
+        ZoomScrolling.KeepAnchor(CanvasScroller, anchor, oldScale, _scale);
+    }
+
+    // The plain wheel scrolls; a command at its bound doesn't run (the toolkit's Execute doesn't check).
+    private void OnCanvasMouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+        {
+            return;
+        }
+
+        e.Handled = true;
+        var command = e.Delta > 0 ? _composer.CanvasZoom.ZoomInCommand : _composer.CanvasZoom.ZoomOutCommand;
+        if (command.CanExecute(null))
+        {
+            _zoomAnchor = e.GetPosition(CanvasScroller);
+            command.Execute(null);
+        }
+    }
 
     private void OnCanvasPressed(object sender, MouseButtonEventArgs e)
     {
@@ -98,7 +140,8 @@ internal sealed partial class ObjectComposerWindow : Window
         (_strokeButton, _lastStrokeCell) = (null, null);
     }
 
-    // A drag paints each cell it enters once, not once per mouse move.
+    // A drag paints each cell it enters once, not once per mouse move. The position is in the canvas's own pixels
+    // whatever its zoom: GetPosition undoes the image's layout transform.
     private void StrokeAt(Point position)
     {
         var cell = new GridCell((int)Math.Floor(position.X / MapDrawing.CellPixels), (int)Math.Floor(position.Y / MapDrawing.CellPixels));
@@ -131,6 +174,7 @@ internal sealed partial class ObjectComposerWindow : Window
     private void OnClosed(object? sender, EventArgs e)
     {
         _composer.Painting.PropertyChanged -= OnPaintingChanged;
+        _composer.CanvasZoom.PropertyChanged -= OnCanvasZoomChanged;
         _animationTime.FramesChanged -= OnFramesChanged;
         Picker.DataContext = null;
     }

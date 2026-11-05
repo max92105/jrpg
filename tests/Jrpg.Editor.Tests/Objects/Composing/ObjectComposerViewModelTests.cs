@@ -35,6 +35,10 @@ public sealed class ObjectComposerViewModelTests : IDisposable
     }
 
     [Fact]
+    public void CanvasZoom_New_ShowsTheMapCellSize() =>
+        Assert.Equal(48, ObjectComposerViewModel.ForNew(Painting(ObjectCanvas.Empty(3, 3)), Naming("tree_4", "Trees")).CanvasZoom.CellPixels);
+
+    [Fact]
     public void Problem_OnlyAnUpperLevelPainted_IsNull()
     {
         var canvas = ObjectCanvas.Empty(3, 3).Stamp(1, new GridCell(1, 1), new SheetCellRectangle("forest", 0, 0, 1, 1));

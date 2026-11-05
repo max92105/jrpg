@@ -1,5 +1,5 @@
 # Object levels and sheet zoom
-Status: approved
+Status: retro pending
 
 Drafted on 2026-11-05 from two requests the developer made while painting objects with the composer:
 
@@ -55,7 +55,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 2: the sheet zoom
 - [x] **SZ1. `CellZoom`: a cell's shown size in steps (16 to 192 px, 48 the map's), in and out within the bounds, the scale for a source cell size, the scroll offset that keeps the point under the mouse** (Editor, about 180 lines) → [slices/SZ1.md](slices/SZ1.md)
 - [x] **SZ2. The Tiles panel's sheet zooms: the zoom bar over it, Ctrl + wheel toward the mouse, marks one screen pixel wide at every size; the composer's picker shares it** (Editor, about 185 lines) → [slices/SZ2.md](slices/SZ2.md)
-- [ ] **SZ3. The composer's canvas zooms: its own zoom and bar, Ctrl + wheel toward the mouse, sharp pixels, grid lines one screen pixel wide, strokes on the right cell at every size** (Editor, about 85 lines) → [slices/SZ3.md](slices/SZ3.md)
+- [x] **SZ3. The composer's canvas zooms: its own zoom and bar, Ctrl + wheel toward the mouse, sharp pixels, grid lines one screen pixel wide, strokes on the right cell at every size** (Editor, about 85 lines) → [slices/SZ3.md](slices/SZ3.md)
 
 ## Decisions
 - **472. An object tile has a level** (ADR 0040): `ObjectTile.Level`, a whole number on the tile's cell, 0 the base; a higher level is drawn over a lower one. `objects.json` writes it as `level` on a tile, left out while 0, so every object written before writes back byte for byte.

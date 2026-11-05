@@ -2,12 +2,14 @@ using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Maps;
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Maps;
+using Jrpg.Editor.Viewport;
 
 namespace Jrpg.Editor.Objects.Composing;
 
 /// <summary>
-/// The composer window's state (decision 455): the painting, the naming of a new object or the edited original, what
-/// stops Save, and the object Save makes.
+/// The composer window's state (decision 455): the painting, the canvas's zoom, the naming of a new object or the
+/// edited original, what stops Save, and the object Save makes.
 /// </summary>
 internal sealed partial class ObjectComposerViewModel : ObservableObject
 {
@@ -21,6 +23,9 @@ internal sealed partial class ObjectComposerViewModel : ObservableObject
     public CanvasPainting Painting { get; }
 
     public ObjectNaming Naming { get; }
+
+    /// <summary>The canvas's own zoom, at the map's cell size each time the composer opens (decision 484).</summary>
+    public CellZoom CanvasZoom { get; } = new((int)MapDrawing.CellPixels);
 
     /// <summary>The object being edited; null for a new one.</summary>
     public ObjectDefinition? Original { get; }

@@ -2,6 +2,8 @@
 
 Builds on design.md, "Key decisions" 5; decisions 478 and 479. The window part of OL3's rules.
 
+- **Done, with deviations:** `Draw_TwoLevelsOnOneCell_DrawsTheUpperLast` left at review: OL3's `Draw_LevelOnePaintedBeforeTheBase_DrawsTheBaseFirst` covers the order, painted the harder way round.
+
 ## Goal
 The composer window shows a Level box over the canvas (the painting's `LevelChoices`, the chosen one painted and erased, one empty level always offered on top). The canvas draws every level bottom first, those above the chosen level faded, so the developer sees what will cover the cells being painted. F1 lists it. This slice's hand check makes the first stacked object, gives it an above-player zone, and looks at it in the editor and the game, the canopy bake of OL2 included.
 

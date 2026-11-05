@@ -44,7 +44,7 @@ internal sealed partial class ObjectComposerWindow : Window
 
     private void OnPaintingChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(CanvasPainting.Canvas))
+        if (e.PropertyName is nameof(CanvasPainting.Canvas) or nameof(CanvasPainting.Level))
         {
             DrawCanvas();
         }
@@ -53,7 +53,7 @@ internal sealed partial class ObjectComposerWindow : Window
     private void OnFramesChanged(object? sender, EventArgs e) => DrawCanvas();
 
     private void DrawCanvas() =>
-        CanvasImage.Source = ObjectCanvasDrawing.Draw(_composer.Painting.Canvas, cell => _images.CellImageAt(cell, _animationTime.Elapsed));
+        CanvasImage.Source = ObjectCanvasDrawing.Draw(_composer.Painting.Canvas, _composer.Painting.Level, cell => _images.CellImageAt(cell, _animationTime.Elapsed));
 
     private void OnCanvasPressed(object sender, MouseButtonEventArgs e)
     {

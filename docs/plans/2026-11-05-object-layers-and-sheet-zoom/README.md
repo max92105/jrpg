@@ -50,7 +50,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **OL1. `ObjectTile.Level`: a tile's level on its cell in `objects.json`, left out at 0; one tile per cell and level, listed bottom level first, levels 0 to 7; written back** (Core + Data, about 175 lines) → [slices/OL1.md](slices/OL1.md)
 - [x] **OL2. The stack drawn bottom first: the game's canopy bake lays each tile over the one under it; the editor's object pictures pinned on a stacked object** (Game + Editor, about 110 lines) → [slices/OL2.md](slices/OL2.md)
 - [x] **OL3. The composer's levels: `ObjectCanvas` keyed by cell and level, `CanvasPainting.Level` and its choices (one empty level on top), Save and Edit with a stack** (Editor, about 235 lines, 25 of them one-token call-site churn) → [slices/OL3.md](slices/OL3.md)
-- [ ] **OL4. The composer window's Level box; the levels above the chosen one faded; the first stacked object made, zoned and seen in the game** (Editor, about 90 lines) → [slices/OL4.md](slices/OL4.md)
+- [x] **OL4. The composer window's Level box; the levels above the chosen one faded; the first stacked object made, zoned and seen in the game** (Editor, about 90 lines) → [slices/OL4.md](slices/OL4.md)
 
 ### Phase 2: the sheet zoom
 - [ ] **SZ1. `CellZoom`: a cell's shown size in steps (16 to 192 px, 48 the map's), in and out within the bounds, the scale for a source cell size, the scroll offset that keeps the point under the mouse** (Editor, about 180 lines) → [slices/SZ1.md](slices/SZ1.md)

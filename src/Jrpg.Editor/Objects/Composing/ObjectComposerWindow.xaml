@@ -16,12 +16,20 @@
   </Window.InputBindings>
   <Grid Margin="12">
     <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="420" />
-      <ColumnDefinition Width="12" />
-      <ColumnDefinition Width="*" />
+      <!-- The picker never narrower than the side panel's minimum, where the Cut panel's grid clips; the canvas side
+           never narrower than its Columns to Redo row (decision 494). -->
+      <ColumnDefinition Width="420" MinWidth="300" />
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="*" MinWidth="400" />
     </Grid.ColumnDefinitions>
     <!-- The Tiles panel's own sheet view (decision 457): its DataContext is set in code, after its images. -->
     <tiles:TileBrowserView x:Name="Picker" Grid.Column="0" />
+    <GridSplitter Grid.Column="1"
+                  Width="5"
+                  Margin="4,0"
+                  HorizontalAlignment="Stretch"
+                  ResizeBehavior="PreviousAndNext"
+                  ToolTip="Drag to widen the sheet or the canvas." />
     <DockPanel Grid.Column="2">
       <StackPanel DockPanel.Dock="Top">
         <TextBlock Text="Id (fixed once created; maps and saves refer to it)" />
@@ -48,9 +56,9 @@
           <TextBlock Text="Level" VerticalAlignment="Center" />
           <ComboBox Width="110"
                     Margin="4,0,0,0"
-                    ToolTip="The level strokes paint and erase, from -7 to 7: 0 is the base, a higher level is drawn over a lower one."
+                    ToolTip="The level strokes paint and erase, from -7 to 7: 0 is the base, a higher level is drawn over a lower one. A • marks the levels painted on."
                     ItemsSource="{Binding Painting.LevelChoices}"
-                    DisplayMemberPath="Name"
+                    DisplayMemberPath="Text"
                     SelectedValuePath="Level"
                     SelectedValue="{Binding Painting.Level}" />
         </StackPanel>

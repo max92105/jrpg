@@ -86,6 +86,45 @@ public sealed class CanvasPaintingLevelTests : IDisposable
         Assert.Equal(3, painting.Level);
     }
 
+    [Fact]
+    public void LevelChoices_PaintedUnderAndOverTheBase_MarksThoseLevelsOnly()
+    {
+        var painting = Painting(ObjectCanvas.Empty(3, 3).Stamp(-1, _cell, Cell(0)).Stamp(2, _cell, Cell(1)));
+
+        Assert.Equal(["2 •", "0 (base)", "-1 •"], new[] { 2, 0, -1 }.Select(level => ChoiceOf(painting, level).Text));
+        Assert.Equal(2, painting.LevelChoices.Count(choice => choice.IsPainted));
+    }
+
+    [Fact]
+    public void PaintAt_OnAnEmptyLevel_RaisesItsChoiceText()
+    {
+        var painting = Painting(ObjectCanvas.Empty(3, 3));
+        ChooseTopLeftCell(painting.Picker);
+        var raised = new List<string?>();
+        ChoiceOf(painting, 4).PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        painting.Level = 4;
+        Stroke(painting, _cell);
+
+        Assert.Contains(nameof(LevelChoice.Text), raised);
+        Assert.Equal("4 •", ChoiceOf(painting, 4).Text);
+    }
+
+    [Fact]
+    public void Undo_OnlyStrokeOnALevel_ClearsItsMark()
+    {
+        var painting = Painting(ObjectCanvas.Empty(3, 3));
+        ChooseTopLeftCell(painting.Picker);
+        painting.Level = -2;
+        Stroke(painting, _cell);
+
+        painting.UndoCommand.Execute(null);
+
+        Assert.False(ChoiceOf(painting, -2).IsPainted);
+    }
+
+    private static LevelChoice ChoiceOf(CanvasPainting painting, int level) => painting.LevelChoices.Single(choice => choice.Level == level);
+
     private static SheetCellRectangle Cell(int column) => new("forest", column, 0, 1, 1);
 
     private CanvasPainting Painting(ObjectCanvas start) =>

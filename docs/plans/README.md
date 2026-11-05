@@ -15,7 +15,7 @@ Older plans are single files with the same sections.
 
 | Plan | Status |
 |---|---|
-| [2026-11-05-free-levels-and-picker-width](2026-11-05-free-levels-and-picker-width/README.md) | approved |
+| [2026-11-05-free-levels-and-picker-width](2026-11-05-free-levels-and-picker-width/README.md) | retro pending |
 | [done/2026-11-05-object-layers-and-sheet-zoom](done/2026-11-05-object-layers-and-sheet-zoom/README.md) | done |
 | [2026-11-03-object-composer-and-animated-tiles](done/2026-11-03-object-composer-and-animated-tiles/README.md) | done |
 | [done/2026-11-03-mana-seed-reset](done/2026-11-03-mana-seed-reset/README.md) | done (the maps painted after it, as content work) |

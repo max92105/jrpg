@@ -59,6 +59,20 @@ public sealed class ObjectComposingLevelTests : IDisposable
         Assert.True(painting.Canvas.Cells.ContainsKey(new CellOnLevel(new GridCell(baseTile.X, baseTile.Y), 2)));
     }
 
+    [Fact]
+    public void StartEdit_StackedObject_MarksItsPaintedLevels()
+    {
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
+        var chest = viewModel.Catalog!.Objects["chest"];
+        viewModel.Content!.SetObject(chest with { Tiles = [.. chest.Tiles, chest.Tiles[0] with { Level = 2 }] });
+        var browser = viewModel.Placing!.Browser;
+        browser.SelectedObject = browser.Objects.First(definition => definition.Id == "chest");
+
+        var choices = viewModel.Composing!.StartEdit()!.Painting.LevelChoices;
+
+        Assert.Equal(["2 •", "1", "0 (base) •"], choices.Where(choice => choice.Level is >= 0 and <= 2).Select(choice => choice.Text));
+    }
+
     // Chooses the sheet's first tile in the Tiles panel and strokes it on the canvas's top-left cell on the level.
     private static int PaintTileOf(MainViewModel viewModel, ObjectComposerViewModel composer, string sheetId, int level)
     {

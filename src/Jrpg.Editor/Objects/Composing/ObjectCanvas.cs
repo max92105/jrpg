@@ -33,6 +33,9 @@ internal sealed class ObjectCanvas
 
     public bool IsBlank => _cells.Count == 0;
 
+    /// <summary>Whether a cell is painted on <paramref name="level"/>.</summary>
+    public bool HasCellsOn(int level) => _cells.Keys.Any(key => key.Level == level);
+
     /// <exception cref="ArgumentOutOfRangeException">A size outside 1 to <see cref="MaxCells"/>.</exception>
     public static ObjectCanvas Empty(int width, int height) => new(width, height, []);
 

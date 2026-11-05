@@ -2,6 +2,8 @@
 
 Builds on design.md, "Key decisions" 4, 6 and 7; decisions 491, 494 and 495. Needs FL2 (`LevelChoice`, the fixed list).
 
+- **Done:** as planned.
+
 ## Goal
 1. **The marks:** in the composer's Level box, every level holding a painted cell reads with a mark ("2 •", "0 (base) •", "-1 •"), the others plain. The marks follow every stroke, undo, redo and resize, and show a stacked object's levels as soon as Edit object opens it. The list itself never changes, so the chosen level stays chosen.
 2. **The drag bar:** a thin bar between the composer's picker and its canvas side. Dragging it right widens the picker, which shows more of the sheet at the same zoom; its horizontal scroll bar goes once the whole sheet fits. The picker starts at 420 px each time the composer opens, never narrower than 300; the canvas side never narrower than 400, so its boxes row stays whole.

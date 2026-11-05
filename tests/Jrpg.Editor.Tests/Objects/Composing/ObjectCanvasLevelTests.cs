@@ -60,6 +60,12 @@ public sealed class ObjectCanvasLevelTests
     }
 
     [Fact]
+    public void HasCellsOn_PaintedLevel_IsTrue() => Assert.True(ObjectCanvas.Empty(3, 3).Stamp(-1, _cell, _wall).HasCellsOn(-1));
+
+    [Fact]
+    public void HasCellsOn_EmptyLevel_IsFalse() => Assert.False(ObjectCanvas.Empty(3, 3).Stamp(0, _cell, _wall).HasCellsOn(1));
+
+    [Fact]
     public void Of_StackedObject_PutsEachTileOnItsLevel()
     {
         var tiles = new Dictionary<int, TileDefinition>

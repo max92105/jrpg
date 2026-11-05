@@ -110,6 +110,15 @@ internal sealed partial class CanvasPainting : ObservableObject
         ShowRestoredCanvas();
     }
 
+    // Runs for the start canvas too: the choices are made before the constructor's body sets it.
+    partial void OnCanvasChanged(ObjectCanvas value)
+    {
+        foreach (var choice in LevelChoices)
+        {
+            choice.IsPainted = value.HasCellsOn(choice.Level);
+        }
+    }
+
     partial void OnColumnsTextChanged(string value) => ApplyTypedSize();
 
     partial void OnRowsTextChanged(string value) => ApplyTypedSize();

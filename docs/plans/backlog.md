@@ -176,7 +176,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the object composer and animated tiles plan (2026-11-03, at approval)
 
-- Several tiles on one object cell (decision 456): its own plan, with an ADR on the object tile format, if the half-timber house's doors or windows turn out to be transparent overlays on wall cells.
+- Several tiles on one object cell (decision 456): taken by the object levels and sheet zoom plan (`2026-11-05-object-layers-and-sheet-zoom`, ADR 0040).
 - The editor's map animating (the plan's former AE4, decision 466): one shared, unfrozen `ImageBrush` per animated tile, swapped on `TileAnimationTime.FramesChanged`; `MapDrawing` paints those cells with it and leaves such a drawing unfrozen (design.md, "Extension points").
 - The other out-of-scope items (an explicit frame list or per-frame times, per-cell start offsets, the tall grass effect, a free pixel rectangle from an image without a cut, animated canopies, an animated tile's mark on the sheet, the re-cut warning counting frames) are listed in `docs/plans/done/2026-11-03-object-composer-and-animated-tiles/README.md`, "Out of scope".
 - `tests/Jrpg.Game.Tests/Flow/GameFlowTests.cs` (321 lines) and `Exploration/EventPresenterTests.cs` (306) crossed 300 before the Mana Seed plan; split each by scenario when next touched (reset retro).
@@ -186,3 +186,10 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Editor/Catalogs/CatalogDraft` is at 298 lines after AI2 (the removals already moved to `CatalogDraft.Removals.cs`): the next catalog step moves the `With...`/`Without...` helpers into a partial file first.
 - `Editor/Shell/MainWindow.xaml` is at 296 lines after AE2 (the Animate panel became `Tiles/TileAnimationPanel`): the next panel in the Tiles tab goes in its own control.
 - The "chosen cells' sheet has its image" query is written twice, in `Objects/Composing/CanvasPainting.PaintAt` and `Tiles/TileAnimationViewModel.CanOpen`: a third use moves it onto `TileBrowserViewModel` (AE1).
+
+## From the object levels and sheet zoom plan (2026-11-05, at approval)
+
+- Composer levels: showing or hiding a level, reordering levels, moving painted cells from one level to another, a level above an empty one (the Level box offers one empty level on top, decision 478).
+- A level with its own above-player zone or collision (ADR 0040's consequences: a format addition).
+- The sheet zoom remembered between editor runs, keyboard shortcuts for it, steps below the sheet's own pixels; the Animate panel's preview following the zoom (decision 486).
+- The marks' and grids' "one screen pixel" is one DIP, not exact at 125 % or 150 % Windows scaling (already true before the plan).

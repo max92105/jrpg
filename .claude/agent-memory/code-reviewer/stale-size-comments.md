@@ -35,6 +35,10 @@ call or a rename. These cases slipped past it:
   elsewhere saying where it refuses ("refuses it only on save" in TileImages) and summaries describing the old fallback
   (`Select`: "nothing when the sheet isn't in the box"); grep the check's name and "on save" across the feature folders.
 
+- Deleted content files leave text a script generates (music change, decision 496: fetch-placeholder-sounds.ps1 writing
+  "The music ... rendered by new-placeholder-tune.pl" into CREDITS.md) and the generator's now-unused subs; grep
+  `.claude/scripts/` too, not only comments and docs.
+
 **Why:** a comment or doc stating a wrong rule, name or number misleads the next reader.
 
 **How to apply:** after the rule's grep, run the list above against the diff's renames, moves, new members and removed

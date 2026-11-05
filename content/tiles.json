@@ -1,1 +1,1241 @@
-[]
+[
+  {
+    "id": 1,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 2,
+    "row": 4
+  },
+  {
+    "id": 2,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 3,
+    "row": 4
+  },
+  {
+    "id": 3,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 4,
+    "row": 4
+  },
+  {
+    "id": 4,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 5,
+    "row": 4
+  },
+  {
+    "id": 5,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 6,
+    "row": 4
+  },
+  {
+    "id": 6,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 7,
+    "row": 4
+  },
+  {
+    "id": 7,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 2,
+    "row": 5
+  },
+  {
+    "id": 8,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 3,
+    "row": 5
+  },
+  {
+    "id": 9,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 4,
+    "row": 5
+  },
+  {
+    "id": 10,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 5,
+    "row": 5
+  },
+  {
+    "id": 11,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 6,
+    "row": 5
+  },
+  {
+    "id": 12,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 7,
+    "row": 5
+  },
+  {
+    "id": 13,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 2,
+    "row": 6
+  },
+  {
+    "id": 14,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 3,
+    "row": 6
+  },
+  {
+    "id": 15,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 4,
+    "row": 6
+  },
+  {
+    "id": 16,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 5,
+    "row": 6
+  },
+  {
+    "id": 17,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 6,
+    "row": 6
+  },
+  {
+    "id": 18,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 7,
+    "row": 6
+  },
+  {
+    "id": 19,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 2,
+    "row": 7
+  },
+  {
+    "id": 20,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 3,
+    "row": 7
+  },
+  {
+    "id": 21,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 4,
+    "row": 7
+  },
+  {
+    "id": 22,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 5,
+    "row": 7
+  },
+  {
+    "id": 23,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 6,
+    "row": 7
+  },
+  {
+    "id": 24,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 7,
+    "row": 7
+  },
+  {
+    "id": 25,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 2,
+    "row": 8
+  },
+  {
+    "id": 26,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 3,
+    "row": 8
+  },
+  {
+    "id": 27,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 4,
+    "row": 8
+  },
+  {
+    "id": 28,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 5,
+    "row": 8
+  },
+  {
+    "id": 29,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 6,
+    "row": 8
+  },
+  {
+    "id": 30,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 7,
+    "row": 8
+  },
+  {
+    "id": 31,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 0,
+    "row": 4
+  },
+  {
+    "id": 32,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 0,
+    "row": 5
+  },
+  {
+    "id": 33,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 0,
+    "row": 6
+  },
+  {
+    "id": 34,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 0,
+    "row": 7
+  },
+  {
+    "id": 35,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 0,
+    "row": 8
+  },
+  {
+    "id": 36,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 8,
+    "row": 4
+  },
+  {
+    "id": 37,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 8,
+    "row": 5
+  },
+  {
+    "id": 38,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 8,
+    "row": 6
+  },
+  {
+    "id": 39,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 8,
+    "row": 7
+  },
+  {
+    "id": 40,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 8,
+    "row": 8
+  },
+  {
+    "id": 41,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 8,
+    "row": 16
+  },
+  {
+    "id": 42,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 3,
+    "row": 16
+  },
+  {
+    "id": 43,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 8,
+    "row": 15
+  },
+  {
+    "id": 44,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 3,
+    "row": 15
+  },
+  {
+    "id": 45,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 2,
+    "row": 16
+  },
+  {
+    "id": 46,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 9,
+    "row": 16
+  },
+  {
+    "id": 47,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 23,
+    "row": 25
+  },
+  {
+    "id": 48,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 24,
+    "row": 25
+  },
+  {
+    "id": 49,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 25,
+    "row": 25
+  },
+  {
+    "id": 50,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 23,
+    "row": 26
+  },
+  {
+    "id": 51,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 24,
+    "row": 26
+  },
+  {
+    "id": 52,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 25,
+    "row": 26
+  },
+  {
+    "id": 53,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 0,
+    "row": 30
+  },
+  {
+    "id": 54,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 0,
+    "row": 26
+  },
+  {
+    "id": 55,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 20,
+    "row": 30
+  },
+  {
+    "id": 56,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 20,
+    "row": 26
+  },
+  {
+    "id": 57,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 0,
+    "row": 0
+  },
+  {
+    "id": 58,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 1,
+    "row": 0
+  },
+  {
+    "id": 59,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 2,
+    "row": 0
+  },
+  {
+    "id": 60,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 3,
+    "row": 0
+  },
+  {
+    "id": 61,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 4,
+    "row": 0
+  },
+  {
+    "id": 62,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 0,
+    "row": 1
+  },
+  {
+    "id": 63,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 1,
+    "row": 1
+  },
+  {
+    "id": 64,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 2,
+    "row": 1
+  },
+  {
+    "id": 65,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 3,
+    "row": 1
+  },
+  {
+    "id": 66,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 4,
+    "row": 1
+  },
+  {
+    "id": 67,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 0,
+    "row": 2
+  },
+  {
+    "id": 68,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 1,
+    "row": 2
+  },
+  {
+    "id": 69,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 2,
+    "row": 2
+  },
+  {
+    "id": 70,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 3,
+    "row": 2
+  },
+  {
+    "id": 71,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 4,
+    "row": 2
+  },
+  {
+    "id": 72,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 0,
+    "row": 3
+  },
+  {
+    "id": 73,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 1,
+    "row": 3
+  },
+  {
+    "id": 74,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 2,
+    "row": 3
+  },
+  {
+    "id": 75,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 3,
+    "row": 3
+  },
+  {
+    "id": 76,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 4,
+    "row": 3
+  },
+  {
+    "id": 77,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 0,
+    "row": 4
+  },
+  {
+    "id": 78,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 1,
+    "row": 4
+  },
+  {
+    "id": 79,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 2,
+    "row": 4
+  },
+  {
+    "id": 80,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 3,
+    "row": 4
+  },
+  {
+    "id": 81,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 4,
+    "row": 4
+  },
+  {
+    "id": 82,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 0,
+    "row": 5
+  },
+  {
+    "id": 83,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 1,
+    "row": 5
+  },
+  {
+    "id": 84,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 2,
+    "row": 5
+  },
+  {
+    "id": 85,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 3,
+    "row": 5
+  },
+  {
+    "id": 86,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 4,
+    "row": 5
+  },
+  {
+    "id": 87,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 0,
+    "row": 6
+  },
+  {
+    "id": 88,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 1,
+    "row": 6
+  },
+  {
+    "id": 89,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 2,
+    "row": 6
+  },
+  {
+    "id": 90,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 3,
+    "row": 6
+  },
+  {
+    "id": 91,
+    "isWalkable": true,
+    "sheetId": "autumn_trees_leaves_80_x_112",
+    "column": 4,
+    "row": 6
+  },
+  {
+    "id": 92,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 0,
+    "row": 1
+  },
+  {
+    "id": 93,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 0,
+    "row": 2
+  },
+  {
+    "id": 94,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 0,
+    "row": 3
+  },
+  {
+    "id": 95,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 0,
+    "row": 4
+  },
+  {
+    "id": 96,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 0,
+    "row": 5
+  },
+  {
+    "id": 97,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 8,
+    "row": 2
+  },
+  {
+    "id": 98,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 8,
+    "row": 1
+  },
+  {
+    "id": 99,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 8,
+    "row": 0
+  },
+  {
+    "id": 100,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 7,
+    "row": 2
+  },
+  {
+    "id": 101,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 6,
+    "row": 2
+  },
+  {
+    "id": 102,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 7,
+    "row": 5
+  },
+  {
+    "id": 103,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 6,
+    "row": 0
+  },
+  {
+    "id": 104,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 8,
+    "row": 5
+  },
+  {
+    "id": 105,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 7,
+    "row": 6
+  },
+  {
+    "id": 106,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 5,
+    "row": 4
+  },
+  {
+    "id": 107,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 2,
+    "row": 8
+  },
+  {
+    "id": 108,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 3,
+    "row": 8
+  },
+  {
+    "id": 109,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 4,
+    "row": 8
+  },
+  {
+    "id": 110,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 2,
+    "row": 7
+  },
+  {
+    "id": 111,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 3,
+    "row": 7
+  },
+  {
+    "id": 112,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 4,
+    "row": 7
+  },
+  {
+    "id": 113,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_bare",
+    "column": 9,
+    "row": 7
+  },
+  {
+    "id": 114,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 8,
+    "row": 4
+  },
+  {
+    "id": 115,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 8,
+    "row": 3
+  },
+  {
+    "id": 116,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 0,
+    "row": 20
+  },
+  {
+    "id": 117,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 4,
+    "row": 4
+  },
+  {
+    "id": 118,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 4,
+    "row": 3
+  },
+  {
+    "id": 119,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 4,
+    "row": 2
+  },
+  {
+    "id": 120,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 4,
+    "row": 1
+  },
+  {
+    "id": 121,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 4,
+    "row": 0
+  },
+  {
+    "id": 122,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 2,
+    "row": 2
+  },
+  {
+    "id": 123,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 1,
+    "row": 2
+  },
+  {
+    "id": 124,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 2,
+    "row": 1
+  },
+  {
+    "id": 125,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 4,
+    "row": 5
+  },
+  {
+    "id": 126,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 3,
+    "row": 6
+  },
+  {
+    "id": 127,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 5,
+    "row": 9
+  },
+  {
+    "id": 128,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 4,
+    "row": 6
+  },
+  {
+    "id": 129,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_bare",
+    "column": 10,
+    "row": 7
+  },
+  {
+    "id": 130,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 7,
+    "row": 4
+  },
+  {
+    "id": 131,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 7,
+    "row": 3
+  },
+  {
+    "id": 132,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 7,
+    "row": 0
+  },
+  {
+    "id": 133,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 7,
+    "row": 1
+  },
+  {
+    "id": 134,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 8,
+    "row": 7
+  },
+  {
+    "id": 135,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 9,
+    "row": 8
+  },
+  {
+    "id": 136,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 2,
+    "row": 0
+  },
+  {
+    "id": 137,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 6,
+    "row": 3
+  },
+  {
+    "id": 138,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 5,
+    "row": 0
+  },
+  {
+    "id": 139,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 6,
+    "row": 5
+  },
+  {
+    "id": 140,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 5,
+    "row": 3
+  },
+  {
+    "id": 141,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 6,
+    "row": 4
+  },
+  {
+    "id": 142,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 10,
+    "row": 2
+  },
+  {
+    "id": 143,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 1,
+    "row": 3
+  },
+  {
+    "id": 144,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 2,
+    "row": 3
+  },
+  {
+    "id": 145,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 1,
+    "row": 4
+  },
+  {
+    "id": 146,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 2,
+    "row": 4
+  },
+  {
+    "id": 147,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 24,
+    "row": 21
+  },
+  {
+    "id": 148,
+    "isWalkable": true,
+    "sheetId": "bonus_wooden_deck",
+    "column": 2,
+    "row": 1
+  },
+  {
+    "id": 149,
+    "isWalkable": true,
+    "sheetId": "bonus_wooden_deck",
+    "column": 2,
+    "row": 5
+  },
+  {
+    "id": 150,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 13,
+    "row": 20
+  },
+  {
+    "id": 151,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 8,
+    "row": 21
+  },
+  {
+    "id": 152,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 8,
+    "row": 20
+  },
+  {
+    "id": 153,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 14,
+    "row": 20
+  },
+  {
+    "id": 154,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 11,
+    "row": 20
+  },
+  {
+    "id": 155,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 12,
+    "row": 20
+  },
+  {
+    "id": 156,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 11,
+    "row": 19
+  },
+  {
+    "id": 157,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 12,
+    "row": 19
+  },
+  {
+    "id": 158,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 5,
+    "row": 21
+  },
+  {
+    "id": 159,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 16,
+    "row": 20
+  },
+  {
+    "id": 160,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 15,
+    "row": 20
+  },
+  {
+    "id": 161,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 10,
+    "row": 20
+  },
+  {
+    "id": 162,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 15,
+    "row": 19
+  },
+  {
+    "id": 163,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 17,
+    "row": 19
+  },
+  {
+    "id": 164,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 16,
+    "row": 19
+  },
+  {
+    "id": 165,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 18,
+    "row": 19
+  },
+  {
+    "id": 166,
+    "isWalkable": false,
+    "sheetId": "bonus_wooden_deck",
+    "column": 2,
+    "row": 7
+  },
+  {
+    "id": 167,
+    "isWalkable": true,
+    "sheetId": "bonus_shadows",
+    "column": 0,
+    "row": 0
+  },
+  {
+    "id": 168,
+    "isWalkable": true,
+    "sheetId": "bonus_shadows",
+    "column": 6,
+    "row": 0
+  },
+  {
+    "id": 169,
+    "isWalkable": true,
+    "sheetId": "bonus_shadows",
+    "column": 0,
+    "row": 7
+  },
+  {
+    "id": 170,
+    "isWalkable": true,
+    "sheetId": "bonus_shadows",
+    "column": 0,
+    "row": 1
+  },
+  {
+    "id": 171,
+    "isWalkable": true,
+    "sheetId": "bonus_shadows",
+    "column": 2,
+    "row": 1
+  },
+  {
+    "id": 172,
+    "isWalkable": true,
+    "sheetId": "bonus_shadows",
+    "column": 7,
+    "row": 1
+  },
+  {
+    "id": 173,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 5,
+    "row": 5
+  },
+  {
+    "id": 174,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 5,
+    "row": 1
+  },
+  {
+    "id": 175,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 5,
+    "row": 2
+  },
+  {
+    "id": 176,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 10,
+    "row": 6
+  },
+  {
+    "id": 177,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 6,
+    "row": 1
+  }
+]

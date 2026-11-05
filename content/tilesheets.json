@@ -88,6 +88,22 @@
     "spacing": 0
   },
   {
+    "id": "bonus_shadows",
+    "file": "bonus shadows.png",
+    "tileWidth": 16,
+    "tileHeight": 16,
+    "margin": 0,
+    "spacing": 0
+  },
+  {
+    "id": "bonus_wooden_deck",
+    "file": "bonus wooden deck.png",
+    "tileWidth": 16,
+    "tileHeight": 16,
+    "margin": 0,
+    "spacing": 0
+  },
+  {
     "id": "home_exteriors_half_timber_v_1",
     "file": "home exteriors, half-timber v1.png",
     "tileWidth": 16,

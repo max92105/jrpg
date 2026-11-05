@@ -5,9 +5,8 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-05-object-layers-and-sheet-zoom, slice SZ3, round 1 (2026-11-05). Verdict: ready to commit. Last slice of the plan.
+Plan 2026-11-05-free-levels-and-picker-width, slice FL3 (last slice), round 1 (2026-11-05). Verdict: ready to commit.
 
-- Suggestion: ObjectCanvasDrawing summary rewrap leaves a one-word last line ("/// grid.") — open (optional)
-- Suggestion: wheel handler + zoom-changed anchor block now in TileBrowserView and ObjectComposerWindow (2 copies); a third zooming view should extract it — open (optional)
-- Fixed: SZ2's follow-up, OnCanvasMouseWheel checks CanExecute before Execute
-- Dropped: SZ2's two optional Suggestions (committed slice, not carried)
+- Fixed: the plural "Choices" test name is now PaintAt_OnAnEmptyLevel_RaisesItsChoiceText.
+- Fixed (from FL2): the Level_SetOnAnEmptyLevelAboveTheBase_IsChosen auto-property round-trip test is gone from the tree.
+- Checked: GridSplitter themed by EditorTheme's implicit style (no local Style); no stale "Name" display path or "420" wording elsewhere.

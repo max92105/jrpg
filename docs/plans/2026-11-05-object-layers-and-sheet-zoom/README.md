@@ -53,7 +53,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **OL4. The composer window's Level box; the levels above the chosen one faded; the first stacked object made, zoned and seen in the game** (Editor, about 90 lines) → [slices/OL4.md](slices/OL4.md)
 
 ### Phase 2: the sheet zoom
-- [ ] **SZ1. `CellZoom`: a cell's shown size in steps (16 to 192 px, 48 the map's), in and out within the bounds, the scale for a source cell size, the scroll offset that keeps the point under the mouse** (Editor, about 180 lines) → [slices/SZ1.md](slices/SZ1.md)
+- [x] **SZ1. `CellZoom`: a cell's shown size in steps (16 to 192 px, 48 the map's), in and out within the bounds, the scale for a source cell size, the scroll offset that keeps the point under the mouse** (Editor, about 180 lines) → [slices/SZ1.md](slices/SZ1.md)
 - [ ] **SZ2. The Tiles panel's sheet zooms: the zoom bar over it, Ctrl + wheel toward the mouse, marks one screen pixel wide at every size; the composer's picker shares it** (Editor, about 185 lines) → [slices/SZ2.md](slices/SZ2.md)
 - [ ] **SZ3. The composer's canvas zooms: its own zoom and bar, Ctrl + wheel toward the mouse, sharp pixels, grid lines one screen pixel wide, strokes on the right cell at every size** (Editor, about 85 lines) → [slices/SZ3.md](slices/SZ3.md)
 

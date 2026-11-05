@@ -2,6 +2,8 @@
 
 Builds on design.md, "Key decisions" 6 and 7; decisions 481 and 483. The rule before the views (SZ2, SZ3), as `ViewportTransform` is for the map.
 
+- **Done, with deviations:** `ZoomOutCommand_ReachingTheSmallestStep_RaisesCanExecuteChanged` and `CellPixelsText_AfterZoomingIn_IsRaised` added (the other side of the bound, and the text's notification).
+
 ## Goal
 One pure, tested type says how big a cell is shown: a size in fixed steps, stepping in and out within the bounds, back to the starting size, the scale that gives for a source cell size, and the scroll offset that keeps the point under the mouse in place when the scale changes. No view uses it yet.
 

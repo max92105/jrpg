@@ -28,8 +28,23 @@ public sealed class ObjectComposingLevelTests : IDisposable
         Assert.Equal([new ObjectTile(0, 0, wall), new ObjectTile(0, 0, overlay, Level: 1)], viewModel.Catalog!.Objects["house_window"].Tiles);
     }
 
+    // A ground tile as the base, a city tile on -1 under it on the same cell, painted base first.
     [Fact]
-    public void StartEdit_StackedObject_OffersEveryLevelAndOneAbove()
+    public void TryApply_TileUnderTheBase_SavesItFirst()
+    {
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
+        var composer = viewModel.Composing!.StartNew();
+        (composer.Naming.Id, composer.Naming.Category) = ("house_shadow", "House");
+        var ground = PaintTileOf(viewModel, composer, "ground", level: 0);
+        var shadow = PaintTileOf(viewModel, composer, "city", level: -1);
+
+        Assert.True(viewModel.Composing.TryApply(composer));
+
+        Assert.Equal([new ObjectTile(0, 0, shadow, Level: -1), new ObjectTile(0, 0, ground)], viewModel.Catalog!.Objects["house_shadow"].Tiles);
+    }
+
+    [Fact]
+    public void StartEdit_StackedObject_ChoosesTheBaseWithTheUpperTileOnItsLevel()
     {
         var viewModel = _content.Open(_content.CopyOfTestWorld());
         var chest = viewModel.Catalog!.Objects["chest"];
@@ -40,7 +55,7 @@ public sealed class ObjectComposingLevelTests : IDisposable
 
         var painting = viewModel.Composing!.StartEdit()!.Painting;
 
-        Assert.Equal(["0 (base)", "1", "2", "3"], painting.LevelChoices);
+        Assert.Equal(0, painting.Level);
         Assert.True(painting.Canvas.Cells.ContainsKey(new CellOnLevel(new GridCell(baseTile.X, baseTile.Y), 2)));
     }
 

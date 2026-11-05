@@ -2,6 +2,8 @@
 
 Builds on design.md, "Key decisions" 2, 3, 5 and 6; decisions 490, 492 and 493. Needs FL1 (`ObjectTile.MinLevel`; Data accepting a negative level at Ctrl+S).
 
+- **Done, with deviations:** `Level_SetOnAnEmptyLevelAboveTheBase_IsChosen` became `PaintAt_OnAnEmptyLevelAboveTheBase_StampsThere` at review: it paints on 5 over an empty canvas, not only sets the level.
+
 ## Goal
 The composer's Level box lists every level, "7" at the top down to "-7" at the bottom, "0 (base)" chosen when the composer opens. The developer chooses any level at any time, empty or not, -1 included; strokes paint and erase on it; an undo or redo never changes the choice. The canvas draws a negative level under the base, and with -1 chosen the base and everything over it are faded (the drawing already compares levels as numbers). Save writes the tiles lowest level first, so a -1 tile is listed before the base. The painted levels are not marked yet (FL3).
 

@@ -43,14 +43,16 @@
           <Button Content="Undo" Padding="8,2" Margin="12,0,0,0" ToolTip="Ctrl+Z: undo the last stroke or size change." Command="{Binding Painting.UndoCommand}" />
           <Button Content="Redo" Padding="8,2" Margin="4,0,0,0" ToolTip="Ctrl+Y" Command="{Binding Painting.RedoCommand}" />
         </StackPanel>
-        <!-- Bound by index: the painting ignores the -1 the box pushes while its list is rebuilt (decision 478). -->
+        <!-- Bound by value to a list that never changes, so the box never clears its choice (decision 490). -->
         <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
           <TextBlock Text="Level" VerticalAlignment="Center" />
-          <ComboBox Width="90"
+          <ComboBox Width="110"
                     Margin="4,0,0,0"
-                    ToolTip="The level strokes paint and erase: 0 is the base, higher levels are drawn over it. The last one is empty, ready to paint."
+                    ToolTip="The level strokes paint and erase, from -7 to 7: 0 is the base, a higher level is drawn over a lower one."
                     ItemsSource="{Binding Painting.LevelChoices}"
-                    SelectedIndex="{Binding Painting.Level}" />
+                    DisplayMemberPath="Name"
+                    SelectedValuePath="Level"
+                    SelectedValue="{Binding Painting.Level}" />
         </StackPanel>
       </StackPanel>
       <StackPanel DockPanel.Dock="Bottom">

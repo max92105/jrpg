@@ -189,7 +189,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the object levels and sheet zoom plan (2026-11-05, at approval)
 
-- Composer levels: showing or hiding a level, reordering levels, moving painted cells from one level to another, a level above an empty one (the Level box offers one empty level on top, decision 478).
+- Composer levels: showing or hiding a level, reordering levels, moving painted cells from one level to another (a level above an empty one came with the free levels plan, decision 490).
 - A level with its own above-player zone or collision (ADR 0040's consequences: a format addition).
 - The sheet zoom remembered between editor runs, keyboard shortcuts for it, steps below the sheet's own pixels; the Animate panel's preview following the zoom (decision 486).
 - The marks' and grids' "one screen pixel" is one DIP, not exact at 125 % or 150 % Windows scaling (already true before the plan).

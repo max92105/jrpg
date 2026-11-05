@@ -48,7 +48,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Free levels
 - [x] ADR 0040 amendment: free levels from -7 to 7. Write it from the entry under "ADRs" below (no new ADR).
 - [x] **FL1. Levels from -7 to 7 in `objects.json`: `ObjectTile.MinLevel`, the check's range and its order check starting at the lowest level** (Core + Data, about 60 lines) → [slices/FL1.md](slices/FL1.md)
-- [ ] **FL2. The composer paints any level: the canvas takes -7 to 7, the Level box lists all fifteen (bound by value, never rebuilt), no clamp on undo** (Editor, about 175 lines) → [slices/FL2.md](slices/FL2.md)
+- [x] **FL2. The composer paints any level: the canvas takes -7 to 7, the Level box lists all fifteen (bound by value, never rebuilt), no clamp on undo** (Editor, about 175 lines) → [slices/FL2.md](slices/FL2.md)
 - [ ] **FL3. The Level box marks the painted levels; the composer's picker widens with a drag bar** (Editor, about 120 lines) → [slices/FL3.md](slices/FL3.md)
 
 ## Decisions

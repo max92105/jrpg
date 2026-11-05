@@ -8,7 +8,7 @@ using Jrpg.Editor.Tiles;
 namespace Jrpg.Editor.Tests.Objects.Composing;
 
 /// <summary>
-/// The composer's chosen level and its choices (decision 478), over the Tiles panel's picker on the test world.
+/// The composer's chosen level, any from -7 to 7 (decision 490), over the Tiles panel's picker on the test world.
 /// </summary>
 public sealed class CanvasPaintingLevelTests : IDisposable
 {
@@ -17,6 +17,20 @@ public sealed class CanvasPaintingLevelTests : IDisposable
     private readonly EditorTestContent _content = new();
 
     public void Dispose() => _content.Dispose();
+
+    [Fact]
+    public void Level_New_IsTheBase() => Assert.Equal(0, Painting(ObjectCanvas.Empty(3, 3)).Level);
+
+    [Fact]
+    public void LevelChoices_New_ListsEveryLevelFromTheTopDown()
+    {
+        var choices = Painting(ObjectCanvas.Empty(3, 3)).LevelChoices;
+
+        Assert.Equal(ObjectTile.MaxLevel - ObjectTile.MinLevel + 1, choices.Count);
+        Assert.Equal((ObjectTile.MaxLevel, ObjectTile.MinLevel), (choices[0].Level, choices[^1].Level));
+        Assert.Equal("0 (base)", choices.Single(choice => choice.Level == 0).Name);
+        Assert.Equal("-1", choices.Single(choice => choice.Level == -1).Name);
+    }
 
     [Fact]
     public void PaintAt_OnLevelOne_StampsOverTheBaseCell()
@@ -34,74 +48,42 @@ public sealed class CanvasPaintingLevelTests : IDisposable
     }
 
     [Fact]
-    public void LevelChoices_BlankCanvas_IsTheBaseOnly() => Assert.Equal(["0 (base)"], Painting(ObjectCanvas.Empty(3, 3)).LevelChoices);
-
-    [Fact]
-    public void LevelChoices_PaintedOnLevelOne_EndsWithAnEmptyLevelTwo()
+    public void PaintAt_OnLevelMinusOne_StampsUnderTheBaseCell()
     {
-        var painting = Painting(ObjectCanvas.Empty(3, 3).Stamp(0, _cell, Cell(0)).Stamp(1, _cell, Cell(1)));
+        var painting = Painting(ObjectCanvas.Empty(3, 3).Stamp(0, _cell, Cell(5)));
+        var chosen = ChooseTopLeftCell(painting.Picker);
 
-        Assert.Equal(["0 (base)", "1", "2"], painting.LevelChoices);
+        painting.Level = -1;
+        Stroke(painting, _cell);
+
+        Assert.Equal(new SheetCell("forest", 5, 0), painting.Canvas.Cells[new CellOnLevel(_cell, 0)]);
+        Assert.Equal(chosen.Cells[0], painting.Canvas.Cells[new CellOnLevel(_cell, -1)]);
     }
 
     [Fact]
-    public void LevelChoices_PaintedOnTheHighestLevel_StopsAtIt()
+    public void PaintAt_OnAnEmptyLevelAboveTheBase_StampsThere()
     {
-        var painting = Painting(ObjectCanvas.Empty(3, 3).Stamp(ObjectTile.MaxLevel, _cell, Cell(0)));
+        var painting = Painting(ObjectCanvas.Empty(3, 3));
+        var chosen = ChooseTopLeftCell(painting.Picker);
 
-        Assert.Equal(ObjectTile.MaxLevel + 1, painting.LevelChoices.Count);
-        Assert.Equal("7", painting.LevelChoices[^1]);
+        painting.Level = 5;
+        Stroke(painting, _cell);
+
+        Assert.Equal(chosen.Cells[0], Assert.Single(painting.Canvas.Cells, pair => pair.Key == new CellOnLevel(_cell, 5)).Value);
     }
 
     [Fact]
-    public void LevelChoices_StrokeOnTheTopLevel_RaisesPropertyChanged()
+    public void Undo_OnlyStrokeOnTheChosenLevel_KeepsTheLevelChosen()
     {
         var painting = Painting(ObjectCanvas.Empty(3, 3));
         ChooseTopLeftCell(painting.Picker);
-        var raised = new List<string?>();
-        painting.PropertyChanged += (_, args) => raised.Add(args.PropertyName);
-
+        painting.Level = 3;
         Stroke(painting, _cell);
-
-        Assert.Equal(["0 (base)", "1"], painting.LevelChoices);
-        Assert.Equal(raised.IndexOf(nameof(CanvasPainting.LevelChoices)) + 1, raised.IndexOf(nameof(CanvasPainting.Level)));
-    }
-
-    [Fact]
-    public void Undo_StrokeThatOpenedTheChosenLevel_ChoosesTheHighestLevelLeft()
-    {
-        var painting = Painting(ObjectCanvas.Empty(3, 3).Stamp(0, _cell, Cell(0)));
-        ChooseTopLeftCell(painting.Picker);
-        painting.Level = 1;
-        Stroke(painting, _cell);
-        painting.Level = 2;
 
         painting.UndoCommand.Execute(null);
 
-        Assert.Equal(["0 (base)", "1"], painting.LevelChoices);
-        Assert.Equal(1, painting.Level);
-    }
-
-    [Fact]
-    public void Level_SetToMinusOne_KeepsTheChosenLevel()
-    {
-        var painting = Painting(ObjectCanvas.Empty(3, 3).Stamp(0, _cell, Cell(0)));
-        painting.Level = 1;
-
-        painting.Level = -1;
-
-        Assert.Equal(1, painting.Level);
-    }
-
-    [Fact]
-    public void Level_SetPastTheChoices_KeepsTheChosenLevel()
-    {
-        var painting = Painting(ObjectCanvas.Empty(3, 3).Stamp(0, _cell, Cell(0)));
-        painting.Level = 1;
-
-        painting.Level = 2;
-
-        Assert.Equal(1, painting.Level);
+        Assert.True(painting.Canvas.IsBlank);
+        Assert.Equal(3, painting.Level);
     }
 
     private static SheetCellRectangle Cell(int column) => new("forest", column, 0, 1, 1);

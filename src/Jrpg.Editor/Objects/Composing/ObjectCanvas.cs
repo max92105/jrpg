@@ -33,9 +33,6 @@ internal sealed class ObjectCanvas
 
     public bool IsBlank => _cells.Count == 0;
 
-    /// <summary>The highest level holding a painted cell; -1 on a blank canvas.</summary>
-    public int HighestLevel => IsBlank ? -1 : _cells.Keys.Max(key => key.Level);
-
     /// <exception cref="ArgumentOutOfRangeException">A size outside 1 to <see cref="MaxCells"/>.</exception>
     public static ObjectCanvas Empty(int width, int height) => new(width, height, []);
 
@@ -66,7 +63,7 @@ internal sealed class ObjectCanvas
     /// out.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">
-    /// A level outside 0 to <see cref="ObjectTile.MaxLevel"/>.
+    /// A level outside <see cref="ObjectTile.MinLevel"/> to <see cref="ObjectTile.MaxLevel"/>.
     /// </exception>
     public ObjectCanvas Stamp(int level, GridCell at, SheetCellRectangle cells)
     {
@@ -85,7 +82,7 @@ internal sealed class ObjectCanvas
     }
 
     /// <exception cref="ArgumentOutOfRangeException">
-    /// A level outside 0 to <see cref="ObjectTile.MaxLevel"/>.
+    /// A level outside <see cref="ObjectTile.MinLevel"/> to <see cref="ObjectTile.MaxLevel"/>.
     /// </exception>
     public ObjectCanvas Erase(int level, GridCell at)
     {
@@ -113,7 +110,7 @@ internal sealed class ObjectCanvas
 
     private static void ThrowIfOutsideTheLevels(int level)
     {
-        ArgumentOutOfRangeException.ThrowIfNegative(level);
+        ArgumentOutOfRangeException.ThrowIfLessThan(level, ObjectTile.MinLevel);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(level, ObjectTile.MaxLevel);
     }
 

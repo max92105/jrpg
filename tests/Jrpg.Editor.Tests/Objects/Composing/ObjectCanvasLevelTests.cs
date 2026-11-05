@@ -30,17 +30,34 @@ public sealed class ObjectCanvasLevelTests
     }
 
     [Theory]
-    [InlineData(-1)]
+    [InlineData(ObjectTile.MinLevel - 1)]
     [InlineData(ObjectTile.MaxLevel + 1)]
     public void Stamp_OutsideTheLevels_Throws(int level) =>
         Assert.Throws<ArgumentOutOfRangeException>(() => ObjectCanvas.Empty(3, 3).Stamp(level, _cell, _wall));
 
-    [Fact]
-    public void Stamp_OnTheHighestLevel_PaintsIt() =>
-        Assert.Equal(ObjectTile.MaxLevel, ObjectCanvas.Empty(3, 3).Stamp(ObjectTile.MaxLevel, _cell, _wall).HighestLevel);
+    [Theory]
+    [InlineData(ObjectTile.MinLevel)]
+    [InlineData(ObjectTile.MaxLevel)]
+    public void Stamp_AtEachBound_PaintsIt(int level) =>
+        Assert.Equal([new CellOnLevel(_cell, level)], ObjectCanvas.Empty(3, 3).Stamp(level, _cell, _wall).Cells.Keys);
 
     [Fact]
-    public void HighestLevel_Blank_IsMinusOne() => Assert.Equal(-1, ObjectCanvas.Empty(3, 3).HighestLevel);
+    public void Stamp_UnderTheBase_KeepsTheBaseCellOver()
+    {
+        var canvas = ObjectCanvas.Empty(3, 3).Stamp(0, _cell, _wall).Stamp(-1, _cell, _window);
+
+        Assert.Equal(new SheetCell("house", 0, 0), canvas.Cells[new CellOnLevel(_cell, 0)]);
+        Assert.Equal(new SheetCell("house", 3, 2), canvas.Cells[new CellOnLevel(_cell, -1)]);
+    }
+
+    // The base is stamped first, the opposite of the expected order.
+    [Fact]
+    public void TilesOf_LevelUnderTheBase_ListsItFirst()
+    {
+        var canvas = ObjectCanvas.Empty(3, 3).Stamp(0, _cell, _wall).Stamp(-1, _cell, _window);
+
+        Assert.Equal([new ObjectTile(1, 1, 3, Level: -1), new ObjectTile(1, 1, 0)], canvas.TilesOf(cell => cell.Column));
+    }
 
     [Fact]
     public void Of_StackedObject_PutsEachTileOnItsLevel()

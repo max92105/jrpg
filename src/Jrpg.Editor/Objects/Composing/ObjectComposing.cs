@@ -42,7 +42,7 @@ internal sealed partial class ObjectComposing : ObservableObject
     public ObjectComposerViewModel StartNew()
     {
         var canvas = _tiles.SelectedCells is { } cells
-            ? ObjectCanvas.Empty(Math.Min(cells.Columns, ObjectCanvas.MaxCells), Math.Min(cells.Rows, ObjectCanvas.MaxCells)).Stamp(new GridCell(0, 0), cells)
+            ? ObjectCanvas.Empty(Math.Min(cells.Columns, ObjectCanvas.MaxCells), Math.Min(cells.Rows, ObjectCanvas.MaxCells)).Stamp(0, new GridCell(0, 0), cells)
             : ObjectCanvas.Empty(NewCanvasCells, NewCanvasCells);
         return ObjectComposerViewModel.ForNew(new CanvasPainting(canvas, _tiles), new ObjectNaming([.. _catalog.Current.Objects.Keys], Categories()));
     }

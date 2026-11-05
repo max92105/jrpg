@@ -22,7 +22,7 @@ public sealed class CanvasPaintingTests : IDisposable
 
         Stroke(painting, new GridCell(1, 1));
 
-        Assert.Equal(ObjectCanvas.Empty(4, 4).Stamp(new GridCell(1, 1), cells).Cells, painting.Canvas.Cells);
+        Assert.Equal(ObjectCanvas.Empty(4, 4).Stamp(0, new GridCell(1, 1), cells).Cells, painting.Canvas.Cells);
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public sealed class CanvasPaintingTests : IDisposable
 
         Stroke(painting, new GridCell(1, 0));
 
-        Assert.False(painting.Canvas.Cells.ContainsKey(new GridCell(1, 0)));
+        Assert.False(painting.Canvas.Cells.ContainsKey(new CellOnLevel(new GridCell(1, 0), 0)));
         Assert.Equal(3, painting.Canvas.Cells.Count);
     }
 
@@ -74,7 +74,7 @@ public sealed class CanvasPaintingTests : IDisposable
         painting.EraseAt(new GridCell(0, 1));
         painting.EndStroke();
 
-        Assert.False(painting.Canvas.Cells.ContainsKey(new GridCell(0, 1)));
+        Assert.False(painting.Canvas.Cells.ContainsKey(new CellOnLevel(new GridCell(0, 1), 0)));
         Assert.True(painting.CanUndo);
     }
 

@@ -17,8 +17,8 @@ public sealed class ObjectCanvasTests
 
         Assert.Equal((3, 2), (canvas.Width, canvas.Height));
         Assert.Equal(6, canvas.Cells.Count);
-        Assert.Equal(new SheetCell("forest", 4, 1), canvas.Cells[new GridCell(0, 0)]);
-        Assert.Equal(new SheetCell("forest", 6, 2), canvas.Cells[new GridCell(2, 1)]);
+        Assert.Equal(new SheetCell("forest", 4, 1), canvas.Cells[new CellOnLevel(new GridCell(0, 0), 0)]);
+        Assert.Equal(new SheetCell("forest", 6, 2), canvas.Cells[new CellOnLevel(new GridCell(2, 1), 0)]);
     }
 
     [Fact]
@@ -44,22 +44,22 @@ public sealed class ObjectCanvasTests
 
         Assert.Equal((2, 3), (canvas.Width, canvas.Height));
         Assert.Equal(
-            new Dictionary<GridCell, SheetCell> { [new GridCell(1, 0)] = new("forest", 3, 5), [new GridCell(0, 2)] = new("house", 0, 2) },
+            new Dictionary<CellOnLevel, SheetCell> { [new CellOnLevel(new GridCell(1, 0), 0)] = new("forest", 3, 5), [new CellOnLevel(new GridCell(0, 2), 0)] = new("house", 0, 2) },
             canvas.Cells);
     }
 
     [Fact]
     public void Stamp_RectangleAtACell_PaintsItsCellsFromThere()
     {
-        var canvas = ObjectCanvas.Empty(4, 4).Stamp(new GridCell(1, 2), _square);
+        var canvas = ObjectCanvas.Empty(4, 4).Stamp(0, new GridCell(1, 2), _square);
 
         Assert.Equal(
-            new Dictionary<GridCell, SheetCell>
+            new Dictionary<CellOnLevel, SheetCell>
             {
-                [new GridCell(1, 2)] = new("forest", 4, 1),
-                [new GridCell(2, 2)] = new("forest", 5, 1),
-                [new GridCell(1, 3)] = new("forest", 4, 2),
-                [new GridCell(2, 3)] = new("forest", 5, 2),
+                [new CellOnLevel(new GridCell(1, 2), 0)] = new("forest", 4, 1),
+                [new CellOnLevel(new GridCell(2, 2), 0)] = new("forest", 5, 1),
+                [new CellOnLevel(new GridCell(1, 3), 0)] = new("forest", 4, 2),
+                [new CellOnLevel(new GridCell(2, 3), 0)] = new("forest", 5, 2),
             },
             canvas.Cells);
     }
@@ -67,26 +67,26 @@ public sealed class ObjectCanvasTests
     [Fact]
     public void Stamp_PastTheRightAndBottomEdges_KeepsOnlyTheCellsInside()
     {
-        var canvas = ObjectCanvas.Empty(3, 3).Stamp(new GridCell(2, 2), _square);
+        var canvas = ObjectCanvas.Empty(3, 3).Stamp(0, new GridCell(2, 2), _square);
 
-        Assert.Equal(new Dictionary<GridCell, SheetCell> { [new GridCell(2, 2)] = new("forest", 4, 1) }, canvas.Cells);
+        Assert.Equal(new Dictionary<CellOnLevel, SheetCell> { [new CellOnLevel(new GridCell(2, 2), 0)] = new("forest", 4, 1) }, canvas.Cells);
     }
 
     [Fact]
     public void Stamp_OverAPaintedCell_ReplacesIt()
     {
-        var canvas = ObjectCanvas.Of(_square).Stamp(new GridCell(1, 1), new SheetCellRectangle("house", 7, 8, 1, 1));
+        var canvas = ObjectCanvas.Of(_square).Stamp(0, new GridCell(1, 1), new SheetCellRectangle("house", 7, 8, 1, 1));
 
-        Assert.Equal(new SheetCell("house", 7, 8), canvas.Cells[new GridCell(1, 1)]);
+        Assert.Equal(new SheetCell("house", 7, 8), canvas.Cells[new CellOnLevel(new GridCell(1, 1), 0)]);
         Assert.Equal(4, canvas.Cells.Count);
     }
 
     [Fact]
     public void Erase_PaintedCell_LeavesItEmpty()
     {
-        var canvas = ObjectCanvas.Of(_square).Erase(new GridCell(0, 1));
+        var canvas = ObjectCanvas.Of(_square).Erase(0, new GridCell(0, 1));
 
-        Assert.False(canvas.Cells.ContainsKey(new GridCell(0, 1)));
+        Assert.False(canvas.Cells.ContainsKey(new CellOnLevel(new GridCell(0, 1), 0)));
         Assert.Equal(3, canvas.Cells.Count);
     }
 
@@ -97,7 +97,7 @@ public sealed class ObjectCanvasTests
 
         Assert.Equal((1, 2), (canvas.Width, canvas.Height));
         Assert.Equal(
-            new Dictionary<GridCell, SheetCell> { [new GridCell(0, 0)] = new("forest", 4, 1), [new GridCell(0, 1)] = new("forest", 4, 2) },
+            new Dictionary<CellOnLevel, SheetCell> { [new CellOnLevel(new GridCell(0, 0), 0)] = new("forest", 4, 1), [new CellOnLevel(new GridCell(0, 1), 0)] = new("forest", 4, 2) },
             canvas.Cells);
     }
 
@@ -123,15 +123,15 @@ public sealed class ObjectCanvasTests
 
     [Fact]
     public void IsBlank_OneCellPainted_IsFalse() =>
-        Assert.False(ObjectCanvas.Empty(3, 3).Stamp(new GridCell(1, 1), new SheetCellRectangle("forest", 0, 0, 1, 1)).IsBlank);
+        Assert.False(ObjectCanvas.Empty(3, 3).Stamp(0, new GridCell(1, 1), new SheetCellRectangle("forest", 0, 0, 1, 1)).IsBlank);
 
     [Fact]
     public void TilesOf_ScatteredCells_OneTilePerPaintedCellRowByRow()
     {
         var canvas = ObjectCanvas.Empty(3, 3)
-            .Stamp(new GridCell(2, 2), new SheetCellRectangle("forest", 1, 0, 1, 1))
-            .Stamp(new GridCell(2, 0), new SheetCellRectangle("forest", 2, 0, 1, 1))
-            .Stamp(new GridCell(0, 1), new SheetCellRectangle("house", 3, 0, 1, 1));
+            .Stamp(0, new GridCell(2, 2), new SheetCellRectangle("forest", 1, 0, 1, 1))
+            .Stamp(0, new GridCell(2, 0), new SheetCellRectangle("forest", 2, 0, 1, 1))
+            .Stamp(0, new GridCell(0, 1), new SheetCellRectangle("house", 3, 0, 1, 1));
 
         var tiles = canvas.TilesOf(cell => (cell.SheetId == "house" ? 100 : 0) + cell.Column);
 

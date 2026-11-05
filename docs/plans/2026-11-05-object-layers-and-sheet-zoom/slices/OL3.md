@@ -2,6 +2,8 @@
 
 Builds on design.md, "Key decisions" 4 and 5; decisions 478 and 480. The rules before the window (OL4), as every editor panel is split.
 
+- **Done, with deviations:** `Stamp_PastTheHighestLevel_Throws` is a theory over both sides (-1 and 8, `Stamp_OutsideTheLevels_Throws`) with `Stamp_OnTheHighestLevel_PaintsIt` and `HighestLevel_Blank_IsMinusOne` beside it; the choices and the clamp follow every canvas change (`OnCanvasChanged`: a stroke, an undo, a redo or a resize), which covers the undo rule; a level is chosen only once one below it is painted, so the save test paints the base first. The review asked for `ObjectCanvasDrawingTests.Draw_LevelOnePaintedBeforeTheBase_DrawsTheBaseFirst` (the drawing's order by level had no test).
+
 ## Goal
 The composer's canvas holds its cells by cell and level. Stamping and erasing name their level and leave the others alone; a stacked object opens in Edit with each tile on its level (closing OL1's known gap); Save writes the tiles bottom level first with their levels. The painting has a chosen level its strokes act on and offers the levels from 0 to one above the highest painted, so one empty level always waits on top; a value outside those choices is ignored, and an undo that leaves the chosen level above them chooses the highest. Nothing in the window shows the choice yet (OL4), so by hand the composer still paints the base level; the tests choose others.
 

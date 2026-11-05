@@ -35,6 +35,16 @@ public sealed class ObjectComposerViewModelTests : IDisposable
     }
 
     [Fact]
+    public void Problem_OnlyAnUpperLevelPainted_IsNull()
+    {
+        var canvas = ObjectCanvas.Empty(3, 3).Stamp(1, new GridCell(1, 1), new SheetCellRectangle("forest", 0, 0, 1, 1));
+
+        var composer = ObjectComposerViewModel.ForNew(Painting(canvas), Naming("window", "House"));
+
+        Assert.Null(composer.Problem);
+    }
+
+    [Fact]
     public void Problem_NewWithATakenId_IsTheIdProblem()
     {
         var composer = ObjectComposerViewModel.ForNew(Painting(Painted(2, 2)), Naming("chest", "Trees"));

@@ -40,7 +40,7 @@ public sealed class ObjectComposingTests : IDisposable
         var canvas = viewModel.Composing!.StartNew().Painting.Canvas;
 
         Assert.Equal((1, ObjectCanvas.MaxCells), (canvas.Width, canvas.Height));
-        Assert.Equal(new SheetCell("ra_jungle", 0, ObjectCanvas.MaxCells - 1), canvas.Cells[new GridCell(0, ObjectCanvas.MaxCells - 1)]);
+        Assert.Equal(new SheetCell("ra_jungle", 0, ObjectCanvas.MaxCells - 1), canvas.Cells[new CellOnLevel(new GridCell(0, ObjectCanvas.MaxCells - 1), 0)]);
     }
 
     [Fact]
@@ -186,7 +186,7 @@ public sealed class ObjectComposingTests : IDisposable
 
         Assert.Equal(placementsBefore, ChestPlacements(viewModel));
         var chest = viewModel.Catalog!.Objects["chest"];
-        Assert.Equal(composer.Painting.Canvas.Cells, chest.Tiles.ToDictionary(tile => new GridCell(tile.X, tile.Y), tile => SheetCellOf(viewModel.Catalog.Tiles[tile.TileId])));
+        Assert.Equal(composer.Painting.Canvas.Cells, chest.Tiles.ToDictionary(tile => new CellOnLevel(new GridCell(tile.X, tile.Y), tile.Level), tile => SheetCellOf(viewModel.Catalog.Tiles[tile.TileId])));
     }
 
     [Fact]

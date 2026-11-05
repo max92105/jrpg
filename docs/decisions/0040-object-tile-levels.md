@@ -42,3 +42,14 @@ draws). The editor's composer paints one level at a time. Saves are untouched.
 - A hand-edited file listing a higher level first is refused with the tile named rather than drawn wrong.
 - The composer's canvas holds cells by cell and level.
 - A later wish (a level hidden in the editor, zones per level) adds to the composer, not the format.
+
+## Amendment (2026-11-05): free levels
+Plan `2026-11-05-free-levels-and-picker-width`, decisions 488 and 489. After painting with the composer, the developer
+wanted to choose any level, including one under the base. A level now runs from -7 to 7 (`ObjectTile.MinLevel`,
+`MaxLevel`), 0 still the base and the default, left out of the file while 0; a negative level is drawn under the base.
+Tiles are still listed lowest level first, so every drawer and the canopy bake keep drawing the list in order; Data
+refuses a level outside the range and a lower level listed after a higher one, naming the tile. A level only orders the
+object's own tiles: the object stays one sprite on one map layer. The composer chooses any level freely.
+
+The decision's shape and its options are unchanged, only the range moves, so this is an amendment and not a new ADR:
+every file valid before stays valid. An older build refuses an `objects.json` with a negative level, naming the file.

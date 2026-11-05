@@ -174,8 +174,9 @@ public sealed class ObjectCatalogValidatorTests
     }
 
     [Theory]
-    [InlineData(-1)]
+    [InlineData(-8)]
     [InlineData(8)]
+    [InlineData(int.MinValue)]
     [InlineData(int.MaxValue)]
     public void Validate_TileLevelOutsideTheRange_ThrowsNamingTheTile(int level)
     {
@@ -183,10 +184,11 @@ public sealed class ObjectCatalogValidatorTests
 
         var exception = Assert.Throws<ContentValidationException>(() => ObjectCatalogValidator.Validate(FileName, [chest], _tileIds));
 
-        Assert.Equal($"objects.json: object 'chest': tile (0, 1) has level {level}; levels run from 0 to 7.", exception.Message);
+        Assert.Equal($"objects.json: object 'chest': tile (0, 1) has level {level}; levels run from -7 to 7.", exception.Message);
     }
 
     [Theory]
+    [InlineData(-7)]
     [InlineData(0)]
     [InlineData(7)]
     public void Validate_TileLevelAtEachBound_Passes(int level)
@@ -196,6 +198,29 @@ public sealed class ObjectCatalogValidatorTests
         var exception = Record.Exception(() => ObjectCatalogValidator.Validate(FileName, [chest], _tileIds));
 
         Assert.Null(exception);
+    }
+
+    // A shadow under the base on the same cell (decision 488): the order check starts at the lowest level, not 0.
+    [Fact]
+    public void Validate_LevelUnderTheBaseListedFirst_Passes()
+    {
+        var chest = _chest with { Tiles = [new ObjectTile(0, 1, 1, Level: -1), new ObjectTile(0, 1, 2)] };
+
+        var exception = Record.Exception(() => ObjectCatalogValidator.Validate(FileName, [chest], _tileIds));
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void Validate_LevelUnderTheBaseListedAfterTheBase_ThrowsNamingTheTile()
+    {
+        var chest = _chest with { Tiles = [new ObjectTile(0, 0, 1), new ObjectTile(0, 1, 2, Level: -1)] };
+
+        var exception = Assert.Throws<ContentValidationException>(() => ObjectCatalogValidator.Validate(FileName, [chest], _tileIds));
+
+        Assert.Equal(
+            "objects.json: object 'chest': tile (0, 1) on level -1 is listed after a tile on level 0; tiles are listed bottom level first, the order they are drawn in.",
+            exception.Message);
     }
 
     [Fact]

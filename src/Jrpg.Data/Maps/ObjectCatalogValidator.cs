@@ -51,12 +51,12 @@ internal static class ObjectCatalogValidator
         return hasSprite && definition.AbovePlayerZones.Count > 0 ? "abovePlayerZones aren't drawn for a field-sprite object." : null;
     }
 
-    // Tiles are listed bottom level first, one per cell and level (ADR 0040): drawing the list in order draws each
-    // stack bottom first, so no drawer sorts.
+    // Tiles are listed lowest level first, negative levels included, one per cell and level (ADR 0040): drawing the
+    // list in order draws each stack bottom first, so no drawer sorts.
     private static string? FindTileListProblem(ObjectDefinition definition, IReadOnlySet<int> tileIds)
     {
         var usedCells = new HashSet<(int X, int Y, int Level)>();
-        var previousLevel = 0;
+        var previousLevel = ObjectTile.MinLevel;
         foreach (var tile in definition.Tiles)
         {
             var problem = FindSingleTileProblem(definition, tile, tileIds);
@@ -93,8 +93,8 @@ internal static class ObjectCatalogValidator
             return $"tile ({tile.X}, {tile.Y}) must be inside the object's {definition.Width}x{definition.Height} cells.";
         }
 
-        return tile.Level is < 0 or > ObjectTile.MaxLevel
-            ? $"tile ({tile.X}, {tile.Y}) has level {tile.Level}; levels run from 0 to {ObjectTile.MaxLevel}."
+        return tile.Level is < ObjectTile.MinLevel or > ObjectTile.MaxLevel
+            ? $"tile ({tile.X}, {tile.Y}) has level {tile.Level}; levels run from {ObjectTile.MinLevel} to {ObjectTile.MaxLevel}."
             : null;
     }
 

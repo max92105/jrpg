@@ -2,6 +2,8 @@
 
 Builds on design.md, "Core changes" and "Key decisions" 1; decisions 488 and 489. The ADR 0040 amendment is written first (README, "ADRs").
 
+- **Done:** as planned.
+
 ## Goal
 An object tile's level may be any whole number from -7 to 7; 0 stays the base, left out of the file while 0. Data refuses a level outside -7 to 7 and a lower level listed after a higher one, naming the tile, and accepts a list that starts on a negative level. Every existing object loads and writes back byte for byte. Nothing in the editor can paint a negative level yet (FL2); the game would draw one under the base already, since it draws the list in order.
 

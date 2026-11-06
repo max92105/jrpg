@@ -5,20 +5,17 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-05-map-editing-flows, slice PO1 (PlacedObjectEditing, ReplacePlacedObjectEdit, MapDraft.ReplaceObject),
-round 1 (2026-11-05). Verdict: fix the Criticals.
-CP2 items checked in the tree: Edit menu CommandTarget fixed; Paste off-map check fixed; IsCopyingObjects gone (fixed);
-CanPaste now covers swapped-to objects (fixed). Removal of a shown object's definition: impossible (Remove and catalog
-undo refused while placed; purge needs every map saved and rewrites maps before Current).
+Plan 2026-11-05-map-editing-flows, slice PO2 (PlacedObjectEditing swaps the placement's object; Warning for stranded
+gated events), round 1 (2026-11-05). Verdict: ready to commit.
+PO1 items checked in the tree: NaN coordinate fixed (IsFinite); CatalogDraft.Current subscription fixed; ObjectPlacingViewModel
+summary names Copying/Editing (fixed); EventStepViewModel seconds Infinity fixed (IsFinite).
 
-- Critical, open: PlacedObjectEditing.Coordinate accepts "NaN" (double.TryParse ignores NumberStyles for the symbols);
-  floor(NaN) casts to 0 so the center check passes, Apply stores a NaN position, and the save's JSON writer throws an
-  uncaught ArgumentException. Fix: `&& double.IsFinite(value)`; theory row X "NaN".
-- Warning, open: no CatalogDraft.Current subscription; an Edit object resize (or its catalog undo) leaves Problem and
-  ApplyCommand.CanExecute stale (editor.md rule); test with SetObject wider while the panel shows the chest.
-- Suggestion, open: ObjectPlacingViewModel class summary doesn't mention Copying/Editing.
-- Follow-up: EventStepViewModel seconds parse accepts "Infinity" (> 0), which the save can't write.
-- Follow-up (from SN1, still present): window key guards exclude only TextBox, so B/R/F/G eat a focused ComboBox's
-  type-to-select.
+- Suggestion, open: the center rule now reads the chosen object's size, untested; test a swap near the right edge to a
+  wider object giving "The object's center must stay on the map."
+- Suggestion, open: no test that Apply stays enabled while Warning is shown (the slice's "a warning, not a problem").
+- Suggestion, open: ObjectIds hand-rolls its notification; [ObservableProperty] with a private setter keeps the
+  SequenceEqual guard.
+- Follow-up (from SN1, still present; now matters for PO3's object box): window key guards exclude only TextBox, so
+  B/R/F/G eat a focused ComboBox's type-to-select.
 - Follow-up (from MO2, still present): a wheel zoom mid Shift-drag runs DrawSelectionMarks, resetting the marks'
   transform until the next mouse move.

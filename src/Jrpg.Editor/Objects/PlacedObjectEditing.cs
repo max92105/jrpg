@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Editor.Catalogs;
@@ -11,9 +12,9 @@ using Jrpg.Editor.Maps.Editing;
 namespace Jrpg.Editor.Objects;
 
 /// <summary>
-/// The placed object panel's fields (decision 513): the one selected object's position and layer as typed, applied as
-/// one undo step. They follow the selection and every change of the map, an undo included, so they never show a record
-/// the map no longer holds.
+/// The placed object panel's fields (decision 513): the one selected object's object, position and layer as typed,
+/// applied as one undo step. They follow the selection and every change of the map, an undo included, so they never
+/// show a record the map no longer holds.
 /// </summary>
 internal sealed partial class PlacedObjectEditing : ObservableObject
 {
@@ -22,19 +23,32 @@ internal sealed partial class PlacedObjectEditing : ObservableObject
     private MapViewModel? _map;
     private PlacedObject? _shown;
 
-    /// <param name="catalog">The objects' sizes, for the center the map must keep.</param>
+    /// <param name="catalog">The objects to choose from, and their sizes for the center the map must keep.</param>
     /// <param name="placing">The shown map and its selection.</param>
     public PlacedObjectEditing(CatalogDraft catalog, ObjectPlacingViewModel placing)
     {
         (_catalog, _placing) = (catalog, placing);
         placing.PropertyChanged += OnPlacingChanged;
         catalog.PropertyChanged += OnCatalogChanged;
+        ObjectIds = SortedObjectIds();
     }
 
     /// <summary>Whether exactly one placed object is selected, so the panel shows it.</summary>
     public bool HasObject => _shown is not null;
 
     public string Uid => _shown?.Uid ?? "";
+
+    /// <summary>
+    /// Every object in the catalog, sorted: what the placement can be swapped to; follows the catalog.
+    /// </summary>
+    [ObservableProperty]
+    public partial IReadOnlyList<string> ObjectIds { get; private set; }
+
+    /// <summary>The object the placement uses; another one swaps it, uid, position, layer and events kept.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Problem), nameof(Warning))]
+    [NotifyCanExecuteChangedFor(nameof(ApplyCommand))]
+    public partial string ObjectId { get; set; } = "";
 
     /// <summary>The top-left's x in map cells, free (with a dot for decimals), as typed.</summary>
     [ObservableProperty]
@@ -53,27 +67,43 @@ internal sealed partial class PlacedObjectEditing : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(ApplyCommand))]
     public partial string ZText { get; set; } = "";
 
+    /// <summary>
+    /// The first event waiting for an object (<see cref="MapEvent.OnlyWhenObjectId"/>) the placement never becomes:
+    /// neither the chosen object nor one its events swap to. Advice: Apply still works, a later edit may add the swap.
+    /// </summary>
+    public string? Warning =>
+        _shown is { } shown && StrandedEventOf(shown) is { } stranded
+            ? $"Event {stranded.Id} runs only while the object is {stranded.OnlyWhenObjectId}; this one never becomes it."
+            : null;
+
     /// <summary>What stops Apply; null when it can apply, or with no object shown.</summary>
-    public string? Problem => _shown is not { } shown ? null : ProblemOf(shown);
+    public string? Problem => _shown is null ? null : ProblemOf();
 
     private bool CanApply() => _shown is not null && Problem is null;
 
     /// <summary>
-    /// Gives the object the typed position and layer as one undo step; nothing when they didn't change.
+    /// Gives the placement the chosen object and the typed position and layer as one undo step, or records no step when
+    /// none of them changed.
     /// </summary>
     [RelayCommand(CanExecute = nameof(CanApply))]
     private void Apply()
     {
         var shown = _shown!;
-        var edited = shown with { Position = new Point2D(Coordinate(XText)!.Value, Coordinate(YText)!.Value), Z = Layer(ZText)!.Value };
+        var edited = shown with { ObjectId = ObjectId, Position = new Point2D(Coordinate(XText)!.Value, Coordinate(YText)!.Value), Z = Layer(ZText)!.Value };
         if (edited != shown)
         {
             _map!.Do(new ReplacePlacedObjectEdit(shown, edited));
         }
     }
 
-    private string? ProblemOf(PlacedObject shown)
+    private string? ProblemOf()
     {
+        // Empty, or undone out of the catalog since it was chosen.
+        if (_catalog.Current.Objects.GetValueOrDefault(ObjectId) is not { } definition)
+        {
+            return "Choose an object.";
+        }
+
         if (Coordinate(XText) is not { } x || Coordinate(YText) is not { } y)
         {
             return "X and Y must be numbers, with a dot for decimals.";
@@ -85,7 +115,6 @@ internal sealed partial class PlacedObjectEditing : ObservableObject
         }
 
         // Placing's own rule: an object whose center leaves the map is drawn clipped and couldn't be seen.
-        var definition = _catalog.Current.Objects[shown.ObjectId];
         var center = new Point2D(x + (definition.Width / 2.0), y + (definition.Height / 2.0));
         return _map!.Map.Layout.Contains(GridCell.Containing(center)) ? null : "The object's center must stay on the map.";
     }
@@ -105,11 +134,18 @@ internal sealed partial class PlacedObjectEditing : ObservableObject
         }
     }
 
-    // An object's size decides where its center falls, so an edit of it (or its undo) is checked again.
+    // An object's size decides where its center falls, and an undo can take the chosen object away: both are checked
+    // again, and the list follows the catalog.
     private void OnCatalogChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(CatalogDraft.Current))
         {
+            var ids = SortedObjectIds();
+            if (!ids.SequenceEqual(ObjectIds))
+            {
+                ObjectIds = ids;
+            }
+
             OnPropertyChanged(nameof(Problem));
             ApplyCommand.NotifyCanExecuteChanged();
         }
@@ -127,13 +163,25 @@ internal sealed partial class PlacedObjectEditing : ObservableObject
     private void ShowSelected()
     {
         _shown = _map is not null && _placing.SelectedObjectUids is [var uid] ? _map.Map.Layout.Objects.FirstOrDefault(placed => placed.Uid == uid) : null;
-        XText = _shown?.Position.X.ToString(CultureInfo.InvariantCulture) ?? "";
-        YText = _shown?.Position.Y.ToString(CultureInfo.InvariantCulture) ?? "";
-        ZText = _shown?.Z.ToString(CultureInfo.InvariantCulture) ?? "";
+        (ObjectId, XText, YText, ZText) = _shown is { } shown
+            ? (shown.ObjectId, Text(shown.Position.X), Text(shown.Position.Y), shown.Z.ToString(CultureInfo.InvariantCulture))
+            : ("", "", "", "");
         OnPropertyChanged(nameof(HasObject));
         OnPropertyChanged(nameof(Uid));
         OnPropertyChanged(nameof(Problem));
+        OnPropertyChanged(nameof(Warning));
         ApplyCommand.NotifyCanExecuteChanged();
+    }
+
+    private static string Text(double coordinate) => coordinate.ToString(CultureInfo.InvariantCulture);
+
+    private IReadOnlyList<string> SortedObjectIds() => [.. _catalog.Current.Objects.Keys.Order(StringComparer.Ordinal)];
+
+    // The objects the placement can become are the chosen one and every one its events swap it to.
+    private MapEvent? StrandedEventOf(PlacedObject shown)
+    {
+        HashSet<string> reachable = [ObjectId, .. shown.Events.SelectMany(mapEvent => mapEvent.Steps).OfType<SwapObjectStep>().Select(swap => swap.ObjectId)];
+        return shown.Events.FirstOrDefault(mapEvent => mapEvent.OnlyWhenObjectId is { } gate && !reachable.Contains(gate));
     }
 
     // A free position can be negative: an object near the left or top edge, centered on the map. TryParse also reads

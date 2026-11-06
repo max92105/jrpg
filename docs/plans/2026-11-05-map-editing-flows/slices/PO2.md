@@ -34,3 +34,5 @@ Size: about 45 lines of code; 8 tests (about 110): about 155.
 
 ## Hand check (yours)
 Nothing to see yet (PO3).
+
+- **Done, with deviations:** the constructor already had the catalog (PO1). `ShowSelected` sets the four fields from one tuple to stay under the complexity limit. `Problem` checks the chosen object first ("Choose an object."), and the center rule now reads the chosen object's size. Review: a test pins that size (a wider object on the edge), the warning test checks Apply stays on, and `ObjectIds` is a toolkit property.

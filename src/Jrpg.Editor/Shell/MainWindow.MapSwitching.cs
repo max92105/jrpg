@@ -1,8 +1,12 @@
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
 
 namespace Jrpg.Editor.Shell;
 
-/// <summary>The map list: choosing and reselecting the shown map; later its filter, Back and Go to's arrival.</summary>
+/// <summary>
+/// The map list: choosing and reselecting the shown map, its filter box (decision 504); later Go to's arrival.
+/// </summary>
 internal sealed partial class MainWindow
 {
     private void OpenCurrentMap()
@@ -27,11 +31,35 @@ internal sealed partial class MainWindow
         }
     }
 
-    // A save (a new map, a new name) or a row's unsaved mark rebuilds the list, which drops its selection; the list is
-    // refreshed first, since this handler may run before its binding does.
-    private void ReselectShownMap()
+    // A save (a new map, a new name), a row's unsaved mark or the filter replaces the rows, which drops the selection;
+    // this runs once the new rows are in.
+    private void OnMapListUpdated(object? sender, DataTransferEventArgs e) => MapList.SelectedValue = _shownMap?.Map.Id;
+
+    private void OnGoToMapExecuted(object sender, ExecutedRoutedEventArgs e)
     {
-        MapList.GetBindingExpression(ItemsControl.ItemsSourceProperty)?.UpdateTarget();
-        MapList.SelectedValue = _shownMap?.Map.Id;
+        MapFilterBox.Focus();
+        MapFilterBox.SelectAll();
+    }
+
+    // Enter opens the first map shown, Esc clears the filter and gives the map back the keys, Down goes to the list.
+    private void OnMapFilterKeyDown(object sender, KeyEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case Key.Enter:
+                _viewModel.Navigation.TryOpenFirstShown();
+                break;
+            case Key.Escape:
+                _viewModel.Navigation.Filter = "";
+                MapViewport.Focus();
+                break;
+            case Key.Down:
+                MapList.Focus();
+                break;
+            default:
+                return;
+        }
+
+        e.Handled = true;
     }
 }

@@ -122,9 +122,6 @@ internal sealed partial class MainWindow : Window
             case nameof(MainViewModel.CurrentMap):
                 OpenCurrentMap();
                 break;
-            case nameof(MainViewModel.MapEntries):
-                ReselectShownMap();
-                break;
             case nameof(MainViewModel.Mode):
                 ShowBrushAt(_brushCell);
                 ShowObjectDragAt(_mapPoint);

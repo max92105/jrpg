@@ -25,6 +25,9 @@ internal sealed partial class MainViewModel
     [ObservableProperty]
     public partial IReadOnlyList<MapEntry> MapEntries { get; private set; } = [];
 
+    /// <summary>The map list's filter and Back to previous map (decisions 504, 505).</summary>
+    public MapNavigation Navigation => field ??= new(TryOpenMap);
+
     /// <summary>Shows another map, opening it the first time; an open map comes back as it was left.</summary>
     /// <returns>False when no map has this id, saved or open.</returns>
     public bool TryOpenMap(string mapId)
@@ -88,6 +91,7 @@ internal sealed partial class MainViewModel
         Painting?.OpenMap = newValue;
         Placing?.OpenMap = newValue;
         EventEditing?.OpenMap = newValue;
+        Navigation.NoteShown(newValue?.Map.Id);
         RefreshLayerEntries();
         OnPropertyChanged(nameof(HasUnsavedChanges));
     }
@@ -137,6 +141,7 @@ internal sealed partial class MainViewModel
         if (!entries.SequenceEqual(MapEntries))
         {
             MapEntries = entries;
+            Navigation.ShowEntries(entries);
         }
     }
 }

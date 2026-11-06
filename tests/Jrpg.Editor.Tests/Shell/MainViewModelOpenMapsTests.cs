@@ -259,6 +259,21 @@ public sealed class MainViewModelOpenMapsTests : IDisposable
         return (viewModel, tile.SheetId);
     }
 
+    [Fact]
+    public void GoBack_MapLeftUnsaved_ShowsItWithItsChanges()
+    {
+        var viewModel = _content.Open(_content.TestWorld);
+        var painted = EditorTestContent.PaintTopLeft(viewModel);
+        viewModel.TryOpenMap("start");
+        Assert.True(viewModel.Navigation.GoBackCommand.CanExecute(null));
+
+        viewModel.Navigation.GoBackCommand.Execute(null);
+
+        Assert.Equal("forest", viewModel.CurrentMap!.Map.Id);
+        Assert.Equal(painted, viewModel.CurrentMap.Map.Layout.Layers[0].TileIdAt(new GridCell(0, 0)));
+        Assert.Empty(_content.Questions);
+    }
+
     private MainViewModel PlaceNewObjectOnForestThenOpenStart()
     {
         var viewModel = _content.Open(_content.CopyOfTestWorld());

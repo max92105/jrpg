@@ -43,3 +43,5 @@ Size: about 55 lines of code, XAML 12, handlers 35; 13 tests (about 115): about 
 4. Click map A, then map B in the list. Press Alt+Left: A shows (with any unsaved change you left). Alt+Left again: B. Map > Back to previous map does the same and shows "Alt+Left".
 5. Make a new map (File > New map...): it is listed and selected. Alt+Left goes back to the map before; Alt+Left again shows the new map.
 6. Type in the tool bar's layer box and press Alt+Left: the caret stays in the box.
+
+- **Done, with deviations:** Ctrl+M runs WPF's `Find` command (so Ctrl+F also focuses the filter box) in place of a new `RoutedCommand`, which a XAML `x:Static` on the internal window would need. The list's `TargetUpdated` only sets the selection (the old `UpdateTarget` there would raise it again); `MapNavigation` keeps the previous map private. One test beyond the plan: rows replaced while filtered keep the filter. The look is unchecked by capture (hand check). Review: the editor-level Back test asserts the command can run (the rows reach `MapNavigation`).

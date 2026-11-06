@@ -72,7 +72,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **MS2. Usage checks read every open map: `CatalogUsage` takes the open layouts; undo refusals, removals and the re-cut warning see hidden unsaved maps; the purge rebuilds every open map** (Editor, about 175 lines, 33 test sites mechanical) → [slices/MS2.md](slices/MS2.md)
 - [x] **MS3. Undo follows each open map: journal steps carry their map, Ctrl+Z reaches the shown map's and the catalogs' steps, switching forgets nothing** (Editor, about 180 lines) → [slices/MS3.md](slices/MS3.md)
 - [x] **MS4. Save all (Ctrl+Shift+S), Save with no map open writes the tiles, and the close question: Save all / Don't save / Cancel in a dark window listing what is unsaved; Save moves into `MainViewModel.Saving.cs`** (Editor, about 240 lines besides a 45-line move) → [slices/MS4.md](slices/MS4.md)
-- [ ] **MS5. The map list's filter box (Ctrl+M, Enter opens the first match) and Back to previous map (Alt+Left), enabled only while the previous map is listed** (Editor, about 215 lines) → [slices/MS5.md](slices/MS5.md)
+- [x] **MS5. The map list's filter box (Ctrl+M, Enter opens the first match) and Back to previous map (Alt+Left), enabled only while the previous map is listed** (Editor, about 215 lines) → [slices/MS5.md](slices/MS5.md)
 
 ### Phase 2: warps
 - [ ] **WP1. `WarpDestinationViewModel` and `WarpMaps`: the picker's map, cell, warning (no tile, blocked, inside an outline, a walk-into event) and problem** (Editor, about 235 lines) → [slices/WP1.md](slices/WP1.md)

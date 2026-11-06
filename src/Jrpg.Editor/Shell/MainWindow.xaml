@@ -19,6 +19,8 @@
   <Window.CommandBindings>
     <CommandBinding Command="New" Executed="OnNewMapExecuted" />
     <CommandBinding Command="Help" Executed="OnControlsHelpExecuted" />
+    <!-- Find (also Ctrl+F) focuses the map list's filter box. -->
+    <CommandBinding Command="Find" Executed="OnGoToMapExecuted" />
   </Window.CommandBindings>
   <Window.InputBindings>
     <KeyBinding Key="Z" Modifiers="Control" Command="{Binding History.UndoCommand}" />
@@ -26,6 +28,8 @@
     <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}" />
     <KeyBinding Key="S" Modifiers="Control+Shift" Command="{Binding SaveAllCommand}" />
     <KeyBinding Key="H" Modifiers="Control" Command="{Binding ToggleCollisionCommand}" />
+    <KeyBinding Key="M" Modifiers="Control" Command="Find" />
+    <KeyBinding Key="Left" Modifiers="Alt" Command="{Binding Navigation.GoBackCommand}" />
   </Window.InputBindings>
   <DockPanel>
     <!-- Not the main menu, so letting go of Alt after Alt + click (pick a tile) doesn't move the focus to the menu. -->
@@ -69,6 +73,9 @@
         <MenuItem Header="Edit quests..." Click="OnEditQuestsClicked" IsEnabled="{Binding HasQuestEditing}" />
       </MenuItem>
       <MenuItem Header="Map">
+        <MenuItem Header="Go to map..." Command="Find" InputGestureText="Ctrl+M" />
+        <MenuItem Header="Back to previous map" Command="{Binding Navigation.GoBackCommand}" InputGestureText="Alt+Left" />
+        <Separator />
         <MenuItem Header="Settings..." Click="OnMapSettingsClicked" />
         <MenuItem Header="Add layer..." Click="OnAddLayerMenuClicked" />
       </MenuItem>
@@ -155,11 +162,19 @@
         <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="{StaticResource SidePanelWidth}" MinWidth="{StaticResource SidePanelMinWidth}" />
       </Grid.ColumnDefinitions>
-      <ListBox x:Name="MapList"
-               ItemsSource="{Binding MapEntries}"
-               DisplayMemberPath="Text"
-               SelectedValuePath="Id"
-               SelectionChanged="OnMapListSelectionChanged" />
+      <DockPanel>
+        <TextBox x:Name="MapFilterBox"
+                 DockPanel.Dock="Top"
+                 Text="{Binding Navigation.Filter, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="Type part of a map's name or id; Enter opens the first one, Esc clears (Ctrl+M)"
+                 PreviewKeyDown="OnMapFilterKeyDown" />
+        <ListBox x:Name="MapList"
+                 ItemsSource="{Binding Navigation.ShownEntries, NotifyOnTargetUpdated=True}"
+                 TargetUpdated="OnMapListUpdated"
+                 DisplayMemberPath="Text"
+                 SelectedValuePath="Id"
+                 SelectionChanged="OnMapListSelectionChanged" />
+      </DockPanel>
       <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
       <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
       <DockPanel Grid.Column="4">

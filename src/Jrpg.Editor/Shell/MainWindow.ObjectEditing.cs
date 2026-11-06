@@ -109,13 +109,14 @@ internal sealed partial class MainWindow
         {
             _selectionStart = point;
         }
-        else if (Keyboard.Modifiers == ModifierKeys.Shift && Placing.ObjectAt(point) is { } grabbed)
+        // Alt with Shift snaps the move; Ctrl stays exact (Ctrl + Alt is AltGr on some layouts).
+        else if ((Keyboard.Modifiers & ~ModifierKeys.Alt) == ModifierKeys.Shift && Placing.ObjectAt(point) is { } grabbed)
         {
             _movedObject = (grabbed, new Vector(grabbed.Position.X - point.X, grabbed.Position.Y - point.Y), point, Placing.IsSelected(grabbed.Uid));
         }
         else
         {
-            Placing.PlaceObjectAt(point);
+            PlaceChosenObjectAt(point);
             return true;
         }
 
@@ -124,8 +125,8 @@ internal sealed partial class MainWindow
         return true;
     }
 
-    // Delete removes; Esc clears a selection and the arrows nudge it, while the map has the keys (else Esc closes a
-    // drop-down and the arrows pan).
+    // Delete removes; G toggles snapping; Esc clears a selection and the arrows nudge it, while the map has the keys
+    // (else Esc closes a drop-down and the arrows pan).
     private bool HandleObjectKey(Key key)
     {
         if (_viewModel.Mode != EditingMode.Objects || _viewModel.CurrentMap is null || Keyboard.FocusedElement is TextBox)
@@ -133,20 +134,48 @@ internal sealed partial class MainWindow
             return false;
         }
 
-        var hasSelection = Placing.SelectedObjectUids.Count > 0;
         switch (key)
         {
             case Key.Delete:
                 DeleteSelectedOrHoveredObject();
                 return true;
-            case Key.Escape when hasSelection && MapViewport.IsKeyboardFocusWithin:
+            case Key.G:
+                Placing.ToggleGridSnap();
+                return true;
+            default:
+                return HandleSelectionKey(key);
+        }
+    }
+
+    private bool HandleSelectionKey(Key key)
+    {
+        if (Placing.SelectedObjectUids.Count == 0 || !MapViewport.IsKeyboardFocusWithin)
+        {
+            return false;
+        }
+
+        switch (key)
+        {
+            case Key.Escape:
                 Placing.ClearSelection();
                 return true;
-            case Key.Left or Key.Right or Key.Up or Key.Down when hasSelection && MapViewport.IsKeyboardFocusWithin:
+            case Key.Left or Key.Right or Key.Up or Key.Down:
                 NudgeSelection(key);
                 return true;
             default:
                 return false;
+        }
+    }
+
+    private void PlaceChosenObjectAt(Point2D center)
+    {
+        if (IsSnapping)
+        {
+            Placing.PlaceObjectOnGridAt(center);
+        }
+        else
+        {
+            Placing.PlaceObjectAt(center);
         }
     }
 

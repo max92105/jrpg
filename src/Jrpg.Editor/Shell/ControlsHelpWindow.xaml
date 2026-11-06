@@ -63,6 +63,7 @@
       <TextBlock Style="{StaticResource Lines}">
         Click: place the chosen object, centered on the mouse.<LineBreak />
         Shift + drag: move an object; on a selected object, move the whole selection.<LineBreak />
+        Alt, held while clicking or Shift + dragging: snap the object's top-left to the grid (the ghost shows where). Snap to grid in the Objects tool bar, or G: snap by default; Alt then places freely.<LineBreak />
         Right click: remove an object.<LineBreak />
         Ctrl + drag: select objects.<LineBreak />
         Ctrl + click: select the object under the mouse (on empty ground: select nothing). Esc, with the map clicked: clear the selection.<LineBreak />

@@ -66,6 +66,12 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
     /// <exception cref="InvalidOperationException">The edited shapes have a problem (<see cref="ObjectShapesViewModel.Problem"/>).</exception>
     public void ApplyShapes(ObjectShapesViewModel edited) => _catalog.SetObject(edited.ToDefinition());
 
+    /// <summary>
+    /// Whether placed and moved objects land on whole cells; Alt does the opposite (decision 511). Off at the start.
+    /// </summary>
+    [ObservableProperty]
+    public partial bool IsGridSnapOn { get; set; }
+
     /// <summary>The map objects are placed on; set by the shell when a map opens, which empties the selection.</summary>
     [ObservableProperty]
     public partial MapViewModel? OpenMap { get; set; }
@@ -83,22 +89,16 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
     /// map is drawn clipped and the object couldn't be seen.
     /// </summary>
     /// <param name="center">In map cells; positions aren't snapped to the grid.</param>
-    public void PlaceObjectAt(Point2D center)
-    {
-        if (OpenMap is not { } open || Browser.SelectedObject is not { } definition || !open.Map.Layout.Contains(GridCell.Containing(center)))
-        {
-            return;
-        }
+    public void PlaceObjectAt(Point2D center) => PlaceChosen(center, topLeft => topLeft);
 
-        var takenUids = open.Map.Layout.Objects.Select(placed => placed.Uid).ToHashSet();
-        open.Do(new PlaceObjectEdit(new PlacedObject
-        {
-            Uid = PlacedObjectUids.Next(definition.Id, takenUids),
-            ObjectId = definition.Id,
-            Position = new Point2D(center.X - (definition.Width / 2.0), center.Y - (definition.Height / 2.0)),
-            Z = _layer.Z,
-        }));
-    }
+    /// <summary>
+    /// As <see cref="PlaceObjectAt"/>, the top-left landing on the nearest whole cell (decision 511).
+    /// </summary>
+    /// <param name="center">In map cells; the point off the map places nothing, as for a free placing.</param>
+    public void PlaceObjectOnGridAt(Point2D center) => PlaceChosen(center, GridSnap.TopLeft);
+
+    /// <summary>G, or the tool bar's Snap to grid box.</summary>
+    public void ToggleGridSnap() => IsGridSnapOn = !IsGridSnapOn;
 
     /// <summary>The object drawn on top at a point, to move or remove; null when none is there.</summary>
     /// <param name="point">In map cells.</param>
@@ -116,6 +116,9 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
         }
     }
 
+    /// <summary>As <see cref="MoveObject"/>, the top-left landing on the nearest whole cell (decision 511).</summary>
+    public void MoveObjectOnGrid(string uid, Point2D to) => MoveObject(uid, GridSnap.TopLeft(to));
+
     public void RemoveObject(string uid) => RemoveObjects([uid]);
 
     /// <summary>Selects the objects overlapping the rectangle between two corners, in map cells.</summary>
@@ -131,6 +134,21 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
     public void SelectObjectAt(Point2D point) => SelectedObjectUids = ObjectAt(point) is { } top ? [top.Uid] : [];
 
     public void ClearSelection() => SelectedObjectUids = [];
+
+    /// <summary>
+    /// Moves the selection so the grabbed object's top-left lands on the nearest whole cell, the others keeping their
+    /// offsets from it, as one undo step (decision 511).
+    /// </summary>
+    /// <param name="grabbedUid">The selected object under the mouse.</param>
+    /// <param name="grabbedTo">Its free top-left where the mouse left it, in map cells.</param>
+    public void MoveSelectedObjectsOnGrid(string grabbedUid, Point2D grabbedTo)
+    {
+        if (PlacedObjectWithUid(grabbedUid) is { } grabbed)
+        {
+            var landed = GridSnap.TopLeft(grabbedTo);
+            MoveSelectedObjects(landed.X - grabbed.Position.X, landed.Y - grabbed.Position.Y);
+        }
+    }
 
     public bool IsSelected(string uid) => SelectedObjectUids.Contains(uid);
 
@@ -187,6 +205,25 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
         {
             SelectedObjectUids = [.. SelectedObjectUids.Where(onMap.Contains)];
         }
+    }
+
+    // The chosen object centered on a point of the open map, its top-left where land puts it; nothing with nothing
+    // chosen, no map, or the point off the map (drawn clipped, the object couldn't be seen).
+    private void PlaceChosen(Point2D center, Func<Point2D, Point2D> land)
+    {
+        if (OpenMap is not { } open || Browser.SelectedObject is not { } definition || !open.Map.Layout.Contains(GridCell.Containing(center)))
+        {
+            return;
+        }
+
+        var takenUids = open.Map.Layout.Objects.Select(placed => placed.Uid).ToHashSet();
+        open.Do(new PlaceObjectEdit(new PlacedObject
+        {
+            Uid = PlacedObjectUids.Next(definition.Id, takenUids),
+            ObjectId = definition.Id,
+            Position = land(new Point2D(center.X - (definition.Width / 2.0), center.Y - (definition.Height / 2.0))),
+            Z = _layer.Z,
+        }));
     }
 
     private PlacedObject? PlacedObjectWithUid(string uid) => OpenMap?.Map.Layout.Objects.FirstOrDefault(placed => placed.Uid == uid);

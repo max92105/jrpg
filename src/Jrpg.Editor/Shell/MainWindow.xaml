@@ -143,6 +143,7 @@
         <Button Content="New object..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" />
         <Button Content="Edit object..." Click="OnEditObjectClicked" IsEnabled="{Binding Composing.CanEdit, FallbackValue=False}" />
         <Button Content="New NPC..." Click="OnNewNpcClicked" IsEnabled="{Binding CanStartNewNpc}" />
+        <CheckBox Content="Snap to grid (Alt, G)" IsChecked="{Binding Placing.IsGridSnapOn, FallbackValue=False}" ToolTip="Placed and moved objects land on whole cells. Holding Alt does the opposite of this box; G ticks or unticks it." />
       </ToolBar>
     </ToolBarTray>
     <StatusBar DockPanel.Dock="Bottom">

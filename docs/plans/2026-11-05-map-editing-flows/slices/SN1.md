@@ -49,9 +49,11 @@ Size: about 10 lines for `GridSnap`, 33 in the view model, 28 in the window, 3 i
 `docs/map.md`, Editor `Tiles, Objects` row: `GridSnap` (where a top-left lands on the grid; Alt or the Snap to grid box).
 
 ## Hand check (yours)
-1. Start the editor (Visual Studio's "Game and editor" profile, F5); Objects tab; choose an object in the list. The Objects tool bar shows **Snap to grid (Alt)**, unticked.
-2. Move the mouse over the map: the ghost follows freely. Hold Alt and move: the ghost jumps cell by cell, its top-left on the grid lines. Click with Alt held: it lands where the ghost was.
+1. Start the editor (Visual Studio's "Game and editor" profile, F5); Objects tab; choose an object in the list. The Objects tool bar shows **Snap to grid (Alt, G)**, unticked.
+2. Move the mouse over the map: the ghost follows freely. Hold Alt and move: the ghost jumps cell by cell, its top-left on the grid lines. Click with Alt held: it lands where the ghost was. Hold Alt, move the mouse, let go of Alt without clicking, then press G: the box still toggles (no menu took the key).
 3. Hold Shift + Alt and drag a placed object: it moves cell by cell; let go. (If your keyboard layout switches, this is Windows' Alt + Shift shortcut: tick the box instead and drag with Shift only.)
 4. Tick **Snap to grid**: plain clicks land on the grid; Alt + click lands freely. Press G (the map focused): the box unticks; G again ticks it. Shift + drag with the box ticked moves cell by cell without Alt.
 5. Ctrl + drag two objects, untick the box, Shift + Alt + drag one of them: the grabbed one lands on the grid, the other keeps its distance to it. Ctrl+Z puts both back.
 6. F1: the Objects section has the Alt and G line. Type a "g" in the map list's filter box: it is typed, the box doesn't change.
+
+- **Done, with deviations:** the window moves a dragged selection or object through `MoveDraggedSelection` and `MoveDraggedObject` (each picking the grid or free method), and places through `PlaceChosenObjectAt`; `HandleObjectKey` hands Esc and the arrows to `HandleSelectionKey` to stay under the complexity limit. The view model's two placings share `ChosenTopLeftAt` and `PlaceChosenAt`. Review: the two placings share one `PlaceChosen(center, land)`; G calls a plain `ToggleGridSnap()` (the box binds the property). Left for the backlog: B, R, F and G are taken at the window while a non-editable combo box (the Layer box) has the focus, so its type-to-select never sees them.

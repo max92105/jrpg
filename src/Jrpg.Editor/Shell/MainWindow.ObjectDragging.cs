@@ -1,9 +1,11 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Editor.Maps;
+using Jrpg.Editor.Objects;
 
 namespace Jrpg.Editor.Shell;
 
@@ -15,6 +17,9 @@ internal sealed partial class MainWindow
     private Point2D? _selectionStart;
     private (PlacedObject Placed, Vector Offset, Point2D From, bool IsSelection)? _movedObject;
     private ObjectDefinition? _ghostDefinition;
+
+    // The Snap to grid box, turned the other way while Alt is held (decision 511); read on each move and release.
+    private bool IsSnapping => Placing.IsGridSnapOn != Keyboard.Modifiers.HasFlag(ModifierKeys.Alt);
 
     /// <summary>
     /// Shows where the mouse would put an object: the dragged selection, the moved object, or the chosen one.
@@ -37,17 +42,19 @@ internal sealed partial class MainWindow
         }
         else if (_movedObject is { } moved)
         {
-            // The selection's marks follow the mouse as a whole, not redrawn on every move.
+            var landing = Snapped(new Point2D(at.X + moved.Offset.X, at.Y + moved.Offset.Y));
+
+            // The selection's marks follow the grabbed object as a whole, not redrawn on every move.
             if (moved.IsSelection)
             {
-                SelectionMarks.RenderTransform = new TranslateTransform((at.X - moved.From.X) * MapDrawing.CellPixels, (at.Y - moved.From.Y) * MapDrawing.CellPixels);
+                SelectionMarks.RenderTransform = new TranslateTransform((landing.X - moved.Placed.Position.X) * MapDrawing.CellPixels, (landing.Y - moved.Placed.Position.Y) * MapDrawing.CellPixels);
             }
 
-            ShowGhost(_viewModel.Catalog!.Objects[moved.Placed.ObjectId], new Point2D(at.X + moved.Offset.X, at.Y + moved.Offset.Y));
+            ShowGhost(_viewModel.Catalog!.Objects[moved.Placed.ObjectId], landing);
         }
         else if (Placing.Browser.SelectedObject is { } chosen)
         {
-            ShowGhost(chosen, new Point2D(at.X - (chosen.Width / 2.0), at.Y - (chosen.Height / 2.0)));
+            ShowGhost(chosen, Snapped(new Point2D(at.X - (chosen.Width / 2.0), at.Y - (chosen.Height / 2.0))));
         }
     }
 
@@ -72,13 +79,40 @@ internal sealed partial class MainWindow
         }
         else if (_movedObject is { IsSelection: true } selection && IsPastDragDistance(selection.From, point))
         {
-            Placing.MoveSelectedObjects(point.X - selection.From.X, point.Y - selection.From.Y);
+            MoveDraggedSelection(selection.Placed, new Point2D(point.X + selection.Offset.X, point.Y + selection.Offset.Y));
         }
         else if (_movedObject is { } moved && IsPastDragDistance(moved.From, point))
         {
-            Placing.MoveObject(moved.Placed.Uid, new Point2D(point.X + moved.Offset.X, point.Y + moved.Offset.Y));
+            MoveDraggedObject(moved.Placed, new Point2D(point.X + moved.Offset.X, point.Y + moved.Offset.Y));
         }
     }
+
+    // The grabbed object's free top-left where the mouse left it; the whole selection moves with it.
+    private void MoveDraggedSelection(PlacedObject grabbed, Point2D to)
+    {
+        if (IsSnapping)
+        {
+            Placing.MoveSelectedObjectsOnGrid(grabbed.Uid, to);
+        }
+        else
+        {
+            Placing.MoveSelectedObjects(to.X - grabbed.Position.X, to.Y - grabbed.Position.Y);
+        }
+    }
+
+    private void MoveDraggedObject(PlacedObject grabbed, Point2D to)
+    {
+        if (IsSnapping)
+        {
+            Placing.MoveObjectOnGrid(grabbed.Uid, to);
+        }
+        else
+        {
+            Placing.MoveObject(grabbed.Uid, to);
+        }
+    }
+
+    private Point2D Snapped(Point2D topLeft) => IsSnapping ? GridSnap.TopLeft(topLeft) : topLeft;
 
     // A press and release within Windows' drag distance is a click, so a Shift + double-click doesn't nudge the object.
     private bool IsPastDragDistance(Point2D from, Point2D to)

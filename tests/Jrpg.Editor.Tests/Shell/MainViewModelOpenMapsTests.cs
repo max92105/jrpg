@@ -198,31 +198,6 @@ public sealed class MainViewModelOpenMapsTests : IDisposable
         Assert.DoesNotContain(viewModel.MapEntries, entry => entry.Text.EndsWith(" *", StringComparison.Ordinal));
     }
 
-    [Fact]
-    public void ConfirmClose_TwoMapsChanged_AsksOnceNamingBoth()
-    {
-        var viewModel = _content.Open(_content.TestWorld);
-        EditorTestContent.PaintTopLeft(viewModel);
-        viewModel.TryOpenMap("start");
-        EditorTestContent.PaintTopLeft(viewModel);
-
-        Assert.False(viewModel.ConfirmClose());
-
-        Assert.Equal(["Maps 'forest' and 'start' have unsaved changes. Discard them?"], _content.Questions);
-    }
-
-    [Fact]
-    public void ConfirmClose_UnsavedMapAndCatalogChanges_AsksOnceNamingBoth()
-    {
-        var viewModel = _content.Open(_content.TestWorld);
-        EditorTestContent.BlockFirstWalkableTile(viewModel);
-        EditorTestContent.PaintTopLeft(viewModel);
-
-        Assert.False(viewModel.ConfirmClose());
-
-        Assert.Equal(["Map 'forest' and the tiles have unsaved changes. Discard them?"], _content.Questions);
-    }
-
     // The object is placed on forest only in its unsaved layout; on start, forest's step waits and the object's making
     // is the newest step (decisions 502, 503).
     [Fact]

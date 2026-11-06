@@ -31,14 +31,17 @@ internal sealed partial class MainViewModel : ObservableObject
     private readonly ContentWriter _writer;
     private readonly string _audioRoot;
     private readonly Func<string, bool> _confirm;
+    private readonly Func<string, UnsavedChangesAnswer> _askToClose;
     private readonly SheetImageSizes _sheetImageSizes;
 
     /// <param name="contentRoot">The content folder to edit.</param>
-    /// <param name="confirm">Asks the user a yes or no question, such as whether to drop unsaved changes; true for yes.</param>
-    public MainViewModel(string contentRoot, Func<string, bool> confirm)
+    /// <param name="confirm">Asks the user a yes or no question, such as whether to resize; true for yes.</param>
+    /// <param name="askToClose">Asks what to do with unsaved changes when the editor closes (decision 501).</param>
+    public MainViewModel(string contentRoot, Func<string, bool> confirm, Func<string, UnsavedChangesAnswer> askToClose)
     {
         _writer = new ContentWriter(contentRoot);
         _confirm = confirm;
+        _askToClose = askToClose;
         Layer.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(LayerChoiceViewModel.Z))
@@ -200,14 +203,6 @@ internal sealed partial class MainViewModel : ObservableObject
         return true;
     }
 
-    /// <summary>Whether the editor may close: nothing unsaved, or the user agreed, when asked, to drop it.</summary>
-    public bool ConfirmClose()
-    {
-        // A stroke still being dragged counts as a change, so it ends before the question.
-        CurrentMap?.EndStroke();
-        return UnsavedChangesWording() is not { } unsaved || _confirm($"{unsaved} unsaved changes. Discard them?");
-    }
-
     /// <param name="cell">The cell under the cursor, or null when the cursor left the view.</param>
     public void ShowCursorAt(GridCell? cell)
     {
@@ -253,41 +248,6 @@ internal sealed partial class MainViewModel : ObservableObject
         }
 
         return true;
-    }
-
-    /// <summary>Saves the open map if the game would load it; otherwise keeps it unsaved and shows why.</summary>
-    [RelayCommand]
-    private void Save()
-    {
-        if (CurrentMap is null || Content is not { } content)
-        {
-            return;
-        }
-
-        var map = CurrentMap.Map;
-        try
-        {
-            // The catalogs first, so a saved map never names a tile the game doesn't know.
-            if (content.IsDirty)
-            {
-                _writer.WriteMapCatalogs(content.Current);
-                content.MarkSaved();
-            }
-
-            _writer.WriteMap(map, content.Current);
-        }
-        catch (Exception exception) when (exception is ContentValidationException or IOException or UnauthorizedAccessException)
-        {
-            SaveError = exception.Message;
-            return;
-        }
-
-        content.AddSavedMap(map);
-        ShowMapList(content.Current);
-
-        CurrentMap.MarkSaved();
-        SaveError = null;
-        Art!.Refresh();
     }
 
     [RelayCommand]

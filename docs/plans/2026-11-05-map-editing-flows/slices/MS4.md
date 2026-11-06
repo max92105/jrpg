@@ -48,3 +48,5 @@ Size: about 60 lines of code, the window about 45 (XAML 30, code 15), the helper
 3. Paint on A and B again, then File > Exit: the dark window lists map A and map B. **Cancel**: the editor stays. Exit again, **Don't save**: it closes; Git Changes shows nothing new.
 4. Start again, paint on A, mark a tile blocked, Exit, **Save all** (or Enter): it closes; Git Changes lists A's layout and `tiles.json`.
 5. Start again, mark a tile blocked with no map shown (or with a fresh map), Ctrl+S: `tiles.json` is written.
+
+- **Done, with deviations:** `Save_NoMapShownWithUnsavedTiles_WritesTheTiles` was dropped: content that loads always has the new game's start map, which the editor shows at once, so no map shown can't be reached; Save still writes the tiles first and the shown map only when there is one. Added `ConfirmClose_OnlyTilesChanged_NamesThem`. The close tests moved from `MainViewModelTests` and `MainViewModelOpenMapsTests` to the new `MainViewModelSavingTests`. Its look is unchecked by capture (hand check). Review: `SaveAll_FirstMapRefused_LeavesTheNextUnwritten` pins the stop; the new map test reads the saved file.

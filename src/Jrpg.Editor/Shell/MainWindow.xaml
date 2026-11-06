@@ -24,6 +24,7 @@
     <KeyBinding Key="Z" Modifiers="Control" Command="{Binding History.UndoCommand}" />
     <KeyBinding Key="Y" Modifiers="Control" Command="{Binding History.RedoCommand}" />
     <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveCommand}" />
+    <KeyBinding Key="S" Modifiers="Control+Shift" Command="{Binding SaveAllCommand}" />
     <KeyBinding Key="H" Modifiers="Control" Command="{Binding ToggleCollisionCommand}" />
   </Window.InputBindings>
   <DockPanel>
@@ -32,6 +33,7 @@
       <MenuItem Header="File">
         <MenuItem Header="New map..." Command="New" />
         <MenuItem Header="Save" Command="{Binding SaveCommand}" InputGestureText="Ctrl+S" />
+        <MenuItem Header="Save all" Command="{Binding SaveAllCommand}" InputGestureText="Ctrl+Shift+S" />
         <Separator />
         <MenuItem Header="Exit" Click="OnExitClicked" />
       </MenuItem>

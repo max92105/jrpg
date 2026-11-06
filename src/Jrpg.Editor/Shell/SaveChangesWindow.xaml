@@ -1,0 +1,22 @@
+<Window x:Class="Jrpg.Editor.Shell.SaveChangesWindow"
+        x:ClassModifier="internal"
+        Style="{StaticResource EditorWindow}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Map editor"
+        Width="420"
+        SizeToContent="Height"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+  <StackPanel Margin="12">
+    <TextBlock x:Name="QuestionText" TextWrapping="Wrap" />
+    <TextBlock Text="Save them before closing?" Margin="0,8,0,0" />
+    <!-- Enter saves everything, Esc and the title bar's X cancel (decision 501). -->
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+      <Button Content="Save all" Width="90" IsDefault="True" Click="OnSaveAllClicked" />
+      <Button Content="Don't save" Width="90" Margin="8,0,0,0" Click="OnDiscardClicked" />
+      <Button Content="Cancel" Width="90" Margin="8,0,0,0" IsCancel="True" />
+    </StackPanel>
+  </StackPanel>
+</Window>

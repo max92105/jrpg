@@ -28,13 +28,29 @@ internal sealed class EditorTestContent : IDisposable
     }
 
     /// <param name="contentRoot">The test world, or <see cref="ContentCopy"/> for a test that saves.</param>
-    /// <param name="answer">What the user answers to every question.</param>
+    /// <param name="answer">
+    /// What the user answers to every yes or no question; the close question gets Don't save for yes, Cancel for no.
+    /// </param>
     public MainViewModel Open(string contentRoot, bool answer = false) =>
-        new(contentRoot, question =>
-        {
-            Questions.Add(question);
-            return answer;
-        });
+        Open(contentRoot, answer, answer ? UnsavedChangesAnswer.Discard : UnsavedChangesAnswer.Cancel);
+
+    /// <param name="contentRoot">The test world, or <see cref="ContentCopy"/> for a test that saves.</param>
+    /// <param name="closeAnswer">What the user answers to the close question; no to every yes or no question.</param>
+    public MainViewModel Open(string contentRoot, UnsavedChangesAnswer closeAnswer) => Open(contentRoot, answer: false, closeAnswer);
+
+    private MainViewModel Open(string contentRoot, bool answer, UnsavedChangesAnswer closeAnswer) =>
+        new(
+            contentRoot,
+            question =>
+            {
+                Questions.Add(question);
+                return answer;
+            },
+            question =>
+            {
+                Questions.Add(question);
+                return closeAnswer;
+            });
 
     // Paints the open map's top-left ground cell with another tile already used on the map, so the result is valid content.
     public static int PaintTopLeft(MainViewModel viewModel)

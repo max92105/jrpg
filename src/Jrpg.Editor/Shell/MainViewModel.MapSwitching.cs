@@ -139,19 +139,4 @@ internal sealed partial class MainViewModel
             MapEntries = entries;
         }
     }
-
-    // What the close question names: "Map 'forest' has", "Maps 'forest' and 'start' and the tiles have"; null when
-    // nothing is unsaved.
-    private string? UnsavedChangesWording()
-    {
-        var maps = _openMaps.Dirty.Select(open => $"'{open.Map.Id}'").ToList();
-        var areTilesUnsaved = Content is { IsDirty: true };
-        if (maps.Count == 0)
-        {
-            return areTilesUnsaved ? "The tiles have" : null;
-        }
-
-        var named = $"{(maps.Count == 1 ? "Map" : "Maps")} {string.Join(" and ", maps)}";
-        return areTilesUnsaved ? $"{named} and the tiles have" : $"{named} {(maps.Count == 1 ? "has" : "have")}";
-    }
 }

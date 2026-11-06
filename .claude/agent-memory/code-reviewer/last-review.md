@@ -5,10 +5,10 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-05-map-editing-flows, slice MS3 (UndoStep; UndoJournal picks the newest step of the shown map or the
-catalogs; CombinedHistory keeps steps across switches), round 2 (2026-11-05). Verdict: ready to commit.
+Plan 2026-11-05-map-editing-flows, slice MS4 (Save all, the close question, SaveChangesWindow,
+MainViewModel.Saving partial), round 1 (2026-11-05). Verdict: ready to commit.
 
-- Fixed (Critical): catalog redo skipping a hidden map's newer undone step; UndoJournal.IndexOfNextRedo holds it
-  (greyed, decision 503 amended), MainViewModelSwitchUndoTests covers the input.
-- Fixed (Warning): Undo_OnAnotherMap_DoesNotTouchTheHiddenMap now executes Undo.
-- Fixed (Suggestions): CombinedHistory param doc, MainViewModelOpenMapsTests comment, UndoStep private constructor.
+- Open (Suggestion): SaveAll_SecondMapRefused test puts the refused map last, so deleting the `break` in SaveAll
+  still passes; refuse forest and paint start validly, assert start stays dirty.
+- Open (Suggestion): EditorTestContent.Open(root, closeAnswer) has an empty `<param name="contentRoot"></param>`.
+- Open (Suggestion): SaveAll_NewMapOpen_WritesIt... never reads the file back; its MapIds assert holds before the save.

@@ -8,7 +8,7 @@ using Jrpg.Editor.Tiles;
 namespace Jrpg.Editor.Tests.Shell;
 
 /// <summary>
-/// The map list, the close question, objects, map settings and new maps; switching maps, saving and undo are tested in
+/// The map list, layers, objects, map settings and new maps; switching maps, saving, closing and undo are tested in
 /// their own classes.
 /// </summary>
 public sealed class MainViewModelTests : IDisposable
@@ -75,36 +75,6 @@ public sealed class MainViewModelTests : IDisposable
         viewModel.Layer.Z = 2;
 
         Assert.Contains("Layer (z 2), empty", viewModel.LayerEntries.Select(entry => entry.Text));
-    }
-
-    [Fact]
-    public void ConfirmClose_UnsavedChanges_AsksTheUser()
-    {
-        var viewModel = _content.Open(_content.TestWorld, answer: false);
-        EditorTestContent.PaintTopLeft(viewModel);
-
-        Assert.False(viewModel.ConfirmClose());
-        Assert.Single(_content.Questions);
-    }
-
-    [Fact]
-    public void ConfirmClose_MidStroke_AsksTheUser()
-    {
-        var viewModel = _content.Open(_content.TestWorld, answer: false);
-        viewModel.Painting!.StartErasing(new GridCell(0, 0));
-
-        Assert.False(viewModel.ConfirmClose());
-        Assert.Single(_content.Questions);
-    }
-
-    [Fact]
-    public void ConfirmClose_UnsavedCatalogChange_AsksTheUser()
-    {
-        var viewModel = _content.Open(_content.TestWorld);
-        EditorTestContent.BlockFirstWalkableTile(viewModel);
-
-        Assert.False(viewModel.ConfirmClose());
-        Assert.Equal(["The tiles have unsaved changes. Discard them?"], _content.Questions);
     }
 
     [Fact]

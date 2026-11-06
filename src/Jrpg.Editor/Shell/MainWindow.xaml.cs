@@ -276,10 +276,10 @@ internal sealed partial class MainWindow : Window
 
     private void OnViewportSizeChanged(object sender, SizeChangedEventArgs e) => FitMap();
 
-    // Anywhere but a text box, so tools and brush size change while browsing tiles too.
+    // Anywhere but a text or combo box (whose typed letters pick an entry), so tools change while browsing tiles too.
     private bool HandleToolKey(Key key)
     {
-        if (_viewModel.Painting is not { } painting || Keyboard.FocusedElement is TextBox)
+        if (_viewModel.Painting is not { } painting || Keyboard.FocusedElement is TextBox or ComboBox or ComboBoxItem)
         {
             return false;
         }

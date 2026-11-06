@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -23,6 +24,25 @@ internal sealed partial class MainWindow
     private const double MarkerSpacing = 13;
     private const double MarkerInset = 8;
 
+    // The Placed object panel's Edit events...: the same dialog as a click in Events mode, Go to included.
+    private void OnPlacedObjectEditEvents(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel.EventEditing!.StartEditing(Placing.Editing.Uid) is { } events)
+        {
+            EditObjectEvents(events);
+        }
+    }
+
+    private void EditObjectEvents(EventListViewModel events)
+    {
+        var objectWindow = new ObjectEventsWindow(events, _drawing!) { Owner = this };
+        if (objectWindow.ShowDialog() == true)
+        {
+            _viewModel.EventEditing!.Apply(events);
+            GoToFollowedWarp(objectWindow.FollowedWarp);
+        }
+    }
+
     // Left: the clicked object's events, or the cell's when no object is there. Right: removes the cell's event.
     private bool HandleEventButton(MouseButton button, Point2D point)
     {
@@ -31,13 +51,7 @@ internal sealed partial class MainWindow
         switch (button)
         {
             case MouseButton.Left when eventEditing.StartEditingAt(point) is { } events:
-                var objectWindow = new ObjectEventsWindow(events, _drawing!) { Owner = this };
-                if (objectWindow.ShowDialog() == true)
-                {
-                    eventEditing.Apply(events);
-                    GoToFollowedWarp(objectWindow.FollowedWarp);
-                }
-
+                EditObjectEvents(events);
                 return true;
             case MouseButton.Left when eventEditing.StartEditingCellAt(cell) is { } cellEvent:
                 var cellWindow = new CellEventWindow(cellEvent, _drawing!) { Owner = this };

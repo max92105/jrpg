@@ -1,4 +1,5 @@
 using Jrpg.Core.Geometry;
+using Jrpg.Core.Maps;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
@@ -20,9 +21,13 @@ internal sealed class EventEditingViewModel(CatalogDraft catalog, OpenMaps openM
     /// <summary>The event dialog's state for the object drawn on top at a point; null when no object is there.</summary>
     /// <param name="point">In map cells.</param>
     public EventListViewModel? StartEditingAt(Point2D point) =>
-        OpenMap is { } open && PlacedObjectHits.TopAt(open.Map.Layout, point, catalog.Current.Objects) is { } placed
-            ? new EventListViewModel(placed, Choices(), EventPresets.GuessOpenedObject(placed.ObjectId, catalog.Current.Objects))
-            : null;
+        OpenMap is { } open && PlacedObjectHits.TopAt(open.Map.Layout, point, catalog.Current.Objects) is { } placed ? EventListFor(placed) : null;
+
+    /// <summary>
+    /// The Placed object panel's event dialog: the placed object with this uid; null when it isn't on the map.
+    /// </summary>
+    public EventListViewModel? StartEditing(string uid) =>
+        OpenMap?.Map.Layout.Objects.FirstOrDefault(placed => placed.Uid == uid) is { } found ? EventListFor(found) : null;
 
     /// <summary>The cell event dialog's state for a cell, with its event if it has one; null off the map.</summary>
     public CellEventViewModel? StartEditingCellAt(GridCell cell) =>
@@ -56,6 +61,9 @@ internal sealed class EventEditingViewModel(CatalogDraft catalog, OpenMaps openM
             open.Do(SetCellEventEdit.For(open.Map.Layout.CellEvents, cell, null));
         }
     }
+
+    private EventListViewModel EventListFor(PlacedObject placed) =>
+        new(placed, Choices(), EventPresets.GuessOpenedObject(placed.ObjectId, catalog.Current.Objects));
 
     // Read when a dialog opens, so objects made since the editor started can be chosen.
     private StepChoices Choices() => new(

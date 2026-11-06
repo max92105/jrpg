@@ -171,6 +171,20 @@ public sealed class EventEditingViewModelTests
         Assert.False(_eventEditing.OpenMap!.UndoCommand.CanExecute(null));
     }
 
+    [Fact]
+    public void StartEditing_UidOnTheMap_StartsOnItsEvents()
+    {
+        var events = _eventEditing.StartEditing("0bff6243");
+
+        Assert.StartsWith("Events of 0bff6243 ", events?.Title, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void StartEditing_UnknownUid_IsNull()
+    {
+        Assert.Null(_eventEditing.StartEditing("no_such_uid"));
+    }
+
     // Forest is painted and hidden behind start: the picker draws forest as it is now, not as saved.
     [Fact]
     public void StartEditingAt_HiddenOpenMapPainted_WarpMapsHoldItsDraftLayout()

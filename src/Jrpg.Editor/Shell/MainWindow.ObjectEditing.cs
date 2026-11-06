@@ -129,7 +129,7 @@ internal sealed partial class MainWindow
     // (else Esc closes a drop-down and the arrows pan).
     private bool HandleObjectKey(Key key)
     {
-        if (_viewModel.Mode != EditingMode.Objects || _viewModel.CurrentMap is null || Keyboard.FocusedElement is TextBox)
+        if (_viewModel.Mode != EditingMode.Objects || _viewModel.CurrentMap is null || Keyboard.FocusedElement is TextBox or ComboBox or ComboBoxItem)
         {
             return false;
         }

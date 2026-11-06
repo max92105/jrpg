@@ -1,0 +1,47 @@
+<UserControl x:Class="Jrpg.Editor.Objects.PlacedObjectPanel"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <UserControl.Resources>
+    <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
+  </UserControl.Resources>
+  <!-- Enter in a box applies here only; a default button would answer Enter anywhere in the main window. -->
+  <UserControl.InputBindings>
+    <KeyBinding Key="Enter" Command="{Binding ApplyCommand}" />
+  </UserControl.InputBindings>
+  <!-- Shown while exactly one placed object is selected (decision 513). -->
+  <GroupBox Header="Placed object" Margin="0,8,0,0" Visibility="{Binding HasObject, Converter={StaticResource VisibleWhenTrue}}">
+    <Grid Margin="4">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <TextBlock Text="Uid" VerticalAlignment="Center" Margin="0,0,8,4" />
+      <TextBlock Grid.Column="1" Text="{Binding Uid}" Foreground="{StaticResource MutedTextBrush}" Margin="0,0,0,4" />
+      <TextBlock Grid.Row="1" Text="Object" VerticalAlignment="Center" Margin="0,0,8,4" />
+      <ComboBox Grid.Row="1" Grid.Column="1" Margin="0,0,0,4" ItemsSource="{Binding ObjectIds}" SelectedItem="{Binding ObjectId}" />
+      <TextBlock Grid.Row="2" Text="X" VerticalAlignment="Center" Margin="0,0,8,4" />
+      <TextBox Grid.Row="2" Grid.Column="1" Margin="0,0,0,4" Text="{Binding XText, UpdateSourceTrigger=PropertyChanged}" ToolTip="In cells, from the map's left edge; a dot for decimals" />
+      <TextBlock Grid.Row="3" Text="Y" VerticalAlignment="Center" Margin="0,0,8,4" />
+      <TextBox Grid.Row="3" Grid.Column="1" Margin="0,0,0,4" Text="{Binding YText, UpdateSourceTrigger=PropertyChanged}" ToolTip="In cells, from the map's top edge; a dot for decimals" />
+      <TextBlock Grid.Row="4" Text="Layer" VerticalAlignment="Center" Margin="0,0,8,4" />
+      <TextBox Grid.Row="4" Grid.Column="1" Margin="0,0,0,4" Text="{Binding ZText, UpdateSourceTrigger=PropertyChanged}" ToolTip="The layer's z, as the layer list shows it" />
+      <TextBlock Grid.Row="5" Grid.ColumnSpan="2" Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Text="{Binding Problem}" />
+      <TextBlock Grid.Row="6" Grid.ColumnSpan="2" Foreground="{StaticResource WarningTextBrush}" TextWrapping="Wrap" Text="{Binding Warning}" />
+      <StackPanel Grid.Row="7" Grid.ColumnSpan="2" Orientation="Horizontal" Margin="0,4,0,0">
+        <Button Content="Apply" Width="70" Command="{Binding ApplyCommand}" ToolTip="Change the object, position and layer as one Ctrl+Z step (Enter)" />
+        <Button Content="Edit events..." Margin="8,0,0,0" Click="OnEditEventsClicked" ToolTip="Open this object's events" />
+      </StackPanel>
+    </Grid>
+  </GroupBox>
+</UserControl>

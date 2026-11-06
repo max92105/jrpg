@@ -68,6 +68,7 @@
         Ctrl + drag: select objects.<LineBreak />
         Ctrl + click: select the object under the mouse (on empty ground: select nothing). Esc, with the map clicked: clear the selection.<LineBreak />
         Ctrl+C / Ctrl+X: copy / cut the selected objects with their events. Ctrl+V: paste them centered on the mouse, or on the middle of the view from the Edit menu (Alt snaps), on this map or another; the pasted ones are selected.<LineBreak />
+        Placed object (under the list, with one object selected): change its object, X, Y or layer and press Apply or Enter (one Ctrl+Z step); its uid and events stay. Edit events... opens its events.<LineBreak />
         Arrow keys, with objects selected: move them one cell; Shift + arrow: one art pixel. Each press is one Ctrl+Z step. With nothing selected, arrows pan.<LineBreak />
         Delete: remove the selected objects, or the one under the mouse.<LineBreak />
         Objects > Edit shapes: open the shapes window for the one placed object selected, else the object chosen in the Objects panel.<LineBreak />

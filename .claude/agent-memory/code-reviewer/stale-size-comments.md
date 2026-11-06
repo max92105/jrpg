@@ -45,6 +45,9 @@ call or a rename. These cases slipped past it:
   "The music ... rendered by new-placeholder-tune.pl" into CREDITS.md) and the generator's now-unused subs; grep
   `.claude/scripts/` too, not only comments and docs.
 
+- A guard widened (map flows PO3: key guards `is TextBox` -> `is TextBox or ComboBox or ComboBoxItem`) leaves the
+  method's comment "Anywhere but a text box"; reread the comment above every changed condition.
+
 **Why:** a comment or doc stating a wrong rule, name or number misleads the next reader.
 
 **How to apply:** after the rule's grep, run the list above against the diff's renames, moves, new members and removed

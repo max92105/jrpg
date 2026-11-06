@@ -200,7 +200,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the music tracks change (2026-11-05, decision 496)
 
-- The title's intro hands over to its loop when `MusicPlayer.FollowIntros` sees the intro's instance stopped, once per update: up to a frame of silence at the join, plus the device's start delay. If it is heard, a `DynamicSoundEffectInstance` fed the intro's samples then the loop's closes the gap (ADR 0035 amendment).
+- The title's parts (intro, loop, outro) hand over when `MusicPlayer.FollowParts` sees the part's instance stopped, once per update: up to a frame of silence at each join, plus the device's start delay. If it is heard, a `DynamicSoundEffectInstance` fed the parts' samples in turn closes the gap (ADR 0035 amendment).
 - The loops are 6 to 23 MB of 48 kHz WAV each, loaded whole by `SoundEffect.FromFile` on a map change, which can stall a frame: streaming through `DynamicSoundEffectInstance` is the ADR 0035 follow-up if it does.
 
 ## From the map editing flows plan (2026-11-05, during the slices)

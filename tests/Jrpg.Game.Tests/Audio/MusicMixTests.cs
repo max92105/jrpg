@@ -2,8 +2,8 @@ using Jrpg.Game.Audio;
 
 namespace Jrpg.Game.Tests.Audio;
 
-// What plays, what leaves and what waits (decisions 416, 417, 496): a loop fades in while the one before fades out and
-// then waits paused; a track with its own intro and outro is neither faded nor paused.
+// What plays, what leaves and what waits (decisions 416, 417, 496): the track playing fades out first, then the wanted
+// one fades in; a loop left for another waits paused; a track that cycles its parts is never paused.
 public sealed class MusicMixTests
 {
     private static readonly MusicTrack _forest = new("forest/loop.wav");
@@ -14,7 +14,7 @@ public sealed class MusicMixTests
     private readonly MusicMix _mix = new();
 
     [Fact]
-    public void Want_NewTrack_PlaysItFromSilence()
+    public void Want_NewTrackFromSilence_PlaysItFromZero()
     {
         _mix.Want(_forest);
 
@@ -44,13 +44,13 @@ public sealed class MusicMixTests
     }
 
     [Fact]
-    public void Want_NewTrack_FadesTheOneBeforeOutAndPausesIt()
+    public void Want_NewTrack_FadesTheOneBeforeOutFirstAndPausesIt()
     {
-        PlayForest();
+        Play(_forest);
 
         _mix.Want(_battle);
 
-        Assert.Equal(_battle, _mix.Playing);
+        Assert.Null(_mix.Playing);
         Assert.Equal(_forest, _mix.Leaving);
         Assert.Equal(1f, _mix.LeavingGain);
         Assert.Equal(_forest, _mix.Paused);
@@ -59,23 +59,26 @@ public sealed class MusicMixTests
     [Fact]
     public void Advance_HalfTheFade_LeavingGainIsHalf()
     {
-        PlayForest();
+        Play(_forest);
         _mix.Want(_battle);
 
         _mix.Advance(MusicMix.Fade / 2);
 
         Assert.Equal(0.5f, _mix.LeavingGain);
+        Assert.Null(_mix.Playing);
     }
 
     [Fact]
-    public void Advance_PastTheFade_TheTrackLeavingIsGoneAndStillPaused()
+    public void Advance_PastTheFade_StartsTheWantedTrackFromZero()
     {
-        PlayForest();
+        Play(_forest);
         _mix.Want(_battle);
 
         _mix.Advance(MusicMix.Fade);
 
         Assert.Null(_mix.Leaving);
+        Assert.Equal(_battle, _mix.Playing);
+        Assert.Equal(0f, _mix.PlayingGain);
         Assert.Equal(_forest, _mix.Paused);
     }
 
@@ -91,70 +94,74 @@ public sealed class MusicMixTests
         Assert.Equal(0.25f, _mix.LeavingGain);
     }
 
-    // The older track's fade-out is cut: at most two instances, the one playing and the one leaving or paused.
+    // The fade-out under way goes on; only the track that follows it changes.
     [Fact]
-    public void Want_NewTrackDuringTheFadeOut_CutsTheTrackLeaving()
+    public void Want_AnotherTrackDuringTheFadeOut_KeepsTheFadeAndChangesWhatFollows()
     {
-        PlayForest();
+        Play(_forest);
         _mix.Want(_battle);
         _mix.Advance(MusicMix.Fade / 2);
 
         _mix.Want(_town);
 
-        Assert.Equal(_battle, _mix.Leaving);
-        Assert.Equal(_battle, _mix.Paused);
+        Assert.Equal(_forest, _mix.Leaving);
+        Assert.Equal(0.5f, _mix.LeavingGain);
+        _mix.Advance(MusicMix.Fade / 2);
+        Assert.Equal(_town, _mix.Playing);
+        Assert.Equal(_forest, _mix.Paused);
     }
 
     [Fact]
-    public void Want_ThePausedTrack_ResumesItFromSilenceAndFadesThePlayingOneOut()
+    public void Want_TheTrackFadingOut_ResumesItOnceItsFadeOutEnds()
     {
-        PlayForest();
-        _mix.Want(_battle);
-        _mix.Advance(MusicMix.Fade);
-
-        _mix.Want(_forest);
-
-        Assert.Equal(_forest, _mix.Playing);
-        Assert.Equal(0f, _mix.PlayingGain);
-        Assert.Equal(_battle, _mix.Leaving);
-        Assert.Null(_mix.Paused);
-    }
-
-    [Fact]
-    public void Want_TheTrackStillFadingOut_RisesAgainFromWhereItIs()
-    {
-        PlayForest();
+        Play(_forest);
         _mix.Want(_battle);
         _mix.Advance(MusicMix.Fade / 2);
 
         _mix.Want(_forest);
+        _mix.Advance(MusicMix.Fade / 2);
 
         Assert.Equal(_forest, _mix.Playing);
-        Assert.Equal(0.5f, _mix.PlayingGain);
+        Assert.Null(_mix.Paused);
+    }
+
+    [Fact]
+    public void Want_ThePausedTrack_FadesThePlayingOneOutThenResumesItFromZero()
+    {
+        Play(_forest);
+        Switch(_battle);
+
+        _mix.Want(_forest);
+
         Assert.Equal(_battle, _mix.Leaving);
+        Assert.Null(_mix.Playing);
+        _mix.Advance(MusicMix.Fade);
+        Assert.Equal(_forest, _mix.Playing);
+        Assert.Equal(0f, _mix.PlayingGain);
         Assert.Null(_mix.Paused);
     }
 
     [Fact]
     public void Want_Silence_FadesThePlayingTrackOutAndKeepsThePausedOne()
     {
-        PlayForest();
-        _mix.Want(_battle);
+        Play(_forest);
+        Switch(_battle);
 
         _mix.Want(null);
+        _mix.Advance(MusicMix.Fade);
 
         Assert.Null(_mix.Playing);
-        Assert.Equal(_battle, _mix.Leaving);
+        Assert.Null(_mix.Leaving);
         Assert.Equal(_forest, _mix.Paused);
     }
 
     // Silence first, as the victory's fanfare: the map's track still comes back where it paused.
     [Fact]
-    public void Want_ThePausedTrackAfterSilence_ResumesIt()
+    public void Want_ThePausedTrackAfterSilence_ResumesItAtOnce()
     {
-        PlayForest();
-        _mix.Want(_battle);
-        _mix.Want(null);
+        Play(_forest);
+        Switch(_battle);
+        Switch(null);
 
         _mix.Want(_forest);
 
@@ -165,9 +172,9 @@ public sealed class MusicMixTests
     [Fact]
     public void Want_NewTrackAfterSilence_KeepsThePausedOne()
     {
-        PlayForest();
-        _mix.Want(_battle);
-        _mix.Want(null);
+        Play(_forest);
+        Switch(_battle);
+        Switch(null);
 
         _mix.Want(_town);
 
@@ -178,10 +185,10 @@ public sealed class MusicMixTests
     [Fact]
     public void Want_ThirdTrack_DropsTheOlderPausedOne()
     {
-        PlayForest();
-        _mix.Want(_battle);
+        Play(_forest);
+        Switch(_battle);
 
-        _mix.Want(_town);
+        Switch(_town);
 
         Assert.Equal(_town, _mix.Playing);
         Assert.Equal(_battle, _mix.Paused);
@@ -199,42 +206,53 @@ public sealed class MusicMixTests
         Assert.Equal(0.5f, _mix.PlayingGain);
     }
 
-    // Its intro fades in by itself.
     [Fact]
-    public void Want_TrackWithAnIntro_PlaysItAtFullGain()
+    public void Want_TheTrackAlreadyWantedNext_ChangesNothing()
     {
-        _mix.Want(_title);
+        Play(_forest);
+        _mix.Want(_battle);
+        _mix.Advance(MusicMix.Fade / 2);
 
-        Assert.Equal(1f, _mix.PlayingGain);
+        _mix.Want(_battle);
+
+        Assert.Equal(0.5f, _mix.LeavingGain);
+        Assert.Equal(_forest, _mix.Leaving);
     }
 
-    // Its outro ends it, so it neither fades out nor waits to resume.
+    // The title starts over from its intro, so it isn't kept.
     [Fact]
-    public void Want_NewTrackOverOneWithAnOutro_LeavesItAtOnceUnpaused()
+    public void Want_NewTrackOverOneThatCyclesParts_NeverPausesIt()
     {
-        _mix.Want(_title);
+        Play(_title);
 
-        _mix.Want(_town);
+        Switch(_town);
 
         Assert.Equal(_town, _mix.Playing);
-        Assert.Null(_mix.Leaving);
         Assert.Null(_mix.Paused);
     }
 
     [Fact]
-    public void Want_NewTrackOverOneWithAnOutro_KeepsTheOlderPausedOne()
+    public void Want_NewTrackOverOneThatCyclesParts_KeepsTheOlderPausedOne()
     {
-        PlayForest();
-        _mix.Want(_title);
+        Play(_forest);
+        Switch(_title);
 
-        _mix.Want(_town);
+        Switch(_town);
 
         Assert.Equal(_forest, _mix.Paused);
     }
 
-    private void PlayForest()
+    private void Play(MusicTrack track)
     {
-        _mix.Want(_forest);
+        _mix.Want(track);
+        _mix.Advance(MusicMix.Fade);
+    }
+
+    // Through the fade-out and the fade-in, so the track is heard at full gain.
+    private void Switch(MusicTrack? track)
+    {
+        _mix.Want(track);
+        _mix.Advance(MusicMix.Fade);
         _mix.Advance(MusicMix.Fade);
     }
 }

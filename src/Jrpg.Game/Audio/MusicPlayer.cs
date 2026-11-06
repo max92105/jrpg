@@ -4,10 +4,10 @@ using Microsoft.Xna.Framework.Audio;
 namespace Jrpg.Game.Audio;
 
 /// <summary>
-/// Plays on the audio device what the <see cref="MusicMix"/> makes of the <see cref="MusicChannel"/> (ADR 0035): each
-/// track's loop on a looped instance, after its intro when it has one, and its outro once when it leaves. A track that
-/// leaves the mix is released, its instance and its loaded loop, unless the host keeps it loaded; intros and outros
-/// stay loaded, being short.
+/// Plays on the audio device what the <see cref="MusicMix"/> makes of the <see cref="MusicChannel"/> (ADR 0035): a
+/// track's loop on a looped instance, or its parts one after the other and over when it has an intro or an outro. A
+/// track that leaves the mix is released, its instance and its loaded loop, unless the host keeps it loaded; intros and
+/// outros stay loaded, being short.
 /// </summary>
 /// <param name="sounds">Opens the tracks.</param>
 /// <param name="keptLoaded">The loops never released: the themes preloaded so a flash doesn't stall on a load.</param>
@@ -15,10 +15,10 @@ internal sealed class MusicPlayer(SoundLibrary sounds, IReadOnlyList<string> kep
 {
     private readonly MusicMix _mix = new();
 
-    // By loop file: the track's loop, or its intro while that plays.
+    // By loop file: the instance heard for the track, its current part for one that cycles.
     private readonly Dictionary<string, SoundEffectInstance> _instances = [];
-    private readonly List<string> _inIntro = [];
-    private readonly List<SoundEffectInstance> _outros = [];
+    private readonly Dictionary<string, int> _partPlaying = [];
+    private readonly List<string> _cycling = [];
 
     /// <summary>
     /// Called after every update, with the Music volume's gain, so a change in the Options page is heard at once.
@@ -28,18 +28,17 @@ internal sealed class MusicPlayer(SoundLibrary sounds, IReadOnlyList<string> kep
         var (wasPlaying, wasLeaving, wasPaused) = (_mix.Playing, _mix.Leaving, _mix.Paused);
         _mix.Want(Wanted(music.Track));
         _mix.Advance(delta);
-        Settle(wasPlaying, gain);
-        Settle(wasLeaving, gain);
-        Settle(wasPaused, gain);
+        Settle(wasPlaying);
+        Settle(wasLeaving);
+        Settle(wasPaused);
         if (_mix.Playing is { } playing && playing != wasPlaying)
         {
             Begin(playing, gain * _mix.PlayingGain);
         }
 
+        FollowParts(gain);
         SetVolume(_mix.Playing, gain * _mix.PlayingGain);
         SetVolume(_mix.Leaving, gain * _mix.LeavingGain);
-        FollowIntros(gain);
-        FollowOutros(gain);
     }
 
     public void Dispose()
@@ -50,18 +49,13 @@ internal sealed class MusicPlayer(SoundLibrary sounds, IReadOnlyList<string> kep
             instance.Dispose();
         }
 
-        foreach (var outro in _outros)
-        {
-            outro.Stop();
-            outro.Dispose();
-        }
-
         _instances.Clear();
-        _inIntro.Clear();
-        _outros.Clear();
+        _partPlaying.Clear();
+        _cycling.Clear();
     }
 
-    // The flow names the loop file; whether an intro and an outro sit beside it is read once, when the track changes.
+    // The flow names the loop file; whether an intro and an outro sit beside it is read once, on the frame the track is
+    // first wanted: from then on the mix knows it, as the next track, the playing one, the leaving or the paused one.
     private MusicTrack? Wanted(string? loop)
     {
         if (loop is null)
@@ -69,9 +63,9 @@ internal sealed class MusicPlayer(SoundLibrary sounds, IReadOnlyList<string> kep
             return null;
         }
 
-        if (_mix.Playing is { } playing && playing.Loop == loop)
+        if (TrackOf(loop) is { } known)
         {
-            return playing;
+            return known;
         }
 
         return new MusicTrack(
@@ -80,8 +74,23 @@ internal sealed class MusicPlayer(SoundLibrary sounds, IReadOnlyList<string> kep
             sounds.Exists(AudioFolders.Music, MusicTrack.OutroBeside(loop)));
     }
 
-    // A track gone from the mix ends (its outro, or dropped); one whose fade-out ended and that waits is paused.
-    private void Settle(MusicTrack? was, float gain)
+    private MusicTrack? TrackOf(string loop)
+    {
+        if (_mix.Next is { } next && next.Loop == loop)
+        {
+            return next;
+        }
+
+        if (_mix.Leaving is { } leaving && leaving.Loop == loop)
+        {
+            return leaving;
+        }
+
+        return _mix.Paused is { } paused && paused.Loop == loop ? paused : null;
+    }
+
+    // A track gone from the mix is dropped; one whose fade-out ended and that waits is paused.
+    private void Settle(MusicTrack? was)
     {
         if (was is not { } track)
         {
@@ -90,7 +99,7 @@ internal sealed class MusicPlayer(SoundLibrary sounds, IReadOnlyList<string> kep
 
         if (track != _mix.Playing && track != _mix.Leaving && track != _mix.Paused)
         {
-            End(track, gain);
+            Drop(track);
         }
         else if (track == _mix.Paused && track != _mix.Leaving && _instances.TryGetValue(track.Loop, out var waiting) && waiting.State == SoundState.Playing)
         {
@@ -98,7 +107,7 @@ internal sealed class MusicPlayer(SoundLibrary sounds, IReadOnlyList<string> kep
         }
     }
 
-    // A track waiting paused resumes where it was; any other starts from its beginning, intro first when it has one.
+    // A track waiting paused resumes where it was; any other starts from its beginning, its first part when it cycles.
     private void Begin(MusicTrack track, float volume)
     {
         if (_instances.TryGetValue(track.Loop, out var waiting))
@@ -106,96 +115,105 @@ internal sealed class MusicPlayer(SoundLibrary sounds, IReadOnlyList<string> kep
             waiting.Volume = volume;
             waiting.Resume();
         }
-        else if (track.HasIntro && Start(MusicTrack.IntroBeside(track.Loop), volume) is { } intro)
+        else if (track.CyclesParts && StartPart(track, 0, volume))
         {
-            _instances.Add(track.Loop, intro);
-            _inIntro.Add(track.Loop);
+            _cycling.Add(track.Loop);
         }
-        else if (Start(track.Loop, volume) is { } loop)
+        else if (StartLooped(track.Loop, volume) is { } loop)
         {
-            // Reached with no intro, or with one whose file won't load: the loop is better than silence.
-            loop.IsLooped = true;
             _instances.Add(track.Loop, loop);
         }
     }
 
-    private void End(MusicTrack track, float gain)
+    private void Drop(MusicTrack track)
     {
-        if (!_instances.Remove(track.Loop, out var instance))
+        if (_instances.Remove(track.Loop, out var instance))
         {
-            return;
+            instance.Stop();
+            instance.Dispose();
         }
 
-        instance.Stop();
-        instance.Dispose();
-        _inIntro.Remove(track.Loop);
+        _cycling.Remove(track.Loop);
+        _partPlaying.Remove(track.Loop);
         if (!keptLoaded.Contains(track.Loop))
         {
             sounds.Release(AudioFolders.Music, track.Loop);
         }
-
-        if (track.HasOutro && Start(MusicTrack.OutroBeside(track.Loop), gain) is { } outro)
-        {
-            _outros.Add(outro);
-        }
     }
 
-    // An intro that reached its end hands over to the loop, while the track is still the one playing.
-    private void FollowIntros(float gain)
+    // A part that reached its end hands over to the next, the last to the first again.
+    private void FollowParts(float gain)
     {
-        for (var i = _inIntro.Count - 1; i >= 0; i--)
+        for (var i = _cycling.Count - 1; i >= 0; i--)
         {
-            var loop = _inIntro[i];
-            if (_instances[loop].State != SoundState.Stopped)
+            var loop = _cycling[i];
+            if (!_instances.TryGetValue(loop, out var part) || part.State != SoundState.Stopped || TrackOf(loop) is not { } track)
             {
                 continue;
             }
 
-            _instances[loop].Dispose();
+            part.Dispose();
             _instances.Remove(loop);
-            _inIntro.RemoveAt(i);
-            if (_mix.Playing?.Loop == loop && Start(loop, gain * _mix.PlayingGain) is { } started)
-            {
-                started.IsLooped = true;
-                _instances.Add(loop, started);
-            }
+            var volume = gain * (track == _mix.Playing ? _mix.PlayingGain : _mix.LeavingGain);
+            StartPart(track, _partPlaying[loop] + 1, volume);
         }
     }
 
-    private void FollowOutros(float gain)
+    // A part that won't load is skipped for the next, so a bad intro still leaves the loop heard; none starting, false.
+    private bool StartPart(MusicTrack track, int index, float volume)
     {
-        for (var i = _outros.Count - 1; i >= 0; i--)
+        var parts = track.Parts;
+        for (var tried = 0; tried < parts.Count; tried++)
         {
-            if (_outros[i].State == SoundState.Stopped)
+            var playing = (index + tried) % parts.Count;
+            if (StartOnce(parts[playing], volume) is { } part)
             {
-                _outros[i].Dispose();
-                _outros.RemoveAt(i);
-            }
-            else
-            {
-                _outros[i].Volume = gain;
+                _instances[track.Loop] = part;
+                _partPlaying[track.Loop] = playing;
+                return true;
             }
         }
+
+        return false;
     }
 
     private void SetVolume(MusicTrack? track, float volume)
     {
-        if (track is { } playing && _instances.TryGetValue(playing.Loop, out var instance))
+        if (track is { } heard && _instances.TryGetValue(heard.Loop, out var instance))
         {
             instance.Volume = volume;
         }
     }
 
-    private SoundEffectInstance? Start(string file, float volume)
+    private SoundEffectInstance? StartLooped(string file, float volume)
+    {
+        var instance = Prepare(file, volume);
+        if (instance is not null)
+        {
+            // Set before Play: set after, the device may keep the one-shot it was given.
+            instance.IsLooped = true;
+            instance.Play();
+        }
+
+        return instance;
+    }
+
+    private SoundEffectInstance? StartOnce(string file, float volume)
+    {
+        var instance = Prepare(file, volume);
+        instance?.Play();
+        return instance;
+    }
+
+    private SoundEffectInstance? Prepare(string file, float volume)
     {
         if (sounds.Get(AudioFolders.Music, file) is not { } sound)
         {
             return null;
         }
 
-        var started = sound.CreateInstance();
-        started.Volume = volume;
-        started.Play();
-        return started;
+        var instance = sound.CreateInstance();
+        instance.Volume = volume;
+        return instance;
     }
 }

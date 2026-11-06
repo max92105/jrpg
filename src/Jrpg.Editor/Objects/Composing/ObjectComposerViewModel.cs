@@ -54,6 +54,19 @@ internal sealed partial class ObjectComposerViewModel : ObservableObject
 
     public static ObjectComposerViewModel ForNew(CanvasPainting painting, ObjectNaming naming) => new(painting, naming, null);
 
+    /// <summary>A new object on the canvas a map selection made (decision 514), with its drawing warning.</summary>
+    public static ObjectComposerViewModel ForNewFromMap(CanvasPainting painting, ObjectNaming naming, string? mapLayerWarning) =>
+        new(painting, naming, null) { MapLayerWarning = mapLayerWarning };
+
+    /// <summary>
+    /// How an object made from map cells will draw differently from them (decision 516); null otherwise, and for New
+    /// object and Edit object.
+    /// </summary>
+    public string? MapLayerWarning { get; private init; }
+
+    /// <summary>Whether the composer shows <see cref="MapLayerWarning"/>; its line takes no room otherwise.</summary>
+    public bool HasMapLayerWarning => MapLayerWarning is not null;
+
     /// <param name="painting">The painting, started from the original's picture.</param>
     /// <param name="original">The object edited.</param>
     /// <param name="categories">The categories objects use today.</param>

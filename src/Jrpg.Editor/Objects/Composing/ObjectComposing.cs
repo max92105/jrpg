@@ -7,8 +7,9 @@ using Jrpg.Editor.Tiles;
 namespace Jrpg.Editor.Objects.Composing;
 
 /// <summary>
-/// Objects > New object and Edit object (decision 455): starts the composer on the cells chosen in the Tiles panel or
-/// the object chosen in the Objects panel, and applies it as one undo step.
+/// Objects > New object, Edit object and New object from map selection (decisions 455, 514): starts the composer on the
+/// cells chosen in the Tiles panel, the object chosen in the Objects panel or the canvas a map selection made, and
+/// applies it as one undo step.
 /// </summary>
 internal sealed partial class ObjectComposing : ObservableObject
 {
@@ -44,8 +45,14 @@ internal sealed partial class ObjectComposing : ObservableObject
         var canvas = _tiles.SelectedCells is { } cells
             ? ObjectCanvas.Empty(Math.Min(cells.Columns, ObjectCanvas.MaxCells), Math.Min(cells.Rows, ObjectCanvas.MaxCells)).Stamp(0, new GridCell(0, 0), cells)
             : ObjectCanvas.Empty(NewCanvasCells, NewCanvasCells);
-        return ObjectComposerViewModel.ForNew(new CanvasPainting(canvas, _tiles), new ObjectNaming([.. _catalog.Current.Objects.Keys], Categories()));
+        return ObjectComposerViewModel.ForNew(new CanvasPainting(canvas, _tiles), NewNaming());
     }
+
+    /// <summary>The composer for a new object on the canvas a map selection made (decision 514).</summary>
+    /// <param name="canvas">The map's cells, every layer on its level.</param>
+    /// <param name="mapLayerWarning">How the object will draw differently from the cells; null when it won't.</param>
+    public ObjectComposerViewModel StartNewFromMap(ObjectCanvas canvas, string? mapLayerWarning) =>
+        ObjectComposerViewModel.ForNewFromMap(new CanvasPainting(canvas, _tiles), NewNaming(), mapLayerWarning);
 
     /// <summary>The composer on the chosen object's picture, its id kept; null unless <see cref="CanEdit"/>.</summary>
     public ObjectComposerViewModel? StartEdit()
@@ -80,6 +87,8 @@ internal sealed partial class ObjectComposing : ObservableObject
         _objects.SelectedObject = _catalog.Current.Objects[definition.Id];
         return true;
     }
+
+    private ObjectNaming NewNaming() => new([.. _catalog.Current.Objects.Keys], Categories());
 
     private List<string> Categories() => [.. _catalog.Current.Objects.Values.Select(definition => definition.Category)];
 

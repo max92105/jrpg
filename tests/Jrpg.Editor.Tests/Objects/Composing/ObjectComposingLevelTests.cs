@@ -74,6 +74,19 @@ public sealed class ObjectComposingLevelTests : IDisposable
     }
 
     // Chooses the sheet's first tile in the Tiles panel and strokes it on the canvas's top-left cell on the level.
+    [Fact]
+    public void StartNewFromMap_Canvas_StartsANewObjectOnIt()
+    {
+        var viewModel = _content.Open(_content.TestWorld);
+        var canvas = ObjectCanvas.OfCells(2, 1, new Dictionary<CellOnLevel, Editor.Catalogs.SheetCell> { [new CellOnLevel(new GridCell(1, 0), -1)] = new("ground", 0, 0) });
+
+        var composer = viewModel.Composing!.StartNewFromMap(canvas, "A warning.");
+
+        Assert.Same(canvas, composer.Painting.Canvas);
+        Assert.Equal(("", "A warning.", true), (composer.Naming.Id, composer.MapLayerWarning, composer.HasMapLayerWarning));
+        Assert.Null(composer.Original);
+    }
+
     private static int PaintTileOf(MainViewModel viewModel, ObjectComposerViewModel composer, string sheetId, int level)
     {
         var tileId = viewModel.Catalog!.Tiles.Values.First(tile => tile.SheetId == sheetId).Id;

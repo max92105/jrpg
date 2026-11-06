@@ -50,6 +50,28 @@ internal static class MapSelectionCanvas
             : null;
     }
 
+    /// <summary>
+    /// Why the object will draw differently from the map's cells (decision 516): a layer drawn over the player becomes
+    /// depth-sorted in an object, and a base under the player keeps the whole object under it; null when neither.
+    /// </summary>
+    /// <param name="takenLayers"><see cref="TakenLayersOf"/>'s layers.</param>
+    /// <param name="baseZ">The base layer's z.</param>
+    public static string? DrawingWarningOf(IReadOnlyList<(int Z, int Level)> takenLayers, int baseZ)
+    {
+        List<string> warnings = [];
+        if (takenLayers.Select(layer => layer.Z).Where(z => z >= MapLayers.AbovePlayerZ).ToList() is [var overPlayer, ..])
+        {
+            warnings.Add($"Layer z {overPlayer} drew over the player; in an object it draws by depth.");
+        }
+
+        if (baseZ < MapLayers.PlayerZ)
+        {
+            warnings.Add($"The base layer z {baseZ} is under the player: the object will always draw under the player.");
+        }
+
+        return warnings.Count == 0 ? null : string.Join(" ", warnings);
+    }
+
     /// <exception cref="ArgumentException">
     /// The rectangle can't make an object; the message is <see cref="ProblemOf"/>'s.
     /// </exception>

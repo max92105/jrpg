@@ -99,7 +99,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **OM0. Moves only: the Tiles mode handlers into `MainWindow.TilePainting.cs`** (Editor, about 120 lines moved, no behavior change) → [slices/OM0.md](slices/OM0.md)
 - [x] **OM1. Ctrl + drag in Tiles mode selects map cells (`MapCellRectangle`), drawn dashed** (Editor, about 190 lines) → [slices/OM1.md](slices/OM1.md)
 - [x] **OM2. `MapSelectionCanvas`: the canvas a map selection makes, every layer on its level around the chosen one (level 0), and why it can't; `ObjectCanvas.OfCells`** (Editor, about 240 lines) → [slices/OM2.md](slices/OM2.md)
-- [ ] **OM3. Objects > New object from map selection opens the composer on it, warning about layers that draw differently in an object; Save makes the object from the map's own tiles** (Editor, about 165 lines) → [slices/OM3.md](slices/OM3.md)
+- [x] **OM3. Objects > New object from map selection opens the composer on it, warning about layers that draw differently in an object; Save makes the object from the map's own tiles** (Editor, about 165 lines) → [slices/OM3.md](slices/OM3.md)
 - [ ] **OM4. Replace the cells with the object: the composer's check box, `ReplaceCellsWithObjectEdit` erasing only the cells the object still holds, one map step after the catalog step** (Editor, about 210 lines) → [slices/OM4.md](slices/OM4.md)
 
 ## Decisions

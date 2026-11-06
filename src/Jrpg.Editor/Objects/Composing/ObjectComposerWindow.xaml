@@ -10,6 +10,9 @@
         Height="720"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False">
+  <Window.Resources>
+    <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
+  </Window.Resources>
   <Window.InputBindings>
     <KeyBinding Key="Z" Modifiers="Control" Command="{Binding Painting.UndoCommand}" />
     <KeyBinding Key="Y" Modifiers="Control" Command="{Binding Painting.RedoCommand}" />
@@ -65,6 +68,10 @@
       </StackPanel>
       <StackPanel DockPanel.Dock="Bottom">
         <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Text="{Binding Problem}" Margin="0,8,0,0" />
+        <TextBlock Foreground="{StaticResource WarningTextBrush}"
+                   TextWrapping="Wrap"
+                   Text="{Binding MapLayerWarning}"
+                   Visibility="{Binding HasMapLayerWarning, Converter={StaticResource VisibleWhenTrue}}" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
           <!-- Greyed while something stops Save; the line above says what. -->
           <Button Content="Save" Width="80" IsDefault="True" Click="OnSaveClicked">

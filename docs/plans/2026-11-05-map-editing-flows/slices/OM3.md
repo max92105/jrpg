@@ -46,3 +46,5 @@ Size: about 50 lines of code, 5 of XAML and F1; 10 tests (about 110): about 165.
 5. Choose the Ground layer (under the player), select the same rectangle, New object from map selection: the amber line says the object will always draw under the player. Cancel.
 6. Without a selection, the menu entry only writes in the status bar: "Ctrl + drag a rectangle of cells on the map first (Tiles tab)."
 7. Ctrl+Z removes `test_tree` (after removing its placement first, or the undo is refused, naming the map).
+
+- **Done, with deviations:** the composer gets its warning through a `ForNewFromMap` factory (an init-only `MapLayerWarning`); the tool bar button reads "From map..."; `MainWindow.xaml` ends at 296 lines. The "empty cells" test selects on a new map, which has no tile. No capture (Mana Seed art). Review: the warning line takes no room when null (`HasMapLayerWarning`), so New object and Edit object look as before; `ObjectComposing`'s summary names the third entry; a test joins both warnings.

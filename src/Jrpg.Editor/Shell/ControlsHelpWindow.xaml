@@ -74,6 +74,7 @@
         Delete: remove the selected objects, or the one under the mouse.<LineBreak />
         Objects > Edit shapes: open the shapes window for the one placed object selected, else the object chosen in the Objects panel.<LineBreak />
         Shift + double-click a placed object, or double-click one in the Objects panel: open its shapes.<LineBreak />
+        Objects > New object from map selection (or From map... in the tool bar): the composer on the cells selected with Ctrl + drag (Tiles tab); the chosen layer becomes level 0, each layer under or over it with a tile there the next level down or up.<LineBreak />
         Objects > New object: the composer; choose cells on its sheet, click or drag on the canvas to stamp them, right click or drag to erase (or the Erase toggle), Ctrl+Z and Ctrl+Y undo strokes; Save, then its shapes open.<LineBreak />
         In the composer, Ctrl + mouse wheel over the canvas, or − and + over it: zoom the canvas.<LineBreak />
         In the composer, the Level box chooses the level strokes paint and erase, from -7 to 7 (0 is the base; a higher level is drawn over a lower one; the levels above the chosen one are faded; a • marks the levels painted on).<LineBreak />

@@ -74,6 +74,7 @@
       <MenuItem Header="Objects">
         <MenuItem Header="Edit shapes..." Click="OnEditShapesClicked" IsEnabled="{Binding Placing.CanEditShapes, FallbackValue=False}" />
         <MenuItem Header="New object..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" ToolTip="Paint an object in the composer from cells of any sheet; a rectangle chosen in the Tiles panel starts it." />
+        <MenuItem Header="New object from map selection..." Click="OnNewObjectFromMapClicked" IsEnabled="{Binding CanStartObjectFromMap}" ToolTip="Make an object of the map cells selected with Ctrl + drag in the Tiles tab: the chosen layer is level 0, the layers under and over it the levels under and over." />
         <MenuItem Header="New NPC..." Click="OnNewNpcClicked" IsEnabled="{Binding CanStartNewNpc}" />
         <!-- Keeps the object's id, outline, zones, events and placements, so the doors keep working with new art (decision 449). -->
         <MenuItem Header="Edit object..." Click="OnEditObjectClicked" IsEnabled="{Binding Composing.CanEdit, FallbackValue=False}" ToolTip="Repaint the chosen object; its id, outline, zones, placements and events stay. Ctrl+Z puts the old picture back." />
@@ -151,6 +152,7 @@
         <Button Content="Edit shapes..." Click="OnEditShapesClicked" IsEnabled="{Binding Placing.CanEditShapes, FallbackValue=False}" />
         <Button Content="New object..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" />
         <Button Content="Edit object..." Click="OnEditObjectClicked" IsEnabled="{Binding Composing.CanEdit, FallbackValue=False}" />
+        <Button Content="From map..." Click="OnNewObjectFromMapClicked" IsEnabled="{Binding CanStartObjectFromMap}" ToolTip="Objects &gt; New object from map selection: an object of the cells selected with Ctrl + drag in the Tiles tab." />
         <Button Content="New NPC..." Click="OnNewNpcClicked" IsEnabled="{Binding CanStartNewNpc}" />
         <CheckBox Content="Snap to grid (Alt, G)" IsChecked="{Binding Placing.IsGridSnapOn, FallbackValue=False}" ToolTip="Placed and moved objects land on whole cells. Holding Alt does the opposite of this box; G ticks or unticks it." />
       </ToolBar>

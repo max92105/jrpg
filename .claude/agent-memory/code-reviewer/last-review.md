@@ -5,13 +5,16 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-05-map-editing-flows, slice OM2 (MapSelectionCanvas, ObjectCanvas.OfCells), round 1 (2026-11-06).
+Plan 2026-11-05-map-editing-flows, slice OM3 (New object from map selection), round 1 (2026-11-06).
 Verdict: ready to commit (no Criticals).
 
-- Warning (open): MapSelectionCanvas.SheetCellOf is a second copy of ObjectCanvas's private SheetCellOf (the
-  TileDefinition -> SheetCell conversion also inline in TileBrowserViewModel:180, TileImages:36, :92); share one.
-- Suggestion (open): SheetCellsOf's "no layer at that z" branch; iterate layout.Layers with their level instead.
-- Suggestion (open): ObjectCanvasTests.cs:140 no blank line between the last test and the new [Fact].
-- Follow-up: docs/map.md Viewport row has a stray `|` after the ZoomedScroller entry (4 cells in 3 columns).
-- OM1 carried items: resize clipping fixed (OnOpenMapContentChanged); Maps-row stray `|` fixed; DrawMapSelection
-  duplicate / `_rectangleStart!` were OM1 round items, OM1 committed, not carried.
+- Warning (open): ObjectComposerWindow.xaml:68 MapLayerWarning TextBlock not collapsed when null: blank line in every
+  New/Edit composer (slice asked "collapsed when null"; MainWindowStyles' ErrorLine comment confirms the gap).
+- Warning (open): ObjectComposing class summary still "New object and Edit object ... Tiles panel or Objects panel";
+  StartNewFromMap's map-selection job missing.
+- Suggestion (open): ObjectComposingLevelTests new [Fact] placed after the private PaintTileOf helper.
+- Suggestion (open): no DrawingWarningOf test with both warnings (the " " join).
+- Suggestion (open): StartObjectFromMap's `CurrentMap is not { } shown` guard; a selection implies an open map.
+- Follow-up dropped: CatalogDraft.TileAt lowest-id-wins on cells cut twice (content has no duplicates today).
+- OM2 carried: SheetCellOf shared via SheetCell.Of (fixed); inline copies are in backlog.md:209 (dropped);
+  map.md Viewport stray `|` fixed.

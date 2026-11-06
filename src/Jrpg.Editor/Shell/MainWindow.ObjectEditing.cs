@@ -23,6 +23,8 @@ internal sealed partial class MainWindow
 
     private void OnNewObjectClicked(object sender, RoutedEventArgs e) => Compose(_viewModel.Composing?.StartNew());
 
+    private void OnNewObjectFromMapClicked(object sender, RoutedEventArgs e) => Compose(_viewModel.StartObjectFromMap());
+
     private void OnEditObjectClicked(object sender, RoutedEventArgs e) => Compose(_viewModel.Composing?.StartEdit());
 
     // A new object's shapes are drawn right away (decision 124), an edited one's when its size changed (decision 462);

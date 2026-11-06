@@ -155,6 +155,44 @@ public sealed class MapSelectionCanvasTests
     }
 
     [Fact]
+    public void DrawingWarningOf_LayerAtAbovePlayerZ_Warns()
+    {
+        var warning = MapSelectionCanvas.DrawingWarningOf([(MapLayers.PlayerZ, 0), (MapLayers.AbovePlayerZ, 1)], MapLayers.PlayerZ);
+
+        Assert.Equal($"Layer z {MapLayers.AbovePlayerZ} drew over the player; in an object it draws by depth.", warning);
+    }
+
+    [Fact]
+    public void DrawingWarningOf_LayerJustUnderAbovePlayerZ_IsNull()
+    {
+        Assert.Null(MapSelectionCanvas.DrawingWarningOf([(MapLayers.PlayerZ, 0), (MapLayers.AbovePlayerZ - 1, 1)], MapLayers.PlayerZ));
+    }
+
+    [Fact]
+    public void DrawingWarningOf_BaseUnderPlayerZ_Warns()
+    {
+        var warning = MapSelectionCanvas.DrawingWarningOf([(MapLayers.PlayerZ - 1, 0)], MapLayers.PlayerZ - 1);
+
+        Assert.Equal($"The base layer z {MapLayers.PlayerZ - 1} is under the player: the object will always draw under the player.", warning);
+    }
+
+    [Fact]
+    public void DrawingWarningOf_BothApply_JoinsThem()
+    {
+        var warning = MapSelectionCanvas.DrawingWarningOf([(MapLayers.PlayerZ - 1, 0), (MapLayers.AbovePlayerZ, 1)], MapLayers.PlayerZ - 1);
+
+        Assert.Equal(
+            $"Layer z {MapLayers.AbovePlayerZ} drew over the player; in an object it draws by depth. The base layer z {MapLayers.PlayerZ - 1} is under the player: the object will always draw under the player.",
+            warning);
+    }
+
+    [Fact]
+    public void DrawingWarningOf_BaseAtPlayerZ_IsNull()
+    {
+        Assert.Null(MapSelectionCanvas.DrawingWarningOf([(MapLayers.PlayerZ, 0)], MapLayers.PlayerZ));
+    }
+
+    [Fact]
     public void Of_WithAProblem_Throws()
     {
         var thrown = Assert.Throws<ArgumentException>(() => MapSelectionCanvas.Of(Layout(Layer(1, 0)), _twoByTwo, baseZ: 1, _tiles));

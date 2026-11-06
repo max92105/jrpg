@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Editor.Maps;
@@ -9,9 +10,10 @@ namespace Jrpg.Editor.Shell;
 /// <summary>The object drags on the map: the selection rectangle, the moved objects and the placing ghost.</summary>
 internal sealed partial class MainWindow
 {
-    // The drag under way, if any: a selection rectangle from a point, or an object moved with an offset from the mouse.
+    // The drag under way, if any: a selection rectangle from a point, or an object moved with an offset from the mouse,
+    // the whole selection with it when it was grabbed selected (decision 510).
     private Point2D? _selectionStart;
-    private (PlacedObject Placed, Vector Offset, Point2D From)? _movedObject;
+    private (PlacedObject Placed, Vector Offset, Point2D From, bool IsSelection)? _movedObject;
     private ObjectDefinition? _ghostDefinition;
 
     /// <summary>
@@ -35,6 +37,12 @@ internal sealed partial class MainWindow
         }
         else if (_movedObject is { } moved)
         {
+            // The selection's marks follow the mouse as a whole, not redrawn on every move.
+            if (moved.IsSelection)
+            {
+                SelectionMarks.RenderTransform = new TranslateTransform((at.X - moved.From.X) * MapDrawing.CellPixels, (at.Y - moved.From.Y) * MapDrawing.CellPixels);
+            }
+
             ShowGhost(_viewModel.Catalog!.Objects[moved.Placed.ObjectId], new Point2D(at.X + moved.Offset.X, at.Y + moved.Offset.Y));
         }
         else if (Placing.Browser.SelectedObject is { } chosen)
@@ -61,6 +69,10 @@ internal sealed partial class MainWindow
         if (_selectionStart is { } start)
         {
             SelectAfterDrag(start, point);
+        }
+        else if (_movedObject is { IsSelection: true } selection && IsPastDragDistance(selection.From, point))
+        {
+            Placing.MoveSelectedObjects(point.X - selection.From.X, point.Y - selection.From.Y);
         }
         else if (_movedObject is { } moved && IsPastDragDistance(moved.From, point))
         {
@@ -93,6 +105,7 @@ internal sealed partial class MainWindow
     {
         _selectionStart = null;
         _movedObject = null;
+        SelectionMarks.RenderTransform = Transform.Identity;
         ShowObjectDragAt(_mapPoint);
     }
 }

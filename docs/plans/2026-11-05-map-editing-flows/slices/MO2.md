@@ -32,3 +32,5 @@ Size: about 15 lines in the view model, 40 in the window; 4 tests (about 55): ab
 2. Hold Shift and drag one of the three: all three outlines follow the mouse; let go: all three moved by the same amount. Ctrl+Z: all three return in one step.
 3. Shift + drag an object outside the selection: it moves alone; the selection stays where it was.
 4. Shift + double-click a selected object: its shapes open, nothing moves.
+
+- **Done, with deviations:** MO1's `NudgeSelectedObjects(right, down)` became `MoveSelectedObjects(right, down)`, serving the arrows and the drag alike, and records nothing for a zero offset, in place of a second method taking a point; `IsSelected` has a test per side. Review: a wheel zoom during a Shift + drag of the selection snaps its outlines back until the mouse moves (`ApplyViewport` redraws the marks); left, since it is brief and `MainWindow.xaml.cs` would grow.

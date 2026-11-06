@@ -111,7 +111,7 @@ internal sealed partial class MainWindow
         }
         else if (Keyboard.Modifiers == ModifierKeys.Shift && Placing.ObjectAt(point) is { } grabbed)
         {
-            _movedObject = (grabbed, new Vector(grabbed.Position.X - point.X, grabbed.Position.Y - point.Y), point);
+            _movedObject = (grabbed, new Vector(grabbed.Position.X - point.X, grabbed.Position.Y - point.Y), point, Placing.IsSelected(grabbed.Uid));
         }
         else
         {
@@ -160,7 +160,7 @@ internal sealed partial class MainWindow
             Key.Up => (0.0, -step),
             _ => (0.0, step),
         };
-        Placing.NudgeSelectedObjects(right, down);
+        Placing.MoveSelectedObjects(right, down);
     }
 
     private void DeleteSelectedOrHoveredObject()
@@ -178,6 +178,7 @@ internal sealed partial class MainWindow
     private void DrawSelectionMarks()
     {
         SelectionMarks.Children.Clear();
+        SelectionMarks.RenderTransform = Transform.Identity;
         var objects = _viewModel.CurrentMap?.Map.Layout.Objects ?? [];
         var selected = _viewModel.Placing?.SelectedObjectUids ?? [];
         foreach (var placed in objects.Where(placed => selected.Contains(placed.Uid)))

@@ -132,14 +132,17 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
 
     public void ClearSelection() => SelectedObjectUids = [];
 
+    public bool IsSelected(string uid) => SelectedObjectUids.Contains(uid);
+
     /// <summary>
-    /// Moves every selected object by the same offset as one undo step; nothing selected records nothing.
+    /// Moves every selected object by the same offset as one undo step (an arrow's nudge, a Shift + drag on the
+    /// selection); nothing selected, or no offset, records nothing.
     /// </summary>
     /// <param name="cellsRight">The offset right, in map cells; negative moves left.</param>
     /// <param name="cellsDown">The offset down, in map cells; negative moves up.</param>
-    public void NudgeSelectedObjects(double cellsRight, double cellsDown)
+    public void MoveSelectedObjects(double cellsRight, double cellsDown)
     {
-        if (OpenMap is not { } open)
+        if (OpenMap is not { } open || (cellsRight == 0 && cellsDown == 0))
         {
             return;
         }

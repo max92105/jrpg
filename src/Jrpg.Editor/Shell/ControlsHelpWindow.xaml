@@ -62,7 +62,7 @@
       <TextBlock Style="{StaticResource Heading}" Text="Objects" />
       <TextBlock Style="{StaticResource Lines}">
         Click: place the chosen object, centered on the mouse.<LineBreak />
-        Shift + drag: move an object.<LineBreak />
+        Shift + drag: move an object; on a selected object, move the whole selection.<LineBreak />
         Right click: remove an object.<LineBreak />
         Ctrl + drag: select objects.<LineBreak />
         Ctrl + click: select the object under the mouse (on empty ground: select nothing). Esc, with the map clicked: clear the selection.<LineBreak />

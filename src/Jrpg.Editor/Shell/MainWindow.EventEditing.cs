@@ -31,14 +31,14 @@ internal sealed partial class MainWindow
         switch (button)
         {
             case MouseButton.Left when eventEditing.StartEditingAt(point) is { } events:
-                if (new ObjectEventsWindow(events) { Owner = this }.ShowDialog() == true)
+                if (new ObjectEventsWindow(events, _drawing!) { Owner = this }.ShowDialog() == true)
                 {
                     eventEditing.Apply(events);
                 }
 
                 return true;
             case MouseButton.Left when eventEditing.StartEditingCellAt(cell) is { } cellEvent:
-                if (new CellEventWindow(cellEvent) { Owner = this }.ShowDialog() == true)
+                if (new CellEventWindow(cellEvent, _drawing!) { Owner = this }.ShowDialog() == true)
                 {
                     eventEditing.Apply(cellEvent);
                 }

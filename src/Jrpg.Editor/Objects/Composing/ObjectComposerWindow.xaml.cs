@@ -23,9 +23,7 @@ internal sealed partial class ObjectComposerWindow : Window
     private MouseButton? _strokeButton;
     private GridCell? _lastStrokeCell;
     private double _scale = 1;
-
-    // Where Ctrl + wheel left the mouse, which the next zoom keeps in place; the viewer's center for the bar's buttons.
-    private Point? _zoomAnchor;
+    private readonly ZoomedScroller _zooming;
 
     /// <param name="composer">The composer's state, edited here.</param>
     /// <param name="images">The main window's sheet images, shared by the picker and the canvas.</param>
@@ -42,7 +40,7 @@ internal sealed partial class ObjectComposerWindow : Window
         Picker.Images = images;
         Picker.DataContext = composer.Painting.Picker;
         composer.Painting.PropertyChanged += OnPaintingChanged;
-        composer.CanvasZoom.PropertyChanged += OnCanvasZoomChanged;
+        _zooming = new ZoomedScroller(CanvasScroller, DrawCanvas, () => _scale) { Zoom = composer.CanvasZoom };
         animationTime.FramesChanged += OnFramesChanged;
         Closed += OnClosed;
         Loaded += (_, _) => IdBox.Focus();
@@ -66,36 +64,7 @@ internal sealed partial class ObjectComposerWindow : Window
         CanvasImage.LayoutTransform = new ScaleTransform(_scale, _scale);
     }
 
-    private void OnCanvasZoomChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName != nameof(CellZoom.CellPixels))
-        {
-            return;
-        }
 
-        var oldScale = _scale;
-        DrawCanvas();
-        var anchor = _zoomAnchor ?? new Point(CanvasScroller.ViewportWidth / 2, CanvasScroller.ViewportHeight / 2);
-        _zoomAnchor = null;
-        ZoomScrolling.KeepAnchor(CanvasScroller, anchor, oldScale, _scale);
-    }
-
-    // The plain wheel scrolls; a command at its bound doesn't run (the toolkit's Execute doesn't check).
-    private void OnCanvasMouseWheel(object sender, MouseWheelEventArgs e)
-    {
-        if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
-        {
-            return;
-        }
-
-        e.Handled = true;
-        var command = e.Delta > 0 ? _composer.CanvasZoom.ZoomInCommand : _composer.CanvasZoom.ZoomOutCommand;
-        if (command.CanExecute(null))
-        {
-            _zoomAnchor = e.GetPosition(CanvasScroller);
-            command.Execute(null);
-        }
-    }
 
     private void OnCanvasPressed(object sender, MouseButtonEventArgs e)
     {
@@ -174,7 +143,7 @@ internal sealed partial class ObjectComposerWindow : Window
     private void OnClosed(object? sender, EventArgs e)
     {
         _composer.Painting.PropertyChanged -= OnPaintingChanged;
-        _composer.CanvasZoom.PropertyChanged -= OnCanvasZoomChanged;
+        _zooming.Zoom = null;
         _animationTime.FramesChanged -= OnFramesChanged;
         Picker.DataContext = null;
     }

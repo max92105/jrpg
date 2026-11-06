@@ -76,6 +76,7 @@
       <TextBlock Text=", " VerticalAlignment="Center" />
       <TextBox Width="40" Text="{Binding CellYText, UpdateSourceTrigger=PropertyChanged}" />
       <TextBlock Text=")" VerticalAlignment="Center" />
+      <Button Content="Pick..." Margin="8,0,0,0" ToolTip="Choose the map and click the arrival cell on its picture." Click="OnPickWarpDestinationClicked" />
     </StackPanel>
     <StackPanel Visibility="{Binding IsStill, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
       <StackPanel Orientation="Horizontal">

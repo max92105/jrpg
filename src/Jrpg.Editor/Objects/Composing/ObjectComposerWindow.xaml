@@ -89,7 +89,6 @@
                  Text="Choose a cell or drag a rectangle on the sheet, then click or drag on the canvas to stamp it on the chosen level; right click or drag erases." />
       <viewport:CellZoomBar DockPanel.Dock="Top" Margin="0,0,0,4" HorizontalAlignment="Left" DataContext="{Binding CanvasZoom}" />
       <ScrollViewer x:Name="CanvasScroller"
-                    PreviewMouseWheel="OnCanvasMouseWheel"
                     HorizontalScrollBarVisibility="Auto"
                     VerticalScrollBarVisibility="Auto">
         <!-- Scaled to the canvas's zoom as a layout transform, its pixels kept sharp (decision 484). -->

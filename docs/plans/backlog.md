@@ -196,7 +196,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the object levels and sheet zoom plan (2026-11-05, during the slices)
 
-- The Ctrl + wheel handler and the zoom-changed block (old scale, redraw, anchor or the viewer's center, `ZoomScrolling.KeepAnchor`) are copied in `Tiles/TileBrowserView.xaml.cs` and `Objects/Composing/ObjectComposerWindow.xaml.cs`: a third zooming view moves both into a view-side type in `Viewport/` taking a `ScrollViewer`, a `CellZoom` and a redraw callback (SZ3 review).
 - `Game/Rendering/ObjectSpriteBaker.Over` copies `Ui/UiTheme.Over` (`Rendering` doesn't reference `Ui`): a third user moves it into a shared rendering helper (OL2).
 
 ## From the music tracks change (2026-11-05, decision 496)

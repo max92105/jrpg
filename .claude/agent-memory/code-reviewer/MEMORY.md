@@ -1,5 +1,5 @@
 - [Records with lists equality](records-with-lists-equality.md) — records with list members compare by reference; combined-field messages; tautological tests
-- [Scratch builds blocked](scratch-builds-blocked.md) — probe recipes: fsi for Core probes and MonoGame IL walks; PowerShell -STA for WPF; no Python
+- [Scratch builds blocked](scratch-builds-blocked.md) — probe recipes: fsi for Core probes and MonoGame IL walks; PowerShell -STA or a scratch net10 WPF project for WPF; no Python
 - [Tautological tests](tautological-tests.md) — same-seed-twice, count==count, File.Exists-only, untested `<=` boundary; pin golden values
 - [Namespace cycles](namespace-cycles.md) — grep reverse usings for each new Core using; Content is the hub (Content<->Session seen in slice 8)
 - [Stale comments](stale-size-comments.md) — sizing, moved drawing, a newly conditional call or a renamed file leave old sizes/places/names; grep old wording

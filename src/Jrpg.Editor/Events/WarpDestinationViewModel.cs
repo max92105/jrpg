@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Editor.Maps;
+using Jrpg.Editor.Viewport;
 
 namespace Jrpg.Editor.Events;
 
@@ -27,6 +28,9 @@ internal sealed partial class WarpDestinationViewModel : ObservableObject
     }
 
     public IReadOnlyList<MapEntry> Maps => _maps.Entries;
+
+    /// <summary>The picture's cell size: 32 px to start, small enough to show a whole map (tunable).</summary>
+    public CellZoom Zoom { get; } = new(32);
 
     /// <summary>The chosen map; another map keeps the cell when it fits there.</summary>
     [ObservableProperty]

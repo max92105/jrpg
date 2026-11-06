@@ -27,8 +27,10 @@ Size: XAML about 77, code-behind about 107: about 185.
 1. Start the editor (Visual Studio's "Game and editor" profile, F5). Click the **Events** tab, then a door object on the map (one with a Door preset; or make one: choose a door object, Events tab, click it, press **Door**).
 2. In the event dialog, choose the door's event, then its "Warp to" step: the row ends with **Pick...**. Press it.
 3. The picker opens on the step's map with its cell outlined in cyan (a new step: no map chosen, the red line says "Choose the map to warp to.").
-4. Click another map in the list: its picture shows, unsaved changes included if you painted it earlier in the session. Use − and + (or Ctrl + wheel over the picture): the cells grow and shrink, the grid stays one pixel wide.
+4. Click another map in the list: its picture shows, unsaved changes included if you painted it earlier in the session. Use − and + (or Ctrl + wheel over the picture): the cells grow and shrink, the grid stays one pixel wide. The Tiles panel's sheet and the composer's canvas still zoom the same way (Ctrl + wheel toward the mouse, the buttons around the center): their code is now shared.
 5. Click a cell: the cyan square moves there, the line reads "Cell (x, y)". Click a black (empty) cell, one inside a house's outline (Ctrl+H in the main window shows them in green) and one with a cyan square (a walk-into event): the amber line names each; they are still allowed.
 6. Press **OK**: the step's row shows the map and the two numbers. Press **OK** in the event dialog, then Ctrl+S.
 7. Start the game (same F5), walk through the door: you arrive on the cell you clicked.
 8. Do the same from a cell event (Events tab, click a cell without an object, add a Warp step): the button works there too.
+
+- **Done, with deviations:** the picker's `Zoom` (32 px to start) came with this slice, its first user. The cell outline's cyan is a named brush in the code-behind, as the main window's selection mark. No capture: the maps show Mana Seed art, which agents never look at (decision 438); the look is your hand check. Review: the third zooming view, so the zoom and Ctrl + wheel code of the Tiles panel's sheet, the composer's canvas and the picker moved into `Viewport/ZoomedScroller` (the backlog line done); the hand check covers zooming in all three.

@@ -21,15 +21,13 @@ internal sealed partial class TileBrowserView : UserControl
     private (Point Pixel, Point OnView)? _press;
     private bool _isDraggingCells;
     private SheetCutViewModel? _cut;
-    private CellZoom? _zoom;
     private double _scale = 1;
-
-    // Where Ctrl + wheel left the mouse, which the next zoom keeps in place; the viewer's center for the bar's buttons.
-    private Point? _zoomAnchor;
+    private readonly ZoomedScroller _zooming;
 
     public TileBrowserView()
     {
         InitializeComponent();
+        _zooming = new ZoomedScroller(SheetScroller, DrawSheet, () => _scale);
         DataContextChanged += OnDataContextChanged;
     }
 
@@ -48,9 +46,7 @@ internal sealed partial class TileBrowserView : UserControl
         _cut?.PropertyChanged -= OnCutChanged;
         _cut = _browser?.Cut;
         _cut?.PropertyChanged += OnCutChanged;
-        _zoom?.PropertyChanged -= OnZoomChanged;
-        _zoom = _browser?.Zoom;
-        _zoom?.PropertyChanged += OnZoomChanged;
+        _zooming.Zoom = _browser?.Zoom;
         DrawSheet();
     }
 
@@ -77,36 +73,7 @@ internal sealed partial class TileBrowserView : UserControl
         }
     }
 
-    private void OnZoomChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName != nameof(CellZoom.CellPixels))
-        {
-            return;
-        }
 
-        var oldScale = _scale;
-        DrawSheet();
-        var anchor = _zoomAnchor ?? new Point(SheetScroller.ViewportWidth / 2, SheetScroller.ViewportHeight / 2);
-        _zoomAnchor = null;
-        ZoomScrolling.KeepAnchor(SheetScroller, anchor, oldScale, _scale);
-    }
-
-    // The plain wheel scrolls as before; a command at its bound doesn't run (the toolkit's Execute doesn't check).
-    private void OnSheetMouseWheel(object sender, MouseWheelEventArgs e)
-    {
-        if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Control) || _zoom is null)
-        {
-            return;
-        }
-
-        e.Handled = true;
-        var command = e.Delta > 0 ? _zoom.ZoomInCommand : _zoom.ZoomOutCommand;
-        if (command.CanExecute(null))
-        {
-            _zoomAnchor = e.GetPosition(SheetScroller);
-            command.Execute(null);
-        }
-    }
 
     /// <summary>Draws the shown image again; the window calls it when an import replaced its file.</summary>
     public void RedrawSheet() => DrawSheet();

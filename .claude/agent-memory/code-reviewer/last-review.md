@@ -5,11 +5,14 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-05-map-editing-flows, slice WP2 (warp step's side of the picker: OpenMaps.EntriesWith/LayoutsWith,
-StepChoices.WarpMaps, EventStepViewModel.Warp, WarpDestination), round 1 (2026-11-05). Verdict: ready to commit.
+Plan 2026-11-05-map-editing-flows, slice WP3 (WarpDestinationWindow, Pick... button and PickWarpDestination routed
+event, both event dialogs take MapDrawing), round 1 (2026-11-05). Verdict: ready to commit.
 
-- Open (Suggestion): EventEditingViewModelTests.cs:172 no blank line between the previous test's `}` and the new comment.
-- Open (Suggestion): Problem's warp clause repeats TypedCell's two WholeNumber calls; could read `TypedCell() is null`.
-- Open (Suggestion): ListTheMapsInTheMapListsOrder compares to EntriesWith itself (wiring only; order pinned by MainViewModelTests).
-- Carried from WP1 (not re-checked in this diff, WP1 code untouched): Touch cell-event warning wording (decision 507);
-  MapId NotifyPropertyChangedFor untested in WarpDestinationViewModel. Earlier WP1 Suggestions dropped.
+- Open (Warning): WarpDestinationWindow OnZoomChanged/OnPictureMouseWheel are the third copy of the zoom block
+  (TileBrowserView, ObjectComposerWindow); backlog.md line ~199 says the third view extracts it into Viewport/.
+- Open (Suggestion): PickWarpDestinationEvent doc says the source is the button; at the dialog e.Source is the
+  re-targeted EventStepEditor (probe-verified), works only via its DataContext=SelectedStep; reword or use OriginalSource.
+- Open (Suggestion): empty `<param name="cellEvent"></param>` / `<param name="events"></param>` in the two dialogs.
+- Verified: attached routed event without Add/Remove statics is wired at runtime from BAML (not in Connect), private
+  handler reached (scratch WPF probe).
+- WP2/WP1 carried Suggestions: committed as is, treated as declined, dropped.

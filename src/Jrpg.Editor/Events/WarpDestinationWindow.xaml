@@ -1,0 +1,53 @@
+<Window x:Class="Jrpg.Editor.Events.WarpDestinationWindow"
+        x:ClassModifier="internal"
+        Style="{StaticResource EditorWindow}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:viewport="clr-namespace:Jrpg.Editor.Viewport"
+        Title="Warp destination"
+        Width="1100"
+        Height="720"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+  <!-- The maps a warp can lead to beside the chosen map's picture, where a click chooses the arrival cell (decision 506). -->
+  <Grid Margin="12">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="240" MinWidth="140" />
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+    <ListBox ItemsSource="{Binding Maps}"
+             DisplayMemberPath="Text"
+             SelectedValuePath="Id"
+             SelectedValue="{Binding MapId}" />
+    <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
+    <DockPanel Grid.Column="2">
+      <viewport:CellZoomBar DockPanel.Dock="Top" Margin="0,0,0,4" HorizontalAlignment="Left" DataContext="{Binding Zoom}" />
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+        <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked" />
+        <Button Content="Cancel" Width="80" Margin="8,0,0,0" IsCancel="True" />
+      </StackPanel>
+      <TextBlock DockPanel.Dock="Bottom" Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Text="{Binding Problem}" />
+      <!-- Advice only: the game moves a player who can't stand there to the nearest cell they can (decision 507). -->
+      <TextBlock DockPanel.Dock="Bottom" Foreground="{StaticResource WarningTextBrush}" TextWrapping="Wrap" Text="{Binding Warning}" />
+      <TextBlock DockPanel.Dock="Bottom" Margin="0,8,0,0" Text="{Binding CellText}" />
+      <ScrollViewer x:Name="PictureScroller"
+                    HorizontalScrollBarVisibility="Auto"
+                    VerticalScrollBarVisibility="Auto">
+        <!-- Scaled to the zoom as a layout transform, its pixels kept sharp; clicks read in the picture's own pixels. -->
+        <Grid x:Name="Picture"
+              Background="Transparent"
+              RenderOptions.BitmapScalingMode="NearestNeighbor"
+              HorizontalAlignment="Left"
+              VerticalAlignment="Top"
+              MouseLeftButtonDown="OnPicturePressed">
+          <Image x:Name="MapImage" Stretch="None" />
+          <Image x:Name="GridImage" Stretch="None" IsHitTestVisible="False" />
+          <Canvas IsHitTestVisible="False">
+            <Rectangle x:Name="ChosenCell" />
+          </Canvas>
+        </Grid>
+      </ScrollViewer>
+    </DockPanel>
+  </Grid>
+</Window>

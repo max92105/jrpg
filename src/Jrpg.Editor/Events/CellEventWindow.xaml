@@ -9,7 +9,7 @@
         Height="520"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False">
-  <DockPanel Margin="12">
+  <DockPanel Margin="12" local:EventStepEditor.PickWarpDestination="OnPickWarpDestination">
     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
       <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked" />
       <Button Content="Cancel" Width="80" Margin="8,0,0,0" IsCancel="True" />

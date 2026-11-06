@@ -75,7 +75,6 @@
                Visibility="{Binding SelectedChoice.IsImageMissing, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}" />
     <viewport:CellZoomBar DockPanel.Dock="Top" Margin="0,0,0,4" HorizontalAlignment="Left" DataContext="{Binding Zoom}" />
     <ScrollViewer x:Name="SheetScroller"
-                  PreviewMouseWheel="OnSheetMouseWheel"
                   HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"
                   Background="{StaticResource ViewportBackgroundBrush}">

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Jrpg.Core.Geometry;
@@ -40,8 +41,15 @@ internal sealed partial class TilePaintingViewModel : ObservableObject
 
     public IReadOnlyList<TileTool> Tools { get; } = Enum.GetValues<TileTool>();
 
-    /// <summary>The map painted on; set by the shell when a map opens.</summary>
-    public MapViewModel? OpenMap { get; set; }
+    /// <summary>The map painted on; set by the shell when a map opens, which clears the cell selection.</summary>
+    [ObservableProperty]
+    public partial MapViewModel? OpenMap { get; set; }
+
+    /// <summary>
+    /// The map cells chosen with Ctrl + drag, to make an object of (decision 514); null when none are.
+    /// </summary>
+    [ObservableProperty]
+    public partial MapCellRectangle? SelectedMapCells { get; private set; }
 
     /// <summary>The brush's width and height in cells, one of <see cref="BrushSizes"/>.</summary>
     [ObservableProperty]
@@ -56,6 +64,28 @@ internal sealed partial class TilePaintingViewModel : ObservableObject
         if (OpenMap is { } open && TryTakeChosenTile(out var tileId))
         {
             open.StartStroke(new TileBrush(_layer.Z, tileId, BrushSize), cell);
+        }
+    }
+
+    /// <summary>Selects the cells between two corners, clipped to the open map; nothing is painted.</summary>
+    public void SelectMapCells(GridCell corner, GridCell oppositeCorner) =>
+        SelectedMapCells = OpenMap is { } open ? MapCellRectangle.Between(corner, oppositeCorner).ClippedTo(open.Map.Layout) : null;
+
+    public void ClearMapSelection() => SelectedMapCells = null;
+
+    partial void OnOpenMapChanged(MapViewModel? oldValue, MapViewModel? newValue)
+    {
+        oldValue?.PropertyChanged -= OnOpenMapContentChanged;
+        newValue?.PropertyChanged += OnOpenMapContentChanged;
+        SelectedMapCells = null;
+    }
+
+    // A resize (or its undo) can leave the selection partly off the map: it keeps only what is still on it.
+    private void OnOpenMapContentChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MapViewModel.Map) && SelectedMapCells is { } selected)
+        {
+            SelectedMapCells = selected.ClippedTo(OpenMap!.Map.Layout);
         }
     }
 

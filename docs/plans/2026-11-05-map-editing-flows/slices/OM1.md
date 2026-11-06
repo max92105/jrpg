@@ -46,3 +46,5 @@ Size: about 30 lines for the record, 20 in the view model, 35 in the window part
 3. Ctrl + drag past the map's edge: the rectangle stops at the edge.
 4. Press Esc: the rectangle goes. Ctrl + click: one cell is outlined. Show another map: it goes.
 5. Shift + click still fills, Alt + click still picks, R and F still change the tool.
+
+- **Done, with deviations:** the outline is redrawn through the window's `Painting.PropertyChanged` subscription, which calls `ShowBrushAt` and so `DrawMapSelection`; `TryStartCellSelection` and `TryClearMapSelection` keep `HandlePaintButton` and `HandleToolKey` under the complexity limit. `MapCellRectangle.BottomRight` is read by `Cells` and the clipping. No capture (Mana Seed art). Review: a resize or its undo re-clips the selection to the map (a test); a stray table cell in `docs/map.md` fixed; three redundant redraws removed.

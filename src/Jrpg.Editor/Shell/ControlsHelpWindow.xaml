@@ -48,6 +48,7 @@
         Ctrl + mouse wheel over the sheet: zoom toward the mouse. − and + over the sheet: smaller or bigger cells; the size between them goes back to the map's 48 px. The composer's picker shares the zoom.<LineBreak />
         Drag over the sheet (Shift + drag works too): select a rectangle of cells (dashed); painting uses its top-left cell, and Objects > New object starts from them.<LineBreak />
         Left drag: paint with the chosen tool. Right drag: erase.<LineBreak />
+        Ctrl + drag on the map: select a rectangle of map cells (dashed); Ctrl + click: one cell; Esc clears it.<LineBreak />
         B: brush (paints as you drag). R: rectangle (filled on release). F: fill (click).<LineBreak />
         Shift + click: fill, with any tool.<LineBreak />
         Alt + click: pick the tile and layer under the mouse.<LineBreak />

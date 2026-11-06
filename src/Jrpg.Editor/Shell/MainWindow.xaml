@@ -283,6 +283,7 @@
               <Canvas x:Name="SelectionMarks" />
               <Canvas x:Name="EventMarks" />
               <Rectangle x:Name="SelectionOutline" Stroke="Cyan" StrokeDashArray="4 2" Visibility="Collapsed" />
+              <Rectangle x:Name="MapSelectionOutline" Stroke="Cyan" StrokeDashArray="4 2" Visibility="Collapsed" />
               <Rectangle x:Name="DestinationMark" Stroke="Gold" StrokeThickness="3" StrokeDashArray="3 2" Visibility="Collapsed" />
             </Canvas>
           </Grid>

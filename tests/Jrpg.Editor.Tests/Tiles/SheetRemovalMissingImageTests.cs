@@ -149,8 +149,14 @@ public sealed class SheetRemovalMissingImageTests : IDisposable
         var draft = new CatalogDraft(catalog);
         var artRoot = ArtFolders.RootIn(_root);
         var images = new SheetImages(() => [.. ArtFolders.TilesheetImagesIn(artRoot)], file => PngSize.Read(Path.Combine(artRoot, ArtFolders.Tilesheets, file)));
-        var browser = new TileBrowserViewModel(draft, images, _ => true, () => openMap?.Map.Layout);
+        var openMaps = new OpenMaps();
+        if (openMap is not null)
+        {
+            openMaps.Add(openMap);
+        }
+
+        var browser = new TileBrowserViewModel(draft, images, _ => true, () => openMaps.Layouts);
         browser.SelectedChoice = browser.SheetChoices.Single(choice => choice.Sheet?.Id == "city");
-        return (new SheetRemoval(draft, browser, () => openMap, new ContentWriter(_root)), draft);
+        return (new SheetRemoval(draft, browser, openMaps, new ContentWriter(_root)), draft);
     }
 }

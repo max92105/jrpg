@@ -67,16 +67,16 @@ internal sealed partial class MainViewModel : ObservableObject
         {
             ShowMapList(Content.Current);
             var images = new SheetImages(() => [.. ArtFolders.TilesheetImagesIn(ArtRoot).Where(_sheetImageSizes.IsReadable)], _sheetImageSizes.SizeOf);
-            Painting = new TilePaintingViewModel(Content, Layer, images, confirm);
+            Painting = new TilePaintingViewModel(Content, Layer, new TileBrowserViewModel(Content, images, confirm, () => _openMaps.Layouts));
             Marking = new WalkabilityMarking(Content, Painting.Browser);
             Animating = new TileAnimationViewModel(Content, Painting.Browser, images);
             AnimationTime = new TileAnimationTime(Content);
-            Removal = new SheetRemoval(Content, Painting.Browser, () => CurrentMap, _writer);
+            Removal = new SheetRemoval(Content, Painting.Browser, _openMaps, _writer);
             Content.PropertyChanged += OnContentChanged;
             _openMaps.DirtyChanged += OnOpenMapsDirtyChanged;
             Content.Rewriting += (_, written) => ShowRewritten(written);
-            History = new CombinedHistory(Content);
-            Placing = new ObjectPlacingViewModel(Content, Layer);
+            History = new CombinedHistory(Content, _openMaps);
+            Placing = new ObjectPlacingViewModel(Content, Layer, _openMaps);
             Composing = new ObjectComposing(Content, Placing.Browser, Painting.Browser);
             AnimationImport = new AnimationImport(Content);
             EventEditing = new EventEditingViewModel(Content) { MapIds = MapIds };

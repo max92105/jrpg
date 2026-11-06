@@ -18,7 +18,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     private readonly CatalogDraft _catalog;
     private readonly SheetImages _images;
     private readonly Func<string, bool> _confirm;
-    private readonly Func<MapLayout?> _openLayout;
+    private readonly Func<IReadOnlyCollection<MapLayout>> _openLayouts;
     // The sheets the choices were built from; a catalog change replaces this dictionary only when it changes a sheet.
     private IReadOnlyDictionary<string, TilesheetDefinition> _listedSheets;
 
@@ -28,13 +28,13 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     /// <param name="catalog">The sheets and tiles.</param>
     /// <param name="images">The tilesheet folder's images.</param>
     /// <param name="confirm">Asks the developer a yes or no question, before a re-cut changes tiles in use.</param>
-    /// <param name="openLayout">The open map's layout, unsaved changes included, or null; for what a re-cut touches.</param>
-    public TileBrowserViewModel(CatalogDraft catalog, SheetImages images, Func<string, bool> confirm, Func<MapLayout?> openLayout)
+    /// <param name="openLayouts">The open maps' layouts, unsaved changes included; for what a re-cut touches.</param>
+    public TileBrowserViewModel(CatalogDraft catalog, SheetImages images, Func<string, bool> confirm, Func<IReadOnlyCollection<MapLayout>> openLayouts)
     {
         _catalog = catalog;
         _images = images;
         _confirm = confirm;
-        _openLayout = openLayout;
+        _openLayouts = openLayouts;
         catalog.PropertyChanged += OnCatalogChanged;
         _listedSheets = catalog.Current.Tilesheets;
         SheetChoices = ListChoices();
@@ -231,19 +231,19 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
     private void CutSheet()
     {
         var sheet = SelectedSheet!;
-        Cut = new SheetCutViewModel(sheet, _images.SizeOf(sheet.File), CatalogUsage.OfSheet(_catalog.Current, sheet.Id, _openLayout()));
+        Cut = new SheetCutViewModel(sheet, _images.SizeOf(sheet.File), CatalogUsage.OfSheet(_catalog.Current, sheet.Id, _openLayouts()));
     }
 
     /// <summary>
-    /// Makes the sheet as the Cut panel has it, as one undo step, and closes the panel. A re-cut of a sheet with tiles asks
-    /// first with the panel's warning (decision 116), counted again here as the open map may have changed since the panel
-    /// opened; on no, the panel stays open.
+    /// Makes the sheet as the Cut panel has it, as one undo step, and closes the panel. A re-cut of a sheet with tiles
+    /// asks first with the panel's warning (decision 116), counted again here as an open map may have changed since the
+    /// panel opened; on no, the panel stays open.
     /// </summary>
     [RelayCommand(CanExecute = nameof(CanApplyCut))]
     private void ApplyCut()
     {
         var cut = Cut!;
-        cut.Usage = CatalogUsage.OfSheet(_catalog.Current, cut.SheetId, _openLayout());
+        cut.Usage = CatalogUsage.OfSheet(_catalog.Current, cut.SheetId, _openLayouts());
         if (cut.Problem is not null || (cut.Warning is { } warning && !_confirm($"{warning} Re-cut it?")))
         {
             return;
@@ -299,7 +299,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
 
         if (Cut is { } cut)
         {
-            cut.Usage = CatalogUsage.OfSheet(_catalog.Current, cut.SheetId, _openLayout());
+            cut.Usage = CatalogUsage.OfSheet(_catalog.Current, cut.SheetId, _openLayouts());
         }
 
         OnPropertyChanged(nameof(SheetTiles));

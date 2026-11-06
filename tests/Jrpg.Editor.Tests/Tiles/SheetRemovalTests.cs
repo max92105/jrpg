@@ -117,9 +117,15 @@ public sealed class SheetRemovalTests
     {
         var files = draft.Current.Tilesheets.Values.Select(sheet => sheet.File).Distinct().Order(StringComparer.Ordinal).ToList();
         var images = new SheetImages(() => files, _ => (1000, 1000));
-        var browser = new TileBrowserViewModel(draft, images, _ => true, () => openMap?.Map.Layout);
+        var openMaps = new OpenMaps();
+        if (openMap is not null)
+        {
+            openMaps.Add(openMap);
+        }
+
+        var browser = new TileBrowserViewModel(draft, images, _ => true, () => openMaps.Layouts);
         browser.SelectedChoice = browser.SheetChoices.First(choice => choice.Sheet?.Id == "scratch");
-        return (new SheetRemoval(draft, browser, () => openMap, new ContentWriter(Path.Combine(Path.GetTempPath(), "jrpg-never-written"))), browser);
+        return (new SheetRemoval(draft, browser, openMaps, new ContentWriter(Path.Combine(Path.GetTempPath(), "jrpg-never-written"))), browser);
     }
 
     private static ContentCatalog WithTilePaintedOnSavedForest(ContentCatalog catalog)

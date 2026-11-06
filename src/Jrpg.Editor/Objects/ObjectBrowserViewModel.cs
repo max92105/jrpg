@@ -13,18 +13,18 @@ namespace Jrpg.Editor.Objects;
 internal sealed partial class ObjectBrowserViewModel : ObservableObject
 {
     private readonly CatalogDraft _catalog;
-    private readonly Func<MapLayout?> _openLayout;
+    private readonly Func<IReadOnlyCollection<MapLayout>> _openLayouts;
     // The objects the list was built from; a catalog change replaces this dictionary only when it changes an object.
     private IReadOnlyDictionary<string, ObjectDefinition> _listedObjects;
 
     /// <param name="catalog">The object definitions; the list follows its changes (an edited outline, its undo).</param>
-    /// <param name="openLayout">
-    /// The open map's layout, unsaved changes included, or null; what a removal checks in place of its saved file.
+    /// <param name="openLayouts">
+    /// The open maps' layouts, unsaved changes included; what a removal checks in place of their saved files.
     /// </param>
-    public ObjectBrowserViewModel(CatalogDraft catalog, Func<MapLayout?> openLayout)
+    public ObjectBrowserViewModel(CatalogDraft catalog, Func<IReadOnlyCollection<MapLayout>> openLayouts)
     {
         _catalog = catalog;
-        _openLayout = openLayout;
+        _openLayouts = openLayouts;
         _listedObjects = catalog.Current.Objects;
         Objects = Sorted(_listedObjects.Values);
         catalog.PropertyChanged += OnCatalogChanged;
@@ -53,7 +53,7 @@ internal sealed partial class ObjectBrowserViewModel : ObservableObject
     private void RemoveSelected()
     {
         var objectId = SelectedObject!.Id;
-        if (CatalogUsage.UsersOfObject(_catalog.Current, objectId, _openLayout()) is [var user, ..])
+        if (CatalogUsage.UsersOfObject(_catalog.Current, objectId, _openLayouts()) is [var user, ..])
         {
             RemovalStatus = $"Can't remove object {objectId}: it is used on {user}.";
             return;

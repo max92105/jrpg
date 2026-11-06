@@ -18,20 +18,18 @@ internal sealed partial class SheetRemoval : ObservableObject
 {
     private readonly CatalogDraft _catalog;
     private readonly TileBrowserViewModel _browser;
-    private readonly Func<MapViewModel?> _openMap;
+    private readonly OpenMaps _openMaps;
     private readonly ContentWriter _writer;
 
     /// <param name="catalog">The sheets and tiles.</param>
     /// <param name="browser">Whose shown sheet is removed.</param>
-    /// <param name="openMap">
-    /// The open map, read as it is on screen in place of its saved file; null when none is open.
-    /// </param>
+    /// <param name="openMaps">Every open map, read as it is now in place of its saved file (decision 502).</param>
     /// <param name="writer">Writes the purge, which goes to disk at once.</param>
-    public SheetRemoval(CatalogDraft catalog, TileBrowserViewModel browser, Func<MapViewModel?> openMap, ContentWriter writer)
+    public SheetRemoval(CatalogDraft catalog, TileBrowserViewModel browser, OpenMaps openMaps, ContentWriter writer)
     {
         _catalog = catalog;
         _browser = browser;
-        _openMap = openMap;
+        _openMaps = openMaps;
         _writer = writer;
         browser.PropertyChanged += OnBrowserChanged;
     }
@@ -81,7 +79,7 @@ internal sealed partial class SheetRemoval : ObservableObject
         }
 
         var sheetId = _browser.SelectedSheet!.Id;
-        var usage = CatalogUsage.OfSheet(_catalog.Current, sheetId, _openMap()?.Map.Layout);
+        var usage = CatalogUsage.OfSheet(_catalog.Current, sheetId, _openMaps.Layouts);
         if (usage.MapIds.Count > 0 || usage.ObjectIds.Count > 0)
         {
             Status = $"Can't remove sheet {sheetId}: its tiles are used on {UsersText(usage)}.";
@@ -98,7 +96,7 @@ internal sealed partial class SheetRemoval : ObservableObject
     private void AskPurge()
     {
         var sheetId = _browser.SelectedSheet!.Id;
-        if (_catalog.IsDirty || _openMap() is { IsDirty: true })
+        if (_catalog.IsDirty || _openMaps.Dirty.Count > 0)
         {
             Status = $"Save first: removing sheet {sheetId} writes the content at once.";
             return;

@@ -13,7 +13,7 @@ public sealed class TileBrowserZoomTests
     {
         var draft = new CatalogDraft(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));
         var files = draft.Current.Tilesheets.Values.Select(sheet => sheet.File).ToList();
-        _browser = new TileBrowserViewModel(draft, new SheetImages(() => files, _ => (512, 512)), _ => true, () => null);
+        _browser = new TileBrowserViewModel(draft, new SheetImages(() => files, _ => (512, 512)), _ => true, () => []);
     }
 
     [Fact]

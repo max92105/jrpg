@@ -1,4 +1,6 @@
 using Jrpg.Core.Geometry;
+using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Shell;
 
 namespace Jrpg.Editor.Tests.Shell;
 
@@ -219,5 +221,76 @@ public sealed class MainViewModelOpenMapsTests : IDisposable
         Assert.False(viewModel.ConfirmClose());
 
         Assert.Equal(["Map 'forest' and the tiles have unsaved changes. Discard them?"], _content.Questions);
+    }
+
+    // The object is placed on forest only in its unsaved layout; the switch drops forest's steps, so the undo reaches
+    // the object's making (decision 502).
+    [Fact]
+    public void Undo_ObjectPlacedOnAHiddenUnsavedMap_IsRefusedNamingIt()
+    {
+        var viewModel = PlaceNewObjectOnForestThenOpenStart();
+
+        viewModel.History!.UndoCommand.Execute(null);
+
+        Assert.Equal("Can't undo: object test_box is used on map forest.", viewModel.History.Refusal);
+        Assert.True(viewModel.Catalog!.Objects.ContainsKey("test_box"));
+    }
+
+    [Fact]
+    public void RemoveObject_PlacedOnAHiddenUnsavedMap_IsRefused()
+    {
+        var viewModel = PlaceNewObjectOnForestThenOpenStart();
+        var browser = viewModel.Placing!.Browser;
+        browser.SelectedObject = browser.Objects.First(definition => definition.Id == "test_box");
+
+        browser.RemoveSelectedCommand.Execute(null);
+
+        Assert.Equal("Can't remove object test_box: it is used on map forest.", browser.RemovalStatus);
+        Assert.True(viewModel.Catalog!.Objects.ContainsKey("test_box"));
+    }
+
+    [Fact]
+    public void CutSheet_ItsTilePaintedOnAHiddenUnsavedMap_NamesIt()
+    {
+        var (viewModel, _) = PaintUnusedSheetOnForestThenOpenStart();
+        var browser = viewModel.Painting!.Browser;
+
+        browser.CutSheetCommand.Execute(null);
+
+        Assert.Equal(["forest"], browser.Cut!.Usage.MapIds);
+    }
+
+    [Fact]
+    public void RemoveSheet_ItsTilePaintedOnAHiddenUnsavedMap_IsRefusedNamingIt()
+    {
+        var (viewModel, sheetId) = PaintUnusedSheetOnForestThenOpenStart();
+
+        viewModel.Removal!.RemoveSheetCommand.Execute(null);
+
+        Assert.StartsWith($"Can't remove sheet {sheetId}: its tiles are used on map forest", viewModel.Removal.Status, StringComparison.Ordinal);
+    }
+
+    // A tile of a sheet no saved map draws is painted on forest, unsaved; then start is shown and that sheet chosen.
+    private (MainViewModel ViewModel, string SheetId) PaintUnusedSheetOnForestThenOpenStart()
+    {
+        var viewModel = _content.Open(_content.TestWorld);
+        var catalog = viewModel.Catalog!;
+        var tile = catalog.Tiles.Values.First(tile => CatalogUsage.OfSheet(catalog, tile.SheetId, []).MapIds.Count == 0);
+        var forest = viewModel.CurrentMap!;
+        forest.PutTiles(forest.Layers[0].Z, tile.Id, [new GridCell(0, 0)]);
+        viewModel.TryOpenMap("start");
+        var browser = viewModel.Painting!.Browser;
+        browser.SelectedChoice = browser.SheetChoices.Single(choice => choice.Sheet?.Id == tile.SheetId);
+        return (viewModel, tile.SheetId);
+    }
+
+    private MainViewModel PlaceNewObjectOnForestThenOpenStart()
+    {
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
+        _content.ChooseTwoCellsNotTiles(viewModel);
+        EditorTestContent.ComposeObject(viewModel, "test_box");
+        viewModel.Placing!.PlaceObjectAt(new Point2D(2, 2));
+        viewModel.TryOpenMap("start");
+        return viewModel;
     }
 }

@@ -14,12 +14,15 @@ internal sealed partial class CombinedHistory : ObservableObject
 {
     private readonly CatalogDraft _catalog;
     private readonly UndoJournal _journal = new();
+    private readonly OpenMaps _openMaps;
     private MapViewModel? _openMap;
 
     /// <param name="catalog">The catalogs whose steps share the order with the open map's.</param>
-    public CombinedHistory(CatalogDraft catalog)
+    /// <param name="openMaps">Every open map, read by the refusals as it is now (decision 502).</param>
+    public CombinedHistory(CatalogDraft catalog, OpenMaps openMaps)
     {
         _catalog = catalog;
+        _openMaps = openMaps;
         catalog.StepRecorded += (_, _) => RecordStep(UndoTarget.Catalogs);
         catalog.RedoDropped += (_, _) =>
         {
@@ -118,7 +121,7 @@ internal sealed partial class CombinedHistory : ObservableObject
 
         foreach (var objectId in _catalog.ObjectsRemovedByUndo())
         {
-            if (CatalogUsage.UsersOfObject(_catalog.Current, objectId, _openMap?.Map.Layout) is [var map, ..])
+            if (CatalogUsage.UsersOfObject(_catalog.Current, objectId, _openMaps.Layouts) is [var map, ..])
             {
                 return $"Can't undo: object {objectId} is used on {map}.";
             }
@@ -134,7 +137,7 @@ internal sealed partial class CombinedHistory : ObservableObject
 
         foreach (var tileId in _catalog.TilesRemovedByUndo())
         {
-            if (CatalogUsage.UsersOfTile(tileId, _catalog.Current, _openMap?.Map.Layout) is [var user, ..])
+            if (CatalogUsage.UsersOfTile(tileId, _catalog.Current, _openMaps.Layouts) is [var user, ..])
             {
                 return $"Can't undo: tile {tileId} is used on {user}.";
             }
@@ -145,10 +148,10 @@ internal sealed partial class CombinedHistory : ObservableObject
 
     private string? RefusalOfQuestUndo()
     {
-        var openLayout = _openMap?.Map.Layout;
+        var openLayouts = _openMaps.Layouts;
         foreach (var questId in _catalog.QuestsRemovedByUndo())
         {
-            if (CatalogUsage.UsersOfQuest(_catalog.Current, questId, null, openLayout) is [var map, ..])
+            if (CatalogUsage.UsersOfQuest(_catalog.Current, questId, null, openLayouts) is [var map, ..])
             {
                 return $"Can't undo: quest {questId} is used on {map}.";
             }
@@ -156,7 +159,7 @@ internal sealed partial class CombinedHistory : ObservableObject
 
         foreach (var (questId, stageId) in _catalog.QuestStagesRemovedByUndo())
         {
-            if (CatalogUsage.UsersOfQuest(_catalog.Current, questId, stageId, openLayout) is [var map, ..])
+            if (CatalogUsage.UsersOfQuest(_catalog.Current, questId, stageId, openLayouts) is [var map, ..])
             {
                 return $"Can't undo: stage {stageId} of quest {questId} is used on {map}.";
             }

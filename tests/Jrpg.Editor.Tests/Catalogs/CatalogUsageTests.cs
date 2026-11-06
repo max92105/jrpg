@@ -20,7 +20,7 @@ public sealed class CatalogUsageTests
         var forestWithIt = new MapDefinition(WithTileAtTopLeft(forest, unusedTileId), _catalog.Maps["forest"].Settings);
         var saved = _catalog with { Maps = new Dictionary<string, MapDefinition>(_catalog.Maps) { ["forest"] = forestWithIt } };
 
-        var users = CatalogUsage.UsersOfTile(unusedTileId, saved, WithTileAtTopLeft(start, unusedTileId));
+        var users = CatalogUsage.UsersOfTile(unusedTileId, saved, [WithTileAtTopLeft(start, unusedTileId)]);
 
         Assert.Equal(["map forest", "map start"], users);
     }
@@ -33,7 +33,7 @@ public sealed class CatalogUsageTests
         var forestWithIt = new MapDefinition(WithTileAtTopLeft(forest.Layout, unusedTileId), forest.Settings);
         var saved = _catalog with { Maps = new Dictionary<string, MapDefinition>(_catalog.Maps) { ["forest"] = forestWithIt } };
 
-        Assert.Empty(CatalogUsage.UsersOfTile(unusedTileId, saved, forest.Layout));
+        Assert.Empty(CatalogUsage.UsersOfTile(unusedTileId, saved, [forest.Layout]));
     }
 
     [Fact]
@@ -41,13 +41,13 @@ public sealed class CatalogUsageTests
     {
         var tileId = _catalog.Objects["chest"].Tiles[0].TileId;
 
-        Assert.Contains("object chest", CatalogUsage.UsersOfTile(tileId, _catalog, openLayout: null));
+        Assert.Contains("object chest", CatalogUsage.UsersOfTile(tileId, _catalog, openLayouts: []));
     }
 
     [Fact]
     public void UsersOfTile_UnusedTile_IsEmpty()
     {
-        Assert.Empty(CatalogUsage.UsersOfTile(_catalog.Tiles.Keys.Max() + 1, _catalog, openLayout: null));
+        Assert.Empty(CatalogUsage.UsersOfTile(_catalog.Tiles.Keys.Max() + 1, _catalog, openLayouts: []));
     }
 
     // The chest's sheet, with one of its tiles also painted on the open forest.
@@ -57,7 +57,7 @@ public sealed class CatalogUsageTests
         var chestTile = _catalog.Tiles[_catalog.Objects["chest"].Tiles[0].TileId];
         var forest = WithTileAtTopLeft(_catalog.Maps["forest"].Layout, chestTile.Id);
 
-        var usage = CatalogUsage.OfSheet(_catalog, chestTile.SheetId, forest);
+        var usage = CatalogUsage.OfSheet(_catalog, chestTile.SheetId, [forest]);
 
         Assert.Equal(CatalogUsage.TilesCutFrom(chestTile.SheetId, _catalog), usage.Tiles.Select(tile => tile.Id));
         Assert.Contains("forest", usage.MapIds);
@@ -67,7 +67,7 @@ public sealed class CatalogUsageTests
     [Fact]
     public void OfSheet_UnusedSheet_IsEmpty()
     {
-        var usage = CatalogUsage.OfSheet(_catalog, "no_such_sheet", openLayout: null);
+        var usage = CatalogUsage.OfSheet(_catalog, "no_such_sheet", openLayouts: []);
 
         Assert.Empty(usage.Tiles);
         Assert.Empty(usage.MapIds);
@@ -81,9 +81,34 @@ public sealed class CatalogUsageTests
         var start = _catalog.Maps["start"].Layout;
         var placed = new PlacedObject { Uid = "tree_4_1", ObjectId = "tree_4", Position = new Point2D(1, 1), Z = 1 };
 
-        var users = CatalogUsage.UsersOfObject(_catalog, "tree_4", start with { Objects = [.. start.Objects, placed] });
+        var users = CatalogUsage.UsersOfObject(_catalog, "tree_4", [start with { Objects = [.. start.Objects, placed] }]);
 
         Assert.Equal(["map start"], users);
+    }
+
+    // Two open maps, each placing the object only in its unsaved layout: both are read in place of their saved files.
+    [Fact]
+    public void UsersOfObject_TwoOpenLayouts_NamesBoth()
+    {
+        var start = _catalog.Maps["start"].Layout;
+        var forest = _catalog.Maps["forest"].Layout;
+        var placed = new PlacedObject { Uid = "tree_4_1", ObjectId = "tree_4", Position = new Point2D(1, 1), Z = 1 };
+
+        var users = CatalogUsage.UsersOfObject(
+            _catalog, "tree_4", [start with { Objects = [.. start.Objects, placed] }, forest with { Objects = [.. forest.Objects, placed] }]);
+
+        Assert.Equal(["map forest", "map start"], users);
+    }
+
+    [Fact]
+    public void UsersOfTile_OpenNewMapNotSaved_NamesIt()
+    {
+        var unusedTileId = _catalog.Tiles.Keys.Max() + 1;
+        var newMap = _catalog.Maps["forest"].Layout with { Id = "old_mill" };
+
+        var users = CatalogUsage.UsersOfTile(unusedTileId, _catalog, [WithTileAtTopLeft(newMap, unusedTileId)]);
+
+        Assert.Equal(["map old_mill"], users);
     }
 
     // A swap only works in an object's event (the validator refuses it on a cell), so the start map's first placed
@@ -91,7 +116,7 @@ public sealed class CatalogUsageTests
     [Fact]
     public void UsersOfObject_SwapStepNamesIt_NamesTheMap()
     {
-        var users = CatalogUsage.UsersOfObject(_catalog, "tree_4", WithSwapOnFirstObject(_catalog.Maps["start"].Layout, "tree_4"));
+        var users = CatalogUsage.UsersOfObject(_catalog, "tree_4", [WithSwapOnFirstObject(_catalog.Maps["start"].Layout, "tree_4")]);
 
         Assert.Equal(["map start"], users);
     }
@@ -99,7 +124,7 @@ public sealed class CatalogUsageTests
     [Fact]
     public void UsersOfObject_AnotherObjectSwappedTo_IsEmpty()
     {
-        var users = CatalogUsage.UsersOfObject(_catalog, "tree_4", WithSwapOnFirstObject(_catalog.Maps["start"].Layout, "tree_5"));
+        var users = CatalogUsage.UsersOfObject(_catalog, "tree_4", [WithSwapOnFirstObject(_catalog.Maps["start"].Layout, "tree_5")]);
 
         Assert.Empty(users);
     }
@@ -111,7 +136,7 @@ public sealed class CatalogUsageTests
         var swapping = new MapDefinition(WithSwapOnFirstObject(forest.Layout, "tree_4"), forest.Settings);
         var saved = _catalog with { Maps = new Dictionary<string, MapDefinition>(_catalog.Maps) { ["forest"] = swapping } };
 
-        var users = CatalogUsage.UsersOfObject(saved, "tree_4", openLayout: null);
+        var users = CatalogUsage.UsersOfObject(saved, "tree_4", openLayouts: []);
 
         Assert.Equal(["map forest"], users);
     }

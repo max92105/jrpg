@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using Jrpg.Core.Content;
+using Jrpg.Core.Maps;
 
 namespace Jrpg.Editor.Maps;
 
@@ -16,6 +17,9 @@ internal sealed class OpenMaps
 
     /// <summary>In opening order.</summary>
     public IReadOnlyList<MapViewModel> All => _all;
+
+    /// <summary>Each open map's layout as it is now, unsaved changes included: what the usage checks read.</summary>
+    public IReadOnlyCollection<MapLayout> Layouts => [.. _all.Select(map => map.Map.Layout)];
 
     /// <summary>The open maps with unsaved changes, in id order.</summary>
     public IReadOnlyList<MapViewModel> Dirty =>

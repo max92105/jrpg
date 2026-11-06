@@ -36,7 +36,9 @@ call or a rename. These cases slipped past it:
   (`Select`: "nothing when the sheet isn't in the box"); grep the check's name and "on save" across the feature folders.
 
 - A removed question or refusal (map flows MS1: switching no longer asks) leaves callers' summaries and window
-  comments naming it ("or the user kept the open map"); grep the old outcome's wording across the views.
+  comments naming it ("or the user kept the open map"); grep the old outcome's wording across the views. MS2 (one open
+  map became many) left "the open map may have changed" in TileBrowserViewModel.ApplyCut and CatalogDraft.Rewriting's
+  "the open map is replaced": grep the singular noun when a single becomes a collection.
 
 - Deleted content files leave text a script generates (music change, decision 496: fetch-placeholder-sounds.ps1 writing
   "The music ... rendered by new-placeholder-tune.pl" into CREDITS.md) and the generator's now-unused subs; grep

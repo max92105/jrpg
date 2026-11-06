@@ -70,6 +70,18 @@ public sealed class OpenMapsTests
     }
 
     [Fact]
+    public void Layouts_MapPainted_HoldsTheUnsavedTile()
+    {
+        var maps = new OpenMaps();
+        var meadow = MapNamed("meadow");
+        maps.Add(meadow);
+
+        meadow.PutTiles(0, 3, [new GridCell(0, 0)]);
+
+        Assert.Equal(3, Assert.Single(maps.Layouts).Layers[0].TileIdAt(new GridCell(0, 0)));
+    }
+
+    [Fact]
     public void ReplaceFrom_WrittenContent_RebuildsACleanMapAndDropsOneItLacks()
     {
         var written = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));

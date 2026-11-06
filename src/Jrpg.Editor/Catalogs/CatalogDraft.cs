@@ -33,8 +33,8 @@ internal sealed partial class CatalogDraft : ObservableObject
 
     /// <summary>
     /// The content was written straight away and is about to replace <see cref="Current"/> (the sheet purge), given as
-    /// the argument: the open map and every history start afresh. Raised before <see cref="Current"/> changes, so the
-    /// open map is replaced first and nothing ever draws an old layout against the new catalogs (it would name tiles
+    /// the argument: the open maps and every history start afresh. Raised before <see cref="Current"/> changes, so the
+    /// open maps are replaced first and nothing ever draws an old layout against the new catalogs (it would name tiles
     /// and objects that are gone); the new layout is a subset of the old, so drawing it against the old catalogs is
     /// safe.
     /// </summary>

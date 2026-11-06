@@ -22,7 +22,7 @@ public sealed class ObjectPlacingViewModelTests
     {
         var forest = _catalog.Maps["forest"];
         var emptyForest = new MapDefinition(forest.Layout with { Objects = [] }, forest.Settings);
-        _placing = new ObjectPlacingViewModel(_draft, _layer) { OpenMap = new MapViewModel(emptyForest) };
+        _placing = new ObjectPlacingViewModel(_draft, _layer, new OpenMaps()) { OpenMap = new MapViewModel(emptyForest) };
         _placing.Browser.SelectedObject = _catalog.Objects["chest"];
     }
 

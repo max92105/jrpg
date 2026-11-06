@@ -22,8 +22,8 @@ public sealed class CatalogUsageQuestTests
         var gate = new MapEvent { Id = "heist_gate", Activation = EventActivation.Touch, OnlyWhenQuest = new QuestCondition("heist", QuestConditionKind.Active), Steps = [] };
         var open = WithCellEvent(_catalog.Maps["start"].Layout, gate);
 
-        Assert.Equal(["map forest", "map start"], CatalogUsage.UsersOfQuest(saved, "heist", null, open));
-        Assert.Empty(CatalogUsage.UsersOfQuest(saved, "heist", "case", open));
+        Assert.Equal(["map forest", "map start"], CatalogUsage.UsersOfQuest(saved, "heist", null, [open]));
+        Assert.Empty(CatalogUsage.UsersOfQuest(saved, "heist", "case", [open]));
     }
 
     [Fact]
@@ -31,8 +31,8 @@ public sealed class CatalogUsageQuestTests
     {
         var saved = WithForestCellEvent(new MapEvent { Id = "heist_case", Activation = EventActivation.Touch, Steps = [new AdvanceQuestStep("heist", "case")] });
 
-        Assert.Equal(["map forest"], CatalogUsage.UsersOfQuest(saved, "heist", "case", null));
-        Assert.Empty(CatalogUsage.UsersOfQuest(saved, "heist", "crack", null));
+        Assert.Equal(["map forest"], CatalogUsage.UsersOfQuest(saved, "heist", "case", []));
+        Assert.Empty(CatalogUsage.UsersOfQuest(saved, "heist", "crack", []));
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public sealed class CatalogUsageQuestTests
         var layout = forest.Layout with { Objects = [first with { Events = [gated] }, .. forest.Layout.Objects.Skip(1)] };
         var saved = _catalog with { Maps = new Dictionary<string, MapDefinition>(_catalog.Maps) { ["forest"] = new MapDefinition(layout, forest.Settings) } };
 
-        Assert.Equal(["map forest"], CatalogUsage.UsersOfQuest(saved, "heist", "case", null));
+        Assert.Equal(["map forest"], CatalogUsage.UsersOfQuest(saved, "heist", "case", []));
     }
 
     private static ContentCatalog WithForestCellEvent(MapEvent mapEvent)

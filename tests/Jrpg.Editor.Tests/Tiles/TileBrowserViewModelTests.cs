@@ -40,7 +40,7 @@ public sealed class TileBrowserViewModelTests
     public TileBrowserViewModelTests()
     {
         var images = new SheetImages(() => [.. _imageFiles], file => _imageSizes[file]);
-        _browser = new TileBrowserViewModel(_draft, images, Ask, () => null);
+        _browser = new TileBrowserViewModel(_draft, images, Ask, () => []);
     }
 
     [Fact]

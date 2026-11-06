@@ -66,6 +66,22 @@ public sealed class MainViewModelPurgeTests : IDisposable
         Assert.False(viewModel.HasUnsavedChanges);
     }
 
+    [Fact]
+    public void RemoveSheet_AHiddenOpenMapUnsaved_AsksToSaveFirst()
+    {
+        var (viewModel, root) = OpenWithCityMissing();
+        EditorTestContent.PaintTopLeft(viewModel);
+        viewModel.TryOpenMap(viewModel.MapIds.First(id => id != viewModel.CurrentMap!.Map.Id));
+        var browser = viewModel.Painting!.Browser;
+        browser.SelectedChoice = browser.SheetChoices.Single(choice => choice.Sheet?.Id == "city");
+
+        viewModel.Removal!.RemoveSheetCommand.Execute(null);
+
+        Assert.Null(viewModel.Removal.PurgeQuestion);
+        Assert.Equal("Save first: removing sheet city writes the content at once.", viewModel.Removal.Status);
+        Assert.True(ContentCatalogLoader.Load(root).Tilesheets.ContainsKey("city"));
+    }
+
     // The rebuilt map is one of the open maps: its next edit is unsaved and the close question names it.
     [Fact]
     public void RemoveSheet_PurgedThenPainted_CountsAsUnsaved()

@@ -40,3 +40,5 @@ Size: about 45 lines of code changed, 33 mechanical test sites (about 40 lines),
 3. Open map B. Press Ctrl+Z until the next undo would remove `test_box`: the status bar says "Can't undo: object test_box is used on map A." and the object stays.
 4. Objects tab: choose `test_box`, press Remove: refused, naming map A.
 5. Open map A, right click the placed `test_box` (removed); in the Objects tab choose `test_box` and press Remove: it leaves the list.
+
+- **Done, with deviations:** `OpenMaps.ReplaceFrom` and `ShowRewritten` were already done in MS1 (its review). `RemoveSheet_AHiddenOpenMapUnsaved_AsksToSaveFirst` went to `MainViewModelPurgeTests`, through the editor's own wiring, in place of `SheetRemovalMissingImageTests`. Review: two tests through the editor reach the re-cut warning and Remove sheet with a hidden unsaved map (`MainViewModelOpenMapsTests`, now 296 lines: MS3's tests go to a sibling file); two comments say "open maps".

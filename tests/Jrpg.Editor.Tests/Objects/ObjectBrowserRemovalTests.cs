@@ -110,7 +110,7 @@ public sealed class ObjectBrowserRemovalTests
     [Fact]
     public void RemoveSelectedCommand_NothingChosen_CannotExecute()
     {
-        var browser = new ObjectBrowserViewModel(new CatalogDraft(_catalog), () => null);
+        var browser = new ObjectBrowserViewModel(new CatalogDraft(_catalog), () => []);
 
         Assert.False(browser.RemoveSelectedCommand.CanExecute(null));
     }
@@ -144,7 +144,7 @@ public sealed class ObjectBrowserRemovalTests
 
     private static ObjectBrowserViewModel BrowserOn(CatalogDraft draft, MapLayout? openLayout)
     {
-        var browser = new ObjectBrowserViewModel(draft, () => openLayout);
+        var browser = new ObjectBrowserViewModel(draft, () => openLayout is null ? [] : [openLayout]);
         browser.SelectedObject = browser.Objects.First(definition => definition.Id == "crate");
         return browser;
     }

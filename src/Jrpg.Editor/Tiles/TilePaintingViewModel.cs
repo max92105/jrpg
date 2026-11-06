@@ -23,11 +23,10 @@ internal sealed partial class TilePaintingViewModel : ObservableObject
 
     /// <param name="catalog">The sheets and tiles.</param>
     /// <param name="layer">The layer painted on.</param>
-    /// <param name="images">The tilesheet folder's images.</param>
-    /// <param name="confirm">Asks the developer a yes or no question, before a re-cut changes tiles in use.</param>
-    public TilePaintingViewModel(CatalogDraft catalog, LayerChoiceViewModel layer, SheetImages images, Func<string, bool> confirm)
+    /// <param name="browser">The sheet view whose chosen cells are painted.</param>
+    public TilePaintingViewModel(CatalogDraft catalog, LayerChoiceViewModel layer, TileBrowserViewModel browser)
     {
-        Browser = new TileBrowserViewModel(catalog, images, confirm, () => OpenMap?.Map.Layout);
+        Browser = browser;
         _catalog = catalog;
         _layer = layer;
     }

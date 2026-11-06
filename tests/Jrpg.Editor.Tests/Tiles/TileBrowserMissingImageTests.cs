@@ -30,7 +30,7 @@ public sealed class TileBrowserMissingImageTests
     public TileBrowserMissingImageTests()
     {
         var images = new SheetImages(() => ["Forest.png"], file => file == "Forest.png" ? (96, 96) : throw new InvalidOperationException($"{file} has no image to size."));
-        _browser = new TileBrowserViewModel(_draft, images, _ => true, () => null);
+        _browser = new TileBrowserViewModel(_draft, images, _ => true, () => []);
         _browser.SelectedChoice = _browser.SheetChoices.Single(choice => choice.IsImageMissing);
     }
 

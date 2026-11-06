@@ -60,7 +60,7 @@ internal sealed partial class MainWindow
     {
         if (_selectionStart is { } start)
         {
-            Placing.SelectObjectsIn(start, point);
+            SelectAfterDrag(start, point);
         }
         else if (_movedObject is { } moved && IsPastDragDistance(moved.From, point))
         {
@@ -74,6 +74,19 @@ internal sealed partial class MainWindow
         var screenPixelsPerCell = MapDrawing.CellPixels * _viewport.Zoom;
         return Math.Abs(to.X - from.X) * screenPixelsPerCell >= SystemParameters.MinimumHorizontalDragDistance
             || Math.Abs(to.Y - from.Y) * screenPixelsPerCell >= SystemParameters.MinimumVerticalDragDistance;
+    }
+
+    // Ctrl + click, released within Windows' drag distance, selects the object on top there (decision 509).
+    private void SelectAfterDrag(Point2D start, Point2D end)
+    {
+        if (IsPastDragDistance(start, end))
+        {
+            Placing.SelectObjectsIn(start, end);
+        }
+        else
+        {
+            Placing.SelectObjectAt(start);
+        }
     }
 
     private void CancelObjectDrag()

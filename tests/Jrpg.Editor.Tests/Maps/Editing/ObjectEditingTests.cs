@@ -57,6 +57,31 @@ public sealed class ObjectEditingTests
         Assert.Equal([_tree, _chest, _farChest], _draft.Objects);
     }
 
+    // Free positions moved by an offset: the revert puts back the exact doubles.
+    [Fact]
+    public void MoveObjectsEdit_ApplyThenRevert_RestoresTheExactPositions()
+    {
+        var draft = MapDraft.From(new MapDefinition(Layout() with { Objects = [Placed("tree_1", "tree", 0.1, 0.2), _chest] }, new MapSettings { Id = "glade", DisplayName = "Glade" }));
+        var edit = new MoveObjectsEdit([new MoveObjectEdit("tree_1", new Point2D(0.1, 0.2), new Point2D(0.3, 0.4)), new MoveObjectEdit("chest_1", new Point2D(2, 1.5), new Point2D(2.2, 1.7))]);
+        edit.Apply(draft);
+
+        edit.Revert(draft);
+
+        Assert.Equal([new Point2D(0.1, 0.2), new Point2D(2, 1.5)], draft.Objects.Select(placed => placed.Position));
+    }
+
+    // The same object moved twice in one step: the second move must be undone first to land on the first's start.
+    [Fact]
+    public void MoveObjectsEdit_SameObjectTwice_RevertsTheLastMoveFirst()
+    {
+        var edit = new MoveObjectsEdit([new MoveObjectEdit("chest_1", new Point2D(2, 1.5), new Point2D(3, 1.5)), new MoveObjectEdit("chest_1", new Point2D(3, 1.5), new Point2D(4, 1.5))]);
+        edit.Apply(_draft);
+
+        edit.Revert(_draft);
+
+        Assert.Equal(new Point2D(2, 1.5), _draft.Objects[1].Position);
+    }
+
     [Fact]
     public void MoveObjectEdit_Revert_RestoresPosition()
     {

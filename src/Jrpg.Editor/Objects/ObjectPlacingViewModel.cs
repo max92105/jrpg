@@ -10,11 +10,17 @@ using Jrpg.Editor.Maps.Editing;
 namespace Jrpg.Editor.Objects;
 
 /// <summary>
-/// Placing, moving and removing objects on the open map. Every change is one undo step;
-/// nothing is placed until an object is chosen.
+/// Placing, moving, selecting, nudging and removing objects on the open map. Every change is one undo step; nothing is
+/// placed until an object is chosen.
 /// </summary>
 internal sealed partial class ObjectPlacingViewModel : ObservableObject
 {
+    /// <summary>An arrow key's nudge of the selection, in map cells (decision 509; tunable).</summary>
+    public const double NudgeCells = 1;
+
+    /// <summary>Shift + arrow's nudge: one art pixel of a 16-pixel cell, exact in binary (decision 509).</summary>
+    public const double FineNudgeCells = 1.0 / 16;
+
     private readonly CatalogDraft _catalog;
     private readonly LayerChoiceViewModel _layer;
 
@@ -64,7 +70,10 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
     [ObservableProperty]
     public partial MapViewModel? OpenMap { get; set; }
 
-    /// <summary>The placed objects chosen with a dragged rectangle, for Delete; kept to objects still on the map.</summary>
+    /// <summary>
+    /// The placed objects chosen with Ctrl + click or a dragged rectangle, for Delete and the arrow keys; kept to
+    /// objects still on the map.
+    /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanEditShapes))]
     public partial IReadOnlyList<string> SelectedObjectUids { get; private set; } = [];
@@ -114,6 +123,38 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
         SelectedObjectUids = OpenMap is { } open
             ? [.. PlacedObjectHits.InRectangle(open.Map.Layout, corner, oppositeCorner, _catalog.Current.Objects).Select(placed => placed.Uid)]
             : [];
+
+    /// <summary>
+    /// Selects only the object drawn on top at a point (Ctrl + click); none there clears the selection.
+    /// </summary>
+    /// <param name="point">In map cells.</param>
+    public void SelectObjectAt(Point2D point) => SelectedObjectUids = ObjectAt(point) is { } top ? [top.Uid] : [];
+
+    public void ClearSelection() => SelectedObjectUids = [];
+
+    /// <summary>
+    /// Moves every selected object by the same offset as one undo step; nothing selected records nothing.
+    /// </summary>
+    /// <param name="cellsRight">The offset right, in map cells; negative moves left.</param>
+    /// <param name="cellsDown">The offset down, in map cells; negative moves up.</param>
+    public void NudgeSelectedObjects(double cellsRight, double cellsDown)
+    {
+        if (OpenMap is not { } open)
+        {
+            return;
+        }
+
+        IReadOnlyList<MoveObjectEdit> moves =
+        [
+            .. open.Map.Layout.Objects
+                .Where(placed => SelectedObjectUids.Contains(placed.Uid))
+                .Select(placed => new MoveObjectEdit(placed.Uid, placed.Position, new Point2D(placed.Position.X + cellsRight, placed.Position.Y + cellsDown))),
+        ];
+        if (moves.Count > 0)
+        {
+            open.Do(new MoveObjectsEdit(moves));
+        }
+    }
 
     /// <summary>Removes the selected objects as one undo step.</summary>
     [RelayCommand]

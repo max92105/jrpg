@@ -12,7 +12,8 @@ namespace Jrpg.Editor.Shell;
 
 /// <summary>
 /// The window's object mode: a click places the chosen object centered on the mouse, Shift + drag moves an object, a
-/// right click removes one, Ctrl + drag selects objects for Delete.
+/// right click removes one; Ctrl + click or Ctrl + drag selects objects for Delete and the arrow keys, and Esc clears
+/// what is selected.
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -123,13 +124,47 @@ internal sealed partial class MainWindow
         return true;
     }
 
+    // Delete removes; Esc clears a selection and the arrows nudge it, while the map has the keys (else Esc closes a
+    // drop-down and the arrows pan).
     private bool HandleObjectKey(Key key)
     {
-        if (key != Key.Delete || _viewModel.Mode != EditingMode.Objects || _viewModel.CurrentMap is null || Keyboard.FocusedElement is TextBox)
+        if (_viewModel.Mode != EditingMode.Objects || _viewModel.CurrentMap is null || Keyboard.FocusedElement is TextBox)
         {
             return false;
         }
 
+        var hasSelection = Placing.SelectedObjectUids.Count > 0;
+        switch (key)
+        {
+            case Key.Delete:
+                DeleteSelectedOrHoveredObject();
+                return true;
+            case Key.Escape when hasSelection && MapViewport.IsKeyboardFocusWithin:
+                Placing.ClearSelection();
+                return true;
+            case Key.Left or Key.Right or Key.Up or Key.Down when hasSelection && MapViewport.IsKeyboardFocusWithin:
+                NudgeSelection(key);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    private void NudgeSelection(Key key)
+    {
+        var step = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift) ? ObjectPlacingViewModel.FineNudgeCells : ObjectPlacingViewModel.NudgeCells;
+        var (right, down) = key switch
+        {
+            Key.Left => (-step, 0.0),
+            Key.Right => (step, 0.0),
+            Key.Up => (0.0, -step),
+            _ => (0.0, step),
+        };
+        Placing.NudgeSelectedObjects(right, down);
+    }
+
+    private void DeleteSelectedOrHoveredObject()
+    {
         if (Placing.SelectedObjectUids.Count > 0)
         {
             Placing.DeleteSelectedObjects();
@@ -138,8 +173,6 @@ internal sealed partial class MainWindow
         {
             Placing.RemoveObject(hovered.Uid);
         }
-
-        return true;
     }
 
     private void DrawSelectionMarks()

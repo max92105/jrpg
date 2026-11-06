@@ -227,8 +227,9 @@
               <tiles:TileBrowserView x:Name="TileBrowser" DataContext="{Binding Painting.Browser}" />
             </DockPanel>
           </TabItem>
-          <!-- Click places the chosen object, Shift + drag moves one, right click or Delete removes, Ctrl + drag selects. -->
-          <TabItem x:Name="ObjectsTab" Header="Objects">
+          <!-- The tooltip names the mode's mouse and key gestures; F1 lists them all. -->
+          <TabItem x:Name="ObjectsTab" Header="Objects"
+                   ToolTip="Click places the chosen object; Shift + drag moves; Ctrl + click or Ctrl + drag selects; arrows nudge the selection, Shift for one pixel; Esc clears it; right click or Delete removes.">
             <objects:ObjectBrowserView x:Name="ObjectBrowser" DataContext="{Binding Placing.Browser}" MouseDoubleClick="OnObjectBrowserDoubleClicked" />
           </TabItem>
           <TabItem x:Name="EventsTab" Header="Events">

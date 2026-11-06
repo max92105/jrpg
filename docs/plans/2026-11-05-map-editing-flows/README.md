@@ -82,7 +82,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 3: moving and snapping
 - [x] **MO0. Moves only: the object drags into `MainWindow.ObjectDragging.cs`** (Editor, about 75 lines moved, no behavior change) → [slices/MO0.md](slices/MO0.md)
-- [ ] **MO1. Ctrl + click selects one object, Esc clears the selection, arrow keys nudge the selected objects as one step each (`MoveObjectsEdit`)** (Editor, about 195 lines) → [slices/MO1.md](slices/MO1.md)
+- [x] **MO1. Ctrl + click selects one object, Esc clears the selection, arrow keys nudge the selected objects as one step each (`MoveObjectsEdit`)** (Editor, about 195 lines) → [slices/MO1.md](slices/MO1.md)
 - [ ] **MO2. Shift + drag on a selected object moves the whole selection as one step, its outlines following the mouse** (Editor, about 115 lines) → [slices/MO2.md](slices/MO2.md)
 - [ ] **SN1. Snap to grid: `GridSnap`, Alt held while placing or moving, the ghost where it lands, the Snap to grid check box and G** (Editor, about 205 lines) → [slices/SN1.md](slices/SN1.md)
 

@@ -42,5 +42,7 @@ Size: about 25 lines in the view model, 15 for the edit, 35 in the window, 4 in 
 2. Hold Ctrl and click one object (no drag): only it gets the cyan outline, even where two objects overlap (the one drawn in front wins). Ctrl + click on grass: the outline goes.
 3. Ctrl + drag a rectangle over two objects; click the map once with the middle button (focus), then press → three times: both move three cells right. Shift + → moves them a hair (one art pixel).
 4. Press Ctrl+Z once: the last press undoes; three more: they are back exactly where they were (check by eye against the grid).
-5. Press Esc: the selection clears; → now pans the view.
+5. Click the map with the middle button, then press Esc: the selection clears; → now pans the view.
 6. Type in the layer box of the tool bar and press arrows: the caret moves, no object moves.
+
+- **Done, with deviations:** the window's Ctrl + click is `SelectAfterDrag` in `MainWindow.ObjectDragging.cs` (a rectangle past the drag distance, else the object on top); Delete's old body is `DeleteSelectedOrHoveredObject`. The Objects tab's comment now says its tooltip names the gestures. Review: the exact-undo test starts from (0.1, 0.3) with both chests selected; Esc clears the selection only while the map has the keys, as the arrows (a toolbar drop-down keeps its own Esc); a test that a same-object move reverts last first.

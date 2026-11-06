@@ -13,7 +13,7 @@ metadata:
 - **count==count / oracle** (4b, 11g, stats E1, mana T2b): the test rebuilds the production computation; pin a golden prefix instead.
 - **guard clause** (6a, 8, 1b, class-mechanics PL2b, RG1): a `||` clause, a validator message or a `throw` with no test; match each to a test (one theory row per clause).
 - **boundary** (1b re-review, gold I1): `<=` tested only at the bound, or a range tested only on rejected values (0 and max + 1); test the accepted bounds too.
-- **fixture doesn't reach the scenario** (part 2 4a, 5b, slice 7): coordinates, keys or identical inputs make the named case never happen; trace the fixture.
+- **fixture doesn't reach the scenario** (part 2 4a, 5b, slice 7, map flows MO1: an object moved out of the selection rectangle): coordinates, keys or identical inputs make the named case never happen; trace the fixture.
 - **single recipient / neutral rules / fixture default** (battle C1, stats M1a, M2a): a total equals a share, a multiplier runs at 1, a stat defaults to 0; use two recipients and a non-neutral value.
 - **stale equals expected** (demo G1a, gold L2b): the "refreshed" value was already the expected one; start from a state where it differs, one test per cache key.
 - **same observable** (gold I2b, B3): two outcomes look alike through the assertion used (`IsShowingMessage`, "a consumable row"); assert the id or value only the right outcome has.
@@ -23,5 +23,6 @@ metadata:
 - **action never taken** (map flows MS3): a test named `Undo_..._DoesNotTouch...` asserts "unchanged" without executing Undo; check the named action runs.
 - **second overload / twin hook** (gold S2/S3, composer CO2): one of two parallel overloads or property hooks (ColumnsText tested, RowsText not) has no test; check each.
 - **order already given** (quests J1): a sort test whose setup already yields the expected order by another rule (main started last, then reversed); set up the opposite order.
+- **round trip exact anyway** (map flows MO1): "exact after undo" from 2.3 + 0.1 - 0.1, which is exact in doubles; check with powershell that offset arithmetic would fail (0.1 + 1 - 1 does).
 
 Related: [[records-with-lists-equality]].

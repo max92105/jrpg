@@ -16,3 +16,5 @@ Size: about 75 lines moved, 10 of file header.
 ## Hand check (yours)
 1. Start the editor (Visual Studio's "Game and editor" profile, F5); Objects tab; choose an object.
 2. The ghost follows the mouse; a click places it; Shift + drag moves a placed object; Ctrl + drag draws the dashed selection rectangle and selects; all as before.
+
+- **Done:** as planned. `MainWindow.ObjectEditing.cs` ends at 185 lines, the new `MainWindow.ObjectDragging.cs` at 83; the test count is unchanged (4195). The summary of `ShowObjectDragAt` was rewrapped by the 120-column check, its words unchanged.

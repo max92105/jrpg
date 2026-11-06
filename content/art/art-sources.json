@@ -260,6 +260,18 @@
       "sourceId": "mana-seed"
     },
     {
+      "path": "tilesheets/bonus shadows.png",
+      "sourceId": "mana-seed"
+    },
+    {
+      "path": "tilesheets/bonus wooden deck.png",
+      "sourceId": "mana-seed"
+    },
+    {
+      "path": "tilesheets/collision & alpha.png",
+      "sourceId": "mana-seed"
+    },
+    {
       "path": "tilesheets/home exteriors, half-timber v1.png",
       "sourceId": "mana-seed"
     }

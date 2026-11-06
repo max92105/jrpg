@@ -308,6 +308,7 @@ internal sealed partial class MainWindow : Window
 
     private void OnViewportMouseDown(object sender, MouseButtonEventArgs e)
     {
+        HideDestinationMark();
         MapViewport.Focus();
         var isPanGesture = e.ChangedButton == MouseButton.Middle || (e.ChangedButton == MouseButton.Left && _isSpaceHeld);
         if (isPanGesture)

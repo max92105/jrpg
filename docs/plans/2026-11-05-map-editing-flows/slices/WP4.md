@@ -30,3 +30,5 @@ Size: about 65 lines of code (`CenterOn` 5, editor 12, dialogs 16, main window 3
 4. Paint a cell, open the door's events again, press **Go to**, then Alt+Left: the painted cell is still there (maps stay open).
 5. Clear the warp's map in the step's box, press **Go to**: the dialog stays open and its problem line says what is missing.
 6. Click anywhere on the map: the gold square goes.
+
+- **Done, with deviations:** the main window's step is `GoToFollowedWarp(window.FollowedWarp)`, called after each dialog's apply, doing nothing for a dialog closed by OK. The gold mark is 3 px wide. No capture (Mana Seed art, decision 438). Review: the map's own press handler marks most presses handled, so it hides the mark first (one line in `MainWindow.xaml.cs`, which otherwise doesn't grow) in place of a one-shot handler; the `CenterOn` tests read back through `ScreenToMap`.

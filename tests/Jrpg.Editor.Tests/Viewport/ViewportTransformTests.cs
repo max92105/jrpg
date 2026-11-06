@@ -68,4 +68,25 @@ public sealed class ViewportTransformTests
 
         Assert.Equal(new GridCell(-1, 0), cell);
     }
+
+    [Fact]
+    public void CenterOn_MapPoint_PutsItAtTheViewCenter()
+    {
+        _viewport.PanBy(new Vector(30, -20));
+
+        _viewport.CenterOn(new Point(240, 120), new Size(800, 600));
+
+        Assert.Equal(new Point(240, 120), _viewport.ScreenToMap(new Point(400, 300)));
+    }
+
+    [Fact]
+    public void CenterOn_AtZoomTwo_KeepsTheZoomAndCenters()
+    {
+        _viewport.ZoomAt(new Point(0, 0), 2);
+
+        _viewport.CenterOn(new Point(240, 120), new Size(800, 600));
+
+        Assert.Equal(2, _viewport.Zoom);
+        Assert.Equal(new Point(240, 120), _viewport.ScreenToMap(new Point(400, 300)));
+    }
 }

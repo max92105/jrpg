@@ -31,16 +31,20 @@ internal sealed partial class MainWindow
         switch (button)
         {
             case MouseButton.Left when eventEditing.StartEditingAt(point) is { } events:
-                if (new ObjectEventsWindow(events, _drawing!) { Owner = this }.ShowDialog() == true)
+                var objectWindow = new ObjectEventsWindow(events, _drawing!) { Owner = this };
+                if (objectWindow.ShowDialog() == true)
                 {
                     eventEditing.Apply(events);
+                    GoToFollowedWarp(objectWindow.FollowedWarp);
                 }
 
                 return true;
             case MouseButton.Left when eventEditing.StartEditingCellAt(cell) is { } cellEvent:
-                if (new CellEventWindow(cellEvent, _drawing!) { Owner = this }.ShowDialog() == true)
+                var cellWindow = new CellEventWindow(cellEvent, _drawing!) { Owner = this };
+                if (cellWindow.ShowDialog() == true)
                 {
                     eventEditing.Apply(cellEvent);
+                    GoToFollowedWarp(cellWindow.FollowedWarp);
                 }
 
                 return true;

@@ -19,6 +19,20 @@ internal sealed partial class ObjectEventsWindow : Window
         _drawing = drawing;
     }
 
+    /// <summary>The destination a warp step's Go to closed the dialog with; null when OK or Cancel closed it.</summary>
+    public WarpDestination? FollowedWarp { get; private set; }
+
+    // As OK, keeping the events, then naming the step's destination for the main window to show.
+    private void OnGoToWarpDestination(object sender, RoutedEventArgs e)
+    {
+        ProblemText.Text = _events.Problem;
+        if (_events.Problem is null && e.Source is FrameworkElement { DataContext: EventStepViewModel { Destination: { } destination } })
+        {
+            FollowedWarp = destination;
+            DialogResult = true;
+        }
+    }
+
     private void OnPickWarpDestination(object sender, RoutedEventArgs e)
     {
         if (e.Source is FrameworkElement { DataContext: EventStepViewModel step } && _events.Choices.WarpMaps is { } maps)

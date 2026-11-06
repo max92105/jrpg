@@ -39,6 +39,12 @@ internal sealed class ViewportTransform
         Origin = new Point((view.Width - (map.Width * Zoom)) / 2, (view.Height - (map.Height * Zoom)) / 2);
     }
 
+    /// <summary>Puts a map pixel at the view's center, the zoom unchanged (Go to a warp's destination).</summary>
+    /// <param name="map">The map pixel to center.</param>
+    /// <param name="view">The view's size in screen pixels.</param>
+    public void CenterOn(Point map, Size view) =>
+        Origin = new Point((view.Width / 2) - (map.X * Zoom), (view.Height / 2) - (map.Y * Zoom));
+
     public Point ScreenToMap(Point screen) => new((screen.X - Origin.X) / Zoom, (screen.Y - Origin.Y) / Zoom);
 
     /// <summary>The cell under a screen point; it may lie outside the map.</summary>

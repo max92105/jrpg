@@ -223,8 +223,8 @@ public sealed class MainViewModelOpenMapsTests : IDisposable
         Assert.Equal(["Map 'forest' and the tiles have unsaved changes. Discard them?"], _content.Questions);
     }
 
-    // The object is placed on forest only in its unsaved layout; the switch drops forest's steps, so the undo reaches
-    // the object's making (decision 502).
+    // The object is placed on forest only in its unsaved layout; on start, forest's step waits and the object's making
+    // is the newest step (decisions 502, 503).
     [Fact]
     public void Undo_ObjectPlacedOnAHiddenUnsavedMap_IsRefusedNamingIt()
     {

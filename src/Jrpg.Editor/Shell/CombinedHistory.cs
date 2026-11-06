@@ -6,9 +6,9 @@ using Jrpg.Editor.Maps;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// One Undo and Redo over the open map's and the catalogs' histories, in the order the steps were recorded (ADR 0014,
-/// decision 117). A catalog undo that would remove a record still in use is refused, with the reason in
-/// <see cref="Refusal"/>.
+/// One Undo and Redo over the open maps' and the catalogs' histories, in the order the steps were recorded (ADR 0014,
+/// decision 117); each open map keeps its steps while another is shown (decision 503). A catalog undo that would remove
+/// a record still in use is refused, with the reason in <see cref="Refusal"/>.
 /// </summary>
 internal sealed partial class CombinedHistory : ObservableObject
 {
@@ -17,13 +17,13 @@ internal sealed partial class CombinedHistory : ObservableObject
     private readonly OpenMaps _openMaps;
     private MapViewModel? _openMap;
 
-    /// <param name="catalog">The catalogs whose steps share the order with the open map's.</param>
+    /// <param name="catalog">The catalogs whose steps share the order with the open maps'.</param>
     /// <param name="openMaps">Every open map, read by the refusals as it is now (decision 502).</param>
     public CombinedHistory(CatalogDraft catalog, OpenMaps openMaps)
     {
         _catalog = catalog;
         _openMaps = openMaps;
-        catalog.StepRecorded += (_, _) => RecordStep(UndoTarget.Catalogs);
+        catalog.StepRecorded += (_, _) => RecordStep(UndoStep.Catalogs);
         catalog.RedoDropped += (_, _) =>
         {
             _journal.ForgetUndoneCatalogSteps();
@@ -36,7 +36,9 @@ internal sealed partial class CombinedHistory : ObservableObject
         };
     }
 
-    /// <summary>The map whose steps share the order; another map starts with none of the old one's steps.</summary>
+    /// <summary>
+    /// The shown map: Undo and Redo reach its steps and the catalogs'; another map's wait until it is shown.
+    /// </summary>
     public MapViewModel? OpenMap
     {
         get => _openMap;
@@ -45,7 +47,6 @@ internal sealed partial class CombinedHistory : ObservableObject
             _openMap?.StepRecorded -= OnMapStepRecorded;
             _openMap = value;
             _openMap?.StepRecorded += OnMapStepRecorded;
-            _journal.ForgetMapSteps();
             NotifyUndoRedoChanged();
         }
     }
@@ -57,24 +58,24 @@ internal sealed partial class CombinedHistory : ObservableObject
     [ObservableProperty]
     public partial string? Refusal { get; private set; }
 
-    /// <summary>Undoes the newest step, whether it went to the open map or to the catalogs (decision 117).</summary>
+    /// <summary>Undoes the newest step, whether it went to the shown map or to the catalogs (decision 117).</summary>
     [RelayCommand(CanExecute = nameof(CanUndo))]
     private void Undo()
     {
         // A stroke still being dragged is the newest step.
         _openMap?.EndStroke();
-        if (!_journal.CanUndo)
+        if (!_journal.CanUndo(ShownMapId))
         {
             return;
         }
 
-        Refusal = _journal.NextUndo == UndoTarget.Catalogs ? RefusalOfCatalogUndo() : null;
+        Refusal = _journal.NextUndo(ShownMapId)?.Target == UndoTarget.Catalogs ? RefusalOfCatalogUndo() : null;
         if (Refusal is not null)
         {
             return;
         }
 
-        if (_journal.Undo() == UndoTarget.Map)
+        if (_journal.Undo(ShownMapId).Target == UndoTarget.Map)
         {
             _openMap!.UndoCommand.Execute(null);
         }
@@ -90,14 +91,14 @@ internal sealed partial class CombinedHistory : ObservableObject
     private void Redo()
     {
         _openMap?.EndStroke();
-        if (!_journal.CanRedo)
+        if (!_journal.CanRedo(ShownMapId))
         {
             return;
         }
 
         Refusal = null;
 
-        if (_journal.Redo() == UndoTarget.Map)
+        if (_journal.Redo(ShownMapId).Target == UndoTarget.Map)
         {
             _openMap!.RedoCommand.Execute(null);
         }
@@ -168,13 +169,15 @@ internal sealed partial class CombinedHistory : ObservableObject
         return null;
     }
 
-    private bool CanUndo() => _journal.CanUndo;
+    private string? ShownMapId => _openMap?.Map.Id;
 
-    private bool CanRedo() => _journal.CanRedo;
+    private bool CanUndo() => _journal.CanUndo(ShownMapId);
 
-    private void OnMapStepRecorded(object? sender, EventArgs e) => RecordStep(UndoTarget.Map);
+    private bool CanRedo() => _journal.CanRedo(ShownMapId);
 
-    private void RecordStep(UndoTarget step)
+    private void OnMapStepRecorded(object? sender, EventArgs e) => RecordStep(UndoStep.OnMap(_openMap!.Map.Id));
+
+    private void RecordStep(UndoStep step)
     {
         Refusal = null;
         _journal.Record(step);

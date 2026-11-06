@@ -9,58 +9,110 @@ public sealed class UndoJournalTests
     [Fact]
     public void Undo_MapStepThenCatalogStep_UndoesTheCatalogFirst()
     {
-        _journal.Record(UndoTarget.Map);
-        _journal.Record(UndoTarget.Catalogs);
+        _journal.Record(UndoStep.OnMap("a"));
+        _journal.Record(UndoStep.Catalogs);
 
-        Assert.Equal([UndoTarget.Catalogs, UndoTarget.Map], [_journal.Undo(), _journal.Undo()]);
-    }
-
-    // A catalog redo (a removal) could take what the closed map, saved since, now uses; nothing could check it.
-    [Fact]
-    public void ForgetMapSteps_UndoneCatalogStep_CanNoLongerBeRedone()
-    {
-        _journal.Record(UndoTarget.Catalogs);
-        _journal.Undo();
-
-        _journal.ForgetMapSteps();
-
-        Assert.False(_journal.CanRedo);
+        Assert.Equal([UndoStep.Catalogs, UndoStep.OnMap("a")], [_journal.Undo("a"), _journal.Undo("a")]);
     }
 
     [Fact]
-    public void Undo_AfterAnotherMapOpened_SkipsTheClosedMapsSteps()
+    public void Undo_StepsOnTwoMaps_UndoesOnlyTheShownMapsAndTheCatalogs()
     {
-        _journal.Record(UndoTarget.Catalogs);
-        _journal.Record(UndoTarget.Map);
+        _journal.Record(UndoStep.OnMap("a"));
+        _journal.Record(UndoStep.Catalogs);
+        _journal.Record(UndoStep.OnMap("b"));
 
-        _journal.ForgetMapSteps();
+        Assert.Equal([UndoStep.Catalogs, UndoStep.OnMap("a")], [_journal.Undo("a"), _journal.Undo("a")]);
+        Assert.False(_journal.CanUndo("a"));
+    }
 
-        Assert.Equal(UndoTarget.Catalogs, _journal.Undo());
-        Assert.False(_journal.CanUndo);
+    [Fact]
+    public void Undo_OtherMapShownAgain_ItsStepsAreStillThere()
+    {
+        _journal.Record(UndoStep.OnMap("b"));
+        _journal.Record(UndoStep.OnMap("a"));
+        _journal.Undo("a");
+
+        Assert.Equal(UndoStep.OnMap("b"), _journal.Undo("b"));
+    }
+
+    [Fact]
+    public void CanUndo_OnlyAnotherMapsSteps_IsFalse()
+    {
+        _journal.Record(UndoStep.OnMap("b"));
+
+        Assert.False(_journal.CanUndo("a"));
+        Assert.Null(_journal.NextUndo("a"));
+    }
+
+    [Fact]
+    public void Redo_UndoneOnMapA_RedoesOnlyWhenAIsShown()
+    {
+        _journal.Record(UndoStep.OnMap("a"));
+        _journal.Undo("a");
+
+        Assert.False(_journal.CanRedo("b"));
+        Assert.Equal(UndoStep.OnMap("a"), _journal.Redo("a"));
     }
 
     [Fact]
     public void ForgetUndoneCatalogSteps_MapStepUndoneToo_KeepsTheMapStep()
     {
-        _journal.Record(UndoTarget.Map);
-        _journal.Record(UndoTarget.Catalogs);
-        _journal.Undo();
-        _journal.Undo();
+        _journal.Record(UndoStep.OnMap("a"));
+        _journal.Record(UndoStep.Catalogs);
+        _journal.Undo("a");
+        _journal.Undo("a");
 
         _journal.ForgetUndoneCatalogSteps();
 
-        Assert.Equal(UndoTarget.Map, _journal.Redo());
-        Assert.False(_journal.CanRedo);
+        Assert.Equal(UndoStep.OnMap("a"), _journal.Redo("a"));
+        Assert.False(_journal.CanRedo("a"));
+    }
+
+    // Map a's undone step is newer than the catalog step: a may use, as it is now, what the catalog redo removes.
+    [Fact]
+    public void CanRedo_AnotherMapsUndoneStepNewerThanACatalogStep_IsFalse()
+    {
+        _journal.Record(UndoStep.OnMap("a"));
+        _journal.Record(UndoStep.Catalogs);
+        _journal.Undo("a");
+        _journal.Undo("a");
+
+        Assert.False(_journal.CanRedo("b"));
+        Assert.Equal(UndoStep.OnMap("a"), _journal.Redo("a"));
     }
 
     [Fact]
-    public void Redo_AfterANewStep_HasNothing()
+    public void Redo_CatalogStepNewerThanAnotherMapsStep_RedoesIt()
     {
-        _journal.Record(UndoTarget.Catalogs);
-        _journal.Undo();
+        _journal.Record(UndoStep.Catalogs);
+        _journal.Record(UndoStep.OnMap("a"));
+        _journal.Undo("a");
+        _journal.Undo("a");
 
-        _journal.Record(UndoTarget.Map);
+        Assert.Equal(UndoStep.Catalogs, _journal.Redo("b"));
+    }
 
-        Assert.False(_journal.CanRedo);
+    [Fact]
+    public void Redo_AnotherMapsStepNewerThanTheShownMaps_SkipsIt()
+    {
+        _journal.Record(UndoStep.OnMap("b"));
+        _journal.Record(UndoStep.OnMap("a"));
+        _journal.Undo("a");
+        _journal.Undo("b");
+
+        Assert.Equal(UndoStep.OnMap("a"), _journal.Redo("a"));
+    }
+
+    // A new edit could start using what a redo would take away, on any map.
+    [Fact]
+    public void Redo_AfterANewStepOnAnotherMap_HasNothing()
+    {
+        _journal.Record(UndoStep.Catalogs);
+        _journal.Undo("a");
+
+        _journal.Record(UndoStep.OnMap("b"));
+
+        Assert.False(_journal.CanRedo("a"));
     }
 }

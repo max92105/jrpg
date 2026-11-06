@@ -38,7 +38,8 @@ call or a rename. These cases slipped past it:
 - A removed question or refusal (map flows MS1: switching no longer asks) leaves callers' summaries and window
   comments naming it ("or the user kept the open map"); grep the old outcome's wording across the views. MS2 (one open
   map became many) left "the open map may have changed" in TileBrowserViewModel.ApplyCut and CatalogDraft.Rewriting's
-  "the open map is replaced": grep the singular noun when a single becomes a collection.
+  "the open map is replaced": grep the singular noun when a single becomes a collection. MS3 (switching keeps steps)
+  left a test comment "the switch drops forest's steps" and a param doc "the open map's": grep tests' comments too.
 
 - Deleted content files leave text a script generates (music change, decision 496: fetch-placeholder-sounds.ps1 writing
   "The music ... rendered by new-placeholder-tune.pl" into CREDITS.md) and the generator's now-unused subs; grep

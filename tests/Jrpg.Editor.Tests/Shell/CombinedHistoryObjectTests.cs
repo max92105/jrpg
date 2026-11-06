@@ -1,4 +1,5 @@
 using Jrpg.Core.Events;
+using Jrpg.Core.Geometry;
 using Jrpg.Editor.Maps.Editing;
 
 namespace Jrpg.Editor.Tests.Shell;
@@ -32,9 +33,10 @@ public sealed class CombinedHistoryObjectTests : IDisposable
         Assert.True(viewModel.Catalog!.Objects.ContainsKey("tree_4"));
     }
 
-    // The removal undone, then another map opened: the closed map may use the object again since, so no redo is left.
+    // The removal undone, then another map shown: maps stay open, and a map can only start using the object through an
+    // edit, which ends every redo, so the redo stays (decision 503).
     [Fact]
-    public void Redo_RemovalUndoneThenAnotherMapOpened_CannotExecute()
+    public void Redo_RemovalUndoneThenAnotherMapOpened_CanStillExecute()
     {
         var viewModel = _content.Open(_content.CopyOfTestWorld());
         _content.ChooseTwoCellsNotTiles(viewModel);
@@ -46,6 +48,24 @@ public sealed class CombinedHistoryObjectTests : IDisposable
         Assert.True(viewModel.History.RedoCommand.CanExecute(null));
 
         viewModel.TryOpenMap(viewModel.MapIds.First(id => id != viewModel.CurrentMap!.Map.Id));
+
+        Assert.True(viewModel.History.RedoCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void Redo_RemovalUndoneThenObjectPlacedOnAnotherMap_CannotExecute()
+    {
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
+        _content.ChooseTwoCellsNotTiles(viewModel);
+        EditorTestContent.ComposeObject(viewModel, "tree_4");
+        var browser = viewModel.Placing!.Browser;
+        browser.SelectedObject = browser.Objects.First(definition => definition.Id == "tree_4");
+        browser.RemoveSelectedCommand.Execute(null);
+        viewModel.History!.UndoCommand.Execute(null);
+        viewModel.TryOpenMap(viewModel.MapIds.First(id => id != viewModel.CurrentMap!.Map.Id));
+        browser.SelectedObject = browser.Objects.First(definition => definition.Id == "tree_4");
+
+        viewModel.Placing.PlaceObjectAt(new Point2D(2, 2));
 
         Assert.False(viewModel.History.RedoCommand.CanExecute(null));
     }

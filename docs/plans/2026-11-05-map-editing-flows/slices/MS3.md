@@ -48,3 +48,5 @@ Size: about 50 lines of code (journal 30, history 15, record 3, F1 1); 9 new or 
 3. Press Ctrl+Z: A's cell goes. Ctrl+Z again: greyed if nothing else was done on A or the tiles (B's cell is untouched).
 4. Open map B: Ctrl+Z undoes B's cell. Ctrl+Y redoes it.
 5. Mark a tile blocked (Tiles > Mark blocked, click a sheet cell); open map A; Ctrl+Z: the mark is undone from map A too (a tiles step undoes from any map).
+
+- **Done, with deviations:** the switch tests went to a new `MainViewModelSwitchUndoTests` (`MainViewModelOpenMapsTests` is at 296 lines), with two beyond the plan: a redo kept across a switch, and Undo's `CanExecuteChanged` raised when a map with steps is shown. `UndoStep` has `Catalogs` and `OnMap(id)` for the two kinds of step. Review: a redo from another map could re-apply a tiles or objects removal under a hidden map's newer undone step (an undo can start a use without ending redo); `UndoJournal` now holds a catalog redo back behind another map's newer undone step (decision 503 amended), with three journal tests and one through the editor; `UndoStep` builds only through `Catalogs` and `OnMap`.

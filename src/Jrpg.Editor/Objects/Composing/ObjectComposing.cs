@@ -1,15 +1,16 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Geometry;
+using Jrpg.Core.Maps;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Tiles;
 
 namespace Jrpg.Editor.Objects.Composing;
 
 /// <summary>
-/// Objects > New object, Edit object and New object from map selection (decisions 455, 514): starts the composer on the
-/// cells chosen in the Tiles panel, the object chosen in the Objects panel or the canvas a map selection made, and
-/// applies it as one undo step.
+/// Objects > New object, Edit object, Duplicate object and New object from map selection (decisions 455, 514, 517):
+/// starts the composer on the cells chosen in the Tiles panel, the object chosen in the Objects panel (to repaint or
+/// to copy) or the canvas a map selection made, and applies it as one undo step.
 /// </summary>
 internal sealed partial class ObjectComposing : ObservableObject
 {
@@ -21,7 +22,7 @@ internal sealed partial class ObjectComposing : ObservableObject
     private readonly TileBrowserViewModel _tiles;
 
     /// <param name="catalog">The objects and tiles.</param>
-    /// <param name="objects">Whose chosen object Edit opens, and which chooses the object saved.</param>
+    /// <param name="objects">Whose chosen object Edit and Duplicate open, and which chooses the object saved.</param>
     /// <param name="tiles">Whose chosen rectangle New starts from; the composer's picker.</param>
     public ObjectComposing(CatalogDraft catalog, ObjectBrowserViewModel objects, TileBrowserViewModel tiles)
     {
@@ -30,9 +31,10 @@ internal sealed partial class ObjectComposing : ObservableObject
     }
 
     /// <summary>
-    /// An object with cells is chosen, within the canvas's largest size; an NPC is a field sprite, with none to paint.
+    /// An object with cells is chosen, within the canvas's largest size, for Edit and Duplicate alike; an NPC is a
+    /// field sprite, with none to paint.
     /// </summary>
-    public bool CanEdit =>
+    public bool CanComposeChosenObject =>
         _objects.SelectedObject is { Tiles.Count: > 0, Width: <= ObjectCanvas.MaxCells, Height: <= ObjectCanvas.MaxCells };
 
     /// <summary>
@@ -54,17 +56,35 @@ internal sealed partial class ObjectComposing : ObservableObject
     public ObjectComposerViewModel StartNewFromMap(ObjectCanvas canvas, string? mapLayerWarning) =>
         ObjectComposerViewModel.ForNewFromMap(new CanvasPainting(canvas, _tiles), NewNaming(), mapLayerWarning);
 
-    /// <summary>The composer on the chosen object's picture, its id kept; null unless <see cref="CanEdit"/>.</summary>
+    /// <summary>
+    /// The composer on the chosen object's picture, its id kept; null unless <see cref="CanComposeChosenObject"/>.
+    /// </summary>
     public ObjectComposerViewModel? StartEdit()
     {
-        if (!CanEdit)
+        if (!CanComposeChosenObject)
         {
             return null;
         }
 
         var original = _objects.SelectedObject!;
-        var painting = new CanvasPainting(ObjectCanvas.Of(original, _catalog.Current.Tiles), _tiles);
-        return ObjectComposerViewModel.ForEdit(painting, original, Categories());
+        return ObjectComposerViewModel.ForEdit(PaintingOf(original), original, Categories());
+    }
+
+    /// <summary>
+    /// The composer on a copy of the chosen object's picture, for a new object with its outline, zones and category
+    /// and an id to type (decision 517); null unless <see cref="CanComposeChosenObject"/>.
+    /// </summary>
+    public ObjectComposerViewModel? StartDuplicate()
+    {
+        if (!CanComposeChosenObject)
+        {
+            return null;
+        }
+
+        var duplicated = _objects.SelectedObject!;
+        var naming = NewNaming();
+        naming.Category = duplicated.Category;
+        return ObjectComposerViewModel.ForDuplicate(PaintingOf(duplicated), duplicated, naming);
     }
 
     /// <summary>
@@ -88,6 +108,8 @@ internal sealed partial class ObjectComposing : ObservableObject
         return true;
     }
 
+    private CanvasPainting PaintingOf(ObjectDefinition definition) => new(ObjectCanvas.Of(definition, _catalog.Current.Tiles), _tiles);
+
     private ObjectNaming NewNaming() => new([.. _catalog.Current.Objects.Keys], Categories());
 
     private List<string> Categories() => [.. _catalog.Current.Objects.Values.Select(definition => definition.Category)];
@@ -96,7 +118,7 @@ internal sealed partial class ObjectComposing : ObservableObject
     {
         if (e.PropertyName == nameof(ObjectBrowserViewModel.SelectedObject))
         {
-            OnPropertyChanged(nameof(CanEdit));
+            OnPropertyChanged(nameof(CanComposeChosenObject));
         }
     }
 }

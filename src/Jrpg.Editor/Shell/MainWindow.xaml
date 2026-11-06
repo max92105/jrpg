@@ -77,7 +77,8 @@
         <MenuItem Header="New object from map selection..." Click="OnNewObjectFromMapClicked" IsEnabled="{Binding CanStartObjectFromMap}" ToolTip="Make an object of the map cells selected with Ctrl + drag in the Tiles tab: the chosen layer is level 0, the layers under and over it the levels under and over." />
         <MenuItem Header="New NPC..." Click="OnNewNpcClicked" IsEnabled="{Binding CanStartNewNpc}" />
         <!-- Keeps the object's id, outline, zones, events and placements, so the doors keep working with new art (decision 449). -->
-        <MenuItem Header="Edit object..." Click="OnEditObjectClicked" IsEnabled="{Binding Composing.CanEdit, FallbackValue=False}" ToolTip="Repaint the chosen object; its id, outline, zones, placements and events stay. Ctrl+Z puts the old picture back." />
+        <MenuItem Header="Edit object..." Click="OnEditObjectClicked" IsEnabled="{Binding Composing.CanComposeChosenObject, FallbackValue=False}" ToolTip="Repaint the chosen object; its id, outline, zones, placements and events stay. Ctrl+Z puts the old picture back." />
+        <MenuItem Header="Duplicate object..." Click="OnDuplicateObjectClicked" IsEnabled="{Binding Composing.CanComposeChosenObject, FallbackValue=False}" ToolTip="A new object from a copy of the chosen one's picture, outline, zones and category; type its id, then repaint what differs. Its shapes open when its size changed." />
       </MenuItem>
       <MenuItem Header="Quests">
         <MenuItem Header="Edit quests..." Click="OnEditQuestsClicked" IsEnabled="{Binding HasQuestEditing}" />
@@ -151,7 +152,8 @@
       <ToolBar Band="0" BandIndex="2" Style="{StaticResource ObjectsBand}">
         <Button Content="Edit shapes..." Click="OnEditShapesClicked" IsEnabled="{Binding Placing.CanEditShapes, FallbackValue=False}" />
         <Button Content="New object..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" />
-        <Button Content="Edit object..." Click="OnEditObjectClicked" IsEnabled="{Binding Composing.CanEdit, FallbackValue=False}" />
+        <Button Content="Edit object..." Click="OnEditObjectClicked" IsEnabled="{Binding Composing.CanComposeChosenObject, FallbackValue=False}" />
+        <Button Content="Duplicate..." Click="OnDuplicateObjectClicked" IsEnabled="{Binding Composing.CanComposeChosenObject, FallbackValue=False}" ToolTip="Objects &gt; Duplicate object: a new object from a copy of the chosen one." />
         <Button Content="From map..." Click="OnNewObjectFromMapClicked" IsEnabled="{Binding CanStartObjectFromMap}" ToolTip="Objects &gt; New object from map selection: an object of the cells selected with Ctrl + drag in the Tiles tab." />
         <Button Content="New NPC..." Click="OnNewNpcClicked" IsEnabled="{Binding CanStartNewNpc}" />
         <CheckBox Content="Snap to grid (Alt, G)" IsChecked="{Binding Placing.IsGridSnapOn, FallbackValue=False}" ToolTip="Placed and moved objects land on whole cells. Holding Alt does the opposite of this box; G ticks or unticks it." />

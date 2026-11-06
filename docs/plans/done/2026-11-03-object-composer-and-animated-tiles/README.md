@@ -86,6 +86,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - **469. Tiles > Import animations...** reads a Tiled `.tsx` file chosen in a dialog: its sheet is the set-up sheet whose image has the `.tsx`'s image file name, its cut must match the sheet's, and every `<tile>` with an `<animation>` becomes that cell's frame count and time, as one undo step (cells not tiles yet made tiles first). A `.tsx` with an animation whose frames don't run rightward from the tile's own cell on its row, or whose frames differ in duration, is refused whole, naming the tile.
 - **470. The editor's animated pictures follow WPF's render tick** (`CompositionTarget.Rendering`, about 16 ms): the editor's animation time moves on by the rendering time, and a picture is redrawn only when `FrameAt` gives a new frame for one of its tiles.
 - **471. The tall grass effect sheet is out of scope**: a cutting effect drawn with 32 px frames, not a tile animation.
+- **517. Objects > Duplicate object** (2026-11-06, after the plan, without one of its own): the composer on a copy of the chosen object's picture, with its outline, zones and category and a new id to type; Save makes a new object, whose shapes open only when its size differs from the copied object's (as decision 462 for an edit). The entry is enabled like Edit object, so an NPC can't be duplicated.
 
 ## Open design questions (developer decides)
 None open.

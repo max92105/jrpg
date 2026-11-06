@@ -114,6 +114,39 @@ public sealed class ObjectComposerViewModelTests : IDisposable
         Assert.True(ObjectComposerViewModel.ForNew(Painting(Painted(2, 2)), Naming("tree_4", "Trees")).ShouldOpenShapesAfterSave);
 
     [Fact]
+    public void ShouldOpenShapesAfterSave_DuplicateSameSize_IsFalse() =>
+        Assert.False(ObjectComposerViewModel.ForDuplicate(Painting(Painted(2, 2)), _chest, Naming("chest_2", "Chests")).ShouldOpenShapesAfterSave);
+
+    [Fact]
+    public void ShouldOpenShapesAfterSave_DuplicateOtherSize_IsTrue() =>
+        Assert.True(ObjectComposerViewModel.ForDuplicate(Painting(Painted(3, 2)), _chest, Naming("chest_2", "Chests")).ShouldOpenShapesAfterSave);
+
+    [Fact]
+    public void ForDuplicate_NoIdTyped_IsEditableTitledAfterTheCopyAndAsksForAnId()
+    {
+        var composer = ObjectComposerViewModel.ForDuplicate(Painting(Painted(2, 2)), _chest, Naming("", "Chests"));
+
+        Assert.True(composer.IsIdEditable);
+        Assert.Null(composer.Original);
+        Assert.Equal("Duplicate of 'chest'", composer.Title);
+        Assert.Equal("The id must not be empty.", composer.Problem);
+    }
+
+    // The outline and zones come from the copied object, the rest from the composer: a new id, the canvas's tiles.
+    [Fact]
+    public void ToObject_Duplicate_TakesTheCopiedShapesUnderTheTypedId()
+    {
+        var composer = ObjectComposerViewModel.ForDuplicate(Painting(Painted(2, 1)), _chest, Naming("chest_2", "Chests"));
+
+        var duplicate = composer.ToObject(TileIdOf);
+
+        Assert.Equal(("chest_2", "Chests", 2, 1), (duplicate.Id, duplicate.Category, duplicate.Width, duplicate.Height));
+        Assert.Equal([new ObjectTile(0, 0, 0), new ObjectTile(1, 0, 10)], duplicate.Tiles);
+        Assert.Equal(_chest.CollisionPolygon, duplicate.CollisionPolygon);
+        Assert.Equal(_chest.AbovePlayerZones, duplicate.AbovePlayerZones);
+    }
+
+    [Fact]
     public void Problem_FirstStrokeOnABlankCanvas_IsRaisedAndCleared()
     {
         var composer = ObjectComposerViewModel.ForNew(Painting(ObjectCanvas.Empty(2, 2)), Naming("tree_4", "Trees"));

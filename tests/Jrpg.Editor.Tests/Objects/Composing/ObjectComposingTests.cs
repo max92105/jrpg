@@ -72,12 +72,12 @@ public sealed class ObjectComposingTests : IDisposable
 
         ChooseObject(viewModel, "villager");
 
-        Assert.False(viewModel.Composing!.CanEdit);
+        Assert.False(viewModel.Composing!.CanComposeChosenObject);
         Assert.Null(viewModel.Composing.StartEdit());
     }
 
     [Fact]
-    public void CanEdit_NothingChosen_IsFalse() => Assert.False(_content.Open(_content.TestWorld).Composing!.CanEdit);
+    public void CanEdit_NothingChosen_IsFalse() => Assert.False(_content.Open(_content.TestWorld).Composing!.CanComposeChosenObject);
 
     [Fact]
     public void CanEdit_TileObjectChosen_IsTrueAndRaised()
@@ -88,8 +88,8 @@ public sealed class ObjectComposingTests : IDisposable
 
         ChooseObject(viewModel, "chest");
 
-        Assert.True(viewModel.Composing.CanEdit);
-        Assert.Contains(nameof(ObjectComposing.CanEdit), raised);
+        Assert.True(viewModel.Composing.CanComposeChosenObject);
+        Assert.Contains(nameof(ObjectComposing.CanComposeChosenObject), raised);
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public sealed class ObjectComposingTests : IDisposable
 
         ChooseObject(viewModel, "tower");
 
-        Assert.False(viewModel.Composing!.CanEdit);
+        Assert.False(viewModel.Composing!.CanComposeChosenObject);
         Assert.Null(viewModel.Composing.StartEdit());
     }
 
@@ -112,12 +112,12 @@ public sealed class ObjectComposingTests : IDisposable
         var viewModel = _content.Open(_content.CopyOfTestWorld());
         _content.ChooseTwoCellsNotTiles(viewModel);
         EditorTestContent.ComposeObject(viewModel, "tree_4");
-        Assert.True(viewModel.Composing!.CanEdit);
+        Assert.True(viewModel.Composing!.CanComposeChosenObject);
 
         viewModel.Placing!.Browser.RemoveSelectedCommand.Execute(null);
 
         Assert.False(viewModel.Catalog!.Objects.ContainsKey("tree_4"));
-        Assert.False(viewModel.Composing.CanEdit);
+        Assert.False(viewModel.Composing.CanComposeChosenObject);
     }
 
     [Fact]

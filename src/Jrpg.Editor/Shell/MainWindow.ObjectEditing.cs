@@ -27,8 +27,10 @@ internal sealed partial class MainWindow
 
     private void OnEditObjectClicked(object sender, RoutedEventArgs e) => Compose(_viewModel.Composing!.StartEdit(), _viewModel.Composing.TryApply);
 
-    // A new object's shapes are drawn right away (decision 124), an edited one's when its size changed (decision 462);
-    // cancelling them keeps the object as saved.
+    private void OnDuplicateObjectClicked(object sender, RoutedEventArgs e) => Compose(_viewModel.Composing!.StartDuplicate(), _viewModel.Composing.TryApply);
+
+    // A new object's shapes are drawn right away (decision 124), an edited or duplicated one's when its size changed
+    // (decisions 462, 517); cancelling them keeps the object as saved.
     /// <param name="composer">The composer to show; null shows nothing.</param>
     /// <param name="tryApply">The composer's Save: the object alone, or with the map cells replaced.</param>
     private void Compose(ObjectComposerViewModel? composer, Func<ObjectComposerViewModel, bool> tryApply)

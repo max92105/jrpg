@@ -23,3 +23,5 @@ Size: about 170 lines moved, about 15 lines of file headers and the merged dicti
 1. Start the editor (Visual Studio's "Game and editor" profile, F5).
 2. The window looks as before: the Tiles tool bar shows on the Tiles tab only, the Objects tool bar on the Objects tab; the side panel and the map list keep their widths and minimums; an error line (break a number in Map > Settings) is red.
 3. Click another map in the list: it opens (the old question still comes when the map has changes, until MS1).
+
+- **Done:** as planned. `MainViewModel.cs` ends at 390 lines, `MainWindow.xaml.cs` at 546, `MainWindow.xaml` at 261; the test count is unchanged (4099).

@@ -1,0 +1,44 @@
+<!-- The main window's styles and panel sizes, merged by MainWindow.xaml: its tool bands, error and warning lines. -->
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=System.Runtime">
+  <!-- Panel sizes (design tunables): the map view takes the rest, and the splitters stop at the minimums. -->
+  <GridLength x:Key="MapListWidth">200</GridLength>
+  <sys:Double x:Key="MapListMinWidth">140</sys:Double>
+  <GridLength x:Key="SidePanelWidth">420</GridLength>
+  <sys:Double x:Key="SidePanelMinWidth">300</sys:Double>
+  <!-- A mode's tool bar shows only while its tab is open. -->
+  <Style x:Key="TilesBand" TargetType="ToolBar" BasedOn="{StaticResource {x:Type ToolBar}}">
+    <Setter Property="Visibility" Value="Collapsed" />
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding Mode}" Value="Tiles">
+        <Setter Property="Visibility" Value="Visible" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+  <Style x:Key="ObjectsBand" TargetType="ToolBar" BasedOn="{StaticResource {x:Type ToolBar}}">
+    <Setter Property="Visibility" Value="Collapsed" />
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding Mode}" Value="Objects">
+        <Setter Property="Visibility" Value="Visible" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+  <!-- An error line takes no space until there is an error to show. -->
+  <Style x:Key="ErrorLine" TargetType="TextBlock">
+    <Setter Property="Foreground" Value="{StaticResource ProblemTextBrush}" />
+    <Setter Property="TextWrapping" Value="Wrap" />
+    <Style.Triggers>
+      <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Self}}" Value="">
+        <Setter Property="Visibility" Value="Collapsed" />
+      </DataTrigger>
+      <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Self}}" Value="{x:Null}">
+        <Setter Property="Visibility" Value="Collapsed" />
+      </DataTrigger>
+    </Style.Triggers>
+  </Style>
+  <!-- Missing art is a warning, not a lockout (decision 442): the maps stay open and show what they can't draw. -->
+  <Style x:Key="WarningLine" TargetType="TextBlock" BasedOn="{StaticResource ErrorLine}">
+    <Setter Property="Foreground" Value="{StaticResource WarningTextBrush}" />
+  </Style>
+</ResourceDictionary>

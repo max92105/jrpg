@@ -123,10 +123,7 @@ internal sealed partial class MainWindow : Window
                 OpenCurrentMap();
                 break;
             case nameof(MainViewModel.MapEntries):
-                // A save rebuilds the list (a new map, a new name), which drops its selection; the list is refreshed first,
-                // since this handler may run before its binding does.
-                MapList.GetBindingExpression(ItemsControl.ItemsSourceProperty)?.UpdateTarget();
-                MapList.SelectedValue = _shownMap?.Map.Id;
+                ReselectShownMap();
                 break;
             case nameof(MainViewModel.Mode):
                 ShowBrushAt(_brushCell);
@@ -164,20 +161,6 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    private void OpenCurrentMap()
-    {
-        _shownMap?.PropertyChanged -= OnOpenMapChanged;
-        _shownMap = _viewModel.CurrentMap;
-        _shownMap?.PropertyChanged += OnOpenMapChanged;
-
-        // Kept in step here rather than bound, so a refused switch simply leaves the list on the open map.
-        MapList.SelectedValue = _shownMap?.Map.Id;
-        _gridDrawnFor = null;
-        DrawCurrentMap();
-        DrawEventMarks();
-        RefitMap();
-    }
-
     private void DrawCurrentMap()
     {
         var layout = _shownMap?.Map.Layout;
@@ -191,14 +174,6 @@ internal sealed partial class MainWindow : Window
         CollisionImage.Source = _viewModel.IsCollisionShown && _shownMap?.Map.Layout is { } layout && _viewModel.Catalog is { } catalog
             ? CollisionDrawing.Draw(CollisionShapes.Of(layout, catalog), layout, 1 / _viewport.Zoom)
             : null;
-
-    private void OnMapListSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (MapList.SelectedValue is string mapId && !_viewModel.TryOpenMap(mapId))
-        {
-            MapList.SelectedValue = _shownMap?.Map.Id;
-        }
-    }
 
     private bool HandleZoomKey(Key key)
     {

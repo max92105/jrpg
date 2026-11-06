@@ -67,7 +67,7 @@ Dependencies across phases: MS0 before any slice adding to `MainWindow.xaml` (th
 One line per slice; each slice's goal, types, tests and hand checks are in its file under `slices/`. Tick the box here when a slice is done, and write its deviations in the slice file. Tunables, design overview and risks: [design.md](design.md).
 
 ### Phase 1: several maps open
-- [ ] **MS0. Moves only: the map list and opening into `MainViewModel.MapSwitching.cs`, its handlers into `MainWindow.MapSwitching.cs`, the window's styles into `MainWindowStyles.xaml`** (Editor, about 170 lines moved, no behavior change) → [slices/MS0.md](slices/MS0.md)
+- [x] **MS0. Moves only: the map list and opening into `MainViewModel.MapSwitching.cs`, its handlers into `MainWindow.MapSwitching.cs`, the window's styles into `MainWindowStyles.xaml`** (Editor, about 170 lines moved, no behavior change) → [slices/MS0.md](slices/MS0.md)
 - [ ] **MS1. Open maps stay open (`Maps/OpenMaps`): switching and new maps never ask, unsaved maps marked in the list, new maps listed; `MapEntry` moves to `Maps/`** (Editor, about 240 lines, 40 of them re-pinned tests) → [slices/MS1.md](slices/MS1.md)
 - [ ] **MS2. Usage checks read every open map: `CatalogUsage` takes the open layouts; undo refusals, removals and the re-cut warning see hidden unsaved maps; the purge rebuilds every open map** (Editor, about 175 lines, 33 test sites mechanical) → [slices/MS2.md](slices/MS2.md)
 - [ ] **MS3. Undo follows each open map: journal steps carry their map, Ctrl+Z reaches the shown map's and the catalogs' steps, switching forgets nothing** (Editor, about 180 lines) → [slices/MS3.md](slices/MS3.md)

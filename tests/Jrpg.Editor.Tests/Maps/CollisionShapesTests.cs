@@ -93,6 +93,15 @@ public sealed class CollisionShapesTests
         Assert.Empty(shapes.Zones);
     }
 
+    // The house at (3, 1), 2 x 3 cells: its triangle's points scaled by the size and moved by the position.
+    [Fact]
+    public void OutlineOf_PlacedObject_IsItsOutlineInMapCells()
+    {
+        var placed = new PlacedObject { Uid = "house_1", ObjectId = "house", Position = new Point2D(3, 1), Z = 1 };
+
+        Assert.Equal([new Point2D(3, 2.5), new Point2D(5, 2.5), new Point2D(4, 4)], CollisionShapes.OutlineOf(placed, _house));
+    }
+
     // A 10 x 10 map of one layer, each cell's tile chosen by the caller.
     private static MapLayout Layout(Func<GridCell, int> tileAt, params PlacedObject[] objects) => new()
     {

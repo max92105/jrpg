@@ -42,3 +42,5 @@ Size: about 95 lines of code (the view model 80, the record 8, `OutlineOf` 5); 2
 
 ## Hand check (yours)
 Nothing to see yet (WP3).
+
+- **Done, with deviations:** the warning is its own static `WarpArrivalWarning`, so the view model holds only the choice. `WarpMaps.Empty` and the picker's `Zoom` wait for their users (WP2, WP3). An object's walk-into event counts only when it runs on that object (`CanRunOn`), with a test. Review: the game starts nothing on arrival, so the walk-into warnings say when the event starts (a cell's on stepping off and back on, an object's on the first step), decision 507's wording; a test for the notices on a map change; the fixture builds its own tiles.

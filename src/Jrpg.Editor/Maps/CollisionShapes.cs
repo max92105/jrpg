@@ -30,7 +30,7 @@ internal sealed record CollisionShapes(
         var placed = layout.Objects.Select(placedObject => (Placed: placedObject, Definition: catalog.Objects[placedObject.ObjectId])).ToList();
         IReadOnlyList<IReadOnlyList<Point2D>> outlines =
         [
-            .. placed.Where(pair => pair.Definition.CollisionPolygon.Count > 0).Select(pair => InMapCells(pair.Definition.CollisionPolygon, pair.Placed, pair.Definition)),
+            .. placed.Where(pair => pair.Definition.CollisionPolygon.Count > 0).Select(pair => OutlineOf(pair.Placed, pair.Definition)),
         ];
         IReadOnlyList<IReadOnlyList<Point2D>> zones =
         [
@@ -38,6 +38,10 @@ internal sealed record CollisionShapes(
         ];
         return new CollisionShapes(blocked, outlines, zones);
     }
+
+    /// <summary>A placed object's collision outline in map cells; empty when the object has none.</summary>
+    public static IReadOnlyList<Point2D> OutlineOf(PlacedObject placed, ObjectDefinition definition) =>
+        InMapCells(definition.CollisionPolygon, placed, definition);
 
     // Shape points are 0..1 over the object's cells, from its top-left corner (as MapCollision reads them).
     private static IReadOnlyList<Point2D> InMapCells(IReadOnlyList<Point2D> shape, PlacedObject placed, ObjectDefinition definition) =>

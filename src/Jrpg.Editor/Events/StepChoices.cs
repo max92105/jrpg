@@ -17,4 +17,9 @@ internal sealed record StepChoices(IReadOnlyList<string> ItemIds, IReadOnlyList<
     public IReadOnlyList<string> QuestIds { get; init; } = [];
 
     public IReadOnlyList<QuestStageChoice> QuestStages { get; init; } = [];
+
+    /// <summary>
+    /// The maps a warp can lead to, drawn by the destination picker; null where no map can be picked.
+    /// </summary>
+    public WarpMaps? WarpMaps { get; init; }
 }

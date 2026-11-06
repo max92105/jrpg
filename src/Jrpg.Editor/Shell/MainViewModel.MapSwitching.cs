@@ -1,6 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Content;
-using Jrpg.Core.Maps;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Settings;
 
@@ -128,16 +127,7 @@ internal sealed partial class MainViewModel
             MapIds = ids;
         }
 
-        IEnumerable<(MapDefinition Map, bool IsUnsaved)> shown = catalog.Maps.Values
-            .Select(saved => _openMaps.Find(saved.Id) is { } open ? (open.Map, open.IsDirty) : (saved, false))
-            .Concat(_openMaps.All.Where(open => !catalog.Maps.ContainsKey(open.Map.Id)).Select(open => (open.Map, open.IsDirty)));
-        IReadOnlyList<MapEntry> entries =
-        [
-            .. shown
-                .OrderBy(row => row.Map.Settings.DisplayName, StringComparer.OrdinalIgnoreCase)
-                .ThenBy(row => row.Map.Id, StringComparer.Ordinal)
-                .Select(row => MapEntry.Of(row.Map, row.IsUnsaved)),
-        ];
+        var entries = _openMaps.EntriesWith(catalog);
         if (!entries.SequenceEqual(MapEntries))
         {
             MapEntries = entries;

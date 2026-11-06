@@ -1,6 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
+using Jrpg.Core.Maps;
 using Jrpg.Core.Quests;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
@@ -15,10 +16,12 @@ public sealed class EventEditingViewModelTests
 
     private readonly CatalogDraft _draft = new(_catalog);
 
+    private readonly OpenMaps _openMaps = new();
+
     private readonly EventEditingViewModel _eventEditing;
 
     public EventEditingViewModelTests() =>
-        _eventEditing = new EventEditingViewModel(_draft) { OpenMap = new MapViewModel(_catalog.Maps["start"]), MapIds = ["forest", "start"] };
+        _eventEditing = new EventEditingViewModel(_draft, _openMaps) { OpenMap = new MapViewModel(_catalog.Maps["start"]), MapIds = ["forest", "start"] };
 
     // The start map's chest, which gives a potion and turns into an opened chest.
     private Point2D ChestCenter
@@ -166,5 +169,49 @@ public sealed class EventEditingViewModelTests
         _eventEditing.Apply(_eventEditing.StartEditingAt(ChestCenter)!);
 
         Assert.False(_eventEditing.OpenMap!.UndoCommand.CanExecute(null));
+    }
+
+    // Forest is painted and hidden behind start: the picker draws forest as it is now, not as saved.
+    [Fact]
+    public void StartEditingAt_HiddenOpenMapPainted_WarpMapsHoldItsDraftLayout()
+    {
+        var (editing, forest) = EditingStartWithForestOpen();
+        forest.PutTiles(forest.Layers[0].Z, 0, [new GridCell(0, 0)]);
+
+        var dialog = editing.StartEditingAt(ChestCenter)!;
+
+        Assert.Same(forest.Map.Layout, dialog.Choices.WarpMaps!.Layouts["forest"]);
+    }
+
+    [Fact]
+    public void StartEditingAt_NewMapOpen_WarpMapsListIt()
+    {
+        var (editing, _) = EditingStartWithForestOpen();
+        var mill = MapViewModel.ForNewMap(new MapDefinition(_catalog.Maps["forest"].Layout with { Id = "old_mill" }, _catalog.Maps["forest"].Settings with { Id = "old_mill", DisplayName = "Old Mill" }));
+        _openMaps.Add(mill);
+
+        var warpMaps = editing.StartEditingAt(ChestCenter)!.Choices.WarpMaps!;
+
+        Assert.Contains(warpMaps.Entries, entry => entry.Id == "old_mill");
+        Assert.True(warpMaps.Layouts.ContainsKey("old_mill"));
+    }
+
+    [Fact]
+    public void StartEditingAt_WarpMaps_AreTheMapListsRows()
+    {
+        var (editing, _) = EditingStartWithForestOpen();
+
+        var warpMaps = editing.StartEditingAt(ChestCenter)!.Choices.WarpMaps!;
+
+        Assert.Equal(_openMaps.EntriesWith(_catalog), warpMaps.Entries);
+    }
+
+    // The editing state on start with forest open too, through the same open maps.
+    private (EventEditingViewModel Editing, MapViewModel Forest) EditingStartWithForestOpen()
+    {
+        var forest = new MapViewModel(_catalog.Maps["forest"]);
+        _openMaps.Add(forest);
+        _openMaps.Add(_eventEditing.OpenMap!);
+        return (_eventEditing, forest);
     }
 }

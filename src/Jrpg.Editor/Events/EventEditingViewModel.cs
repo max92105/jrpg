@@ -9,7 +9,7 @@ namespace Jrpg.Editor.Events;
 /// Editing the events on the open map: an object's events, or a cell's when no object is clicked; which one a click
 /// picks, and applying the dialogs. Each change is one undo step.
 /// </summary>
-internal sealed class EventEditingViewModel(CatalogDraft catalog)
+internal sealed class EventEditingViewModel(CatalogDraft catalog, OpenMaps openMaps)
 {
     /// <summary>The map whose events are edited; set by the shell when a map opens.</summary>
     public MapViewModel? OpenMap { get; set; }
@@ -67,6 +67,7 @@ internal sealed class EventEditingViewModel(CatalogDraft catalog)
         ShopIds = [.. catalog.Current.Shops.Keys.Order(StringComparer.Ordinal)],
         QuestIds = [.. catalog.Current.Quests.Keys.Order(StringComparer.Ordinal)],
         QuestStages = QuestStageChoices(),
+        WarpMaps = new(openMaps.EntriesWith(catalog.Current), openMaps.LayoutsWith(catalog.Current), catalog.Current),
     };
 
     // Quests in id order, each quest's stages in its own order.

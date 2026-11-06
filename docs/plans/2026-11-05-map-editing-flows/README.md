@@ -76,7 +76,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 2: warps
 - [x] **WP1. `WarpDestinationViewModel` and `WarpMaps`: the picker's map, cell, warning (no tile, blocked, inside an outline, a walk-into event) and problem** (Editor, about 235 lines) → [slices/WP1.md](slices/WP1.md)
-- [ ] **WP2. The warp step's side: `StepChoices.WarpMaps` from every open map, the step starting the picker, taking its result and naming its `WarpDestination`** (Editor, about 165 lines) → [slices/WP2.md](slices/WP2.md)
+- [x] **WP2. The warp step's side: `StepChoices.WarpMaps` from every open map, the step starting the picker, taking its result and naming its `WarpDestination`** (Editor, about 165 lines) → [slices/WP2.md](slices/WP2.md)
 - [ ] **WP3. The warp destination picker window: the map list, the zoomable map picture with its grid and the chosen cell; the warp step's Pick... button in both event dialogs** (Editor, about 185 lines) → [slices/WP3.md](slices/WP3.md)
 - [ ] **WP4. Go to: the warp step's button keeps the dialog's edits and shows the destination centered on its cell, marked** (Editor, about 90 lines) → [slices/WP4.md](slices/WP4.md)
 

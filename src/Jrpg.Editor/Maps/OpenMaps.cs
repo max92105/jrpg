@@ -21,6 +21,32 @@ internal sealed class OpenMaps
     /// <summary>Each open map's layout as it is now, unsaved changes included: what the usage checks read.</summary>
     public IReadOnlyCollection<MapLayout> Layouts => [.. _all.Select(map => map.Map.Layout)];
 
+    /// <summary>
+    /// The map list's rows: the saved maps and the open new ones, each open map as it is now and marked while unsaved,
+    /// sorted by display name then id (decisions 122, 498).
+    /// </summary>
+    /// <param name="saved">The content as last saved.</param>
+    public IReadOnlyList<MapEntry> EntriesWith(ContentCatalog saved) =>
+        [.. saved.Maps.Values
+            .Select(map => Find(map.Id) is { } open ? (Map: open.Map, IsUnsaved: open.IsDirty) : (Map: map, IsUnsaved: false))
+            .Concat(_all.Where(open => !saved.Maps.ContainsKey(open.Map.Id)).Select(open => (Map: open.Map, IsUnsaved: open.IsDirty)))
+            .OrderBy(row => row.Map.Settings.DisplayName, StringComparer.OrdinalIgnoreCase)
+            .ThenBy(row => row.Map.Id, StringComparer.Ordinal)
+            .Select(row => MapEntry.Of(row.Map, row.IsUnsaved))];
+
+    /// <summary>Every listed map's layout by id, each open map's as it is now in place of its saved one.</summary>
+    /// <param name="saved">The content as last saved.</param>
+    public IReadOnlyDictionary<string, MapLayout> LayoutsWith(ContentCatalog saved)
+    {
+        var layouts = saved.Maps.ToDictionary(pair => pair.Key, pair => pair.Value.Layout);
+        foreach (var open in _all)
+        {
+            layouts[open.Map.Id] = open.Map.Layout;
+        }
+
+        return layouts;
+    }
+
     /// <summary>The open maps with unsaved changes, in id order.</summary>
     public IReadOnlyList<MapViewModel> Dirty =>
         [.. _all.Where(map => map.IsDirty).OrderBy(map => map.Map.Id, StringComparer.Ordinal)];

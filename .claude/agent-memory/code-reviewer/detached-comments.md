@@ -9,4 +9,6 @@ A member inserted just above an existing one takes that one's comment (MO2b, A4a
 
 **Why:** the comment then misdescribes the new member; a misleading comment counts as Critical (cheap fix).
 
+Related: tests appended after the last member with no blank line between `}` and the new `//` or `[Fact]` (map editing flows WP1, WP2); format does not catch it.
+
 **How to apply:** in `git diff`, look at the context line right before each `+` member or `[Fact]` and right after each removed `-` member: a context `//`, `///` or `(...)` there with no `-` below it is orphaned. In `docs/map.md`, read every changed entry whole.

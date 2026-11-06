@@ -5,15 +5,11 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-05-map-editing-flows, slice WP1 (warp destination picker rules: WarpMaps, WarpDestinationViewModel,
-WarpArrivalWarning, CollisionShapes.OutlineOf), round 1 (2026-11-05). Verdict: ready to commit.
+Plan 2026-11-05-map-editing-flows, slice WP2 (warp step's side of the picker: OpenMaps.EntriesWith/LayoutsWith,
+StepChoices.WarpMaps, EventStepViewModel.Warp, WarpDestination), round 1 (2026-11-05). Verdict: ready to commit.
 
-- Open (Warning): the Touch cell event case warns "Arriving on (0, 2) starts event trap", but Core's EnterMap sets
-  _lastCell to the arrival cell, so a cell event never starts on arrival (only on stepping back on). Design question
-  for the developer (decision 507): drop the cell-event case or reword.
-- Open (Warning): MapId's NotifyPropertyChangedFor(Layout, Warning, Problem) has no test (tests.md relayed-arm rule);
-  hall (1, 0) -> closet keeps the cell and would show the stale "can't stand" warning.
-- Open (Suggestion): WarpArrivalWarning.Covers repeats PlacedObjectHits.Covers' NPC bounds test; CenterOf computed twice.
-- Open (Suggestion): CollisionShapesTests.OutlineOf test sits after the private Placed helper with no blank line.
-- Open (Suggestion): fixture tiles picked by position from the test world (First(IsWalkable)); pick by id.
-- Fixed (from MS5): GoBack CanExecute true asserted; filter "e" used. Fixed (from MS4): SaveAll_FirstMapRefused added.
+- Open (Suggestion): EventEditingViewModelTests.cs:172 no blank line between the previous test's `}` and the new comment.
+- Open (Suggestion): Problem's warp clause repeats TypedCell's two WholeNumber calls; could read `TypedCell() is null`.
+- Open (Suggestion): ListTheMapsInTheMapListsOrder compares to EntriesWith itself (wiring only; order pinned by MainViewModelTests).
+- Carried from WP1 (not re-checked in this diff, WP1 code untouched): Touch cell-event warning wording (decision 507);
+  MapId NotifyPropertyChangedFor untested in WarpDestinationViewModel. Earlier WP1 Suggestions dropped.

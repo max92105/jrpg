@@ -168,7 +168,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.Rest when !IsFreeRest && ValidPrice() is null => $"The price must be empty or a whole number from 1 to {Purse.MaxGold}.",
         EventStepKind.Voice when string.IsNullOrWhiteSpace(VoiceFile) => "Write the voice's file.",
         EventStepKind.GiveItem when WholeNumber(QuantityText, minimum: 1) is null => "The quantity must be a whole number of at least 1.",
-        EventStepKind.Warp when WholeNumber(CellXText, minimum: 0) is null || WholeNumber(CellYText, minimum: 0) is null =>
+        EventStepKind.Warp when TypedCell() is null =>
             "The warp cell must be two whole numbers of at least 0.",
         _ => null,
     };

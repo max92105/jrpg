@@ -39,3 +39,5 @@ Size: about 50 lines of code; 11 tests (about 115): about 165.
 
 ## Hand check (yours)
 Nothing to see yet (WP3).
+
+- **Done, with deviations:** the map list's rows and every listed layout are `OpenMaps.EntriesWith` and `LayoutsWith`, read by the map list and the event dialogs alike, so the picker lists the maps as the list does. `StepChoices.WarpMaps` is null where no map can be picked, in place of a `WarpMaps.Empty` (a catalog can't be empty). Review: the warp clause of `Problem` reads `TypedCell()`, so the cell rule lives in one place.

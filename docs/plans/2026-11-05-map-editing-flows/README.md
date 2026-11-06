@@ -87,7 +87,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **SN1. Snap to grid: `GridSnap`, Alt held while placing or moving, the ghost where it lands, the Snap to grid check box and G** (Editor, about 205 lines) → [slices/SN1.md](slices/SN1.md)
 
 ### Phase 4: copy and paste
-- [ ] **CP1. `PlacedObjectCopies`: copies of placed objects for a map, with fresh uids and event ids, moved to a new top-left; `PlaceObjectsEdit`** (Editor, about 180 lines) → [slices/CP1.md](slices/CP1.md)
+- [x] **CP1. `PlacedObjectCopies`: copies of placed objects for a map, with fresh uids and event ids, moved to a new top-left; `PlaceObjectsEdit`** (Editor, about 180 lines) → [slices/CP1.md](slices/CP1.md)
 - [ ] **CP2. `ObjectCopying`: Ctrl+C, Ctrl+X and Ctrl+V in Objects mode and the Edit menu, across maps, pasted at the mouse (snapped with Alt) and selected; greyed while a copied object is missing** (Editor, about 225 lines) → [slices/CP2.md](slices/CP2.md)
 
 ### Phase 5: the placed object panel

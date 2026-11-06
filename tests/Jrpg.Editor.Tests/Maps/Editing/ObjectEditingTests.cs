@@ -83,6 +83,18 @@ public sealed class ObjectEditingTests
     }
 
     [Fact]
+    public void PlaceObjectsEdit_ApplyThenRevert_LeavesTheMapAsBefore()
+    {
+        var edit = new PlaceObjectsEdit([Placed("chest_3", "chest", 4, 4), Placed("tree_2", "tree", 6, 6)]);
+        edit.Apply(_draft);
+        Assert.Equal(["chest_3", "tree_2"], _draft.Objects.Skip(3).Select(placed => placed.Uid));
+
+        edit.Revert(_draft);
+
+        Assert.Equal([_tree, _chest, _farChest], _draft.Objects);
+    }
+
+    [Fact]
     public void MoveObjectEdit_Revert_RestoresPosition()
     {
         var edit = new MoveObjectEdit("chest_1", new Point2D(2, 1.5), new Point2D(4.25, 3));

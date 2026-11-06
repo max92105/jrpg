@@ -5,17 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-05-map-editing-flows, slice SN1 (snap to grid: GridSnap, IsGridSnapOn, ...OnGrid methods, Alt inverts
-the box, G toggles), round 1 (2026-11-05). Verdict: ready to commit.
+Plan 2026-11-05-map-editing-flows, slice CP1 (PlacedObjectCopies.Make/TopLeftOf, PlaceObjectsEdit), round 1
+(2026-11-05). Verdict: ready to commit. Not carried from SN1: its three Suggestions (new slice).
 
-Carried from MO2: ObjectPlacingMoveTests summary and near-duplicate tests, fixed (checked in the tree).
-
-- Suggestion, open: PlaceChosenAt re-reads OpenMap! and Browser.SelectedObject! after ChosenTopLeftAt checked them;
-  one private place method taking the landing function would drop both `!`.
-- Suggestion, open: ToggleGridSnapCommand's only user is the G key (the box binds IsGridSnapOn); a plain public method
-  avoids Execute without CanExecute in code-behind (editor.md).
-- Suggestion, open: SN1 hand check step 1 names the box "Snap to grid (Alt)"; it reads "Snap to grid (Alt, G)".
-- Follow-up: the window's key guards exclude only TextBox, so B/R/F and now G (Objects mode) eat a focused ComboBox's
-  type-to-select (the Layer box's "Ground").
-- Follow-up (from MO2, still present): a wheel zoom mid Shift-drag runs DrawSelectionMarks, which resets the marks'
+- Suggestion, open: Make_OntoTheMapItCameFrom_LeavesTheOriginalsUnchanged's last assert (target.Objects equal to the
+  same instances of an immutable layout) can't fail; the id-disjointness assert is the real check; name it for that.
+- Suggestion, open: PlacedObjectCopies summary "a save's memory of the originals never carries over" holds only while
+  the originals are on the target; after a cut of the highest-numbered object, a paste back takes its uid and event ids.
+- Follow-up: Make/TopLeftOf on an empty list throws (Min); CP2 must never paste an empty clipboard.
+- Follow-up (from SN1, still present): window key guards exclude only TextBox, so B/R/F/G eat a focused ComboBox's
+  type-to-select.
+- Follow-up (from MO2, still present): a wheel zoom mid Shift-drag runs DrawSelectionMarks, resetting the marks'
   transform until the next mouse move.

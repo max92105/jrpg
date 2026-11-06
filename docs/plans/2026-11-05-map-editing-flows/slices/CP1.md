@@ -34,3 +34,5 @@ Size: about 60 lines of code; 10 tests (about 120): about 180.
 
 ## Hand check (yours)
 Nothing to see yet (CP2).
+
+- **Done:** as planned. `Make_KeepsObjectIdLayerAndEventContent` checks the fields one by one (records holding lists don't compare by value). Review: the summary says a cut original pasted back may take its old uid, as a move would; a test that compared unchanged records was cut down to what it checks. CP2 must not paste an empty clipboard (`TopLeftOf` reads a minimum).

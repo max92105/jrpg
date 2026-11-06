@@ -20,7 +20,7 @@ metadata:
 - **loop exit restated** (battle B1b): asserting the loop's own exit condition; ask what else differs.
 - **cache by reference** (demo I1): `Assert.Same` on a value the runtime interns anyway.
 - **constant oracle** (stats P3b, quests E3): asserting `Cap * 10`, or a list equal to the static it was set from, keeps green when the values change; pin the literals.
-- **action never taken** (map flows MS3): a test named `Undo_..._DoesNotTouch...` asserts "unchanged" without executing Undo; check the named action runs.
+- **action never taken / immutable input** (map flows MS3, CP1): a test named `Undo_..._DoesNotTouch...` asserts "unchanged" without executing Undo, or asserts an immutable record input "unchanged"; check the named action runs and could mutate it.
 - **second overload / twin hook** (gold S2/S3, composer CO2): one of two parallel overloads or property hooks (ColumnsText tested, RowsText not) has no test; check each.
 - **order already given** (quests J1): a sort test whose setup already yields the expected order by another rule (main started last, then reversed); set up the opposite order.
 - **round trip exact anyway** (map flows MO1): "exact after undo" from 2.3 + 0.1 - 0.1, which is exact in doubles; check with powershell that offset arithmetic would fail (0.1 + 1 - 1 does).

@@ -36,9 +36,13 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
         };
         _catalog = catalog;
         _layer = layer;
+        Copying = new ObjectCopying(catalog, this);
     }
 
     public ObjectBrowserViewModel Browser { get; }
+
+    /// <summary>Copy, Cut and Paste of the selected objects (decision 512).</summary>
+    public ObjectCopying Copying { get; }
 
     /// <summary>Whether Objects > Edit shapes has an object to open: one selected on the map, or the one chosen in the panel.</summary>
     public bool CanEditShapes => SelectedObjectUids.Count == 1 || Browser.SelectedObject is not null;
@@ -134,6 +138,11 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
     public void SelectObjectAt(Point2D point) => SelectedObjectUids = ObjectAt(point) is { } top ? [top.Uid] : [];
 
     public void ClearSelection() => SelectedObjectUids = [];
+
+    /// <summary>
+    /// Selects these objects only (the pasted ones); uids not on the map are dropped at the next change.
+    /// </summary>
+    public void Select(IReadOnlyList<string> uids) => SelectedObjectUids = uids;
 
     /// <summary>
     /// Moves the selection so the grabbed object's top-left lands on the nearest whole cell, the others keeping their

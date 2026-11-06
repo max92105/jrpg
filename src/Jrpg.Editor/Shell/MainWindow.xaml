@@ -21,6 +21,11 @@
     <CommandBinding Command="Help" Executed="OnControlsHelpExecuted" />
     <!-- Find (also Ctrl+F) focuses the map list's filter box. -->
     <CommandBinding Command="Find" Executed="OnGoToMapExecuted" />
+    <!-- Copy, Cut and Paste of placed objects in Objects mode; a focused text box keeps the keys, and the Edit menu's
+         entries aim at the map so they never reach a text box. -->
+    <CommandBinding Command="Copy" CanExecute="OnCopyCanExecute" Executed="OnCopyExecuted" />
+    <CommandBinding Command="Cut" CanExecute="OnCutCanExecute" Executed="OnCutExecuted" />
+    <CommandBinding Command="Paste" CanExecute="OnPasteCanExecute" Executed="OnPasteExecuted" />
   </Window.CommandBindings>
   <Window.InputBindings>
     <KeyBinding Key="Z" Modifiers="Control" Command="{Binding History.UndoCommand}" />
@@ -44,6 +49,10 @@
       <MenuItem Header="Edit">
         <MenuItem Header="Undo" Command="{Binding History.UndoCommand}" InputGestureText="Ctrl+Z" />
         <MenuItem Header="Redo" Command="{Binding History.RedoCommand}" InputGestureText="Ctrl+Y" />
+        <Separator />
+        <MenuItem Header="Copy objects" Command="Copy" CommandTarget="{Binding ElementName=MapViewport}" />
+        <MenuItem Header="Cut objects" Command="Cut" CommandTarget="{Binding ElementName=MapViewport}" />
+        <MenuItem Header="Paste objects" Command="Paste" CommandTarget="{Binding ElementName=MapViewport}" />
         <MenuItem Header="Delete selected objects" Command="{Binding Placing.DeleteSelectedObjectsCommand}" InputGestureText="Del" />
       </MenuItem>
       <MenuItem Header="View">

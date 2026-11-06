@@ -5,14 +5,19 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-05-map-editing-flows, slice CP1 (PlacedObjectCopies.Make/TopLeftOf, PlaceObjectsEdit), round 1
-(2026-11-05). Verdict: ready to commit. Not carried from SN1: its three Suggestions (new slice).
+Plan 2026-11-05-map-editing-flows, slice CP2 (ObjectCopying, MainWindow.ObjectCopying, Edit menu Copy/Cut/Paste
+objects), round 1 (2026-11-05). Verdict: fix the Criticals. CP1's two Suggestions not carried (new slice).
+CP1 follow-up "Make on an empty list throws": fixed (CanPaste requires Copied.Count > 0; Copy reads only uids on map).
 
-- Suggestion, open: Make_OntoTheMapItCameFrom_LeavesTheOriginalsUnchanged's last assert (target.Objects equal to the
-  same instances of an immutable layout) can't fail; the id-disjointness assert is the real check; name it for that.
-- Suggestion, open: PlacedObjectCopies summary "a save's memory of the originals never carries over" holds only while
-  the originals are on the target; after a cut of the highest-numbered object, a paste back takes its uid and event ids.
-- Follow-up: Make/TopLeftOf on an empty list throws (Min); CP2 must never paste an empty clipboard.
+- Critical, open: MainWindow.xaml Edit menu Copy/Cut/Paste objects have no CommandTarget; with the map filter box
+  focused (Ctrl+F, Enter), the Menu focus scope transfers the command to the TextBox: "Paste objects" pastes clipboard
+  text into the filter (greyed with no text). Fix: CommandTarget="{Binding ElementName=MapViewport}" on the three.
+- Warning, open: ObjectCopying.Paste has no off-map check; PlaceChosen refuses a center off the map. Ctrl+V over the
+  viewport's empty area (or the view center panned off the map) pastes unseen objects that save. Test it.
+- Suggestion, open: IsCopyingObjects reads as "a copy in progress"; name it for "the object commands apply"; the
+  Placing-not-null clause is defensive (Placing exists whenever a map is open).
+- Suggestion, open: Copy_ThenPasteCenteredAt_AddsCopiesWithTheirEventsInOneStep checks no step; drop "InOneStep".
+- Follow-up: CanPaste checks only placed ObjectIds, not objects a copied event swaps to; save validation catches it.
 - Follow-up (from SN1, still present): window key guards exclude only TextBox, so B/R/F/G eat a focused ComboBox's
   type-to-select.
 - Follow-up (from MO2, still present): a wheel zoom mid Shift-drag runs DrawSelectionMarks, resetting the marks'

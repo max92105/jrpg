@@ -88,7 +88,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 4: copy and paste
 - [x] **CP1. `PlacedObjectCopies`: copies of placed objects for a map, with fresh uids and event ids, moved to a new top-left; `PlaceObjectsEdit`** (Editor, about 180 lines) → [slices/CP1.md](slices/CP1.md)
-- [ ] **CP2. `ObjectCopying`: Ctrl+C, Ctrl+X and Ctrl+V in Objects mode and the Edit menu, across maps, pasted at the mouse (snapped with Alt) and selected; greyed while a copied object is missing** (Editor, about 225 lines) → [slices/CP2.md](slices/CP2.md)
+- [x] **CP2. `ObjectCopying`: Ctrl+C, Ctrl+X and Ctrl+V in Objects mode and the Edit menu, across maps, pasted at the mouse (snapped with Alt) and selected; greyed while a copied object is missing** (Editor, about 225 lines) → [slices/CP2.md](slices/CP2.md)
 
 ### Phase 5: the placed object panel
 - [ ] **PO1. `PlacedObjectEditing`: the one selected placed object's position and layer as typed, their problems, applied as one step (`ReplacePlacedObjectEdit`), following the selection and every map change** (Editor, about 205 lines) → [slices/PO1.md](slices/PO1.md)

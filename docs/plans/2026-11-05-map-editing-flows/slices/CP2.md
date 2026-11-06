@@ -45,3 +45,5 @@ Size: about 78 lines for `ObjectCopying`, 8 in the placing view model, 35 in the
 6. Ctrl+X on a selected object: it goes; Ctrl+V puts it back where the mouse is.
 7. Edit > Copy, Cut and Paste show their keys; Edit > Paste pastes in the middle of the view.
 8. Click in the map list's filter box, type some text, Ctrl+C then Ctrl+V: the text is copied and pasted in the box; no object changes.
+
+- **Done, with deviations:** the Edit menu entries read "Copy objects", "Cut objects" and "Paste objects", so they aren't taken for text editing; the window relies on WPF's own requery after each key or click for Paste's greying, no `InvalidateRequerySuggested`. The undo checks are their own tests (`PasteCenteredAt_Undo_...`, `Cut_Undo_...`, `CanPaste_ComposingUndoneThenRedone_...`), and the editor-level ones are in `Shell/MainViewModelObjectCopyingTests`. Review: the Edit menu's three entries aim at the map (`CommandTarget`), since a menu hands its command to the focused text box first; a paste centered off the map does nothing, as placing; Paste is greyed too while a copied event swaps to an object the catalog lacks; each with a test.

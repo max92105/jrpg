@@ -16,3 +16,5 @@ Size: about 120 lines moved, 10 of file header.
 ## Hand check (yours)
 1. Start the editor (Visual Studio's "Game and editor" profile, F5); Tiles tab; choose a tile.
 2. Drag paints, right drag erases, R then drag fills a rectangle on release, Shift + click fills, Alt + click picks, [ and ] resize the brush (the white outline follows): all as before.
+
+- **Done:** as planned. `MainWindow.xaml.cs` ends at 426 lines, the new `MainWindow.TilePainting.cs` at 136; the test count is unchanged (4281). Two moved comments were reworded to end on more than two words (the check reads every line of a new file).

@@ -22,7 +22,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - **Why Core refused an equipment change:** `SlotChoice.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. `PartyEquipment.ItemWithoutRoom` and `UnequipAll` would own both. It can wait because it is correct today, and nothing planned changes equipment.
 - **`Ui/MessageIds.cs` is 767 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
 - **`MainViewModelTests`, part 2 (449 lines after E1a):** move the new content tests (`CreateNpc_*`, `CanStartNewObject_*`, `TryCreateMap_*`; the object tests went to `ObjectComposingTests` in the composer plan) and the map settings tests (`TryApplySettings_*`) into their own classes, on E1a's `EditorTestContent`.
-- **`MainWindow.xaml.cs` (547 lines):** move the viewport (pan, zoom, fit) and the tile painting handlers into partial files, as `.EventEditing` and `.ObjectEditing` already are.
+- **`MainWindow.xaml.cs` (426 lines):** move the viewport (pan, zoom, fit) into a partial file, as `.EventEditing`, `.ObjectEditing` and `.TilePainting` (the map editing flows plan's OM0) already are.
 - **`TileBrowserViewModelTests` (410 lines):** move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class.
 - **`TileBrowserViewModel` (332 lines since the sheet zoom):** move the sheet hit-testing (`CellAt`, `NearestCellTo`, `GridPositionOf`, F1's grid check) into a `Tiles/SheetGrid`.
 - **`ObjectShapesViewModelTests` (347 lines):** move the zone tests (E10) and the point-editing tests (E11a) into their own classes.
@@ -202,3 +202,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 - The title's intro hands over to its loop when `MusicPlayer.FollowIntros` sees the intro's instance stopped, once per update: up to a frame of silence at the join, plus the device's start delay. If it is heard, a `DynamicSoundEffectInstance` fed the intro's samples then the loop's closes the gap (ADR 0035 amendment).
 - The loops are 6 to 23 MB of 48 kHz WAV each, loaded whole by `SoundEffect.FromFile` on a map change, which can stall a frame: streaming through `DynamicSoundEffectInstance` is the ADR 0035 follow-up if it does.
+
+## From the map editing flows plan (2026-11-05, during the slices)
+
+- A wheel zoom during a Shift + drag of the selection runs `DrawSelectionMarks` (through `ApplyViewport`), which snaps the outlines back to the start until the mouse moves again (MO2 review).

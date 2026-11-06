@@ -1237,5 +1237,978 @@
     "sheetId": "autumn_forest_bare",
     "column": 6,
     "row": 1
+  },
+  {
+    "id": 178,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 1,
+    "row": 1
+  },
+  {
+    "id": 179,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 3,
+    "row": 1
+  },
+  {
+    "id": 180,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 3,
+    "row": 0
+  },
+  {
+    "id": 181,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 1,
+    "row": 0
+  },
+  {
+    "id": 182,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 3,
+    "row": 2
+  },
+  {
+    "id": 183,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 3,
+    "row": 5
+  },
+  {
+    "id": 184,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 2,
+    "row": 5
+  },
+  {
+    "id": 185,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 3,
+    "row": 3
+  },
+  {
+    "id": 186,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 3,
+    "row": 4
+  },
+  {
+    "id": 187,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 1,
+    "row": 5
+  },
+  {
+    "id": 188,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 23,
+    "row": 27
+  },
+  {
+    "id": 189,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 24,
+    "row": 27
+  },
+  {
+    "id": 190,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 28,
+    "row": 25
+  },
+  {
+    "id": 191,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 29,
+    "row": 25
+  },
+  {
+    "id": 192,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 28,
+    "row": 26
+  },
+  {
+    "id": 193,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 29,
+    "row": 26
+  },
+  {
+    "id": 194,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 8,
+    "row": 2
+  },
+  {
+    "id": 195,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 7,
+    "row": 6
+  },
+  {
+    "id": 196,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 8,
+    "row": 1
+  },
+  {
+    "id": 197,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 6,
+    "row": 2
+  },
+  {
+    "id": 198,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 6,
+    "row": 0
+  },
+  {
+    "id": 199,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 7,
+    "row": 4
+  },
+  {
+    "id": 200,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 7,
+    "row": 2
+  },
+  {
+    "id": 201,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 6,
+    "row": 3
+  },
+  {
+    "id": 202,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 1,
+    "row": 2
+  },
+  {
+    "id": 203,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 1,
+    "row": 4
+  },
+  {
+    "id": 204,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 1,
+    "row": 5
+  },
+  {
+    "id": 205,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 1,
+    "row": 6
+  },
+  {
+    "id": 206,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 7,
+    "row": 3
+  },
+  {
+    "id": 207,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 1,
+    "row": 3
+  },
+  {
+    "id": 208,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 13,
+    "row": 8
+  },
+  {
+    "id": 209,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 16,
+    "row": 8
+  },
+  {
+    "id": 210,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 14,
+    "row": 9
+  },
+  {
+    "id": 211,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 13,
+    "row": 9
+  },
+  {
+    "id": 212,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 12,
+    "row": 9
+  },
+  {
+    "id": 213,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 12,
+    "row": 8
+  },
+  {
+    "id": 214,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 12,
+    "row": 7
+  },
+  {
+    "id": 215,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 6,
+    "row": 21
+  },
+  {
+    "id": 216,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 7,
+    "row": 20
+  },
+  {
+    "id": 217,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 22,
+    "row": 23
+  },
+  {
+    "id": 218,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 12,
+    "row": 23
+  },
+  {
+    "id": 219,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 12,
+    "row": 21
+  },
+  {
+    "id": 220,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 6,
+    "row": 10
+  },
+  {
+    "id": 221,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 7,
+    "row": 10
+  },
+  {
+    "id": 222,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 6,
+    "row": 11
+  },
+  {
+    "id": 223,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 7,
+    "row": 11
+  },
+  {
+    "id": 224,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 14,
+    "row": 7
+  },
+  {
+    "id": 225,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 10,
+    "row": 10
+  },
+  {
+    "id": 226,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 13,
+    "row": 10
+  },
+  {
+    "id": 227,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 13,
+    "row": 11
+  },
+  {
+    "id": 228,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 12,
+    "row": 10
+  },
+  {
+    "id": 229,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 14,
+    "row": 8
+  },
+  {
+    "id": 230,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 13,
+    "row": 7
+  },
+  {
+    "id": 231,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 4,
+    "row": 2
+  },
+  {
+    "id": 232,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 4,
+    "row": 3
+  },
+  {
+    "id": 233,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 4,
+    "row": 4
+  },
+  {
+    "id": 234,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 4,
+    "row": 5
+  },
+  {
+    "id": 235,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 4,
+    "row": 6
+  },
+  {
+    "id": 236,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 2,
+    "row": 2
+  },
+  {
+    "id": 237,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 2,
+    "row": 3
+  },
+  {
+    "id": 238,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 2,
+    "row": 4
+  },
+  {
+    "id": 239,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 7,
+    "row": 0
+  },
+  {
+    "id": 240,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 2,
+    "row": 5
+  },
+  {
+    "id": 241,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_wang_tiles",
+    "column": 2,
+    "row": 6
+  },
+  {
+    "id": 242,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 5,
+    "row": 10
+  },
+  {
+    "id": 243,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 6,
+    "row": 10
+  },
+  {
+    "id": 244,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 7,
+    "row": 10
+  },
+  {
+    "id": 245,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 8,
+    "row": 10
+  },
+  {
+    "id": 246,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 9,
+    "row": 10
+  },
+  {
+    "id": 247,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 5,
+    "row": 11
+  },
+  {
+    "id": 248,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 6,
+    "row": 11
+  },
+  {
+    "id": 249,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 7,
+    "row": 11
+  },
+  {
+    "id": 250,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 8,
+    "row": 11
+  },
+  {
+    "id": 251,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 9,
+    "row": 11
+  },
+  {
+    "id": 252,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 5,
+    "row": 12
+  },
+  {
+    "id": 253,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 6,
+    "row": 12
+  },
+  {
+    "id": 254,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 7,
+    "row": 12
+  },
+  {
+    "id": 255,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 8,
+    "row": 12
+  },
+  {
+    "id": 256,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 9,
+    "row": 12
+  },
+  {
+    "id": 257,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 5,
+    "row": 13
+  },
+  {
+    "id": 258,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 6,
+    "row": 13
+  },
+  {
+    "id": 259,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 7,
+    "row": 13
+  },
+  {
+    "id": 260,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 8,
+    "row": 13
+  },
+  {
+    "id": 261,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 9,
+    "row": 13
+  },
+  {
+    "id": 262,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 5,
+    "row": 14
+  },
+  {
+    "id": 263,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 6,
+    "row": 14
+  },
+  {
+    "id": 264,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 7,
+    "row": 14
+  },
+  {
+    "id": 265,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 8,
+    "row": 14
+  },
+  {
+    "id": 266,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 9,
+    "row": 14
+  },
+  {
+    "id": 267,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 5,
+    "row": 15
+  },
+  {
+    "id": 268,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 6,
+    "row": 15
+  },
+  {
+    "id": 269,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 7,
+    "row": 15
+  },
+  {
+    "id": 270,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 8,
+    "row": 15
+  },
+  {
+    "id": 271,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 9,
+    "row": 15
+  },
+  {
+    "id": 272,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 13,
+    "row": 8
+  },
+  {
+    "id": 273,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 12,
+    "row": 8
+  },
+  {
+    "id": 274,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 12,
+    "row": 6
+  },
+  {
+    "id": 275,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 13,
+    "row": 6
+  },
+  {
+    "id": 276,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 12,
+    "row": 7
+  },
+  {
+    "id": 277,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 13,
+    "row": 7
+  },
+  {
+    "id": 278,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 9,
+    "row": 8
+  },
+  {
+    "id": 279,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 9,
+    "row": 7
+  },
+  {
+    "id": 280,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 6,
+    "row": 18
+  },
+  {
+    "id": 281,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 7,
+    "row": 18
+  },
+  {
+    "id": 282,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 6,
+    "row": 19
+  },
+  {
+    "id": 283,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 7,
+    "row": 19
+  },
+  {
+    "id": 284,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 10,
+    "row": 17
+  },
+  {
+    "id": 285,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 1,
+    "row": 19
+  },
+  {
+    "id": 286,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 2,
+    "row": 19
+  },
+  {
+    "id": 287,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 0,
+    "row": 19
+  },
+  {
+    "id": 288,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 1,
+    "row": 18
+  },
+  {
+    "id": 289,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 2,
+    "row": 18
+  },
+  {
+    "id": 290,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 0,
+    "row": 18
+  },
+  {
+    "id": 291,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 3,
+    "row": 19
+  },
+  {
+    "id": 292,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 17,
+    "row": 5
+  },
+  {
+    "id": 293,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 17,
+    "row": 6
+  },
+  {
+    "id": 294,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 18,
+    "row": 5
+  },
+  {
+    "id": 295,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 18,
+    "row": 6
+  },
+  {
+    "id": 296,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 19,
+    "row": 6
+  },
+  {
+    "id": 297,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 20,
+    "row": 6
+  },
+  {
+    "id": 298,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 21,
+    "row": 6
+  },
+  {
+    "id": 299,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 22,
+    "row": 5
+  },
+  {
+    "id": 300,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 21,
+    "row": 5
+  },
+  {
+    "id": 301,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 22,
+    "row": 4
+  },
+  {
+    "id": 302,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 20,
+    "row": 5
+  },
+  {
+    "id": 303,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 19,
+    "row": 5
+  },
+  {
+    "id": 304,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 17,
+    "row": 4
+  },
+  {
+    "id": 305,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 18,
+    "row": 4
+  },
+  {
+    "id": 306,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 19,
+    "row": 4
+  },
+  {
+    "id": 307,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 20,
+    "row": 4
+  },
+  {
+    "id": 308,
+    "isWalkable": false,
+    "sheetId": "autumn_forest_clean",
+    "column": 21,
+    "row": 4
+  },
+  {
+    "id": 309,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 16,
+    "row": 5
+  },
+  {
+    "id": 310,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 15,
+    "row": 5
+  },
+  {
+    "id": 311,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 5,
+    "row": 9
+  },
+  {
+    "id": 312,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 6,
+    "row": 9
+  },
+  {
+    "id": 313,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 6,
+    "row": 8
+  },
+  {
+    "id": 314,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 6,
+    "row": 1
+  },
+  {
+    "id": 315,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 0,
+    "row": 3
+  },
+  {
+    "id": 316,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 8,
+    "row": 2
   }
 ]

@@ -129,7 +129,42 @@
       ]
     }
   ],
-  "objects": [],
+  "objects": [
+    {
+      "uid": "villager_1",
+      "objectId": "villager",
+      "position": {
+        "x": 5.999999999999999,
+        "y": 2.947916666666666
+      },
+      "z": 1,
+      "events": [
+        {
+          "id": "villager_1_0",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "Have a look. Everything is priced fair."
+                ],
+                "speaker": "Shopkeeper",
+                "portraitFile": null
+              }
+            },
+            {
+              "type": "openShop",
+              "shopId": "general_store"
+            }
+          ]
+        }
+      ]
+    }
+  ],
   "cellEvents": [
     {
       "cell": {

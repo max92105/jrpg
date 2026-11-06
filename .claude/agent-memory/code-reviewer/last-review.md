@@ -5,15 +5,12 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-05-map-editing-flows, slice OM4 (Replace the map cells with the new object), round 1 (2026-11-06).
+Plan 2026-11-05-map-editing-flows, slice OM4 (Replace the map cells with the new object), round 1 (2026-11-06); the plan
+is done and retro'd (2026-11-06).
 Verdict: ready to commit (no Criticals).
 
-- Warning (open): no test erases a layer over the base (level > 0); all tests take Decoration as the top layer.
-- Warning (open): MainViewModel.ObjectFromMap.cs:93-94 FirstOrDefault + `is not null` + `!` guard a layer that can't
-  vanish while the modal composer is open; `Single` instead.
-- Suggestion (open): ErasedCells' Zip of two Selects over the same tiles; ErasedOn reads TileIdAt three times.
-- Suggestion (open): MainWindow.ObjectEditing.cs:24/28 mix `Composing?.StartNew()` with `Composing!.TryApply`.
-- Follow-up: OM3 leftovers still open: no DrawingWarningOf test with both warnings; StartObjectFromMap's
-  `CurrentMap is not { } shown` guard.
-- OM3 carried, fixed: MapLayerWarning collapsed when null; ObjectComposing summary names the map selection;
-  ObjectComposingLevelTests helper now last.
+- Fixed: a test erases a layer over the base (the ground chosen erases level 1 too); the OM3 "both warnings" test.
+- To the backlog (not carried): the ObjectFromMap impossible-state guards, the `Composing?.`/`Composing!` mix, ErasedCells'
+  double pass.
+- Rules now (not carried): impossible-state guards, typed double IsFinite and the window key guard are in
+  `.claude/rules/editor.md`; the blank line before an added test is verify.ps1's check 7c.

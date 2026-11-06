@@ -1,5 +1,5 @@
 # Map editing flows
-Status: retro pending
+Status: done
 
 Drafted on 2026-11-05 from the developer's list of what slows down building maps in the editor every day (cleaned up by the coordinator):
 

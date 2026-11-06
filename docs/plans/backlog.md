@@ -21,7 +21,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   The file is protected, so ask the developer first.
 - **Why Core refused an equipment change:** `SlotChoice.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. `PartyEquipment.ItemWithoutRoom` and `UnequipAll` would own both. It can wait because it is correct today, and nothing planned changes equipment.
 - **`Ui/MessageIds.cs` is 767 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
-- **`MainViewModelTests`, part 2 (449 lines after E1a):** move the new content tests (`CreateNpc_*`, `CanStartNewObject_*`, `TryCreateMap_*`; the object tests went to `ObjectComposingTests` in the composer plan) and the map settings tests (`TryApplySettings_*`) into their own classes, on E1a's `EditorTestContent`.
+- **`MainViewModelTests`, part 2 (292 lines after the map editing flows' MS1 and MS4 moved the switching and closing tests out; takes no new test):** move the new content tests (`CreateNpc_*`, `CanStartNewObject_*`, `TryCreateMap_*`; the object tests went to `ObjectComposingTests` in the composer plan) and the map settings tests (`TryApplySettings_*`) into their own classes, on E1a's `EditorTestContent`.
 - **`MainWindow.xaml.cs` (426 lines):** move the viewport (pan, zoom, fit) into a partial file, as `.EventEditing`, `.ObjectEditing` and `.TilePainting` (the map editing flows plan's OM0) already are.
 - **`TileBrowserViewModelTests` (410 lines):** move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class.
 - **`TileBrowserViewModel` (332 lines since the sheet zoom):** move the sheet hit-testing (`CellAt`, `NearestCellTo`, `GridPositionOf`, F1's grid check) into a `Tiles/SheetGrid`.
@@ -180,11 +180,11 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - The editor's map animating (the plan's former AE4, decision 466): one shared, unfrozen `ImageBrush` per animated tile, swapped on `TileAnimationTime.FramesChanged`; `MapDrawing` paints those cells with it and leaves such a drawing unfrozen (design.md, "Extension points").
 - The other out-of-scope items (an explicit frame list or per-frame times, per-cell start offsets, the tall grass effect, a free pixel rectangle from an image without a cut, animated canopies, an animated tile's mark on the sheet, the re-cut warning counting frames) are listed in `docs/plans/done/2026-11-03-object-composer-and-animated-tiles/README.md`, "Out of scope".
 - `tests/Jrpg.Game.Tests/Flow/GameFlowTests.cs` (321 lines) and `Exploration/EventPresenterTests.cs` (306) crossed 300 before the Mana Seed plan; split each by scenario when next touched (reset retro).
-- `src/Jrpg.Editor/Shell/MainWindow.xaml.cs` is 571 lines after the composer plan's AE3: the sheet import, the removal question and the map settings handlers could join the `.ObjectEditing`/`.EventEditing` partial files (reset retro).
+- `src/Jrpg.Editor/Shell/MainWindow.xaml.cs` is 425 lines after the map editing flows' MS0 and OM0 (the map list and the tile painting handlers moved out): the sheet import, the removal question and the map settings handlers could join the `.ObjectEditing`/`.EventEditing` partial files (reset retro).
 - `ObjectComposing.StartNew` clips a dragged rectangle to `ObjectCanvas.MaxCells` each way; only the row clip has a test, since no test-world sheet is wider than 32 cells (CO4a review): add a wide sheet to a test-only catalog when the composer is next touched.
 - `Data/Art/ArtReferenceCheck.LastFrameColumn` adds a tile's column and its frame count, which wraps for a hand-edited `frameCount` near the int limit, so the startup check would pass it and `TileAtlas` would throw (AE1 review): compare `frameCount > columns - column` instead, as the Animate panel does.
 - `Editor/Catalogs/CatalogDraft` is at 298 lines after AI2 (the removals already moved to `CatalogDraft.Removals.cs`): the next catalog step moves the `With...`/`Without...` helpers into a partial file first.
-- `Editor/Shell/MainWindow.xaml` is at 296 lines after AE2 (the Animate panel became `Tiles/TileAnimationPanel`): the next panel in the Tiles tab goes in its own control.
+- `Editor/Shell/MainWindow.xaml` is at 296 lines again after the map editing flows' OM3 (MS0 moved its styles out, the plan added them back): the next control anywhere in the window goes in its own user control, as the Placed object panel did.
 - The "chosen cells' sheet has its image" query is written twice, in `Objects/Composing/CanvasPainting.PaintAt` and `Tiles/TileAnimationViewModel.CanOpen`: a third use moves it onto `TileBrowserViewModel` (AE1).
 
 ## From the object levels and sheet zoom plan (2026-11-05, at approval)
@@ -207,3 +207,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 - A wheel zoom during a Shift + drag of the selection runs `DrawSelectionMarks` (through `ApplyViewport`), which snaps the outlines back to the start until the mouse moves again (MO2 review).
 - A tile's sheet cell is still worked out inline in `Tiles/TileBrowserViewModel.cs` and twice in `Tiles/TileImages.cs`: `SheetCell.Of(tile)` is the one rule now (OM2 review).
+- `Shell/MainViewModel.ObjectFromMap.cs` guards states the modal composer rules out: `StartObjectFromMap`'s `CurrentMap is not { } shown` and `ErasedCells`' `FirstOrDefault` + null check on a layer that can't vanish while the composer is open; `Single` or the value, so a bug fails instead of skipping (OM3, OM4 reviews).
+- `Shell/MainWindow.ObjectEditing.cs` lines 24 and 28 mix `Composing?.StartNew()` with `Composing!.TryApply` (OM4 review).
+- `ErasedCells` zips two `Select`s over the same tiles, and `ErasedOn` reads `TileIdAt` three times for one cell (OM4 review).
+- `tests/Jrpg.Editor.Tests/Shell/MainViewModelOpenMapsTests.cs` is at 286 lines after MS2 and `MainViewModelObjectFromMapTests.cs` at 251 after OM4: the next open-maps or object-from-map test goes in a sibling file.

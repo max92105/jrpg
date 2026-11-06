@@ -31,3 +31,4 @@ paths:
 - When tests change their data source (the repository's content to the test world), their names and summaries change with it: grep the old source's word in test names and in the fixture's users, not only in comments (the reset's T2a, T2b and T2c reviews).
 - A relayed `PropertyChanged` arm and each `[NotifyCanExecuteChangedFor]` that greys a button gets a test asserting the event is raised; a `CanExecute` that reads the catalog is re-raised on every catalog change and tested with an undo while the panel is open (the composer plan's CO2, CO3, AE2).
 - A sort or draw-order test sets its items up in the opposite order (the overlay painted before the base): a fixture already in order passes with the sort deleted (quests J1, the levels plan's OL3 Critical and OL4).
+- An undo check is its own test (`Paste_Undo_RemovesTheCopies`), never a last assert in the edit's test: the edit's failure then hides the undo's (the map editing flows' CP1, CP2 and PO1 reviews).

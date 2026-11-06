@@ -23,6 +23,8 @@ Turn a feature request into a plan that a developer can implement one slice at a
    - For Game screens, plan two slices up front: behavior with a plain draw, then the look (timing, shapes). Budget tests at about the code's size, plus the existing tests the change will break.
    - For Editor slices, aim at about 200 lines, not 300 (the editor plan split 8 slices at the size check): count tests as about as many lines as the code, and plan a new window or panel as two slices up front (its rules and catalog step, then the window).
    - A new event step kind or saved list touches every switch and check over kinds along the chain (Data's null-entry check, Core's `ApplyAndCheckWait`, the editor's `ToStep`): name each one's complexity room in the slice, not just Core's (the quests plan budgeted one of three, and E1 and SV had to extract a helper).
+   - The editor's `HandleObjectKey`, `HandlePaintButton`, `HandleToolKey` and `ShowSelected` sit at the CA1502 limit: a slice adding a key or a branch names the helper it extracts (the map editing flows' OM1, SN1 and PO2 each extracted one mid-slice).
+   - A test file a phase of three or more slices fills gets its sibling named per slice, not once it reaches 250 lines (MS2 filled `MainViewModelOpenMapsTests` to 296 and MS3 had to find a sibling).
 4. For each slice list: goal, files to create/change, public types/signatures, tests to write (by name), and how to verify by hand if relevant.
    - Write planned test names as `Method_Scenario_ExpectedResult` under the test class's name (`CommandMenuTests: Update_ConfirmSkills_ListsActorSkills`), as the repo's test files do.
    - Every new type gets a one-line responsibility next to its name. If the line needs "and", split the type.

@@ -205,6 +205,20 @@ foreach ($changed in $addedLines.Keys) {
 }
 Report 'changed comments end on more than two words (perl .claude/scripts/reflow-comments.pl <file>, then reword)' (-not $shortLastLines) ($shortLastLines | Select-Object -First 20)
 
+# 7c. A test or doc comment added right under a closing brace has a blank line before it: format leaves the join, and
+# the member then reads as glued to the one above (the map editing flows' WP1 and WP2).
+$joinedMembers = @()
+foreach ($changed in $addedLines.Keys) {
+    $path = Join-Path $repositoryRoot $changed
+    if (-not (Test-Path $path)) { continue }
+    $lines = [IO.File]::ReadAllLines($path)
+    foreach ($number in $addedLines[$changed].Keys) {
+        if ($number -lt 2 -or $lines[$number - 1] -notmatch '^\s*(\[(Fact|Theory)|///)') { continue }
+        if ($lines[$number - 2] -match '^\s*}\s*$') { $joinedMembers += "${changed}:$number" }
+    }
+}
+Report 'changed tests and doc comments have a blank line after the brace before them' (-not $joinedMembers) ($joinedMembers | Select-Object -First 20)
+
 # 8-11. Slips a shell edit leaves behind, caught before the review. The quote is the shell escape '"'"' written literally
 # (a heredoc perl script, see the class-mechanics retro); a doubled summary is a member inserted between another's doc
 # comment and its declaration; a broken doc line is a /// line that lost a slash (`/// //` or a lone `//` inside a

@@ -95,6 +95,18 @@ public sealed class ObjectEditingTests
     }
 
     [Fact]
+    public void ReplacePlacedObjectEdit_ApplyThenRevert_KeepsItsPlaceInTheOrder()
+    {
+        var edit = new ReplacePlacedObjectEdit(_chest, _chest with { Position = new Point2D(7, 7), Z = 3 });
+        edit.Apply(_draft);
+        Assert.Equal((new Point2D(7, 7), 3), (_draft.Objects[1].Position, _draft.Objects[1].Z));
+
+        edit.Revert(_draft);
+
+        Assert.Equal([_tree, _chest, _farChest], _draft.Objects);
+    }
+
+    [Fact]
     public void MoveObjectEdit_Revert_RestoresPosition()
     {
         var edit = new MoveObjectEdit("chest_1", new Point2D(2, 1.5), new Point2D(4.25, 3));

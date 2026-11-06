@@ -91,7 +91,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **CP2. `ObjectCopying`: Ctrl+C, Ctrl+X and Ctrl+V in Objects mode and the Edit menu, across maps, pasted at the mouse (snapped with Alt) and selected; greyed while a copied object is missing** (Editor, about 225 lines) → [slices/CP2.md](slices/CP2.md)
 
 ### Phase 5: the placed object panel
-- [ ] **PO1. `PlacedObjectEditing`: the one selected placed object's position and layer as typed, their problems, applied as one step (`ReplacePlacedObjectEdit`), following the selection and every map change** (Editor, about 205 lines) → [slices/PO1.md](slices/PO1.md)
+- [x] **PO1. `PlacedObjectEditing`: the one selected placed object's position and layer as typed, their problems, applied as one step (`ReplacePlacedObjectEdit`), following the selection and every map change** (Editor, about 205 lines) → [slices/PO1.md](slices/PO1.md)
 - [ ] **PO2. The panel's object swap: every catalog object offered, the uid and events kept, a warning when a gated event can't run, the list following the catalog** (Editor, about 155 lines) → [slices/PO2.md](slices/PO2.md)
 - [ ] **PO3. The Placed object panel under the Objects panel's list; Edit events... opens the object's events** (Editor, about 115 lines) → [slices/PO3.md](slices/PO3.md)
 

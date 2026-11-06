@@ -38,3 +38,5 @@ Size: about 85 lines of code (the view model 70, the edit 8, the draft 5, the pr
 
 ## Hand check (yours)
 Nothing to see yet (PO3).
+
+- **Done, with deviations:** `PlacedObjectEditing` takes the catalog draft beside the placing view model, for the objects' sizes (the placing view model keeps its catalog private). X and Y accept a minus sign: an object near the left or top edge has a negative top-left. The undo check is its own test. Review: X and Y refuse "NaN" and "Infinity", which `double.TryParse` reads and the save can't write (a crash on save); the still step's seconds got the same guard (`EventStepViewModel.Seconds`, one theory row); the panel checks again on every catalog change, an object's size moving its center, with a test.

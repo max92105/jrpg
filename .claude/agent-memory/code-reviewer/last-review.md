@@ -5,19 +5,19 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-05-map-editing-flows, slice CP2 (ObjectCopying, MainWindow.ObjectCopying, Edit menu Copy/Cut/Paste
-objects), round 1 (2026-11-05). Verdict: fix the Criticals. CP1's two Suggestions not carried (new slice).
-CP1 follow-up "Make on an empty list throws": fixed (CanPaste requires Copied.Count > 0; Copy reads only uids on map).
+Plan 2026-11-05-map-editing-flows, slice PO1 (PlacedObjectEditing, ReplacePlacedObjectEdit, MapDraft.ReplaceObject),
+round 1 (2026-11-05). Verdict: fix the Criticals.
+CP2 items checked in the tree: Edit menu CommandTarget fixed; Paste off-map check fixed; IsCopyingObjects gone (fixed);
+CanPaste now covers swapped-to objects (fixed). Removal of a shown object's definition: impossible (Remove and catalog
+undo refused while placed; purge needs every map saved and rewrites maps before Current).
 
-- Critical, open: MainWindow.xaml Edit menu Copy/Cut/Paste objects have no CommandTarget; with the map filter box
-  focused (Ctrl+F, Enter), the Menu focus scope transfers the command to the TextBox: "Paste objects" pastes clipboard
-  text into the filter (greyed with no text). Fix: CommandTarget="{Binding ElementName=MapViewport}" on the three.
-- Warning, open: ObjectCopying.Paste has no off-map check; PlaceChosen refuses a center off the map. Ctrl+V over the
-  viewport's empty area (or the view center panned off the map) pastes unseen objects that save. Test it.
-- Suggestion, open: IsCopyingObjects reads as "a copy in progress"; name it for "the object commands apply"; the
-  Placing-not-null clause is defensive (Placing exists whenever a map is open).
-- Suggestion, open: Copy_ThenPasteCenteredAt_AddsCopiesWithTheirEventsInOneStep checks no step; drop "InOneStep".
-- Follow-up: CanPaste checks only placed ObjectIds, not objects a copied event swaps to; save validation catches it.
+- Critical, open: PlacedObjectEditing.Coordinate accepts "NaN" (double.TryParse ignores NumberStyles for the symbols);
+  floor(NaN) casts to 0 so the center check passes, Apply stores a NaN position, and the save's JSON writer throws an
+  uncaught ArgumentException. Fix: `&& double.IsFinite(value)`; theory row X "NaN".
+- Warning, open: no CatalogDraft.Current subscription; an Edit object resize (or its catalog undo) leaves Problem and
+  ApplyCommand.CanExecute stale (editor.md rule); test with SetObject wider while the panel shows the chest.
+- Suggestion, open: ObjectPlacingViewModel class summary doesn't mention Copying/Editing.
+- Follow-up: EventStepViewModel seconds parse accepts "Infinity" (> 0), which the save can't write.
 - Follow-up (from SN1, still present): window key guards exclude only TextBox, so B/R/F/G eat a focused ComboBox's
   type-to-select.
 - Follow-up (from MO2, still present): a wheel zoom mid Shift-drag runs DrawSelectionMarks, resetting the marks'

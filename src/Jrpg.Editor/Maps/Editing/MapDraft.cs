@@ -58,6 +58,9 @@ internal sealed class MapDraft
         _objects[index] = _objects[index] with { Position = position };
     }
 
+    /// <summary>Puts a record in place of the placed object with its uid, keeping its place in the order.</summary>
+    public void ReplaceObject(PlacedObject placed) => _objects[_objects.FindIndex(onMap => onMap.Uid == placed.Uid)] = placed;
+
     public void SetObjectEvents(string uid, IReadOnlyList<MapEvent> events)
     {
         var index = _objects.FindIndex(placed => placed.Uid == uid);

@@ -52,6 +52,7 @@ public sealed class EventStepViewModelTests
     [InlineData("0")]
     [InlineData("-1")]
     [InlineData("four")]
+    [InlineData("Infinity")]
     [InlineData("")]
     public void Problem_StillWithSecondsNotAboveZero_SaysSo(string seconds)
     {

@@ -244,9 +244,11 @@ internal sealed partial class EventStepViewModel : ObservableObject
 
     private static string Text(double number) => number.ToString(CultureInfo.InvariantCulture);
 
-    // A decimal number with a dot, as content writes it.
+    // A decimal number with a dot, as content writes it; TryParse also reads "Infinity", which content can't hold.
     private static double? Seconds(string text) =>
-        double.TryParse(text.Trim(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var seconds) && seconds > 0 ? seconds : null;
+        double.TryParse(text.Trim(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var seconds) && seconds > 0 && double.IsFinite(seconds)
+            ? seconds
+            : null;
 
     // Digits only.
     private static int? WholeNumber(string text, int minimum) =>

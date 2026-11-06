@@ -10,8 +10,9 @@ using Jrpg.Editor.Maps.Editing;
 namespace Jrpg.Editor.Objects;
 
 /// <summary>
-/// Placing, moving, selecting, nudging and removing objects on the open map. Every change is one undo step; nothing is
-/// placed until an object is chosen.
+/// Placing, moving, selecting, nudging and removing objects on the open map, with the selection's copy and paste
+/// (<see cref="Copying"/>) and the placed object panel (<see cref="Editing"/>). Every change is one undo step; nothing
+/// is placed until an object is chosen.
 /// </summary>
 internal sealed partial class ObjectPlacingViewModel : ObservableObject
 {
@@ -37,12 +38,18 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
         _catalog = catalog;
         _layer = layer;
         Copying = new ObjectCopying(catalog, this);
+        Editing = new PlacedObjectEditing(catalog, this);
     }
 
     public ObjectBrowserViewModel Browser { get; }
 
     /// <summary>Copy, Cut and Paste of the selected objects (decision 512).</summary>
     public ObjectCopying Copying { get; }
+
+    /// <summary>
+    /// The placed object panel's fields: the one selected object's position and layer (decision 513).
+    /// </summary>
+    public PlacedObjectEditing Editing { get; }
 
     /// <summary>Whether Objects > Edit shapes has an object to open: one selected on the map, or the one chosen in the panel.</summary>
     public bool CanEditShapes => SelectedObjectUids.Count == 1 || Browser.SelectedObject is not null;

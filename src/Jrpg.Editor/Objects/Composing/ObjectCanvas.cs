@@ -40,6 +40,26 @@ internal sealed class ObjectCanvas
     public static ObjectCanvas Empty(int width, int height) => new(width, height, []);
 
     /// <summary>
+    /// A canvas holding exactly these cells, built at once (an object made from the map, decision 514).
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// A size outside 1 to <see cref="MaxCells"/>, a cell outside the size, or a level outside the object levels.
+    /// </exception>
+    public static ObjectCanvas OfCells(int width, int height, IReadOnlyDictionary<CellOnLevel, SheetCell> cells)
+    {
+        foreach (var (cell, level) in cells.Keys)
+        {
+            ThrowIfOutsideTheLevels(level);
+            if (!IsInside(cell, width, height))
+            {
+                throw new ArgumentOutOfRangeException(nameof(cells), cell, $"A cell outside the {width} x {height} canvas.");
+            }
+        }
+
+        return new ObjectCanvas(width, height, new Dictionary<CellOnLevel, SheetCell>(cells));
+    }
+
+    /// <summary>
     /// The canvas a rectangle of sheet cells makes, its size and picture on the base level (New object from the chosen
     /// cells).
     /// </summary>
@@ -58,7 +78,7 @@ internal sealed class ObjectCanvas
     public static ObjectCanvas Of(ObjectDefinition definition, IReadOnlyDictionary<int, TileDefinition> tiles) =>
         new(definition.Width, definition.Height, definition.Tiles.ToDictionary(
             tile => new CellOnLevel(new GridCell(tile.X, tile.Y), tile.Level),
-            tile => SheetCellOf(tiles[tile.TileId])));
+            tile => SheetCell.Of(tiles[tile.TileId])));
 
     /// <summary>
     /// The rectangle painted on <paramref name="level"/> with its top-left on <paramref name="at"/> (decision 458),
@@ -116,8 +136,6 @@ internal sealed class ObjectCanvas
         ArgumentOutOfRangeException.ThrowIfLessThan(level, ObjectTile.MinLevel);
         ArgumentOutOfRangeException.ThrowIfGreaterThan(level, ObjectTile.MaxLevel);
     }
-
-    private static SheetCell SheetCellOf(TileDefinition tile) => new(tile.SheetId, tile.Column, tile.Row);
 
     private static bool IsInside(GridCell cell, int width, int height) =>
         cell.X >= 0 && cell.Y >= 0 && cell.X < width && cell.Y < height;

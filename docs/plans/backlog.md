@@ -206,3 +206,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 ## From the map editing flows plan (2026-11-05, during the slices)
 
 - A wheel zoom during a Shift + drag of the selection runs `DrawSelectionMarks` (through `ApplyViewport`), which snaps the outlines back to the start until the mouse moves again (MO2 review).
+- A tile's sheet cell is still worked out inline in `Tiles/TileBrowserViewModel.cs` and twice in `Tiles/TileImages.cs`: `SheetCell.Of(tile)` is the one rule now (OM2 review).

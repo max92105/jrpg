@@ -137,4 +137,31 @@ public sealed class ObjectCanvasTests
 
         Assert.Equal([new ObjectTile(2, 0, 2), new ObjectTile(0, 1, 103), new ObjectTile(2, 2, 1)], tiles);
     }
+
+    [Fact]
+    public void OfCells_CellsInside_HoldsThem()
+    {
+        var cell = new CellOnLevel(new GridCell(1, 2), -1);
+
+        var canvas = ObjectCanvas.OfCells(2, 3, new Dictionary<CellOnLevel, SheetCell> { [cell] = new("trees", 3, 4) });
+
+        Assert.Equal((2, 3), (canvas.Width, canvas.Height));
+        Assert.Equal(new SheetCell("trees", 3, 4), Assert.Single(canvas.Cells).Value);
+    }
+
+    [Fact]
+    public void OfCells_CellOutsideTheSize_Throws()
+    {
+        var cells = new Dictionary<CellOnLevel, SheetCell> { [new CellOnLevel(new GridCell(2, 0), 0)] = new("trees", 0, 0) };
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => ObjectCanvas.OfCells(2, 3, cells));
+    }
+
+    [Fact]
+    public void OfCells_LevelOutsideTheRange_Throws()
+    {
+        var cells = new Dictionary<CellOnLevel, SheetCell> { [new CellOnLevel(new GridCell(0, 0), ObjectTile.MaxLevel + 1)] = new("trees", 0, 0) };
+
+        Assert.Throws<ArgumentOutOfRangeException>(() => ObjectCanvas.OfCells(2, 3, cells));
+    }
 }

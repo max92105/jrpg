@@ -36,3 +36,5 @@ Size: about 70 lines of code; 20 tests (about 170 with a small shared layout bui
 
 ## Hand check (yours)
 Nothing to see yet (OM3).
+
+- **Done, with deviations:** `ProblemOf` checks "no tile" first, then the size, then the levels. The canvas's cells come from a four-parameter `SheetCellsOf` (the five-parameter add the plan implied would break the rule). `Of_Rectangle_GivesTheCanvasItsSize` also checks where a rectangle away from the corner lands (`..._AndPlaces`). Review: a tile's sheet cell is one `SheetCell.Of(tile)`, shared with `ObjectCanvas` (three inline sites left for the backlog); `Of` loops over the map's layers by their taken level.

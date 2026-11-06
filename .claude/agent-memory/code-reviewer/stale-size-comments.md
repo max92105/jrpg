@@ -35,6 +35,9 @@ call or a rename. These cases slipped past it:
   elsewhere saying where it refuses ("refuses it only on save" in TileImages) and summaries describing the old fallback
   (`Select`: "nothing when the sheet isn't in the box"); grep the check's name and "on save" across the feature folders.
 
+- A removed question or refusal (map flows MS1: switching no longer asks) leaves callers' summaries and window
+  comments naming it ("or the user kept the open map"); grep the old outcome's wording across the views.
+
 - Deleted content files leave text a script generates (music change, decision 496: fetch-placeholder-sounds.ps1 writing
   "The music ... rendered by new-placeholder-tune.pl" into CREDITS.md) and the generator's now-unused subs; grep
   `.claude/scripts/` too, not only comments and docs.

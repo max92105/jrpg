@@ -66,6 +66,34 @@ public sealed class MainViewModelPurgeTests : IDisposable
         Assert.False(viewModel.HasUnsavedChanges);
     }
 
+    // The rebuilt map is one of the open maps: its next edit is unsaved and the close question names it.
+    [Fact]
+    public void RemoveSheet_PurgedThenPainted_CountsAsUnsaved()
+    {
+        var (viewModel, _) = OpenWithCityMissing();
+        PurgeCity(viewModel);
+
+        EditorTestContent.PaintTopLeft(viewModel);
+
+        Assert.True(viewModel.HasUnsavedChanges);
+        Assert.False(viewModel.ConfirmClose());
+        Assert.Single(_content.Questions);
+    }
+
+    [Fact]
+    public void RemoveSheet_PurgedThenAnotherMapAndBack_ShowsTheRebuiltMap()
+    {
+        var (viewModel, _) = OpenWithCityMissing();
+        var openId = viewModel.CurrentMap!.Map.Id;
+        PurgeCity(viewModel);
+        var rebuilt = viewModel.CurrentMap;
+
+        viewModel.TryOpenMap(viewModel.MapIds.First(id => id != openId));
+        viewModel.TryOpenMap(openId);
+
+        Assert.Same(rebuilt, viewModel.CurrentMap);
+    }
+
     private (Editor.Shell.MainViewModel ViewModel, string Root) OpenWithCityMissing()
     {
         var root = _content.CopyOfTestWorld();

@@ -1,8 +1,8 @@
 using Jrpg.Core.Geometry;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
-using Jrpg.Editor.Shell;
 
 namespace Jrpg.Editor.Tests.Shell;
 

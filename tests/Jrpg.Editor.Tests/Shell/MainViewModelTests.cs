@@ -8,7 +8,8 @@ using Jrpg.Editor.Tiles;
 namespace Jrpg.Editor.Tests.Shell;
 
 /// <summary>
-/// Opening maps, unsaved-change questions, objects, map settings and new maps; saving and undo have their own classes.
+/// The map list, the close question, objects, map settings and new maps; switching maps, saving and undo are tested in
+/// their own classes.
 /// </summary>
 public sealed class MainViewModelTests : IDisposable
 {
@@ -77,40 +78,6 @@ public sealed class MainViewModelTests : IDisposable
     }
 
     [Fact]
-    public void TryOpenMap_NoUnsavedChanges_OpensItWithoutAsking()
-    {
-        var viewModel = _content.Open(_content.TestWorld);
-
-        Assert.True(viewModel.TryOpenMap("start"));
-
-        Assert.Equal("start", viewModel.CurrentMap?.Map.Id);
-        Assert.Empty(_content.Questions);
-    }
-
-    [Fact]
-    public void TryOpenMap_UnsavedChangesAndUserKeepsThem_StaysOnTheMap()
-    {
-        var viewModel = _content.Open(_content.TestWorld, answer: false);
-        EditorTestContent.PaintTopLeft(viewModel);
-
-        Assert.False(viewModel.TryOpenMap("start"));
-
-        Assert.Equal("forest", viewModel.CurrentMap?.Map.Id);
-        Assert.Equal(["Map 'forest' has unsaved changes. Discard them?"], _content.Questions);
-    }
-
-    [Fact]
-    public void TryOpenMap_UnsavedChangesAndUserDiscards_OpensTheOther()
-    {
-        var viewModel = _content.Open(_content.TestWorld, answer: true);
-        EditorTestContent.PaintTopLeft(viewModel);
-
-        Assert.True(viewModel.TryOpenMap("start"));
-
-        Assert.Equal("start", viewModel.CurrentMap?.Map.Id);
-    }
-
-    [Fact]
     public void ConfirmClose_UnsavedChanges_AsksTheUser()
     {
         var viewModel = _content.Open(_content.TestWorld, answer: false);
@@ -138,30 +105,6 @@ public sealed class MainViewModelTests : IDisposable
 
         Assert.False(viewModel.ConfirmClose());
         Assert.Equal(["The tiles have unsaved changes. Discard them?"], _content.Questions);
-    }
-
-    [Fact]
-    public void ConfirmClose_UnsavedMapAndCatalogChanges_AsksOnceNamingBoth()
-    {
-        var viewModel = _content.Open(_content.TestWorld);
-        EditorTestContent.BlockFirstWalkableTile(viewModel);
-        EditorTestContent.PaintTopLeft(viewModel);
-
-        Assert.False(viewModel.ConfirmClose());
-        Assert.Equal([$"Map '{viewModel.CurrentMap!.Map.Id}' and the tiles have unsaved changes. Discard them?"], _content.Questions);
-    }
-
-    [Fact]
-    public void TryOpenMap_UnsavedCatalogChangeOnly_OpensWithoutAsking()
-    {
-        var viewModel = _content.Open(_content.TestWorld);
-        EditorTestContent.BlockFirstWalkableTile(viewModel);
-        var otherMapId = viewModel.MapIds.First(id => id != viewModel.CurrentMap!.Map.Id);
-
-        Assert.True(viewModel.TryOpenMap(otherMapId));
-
-        Assert.Empty(_content.Questions);
-        Assert.True(viewModel.HasUnsavedChanges);
     }
 
     [Fact]
@@ -335,31 +278,6 @@ public sealed class MainViewModelTests : IDisposable
 
         Assert.False(viewModel.TryApplySettings(settings));
         Assert.False(viewModel.CurrentMap!.IsDirty);
-    }
-
-    [Fact]
-    public void TryCreateMap_ValidFields_OpensItUnsavedOutsideTheList()
-    {
-        var viewModel = _content.Open(_content.TestWorld);
-        var newMap = viewModel.StartNewMap()!;
-        newMap.Name = "Old Mill";
-
-        Assert.True(viewModel.TryCreateMap(newMap));
-
-        Assert.Equal("old_mill", viewModel.CurrentMap!.Map.Id);
-        Assert.True(viewModel.CurrentMap.IsDirty);
-        Assert.DoesNotContain("old_mill", viewModel.MapIds);
-    }
-
-    [Fact]
-    public void TryCreateMap_UnsavedChangesKept_StaysOnTheOpenMap()
-    {
-        var viewModel = _content.Open(_content.TestWorld, answer: false);
-        EditorTestContent.PaintTopLeft(viewModel);
-
-        Assert.False(viewModel.TryCreateMap(viewModel.StartNewMap()!));
-
-        Assert.Equal("forest", viewModel.CurrentMap!.Map.Id);
     }
 
     [Fact]

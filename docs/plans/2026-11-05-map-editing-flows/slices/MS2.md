@@ -10,7 +10,7 @@ None.
 
 ## Changes
 - `Catalogs/CatalogUsage`: `MapLayout? openLayout` becomes `IReadOnlyCollection<MapLayout> openLayouts` in `UsersOfTile`, `OfSheet`, `UsersOfObject`, `UsersOfQuest` and the private `LayoutsOf` (the saved maps whose id no open layout has, then every open layout); its summary and param docs say "the open maps' layouts, unsaved changes included; empty when none is open".
-- `Maps/OpenMaps` (MS1): `public IReadOnlyCollection<MapLayout> Layouts` (each open map's layout now); `public void ReplaceFrom(ContentCatalog written)` (every open map rebuilt from the written content; a map the written content lacks is dropped; the purge runs only with nothing dirty, so nothing unsaved is lost).
+- `Maps/OpenMaps` (MS1): `public IReadOnlyCollection<MapLayout> Layouts` (each open map's layout now); `public void ReplaceFrom(ContentCatalog written)` (done in MS1, keeping a map with unsaved changes as it is: every open map rebuilt from the written content; a map the written content lacks is dropped; the purge runs only with nothing dirty, so nothing unsaved is lost).
 - Providers, each now `Func<IReadOnlyCollection<MapLayout>>` from `OpenMaps.Layouts`:
   - `Shell/CombinedHistory(CatalogDraft catalog, OpenMaps openMaps)`: its five calls pass `openMaps.Layouts`.
   - `Objects/ObjectPlacingViewModel(CatalogDraft catalog, LayerChoiceViewModel layer, OpenMaps openMaps)`: its browser's provider.

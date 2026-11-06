@@ -73,9 +73,8 @@ internal sealed partial class MainViewModel : ObservableObject
             AnimationTime = new TileAnimationTime(Content);
             Removal = new SheetRemoval(Content, Painting.Browser, () => CurrentMap, _writer);
             Content.PropertyChanged += OnContentChanged;
-            // The purge wrote the content at once: the open map shows it from the written content, with no history,
-            // before the catalogs change (the window redraws on that change).
-            Content.Rewriting += (_, written) => CurrentMap = CurrentMap is { } open ? new MapViewModel(written.Maps[open.Map.Id]) : null;
+            _openMaps.DirtyChanged += OnOpenMapsDirtyChanged;
+            Content.Rewriting += (_, written) => ShowRewritten(written);
             History = new CombinedHistory(Content);
             Placing = new ObjectPlacingViewModel(Content, Layer);
             Composing = new ObjectComposing(Content, Placing.Browser, Painting.Browser);
@@ -204,14 +203,9 @@ internal sealed partial class MainViewModel : ObservableObject
     /// <summary>Whether the editor may close: nothing unsaved, or the user agreed, when asked, to drop it.</summary>
     public bool ConfirmClose()
     {
-        if (Content is not { IsDirty: true })
-        {
-            return ConfirmLeaveCurrentMap();
-        }
-
+        // A stroke still being dragged counts as a change, so it ends before the question.
         CurrentMap?.EndStroke();
-        var unsaved = CurrentMap is { IsDirty: true } open ? $"Map '{open.Map.Id}' and the tiles have" : "The tiles have";
-        return ConfirmDiscard(unsaved);
+        return UnsavedChangesWording() is not { } unsaved || _confirm($"{unsaved} unsaved changes. Discard them?");
     }
 
     /// <param name="cell">The cell under the cursor, or null when the cursor left the view.</param>
@@ -340,10 +334,6 @@ internal sealed partial class MainViewModel : ObservableObject
         if (e.PropertyName == nameof(MapViewModel.Map))
         {
             RefreshLayerEntries();
-        }
-        else if (e.PropertyName == nameof(MapViewModel.IsDirty))
-        {
-            OnPropertyChanged(nameof(HasUnsavedChanges));
         }
     }
 

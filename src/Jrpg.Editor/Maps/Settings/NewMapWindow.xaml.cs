@@ -4,7 +4,7 @@ namespace Jrpg.Editor.Maps.Settings;
 
 /// <summary>
 /// The new map dialog. Create hands the name and size to the window's create step, which returns false when no map was
-/// made (a field is invalid or the user kept the open map), and the dialog then stays open.
+/// made (a field is invalid), and the dialog then stays open.
 /// </summary>
 internal sealed partial class NewMapWindow : Window
 {

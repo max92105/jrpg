@@ -23,7 +23,8 @@
       <TextBlock Style="{StaticResource Heading}" Text="Anywhere" />
       <TextBlock Style="{StaticResource Lines}">
         Ctrl+N: new map.<LineBreak />
-        Ctrl+S: save the map and the tiles.<LineBreak />
+        Ctrl+S: save the shown map and the tiles.<LineBreak />
+        Maps stay open: switch freely, a * in the map list marks unsaved changes.<LineBreak />
         Ctrl+Z / Ctrl+Y: undo / redo.<LineBreak />
         F1: this list.
       </TextBlock>

@@ -56,13 +56,22 @@ internal sealed partial class ObjectComposerViewModel : ObservableObject
 
     /// <summary>A new object on the canvas a map selection made (decision 514), with its drawing warning.</summary>
     public static ObjectComposerViewModel ForNewFromMap(CanvasPainting painting, ObjectNaming naming, string? mapLayerWarning) =>
-        new(painting, naming, null) { MapLayerWarning = mapLayerWarning };
+        new(painting, naming, null) { MapLayerWarning = mapLayerWarning, CanReplaceMapCells = true, IsReplacingMapCells = true };
 
     /// <summary>
     /// How an object made from map cells will draw differently from them (decision 516); null otherwise, and for New
     /// object and Edit object.
     /// </summary>
     public string? MapLayerWarning { get; private init; }
+
+    /// <summary>
+    /// Whether the composer offers to put the object in place of the map cells it was made from (decision 515).
+    /// </summary>
+    public bool CanReplaceMapCells { get; private init; }
+
+    /// <summary>Whether Save also replaces the map cells with the object; ticked at the start when it can.</summary>
+    [ObservableProperty]
+    public partial bool IsReplacingMapCells { get; set; }
 
     /// <summary>Whether the composer shows <see cref="MapLayerWarning"/>; its line takes no room otherwise.</summary>
     public bool HasMapLayerWarning => MapLayerWarning is not null;

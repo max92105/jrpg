@@ -72,6 +72,12 @@
                    TextWrapping="Wrap"
                    Text="{Binding MapLayerWarning}"
                    Visibility="{Binding HasMapLayerWarning, Converter={StaticResource VisibleWhenTrue}}" />
+        <!-- Only for an object made from map cells (decision 515). -->
+        <CheckBox Content="Replace the cells on the map with the object"
+                  Margin="0,4,0,0"
+                  IsChecked="{Binding IsReplacingMapCells}"
+                  Visibility="{Binding CanReplaceMapCells, Converter={StaticResource VisibleWhenTrue}}"
+                  ToolTip="Save also erases the cells the object took, from the chosen layer up, and places the object there. The layers under it stay. Ctrl+Z undoes the replacement, then the object." />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
           <!-- Greyed while something stops Save; the line above says what. -->
           <Button Content="Save" Width="80" IsDefault="True" Click="OnSaveClicked">

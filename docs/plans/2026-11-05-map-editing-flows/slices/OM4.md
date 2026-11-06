@@ -47,3 +47,5 @@ Size: about 75 lines of code (the edit 15, the partial 40, the composer 8, the w
 5. Ctrl+Y twice: the object and the replacement come back.
 6. Ctrl+S, start the game, walk up to the tree: the player is blocked by its outline and drawn in front of or behind it by depth, as other objects are (an above-player zone drawn in the Shapes window puts its top over the player).
 7. Objects > New object (not from the map): no Replace box.
+
+- **Done, with deviations:** the replacement erases only the base layer and the layers over it (decision 515 as amended at approval: the ground under the base stays), so the first test is `..._ErasesTheBaseLayersCells` and `..._LeavesTheLayersUnderTheBase` its pair. What the composer opened from is a private `MapSelectionSource` record; the erasing is `ErasedCells` and a per-layer `ErasedOn`. A layer the replacement empties is dropped from the saved map, as any empty layer (the edit test says so). No capture (Mana Seed art). Review: a test with the ground chosen erases the layer over it too (level 1), and one with a base z that has no layer on the map erases nothing; only the map's own layers are read for the erasing.

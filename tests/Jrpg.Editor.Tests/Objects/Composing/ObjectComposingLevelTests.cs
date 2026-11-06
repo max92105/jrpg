@@ -87,6 +87,24 @@ public sealed class ObjectComposingLevelTests : IDisposable
         Assert.Null(composer.Original);
     }
 
+    [Fact]
+    public void StartNew_FromTheTilesPanel_CannotReplaceMapCells()
+    {
+        var composer = _content.Open(_content.TestWorld).Composing!.StartNew();
+
+        Assert.False(composer.CanReplaceMapCells);
+        Assert.False(composer.IsReplacingMapCells);
+    }
+
+    [Fact]
+    public void StartNewFromMap_CanReplaceAndIsTicked()
+    {
+        var composer = _content.Open(_content.TestWorld).Composing!.StartNewFromMap(ObjectCanvas.Empty(1, 1), null);
+
+        Assert.True(composer.CanReplaceMapCells);
+        Assert.True(composer.IsReplacingMapCells);
+    }
+
     private static int PaintTileOf(MainViewModel viewModel, ObjectComposerViewModel composer, string sheetId, int level)
     {
         var tileId = viewModel.Catalog!.Tiles.Values.First(tile => tile.SheetId == sheetId).Id;

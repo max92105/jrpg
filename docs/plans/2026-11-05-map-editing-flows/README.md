@@ -1,5 +1,5 @@
 # Map editing flows
-Status: approved
+Status: retro pending
 
 Drafted on 2026-11-05 from the developer's list of what slows down building maps in the editor every day (cleaned up by the coordinator):
 
@@ -100,7 +100,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **OM1. Ctrl + drag in Tiles mode selects map cells (`MapCellRectangle`), drawn dashed** (Editor, about 190 lines) → [slices/OM1.md](slices/OM1.md)
 - [x] **OM2. `MapSelectionCanvas`: the canvas a map selection makes, every layer on its level around the chosen one (level 0), and why it can't; `ObjectCanvas.OfCells`** (Editor, about 240 lines) → [slices/OM2.md](slices/OM2.md)
 - [x] **OM3. Objects > New object from map selection opens the composer on it, warning about layers that draw differently in an object; Save makes the object from the map's own tiles** (Editor, about 165 lines) → [slices/OM3.md](slices/OM3.md)
-- [ ] **OM4. Replace the cells with the object: the composer's check box, `ReplaceCellsWithObjectEdit` erasing only the cells the object still holds, one map step after the catalog step** (Editor, about 210 lines) → [slices/OM4.md](slices/OM4.md)
+- [x] **OM4. Replace the cells with the object: the composer's check box, `ReplaceCellsWithObjectEdit` erasing only the cells the object still holds, one map step after the catalog step** (Editor, about 210 lines) → [slices/OM4.md](slices/OM4.md)
 
 ## Decisions
 - **497. Maps stay open in a session** (the developer's change; replaces the leave question): every map opened stays in memory with its unsaved changes and its undo history; switching maps and making a new map never ask. A new map is listed from its creation and stays open until it is saved or the editor closes (Don't save then drops it).

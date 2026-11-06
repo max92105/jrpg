@@ -5,16 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-05-map-editing-flows, slice OM3 (New object from map selection), round 1 (2026-11-06).
+Plan 2026-11-05-map-editing-flows, slice OM4 (Replace the map cells with the new object), round 1 (2026-11-06).
 Verdict: ready to commit (no Criticals).
 
-- Warning (open): ObjectComposerWindow.xaml:68 MapLayerWarning TextBlock not collapsed when null: blank line in every
-  New/Edit composer (slice asked "collapsed when null"; MainWindowStyles' ErrorLine comment confirms the gap).
-- Warning (open): ObjectComposing class summary still "New object and Edit object ... Tiles panel or Objects panel";
-  StartNewFromMap's map-selection job missing.
-- Suggestion (open): ObjectComposingLevelTests new [Fact] placed after the private PaintTileOf helper.
-- Suggestion (open): no DrawingWarningOf test with both warnings (the " " join).
-- Suggestion (open): StartObjectFromMap's `CurrentMap is not { } shown` guard; a selection implies an open map.
-- Follow-up dropped: CatalogDraft.TileAt lowest-id-wins on cells cut twice (content has no duplicates today).
-- OM2 carried: SheetCellOf shared via SheetCell.Of (fixed); inline copies are in backlog.md:209 (dropped);
-  map.md Viewport stray `|` fixed.
+- Warning (open): no test erases a layer over the base (level > 0); all tests take Decoration as the top layer.
+- Warning (open): MainViewModel.ObjectFromMap.cs:93-94 FirstOrDefault + `is not null` + `!` guard a layer that can't
+  vanish while the modal composer is open; `Single` instead.
+- Suggestion (open): ErasedCells' Zip of two Selects over the same tiles; ErasedOn reads TileIdAt three times.
+- Suggestion (open): MainWindow.ObjectEditing.cs:24/28 mix `Composing?.StartNew()` with `Composing!.TryApply`.
+- Follow-up: OM3 leftovers still open: no DrawingWarningOf test with both warnings; StartObjectFromMap's
+  `CurrentMap is not { } shown` guard.
+- OM3 carried, fixed: MapLayerWarning collapsed when null; ObjectComposing summary names the map selection;
+  ObjectComposingLevelTests helper now last.

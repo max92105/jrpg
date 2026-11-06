@@ -7,3 +7,4 @@
 - [Detached comments](detached-comments.md) — a member inserted under, or removed from under, a comment leaves it describing the wrong code
 - [Lax test JSON readers](lax-test-json-readers.md) — test-only manifest readers skip required/nullable checks; ContentJsonOptions.Strict exists
 - [Typed double NaN](typed-double-nan.md) — double.TryParse takes "NaN"/"Infinity" despite NumberStyles; require IsFinite in editor fields
+- [Impossible-state guards](impossible-state-guards.md) — Editor VMs guard states modal windows rule out (null map, missing layer); propose Single/!

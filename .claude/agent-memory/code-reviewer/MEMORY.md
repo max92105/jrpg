@@ -5,4 +5,5 @@
 - [Stale comments](stale-size-comments.md) — sizing, moved drawing, a newly conditional call or a renamed file leave old sizes/places/names; grep old wording
 - [Last review](last-review.md) — slice, round and finding status of the latest review; read first to apply re-review rules
 - [Detached comments](detached-comments.md) — a member inserted under, or removed from under, a comment leaves it describing the wrong code
+- [Stale derived UI text](stale-derived-ui-text.md) — a note set at an action (pick note) not reset when the lock/layer/object it describes changes
 - [Lax test JSON readers](lax-test-json-readers.md) — test-only manifest readers skip required/nullable checks; ContentJsonOptions.Strict exists

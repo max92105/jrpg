@@ -5,16 +5,16 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-10-map-fixes-banner-and-folders, slice UO1 (Ctrl + click again picks the next object under,
-decisions 523, 524), 2026-11-10. Round 1. Verdict: ready to commit.
+Plan 2026-11-10-map-fixes-banner-and-folders, slice UO2 (Dim and lock other layers, decisions 522, 525), 2026-11-10.
+Round 1. Verdict: ready to commit.
 
-- Open (Warning): ObjectPicking.cs:423-431 the note and Next under survive a move of the picked object (Shift + drag,
-  arrows, panel Apply, undo): "bench_1 selected: 2 of 2 objects here" stays after the bench left the spot; reset on
-  the open map's change too, plus one test.
-- Open (Warning): content/map-layouts/start.json (two new trees, tree_2_3 moved/relayered) is hand-check residue
-  outside the slice; keep it out of the commit or note it.
-- Open (Suggestion): ObjectPlacingViewModel.cs:161-163 doc says "next one under it when the top one is already the
-  one selected"; it is the next under whichever selected object is in the stack.
-- Open (Suggestion): `is [var top, ..] ? top : null` x3 (TopAt, ObjectAt, GrabbedObjectAt) where FirstOrDefault()
-  says it; PickAt's `hits.ToList().IndexOf(picked)` re-finds the index NextUnder already had.
-- DO2 items: not carried (new slice; DO2 committed).
+- Open (Warning): ObjectPicking.cs:47-52 the "Locked: only layer z 2 takes clicks" note (and "2 of 3 objects here")
+  stays after the box is unticked or the layer changed; Forget() on Layer's Z/AreOtherLayersDimmed change + one test.
+- Open (Warning): PlacedObjectHits.cs:34 TopAt has no production caller left (EventEditingViewModel moved to AllAt);
+  only ObjectEditingTests 162-180 use it. Delete it, port the tests to AllAt.
+- Open (Suggestion): EventEditingViewModel.cs:13-14 empty `<param>` tags; fill them or drop the `layer` one.
+- Open (Suggestion): LockNoteAt builds note text in ObjectPlacingViewModel while ObjectPicking owns the other note
+  text, and scans AllObjectsAt twice; a bool `IsLockHidingObjectsAt` + text in ObjectPicking.
+- Open (Suggestion): a locked-layer object selected before ticking stays selected (Delete, arrows, panel still act).
+- UO1 items: note-survives-move fixed (Picking.Forget at ObjectPlacingViewModel.cs:251); start.json residue is the
+  developer's hand test, excluded by the caller; the two UO1 Suggestions not carried (new slice).

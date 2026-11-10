@@ -4,49 +4,18 @@ using Jrpg.Core.Maps;
 namespace Jrpg.Game.Exploration;
 
 /// <summary>
-/// The map's tile layers, placed objects, their canopies and the player in the order Core's <see cref="DrawOrderKey"/>
-/// gives, so the game draws what the editor will show. Rebuilding reuses its storage: nothing is allocated once it has grown.
+/// The map's parts in Core's <see cref="MapDrawOrder"/>, the player included, rebuilt every update into the same
+/// storage: nothing is allocated once it has grown.
 /// </summary>
 internal sealed class MapDrawList
 {
-    // The sprite is one cell tall and centered on the player's position, so the feet are half a cell below it.
-    private const double PlayerFeetBelowPosition = 0.5;
+    private readonly List<MapDrawItem> _items = [];
 
-    private static readonly IComparer<Drawable> _byDrawOrder = Comparer<Drawable>.Create((left, right) => left.Key.CompareTo(right.Key));
-
-    private readonly List<Drawable> _drawables = [];
-
-    public IReadOnlyList<Drawable> Drawables => _drawables;
+    public IReadOnlyList<MapDrawItem> Items => _items;
 
     /// <param name="layout">The map whose layers and placed objects are drawn.</param>
     /// <param name="currentDefinitionOf">What each placed object is now, after any swap, for its height and canopy.</param>
     /// <param name="playerPosition">The player's position, in cells.</param>
-    public void Rebuild(MapLayout layout, Func<PlacedObject, ObjectDefinition> currentDefinitionOf, Point2D playerPosition)
-    {
-        _drawables.Clear();
-        for (var index = 0; index < layout.Layers.Count; index++)
-        {
-            _drawables.Add(new Drawable(DrawOrderKey.ForTile(layout.Layers[index].Z, index), DrawableKind.Layer, index));
-        }
-
-        for (var index = 0; index < layout.Objects.Count; index++)
-        {
-            // An object sorts as a whole by its bottom edge, so overlapping objects never interleave their tiles.
-            var placed = layout.Objects[index];
-            var definition = currentDefinitionOf(placed);
-            var baseY = placed.Position.Y + definition.Height;
-            _drawables.Add(new Drawable(DrawOrderKey.ForSprite(placed.Z, baseY, index), DrawableKind.Object, index));
-            // An object already on or above the canopy layer covers the player whole; a canopy would only tie with its body.
-            var canopyZ = MapLayers.CanopyZOf(placed.Z);
-            if (definition.AbovePlayerZones.Count > 0 && canopyZ > placed.Z)
-            {
-                _drawables.Add(new Drawable(DrawOrderKey.ForSprite(canopyZ, baseY, index), DrawableKind.Canopy, index));
-            }
-        }
-
-        // After every object in insertion order, so a tie with an object's base never depends on the sort.
-        var playerKey = DrawOrderKey.ForSprite(MapLayers.PlayerZ, playerPosition.Y + PlayerFeetBelowPosition, layout.Objects.Count);
-        _drawables.Add(new Drawable(playerKey, DrawableKind.Player, 0));
-        _drawables.Sort(_byDrawOrder);
-    }
+    public void Rebuild(MapLayout layout, Func<PlacedObject, ObjectDefinition> currentDefinitionOf, Point2D playerPosition) =>
+        MapDrawOrder.FillWithPlayer(_items, layout, currentDefinitionOf, playerPosition);
 }

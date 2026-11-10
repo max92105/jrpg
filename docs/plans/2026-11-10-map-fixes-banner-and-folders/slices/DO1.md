@@ -27,5 +27,7 @@ The game's map, the editor's map and the editor's hit test draw and pick from on
 - New in `MapDrawOrderTests`: `Fill_NoPlayer_HasNoPlayerItem`; `SpriteKeyOf_LowerBase_SortsBefore` (objects set up in the opposite order).
 - Existing `MapDrawingTests` and the hits tests pass unchanged.
 
+- **Done, with deviations:** `MapDrawItemKind.Object` is `ObjectBody` (CA1720 refuses a member named `Object`). `MapDrawListTests` keeps `Rebuild_TwoMaps_DrawablesFollowTheLastMap` over layers alone; the nine moved tests and the two new ones are in `MapDrawOrderTests`. `MapDrawOrder.BaseOf` holds the one bottom-edge formula the body and the canopy keys share. From the review: the sort takes a `Comparison` delegate, since `List.Sort(IComparer)` allocated one per update (the old game code did too, 64 bytes measured); `MapDrawList.Drawables` is `Items`.
+
 ## Verify by hand
 Before/after screenshots of one repository map in the game (F12 capture) and the editor (same map, Fit): identical. Toggle View > Dim other layers in the editor: the same parts dim as before.

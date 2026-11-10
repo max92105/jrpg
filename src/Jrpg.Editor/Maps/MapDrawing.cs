@@ -9,8 +9,8 @@ namespace Jrpg.Editor.Maps;
 
 /// <summary>
 /// Draws a map as the game does (ADR 0012): tile layers, objects and their canopies in Core's
-/// <see cref="DrawOrderKey"/> order, at the game's 48 pixels per cell. Canopies are the object's tiles again, clipped
-/// to its above-player zones.
+/// <see cref="MapDrawOrder"/>, at the game's 48 pixels per cell. Canopies are the object's tiles again, clipped to its
+/// above-player zones.
 /// </summary>
 internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
 {
@@ -24,8 +24,6 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
     /// The lines between cells, faint enough to read the tiles through; the object composer's canvas shares them.
     /// </summary>
     public static SolidColorBrush GridBrush { get; } = CreateGridBrush();
-
-    private static readonly IComparer<MapPart> _byDrawOrder = Comparer<MapPart>.Create((left, right) => left.Key.CompareTo(right.Key));
 
     /// <param name="layout">The map to draw.</param>
     /// <param name="focusZ">When set, everything on another Z is drawn faint, to show what the layer at this Z holds.</param>
@@ -118,43 +116,24 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
         return lines;
     }
 
-    private List<MapPart> PartsInDrawOrder(MapLayout layout)
+    private List<MapDrawItem> PartsInDrawOrder(MapLayout layout)
     {
-        var parts = new List<MapPart>();
-        for (var index = 0; index < layout.Layers.Count; index++)
-        {
-            parts.Add(new MapPart(DrawOrderKey.ForTile(layout.Layers[index].Z, index), layout.Layers[index].Z, MapPartKind.Layer, index));
-        }
-
-        for (var index = 0; index < layout.Objects.Count; index++)
-        {
-            var placed = layout.Objects[index];
-            var definition = catalog.Current.Objects[placed.ObjectId];
-            var baseY = placed.Position.Y + definition.Height;
-            parts.Add(new MapPart(DrawOrderKey.ForSprite(placed.Z, baseY, index), placed.Z, MapPartKind.Object, index));
-
-            var canopyZ = MapLayers.CanopyZOf(placed.Z);
-            if (definition.AbovePlayerZones.Count > 0 && canopyZ > placed.Z)
-            {
-                parts.Add(new MapPart(DrawOrderKey.ForSprite(canopyZ, baseY, index), canopyZ, MapPartKind.Canopy, index));
-            }
-        }
-
-        parts.Sort(_byDrawOrder);
+        var parts = new List<MapDrawItem>();
+        MapDrawOrder.Fill(parts, layout, placed => catalog.Current.Objects[placed.ObjectId]);
         return parts;
     }
 
-    private void DrawPart(DrawingContext context, MapLayout layout, MapPart part)
+    private void DrawPart(DrawingContext context, MapLayout layout, MapDrawItem part)
     {
         switch (part.Kind)
         {
-            case MapPartKind.Layer:
+            case MapDrawItemKind.Layer:
                 DrawLayer(context, layout, layout.Layers[part.Index]);
                 break;
-            case MapPartKind.Object:
+            case MapDrawItemKind.ObjectBody:
                 DrawObject(context, layout.Objects[part.Index]);
                 break;
-            case MapPartKind.Canopy:
+            case MapDrawItemKind.Canopy:
                 DrawCanopy(context, layout.Objects[part.Index]);
                 break;
         }
@@ -222,13 +201,4 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
     }
 
     private static Rect CellRect(double x, double y) => new(x * CellPixels, y * CellPixels, CellPixels, CellPixels);
-
-    private enum MapPartKind
-    {
-        Layer,
-        Object,
-        Canopy,
-    }
-
-    private readonly record struct MapPart(DrawOrderKey Key, int Z, MapPartKind Kind, int Index);
 }

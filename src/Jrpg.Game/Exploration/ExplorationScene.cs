@@ -158,23 +158,23 @@ internal sealed class ExplorationScene : IScene
     private void DrawMap(SpriteBatch batch, TextureLibrary textures)
     {
         var origin = _camera.Origin;
-        var drawables = _drawList.Drawables;
-        for (var index = 0; index < drawables.Count; index++)
+        var items = _drawList.Items;
+        for (var index = 0; index < items.Count; index++)
         {
-            var drawable = drawables[index];
-            switch (drawable.Kind)
+            var item = items[index];
+            switch (item.Kind)
             {
-                case DrawableKind.Layer:
-                    _view.DrawLayer(batch, textures, _map.Layout.Layers[drawable.Index], origin);
+                case MapDrawItemKind.Layer:
+                    _view.DrawLayer(batch, textures, _map.Layout.Layers[item.Index], origin);
                     break;
-                case DrawableKind.Object:
-                    _view.DrawObject(batch, textures, _map.Layout.Objects[drawable.Index], origin);
+                case MapDrawItemKind.ObjectBody:
+                    _view.DrawObject(batch, textures, _map.Layout.Objects[item.Index], origin);
                     break;
-                case DrawableKind.Canopy:
-                    var placed = _map.Layout.Objects[drawable.Index];
+                case MapDrawItemKind.Canopy:
+                    var placed = _map.Layout.Objects[item.Index];
                     _view.DrawCanopy(batch, _art.Canopies.CanopyOf(_currentDefinitionOf(placed).Id, textures), placed, origin);
                     break;
-                case DrawableKind.Player:
+                case MapDrawItemKind.Player:
                     DrawPlayer(batch, textures, origin);
                     break;
             }

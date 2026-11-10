@@ -8,7 +8,7 @@ internal static class PlacedObjectHits
 {
     /// <summary>
     /// The object drawn on top at a point: one of its tiles covers it, or its NPC sprite does; among several, the one
-    /// drawn last in Core's <see cref="DrawOrderKey"/> order. Null when no object is there.
+    /// drawn last in Core's <see cref="MapDrawOrder"/>. Null when no object is there.
     /// </summary>
     public static PlacedObject? TopAt(MapLayout map, Point2D point, IReadOnlyDictionary<string, ObjectDefinition> definitions)
     {
@@ -18,7 +18,7 @@ internal static class PlacedObjectHits
         {
             var placed = map.Objects[index];
             var definition = definitions[placed.ObjectId];
-            var key = DrawOrderKey.ForSprite(placed.Z, placed.Position.Y + definition.Height, index);
+            var key = MapDrawOrder.SpriteKeyOf(placed, definition, index);
             if (Covers(placed, definition, point) && (topKey is null || key > topKey))
             {
                 (top, topKey) = (placed, key);

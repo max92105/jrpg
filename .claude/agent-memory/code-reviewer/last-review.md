@@ -5,18 +5,16 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-10-map-fixes-banner-and-folders, slice MB3 (the banner's look: serif name, hairline, LV label + number,
-gradient band, slide; decisions 527-529), 2026-11-10. Round 1. Verdict: fix the Critical, then commit.
+Plan 2026-11-10-map-fixes-banner-and-folders, slice ML0 (moves only: the map list into Shell/MapListPanel), 2026-11-10.
+Round 1. Verdict: ready to commit.
 
-- Open (Critical): src/Jrpg.Game/Exploration/MapBannerView.cs:98-104, the hairline is drawn only after the no-level
-  return, and _bandHeight (line 79) leaves its room out; the slice's goal and hand check 2 want name + hairline on a
-  map without a level.
-- Open (Warning): MapBannerView.cs:57,78,92,95, `BandWidth` is text + 2 * padding but the drawn band is text + padding
-  + MapBannerRight (to the screen edge); Draw adds the padding then subtracts it back. Store the text width instead.
-- Open (Warning): design.md tunables row 14 still names `map_banner_level` (removed); no rows for padding, label gap,
-  band gradient that the slice asked for.
-- Open (Suggestion): fractional slide moves the text by sub-pixels while the band/hairline truncate (1 px shimmer);
-  round the slide.
-- Open (Suggestion): the hairline's 1 px height is a bare literal in Update and twice in Draw.
-- MB2 items fixed: StartMapScenarios SceneOf doc comment clean; ExplorationSceneBannerTests read BannerView.NameLine.
+- Open (Warning): docs/map.md:80 Shell row still describes `MainWindow.MapSwitching` as "(the map list, its filter, and
+  a warp's Go to ...)"; the list and filter now live in `MapListPanel`. Reword to "(the open map's row kept selected,
+  Find reaching the filter, and a warp's Go to ...)".
+- Open (Suggestion): MapListPanel.xaml.cs `_selectedMapId` holds the open map's id (the fallback for a refused switch),
+  not the list's selection; `_openMapId` says so.
+- Open (Suggestion): MainWindow.MapSwitching.cs:10 `<see cref="MapListPanel"/>` inside MainWindow binds to the field
+  of the same name, not the type; `Shell.MapListPanel` or plain text.
+- MB3 items all fixed (hairline drawn before the no-level return, TextWidth, rounded slide, HairlineHeight constant,
+  design.md tunables no longer name map_banner_level).
 - start.json residue: the developer's hand test, excluded by the caller.

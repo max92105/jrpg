@@ -24,7 +24,9 @@ call or a rename. These cases slipped past it:
   only the null and zero filters) is missed by every "X, Y and Z" summary of it; grep the last listed field. A mechanic no
   longer read (M2b-1) turns "while the battle uses it" docs false; grep "while ... uses" and the slice id.
 - A responsibility moved to a new type (C1) leaves a neighbour's param doc naming the old owner; C2 left the backlog with
-  `EquipmentPage.Apply` after it moved: grep `<OldOwner>.<MovedMember>` across docs/.
+  `EquipmentPage.Apply` after it moved: grep `<OldOwner>.<MovedMember>` across docs/. ML0 (map list moved into
+  `MapListPanel`) added the panel to map.md's Shell row but left `MainWindow.MapSwitching` described as "the map list,
+  its filter": reread the old owner's own parenthetical in the same row.
 - A removed member leaves its noun in the type's own param docs (G1b-2: "the take hint and the refusal").
 - A child's spacing change (ST1a) leaves the parent's reserved-height arithmetic on the old rows; grep the parent for the
   child's old numbers. Sizes and file counts a doc states (C3: "split in two files" with four present) need rechecking.

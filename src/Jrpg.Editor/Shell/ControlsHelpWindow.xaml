@@ -101,6 +101,7 @@
         Click an object: edit its events. Presets: Chest, Door, Door you open, Sign, and Talk (an NPC: type its speaker and lines).<LineBreak />
         Click a cell without an object: edit the event that runs when the player walks onto it.<LineBreak />
         Right click a cell without an object: remove its event.<LineBreak />
+        Ctrl + click: the event of the cell under any object (a new one when it has none); Ctrl + right click: remove it (a plain right click never removes an event hidden under an object).<LineBreak />
         A warp step's Pick...: choose the map on the left, click the arrival cell on its picture (double-click: choose and OK); Ctrl + wheel or − and + zoom it. A cell the player can't stand on, or holding a walk-into event, is warned about.<LineBreak />
         A warp step's Go to: keep the events, then show the destination map centered on its cell (gold square). Alt+Left comes back.<LineBreak />
         On the map, in every mode: a yellow dot is an event run when pressed, a cyan dot one run when walked into, a cyan square a cell with an event.

@@ -12,8 +12,9 @@ namespace Jrpg.Editor.Shell;
 
 /// <summary>
 /// The window's event mode: a click on an object opens its events, a click on a cell without one opens the cell's, and
-/// a right click removes a cell's. Events carry their markers in every mode: one dot per object event along the
-/// object's top edge from the right, yellow when pressed, cyan when walked into, and a cyan square on a cell with one.
+/// a right click removes a cell's; with Ctrl, the cell under any object: a click opens its event, a right click removes
+/// it (decision 526). Events carry their markers in every mode: one dot per object event along the object's top edge
+/// from the right, yellow when pressed, cyan when walked into, and a cyan square on a cell with one.
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -43,32 +44,63 @@ internal sealed partial class MainWindow
         }
     }
 
-    // Left: the clicked object's events, or the cell's when no object is there. Right: removes the cell's event.
+    // Left: the clicked object's events, or the cell's when no object is there. Right: removes the cell's event. Ctrl
+    // goes to the cell whatever covers it.
     private bool HandleEventButton(MouseButton button, Point2D point)
     {
-        var eventEditing = _viewModel.EventEditing!;
         var cell = GridCell.Containing(point);
+        if (Keyboard.Modifiers == ModifierKeys.Control)
+        {
+            return HandleCellEventButton(button, cell);
+        }
+
         switch (button)
         {
-            case MouseButton.Left when eventEditing.StartEditingAt(point) is { } events:
+            case MouseButton.Left when _viewModel.EventEditing!.StartEditingAt(point) is { } events:
                 EditObjectEvents(events);
                 return true;
-            case MouseButton.Left when eventEditing.StartEditingCellAt(cell) is { } cellEvent:
-                var cellWindow = new CellEventWindow(cellEvent, _drawing!) { Owner = this };
-                if (cellWindow.ShowDialog() == true)
-                {
-                    eventEditing.Apply(cellEvent);
-                    GoToFollowedWarp(cellWindow.FollowedWarp);
-                }
-
-                return true;
+            case MouseButton.Left:
+                return EditCellEventAt(cell);
             // An object hides the cell under it, so its event isn't removed unseen.
             case MouseButton.Right when _viewModel.Placing!.ObjectAt(point) is null:
-                eventEditing.RemoveCellEventAt(cell);
+                _viewModel.EventEditing!.RemoveCellEventAt(cell);
                 return true;
             default:
                 return false;
         }
+    }
+
+    // Ctrl reaches the cell under any object (decision 526): left opens its event, right removes it.
+    private bool HandleCellEventButton(MouseButton button, GridCell cell)
+    {
+        switch (button)
+        {
+            case MouseButton.Left:
+                return EditCellEventAt(cell);
+            case MouseButton.Right:
+                _viewModel.EventEditing!.RemoveCellEventAt(cell);
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    // The cell's dialog, Go to included; false off the map.
+    private bool EditCellEventAt(GridCell cell)
+    {
+        if (_viewModel.EventEditing!.StartEditingCellAt(cell) is not { } cellEvent)
+        {
+            return false;
+        }
+
+        var cellWindow = new CellEventWindow(cellEvent, _drawing!) { Owner = this };
+        if (cellWindow.ShowDialog() == true)
+        {
+            _viewModel.EventEditing.Apply(cellEvent);
+            GoToFollowedWarp(cellWindow.FollowedWarp);
+        }
+
+        return true;
     }
 
     private void DrawEventMarks()

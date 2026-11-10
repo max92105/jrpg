@@ -19,6 +19,8 @@ The routing is window code (no new type, `.claude/rules/editor.md`); the rules i
 - `RemoveCellEventAt_CellUnderAnObject_RemovesIt`.
 - `RemoveCellEventAt_CellUnderAnObject_Undo_PutsItBack`.
 
+- **Done, with deviations:** `HandleEventButton` reads Ctrl once and hands the cell to `HandleCellEventButton`; `EditCellEventAt` holds the cell dialog both paths open. Cyclomatic complexity: `HandleEventButton` about 8 before (three guarded cases, the dialog's `if` inside one), about 7 after, the two helpers 3 each. The tests are in the new `EventEditingCellTests` (the existing file was at 231 lines, past 250 with them), on the interior map's cell (4, 9) with a chest placed over it.
+
 ## Verify by hand
 1. Events tab; click a free cell, give it a dialogue step; OK (a cyan or gold square marks it).
 2. Objects tab; place a crate over that cell.

@@ -4,5 +4,5 @@ namespace Jrpg.Core.Maps;
 /// <param name="Key">Where the part sorts.</param>
 /// <param name="Kind">What it is.</param>
 /// <param name="Index">The layer's or the placed object's index in the map, 0 for the player.</param>
-/// <param name="Z">The layer the part belongs to, which the editor dims by: a canopy's is the canopy layer.</param>
+/// <param name="Z">The layer the part belongs to, which the editor dims by; a canopy's is its object's (522).</param>
 public readonly record struct MapDrawItem(DrawOrderKey Key, MapDrawItemKind Kind, int Index, int Z);

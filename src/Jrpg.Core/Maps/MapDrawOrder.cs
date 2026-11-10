@@ -64,11 +64,10 @@ public static class MapDrawOrder
             var definition = definitionOf(placed);
             into.Add(new MapDrawItem(SpriteKeyOf(placed, definition, index), MapDrawItemKind.ObjectBody, index, placed.Z));
             // An object already on or above the canopy layer covers the player whole: a canopy there would only tie
-            // with the body it comes from.
-            var canopyZ = MapLayers.CanopyZOf(placed.Z);
-            if (definition.AbovePlayerZones.Count > 0 && canopyZ > placed.Z)
+            // with the body it comes from. The item belongs to the object's layer (decision 522).
+            if (definition.AbovePlayerZones.Count > 0 && MapLayers.CanopyZOf(placed.Z) > placed.Z)
             {
-                into.Add(new MapDrawItem(DrawOrderKey.ForSprite(canopyZ, BaseOf(placed, definition), index), MapDrawItemKind.Canopy, index, canopyZ));
+                into.Add(new MapDrawItem(DrawOrderKey.ForCanopy(placed.Z, BaseOf(placed, definition), index), MapDrawItemKind.Canopy, index, placed.Z));
             }
         }
     }

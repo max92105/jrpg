@@ -33,6 +33,15 @@ An object on a higher layer draws over an object on a lower layer, canopies incl
 
 Throwaway, deleted in this slice: `Core.Tests` or `Data.Tests` `RepositoryCanopyFlipsTests.ListFlippedPairs` (in `Data.Tests`, which loads the repository's `content` through the source tree's content root, `AssemblyMetadata ContentRoot`): for each repository map, each pair of placed objects that both have above-player zones, on different layers, whose rectangles overlap, and whose canopy order differs between the old key (base only) and `ForCanopy`; it writes "map, uid A (z, base), uid B (z, base), overlap cells" through `ITestOutputHelper` and always passes. Reads layouts and the object catalog only, never an image (decision 438).
 
+- **Done, with deviations:** three of the five new `MapDrawOrderTests` failed on the old rule first (`Fill_TreeOnMinus3HouseOnMinus4HouseLower_DrawsTheLeavesOverTheRoof`: the canopies came 0 then 1; `Fill_TreeOnMinus5InFrontOfHouseOnMinus4_LeavesUnderTheRoof`; `Fill_CanopyItem_TakesItsObjectsLayer`: 5 for -3); the same-layer and the behind-the-house tests passed on both rules, as they should. The throwaway `RepositoryCanopyFlipsTests` ran once (it computes both rules itself) and was deleted in this slice; its output, every pair on the start map, bases and overlaps in cells:
+  - house_2 (z -4, base 13.96), tree_2_2 (z -3, base 11), overlap 1.96 x 6
+  - house_2 (z -4, base 13.96), tree_2_3 (z -3, base 8), overlap 5 x 3.04
+  - house_3 (z -5, base 10.02), tree_2_1 (z -4, base 5), overlap 3.95 x 3.98
+  - tree_1_1 (z -4, base 10.16), tree_2_3 (z -3, base 8), overlap 0.01 x 4.84
+  - tree_1_9 (z -3, base 41), house_2_3 (z -4, base 47.05), overlap 3.76 x 2.95
+
+  `MapDrawingTests.Draw_FocusOnObjectsLayer_CanopyNotDimmed` observes the dimming through the drawing's opacity groups (one dimmed group, the ground layer's). `DrawOrderKey` keeps its two Zs in a private `Layers(DrawnOn, Origin)` record, since verify refuses a fifth constructor parameter. From the review: an object placed on the canopy layer itself (the editor's "Above player" preset, which no repository map uses yet) now draws over every canopy from a lower layer whatever the bases, where it sorted by base before; that is decision 521's rule, pinned by `Fill_ObjectOnTheCanopyLayer_DrawsOverACanopyFromBelow`.
+
 ## Verify by hand
 1. For each pair in the Done note's flip list: open the map, find the two objects at the listed cells, compare with a capture taken before the slice (F12 in the game, or the editor at 100 %): the higher layer's leaves now draw over the lower layer's roof.
 2. On the start map (houses on -4 and -5, trees on -3 and -4): Objects tab, Layer box "-3" (type it in the z box), place a tree with its leaves over the roof of a house on -4 whose bottom edge is lower than the tree's: the leaves draw over the roof (before: under it).

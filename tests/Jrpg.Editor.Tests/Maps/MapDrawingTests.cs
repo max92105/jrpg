@@ -1,4 +1,5 @@
 using System.Windows.Media;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
 using Jrpg.Data.Content;
@@ -46,6 +47,27 @@ public sealed class MapDrawingTests
         var drawn = drawing.Children.OfType<ImageDrawing>().ToList();
         Assert.Equal(2, drawn.Count);
         Assert.Same(_images.CellImageOf(new SheetCell(still[1].SheetId, still[1].Column, still[1].Row)), drawn[1].ImageSource);
+    }
+
+    // Focus on the tree's layer: the ground layer dims, the tree's body and its canopy stay bright (decision 522).
+    [Fact]
+    public void Draw_FocusOnObjectsLayer_CanopyNotDimmed()
+    {
+        var tree = OneTileObject(_tile.Id) with { Id = "canopy_tree", AbovePlayerZones = [[new Point2D(0, 0), new Point2D(1, 0), new Point2D(1, 1), new Point2D(0, 1)]] };
+        _draft.SetObject(tree);
+        var layout = new MapLayout
+        {
+            Id = "test_map",
+            Width = 1,
+            Height = 1,
+            Layers = [new TileLayer { Z = -5, Rows = [[_tile.Id]] }],
+            Objects = [new PlacedObject { Uid = "tree_1", ObjectId = "canopy_tree", Position = new Point2D(0, 0), Z = -3 }],
+        };
+
+        var drawing = (DrawingGroup)_drawing.Draw(layout, focusZ: -3).Drawing;
+
+        var dimmed = Assert.Single(drawing.Children.OfType<DrawingGroup>(), group => group.Opacity < 1);
+        Assert.Single(dimmed.Children.OfType<ImageDrawing>());
     }
 
     [Fact]

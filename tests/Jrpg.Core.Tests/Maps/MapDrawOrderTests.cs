@@ -133,6 +133,77 @@ public sealed class MapDrawOrderTests
         Assert.Equal([(MapDrawItemKind.ObjectBody, 0), (MapDrawItemKind.Player, 0)], KindsAndIndexes());
     }
 
+    // The developer's maps: a house on -4 whose bottom edge is lower on screen than a tree's on -3 (decision 521). The
+    // tree is listed first, so the order comes from the rule.
+    [Fact]
+    public void Fill_TreeOnMinus3HouseOnMinus4HouseLower_DrawsTheLeavesOverTheRoof()
+    {
+        var layout = Layout(layers: [-5], CanopyTree(y: 3, z: -3), CanopyTree(y: 4, z: -4));
+
+        MapDrawOrder.Fill(_items, layout, PlacedDefinitionOf);
+
+        Assert.Equal(
+            [(MapDrawItemKind.Layer, 0), (MapDrawItemKind.ObjectBody, 1), (MapDrawItemKind.ObjectBody, 0), (MapDrawItemKind.Canopy, 1), (MapDrawItemKind.Canopy, 0)],
+            KindsAndIndexes());
+    }
+
+    [Fact]
+    public void Fill_TreeOnMinus5InFrontOfHouseOnMinus4_LeavesUnderTheRoof()
+    {
+        var layout = Layout(layers: [], CanopyTree(y: 4, z: -4), CanopyTree(y: 5, z: -5));
+
+        MapDrawOrder.Fill(_items, layout, PlacedDefinitionOf);
+
+        Assert.Equal(
+            [(MapDrawItemKind.ObjectBody, 1), (MapDrawItemKind.ObjectBody, 0), (MapDrawItemKind.Canopy, 1), (MapDrawItemKind.Canopy, 0)],
+            KindsAndIndexes());
+    }
+
+    [Fact]
+    public void Fill_SameLayerCanopies_LowerBaseDrawsLater()
+    {
+        var layout = Layout(layers: [], CanopyTree(y: 6, z: -3), CanopyTree(y: 2, z: -3));
+
+        MapDrawOrder.Fill(_items, layout, PlacedDefinitionOf);
+
+        Assert.Equal(
+            [(MapDrawItemKind.ObjectBody, 1), (MapDrawItemKind.ObjectBody, 0), (MapDrawItemKind.Canopy, 1), (MapDrawItemKind.Canopy, 0)],
+            KindsAndIndexes());
+    }
+
+    // The limit decision 521 keeps: a canopy draws over the player, so over every body under the canopy layer.
+    [Fact]
+    public void Fill_TreeBehindHouseOnLowerLayer_LeavesStillAfterTheHousesBody()
+    {
+        var layout = Layout(layers: [], CanopyTree(y: 4, z: -4), CanopyTree(y: 1, z: -5));
+
+        MapDrawOrder.Fill(_items, layout, PlacedDefinitionOf);
+
+        Assert.Equal(
+            [(MapDrawItemKind.ObjectBody, 1), (MapDrawItemKind.ObjectBody, 0), (MapDrawItemKind.Canopy, 1), (MapDrawItemKind.Canopy, 0)],
+            KindsAndIndexes());
+    }
+
+    // An object on the canopy layer itself is above everything from below, a lower tree's leaves included, whatever the
+    // bases: the roof is listed first with the smaller base, which alone would draw it first.
+    [Fact]
+    public void Fill_ObjectOnTheCanopyLayer_DrawsOverACanopyFromBelow()
+    {
+        var layout = Layout(layers: [], Tree(y: -1, z: MapLayers.AbovePlayerZ), CanopyTree(y: 4, z: -4));
+
+        MapDrawOrder.Fill(_items, layout, PlacedDefinitionOf);
+
+        Assert.Equal([(MapDrawItemKind.ObjectBody, 1), (MapDrawItemKind.Canopy, 1), (MapDrawItemKind.ObjectBody, 0)], KindsAndIndexes());
+    }
+
+    [Fact]
+    public void Fill_CanopyItem_TakesItsObjectsLayer()
+    {
+        MapDrawOrder.Fill(_items, Layout(layers: [], CanopyTree(y: 0, z: -3)), PlacedDefinitionOf);
+
+        Assert.Equal(-3, _items.Single(item => item.Kind == MapDrawItemKind.Canopy).Z);
+    }
+
     [Fact]
     public void Fill_NoPlayer_HasNoPlayerItem()
     {
@@ -158,6 +229,8 @@ public sealed class MapDrawOrderTests
 
     private static PlacedObject Tree(double y, int z) =>
         new() { Uid = $"tree@{y}", ObjectId = "tree", Position = new Point2D(0, y), Z = z };
+
+    private static PlacedObject CanopyTree(double y, int z) => Tree(y, z) with { ObjectId = "canopy_tree" };
 
     private static MapLayout Layout(int[] layers, params PlacedObject[] objects) => new()
     {

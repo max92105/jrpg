@@ -71,7 +71,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 2: draw order
 - [x] **DO1. Moves only: one draw order in Core (`MapDrawOrder`, `MapDrawItem`), read by the game's `MapDrawList`, the editor's `MapDrawing` and `PlacedObjectHits`** (Core + Game + Editor, about 150 lines changed, 140 lines of tests moved) → [slices/DO1.md](slices/DO1.md)
 - [x] ADR 0041: one draw order and the canopy's layer. Write it from the entry under "ADRs" below (decisions 520-522).
-- [ ] **DO2. Canopies keep their object's layer: `DrawOrderKey.ForCanopy`; the editor dims a canopy with its object; a throwaway listing of the repository's flipped pairs** (Core + Editor, about 150 lines, the throwaway test deleted) → [slices/DO2.md](slices/DO2.md)
+- [x] **DO2. Canopies keep their object's layer: `DrawOrderKey.ForCanopy`; the editor dims a canopy with its object; a throwaway listing of the repository's flipped pairs** (Core + Editor, about 150 lines, the throwaway test deleted) → [slices/DO2.md](slices/DO2.md)
 
 ### Phase 3: reaching covered things
 - [ ] **UO1. Ctrl + click again selects the next object under the point, ranked as drawn (a roof's zone counts as the roof); Next under in the Placed object panel; Shift + drag grabs the selected object first** (Core + Editor, about 215 lines) → [slices/UO1.md](slices/UO1.md)

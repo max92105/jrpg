@@ -31,6 +31,25 @@ public sealed class DrawOrderKeyTests
         Assert.True(player.CompareTo(treeInFront) < 0);
     }
 
+    // The canopy from the higher layer has the lower base, which alone would draw it first.
+    [Fact]
+    public void CompareTo_SameZSpritesFromDifferentLayers_HigherOriginDrawsLater()
+    {
+        var fromMinus3 = DrawOrderKey.ForCanopy(objectZ: -3, baseY: 7, order: 0);
+        var fromMinus4 = DrawOrderKey.ForCanopy(objectZ: -4, baseY: 8, order: 1);
+
+        Assert.True(fromMinus4.CompareTo(fromMinus3) < 0);
+    }
+
+    [Fact]
+    public void CompareTo_TileAndCanopyOnOneZ_TileFirst()
+    {
+        var canopy = DrawOrderKey.ForCanopy(objectZ: -3, baseY: 0, order: 0);
+        var roofTiles = DrawOrderKey.ForTile(z: MapLayers.AbovePlayerZ, order: 9);
+
+        Assert.True(roofTiles.CompareTo(canopy) < 0);
+    }
+
     [Fact]
     public void CompareTo_TilesSameZ_KeepInsertionOrder()
     {

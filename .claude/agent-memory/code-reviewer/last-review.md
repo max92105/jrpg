@@ -5,13 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-10-map-fixes-banner-and-folders, slice AL2 (map shows the entry banner, decision 528), 2026-11-10. Round 1.
-Verdict: ready to commit. No Critical.
+Plan 2026-11-10-map-fixes-banner-and-folders, slice MB1 (MapBanner presenter, decisions 528, 529), 2026-11-10. Round 1.
+Verdict: fix the Critical, then commit.
 
-- Open (Warning): AbsentWhenTrueFilter.SkipTrueOptionalFields is the third copy of the Null/Zero filters' loop (only
-  the predicate differs); share one loop taking the table and the absent test, keep the three tables.
-- Open (Suggestion): MainViewModel.TryApplySettings summary (~line 229-230) lists the fields applied without the banner.
-- Open (Suggestion): docs/map.md Content line (47) names the null and zero filters, not AbsentWhenTrueFilter.
-- AL1 items fixed: PropertyChanged tests on size/odds exist, TryApplySettings names the area level, window summary
-  lists the level, the extra Trim before TypedCounts.Parse is gone.
+- Open (Critical): MapBannerTests.Enter_SameMapAgain_DoesNotRestart asserts Opacity < before; a restart gives 0, also
+  < before, so the test passes with the id check deleted. Assert InRange(Opacity, >0, <before).
+- Open (Warning): no test of a same-map Enter after the banner ended (Shown null); a check against Shown?.Id instead of
+  _lastEnteredId would re-show it on every in-town warp and no test fails.
+- Open (Suggestion): MapBanner.WaitTime summary says the warp's fade from black finishes during the wait; the class
+  summary (and design) say the clock doesn't move while the warp's event runs, so the fade is already over.
+- AL2 items fixed: filters share OptionalFieldFilter.SkipWhen, TryApplySettings summary names the banner, docs/map.md
+  line 47 names AbsentWhenTrueFilter.
 - start.json residue: the developer's hand test, excluded by the caller.

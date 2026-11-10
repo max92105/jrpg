@@ -16,7 +16,7 @@ metadata:
 - **fixture doesn't reach the scenario** (part 2 4a, 5b, slice 7, map flows MO1: an object moved out of the selection rectangle): coordinates, keys or identical inputs make the named case never happen; trace the fixture.
 - **single recipient / neutral rules / fixture default** (battle C1, stats M1a, M2a): a total equals a share, a multiplier runs at 1, a stat defaults to 0; use two recipients and a non-neutral value.
 - **stale equals expected** (demo G1a, gold L2b): the "refreshed" value was already the expected one; start from a state where it differs, one test per cache key.
-- **same observable** (gold I2b, B3): two outcomes look alike through the assertion used (`IsShowingMessage`, "a consumable row"); assert the id or value only the right outcome has.
+- **same observable** (gold I2b, B3): two outcomes look alike through the assertion used (`IsShowingMessage`, "a consumable row"); assert the id or value only the right outcome has. Also a one-sided "keeps falling" (`< before`) that a reset to 0 meets too (banner MB1): bound both sides.
 - **loop exit restated** (battle B1b): asserting the loop's own exit condition; ask what else differs.
 - **cache by reference** (demo I1): `Assert.Same` on a value the runtime interns anyway.
 - **constant oracle** (stats P3b, quests E3): asserting `Cap * 10`, or a list equal to the static it was set from, keeps green when the values change; pin the literals.

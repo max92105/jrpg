@@ -81,7 +81,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 ### Phase 4: area level and banner
 - [x] **AL1. `MapSettings.AreaLevel`: `areaLevel` in map settings, validated, left out while null; the Map settings window's Area level box; `MapSettingsViewModel.Problem` joining the dialog's problems** (Core + Data + Editor, about 185 lines) → [slices/AL1.md](slices/AL1.md)
 - [x] **AL2. `MapSettings.ShowsBanner`: `showsBanner` in map settings, true by default and left out while true; the Map settings window's "Show banner on entry" box** (Core + Data + Editor, about 150 lines; a sibling of AL1, which would pass 250 with it) → [slices/AL2.md](slices/AL2.md)
-- [ ] **MB1. `MapBanner`: which map's name and level show and how opaque, from entering a map (another one than the last, whose settings show the banner) through its wait, fade in, hold and fade out** (Game, about 185 lines) → [slices/MB1.md](slices/MB1.md)
+- [x] **MB1. `MapBanner`: which map's name and level show and how opaque, from entering a map (another one than the last, whose settings show the banner) through its wait, fade in, hold and fade out** (Game, about 185 lines) → [slices/MB1.md](slices/MB1.md)
 - [ ] **MB2. The banner drawn plain at the top right, waiting while an event runs: `MapBannerView`, `FieldOverlays` in `ExplorationScene`, the level line from `ui.json`** (Game, about 150 raw, 240 at 1.6x) → [slices/MB2.md](slices/MB2.md)
 - [ ] **MB3. The banner's look: serif name, spaced-caps level label and large number, a dark band fading to the left, a short slide** (Game, about 140 raw, 225 at 1.6x) → [slices/MB3.md](slices/MB3.md)
 

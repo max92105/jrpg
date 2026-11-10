@@ -31,5 +31,7 @@ None outside the new type: the scene calls it in MB2.
 - `Enter_FromHiddenMapToShownMap_ShowsIt`.
 - The hold while an event runs is the scene's (MB2 tests it through `ExplorationScene`).
 
+- **Done, with deviations:** a twelfth test pins the fade out's halfway point, the other side of the fade in's; from the review, the same-map test checks both bounds (a restart would read 0) and a thirteenth enters the same map after the banner ended. `Advance` does nothing while nothing is shown, so the clock can't run on for a hidden map.
+
 ## Verify by hand
 Nothing on screen yet; the tests are the check.

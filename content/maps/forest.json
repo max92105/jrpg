@@ -1,6 +1,6 @@
 {
   "id": "forest",
-  "displayName": "Forest",
+  "displayName": "Milestone Outside",
   "musicFile": "forest/loop.wav",
   "randomEncounters": {
     "oneInSteps": 25,

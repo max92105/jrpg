@@ -211,3 +211,8 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Shell/MainWindow.ObjectEditing.cs` lines 24 and 28 mix `Composing?.StartNew()` with `Composing!.TryApply` (OM4 review).
 - `ErasedCells` zips two `Select`s over the same tiles, and `ErasedOn` reads `TileIdAt` three times for one cell (OM4 review).
 - `tests/Jrpg.Editor.Tests/Shell/MainViewModelOpenMapsTests.cs` is at 286 lines after MS2 and `MainViewModelObjectFromMapTests.cs` at 251 after OM4: the next open-maps or object-from-map test goes in a sibling file.
+
+## From the map fixes, banner and folders plan (2026-11-10, at approval)
+
+- A per-placement depth offset for forced perspective on the player's layer (`depthOffset` on a placed object moving the line it sorts by), DO3 of the map fixes plan, if the developer ever hits the case: the developer's houses and trees sit on z -3 to -5, where the player is always in front, so the layer alone is the model.
+- The Placed object panel's Depth offset box and the selected object's sort line drawn dashed, DO4 of the map fixes plan, with DO3, if the developer ever hits the case.

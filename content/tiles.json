@@ -2672,5 +2672,54 @@
     "sheetId": "autumn_forest_bare",
     "column": 1,
     "row": 6
+  },
+  {
+    "id": 383,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 1,
+    "row": 30
+  },
+  {
+    "id": 384,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 2,
+    "row": 30
+  },
+  {
+    "id": 385,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 18,
+    "row": 26
+  },
+  {
+    "id": 386,
+    "isWalkable": true,
+    "sheetId": "home_exteriors_half_timber_v_1",
+    "column": 17,
+    "row": 26
+  },
+  {
+    "id": 387,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_bare",
+    "column": 10,
+    "row": 1
+  },
+  {
+    "id": 388,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 1,
+    "row": 20
+  },
+  {
+    "id": 389,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 0,
+    "row": 2
   }
 ]

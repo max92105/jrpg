@@ -11,7 +11,7 @@ metadata:
 
 - **same-seed-twice** (5a, 5b): two runs compared with each other pass with the randomness removed; pin golden values.
 - **count==count / oracle** (4b, 11g, stats E1, mana T2b): the test rebuilds the production computation; pin a golden prefix instead.
-- **guard clause** (6a, 8, 1b, class-mechanics PL2b, RG1): a `||` clause, a validator message or a `throw` with no test; match each to a test (one theory row per clause).
+- **guard clause** (6a, 8, 1b, class-mechanics PL2b, RG1, map folders MF2: an `IsWithin` clause no sibling folder reaches): a `||` clause, a validator message or a `throw` with no test; match each to a test (one theory row per clause).
 - **boundary** (1b re-review, gold I1): `<=` tested only at the bound, or a range tested only on rejected values (0 and max + 1); test the accepted bounds too.
 - **fixture doesn't reach the scenario** (part 2 4a, 5b, slice 7, map flows MO1: an object moved out of the selection rectangle): coordinates, keys or identical inputs make the named case never happen; trace the fixture.
 - **single recipient / neutral rules / fixture default** (battle C1, stats M1a, M2a): a total equals a share, a multiplier runs at 1, a stat defaults to 0; use two recipients and a non-neutral value.

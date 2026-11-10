@@ -66,6 +66,30 @@ public sealed class ContentWriter(string contentRoot)
     public void WriteMapCatalogsAndMaps(ContentCatalog catalog, IReadOnlyCollection<string> mapIds)
     {
         var writes = CheckedCatalogWrites(catalog);
+        writes.AddRange(CheckedMapWrites(catalog, mapIds));
+        WriteAll(writes);
+    }
+
+    /// <summary>
+    /// Writes the named maps in one go, all or none, after the checks of <see cref="WriteMapCatalogsAndMaps"/> on
+    /// every map and on the named ones' settings; the catalogs are neither checked nor written. The editor's Save
+    /// and Save all (decision 518): each open map is checked as it is now, so two maps valid only together save.
+    /// </summary>
+    /// <param name="content">The content holding the maps to save, each open map in place of its saved one.</param>
+    /// <param name="mapIds">The maps whose files are written; the others are only checked.</param>
+    /// <exception cref="ContentValidationException">
+    /// The game would reject a map; the message names the file, and nothing was written.
+    /// </exception>
+    public void WriteMaps(ContentCatalog content, IReadOnlyCollection<string> mapIds)
+    {
+        CheckLayouts(content);
+        WriteAll(CheckedMapWrites(content, mapIds));
+    }
+
+    // The named maps' two files each, once their settings and the new game's start pass the loader's checks.
+    private List<FileToWrite> CheckedMapWrites(ContentCatalog catalog, IReadOnlyCollection<string> mapIds)
+    {
+        var writes = new List<FileToWrite>();
         var encounterIds = catalog.Encounters.Keys.ToHashSet();
         foreach (var map in mapIds.Select(id => catalog.Maps[id]))
         {
@@ -77,7 +101,7 @@ public sealed class ContentWriter(string contentRoot)
 
         var newGameReferences = new NewGameReferences(catalog.PartyMembers.Keys.ToHashSet(), catalog.Items, catalog.Maps);
         NewGameValidator.Validate(ContentCatalogLoader.NewGameFile, catalog.NewGame, newGameReferences);
-        WriteAll(writes);
+        return writes;
     }
 
     // The catalog files, each sorted by id, once they and every map's layout pass the loader's checks.
@@ -91,12 +115,7 @@ public sealed class ContentWriter(string contentRoot)
         TileCatalogValidator.Validate(ContentCatalogLoader.TilesFile, tiles, catalog.Tilesheets.Keys.ToHashSet());
         ObjectCatalogValidator.Validate(ContentCatalogLoader.ObjectsFile, objects, catalog.Tiles.Keys.ToHashSet());
         QuestCatalogValidator.Validate(ContentCatalogLoader.QuestsFile, quests);
-        var references = new MapReferences(ContentReferencesOf(catalog), catalog.Maps.Values.ToDictionary(map => map.Id, map => map.Layout));
-        foreach (var layout in references.Layouts.Values)
-        {
-            MapLayoutValidator.Validate(MapFolderReader.LayoutFile(layout.Id), layout, references);
-        }
-
+        CheckLayouts(catalog);
         return
         [
             PlanWrite(ContentCatalogLoader.TilesheetsFile, sheets),
@@ -132,6 +151,17 @@ public sealed class ContentWriter(string contentRoot)
         File.Copy(sourcePath, destination + TemporarySuffix, overwrite: true);
         File.Move(destination + TemporarySuffix, destination, overwrite: true);
         return fileName;
+    }
+
+    // Every layout against the content and the other layouts, as the loader checks them: a warp into a resized map
+    // is refused by the map that holds it.
+    private static void CheckLayouts(ContentCatalog catalog)
+    {
+        var references = new MapReferences(ContentReferencesOf(catalog), catalog.Maps.Values.ToDictionary(map => map.Id, map => map.Layout));
+        foreach (var layout in references.Layouts.Values)
+        {
+            MapLayoutValidator.Validate(MapFolderReader.LayoutFile(layout.Id), layout, references);
+        }
     }
 
     private string TilesheetImagePath(string fileName) => Path.Combine(ArtFolders.RootIn(contentRoot), ArtFolders.Tilesheets, fileName);

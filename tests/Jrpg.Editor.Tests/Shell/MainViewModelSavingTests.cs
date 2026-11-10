@@ -1,13 +1,11 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Geometry;
 using Jrpg.Data.Content;
-using Jrpg.Editor.Maps;
-using Jrpg.Editor.Maps.Editing;
 using Jrpg.Editor.Shell;
 
 namespace Jrpg.Editor.Tests.Shell;
 
-/// <summary>Save all and the close question, on a copy of the test world (decisions 500, 501).</summary>
+/// <summary>Save all and the close question, on a copy of the test world (decisions 500, 501, 518).</summary>
 public sealed class MainViewModelSavingTests : IDisposable
 {
     private readonly EditorTestContent _content = new();
@@ -43,30 +41,33 @@ public sealed class MainViewModelSavingTests : IDisposable
         Assert.False(viewModel.Content!.IsDirty);
     }
 
+    // All or none (decision 518): the valid forest isn't written either, whichever map is refused.
     [Fact]
-    public void SaveAll_SecondMapRefused_KeepsTheFirstSavedAndShowsTheReason()
+    public void SaveAll_SecondMapRefused_WritesNeitherAndShowsTheReason()
     {
         var viewModel = _content.Open(_content.CopyOfTestWorld());
         var forest = viewModel.CurrentMap!;
-        var painted = EditorTestContent.PaintTopLeft(viewModel);
+        var before = TopLeftOf(ContentCatalogLoader.Load(_content.ContentCopy), "forest");
+        EditorTestContent.PaintTopLeft(viewModel);
         viewModel.TryOpenMap("start");
         var start = viewModel.CurrentMap!;
-        PaintUnknownTile(start);
+        EditorTestContent.PaintUnknownTile(start);
 
         viewModel.SaveAllCommand.Execute(null);
 
-        Assert.Equal(painted, TopLeftOf(ContentCatalogLoader.Load(_content.ContentCopy), "forest"));
-        Assert.False(forest.IsDirty);
+        Assert.Equal(before, TopLeftOf(ContentCatalogLoader.Load(_content.ContentCopy), "forest"));
+        Assert.True(forest.IsDirty);
         Assert.True(start.IsDirty);
         Assert.StartsWith("map-layouts/start.json: ", viewModel.SaveError, StringComparison.Ordinal);
+        Assert.EndsWith(" Nothing was written.", viewModel.SaveError, StringComparison.Ordinal);
     }
 
-    // Forest comes first by id: its refusal stops Save all before start is written.
     [Fact]
-    public void SaveAll_FirstMapRefused_LeavesTheNextUnwritten()
+    public void SaveAll_FirstMapRefused_WritesNeither()
     {
         var viewModel = _content.Open(_content.CopyOfTestWorld());
-        PaintUnknownTile(viewModel.CurrentMap!);
+        var forest = viewModel.CurrentMap!;
+        EditorTestContent.PaintUnknownTile(forest);
         viewModel.TryOpenMap("start");
         var start = viewModel.CurrentMap!;
         var before = TopLeftOf(ContentCatalogLoader.Load(_content.ContentCopy), "start");
@@ -75,6 +76,7 @@ public sealed class MainViewModelSavingTests : IDisposable
         viewModel.SaveAllCommand.Execute(null);
 
         Assert.True(start.IsDirty);
+        Assert.True(forest.IsDirty);
         Assert.Equal(before, TopLeftOf(ContentCatalogLoader.Load(_content.ContentCopy), "start"));
         Assert.StartsWith("map-layouts/forest.json: ", viewModel.SaveError, StringComparison.Ordinal);
     }
@@ -151,7 +153,7 @@ public sealed class MainViewModelSavingTests : IDisposable
     public void ConfirmClose_UserSavesAllAndAMapIsRefused_StaysOpen()
     {
         var viewModel = _content.Open(_content.CopyOfTestWorld(), UnsavedChangesAnswer.SaveAll);
-        PaintUnknownTile(viewModel.CurrentMap!);
+        EditorTestContent.PaintUnknownTile(viewModel.CurrentMap!);
 
         Assert.False(viewModel.ConfirmClose());
         Assert.NotNull(viewModel.SaveError);
@@ -181,11 +183,4 @@ public sealed class MainViewModelSavingTests : IDisposable
 
     private static int TopLeftOf(ContentCatalog catalog, string mapId) =>
         catalog.Maps[mapId].Layout.Layers[0].TileIdAt(new GridCell(0, 0));
-
-    // A tile id no catalog has: the game would refuse the map, so its save fails.
-    private static void PaintUnknownTile(MapViewModel map)
-    {
-        var ground = map.Map.Layout.Layers[0];
-        map.Do(new SetTilesEdit(ground.Z, [new TileChange(new GridCell(0, 0), ground.TileIdAt(new GridCell(0, 0)), 99_999)]));
-    }
 }

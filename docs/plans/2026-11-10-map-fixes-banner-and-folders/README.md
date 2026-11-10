@@ -65,7 +65,7 @@ Phases 1, 2, 4 and 5 don't depend on each other, except RN1 and SV2 reusing SV1'
 One line per slice; each slice's goal, types, tests and hand checks are in its file under `slices/`. Tick the box here when a slice is done, and write its deviations in the slice file. Tunables, design overview and risks: [design.md](design.md).
 
 ### Phase 1: saving
-- [ ] **SV1. The save deadlock reproduced, then fixed: Save and Save all write in one go, all or none (the tiles and objects alone when a map is refused); Save all checks each map against the open maps as they are now (`ContentWriter.WriteMaps`, `OpenMaps.ContentWith`)** (Data + Editor, about 250 lines, 25 of them re-pinned tests) → [slices/SV1.md](slices/SV1.md)
+- [x] **SV1. The save deadlock reproduced, then fixed: Save and Save all write in one go, all or none (the tiles and objects alone when a map is refused); Save all checks each map against the open maps as they are now (`ContentWriter.WriteMaps`, `OpenMaps.ContentWith`)** (Data + Editor, about 250 lines, 25 of them re-pinned tests) → [slices/SV1.md](slices/SV1.md)
 - [ ] **SV2. A refused Ctrl+S that Save all would pass says so: a dry run of the map checks on the open maps (`ContentWriter.CheckMaps`)** (Data + Editor, about 110 lines) → [slices/SV2.md](slices/SV2.md)
 
 ### Phase 2: draw order

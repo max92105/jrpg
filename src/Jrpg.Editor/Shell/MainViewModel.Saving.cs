@@ -1,12 +1,13 @@
 using System.IO;
 using CommunityToolkit.Mvvm.Input;
+using Jrpg.Core.Content;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Maps;
 
 namespace Jrpg.Editor.Shell;
 
-/// <summary>Save, Save all and the close question (decisions 499-501).</summary>
+/// <summary>Save, Save all and the close question (decisions 499-501, 518).</summary>
 internal sealed partial class MainViewModel
 {
     /// <summary>
@@ -35,8 +36,8 @@ internal sealed partial class MainViewModel
     }
 
     /// <summary>
-    /// Saves the tiles and objects when changed, then the shown map, each if the game would load it; otherwise keeps it
-    /// unsaved and shows why. With no map shown it still saves the tiles and objects (decision 499).
+    /// Saves the shown map and the tiles and objects when changed, in one go, if the game would load them; otherwise
+    /// keeps them unsaved and shows why (decisions 499, 518). With no map shown it still saves the tiles and objects.
     /// </summary>
     [RelayCommand]
     private void Save()
@@ -47,9 +48,13 @@ internal sealed partial class MainViewModel
         }
 
         SaveError = null;
-        if (TryWriteCatalogs(content) && CurrentMap is { } shown)
+        if (CurrentMap is { } shown)
         {
-            TryWriteMap(shown, content);
+            SaveTogether(content, OpenMaps.ContentWith(content.Current, shown), [shown]);
+        }
+        else if (content.IsDirty && TryWrite(() => _writer.WriteMapCatalogs(content.Current)))
+        {
+            content.MarkSaved();
         }
 
         ShowMapList(content.Current);
@@ -57,8 +62,8 @@ internal sealed partial class MainViewModel
     }
 
     /// <summary>
-    /// Saves the tiles and objects when changed, then every open map with changes in id order; the first the game would
-    /// refuse stops it with the reason shown, the maps written before it staying saved (decision 500).
+    /// Saves every open map with changes and the tiles and objects when changed, in one go, all or none, each map
+    /// checked with the open maps as they are now (decision 518): two maps valid only together save.
     /// </summary>
     [RelayCommand]
     private void SaveAll()
@@ -69,40 +74,54 @@ internal sealed partial class MainViewModel
         }
 
         SaveError = null;
-        if (TryWriteCatalogs(content))
-        {
-            foreach (var open in _openMaps.Dirty)
-            {
-                if (!TryWriteMap(open, content))
-                {
-                    break;
-                }
-            }
-        }
-
+        SaveTogether(content, _openMaps.ContentWith(content.Current), _openMaps.Dirty);
         ShowMapList(content.Current);
         Art!.Refresh();
     }
 
-    // The catalogs first, so a saved map never names a tile the game doesn't know.
-    private bool TryWriteCatalogs(CatalogDraft content) =>
-        !content.IsDirty || TryWrite(() =>
-        {
-            _writer.WriteMapCatalogs(content.Current);
-            content.MarkSaved();
-        });
-
-    private bool TryWriteMap(MapViewModel open, CatalogDraft content)
+    // All or none; refused, the changed tiles and objects are still written alone when they pass by themselves, as
+    // Ctrl+S wrote them first before decision 518, so composer work never waits on a map.
+    private void SaveTogether(CatalogDraft content, ContentCatalog checkedContent, IReadOnlyList<MapViewModel> maps)
     {
-        var map = open.Map;
-        if (!TryWrite(() => _writer.WriteMap(map, content.Current)))
+        var mapIds = maps.Select(map => map.Map.Id).ToList();
+        var written = TryWrite(() =>
         {
-            return false;
+            if (content.IsDirty)
+            {
+                _writer.WriteMapCatalogsAndMaps(checkedContent, mapIds);
+            }
+            else
+            {
+                _writer.WriteMaps(checkedContent, mapIds);
+            }
+        });
+        if (!written)
+        {
+            WriteCatalogsAlone(content);
+            return;
         }
 
-        content.AddSavedMap(map);
-        open.MarkSaved();
-        return true;
+        content.MarkSaved();
+        foreach (var map in maps)
+        {
+            content.AddSavedMap(map.Map);
+            map.MarkSaved();
+        }
+    }
+
+    // The map's refusal stays shown, ending with what was written.
+    private void WriteCatalogsAlone(CatalogDraft content)
+    {
+        var mapRefusal = SaveError;
+        if (content.IsDirty && TryWrite(() => _writer.WriteMapCatalogs(content.Current)))
+        {
+            content.MarkSaved();
+            SaveError = $"{mapRefusal} The tiles and objects were saved; no map was written.";
+        }
+        else
+        {
+            SaveError = $"{mapRefusal} Nothing was written.";
+        }
     }
 
     private bool TryWrite(Action write)

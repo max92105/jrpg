@@ -47,6 +47,21 @@ internal sealed class OpenMaps
         return layouts;
     }
 
+    /// <summary>
+    /// The content a save checks (decision 518): every open map as it is now in place of its saved one, a new map
+    /// added, for Save all.
+    /// </summary>
+    /// <param name="saved">The content as last saved.</param>
+    public ContentCatalog ContentWith(ContentCatalog saved) => ContentWith(saved, _all);
+
+    /// <summary>
+    /// The content a save checks (decision 518): this one open map as it is now in place of its saved one, the other
+    /// maps as saved, for Save.
+    /// </summary>
+    /// <param name="saved">The content as last saved.</param>
+    /// <param name="only">The shown map.</param>
+    public static ContentCatalog ContentWith(ContentCatalog saved, MapViewModel only) => ContentWith(saved, [only]);
+
     /// <summary>The open maps with unsaved changes, in id order.</summary>
     public IReadOnlyList<MapViewModel> Dirty =>
         [.. _all.Where(map => map.IsDirty).OrderBy(map => map.Map.Id, StringComparer.Ordinal)];
@@ -90,6 +105,17 @@ internal sealed class OpenMaps
                 _all.Insert(index, rebuilt);
             }
         }
+    }
+
+    private static ContentCatalog ContentWith(ContentCatalog saved, IEnumerable<MapViewModel> open)
+    {
+        var maps = new Dictionary<string, MapDefinition>(saved.Maps);
+        foreach (var map in open)
+        {
+            maps[map.Map.Id] = map.Map;
+        }
+
+        return saved with { Maps = maps };
     }
 
     private void OnMapChanged(object? sender, PropertyChangedEventArgs e)

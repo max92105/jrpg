@@ -37,6 +37,8 @@ A map resized so that a warp on another map had to move into its new cells saves
   - `SaveAll_SecondMapRefused_KeepsTheFirstSavedAndShowsTheReason` becomes `SaveAll_SecondMapRefused_WritesNeitherAndShowsTheReason` (forest stays dirty and unwritten).
   - `SaveAll_FirstMapRefused_LeavesTheNextUnwritten` becomes `SaveAll_FirstMapRefused_WritesNeither` (same assertions on start, plus forest unwritten).
 
+- **Done, with deviations:** the reproduction and the six other new tests all failed on the old code first; the reproduction's message was "map-layouts/start.json: cell event 'save_check' at ... step 0: warp cell (0, 18) is outside map 'forest'." `TryWriteTogether` is named `SaveTogether` (it marks the drafts saved or falls back, so it is no `Try`; the review's Critical). `OpenMaps.ContentWith(saved, only)` is static (it reads no open map but the one given). `PaintUnknownTile` moved from `MainViewModelSavingTests` into `EditorTestContent` (its second user), with `LayoutBytes` and `ObjectsPath` beside it. `ContentWriter.WriteMap` stays for its Data tests, with no editor caller left. The two re-pinned tests are `SaveAll_SecondMapRefused_WritesNeitherAndShowsTheReason` and `SaveAll_FirstMapRefused_WritesNeither`: decision 500's partial write was the old expectation.
+
 ## Verify by hand
 1. In the editor: File > New map..., name "Save Check", width 10, height 8, OK; Ctrl+S.
 2. Open the map "start" in the map list; the Events tab; click a free cell; in the dialog Add step > Warp; Pick...; choose "Save Check (save_check)", click its top-right cell (9, 0); OK; OK; Ctrl+S (saved).

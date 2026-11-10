@@ -1,6 +1,7 @@
 using Jrpg.Core.Geometry;
 using Jrpg.Data.Art;
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
 using Jrpg.Editor.Shell;
 
@@ -101,12 +102,23 @@ internal sealed class EditorTestContent : IDisposable
         Assert.True(viewModel.Composing.TryApply(composer));
     }
 
+    // A tile id no catalog has: the game would refuse the map, so its save fails.
+    public static void PaintUnknownTile(MapViewModel map)
+    {
+        var ground = map.Map.Layout.Layers[0];
+        map.Do(new SetTilesEdit(ground.Z, [new TileChange(new GridCell(0, 0), ground.TileIdAt(new GridCell(0, 0)), 99_999)]));
+    }
+
     public static int BlockFirstWalkableTile(MainViewModel viewModel)
     {
         var tileId = viewModel.Catalog!.Tiles.Values.First(tile => tile.IsWalkable).Id;
         viewModel.Content!.SetWalkable(tileId, isWalkable: false);
         return tileId;
     }
+
+    public string ObjectsPath => Path.Combine(ContentCopy, "objects.json");
+
+    public byte[] LayoutBytes(string mapId) => File.ReadAllBytes(Path.Combine(ContentCopy, "map-layouts", $"{mapId}.json"));
 
     public byte[] TilesAndForestBytes() =>
         [.. File.ReadAllBytes(Path.Combine(ContentCopy, "tiles.json")),

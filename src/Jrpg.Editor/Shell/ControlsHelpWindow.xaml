@@ -39,7 +39,7 @@
         Mouse wheel: zoom toward the mouse.<LineBreak />
         Ctrl+0: fit the map. Ctrl+1: actual size.<LineBreak />
         Ctrl+H: show collision: cells the player can't enter (red), object outlines (green), above-player zones (blue).<LineBreak />
-        The layer list chooses the layer edits go to; Add layer adds one at a preset or any z.
+        The layer list chooses the layer edits go to; Add layer adds one at a preset or any z. Dim and lock other layers (tool bar, View menu): the other layers are drawn faint and ignore every click, in the Objects and Events tabs, so an object under another layer's object is reached once its layer is chosen; the Placed object panel's note says when the lock left a click with nothing.
       </TextBlock>
 
       <TextBlock Style="{StaticResource Heading}" Text="Tiles" />

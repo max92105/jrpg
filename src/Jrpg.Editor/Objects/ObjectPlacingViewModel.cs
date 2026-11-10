@@ -39,7 +39,7 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
         _layer = layer;
         Copying = new ObjectCopying(catalog, this);
         Editing = new PlacedObjectEditing(catalog, this);
-        Picking = new ObjectPicking(this);
+        Picking = new ObjectPicking(this, layer);
     }
 
     public ObjectBrowserViewModel Browser { get; }
@@ -115,10 +115,17 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
     /// <summary>G, or the tool bar's Snap to grid box.</summary>
     public void ToggleGridSnap() => IsGridSnapOn = !IsGridSnapOn;
 
-    /// <summary>The objects at a point, the one drawn on top first; empty with no map.</summary>
+    /// <summary>
+    /// The objects at a point that a click reaches (the locked layers' left out, decision 525), the one drawn on top
+    /// first; empty with no map.
+    /// </summary>
     /// <param name="point">In map cells.</param>
-    public IReadOnlyList<PlacedObject> ObjectsAt(Point2D point) =>
-        OpenMap is { } open ? PlacedObjectHits.AllAt(open.Map.Layout, point, _catalog.Current.Objects) : [];
+    public IReadOnlyList<PlacedObject> ObjectsAt(Point2D point) => [.. AllObjectsAt(point).Where(placed => _layer.Accepts(placed.Z))];
+
+    /// <summary>Whether the lock is what leaves a click with nothing here: objects, all on locked layers.</summary>
+    /// <param name="point">In map cells.</param>
+    public bool IsLockHidingObjectsAt(Point2D point) =>
+        AllObjectsAt(point) is { Count: > 0 } all && !all.Any(placed => _layer.Accepts(placed.Z));
 
     /// <summary>The object drawn on top at a point, to remove or open; null when none is there.</summary>
     /// <param name="point">In map cells.</param>
@@ -151,10 +158,12 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
 
     public void RemoveObject(string uid) => RemoveObjects([uid]);
 
-    /// <summary>Selects the objects overlapping the rectangle between two corners, in map cells.</summary>
+    /// <summary>
+    /// Selects the objects overlapping the rectangle between two corners, in map cells, the locked layers' left out.
+    /// </summary>
     public void SelectObjectsIn(Point2D corner, Point2D oppositeCorner) =>
         SelectedObjectUids = OpenMap is { } open
-            ? [.. PlacedObjectHits.InRectangle(open.Map.Layout, corner, oppositeCorner, _catalog.Current.Objects).Select(placed => placed.Uid)]
+            ? [.. PlacedObjectHits.InRectangle(open.Map.Layout, corner, oppositeCorner, _catalog.Current.Objects).Where(placed => _layer.Accepts(placed.Z)).Select(placed => placed.Uid)]
             : [];
 
     /// <summary>
@@ -262,6 +271,9 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
             Z = _layer.Z,
         }));
     }
+
+    private IReadOnlyList<PlacedObject> AllObjectsAt(Point2D point) =>
+        OpenMap is { } open ? PlacedObjectHits.AllAt(open.Map.Layout, point, _catalog.Current.Objects) : [];
 
     private PlacedObject? PlacedObjectWithUid(string uid) => OpenMap?.Map.Layout.Objects.FirstOrDefault(placed => placed.Uid == uid);
 

@@ -30,10 +30,6 @@ internal static class PlacedObjectHits
         return [.. hits.OrderByDescending(hit => hit.Key).Select(hit => hit.Placed)];
     }
 
-    /// <summary>The object drawn on top at a point; null when no object is there.</summary>
-    public static PlacedObject? TopAt(MapLayout map, Point2D point, IReadOnlyDictionary<string, ObjectDefinition> definitions) =>
-        AllAt(map, point, definitions) is [var top, ..] ? top : null;
-
     /// <summary>
     /// The object a Ctrl + click on the same spot again selects (decision 523): the one after the selected object in
     /// the hits, the first again after the last; the first when none is selected or the selected one isn't there.

@@ -2,6 +2,7 @@ using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Jrpg.Core.Geometry;
+using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
 
 namespace Jrpg.Editor.Objects;
@@ -14,18 +15,24 @@ namespace Jrpg.Editor.Objects;
 internal sealed partial class ObjectPicking : ObservableObject
 {
     private readonly ObjectPlacingViewModel _placing;
+    private readonly LayerChoiceViewModel _layer;
     private Point2D _lastPoint;
     private int _lastCount;
     private string? _pickedUid;
 
     /// <param name="placing">Whose selection the pick sets, and which finds the objects at a point.</param>
-    public ObjectPicking(ObjectPlacingViewModel placing)
+    /// <param name="layer">Whose lock decides what a pick reaches (decision 525): a change there ends the note.</param>
+    public ObjectPicking(ObjectPlacingViewModel placing, LayerChoiceViewModel layer)
     {
-        _placing = placing;
+        (_placing, _layer) = (placing, layer);
         placing.PropertyChanged += OnPlacingChanged;
+        layer.PropertyChanged += (_, _) => Forget();
     }
 
-    /// <summary>"bench_2 selected: 2 of 3 objects here"; empty while the pick found one object or none.</summary>
+    /// <summary>
+    /// "bench_2 selected: 2 of 3 objects here"; "Locked: only layer z 1 takes clicks" when the lock left the pick with
+    /// nothing (decision 525); empty while the pick found one object, or none at all.
+    /// </summary>
     [ObservableProperty]
     public partial string Note { get; private set; } = "";
 
@@ -41,7 +48,12 @@ internal sealed partial class ObjectPicking : ObservableObject
         var picked = PlacedObjectHits.NextUnder(hits, selected);
         (_lastPoint, _lastCount, _pickedUid) = (point, hits.Count, picked?.Uid);
         _placing.Select(picked is null ? [] : [picked.Uid]);
-        Note = picked is not null && hits.Count > 1 ? $"{picked.Uid} selected: {hits.ToList().IndexOf(picked) + 1} of {hits.Count} objects here" : "";
+        Note = picked switch
+        {
+            null => _placing.IsLockHidingObjectsAt(point) ? $"Locked: only layer z {_layer.Z} takes clicks" : "",
+            _ when hits.Count > 1 => $"{picked.Uid} selected: {hits.ToList().IndexOf(picked) + 1} of {hits.Count} objects here",
+            _ => "",
+        };
         SelectNextUnderCommand.NotifyCanExecuteChanged();
     }
 

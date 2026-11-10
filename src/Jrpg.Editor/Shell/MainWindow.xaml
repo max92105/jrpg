@@ -58,7 +58,7 @@
       <MenuItem Header="View">
         <MenuItem Header="Grid" IsCheckable="True" IsChecked="{Binding IsGridShown}" />
         <MenuItem Header="Show collision" IsCheckable="True" IsChecked="{Binding IsCollisionShown}" InputGestureText="Ctrl+H" />
-        <MenuItem Header="Dim other layers" IsCheckable="True" IsChecked="{Binding Layer.AreOtherLayersDimmed}" />
+        <MenuItem Header="Dim and lock other layers" IsCheckable="True" IsChecked="{Binding Layer.AreOtherLayersDimmed}" ToolTip="Other layers are drawn faint and ignore clicks; choose the layer of what you want to reach." />
         <Separator />
         <MenuItem Header="Fit map" Click="OnFitClicked" InputGestureText="Ctrl+0" />
         <MenuItem Header="Actual size" Click="OnActualSizeClicked" InputGestureText="Ctrl+1" />
@@ -129,7 +129,7 @@
         <TextBox Width="40"
                  ToolTip="Layer z: any whole number"
                  Text="{Binding Layer.Z, UpdateSourceTrigger=PropertyChanged}" />
-        <CheckBox Content="Dim other layers" IsChecked="{Binding Layer.AreOtherLayersDimmed}" />
+        <CheckBox Content="Dim and lock other layers" IsChecked="{Binding Layer.AreOtherLayersDimmed}" ToolTip="Other layers are drawn faint and ignore clicks; choose the layer of what you want to reach." />
         <Separator />
         <Button Content="Fit (Ctrl+0)" Click="OnFitClicked" />
         <Button Content="100 % (Ctrl+1)" Click="OnActualSizeClicked" />
@@ -252,7 +252,7 @@
           <TabItem x:Name="EventsTab" Header="Events">
             <TextBlock Margin="8"
                        TextWrapping="Wrap"
-                       Text="Click an object on the map to edit its events, or a cell without an object to edit the event that runs when the player walks onto it; right click removes a cell's event. Dots on an object show its events (yellow: pressed, cyan: walked into); a cyan square marks a cell with an event." />
+                       Text="Click an object on the map to edit its events, or a cell without an object to edit the event that runs when the player walks onto it; right click removes a cell's event. With Dim and lock other layers ticked, only the chosen layer's objects take clicks. Dots on an object show its events (yellow: pressed, cyan: walked into); a cyan square marks a cell with an event." />
           </TabItem>
         </TabControl>
       </DockPanel>

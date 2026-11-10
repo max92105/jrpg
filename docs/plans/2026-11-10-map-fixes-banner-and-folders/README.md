@@ -75,7 +75,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 3: reaching covered things
 - [x] **UO1. Ctrl + click again selects the next object under the point, ranked as drawn (a roof's zone counts as the roof); Next under in the Placed object panel; Shift + drag grabs the selected object first** (Core + Editor, about 215 lines) → [slices/UO1.md](slices/UO1.md)
-- [ ] **UO2. Dim and lock other layers: clicks reach only the chosen layer's objects, in Objects and Events modes** (Editor, about 150 lines) → [slices/UO2.md](slices/UO2.md)
+- [x] **UO2. Dim and lock other layers: clicks reach only the chosen layer's objects, in Objects and Events modes** (Editor, about 150 lines) → [slices/UO2.md](slices/UO2.md)
 - [ ] **UO3. Events mode: Ctrl + click opens the cell's event under any object, Ctrl + right click removes it** (Editor, about 120 lines) → [slices/UO3.md](slices/UO3.md)
 
 ### Phase 4: area level and banner

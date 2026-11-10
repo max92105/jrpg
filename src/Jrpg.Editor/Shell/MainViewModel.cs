@@ -82,7 +82,7 @@ internal sealed partial class MainViewModel : ObservableObject
             Placing = new ObjectPlacingViewModel(Content, Layer, _openMaps);
             Composing = new ObjectComposing(Content, Placing.Browser, Painting.Browser);
             AnimationImport = new AnimationImport(Content);
-            EventEditing = new EventEditingViewModel(Content, _openMaps) { MapIds = MapIds };
+            EventEditing = new EventEditingViewModel(Content, _openMaps, Layer) { MapIds = MapIds };
             QuestEditing = new QuestEditingViewModel(Content);
             if (MapIds.Count > 0)
             {

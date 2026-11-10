@@ -27,6 +27,8 @@ While **Dim and lock other layers** is ticked, the objects on other layers are f
 - `StartEditingAt_LockedOnALayerWithNoObjectThere_GivesNull` (the click then opens the cell, as today's window code does).
 `LayerChoiceViewModelTests` (or the file testing it): `Accepts_NotDimmed_TakesEveryLayer`, `Accepts_Dimmed_TakesOnlyTheChosen`.
 
+- **Done, with deviations:** the filtered list is `ObjectPlacingViewModel.ObjectsAt` (UO1's public list, now the reached objects only) over a private `AllObjectsAt`; `IsLockHidingObjectsAt(point)` gives the "Locked: only layer z 1 takes clicks" note when the lock is what left the click with nothing, and `ObjectPicking` shows it. `EventEditingViewModel.StartEditingAt` takes the first of `AllAt` the layer accepts (the window's cell fallback then opens the cell, as today). The placing view model ends at 296 lines. The lock tests found the dialog's `Title` is what names the placed object (`EventListViewModel` has no uid property). From the review: the pick's note ends when the layer choice or the lock changes (`Picking.Forget` on the layer's property changes, tested); `PlacedObjectHits.TopAt` is deleted, `AllAt` having taken its last caller, and its three tests read `AllAt`. Left as a design choice for the developer: an object on another layer selected before the lock is ticked stays selected, so Delete, the arrows and the panel still act on it; decision 525 covers clicks only.
+
 ## Verify by hand
 1. Place a rug on layer -3 and a table on layer 1 over it (Layer box before each placing).
 2. Layer box: "Decoration (below player) (-3)"; tick **Dim and lock other layers** (tool bar): the table is faint.

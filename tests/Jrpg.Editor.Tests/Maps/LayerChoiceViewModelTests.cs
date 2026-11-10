@@ -26,6 +26,25 @@ public sealed class LayerChoiceViewModelTests
     }
 
     [Fact]
+    public void Accepts_NotDimmed_TakesEveryLayer()
+    {
+        _layer.Z = 1;
+
+        Assert.True(_layer.Accepts(-4));
+        Assert.True(_layer.Accepts(1));
+    }
+
+    [Fact]
+    public void Accepts_Dimmed_TakesOnlyTheChosen()
+    {
+        _layer.Z = 1;
+        _layer.AreOtherLayersDimmed = true;
+
+        Assert.True(_layer.Accepts(1));
+        Assert.False(_layer.Accepts(-4));
+    }
+
+    [Fact]
     public void TryAddLayer_NotANumber_KeepsTheChoice()
     {
         var isAdded = _layer.TryAddLayer("flowers");

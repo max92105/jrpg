@@ -8,9 +8,12 @@ namespace Jrpg.Editor.Events;
 
 /// <summary>
 /// Editing the events on the open map: an object's events, or a cell's when no object is clicked; which one a click
-/// picks, and applying the dialogs. Each change is one undo step.
+/// picks (the locked layers' objects never, decision 525), and applying the dialogs. Each change is one undo step.
 /// </summary>
-internal sealed class EventEditingViewModel(CatalogDraft catalog, OpenMaps openMaps)
+/// <param name="catalog">The objects the clicks hit, and the choices the dialogs offer.</param>
+/// <param name="openMaps">Every open map, for the warp picker.</param>
+/// <param name="layer">Whose lock decides which objects a click reaches.</param>
+internal sealed class EventEditingViewModel(CatalogDraft catalog, OpenMaps openMaps, LayerChoiceViewModel layer)
 {
     /// <summary>The map whose events are edited; set by the shell when a map opens.</summary>
     public MapViewModel? OpenMap { get; set; }
@@ -18,10 +21,16 @@ internal sealed class EventEditingViewModel(CatalogDraft catalog, OpenMaps openM
     /// <summary>The maps a warp can lead to; set by the shell, which adds a new map once it is saved.</summary>
     public IReadOnlyList<string> MapIds { get; set; } = [];
 
-    /// <summary>The event dialog's state for the object drawn on top at a point; null when no object is there.</summary>
+    /// <summary>
+    /// The event dialog's state for the object drawn on top at a point, among those a click reaches; null when no
+    /// object is reached there.
+    /// </summary>
     /// <param name="point">In map cells.</param>
     public EventListViewModel? StartEditingAt(Point2D point) =>
-        OpenMap is { } open && PlacedObjectHits.TopAt(open.Map.Layout, point, catalog.Current.Objects) is { } placed ? EventListFor(placed) : null;
+        OpenMap is { } open
+            && PlacedObjectHits.AllAt(open.Map.Layout, point, catalog.Current.Objects).FirstOrDefault(placed => layer.Accepts(placed.Z)) is { } placed
+            ? EventListFor(placed)
+            : null;
 
     /// <summary>
     /// The Placed object panel's event dialog: the placed object with this uid; null when it isn't on the map.

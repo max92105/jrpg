@@ -156,28 +156,28 @@ public sealed class ObjectEditingTests
     }
 
     [Fact]
-    public void PlacedObjectHits_TopAt_OverlappingObjects_ReturnsTheOneDrawnLast()
+    public void PlacedObjectHits_AllAt_OverlappingObjects_ListsTheOneDrawnLastFirst()
     {
         // The tree's base (row 3) is lower on screen than the chest's (2.5), so the tree is drawn over it.
-        Assert.Equal(_tree, PlacedObjectHits.TopAt(Layout(), new Point2D(2.5, 2.2), _definitions));
+        Assert.Equal([_tree, _chest], PlacedObjectHits.AllAt(Layout(), new Point2D(2.5, 2.2), _definitions));
     }
 
     [Fact]
-    public void PlacedObjectHits_TopAt_FieldSpriteObject_IsHitAnywhereOnItsCell()
+    public void PlacedObjectHits_AllAt_FieldSpriteObject_IsHitAnywhereOnItsCell()
     {
         var villager = Placed("villager_1", "villager", 6, 6);
         var npc = Definition("villager", 1, 1, []) with { FieldSpriteFile = "npc_placeholder.png" };
         var definitions = new Dictionary<string, ObjectDefinition>(_definitions) { ["villager"] = npc };
         var map = Layout() with { Objects = [villager] };
 
-        Assert.Equal(villager, PlacedObjectHits.TopAt(map, new Point2D(6.1, 6.2), definitions));
-        Assert.Null(PlacedObjectHits.TopAt(map, new Point2D(7.0, 6.5), definitions));
+        Assert.Equal([villager], PlacedObjectHits.AllAt(map, new Point2D(6.1, 6.2), definitions));
+        Assert.Empty(PlacedObjectHits.AllAt(map, new Point2D(7.0, 6.5), definitions));
     }
 
     [Fact]
-    public void PlacedObjectHits_TopAt_CellWithoutTheObjectsTile_MissesIt()
+    public void PlacedObjectHits_AllAt_CellWithoutTheObjectsTile_MissesIt()
     {
-        Assert.Null(PlacedObjectHits.TopAt(Layout(), new Point2D(2.5, 1.2), _definitions));
+        Assert.Empty(PlacedObjectHits.AllAt(Layout(), new Point2D(2.5, 1.2), _definitions));
     }
 
     private static MapLayout Layout() => new() { Id = "glade", Width = 10, Height = 10, Layers = [], Objects = [_tree, _chest, _farChest] };

@@ -285,7 +285,7 @@ internal sealed partial class MainViewModel : ObservableObject
     {
         if (e.PropertyName == nameof(CatalogDraft.IsDirty))
         {
-            OnPropertyChanged(nameof(HasUnsavedChanges));
+            RaiseUnsavedChanged();
         }
     }
 

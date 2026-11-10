@@ -6,7 +6,7 @@ namespace Jrpg.Editor.Maps.Settings;
 
 /// <summary>
 /// The new map dialog: a name and a size ("New Map", 30 x 17, to start). The id the map will get is shown as the name
-/// is typed, since it can't change afterwards (question 70).
+/// is typed; Map > Rename map changes it later (decision 530).
 /// </summary>
 internal sealed partial class NewMapViewModel : ObservableObject
 {

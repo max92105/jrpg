@@ -6,7 +6,7 @@ namespace Jrpg.Editor.Maps.Settings;
 
 /// <summary>
 /// The map settings dialog: display name, track, area level, size and random battles, edited apart from the map until
-/// applied. The id can't change (question 70), since saves and warps refer to it. Numbers are kept as typed
+/// applied. The id changes elsewhere, through Map > Rename map (decision 530). Numbers are kept as typed
 /// (<see cref="TypedCounts"/>).
 /// </summary>
 internal sealed partial class MapSettingsViewModel : ObservableObject

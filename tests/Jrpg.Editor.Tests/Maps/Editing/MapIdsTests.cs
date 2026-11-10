@@ -5,6 +5,22 @@ namespace Jrpg.Editor.Tests.Maps.Editing;
 public sealed class MapIdsTests
 {
     [Fact]
+    public void IsWellFormed_SnakeCase_IsTrue()
+    {
+        Assert.True(MapIds.IsWellFormed("old_mill_2"));
+    }
+
+    [Theory]
+    [InlineData("Old Mill")]
+    [InlineData("OldMill")]
+    [InlineData("old-mill")]
+    [InlineData("")]
+    public void IsWellFormed_SpaceUpperDashOrEmpty_IsFalse(string id)
+    {
+        Assert.False(MapIds.IsWellFormed(id));
+    }
+
+    [Fact]
     public void FromName_TakenId_AppendsNumber()
     {
         Assert.Equal("forest_3", MapIds.FromName("Forest", ["forest", "forest_2", "start"]));

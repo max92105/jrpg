@@ -39,5 +39,7 @@ The editor renames the shown map's id: the new id is typed, prefilled from the d
 - `TryRenameMap_ThenGoBackTwice_ReturnsToTheRenamedMap` (start shown, then forest; forest renamed; Back shows start; Back again shows the forest under its new id).
 - `StartRenamingMap_NoMapShown_IsNull`.
 
+- **Done, with deviations:** `ContentWriter.RenameMap` returns the content as written, since `MapIdRename` is Data's own and the editor carries on from that content. `HasUnsavedChanges`, `CanRenameMap` and `RenameMapTip` are raised together by one `RaiseUnsavedChanged`, replacing the three `HasUnsavedChanges` notifications so `MainViewModel.cs` stays at 340 lines. After the rewrite the map list is rebuilt (`ShowMapList`), since the rows carry the id. `StartRenamingMap_NoMapShown_IsNull` is `CanRenameMap_AnythingUnsaved_IsFalse`'s null check: a loaded content always shows a map. `MapIds.IsWellFormed` refuses a dash too (a theory over space, upper case, dash and empty). From the review: the "already this map's" check compares without case too, since a hand-made id with a capital prefills its lower-case form, the same file on Windows; the catalog draft's rewrite summaries name the rename beside the purge.
+
 ## Verify by hand
 Tests only; RN3 adds the window.

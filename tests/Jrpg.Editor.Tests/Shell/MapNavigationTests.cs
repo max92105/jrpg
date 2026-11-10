@@ -139,6 +139,32 @@ public sealed class MapNavigationTests
     }
 
     [Fact]
+    public void RenameMap_PreviousMapRenamed_GoBackOpensTheNewId()
+    {
+        _navigation.NoteShown("forest");
+        _navigation.NoteShown("interior_1");
+
+        _navigation.RenameMap("forest", "woods");
+        _navigation.ShowEntries([new MapEntry("woods", "Forest (woods)"), _inn, _mill]);
+        _navigation.GoBackCommand.Execute(null);
+
+        Assert.Equal(["woods"], _opened);
+    }
+
+    [Fact]
+    public void RenameMap_ShownMapRenamed_KeepsThePreviousForGoBack()
+    {
+        _navigation.NoteShown("forest");
+        _navigation.NoteShown("interior_1");
+
+        _navigation.RenameMap("interior_1", "shop");
+        _navigation.NoteShown("shop");
+        _navigation.GoBackCommand.Execute(null);
+
+        Assert.Equal(["forest"], _opened);
+    }
+
+    [Fact]
     public void GoBackCommand_PreviousNoLongerListed_CannotExecute()
     {
         _navigation.NoteShown("old_mill");

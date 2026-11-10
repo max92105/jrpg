@@ -92,7 +92,7 @@ internal sealed partial class MainViewModel
         EventEditing?.OpenMap = newValue;
         Navigation.NoteShown(newValue?.Map.Id);
         RefreshLayerEntries();
-        OnPropertyChanged(nameof(HasUnsavedChanges));
+        RaiseUnsavedChanged();
     }
 
     // A stroke still being dragged becomes its map's undo step before another map is shown.
@@ -103,18 +103,26 @@ internal sealed partial class MainViewModel
         SaveError = null;
     }
 
-    // The purge wrote the content at once: the open maps are rebuilt from the written content, with no history, and the
-    // shown one shown, before the catalogs change (the window redraws on that change).
+    // The purge or a rename wrote the content at once: the open maps are rebuilt from the written content, with no
+    // history, and the shown one shown again, under its new id after a rename, before the catalogs change (the window
+    // redraws on that change). Never through "no map shown", which would lose the previous map for Back.
     private void ShowRewritten(ContentCatalog written)
     {
         _openMaps.ReplaceFrom(written);
-        CurrentMap = CurrentMap is { } shown ? _openMaps.Find(shown.Map.Id) : null;
+        var shownId = _shownAfterRewrite ?? CurrentMap?.Map.Id;
+        _shownAfterRewrite = null;
+        if (shownId is not null && _openMaps.Find(shownId) is null && written.Maps.TryGetValue(shownId, out var renamed))
+        {
+            _openMaps.Add(new MapViewModel(renamed));
+        }
+
+        CurrentMap = shownId is null ? null : _openMaps.Find(shownId);
     }
 
     private void OnOpenMapsDirtyChanged(object? sender, EventArgs e)
     {
         ShowMapList(Catalog!);
-        OnPropertyChanged(nameof(HasUnsavedChanges));
+        RaiseUnsavedChanged();
     }
 
     // A save can add a map or rename one, and an edit or its undo marks a row or clears its mark, so both lists are

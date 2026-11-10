@@ -3,13 +3,19 @@ using System.Text;
 namespace Jrpg.Editor.Maps.Editing;
 
 /// <summary>
-/// Ids for new maps, made from the name typed for them: snake_case like the content's other ids, and unique. An id is
-/// fixed once the map exists (question 70), since saves and warps refer to it; the display name can change later.
+/// Ids for maps, made from the name typed for them: snake_case like the content's other ids, and unique. A map keeps
+/// its id until Map > Rename map changes it with every reference (decision 530).
 /// </summary>
 internal static class MapIds
 {
     // When the name has no letters or digits at all.
     private const string Fallback = "map";
+
+    /// <summary>
+    /// Whether a typed id is one this rule makes: lower-case letters, digits and underscores, not empty.
+    /// </summary>
+    public static bool IsWellFormed(string id) =>
+        id.Length > 0 && id.All(character => char.IsAsciiLetterLower(character) || char.IsAsciiDigit(character) || character == '_');
 
     /// <param name="name">The map's display name, such as "Old Mill".</param>
     /// <param name="taken">The ids already used; compared without case, since map ids are also file names.</param>

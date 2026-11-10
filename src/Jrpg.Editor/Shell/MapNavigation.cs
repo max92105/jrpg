@@ -49,6 +49,25 @@ internal sealed partial class MapNavigation : ObservableObject
         GoBackCommand.NotifyCanExecuteChanged();
     }
 
+    /// <summary>
+    /// A map's id was renamed (decision 530): the shown and the previous map follow it, so Back still reaches the
+    /// renamed map or returns from it.
+    /// </summary>
+    public void RenameMap(string oldId, string newId)
+    {
+        if (_shownMapId == oldId)
+        {
+            _shownMapId = newId;
+        }
+
+        if (_previousMapId == oldId)
+        {
+            _previousMapId = newId;
+        }
+
+        GoBackCommand.NotifyCanExecuteChanged();
+    }
+
     /// <summary>Enter in the filter box: shows the first map the list shows.</summary>
     /// <returns>False when the filter matches no map.</returns>
     public bool TryOpenFirstShown() => ShownEntries is [var first, ..] && _tryOpenMap(first.Id);

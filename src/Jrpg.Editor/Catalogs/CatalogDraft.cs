@@ -32,11 +32,11 @@ internal sealed partial class CatalogDraft : ObservableObject
     public event EventHandler? RedoDropped;
 
     /// <summary>
-    /// The content was written straight away and is about to replace <see cref="Current"/> (the sheet purge), given as
-    /// the argument: the open maps and every history start afresh. Raised before <see cref="Current"/> changes, so the
-    /// open maps are replaced first and nothing ever draws an old layout against the new catalogs (it would name tiles
-    /// and objects that are gone); the new layout is a subset of the old, so drawing it against the old catalogs is
-    /// safe.
+    /// The content was written straight away and is about to replace <see cref="Current"/> (the sheet purge, decision
+    /// 442; a map id rename, decision 530), given as the argument: the open maps and every history start afresh. Raised
+    /// before <see cref="Current"/> changes, so the open maps are replaced first and nothing ever draws an old layout
+    /// against the new catalogs (after a purge it would name tiles and objects that are gone); drawing the new layout
+    /// against the old catalogs is safe, since a purge only takes away and a rename leaves them as they are.
     /// </summary>
     public event EventHandler<ContentCatalog>? Rewriting;
 
@@ -215,8 +215,8 @@ internal sealed partial class CatalogDraft : ObservableObject
     }
 
     /// <summary>
-    /// Takes content already written as the current one, with nothing to undo and nothing unsaved (decision 442's
-    /// purge, which can't be undone); the tile id mark keeps its value, so no id is reused.
+    /// Takes content already written as the current one, with nothing to undo and nothing unsaved (the sheet purge and
+    /// a map id rename, neither of which can be undone); the tile id mark keeps its value, so no id is reused.
     /// </summary>
     public void ReplaceAfterRewrite(ContentCatalog written)
     {

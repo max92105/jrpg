@@ -95,9 +95,10 @@ public sealed class ContentWriter(string contentRoot)
     /// <param name="content">The content as saved, the map among its maps.</param>
     /// <param name="oldId">The map's id today.</param>
     /// <param name="newId">Its id from now on, used by no map.</param>
+    /// <returns>The content as written, for the editor to carry on from.</returns>
     /// <exception cref="ArgumentException">The old id is unknown or the new one already used.</exception>
     /// <exception cref="ContentValidationException">The game would reject a map; nothing was written.</exception>
-    public void RenameMap(ContentCatalog content, string oldId, string newId)
+    public ContentCatalog RenameMap(ContentCatalog content, string oldId, string newId)
     {
         var renamed = MapIdRename.Apply(content, oldId, newId);
         CheckLayouts(renamed.Content);
@@ -110,6 +111,7 @@ public sealed class ContentWriter(string contentRoot)
         WriteAll(writes);
         File.Delete(Path.Combine(contentRoot, MapFolderReader.LayoutFile(oldId)));
         File.Delete(Path.Combine(contentRoot, MapFolderReader.SettingsFile(oldId)));
+        return renamed.Content;
     }
 
     /// <summary>

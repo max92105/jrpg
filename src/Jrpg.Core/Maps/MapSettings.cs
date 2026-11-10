@@ -23,6 +23,12 @@ public sealed record MapSettings
     /// </summary>
     public bool ShowsBanner { get; init; } = true;
 
+    /// <summary>
+    /// Where the editor lists the map (decision 532), a <see cref="MapFolderPath"/>; null for the top of the list. The
+    /// game never reads it.
+    /// </summary>
+    public string? Folder { get; init; }
+
     /// <summary>Null on maps without random battles, such as towns and houses.</summary>
     public RandomEncounterTable? RandomEncounters { get; init; }
 }

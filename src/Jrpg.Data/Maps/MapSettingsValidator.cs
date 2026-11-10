@@ -10,6 +10,7 @@ internal static class MapSettingsValidator
     {
         var problem = FindIdentityProblem(fileName, settings)
             ?? (settings.AreaLevel is { } level ? RangeProblems.AtLeast("areaLevel", level, minimum: 1) : null)
+            ?? (settings.Folder is { } folder && MapFolderPath.ProblemOf(folder) is { } folderProblem ? $"folder: {folderProblem}" : null)
             ?? FindEncounterProblem(settings.RandomEncounters, encounterIds);
         if (problem is not null)
         {

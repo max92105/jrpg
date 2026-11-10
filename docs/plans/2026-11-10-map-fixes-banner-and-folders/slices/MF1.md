@@ -25,6 +25,8 @@ A map's settings may hold `folder`, a path of folder names joined by "/" ("Act 1
 - `Data.Tests/Content/ContentWriterFolderTests` (new): `WriteMap_NoFolder_LeavesTheFieldOut`, `WriteMap_Folder_RoundTrips`.
 - `Editor.Tests/Maps/Settings/MapSettingsFolderTests` (new): `FolderText_MapInAFolder_ShowsIt`, `ToSettings_FolderTyped_CarriesIt`, `ToSettings_Empty_HasNoFolder`, `AreSettingsChanged_OnlyTheFolderChanged_IsTrue`, `FolderProblem_BadPath_NamesTheRule`, `Problem_OnlyTheFolderWrong_IsTheFolderProblem`, `ToSettings_LevelBannerOffAndFolder_AllKept` (applying the dialog keeps the three new fields: the copy-back rule).
 
+- **Done, with deviations:** the box's text is trimmed before the check and the copy, so a space at either end of a typed path is forgiven rather than refused; the content rule stays strict. The settings view model's constructor reached the complexity limit with the folder's line, so the music choices moved to a `MusicChoicesFor` helper. Two more tests: `ProblemOf_Empty_NamesTheRule`, `NamesOf_Nested_GivesEachName`, and the folder's raised-event test. From the review: the rule's message names the backslash it refuses, and `IsWithin` has its reverse-direction test.
+
 ## Verify by hand
 1. Open "forest"; Map > Settings...: type `Act 1/Woods` in Folder; OK; Ctrl+S: `content/maps/forest.json` holds `"folder": "Act 1/Woods"`; other files unchanged.
 2. Type `Act 1//Woods`: the problem line shows, OK greyed.

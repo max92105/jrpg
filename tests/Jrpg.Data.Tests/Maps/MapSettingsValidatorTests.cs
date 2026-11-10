@@ -25,7 +25,18 @@ public sealed class MapSettingsValidatorTests
         { WithTable(_forest.RandomEncounters! with { EncounterIds = ["goblin_trio", null!] }), "randomEncounters.encounterIds holds a null entry." },
         { _forest with { AreaLevel = 0 }, "areaLevel must be at least 1 (was 0)." },
         { _forest with { AreaLevel = -1 }, "areaLevel must be at least 1 (was -1)." },
+        { _forest with { Folder = "" }, "folder: A folder path is names joined by '/', each with text, no space at either end and no backslash." },
+        { _forest with { Folder = "Act 1//Village" }, "folder: A folder path is names joined by '/', each with text, no space at either end and no backslash." },
+        { _forest with { Folder = " Act 1" }, "folder: A folder path is names joined by '/', each with text, no space at either end and no backslash." },
     };
+
+    [Fact]
+    public void Validate_NestedFolder_DoesNotThrow()
+    {
+        var exception = Record.Exception(() => MapSettingsValidator.Validate(FileName, _forest with { Folder = "Act 1/Village" }, _encounterIds));
+
+        Assert.Null(exception);
+    }
 
     // No area level at all is the valid settings test.
     [Fact]

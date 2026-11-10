@@ -27,12 +27,11 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
         _currentSize = (map.Layout.Width, map.Layout.Height);
         DisplayName = map.Settings.DisplayName;
         var track = map.Settings.MusicFile;
-
-        // A track no longer in the folder stays listed, so opening the dialog never changes the map.
-        MusicChoices = track is null || musicFiles.Contains(track) ? [NoMusic, .. musicFiles] : [NoMusic, track, .. musicFiles];
+        MusicChoices = MusicChoicesFor(track, musicFiles);
         SelectedMusic = track ?? NoMusic;
         AreaLevelText = map.Settings.AreaLevel is { } level ? Text(level) : "";
         ShowsBanner = map.Settings.ShowsBanner;
+        FolderText = map.Settings.Folder ?? "";
         WidthText = Text(map.Layout.Width);
         HeightText = Text(map.Layout.Height);
         var table = map.Settings.RandomEncounters;
@@ -43,6 +42,10 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
         GraceStepsText = Text(table?.GraceSteps ?? 1);
         Encounters = [.. encounterIds.Order(StringComparer.Ordinal).Select(id => new EncounterChoice(id) { IsChosen = table?.EncounterIds.Contains(id) == true })];
     }
+
+    // A track no longer in the folder stays listed, so opening the dialog never changes the map.
+    private static IReadOnlyList<string> MusicChoicesFor(string? track, IReadOnlyList<string> musicFiles) =>
+        track is null || musicFiles.Contains(track) ? [NoMusic, .. musicFiles] : [NoMusic, track, .. musicFiles];
 
     public string MapId { get; }
 
@@ -64,6 +67,11 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(AreaLevelProblem), nameof(Problem), nameof(CanApply))]
     public partial string AreaLevelText { get; set; }
+
+    /// <summary>The folder the map list shows the map under, as typed; empty for the top (decision 532).</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FolderProblem), nameof(Problem), nameof(CanApply))]
+    public partial string FolderText { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(NewSize), nameof(IsShrinking), nameof(IsResizing), nameof(SizeProblem), nameof(Problem), nameof(CanApply))]
@@ -109,13 +117,18 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
             ? "The area level is empty or a whole number of at least 1."
             : null;
 
-    /// <summary>What stops OK, the first of the size, the battle odds and the area level; null when nothing.</summary>
-    public string? Problem => SizeProblem ?? OddsProblem ?? AreaLevelProblem;
+    /// <summary>Why the folder can't be applied; null when it can, an empty box included.</summary>
+    public string? FolderProblem => FolderText.Trim() is { Length: > 0 } typed ? MapFolderPath.ProblemOf(typed) : null;
+
+    /// <summary>
+    /// What stops OK, the first of the size, the battle odds, the area level and the folder; null when nothing.
+    /// </summary>
+    public string? Problem => SizeProblem ?? OddsProblem ?? AreaLevelProblem ?? FolderProblem;
 
     public bool CanApply => Problem is null;
 
     /// <summary>
-    /// Whether the name, the track, the area level, the banner or the random battles differ from the map's.
+    /// Whether the name, the track, the area level, the banner, the folder or the random battles differ from the map's.
     /// </summary>
     public bool AreSettingsChanged => !AreSame(ToSettings(), _currentSettings);
 
@@ -130,6 +143,7 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
         MusicFile = SelectedMusic == NoMusic ? null : SelectedMusic,
         AreaLevel = TypedCounts.Parse(AreaLevelText, int.MaxValue),
         ShowsBanner = ShowsBanner,
+        Folder = FolderText.Trim() is { Length: > 0 } folder ? folder : null,
         RandomEncounters = HasRandomEncounters
             ? new RandomEncounterTable
             {
@@ -148,6 +162,7 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
         && edited.MusicFile == current.MusicFile
         && edited.AreaLevel == current.AreaLevel
         && edited.ShowsBanner == current.ShowsBanner
+        && edited.Folder == current.Folder
         && (edited.RandomEncounters, current.RandomEncounters) switch
         {
             (null, null) => true,

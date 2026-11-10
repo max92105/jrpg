@@ -93,7 +93,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **RN3. The Rename map window; Map > Rename map... and the map list's context menu, greyed with the reason while anything is unsaved** (Editor, about 125 lines) → [slices/RN3.md](slices/RN3.md)
 
 ### Phase 6: folders
-- [ ] **MF1. `MapSettings.Folder` and `MapFolderPath`: `folder` in map settings, validated, left out while null; the Map settings window's Folder box** (Core + Data + Editor, about 175 lines) → [slices/MF1.md](slices/MF1.md)
+- [x] **MF1. `MapSettings.Folder` and `MapFolderPath`: `folder` in map settings, validated, left out while null; the Map settings window's Folder box** (Core + Data + Editor, about 175 lines) → [slices/MF1.md](slices/MF1.md)
 - [ ] **MF2. `MapTree`: the map list as folders and maps, the filter narrowing it, the session's empty folders** (Editor, about 200 lines) → [slices/MF2.md](slices/MF2.md)
 - [ ] **MF3. The map list panel shows the tree: folders open and close, a map row opens the map, the shown map selected, Rename map... kept on map rows** (Editor, about 170 lines) → [slices/MF3.md](slices/MF3.md)
 - [ ] **MF4. New folder and Move to folder, the rules: `MapFolderChoiceViewModel`, `MainViewModel.MapFolders.cs`; a move is a settings step on the moved map, shown** (Editor, about 200 lines) → [slices/MF4.md](slices/MF4.md)

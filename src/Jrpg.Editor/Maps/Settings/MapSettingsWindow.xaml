@@ -27,6 +27,10 @@
 
     <CheckBox Content="Show banner on entry" IsChecked="{Binding ShowsBanner}" Margin="0,0,0,8" ToolTip="Entering this map shows its name and area level at the top right for a few seconds." />
 
+    <TextBlock Text="Folder in the map list (names joined by /; empty for the top)" />
+    <TextBox Text="{Binding FolderText, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,2" ToolTip="Such as Act 1/Village; only the editor reads it" />
+    <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Text="{Binding FolderProblem}" Margin="0,0,0,6" />
+
     <TextBlock Text="Size in cells (width x height)" />
     <StackPanel Orientation="Horizontal" Margin="0,2,0,2">
       <TextBox Width="60" Text="{Binding WidthText, UpdateSourceTrigger=PropertyChanged}" />

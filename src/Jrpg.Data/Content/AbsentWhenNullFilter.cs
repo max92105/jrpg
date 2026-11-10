@@ -34,6 +34,9 @@ internal static class AbsentWhenNullFilter
         // Decision 527: a town has no area level.
         (typeof(MapSettings), "areaLevel"),
 
+        // Decision 532: a map at the top of the editor's list has no folder.
+        (typeof(MapSettings), "folder"),
+
         // ADR 0039: only animated tiles have an animation.
         (typeof(TileDefinition), "animation"),
     ];

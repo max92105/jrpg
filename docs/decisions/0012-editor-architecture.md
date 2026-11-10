@@ -34,4 +34,4 @@ Rules that come with it:
 ## Consequences
 - Easier: editing rules (fill, ids, undo) are unit-tested; the views stay thin; a save can't break the game.
 - Harder: two models of a map (Core's immutable records, the editor's draft), converted on open and save; a round-trip test (open, save untouched, no diff) guards it.
-- Watch: the draw order and canopy rules exist in two places (game and editor) on top of one Core key; a visual difference means one of them drifted from `DrawOrderKey`.
+- Watch: the draw order and canopy rules exist in two places (game and editor) on top of one Core key; a visual difference means one of them drifted from `DrawOrderKey`. Closed by ADR 0041 (2026-11-10): Core's `MapDrawOrder` builds the one list both read.

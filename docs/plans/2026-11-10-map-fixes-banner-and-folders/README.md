@@ -69,8 +69,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **SV2. A refused Ctrl+S that Save all would pass says so: a dry run of the map checks on the open maps (`ContentWriter.CheckMaps`)** (Data + Editor, about 110 lines) → [slices/SV2.md](slices/SV2.md)
 
 ### Phase 2: draw order
-- [ ] **DO1. Moves only: one draw order in Core (`MapDrawOrder`, `MapDrawItem`), read by the game's `MapDrawList`, the editor's `MapDrawing` and `PlacedObjectHits`** (Core + Game + Editor, about 150 lines changed, 140 lines of tests moved) → [slices/DO1.md](slices/DO1.md)
-- [ ] ADR 0041: one draw order and the canopy's layer. Write it from the entry under "ADRs" below (decisions 520-522).
+- [x] **DO1. Moves only: one draw order in Core (`MapDrawOrder`, `MapDrawItem`), read by the game's `MapDrawList`, the editor's `MapDrawing` and `PlacedObjectHits`** (Core + Game + Editor, about 150 lines changed, 140 lines of tests moved) → [slices/DO1.md](slices/DO1.md)
+- [x] ADR 0041: one draw order and the canopy's layer. Write it from the entry under "ADRs" below (decisions 520-522).
 - [ ] **DO2. Canopies keep their object's layer: `DrawOrderKey.ForCanopy`; the editor dims a canopy with its object; a throwaway listing of the repository's flipped pairs** (Core + Editor, about 150 lines, the throwaway test deleted) → [slices/DO2.md](slices/DO2.md)
 
 ### Phase 3: reaching covered things

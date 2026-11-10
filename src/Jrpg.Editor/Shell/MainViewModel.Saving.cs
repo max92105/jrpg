@@ -7,7 +7,10 @@ using Jrpg.Editor.Maps;
 
 namespace Jrpg.Editor.Shell;
 
-/// <summary>Save, Save all and the close question (decisions 499-501, 518).</summary>
+/// <summary>
+/// Save, Save all and the close question (decisions 499-501, 518); a refused Save points to Save all when the open
+/// maps pass together (decision 519).
+/// </summary>
 internal sealed partial class MainViewModel
 {
     /// <summary>
@@ -37,7 +40,8 @@ internal sealed partial class MainViewModel
 
     /// <summary>
     /// Saves the shown map and the tiles and objects when changed, in one go, if the game would load them; otherwise
-    /// keeps them unsaved and shows why (decisions 499, 518). With no map shown it still saves the tiles and objects.
+    /// keeps them unsaved and shows why, with the way out when it is Save all (decisions 499, 518, 519). With no map
+    /// shown it still saves the tiles and objects.
     /// </summary>
     [RelayCommand]
     private void Save()
@@ -51,6 +55,10 @@ internal sealed partial class MainViewModel
         if (CurrentMap is { } shown)
         {
             SaveTogether(content, OpenMaps.ContentWith(content.Current, shown), [shown]);
+            if (SaveError is not null && SaveAllHint(content, shown) is { } hint)
+            {
+                SaveError += hint;
+            }
         }
         else if (content.IsDirty && TryWrite(() => _writer.WriteMapCatalogs(content.Current)))
         {
@@ -138,6 +146,33 @@ internal sealed partial class MainViewModel
         }
     }
 
+    // Ctrl+S checks the other maps as saved; when that is what refused it and every open map passes as it is now,
+    // Save all is the way (decision 519). The hint names the other maps with changes, which Save all writes with the
+    // shown one. A refusal from elsewhere (a file that can't be written, a catalog check) gets no hint.
+    private string? SaveAllHint(CatalogDraft content, MapViewModel shown)
+    {
+        List<string> others = [.. _openMaps.Dirty.Where(open => open != shown).Select(open => $"map '{open.Map.Id}'")];
+        if (others.Count == 0 || MapsPass(OpenMaps.ContentWith(content.Current, shown)) || !MapsPass(_openMaps.ContentWith(content.Current)))
+        {
+            return null;
+        }
+
+        return $" Save all (Ctrl+Shift+S) writes {Named(others)} with it, which makes this valid.";
+    }
+
+    private static bool MapsPass(ContentCatalog content)
+    {
+        try
+        {
+            ContentWriter.CheckMaps(content);
+            return true;
+        }
+        catch (ContentValidationException)
+        {
+            return false;
+        }
+    }
+
     // "Unsaved changes in map 'forest', map 'start' and the tiles and objects."; null when nothing is unsaved.
     private string? UnsavedChangesQuestion()
     {
@@ -147,11 +182,10 @@ internal sealed partial class MainViewModel
             unsaved.Add("the tiles and objects");
         }
 
-        return unsaved switch
-        {
-            [] => null,
-            [var only] => $"Unsaved changes in {only}.",
-            [.. var first, var last] => $"Unsaved changes in {string.Join(", ", first)} and {last}.",
-        };
+        return unsaved.Count == 0 ? null : $"Unsaved changes in {Named(unsaved)}.";
     }
+
+    // "map 'forest'", "map 'forest' and map 'start'", "map 'forest', map 'start' and the tiles and objects".
+    private static string Named(List<string> names) =>
+        names.Count == 1 ? names[0] : $"{string.Join(", ", names[..^1])} and {names[^1]}";
 }

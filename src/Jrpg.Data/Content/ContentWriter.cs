@@ -86,22 +86,42 @@ public sealed class ContentWriter(string contentRoot)
         WriteAll(CheckedMapWrites(content, mapIds));
     }
 
+    /// <summary>
+    /// Checks every map as <see cref="WriteMaps"/> would, every layout against the others, every map's settings and
+    /// the new game's start, and writes nothing: the editor's dry run on the open maps when Ctrl+S is refused, to
+    /// point to Save all (decision 519).
+    /// </summary>
+    /// <exception cref="ContentValidationException">The game would reject a map; it names the file.</exception>
+    public static void CheckMaps(ContentCatalog content)
+    {
+        CheckLayouts(content);
+        CheckSettingsAndNewGame(content, content.Maps.Keys);
+    }
+
     // The named maps' two files each, once their settings and the new game's start pass the loader's checks.
     private List<FileToWrite> CheckedMapWrites(ContentCatalog catalog, IReadOnlyCollection<string> mapIds)
     {
+        CheckSettingsAndNewGame(catalog, mapIds);
         var writes = new List<FileToWrite>();
+        foreach (var map in mapIds.Select(id => catalog.Maps[id]))
+        {
+            writes.Add(PlanWrite(MapFolderReader.LayoutFile(map.Id), map.Layout));
+            writes.Add(PlanWrite(MapFolderReader.SettingsFile(map.Id), map.Settings));
+        }
+
+        return writes;
+    }
+
+    private static void CheckSettingsAndNewGame(ContentCatalog catalog, IEnumerable<string> mapIds)
+    {
         var encounterIds = catalog.Encounters.Keys.ToHashSet();
         foreach (var map in mapIds.Select(id => catalog.Maps[id]))
         {
-            var settingsFile = MapFolderReader.SettingsFile(map.Id);
-            MapSettingsValidator.Validate(settingsFile, map.Settings, encounterIds);
-            writes.Add(PlanWrite(MapFolderReader.LayoutFile(map.Id), map.Layout));
-            writes.Add(PlanWrite(settingsFile, map.Settings));
+            MapSettingsValidator.Validate(MapFolderReader.SettingsFile(map.Id), map.Settings, encounterIds);
         }
 
         var newGameReferences = new NewGameReferences(catalog.PartyMembers.Keys.ToHashSet(), catalog.Items, catalog.Maps);
         NewGameValidator.Validate(ContentCatalogLoader.NewGameFile, catalog.NewGame, newGameReferences);
-        return writes;
     }
 
     // The catalog files, each sorted by id, once they and every map's layout pass the loader's checks.

@@ -9,8 +9,9 @@ namespace Jrpg.Editor.Tests.Shell;
 
 /// <summary>
 /// Save and Save all writing in one go, all or none, each map checked with the open maps as they are now (decision
-/// 518), on a copy of the test world. The deadlock: the forest resized so that start's warp into it had to move into
-/// the new cells; each map's file refused against the other's saved one.
+/// 518), and a refused Ctrl+S pointing to Save all when the open maps pass together (decision 519), on a copy of
+/// the test world. The deadlock: the forest resized so that start's warp into it had to move into the new cells; each
+/// map's file refused against the other's saved one.
 /// </summary>
 public sealed class MainViewModelSaveTogetherTests : IDisposable
 {
@@ -44,9 +45,82 @@ public sealed class MainViewModelSaveTogetherTests : IDisposable
         viewModel.SaveCommand.Execute(null);
 
         Assert.StartsWith("map-layouts/start.json: ", viewModel.SaveError, StringComparison.Ordinal);
-        Assert.EndsWith(" Nothing was written.", viewModel.SaveError, StringComparison.Ordinal);
+        Assert.Contains(" Nothing was written.", viewModel.SaveError, StringComparison.Ordinal);
         Assert.Equal(startBefore, _content.LayoutBytes("start"));
         Assert.Equal(forestBefore, _content.LayoutBytes("forest"));
+    }
+
+    // The resized forest is refused by start's saved warp into its old top-right cell.
+    [Fact]
+    public void Save_ResizedMapRefusedByTheOthersSavedWarp_PointsToSaveAll()
+    {
+        var viewModel = OpenTheDeadlock();
+        viewModel.TryOpenMap("forest");
+
+        viewModel.SaveCommand.Execute(null);
+
+        Assert.EndsWith(" Nothing was written. Save all (Ctrl+Shift+S) writes map 'start' with it, which makes this valid.", viewModel.SaveError, StringComparison.Ordinal);
+    }
+
+    // Start's moved warp is refused by the forest's saved file, still the old size.
+    [Fact]
+    public void Save_WarpMapRefusedByTheResizedMapsSavedFile_PointsToSaveAll()
+    {
+        var viewModel = OpenTheDeadlock();
+
+        viewModel.SaveCommand.Execute(null);
+
+        Assert.EndsWith(" Nothing was written. Save all (Ctrl+Shift+S) writes map 'forest' with it, which makes this valid.", viewModel.SaveError, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Save_RefusedAndSaveAllWouldBeRefusedToo_GivesTheMessageAlone()
+    {
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
+        EditorTestContent.PaintUnknownTile(viewModel.CurrentMap!);
+        viewModel.TryOpenMap("start");
+        EditorTestContent.PaintTopLeft(viewModel);
+        viewModel.TryOpenMap("forest");
+
+        viewModel.SaveCommand.Execute(null);
+
+        Assert.EndsWith(" Nothing was written.", viewModel.SaveError, StringComparison.Ordinal);
+    }
+
+    // Every map is valid; the refusal is the file's: Save all would fail on it too.
+    [Fact]
+    public void Save_RefusedByTheFileWhileTheMapsPass_GivesTheMessageAlone()
+    {
+        var viewModel = _content.Open(_content.CopyOfTestWorld());
+        EditorTestContent.PaintTopLeft(viewModel);
+        viewModel.TryOpenMap("start");
+        EditorTestContent.PaintTopLeft(viewModel);
+        var startLayout = Path.Combine(_content.ContentCopy, "map-layouts", "start.json");
+        File.SetAttributes(startLayout, FileAttributes.ReadOnly);
+        try
+        {
+            viewModel.SaveCommand.Execute(null);
+        }
+        finally
+        {
+            File.SetAttributes(startLayout, FileAttributes.Normal);
+        }
+
+        Assert.NotNull(viewModel.SaveError);
+        Assert.EndsWith(" Nothing was written.", viewModel.SaveError, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Save_RefusedWithNoOtherMapChanged_GivesTheMessageAlone()
+    {
+        var viewModel = OpenTheDeadlock();
+        viewModel.TryOpenMap("forest");
+        viewModel.SaveAllCommand.Execute(null);
+        EditorTestContent.PaintUnknownTile(viewModel.CurrentMap!);
+
+        viewModel.SaveCommand.Execute(null);
+
+        Assert.EndsWith(" Nothing was written.", viewModel.SaveError, StringComparison.Ordinal);
     }
 
     // Removing an object the saved forest still places: the catalogs alone were refused against the saved map.

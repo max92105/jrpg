@@ -24,7 +24,7 @@
       <TextBlock Style="{StaticResource Lines}">
         Ctrl+N: new map.<LineBreak />
         Ctrl+S: save the shown map and the tiles.<LineBreak />
-        Ctrl+Shift+S: save every changed map and the tiles (File &gt; Save all). Closing with unsaved changes: Save all, Don't save or Cancel.<LineBreak />
+        Ctrl+Shift+S: save every changed map and the tiles and objects, checked together, all or none (File &gt; Save all); Ctrl+S checks the other maps as saved, and says when Save all would pass. Closing with unsaved changes: Save all, Don't save or Cancel.<LineBreak />
         Maps stay open: switch freely, a * in the map list marks unsaved changes.<LineBreak />
         Ctrl+M: filter the map list by name or id; Enter opens the first map shown, Esc clears it.<LineBreak />
         Alt+Left: back to the previous map; again to return.<LineBreak />

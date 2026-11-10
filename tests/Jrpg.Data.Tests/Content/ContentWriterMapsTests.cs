@@ -99,6 +99,25 @@ public sealed class ContentWriterMapsTests : IDisposable
         Assert.Equal(tilesBefore, File.ReadAllBytes(_content.PathOf("tiles.json")));
     }
 
+    [Fact]
+    public void CheckMaps_MapsValidOnlyTogether_DoesNotThrow()
+    {
+        var catalog = ContentCatalogLoader.Load(_content.Path);
+        var changed = WithStartWarpsIntoForestAt(WithForestGrownBy(catalog, 3), new GridCell(28, 19));
+
+        ContentWriter.CheckMaps(changed);
+    }
+
+    [Fact]
+    public void CheckMaps_WarpOutsideItsMap_ThrowsNamingTheLayout()
+    {
+        var broken = WithStartWarpsIntoForestAt(ContentCatalogLoader.Load(_content.Path), new GridCell(28, 19));
+
+        var exception = Assert.Throws<ContentValidationException>(() => ContentWriter.CheckMaps(broken));
+
+        Assert.StartsWith("map-layouts/start.json: ", exception.Message, StringComparison.Ordinal);
+    }
+
     private string LayoutPath(string mapId) => Path.Combine(_content.Path, "map-layouts", $"{mapId}.json");
 
     private static ContentCatalog WithForestTopLeft(ContentCatalog catalog, int tileId)

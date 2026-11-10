@@ -18,6 +18,8 @@ When Ctrl+S is refused (it checks the other maps as saved) and the same checks p
   - `Save_RefusedAndSaveAllWouldBeRefusedToo_GivesTheMessageAlone` (the shown map with an unknown tile while another map is dirty: no hint).
   - `Save_RefusedWithNoOtherMapChanged_GivesTheMessageAlone`.
 
+- **Done, with deviations:** `ContentWriter.CheckMaps` is static (it reads no content root), with the settings and new game checks split out of `CheckedMapWrites` into `CheckSettingsAndNewGame` so the dry run plans no writes. The hint follows the "Nothing was written." or "The tiles and objects were saved" sentence; SV1's `Save_ShownMapNeedsAnotherOpenMapsChange_RefusesAndWritesNothing` now checks that sentence with Contains, the new direction tests check the full ending. The "a, b and c" join became `Named`, shared with the close question. The review's Warning: the hint shows only when the map checks are what refused Ctrl+S (they fail on the shown map against the others as saved, pass on the open maps), so a file that can't be written or a catalog refusal gets none (`Save_RefusedByTheFileWhileTheMapsPass_GivesTheMessageAlone`, a read-only layout file).
+
 ## Verify by hand
 SV1's steps 1-4, then:
 1. Ctrl+S on "start": the "Not saved" line names `map-layouts/start.json` and ends "Save all (Ctrl+Shift+S) writes map 'save_check' with it, which makes this valid."

@@ -5,15 +5,16 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-10-map-fixes-banner-and-folders, slice MF4 (MapFolderChoiceViewModel, MainViewModel.MapFolders,
-MapNavigation.SessionFolders), 2026-11-10. Round 1. Verdict: fix the Criticals.
+Plan 2026-11-10-map-fixes-banner-and-folders, slice MF5 (MapFolderWindow, MapListPanel folder menus and drag),
+2026-11-10. Round 1. Verdict: ready to commit (no Critical).
 
-- Withdrawn (Critical, wrong premise): "the map list is rebuilt only on an IsDirty flip". MapViewModel.Refresh raises
-  PropertyChanged(IsDirty) on every step, undo and redo, so the rows are rebuilt every time; the undo test the review
-  asked for passes with no change (kept). The developer dropped TryMoveMapTo's redundant ShowMapList call and the
-  settings event, and reworded OpenMaps.DirtyChanged's summary. The Map settings follow-up falls with it.
-- Fixed (Warning): TryMoveMapTo checks the row's folder before TryOpenMap, with a test.
-- Open (Suggestion): split the ~170-column lines (Folders initializer, TryMoveMap, KnownFolders).
-- MF3 items all fixed (ContextMenu Tag on the TextBlock, NoteExpanded ignored while filtering, SelectMap clears the
-  stale row, PART_Header/ItemsHost). Session folder after a map moves out: recorded in MF4's Done note, dropped.
+- Open (Warning): drag payload is a plain string with Move effect: text dragged from the filter box or another app is
+  accepted and cut from its source. Fix: private DataObject format.
+- Open (Warning): row menus sit on the template's TextBlock/StackPanel, so a right click right of a row's name and
+  Shift+F10 get the tree's one-item menu, and MenuFolder (set on right button down) is stale for the keyboard. Fix:
+  menus on the TreeViewItem via ItemContainerStyle, MenuFolder set in ContextMenuOpening.
+- Open (Warning): New folder on the empty space opens on "(top of the list)" with OK lit; OK does nothing, no reason.
+- Open (Suggestion): folder dialog handlers in a MainWindow.MapFolders partial instead of MapSwitching.
+- Follow-up: MF4's ~150-170-column lines (MainViewModel.MapFolders TryMoveMap/KnownFolders, Folders initializer).
+- Accepted by the Done note: Move to folder acts on the shown map; Choose returns nothing.
 - start.json residue: the developer's hand test, excluded by the caller.

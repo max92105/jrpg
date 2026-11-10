@@ -86,7 +86,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **MB3. The banner's look: serif name, spaced-caps level label and large number, a dark band fading to the left, a short slide** (Game, about 140 raw, 225 at 1.6x) → [slices/MB3.md](slices/MB3.md)
 
 ### Phase 5: map ids
-- [ ] **ML0. Moves only: the map list and its filter box into `Shell/MapListPanel`, their handlers with them** (Editor, about 110 lines moved, no behavior change) → [slices/ML0.md](slices/ML0.md)
+- [x] **ML0. Moves only: the map list and its filter box into `Shell/MapListPanel`, their handlers with them** (Editor, about 110 lines moved, no behavior change) → [slices/ML0.md](slices/ML0.md)
 - [ ] ADR 0042: renaming map ids before the first release. Write it from the entry under "ADRs" below (decisions 530, 531).
 - [ ] **RN1. `MapIdRename` and `ContentWriter.RenameMap`: the map's two files under the new id, every warp and the new game's start following, checked, written, the old files deleted** (Data, about 260 lines) → [slices/RN1.md](slices/RN1.md)
 - [ ] **RN2. `MapRenamingViewModel` and `MainViewModel.MapRenaming.cs`: the new id typed (prefilled from the display name), its problems, refused while anything is unsaved, written, the editor carrying on under the new id with Back still working** (Editor, about 230 lines) → [slices/RN2.md](slices/RN2.md)

@@ -18,6 +18,8 @@ The map list (the filter box and the list) is its own user control with its own 
 ## Tests
 No new rule: the existing `MapNavigationTests` and `MainViewModel*` tests pass unchanged (counted before and after in the Done note).
 
+- **Done:** as planned. 4468 tests before and after. `MainWindow.xaml` ends at 287 lines, `MainWindow.MapSwitching.cs` at 56; the panel keeps the selected id itself, so its reselect after a rows change reads no window field.
+
 ## Verify by hand
 1. The map list shows as before; clicking a row opens the map; the open map stays selected after a save and after an edit marks its row " *".
 2. Ctrl+M focuses the filter box; typing narrows the list; Enter opens the first map; Esc clears it and the arrows pan the map again; Down moves into the list.

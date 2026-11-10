@@ -1,6 +1,5 @@
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
 using Jrpg.Editor.Events;
 using Jrpg.Editor.Maps;
@@ -8,8 +7,8 @@ using Jrpg.Editor.Maps;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// The map list: choosing and reselecting the shown map, its filter box (decision 504), and a warp's Go to arriving on
-/// its destination (decision 508).
+/// Showing the open map: its row in the map list panel kept selected (decision 504), the filter box
+/// reached by Find, and a warp's Go to arriving on its destination (decision 508).
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -18,9 +17,7 @@ internal sealed partial class MainWindow
         _shownMap?.PropertyChanged -= OnOpenMapChanged;
         _shownMap = _viewModel.CurrentMap;
         _shownMap?.PropertyChanged += OnOpenMapChanged;
-
-        // Kept in step here rather than bound, so a switch refused (an unknown id) leaves the list on the open map.
-        MapList.SelectedValue = _shownMap?.Map.Id;
+        MapListPanel.SelectMap(_shownMap?.Map.Id);
         _gridDrawnFor = null;
         HideDestinationMark();
         DrawCurrentMap();
@@ -28,45 +25,10 @@ internal sealed partial class MainWindow
         RefitMap();
     }
 
-    private void OnMapListSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (MapList.SelectedValue is string mapId && !_viewModel.TryOpenMap(mapId))
-        {
-            MapList.SelectedValue = _shownMap?.Map.Id;
-        }
-    }
+    private void OnGoToMapExecuted(object sender, ExecutedRoutedEventArgs e) => MapListPanel.FocusFilter();
 
-    // A save (a new map, a new name), a row's unsaved mark or the filter replaces the rows, which drops the selection;
-    // this runs once the new rows are in.
-    private void OnMapListUpdated(object? sender, DataTransferEventArgs e) => MapList.SelectedValue = _shownMap?.Map.Id;
-
-    private void OnGoToMapExecuted(object sender, ExecutedRoutedEventArgs e)
-    {
-        MapFilterBox.Focus();
-        MapFilterBox.SelectAll();
-    }
-
-    // Enter opens the first map shown, Esc clears the filter and gives the map back the keys, Down goes to the list.
-    private void OnMapFilterKeyDown(object sender, KeyEventArgs e)
-    {
-        switch (e.Key)
-        {
-            case Key.Enter:
-                _viewModel.Navigation.TryOpenFirstShown();
-                break;
-            case Key.Escape:
-                _viewModel.Navigation.Filter = "";
-                MapViewport.Focus();
-                break;
-            case Key.Down:
-                MapList.Focus();
-                break;
-            default:
-                return;
-        }
-
-        e.Handled = true;
-    }
+    // Esc in the filter box: the map takes the keys back, so the arrows pan again.
+    private void OnMapFilterLeft(object sender, RoutedEventArgs e) => MapViewport.Focus();
 
     // The dialog closed with Go to: its map shown (opened if needed, never asked), at 100 % with the arrival cell in
     // the middle of the view, marked until the next press on the map.

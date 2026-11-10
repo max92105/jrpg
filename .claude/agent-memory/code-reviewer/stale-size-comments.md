@@ -19,7 +19,9 @@ call or a rename. These cases slipped past it:
   `RepositoryTree`, `RepositoryIntroSkipped`): grep test names for the old source's word, not only comments. A shared
   fixture switching source (T2c: `SaveGameFixtures.Catalog` -> test-world) leaves its users' unchanged summaries saying
   "against the repository content": grep the fixture's users, not only the diff.
-- A record gaining a field (M2b-2: StatSheet.AttackDamage) is missed by its owner's "X, Y and Z" summary; a mechanic no
+- A record gaining a field (M2b-2: StatSheet.AttackDamage; AL2: MapSettings.ShowsBanner left MainViewModel.
+  TryApplySettings's "the name, the track, the area level and the random battles", and docs/map.md's Content line naming
+  only the null and zero filters) is missed by every "X, Y and Z" summary of it; grep the last listed field. A mechanic no
   longer read (M2b-1) turns "while the battle uses it" docs false; grep "while ... uses" and the slice id.
 - A responsibility moved to a new type (C1) leaves a neighbour's param doc naming the old owner; C2 left the backlog with
   `EquipmentPage.Apply` after it moved: grep `<OldOwner>.<MovedMember>` across docs/.

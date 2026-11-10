@@ -54,6 +54,18 @@ public sealed class MapNavigationTreeTests
         Assert.False(_navigation.ShownTree[0].IsExpanded);
     }
 
+    // A filter opens every folder it shows and the tree reports each as opened.
+    [Fact]
+    public void NoteExpanded_WhileFiltering_LeavesTheFolderClosedOnceTheFilterClears()
+    {
+        _navigation.Filter = "mill";
+
+        _navigation.NoteExpanded("Act 1", isExpanded: true);
+        _navigation.Filter = "";
+
+        Assert.False(_navigation.ShownTree[0].IsExpanded);
+    }
+
     [Fact]
     public void AddSessionFolder_ShowsItInTheTree()
     {

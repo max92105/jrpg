@@ -2,13 +2,16 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
+using Jrpg.Editor.Maps;
 
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// The map list beside the map and its filter box (decision 504): choosing a row opens the map, and the open map's row
-/// is selected again whenever the rows are replaced; a right click opens the map and offers Rename map (decision 530).
-/// Its DataContext is the main view model.
+/// The map list beside the map, a tree of folders (decision 532), and its filter box (decision 504): choosing a map row
+/// opens the map, and the open map's row is selected again, its folders opened, whenever the rows are replaced; a right
+/// click selects the row and offers Rename map (decision 530); a folder opened or closed stays so. Its DataContext is
+/// the main view model.
 /// </summary>
 internal sealed partial class MapListPanel : UserControl
 {
@@ -42,13 +45,30 @@ internal sealed partial class MapListPanel : UserControl
     private MainViewModel ViewModel => (MainViewModel)DataContext;
 
     /// <summary>
-    /// Selects the open map's row, kept here rather than bound, so a switch refused (an unknown id) leaves the list on
-    /// the open map; null selects none.
+    /// Selects the open map's row and opens the folders above it, kept here rather than bound, so a switch refused (an
+    /// unknown id) leaves the tree on the open map; null selects none.
     /// </summary>
     public void SelectMap(string? mapId)
     {
         _openMapId = mapId;
-        MapList.SelectedValue = mapId;
+        var path = mapId is null ? [] : MapTree.PathTo(ViewModel.Navigation.ShownTree, mapId);
+        if (path.Count == 0)
+        {
+            // The tree keeps a row selected until told otherwise; a row left selected can't be clicked again.
+            if (MapTreeView.SelectedItem is MapTreeNode shown)
+            {
+                shown.IsSelected = false;
+            }
+
+            return;
+        }
+
+        foreach (var folder in path.SkipLast(1))
+        {
+            folder.IsExpanded = true;
+        }
+
+        path[^1].IsSelected = true;
     }
 
     /// <summary>Find / Ctrl+M: the filter box takes the keys, its text selected.</summary>
@@ -58,21 +78,48 @@ internal sealed partial class MapListPanel : UserControl
         MapFilterBox.SelectAll();
     }
 
-    private void OnMapListSelectionChanged(object sender, SelectionChangedEventArgs e)
+    // A map row opens its map; a folder row opens nothing.
+    private void OnMapTreeSelectionChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
     {
-        if (MapList.SelectedValue is string mapId && !ViewModel.TryOpenMap(mapId))
+        if (e.NewValue is MapTreeNode { Map: { } map } && !ViewModel.TryOpenMap(map.Id))
         {
-            MapList.SelectedValue = _openMapId;
+            SelectMap(_openMapId);
         }
     }
 
     // A save (a new map, a new name), a row's unsaved mark or the filter replaces the rows, which drops the selection;
     // this runs once the new rows are in.
-    private void OnMapListUpdated(object? sender, DataTransferEventArgs e) => MapList.SelectedValue = _openMapId;
+    private void OnMapTreeUpdated(object? sender, DataTransferEventArgs e) => SelectMap(_openMapId);
+
+    private void OnFolderExpanded(object sender, RoutedEventArgs e) => NoteExpanded(e, isExpanded: true);
+
+    private void OnFolderCollapsed(object sender, RoutedEventArgs e) => NoteExpanded(e, isExpanded: false);
+
+    // SelectMap opening a folder is noted too: the folder stays open on the next rebuild.
+    private void NoteExpanded(RoutedEventArgs e, bool isExpanded)
+    {
+        if (e.OriginalSource is TreeViewItem { DataContext: MapTreeNode { FolderPath: { } path } })
+        {
+            ViewModel.Navigation.NoteExpanded(path, isExpanded);
+        }
+    }
+
+    // The row under the mouse is selected, which opens its map, before the context menu shows.
+    private void OnMapTreeRightButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        for (var element = e.OriginalSource as DependencyObject; element is not null; element = VisualTreeHelper.GetParent(element))
+        {
+            if (element is TreeViewItem row)
+            {
+                row.IsSelected = true;
+                return;
+            }
+        }
+    }
 
     private void OnRenameMapClicked(object sender, RoutedEventArgs e) => RaiseEvent(new RoutedEventArgs(RenameRequestedEvent, this));
 
-    // Enter opens the first map shown, Esc clears the filter and gives the map back the keys, Down goes to the list.
+    // Enter opens the first map shown, Esc clears the filter and gives the map back the keys, Down goes to the tree.
     private void OnMapFilterKeyDown(object sender, KeyEventArgs e)
     {
         switch (e.Key)
@@ -85,7 +132,7 @@ internal sealed partial class MapListPanel : UserControl
                 RaiseEvent(new RoutedEventArgs(FilterLeftEvent, this));
                 break;
             case Key.Down:
-                MapList.Focus();
+                MapTreeView.Focus();
                 break;
             default:
                 return;

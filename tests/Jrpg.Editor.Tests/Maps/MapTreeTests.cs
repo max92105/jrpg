@@ -116,6 +116,28 @@ public sealed class MapTreeTests
     }
 
     [Fact]
+    public void PathTo_NestedMap_GivesEveryFolderAboveThenTheMap()
+    {
+        var rows = MapTree.Of([_town, _mill, _forest], [], "", _noFolders);
+
+        var path = MapTree.PathTo(rows, "mill");
+
+        Assert.Equal(["Act 1", "Act 1/Village", null], path.Select(node => node.FolderPath));
+        Assert.Equal("mill", path[^1].Map?.Id);
+    }
+
+    [Fact]
+    public void PathTo_TopLevelMap_IsTheMapAlone()
+    {
+        var rows = MapTree.Of([_town, _mill], [], "", _noFolders);
+
+        Assert.Equal(["Town (town)"], MapTree.PathTo(rows, "town").Select(node => node.Text));
+    }
+
+    [Fact]
+    public void PathTo_UnknownMap_IsEmpty() => Assert.Empty(MapTree.PathTo(MapTree.Of([_town], [], "", _noFolders), "cave"));
+
+    [Fact]
     public void MapsInOrder_Nested_DepthFirst()
     {
         var rows = MapTree.Of([_town, _forest, _mill], [], "", _noFolders);

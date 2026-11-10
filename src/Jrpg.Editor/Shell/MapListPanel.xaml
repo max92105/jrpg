@@ -1,28 +1,56 @@
 <UserControl x:Class="Jrpg.Editor.Shell.MapListPanel"
              x:ClassModifier="internal"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:maps="clr-namespace:Jrpg.Editor.Maps">
   <DockPanel>
     <TextBox x:Name="MapFilterBox"
              DockPanel.Dock="Top"
              Text="{Binding Navigation.Filter, UpdateSourceTrigger=PropertyChanged}"
              ToolTip="Type part of a map's name or id; Enter opens the first one, Esc clears (Ctrl+M)"
              PreviewKeyDown="OnMapFilterKeyDown" />
-    <ListBox x:Name="MapList"
-             ItemsSource="{Binding Navigation.ShownEntries, NotifyOnTargetUpdated=True}"
-             TargetUpdated="OnMapListUpdated"
-             DisplayMemberPath="Text"
-             SelectedValuePath="Id"
-             SelectionChanged="OnMapListSelectionChanged">
-      <ListBox.ContextMenu>
-        <ContextMenu>
-          <MenuItem Header="Rename map..."
-                    Click="OnRenameMapClicked"
-                    IsEnabled="{Binding CanRenameMap}"
-                    ToolTip="{Binding RenameMapTip}"
-                    ToolTipService.ShowOnDisabled="True" />
-        </ContextMenu>
-      </ListBox.ContextMenu>
-    </ListBox>
+    <!-- A right click selects the row first (a tree row doesn't on its own), so the menu is on the map it points at. -->
+    <TreeView x:Name="MapTreeView"
+              ItemsSource="{Binding Navigation.ShownTree, NotifyOnTargetUpdated=True}"
+              TargetUpdated="OnMapTreeUpdated"
+              SelectedItemChanged="OnMapTreeSelectionChanged"
+              TreeViewItem.Expanded="OnFolderExpanded"
+              TreeViewItem.Collapsed="OnFolderCollapsed"
+              PreviewMouseRightButtonDown="OnMapTreeRightButtonDown">
+      <TreeView.ItemContainerStyle>
+        <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+          <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+          <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+        </Style>
+      </TreeView.ItemContainerStyle>
+      <TreeView.ItemTemplate>
+        <HierarchicalDataTemplate DataType="{x:Type maps:MapTreeNode}" ItemsSource="{Binding Rows}">
+          <Grid>
+            <StackPanel x:Name="FolderRow" Orientation="Horizontal" Visibility="Collapsed">
+              <Path Data="M0,2 L4,2 L5,0 L8,0 L8,1 L12,1 L12,9 L0,9 Z" Fill="{StaticResource MutedTextBrush}" VerticalAlignment="Center" Margin="0,0,5,0" />
+              <TextBlock Text="{Binding Text}" />
+            </StackPanel>
+            <!-- The menu reaches the main view model through its target's Tag: a context menu has no ancestor in the tree. -->
+            <TextBlock x:Name="MapRow" Text="{Binding Text}" Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}">
+              <TextBlock.ContextMenu>
+                <ContextMenu>
+                  <MenuItem Header="Rename map..."
+                            Click="OnRenameMapClicked"
+                            IsEnabled="{Binding PlacementTarget.Tag.CanRenameMap, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                            ToolTip="{Binding PlacementTarget.Tag.RenameMapTip, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                            ToolTipService.ShowOnDisabled="True" />
+                </ContextMenu>
+              </TextBlock.ContextMenu>
+            </TextBlock>
+          </Grid>
+          <HierarchicalDataTemplate.Triggers>
+            <DataTrigger Binding="{Binding IsFolder}" Value="True">
+              <Setter TargetName="FolderRow" Property="Visibility" Value="Visible" />
+              <Setter TargetName="MapRow" Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+          </HierarchicalDataTemplate.Triggers>
+        </HierarchicalDataTemplate>
+      </TreeView.ItemTemplate>
+    </TreeView>
   </DockPanel>
 </UserControl>

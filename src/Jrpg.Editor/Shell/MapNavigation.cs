@@ -25,11 +25,9 @@ internal sealed partial class MapNavigation : ObservableObject
     [ObservableProperty]
     public partial string Filter { get; set; } = "";
 
-    /// <summary>The list's rows holding <see cref="Filter"/> in their text, in the list's order.</summary>
-    [ObservableProperty]
-    public partial IReadOnlyList<MapEntry> ShownEntries { get; private set; } = [];
-
-    /// <summary>The same rows as the tree shows them: folders holding their maps (<see cref="MapTree"/>).</summary>
+    /// <summary>
+    /// The rows holding <see cref="Filter"/> in their text, as a tree of folders (<see cref="MapTree"/>).
+    /// </summary>
     [ObservableProperty]
     public partial IReadOnlyList<MapTreeNode> ShownTree { get; private set; } = [];
 
@@ -38,12 +36,21 @@ internal sealed partial class MapNavigation : ObservableObject
     {
         _sessionFolders.Add(path);
         _expandedFolders.Add(path);
-        RefreshShownEntries();
+        RefreshShownTree();
     }
 
-    /// <summary>A folder was opened or closed in the tree, so a rebuild after a save keeps it so.</summary>
+    /// <summary>
+    /// A folder was opened or closed in the tree, so a rebuild after a save keeps it so. A filter opens every folder it
+    /// shows (decision 535) and the tree reports each; those are ignored, so the filter cleared brings the folders back
+    /// as they were.
+    /// </summary>
     public void NoteExpanded(string path, bool isExpanded)
     {
+        if (Filter.Length > 0)
+        {
+            return;
+        }
+
         if (isExpanded)
         {
             _expandedFolders.Add(path);
@@ -58,7 +65,7 @@ internal sealed partial class MapNavigation : ObservableObject
     public void ShowEntries(IReadOnlyList<MapEntry> entries)
     {
         _entries = entries;
-        RefreshShownEntries();
+        RefreshShownTree();
         GoBackCommand.NotifyCanExecuteChanged();
     }
 
@@ -100,7 +107,7 @@ internal sealed partial class MapNavigation : ObservableObject
     /// <returns>False when the filter matches no map.</returns>
     public bool TryOpenFirstShown() => MapTree.MapsInOrder(ShownTree).FirstOrDefault() is { } first && _tryOpenMap(first.Id);
 
-    partial void OnFilterChanged(string value) => RefreshShownEntries();
+    partial void OnFilterChanged(string value) => RefreshShownTree();
 
     // A previous map no longer listed (a new map dropped, B2) can't be gone back to.
     private bool CanGoBack() => _previousMapId is { } previous && _entries.Any(entry => entry.Id == previous);
@@ -109,9 +116,8 @@ internal sealed partial class MapNavigation : ObservableObject
     [RelayCommand(CanExecute = nameof(CanGoBack))]
     private void GoBack() => _tryOpenMap(_previousMapId!);
 
-    private void RefreshShownEntries()
+    private void RefreshShownTree()
     {
-        ShownEntries = Filter.Length == 0 ? _entries : [.. _entries.Where(entry => entry.Matches(Filter))];
         ShownTree = MapTree.Of(_entries, _sessionFolders, Filter, _expandedFolders);
     }
 }

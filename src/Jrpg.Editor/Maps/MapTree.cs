@@ -27,6 +27,28 @@ internal static class MapTree
     public static IEnumerable<MapEntry> MapsInOrder(IReadOnlyList<MapTreeNode> rows) =>
         rows.SelectMany(row => row.Map is { } map ? [map] : MapsInOrder(row.Rows));
 
+    /// <summary>
+    /// The nodes from the top down to a map, its folders then itself, so the view can open them and select it; empty
+    /// when the tree doesn't hold the map.
+    /// </summary>
+    public static IReadOnlyList<MapTreeNode> PathTo(IReadOnlyList<MapTreeNode> rows, string mapId)
+    {
+        foreach (var row in rows)
+        {
+            if (row.Map?.Id == mapId)
+            {
+                return [row];
+            }
+
+            if (PathTo(row.Rows, mapId) is { Count: > 0 } below)
+            {
+                return [row, .. below];
+            }
+        }
+
+        return [];
+    }
+
     // A folder's rows: the folders right under it, then its own maps.
     private static List<MapTreeNode> RowsUnder(string? parent, Shown shown)
     {

@@ -25,54 +25,54 @@ public sealed class MapNavigationTests
     }
 
     [Fact]
-    public void ShownEntries_EmptyFilter_ShowsEveryRowInOrder()
+    public void ShownTree_EmptyFilter_ShowsEveryRowInOrder()
     {
-        Assert.Equal([_forest, _inn, _mill], _navigation.ShownEntries);
+        Assert.Equal([_forest, _inn, _mill], MapTree.MapsInOrder(_navigation.ShownTree));
     }
 
     [Fact]
-    public void ShownEntries_FilterInTheName_ShowsOnlyMatchingRows()
+    public void ShownTree_FilterInTheName_ShowsOnlyMatchingRows()
     {
         _navigation.Filter = "mill";
 
-        Assert.Equal([_mill], _navigation.ShownEntries);
+        Assert.Equal([_mill], MapTree.MapsInOrder(_navigation.ShownTree));
     }
 
     [Fact]
-    public void ShownEntries_FilterInTheIdOnly_ShowsTheRow()
+    public void ShownTree_FilterInTheIdOnly_ShowsTheRow()
     {
         _navigation.Filter = "interior";
 
-        Assert.Equal([_inn], _navigation.ShownEntries);
+        Assert.Equal([_inn], MapTree.MapsInOrder(_navigation.ShownTree));
     }
 
     [Fact]
-    public void ShownEntries_FilterInAnotherCase_ShowsTheRow()
+    public void ShownTree_FilterInAnotherCase_ShowsTheRow()
     {
         _navigation.Filter = "FOREST";
 
-        Assert.Equal([_forest], _navigation.ShownEntries);
+        Assert.Equal([_forest], MapTree.MapsInOrder(_navigation.ShownTree));
     }
 
     [Fact]
-    public void ShownEntries_RowsChangedWhileFiltered_KeepsTheFilter()
+    public void ShownTree_RowsChangedWhileFiltered_KeepsTheFilter()
     {
         _navigation.Filter = "mill";
 
         _navigation.ShowEntries([_forest, _mill with { Text = "Old Mill (old_mill) *" }]);
 
-        Assert.Equal(["old_mill"], _navigation.ShownEntries.Select(entry => entry.Id));
+        Assert.Equal(["old_mill"], MapTree.MapsInOrder(_navigation.ShownTree).Select(entry => entry.Id));
     }
 
     [Fact]
-    public void Filter_Changed_RaisesShownEntries()
+    public void Filter_Changed_RaisesShownTree()
     {
         var changed = new List<string?>();
         _navigation.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
 
         _navigation.Filter = "inn";
 
-        Assert.Contains(nameof(MapNavigation.ShownEntries), changed);
+        Assert.Contains(nameof(MapNavigation.ShownTree), changed);
     }
 
     [Fact]

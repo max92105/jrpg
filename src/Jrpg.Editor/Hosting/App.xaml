@@ -8,6 +8,7 @@
       <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/Jrpg.Editor;component/Shell/EditorTheme.xaml" />
         <ResourceDictionary Source="/Jrpg.Editor;component/Shell/EditorTemplates.xaml" />
+        <ResourceDictionary Source="/Jrpg.Editor;component/Shell/EditorTreeTemplates.xaml" />
       </ResourceDictionary.MergedDictionaries>
     </ResourceDictionary>
   </Application.Resources>

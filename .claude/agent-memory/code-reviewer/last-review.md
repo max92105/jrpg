@@ -5,16 +5,16 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-10-map-fixes-banner-and-folders, slice MF5 (MapFolderWindow, MapListPanel folder menus and drag),
-2026-11-10. Round 1. Verdict: ready to commit (no Critical).
+Plan 2026-11-10-map-fixes-banner-and-folders, slice MF6 (Rename folder, written at once), 2026-11-10. Round 1.
+Verdict: ready to commit (no Critical). Plan's last slice; status retro pending.
 
-- Open (Warning): drag payload is a plain string with Move effect: text dragged from the filter box or another app is
-  accepted and cut from its source. Fix: private DataObject format.
-- Open (Warning): row menus sit on the template's TextBlock/StackPanel, so a right click right of a row's name and
-  Shift+F10 get the tree's one-item menu, and MenuFolder (set on right button down) is stale for the keyboard. Fix:
-  menus on the TreeViewItem via ItemContainerStyle, MenuFolder set in ContextMenuOpening.
-- Open (Warning): New folder on the empty space opens on "(top of the list)" with OK lit; OK does nothing, no reason.
-- Open (Suggestion): folder dialog handlers in a MainWindow.MapFolders partial instead of MapSwitching.
-- Follow-up: MF4's ~150-170-column lines (MainViewModel.MapFolders TryMoveMap/KnownFolders, Folders initializer).
-- Accepted by the Done note: Move to folder acts on the shown map; Choose returns nothing.
+- Open (Warning): MapNavigation.Follow removes/adds one at a time, so the result depends on set order: expanded
+  {"A","A/A"}, rename "A" to "A/A" gives {"A/A/A"} not {"A/A","A/A/A"} (renamed folder shows collapsed). Fix:
+  ExceptWith(within) then UnionWith(moved).
+- Open (Suggestion): MapFolderChoiceViewModel.Problem nested ternary on one ~170-col line; MapsMoved a noun name.
+- Open (Suggestion): docs/map.md MapListPanel entry still lists "Rename map, Move to folder and New folder".
+- Open (Suggestion): TryRenameFolder's refused-write branch untested (SaveError set, catalog and folders unchanged).
+- Follow-up (carried from MF5, not in backlog): MF4's ~150-170-column lines in MainViewModel.MapFolders.
+- Fixed since MF5: drag payload private format (MapRowFormat); row menus via ItemContainerStyle and MenuFolder set in
+  ContextMenuOpening; New folder at the top greys OK (NeedsAName); MainWindow.MapFolders partial exists.
 - start.json residue: the developer's hand test, excluded by the caller.

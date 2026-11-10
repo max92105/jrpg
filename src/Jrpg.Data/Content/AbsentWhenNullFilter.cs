@@ -38,14 +38,5 @@ internal static class AbsentWhenNullFilter
         (typeof(TileDefinition), "animation"),
     ];
 
-    public static void SkipNullOptionalFields(JsonTypeInfo typeInfo)
-    {
-        foreach (var (type, field) in _addedLater)
-        {
-            if (typeInfo.Type == type)
-            {
-                typeInfo.Properties.Single(property => property.Name == field).ShouldSerialize = (_, value) => value is not null;
-            }
-        }
-    }
+    public static void SkipNullOptionalFields(JsonTypeInfo typeInfo) => OptionalFieldFilter.SkipWhen(typeInfo, _addedLater, value => value is null);
 }

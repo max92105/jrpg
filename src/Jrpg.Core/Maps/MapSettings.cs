@@ -17,6 +17,12 @@ public sealed record MapSettings
     /// </summary>
     public int? AreaLevel { get; init; }
 
+    /// <summary>
+    /// Whether entering the map shows its name and level at the top right (decision 528); true unless the developer
+    /// turned it off.
+    /// </summary>
+    public bool ShowsBanner { get; init; } = true;
+
     /// <summary>Null on maps without random battles, such as towns and houses.</summary>
     public RandomEncounterTable? RandomEncounters { get; init; }
 }

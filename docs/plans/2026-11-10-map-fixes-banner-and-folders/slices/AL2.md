@@ -27,6 +27,8 @@ A map's settings say whether entering it shows the banner: `showsBanner`, true b
   - `ToSettings_LevelAndBannerOff_BothKept` (the copy-back rule over both new fields).
 - `Editor.Tests/Shell/MainViewModelMapSettingsTests` (AL1's file): `TryApplySettings_BannerUnticked_Undo_TicksItAgain`.
 
+- **Done, with deviations:** `AbsentWhenTrueFilter` is registered after the null and zero filters in the content JSON options; the test world's start settings file writes back byte for byte and loads as showing the banner. From the review: the three filters' loop was a third copy, so `OptionalFieldFilter.SkipWhen` holds it and each filter keeps its table and its reasons.
+
 ## Verify by hand
 1. Open the intro map ("intro"); Map > Settings...: Show banner on entry is ticked; untick it; OK; Ctrl+S: `content/maps/intro.json` holds `"showsBanner": false`; no other settings file changed.
 2. Tick it again, OK, Ctrl+S: the field leaves the file.

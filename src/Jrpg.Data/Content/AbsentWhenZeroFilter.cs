@@ -15,14 +15,5 @@ internal static class AbsentWhenZeroFilter
         (typeof(ObjectTile), "level"),
     ];
 
-    public static void SkipZeroOptionalFields(JsonTypeInfo typeInfo)
-    {
-        foreach (var (type, field) in _addedLater)
-        {
-            if (typeInfo.Type == type)
-            {
-                typeInfo.Properties.Single(property => property.Name == field).ShouldSerialize = (_, value) => value is not 0;
-            }
-        }
-    }
+    public static void SkipZeroOptionalFields(JsonTypeInfo typeInfo) => OptionalFieldFilter.SkipWhen(typeInfo, _addedLater, value => value is 0);
 }

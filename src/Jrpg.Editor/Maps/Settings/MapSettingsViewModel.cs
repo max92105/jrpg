@@ -32,6 +32,7 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
         MusicChoices = track is null || musicFiles.Contains(track) ? [NoMusic, .. musicFiles] : [NoMusic, track, .. musicFiles];
         SelectedMusic = track ?? NoMusic;
         AreaLevelText = map.Settings.AreaLevel is { } level ? Text(level) : "";
+        ShowsBanner = map.Settings.ShowsBanner;
         WidthText = Text(map.Layout.Width);
         HeightText = Text(map.Layout.Height);
         var table = map.Settings.RandomEncounters;
@@ -54,6 +55,10 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
 
     [ObservableProperty]
     public partial string DisplayName { get; set; }
+
+    /// <summary>Whether entering the map shows the banner (decision 528); on unless unticked.</summary>
+    [ObservableProperty]
+    public partial bool ShowsBanner { get; set; }
 
     /// <summary>The area level as typed; empty for none (decision 527).</summary>
     [ObservableProperty]
@@ -109,7 +114,9 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
 
     public bool CanApply => Problem is null;
 
-    /// <summary>Whether the name, the track, the area level or the random battles differ from the map's.</summary>
+    /// <summary>
+    /// Whether the name, the track, the area level, the banner or the random battles differ from the map's.
+    /// </summary>
     public bool AreSettingsChanged => !AreSame(ToSettings(), _currentSettings);
 
     /// <summary>
@@ -122,6 +129,7 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
 
         MusicFile = SelectedMusic == NoMusic ? null : SelectedMusic,
         AreaLevel = TypedCounts.Parse(AreaLevelText, int.MaxValue),
+        ShowsBanner = ShowsBanner,
         RandomEncounters = HasRandomEncounters
             ? new RandomEncounterTable
             {
@@ -139,6 +147,7 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
         edited.DisplayName == current.DisplayName
         && edited.MusicFile == current.MusicFile
         && edited.AreaLevel == current.AreaLevel
+        && edited.ShowsBanner == current.ShowsBanner
         && (edited.RandomEncounters, current.RandomEncounters) switch
         {
             (null, null) => true,

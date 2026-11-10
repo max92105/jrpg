@@ -1,7 +1,7 @@
 namespace Jrpg.Editor.Tests.Shell;
 
 /// <summary>
-/// Map > Settings applying the fields the settings record gained (decision 527), on the test world's forest.
+/// Map > Settings applying the fields the settings record gained (decisions 527, 528), on the test world's forest.
 /// </summary>
 public sealed class MainViewModelMapSettingsTests : IDisposable
 {
@@ -34,6 +34,20 @@ public sealed class MainViewModelMapSettingsTests : IDisposable
 
         Assert.Null(viewModel.CurrentMap.Map.Settings.AreaLevel);
         Assert.False(viewModel.CurrentMap.IsDirty);
+    }
+
+    [Fact]
+    public void TryApplySettings_BannerUnticked_Undo_TicksItAgain()
+    {
+        var viewModel = _content.Open(_content.TestWorld);
+        var settings = viewModel.StartEditingSettings()!;
+        settings.ShowsBanner = false;
+        Assert.True(viewModel.TryApplySettings(settings));
+        Assert.False(viewModel.CurrentMap!.Map.Settings.ShowsBanner);
+
+        viewModel.CurrentMap.UndoCommand.Execute(null);
+
+        Assert.True(viewModel.CurrentMap.Map.Settings.ShowsBanner);
     }
 
     [Fact]

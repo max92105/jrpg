@@ -23,7 +23,7 @@ internal static class ContentJsonOptions
 
             // Hand-written content may put "type" anywhere in a step, not only first.
             AllowOutOfOrderMetadataProperties = true,
-            TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { ContentTypeDiscriminators.Register, ComputedPropertyFilter.RemoveComputedProperties, AbsentWhenNullFilter.SkipNullOptionalFields, AbsentWhenZeroFilter.SkipZeroOptionalFields } },
+            TypeInfoResolver = new DefaultJsonTypeInfoResolver { Modifiers = { ContentTypeDiscriminators.Register, ComputedPropertyFilter.RemoveComputedProperties, AbsentWhenNullFilter.SkipNullOptionalFields, AbsentWhenZeroFilter.SkipZeroOptionalFields, AbsentWhenTrueFilter.SkipTrueOptionalFields } },
         };
         options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase, allowIntegerValues: false));
         options.Converters.Add(new StatBonusesConverter());

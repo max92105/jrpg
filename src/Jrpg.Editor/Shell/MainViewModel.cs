@@ -227,7 +227,7 @@ internal sealed partial class MainViewModel : ObservableObject
 
     /// <summary>
     /// Applies the settings dialog to the open map: the new size first, asking before it drops anything, then the name,
-    /// the track, the area level and the random battles. Each is one undo step.
+    /// the track, the area level, the banner and the random battles. Each is one undo step.
     /// </summary>
     /// <returns>False when nothing was applied: a field has a problem or the user kept the old size.</returns>
     public bool TryApplySettings(MapSettingsViewModel edited)

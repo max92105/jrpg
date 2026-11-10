@@ -7,14 +7,38 @@ namespace Jrpg.Game.Ui;
 // caption band and the entry banner.
 internal static partial class UiTheme
 {
-    /// <summary>The entry banner's text (plain look, placeholder).</summary>
-    public const int MapBannerTextPixels = 36;
+    /// <summary>The entry banner's name, in the title serif, like the reference's "Victory!" (placeholder).</summary>
+    public const int MapBannerTitlePixels = 52;
+
+    /// <summary>The entry banner's "LV" label, in spaced caps beside the number (placeholder).</summary>
+    public const int MapBannerLabelPixels = 24;
+
+    /// <summary>
+    /// The entry banner's level number, large beside its label as the reference's values are (placeholder).
+    /// </summary>
+    public const int MapBannerNumberPixels = 40;
+
+    /// <summary>The space between the banner's label and its number (placeholder).</summary>
+    public const int MapBannerLabelGap = 10;
 
     /// <summary>The entry banner's distance in from the screen's right edge, in virtual pixels (placeholder).</summary>
     public const int MapBannerRight = 64;
 
     /// <summary>The entry banner's distance down from the screen's top edge, in virtual pixels (placeholder).</summary>
     public const int MapBannerTop = 56;
+
+    /// <summary>How far right of its place the banner starts, sliding in while it fades in (placeholder).</summary>
+    public const int MapBannerSlide = 24;
+
+    /// <summary>The band's room around the banner's text (placeholder).</summary>
+    public static Point MapBannerPadding { get; } = new(28, 12);
+
+    /// <summary>
+    /// The dark band behind the banner, fading out to the left (no hard box, as the reference's panels), in black so
+    /// premultiplying changes nothing.
+    /// </summary>
+    public static ImmutableArray<GradientStop> MapBannerBand { get; } =
+        [new(0, Color.Transparent), new(0.45f, new Color(0, 0, 0, 0x99)), new(1, new Color(0, 0, 0, 0xD9))];
 
     /// <summary>The message box's text, sized toward the reference UI (plan 2026-10-25-ui-second-pass, SZ2).</summary>
     public const int MessageTextPixels = 36;

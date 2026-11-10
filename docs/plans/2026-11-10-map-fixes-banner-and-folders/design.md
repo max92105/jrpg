@@ -11,7 +11,8 @@
 | Banner place | `Ui/UiTheme.MapBanner*` | right edge 64 px in, top 56 px down at 1920 x 1080 | MB2 plain, MB3 look. Placeholder. |
 | Banner sizes | `UiTheme.MapBannerTitlePixels`, `MapBannerLabelPixels`, `MapBannerNumberPixels` | 52 px title serif, 24 px label, 40 px number | MB3. Placeholder. |
 | Banner slide | `UiTheme.MapBannerSlide` | 24 px from the right while fading in | MB3. Placeholder. |
-| Level line text | `content/text/ui.json` `map_banner_level` | "Lv {level}" | MB2 (ADR 0010); MB3 may replace it by the shared "Lv" label. |
+| Level label | `content/text/ui.json` `status_level_short` | "Lv", drawn as spaced caps "LV" | MB3 (ADR 0010): the shared label, beside the large number. |
+| Banner band and spacing | `UiTheme.MapBannerBand`, `MapBannerPadding`, `MapBannerLabelGap` | transparent at the left to 0xD9 black at the right; 28 x 12 px; 10 px | MB3. Placeholder. |
 | Folder separator | `Core/Maps/MapFolderPath.Separator` | "/" | Decision 532; a format rule, so a Core constant. |
 
 ## Diagnosis: the save deadlock (item 1)

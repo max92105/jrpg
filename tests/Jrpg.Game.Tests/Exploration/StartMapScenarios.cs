@@ -143,7 +143,7 @@ internal static class StartMapScenarios
         return new FieldOverlays(
             new InteractionPromptView(RepositoryScreenText.Text, exploration.CurrentDefinitionOf),
             banner,
-            new MapBannerView(RepositoryScreenText.Text, banner));
+            new MapBannerView(RepositoryScreenText.Text, new UiTextures(), banner));
     }
 
     /// <summary>Holds Left from <see cref="NextToForestWarpAlwaysRolling"/>, through the warp, until a step requests a battle.</summary>

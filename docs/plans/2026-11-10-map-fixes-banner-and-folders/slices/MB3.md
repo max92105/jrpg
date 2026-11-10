@@ -18,6 +18,8 @@ The banner looks like the reference's UI: the map's name in the title serif, und
 - `MapBannerViewTests`: `Update_LongName_BandFitsTheWiderLine` (the band's width from the name when wider than the level line), through an internal `BandWidth` accessor.
 - The look itself is the hand check (draw-only; F12 captures before and after).
 
+- **Done, with deviations:** the label is `status_level_short` in spaced caps (upper-cased, `SheetRowLook.LabelSpacing`), so MB2's `map_banner_level` line, its id and `MapBannerTextPixels` are gone; the band is a `UiTextures.Gradient` of `UiTheme.MapBannerBand` (transparent at the left to dark at the right), running from the text's padding to the screen's right edge, so the view takes `UiTextures` and `Draw` takes the textures. `MapBanner.FadeInShare` reads `Easing.ShareOf`. The view's test accessors are `NameLine`, `LevelNumber` and `TextWidth` (the width the band's text part and the hairline cover; the band itself runs to the screen edge). From the review: the hairline is drawn with or without a level, the slide is rounded to whole pixels so the text and the lines move together. Not captured: the machine's freedom for captures wasn't settled this session; the look is the hand check's, captures welcome in this note.
+
 ## Verify by hand
 1. F5, enter a map with an area level: F12 capture while it holds; compare with `docs/ui-reference/battle-victory.jpg` (serif title) and `battle-party-panel.webp` (label beside number): the name in the serif, "L V" in small spaced caps beside a large "3", the band fading to the left, nothing boxed.
 2. A town without a level: the name and the hairline alone, the band narrower.

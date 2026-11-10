@@ -764,9 +764,4 @@ internal static class MessageIds
 
     /// <summary>The line when it completed a quest; placeholder <c>{title}</c>.</summary>
     public const string QuestCompleted = "quest_completed";
-
-    /// <summary>
-    /// The entry banner's level line under the map's name (decision 527); placeholder <c>{level}</c>.
-    /// </summary>
-    public const string MapBannerLevel = "map_banner_level";
 }

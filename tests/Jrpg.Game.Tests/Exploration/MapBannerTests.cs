@@ -150,6 +150,38 @@ public sealed class MapBannerTests
     }
 
     [Fact]
+    public void FadeInShare_HalfwayThroughTheFadeIn_IsHalf()
+    {
+        _banner.Enter(_village);
+
+        StepFor(MapBanner.WaitTime + (MapBanner.FadeInTime / 2));
+
+        Assert.InRange(_banner.FadeInShare, 0.45f, 0.55f);
+    }
+
+    [Fact]
+    public void FadeInShare_DuringTheHold_IsOne()
+    {
+        _banner.Enter(_village);
+
+        StepFor(MapBanner.WaitTime + MapBanner.FadeInTime + (MapBanner.HoldTime / 2));
+
+        Assert.Equal(1, _banner.FadeInShare);
+    }
+
+    // The slide in doesn't run backwards on the way out.
+    [Fact]
+    public void FadeInShare_DuringTheFadeOut_IsOne()
+    {
+        _banner.Enter(_village);
+
+        StepFor(MapBanner.WaitTime + MapBanner.FadeInTime + MapBanner.HoldTime + (MapBanner.FadeOutTime / 2));
+
+        Assert.Equal(1, _banner.FadeInShare);
+        Assert.InRange(_banner.Opacity, 0.45f, 0.55f);
+    }
+
+    [Fact]
     public void Enter_FromHiddenMapToShownMap_ShowsIt()
     {
         _banner.Enter(_intro);

@@ -84,7 +84,7 @@ internal sealed class ExplorationScene : IScene
     {
         DrawMap(batch, textures);
         _overlays.Prompt.Draw(batch, textures, _camera.Origin);
-        _overlays.BannerView.Draw(batch);
+        _overlays.BannerView.Draw(batch, textures);
         _presenter.Draw(batch, textures);
     }
 

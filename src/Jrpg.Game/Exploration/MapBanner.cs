@@ -1,4 +1,5 @@
 using Jrpg.Core.Maps;
+using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Exploration;
 
@@ -34,6 +35,12 @@ internal sealed class MapBanner
 
     /// <summary>0 for transparent to 1 for opaque, linear in and out.</summary>
     public float Opacity => Shown is null ? 0 : OpacityAt(_clock);
+
+    /// <summary>
+    /// How far the fade in has come, 0 to 1, staying 1 through the hold and the fade out: the slide in follows it, and
+    /// must not run backwards on the way out, which <see cref="Opacity"/> alone can't tell.
+    /// </summary>
+    public float FadeInShare => Shown is null ? 0 : Easing.ShareOf(_clock - WaitTime, FadeInTime);
 
     /// <summary>
     /// Restarts the banner on a map other than the one entered last, or stops it when that map doesn't show the banner;

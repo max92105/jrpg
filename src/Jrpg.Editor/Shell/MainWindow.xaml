@@ -178,7 +178,11 @@
         <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="{StaticResource SidePanelWidth}" MinWidth="{StaticResource SidePanelMinWidth}" />
       </Grid.ColumnDefinitions>
-      <local:MapListPanel x:Name="MapListPanel" FilterLeft="OnMapFilterLeft" RenameRequested="OnRenameMapClicked" />
+      <local:MapListPanel x:Name="MapListPanel"
+                         FilterLeft="OnMapFilterLeft"
+                         RenameRequested="OnRenameMapClicked"
+                         MoveRequested="OnMoveToFolderRequested"
+                         NewFolderRequested="OnNewFolderRequested" />
       <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
       <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
       <DockPanel Grid.Column="4">

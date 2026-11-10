@@ -1,4 +1,3 @@
-using Jrpg.Core.Maps;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
 
@@ -11,22 +10,19 @@ namespace Jrpg.Editor.Shell;
 /// </summary>
 internal sealed partial class MainViewModel
 {
-    /// <summary>
-    /// The folder dialog for New folder: the box offers the parent's path with the separator after it.
-    /// </summary>
+    /// <summary>The folder dialog for New folder.</summary>
     /// <param name="parentPath">The folder right-clicked; null for a folder at the top.</param>
-    public MapFolderChoiceViewModel StartNewFolder(string? parentPath) =>
-        new(KnownFolders, parentPath is null ? null : parentPath + MapFolderPath.Separator);
+    public MapFolderChoiceViewModel StartNewFolder(string? parentPath) => MapFolderChoiceViewModel.ForNewFolder(KnownFolders, parentPath);
 
-    /// <returns>False when nothing was added: the path has a problem or is the top of the list.</returns>
+    /// <returns>False when nothing was added: the path has a problem (the top among them, for a new folder).</returns>
     public bool TryAddFolder(MapFolderChoiceViewModel choice)
     {
-        if (choice.Problem is not null || choice.ToPath() is not { } path)
+        if (choice.Problem is not null)
         {
             return false;
         }
 
-        Navigation.AddSessionFolder(path);
+        Navigation.AddSessionFolder(choice.ToPath()!);
         return true;
     }
 

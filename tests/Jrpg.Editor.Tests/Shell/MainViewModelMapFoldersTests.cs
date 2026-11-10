@@ -170,7 +170,7 @@ public sealed class MainViewModelMapFoldersTests : IDisposable
     }
 
     [Fact]
-    public void TryAddFolder_Top_AddsNothing()
+    public void TryAddFolder_NothingTyped_AddsNothing()
     {
         var viewModel = _content.Open(_content.TestWorld);
 

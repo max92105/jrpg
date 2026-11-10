@@ -3,50 +3,71 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:maps="clr-namespace:Jrpg.Editor.Maps">
+  <UserControl.Resources>
+    <!-- The row menus reach the main view model through the row's Tag: a context menu has no ancestor in the tree. -->
+    <ContextMenu x:Key="MapRowMenu">
+      <MenuItem Header="Move to folder..." Click="OnMoveToFolderClicked" />
+      <MenuItem Header="New folder..." Click="OnNewFolderClicked" />
+      <Separator />
+      <MenuItem Header="Rename map..."
+                Click="OnRenameMapClicked"
+                IsEnabled="{Binding PlacementTarget.Tag.CanRenameMap, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                ToolTip="{Binding PlacementTarget.Tag.RenameMapTip, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                ToolTipService.ShowOnDisabled="True" />
+    </ContextMenu>
+    <ContextMenu x:Key="FolderRowMenu">
+      <MenuItem Header="New folder..." Click="OnNewFolderClicked" />
+      <MenuItem Header="Rename folder..." IsEnabled="False" ToolTip="Not yet: comes with the next slice" ToolTipService.ShowOnDisabled="True" />
+    </ContextMenu>
+  </UserControl.Resources>
   <DockPanel>
     <TextBox x:Name="MapFilterBox"
              DockPanel.Dock="Top"
              Text="{Binding Navigation.Filter, UpdateSourceTrigger=PropertyChanged}"
              ToolTip="Type part of a map's name or id; Enter opens the first one, Esc clears (Ctrl+M)"
              PreviewKeyDown="OnMapFilterKeyDown" />
-    <!-- A right click selects the row first (a tree row doesn't on its own), so the menu is on the map it points at. -->
+    <!-- A right click selects the row first (a tree row doesn't on its own), so the menu is on the map it points at;
+         the empty space below the rows has the tree's own menu. A map row dragged onto a folder moves the map there. -->
     <TreeView x:Name="MapTreeView"
               ItemsSource="{Binding Navigation.ShownTree, NotifyOnTargetUpdated=True}"
               TargetUpdated="OnMapTreeUpdated"
               SelectedItemChanged="OnMapTreeSelectionChanged"
               TreeViewItem.Expanded="OnFolderExpanded"
               TreeViewItem.Collapsed="OnFolderCollapsed"
-              PreviewMouseRightButtonDown="OnMapTreeRightButtonDown">
+              PreviewMouseRightButtonDown="OnMapTreeRightButtonDown"
+              ContextMenuOpening="OnMapTreeMenuOpening"
+              PreviewMouseLeftButtonDown="OnMapTreeLeftButtonDown"
+              PreviewMouseMove="OnMapTreeMouseMove"
+              AllowDrop="True"
+              DragOver="OnMapTreeDragOver"
+              Drop="OnMapTreeDrop">
+      <TreeView.ContextMenu>
+        <ContextMenu>
+          <MenuItem Header="New folder..." Click="OnNewFolderClicked" />
+        </ContextMenu>
+      </TreeView.ContextMenu>
       <TreeView.ItemContainerStyle>
         <Style TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
           <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
           <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+          <Setter Property="Tag" Value="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+          <Setter Property="ContextMenu" Value="{StaticResource MapRowMenu}" />
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding IsFolder}" Value="True">
+              <Setter Property="ContextMenu" Value="{StaticResource FolderRowMenu}" />
+            </DataTrigger>
+          </Style.Triggers>
         </Style>
       </TreeView.ItemContainerStyle>
       <TreeView.ItemTemplate>
         <HierarchicalDataTemplate DataType="{x:Type maps:MapTreeNode}" ItemsSource="{Binding Rows}">
-          <Grid>
-            <StackPanel x:Name="FolderRow" Orientation="Horizontal" Visibility="Collapsed">
-              <Path Data="M0,2 L4,2 L5,0 L8,0 L8,1 L12,1 L12,9 L0,9 Z" Fill="{StaticResource MutedTextBrush}" VerticalAlignment="Center" Margin="0,0,5,0" />
-              <TextBlock Text="{Binding Text}" />
-            </StackPanel>
-            <!-- The menu reaches the main view model through its target's Tag: a context menu has no ancestor in the tree. -->
-            <TextBlock x:Name="MapRow" Text="{Binding Text}" Tag="{Binding DataContext, RelativeSource={RelativeSource AncestorType=UserControl}}">
-              <TextBlock.ContextMenu>
-                <ContextMenu>
-                  <MenuItem Header="Rename map..."
-                            Click="OnRenameMapClicked"
-                            IsEnabled="{Binding PlacementTarget.Tag.CanRenameMap, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                            ToolTip="{Binding PlacementTarget.Tag.RenameMapTip, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                            ToolTipService.ShowOnDisabled="True" />
-                </ContextMenu>
-              </TextBlock.ContextMenu>
-            </TextBlock>
-          </Grid>
+          <StackPanel Orientation="Horizontal">
+            <Path x:Name="FolderGlyph" Data="M0,2 L4,2 L5,0 L8,0 L8,1 L12,1 L12,9 L0,9 Z" Fill="{StaticResource MutedTextBrush}" VerticalAlignment="Center" Margin="0,0,5,0" Visibility="Collapsed" />
+            <TextBlock Text="{Binding Text}" />
+          </StackPanel>
           <HierarchicalDataTemplate.Triggers>
             <DataTrigger Binding="{Binding IsFolder}" Value="True">
-              <Setter TargetName="FolderRow" Property="Visibility" Value="Visible" />
-              <Setter TargetName="MapRow" Property="Visibility" Value="Collapsed" />
+              <Setter TargetName="FolderGlyph" Property="Visibility" Value="Visible" />
             </DataTrigger>
           </HierarchicalDataTemplate.Triggers>
         </HierarchicalDataTemplate>

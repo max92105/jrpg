@@ -23,6 +23,28 @@ public sealed class MapFolderChoiceViewModelTests
     }
 
     [Fact]
+    public void ForNewFolder_NoParent_StartsEmptyWithTheNameAsked()
+    {
+        var choice = MapFolderChoiceViewModel.ForNewFolder(["Act 1"], null);
+
+        Assert.Equal("", choice.PathText);
+        Assert.Equal("Type the new folder's name.", choice.Problem);
+        Assert.Equal(["Act 1"], choice.Folders);
+    }
+
+    [Fact]
+    public void ForNewFolder_UnderAFolder_OffersItsPathUntilANameIsTyped()
+    {
+        var choice = MapFolderChoiceViewModel.ForNewFolder([], "Act 1");
+        Assert.Equal("Act 1/", choice.PathText);
+        Assert.False(choice.CanApply);
+
+        choice.PathText = "Act 1/Village";
+
+        Assert.Equal("Act 1/Village", choice.ToPath());
+    }
+
+    [Fact]
     public void Problem_BadPath_NamesTheRule()
     {
         var choice = new MapFolderChoiceViewModel([], "Act 1/");

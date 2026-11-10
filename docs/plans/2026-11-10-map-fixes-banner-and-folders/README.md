@@ -66,7 +66,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 1: saving
 - [x] **SV1. The save deadlock reproduced, then fixed: Save and Save all write in one go, all or none (the tiles and objects alone when a map is refused); Save all checks each map against the open maps as they are now (`ContentWriter.WriteMaps`, `OpenMaps.ContentWith`)** (Data + Editor, about 250 lines, 25 of them re-pinned tests) → [slices/SV1.md](slices/SV1.md)
-- [ ] **SV2. A refused Ctrl+S that Save all would pass says so: a dry run of the map checks on the open maps (`ContentWriter.CheckMaps`)** (Data + Editor, about 110 lines) → [slices/SV2.md](slices/SV2.md)
+- [x] **SV2. A refused Ctrl+S that Save all would pass says so: a dry run of the map checks on the open maps (`ContentWriter.CheckMaps`)** (Data + Editor, about 110 lines) → [slices/SV2.md](slices/SV2.md)
 
 ### Phase 2: draw order
 - [ ] **DO1. Moves only: one draw order in Core (`MapDrawOrder`, `MapDrawItem`), read by the game's `MapDrawList`, the editor's `MapDrawing` and `PlacedObjectHits`** (Core + Game + Editor, about 150 lines changed, 140 lines of tests moved) → [slices/DO1.md](slices/DO1.md)

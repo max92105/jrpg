@@ -31,6 +31,9 @@ internal sealed partial class MapNavigation : ObservableObject
     [ObservableProperty]
     public partial IReadOnlyList<MapTreeNode> ShownTree { get; private set; } = [];
 
+    /// <summary>The folders made this session (decision 534), for the folder dialog's list.</summary>
+    public IReadOnlyCollection<string> SessionFolders => _sessionFolders;
+
     /// <summary>New folder (decision 534): an empty folder shown for the session, until a map moves in.</summary>
     public void AddSessionFolder(string path)
     {

@@ -12,7 +12,10 @@ internal sealed class OpenMaps
 {
     private readonly List<MapViewModel> _all = [];
 
-    /// <summary>Any open map's <see cref="MapViewModel.IsDirty"/> changed: an edit, its undo or a save.</summary>
+    /// <summary>
+    /// An open map took a step, undid or redid one, or was saved: its <see cref="MapViewModel.IsDirty"/> and its row in
+    /// the list (its mark, name or folder) may have changed. Raised on every step, not only when the mark flips.
+    /// </summary>
     public event EventHandler? DirtyChanged;
 
     /// <summary>In opening order.</summary>

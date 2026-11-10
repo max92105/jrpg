@@ -28,3 +28,5 @@ The editor can make an empty folder (kept for the session) and move a map into a
 
 ## Verify by hand
 Rules only; MF5 adds the menus, the dialog and the drag.
+
+- **Done, with deviations:** `MapFolderChoiceViewModel.Folders` also lists each folder's parents ("Act 1" for "Act 1/Village"), and `PathText` starts on "(top of the list)" for null; the known folders come from `MapEntries` (as the maps are now) and a new `MapNavigation.SessionFolders`. `TryMoveMapTo` returns false when nothing was recorded (unknown map, same folder), the folder checked on the row before the map is shown, so a drop onto its own folder shows nothing (review). The row moves at once, undo included, with no extra call: `OpenMaps.DirtyChanged` is raised on every step, not only when the mark flips (its summary now says so; the review's Critical assumed otherwise and a settings-change event built on that assumption was reverted). `TryAddFolder` refuses the top (no folder to add). Decision 534's open point stands: a session folder stays listed after its map moves out again.

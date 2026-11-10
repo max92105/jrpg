@@ -50,6 +50,18 @@ public sealed class ContentWriterRepositoryTests : IDisposable
         Assert.Equal(filesBefore, CatalogFileBytes());
     }
 
+    // A map id rename writes the new game's file (decision 530): the repository's file must be laid out as the writer
+    // lays it out, or a rename would rewrite its whitespace.
+    [Fact]
+    public void NewGame_RepositoryFile_WritesBackUnchanged()
+    {
+        var written = _content.PathOf("new-game.written.json");
+
+        ContentFileWriter.Write(written, _catalog.NewGame);
+
+        Assert.Equal(File.ReadAllBytes(_content.PathOf("new-game.json")), File.ReadAllBytes(written));
+    }
+
     private byte[] CatalogFileBytes() =>
         [.. File.ReadAllBytes(_content.PathOf("tilesheets.json")),
          .. File.ReadAllBytes(_content.PathOf("tiles.json")),

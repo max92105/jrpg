@@ -87,6 +87,32 @@ public sealed class ContentWriter(string contentRoot)
     }
 
     /// <summary>
+    /// Renames a map's id and every reference to it (decision 530, ADR 0042): the map's two files under the new id,
+    /// every map whose warps lead to it and the new game when it starts there, written in one go after the checks of
+    /// <see cref="WriteMaps"/>; then the old two files are deleted, last, so a failure leaves both maps and never none.
+    /// Saves naming the old id stay as they are: the repair handles them as a removed map (decision 531).
+    /// </summary>
+    /// <param name="content">The content as saved, the map among its maps.</param>
+    /// <param name="oldId">The map's id today.</param>
+    /// <param name="newId">Its id from now on, used by no map.</param>
+    /// <exception cref="ArgumentException">The old id is unknown or the new one already used.</exception>
+    /// <exception cref="ContentValidationException">The game would reject a map; nothing was written.</exception>
+    public void RenameMap(ContentCatalog content, string oldId, string newId)
+    {
+        var renamed = MapIdRename.Apply(content, oldId, newId);
+        CheckLayouts(renamed.Content);
+        var writes = CheckedMapWrites(renamed.Content, [newId, .. renamed.ChangedMapIds]);
+        if (renamed.IsNewGameChanged)
+        {
+            writes.Add(PlanWrite(ContentCatalogLoader.NewGameFile, renamed.Content.NewGame));
+        }
+
+        WriteAll(writes);
+        File.Delete(Path.Combine(contentRoot, MapFolderReader.LayoutFile(oldId)));
+        File.Delete(Path.Combine(contentRoot, MapFolderReader.SettingsFile(oldId)));
+    }
+
+    /// <summary>
     /// Checks every map as <see cref="WriteMaps"/> would, every layout against the others, every map's settings and
     /// the new game's start, and writes nothing: the editor's dry run on the open maps when Ctrl+S is refused, to
     /// point to Save all (decision 519).

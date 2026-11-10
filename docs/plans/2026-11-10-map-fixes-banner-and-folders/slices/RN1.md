@@ -34,5 +34,7 @@ Data renames a map id and every content reference to it in one checked write: th
 `Data.Tests/Content/ContentWriterRepositoryTests` (63 lines): `NewGame_RepositoryFile_WritesBackUnchanged` (written through the writer's options to a temporary file: the same bytes as `content/new-game.json`; if it fails, re-lay `content/new-game.json` once as the writer writes it, and say so in the Done note).
 `Data.Tests/Maps/MapIdRenameTests` (new): `Apply_CellEventWarp_Renamed`, `Apply_ObjectEventWarp_Renamed`, `Apply_WarpToAnotherMap_Untouched`, `Apply_UnknownOldId_Throws`.
 
+- **Done, with deviations:** `RenamedContent` is its own file beside `MapIdRename` (one type per file). The identity test on `content/new-game.json` failed on the first run (its entries were one per line, the writer writes one field per line), so the file was re-laid once as the writer lays it out through a throwaway test, deleted in this slice; the test world's copy is untouched (ADR 0037). `MapIdRenameTests` found `to_aslas_1` warps into the forest too, so the changed-maps assertion names start and excludes the interior rather than listing every map. Two more tests pin the renamed map's two ids and the new game flag. From the review: a taken new id is refused without case, since ids are file names and Windows file names ignore case.
+
 ## Verify by hand
 Tests only: the editor's command comes in RN2-RN3. A save loaded after a rename is checked in RN3's hand check.

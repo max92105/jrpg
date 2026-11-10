@@ -1,14 +1,22 @@
 ---
 name: stale-derived-ui-text
-description: Editor notes/labels computed at an action (a pick's note) aren't reset when the state they describe changes
+description: Editor notes/labels/list rows computed at an action aren't refreshed on every path that changes their inputs (undo, redo)
 metadata:
   type: feedback
 ---
 
-A note or label computed once at an action (ObjectPicking.Note in UO1 and UO2) keeps describing state that has since
-changed: the picked object moved (UO1), the lock unticked or the layer changed (UO2).
+A note, label or list row computed once at an action keeps describing state that has since changed:
+ObjectPicking.Note after the picked object moved (UO1) or the lock/layer changed (UO2).
 
-**Why:** flagged twice in a row in the map-fixes plan; the stale text tells the developer something false.
+A false alarm to learn from (MF4): the Critical "the map list is rebuilt only when IsDirty flips, so undo of a move
+leaves the row in the old folder" was wrong. MapViewModel.Refresh raises PropertyChanged(IsDirty) on every step, undo
+and redo, whatever the value, so OpenMaps.DirtyChanged (now documented so) rebuilds the rows every time; the undo test
+passed with no change. The developer reverted the settings event built on the claim.
 
-**How to apply:** for each new text a view model sets at an action, list the inputs it reads (selection, layer, lock,
-map) and check each one's change resets or recomputes it. Missing reset = Warning with a concrete "after X, shows Y".
+**Why:** flagged twice in the map-fixes plan; the stale text tells the developer something false. The false alarm cost
+a revert.
+
+**How to apply:** for each new text/row a view model derives, list the inputs it reads and check every path that
+changes each one (the action, its undo and redo, another window's edit) refreshes it. Before calling a refresh
+missing, trace the event from where it is raised, not from its summary: "raised when X changed" often means "raised
+on every step". Confirm with a run or a test (`dotnet test` with a filter) before marking it Critical.

@@ -45,6 +45,35 @@ public sealed class MapFolderChoiceViewModelTests
     }
 
     [Fact]
+    public void ForRenamingFolder_PathUnchanged_NamesTheProblem()
+    {
+        var choice = MapFolderChoiceViewModel.ForRenamingFolder(["Act 1"], "Act 1");
+
+        Assert.Equal("The folder already has this path.", choice.Problem);
+        Assert.False(choice.CanApply);
+    }
+
+    [Fact]
+    public void ForRenamingFolder_NewPathTyped_GivesIt()
+    {
+        var choice = MapFolderChoiceViewModel.ForRenamingFolder([], "Act 1");
+
+        choice.PathText = "Chapter 1";
+
+        Assert.Equal("Chapter 1", choice.ToPath());
+    }
+
+    [Fact]
+    public void ForRenamingFolder_Emptied_AsksForAPath()
+    {
+        var choice = MapFolderChoiceViewModel.ForRenamingFolder([], "Act 1");
+
+        choice.PathText = "";
+
+        Assert.Equal("Type the folder's new path.", choice.Problem);
+    }
+
+    [Fact]
     public void Problem_BadPath_NamesTheRule()
     {
         var choice = new MapFolderChoiceViewModel([], "Act 1/");

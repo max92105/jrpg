@@ -67,6 +67,45 @@ public sealed class MapNavigationTreeTests
     }
 
     [Fact]
+    public void RenameFolders_ExpandedSubfolder_StaysExpandedUnderTheNewPath()
+    {
+        _navigation.NoteExpanded("Act 1", isExpanded: true);
+
+        _navigation.RenameFolders("Act 1", "Chapter 1");
+        _navigation.ShowEntries([_forest, _mill with { Folder = "Chapter 1" }]);
+
+        Assert.True(_navigation.ShownTree[0].IsExpanded);
+        Assert.Equal("Chapter 1", _navigation.ShownTree[0].FolderPath);
+    }
+
+    [Fact]
+    public void RenameFolders_SessionFolderWithin_FollowsTheNewPath()
+    {
+        _navigation.AddSessionFolder("Act 2/Keep");
+
+        _navigation.RenameFolders("Act 2", "Act 3");
+
+        Assert.Equal(["Act 1", "Act 3"], _navigation.ShownTree.Where(row => row.IsFolder).Select(row => row.Text));
+        Assert.Equal(["Keep"], _navigation.ShownTree[1].Rows.Select(row => row.Text));
+    }
+
+    // "A" renamed "A/A": both open folders move once, whatever order the set hands them out in.
+    [Fact]
+    public void RenameFolders_IntoItsOwnSubfolder_MovesEachFolderOnce()
+    {
+        _navigation.NoteExpanded("Act 1", isExpanded: true);
+        _navigation.NoteExpanded("Act 1/Act 1", isExpanded: true);
+
+        _navigation.RenameFolders("Act 1", "Act 1/Act 1");
+        _navigation.ShowEntries([_mill with { Folder = "Act 1/Act 1/Act 1" }]);
+
+        var act = Assert.Single(_navigation.ShownTree);
+        Assert.False(act.IsExpanded);
+        Assert.True(act.Rows[0].IsExpanded);
+        Assert.True(act.Rows[0].Rows[0].IsExpanded);
+    }
+
+    [Fact]
     public void AddSessionFolder_ShowsItInTheTree()
     {
         _navigation.AddSessionFolder("Act 2");

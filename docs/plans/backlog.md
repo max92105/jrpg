@@ -217,3 +217,5 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - A per-placement depth offset for forced perspective on the player's layer (`depthOffset` on a placed object moving the line it sorts by), DO3 of the map fixes plan, if the developer ever hits the case: the developer's houses and trees sit on z -3 to -5, where the player is always in front, so the layer alone is the model.
 - The Placed object panel's Depth offset box and the selected object's sort line drawn dashed, DO4 of the map fixes plan, with DO3, if the developer ever hits the case.
 - `ContentWriter.RenameMap` (RN1): an `IOException` from deleting the old files after the writes leaves both maps on disk while the editor reports a failure and keeps the old content (ADR 0042 accepts the state; the editor could say which pair to delete).
+- `MainViewModel.MapFolders` (MF4-MF6): `TryMoveMap`, `KnownFolders`, `RenameFolderTip` and `MapsMoved` run to 150-170 columns; split them over lines (the MF5 and MF6 reviews).
+- A session folder (decision 534) stays listed after its map moves out again (MF2, MF4): decide whether it should go.

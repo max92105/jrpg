@@ -59,11 +59,13 @@ internal sealed partial class MainViewModel
         return true;
     }
 
-    // HasUnsavedChanges and what hangs on it: the Rename map entries' greying and their tooltip.
+    // HasUnsavedChanges and what hangs on it: the Rename map and Rename folder entries' greying and their tooltips.
     private void RaiseUnsavedChanged()
     {
         OnPropertyChanged(nameof(HasUnsavedChanges));
         OnPropertyChanged(nameof(CanRenameMap));
         OnPropertyChanged(nameof(RenameMapTip));
+        OnPropertyChanged(nameof(CanRenameFolder));
+        OnPropertyChanged(nameof(RenameFolderTip));
     }
 }

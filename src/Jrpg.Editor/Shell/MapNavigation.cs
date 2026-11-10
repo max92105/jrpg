@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Jrpg.Core.Maps;
 using Jrpg.Editor.Maps;
 
 namespace Jrpg.Editor.Shell;
@@ -39,6 +40,17 @@ internal sealed partial class MapNavigation : ObservableObject
     {
         _sessionFolders.Add(path);
         _expandedFolders.Add(path);
+        RefreshShownTree();
+    }
+
+    /// <summary>
+    /// A folder was renamed (decision 533): the session's folders and the open ones within it follow, so an empty
+    /// folder keeps showing and the open ones stay open under the new path.
+    /// </summary>
+    public void RenameFolders(string oldPath, string newPath)
+    {
+        Follow(_sessionFolders, oldPath, newPath);
+        Follow(_expandedFolders, oldPath, newPath);
         RefreshShownTree();
     }
 
@@ -118,6 +130,15 @@ internal sealed partial class MapNavigation : ObservableObject
     /// <summary>Shows the map shown before the current one; pressed again, it returns.</summary>
     [RelayCommand(CanExecute = nameof(CanGoBack))]
     private void GoBack() => _tryOpenMap(_previousMapId!);
+
+    // All removed, then all added: one at a time, a folder renamed into its own subfolder ("A" to "A/A") would move the
+    // "A/A" just added once more.
+    private static void Follow(HashSet<string> folders, string oldPath, string newPath)
+    {
+        var within = folders.Where(folder => MapFolderPath.IsWithin(folder, oldPath)).ToList();
+        folders.ExceptWith(within);
+        folders.UnionWith(within.Select(folder => MapFolderPath.Moved(folder, oldPath, newPath)));
+    }
 
     private void RefreshShownTree()
     {

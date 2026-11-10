@@ -1,5 +1,5 @@
 # Map fixes, area banner, map ids and folders
-Status: approved
+Status: retro pending
 
 Drafted on 2026-11-10 from the developer's next batch of map and editor work (lightly cleaned up by the coordinator):
 
@@ -98,7 +98,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **MF3. The map list panel shows the tree: folders open and close, a map row opens the map, the shown map selected, Rename map... kept on map rows** (Editor, about 170 lines) → [slices/MF3.md](slices/MF3.md)
 - [x] **MF4. New folder and Move to folder, the rules: `MapFolderChoiceViewModel`, `MainViewModel.MapFolders.cs`; a move is a settings step on the moved map, shown** (Editor, about 200 lines) → [slices/MF4.md](slices/MF4.md)
 - [x] **MF5. The folder dialog (`MapFolderWindow`), the map list's folder context menus and dragging a map onto a folder** (Editor, about 160 lines) → [slices/MF5.md](slices/MF5.md)
-- [ ] **MF6. Rename folder: every map in it written at once, refused while anything is unsaved** (Editor, about 170 lines) → [slices/MF6.md](slices/MF6.md)
+- [x] **MF6. Rename folder: every map in it written at once, refused while anything is unsaved** (Editor, about 170 lines) → [slices/MF6.md](slices/MF6.md)
 
 ## Decisions
 The developer's answers of 2026-11-10 (Q1-Q15 below; Q3, Q8, Q9, Q12 chosen explicitly, the others as recommended).

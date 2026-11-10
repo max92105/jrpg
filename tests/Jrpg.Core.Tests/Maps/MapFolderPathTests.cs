@@ -38,4 +38,10 @@ public sealed class MapFolderPathTests
 
     [Fact]
     public void IsWithin_ParentFolder_IsFalse() => Assert.False(MapFolderPath.IsWithin("Act 1", "Act 1/Village"));
+
+    [Fact]
+    public void Moved_Subfolder_FollowsTheNewRoot() => Assert.Equal("Chapter 1/Village", MapFolderPath.Moved("Act 1/Village", "Act 1", "Chapter 1"));
+
+    [Fact]
+    public void Moved_TheFolderItself_IsTheNewPath() => Assert.Equal("Act 2/Woods", MapFolderPath.Moved("Act 1/Woods", "Act 1/Woods", "Act 2/Woods"));
 }

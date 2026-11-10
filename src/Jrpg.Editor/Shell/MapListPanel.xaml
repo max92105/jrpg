@@ -17,7 +17,11 @@
     </ContextMenu>
     <ContextMenu x:Key="FolderRowMenu">
       <MenuItem Header="New folder..." Click="OnNewFolderClicked" />
-      <MenuItem Header="Rename folder..." IsEnabled="False" ToolTip="Not yet: comes with the next slice" ToolTipService.ShowOnDisabled="True" />
+      <MenuItem Header="Rename folder..."
+                Click="OnRenameFolderClicked"
+                IsEnabled="{Binding PlacementTarget.Tag.CanRenameFolder, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                ToolTip="{Binding PlacementTarget.Tag.RenameFolderTip, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                ToolTipService.ShowOnDisabled="True" />
     </ContextMenu>
   </UserControl.Resources>
   <DockPanel>

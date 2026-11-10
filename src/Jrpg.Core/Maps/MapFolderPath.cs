@@ -22,4 +22,13 @@ public static class MapFolderPath
     /// </summary>
     public static bool IsWithin(string path, string folder) =>
         path == folder || path.StartsWith(folder + Separator, StringComparison.Ordinal);
+
+    /// <summary>
+    /// The path once the folder it is within is renamed: "Act 1/Village" under "Act 1" renamed "Chapter 1" is "Chapter
+    /// 1/Village"; the folder itself becomes the new path.
+    /// </summary>
+    /// <param name="path">A path within <paramref name="oldFolder"/>.</param>
+    /// <param name="oldFolder">The folder renamed.</param>
+    /// <param name="newFolder">Its new path.</param>
+    public static string Moved(string path, string oldFolder, string newFolder) => newFolder + path[oldFolder.Length..];
 }

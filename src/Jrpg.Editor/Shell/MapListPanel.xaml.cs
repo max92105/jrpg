@@ -10,9 +10,9 @@ namespace Jrpg.Editor.Shell;
 /// <summary>
 /// The map list beside the map, a tree of folders (decision 532), and its filter box (decision 504): choosing a map row
 /// opens the map, and the open map's row is selected again, its folders opened, whenever the rows are replaced; a right
-/// click selects the row and offers Rename map (decision 530), Move to folder and New folder (the window opens the
-/// dialogs); a map row dragged onto a folder moves the map there (decision 533); a folder opened or closed stays so.
-/// Its DataContext is the main view model.
+/// click selects the row and offers Rename map (decision 530), Move to folder, New folder and Rename folder (the window
+/// opens the dialogs); a map row dragged onto a folder moves the map there (decision 533); a folder opened or closed
+/// stays so. Its DataContext is the main view model.
 /// </summary>
 internal sealed partial class MapListPanel : UserControl
 {
@@ -29,6 +29,12 @@ internal sealed partial class MapListPanel : UserControl
     /// </summary>
     public static readonly RoutedEvent MoveRequestedEvent = EventManager.RegisterRoutedEvent(
         nameof(MoveRequested), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(MapListPanel));
+
+    /// <summary>
+    /// Rename folder... was chosen on a folder row: the window opens the folder dialog on <see cref="MenuFolder"/>.
+    /// </summary>
+    public static readonly RoutedEvent RenameFolderRequestedEvent = EventManager.RegisterRoutedEvent(
+        nameof(RenameFolderRequested), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(MapListPanel));
 
     /// <summary>New folder... was chosen: the window opens the folder dialog under <see cref="MenuFolder"/>.</summary>
     public static readonly RoutedEvent NewFolderRequestedEvent = EventManager.RegisterRoutedEvent(
@@ -61,6 +67,12 @@ internal sealed partial class MapListPanel : UserControl
     {
         add => AddHandler(MoveRequestedEvent, value);
         remove => RemoveHandler(MoveRequestedEvent, value);
+    }
+
+    public event RoutedEventHandler RenameFolderRequested
+    {
+        add => AddHandler(RenameFolderRequestedEvent, value);
+        remove => RemoveHandler(RenameFolderRequestedEvent, value);
     }
 
     public event RoutedEventHandler NewFolderRequested
@@ -212,6 +224,8 @@ internal sealed partial class MapListPanel : UserControl
     private void OnMoveToFolderClicked(object sender, RoutedEventArgs e) => RaiseEvent(new RoutedEventArgs(MoveRequestedEvent, this));
 
     private void OnNewFolderClicked(object sender, RoutedEventArgs e) => RaiseEvent(new RoutedEventArgs(NewFolderRequestedEvent, this));
+
+    private void OnRenameFolderClicked(object sender, RoutedEventArgs e) => RaiseEvent(new RoutedEventArgs(RenameFolderRequestedEvent, this));
 
     // Enter opens the first map shown, Esc clears the filter and gives the map back the keys, Down goes to the tree.
     private void OnMapFilterKeyDown(object sender, KeyEventArgs e)

@@ -15,6 +15,7 @@ internal sealed partial class MapFolderChoiceViewModel : ObservableObject
     private const string NeedsAName = "Type the new folder's name.";
 
     private readonly string? _topProblem;
+    private string? _unchangedPath;
 
     /// <param name="knownFolders">
     /// The folders of the saved and open maps and the session's, any order, repeats allowed.
@@ -44,10 +45,22 @@ internal sealed partial class MapFolderChoiceViewModel : ObservableObject
     public partial string PathText { get; set; }
 
     /// <summary>
-    /// Why the text can't be a folder path (<see cref="MapFolderPath"/>), or, for a new folder, that none is typed yet;
-    /// null when it can, or means the top.
+    /// Why the text can't be a folder path (<see cref="MapFolderPath"/>), or, for a new folder, that none is typed yet,
+    /// or, for a rename, that the path is the folder's own; null when it can, or means the top.
     /// </summary>
-    public string? Problem => IsTop ? _topProblem : MapFolderPath.ProblemOf(PathText.Trim());
+    public string? Problem
+    {
+        get
+        {
+            if (IsTop)
+            {
+                return _topProblem;
+            }
+
+            var typed = PathText.Trim();
+            return typed == _unchangedPath ? "The folder already has this path." : MapFolderPath.ProblemOf(typed);
+        }
+    }
 
     public bool CanApply => Problem is null;
 
@@ -60,6 +73,12 @@ internal sealed partial class MapFolderChoiceViewModel : ObservableObject
     /// <param name="parentPath">The folder the new one goes under; null for one at the top.</param>
     public static MapFolderChoiceViewModel ForNewFolder(IEnumerable<string> knownFolders, string? parentPath) =>
         new(knownFolders, parentPath is null ? "" : parentPath + MapFolderPath.Separator, NeedsAName);
+
+    /// <summary>Rename folder: the box starts on the folder's path, which is refused until it differs.</summary>
+    /// <param name="knownFolders">As the constructor's.</param>
+    /// <param name="folderPath">The folder renamed.</param>
+    public static MapFolderChoiceViewModel ForRenamingFolder(IEnumerable<string> knownFolders, string folderPath) =>
+        new(knownFolders, folderPath, "Type the folder's new path.") { _unchangedPath = folderPath };
 
     /// <summary>The path chosen; null for the top of the list.</summary>
     /// <exception cref="InvalidOperationException">The text has a problem (OK is greyed then).</exception>

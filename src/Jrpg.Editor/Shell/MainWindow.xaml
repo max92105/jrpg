@@ -182,7 +182,8 @@
                          FilterLeft="OnMapFilterLeft"
                          RenameRequested="OnRenameMapClicked"
                          MoveRequested="OnMoveToFolderRequested"
-                         NewFolderRequested="OnNewFolderRequested" />
+                         NewFolderRequested="OnNewFolderRequested"
+                         RenameFolderRequested="OnRenameFolderRequested" />
       <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
       <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
       <DockPanel Grid.Column="4">

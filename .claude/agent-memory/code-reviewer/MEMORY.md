@@ -7,3 +7,4 @@
 - [Detached comments](detached-comments.md) — a member inserted under, or removed from under, a comment leaves it describing the wrong code
 - [Stale derived UI text](stale-derived-ui-text.md) — a note set at an action (pick note) not reset when the lock/layer/object it describes changes
 - [Lax test JSON readers](lax-test-json-readers.md) — test-only manifest readers skip required/nullable checks; ContentJsonOptions.Strict exists
+- [Id case comparisons](id-case-comparisons.md) — ids are file names: every check in a rename/create path (editor and Data) uses the same comparer

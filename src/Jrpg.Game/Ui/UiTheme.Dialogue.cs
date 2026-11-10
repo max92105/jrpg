@@ -3,10 +3,19 @@ using Microsoft.Xna.Framework;
 
 namespace Jrpg.Game.Ui;
 
-// The dialogue's colors and sizes: the message box, the interaction prompt and its key cap, the speaker strip and the
-// caption band.
+// The dialogue's colors and sizes: the message box, the interaction prompt and its key cap, the speaker strip, the
+// caption band and the entry banner.
 internal static partial class UiTheme
 {
+    /// <summary>The entry banner's text (plain look, placeholder).</summary>
+    public const int MapBannerTextPixels = 36;
+
+    /// <summary>The entry banner's distance in from the screen's right edge, in virtual pixels (placeholder).</summary>
+    public const int MapBannerRight = 64;
+
+    /// <summary>The entry banner's distance down from the screen's top edge, in virtual pixels (placeholder).</summary>
+    public const int MapBannerTop = 56;
+
     /// <summary>The message box's text, sized toward the reference UI (plan 2026-10-25-ui-second-pass, SZ2).</summary>
     public const int MessageTextPixels = 36;
 

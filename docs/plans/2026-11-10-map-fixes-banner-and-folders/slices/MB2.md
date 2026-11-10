@@ -30,6 +30,8 @@ Entering a map whose settings show the banner shows its display name and, when i
 - `Update_MapWithLevel_FormatsTheLevelLine` ("Lv 3" from a test map with 3).
 - `Update_MapWithoutLevel_HasNoLevelLine`.
 
+- **Done, with deviations:** `MapBannerView.Draw` takes the batch alone (the plain look needs no texture; MB3 adds it with the band); the plain size is `UiTheme.MapBannerTextPixels` (36), beside `MapBannerRight` and `MapBannerTop` in `UiTheme.Dialogue.cs`. `StartMapScenarios.SceneOf` gained an overload taking the `FieldOverlays` (`OverlaysFor` builds them as the factory does), so a scene test reads the view too (`NameLine`, added for that). The battle test is left out: a battle pushes over the scene (`BattleTransitions`), which never enters the map again, and MB1 pins the same-map rule; a scene stepped past its banner guards nothing. Not captured: the look is the hand check's.
+
 ## Verify by hand
 1. Give "start" an area level (AL1) or not, F5, New game, pass the intro: after the fade from black, "Start map name" and "Lv n" appear at the top right, hold about three seconds and fade out.
 2. Walk through a door to another map: after the fade from black the other map's name shows; back through the door: the first map's name shows again.

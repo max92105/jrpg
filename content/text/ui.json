@@ -270,5 +270,6 @@
   "quests_objective": "Objective",
   "quest_started": "Quest started: {title}",
   "quest_updated": "Quest updated: {title}",
-  "quest_completed": "Quest completed: {title}"
+  "quest_completed": "Quest completed: {title}",
+  "map_banner_level": "Lv {level}"
 }

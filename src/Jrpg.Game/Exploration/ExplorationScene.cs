@@ -14,8 +14,9 @@ namespace Jrpg.Game.Exploration;
 
 /// <summary>
 /// The player walking the current map; the scene a new game starts in. It shows the tile layers, the animated player
-/// and objects in depth order, canopies and roofs over the player, with the camera easing after the player, and leaves
-/// map events to <see cref="EventPresenter"/>.
+/// and objects in depth order, canopies and roofs over the player, with the camera easing after the player, the prompt
+/// and the entry banner over the field (<see cref="FieldOverlays"/>), and leaves map events to
+/// <see cref="EventPresenter"/>.
 /// </summary>
 internal sealed class ExplorationScene : IScene
 {
@@ -29,20 +30,20 @@ internal sealed class ExplorationScene : IScene
     private readonly MapArt _art;
     private readonly EventPresenter _presenter;
     private readonly AskedSounds _sounds = new();
-    private readonly InteractionPromptView _prompt;
+    private readonly FieldOverlays _overlays;
     private readonly MapCamera _camera = new();
     private readonly MapDrawList _drawList = new();
     private readonly WalkAnimation _walkAnimation = new();
     private MapDefinition _map;
     private MapView _view;
 
-    public ExplorationScene(ExplorationState exploration, MapArt art, EventPresenter presenter, InteractionPromptView prompt)
+    public ExplorationScene(ExplorationState exploration, MapArt art, EventPresenter presenter, FieldOverlays overlays)
     {
         _exploration = exploration;
         _currentDefinitionOf = exploration.CurrentDefinitionOf;
         _art = art;
         _presenter = presenter;
-        _prompt = prompt;
+        _overlays = overlays;
         EnterCurrentMap();
     }
 
@@ -54,7 +55,8 @@ internal sealed class ExplorationScene : IScene
     /// <summary>
     /// Shows the running event's step; interacts, walks and opens the menu only once it and its fade are over. An
     /// interaction that starts an event waits for it like any other. While a step's encounter is pending, the player
-    /// stands. The prompt over what the player faces follows, hidden while an event shows.
+    /// stands. The prompt over what the player faces follows, hidden while an event shows; the entry banner's clock
+    /// runs only between events (decision 529).
     /// </summary>
     /// <returns>
     /// The menu when Menu is pressed between events; a battle on the update a step starts an encounter; the Forge or
@@ -66,14 +68,23 @@ internal sealed class ExplorationScene : IScene
         // First, so the animated tiles move on whatever the update then does: an event, an encounter's pause, a warp.
         _view.Advance(delta);
         var request = UpdateExploration(delta, input);
-        _prompt.Update(_presenter.IsBusy ? null : _exploration.InteractionInFront, input.Device, delta);
+        var isBusy = _presenter.IsBusy;
+        _overlays.Prompt.Update(isBusy ? null : _exploration.InteractionInFront, input.Device, delta);
+        if (!isBusy)
+        {
+            _overlays.Banner.Advance(delta);
+        }
+
+        _overlays.BannerView.Update();
         return request;
     }
 
+    // The banner under the presenter: an event's message box covers it.
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
         DrawMap(batch, textures);
-        _prompt.Draw(batch, textures, _camera.Origin);
+        _overlays.Prompt.Draw(batch, textures, _camera.Origin);
+        _overlays.BannerView.Draw(batch);
         _presenter.Draw(batch, textures);
     }
 
@@ -135,6 +146,7 @@ internal sealed class ExplorationScene : IScene
         _view = new MapView(_map.Layout, _currentDefinitionOf, _art.Atlas);
         _camera.SnapTo(_exploration.PlayerPosition, _map.Layout);
         _drawList.Rebuild(_map.Layout, _currentDefinitionOf, _exploration.PlayerPosition);
+        _overlays.Banner.Enter(_map);
     }
 
     private void WalkAndFollow(TimeSpan delta, InputFrame input)

@@ -126,12 +126,25 @@ internal static class StartMapScenarios
         return GameSession.Restore(save with { Members = [.. save.Members, .. recruits] }, catalog, new SeededRandom(1));
     }
 
-    public static ExplorationScene SceneOf(ExplorationState exploration, ContentCatalog catalog) =>
+    public static ExplorationScene SceneOf(ExplorationState exploration, ContentCatalog catalog) => SceneOf(exploration, catalog, OverlaysFor(exploration));
+
+    /// <summary>The scene over the given overlays, for a test that watches the banner and its view.</summary>
+    public static ExplorationScene SceneOf(ExplorationState exploration, ContentCatalog catalog, FieldOverlays overlays) =>
         new(
             exploration,
             new MapArt(catalog, MapView.CellPixels),
             new EventPresenter(exploration, new EventLook(RepositoryScreenText.Text, new UiTextures()), new PlayerSettings(), new VoiceChannel()),
-            new InteractionPromptView(RepositoryScreenText.Text, exploration.CurrentDefinitionOf));
+            overlays);
+
+    /// <summary>The prompt, a new banner and its view, as the scene factory builds them.</summary>
+    public static FieldOverlays OverlaysFor(ExplorationState exploration)
+    {
+        var banner = new MapBanner();
+        return new FieldOverlays(
+            new InteractionPromptView(RepositoryScreenText.Text, exploration.CurrentDefinitionOf),
+            banner,
+            new MapBannerView(RepositoryScreenText.Text, banner));
+    }
 
     /// <summary>Holds Left from <see cref="NextToForestWarpAlwaysRolling"/>, through the warp, until a step requests a battle.</summary>
     /// <returns>Whether a battle was requested within 10 s.</returns>

@@ -36,5 +36,7 @@ The map list's rows arranged into a tree: folders first (by name, any case), the
 - `AddSessionFolder_ShowsItInTheTree`.
 `Editor.Tests/Maps/MapEntryTests` (or the file that tests `MapEntry.Of`): `Of_OpenMapMovedUnsaved_TakesTheNewFolder`.
 
+- **Done, with deviations:** `MapEntry` gained `Folder` as an optional third positional parameter, so the existing rows and tests build unchanged. `MapTree`'s recursion takes a private `Shown` record (the maps, the folders, whether a filter applies, the open folders), since verify refuses a fifth parameter. `MapEntryTests` (new) holds the entry tests, the moved-unsaved one through `OpenMaps.EntriesWith`. `MapNavigationTreeTests` also pins a closed folder staying closed and the filter narrowing the tree. From the review: the filter rule lives once, `MapEntry.Matches`, read by the flat list and the tree; `MapTreeNode` is built through `ForFolder` and `ForMap`; two more tree tests (a sibling folder sharing a prefix, a session folder under a map's folder). Open for MF4: a session folder a map moved into and out of again stays listed empty for the session.
+
 ## Verify by hand
 Rules only; MF3 shows the tree.

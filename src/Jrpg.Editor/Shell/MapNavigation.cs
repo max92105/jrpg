@@ -5,12 +5,15 @@ using Jrpg.Editor.Maps;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// The map list as filtered (decision 504), and the map shown before the current one, for Back to previous map
-/// (decision 505). Neither asks anything: maps stay open.
+/// The map list as filtered (decision 504) and as a tree of folders (decision 532), the session's empty folders
+/// (decision 534), and the map shown before the current one, for Back to previous map (decision 505). None asks
+/// anything: maps stay open.
 /// </summary>
 internal sealed partial class MapNavigation : ObservableObject
 {
     private readonly Func<string, bool> _tryOpenMap;
+    private readonly HashSet<string> _sessionFolders = new(StringComparer.Ordinal);
+    private readonly HashSet<string> _expandedFolders = new(StringComparer.Ordinal);
     private IReadOnlyList<MapEntry> _entries = [];
     private string? _shownMapId;
     private string? _previousMapId;
@@ -25,6 +28,31 @@ internal sealed partial class MapNavigation : ObservableObject
     /// <summary>The list's rows holding <see cref="Filter"/> in their text, in the list's order.</summary>
     [ObservableProperty]
     public partial IReadOnlyList<MapEntry> ShownEntries { get; private set; } = [];
+
+    /// <summary>The same rows as the tree shows them: folders holding their maps (<see cref="MapTree"/>).</summary>
+    [ObservableProperty]
+    public partial IReadOnlyList<MapTreeNode> ShownTree { get; private set; } = [];
+
+    /// <summary>New folder (decision 534): an empty folder shown for the session, until a map moves in.</summary>
+    public void AddSessionFolder(string path)
+    {
+        _sessionFolders.Add(path);
+        _expandedFolders.Add(path);
+        RefreshShownEntries();
+    }
+
+    /// <summary>A folder was opened or closed in the tree, so a rebuild after a save keeps it so.</summary>
+    public void NoteExpanded(string path, bool isExpanded)
+    {
+        if (isExpanded)
+        {
+            _expandedFolders.Add(path);
+        }
+        else
+        {
+            _expandedFolders.Remove(path);
+        }
+    }
 
     /// <summary>The map list's rows changed: a save, a new map, a row's unsaved mark.</summary>
     public void ShowEntries(IReadOnlyList<MapEntry> entries)
@@ -68,9 +96,9 @@ internal sealed partial class MapNavigation : ObservableObject
         GoBackCommand.NotifyCanExecuteChanged();
     }
 
-    /// <summary>Enter in the filter box: shows the first map the list shows.</summary>
+    /// <summary>Enter in the filter box: shows the first map the tree shows.</summary>
     /// <returns>False when the filter matches no map.</returns>
-    public bool TryOpenFirstShown() => ShownEntries is [var first, ..] && _tryOpenMap(first.Id);
+    public bool TryOpenFirstShown() => MapTree.MapsInOrder(ShownTree).FirstOrDefault() is { } first && _tryOpenMap(first.Id);
 
     partial void OnFilterChanged(string value) => RefreshShownEntries();
 
@@ -81,6 +109,9 @@ internal sealed partial class MapNavigation : ObservableObject
     [RelayCommand(CanExecute = nameof(CanGoBack))]
     private void GoBack() => _tryOpenMap(_previousMapId!);
 
-    private void RefreshShownEntries() =>
-        ShownEntries = Filter.Length == 0 ? _entries : [.. _entries.Where(entry => entry.Text.Contains(Filter, StringComparison.OrdinalIgnoreCase))];
+    private void RefreshShownEntries()
+    {
+        ShownEntries = Filter.Length == 0 ? _entries : [.. _entries.Where(entry => entry.Matches(Filter))];
+        ShownTree = MapTree.Of(_entries, _sessionFolders, Filter, _expandedFolders);
+    }
 }

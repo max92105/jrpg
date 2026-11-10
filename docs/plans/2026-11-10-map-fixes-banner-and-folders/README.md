@@ -94,7 +94,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 6: folders
 - [x] **MF1. `MapSettings.Folder` and `MapFolderPath`: `folder` in map settings, validated, left out while null; the Map settings window's Folder box** (Core + Data + Editor, about 175 lines) → [slices/MF1.md](slices/MF1.md)
-- [ ] **MF2. `MapTree`: the map list as folders and maps, the filter narrowing it, the session's empty folders** (Editor, about 200 lines) → [slices/MF2.md](slices/MF2.md)
+- [x] **MF2. `MapTree`: the map list as folders and maps, the filter narrowing it, the session's empty folders** (Editor, about 200 lines) → [slices/MF2.md](slices/MF2.md)
 - [ ] **MF3. The map list panel shows the tree: folders open and close, a map row opens the map, the shown map selected, Rename map... kept on map rows** (Editor, about 170 lines) → [slices/MF3.md](slices/MF3.md)
 - [ ] **MF4. New folder and Move to folder, the rules: `MapFolderChoiceViewModel`, `MainViewModel.MapFolders.cs`; a move is a settings step on the moved map, shown** (Editor, about 200 lines) → [slices/MF4.md](slices/MF4.md)
 - [ ] **MF5. The folder dialog (`MapFolderWindow`), the map list's folder context menus and dragging a map onto a folder** (Editor, about 160 lines) → [slices/MF5.md](slices/MF5.md)

@@ -276,6 +276,13 @@
       </Trigger>
     </ControlTemplate.Triggers>
   </ControlTemplate>
+  <!-- A right-click menu (the map list's): the dark frame of a bar header's popup; its entries are styled below. -->
+  <Style TargetType="ContextMenu">
+    <Setter Property="Background" Value="{DynamicResource PanelBackgroundBrush}" />
+    <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+    <Setter Property="BorderThickness" Value="1" />
+    <Setter Property="Padding" Value="0,2" />
+  </Style>
   <!-- The editor's menus are one level deep: bar headers, and plain entries under them. -->
   <Style TargetType="MenuItem">
     <Setter Property="Background" Value="Transparent" />

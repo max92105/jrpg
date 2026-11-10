@@ -1,0 +1,29 @@
+<Window x:Class="Jrpg.Editor.Maps.MapRenameWindow"
+        x:ClassModifier="internal"
+        Style="{StaticResource EditorWindow}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Rename map"
+        Width="440"
+        SizeToContent="Height"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+  <StackPanel Margin="12">
+    <TextBlock Text="{Binding DisplayName, StringFormat=Map: {0}}" Margin="0,0,0,2" />
+    <TextBlock Text="{Binding OldId, StringFormat=Old id: {0}}" Foreground="{StaticResource MutedTextBrush}" Margin="0,0,0,8" />
+
+    <TextBlock Text="New id" />
+    <TextBox x:Name="IdBox" Text="{Binding NewId, UpdateSourceTrigger=PropertyChanged}" Margin="0,2,0,2" ToolTip="Lower-case letters, digits and underscores; the file name of the map's two files" />
+    <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Text="{Binding Problem}" />
+    <TextBlock Foreground="{StaticResource WarningTextBrush}"
+               TextWrapping="Wrap"
+               Margin="0,8,0,0"
+               Text="Every warp into this map and the new game's start follow. Written at once: Ctrl+Z can't undo it, and every map's undo history clears; rename it back instead." />
+
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+      <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked" IsEnabled="{Binding CanApply}" />
+      <Button Content="Cancel" Width="80" Margin="8,0,0,0" IsCancel="True" />
+    </StackPanel>
+  </StackPanel>
+</Window>

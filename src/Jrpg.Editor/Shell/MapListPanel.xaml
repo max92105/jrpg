@@ -13,6 +13,16 @@
              TargetUpdated="OnMapListUpdated"
              DisplayMemberPath="Text"
              SelectedValuePath="Id"
-             SelectionChanged="OnMapListSelectionChanged" />
+             SelectionChanged="OnMapListSelectionChanged">
+      <ListBox.ContextMenu>
+        <ContextMenu>
+          <MenuItem Header="Rename map..."
+                    Click="OnRenameMapClicked"
+                    IsEnabled="{Binding CanRenameMap}"
+                    ToolTip="{Binding RenameMapTip}"
+                    ToolTipService.ShowOnDisabled="True" />
+        </ContextMenu>
+      </ListBox.ContextMenu>
+    </ListBox>
   </DockPanel>
 </UserControl>

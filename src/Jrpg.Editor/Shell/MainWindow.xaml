@@ -89,6 +89,7 @@
         <MenuItem Header="Back to previous map" Command="{Binding Navigation.GoBackCommand}" InputGestureText="Alt+Left" />
         <Separator />
         <MenuItem Header="Settings..." Click="OnMapSettingsClicked" />
+        <MenuItem Header="Rename map..." Click="OnRenameMapClicked" IsEnabled="{Binding CanRenameMap}" ToolTip="{Binding RenameMapTip}" ToolTipService.ShowOnDisabled="True" />
         <MenuItem Header="Add layer..." Click="OnAddLayerMenuClicked" />
       </MenuItem>
       <MenuItem Header="Help">
@@ -177,7 +178,7 @@
         <ColumnDefinition Width="Auto" />
         <ColumnDefinition Width="{StaticResource SidePanelWidth}" MinWidth="{StaticResource SidePanelMinWidth}" />
       </Grid.ColumnDefinitions>
-      <local:MapListPanel x:Name="MapListPanel" FilterLeft="OnMapFilterLeft" />
+      <local:MapListPanel x:Name="MapListPanel" FilterLeft="OnMapFilterLeft" RenameRequested="OnRenameMapClicked" />
       <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
       <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
       <DockPanel Grid.Column="4">

@@ -28,6 +28,7 @@
         Maps stay open: switch freely, a * in the map list marks unsaved changes.<LineBreak />
         Ctrl+M: filter the map list by name or id; Enter opens the first map shown, Esc clears it.<LineBreak />
         Alt+Left: back to the previous map; again to return.<LineBreak />
+        Map &gt; Rename map... (or right click a map in the list): a new id for the shown map; every warp into it and the new game's start follow, written at once, so it is greyed while anything is unsaved and can't be undone.<LineBreak />
         Ctrl+Z / Ctrl+Y: undo / redo the shown map's changes and the tiles' and objects', newest first; each open map keeps its own.<LineBreak />
         F1: this list.
       </TextBlock>

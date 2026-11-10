@@ -15,7 +15,7 @@
     <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Text="{Binding NameProblem}" />
     <TextBlock Foreground="{StaticResource MutedTextBrush}"
                TextWrapping="Wrap"
-               Text="{Binding MapId, StringFormat=Map id: {0} (fixed once created; saves and warps refer to it)}"
+               Text="{Binding MapId, StringFormat=Map id: {0} (Map > Rename map... changes it later)}"
                Margin="0,0,0,8" />
 
     <TextBlock Text="Size in cells (width x height)" />

@@ -30,6 +30,15 @@ internal sealed partial class MainWindow
     // Esc in the filter box: the map takes the keys back, so the arrows pan again.
     private void OnMapFilterLeft(object sender, RoutedEventArgs e) => MapViewport.Focus();
 
+    // Map > Rename map..., or the list's right-click entry on the row it just opened (decision 530).
+    private void OnRenameMapClicked(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel.StartRenamingMap() is { } renaming)
+        {
+            new MapRenameWindow(renaming, _viewModel.TryRenameMap) { Owner = this }.ShowDialog();
+        }
+    }
+
     // The dialog closed with Go to: its map shown (opened if needed, never asked), at 100 % with the arrival cell in
     // the middle of the view, marked until the next press on the map.
     private void GoToFollowedWarp(WarpDestination? warp)

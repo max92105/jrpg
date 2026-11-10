@@ -7,13 +7,18 @@ namespace Jrpg.Editor.Shell;
 
 /// <summary>
 /// The map list beside the map and its filter box (decision 504): choosing a row opens the map, and the open map's row
-/// is selected again whenever the rows are replaced. Its DataContext is the main view model.
+/// is selected again whenever the rows are replaced; a right click opens the map and offers Rename map (decision 530).
+/// Its DataContext is the main view model.
 /// </summary>
 internal sealed partial class MapListPanel : UserControl
 {
     /// <summary>Escape in the filter box: the map takes the keys back (the window focuses it).</summary>
     public static readonly RoutedEvent FilterLeftEvent = EventManager.RegisterRoutedEvent(
         nameof(FilterLeft), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(MapListPanel));
+
+    /// <summary>Rename map... was chosen on a row: the window opens the Rename map dialog on the shown map.</summary>
+    public static readonly RoutedEvent RenameRequestedEvent = EventManager.RegisterRoutedEvent(
+        nameof(RenameRequested), RoutingStrategy.Bubble, typeof(RoutedEventHandler), typeof(MapListPanel));
 
     private string? _openMapId;
 
@@ -26,6 +31,12 @@ internal sealed partial class MapListPanel : UserControl
     {
         add => AddHandler(FilterLeftEvent, value);
         remove => RemoveHandler(FilterLeftEvent, value);
+    }
+
+    public event RoutedEventHandler RenameRequested
+    {
+        add => AddHandler(RenameRequestedEvent, value);
+        remove => RemoveHandler(RenameRequestedEvent, value);
     }
 
     private MainViewModel ViewModel => (MainViewModel)DataContext;
@@ -58,6 +69,8 @@ internal sealed partial class MapListPanel : UserControl
     // A save (a new map, a new name), a row's unsaved mark or the filter replaces the rows, which drops the selection;
     // this runs once the new rows are in.
     private void OnMapListUpdated(object? sender, DataTransferEventArgs e) => MapList.SelectedValue = _openMapId;
+
+    private void OnRenameMapClicked(object sender, RoutedEventArgs e) => RaiseEvent(new RoutedEventArgs(RenameRequestedEvent, this));
 
     // Enter opens the first map shown, Esc clears the filter and gives the map back the keys, Down goes to the list.
     private void OnMapFilterKeyDown(object sender, KeyEventArgs e)

@@ -17,6 +17,8 @@ Map > Rename map... and the map list's right-click **Rename map...** open a smal
 ## Tests
 Window code only: RN2's tests cover the rules (`CanRenameMap`, `RenameMapTip` and their change events). None new.
 
+- **Done, with deviations:** `MapRenameWindow` follows the other dialogs (a constructor taking the view model and the rename step, shown with `ShowDialog`) rather than a static `TryRename`. A right click on a row selects it, which opens the map as a click does (WPF does that itself, so no handler), and the context menu's entry raises `RenameRequested`, handled by the window's `OnRenameMapClicked` with the menu entry. The New map dialog's id line no longer says the id is fixed. `MainWindow.xaml` ends at 288 lines. The theme gained a `ContextMenu` style (the bar popups' dark frame), since only the entries were styled and the right-click menu would have shown the light Windows frame.
+
 ## Verify by hand
 1. Open "to_aslas_1" (display name "Primeval Growth Crossroad"); Map > Rename map...: the new id box shows `primeval_growth_crossroad`, selected; the note says every map's undo history clears.
 2. Type `forest`: the problem line names map 'forest' and OK is greyed. Type `primeval_crossroad`: OK.

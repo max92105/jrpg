@@ -5,17 +5,19 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-10-map-fixes-banner-and-folders, slice MF2 (MapTree, MapTreeNode, MapEntry.Folder, MapNavigation
-ShownTree / AddSessionFolder / NoteExpanded), 2026-11-10. Round 1. Verdict: ready to commit.
+Plan 2026-11-10-map-fixes-banner-and-folders, slice MF3 (map list panel as a TreeView, MapTree.PathTo,
+EditorTreeTemplates.xaml), 2026-11-10. Round 1. Verdict: fix the Criticals.
 
-- Open (Warning): MapTree.cs:52 the `!MapFolderPath.IsWithin(path, parent)` clause has no test; deleting it lists
-  "Act 2/Keep" (or "Act 10/Keep") as "Keep" under "Act 1". Add a test with sibling folders "Act 1" and "Act 10/Keep".
-- Open (Warning): the filter predicate (`Text.Contains(filter, OrdinalIgnoreCase)`) now lives twice, MapTree.cs:21 and
-  MapNavigation.cs:114; one rule (e.g. `MapEntry.Matches(filter)`) for both.
-- Open (Suggestion): MapTreeNode's ctor admits a node with both or neither of FolderPath/Map; two named factories.
-- Open (Suggestion): a test for a session folder nested under a map's folder showing once.
-- Follow-up: a session folder stays after a map moves in and out again (shown empty); confirm vs decision 534 in the
-  move slice.
-- MF1 item: MapFolderPath Rule message now names the backslash (fixed).
-- Checked fine: FolderRightUnder for "Act 10" beside "Act 1", shorter path, top level; session/map folder dedupe.
+- Open (Critical): MapListPanel.xaml the Rename map... item binds `PlacementTarget.Tag.*` but the Tag is on the Grid
+  and the menu on the TextBlock: PlacementTarget.Tag is null (probed), so never greyed, no tip. Tag onto the TextBlock.
+- Open (Critical): MapListPanel.xaml.cs NoteExpanded: a generated container with IsExpanded=true raises Expanded
+  (probed), so a filter notes every shown folder open; Esc leaves them open (hand check 5). Ignore while Filter set + test.
+- Open (Warning): SelectMap returns early for null or a map not in the shown tree, leaving a stale row selected (filter
+  "for", open forest, Alt+Left: forest still highlighted, a click on it doesn't reopen); doc says "null selects none".
+- Open (Suggestion): name the template parts PART_Header / ItemsHost as WPF's TreeViewItem expects.
+- Follow-up: a session folder stays after a map moves in and out again (decision 534) - for MF4.
+- MF2 items: IsWithin test (fixed, Of_SiblingFolderSharingAPrefix), filter predicate twice (fixed, Matches),
+  MapTreeNode factories (fixed), nested session folder test (fixed).
+- Checked fine: TryOpenMap re-entrance (same id returns early, no rebuild), TreeExpander IsChecked two-way to
+  TemplatedParent, BasedOn on the ItemContainerStyle, PathTo.
 - start.json residue: the developer's hand test, excluded by the caller.

@@ -22,4 +22,6 @@ Allocation probes (verified 2026-11-10, DO1 review): fsi loop with `GC.GetAlloca
 Runtime WPF probes against .NET 10 (verified 2026-11-05, WP3 review): a scratch `net10.0-windows` `UseWPF` console
 project in the scratchpad (csproj + a UserControl/Window XAML pair + `[STAThread] Main` that `new`s the window without
 `Show`) builds in seconds and runs; good for "does this XAML wire/resolve at runtime" questions. Check the `.g.cs`
-`Connect` too: members of local types the pass-1 compiler can't resolve go into BAML instead.
+`Connect` too: members of local types the pass-1 compiler can't resolve go into BAML instead. For behavior needing
+containers (TreeView events, context menu bindings, verified MF3 2026-11-10): `XamlReader.Parse` the XAML, `Show()` a
+Window at Left=-2000, then `Dispatcher.CurrentDispatcher.Invoke(() => {}, DispatcherPriority.ApplicationIdle)`.

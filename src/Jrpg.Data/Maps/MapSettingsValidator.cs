@@ -8,7 +8,9 @@ internal static class MapSettingsValidator
     /// <summary>Checks one settings file; <paramref name="fileName"/> is its path under the content folder, and the map id must equal its file name.</summary>
     public static void Validate(string fileName, MapSettings settings, IReadOnlySet<string> encounterIds)
     {
-        var problem = FindIdentityProblem(fileName, settings) ?? FindEncounterProblem(settings.RandomEncounters, encounterIds);
+        var problem = FindIdentityProblem(fileName, settings)
+            ?? (settings.AreaLevel is { } level ? RangeProblems.AtLeast("areaLevel", level, minimum: 1) : null)
+            ?? FindEncounterProblem(settings.RandomEncounters, encounterIds);
         if (problem is not null)
         {
             throw new ContentValidationException($"{fileName}: {problem}");

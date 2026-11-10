@@ -4,7 +4,8 @@ namespace Jrpg.Editor.Maps.Settings;
 
 /// <summary>
 /// The map settings dialog. OK hands the edited settings to the window's apply step, which returns false when they
-/// weren't applied (the size is invalid or the user kept the old one), and the dialog then stays open.
+/// weren't applied (a field has a problem, the size, the odds or the area level, or the user kept the old size), and
+/// the dialog then stays open.
 /// </summary>
 internal sealed partial class MapSettingsWindow : Window
 {

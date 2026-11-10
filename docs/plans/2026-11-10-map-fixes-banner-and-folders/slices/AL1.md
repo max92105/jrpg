@@ -29,6 +29,8 @@ A map's settings may hold `areaLevel`, the party level the area is made for, one
   - `Problem_OnlyTheLevelWrong_IsTheLevelProblem`; `Problem_PropertyChangedOnLevelTyped_IsRaised`.
 - `Editor.Tests/Shell/MainViewModelMapSettingsTests` (new; `MainViewModelTests` is at 292): `TryApplySettings_AreaLevelTyped_SetsItAsOneStep`, `TryApplySettings_AreaLevelTyped_Undo_RemovesIt`, `TryApplySettings_LevelProblem_AppliesNothing`.
 
+- **Done, with deviations:** OK's greying binds a `CanApply` bool (`Problem is null`), since a string can't enable a button without a converter; the area level's own problem line sits under its box, as the size's and the odds' do, and `Problem` is what `TryApplySettings` checks. Every property feeding `Problem` notifies it and `CanApply`, each with a raised-event test (the level, the two size boxes, the battles box and its two odds boxes; the review asked for the last five). The test world's start settings file writes back byte for byte without the field.
+
 ## Verify by hand
 1. Open "forest"; Map > Settings...: the new Area level box is empty; type 3; OK; the map row gets " *"; Ctrl+S.
 2. `content/maps/forest.json` holds `"areaLevel": 3`, laid out as the writer lays it out; other maps' files are unchanged.

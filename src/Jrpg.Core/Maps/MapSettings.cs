@@ -11,6 +11,12 @@ public sealed record MapSettings
     /// <summary>The track the map loops, in the music folder; null for silence (decision 419).</summary>
     public string? MusicFile { get; init; }
 
+    /// <summary>
+    /// The party level the area is made for, shown beside its name on entering (decision 527); null for none, such as a
+    /// town. Display only.
+    /// </summary>
+    public int? AreaLevel { get; init; }
+
     /// <summary>Null on maps without random battles, such as towns and houses.</summary>
     public RandomEncounterTable? RandomEncounters { get; init; }
 }

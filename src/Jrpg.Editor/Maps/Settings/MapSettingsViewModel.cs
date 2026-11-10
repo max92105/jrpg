@@ -5,8 +5,8 @@ using Jrpg.Core.Maps;
 namespace Jrpg.Editor.Maps.Settings;
 
 /// <summary>
-/// The map settings dialog: display name, track, size and random battles, edited apart from the map until applied. The
-/// id can't change (question 70), since saves and warps refer to it. Numbers are kept as typed
+/// The map settings dialog: display name, track, area level, size and random battles, edited apart from the map until
+/// applied. The id can't change (question 70), since saves and warps refer to it. Numbers are kept as typed
 /// (<see cref="TypedCounts"/>).
 /// </summary>
 internal sealed partial class MapSettingsViewModel : ObservableObject
@@ -31,6 +31,7 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
         // A track no longer in the folder stays listed, so opening the dialog never changes the map.
         MusicChoices = track is null || musicFiles.Contains(track) ? [NoMusic, .. musicFiles] : [NoMusic, track, .. musicFiles];
         SelectedMusic = track ?? NoMusic;
+        AreaLevelText = map.Settings.AreaLevel is { } level ? Text(level) : "";
         WidthText = Text(map.Layout.Width);
         HeightText = Text(map.Layout.Height);
         var table = map.Settings.RandomEncounters;
@@ -54,25 +55,30 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
     [ObservableProperty]
     public partial string DisplayName { get; set; }
 
+    /// <summary>The area level as typed; empty for none (decision 527).</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(NewSize), nameof(IsShrinking), nameof(IsResizing), nameof(SizeProblem))]
+    [NotifyPropertyChangedFor(nameof(AreaLevelProblem), nameof(Problem), nameof(CanApply))]
+    public partial string AreaLevelText { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(NewSize), nameof(IsShrinking), nameof(IsResizing), nameof(SizeProblem), nameof(Problem), nameof(CanApply))]
     public partial string WidthText { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(NewSize), nameof(IsShrinking), nameof(IsResizing), nameof(SizeProblem))]
+    [NotifyPropertyChangedFor(nameof(NewSize), nameof(IsShrinking), nameof(IsResizing), nameof(SizeProblem), nameof(Problem), nameof(CanApply))]
     public partial string HeightText { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(OddsProblem))]
+    [NotifyPropertyChangedFor(nameof(OddsProblem), nameof(Problem), nameof(CanApply))]
     public partial bool HasRandomEncounters { get; set; }
 
     /// <summary>Each step past the grace steps starts a battle with a chance of 1 in this many.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(OddsProblem))]
+    [NotifyPropertyChangedFor(nameof(OddsProblem), nameof(Problem), nameof(CanApply))]
     public partial string OneInStepsText { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(OddsProblem))]
+    [NotifyPropertyChangedFor(nameof(OddsProblem), nameof(Problem), nameof(CanApply))]
     public partial string GraceStepsText { get; set; }
 
     /// <summary>The size typed in; null when it isn't two whole numbers from 1 to <see cref="TypedCounts.MaxMapSide"/>.</summary>
@@ -92,16 +98,30 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
             ? "The battle odds and the steps without battles must be whole numbers of at least 1."
             : null;
 
-    /// <summary>Whether the name, the track or the random battles differ from the map's.</summary>
+    /// <summary>Why the area level can't be applied; null when it can, an empty box included.</summary>
+    public string? AreaLevelProblem =>
+        !string.IsNullOrWhiteSpace(AreaLevelText) && TypedCounts.Parse(AreaLevelText, int.MaxValue) is null
+            ? "The area level is empty or a whole number of at least 1."
+            : null;
+
+    /// <summary>What stops OK, the first of the size, the battle odds and the area level; null when nothing.</summary>
+    public string? Problem => SizeProblem ?? OddsProblem ?? AreaLevelProblem;
+
+    public bool CanApply => Problem is null;
+
+    /// <summary>Whether the name, the track, the area level or the random battles differ from the map's.</summary>
     public bool AreSettingsChanged => !AreSame(ToSettings(), _currentSettings);
 
-    /// <summary>The settings as edited, once <see cref="OddsProblem"/> is null; the encounter list is checked when the map is saved.</summary>
+    /// <summary>
+    /// The settings as edited, once <see cref="Problem"/> is null; the encounter list is checked when the map is saved.
+    /// </summary>
     public MapSettings ToSettings() => new()
     {
         Id = MapId,
         DisplayName = DisplayName.Trim(),
 
         MusicFile = SelectedMusic == NoMusic ? null : SelectedMusic,
+        AreaLevel = TypedCounts.Parse(AreaLevelText, int.MaxValue),
         RandomEncounters = HasRandomEncounters
             ? new RandomEncounterTable
             {
@@ -118,6 +138,7 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
     private static bool AreSame(MapSettings edited, MapSettings current) =>
         edited.DisplayName == current.DisplayName
         && edited.MusicFile == current.MusicFile
+        && edited.AreaLevel == current.AreaLevel
         && (edited.RandomEncounters, current.RandomEncounters) switch
         {
             (null, null) => true,

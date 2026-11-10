@@ -23,7 +23,18 @@ public sealed class MapSettingsValidatorTests
         { WithTable(_forest.RandomEncounters! with { GraceSteps = 0 }), "randomEncounters.graceSteps must be at least 1 (was 0)." },
         { WithTable(_forest.RandomEncounters! with { EncounterIds = [] }), "randomEncounters.encounterIds must list at least one encounter." },
         { WithTable(_forest.RandomEncounters! with { EncounterIds = ["goblin_trio", null!] }), "randomEncounters.encounterIds holds a null entry." },
+        { _forest with { AreaLevel = 0 }, "areaLevel must be at least 1 (was 0)." },
+        { _forest with { AreaLevel = -1 }, "areaLevel must be at least 1 (was -1)." },
     };
+
+    // No area level at all is the valid settings test.
+    [Fact]
+    public void Validate_AreaLevelOne_DoesNotThrow()
+    {
+        var exception = Record.Exception(() => MapSettingsValidator.Validate(FileName, _forest with { AreaLevel = 1 }, _encounterIds));
+
+        Assert.Null(exception);
+    }
 
     [Fact]
     public void Validate_ValidSettings_DoesNotThrow()

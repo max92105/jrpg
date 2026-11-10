@@ -31,6 +31,9 @@ internal static class AbsentWhenNullFilter
         // Decision 419: a map without a track is silent.
         (typeof(MapSettings), "musicFile"),
 
+        // Decision 527: a town has no area level.
+        (typeof(MapSettings), "areaLevel"),
+
         // ADR 0039: only animated tiles have an animation.
         (typeof(TileDefinition), "animation"),
     ];

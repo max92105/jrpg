@@ -7,25 +7,56 @@ namespace Jrpg.Editor.Maps.Editing;
 internal static class PlacedObjectHits
 {
     /// <summary>
-    /// The object drawn on top at a point: one of its tiles covers it, or its NPC sprite does; among several, the one
-    /// drawn last in Core's <see cref="MapDrawOrder"/>. Null when no object is there.
+    /// The objects covering a point, the one drawn on top first (Core's <see cref="MapDrawOrder"/>): one of their tiles
+    /// covers it, or their NPC sprite does. An object whose above-player zones hold the point ranks by its canopy,
+    /// drawn over everything under the canopy layer (decision 523), so a roof comes before what it hides.
     /// </summary>
-    public static PlacedObject? TopAt(MapLayout map, Point2D point, IReadOnlyDictionary<string, ObjectDefinition> definitions)
+    public static IReadOnlyList<PlacedObject> AllAt(MapLayout map, Point2D point, IReadOnlyDictionary<string, ObjectDefinition> definitions)
     {
-        PlacedObject? top = null;
-        DrawOrderKey? topKey = null;
+        var hits = new List<(PlacedObject Placed, DrawOrderKey Key)>();
         for (var index = 0; index < map.Objects.Count; index++)
         {
             var placed = map.Objects[index];
             var definition = definitions[placed.ObjectId];
-            var key = MapDrawOrder.SpriteKeyOf(placed, definition, index);
-            if (Covers(placed, definition, point) && (topKey is null || key > topKey))
+            if (Covers(placed, definition, point))
             {
-                (top, topKey) = (placed, key);
+                var key = IsInAZone(placed, definition, point)
+                    ? MapDrawOrder.CanopyKeyOf(placed, definition, index)
+                    : MapDrawOrder.SpriteKeyOf(placed, definition, index);
+                hits.Add((placed, key));
             }
         }
 
-        return top;
+        return [.. hits.OrderByDescending(hit => hit.Key).Select(hit => hit.Placed)];
+    }
+
+    /// <summary>The object drawn on top at a point; null when no object is there.</summary>
+    public static PlacedObject? TopAt(MapLayout map, Point2D point, IReadOnlyDictionary<string, ObjectDefinition> definitions) =>
+        AllAt(map, point, definitions) is [var top, ..] ? top : null;
+
+    /// <summary>
+    /// The object a Ctrl + click on the same spot again selects (decision 523): the one after the selected object in
+    /// the hits, the first again after the last; the first when none is selected or the selected one isn't there.
+    /// </summary>
+    /// <param name="hits">What <see cref="AllAt"/> found, topmost first.</param>
+    /// <param name="selectedUid">The one selected object; null when none or several are.</param>
+    public static PlacedObject? NextUnder(IReadOnlyList<PlacedObject> hits, string? selectedUid)
+    {
+        if (hits.Count == 0)
+        {
+            return null;
+        }
+
+        var selectedIndex = -1;
+        for (var index = 0; index < hits.Count; index++)
+        {
+            if (hits[index].Uid == selectedUid)
+            {
+                selectedIndex = index;
+            }
+        }
+
+        return hits[(selectedIndex + 1) % hits.Count];
     }
 
     /// <summary>The objects whose bounds overlap the rectangle between two opposite corners, in placement order.</summary>
@@ -41,6 +72,9 @@ internal static class PlacedObjectHits
                 && placed.Position.Y < bottom && placed.Position.Y + definition.Height > top;
         })];
     }
+
+    private static bool IsInAZone(PlacedObject placed, ObjectDefinition definition, Point2D point) =>
+        definition.AbovePlayerZones.Any(zone => Polygon.Contains(CollisionShapes.InMapCells(zone, placed, definition), point));
 
     // An NPC has no tiles: its sprite covers all its cells (ADR 0015).
     private static bool Covers(PlacedObject placed, ObjectDefinition definition, Point2D point) =>

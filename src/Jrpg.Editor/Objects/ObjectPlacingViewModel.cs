@@ -39,12 +39,16 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
         _layer = layer;
         Copying = new ObjectCopying(catalog, this);
         Editing = new PlacedObjectEditing(catalog, this);
+        Picking = new ObjectPicking(this);
     }
 
     public ObjectBrowserViewModel Browser { get; }
 
     /// <summary>Copy, Cut and Paste of the selected objects (decision 512).</summary>
     public ObjectCopying Copying { get; }
+
+    /// <summary>Ctrl + click's pick, cycling down through the objects under the point (decision 523).</summary>
+    public ObjectPicking Picking { get; }
 
     /// <summary>
     /// The placed object panel's fields: the one selected object's position and layer (decision 513).
@@ -111,10 +115,25 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
     /// <summary>G, or the tool bar's Snap to grid box.</summary>
     public void ToggleGridSnap() => IsGridSnapOn = !IsGridSnapOn;
 
-    /// <summary>The object drawn on top at a point, to move or remove; null when none is there.</summary>
+    /// <summary>The objects at a point, the one drawn on top first; empty with no map.</summary>
     /// <param name="point">In map cells.</param>
-    public PlacedObject? ObjectAt(Point2D point) =>
-        OpenMap is { } open ? PlacedObjectHits.TopAt(open.Map.Layout, point, _catalog.Current.Objects) : null;
+    public IReadOnlyList<PlacedObject> ObjectsAt(Point2D point) =>
+        OpenMap is { } open ? PlacedObjectHits.AllAt(open.Map.Layout, point, _catalog.Current.Objects) : [];
+
+    /// <summary>The object drawn on top at a point, to remove or open; null when none is there.</summary>
+    /// <param name="point">In map cells.</param>
+    public PlacedObject? ObjectAt(Point2D point) => ObjectsAt(point) is [var top, ..] ? top : null;
+
+    /// <summary>
+    /// The object Shift + drag takes at a point (decision 524): a selected one under it before the one drawn on top, so
+    /// an object reached by the pick's cycle can be moved; null when none is there.
+    /// </summary>
+    /// <param name="point">In map cells.</param>
+    public PlacedObject? GrabbedObjectAt(Point2D point)
+    {
+        var hits = ObjectsAt(point);
+        return hits.FirstOrDefault(hit => SelectedObjectUids.Contains(hit.Uid)) ?? (hits is [var top, ..] ? top : null);
+    }
 
     /// <param name="uid">The placed object to move.</param>
     /// <param name="to">Its new top-left corner, in map cells.</param>
@@ -139,10 +158,11 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
             : [];
 
     /// <summary>
-    /// Selects only the object drawn on top at a point (Ctrl + click); none there clears the selection.
+    /// Ctrl + click: selects only the object drawn on top at a point, or the next one under the one selected object
+    /// when that object is there (<see cref="Picking"/>); none there clears the selection.
     /// </summary>
     /// <param name="point">In map cells.</param>
-    public void SelectObjectAt(Point2D point) => SelectedObjectUids = ObjectAt(point) is { } top ? [top.Uid] : [];
+    public void SelectObjectAt(Point2D point) => Picking.PickAt(point);
 
     public void ClearSelection() => SelectedObjectUids = [];
 
@@ -216,6 +236,7 @@ internal sealed partial class ObjectPlacingViewModel : ObservableObject
             return;
         }
 
+        Picking.Forget();
         var onMap = open.Map.Layout.Objects.Select(placed => placed.Uid).ToHashSet();
         if (SelectedObjectUids.Any(uid => !onMap.Contains(uid)))
         {

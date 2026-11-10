@@ -43,7 +43,10 @@ internal sealed record CollisionShapes(
     public static IReadOnlyList<Point2D> OutlineOf(PlacedObject placed, ObjectDefinition definition) =>
         InMapCells(definition.CollisionPolygon, placed, definition);
 
-    // Shape points are 0..1 over the object's cells, from its top-left corner (as MapCollision reads them).
-    private static IReadOnlyList<Point2D> InMapCells(IReadOnlyList<Point2D> shape, PlacedObject placed, ObjectDefinition definition) =>
+    /// <summary>
+    /// A shape of the object in map cells: its points are 0..1 over the object's cells, from its top-left corner (as
+    /// <c>MapCollision</c> reads them).
+    /// </summary>
+    public static IReadOnlyList<Point2D> InMapCells(IReadOnlyList<Point2D> shape, PlacedObject placed, ObjectDefinition definition) =>
         [.. shape.Select(point => new Point2D(placed.Position.X + (point.X * definition.Width), placed.Position.Y + (point.Y * definition.Height)))];
 }

@@ -39,6 +39,8 @@ An object covered by another, on any layer, can be selected, moved and edited: C
 - `GrabbedObjectAt_SelectedObjectCovered_GivesTheSelected`.
 - `GrabbedObjectAt_NothingSelectedThere_GivesTheTop`.
 
+- **Done, with deviations:** the pick's state (last point and count, the note, the Next under command) lives in its own `Objects/ObjectPicking`, owned by `ObjectPlacingViewModel.Picking`, since the placing view model was at 260 lines and verify refuses a file crossing 300 (it ends at 280); the panel binds `Placing.Picking.Note` and `Placing.Picking.SelectNextUnderCommand` through the tab's DataContext. `PlacedObjectHits.NextUnder` takes the hits list `AllAt` gives rather than the map and point, so the view model computes the hits once per click and UO2 can filter them before the cycle. `ObjectPlacingViewModel.ObjectsAt(point)` (topmost first) is public, `ObjectAt` its first. The hits tests are in the new `PlacedObjectHitsStackTests` (the existing file was at 198 lines, over 250 with them). `CollisionShapes.InMapCells` is public, so a zone is scaled once, as outlines are. From the review: the note and Next under also end when the map changes under the pick (the picked object moved, an undo), `ObjectPicking.Forget` called from the placing view model's map-change handler. "The first hit" is written `is [var top, ..]` since CA1826 refuses `FirstOrDefault()` on a list.
+
 ## Verify by hand
 1. Objects tab; place a bench, then a tree over it on the same layer, its base lower on screen (the tree covering the bench).
 2. Ctrl + click where both overlap: the tree is selected (cyan frame), the panel says "1 of 2 objects here".

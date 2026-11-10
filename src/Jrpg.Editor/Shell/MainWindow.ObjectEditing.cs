@@ -11,9 +11,9 @@ using Jrpg.Editor.Objects.Composing;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// The window's object mode: a click places the chosen object centered on the mouse, Shift + drag moves an object, a
-/// right click removes one; Ctrl + click or Ctrl + drag selects objects for Delete and the arrow keys, and Esc clears
-/// what is selected.
+/// The window's object mode: a click places the chosen object centered on the mouse, Shift + drag moves an object (a
+/// selected one under the mouse first), a right click removes one; Ctrl + click or Ctrl + drag selects objects for
+/// Delete and the arrow keys (Ctrl + click again: the next object under, decision 523), and Esc clears the selection.
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -116,7 +116,7 @@ internal sealed partial class MainWindow
             _selectionStart = point;
         }
         // Alt with Shift snaps the move; Ctrl stays exact (Ctrl + Alt is AltGr on some layouts).
-        else if ((Keyboard.Modifiers & ~ModifierKeys.Alt) == ModifierKeys.Shift && Placing.ObjectAt(point) is { } grabbed)
+        else if ((Keyboard.Modifiers & ~ModifierKeys.Alt) == ModifierKeys.Shift && Placing.GrabbedObjectAt(point) is { } grabbed)
         {
             _movedObject = (grabbed, new Vector(grabbed.Position.X - point.X, grabbed.Position.Y - point.Y), point, Placing.IsSelected(grabbed.Uid));
         }

@@ -49,6 +49,10 @@ public static class MapDrawOrder
     public static DrawOrderKey SpriteKeyOf(PlacedObject placed, ObjectDefinition definition, int order) =>
         DrawOrderKey.ForSprite(placed.Z, BaseOf(placed, definition), order);
 
+    /// <summary>A placed object's canopy key: its above-player zones, drawn over the player (decision 521).</summary>
+    public static DrawOrderKey CanopyKeyOf(PlacedObject placed, ObjectDefinition definition, int order) =>
+        DrawOrderKey.ForCanopy(placed.Z, BaseOf(placed, definition), order);
+
     private static void AddParts(List<MapDrawItem> into, MapLayout layout, Func<PlacedObject, ObjectDefinition> definitionOf)
     {
         into.Clear();
@@ -67,7 +71,7 @@ public static class MapDrawOrder
             // with the body it comes from. The item belongs to the object's layer (decision 522).
             if (definition.AbovePlayerZones.Count > 0 && MapLayers.CanopyZOf(placed.Z) > placed.Z)
             {
-                into.Add(new MapDrawItem(DrawOrderKey.ForCanopy(placed.Z, BaseOf(placed, definition), index), MapDrawItemKind.Canopy, index, placed.Z));
+                into.Add(new MapDrawItem(CanopyKeyOf(placed, definition, index), MapDrawItemKind.Canopy, index, placed.Z));
             }
         }
     }

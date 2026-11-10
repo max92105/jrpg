@@ -74,7 +74,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **DO2. Canopies keep their object's layer: `DrawOrderKey.ForCanopy`; the editor dims a canopy with its object; a throwaway listing of the repository's flipped pairs** (Core + Editor, about 150 lines, the throwaway test deleted) → [slices/DO2.md](slices/DO2.md)
 
 ### Phase 3: reaching covered things
-- [ ] **UO1. Ctrl + click again selects the next object under the point, ranked as drawn (a roof's zone counts as the roof); Next under in the Placed object panel; Shift + drag grabs the selected object first** (Core + Editor, about 215 lines) → [slices/UO1.md](slices/UO1.md)
+- [x] **UO1. Ctrl + click again selects the next object under the point, ranked as drawn (a roof's zone counts as the roof); Next under in the Placed object panel; Shift + drag grabs the selected object first** (Core + Editor, about 215 lines) → [slices/UO1.md](slices/UO1.md)
 - [ ] **UO2. Dim and lock other layers: clicks reach only the chosen layer's objects, in Objects and Events modes** (Editor, about 150 lines) → [slices/UO2.md](slices/UO2.md)
 - [ ] **UO3. Events mode: Ctrl + click opens the cell's event under any object, Ctrl + right click removes it** (Editor, about 120 lines) → [slices/UO3.md](slices/UO3.md)
 

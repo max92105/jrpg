@@ -243,7 +243,7 @@
           </TabItem>
           <!-- The tooltip names the mode's mouse and key gestures; F1 lists them all. -->
           <TabItem x:Name="ObjectsTab" Header="Objects"
-                   ToolTip="Click places the chosen object; Shift + drag moves; Ctrl + click or Ctrl + drag selects; arrows nudge the selection, Shift for one pixel; Esc clears it; right click or Delete removes.">
+                   ToolTip="Click places the chosen object; Shift + drag moves; Ctrl + click or Ctrl + drag selects (Ctrl + click again: the next object under); arrows nudge the selection, Shift for one pixel; Esc clears it; right click or Delete removes.">
             <DockPanel>
               <objects:PlacedObjectPanel DockPanel.Dock="Bottom" DataContext="{Binding Placing.Editing}" EditEventsRequested="OnPlacedObjectEditEvents" />
               <objects:ObjectBrowserView x:Name="ObjectBrowser" DataContext="{Binding Placing.Browser}" MouseDoubleClick="OnObjectBrowserDoubleClicked" />

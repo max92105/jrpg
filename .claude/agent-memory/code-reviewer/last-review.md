@@ -5,16 +5,16 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-10-map-fixes-banner-and-folders, slice ML0 (moves only: the map list into Shell/MapListPanel), 2026-11-10.
+Plan 2026-11-10-map-fixes-banner-and-folders, slice RN1 (MapIdRename + ContentWriter.RenameMap), 2026-11-10.
 Round 1. Verdict: ready to commit.
 
-- Open (Warning): docs/map.md:80 Shell row still describes `MainWindow.MapSwitching` as "(the map list, its filter, and
-  a warp's Go to ...)"; the list and filter now live in `MapListPanel`. Reword to "(the open map's row kept selected,
-  Find reaching the filter, and a warp's Go to ...)".
-- Open (Suggestion): MapListPanel.xaml.cs `_selectedMapId` holds the open map's id (the fallback for a refused switch),
-  not the list's selection; `_openMapId` says so.
-- Open (Suggestion): MainWindow.MapSwitching.cs:10 `<see cref="MapListPanel"/>` inside MainWindow binds to the field
-  of the same name, not the type; `Shell.MapListPanel` or plain text.
-- MB3 items all fixed (hairline drawn before the no-level return, TextWidth, rounded slide, HairlineHeight constant,
-  design.md tunables no longer name map_banner_level).
+- Open (Warning): MapIdRename.cs:24 backstop compares the new id case-sensitively; files are case-insensitive on
+  Windows, so "forest" -> "Forest" (or "woods" -> "Forest" with forest saved) overwrites forest's files and the
+  RenameMap deletes (ContentWriter.cs:111-112) then delete the just-written files. Fix: OrdinalIgnoreCase check
+  + test Apply_NewIdTakenWithOtherCase_Throws.
+- Open (Suggestion): MapIdRename.cs:59 `renamedSteps` counts events, used only as a flag; a captured bool
+  `isAnyWarpRenamed` says it.
+- Open (Suggestion): ContentWriterRenameTests.cs:100 NewIdTaken asserts forest's bytes; the file a wrong write would
+  clobber is start's; assert start's layout bytes too.
+- ML0 items all fixed (map.md Shell row, `_openMapId`, MapSwitching summary plain text).
 - start.json residue: the developer's hand test, excluded by the caller.

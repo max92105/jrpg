@@ -5,16 +5,14 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-10-map-fixes-banner-and-folders, slice SV2 (refused Ctrl+S points to Save all, decision 519), 2026-11-10.
+Plan 2026-11-10-map-fixes-banner-and-folders, slice DO1 (one draw order in Core, decision 520, moves only), 2026-11-10.
 Round 1. Verdict: ready to commit.
 
-- Open (Warning): MainViewModel.Saving.cs:54 hint appended after any refusal; a read-only/locked file (IO error) or a
-  catalog-validator refusal with another map dirty gets "Save all ... makes this valid", Save all fails the same way.
-  Fix: hint only when CheckMaps fails on the Ctrl+S content and passes on the open maps.
-- Open (Suggestion): MainViewModel.Saving.cs:10/39-40 file and Save summaries still cite decisions 499(-501), 518 only;
-  docs/map.md Shell line too (519 missing).
-- Open (Suggestion): ContentWriterMapsTests CheckMaps_ValidContent_WritesNothing cannot fail on its bytes asserts
-  (static, no root); its real claim is the deadlock content passes: rename MapsValidOnlyTogether_DoesNotThrow-ish.
-- Open (Suggestion): Save_RefusedWithNoOtherMapChanged also fails PassTogether, so it doesn't pin the others.Count==0
-  guard; the IO-refusal case would.
-- SV1 items all fixed (SaveTogether rename, test comment, duplicate test removed, map.md 518, backlog WriteMaps).
+- Open (Warning): MapDrawOrder.cs:17/25/41 `List.Sort(IComparer)` allocates a 64-byte Comparison delegate per call
+  (probed with fsi), so FillWithPlayer allocates every update against its summary; fix: static readonly
+  `Comparison<MapDrawItem>` + `into.Sort(_byKey)`. Pre-existing in the game's MapDrawList, carried by the move.
+- Open (Suggestion): MapDrawOrder.cs:32-34 empty `<param>` tags (CS1573 filler); copy Fill's wording.
+- Open (Suggestion): MapDrawOrderTests.cs:147 `SpriteKeyOf_LowerBase_SortsBefore` with variable `lower` sorting after;
+  rename variables (`nearer`/`farther`) or the test (`..._SmallerBaseY_SortsBefore`).
+- Open (Suggestion): MapDrawList.Drawables named after the deleted Drawable type; `Items` (scene local already `items`).
+- SV2 items: not re-checked (different slice; the SV2 Warning was addressed in the SV2 commit message).

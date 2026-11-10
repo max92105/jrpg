@@ -15,6 +15,10 @@ No Python on this machine (`python` opens the Store stub). For "moved code uncha
 
 MonoGame behavior probes (verified 2026-10-24, A1b review): `dotnet fsi` can `Assembly.LoadFrom` the nuget `MonoGame.Framework.dll` and walk a method's IL (`GetMethodBody().GetILAsByteArray()`, opcodes 0x28/0x6F/0x73 + `Module.ResolveMethod(token)`) to list what it calls. Found `SoundEffect.MasterVolume = 1f` is a no-op (early return when equal) and only SoundEffect ctors, DynamicSoundEffectInstance and Microphone init the audio device.
 
+Allocation probes (verified 2026-11-10, DO1 review): fsi loop with `GC.GetAllocatedBytesForCurrentThread()` around
+1000 calls after a 2000-call warm-up. Found `List<T>.Sort(IComparer<T>)` allocates 64 B per call (it wraps
+`comparer.Compare` in a delegate); `Sort(Comparison<T>)` with a cached static delegate allocates 0.
+
 Runtime WPF probes against .NET 10 (verified 2026-11-05, WP3 review): a scratch `net10.0-windows` `UseWPF` console
 project in the scratchpad (csproj + a UserControl/Window XAML pair + `[STAThread] Main` that `new`s the window without
 `Show`) builds in seconds and runs; good for "does this XAML wire/resolve at runtime" questions. Check the `.g.cs`

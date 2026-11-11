@@ -62,7 +62,7 @@ Sizes are hand-written lines, tests included; "moved" lines are cut and pasted (
 - [x] **S2. Moves only: the sheet import into `MainViewModel.SheetImport` and `MainWindow.SheetFiles`** (Editor and tests, about 110 lines moved) → [slices/S2.md](slices/S2.md)
 - [x] **S3. Moves only: the map settings into `MainViewModel.MapSettings`** (Editor and tests, about 110 lines moved) → [slices/S3.md](slices/S3.md)
 - [x] **S4. Moves only: the catalog snapshots into `CatalogDraft.Snapshots`** (Editor, about 35 lines moved) → [slices/S4.md](slices/S4.md)
-- [ ] **S5. Moves only: the selection into `ObjectPlacingViewModel.Selection`** (Editor, about 75 lines moved) → [slices/S5.md](slices/S5.md)
+- [x] **S5. Moves only: the selection into `ObjectPlacingViewModel.Selection`** (Editor, about 75 lines moved) → [slices/S5.md](slices/S5.md)
 
 ### Phase 3: dead code and duplicates
 - [ ] **X1. Dead code with evidence; `ContentWriter.WriteMap` deleted** (Data, Editor, Data tests, about 90 lines) → [slices/X1.md](slices/X1.md)

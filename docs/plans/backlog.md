@@ -123,8 +123,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - Private draw helpers over four parameters: `ShopDetailView.DrawRow` (6), `DrawPreview` and `DrawPicker` (5), `ShopListView.DrawTabs`, `DrawRowSelection` and `DrawRow` (5); fold the area or the opacity into a per-frame record when each view is next touched.
 - The gold plan's out-of-scope features (editing shops in the editor, gold in the save list, a `giveGold` step, Unique items in shops, the whole party's preview at once) are listed in `docs/plans/done/2026-10-29-gold-and-shops/README.md`, "Out of scope".
 - The copied-content-root fixture (`CopiedContentRoot`, quests QD) exists; `ContentCatalogLoaderShopTests`, `ContentCatalogLoaderCraftingTests`, `ContentWriterTests` and `ContentWriterShopTests` still copy the content themselves: switch them when next touched.
-- The "enum to its camelCase JSON name" one-liner is written five times (`ResistancesConverter`, `StatBonusesConverter`, `CraftingRulesValidator.NameOf`, `LootRulesValidator.NameOf`, `MapEventValidator.JsonNameOf`): one shared Data helper (QV review).
-- Data enumerates "a layout's events" three times (`MapEventValidator.AllEvents`, `MapEventSteps.Of`, `WorldStateRepair`); `MapLayout.AllEvents` (quests QE1) is the shared member to move them to.
 - `ObjectIds.ProblemOf` is the content id rule for any typed id (the Quests window uses it for quests and stages, QE2); rename it to a `Catalogs/ContentIds` shared by objects and quests.
 
 ## From the quests plan (2026-11-01, at the retro)
@@ -197,7 +195,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the map editing flows plan (2026-11-05, during the slices)
 
-- A tile's sheet cell is still worked out inline in `Tiles/TileBrowserViewModel.cs` and twice in `Tiles/TileImages.cs`: `SheetCell.Of(tile)` is the one rule now (OM2 review).
 - `Shell/MainViewModel.ObjectFromMap.cs` guards states the modal composer rules out: `StartObjectFromMap`'s `CurrentMap is not { } shown` and `ErasedCells`' `FirstOrDefault` + null check on a layer that can't vanish while the composer is open; `Single` or the value, so a bug fails instead of skipping (OM3, OM4 reviews).
 - `tests/Jrpg.Editor.Tests/Shell/MainViewModelOpenMapsTests.cs` is at 286 lines after MS2 and `MainViewModelObjectFromMapTests.cs` at 251 after OM4: the next open-maps or object-from-map test goes in a sibling file.
 

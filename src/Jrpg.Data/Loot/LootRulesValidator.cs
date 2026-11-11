@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
 using Jrpg.Data.Content;
@@ -29,25 +28,25 @@ internal static class LootRulesValidator
     {
         if (rarities.ContainsKey(Rarity.Unique))
         {
-            return $"{NameOf(Rarity.Unique)} must not be listed: unique items never roll.";
+            return $"{ContentJsonOptions.EnumName(Rarity.Unique)} must not be listed: unique items never roll.";
         }
 
         foreach (var rarity in _rolled)
         {
             if (!rarities.TryGetValue(rarity, out var rule))
             {
-                return $"{NameOf(rarity)} is missing.";
+                return $"{ContentJsonOptions.EnumName(rarity)} is missing.";
             }
 
             // The serializer doesn't apply nullable annotations to dictionary values, so a stray null gets here.
             if (rule is null)
             {
-                return $"{NameOf(rarity)} is null.";
+                return $"{ContentJsonOptions.EnumName(rarity)} is null.";
             }
 
             if (FindRuleProblem(rarity, rule) is { } problem)
             {
-                return $"{NameOf(rarity)}.{problem}";
+                return $"{ContentJsonOptions.EnumName(rarity)}.{problem}";
             }
         }
 
@@ -62,6 +61,4 @@ internal static class LootRulesValidator
             ?? Within("minAffixes", rule.MinAffixes, 0, mostAffixes)
             ?? Within("maxAffixes", rule.MaxAffixes, rule.MinAffixes, mostAffixes);
     }
-
-    private static string NameOf(Rarity rarity) => JsonNamingPolicy.CamelCase.ConvertName(rarity.ToString());
 }

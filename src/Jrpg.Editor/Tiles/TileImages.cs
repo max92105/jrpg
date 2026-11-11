@@ -33,7 +33,7 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<Miss
     public ImageSource TileImageOf(int tileId)
     {
         var tile = catalog.Current.Tiles[tileId];
-        return CellImageOf(new SheetCell(tile.SheetId, tile.Column, tile.Row));
+        return CellImageOf(SheetCell.Of(tile));
     }
 
     /// <summary>
@@ -89,7 +89,7 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<Miss
         {
             _animatedTilesOf = catalog.Current;
             _animatedTileIds = catalog.Current.Tiles.Values.OrderBy(tile => tile.Id)
-                .GroupBy(tile => new SheetCell(tile.SheetId, tile.Column, tile.Row))
+                .GroupBy(SheetCell.Of)
                 .Where(group => group.First().Animation is not null)
                 .ToDictionary(group => group.Key, group => group.First().Id);
         }

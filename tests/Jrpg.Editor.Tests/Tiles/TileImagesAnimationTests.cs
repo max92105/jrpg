@@ -24,7 +24,7 @@ public sealed class TileImagesAnimationTests
         var tile = _catalog.Tiles.Values.First(tile => tile.SheetId == "fg_forest_fall" && tile.Column + 4 <= 32);
         _draft.SetTileAnimations(new Dictionary<int, TileAnimation?> { [tile.Id] = new TileAnimation { FrameCount = 4, FrameMilliseconds = 140 } });
         _images = new TileImages(_draft, ArtFolders.RootIn(_root), () => MissingArt.None);
-        _animatedCell = new SheetCell(tile.SheetId, tile.Column, tile.Row);
+        _animatedCell = SheetCell.Of(tile);
     }
 
     [Fact]

@@ -177,7 +177,7 @@ internal sealed partial class TileBrowserViewModel : ObservableObject
         var tile = _catalog.Current.Tiles[tileId];
         SelectedChoice = SheetChoices.First(choice => choice.Sheet?.Id == tile.SheetId);
         SelectedCells = null;
-        SelectedCell = new SheetCell(tile.SheetId, tile.Column, tile.Row);
+        SelectedCell = SheetCell.Of(tile);
     }
 
     // The whole cell under a pixel, or the nearest one when the pixel is on the margin, spacing or past the last whole cell.

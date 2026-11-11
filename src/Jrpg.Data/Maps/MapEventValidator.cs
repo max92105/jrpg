@@ -1,9 +1,9 @@
 using System.Globalization;
-using System.Text.Json;
 using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Quests;
+using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Maps;
 
@@ -36,20 +36,20 @@ internal static class MapEventValidator
             return "cellEvents holds a null entry.";
         }
 
-        var eventWithNullStep = AllEvents(layout).FirstOrDefault(mapEvent => mapEvent.Steps.Contains(null));
+        var eventWithNullStep = layout.AllEvents.FirstOrDefault(mapEvent => mapEvent.Steps.Contains(null));
         if (eventWithNullStep is not null)
         {
             return $"event '{eventWithNullStep.Id}': steps holds a null entry.";
         }
 
-        var eventWithNullLine = AllEvents(layout).FirstOrDefault(
+        var eventWithNullLine = layout.AllEvents.FirstOrDefault(
             mapEvent => mapEvent.Steps.OfType<DialogueStep>().Any(dialogue => dialogue.Speech.Lines.Contains(null)));
         return eventWithNullLine is null ? null : $"event '{eventWithNullLine.Id}': a dialogue's lines hold a null entry.";
     }
 
     private static string? FindRepeatedEventId(MapLayout layout)
     {
-        var repeatedId = AllEvents(layout).GroupBy(mapEvent => mapEvent.Id).FirstOrDefault(group => group.Count() > 1)?.Key;
+        var repeatedId = layout.AllEvents.GroupBy(mapEvent => mapEvent.Id).FirstOrDefault(group => group.Count() > 1)?.Key;
         return repeatedId is null ? null : $"event id '{repeatedId}' is used more than once.";
     }
 
@@ -69,7 +69,7 @@ internal static class MapEventValidator
 
                 if (placed.Events.Skip(index + 1).FirstOrDefault(later => later.Activation == first.Activation) is { } shadowed)
                 {
-                    return $"object '{placed.Uid}': event '{first.Id}' can always start, so the later {JsonNameOf(first.Activation)} event '{shadowed.Id}' never would; gate it or make it once.";
+                    return $"object '{placed.Uid}': event '{first.Id}' can always start, so the later {ContentJsonOptions.EnumName(first.Activation)} event '{shadowed.Id}' never would; gate it or make it once.";
                 }
             }
         }
@@ -79,8 +79,6 @@ internal static class MapEventValidator
 
     private static bool CanAlwaysStart(MapEvent mapEvent) =>
         !mapEvent.IsOnce && mapEvent.OnlyWhenObjectId is null && mapEvent.OnlyWhenLeaderId is null && mapEvent.OnlyWhenQuest is null;
-
-    private static string JsonNameOf<T>(T value) where T : struct, Enum => JsonNamingPolicy.CamelCase.ConvertName(value.ToString());
 
     private static string? FindObjectEventProblem(MapLayout layout, MapReferences references)
     {
@@ -174,7 +172,7 @@ internal static class MapEventValidator
             return $"onlyWhenQuest has unknown quest id '{condition.QuestId}'.";
         }
 
-        var kind = JsonNameOf(condition.Kind);
+        var kind = ContentJsonOptions.EnumName(condition.Kind);
         if (condition.Kind is not (QuestConditionKind.AtStage or QuestConditionKind.ReachedStage))
         {
             return condition.StageId is null ? null : $"onlyWhenQuest kind '{kind}' names no stage; remove stageId '{condition.StageId}'.";
@@ -235,7 +233,4 @@ internal static class MapEventValidator
             ? $"still seconds must be above 0 and a time the game can count (was {still.Seconds.ToString(CultureInfo.InvariantCulture)})."
         : still.Caption is not null && string.IsNullOrWhiteSpace(still.Caption) ? "still caption must be null or have text."
         : null;
-
-    private static IEnumerable<MapEvent> AllEvents(MapLayout layout) =>
-        layout.Objects.SelectMany(placed => placed.Events).Concat(layout.CellEvents.Select(cellEvent => cellEvent.Event));
 }

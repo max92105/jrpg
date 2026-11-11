@@ -13,7 +13,7 @@ internal static class MapEventSteps
     public static IEnumerable<(TStep Step, string NamedBy)> Of<TStep>(ContentCatalog catalog)
         where TStep : EventStep =>
         from map in catalog.Maps.Values.OrderBy(map => map.Id, StringComparer.Ordinal)
-        from mapEvent in map.Layout.Objects.SelectMany(placed => placed.Events).Concat(map.Layout.CellEvents.Select(cell => cell.Event))
+        from mapEvent in map.Layout.AllEvents
         from step in mapEvent.Steps.OfType<TStep>()
         select (step, $"event '{mapEvent.Id}' on map '{map.Id}'");
 }

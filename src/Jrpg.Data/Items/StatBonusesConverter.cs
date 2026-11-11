@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Jrpg.Core.Stats;
+using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Items;
 
@@ -12,7 +13,7 @@ namespace Jrpg.Data.Items;
 internal sealed class StatBonusesConverter : JsonConverter<StatBonuses>
 {
     private static readonly FrozenDictionary<StatKind, string> _names =
-        Enum.GetValues<StatKind>().ToFrozenDictionary(kind => kind, kind => JsonNamingPolicy.CamelCase.ConvertName(kind.ToString()));
+        Enum.GetValues<StatKind>().ToFrozenDictionary(kind => kind, ContentJsonOptions.EnumName);
 
     private static readonly FrozenDictionary<string, StatKind> _kinds = _names.ToFrozenDictionary(entry => entry.Value, entry => entry.Key);
 

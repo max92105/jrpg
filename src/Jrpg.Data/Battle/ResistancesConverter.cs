@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Jrpg.Core.Stats;
+using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Battle;
 
@@ -13,7 +14,7 @@ namespace Jrpg.Data.Battle;
 internal sealed class ResistancesConverter : JsonConverter<Resistances>
 {
     private static readonly FrozenDictionary<DamageType, string> _names =
-        Enum.GetValues<DamageType>().ToFrozenDictionary(type => type, type => JsonNamingPolicy.CamelCase.ConvertName(type.ToString()));
+        Enum.GetValues<DamageType>().ToFrozenDictionary(type => type, ContentJsonOptions.EnumName);
 
     private static readonly FrozenDictionary<string, DamageType> _types = _names.ToFrozenDictionary(entry => entry.Value, entry => entry.Key);
 

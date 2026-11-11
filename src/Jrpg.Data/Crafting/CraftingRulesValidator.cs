@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Jrpg.Core.Crafting;
 using Jrpg.Core.Items;
 using Jrpg.Data.Content;
@@ -38,16 +37,16 @@ internal static class CraftingRulesValidator
         {
             if (!table.TryGetValue(rarity, out var materials))
             {
-                return $"{field}.{NameOf(rarity)} is missing.";
+                return $"{field}.{ContentJsonOptions.EnumName(rarity)} is missing.";
             }
 
-            if (FindListProblem($"{field}.{NameOf(rarity)}", materials, items) is { } problem)
+            if (FindListProblem($"{field}.{ContentJsonOptions.EnumName(rarity)}", materials, items) is { } problem)
             {
                 return problem;
             }
         }
 
-        return table.Keys.Except(rarities).Select(NameOf).FirstOrDefault() is { } extra
+        return table.Keys.Except(rarities).Select(rarity => ContentJsonOptions.EnumName(rarity)).FirstOrDefault() is { } extra
             ? $"{field}.{extra} must not be listed: a craft never works that tier."
             : null;
     }
@@ -82,6 +81,4 @@ internal static class CraftingRulesValidator
         !items.TryGetValue(entry.ItemId, out var item) ? $"itemId has unknown item id '{entry.ItemId}'."
         : !item.IsMaterial ? $"itemId '{entry.ItemId}' must be a material (isMaterial true)."
         : Within("quantity", entry.Quantity, 1, item.MaxStack);
-
-    private static string NameOf(Rarity rarity) => JsonNamingPolicy.CamelCase.ConvertName(rarity.ToString());
 }

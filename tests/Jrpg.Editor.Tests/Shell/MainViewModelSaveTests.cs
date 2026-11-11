@@ -80,7 +80,7 @@ public sealed class MainViewModelSaveTests : IDisposable
 
         Assert.Null(viewModel.SaveError);
         var loaded = ContentCatalogLoader.Load(_content.ContentCopy);
-        var tile = loaded.Tiles.Values.Single(tile => new SheetCell(tile.SheetId, tile.Column, tile.Row) == cell);
+        var tile = loaded.Tiles.Values.Single(tile => SheetCell.Of(tile) == cell);
         var layer = loaded.Maps["forest"].Layout.Layers.Single(layer => layer.Z == viewModel.Layer.Z);
         Assert.Equal(tile.Id, layer.TileIdAt(new GridCell(0, 0)));
     }

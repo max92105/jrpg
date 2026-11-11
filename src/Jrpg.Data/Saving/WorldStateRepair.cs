@@ -82,6 +82,5 @@ internal static class WorldStateRepair
     }
 
     private static HashSet<string> EventIdsOf(MapDefinition map) =>
-        [.. map.Layout.Objects.SelectMany(placed => placed.Events).Concat(map.Layout.CellEvents.Select(cellEvent => cellEvent.Event))
-            .Select(mapEvent => mapEvent.Id)];
+        [.. map.Layout.AllEvents.Select(mapEvent => mapEvent.Id)];
 }

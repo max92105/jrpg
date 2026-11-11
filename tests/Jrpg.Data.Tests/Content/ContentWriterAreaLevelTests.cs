@@ -21,23 +21,25 @@ public sealed class ContentWriterAreaLevelTests : IDisposable
 
     // The test world predates the field: its file writes back byte for byte.
     [Fact]
-    public void WriteMap_NoAreaLevel_LeavesTheFieldOut()
+    public void WriteMaps_NoAreaLevel_LeavesTheFieldOut()
     {
         var start = _catalog.Maps["start"];
         var before = File.ReadAllBytes(SettingsPath("start"));
 
-        _writer.WriteMap(start, _catalog);
+        _writer.WriteMaps(MapContent.With(_catalog, start), [start.Id]);
 
         Assert.Equal(before, File.ReadAllBytes(SettingsPath("start")));
         Assert.DoesNotContain("areaLevel", File.ReadAllText(SettingsPath("start")), StringComparison.Ordinal);
     }
 
     [Fact]
-    public void WriteMap_AreaLevel_RoundTrips()
+    public void WriteMaps_AreaLevel_RoundTrips()
     {
         var start = _catalog.Maps["start"];
 
-        _writer.WriteMap(new MapDefinition(start.Layout, start.Settings with { AreaLevel = 7 }), _catalog);
+        var edited = new MapDefinition(start.Layout, start.Settings with { AreaLevel = 7 });
+
+        _writer.WriteMaps(MapContent.With(_catalog, edited), [edited.Id]);
 
         Assert.Equal(7, ContentCatalogLoader.Load(_content.Path).Maps["start"].Settings.AreaLevel);
     }

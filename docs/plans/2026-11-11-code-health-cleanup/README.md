@@ -65,7 +65,7 @@ Sizes are hand-written lines, tests included; "moved" lines are cut and pasted (
 - [x] **S5. Moves only: the selection into `ObjectPlacingViewModel.Selection`** (Editor, about 75 lines moved) → [slices/S5.md](slices/S5.md)
 
 ### Phase 3: dead code and duplicates
-- [ ] **X1. Dead code with evidence; `ContentWriter.WriteMap` deleted** (Data, Editor, Data tests, about 90 lines) → [slices/X1.md](slices/X1.md)
+- [x] **X1. Dead code with evidence; `ContentWriter.WriteMap` deleted** (Data, Editor, Data tests, about 90 lines) → [slices/X1.md](slices/X1.md)
 - [ ] **D1. One `MapLayout.AllEvents`, one enum JSON name, one `SheetCell.Of`** (Data, Editor, about 45 lines) → [slices/D1.md](slices/D1.md)
 - [ ] **D2. The writer tests copy content through `CopiedContentRoot`** (Data tests, about 60 lines, net fewer) → [slices/D2.md](slices/D2.md)
 

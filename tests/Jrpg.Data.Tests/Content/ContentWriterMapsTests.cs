@@ -126,7 +126,7 @@ public sealed class ContentWriterMapsTests : IDisposable
         var ground = forest.Layout.Layers[0];
         IReadOnlyList<int> row = [tileId, .. ground.Rows[0].Skip(1)];
         var layout = forest.Layout with { Layers = [ground with { Rows = [row, .. ground.Rows.Skip(1)] }, .. forest.Layout.Layers.Skip(1)] };
-        return WithMap(catalog, new MapDefinition(layout, forest.Settings));
+        return MapContent.With(catalog, new MapDefinition(layout, forest.Settings));
     }
 
     private static ContentCatalog WithForestGrownBy(ContentCatalog catalog, int rows)
@@ -138,7 +138,7 @@ public sealed class ContentWriterMapsTests : IDisposable
             Height = forest.Layout.Height + rows,
             Layers = [.. forest.Layout.Layers.Select(layer => layer with { Rows = [.. layer.Rows, .. emptyRows] })],
         };
-        return WithMap(catalog, new MapDefinition(layout, forest.Settings));
+        return MapContent.With(catalog, new MapDefinition(layout, forest.Settings));
     }
 
     private static ContentCatalog WithStartWarpsIntoForestAt(ContentCatalog catalog, GridCell cell)
@@ -154,9 +154,6 @@ public sealed class ContentWriterMapsTests : IDisposable
                 },
             })],
         };
-        return WithMap(catalog, new MapDefinition(layout, start.Settings));
+        return MapContent.With(catalog, new MapDefinition(layout, start.Settings));
     }
-
-    private static ContentCatalog WithMap(ContentCatalog catalog, MapDefinition map) =>
-        catalog with { Maps = new Dictionary<string, MapDefinition>(catalog.Maps) { [map.Id] = map } };
 }

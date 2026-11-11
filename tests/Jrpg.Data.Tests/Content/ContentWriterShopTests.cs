@@ -31,26 +31,26 @@ public sealed class ContentWriterShopTests : IDisposable
     public void Dispose() => Directory.Delete(_contentRoot, recursive: true);
 
     [Fact]
-    public void WriteMap_MapWithOpenShopStep_IsAccepted()
+    public void WriteMaps_MapWithOpenShopStep_IsAccepted()
     {
         var start = _catalog.Maps["start"];
         var shopCell = new CellEvent(new GridCell(0, 0), new MapEvent { Id = "shop_cell", Activation = EventActivation.Touch, Steps = [new OpenShopStep("general_store")] });
         var withShop = new MapDefinition(start.Layout with { CellEvents = [.. start.Layout.CellEvents, shopCell] }, start.Settings);
 
-        _writer.WriteMap(withShop, _catalog);
+        _writer.WriteMaps(MapContent.With(_catalog, withShop), [withShop.Id]);
 
         var loaded = ContentCatalogLoader.Load(_contentRoot).Maps["start"].Layout.CellEvents;
         Assert.Contains(loaded, cell => cell.Event.Steps is [OpenShopStep { ShopId: "general_store" }]);
     }
 
     [Fact]
-    public void WriteMap_OpenShopStepNamingUnknownShop_ThrowsNamingIt()
+    public void WriteMaps_OpenShopStepNamingUnknownShop_ThrowsNamingIt()
     {
         var start = _catalog.Maps["start"];
         var shopCell = new CellEvent(new GridCell(0, 0), new MapEvent { Id = "shop_cell", Activation = EventActivation.Touch, Steps = [new OpenShopStep("bazaar")] });
         var withShop = new MapDefinition(start.Layout with { CellEvents = [.. start.Layout.CellEvents, shopCell] }, start.Settings);
 
-        var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMap(withShop, _catalog));
+        var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMaps(MapContent.With(_catalog, withShop), [withShop.Id]));
 
         Assert.Contains("openShop has unknown shop id 'bazaar'.", exception.Message, StringComparison.Ordinal);
     }

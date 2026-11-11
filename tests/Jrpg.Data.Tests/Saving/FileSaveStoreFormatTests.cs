@@ -49,7 +49,7 @@ public sealed class FileSaveStoreFormatTests : IDisposable
         var exception = Assert.Throws<UnreadableSaveException>(() => _store.Read(Slot));
 
         Assert.Equal("it's not a save from this version of the game.", exception.Reason);
-        Assert.Equal(Slot, exception.SlotName);
+        Assert.StartsWith($"Save '{Slot}' can't be read:", exception.Message, StringComparison.Ordinal);
     }
 
     // Saves before format 7 had no quests (the quests plan). Until the first release an older save is refused, not

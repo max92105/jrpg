@@ -21,12 +21,12 @@ public sealed class ContentWriterBannerTests : IDisposable
 
     // The test world predates the field: every map shows the banner, and its file writes back byte for byte.
     [Fact]
-    public void WriteMap_ShowsBanner_LeavesTheFieldOut()
+    public void WriteMaps_ShowsBanner_LeavesTheFieldOut()
     {
         var start = _catalog.Maps["start"];
         var before = File.ReadAllBytes(SettingsPath("start"));
 
-        _writer.WriteMap(start, _catalog);
+        _writer.WriteMaps(MapContent.With(_catalog, start), [start.Id]);
 
         Assert.Equal(before, File.ReadAllBytes(SettingsPath("start")));
         Assert.DoesNotContain("showsBanner", File.ReadAllText(SettingsPath("start")), StringComparison.Ordinal);
@@ -36,21 +36,25 @@ public sealed class ContentWriterBannerTests : IDisposable
     public void Load_SettingsWithoutTheField_ShowsTheBanner() => Assert.True(_catalog.Maps["start"].Settings.ShowsBanner);
 
     [Fact]
-    public void WriteMap_BannerOff_WritesFalse()
+    public void WriteMaps_BannerOff_WritesFalse()
     {
         var start = _catalog.Maps["start"];
 
-        _writer.WriteMap(new MapDefinition(start.Layout, start.Settings with { ShowsBanner = false }), _catalog);
+        var edited = new MapDefinition(start.Layout, start.Settings with { ShowsBanner = false });
+
+        _writer.WriteMaps(MapContent.With(_catalog, edited), [edited.Id]);
 
         Assert.Contains("\"showsBanner\": false", File.ReadAllText(SettingsPath("start")), StringComparison.Ordinal);
     }
 
     [Fact]
-    public void WriteMap_BannerOff_RoundTrips()
+    public void WriteMaps_BannerOff_RoundTrips()
     {
         var start = _catalog.Maps["start"];
 
-        _writer.WriteMap(new MapDefinition(start.Layout, start.Settings with { ShowsBanner = false }), _catalog);
+        var edited = new MapDefinition(start.Layout, start.Settings with { ShowsBanner = false });
+
+        _writer.WriteMaps(MapContent.With(_catalog, edited), [edited.Id]);
 
         Assert.False(ContentCatalogLoader.Load(_content.Path).Maps["start"].Settings.ShowsBanner);
     }

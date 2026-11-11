@@ -24,12 +24,12 @@ public sealed class ContentWriterTests : IDisposable
     public void Dispose() => Directory.Delete(_contentRoot, recursive: true);
 
     [Fact]
-    public void WriteMap_ThenLoad_ReturnsEqualMap()
+    public void WriteMaps_ThenLoad_ReturnsEqualMap()
     {
         var start = _catalog.Maps["start"];
         var renamed = new MapDefinition(start.Layout, start.Settings with { DisplayName = "Starting village" });
 
-        _writer.WriteMap(renamed, _catalog);
+        _writer.WriteMaps(MapContent.With(_catalog, renamed), [renamed.Id]);
         var loaded = ContentCatalogLoader.Load(_contentRoot).Maps["start"];
 
         Assert.Equal(renamed.Settings, loaded.Settings);
@@ -37,7 +37,7 @@ public sealed class ContentWriterTests : IDisposable
     }
 
     [Fact]
-    public void WriteMap_InvalidWarpTarget_ThrowsAndLeavesFilesUntouched()
+    public void WriteMaps_InvalidWarpTarget_ThrowsAndLeavesFilesUntouched()
     {
         var start = _catalog.Maps["start"];
         var warpToNowhere = new CellEvent(
@@ -46,7 +46,7 @@ public sealed class ContentWriterTests : IDisposable
         var broken = new MapDefinition(start.Layout with { CellEvents = [.. start.Layout.CellEvents, warpToNowhere] }, start.Settings);
         var filesBefore = MapFileBytes("start");
 
-        var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMap(broken, _catalog));
+        var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMaps(MapContent.With(_catalog, broken), [broken.Id]));
 
         Assert.StartsWith("map-layouts/start.json: ", exception.Message, StringComparison.Ordinal);
         Assert.Contains("'nowhere'", exception.Message, StringComparison.Ordinal);
@@ -55,19 +55,19 @@ public sealed class ContentWriterTests : IDisposable
     }
 
     [Fact]
-    public void WriteMap_ShrinkingAMapAnotherMapWarpsInto_ThrowsNamingTheOtherMap()
+    public void WriteMaps_ShrinkingAMapAnotherMapWarpsInto_ThrowsNamingTheOtherMap()
     {
         // The forest's east exit leads back into the start map, well inside its 45x45 cells.
         var start = _catalog.Maps["start"];
         var shrunk = new MapDefinition(ShrinkTo(start.Layout, 1, 1), start.Settings);
 
-        var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMap(shrunk, _catalog));
+        var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMaps(MapContent.With(_catalog, shrunk), [shrunk.Id]));
 
         Assert.StartsWith("map-layouts/forest.json: ", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]
-    public void WriteMap_ShrinkingIntroMapPastStartLocation_ThrowsNamingNewGame()
+    public void WriteMaps_ShrinkingIntroMapPastStartLocation_ThrowsNamingNewGame()
     {
         // 2 columns keep the intro events on them, but not the new game's start at (2.5, 2.5).
         var intro = _catalog.Maps["intro"];
@@ -75,19 +75,19 @@ public sealed class ContentWriterTests : IDisposable
         var narrowed = new MapDefinition(ShrinkTo(intro.Layout, 2, intro.Layout.Height) with { CellEvents = kept }, intro.Settings);
         var filesBefore = MapFileBytes("intro");
 
-        var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMap(narrowed, _catalog));
+        var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMaps(MapContent.With(_catalog, narrowed), [narrowed.Id]));
 
         Assert.StartsWith("new-game.json: ", exception.Message, StringComparison.Ordinal);
         Assert.Equal(filesBefore, MapFileBytes("intro"));
     }
 
     [Fact]
-    public void WriteMap_NewMap_AddsBothFiles()
+    public void WriteMaps_NewMap_AddsBothFiles()
     {
         var forest = _catalog.Maps["forest"];
         var copy = new MapDefinition(forest.Layout with { Id = "forest_2" }, forest.Settings with { Id = "forest_2" });
 
-        _writer.WriteMap(copy, _catalog);
+        _writer.WriteMaps(MapContent.With(_catalog, copy), [copy.Id]);
 
         Assert.Equal("forest_2", ContentCatalogLoader.Load(_contentRoot).Maps["forest_2"].Settings.Id);
     }

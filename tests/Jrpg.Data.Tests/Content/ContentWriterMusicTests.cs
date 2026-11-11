@@ -20,21 +20,25 @@ public sealed class ContentWriterMusicTests : IDisposable
     public void Dispose() => _content.Dispose();
 
     [Fact]
-    public void WriteMap_MapWithoutMusic_LeavesTheFieldOut()
+    public void WriteMaps_MapWithoutMusic_LeavesTheFieldOut()
     {
         var start = _catalog.Maps["start"];
 
-        _writer.WriteMap(new MapDefinition(start.Layout, start.Settings with { MusicFile = null }), _catalog);
+        var edited = new MapDefinition(start.Layout, start.Settings with { MusicFile = null });
+
+        _writer.WriteMaps(MapContent.With(_catalog, edited), [edited.Id]);
 
         Assert.DoesNotContain("musicFile", File.ReadAllText(_content.PathOf(Path.Combine("maps", "start.json"))), StringComparison.Ordinal);
     }
 
     [Fact]
-    public void WriteMap_MapWithMusic_ReadsItBack()
+    public void WriteMaps_MapWithMusic_ReadsItBack()
     {
         var start = _catalog.Maps["start"];
 
-        _writer.WriteMap(new MapDefinition(start.Layout, start.Settings with { MusicFile = "forest/loop.wav" }), _catalog);
+        var edited = new MapDefinition(start.Layout, start.Settings with { MusicFile = "forest/loop.wav" });
+
+        _writer.WriteMaps(MapContent.With(_catalog, edited), [edited.Id]);
 
         Assert.Equal("forest/loop.wav", ContentCatalogLoader.Load(_content.Path).Maps["start"].Settings.MusicFile);
     }

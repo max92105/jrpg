@@ -55,7 +55,7 @@ public sealed class ContentWriterRenameTests : IDisposable
     {
         var forest = _catalog.Maps["forest"];
         var loop = new CellEvent(new GridCell(0, 0), new MapEvent { Id = "loop", Activation = EventActivation.Touch, Steps = [new WarpStep("forest", new GridCell(1, 1))] });
-        var withLoop = WithMap(_catalog, new MapDefinition(forest.Layout with { CellEvents = [.. forest.Layout.CellEvents, loop] }, forest.Settings));
+        var withLoop = MapContent.With(_catalog, new MapDefinition(forest.Layout with { CellEvents = [.. forest.Layout.CellEvents, loop] }, forest.Settings));
 
         _writer.RenameMap(withLoop, "forest", "woods");
 
@@ -115,7 +115,7 @@ public sealed class ContentWriterRenameTests : IDisposable
         var forest = _catalog.Maps["forest"];
         var ground = forest.Layout.Layers[0];
         IReadOnlyList<int> row = [_catalog.Tiles.Keys.Max() + 1, .. ground.Rows[0].Skip(1)];
-        var broken = WithMap(_catalog, new MapDefinition(forest.Layout with { Layers = [ground with { Rows = [row, .. ground.Rows.Skip(1)] }, .. forest.Layout.Layers.Skip(1)] }, forest.Settings));
+        var broken = MapContent.With(_catalog, new MapDefinition(forest.Layout with { Layers = [ground with { Rows = [row, .. ground.Rows.Skip(1)] }, .. forest.Layout.Layers.Skip(1)] }, forest.Settings));
 
         Assert.Throws<ContentValidationException>(() => _writer.RenameMap(broken, "forest", "woods"));
 
@@ -139,9 +139,6 @@ public sealed class ContentWriterRenameTests : IDisposable
             .Concat(layout.Objects.SelectMany(placed => placed.Events))
             .SelectMany(mapEvent => mapEvent.Steps.OfType<WarpStep>())
             .Where(warp => warp.MapId == mapId);
-
-    private static ContentCatalog WithMap(ContentCatalog catalog, MapDefinition map) =>
-        catalog with { Maps = new Dictionary<string, MapDefinition>(catalog.Maps) { [map.Id] = map } };
 
     private string LayoutPath(string mapId) => Path.Combine(_content.Path, "map-layouts", $"{mapId}.json");
 

@@ -31,11 +31,11 @@ public sealed class ContentWriterRepositoryTests : IDisposable
 
     [Theory]
     [MemberData(nameof(RepositoryMapIds))]
-    public void WriteMap_UnchangedRepositoryMap_WritesIdenticalBytes(string mapId)
+    public void WriteMaps_UnchangedRepositoryMap_WritesIdenticalBytes(string mapId)
     {
         var filesBefore = MapFileBytes(mapId);
 
-        _writer.WriteMap(_catalog.Maps[mapId], _catalog);
+        _writer.WriteMaps(_catalog, [mapId]);
 
         Assert.Equal(filesBefore, MapFileBytes(mapId));
     }

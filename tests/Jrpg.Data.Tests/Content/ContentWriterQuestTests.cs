@@ -25,20 +25,22 @@ public sealed class ContentWriterQuestTests : IDisposable
     public void Dispose() => _content.Dispose();
 
     [Fact]
-    public void WriteMap_GatedEvent_ReadsBackWithItsCondition()
+    public void WriteMaps_GatedEvent_ReadsBackWithItsCondition()
     {
         var condition = new QuestCondition("placeholder_errand", QuestConditionKind.AtStage, "ask_innkeeper");
 
-        _writer.WriteMap(WithGatedCell(condition), _catalog);
+        var edited = WithGatedCell(condition);
+        _writer.WriteMaps(MapContent.With(_catalog, edited), [edited.Id]);
 
         var loaded = ContentCatalogLoader.Load(_content.Path).Maps["start"].Layout.CellEvents;
         Assert.Contains(loaded, cell => cell.Event.Id == "gated_cell" && condition.Equals(cell.Event.OnlyWhenQuest));
     }
 
     [Fact]
-    public void WriteMap_ConditionWithoutStage_LeavesStageIdOut()
+    public void WriteMaps_ConditionWithoutStage_LeavesStageIdOut()
     {
-        _writer.WriteMap(WithGatedCell(new QuestCondition("placeholder_errand", QuestConditionKind.Active)), _catalog);
+        var edited = WithGatedCell(new QuestCondition("placeholder_errand", QuestConditionKind.Active));
+        _writer.WriteMaps(MapContent.With(_catalog, edited), [edited.Id]);
 
         // The map holds other gated events (the placeholder errand's), so only the written cell event's condition is
         // read.
@@ -49,9 +51,10 @@ public sealed class ContentWriterQuestTests : IDisposable
     }
 
     [Fact]
-    public void WriteMap_ConditionNamingUnknownQuest_ThrowsNamingIt()
+    public void WriteMaps_ConditionNamingUnknownQuest_ThrowsNamingIt()
     {
-        var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMap(WithGatedCell(new QuestCondition("heist", QuestConditionKind.Active)), _catalog));
+        var edited = WithGatedCell(new QuestCondition("heist", QuestConditionKind.Active));
+        var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMaps(MapContent.With(_catalog, edited), [edited.Id]));
 
         Assert.Contains("onlyWhenQuest has unknown quest id 'heist'.", exception.Message, StringComparison.Ordinal);
     }

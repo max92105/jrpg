@@ -58,7 +58,7 @@ Sizes are hand-written lines, tests included; "moved" lines are cut and pasted (
 - [x] **B3. A zoom mid-drag keeps the selection's marks** (Editor window, about 5 lines, hand check) → [slices/B3.md](slices/B3.md)
 
 ### Phase 2: splits (pure moves)
-- [ ] **S1. Moves only: the map view's pan and zoom into `MainWindow.Viewport`** (Editor, about 125 lines moved) → [slices/S1.md](slices/S1.md)
+- [x] **S1. Moves only: the map view's pan and zoom into `MainWindow.Viewport`** (Editor, about 125 lines moved) → [slices/S1.md](slices/S1.md)
 - [ ] **S2. Moves only: the sheet import into `MainViewModel.SheetImport` and `MainWindow.SheetFiles`** (Editor and tests, about 110 lines moved) → [slices/S2.md](slices/S2.md)
 - [ ] **S3. Moves only: the map settings into `MainViewModel.MapSettings`** (Editor and tests, about 110 lines moved) → [slices/S3.md](slices/S3.md)
 - [ ] **S4. Moves only: the catalog snapshots into `CatalogDraft.Snapshots`** (Editor, about 35 lines moved) → [slices/S4.md](slices/S4.md)

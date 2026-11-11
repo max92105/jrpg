@@ -15,28 +15,20 @@ namespace Jrpg.Editor.Shell;
 
 /// <summary>
 /// The editor window. Turning the open map into WPF images and mouse and keys into pan and zoom are view concerns, done
-/// here; the view models hold plain data and run in tests without a UI thread (ADR 0012). The camera rules are in
-/// <see cref="ViewportTransform"/>, the painting rules in <see cref="MapViewModel"/>.
+/// in this class's partial files; the view models hold plain data and run in tests without a UI thread (ADR 0012). The
+/// camera rules are in <see cref="ViewportTransform"/>, the painting rules in <see cref="MapViewModel"/>.
 /// </summary>
 internal sealed partial class MainWindow : Window
 {
-    // Placeholder steps: 15 % per wheel notch, 150 screen pixels per arrow press.
-    private const double WheelZoomStep = 1.15;
-    private const double ArrowPanStep = 150;
-
     private readonly MainViewModel _viewModel;
     private readonly MapDrawing? _drawing;
     private readonly ViewportTransform _viewport = new();
     private bool _isSpaceHeld;
-    private Point? _panFrom;
     private MouseButton? _strokeButton;
     private Point2D? _mapPoint;
 
-    private (double Zoom, int Width, int Height)? _gridDrawnFor;
     private MapViewModel? _shownMap;
 
-    // A newly opened map is fitted to the view, which has no size until the window is laid out.
-    private bool _isFitPending = true;
     private ControlsHelpWindow? _controlsHelp;
 
     public MainWindow(MainViewModel viewModel)
@@ -168,49 +160,6 @@ internal sealed partial class MainWindow : Window
             ? CollisionDrawing.Draw(CollisionShapes.Of(layout, catalog), layout, 1 / _viewport.Zoom)
             : null;
 
-    private bool HandleZoomKey(Key key)
-    {
-        switch (key)
-        {
-            case Key.D0 or Key.NumPad0:
-                RefitMap();
-                return true;
-            case Key.D1 or Key.NumPad1:
-                ZoomAtViewCenter(1);
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    // Only while the map has focus, so arrows still move through the map and layer lists.
-    private bool HandleViewportKey(Key key)
-    {
-        if (!MapViewport.IsKeyboardFocusWithin)
-        {
-            return false;
-        }
-
-        var pan = key switch
-        {
-            Key.Left => new Vector(ArrowPanStep, 0),
-            Key.Right => new Vector(-ArrowPanStep, 0),
-            Key.Up => new Vector(0, ArrowPanStep),
-            Key.Down => new Vector(0, -ArrowPanStep),
-            _ => (Vector?)null,
-        };
-        if (pan is { } delta)
-        {
-            _viewport.PanBy(delta);
-            ApplyViewport();
-            return true;
-        }
-
-        return key == Key.Space;
-    }
-
-    private void OnFitClicked(object sender, RoutedEventArgs e) => RefitMap();
-
     private void OnAddLayerClicked(object sender, RoutedEventArgs e) => _viewModel.Layer.TryAddLayer(NewLayerBox.Text);
 
     private void OnAddLayerMenuClicked(object sender, RoutedEventArgs e) => NewLayerBox.Focus();
@@ -268,10 +217,6 @@ internal sealed partial class MainWindow : Window
         }
     }
 
-    private void OnActualSizeClicked(object sender, RoutedEventArgs e) => ZoomAtViewCenter(1);
-
-    private void OnViewportSizeChanged(object sender, SizeChangedEventArgs e) => FitMap();
-
     private void OnViewportMouseDown(object sender, MouseButtonEventArgs e)
     {
         HideDestinationMark();
@@ -291,13 +236,6 @@ internal sealed partial class MainWindow : Window
                 _ => HandlePaintButton(e.ChangedButton, CellAt(e)),
             };
         }
-    }
-
-    private void StartPanning(Point from)
-    {
-        _panFrom = from;
-        MapViewport.CaptureMouse();
-        MapViewport.Cursor = Cursors.SizeAll;
     }
 
     private void OnViewportMouseMove(object sender, MouseEventArgs e)
@@ -355,74 +293,11 @@ internal sealed partial class MainWindow : Window
     // Painting exists whenever a map is open, which the mouse and key handlers check first.
     private TilePaintingViewModel Painting => _viewModel.Painting!;
 
-    private GridCell CellAt(MouseEventArgs e) => _viewport.ScreenToCell(e.GetPosition(MapViewport), MapDrawing.CellPixels);
-
-    private Point2D MapPointAt(MouseEventArgs e)
-    {
-        var mapPixel = _viewport.ScreenToMap(e.GetPosition(MapViewport));
-        return new Point2D(mapPixel.X / MapDrawing.CellPixels, mapPixel.Y / MapDrawing.CellPixels);
-    }
-
-    private void OnViewportMouseWheel(object sender, MouseWheelEventArgs e)
-    {
-        var zoom = e.Delta > 0 ? _viewport.Zoom * WheelZoomStep : _viewport.Zoom / WheelZoomStep;
-        _viewport.ZoomAt(e.GetPosition(MapViewport), zoom);
-        ApplyViewport();
-        e.Handled = true;
-    }
-
     private void OnViewportMouseLeave(object sender, MouseEventArgs e)
     {
         _mapPoint = null;
         _viewModel.ShowCursorAt(null);
         ShowBrushAt(null);
         ShowObjectDragAt(null);
-    }
-
-    private void RefitMap()
-    {
-        _isFitPending = true;
-        FitMap();
-    }
-
-    private void FitMap()
-    {
-        var layout = _viewModel.CurrentMap?.Map.Layout;
-        if (!_isFitPending || layout is null || MapViewport.ActualWidth <= 0 || MapViewport.ActualHeight <= 0)
-        {
-            return;
-        }
-
-        var mapSize = new Size(layout.Width * MapDrawing.CellPixels, layout.Height * MapDrawing.CellPixels);
-        _viewport.Fit(mapSize, new Size(MapViewport.ActualWidth, MapViewport.ActualHeight));
-        _isFitPending = false;
-        ApplyViewport();
-    }
-
-    private void ZoomAtViewCenter(double zoom)
-    {
-        _viewport.ZoomAt(new Point(MapViewport.ActualWidth / 2, MapViewport.ActualHeight / 2), zoom);
-        ApplyViewport();
-    }
-
-    private void ApplyViewport()
-    {
-        var zoom = _viewport.Zoom;
-        MapLayers.RenderTransform = new MatrixTransform(zoom, 0, 0, zoom, _viewport.Origin.X, _viewport.Origin.Y);
-        ZoomStatus.Content = $"{zoom:P0}";
-
-        // The grid's lines are one screen pixel wide, so they're redrawn when the zoom or the map's size changes, not on every pan.
-        if (_viewModel.CurrentMap?.Map.Layout is not { } layout || _gridDrawnFor == (zoom, layout.Width, layout.Height))
-        {
-            return;
-        }
-
-        GridImage.Source = MapDrawing.DrawGrid(layout, 1 / zoom);
-        DrawCollision();
-        DrawSelectionMarks();
-
-        // The marks are redrawn in place; a drag under way puts them back under the dragged objects at the new zoom.
-        ShowObjectDragAt(_mapPoint);
-        _gridDrawnFor = (zoom, layout.Width, layout.Height);
     }
 }

@@ -106,6 +106,33 @@ public sealed class MainViewModelFolderRenamingTests : IDisposable
         Assert.Contains(nameof(MainViewModel.RenameFolderTip), raised);
     }
 
+    // Both layout files read-only, so the first file the writer moves fails whatever the map order.
+    [Fact]
+    public void TryRenameFolder_WriteRefused_ChangesNothing()
+    {
+        var viewModel = OpenWithAct1Saved();
+        var layoutsFolder = Path.Combine(_content.ContentCopy, "map-layouts");
+        List<string> layouts = [Path.Combine(layoutsFolder, "forest.json"), Path.Combine(layoutsFolder, "start.json")];
+        layouts.ForEach(layout => File.SetAttributes(layout, FileAttributes.ReadOnly));
+        try
+        {
+            Assert.False(RenameFolder(viewModel, "Act 1", "Chapter 1"));
+        }
+        finally
+        {
+            layouts.ForEach(layout => File.SetAttributes(layout, FileAttributes.Normal));
+        }
+
+        Assert.NotNull(viewModel.SaveError);
+        var written = ContentCatalogLoader.Load(_content.ContentCopy);
+        Assert.Equal("Act 1", written.Maps["forest"].Settings.Folder);
+        Assert.Equal("Act 1/Village", written.Maps["start"].Settings.Folder);
+        Assert.Equal("Act 1", viewModel.Catalog!.Maps["forest"].Settings.Folder);
+        Assert.Contains(viewModel.Navigation.ShownTree, row => row is { IsFolder: true, FolderPath: "Act 1" });
+        Assert.DoesNotContain(viewModel.Navigation.ShownTree, row => row.FolderPath == "Chapter 1");
+        Assert.True(viewModel.History!.UndoCommand.CanExecute(null));
+    }
+
     private MainViewModel OpenWithAct1Saved()
     {
         var viewModel = _content.Open(_content.CopyOfTestWorld());

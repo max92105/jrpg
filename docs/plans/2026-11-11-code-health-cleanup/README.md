@@ -53,7 +53,7 @@ One line per slice; each slice's goal, files, moves and checks are in its file u
 Sizes are hand-written lines, tests included; "moved" lines are cut and pasted (`git diff --color-moved`) and counted apart.
 
 ### Phase 1: bugs and the untested branch
-- [ ] **B1. Rename folder's refused write is tested; done backlog lines deleted** (Editor tests, docs, about 35 lines) → [slices/B1.md](slices/B1.md)
+- [x] **B1. Rename folder's refused write is tested; done backlog lines deleted** (Editor tests, docs, about 35 lines) → [slices/B1.md](slices/B1.md)
 - [ ] **B2. Tile cells and animations past the image are refused, as counts** (Data, about 70 lines) → [slices/B2.md](slices/B2.md)
 - [ ] **B3. A zoom mid-drag keeps the selection's marks** (Editor window, about 5 lines, hand check) → [slices/B3.md](slices/B3.md)
 

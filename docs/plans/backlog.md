@@ -12,7 +12,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - **`TextureLibrary` keeps every texture it loads for good**, cutscene stills included. That is fine with the 4 KB placeholder stills, but full-screen real stills (about 8 MB of video memory each, 3 per intro) would stay loaded after the intro. Drop a still once its event ends when real art arrives. (new-game-flow K2a)
 - **An open yes/no question is held and drawn the same way in 3 screens** (`SavePage`, `SystemPage`, `NewGame/LeaderChoiceScene`: a `ConfirmPrompt?` field, a `ConfirmPromptView`, drawn while open, cleared when answered). Each copy is a few lines, and what Yes does differs per screen. Pull it into a small shared `Ui` type when a fourth screen needs it. (new-game-flow S1b review)
 - **A dialog a menu page draws leaves the footer hint bright**: `GameMenuScene.Draw` draws the footer after the page, so the scrim of the Party notice and of the Save and System prompts dims everything but the hint. Draw page dialogs after the footer, or the footer under the page, when the walk-through or the next menu change gets to it. (escape-menu-third-pass PD1 review)
-- `MainViewModel` (484 lines after the object composer plan; 502 after the music plan's E1): the sheet image-size cache (`SheetImageSizes`) and the import status text (`SheetImportResult.Summary`) could leave it.
 - **`Directory.Build.props`:** merge `src/` and `tests/` into a root file. Decision 144 keeps two files for now; the developer didn't choose to merge. When it happens, use the standard form:
   - the gates go in a root `Directory.Build.props`;
   - `tests/Directory.Build.props` keeps its two test-only settings (`IsPackable=false`, `using Xunit`) and imports the root file through `$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))`;
@@ -167,7 +166,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - The plan's out-of-scope features (removing a sheet's unused tiles while the sheet stays, decision 450; an autotile or Wang brush; animated tiles; Mana Seed characters and monsters against `FieldSpriteLayout`'s 48 px frames; the lighting layer, decision 445; map removal in the editor; deleting an image from the editor; Import writing the art manifest entry, decision 448; a release check refusing placeholder art; undoing the purge) are listed in `docs/plans/done/2026-11-03-mana-seed-reset/README.md`, "Out of scope".
 - `SaveGameRepair` checks only that a saved map still exists (decision 186): a save on a rebuilt map with the same id loads at its old position, maybe in a wall or past a shrunk edge. Repair a position outside the map or on a blocked cell to the new game's start, or the map's arrival, when saves outlive a map rebuild (after the first release).
 - `SoundSourcesTests` reads the test output's copy of `content/`, which keeps a deleted file until a clean build (`PreserveNewest` never deletes): read the repository's folder through the `ContentRoot` metadata the Mana Seed plan's AS1 stamps into `Jrpg.Data.Tests`, as `ArtSourcesTests` does.
-- The `MainViewModel` line above (image-size cache, import status) is done by the Mana Seed plan's X1, which needs the room.
 - `CopiedContentRoot` takes its source folder since T2c; the older copy loops (`ContentWriterTests.CopyFolder`, `ContentWriterShopTests`, the shop and crafting loader tests, `EditorTestContent`) could move onto it.
 - `ContentCatalogLoaderTests.Load_RepositoryContent_Succeeds` says the start layout refers to "potion"; once the maps are rebuilt (C2), restate the reason by an id or drop the comment.
 - `SoundSourcesTests` reads its manifest with its own loose options (camelCase, unmapped members disallowed): a missing field reads as a default; switch it to `ContentJsonOptions.Strict` as `ArtSourcesManifest` does (AS1 review).
@@ -176,7 +174,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the object composer and animated tiles plan (2026-11-03, at approval)
 
-- Several tiles on one object cell (decision 456): taken by the object levels and sheet zoom plan (`2026-11-05-object-layers-and-sheet-zoom`, ADR 0040).
 - The editor's map animating (the plan's former AE4, decision 466): one shared, unfrozen `ImageBrush` per animated tile, swapped on `TileAnimationTime.FramesChanged`; `MapDrawing` paints those cells with it and leaves such a drawing unfrozen (design.md, "Extension points").
 - The other out-of-scope items (an explicit frame list or per-frame times, per-cell start offsets, the tall grass effect, a free pixel rectangle from an image without a cut, animated canopies, an animated tile's mark on the sheet, the re-cut warning counting frames) are listed in `docs/plans/done/2026-11-03-object-composer-and-animated-tiles/README.md`, "Out of scope".
 - `tests/Jrpg.Game.Tests/Flow/GameFlowTests.cs` (321 lines) and `Exploration/EventPresenterTests.cs` (306) crossed 300 before the Mana Seed plan; split each by scenario when next touched (reset retro).
@@ -208,8 +205,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - A wheel zoom during a Shift + drag of the selection runs `DrawSelectionMarks` (through `ApplyViewport`), which snaps the outlines back to the start until the mouse moves again (MO2 review).
 - A tile's sheet cell is still worked out inline in `Tiles/TileBrowserViewModel.cs` and twice in `Tiles/TileImages.cs`: `SheetCell.Of(tile)` is the one rule now (OM2 review).
 - `Shell/MainViewModel.ObjectFromMap.cs` guards states the modal composer rules out: `StartObjectFromMap`'s `CurrentMap is not { } shown` and `ErasedCells`' `FirstOrDefault` + null check on a layer that can't vanish while the composer is open; `Single` or the value, so a bug fails instead of skipping (OM3, OM4 reviews).
-- `Shell/MainWindow.ObjectEditing.cs` lines 24 and 28 mix `Composing?.StartNew()` with `Composing!.TryApply` (OM4 review).
-- `ErasedCells` zips two `Select`s over the same tiles, and `ErasedOn` reads `TileIdAt` three times for one cell (OM4 review).
 - `tests/Jrpg.Editor.Tests/Shell/MainViewModelOpenMapsTests.cs` is at 286 lines after MS2 and `MainViewModelObjectFromMapTests.cs` at 251 after OM4: the next open-maps or object-from-map test goes in a sibling file.
 
 ## From the map fixes, banner and folders plan (2026-11-10, at approval)
@@ -218,7 +213,5 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - The Placed object panel's Depth offset box and the selected object's sort line drawn dashed, DO4 of the map fixes plan, with DO3, if the developer ever hits the case.
 - `ContentWriter.RenameMap` (RN1): an `IOException` from deleting the old files after the writes leaves both maps on disk while the editor reports a failure and keeps the old content (ADR 0042 accepts the state; the editor could say which pair to delete).
 - `MainViewModel.MapFolders` (MF4-MF6): `TryMoveMap`, `KnownFolders`, `RenameFolderTip` and `MapsMoved` run to 150-170 columns; split them over lines (the MF5 and MF6 reviews).
-- A session folder (decision 534) stays listed after its map moves out again (MF2, MF4): decide whether it should go.
 - `src/Jrpg.Editor/Shell/MainViewModel.cs` is 340 lines (over the 300 the verify script allows a changed file): it grows only through partial files; the next editor cleanup moves a feature out (the settings dialog members, `StartEditingSettings`/`TryApplySettings`/`TryResize`, are one candidate).
 - Files at the limit after the map fixes plan, to split before the slice that grows them: `Catalogs/CatalogDraft.cs` 298, `Shell/EditorTemplates.xaml` 297, `Shell/MainWindow.xaml` 293, `Objects/ObjectPlacingViewModel.cs` 293.
-- `MainViewModel.TryRenameFolder` (MF6): the refused-write branch (a read-only settings file) has no test: it should return false, set `SaveError`, and leave `Content.Current`, the folders and the histories untouched (the MF6 review).

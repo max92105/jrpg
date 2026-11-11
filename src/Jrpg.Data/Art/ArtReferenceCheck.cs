@@ -82,7 +82,7 @@ public static class ArtReferenceCheck
             {
                 problems.Add($"{shownPath}: tile {tile.Id}'s cell ({tile.Column}, {tile.Row}) lies outside the {size.Width}x{size.Height} image.");
             }
-            else if (!IsCellInside(LastFrameColumn(tile), tile.Row, sheet, size))
+            else if (!IsLastFrameInside(tile, sheet, size))
             {
                 problems.Add($"{shownPath}: tile {tile.Id}'s last animation frame ({LastFrameColumn(tile)}, {tile.Row}) lies outside the {size.Width}x{size.Height} image.");
             }
@@ -151,15 +151,28 @@ public static class ArtReferenceCheck
     {
         var sheets = catalog.Tilesheets.Values.Where(sheet => string.Equals(sheet.File, file, StringComparison.OrdinalIgnoreCase)).ToDictionary(sheet => sheet.Id);
         return catalog.Tiles.Values
-            .Where(tile => sheets.TryGetValue(tile.SheetId, out var sheet) && !IsCellInside(LastFrameColumn(tile), tile.Row, sheet, size))
+            .Where(tile => sheets.TryGetValue(tile.SheetId, out var sheet) && !IsTileInside(tile, sheet, size))
             .MinBy(tile => tile.Id);
     }
 
-    private static bool IsCellInside(int column, int row, TilesheetDefinition sheet, (int Width, int Height) size) =>
-        sheet.CellLeft(column) + sheet.TileWidth <= size.Width && sheet.CellTop(row) + sheet.TileHeight <= size.Height;
+    // Its cell and, animated, its last frame.
+    private static bool IsTileInside(TileDefinition tile, TilesheetDefinition sheet, (int Width, int Height) size) =>
+        IsCellInside(tile.Column, tile.Row, sheet, size) && IsLastFrameInside(tile, sheet, size);
 
-    // Frames run rightward on the tile's row, so the last is the furthest right; a still tile's is its own cell.
-    private static int LastFrameColumn(TileDefinition tile) => tile.Column + (tile.Animation?.FrameCount ?? 1) - 1;
+    // Counts, not pixel sums: a hand-edited column or frame count near the int limit would wrap back inside the image
+    // (the column and row are never negative, the tile validator refuses that).
+    private static bool IsCellInside(int column, int row, TilesheetDefinition sheet, (int Width, int Height) size) =>
+        column < sheet.ColumnsIn(size.Width) && row < sheet.RowsIn(size.Height);
+
+    // Frames run rightward on the tile's row, so the last must fit in the columns left of its cell; a still tile is one
+    // frame, its own cell.
+    private static bool IsLastFrameInside(TileDefinition tile, TilesheetDefinition sheet, (int Width, int Height) size) =>
+        FrameCount(tile) <= sheet.ColumnsIn(size.Width) - tile.Column;
+
+    private static int FrameCount(TileDefinition tile) => tile.Animation?.FrameCount ?? 1;
+
+    // For the message only, in long so the text names the frame's column however far it lies.
+    private static long LastFrameColumn(TileDefinition tile) => tile.Column + (long)FrameCount(tile) - 1;
 
     private static (int Width, int Height)? TryReadSize(string artRoot, string folder, string file, List<string> problems)
     {

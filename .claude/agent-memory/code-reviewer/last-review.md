@@ -5,10 +5,11 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-11-code-health-cleanup, slice S1 (pure move: the map view's pan and zoom into
-`Shell/MainWindow.Viewport.cs`), 2026-11-11. Round 1. Verdict: ready to commit.
+Plan 2026-11-11-code-health-cleanup, slice S2 (pure move: the sheet import into `MainViewModel.SheetImport`,
+`MainWindow.SheetFiles` and `MainViewModelSheetImportTests`), 2026-11-11. Round 1. Verdict: ready to commit.
 
-- No Critical, no Warning, no Suggestion.
-- Verified mechanically: sorted non-blank removed lines vs new file's lines differ only by the file head (usings,
-  namespace, summary, class braces), the old class summary lines and ApplyViewport's comment rewrap (decision 541).
-- B3's follow-up (undo during Shift + drag snaps marks) dropped: backlog.md line 212 lists it.
+- No Critical, no Warning.
+- Suggestion (open): Done note omits the fifth wrap (`ImportSheetImages`' summary, 121 columns, rewrapped by the
+  120-column comment check) and gives the test file 43 lines where it has 42.
+- Verified mechanically: sorted non-blank removed lines vs each new file differ only by file heads (usings, namespace,
+  summary, class braces) and the wraps; usings moved/kept correctly in all six files (build enforces IDE0005).

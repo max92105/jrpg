@@ -5,14 +5,16 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-11-code-health-cleanup, slice S3 (pure move: the map settings into `MainViewModel.MapSettings` and
-`MainViewModelMapSettingsTests`), 2026-11-11. Round 1. Verdict: ready to commit.
+Plan 2026-11-11-code-health-cleanup, slice S4 (pure move: the seven `With...`/`Without...` snapshot helpers into
+`CatalogDraft.Snapshots.cs`), 2026-11-11. Round 1. Verdict: ready to commit.
 
 - No Critical, no Warning.
-- Suggestion (open): `MainViewModel.cs` keeps two blank lines in a row at 215-216 (after `ShowPaintHint`), left where
-  `StartEditingSettings`/`TryApplySettings` were cut.
-- Follow-up (open, not in backlog): `tests/Jrpg.Editor.Tests/Shell/MainViewModelMusicTests.cs:3` says MainViewModelTests
-  is over 300 lines so the track is tested there; now false (194) and its two `StartEditingSettings_*` tests belong in
-  `MainViewModelMapSettingsTests`.
-- Verified: bodies identical, question text byte-identical after the three-part split, usings moved correctly (build
-  enforces IDE0005), five tests moved with no helper copied, both test summaries and the class summary match the files.
+- Suggestion (open): `docs/map.md` Catalogs row says `.Removals` is "a sheet and its tiles taken out"; it also holds
+  `RemoveObject`.
+- Suggestion (open): S4 Done note calls the map fixes plan's "files at the limit" backlog line "the
+  `ObjectPlacingViewModel`'s" line.
+- Suggestion (open): `CatalogDraft.cs` keeps two blank lines between `NewTileAt` and `Do` (predates S4, file in diff).
+- S3 items: the MainViewModel.cs double blank line is fixed (HEAD has one); the MainViewModelMusicTests follow-up is in
+  backlog.md, dropped.
+- Verified: seven bodies identical apart from the two `with { ... }` wraps, nothing dropped or duplicated, new file CRLF,
+  usings minimal (Content, Maps), main file still uses Content/Maps/Quests, summary matches the slice's wording.

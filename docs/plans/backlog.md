@@ -201,7 +201,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the map editing flows plan (2026-11-05, during the slices)
 
-- A wheel zoom during a Shift + drag of the selection runs `DrawSelectionMarks` (through `ApplyViewport`), which snaps the outlines back to the start until the mouse moves again (MO2 review).
 - A tile's sheet cell is still worked out inline in `Tiles/TileBrowserViewModel.cs` and twice in `Tiles/TileImages.cs`: `SheetCell.Of(tile)` is the one rule now (OM2 review).
 - `Shell/MainViewModel.ObjectFromMap.cs` guards states the modal composer rules out: `StartObjectFromMap`'s `CurrentMap is not { } shown` and `ErasedCells`' `FirstOrDefault` + null check on a layer that can't vanish while the composer is open; `Single` or the value, so a bug fails instead of skipping (OM3, OM4 reviews).
 - `tests/Jrpg.Editor.Tests/Shell/MainViewModelOpenMapsTests.cs` is at 286 lines after MS2 and `MainViewModelObjectFromMapTests.cs` at 251 after OM4: the next open-maps or object-from-map test goes in a sibling file.
@@ -211,6 +210,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - A per-placement depth offset for forced perspective on the player's layer (`depthOffset` on a placed object moving the line it sorts by), DO3 of the map fixes plan, if the developer ever hits the case: the developer's houses and trees sit on z -3 to -5, where the player is always in front, so the layer alone is the model.
 - The Placed object panel's Depth offset box and the selected object's sort line drawn dashed, DO4 of the map fixes plan, with DO3, if the developer ever hits the case.
 - `ContentWriter.RenameMap` (RN1): an `IOException` from deleting the old files after the writes leaves both maps on disk while the editor reports a failure and keeps the old content (ADR 0042 accepts the state; the editor could say which pair to delete).
+- An undo or redo (Ctrl+Z) during a Shift + drag of the selection: `OnOpenMapChanged` calls `DrawSelectionMarks`, which snaps the marks back to the start as a zoom did before B3, and `_movedObject.Placed` then points at the object as it was before the undo (the B3 review, traced from the code, not reproduced).
 - `MainViewModel.MapFolders` (MF4-MF6): `TryMoveMap`, `KnownFolders`, `RenameFolderTip` and `MapsMoved` run to 150-170 columns; split them over lines (the MF5 and MF6 reviews).
 - `src/Jrpg.Editor/Shell/MainViewModel.cs` is 340 lines (over the 300 the verify script allows a changed file): it grows only through partial files; the next editor cleanup moves a feature out (the settings dialog members, `StartEditingSettings`/`TryApplySettings`/`TryResize`, are one candidate).
 - Files at the limit after the map fixes plan, to split before the slice that grows them: `Catalogs/CatalogDraft.cs` 298, `Shell/EditorTemplates.xaml` 297, `Shell/MainWindow.xaml` 293, `Objects/ObjectPlacingViewModel.cs` 293.

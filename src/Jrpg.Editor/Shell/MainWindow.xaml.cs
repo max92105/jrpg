@@ -420,6 +420,9 @@ internal sealed partial class MainWindow : Window
         GridImage.Source = MapDrawing.DrawGrid(layout, 1 / zoom);
         DrawCollision();
         DrawSelectionMarks();
+
+        // The marks are redrawn in place; a drag under way puts them back under the dragged objects at the new zoom.
+        ShowObjectDragAt(_mapPoint);
         _gridDrawnFor = (zoom, layout.Width, layout.Height);
     }
 }

@@ -5,16 +5,14 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-11-code-health-cleanup, slice S4 (pure move: the seven `With...`/`Without...` snapshot helpers into
-`CatalogDraft.Snapshots.cs`), 2026-11-11. Round 1. Verdict: ready to commit.
+Plan 2026-11-11-code-health-cleanup, slice S5 (pure move: the selection into `ObjectPlacingViewModel.Selection.cs`),
+2026-11-11. Round 2. Verdict: ready to commit.
 
-- No Critical, no Warning.
-- Suggestion (open): `docs/map.md` Catalogs row says `.Removals` is "a sheet and its tiles taken out"; it also holds
-  `RemoveObject`.
-- Suggestion (open): S4 Done note calls the map fixes plan's "files at the limit" backlog line "the
-  `ObjectPlacingViewModel`'s" line.
-- Suggestion (open): `CatalogDraft.cs` keeps two blank lines between `NewTileAt` and `Do` (predates S4, file in diff).
-- S3 items: the MainViewModel.cs double blank line is fixed (HEAD has one); the MainViewModelMusicTests follow-up is in
-  backlog.md, dropped.
-- Verified: seven bodies identical apart from the two `with { ... }` wraps, nothing dropped or duplicated, new file CRLF,
-  usings minimal (Content, Maps), main file still uses Content/Maps/Quests, summary matches the slice's wording.
+- Critical (fixed): `ObjectPlacingViewModel.cs` summary left unclosed and the class header rewrapped into the comment;
+  restored from HEAD and re-cut, CRLF, 212 lines, summary closed, class line intact.
+- Critical (fixed): format pass on the unbuilt tree deleted generator `On...Changed` hooks in 8 files; all restored
+  from HEAD, no diff left outside the slice.
+- Verified round 2: removed lines (HEAD 94-101, 161-232) equal the partial's body after whitespace normalization;
+  only other changes are the dropped Input using and the 3-line summary.
+- Follow-up (open): "never run `verify.ps1 -Fix` before a plain build passes" lives only in the S5 Done note; a
+  `/lesson` or a build-first guard in verify.ps1 would make it a rule.

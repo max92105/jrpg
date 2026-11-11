@@ -5,16 +5,11 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-10-map-fixes-banner-and-folders, slice MF6 (Rename folder, written at once), 2026-11-10. Round 1.
-Verdict: ready to commit (no Critical). Plan's last slice; status retro pending.
+Plan 2026-11-11-code-health-cleanup, slice B1 (Rename folder's refused write tested; done backlog lines deleted),
+2026-11-11. Round 1. Verdict: ready to commit (no finding).
 
-- Open (Warning): MapNavigation.Follow removes/adds one at a time, so the result depends on set order: expanded
-  {"A","A/A"}, rename "A" to "A/A" gives {"A/A/A"} not {"A/A","A/A/A"} (renamed folder shows collapsed). Fix:
-  ExceptWith(within) then UnionWith(moved).
-- Open (Suggestion): MapFolderChoiceViewModel.Problem nested ternary on one ~170-col line; MapsMoved a noun name.
-- Open (Suggestion): docs/map.md MapListPanel entry still lists "Rename map, Move to folder and New folder".
-- Open (Suggestion): TryRenameFolder's refused-write branch untested (SaveError set, catalog and folders unchanged).
-- Follow-up (carried from MF5, not in backlog): MF4's ~150-170-column lines in MainViewModel.MapFolders.
-- Fixed since MF5: drag payload private format (MapRowFormat); row menus via ItemContainerStyle and MenuFolder set in
-  ContextMenuOpening; New folder at the top greys OK (NeedsAName); MainWindow.MapFolders partial exists.
+- Fixed (from MF6): TryRenameFolder's refused-write branch now tested (TryRenameFolder_WriteRefused_ChangesNothing).
+- Fixed (from MF6, grep-checked): MapNavigation.Follow uses ExceptWith then UnionWith; docs/map.md MapListPanel lists
+  Rename folder; MapFolderChoiceViewModel.Problem ternary (design.md says done).
+- Dropped: MF4 long-column lines in MainViewModel.MapFolders (in docs/plans/backlog.md now).
 - start.json residue: the developer's hand test, excluded by the caller.

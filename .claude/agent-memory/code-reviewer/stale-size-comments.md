@@ -27,6 +27,8 @@ call or a rename. These cases slipped past it:
   `EquipmentPage.Apply` after it moved: grep `<OldOwner>.<MovedMember>` across docs/. ML0 (map list moved into
   `MapListPanel`) added the panel to map.md's Shell row but left `MainWindow.MapSwitching` described as "the map list,
   its filter": reread the old owner's own parenthetical in the same row.
+- A file split (cleanup S3: MainViewModelTests 260 -> 194) leaves a sibling's "X is over 300 lines, so this is tested
+  here" comment (`MainViewModelMusicTests`); grep the split file's name across its test folder.
 - A removed member leaves its noun in the type's own param docs (G1b-2: "the take hint and the refusal").
 - A child's spacing change (ST1a) leaves the parent's reserved-height arithmetic on the old rows; grep the parent for the
   child's old numbers. Sizes and file counts a doc states (C3: "split in two files" with four present) need rechecking.

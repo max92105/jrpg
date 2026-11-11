@@ -10,25 +10,17 @@ namespace Jrpg.Data.Tests.Content;
 // a map with an openShop step could never be saved.
 public sealed class ContentWriterShopTests : IDisposable
 {
-    private readonly string _contentRoot = Path.Combine(Path.GetTempPath(), $"jrpg-writer-shop-{Guid.NewGuid():N}");
+    private readonly CopiedContentRoot _content = new("writer-shop", "test-world");
     private readonly ContentCatalog _catalog;
     private readonly ContentWriter _writer;
 
     public ContentWriterShopTests()
     {
-        var source = Path.Combine(AppContext.BaseDirectory, "test-world");
-        foreach (var file in Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories))
-        {
-            var target = Path.Combine(_contentRoot, Path.GetRelativePath(source, file));
-            Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-            File.Copy(file, target);
-        }
-
-        _catalog = ContentCatalogLoader.Load(_contentRoot);
-        _writer = new ContentWriter(_contentRoot);
+        _catalog = ContentCatalogLoader.Load(_content.Path);
+        _writer = new ContentWriter(_content.Path);
     }
 
-    public void Dispose() => Directory.Delete(_contentRoot, recursive: true);
+    public void Dispose() => _content.Dispose();
 
     [Fact]
     public void WriteMaps_MapWithOpenShopStep_IsAccepted()
@@ -39,7 +31,7 @@ public sealed class ContentWriterShopTests : IDisposable
 
         _writer.WriteMaps(MapContent.With(_catalog, withShop), [withShop.Id]);
 
-        var loaded = ContentCatalogLoader.Load(_contentRoot).Maps["start"].Layout.CellEvents;
+        var loaded = ContentCatalogLoader.Load(_content.Path).Maps["start"].Layout.CellEvents;
         Assert.Contains(loaded, cell => cell.Event.Steps is [OpenShopStep { ShopId: "general_store" }]);
     }
 

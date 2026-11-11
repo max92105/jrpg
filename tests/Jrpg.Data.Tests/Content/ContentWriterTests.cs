@@ -10,18 +10,17 @@ namespace Jrpg.Data.Tests.Content;
 
 public sealed class ContentWriterTests : IDisposable
 {
-    private readonly string _contentRoot = Path.Combine(Path.GetTempPath(), $"jrpg-writer-{Guid.NewGuid():N}");
+    private readonly CopiedContentRoot _content = new("writer", "test-world");
     private readonly ContentCatalog _catalog;
     private readonly ContentWriter _writer;
 
     public ContentWriterTests()
     {
-        CopyFolder(Path.Combine(AppContext.BaseDirectory, "test-world"), _contentRoot);
-        _catalog = ContentCatalogLoader.Load(_contentRoot);
-        _writer = new ContentWriter(_contentRoot);
+        _catalog = ContentCatalogLoader.Load(_content.Path);
+        _writer = new ContentWriter(_content.Path);
     }
 
-    public void Dispose() => Directory.Delete(_contentRoot, recursive: true);
+    public void Dispose() => _content.Dispose();
 
     [Fact]
     public void WriteMaps_ThenLoad_ReturnsEqualMap()
@@ -30,7 +29,7 @@ public sealed class ContentWriterTests : IDisposable
         var renamed = new MapDefinition(start.Layout, start.Settings with { DisplayName = "Starting village" });
 
         _writer.WriteMaps(MapContent.With(_catalog, renamed), [renamed.Id]);
-        var loaded = ContentCatalogLoader.Load(_contentRoot).Maps["start"];
+        var loaded = ContentCatalogLoader.Load(_content.Path).Maps["start"];
 
         Assert.Equal(renamed.Settings, loaded.Settings);
         Assert.Equivalent(renamed.Layout, loaded.Layout, strict: true);
@@ -51,7 +50,7 @@ public sealed class ContentWriterTests : IDisposable
         Assert.StartsWith("map-layouts/start.json: ", exception.Message, StringComparison.Ordinal);
         Assert.Contains("'nowhere'", exception.Message, StringComparison.Ordinal);
         Assert.Equal(filesBefore, MapFileBytes("start"));
-        Assert.Empty(Directory.EnumerateFiles(_contentRoot, "*.saving", SearchOption.AllDirectories));
+        Assert.Empty(Directory.EnumerateFiles(_content.Path, "*.saving", SearchOption.AllDirectories));
     }
 
     [Fact]
@@ -89,7 +88,7 @@ public sealed class ContentWriterTests : IDisposable
 
         _writer.WriteMaps(MapContent.With(_catalog, copy), [copy.Id]);
 
-        Assert.Equal("forest_2", ContentCatalogLoader.Load(_contentRoot).Maps["forest_2"].Settings.Id);
+        Assert.Equal("forest_2", ContentCatalogLoader.Load(_content.Path).Maps["forest_2"].Settings.Id);
     }
 
     [Fact]
@@ -99,7 +98,7 @@ public sealed class ContentWriterTests : IDisposable
 
         _writer.WriteMapCatalogs(WithTile(tile));
 
-        Assert.Equal(tile, ContentCatalogLoader.Load(_contentRoot).Tiles[tile.Id]);
+        Assert.Equal(tile, ContentCatalogLoader.Load(_content.Path).Tiles[tile.Id]);
     }
 
     [Fact]
@@ -111,7 +110,7 @@ public sealed class ContentWriterTests : IDisposable
 
         Assert.StartsWith("tiles.json: ", exception.Message, StringComparison.Ordinal);
         Assert.Equal(filesBefore, CatalogFileBytes());
-        Assert.Empty(Directory.EnumerateFiles(_contentRoot, "*.saving", SearchOption.AllDirectories));
+        Assert.Empty(Directory.EnumerateFiles(_content.Path, "*.saving", SearchOption.AllDirectories));
     }
 
     // Art is the game's startup check (decision 442,
@@ -123,7 +122,7 @@ public sealed class ContentWriterTests : IDisposable
 
         _writer.WriteMapCatalogs(WithTile(tile));
 
-        Assert.Equal(tile, ContentCatalogLoader.Load(_contentRoot).Tiles[tile.Id]);
+        Assert.Equal(tile, ContentCatalogLoader.Load(_content.Path).Tiles[tile.Id]);
     }
 
     [Fact]
@@ -158,7 +157,7 @@ public sealed class ContentWriterTests : IDisposable
     [Fact]
     public void ImportTilesheetImage_NotAPng_ThrowsAndCopiesNothing()
     {
-        var source = Path.Combine(_contentRoot, "import-source", "Notes.png");
+        var source = Path.Combine(_content.Path, "import-source", "Notes.png");
         Directory.CreateDirectory(Path.GetDirectoryName(source)!);
         File.WriteAllText(source, "not an image");
 
@@ -215,10 +214,10 @@ public sealed class ContentWriterTests : IDisposable
          where outside is not null && sheet.Margin == 0
          select (sheet, outside)).First();
 
-    private string TilesheetImage(string fileName) => Path.Combine(ArtFolders.RootIn(_contentRoot), ArtFolders.Tilesheets, fileName);
+    private string TilesheetImage(string fileName) => Path.Combine(ArtFolders.RootIn(_content.Path), ArtFolders.Tilesheets, fileName);
 
     // Where a test puts an image before importing it: outside the art folder, as a file the developer picked would be.
-    private string ImportSource(string fileName) => Path.Combine(_contentRoot, "import-source", fileName);
+    private string ImportSource(string fileName) => Path.Combine(_content.Path, "import-source", fileName);
 
     // A tile on the first sheet that isn't in the catalog yet.
     private TileDefinition NewTile() => new()
@@ -234,15 +233,15 @@ public sealed class ContentWriterTests : IDisposable
         _catalog with { Tiles = _catalog.Tiles.Values.Append(tile).ToDictionary(other => other.Id) };
 
     private byte[] CatalogFileBytes() =>
-        [.. File.ReadAllBytes(Path.Combine(_contentRoot, "tilesheets.json")),
-         .. File.ReadAllBytes(Path.Combine(_contentRoot, "tiles.json")),
-         .. File.ReadAllBytes(Path.Combine(_contentRoot, "objects.json")),
-         .. File.ReadAllBytes(Path.Combine(_contentRoot, "quests.json"))];
+        [.. File.ReadAllBytes(_content.PathOf("tilesheets.json")),
+         .. File.ReadAllBytes(_content.PathOf("tiles.json")),
+         .. File.ReadAllBytes(_content.PathOf("objects.json")),
+         .. File.ReadAllBytes(_content.PathOf("quests.json"))];
 
     // Both files one after the other, compared byte for byte: line endings and encoding count.
     private byte[] MapFileBytes(string mapId) =>
-        [.. File.ReadAllBytes(Path.Combine(_contentRoot, "map-layouts", $"{mapId}.json")),
-         .. File.ReadAllBytes(Path.Combine(_contentRoot, "maps", $"{mapId}.json"))];
+        [.. File.ReadAllBytes(Path.Combine(_content.Path, "map-layouts", $"{mapId}.json")),
+         .. File.ReadAllBytes(Path.Combine(_content.Path, "maps", $"{mapId}.json"))];
 
     private static MapLayout ShrinkTo(MapLayout layout, int width, int height) => layout with
     {
@@ -252,14 +251,4 @@ public sealed class ContentWriterTests : IDisposable
         Objects = [],
         CellEvents = [],
     };
-
-    private static void CopyFolder(string source, string destination)
-    {
-        foreach (var file in Directory.EnumerateFiles(source, "*", SearchOption.AllDirectories))
-        {
-            var target = Path.Combine(destination, Path.GetRelativePath(source, file));
-            Directory.CreateDirectory(Path.GetDirectoryName(target)!);
-            File.Copy(file, target);
-        }
-    }
 }

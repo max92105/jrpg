@@ -5,13 +5,10 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-11-code-health-cleanup, slice B3 (a zoom mid-drag keeps the selection's marks; one
-`ShowObjectDragAt(_mapPoint)` call in `ApplyViewport`'s zoom-changed branch), 2026-11-11. Round 1. Verdict: ready to commit.
+Plan 2026-11-11-code-health-cleanup, slice S1 (pure move: the map view's pan and zoom into
+`Shell/MainWindow.Viewport.cs`), 2026-11-11. Round 1. Verdict: ready to commit.
 
-- No Critical, no Warning.
-- Verified: no recursion (ShowObjectDragAt -> PlaceOnMap/ShowGhost/Snapped, none reach ApplyViewport; RenderTransform
-  and Canvas children don't drive MapViewport.SizeChanged); call order vs `_gridDrawnFor` irrelevant (not read by it);
-  `_mapPoint` only drives the preview, FinishObjectDrag reads the mouse-up point.
-- Open (Follow-up): OnOpenMapChanged (MainWindow.xaml.cs:145) also calls DrawSelectionMarks, so an undo/redo during a
-  Shift + drag snaps the marks back the same way (and `_movedObject.Placed` may be a stale record).
-- B2's open Warning/Suggestion (FirstTileOutside row-side test, IsTileInside name): not re-checked here, B2 committed.
+- No Critical, no Warning, no Suggestion.
+- Verified mechanically: sorted non-blank removed lines vs new file's lines differ only by the file head (usings,
+  namespace, summary, class braces), the old class summary lines and ApplyViewport's comment rewrap (decision 541).
+- B3's follow-up (undo during Shift + drag snaps marks) dropped: backlog.md line 212 lists it.

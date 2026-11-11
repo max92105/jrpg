@@ -13,6 +13,8 @@ Rule seen at the 2026-11-05 approval: a review that adds features (pickers, prev
 
 2026-11-10: `2026-11-10-map-fixes-banner-and-folders` approved the same day (decisions 518-535, ADRs 0041 draw order, 0042 map id rename): save deadlock, canopy layer order (no depth offset: the developer's houses and trees sit on z -3 to -5, the layer alone is the model), reaching covered objects, area level + per-map `showsBanner` + entry banner, map id rename (reverses question 70), map folders as a settings field managed from a tree. A field only the editor reads gets a decision, not an ADR.
 
+2026-11-11: `2026-11-11-code-health-cleanup` (editor + Data) approved (decisions 536-549; V1 is the developer's verify.ps1 edit for 130-column code lines); `2026-11-11-game-code-health-cleanup` approved the same day (decisions 550-558; next free 559), run after the editor/Data one.
+
 Direction (decision 234): an investor demo. Later: speed-based turn count (301, with enemy speed), Act 1 content, map banner, autosave, a battle event step (decision 399), gold/inn prices (222), other classes' lasting costs (220), skills for dead stat dimensions (310).
 
 Still-open older questions: 92, 112, 147, 151-155, 179, 180, 182, 183, 208-220, 222, 223, 225-228 (224 answered by the enemy skills plan).

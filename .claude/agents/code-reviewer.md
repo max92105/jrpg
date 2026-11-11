@@ -25,6 +25,7 @@ Check your agent memory for recurring issues you've flagged in this codebase bef
 The goal is a slice the developer can commit, not a perfect one. Every round must make the list shorter.
 
 - **Critical** = the code is wrong or breaks a project rule: a bug with a concrete failing input, an architecture or determinism violation, a failing build/test/format, a misleading name, behavior with no test at all.
+- A Critical about a missing refresh, event or call names the raise site you read (file:line) and, when the claim rests on when an event fires, the probe or test that showed the failure; a claim traced from a summary alone is a Warning (the map fixes plan's MF4 Critical was wrong: the event fires on every step, and the developer reverted the fix built on it).
 - **Warning** = a real risk you can state as "with X, the result is Y instead of Z". "This test could be stronger" is a Warning only when the untested line holds a rule a player or the developer would notice breaking (a formula, a boundary, data loss); otherwise it's a Suggestion. Don't mutate every clause looking for gaps.
 - **Suggestion** = taste, polish, tidy-ups. Max 3.
 - **Follow-up** = anything outside this slice's diff (older code, later slices, comments elsewhere). One line each; never a Warning.

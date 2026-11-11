@@ -67,3 +67,7 @@ The bar: a professional reviewer reads the diff and understands the intent from 
 - Renaming or reformatting code outside the slice.
 
 When existing code breaks these rules, follow the rules in new code and note the old code as a follow-up; don't refactor it in the same slice.
+
+## What the build refuses (each cost a build round in the map fixes plan)
+
+- A member named `Object` (CA1720); a constructor near ten branches takes a helper (CA1502); `First()` or `FirstOrDefault()` without a predicate on a list (CA1826: pattern-match the list instead); a fifth parameter (the verify script); an object initializer after a method call (it follows `new` alone).

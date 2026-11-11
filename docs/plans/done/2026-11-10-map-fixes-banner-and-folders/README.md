@@ -1,5 +1,5 @@
 # Map fixes, area banner, map ids and folders
-Status: retro pending
+Status: done
 
 Drafted on 2026-11-10 from the developer's next batch of map and editor work (lightly cleaned up by the coordinator):
 

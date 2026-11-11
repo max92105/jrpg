@@ -6,8 +6,8 @@ using Jrpg.Editor.Shell;
 namespace Jrpg.Editor.Tests.Shell;
 
 /// <summary>
-/// The map list, layers, objects, map settings and new maps; switching maps, saving, closing and undo are tested in
-/// their own classes.
+/// The map list, layers, objects and new maps; map settings, the sheet import, switching maps, saving, closing and undo
+/// are tested in their own classes.
 /// </summary>
 public sealed class MainViewModelTests : IDisposable
 {
@@ -150,72 +150,6 @@ public sealed class MainViewModelTests : IDisposable
 
         Assert.Same(viewModel.CurrentMap, viewModel.Painting!.OpenMap);
         Assert.Same(viewModel.CurrentMap, viewModel.Placing!.OpenMap);
-    }
-
-    [Fact]
-    public void TryApplySettings_ShrinkRefused_KeepsTheMapAsItIs()
-    {
-        var viewModel = _content.Open(_content.TestWorld, answer: false);
-        var settings = viewModel.StartEditingSettings()!;
-        settings.WidthText = "1";
-        settings.DisplayName = "Small forest";
-
-        Assert.False(viewModel.TryApplySettings(settings));
-
-        Assert.StartsWith("Resizing to 1 x ", Assert.Single(_content.Questions), StringComparison.Ordinal);
-        Assert.False(viewModel.CurrentMap!.IsDirty);
-    }
-
-    [Fact]
-    public void TryApplySettings_ShrinkAccepted_ResizesAndRenamesAsTwoUndoSteps()
-    {
-        var viewModel = _content.Open(_content.TestWorld, answer: true);
-        var settings = viewModel.StartEditingSettings()!;
-        settings.WidthText = "1";
-        settings.DisplayName = "Small forest";
-
-        Assert.True(viewModel.TryApplySettings(settings));
-
-        var map = viewModel.CurrentMap!;
-        Assert.Equal((1, "Small forest"), (map.Map.Layout.Width, map.Map.Settings.DisplayName));
-        map.UndoCommand.Execute(null);
-        Assert.Equal((1, "Forest"), (map.Map.Layout.Width, map.Map.Settings.DisplayName));
-        map.UndoCommand.Execute(null);
-        Assert.False(map.IsDirty);
-    }
-
-    [Fact]
-    public void TryApplySettings_Grow_ResizesWithoutAsking()
-    {
-        var viewModel = _content.Open(_content.TestWorld);
-        var settings = viewModel.StartEditingSettings()!;
-        settings.HeightText = "100";
-
-        Assert.True(viewModel.TryApplySettings(settings));
-
-        Assert.Equal(100, viewModel.CurrentMap!.Map.Layout.Height);
-        Assert.Empty(_content.Questions);
-    }
-
-    [Fact]
-    public void TryApplySettings_NothingChanged_AddsNoUndoStep()
-    {
-        var viewModel = _content.Open(_content.TestWorld);
-
-        Assert.True(viewModel.TryApplySettings(viewModel.StartEditingSettings()!));
-
-        Assert.False(viewModel.CurrentMap!.UndoCommand.CanExecute(null));
-    }
-
-    [Fact]
-    public void TryApplySettings_EmptySizeBox_AppliesNothing()
-    {
-        var viewModel = _content.Open(_content.TestWorld);
-        var settings = viewModel.StartEditingSettings()!;
-        settings.HeightText = "";
-
-        Assert.False(viewModel.TryApplySettings(settings));
-        Assert.False(viewModel.CurrentMap!.IsDirty);
     }
 
     [Fact]

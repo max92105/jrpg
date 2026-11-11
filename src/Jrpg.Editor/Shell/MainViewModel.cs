@@ -11,8 +11,6 @@ using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Events;
 using Jrpg.Editor.Maps;
-using Jrpg.Editor.Maps.Editing;
-using Jrpg.Editor.Maps.Settings;
 using Jrpg.Editor.Objects;
 using Jrpg.Editor.Objects.Composing;
 using Jrpg.Editor.Quests;
@@ -21,9 +19,10 @@ using Jrpg.Editor.Tiles;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// The editor window's state: the loaded content, the maps to choose from and the open one, which it opens, saves and
-/// closes; painting tiles, placing objects and editing their events are <see cref="Painting"/>, <see cref="Placing"/>
-/// and <see cref="EventEditing"/>. Content that can't load is shown with the loader's message instead of crashing, so a
+/// The editor window's state: the loaded content, the maps open in the session and the shown one (decision 497);
+/// saving, switching, renaming, folders, settings, the sheet import and an object from the map are its partial files;
+/// painting tiles, placing objects and editing their events are <see cref="Painting"/>, <see cref="Placing"/> and
+/// <see cref="EventEditing"/>. Content that can't load is shown with the loader's message instead of crashing, so a
 /// broken file can be found and fixed.
 /// </summary>
 internal sealed partial class MainViewModel : ObservableObject
@@ -214,35 +213,6 @@ internal sealed partial class MainViewModel : ObservableObject
     /// <summary>Says in the status bar why a click on the map painted nothing: no cell is chosen in the Tiles panel.</summary>
     public void ShowPaintHint() => CursorStatus = "Choose a tile in the Tiles panel";
 
-    /// <summary>The settings dialog's state for the open map; null when no map is open.</summary>
-    public MapSettingsViewModel? StartEditingSettings() =>
-        CurrentMap is { } open ? new(open.Map, Catalog!.Encounters.Keys, AudioFolders.TracksIn(_audioRoot)) : null;
-
-    /// <summary>
-    /// Applies the settings dialog to the open map: the new size first, asking before it drops anything, then the name,
-    /// the track, the area level, the banner and the random battles. Each is one undo step.
-    /// </summary>
-    /// <returns>False when nothing was applied: a field has a problem or the user kept the old size.</returns>
-    public bool TryApplySettings(MapSettingsViewModel edited)
-    {
-        if (CurrentMap is not { } open || edited.Problem is not null || edited.NewSize is not { } size)
-        {
-            return false;
-        }
-
-        if (edited.IsResizing && !TryResize(open, size.Width, size.Height))
-        {
-            return false;
-        }
-
-        if (edited.AreSettingsChanged)
-        {
-            open.Do(new SetMapSettingsEdit(open.Map.Settings, edited.ToSettings()));
-        }
-
-        return true;
-    }
-
     [RelayCommand]
     private void ToggleCollision() => IsCollisionShown = !IsCollisionShown;
 
@@ -278,21 +248,6 @@ internal sealed partial class MainViewModel : ObservableObject
         {
             LayerEntries = sorted;
         }
-    }
-
-    private bool TryResize(MapViewModel open, int width, int height)
-    {
-        var resize = new ResizeMapEdit(open.Map.Layout, width, height, Catalog!.Objects);
-        var dropsSomething = resize.DroppedTileCount + resize.DroppedObjectCount + resize.DroppedCellEventCount > 0;
-        var question = $"Resizing to {width} x {height} drops {resize.DroppedTileCount} tiles, {resize.DroppedObjectCount} objects "
-            + $"and {resize.DroppedCellEventCount} cell events outside the new size. Resize anyway?";
-        if (dropsSomething && !_confirm(question))
-        {
-            return false;
-        }
-
-        open.Do(resize);
-        return true;
     }
 
     // The new object joins the catalog as one undo step, then is chosen in the Objects panel, in Objects mode.

@@ -236,29 +236,6 @@ internal sealed partial class CatalogDraft : ObservableObject
     public void AddSavedMap(MapDefinition map) =>
         Current = Current with { Maps = new Dictionary<string, MapDefinition>(Current.Maps) { [map.Id] = map } };
 
-    private static ContentCatalog WithTile(ContentCatalog catalog, TileDefinition tile) =>
-        catalog with { Tiles = new Dictionary<int, TileDefinition>(catalog.Tiles) { [tile.Id] = tile } };
-
-    private static ContentCatalog WithTiles(ContentCatalog catalog, IEnumerable<TileDefinition> tiles)
-    {
-        var changed = new Dictionary<int, TileDefinition>(catalog.Tiles);
-        foreach (var tile in tiles)
-        {
-            changed[tile.Id] = tile;
-        }
-
-        return catalog with { Tiles = changed };
-    }
-
-    private static ContentCatalog WithoutTile(ContentCatalog catalog, int tileId) =>
-        catalog with { Tiles = catalog.Tiles.Where(pair => pair.Key != tileId).ToDictionary() };
-
-    private static ContentCatalog WithObject(ContentCatalog catalog, ObjectDefinition definition) =>
-        catalog with { Objects = new Dictionary<string, ObjectDefinition>(catalog.Objects) { [definition.Id] = definition } };
-
-    private static ContentCatalog WithoutObject(ContentCatalog catalog, string objectId) =>
-        catalog with { Objects = catalog.Objects.Where(pair => pair.Key != objectId).ToDictionary() };
-
     // Records compare lists by reference, so an outline edited back to the same points would otherwise count as a change:
     // the with-copy compares every field but the lists, and the lists are compared by content below.
     private static bool IsSameObject(ObjectDefinition before, ObjectDefinition after) =>
@@ -267,12 +244,6 @@ internal sealed partial class CatalogDraft : ObservableObject
         && before.Tiles.SequenceEqual(after.Tiles)
         && before.AbovePlayerZones.Count == after.AbovePlayerZones.Count
         && before.AbovePlayerZones.Zip(after.AbovePlayerZones).All(pair => pair.First.SequenceEqual(pair.Second));
-
-    private static ContentCatalog WithTilesheet(ContentCatalog catalog, TilesheetDefinition sheet) =>
-        catalog with { Tilesheets = new Dictionary<string, TilesheetDefinition>(catalog.Tilesheets) { [sheet.Id] = sheet } };
-
-    private static ContentCatalog WithoutTilesheet(ContentCatalog catalog, string sheetId) =>
-        catalog with { Tilesheets = catalog.Tilesheets.Where(pair => pair.Key != sheetId).ToDictionary() };
 
     private TileDefinition NewTileAt(SheetCell cell, bool isWalkable)
     {

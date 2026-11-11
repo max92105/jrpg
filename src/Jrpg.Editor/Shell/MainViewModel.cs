@@ -165,13 +165,6 @@ internal sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     public partial bool IsCollisionShown { get; set; }
 
-    /// <summary>What the last import copied and refused ("Imported Forest2.png"); empty before any import.</summary>
-    [ObservableProperty]
-    public partial string ImportStatus { get; private set; } = "";
-
-    /// <summary>The images an import copied, raised before the last is shown, so cached pictures of replaced files are dropped.</summary>
-    public event EventHandler<IReadOnlyList<string>>? SheetImagesImported;
-
     /// <summary>What the status bar says about the cell under the cursor; empty when the cursor is off the map.</summary>
     [ObservableProperty]
     public partial string CursorStatus { get; private set; } = "";
@@ -252,34 +245,6 @@ internal sealed partial class MainViewModel : ObservableObject
 
     [RelayCommand]
     private void ToggleCollision() => IsCollisionShown = !IsCollisionShown;
-
-    /// <summary>
-    /// Copies images into the tilesheet art (asking before replacing one), then shows the last one copied, "(not set up)"
-    /// if it has no sheet. A file copy, not an undo step.
-    /// </summary>
-    /// <param name="paths">The images chosen in the file dialog.</param>
-    public void ImportSheetImages(IReadOnlyList<string> paths)
-    {
-        if (Content is null || Painting is null)
-        {
-            return;
-        }
-
-        var result = new SheetImport(_writer, Content).Import(paths, file => _confirm($"{file} is already in the tilesheet art. Replace it?"));
-        foreach (var file in result.Imported)
-        {
-            _sheetImageSizes.Forget(file);
-        }
-
-        if (result.LastImported is { } last)
-        {
-            Art!.Refresh();
-            SheetImagesImported?.Invoke(this, result.Imported);
-            Painting.Browser.Show(last);
-        }
-
-        ImportStatus = result.Summary;
-    }
 
     private void OnContentChanged(object? sender, PropertyChangedEventArgs e)
     {

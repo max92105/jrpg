@@ -5,12 +5,13 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-11-code-health-cleanup, slice B2 (tile cells and animations past the image refused as counts, decision 542),
-2026-11-11. Round 1. Verdict: ready to commit.
+Plan 2026-11-11-code-health-cleanup, slice B3 (a zoom mid-drag keeps the selection's marks; one
+`ShowObjectDragAt(_mapPoint)` call in `ApplyViewport`'s zoom-changed branch), 2026-11-11. Round 1. Verdict: ready to commit.
 
-- Open (Warning): FirstTileOutside's `IsCellInside &&` clause (ArtReferenceCheck.cs:154) has no test on its row side;
-  the ContentWriter import test's tile (city 31 at (3, 1)) is caught by IsLastFrameInside alone.
-- Open (Suggestion): name the combined check `IsTileInside(tile, sheet, size)`; line 154 is ~165 columns.
-- Verified: count checks equal the old pixel sums for every in-range value (TileWidth >= 1, Margin/Spacing >= 0,
-  column/row >= 0 validated).
-- start.json residue: the developer's hand test, excluded by the caller.
+- No Critical, no Warning.
+- Verified: no recursion (ShowObjectDragAt -> PlaceOnMap/ShowGhost/Snapped, none reach ApplyViewport; RenderTransform
+  and Canvas children don't drive MapViewport.SizeChanged); call order vs `_gridDrawnFor` irrelevant (not read by it);
+  `_mapPoint` only drives the preview, FinishObjectDrag reads the mouse-up point.
+- Open (Follow-up): OnOpenMapChanged (MainWindow.xaml.cs:145) also calls DrawSelectionMarks, so an undo/redo during a
+  Shift + drag snaps the marks back the same way (and `_movedObject.Placed` may be a stale record).
+- B2's open Warning/Suggestion (FirstTileOutside row-side test, IsTileInside name): not re-checked here, B2 committed.

@@ -50,7 +50,7 @@ Sizes are hand-written lines, tests included; "moved" lines are cut and pasted (
 
 ### Phase 1: bugs
 - [x] **GB1. The Weapons and Armor tabs show no quantity column** (Game, about 50 lines, hand check) → [slices/GB1.md](slices/GB1.md)
-- [ ] **GB2. A page's dialog dims the footer hint too** (Game, about 5 lines, hand check) → [slices/GB2.md](slices/GB2.md)
+- [x] **GB2. A page's dialog dims the footer hint too** (Game, about 5 lines, hand check) → [slices/GB2.md](slices/GB2.md)
 - [ ] **GB3. The UI art check compares exact file names** (Game tests, about 15 lines) → [slices/GB3.md](slices/GB3.md)
 
 ### Phase 2: splits and test duplicates

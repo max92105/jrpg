@@ -116,12 +116,13 @@ internal sealed class GameMenuScene : IScene
         DrawFrame(batch, textures, opacity);
         _header.Draw(batch, textures, _isInPage ? _tabLabels[_tabs.Selected] : _menuTitle, opacity);
         _tabsView.Draw(batch, textures, new MenuTabsView.Place(_motion, _tabs.Selected, _tabGlide.Position, _tabFold));
+
+        // Before the page, so a dialog's scrim dims the hint with the rest of the menu (decision 554).
+        DrawFooterHint(batch, opacity);
         if (_isInPage)
         {
             DrawPage(batch, textures, opacity * _pageTransition.Opacity);
         }
-
-        DrawFooterHint(batch, opacity);
     }
 
     private void RefreshMemberColumn()

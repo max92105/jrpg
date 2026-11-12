@@ -18,3 +18,5 @@ None new: a draw order (decision 551). The runner's totals per project equal bef
 3. System, Quit: the question dims the hint; No brings it back bright.
 4. Save page, choose a used file: the overwrite question dims the hint.
 5. Opening and closing the menu: the hint fades in and out with the menu, as before.
+
+- **Done:** as planned; `DrawFooterHint` runs right after the tabs, before the page, with a comment naming decision 554. The runner's total is 4610 before and after. The PD1 line went.

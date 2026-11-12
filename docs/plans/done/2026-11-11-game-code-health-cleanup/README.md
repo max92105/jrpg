@@ -3,7 +3,7 @@ Status: done
 
 Developer's request (2026-11-11), verbatim: "it's time to do all the health check listed and do a clean up phase. dead code optimisation using clean code convention and microsoft convention. to be most human readable possible. using clear strucutre and segmentation and intention. everything work really well so no regression."
 
-The developer chose two plans (decision 536): [2026-11-11-code-health-cleanup](../2026-11-11-code-health-cleanup/README.md) is the editor and Data phase; this one covers the backlog lines about `src/Jrpg.Game` and `tests/Jrpg.Game.Tests`, and follows it. The developer approved it on 2026-11-11 with the devil's advocate's changes (decisions 550-558).
+The developer chose two plans (decision 536): [2026-11-11-code-health-cleanup](../done/2026-11-11-code-health-cleanup/README.md) is the editor and Data phase; this one covers the backlog lines about `src/Jrpg.Game` and `tests/Jrpg.Game.Tests`, and follows it. The developer approved it on 2026-11-11 with the devil's advocate's changes (decisions 550-558).
 
 ## Goal
 At the end of this plan:

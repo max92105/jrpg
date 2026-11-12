@@ -155,11 +155,13 @@ $textHits = if ($textFiles) {
 }
 Report 'no retired word outside history' (-not $nameHits -and -not $textHits) (@($nameHits) + @($textHits) | Select-Object -First 20)
 
-# 7. Comment lines changed since the last commit fit in 120 columns (code-quality.md); older lines are rewrapped when
-# next touched. Counted in characters, without the line ending.
+# 7. Comment lines changed since the last commit fit in 120 columns and code lines in 130 (code-quality.md); older
+# lines are rewrapped when next touched. Counted in characters, without the line ending.
 $maxCommentColumns = 120
+$maxCodeColumns = 130
 $commentPattern = '^\s*//'
 $longComments = @()
+$longCode = @()
 $addedLines = @{}
 $file = $null
 $lineNumber = 0
@@ -169,6 +171,7 @@ foreach ($line in git diff -U0 HEAD -- '*.cs') {
     if ($line -match '^\+' -and $line -notmatch '^\+\+\+') {
         $text = $line.Substring(1).TrimEnd("`r")
         if ($text -match $commentPattern -and $text.Length -gt $maxCommentColumns) { $longComments += "${file}:$lineNumber ($($text.Length) columns)" }
+        elseif ($text -notmatch $commentPattern -and $text.Length -gt $maxCodeColumns) { $longCode += "${file}:$lineNumber ($($text.Length) columns)" }
         $addedLines[$file][$lineNumber] = $true
         $lineNumber++
     }
@@ -179,10 +182,12 @@ foreach ($newFile in git ls-files --others --exclude-standard -- '*.cs') {
     foreach ($text in [IO.File]::ReadAllLines((Join-Path $repositoryRoot $newFile))) {
         $number++
         if ($text -match $commentPattern -and $text.Length -gt $maxCommentColumns) { $longComments += "${newFile}:$number ($($text.Length) columns)" }
+        elseif ($text -notmatch $commentPattern -and $text.Length -gt $maxCodeColumns) { $longCode += "${newFile}:$number ($($text.Length) columns)" }
         $addedLines[$newFile][$number] = $true
     }
 }
 Report "changed comments fit in $maxCommentColumns columns (perl .claude/scripts/reflow-comments.pl <file>)" (-not $longComments) ($longComments | Select-Object -First 20)
+Report "changed code lines fit in $maxCodeColumns columns (split the line where it does two things)" (-not $longCode) ($longCode | Select-Object -First 20)
 
 # 7b. A changed comment block of two or more lines doesn't end on a one- or two-word line (code-quality.md); the -Fix
 # rewrap left two in the levels plan's SZ3. A line of prose only: an XML tag line or a list item doesn't count.

@@ -5,13 +5,14 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-11-code-health-cleanup, slice R1 (Shell: the folder rename's write extracted; the composer's
-ruled-out states thrown), 2026-11-12. Round 1. Verdict: ready to commit.
+Plan 2026-11-11-code-health-cleanup, slice R2 (Editor Maps: the lines that do two things), 2026-11-12. Round 1.
+Verdict: ready to commit.
 
-- Suggestion (open): `StartObjectFromMap` summary "so no shown map is a state this reaches" reads both ways; say
-  "so it is reached with no map shown, and returns null then".
-- Suggestion (open): `ErasedOn` merged its two `Where`s into one `&&`; the slice only asked to name the canvas cell.
-- Verified: TryRenameFolder effects order kept (MovedMaps pure, so computing it after `SaveError = null` is
-  harmless); KeptTile/IsKept/Moved build the same values; the `!` reads NRE before `map.Do` (catalog step already
-  applied, as before); all three TryWriteMovedMaps branches tested (empty session folder, two maps, write refused).
-- D2: no findings, nothing carried.
+- Warning (open): `MapTree.Shown` record and `CollisionShapes.InMapCells` signature are only-long lines wrapped
+  against decision 539; Done note calls Shown "as planned" and omits the InMapCells signature. Record or revert.
+- Suggestion (open): `InMapCell`'s `//` comment repeats the `InMapCells` summary just above; drop it.
+- Follow-up: `MapDrawing.DrawCanopy` repeats `InMapCell`'s arithmetic (times CellPixels); `DrawObjectAt`'s sprite
+  branch has no test (MapDrawingTests never sets FieldSpriteFile).
+- Verified equal: ClosedOutline (outline[0], Skip(1) unstroked, closed), Rect(Point,Size) vs Rect(x,y,w,h),
+  InMapCell arithmetic, IsOpen, withOutline/mapFolders lazy and enumerated once. CollisionShapes:34 is 130 columns.
+- R1's two suggestions: not carried (R1 committed).

@@ -14,16 +14,18 @@ namespace Jrpg.Editor.Shell;
 internal sealed partial class MainViewModel
 {
     private const string SaveAllBeforeFolderRename = "Save all first (Ctrl+Shift+S): renaming a folder writes every map in it.";
+    private const string FolderRenameEffect = "Change the folder's path; every map in it and its subfolders is written at once.";
 
     /// <summary>Whether Rename folder may open: nothing is unsaved.</summary>
     public bool CanRenameFolder => !HasUnsavedChanges;
 
     /// <summary>The Rename folder entry's tooltip: what a rename does, or why the entry is greyed.</summary>
-    public string RenameFolderTip => HasUnsavedChanges ? SaveAllBeforeFolderRename : "Change the folder's path; every map in it and its subfolders is written at once.";
+    public string RenameFolderTip => HasUnsavedChanges ? SaveAllBeforeFolderRename : FolderRenameEffect;
 
     /// <summary>The folder dialog for New folder.</summary>
     /// <param name="parentPath">The folder right-clicked; null for a folder at the top.</param>
-    public MapFolderChoiceViewModel StartNewFolder(string? parentPath) => MapFolderChoiceViewModel.ForNewFolder(KnownFolders, parentPath);
+    public MapFolderChoiceViewModel StartNewFolder(string? parentPath) =>
+        MapFolderChoiceViewModel.ForNewFolder(KnownFolders, parentPath);
 
     /// <returns>False when nothing was added: the path has a problem (the top among them, for a new folder).</returns>
     public bool TryAddFolder(MapFolderChoiceViewModel choice)
@@ -43,7 +45,8 @@ internal sealed partial class MainViewModel
         new(KnownFolders, MapEntries.Single(entry => entry.Id == mapId).Folder);
 
     /// <returns>False when nothing was recorded: the path has a problem, or the map is already there.</returns>
-    public bool TryMoveMap(string mapId, MapFolderChoiceViewModel choice) => choice.Problem is null && TryMoveMapTo(mapId, choice.ToPath());
+    public bool TryMoveMap(string mapId, MapFolderChoiceViewModel choice) =>
+        choice.Problem is null && TryMoveMapTo(mapId, choice.ToPath());
 
     /// <summary>
     /// A drag onto a folder, or the dialog's choice: the map is shown first, so Ctrl+Z reaches the step (decision 503),
@@ -67,7 +70,8 @@ internal sealed partial class MainViewModel
     }
 
     /// <summary>The folder dialog for Rename folder, starting on the folder's path.</summary>
-    public MapFolderChoiceViewModel StartRenamingFolder(string folderPath) => MapFolderChoiceViewModel.ForRenamingFolder(KnownFolders, folderPath);
+    public MapFolderChoiceViewModel StartRenamingFolder(string folderPath) =>
+        MapFolderChoiceViewModel.ForRenamingFolder(KnownFolders, folderPath);
 
     /// <summary>
     /// Every map in the folder and its subfolders gets its path under the new one, written at once through Data, the
@@ -92,23 +96,10 @@ internal sealed partial class MainViewModel
         }
 
         var newPath = choice.ToPath()!;
-        var moved = MapsMoved(Content!.Current, folderPath, newPath);
         SaveError = null;
-        if (moved.Count > 0)
+        if (!TryWriteMovedMaps(MovedMaps(Content!.Current, folderPath, newPath)))
         {
-            var maps = new Dictionary<string, MapDefinition>(Content.Current.Maps);
-            foreach (var map in moved)
-            {
-                maps[map.Id] = map;
-            }
-
-            var rewritten = Content.Current with { Maps = maps };
-            if (!TryWrite(() => _writer.WriteMaps(rewritten, [.. moved.Select(map => map.Id)])))
-            {
-                return false;
-            }
-
-            Content.ReplaceAfterRewrite(rewritten);
+            return false;
         }
 
         Navigation.RenameFolders(folderPath, newPath);
@@ -116,12 +107,46 @@ internal sealed partial class MainViewModel
         return true;
     }
 
+    // Nothing to write is a success; otherwise the content with the moved maps is written at once and taken as the
+    // current one. False when Data refused, SaveError set by the write.
+    private bool TryWriteMovedMaps(List<MapDefinition> moved)
+    {
+        if (moved.Count == 0)
+        {
+            return true;
+        }
+
+        var maps = new Dictionary<string, MapDefinition>(Content!.Current.Maps);
+        foreach (var map in moved)
+        {
+            maps[map.Id] = map;
+        }
+
+        var rewritten = Content.Current with { Maps = maps };
+        if (!TryWrite(() => _writer.WriteMaps(rewritten, [.. moved.Select(map => map.Id)])))
+        {
+            return false;
+        }
+
+        Content.ReplaceAfterRewrite(rewritten);
+        return true;
+    }
+
     // The maps within the folder, each with its path moved under the new one; "Act 10" isn't within "Act 1".
-    private static List<MapDefinition> MapsMoved(ContentCatalog content, string folderPath, string newPath) =>
-        [.. content.Maps.Values
+    private static List<MapDefinition> MovedMaps(ContentCatalog content, string folderPath, string newPath)
+    {
+        MapDefinition Moved(MapDefinition map)
+        {
+            var movedSettings = map.Settings with { Folder = MapFolderPath.Moved(map.Settings.Folder!, folderPath, newPath) };
+            return new MapDefinition(map.Layout, movedSettings);
+        }
+
+        return [.. content.Maps.Values
             .Where(map => map.Settings.Folder is { } folder && MapFolderPath.IsWithin(folder, folderPath))
-            .Select(map => new MapDefinition(map.Layout, map.Settings with { Folder = MapFolderPath.Moved(map.Settings.Folder!, folderPath, newPath) }))];
+            .Select(Moved)];
+    }
 
     // The folders the dialog offers: the listed maps' as they are now and the session's empty ones.
-    private IEnumerable<string> KnownFolders => MapEntries.Select(entry => entry.Folder).OfType<string>().Concat(Navigation.SessionFolders);
+    private IEnumerable<string> KnownFolders =>
+        MapEntries.Select(entry => entry.Folder).OfType<string>().Concat(Navigation.SessionFolders);
 }

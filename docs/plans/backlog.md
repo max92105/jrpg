@@ -194,7 +194,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the map editing flows plan (2026-11-05, during the slices)
 
-- `Shell/MainViewModel.ObjectFromMap.cs` guards states the modal composer rules out: `StartObjectFromMap`'s `CurrentMap is not { } shown` and `ErasedCells`' `FirstOrDefault` + null check on a layer that can't vanish while the composer is open; `Single` or the value, so a bug fails instead of skipping (OM3, OM4 reviews).
 - `tests/Jrpg.Editor.Tests/Shell/MainViewModelOpenMapsTests.cs` is at 286 lines after MS2 and `MainViewModelObjectFromMapTests.cs` at 251 after OM4: the next open-maps or object-from-map test goes in a sibling file.
 
 ## From the map fixes, banner and folders plan (2026-11-10, at approval)
@@ -206,5 +205,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `MainViewModelMusicTests`' comment says `MainViewModelTests` is over 300 lines, which the cleanup plan's S3 made false (194); its two `StartEditingSettings_*` tests belong in `MainViewModelMapSettingsTests` (the S3 review).
 - `verify.ps1 -Fix` on a tree that doesn't build lets `dotnet format` delete the toolkit's generator hooks (`partial void On...Changed`) as unused code (the cleanup plan's S5): make `-Fix` refuse to format until a plain build passes, or write the rule in CLAUDE.md (the S5 review).
 - The map-replace expression `MapContent.With` holds (the cleanup plan's X1) is still written out in `ArtReferenceCheckTests`, `AudioReferenceCheckTests` and about 15 Editor, Game and Simulations tests that can't reach the Data.Tests helper: a shared test helper per project, or Core's catalog gaining the one-map replacement (the X1 review).
-- `MainViewModel.MapFolders` (MF4-MF6): `TryMoveMap`, `KnownFolders`, `RenameFolderTip` and `MapsMoved` run to 150-170 columns; split them over lines (the MF5 and MF6 reviews).
 - Files at the limit after the map fixes plan, to split before the slice that grows them: `Shell/EditorTemplates.xaml` 297, `Shell/MainWindow.xaml` 293.

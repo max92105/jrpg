@@ -70,7 +70,7 @@ Sizes are hand-written lines, tests included; "moved" lines are cut and pasted (
 - [x] **D2. The writer tests copy content through `CopiedContentRoot`** (Data tests, about 60 lines, net fewer) → [slices/D2.md](slices/D2.md)
 
 ### Phase 4: readability
-- [ ] **R1. Shell: the folder rename's write extracted; the composer's ruled-out states thrown** (Editor, about 70 lines; one behavior change on a bug path) → [slices/R1.md](slices/R1.md)
+- [x] **R1. Shell: the folder rename's write extracted; the composer's ruled-out states thrown** (Editor, about 70 lines; one behavior change on a bug path) → [slices/R1.md](slices/R1.md)
 - [ ] **V1. `verify.ps1` refuses a changed code line over 130 columns (the developer's edit)** (script, about 10 lines) → [slices/V1.md](slices/V1.md)
 - [ ] **R2. Editor Maps: the lines that do two things** (Editor, about 50 lines) → [slices/R2.md](slices/R2.md)
 - [ ] **R3. The art check's lines that do two things; the backlog closed** (Data, docs, about 50 lines) → [slices/R3.md](slices/R3.md)

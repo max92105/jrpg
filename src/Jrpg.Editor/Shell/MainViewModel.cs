@@ -236,9 +236,16 @@ internal sealed partial class MainViewModel : ObservableObject
     // list each time would reset the list's selection mid-click.
     private void RefreshLayerEntries()
     {
-        var layers = CurrentMap?.Layers ?? [];
-        var entries = layers.Select(layer => new LayerEntry(layer.Z, LayerPresets.NameOf(layer.Z), IsEmpty: false)).ToList();
-        if (CurrentMap is not null && !layers.Any(layer => layer.Z == Layer.Z))
+        if (CurrentMap is null)
+        {
+            LayerEntries = [];
+            return;
+        }
+
+        var layout = CurrentMap.Map.Layout;
+        var usedZs = layout.Layers.Select(layer => layer.Z).Union(layout.Objects.Select(placed => placed.Z));
+        var entries = usedZs.Select(z => new LayerEntry(z, LayerPresets.NameOf(z), IsEmpty: false)).ToList();
+        if (!entries.Any(entry => entry.Z == Layer.Z))
         {
             entries.Add(new LayerEntry(Layer.Z, LayerPresets.NameOf(Layer.Z), IsEmpty: true));
         }

@@ -1,5 +1,7 @@
 using Jrpg.Core.Geometry;
+using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
+using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
 using Jrpg.Editor.Shell;
 
@@ -58,6 +60,23 @@ public sealed class MainViewModelTests : IDisposable
         var tileId = viewModel.CurrentMap.Map.Layout.Layers[0].TileIdAt(new GridCell(0, 0));
 
         viewModel.CurrentMap.Do(new SetTilesEdit(2, [new TileChange(new GridCell(0, 0), 0, tileId)]));
+
+        var entries = viewModel.LayerEntries.Select(entry => entry.Text).ToList();
+        Assert.Contains("Layer (z 2)", entries);
+        Assert.DoesNotContain("Layer (z 2), empty", entries);
+    }
+
+    // A layer holding only objects is a layer of the map too (decision 592): it stays listed once another is chosen.
+    [Fact]
+    public void LayerEntries_ObjectPlacedOnEmptyZ_KeepsTheLayerListedAfterChoosingAnother()
+    {
+        var viewModel = _content.Open(_content.TestWorld);
+        Assert.DoesNotContain(viewModel.CurrentMap!.Map.Layout.Layers, layer => layer.Z == 2);
+        viewModel.Layer.Z = 2;
+
+        var chest = new PlacedObject { Uid = "chest_9", ObjectId = "chest", Position = new Point2D(0, 0), Z = 2 };
+        viewModel.CurrentMap.Do(new PlaceObjectEdit(chest));
+        viewModel.Layer.Z = LayerPresets.GroundZ;
 
         var entries = viewModel.LayerEntries.Select(entry => entry.Text).ToList();
         Assert.Contains("Layer (z 2)", entries);

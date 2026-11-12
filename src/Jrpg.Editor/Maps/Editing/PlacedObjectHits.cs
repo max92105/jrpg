@@ -7,9 +7,11 @@ namespace Jrpg.Editor.Maps.Editing;
 internal static class PlacedObjectHits
 {
     /// <summary>
-    /// The objects covering a point, the one drawn on top first (Core's <see cref="MapDrawOrder"/>): one of their tiles
-    /// covers it, or their NPC sprite does. An object whose above-player zones hold the point ranks by its canopy,
-    /// drawn over everything under the canopy layer (decision 523), so a roof comes before what it hides.
+    /// The objects covering a point (one of their tiles covers it, or their NPC sprite does), the one on the higher
+    /// layer first: the layer is where the developer put the object, so a chest placed above a tree's layer takes the
+    /// click under its canopy (decision 592). On one layer, the one drawn on top first (Core's
+    /// <see cref="MapDrawOrder"/>); an object whose above-player zones hold the point ranks by its canopy, drawn over
+    /// everything under the canopy layer (decision 523), so a roof comes before what it hides on its own layer.
     /// </summary>
     public static IReadOnlyList<PlacedObject> AllAt(MapLayout map, Point2D point, IReadOnlyDictionary<string, ObjectDefinition> definitions)
     {
@@ -27,14 +29,14 @@ internal static class PlacedObjectHits
             }
         }
 
-        return [.. hits.OrderByDescending(hit => hit.Key).Select(hit => hit.Placed)];
+        return [.. hits.OrderByDescending(hit => hit.Placed.Z).ThenByDescending(hit => hit.Key).Select(hit => hit.Placed)];
     }
 
     /// <summary>
     /// The object a Ctrl + click on the same spot again selects (decision 523): the one after the selected object in
     /// the hits, the first again after the last; the first when none is selected or the selected one isn't there.
     /// </summary>
-    /// <param name="hits">What <see cref="AllAt"/> found, topmost first.</param>
+    /// <param name="hits">What <see cref="AllAt"/> found, in its pick order.</param>
     /// <param name="selectedUid">The one selected object; null when none or several are.</param>
     public static PlacedObject? NextUnder(IReadOnlyList<PlacedObject> hits, string? selectedUid)
     {

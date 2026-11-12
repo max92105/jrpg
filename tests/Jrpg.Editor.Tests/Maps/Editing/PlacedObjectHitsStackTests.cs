@@ -4,7 +4,10 @@ using Jrpg.Editor.Maps.Editing;
 
 namespace Jrpg.Editor.Tests.Maps.Editing;
 
-/// <summary>The objects under a point, topmost first, and the pick cycling through them (decision 523).</summary>
+/// <summary>
+/// The objects under a point, the higher layer first (decision 592) then the topmost, and the pick that cycles
+/// through them (decision 523).
+/// </summary>
 public sealed class PlacedObjectHitsStackTests
 {
     // A 1x1 crate; a 3x3 house whose roof zone is its top third; a villager, an NPC drawn from a field sprite.
@@ -42,15 +45,27 @@ public sealed class PlacedObjectHitsStackTests
         Assert.Equal([higherLayer, lowerLayer], hits);
     }
 
-    // The roof's zone is drawn over the player's layer, so over the villager, whatever the house's own layer.
+    // The roof's zone is drawn over the villager, but the villager was put on the higher layer (decision 592).
     [Fact]
-    public void AllAt_VillagerOnLayer1UnderAMinus4HousesRoof_HouseFirst()
+    public void AllAt_VillagerOnLayer1UnderAMinus4HousesRoof_VillagerFirst()
     {
         var villager = Placed("villager_1", "villager", 1, 0, z: MapLayers.PlayerZ);
 
         var hits = PlacedObjectHits.AllAt(Layout(_house, villager), new Point2D(1.5, 0.5), _definitions);
 
-        Assert.Equal([_house, villager], hits);
+        Assert.Equal([villager, _house], hits);
+    }
+
+    // On the house's own layer, the roof counts as drawn over what it hides (decision 523): the crate's lower base
+    // alone would put the crate on top.
+    [Fact]
+    public void AllAt_CrateOnTheHousesLayerUnderItsRoof_HouseFirst()
+    {
+        var crate = Placed("crate_1", "crate", 1, 0, z: -4);
+
+        var hits = PlacedObjectHits.AllAt(Layout(_house, crate), new Point2D(1.5, 0.5), _definitions);
+
+        Assert.Equal([_house, crate], hits);
     }
 
     [Fact]

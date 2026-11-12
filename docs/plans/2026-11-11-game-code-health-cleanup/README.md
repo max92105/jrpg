@@ -61,7 +61,7 @@ Sizes are hand-written lines, tests included; "moved" lines are cut and pasted (
 - [x] **GT3. `EventPresenterTests` split: eight stills tests into `EventPresenterStillsTests`** (Game tests, about 100 moved) → [slices/GT3.md](slices/GT3.md)
 
 ### Phase 3: dead code
-- [ ] **GX1. Game dead code with evidence** (Game, size set by the listing; about 40 lines expected) → [slices/GX1.md](slices/GX1.md)
+- [x] **GX1. Game dead code with evidence** (Game, size set by the listing; about 40 lines expected) → [slices/GX1.md](slices/GX1.md)
 
 ### Phase 4: readability
 - [ ] **GR1. The Options page's pips drawn apart; its tests reach rows by name; the backlog closed** (Game, tests, docs, about 60 lines, hand check) → [slices/GR1.md](slices/GR1.md)

@@ -15,6 +15,8 @@ Rule seen at the 2026-11-05 approval: a review that adds features (pickers, prev
 
 2026-11-11: `2026-11-11-code-health-cleanup` (editor + Data) approved (decisions 536-549; V1 is the developer's verify.ps1 edit for 130-column code lines); `2026-11-11-game-code-health-cleanup` approved the same day (decisions 550-558; next free 559), run after the editor/Data one.
 
+2026-11-12: approved `2026-11-12-character-sprites-and-npcs` (decisions 559-579, ADRs 0043-0044: per-image `field-sprites.json`, NPC stays an object, facing derived, a `moveNpc` cutscene step with positions kept for the visit only; idle loops and wandering later) and `2026-11-12-shops-and-enemy-database` (580-591, ADR 0045; runs after the first). Dropped at approval: class/skill editors (balancing stays in JSON; a read-only comparison table first) and the tactics/encounters forms. The player's sheet swap is its own later plan. Next free 592 / 0046. The developer wants the introduction and first main quest line soon.
+
 Direction (decision 234): an investor demo. Later: speed-based turn count (301, with enemy speed), Act 1 content, map banner, autosave, a battle event step (decision 399), gold/inn prices (222), other classes' lasting costs (220), skills for dead stat dimensions (310).
 
 Still-open older questions: 92, 112, 147, 151-155, 179, 180, 182, 183, 208-220, 222, 223, 225-228 (224 answered by the enemy skills plan).

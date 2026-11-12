@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-11-game-code-health-cleanup, slice GR1 (Options pips extraction, text speed tests via PageOn, backlog
-closing pass), 2026-11-12. Round 1. Verdict: ready to commit. No Critical.
+Out-of-plan fix, decision 592 (amends 523; recorded in done/2026-11-10-map-fixes-banner-and-folders README):
+PlacedObjectHits.AllAt ranks by placed Z then draw key; MainViewModel.RefreshLayerEntries unions object Zs.
+2026-11-12. Round 1. Verdict: ready to commit. No Critical, no Warning.
 
-- Warning (open): backlog.md:114 still says `EventPresenter` "at 293 lines"; the file is 294 since FE3 (1d45d193) and
-  design.md's Stays says 294. The slice's "a count that moved is corrected" step missed it, and the Done note says every
-  Stays count matches its file. Fix: 293 -> 294 in the backlog line.
-- GX1 Warning (Done note name-sharing gap): fixed (GX1.md line 34).
-- GX1 Follow-up (eight in-file-only members could be private): dropped, backlog.md lists it.
+- Suggestion (open): "topmost first" wording left in PlacedObjectHits.cs:39 (NextUnder param) and
+  PlacedObjectHitsStackTests.cs:7 (class summary, cites only 523); say "in pick order" / add 592.
+- Suggestion (open): MainViewModel.cs:239-241 two null-propagating `?? []` could be one `CurrentMap is null` guard.
+- GR1 Warning (backlog EventPresenter 293 -> 294): not re-checked, other work; carry only if the next review is GR-plan.

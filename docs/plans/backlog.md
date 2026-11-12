@@ -196,3 +196,9 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - Eight Game members read only inside their own file could be `private`: `TypingTicks.CharactersPerTick`, `OptionsPage.FullScreenRow`, `PromptPlacement.GapAboveObject`, `BattlerScaling.PaintingSize`, `ShatterLayout.RingShareMax`, `ResourceGaugeView.SinceChange`, `TurnOrderStrip.UpcomingCount`, `StatusSheetView.WriteLabel` (the Game cleanup plan's GX1 review).
 - `verify.ps1 -Fix` on a tree that doesn't build lets `dotnet format` delete the toolkit's generator hooks (`partial void On...Changed`) as unused code (the cleanup plan's S5): make `-Fix` refuse to format until a plain build passes, or write the rule in CLAUDE.md (the S5 review).
 - The map-replace expression `MapContent.With` holds (the cleanup plan's X1) is still written out in `ArtReferenceCheckTests`, `AudioReferenceCheckTests` and about 15 Editor, Game and Simulations tests that can't reach the Data.Tests helper: a shared test helper per project, or Core's catalog gaining the one-map replacement (the X1 review).
+
+## From the character sprites and shops plans (2026-11-12, at approval)
+
+- Class and skill balancing stays in `classes.json` and `skills.json`, checked by the startup validation, until their schema settles (the class and skill editors plan was dropped at approval); the first balancing tool worth building is a read-only side-by-side table of skills and classes (and enemies), not per-record forms.
+- Replacing the player's field sprite with a bought sheet: its own plan, done with help (the character sprites plan only moves the player's drawing to its `field-sprites.json` record with today's numbers).
+- A cutscene-moved NPC sorts against the player by its placed row (`MapDrawOrder` keys objects on `PlacedObject.Position`): a position lookup into the shared draw order, with the wandering NPCs plan.

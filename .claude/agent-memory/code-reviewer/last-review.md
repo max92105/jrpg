@@ -5,10 +5,9 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-11-game-code-health-cleanup, slice GB2 (footer hint drawn before the page, decision 554), 2026-11-12.
+Plan 2026-11-11-game-code-health-cleanup, slice GB3 (UI art check compares exact file names, decision 555), 2026-11-12.
 Round 1. Verdict: ready to commit. No findings.
 
-- Verified: pages draw within PageArea (32 px gap above the footer) or MenuLayout.FullHeight (stops at the footer's
-  top); only ConfirmPromptView:61 and NoticeDialogView:57 cover the full screen. Hint keeps the menu's `opacity`.
-- GB1 Warning (InventoryColumnView `_categories` re-derivation): fixed (line 68 reads `place.Rail.Category`).
-- GB1 Suggestion (map.md `ShowsCounts`): fixed (map.md:70).
+- Verified: the theory matches UiSoundFilesTests (same comment, ordinal set, same message); backlog P1 line removed.
+- Remaining File.Exists calls in tests check files the test itself wrote in a temp copy (rename, save slot),
+  not repository names: outside decision 555.

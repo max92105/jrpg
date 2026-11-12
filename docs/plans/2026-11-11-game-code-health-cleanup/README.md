@@ -54,7 +54,7 @@ Sizes are hand-written lines, tests included; "moved" lines are cut and pasted (
 - [x] **GB3. The UI art check compares exact file names** (Game tests, about 15 lines) → [slices/GB3.md](slices/GB3.md)
 
 ### Phase 2: splits and test duplicates
-- [ ] **GS1. Moves only: `MessageIds` in partial files by feature** (Game, about 770 lines moved, about 30 new) → [slices/GS1.md](slices/GS1.md)
+- [x] **GS1. Moves only: `MessageIds` in partial files by feature** (Game, about 770 lines moved, about 30 new) → [slices/GS1.md](slices/GS1.md)
 - [ ] **GT1. `GameFlowTests` split: the new game's tests into `GameFlowNewGameTests`** (Game tests, about 110 moved) → [slices/GT1.md](slices/GT1.md)
 - [ ] **GT2. `CommandMenuTests` split by menu entry over a `CommandMenuDriver`** (Game tests, about 50 new, 170 moved) → [slices/GT2.md](slices/GT2.md)
 - [ ] **GD1. One `EventPresenters.Over` builder for the 20 hand-built presenters** (Game tests, about 60 lines) → [slices/GD1.md](slices/GD1.md)

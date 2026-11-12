@@ -12,7 +12,7 @@ public sealed class RepositoryForgeTests
     [Fact]
     public void StartMap_HasAnInteractEventOpeningTheForge()
     {
-        var events = _catalog.Maps["start"].Layout.Objects.SelectMany(placed => placed.Events);
+        var events = _catalog.Maps["milestone"].Layout.Objects.SelectMany(placed => placed.Events);
 
         Assert.Contains(events, mapEvent => mapEvent.Activation == EventActivation.Interact && mapEvent.Steps.Any(step => step is OpenForgeStep));
     }

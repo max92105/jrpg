@@ -17,7 +17,7 @@ public sealed class ContentCatalogLoaderTests
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-        var steps = catalog.Maps["start"].Layout.Objects.SelectMany(placed => placed.Events).SelectMany(mapEvent => mapEvent.Steps);
+        var steps = catalog.Maps["milestone"].Layout.Objects.SelectMany(placed => placed.Events).SelectMany(mapEvent => mapEvent.Steps);
         Assert.Contains(steps, step => step is RestStep);
     }
 
@@ -93,28 +93,28 @@ public sealed class ContentCatalogLoaderTests
     }
 
     [Fact]
-    public void Load_RepositoryContent_OnlyTheForestHasRandomBattles()
+    public void Load_RepositoryContent_OnlyMilestoneOutsideHasRandomBattles()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-        var forestBattles = catalog.Maps["forest"].Settings.RandomEncounters;
+        var outsideBattles = catalog.Maps["milestone_outside"].Settings.RandomEncounters;
 
-        Assert.Contains("goblin_trio", forestBattles?.EncounterIds ?? []);
-        Assert.Null(catalog.Maps["start"].Settings.RandomEncounters);
-        Assert.Null(catalog.Maps["interior_1"].Settings.RandomEncounters);
+        Assert.Contains("goblin_trio", outsideBattles?.EncounterIds ?? []);
+        Assert.Null(catalog.Maps["milestone"].Settings.RandomEncounters);
+        Assert.Null(catalog.Maps["proud_iron"].Settings.RandomEncounters);
     }
 
     // Armor penetration only shows against a positive physical resistance, so one must be met in play (decision 363).
     [Fact]
-    public void Load_RepositoryContent_ForestRollsAnEnemyWithAPhysicalResistance()
+    public void Load_RepositoryContent_MilestoneOutsideRollsAnEnemyWithAPhysicalResistance()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-        var forestEnemies = catalog.Maps["forest"].Settings.RandomEncounters!.EncounterIds
+        var outsideEnemies = catalog.Maps["milestone_outside"].Settings.RandomEncounters!.EncounterIds
             .SelectMany(id => catalog.Encounters[id].EnemyIds)
             .Select(id => catalog.Enemies[id].Resistances);
 
-        Assert.Contains(forestEnemies, resistances => resistances.Blunt > 0 || resistances.Piercing > 0 || resistances.Slashing > 0);
+        Assert.Contains(outsideEnemies, resistances => resistances.Blunt > 0 || resistances.Piercing > 0 || resistances.Slashing > 0);
     }
 
     [Fact]

@@ -13,7 +13,7 @@ public sealed class RepositoryShopTests
     [Fact]
     public void InteriorMap_HasAnInteractEventOpeningTheGeneralStore()
     {
-        var events = _catalog.Maps["interior_1"].Layout.Objects.SelectMany(placed => placed.Events);
+        var events = _catalog.Maps["proud_iron"].Layout.Objects.SelectMany(placed => placed.Events);
 
         Assert.Contains(events, mapEvent => mapEvent.Activation == EventActivation.Interact && mapEvent.Steps.Any(step => step is OpenShopStep { ShopId: "general_store" }));
     }

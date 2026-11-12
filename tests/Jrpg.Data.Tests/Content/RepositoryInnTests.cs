@@ -13,7 +13,7 @@ public sealed class RepositoryInnTests
     [Fact]
     public void StartMap_Innkeeper_ChargesForRest()
     {
-        var innkeeper = _catalog.Maps["start"].Layout.Objects.Single(placed => placed.Uid == "innkeeper");
+        var innkeeper = _catalog.Maps["milestone"].Layout.Objects.Single(placed => placed.Uid == "innkeeper");
 
         var rest = Assert.Single(innkeeper.Events.SelectMany(mapEvent => mapEvent.Steps).OfType<RestStep>());
         Assert.NotNull(rest.Price);

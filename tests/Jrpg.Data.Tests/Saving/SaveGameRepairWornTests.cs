@@ -54,7 +54,7 @@ public sealed class SaveGameRepairWornTests
         Quests = [],
         SavedAt = new DateTimeOffset(2026, 10, 27, 12, 0, 0, TimeSpan.Zero),
         PlayTime = TimeSpan.FromMinutes(30),
-        Location = new MapLocation("start", new Point2D(10, 3), Facing.Down),
+        Location = new MapLocation("milestone", new Point2D(10, 3), Facing.Down),
         Members = [new PartyMemberProgress("sarxian", Level: 3, Experience: 0, Hp: 100, worn, new Dictionary<string, int>())],
         ActiveMemberIds = ["sarxian"],
         Inventory = [],

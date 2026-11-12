@@ -14,7 +14,7 @@ public sealed class RepositoryQuestTests
     [Fact]
     public void StartMap_QuestGiverStartsThePlaceholderErrand()
     {
-        var giver = _catalog.Maps["start"].Layout.Objects.Single(placed => placed.Uid == "quest_giver");
+        var giver = _catalog.Maps["milestone"].Layout.Objects.Single(placed => placed.Uid == "quest_giver");
 
         var starting = Assert.Single(giver.Events, mapEvent => mapEvent.Steps.Any(step => step is StartQuestStep { QuestId: "placeholder_errand" }));
         Assert.Equal(new QuestCondition("placeholder_errand", QuestConditionKind.NotStarted), starting.OnlyWhenQuest);
@@ -27,7 +27,7 @@ public sealed class RepositoryQuestTests
     [Fact]
     public void StartMap_QuestGiverCompletesBeforeReminding()
     {
-        var events = _catalog.Maps["start"].Layout.Objects.Single(placed => placed.Uid == "quest_giver").Events;
+        var events = _catalog.Maps["milestone"].Layout.Objects.Single(placed => placed.Uid == "quest_giver").Events;
 
         var completing = events.ToList().FindIndex(mapEvent => mapEvent.OnlyWhenQuest is { Kind: QuestConditionKind.ReachedStage });
         var reminding = events.ToList().FindIndex(mapEvent => mapEvent.OnlyWhenQuest is { Kind: QuestConditionKind.Active });
@@ -37,7 +37,7 @@ public sealed class RepositoryQuestTests
     [Fact]
     public void StartMap_InnkeeperAdvancesTheErrandOnlyAtAskInnkeeper()
     {
-        var innkeeper = _catalog.Maps["start"].Layout.Objects.Single(placed => placed.Uid == "innkeeper");
+        var innkeeper = _catalog.Maps["milestone"].Layout.Objects.Single(placed => placed.Uid == "innkeeper");
 
         var advancing = Assert.Single(innkeeper.Events, mapEvent => mapEvent.Steps.Any(step => step is AdvanceQuestStep));
         Assert.Equal(new QuestCondition("placeholder_errand", QuestConditionKind.AtStage, "ask_innkeeper"), advancing.OnlyWhenQuest);

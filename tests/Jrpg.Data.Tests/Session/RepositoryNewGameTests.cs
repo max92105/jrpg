@@ -40,7 +40,7 @@ public sealed class RepositoryNewGameTests
     public void StartMap_RepositoryContent_OffersEveryCharacterToRecruit()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
-        var recruitSteps = catalog.Maps["start"].Layout.Objects
+        var recruitSteps = catalog.Maps["milestone"].Layout.Objects
             .SelectMany(placed => placed.Events)
             .SelectMany(mapEvent => mapEvent.Steps)
             .OfType<RecruitStep>()
@@ -96,7 +96,7 @@ public sealed class RepositoryNewGameTests
 
         var introsPerLeader = catalog.NewGame.LeaderChoices.Select(choice => IntrosOf(catalog, choice.MemberId));
 
-        Assert.All(introsPerLeader, intros => Assert.Equal("start", Assert.IsType<WarpStep>(Assert.Single(intros).Steps[^1]).MapId));
+        Assert.All(introsPerLeader, intros => Assert.Equal("milestone", Assert.IsType<WarpStep>(Assert.Single(intros).Steps[^1]).MapId));
     }
 
     [Fact]
@@ -110,7 +110,7 @@ public sealed class RepositoryNewGameTests
         exploration.ContinueEvent();
 
         Assert.False(exploration.IsEventRunning);
-        Assert.Equal(new MapLocation("start", warp.Cell.Center, Facing.Down), exploration.Location);
+        Assert.Equal(new MapLocation("milestone", warp.Cell.Center, Facing.Down), exploration.Location);
     }
 
     // A door is a placed object's event; an interior has no random battles. Nothing else tells an interior apart.
@@ -119,9 +119,9 @@ public sealed class RepositoryNewGameTests
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-        var warps = catalog.Maps["start"].Layout.Objects.SelectMany(placed => placed.Events).SelectMany(mapEvent => mapEvent.Steps).OfType<WarpStep>();
+        var warps = catalog.Maps["milestone"].Layout.Objects.SelectMany(placed => placed.Events).SelectMany(mapEvent => mapEvent.Steps).OfType<WarpStep>();
 
-        Assert.Contains(warps, warp => warp.MapId != "start" && catalog.Maps[warp.MapId].Settings.RandomEncounters is null);
+        Assert.Contains(warps, warp => warp.MapId != "milestone" && catalog.Maps[warp.MapId].Settings.RandomEncounters is null);
     }
 
     // An edge exit is a cell the player walks onto; the wild beyond it rolls random battles.
@@ -130,7 +130,7 @@ public sealed class RepositoryNewGameTests
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-        var warps = catalog.Maps["start"].Layout.CellEvents.SelectMany(cellEvent => cellEvent.Event.Steps).OfType<WarpStep>();
+        var warps = catalog.Maps["milestone"].Layout.CellEvents.SelectMany(cellEvent => cellEvent.Event.Steps).OfType<WarpStep>();
 
         Assert.Contains(warps, warp => catalog.Maps[warp.MapId].Settings.RandomEncounters is not null);
     }

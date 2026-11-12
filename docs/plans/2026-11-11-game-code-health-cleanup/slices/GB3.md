@@ -14,3 +14,5 @@ The changed theory. To show it can fail (decision 538): change one `UiArtFiles` 
 
 ## Verify by hand
 None.
+
+- **Done:** as planned; the folder's names in a set compared with `StringComparer.Ordinal`, the comment as the sound test's. With `UiArtFiles.Backgrounds.Menu` as "gamemenu.png" for one run, the theory failed naming the file ("content/art/backgrounds has no 'gamemenu.png'."), where `File.Exists` passed it; restored, it passes. The runner's total is 4610 before and after. The P1 line went.

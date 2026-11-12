@@ -8,6 +8,7 @@ public sealed class UiArtFilesTests
 {
     private static readonly string _artRoot = ArtFolders.RootIn(Path.Combine(AppContext.BaseDirectory, "content"));
 
+    // Compared with the folder's list, since File.Exists ignores case on Windows and the release may not.
     [Theory]
     [InlineData(typeof(UiArtFiles.Backgrounds), ArtFolders.Backgrounds)]
     [InlineData(typeof(UiArtFiles.Icons), ArtFolders.Icons)]
@@ -17,9 +18,10 @@ public sealed class UiArtFilesTests
             .Where(field => field.IsLiteral)
             .Select(field => (string)field.GetRawConstantValue()!)
             .ToList();
+        var present = Directory.GetFiles(Path.Combine(_artRoot, folder)).Select(Path.GetFileName).ToHashSet(StringComparer.Ordinal);
 
         Assert.NotEmpty(files);
-        Assert.All(files, file => Assert.True(File.Exists(Path.Combine(_artRoot, folder, file)), $"content/art/{folder} has no '{file}'."));
+        Assert.All(files, file => Assert.True(present.Contains(file), $"content/art/{folder} has no '{file}'."));
     }
 
     [Fact]

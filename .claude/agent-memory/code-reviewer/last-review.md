@@ -5,11 +5,13 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-11-code-health-cleanup, slice D2 (the writer tests copy content through `CopiedContentRoot`),
-2026-11-11. Round 1. Verdict: ready to commit. No findings.
+Plan 2026-11-11-code-health-cleanup, slice R1 (Shell: the folder rename's write extracted; the composer's
+ruled-out states thrown), 2026-11-12. Round 1. Verdict: ready to commit.
 
-- Verified: `CopiedContentRoot` ctor runs the same loop as the deleted `CopyFolder` and inline loop ("*", all
-  directories, relative layout kept, same `jrpg-<purpose>-<guid>` temp name); every `_contentRoot` use maps 1:1.
-- Verified: backlog claims hold (loader shop/crafting tests copy only `*.json`; `EditorTestContent` in Editor.Tests).
-- D1 items: `new SheetCell(tile...` follow-up fixed (no match left in tests); `_enumNaming` comment suggestion
-  dropped with D1's commit.
+- Suggestion (open): `StartObjectFromMap` summary "so no shown map is a state this reaches" reads both ways; say
+  "so it is reached with no map shown, and returns null then".
+- Suggestion (open): `ErasedOn` merged its two `Where`s into one `&&`; the slice only asked to name the canvas cell.
+- Verified: TryRenameFolder effects order kept (MovedMaps pure, so computing it after `SaveError = null` is
+  harmless); KeptTile/IsKept/Moved build the same values; the `!` reads NRE before `map.Do` (catalog step already
+  applied, as before); all three TryWriteMovedMaps branches tested (empty session folder, two maps, write refused).
+- D2: no findings, nothing carried.

@@ -70,8 +70,8 @@ Phase 3 needs FS3; MV2 needs NB1 (the view's NPC lookup); MV3's hand check needs
 One line per slice; each slice's goal, types, tests and hand checks are in its file under `slices/`. Tick the box when a slice is done and write its deviations in the slice file. Tunables, design overview and risks: [design.md](design.md).
 
 ### Phase 1: sheets as content
-- [ ] ADR 0043: field sprite sheets as content (amends ADR 0015). Write it from the entry under "ADRs" below (decisions 560-567).
-- [ ] **FS1. Field sprite sheets load from `field-sprites.json`: `FieldSpriteSheet`, `FacingRows`, `FacingCycle`; every named sprite needs a record; the test world freezes its copy** (Core + Data + content, about 260 lines) → [slices/FS1.md](slices/FS1.md)
+- [x] ADR 0043: field sprite sheets as content (amends ADR 0015). Write it from the entry under "ADRs" below (decisions 560-567).
+- [x] **FS1. Field sprite sheets load from `field-sprites.json`: `FieldSpriteSheet`, `FacingRows`, `FacingCycle`; every named sprite needs a record; the test world freezes its copy** (Core + Data + content, about 260 lines) → [slices/FS1.md](slices/FS1.md)
 - [ ] **FS2. The startup art check reads each sheet's own layout** (Core + Data, about 180 lines) → [slices/FS2.md](slices/FS2.md)
 - [ ] **FS3. The game draws the player and NPCs from their records, scaled and standing on their cell; the player unchanged** (Core + Game, about 250 lines) → [slices/FS3.md](slices/FS3.md)
 - [ ] **FS4. The interaction prompt clears a tall NPC's head: one object screen area for the view and the prompt** (Game, about 140 lines) → [slices/FS4.md](slices/FS4.md)

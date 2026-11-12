@@ -29,3 +29,5 @@ Every field sprite image the content names has a layout record in `content/field
 
 ## Verify by hand
 None: nothing is drawn from the records yet. `dotnet run --project src/Jrpg.Game` starts as before.
+
+- **Done, with deviations:** `ContentFileReader` now reports a missing content file as a content problem ("field-sprites.json: the file is missing.") instead of a bare `FileNotFoundException`, so the start names the file; the loader tests copy the test world, the repository load reads `content` directly.

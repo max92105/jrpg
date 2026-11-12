@@ -13,6 +13,10 @@ internal static class ContentFileReader
             return JsonSerializer.Deserialize<T>(stream, ContentJsonOptions.Strict)
                 ?? throw new ContentValidationException($"{fileName}: the file holds null instead of content.");
         }
+        catch (FileNotFoundException exception)
+        {
+            throw new ContentValidationException($"{fileName}: the file is missing.", exception);
+        }
         catch (JsonException exception)
         {
             var location = exception.Path is null ? fileName : $"{fileName} at {exception.Path}";

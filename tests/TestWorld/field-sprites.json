@@ -1,0 +1,38 @@
+[
+  {
+    "file": "npc_placeholder.png",
+    "frameWidth": 48,
+    "frameHeight": 48,
+    "scale": 1,
+    "walk": {
+      "rows": {
+        "down": 0,
+        "up": 3,
+        "left": 1,
+        "right": 2
+      },
+      "frames": {
+        "frameCount": 8,
+        "frameMilliseconds": 100
+      }
+    }
+  },
+  {
+    "file": "player.png",
+    "frameWidth": 48,
+    "frameHeight": 48,
+    "scale": 1,
+    "walk": {
+      "rows": {
+        "down": 0,
+        "up": 3,
+        "left": 1,
+        "right": 2
+      },
+      "frames": {
+        "frameCount": 8,
+        "frameMilliseconds": 100
+      }
+    }
+  }
+]

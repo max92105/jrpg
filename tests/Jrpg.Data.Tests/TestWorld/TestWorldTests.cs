@@ -28,6 +28,18 @@ public sealed class TestWorldTests
         Assert.Empty(ArtReferenceCheck.FindProblems(catalog, ArtFolders.RootIn(_testWorldRoot)));
     }
 
+    // The frozen copy of field-sprites.json (ADR 0043) must list every sprite the frozen objects and new game name.
+    [Fact]
+    public void Load_TestWorld_FieldSpritesListEveryNamedSprite()
+    {
+        var catalog = ContentCatalogLoader.Load(_testWorldRoot);
+
+        var objectSprites = catalog.Objects.Values.Select(definition => definition.FieldSpriteFile).OfType<string>();
+        var named = objectSprites.Append(catalog.NewGame.FieldSpriteFile);
+
+        Assert.Equal(named.Distinct().Order(), catalog.FieldSprites.Keys.Order());
+    }
+
     [Fact]
     public void TestWorld_TilesheetFolder_HoldsTheUnsetUpImage()
     {

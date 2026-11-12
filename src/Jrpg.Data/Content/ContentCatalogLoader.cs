@@ -7,6 +7,7 @@ using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Quests;
 using Jrpg.Core.Skills;
+using Jrpg.Core.Sprites;
 using Jrpg.Core.Trade;
 using Jrpg.Data.Battle;
 using Jrpg.Data.Crafting;
@@ -16,6 +17,7 @@ using Jrpg.Data.Maps;
 using Jrpg.Data.Party;
 using Jrpg.Data.Quests;
 using Jrpg.Data.Skills;
+using Jrpg.Data.Sprites;
 using Jrpg.Data.Trade;
 
 namespace Jrpg.Data.Content;
@@ -38,6 +40,7 @@ public static class ContentCatalogLoader
     internal const string TilesheetsFile = "tilesheets.json";
     internal const string TilesFile = "tiles.json";
     internal const string ObjectsFile = "objects.json";
+    internal const string FieldSpritesFile = "field-sprites.json";
 
     /// <summary>Loads and validates every content file under <paramref name="contentRoot"/>, referenced files first.</summary>
     /// <exception cref="ContentValidationException">A file is malformed or breaks a content rule.</exception>
@@ -80,6 +83,9 @@ public static class ContentCatalogLoader
         var objects = ReadValidated<IReadOnlyList<ObjectDefinition>>(
             contentRoot, ObjectsFile, (file, list) => ObjectCatalogValidator.Validate(file, list, tileIds));
         var objectsById = objects.ToFrozenDictionary(definition => definition.Id);
+        var fieldSprites = ReadValidated<IReadOnlyList<FieldSpriteSheet>>(
+            contentRoot, FieldSpritesFile, FieldSpriteCatalogValidator.Validate);
+        var fieldSpritesByFile = fieldSprites.ToFrozenDictionary(sheet => sheet.File, StringComparer.Ordinal);
         var mapContent = new MapContentReferences(
             tileIds,
             objectsById,
@@ -96,6 +102,7 @@ public static class ContentCatalogLoader
             members.Select(member => member.Id).ToFrozenSet(), itemsById, mapsById);
         var newGame = ReadValidated<NewGameDefinition>(
             contentRoot, NewGameFile, (file, definition) => NewGameValidator.Validate(file, definition, newGameReferences));
+        FieldSpriteReferenceCheck.Check(FieldSpritesFile, fieldSpritesByFile, objects, newGame);
 
         return new ContentCatalog
         {
@@ -117,6 +124,7 @@ public static class ContentCatalogLoader
             DropTables = dropTables.ToFrozenDictionary(table => table.Id),
             Shops = shops.ToFrozenDictionary(shop => shop.Id),
             Quests = questsById,
+            FieldSprites = fieldSpritesByFile,
         };
     }
 

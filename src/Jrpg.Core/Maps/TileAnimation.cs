@@ -2,7 +2,7 @@ namespace Jrpg.Core.Maps;
 
 /// <summary>
 /// A tile's animation as content (ADR 0039): how many frames run rightward from the tile's own cell on its sheet's row,
-/// and the time each frame shows.
+/// and the time each frame shows. A field sprite's walk is the same shape, from column 0 of a facing's row (ADR 0043).
 /// </summary>
 public sealed record TileAnimation
 {

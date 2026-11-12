@@ -5,6 +5,7 @@ using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Quests;
 using Jrpg.Core.Skills;
+using Jrpg.Core.Sprites;
 using Jrpg.Core.Trade;
 
 namespace Jrpg.Core.Content;
@@ -47,6 +48,12 @@ public sealed record ContentCatalog
 
     /// <summary>The quests the steps and conditions name, by id (ADR 0032).</summary>
     public required IReadOnlyDictionary<string, QuestDefinition> Quests { get; init; }
+
+    /// <summary>
+    /// Every field sprite image's layout by file name, exact case (ADR 0043); empty until content lists them.
+    /// </summary>
+    public IReadOnlyDictionary<string, FieldSpriteSheet> FieldSprites { get; init; } =
+        new Dictionary<string, FieldSpriteSheet>(StringComparer.Ordinal);
 
     /// <summary>The class that gives a member their numbers at their level (ADR 0017).</summary>
     public ClassDefinition ClassOf(PartyMemberDefinition member) => Classes[member.ClassId];

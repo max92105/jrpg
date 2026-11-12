@@ -1,8 +1,9 @@
 # The test world
 
 The map side of the content as it was on 2026-11-03, frozen for the tests (ADR 0037): the five maps (`maps/`,
-`map-layouts/`), `tiles.json`, `tilesheets.json`, `objects.json`, `new-game.json` and the tilesheet images they name,
-plus `Grass3.png`, an image no sheet is set up on, which the editor tests open.
+`map-layouts/`), `tiles.json`, `tilesheets.json`, `objects.json`, `new-game.json`, `field-sprites.json` (the layouts of
+the two field sprites the frozen objects and new game name, ADR 0043) and the tilesheet images they name, plus
+`Grass3.png`, an image no sheet is set up on, which the editor tests open.
 
 `TestWorld.props`, imported by every test project but Core's, lays the live `content/` without those files, then this
 folder, into `test-world/` in the test output. A test that walks a map, reads a tile, a sheet, an object or a tilesheet

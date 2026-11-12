@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization.Metadata;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Sprites;
 
 namespace Jrpg.Data.Content;
 
@@ -13,6 +14,8 @@ internal static class AbsentWhenZeroFilter
     [
         // ADR 0040: only stacked tiles have a level above the base.
         (typeof(ObjectTile), "level"),
+        // ADR 0043: most sheets stand on the frame's bottom edge.
+        (typeof(FieldSpriteSheet), "feetPixels"),
     ];
 
     public static void SkipZeroOptionalFields(JsonTypeInfo typeInfo) => OptionalFieldFilter.SkipWhen(typeInfo, _addedLater, value => value is 0);

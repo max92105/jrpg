@@ -29,8 +29,8 @@ public sealed record ObjectDefinition
     public required IReadOnlyList<ObjectTile> Tiles { get; init; }
 
     /// <summary>
-    /// The field sprite an NPC is drawn from instead of tiles (ADR 0015), a file in the field-sprite art folder laid out
-    /// like the player's; null for an object drawn from <see cref="Tiles"/>.
+    /// The field sprite an NPC is drawn from instead of tiles (ADR 0015), a file in the field-sprite art folder with
+    /// its layout record in <c>field-sprites.json</c> (ADR 0043); null for an object drawn from <see cref="Tiles"/>.
     /// </summary>
     public string? FieldSpriteFile { get; init; }
 

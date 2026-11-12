@@ -75,7 +75,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **FS2. The startup art check reads each sheet's own layout** (Core + Data, about 180 lines) → [slices/FS2.md](slices/FS2.md)
 - [x] **FS3. The game draws the player and NPCs from their records, scaled and standing on their cell; the player unchanged** (Core + Game, about 250 lines) → [slices/FS3.md](slices/FS3.md)
 - [x] **FS4. The interaction prompt clears a tall NPC's head: one object screen area for the view and the prompt** (Game, about 140 lines) → [slices/FS4.md](slices/FS4.md)
-- [ ] **FS5. The editor draws NPCs from their records; `FieldSpriteLayout` deleted** (Editor + Data, about 170 lines) → [slices/FS5.md](slices/FS5.md)
+- [x] **FS5. The editor draws NPCs from their records; `FieldSpriteLayout` deleted** (Editor + Data, about 170 lines) → [slices/FS5.md](slices/FS5.md)
 
 ### Phase 2: set up in the editor
 - [ ] **CW1. A save writes only the catalog files that changed, and refuses one edited on disk since the editor read it (`CatalogFileStamps`)** (Data + Editor, about 240 lines) → [slices/CW1.md](slices/CW1.md)

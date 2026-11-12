@@ -58,7 +58,8 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
     }
 
     /// <summary>
-    /// One object on its own, at the map's scale, its tiles' first frames: the placing ghost and the Shapes window.
+    /// One object on its own in its cells' box, at the map's scale, its tiles' first frames (an NPC's frame shrunk to
+    /// fit the box when taller): the placing ghost and the Shapes window.
     /// </summary>
     public DrawingImage DrawObject(ObjectDefinition definition) => DrawObject(definition, TimeSpan.Zero);
 
@@ -73,7 +74,14 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
         using (var context = drawing.Open())
         {
             context.DrawRectangle(Brushes.Transparent, null, area);
-            DrawObjectAt(context, definition, new Point2D(0, 0), tileId => tileImages.TileImageAt(tileId, elapsed));
+            if (definition.FieldSpriteFile is { } spriteFile)
+            {
+                context.DrawImage(tileImages.FieldSpriteFrameOf(spriteFile), FittedSpriteArea(definition, spriteFile, area));
+            }
+            else
+            {
+                DrawTilesAt(context, definition, new Point2D(0, 0), tileId => tileImages.TileImageAt(tileId, elapsed));
+            }
         }
 
         var image = new DrawingImage(drawing);
@@ -154,25 +162,53 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
         }
     }
 
-    private void DrawObject(DrawingContext context, PlacedObject placed) =>
-        DrawObjectAt(context, catalog.Current.Objects[placed.ObjectId], placed.Position, tileImages.TileImageOf);
-
-    // An NPC stands still facing down over its cells, as in the game (ADR 0015); other objects are drawn from their tiles.
-    private void DrawObjectAt(DrawingContext context, ObjectDefinition definition, Point2D topLeft, Func<int, ImageSource> tileImageOf)
+    // An NPC stands still facing down (decision 128) on its sheet's frame over its cell, as in the game (ADR 0043), or
+    // the mark over its cells while its sheet has no record; other objects are drawn from their tiles.
+    private void DrawObject(DrawingContext context, PlacedObject placed)
     {
+        var definition = catalog.Current.Objects[placed.ObjectId];
         if (definition.FieldSpriteFile is { } spriteFile)
         {
-            var areaTopLeft = new Point(topLeft.X * CellPixels, topLeft.Y * CellPixels);
-            var areaSize = new Size(definition.Width * CellPixels, definition.Height * CellPixels);
-            context.DrawImage(tileImages.FieldSpriteFrameOf(spriteFile), new Rect(areaTopLeft, areaSize));
+            context.DrawImage(tileImages.FieldSpriteFrameOf(spriteFile), SpriteAreaOf(definition, spriteFile, placed.Position));
             return;
         }
 
-        // Listed bottom level first (ADR 0040): drawing the list in order draws each stack.
+        DrawTilesAt(context, definition, placed.Position, tileImages.TileImageOf);
+    }
+
+    // Listed bottom level first (ADR 0040): drawing the list in order draws each stack.
+    private static void DrawTilesAt(
+        DrawingContext context, ObjectDefinition definition, Point2D topLeft, Func<int, ImageSource> tileImageOf)
+    {
         foreach (var tile in definition.Tiles)
         {
             context.DrawImage(tileImageOf(tile.TileId), CellRect(topLeft.X + tile.X, topLeft.Y + tile.Y));
         }
+    }
+
+    // The picture of an NPC on its own is its cells' box, where the ghost and the Shapes window put the object: a frame
+    // taller than the cell is shrunk to fit it, standing on the box's bottom, so the outline keeps its place.
+    private Rect FittedSpriteArea(ObjectDefinition definition, string spriteFile, Rect box)
+    {
+        var full = SpriteAreaOf(definition, spriteFile, new Point2D(0, 0));
+        var scale = Math.Min(1, Math.Min(box.Width / full.Width, box.Height / full.Height));
+        var width = full.Width * scale;
+        var height = full.Height * scale;
+        return new Rect(box.X + ((box.Width - width) / 2), box.Bottom - height, width, height);
+    }
+
+    // The sheet's area over the cell (FieldSpriteSheet.AreaOver), as the game draws it; without a record, the cells.
+    private Rect SpriteAreaOf(ObjectDefinition definition, string spriteFile, Point2D topLeft)
+    {
+        var cellLeft = topLeft.X * CellPixels;
+        var cellTop = topLeft.Y * CellPixels;
+        if (!catalog.Current.FieldSprites.TryGetValue(spriteFile, out var sheet))
+        {
+            return new Rect(cellLeft, cellTop, definition.Width * CellPixels, definition.Height * CellPixels);
+        }
+
+        var over = sheet.AreaOver((int)CellPixels);
+        return new Rect(cellLeft + over.Left, cellTop + over.Top, over.Width, over.Height);
     }
 
     private void DrawCanopy(DrawingContext context, PlacedObject placed)

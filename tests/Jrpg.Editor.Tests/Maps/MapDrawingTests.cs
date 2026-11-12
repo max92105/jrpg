@@ -1,6 +1,8 @@
+using System.Windows;
 using System.Windows.Media;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Sprites;
 using Jrpg.Data.Art;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
@@ -76,6 +78,51 @@ public sealed class MapDrawingTests
     [Fact]
     public void IsAnimated_StillObject_IsFalse() =>
         Assert.False(_drawing.IsAnimated(OneTileObject(_draft.Current.Tiles.Values.First(tile => tile.Animation is null).Id)));
+
+    // The map draws an NPC as the game does (ADR 0043): a 32 px frame at scale 3 on the cell at (1, 1) covers 96 px
+    // from 24 px above the map's top, standing on the cell's bottom edge.
+    [Fact]
+    public void Draw_PlacedNpc_DrawsItsFrameOverItsArea()
+    {
+        var (drawing, villager) = TallVillagerDrawing();
+        var layout = new MapLayout
+        {
+            Id = "test_map",
+            Width = 3,
+            Height = 3,
+            Layers = [],
+            Objects = [new PlacedObject { Uid = "villager_1", ObjectId = villager.Id, Position = new Point2D(1, 1), Z = 1 }],
+        };
+
+        var drawn = (DrawingGroup)drawing.Draw(layout, focusZ: null).Drawing;
+
+        var frame = Assert.Single(drawn.Children.OfType<ImageDrawing>());
+        Assert.Equal(new Rect(24, 0, 96, 96), frame.Rect);
+    }
+
+    // On its own (the ghost, the preview, the Shapes window) the frame is shrunk into the cells' box.
+    [Fact]
+    public void DrawObject_TallNpc_FitsItsFrameInTheCell()
+    {
+        var (drawing, villager) = TallVillagerDrawing();
+
+        var drawn = (DrawingGroup)drawing.DrawObject(villager).Drawing;
+
+        var frame = Assert.Single(drawn.Children.OfType<ImageDrawing>());
+        Assert.Equal(new Rect(0, 0, 48, 48), frame.Rect);
+    }
+
+    // The test world's villager with its placeholder sprite's record changed to a bought sheet's shape.
+    private static (MapDrawing Drawing, ObjectDefinition Villager) TallVillagerDrawing()
+    {
+        var catalog = ContentCatalogLoader.Load(_root);
+        var sheet = catalog.FieldSprites["npc_placeholder.png"] with { FrameWidth = 32, FrameHeight = 32, Scale = 3 };
+        var sheets = new Dictionary<string, FieldSpriteSheet>(catalog.FieldSprites, StringComparer.Ordinal);
+        sheets[sheet.File] = sheet;
+        var draft = new CatalogDraft(catalog with { FieldSprites = sheets });
+        var images = new TileImages(draft, ArtFolders.RootIn(_root), () => MissingArt.None);
+        return (new MapDrawing(draft, images), catalog.Objects["villager"]);
+    }
 
     private static ObjectDefinition OneTileObject(int tileId) => new()
     {

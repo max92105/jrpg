@@ -22,3 +22,5 @@ None.
 ## Verify by hand
 1. `dotnet run --project src/Jrpg.Editor`, open the start map: the placeholder NPC looks as before.
 2. With FS3's hand-written bought NPC record: the NPC shows on the map at the game's size, feet on its cell; select it with a click on its feet (its head isn't clickable: design, "Risks"); its Shapes window opens.
+
+- **Done, with deviations:** the picture of an NPC on its own (the ghost, the Objects panel preview, the Shapes window) shrinks a frame taller than the cell into the cells box, standing on its bottom, so the outline and the grid keep their place; the map draws the true area. The crop tests read the placeholder sprite through changed records instead of a test-written PNG (WPF decodes a whole image, the header-only test files would not do).

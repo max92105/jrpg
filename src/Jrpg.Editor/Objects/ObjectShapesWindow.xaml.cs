@@ -44,7 +44,10 @@ internal sealed partial class ObjectShapesWindow : Window
     private Point2D? _rectangleStart;
 
     /// <param name="shapes">The shapes being edited.</param>
-    /// <param name="picture">The object as the map draws it (<see cref="MapDrawing.DrawObject(Core.Maps.ObjectDefinition)"/>).</param>
+    /// <param name="picture">
+    /// The object in its cells' box (<see cref="MapDrawing.DrawObject(Core.Maps.ObjectDefinition)"/>), where the
+    /// outline's coordinates live.
+    /// </param>
     public ObjectShapesWindow(ObjectShapesViewModel shapes, ImageSource picture)
     {
         InitializeComponent();

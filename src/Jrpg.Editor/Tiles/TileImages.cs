@@ -3,7 +3,9 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Jrpg.Core.Content;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Sprites;
 using Jrpg.Data.Art;
 using Jrpg.Editor.Catalogs;
 
@@ -12,8 +14,8 @@ namespace Jrpg.Editor.Tiles;
 /// <summary>
 /// Tilesheet images, the tiles and cells cut from them and NPCs' standing frames, each loaded once and kept for the
 /// editor's lifetime. A tile or cell of a sheet whose image is missing, one past its image's edge, and an NPC without a
-/// sprite draw as <see cref="MissingArtMark"/> (decision 442), never cached, so an import that brings the file back
-/// draws the art.
+/// sprite or a sheet record draw as <see cref="MissingArtMark"/> (decision 442), never cached, so an import that brings
+/// the file back draws the art.
 /// </summary>
 /// <param name="catalog">The tiles, sheets and objects drawn.</param>
 /// <param name="artRoot">The <c>art</c> folder.</param>
@@ -21,7 +23,7 @@ namespace Jrpg.Editor.Tiles;
 internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<MissingArt> missingArt)
 {
     private readonly Dictionary<string, BitmapSource> _sheets = [];
-    private readonly Dictionary<string, ImageSource> _spriteFrames = [];
+    private readonly Dictionary<FieldSpriteSheet, ImageSource> _spriteFrames = [];
 
     // Keyed by the sheet's cut as well as the cell, so a re-cut sheet (another record) is cropped anew (design key decision 3).
     private readonly Dictionary<(TilesheetDefinition Sheet, int Column, int Row), ImageSource> _cells = [];
@@ -97,24 +99,32 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<Miss
         return _animatedTileIds;
     }
 
-    /// <summary>The standing frame an NPC is drawn with (ADR 0015, decision 128): the down row's first frame.</summary>
+    /// <summary>
+    /// The standing frame an NPC is drawn with (decision 128): the down row's first frame as its sheet's record cuts it
+    /// (ADR 0043). The mark for a sprite whose image is missing, one without a record (an object made before its sheet
+    /// was set up) or one whose frame lies past the image's edge; cached by the record, so a changed setup crops anew.
+    /// </summary>
     /// <param name="file">The file name in the field-sprite art folder.</param>
     public ImageSource FieldSpriteFrameOf(string file)
     {
-        if (missingArt().IsSpriteMissing(file))
+        if (missingArt().IsSpriteMissing(file) || !catalog.Current.FieldSprites.TryGetValue(file, out var sheet))
         {
             return MissingArtMark.Picture;
         }
 
-        if (!_spriteFrames.TryGetValue(file, out var frame))
+        if (!_spriteFrames.TryGetValue(sheet, out var frame))
         {
-            // The New NPC dialog can still pick a sprite smaller than a frame (only the game's startup refuses it; the
-            // status band warns), so one is shown whole rather than failing to crop.
             var sprite = LoadImage(ArtFolders.FieldSprites, file);
-            var side = Math.Min(FieldSpriteLayout.FramePixels, Math.Min(sprite.PixelWidth, sprite.PixelHeight));
-            frame = new CroppedBitmap(sprite, new Int32Rect(0, 0, side, side));
+            var cell = sheet.StandingCell(Facing.Down);
+            var area = new Int32Rect(sheet.FrameLeft(cell), sheet.FrameTop(cell), sheet.FrameWidth, sheet.FrameHeight);
+            if (area.X + area.Width > sprite.PixelWidth || area.Y + area.Height > sprite.PixelHeight)
+            {
+                return MissingArtMark.Picture;
+            }
+
+            frame = new CroppedBitmap(sprite, area);
             frame.Freeze();
-            _spriteFrames.Add(file, frame);
+            _spriteFrames.Add(sheet, frame);
         }
 
         return frame;

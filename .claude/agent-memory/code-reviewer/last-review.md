@@ -5,12 +5,10 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-11-game-code-health-cleanup, slice GB1 (no Qty title on the Weapons and Armor tabs), 2026-11-12.
-Round 1. Verdict: ready to commit.
+Plan 2026-11-11-game-code-health-cleanup, slice GB2 (footer hint drawn before the page, decision 554), 2026-11-12.
+Round 1. Verdict: ready to commit. No findings.
 
-- Warning (open): InventoryColumnView.cs:34,52,70 — `_categories[place.Rail.Selected].Category` re-derives
-  `CategoryRail.Category` (CategoryRail.cs:29); drop the field, use `ShowsCounts(place.Rail.Category)`.
-- Suggestion (open): docs/map.md Menus line — `InventoryFilter` entry doesn't mention `ShowsCounts`.
-- Verified: Rail.Selected indexes rail.Tabs (InventoryPage.cs:50 passes `_rail.Tabs`); no per-frame alloc;
-  equipment always goes to Gear (Inventory.Add:27), RowOf(GearPiece) Quantity: null, so Weapons/Armor rows never count.
-- R3 Critical (backlog -Fix line): fixed (backlog.md:206 restored, no duplicate). R3 Suggestion: not carried.
+- Verified: pages draw within PageArea (32 px gap above the footer) or MenuLayout.FullHeight (stops at the footer's
+  top); only ConfirmPromptView:61 and NoticeDialogView:57 cover the full screen. Hint keeps the menu's `opacity`.
+- GB1 Warning (InventoryColumnView `_categories` re-derivation): fixed (line 68 reads `place.Rail.Category`).
+- GB1 Suggestion (map.md `ShowsCounts`): fixed (map.md:70).

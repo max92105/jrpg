@@ -5,10 +5,13 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-12-character-sprites-and-npcs, slice FS1 (field-sprites.json, FieldSpriteSheet/FacingRows/FacingCycle,
-FieldSpriteCatalogValidator, FieldSpriteReferenceCheck, ContentFileReader missing-file message).
-2026-11-12. Round 1. Verdict: ready to commit. No Critical.
+Plan 2026-11-12-character-sprites-and-npcs, slice FS2 (FieldSpriteSheet.ColumnsNeeded/RowsNeeded,
+ArtReferenceCheck.AddSpritesTooSmall, ArtReferenceCheckFieldSpriteTests).
+2026-11-12. Round 1. Verdict: fix the Critical, then commit.
 
-- Warning (open): ContentCatalogLoaderFieldSpriteTests.cs:23-24 pins live content's player numbers (48,48,1,0 / 8,100);
-  ADR 0037 says repository tests pin ids, never cells; move the numbers to the frozen test world or assert ids only.
-- Earlier Suggestions from decision 592 fix (PlacedObjectHits "topmost first" wording, MainViewModel `?? []`): other work, not carried.
+- Critical (open): FieldSpriteSheet.cs:36 RowsNeeded = max row + 1 wraps at row int.MaxValue to int.MinValue, so
+  ArtReferenceCheck.cs:127 holdsRows passes; validator only checks rows >= 0. Fix: long, or compare `> highest row`;
+  add a row-int.MaxValue test (code-quality rule line 57).
+- Warning (open): FieldSpriteLayout.Holds (Data/Art/FieldSpriteLayout.cs:19) has no production caller left, only
+  FieldSpriteLayoutTests; delete both now rather than wait for FS5.
+- FS1 Warning (ContentCatalogLoaderFieldSpriteTests repository numbers): fixed (test world pins them, repository by id).

@@ -5,13 +5,13 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-12-character-sprites-and-npcs, slice FS2 (FieldSpriteSheet.ColumnsNeeded/RowsNeeded,
-ArtReferenceCheck.AddSpritesTooSmall, ArtReferenceCheckFieldSpriteTests).
-2026-11-12. Round 1. Verdict: fix the Critical, then commit.
+Plan 2026-11-12-character-sprites-and-npcs, slice FS3 (SpriteCell, SpriteArea, FieldSpriteSheet StandingCell/
+WalkCellAt/FrameLeft/FrameTop/AreaOver; WalkAnimation.Walked, FieldSpriteFrame.SourceOf(sheet, cell), MapArt
+PlayerSprite/FieldSprites, MapView takes MapArt, ExplorationScene.DrawPlayer).
+2026-11-12. Round 1. Verdict: ready to commit (no Critical, no Warning).
 
-- Critical (open): FieldSpriteSheet.cs:36 RowsNeeded = max row + 1 wraps at row int.MaxValue to int.MinValue, so
-  ArtReferenceCheck.cs:127 holdsRows passes; validator only checks rows >= 0. Fix: long, or compare `> highest row`;
-  add a row-int.MaxValue test (code-quality rule line 57).
-- Warning (open): FieldSpriteLayout.Holds (Data/Art/FieldSpriteLayout.cs:19) has no production caller left, only
-  FieldSpriteLayoutTests; delete both now rather than wait for FS5.
-- FS1 Warning (ContentCatalogLoaderFieldSpriteTests repository numbers): fixed (test world pins them, repository by id).
+- Suggestion (open): MapView.cs:75 `var area = cells;` leftover alias; use one name.
+- Suggestion (open): FieldSpriteLayout.WalkFrames and Rows now unused, summary "The game draws from it" stale (FS5 deletes the type).
+- Suggestion (open): AreaOver odd width: truncation toward zero puts the extra pixel right when narrower, left when wider.
+- Follow-up: ObjectDefinition.cs:31-32 "laid out like the player's" stale since ADR 0043.
+- FS2 Critical (RowsNeeded wrap) and Warning (FieldSpriteLayout.Holds): fixed in 258885f0.

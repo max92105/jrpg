@@ -1,20 +1,13 @@
-using Jrpg.Core.Geometry;
-using Jrpg.Data.Art;
+using Jrpg.Core.Sprites;
 using Microsoft.Xna.Framework;
 
 namespace Jrpg.Game.Exploration;
 
 /// <summary>
-/// Where one frame sits in a field sprite sheet (the player's and NPCs', ADR 0015), laid out as
-/// <see cref="FieldSpriteLayout"/> says: a row per facing and a column per walk frame.
+/// Where one frame sits in a field sprite sheet (the player's and NPCs'), as its record cuts it (ADR 0043).
 /// </summary>
 internal static class FieldSpriteFrame
 {
-    /// <param name="facing">Picks the row (<see cref="WalkAnimation.RowOf"/>).</param>
-    /// <param name="frame">The column, 0 for standing.</param>
-    public static Rectangle SourceOf(Facing facing, int frame)
-    {
-        const int pixels = FieldSpriteLayout.FramePixels;
-        return new(frame * pixels, WalkAnimation.RowOf(facing) * pixels, pixels, pixels);
-    }
+    public static Rectangle SourceOf(FieldSpriteSheet sheet, SpriteCell cell) =>
+        new(sheet.FrameLeft(cell), sheet.FrameTop(cell), sheet.FrameWidth, sheet.FrameHeight);
 }

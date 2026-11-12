@@ -73,7 +73,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] ADR 0043: field sprite sheets as content (amends ADR 0015). Write it from the entry under "ADRs" below (decisions 560-567).
 - [x] **FS1. Field sprite sheets load from `field-sprites.json`: `FieldSpriteSheet`, `FacingRows`, `FacingCycle`; every named sprite needs a record; the test world freezes its copy** (Core + Data + content, about 260 lines) → [slices/FS1.md](slices/FS1.md)
 - [x] **FS2. The startup art check reads each sheet's own layout** (Core + Data, about 180 lines) → [slices/FS2.md](slices/FS2.md)
-- [ ] **FS3. The game draws the player and NPCs from their records, scaled and standing on their cell; the player unchanged** (Core + Game, about 250 lines) → [slices/FS3.md](slices/FS3.md)
+- [x] **FS3. The game draws the player and NPCs from their records, scaled and standing on their cell; the player unchanged** (Core + Game, about 250 lines) → [slices/FS3.md](slices/FS3.md)
 - [ ] **FS4. The interaction prompt clears a tall NPC's head: one object screen area for the view and the prompt** (Game, about 140 lines) → [slices/FS4.md](slices/FS4.md)
 - [ ] **FS5. The editor draws NPCs from their records; `FieldSpriteLayout` deleted** (Editor + Data, about 170 lines) → [slices/FS5.md](slices/FS5.md)
 

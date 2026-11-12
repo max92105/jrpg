@@ -143,7 +143,7 @@ internal sealed class ExplorationScene : IScene
     private void EnterCurrentMap()
     {
         _map = _exploration.CurrentMap;
-        _view = new MapView(_map.Layout, _currentDefinitionOf, _art.Atlas);
+        _view = new MapView(_map.Layout, _currentDefinitionOf, _art);
         _camera.SnapTo(_exploration.PlayerPosition, _map.Layout);
         _drawList.Rebuild(_map.Layout, _currentDefinitionOf, _exploration.PlayerPosition);
         _overlays.Banner.Enter(_map);
@@ -193,14 +193,17 @@ internal sealed class ExplorationScene : IScene
         }
     }
 
-    // The sprite is one cell square, centered on the player's position.
+    // The player's cell is centered on the position; the sheet says where its frame stands over that cell (ADR 0043).
     private void DrawPlayer(SpriteBatch batch, TextureLibrary textures, Vector2 origin)
     {
         const int size = MapView.CellPixels;
         var position = _exploration.PlayerPosition;
-        var left = (int)Math.Round((position.X * size) - (size / 2.0) - origin.X);
-        var top = (int)Math.Round((position.Y * size) - (size / 2.0) - origin.Y);
-        var source = FieldSpriteFrame.SourceOf(_exploration.PlayerFacing, _walkAnimation.Frame);
-        batch.Draw(textures.Get(ArtFolders.FieldSprites, _art.PlayerSpriteFile), new Rectangle(left, top, size, size), source, Color.White);
+        var cellLeft = (int)Math.Round((position.X * size) - (size / 2.0) - origin.X);
+        var cellTop = (int)Math.Round((position.Y * size) - (size / 2.0) - origin.Y);
+        var sheet = _art.PlayerSprite;
+        var over = sheet.AreaOver(size);
+        var area = new Rectangle(cellLeft + over.Left, cellTop + over.Top, over.Width, over.Height);
+        var source = FieldSpriteFrame.SourceOf(sheet, sheet.WalkCellAt(_exploration.PlayerFacing, _walkAnimation.Walked));
+        batch.Draw(textures.Get(ArtFolders.FieldSprites, sheet.File), area, source, Color.White);
     }
 }

@@ -1,5 +1,6 @@
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Sprites;
 using Jrpg.Data.Art;
 using Jrpg.Game.Rendering;
 using Microsoft.Xna.Framework;
@@ -12,7 +13,7 @@ namespace Jrpg.Game.Exploration;
 /// open). It holds the time its animated tiles show (decision 464): from zero on entering the map, moved on by the
 /// scene.
 /// </summary>
-internal sealed class MapView(MapLayout layout, Func<PlacedObject, ObjectDefinition> currentDefinitionOf, TileAtlas atlas)
+internal sealed class MapView(MapLayout layout, Func<PlacedObject, ObjectDefinition> currentDefinitionOf, MapArt art)
 {
     /// <summary>Screen pixels per map cell at the 1920x1080 virtual screen (decision 48).</summary>
     public const int CellPixels = 48;
@@ -52,20 +53,22 @@ internal sealed class MapView(MapLayout layout, Func<PlacedObject, ObjectDefinit
         }
     }
 
-    /// <summary>Draws a placed object's tiles at its position, as seen from the camera's <paramref name="origin"/>.</summary>
+    /// <summary>
+    /// Draws a placed object at its position, as seen from the camera's <paramref name="origin"/>: its tiles, or an
+    /// NPC's standing frame from its sheet's record, standing on its cell (ADR 0043).
+    /// </summary>
     public void DrawObject(SpriteBatch batch, TextureLibrary textures, PlacedObject placed, Vector2 origin)
     {
         var definition = currentDefinitionOf(placed);
-        var area = ScreenAreaOf(placed, definition, origin);
-        if (!IsOnScreen(area))
+        var cells = ScreenAreaOf(placed, definition, origin);
+        if (definition.FieldSpriteFile is { } spriteFile)
         {
+            DrawSprite(batch, textures, art.FieldSprites[spriteFile], cells.Location);
             return;
         }
 
-        // An NPC stands still facing down (decisions 127, 128).
-        if (definition.FieldSpriteFile is { } spriteFile)
+        if (!IsOnScreen(cells))
         {
-            batch.Draw(textures.Get(ArtFolders.FieldSprites, spriteFile), area, FieldSpriteFrame.SourceOf(Facing.Down, 0), Color.White);
             return;
         }
 
@@ -74,7 +77,7 @@ internal sealed class MapView(MapLayout layout, Func<PlacedObject, ObjectDefinit
         for (var index = 0; index < tiles.Count; index++)
         {
             var tile = tiles[index];
-            DrawTile(batch, textures, tile.TileId, new Point(area.X + (tile.X * CellPixels), area.Y + (tile.Y * CellPixels)));
+            DrawTile(batch, textures, tile.TileId, new Point(cells.X + (tile.X * CellPixels), cells.Y + (tile.Y * CellPixels)));
         }
     }
 
@@ -96,12 +99,24 @@ internal sealed class MapView(MapLayout layout, Func<PlacedObject, ObjectDefinit
             definition.Width * CellPixels,
             definition.Height * CellPixels);
 
+    // An NPC stands still facing down (decisions 127, 128) on its sheet's standing frame, over its cell's top-left.
+    private static void DrawSprite(SpriteBatch batch, TextureLibrary textures, FieldSpriteSheet sheet, Point cellTopLeft)
+    {
+        var over = sheet.AreaOver(CellPixels);
+        var area = new Rectangle(cellTopLeft.X + over.Left, cellTopLeft.Y + over.Top, over.Width, over.Height);
+        if (IsOnScreen(area))
+        {
+            var source = FieldSpriteFrame.SourceOf(sheet, sheet.StandingCell(Facing.Down));
+            batch.Draw(textures.Get(ArtFolders.FieldSprites, sheet.File), area, source, Color.White);
+        }
+    }
+
     private static bool IsOnScreen(Rectangle area) =>
         area.Right > 0 && area.Bottom > 0 && area.Left < VirtualScreen.Width && area.Top < VirtualScreen.Height;
 
     private void DrawTile(SpriteBatch batch, TextureLibrary textures, int tileId, Point screenTopLeft)
     {
-        var image = atlas.ImageAt(tileId, AnimationTime);
+        var image = art.Atlas.ImageAt(tileId, AnimationTime);
         var destination = new Rectangle(screenTopLeft.X, screenTopLeft.Y, CellPixels, CellPixels);
         batch.Draw(textures.Get(ArtFolders.Tilesheets, image.SheetFile), destination, image.Source, Color.White);
     }

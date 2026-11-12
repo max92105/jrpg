@@ -8,11 +8,17 @@ internal static class ContentFileWriter
 {
     private static readonly JsonSerializerOptions _options = CreateOptions();
 
-    public static void Write<T>(string path, T content)
+    public static void Write<T>(string path, T content) => File.WriteAllBytes(path, Serialize(content));
+
+    /// <summary>
+    /// The file's bytes as <see cref="Write"/> would lay them, for a write planned or compared in memory.
+    /// </summary>
+    public static byte[] Serialize<T>(T content)
     {
-        using var stream = File.Create(path);
+        using var stream = new MemoryStream();
         JsonSerializer.Serialize(stream, content, _options);
         stream.Write(Encoding.UTF8.GetBytes(_options.NewLine));
+        return stream.ToArray();
     }
 
     private static JsonSerializerOptions CreateOptions()

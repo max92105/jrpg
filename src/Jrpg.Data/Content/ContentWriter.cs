@@ -1,4 +1,6 @@
 using Jrpg.Core.Content;
+using Jrpg.Core.Maps;
+using Jrpg.Core.Quests;
 using Jrpg.Data.Art;
 using Jrpg.Data.Maps;
 using Jrpg.Data.Quests;
@@ -7,21 +9,41 @@ namespace Jrpg.Data.Content;
 
 /// <summary>
 /// Saves content so the game will load it (ADR 0011, 0012): the loader's validators run first, and on any problem
-/// nothing is written.
+/// nothing is written. A catalog file is written only when its content changed since the editor read or wrote it, and
+/// refused when its bytes on disk changed since then (decision 559, <see cref="StampCatalogs"/>).
 /// </summary>
 /// <param name="contentRoot">The content folder written to, found by <see cref="ContentRootLocator"/>.</param>
-public sealed class ContentWriter(string contentRoot)
+public sealed partial class ContentWriter(string contentRoot)
 {
     private const string TemporarySuffix = ".saving";
 
+    private readonly CatalogFileStamps _stamps = new();
+
     /// <summary>
-    /// Writes the tilesheet, tile, object and quest catalogs, each sorted by id, after checking them as the loader
-    /// would, with every map's layout checked against them (the quests and stages its events name included, decision
-    /// 394). Missing art doesn't stop a save: the editor warns and the game's startup refuses (decision 442).
+    /// Takes the catalogs as just loaded: from now on a save writes only a catalog whose content differs from this (so
+    /// a hand edit to another file, or a hand layout, is kept), and refuses one edited on disk since. The editor calls
+    /// it once after the load; a writer never given the catalogs writes every one.
+    /// </summary>
+    public void StampCatalogs(ContentCatalog loaded) =>
+        _stamps.Take(contentRoot, SerializedCatalogs(loaded).Select(write => (write.File, write.Bytes)));
+
+    /// <summary>
+    /// Writes the tilesheet, tile, object and quest catalogs that changed, each sorted by id, after checking them all
+    /// as the loader would, with every map's layout checked against them (the quests and stages its events name
+    /// included, decision 394). Missing art doesn't stop a save (decision 442): the editor warns, the game's startup
+    /// refuses the missing file.
     /// </summary>
     /// <param name="catalog">The content holding the catalogs to save; its maps are the ones checked.</param>
-    /// <exception cref="ContentValidationException">The game would reject the catalogs; the message names the file, and nothing was written.</exception>
-    public void WriteMapCatalogs(ContentCatalog catalog) => WriteAll(CheckedCatalogWrites(catalog));
+    /// <exception cref="ContentValidationException">
+    /// The game would reject the catalogs, or a changed one was edited on disk since the editor read it; the message
+    /// names the file, and nothing was written.
+    /// </exception>
+    public void WriteMapCatalogs(ContentCatalog catalog)
+    {
+        var catalogs = CheckedCatalogWrites(catalog);
+        WriteAll([.. catalogs.Select(PlanWrite)]);
+        RenewStamps(catalogs);
+    }
 
     /// <summary>
     /// Writes the catalogs and the named maps in one go, all or none, after the checks of
@@ -37,9 +59,11 @@ public sealed class ContentWriter(string contentRoot)
     /// </exception>
     public void WriteMapCatalogsAndMaps(ContentCatalog catalog, IReadOnlyCollection<string> mapIds)
     {
-        var writes = CheckedCatalogWrites(catalog);
+        var catalogs = CheckedCatalogWrites(catalog);
+        List<FileToWrite> writes = [.. catalogs.Select(PlanWrite)];
         writes.AddRange(CheckedMapWrites(catalog, mapIds));
         WriteAll(writes);
+        RenewStamps(catalogs);
     }
 
     /// <summary>
@@ -124,54 +148,64 @@ public sealed class ContentWriter(string contentRoot)
         NewGameValidator.Validate(ContentCatalogLoader.NewGameFile, catalog.NewGame, newGameReferences);
     }
 
-    // The catalog files, each sorted by id, once they and every map's layout pass the loader's checks.
-    private List<FileToWrite> CheckedCatalogWrites(ContentCatalog catalog)
+    // The catalog files whose content changed, once every catalog and every map's layout pass the loader's checks and
+    // none of the changed files was edited on disk since its stamp (decision 559).
+    private List<CatalogWrite> CheckedCatalogWrites(ContentCatalog catalog)
     {
-        var sheets = catalog.Tilesheets.Values.OrderBy(sheet => sheet.Id, StringComparer.Ordinal).ToList();
-        var tiles = catalog.Tiles.Values.OrderBy(tile => tile.Id).ToList();
-        var objects = catalog.Objects.Values.OrderBy(definition => definition.Id, StringComparer.Ordinal).ToList();
-        var quests = catalog.Quests.Values.OrderBy(quest => quest.Id, StringComparer.Ordinal).ToList();
-        TilesheetCatalogValidator.Validate(ContentCatalogLoader.TilesheetsFile, sheets);
-        TileCatalogValidator.Validate(ContentCatalogLoader.TilesFile, tiles, catalog.Tilesheets.Keys.ToHashSet());
-        ObjectCatalogValidator.Validate(ContentCatalogLoader.ObjectsFile, objects, catalog.Tiles.Keys.ToHashSet());
-        QuestCatalogValidator.Validate(ContentCatalogLoader.QuestsFile, quests);
+        CheckCatalogs(catalog);
         CheckLayouts(catalog);
-        return
-        [
-            PlanWrite(ContentCatalogLoader.TilesheetsFile, sheets),
-            PlanWrite(ContentCatalogLoader.TilesFile, tiles),
-            PlanWrite(ContentCatalogLoader.ObjectsFile, objects),
-            PlanWrite(ContentCatalogLoader.QuestsFile, quests),
-        ];
-    }
-
-    /// <param name="fileName">A file name in the tilesheet art folder.</param>
-    public bool HasTilesheetImage(string fileName) => File.Exists(TilesheetImagePath(fileName));
-
-    /// <summary>
-    /// Copies a PNG into the tilesheet art folder under its own file name, replacing one already there (the caller asks
-    /// first, decision 125). A replacement must still hold every tile cut from it by the catalog's sheets.
-    /// </summary>
-    /// <param name="sourcePath">The image to copy, anywhere on disk.</param>
-    /// <param name="catalog">The sheets and tiles the image is checked against; the editor's draft, unsaved tiles included.</param>
-    /// <returns>The file name it was copied under.</returns>
-    /// <exception cref="ContentValidationException">Not a PNG, or too small for a tile cut from it; nothing was copied.</exception>
-    public string ImportTilesheetImage(string sourcePath, ContentCatalog catalog)
-    {
-        var fileName = Path.GetFileName(sourcePath);
-        var size = PngSize.Read(sourcePath);
-        if (ArtReferenceCheck.FirstTileOutside(catalog, fileName, size) is { } outside)
+        List<CatalogWrite> changed = [.. SerializedCatalogs(catalog).Where(write => _stamps.IsChanged(write.File, write.Bytes))];
+        foreach (var write in changed)
         {
-            throw new ContentValidationException(
-                $"{fileName}: tile {outside.Id} at ({outside.Column}, {outside.Row}) would be outside the new {size.Width} x {size.Height} image.");
+            if (_stamps.IsEditedOnDisk(contentRoot, write.File, write.Bytes))
+            {
+                throw new ContentValidationException(
+                    $"{write.File} changed on disk since the editor read it: close the editor and reopen it to edit it, "
+                    + "or undo the changes to it.");
+            }
         }
 
-        var destination = TilesheetImagePath(fileName);
-        Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
-        File.Copy(sourcePath, destination + TemporarySuffix, overwrite: true);
-        File.Move(destination + TemporarySuffix, destination, overwrite: true);
-        return fileName;
+        return changed;
     }
+
+    private static void CheckCatalogs(ContentCatalog catalog)
+    {
+        TilesheetCatalogValidator.Validate(ContentCatalogLoader.TilesheetsFile, SortedSheets(catalog));
+        TileCatalogValidator.Validate(ContentCatalogLoader.TilesFile, SortedTiles(catalog), catalog.Tilesheets.Keys.ToHashSet());
+        ObjectCatalogValidator.Validate(ContentCatalogLoader.ObjectsFile, SortedObjects(catalog), catalog.Tiles.Keys.ToHashSet());
+        QuestCatalogValidator.Validate(ContentCatalogLoader.QuestsFile, SortedQuests(catalog));
+    }
+
+    // Each catalog file's bytes as it would be written, sorted by id: what the stamps compare and the writes carry.
+    private static List<CatalogWrite> SerializedCatalogs(ContentCatalog catalog) =>
+    [
+        new(ContentCatalogLoader.TilesheetsFile, ContentFileWriter.Serialize(SortedSheets(catalog))),
+        new(ContentCatalogLoader.TilesFile, ContentFileWriter.Serialize(SortedTiles(catalog))),
+        new(ContentCatalogLoader.ObjectsFile, ContentFileWriter.Serialize(SortedObjects(catalog))),
+        new(ContentCatalogLoader.QuestsFile, ContentFileWriter.Serialize(SortedQuests(catalog))),
+    ];
+
+    private static List<TilesheetDefinition> SortedSheets(ContentCatalog catalog) =>
+        [.. catalog.Tilesheets.Values.OrderBy(sheet => sheet.Id, StringComparer.Ordinal)];
+
+    private static List<TileDefinition> SortedTiles(ContentCatalog catalog) => [.. catalog.Tiles.Values.OrderBy(tile => tile.Id)];
+
+    private static List<ObjectDefinition> SortedObjects(ContentCatalog catalog) =>
+        [.. catalog.Objects.Values.OrderBy(definition => definition.Id, StringComparer.Ordinal)];
+
+    private static List<QuestDefinition> SortedQuests(ContentCatalog catalog) =>
+        [.. catalog.Quests.Values.OrderBy(quest => quest.Id, StringComparer.Ordinal)];
+
+    private void RenewStamps(List<CatalogWrite> written)
+    {
+        foreach (var write in written)
+        {
+            _stamps.Renew(write.File, write.Bytes);
+        }
+    }
+
+    private FileToWrite PlanWrite(CatalogWrite write) =>
+        new(Path.Combine(contentRoot, write.File), path => File.WriteAllBytes(path, write.Bytes));
 
     // Every layout against the content and the other layouts, as the loader checks them: a warp into a resized map
     // is refused by the map that holds it.
@@ -222,8 +256,9 @@ public sealed class ContentWriter(string contentRoot)
             throw;
         }
 
-        // The moves aren't atomic across files: a failure between two leaves some files new and some old, and the next
-        // save writes them all again.
+        // The moves aren't atomic across files: a failure between two leaves some files new and some old, with their
+        // stamps not renewed; the next save writes the old ones again and, since they already hold their bytes, passes
+        // the new ones (CatalogFileStamps.IsEditedOnDisk) without calling them hand edits.
         foreach (var (path, _) in files)
         {
             File.Move(path + TemporarySuffix, path, overwrite: true);
@@ -232,4 +267,7 @@ public sealed class ContentWriter(string contentRoot)
 
     // A content file's full path, and how to write its content to a given path: the file aside first, then the real one.
     private sealed record FileToWrite(string Path, Action<string> WriteTo);
+
+    // A catalog file's name and its bytes as they will be written.
+    private sealed record CatalogWrite(string File, byte[] Bytes);
 }

@@ -54,7 +54,9 @@ internal sealed partial class MainViewModel : ObservableObject
         try
         {
             // Both or neither: the window reads the art status whenever the content is there.
-            var content = new CatalogDraft(ContentCatalogLoader.Load(contentRoot));
+            var loaded = ContentCatalogLoader.Load(contentRoot);
+            _writer.StampCatalogs(loaded);
+            var content = new CatalogDraft(loaded);
             Art = new ArtStatus(content, ArtRoot);
             Content = content;
         }

@@ -78,7 +78,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **FS5. The editor draws NPCs from their records; `FieldSpriteLayout` deleted** (Editor + Data, about 170 lines) → [slices/FS5.md](slices/FS5.md)
 
 ### Phase 2: set up in the editor
-- [ ] **CW1. A save writes only the catalog files that changed, and refuses one edited on disk since the editor read it (`CatalogFileStamps`)** (Data + Editor, about 240 lines) → [slices/CW1.md](slices/CW1.md)
+- [x] **CW1. A save writes only the catalog files that changed, and refuses one edited on disk since the editor read it (`CatalogFileStamps`)** (Data + Editor, about 240 lines) → [slices/CW1.md](slices/CW1.md)
 - [ ] **SI1. Field sprites save and import through Data: `field-sprites.json` written with the catalogs, `ImportArtImage`, `CatalogDraft.SetFieldSprites`, `CatalogProblems`** (Data + Editor, about 240 lines) → [slices/SI1.md](slices/SI1.md)
 - [ ] **SI2. The sprite setup's rules, the grid cut shared with the tile Cut panel** (Editor, about 230 lines) → [slices/SI2.md](slices/SI2.md)
 - [ ] **SI3. The sprite list, import and Copy setup from...; OK as one undo step** (Editor, about 220 lines) → [slices/SI3.md](slices/SI3.md)

@@ -5,11 +5,10 @@ metadata:
   type: project
 ---
 
-Out-of-plan fix, decision 592 (amends 523; recorded in done/2026-11-10-map-fixes-banner-and-folders README):
-PlacedObjectHits.AllAt ranks by placed Z then draw key; MainViewModel.RefreshLayerEntries unions object Zs.
-2026-11-12. Round 1. Verdict: ready to commit. No Critical, no Warning.
+Plan 2026-11-12-character-sprites-and-npcs, slice FS1 (field-sprites.json, FieldSpriteSheet/FacingRows/FacingCycle,
+FieldSpriteCatalogValidator, FieldSpriteReferenceCheck, ContentFileReader missing-file message).
+2026-11-12. Round 1. Verdict: ready to commit. No Critical.
 
-- Suggestion (open): "topmost first" wording left in PlacedObjectHits.cs:39 (NextUnder param) and
-  PlacedObjectHitsStackTests.cs:7 (class summary, cites only 523); say "in pick order" / add 592.
-- Suggestion (open): MainViewModel.cs:239-241 two null-propagating `?? []` could be one `CurrentMap is null` guard.
-- GR1 Warning (backlog EventPresenter 293 -> 294): not re-checked, other work; carry only if the next review is GR-plan.
+- Warning (open): ContentCatalogLoaderFieldSpriteTests.cs:23-24 pins live content's player numbers (48,48,1,0 / 8,100);
+  ADR 0037 says repository tests pin ids, never cells; move the numbers to the frozen test world or assert ids only.
+- Earlier Suggestions from decision 592 fix (PlacedObjectHits "topmost first" wording, MainViewModel `?? []`): other work, not carried.

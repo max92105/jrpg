@@ -5,16 +5,16 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-12-character-sprites-and-npcs, slice FS5 (TileImages.FieldSpriteFrameOf crops the record's standing
-cell, cache keyed by record; MapDrawing.DrawObject(placed) at AreaOver, standalone picture FittedSpriteArea;
-FieldSpriteLayout deleted).
-2026-11-12. Round 1. Verdict: ready to commit (no Critical, no Warning).
+Plan 2026-11-12-character-sprites-and-npcs, slice CW1 (CatalogFileStamps owned by ContentWriter, StampCatalogs after
+load, only changed catalogs written, a changed one edited on disk refused; image imports moved to ContentWriter.ArtImports.cs).
+2026-11-12. Round 1. Verdict: ready to commit (no Critical).
 
-- Suggestion (open): MapDrawing.cs DrawObject(definition) summaries ("its tiles' first frames") and
-  ObjectShapesWindow.xaml.cs:47 ("The object as the map draws it") don't say a tall NPC is shrunk into its cells.
-- Suggestion (open): TileImages.cs:117-123 a frame past the edge reloads and decodes the PNG on every draw (bitmap not cached, only the mark is meant to be uncached).
-- Suggestion (open): FittedSpriteArea ignores FeetPixels; picture's frame bottom on the box bottom, map's feet line on the cell bottom.
-- FS4 Suggestion ObjectScreenAreaTests rounding: fixed (origin 10.6 now).
-- FS3 Suggestion FieldSpriteLayout leftovers: fixed (type deleted).
+- Warning (open): ContentWriter.cs:259 WriteAll partial-move failure: moved catalogs' disk bytes differ from stamps
+  (not renewed), so the next save refuses them as "edited on disk" instead of "writes them all again" (comment stale);
+  fix: IsEditedOnDisk false when disk bytes equal the bytes about to be written.
+- Warning (open): ContentWriter.cs:153-166 validation checks the editor's in-memory catalogs, but an unchanged file's
+  hand edit stays on disk, so disk can end inconsistent (hand-removed tile + editor object using it) -> game refuses at startup.
+- Suggestion (open): ContentWriter.cs:221 TilesheetImagePath only used by ArtImports partial; move it there.
+- Suggestion (open): slice's WriteMapCatalogs_NothingChanged_WritesNothing test absent (covered indirectly by TwoSaves).
+- FS5 Suggestions (MapDrawing summaries, TileImages past-edge reload, FittedSpriteArea FeetPixels): not this diff, unchecked.
 - FS3 Suggestion AreaOver odd width: open (not this diff).
-- FS4 Follow-up ObjectDefinition.cs "laid out like the player's": fixed in FS5.

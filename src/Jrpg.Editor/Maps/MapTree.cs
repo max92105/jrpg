@@ -15,11 +15,16 @@ internal static class MapTree
     /// <param name="expandedFolders">
     /// The folders open in the tree, kept across rebuilds while no filter applies.
     /// </param>
-    public static IReadOnlyList<MapTreeNode> Of(IReadOnlyList<MapEntry> entries, IReadOnlyCollection<string> sessionFolders, string filter, IReadOnlySet<string> expandedFolders)
+    public static IReadOnlyList<MapTreeNode> Of(
+        IReadOnlyList<MapEntry> entries,
+        IReadOnlyCollection<string> sessionFolders,
+        string filter,
+        IReadOnlySet<string> expandedFolders)
     {
         var isFiltering = filter.Length > 0;
         var maps = isFiltering ? [.. entries.Where(entry => entry.Matches(filter))] : entries;
-        var folders = maps.Select(map => map.Folder).OfType<string>().Concat(isFiltering ? [] : sessionFolders).ToHashSet(StringComparer.Ordinal);
+        var mapFolders = maps.Select(map => map.Folder).OfType<string>();
+        var folders = mapFolders.Concat(isFiltering ? [] : sessionFolders).ToHashSet(StringComparer.Ordinal);
         return RowsUnder(null, new Shown(maps, folders, isFiltering, expandedFolders));
     }
 
@@ -52,12 +57,14 @@ internal static class MapTree
     // A folder's rows: the folders right under it, then its own maps.
     private static List<MapTreeNode> RowsUnder(string? parent, Shown shown)
     {
+        bool IsOpen(string folder) => shown.IsFiltering || shown.ExpandedFolders.Contains(folder);
+
         var subfolders = shown.Folders
             .Select(folder => FolderRightUnder(parent, folder))
             .OfType<string>()
             .Distinct(StringComparer.Ordinal)
             .OrderBy(folder => folder, StringComparer.OrdinalIgnoreCase)
-            .Select(folder => MapTreeNode.ForFolder(folder, RowsUnder(folder, shown), isExpanded: shown.IsFiltering || shown.ExpandedFolders.Contains(folder)));
+            .Select(folder => MapTreeNode.ForFolder(folder, RowsUnder(folder, shown), isExpanded: IsOpen(folder)));
         var ownMaps = shown.Maps.Where(map => map.Folder == parent).Select(MapTreeNode.ForMap);
         return [.. subfolders, .. ownMaps];
     }
@@ -78,5 +85,9 @@ internal static class MapTree
 
     // What the tree is built from: the maps shown, every folder shown (the maps' and the session's), whether a filter
     // applies (every folder open) and the folders open otherwise.
-    private sealed record Shown(IReadOnlyList<MapEntry> Maps, IReadOnlySet<string> Folders, bool IsFiltering, IReadOnlySet<string> ExpandedFolders);
+    private sealed record Shown(
+        IReadOnlyList<MapEntry> Maps,
+        IReadOnlySet<string> Folders,
+        bool IsFiltering,
+        IReadOnlySet<string> ExpandedFolders);
 }

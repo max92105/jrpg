@@ -162,8 +162,9 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
     {
         if (definition.FieldSpriteFile is { } spriteFile)
         {
-            var area = new Rect(topLeft.X * CellPixels, topLeft.Y * CellPixels, definition.Width * CellPixels, definition.Height * CellPixels);
-            context.DrawImage(tileImages.FieldSpriteFrameOf(spriteFile), area);
+            var areaTopLeft = new Point(topLeft.X * CellPixels, topLeft.Y * CellPixels);
+            var areaSize = new Size(definition.Width * CellPixels, definition.Height * CellPixels);
+            context.DrawImage(tileImages.FieldSpriteFrameOf(spriteFile), new Rect(areaTopLeft, areaSize));
             return;
         }
 
@@ -185,12 +186,19 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
             var outline = zone.Select(point => new Point(
                 (placed.Position.X + (point.X * definition.Width)) * CellPixels,
                 (placed.Position.Y + (point.Y * definition.Height)) * CellPixels)).ToArray();
-            zones.Children.Add(new PathGeometry([new PathFigure(outline[0], [new PolyLineSegment(outline.Skip(1), isStroked: false)], closed: true)]));
+            zones.Children.Add(ClosedOutline(outline));
         }
 
         context.PushClip(zones);
         DrawObject(context, placed);
         context.Pop();
+    }
+
+    // A closed figure through the points, its edges unstroked: a clip, never a drawn line.
+    private static PathGeometry ClosedOutline(Point[] outline)
+    {
+        var edges = new PolyLineSegment(outline.Skip(1), isStroked: false);
+        return new PathGeometry([new PathFigure(outline[0], [edges], closed: true)]);
     }
 
     private static SolidColorBrush CreateGridBrush()

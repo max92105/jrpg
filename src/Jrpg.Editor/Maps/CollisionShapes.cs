@@ -27,14 +27,15 @@ internal sealed record CollisionShapes(
                where !grid.IsWalkable(cell)
                select cell,
         ];
-        var placed = layout.Objects.Select(placedObject => (Placed: placedObject, Definition: catalog.Objects[placedObject.ObjectId])).ToList();
-        IReadOnlyList<IReadOnlyList<Point2D>> outlines =
-        [
-            .. placed.Where(pair => pair.Definition.CollisionPolygon.Count > 0).Select(pair => OutlineOf(pair.Placed, pair.Definition)),
-        ];
+        var placed = layout.Objects
+            .Select(placedObject => (Placed: placedObject, Definition: catalog.Objects[placedObject.ObjectId]))
+            .ToList();
+        var withOutline = placed.Where(pair => pair.Definition.CollisionPolygon.Count > 0);
+        IReadOnlyList<IReadOnlyList<Point2D>> outlines = [.. withOutline.Select(pair => OutlineOf(pair.Placed, pair.Definition))];
         IReadOnlyList<IReadOnlyList<Point2D>> zones =
         [
-            .. placed.SelectMany(pair => pair.Definition.AbovePlayerZones.Select(zone => InMapCells(zone, pair.Placed, pair.Definition))),
+            .. placed.SelectMany(pair => pair.Definition.AbovePlayerZones
+                .Select(zone => InMapCells(zone, pair.Placed, pair.Definition))),
         ];
         return new CollisionShapes(blocked, outlines, zones);
     }
@@ -47,6 +48,12 @@ internal sealed record CollisionShapes(
     /// A shape of the object in map cells: its points are 0..1 over the object's cells, from its top-left corner (as
     /// <c>MapCollision</c> reads them).
     /// </summary>
-    public static IReadOnlyList<Point2D> InMapCells(IReadOnlyList<Point2D> shape, PlacedObject placed, ObjectDefinition definition) =>
-        [.. shape.Select(point => new Point2D(placed.Position.X + (point.X * definition.Width), placed.Position.Y + (point.Y * definition.Height)))];
+    public static IReadOnlyList<Point2D> InMapCells(
+        IReadOnlyList<Point2D> shape,
+        PlacedObject placed,
+        ObjectDefinition definition) =>
+        [.. shape.Select(point => InMapCell(point, placed, definition))];
+
+    private static Point2D InMapCell(Point2D point, PlacedObject placed, ObjectDefinition definition) =>
+        new(placed.Position.X + (point.X * definition.Width), placed.Position.Y + (point.Y * definition.Height));
 }

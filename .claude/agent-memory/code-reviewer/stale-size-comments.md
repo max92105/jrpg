@@ -54,6 +54,9 @@ call or a rename. These cases slipped past it:
 - A guard widened (map flows PO3: key guards `is TextBox` -> `is TextBox or ComboBox or ComboBoxItem`) leaves the
   method's comment "Anywhere but a text box"; reread the comment above every changed condition.
 
+- A Done note saying "every count matches its file" (game cleanup GR1) checked design.md, not the backlog
+  line it corrects: EventPresenter stayed 293 vs 294. wc -l each file a changed backlog group names.
+
 **Why:** a comment or doc stating a wrong rule, name or number misleads the next reader.
 
 **How to apply:** after the rule's grep, run the list above against the diff's renames, moves, new members and removed

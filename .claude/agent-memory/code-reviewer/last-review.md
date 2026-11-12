@@ -5,16 +5,11 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-11-game-code-health-cleanup, slice GX1 (Game dead code with evidence; docs-only diff: Done note listing
-78 members, all kept), 2026-11-12. Round 1. Verdict: ready to commit. No Critical.
+Plan 2026-11-11-game-code-health-cleanup, slice GR1 (Options pips extraction, text speed tests via PageOn, backlog
+closing pass), 2026-11-12. Round 1. Verdict: ready to commit. No Critical.
 
-- Verified: test seams Beats, CardHeight, IsChoosingCategory, OwnedColors, ShownGold, LevelNumber read by Game tests;
-  all eight "own file, no test" members have real in-file readers; all 323 MessageIds/UiArtFiles/UiSoundFiles
-  constants have a reader outside their files.
-- Warning (open): the bare-name listing misses members sharing a name with another Game member (SelectionPosition x5,
-  EventPresenter.ShownLine/Question, ForgeScene.SelectedPiece, QuestsPage/ShopScene.Category, SavePage.Notice/
-  Entries/IsAsking, LoadPage.Entries, InventoryPage.IsDescriptionShown/ShownItemIds/Notice/SelectedRow, PartyPage.
-  Notice/CardOf, LeaderChoiceScene.IsAsking, OptionsPage.SelectedRow, UiTheme.RarityMagic/Rare/Unique); none dead, but
-  the note's 78/18 counts are incomplete. Fix: one sentence in the Done note.
-- Follow-up: the eight in-file-only public constants/members could be private.
-- GT3 Suggestion (Done note 128 vs 124 lines): not re-checked this round; GT3 committed.
+- Warning (open): backlog.md:114 still says `EventPresenter` "at 293 lines"; the file is 294 since FE3 (1d45d193) and
+  design.md's Stays says 294. The slice's "a count that moved is corrected" step missed it, and the Done note says every
+  Stays count matches its file. Fix: 293 -> 294 in the backlog line.
+- GX1 Warning (Done note name-sharing gap): fixed (GX1.md line 34).
+- GX1 Follow-up (eight in-file-only members could be private): dropped, backlog.md lists it.

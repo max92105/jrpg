@@ -14,7 +14,4 @@ public static class FieldSpriteLayout
 
     /// <summary>One row per facing.</summary>
     public const int Rows = 4;
-
-    /// <summary>Whether an image this size holds every frame; a larger one is allowed and its extra pixels unused.</summary>
-    public static bool Holds((int Width, int Height) size) => size.Width >= WalkFrames * FramePixels && size.Height >= Rows * FramePixels;
 }

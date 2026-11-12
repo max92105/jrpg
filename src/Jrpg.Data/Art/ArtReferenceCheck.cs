@@ -1,6 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Sprites;
 using Jrpg.Data.Content;
 using Jrpg.Data.Maps;
 
@@ -17,8 +18,8 @@ public static class ArtReferenceCheck
     /// still, every party member's portrait, every item's icon, every skill icon named (a skill may have none), every
     /// battle sprite, every enemy's portrait, every attack effect and every encounter's background exist as PNGs, every
     /// tile's cell and its animation's last frame lie inside its sheet, every effect strip is whole square frames, and
-    /// every field sprite holds the walk frames of <see cref="FieldSpriteLayout"/>. The names of skill icons, NPC
-    /// sprites, stills and battle art must match their files exactly, case included.
+    /// every field sprite holds the frames its record needs (ADR 0043). The names of skill icons, NPC sprites, stills
+    /// and battle art must match their files exactly, case included.
     /// </summary>
     /// <returns>One line per problem, naming the file; empty when the art is complete.</returns>
     public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string artRoot)
@@ -42,7 +43,8 @@ public static class ArtReferenceCheck
             .Select(definition => (File: definition.FieldSpriteFile!, NamedBy: $"object '{definition.Id}'"))
             .ToList();
         AddMissingByExactName(problems, artRoot, ArtFolders.FieldSprites, npcSprites);
-        AddSpritesWithoutWalkFrames(problems, artRoot, npcSprites.Prepend((catalog.NewGame.FieldSpriteFile, "the new game")));
+        var allSprites = npcSprites.Prepend((catalog.NewGame.FieldSpriteFile, "the new game"));
+        AddSpritesTooSmall(problems, artRoot, catalog.FieldSprites, allSprites);
         var dialoguePortraits = from named in MapEventSteps.Of<DialogueStep>(catalog)
                                 where named.Step.Speech.PortraitFile is not null
                                 select (named.Step.Speech.PortraitFile!, named.NamedBy);
@@ -105,18 +107,31 @@ public static class ArtReferenceCheck
         }
     }
 
-    // The walk animation reads every frame of the grid, so a smaller sprite would be cropped past its edge.
-    private static void AddSpritesWithoutWalkFrames(List<string> problems, string artRoot, IEnumerable<(string File, string NamedBy)> sprites)
+    // The walk reads every frame its record names, so a smaller sprite would be cropped past its edge. A sprite without
+    // a record is the loader's refusal, not this check's. Counts, not pixel products: a hand-typed frame count near the
+    // int limit would wrap back inside the image; the needed size is only said, in long.
+    private static void AddSpritesTooSmall(
+        List<string> problems,
+        string artRoot,
+        IReadOnlyDictionary<string, FieldSpriteSheet> sheets,
+        IEnumerable<(string File, string NamedBy)> sprites)
     {
-        const int neededWidth = FieldSpriteLayout.WalkFrames * FieldSpriteLayout.FramePixels;
-        const int neededHeight = FieldSpriteLayout.Rows * FieldSpriteLayout.FramePixels;
         foreach (var (file, namedBy) in sprites)
         {
-            if (ReadSize(artRoot, ArtFolders.FieldSprites, file).Size is { } size && !FieldSpriteLayout.Holds(size))
+            if (ReadSize(artRoot, ArtFolders.FieldSprites, file).Size is not { } size || !sheets.TryGetValue(file, out var sheet))
             {
+                continue;
+            }
+
+            var holdsColumns = size.Width / sheet.FrameWidth >= sheet.ColumnsNeeded;
+            var holdsRows = size.Height / sheet.FrameHeight >= sheet.RowsNeeded;
+            if (!holdsColumns || !holdsRows)
+            {
+                var neededWidth = (long)sheet.ColumnsNeeded * sheet.FrameWidth;
+                var neededHeight = (long)sheet.RowsNeeded * sheet.FrameHeight;
                 problems.Add(
                     $"{ExactFileName.ShownPath(ArtFolders.FieldSprites, file)}: a {size.Width}x{size.Height} sprite doesn't hold "
-                    + $"{FieldSpriteLayout.WalkFrames} x {FieldSpriteLayout.Rows} frames of {FieldSpriteLayout.FramePixels} px "
+                    + $"{sheet.ColumnsNeeded} x {sheet.RowsNeeded} frames of {sheet.FrameWidth} x {sheet.FrameHeight} px "
                     + $"({neededWidth}x{neededHeight}). Named by {namedBy}.");
             }
         }

@@ -20,3 +20,5 @@ None.
 
 ## Verify by hand
 None: the repository's two sprites pass as before.
+
+- **Done, with deviations:** a sprite without a record is skipped by the size check (the loader refuses it); `RowsNeeded` is a `long` (the review: a row typed at the int limit wrapped), tested on both sides; `FieldSpriteLayout.Holds` and its tests deleted now, their last caller gone; the two walk-frame tests moved and four new ones joined them.

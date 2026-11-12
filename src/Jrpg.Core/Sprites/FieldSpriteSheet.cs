@@ -28,4 +28,15 @@ public sealed record FieldSpriteSheet
     public int FeetPixels { get; init; }
 
     public required FacingCycle Walk { get; init; }
+
+    /// <summary>The whole frames the image must hold across: the walk's frames, from column 0.</summary>
+    public int ColumnsNeeded => Walk.Frames.FrameCount;
+
+    /// <summary>
+    /// The whole frames the image must hold down: through the highest row a facing reads. In long, since a typed row at
+    /// the int limit plus one would wrap and pass every size check.
+    /// </summary>
+    public long RowsNeeded => (long)HighestRow + 1;
+
+    private int HighestRow => Math.Max(Math.Max(Walk.Rows.Down, Walk.Rows.Up), Math.Max(Walk.Rows.Left, Walk.Rows.Right));
 }

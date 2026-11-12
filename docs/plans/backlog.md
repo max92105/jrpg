@@ -47,7 +47,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the class mechanics plan (2026-10-25)
 
-- `tests/Jrpg.Game.Tests/Exploration/EventPresenterTests.cs` (304): split by behavior when next touched.
 - Core can't say whether a turn was kept: the screen keeps the actor forward both after a quick skill and when the same member gets two turns in a row (a readied turn right before their own; LK2b review). A `TurnKept` event from `TurnFlow.KeepTurn` would tell them apart.
 - `UiTheme.ColorFromHex("")` throws, and the Core test fixtures build resources without a color; a Game test that reaches them through a battle panel would fail (LK1a review). Give the test builders a color, or make the validator's rule a Core default.
 - Placeholder marks waiting on icon art: Move borrows the Run icon (FM2), and the extra turn's hourglass is a bright diamond (LK3).
@@ -124,7 +123,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 ## From the quests plan (2026-11-01, at the retro)
 
 - `Core/Session/GameSession.cs` is at 289 lines (the quests plan added the journal and the log's capture and restore): the next member moves the save capture and restore into their own type first.
-- `tests/Jrpg.Data.Tests/Content/ContentWriterTests.cs` (254 after the cleanup plan's D2) and `tests/Jrpg.Game.Tests/Exploration/EventPresenterTests.cs` (306): new tests go in sibling files, as `ContentWriterQuestTests` and `EventPresenterQuestTests` do.
+- `tests/Jrpg.Data.Tests/Content/ContentWriterTests.cs` (254 after the cleanup plan's D2): new tests go in sibling files, as `ContentWriterQuestTests` and `EventPresenterQuestTests` do.
 - `Objects/ObjectIds.ProblemOf`'s message says "(like tree_4)" and the Quests window shows it for quest and stage ids (QE2): reword it with the `ContentIds` rename above.
 - `Ui/ResourceGaugeView.LabelSpacing` (2) duplicates `SheetRowLook.LabelSpacing`, which `QuestDetailView` reads too (L3 review): one constant in `Ui/`.
 - The quests plan's out-of-scope features (the Quest giver preset, removing a saved quest or stage in the Quests window, a cell's touch event that changes with a quest, rewards, story flags, map markers) are listed in `docs/plans/done/2026-10-29-quests/README.md`, "Out of scope".
@@ -163,7 +162,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 - The editor's map animating (the plan's former AE4, decision 466): one shared, unfrozen `ImageBrush` per animated tile, swapped on `TileAnimationTime.FramesChanged`; `MapDrawing` paints those cells with it and leaves such a drawing unfrozen (design.md, "Extension points").
 - The other out-of-scope items (an explicit frame list or per-frame times, per-cell start offsets, the tall grass effect, a free pixel rectangle from an image without a cut, animated canopies, an animated tile's mark on the sheet, the re-cut warning counting frames) are listed in `docs/plans/done/2026-11-03-object-composer-and-animated-tiles/README.md`, "Out of scope".
-- `tests/Jrpg.Game.Tests/Exploration/EventPresenterTests.cs` (306) crossed 300 before the Mana Seed plan; split it by scenario when next touched (reset retro).
 - `ObjectComposing.StartNew` clips a dragged rectangle to `ObjectCanvas.MaxCells` each way; only the row clip has a test, since no test-world sheet is wider than 32 cells (CO4a review): add a wide sheet to a test-only catalog when the composer is next touched.
 - The "chosen cells' sheet has its image" query is written twice, in `Objects/Composing/CanvasPainting.PaintAt` and `Tiles/TileAnimationViewModel.CanOpen`: a third use moves it onto `TileBrowserViewModel` (AE1).
 

@@ -23,3 +23,5 @@ None new. The runner's totals per project equal before and after; the Done note 
 
 ## Verify by hand
 None: tests only.
+
+- **Done:** as planned; `EventPresenterTests` ends at 197 lines (11 tests: the warp, the pages, the voice and the intro, with `_confirmPressed` and `StartIntro`), `EventPresenterStillsTests` at 124 with the collection attribute (8 tests with `StartStills`). Moved: `Update_PastFirstStillsSeconds_ShowsTheSecond`, `Update_ConfirmDuringStill_SkipsToTheDialogue`, `Update_ConfirmRightAfterTheSkip_DoesNotEndTheDialogue`, `Update_ConfirmOnFirstStillStep_StartsTheLeadIn`, `Update_ConfirmDuringLeadIn_SkipsToTheDialogue`, `Update_DuringLeadIn_ShowsNoStill`, `Update_FirstStillOver_SecondStartsAtOnceWithNoBlackHold`, `Update_LastStillOver_HoldsBlackForTheLeadOutBeforeTheDialogue`; the one edit in moved bodies is `_confirmPressed` → `InputFrames.Pressing(GameButton.Confirm)` (the same frame: Confirm pressed and held). The usings the new class didn't need left it (the build named each). The runner's total is 4610 before and after (Game.Tests 1432). The three backlog lines changed as planned.

@@ -4,7 +4,7 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// Which owned stacks and gear pieces each inventory category shows, each in the order they were picked up; the page
-/// lists the stacks, then the pieces (ADR 0029).
+/// lists the stacks, then the pieces (ADR 0029); and whether a category's list has a Qty column.
 /// </summary>
 internal static class InventoryFilter
 {
@@ -35,4 +35,11 @@ internal static class InventoryFilter
         InventoryCategory.Materials => item.IsMaterial,
         _ => throw new ArgumentOutOfRangeException(nameof(category), category, null),
     };
+
+    /// <summary>
+    /// Whether the category's rows carry a count, so its list has a Qty column: Weapons and Armor list only gear
+    /// pieces, which have none (ADR 0029).
+    /// </summary>
+    public static bool ShowsCounts(InventoryCategory category) =>
+        category is not (InventoryCategory.Weapons or InventoryCategory.Armor);
 }

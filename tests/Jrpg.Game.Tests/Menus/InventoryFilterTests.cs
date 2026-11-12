@@ -21,6 +21,15 @@ public sealed class InventoryFilterTests
         new("scrap", 2),
     ];
 
+    [Theory]
+    [InlineData("All", true)]
+    [InlineData("Consumables", true)]
+    [InlineData("Weapons", false)]
+    [InlineData("Armor", false)]
+    [InlineData("Materials", true)]
+    public void ShowsCounts_Category_SaysWhetherRowsHaveACount(string category, bool expected) =>
+        Assert.Equal(expected, InventoryFilter.ShowsCounts(Enum.Parse<InventoryCategory>(category)));
+
     [Fact]
     public void SelectStacks_Weapons_KeepsOnlyWeaponKindItems()
     {

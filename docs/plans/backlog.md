@@ -89,7 +89,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the loot plan (2026-10-29)
 
-- The Inventory page's Weapons and Armor tabs still show the QTY column title, though each of their rows is a piece without a count (P1a).
 - `Battle/VictoryScreenView.cs` is at 263 lines since the Items step (D3): the next change that grows it moves the cards' drawing into a `VictoryCardsView` first.
 - `tests/Jrpg.Core.Tests/Session/GameSessionSaveTests.cs` is at 270 lines: the next save test goes in a new file split by concern (gear, members, world).
 

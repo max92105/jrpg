@@ -21,3 +21,5 @@ The developer confirms the look (decision 553 is taken; the check is that it rea
 2. Weapons and Armor: only Item; the rows are as before (no count).
 3. Consumables and Materials: Item and Qty, the counts under Qty.
 4. Switching tabs back and forth: the titles follow at once, nothing flickers.
+
+- **Done, with deviations:** as planned, the theory's rows given as the category's name (`InventoryCategory` is internal, so a public theory can't take it as a parameter) and parsed. Shown failing with Armor left out of the rule (the Armor row failed, the rest passed), then the rule as planned. `InventoryColumnView` builds `_titlesWithCounts` and `_titlesWithoutCounts` once from the shared `itemTitle` and `quantityTitle`, and reads the shown category from the rail (`place.Rail.Category`, the review: no second copy of the tabs). Totals per project: Game.Tests five more (4610 in all). The P1a line went.

@@ -8,7 +8,8 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// Draws the Inventory page's list column: the category rail, then on a page column beside it the category's name, the
-/// column titles and the list with the selected item's detail strip.
+/// column titles (Item alone over the Weapons and Armor tabs, whose rows have no count) and the list with the selected
+/// item's detail strip.
 /// </summary>
 internal sealed class InventoryColumnView
 {
@@ -28,7 +29,8 @@ internal sealed class InventoryColumnView
     private readonly InventoryListView _listView;
     private readonly ColumnPanelView _listPanel = new(UiTheme.PageColumn);
     private readonly SpriteFontBase _headingFont;
-    private readonly ColumnTitles _columnTitles;
+    private readonly ColumnTitles _titlesWithCounts;
+    private readonly ColumnTitles _titlesWithoutCounts;
     private readonly string[] _categoryNames;
 
     /// <param name="text">Messages and fonts.</param>
@@ -40,13 +42,12 @@ internal sealed class InventoryColumnView
         _railView = new CategoryRailView(ui);
         _listView = new InventoryListView(ui, bodyFont, text.Messages);
         _headingFont = text.Fonts.FontAt(HeadingPixels);
-        _columnTitles = new ColumnTitles(
-            text.Fonts.FontAt(LabelPixels),
-            ui,
-            [
-                ColumnTitle.FromLeft(text.Messages.Text(MessageIds.InventoryColumnItem), InventoryListView.NameLeft),
-                ColumnTitle.FromRight(text.Messages.Text(MessageIds.InventoryColumnQuantity), InventoryListView.QuantityInset),
-            ]);
+        // Both built once: a frame draws the one the shown category needs (decision 553).
+        var labelFont = text.Fonts.FontAt(LabelPixels);
+        var itemTitle = ColumnTitle.FromLeft(text.Messages.Text(MessageIds.InventoryColumnItem), InventoryListView.NameLeft);
+        var quantityTitle = ColumnTitle.FromRight(text.Messages.Text(MessageIds.InventoryColumnQuantity), InventoryListView.QuantityInset);
+        _titlesWithCounts = new ColumnTitles(labelFont, ui, [itemTitle, quantityTitle]);
+        _titlesWithoutCounts = new ColumnTitles(labelFont, ui, [itemTitle]);
         _categoryNames = [.. categories.Select(tab => text.Messages.Text(tab.LabelId))];
     }
 
@@ -64,7 +65,8 @@ internal sealed class InventoryColumnView
         var top = area.Y + TopMargin;
         var width = area.Right - Margin - left;
         batch.DrawString(_headingFont, _categoryNames[place.Rail.Selected], new Vector2(left, top), UiTheme.TextPrimary * opacity);
-        _columnTitles.Draw(batch, textures, new Rectangle(left, top + ColumnTitlesTop, width, 0), opacity);
+        var titles = InventoryFilter.ShowsCounts(place.Rail.Category) ? _titlesWithCounts : _titlesWithoutCounts;
+        titles.Draw(batch, textures, new Rectangle(left, top + ColumnTitlesTop, width, 0), opacity);
 
         var rows = new Rectangle(left, top + RowsTop, width, InventoryListView.Height);
         var list = new InventoryListView.Place(place.Rows, place.Cursor, place.ListHasCursor, place.Selection, rows, place.Detail);

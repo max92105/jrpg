@@ -1,5 +1,5 @@
 # Code health cleanup: the Game
-Status: approved
+Status: approved, in progress
 
 Developer's request (2026-11-11), verbatim: "it's time to do all the health check listed and do a clean up phase. dead code optimisation using clean code convention and microsoft convention. to be most human readable possible. using clear strucutre and segmentation and intention. everything work really well so no regression."
 
@@ -49,7 +49,7 @@ One line per slice; each slice's goal, files, moves and checks are in its file u
 Sizes are hand-written lines, tests included; "moved" lines are cut and pasted (`git diff --color-moved`) and counted apart.
 
 ### Phase 1: bugs
-- [ ] **GB1. The Weapons and Armor tabs show no quantity column** (Game, about 50 lines, hand check) → [slices/GB1.md](slices/GB1.md)
+- [x] **GB1. The Weapons and Armor tabs show no quantity column** (Game, about 50 lines, hand check) → [slices/GB1.md](slices/GB1.md)
 - [ ] **GB2. A page's dialog dims the footer hint too** (Game, about 5 lines, hand check) → [slices/GB2.md](slices/GB2.md)
 - [ ] **GB3. The UI art check compares exact file names** (Game tests, about 15 lines) → [slices/GB3.md](slices/GB3.md)
 

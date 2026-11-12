@@ -5,14 +5,14 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-11-code-health-cleanup, slice R2 (Editor Maps: the lines that do two things), 2026-11-12. Round 1.
-Verdict: ready to commit.
+Plan 2026-11-11-code-health-cleanup, slice R3 (the art check's lines that do two things; the backlog closed), 2026-11-12.
+Round 1. Verdict: fix the Critical, then commit.
 
-- Warning (open): `MapTree.Shown` record and `CollisionShapes.InMapCells` signature are only-long lines wrapped
-  against decision 539; Done note calls Shown "as planned" and omits the InMapCells signature. Record or revert.
-- Suggestion (open): `InMapCell`'s `//` comment repeats the `InMapCells` summary just above; drop it.
-- Follow-up: `MapDrawing.DrawCanopy` repeats `InMapCell`'s arithmetic (times CellPixels); `DrawObjectAt`'s sprite
-  branch has no test (MapDrawingTests never sets FieldSpriteFile).
-- Verified equal: ClosedOutline (outline[0], Skip(1) unstroked, closed), Rect(Point,Size) vs Rect(x,y,w,h),
-  InMapCell arithmetic, IsOpen, withOutline/mapFolders lazy and enumerated once. CollisionShapes:34 is 130 columns.
-- R1's two suggestions: not carried (R1 committed).
+- Critical (open): backlog.md:205 — the merged "Files at the limit" line replaced the unrelated `verify.ps1 -Fix`
+  generator-hooks line (lost) instead of the map fixes' line, which still sits at :207 as a duplicate. Restore the
+  -Fix line, delete :207. Done note's "the two MainWindow.xaml lines one" is false until then.
+- Suggestion (open): the items' icons line (ArtReferenceCheck:56) is the only check left with an inline Select.
+- Verified equal: all four split messages byte-identical; effect strip cases same (only a header >= 2^31, read
+  negative by PngSize, now reports where it didn't); lazy locals enumerated in the same call order; 4 signatures
+  remain over 130 columns; no comment over 120.
+- R2's Warning and Suggestion: not carried (R2 committed).

@@ -5,9 +5,11 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-11-game-code-health-cleanup, slice GB3 (UI art check compares exact file names, decision 555), 2026-11-12.
-Round 1. Verdict: ready to commit. No findings.
+Plan 2026-11-11-game-code-health-cleanup, slice GS1 (MessageIds partial by screen, decision 552), 2026-11-12.
+Round 1. Verdict: ready to commit. No Critical, no Warning.
 
-- Verified: the theory matches UiSoundFilesTests (same comment, ordinal set, same message); backlog P1 line removed.
-- Remaining File.Exists calls in tests check files the test itself wrote in a temp copy (rename, save slot),
-  not repository names: outside decision 555.
+- Verified by script: 272 constants before and after, each with its summary text identical (only the five rewrapped
+  summaries differ, by whitespace); order kept inside each of the eight files; each file's set matches the table.
+- Suggestion (open): MessageIds.cs class summary's "or here for ..." list omits the menu's title and the System page
+  entries/questions (MenuTitle, MenuSystem, SystemTitleScreen, SystemQuit, ConfirmTitleScreen, ConfirmQuit) that stay there.
+- Suggestion (open): GS1 Done note's line counts are before the fix pass (.Field 40/42, .Menus 213/217, .Battle 160/164).

@@ -1,5 +1,5 @@
 {
-  "id": "forest",
+  "id": "milestone_outside",
   "width": 17,
   "height": 30,
   "layers": [
@@ -1481,7 +1481,7 @@
         "steps": [
           {
             "type": "warp",
-            "mapId": "start",
+            "mapId": "milestone",
             "cell": {
               "x": 0,
               "y": 14
@@ -1504,7 +1504,7 @@
         "steps": [
           {
             "type": "warp",
-            "mapId": "start",
+            "mapId": "milestone",
             "cell": {
               "x": 0,
               "y": 14
@@ -1527,7 +1527,7 @@
         "steps": [
           {
             "type": "warp",
-            "mapId": "to_aslas_1",
+            "mapId": "primeval_growth_crossroad",
             "cell": {
               "x": 0,
               "y": 14
@@ -1550,7 +1550,7 @@
         "steps": [
           {
             "type": "warp",
-            "mapId": "to_aslas_1",
+            "mapId": "primeval_growth_crossroad",
             "cell": {
               "x": 0,
               "y": 15

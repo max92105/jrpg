@@ -1,5 +1,5 @@
 {
-  "id": "start",
+  "id": "milestone",
   "width": 45,
   "height": 45,
   "layers": [
@@ -6937,7 +6937,7 @@
         "x": 19.048679060723998,
         "y": 1.0221812339353349
       },
-      "z": -5,
+      "z": -4,
       "events": []
     },
     {
@@ -6991,7 +6991,7 @@
           "steps": [
             {
               "type": "warp",
-              "mapId": "interior_1",
+              "mapId": "proud_iron",
               "cell": {
                 "x": 4,
                 "y": 8
@@ -7035,10 +7035,10 @@
       "uid": "tree_2_3",
       "objectId": "tree_2",
       "position": {
-        "x": 9,
-        "y": 2
+        "x": 9.086519940182285,
+        "y": 2.461439680972177
       },
-      "z": -3,
+      "z": -4,
       "events": []
     },
     {
@@ -7250,6 +7250,26 @@
       },
       "z": -4,
       "events": []
+    },
+    {
+      "uid": "tree_1_14",
+      "objectId": "tree_1",
+      "position": {
+        "x": 6.804378180195846,
+        "y": 33.568215720132144
+      },
+      "z": -4,
+      "events": []
+    },
+    {
+      "uid": "tree_1_15",
+      "objectId": "tree_1",
+      "position": {
+        "x": 0.7399792729691668,
+        "y": 40.6242773417481
+      },
+      "z": -3,
+      "events": []
     }
   ],
   "cellEvents": [
@@ -7267,7 +7287,7 @@
         "steps": [
           {
             "type": "warp",
-            "mapId": "forest",
+            "mapId": "milestone_outside",
             "cell": {
               "x": 16,
               "y": 21
@@ -7290,7 +7310,7 @@
         "steps": [
           {
             "type": "warp",
-            "mapId": "forest",
+            "mapId": "milestone_outside",
             "cell": {
               "x": 16,
               "y": 22

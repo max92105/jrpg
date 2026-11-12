@@ -1,7 +1,8 @@
 {
-  "id": "to_aslas_1",
+  "id": "primeval_growth_crossroad",
   "displayName": "Primeval Growth Crossroad",
   "musicFile": "forest/loop.wav",
+  "folder": "Milestone Area",
   "randomEncounters": {
     "oneInSteps": 15,
     "graceSteps": 5,

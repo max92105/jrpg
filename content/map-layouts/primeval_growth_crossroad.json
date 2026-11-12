@@ -1,5 +1,5 @@
 {
-  "id": "to_aslas_1",
+  "id": "primeval_growth_crossroad",
   "width": 40,
   "height": 30,
   "layers": [
@@ -2746,7 +2746,7 @@
         "steps": [
           {
             "type": "warp",
-            "mapId": "forest",
+            "mapId": "milestone_outside",
             "cell": {
               "x": 16,
               "y": 4
@@ -2769,10 +2769,79 @@
         "steps": [
           {
             "type": "warp",
-            "mapId": "forest",
+            "mapId": "milestone_outside",
             "cell": {
               "x": 16,
               "y": 5
+            }
+          }
+        ]
+      }
+    },
+    {
+      "cell": {
+        "x": 34,
+        "y": 0
+      },
+      "event": {
+        "id": "cell_34_0",
+        "activation": "touch",
+        "prompt": null,
+        "isOnce": false,
+        "onlyWhenObjectId": null,
+        "steps": [
+          {
+            "type": "warp",
+            "mapId": "primeval_growth_northen_road",
+            "cell": {
+              "x": 15,
+              "y": 39
+            }
+          }
+        ]
+      }
+    },
+    {
+      "cell": {
+        "x": 33,
+        "y": 0
+      },
+      "event": {
+        "id": "cell_33_0",
+        "activation": "touch",
+        "prompt": null,
+        "isOnce": false,
+        "onlyWhenObjectId": null,
+        "steps": [
+          {
+            "type": "warp",
+            "mapId": "primeval_growth_northen_road",
+            "cell": {
+              "x": 15,
+              "y": 39
+            }
+          }
+        ]
+      }
+    },
+    {
+      "cell": {
+        "x": 32,
+        "y": 0
+      },
+      "event": {
+        "id": "cell_32_0",
+        "activation": "touch",
+        "prompt": null,
+        "isOnce": false,
+        "onlyWhenObjectId": null,
+        "steps": [
+          {
+            "type": "warp",
+            "mapId": "primeval_growth_northen_road",
+            "cell": {
+              "x": 14,
+              "y": 39
             }
           }
         ]

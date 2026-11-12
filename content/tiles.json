@@ -2721,5 +2721,376 @@
     "sheetId": "autumn_forest_clean",
     "column": 0,
     "row": 2
+  },
+  {
+    "id": 390,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 0,
+    "row": 9
+  },
+  {
+    "id": 391,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 1,
+    "row": 9
+  },
+  {
+    "id": 392,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 2,
+    "row": 9
+  },
+  {
+    "id": 393,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 3,
+    "row": 9
+  },
+  {
+    "id": 394,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 4,
+    "row": 9
+  },
+  {
+    "id": 395,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 0,
+    "row": 10
+  },
+  {
+    "id": 396,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 1,
+    "row": 10
+  },
+  {
+    "id": 397,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 2,
+    "row": 10
+  },
+  {
+    "id": 398,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 3,
+    "row": 10
+  },
+  {
+    "id": 399,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 4,
+    "row": 10
+  },
+  {
+    "id": 400,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 0,
+    "row": 11
+  },
+  {
+    "id": 401,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 1,
+    "row": 11
+  },
+  {
+    "id": 402,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 2,
+    "row": 11
+  },
+  {
+    "id": 403,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 3,
+    "row": 11
+  },
+  {
+    "id": 404,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 4,
+    "row": 11
+  },
+  {
+    "id": 405,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 0,
+    "row": 12
+  },
+  {
+    "id": 406,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 1,
+    "row": 12
+  },
+  {
+    "id": 407,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 2,
+    "row": 12
+  },
+  {
+    "id": 408,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 3,
+    "row": 12
+  },
+  {
+    "id": 409,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 4,
+    "row": 12
+  },
+  {
+    "id": 410,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 0,
+    "row": 13
+  },
+  {
+    "id": 411,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 1,
+    "row": 13
+  },
+  {
+    "id": 412,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 2,
+    "row": 13
+  },
+  {
+    "id": 413,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 3,
+    "row": 13
+  },
+  {
+    "id": 414,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 4,
+    "row": 13
+  },
+  {
+    "id": 415,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 0,
+    "row": 14
+  },
+  {
+    "id": 416,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 1,
+    "row": 14
+  },
+  {
+    "id": 417,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 2,
+    "row": 14
+  },
+  {
+    "id": 418,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 3,
+    "row": 14
+  },
+  {
+    "id": 419,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 4,
+    "row": 14
+  },
+  {
+    "id": 420,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 0,
+    "row": 15
+  },
+  {
+    "id": 421,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 1,
+    "row": 15
+  },
+  {
+    "id": 422,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 2,
+    "row": 15
+  },
+  {
+    "id": 423,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 3,
+    "row": 15
+  },
+  {
+    "id": 424,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 4,
+    "row": 15
+  },
+  {
+    "id": 425,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 10,
+    "row": 10
+  },
+  {
+    "id": 426,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 11,
+    "row": 10
+  },
+  {
+    "id": 427,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 12,
+    "row": 10
+  },
+  {
+    "id": 428,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 10,
+    "row": 11
+  },
+  {
+    "id": 429,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 11,
+    "row": 11
+  },
+  {
+    "id": 430,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 12,
+    "row": 11
+  },
+  {
+    "id": 431,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 10,
+    "row": 12
+  },
+  {
+    "id": 432,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 11,
+    "row": 12
+  },
+  {
+    "id": 433,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 12,
+    "row": 12
+  },
+  {
+    "id": 434,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 10,
+    "row": 13
+  },
+  {
+    "id": 435,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 11,
+    "row": 13
+  },
+  {
+    "id": 436,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 12,
+    "row": 13
+  },
+  {
+    "id": 437,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 10,
+    "row": 14
+  },
+  {
+    "id": 438,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 11,
+    "row": 14
+  },
+  {
+    "id": 439,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 12,
+    "row": 14
+  },
+  {
+    "id": 440,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 10,
+    "row": 15
+  },
+  {
+    "id": 441,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 11,
+    "row": 15
+  },
+  {
+    "id": 442,
+    "isWalkable": true,
+    "sheetId": "autumn_forest_clean",
+    "column": 12,
+    "row": 15
   }
 ]

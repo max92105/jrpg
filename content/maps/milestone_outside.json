@@ -1,7 +1,8 @@
 {
-  "id": "forest",
+  "id": "milestone_outside",
   "displayName": "Milestone Outside",
   "musicFile": "forest/loop.wav",
+  "folder": "Milestone Area",
   "randomEncounters": {
     "oneInSteps": 25,
     "graceSteps": 3,

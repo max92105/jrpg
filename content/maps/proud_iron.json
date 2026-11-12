@@ -1,6 +1,7 @@
 {
-  "id": "interior_1",
+  "id": "proud_iron",
   "displayName": "Proud Iron",
   "musicFile": "town/loop.wav",
+  "folder": "Milestone Area",
   "randomEncounters": null
 }

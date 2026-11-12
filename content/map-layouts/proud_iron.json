@@ -1,5 +1,5 @@
 {
-  "id": "interior_1",
+  "id": "proud_iron",
   "width": 10,
   "height": 10,
   "layers": [
@@ -180,7 +180,7 @@
         "steps": [
           {
             "type": "warp",
-            "mapId": "start",
+            "mapId": "milestone",
             "cell": {
               "x": 37,
               "y": 21
@@ -203,7 +203,7 @@
         "steps": [
           {
             "type": "warp",
-            "mapId": "start",
+            "mapId": "milestone",
             "cell": {
               "x": 38,
               "y": 21

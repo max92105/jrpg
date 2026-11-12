@@ -1,6 +1,7 @@
 {
-  "id": "start",
+  "id": "milestone",
   "displayName": "Milestone",
   "musicFile": "town/loop.wav",
+  "folder": "Milestone Area",
   "randomEncounters": null
 }

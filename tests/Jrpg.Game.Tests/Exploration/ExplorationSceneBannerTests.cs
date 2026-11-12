@@ -68,7 +68,7 @@ public sealed class ExplorationSceneBannerTests
     private static (ExplorationState Exploration, ExplorationScene Scene, FieldOverlays Overlays) Start(ContentCatalog catalog)
     {
         var exploration = StartMapScenarios.StartExploring(catalog);
-        var overlays = StartMapScenarios.OverlaysFor(exploration);
+        var overlays = StartMapScenarios.OverlaysFor(exploration, catalog);
         return (exploration, StartMapScenarios.SceneOf(exploration, catalog, overlays), overlays);
     }
 }

@@ -21,3 +21,5 @@ The "Talk" prompt floats above a tall NPC's drawn head, not inside it. One rule 
 ## Verify by hand
 1. With FS3's hand-written bought NPC: face it; the prompt sits above its head with the usual gap, centered.
 2. Face a chest and a door: the prompt sits where it did before.
+
+- **Done, with deviations:** the prompt view reads the sprites from `MapArt.FieldSprites` in the factory and from the catalog in the scenarios; the canopy reads the same area rule (a field-sprite object has none, so it is always the cells).

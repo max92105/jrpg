@@ -1,6 +1,5 @@
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
-using Jrpg.Core.Sprites;
 using Jrpg.Data.Art;
 using Jrpg.Game.Rendering;
 using Microsoft.Xna.Framework;
@@ -60,15 +59,18 @@ internal sealed class MapView(MapLayout layout, Func<PlacedObject, ObjectDefinit
     public void DrawObject(SpriteBatch batch, TextureLibrary textures, PlacedObject placed, Vector2 origin)
     {
         var definition = currentDefinitionOf(placed);
-        var cells = ScreenAreaOf(placed, definition, origin);
-        if (definition.FieldSpriteFile is { } spriteFile)
+        var area = ObjectScreenArea.Of(placed, definition, art.FieldSprites, origin);
+        if (!IsOnScreen(area))
         {
-            DrawSprite(batch, textures, art.FieldSprites[spriteFile], cells.Location);
             return;
         }
 
-        if (!IsOnScreen(cells))
+        // An NPC stands still facing down (decisions 127, 128) on its sheet's standing frame.
+        if (definition.FieldSpriteFile is { } spriteFile)
         {
+            var sheet = art.FieldSprites[spriteFile];
+            var source = FieldSpriteFrame.SourceOf(sheet, sheet.StandingCell(Facing.Down));
+            batch.Draw(textures.Get(ArtFolders.FieldSprites, sheet.File), area, source, Color.White);
             return;
         }
 
@@ -77,37 +79,20 @@ internal sealed class MapView(MapLayout layout, Func<PlacedObject, ObjectDefinit
         for (var index = 0; index < tiles.Count; index++)
         {
             var tile = tiles[index];
-            DrawTile(batch, textures, tile.TileId, new Point(cells.X + (tile.X * CellPixels), cells.Y + (tile.Y * CellPixels)));
+            DrawTile(batch, textures, tile.TileId, new Point(area.X + (tile.X * CellPixels), area.Y + (tile.Y * CellPixels)));
         }
     }
 
-    /// <summary>Draws a placed object's baked canopy over its body, as seen from the camera's <paramref name="origin"/>.</summary>
+    /// <summary>
+    /// Draws a placed object's baked canopy over its body, as seen from the camera's <paramref name="origin"/>; a
+    /// field-sprite object has no canopy, so the area is always the object's cells.
+    /// </summary>
     public void DrawCanopy(SpriteBatch batch, Texture2D canopy, PlacedObject placed, Vector2 origin)
     {
-        var area = ScreenAreaOf(placed, currentDefinitionOf(placed), origin);
+        var area = ObjectScreenArea.Of(placed, currentDefinitionOf(placed), art.FieldSprites, origin);
         if (IsOnScreen(area))
         {
             batch.Draw(canopy, area, Color.White);
-        }
-    }
-
-    // Objects can sit between cells (positions such as 2.5), so the top-left is rounded to a whole pixel once.
-    private static Rectangle ScreenAreaOf(PlacedObject placed, ObjectDefinition definition, Vector2 origin) =>
-        new(
-            (int)Math.Round((placed.Position.X * CellPixels) - origin.X),
-            (int)Math.Round((placed.Position.Y * CellPixels) - origin.Y),
-            definition.Width * CellPixels,
-            definition.Height * CellPixels);
-
-    // An NPC stands still facing down (decisions 127, 128) on its sheet's standing frame, over its cell's top-left.
-    private static void DrawSprite(SpriteBatch batch, TextureLibrary textures, FieldSpriteSheet sheet, Point cellTopLeft)
-    {
-        var over = sheet.AreaOver(CellPixels);
-        var area = new Rectangle(cellTopLeft.X + over.Left, cellTopLeft.Y + over.Top, over.Width, over.Height);
-        if (IsOnScreen(area))
-        {
-            var source = FieldSpriteFrame.SourceOf(sheet, sheet.StandingCell(Facing.Down));
-            batch.Draw(textures.Get(ArtFolders.FieldSprites, sheet.File), area, source, Color.White);
         }
     }
 

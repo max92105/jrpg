@@ -124,7 +124,8 @@ internal static class StartMapScenarios
         return GameSession.Restore(save with { Members = [.. save.Members, .. recruits] }, catalog, new SeededRandom(1));
     }
 
-    public static ExplorationScene SceneOf(ExplorationState exploration, ContentCatalog catalog) => SceneOf(exploration, catalog, OverlaysFor(exploration));
+    public static ExplorationScene SceneOf(ExplorationState exploration, ContentCatalog catalog) =>
+        SceneOf(exploration, catalog, OverlaysFor(exploration, catalog));
 
     /// <summary>The scene over the given overlays, for a test that watches the banner and its view.</summary>
     public static ExplorationScene SceneOf(ExplorationState exploration, ContentCatalog catalog, FieldOverlays overlays) =>
@@ -135,11 +136,11 @@ internal static class StartMapScenarios
             overlays);
 
     /// <summary>The prompt, a new banner and its view, as the scene factory builds them.</summary>
-    public static FieldOverlays OverlaysFor(ExplorationState exploration)
+    public static FieldOverlays OverlaysFor(ExplorationState exploration, ContentCatalog catalog)
     {
         var banner = new MapBanner();
         return new FieldOverlays(
-            new InteractionPromptView(RepositoryScreenText.Text, exploration.CurrentDefinitionOf),
+            new InteractionPromptView(RepositoryScreenText.Text, exploration.CurrentDefinitionOf, catalog.FieldSprites),
             banner,
             new MapBannerView(RepositoryScreenText.Text, new UiTextures(), banner));
     }

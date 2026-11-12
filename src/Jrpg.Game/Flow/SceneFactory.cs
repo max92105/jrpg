@@ -70,7 +70,10 @@ internal sealed class SceneFactory
             exploration,
             _art,
             new EventPresenter(exploration, new EventLook(_text, _ui), _settings, Audio.Voice),
-            new FieldOverlays(new InteractionPromptView(_text, exploration.CurrentDefinitionOf), banner, new MapBannerView(_text, _ui, banner)));
+            new FieldOverlays(
+                new InteractionPromptView(_text, exploration.CurrentDefinitionOf, _art.FieldSprites),
+                banner,
+                new MapBannerView(_text, _ui, banner)));
     }
 
     private SystemPage CreateSystemPage(GameSession session) =>

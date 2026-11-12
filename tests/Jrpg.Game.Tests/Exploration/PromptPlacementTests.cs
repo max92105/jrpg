@@ -1,5 +1,3 @@
-using Jrpg.Core.Geometry;
-using Jrpg.Core.Maps;
 using Jrpg.Game.Exploration;
 using Microsoft.Xna.Framework;
 
@@ -9,44 +7,35 @@ public sealed class PromptPlacementTests
 {
     private static readonly Point _boxSize = new(60, 30);
 
+    // A two-cell object at column 1, row 3, as ObjectScreenArea gives it.
+    private static readonly Rectangle _twoCells = new(48, 144, 96, 48);
+
     [Fact]
-    public void BoxFor_TwoCellObject_CentersOnItsWidth()
+    public void BoxFor_ObjectArea_CentersOnItsWidth()
     {
-        var box = PromptPlacement.BoxFor(PlacedAt(1, 3), DefinitionOfWidth(2), Vector2.Zero, _boxSize);
+        var box = PromptPlacement.BoxFor(_twoCells, _boxSize);
 
         Assert.Equal(48 + 48 - 30, box.X);
         Assert.Equal(_boxSize, box.Size);
     }
 
     [Fact]
-    public void BoxFor_CameraMoved_ShiftsByTheOrigin()
+    public void BoxFor_ObjectArea_BottomIs6PixelsAboveItsTop()
     {
-        var atRest = PromptPlacement.BoxFor(PlacedAt(1, 3), DefinitionOfWidth(1), Vector2.Zero, _boxSize);
+        var box = PromptPlacement.BoxFor(_twoCells, _boxSize);
 
-        var moved = PromptPlacement.BoxFor(PlacedAt(1, 3), DefinitionOfWidth(1), new Vector2(20, 10), _boxSize);
-
-        Assert.Equal(atRest.Location - new Point(20, 10), moved.Location);
+        Assert.Equal(144 - 6, box.Bottom);
     }
 
+    // A tall NPC's area starts above its cell (FS4): the prompt clears the head, not the cell.
     [Fact]
-    public void BoxFor_ObjectAtRow3_BottomIs6PixelsAboveItsTop()
+    public void BoxFor_TallNpcArea_SitsAboveTheHead()
     {
-        var box = PromptPlacement.BoxFor(PlacedAt(1, 3), DefinitionOfWidth(1), Vector2.Zero, _boxSize);
+        var head = new Rectangle(24, 96, 96, 96);
 
-        Assert.Equal((3 * MapView.CellPixels) - 6, box.Bottom);
+        var box = PromptPlacement.BoxFor(head, _boxSize);
+
+        Assert.Equal(96 - 6, box.Bottom);
+        Assert.Equal(24 + 18, box.X);
     }
-
-    private static PlacedObject PlacedAt(double x, double y) =>
-        new() { Uid = "thing", ObjectId = "thing", Position = new Point2D(x, y), Z = MapLayers.PlayerZ, Events = [] };
-
-    private static ObjectDefinition DefinitionOfWidth(int width) => new()
-    {
-        Id = "thing",
-        Width = width,
-        Height = 1,
-        CollisionPolygon = [],
-        Category = "test",
-        Tiles = [],
-        AbovePlayerZones = [],
-    };
 }

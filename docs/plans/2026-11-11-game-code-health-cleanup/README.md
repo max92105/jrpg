@@ -1,5 +1,5 @@
 # Code health cleanup: the Game
-Status: approved, in progress
+Status: retro pending
 
 Developer's request (2026-11-11), verbatim: "it's time to do all the health check listed and do a clean up phase. dead code optimisation using clean code convention and microsoft convention. to be most human readable possible. using clear strucutre and segmentation and intention. everything work really well so no regression."
 
@@ -64,7 +64,7 @@ Sizes are hand-written lines, tests included; "moved" lines are cut and pasted (
 - [x] **GX1. Game dead code with evidence** (Game, size set by the listing; about 40 lines expected) → [slices/GX1.md](slices/GX1.md)
 
 ### Phase 4: readability
-- [ ] **GR1. The Options page's pips drawn apart; its tests reach rows by name; the backlog closed** (Game, tests, docs, about 60 lines, hand check) → [slices/GR1.md](slices/GR1.md)
+- [x] **GR1. The Options page's pips drawn apart; its tests reach rows by name; the backlog closed** (Game, tests, docs, about 60 lines, hand check) → [slices/GR1.md](slices/GR1.md)
 
 ## Decisions
 - **550. Scope: the Game's backlog lines that the next Game work touches first**: `MessageIds` (every Game plan adds ids), the Options page (the settings-kept-between-runs plan, decision 415, is the next known Game plan), the Game test files over 300, and the known bugs. Every other Game line stays in `backlog.md` with its reason.

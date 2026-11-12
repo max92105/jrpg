@@ -49,8 +49,7 @@ public sealed class OptionsPageTests
     [Fact]
     public void Update_RightOnTextSpeed_GoesToFaster()
     {
-        var page = NewPage();
-        page.Update(Pressing(GameButton.Down));
+        var page = PageOn(OptionsPage.TextSpeedRow);
 
         page.Update(Pressing(GameButton.Right));
 
@@ -61,8 +60,7 @@ public sealed class OptionsPageTests
     public void Update_RightOnTextSpeed_LastValue_StaysOnLast()
     {
         _settings.TextSpeed = TextSpeed.Instant;
-        var page = NewPage();
-        page.Update(Pressing(GameButton.Down));
+        var page = PageOn(OptionsPage.TextSpeedRow);
 
         page.Update(Pressing(GameButton.Right));
 
@@ -72,8 +70,7 @@ public sealed class OptionsPageTests
     [Fact]
     public void Update_LeftOnTextSpeed_GoesToSlower()
     {
-        var page = NewPage();
-        page.Update(Pressing(GameButton.Down));
+        var page = PageOn(OptionsPage.TextSpeedRow);
 
         page.Update(Pressing(GameButton.Left));
 
@@ -84,8 +81,7 @@ public sealed class OptionsPageTests
     public void Update_LeftOnTextSpeed_FirstValue_StaysOnFirst()
     {
         _settings.TextSpeed = TextSpeed.Slow;
-        var page = NewPage();
-        page.Update(Pressing(GameButton.Down));
+        var page = PageOn(OptionsPage.TextSpeedRow);
 
         page.Update(Pressing(GameButton.Left));
 

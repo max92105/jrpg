@@ -219,8 +219,7 @@ internal sealed class OptionsPage : IMenuPage
         if (LevelOf(place.Index) is { } level)
         {
             var pipsAt = new Point(valueLeft, (int)(middle - (PipRow.PipSize / 2f)));
-            _pips.Draw(batch, textures, pipsAt, new PipRowLook(VolumeLevel.Max, level, tone, opacity, default));
-            numberLeft += PipRow.WidthOf(VolumeLevel.Max) + PipsToNumberGap;
+            numberLeft += DrawVolumePips(batch, textures, pipsAt, new PipRowLook(VolumeLevel.Max, level, tone, opacity, default));
         }
 
         batch.DrawString(_font, value.Text, new Vector2(numberLeft, textTop), color);
@@ -229,6 +228,13 @@ internal sealed class OptionsPage : IMenuPage
             new Diamond(new Vector2(valueLeft - ArrowGap, middle), ArrowSide).Draw(batch, textures.Pixel, color);
             new Diamond(new Vector2(numberLeft + value.Width + ArrowGap, middle), ArrowSide).Draw(batch, textures.Pixel, color);
         }
+    }
+
+    // The pips at their place; the width the number is drawn after.
+    private float DrawVolumePips(SpriteBatch batch, TextureLibrary textures, Point at, PipRowLook look)
+    {
+        _pips.Draw(batch, textures, at, look);
+        return PipRow.WidthOf(VolumeLevel.Max) + PipsToNumberGap;
     }
 
     // Which row is drawn, and where.

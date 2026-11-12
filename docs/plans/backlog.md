@@ -27,7 +27,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 - **Enemy attack strips are drawn unmirrored over the party**; no flip rule is decided (B5d). A design question for the developer.
 - **"Load the latest save" and the save-list overlay are written twice** (`TitleScene`, `DefeatScreen`/`DefeatScreenView`). Share them in the **autosave plan**, which is likely to add the third copy.
-- **The banner band** is drawn only by `BattleScene.DrawEscaped` now (the action name moved into a framed window in W1a). Share it with the **map name banner plan** when that plan draws the second one.
+- **The banner band** is drawn only by `BattleScene.DrawEscaped` (the action name moved into a framed window in W1a); the map banner (the map fixes plan's MB2) drew a different fading band, so a third banner shares, not the second.
 - `TileImages.Forget` keeps cached field-sprite frames; drop them too once field sprites can be imported (no import yet).
 
 ## From the demo retirement plan (2026-10-23)
@@ -39,7 +39,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - The editor's map save (`ContentWriter.WriteMaps`, decision 518) doesn't check that the files a map's events name exist: still images (`ArtReferenceCheck`) and voice files (`AudioReferenceCheck`). The game's startup rejects both, so an editor save can write content the game won't start with (`editor.md`, "Validate on save").
 - Test files over 300 lines: Core's `PartyStateTests` (322). Split by behavior when next touched.
 - Comment lines over 120 columns from before the rule was enforced: `ExplorationState` (5), `GameSession` (8). Rewrap when next touched.
-- `ScreenFade` skips its black moment when one update is longer than its fade-out plus hold (about 0.33 s), so a warp never moves the player. The fixed 1/60 s step hides it in play; tests must step at 1/60 s. Make `Update` stop on Holding if a long frame can ever reach it.
+- `ScreenFade` skips its black moment when one update is longer than its fade-out plus hold (about 0.33 s; the 0.08 s hold alone jumps too, so `EventPresenter.ShowWarp` never sees `Holding` and the warp's fade runs out and in over the old map, then starts again with its sound: the sound pass's FE3). Unreachable in play (decision 557): `JrpgGame` sets `IsFixedTimeStep` with a 1/60 s step, and MonoGame's `Game.Tick` (develop branch) passes `ElapsedGameTime = TargetElapsedTime` to every catch-up `DoUpdate`, its backlog capped at 500 ms; tests step at 1/60 s. Reopen (let a fade report a hold it passed) if the step is ever made variable.
 - `BattleState.cs` is at 283 lines after the enemy plan's B2 (296 at DR2): split the per-command bodies before the next command path lands (DR2 review).
 - The tip strip (dark `UiTheme.CommandHintFill` fill, highlight hairline, padded text) is drawn twice: `Battle/CommandPanelView.DrawHint` and `Menus/InventoryListView.DrawStrip`. Move it into one drawer in `Ui` when a third appears (M4 review).
 - The gap under a section title's band, `SectionTitle.Height + 10`, is written three times (`EquipmentSheetView.SectionHeight`, `StatusParametersView.BelowBand`, `StatusSheetView.AttributesBelowBand`; `StatusSkillsView`'s is 4 since decision 373): give `SectionTitle` a `ContentTop` (M3b review; the band's height itself moved there in the escape menu third pass, F1).
@@ -68,7 +68,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Menus/PartyPage.cs` (296 after the music plan's S4) is at the limit: the next change that grows it splits the notice and the action choice into their own presenter first. (`InventoryPage` split its list into `InventoryList` in the loot plan, C1.)
 - A titled dialog's frame (the scrim, a `FramedWindowLayout.Titled` window, the centered title, measured when the dialog changes) is written twice: `ConfirmPromptView` and `NoticeDialogView`. Share it when a third dialog comes, such as Equipment's or the save page's notice (decision 284).
 - The inventory hint names the Info button as "X (Y on a controller)" in `ui.json`, a copy of `InputBindings`; give the hint a `{button}` from `ButtonLabels.Of(GameButton.Info, device)` as `cinematic_skip` does, once menu pages know the device in use (F1 review).
-- Status: the Skills section starts under the longer of the gear and resource rows, so the stats plan's nine slots will push it off the page; that plan places it (F1 review).
 - Lists outside the menu still draw `MenuPointer` at the cursor's row, against the glide rule (`.claude/rules/game.md`, decision 336): the battle's command list (`CommandPanelView`), the defeat menu (`DefeatScreenView`) and the leader choice (`LeaderChoiceScene`). Glide them when next touched; the battle's look follows later anyway (decision 272).
 
 ## From the stats and gear slots plan (2026-10-27)
@@ -85,7 +84,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the loot plan (2026-10-29)
 
-- `Battle/VictoryScreenView.cs` is at 263 lines since the Items step (D3): the next change that grows it moves the cards' drawing into a `VictoryCardsView` first.
+- `Battle/VictoryScreenView.cs` is at 277 lines (263 after the Items step, D3): the next change that grows it moves the cards' drawing into a `VictoryCardsView` first.
 - `tests/Jrpg.Core.Tests/Session/GameSessionSaveTests.cs` is at 270 lines: the next save test goes in a new file split by concern (gear, members, world).
 
 ## From the affix stats plan (2026-10-29)
@@ -112,8 +111,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the gold and shops plan (2026-11-01)
 
-- `Game/Exploration/EventPresenter` is at 293 lines after the sound pass's FE3 (its page reading left for `MessageReading` in FE1); the next growth past about 300 lines moves the rest's handling (`ShowRest` and the rest's line in `StartReading`) beside `RestPlayback` first.
-- `Scenes/ScreenFade`: one update longer than the 0.08 s hold at black jumps over it, so `EventPresenter.ShowWarp` never sees `Holding`, the warp's fade runs out and in over the old map, then starts again with its sound (found by a test stepping 0.1 s in the sound pass's FE3). The fixed 1/60 s step hides it; a long frame would show it: let a fade report a hold it passed.
+- `Game/Exploration/EventPresenter` is at 294 lines after the sound pass's FE3 (its page reading left for `MessageReading` in FE1); the next growth past about 300 lines moves the rest's handling (`ShowRest` and the rest's line in `StartReading`) beside `RestPlayback` first.
 - The "move down until the wanted row" test helper is written three times (`ShopSceneBuyTests`, `ShopSceneSellTests`, `ShopScenePreviewTests`): `Trade/ShopDriver.MoveDownUntil` (the sound pass, SH2) is the shared one they can switch to.
 - Private draw helpers over four parameters: `ShopDetailView.DrawRow` (6), `DrawPreview` and `DrawPicker` (5), `ShopListView.DrawTabs`, `DrawRowSelection` and `DrawRow` (5); fold the area or the opacity into a per-frame record when each view is next touched.
 - The gold plan's out-of-scope features (editing shops in the editor, gold in the save list, a `giveGold` step, Unique items in shops, the whole party's preview at once) are listed in `docs/plans/done/2026-10-29-gold-and-shops/README.md`, "Out of scope".
@@ -137,11 +135,9 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the music and sound effects plan (2026-11-01)
 
-- `OptionsPageTests` (lines 53-88): the older text speed tests reach their row with one Down press; `PageOn(OptionsPage.TextSpeedRow)` now exists (V1 review).
 - `SystemPageTests`' older tests (`Update_ConfirmQuit_AsksBeforeRequesting`, `Update_YesToQuit_RequestsQuit`, `Update_YesToTitleScreen_RequestsTitle`, `Update_AnswerNo_StaysInPage`) and the new `Update_ConfirmQuit_AsksNothing` reach rows by fixed presses: `SystemPage` exposes no selected entry (S3 review).
 - `BattleSceneTests` and `BattleSceneSoundTests` reach command rows by fixed presses (Up wrapping to Run, Down counted to Defend), since `BattleScene` doesn't expose its menu's selection (B4 review).
 - `Battle/BattleScene` is at 290 lines after the sound pass's V1: the next change that grows it moves its outcome screens' update and finish into their own type first.
-- `Menus/OptionsPage.DrawRow` is 25 lines since the volume pips (V2): extract the pips' drawing when the page is next touched.
 - `InventoryPageSoundTests` and the older Inventory tests lean on the list opening on the potion: a small helper that moves to an item by id (S4 review).
 - The music plan's out-of-scope features (settings kept between runs, composed music, crossfades, streaming, field sounds, a `playMusic` step, pausing on lost focus) are listed in `docs/plans/done/2026-10-29-music-and-sfx/README.md`, "Out of scope".
 

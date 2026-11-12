@@ -7,3 +7,4 @@
 - [Detached comments](detached-comments.md) — a member inserted under, or removed from under, a comment leaves it describing the wrong code
 - [Stale derived UI text](stale-derived-ui-text.md) — notes or labels set at an action and not refreshed when their inputs change; trace a refresh event before calling it missing (MF4 false alarm)
 - [Lax test JSON readers](lax-test-json-readers.md) — test-only manifest readers skip required/nullable checks; ContentJsonOptions.Strict exists
+- [Dead-member listing gap](dead-member-listing-gap.md) — bare-name dead-code greps miss members sharing a name; type-scoped recheck recipe

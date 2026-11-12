@@ -3,7 +3,7 @@ Status: approved, in progress (every slice done but V1, the developer's `verify.
 
 Developer's request (2026-11-11), verbatim: "it's time to do all the health check listed and do a clean up phase. dead code optimisation using clean code convention and microsoft convention. to be most human readable possible. using clear strucutre and segmentation and intention. everything work really well so no regression."
 
-The developer approved the plan on 2026-11-11 with the devil's advocate's changes. It is the editor and Data half of the cleanup (decision 536); the Game's backlog lines are in [2026-11-11-game-code-health-cleanup](../2026-11-11-game-code-health-cleanup/README.md).
+The developer approved the plan on 2026-11-11 with the devil's advocate's changes. It is the editor and Data half of the cleanup (decision 536); the Game's backlog lines are in [2026-11-11-game-code-health-cleanup](../done/2026-11-11-game-code-health-cleanup/README.md).
 
 The Game plan (approved the same day, decisions 550-558) follows this one.
 
@@ -36,7 +36,7 @@ Each phase ends green: every slice builds, passes every test, and passes `verify
 - **No NuGet package, nothing in `content/`, no Core change.** The one behavior change is R1's (decision 544): a state the modal composer rules out throws instead of skipping.
 
 ## Out of scope
-- **The Game's backlog lines**: the second plan, [2026-11-11-game-code-health-cleanup](../2026-11-11-game-code-health-cleanup/README.md).
+- **The Game's backlog lines**: the second plan, [2026-11-11-game-code-health-cleanup](../done/2026-11-11-game-code-health-cleanup/README.md).
 - **Everything the next editor and Data plans won't touch first**, which stays in `backlog.md` with its reason (design.md, "Backlog survey"). Among them:
   - the Data validators' repeated checks (the six "lists 'x' more than once", `WholeChance` three times);
   - `TileBrowserViewModel` (332 lines) and its `SheetGrid`; `TileBrowserViewModelTests` (496) and `ObjectShapesViewModelTests` (347), Editor test files outside this plan's scope rule (decision 536);
@@ -76,7 +76,7 @@ Sizes are hand-written lines, tests included; "moved" lines are cut and pasted (
 - [x] **R3. The art check's lines that do two things; the backlog closed** (Data, docs, about 50 lines) → [slices/R3.md](slices/R3.md)
 
 ## Decisions
-- **536. Two cleanup plans** (the developer's scope (a)): this one is the editor and Data phase, scoped to what the next plans touch first (the editor shell, the content writer, the maps); [2026-11-11-game-code-health-cleanup](../2026-11-11-game-code-health-cleanup/README.md) covers the Game's backlog lines. Every other line stays in `backlog.md` with its reason.
+- **536. Two cleanup plans** (the developer's scope (a)): this one is the editor and Data phase, scoped to what the next plans touch first (the editor shell, the content writer, the maps); [2026-11-11-game-code-health-cleanup](../done/2026-11-11-game-code-health-cleanup/README.md) covers the Game's backlog lines. Every other line stays in `backlog.md` with its reason.
 - **537. The refactor guard is the runner's total per project, before and after, with the moved test names listed**; never a count of test methods. A moved test changes only by a mechanical prefix.
 - **538. Bugs before the refactor of their file, each showing its test can fail** (B1 by deleting the branch's `return false` for one run, B2 before its fix); window code by hand (B3).
 - **539. The line rule:** code lines at most 130 columns, comments at most 120. `verify.ps1` refuses a changed code line over 130 columns as it refuses a changed comment over 120; the developer makes the script edit (V1, the script is protected). No repository-wide rewrap: about 250 Editor and 140 Data lines run past 130 today, and they wrap when a slice next changes them. A readability slice changes only lines that do two things; a message is wrapped by splitting its interpolated string with `+`, unless pinned by `Assert.Equal` first.

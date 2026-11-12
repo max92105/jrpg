@@ -1,5 +1,5 @@
 # Code health cleanup: the Game
-Status: retro pending
+Status: done
 
 Developer's request (2026-11-11), verbatim: "it's time to do all the health check listed and do a clean up phase. dead code optimisation using clean code convention and microsoft convention. to be most human readable possible. using clear strucutre and segmentation and intention. everything work really well so no regression."
 

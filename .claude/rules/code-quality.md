@@ -70,4 +70,4 @@ When existing code breaks these rules, follow the rules in new code and note the
 
 ## What the build refuses (each cost a build round in the map fixes plan)
 
-- A member named `Object` (CA1720); a constructor near ten branches takes a helper (CA1502); `First()` or `FirstOrDefault()` without a predicate on a list (CA1826: pattern-match the list instead); a fifth parameter (the verify script); an object initializer after a method call (it follows `new` alone).
+- A member named `Object` (CA1720); a constructor near ten branches takes a helper (CA1502); `First()` or `FirstOrDefault()` without a predicate on a list (CA1826: pattern-match the list instead); a fifth parameter (the verify script); an object initializer after a method call (it follows `new` alone). A private method taking `IReadOnlyList` or `IEnumerable` when its only callers pass a concrete list or array (CA1859): take the concrete type.

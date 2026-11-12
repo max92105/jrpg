@@ -1,7 +1,5 @@
-using Jrpg.Core.Content;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Geometry;
-using Jrpg.Data.Content;
 using Jrpg.Data.Saving;
 using Jrpg.Game.Flow;
 using Jrpg.Game.Hosting;
@@ -19,8 +17,6 @@ namespace Jrpg.Game.Tests.Flow;
 [Collection(RepositoryScreenText.CollectionName)]
 public sealed class GameFlowTests : IDisposable
 {
-    private static readonly ContentCatalog _catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
-
     private static readonly InputFrame _holdingRight =
         new(MoveIntent.FromAxes(1, 0), ButtonSet.Empty.With(GameButton.Right), ButtonSet.Empty);
 
@@ -37,7 +33,7 @@ public sealed class GameFlowTests : IDisposable
     [Fact]
     public void Constructor_WaitingOnTitle_HasNoSession()
     {
-        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create(), new PlayerSettings());
+        var flow = new GameFlow(StartMapScenarios.TestWorld, RepositoryScreenText.Text, UnwrittenSaveSlots.Create(), new PlayerSettings());
 
         flow.Update(WholeFade, default);
 
@@ -47,115 +43,12 @@ public sealed class GameFlowTests : IDisposable
     [Fact]
     public void Update_QuitConfirmed_ReturnsQuitRequest()
     {
-        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create(), new PlayerSettings());
+        var flow = new GameFlow(StartMapScenarios.TestWorld, RepositoryScreenText.Text, UnwrittenSaveSlots.Create(), new PlayerSettings());
         flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Down));
 
         var request = flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
 
         Assert.IsType<QuitRequested>(request);
-    }
-
-    [Fact]
-    public void Update_NewGameConfirmedWholeFade_HasNoSession()
-    {
-        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create(), new PlayerSettings());
-        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
-
-        flow.Update(WholeFade, default);
-
-        Assert.Null(flow.Session);
-    }
-
-    [Fact]
-    public void Update_CancelOnChoice_ReturnsToTitleWithoutSession()
-    {
-        var flow = new GameFlow(_catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create(), new PlayerSettings());
-        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
-        flow.Update(WholeFade, default);
-        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Cancel));
-        flow.Update(WholeFade, default);
-
-        // With no save the title lists New Game and Quit: Down then Confirm quits only if the title is back.
-        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Down));
-        var request = flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
-
-        Assert.IsType<QuitRequested>(request);
-        Assert.Null(flow.Session);
-    }
-
-    [Fact]
-    public void Update_LeaderConfirmedFadeReachesBlack_StartsLedByThem()
-    {
-        var catalog = _catalog with { NewGame = _catalog.NewGame with { LeaderChoices = [Choice("sarxian"), Choice("zanyr")] } };
-        var flow = new GameFlow(catalog, RepositoryScreenText.Text, UnwrittenSaveSlots.Create(), new PlayerSettings());
-        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
-        flow.Update(WholeFade, default);
-        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Down));
-        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
-        AnswerYes(flow);
-
-        flow.Update(FadeOut, default);
-
-        Assert.Equal("zanyr", SessionOf(flow).Party.Leader.Id);
-    }
-
-    [Fact]
-    public void Update_LeaderConfirmedFadeNotYetBlack_HasNoSession()
-    {
-        var flow = FlowWithLeaderConfirmed();
-
-        flow.Update(FadeOut - TimeSpan.FromSeconds(0.1), default);
-
-        Assert.Null(flow.Session);
-    }
-
-    [Fact]
-    public void Update_LeaderConfirmedFadeReachesBlack_StartsOnTheStartMap()
-    {
-        var flow = FlowWithLeaderConfirmed();
-
-        flow.Update(FadeOut, default);
-
-        Assert.Equal("start", flow.Session?.Exploration.Location.MapId);
-    }
-
-    [Fact]
-    public void Update_TestWorldIntroSkipped_LandsOnTheStartMap()
-    {
-        var flow = FlowWithLeaderConfirmed(catalog: _catalog);
-        flow.Update(WholeFade, default);
-        flow.Update(OneUpdate, default);
-        Assert.Equal("intro", SessionOf(flow).Exploration.CurrentMap.Id);
-
-        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
-        for (var update = 0; update < 60; update++)
-        {
-            flow.Update(OneUpdate, default);
-        }
-
-        Assert.Equal("start", SessionOf(flow).Exploration.CurrentMap.Id);
-    }
-
-    [Fact]
-    public void Update_LeaderConfirmedThenOneUpdateLongerThanTheFade_StillStartsNewGame()
-    {
-        var flow = FlowWithLeaderConfirmed();
-
-        flow.Update(WholeFade + TimeSpan.FromSeconds(1), default);
-
-        Assert.NotNull(flow.Session);
-    }
-
-    [Fact]
-    public void Update_IntroSkipped_VoiceStops()
-    {
-        var flow = StartedFlow(catalog: _catalog);
-        flow.Update(OneUpdate, default);
-        Assert.Equal("Placeholder.wav", flow.Audio.Voice.VoiceFile);
-
-        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
-
-        Assert.Null(flow.Audio.Voice.VoiceFile);
     }
 
     [Fact]
@@ -240,7 +133,7 @@ public sealed class GameFlowTests : IDisposable
     [Fact]
     public void Update_LoadRequested_RestoresSavedLocationAndPlayTime()
     {
-        var slots = new SaveSlots(new FileSaveStore(_directory, _catalog), _catalog, () => DateTimeOffset.UnixEpoch);
+        var slots = new SaveSlots(new FileSaveStore(_directory, StartMapScenarios.TestWorld), StartMapScenarios.TestWorld, () => DateTimeOffset.UnixEpoch);
         var flow = StartedFlow(slots);
         flow.Update(TimeSpan.FromSeconds(0.3), _holdingRight);
         var saved = SessionOf(flow);

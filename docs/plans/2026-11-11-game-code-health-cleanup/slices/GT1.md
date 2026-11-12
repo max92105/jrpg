@@ -19,3 +19,5 @@ None new. The runner's totals per project equal before and after; the Done note 
 
 ## Verify by hand
 None: tests only.
+
+- **Done:** as planned; `GameFlowTests` ends at 214 lines (its `_catalog` field and the `Jrpg.Core.Content` and `Jrpg.Data.Content` usings gone), `GameFlowNewGameTests` at 119 with the collection attribute. The moved tests: `Update_NewGameConfirmedWholeFade_HasNoSession`, `Update_CancelOnChoice_ReturnsToTitleWithoutSession`, `Update_LeaderConfirmedFadeReachesBlack_StartsLedByThem`, `Update_LeaderConfirmedFadeNotYetBlack_HasNoSession`, `Update_LeaderConfirmedFadeReachesBlack_StartsOnTheStartMap`, `Update_TestWorldIntroSkipped_LandsOnTheStartMap`, `Update_LeaderConfirmedThenOneUpdateLongerThanTheFade_StillStartsNewGame`, `Update_IntroSkipped_VoiceStops`; the one mechanical edit is `_catalog` → `StartMapScenarios.TestWorld` in both classes; none of the moved tests reads `_holdingRight` or the save directory. The runner's totals: Game.Tests 1432 before and after (4610 in all). The two backlog lines changed as planned.

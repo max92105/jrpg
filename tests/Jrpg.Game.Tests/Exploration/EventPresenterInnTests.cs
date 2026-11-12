@@ -1,7 +1,5 @@
 using Jrpg.Core.Session;
-using Jrpg.Game.Audio;
 using Jrpg.Game.Exploration;
-using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
 using Jrpg.Game.Tests.Ui;
 using Jrpg.Game.Ui;
@@ -123,6 +121,6 @@ public sealed class EventPresenterInnTests
     private static EventPresenter NewPresenter(GameSession session)
     {
         session.Exploration.TryInteract();
-        return new EventPresenter(session.Exploration, new EventLook(RepositoryScreenText.Text, new UiTextures()), new PlayerSettings(), new VoiceChannel());
+        return EventPresenters.Over(session.Exploration);
     }
 }

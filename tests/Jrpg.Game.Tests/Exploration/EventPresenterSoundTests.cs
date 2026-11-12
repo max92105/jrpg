@@ -95,8 +95,7 @@ public sealed class EventPresenterSoundTests
     {
         var exploration = StartMapScenarios.StartExploring(catalog);
         Assert.True(exploration.TryInteract());
-        var look = new EventLook(RepositoryScreenText.Text, new UiTextures());
-        var presenter = new EventPresenter(exploration, look, new PlayerSettings { TextSpeed = speed }, _voice);
+        var presenter = EventPresenters.Over(exploration, settings: new PlayerSettings { TextSpeed = speed }, voice: _voice);
         presenter.Update(StartMapScenarios.OneUpdate, default);
         Assert.True(presenter.IsShowingMessage);
         return presenter;

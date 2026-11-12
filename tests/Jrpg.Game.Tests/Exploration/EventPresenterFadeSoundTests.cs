@@ -2,9 +2,7 @@ using Jrpg.Core.Events;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
-using Jrpg.Game.Audio;
 using Jrpg.Game.Exploration;
-using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
 using Jrpg.Game.Tests.Ui;
 using Jrpg.Game.Ui;
@@ -67,7 +65,7 @@ public sealed class EventPresenterFadeSoundTests
     {
         var exploration = StartMapScenarios.StartExploring(StartMapScenarios.BelowRestingChest);
         Assert.True(exploration.TryInteract());
-        var presenter = NewPresenter(exploration);
+        var presenter = EventPresenters.Over(exploration);
 
         presenter.Update(StartMapScenarios.OneUpdate, default);
 
@@ -127,7 +125,7 @@ public sealed class EventPresenterFadeSoundTests
     private static List<string> SoundsThroughTheIntro(Func<EventPresenter, InputFrame> inputFor)
     {
         var exploration = GameSession.StartNew(StartMapScenarios.TestWorld, "ragnir", new SeededRandom(1)).Exploration;
-        var presenter = NewPresenter(exploration);
+        var presenter = EventPresenters.Over(exploration);
         var asked = new List<string>();
         for (var update = 0; update < 5000 && exploration.CurrentMap.Id == "intro"; update++)
         {
@@ -149,18 +147,16 @@ public sealed class EventPresenterFadeSoundTests
         }
 
         Assert.IsType<WarpStep>(exploration.CurrentEventStep);
-        return (exploration, NewPresenter(exploration));
+        return (exploration, EventPresenters.Over(exploration));
     }
 
     private static (GameSession Session, EventPresenter Presenter) AtTheInnQuestion()
     {
         var session = StartMapScenarios.StartWithWholeParty(StartMapScenarios.BelowInnChest);
         Assert.True(session.Exploration.TryInteract());
-        var presenter = NewPresenter(session.Exploration);
+        var presenter = EventPresenters.Over(session.Exploration);
         presenter.Update(StartMapScenarios.OneUpdate, default);
         return (session, presenter);
     }
 
-    private static EventPresenter NewPresenter(ExplorationState exploration) =>
-        new(exploration, new EventLook(RepositoryScreenText.Text, new UiTextures()), new PlayerSettings(), new VoiceChannel());
 }

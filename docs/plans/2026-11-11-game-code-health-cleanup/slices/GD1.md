@@ -19,3 +19,5 @@ None new. The runner's totals per project equal before and after (Done note); no
 
 ## Verify by hand
 None: tests only.
+
+- **Done, with deviations:** as planned; `EventPresenters.Over(exploration, settings, voice)` in `tests/Jrpg.Game.Tests/Exploration/EventPresenters.cs`; 21 sites rewritten (the grep missed `EventPresenterFadeSoundTests.NewPresenter`, the short `new(...)` form, found by the review and folded in): 15 with the defaults, four passing `settings:` for an instant or a theory's speed (the sound theory also its `_voice`), `StartIntro` passing `voice:` to keep its channel, the two sound tests dropping their `look` local with the call. Neither `look` was read afterwards, so both went. The usings the builder absorbed left ten files (the build named each). The runner's total is 4610 before and after (Game.Tests 1432); no test moved. The sound pass's backlog line went.

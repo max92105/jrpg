@@ -148,7 +148,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the sound pass plan (2026-11-02)
 
-- Tests build an `EventPresenter` by hand 20 times in 9 files (`new EventPresenter(exploration, new EventLook(RepositoryScreenText.Text, new UiTextures()), new PlayerSettings(), new VoiceChannel())`): one test builder beside `StartMapScenarios`.
 - `VictoryScreenSoundTests` copies `VictoryScreenTests`' spoils builders (Sarxian, half a level, a potion): share them when a third victory test file comes.
 
 ## From the Mana Seed reset plan (2026-11-03, at approval)

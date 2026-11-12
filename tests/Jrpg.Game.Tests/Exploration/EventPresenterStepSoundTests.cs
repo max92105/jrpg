@@ -1,7 +1,6 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Events;
 using Jrpg.Core.Exploration;
-using Jrpg.Game.Audio;
 using Jrpg.Game.Exploration;
 using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
@@ -136,8 +135,7 @@ public sealed class EventPresenterStepSoundTests
         ContentCatalog catalog = StartMapScenarios.WithChestSaying(StartMapScenarios.BelowChest, steps);
         var exploration = StartMapScenarios.StartExploring(catalog);
         Assert.True(exploration.TryInteract());
-        var look = new EventLook(RepositoryScreenText.Text, new UiTextures());
-        var presenter = new EventPresenter(exploration, look, new PlayerSettings { TextSpeed = TextSpeed.Instant }, new VoiceChannel());
+        var presenter = EventPresenters.Over(exploration, settings: new PlayerSettings { TextSpeed = TextSpeed.Instant });
         return (presenter, exploration);
     }
 

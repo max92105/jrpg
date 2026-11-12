@@ -8,9 +8,7 @@ using Jrpg.Core.Party;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Data.Content;
-using Jrpg.Game.Audio;
 using Jrpg.Game.Exploration;
-using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
 using Jrpg.Game.Scenes;
@@ -133,7 +131,7 @@ internal static class StartMapScenarios
         new(
             exploration,
             new MapArt(catalog, MapView.CellPixels),
-            new EventPresenter(exploration, new EventLook(RepositoryScreenText.Text, new UiTextures()), new PlayerSettings(), new VoiceChannel()),
+            EventPresenters.Over(exploration),
             overlays);
 
     /// <summary>The prompt, a new banner and its view, as the scene factory builds them.</summary>

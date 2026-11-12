@@ -35,7 +35,10 @@ public static class ArtReferenceCheck
 
         AddTilesOutside(problems, catalog, sheetSizes);
         TryReadSize(artRoot, ArtFolders.FieldSprites, catalog.NewGame.FieldSpriteFile, problems);
-        var npcSprites = catalog.Objects.Values.Where(definition => definition.FieldSpriteFile is not null).OrderBy(definition => definition.Id, StringComparer.Ordinal)
+        var npcsWithSprites = catalog.Objects.Values
+            .Where(definition => definition.FieldSpriteFile is not null)
+            .OrderBy(definition => definition.Id, StringComparer.Ordinal);
+        var npcSprites = npcsWithSprites
             .Select(definition => (File: definition.FieldSpriteFile!, NamedBy: $"object '{definition.Id}'"))
             .ToList();
         AddMissingByExactName(problems, artRoot, ArtFolders.FieldSprites, npcSprites);
@@ -47,22 +50,31 @@ public static class ArtReferenceCheck
         var stills = MapEventSteps.Of<StillStep>(catalog).Select(named => (named.Step.ImageFile, named.NamedBy));
         AddMissingByExactName(problems, artRoot, ArtFolders.Cinematics, stills);
         var members = catalog.PartyMembers.Values.OrderBy(member => member.Id, StringComparer.Ordinal);
-        AddMissing(problems, artRoot, ArtFolders.Portraits, members.Select(member => (member.PortraitFile, $"party member '{member.Id}'")));
+        var memberPortraits = members.Select(member => (member.PortraitFile, $"party member '{member.Id}'"));
+        AddMissing(problems, artRoot, ArtFolders.Portraits, memberPortraits);
         var items = catalog.Items.Values.OrderBy(item => item.Id, StringComparer.Ordinal);
-        AddMissing(problems, artRoot, ArtFolders.Icons, items.Select(item => (item.IconFile, $"item '{item.Id}'")));
-        var skillsWithIcons = catalog.Skills.Values.Where(skill => skill.IconFile.Length > 0).OrderBy(skill => skill.Id, StringComparer.Ordinal);
-        AddMissingByExactName(problems, artRoot, ArtFolders.Icons, skillsWithIcons.Select(skill => (skill.IconFile, $"skill '{skill.Id}'")));
-        AddMissingByExactName(problems, artRoot, ArtFolders.Battlers, members.Select(member => (member.BattleSpriteFile, $"party member '{member.Id}'")));
+        var itemIcons = items.Select(item => (item.IconFile, $"item '{item.Id}'"));
+        AddMissing(problems, artRoot, ArtFolders.Icons, itemIcons);
+        var skillsWithIcons = catalog.Skills.Values
+            .Where(skill => skill.IconFile.Length > 0)
+            .OrderBy(skill => skill.Id, StringComparer.Ordinal);
+        var skillIcons = skillsWithIcons.Select(skill => (skill.IconFile, $"skill '{skill.Id}'"));
+        AddMissingByExactName(problems, artRoot, ArtFolders.Icons, skillIcons);
+        var memberBattlers = members.Select(member => (member.BattleSpriteFile, $"party member '{member.Id}'"));
+        AddMissingByExactName(problems, artRoot, ArtFolders.Battlers, memberBattlers);
         var enemies = catalog.Enemies.Values.OrderBy(enemy => enemy.Id, StringComparer.Ordinal);
-        AddMissingByExactName(problems, artRoot, ArtFolders.Battlers, enemies.Select(enemy => (enemy.BattleSpriteFile, $"enemy '{enemy.Id}'")));
-        AddMissingByExactName(problems, artRoot, ArtFolders.Portraits, enemies.Select(enemy => (enemy.PortraitFile, $"enemy '{enemy.Id}'")));
+        var enemyBattlers = enemies.Select(enemy => (enemy.BattleSpriteFile, $"enemy '{enemy.Id}'"));
+        AddMissingByExactName(problems, artRoot, ArtFolders.Battlers, enemyBattlers);
+        var enemyPortraits = enemies.Select(enemy => (enemy.PortraitFile, $"enemy '{enemy.Id}'"));
+        AddMissingByExactName(problems, artRoot, ArtFolders.Portraits, enemyPortraits);
         var attackEffects = members.Select(member => (File: member.AttackEffectFile, NamedBy: $"party member '{member.Id}'"))
             .Concat(enemies.Select(enemy => (File: enemy.AttackEffectFile, NamedBy: $"enemy '{enemy.Id}'")))
             .ToList();
         AddMissingByExactName(problems, artRoot, ArtFolders.Effects, attackEffects);
         AddPartialFrameStrips(problems, artRoot, attackEffects.Select(effect => effect.File));
         var encounters = catalog.Encounters.Values.OrderBy(encounter => encounter.Id, StringComparer.Ordinal);
-        AddMissingByExactName(problems, artRoot, ArtFolders.Backgrounds, encounters.Select(encounter => (encounter.BackgroundFile, $"encounter '{encounter.Id}'")));
+        var backgrounds = encounters.Select(encounter => (encounter.BackgroundFile, $"encounter '{encounter.Id}'"));
+        AddMissingByExactName(problems, artRoot, ArtFolders.Backgrounds, backgrounds);
         return problems;
     }
 
@@ -80,11 +92,15 @@ public static class ArtReferenceCheck
             var shownPath = ExactFileName.ShownPath(ArtFolders.Tilesheets, sheet.File);
             if (!IsCellInside(tile.Column, tile.Row, sheet, size))
             {
-                problems.Add($"{shownPath}: tile {tile.Id}'s cell ({tile.Column}, {tile.Row}) lies outside the {size.Width}x{size.Height} image.");
+                problems.Add(
+                    $"{shownPath}: tile {tile.Id}'s cell ({tile.Column}, {tile.Row}) "
+                    + $"lies outside the {size.Width}x{size.Height} image.");
             }
             else if (!IsLastFrameInside(tile, sheet, size))
             {
-                problems.Add($"{shownPath}: tile {tile.Id}'s last animation frame ({LastFrameColumn(tile)}, {tile.Row}) lies outside the {size.Width}x{size.Height} image.");
+                problems.Add(
+                    $"{shownPath}: tile {tile.Id}'s last animation frame ({LastFrameColumn(tile)}, {tile.Row}) "
+                    + $"lies outside the {size.Width}x{size.Height} image.");
             }
         }
     }
@@ -99,7 +115,9 @@ public static class ArtReferenceCheck
             if (ReadSize(artRoot, ArtFolders.FieldSprites, file).Size is { } size && !FieldSpriteLayout.Holds(size))
             {
                 problems.Add(
-                    $"{ExactFileName.ShownPath(ArtFolders.FieldSprites, file)}: a {size.Width}x{size.Height} sprite doesn't hold {FieldSpriteLayout.WalkFrames} x {FieldSpriteLayout.Rows} frames of {FieldSpriteLayout.FramePixels} px ({neededWidth}x{neededHeight}). Named by {namedBy}.");
+                    $"{ExactFileName.ShownPath(ArtFolders.FieldSprites, file)}: a {size.Width}x{size.Height} sprite doesn't hold "
+                    + $"{FieldSpriteLayout.WalkFrames} x {FieldSpriteLayout.Rows} frames of {FieldSpriteLayout.FramePixels} px "
+                    + $"({neededWidth}x{neededHeight}). Named by {namedBy}.");
             }
         }
     }
@@ -109,9 +127,17 @@ public static class ArtReferenceCheck
     {
         foreach (var file in files.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal))
         {
-            if (ReadSize(artRoot, ArtFolders.Effects, file).Size is { } size && (size.Height == 0 || size.Width % size.Height != 0))
+            if (ReadSize(artRoot, ArtFolders.Effects, file).Size is not { } size)
             {
-                problems.Add($"{ExactFileName.ShownPath(ArtFolders.Effects, file)}: a {size.Width}x{size.Height} strip isn't a row of whole square frames.");
+                continue;
+            }
+
+            var isRowOfSquares = size.Height > 0 && size.Width % size.Height == 0;
+            if (!isRowOfSquares)
+            {
+                problems.Add(
+                    $"{ExactFileName.ShownPath(ArtFolders.Effects, file)}: a {size.Width}x{size.Height} strip "
+                    + "isn't a row of whole square frames.");
             }
         }
     }
@@ -145,11 +171,15 @@ public static class ArtReferenceCheck
     /// image of this size wouldn't hold.
     /// </summary>
     /// <param name="catalog">The sheets and tiles checked.</param>
-    /// <param name="file">The image's file name in the tilesheet art folder; sheets match it ignoring case, as Windows does.</param>
+    /// <param name="file">
+    /// The image's file name in the tilesheet art folder; sheets match it ignoring case, as Windows does.
+    /// </param>
     /// <param name="size">The new image's width and height in pixels.</param>
     internal static TileDefinition? FirstTileOutside(ContentCatalog catalog, string file, (int Width, int Height) size)
     {
-        var sheets = catalog.Tilesheets.Values.Where(sheet => string.Equals(sheet.File, file, StringComparison.OrdinalIgnoreCase)).ToDictionary(sheet => sheet.Id);
+        var sheetsFromFile = catalog.Tilesheets.Values
+            .Where(sheet => string.Equals(sheet.File, file, StringComparison.OrdinalIgnoreCase));
+        var sheets = sheetsFromFile.ToDictionary(sheet => sheet.Id);
         return catalog.Tiles.Values
             .Where(tile => sheets.TryGetValue(tile.SheetId, out var sheet) && !IsTileInside(tile, sheet, size))
             .MinBy(tile => tile.Id);

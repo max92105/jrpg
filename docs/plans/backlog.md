@@ -20,7 +20,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   The file is protected, so ask the developer first.
 - **Why Core refused an equipment change:** `SlotChoice.Apply` works out "no room in the bag" itself, and "Remove all" loops over the slots in the Game. `PartyEquipment.ItemWithoutRoom` and `UnequipAll` would own both. It can wait because it is correct today, and nothing planned changes equipment.
 - **`Ui/MessageIds.cs` is 767 lines** of constants. Split it into partial files by feature, so no call site changes. It can wait because a table of constants doesn't get harder to change as it grows.
-- **`TileBrowserViewModelTests` (410 lines):** move the Cut panel tests (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) into a `TileBrowserCutTests` class.
+- **`TileBrowserViewModelTests` (496 lines):** split it into Cut and re-cut classes (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) over a shared setup when the tile browser is next touched (outside the cleanup plan's scope, decision 536).
 - **`TileBrowserViewModel` (332 lines since the sheet zoom):** move the sheet hit-testing (`CellAt`, `NearestCellTo`, `GridPositionOf`, F1's grid check) into a `Tiles/SheetGrid`.
 - **`ObjectShapesViewModelTests` (347 lines):** move the zone tests (E10) and the point-editing tests (E11a) into their own classes.
 - **The New NPC dialog** doesn't check that the chosen sprite holds the walk frames. The startup and save check (plan 2026-10-23, F5a) refuses such a sprite, and `NewNpcViewModel.SpriteProblem` could say so in the dialog, through a size lookup.
@@ -40,7 +40,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 - The editor's map save (`ContentWriter.WriteMaps`, decision 518) doesn't check that the files a map's events name exist: still images (`ArtReferenceCheck`) and voice files (`AudioReferenceCheck`). The game's startup rejects both, so an editor save can write content the game won't start with (`editor.md`, "Validate on save").
 - Test files over 300 lines: `GameFlowTests` (369), `PartyStateTests` (322). Split by behavior when next touched.
-- Comment lines over 120 columns from before the rule was enforced: `ExplorationState` (5), `GameSession` (8), `ArtReferenceCheck` (2), `MessageIds` (1). Rewrap when next touched.
+- Comment lines over 120 columns from before the rule was enforced: `ExplorationState` (5), `GameSession` (8), `MessageIds` (1). Rewrap when next touched.
 - `ScreenFade` skips its black moment when one update is longer than its fade-out plus hold (about 0.33 s), so a warp never moves the player. The fixed 1/60 s step hides it in play; tests must step at 1/60 s. Make `Update` stop on Holding if a long frame can ever reach it.
 - `BattleState.cs` is at 283 lines after the enemy plan's B2 (296 at DR2): split the per-command bodies before the next command path lands (DR2 review).
 - `tests/Jrpg.Game.Tests/Battle/CommandMenuTests.cs` is at 393 lines: split it by menu entry (MO1 review).
@@ -130,7 +130,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Core/Session/GameSession.cs` is at 289 lines (the quests plan added the journal and the log's capture and restore): the next member moves the save capture and restore into their own type first.
 - `tests/Jrpg.Data.Tests/Content/ContentWriterTests.cs` (254 after the cleanup plan's D2) and `tests/Jrpg.Game.Tests/Exploration/EventPresenterTests.cs` (306): new tests go in sibling files, as `ContentWriterQuestTests` and `EventPresenterQuestTests` do.
 - `Objects/ObjectIds.ProblemOf`'s message says "(like tree_4)" and the Quests window shows it for quest and stage ids (QE2): reword it with the `ContentIds` rename above.
-- `CatalogDraft.SetQuests` builds its dictionary with `ToDictionary`, which throws on a repeated id; only `QuestCatalogViewModel.Problem` stands before it (QE1): refuse with the validator's message instead.
 - `Ui/ResourceGaugeView.LabelSpacing` (2) duplicates `SheetRowLook.LabelSpacing`, which `QuestDetailView` reads too (L3 review): one constant in `Ui/`.
 - The quests plan's out-of-scope features (the Quest giver preset, removing a saved quest or stage in the Quests window, a cell's touch event that changes with a quest, rewards, story flags, map markers) are listed in `docs/plans/done/2026-10-29-quests/README.md`, "Out of scope".
 
@@ -164,7 +163,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `SoundSourcesTests` reads the test output's copy of `content/`, which keeps a deleted file until a clean build (`PreserveNewest` never deletes): read the repository's folder through the `ContentRoot` metadata the Mana Seed plan's AS1 stamps into `Jrpg.Data.Tests`, as `ArtSourcesTests` does.
 - `ContentCatalogLoaderTests.Load_RepositoryContent_Succeeds` says the start layout refers to "potion"; once the maps are rebuilt (C2), restate the reason by an id or drop the comment.
 - `SoundSourcesTests` reads its manifest with its own loose options (camelCase, unmapped members disallowed): a missing field reads as a default; switch it to `ContentJsonOptions.Strict` as `ArtSourcesManifest` does (AS1 review).
-- `tests/Jrpg.Editor.Tests/Tiles/TileBrowserViewModelTests.cs` is about 500 lines: split it along the Cut-panel tests and the hit-test tests (M1 review).
 - The start map has no door into `interior_1` (decision 454): place one (a door object from the half-timber sheet, the event panel's door preset warping to `interior_1`), then remove the `Skip` on `RepositoryNewGameTests.StartMap_RepositoryContent_HasADoorIntoAnInterior`.
 
 ## From the object composer and animated tiles plan (2026-11-03, at approval)
@@ -173,7 +171,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - The other out-of-scope items (an explicit frame list or per-frame times, per-cell start offsets, the tall grass effect, a free pixel rectangle from an image without a cut, animated canopies, an animated tile's mark on the sheet, the re-cut warning counting frames) are listed in `docs/plans/done/2026-11-03-object-composer-and-animated-tiles/README.md`, "Out of scope".
 - `tests/Jrpg.Game.Tests/Flow/GameFlowTests.cs` (321 lines) and `Exploration/EventPresenterTests.cs` (306) crossed 300 before the Mana Seed plan; split each by scenario when next touched (reset retro).
 - `ObjectComposing.StartNew` clips a dragged rectangle to `ObjectCanvas.MaxCells` each way; only the row clip has a test, since no test-world sheet is wider than 32 cells (CO4a review): add a wide sheet to a test-only catalog when the composer is next touched.
-- `Editor/Shell/MainWindow.xaml` is at 296 lines again after the map editing flows' OM3 (MS0 moved its styles out, the plan added them back): the next control anywhere in the window goes in its own user control, as the Placed object panel did.
 - The "chosen cells' sheet has its image" query is written twice, in `Objects/Composing/CanvasPainting.PaintAt` and `Tiles/TileAnimationViewModel.CanOpen`: a third use moves it onto `TileBrowserViewModel` (AE1).
 
 ## From the object levels and sheet zoom plan (2026-11-05, at approval)
@@ -205,6 +202,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `MainViewModelMusicTests`' comment says `MainViewModelTests` is over 300 lines, which the cleanup plan's S3 made false (194); its two `StartEditingSettings_*` tests belong in `MainViewModelMapSettingsTests` (the S3 review).
 - `MapDrawing.DrawCanopy` repeats `CollisionShapes.InMapCell`'s arithmetic times `CellPixels`: it could map through `CollisionShapes.InMapCells` and scale (the cleanup plan's R2 review).
 - `MapDrawing.DrawObjectAt`'s NPC sprite branch has no test: `MapDrawingTests` never sets `FieldSpriteFile` (the R2 review).
+- `PngSize.Read` reads the width and height with `ReadInt32BigEndian`, so a corrupt header of 2^31 or more comes back negative; the PNG rule forbids it, nothing checks it (the cleanup plan's R3 review).
+- Files at the limit after the map fixes plan: `Shell/EditorTemplates.xaml` 297 and `Shell/MainWindow.xaml` 293; the next template goes in its own dictionary (as `EditorTreeTemplates.xaml` did) and the next control anywhere in the window in its own user control (as the Placed object panel did), never in these two.
 - `verify.ps1 -Fix` on a tree that doesn't build lets `dotnet format` delete the toolkit's generator hooks (`partial void On...Changed`) as unused code (the cleanup plan's S5): make `-Fix` refuse to format until a plain build passes, or write the rule in CLAUDE.md (the S5 review).
 - The map-replace expression `MapContent.With` holds (the cleanup plan's X1) is still written out in `ArtReferenceCheckTests`, `AudioReferenceCheckTests` and about 15 Editor, Game and Simulations tests that can't reach the Data.Tests helper: a shared test helper per project, or Core's catalog gaining the one-map replacement (the X1 review).
-- Files at the limit after the map fixes plan, to split before the slice that grows them: `Shell/EditorTemplates.xaml` 297, `Shell/MainWindow.xaml` 293.

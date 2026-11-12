@@ -1,5 +1,5 @@
 # Code health cleanup: editor shell, content writer, maps
-Status: approved
+Status: approved, in progress (every slice done but V1, the developer's `verify.ps1` edit)
 
 Developer's request (2026-11-11), verbatim: "it's time to do all the health check listed and do a clean up phase. dead code optimisation using clean code convention and microsoft convention. to be most human readable possible. using clear strucutre and segmentation and intention. everything work really well so no regression."
 
@@ -73,7 +73,7 @@ Sizes are hand-written lines, tests included; "moved" lines are cut and pasted (
 - [x] **R1. Shell: the folder rename's write extracted; the composer's ruled-out states thrown** (Editor, about 70 lines; one behavior change on a bug path) → [slices/R1.md](slices/R1.md)
 - [ ] **V1. `verify.ps1` refuses a changed code line over 130 columns (the developer's edit)** (script, about 10 lines) → [slices/V1.md](slices/V1.md)
 - [x] **R2. Editor Maps: the lines that do two things** (Editor, about 50 lines) → [slices/R2.md](slices/R2.md)
-- [ ] **R3. The art check's lines that do two things; the backlog closed** (Data, docs, about 50 lines) → [slices/R3.md](slices/R3.md)
+- [x] **R3. The art check's lines that do two things; the backlog closed** (Data, docs, about 50 lines) → [slices/R3.md](slices/R3.md)
 
 ## Decisions
 - **536. Two cleanup plans** (the developer's scope (a)): this one is the editor and Data phase, scoped to what the next plans touch first (the editor shell, the content writer, the maps); [2026-11-11-game-code-health-cleanup](../2026-11-11-game-code-health-cleanup/README.md) covers the Game's backlog lines. Every other line stays in `backlog.md` with its reason.

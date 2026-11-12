@@ -15,7 +15,7 @@ Older plans are single files with the same sections.
 
 | Plan | Status |
 |---|---|
-| [2026-11-11-code-health-cleanup](2026-11-11-code-health-cleanup/README.md) | approved |
+| [2026-11-11-code-health-cleanup](2026-11-11-code-health-cleanup/README.md) | approved, in progress (V1, the developer's script edit, pending) |
 | [2026-11-11-game-code-health-cleanup](2026-11-11-game-code-health-cleanup/README.md) | approved |
 | [2026-11-10-map-fixes-banner-and-folders](done/2026-11-10-map-fixes-banner-and-folders/README.md) | done |
 | [2026-11-05-map-editing-flows](done/2026-11-05-map-editing-flows/README.md) | done |

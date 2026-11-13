@@ -5,15 +5,12 @@ metadata:
   type: project
 ---
 
-Post-plan editor bug fixes after 2026-11-12-character-sprites-and-npcs (decisions 594, 595): import counts as
-edited (FieldSpriteCatalogViewModel.RefreshAfterImport/EditedSetups), FieldSpriteWindow Grid + splitter + WorkArea
-cap, NPCs menu. 2026-11-13. Round 1. Verdict: ready to commit.
+Plan 2026-11-13-drop-table-editor, slice DT0 (decision 604: TypedNumber to Catalogs, EnabledWhenChosen to
+EditorTheme.xaml, CatalogDraft.HasSameRecords). 2026-11-13. Round 1. Verdict: ready to commit. No Critical/Warning.
 
-- EN7 items: battler IsReadable guard, SelectedEnemy!, ImportArtImages shared, all fixed; ArtStatus follow-up is in
-  backlog.md (dropped).
-- Warning (open): an import whose guess has a problem greys OK for the rest of the session; nothing un-counts it, so
-  earlier edits need a junk permanent record (decision 569) or Cancel. Developer question.
-- Warning (open): FieldSpriteWindow WorkArea cap keeps CenterOwner; a non-maximized or second-monitor editor still
-  places the window off-screen (WPF doesn't clamp CenterOwner; WorkArea is the primary monitor's).
-- Suggestion (open): docs/map.md Sprites row "Problem naming another opened setup's" -> edited; mention imports count.
-- Suggestion (open): ListBox item ToolTip repeats a label the wrap already shows whole.
+- Suggestion (open): EditorTheme.xaml:146 comment and map.md Shell row say "Database window's", but the
+  Character sprites window (FieldSpriteWindow) using the style sits in the NPCs menu -> "a catalog window's".
+- Suggestion (open): `(current, edited) => current == edited` written twice (CatalogDraft.Database.cs:18,
+  CatalogDraft.cs:157) -> EqualityComparer<T>.Default.Equals.
+- Suggestion (open): DT0.md Done note "Window.Resources with them, left empty" reads as kept-but-empty; they're removed.
+- Carried from the editor bug fixes (decisions 594/595): all fixed in commit b4c8df6c before it landed: an import with a bad guess no longer counts (it never greys OK); FieldSpriteWindow keeps itself on the desktop once loaded (KeepOnDesktop over the virtual screen); map.md Sprites row wording fixed. Don't carry them.

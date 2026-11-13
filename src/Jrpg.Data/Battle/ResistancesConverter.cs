@@ -9,7 +9,7 @@ namespace Jrpg.Data.Battle;
 /// <summary>
 /// Reads an enemy's <c>"resistances": { "fire": -25 }</c> into Core's <see cref="Resistances"/>, which carries no JSON
 /// attributes (ADR 0002): whole percents by damage type, held in permille (ADR 0026); a type left out is 0, an unknown
-/// or repeated one is refused by name.
+/// or repeated one is refused by name. Writes them back the same way, for the editor's enemies (decision 587).
 /// </summary>
 internal sealed class ResistancesConverter : JsonConverter<Resistances>
 {
@@ -47,7 +47,20 @@ internal sealed class ResistancesConverter : JsonConverter<Resistances>
         return Resistances.From(type => StatFormula.PermilleOf(percents.GetValueOrDefault(type)));
     }
 
-    // Nothing writes enemies.json yet; the enemy editor will add the writing with its round-trip test.
-    public override void Write(Utf8JsonWriter writer, Resistances value, JsonSerializerOptions options) =>
-        throw new NotSupportedException("Enemy resistances are only read.");
+    // Whole percents by type in the enum's order, a type at 0 percent left out (decision 587): exact for content, which
+    // loads percents as permille times ten; a stray permille under one percent is left out too, not written as 0.
+    public override void Write(Utf8JsonWriter writer, Resistances value, JsonSerializerOptions options)
+    {
+        writer.WriteStartObject();
+        foreach (var type in Enum.GetValues<DamageType>())
+        {
+            var percent = StatFormula.WholePercentOf(value.Of(type));
+            if (percent != 0)
+            {
+                writer.WriteNumber(_names[type], percent);
+            }
+        }
+
+        writer.WriteEndObject();
+    }
 }

@@ -29,3 +29,5 @@ Data + Editor, about 230 lines (120 of them tests). Design: "Data changes", "Con
 
 ## Verify by hand
 None: no window changes enemies yet. Battles play as before; `git diff content/enemies.json` in the relay commit shows only layout.
+
+- **Done, with deviations:** `AbsentWhenEmptyFilter` tests the value as an `ICollection` with no entries; the boss test writes a boss and a non-boss of the tests' own and reads both back from the JSON; `CatalogDraftEnemyTests` also pins a tactic weight change as a step; the relay commit holds only `content/enemies.json` (a throwaway test, deleted); `enemies.json` joined the identical-bytes list. The review: `CatalogProblems.FirstProblem` shares the try block of the three `OfX`, the null and zero filters say their two reasons, a phase tactic change is pinned, and the writer skips a type whose whole percent is 0.

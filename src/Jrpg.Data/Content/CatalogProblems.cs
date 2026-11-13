@@ -1,6 +1,8 @@
+using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Core.Sprites;
 using Jrpg.Core.Trade;
+using Jrpg.Data.Battle;
 using Jrpg.Data.Sprites;
 using Jrpg.Data.Trade;
 
@@ -19,18 +21,8 @@ public static class CatalogProblems
     /// </summary>
     /// <param name="sheets">The records as edited.</param>
     /// <param name="content">The objects and the new game that name sprites.</param>
-    public static string? OfFieldSprites(IReadOnlyList<FieldSpriteSheet> sheets, ContentCatalog content)
-    {
-        try
-        {
-            CheckFieldSprites(sheets, content);
-            return null;
-        }
-        catch (ContentValidationException exception)
-        {
-            return exception.Message;
-        }
-    }
+    public static string? OfFieldSprites(IReadOnlyList<FieldSpriteSheet> sheets, ContentCatalog content) =>
+        FirstProblem(() => CheckFieldSprites(sheets, content));
 
     /// <summary>
     /// The first problem in the shops (ADR 0031, ADR 0045): a shop's own rule, or an item it sells that the content
@@ -38,18 +30,17 @@ public static class CatalogProblems
     /// </summary>
     /// <param name="shops">The shops as edited.</param>
     /// <param name="content">The items the shops sell.</param>
-    public static string? OfShops(IReadOnlyList<ShopDefinition> shops, ContentCatalog content)
-    {
-        try
-        {
-            CheckShops(shops, content);
-            return null;
-        }
-        catch (ContentValidationException exception)
-        {
-            return exception.Message;
-        }
-    }
+    public static string? OfShops(IReadOnlyList<ShopDefinition> shops, ContentCatalog content) =>
+        FirstProblem(() => CheckShops(shops, content));
+
+    /// <summary>
+    /// The first problem in the enemies (ADR 0034, ADR 0045): an enemy's own numbers, its drop table, or a tactic
+    /// naming a skill the content lacks or enemies can't use; null when the loader would take them.
+    /// </summary>
+    /// <param name="enemies">The enemies as edited.</param>
+    /// <param name="content">The drop tables and skills an enemy may name.</param>
+    public static string? OfEnemies(IReadOnlyList<EnemyDefinition> enemies, ContentCatalog content) =>
+        FirstProblem(() => CheckEnemies(enemies, content));
 
     /// <summary>
     /// The checks the loader makes on <c>field-sprites.json</c>, for the writer and the problem line alike.
@@ -66,4 +57,26 @@ public static class CatalogProblems
     /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
     internal static void CheckShops(IReadOnlyList<ShopDefinition> shops, ContentCatalog content) =>
         ShopCatalogValidator.Validate(ContentCatalogLoader.ShopsFile, shops, content.Items);
+
+    /// <summary>
+    /// The checks the loader makes on <c>enemies.json</c>, for the writer and the problem line alike.
+    /// </summary>
+    /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
+    internal static void CheckEnemies(IReadOnlyList<EnemyDefinition> enemies, ContentCatalog content) =>
+        EnemyCatalogValidator.Validate(
+            ContentCatalogLoader.EnemiesFile, enemies, new EnemyReferences(content.DropTables.Keys.ToHashSet(), content.Skills));
+
+    // The loader's refusal as a line, or null when it would take the catalog.
+    private static string? FirstProblem(Action check)
+    {
+        try
+        {
+            check();
+            return null;
+        }
+        catch (ContentValidationException exception)
+        {
+            return exception.Message;
+        }
+    }
 }

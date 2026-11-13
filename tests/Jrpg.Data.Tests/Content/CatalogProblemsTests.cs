@@ -1,4 +1,5 @@
 using Jrpg.Core.Content;
+using Jrpg.Core.Trade;
 using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Tests.Content;
@@ -14,6 +15,27 @@ public sealed class CatalogProblemsTests
     [Fact]
     public void OfFieldSprites_TestWorldSheets_IsNull() =>
         Assert.Null(CatalogProblems.OfFieldSprites([.. _catalog.FieldSprites.Values], _catalog));
+
+    [Fact]
+    public void OfShops_TestWorldShops_IsNull() => Assert.Null(CatalogProblems.OfShops([.. _catalog.Shops.Values], _catalog));
+
+    [Fact]
+    public void OfShops_EmptyName_NamesShopAndField()
+    {
+        var shops = WithGeneralStore(store => store with { Name = " " });
+
+        Assert.Equal("shops.json: shop 'general_store': name must not be empty.", CatalogProblems.OfShops(shops, _catalog));
+    }
+
+    [Fact]
+    public void OfShops_UnknownItem_NamesIt()
+    {
+        var shops = WithGeneralStore(store => store with { ItemIds = ["elixir_of_nothing"] });
+
+        var problem = CatalogProblems.OfShops(shops, _catalog);
+
+        Assert.Equal("shops.json: shop 'general_store': itemIds[0] has unknown item id 'elixir_of_nothing'.", problem);
+    }
 
     [Fact]
     public void OfFieldSprites_ScaleZero_NamesTheFileAndTheField()
@@ -48,4 +70,7 @@ public sealed class CatalogProblemsTests
 
         Assert.Null(CatalogProblems.OfFieldSprites([_catalog.FieldSprites["player.png"]], content));
     }
+
+    private static List<ShopDefinition> WithGeneralStore(Func<ShopDefinition, ShopDefinition> change) =>
+        [.. _catalog.Shops.Values.Select(shop => shop.Id == "general_store" ? change(shop) : shop)];
 }

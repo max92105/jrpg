@@ -51,11 +51,10 @@ internal static class CatalogUsage
     /// <param name="openLayouts">The open maps' layouts, unsaved changes included; empty when none is open.</param>
     /// <returns>"map forest" style names, sorted by id; empty when no map uses it.</returns>
     public static IReadOnlyList<string> UsersOfObject(ContentCatalog catalog, string objectId, IReadOnlyCollection<MapLayout> openLayouts) =>
-        [.. LayoutsOf(catalog, openLayouts)
-            .Where(layout => layout.Objects.Any(placed => placed.ObjectId == objectId) || SwapsTo(layout, objectId))
-            .Select(layout => layout.Id)
-            .Order(StringComparer.Ordinal)
-            .Select(id => $"map {id}")];
+        MapNamesWhere(catalog, openLayouts, layout => PlacesOrSwapsTo(layout, objectId));
+
+    private static bool PlacesOrSwapsTo(MapLayout layout, string objectId) =>
+        layout.Objects.Any(placed => placed.ObjectId == objectId) || SwapsTo(layout, objectId);
 
     private static bool SwapsTo(MapLayout layout, string objectId) =>
         layout.AllEvents.Any(mapEvent => mapEvent.Steps.Any(step => step is SwapObjectStep swap && swap.ObjectId == objectId));
@@ -70,8 +69,31 @@ internal static class CatalogUsage
     /// <param name="openLayouts">The open maps' layouts, unsaved changes included; empty when none is open.</param>
     /// <returns>"map forest" style names, sorted by id; empty when no event names it.</returns>
     public static IReadOnlyList<string> UsersOfQuest(ContentCatalog catalog, string questId, string? stageId, IReadOnlyCollection<MapLayout> openLayouts) =>
+        MapNamesWhere(catalog, openLayouts, layout => layout.AllEvents.Any(e => NamesQuest(e, questId, stageId)));
+
+    /// <summary>
+    /// The maps whose events open a shop, so an undo that would remove it can be refused (decision 581).
+    /// </summary>
+    /// <param name="catalog">The saved maps.</param>
+    /// <param name="shopId">The shop looked for.</param>
+    /// <param name="openLayouts">The open maps' layouts, unsaved changes included; empty when none is open.</param>
+    /// <returns>"map forest" style names, sorted by id; empty when no event opens it.</returns>
+    public static IReadOnlyList<string> UsersOfShop(
+        ContentCatalog catalog,
+        string shopId,
+        IReadOnlyCollection<MapLayout> openLayouts) =>
+        MapNamesWhere(catalog, openLayouts, layout => layout.AllEvents.Any(mapEvent => OpensShop(mapEvent, shopId)));
+
+    private static bool OpensShop(MapEvent mapEvent, string shopId) =>
+        mapEvent.Steps.Any(step => step is OpenShopStep shop && shop.ShopId == shopId);
+
+    // "map forest" style names of the maps that use a record, sorted by id, the open maps as they are now.
+    private static IReadOnlyList<string> MapNamesWhere(
+        ContentCatalog catalog,
+        IReadOnlyCollection<MapLayout> openLayouts,
+        Func<MapLayout, bool> uses) =>
         [.. LayoutsOf(catalog, openLayouts)
-            .Where(layout => layout.AllEvents.Any(mapEvent => NamesQuest(mapEvent, questId, stageId)))
+            .Where(uses)
             .Select(layout => layout.Id)
             .Order(StringComparer.Ordinal)
             .Select(id => $"map {id}")];

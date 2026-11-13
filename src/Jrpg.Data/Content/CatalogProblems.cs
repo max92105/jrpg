@@ -1,6 +1,8 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Sprites;
+using Jrpg.Core.Trade;
 using Jrpg.Data.Sprites;
+using Jrpg.Data.Trade;
 
 namespace Jrpg.Data.Content;
 
@@ -31,6 +33,25 @@ public static class CatalogProblems
     }
 
     /// <summary>
+    /// The first problem in the shops (ADR 0031, ADR 0045): a shop's own rule, or an item it sells that the content
+    /// doesn't price; null when the loader would take them.
+    /// </summary>
+    /// <param name="shops">The shops as edited.</param>
+    /// <param name="content">The items the shops sell.</param>
+    public static string? OfShops(IReadOnlyList<ShopDefinition> shops, ContentCatalog content)
+    {
+        try
+        {
+            CheckShops(shops, content);
+            return null;
+        }
+        catch (ContentValidationException exception)
+        {
+            return exception.Message;
+        }
+    }
+
+    /// <summary>
     /// The checks the loader makes on <c>field-sprites.json</c>, for the writer and the problem line alike.
     /// </summary>
     /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
@@ -40,4 +61,9 @@ public static class CatalogProblems
         var byFile = sheets.ToDictionary(sheet => sheet.File, StringComparer.Ordinal);
         FieldSpriteReferenceCheck.Check(ContentCatalogLoader.FieldSpritesFile, byFile, content.Objects.Values, content.NewGame);
     }
+
+    /// <summary>The checks the loader makes on <c>shops.json</c>, for the writer and the problem line alike.</summary>
+    /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
+    internal static void CheckShops(IReadOnlyList<ShopDefinition> shops, ContentCatalog content) =>
+        ShopCatalogValidator.Validate(ContentCatalogLoader.ShopsFile, shops, content.Items);
 }

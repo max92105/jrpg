@@ -23,3 +23,5 @@ The draft can replace the shops as one undo step, Ctrl+S writes `shops.json` (re
 
 ## Verify by hand
 None: no window changes shops yet (SH3). Ctrl+S in the editor after any edit rewrites `shops.json` in the relaid layout only once (the relay commit), then leaves it unchanged.
+
+- **Done, with deviations:** `shops.json` was relaid by hand in the writer's layout (one shop; the identical-bytes test proves it) rather than through a throwaway test, and `field-sprites.json` joined that test's file list beside it (FS1 had left it out); the "writes nothing" test names an unknown item, as the repository has no unpriced item to pick by id; `CatalogProblems.CheckShops` runs for the writer and the problem line alike, as the field sprites' check does. `ContentWriterShopTests` already existed (the writer's references knowing the shops): its two `WriteMaps` tests stay and the three new ones join them on the test world; `CatalogUsage.MapNamesWhere` now serves the object, quest and shop queries (the review's third copy); an unsaved open map's `openShop` step also refuses the undo, tested.

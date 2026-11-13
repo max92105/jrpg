@@ -110,14 +110,15 @@ internal sealed partial class CombinedHistory : ObservableObject
         NotifyUndoRedoChanged();
     }
 
-    // In the order checked: the first map whose event names a quest or a stage the undo would remove (decision 394);
-    // the first map placing or swapping to an object it would remove; the first tile cut from a sheet it would remove;
-    // the first tile it would remove that something still uses, named with its first user (decision 117).
+    // In the order checked: the first map whose event names a quest or a stage the undo would remove (decision 394), or
+    // opens a shop it would remove (decision 581); the first map placing or swapping to an object it would remove; the
+    // first tile cut from a sheet it would remove; the first tile it would remove that something still uses, named with
+    // its first user (decision 117).
     private string? RefusalOfCatalogUndo()
     {
-        if (RefusalOfQuestUndo() is { } quest)
+        if ((RefusalOfQuestUndo() ?? RefusalOfShopUndo()) is { } named)
         {
-            return quest;
+            return named;
         }
 
         foreach (var objectId in _catalog.ObjectsRemovedByUndo())
@@ -163,6 +164,20 @@ internal sealed partial class CombinedHistory : ObservableObject
             if (CatalogUsage.UsersOfQuest(_catalog.Current, questId, stageId, openLayouts) is [var map, ..])
             {
                 return $"Can't undo: stage {stageId} of quest {questId} is used on {map}.";
+            }
+        }
+
+        return null;
+    }
+
+    // A saved shop is never removed by its window (decision 581), so only an added one can be undone away.
+    private string? RefusalOfShopUndo()
+    {
+        foreach (var shopId in _catalog.ShopsRemovedByUndo())
+        {
+            if (CatalogUsage.UsersOfShop(_catalog.Current, shopId, _openMaps.Layouts) is [var map, ..])
+            {
+                return $"Can't undo: shop {shopId} is opened on {map}.";
             }
         }
 

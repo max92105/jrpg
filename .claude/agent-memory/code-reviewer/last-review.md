@@ -5,18 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-12-character-sprites-and-npcs, slice MV2 (moveNpc in content and on screen: MoveNpcStepValidator, the
-warp rule in MapEventValidator, ActiveMap.PositionOf read by MapCollision/InteractionFinder, MapView.DrawNpc,
-InteractionPromptView pose lookup, ExplorationScene.AdvanceNpcWalks). 2026-11-12. Round 1. Verdict: ready to commit.
+Plan 2026-11-12-character-sprites-and-npcs, slice MV3 (moveNpc step in the editor: NpcChoice, StepChoices.NpcChoices,
+EventStepViewModel.MoveNpc partial, Move NPC buttons in both event dialogs, EventStepEditor fields). 2026-11-13.
+Round 1. Verdict: ready to commit.
 
-- MV1 findings: all fixed (skip chain finishes the previous walk, MoveNpcStepTests equality, IsAnyNpcWalking gone,
-  PositionOf now used, presenter never ContinueEvent on a move, move after warp refused).
-- Warning (open): a walk ending on the player's centre traps the player: MapCollision.IsInsideAnObject now reads the
-  walk position, PlayerWalker.TryMoveBy (line 78) refuses every target still inside the polygon. Villager (12,4), polygon
-  x .2-.8 y .5-1, player (12.5, 5.6) facing up, path [down] -> stuck until load. Design call: ask the developer.
-- Suggestion (open): MapView.DrawNpc re-reads currentDefinitionOf and uses `!`; MapView class summary still says only
-  "facing what Core says".
-- Suggestion (open): InteractionPromptView passes every object (chests too) through npcPoseOf for a position.
-- Suggestion (open): ExplorationSceneMoveNpcTests.Update_UntilArrived_ShowsTheDialogueAfterTheMove asserts Core's step,
-  not the presenter showing it.
-- Follow-up: editor EventStepViewModel.From throws on a moveNpc step until MV3 (planned).
+- MV2 carried: the trap Warning is fixed (decision 593, MapCollision.CanMoveTo lets a body leave a polygon); MV2's
+  three Suggestions not carried (committed slice, optional); MV2's Follow-up (From throws on moveNpc) fixed by MV3.
+- Suggestion (open): NpcChoice.cs:3-4 summary says value equality makes an opened step select its entry; the combo
+  selects by SelectedValuePath=Uid (string), equality only serves the test's Assert.Contains.
+- Suggestion (open): "unsaved placements included" (EventEditingViewModel.NpcChoices) has no test placing an NPC on the
+  open map and seeing it offered.
+- Follow-up: deleting a placed NPC that another event's moveNpc step names is only caught by ContentWriter's
+  validation on save; the editor could warn at delete time.

@@ -56,7 +56,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 2: the windows
 - [x] **DT5. The Drop tables window and Database > Drop tables...** (Editor, about 170 lines) → [slices/DT5.md](slices/DT5.md)
-- [ ] ADR 0045 amendment: one line under Decision for the nested window. Write it from the entry under "ADRs" below (decision 602).
+- [x] ADR 0045 amendment: one line under Decision for the nested window. Write it from the entry under "ADRs" below (decision 602).
 - [ ] **DT6. Edit... beside the Enemies window's Drop table box: the Drop tables window over it, the new tables offered at once** (Editor, about 170 lines) → [slices/DT6.md](slices/DT6.md)
 
 ## Decisions

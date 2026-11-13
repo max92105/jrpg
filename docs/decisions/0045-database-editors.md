@@ -44,6 +44,13 @@ file the editor takes over is relaid once through the writer, with a test that t
 the same, and then the identical-bytes test covers it. The first balancing tool beyond the forms is a read-only
 side-by-side table over the draft's records, not more per-record forms.
 
+**B. Amendment (2026-11-13, decision 602):** a Database window may open another over it (the Enemies window's Edit...
+beside its Drop table box opens the Drop tables window). The inner window's OK applies its own `CatalogDraft` step at
+once, and the outer window then reads the draft's records it offers again, inserting new ones into its lists in place
+so no box loses its choice; this is the one path where a modal window re-checks the draft under it. Weighed and set
+aside: folding the inner edits into the outer session as one step (one undo for both, but a new combined setter, and
+the outer Cancel would drop a table the developer had OK'd), and no nesting at all (the menu only).
+
 ## Consequences
 - **Easier:** a store, a quest NPC or a monster is set up without opening JSON; the editor can't save what the game
   would refuse, and says why in the loader's words.

@@ -22,3 +22,5 @@ None.
 ## Verify by hand
 1. Open a Talk event's dialogue step: the Portrait box drops down the portraits folder's files; pick one, OK, Ctrl+S, play: the portrait shows beside the line.
 2. Type a name that doesn't exist: the dialog accepts it; the game's start names the missing file. Revert.
+
+- **Done, with deviations:** the step editor's box binds to `Choices.PortraitFiles` through the window's `DataContext`, as the other pickers do, so `EventStepViewModel` is untouched; the lookup is an init member of `EventEditingViewModel` (`PortraitFilesLookup`, empty by default) set by the shell over `ArtFolders.ImagesIn(ArtRoot, Portraits)`; the two older folder lookups now call `ImagesIn`.

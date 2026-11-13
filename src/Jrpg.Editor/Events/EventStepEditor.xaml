@@ -20,7 +20,11 @@
       </StackPanel>
       <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
         <TextBlock Text="Portrait file (optional)" Width="160" VerticalAlignment="Center" />
-        <TextBox Width="160" Text="{Binding PortraitFile, UpdateSourceTrigger=PropertyChanged}" />
+        <!-- The portraits folder's files, or a typed name: the game's start names a missing one (decision 442). -->
+        <ComboBox Width="200"
+                  IsEditable="True"
+                  ItemsSource="{Binding DataContext.Choices.PortraitFiles, RelativeSource={RelativeSource AncestorType=Window}}"
+                  Text="{Binding PortraitFile, UpdateSourceTrigger=PropertyChanged}" />
       </StackPanel>
     </StackPanel>
     <StackPanel Orientation="Horizontal" Visibility="{Binding IsGiveItem, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">

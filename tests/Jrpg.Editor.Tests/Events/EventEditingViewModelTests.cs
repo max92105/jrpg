@@ -55,6 +55,31 @@ public sealed class EventEditingViewModelTests
         Assert.DoesNotContain(events.Choices.NpcChoices, choice => choice.Uid == "0bff6243");
     }
 
+    // Decision 589: the portraits the dialogue step's box offers come from the shell's lookup, read as the dialog
+    // opens, so a picture dropped in since the editor started is offered too.
+    [Fact]
+    public void StartEditingAt_PortraitLookup_OffersItsFiles()
+    {
+        var folder = new List<string> { "Elder.png" };
+        var editing = new EventEditingViewModel(_draft, _openMaps, new LayerChoiceViewModel())
+        {
+            OpenMap = new MapViewModel(_catalog.Maps["start"]),
+            PortraitFilesLookup = () => [.. folder],
+        };
+        Assert.Equal(["Elder.png"], editing.StartEditingAt(ChestCenter)!.Choices.PortraitFiles);
+        folder.Add("Villager.png");
+
+        var events = editing.StartEditingAt(ChestCenter)!;
+
+        Assert.Equal(["Elder.png", "Villager.png"], events.Choices.PortraitFiles);
+    }
+
+    [Fact]
+    public void StartEditingAt_NoPortraitLookup_OffersNone()
+    {
+        Assert.Empty(_eventEditing.StartEditingAt(ChestCenter)!.Choices.PortraitFiles);
+    }
+
     // The dialog reads the open map as it is, so an NPC placed and not yet saved can be moved.
     [Fact]
     public void StartEditingAt_NpcPlacedUnsaved_OffersItToMove()

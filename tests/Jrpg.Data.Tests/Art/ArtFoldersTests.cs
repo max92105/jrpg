@@ -12,6 +12,27 @@ public sealed class ArtFoldersTests
         Assert.Equal(["npc_placeholder.png", "player.png"], images);
     }
 
+    // Any art folder by name (decision 589): PNGs only, in ordinal order, whatever order the disk gives them.
+    [Fact]
+    public void ImagesIn_FolderWithPngsAndOtherFiles_ListsPngsSorted()
+    {
+        var artRoot = Path.Combine(Path.GetTempPath(), $"jrpg-art-{Guid.NewGuid():N}");
+        var portraits = Path.Combine(artRoot, ArtFolders.Portraits);
+        Directory.CreateDirectory(portraits);
+        try
+        {
+            File.WriteAllBytes(Path.Combine(portraits, "b.png"), []);
+            File.WriteAllBytes(Path.Combine(portraits, "a.png"), []);
+            File.WriteAllText(Path.Combine(portraits, "notes.txt"), "not a picture");
+
+            Assert.Equal(["a.png", "b.png"], ArtFolders.ImagesIn(artRoot, ArtFolders.Portraits));
+        }
+        finally
+        {
+            Directory.Delete(artRoot, recursive: true);
+        }
+    }
+
     [Fact]
     public void TilesheetImagesIn_TestWorldArt_ListsEveryPngSorted()
     {

@@ -84,7 +84,11 @@ internal sealed partial class MainViewModel : ObservableObject
             Placing = new ObjectPlacingViewModel(Content, Layer, _openMaps);
             Composing = new ObjectComposing(Content, Placing.Browser, Painting.Browser);
             AnimationImport = new AnimationImport(Content);
-            EventEditing = new EventEditingViewModel(Content, _openMaps, Layer) { MapIds = MapIds };
+            EventEditing = new EventEditingViewModel(Content, _openMaps, Layer)
+            {
+                MapIds = MapIds,
+                PortraitFilesLookup = () => ArtFolders.ImagesIn(ArtRoot, ArtFolders.Portraits),
+            };
             QuestEditing = new QuestEditingViewModel(Content);
             ShopEditing = new ShopEditingViewModel(Content);
             FieldSpriteEditing = CreateFieldSpriteEditing();

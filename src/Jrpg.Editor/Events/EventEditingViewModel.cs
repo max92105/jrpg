@@ -22,6 +22,12 @@ internal sealed class EventEditingViewModel(CatalogDraft catalog, OpenMaps openM
     public IReadOnlyList<string> MapIds { get; set; } = [];
 
     /// <summary>
+    /// The portraits folder's files, read when a dialog opens so a picture dropped in since is offered (decision 589);
+    /// the shell gives the folder, a view model never reads files.
+    /// </summary>
+    public Func<IReadOnlyList<string>> PortraitFilesLookup { get; init; } = () => [];
+
+    /// <summary>
     /// The event dialog's state for the object drawn on top at a point, among those a click reaches; null when no
     /// object is reached there.
     /// </summary>
@@ -86,6 +92,7 @@ internal sealed class EventEditingViewModel(CatalogDraft catalog, OpenMaps openM
         QuestStages = QuestStageChoices(),
         WarpMaps = new(openMaps.EntriesWith(catalog.Current), openMaps.LayoutsWith(catalog.Current), catalog.Current),
         NpcChoices = NpcChoices(),
+        PortraitFiles = PortraitFilesLookup(),
     };
 
     // The open map's placed NPCs as it is now, unsaved placements included; a tile object can't walk (ADR 0044).

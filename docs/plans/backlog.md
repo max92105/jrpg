@@ -204,3 +204,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - The sprite setup's `From` divides the image size by the record's frame size, so an image with spare pixels past its frames (which the start allows) opens with a cut problem until the counts are retyped (sprites plan SI2, SI4 reviews); bought sheets are exact, so it waits.
 - Removing a placed NPC that another event's `moveNpc` step names is caught only at save (`MapLayoutValidator`); the editor could warn at the removal, as it does for an object in use (MV3's review).
 - `Events/ListOrder`'s summary still says "the event dialog's lists" while the Quests and Shops windows use it too: reword it or move it to a shared folder (SH2's review).
+- `ArtFolders.ImagesIn` (and the two older folder lookups) throws when a `--content` folder lacks the art folder asked for; the pickers could offer nothing instead (NP2's review).

@@ -59,7 +59,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 
 ### Phase 2: quest NPCs
 - [x] **NP1. The Quest giver preset: the quest offered while not started, a reminder while active** (Editor, about 150 lines) → [slices/NP1.md](slices/NP1.md)
-- [ ] **NP2. The dialogue step's portrait picked from the portraits folder** (Data + Editor, about 120 lines) → [slices/NP2.md](slices/NP2.md)
+- [x] **NP2. The dialogue step's portrait picked from the portraits folder** (Data + Editor, about 120 lines) → [slices/NP2.md](slices/NP2.md)
 
 ### Phase 3: enemies
 - [ ] **EN1. Enemies save from the editor: `enemies.json` relaid and written, resistances in percents, every default-valued field left out, `CatalogProblems.OfEnemies`, `CatalogDraft.SetEnemies`** (Data + Editor, about 230 lines) → [slices/EN1.md](slices/EN1.md)

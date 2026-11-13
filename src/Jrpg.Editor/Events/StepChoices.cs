@@ -26,6 +26,12 @@ internal sealed record StepChoices(IReadOnlyList<string> ItemIds, IReadOnlyList<
     public IReadOnlyList<NpcChoice> NpcChoices { get; init; } = [];
 
     /// <summary>
+    /// The portraits folder's files a dialogue step's box offers (decision 589); a typed name still works. An init
+    /// member as <see cref="ShopIds"/>.
+    /// </summary>
+    public IReadOnlyList<string> PortraitFiles { get; init; } = [];
+
+    /// <summary>
     /// The maps a warp can lead to, drawn by the destination picker; null where no map can be picked.
     /// </summary>
     public WarpMaps? WarpMaps { get; init; }

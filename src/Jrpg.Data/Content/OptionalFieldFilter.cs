@@ -3,8 +3,8 @@ using System.Text.Json.Serialization.Metadata;
 namespace Jrpg.Data.Content;
 
 /// <summary>
-/// The one loop the filters for fields added after the content was written share: each names its fields and what value
-/// leaves one out of a file.
+/// The one loop the optional field filters share, whether a field was added after the content was written or its
+/// default carries a meaning (decision 586): each filter names its fields and the value that leaves one out of a file.
 /// </summary>
 internal static class OptionalFieldFilter
 {

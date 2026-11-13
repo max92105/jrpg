@@ -1,3 +1,4 @@
+using Jrpg.Core.Loot;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Battle;
 using Jrpg.Editor.Catalogs;
@@ -46,5 +47,18 @@ public sealed class EnemyEditingViewModelTests
         _enemyEditing.Apply(_enemyEditing.Start());
 
         Assert.False(_draft.CanUndo);
+    }
+
+    // The window reads the draft when it opens, so a table added before is offered, after the saved ones by id.
+    [Fact]
+    public void Start_AfterSetDropTables_OffersTheNewTable()
+    {
+        _draft.SetDropTables([.. _draft.Current.DropTables.Values, new DropTable("zz_slime", [new DropEntry("potion", 50)])]);
+
+        var choices = _enemyEditing.Start().DropTableChoices;
+
+        Assert.Equal("", choices[0]);
+        Assert.Equal("zz_slime", choices[^1]);
+        Assert.Contains("goblin", choices);
     }
 }

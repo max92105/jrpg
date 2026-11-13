@@ -42,3 +42,5 @@ The draft can replace the drop tables as one undo step; a save writes `drop-tabl
 
 ## Verify by hand
 None: no window changes drop tables yet (DT5). `git diff content/drop-tables.json` shows only the relaid layout, and scrap's `"minQuantity": 1` gone.
+
+- **Done, with deviations:** `drop-tables.json` relaid by a throwaway test (deleted), only layout in its diff and `scrap`'s `minQuantity: 1` gone; `ContentWriter.cs` ends at 294 lines; the Core equality test adds `Equals_OtherId_IsFalse`; `SetDropTables_ChangedChance_IsOneUndoStep` pins the raised chance and the single step; the Enemies window's test names its new table `zz_slime` so it sorts last whatever the repository adds.

@@ -1,13 +1,32 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Loot;
 using Jrpg.Core.Trade;
 
 namespace Jrpg.Editor.Catalogs;
 
 /// <summary>
-/// The catalogs the Database windows edit (ADR 0045): the shops and the enemies, each window's session one step.
+/// The catalogs the Database windows edit (ADR 0045): the shops, the enemies and the drop tables, the whole session of
+/// each window recorded as one undo step.
 /// </summary>
 internal sealed partial class CatalogDraft
 {
+    /// <summary>
+    /// Replaces the drop tables as one undo step (decision 591); nothing when they are the same by content, entries in
+    /// order included. No undo refusal (decision 599): only enemies name a table, and catalog steps undo in order, so
+    /// an enemy's pick of an added table is undone before the table.
+    /// </summary>
+    public void SetDropTables(IReadOnlyList<DropTable> tables)
+    {
+        var before = Current.DropTables;
+        var after = tables.ToDictionary(table => table.Id, StringComparer.Ordinal);
+        if (HasSameRecords(before, after, EqualityComparer<DropTable>.Default.Equals))
+        {
+            return;
+        }
+
+        Do(new CatalogEdit(catalog => catalog with { DropTables = after }, catalog => catalog with { DropTables = before }));
+    }
+
     /// <summary>
     /// Replaces the shops as one undo step (decision 591); nothing when they are the same by content, items included.
     /// </summary>

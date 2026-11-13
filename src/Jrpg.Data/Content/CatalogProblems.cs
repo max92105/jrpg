@@ -1,8 +1,10 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
+using Jrpg.Core.Loot;
 using Jrpg.Core.Sprites;
 using Jrpg.Core.Trade;
 using Jrpg.Data.Battle;
+using Jrpg.Data.Loot;
 using Jrpg.Data.Sprites;
 using Jrpg.Data.Trade;
 
@@ -43,6 +45,15 @@ public static class CatalogProblems
         FirstProblem(() => CheckEnemies(enemies, content));
 
     /// <summary>
+    /// The first problem in the drop tables (decision 343, ADR 0045): a table's own rule, or an entry naming an item
+    /// the content lacks or a quantity its stack can't hold; null when the loader would take them.
+    /// </summary>
+    /// <param name="tables">The drop tables as edited.</param>
+    /// <param name="content">The items the entries name.</param>
+    public static string? OfDropTables(IReadOnlyList<DropTable> tables, ContentCatalog content) =>
+        FirstProblem(() => CheckDropTables(tables, content));
+
+    /// <summary>
     /// The checks the loader makes on <c>field-sprites.json</c>, for the writer and the problem line alike.
     /// </summary>
     /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
@@ -65,6 +76,13 @@ public static class CatalogProblems
     internal static void CheckEnemies(IReadOnlyList<EnemyDefinition> enemies, ContentCatalog content) =>
         EnemyCatalogValidator.Validate(
             ContentCatalogLoader.EnemiesFile, enemies, new EnemyReferences(content.DropTables.Keys.ToHashSet(), content.Skills));
+
+    /// <summary>
+    /// The checks the loader makes on <c>drop-tables.json</c>, for the writer and the problem line alike.
+    /// </summary>
+    /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
+    internal static void CheckDropTables(IReadOnlyList<DropTable> tables, ContentCatalog content) =>
+        DropTableCatalogValidator.Validate(ContentCatalogLoader.DropTablesFile, tables, content.Items);
 
     // The loader's refusal as a line, or null when it would take the catalog.
     private static string? FirstProblem(Action check)

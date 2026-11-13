@@ -41,6 +41,7 @@ internal static class ContentJsonOptions
                     ComputedPropertyFilter.RemoveComputedProperties,
                     AbsentWhenNullFilter.SkipNullOptionalFields,
                     AbsentWhenZeroFilter.SkipZeroOptionalFields,
+                    AbsentWhenOneFilter.SkipOneOptionalFields,
                     AbsentWhenTrueFilter.SkipTrueOptionalFields,
                     AbsentWhenFalseFilter.SkipFalseOptionalFields,
                     AbsentWhenEmptyFilter.SkipEmptyOptionalFields,

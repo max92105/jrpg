@@ -1,5 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
+using Jrpg.Core.Loot;
 using Jrpg.Core.Trade;
 using Jrpg.Data.Content;
 
@@ -54,6 +55,23 @@ public sealed class CatalogProblemsTests
     }
 
     [Fact]
+    public void OfDropTables_TestWorldTables_IsNull() =>
+        Assert.Null(CatalogProblems.OfDropTables([.. _catalog.DropTables.Values], _catalog));
+
+    [Fact]
+    public void OfDropTables_ChanceZero_NamesTableAndEntry()
+    {
+        var problem = CatalogProblems.OfDropTables([GoblinTableWithFirstChance(0)], _catalog);
+
+        Assert.Equal("drop-tables.json: drop table 'goblin': entries[0]: chance must be within 1..100 (was 0).", problem);
+    }
+
+    // The accepted bound: a certain drop loads.
+    [Fact]
+    public void OfDropTables_ChanceHundred_IsNull() =>
+        Assert.Null(CatalogProblems.OfDropTables([GoblinTableWithFirstChance(100)], _catalog));
+
+    [Fact]
     public void OfFieldSprites_ScaleZero_NamesTheFileAndTheField()
     {
         var sheets = _catalog.FieldSprites.Values
@@ -89,4 +107,10 @@ public sealed class CatalogProblemsTests
 
     private static List<ShopDefinition> WithGeneralStore(Func<ShopDefinition, ShopDefinition> change) =>
         [.. _catalog.Shops.Values.Select(shop => shop.Id == "general_store" ? change(shop) : shop)];
+
+    private static DropTable GoblinTableWithFirstChance(int chance)
+    {
+        var goblin = _catalog.DropTables["goblin"];
+        return goblin with { Entries = [goblin.Entries[0] with { Chance = chance }, .. goblin.Entries.Skip(1)] };
+    }
 }

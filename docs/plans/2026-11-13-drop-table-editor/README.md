@@ -51,7 +51,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **DT0. Shared pieces first: `TypedNumber` into `Editor/Catalogs`, `EnabledWhenChosen` into the theme, `CatalogDraft.HasSameRecords`** (Editor, about 120 lines moved or folded, none new) → [slices/DT0.md](slices/DT0.md)
 - [x] **DT1. Drop tables save from the editor: `DropTable` equal by content, `drop-tables.json` relaid and written, quantities of 1 left out, `CatalogProblems.OfDropTables`, `CatalogDraft.SetDropTables`** (Core + Data + Editor, about 235 lines) → [slices/DT1.md](slices/DT1.md)
 - [x] **DT2. One drop table as typed: its id, its entries' chance and quantity boxes, `ToTable`** (Editor, about 210 lines) → [slices/DT2.md](slices/DT2.md)
-- [ ] **DT3. A table's entries edited: add from every item by name, remove, move, one change event** (Editor, about 210 lines) → [slices/DT3.md](slices/DT3.md)
+- [x] **DT3. A table's entries edited: add from every item by name, remove, move, one change event** (Editor, about 210 lines) → [slices/DT3.md](slices/DT3.md)
 - [ ] **DT4. The Drop tables window's rules: tables in id order, Add, Remove while new, who rolls the chosen table, the problem line, one undo step** (Editor, about 235 lines) → [slices/DT4.md](slices/DT4.md)
 
 ### Phase 2: the windows

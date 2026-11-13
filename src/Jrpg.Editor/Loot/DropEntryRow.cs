@@ -11,6 +11,11 @@ namespace Jrpg.Editor.Loot;
 /// </summary>
 internal sealed partial class DropEntryRow : ObservableObject
 {
+    // A new entry's starting boxes (design tunables): a chance the developer retypes, and one copy, which the writer
+    // leaves out of the file.
+    private const int NewChance = 10;
+    private const int NewQuantity = 1;
+
     private DropEntryRow(string itemId, string itemName)
     {
         ItemId = itemId;
@@ -24,6 +29,14 @@ internal sealed partial class DropEntryRow : ObservableObject
         ChanceText = TypedNumber.Text(entry.Chance),
         MinQuantityText = TypedNumber.Text(entry.MinQuantity),
         MaxQuantityText = TypedNumber.Text(entry.MaxQuantity),
+    };
+
+    /// <summary>An entry just added for the picked item, from the tunable starting boxes.</summary>
+    public static DropEntryRow New(DropItemChoice item) => new(item.Id, item.Name)
+    {
+        ChanceText = TypedNumber.Text(NewChance),
+        MinQuantityText = TypedNumber.Text(NewQuantity),
+        MaxQuantityText = TypedNumber.Text(NewQuantity),
     };
 
     public string ItemId { get; }

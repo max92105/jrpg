@@ -34,3 +34,5 @@ A table's entries are added from a box of every item, removed and moved; every t
 
 ## Verify by hand
 None: no window yet (DT5).
+
+- **Done, with deviations:** the entry editing stays in `DropTableViewModel.cs` (149 lines, no partial needed); Remove's and the moves' `CanExecute` share one greyed test; an extra `EntriesChanged_AddedRowTyped_IsRaised` pins that a row added later is watched.

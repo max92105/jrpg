@@ -1,11 +1,11 @@
 # Drop table editor
-Status: retro pending
+Status: done
 
 Drafted on 2026-11-13 from the developer's request (verbatim):
 
 > "missing part in enemy i can create edit loot tables."
 
-Context: the new Database > Enemies... window (plan [`2026-11-12-shops-and-enemy-database`](../done/2026-11-12-shops-and-enemy-database/README.md), ADR 0045) has a Drop table box that picks one of the draft's drop tables, but nothing in the editor creates or edits a drop table: `content/drop-tables.json` is still hand-written.
+Context: the new Database > Enemies... window (plan [`2026-11-12-shops-and-enemy-database`](../2026-11-12-shops-and-enemy-database/README.md), ADR 0045) has a Drop table box that picks one of the draft's drop tables, but nothing in the editor creates or edits a drop table: `content/drop-tables.json` is still hand-written.
 
 Approved on 2026-11-13 with the devil's advocate's fixes: DT5's row selection through a focus handler; the Enemies window's Edit... button made core (Q1 became decision 596); the draft's DT6 (Duplicate, the average drops) cut to the backlog, its "Rolled by" line folded into DT4 and DT5; DT0 keeps `ContentWriter.cs` whole (DT1 takes it to about 293) and takes the `HasSameRecords` extraction; `DropTable` compares by content in Core; `DropTableEditing` set in the constructor like its siblings; every question answered as a decision. The draft's DT7 is now DT6.
 

@@ -120,6 +120,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - 578: the path is relative to where the NPC stands; it is checked at load from the placed cell: from 1 to 64 steps, every cell on the map (walls allowed), the uid a field-sprite object on the same map; at run time a step that would leave the map is dropped.
 - 579: the editor builds the path with four direction buttons and Remove last, the path shown as text ("left, left, down").
 - 593 (MV2, from the review): a collision polygon already holding the player's center never refuses their step, so a cutscene walk that ends on the player leaves them free to walk out; `MapCollision.CanMoveTo(from, to, radius)` replaces `CanStandAt`.
+- 594 (after the plan, 2026-11-13, the developer's bug report): an image imported in the Character sprites window counts as edited, so OK keeps its guessed setup untouched (an imported merchant whose guess was right saved no record, and New NPC said it had none); choosing an image already in the folder and leaving it still makes no record; an import whose guess doesn't split the image shows the reason in its setup but counts only once edited, so it never greys OK for the session (the review).
+- 595 (after the plan, 2026-11-13, the developer): New NPC..., Character sprites... and Change NPC sprite... move from the Objects menu to their own NPCs menu.
 
 ## Open design questions (developer decides)
 None left: every question was answered at approval.

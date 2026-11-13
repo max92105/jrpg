@@ -7,7 +7,7 @@ using Jrpg.Editor.Tiles;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// Objects > Character sprites...: the window's start and apply over the draft, and its Import... through Data, asking
+/// NPCs > Character sprites...: the window's start and apply over the draft, and its Import... through Data, asking
 /// before replacing an image, the outcome in the status bar as the tilesheet import's.
 /// </summary>
 internal sealed partial class MainViewModel
@@ -17,7 +17,7 @@ internal sealed partial class MainViewModel
     public bool CanEditFieldSprites => FieldSpriteEditing is not null;
 
     /// <summary>
-    /// Objects > Change NPC sprite... on the Objects panel's chosen NPC; null when the content didn't load.
+    /// NPCs > Change NPC sprite... on the Objects panel's chosen NPC; null when the content didn't load.
     /// </summary>
     public NpcSpriteChange? NpcSpriteChange { get; }
 

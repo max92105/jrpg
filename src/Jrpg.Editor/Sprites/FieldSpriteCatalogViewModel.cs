@@ -9,7 +9,8 @@ namespace Jrpg.Editor.Sprites;
 /// The Character sprites window's state (decisions 569, 570): every image in the field-sprite folder, set up or not,
 /// then every record whose image is missing; the chosen image's setup, each opened setup kept while the window is open;
 /// Copy setup from another set-up image; the problem that greys OK; and the records changed, for one undo step. A setup
-/// counts (for OK and the records) once it was edited: choosing a new image and leaving it makes no record. Reads no
+/// counts (for OK and the records) once it was edited, or its image imported in this window with a guess that fits:
+/// choosing an image already in the folder and leaving it makes no record, but an import means "set this up". Reads no
 /// file itself: the folder's listing and an image's size come in as lookups.
 /// </summary>
 internal sealed partial class FieldSpriteCatalogViewModel : ObservableObject
@@ -114,8 +115,10 @@ internal sealed partial class FieldSpriteCatalogViewModel : ObservableObject
             .Where(sheet => !_catalog.Current.FieldSprites.TryGetValue(sheet.File, out var current) || current != sheet)];
 
     /// <summary>
-    /// Lists the folder again after an import: a copied image without a record shows "(not set up)", and the last one
-    /// copied is chosen; a copied image's setup opens anew, since its size may have changed; the others stay.
+    /// Lists the folder again after an import: the last image copied is chosen; a copied image's setup opens anew,
+    /// since its size may have changed, and counts as edited while its guess has no problem, so OK keeps a right guess
+    /// untouched (decision 594: an imported merchant saved nothing); a wrong guess shows its problem in the setup but
+    /// greys nothing until edited, so it never traps OK; the others stay.
     /// </summary>
     /// <param name="imported">The files the import copied, in order; empty keeps the choice.</param>
     public void RefreshAfterImport(IReadOnlyList<string> imported)
@@ -124,6 +127,10 @@ internal sealed partial class FieldSpriteCatalogViewModel : ObservableObject
         {
             _opened.Remove(file);
             _edited.Remove(file);
+            if (OpenedSetup(file) is { Problem: null })
+            {
+                _edited.Add(file);
+            }
         }
 
         var chosenFile = imported.Count > 0 ? imported[^1] : Chosen?.File;
@@ -131,7 +138,9 @@ internal sealed partial class FieldSpriteCatalogViewModel : ObservableObject
         Chosen = Choices.FirstOrDefault(choice => choice.File == chosenFile);
     }
 
-    private IEnumerable<FieldSpriteSetupViewModel> EditedSetups() => _opened.Values.Where(setup => _edited.Contains(setup.File));
+    // An imported image counts before anything reads its setup, so each counted file's setup is opened here.
+    private List<FieldSpriteSetupViewModel> EditedSetups() =>
+        [.. _edited.Order(StringComparer.Ordinal).Select(OpenedSetup).OfType<FieldSpriteSetupViewModel>()];
 
     private FieldSpriteSetupViewModel? OpenedSetup(string file)
     {

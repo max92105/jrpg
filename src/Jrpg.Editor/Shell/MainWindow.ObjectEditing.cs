@@ -57,7 +57,7 @@ internal sealed partial class MainWindow
         }
     }
 
-    // Objects > Change NPC sprite... and the Objects tab's Change sprite...: the same dialog on the chosen NPC.
+    // NPCs > Change NPC sprite... and the Objects tab's Change sprite...: the same dialog on the chosen NPC.
     private void OnChangeNpcSpriteClicked(object sender, RoutedEventArgs e)
     {
         if (_viewModel.NpcSpriteChange is { } change && change.Start() is { } dialog)

@@ -67,8 +67,8 @@ internal sealed partial class NewNpcViewModel : ObservableObject
     public string? IdProblem => IsIdFixed ? null : ObjectIds.ProblemOf(Id, _takenIds);
 
     public string? SpriteProblem =>
-        SpriteFiles.Count == 0 ? "Set up a character sprite first: Objects > Character sprites..."
-        : ChosenSheet is null ? $"{SpriteFile} has no record; set it up in Objects > Character sprites..."
+        SpriteFiles.Count == 0 ? "Set up a character sprite first: NPCs > Character sprites..."
+        : ChosenSheet is null ? $"{SpriteFile} has no record; set it up in NPCs > Character sprites..."
         : null;
 
     /// <summary>Change NPC sprite: the dialog on an NPC that exists, keeping everything but the sprite.</summary>

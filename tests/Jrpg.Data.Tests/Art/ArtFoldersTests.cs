@@ -4,12 +4,15 @@ namespace Jrpg.Data.Tests.Art;
 
 public sealed class ArtFoldersTests
 {
+    // The developer imports NPC sheets into this folder: only the two the code relies on are pinned, and the order.
     [Fact]
     public void FieldSpriteImagesIn_RepositoryArt_ListsPlayerAndPlaceholder()
     {
         var images = ArtFolders.FieldSpriteImagesIn(ArtFolders.RootIn(Path.Combine(AppContext.BaseDirectory, "content")));
 
-        Assert.Equal(["npc_placeholder.png", "player.png"], images);
+        Assert.Contains("npc_placeholder.png", images);
+        Assert.Contains("player.png", images);
+        Assert.Equal(images.Order(StringComparer.Ordinal), images);
     }
 
     // Any art folder by name (decision 589): PNGs only, in ordinal order, whatever order the disk gives them.

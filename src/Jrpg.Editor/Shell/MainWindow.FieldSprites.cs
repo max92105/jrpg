@@ -4,7 +4,7 @@ using Jrpg.Editor.Sprites;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// Objects > Character sprites...: the window edits the draft's sprite records, and OK applies the whole session as one
+/// NPCs > Character sprites...: the window edits the draft's sprite records, and OK applies the whole session as one
 /// undo step (decision 569); its Import... copies images through the view model, whose import event drops the replaced
 /// pictures as the tilesheet import's does.
 /// </summary>

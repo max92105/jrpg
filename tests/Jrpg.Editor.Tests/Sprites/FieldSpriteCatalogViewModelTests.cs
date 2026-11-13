@@ -177,6 +177,66 @@ public sealed class FieldSpriteCatalogViewModelTests
         Assert.Null(window.Problem);
     }
 
+    // An import means "set this up": OK keeps the guess even when nothing was touched (the merchant bug).
+    [Fact]
+    public void ToSheets_ImportedImageUntouched_ReturnsItsGuess()
+    {
+        _files = [Placeholder, Player];
+        var window = Open();
+        _files = [Placeholder, Player, Bought];
+
+        window.RefreshAfterImport([Bought]);
+
+        var sheet = Assert.Single(window.ToSheets());
+        Assert.Equal((Bought, 32, 32), (sheet.File, sheet.FrameWidth, sheet.FrameHeight));
+    }
+
+    // An imported image whose guess doesn't split it shows the reason in its setup, but greys nothing until edited, so
+    // it can't trap the session's other edits behind OK (decision 594).
+    [Fact]
+    public void Problem_ImportedImageWithABadGuess_DoesNotGreyOk()
+    {
+        _files = [Placeholder, Player];
+        var window = Open();
+        _files = [Placeholder, Player, "odd.png"];
+
+        window.RefreshAfterImport(["odd.png"]);
+
+        Assert.Equal("102 px doesn't split into 4 columns.", window.Setup!.Problem);
+        Assert.Null(window.Problem);
+        Assert.Empty(window.ToSheets());
+    }
+
+    // Once the bad guess is edited, the import counts like any edited setup.
+    [Fact]
+    public void ToSheets_ImportedBadGuessThenFixed_ReturnsTheFix()
+    {
+        _files = [Placeholder, Player];
+        var window = Open();
+        _files = [Placeholder, Player, "odd.png"];
+        window.RefreshAfterImport(["odd.png"]);
+
+        window.Setup!.Columns = 3;
+        window.Setup.Rows = 7;
+        window.Setup.Walk.Frames = 3;
+
+        var sheet = Assert.Single(window.ToSheets());
+        Assert.Equal(("odd.png", 34, 32), (sheet.File, sheet.FrameWidth, sheet.FrameHeight));
+    }
+
+    // A failed import copies nothing: the choice and the edits stay, and nothing new counts.
+    [Fact]
+    public void RefreshAfterImport_NothingCopied_KeepsTheChoiceAndCountsNothing()
+    {
+        var window = Open();
+        window.Chosen = window.Choices.Single(choice => choice.File == Bought);
+
+        window.RefreshAfterImport([]);
+
+        Assert.Equal(Bought, window.Chosen?.File);
+        Assert.Empty(window.ToSheets());
+    }
+
     private FieldSpriteCatalogViewModel Open() =>
         new(_draft, () => _files, file => _sizes.TryGetValue(file, out var size) ? size : null);
 }

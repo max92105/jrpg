@@ -6,9 +6,9 @@ using Jrpg.Editor.Catalogs;
 namespace Jrpg.Editor.Objects;
 
 /// <summary>
-/// Objects > Change NPC sprite...: the New NPC dialog on the Objects panel's chosen NPC, its id fixed, and OK swapping
-/// its sprite as one undo step (ADR 0015's one-field change per NPC, now a click). Greyed unless the chosen object is
-/// an NPC; re-checked when the choice or the catalog changes (an undo may remove the NPC).
+/// NPCs > Change NPC sprite...: the New NPC dialog on the Objects panel's chosen NPC, its id fixed, and OK swapping its
+/// sprite as one undo step (ADR 0015's one-field change per NPC, now a click). Greyed unless the chosen object is an
+/// NPC; re-checked when the choice or the catalog changes (an undo may remove the NPC).
 /// </summary>
 internal sealed partial class NpcSpriteChange : ObservableObject
 {

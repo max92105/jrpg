@@ -43,6 +43,12 @@ internal sealed partial class FieldSpriteWindow : Window
         Func<IReadOnlyList<string>, SheetImportResult> import)
     {
         InitializeComponent();
+
+        // At most the screen's work area: at 175 % display scaling 1120 px is wider than the screen, and centering on
+        // the editor cut the window's sides.
+        Width = Math.Min(Width, SystemParameters.WorkArea.Width);
+        Height = Math.Min(Height, SystemParameters.WorkArea.Height);
+        Loaded += (_, _) => KeepOnDesktop();
         DataContext = _sprites = sprites;
         (_artRoot, _animationTime, _import) = (artRoot, animationTime, import);
         ZoomBar.DataContext = _zoom;
@@ -51,6 +57,15 @@ internal sealed partial class FieldSpriteWindow : Window
         CompositionTarget.Rendering += OnRendering;
         Closed += OnClosed;
         ShowChosen();
+    }
+
+    // Centering on an editor snapped to half a screen, or on a second monitor, can still push a side off the desktop.
+    private void KeepOnDesktop()
+    {
+        var right = SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth - ActualWidth;
+        var bottom = SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight - ActualHeight;
+        Left = Math.Max(SystemParameters.VirtualScreenLeft, Math.Min(Left, right));
+        Top = Math.Max(SystemParameters.VirtualScreenTop, Math.Min(Top, bottom));
     }
 
     private void OnSpritesChanged(object? sender, PropertyChangedEventArgs e)

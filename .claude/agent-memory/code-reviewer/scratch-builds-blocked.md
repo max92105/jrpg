@@ -25,3 +25,6 @@ project in the scratchpad (csproj + a UserControl/Window XAML pair + `[STAThread
 `Connect` too: members of local types the pass-1 compiler can't resolve go into BAML instead. For behavior needing
 containers (TreeView events, context menu bindings, verified MF3 2026-11-10): `XamlReader.Parse` the XAML, `Show()` a
 Window at Left=-2000, then `Dispatcher.CurrentDispatcher.Invoke(() => {}, DispatcherPriority.ApplicationIdle)`.
+
+WPF binding fact (probed 2026-11-13, NP1 review, PowerShell -STA + XamlReader): a non-editable ComboBox whose bound
+SelectedItem ("" or any value) is not in its ItemsSource leaves the source alone on load and close: no null write-back.

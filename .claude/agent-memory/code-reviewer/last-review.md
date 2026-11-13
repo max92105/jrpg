@@ -5,13 +5,14 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-12-shops-and-enemy-database, slice SH3 (Shops window, Database menu: Trade/ShopCatalogWindow,
-Shell/MainWindow.Database, Shell/MainViewModel.Database, ShopCatalogViewModel.CanApply). 2026-11-13. Round 1.
-Verdict: ready to commit. XAML bindings all checked against ShopViewModel/ShopCatalogViewModel/PricedItemChoice: match.
+Plan 2026-11-12-shops-and-enemy-database, slice NP1 (Quest giver preset: EventPresets.QuestGiver,
+EventListViewModel.PresetQuestId / ApplyQuestGiverPresetCommand, ObjectEventsWindow button + quest box). 2026-11-13.
+Round 1. Verdict: ready to commit. XAML bindings checked: ApplyQuestGiverPresetCommand, Choices.QuestIds (public
+StepChoices Choices), PresetQuestId all match. Probed: a ComboBox with SelectedItem "" over an empty list never writes
+null back (no NRE in HasPresetQuest).
 
-- SH2 carried: RecordListProblem Warning fixed (Catalogs/RecordListProblem.FirstOf in use); SH2 Suggestions not
-  carried (committed slice); ListOrder summary Follow-up is in backlog.md line 206, dropped.
-- Suggestion (open): "Sells, in order" ListBox shows raw item ids while the picker shows names.
-- Suggestion (open): every ShopViewModel PropertyChanged (SelectedItem, ItemToAdd, Label, Problem) reruns the whole
-  check twice (Problem + CanApply); filter OnShopChanged to Id/Name.
-- Suggestion (open): CanApply test interleaves act and assert; split appear/go or keep one act per test.
+- SH3 Suggestions not carried (committed slice).
+- Suggestion (open): test PresetQuestId_ClearedByTheBox_GreysTheButton names a UI path the read-only box can't take;
+  rename PresetQuestId_Emptied_GreysTheButton.
+- Suggestion (open): the Quest giver tool tip doesn't say it replaces the object's events like every preset.
+- Suggestion (open): EventListViewModel ctor's `choices` param doc omits the quests (gate and now the preset box).

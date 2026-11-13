@@ -1,10 +1,8 @@
 using System.ComponentModel;
-using System.IO;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Jrpg.Core.Sprites;
-using Jrpg.Data.Art;
 using Jrpg.Editor.Tiles;
 using Jrpg.Editor.Viewport;
 using Microsoft.Win32;
@@ -81,7 +79,7 @@ internal sealed partial class FieldSpriteWindow : Window
             _setup.PropertyChanged += OnSetupChanged;
         }
 
-        _sheet = _setup is null ? null : LoadSheet(_setup.File);
+        _sheet = _setup is null ? null : SpriteImageFile.Load(_artRoot, _setup.File);
         OkButton.IsEnabled = _sprites.Problem is null;
         DrawSheet();
         DrawPreview();
@@ -95,24 +93,6 @@ internal sealed partial class FieldSpriteWindow : Window
         }
 
         DrawPreview();
-    }
-
-    private BitmapImage? LoadSheet(string file)
-    {
-        var path = Path.Combine(_artRoot, ArtFolders.FieldSprites, file);
-        if (!File.Exists(path))
-        {
-            return null;
-        }
-
-        var bitmap = new BitmapImage();
-        bitmap.BeginInit();
-        bitmap.UriSource = new Uri(path);
-        bitmap.CacheOption = BitmapCacheOption.OnLoad;
-        bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
-        bitmap.EndInit();
-        bitmap.Freeze();
-        return bitmap;
     }
 
     // The sheet at the zoom's size per frame, its grid and row numbers over it.

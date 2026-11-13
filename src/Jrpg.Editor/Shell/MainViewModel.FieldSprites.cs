@@ -1,5 +1,6 @@
 using System.IO;
 using Jrpg.Data.Art;
+using Jrpg.Editor.Objects;
 using Jrpg.Editor.Sprites;
 using Jrpg.Editor.Tiles;
 
@@ -14,6 +15,12 @@ internal sealed partial class MainViewModel
     public FieldSpriteEditingViewModel? FieldSpriteEditing { get; }
 
     public bool CanEditFieldSprites => FieldSpriteEditing is not null;
+
+    /// <summary>
+    /// Objects > Change NPC sprite... on the Objects panel's chosen NPC; null when the content didn't load.
+    /// </summary>
+    public NpcSpriteChange? NpcSpriteChange { get; }
+
 
     /// <summary>
     /// Copies images into the field-sprite art (asking before replacing one); a file copy, not an undo step.

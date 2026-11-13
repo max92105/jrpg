@@ -1,36 +1,45 @@
 using System.ComponentModel;
-using System.IO;
 using System.Windows;
 using System.Windows.Media;
-using Jrpg.Core.Maps;
+using System.Windows.Media.Imaging;
+using Jrpg.Editor.Sprites;
+using Jrpg.Editor.Tiles;
 
 namespace Jrpg.Editor.Objects;
 
 /// <summary>
-/// The New NPC dialog. Create hands the id and sprite to the window's create step, which returns false when no NPC was
-/// made (a field has a problem), and the dialog then stays open.
+/// The New NPC and Change NPC sprite dialog. OK hands the id and sprite to the window's apply step, which returns false
+/// when nothing was made (a field has a problem), and the dialog then stays open. The chosen sprite walks its four
+/// facings at the editor's animation time, as the Character sprites window shows it.
 /// </summary>
 internal sealed partial class NewNpcWindow : Window
 {
-    private readonly NewNpcViewModel _newNpc;
-    private readonly Func<NewNpcViewModel, bool> _create;
-    private readonly Func<ObjectDefinition, ImageSource> _draw;
+    private readonly NewNpcViewModel _npc;
+    private readonly Func<NewNpcViewModel, bool> _apply;
+    private readonly string _artRoot;
+    private readonly TileAnimationTime _animationTime;
+    private readonly WalkPreview _preview = new();
+    private BitmapSource? _sheet;
 
-    /// <param name="newNpc">The id and sprite, edited here.</param>
-    /// <param name="create">Makes the NPC; false when it didn't.</param>
-    /// <param name="draw">Draws an object as the map does, for the sprite's preview.</param>
-    public NewNpcWindow(NewNpcViewModel newNpc, Func<NewNpcViewModel, bool> create, Func<ObjectDefinition, ImageSource> draw)
+    /// <param name="npc">The id and sprite, edited here.</param>
+    /// <param name="apply">Makes or changes the NPC; false when it didn't.</param>
+    /// <param name="artRoot">The <c>art</c> folder, where the sprite image is read from.</param>
+    /// <param name="animationTime">The editor's animation time, which the preview walks on.</param>
+    public NewNpcWindow(NewNpcViewModel npc, Func<NewNpcViewModel, bool> apply, string artRoot, TileAnimationTime animationTime)
     {
         InitializeComponent();
-        DataContext = _newNpc = newNpc;
-        _create = create;
-        _draw = draw;
-        newNpc.PropertyChanged += OnNewNpcChanged;
+        DataContext = _npc = npc;
+        (_apply, _artRoot, _animationTime) = (apply, artRoot, animationTime);
+        Title = npc.IsIdFixed ? "Change NPC sprite" : "New NPC";
+        OkButton.Content = npc.IsIdFixed ? "Change" : "Create";
+        npc.PropertyChanged += OnNpcChanged;
+        CompositionTarget.Rendering += OnRendering;
+        Closed += OnClosed;
         ShowPreview();
-        Loaded += (_, _) => IdBox.Focus();
+        Loaded += (_, _) => ((UIElement)(npc.IsIdFixed ? SpriteBox : IdBox)).Focus();
     }
 
-    private void OnNewNpcChanged(object? sender, PropertyChangedEventArgs e)
+    private void OnNpcChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(NewNpcViewModel.SpriteFile))
         {
@@ -38,26 +47,37 @@ internal sealed partial class NewNpcWindow : Window
         }
     }
 
-    // Any PNG in the folder is listed, read or not: one that can't be read shows a line, not a crash.
     private void ShowPreview()
     {
-        PreviewProblem.Text = "";
-        try
+        _sheet = _npc.ChosenSheet is null ? null : SpriteImageFile.Load(_artRoot, _npc.SpriteFile);
+        PreviewProblem.Text = _npc.ChosenSheet is not null && _sheet is null ? "The image is missing from the folder." : "";
+        DrawPreview();
+    }
+
+    private void OnRendering(object? sender, EventArgs e)
+    {
+        if (_npc.ChosenSheet is { } sheet && _sheet is not null && _preview.HasMovedOn(sheet, _animationTime.Elapsed))
         {
-            Preview.Source = _newNpc.SpriteProblem is null ? _draw(_newNpc.ToDefinition()) : null;
-        }
-        catch (Exception exception) when (exception is NotSupportedException or FileFormatException or IOException)
-        {
-            Preview.Source = null;
-            PreviewProblem.Text = "Can't read this image.";
+            DrawPreview();
         }
     }
 
-    private void OnCreateClicked(object sender, RoutedEventArgs e)
+    private void DrawPreview() =>
+        Preview.Source = _npc.ChosenSheet is { } sheet && _sheet is not null
+            ? _preview.Draw(sheet, _sheet, _animationTime.Elapsed)
+            : null;
+
+    private void OnOkClicked(object sender, RoutedEventArgs e)
     {
-        if (_create(_newNpc))
+        if (_apply(_npc))
         {
             DialogResult = true;
         }
+    }
+
+    private void OnClosed(object? sender, EventArgs e)
+    {
+        CompositionTarget.Rendering -= OnRendering;
+        _npc.PropertyChanged -= OnNpcChanged;
     }
 }

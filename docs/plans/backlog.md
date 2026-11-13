@@ -21,7 +21,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - **`TileBrowserViewModelTests` (496 lines):** split it into Cut and re-cut classes (Set up, Cut, Apply, Cancel, with `OpenGrass3Cut` and `Ask`) over a shared setup when the tile browser is next touched (outside the cleanup plan's scope, decision 536).
 - **`TileBrowserViewModel` (332 lines since the sheet zoom):** move the sheet hit-testing (`CellAt`, `NearestCellTo`, `GridPositionOf`, F1's grid check) into a `Tiles/SheetGrid`.
 - **`ObjectShapesViewModelTests` (347 lines):** move the zone tests (E10) and the point-editing tests (E11a) into their own classes.
-- **The New NPC dialog** doesn't check that the chosen sprite holds the walk frames. The startup and save check (plan 2026-10-23, F5a) refuses such a sprite, and `NewNpcViewModel.SpriteProblem` could say so in the dialog, through a size lookup.
 
 ## From the battle plan (2026-10-20)
 

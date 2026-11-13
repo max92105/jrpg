@@ -23,3 +23,5 @@ New NPC... offers only sprites with a record, the placeholder first, and shows t
 2. Choose the placeholder NPC object, Objects > Change NPC sprite...: the id is greyed; pick the bought sheet, OK: every placed copy on the map shows it. Ctrl+Z: back; Ctrl+Y.
 3. Ctrl+S, `dotnet run --project src/Jrpg.Game`: the NPC stands on the map as in the editor, and the Talk prompt sits above its head.
 4. Revert with `git checkout -- content` if this was only a check.
+
+- **Done, with deviations:** the dialog's preview walks all four facings through `WalkPreview` (shared with the Character sprites window), the image read through `SpriteImageFile` (shared too); `NpcSpriteChange` is an observable object re-raising `CanChange` on the browser's choice and the catalog; `Apply` returns false on a sprite problem, as `CreateNpc` does, so one dialog serves both; the backlog line on the dialog's sprite check is folded (only set-up sprites are offered). The review: the dialog orders the files itself, so the shell and the change flow pass the records as they are.

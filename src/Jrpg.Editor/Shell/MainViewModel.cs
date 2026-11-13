@@ -86,6 +86,7 @@ internal sealed partial class MainViewModel : ObservableObject
             EventEditing = new EventEditingViewModel(Content, _openMaps, Layer) { MapIds = MapIds };
             QuestEditing = new QuestEditingViewModel(Content);
             FieldSpriteEditing = CreateFieldSpriteEditing();
+            NpcSpriteChange = new NpcSpriteChange(Content, Placing.Browser);
             if (MapIds.Count > 0)
             {
                 TryOpenMap(MapIds[0]);
@@ -181,9 +182,11 @@ internal sealed partial class MainViewModel : ObservableObject
     /// <summary>Whether a new NPC can be made: only once the content and its art loaded.</summary>
     public bool CanStartNewNpc => Placing is not null;
 
-    /// <summary>The New NPC dialog's state, listing the field sprites on disk now; null when the content didn't load.</summary>
+    /// <summary>
+    /// The New NPC dialog's state over the set-up sheets (ADR 0043); null when the content didn't load.
+    /// </summary>
     public NewNpcViewModel? StartNewNpc() =>
-        CanStartNewNpc ? new NewNpcViewModel([.. Catalog!.Objects.Keys], ArtFolders.FieldSpriteImagesIn(ArtRoot)) : null;
+        CanStartNewNpc ? new NewNpcViewModel([.. Catalog!.Objects.Keys], [.. Catalog.FieldSprites.Values]) : null;
 
     /// <summary>Makes the NPC the New NPC dialog describes, as one undo step; it is chosen in the Objects panel, in Objects mode.</summary>
     /// <returns>False when nothing was made: the id or sprite has a problem.</returns>

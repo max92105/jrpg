@@ -5,16 +5,13 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-12-shops-and-enemy-database, slice SH2 (Shops window's headless rules: Editor/Trade ShopViewModel,
-PricedItemChoice, ShopCatalogViewModel, ShopEditingViewModel). 2026-11-13. Round 1. Verdict: ready to commit.
+Plan 2026-11-12-shops-and-enemy-database, slice SH3 (Shops window, Database menu: Trade/ShopCatalogWindow,
+Shell/MainWindow.Database, Shell/MainViewModel.Database, ShopCatalogViewModel.CanApply). 2026-11-13. Round 1.
+Verdict: ready to commit. XAML bindings all checked against ShopViewModel/ShopCatalogViewModel/PricedItemChoice: match.
 
-- SH1 carried: its three Warnings fixed (WriteMaps openShop tests back, ordinal-order assert, MapNamesWhere
-  extracted); its Suggestions not carried (committed slice); MV3's moveNpc Follow-up now in backlog, dropped.
-- Warning (open): ShopCatalogViewModel.cs:57-69 copies QuestCatalogViewModel.Problem's "listed twice / own problem by
-  id or #position" loop (third copy with QuestViewModel.FirstStageProblem; Enemies window will be the fourth);
-  extract a shared list-problem function.
-- Suggestion (open): two test names claim what they don't assert (RemoveShop_NewShop_RemovesItAndSelectsAnother,
-  AddItem_AfterAdding_GreysUntilAnotherIsPicked).
-- Suggestion (open): OfferedItems has no ThenBy(id) for same-named items.
-- Suggestion (open): RemoveShop's unsubscription untested.
-- Follow-up: Events/ListOrder summary says "the event dialog's lists", now used by Quests and Trade too.
+- SH2 carried: RecordListProblem Warning fixed (Catalogs/RecordListProblem.FirstOf in use); SH2 Suggestions not
+  carried (committed slice); ListOrder summary Follow-up is in backlog.md line 206, dropped.
+- Suggestion (open): "Sells, in order" ListBox shows raw item ids while the picker shows names.
+- Suggestion (open): every ShopViewModel PropertyChanged (SelectedItem, ItemToAdd, Label, Problem) reruns the whole
+  check twice (Problem + CanApply); filter OnShopChanged to Id/Name.
+- Suggestion (open): CanApply test interleaves act and assert; split appear/go or keep one act per test.

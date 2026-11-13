@@ -34,7 +34,8 @@ call or a rename. These cases slipped past it:
   child's old numbers. Sizes and file counts a doc states (C3: "split in two files" with four present) need rechecking.
 - A docs/map.md entry edited by inserting a new parenthetical keeps the old one beside it (gold S2: `AffixDefinition`
   with two field lists); verify.ps1's two-summaries check only reads code, so read every changed map.md line whole. E1 (gold)
-  added `EventScreenTransitions` to the Flow line but left the deleted `ForgeTransitions` in its key types.
+  added `EventScreenTransitions` to the Flow line but left the deleted `ForgeTransitions` in its key types. SI2 broke the
+  tables themselves (a header merged with its `|---|` row; a key type appended as a 4th cell): count the `|` per changed row.
 - A part that starts writing into its host's list (sound SH3: ShopCounter asking coins into ShopScene's AskedSounds) leaves the
   host's `Sounds` summary listing only the host's own asks; reread the host's summary.
 - A check moved out of one layer (mana-seed X2: the writer's art check now only at game startup) leaves comments

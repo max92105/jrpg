@@ -22,6 +22,19 @@ public sealed class NpcFacingTests
         Assert.Equal(expected, NpcFacing.Of(_villager, _villager, playerFacing));
 
     [Fact]
+    public void Of_NoEventRunning_FacesItsPlacedFacing() =>
+        Assert.Equal(Facing.Left, NpcFacing.Of(_villager with { Facing = Facing.Left }, speaking: null, Facing.Up));
+
+    // The player wins over the placed facing while the event runs; the placed one is what it turns back to after.
+    [Fact]
+    public void Of_OwnEventRunning_IgnoresItsPlacedFacing()
+    {
+        var turned = _villager with { Facing = Facing.Left };
+
+        Assert.Equal(Facing.Down, NpcFacing.Of(turned, turned, Facing.Up));
+    }
+
+    [Fact]
     public void Of_OtherObjectsEventRunning_FacesDown() =>
         Assert.Equal(Facing.Down, NpcFacing.Of(_villager, _guard, Facing.Left));
 

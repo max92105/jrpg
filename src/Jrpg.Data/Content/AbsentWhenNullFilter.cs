@@ -39,6 +39,9 @@ internal static class AbsentWhenNullFilter
 
         // ADR 0039: only animated tiles have an animation.
         (typeof(TileDefinition), "animation"),
+
+        // ADR 0044: only a turned NPC has a facing.
+        (typeof(PlacedObject), "facing"),
     ];
 
     public static void SkipNullOptionalFields(JsonTypeInfo typeInfo) => OptionalFieldFilter.SkipWhen(typeInfo, _addedLater, value => value is null);

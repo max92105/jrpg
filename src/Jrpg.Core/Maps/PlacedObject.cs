@@ -19,4 +19,10 @@ public sealed record PlacedObject
 
     /// <summary>What the object does when the player interacts with it or touches it; empty for decoration.</summary>
     public IReadOnlyList<MapEvent> Events { get; init; } = [];
+
+    /// <summary>
+    /// Which way an NPC stands (ADR 0044, decision 572): null means down, and only an object drawn from a field sprite
+    /// carries one (content refuses it on a tile object).
+    /// </summary>
+    public Facing? Facing { get; init; }
 }

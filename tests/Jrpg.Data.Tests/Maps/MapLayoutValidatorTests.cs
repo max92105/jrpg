@@ -15,6 +15,17 @@ public sealed class MapLayoutValidatorTests
         Objects: new Dictionary<string, ObjectDefinition>
         {
             ["tree"] = new() { Id = "tree", Width = 4, Height = 4, CollisionPolygon = [], Category = "General", Tiles = [new ObjectTile(0, 0, 1)], AbovePlayerZones = [] },
+            ["villager"] = new()
+            {
+                Id = "villager",
+                Width = 1,
+                Height = 1,
+                CollisionPolygon = [],
+                Category = "NPC",
+                Tiles = [],
+                FieldSpriteFile = "npc_placeholder.png",
+                AbovePlayerZones = [],
+            },
         },
         ItemIds: new HashSet<string>(),
         EncounterIds: new HashSet<string>(),
@@ -31,6 +42,8 @@ public sealed class MapLayoutValidatorTests
         Layers = [new TileLayer { Z = 0, Rows = [[1, 1, 2], [1, 0, 1]] }],
         Objects = [_tree],
     };
+
+    private static void Validate(MapLayout layout) => MapLayoutValidator.Validate(FileName, layout, _references);
 
     [Theory]
     [InlineData(-4)]
@@ -101,6 +114,26 @@ public sealed class MapLayoutValidatorTests
         var exception = Assert.Throws<ContentValidationException>(() => MapLayoutValidator.Validate(FileName, layout, _references));
 
         Assert.Equal("map-layouts/forest.json: object '1@0,0' has unknown object id 'house_9'.", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_NpcWithFacing_Passes()
+    {
+        var villager = _tree with { Uid = "villager_1", ObjectId = "villager", Facing = Facing.Left };
+        var layout = _forest with { Objects = [villager] };
+
+        Assert.Null(Record.Exception(() => Validate(layout)));
+    }
+
+    // Only an NPC turns (ADR 0044): a facing on a tile object is refused by name.
+    [Fact]
+    public void Validate_TileObjectWithFacing_ThrowsNamingTheUid()
+    {
+        var layout = _forest with { Objects = [_tree with { Facing = Facing.Up }] };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate(layout));
+
+        Assert.Equal("map-layouts/forest.json: object '1@0,0' (tree) has a facing, but only an NPC turns.", exception.Message);
     }
 
     [Theory]

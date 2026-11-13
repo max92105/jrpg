@@ -1,3 +1,4 @@
+using Jrpg.Core.Geometry;
 using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Tests.Content;
@@ -65,6 +66,19 @@ public sealed class ContentCatalogLoaderFieldSpriteTests : IDisposable
         var exception = Assert.Throws<ContentValidationException>(() => ContentCatalogLoader.Load(_content.Path));
 
         Assert.Contains("'Player.png', which has no record", exception.Message, StringComparison.Ordinal);
+    }
+
+    // A placed NPC's facing (decision 572) is read as the content spells it; the frozen start map has none.
+    [Fact]
+    public void Load_LayoutWithNpcFacingLeft_ReadsIt()
+    {
+        const string villagerUid = "\"uid\": \"villager_1\",";
+        _content.Replace(Path.Combine("map-layouts", "start.json"), villagerUid, villagerUid + "\r\n      \"facing\": \"left\",");
+
+        var catalog = ContentCatalogLoader.Load(_content.Path);
+
+        var villager = catalog.Maps["start"].Layout.Objects.Single(placed => placed.Uid == "villager_1");
+        Assert.Equal(Facing.Left, villager.Facing);
     }
 
     [Fact]

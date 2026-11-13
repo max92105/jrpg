@@ -124,12 +124,23 @@ internal static class MapLayoutValidator
                 return $"object uid '{placed.Uid}' is used more than once.";
             }
 
-            if (!references.Content.Objects.ContainsKey(placed.ObjectId))
+            if (!references.Content.Objects.TryGetValue(placed.ObjectId, out var definition))
             {
                 return $"object '{placed.Uid}' has unknown object id '{placed.ObjectId}'.";
+            }
+
+            if (FindFacingProblem(placed, definition) is { } facingProblem)
+            {
+                return facingProblem;
             }
         }
 
         return null;
     }
+
+    // Only an NPC turns (ADR 0044): a facing on a tile object would be read by nothing and mislead whoever placed it.
+    private static string? FindFacingProblem(PlacedObject placed, ObjectDefinition definition) =>
+        placed.Facing is not null && definition.FieldSpriteFile is null
+            ? $"object '{placed.Uid}' ({placed.ObjectId}) has a facing, but only an NPC turns."
+            : null;
 }

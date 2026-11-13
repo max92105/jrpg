@@ -24,3 +24,5 @@ None.
 ## Verify by hand
 1. In a map layout under `content/map-layouts/`, add `"facing": "left"` to a placed NPC by hand; start the game: it stands facing left; talk to it from below: it faces up, then left again after.
 2. Add `"facing": "up"` to a chest: the game's start refuses the content, naming the map and the chest. Revert with `git checkout -- content`.
+
+- **Done, with deviations:** two test names: `Of_OwnEventRunning_IgnoresItsPlacedFacing` (the rule keeps no state, so the no-event test already covers turning back) and `Validate_TileObjectWithFacing_ThrowsNamingTheUid`.

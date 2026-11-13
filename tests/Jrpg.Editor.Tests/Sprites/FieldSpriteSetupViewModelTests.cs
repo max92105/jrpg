@@ -195,7 +195,7 @@ public sealed class FieldSpriteSetupViewModelTests
 
         setup.Rows = 2;
 
-        Assert.Equal([0, 1], setup.RowChoices);
+        Assert.Equal([1, 2], setup.RowChoices);
     }
 
     private FieldSpriteSetupViewModel PlayerSetup() => FieldSpriteSetupViewModel.From(_player, (384, 288), _draft);

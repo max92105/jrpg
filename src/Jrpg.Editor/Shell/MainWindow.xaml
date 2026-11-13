@@ -77,6 +77,7 @@
         <MenuItem Header="New object..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" ToolTip="Paint an object in the composer from cells of any sheet; a rectangle chosen in the Tiles panel starts it." />
         <MenuItem Header="New object from map selection..." Click="OnNewObjectFromMapClicked" IsEnabled="{Binding CanStartObjectFromMap}" ToolTip="Make an object of the map cells selected with Ctrl + drag in the Tiles tab: the chosen layer is level 0, the layers under and over it the levels under and over." />
         <MenuItem Header="New NPC..." Click="OnNewNpcClicked" IsEnabled="{Binding CanStartNewNpc}" />
+        <MenuItem Header="Character sprites..." Click="OnCharacterSpritesClicked" IsEnabled="{Binding CanEditFieldSprites}" ToolTip="Import, cut and animate character sheets; New NPC uses them." />
         <!-- Keeps the object's id, outline, zones, events and placements, so the doors keep working with new art (decision 449). -->
         <MenuItem Header="Edit object..." Click="OnEditObjectClicked" IsEnabled="{Binding Composing.CanComposeChosenObject, FallbackValue=False}" ToolTip="Repaint the chosen object; its id, outline, zones, placements and events stay. Ctrl+Z puts the old picture back." />
         <MenuItem Header="Duplicate object..." Click="OnDuplicateObjectClicked" IsEnabled="{Binding Composing.CanComposeChosenObject, FallbackValue=False}" ToolTip="A new object from a copy of the chosen one's picture, outline, zones and category; type its id, then repaint what differs. Its shapes open when its size changed." />
@@ -96,18 +97,7 @@
         <MenuItem Header="Controls" Command="Help" />
       </MenuItem>
     </Menu>
-    <TextBlock DockPanel.Dock="Top"
-               Margin="8"
-               Style="{StaticResource ErrorLine}"
-               Text="{Binding LoadError}" />
-    <TextBlock DockPanel.Dock="Top"
-               Margin="8,4"
-               Style="{StaticResource WarningLine}"
-               Text="{Binding Art.Warning, StringFormat=Art problems: {0}, TargetNullValue=''}" />
-    <TextBlock DockPanel.Dock="Top"
-               Margin="8,4"
-               Style="{StaticResource ErrorLine}"
-               Text="{Binding SaveError, StringFormat=Not saved: {0}, TargetNullValue=''}" />
+    <local:StatusBand DockPanel.Dock="Top" />
     <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
       <ToolBar Band="0" BandIndex="0">
         <Button Content="Save (Ctrl+S)" Command="{Binding SaveCommand}" />

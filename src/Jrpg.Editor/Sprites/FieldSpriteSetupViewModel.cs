@@ -57,8 +57,10 @@ internal sealed partial class FieldSpriteSetupViewModel : ObservableObject
     /// <summary>In image pixels; rounded down when the height doesn't split evenly.</summary>
     public int FrameHeight => GridCut.Plain.LengthAlong(_imageSize.Height, Rows);
 
-    /// <summary>The rows a facing may walk on, from 0, as the boxes list them (decision 568).</summary>
-    public IReadOnlyList<int> RowChoices => [.. Enumerable.Range(0, Math.Max(0, Rows))];
+    /// <summary>
+    /// The rows a facing may walk on as the boxes list them, numbered from 1 (decision 568); a box's index is the row.
+    /// </summary>
+    public IReadOnlyList<int> RowChoices => [.. Enumerable.Range(1, Math.Max(0, Rows))];
 
     /// <summary>
     /// Why the setup can't be applied, or null: the cut first, then the walk against it, then what the loader would

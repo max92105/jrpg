@@ -1,0 +1,17 @@
+<UserControl x:Class="Jrpg.Editor.Shell.StatusBand"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <!-- The lines under the menu: the load error, the art warning and the save error, each empty while there is none. -->
+  <StackPanel>
+    <TextBlock Margin="8"
+               Style="{DynamicResource ErrorLine}"
+               Text="{Binding LoadError}" />
+    <TextBlock Margin="8,4"
+               Style="{DynamicResource WarningLine}"
+               Text="{Binding Art.Warning, StringFormat=Art problems: {0}, TargetNullValue=''}" />
+    <TextBlock Margin="8,4"
+               Style="{DynamicResource ErrorLine}"
+               Text="{Binding SaveError, StringFormat=Not saved: {0}, TargetNullValue=''}" />
+  </StackPanel>
+</UserControl>

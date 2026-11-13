@@ -14,9 +14,10 @@ internal sealed partial class MainViewModel
     public partial string ImportStatus { get; private set; } = "";
 
     /// <summary>
-    /// The images an import copied, raised before the last is shown, so cached pictures of replaced files are dropped.
+    /// The images an import copied, tilesheets or field sprites, raised before the last is shown, so cached pictures of
+    /// replaced files are dropped.
     /// </summary>
-    public event EventHandler<IReadOnlyList<string>>? SheetImagesImported;
+    public event EventHandler<IReadOnlyList<string>>? ImagesImported;
 
     /// <summary>
     /// Copies images into the tilesheet art (asking before replacing one), then shows the last one copied, "(not set
@@ -40,7 +41,7 @@ internal sealed partial class MainViewModel
         if (result.LastImported is { } last)
         {
             Art!.Refresh();
-            SheetImagesImported?.Invoke(this, result.Imported);
+            ImagesImported?.Invoke(this, result.Imported);
             Painting.Browser.Show(last);
         }
 

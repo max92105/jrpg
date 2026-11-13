@@ -43,7 +43,7 @@ internal sealed partial class MainWindow : Window
             ObjectBrowser.Drawing = _drawing;
             ObjectBrowser.AnimationTime = viewModel.AnimationTime;
             content.PropertyChanged += OnContentChanged;
-            viewModel.SheetImagesImported += (_, files) => RedrawImportedImages(tileImages, files);
+            viewModel.ImagesImported += (_, files) => RedrawImportedImages(tileImages, files);
         }
 
         DataContext = _viewModel = viewModel;

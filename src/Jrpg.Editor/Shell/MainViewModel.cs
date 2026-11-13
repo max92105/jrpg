@@ -85,6 +85,7 @@ internal sealed partial class MainViewModel : ObservableObject
             AnimationImport = new AnimationImport(Content);
             EventEditing = new EventEditingViewModel(Content, _openMaps, Layer) { MapIds = MapIds };
             QuestEditing = new QuestEditingViewModel(Content);
+            FieldSpriteEditing = CreateFieldSpriteEditing();
             if (MapIds.Count > 0)
             {
                 TryOpenMap(MapIds[0]);

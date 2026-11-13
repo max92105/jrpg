@@ -82,7 +82,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **SI1. Field sprites save and import through Data: `field-sprites.json` written with the catalogs, `ImportArtImage`, `CatalogDraft.SetFieldSprites`, `CatalogProblems`** (Data + Editor, about 240 lines) → [slices/SI1.md](slices/SI1.md)
 - [x] **SI2. The sprite setup's rules, the grid cut shared with the tile Cut panel** (Editor, about 230 lines) → [slices/SI2.md](slices/SI2.md)
 - [x] **SI3. The sprite list, import and Copy setup from...; OK as one undo step** (Editor, about 220 lines) → [slices/SI3.md](slices/SI3.md)
-- [ ] **SI4. The Character sprites window (the status lines moved out of `MainWindow.xaml` first)** (Editor, about 230 lines) → [slices/SI4.md](slices/SI4.md)
+- [x] **SI4. The Character sprites window (the status lines moved out of `MainWindow.xaml` first)** (Editor, about 230 lines) → [slices/SI4.md](slices/SI4.md)
 - [ ] **SI5. New NPC picks a set-up sprite and shows it walking; Change NPC sprite...** (Editor, about 190 lines) → [slices/SI5.md](slices/SI5.md)
 
 ### Phase 3: NPC behavior

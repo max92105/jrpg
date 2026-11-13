@@ -1,5 +1,6 @@
 using System.IO;
 using Jrpg.Data.Art;
+using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Objects;
 using Jrpg.Editor.Sprites;
 using Jrpg.Editor.Tiles;
@@ -28,8 +29,8 @@ internal sealed partial class MainViewModel
     /// <param name="paths">The images chosen in the file dialog.</param>
     public SheetImportResult ImportFieldSprites(IReadOnlyList<string> paths)
     {
-        var result = new FieldSpriteImport(_writer, Content!)
-            .Import(paths, file => _confirm($"{file} is already in the field-sprite art. Replace it?"));
+        var result = new ArtImageImport(_writer, Content!)
+            .Import(ArtFolders.FieldSprites, paths, file => _confirm($"{file} is already in the field-sprite art. Replace it?"));
         if (result.Imported.Count > 0)
         {
             Art!.Refresh();

@@ -24,9 +24,11 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject
     /// <param name="content">
     /// The draft as it is: the enemies edited, and the skills and drop tables they may name.
     /// </param>
-    public EnemyCatalogViewModel(ContentCatalog content)
+    /// <param name="artImagesIn">The PNG names of an art folder by name, for the three art boxes.</param>
+    public EnemyCatalogViewModel(ContentCatalog content, Func<string, IReadOnlyList<string>> artImagesIn)
     {
         _content = content;
+        ArtChoices = new BattleArtChoices(artImagesIn);
         DropTableChoices = ["", .. content.DropTables.Keys.Order(StringComparer.Ordinal)];
         Enemies = [.. content.Enemies.Values.OrderBy(enemy => enemy.Id, StringComparer.Ordinal).Select(EnemyViewModel.From)];
         foreach (var enemy in Enemies)
@@ -44,6 +46,11 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject
 
     /// <summary>The drop tables an enemy may roll, the empty one for none first, then the draft's by id.</summary>
     public IReadOnlyList<string> DropTableChoices { get; }
+
+    /// <summary>
+    /// The three art folders' files, refreshed after an import; which of an enemy's pictures are missing.
+    /// </summary>
+    public BattleArtChoices ArtChoices { get; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(DuplicateEnemyCommand), nameof(RemoveEnemyCommand))]

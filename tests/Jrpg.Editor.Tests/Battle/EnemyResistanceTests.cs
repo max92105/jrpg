@@ -57,7 +57,7 @@ public sealed class EnemyResistanceTests
     [Fact]
     public void Problem_ResistancePastCap_IsDataMessageAndNotifies()
     {
-        var catalog = new EnemyCatalogViewModel(_catalog);
+        var catalog = new EnemyCatalogViewModel(_catalog, _ => []);
         var notified = new List<string?>();
         catalog.PropertyChanged += (_, e) => notified.Add(e.PropertyName);
 

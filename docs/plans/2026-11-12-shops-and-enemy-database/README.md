@@ -65,7 +65,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **EN1. Enemies save from the editor: `enemies.json` relaid and written, resistances in percents, every default-valued field left out, `CatalogProblems.OfEnemies`, `CatalogDraft.SetEnemies`** (Data + Editor, about 230 lines) → [slices/EN1.md](slices/EN1.md)
 - [x] **EN2. The Enemies window's rules: the list, Add and Duplicate, an enemy's numbers; tactics and phases kept as they are** (Editor, about 220 lines) → [slices/EN2.md](slices/EN2.md)
 - [x] **EN3. Resistances by damage type, gold, drop table and boss** (Editor, about 170 lines) → [slices/EN3.md](slices/EN3.md)
-- [ ] **EN6. Enemy art: battle sprite, portrait and attack effect picked or imported** (Editor, about 180 lines) → [slices/EN6.md](slices/EN6.md)
+- [x] **EN6. Enemy art: battle sprite, portrait and attack effect picked or imported** (Editor, about 180 lines) → [slices/EN6.md](slices/EN6.md)
 - [ ] **EN7. The Enemies window: the list, Stats and Art tabs** (Editor, about 220 lines) → [slices/EN7.md](slices/EN7.md)
 
 ## Later (not in this plan; slice files kept as drafts)

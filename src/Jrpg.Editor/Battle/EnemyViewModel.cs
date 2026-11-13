@@ -7,7 +7,7 @@ namespace Jrpg.Editor.Battle;
 
 /// <summary>
 /// One enemy as the Enemies window edits it (ADR 0045): its id (typed while new, fixed once the draft holds it,
-/// decision 582), name, numbers, resistances and rewards as typed. What no form edits yet (its art, tactics and phases)
+/// decision 582), name, numbers, resistances, rewards and art as typed. What no form edits yet (its tactics and phases)
 /// is carried from the record it came from, so the window never wipes it; a duplicate carries it too (decision 585).
 /// <see cref="Problem"/> is the typed id's or a box that isn't a number; the ranges are Data's rules, shown by the
 /// list.
@@ -51,6 +51,8 @@ internal sealed partial class EnemyViewModel : ObservableObject
         IsBoss = original.IsBoss;
         Resistances = WatchedResistanceRows(original);
         ReadRewards(original);
+        Art = new EnemyArtViewModel(original);
+        Art.PropertyChanged += (_, _) => OnPropertyChanged(nameof(Art));
     }
 
     public static EnemyViewModel From(EnemyDefinition enemy) => new(enemy, enemy.Id);
@@ -80,8 +82,12 @@ internal sealed partial class EnemyViewModel : ObservableObject
         };
         copy.CopyResistancesFrom(chosen);
         copy.CopyRewardsFrom(chosen);
+        copy.Art.CopyFrom(chosen.Art);
         return copy;
     }
+
+    /// <summary>Its three pictures and the flip; a change in them is this enemy's change.</summary>
+    public EnemyArtViewModel Art { get; }
 
     /// <summary>
     /// True while the enemy was added this session: the only time its id can be typed (decision 582).
@@ -143,7 +149,7 @@ internal sealed partial class EnemyViewModel : ObservableObject
     public EnemyDefinition ToEnemy() =>
         Problem is { } problem
             ? throw new InvalidOperationException(problem)
-            : _original with
+            : Art.ApplyTo(_original with
             {
                 Id = Id,
                 Name = Name.Trim(),
@@ -159,7 +165,7 @@ internal sealed partial class EnemyViewModel : ObservableObject
                 Gold = TypedGold(),
                 DropTableId = TypedDropTable(),
                 IsBoss = IsBoss,
-            };
+            });
 
     // In the form's order, so the problem names the first box the eye reaches.
     private string? FirstNumberProblem() =>

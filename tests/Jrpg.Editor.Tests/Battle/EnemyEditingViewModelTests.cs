@@ -10,7 +10,7 @@ public sealed class EnemyEditingViewModelTests
     private readonly CatalogDraft _draft = new(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));
     private readonly EnemyEditingViewModel _enemyEditing;
 
-    public EnemyEditingViewModelTests() => _enemyEditing = new EnemyEditingViewModel(_draft);
+    public EnemyEditingViewModelTests() => _enemyEditing = new EnemyEditingViewModel(_draft, _ => []);
 
     [Fact]
     public void Start_Draft_ListsItsEnemies()

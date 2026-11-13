@@ -18,3 +18,5 @@ An enemy's three pictures are picked from their folders (battle sprite from `bat
 
 ## Verify by hand
 None: the window is EN7.
+
+- **Done, with deviations:** the folders' files live in `BattleArtChoices` on the catalog view model (one lookup given by the shell, `Refresh()` after an import, `MissingOf(art)` for the marks) rather than on each enemy's art view model, which only holds the three names and the flip and raises the enemy's `Art` on a change; `BattleArtImport.Import` takes the folder, so one import serves the three boxes; `EnemyCatalogViewModel` and `EnemyEditingViewModel` take the folder lookup as a constructor parameter (the tests pass an empty one).

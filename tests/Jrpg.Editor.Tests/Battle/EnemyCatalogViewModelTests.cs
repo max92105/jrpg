@@ -15,7 +15,7 @@ public sealed class EnemyCatalogViewModelTests
     [Fact]
     public void Enemies_Draft_InIdOrderWithTheFirstChosen()
     {
-        var catalog = new EnemyCatalogViewModel(_catalog);
+        var catalog = new EnemyCatalogViewModel(_catalog, _ => []);
 
         var ids = catalog.Enemies.Select(enemy => enemy.Id).ToList();
         Assert.Equal(ids.Order(StringComparer.Ordinal), ids);
@@ -27,13 +27,13 @@ public sealed class EnemyCatalogViewModelTests
     [Fact]
     public void DamageTypes_EveryCoreType_IsOffered()
     {
-        Assert.Equal(Enum.GetValues<DamageType>(), new EnemyCatalogViewModel(_catalog).DamageTypes);
+        Assert.Equal(Enum.GetValues<DamageType>(), new EnemyCatalogViewModel(_catalog, _ => []).DamageTypes);
     }
 
     [Fact]
     public void DuplicateEnemy_Chosen_AddsAfterAndChoosesIt()
     {
-        var catalog = new EnemyCatalogViewModel(_catalog);
+        var catalog = new EnemyCatalogViewModel(_catalog, _ => []);
         var chief = catalog.Enemies.Single(enemy => enemy.Id == "goblin_chief");
         catalog.SelectedEnemy = chief;
 
@@ -48,7 +48,7 @@ public sealed class EnemyCatalogViewModelTests
     [Fact]
     public void AddEnemy_AddsLastAndChoosesIt()
     {
-        var catalog = new EnemyCatalogViewModel(_catalog);
+        var catalog = new EnemyCatalogViewModel(_catalog, _ => []);
 
         catalog.AddEnemyCommand.Execute(null);
 
@@ -60,7 +60,7 @@ public sealed class EnemyCatalogViewModelTests
     [Fact]
     public void RemoveEnemy_SavedEnemy_IsGreyed()
     {
-        var catalog = new EnemyCatalogViewModel(_catalog);
+        var catalog = new EnemyCatalogViewModel(_catalog, _ => []);
 
         Assert.False(catalog.RemoveEnemyCommand.CanExecute(null));
     }
@@ -68,7 +68,7 @@ public sealed class EnemyCatalogViewModelTests
     [Fact]
     public void RemoveEnemy_NewEnemy_RemovesIt()
     {
-        var catalog = new EnemyCatalogViewModel(_catalog);
+        var catalog = new EnemyCatalogViewModel(_catalog, _ => []);
         var count = catalog.Enemies.Count;
         catalog.AddEnemyCommand.Execute(null);
         Assert.True(catalog.RemoveEnemyCommand.CanExecute(null));
@@ -83,7 +83,7 @@ public sealed class EnemyCatalogViewModelTests
     [Fact]
     public void Problem_DodgePastCap_IsDataMessageAndNotifies()
     {
-        var catalog = new EnemyCatalogViewModel(_catalog);
+        var catalog = new EnemyCatalogViewModel(_catalog, _ => []);
         var notified = new List<string?>();
         catalog.PropertyChanged += (_, e) => notified.Add(e.PropertyName);
 
@@ -97,7 +97,7 @@ public sealed class EnemyCatalogViewModelTests
     [Fact]
     public void Problem_TwoNewSameId_SaysSo()
     {
-        var catalog = new EnemyCatalogViewModel(_catalog);
+        var catalog = new EnemyCatalogViewModel(_catalog, _ => []);
         catalog.AddEnemyCommand.Execute(null);
         catalog.SelectedEnemy!.Id = "slime";
         catalog.AddEnemyCommand.Execute(null);
@@ -110,7 +110,7 @@ public sealed class EnemyCatalogViewModelTests
     [Fact]
     public void ToEnemies_Unchanged_EqualsDraft()
     {
-        var enemies = new EnemyCatalogViewModel(_catalog).ToEnemies();
+        var enemies = new EnemyCatalogViewModel(_catalog, _ => []).ToEnemies();
 
         Assert.Equal(_catalog.Enemies.Keys.Order(StringComparer.Ordinal), enemies.Select(enemy => enemy.Id));
         Assert.All(

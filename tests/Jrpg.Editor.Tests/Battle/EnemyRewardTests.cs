@@ -107,7 +107,7 @@ public sealed class EnemyRewardTests
     public void Problem_GoldMaxBelowMin_IsDataMessage()
     {
         var onlyRich = _catalog with { Enemies = new Dictionary<string, EnemyDefinition> { ["goblin"] = Rich } };
-        var catalog = new EnemyCatalogViewModel(onlyRich);
+        var catalog = new EnemyCatalogViewModel(onlyRich, _ => []);
 
         catalog.Enemies[0].GoldMaxText = "4";
 
@@ -117,7 +117,7 @@ public sealed class EnemyRewardTests
     [Fact]
     public void DropTableChoices_Draft_StartsWithNoneThenTablesById()
     {
-        var choices = new EnemyCatalogViewModel(_catalog).DropTableChoices;
+        var choices = new EnemyCatalogViewModel(_catalog, _ => []).DropTableChoices;
 
         Assert.Equal("", choices[0]);
         Assert.Contains("goblin", choices);

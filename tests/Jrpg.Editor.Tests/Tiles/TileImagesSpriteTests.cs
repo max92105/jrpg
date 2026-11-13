@@ -61,6 +61,18 @@ public sealed class TileImagesSpriteTests
         Assert.Same(MissingArtMark.Picture, images.FieldSpriteFrameOf(Placeholder));
     }
 
+    // An import replacing the file: the frame cropped before is dropped, so the next draw crops the new image.
+    [Fact]
+    public void Forget_SpriteFile_CropsAnew()
+    {
+        var images = new TileImages(new CatalogDraft(_catalog), ArtFolders.RootIn(_root), () => MissingArt.None);
+        var before = images.FieldSpriteFrameOf(Placeholder);
+
+        images.Forget("NPC_PLACEHOLDER.png");
+
+        Assert.NotSame(before, images.FieldSpriteFrameOf(Placeholder));
+    }
+
     private static ContentCatalog WithPlaceholder(int frameWidth, int frameHeight, int downRow)
     {
         var sheet = _catalog.FieldSprites[Placeholder];

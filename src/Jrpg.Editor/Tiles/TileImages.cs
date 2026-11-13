@@ -130,8 +130,10 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<Miss
         return frame;
     }
 
-    /// <summary>Drops an image and the tiles cropped from it, so a file replaced by an import is read again.</summary>
-    /// <param name="file">The file name in the tilesheet art folder, in any case.</param>
+    /// <summary>
+    /// Drops an image and the tiles or sprite frames cropped from it, so a file replaced by an import is read again.
+    /// </summary>
+    /// <param name="file">The file name in the tilesheet or field-sprite art folder, in any case.</param>
     public void Forget(string file)
     {
         foreach (var cached in _sheets.Keys.Where(key => string.Equals(key, file, StringComparison.OrdinalIgnoreCase)).ToList())
@@ -142,6 +144,12 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<Miss
         foreach (var cropped in _cells.Keys.Where(key => string.Equals(key.Sheet.File, file, StringComparison.OrdinalIgnoreCase)).ToList())
         {
             _cells.Remove(cropped);
+        }
+
+        var sheetsOfFile = _spriteFrames.Keys.Where(key => string.Equals(key.File, file, StringComparison.OrdinalIgnoreCase));
+        foreach (var sheet in sheetsOfFile.ToList())
+        {
+            _spriteFrames.Remove(sheet);
         }
     }
 

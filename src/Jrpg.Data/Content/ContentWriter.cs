@@ -1,7 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Quests;
-using Jrpg.Data.Art;
+using Jrpg.Core.Sprites;
 using Jrpg.Data.Maps;
 using Jrpg.Data.Quests;
 
@@ -28,10 +28,10 @@ public sealed partial class ContentWriter(string contentRoot)
         _stamps.Take(contentRoot, SerializedCatalogs(loaded).Select(write => (write.File, write.Bytes)));
 
     /// <summary>
-    /// Writes the tilesheet, tile, object and quest catalogs that changed, each sorted by id, after checking them all
-    /// as the loader would, with every map's layout checked against them (the quests and stages its events name
-    /// included, decision 394). Missing art doesn't stop a save (decision 442): the editor warns, the game's startup
-    /// refuses the missing file.
+    /// Writes the tilesheet, tile, object, quest and field sprite catalogs that changed, each sorted by id, after
+    /// checking them all as the loader would, with every map's layout checked against them (the quests and stages its
+    /// events name included, decision 394). Missing art doesn't stop a save (decision 442): the editor warns, the
+    /// game's startup refuses the missing file.
     /// </summary>
     /// <param name="catalog">The content holding the catalogs to save; its maps are the ones checked.</param>
     /// <exception cref="ContentValidationException">
@@ -174,6 +174,7 @@ public sealed partial class ContentWriter(string contentRoot)
         TileCatalogValidator.Validate(ContentCatalogLoader.TilesFile, SortedTiles(catalog), catalog.Tilesheets.Keys.ToHashSet());
         ObjectCatalogValidator.Validate(ContentCatalogLoader.ObjectsFile, SortedObjects(catalog), catalog.Tiles.Keys.ToHashSet());
         QuestCatalogValidator.Validate(ContentCatalogLoader.QuestsFile, SortedQuests(catalog));
+        CatalogProblems.CheckFieldSprites(SortedFieldSprites(catalog), catalog);
     }
 
     // Each catalog file's bytes as it would be written, sorted by id: what the stamps compare and the writes carry.
@@ -183,6 +184,7 @@ public sealed partial class ContentWriter(string contentRoot)
         new(ContentCatalogLoader.TilesFile, ContentFileWriter.Serialize(SortedTiles(catalog))),
         new(ContentCatalogLoader.ObjectsFile, ContentFileWriter.Serialize(SortedObjects(catalog))),
         new(ContentCatalogLoader.QuestsFile, ContentFileWriter.Serialize(SortedQuests(catalog))),
+        new(ContentCatalogLoader.FieldSpritesFile, ContentFileWriter.Serialize(SortedFieldSprites(catalog))),
     ];
 
     private static List<TilesheetDefinition> SortedSheets(ContentCatalog catalog) =>
@@ -195,6 +197,9 @@ public sealed partial class ContentWriter(string contentRoot)
 
     private static List<QuestDefinition> SortedQuests(ContentCatalog catalog) =>
         [.. catalog.Quests.Values.OrderBy(quest => quest.Id, StringComparer.Ordinal)];
+
+    private static List<FieldSpriteSheet> SortedFieldSprites(ContentCatalog catalog) =>
+        [.. catalog.FieldSprites.Values.OrderBy(sheet => sheet.File, StringComparer.Ordinal)];
 
     private void RenewStamps(List<CatalogWrite> written)
     {
@@ -217,8 +222,6 @@ public sealed partial class ContentWriter(string contentRoot)
             MapLayoutValidator.Validate(MapFolderReader.LayoutFile(layout.Id), layout, references);
         }
     }
-
-    private string TilesheetImagePath(string fileName) => Path.Combine(ArtFolders.RootIn(contentRoot), ArtFolders.Tilesheets, fileName);
 
     private static MapContentReferences ContentReferencesOf(ContentCatalog catalog) =>
         new(

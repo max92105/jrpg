@@ -26,3 +26,5 @@ The editor can change sprite records as one undo step and save them with Ctrl+S 
 
 ## Verify by hand
 None: no window changes the records yet (SI4).
+
+- **Done, with deviations:** the imports partial already existed from CW1; `ImportArtImage` takes a field sprite without a record yet (the window sets the record up after the import), tested; `TileImagesSpriteTests` holds the Forget test (the sibling file of FS5). The review: `SetFieldSprites` adds or replaces the given records by file and keeps the rest (the window hands back only what it edited); the writer and `CatalogProblems` run one `CheckFieldSprites`.

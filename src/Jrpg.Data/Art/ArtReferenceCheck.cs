@@ -123,9 +123,7 @@ public static class ArtReferenceCheck
                 continue;
             }
 
-            var holdsColumns = size.Width / sheet.FrameWidth >= sheet.ColumnsNeeded;
-            var holdsRows = size.Height / sheet.FrameHeight >= sheet.RowsNeeded;
-            if (!holdsColumns || !holdsRows)
+            if (!HoldsFrames(sheet, size))
             {
                 var neededWidth = (long)sheet.ColumnsNeeded * sheet.FrameWidth;
                 var neededHeight = (long)sheet.RowsNeeded * sheet.FrameHeight;
@@ -147,8 +145,7 @@ public static class ArtReferenceCheck
                 continue;
             }
 
-            var isRowOfSquares = size.Height > 0 && size.Width % size.Height == 0;
-            if (!isRowOfSquares)
+            if (!IsRowOfSquareFrames(size))
             {
                 problems.Add(
                     $"{ExactFileName.ShownPath(ArtFolders.Effects, file)}: a {size.Width}x{size.Height} strip "
@@ -156,6 +153,16 @@ public static class ArtReferenceCheck
             }
         }
     }
+
+    /// <summary>
+    /// Whether an image this size holds the frames a record needs, by counts (a frame count near the int limit never
+    /// wraps); the startup check and the import share it.
+    /// </summary>
+    internal static bool HoldsFrames(FieldSpriteSheet sheet, (int Width, int Height) size) =>
+        size.Width / sheet.FrameWidth >= sheet.ColumnsNeeded && size.Height / sheet.FrameHeight >= sheet.RowsNeeded;
+
+    /// <summary>Whether an effect strip this size is whole square frames side by side (decision 57).</summary>
+    internal static bool IsRowOfSquareFrames((int Width, int Height) size) => size.Height > 0 && size.Width % size.Height == 0;
 
     // Matched by exact name, case included (see ExactFileName).
     private static void AddMissingByExactName(List<string> problems, string artRoot, string folder, IEnumerable<(string File, string NamedBy)> references)

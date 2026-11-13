@@ -76,7 +76,8 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
             context.DrawRectangle(Brushes.Transparent, null, area);
             if (definition.FieldSpriteFile is { } spriteFile)
             {
-                context.DrawImage(tileImages.FieldSpriteFrameOf(spriteFile), FittedSpriteArea(definition, spriteFile, area));
+                var frame = tileImages.FieldSpriteFrameOf(spriteFile, Facing.Down);
+                context.DrawImage(frame, FittedSpriteArea(definition, spriteFile, area));
             }
             else
             {
@@ -162,14 +163,15 @@ internal sealed class MapDrawing(CatalogDraft catalog, TileImages tileImages)
         }
     }
 
-    // An NPC stands still facing down (decision 128) on its sheet's frame over its cell, as in the game (ADR 0043), or
+    // An NPC stands its placed facing (decision 572) on its sheet's frame over its cell, as in the game (ADR 0043), or
     // the mark over its cells while its sheet has no record; other objects are drawn from their tiles.
     private void DrawObject(DrawingContext context, PlacedObject placed)
     {
         var definition = catalog.Current.Objects[placed.ObjectId];
         if (definition.FieldSpriteFile is { } spriteFile)
         {
-            context.DrawImage(tileImages.FieldSpriteFrameOf(spriteFile), SpriteAreaOf(definition, spriteFile, placed.Position));
+            var frame = tileImages.FieldSpriteFrameOf(spriteFile, placed.Facing ?? Facing.Down);
+            context.DrawImage(frame, SpriteAreaOf(definition, spriteFile, placed.Position));
             return;
         }
 

@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Jrpg.Core.Content;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Sprites;
 using Jrpg.Data.Art;
 using Jrpg.Data.Content;
@@ -25,7 +26,7 @@ public sealed class TileImagesSpriteTests
     {
         var images = new TileImages(new CatalogDraft(_catalog), ArtFolders.RootIn(_root), () => MissingArt.None);
 
-        var frame = Assert.IsType<CroppedBitmap>(images.FieldSpriteFrameOf(Placeholder));
+        var frame = Assert.IsType<CroppedBitmap>(images.FieldSpriteFrameOf(Placeholder, Facing.Down));
 
         Assert.Equal(new Int32Rect(0, 0, 48, 48), frame.SourceRect);
     }
@@ -37,9 +38,20 @@ public sealed class TileImagesSpriteTests
         var catalog = WithPlaceholder(16, 24, downRow: 2);
         var images = new TileImages(new CatalogDraft(catalog), ArtFolders.RootIn(_root), () => MissingArt.None);
 
-        var frame = Assert.IsType<CroppedBitmap>(images.FieldSpriteFrameOf(Placeholder));
+        var frame = Assert.IsType<CroppedBitmap>(images.FieldSpriteFrameOf(Placeholder, Facing.Down));
 
         Assert.Equal(new Int32Rect(0, 48, 16, 24), frame.SourceRect);
+    }
+
+    // A placed facing (decision 572) reads its own row: left is row 1 on the placeholder's record.
+    [Fact]
+    public void FieldSpriteFrameOf_FacingLeft_CropsItsRow()
+    {
+        var images = new TileImages(new CatalogDraft(_catalog), ArtFolders.RootIn(_root), () => MissingArt.None);
+
+        var frame = Assert.IsType<CroppedBitmap>(images.FieldSpriteFrameOf(Placeholder, Facing.Left));
+
+        Assert.Equal(new Int32Rect(0, 48, 48, 48), frame.SourceRect);
     }
 
     [Fact]
@@ -47,7 +59,7 @@ public sealed class TileImagesSpriteTests
     {
         var images = new TileImages(new CatalogDraft(_catalog), ArtFolders.RootIn(_root), () => MissingArt.None);
 
-        Assert.Same(MissingArtMark.Picture, images.FieldSpriteFrameOf("nobody.png"));
+        Assert.Same(MissingArtMark.Picture, images.FieldSpriteFrameOf("nobody.png", Facing.Down));
     }
 
     // A frame one pixel taller than the image: the standing frame would be cropped past the edge.
@@ -58,7 +70,7 @@ public sealed class TileImagesSpriteTests
         var catalog = WithPlaceholder(48, imageHeight + 1, downRow: 0);
         var images = new TileImages(new CatalogDraft(catalog), ArtFolders.RootIn(_root), () => MissingArt.None);
 
-        Assert.Same(MissingArtMark.Picture, images.FieldSpriteFrameOf(Placeholder));
+        Assert.Same(MissingArtMark.Picture, images.FieldSpriteFrameOf(Placeholder, Facing.Down));
     }
 
     // An import replacing the file: the frame cropped before is dropped, so the next draw crops the new image.
@@ -66,11 +78,11 @@ public sealed class TileImagesSpriteTests
     public void Forget_SpriteFile_CropsAnew()
     {
         var images = new TileImages(new CatalogDraft(_catalog), ArtFolders.RootIn(_root), () => MissingArt.None);
-        var before = images.FieldSpriteFrameOf(Placeholder);
+        var before = images.FieldSpriteFrameOf(Placeholder, Facing.Down);
 
         images.Forget("NPC_PLACEHOLDER.png");
 
-        Assert.NotSame(before, images.FieldSpriteFrameOf(Placeholder));
+        Assert.NotSame(before, images.FieldSpriteFrameOf(Placeholder, Facing.Down));
     }
 
     private static ContentCatalog WithPlaceholder(int frameWidth, int frameHeight, int downRow)

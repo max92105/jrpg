@@ -12,9 +12,9 @@ using Jrpg.Editor.Maps.Editing;
 namespace Jrpg.Editor.Objects;
 
 /// <summary>
-/// The placed object panel's fields (decision 513): the one selected object's object, position and layer as typed,
-/// applied as one undo step. They follow the selection and every change of the map, an undo included, so they never
-/// show a record the map no longer holds.
+/// The placed object panel's fields (decision 513): the one selected object's object, position, layer and, for an NPC,
+/// facing (decision 572) as typed, applied as one undo step. They follow the selection and every change of the map, an
+/// undo included, so they never show a record the map no longer holds.
 /// </summary>
 internal sealed partial class PlacedObjectEditing : ObservableObject
 {
@@ -44,9 +44,12 @@ internal sealed partial class PlacedObjectEditing : ObservableObject
     [ObservableProperty]
     public partial IReadOnlyList<string> ObjectIds { get; private set; }
 
-    /// <summary>The object the placement uses; another one swaps it, uid, position, layer and events kept.</summary>
+    /// <summary>
+    /// The object the placement uses; another one swaps it, uid, position, layer and events kept, and the facing kept
+    /// only while the new object is an NPC.
+    /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Problem), nameof(Warning))]
+    [NotifyPropertyChangedFor(nameof(Problem), nameof(Warning), nameof(HasFacing))]
     [NotifyCanExecuteChangedFor(nameof(ApplyCommand))]
     public partial string ObjectId { get; set; } = "";
 
@@ -68,6 +71,20 @@ internal sealed partial class PlacedObjectEditing : ObservableObject
     public partial string ZText { get; set; } = "";
 
     /// <summary>
+    /// Which way an NPC stands (decision 572); down when the placement has none. Read only for an NPC.
+    /// </summary>
+    [ObservableProperty]
+    public partial Facing Facing { get; set; } = Facing.Down;
+
+    /// <summary>The four facings, as the box lists them.</summary>
+    public IReadOnlyList<Facing> FacingChoices { get; } = [Facing.Down, Facing.Left, Facing.Right, Facing.Up];
+
+    /// <summary>
+    /// Whether the chosen object is an NPC, the only object that turns (ADR 0044); follows the object box.
+    /// </summary>
+    public bool HasFacing => _catalog.Current.Objects.GetValueOrDefault(ObjectId)?.FieldSpriteFile is not null;
+
+    /// <summary>
     /// The first event waiting for an object (<see cref="MapEvent.OnlyWhenObjectId"/>) the placement never becomes:
     /// neither the chosen object nor one its events swap to. Advice: Apply still works, a later edit may add the swap.
     /// </summary>
@@ -82,14 +99,22 @@ internal sealed partial class PlacedObjectEditing : ObservableObject
     private bool CanApply() => _shown is not null && Problem is null;
 
     /// <summary>
-    /// Gives the placement the chosen object and the typed position and layer as one undo step, or records no step when
-    /// none of them changed.
+    /// Gives the placement the chosen object and the typed position, layer and facing as one undo step, or records no
+    /// step when none of them changed.
     /// </summary>
     [RelayCommand(CanExecute = nameof(CanApply))]
     private void Apply()
     {
         var shown = _shown!;
-        var edited = shown with { ObjectId = ObjectId, Position = new Point2D(Coordinate(XText)!.Value, Coordinate(YText)!.Value), Z = Layer(ZText)!.Value };
+        var edited = shown with
+        {
+            ObjectId = ObjectId,
+            Position = new Point2D(Coordinate(XText)!.Value, Coordinate(YText)!.Value),
+            Z = Layer(ZText)!.Value,
+
+            // Down is written as none, so an untouched NPC's layout stays byte for byte; a tile object takes no facing.
+            Facing = HasFacing && Facing != Facing.Down ? Facing : null,
+        };
         if (edited != shown)
         {
             _map!.Do(new ReplacePlacedObjectEdit(shown, edited));
@@ -147,6 +172,7 @@ internal sealed partial class PlacedObjectEditing : ObservableObject
             }
 
             OnPropertyChanged(nameof(Problem));
+            OnPropertyChanged(nameof(HasFacing));
             ApplyCommand.NotifyCanExecuteChanged();
         }
     }
@@ -166,6 +192,7 @@ internal sealed partial class PlacedObjectEditing : ObservableObject
         (ObjectId, XText, YText, ZText) = _shown is { } shown
             ? (shown.ObjectId, Text(shown.Position.X), Text(shown.Position.Y), shown.Z.ToString(CultureInfo.InvariantCulture))
             : ("", "", "", "");
+        Facing = _shown?.Facing ?? Facing.Down;
         OnPropertyChanged(nameof(HasObject));
         OnPropertyChanged(nameof(Uid));
         OnPropertyChanged(nameof(Problem));

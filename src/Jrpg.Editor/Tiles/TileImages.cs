@@ -23,7 +23,7 @@ namespace Jrpg.Editor.Tiles;
 internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<MissingArt> missingArt)
 {
     private readonly Dictionary<string, BitmapSource> _sheets = [];
-    private readonly Dictionary<FieldSpriteSheet, ImageSource> _spriteFrames = [];
+    private readonly Dictionary<(FieldSpriteSheet Sheet, Facing Facing), ImageSource> _spriteFrames = [];
 
     // Keyed by the sheet's cut as well as the cell, so a re-cut sheet (another record) is cropped anew (design key decision 3).
     private readonly Dictionary<(TilesheetDefinition Sheet, int Column, int Row), ImageSource> _cells = [];
@@ -100,22 +100,23 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<Miss
     }
 
     /// <summary>
-    /// The standing frame an NPC is drawn with (decision 128): the down row's first frame as its sheet's record cuts it
-    /// (ADR 0043). The mark for a sprite whose image is missing, one without a record (an object made before its sheet
-    /// was set up) or one whose frame lies past the image's edge; cached by the record, so a changed setup crops anew.
+    /// The standing frame an NPC is drawn with: a facing's first walk frame as its sheet's record cuts it (ADR 0043).
+    /// The mark for a sprite whose image is missing, one without a record (an object made before its sheet was set up)
+    /// or one whose frame lies past the image's edge; cached by record and facing, so a changed setup crops anew.
     /// </summary>
     /// <param name="file">The file name in the field-sprite art folder.</param>
-    public ImageSource FieldSpriteFrameOf(string file)
+    /// <param name="facing">Which way the NPC stands (decision 572).</param>
+    public ImageSource FieldSpriteFrameOf(string file, Facing facing)
     {
         if (missingArt().IsSpriteMissing(file) || !catalog.Current.FieldSprites.TryGetValue(file, out var sheet))
         {
             return MissingArtMark.Picture;
         }
 
-        if (!_spriteFrames.TryGetValue(sheet, out var frame))
+        if (!_spriteFrames.TryGetValue((sheet, facing), out var frame))
         {
             var sprite = LoadImage(ArtFolders.FieldSprites, file);
-            var cell = sheet.StandingCell(Facing.Down);
+            var cell = sheet.StandingCell(facing);
             var area = new Int32Rect(sheet.FrameLeft(cell), sheet.FrameTop(cell), sheet.FrameWidth, sheet.FrameHeight);
             if (area.X + area.Width > sprite.PixelWidth || area.Y + area.Height > sprite.PixelHeight)
             {
@@ -124,7 +125,7 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<Miss
 
             frame = new CroppedBitmap(sprite, area);
             frame.Freeze();
-            _spriteFrames.Add(sheet, frame);
+            _spriteFrames.Add((sheet, facing), frame);
         }
 
         return frame;
@@ -146,10 +147,11 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<Miss
             _cells.Remove(cropped);
         }
 
-        var sheetsOfFile = _spriteFrames.Keys.Where(key => string.Equals(key.File, file, StringComparison.OrdinalIgnoreCase));
-        foreach (var sheet in sheetsOfFile.ToList())
+        var framesOfFile = _spriteFrames.Keys
+            .Where(key => string.Equals(key.Sheet.File, file, StringComparison.OrdinalIgnoreCase));
+        foreach (var key in framesOfFile.ToList())
         {
-            _spriteFrames.Remove(sheet);
+            _spriteFrames.Remove(key);
         }
     }
 

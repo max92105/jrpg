@@ -89,7 +89,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] ADR 0044: NPC facing and cutscene movement (amends ADR 0015's decisions 127 and 128). Write it from the entry under "ADRs" below (decisions 571-578).
 - [x] **NB1. An NPC faces the player while its own event runs, and turns back after** (Core + Game, about 190 lines) → [slices/NB1.md](slices/NB1.md)
 - [x] **NB2. Each placed NPC's standing facing: `PlacedObject.Facing` in the layout file, refused on a non-NPC** (Core + Data + Game, about 170 lines) → [slices/NB2.md](slices/NB2.md)
-- [ ] **NB3. The placed facing in the editor: a Facing box in the Placed object panel** (Editor, about 190 lines) → [slices/NB3.md](slices/NB3.md)
+- [x] **NB3. The placed facing in the editor: a Facing box in the Placed object panel** (Editor, about 190 lines) → [slices/NB3.md](slices/NB3.md)
 - [ ] **MV1. The `moveNpc` step in Core: an NPC walks its path cell by cell for the visit, the event waiting until it arrives** (Core, about 260 lines) → [slices/MV1.md](slices/MV1.md)
 - [ ] **MV2. The step in content and on screen: Data's rules, the NPC drawn walking at its runtime position, the prompt and collision following it** (Data + Game, about 240 lines) → [slices/MV2.md](slices/MV2.md)
 - [ ] **MV3. The step in the editor: the NPC picked from the map, the path built from direction buttons** (Editor, about 210 lines) → [slices/MV3.md](slices/MV3.md)

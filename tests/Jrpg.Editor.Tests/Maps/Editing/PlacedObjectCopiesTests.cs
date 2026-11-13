@@ -19,6 +19,17 @@ public sealed class PlacedObjectCopiesTests
         Assert.Equal("chest_4", Assert.Single(copies).Uid);
     }
 
+    // An NPC's standing facing (decision 572) is part of what is copied.
+    [Fact]
+    public void Make_NpcFacingUp_KeepsIt()
+    {
+        var turned = _chest3 with { Facing = Facing.Up };
+
+        var copies = PlacedObjectCopies.Make([turned], Target(_chest1), new Point2D(0, 0));
+
+        Assert.Equal(Facing.Up, Assert.Single(copies).Facing);
+    }
+
     [Fact]
     public void Make_TwoCopiesOfOneObject_GetTwoDifferentUids()
     {

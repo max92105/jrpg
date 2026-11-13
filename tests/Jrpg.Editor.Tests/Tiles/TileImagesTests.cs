@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Media.Imaging;
 using Jrpg.Core.Content;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
 using Jrpg.Data.Content;
@@ -88,6 +89,6 @@ public sealed class TileImagesTests
     {
         var images = new TileImages(new CatalogDraft(_catalog), ArtFolders.RootIn(_root), () => _spriteMissing);
 
-        Assert.Same(MissingArtMark.Picture, images.FieldSpriteFrameOf("npc_placeholder.png"));
+        Assert.Same(MissingArtMark.Picture, images.FieldSpriteFrameOf("npc_placeholder.png", Facing.Down));
     }
 }

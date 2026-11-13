@@ -25,3 +25,5 @@ None.
 3. Ctrl+C, Ctrl+V the NPC: the copy faces left too.
 4. Ctrl+S, start the game: it stands facing left and turns back to left after talking.
 5. Revert with `git checkout -- content` if this was only a check.
+
+- **Done, with deviations:** `PlacedObjectCopies` needed no change (a record `with` copy keeps the facing; a test pins it); `FieldSpriteFrameOf` takes the facing, cached by record and facing, the standalone picture passing down; the Facing box binds `SelectedItem` over the fixed list (the same on an enum list as `SelectedValue`).

@@ -15,4 +15,14 @@ public static class Facings
         Facing.Right => Facing.Left,
         _ => throw new ArgumentOutOfRangeException(nameof(facing), facing, "Not a facing."),
     };
+
+    /// <summary>The cell one step that way (a cutscene walk's step, ADR 0044).</summary>
+    public static GridCell Step(GridCell cell, Facing facing) => facing switch
+    {
+        Facing.Up => new GridCell(cell.X, cell.Y - 1),
+        Facing.Down => new GridCell(cell.X, cell.Y + 1),
+        Facing.Left => new GridCell(cell.X - 1, cell.Y),
+        Facing.Right => new GridCell(cell.X + 1, cell.Y),
+        _ => throw new ArgumentOutOfRangeException(nameof(facing), facing, "Not a facing."),
+    };
 }

@@ -27,3 +27,5 @@ An event can hold a `moveNpc` step naming a placed NPC on its map and a path of 
 
 ## Verify by hand
 None: Data refuses the step's kind until MV2, so no content holds it yet.
+
+- **Done, with deviations:** `NpcFacing.Of` takes the whole `NpcPose` (which says whether a walk moves the NPC) rather than a walk facing alone; `ActiveMap` keeps one `NpcWalk` per uid, a finished one serving as the end; a skip calls `FinishWalks` once after running past the presentation steps, and `StartWalk` finishes the uid's earlier walk first, so a skipped chain of moves ends where the last path leads (review); `IsAnyNpcWalking` and `PositionOf` wait for a caller (MV2 adds `PositionOf` with the collision change); a step off the map is dropped and the next one walks on, as decision 578 says (the first cut stopped the path there); the player-walk test asserts the throw the running event already makes.

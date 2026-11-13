@@ -8,7 +8,8 @@ namespace Jrpg.Core.Exploration;
 /// <summary>
 /// One running map event, as a cursor over its steps (ADR 0006). Steps the player doesn't need to see apply at once, a
 /// quest step among them unless it changed the log, when it waits for its line (decision 387); dialogue, a received
-/// item, a recruit and a warp stay <see cref="Current"/> until the Game calls <see cref="Continue"/>.
+/// item, a recruit and a warp stay <see cref="Current"/> until the Game calls <see cref="Continue"/>, and a move step
+/// until its NPC arrives, which <c>ExplorationState.AdvanceNpcWalks</c> notices (ADR 0044).
 /// </summary>
 internal sealed class EventRun
 {
@@ -88,6 +89,8 @@ internal sealed class EventRun
             AdvanceToNextWaitingStep();
         }
 
+        // A move step run past leaves its NPC at the path's end (decision 576).
+        _map.FinishWalks();
         StartedVoice = null;
     }
 
@@ -110,15 +113,12 @@ internal sealed class EventRun
     {
         switch (step)
         {
-            case SwapObjectStep swap:
-                // Content validation only allows swaps in object events (slice 3b).
-                var source = _triggered.Source
-                    ?? throw new InvalidOperationException($"Event '{_triggered.Event.Id}' swaps an object but has none.");
-                _map.SwapObject(source, swap.ObjectId);
+            case SwapObjectStep or VoiceStep:
+                ApplyAtOnce(step);
                 return false;
-            case VoiceStep voice:
-                StartedVoice = voice;
-                return false;
+            case MoveNpcStep move:
+                _map.StartWalk(WalkedNpc(move), move);
+                return true;
             case GiveItemStep give:
                 var item = _context.Catalog.Items[give.ItemId];
                 var lost = _context.Inventory.Add(item, give.Quantity);
@@ -138,6 +138,31 @@ internal sealed class EventRun
                 throw new InvalidOperationException($"Step {step.GetType().Name} has no rule in EventRun.");
         }
     }
+
+    // The steps that change the map or the voice and wait for nothing.
+    private void ApplyAtOnce(EventStep step)
+    {
+        switch (step)
+        {
+            case SwapObjectStep swap:
+                // Content validation only allows swaps in object events (slice 3b).
+                var source = _triggered.Source
+                    ?? throw new InvalidOperationException($"Event '{_triggered.Event.Id}' swaps an object but has none.");
+                _map.SwapObject(source, swap.ObjectId);
+                break;
+            case VoiceStep voice:
+                StartedVoice = voice;
+                break;
+            default:
+                throw new InvalidOperationException($"Step {step.GetType().Name} doesn't apply at once.");
+        }
+    }
+
+    // Data checks the uid against the event's map, so a missing one is a content bug worth a clear message.
+    private PlacedObject WalkedNpc(MoveNpcStep move) =>
+        _map.Definition.Layout.Objects.FirstOrDefault(placed => placed.Uid == move.ObjectUid)
+            ?? throw new InvalidOperationException(
+                $"Event '{_triggered.Event.Id}' moves '{move.ObjectUid}', which isn't on its map.");
 
     // The rules for every quest state are the log's (decision 388); the step only names the quest and the stage. A step
     // that changed the log waits for its line (decision 387); one that changed nothing shows nothing and doesn't wait.

@@ -1,3 +1,4 @@
+using Jrpg.Core.Exploration;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
@@ -16,7 +17,7 @@ internal sealed class MapView(
     MapLayout layout,
     Func<PlacedObject, ObjectDefinition> currentDefinitionOf,
     MapArt art,
-    Func<PlacedObject, Facing> npcFacingOf)
+    Func<PlacedObject, NpcPose> npcPoseOf)
 {
     /// <summary>Screen pixels per map cell at the 1920x1080 virtual screen (decision 48).</summary>
     public const int CellPixels = 48;
@@ -73,7 +74,7 @@ internal sealed class MapView(
         if (definition.FieldSpriteFile is { } spriteFile)
         {
             var sheet = art.FieldSprites[spriteFile];
-            var source = FieldSpriteFrame.SourceOf(sheet, sheet.StandingCell(npcFacingOf(placed)));
+            var source = FieldSpriteFrame.SourceOf(sheet, sheet.StandingCell(npcPoseOf(placed).Facing));
             batch.Draw(textures.Get(ArtFolders.FieldSprites, sheet.File), area, source, Color.White);
             return;
         }

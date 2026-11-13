@@ -14,4 +14,12 @@ public sealed class FacingsTests
 
     [Fact]
     public void Opposite_UnknownValue_Throws() => Assert.Throws<ArgumentOutOfRangeException>(() => Facings.Opposite((Facing)9));
+
+    [Theory]
+    [InlineData(Facing.Up, 2, 1)]
+    [InlineData(Facing.Down, 2, 3)]
+    [InlineData(Facing.Left, 1, 2)]
+    [InlineData(Facing.Right, 3, 2)]
+    public void Step_EachFacing_MovesOneCell(Facing facing, int x, int y) =>
+        Assert.Equal(new GridCell(x, y), Facings.Step(new GridCell(2, 2), facing));
 }

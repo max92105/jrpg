@@ -79,8 +79,29 @@ public sealed class ExplorationState
     /// </summary>
     public ObjectDefinition CurrentDefinitionOf(PlacedObject placed) => _map.CurrentDefinitionOf(placed);
 
-    /// <summary>What an NPC faces now (ADR 0044): the player while an event of its own runs, else down.</summary>
-    public Facing NpcFacingOf(PlacedObject placed) => NpcFacing.Of(placed, _events.Run?.Source, PlayerFacing);
+    /// <summary>
+    /// Where an NPC stands or walks now and what it faces (ADR 0044): its walk's step, else the player while an event
+    /// of its own runs, else its last walk's or placed facing.
+    /// </summary>
+    public NpcPose NpcPoseOf(PlacedObject placed)
+    {
+        var pose = _map.PoseOf(placed);
+        return pose with { Facing = NpcFacing.Of(placed, _events.Run?.Source, PlayerFacing, pose) };
+    }
+
+    /// <summary>
+    /// Moves the cutscene walks on by the Game's delta at the walk speed (decision 573), and when the running event's
+    /// move step has its NPC arrived, continues the event itself (ADR 0044).
+    /// </summary>
+    public void AdvanceNpcWalks(TimeSpan delta)
+    {
+        _map.AdvanceWalks(delta, _context.Catalog.Rules.Exploration.WalkSpeed);
+        if (_events.Run?.Current is MoveNpcStep move && !_map.IsWalking(move.ObjectUid))
+        {
+            _events.Continue();
+            RefreshInteraction();
+        }
+    }
 
     /// <summary>
     /// The battle a step just started, or null. The Game runs it, then calls <see cref="FinishEncounter"/>; the player

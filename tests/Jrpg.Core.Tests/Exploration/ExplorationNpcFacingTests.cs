@@ -35,14 +35,14 @@ public sealed class ExplorationNpcFacingTests
     {
         var exploration = TestExplorationMap.Start(new Inventory(), new Point2D(3.5, 0.5), Facing.Right);
         var board = exploration.CurrentMap.Layout.Objects.Single(placed => placed.Uid == "notice@4,0");
-        Assert.Equal(Facing.Down, exploration.NpcFacingOf(board));
+        Assert.Equal(Facing.Down, exploration.NpcPoseOf(board).Facing);
 
         Assert.True(exploration.TryInteract());
-        Assert.Equal(Facing.Left, exploration.NpcFacingOf(board));
+        Assert.Equal(Facing.Left, exploration.NpcPoseOf(board).Facing);
 
         exploration.ContinueEvent();
         Assert.False(exploration.IsEventRunning);
-        Assert.Equal(Facing.Down, exploration.NpcFacingOf(board));
+        Assert.Equal(Facing.Down, exploration.NpcPoseOf(board).Facing);
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public sealed class ExplorationNpcFacingTests
         exploration.Walk(MoveIntent.FromAxes(0, 1), TestExplorationMap.ThirdOfASecond);
 
         Assert.True(exploration.IsEventRunning);
-        Assert.Equal(Facing.Down, exploration.NpcFacingOf(board));
+        Assert.Equal(Facing.Down, exploration.NpcPoseOf(board).Facing);
     }
 
     // An event that warps mid-way keeps running on the next map; a same-named object there is not its source.
@@ -83,14 +83,14 @@ public sealed class ExplorationNpcFacingTests
         var start = new MapLocation("inn", new Point2D(2.5, 0.5), Facing.Left);
         var exploration = new ExplorationState(context, TestParties.LedBy("sarxian"), start);
         Assert.True(exploration.TryInteract());
-        Assert.Equal(Facing.Right, exploration.NpcFacingOf(inn.Objects[0]));
+        Assert.Equal(Facing.Right, exploration.NpcPoseOf(inn.Objects[0]).Facing);
 
         exploration.ContinueEvent();
         exploration.ContinueEvent();
 
         Assert.Equal("street", exploration.CurrentMap.Id);
         Assert.Same(greeting, exploration.CurrentEventStep);
-        Assert.Equal(Facing.Down, exploration.NpcFacingOf(exploration.CurrentMap.Layout.Objects[0]));
+        Assert.Equal(Facing.Down, exploration.NpcPoseOf(exploration.CurrentMap.Layout.Objects[0]).Facing);
     }
 
     [Fact]
@@ -119,11 +119,11 @@ public sealed class ExplorationNpcFacingTests
 
         Assert.True(exploration.TryInteract());
         Assert.IsType<OpenShopStep>(exploration.CurrentEventStep);
-        Assert.Equal(Facing.Right, exploration.NpcFacingOf(keeper));
+        Assert.Equal(Facing.Right, exploration.NpcPoseOf(keeper).Facing);
 
         exploration.ContinueEvent();
 
         Assert.False(exploration.IsEventRunning);
-        Assert.Equal(Facing.Down, exploration.NpcFacingOf(keeper));
+        Assert.Equal(Facing.Down, exploration.NpcPoseOf(keeper).Facing);
     }
 }

@@ -7,6 +7,7 @@ using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Events;
 using Jrpg.Editor.Maps;
+using Jrpg.Editor.Maps.Editing;
 
 namespace Jrpg.Editor.Tests.Events;
 
@@ -42,6 +43,35 @@ public sealed class EventEditingViewModelTests
         Assert.Equal(["forest", "start"], events.Choices.MapIds);
         Assert.Contains("potion", events.Choices.ItemIds);
         Assert.Contains("general_store", events.Choices.ShopIds);
+    }
+
+    // The start map holds the villager (a field-sprite object) and the chest: only the villager can walk (ADR 0044).
+    [Fact]
+    public void StartEditingAt_MapWithNpcAndChest_OffersOnlyTheNpcsToMove()
+    {
+        var events = _eventEditing.StartEditingAt(ChestCenter)!;
+
+        Assert.Contains(new NpcChoice("villager_1", "villager"), events.Choices.NpcChoices);
+        Assert.DoesNotContain(events.Choices.NpcChoices, choice => choice.Uid == "0bff6243");
+    }
+
+    // The dialog reads the open map as it is, so an NPC placed and not yet saved can be moved.
+    [Fact]
+    public void StartEditingAt_NpcPlacedUnsaved_OffersItToMove()
+    {
+        var guard = new PlacedObject
+        {
+            Uid = "guard_new",
+            ObjectId = "villager",
+            Position = new Point2D(20, 20),
+            Z = MapLayers.PlayerZ,
+            Events = [],
+        };
+        _eventEditing.OpenMap!.Do(new PlaceObjectEdit(guard));
+
+        var events = _eventEditing.StartEditingAt(ChestCenter)!;
+
+        Assert.Contains(new NpcChoice("guard_new", "villager"), events.Choices.NpcChoices);
     }
 
     [Fact]

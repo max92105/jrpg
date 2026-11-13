@@ -79,6 +79,25 @@
       <Button Content="Pick..." Margin="8,0,0,0" ToolTip="Choose the map and click the arrival cell on its picture." Click="OnPickWarpDestinationClicked" />
       <Button Content="Go to" Margin="4,0,0,0" ToolTip="Keep these events, then show the destination map on its cell." Click="OnGoToWarpDestinationClicked" />
     </StackPanel>
+    <StackPanel Visibility="{Binding IsMoveNpc, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
+      <StackPanel Orientation="Horizontal">
+        <TextBlock Text="Move NPC" VerticalAlignment="Center" Margin="0,0,8,0" />
+        <ComboBox Width="260"
+                  DisplayMemberPath="Label"
+                  SelectedValuePath="Uid"
+                  ItemsSource="{Binding DataContext.Choices.NpcChoices, RelativeSource={RelativeSource AncestorType=Window}}"
+                  SelectedValue="{Binding MoveNpcUid}" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+        <TextBlock Text="Path" Width="40" VerticalAlignment="Center" />
+        <Button Content="Up" Width="50" Command="{Binding AddUpCommand}" />
+        <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding AddDownCommand}" />
+        <Button Content="Left" Width="50" Margin="4,0,0,0" Command="{Binding AddLeftCommand}" />
+        <Button Content="Right" Width="50" Margin="4,0,0,0" Command="{Binding AddRightCommand}" />
+        <Button Content="Remove last" Width="90" Margin="12,0,0,0" Command="{Binding RemoveLastMoveStepCommand}" />
+      </StackPanel>
+      <TextBlock Margin="40,4,0,0" TextWrapping="Wrap" Text="{Binding MovePathText}" />
+    </StackPanel>
     <StackPanel Visibility="{Binding IsStill, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}">
       <StackPanel Orientation="Horizontal">
         <TextBlock Text="Image file (cinematics folder)" Width="180" VerticalAlignment="Center" />

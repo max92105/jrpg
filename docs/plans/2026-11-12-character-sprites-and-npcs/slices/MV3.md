@@ -26,3 +26,5 @@ The event dialog offers **Move NPC**: an NPC box listing the placed NPCs of the 
 2. Add a dialogue step after it, OK, Ctrl+S, play: talking to the first NPC makes the second walk two cells left, then the first speaks.
 3. Ctrl+Z in the editor before saving removes the step with the event change.
 4. Revert with `git checkout -- content` if this was only a check.
+
+- **Done, with deviations:** the step's line reads "Move npc_3: left, left, down" (the uid alone: a loaded step knows no object id, and the box shows "villager_anna (npc_3)"); the four direction buttons and Remove last grey at the bounds (no step past 64, nothing to remove on an empty path); `MapEventComparison` needed no change, since `MoveNpcStep` compares its path by content (MV1), pinned by `MapEventComparisonTests`; the cell event dialog offers Move NPC too, as Data allows it.

@@ -1,5 +1,5 @@
 # Character sprites and NPCs
-Status: approved
+Status: retro pending
 
 Drafted on 2026-11-12 from the developer's request (lightly cleaned up):
 
@@ -92,7 +92,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **NB3. The placed facing in the editor: a Facing box in the Placed object panel** (Editor, about 190 lines) → [slices/NB3.md](slices/NB3.md)
 - [x] **MV1. The `moveNpc` step in Core: an NPC walks its path cell by cell for the visit, the event waiting until it arrives** (Core, about 260 lines) → [slices/MV1.md](slices/MV1.md)
 - [x] **MV2. The step in content and on screen: Data's rules, the NPC drawn walking at its runtime position, the prompt and collision following it** (Data + Game, about 240 lines) → [slices/MV2.md](slices/MV2.md)
-- [ ] **MV3. The step in the editor: the NPC picked from the map, the path built from direction buttons** (Editor, about 210 lines) → [slices/MV3.md](slices/MV3.md)
+- [x] **MV3. The step in the editor: the NPC picked from the map, the path built from direction buttons** (Editor, about 210 lines) → [slices/MV3.md](slices/MV3.md)
 
 ## Later (not in this plan)
 - **NB4, NB5: idle loops** (slice files kept as drafts: [NB4](slices/NB4.md), [NB5](slices/NB5.md)). If they come back: every loop on the map's clock would bob in step on a whole street of NPCs, so each placed NPC needs an offset from its uid (a fixed hash, no randomness) added to the time.

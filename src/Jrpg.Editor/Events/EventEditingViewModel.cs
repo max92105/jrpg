@@ -85,7 +85,16 @@ internal sealed class EventEditingViewModel(CatalogDraft catalog, OpenMaps openM
         QuestIds = [.. catalog.Current.Quests.Keys.Order(StringComparer.Ordinal)],
         QuestStages = QuestStageChoices(),
         WarpMaps = new(openMaps.EntriesWith(catalog.Current), openMaps.LayoutsWith(catalog.Current), catalog.Current),
+        NpcChoices = NpcChoices(),
     };
+
+    // The open map's placed NPCs as it is now, unsaved placements included; a tile object can't walk (ADR 0044).
+    private IReadOnlyList<NpcChoice> NpcChoices() =>
+        OpenMap is { } open
+            ? [.. open.Map.Layout.Objects
+                .Where(placed => catalog.Current.Objects[placed.ObjectId].FieldSpriteFile is not null)
+                .Select(placed => new NpcChoice(placed.Uid, placed.ObjectId))]
+            : [];
 
     // Quests in id order, each quest's stages in its own order.
     private IReadOnlyList<QuestStageChoice> QuestStageChoices() =>

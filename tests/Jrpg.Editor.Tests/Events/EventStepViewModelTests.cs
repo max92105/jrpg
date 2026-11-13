@@ -251,6 +251,7 @@ public sealed class EventStepViewModelTests
         new GiveItemStep("potion", 2),
         new SwapObjectStep("door_open"),
         new WarpStep("interior_1", new GridCell(2, 3)),
+        new MoveNpcStep("villager_1", [Facing.Left, Facing.Down]),
         new StillStep("Placeholder1.png", 2.5, "Long ago."),
         new StillStep("Placeholder2.png", 4, Caption: null),
         new RecruitStep("omer"),

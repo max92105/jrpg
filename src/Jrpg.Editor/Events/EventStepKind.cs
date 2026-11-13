@@ -7,6 +7,7 @@ internal enum EventStepKind
     GiveItem,
     SwapObject,
     Warp,
+    MoveNpc,
     Still,
     Recruit,
     Voice,

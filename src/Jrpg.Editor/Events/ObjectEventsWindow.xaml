@@ -99,6 +99,7 @@
           <Button Content="Give item" Width="70" Margin="4,0,0,0" Command="{Binding AddGiveItemCommand}" />
           <Button Content="Swap object" Width="80" Margin="4,0,0,0" Command="{Binding AddSwapObjectCommand}" />
           <Button Content="Warp" Width="60" Margin="4,0,0,0" Command="{Binding AddWarpCommand}" />
+          <Button Content="Move NPC" Width="70" Margin="4,0,0,0" Command="{Binding AddMoveNpcCommand}" />
           <Button Content="Still" Width="50" Margin="4,0,0,0" Command="{Binding AddStillCommand}" />
           <Button Content="Recruit" Width="60" Margin="4,0,0,0" Command="{Binding AddRecruitCommand}" />
           <Button Content="Voice" Width="50" Margin="4,0,0,0" Command="{Binding AddVoiceCommand}" />

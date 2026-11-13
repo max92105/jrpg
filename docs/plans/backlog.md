@@ -202,3 +202,4 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - Replacing the player's field sprite with a bought sheet: its own plan, done with help (the character sprites plan only moves the player's drawing to its `field-sprites.json` record with today's numbers).
 - A cutscene-moved NPC sorts against the player by its placed row (`MapDrawOrder` keys objects on `PlacedObject.Position`): a position lookup into the shared draw order, with the wandering NPCs plan.
 - The sprite setup's `From` divides the image size by the record's frame size, so an image with spare pixels past its frames (which the start allows) opens with a cut problem until the counts are retyped (sprites plan SI2, SI4 reviews); bought sheets are exact, so it waits.
+- Removing a placed NPC that another event's `moveNpc` step names is caught only at save (`MapLayoutValidator`); the editor could warn at the removal, as it does for an object in use (MV3's review).

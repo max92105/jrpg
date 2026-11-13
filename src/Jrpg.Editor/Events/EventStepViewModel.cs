@@ -21,6 +21,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
     private EventStepViewModel(EventStepKind kind)
     {
         Kind = kind;
+        WatchMovePath();
     }
 
     public EventStepKind Kind { get; }
@@ -32,6 +33,8 @@ internal sealed partial class EventStepViewModel : ObservableObject
     public bool IsSwapObject => Kind == EventStepKind.SwapObject;
 
     public bool IsWarp => Kind == EventStepKind.Warp;
+
+    public bool IsMoveNpc => Kind == EventStepKind.MoveNpc;
 
     public bool IsStill => Kind == EventStepKind.Still;
 
@@ -139,6 +142,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.GiveItem => $"Give item: {ItemId} x{QuantityText}",
         EventStepKind.SwapObject => $"Swap object to: {ObjectId}",
         EventStepKind.Warp => $"Warp to: {MapId} ({CellXText}, {CellYText})",
+        EventStepKind.MoveNpc => MoveNpcLabel(),
         EventStepKind.Still => $"Still: {ImageFile}, {SecondsText} s",
         EventStepKind.Recruit => $"Recruit: {MemberId}",
         EventStepKind.Voice => $"Voice: {VoiceFile}",
@@ -159,6 +163,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.GiveItem when string.IsNullOrEmpty(ItemId) => "Choose the item to give.",
         EventStepKind.SwapObject when string.IsNullOrEmpty(ObjectId) => "Choose the object it becomes.",
         EventStepKind.Warp when string.IsNullOrEmpty(MapId) => "Choose the map to warp to.",
+        EventStepKind.MoveNpc => MoveNpcProblem,
         EventStepKind.Still when string.IsNullOrWhiteSpace(ImageFile) => "Write the still's image file.",
         EventStepKind.Still when Seconds(SecondsText) is null => "The seconds must be a number above 0.",
         EventStepKind.Recruit when string.IsNullOrEmpty(MemberId) => "Choose the member who joins.",
@@ -184,6 +189,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         GiveItemStep give => new(EventStepKind.GiveItem) { ItemId = give.ItemId, QuantityText = Text(give.Quantity) },
         SwapObjectStep swap => new(EventStepKind.SwapObject) { ObjectId = swap.ObjectId },
         WarpStep warp => new(EventStepKind.Warp) { MapId = warp.MapId, CellXText = Text(warp.Cell.X), CellYText = Text(warp.Cell.Y) },
+        MoveNpcStep move => FromMove(move),
         StillStep still => new(EventStepKind.Still) { ImageFile = still.ImageFile, SecondsText = Text(still.Seconds), Caption = still.Caption ?? "" },
         RecruitStep recruit => new(EventStepKind.Recruit) { MemberId = recruit.MemberId },
         VoiceStep voice => new(EventStepKind.Voice) { VoiceFile = voice.File },
@@ -208,6 +214,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.Warp => new WarpStep(MapId, new GridCell(
             WholeNumber(CellXText, minimum: 0) ?? throw InvalidFields(),
             WholeNumber(CellYText, minimum: 0) ?? throw InvalidFields())),
+        EventStepKind.MoveNpc => ToMoveNpcStep(),
         EventStepKind.Still => new StillStep(
             ImageFile.Trim(), Seconds(SecondsText) ?? throw InvalidFields(), string.IsNullOrWhiteSpace(Caption) ? null : Caption.Trim()),
         EventStepKind.Recruit => new RecruitStep(MemberId),

@@ -110,6 +110,9 @@ internal sealed partial class EventViewModel : ObservableObject
     private void AddWarp() => AddStep(EventStepKind.Warp);
 
     [RelayCommand]
+    private void AddMoveNpc() => AddStep(EventStepKind.MoveNpc);
+
+    [RelayCommand]
     private void AddStill() => AddStep(EventStepKind.Still);
 
     [RelayCommand]

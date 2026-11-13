@@ -2,6 +2,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Quests;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Events;
 
@@ -131,6 +132,37 @@ public sealed class EventPresetsTests
         };
 
         Assert.Equal("vault_opened", EventPresets.GuessOpenedObject("vault", definitions));
+    }
+
+    // Decision 588: the offer runs while the quest is not started and starts it; the line is the developer's.
+    [Fact]
+    public void QuestGiver_Quest_FirstEventGatedNotStartedStartsIt()
+    {
+        var offer = EventPresets.QuestGiver(new EventIdAllocation("elder_1", "villager", []), "placeholder_errand")[0];
+
+        Assert.Equal(("elder_1_0", EventActivation.Interact, "Talk"), (offer.Id, offer.Activation, offer.Prompt));
+        Assert.Equal(new QuestCondition("placeholder_errand", QuestConditionKind.NotStarted), offer.OnlyWhenQuest);
+        Assert.Collection(
+            offer.Steps,
+            step => Assert.Empty(Assert.IsType<DialogueStep>(step).Speech.Lines),
+            step => Assert.Equal(new StartQuestStep("placeholder_errand"), step));
+    }
+
+    [Fact]
+    public void QuestGiver_Quest_SecondEventGatedActiveTalks()
+    {
+        var reminder = EventPresets.QuestGiver(new EventIdAllocation("elder_1", "villager", []), "placeholder_errand")[1];
+
+        Assert.Equal(new QuestCondition("placeholder_errand", QuestConditionKind.Active), reminder.OnlyWhenQuest);
+        Assert.Empty(Assert.IsType<DialogueStep>(Assert.Single(reminder.Steps)).Speech.Lines);
+    }
+
+    [Fact]
+    public void QuestGiver_TwoEvents_TakeFreshIds()
+    {
+        var events = EventPresets.QuestGiver(_door, "placeholder_errand");
+
+        Assert.Equal(["door_1_2", "door_1_3"], events.Select(mapEvent => mapEvent.Id));
     }
 
     private static ObjectDefinition Definition(string id, string category) => new()

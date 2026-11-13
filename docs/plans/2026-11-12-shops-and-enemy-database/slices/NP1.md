@@ -22,3 +22,5 @@ None.
 2. Place an NPC, open its events (Events mode, double-click), choose the quest in the Quest giver box, click **Quest giver**: two events appear; type the offer line and the reminder line; OK.
 3. Ctrl+S, play: talk to the NPC: the offer line, then "Quest started: ..."; talk again: the reminder.
 4. Revert with `git checkout -- content` if this was only a check.
+
+- **Done, with deviations:** the quest box binds to `Choices.QuestIds` (no separate `QuestIds` member on the list); the list view model tests sit in `EventListViewModelQuestGiverTests` (the existing file is past 250 lines); clearing the box greys the button, tested.

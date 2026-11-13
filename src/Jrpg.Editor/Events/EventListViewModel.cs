@@ -19,7 +19,10 @@ internal sealed partial class EventListViewModel : ObservableObject
     private readonly string _likelyOpenedObjectId;
 
     /// <param name="placed">The object whose events are edited.</param>
-    /// <param name="choices">The ids the steps, "only while the object is" and "only while led by" can pick from.</param>
+    /// <param name="choices">
+    /// The ids the steps, the quest gate and the Quest giver preset, "only while the object is" and "only while led by"
+    /// can pick from.
+    /// </param>
     /// <param name="likelyOpenedObjectId">What the chest and door presets turn the object into (<see cref="EventPresets.GuessOpenedObject"/>).</param>
     public EventListViewModel(PlacedObject placed, StepChoices choices, string likelyOpenedObjectId)
     {
@@ -30,6 +33,7 @@ internal sealed partial class EventListViewModel : ObservableObject
         OnlyWhenChoices = ["", .. choices.ObjectIds];
         LeaderChoices = ["", .. choices.MemberIds];
         QuestChoices = ["", .. choices.QuestIds];
+        PresetQuestId = choices.QuestIds.Count > 0 ? choices.QuestIds[0] : "";
         SelectedEvent = Events.Count > 0 ? Events[0] : null;
     }
 
@@ -51,6 +55,13 @@ internal sealed partial class EventListViewModel : ObservableObject
     public IReadOnlyList<string> QuestChoices { get; }
 
     public IReadOnlyList<QuestConditionKindChoice> ConditionKinds { get; } = QuestConditionKindChoice.All;
+
+    /// <summary>
+    /// The quest the Quest giver preset offers (decision 588): the first by id, empty while none exists.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ApplyQuestGiverPresetCommand))]
+    public partial string PresetQuestId { get; set; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RemoveEventCommand), nameof(MoveEventUpCommand), nameof(MoveEventDownCommand))]
@@ -101,6 +112,11 @@ internal sealed partial class EventListViewModel : ObservableObject
 
     [RelayCommand]
     private void ApplyShopkeeperPreset() => ApplyPreset(EventPresets.Shopkeeper(IdAllocation()));
+
+    [RelayCommand(CanExecute = nameof(HasPresetQuest))]
+    private void ApplyQuestGiverPreset() => ApplyPreset(EventPresets.QuestGiver(IdAllocation(), PresetQuestId));
+
+    private bool HasPresetQuest() => PresetQuestId.Length > 0;
 
     // Replaces every event, and shows the first field the preset leaves to fill in.
     private void ApplyPreset(IReadOnlyList<MapEvent> presetEvents)

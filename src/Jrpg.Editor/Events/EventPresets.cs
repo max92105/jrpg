@@ -2,14 +2,16 @@ using Jrpg.Core.Dialogue;
 using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Quests;
 
 namespace Jrpg.Editor.Events;
 
 /// <summary>
 /// The event dialog's presets: the usual events of a chest, a door, a door the player opens first and a sign, an NPC
-/// who talks, a forge master who talks and opens the Forge, and a shopkeeper who talks and opens a shop (decision 353).
-/// What only the developer can say is left empty for the dialog to ask for: the chest's item, the door's destination,
-/// the sign's or the NPC's text, the shopkeeper's shop.
+/// who talks, a forge master who talks and opens the Forge, a shopkeeper who talks and opens a shop (decision 353), and
+/// a quest giver who offers a quest and then reminds of it (decision 588). What only the developer can say is left
+/// empty for the dialog to ask for: the chest's item, the door's destination, the sign's or the NPC's text, and the
+/// shop the shopkeeper opens.
 /// </summary>
 internal static class EventPresets
 {
@@ -108,6 +110,35 @@ internal static class EventPresets
             Steps = [new DialogueStep(new Speech([])), new OpenShopStep(string.Empty)],
         },
     ];
+
+    /// <summary>
+    /// Pressed: a quest giver offers a quest (decision 588): while it is not started, a line left to type and the
+    /// start; while it is active, a reminder line left to type. Both gated, so neither shadows the other (ADR 0033);
+    /// what it says once the quest is completed is a third event the developer adds.
+    /// </summary>
+    public static IReadOnlyList<MapEvent> QuestGiver(EventIdAllocation target, string questId)
+    {
+        var ids = target.NewEventIds(2);
+        return
+        [
+            new MapEvent
+            {
+                Id = ids[0],
+                Activation = EventActivation.Interact,
+                Prompt = TalkPrompt,
+                OnlyWhenQuest = new QuestCondition(questId, QuestConditionKind.NotStarted),
+                Steps = [new DialogueStep(new Speech([])), new StartQuestStep(questId)],
+            },
+            new MapEvent
+            {
+                Id = ids[1],
+                Activation = EventActivation.Interact,
+                Prompt = TalkPrompt,
+                OnlyWhenQuest = new QuestCondition(questId, QuestConditionKind.Active),
+                Steps = [new DialogueStep(new Speech([]))],
+            },
+        ];
+    }
 
     /// <summary>
     /// The likely "opened" version of an object, such as <c>chest_opened</c> for <c>chest</c>: another object whose id

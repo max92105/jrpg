@@ -29,6 +29,8 @@
         <Button Content="Talk" Width="50" Margin="4,0,0,0" Command="{Binding ApplyTalkPresetCommand}" />
         <Button Content="Forge master" Width="90" Margin="4,0,0,0" Command="{Binding ApplyForgeMasterPresetCommand}" />
         <Button Content="Shopkeeper" Width="80" Margin="4,0,0,0" Command="{Binding ApplyShopkeeperPresetCommand}" />
+        <Button Content="Quest giver" Width="80" Margin="4,0,0,0" Command="{Binding ApplyQuestGiverPresetCommand}" ToolTip="Replaces the object's events with two for the chosen quest: an offer that starts it while not started, a reminder while active; what it says once completed is a third event to add. Greyed while no quest exists." />
+        <ComboBox Width="120" Margin="4,0,0,0" ItemsSource="{Binding Choices.QuestIds}" SelectedItem="{Binding PresetQuestId}" ToolTip="The quest the Quest giver preset offers" />
       </WrapPanel>
       <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
         <Button Content="Add" Width="60" Command="{Binding AddEventCommand}" />

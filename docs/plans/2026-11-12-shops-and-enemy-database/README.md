@@ -58,7 +58,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **SH3. The Shops window and the Database menu** (Editor, about 170 lines) → [slices/SH3.md](slices/SH3.md)
 
 ### Phase 2: quest NPCs
-- [ ] **NP1. The Quest giver preset: the quest offered while not started, a reminder while active** (Editor, about 150 lines) → [slices/NP1.md](slices/NP1.md)
+- [x] **NP1. The Quest giver preset: the quest offered while not started, a reminder while active** (Editor, about 150 lines) → [slices/NP1.md](slices/NP1.md)
 - [ ] **NP2. The dialogue step's portrait picked from the portraits folder** (Data + Editor, about 120 lines) → [slices/NP2.md](slices/NP2.md)
 
 ### Phase 3: enemies

@@ -5,17 +5,16 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-12-shops-and-enemy-database, slice SH1 (shops save from the editor: CatalogProblems.OfShops/CheckShops,
-ContentWriter writes shops.json, CatalogDraft.Database SetShops/ShopsRemovedByUndo, CatalogUsage.UsersOfShop,
-CombinedHistory.RefusalOfShopUndo). 2026-11-13. Round 1. Verdict: ready to commit.
+Plan 2026-11-12-shops-and-enemy-database, slice SH2 (Shops window's headless rules: Editor/Trade ShopViewModel,
+PricedItemChoice, ShopCatalogViewModel, ShopEditingViewModel). 2026-11-13. Round 1. Verdict: ready to commit.
 
-- MV3 carried: its two Suggestions not carried (committed slice, optional); its Follow-up (deleting a placed NPC a
-  moveNpc step names only caught on save) still open, not in backlog.
-- Warning (open): ContentWriterShopTests.cs rewritten over an existing file; the two WriteMaps openShop tests (accepted /
-  unknown shop refused through the writer's references, ContentWriter.cs:240) deleted, not in the Done note.
-- Warning (open): ContentWriterShopTests.cs WriteMapCatalogs_NewShop_WritesItSorted asserts the repository's whole shop
-  id list ["armory","general_store"] (G2); assert armory precedes general_store / the ids are ordinal-sorted.
-- Warning (open): CatalogUsage.cs:86-94 UsersOfShop is the third copy of the LayoutsOf.Where.Select(Id).Order.Select
-  ("map {id}") pipeline (UsersOfObject, UsersOfQuest); extract MapNamesWhere(catalog, openLayouts, predicate).
-- Suggestion (open): CatalogProblemsTests.cs WithGeneralStore helper sits between [Fact]s; move it to the class end.
-- Suggestion (open): no test of UsersOfShop counting an unsaved open layout (refusal test saves first).
+- SH1 carried: its three Warnings fixed (WriteMaps openShop tests back, ordinal-order assert, MapNamesWhere
+  extracted); its Suggestions not carried (committed slice); MV3's moveNpc Follow-up now in backlog, dropped.
+- Warning (open): ShopCatalogViewModel.cs:57-69 copies QuestCatalogViewModel.Problem's "listed twice / own problem by
+  id or #position" loop (third copy with QuestViewModel.FirstStageProblem; Enemies window will be the fourth);
+  extract a shared list-problem function.
+- Suggestion (open): two test names claim what they don't assert (RemoveShop_NewShop_RemovesItAndSelectsAnother,
+  AddItem_AfterAdding_GreysUntilAnotherIsPicked).
+- Suggestion (open): OfferedItems has no ThenBy(id) for same-named items.
+- Suggestion (open): RemoveShop's unsubscription untested.
+- Follow-up: Events/ListOrder summary says "the event dialog's lists", now used by Quests and Trade too.

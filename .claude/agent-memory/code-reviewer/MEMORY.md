@@ -8,3 +8,4 @@
 - [Lax test JSON readers](lax-test-json-readers.md) — test-only manifest readers skip required/nullable checks; ContentJsonOptions.Strict exists
 - [Dead-member listing gap](dead-member-listing-gap.md) — bare-name dead-code greps miss members sharing a name; type-scoped recheck recipe
 - [Frame size integer division](frame-size-integer-division.md) — columns = image / frame silently changes the frame size; test a remainder
+- [Database window copies](database-window-copies.md) — quest/shop/enemy windows clone the Quests types; grep the Problem loop for third+ copies

@@ -64,10 +64,10 @@ internal sealed partial class SheetCutViewModel : ObservableObject
     public partial int Spacing { get; set; }
 
     /// <summary>In image pixels; rounded down when the width doesn't split evenly.</summary>
-    public int TileWidth => TileLengthAlong(_imageSize.Width, Columns);
+    public int TileWidth => Cut.LengthAlong(_imageSize.Width, Columns);
 
     /// <summary>In image pixels; rounded down when the height doesn't split evenly.</summary>
-    public int TileHeight => TileLengthAlong(_imageSize.Height, Rows);
+    public int TileHeight => Cut.LengthAlong(_imageSize.Height, Rows);
 
     /// <summary>Why the cut can't be applied, or null when it splits the image into whole tiles.</summary>
     public string? Problem
@@ -84,7 +84,11 @@ internal sealed partial class SheetCutViewModel : ObservableObject
                 return "Margin and spacing must not be negative.";
             }
 
-            return ProblemAlong(_imageSize.Width, Columns, "columns") ?? ProblemAlong(_imageSize.Height, Rows, "rows") ?? MarginProblem() ?? TileOutsideProblem() ?? SquareProblem();
+            return Cut.ProblemAlong(_imageSize.Width, Columns, "columns")
+                ?? Cut.ProblemAlong(_imageSize.Height, Rows, "rows")
+                ?? MarginProblem()
+                ?? TileOutsideProblem()
+                ?? SquareProblem();
         }
     }
 
@@ -116,20 +120,7 @@ internal sealed partial class SheetCutViewModel : ObservableObject
         };
     }
 
-    // The image less the margin on both sides and the spacing between cells, shared by the cells.
-    private int SpanAlong(int imageLength, int cells) => imageLength - (2 * Margin) - ((cells - 1) * Spacing);
-
-    private int TileLengthAlong(int imageLength, int cells) => cells < 1 ? 0 : SpanAlong(imageLength, cells) / cells;
-
-    private string? ProblemAlong(int imageLength, int cells, string cellsName)
-    {
-        if (TileLengthAlong(imageLength, cells) < 1)
-        {
-            return $"{imageLength} px is too small for {cells} {cellsName}.";
-        }
-
-        return SpanAlong(imageLength, cells) % cells != 0 ? $"{imageLength} px doesn't split into {cells} {cellsName}." : null;
-    }
+    private GridCut Cut => new(Margin, Spacing);
 
     // The sheet stores the margin once, before the cells, so the grid counts whole cells to the image's edge: a margin as
     // wide as a cell and its spacing would give the saved sheet one more column or row than asked for.

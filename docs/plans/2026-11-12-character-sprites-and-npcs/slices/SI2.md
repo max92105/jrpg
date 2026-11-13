@@ -23,3 +23,5 @@ One sprite image's setup as the window will edit it: columns and rows typed, the
 
 ## Verify by hand
 1. Tiles > Set up sheet on any sheet: the Cut panel behaves as before (type a column count that doesn't split: the same message).
+
+- **Done, with deviations:** `GridCut` is a readonly record struct of the margin and spacing (`GridCut.Plain` for a sprite sheet), so its two methods take three parameters, not five; the walk setup raises the parent's `Problem` through its own `PropertyChanged`; a new setup walks over as many frames as columns (4). Accepted (the review): an image with spare pixels past its record's frames (which the start allows) opens with a cut problem until the counts are retyped, since bought sheets are exact.

@@ -1,5 +1,5 @@
 # Shops and the enemy database
-Status: retro pending
+Status: done
 
 Drafted on 2026-11-12 from the developer's request (lightly cleaned up):
 

@@ -25,6 +25,7 @@ Turn a feature request into a plan that a developer can implement one slice at a
    - A new event step kind or saved list touches every switch and check over kinds along the chain (Data's null-entry check, Core's `ApplyAndCheckWait`, the editor's `ToStep`): name each one's complexity room in the slice, not just Core's (the quests plan budgeted one of three, and E1 and SV had to extract a helper).
    - The editor's `HandleObjectKey`, `HandlePaintButton`, `HandleToolKey` and `ShowSelected` sit at the CA1502 limit: a slice adding a key or a branch names the helper it extracts (the map editing flows' OM1, SN1 and PO2 each extracted one mid-slice).
    - A test file a phase of three or more slices fills gets its sibling named per slice, not once it reaches 250 lines (MS2 filled `MainViewModelOpenMapsTests` to 296 and MS3 had to find a sibling).
+   - Glob each file a slice calls new: an existing one is extended (in a sibling once past 250 lines), and the slice says so (SH1 called `ContentWriterShopTests` new; writing it whole deleted two tests).
 4. For each slice list: goal, files to create/change, public types/signatures, tests to write (by name), and how to verify by hand if relevant.
    - Write planned test names as `Method_Scenario_ExpectedResult` under the test class's name (`CommandMenuTests: Update_ConfirmSkills_ListsActorSkills`), as the repo's test files do.
    - Every new type gets a one-line responsibility next to its name. If the line needs "and", split the type.

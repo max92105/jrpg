@@ -7,5 +7,3 @@
 - [Detached comments](detached-comments.md) — a member inserted under, or removed from under, a comment leaves it describing the wrong code
 - [Lax test JSON readers](lax-test-json-readers.md) — test-only manifest readers skip required/nullable checks; ContentJsonOptions.Strict exists
 - [Dead-member listing gap](dead-member-listing-gap.md) — bare-name dead-code greps miss members sharing a name; type-scoped recheck recipe
-- [Frame size integer division](frame-size-integer-division.md) — columns = image / frame silently changes the frame size; test a remainder
-- [Database window copies](database-window-copies.md) — quest/shop/enemy windows and art imports clone older types; grep for third+ copies

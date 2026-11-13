@@ -26,6 +26,7 @@ The bar: a professional reviewer reads the diff and understands the intent from 
 - Prefer composition over inheritance. Inheritance only for true "is-a" with shared behavior, max one level deep in Core.
 - An interface needs a reason: two implementations, or a seam for I/O, time or randomness. Not "in case".
 - A value one type works out (a length, a direction, a layout rect) is read from it by the others, never recomputed beside it.
+- Before writing a type or method that mirrors an older one (a catalog window, an image import, a usage query, a `CatalogProblems.OfX`), grep the older one's distinctive line; at the third copy, extract the shared piece in this slice (`RecordListProblem`, `ArtImageImport`, `CatalogProblems.FirstProblem`; five third copies reached review in the shops and enemies plan).
 
 ## Methods
 

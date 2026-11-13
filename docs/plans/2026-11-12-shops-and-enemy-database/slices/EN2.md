@@ -20,3 +20,5 @@ None outside the new folder.
 
 ## Verify by hand
 None: the window is EN7.
+
+- **Done, with deviations:** the numbers are kept as typed (`TypedNumber`, as the event dialog keeps its numbers), so an emptied box is the form's problem ("Max HP must be a whole number (was '')."), the ranges Data's; the damage type box's list is the catalog view model's `DamageTypes`; `CanApply` greys OK with the problem line, as the Shops window; `EnemyCatalogViewModel` takes the whole `ContentCatalog`, as the shops'. The review: Duplicate copies the boxes as typed rather than the built record, which threw while the chosen enemy had a problem (a new one with no id); the catalog skips the enemy's own Label and Problem notices.

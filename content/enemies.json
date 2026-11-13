@@ -13,10 +13,78 @@
     "dodge": 0,
     "critChance": 5,
     "crowdControlResistance": 10,
-    "resistances": { "fire": -25 },
+    "resistances": {
+      "fire": -25
+    },
     "experienceReward": 40,
     "dropTableId": "goblin",
-    "gold": { "min": 6, "max": 12 }
+    "gold": {
+      "min": 6,
+      "max": 12
+    }
+  },
+  {
+    "id": "goblin_chief",
+    "name": "Goblin Chief",
+    "portraitFile": "Goblin.png",
+    "battleSpriteFile": "GoblinChief.png",
+    "attackEffectFile": "AttackEnemy.png",
+    "isSpriteFlipped": false,
+    "maxHp": 240,
+    "damage": 12,
+    "damageType": "piercing",
+    "accuracy": 80,
+    "dodge": 0,
+    "critChance": 5,
+    "crowdControlResistance": 50,
+    "resistances": {
+      "fire": -25
+    },
+    "experienceReward": 150,
+    "dropTableId": "goblin",
+    "isBoss": true,
+    "tactics": [
+      {
+        "weight": 4
+      },
+      {
+        "skillId": "cleave",
+        "weight": 2
+      },
+      {
+        "skillId": "field_dressing",
+        "weight": 3,
+        "when": {
+          "kind": "allyHpBelow",
+          "percent": 50
+        }
+      }
+    ],
+    "phases": [
+      {
+        "belowHpPercent": 50,
+        "tactics": [
+          {
+            "weight": 2
+          },
+          {
+            "skillId": "crushing_blow",
+            "weight": 3
+          },
+          {
+            "skillId": "cleave",
+            "weight": 2
+          },
+          {
+            "skillId": "war_cry",
+            "weight": 2,
+            "when": {
+              "kind": "allyFallen"
+            }
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "stone_beetle",
@@ -32,10 +100,17 @@
     "dodge": 0,
     "critChance": 5,
     "crowdControlResistance": 10,
-    "resistances": { "slashing": 25, "piercing": 25, "blunt": -25 },
+    "resistances": {
+      "blunt": -25,
+      "piercing": 25,
+      "slashing": 25
+    },
     "experienceReward": 40,
     "dropTableId": "goblin",
-    "gold": { "min": 6, "max": 12 }
+    "gold": {
+      "min": 6,
+      "max": 12
+    }
   },
   {
     "id": "training_dummy",
@@ -51,42 +126,11 @@
     "dodge": 0,
     "critChance": 0,
     "crowdControlResistance": 50,
-    "resistances": { "blunt": 25, "piercing": 25, "fire": -50 },
+    "resistances": {
+      "blunt": 25,
+      "piercing": 25,
+      "fire": -50
+    },
     "experienceReward": 10
-  },
-  {
-    "id": "goblin_chief",
-    "name": "Goblin Chief",
-    "isBoss": true,
-    "portraitFile": "Goblin.png",
-    "battleSpriteFile": "GoblinChief.png",
-    "attackEffectFile": "AttackEnemy.png",
-    "isSpriteFlipped": false,
-    "maxHp": 240,
-    "damage": 12,
-    "damageType": "piercing",
-    "accuracy": 80,
-    "dodge": 0,
-    "critChance": 5,
-    "crowdControlResistance": 50,
-    "resistances": { "fire": -25 },
-    "experienceReward": 150,
-    "dropTableId": "goblin",
-    "tactics": [
-      { "weight": 4 },
-      { "skillId": "cleave", "weight": 2 },
-      { "skillId": "field_dressing", "weight": 3, "when": { "kind": "allyHpBelow", "percent": 50 } }
-    ],
-    "phases": [
-      {
-        "belowHpPercent": 50,
-        "tactics": [
-          { "weight": 2 },
-          { "skillId": "crushing_blow", "weight": 3 },
-          { "skillId": "cleave", "weight": 2 },
-          { "skillId": "war_cry", "weight": 2, "when": { "kind": "allyFallen" } }
-        ]
-      }
-    ]
   }
 ]

@@ -5,14 +5,12 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-12-shops-and-enemy-database, slice NP1 (Quest giver preset: EventPresets.QuestGiver,
-EventListViewModel.PresetQuestId / ApplyQuestGiverPresetCommand, ObjectEventsWindow button + quest box). 2026-11-13.
-Round 1. Verdict: ready to commit. XAML bindings checked: ApplyQuestGiverPresetCommand, Choices.QuestIds (public
-StepChoices Choices), PresetQuestId all match. Probed: a ComboBox with SelectedItem "" over an empty list never writes
-null back (no NRE in HasPresetQuest).
+Plan 2026-11-12-shops-and-enemy-database, slice NP2 (portrait picker: ArtFolders.ImagesIn, StepChoices.PortraitFiles,
+EventEditingViewModel.PortraitFilesLookup, EventStepEditor editable ComboBox). 2026-11-13.
+Round 1. Verdict: ready to commit. XAML checked: DataContext.Choices.PortraitFiles resolves on both hosts
+(ObjectEventsWindow -> EventListViewModel.Choices, CellEventWindow -> CellEventViewModel.Choices); Text binds
+EventStepViewModel.PortraitFile; theme ComboBox template has PART_EditableTextBox + IsEditable trigger.
 
-- SH3 Suggestions not carried (committed slice).
-- Suggestion (open): test PresetQuestId_ClearedByTheBox_GreysTheButton names a UI path the read-only box can't take;
-  rename PresetQuestId_Emptied_GreysTheButton.
-- Suggestion (open): the Quest giver tool tip doesn't say it replaces the object's events like every preset.
-- Suggestion (open): EventListViewModel ctor's `choices` param doc omits the quests (gate and now the preset box).
+- NP1 Suggestions not carried (committed slice).
+- Suggestion (open): StartEditingAt_PortraitLookup_OffersItsFiles doesn't show the lookup is read per dialog
+  (a value cached at init passes); open twice with a lookup whose list changes between.

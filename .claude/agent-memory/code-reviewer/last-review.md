@@ -5,12 +5,13 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-13-drop-table-editor, slice DT0 (decision 604: TypedNumber to Catalogs, EnabledWhenChosen to
-EditorTheme.xaml, CatalogDraft.HasSameRecords). 2026-11-13. Round 1. Verdict: ready to commit. No Critical/Warning.
+Plan 2026-11-13-drop-table-editor, slice DT1 (decisions 599, 600, 601, 604: DropTable equal by content,
+AbsentWhenOneFilter, drop-tables.json written and relaid, CatalogProblems.OfDropTables, CatalogDraft.SetDropTables).
+2026-11-13. Round 1. Verdict: ready to commit. No Critical/Warning.
 
-- Suggestion (open): EditorTheme.xaml:146 comment and map.md Shell row say "Database window's", but the
-  Character sprites window (FieldSpriteWindow) using the style sits in the NPCs menu -> "a catalog window's".
-- Suggestion (open): `(current, edited) => current == edited` written twice (CatalogDraft.Database.cs:18,
-  CatalogDraft.cs:157) -> EqualityComparer<T>.Default.Equals.
-- Suggestion (open): DT0.md Done note "Window.Resources with them, left empty" reads as kept-but-empty; they're removed.
-- Carried from the editor bug fixes (decisions 594/595): all fixed in commit b4c8df6c before it landed: an import with a bad guess no longer counts (it never greys OK); FieldSpriteWindow keeps itself on the desktop once loaded (KeepOnDesktop over the virtual screen); map.md Sprites row wording fixed. Don't carry them.
+- Suggestion (open): docs/plans/backlog.md:210 ContentWriter size line says "at 294 after DT1" and still "DT1 takes it
+  to about 293 (approved 2026-11-13)" -> drop the stale clause.
+- Follow-up: OptionalFieldFilter summary still says "the filters for fields added after the content was written" (stale
+  since decision 586; now six filters).
+- DT0's three suggestions: all fixed (theme comment "A catalog window's", EqualityComparer<T>.Default.Equals, DT0.md
+  "then empty, removed too"). Don't carry.

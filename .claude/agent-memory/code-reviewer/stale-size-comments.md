@@ -58,7 +58,8 @@ call or a rename. These cases slipped past it:
   method's comment "Anywhere but a text box"; reread the comment above every changed condition.
 
 - A Done note saying "every count matches its file" (game cleanup GR1) checked design.md, not the backlog
-  line it corrects: EventPresenter stayed 293 vs 294. wc -l each file a changed backlog group names.
+  line it corrects: EventPresenter stayed 293 vs 294. wc -l each file a changed backlog group names. DT1 (drop
+  tables) prefixed the real count but kept the approval's "takes it to about 293": read the whole updated line.
 
 - A write made conditional (CW1: only changed catalogs, a stamped one refused) leaves an unchanged helper comment
   promising the old recovery (WriteAll: "the next save writes them all again"); reread comments in the callees.

@@ -22,3 +22,5 @@ The Character sprites window's state: every PNG in the field-sprite folder, set 
 
 ## Verify by hand
 None: the window is SI4.
+
+- **Done, with deviations:** `RefreshAfterImport(imported)` rebuilds the list and chooses the last copied file (one call for the window); the cached frames of a replaced file are dropped by the window (`TileImages.Forget`, as the tile import does through the shell), not by `FieldSpriteImport`; a copy onto an image the source's frame size doesn't split into takes nothing and shows the refusal until the next edit (the review); a setup counts for OK and the records only once edited, so choosing a new image and leaving it makes no record; a replaced image's setup opens anew after the import.

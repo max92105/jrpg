@@ -3092,5 +3092,250 @@
     "sheetId": "autumn_forest_clean",
     "column": 12,
     "row": 15
+  },
+  {
+    "id": 443,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 0,
+    "row": 2
+  },
+  {
+    "id": 444,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 1,
+    "row": 2
+  },
+  {
+    "id": 445,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 2,
+    "row": 2
+  },
+  {
+    "id": 446,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 3,
+    "row": 2
+  },
+  {
+    "id": 447,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 0,
+    "row": 9
+  },
+  {
+    "id": 448,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 1,
+    "row": 11
+  },
+  {
+    "id": 449,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 1,
+    "row": 10
+  },
+  {
+    "id": 450,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 1,
+    "row": 12
+  },
+  {
+    "id": 451,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 0,
+    "row": 12
+  },
+  {
+    "id": 452,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 0,
+    "row": 4
+  },
+  {
+    "id": 453,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 1,
+    "row": 4
+  },
+  {
+    "id": 454,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 2,
+    "row": 4
+  },
+  {
+    "id": 455,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 26,
+    "row": 1
+  },
+  {
+    "id": 456,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 27,
+    "row": 1
+  },
+  {
+    "id": 457,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 26,
+    "row": 2
+  },
+  {
+    "id": 458,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 27,
+    "row": 2
+  },
+  {
+    "id": 459,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 26,
+    "row": 3
+  },
+  {
+    "id": 460,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 27,
+    "row": 3
+  },
+  {
+    "id": 461,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 19,
+    "row": 7
+  },
+  {
+    "id": 462,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 17,
+    "row": 15
+  },
+  {
+    "id": 463,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 17,
+    "row": 14
+  },
+  {
+    "id": 464,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 19,
+    "row": 13
+  },
+  {
+    "id": 465,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 20,
+    "row": 13
+  },
+  {
+    "id": 466,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 21,
+    "row": 13
+  },
+  {
+    "id": 467,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 22,
+    "row": 13
+  },
+  {
+    "id": 468,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 18,
+    "row": 13
+  },
+  {
+    "id": 469,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 17,
+    "row": 13
+  },
+  {
+    "id": 470,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 18,
+    "row": 14
+  },
+  {
+    "id": 471,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 22,
+    "row": 14
+  },
+  {
+    "id": 472,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 12,
+    "row": 12
+  },
+  {
+    "id": 473,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 12,
+    "row": 13
+  },
+  {
+    "id": 474,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 9,
+    "row": 14
+  },
+  {
+    "id": 475,
+    "isWalkable": true,
+    "sheetId": "home_interiors_half_timber",
+    "column": 12,
+    "row": 14
+  },
+  {
+    "id": 476,
+    "isWalkable": true,
+    "sheetId": "treasure_chests",
+    "column": 0,
+    "row": 0
+  },
+  {
+    "id": 477,
+    "isWalkable": true,
+    "sheetId": "treasure_chests",
+    "column": 0,
+    "row": 1
   }
 ]

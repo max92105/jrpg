@@ -110,5 +110,21 @@
     "tileHeight": 16,
     "margin": 0,
     "spacing": 0
+  },
+  {
+    "id": "home_interiors_half_timber",
+    "file": "home interiors, half-timber.png",
+    "tileWidth": 16,
+    "tileHeight": 16,
+    "margin": 0,
+    "spacing": 0
+  },
+  {
+    "id": "treasure_chests",
+    "file": "treasure chests.png",
+    "tileWidth": 32,
+    "tileHeight": 32,
+    "margin": 0,
+    "spacing": 0
   }
 ]

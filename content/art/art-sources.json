@@ -274,6 +274,14 @@
     {
       "path": "tilesheets/home exteriors, half-timber v1.png",
       "sourceId": "mana-seed"
+    },
+    {
+      "path": "tilesheets/home interiors, half-timber.png",
+      "sourceId": "mana-seed"
+    },
+    {
+      "path": "tilesheets/treasure chests.png",
+      "sourceId": "mana-seed"
     }
   ]
 }

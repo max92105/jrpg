@@ -1874,8 +1874,8 @@
       "uid": "tree_1_29",
       "objectId": "tree_1",
       "position": {
-        "x": 21.736363473321035,
-        "y": 26.207148990165063
+        "x": 21.348680481535965,
+        "y": 24.617648723846287
       },
       "z": -4,
       "events": []
@@ -2724,8 +2724,8 @@
       "uid": "tree_2_11",
       "objectId": "tree_2",
       "position": {
-        "x": 20.834509423946656,
-        "y": 15.469806175750765
+        "x": 20.61538425467684,
+        "y": 15.436094611247714
       },
       "z": -4,
       "events": []
@@ -2894,8 +2894,8 @@
       "uid": "tree_1_94",
       "objectId": "tree_1",
       "position": {
-        "x": 7.737704712504547,
-        "y": 16.465110650679197
+        "x": 7.035912637705987,
+        "y": 16.15320306187984
       },
       "z": -4,
       "events": []
@@ -3024,11 +3024,69 @@
       "uid": "tree_1_108",
       "objectId": "tree_1",
       "position": {
-        "x": 7.634580265957759,
-        "y": 18.218226241974595
+        "x": 8.765245275355435,
+        "y": 17.711376410175635
       },
       "z": -4,
       "events": []
+    },
+    {
+      "uid": "chest_closed_1_1",
+      "objectId": "chest_closed_1",
+      "position": {
+        "x": 25.520387509242862,
+        "y": 25.058073825867982
+      },
+      "z": -3,
+      "events": [
+        {
+          "id": "chest_closed_1_1_0",
+          "activation": "interact",
+          "prompt": "Open",
+          "isOnce": true,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "giveItem",
+              "itemId": "camp_kit",
+              "quantity": 1
+            },
+            {
+              "type": "swapObject",
+              "objectId": "chest_opened_1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "uid": "chest_closed_1_2",
+      "objectId": "chest_closed_1",
+      "position": {
+        "x": 4.248390307818712,
+        "y": 23.220793560451796
+      },
+      "z": -3,
+      "events": [
+        {
+          "id": "chest_closed_1_2_0",
+          "activation": "interact",
+          "prompt": "Open",
+          "isOnce": true,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "giveItem",
+              "itemId": "bomb_all",
+              "quantity": 1
+            },
+            {
+              "type": "swapObject",
+              "objectId": "chest_opened_1"
+            }
+          ]
+        }
+      ]
     }
   ],
   "cellEvents": [

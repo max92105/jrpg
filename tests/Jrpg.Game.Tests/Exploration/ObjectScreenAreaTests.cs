@@ -21,7 +21,7 @@ public sealed class ObjectScreenAreaTests
     [Fact]
     public void Of_TileObject_CoversItsCells()
     {
-        var area = ObjectScreenArea.Of(PlacedAt(1, 3), Definition(2, 1, sprite: null), _sprites, Vector2.Zero);
+        var area = ObjectScreenArea.Of(new Point2D(1, 3), Definition(2, 1, sprite: null), _sprites, Vector2.Zero);
 
         Assert.Equal(new Rectangle(48, 144, 96, 48), area);
     }
@@ -30,7 +30,7 @@ public sealed class ObjectScreenAreaTests
     [Fact]
     public void Of_ObjectBetweenCells_RoundsTheTopLeftOnce()
     {
-        var area = ObjectScreenArea.Of(PlacedAt(2.5, 1.25), Definition(1, 1, sprite: null), _sprites, new Vector2(10.6f, 0));
+        var area = ObjectScreenArea.Of(new Point2D(2.5, 1.25), Definition(1, 1, sprite: null), _sprites, new Vector2(10.6f, 0));
 
         Assert.Equal(new Rectangle(109, 60, 48, 48), area);
     }
@@ -38,7 +38,7 @@ public sealed class ObjectScreenAreaTests
     [Fact]
     public void Of_PlayerShapedNpc_IsItsCell()
     {
-        var area = ObjectScreenArea.Of(PlacedAt(1, 3), Definition(1, 1, PlayerShaped), _sprites, Vector2.Zero);
+        var area = ObjectScreenArea.Of(new Point2D(1, 3), Definition(1, 1, PlayerShaped), _sprites, Vector2.Zero);
 
         Assert.Equal(new Rectangle(48, 144, 48, 48), area);
     }
@@ -46,13 +46,10 @@ public sealed class ObjectScreenAreaTests
     [Fact]
     public void Of_TallNpc_RisesAboveItsCell()
     {
-        var area = ObjectScreenArea.Of(PlacedAt(1, 3), Definition(1, 1, Tall), _sprites, Vector2.Zero);
+        var area = ObjectScreenArea.Of(new Point2D(1, 3), Definition(1, 1, Tall), _sprites, Vector2.Zero);
 
         Assert.Equal(new Rectangle(48 - 24, 144 - 48, 96, 96), area);
     }
-
-    private static PlacedObject PlacedAt(double x, double y) =>
-        new() { Uid = "thing", ObjectId = "thing", Position = new Point2D(x, y), Z = MapLayers.PlayerZ, Events = [] };
 
     private static ObjectDefinition Definition(int width, int height, string? sprite) => new()
     {

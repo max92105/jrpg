@@ -73,16 +73,17 @@ public sealed class ActiveMapTests
     }
 
     [Fact]
-    public void MapCollision_CanStandAt_AfterSwapToObjectWithoutPolygon_ReturnsTrue()
+    public void MapCollision_CanMoveTo_AfterSwapToObjectWithoutPolygon_ReturnsTrue()
     {
         var map = DoorMap(new WorldState());
         var collision = new MapCollision(map);
+        var beforeTheDoor = new Point2D(0.5, 0.5);
         var doorCenter = new Point2D(1.5, 0.5);
-        Assert.False(collision.CanStandAt(doorCenter, 0.1));
+        Assert.False(collision.CanMoveTo(beforeTheDoor, doorCenter, 0.1));
 
         map.SwapObject(map.Definition.Layout.Objects[0], "door_open");
 
-        Assert.True(collision.CanStandAt(doorCenter, 0.1));
+        Assert.True(collision.CanMoveTo(beforeTheDoor, doorCenter, 0.1));
     }
 
     private static ActiveMap DoorMap(WorldState world) =>

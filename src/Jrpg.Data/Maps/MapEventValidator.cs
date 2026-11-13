@@ -86,7 +86,7 @@ internal static class MapEventValidator
         {
             foreach (var mapEvent in placed.Events)
             {
-                var problem = FindEventProblem(mapEvent, references);
+                var problem = FindEventProblem(mapEvent, layout, references);
                 if (problem is not null)
                 {
                     return $"event '{mapEvent.Id}': {problem}";
@@ -104,7 +104,7 @@ internal static class MapEventValidator
             var problem = !layout.Contains(cellEvent.Cell) ? "the cell is outside the map."
                 : cellEvent.Event.Activation == EventActivation.Interact ? "a cell event must have touch or arrive activation."
                 : cellEvent.Event.Steps.Any(step => step is SwapObjectStep) ? "swapObject only works in an object's event."
-                : FindEventProblem(cellEvent.Event, references);
+                : FindEventProblem(cellEvent.Event, layout, references);
             if (problem is not null)
             {
                 return $"cell event '{cellEvent.Event.Id}' at ({cellEvent.Cell.X}, {cellEvent.Cell.Y}): {problem}";
@@ -114,7 +114,7 @@ internal static class MapEventValidator
         return null;
     }
 
-    private static string? FindEventProblem(MapEvent mapEvent, MapReferences references)
+    private static string? FindEventProblem(MapEvent mapEvent, MapLayout layout, MapReferences references)
     {
         if (FindStartProblem(mapEvent, references) is { } startProblem)
         {
@@ -126,13 +126,19 @@ internal static class MapEventValidator
             return "steps must not be empty.";
         }
 
+        // The run keeps the map it started on, so an NPC moved after a warp would walk on the map just left.
+        var hasWarped = false;
         for (var index = 0; index < mapEvent.Steps.Count; index++)
         {
-            var problem = FindStepProblem(mapEvent.Steps[index], references);
+            var step = mapEvent.Steps[index];
+            var problem = hasWarped && step is MoveNpcStep ? "moveNpc can't follow a warp: its map is left."
+                : FindStepProblem(step, layout, references);
             if (problem is not null)
             {
                 return $"step {index}: {problem}";
             }
+
+            hasWarped |= step is WarpStep;
         }
 
         return null;
@@ -183,8 +189,9 @@ internal static class MapEventValidator
             : null;
     }
 
-    private static string? FindStepProblem(EventStep step, MapReferences references) => step switch
+    private static string? FindStepProblem(EventStep step, MapLayout layout, MapReferences references) => step switch
     {
+        MoveNpcStep move => MoveNpcStepValidator.FindProblem(move, layout, references.Content.Objects),
         DialogueStep dialogue when dialogue.Speech.Lines.Count == 0 => "dialogue needs at least one line.",
         GiveItemStep give when !references.Content.ItemIds.Contains(give.ItemId) => $"giveItem has unknown item id '{give.ItemId}'.",
         GiveItemStep give when give.Quantity < 1 => $"giveItem quantity must be at least 1 (was {give.Quantity}).",

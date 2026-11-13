@@ -140,7 +140,8 @@ internal static class StartMapScenarios
     {
         var banner = new MapBanner();
         return new FieldOverlays(
-            new InteractionPromptView(RepositoryScreenText.Text, exploration.CurrentDefinitionOf, catalog.FieldSprites),
+            new InteractionPromptView(
+                RepositoryScreenText.Text, exploration.CurrentDefinitionOf, catalog.FieldSprites, exploration.NpcPoseOf),
             banner,
             new MapBannerView(RepositoryScreenText.Text, new UiTextures(), banner));
     }
@@ -177,11 +178,18 @@ internal static class StartMapScenarios
     }
 
     // The chest's interact event, made repeatable, runs only this step, so the chest never swaps open.
-    public static ContentCatalog WithChestSaying(ContentCatalog catalog, params EventStep[] steps)
+    public static ContentCatalog WithChestSaying(ContentCatalog catalog, params EventStep[] steps) =>
+        WithEventSaying(catalog, placed => placed.ObjectId == "chest", steps);
+
+    /// <summary>The villager's talk (<see cref="BelowVillager"/>) runs these steps instead of its line.</summary>
+    public static ContentCatalog WithVillagerSaying(ContentCatalog catalog, params EventStep[] steps) =>
+        WithEventSaying(catalog, placed => placed.Uid == "villager_1", steps);
+
+    private static ContentCatalog WithEventSaying(ContentCatalog catalog, Func<PlacedObject, bool> isTheOne, EventStep[] steps)
     {
         var start = catalog.Maps["start"];
         var objects = start.Layout.Objects
-            .Select(placed => placed.ObjectId == "chest"
+            .Select(placed => isTheOne(placed)
                 ? placed with { Events = [placed.Events[0] with { IsOnce = false, Steps = steps }] }
                 : placed)
             .ToList();

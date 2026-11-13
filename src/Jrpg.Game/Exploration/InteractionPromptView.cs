@@ -23,6 +23,7 @@ internal sealed class InteractionPromptView
     private readonly SpriteFontBase _font;
     private readonly Func<PlacedObject, ObjectDefinition> _currentDefinitionOf;
     private readonly IReadOnlyDictionary<string, FieldSpriteSheet> _sprites;
+    private readonly Func<PlacedObject, NpcPose> _npcPoseOf;
     private readonly PromptFade _fade = new();
     private readonly PanelView _pill = new(UiTheme.PromptPanel);
     private readonly PanelView _keyCap = new(UiTheme.KeyCap);
@@ -36,14 +37,20 @@ internal sealed class InteractionPromptView
     /// <param name="text">The fonts.</param>
     /// <param name="currentDefinitionOf">What an object is now, after any swap, for the prompt's place over it.</param>
     /// <param name="sprites">Every field sprite's record, for the drawn height of an NPC the prompt sits over.</param>
+    /// <param name="npcPoseOf">
+    /// Where any object stands now (a chest's pose is its placed cell): an NPC walked by a cutscene is prompted at the
+    /// cell where its walk ended.
+    /// </param>
     public InteractionPromptView(
         ScreenText text,
         Func<PlacedObject, ObjectDefinition> currentDefinitionOf,
-        IReadOnlyDictionary<string, FieldSpriteSheet> sprites)
+        IReadOnlyDictionary<string, FieldSpriteSheet> sprites,
+        Func<PlacedObject, NpcPose> npcPoseOf)
     {
         _font = text.Fonts.FontAt(UiTheme.PromptTextPixels);
         _currentDefinitionOf = currentDefinitionOf;
         _sprites = sprites;
+        _npcPoseOf = npcPoseOf;
     }
 
     /// <summary>Fades toward the target; measures the key and the prompt again only when what's shown or the device changed.</summary>
@@ -84,7 +91,8 @@ internal sealed class InteractionPromptView
             return;
         }
 
-        var area = ObjectScreenArea.Of(_measured.Placed, _currentDefinitionOf(_measured.Placed), _sprites, cameraOrigin);
+        var placed = _measured.Placed;
+        var area = ObjectScreenArea.Of(_npcPoseOf(placed).Position, _currentDefinitionOf(placed), _sprites, cameraOrigin);
         var box = PromptPlacement.BoxFor(area, _boxSize);
         _pill.Draw(batch, textures, box, opacity);
         var keyCap = new Rectangle(box.X + UiTheme.PromptPadding.X, box.Y + UiTheme.PromptPadding.Y, _keyCapWidth, _font.LineHeight);

@@ -10,8 +10,8 @@ namespace Jrpg.Game.Exploration;
 
 /// <summary>
 /// Draws one map's tile layers, only the cells on screen, and its placed objects as they are now (an opened door draws
-/// open), an NPC facing what Core says (ADR 0044). It holds the time its animated tiles show (decision 464): from zero
-/// on entering the map, moved on by the scene.
+/// open), an NPC where Core says it stands or walks, facing as it says, on its walk frame while it walks (ADR 0044). It
+/// holds the time its animated tiles show (decision 464): from zero on entering the map, moved on by the scene.
 /// </summary>
 internal sealed class MapView(
     MapLayout layout,
@@ -58,24 +58,21 @@ internal sealed class MapView(
     }
 
     /// <summary>
-    /// Draws a placed object at its position, as seen from the camera's <paramref name="origin"/>: its tiles, or an
-    /// NPC's standing frame from its sheet's record, standing on its cell (ADR 0043).
+    /// Draws a placed object as seen from the camera's <paramref name="origin"/>: its tiles at its position, or an NPC
+    /// where Core says it stands or walks, on its sheet's standing or walk frame (ADR 0043, ADR 0044).
     /// </summary>
     public void DrawObject(SpriteBatch batch, TextureLibrary textures, PlacedObject placed, Vector2 origin)
     {
         var definition = currentDefinitionOf(placed);
-        var area = ObjectScreenArea.Of(placed, definition, art.FieldSprites, origin);
-        if (!IsOnScreen(area))
+        if (definition.FieldSpriteFile is not null)
         {
+            DrawNpc(batch, textures, placed, origin);
             return;
         }
 
-        // An NPC stands on its sheet's standing frame, facing what Core says it faces (ADR 0044).
-        if (definition.FieldSpriteFile is { } spriteFile)
+        var area = ObjectScreenArea.Of(placed.Position, definition, art.FieldSprites, origin);
+        if (!IsOnScreen(area))
         {
-            var sheet = art.FieldSprites[spriteFile];
-            var source = FieldSpriteFrame.SourceOf(sheet, sheet.StandingCell(npcPoseOf(placed).Facing));
-            batch.Draw(textures.Get(ArtFolders.FieldSprites, sheet.File), area, source, Color.White);
             return;
         }
 
@@ -94,11 +91,28 @@ internal sealed class MapView(
     /// </summary>
     public void DrawCanopy(SpriteBatch batch, Texture2D canopy, PlacedObject placed, Vector2 origin)
     {
-        var area = ObjectScreenArea.Of(placed, currentDefinitionOf(placed), art.FieldSprites, origin);
+        var area = ObjectScreenArea.Of(placed.Position, currentDefinitionOf(placed), art.FieldSprites, origin);
         if (IsOnScreen(area))
         {
             batch.Draw(canopy, area, Color.White);
         }
+    }
+
+    // The walk frame runs while a cutscene moves the NPC; standing, it shows its facing's standing frame. Only called
+    // for an object whose definition names a field sprite.
+    private void DrawNpc(SpriteBatch batch, TextureLibrary textures, PlacedObject placed, Vector2 origin)
+    {
+        var pose = npcPoseOf(placed);
+        var definition = currentDefinitionOf(placed);
+        var area = ObjectScreenArea.Of(pose.Position, definition, art.FieldSprites, origin);
+        if (!IsOnScreen(area))
+        {
+            return;
+        }
+
+        var sheet = art.FieldSprites[definition.FieldSpriteFile!];
+        var cell = pose.IsWalking ? sheet.WalkCellAt(pose.Facing, pose.Walked) : sheet.StandingCell(pose.Facing);
+        batch.Draw(textures.Get(ArtFolders.FieldSprites, sheet.File), area, FieldSpriteFrame.SourceOf(sheet, cell), Color.White);
     }
 
     private static bool IsOnScreen(Rectangle area) =>

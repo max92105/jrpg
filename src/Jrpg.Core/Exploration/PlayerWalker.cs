@@ -75,7 +75,7 @@ internal sealed class PlayerWalker(Point2D position, Facing facing, ExplorationR
     private bool TryMoveBy(Point2D step, MapCollision collision)
     {
         var target = collision.KeepOnMap(new Point2D(Position.X + step.X, Position.Y + step.Y), rules.PlayerRadius);
-        if (!collision.CanStandAt(target, rules.PlayerRadius))
+        if (!collision.CanMoveTo(Position, target, rules.PlayerRadius))
         {
             return false;
         }

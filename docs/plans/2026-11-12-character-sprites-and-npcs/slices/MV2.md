@@ -33,3 +33,5 @@ A `moveNpc` step can be written in a map's events and is checked at load; in the
 4. Leave the map and come back: it stands at its placed cell.
 5. Put the step after a still in a cutscene, skip the still: the NPC appears at its path's end.
 6. Revert with `git checkout -- content`.
+
+- **Done, with deviations:** the validator skips the null-entry and unknown-direction checks, since the content serializer refuses both for an enum list before the validator runs; the "through a wall" test is a "through an object" one, as the validator reads no tiles; a `moveNpc` after a `warp` in the same event is refused (the run keeps the map it started on, MV1's review); `ActiveMap.PositionOf` came back with its callers; `MapView.DrawNpc` draws the NPC at its pose; `StartMapScenarios.WithVillagerSaying` beside the chest's. The review found a walk ending on the player would trap them: decision 593, `MapCollision.CanMoveTo(from, to, radius)` lets a body leave a polygon already holding it, with a walker test.

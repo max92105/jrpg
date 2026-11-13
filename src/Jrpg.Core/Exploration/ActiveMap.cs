@@ -21,6 +21,13 @@ internal sealed class ActiveMap(
     public MapDefinition Definition { get; } = definition;
 
     /// <summary>
+    /// Where a placed object stands now, for collision and interaction: a walked NPC where its walk took it, else where
+    /// it was placed (decision 574).
+    /// </summary>
+    public Point2D PositionOf(PlacedObject placed) =>
+        _walks.TryGetValue(placed.Uid, out var walk) ? walk.Position : placed.Position;
+
+    /// <summary>
     /// An NPC's pose before the facing rule: its walk's, or standing where it was placed, facing as placed.
     /// </summary>
     public NpcPose PoseOf(PlacedObject placed) =>

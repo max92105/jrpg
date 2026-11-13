@@ -77,6 +77,30 @@ public sealed class InteractionFinderTests
         Assert.Equal("chest_1", triggered?.Event.Id);
     }
 
+    // A walked NPC is talked to where its walk ended (decision 574): one cell left of its placed cell here.
+    [Fact]
+    public void FindInFront_NpcAtItsWalkEnd_IsFound()
+    {
+        var talk = new MapEventBuilder().WithId("guard_0").WithSteps(_look).Build();
+        var finder = new InteractionFinder(WithGuardWalkedLeft(talk), _rules, "sarxian");
+        var belowTheEnd = new Point2D(1.5, 2.5);
+
+        var triggered = finder.FindInFront(belowTheEnd, Facing.Up, EventActivation.Interact);
+
+        Assert.Equal(talk, triggered?.Event);
+    }
+
+    [Fact]
+    public void FindInFront_NpcWalkedAway_ReturnsNull()
+    {
+        var map = WithGuardWalkedLeft(new MapEventBuilder().WithId("guard_0").WithSteps(_look).Build());
+        var finder = new InteractionFinder(map, _rules, "sarxian");
+
+        var triggered = finder.FindInFront(_belowChest, Facing.Up, EventActivation.Interact);
+
+        Assert.Null(triggered);
+    }
+
     [Fact]
     public void FindInFront_OnlyWhenObjectNotCurrent_ReturnsNull()
     {
@@ -91,4 +115,13 @@ public sealed class InteractionFinderTests
 
     private static ActiveMap MapWith(ObjectDefinition definition, params MapEvent[] events) =>
         new ActiveMapBuilder().WithRows("111", "111", "111").WithObject(definition, new Point2D(2, 1), events).Build();
+
+    // The guard stands where the chest would, at (2, 1), and walks one cell left to (1, 1).
+    private static ActiveMap WithGuardWalkedLeft(MapEvent talk)
+    {
+        var map = MapWith(_chest with { Id = "guard", FieldSpriteFile = "guard.png" }, talk);
+        map.StartWalk(map.Definition.Layout.Objects[0], new MoveNpcStep("guard_0", [Facing.Left]));
+        map.FinishWalks();
+        return map;
+    }
 }

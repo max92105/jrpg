@@ -69,6 +69,8 @@ internal sealed class ExplorationScene : IScene
         _sounds.Clear();
         // First, so the animated tiles move on whatever the update then does: an event, an encounter's pause, a warp.
         _view.Advance(delta);
+        // The cutscene walks too: once the moved NPC arrives, Core goes on to the step the presenter then shows.
+        _exploration.AdvanceNpcWalks(delta);
         var request = UpdateExploration(delta, input);
         var isBusy = _presenter.IsBusy;
         _overlays.Prompt.Update(isBusy ? null : _exploration.InteractionInFront, input.Device, delta);

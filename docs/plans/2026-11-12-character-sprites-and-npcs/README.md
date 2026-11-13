@@ -13,7 +13,7 @@ This plan comes first; [`2026-11-12-shops-and-enemy-database`](../2026-11-12-sho
 
 Builds on ADR 0006 (map event flow), ADR 0009 (art folders), ADR 0011 (content the only source of truth), ADR 0012 and 0014 (editor, catalog undo), ADR 0015 (an NPC is an object with a field sprite: kept, amended), ADR 0016 (cutscenes as map events, skipping presentation steps), ADR 0037 (the frozen test world), ADR 0038 (art sources), ADR 0039 (a frame count and a time, rightward: reused for the walk), ADR 0041 (one draw order).
 
-- Numbers: decisions 559-579, ADRs 0043 and 0044.
+- Numbers: decisions 559-579 and 593, ADRs 0043 and 0044.
 - Core: `Sprites/` (new folder: a sheet's layout as content), `Geometry/Facings`, `Events/MoveNpcStep`, `Exploration/NpcFacing`, `NpcWalk`, `NpcPose`, `Maps/PlacedObject.Facing`. No save format change (design.md, "Saves").
 
 ## Goal
@@ -91,7 +91,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **NB2. Each placed NPC's standing facing: `PlacedObject.Facing` in the layout file, refused on a non-NPC** (Core + Data + Game, about 170 lines) → [slices/NB2.md](slices/NB2.md)
 - [x] **NB3. The placed facing in the editor: a Facing box in the Placed object panel** (Editor, about 190 lines) → [slices/NB3.md](slices/NB3.md)
 - [x] **MV1. The `moveNpc` step in Core: an NPC walks its path cell by cell for the visit, the event waiting until it arrives** (Core, about 260 lines) → [slices/MV1.md](slices/MV1.md)
-- [ ] **MV2. The step in content and on screen: Data's rules, the NPC drawn walking at its runtime position, the prompt and collision following it** (Data + Game, about 240 lines) → [slices/MV2.md](slices/MV2.md)
+- [x] **MV2. The step in content and on screen: Data's rules, the NPC drawn walking at its runtime position, the prompt and collision following it** (Data + Game, about 240 lines) → [slices/MV2.md](slices/MV2.md)
 - [ ] **MV3. The step in the editor: the NPC picked from the map, the path built from direction buttons** (Editor, about 210 lines) → [slices/MV3.md](slices/MV3.md)
 
 ## Later (not in this plan)
@@ -119,6 +119,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - 577: what an NPC faces, first rule that applies: its walk's step while walking; the player while its own event runs; its last walk's facing this visit; its placed facing.
 - 578: the path is relative to where the NPC stands; it is checked at load from the placed cell: from 1 to 64 steps, every cell on the map (walls allowed), the uid a field-sprite object on the same map; at run time a step that would leave the map is dropped.
 - 579: the editor builds the path with four direction buttons and Remove last, the path shown as text ("left, left, down").
+- 593 (MV2, from the review): a collision polygon already holding the player's center never refuses their step, so a cutscene walk that ends on the player leaves them free to walk out; `MapCollision.CanMoveTo(from, to, radius)` replaces `CanStandAt`.
 
 ## Open design questions (developer decides)
 None left: every question was answered at approval.

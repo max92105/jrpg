@@ -1,4 +1,5 @@
 using Jrpg.Core.Geometry;
+using Jrpg.Core.Maps;
 
 namespace Jrpg.Core.Exploration;
 
@@ -6,11 +7,13 @@ namespace Jrpg.Core.Exploration;
 internal sealed class MapCollision(ActiveMap map)
 {
     /// <summary>
-    /// A body is a square of half-width <paramref name="radius"/>. It fits when every cell under the square is
-    /// walkable and its center is outside every object's collision polygon. Only the center is tested
-    /// against polygons (placeholder rule).
+    /// A body is a square of half-width <paramref name="radius"/>. It may step from <paramref name="from"/> to
+    /// <paramref name="to"/> when every cell under the square there is walkable and its center enters no object's
+    /// collision polygon. Only the center is tested against polygons (placeholder rule), and a polygon already holding
+    /// the center never refuses the step (decision 593): a cutscene walk that ends on the player leaves them free to
+    /// walk out of it.
     /// </summary>
-    public bool CanStandAt(Point2D center, double radius) => AreCellsWalkable(center, radius) && !IsInsideAnObject(center);
+    public bool CanMoveTo(Point2D from, Point2D to, double radius) => AreCellsWalkable(to, radius) && !EntersAnObject(from, to);
 
     /// <summary>The nearest point where the whole body is on the map.</summary>
     public Point2D KeepOnMap(Point2D center, double radius)
@@ -43,7 +46,7 @@ internal sealed class MapCollision(ActiveMap map)
         return true;
     }
 
-    private bool IsInsideAnObject(Point2D center)
+    private bool EntersAnObject(Point2D from, Point2D to)
     {
         var placedObjects = map.Definition.Layout.Objects;
         for (var index = 0; index < placedObjects.Count; index++)
@@ -55,17 +58,22 @@ internal sealed class MapCollision(ActiveMap map)
                 continue;
             }
 
-            // Polygon points are fractions of the object's size, measured from its top-left corner.
-            var local = new Point2D(
-                (center.X - placed.Position.X) / definition.Width,
-                (center.Y - placed.Position.Y) / definition.Height);
-            var isWithinBounds = local.X is >= 0 and <= 1 && local.Y is >= 0 and <= 1;
-            if (isWithinBounds && Polygon.Contains(definition.CollisionPolygon, local))
+            // Where the object stands now: a walked NPC blocks at its walk's end (decision 574).
+            var position = map.PositionOf(placed);
+            if (Holds(definition, position, to) && !Holds(definition, position, from))
             {
                 return true;
             }
         }
 
         return false;
+    }
+
+    // Polygon points are fractions of the object's size, measured from its top-left corner.
+    private static bool Holds(ObjectDefinition definition, Point2D topLeft, Point2D point)
+    {
+        var local = new Point2D((point.X - topLeft.X) / definition.Width, (point.Y - topLeft.Y) / definition.Height);
+        var isWithinBounds = local.X is >= 0 and <= 1 && local.Y is >= 0 and <= 1;
+        return isWithinBounds && Polygon.Contains(definition.CollisionPolygon, local);
     }
 }

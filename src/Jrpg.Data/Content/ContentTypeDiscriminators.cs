@@ -30,6 +30,7 @@ internal static class ContentTypeDiscriminators
                 new JsonDerivedType(typeof(CompleteQuestStep), "completeQuest"),
                 new JsonDerivedType(typeof(DialogueStep), "dialogue"),
                 new JsonDerivedType(typeof(GiveItemStep), "giveItem"),
+                new JsonDerivedType(typeof(MoveNpcStep), "moveNpc"),
                 new JsonDerivedType(typeof(OpenForgeStep), "openForge"),
                 new JsonDerivedType(typeof(OpenShopStep), "openShop"),
                 new JsonDerivedType(typeof(RecruitStep), "recruit"),

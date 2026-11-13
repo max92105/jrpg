@@ -28,8 +28,9 @@ internal sealed class InteractionFinder(ActiveMap map, ExplorationRules rules, s
                 continue;
             }
 
+            // Reached where it stands now: a walked NPC talks at its walk's end (decision 574).
             var definition = map.CurrentDefinitionOf(placed);
-            if (!IsReached(probe, placed, definition))
+            if (!IsReached(probe, map.PositionOf(placed), definition))
             {
                 continue;
             }
@@ -47,9 +48,9 @@ internal sealed class InteractionFinder(ActiveMap map, ExplorationRules rules, s
         return null;
     }
 
-    private static bool IsReached(Point2D probe, PlacedObject placed, ObjectDefinition definition) =>
-        probe.X >= placed.Position.X - InteractMargin && probe.X <= placed.Position.X + definition.Width + InteractMargin
-        && probe.Y >= placed.Position.Y - InteractMargin && probe.Y <= placed.Position.Y + definition.Height + InteractMargin;
+    private static bool IsReached(Point2D probe, Point2D topLeft, ObjectDefinition definition) =>
+        probe.X >= topLeft.X - InteractMargin && probe.X <= topLeft.X + definition.Width + InteractMargin
+        && probe.Y >= topLeft.Y - InteractMargin && probe.Y <= topLeft.Y + definition.Height + InteractMargin;
 
     private Point2D ProbeInFront(Point2D position, Facing facing)
     {

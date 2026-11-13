@@ -71,7 +71,7 @@ internal sealed class SceneFactory
             _art,
             new EventPresenter(exploration, new EventLook(_text, _ui), _settings, Audio.Voice),
             new FieldOverlays(
-                new InteractionPromptView(_text, exploration.CurrentDefinitionOf, _art.FieldSprites),
+                new InteractionPromptView(_text, exploration.CurrentDefinitionOf, _art.FieldSprites, exploration.NpcPoseOf),
                 banner,
                 new MapBannerView(_text, _ui, banner)));
     }

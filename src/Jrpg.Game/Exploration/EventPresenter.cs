@@ -112,7 +112,7 @@ internal sealed class EventPresenter
         FollowScreenStep(step);
         switch (step)
         {
-            case null or OpenForgeStep or OpenShopStep:
+            case null or OpenForgeStep or OpenShopStep or MoveNpcStep:
                 break;
             case WarpStep:
                 ShowWarp();

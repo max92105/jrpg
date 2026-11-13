@@ -1,6 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Exploration;
 using Jrpg.Core.Geometry;
+using Jrpg.Core.Maps;
 using Jrpg.Core.Tests.Builders;
 
 namespace Jrpg.Core.Tests.Exploration;
@@ -69,6 +70,29 @@ public sealed class PlayerWalkerTests
 
         Assert.Equal(0.85, walker.Position.X, Precision);
         Assert.Equal(0.5 + (0.3 / Math.Sqrt(2)), walker.Position.Y, Precision);
+    }
+
+    // A cutscene walk ended on the player (decision 593): the player walks out of the NPC's outline, step by step.
+    [Fact]
+    public void Walk_FromInsideAnObjectOutline_WalksOut()
+    {
+        var wall = new ObjectDefinition
+        {
+            Id = "wall",
+            Width = 1,
+            Height = 1,
+            CollisionPolygon = [new(0, 0), new(1, 0), new(1, 1), new(0, 1)],
+            Category = "test",
+            Tiles = [],
+            AbovePlayerZones = [],
+        };
+        var collision = new MapCollision(new ActiveMapBuilder().WithRows("1111").WithObject(wall, new Point2D(1, 0)).Build());
+        var walker = new PlayerWalker(new Point2D(1.5, 0.5), Facing.Down, _rules);
+
+        walker.Walk(MoveIntent.FromAxes(1, 0), _halfSecond, collision);
+
+        Assert.Equal(3, walker.Position.X, Precision);
+        Assert.Equal(0.5, walker.Position.Y);
     }
 
     [Fact]

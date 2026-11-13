@@ -27,18 +27,26 @@ internal sealed partial class MainWindow
         }
     }
 
-    private void OnEditDropTablesClicked(object sender, RoutedEventArgs e)
+    private void OnEditDropTablesClicked(object sender, RoutedEventArgs e) => _ = EditDropTables(this, "");
+
+    // The Drop tables window over the owner, on the chosen table; its OK applies its own undo step at once, so a window
+    // under it can take the new tables (decision 602). Returns whether it applied.
+    private bool EditDropTables(Window owner, string chosenTableId)
     {
         if (_viewModel.DropTableEditing is not { } dropTableEditing)
         {
-            return;
+            return false;
         }
 
         var edited = dropTableEditing.Start();
-        if (new DropTableCatalogWindow(edited) { Owner = this }.ShowDialog() == true)
+        edited.ChooseTable(chosenTableId);
+        if (new DropTableCatalogWindow(edited) { Owner = owner }.ShowDialog() != true)
         {
-            dropTableEditing.Apply(edited);
+            return false;
         }
+
+        dropTableEditing.Apply(edited);
+        return true;
     }
 
     private void OnEditEnemiesClicked(object sender, RoutedEventArgs e)
@@ -52,7 +60,14 @@ internal sealed partial class MainWindow
         var window = new EnemyCatalogWindow(
             edited,
             _viewModel.ImportArtImages,
-            file => SpriteImageFile.LoadFrom(_viewModel.ArtRoot, ArtFolders.Battlers, file))
+            file => SpriteImageFile.LoadFrom(_viewModel.ArtRoot, ArtFolders.Battlers, file),
+            (owner, tableId) =>
+            {
+                if (EditDropTables(owner, tableId))
+                {
+                    enemyEditing.RefreshDropTables(edited);
+                }
+            })
         {
             Owner = this,
         };

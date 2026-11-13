@@ -206,6 +206,27 @@ public sealed class DropTableCatalogViewModelTests
         Assert.Equal(new DropTable("slime_drops", [new DropEntry("potion", 10)]), catalog.ToTables()[^1]);
     }
 
+    [Fact]
+    public void ChooseTable_KnownId_ChoosesIt()
+    {
+        var catalog = new DropTableCatalogViewModel(WithTables(_spare, _wolfDrops));
+
+        catalog.ChooseTable("wolf_drops");
+
+        Assert.Equal("wolf_drops", catalog.SelectedTable!.Id);
+    }
+
+    // An enemy with no table passes "": the window opens on its first table, as from the menu.
+    [Fact]
+    public void ChooseTable_EmptyId_KeepsTheFirst()
+    {
+        var catalog = new DropTableCatalogViewModel(WithTables(_spare, _wolfDrops));
+
+        catalog.ChooseTable("");
+
+        Assert.Equal("spare", catalog.SelectedTable!.Id);
+    }
+
     // No enemy: "Rolled by" sees only what a test gives it, never the repository's enemies.
     private static ContentCatalog WithTables(params DropTable[] tables) =>
         _testWorld with

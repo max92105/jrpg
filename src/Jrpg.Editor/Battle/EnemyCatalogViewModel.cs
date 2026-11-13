@@ -16,11 +16,12 @@ namespace Jrpg.Editor.Battle;
 /// Every enemy as the Enemies window edits it (ADR 0045): the draft's enemies in id order, the ones added this session
 /// after them; Add starts from the tunable defaults, Duplicate from the chosen one (decision 585); only an added one
 /// can be removed, since encounters name a saved one (decision 581). <see cref="Problem"/> is an enemy's own problem
-/// first, then Data's message for the whole list (decision 580).
+/// first, then Data's message for the whole list (decision 580). The draft's drop tables are taken again after a Drop
+/// tables window opened from this one applies (decision 602).
 /// </summary>
 internal sealed partial class EnemyCatalogViewModel : ObservableObject
 {
-    private readonly ContentCatalog _content;
+    private ContentCatalog _content;
 
     /// <param name="content">
     /// The draft as it is: the enemies edited, and the skills and drop tables they may name.
@@ -46,7 +47,7 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject
     public IReadOnlyList<DamageType> DamageTypes { get; } = Enum.GetValues<DamageType>();
 
     /// <summary>The drop tables an enemy may roll, the empty one for none first, then the draft's by id.</summary>
-    public IReadOnlyList<string> DropTableChoices { get; }
+    public ObservableCollection<string> DropTableChoices { get; }
 
     /// <summary>
     /// The three art folders' files, refreshed after an import; which of an enemy's pictures are missing.
@@ -83,6 +84,23 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject
 
         ArtChoices.Refresh();
         SelectedEnemy!.Art.Pick(artFolder, file);
+    }
+
+    /// <summary>
+    /// After a Drop tables window opened from this one applied its step (decision 602): the box offers every table the
+    /// draft now holds, each new one inserted at its place in id order so no enemy's box loses its choice, and the
+    /// problem line checks the enemies against them.
+    /// </summary>
+    /// <param name="current">The draft as the Drop tables window left it.</param>
+    public void TakeDropTables(ContentCatalog current)
+    {
+        _content = current;
+        foreach (var id in current.DropTables.Keys.Where(id => !DropTableChoices.Contains(id)))
+        {
+            DropTableChoices.Insert(DropTableChoices.Count(choice => string.CompareOrdinal(choice, id) < 0), id);
+        }
+
+        RaiseProblemChanged();
     }
 
     /// <exception cref="InvalidOperationException">

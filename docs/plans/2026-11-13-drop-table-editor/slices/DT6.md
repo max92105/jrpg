@@ -33,3 +33,5 @@ In the Enemies window's Stats tab, an **Edit...** button beside the Drop table b
 5. Cancel path: **Database > Enemies...**, **Edit...**, add table `bat_loot` with one entry, **OK**, then **Cancel** the Enemies window: **Database > Drop tables...** still lists `bat_loot` (its own OK applied it); **Ctrl+Z** removes it.
 6. Focus: with the Drop tables window open over the Enemies window, click the main window: the Drop tables window stays in front; closing it (OK or Cancel) returns to the Enemies window, not the map.
 7. Revert with `git checkout -- content` if this was saved only as a check.
+
+- **Done, with deviations:** the ChooseTable tests use the DT4 file's `spare` and `wolf_drops` tables, not `alpha` and `zeta`. The Enemies window's callback is a lambda in `MainWindow.Database.cs` that calls `EditDropTables` and then `RefreshDropTables`, as planned.

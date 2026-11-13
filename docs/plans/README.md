@@ -15,7 +15,7 @@ Older plans are single files with the same sections.
 
 | Plan | Status |
 |---|---|
-| [2026-11-13-drop-table-editor](2026-11-13-drop-table-editor/README.md) | approved |
+| [2026-11-13-drop-table-editor](2026-11-13-drop-table-editor/README.md) | retro pending |
 | [2026-11-12-character-sprites-and-npcs](done/2026-11-12-character-sprites-and-npcs/README.md) | done |
 | [2026-11-12-shops-and-enemy-database](done/2026-11-12-shops-and-enemy-database/README.md) | done |
 | [2026-11-11-code-health-cleanup](done/2026-11-11-code-health-cleanup/README.md) | done |

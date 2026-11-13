@@ -17,6 +17,7 @@ internal sealed partial class EnemyCatalogWindow : Window
     private readonly EnemyCatalogViewModel _enemies;
     private readonly Func<string, IReadOnlyList<string>, SheetImportResult> _import;
     private readonly Func<string, BitmapSource?> _battlerImageOf;
+    private readonly Action<Window, string> _editDropTables;
     private EnemyArtViewModel? _watchedArt;
 
     /// <param name="enemies">The window's state.</param>
@@ -24,14 +25,19 @@ internal sealed partial class EnemyCatalogWindow : Window
     /// Copies chosen images into an art folder, by folder name, and says what it did (the shell's import).
     /// </param>
     /// <param name="battlerImageOf">A battle sprite read whole by file name; null when the folder lacks it.</param>
+    /// <param name="editDropTables">
+    /// Opens the Drop tables window over the given window on the given table id, and takes the draft's tables back when
+    /// its OK applied (decision 602).
+    /// </param>
     public EnemyCatalogWindow(
         EnemyCatalogViewModel enemies,
         Func<string, IReadOnlyList<string>, SheetImportResult> import,
-        Func<string, BitmapSource?> battlerImageOf)
+        Func<string, BitmapSource?> battlerImageOf,
+        Action<Window, string> editDropTables)
     {
         InitializeComponent();
         DataContext = _enemies = enemies;
-        (_import, _battlerImageOf) = (import, battlerImageOf);
+        (_import, _battlerImageOf, _editDropTables) = (import, battlerImageOf, editDropTables);
         enemies.PropertyChanged += OnEnemiesChanged;
         enemies.ArtChoices.PropertyChanged += (_, _) => ShowArt();
         WatchChosenArt(null);
@@ -98,6 +104,10 @@ internal sealed partial class EnemyCatalogWindow : Window
         ImportStatusText.Text = result.Summary;
         _enemies.TakeImport(artFolder, result);
     }
+
+    // The button sits in the chosen enemy's panel, greyed while none is chosen.
+    private void OnEditDropTablesClicked(object sender, RoutedEventArgs e) =>
+        _editDropTables(this, _enemies.SelectedEnemy!.DropTableId);
 
     // OK is greyed while a problem shows, so a click always applies.
     private void OnOkClicked(object sender, RoutedEventArgs e) => DialogResult = true;

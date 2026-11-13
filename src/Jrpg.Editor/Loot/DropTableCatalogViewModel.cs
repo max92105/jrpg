@@ -90,6 +90,18 @@ internal sealed partial class DropTableCatalogViewModel : ObservableObject
     public IReadOnlyList<DropTable> ToTables() =>
         Problem is { } problem ? throw new InvalidOperationException(problem) : [.. Tables.Select(table => table.ToTable())];
 
+    /// <summary>
+    /// Chooses the table with that id, the enemy's when the window opens from the Enemies window's Edit...; the first
+    /// stays chosen when no table has it (an enemy with none passes "").
+    /// </summary>
+    public void ChooseTable(string id)
+    {
+        if (Tables.FirstOrDefault(table => table.Id == id) is { } table)
+        {
+            SelectedTable = table;
+        }
+    }
+
     /// <summary>Adds a table with nothing typed yet, last, and chooses it, so its id is the next thing typed.</summary>
     [RelayCommand]
     private void AddTable()

@@ -36,3 +36,5 @@ A drop table read from its record into boxes and built back: its id (typed only 
 
 ## Verify by hand
 None: no window yet (DT5).
+
+- **Done, with deviations:** the tests build their own items and a four-entry table (`DropTableFixtures`) instead of the repository's goblin table, which is live content; an entry naming an item the content lacks shows by its id (tested); `ToTable_Unchanged_EqualsTheTable` pins the round trip.

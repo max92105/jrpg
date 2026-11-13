@@ -8,6 +8,7 @@ using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
 using Jrpg.Data.Audio;
 using Jrpg.Data.Content;
+using Jrpg.Editor.Battle;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Events;
 using Jrpg.Editor.Maps;
@@ -91,6 +92,7 @@ internal sealed partial class MainViewModel : ObservableObject
             };
             QuestEditing = new QuestEditingViewModel(Content);
             ShopEditing = new ShopEditingViewModel(Content);
+            EnemyEditing = new EnemyEditingViewModel(Content, folder => ArtFolders.ImagesIn(ArtRoot, folder));
             FieldSpriteEditing = CreateFieldSpriteEditing();
             NpcSpriteChange = new NpcSpriteChange(Content, Placing.Browser);
             if (MapIds.Count > 0)

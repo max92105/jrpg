@@ -1,0 +1,197 @@
+<Window x:Class="Jrpg.Editor.Battle.EnemyCatalogWindow"
+        x:ClassModifier="internal"
+        Style="{StaticResource EditorWindow}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:art="clr-namespace:Jrpg.Data.Art;assembly=Jrpg.Data"
+        Title="Enemies"
+        Width="860"
+        Height="660"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+  <Window.Resources>
+    <!-- The panel over the chosen enemy is greyed while none is chosen, so nothing typed is lost. -->
+    <Style x:Key="EnabledWhenChosen" TargetType="Panel">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding}" Value="{x:Null}">
+          <Setter Property="IsEnabled" Value="False" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+    <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Setter Property="Width" Value="150" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="NumberBox" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+      <Setter Property="Width" Value="70" />
+      <Setter Property="Margin" Value="0,2,0,2" />
+    </Style>
+  </Window.Resources>
+  <DockPanel Margin="12">
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+      <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked" IsEnabled="{Binding CanApply}" />
+      <Button Content="Cancel" Width="80" Margin="8,0,0,0" IsCancel="True" />
+    </StackPanel>
+    <TextBlock DockPanel.Dock="Bottom" Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Margin="0,8,0,0" Text="{Binding Problem}" />
+
+    <!-- The draft's enemies in id order, the ones added this session after them; only those can be removed. -->
+    <DockPanel DockPanel.Dock="Left" Width="230">
+      <TextBlock DockPanel.Dock="Top" Text="Enemies" FontWeight="Bold" />
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
+        <Button Content="Add" Width="50" Command="{Binding AddEnemyCommand}" />
+        <Button Content="Duplicate" Width="70" Margin="4,0,0,0" Command="{Binding DuplicateEnemyCommand}" ToolTip="A copy of the chosen enemy, tactics and art included; type its id" />
+        <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding RemoveEnemyCommand}" ToolTip="Only an enemy added this session; encounters may name a saved one" />
+      </StackPanel>
+      <ListBox ItemsSource="{Binding Enemies}" SelectedItem="{Binding SelectedEnemy}" DisplayMemberPath="Label" Margin="0,4,0,0" />
+    </DockPanel>
+
+    <!-- The chosen enemy in two tabs: its numbers and rewards, then its pictures. -->
+    <DockPanel Margin="12,0,0,0" DataContext="{Binding SelectedEnemy}" Style="{StaticResource EnabledWhenChosen}">
+      <TabControl>
+        <TabItem Header="Stats">
+          <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="8">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Id" Style="{StaticResource FieldLabel}" />
+                <TextBox Width="220"
+                         Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}"
+                         IsEnabled="{Binding IsNew}"
+                         ToolTip="Lowercase letters, digits and _; fixed once saved, since encounters name it" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                <TextBlock Text="Name" Style="{StaticResource FieldLabel}" />
+                <TextBox Width="220" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+              </StackPanel>
+
+              <!-- The numbers in two columns. -->
+              <Grid Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Max HP" Style="{StaticResource FieldLabel}" />
+                    <TextBox Style="{StaticResource NumberBox}" Text="{Binding MaxHpText, UpdateSourceTrigger=PropertyChanged}" />
+                  </StackPanel>
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Damage" Style="{StaticResource FieldLabel}" />
+                    <TextBox Style="{StaticResource NumberBox}" Text="{Binding DamageText, UpdateSourceTrigger=PropertyChanged}" />
+                  </StackPanel>
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Damage type" Style="{StaticResource FieldLabel}" />
+                    <ComboBox Width="110"
+                              ItemsSource="{Binding DataContext.DamageTypes, RelativeSource={RelativeSource AncestorType=Window}}"
+                              SelectedItem="{Binding DamageType}" />
+                  </StackPanel>
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Accuracy (%)" Style="{StaticResource FieldLabel}" />
+                    <TextBox Style="{StaticResource NumberBox}" Text="{Binding AccuracyText, UpdateSourceTrigger=PropertyChanged}" />
+                  </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="24,0,0,0">
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Dodge (%)" Style="{StaticResource FieldLabel}" />
+                    <TextBox Style="{StaticResource NumberBox}" Text="{Binding DodgeText, UpdateSourceTrigger=PropertyChanged}" />
+                  </StackPanel>
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Crit chance (%)" Style="{StaticResource FieldLabel}" />
+                    <TextBox Style="{StaticResource NumberBox}" Text="{Binding CritChanceText, UpdateSourceTrigger=PropertyChanged}" />
+                  </StackPanel>
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Crowd control resist. (%)" Style="{StaticResource FieldLabel}" />
+                    <TextBox Style="{StaticResource NumberBox}" Text="{Binding CrowdControlResistanceText, UpdateSourceTrigger=PropertyChanged}" />
+                  </StackPanel>
+                  <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Experience" Style="{StaticResource FieldLabel}" />
+                    <TextBox Style="{StaticResource NumberBox}" Text="{Binding ExperienceRewardText, UpdateSourceTrigger=PropertyChanged}" />
+                  </StackPanel>
+                </StackPanel>
+              </Grid>
+
+              <!-- One row per damage type, from Core's list. -->
+              <TextBlock Text="Resistances (%), below 0 a weakness" FontWeight="Bold" Margin="0,10,0,2" />
+              <ItemsControl ItemsSource="{Binding Resistances}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <WrapPanel Width="440" />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Width="110" Margin="0,2,0,2">
+                      <TextBlock Text="{Binding Name}" Width="62" VerticalAlignment="Center" />
+                      <TextBox Width="44" Text="{Binding PercentText, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+
+              <TextBlock Text="Rewards" FontWeight="Bold" Margin="0,10,0,2" />
+              <StackPanel Orientation="Horizontal">
+                <CheckBox Content="Drops gold" Width="150" VerticalAlignment="Center" IsChecked="{Binding HasGold}" />
+                <TextBlock Text="from" VerticalAlignment="Center" Margin="0,0,4,0" />
+                <TextBox Style="{StaticResource NumberBox}" Text="{Binding GoldMinText, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding HasGold}" />
+                <TextBlock Text="to" VerticalAlignment="Center" Margin="6,0,4,0" />
+                <TextBox Style="{StaticResource NumberBox}" Text="{Binding GoldMaxText, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding HasGold}" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                <TextBlock Text="Drop table (empty: none)" Style="{StaticResource FieldLabel}" />
+                <ComboBox Width="180"
+                          ItemsSource="{Binding DataContext.DropTableChoices, RelativeSource={RelativeSource AncestorType=Window}}"
+                          SelectedItem="{Binding DropTableId}" />
+              </StackPanel>
+              <CheckBox Content="Boss: the party can't run" Margin="0,6,0,0" IsChecked="{Binding IsBoss}" />
+              <TextBlock Text="{Binding TacticsSummary}" Foreground="{StaticResource MutedTextBrush}" Margin="0,10,0,0" TextWrapping="Wrap" />
+            </StackPanel>
+          </ScrollViewer>
+        </TabItem>
+
+        <TabItem Header="Art">
+          <DockPanel Margin="8">
+            <StackPanel DockPanel.Dock="Top">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Battle sprite" Style="{StaticResource FieldLabel}" />
+                <ComboBox Width="220"
+                          IsEditable="True"
+                          ItemsSource="{Binding DataContext.ArtChoices.Battlers, RelativeSource={RelativeSource AncestorType=Window}}"
+                          Text="{Binding Art.BattleSpriteFile, UpdateSourceTrigger=PropertyChanged}" />
+                <Button Content="Import..." Width="70" Margin="6,0,0,0" Tag="{x:Static art:ArtFolders.Battlers}" Click="OnImportClicked" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                <TextBlock Text="Portrait" Style="{StaticResource FieldLabel}" />
+                <ComboBox Width="220"
+                          IsEditable="True"
+                          ItemsSource="{Binding DataContext.ArtChoices.Portraits, RelativeSource={RelativeSource AncestorType=Window}}"
+                          Text="{Binding Art.PortraitFile, UpdateSourceTrigger=PropertyChanged}" />
+                <Button Content="Import..." Width="70" Margin="6,0,0,0" Tag="{x:Static art:ArtFolders.Portraits}" Click="OnImportClicked" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                <TextBlock Text="Attack effect strip" Style="{StaticResource FieldLabel}" />
+                <ComboBox Width="220"
+                          IsEditable="True"
+                          ItemsSource="{Binding DataContext.ArtChoices.Effects, RelativeSource={RelativeSource AncestorType=Window}}"
+                          Text="{Binding Art.AttackEffectFile, UpdateSourceTrigger=PropertyChanged}" />
+                <Button Content="Import..." Width="70" Margin="6,0,0,0" Tag="{x:Static art:ArtFolders.Effects}" Click="OnImportClicked" />
+              </StackPanel>
+              <CheckBox Content="Flip the battle sprite" Margin="0,6,0,0" IsChecked="{Binding Art.IsSpriteFlipped}" />
+              <TextBlock x:Name="MissingText" Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Margin="0,6,0,0" />
+              <TextBlock x:Name="ImportStatusText" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap" Margin="0,4,0,0" />
+            </StackPanel>
+
+            <!-- The battle sprite fitted to the box, mirrored when flipped; the battle's own scaling isn't the editor's. -->
+            <StackPanel Margin="0,10,0,0" HorizontalAlignment="Left">
+              <Border Width="240" Height="240" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <Image x:Name="BattlerPreview"
+                       Stretch="Uniform"
+                       RenderTransformOrigin="0.5,0.5"
+                       RenderOptions.BitmapScalingMode="NearestNeighbor" />
+              </Border>
+              <TextBlock x:Name="BattlerSizeText" Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0" />
+            </StackPanel>
+          </DockPanel>
+        </TabItem>
+      </TabControl>
+    </DockPanel>
+  </DockPanel>
+</Window>

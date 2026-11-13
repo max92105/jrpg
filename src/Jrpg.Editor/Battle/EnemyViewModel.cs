@@ -137,6 +137,13 @@ internal sealed partial class EnemyViewModel : ObservableObject
     [ObservableProperty]
     public partial bool IsBoss { get; set; }
 
+    /// <summary>
+    /// The Stats tab's line on what no form edits yet (the forms are later work): "Tactics and phases: edited in
+    /// enemies.json (3 actions, 1 phases)".
+    /// </summary>
+    public string TacticsSummary =>
+        $"Tactics and phases: edited in enemies.json ({_original.Tactics.Count} actions, {_original.Phases.Count} phases)";
+
     /// <summary>The list's line: "goblin: Goblin", or a placeholder while a new enemy has no id.</summary>
     public string Label => Id.Length > 0 ? $"{Id}: {Name}" : "(new enemy)";
 

@@ -8,6 +8,7 @@ using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Events;
+using Jrpg.Editor.Tiles;
 
 namespace Jrpg.Editor.Battle;
 
@@ -66,6 +67,23 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject
 
     /// <summary>Whether OK may apply the session: no problem shows.</summary>
     public bool CanApply => Problem is null;
+
+    /// <summary>
+    /// After an Import... beside an art box: the folders are read again, and the last file copied is picked in that box
+    /// for the chosen enemy; nothing picked when nothing was copied.
+    /// </summary>
+    /// <param name="artFolder">The battlers, portraits or effects folder the import went to.</param>
+    /// <param name="result">What the import copied and refused.</param>
+    public void TakeImport(string artFolder, SheetImportResult result)
+    {
+        if (result.LastImported is not { } file)
+        {
+            return;
+        }
+
+        ArtChoices.Refresh();
+        SelectedEnemy!.Art.Pick(artFolder, file);
+    }
 
     /// <exception cref="InvalidOperationException">
     /// There is a <see cref="Problem"/>; the window applies only without one.

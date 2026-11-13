@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Battle;
+using Jrpg.Data.Art;
 
 namespace Jrpg.Editor.Battle;
 
@@ -28,6 +29,28 @@ internal sealed partial class EnemyArtViewModel : ObservableObject
 
     [ObservableProperty]
     public partial bool IsSpriteFlipped { get; set; }
+
+    /// <summary>Puts a file just imported into the box of the folder it went to.</summary>
+    /// <param name="artFolder">The battlers, portraits or effects folder.</param>
+    /// <param name="file">The imported file's name.</param>
+    /// <exception cref="ArgumentException">Another folder: no enemy picture comes from it.</exception>
+    public void Pick(string artFolder, string file)
+    {
+        switch (artFolder)
+        {
+            case ArtFolders.Battlers:
+                BattleSpriteFile = file;
+                break;
+            case ArtFolders.Portraits:
+                PortraitFile = file;
+                break;
+            case ArtFolders.Effects:
+                AttackEffectFile = file;
+                break;
+            default:
+                throw new ArgumentException($"No enemy picture comes from the '{artFolder}' folder.", nameof(artFolder));
+        }
+    }
 
     public void CopyFrom(EnemyArtViewModel chosen)
     {

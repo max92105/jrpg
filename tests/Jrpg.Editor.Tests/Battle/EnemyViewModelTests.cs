@@ -145,4 +145,20 @@ public sealed class EnemyViewModelTests
         Assert.Null(enemy.Problem);
         Assert.Equal(-3, enemy.ToEnemy().Damage);
     }
+
+    // The tests' own tactics and phase over the goblin: three actions, one phase.
+    [Fact]
+    public void TacticsSummary_ThreeActionsOnePhase_CountsThem()
+    {
+        EnemyAction attack = new() { Weight = 1 };
+        var chief = _catalog.Enemies["goblin"] with
+        {
+            Tactics = [attack, attack, attack],
+            Phases = [new EnemyPhase { BelowHpPercent = 50, Tactics = [attack] }],
+        };
+
+        var summary = EnemyViewModel.From(chief).TacticsSummary;
+
+        Assert.Equal("Tactics and phases: edited in enemies.json (3 actions, 1 phases)", summary);
+    }
 }

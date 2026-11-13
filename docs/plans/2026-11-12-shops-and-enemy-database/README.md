@@ -1,5 +1,5 @@
 # Shops and the enemy database
-Status: approved, in progress
+Status: retro pending
 
 Drafted on 2026-11-12 from the developer's request (lightly cleaned up):
 
@@ -66,7 +66,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **EN2. The Enemies window's rules: the list, Add and Duplicate, an enemy's numbers; tactics and phases kept as they are** (Editor, about 220 lines) → [slices/EN2.md](slices/EN2.md)
 - [x] **EN3. Resistances by damage type, gold, drop table and boss** (Editor, about 170 lines) → [slices/EN3.md](slices/EN3.md)
 - [x] **EN6. Enemy art: battle sprite, portrait and attack effect picked or imported** (Editor, about 180 lines) → [slices/EN6.md](slices/EN6.md)
-- [ ] **EN7. The Enemies window: the list, Stats and Art tabs** (Editor, about 220 lines) → [slices/EN7.md](slices/EN7.md)
+- [x] **EN7. The Enemies window: the list, Stats and Art tabs** (Editor, about 220 lines) → [slices/EN7.md](slices/EN7.md)
 
 ## Later (not in this plan; slice files kept as drafts)
 - **EN4, EN5, EN8: the tactics and phases forms** ([EN4](slices/EN4.md), [EN5](slices/EN5.md), [EN8](slices/EN8.md)). Until then tactics and phases are written by hand in `enemies.json`, and the window keeps them as they are.

@@ -5,14 +5,14 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-12-character-sprites-and-npcs, slice NB2 (PlacedObject.Facing, NpcFacing.Of fallback, AbsentWhenNullFilter
-row, MapLayoutValidator.FindFacingProblem). 2026-11-12. Round 1.
-Verdict: ready to commit.
+Plan 2026-11-12-character-sprites-and-npcs, slice NB3 (Facing box in PlacedObjectEditing/PlacedObjectPanel,
+TileImages.FieldSpriteFrameOf(file, facing), MapDrawing draws placed.Facing). 2026-11-12. Round 1.
+Verdict: ready to commit. No Critical, no Warning.
 
-- Suggestion (open): MapLayoutValidatorTests.cs:126 private Validate helper sits between two tests and only the new
-  tests use it; the other tests call MapLayoutValidator.Validate directly.
-- Suggestion (open): NB2.md "Done: as planned" while two test names differ from the slice
-  (Of_OwnEventRunning_IgnoresItsPlacedFacing, Validate_TileObjectWithFacing_ThrowsNamingTheUid).
-- NB1 Critical (uid compare): fixed, NpcFacing uses ReferenceEquals. NB1 Suggestion (same-uid-after-swap test): fixed,
-  now Of_AnotherObjectWithTheSameUid_FacesDown.
-- Not raised: PlacedObjectEditing.cs:92 keeps Facing when the object id changes to a tile object; NB3.md already plans it.
+- Suggestion (open): stale docs: PlacedObjectEditing.cs:98-100 Apply summary omits facing; :47 ObjectId summary says
+  "uid, position, layer and events kept" though a swap to a tile object drops the facing; TileImages.cs:105
+  "cached by the record" now record and facing.
+- Suggestion (open): TileImages.Forget locals `sheetsOfFile`/`sheet` now hold (Sheet, Facing) keys; rename framesOfFile/key.
+- Suggestion (open): PlacedObjectPanel.xaml:46 binds SelectedItem, the slice planned SelectedValue (free-levels rule);
+  equivalent for a fixed enum list, but the Done note doesn't record it.
+- NB2 suggestions (MapLayoutValidatorTests helper, NB2 test names): not carried, NB2 committed, suggestions only.

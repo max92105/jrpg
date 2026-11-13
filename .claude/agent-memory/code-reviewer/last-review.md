@@ -5,14 +5,14 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-12-character-sprites-and-npcs, slice NB1 (Facings.Opposite, NpcFacing.Of, EventRun.Source,
-ExplorationState.NpcFacingOf, MapView's npcFacingOf delegate). 2026-11-12. Round 1.
-Verdict: fix the Critical, then commit.
+Plan 2026-11-12-character-sprites-and-npcs, slice NB2 (PlacedObject.Facing, NpcFacing.Of fallback, AbsentWhenNullFilter
+row, MapLayoutValidator.FindFacingProblem). 2026-11-12. Round 1.
+Verdict: ready to commit.
 
-- Critical (open): NpcFacing.cs:15 compares by uid only; uids repeat across maps (tree_1_9 on 4 layouts), and a run
-  continues after a WarpStep (ExplorationState.cs:132-137), so a same-uid object on the warped-to map faces the player.
-  Fix: compare the map too (EventRun keeps the map id it started on) or ReferenceEquals (swaps keep the record,
-  ActiveMap.cs:25); add a test: own event Dialogue, Warp, Dialogue onto a map with the same uid.
-- Suggestion (open): NpcFacingTests.Of_SameUidAfterSwap models an impossible case: a swap never replaces the
-  PlacedObject (ActiveMap.cs:22-26 go through WorldState); fix its comment or drop it with the Critical's fix.
-- SI5 items: not re-checked (different slice); SI5 Warning on the two dead sorts was the developer's call.
+- Suggestion (open): MapLayoutValidatorTests.cs:126 private Validate helper sits between two tests and only the new
+  tests use it; the other tests call MapLayoutValidator.Validate directly.
+- Suggestion (open): NB2.md "Done: as planned" while two test names differ from the slice
+  (Of_OwnEventRunning_IgnoresItsPlacedFacing, Validate_TileObjectWithFacing_ThrowsNamingTheUid).
+- NB1 Critical (uid compare): fixed, NpcFacing uses ReferenceEquals. NB1 Suggestion (same-uid-after-swap test): fixed,
+  now Of_AnotherObjectWithTheSameUid_FacesDown.
+- Not raised: PlacedObjectEditing.cs:92 keeps Facing when the object id changes to a tile object; NB3.md already plans it.

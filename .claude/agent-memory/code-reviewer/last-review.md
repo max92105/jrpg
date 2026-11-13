@@ -5,17 +5,13 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-12-character-sprites-and-npcs, slice SI4 (FieldSpriteWindow, WalkPreview, SpriteSheetMarks, StatusBand,
-MainWindow/MainViewModel.FieldSprites). 2026-11-12. Round 1. Verdict: fix the Criticals.
+Plan 2026-11-12-character-sprites-and-npcs, slice SI5 (NewNpcViewModel over set-up sheets, ForChange; NpcSpriteChange;
+NewNpcWindow walking preview; SpriteImageFile; Change NPC sprite menu and button). 2026-11-12. Round 1.
+Verdict: ready to commit.
 
-- Critical (open): Sprites/WalkPreview.cs:95 static mutable `_lastCells` (no static mutable state); make it an instance
-  owned by the window, or keep the last cells in the window.
-- Critical (open): Shell/MainViewModel.FieldSprites.cs:37 `StartFieldSpriteEditing` builds the view model, doesn't start
-  a session (clashes with FieldSpriteEditingViewModel.Start); rename CreateFieldSpriteEditing or inline.
-- Warning (open): FieldSpriteWindow.xaml:82-90 SelectedIndex two-way over a RowChoices list rebuilt on Rows/DataContext
-  change: a row past the new count is cleared and -1 written back (typing Rows "12" via "1"; 7-row -> 4-row image).
-- Warning (open): FieldSpriteWindow.xaml.cs:262-268 + WalkPreview.cs:99: each render tick runs Problem 5 times (catalog
-  check + list) and LINQ; cache the FieldSpriteSheet on setup change, tick compares WalkCellAt only.
-- Suggestion (open): setup problem shown twice (xaml:104 and :41); OnOkClicked guard redundant with greyed OK.
-- Follow-up: SI2 FieldSpriteSetupViewModel.From integer-divides spare pixels (still open, not in backlog).
-- SI3 items: CopySetupFrom split check fixed; RefreshAfterImport stale size fixed; ToSheets merely-chosen fixed.
+- Warning (open): MainViewModel.FieldSprites.cs:26-27 SortedFieldSprites and NpcSpriteChange.cs:48-49 SortedSheets are
+  the same sort, twice, and both dead: NewNpcViewModel.cs:40-44 re-sorts the files itself; pass the values unsorted.
+- Suggestion (open): NewNpcViewModel.cs:71 "has no record" branch untested and unreachable from the editor's flows.
+- Suggestion (open): MainWindow.xaml Change sprite... button tooltip lacks the "Objects &gt; ..." form of its row.
+- SI4 items: static _lastCells fixed; CreateFieldSpriteEditing rename fixed; row-box -1 fixed (RowIndexConverter);
+  per-tick Problem fixed (_previewSheet cached); SI2 spare-pixels follow-up now in backlog (dropped).

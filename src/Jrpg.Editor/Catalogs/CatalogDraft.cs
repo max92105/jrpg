@@ -154,7 +154,7 @@ internal sealed partial class CatalogDraft : ObservableObject
     {
         var before = Current.Quests;
         var after = quests.ToDictionary(quest => quest.Id);
-        if (before.Count == after.Count && after.All(pair => before.TryGetValue(pair.Key, out var quest) && quest == pair.Value))
+        if (HasSameRecords(before, after, EqualityComparer<QuestDefinition>.Default.Equals))
         {
             return;
         }

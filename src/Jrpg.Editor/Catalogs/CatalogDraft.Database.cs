@@ -15,7 +15,7 @@ internal sealed partial class CatalogDraft
     {
         var before = Current.Shops;
         var after = shops.ToDictionary(shop => shop.Id, StringComparer.Ordinal);
-        if (before.Count == after.Count && after.All(pair => before.TryGetValue(pair.Key, out var shop) && shop == pair.Value))
+        if (HasSameRecords(before, after, EqualityComparer<ShopDefinition>.Default.Equals))
         {
             return;
         }
@@ -31,15 +31,22 @@ internal sealed partial class CatalogDraft
     {
         var before = Current.Enemies;
         var after = enemies.ToDictionary(enemy => enemy.Id, StringComparer.Ordinal);
-        var isUnchanged = before.Count == after.Count
-            && after.All(pair => before.TryGetValue(pair.Key, out var enemy) && IsSameEnemy(enemy, pair.Value));
-        if (isUnchanged)
+        if (HasSameRecords(before, after, IsSameEnemy))
         {
             return;
         }
 
         Do(new CatalogEdit(catalog => catalog with { Enemies = after }, catalog => catalog with { Enemies = before }));
     }
+
+    // A window's session changed nothing when it hands back the same ids and each record the same by content, so an OK
+    // with no edit records no step (and keeps the redo).
+    private static bool HasSameRecords<T>(
+        IReadOnlyDictionary<string, T> before,
+        IReadOnlyDictionary<string, T> after,
+        Func<T, T, bool> isSame) =>
+        before.Count == after.Count
+        && after.All(pair => before.TryGetValue(pair.Key, out var record) && isSame(record, pair.Value));
 
     // Records compare lists by reference: the with-copy compares every field but the lists, the lists by content.
     private static bool IsSameEnemy(EnemyDefinition before, EnemyDefinition after) =>

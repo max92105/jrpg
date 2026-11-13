@@ -12,14 +12,6 @@
         ShowInTaskbar="False">
   <Window.Resources>
     <sprites:RowIndexConverter x:Key="RowIndex" />
-    <!-- The setup boxes are greyed while no image with a setup is chosen, so nothing typed is lost. -->
-    <Style x:Key="EnabledWhenChosen" TargetType="Panel">
-      <Style.Triggers>
-        <DataTrigger Binding="{Binding}" Value="{x:Null}">
-          <Setter Property="IsEnabled" Value="False" />
-        </DataTrigger>
-      </Style.Triggers>
-    </Style>
     <Style x:Key="FieldLabel" TargetType="TextBlock">
       <Setter Property="Width" Value="110" />
       <Setter Property="VerticalAlignment" Value="Center" />

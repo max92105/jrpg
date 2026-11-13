@@ -22,3 +22,5 @@ None new. Guard: the test totals of `Jrpg.Editor.Tests` before and after are equ
 1. `git diff --stat` shows the moves, the usings and the three setters shrinking.
 2. `dotnet run --project src/Jrpg.Editor`. Open **Database > Quests...**, **Shops...**, **Enemies...** and **NPCs > Character sprites...** in turn: each shows its right-hand panel lit with a record chosen, as before (a missing resource would throw on opening).
 3. In **Database > Shops...**, change a shop's name and click **OK**, then **Ctrl+Z**: the name comes back; reopen and click **OK** with nothing changed, then **Ctrl+Y**: the rename comes back (an empty step would have cleared the redo; `HasSameRecords` on both sides).
+
+- **Done:** as planned. The four windows' copies of the panel style go with their comment (the Quests and Shops windows' `Window.Resources`, then empty, removed too); the two setters in `CatalogDraft.Database.cs` and `SetQuests` call `HasSameRecords`; test totals unchanged (4966).

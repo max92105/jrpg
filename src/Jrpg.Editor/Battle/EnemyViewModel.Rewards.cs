@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Battle;
+using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Battle;
 

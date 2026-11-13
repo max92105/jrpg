@@ -3,6 +3,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Battle;
+using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Tests.Battle;
 

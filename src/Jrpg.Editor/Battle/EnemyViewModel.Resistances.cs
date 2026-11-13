@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Stats;
+using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Battle;
 

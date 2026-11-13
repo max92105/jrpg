@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Jrpg.Editor.Battle;
+namespace Jrpg.Editor.Catalogs;
 
 /// <summary>
 /// A whole number as a form keeps it: the text as typed, so an emptied or half-typed box is reported instead of keeping

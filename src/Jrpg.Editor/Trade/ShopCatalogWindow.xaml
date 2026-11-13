@@ -8,16 +8,6 @@
         Height="520"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False">
-  <Window.Resources>
-    <!-- The panel over the chosen shop is greyed while none is chosen, so nothing typed is lost. -->
-    <Style x:Key="EnabledWhenChosen" TargetType="Panel">
-      <Style.Triggers>
-        <DataTrigger Binding="{Binding}" Value="{x:Null}">
-          <Setter Property="IsEnabled" Value="False" />
-        </DataTrigger>
-      </Style.Triggers>
-    </Style>
-  </Window.Resources>
   <DockPanel Margin="12">
     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
       <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked" IsEnabled="{Binding CanApply}" />

@@ -16,7 +16,7 @@ Older plans are single files with the same sections.
 | Plan | Status |
 |---|---|
 | [2026-11-12-character-sprites-and-npcs](2026-11-12-character-sprites-and-npcs/README.md) | retro pending |
-| [2026-11-12-shops-and-enemy-database](2026-11-12-shops-and-enemy-database/README.md) | approved (depends on 2026-11-12-character-sprites-and-npcs: run after it) |
+| [2026-11-12-shops-and-enemy-database](2026-11-12-shops-and-enemy-database/README.md) | approved, in progress |
 | [2026-11-11-code-health-cleanup](done/2026-11-11-code-health-cleanup/README.md) | done |
 | [2026-11-11-game-code-health-cleanup](done/2026-11-11-game-code-health-cleanup/README.md) | done |
 | [2026-11-10-map-fixes-banner-and-folders](done/2026-11-10-map-fixes-banner-and-folders/README.md) | done |

@@ -20,3 +20,6 @@ Also watch for, seen in 4b: validator messages that combine two fields ("attack 
 Seen in CO4a (2026-11-03): `_objects.SelectedObject = definition` after a `SetObject` that was a no-op (unchanged
 edit) chooses a fresh `ObjectDefinition` not in the browser's list; WPF's `Items.Contains` uses record equality, so
 the list-member compare fails. Choose the catalog's stored instance by id instead.
+
+Seen in MV1 (2026-11-12): `MoveNpcStep` overrode Equals with `Path.SequenceEqual` and shipped no equality test, though
+every precedent (GearPiece, SavedGear, ShopDefinition) has one. A custom Equals is new behavior: ask for its test.

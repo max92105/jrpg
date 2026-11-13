@@ -55,7 +55,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] ADR 0045: database editors (hand-written forms, Data's validators as the one rule source, files relaid once). Write it from the entry under "ADRs" below (decisions 580-582, 591).
 - [x] **SH1. Shops save from the editor: `shops.json` relaid and written, `CatalogProblems.OfShops`, `CatalogDraft.SetShops`, an undo removing a shop an event opens refused** (Data + Editor, about 220 lines) → [slices/SH1.md](slices/SH1.md)
 - [x] **SH2. The Shops window's rules: shops in id order, a shop's name and its priced items in order** (Editor, about 200 lines) → [slices/SH2.md](slices/SH2.md)
-- [ ] **SH3. The Shops window and the Database menu** (Editor, about 170 lines) → [slices/SH3.md](slices/SH3.md)
+- [x] **SH3. The Shops window and the Database menu** (Editor, about 170 lines) → [slices/SH3.md](slices/SH3.md)
 
 ### Phase 2: quest NPCs
 - [ ] **NP1. The Quest giver preset: the quest offered while not started, a reminder while active** (Editor, about 150 lines) → [slices/NP1.md](slices/NP1.md)

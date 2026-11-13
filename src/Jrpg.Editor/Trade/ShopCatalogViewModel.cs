@@ -56,6 +56,9 @@ internal sealed partial class ShopCatalogViewModel : ObservableObject
         RecordListProblem.FirstOf(Shops, shop => shop.Id, shop => shop.Problem, "Shop")
         ?? CatalogProblems.OfShops([.. Shops.Select(shop => shop.ToShop())], _content);
 
+    /// <summary>Whether OK may apply the session: no problem shows.</summary>
+    public bool CanApply => Problem is null;
+
     /// <exception cref="InvalidOperationException">
     /// There is a <see cref="Problem"/>; the window applies only without one.
     /// </exception>
@@ -70,7 +73,7 @@ internal sealed partial class ShopCatalogViewModel : ObservableObject
         Watch(shop);
         Shops.Add(shop);
         SelectedShop = shop;
-        OnPropertyChanged(nameof(Problem));
+        RaiseProblemChanged();
     }
 
     [RelayCommand(CanExecute = nameof(CanRemoveShop))]
@@ -80,7 +83,7 @@ internal sealed partial class ShopCatalogViewModel : ObservableObject
         removed.PropertyChanged -= OnShopChanged;
         removed.ItemIds.CollectionChanged -= OnShopItemsChanged;
         SelectedShop = ListOrder.Remove(Shops, removed);
-        OnPropertyChanged(nameof(Problem));
+        RaiseProblemChanged();
     }
 
     private bool CanRemoveShop() => SelectedShop is { IsNew: true };
@@ -92,7 +95,21 @@ internal sealed partial class ShopCatalogViewModel : ObservableObject
         shop.ItemIds.CollectionChanged += OnShopItemsChanged;
     }
 
-    private void OnShopChanged(object? sender, PropertyChangedEventArgs e) => OnPropertyChanged(nameof(Problem));
+    // Only the typed fields feed the problem; the selection and the picker's choice don't.
+    private void OnShopChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(ShopViewModel.Id) or nameof(ShopViewModel.Name))
+        {
+            RaiseProblemChanged();
+        }
+    }
 
-    private void OnShopItemsChanged(object? sender, NotifyCollectionChangedEventArgs e) => OnPropertyChanged(nameof(Problem));
+    private void OnShopItemsChanged(object? sender, NotifyCollectionChangedEventArgs e) => RaiseProblemChanged();
+
+    // The problem line and OK's state read the same thing.
+    private void RaiseProblemChanged()
+    {
+        OnPropertyChanged(nameof(Problem));
+        OnPropertyChanged(nameof(CanApply));
+    }
 }

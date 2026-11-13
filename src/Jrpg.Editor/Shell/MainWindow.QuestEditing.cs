@@ -4,7 +4,7 @@ using Jrpg.Editor.Quests;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// The Quests menu: the Quests window edits the draft's quests, and OK applies the whole session as one undo step
+/// Database > Quests...: the Quests window edits the draft's quests, and OK applies the whole session as one undo step
 /// (decision 394).
 /// </summary>
 internal sealed partial class MainWindow

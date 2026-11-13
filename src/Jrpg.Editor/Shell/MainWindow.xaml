@@ -83,8 +83,9 @@
         <MenuItem Header="Edit object..." Click="OnEditObjectClicked" IsEnabled="{Binding Composing.CanComposeChosenObject, FallbackValue=False}" ToolTip="Repaint the chosen object; its id, outline, zones, placements and events stay. Ctrl+Z puts the old picture back." />
         <MenuItem Header="Duplicate object..." Click="OnDuplicateObjectClicked" IsEnabled="{Binding Composing.CanComposeChosenObject, FallbackValue=False}" ToolTip="A new object from a copy of the chosen one's picture, outline, zones and category; type its id, then repaint what differs. Its shapes open when its size changed." />
       </MenuItem>
-      <MenuItem Header="Quests">
-        <MenuItem Header="Edit quests..." Click="OnEditQuestsClicked" IsEnabled="{Binding HasQuestEditing}" />
+      <MenuItem Header="Database">
+        <MenuItem Header="Quests..." Click="OnEditQuestsClicked" IsEnabled="{Binding HasQuestEditing}" />
+        <MenuItem Header="Shops..." Click="OnEditShopsClicked" IsEnabled="{Binding HasShopEditing}" ToolTip="Each shop's name and the priced items it sells, in order; the shopkeeper preset's shop box offers them." />
       </MenuItem>
       <MenuItem Header="Map">
         <MenuItem Header="Go to map..." Command="Find" InputGestureText="Ctrl+M" />

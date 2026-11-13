@@ -15,6 +15,7 @@ using Jrpg.Editor.Objects;
 using Jrpg.Editor.Objects.Composing;
 using Jrpg.Editor.Quests;
 using Jrpg.Editor.Tiles;
+using Jrpg.Editor.Trade;
 
 namespace Jrpg.Editor.Shell;
 
@@ -85,6 +86,7 @@ internal sealed partial class MainViewModel : ObservableObject
             AnimationImport = new AnimationImport(Content);
             EventEditing = new EventEditingViewModel(Content, _openMaps, Layer) { MapIds = MapIds };
             QuestEditing = new QuestEditingViewModel(Content);
+            ShopEditing = new ShopEditingViewModel(Content);
             FieldSpriteEditing = CreateFieldSpriteEditing();
             NpcSpriteChange = new NpcSpriteChange(Content, Placing.Browser);
             if (MapIds.Count > 0)
@@ -150,7 +152,7 @@ internal sealed partial class MainViewModel : ObservableObject
     /// <summary>Null when the content or its art didn't load.</summary>
     public QuestEditingViewModel? QuestEditing { get; }
 
-    /// <summary>Whether the Quests menu can open its window: false while the content didn't load.</summary>
+    /// <summary>Whether Database > Quests... can open its window: false while the content didn't load.</summary>
     public bool HasQuestEditing => QuestEditing is not null;
 
     [ObservableProperty]

@@ -1,0 +1,68 @@
+<Window x:Class="Jrpg.Editor.Trade.ShopCatalogWindow"
+        x:ClassModifier="internal"
+        Style="{StaticResource EditorWindow}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Shops"
+        Width="760"
+        Height="520"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+  <Window.Resources>
+    <!-- The panel over the chosen shop is greyed while none is chosen, so nothing typed is lost. -->
+    <Style x:Key="EnabledWhenChosen" TargetType="Panel">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding}" Value="{x:Null}">
+          <Setter Property="IsEnabled" Value="False" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </Window.Resources>
+  <DockPanel Margin="12">
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+      <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked" IsEnabled="{Binding CanApply}" />
+      <Button Content="Cancel" Width="80" Margin="8,0,0,0" IsCancel="True" />
+    </StackPanel>
+    <TextBlock DockPanel.Dock="Bottom" Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Margin="0,8,0,0" Text="{Binding Problem}" />
+
+    <!-- The draft's shops in id order, the ones added this session after them; only those can be removed. -->
+    <DockPanel DockPanel.Dock="Left" Width="240">
+      <TextBlock DockPanel.Dock="Top" Text="Shops" FontWeight="Bold" />
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
+        <Button Content="Add shop" Width="80" Command="{Binding AddShopCommand}" />
+        <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding RemoveShopCommand}" ToolTip="Only a shop added this session; a saved one may be opened by an event" />
+      </StackPanel>
+      <ListBox ItemsSource="{Binding Shops}" SelectedItem="{Binding SelectedShop}" DisplayMemberPath="Label" Margin="0,4,0,0" />
+    </DockPanel>
+
+    <!-- The chosen shop: its id and name, then what it sells in order and the picker of priced items. -->
+    <DockPanel Margin="12,0,0,0" DataContext="{Binding SelectedShop}" Style="{StaticResource EnabledWhenChosen}">
+      <StackPanel DockPanel.Dock="Top">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="Id" Width="60" VerticalAlignment="Center" />
+          <TextBox Width="240"
+                   Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}"
+                   IsEnabled="{Binding IsNew}"
+                   ToolTip="Lowercase letters, digits and _; fixed once saved, since events name it" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Name" Width="60" VerticalAlignment="Center" />
+          <TextBox Width="240" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+        <TextBlock Text="Sells, in order" FontWeight="Bold" Margin="0,8,0,0" />
+      </StackPanel>
+
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
+        <ComboBox Width="260"
+                  DisplayMemberPath="Label"
+                  ItemsSource="{Binding DataContext.OfferedItems, RelativeSource={RelativeSource AncestorType=Window}}"
+                  SelectedItem="{Binding ItemToAdd}" />
+        <Button Content="Add" Width="60" Margin="4,0,0,0" Command="{Binding AddItemCommand}" ToolTip="After the chosen item; an item sells once" />
+        <Button Content="Remove" Width="60" Margin="12,0,0,0" Command="{Binding RemoveItemCommand}" />
+        <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveItemUpCommand}" />
+        <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveItemDownCommand}" />
+      </StackPanel>
+      <ListBox ItemsSource="{Binding ItemIds}" SelectedItem="{Binding SelectedItem}" />
+    </DockPanel>
+  </DockPanel>
+</Window>

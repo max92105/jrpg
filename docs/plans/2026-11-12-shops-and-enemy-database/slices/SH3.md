@@ -23,3 +23,5 @@ None new: window code; SH2 tests the rules.
 4. Place an NPC, give it the Shopkeeper preset (Events mode), pick `smithy_wares` in its open shop step, Ctrl+S, play: talking to it opens "Smithy" selling the two items.
 5. Undo back past the shop while the map step that opens it is saved on another map: refused, naming the map.
 6. Revert with `git checkout -- content` if this was only a check.
+
+- **Done, with deviations:** `ShopCatalogViewModel.CanApply` greys OK live with the problem line (the editor rules' dialog pattern), so the window's code-behind only closes; `ShopEditing` is built in the constructor beside `QuestEditing`, the partial holding the properties; the Quests menu's wording became "Database > Quests..." in the summaries and the codebase map (decision 583).

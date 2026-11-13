@@ -110,6 +110,31 @@ public sealed class ShopCatalogViewModelTests
         Assert.Contains(nameof(ShopCatalogViewModel.Problem), notified);
     }
 
+    // OK greys with the problem line (the editor rules' CanApply), raised with it.
+    [Fact]
+    public void CanApply_ProblemAppears_IsFalseAndNotifies()
+    {
+        var catalog = new ShopCatalogViewModel(_content);
+        var notified = new List<string?>();
+        catalog.PropertyChanged += (_, e) => notified.Add(e.PropertyName);
+
+        catalog.Shops[1].Name = "";
+
+        Assert.False(catalog.CanApply);
+        Assert.Contains(nameof(ShopCatalogViewModel.CanApply), notified);
+    }
+
+    [Fact]
+    public void CanApply_ProblemGoes_IsTrueAgain()
+    {
+        var catalog = new ShopCatalogViewModel(_content);
+        catalog.Shops[1].Name = "";
+
+        catalog.Shops[1].Name = "General Store";
+
+        Assert.True(catalog.CanApply);
+    }
+
     [Fact]
     public void Problem_LastItemRemoved_IsDataMessageAndNotifies()
     {

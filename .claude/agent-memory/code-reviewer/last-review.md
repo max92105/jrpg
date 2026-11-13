@@ -5,13 +5,14 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-12-character-sprites-and-npcs, slice SI5 (NewNpcViewModel over set-up sheets, ForChange; NpcSpriteChange;
-NewNpcWindow walking preview; SpriteImageFile; Change NPC sprite menu and button). 2026-11-12. Round 1.
-Verdict: ready to commit.
+Plan 2026-11-12-character-sprites-and-npcs, slice NB1 (Facings.Opposite, NpcFacing.Of, EventRun.Source,
+ExplorationState.NpcFacingOf, MapView's npcFacingOf delegate). 2026-11-12. Round 1.
+Verdict: fix the Critical, then commit.
 
-- Warning (open): MainViewModel.FieldSprites.cs:26-27 SortedFieldSprites and NpcSpriteChange.cs:48-49 SortedSheets are
-  the same sort, twice, and both dead: NewNpcViewModel.cs:40-44 re-sorts the files itself; pass the values unsorted.
-- Suggestion (open): NewNpcViewModel.cs:71 "has no record" branch untested and unreachable from the editor's flows.
-- Suggestion (open): MainWindow.xaml Change sprite... button tooltip lacks the "Objects &gt; ..." form of its row.
-- SI4 items: static _lastCells fixed; CreateFieldSpriteEditing rename fixed; row-box -1 fixed (RowIndexConverter);
-  per-tick Problem fixed (_previewSheet cached); SI2 spare-pixels follow-up now in backlog (dropped).
+- Critical (open): NpcFacing.cs:15 compares by uid only; uids repeat across maps (tree_1_9 on 4 layouts), and a run
+  continues after a WarpStep (ExplorationState.cs:132-137), so a same-uid object on the warped-to map faces the player.
+  Fix: compare the map too (EventRun keeps the map id it started on) or ReferenceEquals (swaps keep the record,
+  ActiveMap.cs:25); add a test: own event Dialogue, Warp, Dialogue onto a map with the same uid.
+- Suggestion (open): NpcFacingTests.Of_SameUidAfterSwap models an impossible case: a swap never replaces the
+  PlacedObject (ActiveMap.cs:22-26 go through WorldState); fix its comment or drop it with the Critical's fix.
+- SI5 items: not re-checked (different slice); SI5 Warning on the two dead sorts was the developer's call.

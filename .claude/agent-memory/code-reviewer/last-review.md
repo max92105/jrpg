@@ -5,12 +5,16 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-12-shops-and-enemy-database, slice NP2 (portrait picker: ArtFolders.ImagesIn, StepChoices.PortraitFiles,
-EventEditingViewModel.PortraitFilesLookup, EventStepEditor editable ComboBox). 2026-11-13.
-Round 1. Verdict: ready to commit. XAML checked: DataContext.Choices.PortraitFiles resolves on both hosts
-(ObjectEventsWindow -> EventListViewModel.Choices, CellEventWindow -> CellEventViewModel.Choices); Text binds
-EventStepViewModel.PortraitFile; theme ComboBox template has PART_EditableTextBox + IsEditable trigger.
+Plan 2026-11-12-shops-and-enemy-database, slice EN1 (enemies.json written: AbsentWhenFalse/EmptyFilter, null/zero
+filter rows, ResistancesConverter.Write, CatalogProblems.OfEnemies/CheckEnemies, ContentWriter enemies,
+CatalogDraft.SetEnemies). 2026-11-13. Round 1. Verdict: ready to commit. enemies.json relay checked: same values per
+enemy (PowerShell ConvertFrom-Json), only order/layout differs. test-world enemies.json = live content (TestWorld.props).
 
-- NP1 Suggestions not carried (committed slice).
-- Suggestion (open): StartEditingAt_PortraitLookup_OffersItsFiles doesn't show the lookup is read per dialog
-  (a value cached at init passes); open twice with a lookup whose list changes between.
+- NP2 Suggestion (lookup read per dialog) not carried (committed slice).
+- Warning (open): CatalogProblems.cs:85-96 OfEnemies is the third copy of the try/CheckX/catch-message block; extract
+  `private static string? FirstProblem(Action check)`.
+- Warning (open): AbsentWhenNullFilter.cs:9-15 / AbsentWhenZeroFilter.cs summary + `_addedLater` say "added after the
+  content was written", the new enemy rows are decision 586 defaults; summary should name both reasons (map.md Content
+  row same: "an optional field added later").
+- Suggestion (open): no test that a changed phase tactic makes SetEnemies record a step (Phases.Zip branch).
+- Suggestion (open): ResistancesConverter.Write floors a 1..9 permille to a written 0 (unreachable from content today).

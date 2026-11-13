@@ -11,6 +11,8 @@ call or a rename. These cases slipped past it:
 - A type gaining a second job kept a summary naming only the first (Forge M2/M3a: `GameRules` without crafting,
   `GearRoll` "Rolls a dropped base item" after `AddAffix`; M3b: the Forge's `gearRoll` param "so an upgrade draws" once
   reroll used it too). Now a code-quality line; still reread the class summary of every type that gains a public member.
+  Also a table type gaining rows for a new reason (shops EN1: AbsentWhenNull/ZeroFilter "added after the content was
+  written" + `_addedLater`, gaining decision 586's default-valued enemy fields): reread the summary and the array name.
 - A Done note that pulls work forward or renames a planned API (loot S1a: FromSaved -> PieceFrom) leaves the later slice
   files and design.md citing the old name; grep the next slices and design.md for the planned name. Same after a test
   split (C2): a pending slice still cited "BattleStateTests (lines 225-354)".

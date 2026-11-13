@@ -86,8 +86,8 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **SI5. New NPC picks a set-up sprite and shows it walking; Change NPC sprite...** (Editor, about 190 lines) → [slices/SI5.md](slices/SI5.md)
 
 ### Phase 3: NPC behavior
-- [ ] ADR 0044: NPC facing and cutscene movement (amends ADR 0015's decisions 127 and 128). Write it from the entry under "ADRs" below (decisions 571-578).
-- [ ] **NB1. An NPC faces the player while its own event runs, and turns back after** (Core + Game, about 190 lines) → [slices/NB1.md](slices/NB1.md)
+- [x] ADR 0044: NPC facing and cutscene movement (amends ADR 0015's decisions 127 and 128). Write it from the entry under "ADRs" below (decisions 571-578).
+- [x] **NB1. An NPC faces the player while its own event runs, and turns back after** (Core + Game, about 190 lines) → [slices/NB1.md](slices/NB1.md)
 - [ ] **NB2. Each placed NPC's standing facing: `PlacedObject.Facing` in the layout file, refused on a non-NPC** (Core + Data + Game, about 170 lines) → [slices/NB2.md](slices/NB2.md)
 - [ ] **NB3. The placed facing in the editor: a Facing box in the Placed object panel** (Editor, about 190 lines) → [slices/NB3.md](slices/NB3.md)
 - [ ] **MV1. The `moveNpc` step in Core: an NPC walks its path cell by cell for the visit, the event waiting until it arrives** (Core, about 260 lines) → [slices/MV1.md](slices/MV1.md)

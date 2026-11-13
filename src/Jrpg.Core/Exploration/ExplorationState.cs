@@ -79,6 +79,9 @@ public sealed class ExplorationState
     /// </summary>
     public ObjectDefinition CurrentDefinitionOf(PlacedObject placed) => _map.CurrentDefinitionOf(placed);
 
+    /// <summary>What an NPC faces now (ADR 0044): the player while an event of its own runs, else down.</summary>
+    public Facing NpcFacingOf(PlacedObject placed) => NpcFacing.Of(placed, _events.Run?.Source, PlayerFacing);
+
     /// <summary>
     /// The battle a step just started, or null. The Game runs it, then calls <see cref="FinishEncounter"/>; the player
     /// can't walk or interact meanwhile. What follows a defeat is the Game's (decision 31).

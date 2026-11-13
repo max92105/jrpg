@@ -1,4 +1,5 @@
 using Jrpg.Core.Events;
+using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Quests;
 
@@ -35,6 +36,11 @@ internal sealed class EventRun
     }
 
     private IReadOnlyList<EventStep> Steps => _triggered.Event.Steps;
+
+    /// <summary>
+    /// The placed object the event belongs to, which faces the player while it runs (ADR 0044); null for a cell's.
+    /// </summary>
+    public PlacedObject? Source => _triggered.Source;
 
     /// <summary>The step waiting for the player or the Game, or null once the event is over.</summary>
     public EventStep? Current => IsFinished ? null : Steps[_index];

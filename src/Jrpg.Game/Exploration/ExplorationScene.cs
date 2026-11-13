@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Jrpg.Core.Events;
 using Jrpg.Core.Exploration;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
 using Jrpg.Game.Input;
@@ -27,6 +28,7 @@ internal sealed class ExplorationScene : IScene
     private readonly ExplorationState _exploration;
     // Built once: a method group converted on every call would allocate a delegate per frame.
     private readonly Func<PlacedObject, ObjectDefinition> _currentDefinitionOf;
+    private readonly Func<PlacedObject, Facing> _npcFacingOf;
     private readonly MapArt _art;
     private readonly EventPresenter _presenter;
     private readonly AskedSounds _sounds = new();
@@ -41,6 +43,7 @@ internal sealed class ExplorationScene : IScene
     {
         _exploration = exploration;
         _currentDefinitionOf = exploration.CurrentDefinitionOf;
+        _npcFacingOf = exploration.NpcFacingOf;
         _art = art;
         _presenter = presenter;
         _overlays = overlays;
@@ -143,7 +146,7 @@ internal sealed class ExplorationScene : IScene
     private void EnterCurrentMap()
     {
         _map = _exploration.CurrentMap;
-        _view = new MapView(_map.Layout, _currentDefinitionOf, _art);
+        _view = new MapView(_map.Layout, _currentDefinitionOf, _art, _npcFacingOf);
         _camera.SnapTo(_exploration.PlayerPosition, _map.Layout);
         _drawList.Rebuild(_map.Layout, _currentDefinitionOf, _exploration.PlayerPosition);
         _overlays.Banner.Enter(_map);

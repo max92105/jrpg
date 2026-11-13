@@ -9,10 +9,14 @@ namespace Jrpg.Game.Exploration;
 
 /// <summary>
 /// Draws one map's tile layers, only the cells on screen, and its placed objects as they are now (an opened door draws
-/// open). It holds the time its animated tiles show (decision 464): from zero on entering the map, moved on by the
-/// scene.
+/// open), an NPC facing what Core says (ADR 0044). It holds the time its animated tiles show (decision 464): from zero
+/// on entering the map, moved on by the scene.
 /// </summary>
-internal sealed class MapView(MapLayout layout, Func<PlacedObject, ObjectDefinition> currentDefinitionOf, MapArt art)
+internal sealed class MapView(
+    MapLayout layout,
+    Func<PlacedObject, ObjectDefinition> currentDefinitionOf,
+    MapArt art,
+    Func<PlacedObject, Facing> npcFacingOf)
 {
     /// <summary>Screen pixels per map cell at the 1920x1080 virtual screen (decision 48).</summary>
     public const int CellPixels = 48;
@@ -65,11 +69,11 @@ internal sealed class MapView(MapLayout layout, Func<PlacedObject, ObjectDefinit
             return;
         }
 
-        // An NPC stands still facing down (decisions 127, 128) on its sheet's standing frame.
+        // An NPC stands on its sheet's standing frame, facing what Core says it faces (ADR 0044).
         if (definition.FieldSpriteFile is { } spriteFile)
         {
             var sheet = art.FieldSprites[spriteFile];
-            var source = FieldSpriteFrame.SourceOf(sheet, sheet.StandingCell(Facing.Down));
+            var source = FieldSpriteFrame.SourceOf(sheet, sheet.StandingCell(npcFacingOf(placed)));
             batch.Draw(textures.Get(ArtFolders.FieldSprites, sheet.File), area, source, Color.White);
             return;
         }

@@ -24,3 +24,5 @@ Talk to an NPC from its left: it turns to face the player (right) for the whole 
 1. Start the game, walk to the left of an NPC, face it, Confirm: it turns toward the player while its lines show; after the last line it faces down again.
 2. Talk to it from above, below and the right: it faces the player each time.
 3. A shopkeeper NPC: it faces the player while the Shop is open and turns back after the Shop closes.
+
+- **Done, with deviations:** the shop test talks from the side, since a player facing up gets the fallback's answer (down) either way; `MapViewTests` builds no view, so only the scene's construction changed. The review: the speaking object is compared by reference, not uid (uids repeat across maps and an event warping mid-way keeps its source), with a warp test.

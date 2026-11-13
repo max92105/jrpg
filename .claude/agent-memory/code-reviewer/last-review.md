@@ -5,20 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-12-shops-and-enemy-database, slice EN7 (Editor: EnemyCatalogWindow, Database > Enemies...,
-TakeImport/Pick, TacticsSummary, SpriteImageFile.LoadFrom, ImportBattleArt). 2026-11-13. Round 1.
-Verdict: fix the Criticals. Pick going through the view model is a developer decision, don't re-raise.
+Post-plan editor bug fixes after 2026-11-12-character-sprites-and-npcs (decisions 594, 595): import counts as
+edited (FieldSpriteCatalogViewModel.RefreshAfterImport/EditedSetups), FieldSpriteWindow Grid + splitter + WorkArea
+cap, NPCs menu. 2026-11-13. Round 1. Verdict: ready to commit.
 
-- EN6 items: BattleArtImport third copy fixed (ArtImageImport); ApplyTo rename fixed; MissingOf "(none)" fixed;
-  BattleArtChoicesTests moved fixed.
-- Critical (open): MainWindow.Database.cs:40 battler loader has no PngSize.IsReadable guard; an unreadable PNG in
-  battlers named by an enemy throws from BitmapImage.EndInit in EnemyCatalogWindow.ShowArt and closes the editor.
-- Warning (open): EnemyCatalogViewModel.TakeImport `SelectedEnemy?.` guards a state the greyed panel rules out
-  (editor rule); use `SelectedEnemy!`.
-- Warning (open): MainViewModel.ImportBattleArt copies ImportFieldSprites (third shell import body with
-  ImportSheetImages); one shared ImportArtImages(artFolder, paths).
-- Warning (open): SpriteImageFile class summary still says "A field sprite image".
-- Suggestion (open): window's ShowArt after TakeImport redundant; ShowArt on every Problem reloads the PNG per keystroke.
-- Suggestion (open): TacticsSummary test lives in EnemyCatalogImportTests; slice named EnemyViewModelTests.
-- Suggestion (open): SpriteImageFile.LoadFrom `file.Length == 0` clause redundant with File.Exists.
-- Follow-up: ArtStatus.OnCatalogChanged refreshes only on sheets/objects; an enemies step leaves the band stale.
+- EN7 items: battler IsReadable guard, SelectedEnemy!, ImportArtImages shared, all fixed; ArtStatus follow-up is in
+  backlog.md (dropped).
+- Warning (open): an import whose guess has a problem greys OK for the rest of the session; nothing un-counts it, so
+  earlier edits need a junk permanent record (decision 569) or Cancel. Developer question.
+- Warning (open): FieldSpriteWindow WorkArea cap keeps CenterOwner; a non-maximized or second-monitor editor still
+  places the window off-screen (WPF doesn't clamp CenterOwner; WorkArea is the primary monitor's).
+- Suggestion (open): docs/map.md Sprites row "Problem naming another opened setup's" -> edited; mention imports count.
+- Suggestion (open): ListBox item ToolTip repeats a label the wrap already shows whole.

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Jrpg.Core.Maps;
 using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Objects;
@@ -29,9 +30,7 @@ internal sealed partial class NpcSpriteChange : ObservableObject
 
     /// <summary>The dialog's state on the chosen NPC; null when <see cref="CanChange"/> is false.</summary>
     public NewNpcViewModel? Start() =>
-        CanChange
-            ? NewNpcViewModel.ForChange(_catalog.Current.Objects[_browser.SelectedObject!.Id], [.. _catalog.Current.FieldSprites.Values])
-            : null;
+        CanChange ? NewNpcViewModel.ForChange(ChosenNpc(), [.. _catalog.Current.FieldSprites.Values]) : null;
 
     /// <summary>Gives the NPC its new sprite as one undo step; nothing when it is the same.</summary>
     /// <returns>False when the sprite has a problem, so the dialog stays open.</returns>
@@ -46,6 +45,9 @@ internal sealed partial class NpcSpriteChange : ObservableObject
         return true;
     }
 
+
+    // The catalog's copy, which an undo may have changed since the browser chose it.
+    private ObjectDefinition ChosenNpc() => _catalog.Current.Objects[_browser.SelectedObject!.Id];
 
     private void OnChanged(object? sender, PropertyChangedEventArgs e)
     {

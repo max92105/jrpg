@@ -18,3 +18,5 @@ An enemy's resistances as one row per damage type (whole percents, generated fro
 
 ## Verify by hand
 None: the window is EN7.
+
+- **Done, with deviations:** the rows sit in the partial `EnemyViewModel.Resistances`, the gold and drop table in `.Rewards`, the boss box with the plain fields (the review found the first cut named all of it rewards); a row's percent is kept as typed (`PercentText`), a row's change reaching the list as the enemy's own `Resistances` notice; the drop table box lists `EnemyCatalogViewModel.DropTableChoices` (the empty one for none, as the event dialog's gates), bound like the damage types; the gold boxes only count while the enemy drops gold; Duplicate copies the rows and rewards as typed.

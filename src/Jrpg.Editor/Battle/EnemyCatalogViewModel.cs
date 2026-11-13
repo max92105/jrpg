@@ -27,6 +27,7 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject
     public EnemyCatalogViewModel(ContentCatalog content)
     {
         _content = content;
+        DropTableChoices = ["", .. content.DropTables.Keys.Order(StringComparer.Ordinal)];
         Enemies = [.. content.Enemies.Values.OrderBy(enemy => enemy.Id, StringComparer.Ordinal).Select(EnemyViewModel.From)];
         foreach (var enemy in Enemies)
         {
@@ -40,6 +41,9 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject
 
     /// <summary>The damage types the window's box offers, from Core's list so a type added appears.</summary>
     public IReadOnlyList<DamageType> DamageTypes { get; } = Enum.GetValues<DamageType>();
+
+    /// <summary>The drop tables an enemy may roll, the empty one for none first, then the draft's by id.</summary>
+    public IReadOnlyList<string> DropTableChoices { get; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(DuplicateEnemyCommand), nameof(RemoveEnemyCommand))]

@@ -7,9 +7,10 @@ namespace Jrpg.Editor.Battle;
 
 /// <summary>
 /// One enemy as the Enemies window edits it (ADR 0045): its id (typed while new, fixed once the draft holds it,
-/// decision 582), name and numbers as typed. What no form edits yet (its art, rewards, tactics and phases) is carried
-/// from the record it came from, so the window never wipes it; a duplicate carries it too (decision 585).
-/// <see cref="Problem"/> is the typed id's or a number that isn't one; the ranges are Data's rules, shown by the list.
+/// decision 582), name, numbers, resistances and rewards as typed. What no form edits yet (its art, tactics and phases)
+/// is carried from the record it came from, so the window never wipes it; a duplicate carries it too (decision 585).
+/// <see cref="Problem"/> is the typed id's or a box that isn't a number; the ranges are Data's rules, shown by the
+/// list.
 /// </summary>
 internal sealed partial class EnemyViewModel : ObservableObject
 {
@@ -47,6 +48,9 @@ internal sealed partial class EnemyViewModel : ObservableObject
         CritChanceText = TypedNumber.Text(original.CritChance);
         CrowdControlResistanceText = TypedNumber.Text(original.CrowdControlResistance);
         ExperienceRewardText = TypedNumber.Text(original.ExperienceReward);
+        IsBoss = original.IsBoss;
+        Resistances = WatchedResistanceRows(original);
+        ReadRewards(original);
     }
 
     public static EnemyViewModel From(EnemyDefinition enemy) => new(enemy, enemy.Id);
@@ -58,19 +62,26 @@ internal sealed partial class EnemyViewModel : ObservableObject
     /// A new enemy copying the chosen one as typed, its id left to type (decision 585); its tactics come along. Copied
     /// from the boxes, not the record, so a half-typed enemy duplicates too.
     /// </summary>
-    public static EnemyViewModel DuplicateOf(EnemyViewModel chosen) => new(chosen._original, "")
+    public static EnemyViewModel DuplicateOf(EnemyViewModel chosen)
     {
-        IsNew = true,
-        Name = chosen.Name,
-        MaxHpText = chosen.MaxHpText,
-        DamageText = chosen.DamageText,
-        DamageType = chosen.DamageType,
-        AccuracyText = chosen.AccuracyText,
-        DodgeText = chosen.DodgeText,
-        CritChanceText = chosen.CritChanceText,
-        CrowdControlResistanceText = chosen.CrowdControlResistanceText,
-        ExperienceRewardText = chosen.ExperienceRewardText,
-    };
+        var copy = new EnemyViewModel(chosen._original, "")
+        {
+            IsNew = true,
+            Name = chosen.Name,
+            MaxHpText = chosen.MaxHpText,
+            DamageText = chosen.DamageText,
+            DamageType = chosen.DamageType,
+            AccuracyText = chosen.AccuracyText,
+            DodgeText = chosen.DodgeText,
+            CritChanceText = chosen.CritChanceText,
+            CrowdControlResistanceText = chosen.CrowdControlResistanceText,
+            ExperienceRewardText = chosen.ExperienceRewardText,
+            IsBoss = chosen.IsBoss,
+        };
+        copy.CopyResistancesFrom(chosen);
+        copy.CopyRewardsFrom(chosen);
+        return copy;
+    }
 
     /// <summary>
     /// True while the enemy was added this session: the only time its id can be typed (decision 582).
@@ -116,11 +127,16 @@ internal sealed partial class EnemyViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(Problem))]
     public partial string ExperienceRewardText { get; set; }
 
+    /// <summary>Whether the party can't run from a battle it is in (decisions 407, 414).</summary>
+    [ObservableProperty]
+    public partial bool IsBoss { get; set; }
+
     /// <summary>The list's line: "goblin: Goblin", or a placeholder while a new enemy has no id.</summary>
     public string Label => Id.Length > 0 ? $"{Id}: {Name}" : "(new enemy)";
 
     /// <summary>Why the typed id or a number can't be read; null when the record can be built.</summary>
-    public string? Problem => (IsNew ? ObjectIds.ProblemOf(Id, []) : null) ?? FirstNumberProblem();
+    public string? Problem =>
+        (IsNew ? ObjectIds.ProblemOf(Id, []) : null) ?? FirstNumberProblem() ?? FirstResistanceProblem() ?? FirstGoldProblem();
 
     /// <summary>The record it came from with the edited fields over it.</summary>
     /// <exception cref="InvalidOperationException">There is a <see cref="Problem"/>.</exception>
@@ -139,6 +155,10 @@ internal sealed partial class EnemyViewModel : ObservableObject
                 CritChance = TypedNumber.Parse(CritChanceText)!.Value,
                 CrowdControlResistance = TypedNumber.Parse(CrowdControlResistanceText)!.Value,
                 ExperienceReward = TypedNumber.Parse(ExperienceRewardText)!.Value,
+                Resistances = TypedResistances(),
+                Gold = TypedGold(),
+                DropTableId = TypedDropTable(),
+                IsBoss = IsBoss,
             };
 
     // In the form's order, so the problem names the first box the eye reaches.

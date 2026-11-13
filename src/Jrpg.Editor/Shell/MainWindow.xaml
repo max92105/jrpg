@@ -89,6 +89,7 @@
       <MenuItem Header="Database">
         <MenuItem Header="Quests..." Click="OnEditQuestsClicked" IsEnabled="{Binding HasQuestEditing}" />
         <MenuItem Header="Shops..." Click="OnEditShopsClicked" IsEnabled="{Binding HasShopEditing}" ToolTip="Each shop's name and the priced items it sells, in order; the shopkeeper preset's shop box offers them." />
+        <MenuItem Header="Drop tables..." Click="OnEditDropTablesClicked" IsEnabled="{Binding HasDropTableEditing}" ToolTip="Each table's items, chances and quantities; the Enemies window's Drop table box offers them." />
         <MenuItem Header="Enemies..." Click="OnEditEnemiesClicked" IsEnabled="{Binding HasEnemyEditing}" ToolTip="Each enemy's numbers, resistances, rewards and pictures; tactics and phases stay in enemies.json, encounters in encounters.json." />
       </MenuItem>
       <MenuItem Header="Map">

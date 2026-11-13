@@ -11,6 +11,7 @@ using Jrpg.Data.Content;
 using Jrpg.Editor.Battle;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Events;
+using Jrpg.Editor.Loot;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Objects;
 using Jrpg.Editor.Objects.Composing;
@@ -92,6 +93,7 @@ internal sealed partial class MainViewModel : ObservableObject
             };
             QuestEditing = new QuestEditingViewModel(Content);
             ShopEditing = new ShopEditingViewModel(Content);
+            DropTableEditing = new DropTableEditingViewModel(Content);
             EnemyEditing = new EnemyEditingViewModel(Content, folder => ArtFolders.ImagesIn(ArtRoot, folder));
             FieldSpriteEditing = CreateFieldSpriteEditing();
             NpcSpriteChange = new NpcSpriteChange(Content, Placing.Browser);

@@ -1,13 +1,15 @@
 using Jrpg.Editor.Battle;
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Loot;
 using Jrpg.Editor.Tiles;
 using Jrpg.Editor.Trade;
 
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// The Database menu's windows over the draft (ADR 0045, decision 583): the shops and the enemies, beside the quests;
-/// and the image import the Enemies and Character sprites windows share, through Data, asking before a replacement.
+/// The Database menu's windows over the draft (ADR 0045, decision 583): the shops, the drop tables and the enemies,
+/// beside the quests; and the image import the Enemies and Character sprites windows share, through Data, asking first
+/// when it would replace an image.
 /// </summary>
 internal sealed partial class MainViewModel
 {
@@ -20,6 +22,11 @@ internal sealed partial class MainViewModel
 
     /// <summary>Whether Database > Enemies... can open its window: false while the content didn't load.</summary>
     public bool HasEnemyEditing => EnemyEditing is not null;
+
+    public DropTableEditingViewModel? DropTableEditing { get; }
+
+    /// <summary>Whether Database > Drop tables... can open its window: false while the content didn't load.</summary>
+    public bool HasDropTableEditing => DropTableEditing is not null;
 
     /// <summary>
     /// Copies images into an art folder (asking before replacing one, decisions 125 and 590); a file copy, not an undo

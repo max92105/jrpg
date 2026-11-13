@@ -55,7 +55,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 - [x] **DT4. The Drop tables window's rules: tables in id order, Add, Remove while new, who rolls the chosen table, the problem line, one undo step** (Editor, about 235 lines) → [slices/DT4.md](slices/DT4.md)
 
 ### Phase 2: the windows
-- [ ] **DT5. The Drop tables window and Database > Drop tables...** (Editor, about 170 lines) → [slices/DT5.md](slices/DT5.md)
+- [x] **DT5. The Drop tables window and Database > Drop tables...** (Editor, about 170 lines) → [slices/DT5.md](slices/DT5.md)
 - [ ] ADR 0045 amendment: one line under Decision for the nested window. Write it from the entry under "ADRs" below (decision 602).
 - [ ] **DT6. Edit... beside the Enemies window's Drop table box: the Drop tables window over it, the new tables offered at once** (Editor, about 170 lines) → [slices/DT6.md](slices/DT6.md)
 

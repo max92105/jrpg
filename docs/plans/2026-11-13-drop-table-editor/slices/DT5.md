@@ -36,3 +36,5 @@ None new: window code; DT2-DT4 test the rules.
 9. **Ctrl+S**: `git diff content/` shows `drop-tables.json` with the `slime` table (Scrap with `"maxQuantity": 3`, Potion with only `"chance": 25`) and `enemies.json` with goblin's `dropTableId` changed; no other file.
 10. To see it in play, give `slime`'s Potion a chance of `100` before saving, start the game (`dotnet run --project src/Jrpg.Game`), win a battle against a goblin: the victory's Items step lists the potion.
 11. Revert with `git checkout -- content/drop-tables.json content/enemies.json` if this was only a check.
+
+- **Done, with deviations:** `MainViewModel.cs` reaches 283 lines, not 282: the constructor's line needs a `using Jrpg.Editor.Loot;` (backlog line updated). The "Rolled by" line binds through the window to the list's `RolledBy`, since the right panel's context is the chosen table.

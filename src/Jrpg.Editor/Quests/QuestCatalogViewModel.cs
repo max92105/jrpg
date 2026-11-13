@@ -3,6 +3,7 @@ using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Jrpg.Core.Quests;
+using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Quests;
 
@@ -37,27 +38,7 @@ internal sealed partial class QuestCatalogViewModel : ObservableObject
     /// Why the game would refuse the quests as typed, naming the quest by id (by position while it has none); null when
     /// it wouldn't.
     /// </summary>
-    public string? Problem
-    {
-        get
-        {
-            for (var index = 0; index < Quests.Count; index++)
-            {
-                var quest = Quests[index];
-                if (Quests.Take(index).Any(earlier => earlier.Id == quest.Id))
-                {
-                    return $"Quest {quest.Id} is listed twice.";
-                }
-
-                if (quest.Problem is { } problem)
-                {
-                    return $"Quest {(quest.Id.Length > 0 ? quest.Id : $"#{index + 1}")}: {problem}";
-                }
-            }
-
-            return null;
-        }
-    }
+    public string? Problem => RecordListProblem.FirstOf(Quests, quest => quest.Id, quest => quest.Problem, "Quest");
 
     /// <exception cref="InvalidOperationException">
     /// There is a <see cref="Problem"/>; the window applies only without one.

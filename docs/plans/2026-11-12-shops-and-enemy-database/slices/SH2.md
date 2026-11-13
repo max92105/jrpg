@@ -21,3 +21,5 @@ None outside the new folder.
 
 ## Verify by hand
 None: the window is SH3.
+
+- **Done, with deviations:** `ShopCatalogViewModel` takes the whole `ContentCatalog` (the shops and the items the picker offers, and what `CatalogProblems.OfShops` checks against) rather than a shop list; the Add item button greys while nothing is picked and once the picked item is listed; a new shop typing a saved shop's id reads "Shop x is listed twice." (the list sees them all, as the quests do); the tests build their own items and shops over the test world. The review found the list's problem loop copied from the Quests window: `Catalogs/RecordListProblem.FirstOf` now serves both catalogs.

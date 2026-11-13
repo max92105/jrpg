@@ -41,3 +41,5 @@ Every table as the window edits it: the draft's tables in id order, the ones add
 
 ## Verify by hand
 None: the window comes in DT5.
+
+- **Done, with deviations:** the tests build their own tables (`wolf_drops`, `spare`) and enemies over the test world, emptying the enemies where "Rolled by" shouldn't see the repository's; an extra `RolledBy_AddedTable_IsEmpty` pins the empty line for a new table; `CanApply_NewTableWithOneEntry_IsTrue` also pins the built table.

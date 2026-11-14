@@ -116,6 +116,10 @@
       "sourceId": "generated"
     },
     {
+      "path": "field-sprites/npc merchant A v00.png",
+      "sourceId": "mana-seed"
+    },
+    {
       "path": "field-sprites/npc_placeholder.png",
       "sourceId": "generated"
     },

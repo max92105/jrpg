@@ -7270,6 +7270,40 @@
       },
       "z": -3,
       "events": []
+    },
+    {
+      "uid": "traveling_merchant_1",
+      "objectId": "traveling_merchant",
+      "position": {
+        "x": 22,
+        "y": 23.841107646229343
+      },
+      "z": -5,
+      "events": [
+        {
+          "id": "traveling_merchant_1_0",
+          "activation": "interact",
+          "prompt": "Talk",
+          "isOnce": false,
+          "onlyWhenObjectId": null,
+          "steps": [
+            {
+              "type": "dialogue",
+              "speech": {
+                "lines": [
+                  "Hello"
+                ],
+                "speaker": null,
+                "portraitFile": null
+              }
+            },
+            {
+              "type": "openShop",
+              "shopId": "general_store"
+            }
+          ]
+        }
+      ]
     }
   ],
   "cellEvents": [

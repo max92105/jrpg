@@ -1,5 +1,23 @@
 [
   {
+    "file": "npc merchant A v00.png",
+    "frameWidth": 32,
+    "frameHeight": 32,
+    "scale": 3,
+    "walk": {
+      "rows": {
+        "down": 0,
+        "up": 2,
+        "left": 1,
+        "right": 2
+      },
+      "frames": {
+        "frameCount": 4,
+        "frameMilliseconds": 150
+      }
+    }
+  },
+  {
     "file": "npc_placeholder.png",
     "frameWidth": 48,
     "frameHeight": 48,

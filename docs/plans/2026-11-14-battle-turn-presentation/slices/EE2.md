@@ -38,3 +38,10 @@ EE3's.
 
 ## Verify by hand
 None: no window yet (EE4).
+
+- **Done, with deviations:** the image size lookup is `Func<string, (int Width, int Height)?>`, as `PngSize` reads it,
+  not a WPF `Point` of doubles; no `EffectStripFixtures` class, the test's own lookup and record being two lines. The
+  length line reads "4 frames, 0.32 s; hit at 0.16 s" (two decimals).
+- **Review:** the map row's entry moved past `EnemyViewModel`'s parenthetical; the frame time is compared parsed ("080"
+  is the unlisted pace) and the length worked out in long milliseconds; tests added for `ToStrip` on a hit past the
+  frames, each `IsListed` side and the hit frame's and swing's notices. 112 lines, tests 219.

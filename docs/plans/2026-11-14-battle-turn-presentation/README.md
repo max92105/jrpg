@@ -140,7 +140,7 @@ slice is done and write its deviations in the slice file. Tunables, the timeline
 - [x] **EE1. `effect-strips.json` saved from the editor: written sorted, defaults left out,
   `CatalogProblems.OfEffectStrips`, `CatalogDraft.SetEffectStrips`** (Data + Editor, about 200 lines) →
   [slices/EE1.md](slices/EE1.md)
-- [ ] **EE2. One strip as typed: pace and hit frame boxes, the swing, its length, its problem** (Editor, about 200
+- [x] **EE2. One strip as typed: pace and hit frame boxes, the swing, its length, its problem** (Editor, about 200
   lines) → [slices/EE2.md](slices/EE2.md)
 - [ ] **EE3. The Effect strips window's rules: every effects image, unlisted or not, reset, one undo step** (Editor,
   about 210 lines) → [slices/EE3.md](slices/EE3.md)

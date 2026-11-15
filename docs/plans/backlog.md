@@ -272,3 +272,5 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   sprites window and the playing cell outlined on the sheet (cut from the sprite cells plan at its review).
 - `ObjectTile`'s and `GridCell`'s members aren't required when read: a missing `x` reads as 0 (the serializer builds a
   struct through its parameterless constructor); add them to the sprite cells plan's `RequiredStructMembers` list.
+- `Editor/Sprites/FieldSpriteSetupViewModel.PreviewFrameAt` (formerly `PreviewCellAt`) has no caller but its tests:
+  the walk preview reads the record itself; remove it or give it the preview (sprite cells plan, SC3 review).

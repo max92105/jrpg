@@ -1,3 +1,4 @@
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Sprites;
 
@@ -23,6 +24,12 @@ public sealed class FacingSequenceTests
     public void Equals_SameCellsInAnotherOrder_Differs()
     {
         Assert.NotEqual(Sequence((0, 1), (2, 1)), Sequence((2, 1), (0, 1)));
+    }
+
+    [Fact]
+    public void Equals_OtherMirror_Differs()
+    {
+        Assert.NotEqual(new FacingSequence { MirrorOf = Facing.Left }, new FacingSequence { MirrorOf = Facing.Right });
     }
 
     [Fact]

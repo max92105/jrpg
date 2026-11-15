@@ -80,3 +80,9 @@ implementer runs the tests and step 1's start only.
    sprites..., choose `npc_placeholder.png`: in "Walking: down, left, right, up" the third figure walks as the second,
    flipped; close it with Cancel.
 4. Revert the edit (`git checkout content/field-sprites.json`).
+
+- **Done, with deviations:** run whole, the editor flip included (no SC3b). `FieldSpriteSheet` reads a mirror through
+  one private `SourceOf` (the facing shown and whether flipped), and counts what each facing reads through
+  `ColumnsReadBy` and `RowsReadBy`; the validator splits its rules into `FindMirrorProblem` and `FindCellsProblem`;
+  `WalkPreview` draws a flipped frame through one `DrawFrame`. The hand checks are the developer's (Mana Seed art on the
+  maps and in the window); no content file was edited.

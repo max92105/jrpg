@@ -1,4 +1,5 @@
 using Jrpg.Core.Content;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Sprites;
 using Jrpg.Data.Content;
@@ -87,6 +88,21 @@ public sealed class ContentWriterFieldSpriteTests : IDisposable
 
         Assert.Contains("\"up\": {", written, StringComparison.Ordinal);
         Assert.DoesNotContain("\"down\": null", written, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void WriteFieldSprites_MirrorRecord_WritesOnlyMirrorOf()
+    {
+        var right = new FacingSequence { MirrorOf = Facing.Left };
+        var sequences = new FacingSequences { Right = right };
+        var catalog = WithPlaceholder(sheet => sheet with { Walk = sheet.Walk with { Sequences = sequences } });
+
+        _writer.WriteMapCatalogs(catalog);
+
+        var written = File.ReadAllText(_content.PathOf("field-sprites.json"));
+        Assert.Contains("\"mirrorOf\": \"left\"", written, StringComparison.Ordinal);
+        Assert.DoesNotContain("cells", written, StringComparison.Ordinal);
+        Assert.Equal(catalog.FieldSprites[Placeholder], ContentCatalogLoader.Load(_content.Path).FieldSprites[Placeholder]);
     }
 
     private static FieldSpriteSheet WithUp(FieldSpriteSheet sheet, FacingSequence up) =>

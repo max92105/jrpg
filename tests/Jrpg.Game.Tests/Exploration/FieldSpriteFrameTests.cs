@@ -3,6 +3,7 @@ using Jrpg.Core.Maps;
 using Jrpg.Core.Sprites;
 using Jrpg.Game.Exploration;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Jrpg.Game.Tests.Exploration;
 
@@ -30,6 +31,15 @@ public sealed class FieldSpriteFrameTests
 
         Assert.Equal(new Rectangle(32, 48, 16, 24), FieldSpriteFrame.SourceOf(tall, new SpriteCell(2, 2)));
     }
+
+    [Fact]
+    public void EffectsOf_MirroredFrame_FlipsHorizontally() =>
+        Assert.Equal(
+            SpriteEffects.FlipHorizontally, FieldSpriteFrame.EffectsOf(new SpriteFrame(new SpriteCell(0, 1), IsMirrored: true)));
+
+    [Fact]
+    public void EffectsOf_PlainFrame_DrawsAsIs() =>
+        Assert.Equal(SpriteEffects.None, FieldSpriteFrame.EffectsOf(new SpriteFrame(new SpriteCell(0, 1), IsMirrored: false)));
 
     private static FieldSpriteSheet Sheet(int width, int height, FacingRows rows) => new()
     {

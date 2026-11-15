@@ -22,49 +22,49 @@ public sealed class FieldSpriteSheetSequenceTests
     };
 
     [Fact]
-    public void StandingCell_FacingWithSequence_IsItsFirstCell()
+    public void StandingFrame_FacingWithSequence_IsItsFirstCell()
     {
         var sheet = WithSequences(new FacingSequences { Up = Sequence((2, 5), (3, 5)) });
 
-        Assert.Equal(new SpriteCell(2, 5), sheet.StandingCell(Facing.Up));
+        Assert.Equal(new SpriteCell(2, 5), sheet.StandingFrame(Facing.Up).Cell);
     }
 
     [Theory]
     [InlineData(0, 2)]
     [InlineData(100, 0)]
     [InlineData(200, 3)]
-    public void WalkCellAt_Sequence_PlaysItsCellsInOrder(int walkedMilliseconds, int column)
+    public void WalkFrameAt_Sequence_PlaysItsCellsInOrder(int walkedMilliseconds, int column)
     {
         var sheet = WithSequences(new FacingSequences { Up = Sequence((2, 5), (0, 5), (3, 5)) });
 
-        Assert.Equal(new SpriteCell(column, 5), sheet.WalkCellAt(Facing.Up, TimeSpan.FromMilliseconds(walkedMilliseconds)));
+        Assert.Equal(new SpriteCell(column, 5), sheet.WalkFrameAt(Facing.Up, TimeSpan.FromMilliseconds(walkedMilliseconds)).Cell);
     }
 
     [Fact]
-    public void WalkCellAt_SequenceRepeatingACell_ShowsItAgainInTurn()
+    public void WalkFrameAt_SequenceRepeatingACell_ShowsItAgainInTurn()
     {
         var sheet = WithSequences(new FacingSequences { Down = Sequence((0, 4), (1, 4), (2, 4), (1, 4)) });
 
-        Assert.Equal(new SpriteCell(1, 4), sheet.WalkCellAt(Facing.Down, TimeSpan.FromMilliseconds(300)));
+        Assert.Equal(new SpriteCell(1, 4), sheet.WalkFrameAt(Facing.Down, TimeSpan.FromMilliseconds(300)).Cell);
     }
 
     // Three cells against four-frame rows: the sequence loops over its own count.
     [Fact]
-    public void WalkCellAt_AfterTheSequencesLastCell_LoopsToItsFirst()
+    public void WalkFrameAt_AfterTheSequencesLastCell_LoopsToItsFirst()
     {
         var sheet = WithSequences(new FacingSequences { Up = Sequence((5, 6), (6, 6), (7, 6)) });
         var walked = TimeSpan.FromMilliseconds(300);
 
-        Assert.Equal(new SpriteCell(5, 6), sheet.WalkCellAt(Facing.Up, walked));
-        Assert.Equal(new SpriteCell(3, 2), sheet.WalkCellAt(Facing.Left, walked));
+        Assert.Equal(new SpriteCell(5, 6), sheet.WalkFrameAt(Facing.Up, walked).Cell);
+        Assert.Equal(new SpriteCell(3, 2), sheet.WalkFrameAt(Facing.Left, walked).Cell);
     }
 
     [Fact]
-    public void WalkCellAt_FacingWithoutSequence_StillReadsItsRow()
+    public void WalkFrameAt_FacingWithoutSequence_StillReadsItsRow()
     {
         var sheet = WithSequences(new FacingSequences { Up = Sequence((5, 6)) });
 
-        Assert.Equal(new SpriteCell(1, 2), sheet.WalkCellAt(Facing.Left, TimeSpan.FromMilliseconds(100)));
+        Assert.Equal(new SpriteCell(1, 2), sheet.WalkFrameAt(Facing.Left, TimeSpan.FromMilliseconds(100)).Cell);
     }
 
     [Fact]

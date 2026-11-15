@@ -30,16 +30,18 @@ public sealed class FieldSpriteSheetTests
     [InlineData(100, 1)]
     [InlineData(799, 7)]
     [InlineData(800, 0)]
-    public void WalkCellAt_PlayerSheet_MatchesTodaysFrames(int walkedMilliseconds, int column) =>
-        Assert.Equal(new SpriteCell(column, 2), _player.WalkCellAt(Facing.Right, TimeSpan.FromMilliseconds(walkedMilliseconds)));
+    public void WalkFrameAt_PlayerSheet_MatchesTodaysFrames(int walkedMilliseconds, int column) =>
+        Assert.Equal(
+            new SpriteCell(column, 2),
+            _player.WalkFrameAt(Facing.Right, TimeSpan.FromMilliseconds(walkedMilliseconds)).Cell);
 
     [Theory]
     [InlineData(Facing.Down, 0)]
     [InlineData(Facing.Left, 1)]
     [InlineData(Facing.Right, 2)]
     [InlineData(Facing.Up, 3)]
-    public void StandingCell_EachFacing_IsColumnZeroOfItsRow(Facing facing, int row) =>
-        Assert.Equal(new SpriteCell(0, row), _player.StandingCell(facing));
+    public void StandingFrame_EachFacing_IsColumnZeroOfItsRow(Facing facing, int row) =>
+        Assert.Equal(new SpriteCell(0, row), _player.StandingFrame(facing).Cell);
 
     [Fact]
     public void ColumnsNeeded_EightFrameWalk_IsEight() => Assert.Equal(8, _player.ColumnsNeeded);

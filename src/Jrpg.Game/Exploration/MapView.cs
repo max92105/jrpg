@@ -111,8 +111,10 @@ internal sealed class MapView(
         }
 
         var sheet = art.FieldSprites[definition.FieldSpriteFile!];
-        var cell = pose.IsWalking ? sheet.WalkCellAt(pose.Facing, pose.Walked) : sheet.StandingCell(pose.Facing);
-        batch.Draw(textures.Get(ArtFolders.FieldSprites, sheet.File), area, FieldSpriteFrame.SourceOf(sheet, cell), Color.White);
+        var frame = pose.IsWalking ? sheet.WalkFrameAt(pose.Facing, pose.Walked) : sheet.StandingFrame(pose.Facing);
+        var source = FieldSpriteFrame.SourceOf(sheet, frame.Cell);
+        var image = textures.Get(ArtFolders.FieldSprites, sheet.File);
+        batch.Draw(image, area, source, Color.White, 0, Vector2.Zero, FieldSpriteFrame.EffectsOf(frame), 0);
     }
 
     private static bool IsOnScreen(Rectangle area) =>

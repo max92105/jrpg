@@ -2,7 +2,7 @@ namespace Jrpg.Game.Exploration;
 
 /// <summary>
 /// How long the player has walked since last standing, which the player's sheet turns into a walk frame
-/// (<c>FieldSpriteSheet.WalkCellAt</c>, ADR 0043); the record holds the frame count and time, not this.
+/// (<c>FieldSpriteSheet.WalkFrameAt</c>, ADR 0043); the record holds the frame count and time, not this.
 /// </summary>
 internal sealed class WalkAnimation
 {

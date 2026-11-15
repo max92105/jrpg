@@ -33,15 +33,27 @@ public sealed record FieldSpriteSheet
     public required FacingCycle Walk { get; init; }
 
     /// <summary>
-    /// The frame shown standing: the facing's first, its sequence's first cell or column 0 of its row (decision 764).
+    /// The frame shown standing: the facing's first, its sequence's first cell or column 0 of its row (decision 764); a
+    /// mirror shows the mirrored facing's first, flipped.
     /// </summary>
-    public SpriteCell StandingCell(Facing facing) => CellOf(facing, 0);
+    public SpriteFrame StandingFrame(Facing facing)
+    {
+        var (shown, isMirrored) = SourceOf(facing);
+        return new SpriteFrame(CellOf(shown, 0), isMirrored);
+    }
 
-    /// <summary>The walk's frame after <paramref name="walked"/>: the facing's sequence or row, looped.</summary>
-    /// <param name="facing">Picks the sequence or the row.</param>
+    /// <summary>
+    /// The walk's frame after <paramref name="walked"/>: the facing's sequence or row, looped; a mirror shows the
+    /// mirrored facing's frame at the same time, flipped (decision 766).
+    /// </summary>
+    /// <param name="facing">Picks the sequence, the row or the mirrored facing.</param>
     /// <param name="walked">The time walked since last standing; the shells carry it, Core never reads a clock.</param>
-    public SpriteCell WalkCellAt(Facing facing, TimeSpan walked) =>
-        CellOf(facing, TileAnimation.LoopFrameAt(walked, Walk.Frames.FrameDuration, FrameCountOf(facing)));
+    public SpriteFrame WalkFrameAt(Facing facing, TimeSpan walked)
+    {
+        var (shown, isMirrored) = SourceOf(facing);
+        var index = TileAnimation.LoopFrameAt(walked, Walk.Frames.FrameDuration, FrameCountOf(shown));
+        return new SpriteFrame(CellOf(shown, index), isMirrored);
+    }
 
     /// <summary>A frame's left edge in sheet pixels.</summary>
     public int FrameLeft(SpriteCell cell) => cell.Column * FrameWidth;
@@ -65,20 +77,35 @@ public sealed record FieldSpriteSheet
     /// The whole frames the image must hold across: through the farthest column read, the frame count while a facing
     /// reads its row and every sequence's cells. In long, so a cell at the int limit never wraps.
     /// </summary>
-    public long ColumnsNeeded => Enum.GetValues<Facing>().Max(facing => SequenceOf(facing) is { } sequence
-        ? sequence.Cells.Select(cell => (long)cell.Column + 1).DefaultIfEmpty(0).Max()
-        : Walk.Frames.FrameCount);
+    public long ColumnsNeeded => Enum.GetValues<Facing>().Max(ColumnsReadBy);
 
     /// <summary>
     /// The whole frames the image must hold down: through the highest row read, a facing's row when it has no sequence
     /// and every sequence's cells. In long, since a typed row at the int limit plus one would otherwise wrap and pass
     /// every size check.
     /// </summary>
-    public long RowsNeeded => Enum.GetValues<Facing>().Max(facing => SequenceOf(facing) is { } sequence
-        ? sequence.Cells.Select(cell => (long)cell.Row + 1).DefaultIfEmpty(0).Max()
-        : (long)Walk.Rows.RowOf(facing) + 1);
+    public long RowsNeeded => Enum.GetValues<Facing>().Max(RowsReadBy);
 
     private FacingSequence? SequenceOf(Facing facing) => Walk.Sequences?.Of(facing);
+
+    // A mirror reads the facing it names, one hop (the loader refuses a mirror of a mirror).
+    private (Facing Shown, bool IsMirrored) SourceOf(Facing facing) =>
+        SequenceOf(facing)?.MirrorOf is { } mirrored ? (mirrored, true) : (facing, false);
+
+    // A mirror reads what its facing reads, so it adds nothing; its own row stays unread.
+    private long ColumnsReadBy(Facing facing) => SequenceOf(facing) switch
+    {
+        { MirrorOf: not null } => 0,
+        { } sequence => sequence.Cells.Select(cell => (long)cell.Column + 1).DefaultIfEmpty(0).Max(),
+        null => Walk.Frames.FrameCount,
+    };
+
+    private long RowsReadBy(Facing facing) => SequenceOf(facing) switch
+    {
+        { MirrorOf: not null } => 0,
+        { } sequence => sequence.Cells.Select(cell => (long)cell.Row + 1).DefaultIfEmpty(0).Max(),
+        null => (long)Walk.Rows.RowOf(facing) + 1,
+    };
 
     private int FrameCountOf(Facing facing) => SequenceOf(facing) is { } sequence ? sequence.Cells.Count : Walk.Frames.FrameCount;
 

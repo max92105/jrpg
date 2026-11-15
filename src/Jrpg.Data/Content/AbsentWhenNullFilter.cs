@@ -55,6 +55,7 @@ internal static class AbsentWhenNullFilter
         (typeof(FacingSequences), "up"),
         (typeof(FacingSequences), "left"),
         (typeof(FacingSequences), "right"),
+        (typeof(FacingSequence), "mirrorOf"),
 
         // Decision 586: an enemy the editor writes reads like a hand-written one; null drops nothing, no gold.
         (typeof(EnemyDefinition), "dropTableId"),

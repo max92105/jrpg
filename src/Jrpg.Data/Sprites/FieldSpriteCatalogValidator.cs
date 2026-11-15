@@ -9,8 +9,8 @@ namespace Jrpg.Data.Sprites;
 /// The rules for <c>field-sprites.json</c> (ADR 0043): each record names a PNG once, cuts it in frames of at least a
 /// pixel, draws at a scale from 1 to <see cref="FieldSpriteSheet.MaxScale"/>, keeps its feet inside the frame, reads
 /// rows from 0 and walks through at least two frames shown for at least a millisecond; a facing's sequence (ADR 0054)
-/// holds at least one cell, each at a column and a row from 0. The startup art check, not this one, checks that the
-/// frames lie inside the image.
+/// holds at least one cell, each at a column and a row from 0, or mirrors another facing that isn't itself a mirror.
+/// The startup art check, not this one, checks that the frames lie inside the image.
 /// </summary>
 internal static class FieldSpriteCatalogValidator
 {
@@ -44,20 +44,34 @@ internal static class FieldSpriteCatalogValidator
     // Checked whether or not a facing's row is read (decision 767); the facings in the enum's order.
     private static string? FindSequencesProblem(FacingSequences sequences) =>
         Enum.GetValues<Facing>()
-            .Select(facing => sequences.Of(facing) is { } sequence ? FindSequenceProblem(facing, sequence) : null)
+            .Select(facing => sequences.Of(facing) is { } sequence ? FindSequenceProblem(facing, sequence, sequences) : null)
             .FirstOrDefault(problem => problem is not null);
 
-    private static string? FindSequenceProblem(Facing facing, FacingSequence sequence)
+    // Cells or a mirror, never both nor neither (decision 766).
+    private static string? FindSequenceProblem(Facing facing, FacingSequence sequence, FacingSequences sequences)
     {
-        var field = $"walk.sequences.{ContentJsonOptions.EnumName(facing)}.cells";
-        if (sequence.Cells.Count == 0)
+        var field = $"walk.sequences.{ContentJsonOptions.EnumName(facing)}";
+        return (sequence.Cells.Count > 0, sequence.MirrorOf) switch
         {
-            return $"{field} must hold at least 1 cell.";
-        }
+            (true, not null) => $"{field} has both cells and mirrorOf.",
+            (false, null) => $"{field} needs cells or mirrorOf.",
+            (false, { } mirrored) => FindMirrorProblem(field, facing, mirrored, sequences),
+            _ => FindCellsProblem($"{field}.cells", sequence.Cells),
+        };
+    }
 
-        for (var index = 0; index < sequence.Cells.Count; index++)
+    // One hop, so a mirror never loops (decision 766).
+    private static string? FindMirrorProblem(string field, Facing facing, Facing mirrored, FacingSequences sequences) =>
+        mirrored == facing ? $"{field}.mirrorOf can't name its own facing."
+        : sequences.Of(mirrored) is { MirrorOf: not null }
+            ? $"{field}.mirrorOf names {ContentJsonOptions.EnumName(mirrored)}, which is itself a mirror."
+        : null;
+
+    private static string? FindCellsProblem(string field, IReadOnlyList<SpriteCell> cells)
+    {
+        for (var index = 0; index < cells.Count; index++)
         {
-            var cell = sequence.Cells[index];
+            var cell = cells[index];
             if ((RangeProblems.AtLeast($"{field}[{index}].column", cell.Column, 0)
                 ?? RangeProblems.AtLeast($"{field}[{index}].row", cell.Row, 0)) is { } problem)
             {

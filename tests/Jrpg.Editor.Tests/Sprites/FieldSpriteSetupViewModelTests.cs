@@ -171,21 +171,21 @@ public sealed class FieldSpriteSetupViewModelTests
     [InlineData(0, 0)]
     [InlineData(100, 1)]
     [InlineData(750, 7)]
-    public void PreviewCellAt_WalkingLeft_StepsAlongTheLeftRow(int milliseconds, int column)
+    public void PreviewFrameAt_WalkingLeft_StepsAlongTheLeftRow(int milliseconds, int column)
     {
         var walked = TimeSpan.FromMilliseconds(milliseconds);
 
-        Assert.Equal(new SpriteCell(column, 1), PlayerSetup().PreviewCellAt(Facing.Left, walked));
+        Assert.Equal(new SpriteCell(column, 1), PlayerSetup().PreviewFrameAt(Facing.Left, walked)?.Cell);
     }
 
     [Fact]
-    public void PreviewCellAt_WithProblem_IsNull()
+    public void PreviewFrameAt_WithProblem_IsNull()
     {
         var setup = PlayerSetup();
 
         setup.Scale = 0;
 
-        Assert.Null(setup.PreviewCellAt(Facing.Down, TimeSpan.Zero));
+        Assert.Null(setup.PreviewFrameAt(Facing.Down, TimeSpan.Zero));
     }
 
     [Fact]

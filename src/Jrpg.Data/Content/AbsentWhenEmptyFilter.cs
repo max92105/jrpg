@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Text.Json.Serialization.Metadata;
 using Jrpg.Core.Battle;
+using Jrpg.Core.Sprites;
 
 namespace Jrpg.Data.Content;
 
 /// <summary>
 /// Leaves a list empty by default out of a file while it is empty, so an enemy the editor writes reads like a
-/// hand-written one (decision 586): most enemies only attack and have no phases (ADR 0034).
+/// hand-written one (decision 586): most enemies only attack and have no phases (ADR 0034); a field sprite facing that
+/// mirrors another has no cells (ADR 0054).
 /// </summary>
 internal static class AbsentWhenEmptyFilter
 {
@@ -14,6 +16,7 @@ internal static class AbsentWhenEmptyFilter
     [
         (typeof(EnemyDefinition), "tactics"),
         (typeof(EnemyDefinition), "phases"),
+        (typeof(FacingSequence), "cells"),
     ];
 
     public static void SkipEmptyOptionalFields(JsonTypeInfo typeInfo) =>

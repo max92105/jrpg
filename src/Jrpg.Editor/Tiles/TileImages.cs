@@ -100,9 +100,10 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<Miss
     }
 
     /// <summary>
-    /// The standing frame an NPC is drawn with: a facing's first walk frame as its sheet's record cuts it (ADR 0043).
-    /// The mark for a sprite whose image is missing, one without a record (an object made before its sheet was set up)
-    /// or one whose frame lies past the image's edge; cached by record and facing, so a changed setup crops anew.
+    /// The standing frame an NPC is drawn with: a facing's first walk frame as its sheet's record cuts it (ADR 0043),
+    /// flipped left to right for a facing that mirrors another (ADR 0054). The mark for a sprite whose image is
+    /// missing, one without a record (an object made before its sheet was set up) or one whose frame lies past the
+    /// image's edge; cached by record and facing, so a changed setup crops anew.
     /// </summary>
     /// <param name="file">The file name in the field-sprite art folder.</param>
     /// <param name="facing">Which way the NPC stands (decision 572).</param>
@@ -116,20 +117,25 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<Miss
         if (!_spriteFrames.TryGetValue((sheet, facing), out var frame))
         {
             var sprite = LoadImage(ArtFolders.FieldSprites, file);
-            var cell = sheet.StandingCell(facing);
+            var standing = sheet.StandingFrame(facing);
+            var cell = standing.Cell;
             var area = new Int32Rect(sheet.FrameLeft(cell), sheet.FrameTop(cell), sheet.FrameWidth, sheet.FrameHeight);
             if (area.X + area.Width > sprite.PixelWidth || area.Y + area.Height > sprite.PixelHeight)
             {
                 return MissingArtMark.Picture;
             }
 
-            frame = new CroppedBitmap(sprite, area);
+            var cropped = new CroppedBitmap(sprite, area);
+            frame = standing.IsMirrored ? Mirrored(cropped) : cropped;
             frame.Freeze();
             _spriteFrames.Add((sheet, facing), frame);
         }
 
         return frame;
     }
+
+    // A mirrored facing's frame, flipped left to right in place (decision 766).
+    private static TransformedBitmap Mirrored(BitmapSource frame) => new(frame, new ScaleTransform(-1, 1));
 
     /// <summary>
     /// Drops an image and the tiles or sprite frames cropped from it, so a file replaced by an import is read again.

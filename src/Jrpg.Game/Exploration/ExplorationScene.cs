@@ -207,7 +207,9 @@ internal sealed class ExplorationScene : IScene
         var sheet = _art.PlayerSprite;
         var over = sheet.AreaOver(size);
         var area = new Rectangle(cellLeft + over.Left, cellTop + over.Top, over.Width, over.Height);
-        var source = FieldSpriteFrame.SourceOf(sheet, sheet.WalkCellAt(_exploration.PlayerFacing, _walkAnimation.Walked));
-        batch.Draw(textures.Get(ArtFolders.FieldSprites, sheet.File), area, source, Color.White);
+        var frame = sheet.WalkFrameAt(_exploration.PlayerFacing, _walkAnimation.Walked);
+        var source = FieldSpriteFrame.SourceOf(sheet, frame.Cell);
+        var image = textures.Get(ArtFolders.FieldSprites, sheet.File);
+        batch.Draw(image, area, source, Color.White, 0, Vector2.Zero, FieldSpriteFrame.EffectsOf(frame), 0);
     }
 }

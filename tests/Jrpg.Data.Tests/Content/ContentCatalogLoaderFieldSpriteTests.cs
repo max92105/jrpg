@@ -108,4 +108,15 @@ public sealed class ContentCatalogLoaderFieldSpriteTests : IDisposable
         Assert.Equal([new SpriteCell(2, 5), new SpriteCell(0, 5)], placeholder.Walk.Sequences!.Up!.Cells);
         Assert.Null(placeholder.Walk.Sequences.Down);
     }
+
+    [Fact]
+    public void Load_MirrorRecord_ReadsItsFacing()
+    {
+        _content.Replace(
+            "field-sprites.json", "\"frames\": {", "\"sequences\": { \"right\": { \"mirrorOf\": \"left\" } }, \"frames\": {");
+
+        var placeholder = ContentCatalogLoader.Load(_content.Path).FieldSprites[PlaceholderSprite];
+
+        Assert.Equal(new FacingSequence { MirrorOf = Facing.Left }, placeholder.Walk.Sequences!.Right);
+    }
 }

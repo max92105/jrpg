@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Jrpg.Core.Content;
 using Jrpg.Core.Geometry;
@@ -83,6 +84,28 @@ public sealed class TileImagesSpriteTests
         images.Forget("NPC_PLACEHOLDER.png");
 
         Assert.NotSame(before, images.FieldSpriteFrameOf(Placeholder, Facing.Down));
+    }
+
+    // Right mirrors Left (row 1): the standing frame is Left's, flipped (decision 766).
+    [Fact]
+    public void FieldSpriteFrameOf_MirrorFacing_IsTheMirroredFacingsFrameFlipped()
+    {
+        var sheet = _catalog.FieldSprites[Placeholder];
+        var mirrored = sheet with
+        {
+            Walk = sheet.Walk with { Sequences = new FacingSequences { Right = new FacingSequence { MirrorOf = Facing.Left } } },
+        };
+        var sheets = new Dictionary<string, FieldSpriteSheet>(_catalog.FieldSprites, StringComparer.Ordinal)
+        {
+            [Placeholder] = mirrored,
+        };
+        var draft = new CatalogDraft(_catalog with { FieldSprites = sheets });
+        var images = new TileImages(draft, ArtFolders.RootIn(_root), () => MissingArt.None);
+
+        var frame = Assert.IsType<TransformedBitmap>(images.FieldSpriteFrameOf(Placeholder, Facing.Right));
+
+        Assert.Equal(new Int32Rect(0, 48, 48, 48), Assert.IsType<CroppedBitmap>(frame.Source).SourceRect);
+        Assert.Equal(-1, Assert.IsType<ScaleTransform>(frame.Transform).ScaleX);
     }
 
     private static ContentCatalog WithPlaceholder(int frameWidth, int frameHeight, int downRow)

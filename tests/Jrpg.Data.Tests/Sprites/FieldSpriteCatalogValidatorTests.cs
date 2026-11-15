@@ -1,3 +1,4 @@
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Sprites;
 using Jrpg.Data.Content;
@@ -44,15 +45,33 @@ public sealed class FieldSpriteCatalogValidatorTests
         { WithRows(new FacingRows { Down = 0, Left = -1, Right = 2, Up = 3 }), "walk.rows.left must be at least 0 (was -1)." },
         { WithFrames(1, 150), "walk.frames.frameCount must be at least 2 (was 1)." },
         { WithFrames(4, 0), "walk.frames.frameMilliseconds must be at least 1 (was 0)." },
-        { WithUp(Sequence()), "walk.sequences.up.cells must hold at least 1 cell." },
+        { WithUp(Sequence()), "walk.sequences.up needs cells or mirrorOf." },
         { WithUp(Sequence((0, 2), (1, 2), (-1, 2))), "walk.sequences.up.cells[2].column must be at least 0 (was -1)." },
         { WithUp(Sequence((0, -1))), "walk.sequences.up.cells[0].row must be at least 0 (was -1)." },
+        { WithUp(Sequence((0, 2)) with { MirrorOf = Facing.Down }), "walk.sequences.up has both cells and mirrorOf." },
+        { WithUp(Mirror(Facing.Up)), "walk.sequences.up.mirrorOf can't name its own facing." },
+        {
+            WithSequences(new FacingSequences { Up = Mirror(Facing.Left), Left = Mirror(Facing.Right) }),
+            "walk.sequences.up.mirrorOf names left, which is itself a mirror."
+        },
     };
 
     [Fact]
     public void Validate_FacingOnASequence_Passes() =>
         Assert.Null(Record.Exception(
             () => FieldSpriteCatalogValidator.Validate(FileName, [WithUp(Sequence((0, 2), (1, 2), (0, 2)))])));
+
+    [Fact]
+    public void Validate_MirrorOfARowFacing_Passes() =>
+        Assert.Null(Record.Exception(() => FieldSpriteCatalogValidator.Validate(FileName, [WithUp(Mirror(Facing.Left))])));
+
+    [Fact]
+    public void Validate_MirrorOfASequenceFacing_Passes()
+    {
+        var sheet = WithSequences(new FacingSequences { Up = Mirror(Facing.Left), Left = Sequence((0, 1), (1, 1)) });
+
+        Assert.Null(Record.Exception(() => FieldSpriteCatalogValidator.Validate(FileName, [sheet])));
+    }
 
     // The bound: a single cell stands still while walking (decision 763).
     [Fact]
@@ -90,8 +109,12 @@ public sealed class FieldSpriteCatalogValidatorTests
         Assert.EndsWith("field sprite id 'villager.png' is used more than once.", exception.Message, StringComparison.Ordinal);
     }
 
-    private static FieldSpriteSheet WithUp(FacingSequence up) =>
-        _villager with { Walk = _villager.Walk with { Sequences = new FacingSequences { Up = up } } };
+    private static FieldSpriteSheet WithUp(FacingSequence up) => WithSequences(new FacingSequences { Up = up });
+
+    private static FieldSpriteSheet WithSequences(FacingSequences sequences) =>
+        _villager with { Walk = _villager.Walk with { Sequences = sequences } };
+
+    private static FacingSequence Mirror(Facing facing) => new() { MirrorOf = facing };
 
     private static FacingSequence Sequence(params (int Column, int Row)[] cells) =>
         new() { Cells = [.. cells.Select(cell => new SpriteCell(cell.Column, cell.Row))] };

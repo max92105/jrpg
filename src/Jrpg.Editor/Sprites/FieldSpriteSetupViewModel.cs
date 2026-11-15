@@ -128,8 +128,8 @@ internal sealed partial class FieldSpriteSetupViewModel : ObservableObject
     /// <summary>
     /// The frame the preview shows for a facing after walking this long; null while there is a problem.
     /// </summary>
-    public SpriteCell? PreviewCellAt(Facing facing, TimeSpan elapsed) =>
-        Problem is null ? Record().WalkCellAt(facing, elapsed) : null;
+    public SpriteFrame? PreviewFrameAt(Facing facing, TimeSpan elapsed) =>
+        Problem is null ? Record().WalkFrameAt(facing, elapsed) : null;
 
     private FieldSpriteSheet Record() => new()
     {

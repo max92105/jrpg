@@ -22,7 +22,7 @@
     <DockPanel DockPanel.Dock="Left" Width="260">
       <DockPanel DockPanel.Dock="Top" Margin="0,0,0,4">
         <!-- A preset replaces all the events; the first field it leaves empty is shown. -->
-        <Button x:Name="PresetButton" DockPanel.Dock="Right" Content="Preset ▾" Width="80" Click="OnPresetClicked" ToolTip="Replaces the object's events with a usual set; the first field left to fill is shown.">
+        <Button x:Name="PresetButton" DockPanel.Dock="Right" Content="Preset ▾" Width="80" Click="OnPresetClicked" ToolTip="Replaces the object's events with a usual set; the first field left to fill is shown. A quest giver's words once its quest is completed are a third event to add.">
           <Button.ContextMenu>
             <ContextMenu ItemsSource="{Binding PresetChoices}" ItemContainerStyle="{StaticResource DropDownEntry}" />
           </Button.ContextMenu>

@@ -22,7 +22,11 @@ internal sealed partial class EventViewModel : ObservableObject
         OnlyWhenObjectId = mapEvent.OnlyWhenObjectId ?? "";
         OnlyWhenLeaderId = mapEvent.OnlyWhenLeaderId ?? "";
         QuestGate = new QuestGateViewModel(mapEvent.OnlyWhenQuest, choices.QuestStages);
-        QuestGate.PropertyChanged += (_, _) => OnPropertyChanged(nameof(Label));
+        QuestGate.PropertyChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(Label));
+            OnPropertyChanged(nameof(ConditionSummary));
+        };
         Steps = [.. mapEvent.Steps.Select(EventStepViewModel.From)];
         Steps.CollectionChanged += (_, _) => OnPropertyChanged(nameof(Label));
         AddStepChoices = StepKindMenu.Choices(AddStepCommand);
@@ -45,26 +49,26 @@ internal sealed partial class EventViewModel : ObservableObject
     public QuestGateViewModel QuestGate { get; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Label), nameof(CanHavePrompt))]
+    [NotifyPropertyChangedFor(nameof(Label), nameof(ConditionSummary), nameof(CanHavePrompt))]
     public partial EventActivation Activation { get; set; }
 
     /// <summary>The hint shown when the player can interact, such as "Open".</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Label))]
+    [NotifyPropertyChangedFor(nameof(Label), nameof(ConditionSummary))]
     public partial string Prompt { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Label))]
+    [NotifyPropertyChangedFor(nameof(Label), nameof(ConditionSummary))]
     public partial bool IsOnce { get; set; }
 
     /// <summary>The object the event's object must be for it to run, such as a closed door; empty for always.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Label))]
+    [NotifyPropertyChangedFor(nameof(Label), nameof(ConditionSummary))]
     public partial string OnlyWhenObjectId { get; set; }
 
     /// <summary>The member who must lead for the event to run, such as an intro's character; empty for anyone.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Label))]
+    [NotifyPropertyChangedFor(nameof(Label), nameof(ConditionSummary))]
     public partial string OnlyWhenLeaderId { get; set; }
 
     /// <summary>False for an arrival event: nothing is pressed to start it, so the game refuses a prompt.</summary>
@@ -75,21 +79,15 @@ internal sealed partial class EventViewModel : ObservableObject
     public partial EventStepViewModel? SelectedStep { get; set; }
 
     /// <summary>The one-line summary, such as <c>Press "Open" if door_close: 1 step(s), once</c> or <c>On arrival while omer leads: 4 step(s), once</c>.</summary>
-    public string Label
-    {
-        get
-        {
-            var when = Activation switch
-            {
-                EventActivation.Touch => "Walk into",
-                EventActivation.Arrive => "On arrival",
-                _ => $"Press \"{Prompt}\"",
-            };
-            var objectCondition = OnlyWhenObjectId.Length > 0 ? $" if {OnlyWhenObjectId}" : "";
-            var leaderCondition = OnlyWhenLeaderId.Length > 0 ? $" while {OnlyWhenLeaderId} leads" : "";
-            return $"{when}{objectCondition}{leaderCondition}{QuestGate.Label}: {Steps.Count} step(s){(IsOnce ? ", once" : "")}";
-        }
-    }
+    public string Label => $"{ConditionWords()}: {Steps.Count} step(s){OnceWords}";
+
+    /// <summary>
+    /// The folded conditions' line (decision 732): <see cref="Label"/> without the step count, such as <c>Press "Open"
+    /// if door_close when errand is active, once</c>.
+    /// </summary>
+    public string ConditionSummary => $"{ConditionWords()}{OnceWords}";
+
+    private string OnceWords => IsOnce ? ", once" : "";
 
     public MapEvent ToEvent() => new()
     {
@@ -106,6 +104,20 @@ internal sealed partial class EventViewModel : ObservableObject
     /// <summary>Why the gate or a step can't be kept as typed, naming the step; null when all can.</summary>
     public string? Problem =>
         QuestGate.Problem ?? Steps.Select((step, index) => step.Problem is { } problem ? $"step {index + 1}: {problem}" : null).FirstOrDefault(problem => problem is not null);
+
+    // What starts the event, then the object, leader and quest it waits for.
+    private string ConditionWords()
+    {
+        var when = Activation switch
+        {
+            EventActivation.Touch => "Walk into",
+            EventActivation.Arrive => "On arrival",
+            _ => $"Press \"{Prompt}\"",
+        };
+        var objectCondition = OnlyWhenObjectId.Length > 0 ? $" if {OnlyWhenObjectId}" : "";
+        var leaderCondition = OnlyWhenLeaderId.Length > 0 ? $" while {OnlyWhenLeaderId} leads" : "";
+        return $"{when}{objectCondition}{leaderCondition}{QuestGate.Label}";
+    }
 
     // After the chosen step, or last when none is chosen.
     [RelayCommand(CanExecute = nameof(CanAddStep))]

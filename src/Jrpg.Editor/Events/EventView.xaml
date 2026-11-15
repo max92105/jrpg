@@ -20,49 +20,64 @@
   <DockPanel>
     <StackPanel DockPanel.Dock="Top">
       <TextBlock Text="{Binding Id, StringFormat=Event id: {0}}" Foreground="{StaticResource MutedTextBrush}" />
-      <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-        <TextBlock Text="Starts when the player" Width="160" VerticalAlignment="Center" />
-        <ComboBox Width="120"
-                  ItemsSource="{Binding DataContext.Activations, RelativeSource={RelativeSource AncestorType=Window}}"
-                  SelectedItem="{Binding Activation}"
-                  ToolTip="Touch: walks into it. Arrive: arrives on the map, such as an intro." />
-      </StackPanel>
-      <StackPanel Orientation="Horizontal" Margin="0,4,0,0" Visibility="{Binding IsObjectEvent, Converter={StaticResource VisibleWhenTrue}}">
-        <TextBlock Text="Prompt (for interact)" Width="160" VerticalAlignment="Center" />
-        <TextBox Width="160" Text="{Binding Prompt, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanHavePrompt}" />
-      </StackPanel>
-      <StackPanel Orientation="Horizontal" Margin="0,4,0,0" Visibility="{Binding IsObjectEvent, Converter={StaticResource VisibleWhenTrue}}">
-        <TextBlock Text="Only while the object is" Width="160" VerticalAlignment="Center" />
-        <ComboBox Width="160" Style="{StaticResource ObjectIdBox}" SelectedItem="{Binding OnlyWhenObjectId}" ToolTip="Empty: always" />
-      </StackPanel>
-      <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-        <TextBlock Text="Only while led by" Width="160" VerticalAlignment="Center" />
-        <ComboBox Width="160"
-                  ItemsSource="{Binding DataContext.LeaderChoices, RelativeSource={RelativeSource AncestorType=Window}}"
-                  SelectedItem="{Binding OnlyWhenLeaderId}"
-                  ToolTip="Empty: anyone leads" />
-      </StackPanel>
-      <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-        <TextBlock Text="Only while quest" Width="160" VerticalAlignment="Center" />
-        <ComboBox Width="160"
-                  ItemsSource="{Binding DataContext.QuestChoices, RelativeSource={RelativeSource AncestorType=Window}}"
-                  SelectedItem="{Binding QuestGate.QuestId}"
-                  ToolTip="Empty: always" />
-        <ComboBox Width="110"
-                  Margin="4,0,0,0"
-                  ItemsSource="{Binding DataContext.ConditionKinds, RelativeSource={RelativeSource AncestorType=Window}}"
-                  DisplayMemberPath="Label"
-                  SelectedValuePath="Kind"
-                  SelectedValue="{Binding QuestGate.Kind}"
-                  IsEnabled="{Binding QuestGate.HasQuest}" />
-        <ComboBox Width="140"
-                  Margin="4,0,0,0"
-                  ItemsSource="{Binding QuestGate.Stages}"
-                  SelectedItem="{Binding QuestGate.StageId}"
-                  IsEnabled="{Binding QuestGate.CanChooseStage}"
-                  ToolTip="The stage, for at stage and reached stage" />
-      </StackPanel>
-      <CheckBox Content="Only once per playthrough (remembered in saves)" IsChecked="{Binding IsOnce}" Margin="0,6,0,8" />
+      <!-- The conditions fold under the line that says them (decision 732), folded as the window opens and kept as set
+           while another event is chosen. The header is a TextBlock, never a string: a string header reads the first
+           "_" of an id as an access key and drops it. -->
+      <Expander Margin="0,6,0,8" IsExpanded="False">
+        <Expander.Header>
+          <!-- The tooltip repeats the line: a narrow column trims its end, such as ", once". -->
+          <TextBlock Text="{Binding ConditionSummary}" TextTrimming="CharacterEllipsis">
+            <TextBlock.ToolTip>
+              <TextBlock Text="{Binding ConditionSummary, StringFormat={}{0}. Click to open or fold when the event runs.}" />
+            </TextBlock.ToolTip>
+          </TextBlock>
+        </Expander.Header>
+        <StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+            <TextBlock Text="Starts when the player" Width="160" VerticalAlignment="Center" />
+            <ComboBox Width="120"
+                      ItemsSource="{Binding DataContext.Activations, RelativeSource={RelativeSource AncestorType=Window}}"
+                      SelectedItem="{Binding Activation}"
+                      ToolTip="Touch: walks into it. Arrive: arrives on the map, such as an intro." />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0" Visibility="{Binding IsObjectEvent, Converter={StaticResource VisibleWhenTrue}}">
+            <TextBlock Text="Prompt (for interact)" Width="160" VerticalAlignment="Center" />
+            <TextBox Width="160" Text="{Binding Prompt, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanHavePrompt}" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0" Visibility="{Binding IsObjectEvent, Converter={StaticResource VisibleWhenTrue}}">
+            <TextBlock Text="Only while the object is" Width="160" VerticalAlignment="Center" />
+            <ComboBox Width="160" Style="{StaticResource ObjectIdBox}" SelectedItem="{Binding OnlyWhenObjectId}" ToolTip="Empty: always" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Only while led by" Width="160" VerticalAlignment="Center" />
+            <ComboBox Width="160"
+                      ItemsSource="{Binding DataContext.LeaderChoices, RelativeSource={RelativeSource AncestorType=Window}}"
+                      SelectedItem="{Binding OnlyWhenLeaderId}"
+                      ToolTip="Empty: anyone leads" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Only while quest" Width="160" VerticalAlignment="Center" />
+            <ComboBox Width="160"
+                      ItemsSource="{Binding DataContext.QuestChoices, RelativeSource={RelativeSource AncestorType=Window}}"
+                      SelectedItem="{Binding QuestGate.QuestId}"
+                      ToolTip="Empty: always" />
+            <ComboBox Width="110"
+                      Margin="4,0,0,0"
+                      ItemsSource="{Binding DataContext.ConditionKinds, RelativeSource={RelativeSource AncestorType=Window}}"
+                      DisplayMemberPath="Label"
+                      SelectedValuePath="Kind"
+                      SelectedValue="{Binding QuestGate.Kind}"
+                      IsEnabled="{Binding QuestGate.HasQuest}" />
+            <ComboBox Width="140"
+                      Margin="4,0,0,0"
+                      ItemsSource="{Binding QuestGate.Stages}"
+                      SelectedItem="{Binding QuestGate.StageId}"
+                      IsEnabled="{Binding QuestGate.CanChooseStage}"
+                      ToolTip="The stage, for at stage and reached stage" />
+          </StackPanel>
+          <CheckBox Content="Only once per playthrough (remembered in saves)" IsChecked="{Binding IsOnce}" Margin="0,6,0,4" />
+        </StackPanel>
+      </Expander>
     </StackPanel>
 
     <!-- One drop-down for every step kind, under its group's title; a chosen entry adds its step after the chosen one. -->

@@ -57,3 +57,9 @@ None.
 5. Click an empty cell with an event: its line reads `Walk into` (or `On arrival ...`); open it: no prompt or object
    row.
 6. **F1**: the line about the folded conditions.
+
+- **Done, with deviations:** the tooltip sits on the header line rather than on the `Expander`, whose tooltip would
+  also cover the rows inside it; `Label` and `ConditionSummary` share a private `OnceWords` with `ConditionWords()`.
+  The header's tooltip repeats the line (review: a narrow column trims its end). EW3's Preset tooltip gains the
+  old Quest giver button's hint, the third event (EW3 and EW4 review follow-up). The smoke script opened both windows with no binding-error line; the look is the developer's hand check, steps 2
+  to 6.

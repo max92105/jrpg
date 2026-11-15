@@ -94,7 +94,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 a slice is done and write its deviations in the slice file. Tunables, design and risks: [design.md](design.md).
 
 ### Phase 1: the record
-- [ ] ADR 0054, a field sprite facing's sequence of cells or mirror, overriding its row (amends ADR 0043). Write it
+- [x] ADR 0054, a field sprite facing's sequence of cells or mirror, overriding its row (amends ADR 0043). Write it
   from decisions 761-770 and 776, with design.md's "Key decisions" as its options (A, the override on today's form,
   chosen; B, one form for every facing with every record converted, rejected with its numbers; C, a start column per
   facing; D, repainting sheets). ADR 0043 gets an "Amended by 0054" line; `docs/decisions/README.md` a row.

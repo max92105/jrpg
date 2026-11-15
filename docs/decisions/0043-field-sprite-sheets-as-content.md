@@ -3,6 +3,8 @@
 Status: accepted
 Date: 2026-11-12
 
+Amended by ADR 0054: a facing may read a sequence of cells or mirror another facing, overriding its row.
+
 Amends ADR 0015: its decisions 130 (one shared placeholder sprite) and 132 (one cell, 48 px frames in the player
 sheet's layout), and its consequence that the game and the editor each read the frame layout from a named constant.
 

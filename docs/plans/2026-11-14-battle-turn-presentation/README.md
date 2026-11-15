@@ -125,7 +125,7 @@ slice is done and write its deviations in the slice file. Tunables, the timeline
   [slices/NU3.md](slices/NU3.md)
 
 ### Phase 3: the slash and the impact
-- [ ] ADR 0048, battle effect strips as records. Write it from the entry under "ADRs" below (decisions 654, 657).
+- [x] ADR 0048, battle effect strips as records. Write it from the entry under "ADRs" below (decisions 654, 657).
 - [ ] **EF1. Effect strip records: `effect-strips.json` (pace, hit frame, swing), loaded and checked** (Core + Data,
   about 210 lines) → [slices/EF1.md](slices/EF1.md)
 - [ ] **EF2. The startup check: each listed strip and swing in `effects/`, its hit frame within its frames** (Data,
@@ -246,7 +246,7 @@ None left: every question was answered at approval.
   definition; an enemy's tactics choose 0.7 s before `Execute`, with the same draws in the same order. The rejected
   alternative, kept in a line: executing at the start with a wind-up beat first would put Core 0.7 s ahead of every
   live-state reader (panels, tags, status marks, pips, the fallen's whitening) and re-pin about 40 timing tests.
-- [ ] **ADR 0048: battle effect strips as records** (decisions 654, 657). Write it from this entry; the developer chose
+- [x] **ADR 0048: battle effect strips as records** (decisions 654, 657). Write it from this entry; the developer chose
   A.
   - **A. A record per strip image, `effect-strips.json` (frame time, hit frame, swing file) (chosen).** Pros: facts
     about the art live with the art, once for a strip 13 records name today; another strip (the explosion) lines up its

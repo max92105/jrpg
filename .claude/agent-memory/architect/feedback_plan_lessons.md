@@ -107,4 +107,13 @@ When planning slices in this repo:
 - Battle presentation (turn plan, 2026-11-14): to show time before an outcome, delay Core's `Execute` (a stage before it) rather than the display of Core's state: every live-state reader stays right and `ActionPlayback`'s timing tests stay. Screen timings are Game constants, but facts about one art file (a strip's frame time, its hit frame) are per-image content.
 - Game rendering facts: a MonoGame render target discards its contents when set again; screen effects stay local (bright sprites redrawn additively, e.g. a fringe as three single-channel copies before the numbers), not a host post-process that also hits the HUD (turn plan approval, C1). Game.Tests have no GraphicsDevice: pixel measurements of art are tested on synthetic arrays.
 - Turn plan approval (2026-11-14): art Claude can make from shipped OFL assets (digits from Cormorant) is a script in `art-src/` (PowerShell + System.Drawing), not a developer to-do; pin animation tests to the reference's sampled frames; check what HUD sits where a new element goes (numbers vs enemy name tags); an action's own sound plays at its start, the hit at the impact; a plain look first, rounded/fancy only if the capture comparison asks; hot-file splits go to the very front.
+- Program plans (editor push, 2026-11-15): when asked to challenge a brainstorm, first map each sketched item to the
+  existing Core type in a table (most of the skill sketch already existed: targeting, fire skills, tactics' "ally below
+  50 %"); refuse general engines (status ticks as re-run instant effects, behavior scripts) with the concrete reason;
+  prefer editor-side conversion (sheet -> strip) over a new runtime format; check texture limits for full-screen
+  animations (4096 px holds two 1920 frames). Editor facts: `Hosting/App` was missing from map.md; no editor threads;
+  the status swap touches ~150 sites in 37 files, `SkillDefinition.Effect` 33 src + 111 test uses.
+  Its review: a crash net must fold "the same error again" (type + TargetSite) or a per-frame throw traps the user;
+  ship a net with its smoke-script check in one slice; a nice custom window is optional until the plain box is tried;
+  before claiming a content conversion is mechanical, grep the per-record values (status strengths varied per skill).
 - Animated monsters retro (2026-11-14): an art findings step decodes pixels, not only headers: a GIF's transparency flag doesn't mean a transparent background (`GnollArcher.gif` sets it on every frame and is drawn on near-white; MB3's step 0).

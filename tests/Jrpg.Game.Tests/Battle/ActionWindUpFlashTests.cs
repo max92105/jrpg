@@ -52,7 +52,7 @@ public sealed class ActionWindUpFlashTests
 
     private static ActionWindUp SteppedTo(BattleCommand command, TimeSpan time)
     {
-        var windUp = ActionWindUp.Of(_sarxian, command, RepositoryScreenText.Text.Messages);
+        var windUp = ActionWindUp.Of(_sarxian, command, RepositoryScreenText.Text.Messages, BattleScenarios.NoEffectStrips);
         while (windUp.Elapsed < time)
         {
             windUp.Update(StartMapScenarios.OneUpdate);

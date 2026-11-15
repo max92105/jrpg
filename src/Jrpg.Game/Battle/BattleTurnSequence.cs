@@ -15,6 +15,7 @@ internal sealed class BattleTurnSequence
     private readonly BattleState _battle;
     private readonly EnemyTactics _tactics;
     private readonly UiMessages _messages;
+    private readonly IReadOnlyDictionary<string, EffectStripDefinition> _strips;
     private TimeSpan _timeInStage;
 
     // The command winding up, executed when its wind-up ends; null otherwise.
@@ -23,11 +24,14 @@ internal sealed class BattleTurnSequence
     /// <param name="battle">The battle it plays.</param>
     /// <param name="tactics">What enemies do on their turn.</param>
     /// <param name="messages">How the plaque writes what an actor does.</param>
-    public BattleTurnSequence(BattleState battle, EnemyTactics tactics, UiMessages messages)
+    /// <param name="strips">The effect strips' records (ADR 0048), which name an attacker's swing.</param>
+    public BattleTurnSequence(
+        BattleState battle, EnemyTactics tactics, UiMessages messages, IReadOnlyDictionary<string, EffectStripDefinition> strips)
     {
         _battle = battle;
         _tactics = tactics;
         _messages = messages;
+        _strips = strips;
         Actor = battle.CurrentActor;
         if (battle.IsOver)
         {
@@ -151,7 +155,7 @@ internal sealed class BattleTurnSequence
     // An action with nothing to show before it lands (Defend, Move, Run) executes at once, as before the wind-up.
     private void StartWindUp(BattleCommand command)
     {
-        WindUp = ActionWindUp.Of(Actor, command, _messages);
+        WindUp = ActionWindUp.Of(Actor, command, _messages, _strips);
         if (WindUp.Duration == TimeSpan.Zero)
         {
             Act(command);

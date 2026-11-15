@@ -92,6 +92,47 @@ public sealed class ActionWindUpEffectTests
         Assert.Equal(TimeSpan.Zero, windUp.SinceImpact);
     }
 
+    [Fact]
+    public void SwingFile_AttackWithASwingingStrip_IsItsSwing()
+    {
+        var attack = new AttackCommand(_goblin);
+
+        var windUp = ActionWindUp.Of(_sarxian, attack, RepositoryScreenText.Text.Messages, SarxiansStripSwinging());
+
+        Assert.Equal("Swing.png", windUp.SwingFile);
+    }
+
+    [Fact]
+    public void SwingFile_AttackWithAnUnlistedStrip_IsNone()
+    {
+        Assert.Null(WindUpOf(_sarxian, new AttackCommand(_goblin)).SwingFile);
+    }
+
+    // A damaging skill by an attacker whose strip swings: skills play the impact strip only (decision 657's Q2).
+    [Fact]
+    public void SwingFile_Skill_IsNone()
+    {
+        var sweep = new SkillCommand(SoundingSkills.WithSound(""), [_goblin]);
+
+        Assert.Null(ActionWindUp.Of(_sarxian, sweep, RepositoryScreenText.Text.Messages, SarxiansStripSwinging()).SwingFile);
+    }
+
+    [Fact]
+    public void SinceSwing_AtTheSwingStart_IsZero()
+    {
+        var windUp = WindUpOf(_sarxian, new AttackCommand(_goblin));
+
+        windUp.Update(BattlePacing.SwingStart);
+
+        Assert.Equal(TimeSpan.Zero, windUp.SinceSwing);
+    }
+
+    private static Dictionary<string, EffectStripDefinition> SarxiansStripSwinging()
+    {
+        var strip = _sarxian.Member!.Definition.AttackEffectFile;
+        return new() { [strip] = new EffectStripDefinition { File = strip, FrameMilliseconds = 80, SwingFile = "Swing.png" } };
+    }
+
     private static ActionWindUp WindUpOf(Combatant actor, BattleCommand command) =>
-        ActionWindUp.Of(actor, command, RepositoryScreenText.Text.Messages);
+        ActionWindUp.Of(actor, command, RepositoryScreenText.Text.Messages, BattleScenarios.NoEffectStrips);
 }

@@ -96,5 +96,5 @@ public sealed class ActionWindUpTests
 
     // Built in one place, so a parameter a later slice adds changes one line.
     private static ActionWindUp WindUpOf(BattleCommand command) =>
-        ActionWindUp.Of(_sarxian, command, RepositoryScreenText.Text.Messages);
+        ActionWindUp.Of(_sarxian, command, RepositoryScreenText.Text.Messages, BattleScenarios.NoEffectStrips);
 }

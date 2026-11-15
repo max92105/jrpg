@@ -252,3 +252,11 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   the next Art tab feature moves the battle sprite preview (`ShowFrame`, `FrameOf`, `SizeLineOf`) into its own type first.
 - `Game/Battle/BattlersView.FrameRectangle` cuts a strip's frame from the drawn size, which equals the frame's own size
   only because `BattlerScaling.AtOwnSize` never scales (MB7's review): pass the frame size if the drawn size ever differs.
+
+## From the battle turn presentation plan's phase 3 (2026-11-15)
+
+- `Game/Battle/SwingView` and `ImpactEffectsView` each keep a per-image `EffectStrip` cache (`PaceOf`) and draw a square
+  frame centered on a point the same way (EF5's review): when a third view needs them (a projectile, decision 665),
+  share them in one place first.
+- `ImpactEffectsView.DrawStrip` takes a `(File, Target, IsMirrored)` tuple beside `EffectOnTarget` (EF4's review): the
+  wind-up could build its lead as `EffectOnTarget`s once.

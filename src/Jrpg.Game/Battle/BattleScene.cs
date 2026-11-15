@@ -33,6 +33,7 @@ internal sealed class BattleScene : IScene
     private readonly BattleBannerView _bannerView;
     private readonly FloatingNumbersView _numbers;
     private readonly ImpactEffectsView _impactEffects;
+    private readonly SwingView _swing;
     private ActionWindUp? _shownWindUp;
     private (int Turn, TurnStage Stage) _shown;
     private bool _isFinished;
@@ -54,7 +55,7 @@ internal sealed class BattleScene : IScene
         _battle = battle;
         _turnOrder = new TurnOrderView(_turnOrderStrip, battle.Combatants, text, ui);
         _turnOrderStrip.Refresh(battle);
-        _sequence = new BattleTurnSequence(battle, session.EnemyTactics, text.Messages);
+        _sequence = new BattleTurnSequence(battle, session.EnemyTactics, text.Messages, session.Catalog.EffectStrips);
         _bannerView = new BattleBannerView(_banner, text, ui);
         _shown = (_sequence.Turn, _sequence.Stage);
         _battlers = new BattlersView(battle, _sequence, ui);
@@ -67,6 +68,7 @@ internal sealed class BattleScene : IScene
         _commandPanel = new CommandPanelView(_commands, _battlers, text, ui);
         _numbers = new FloatingNumbersView(_sequence, _battlers, _enemyTags, text);
         _impactEffects = new ImpactEffectsView(_sequence, _battlers, session.Catalog.EffectStrips, text);
+        _swing = new SwingView(_sequence, _battlers, session.Catalog.EffectStrips);
     }
 
     public IReadOnlyList<string> Sounds => _sounds.Files;
@@ -134,6 +136,7 @@ internal sealed class BattleScene : IScene
 
         _enemyTags.Draw(batch, textures);
         _impactEffects.Draw(batch, textures);
+        _swing.Draw(batch, textures);
         _numbers.Draw(batch, textures);
         _turnOrder.Draw(batch, textures);
         _bannerView.Draw(batch, textures);

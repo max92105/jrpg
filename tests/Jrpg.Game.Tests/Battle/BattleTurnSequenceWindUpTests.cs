@@ -1,7 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Items;
 using Jrpg.Core.Randomness;
-using Jrpg.Core.Skills;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Tests.Exploration;
 using Jrpg.Game.Tests.Ui;
@@ -63,7 +62,7 @@ public sealed class BattleTurnSequenceWindUpTests
     {
         var random = new SeededRandom(BattleScenarios.GoblinsFirstSeed);
         var battle = BattleScenarios.SarxianAgainstGoblinTrio(random);
-        var sequence = SequenceOver(battle, random);
+        var sequence = BattleScenarios.SequenceOver(battle, random);
 
         sequence.Update(BattlePacing.Step);
         var stageAfterThePause = sequence.Stage;
@@ -89,7 +88,7 @@ public sealed class BattleTurnSequenceWindUpTests
     {
         var random = new SeededRandom(BattleScenarios.SarxianFirstSeed);
         var battle = BattleScenarios.MemberAgainstGoblinTrio("lazarus", new Inventory(), random);
-        var sequence = SequenceOver(battle, random);
+        var sequence = BattleScenarios.SequenceOver(battle, random);
         sequence.Update(BattlePacing.Step);
         sequence.Submit(new SkillCommand(BattleScenarios.Catalog.Skills["ready"], [battle.Combatants[1]]));
         sequence.Update(BattlePacing.WindUp);
@@ -100,15 +99,12 @@ public sealed class BattleTurnSequenceWindUpTests
         Assert.Equal(TurnStage.WindingUp, sequence.Stage);
     }
 
-    private static BattleTurnSequence SequenceOver(BattleState battle, IRandom random) =>
-        new(battle, new EnemyTactics(random, new Dictionary<string, SkillDefinition>()), RepositoryScreenText.Text.Messages);
-
     // Sarxian's turn, stepped forward and awaiting a command.
     private static (BattleState Battle, BattleTurnSequence Sequence) Start(int seed)
     {
         var random = new SeededRandom(seed);
         var battle = BattleScenarios.SarxianAgainstGoblinTrio(random);
-        var sequence = SequenceOver(battle, random);
+        var sequence = BattleScenarios.SequenceOver(battle, random);
         sequence.Update(BattlePacing.Step);
         return (battle, sequence);
     }

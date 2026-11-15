@@ -84,7 +84,10 @@ public sealed class PlaybackSoundQueueTests
     public void Follow_WindUp_AsksItsOpeningAtOnce()
     {
         var potion = StartMapScenarios.TestWorld.Items["potion"];
-        var windUp = ActionWindUp.Of(_goblin, new ItemCommand(potion, [_goblin]), RepositoryScreenText.Text.Messages);
+        var windUp = ActionWindUp.Of(
+            _goblin, new ItemCommand(potion, [_goblin]),
+            RepositoryScreenText.Text.Messages,
+            BattleScenarios.NoEffectStrips);
 
         _queue.Follow(windUp, _asked);
 

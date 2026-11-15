@@ -6,6 +6,8 @@ using Jrpg.Core.Randomness;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
+using Jrpg.Game.Battle;
+using Jrpg.Game.Tests.Ui;
 
 namespace Jrpg.Game.Tests.Battle;
 
@@ -40,6 +42,10 @@ internal static class BattleScenarios
     /// </summary>
     public static EnemyDefinition Goblin { get; } =
         Catalog.Enemies["goblin"] with { Accuracy = 100, Dodge = 0, CritChance = 0, CrowdControlResistance = 0 };
+
+    /// <summary>No effect strip records: every strip at the unlisted pace, no swing.</summary>
+    public static IReadOnlyDictionary<string, EffectStripDefinition> NoEffectStrips { get; } =
+        new Dictionary<string, EffectStripDefinition>();
 
     /// <summary>
     /// The repository's skills, with Shield Bash's stun a sure one, so a scenario's stun lands without a draw; a member
@@ -78,6 +84,15 @@ internal static class BattleScenarios
             Encounters = new Dictionary<string, EncounterDefinition>(catalog.Encounters) { ["goblin_trio"] = trio },
         };
     }
+
+    /// <summary>
+    /// The turns of a battle, its enemies choosing with no skills, no strip records, the repository's text.
+    /// </summary>
+    public static BattleTurnSequence SequenceOver(BattleState battle, IRandom random) => new(
+        battle,
+        new EnemyTactics(random, new Dictionary<string, SkillDefinition>()),
+        RepositoryScreenText.Text.Messages,
+        NoEffectStrips);
 
     /// <param name="random">Shuffles the turn order; tests that run enemy turns pass the same source to the tactics.</param>
     public static BattleState SarxianAgainstGoblinTrio(IRandom random) => MemberAgainstGoblinTrio("sarxian", new Inventory(), random);

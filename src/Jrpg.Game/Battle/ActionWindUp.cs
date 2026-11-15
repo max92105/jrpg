@@ -7,12 +7,13 @@ namespace Jrpg.Game.Battle;
 /// <summary>
 /// What one action shows before it lands (ADR 0013 amended, decision 644): its time from the command to the impact, the
 /// plaque's words (decision 646), its opening sound (decision 647), its actor's blink (decision 648) and the impact
-/// strip's lead on the targets a damaging action aims at (decision 656), shown from the command alone, since Core
-/// executes it only when the wind-up ends.
+/// strip's lead on the targets a damaging action aims at (decision 656) and an Attack's swing (decision 657), shown
+/// from the command alone, since Core executes it only when the wind-up ends.
 /// </summary>
 internal sealed class ActionWindUp : ISoundTimeline
 {
-    private ActionWindUp(Combatant actor, BattleCommand command, UiMessages messages)
+    private ActionWindUp(
+        Combatant actor, BattleCommand command, UiMessages messages, IReadOnlyDictionary<string, EffectStripDefinition> strips)
     {
         Actor = actor;
         Duration = DurationOf(command);
@@ -21,6 +22,9 @@ internal sealed class ActionWindUp : ISoundTimeline
         AimedTargets = AimedTargetsOf(command);
         ImpactFile = AimedTargets.Count > 0 ? BattlerArt.Of(actor).AttackEffectFile : null;
         IsMirrored = EffectOnTarget.IsMirroredFor(actor);
+        SwingFile = command is AttackCommand && ImpactFile is { } impact
+            ? EffectStripDefinition.Of(impact, strips).SwingFile
+            : null;
     }
 
     public Combatant Actor { get; }
@@ -59,11 +63,23 @@ internal sealed class ActionWindUp : ISoundTimeline
     /// <summary>The time since the impact: negative while the action winds up, zero at the impact.</summary>
     public TimeSpan SinceImpact => Elapsed - Duration;
 
+    /// <summary>
+    /// The swing an Attack plays in front of its attacker, named by the attacker's impact strip's record (decision
+    /// 657); null for a skill, an item, an action that doesn't damage, or a strip that names none.
+    /// </summary>
+    public string? SwingFile { get; }
+
+    /// <summary>The time since the swing started, <see cref="BattlePacing.SwingStart"/> into the wind-up.</summary>
+    public TimeSpan SinceSwing => Elapsed - BattlePacing.SwingStart;
+
     /// <exception cref="InvalidOperationException">The command is of a kind the screen can't show yet.</exception>
     /// <param name="actor">Who acts.</param>
     /// <param name="command">What they do, as chosen.</param>
     /// <param name="messages">How the plaque writes what the actor does.</param>
-    public static ActionWindUp Of(Combatant actor, BattleCommand command, UiMessages messages) => new(actor, command, messages);
+    /// <param name="strips">The effect strips' records (ADR 0048), which name the attacker's swing.</param>
+    public static ActionWindUp Of(
+        Combatant actor, BattleCommand command, UiMessages messages, IReadOnlyDictionary<string, EffectStripDefinition> strips) =>
+        new(actor, command, messages, strips);
 
     // An Attack always damages; a skill or an item when its effect is damage (decision 657's Q2).
     private static IReadOnlyList<Combatant> AimedTargetsOf(BattleCommand command) => command switch

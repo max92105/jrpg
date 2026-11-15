@@ -41,3 +41,9 @@ clip's slash tail over the hit). An impact strip without a swing, or a skill, it
 2. Give Sarxian's strip a swing the same way (`AttackPlayer.png` with `"swingFile": "AttackEnemy.png"`): his attack plays
    it in front of him toward the goblins, mirrored.
 3. A skill by either plays no swing. Revert the file.
+
+- **Done:** as planned. The tests share `BattleScenarios.NoEffectStrips` for the strips no record lists; the five
+  `ActionWindUp.Of` callers and six sequence constructions in the tests pass it. `SwingView` keeps each swing image's
+  pace once, as `ImpactEffectsView` does.
+  Review: no Critical or Warning; `Reach` private; `EnemyTagViewTests` builds its sequence through `SequenceOver`; the
+  map's `ActionWindUp` entry names the swing; the two views' shared strip drawing went to the backlog.

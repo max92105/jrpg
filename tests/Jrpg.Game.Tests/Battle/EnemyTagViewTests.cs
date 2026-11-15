@@ -1,6 +1,5 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Randomness;
-using Jrpg.Core.Skills;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Tests.Ui;
 using Jrpg.Game.Ui;
@@ -30,8 +29,7 @@ public sealed class EnemyTagViewTests
 
     private EnemyTagView Tags()
     {
-        var tactics = new EnemyTactics(new SeededRandom(1), new Dictionary<string, SkillDefinition>());
-        var sequence = new BattleTurnSequence(_battle, tactics, RepositoryScreenText.Text.Messages);
+        var sequence = BattleScenarios.SequenceOver(_battle, new SeededRandom(1));
         return new EnemyTagView(_battle.Combatants, sequence, RepositoryScreenText.Text, new UiTextures());
     }
 }

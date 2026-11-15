@@ -47,7 +47,10 @@ public sealed class BattlerWhitenessTests
 
     private static ActionWindUp AttackAtTheFirstBlink()
     {
-        var windUp = ActionWindUp.Of(_sarxian, new AttackCommand(_goblin), RepositoryScreenText.Text.Messages);
+        var windUp = ActionWindUp.Of(
+            _sarxian, new AttackCommand(_goblin),
+            RepositoryScreenText.Text.Messages,
+            BattleScenarios.NoEffectStrips);
         windUp.Update(TimeSpan.FromSeconds(0.10));
         return windUp;
     }

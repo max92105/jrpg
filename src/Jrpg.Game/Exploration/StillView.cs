@@ -56,7 +56,7 @@ internal sealed class StillView
         batch.End();
         batch.Begin(samplerState: SamplerState.LinearClamp);
         batch.Draw(textures.Pixel, _screen, Color.Black);
-        CoverFit.DrawZoomedOverScreen(batch, textures.Get(ArtFolders.Cinematics, frame.ImageFile), tint, frame.Scale);
+        CoverFit.DrawZoomedOverScreen(batch, textures.Get(ArtFolders.Cinematics, frame.ImageFile), tint, frame.Zoom);
         batch.End();
         VirtualScreen.BeginBatch(batch);
         if (_caption is { } caption)

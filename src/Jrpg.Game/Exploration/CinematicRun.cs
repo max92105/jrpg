@@ -117,11 +117,7 @@ internal sealed class CinematicRun(ExplorationState exploration, StillView view)
 
         if (_moment is { } moment && ShownStill is { } still)
         {
-            var frame = new StillFrame(
-                still.ImageFile,
-                StillFade.OpacityAt(moment.IntoStill, still.Duration),
-                (float)still.ScaleAt(moment.IntoStill));
-            view.Draw(batch, textures, frame);
+            view.Draw(batch, textures, StillFrame.At(still, moment.IntoStill));
             view.DrawSkipRing(batch, textures, _skip.Progress);
         }
     }

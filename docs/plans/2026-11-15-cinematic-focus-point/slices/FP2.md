@@ -80,3 +80,6 @@ developer: the repository's cinematics have no focus yet, so the check gives one
    corner, the corner itself never moving; no black edge.
 5. Remove the `focus` block (keep the zoom), start again: it grows from the center as before this slice.
 6. `git checkout content/cinematics.json` (the intro's real zoom and point are the developer's to set in the editor).
+
+- **Done:** as planned; the hand check is the developer's and left unticked: the implementer edited no content file
+  (steps 1 to 6 above give `ragnir_intro`'s first still a focus locally, then revert it).

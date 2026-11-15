@@ -92,11 +92,15 @@ internal static class UiSoundFiles
 
         public const string Defend = "PlaceholderDefend.wav";
 
+        /// <summary>An Attack's whoosh as its swing starts (decision 658).</summary>
+        public const string Swing = "Swing.wav";
+
         public const string Enraged = "PlaceholderEnraged.wav";
 
         public const string Start = "PlaceholderBattleStart.wav";
 
         public const string Victory = "PlaceholderVictory.wav";
+
 
         public const string Defeat = "PlaceholderDefeat.wav";
 

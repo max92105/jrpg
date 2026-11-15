@@ -41,3 +41,6 @@ whoosh.
   `perl .claude/scripts/add-sound-source.pl effects/Swing.wav=60024:0.35:0.05`, then
   `fetch-placeholder-sounds.ps1 -Only effects/Swing.wav`. The conversion needs ffmpeg (`winget install Gyan.FFmpeg`,
   decision 428), which this machine lacks; installing it is the developer's call, so the slice waits for it.
+- **Done:** as planned, once the developer approved installing ffmpeg (2026-11-15). `effects/Swing.wav` is freesound
+  60024 trimmed to 0.35 s (ends at silence: the fetch script's loop jump 0.000). The three wind-up sound tests sit in
+  `ActionWindUpEffectTests`, beside the swing's own tests and their swinging strip, not in `ActionWindUpTests`.

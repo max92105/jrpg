@@ -3,6 +3,7 @@ using Jrpg.Core.Effects;
 using Jrpg.Core.Randomness;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Tests.Ui;
+using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Tests.Battle;
 
@@ -125,6 +126,33 @@ public sealed class ActionWindUpEffectTests
         windUp.Update(BattlePacing.SwingStart);
 
         Assert.Equal(TimeSpan.Zero, windUp.SinceSwing);
+    }
+
+    [Fact]
+    public void Sounds_AttackWithASwing_WhooshesAtTheSwingStart()
+    {
+        var attack = new AttackCommand(_goblin);
+
+        var windUp = ActionWindUp.Of(_sarxian, attack, RepositoryScreenText.Text.Messages, SarxiansStripSwinging());
+
+        Assert.Equal([new TimedSound(UiSoundFiles.Battle.Swing, BattlePacing.SwingStart)], windUp.Sounds);
+    }
+
+    [Fact]
+    public void Sounds_AttackWithoutASwing_IsSilent()
+    {
+        Assert.Empty(WindUpOf(_sarxian, new AttackCommand(_goblin)).Sounds);
+    }
+
+    // A skill by an attacker whose strip swings: its own sound, no whoosh, as skills don't swing (decision 657's Q2).
+    [Fact]
+    public void Sounds_SkillWithASoundAndNoSwing_IsItsSoundOnly()
+    {
+        var skill = new SkillCommand(SoundingSkills.WithSound("Own.wav"), [_goblin]);
+
+        var windUp = ActionWindUp.Of(_sarxian, skill, RepositoryScreenText.Text.Messages, SarxiansStripSwinging());
+
+        Assert.Equal([new TimedSound("Own.wav", TimeSpan.Zero)], windUp.Sounds);
     }
 
     private static Dictionary<string, EffectStripDefinition> SarxiansStripSwinging()

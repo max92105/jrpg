@@ -6,9 +6,9 @@ namespace Jrpg.Game.Battle;
 
 /// <summary>
 /// What one action shows before it lands (ADR 0013 amended, decision 644): its time from the command to the impact, the
-/// plaque's words (decision 646), its opening sound (decision 647), its actor's blink (decision 648) and the impact
-/// strip's lead on the targets a damaging action aims at (decision 656) and an Attack's swing (decision 657), shown
-/// from the command alone, since Core executes it only when the wind-up ends.
+/// plaque's words (decision 646), its opening sound (decision 647), its actor's blink (decision 648), the impact
+/// strip's lead on the targets a damaging action aims at (decision 656), and an Attack's swing (decision 657) with its
+/// whoosh as it starts (decision 658), shown from the command alone, since Core executes it only when the wind-up ends.
 /// </summary>
 internal sealed class ActionWindUp : ISoundTimeline
 {
@@ -18,13 +18,13 @@ internal sealed class ActionWindUp : ISoundTimeline
         Actor = actor;
         Duration = DurationOf(command);
         BannerText = ActionBannerText.For(actor, command, messages);
-        Sounds = OpeningOf(command);
         AimedTargets = AimedTargetsOf(command);
         ImpactFile = AimedTargets.Count > 0 ? BattlerArt.Of(actor).AttackEffectFile : null;
         IsMirrored = EffectOnTarget.IsMirroredFor(actor);
         SwingFile = command is AttackCommand && ImpactFile is { } impact
             ? EffectStripDefinition.Of(impact, strips).SwingFile
             : null;
+        Sounds = SoundsOf(command, SwingFile);
     }
 
     public Combatant Actor { get; }
@@ -39,7 +39,8 @@ internal sealed class ActionWindUp : ISoundTimeline
     public string? BannerText { get; }
 
     /// <summary>
-    /// The action's opening sound at its start, with the plaque (decision 647); empty when it has none.
+    /// The action's opening sound at its start, with the plaque (decision 647), then an Attack's whoosh as its swing
+    /// starts (decision 658), in time order; empty when it has neither.
     /// </summary>
     public IReadOnlyList<TimedSound> Sounds { get; }
 
@@ -90,8 +91,17 @@ internal sealed class ActionWindUp : ISoundTimeline
         _ => [],
     };
 
-    private static IReadOnlyList<TimedSound> OpeningOf(BattleCommand command) =>
-        ActionSounds.OpeningOf(command) is { } file ? [new TimedSound(file, TimeSpan.Zero)] : [];
+    // The opening sound at 0 comes before the swing's at BattlePacing.SwingStart, so the list is in time order.
+    private static List<TimedSound> SoundsOf(BattleCommand command, string? swingFile)
+    {
+        List<TimedSound> sounds = ActionSounds.OpeningOf(command) is { } file ? [new TimedSound(file, TimeSpan.Zero)] : [];
+        if (swingFile is not null)
+        {
+            sounds.Add(new TimedSound(UiSoundFiles.Battle.Swing, BattlePacing.SwingStart));
+        }
+
+        return sounds;
+    }
 
     private static TimeSpan DurationOf(BattleCommand command) => command switch
     {

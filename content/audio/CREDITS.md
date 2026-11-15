@@ -49,3 +49,4 @@ the script, never this one. Every sound below is a placeholder from [freesound.o
 | `effects/PlaceholderStunned.wav` | [Bonk.wav](https://freesound.org/s/458572/) | facklere | [CC0-1.0](https://creativecommons.org/publicdomain/zero/1.0/) | trimmed, resampled to mono, level-adjusted | 2026-11-02 |
 | `effects/PlaceholderTextTyping.wav` | [typewriter.wav](https://freesound.org/s/160678/) | BMacZero | [CC0-1.0](https://creativecommons.org/publicdomain/zero/1.0/) | trimmed, resampled to mono, level-adjusted | 2026-11-02 |
 | `effects/PlaceholderWarp.wav` | [Transition whoosh sound.wav](https://freesound.org/s/432922/) | SKsemi | [CC0-1.0](https://creativecommons.org/publicdomain/zero/1.0/) | trimmed, resampled to mono, level-adjusted | 2026-11-02 |
+| `effects/Swing.wav` | [swosh swinging sword 37.flac](https://freesound.org/s/60024/) | qubodup | [CC0-1.0](https://creativecommons.org/publicdomain/zero/1.0/) | trimmed, resampled to mono, level-adjusted | 2026-11-15 |

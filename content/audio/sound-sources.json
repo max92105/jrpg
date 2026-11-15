@@ -510,6 +510,18 @@
       "fetched": "2026-11-02",
       "maxSeconds": 0.6,
       "fadeOutSeconds": 0.15
+    },
+    {
+      "file": "effects/Swing.wav",
+      "freesoundId": 60024,
+      "name": "swosh swinging sword 37.flac",
+      "author": "qubodup",
+      "license": "CC0-1.0",
+      "page": "https://freesound.org/s/60024/",
+      "preview": "https://cdn.freesound.org/previews/60/60024_71257-hq.mp3",
+      "fetched": "2026-11-15",
+      "maxSeconds": 0.35,
+      "fadeOutSeconds": 0.05
     }
   ]
 }

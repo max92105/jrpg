@@ -135,7 +135,7 @@ slice is done and write its deviations in the slice file. Tunables, the timeline
 - [x] **EF4. The impact strip's hit frame lands on the impact** (Game, about 200 lines) → [slices/EF4.md](slices/EF4.md)
 - [x] **EF5. The swing its impact strip names sweeps in front of the attacker** (Game, about 120 lines raw, about 190
   at the 1.6x) → [slices/EF5.md](slices/EF5.md)
-- [ ] **EF6. The swing's placeholder sound from freesound, at the swing's start** (content + Game, about 110 lines) →
+- [x] **EF6. The swing's placeholder sound from freesound, at the swing's start** (content + Game, about 110 lines) →
   [slices/EF6.md](slices/EF6.md)
 - [x] **EE1. `effect-strips.json` saved from the editor: written sorted, defaults left out,
   `CatalogProblems.OfEffectStrips`, `CatalogDraft.SetEffectStrips`** (Data + Editor, about 200 lines) →

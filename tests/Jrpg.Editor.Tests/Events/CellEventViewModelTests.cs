@@ -25,6 +25,14 @@ public sealed class CellEventViewModelTests
     }
 
     [Fact]
+    public void Constructor_CellWithEvent_EventIsNotAnObjectEvent()
+    {
+        var cellEvent = new CellEventViewModel(_exit.Cell, _exit, _choices);
+
+        Assert.False(cellEvent.Event.IsObjectEvent);
+    }
+
+    [Fact]
     public void QuestChoices_StartWithNone()
     {
         var cellEvent = new CellEventViewModel(new GridCell(3, 4), null, _choices with { QuestIds = ["errand"] });

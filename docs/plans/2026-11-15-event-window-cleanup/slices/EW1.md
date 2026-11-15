@@ -58,3 +58,7 @@ looks different.
 3. Click an empty cell: the buttons row shows **Give item** and no **Swap object**. Click **Warp**, **Pick...**, pick a
    cell, **OK** twice: the cyan square appears. Reopen, choose the warp step, **Go to**: the editor shows the
    destination map (the routed event still reaches the window).
+
+- **Done:** as planned (`EventView.xaml` 96 lines). Run with `-EventWindows -Map milestone`: both windows open, no
+  binding-error line; a wrong binding added on purpose did show in the trace (the check works), then was removed. The
+  cell capture shows Give item, no Swap object, no prompt or object row. Steps 2 and 3 are the developer's.

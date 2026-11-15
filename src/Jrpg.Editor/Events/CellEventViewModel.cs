@@ -8,7 +8,7 @@ namespace Jrpg.Editor.Events;
 /// <summary>
 /// The cell event dialog: the one event a cell runs when the player walks onto it, such as a warp at a map's edge. A
 /// new one gets the content's id <c>cell_{x}_{y}</c> and is walked into; it can run on arrival instead, as an intro
-/// does (ADR 0016). It offers dialogue, warp and cinematic steps (the game refuses swapping an object from a cell).
+/// does (ADR 0016). It offers every step but Swap object, which the game refuses on a cell (decision 728).
 /// </summary>
 internal sealed class CellEventViewModel
 {
@@ -30,7 +30,10 @@ internal sealed class CellEventViewModel
             Id = $"cell_{cell.X}_{cell.Y}",
             Activation = EventActivation.Touch,
             Steps = [],
-        }, choices);
+        }, choices)
+        {
+            IsObjectEvent = false,
+        };
     }
 
     public string Title => $"Event of cell ({_cell.X}, {_cell.Y})";

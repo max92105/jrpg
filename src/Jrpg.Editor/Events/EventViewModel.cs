@@ -29,6 +29,12 @@ internal sealed partial class EventViewModel : ObservableObject
 
     public string Id { get; }
 
+    /// <summary>
+    /// False for a cell's event, which has no prompt and no object to wait for, and can't swap an object (the game
+    /// refuses it); the dialogs' shared view hides those rows on it.
+    /// </summary>
+    public bool IsObjectEvent { get; init; } = true;
+
     public ObservableCollection<EventStepViewModel> Steps { get; }
 
     /// <summary>The quest the event waits on, if any (ADR 0033).</summary>

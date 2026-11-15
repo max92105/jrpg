@@ -1,0 +1,100 @@
+<!-- The chosen event of the object and cell event dialogs: when it runs, then its steps and the chosen step's fields.
+     Its DataContext is the event; the lists come from the window holding it. -->
+<UserControl x:Class="Jrpg.Editor.Events.EventView"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Jrpg.Editor.Events">
+  <UserControl.Resources>
+    <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
+    <!-- The object ids are set by a trigger, never a plain binding: a cell's dialog has no OnlyWhenChoices, and a
+         collapsed row still evaluates a binding, which would log a binding error in every cell window. -->
+    <Style x:Key="ObjectIdBox" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding IsObjectEvent}" Value="True">
+          <Setter Property="ItemsSource" Value="{Binding DataContext.OnlyWhenChoices, RelativeSource={RelativeSource AncestorType=Window}}" />
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+  </UserControl.Resources>
+  <DockPanel>
+    <StackPanel DockPanel.Dock="Top">
+      <TextBlock Text="{Binding Id, StringFormat=Event id: {0}}" Foreground="{StaticResource MutedTextBrush}" />
+      <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+        <TextBlock Text="Starts when the player" Width="160" VerticalAlignment="Center" />
+        <ComboBox Width="120"
+                  ItemsSource="{Binding DataContext.Activations, RelativeSource={RelativeSource AncestorType=Window}}"
+                  SelectedItem="{Binding Activation}"
+                  ToolTip="Touch: walks into it. Arrive: arrives on the map, such as an intro." />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,4,0,0" Visibility="{Binding IsObjectEvent, Converter={StaticResource VisibleWhenTrue}}">
+        <TextBlock Text="Prompt (for interact)" Width="160" VerticalAlignment="Center" />
+        <TextBox Width="160" Text="{Binding Prompt, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding CanHavePrompt}" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,4,0,0" Visibility="{Binding IsObjectEvent, Converter={StaticResource VisibleWhenTrue}}">
+        <TextBlock Text="Only while the object is" Width="160" VerticalAlignment="Center" />
+        <ComboBox Width="160" Style="{StaticResource ObjectIdBox}" SelectedItem="{Binding OnlyWhenObjectId}" ToolTip="Empty: always" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+        <TextBlock Text="Only while led by" Width="160" VerticalAlignment="Center" />
+        <ComboBox Width="160"
+                  ItemsSource="{Binding DataContext.LeaderChoices, RelativeSource={RelativeSource AncestorType=Window}}"
+                  SelectedItem="{Binding OnlyWhenLeaderId}"
+                  ToolTip="Empty: anyone leads" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+        <TextBlock Text="Only while quest" Width="160" VerticalAlignment="Center" />
+        <ComboBox Width="160"
+                  ItemsSource="{Binding DataContext.QuestChoices, RelativeSource={RelativeSource AncestorType=Window}}"
+                  SelectedItem="{Binding QuestGate.QuestId}"
+                  ToolTip="Empty: always" />
+        <ComboBox Width="110"
+                  Margin="4,0,0,0"
+                  ItemsSource="{Binding DataContext.ConditionKinds, RelativeSource={RelativeSource AncestorType=Window}}"
+                  DisplayMemberPath="Label"
+                  SelectedValuePath="Kind"
+                  SelectedValue="{Binding QuestGate.Kind}"
+                  IsEnabled="{Binding QuestGate.HasQuest}" />
+        <ComboBox Width="140"
+                  Margin="4,0,0,0"
+                  ItemsSource="{Binding QuestGate.Stages}"
+                  SelectedItem="{Binding QuestGate.StageId}"
+                  IsEnabled="{Binding QuestGate.CanChooseStage}"
+                  ToolTip="The stage, for at stage and reached stage" />
+      </StackPanel>
+      <CheckBox Content="Only once per playthrough (remembered in saves)" IsChecked="{Binding IsOnce}" Margin="0,6,0,8" />
+      <TextBlock Text="Steps, run in order" FontWeight="Bold" />
+    </StackPanel>
+
+    <StackPanel DockPanel.Dock="Bottom" Margin="0,4,0,0">
+      <!-- Wraps: a row of every step kind is wider than the steps' column. -->
+      <WrapPanel>
+        <TextBlock Text="Add" VerticalAlignment="Center" Margin="0,0,4,0" />
+        <Button Content="Dialogue" Width="70" Command="{Binding AddDialogueCommand}" />
+        <Button Content="Give item" Width="70" Margin="4,0,0,0" Command="{Binding AddGiveItemCommand}" />
+        <Button Content="Swap object" Width="80" Margin="4,0,0,0" Command="{Binding AddSwapObjectCommand}" Visibility="{Binding IsObjectEvent, Converter={StaticResource VisibleWhenTrue}}" />
+        <Button Content="Warp" Width="60" Margin="4,0,0,0" Command="{Binding AddWarpCommand}" />
+        <Button Content="Move NPC" Width="70" Margin="4,0,0,0" Command="{Binding AddMoveNpcCommand}" />
+        <Button Content="Cinematic" Width="70" Margin="4,0,0,0" Command="{Binding AddCinematicCommand}" />
+        <Button Content="Recruit" Width="60" Margin="4,0,0,0" Command="{Binding AddRecruitCommand}" />
+        <Button Content="Voice" Width="50" Margin="4,0,0,0" Command="{Binding AddVoiceCommand}" />
+        <Button Content="Rest" Width="50" Margin="4,0,0,0" Command="{Binding AddRestCommand}" />
+        <Button Content="Forge" Width="50" Margin="4,0,0,0" Command="{Binding AddOpenForgeCommand}" />
+        <Button Content="Shop" Width="50" Margin="4,0,0,0" Command="{Binding AddOpenShopCommand}" />
+        <Button Content="Start quest" Width="80" Margin="4,0,0,0" Command="{Binding AddStartQuestCommand}" />
+        <Button Content="Advance quest" Width="95" Margin="4,0,0,0" Command="{Binding AddAdvanceQuestCommand}" />
+        <Button Content="Complete quest" Width="100" Margin="4,0,0,0" Command="{Binding AddCompleteQuestCommand}" />
+      </WrapPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+        <Button Content="Remove" Width="60" Command="{Binding RemoveStepCommand}" />
+        <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepUpCommand}" />
+        <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepDownCommand}" />
+      </StackPanel>
+    </StackPanel>
+
+    <!-- The chosen step's fields. -->
+    <local:EventStepEditor DockPanel.Dock="Bottom" DataContext="{Binding SelectedStep}" Margin="0,8,0,0" />
+
+    <ListBox ItemsSource="{Binding Steps}" SelectedItem="{Binding SelectedStep}" DisplayMemberPath="Label" />
+  </DockPanel>
+</UserControl>

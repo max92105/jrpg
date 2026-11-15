@@ -34,3 +34,10 @@ the main window writes `effect-strips.json`.
    the record goes; **Ctrl+S** writes `[]` back.
 4. Reopen, choose the strip again after redoing, **Reset to unlisted**, **OK**, **Ctrl+S**: the record is gone.
 5. Revert `content/effect-strips.json` if anything is left.
+
+- **Done, with deviations:** the rows are styled by `ItemTemplate` triggers on the file name, not
+  `ItemContainerStyle`; a missing image's row reads "<file> (image missing)" in the problem color; an unlisted
+  row's tooltip says it has no record. The window was not opened during the unattended run (no captures): the hand
+  check above carries it. XAML 72 lines, code-behind 18, the handler 14.
+- **Review:** the tooltips say "the default pace" instead of 80 ms, so they can't go stale against
+  `EffectStripDefinition.UnlistedFrameTime`.

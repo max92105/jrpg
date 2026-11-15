@@ -1,0 +1,72 @@
+<Window x:Class="Jrpg.Editor.Battle.EffectStripCatalogWindow"
+        x:ClassModifier="internal"
+        Style="{StaticResource EditorWindow}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Effect strips"
+        Width="720"
+        Height="480"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+  <DockPanel Margin="12">
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+      <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked" IsEnabled="{Binding CanApply}" />
+      <Button Content="Cancel" Width="80" Margin="8,0,0,0" IsCancel="True" />
+    </StackPanel>
+    <TextBlock DockPanel.Dock="Bottom" Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Margin="0,8,0,0" Text="{Binding Problem}" />
+
+    <!-- The effects images in name order, then the records whose image is missing; an unlisted one is greyed. -->
+    <DockPanel DockPanel.Dock="Left" Width="240">
+      <TextBlock DockPanel.Dock="Top" Text="Effects images" FontWeight="Bold" />
+      <ListBox ItemsSource="{Binding Strips}" SelectedItem="{Binding SelectedStrip}" Margin="0,4,0,0">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock x:Name="FileName" Text="{Binding File}" TextTrimming="CharacterEllipsis" />
+            <DataTemplate.Triggers>
+              <DataTrigger Binding="{Binding IsListed}" Value="False">
+                <Setter TargetName="FileName" Property="Foreground" Value="{StaticResource MutedTextBrush}" />
+                <Setter TargetName="FileName" Property="ToolTip" Value="Unlisted: no record, so it plays at the default pace, its hit on frame 0" />
+              </DataTrigger>
+              <DataTrigger Binding="{Binding FrameCount}" Value="{x:Null}">
+                <Setter TargetName="FileName" Property="Text" Value="{Binding File, StringFormat={}{0} (image missing)}" />
+                <Setter TargetName="FileName" Property="Foreground" Value="{StaticResource ProblemTextBrush}" />
+              </DataTrigger>
+            </DataTemplate.Triggers>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+
+    <!-- The chosen strip: its pace, its hit and its swing, as typed; its length line from the image's frames. -->
+    <StackPanel Margin="12,0,0,0" DataContext="{Binding SelectedStrip}" Style="{StaticResource EnabledWhenChosen}">
+      <TextBlock Text="{Binding File}" FontWeight="Bold" />
+      <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+        <TextBlock Text="Frame time (ms)" Width="110" VerticalAlignment="Center" />
+        <TextBox Width="70"
+                 Text="{Binding FrameMillisecondsText, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="How long each frame shows, at least 1 ms" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+        <TextBlock Text="Hit frame" Width="110" VerticalAlignment="Center" />
+        <TextBox Width="70"
+                 Text="{Binding HitFrameText, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="The frame, from 0, shown as the blow lands; the frames before it play during the wind-up" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+        <TextBlock Text="Swing" Width="110" VerticalAlignment="Center" />
+        <ComboBox Width="240"
+                  IsEditable="True"
+                  ItemsSource="{Binding DataContext.SwingChoices, RelativeSource={RelativeSource AncestorType=Window}}"
+                  Text="{Binding SwingFile, UpdateSourceTrigger=PropertyChanged}"
+                  ToolTip="The strip an Attack sweeps in front of the attacker before this one; empty for none" />
+      </StackPanel>
+      <TextBlock Text="{Binding LengthText}" Foreground="{StaticResource MutedTextBrush}" Margin="110,8,0,0" />
+      <Button Content="Reset to unlisted"
+              Width="130"
+              HorizontalAlignment="Left"
+              Margin="110,12,0,0"
+              Command="{Binding DataContext.ResetToUnlistedCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+              ToolTip="Back to the default pace, hit frame 0 and no swing: OK then writes no record for it" />
+    </StackPanel>
+  </DockPanel>
+</Window>

@@ -10,8 +10,8 @@ using Jrpg.Editor.Trade;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// Database > Shops..., Drop tables..., Enemies... and Cinematics...: each window edits its catalog of the draft, and
-/// OK applies the whole session as one undo step (ADR 0045, decision 591), as the Quests window does.
+/// Database > Shops..., Drop tables..., Effect strips..., Enemies... and Cinematics...: each window edits its catalog
+/// of the draft, and OK applies the whole session as one undo step (ADR 0045, decision 591), as the Quests window does.
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -99,5 +99,19 @@ internal sealed partial class MainWindow
 
         BitmapSource? LoadPicture(string file) =>
             SpriteImageFile.LoadAtWidth(artRoot, ArtFolders.Cinematics, file, CinematicCatalogWindow.PreviewWidth);
+    }
+
+    private void OnEditEffectStripsClicked(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel.EffectStripEditing is not { } effectStripEditing)
+        {
+            return;
+        }
+
+        var edited = effectStripEditing.Start();
+        if (new EffectStripCatalogWindow(edited) { Owner = this }.ShowDialog() == true)
+        {
+            effectStripEditing.Apply(edited);
+        }
     }
 }

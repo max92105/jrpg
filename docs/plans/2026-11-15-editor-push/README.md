@@ -181,3 +181,20 @@ The developer's answers and the review, for the later sub-plans:
   0043, row 5); statuses as records with their timing and chance (amends 0021, row 6); enemy triggers and target rules
   (amends 0034, row 8); unique items with fixed affix values (amends 0029, row 9); animated battle backgrounds' sheet
   shape (row 10); the mode bar and the undo rule of a live page (row 11).
+
+## The sub-plans, as planned and challenged on 2026-11-15
+Every row now has its own approved plan folder, each challenged by the devil's advocate and corrected. The developer
+was away: each plan's README lists its "Defaults to confirm". The order the slices run in:
+1. `2026-11-15-skill-effect-strips` (row 2): done.
+2. `2026-11-15-event-window-cleanup` (row 3).
+3. `2026-11-15-cinematic-focus-point` (row 4).
+4. `2026-11-15-sprite-cells-and-mirrors` (row 5).
+5. `2026-11-15-skills-and-statuses-model` (row 6).
+6. `2026-11-15-mode-bar`, its dialog pages WD1-WD8 (the Database menu in its own file, editors as pages in a
+   full-size dialog), before any new editor is built.
+7. `2026-11-15-skill-and-status-editors` (row 7), without its balance table.
+8. `2026-11-15-enemy-behavior` (row 8).
+9. `2026-11-15-items-uniques-affixes` (row 9).
+10. `2026-11-15-encounters-and-backgrounds` (row 10).
+11. `2026-11-15-mode-bar`, the mode bar itself, WS1-WS6 (row 11).
+12. `2026-11-15-classes-and-progression` (row 12), then row 7's balance table.

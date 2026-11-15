@@ -7,7 +7,8 @@ using Jrpg.Game.Tests.Ui;
 
 namespace Jrpg.Game.Tests.Battle;
 
-// A turn on screen: 0.2 s forward, then the command or the enemy's action, a 1.0 s hold (2.0 s with a fall), 0.2 s back.
+// A turn on screen: 0.2 s forward, then the command or the enemy's choice, a 0.7 s wind-up to the impact, a 0.85 s hold
+// (2.0 s with a fall), 0.2 s back.
 [Collection(RepositoryScreenText.CollectionName)]
 public sealed class BattleTurnSequenceTests
 {
@@ -47,7 +48,7 @@ public sealed class BattleTurnSequenceTests
     }
 
     [Fact]
-    public void Update_EnemyTurn_StepsForwardBeforeExecuting()
+    public void Update_EnemyTurn_PausesInPlaceBeforeExecuting()
     {
         var (battle, sequence) = SarxianAgainstGoblinTrio(BattleScenarios.GoblinsFirstSeed);
         var sarxian = battle.LivingOn(BattleSide.Party)[0];
@@ -56,8 +57,20 @@ public sealed class BattleTurnSequenceTests
         sequence.Update(TimeSpan.FromSeconds(0.1));
 
         Assert.Equal(TurnStage.StepForward, sequence.Stage);
-        Assert.Equal(0.5f, sequence.StepShare(sequence.Actor), 3);
+        Assert.Equal(0f, sequence.StepShare(sequence.Actor));
         Assert.Equal(hpBefore, sarxian.Vitals.Hp);
+    }
+
+    // The other side of decision 643: a party member still steps out.
+    [Fact]
+    public void StepShare_PartyMemberMidStep_IsHalf()
+    {
+        var (_, sequence) = SarxianAgainstGoblinTrio(BattleScenarios.SarxianFirstSeed);
+
+        sequence.Update(TimeSpan.FromSeconds(0.1));
+
+        Assert.Equal(TurnStage.StepForward, sequence.Stage);
+        Assert.Equal(0.5f, sequence.StepShare(sequence.Actor), 3);
     }
 
     [Fact]
@@ -71,16 +84,18 @@ public sealed class BattleTurnSequenceTests
     }
 
     [Fact]
-    public void Submit_HoldsThenStepsBack()
+    public void Submit_WindsUpHoldsThenStepsBack()
     {
         var (battle, sequence) = SarxianAgainstGoblinTrio(BattleScenarios.SarxianFirstSeed);
         sequence.Update(_step);
 
         sequence.Submit(new AttackCommand(battle.Combatants[1]));
         var stageAfterSubmit = sequence.Stage;
-        sequence.Update(TimeSpan.FromSeconds(1.0));
+        sequence.Update(BattlePacing.WindUp);
+        var stageAtTheImpact = sequence.Stage;
+        sequence.Update(sequence.Playback!.Duration);
 
-        Assert.Equal(TurnStage.Holding, stageAfterSubmit);
+        Assert.Equal((TurnStage.WindingUp, TurnStage.Holding), (stageAfterSubmit, stageAtTheImpact));
         Assert.Equal(TurnStage.StepBack, sequence.Stage);
     }
 
@@ -120,7 +135,7 @@ public sealed class BattleTurnSequenceTests
         sequence.Update(_step);
 
         sequence.Submit(new AttackCommand(battle.Combatants[1]));
-        sequence.Update(TimeSpan.FromSeconds(0.5));
+        sequence.Update(BattlePacing.WindUp + TimeSpan.FromSeconds(0.5));
 
         Assert.NotSame(sarxian, battle.CurrentActor);
         Assert.Same(sarxian, sequence.Actor);
@@ -132,12 +147,16 @@ public sealed class BattleTurnSequenceTests
         var (battle, sequence) = SarxianAgainstGoblinTrio(BattleScenarios.GoblinsFirstSeed);
         var secondGoblin = battle.Combatants[2];
 
-        // Goblin A: 0.2 s forward, 1.0 s hold, 0.2 s back; then 0.05 s into goblin B's step.
-        sequence.Update(TimeSpan.FromSeconds(1.45));
+        // Goblin A: its pause, wind-up, impact hold and pause again; then 0.05 s into goblin B's pause, which an enemy
+        // shows only as its pause ending 0.05 s early (decision 643: it doesn't step).
+        var goblinATurn = BattlePacing.Step + BattlePacing.WindUp + BattlePacing.ImpactHold + BattlePacing.Step;
+        sequence.Update(goblinATurn + TimeSpan.FromSeconds(0.05));
+        sequence.Update(TimeSpan.FromSeconds(0.15) - TimeSpan.FromTicks(1));
 
         Assert.Equal(TurnStage.StepForward, sequence.Stage);
         Assert.Same(secondGoblin, sequence.Actor);
-        Assert.Equal(0.25f, sequence.StepShare(secondGoblin), 3);
+        sequence.Update(TimeSpan.FromTicks(1));
+        Assert.NotEqual(TurnStage.StepForward, sequence.Stage);
     }
 
     // Omer is a mage, so ending the turn gains mana: a ResourceChanged the screen must take without a beat. He starts
@@ -169,7 +188,7 @@ public sealed class BattleTurnSequenceTests
         sequence.Update(_step);
 
         sequence.Submit(new SkillCommand(BattleScenarios.Skills["shield_bash"], [battle.Combatants[1]]));
-        sequence.Update(BattlePacing.ImpactHold + BattlePacing.SkipHold + BattlePacing.Step);
+        sequence.Update(BattlePacing.WindUp + BattlePacing.ImpactHold + BattlePacing.SkipHold + BattlePacing.Step);
 
         sequence.Update(TimeSpan.FromSeconds(0.1));
 
@@ -204,6 +223,7 @@ public sealed class BattleTurnSequenceTests
         sequence.Update(_step);
         var turn = sequence.Turn;
         sequence.Submit(new SkillCommand(BattleScenarios.Catalog.Skills["ready"], [battle.Combatants[1]]));
+        sequence.Update(BattlePacing.WindUp);
 
         sequence.Update(sequence.Playback!.Duration);
 

@@ -1,6 +1,5 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
-using Jrpg.Core.Skills;
 using Jrpg.Core.Statuses;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Tests.Exploration;
@@ -161,26 +160,6 @@ public sealed class BattleSoundsTests
     }
 
     [Fact]
-    public void Of_ItemUsed_IsTheItemSound()
-    {
-        var potion = StartMapScenarios.TestWorld.Items["potion"];
-
-        Assert.Equal([new TimedSound(UiSoundFiles.Battle.ItemUse, TimeSpan.Zero)], SoundsOf(new ActionStarted(_goblin, new ItemCommand(potion, [_goblin]))));
-    }
-
-    [Fact]
-    public void Of_Defended_IsTheDefendSound()
-    {
-        Assert.Equal([new TimedSound(UiSoundFiles.Battle.Defend, TimeSpan.Zero)], SoundsOf(new ActionStarted(_goblin, new DefendCommand())));
-    }
-
-    [Fact]
-    public void Of_Attacked_IsSilentAsItStarts()
-    {
-        Assert.Empty(SoundsOf(new ActionStarted(_goblin, new AttackCommand(_goblin))));
-    }
-
-    [Fact]
     public void Of_LaterBeatFirstInTheEvents_IsSortedByTime()
     {
         var sounds = SoundsOf(new CombatantDefeated(_goblin), new EffectApplied(_goblin, EffectKind.Damage, 13));
@@ -189,25 +168,13 @@ public sealed class BattleSoundsTests
     }
 
     [Fact]
-    public void Of_SkillUsed_IsItsOwnSoundAtTheStart()
+    public void Of_SkillThatHits_IsTheHitOnly()
     {
-        var sounds = SoundsOf(new ActionStarted(_goblin, new SkillCommand(Skill("Own.wav"), [_goblin])));
+        var skill = new SkillCommand(SoundingSkills.WithSound("Own.wav"), [_goblin]);
 
-        Assert.Equal([new TimedSound("Own.wav", TimeSpan.Zero)], sounds);
-    }
+        var sounds = SoundsOf(new ActionStarted(_goblin, skill), new EffectApplied(_goblin, EffectKind.Damage, 13));
 
-    [Fact]
-    public void Of_SkillWithoutASound_IsSilent()
-    {
-        Assert.Empty(SoundsOf(new ActionStarted(_goblin, new SkillCommand(Skill(""), [_goblin]))));
-    }
-
-    [Fact]
-    public void Of_SkillThatHits_IsItsOwnSoundThenTheHit()
-    {
-        var sounds = SoundsOf(new ActionStarted(_goblin, new SkillCommand(Skill("Own.wav"), [_goblin])), new EffectApplied(_goblin, EffectKind.Damage, 13));
-
-        Assert.Equal([new TimedSound("Own.wav", TimeSpan.Zero), new TimedSound(UiSoundFiles.Battle.Hit, _impact)], sounds);
+        Assert.Equal([new TimedSound(UiSoundFiles.Battle.Hit, _impact)], sounds);
     }
 
     [Fact]
@@ -215,16 +182,6 @@ public sealed class BattleSoundsTests
     {
         Assert.Throws<InvalidOperationException>(() => SoundsOf(new UnknownEvent()));
     }
-
-    private static SkillDefinition Skill(string soundFile) => new()
-    {
-        Id = "own",
-        Name = "Own",
-        Description = "",
-        IconFile = "",
-        SoundFile = soundFile,
-        Effect = new Effect(EffectKind.Damage, 5, Targeting.SingleEnemy),
-    };
 
     private static IReadOnlyList<TimedSound> SoundsOf(params BattleEvent[] events) =>
         BattleSounds.Of(events, (_, kind) => StartOf(kind));

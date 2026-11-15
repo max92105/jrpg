@@ -80,6 +80,17 @@ public sealed class PlaybackSoundQueueTests
         Assert.Empty(_asked.Files);
     }
 
+    [Fact]
+    public void Follow_WindUp_AsksItsOpeningAtOnce()
+    {
+        var potion = StartMapScenarios.TestWorld.Items["potion"];
+        var windUp = ActionWindUp.Of(_goblin, new ItemCommand(potion, [_goblin]), RepositoryScreenText.Text.Messages);
+
+        _queue.Follow(windUp, _asked);
+
+        Assert.Equal([UiSoundFiles.Battle.ItemUse], _asked.Files);
+    }
+
     private ActionPlayback Hit() => ActionPlayback.Start(
         [new ActionStarted(_goblin, new AttackCommand(_goblin)), new EffectApplied(_goblin, EffectKind.Damage, 13)],
         RepositoryScreenText.Text.Messages);

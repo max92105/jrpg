@@ -1,10 +1,8 @@
-using FontStashSharp;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Session;
 using Jrpg.Data.Art;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
-using Jrpg.Game.Saving;
 using Jrpg.Game.Scenes;
 using Jrpg.Game.Ui;
 using Microsoft.Xna.Framework;
@@ -19,18 +17,11 @@ namespace Jrpg.Game.Battle;
 /// </summary>
 internal sealed class BattleScene : IScene
 {
-    // "Escaped" at 64 px on a band padded 18 px (placeholder look).
-    private const int EscapedTextPixels = 64;
-    private const int EscapedPaddingY = 18;
-
     private readonly GameSession _session;
     private readonly BattleState _battle;
     private readonly TurnOrderStrip _turnOrderStrip = new();
     private readonly TurnOrderView _turnOrder;
     private readonly UiTextures _ui;
-    private readonly ScreenText _text;
-    private readonly SaveSlots _saves;
-    private readonly SpriteFontBase _escapedFont;
     private readonly BattlersView _battlers;
     private readonly BattleTurnSequence _sequence;
     private readonly string _backgroundFile;
@@ -42,18 +33,13 @@ internal sealed class BattleScene : IScene
     private readonly BattleBannerView _bannerView;
     private readonly FloatingNumbersView _numbers;
     private readonly ImpactEffectsView _impactEffects;
-    private ActionPlayback? _shownPlayback;
+    private ActionWindUp? _shownWindUp;
     private (int Turn, TurnStage Stage) _shown;
     private bool _isFinished;
-    private VictoryScreen? _victory;
-    private VictoryScreenView? _victoryView;
     private readonly AskedSounds _sounds = new();
     private readonly PlaybackSoundQueue _soundQueue = new();
-    private readonly BattleMusic _music = new();
-    private DefeatScreen? _defeat;
-    private DefeatScreenView? _defeatView;
-    private EscapedNotice? _escaped;
-    private MeasuredText _escapedText;
+    private readonly PlaybackSoundQueue _windUpSoundQueue = new();
+    private readonly BattleOutcomeScreens _outcome;
 
     /// <param name="session">The playthrough whose active battle this screen shows.</param>
     /// <param name="sources">The catalog's items, for the party's items, and the save files, for the defeat screen.</param>
@@ -63,8 +49,6 @@ internal sealed class BattleScene : IScene
     public BattleScene(GameSession session, BattleSceneSources sources, ScreenText text, UiTextures ui)
     {
         _session = session;
-        _text = text;
-        _escapedFont = text.Fonts.FontAt(EscapedTextPixels);
         _ui = ui;
         var battle = session.ActiveBattle ?? throw new InvalidOperationException("A battle screen needs an active battle.");
         _battle = battle;
@@ -78,17 +62,17 @@ internal sealed class BattleScene : IScene
         _enemyTags = new EnemyTagView(battle.Combatants, _sequence, text, ui);
         _backgroundFile = session.Exploration.PendingEncounter?.BackgroundFile
             ?? throw new InvalidOperationException("A battle screen needs the encounter it fights.");
-        _saves = sources.Saves;
+        _outcome = new BattleOutcomeScreens(sources.Saves, text, ui);
         _commands = new CommandMenu(session.Inventory, sources.Items);
         _commandPanel = new CommandPanelView(_commands, _battlers, text, ui);
-        _numbers = new FloatingNumbersView(_sequence, _battlers, text);
+        _numbers = new FloatingNumbersView(_sequence, _battlers, _enemyTags, text);
         _impactEffects = new ImpactEffectsView(_sequence, _battlers, text);
     }
 
     public IReadOnlyList<string> Sounds => _sounds.Files;
 
     /// <summary>What the battle screen calls for from the music as its outcome shows (decision 418).</summary>
-    public BattleMusicCue MusicCue => _music.Cue;
+    public BattleMusicCue MusicCue => _outcome.MusicCue;
 
     /// <returns>
     /// <see cref="BattleFinished"/> when the victory screen or the escaped notice is left; <see cref="LoadRequested"/> or
@@ -97,10 +81,12 @@ internal sealed class BattleScene : IScene
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
         _sounds.Clear();
-        _music.Advance(delta);
+        _outcome.Advance(delta);
         if (_isFinished)
         {
-            return UpdateOutcomeScreen(delta, input);
+            var request = _outcome.Update(delta, input);
+            _sounds.AskAll(_outcome.Sounds);
+            return request;
         }
 
         if (_sequence.IsAwaitingCommand)
@@ -116,10 +102,11 @@ internal sealed class BattleScene : IScene
         ShowAimedTargets();
         AdvanceViews(delta);
         _sequence.Update(delta);
+        _windUpSoundQueue.Follow(_sequence.WindUp, _sounds);
         _soundQueue.Follow(_sequence.Playback, _sounds);
-        if (!ReferenceEquals(_sequence.Playback, _shownPlayback))
+        if (!ReferenceEquals(_sequence.WindUp, _shownWindUp))
         {
-            ShowPlayback(_sequence.Playback);
+            ShowWindUp(_sequence.WindUp);
         }
 
         if (_shown != (_sequence.Turn, _sequence.Stage))
@@ -139,21 +126,15 @@ internal sealed class BattleScene : IScene
     {
         DrawBackdrop(batch, textures);
         _battlers.Draw(batch, textures);
-        if (_victoryView is { } victoryView)
+        if (_outcome.CoversTheHud)
         {
-            victoryView.Draw(batch, textures);
-            return;
-        }
-
-        if (_defeatView is { } defeatView)
-        {
-            defeatView.Draw(batch, textures);
+            _outcome.DrawOverTheBattlers(batch, textures);
             return;
         }
 
         _enemyTags.Draw(batch, textures);
         _impactEffects.Draw(batch, textures);
-        _numbers.Draw(batch, textures);
+        _numbers.Draw(batch);
         _turnOrder.Draw(batch, textures);
         _bannerView.Draw(batch, textures);
         _partyStatus.Draw(batch, textures, _sequence.IsOver ? null : _sequence.Actor);
@@ -162,10 +143,7 @@ internal sealed class BattleScene : IScene
             _commandPanel.Draw(batch, textures, _sequence.Actor);
         }
 
-        if (_escaped is not null)
-        {
-            DrawEscaped(batch, textures);
-        }
+        _outcome.DrawOverTheHud(batch, textures);
     }
 
     // While a target is being chosen, the strip lights it and the floor glows under the allies it would cover.
@@ -203,39 +181,14 @@ internal sealed class BattleScene : IScene
         }
     }
 
-    // Checked on its own, not at a stage change: an action with no hold (Defend) passes the Holding stage within one update.
-    private void ShowPlayback(ActionPlayback? playback)
+    // Checked on its own, not at a stage change: an action with no wind-up (Defend) passes it within one update.
+    private void ShowWindUp(ActionWindUp? windUp)
     {
-        _shownPlayback = playback;
-        if (playback?.BannerText is { } bannerText)
+        _shownWindUp = windUp;
+        if (windUp?.BannerText is { } bannerText)
         {
             _banner.Show(bannerText);
         }
-    }
-
-    // Exactly one outcome screen is set once the battle is finished.
-    private SceneRequest? UpdateOutcomeScreen(TimeSpan delta, InputFrame input)
-    {
-        if (_victory is { } victory)
-        {
-            var request = victory.Update(delta, input);
-            _sounds.AskAll(victory.Sounds);
-            return request;
-        }
-
-        return _escaped is { } escaped ? escaped.Update(delta, input) : UpdateDefeat(delta, input);
-    }
-
-    private SceneRequest? UpdateDefeat(TimeSpan delta, InputFrame input)
-    {
-        if (_defeat is not { } defeat)
-        {
-            return null;
-        }
-
-        var request = defeat.Update(delta, input);
-        _sounds.AskAll(defeat.Sounds);
-        return request;
     }
 
     // Each outcome stays on this screen for its own: a victory's rewards, an escape's notice, a defeat's choices.
@@ -243,41 +196,8 @@ internal sealed class BattleScene : IScene
     {
         _isFinished = true;
         var outcome = _battle.Phase;
-        if (_session.FinishBattle() is { } spoils)
-        {
-            _music.ShowVictory();
-            _sounds.Ask(UiSoundFiles.Battle.Victory);
-            _victory = new VictoryScreen(spoils);
-            _victoryView = new VictoryScreenView(_victory, _text, _ui);
-            return;
-        }
-
-        if (outcome == BattlePhase.Escaped)
-        {
-            _music.ShowEscape();
-            _sounds.Ask(UiSoundFiles.Battle.Escape);
-            _escaped = new EscapedNotice();
-            _escapedText = MeasuredText.Of(_escapedFont, _text.Messages.Text(MessageIds.BattleEscaped));
-            return;
-        }
-
-        _music.ShowDefeat();
-        _sounds.Ask(UiSoundFiles.Battle.Defeat);
-        _defeat = new DefeatScreen(_saves, _text, _ui);
-        _defeatView = new DefeatScreenView(_defeat, _text, _ui);
-    }
-
-    // The battle under a scrim, and "Escaped" on a banner band across the middle of the screen.
-    private void DrawEscaped(SpriteBatch batch, TextureLibrary textures)
-    {
-        batch.Draw(textures.Pixel, new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height), UiTheme.Scrim);
-        var height = (int)_escapedFont.LineHeight + (2 * EscapedPaddingY);
-        var band = new Rectangle(0, (VirtualScreen.Height - height) / 2, VirtualScreen.Width, height);
-        batch.Draw(_ui.Gradient(textures, UiTheme.Banner), band, Color.White);
-        var line = _ui.Gradient(textures, UiTheme.HighlightLine);
-        batch.Draw(line, new Rectangle(band.X, band.Y, band.Width, 1), Color.White);
-        batch.Draw(line, new Rectangle(band.X, band.Bottom - 1, band.Width, 1), Color.White);
-        batch.DrawString(_escapedFont, _escapedText.Text, new Vector2(band.Center.X - (_escapedText.Width / 2), band.Y + EscapedPaddingY), UiTheme.TextPrimary);
+        _outcome.Show(_session.FinishBattle(), outcome);
+        _sounds.AskAll(_outcome.Sounds);
     }
 
     // The backdrop: the picture, the vignette over the whole screen, and the shade across the top.

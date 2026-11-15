@@ -65,7 +65,7 @@ public sealed class ActionPlaybackPhaseTests
         ]);
 
         Assert.Equal(
-            [PlaybackBeatKind.Banner, PlaybackBeatKind.Skip, PlaybackBeatKind.Tick, PlaybackBeatKind.Phase],
+            [PlaybackBeatKind.Skip, PlaybackBeatKind.Tick, PlaybackBeatKind.Phase],
             playback.Beats.Select(beat => beat.Kind));
         Assert.Equal(new CueOnTarget(_goblin, "Enraged!", BattlePacing.SkipHold + BattlePacing.TickHold), playback.Cues[^1]);
         Assert.Equal(BattlePacing.SkipHold, Assert.Single(playback.Numbers).ShowsAt);

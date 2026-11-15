@@ -36,7 +36,7 @@ public sealed class ActionPlaybackSoundTests
             playback.Sounds);
     }
 
-    // The hit fells the goblin (1.0 s), then the backfire fells the caster on a defeat beat of its own (3.0 s).
+    // The hit fells the goblin after the impact's hold, then the backfire fells the caster on a defeat beat of its own.
     [Fact]
     public void Start_TwoFallsOnTwoDefeatBeats_SoundsEachAtItsOwn()
     {
@@ -53,10 +53,10 @@ public sealed class ActionPlaybackSoundTests
 
         var falls = playback.Sounds.Where(sound => sound.File == UiSoundFiles.Battle.Fall).Select(sound => sound.At);
 
-        Assert.Equal([TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(3)], falls);
+        Assert.Equal([BattlePacing.ImpactHold, BattlePacing.DefeatHold + BattlePacing.BackfireHold], falls);
     }
 
-    // The actor's Regen ticks at 1.0 s; the stunned goblin's Poison ticks after its "Stunned" cue, at 2.6 s.
+    // The actor's Regen ticks after the impact's hold; the stunned goblin's Poison after its "Stunned" cue.
     [Fact]
     public void Start_TicksOnTwoTickBeats_SoundsEachAtItsOwn()
     {
@@ -71,7 +71,8 @@ public sealed class ActionPlaybackSoundTests
             ],
             RepositoryScreenText.Text.Messages);
 
-        Assert.Contains(new TimedSound(UiSoundFiles.Battle.RegenTick, TimeSpan.FromSeconds(1)), playback.Sounds);
-        Assert.Contains(new TimedSound(UiSoundFiles.Battle.PoisonTick, TimeSpan.FromSeconds(2.6)), playback.Sounds);
+        Assert.Contains(new TimedSound(UiSoundFiles.Battle.RegenTick, BattlePacing.ImpactHold), playback.Sounds);
+        var poisonAt = BattlePacing.ImpactHold + BattlePacing.TickHold + BattlePacing.SkipHold;
+        Assert.Contains(new TimedSound(UiSoundFiles.Battle.PoisonTick, poisonAt), playback.Sounds);
     }
 }

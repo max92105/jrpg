@@ -49,6 +49,14 @@ internal sealed class EnemyTagView
         Refresh();
     }
 
+    /// <summary>Where <paramref name="combatant"/>'s tag is drawn, so a number above it can keep clear of it.</summary>
+    /// <returns>Null for a party member, who has no tag.</returns>
+    public Rectangle? TagAreaOf(Combatant combatant)
+    {
+        var index = Array.IndexOf(_enemies, combatant);
+        return index < 0 ? null : _tagAreas[index];
+    }
+
     /// <summary>Fills each bar to its enemy's HP now, and writes its statuses.</summary>
     public void Refresh()
     {

@@ -26,8 +26,7 @@ public sealed class ActionPlaybackTests
 
         var playback = Start(events);
 
-        Assert.Equal([new PlaybackBeat(PlaybackBeatKind.Impact, TimeSpan.FromSeconds(1))], playback.Beats);
-        Assert.Null(playback.BannerText);
+        Assert.Equal([new PlaybackBeat(PlaybackBeatKind.Impact, BattlePacing.ImpactHold)], playback.Beats);
     }
 
     [Fact]
@@ -113,28 +112,6 @@ public sealed class ActionPlaybackTests
     }
 
     [Fact]
-    public void Start_MoveCommand_ShowsMoveBanner()
-    {
-        var ally = Combatant.FromPartyMember(BattleScenarios.Recruit("jazog"));
-
-        var playback = Start([new ActionStarted(_sarxian, new MoveCommand(ally)), new PlacesSwapped(_sarxian, ally)]);
-
-        Assert.Equal("Move", playback.BannerText);
-        Assert.Equal([PlaybackBeatKind.Banner], playback.Beats.Select(beat => beat.Kind));
-    }
-
-    [Fact]
-    public void Start_ExtraTurnReadied_ShowsSkillBanner()
-    {
-        var ready = BattleScenarios.Catalog.Skills["ready"];
-
-        var playback = Start([new ActionStarted(_sarxian, new SkillCommand(ready, [_goblin])), new ExtraTurnReadied(_sarxian, _goblin)]);
-
-        Assert.Equal(ready.Name, playback.BannerText);
-        Assert.Equal([PlaybackBeatKind.Banner], playback.Beats.Select(beat => beat.Kind));
-    }
-
-    [Fact]
     public void Start_Backfired_AddsBackfireBeatAfterImpact()
     {
         BattleEvent[] events =
@@ -185,28 +162,6 @@ public sealed class ActionPlaybackTests
         var playback = Start([new ActionStarted(_sarxian, new DefendCommand())]);
 
         Assert.Equal(TimeSpan.Zero, playback.Duration);
-        Assert.Equal($"{_sarxian.Name} defends.", playback.BannerText);
-    }
-
-    [Fact]
-    public void Start_SkillCommand_ShowsSkillName()
-    {
-        var skill = BattleScenarios.Catalog.Skills["fire_blast"];
-
-        var playback = Start([new ActionStarted(_sarxian, new SkillCommand(skill, [_goblin])), new EffectApplied(_goblin, EffectKind.Damage, 20)]);
-
-        Assert.Equal(skill.Name, playback.BannerText);
-        Assert.Equal([PlaybackBeatKind.Banner, PlaybackBeatKind.Impact], playback.Beats.Select(beat => beat.Kind));
-    }
-
-    [Fact]
-    public void Start_ItemCommand_ShowsItemName()
-    {
-        var potion = BattleScenarios.Catalog.Items["potion"];
-
-        var playback = Start([new ActionStarted(_sarxian, new ItemCommand(potion, [_sarxian])), new EffectApplied(_sarxian, EffectKind.RestoreHp, 50)]);
-
-        Assert.Equal(potion.Name, playback.BannerText);
     }
 
     [Fact]

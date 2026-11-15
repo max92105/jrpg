@@ -56,6 +56,48 @@ public sealed class BattleSceneSoundTests
         Assert.Contains(asked, file => file is UiSoundFiles.Battle.Hit or UiSoundFiles.Battle.Critical or UiSoundFiles.Battle.Miss);
     }
 
+    // Sarxian knows the warlock's spells and the new game's bag holds potions, so Items is two rows down; whichever
+    // item comes first, on Sarxian, opens with the item-use sound (decision 647).
+    [Fact]
+    public void Update_ItemConfirmed_AsksTheItemSoundAtOnce()
+    {
+        var scene = NewBattle(_ => { });
+        scene.Update(TimeSpan.FromSeconds(10), default);
+        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Down));
+        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Down));
+        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+
+        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+
+        Assert.Contains(UiSoundFiles.Battle.ItemUse, scene.Sounds);
+    }
+
+    // A certain hit on one goblin: nothing sounds while the attack winds up; the hit sounds in the update that ends the
+    // wind-up, the confirming update being its first.
+    [Fact]
+    public void Update_AttackConfirmed_AsksTheHitOnlyAtTheImpact()
+    {
+        var oneGoblin = BattleScenarios.WithOneGoblin(
+            StartMapScenarios.NextToForestWarpAlwaysRolling, goblin => goblin with { Dodge = 0 });
+        var scene = NewBattle(oneGoblin with { Rules = oneGoblin.Rules with { Stats = BattleScenarios.CertainRules } }, _ => { });
+        scene.Update(TimeSpan.FromSeconds(10), default);
+        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        scene.Update(StartMapScenarios.OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        var heardWhileWindingUp = new List<string>(scene.Sounds);
+        var step = StartMapScenarios.OneUpdate;
+        for (var woundUp = step; woundUp + step < BattlePacing.WindUp; woundUp += step)
+        {
+            scene.Update(step, default);
+            heardWhileWindingUp.AddRange(scene.Sounds);
+        }
+
+        scene.Update(step, default);
+
+        Assert.DoesNotContain(heardWhileWindingUp, file => file is UiSoundFiles.Battle.Hit or UiSoundFiles.Battle.Critical);
+        Assert.Contains(scene.Sounds, file => file is UiSoundFiles.Battle.Hit or UiSoundFiles.Battle.Critical);
+    }
+
     // The victory screen's own sounds reach the flow through the scene; leaving needs no level-up or drop, so it holds
     // whatever the fixture's experience.
     [Fact]

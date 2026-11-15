@@ -9,7 +9,8 @@ namespace Jrpg.Game.Battle;
 
 /// <summary>
 /// Draws every living battler at its spot in the formation, centered on it with its feet on the spot's bottom, the
-/// actor stepped out toward the other side. Whoever falls, party member or enemy, is lit white, then fades out.
+/// party actor stepped out toward the enemies. The actor blinks white twice as its action winds up, a soft spill past
+/// its outline each time (decision 648); whoever falls, party member or enemy, is lit white, then fades out.
 /// </summary>
 internal sealed class BattlersView
 {
@@ -20,8 +21,16 @@ internal sealed class BattlersView
     private readonly FormationSlide _slide = new();
     private IReadOnlyList<Combatant> _covered = [];
     private readonly BattlerArt[] _arts;
-    // How strongly the white lies over a falling battler: bright, with its own colors still showing through.
-    private const float FallenWhiteness = 0.6f;
+
+    // The blink's spill: its silhouette again around the sprite, 6 px out in the eight directions, each faint, so the
+    // white seems to glow past the outline (decision 648).
+    private const float SpillShare = 0.12f;
+    private const int SpillDistance = 6;
+    private static readonly Point[] _spillOffsets =
+    [
+        new(-SpillDistance, -SpillDistance), new(0, -SpillDistance), new(SpillDistance, -SpillDistance), new(-SpillDistance, 0),
+        new(SpillDistance, 0), new(-SpillDistance, SpillDistance), new(0, SpillDistance), new(SpillDistance, SpillDistance),
+    ];
 
     // Placeholder: the floor glow under a covered ally is a flat diamond, 1.4 times the spot's width and 24 px tall.
     private const float GlowWidthShare = 1.4f;
@@ -91,7 +100,9 @@ internal sealed class BattlersView
         return DrawnArea(textures, _arts[index], SpotOf(combatant)).Top;
     }
 
-    /// <summary>Where <paramref name="combatant"/> stands now: their formation spot, stepped out while they act.</summary>
+    /// <summary>
+    /// Where <paramref name="combatant"/> stands now: their formation spot, stepped out while a party member acts.
+    /// </summary>
     /// <exception cref="ArgumentException">The combatant isn't in this battle.</exception>
     public Rectangle SpotOf(Combatant combatant) => SteppedSpot(combatant, SlidSpot(IndexOf(combatant)));
 
@@ -128,11 +139,10 @@ internal sealed class BattlersView
         throw new ArgumentException($"{combatant.Name} isn't in this battle.", nameof(combatant));
     }
 
-    // Each side steps toward the other: the party left, the enemies right.
+    // Only the party steps, leftward toward the enemies; an enemy acts in place (decision 643): its share is always 0.
     private Rectangle SteppedSpot(Combatant combatant, Rectangle spot)
     {
-        var direction = combatant.Side == BattleSide.Party ? -1 : 1;
-        spot.Offset((int)(direction * BattlePacing.StepDistance * _sequence.StepShare(combatant)), 0);
+        spot.Offset((int)(-BattlePacing.StepDistance * _sequence.StepShare(combatant)), 0);
         return spot;
     }
 
@@ -144,7 +154,7 @@ internal sealed class BattlersView
         return new Rectangle(spot.Center.X - (size.X / 2), spot.Bottom - size.Y, size.X, size.Y);
     }
 
-    // A fallen battler, still fading, is lit white over its own colors.
+    // The spill goes under the sprite, the white over it, so the battler's own colors still show through.
     private void DrawBattler(SpriteBatch batch, TextureLibrary textures, int index, float opacity)
     {
         var (combatant, art) = (_combatants[index], _arts[index]);
@@ -153,10 +163,37 @@ internal sealed class BattlersView
         var scaling = BattlerScaling.Of(new Point(source.Width, source.Height));
         var image = scaling.IsShrunkSmoothly ? _ui.Battler(textures, art.SpriteFile, scaling.DrawnSize.X) : source;
         var effects = art.IsFlipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+        var white = new WhiteLayer(_ui.WhiteSilhouette(textures, image), area, effects);
+        DrawSpill(batch, white, opacity * SpillShare * (_sequence.WindUp?.BlinkOf(combatant) ?? 0));
         batch.Draw(image, area, null, Color.White * opacity, 0, Vector2.Zero, effects, 0);
-        if (!combatant.IsAlive)
+        var whiteness = BattlerWhiteness.Of(combatant, _sequence.WindUp);
+        if (whiteness > 0)
         {
-            batch.Draw(_ui.WhiteSilhouette(textures, image), area, null, Color.White * (opacity * FallenWhiteness), 0, Vector2.Zero, effects, 0);
+            white.Draw(batch, Point.Zero, opacity * whiteness);
+        }
+    }
+
+    private static void DrawSpill(SpriteBatch batch, WhiteLayer white, float strength)
+    {
+        if (strength <= 0)
+        {
+            return;
+        }
+
+        foreach (var offset in _spillOffsets)
+        {
+            white.Draw(batch, offset, strength);
+        }
+    }
+
+    // A battler's white silhouette where its sprite is drawn, flipped as the sprite.
+    private readonly record struct WhiteLayer(Texture2D Silhouette, Rectangle Area, SpriteEffects Effects)
+    {
+        public void Draw(SpriteBatch batch, Point offset, float strength)
+        {
+            var area = Area;
+            area.Offset(offset);
+            batch.Draw(Silhouette, area, null, Color.White * strength, 0, Vector2.Zero, Effects, 0);
         }
     }
 }

@@ -95,12 +95,12 @@ public sealed class ActionPlaybackFallTests
 
         var playback = Start(events);
 
-        Assert.Equal([PlaybackBeatKind.Banner, PlaybackBeatKind.Impact, PlaybackBeatKind.Defeat], playback.Beats.Select(beat => beat.Kind));
+        Assert.Equal([PlaybackBeatKind.Impact, PlaybackBeatKind.Defeat], playback.Beats.Select(beat => beat.Kind));
         Assert.Equal(TimeSpan.FromSeconds(2), playback.Duration);
     }
 
-    // The hero's regen ticks (1.0 to 1.8 s), then the stunned goblin loses its turn (to 2.6 s) and its poison fells it
-    // (to 3.4 s): its number and fade come after its "Stunned" cue.
+    // The hero's regen ticks after the impact's hold, then the stunned goblin loses its turn and its poison fells it:
+    // its number and fade come after its "Stunned" cue.
     [Fact]
     public void Start_PoisonFellsSkippedHolder_TicksAndFadesAfterTheSkip()
     {
@@ -115,12 +115,13 @@ public sealed class ActionPlaybackFallTests
         ];
         var playback = Start(events);
 
-        playback.Update(TimeSpan.FromSeconds(3.4));
+        var poisonAt = BattlePacing.ImpactHold + BattlePacing.TickHold + BattlePacing.SkipHold;
+        playback.Update(poisonAt + BattlePacing.TickHold);
 
         PlaybackBeatKind[] beats =
             [PlaybackBeatKind.Impact, PlaybackBeatKind.Tick, PlaybackBeatKind.Skip, PlaybackBeatKind.Tick, PlaybackBeatKind.Defeat];
         Assert.Equal(beats, playback.Beats.Select(beat => beat.Kind));
-        Assert.Equal(new FloatingNumber(_goblin, "9", FloatingNumberTone.Poison, TimeSpan.FromSeconds(2.6)), playback.Numbers[^1]);
+        Assert.Equal(new FloatingNumber(_goblin, "9", FloatingNumberTone.Poison, poisonAt), playback.Numbers[^1]);
         Assert.Equal(1f, playback.FallOpacityOf(_goblin));
     }
 

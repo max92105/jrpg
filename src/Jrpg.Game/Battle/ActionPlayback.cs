@@ -7,17 +7,16 @@ using Jrpg.Game.Ui;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// One turn's events as the beats the screen plays (design key decision 4): a banner for a skill, an item or Defend, an
-/// impact when effects land, a defeat when someone falls, a skip when a stun takes a turn. The hold lasts as long as
-/// the beats; Defend and Run hold nothing. On the impact, each landed effect pops its amount and shows on its target,
-/// damage as the attacker's effect strip, anything else as a placeholder cue (decision 101), and a granted status shows
-/// its name, a miss "Miss" and a resisted status "Resisted"; whoever fell shows white, then fades on the defeat beat. A
-/// lost turn shows "Stunned" on its beat, Poison and Regen pop the HP they took or restored on a tick beat, and an
-/// enemy entering a phase shows "Enraged!" on a beat of its own after all the others (decision 406). An event it
-/// doesn't know throws, so a new mechanic can't be shown silently wrong (ADR 0004). Its sounds follow the beats
-/// (<see cref="BattleSounds"/>).
+/// One turn's events as the beats the screen plays (design key decision 4): an impact when effects land, a defeat when
+/// someone falls, a skip when a stun takes a turn. The hold lasts as long as the beats; Defend and Run hold nothing. On
+/// the impact, each landed effect shows its amount and plays on its target, damage as the attacker's effect strip,
+/// anything else as a placeholder cue (decision 101), and a granted status shows its name, a miss "Miss" and a resisted
+/// status "Resisted"; whoever fell shows white, then fades on the defeat beat. A lost turn shows "Stunned" on its beat,
+/// Poison and Regen show the HP they took or restored on a tick beat, and an enemy entering a phase shows "Enraged!" on
+/// a beat of its own after all the others (decision 406). An event it doesn't know throws, so a new mechanic can't be
+/// shown silently wrong (ADR 0004). Its sounds follow the beats (<see cref="BattleSounds"/>).
 /// </summary>
-internal sealed class ActionPlayback
+internal sealed class ActionPlayback : ISoundTimeline
 {
     // Placeholder timing: the fallen stay lit white for 1.0 s, then fade out over 1.0 s, easing in.
     private static readonly TimeSpan _fallTint = TimeSpan.FromSeconds(1.0);
@@ -34,6 +33,9 @@ internal sealed class ActionPlayback
     private readonly List<(Combatant Fallen, TimeSpan FadeStart)> _fallen = [];
     private string? _attackEffectFile;
 
+    // The action's name, for the placeholder cue an effect without an animation shows (decision 101).
+    private string? _actionName;
+
     // When the beat showing a fall or a tick starts, by the event's place in the turn: a turn may hold two beats of
     // those kinds, so its kind alone doesn't say which. Places, since two equal events would collide as keys.
     private readonly Dictionary<int, TimeSpan> _beatStartOfEvent = [];
@@ -45,13 +47,10 @@ internal sealed class ActionPlayback
 
     public IReadOnlyList<PlaybackBeat> Beats => _beats;
 
-    /// <summary>What the banner says for this action; null when it shows nothing.</summary>
-    public string? BannerText { get; private set; }
-
     /// <summary>How long the screen holds for the beats.</summary>
     public TimeSpan Duration { get; private set; }
 
-    /// <summary>One number per landed effect, built once; they all pop at the impact, which comes first.</summary>
+    /// <summary>One number per landed effect, built once; they all show at the impact, which comes first.</summary>
     public IReadOnlyList<FloatingNumber> Numbers => _numbers;
 
     /// <summary>The attacker's effect strip on each target damage landed on.</summary>
@@ -69,7 +68,7 @@ internal sealed class ActionPlayback
     public TimeSpan Elapsed { get; private set; }
 
     /// <param name="events">One turn's events, as <see cref="BattleState.Execute"/> returned them.</param>
-    /// <param name="messages">How "{name} defends." is written.</param>
+    /// <param name="messages">How the action's name and the cues are written.</param>
     /// <exception cref="InvalidOperationException">An event or a command the battle screen can't show yet.</exception>
     public static ActionPlayback Start(IReadOnlyList<BattleEvent> events, UiMessages messages)
     {
@@ -103,22 +102,13 @@ internal sealed class ActionPlayback
         return 1 - (fadeShare * fadeShare);
     }
 
-    private static string? BannerTextFor(ActionStarted started, UiMessages messages) => started.Command switch
-    {
-        SkillCommand skill => skill.Skill.Name,
-        ItemCommand item => item.Item.Name,
-        DefendCommand => messages.Format(MessageIds.BattleDefends, new MessageArgument("name", started.Actor.Name)),
-        MoveCommand => messages.Text(MessageIds.BattleMove),
-        AttackCommand or FleeCommand => null,
-        _ => throw new InvalidOperationException($"The battle screen can't show a {started.Command.GetType().Name} yet."),
-    };
-
     private void Read(BattleEvent battleEvent, UiMessages messages)
     {
         switch (battleEvent)
         {
             case ActionStarted started:
-                AddBanner(started, messages);
+                _actionName = ActionBannerText.For(started.Actor, started.Command, messages);
+                _attackEffectFile = BattlerArt.Of(started.Actor).AttackEffectFile;
                 break;
             case EffectApplied effect:
                 AddBeatOnce(PlaybackBeatKind.Impact, BattlePacing.ImpactHold);
@@ -174,8 +164,8 @@ internal sealed class ActionPlayback
         _ => throw new ArgumentOutOfRangeException(nameof(effect), effect.Kind, "An effect with no amount to show."),
     };
 
-    // Only damage has an animation so far: the attacker's strip (decision 101). Anything else gets a cue with the action's name.
-    // An action without one, an attack, only ever lands damage.
+    // Only damage has an animation so far: the attacker's strip (decision 101). Anything else gets a cue with the
+    // action's name. Run, the one action without a name, lands nothing.
     private void AddLanding(EffectApplied effect)
     {
         var stack = _numbers.Count(number => number.Target == effect.Target && number.ShowsAt == TimeSpan.Zero);
@@ -189,7 +179,7 @@ internal sealed class ActionPlayback
                 _strips.Add(new EffectOnTarget(effect.Target, file));
             }
         }
-        else if (BannerText is { } actionName)
+        else if (_actionName is { } actionName)
         {
             _cues.Add(new CueOnTarget(effect.Target, actionName));
         }
@@ -200,16 +190,6 @@ internal sealed class ActionPlayback
     {
         var stack = _numbers.Count(number => number.Target == stolen.Actor && number.ShowsAt == TimeSpan.Zero);
         _numbers.Add(new FloatingNumber(stolen.Actor, NumberText.Of(stolen.Amount), FloatingNumberTone.Heal, Stack: stack));
-    }
-
-    private void AddBanner(ActionStarted started, UiMessages messages)
-    {
-        BannerText = BannerTextFor(started, messages);
-        _attackEffectFile = BattlerArt.Of(started.Actor).AttackEffectFile;
-        if (BannerText is not null)
-        {
-            AddBeatOnce(PlaybackBeatKind.Banner, TimeSpan.Zero);
-        }
     }
 
     // A fall fades from the start of the beat that caused it: the impact, or a backfire or a tick after it. Those two

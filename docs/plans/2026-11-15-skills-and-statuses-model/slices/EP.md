@@ -25,7 +25,8 @@ writes it. Data's own refusal (power 0 with a tiered skill, T3) reaches the prob
   - `Problem_PowerNotANumber_NamesPower`.
   - `DuplicateOf_TypedPower_CopiesIt` (typed, not the record's).
 - `Battle/EnemyCatalogViewModelTests` (160 lines): `Problem_TieredSkillWithPowerZero_ShowsDataMessage` (a draft with a
-  skill naming a tier built in the test and an enemy naming it in its tactics; the line holds T3's message).
+  skill naming a tiered effect built in the test and an enemy naming it in its tactics; the line holds T3's message);
+  `Problem_PowerAboveTenThousand_ShowsDataMessage` (decision 818's bound reaches the line).
 
 ## Verify by hand
 1. Run `.claude/scripts/open-editor-windows.ps1`: no `ERROR` line (the Enemies window is in its default list).

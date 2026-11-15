@@ -4,7 +4,7 @@ Feature plans from `/plan-feature`, worked through one slice at a time with `/sl
 
 Code-health work found along the way (big files, copies, open follow-ups) waits in [backlog.md](backlog.md) for the next cleanup plan.
 
-**Next free numbers:** decision 831, ADR 0057 (706-830 and ADRs 0051-0056 are reserved for the editor push's sub-plans of 2026-11-15). A new decision or ADR takes its number from this line and bumps it in the same change, so two plans never share a number.
+**Next free numbers:** decision 1001, ADR 0063 (706-1000 and ADRs 0051-0062 are reserved for the editor push's sub-plans of 2026-11-15). A new decision or ADR takes its number from this line and bumps it in the same change, so two plans never share a number.
 
 **Layout of a plan** (from the battle plan on): a folder `YYYY-MM-DD-name/` with
 - `README.md`: status, goal, order, guiding rules, out of scope, the slice index (one line and a checkbox per slice), the developer's decisions, open questions, ADRs needed. Read for every slice.
@@ -16,6 +16,7 @@ Older plans are single files with the same sections.
 | Plan | Status |
 |---|---|
 | [2026-11-15-editor-push](2026-11-15-editor-push/README.md) | approved (the roadmap of twelve sub-plans, and sub-plan 1: the editor's safety net, NET1; NET2 optional) |
+| [2026-11-15-skills-and-statuses-model](2026-11-15-skills-and-statuses-model/README.md) | approved (the editor push's row 6) |
 | [2026-11-15-event-window-cleanup](2026-11-15-event-window-cleanup/README.md) | approved (the editor push's row 3) |
 | [2026-11-15-sprite-cells-and-mirrors](2026-11-15-sprite-cells-and-mirrors/README.md) | approved (the editor push's row 5) |
 | [2026-11-15-cinematic-focus-point](2026-11-15-cinematic-focus-point/README.md) | approved (the editor push's row 4) |

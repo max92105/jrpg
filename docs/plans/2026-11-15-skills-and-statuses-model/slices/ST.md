@@ -41,7 +41,7 @@ the next actor comes, and a battle it ends ends at once. The countdown stays at 
   - `Execute_StartTickOnAStunnedHolder_TicksThenSkips` (events in that order).
   - `Execute_ReadiedExtraTurn_HasNoStartTick` (decision 202's extra turn).
   - `Execute_StartOfTurnStatus_CountsDownAtTheEnd` (granted for 1 turn: ticks once at the start, ends at the end).
-- `Data.Tests/Content/ContentCatalogLoaderStatusTests` (from SC1): `Load_StatusWithUnknownTiming_RefusesNamingIt`.
+- `Data.Tests/Content/ContentCatalogLoaderStatusTests` (from SR1): `Load_StatusWithUnknownTiming_RefusesNamingIt`.
 - `Game.Tests/Battle/ActionPlaybackPhaseTests` (92 lines): `Start_TickOfTheNextActorAfterAnAttack_PlaysItsTickBeat`
   (an attack's events then a `StatusTicked` of another combatant).
 - `ContentWriterRepositoryTests.Statuses_RepositoryFile_WritesBackUnchanged` keeps passing.

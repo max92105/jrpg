@@ -12,7 +12,7 @@ kind twice and a bad grant, naming its index. `skills.json` writes `"statuses": 
 ## Changes
 - `Core/Effects/Effect`: the positional `StatusGrant? Status` goes; `IReadOnlyList<StatusGrant> Statuses { get; init; }
   = []` ("granted in order to each target still standing after the effect (ADR 0021, decision 809)");
-  `Equals(Effect?)` and `GetHashCode` compare the statuses in order (as `StatusDefinition`, SC1). Grep
+  `Equals(Effect?)` and `GetHashCode` compare the statuses in order (as `StatusDefinition`, SR1). Grep
   `new Effect(` in `src/` and `tests/` for a call passing a fifth or later argument positionally (range, hits): each
   gets its name.
 - `Core/Battle/EffectLanding.LandOn`: `foreach (var grant in effect.Statuses)` where it read `effect.Status`; the

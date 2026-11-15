@@ -98,6 +98,7 @@ internal sealed partial class MainViewModel : ObservableObject
             CinematicEditing = new CinematicEditingViewModel(Content, ReadCinematicMedia);
             EnemyEditing = new EnemyEditingViewModel(Content, folder => ArtFolders.ImagesIn(ArtRoot, folder));
             FieldSpriteEditing = CreateFieldSpriteEditing();
+            EffectStripEditing = CreateEffectStripEditing();
             NpcSpriteChange = new NpcSpriteChange(Content, Placing.Browser);
             if (MapIds.Count > 0)
             {

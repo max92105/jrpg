@@ -7,13 +7,17 @@ namespace Jrpg.Editor.Battle;
 
 /// <summary>
 /// One effect strip as the Effect strips window edits it (decision 659): its file fixed, its frame time and hit frame
-/// kept as typed, its swing chosen or left empty for none. It is listed (written to <c>effect-strips.json</c>) only
-/// while its boxes differ from the unlisted pace (ADR 0048). <see cref="Problem"/> is a box that isn't a whole number,
-/// then a hit frame past the image's frames; the ranges are Data's rules, shown by the window.
+/// kept as typed, its swing chosen or left empty for none. It is listed (written to <c>effect-strips.json</c>) while
+/// its boxes differ from the unlisted pace (ADR 0048), or still hold the record it was loaded from until Reset to
+/// unlisted. <see cref="Problem"/> is a box that isn't a whole number, then a hit frame past the image's frames; the
+/// ranges are Data's rules, shown by the window.
 /// </summary>
 internal sealed partial class EffectStripViewModel : ObservableObject
 {
     private static readonly int _unlistedMilliseconds = (int)EffectStripDefinition.UnlistedFrameTime.TotalMilliseconds;
+
+    // A record already at the unlisted pace (Data takes one) is kept while untouched, so an OK changes nothing.
+    private EffectStripDefinition? _loaded;
 
     private EffectStripViewModel(string file, (int Width, int Height)? imageSize)
     {
@@ -63,12 +67,14 @@ internal sealed partial class EffectStripViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Whether its boxes differ from the unlisted pace (80 ms, hit frame 0, no swing), so it needs a record.
+    /// Whether its boxes differ from the unlisted pace (80 ms, hit frame 0, no swing), or hold the record it was loaded
+    /// from, so it needs a record.
     /// </summary>
     public bool IsListed =>
         TypedNumber.Parse(FrameMillisecondsText) != _unlistedMilliseconds
         || TypedNumber.Parse(HitFrameText) != 0
-        || SwingFile.Trim().Length > 0;
+        || SwingFile.Trim().Length > 0
+        || HoldsTheLoadedRecord();
 
     public string? Problem =>
         TypedNumber.ProblemOf("Frame time", FrameMillisecondsText)
@@ -83,11 +89,22 @@ internal sealed partial class EffectStripViewModel : ObservableObject
             FrameMillisecondsText = TypedNumber.Text(strip.FrameMilliseconds),
             HitFrameText = TypedNumber.Text(strip.HitFrame),
             SwingFile = strip.SwingFile ?? "",
+            _loaded = strip,
         };
 
     /// <summary>An effects image no record lists: the unlisted pace's boxes.</summary>
     public static EffectStripViewModel Unlisted(string file, Func<string, (int Width, int Height)?> imageSizeOf) =>
         new(file, imageSizeOf(file));
+
+    /// <summary>Puts the unlisted pace's boxes back and forgets its loaded record, so it needs no record.</summary>
+    public void ResetToUnlisted()
+    {
+        _loaded = null;
+        FrameMillisecondsText = TypedNumber.Text(_unlistedMilliseconds);
+        HitFrameText = TypedNumber.Text(0);
+        SwingFile = "";
+        OnPropertyChanged(nameof(IsListed));
+    }
 
     /// <summary>The record as typed, the swing trimmed and none when empty.</summary>
     /// <exception cref="InvalidOperationException">There is a <see cref="Problem"/>.</exception>
@@ -101,6 +118,12 @@ internal sealed partial class EffectStripViewModel : ObservableObject
                 HitFrame = TypedNumber.Parse(HitFrameText)!.Value,
                 SwingFile = SwingFile.Trim() is { Length: > 0 } swing ? swing : null,
             };
+
+    private bool HoldsTheLoadedRecord() =>
+        _loaded is { } loaded
+        && TypedNumber.Parse(FrameMillisecondsText) == loaded.FrameMilliseconds
+        && TypedNumber.Parse(HitFrameText) == loaded.HitFrame
+        && SwingFile.Trim() == (loaded.SwingFile ?? "");
 
     private string? HitFrameProblem() =>
         FrameCount is { } frames && TypedNumber.Parse(HitFrameText) is { } hit && hit >= frames

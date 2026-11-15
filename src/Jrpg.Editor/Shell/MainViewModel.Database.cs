@@ -12,9 +12,9 @@ using Jrpg.Editor.Trade;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// The Database menu's windows over the draft (ADR 0045, decision 583): the shops, the drop tables, the enemies and the
-/// cinematics (ADR 0046), beside the quests; and the image import the Enemies and Character sprites windows share,
-/// through Data, asking first when it would replace an image.
+/// The Database menu's windows over the draft (ADR 0045, decision 583): the shops, the drop tables, the enemies, the
+/// cinematics (ADR 0046) and the effect strips (decision 659), beside the quests; and the image import the Enemies and
+/// Character sprites windows share, through Data, asking first when it would replace an image.
 /// </summary>
 internal sealed partial class MainViewModel
 {
@@ -37,6 +37,11 @@ internal sealed partial class MainViewModel
 
     /// <summary>Whether Database > Cinematics... can open its window: false while the content didn't load.</summary>
     public bool HasCinematicEditing => CinematicEditing is not null;
+
+    public EffectStripEditingViewModel? EffectStripEditing { get; }
+
+    /// <summary>Whether Database > Effect strips... can open its window: false while the content didn't load.</summary>
+    public bool HasEffectStripEditing => EffectStripEditing is not null;
 
     /// <summary>
     /// Copies images into an art folder (asking before replacing one, decisions 125 and 590); a file copy, not an undo
@@ -71,4 +76,13 @@ internal sealed partial class MainViewModel
                 ? length
                 : lengths[voice] = WavDuration.Read(Path.Combine(_audioRoot, AudioFolders.Voices, voice)));
     }
+
+    // An image the folder holds but can't be read is left out, as the Character sprites window's: its size is unknown.
+    private EffectStripEditingViewModel CreateEffectStripEditing() =>
+        new(
+            Content!,
+            () => [.. ArtFolders.ImagesIn(ArtRoot, ArtFolders.Effects).Where(file => PngSize.IsReadable(EffectPath(file)))],
+            file => PngSize.IsReadable(EffectPath(file)) ? PngSize.Read(EffectPath(file)) : null);
+
+    private string EffectPath(string file) => Path.Combine(ArtRoot, ArtFolders.Effects, file);
 }

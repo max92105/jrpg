@@ -142,7 +142,7 @@ slice is done and write its deviations in the slice file. Tunables, the timeline
   [slices/EE1.md](slices/EE1.md)
 - [x] **EE2. One strip as typed: pace and hit frame boxes, the swing, its length, its problem** (Editor, about 200
   lines) → [slices/EE2.md](slices/EE2.md)
-- [ ] **EE3. The Effect strips window's rules: every effects image, unlisted or not, reset, one undo step** (Editor,
+- [x] **EE3. The Effect strips window's rules: every effects image, unlisted or not, reset, one undo step** (Editor,
   about 210 lines) → [slices/EE3.md](slices/EE3.md)
 - [ ] **EE4. The Effect strips window and Database > Effect strips...** (Editor, about 170 lines) →
   [slices/EE4.md](slices/EE4.md)

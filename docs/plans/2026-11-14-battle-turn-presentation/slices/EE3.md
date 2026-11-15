@@ -38,3 +38,12 @@ step. Nothing names a record by id, so no undo is refused.
 
 ## Verify by hand
 None: no window yet (EE4).
+
+- **Done, with deviations:** the constructor takes the effects folder's readable images and a size lookup
+  (`(int Width, int Height)?`, EE2's), not a folder lookup and a `Point`; the editing view model reads the folder when
+  the window opens. `MainViewModel.cs` gains one constructor line (`EffectStripEditing = CreateEffectStripEditing()`,
+  286 lines), as its get-only properties are set there; the factory is in `MainViewModel.Database`. A problem in a strip
+  not chosen is named by its file. `EffectStripViewModel` gains `ResetToUnlisted()`. 99 + 20 lines, tests 210 + 51.
+- **Review:** `SwingChoices` tested; a record already at the unlisted pace (Data takes one) stays listed while its
+  boxes hold it, so an untouched OK changes nothing, and Reset to unlisted drops it (`EffectStripViewModel` remembers
+  the record it was loaded from; 135 lines, tests 259). A second missing-image record tests their order.

@@ -214,6 +214,46 @@ public sealed class EffectStripViewModelTests
         Assert.Throws<InvalidOperationException>(strip.ToStrip);
     }
 
+    [Fact]
+    public void IsListed_RecordAtTheUnlistedPace_IsTrue()
+    {
+        var strip = EffectStripViewModel.From(new EffectStripDefinition { File = Burst, FrameMilliseconds = 80 }, SizeOf);
+
+        Assert.True(strip.IsListed);
+    }
+
+    [Fact]
+    public void ResetToUnlisted_RecordAtTheUnlistedPace_IsNotListed()
+    {
+        var strip = EffectStripViewModel.From(new EffectStripDefinition { File = Burst, FrameMilliseconds = 80 }, SizeOf);
+
+        strip.ResetToUnlisted();
+
+        Assert.False(strip.IsListed);
+    }
+
+    [Fact]
+    public void ResetToUnlisted_RecordAtTheUnlistedPace_RaisesIsListed()
+    {
+        var strip = EffectStripViewModel.From(new EffectStripDefinition { File = Burst, FrameMilliseconds = 80 }, SizeOf);
+        var notified = new List<string?>();
+        ((INotifyPropertyChanged)strip).PropertyChanged += (_, e) => notified.Add(e.PropertyName);
+
+        strip.ResetToUnlisted();
+
+        Assert.Contains(nameof(EffectStripViewModel.IsListed), notified);
+    }
+
+    [Fact]
+    public void ResetToUnlisted_ListedRecord_PutsTheUnlistedPaceBack()
+    {
+        var strip = EffectStripViewModel.From(_listed, SizeOf);
+
+        strip.ResetToUnlisted();
+
+        Assert.Equal(("80", "0", "", false), (strip.FrameMillisecondsText, strip.HitFrameText, strip.SwingFile, strip.IsListed));
+    }
+
     // The test's effects folder: Burst.png is four 8 x 8 frames; anything else is missing.
     private static (int Width, int Height)? SizeOf(string file) => file == Burst ? (32, 8) : null;
 }

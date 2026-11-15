@@ -91,3 +91,6 @@ Every focus below is a `new StillFocus { XPercent = x, YPercent = y }` built in 
 
 ## Verify by hand
 None: nothing draws the focus yet. `verify.ps1` passes; `git status` shows no content file changed.
+
+- **Done:** as planned. `StillFocus.MinPercent` and `MaxPercent` carry their own one-line summaries rather than one
+  shared; ADR 0046's amendment and its index line are written. No content file changed.

@@ -54,6 +54,18 @@ public sealed class CinematicCatalogValidatorTests
         { WithZoom(151, 120), "stills[1]: zoom startPercent must be within 100..150 (was 151)." },
         { WithZoom(120, 99), "stills[1]: zoom endPercent must be within 100..150 (was 99)." },
         { WithZoom(120, 151), "stills[1]: zoom endPercent must be within 100..150 (was 151)." },
+        { WithFocus(-1, 50), "stills[1]: focus xPercent must be within 0..100 (was -1)." },
+        { WithFocus(101, 50), "stills[1]: focus xPercent must be within 0..100 (was 101)." },
+        { WithFocus(50, -1), "stills[1]: focus yPercent must be within 0..100 (was -1)." },
+        { WithFocus(50, 101), "stills[1]: focus yPercent must be within 0..100 (was 101)." },
+        {
+            WithSecond(_second with { Zoom = null, Focus = Focus(101, 50) }),
+            "stills[1]: focus xPercent must be within 0..100 (was 101)."
+        },
+        {
+            WithSecond(_second with { Zoom = new StillZoom { StartPercent = 100, EndPercent = 151 }, Focus = Focus(101, 50) }),
+            "stills[1]: zoom endPercent must be within 100..150 (was 151)."
+        },
     };
 
     [Theory]
@@ -79,6 +91,21 @@ public sealed class CinematicCatalogValidatorTests
     public void Validate_ZoomAtBothBounds_Passes(int startPercent, int endPercent)
     {
         Assert.Null(ValidationError(WithZoom(startPercent, endPercent)));
+    }
+
+    [Theory]
+    [InlineData(0, 100)]
+    [InlineData(100, 0)]
+    public void Validate_FocusAtBothBounds_Passes(int xPercent, int yPercent)
+    {
+        Assert.Null(ValidationError(WithFocus(xPercent, yPercent)));
+    }
+
+    // A focus is kept on a still without a zoom, where it changes nothing (decision 750).
+    [Fact]
+    public void Validate_FocusWithoutZoom_Passes()
+    {
+        Assert.Null(ValidationError(WithSecond(_second with { Zoom = null, Focus = Focus(30, 62) })));
     }
 
     [Fact]
@@ -110,4 +137,9 @@ public sealed class CinematicCatalogValidatorTests
 
     private static CinematicDefinition WithZoom(int startPercent, int endPercent) =>
         WithSecond(_second with { Zoom = new StillZoom { StartPercent = startPercent, EndPercent = endPercent } });
+
+    private static CinematicDefinition WithFocus(int xPercent, int yPercent) =>
+        WithSecond(_second with { Focus = Focus(xPercent, yPercent) });
+
+    private static StillFocus Focus(int xPercent, int yPercent) => new() { XPercent = xPercent, YPercent = yPercent };
 }

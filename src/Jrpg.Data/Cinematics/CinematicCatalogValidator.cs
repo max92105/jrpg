@@ -6,8 +6,9 @@ namespace Jrpg.Data.Cinematics;
 
 /// <summary>
 /// The rules for <c>cinematics.json</c> (ADR 0046): at least one still and no null still; each still names a picture,
-/// shows for a finite time above 0, and has a subtitle, voice and zoom that are absent or well formed; the stills
-/// together last a time the game can count; the track is absent or named. Problems name the cinematic and the still.
+/// shows for a finite time above 0, and has a subtitle, voice, zoom and focus that are absent or well formed; the
+/// stills together last a time the game can count; the track is absent or named. A problem names its cinematic and,
+/// when it is a still's, that still too.
 /// </summary>
 internal static class CinematicCatalogValidator
 {
@@ -48,10 +49,13 @@ internal static class CinematicCatalogValidator
         still is null ? "is null."
         : string.IsNullOrWhiteSpace(still.ImageFile) ? "imageFile must name a picture."
         : !double.IsFinite(still.Seconds) || still.Seconds <= 0 ? DescribeSecondsProblem(still.Seconds)
-        : still.Caption is { } caption && string.IsNullOrWhiteSpace(caption) ? "caption must hold text or be left out."
+        : FindOptionalFieldProblem(still);
+
+    // A bad zoom is named before a bad focus; a focus is checked with or without a zoom (decision 750).
+    private static string? FindOptionalFieldProblem(CinematicStill still) =>
+        still.Caption is { } caption && string.IsNullOrWhiteSpace(caption) ? "caption must hold text or be left out."
         : still.VoiceFile is { } voice && string.IsNullOrWhiteSpace(voice) ? "voiceFile must name a voice line or be left out."
-        : still.Zoom is { } zoom ? FindZoomProblem(zoom)
-        : null;
+        : (still.Zoom is { } zoom ? FindZoomProblem(zoom) : null) ?? (still.Focus is { } focus ? FindFocusProblem(focus) : null);
 
     private static string DescribeSecondsProblem(double seconds) =>
         string.Create(CultureInfo.InvariantCulture, $"seconds must be above 0 (was {seconds}).");
@@ -59,4 +63,8 @@ internal static class CinematicCatalogValidator
     private static string? FindZoomProblem(StillZoom zoom) =>
         RangeProblems.Within("zoom startPercent", zoom.StartPercent, StillZoom.MinPercent, StillZoom.MaxPercent)
         ?? RangeProblems.Within("zoom endPercent", zoom.EndPercent, StillZoom.MinPercent, StillZoom.MaxPercent);
+
+    private static string? FindFocusProblem(StillFocus focus) =>
+        RangeProblems.Within("focus xPercent", focus.XPercent, StillFocus.MinPercent, StillFocus.MaxPercent)
+        ?? RangeProblems.Within("focus yPercent", focus.YPercent, StillFocus.MinPercent, StillFocus.MaxPercent);
 }

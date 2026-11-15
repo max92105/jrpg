@@ -35,6 +35,14 @@ public sealed class CinematicDefinitionTests
     }
 
     [Fact]
+    public void Equals_StillFocusDiffers_IsFalse()
+    {
+        var focused = _home with { Focus = new StillFocus { XPercent = 30, YPercent = 62 } };
+
+        Assert.NotEqual(_intro, _intro with { Stills = [focused, _road] });
+    }
+
+    [Fact]
     public void Equals_StillsInOtherOrder_IsFalse()
     {
         Assert.NotEqual(_intro, _intro with { Stills = [_road, _home] });

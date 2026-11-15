@@ -2,8 +2,8 @@ namespace Jrpg.Core.Cinematics;
 
 /// <summary>
 /// A still's slow zoom (decision 617): its scale at the start and at the end of its time, in percent of the fitted
-/// size, each from <see cref="MinPercent"/> to <see cref="MaxPercent"/>; the scale moves linearly about the center
-/// between the two.
+/// size, each from <see cref="MinPercent"/> to <see cref="MaxPercent"/>; the scale moves linearly about the still's
+/// <see cref="CinematicStill.ZoomOrigin"/> between the two.
 /// </summary>
 public sealed record StillZoom
 {

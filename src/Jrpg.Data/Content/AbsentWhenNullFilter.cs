@@ -57,11 +57,12 @@ internal static class AbsentWhenNullFilter
         // ADR 0048: only a strip an Attack sweeps before names a swing.
         (typeof(EffectStripDefinition), "swingFile"),
 
-        // ADR 0046: a cinematic without a track keeps the map's; a still may have no subtitle, voice or zoom.
+        // ADR 0046: a cinematic without a track keeps the map's; a still may have no subtitle, voice, zoom or focus.
         (typeof(CinematicDefinition), "musicFile"),
         (typeof(CinematicStill), "caption"),
         (typeof(CinematicStill), "voiceFile"),
         (typeof(CinematicStill), "zoom"),
+        (typeof(CinematicStill), "focus"),
 
         // Decision 412: a null skill is the basic attack; a null condition is always.
         (typeof(EnemyAction), "skillId"),

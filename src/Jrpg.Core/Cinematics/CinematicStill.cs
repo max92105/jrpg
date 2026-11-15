@@ -1,7 +1,10 @@
+using Jrpg.Core.Geometry;
+
 namespace Jrpg.Core.Cinematics;
 
 /// <summary>
-/// One still of a cinematic as content: its picture, how long it shows, its subtitle, voice line and zoom.
+/// One still of a cinematic as content: its picture, how long it shows, its subtitle, voice line, zoom and the point
+/// the zoom heads to.
 /// </summary>
 public sealed record CinematicStill
 {
@@ -23,7 +26,19 @@ public sealed record CinematicStill
     /// <summary>The slow zoom over the still's time; null draws it at its fitted size.</summary>
     public StillZoom? Zoom { get; init; }
 
+    /// <summary>
+    /// Where the zoom heads, null for the center (decision 746). Kept without a zoom, where it changes nothing
+    /// (decision 750), and kept when the picture changes: it is a share of whatever picture shows (decision 747).
+    /// </summary>
+    public StillFocus? Focus { get; init; }
+
     public TimeSpan Duration => TimeSpan.FromSeconds(Seconds);
+
+    /// <summary>
+    /// The share of the shown picture that stays put while the still zooms: its focus, else the center; read by the
+    /// game and the editor's preview (decision 751).
+    /// </summary>
+    public Point2D ZoomOrigin => (Focus ?? StillFocus.Center).Share;
 
     /// <summary>
     /// How large the still draws at a time into it, as a factor of its fitted size (decision 617): 1 without a zoom;

@@ -69,7 +69,44 @@ public sealed class ContentCatalogLoaderCinematicTests : IDisposable
 
         var still = Assert.Single(intro.Stills);
         Assert.Null(intro.MusicFile);
-        Assert.Equal((null, null, null), (still.Caption, still.VoiceFile, still.Zoom));
+        Assert.Equal((null, null, null, null), (still.Caption, still.VoiceFile, still.Zoom, still.Focus));
+    }
+
+    [Fact]
+    public void Load_StillWithFocus_ReadsIt()
+    {
+        WriteCinematics("""
+            [
+              {
+                "id": "intro",
+                "stills": [
+                  {
+                    "imageFile": "intro/a.png",
+                    "seconds": 3,
+                    "zoom": { "startPercent": 100, "endPercent": 120 },
+                    "focus": { "xPercent": 30, "yPercent": 62 }
+                  }
+                ]
+              }
+            ]
+            """);
+
+        var still = Assert.Single(ContentCatalogLoader.Load(_content.Path).Cinematics["intro"].Stills);
+
+        Assert.Equal(new StillFocus { XPercent = 30, YPercent = 62 }, still.Focus);
+    }
+
+    [Fact]
+    public void Load_FocusMissingYPercent_ThrowsNamingTheFile()
+    {
+        WriteCinematics("""
+            [ { "id": "intro", "stills": [ { "imageFile": "intro/a.png", "seconds": 3, "focus": { "xPercent": 30 } } ] } ]
+            """);
+
+        var exception = Assert.Throws<ContentValidationException>(() => ContentCatalogLoader.Load(_content.Path));
+
+        Assert.StartsWith("cinematics.json", exception.Message, StringComparison.Ordinal);
+        Assert.Contains("yPercent", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]

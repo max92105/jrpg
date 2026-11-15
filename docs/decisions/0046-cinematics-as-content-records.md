@@ -47,3 +47,10 @@ and a reusable, previewable record. A still names its picture with the cinematic
 - The `still` step is retired once every intro is a cinematic (decision 621); the `voice` step stays as the voice-over
   for any story scene.
 - An undo that would remove a cinematic a map's event plays is refused (decision 630), as for other referenced records.
+
+Amended 2026-11-15 (the cinematic focus point plan, decisions 746-751): a still may name a focus point, two whole
+percents of the part of its picture that covers the screen, measured from its top-left (`"focus": { "xPercent": 30,
+"yPercent": 62 }`, left out while none). The still's zoom scales about that point, which stays where it is on the
+screen; without one it scales about the center, as before. A focus is kept on a still without a zoom, where it changes
+nothing. The rule is Core's `CinematicStill.ZoomOrigin`, read by the game and the editor's preview alike, as they read
+the scale. A pan toward the point stays decision 618's backlog line.

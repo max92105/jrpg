@@ -96,12 +96,29 @@ public sealed class ContentWriterCinematicTests : IDisposable
             Caption = "Long ago.",
             VoiceFile = "Placeholder.wav",
             Zoom = new StillZoom { StartPercent = 100, EndPercent = 120 },
+            Focus = new StillFocus { XPercent = 30, YPercent = 62 },
         };
 
         _writer.WriteMapCatalogs(WithCinematics(Cinematic("intro", still) with { MusicFile = "town/loop.wav" }));
 
         Assert.Equal(still, ContentCatalogLoader.Load(_content.Path).Cinematics["intro"].Stills.Single());
         Assert.Equal("town/loop.wav", (string?)Written("intro")["musicFile"]);
+    }
+
+    [Fact]
+    public void WriteMapCatalogs_StillWithFocus_WritesItsTwoPercentsAfterZoom()
+    {
+        var still = Still("intro/1.png") with
+        {
+            Zoom = new StillZoom { StartPercent = 100, EndPercent = 120 },
+            Focus = new StillFocus { XPercent = 30, YPercent = 62 },
+        };
+
+        _writer.WriteMapCatalogs(WithCinematics(Cinematic("intro", still)));
+
+        var written = Written("intro")["stills"]!.AsArray().Single()!.AsObject();
+        Assert.Equal(["imageFile", "seconds", "zoom", "focus"], written.Select(field => field.Key));
+        Assert.Equal(["xPercent", "yPercent"], written["focus"]!.AsObject().Select(field => field.Key));
     }
 
     [Fact]

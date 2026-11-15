@@ -68,7 +68,7 @@ Today a still zooms from a start to an end percent about its picture's center (d
 ## Slices
 
 ### Phase 1: the field
-- [ ] **FP1. A still's focus point in content** (Core, Data, about 180 lines) → [slices/FP1.md](slices/FP1.md)
+- [x] **FP1. A still's focus point in content** (Core, Data, about 180 lines) → [slices/FP1.md](slices/FP1.md)
 
 ### Phase 2: the game
 - [ ] **FP2. The game zooms about the focus** (Game, about 170 lines) → [slices/FP2.md](slices/FP2.md)
@@ -131,5 +131,5 @@ Taken while the developer was away; each is his to overturn at approval (the sli
 None beyond the defaults above.
 
 ## ADRs needed
-- [ ] **ADR 0046 amended** (decision 757), in FP1: write the paragraph from decisions 746-751; no new ADR number
+- [x] **ADR 0046 amended** (decision 757), in FP1: write the paragraph from decisions 746-751; no new ADR number
   (0053 stays free).

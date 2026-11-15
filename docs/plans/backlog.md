@@ -260,9 +260,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   share them in one place first.
 - `ImpactEffectsView.DrawStrip` takes a `(File, Target, IsMirrored)` tuple beside `EffectOnTarget` (EF4's review): the
   wind-up could build its lead as `EffectOnTarget`s once.
-- **Design question for the developer** (EF4's review): a damaging skill that backfires plays its impact strip's lead on
-  the enemies it aimed at during the wind-up, then the caster's strip starts straight on its hit frame with no lead. Keep
-  it, or hold the lead back for a skill that can backfire?
 - `Shell/MainViewModel.Database.CreateEffectStripEditing` and `MainViewModel.FieldSprites.CreateFieldSpriteEditing` are
   the same readable-image listing and size lookup over two folders (EE3's review): a third copy takes one shared pair.
 - "The playback whose damage landed" (`_sequence.Playback is { Strips.Count: > 0 }`) is read three times: in

@@ -232,6 +232,9 @@ slice is done and write its deviations in the slice file. Tunables, the timeline
 - 666: the animated-monsters plan was amended at approval: decision 636 (only the party steps), decision 639 (an effect's
   pace from its record once EF1 lands), goal 3 and MB7 (the loop plays in place; the flash uses the frame), MB8 (its
   `EffectTiming` folds into EF1's record), and a line pointing to this plan.
+- 667: a damaging skill that backfires keeps its impact strip's lead on the enemies it aimed at during the wind-up,
+  then the caster's strip starts on its hit frame with no lead: it reads as the spell blowing back (the developer,
+  2026-11-15, after EF4's review asked).
 
 ## Open design questions (developer decides)
 None left: every question was answered at approval.

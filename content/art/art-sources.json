@@ -108,6 +108,30 @@
       "sourceId": "generated"
     },
     {
+      "path": "cinematics/ragnir_intro/1_happy_life.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "cinematics/ragnir_intro/2_training_son.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "cinematics/ragnir_intro/3_son_becoming_soldier.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "cinematics/ragnir_intro/4_son_deployed.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "cinematics/ragnir_intro/5_son_letters.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "cinematics/ragnir_intro/6_i_will_get_him_back.png",
+      "sourceId": "generated"
+    },
+    {
       "path": "effects/AttackEnemy.png",
       "sourceId": "generated"
     },

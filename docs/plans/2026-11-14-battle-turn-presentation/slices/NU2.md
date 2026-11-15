@@ -44,3 +44,11 @@ pale lavender-grey on the lower part, a thin dark edge baked in. The clip's look
    script's parameters and run again until they do.
 3. `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/scripts/verify.ps1`: green (the art sources listed).
 
+- **Done, with deviations:** the heavy stroke is 4 px, not about 2: at 2 the strokes read thin, Cormorant SemiBold's
+  hairlines being fine. The ink height counts the strokes and the edge, so the glyph itself is scaled to fit inside
+  them. Cormorant's default "1" is drawn like a capital I (GDI+ can't pick its lining figures): the developer's hand
+  check (step 2) judges whether "11" reads. The manifest source has no note field; the credits section names the script.
+  Review: two Criticals fixed in the script: `[Math]::Min(1, ...)` took the Int32 overload, so no digit was ever
+  narrowed ("0" spilled into the "1"'s cell), now `1.0`; the gradient brush spanned only the outline, so it tiled
+  past it (a lavender top row, a white bottom row), now it spans the heavy stroke's reach. The widest ink is 36 px, not
+  38, so antialiasing never touches a cell's edge (probed: every digit 2 px or more inside its cell). `$size` renamed.

@@ -119,7 +119,7 @@ slice is done and write its deviations in the slice file. Tunables, the timeline
 ### Phase 2: the look (after the animated-monsters plan)
 - [x] **TN5. The plaque's look: a small dark plaque with a hairline, hugging the word** (Game, about 150 lines) →
   [slices/TN5.md](slices/TN5.md)
-- [ ] **NU2. The digit strips generated from Cormorant Garamond by a script in `art-src/`** (art + script, about 150
+- [x] **NU2. The digit strips generated from Cormorant Garamond by a script in `art-src/`** (art + script, about 150
   lines) → [slices/NU2.md](slices/NU2.md)
 - [ ] **NU3. The digits drawn from the strips; a critical from its own bigger strip** (Game, about 200 lines) →
   [slices/NU3.md](slices/NU3.md)

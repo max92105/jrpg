@@ -10,6 +10,15 @@
       "isPlaceholder": false
     },
     {
+      "id": "damage-digits",
+      "name": "Damage digits rendered from Cormorant Garamond",
+      "author": "the Cormorant Project Authors (Christian Thalmann)",
+      "url": "https://github.com/CatharsisFonts/Cormorant",
+      "license": "OFL-1.1",
+      "licenseFile": "fonts/titles/OFL.txt",
+      "isPlaceholder": false
+    },
+    {
       "id": "generated",
       "name": "AI-generated placeholders",
       "author": "the developer, with an image generator",
@@ -150,6 +159,14 @@
     {
       "path": "field-sprites/player.png",
       "sourceId": "generated"
+    },
+    {
+      "path": "fonts/CriticalDigits.png",
+      "sourceId": "damage-digits"
+    },
+    {
+      "path": "fonts/DamageDigits.png",
+      "sourceId": "damage-digits"
     },
     {
       "path": "fonts/Lato-Regular.ttf",

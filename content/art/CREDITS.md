@@ -13,6 +13,12 @@ the repository, at the source's page.
 [Cormorant Garamond](https://github.com/CatharsisFonts/Cormorant) by the Cormorant Project Authors (Christian Thalmann),
 under the SIL Open Font License 1.1 (`fonts/titles/OFL.txt`).
 
+## Damage digits
+
+Damage digits rendered from Cormorant Garamond, by the Cormorant Project Authors (Christian Thalmann):
+`fonts/DamageDigits.png` and `fonts/CriticalDigits.png`, drawn from [the font](https://github.com/CatharsisFonts/Cormorant) by
+the repository's script `art-src/digits/New-DigitStrips.ps1`, under the SIL Open Font License 1.1 (`fonts/titles/OFL.txt`).
+
 ## Mana Seed
 
 [Mana Seed](https://seliel-the-shaper.itch.io/) by Seliel the Shaper, bought under the

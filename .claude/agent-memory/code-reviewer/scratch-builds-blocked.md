@@ -33,6 +33,8 @@ average's `(x + 1) * step` passing the source edge (53x100 to 192 throws).
 
 WPF binding fact (probed 2026-11-13, NP1 review, PowerShell -STA + XamlReader): a non-editable ComboBox whose bound
 SelectedItem ("" or any value) is not in its ItemsSource leaves the source alone on load and close: no null write-back.
+An ItemsSource set by a style DataTrigger (EW1, 2026-11-15) still shows the locally bound SelectedItem on open, after a
+null-then-set DataContext and on switching: the trigger's late ItemsSource loses nothing.
 
 WPF layout fact (probed 2026-11-14, CE6 review, PowerShell 5.1 -STA, Measure/Arrange + VisualTreeHelper.GetOffset): an
 Image with Stretch="UniformToFill" and default Stretch alignment that overflows its slot is pinned top-left (offset

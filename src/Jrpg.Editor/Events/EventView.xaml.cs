@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Jrpg.Editor.Events;
@@ -10,4 +11,6 @@ namespace Jrpg.Editor.Events;
 internal sealed partial class EventView : UserControl
 {
     public EventView() => InitializeComponent();
+
+    private void OnAddStepClicked(object sender, RoutedEventArgs e) => DropDownMenu.Open(AddStepButton);
 }

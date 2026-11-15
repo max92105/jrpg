@@ -32,6 +32,23 @@ public sealed class CellEventViewModelTests
         Assert.False(cellEvent.Event.IsObjectEvent);
     }
 
+    // A cell has no object to swap (decision 728): the entry stays in the menu, greyed.
+    [Fact]
+    public void AddStepCommand_SwapObjectOnCell_CannotExecute()
+    {
+        var cellEvent = new CellEventViewModel(_exit.Cell, _exit, _choices);
+
+        Assert.False(cellEvent.Event.AddStepCommand.CanExecute(EventStepKind.SwapObject));
+    }
+
+    [Fact]
+    public void AddStepCommand_GiveItemOnCell_CanExecute()
+    {
+        var cellEvent = new CellEventViewModel(_exit.Cell, _exit, _choices);
+
+        Assert.True(cellEvent.Event.AddStepCommand.CanExecute(EventStepKind.GiveItem));
+    }
+
     [Fact]
     public void QuestChoices_StartWithNone()
     {
@@ -45,7 +62,7 @@ public sealed class CellEventViewModelTests
     public void ToEdit_NewWarp_AddsTheCellEvent()
     {
         var cellEvent = new CellEventViewModel(new GridCell(3, 4), null, _choices);
-        cellEvent.Event.AddWarpCommand.Execute(null);
+        cellEvent.Event.AddStepCommand.Execute(EventStepKind.Warp);
         cellEvent.Event.SelectedStep!.MapId = "forest";
 
         var edit = cellEvent.ToEdit([_exit])!;
@@ -61,7 +78,7 @@ public sealed class CellEventViewModelTests
         var cellEvent = new CellEventViewModel(new GridCell(3, 4), null, _choices);
         cellEvent.Event.Activation = EventActivation.Arrive;
         cellEvent.Event.OnlyWhenLeaderId = "omer";
-        cellEvent.Event.AddCinematicCommand.Execute(null);
+        cellEvent.Event.AddStepCommand.Execute(EventStepKind.Cinematic);
         cellEvent.Event.SelectedStep!.CinematicId = "omer_intro";
 
         var mapEvent = cellEvent.ToEdit([_exit])!.After!.Event;

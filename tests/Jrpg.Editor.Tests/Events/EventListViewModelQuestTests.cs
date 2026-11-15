@@ -52,11 +52,11 @@ public sealed class EventListViewModelQuestTests
     }
 
     [Fact]
-    public void AddAdvanceQuestCommand_NoStepChosen_AddsItLast()
+    public void AddStepCommand_AdvanceQuestWithNoStepChosen_AddsItLast()
     {
         var talk = _list.SelectedEvent!;
 
-        talk.AddAdvanceQuestCommand.Execute(null);
+        talk.AddStepCommand.Execute(EventStepKind.AdvanceQuest);
 
         var added = talk.Steps[^1];
         Assert.Equal(EventStepKind.AdvanceQuest, added.Kind);
@@ -66,13 +66,13 @@ public sealed class EventListViewModelQuestTests
     }
 
     [Fact]
-    public void AddStartAndCompleteQuestCommands_WithTheQuestPicked_RoundTrip()
+    public void AddStepCommand_StartAndCompleteWithTheQuestPicked_RoundTrip()
     {
         var talk = _list.SelectedEvent!;
 
-        talk.AddStartQuestCommand.Execute(null);
+        talk.AddStepCommand.Execute(EventStepKind.StartQuest);
         talk.Steps[^1].QuestId = "errand";
-        talk.AddCompleteQuestCommand.Execute(null);
+        talk.AddStepCommand.Execute(EventStepKind.CompleteQuest);
         talk.Steps[^1].QuestId = "errand";
 
         Assert.Equal([new StartQuestStep("errand"), new CompleteQuestStep("errand")], talk.ToEvent().Steps.Skip(1));

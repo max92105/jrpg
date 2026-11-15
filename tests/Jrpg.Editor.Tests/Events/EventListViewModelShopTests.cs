@@ -43,12 +43,12 @@ public sealed class EventListViewModelShopTests
     }
 
     [Fact]
-    public void AddOpenShopCommand_NoStepChosen_AddsOpenShopLast()
+    public void AddStepCommand_OpenShopWithNoStepChosen_AddsItLast()
     {
         var talk = _list.Events[0];
         talk.SelectedStep = null;
 
-        talk.AddOpenShopCommand.Execute(null);
+        talk.AddStepCommand.Execute(EventStepKind.OpenShop);
         talk.Steps[^1].ShopId = "general_store";
 
         Assert.Equal(new OpenShopStep("general_store"), talk.ToEvent().Steps[^1]);

@@ -86,3 +86,10 @@ with the kinds under five greyed titles in capitals (decision 729). On a cell's 
    available; add a Give item step, pick `potion`, **OK**; **Ctrl+S**: the map saves (the game takes Give item on a
    cell). **Ctrl+Z** if the change isn't wanted.
 4. **F1**: the Events section has the Add step line.
+
+- **Done, with deviations:** `DropDownMenu.Open` doesn't copy the button's data context to the menu (review): the copy
+  went stale when another event was chosen, and a right click, which opens the menu without `Open`, then added the
+  step to the old event; `PlacementTarget` set before `IsOpen` already hands the menu the button's context. Four of
+  the six renamed tests name their kind in the scenario (`AddStepCommand_Warp_AddsAWarpToCellZeroOfNoMapYet`), since
+  one command now serves every kind. The smoke script opened both event windows with no binding-error line. Hand
+  check steps 2 to 4 are the developer's; step 2 also looks at the 6 px gap above TALK, the menu's first title.

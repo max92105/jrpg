@@ -25,17 +25,21 @@ internal sealed partial class EventViewModel : ObservableObject
         QuestGate.PropertyChanged += (_, _) => OnPropertyChanged(nameof(Label));
         Steps = [.. mapEvent.Steps.Select(EventStepViewModel.From)];
         Steps.CollectionChanged += (_, _) => OnPropertyChanged(nameof(Label));
+        AddStepChoices = StepKindMenu.Choices(AddStepCommand);
     }
 
     public string Id { get; }
 
     /// <summary>
     /// False for a cell's event, which has no prompt and no object to wait for, and can't swap an object (the game
-    /// refuses it); the dialogs' shared view hides those rows on it.
+    /// refuses it): the dialogs' shared view hides those rows on it, and Swap object can't be added.
     /// </summary>
     public bool IsObjectEvent { get; init; } = true;
 
     public ObservableCollection<EventStepViewModel> Steps { get; }
+
+    /// <summary>The Add step drop-down's entries: every step kind under its group's title (decision 729).</summary>
+    public IReadOnlyList<DropDownChoice> AddStepChoices { get; }
 
     /// <summary>The quest the event waits on, if any (ADR 0033).</summary>
     public QuestGateViewModel QuestGate { get; }
@@ -103,55 +107,17 @@ internal sealed partial class EventViewModel : ObservableObject
     public string? Problem =>
         QuestGate.Problem ?? Steps.Select((step, index) => step.Problem is { } problem ? $"step {index + 1}: {problem}" : null).FirstOrDefault(problem => problem is not null);
 
-    [RelayCommand]
-    private void AddDialogue() => AddStep(EventStepKind.Dialogue);
-
-    [RelayCommand]
-    private void AddGiveItem() => AddStep(EventStepKind.GiveItem);
-
-    [RelayCommand]
-    private void AddSwapObject() => AddStep(EventStepKind.SwapObject);
-
-    [RelayCommand]
-    private void AddWarp() => AddStep(EventStepKind.Warp);
-
-    [RelayCommand]
-    private void AddMoveNpc() => AddStep(EventStepKind.MoveNpc);
-
-    [RelayCommand]
-    private void AddCinematic() => AddStep(EventStepKind.Cinematic);
-
-    [RelayCommand]
-    private void AddRecruit() => AddStep(EventStepKind.Recruit);
-
-    [RelayCommand]
-    private void AddVoice() => AddStep(EventStepKind.Voice);
-
-    [RelayCommand]
-    private void AddRest() => AddStep(EventStepKind.Rest);
-
-    [RelayCommand]
-    private void AddOpenForge() => AddStep(EventStepKind.OpenForge);
-
-    [RelayCommand]
-    private void AddOpenShop() => AddStep(EventStepKind.OpenShop);
-
-    [RelayCommand]
-    private void AddStartQuest() => AddStep(EventStepKind.StartQuest);
-
-    [RelayCommand]
-    private void AddAdvanceQuest() => AddStep(EventStepKind.AdvanceQuest);
-
-    [RelayCommand]
-    private void AddCompleteQuest() => AddStep(EventStepKind.CompleteQuest);
-
     // After the chosen step, or last when none is chosen.
+    [RelayCommand(CanExecute = nameof(CanAddStep))]
     private void AddStep(EventStepKind kind)
     {
         var step = EventStepViewModel.New(kind);
         Steps.Insert(SelectedStep is null ? Steps.Count : Steps.IndexOf(SelectedStep) + 1, step);
         SelectedStep = step;
     }
+
+    // The game only swaps an object from that object's own event (decision 728).
+    private bool CanAddStep(EventStepKind kind) => kind != EventStepKind.SwapObject || IsObjectEvent;
 
     [RelayCommand(CanExecute = nameof(HasSelectedStep))]
     private void RemoveStep() => SelectedStep = ListOrder.Remove(Steps, SelectedStep!);

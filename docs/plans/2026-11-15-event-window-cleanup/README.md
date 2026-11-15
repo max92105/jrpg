@@ -79,7 +79,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   event windows by map clicks** (Editor + script, about 70 lines) → [slices/EW0.md](slices/EW0.md)
 - [x] **EW1. One event view for both windows: the chosen event's conditions, steps and fields in `EventView`; the cell
   window offers Give item** (Editor, about 210 lines, most of them moved) → [slices/EW1.md](slices/EW1.md)
-- [ ] **EW2. One Add step drop-down, grouped under five titles; Swap object greyed on a cell** (Editor, about 220
+- [x] **EW2. One Add step drop-down, grouped under five titles; Swap object greyed on a cell** (Editor, about 220
   lines) → [slices/EW2.md](slices/EW2.md)
 - [ ] **EW3. One Preset drop-down, a quest giver entry per quest; the quest box goes** (Editor, about 160 lines) →
   [slices/EW3.md](slices/EW3.md)

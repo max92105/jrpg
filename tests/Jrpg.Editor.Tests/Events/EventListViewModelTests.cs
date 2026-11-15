@@ -161,23 +161,23 @@ public sealed class EventListViewModelTests
     }
 
     [Fact]
-    public void AddDialogueCommand_StepSelected_InsertsAfterIt()
+    public void AddStepCommand_DialogueWithAStepSelected_InsertsAfterIt()
     {
         var open = _list.Events[0];
         open.SelectedStep = open.Steps[0];
 
-        open.AddDialogueCommand.Execute(null);
+        open.AddStepCommand.Execute(EventStepKind.Dialogue);
         open.SelectedStep!.LinesText = "It creaks.";
 
         Assert.Equal(["Swap object to: door_open", "Dialogue: \"It creaks.\""], open.Steps.Select(step => step.Label));
     }
 
     [Fact]
-    public void AddWarpCommand_AddsAWarpToCellZeroOfNoMapYet()
+    public void AddStepCommand_Warp_AddsAWarpToCellZeroOfNoMapYet()
     {
         var open = _list.Events[0];
 
-        open.AddWarpCommand.Execute(null);
+        open.AddStepCommand.Execute(EventStepKind.Warp);
 
         Assert.Equal("Warp to:  (0, 0)", open.SelectedStep!.Label);
         Assert.True(open.SelectedStep.IsWarp);
@@ -187,7 +187,7 @@ public sealed class EventListViewModelTests
     public void Problem_QuantityLeftEmpty_NamesTheEventAndStep()
     {
         var open = _list.Events[0];
-        open.AddGiveItemCommand.Execute(null);
+        open.AddStepCommand.Execute(EventStepKind.GiveItem);
         open.SelectedStep!.ItemId = "potion";
 
         open.SelectedStep!.QuantityText = "";
@@ -235,12 +235,12 @@ public sealed class EventListViewModelTests
     }
 
     [Fact]
-    public void AddOpenForgeCommand_NoStepChosen_AddsOpenTheForgeLast()
+    public void AddStepCommand_OpenForgeWithNoStepChosen_AddsItLast()
     {
         var open = _list.Events[0];
         open.SelectedStep = null;
 
-        open.AddOpenForgeCommand.Execute(null);
+        open.AddStepCommand.Execute(EventStepKind.OpenForge);
 
         Assert.Equal(new OpenForgeStep(), open.ToEvent().Steps[^1]);
     }

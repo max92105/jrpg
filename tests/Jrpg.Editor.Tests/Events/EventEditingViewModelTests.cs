@@ -147,7 +147,7 @@ public sealed class EventEditingViewModelTests
     public void AddStep_Rest_UndoRemovesIt()
     {
         var events = _eventEditing.StartEditingAt(ChestCenter)!;
-        events.SelectedEvent!.AddRestCommand.Execute(null);
+        events.SelectedEvent!.AddStepCommand.Execute(EventStepKind.Rest);
         _eventEditing.Apply(events);
         var map = _eventEditing.OpenMap!;
         var chestSteps = () => map.Map.Layout.Objects.Single(placed => placed.Uid == "0bff6243").Events[0].Steps;
@@ -210,7 +210,7 @@ public sealed class EventEditingViewModelTests
     public void Apply_NewCellEvent_AddsIt()
     {
         var cellEvent = _eventEditing.StartEditingCellAt(new GridCell(1, 1))!;
-        cellEvent.Event.AddWarpCommand.Execute(null);
+        cellEvent.Event.AddStepCommand.Execute(EventStepKind.Warp);
         cellEvent.Event.SelectedStep!.MapId = "forest";
 
         _eventEditing.Apply(cellEvent);

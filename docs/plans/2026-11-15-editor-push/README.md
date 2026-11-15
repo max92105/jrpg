@@ -89,7 +89,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 a slice is done and write its deviations in the slice file. Tunables, design and risks: [design.md](design.md).
 
 ### Phase 1: the net
-- [ ] ADR 0050, unexpected errors in the editor. Write it from decisions 669-674, 690 and 692 (the options were keep
+- [x] ADR 0050, unexpected errors in the editor. Write it from decisions 669-674, 690 and 692 (the options were keep
   open, Save all then close, keep open with an autosave; the developer chose keep open).
 - [ ] **NET1. An unexpected error keeps the editor open: the policy with the same-error rule, the report file, a box
   naming the error, the report and what is unsaved, and the smoke script watching for it** (Editor + script, about

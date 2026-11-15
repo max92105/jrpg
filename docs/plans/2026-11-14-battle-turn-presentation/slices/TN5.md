@@ -39,3 +39,8 @@ otherwise the slice stops at the plain plaque and says so in its Done note.
 2. A long skill name widens the plaque around it; "Sarxian defends." fits on one line.
 3. The plaque pops in and out with no frame around it.
 
+- **Done, with deviations:** the plain plaque only: no capture was taken this run, so whether the rounded ends are
+  missed is the developer's hand check (step 1); `PlaqueShape` waits on it. The hairlines are `UiTheme.HighlightLine`'s
+  gradient, as the escaped band's, so only `UiTheme.BannerPlaque` is new. The plaque's height follows the 24 px font's
+  line height, not 24 px exactly.
+  Review: no Critical or Warning; the padding constants are private, their comment says "with a 24 px line".

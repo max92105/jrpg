@@ -73,6 +73,11 @@ internal static partial class UiTheme
     /// <summary>The floating number on a crit: red-gold (placeholder, decision 652).</summary>
     public static Color FloatingCritical { get; } = FromStraightArgb(0xFFF0843C);
 
+    /// <summary>
+    /// The battle plaque's fill (decision 646): near-black navy at 85 %, so the scene shows faintly through.
+    /// </summary>
+    public static Color BannerPlaque { get; } = FromStraightArgb(0xD9101320);
+
     /// <summary>The battle banner's dark band, fading out at both ends.</summary>
     public static ImmutableArray<GradientStop> Banner { get; } =
         [new(0, FromStraightArgb(0x00101320)), new(0.25f, FromStraightArgb(0xE6101320)), new(0.75f, FromStraightArgb(0xE6101320)), new(1, FromStraightArgb(0x00101320))];

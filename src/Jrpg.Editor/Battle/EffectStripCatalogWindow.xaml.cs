@@ -1,8 +1,8 @@
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Jrpg.Core.Maps;
+using Jrpg.Editor.Hosting;
 using Jrpg.Editor.Tiles;
 
 namespace Jrpg.Editor.Battle;
@@ -15,6 +15,7 @@ namespace Jrpg.Editor.Battle;
 /// </summary>
 internal sealed partial class EffectStripCatalogWindow : Window
 {
+    private readonly RenderTick _renderTick;
     private readonly EffectStripCatalogViewModel _strips;
     private readonly Func<string, BitmapSource?> _loadImage;
     private readonly TileAnimationTime _animationTime;
@@ -33,12 +34,13 @@ internal sealed partial class EffectStripCatalogWindow : Window
         EffectStripCatalogViewModel strips, Func<string, BitmapSource?> loadImage, TileAnimationTime animationTime)
     {
         InitializeComponent();
+        _renderTick = new RenderTick(OnRendering);
         DataContext = _strips = strips;
         (_loadImage, _animationTime) = (loadImage, animationTime);
         strips.PropertyChanged += OnStripsChanged;
         WatchChosenStrip();
-        CompositionTarget.Rendering += OnRendering;
-        Closed += (_, _) => CompositionTarget.Rendering -= OnRendering;
+        _renderTick.Start();
+        Closed += (_, _) => _renderTick.Stop();
     }
 
     private void OnOkClicked(object sender, RoutedEventArgs e) => DialogResult = true;

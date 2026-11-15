@@ -31,7 +31,7 @@ working or closes through the usual close question.
 ## Decision
 A: an exception nothing caught on the UI thread, once the main window has loaded, is written and asked about, and the
 editor stays open (the developer: "yes always try to save progress"). The same error again (same exception type and
-throwing method) is counted, never asked about and never written twice, so a throw in a per-frame tick costs one box
+stack) is counted, never asked about and never written twice, so a throw in a per-frame tick costs one box
 and Save all stays reachable. While the box is open, a different error is written without a second box.
 
 ## Consequences
@@ -45,3 +45,7 @@ and Save all stays reachable. While the box is open, a different error is writte
   `.claude/scripts/open-editor-windows.ps1`, which now reports a window whose opening raised the box.
 - The rules that said "the editor has no unhandled-exception handler" now say what a throw does: it stops the command
   halfway and opens the box.
+- Found at the hand check: a handler on `CompositionTarget.Rendering` that throws does so on every frame and WPF
+  paints nothing, so counting the repeats left the editor open but blank. Each window's per-frame work therefore runs
+  through `Hosting/RenderTick`, which stops the work on a throw and raises the error again outside the render pass:
+  one box, the editor painting, only that animation or preview frozen.

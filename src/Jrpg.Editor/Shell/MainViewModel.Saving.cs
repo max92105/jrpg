@@ -21,7 +21,7 @@ internal sealed partial class MainViewModel
     {
         // A stroke still being dragged counts as a change, so it ends before the question.
         CurrentMap?.EndStroke();
-        if (UnsavedChangesQuestion() is not { } question)
+        if (UnsavedChanges is not { } question)
         {
             return true;
         }
@@ -173,16 +173,22 @@ internal sealed partial class MainViewModel
         }
     }
 
-    // "Unsaved changes in map 'forest', map 'start' and the tiles and objects."; null when nothing is unsaved.
-    private string? UnsavedChangesQuestion()
+    /// <summary>
+    /// "Unsaved changes in map 'forest', map 'start' and the tiles and objects."; null when nothing is unsaved. Read by
+    /// the close question and by the unexpected-error box (ADR 0050).
+    /// </summary>
+    public string? UnsavedChanges
     {
-        List<string> unsaved = [.. _openMaps.Dirty.Select(open => $"map '{open.Map.Id}'")];
-        if (Content is { IsDirty: true })
+        get
         {
-            unsaved.Add("the tiles and objects");
-        }
+            List<string> unsaved = [.. _openMaps.Dirty.Select(open => $"map '{open.Map.Id}'")];
+            if (Content is { IsDirty: true })
+            {
+                unsaved.Add("the tiles and objects");
+            }
 
-        return unsaved.Count == 0 ? null : $"Unsaved changes in {Named(unsaved)}.";
+            return unsaved.Count == 0 ? null : $"Unsaved changes in {Named(unsaved)}.";
+        }
     }
 
     // "map 'forest'", "map 'forest' and map 'start'", "map 'forest', map 'start' and the tiles and objects".

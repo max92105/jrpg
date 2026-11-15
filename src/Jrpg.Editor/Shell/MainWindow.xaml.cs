@@ -2,9 +2,9 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using Jrpg.Core.Geometry;
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Hosting;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Settings;
 using Jrpg.Editor.Tiles;
@@ -19,6 +19,7 @@ namespace Jrpg.Editor.Shell;
 /// </summary>
 internal sealed partial class MainWindow : Window
 {
+    private readonly RenderTick _renderTick;
     private readonly MainViewModel _viewModel;
     private readonly MapDrawing? _drawing;
     private readonly ViewportTransform _viewport = new();
@@ -33,12 +34,13 @@ internal sealed partial class MainWindow : Window
     public MainWindow(MainViewModel viewModel)
     {
         InitializeComponent();
+        _renderTick = new RenderTick(OnRendering);
         if (viewModel.Content is { } content)
         {
             var tileImages = new TileImages(content, viewModel.ArtRoot, () => viewModel.Art!.Missing);
             _drawing = new MapDrawing(content, tileImages);
             TileBrowser.Images = tileImages;
-            CompositionTarget.Rendering += OnRendering;
+            _renderTick.Start();
             TileBrowser.Marking = viewModel.Marking;
             ObjectBrowser.Drawing = _drawing;
             ObjectBrowser.AnimationTime = viewModel.AnimationTime;
@@ -147,6 +149,10 @@ internal sealed partial class MainWindow : Window
 
     // Closing goes through OnClosing, so unsaved changes still ask.
     private void OnExitClicked(object sender, RoutedEventArgs e) => Close();
+
+    // Decision 674: thrown on purpose, in every build, so the hand check and the smoke script can prove the net holds.
+    private void OnRaiseTestErrorClicked(object sender, RoutedEventArgs e) =>
+        throw new InvalidOperationException("Test error from Help > Raise a test error.");
 
     // One controls window, kept open beside the map: F1 again brings it to the front.
     private void OnControlsHelpExecuted(object sender, ExecutedRoutedEventArgs e)

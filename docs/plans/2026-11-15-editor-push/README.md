@@ -91,7 +91,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 ### Phase 1: the net
 - [x] ADR 0050, unexpected errors in the editor. Write it from decisions 669-674, 690 and 692 (the options were keep
   open, Save all then close, keep open with an autosave; the developer chose keep open).
-- [ ] **NET1. An unexpected error keeps the editor open: the policy with the same-error rule, the report file, a box
+- [x] **NET1. An unexpected error keeps the editor open: the policy with the same-error rule, the report file, a box
   naming the error, the report and what is unsaved, and the smoke script watching for it** (Editor + script, about
   420 lines) → [slices/NET1.md](slices/NET1.md)
 - [ ] **NET2 (optional, only if the developer asks after using the box). A custom error window: Keep working, Close
@@ -113,7 +113,7 @@ Sub-plan 1:
   aren't handled until the editor has a thread.
 - **674.** Help > Raise a test error, written in `MainWindow.xaml` and kept in every build, throws for the hand checks
   and the smoke script.
-- **690.** The same error again (the same exception type and `TargetSite` as one already reported, asked about or
+- **690.** The same error again (the same exception type and stack as one already reported; NET1's review widened it from `TargetSite`, which two windows' XAML failures share, asked about or
   answered) is counted, never asked about and never written as a new file; on exit its count is added to its report.
 - **691.** Sub-plan 1 is two slices: NET1, the whole net with the box and the script; NET2, a custom window, only if the
   developer asks after using the box. Every sub-plan 1 type lives in `Hosting/`.

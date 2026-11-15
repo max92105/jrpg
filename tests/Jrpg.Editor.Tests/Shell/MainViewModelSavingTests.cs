@@ -96,6 +96,22 @@ public sealed class MainViewModelSavingTests : IDisposable
     }
 
     [Fact]
+    public void UnsavedChanges_MapAndTilesChanged_NamesEach()
+    {
+        var viewModel = _content.Open(_content.TestWorld);
+        EditorTestContent.BlockFirstWalkableTile(viewModel);
+        EditorTestContent.PaintTopLeft(viewModel);
+
+        Assert.Equal("Unsaved changes in map 'forest' and the tiles and objects.", viewModel.UnsavedChanges);
+    }
+
+    [Fact]
+    public void UnsavedChanges_NothingChanged_IsNull()
+    {
+        Assert.Null(_content.Open(_content.TestWorld).UnsavedChanges);
+    }
+
+    [Fact]
     public void ConfirmClose_NothingUnsaved_ClosesWithoutAsking()
     {
         var viewModel = _content.Open(_content.TestWorld);

@@ -138,3 +138,19 @@ Claude, at the slice step (not committed):
    window prints "opened", the last line "Help>Raise a test error: the net caught it".
 9. Give `ShopCatalogWindow.xaml` a broken value (`Width="abc"`) temporarily, rebuild, run the script with `-Windows
    'Database>Shops...'`: it prints `ERROR` with the XAML parse error in the trace. Revert.
+
+- **Done, with deviations:** kept as one slice. `AddRepeatCount` is static (it reads nothing of the log). The script
+  answers the box by its own Yes command (WM_COMMAND, IDYES), not a button found by name: this Windows is French, and
+  UI Automation gave no invokable button; its loop sits in a try/finally that always closes its editor, and several
+  `-Windows` need `-Command` (`-File` passes a list as one string).
+  **Found at hand check 7 and added:** a throw in a `CompositionTarget.Rendering` handler comes back every frame and
+  WPF then paints nothing: with the repeat rule alone the editor stayed open but blank. `Hosting/RenderTick` now runs
+  each window's per-frame work (the main window and five windows), stops it on a throw and raises the error again
+  outside the render pass: one box, then the editor paints, that animation frozen (ADR 0050 amended, a rule in
+  `.claude/rules/editor.md`). Checked on screen: the test error (box, Yes, the editor goes on), a window whose XAML
+  throws (`ERROR`, the next window opens), a throwing render tick (one box, the editor painted after Yes); Save all
+  itself was not pressed in that state. Hand checks 1-6 are the developer's.
+- **Review:** the same error is told by its type and whole stack, not `TargetSite` (two windows' XAML failures both
+  throw from WPF's loader and each needs its report; a test reaches one throwing method two ways); the map row's path
+  and a backlog heading the shell edits had damaged are restored. Left for the backlog: the box reads
+  `UnsavedChanges` without ending a stroke being dragged.

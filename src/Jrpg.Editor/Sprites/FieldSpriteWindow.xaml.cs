@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Jrpg.Core.Sprites;
+using Jrpg.Editor.Hosting;
 using Jrpg.Editor.Tiles;
 using Jrpg.Editor.Viewport;
 using Microsoft.Win32;
@@ -16,6 +17,7 @@ namespace Jrpg.Editor.Sprites;
 /// </summary>
 internal sealed partial class FieldSpriteWindow : Window
 {
+    private readonly RenderTick _renderTick;
     private readonly FieldSpriteCatalogViewModel _sprites;
     private readonly string _artRoot;
     private readonly TileAnimationTime _animationTime;
@@ -43,6 +45,7 @@ internal sealed partial class FieldSpriteWindow : Window
         Func<IReadOnlyList<string>, SheetImportResult> import)
     {
         InitializeComponent();
+        _renderTick = new RenderTick(OnRendering);
 
         // At most the screen's work area: at 175 % display scaling 1120 px is wider than the screen, and centering on
         // the editor cut the window's sides.
@@ -54,7 +57,7 @@ internal sealed partial class FieldSpriteWindow : Window
         ZoomBar.DataContext = _zoom;
         _zooming = new ZoomedScroller(ImageScroller, DrawSheet, () => _scale) { Zoom = _zoom };
         sprites.PropertyChanged += OnSpritesChanged;
-        CompositionTarget.Rendering += OnRendering;
+        _renderTick.Start();
         Closed += OnClosed;
         ShowChosen();
     }
@@ -175,7 +178,7 @@ internal sealed partial class FieldSpriteWindow : Window
 
     private void OnClosed(object? sender, EventArgs e)
     {
-        CompositionTarget.Rendering -= OnRendering;
+        _renderTick.Stop();
         _zooming.Zoom = null;
         _sprites.PropertyChanged -= OnSpritesChanged;
         if (_setup is not null)

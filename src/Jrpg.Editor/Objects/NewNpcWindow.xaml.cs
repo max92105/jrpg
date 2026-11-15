@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Windows;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Jrpg.Editor.Hosting;
 using Jrpg.Editor.Sprites;
 using Jrpg.Editor.Tiles;
 
@@ -14,6 +14,7 @@ namespace Jrpg.Editor.Objects;
 /// </summary>
 internal sealed partial class NewNpcWindow : Window
 {
+    private readonly RenderTick _renderTick;
     private readonly NewNpcViewModel _npc;
     private readonly Func<NewNpcViewModel, bool> _apply;
     private readonly string _artRoot;
@@ -28,12 +29,13 @@ internal sealed partial class NewNpcWindow : Window
     public NewNpcWindow(NewNpcViewModel npc, Func<NewNpcViewModel, bool> apply, string artRoot, TileAnimationTime animationTime)
     {
         InitializeComponent();
+        _renderTick = new RenderTick(OnRendering);
         DataContext = _npc = npc;
         (_apply, _artRoot, _animationTime) = (apply, artRoot, animationTime);
         Title = npc.IsIdFixed ? "Change NPC sprite" : "New NPC";
         OkButton.Content = npc.IsIdFixed ? "Change" : "Create";
         npc.PropertyChanged += OnNpcChanged;
-        CompositionTarget.Rendering += OnRendering;
+        _renderTick.Start();
         Closed += OnClosed;
         ShowPreview();
         Loaded += (_, _) => ((UIElement)(npc.IsIdFixed ? SpriteBox : IdBox)).Focus();
@@ -77,7 +79,7 @@ internal sealed partial class NewNpcWindow : Window
 
     private void OnClosed(object? sender, EventArgs e)
     {
-        CompositionTarget.Rendering -= OnRendering;
+        _renderTick.Stop();
         _npc.PropertyChanged -= OnNpcChanged;
     }
 }

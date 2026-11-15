@@ -1,14 +1,20 @@
 # Opens editor windows through their menus, as the developer would, and reports each: opened (a screenshot saved under
-# -Out), greyed, or the editor crashed (its unhandled exception printed). Editor tests never open a window, so a XAML
-# error (a bad value, a missing resource) only shows here: the cinematics window's int Width crashed the editor on open.
+# -Out), greyed, ERROR (opening it threw and the editor's unexpected-error box caught it, ADR 0050) or CRASHED (a throw
+# before the main window loaded ended the editor). Editor tests never open a window, so a XAML error (a bad value, a
+# missing resource) only shows here: the cinematics window's int Width threw on open. The last default entry raises the
+# editor's test error to check the net itself. The trace at the end is every report the editor wrote to its error output.
 #   powershell -NoProfile -ExecutionPolicy Bypass -File .claude/scripts/open-editor-windows.ps1 -Out <folder>
-#   ... -Windows 'Database>Effect strips...','NPCs>Character sprites...'
+# Several chosen windows need -Command, as -File passes a list as one string:
+#   powershell -NoProfile -ExecutionPolicy Bypass -Command "& '.claude/scripts/open-editor-windows.ps1' -Windows 'Database>Shops...','Help>Raise a test error'"
 # Build the editor first (dotnet build src/Jrpg.Editor); the script runs the Debug build, which reads content/.
+# Take its whole output (into a variable or a file): a pipe that stops early (head, Select-Object -First) ends the
+# script before it closes its editor, which then holds the build's files.
 param(
     [string]$Out = (Join-Path $env:TEMP 'jrpg-editor-windows'),
     [string[]]$Windows = @(
         'Database>Quests...', 'Database>Shops...', 'Database>Drop tables...', 'Database>Effect strips...',
-        'Database>Cinematics...', 'Database>Enemies...', 'NPCs>Character sprites...', 'Map>Settings...')
+        'Database>Cinematics...', 'Database>Enemies...', 'NPCs>Character sprites...', 'Map>Settings...',
+        'Help>Raise a test error')
 )
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes, System.Drawing
@@ -16,6 +22,7 @@ $repository = Resolve-Path (Join-Path $PSScriptRoot '..\..')
 $exe = Join-Path $repository 'src\Jrpg.Editor\bin\Debug\net10.0-windows\Jrpg.Editor.exe'
 New-Item -ItemType Directory -Force $Out | Out-Null
 $automation = [System.Windows.Automation.AutomationElement]
+Add-Type -Name EditorBox -Namespace '' -MemberDefinition '[DllImport("user32.dll")] public static extern bool PostMessage(IntPtr window, uint message, IntPtr wParam, IntPtr lParam);'
 
 function Find-Named($root, [string]$name, [int]$tries = 20) {
     $condition = New-Object System.Windows.Automation.PropertyCondition ($automation::NameProperty), $name
@@ -65,6 +72,8 @@ for ($i = 0; $i -lt 60 -and -not $main; $i++) {
 if (-not $main) { $editor.Kill(); throw 'The editor showed no window within 30 s.' }
 Start-Sleep -Seconds 3
 
+# The editor is closed whatever happens here: left open, it would hold its files and the caller's output.
+try {
 foreach ($entry in $Windows) {
     $menuName, $itemName = $entry -split '>', 2
     $menuElement = Find-Named $main $menuName
@@ -83,6 +92,16 @@ foreach ($entry in $Windows) {
     $editor.Refresh()
     if ($editor.HasExited) { "$entry`: CRASHED (exit code $($editor.ExitCode))"; break }
     $dialog = Find-Dialog $editor $main
+    $raisesTheTestError = $itemName -eq 'Raise a test error'
+    if ($dialog -and $dialog.Current.Name -eq 'Unexpected error') {
+        if ($raisesTheTestError) { "$entry`: the net caught it" }
+        else { "$entry`: ERROR (the editor's unexpected-error box; its report is in the trace below)" }
+        # Yes, sent as the box's own command (WM_COMMAND, IDYES): the button's caption follows the system's language.
+        [void][EditorBox]::PostMessage([IntPtr]$dialog.Current.NativeWindowHandle, 0x0111, [IntPtr]6, [IntPtr]::Zero)
+        Start-Sleep -Seconds 1
+        continue
+    }
+    if ($raisesTheTestError) { "$entry`: THE NET DID NOT CATCH IT"; continue }
     if (-not $dialog) { "$entry`: no window opened"; continue }
     $file = Join-Path $Out (($itemName -replace '[^A-Za-z0-9]', '') + '.png')
     Save-Screenshot $dialog $file
@@ -90,9 +109,11 @@ foreach ($entry in $Windows) {
     $dialog.GetCurrentPattern([System.Windows.Automation.WindowPattern]::Pattern).Close()
     Start-Sleep -Seconds 1
 }
-
-$editor.Refresh()
-if (-not $editor.HasExited) { $editor.Kill() }
+}
+finally {
+    $editor.Refresh()
+    if (-not $editor.HasExited) { $editor.Kill() }
+}
 Start-Sleep -Milliseconds 500
 $trace = $errors.Result
-if ($trace) { '--- the editor''s unhandled exception'; $trace }
+if ($trace) { '--- the editor''s error output'; $trace }

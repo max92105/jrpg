@@ -208,7 +208,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - Six editor boxes parse a whole number their own way (`EventStepViewModel.WholeNumber`, `TypedCounts.Parse`, `TileAnimationViewModel.WholeNumberOf`, `PlacedObjectEditing.Layer`, `LayerChoiceViewModel`, `Catalogs/TypedNumber`): fold them onto one parser in a shared folder (EN2's review).
 - `Shell/ArtStatus` refreshes the art warning only when the sheets or objects change: an Enemies window OK (or its undo) that renames a picture leaves the enemy-art lines stale until the next save (EN7's review).
 - `Shell/MainViewModel.cs` is at 285 lines after the cinematics plan (`CinematicEditing` set beside its siblings); the drop table editor plan set `DropTableEditing` in the constructor beside its siblings (283 with its using, DT5, decision 605): the next window's editing view model is built in its own partial (as `MainViewModel.Database.cs`), not in the constructor's list.
-- The editor has no `DispatcherUnhandledException` handler: an exception in a window closes the editor and the unsaved draft is lost (two crashes found only by review in the shops and enemies plan, EN2 and EN7). A handler that saves nothing but shows the message and keeps the editor open is a design question for the developer.
 
 ## From the drop table editor plan (2026-11-13, at approval)
 
@@ -267,3 +266,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   IL1-IL3): one `BattleTurnSequence` query.
 - `Game/Battle/BattlersView.cs` is at 257 lines after the impact's light, its white layers (the blink's spill, the
   fallen's and the wash's white, the fringe's split) drawn in place: a `BattlerWhiteLayers` drawer would take them.
+- `MainViewModel.UnsavedChanges` doesn't count a stroke still being dragged: the close question ends the stroke first,
+  the unexpected-error box doesn't, so a throw mid-drag on a clean map reads "Nothing is unsaved." (NET1's review;
+  nothing is lost, closing still asks).

@@ -104,6 +104,7 @@
       </MenuItem>
       <MenuItem Header="Help">
         <MenuItem Header="Controls" Command="Help" />
+        <MenuItem Header="Raise a test error" Click="OnRaiseTestErrorClicked" ToolTip="Throws an error on purpose, to check that the editor keeps your work." />
       </MenuItem>
     </Menu>
     <local:StatusBand DockPanel.Dock="Top" />

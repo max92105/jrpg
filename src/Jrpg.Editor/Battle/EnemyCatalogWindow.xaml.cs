@@ -6,6 +6,7 @@ using System.Windows.Media.Imaging;
 using Jrpg.Core.Maps;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.GifImport;
+using Jrpg.Editor.Hosting;
 using Microsoft.Win32;
 
 namespace Jrpg.Editor.Battle;
@@ -18,6 +19,7 @@ namespace Jrpg.Editor.Battle;
 /// </summary>
 internal sealed partial class EnemyCatalogWindow : Window
 {
+    private readonly RenderTick _renderTick;
     private readonly EnemyCatalogViewModel _enemies;
     // The whole image shows while the sprite has no loop to play.
     private const int WholeImage = -1;
@@ -41,13 +43,14 @@ internal sealed partial class EnemyCatalogWindow : Window
         Action<Window, string> editDropTables)
     {
         InitializeComponent();
+        _renderTick = new RenderTick(OnRendering);
         DataContext = _enemies = enemies;
         (_art, _editDropTables) = (art, editDropTables);
         enemies.PropertyChanged += OnEnemiesChanged;
         enemies.ArtChoices.PropertyChanged += (_, _) => ReadAndShowArt();
         WatchChosenArt(null);
-        CompositionTarget.Rendering += OnRendering;
-        Closed += (_, _) => CompositionTarget.Rendering -= OnRendering;
+        _renderTick.Start();
+        Closed += (_, _) => _renderTick.Stop();
     }
 
     // Another enemy chosen: its pictures are watched instead, so the battle sprite is read only when one changes.

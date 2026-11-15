@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Jrpg.Editor.Hosting;
 
 namespace Jrpg.Editor.Cinematics;
 
@@ -12,6 +13,7 @@ namespace Jrpg.Editor.Cinematics;
 /// </summary>
 internal sealed partial class CinematicCatalogWindow : Window
 {
+    private readonly RenderTick _renderTick;
     /// <summary>
     /// The preview's size: the game's 1920 x 1080 screen at a quarter (the plan's tunable "Preview size"). Doubles, as
     /// the XAML sets a <c>Width</c> from them and WPF refuses an int there, failing as the window opens.
@@ -33,6 +35,7 @@ internal sealed partial class CinematicCatalogWindow : Window
     {
         Resources.Add("PictureOf", new CinematicPictureConverter(loadPicture));
         InitializeComponent();
+        _renderTick = new RenderTick(OnRendering);
         DataContext = cinematics;
         _preview = cinematics.Preview;
         _preview.PropertyChanged += OnPreviewChanged;
@@ -51,14 +54,14 @@ internal sealed partial class CinematicCatalogWindow : Window
         StopTheClock();
         if (_preview.IsPlaying && IsVisible)
         {
-            CompositionTarget.Rendering += OnRendering;
+            _renderTick.Start();
         }
     }
 
     // The preview's clock is the render loop's: one tick per frame while Play runs, none otherwise or once closed.
     private void StopTheClock()
     {
-        CompositionTarget.Rendering -= OnRendering;
+        _renderTick.Stop();
         _lastFrame = null;
     }
 

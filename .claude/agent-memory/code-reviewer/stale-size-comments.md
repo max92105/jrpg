@@ -85,7 +85,9 @@ call or a rename. These cases slipped past it:
 
 - A check reading a new source through a private member (SE1: the art check's skill and item strips) left the partial's
   class summary and the public entry point's "Every ..." list without it, though the slice asked for the summary edit and
-  the Done note said "as planned"; reread the entry point's list when a check gains what it reads.
+  the Done note said "as planned"; reread the entry point's list when a check gains what it reads. SE2 again: the
+  slice listed rewords (map.md's ActionWindUp entry, ActionWindUp's `strips` param, BattlePacing.SwingStart) left
+  undone under "as planned". Check each reword the slice's Changes list names, one by one, against the tree.
 
 **Why:** a comment or doc stating a wrong rule, name or number misleads the next reader.
 

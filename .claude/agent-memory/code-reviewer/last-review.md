@@ -5,11 +5,13 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skill-effect-strips, slice SE1 (a skill's or item's own effectFile, load and startup art checks).
-2026-11-15. Round 1. Verdict: ready to commit. NET1's two Criticals checked in the tree: fixed.
+Plan 2026-11-15-skill-effect-strips, slice SE2 (ActionStrip: the action's own strip and swing in wind-up and playback).
+2026-11-15. Round 1. Verdict: ready to commit. SE1's three items checked in the tree: ArtReferenceCheck summaries and
+the map.md Items row fixed; its Done-note suggestion dropped (SE1 committed).
 
-- Warning (open): ArtReferenceCheck.Battle.cs:8-12 class summary and ArtReferenceCheck.cs:17-26 FindProblems doc
-  don't list skills' and items' own strips (decision 709); the slice asked for the summary edit, Done note says "as planned".
-- Suggestion (open): docs/map.md puts `ItemDefinition`'s EffectFile on the Skills/Stats row; the slice asked for the
-  Items row's `ItemDefinition` entry.
-- Suggestion (open): Done note says "as planned" while the summary edit and Items-row map line were not done.
+- Warning (open): rewords the slice listed left undone though Done note says "as planned": docs/map.md Battle row
+  `ActionWindUp` still "an Attack's swing whoosh"/"an Attack's swing (decision 657)"; ActionWindUp.cs:80 `strips` param
+  "which name the attacker's swing"; BattlePacing.cs:18 SwingStart "an Attack's swing starts"; EffectOnTarget.cs:12
+  "an attacker's strip".
+- Suggestion (open): the bomb ItemDefinition literal is written in both ActionStripTests and ActionPlaybackStripTests.
+- Suggestion (open): ActionStrip.FileOf has param/returns docs but no summary saying the fallback (class summary covers it).

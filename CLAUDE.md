@@ -36,7 +36,7 @@ Dependency direction: Game → Data → Core; Editor → Data → Core. Never th
 - Run editor: `dotnet run --project src/Jrpg.Editor` (same content root rule as the game).
 - Visual Studio: the "Game and editor" launch profile (`Jrpg.slnLaunch`) starts both with F5; pick it in the toolbar's startup list. Without it, F5 starts `Jrpg.Game`, the default startup project (`DefaultStartup` in `Jrpg.slnx`).
 - No Python on this machine: edit with the Edit tool, or with sed/awk followed by `sed -i 's/\r*$/\r/'` to restore the CRLF line endings.
-- Run `verify.ps1 -Fix` only after a plain build passes: on a broken build the formatter deletes the toolkit's generator hooks (`partial void On...Changed`) as unused code (the cleanup plan's S5), so check `git status` for files the slice didn't touch after any fix pass.
+- Run `verify.ps1 -Fix` only after a plain build passes: on a broken build the formatter deletes the toolkit's generator hooks (`partial void On...Changed`) as unused code (the cleanup plan's S5), so check `git status` for files the slice didn't touch after any fix pass. Compare the fix pass's test total with the last one: a drop means a file lost its code (in IL3 an edit left mixed line endings and the comment rewrap folded a whole test class into its header comment).
 - Don't start `verify.ps1` while another runs (the stop hook starts one): two builds lock each other and both crawl.
 - After a move, the build names each unused using (IDE0005); delete those lines bottom-up and rebuild until none remains, since one may surface per round.
 - Bash heredocs over about 70 lines fail to parse here ("unexpected EOF while looking for matching quote"): write a long script or file with the Write tool, then run it.

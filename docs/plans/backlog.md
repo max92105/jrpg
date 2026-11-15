@@ -265,3 +265,8 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   it, or hold the lead back for a skill that can backfire?
 - `Shell/MainViewModel.Database.CreateEffectStripEditing` and `MainViewModel.FieldSprites.CreateFieldSpriteEditing` are
   the same readable-image listing and size lookup over two folders (EE3's review): a third copy takes one shared pair.
+- "The playback whose damage landed" (`_sequence.Playback is { Strips.Count: > 0 }`) is read three times: in
+  `ImpactLightView.LitImpactNow`, `BattlersView.WashAt` and `BattlersView.DrawWhite` (the battle presentation plan's
+  IL1-IL3): one `BattleTurnSequence` query.
+- `Game/Battle/BattlersView.cs` is at 257 lines after the impact's light, its white layers (the blink's spill, the
+  fallen's and the wash's white, the fringe's split) drawn in place: a `BattlerWhiteLayers` drawer would take them.

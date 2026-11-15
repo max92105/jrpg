@@ -12,6 +12,7 @@ paths:
 - Load assets through the content pipeline or one asset loader class; never load files ad hoc inside draw code.
 - A shape or texture that `UiTextures` bakes lives in `Ui/`, never in a feature folder: `Ui` must not depend on `Battle`, `Menus` or `Title`.
 - No allocations in `Update`/`Draw` hot paths (no LINQ, no `new` of lists per frame, no string concatenation per frame).
+- A battle light or effect drawn over the battlefield (a flash, a halo, a fringe) goes before every HUD view in `BattleScene.Draw`, `_enemyTags` included: check its line there, not the slice's "after X", and say in the Done note what draws right after it (the battle presentation plan's IL1, IL2 reviews).
 - A sound is asked where the action went through, never at the press: a refusal stays silent (decision 421; the music plan's S1, S2).
 - A step that shows a line whatever happened (a gift, a recruit) sounds only on the outcome that went through (`Added > 0`, `HasJoined`); a switch sounds only where it shows on screen. Each "nothing happened" outcome gets a silent test (the sound pass, SH2, FE2).
 

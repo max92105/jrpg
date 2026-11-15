@@ -35,3 +35,9 @@ whoosh.
 1. With EF5's local strips file: a goblin's attack whooshes as its swing starts, then the hit sounds on the impact.
 2. Without a swing: no whoosh.
 3. Listen to the whoosh on its own: short, clean, no click at its end.
+
+- **Note (paused 2026-11-15):** the sound is chosen: freesound 60024, "swosh swinging sword 37" by qubodup, CC0, a
+  bamboo stick recorded by its uploader (no game or film named), trimmed to 0.35 s with a 0.05 s fade:
+  `perl .claude/scripts/add-sound-source.pl effects/Swing.wav=60024:0.35:0.05`, then
+  `fetch-placeholder-sounds.ps1 -Only effects/Swing.wav`. The conversion needs ffmpeg (`winget install Gyan.FFmpeg`,
+  decision 428), which this machine lacks; installing it is the developer's call, so the slice waits for it.

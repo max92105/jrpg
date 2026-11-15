@@ -13,11 +13,12 @@ namespace Jrpg.Editor.Cinematics;
 internal sealed partial class CinematicCatalogWindow : Window
 {
     /// <summary>
-    /// The preview's size: the game's 1920 x 1080 screen at a quarter (the plan's tunable "Preview size").
+    /// The preview's size: the game's 1920 x 1080 screen at a quarter (the plan's tunable "Preview size"). Doubles, as
+    /// the XAML sets a <c>Width</c> from them and WPF refuses an int there, failing as the window opens.
     /// </summary>
-    public const int PreviewWidth = 480;
+    public const double PreviewWidth = 480;
 
-    public const int PreviewHeight = 270;
+    public const double PreviewHeight = 270;
 
     private readonly CinematicPreview _preview;
 

@@ -98,7 +98,7 @@ internal sealed partial class MainWindow
         }
 
         BitmapSource? LoadPicture(string file) =>
-            SpriteImageFile.LoadAtWidth(artRoot, ArtFolders.Cinematics, file, CinematicCatalogWindow.PreviewWidth);
+            SpriteImageFile.LoadAtWidth(artRoot, ArtFolders.Cinematics, file, (int)CinematicCatalogWindow.PreviewWidth);
     }
 
     private void OnEditEffectStripsClicked(object sender, RoutedEventArgs e)

@@ -5,9 +5,11 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-event-window-cleanup, slice EW6 (list keys: ListKeyCommand, step and event list KeyDown handlers,
-tooltips, F1 line, script Alt+Down check). 2026-11-15. Round 1. Verdict: Ready to commit. Last slice of the plan.
+Plan 2026-11-15-cinematic-focus-point, slice FP1 (StillFocus record, CinematicStill.Focus and ZoomOrigin, validator
+FindOptionalFieldProblem/FindFocusProblem, AbsentWhenNullFilter focus, ADR 0046 amendment). 2026-11-15. Round 1.
+Verdict: Ready to commit.
 
-- EW5 Follow-up (Preset tooltip lacked the quest giver's third-event hint): fixed (ObjectEventsWindow.xaml:25).
-- No new findings beyond one Suggestion, open: open-editor-windows.ps1 Test-StepListKeys sends one Alt+Down, so the
-  refocus after the move (ListKeyCommand.FocusChosenRow) is left to hand check 2; a second press would check it.
+- EW6 Suggestion (open-editor-windows.ps1 Test-StepListKeys one Alt+Down): dropped, other plan, never acted on.
+- Suggestion, open: ContentCatalogLoaderCinematicTests.Load_FocusMissingYPercent_ThrowsNamingTheFile asserts only the
+  "cinematics.json" prefix, so any error in the file passes it; assert the focus path or "yPercent" too.
+- Noted, not raised: CinematicStillRow.From/ToStill drop Focus until FP3 (planned there; no content has a focus).

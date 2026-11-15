@@ -3,7 +3,11 @@
     "id": "goblin",
     "name": "Goblin",
     "portraitFile": "Goblin.png",
-    "battleSpriteFile": "Goblin.png",
+    "battleSpriteFile": "Guerrier gnoll anim\u00E9 en combat.png",
+    "idleAnimation": {
+      "frameCount": 3,
+      "frameMilliseconds": 220
+    },
     "attackEffectFile": "GoldenSlashImpact.png",
     "isSpriteFlipped": false,
     "maxHp": 30,

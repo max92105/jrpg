@@ -7,9 +7,10 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Draws an Attack's swing in front of its attacker (decision 657): the strip its impact strip's record names, from
-/// <see cref="BattlePacing.SwingStart"/> into the wind-up to its last frame, past the impact, at its own pace and size,
-/// its frame centered 60 px ahead of the attacker toward the other side, mirrored for a party member.
+/// Draws the swing of an Attack's or an action's own strip in front of its actor (decisions 657, 708): the strip its
+/// impact strip's record names, from <see cref="BattlePacing.SwingStart"/> into the wind-up to its last frame, past the
+/// impact, at its own pace and size, its frame centered 60 px ahead of the attacker toward the other side, mirrored for
+/// a party member.
 /// </summary>
 internal sealed class SwingView
 {

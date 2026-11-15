@@ -9,12 +9,13 @@ namespace Jrpg.Game.Battle;
 /// <summary>
 /// One turn's events as the beats the screen plays (design key decision 4): an impact when effects land, a defeat when
 /// someone falls, a skip when a stun takes a turn. The hold lasts as long as the beats; Defend and Run hold nothing. On
-/// the impact, each landed effect shows its amount and plays on its target, damage as the attacker's effect strip,
-/// anything else as a placeholder cue (decision 101), and a granted status shows its name, a miss "Miss" and a resisted
-/// status "Resisted"; whoever fell shows white, then fades on the defeat beat. A lost turn shows "Stunned" on its beat,
-/// Poison and Regen show the HP they took or restored on a tick beat, and an enemy entering a phase shows "Enraged!" on
-/// a beat of its own after all the others (decision 406). An event it doesn't know throws, so a new mechanic can't be
-/// shown silently wrong (ADR 0004). Its sounds follow the beats (<see cref="BattleSounds"/>).
+/// the impact, each landed effect shows its amount and plays on its target, damage as the action's strip (its own or
+/// its attacker's, decision 678), anything else as a placeholder cue (decision 101), and a granted status shows its
+/// name, a miss "Miss" and a resisted status "Resisted"; whoever fell shows white, then fades on the defeat beat. A
+/// lost turn shows "Stunned" on its beat, Poison and Regen show the HP they took or restored on a tick beat, and an
+/// enemy entering a phase shows "Enraged!" on a beat of its own after all the others (decision 406). An event it
+/// doesn't know throws, so a new mechanic can't be shown silently wrong (ADR 0004). Its sounds follow the beats, as
+/// <see cref="BattleSounds"/> orders them.
 /// </summary>
 internal sealed class ActionPlayback : ISoundTimeline
 {
@@ -31,7 +32,7 @@ internal sealed class ActionPlayback : ISoundTimeline
     private readonly List<EffectOnTarget> _strips = [];
     private readonly List<CueOnTarget> _cues = [];
     private readonly List<(Combatant Fallen, TimeSpan FadeStart)> _fallen = [];
-    private string? _attackEffectFile;
+    private string? _stripFile;
     private bool _isStripMirrored;
 
     // The action's name, for the placeholder cue an effect without an animation shows (decision 101).
@@ -54,7 +55,7 @@ internal sealed class ActionPlayback : ISoundTimeline
     /// <summary>One number per landed effect, built once; they all show at the impact, which comes first.</summary>
     public IReadOnlyList<FloatingNumber> Numbers => _numbers;
 
-    /// <summary>The attacker's effect strip on each target damage landed on.</summary>
+    /// <summary>The action's strip, its own or its attacker's, on each target damage landed on.</summary>
     public IReadOnlyList<EffectOnTarget> Strips => _strips;
 
     /// <summary>
@@ -109,7 +110,7 @@ internal sealed class ActionPlayback : ISoundTimeline
         {
             case ActionStarted started:
                 _actionName = ActionBannerText.For(started.Actor, started.Command, messages);
-                _attackEffectFile = BattlerArt.Of(started.Actor).AttackEffectFile;
+                _stripFile = ActionStrip.FileOf(started.Actor, started.Command);
                 _isStripMirrored = EffectOnTarget.IsMirroredFor(started.Actor);
                 break;
             case EffectApplied effect:
@@ -166,14 +167,14 @@ internal sealed class ActionPlayback : ISoundTimeline
         _ => throw new ArgumentOutOfRangeException(nameof(effect), effect.Kind, "An effect with no amount to show."),
     };
 
-    // Only damage has an animation so far: the attacker's strip (decision 101). Anything else gets a cue with the
-    // action's name. Run, the one action without a name, lands nothing.
+    // Only damage has an animation so far: the action's strip, its own or its attacker's (decisions 101, 678). Anything
+    // else gets a cue with the action's name. Run, the one action without a name, lands nothing.
     private void AddLanding(EffectApplied effect)
     {
         var stack = _numbers.Count(number => number.Target == effect.Target && number.ShowsAt == TimeSpan.Zero);
         var affinity = stack == 0 ? effect.Affinity : HitAffinity.Neutral;
         _numbers.Add(new FloatingNumber(effect.Target, NumberText.Of(effect.Amount), ToneOf(effect), Stack: stack, Affinity: affinity));
-        if (effect.Kind == EffectKind.Damage && _attackEffectFile is { } file)
+        if (effect.Kind == EffectKind.Damage && _stripFile is { } file)
         {
             // A multi-hit plays one strip on its target, as its hits make one impact.
             if (stack == 0)

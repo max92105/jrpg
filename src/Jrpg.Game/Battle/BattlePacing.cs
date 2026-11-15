@@ -15,7 +15,10 @@ internal static class BattlePacing
     /// <summary>From an action's start to its impact, as the reference clip times it (decision 644).</summary>
     public static TimeSpan WindUp { get; } = TimeSpan.FromSeconds(0.7);
 
-    /// <summary>How far into the wind-up an Attack's swing starts: the clip's slash (decision 657).</summary>
+    /// <summary>
+    /// How far into the wind-up the swing of an Attack's or an action's own strip starts, where the reference clip's
+    /// slash starts (decision 657).
+    /// </summary>
     public static TimeSpan SwingStart { get; } = TimeSpan.FromSeconds(0.47);
 
     /// <summary>

@@ -9,7 +9,7 @@ namespace Jrpg.Game.Battle;
 
 /// <summary>
 /// Draws the last action's effects on its targets: each strip frame by frame at its record's pace and its frame's own
-/// size, centered on the target's drawn sprite, mirrored for a party member's attack (decisions 654, 655), its hit
+/// size, centered on the target's drawn sprite, mirrored for a party member's action (decisions 654, 655), its hit
 /// frame on the impact: its lead starts during the wind-up on every target a damaging action aims at (decision 656).
 /// While the impact's fringe lasts, the strips where damage landed are drawn split into color copies (decision 661).
 /// Each placeholder cue's text shows on the same center (decision 101). Cue texts are measured once a turn.

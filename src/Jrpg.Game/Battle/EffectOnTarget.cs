@@ -9,9 +9,9 @@ namespace Jrpg.Game.Battle;
 internal sealed record EffectOnTarget(Combatant Target, string File, bool IsMirrored)
 {
     /// <summary>
-    /// Whether an attacker's strip is drawn mirrored: effect art faces right, as an enemy attacking the party, so a
-    /// party member's attack is drawn the other way (decision 655). The wind-up's lead and the impact both read this
-    /// one rule, so they face the same way.
+    /// Whether an action's strip is drawn mirrored: effect art faces right, as an enemy attacking the party, so a party
+    /// member's action is drawn the other way (decision 655). The wind-up's lead and the impact both read this one
+    /// rule, so they face the same way.
     /// </summary>
     public static bool IsMirroredFor(Combatant attacker) => attacker.Side == BattleSide.Party;
 }

@@ -155,6 +155,43 @@ public sealed class ActionWindUpEffectTests
         Assert.Equal([new TimedSound("Own.wav", TimeSpan.Zero)], windUp.Sounds);
     }
 
+    [Fact]
+    public void ImpactFile_SkillNamingAStrip_IsTheSkillsStrip()
+    {
+        var skill = new SkillCommand(SoundingSkills.WithSound("") with { EffectFile = "Own.png" }, [_goblin]);
+
+        Assert.Equal("Own.png", WindUpOf(_sarxian, skill).ImpactFile);
+    }
+
+    [Fact]
+    public void SwingFile_SkillNamingASwingingStrip_IsItsSwing()
+    {
+        var skill = new SkillCommand(SoundingSkills.WithSound("") with { EffectFile = "Own.png" }, [_goblin]);
+
+        var windUp = ActionWindUp.Of(_sarxian, skill, RepositoryScreenText.Text.Messages, OwnStripSwinging());
+
+        Assert.Equal("OwnSwing.png", windUp.SwingFile);
+    }
+
+    [Fact]
+    public void Sounds_SkillNamingASwingingStrip_IsItsSoundThenTheWhoosh()
+    {
+        var skill = new SkillCommand(SoundingSkills.WithSound("Own.wav") with { EffectFile = "Own.png" }, [_goblin]);
+
+        var windUp = ActionWindUp.Of(_sarxian, skill, RepositoryScreenText.Text.Messages, OwnStripSwinging());
+
+        Assert.Equal(
+            [new TimedSound("Own.wav", TimeSpan.Zero), new TimedSound(UiSoundFiles.Battle.Swing, BattlePacing.SwingStart)],
+            windUp.Sounds);
+    }
+
+    // The strip a skill names for itself, with a swing in its record (decision 708).
+    private static Dictionary<string, EffectStripDefinition> OwnStripSwinging() =>
+        new()
+        {
+            ["Own.png"] = new EffectStripDefinition { File = "Own.png", FrameMilliseconds = 80, SwingFile = "OwnSwing.png" },
+        };
+
     private static Dictionary<string, EffectStripDefinition> SarxiansStripSwinging()
     {
         var strip = _sarxian.Member!.Definition.AttackEffectFile;

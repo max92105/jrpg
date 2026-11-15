@@ -80,3 +80,9 @@ reverted at the end with `git checkout content/skills.json content/items.json`.
 4. Add `"effectFile": "AttackEnemy.png",` after `bomb`'s `price` line in `items.json` (SE3 gives it the explosion
    for good); **Items > Bomb** on a goblin: `AttackEnemy.png` plays on it.
 5. Revert both files.
+
+- **Done:** as planned, the review adding the rewords first missed (the map's `ActionWindUp` entry, the `strips`
+  param doc, `BattlePacing.SwingStart`, `EffectOnTarget`'s summary). `ActionPlayback.cs` is 275 lines (one more than before). The comments that said "the
+  attacker's strip", "an Attack's swing" and "a party member's attack" in `ActionPlayback`, `ActionWindUp`, `SwingView`,
+  `ImpactEffectsView` and `EffectOnTarget` now name the action's own strip. The hand check (local content edits watched
+  in the game) is the developer's; SE3 gives Fireball and the bomb their strip for good.

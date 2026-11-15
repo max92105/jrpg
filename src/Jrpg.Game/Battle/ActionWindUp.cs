@@ -7,8 +7,9 @@ namespace Jrpg.Game.Battle;
 /// <summary>
 /// What one action shows before it lands (ADR 0013 amended, decision 644): its time from the command to the impact, the
 /// plaque's words (decision 646), its opening sound (decision 647), its actor's blink (decision 648), the impact
-/// strip's lead on the targets a damaging action aims at (decision 656), and an Attack's swing (decision 657) with its
-/// whoosh as it starts (decision 658), shown from the command alone, since Core executes it only when the wind-up ends.
+/// strip's lead on the targets a damaging action aims at (decision 656), and the swing of an Attack's or an action's
+/// own strip (decisions 657, 708) with its whoosh as it starts (decision 658), shown from the command alone, since Core
+/// executes it only when the wind-up ends.
 /// </summary>
 internal sealed class ActionWindUp : ISoundTimeline
 {
@@ -19,11 +20,9 @@ internal sealed class ActionWindUp : ISoundTimeline
         Duration = DurationOf(command);
         BannerText = ActionBannerText.For(actor, command, messages);
         AimedTargets = AimedTargetsOf(command);
-        ImpactFile = AimedTargets.Count > 0 ? BattlerArt.Of(actor).AttackEffectFile : null;
+        ImpactFile = AimedTargets.Count > 0 ? ActionStrip.FileOf(actor, command) : null;
         IsMirrored = EffectOnTarget.IsMirroredFor(actor);
-        SwingFile = command is AttackCommand && ImpactFile is { } impact
-            ? EffectStripDefinition.Of(impact, strips).SwingFile
-            : null;
+        SwingFile = ImpactFile is null ? null : ActionStrip.SwingFileOf(actor, command, strips);
         Sounds = SoundsOf(command, SwingFile);
     }
 
@@ -39,7 +38,7 @@ internal sealed class ActionWindUp : ISoundTimeline
     public string? BannerText { get; }
 
     /// <summary>
-    /// The action's opening sound at its start, with the plaque (decision 647), then an Attack's whoosh as its swing
+    /// The action's opening sound at its start, with the plaque (decision 647), then the swing's whoosh as the swing
     /// starts (decision 658), in time order; empty when it has neither.
     /// </summary>
     public IReadOnlyList<TimedSound> Sounds { get; }
@@ -53,7 +52,7 @@ internal sealed class ActionWindUp : ISoundTimeline
     /// </summary>
     public IReadOnlyList<Combatant> AimedTargets { get; }
 
-    /// <summary>The actor's impact strip while it damages; null otherwise.</summary>
+    /// <summary>The action's strip while it damages, its own or its actor's (decision 678); null otherwise.</summary>
     public string? ImpactFile { get; }
 
     /// <summary>
@@ -65,8 +64,9 @@ internal sealed class ActionWindUp : ISoundTimeline
     public TimeSpan SinceImpact => Elapsed - Duration;
 
     /// <summary>
-    /// The swing an Attack plays in front of its attacker, named by the attacker's impact strip's record (decision
-    /// 657); null for a skill, an item, an action that doesn't damage, or a strip that names none.
+    /// The swing played in front of the actor, named by the record of an Attack's or an action's own strip (decisions
+    /// 657, 708); null for a skill or item on its actor's strip, an action that doesn't damage, or a strip that names
+    /// no swing of its own.
     /// </summary>
     public string? SwingFile { get; }
 
@@ -77,7 +77,9 @@ internal sealed class ActionWindUp : ISoundTimeline
     /// <param name="actor">Who acts.</param>
     /// <param name="command">What they do, as chosen.</param>
     /// <param name="messages">How the plaque writes what the actor does.</param>
-    /// <param name="strips">The effect strips' records (ADR 0048), which name the attacker's swing.</param>
+    /// <param name="strips">
+    /// The effect strips' records (ADR 0048), which name the swing of an Attack's or an action's own strip.
+    /// </param>
     public static ActionWindUp Of(
         Combatant actor, BattleCommand command, UiMessages messages, IReadOnlyDictionary<string, EffectStripDefinition> strips) =>
         new(actor, command, messages, strips);

@@ -158,7 +158,8 @@ public sealed class ArtImageImportGifTests : IDisposable
         {
             var result = _import.Import(ArtFolders.Effects, [gif], new GifImportOptions(8, false), Ask(answer: true));
 
-            var note = "3 frames, 0.24 s; effects play at 80 ms a frame, the GIF's 100 ms dropped";
+            var note = "3 frames, 0.24 s; effects play at 80 ms a frame unless effect-strips.json lists them, "
+                + "the GIF's 100 ms dropped";
             Assert.Equal($"Imported Burst.png ({note}).", result.Summary);
             Assert.Empty(result.Animations);
         });

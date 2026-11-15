@@ -12,6 +12,7 @@ namespace Jrpg.Editor.GifImport;
 /// </param>
 /// <param name="Note">
 /// What the import line says of it: a battle strip's "8 frames of 100 x 128 px, 100 ms", and when the delays differed;
-/// an effect's "3 frames, 0.24 s; effects play at 80 ms a frame, the GIF's 100 ms dropped".
+/// an effect's "3 frames, 0.24 s; effects play at 80 ms a frame unless effect-strips.json lists them, the GIF's 100 ms
+/// dropped", its length at the unlisted pace.
 /// </param>
 internal sealed record ConvertedGif(string StripPath, TileAnimation? Loop, string Note);

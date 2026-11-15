@@ -44,6 +44,7 @@ public static class ContentCatalogLoader
     internal const string TilesFile = "tiles.json";
     internal const string ObjectsFile = "objects.json";
     internal const string FieldSpritesFile = "field-sprites.json";
+    internal const string EffectStripsFile = "effect-strips.json";
 
     /// <summary>Loads and validates every content file under <paramref name="contentRoot"/>, referenced files first.</summary>
     /// <exception cref="ContentValidationException">A file is malformed or breaks a content rule.</exception>
@@ -91,6 +92,8 @@ public static class ContentCatalogLoader
         var fieldSprites = ReadValidated<IReadOnlyList<FieldSpriteSheet>>(
             contentRoot, FieldSpritesFile, FieldSpriteCatalogValidator.Validate);
         var fieldSpritesByFile = fieldSprites.ToFrozenDictionary(sheet => sheet.File, StringComparer.Ordinal);
+        var effectStrips = ReadValidated<IReadOnlyList<EffectStripDefinition>>(
+            contentRoot, EffectStripsFile, EffectStripCatalogValidator.Validate);
         var mapContent = new MapContentReferences(
             tileIds,
             objectsById,
@@ -131,6 +134,7 @@ public static class ContentCatalogLoader
             Shops = shops.ToFrozenDictionary(shop => shop.Id),
             Quests = questsById,
             FieldSprites = fieldSpritesByFile,
+            EffectStrips = effectStrips.ToFrozenDictionary(strip => strip.File, StringComparer.Ordinal),
             Cinematics = cinematics.ToFrozenDictionary(cinematic => cinematic.Id),
         };
     }

@@ -56,6 +56,10 @@ public sealed record ContentCatalog
     public IReadOnlyDictionary<string, FieldSpriteSheet> FieldSprites { get; init; } =
         new Dictionary<string, FieldSpriteSheet>(StringComparer.Ordinal);
 
+    /// <summary>The effect strips' paces, hit frames and swings by file name, exact case (ADR 0048).</summary>
+    public IReadOnlyDictionary<string, EffectStripDefinition> EffectStrips { get; init; } =
+        new Dictionary<string, EffectStripDefinition>(StringComparer.Ordinal);
+
     /// <summary>The cinematics an event's <c>cinematic</c> step plays, by id (ADR 0046).</summary>
     public IReadOnlyDictionary<string, CinematicDefinition> Cinematics { get; init; } =
         new Dictionary<string, CinematicDefinition>(StringComparer.Ordinal);

@@ -78,13 +78,15 @@ internal static class GifConversion
             : $"{note}; the GIF's frame times differed, {loop.FrameMilliseconds} ms is the most common";
     }
 
-    // "12 frames, 0.96 s; effects play at 80 ms a frame, the GIF's 60 ms dropped" (decision 639).
+    // "12 frames, 0.96 s; effects play at 80 ms a frame unless effect-strips.json lists them, the GIF's 60 ms dropped"
+    // (decision 639; ADR 0048 gives a listed strip its own pace).
     private static string EffectNoteOf(int frameCount, IReadOnlyList<GifFrame> stored)
     {
-        var length = (frameCount * EffectTiming.FrameTime).TotalSeconds.ToString("0.##", CultureInfo.InvariantCulture);
-        var pace = EffectTiming.FrameTime.TotalMilliseconds.ToString(CultureInfo.InvariantCulture);
-        return $"{frameCount} frames, {length} s; effects play at {pace} ms a frame, "
-            + $"the GIF's {GifFrameTiming.FrameMilliseconds(stored)} ms dropped";
+        var frameTime = EffectStripDefinition.UnlistedFrameTime;
+        var length = (frameCount * frameTime).TotalSeconds.ToString("0.##", CultureInfo.InvariantCulture);
+        var pace = frameTime.TotalMilliseconds.ToString(CultureInfo.InvariantCulture);
+        return $"{frameCount} frames, {length} s; effects play at {pace} ms a frame unless effect-strips.json lists "
+            + $"them, the GIF's {GifFrameTiming.FrameMilliseconds(stored)} ms dropped";
     }
 
     // The frames as scaled, each frame's width, and the frames as stored, whose delays give the time.

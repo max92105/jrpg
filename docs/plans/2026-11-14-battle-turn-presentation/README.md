@@ -126,7 +126,7 @@ slice is done and write its deviations in the slice file. Tunables, the timeline
 
 ### Phase 3: the slash and the impact
 - [x] ADR 0048, battle effect strips as records. Write it from the entry under "ADRs" below (decisions 654, 657).
-- [ ] **EF1. Effect strip records: `effect-strips.json` (pace, hit frame, swing), loaded and checked** (Core + Data,
+- [x] **EF1. Effect strip records: `effect-strips.json` (pace, hit frame, swing), loaded and checked** (Core + Data,
   about 210 lines) → [slices/EF1.md](slices/EF1.md)
 - [ ] **EF2. The startup check: each listed strip and swing in `effects/`, its hit frame within its frames** (Data,
   about 140 lines) → [slices/EF2.md](slices/EF2.md)

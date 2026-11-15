@@ -51,3 +51,9 @@ art check is EF2's). This slice ships the file empty (`[]`); EF7 fills it. Nothi
 1. Run the game: it starts as before (the empty catalog changes nothing).
 2. Put `[{ "file": "AttackEnemy.png", "frameMilliseconds": 0 }]` in `content/effect-strips.json` and run: the start
    stops naming the file and the frame time. Revert (`git checkout content/effect-strips.json`).
+
+- **Done:** as planned. No test built a content root from scratch: every one copies a root that holds the file, so no
+  test needed the empty file added. The GIF import's effect note reads "effects play at 80 ms a frame unless
+  effect-strips.json lists them".
+  Review: no Critical; `ConvertedGif`'s note doc quotes the new wording; `FrameTime` and `UnlistedFrameTime` have
+  summaries that say what they hold; the repository load test is `Load_RepositoryContent_Loads`.

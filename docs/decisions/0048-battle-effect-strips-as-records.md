@@ -39,3 +39,11 @@ attacker (decision 657).
 - The records get an editor (Database > Effect strips..., ADR 0045's shape); nothing refers to a record by id, so its
   undo is never refused.
 - A strip's look on screen (its size, its hit lining up with the impact, the swing) is the game's, from the record.
+
+## Amendment (2026-11-15): a skill's or item's own strip
+A skill or item may name the impact strip its action plays (`effectFile`, decisions 678, 706-709; plan
+`2026-11-15-skill-effect-strips`). The strip's record gives its pace, hit frame and swing as for an attacker's strip.
+An action without one plays its actor's attack strip, and a skill or item on that strip plays no swing (decision
+657). Only a damaging action names one for now (decision 707). The startup check covers the named strips as it does
+the attackers' (decision 709). The field sits on the skill and the item, not on the effect: decision 704's tiered
+effect records are shared by many skills, which would otherwise share one picture.

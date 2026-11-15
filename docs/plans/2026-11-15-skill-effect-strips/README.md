@@ -57,7 +57,7 @@ developer was away; his to overturn)" are listed under [Defaults to confirm](#de
 ## Slices
 
 ### Phase 0: the record
-- [ ] **ADR 0048 amendment** (docs). Write it from the entry under "ADRs needed" below: a dated "Amendment" section in
+- [x] **ADR 0048 amendment** (docs). Write it from the entry under "ADRs needed" below: a dated "Amendment" section in
   `docs/decisions/0048-battle-effect-strips-as-records.md` and its line in `docs/decisions/README.md`.
 
 ### Phase 1: a skill's own strip

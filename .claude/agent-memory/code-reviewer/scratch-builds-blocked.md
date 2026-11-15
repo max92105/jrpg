@@ -36,6 +36,10 @@ SelectedItem ("" or any value) is not in its ItemsSource leaves the source alone
 An ItemsSource set by a style DataTrigger (EW1, 2026-11-15) still shows the locally bound SelectedItem on open, after a
 null-then-set DataContext and on switching: the trigger's late ItemsSource loses nothing.
 
+WPF context menu fact (probed 2026-11-15, EW2 review, PowerShell -STA): a button's ContextMenu inherits the button's
+DataContext once PlacementTarget is set, and follows a later DataContext change; a DataContext assigned locally on the
+menu sticks and goes stale (a right-click open after a switch shows the old items).
+
 WPF layout fact (probed 2026-11-14, CE6 review, PowerShell 5.1 -STA, Measure/Arrange + VisualTreeHelper.GetOffset): an
 Image with Stretch="UniformToFill" and default Stretch alignment that overflows its slot is pinned top-left (offset
 0,0); only Center alignment centers the crop (offset 0,-45 for 4:3 in 480x270).

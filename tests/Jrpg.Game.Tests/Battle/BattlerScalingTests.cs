@@ -1,3 +1,4 @@
+using Jrpg.Core.Maps;
 using Jrpg.Data.Art;
 using Jrpg.Game.Battle;
 using Microsoft.Xna.Framework;
@@ -41,19 +42,35 @@ public sealed class BattlerScalingTests
 
     // A boss looks bigger only through its art (decision 408): art past 512 px would draw as a painting and fail here.
     [Fact]
-    public void Of_RepositoryChiefArt_IsTwiceTheGoblinsDrawnSize()
+    public void OfImage_RepositoryChiefArt_IsTwiceTheGoblinsDrawnSize()
     {
-        var chief = BattlerScaling.Of(SizeOfBattlerOf("goblin_chief"));
-        var goblin = BattlerScaling.Of(SizeOfBattlerOf("goblin"));
+        var chief = ScalingOfBattlerOf("goblin_chief");
+        var goblin = ScalingOfBattlerOf("goblin");
 
         Assert.False(chief.IsShrunkSmoothly);
         Assert.Equal(new Point(goblin.DrawnSize.X * 2, goblin.DrawnSize.Y * 2), chief.DrawnSize);
     }
 
-    private static Point SizeOfBattlerOf(string enemyId)
+    [Fact]
+    public void OfImage_LoopingStrip_IsOneFrameAtItsOwnSize()
     {
-        var file = BattleScenarios.Catalog.Enemies[enemyId].BattleSpriteFile;
-        var (width, height) = PngSize.Read(Path.Combine(AppContext.BaseDirectory, "content", "art", "battlers", file));
-        return new Point(width, height);
+        var loop = new TileAnimation { FrameCount = 3, FrameMilliseconds = 220 };
+
+        Assert.Equal(new BattlerScaling(new Point(128, 128), false), BattlerScaling.OfImage(new Point(384, 128), loop));
+    }
+
+    [Fact]
+    public void OfImage_StillImage_IsTheWholeImagesScaling()
+    {
+        Assert.Equal(BattlerScaling.Of(new Point(256, 256)), BattlerScaling.OfImage(new Point(256, 256), null));
+    }
+
+    // As the battle draws the repository's enemy: an animated one's frame, a still one's whole image.
+    private static BattlerScaling ScalingOfBattlerOf(string enemyId)
+    {
+        var enemy = BattleScenarios.Catalog.Enemies[enemyId];
+        var path = Path.Combine(AppContext.BaseDirectory, "content", "art", "battlers", enemy.BattleSpriteFile);
+        var (width, height) = PngSize.Read(path);
+        return BattlerScaling.OfImage(new Point(width, height), enemy.IdleAnimation);
     }
 }

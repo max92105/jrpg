@@ -17,7 +17,11 @@ public sealed class BattlerArtTests
 
         var art = BattlerArt.Of(Combatant.FromEnemy(goblin));
 
-        Assert.Equal(new BattlerArt(goblin.BattleSpriteFile, true, goblin.PortraitFile, goblin.AttackEffectFile), art);
+        var expected = new BattlerArt(goblin.BattleSpriteFile, true, goblin.PortraitFile, goblin.AttackEffectFile)
+        {
+            IdleAnimation = goblin.IdleAnimation,
+        };
+        Assert.Equal(expected, art);
     }
 
     [Fact]

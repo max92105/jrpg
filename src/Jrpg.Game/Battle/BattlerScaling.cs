@@ -1,3 +1,4 @@
+using Jrpg.Core.Maps;
 using Microsoft.Xna.Framework;
 
 namespace Jrpg.Game.Battle;
@@ -29,4 +30,12 @@ internal readonly record struct BattlerScaling(Point DrawnSize, bool IsShrunkSmo
         Math.Max(sourceSize.X, sourceSize.Y) > LargestPixelArt
             ? new(new Point(PaintingSize, PaintingSize), true)
             : new(new Point(sourceSize.X / PixelArtDivisor, sourceSize.Y / PixelArtDivisor), false);
+
+    /// <summary>
+    /// A battle image as the battle draws it: one frame at its own size while it loops, else the whole image.
+    /// </summary>
+    /// <param name="imageSize">The whole image's width and height in pixels.</param>
+    /// <param name="idleLoop">Its idle loop, whose frames share the image's width; null for a still image.</param>
+    public static BattlerScaling OfImage(Point imageSize, TileAnimation? idleLoop) =>
+        idleLoop is { } loop ? AtOwnSize(new Point(imageSize.X / loop.FrameCount, imageSize.Y)) : Of(imageSize);
 }

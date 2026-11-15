@@ -165,11 +165,8 @@ internal sealed class BattlersView
     private static Rectangle AreaOn(Rectangle spot, Point size) =>
         new(spot.Center.X - (size.X / 2), spot.Bottom - size.Y, size.X, size.Y);
 
-    // An animated strip's frame is the image's width shared by its frames, at its own size (decision 637).
     private static BattlerScaling ScalingOf(Texture2D source, BattlerArt art) =>
-        art.IdleAnimation is { } loop
-            ? BattlerScaling.AtOwnSize(new Point(source.Width / loop.FrameCount, source.Height))
-            : BattlerScaling.Of(new Point(source.Width, source.Height));
+        BattlerScaling.OfImage(new Point(source.Width, source.Height), art.IdleAnimation);
 
     // The shown frame's part of a strip; null for a still battler, drawn whole.
     private Rectangle? FrameRectangle(int index, BattlerArt art, Point frameSize) =>

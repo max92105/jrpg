@@ -33,7 +33,7 @@ internal sealed partial class EventListViewModel : ObservableObject
         OnlyWhenChoices = ["", .. choices.ObjectIds];
         LeaderChoices = ["", .. choices.MemberIds];
         QuestChoices = ["", .. choices.QuestIds];
-        PresetQuestId = choices.QuestIds.Count > 0 ? choices.QuestIds[0] : "";
+        PresetChoices = PresetMenu(choices);
         SelectedEvent = Events.Count > 0 ? Events[0] : null;
     }
 
@@ -57,11 +57,10 @@ internal sealed partial class EventListViewModel : ObservableObject
     public IReadOnlyList<QuestConditionKindChoice> ConditionKinds { get; } = QuestConditionKindChoice.All;
 
     /// <summary>
-    /// The quest the Quest giver preset offers (decision 588): the first by id, empty while none exists.
+    /// The Preset drop-down's entries (decision 731): the fixed presets under their groups, then a quest giver entry
+    /// per quest in id order, or one greyed entry while no quest exists.
     /// </summary>
-    [ObservableProperty]
-    [NotifyCanExecuteChangedFor(nameof(ApplyQuestGiverPresetCommand))]
-    public partial string PresetQuestId { get; set; }
+    public IReadOnlyList<DropDownChoice> PresetChoices { get; }
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(RemoveEventCommand), nameof(MoveEventUpCommand), nameof(MoveEventDownCommand))]
@@ -113,10 +112,29 @@ internal sealed partial class EventListViewModel : ObservableObject
     [RelayCommand]
     private void ApplyShopkeeperPreset() => ApplyPreset(EventPresets.Shopkeeper(IdAllocation()));
 
-    [RelayCommand(CanExecute = nameof(HasPresetQuest))]
-    private void ApplyQuestGiverPreset() => ApplyPreset(EventPresets.QuestGiver(IdAllocation(), PresetQuestId));
+    // The offer and the reminder for the quest of the chosen entry (decision 588); the entry shown while no quest
+    // exists hands it the empty id and stays greyed.
+    [RelayCommand(CanExecute = nameof(IsQuestId))]
+    private void ApplyQuestGiverPreset(string? questId) => ApplyPreset(EventPresets.QuestGiver(IdAllocation(), questId!));
 
-    private bool HasPresetQuest() => PresetQuestId.Length > 0;
+    private static bool IsQuestId(string? questId) => !string.IsNullOrEmpty(questId);
+
+    private List<DropDownChoice> PresetMenu(StepChoices choices) =>
+    [
+        DropDownChoice.Title("OBJECTS"),
+        new("Chest", ApplyChestPresetCommand, null),
+        new("Door", ApplyDoorPresetCommand, null),
+        new("Door you open", ApplyDoorYouOpenPresetCommand, null),
+        new("Sign", ApplySignPresetCommand, null),
+        DropDownChoice.Title("PEOPLE"),
+        new("Talk", ApplyTalkPresetCommand, null),
+        new("Forge master", ApplyForgeMasterPresetCommand, null),
+        new("Shopkeeper", ApplyShopkeeperPresetCommand, null),
+        DropDownChoice.Title("QUEST GIVER"),
+        .. choices.QuestIds.Count > 0
+            ? choices.QuestIds.Select(id => new DropDownChoice($"Quest giver: {id}", ApplyQuestGiverPresetCommand, id))
+            : [new DropDownChoice("Quest giver (no quest yet)", ApplyQuestGiverPresetCommand, "")],
+    ];
 
     // Replaces every event, and shows the first field the preset leaves to fill in.
     private void ApplyPreset(IReadOnlyList<MapEvent> presetEvents)

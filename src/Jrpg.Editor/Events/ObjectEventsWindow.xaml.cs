@@ -41,6 +41,8 @@ internal sealed partial class ObjectEventsWindow : Window
         }
     }
 
+    private void OnPresetClicked(object sender, RoutedEventArgs e) => DropDownMenu.Open(PresetButton);
+
     // A number left half typed keeps the dialog open, saying which event and step it is in.
     private void OnOkClicked(object sender, RoutedEventArgs e)
     {

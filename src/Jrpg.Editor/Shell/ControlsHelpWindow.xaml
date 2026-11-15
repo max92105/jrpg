@@ -101,7 +101,8 @@
 
       <TextBlock Style="{StaticResource Heading}" Text="Events" />
       <TextBlock Style="{StaticResource Lines}">
-        Click an object: edit its events. Presets: Chest, Door, Door you open, Sign, and Talk (an NPC: type its speaker and lines).<LineBreak />
+        Click an object: edit its events.<LineBreak />
+        Preset ▾ (over the event list): replaces the object's events with a usual set: Objects (Chest, Door, Door you open, Sign), People (Talk, Forge master, Shopkeeper), or a Quest giver for one quest (an offer while not started, a reminder while active; what the NPC says once it is completed is a third event to add); the first field left to fill is shown, and Cancel brings the old events back.<LineBreak />
         Click a cell without an object: edit the event that runs when the player walks onto it.<LineBreak />
         Right click a cell without an object: remove its event.<LineBreak />
         Ctrl + click: the event of the cell under any object (a new one when it has none); Ctrl + right click: remove it (a plain right click never removes an event hidden under an object).<LineBreak />

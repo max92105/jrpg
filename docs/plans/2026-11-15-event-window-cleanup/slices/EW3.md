@@ -69,3 +69,8 @@ None.
 5. The greyed "Quest giver (no quest yet)" entry is left to `PresetChoices_NoQuest_QuestGiverEntryCannotRun`: the
    repository's draft has quests.
 6. **F1**: the Preset line.
+
+- **Done, with deviations:** as planned, plus `ApplyQuestGiverPresetCommand_AQuest_CanExecute` (the rule's other
+  side). The smoke script opened both event windows with no binding-error line; its capture isn't opened by an agent
+  (it can show the map's sheets at its edges), so the heading row's look is the developer's hand check with steps 2
+  to 6.

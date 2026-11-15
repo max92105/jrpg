@@ -6,8 +6,8 @@ using Jrpg.Core.Trade;
 namespace Jrpg.Editor.Catalogs;
 
 /// <summary>
-/// The catalogs the Database windows edit (ADR 0045): the shops, the enemies, the drop tables and the cinematics, the
-/// whole session of each window recorded as one undo step.
+/// The catalogs the Database windows edit (ADR 0045): the shops, the enemies, the drop tables, the cinematics and the
+/// effect strips, the whole session of each window recorded as one undo step.
 /// </summary>
 internal sealed partial class CatalogDraft
 {
@@ -26,6 +26,22 @@ internal sealed partial class CatalogDraft
         }
 
         Do(new CatalogEdit(catalog => catalog with { DropTables = after }, catalog => catalog with { DropTables = before }));
+    }
+
+    /// <summary>
+    /// Replaces the effect strips' records as one undo step (decision 659); nothing when they are the same by content.
+    /// No undo refusal: nothing refers to a record, a strip is named by its file.
+    /// </summary>
+    public void SetEffectStrips(IReadOnlyList<EffectStripDefinition> strips)
+    {
+        var before = Current.EffectStrips;
+        var after = strips.ToDictionary(strip => strip.File, StringComparer.Ordinal);
+        if (HasSameRecords(before, after, EqualityComparer<EffectStripDefinition>.Default.Equals))
+        {
+            return;
+        }
+
+        Do(new CatalogEdit(catalog => catalog with { EffectStrips = after }, catalog => catalog with { EffectStrips = before }));
     }
 
     /// <summary>

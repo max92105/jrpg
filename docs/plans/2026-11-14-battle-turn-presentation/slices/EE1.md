@@ -31,3 +31,8 @@ undo step, compared by content. No window yet (EE2-EE4).
 
 ## Verify by hand
 None: no window yet. EE4's hand check saves through this.
+
+- **Done, with deviations:** `CatalogProblems.OfEffectStrips(strips)` takes the list alone, as `OfCinematics` does:
+  the validator reads nothing else of the catalog. The writer test writes through `WriteMapCatalogs`.
+  Review: a Critical fixed: `ContentWriterRepositoryTests` now compares `effect-strips.json` byte for byte with the
+  others. The writer's comment says the strips sort by file; their sorter follows the cinematics' as in the lists.

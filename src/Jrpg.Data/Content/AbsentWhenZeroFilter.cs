@@ -20,6 +20,8 @@ internal static class AbsentWhenZeroFilter
         (typeof(FieldSpriteSheet), "feetPixels"),
         // Decision 586: only the HP condition kinds read a percent; the fallen one leaves it at 0.
         (typeof(TacticCondition), "percent"),
+        // ADR 0048: most strips land their hit on their first frame.
+        (typeof(EffectStripDefinition), "hitFrame"),
     ];
 
     public static void SkipZeroOptionalFields(JsonTypeInfo typeInfo) =>

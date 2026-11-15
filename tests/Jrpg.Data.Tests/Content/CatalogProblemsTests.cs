@@ -107,6 +107,20 @@ public sealed class CatalogProblemsTests
     }
 
     [Fact]
+    public void OfEffectStrips_FileListedTwice_NamesIt()
+    {
+        var burst = new EffectStripDefinition { File = "Burst.png", FrameMilliseconds = 60 };
+
+        var problem = CatalogProblems.OfEffectStrips([burst, burst with { HitFrame = 1 }]);
+
+        Assert.Equal("effect-strips.json: effect strip id 'Burst.png' is used more than once.", problem);
+    }
+
+    [Fact]
+    public void OfEffectStrips_ValidList_IsNone() =>
+        Assert.Null(CatalogProblems.OfEffectStrips([new EffectStripDefinition { File = "Burst.png", FrameMilliseconds = 60 }]));
+
+    [Fact]
     public void OfCinematics_Valid_IsNull() => Assert.Null(CatalogProblems.OfCinematics([IntroZoomingTo(120)]));
 
     [Fact]

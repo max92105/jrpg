@@ -71,7 +71,8 @@ public sealed class ContentWriterRepositoryTests : IDisposable
          .. File.ReadAllBytes(_content.PathOf("shops.json")),
          .. File.ReadAllBytes(_content.PathOf("enemies.json")),
          .. File.ReadAllBytes(_content.PathOf("drop-tables.json")),
-         .. File.ReadAllBytes(_content.PathOf("cinematics.json"))];
+         .. File.ReadAllBytes(_content.PathOf("cinematics.json")),
+         .. File.ReadAllBytes(_content.PathOf("effect-strips.json"))];
 
     // Both files one after the other, compared byte for byte: line endings and encoding count.
     private byte[] MapFileBytes(string mapId) =>

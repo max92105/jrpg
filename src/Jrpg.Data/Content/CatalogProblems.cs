@@ -37,6 +37,12 @@ public static class CatalogProblems
         FirstProblem(() => CheckCinematics(cinematics));
 
     /// <summary>
+    /// The first problem in the effect strips' records (ADR 0048), as the loader words it; null when none.
+    /// </summary>
+    public static string? OfEffectStrips(IReadOnlyList<EffectStripDefinition> strips) =>
+        FirstProblem(() => CheckEffectStrips(strips));
+
+    /// <summary>
     /// The first problem in the shops (ADR 0031, ADR 0045): a shop's own rule, or an item it sells that the content
     /// doesn't price; null when the loader would take them.
     /// </summary>
@@ -80,6 +86,13 @@ public static class CatalogProblems
     /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
     internal static void CheckCinematics(IReadOnlyList<CinematicDefinition> cinematics) =>
         CinematicCatalogValidator.Validate(ContentCatalogLoader.CinematicsFile, cinematics);
+
+    /// <summary>
+    /// The checks the loader makes on <c>effect-strips.json</c>, for the writer and the problem line alike.
+    /// </summary>
+    /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
+    internal static void CheckEffectStrips(IReadOnlyList<EffectStripDefinition> strips) =>
+        EffectStripCatalogValidator.Validate(ContentCatalogLoader.EffectStripsFile, strips);
 
     /// <summary>The checks the loader makes on <c>shops.json</c>, for the writer and the problem line alike.</summary>
     /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>

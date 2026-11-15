@@ -28,9 +28,11 @@ public sealed partial class ContentWriter
         CatalogProblems.CheckDropTables(SortedDropTables(catalog), catalog);
         CatalogProblems.CheckEnemies(SortedEnemies(catalog), catalog);
         CatalogProblems.CheckCinematics(SortedCinematics(catalog));
+        CatalogProblems.CheckEffectStrips(SortedEffectStrips(catalog));
     }
 
-    // Each catalog file's bytes as it would be written, sorted by id: what the stamps compare and the writes carry.
+    // Each catalog file's bytes as it would be written, sorted by id (the effect strips by file): what the stamps
+    // compare and the writes carry.
     private static List<CatalogWrite> SerializedCatalogs(ContentCatalog catalog) =>
     [
         new(ContentCatalogLoader.TilesheetsFile, ContentFileWriter.Serialize(SortedSheets(catalog))),
@@ -42,6 +44,7 @@ public sealed partial class ContentWriter
         new(ContentCatalogLoader.EnemiesFile, ContentFileWriter.Serialize(SortedEnemies(catalog))),
         new(ContentCatalogLoader.DropTablesFile, ContentFileWriter.Serialize(SortedDropTables(catalog))),
         new(ContentCatalogLoader.CinematicsFile, ContentFileWriter.Serialize(SortedCinematics(catalog))),
+        new(ContentCatalogLoader.EffectStripsFile, ContentFileWriter.Serialize(SortedEffectStrips(catalog))),
     ];
 
     private static List<TilesheetDefinition> SortedSheets(ContentCatalog catalog) =>
@@ -69,6 +72,9 @@ public sealed partial class ContentWriter
 
     private static List<CinematicDefinition> SortedCinematics(ContentCatalog catalog) =>
         [.. catalog.Cinematics.Values.OrderBy(cinematic => cinematic.Id, StringComparer.Ordinal)];
+
+    private static List<EffectStripDefinition> SortedEffectStrips(ContentCatalog catalog) =>
+        [.. catalog.EffectStrips.Values.OrderBy(strip => strip.File, StringComparer.Ordinal)];
 
     // A catalog file's name and its bytes as they will be written.
     private sealed record CatalogWrite(string File, byte[] Bytes);

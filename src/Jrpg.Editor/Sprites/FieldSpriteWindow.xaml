@@ -94,15 +94,15 @@
         <TextBlock Text="Walk rows (as numbered on the image)" Margin="0,8,0,0" />
         <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
           <TextBlock Text="Down" Style="{StaticResource FieldLabel}" />
-          <ComboBox Style="{StaticResource RowBox}" ItemsSource="{Binding RowChoices}" SelectedIndex="{Binding Walk.DownRow, Converter={StaticResource RowIndex}}" />
+          <ComboBox Style="{StaticResource RowBox}" ItemsSource="{Binding RowChoices}" SelectedIndex="{Binding Walk.Down.Row, Converter={StaticResource RowIndex}}" />
           <TextBlock Text="Up" Margin="12,0,8,0" VerticalAlignment="Center" />
-          <ComboBox Style="{StaticResource RowBox}" ItemsSource="{Binding RowChoices}" SelectedIndex="{Binding Walk.UpRow, Converter={StaticResource RowIndex}}" />
+          <ComboBox Style="{StaticResource RowBox}" ItemsSource="{Binding RowChoices}" SelectedIndex="{Binding Walk.Up.Row, Converter={StaticResource RowIndex}}" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
           <TextBlock Text="Left" Style="{StaticResource FieldLabel}" />
-          <ComboBox Style="{StaticResource RowBox}" ItemsSource="{Binding RowChoices}" SelectedIndex="{Binding Walk.LeftRow, Converter={StaticResource RowIndex}}" />
+          <ComboBox Style="{StaticResource RowBox}" ItemsSource="{Binding RowChoices}" SelectedIndex="{Binding Walk.Left.Row, Converter={StaticResource RowIndex}}" />
           <TextBlock Text="Right" Margin="12,0,8,0" VerticalAlignment="Center" />
-          <ComboBox Style="{StaticResource RowBox}" ItemsSource="{Binding RowChoices}" SelectedIndex="{Binding Walk.RightRow, Converter={StaticResource RowIndex}}" />
+          <ComboBox Style="{StaticResource RowBox}" ItemsSource="{Binding RowChoices}" SelectedIndex="{Binding Walk.Right.Row, Converter={StaticResource RowIndex}}" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
           <TextBlock Text="Walk frames" Style="{StaticResource FieldLabel}" />

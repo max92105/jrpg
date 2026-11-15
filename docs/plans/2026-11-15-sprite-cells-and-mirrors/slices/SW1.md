@@ -55,3 +55,8 @@ The window shows the sheets, so the visual step is the developer's; the implemen
 1. (Developer) `dotnet run --project src/Jrpg.Editor`, NPCs > Character sprites..., choose `player.png`: the boxes show
    rows 1-4 as before; change Down's row and back; OK is lit; Cancel.
 2. (Implementer) Run `.claude/scripts/open-editor-windows.ps1`: no `ERROR` line. Read only its lines.
+
+- **Done, with deviations:** as planned, plus `ProblemWithin_RowPastTheRowsOnRow_NamesIt` (the other side of the
+  read-only rule). The copy test's fixture record gains Right mirroring Left for `CopySetupFrom_SourceWithMirror_CopiesIt`;
+  `FieldSpriteCatalogViewModelTests` named no row property, so only `FieldSpriteSetupViewModelTests` moved to
+  `Walk.Down.Row`. `ForNew` already went through `CopyFrom`, unchanged. Hand check step 1 is the developer's.

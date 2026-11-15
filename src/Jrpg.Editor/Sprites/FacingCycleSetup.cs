@@ -1,65 +1,89 @@
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Sprites;
 
 namespace Jrpg.Editor.Sprites;
 
 /// <summary>
-/// One loop of a sprite sheet as typed in the setup (ADR 0043): the row each facing walks on, from 0 (the view counts
-/// them from 1, decision 568), the walk's frame count and the time each frame shows.
+/// A sheet's walk as typed in the setup (ADRs 0043, 0054): each facing's row and what it reads (its row, cells or a
+/// mirror, <see cref="FacingSetup"/>), the walk's frame count and the time each frame shows. A change in a facing is
+/// raised under that facing's property name, so the setup's relay sees every typed change.
 /// </summary>
 internal sealed partial class FacingCycleSetup : ObservableObject
 {
-    [ObservableProperty]
-    public partial int DownRow { get; set; }
+    public FacingCycleSetup()
+    {
+        foreach (var facing in AllFacings)
+        {
+            facing.PropertyChanged += OnFacingChanged;
+        }
+    }
 
-    [ObservableProperty]
-    public partial int UpRow { get; set; }
+    public FacingSetup Down { get; } = new(Facing.Down);
 
-    [ObservableProperty]
-    public partial int LeftRow { get; set; }
+    public FacingSetup Up { get; } = new(Facing.Up);
 
-    [ObservableProperty]
-    public partial int RightRow { get; set; }
+    public FacingSetup Left { get; } = new(Facing.Left);
 
-    /// <summary>The frames walked through from column 0, at least <see cref="TileAnimation.MinFrames"/>.</summary>
+    public FacingSetup Right { get; } = new(Facing.Right);
+
+    /// <summary>The frames a row walks through from column 0, at least <see cref="TileAnimation.MinFrames"/>.</summary>
     [ObservableProperty]
     public partial int Frames { get; set; }
 
     [ObservableProperty]
     public partial int FrameMilliseconds { get; set; }
 
-    /// <summary>Takes a record's loop as the typed values.</summary>
+    // In the order the problem line checks them.
+    private FacingSetup[] AllFacings => [Down, Up, Left, Right];
+
+    /// <summary>Takes a record's loop as the typed values, each facing's sequence included.</summary>
     public void CopyFrom(FacingCycle cycle)
     {
-        DownRow = cycle.Rows.Down;
-        UpRow = cycle.Rows.Up;
-        LeftRow = cycle.Rows.Left;
-        RightRow = cycle.Rows.Right;
+        foreach (var facing in AllFacings)
+        {
+            facing.CopyFrom(cycle.Rows.RowOf(facing.Facing), cycle.Sequences?.Of(facing.Facing));
+        }
+
         Frames = cycle.Frames.FrameCount;
         FrameMilliseconds = cycle.Frames.FrameMilliseconds;
     }
 
     /// <summary>
-    /// Why the loop doesn't fit a sheet cut in this many columns and rows, or null: a facing's row past the rows, or
-    /// more frames than columns. Data's own rules (a count below its floor) are its message's, through the catalog.
+    /// Why the loop doesn't fit a sheet cut in this many columns and rows, or null: a facing's problem (its row past
+    /// the rows, its cells), then more frames than columns, only while some facing reads its row (decision 767). Data's
+    /// own rules (a count below its floor, a mirror's) are its message's, through the catalog.
     /// </summary>
-    public string? ProblemWithin(int columns, int rows)
-    {
-        foreach (var (name, row) in new[] { ("down", DownRow), ("up", UpRow), ("left", LeftRow), ("right", RightRow) })
-        {
-            if (row < 0 || row >= rows)
-            {
-                return $"The {name} row must be within 1..{rows} (was {row + 1}).";
-            }
-        }
+    public string? ProblemWithin(int columns, int rows) =>
+        AllFacings.Select(facing => facing.ProblemWithin(columns, rows)).FirstOrDefault(problem => problem is not null)
+        ?? (Frames > columns && AllFacings.Any(facing => facing.Source == FacingSource.Row)
+            ? $"The walk's {Frames} frames don't fit in {columns} columns."
+            : null);
 
-        return Frames > columns ? $"The walk's {Frames} frames don't fit in {columns} columns." : null;
-    }
-
+    /// <summary>The record's loop: every facing's row, and sequences only when some facing overrides its row.</summary>
     public FacingCycle ToCycle() => new()
     {
-        Rows = new FacingRows { Down = DownRow, Up = UpRow, Left = LeftRow, Right = RightRow },
+        Rows = new FacingRows { Down = Down.Row, Up = Up.Row, Left = Left.Row, Right = Right.Row },
         Frames = new TileAnimation { FrameCount = Frames, FrameMilliseconds = FrameMilliseconds },
+        Sequences = AllFacings.All(facing => facing.Source == FacingSource.Row)
+            ? null
+            : new FacingSequences
+            {
+                Down = Down.ToSequence(),
+                Up = Up.ToSequence(),
+                Left = Left.ToSequence(),
+                Right = Right.ToSequence(),
+            },
     };
+
+    private void OnFacingChanged(object? sender, PropertyChangedEventArgs e) =>
+        OnPropertyChanged(((FacingSetup)sender!).Facing switch
+        {
+            Facing.Down => nameof(Down),
+            Facing.Up => nameof(Up),
+            Facing.Left => nameof(Left),
+            _ => nameof(Right),
+        });
 }

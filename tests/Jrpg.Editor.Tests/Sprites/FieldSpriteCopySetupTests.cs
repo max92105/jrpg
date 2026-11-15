@@ -1,4 +1,5 @@
 using Jrpg.Core.Content;
+using Jrpg.Core.Geometry;
 using Jrpg.Core.Sprites;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
@@ -8,8 +9,8 @@ namespace Jrpg.Editor.Tests.Sprites;
 
 /// <summary>
 /// Copy setup from... (decision 570): a second character from the same pack takes the first one's layout. The test
-/// world's placeholder record is changed to a bought shape (32 px frames at scale 3, 4 frames at 150 ms, feet 2) so the
-/// copy has numbers to carry.
+/// world's placeholder record is changed to a bought shape (32 px frames at scale 3, 4 frames at 150 ms, feet 2, Right
+/// mirroring Left) so the copy has numbers and a walk to carry.
 /// </summary>
 public sealed class FieldSpriteCopySetupTests
 {
@@ -42,7 +43,11 @@ public sealed class FieldSpriteCopySetupTests
             FrameHeight = 32,
             Scale = 3,
             FeetPixels = 2,
-            Walk = placeholder.Walk with { Frames = placeholder.Walk.Frames with { FrameCount = 4, FrameMilliseconds = 150 } },
+            Walk = placeholder.Walk with
+            {
+                Frames = placeholder.Walk.Frames with { FrameCount = 4, FrameMilliseconds = 150 },
+                Sequences = new FacingSequences { Right = new FacingSequence { MirrorOf = Facing.Left } },
+            },
         };
         var sheets = new Dictionary<string, FieldSpriteSheet>(_catalog.FieldSprites, StringComparer.Ordinal);
         sheets[Placeholder] = bought;
@@ -95,6 +100,16 @@ public sealed class FieldSpriteCopySetupTests
         _window.Setup!.Scale = 2;
 
         Assert.Null(_window.Problem);
+    }
+
+    // Decision 570 copies the walk whole: a facing's mirror goes with it (ADR 0054).
+    [Fact]
+    public void CopySetupFrom_SourceWithMirror_CopiesIt()
+    {
+        _window.CopySetupFrom(Placeholder);
+
+        var right = _window.Setup!.Walk.Right;
+        Assert.Equal((FacingSource.Mirror, Facing.Left), (right.Source, right.MirrorOf));
     }
 
     [Fact]

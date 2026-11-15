@@ -83,7 +83,7 @@ public sealed class FieldSpriteSetupViewModelTests
     {
         var walk = FieldSpriteSetupViewModel.ForNew(Bought, _boughtSize, _draft).Walk;
 
-        Assert.Equal((0, 1, 2, 3), (walk.DownRow, walk.LeftRow, walk.RightRow, walk.UpRow));
+        Assert.Equal((0, 1, 2, 3), (walk.Down.Row, walk.Left.Row, walk.Right.Row, walk.Up.Row));
         Assert.Equal((4, FieldSpriteSetupViewModel.NewFrameMilliseconds), (walk.Frames, walk.FrameMilliseconds));
     }
 
@@ -95,7 +95,7 @@ public sealed class FieldSpriteSetupViewModelTests
         var walk = setup.Walk;
         Assert.Equal((8, 6, 48, 48), (setup.Columns, setup.Rows, setup.FrameWidth, setup.FrameHeight));
         Assert.Equal((1, 0), (setup.Scale, setup.FeetPixels));
-        Assert.Equal((0, 1, 2, 3), (walk.DownRow, walk.LeftRow, walk.RightRow, walk.UpRow));
+        Assert.Equal((0, 1, 2, 3), (walk.Down.Row, walk.Left.Row, walk.Right.Row, walk.Up.Row));
         Assert.Equal((8, 100), (walk.Frames, walk.FrameMilliseconds));
     }
 
@@ -117,7 +117,7 @@ public sealed class FieldSpriteSetupViewModelTests
     {
         var setup = PlayerSetup();
 
-        setup.Walk.UpRow = 6;
+        setup.Walk.Up.Row = 6;
 
         Assert.Equal("The up row must be within 1..6 (was 7).", setup.Problem);
     }
@@ -161,7 +161,7 @@ public sealed class FieldSpriteSetupViewModelTests
         var raised = new List<string?>();
         setup.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
 
-        setup.Walk.LeftRow = 9;
+        setup.Walk.Left.Row = 9;
 
         Assert.Contains(nameof(FieldSpriteSetupViewModel.Problem), raised);
         Assert.NotNull(setup.Problem);

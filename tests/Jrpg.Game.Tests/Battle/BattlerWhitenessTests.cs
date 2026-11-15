@@ -24,25 +24,52 @@ public sealed class BattlerWhitenessTests
         var fallen = Combatant.FromEnemy(StartMapScenarios.TestWorld.Enemies["goblin"]);
         fallen.Vitals.TakeDamage(9999);
 
-        Assert.Equal(Strength, BattlerWhiteness.Of(fallen, AttackAtTheFirstBlink()));
+        Assert.Equal(Strength, BattlerWhiteness.Of(fallen, AttackAtTheFirstBlink(), 0));
     }
 
     [Fact]
     public void Of_ActorMidBlink_IsTheBlinksWhite()
     {
-        Assert.Equal(Strength, BattlerWhiteness.Of(_sarxian, AttackAtTheFirstBlink()));
+        Assert.Equal(Strength, BattlerWhiteness.Of(_sarxian, AttackAtTheFirstBlink(), 0));
     }
 
     [Fact]
     public void Of_Bystander_IsNone()
     {
-        Assert.Equal(0, BattlerWhiteness.Of(_goblin, AttackAtTheFirstBlink()));
+        Assert.Equal(0, BattlerWhiteness.Of(_goblin, AttackAtTheFirstBlink(), 0));
     }
 
     [Fact]
     public void Of_NoWindUp_IsNone()
     {
-        Assert.Equal(0, BattlerWhiteness.Of(_sarxian, null));
+        Assert.Equal(0, BattlerWhiteness.Of(_sarxian, null, 0));
+    }
+
+    [Fact]
+    public void Of_WashedBystander_IsTheWash()
+    {
+        Assert.Equal(0.3f, BattlerWhiteness.Of(_goblin, AttackAtTheFirstBlink(), 0.3f));
+    }
+
+    [Fact]
+    public void Of_BlinkingActorWashed_IsTheStronger()
+    {
+        Assert.Equal(Strength, BattlerWhiteness.Of(_sarxian, AttackAtTheFirstBlink(), 0.3f));
+    }
+
+    [Fact]
+    public void Of_NoWindUpWashed_IsTheWash()
+    {
+        Assert.Equal(0.3f, BattlerWhiteness.Of(_sarxian, null, 0.3f));
+    }
+
+    [Fact]
+    public void Of_FallenWashed_IsTheFallensWhite()
+    {
+        var fallen = Combatant.FromEnemy(StartMapScenarios.TestWorld.Enemies["goblin"]);
+        fallen.Vitals.TakeDamage(9999);
+
+        Assert.Equal(Strength, BattlerWhiteness.Of(fallen, null, 0.3f));
     }
 
     private static ActionWindUp AttackAtTheFirstBlink()

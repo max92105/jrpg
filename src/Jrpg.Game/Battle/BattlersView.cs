@@ -11,7 +11,8 @@ namespace Jrpg.Game.Battle;
 /// Draws every living battler at its spot in the formation, centered on it with its feet on the spot's bottom, the
 /// party actor stepped out toward the enemies; an animated enemy loops its strip's frames
 /// (<see cref="BattlerFrames"/>). The actor blinks white twice as its action winds up, a soft spill past its outline
-/// each time (decision 648); whoever falls, party member or enemy, is lit white, then fades out.
+/// each time (decision 648); whoever falls, party member or enemy, is lit white, then fades out. On an impact the
+/// battlers near where damage landed are washed white with the flash (decision 660).
 /// </summary>
 internal sealed class BattlersView
 {
@@ -186,11 +187,36 @@ internal sealed class BattlersView
         var white = new WhiteLayer(_ui.WhiteSilhouette(textures, image), area, frame, effects);
         DrawSpill(batch, white, opacity * SpillShare * (_sequence.WindUp?.BlinkOf(combatant) ?? 0));
         batch.Draw(image, area, frame, Color.White * opacity, 0, Vector2.Zero, effects, 0);
-        var whiteness = BattlerWhiteness.Of(combatant, _sequence.WindUp);
+        var whiteness = BattlerWhiteness.Of(combatant, _sequence.WindUp, WashAt(textures, area.Center));
         if (whiteness > 0)
         {
             white.Draw(batch, Point.Zero, opacity * whiteness);
         }
+    }
+
+    // The nearest hit target's share of the wash at a battler's drawn center, by the distance to the target's.
+    private float WashAt(TextureLibrary textures, Point battlerCenter)
+    {
+        if (_sequence.Playback is not { Strips.Count: > 0 } playback)
+        {
+            return 0;
+        }
+
+        var wash = ImpactLight.At(playback.Elapsed).Wash;
+        if (wash <= 0)
+        {
+            return 0;
+        }
+
+        var center = battlerCenter.ToVector2();
+        var strongest = 0f;
+        for (var index = 0; index < playback.Strips.Count; index++)
+        {
+            var target = AreaOf(textures, playback.Strips[index].Target).Center.ToVector2();
+            strongest = Math.Max(strongest, ImpactLight.WashAt(Vector2.Distance(center, target), wash));
+        }
+
+        return strongest;
     }
 
     private static void DrawSpill(SpriteBatch batch, WhiteLayer white, float strength)

@@ -41,5 +41,6 @@ green copy shifted right and a blue copy in place, before the numbers.
 - The HUD and the damage numbers are never fringed or washed: they draw after the effects.
 - A whole-frame effect (a real bloom, a screen-wide aberration) would need option B or C; this ADR would then be
   superseded.
-- Each additive batch is a `SpriteBatch.Begin` with `BlendState.Additive`, so the draw calls grow by one batch per light
-  while it plays.
+- Each light batch is a `SpriteBatch.Begin` adding premultiplied colors as they are (`VirtualScreen.BeginLightBatch`, a
+  One/One blend: `BlendState.Additive` multiplies by alpha again and would square a fade), so the draw calls grow by
+  one batch per light while it plays.

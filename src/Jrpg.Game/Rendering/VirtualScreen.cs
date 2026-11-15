@@ -13,11 +13,28 @@ internal static class VirtualScreen
     public const int Width = 1920;
     public const int Height = 1080;
 
+    // MonoGame's BlendState.Additive multiplies the source by its alpha again, which squares a premultiplied color's
+    // fade; light added as it is fades as its color does. Never changed once made, and the device takes it as is.
+    private static readonly BlendState _addedLight = new()
+    {
+        ColorSourceBlend = Blend.One,
+        AlphaSourceBlend = Blend.One,
+        ColorDestinationBlend = Blend.One,
+        AlphaDestinationBlend = Blend.One,
+    };
+
     /// <summary>
     /// Begins the batch that draws the scenes onto the virtual screen: point-sampled, so pixel art stays crisp. A view
     /// that ends it midway, as the shatter does, begins it again with this.
     /// </summary>
     public static void BeginBatch(SpriteBatch batch) => batch.Begin(samplerState: SamplerState.PointClamp);
+
+    /// <summary>
+    /// Begins a batch that adds light over what is drawn (ADR 0049): premultiplied colors added as they are, sampled
+    /// linearly, as soft light is never pixel art. The caller ends it, then begins <see cref="BeginBatch"/> again.
+    /// </summary>
+    public static void BeginLightBatch(SpriteBatch batch) =>
+        batch.Begin(blendState: _addedLight, samplerState: SamplerState.LinearClamp);
 
     /// <summary>Where the virtual screen lands in the window, centered.</summary>
     public static Rectangle DestinationIn(Rectangle window)

@@ -34,6 +34,7 @@ internal sealed class BattleScene : IScene
     private readonly FloatingNumbersView _numbers;
     private readonly ImpactEffectsView _impactEffects;
     private readonly SwingView _swing;
+    private readonly ImpactLightView _impactLight;
     private ActionWindUp? _shownWindUp;
     private (int Turn, TurnStage Stage) _shown;
     private bool _isFinished;
@@ -69,6 +70,7 @@ internal sealed class BattleScene : IScene
         _numbers = new FloatingNumbersView(_sequence, _battlers, _enemyTags, text);
         _impactEffects = new ImpactEffectsView(_sequence, _battlers, session.Catalog.EffectStrips, text);
         _swing = new SwingView(_sequence, _battlers, session.Catalog.EffectStrips);
+        _impactLight = new ImpactLightView(_sequence);
     }
 
     public IReadOnlyList<string> Sounds => _sounds.Files;
@@ -134,6 +136,8 @@ internal sealed class BattleScene : IScene
             return;
         }
 
+        // Before the enemy tags, so the flash lights the battlefield and never the HUD over it (ADR 0049).
+        _impactLight.DrawOverTheBattlers(batch, textures);
         _enemyTags.Draw(batch, textures);
         _impactEffects.Draw(batch, textures);
         _swing.Draw(batch, textures);

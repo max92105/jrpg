@@ -78,6 +78,11 @@ internal static partial class UiTheme
     /// </summary>
     public static Color BannerPlaque { get; } = FromStraightArgb(0xD9101320);
 
+    /// <summary>
+    /// The impact's warm light (decision 660): an orange-white added over the battlefield, scaled by the flash.
+    /// </summary>
+    public static Color ImpactWarmth { get; } = FromStraightArgb(0xFFFFC890);
+
     /// <summary>The battle banner's dark band, fading out at both ends.</summary>
     public static ImmutableArray<GradientStop> Banner { get; } =
         [new(0, FromStraightArgb(0x00101320)), new(0.25f, FromStraightArgb(0xE6101320)), new(0.75f, FromStraightArgb(0xE6101320)), new(1, FromStraightArgb(0x00101320))];

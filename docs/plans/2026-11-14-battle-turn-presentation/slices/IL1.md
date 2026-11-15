@@ -44,3 +44,12 @@ heal, a miss or a status alone lights nothing. One warm color for every impact.
    white over it.
 2. A heal or a miss: no flash.
 3. F12 on the impact frame (a few tries) and compare with the clip's frames #77-#80.
+
+- **Done, with deviations:** `ImpactLightView` takes only the sequence for now (IL2 adds the battlers and the textures
+  when the floor glow and the halo need them). `VirtualScreen.BeginLightBatch` adds premultiplied colors as they are
+  (One, One): MonoGame's `BlendState.Additive` multiplies by alpha again and would square the fade. The flash holds at
+  its height to 0.1 s, then falls linearly to 0 at 0.2 s; `ImpactWarmth` is `#FFC890` (placeholder). No captures in the
+  unattended run: the hand check carries the look. `ImpactLight` 45 lines, the view 37, `BattlersView` 245; tests 73.
+- **Review:** the flash draws right after the battlers, before the enemy tags, so the always-shown tags stay clean (the
+  slice put it after the swing, over them); the wash reads the battler's drawn center `DrawBattler` already has. ADR
+  0049's last consequence names the One/One light batch.

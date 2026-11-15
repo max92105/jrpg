@@ -39,3 +39,11 @@ hit frame 0) nothing changes on screen; EF7's golden impact shows it.
    Sarxian's strip now starts on the goblin a little before its HP drops, its third frame on the hit. Make the goblin
    miss (a few tries): the strip starts, then stops when "Miss" shows. Revert the file.
 3. A healing skill: no strip on its target before the heal.
+
+- **Done, with deviations:** `ActionWindUp`'s constructor takes the command and works its parts out itself (it was at
+  four parameters); the mirror rule is EF3's `EffectOnTarget.IsMirroredFor`. The view draws the wind-up's lead before
+  its playback check, since the first action's wind-up has no playback yet. `ImpactFile_Defend_IsNone` added.
+  Review: no Critical or Warning; the map's `ActionWindUp` entry names the lead. Left: building the lead as
+  `EffectOnTarget`s in the wind-up instead of the tuple (EF5 adds the swing to the same type next). Asked of the
+  developer: a backfiring damaging skill leads on the enemies it aimed at, then the caster's strip starts on its hit
+  frame with no lead.

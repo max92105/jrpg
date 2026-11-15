@@ -1,21 +1,26 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Effects;
 using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Battle;
 
 /// <summary>
 /// What one action shows before it lands (ADR 0013 amended, decision 644): its time from the command to the impact, the
-/// plaque's words (decision 646), its opening sound (decision 647) and its actor's blink (decision 648), shown from the
-/// command alone, since Core executes it only when the wind-up ends.
+/// plaque's words (decision 646), its opening sound (decision 647), its actor's blink (decision 648) and the impact
+/// strip's lead on the targets a damaging action aims at (decision 656), shown from the command alone, since Core
+/// executes it only when the wind-up ends.
 /// </summary>
 internal sealed class ActionWindUp : ISoundTimeline
 {
-    private ActionWindUp(Combatant actor, TimeSpan duration, string? bannerText, IReadOnlyList<TimedSound> sounds)
+    private ActionWindUp(Combatant actor, BattleCommand command, UiMessages messages)
     {
         Actor = actor;
-        Duration = duration;
-        BannerText = bannerText;
-        Sounds = sounds;
+        Duration = DurationOf(command);
+        BannerText = ActionBannerText.For(actor, command, messages);
+        Sounds = OpeningOf(command);
+        AimedTargets = AimedTargetsOf(command);
+        ImpactFile = AimedTargets.Count > 0 ? BattlerArt.Of(actor).AttackEffectFile : null;
+        IsMirrored = EffectOnTarget.IsMirroredFor(actor);
     }
 
     public Combatant Actor { get; }
@@ -37,12 +42,37 @@ internal sealed class ActionWindUp : ISoundTimeline
     /// <summary>The time since the action started.</summary>
     public TimeSpan Elapsed { get; private set; }
 
+    /// <summary>
+    /// Who a damaging action aims at, its impact strip's lead playing on each (decision 656): an Attack's target, a
+    /// damaging skill's or item's targets (Q2); none for an action that doesn't damage.
+    /// </summary>
+    public IReadOnlyList<Combatant> AimedTargets { get; }
+
+    /// <summary>The actor's impact strip while it damages; null otherwise.</summary>
+    public string? ImpactFile { get; }
+
+    /// <summary>
+    /// Whether the impact strip is drawn mirrored: a party member's, as effect art faces right (decision 655).
+    /// </summary>
+    public bool IsMirrored { get; }
+
+    /// <summary>The time since the impact: negative while the action winds up, zero at the impact.</summary>
+    public TimeSpan SinceImpact => Elapsed - Duration;
+
     /// <exception cref="InvalidOperationException">The command is of a kind the screen can't show yet.</exception>
     /// <param name="actor">Who acts.</param>
     /// <param name="command">What they do, as chosen.</param>
     /// <param name="messages">How the plaque writes what the actor does.</param>
-    public static ActionWindUp Of(Combatant actor, BattleCommand command, UiMessages messages) =>
-        new(actor, DurationOf(command), ActionBannerText.For(actor, command, messages), OpeningOf(command));
+    public static ActionWindUp Of(Combatant actor, BattleCommand command, UiMessages messages) => new(actor, command, messages);
+
+    // An Attack always damages; a skill or an item when its effect is damage (decision 657's Q2).
+    private static IReadOnlyList<Combatant> AimedTargetsOf(BattleCommand command) => command switch
+    {
+        AttackCommand attack => [attack.Target],
+        SkillCommand { Skill.Effect.Kind: EffectKind.Damage } skill => skill.Targets,
+        ItemCommand { Item.Effect.Kind: EffectKind.Damage } item => item.Targets,
+        _ => [],
+    };
 
     private static IReadOnlyList<TimedSound> OpeningOf(BattleCommand command) =>
         ActionSounds.OpeningOf(command) is { } file ? [new TimedSound(file, TimeSpan.Zero)] : [];

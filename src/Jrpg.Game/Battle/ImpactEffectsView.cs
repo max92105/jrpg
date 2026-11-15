@@ -9,8 +9,9 @@ namespace Jrpg.Game.Battle;
 
 /// <summary>
 /// Draws the last action's effects on its targets: each strip frame by frame at its record's pace and its frame's own
-/// size, centered on the target's drawn sprite, mirrored for a party member's attack (decisions 654, 655), and each
-/// placeholder cue's text on the same center (decision 101). Cue texts are measured once a turn.
+/// size, centered on the target's drawn sprite, mirrored for a party member's attack (decisions 654, 655), its hit
+/// frame on the impact: its lead starts during the wind-up on every target a damaging action aims at (decision 656).
+/// Each placeholder cue's text shows on the same center (decision 101). Cue texts are measured once a turn.
 /// </summary>
 internal sealed class ImpactEffectsView
 {
@@ -42,6 +43,7 @@ internal sealed class ImpactEffectsView
 
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
+        DrawWindUpLead(batch, textures);
         if (_sequence.Playback is not { } playback)
         {
             return;
@@ -55,7 +57,8 @@ internal sealed class ImpactEffectsView
 
         for (var index = 0; index < playback.Strips.Count; index++)
         {
-            DrawStrip(batch, textures, playback.Strips[index], playback.Elapsed);
+            var effect = playback.Strips[index];
+            DrawStrip(batch, textures, (effect.File, effect.Target, effect.IsMirrored), playback.Elapsed);
         }
 
         for (var index = 0; index < _cueTexts.Length; index++)
@@ -70,10 +73,26 @@ internal sealed class ImpactEffectsView
         }
     }
 
-    private void DrawStrip(SpriteBatch batch, TextureLibrary textures, EffectOnTarget effect, TimeSpan elapsed)
+    // Decision 656: a damaging action's impact strip starts on every target it aims at before Core knows whether it
+    // lands; the playback goes on from the impact only where damage landed, so a miss cuts the strip at its hit frame.
+    private void DrawWindUpLead(SpriteBatch batch, TextureLibrary textures)
+    {
+        if (_sequence.Stage != TurnStage.WindingUp || _sequence.WindUp is not { ImpactFile: { } file } windUp)
+        {
+            return;
+        }
+
+        for (var index = 0; index < windUp.AimedTargets.Count; index++)
+        {
+            DrawStrip(batch, textures, (file, windUp.AimedTargets[index], windUp.IsMirrored), windUp.SinceImpact);
+        }
+    }
+
+    private void DrawStrip(
+        SpriteBatch batch, TextureLibrary textures, (string File, Combatant Target, bool IsMirrored) effect, TimeSpan sinceImpact)
     {
         var image = textures.Get(ArtFolders.Effects, effect.File);
-        if (PaceOf(effect.File, image).FrameAt(elapsed) is not { } frame)
+        if (PaceOf(effect.File, image).FrameAtImpactTime(sinceImpact) is not { } frame)
         {
             return;
         }

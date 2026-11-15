@@ -13,6 +13,8 @@ call or a rename. These cases slipped past it:
   reroll used it too). Now a code-quality line; still reread the class summary of every type that gains a public member.
   Also a table type gaining rows for a new reason (shops EN1: AbsentWhenNull/ZeroFilter "added after the content was
   written" + `_addedLater`, gaining decision 586's default-valued enemy fields): reread the summary and the array name.
+  A type gaining a third source (IL1: BattlerWhiteness + the wash) had its summary updated but not its docs/map.md
+  parenthetical ("the fallen's or the blink's"): reread the type's map.md entry too.
 - A Done note that pulls work forward or renames a planned API (loot S1a: FromSaved -> PieceFrom) leaves the later slice
   files and design.md citing the old name; grep the next slices and design.md for the planned name. Same after a test
   split (C2): a pending slice still cited "BattleStateTests (lines 225-354)".
@@ -73,6 +75,9 @@ call or a rename. These cases slipped past it:
 - A retuned timing constant (battle turns TN2: ImpactHold 1.0 -> 0.85 s, a new 0.7 s wind-up) re-pinned to
   `BattlePacing.X` in the asserts left the seconds in the test's own comment and the class header's turn timeline; grep
   the old seconds ("1.0 s") in every re-pinned test file.
+
+- A re-worded user-facing line re-pinned in its test (EF1: the GIF effect note) left a sibling record's param doc
+  (`ConvertedGif.Note`) quoting the old text; grep a distinctive fragment of the old string across src/.
 
 - A caller switching what it feeds a helper (NU3: font advances -> digit strip advances into `DigitRow.Of`) leaves the
   helper's summary and param doc naming the old source ("at the font's own size", "width in the font"); reread the

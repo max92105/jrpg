@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Input;
 using Jrpg.Editor.Maps;
 
 namespace Jrpg.Editor.Events;
@@ -38,6 +39,25 @@ internal sealed partial class ObjectEventsWindow : Window
         if (e.Source is FrameworkElement { DataContext: EventStepViewModel step } && _events.Choices.WarpMaps is { } maps)
         {
             WarpDestinationWindow.TryPick(this, step, maps, _drawing);
+        }
+    }
+
+    // Insert, Delete, Alt+Up and Alt+Down run the buttons under the list (decision 734); a plain Up or Down still moves
+    // the list's own choice.
+    private void OnEventListKeyDown(object sender, KeyEventArgs e)
+    {
+        ICommand? command = ListKeyCommand.Pressed(e) switch
+        {
+            (Key.Insert, ModifierKeys.None) => _events.AddEventCommand,
+            (Key.Delete, ModifierKeys.None) => _events.RemoveEventCommand,
+            (Key.Up, ModifierKeys.Alt) => _events.MoveEventUpCommand,
+            (Key.Down, ModifierKeys.Alt) => _events.MoveEventDownCommand,
+            _ => null,
+        };
+        if (command is not null)
+        {
+            ListKeyCommand.Run(EventList, command);
+            e.Handled = true;
         }
     }
 

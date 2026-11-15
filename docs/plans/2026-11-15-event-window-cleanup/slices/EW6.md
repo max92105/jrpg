@@ -58,3 +58,11 @@ unchanged.
 6. Click the event list: **Insert** adds an event and chooses it; **Alt+Up** moves it up; **Delete** removes it.
 7. In a cell's window, the step list keys work the same.
 8. Hover each list button: the tooltip names its key. **F1**: the two key lines.
+
+- **Done, with deviations:** `ListKeyCommand.Pressed` reads the key and modifiers once for both lists (Alt turns an
+  arrow into the system key). The script's key check gives an object with fewer than two steps the Chest preset
+  first, through the Preset button (the milestone objects with two steps lie below the cells its clicks reach), and
+  prints the steps' order before and after rather than leaving it to the capture: "Give item | Swap object" became
+  "Swap object | Give item", the moved step still chosen, and an Alt+Up after it (review) brought the first order
+  back, so the keyboard stayed on the row; nothing under `content/` changed. Hand check steps 2 to 8 are the
+  developer's.

@@ -1,5 +1,5 @@
 # Event window cleanup
-Status: approved
+Status: retro pending
 
 Roadmap row 3 of [the editor push](../2026-11-15-editor-push/README.md) (its design.md, section 3.2). The developer:
 "maybe the event window is a lot cluttered and hard to use at the moment." The roadmap's direction: the presets and
@@ -89,7 +89,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   their own line** (Editor, about 120 lines, XAML only) → [slices/EW4.md](slices/EW4.md)
 - [x] **EW5. The conditions folded under a one-line summary** (Editor, about 110 lines) →
   [slices/EW5.md](slices/EW5.md)
-- [ ] **EW6. Keys for the lists: Insert, Delete, Alt+Up, Alt+Down** (Editor + script, about 110 lines, view code) →
+- [x] **EW6. Keys for the lists: Insert, Delete, Alt+Up, Alt+Down** (Editor + script, about 110 lines, view code) →
   [slices/EW6.md](slices/EW6.md)
 
 ## Decisions

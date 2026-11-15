@@ -30,12 +30,12 @@
         <TextBlock Text="Events" FontWeight="Bold" VerticalAlignment="Center" />
       </DockPanel>
       <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
-        <Button Content="Add" Width="60" Command="{Binding AddEventCommand}" />
-        <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding RemoveEventCommand}" />
-        <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveEventUpCommand}" />
-        <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveEventDownCommand}" />
+        <Button Content="Add" Width="60" Command="{Binding AddEventCommand}" ToolTip="Add an event (Insert in the list)" />
+        <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding RemoveEventCommand}" ToolTip="Remove the chosen event (Delete)" />
+        <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveEventUpCommand}" ToolTip="Move the chosen event up (Alt+Up)" />
+        <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveEventDownCommand}" ToolTip="Move the chosen event down (Alt+Down)" />
       </StackPanel>
-      <ListBox ItemsSource="{Binding Events}" SelectedItem="{Binding SelectedEvent}" DisplayMemberPath="Label" />
+      <ListBox x:Name="EventList" KeyDown="OnEventListKeyDown" ItemsSource="{Binding Events}" SelectedItem="{Binding SelectedEvent}" DisplayMemberPath="Label" />
     </DockPanel>
 
     <!-- The chosen event: when it runs, then its steps. -->

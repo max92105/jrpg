@@ -83,14 +83,14 @@
     <!-- One drop-down for every step kind, under its group's title; a chosen entry adds its step after the chosen one. -->
     <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,4">
       <TextBlock Text="Steps, run in order" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,12,0" />
-      <Button x:Name="AddStepButton" Content="Add step ▾" Width="90" Margin="0,0,4,0" Click="OnAddStepClicked" ToolTip="Add a step after the chosen one">
+      <Button x:Name="AddStepButton" Content="Add step ▾" Width="90" Margin="0,0,4,0" Click="OnAddStepClicked" ToolTip="Add a step after the chosen one (Insert in the list)">
         <Button.ContextMenu>
           <ContextMenu ItemsSource="{Binding AddStepChoices}" ItemContainerStyle="{StaticResource DropDownEntry}" />
         </Button.ContextMenu>
       </Button>
-      <Button Content="Remove" Width="60" Command="{Binding RemoveStepCommand}" />
-      <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepUpCommand}" />
-      <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepDownCommand}" />
+      <Button Content="Remove" Width="60" Command="{Binding RemoveStepCommand}" ToolTip="Remove the chosen step (Delete)" />
+      <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepUpCommand}" ToolTip="Move the chosen step up (Alt+Up)" />
+      <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepDownCommand}" ToolTip="Move the chosen step down (Alt+Down)" />
     </StackPanel>
 
     <!-- The steps left and the chosen step's fields right, both the window's height (decision 733). The fields scroll
@@ -100,7 +100,7 @@
         <ColumnDefinition Width="280" />
         <ColumnDefinition Width="*" />
       </Grid.ColumnDefinitions>
-      <ListBox ItemsSource="{Binding Steps}" SelectedItem="{Binding SelectedStep}" DisplayMemberPath="Label" />
+      <ListBox x:Name="StepList" KeyDown="OnStepListKeyDown" ItemsSource="{Binding Steps}" SelectedItem="{Binding SelectedStep}" DisplayMemberPath="Label" />
       <ScrollViewer Grid.Column="1" Margin="12,0,0,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
         <local:EventStepEditor DataContext="{Binding SelectedStep}" />
       </ScrollViewer>

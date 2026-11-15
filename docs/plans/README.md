@@ -16,6 +16,7 @@ Older plans are single files with the same sections.
 | Plan | Status |
 |---|---|
 | [2026-11-15-editor-push](2026-11-15-editor-push/README.md) | approved (the roadmap of twelve sub-plans, and sub-plan 1: the editor's safety net, NET1; NET2 optional) |
+| [2026-11-15-cinematic-focus-point](2026-11-15-cinematic-focus-point/README.md) | approved (the editor push's row 4) |
 | [2026-11-15-skill-effect-strips](2026-11-15-skill-effect-strips/README.md) | approved (the editor push's row 2) |
 | [2026-11-14-battle-turn-presentation](done/2026-11-14-battle-turn-presentation/README.md) | done |
 | [2026-11-14-animated-monsters](done/2026-11-14-animated-monsters/README.md) | done |

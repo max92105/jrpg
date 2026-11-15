@@ -21,7 +21,7 @@ This folder is a **program**: the roadmap of twelve sub-plans below, and the sli
 sub-plan gets its own `/plan-feature` folder when its turn comes, starting from its roadmap line and the design.md
 section it names. Decisions 675-681 are direction to confirm in those plans.
 
-- Numbers: decisions 668-681 and 690-702, question 688 (open), ADR 0050. Questions 682-687 and 689 were answered.
+- Numbers: decisions 668-681 and 690-705, ADR 0050. Questions 682-689 were answered.
 - Sub-plan 1 is Editor only (`Hosting/`, one menu line in `Shell/`), plus the smoke script and two rule lines. No
   Core, Data, content or save change.
 
@@ -160,11 +160,19 @@ The developer's answers and the review, for the later sub-plans:
 - **702.** One strength per status ("one per status"): Poison is Poison everywhere, its numbers on its record; today's
   per-skill strengths become distinct records or a rebalance, the model plan's first design question.
 
+- **703.** (Question 688, the price half.) One sale share for every item ("all potion will have same value yes"); the
+  values live on the effect or affix, so everything holding that effect or affix reads the same numbers.
+- **704.** Damage comes in named tiers, the developer's "Damage Test" sheet, which overturns design.md's refusal of
+  `DamageTier`: an effect record such as fire_1 to fire_5 (Low, Medium, High, Massive, Extreme) multiplies the user's
+  Power by its tier (the sheet's 2, 4, 9, 22, 58 per point of Power), then by 1 plus the sum of the modifiers (its
+  example: gear 33 % and other 440 % give x5.73, so Low at Power 1 is 11.46). "Better version scale more": a skill
+  names its tiered effect instead of carrying a flat power. The model plan (row 6) builds this; the numbers are his
+  sheet's and stay content.
+- **705.** Statuses are tiered records the same way (poison_1, poison_2, ...), each scaling from stats ("poison will
+  scale from stats"): this answers decision 702's question with distinct records per tier, not a rebalance.
+
 ## Open design questions (developer decides)
-- **688. The sell price** (for the items plan, row 9): (a) one sale share for every item, as `rules.json` `trade`
-  sets today (ADR 0031); (b) the same, plus an optional per-item sale price. **Recommendation: (a)**; (b) is one
-  optional field if a share feels wrong in play.
-- For row 6: per status, distinct records or a rebalance (decision 702); asked at that plan's start.
+- None open: 688 and row 6's first question were answered on 2026-11-15 (decisions 703-705).
 
 ## ADRs needed
 - **0050, unexpected errors in the editor** (this sub-plan): written from the README's decisions, the developer having

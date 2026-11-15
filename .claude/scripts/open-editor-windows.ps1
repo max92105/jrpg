@@ -7,6 +7,9 @@
 # Several chosen windows need -Command, as -File passes a list as one string:
 #   powershell -NoProfile -ExecutionPolicy Bypass -Command "& '.claude/scripts/open-editor-windows.ps1' -Windows 'Database>Shops...','Help>Raise a test error'"
 # Build the editor first (dotnet build src/Jrpg.Editor); the script runs the Debug build, which reads content/.
+# Agents: never open a screenshot that can show Mana Seed art (decision 438): the main window (its tile and object
+# panels), Character sprites, the composer or New NPC. Read the script's lines for those; look only at windows of
+# generated art (Effect strips, Cinematics, Enemies, Shops, Drop tables, Quests).
 # Take its whole output (into a variable or a file): a pipe that stops early (head, Select-Object -First) ends the
 # script before it closes its editor, which then holds the build's files.
 param(

@@ -26,3 +26,8 @@ start refuses.
 2. Put `[{ "file": "AttackEnemy.png", "frameMilliseconds": 80, "hitFrame": 99, "swingFile": "Nope.png" }]` in
    `content/effect-strips.json` and run: the start stops naming the hit frame past the frames and the missing swing.
    Revert the file.
+
+- **Done:** as planned (`ArtReferenceCheck.Battle.cs`: `AddEffectStripRecordProblems`, `AddHitFramesPastTheirStrip`).
+  The message reads "effects/Burst.png: hit frame 4 lies past its 4 frames (from 0). Named by effect-strips.json.";
+  `FindProblems`' summary names the new check.
+  Review: no Critical or Warning; a comment given its verb, `artRoot` second as in the sibling helpers.

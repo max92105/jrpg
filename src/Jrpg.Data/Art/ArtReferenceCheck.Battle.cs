@@ -7,7 +7,8 @@ namespace Jrpg.Data.Art;
 
 /// <summary>
 /// The battle art the startup check reads: party members' and enemies' battle sprites, an animated enemy's strip split
-/// into its frames (ADR 0047), enemies' portraits, attack effects and their strips.
+/// into its frames (ADR 0047), enemies' portraits, attack effects and their strips, and the strips and swings
+/// <c>effect-strips.json</c> lists, each hit frame within its strip (ADR 0048).
 /// </summary>
 public static partial class ArtReferenceCheck
 {
@@ -27,6 +28,43 @@ public static partial class ArtReferenceCheck
             .ToList();
         AddMissingByExactName(problems, artRoot, ArtFolders.Effects, attackEffects);
         AddPartialFrameStrips(problems, artRoot, attackEffects.Select(effect => effect.File));
+        AddEffectStripRecordProblems(problems, artRoot, catalog.EffectStrips);
+    }
+
+    // ADR 0048: a listed strip and its swing are in effects/ by exact name, the swing is whole square frames, as every
+    // strip is, and the hit lands on one of the strip's frames. A missing strip is named once, by the exact-name line.
+    private static void AddEffectStripRecordProblems(
+        List<string> problems, string artRoot, IReadOnlyDictionary<string, EffectStripDefinition> listed)
+    {
+        var records = listed.Values.OrderBy(strip => strip.File, StringComparer.Ordinal).ToList();
+        var strips = records.Select(strip => (strip.File, $"effect-strips.json '{strip.File}'"));
+        AddMissingByExactName(problems, artRoot, ArtFolders.Effects, strips);
+        var swings = records
+            .Where(strip => strip.SwingFile is not null)
+            .Select(strip => (File: strip.SwingFile!, NamedBy: $"effect-strips.json '{strip.File}' swing"))
+            .ToList();
+        AddMissingByExactName(problems, artRoot, ArtFolders.Effects, swings);
+        AddPartialFrameStrips(problems, artRoot, swings.Select(swing => swing.File));
+        AddHitFramesPastTheirStrip(problems, artRoot, records);
+    }
+
+    private static void AddHitFramesPastTheirStrip(List<string> problems, string artRoot, List<EffectStripDefinition> records)
+    {
+        foreach (var strip in records)
+        {
+            if (ReadSize(artRoot, ArtFolders.Effects, strip.File).Size is not { Height: > 0 } size)
+            {
+                continue;
+            }
+
+            var frames = size.Width / size.Height;
+            if (strip.HitFrame >= frames)
+            {
+                problems.Add(
+                    $"{ExactFileName.ShownPath(ArtFolders.Effects, strip.File)}: hit frame {strip.HitFrame} lies past its "
+                    + $"{frames} frames (from 0). Named by effect-strips.json.");
+            }
+        }
     }
 
     // An animated enemy's strip is its loop's frames side by side (ADR 0047): its width must split into them evenly.

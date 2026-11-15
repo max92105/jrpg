@@ -17,8 +17,9 @@ public static partial class ArtReferenceCheck
     /// <summary>
     /// Every tilesheet, the player's and every NPC object's field sprite, every dialogue portrait, every cinematic's
     /// still, every party member's portrait, every item's icon, every skill icon named (a skill may have none), every
-    /// battle sprite, every enemy's portrait, every attack effect and every encounter's background exist as PNGs, every
-    /// tile's cell and its animation's last frame lie inside its sheet, every effect strip is whole square frames,
+    /// battle sprite, every enemy's portrait, every attack effect, every strip and swing <c>effect-strips.json</c>
+    /// lists (ADR 0048) and every encounter's background exist as PNGs, every tile's cell and its animation's last
+    /// frame lie inside its sheet, every effect strip is whole square frames and its listed hit frame one of them,
     /// every animated enemy's battle strip splits into its loop's frames (ADR 0047), and every field sprite holds the
     /// frames its record needs (ADR 0043). The names of skill icons, NPC sprites, stills and battle art must match
     /// their files exactly, case included.

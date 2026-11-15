@@ -156,7 +156,7 @@ slice is done and write its deviations in the slice file. Tunables, the timeline
   the 1.6x) → [slices/IL1.md](slices/IL1.md)
 - [x] **IL2. The floor glow around the target and its lingering halo** (Game, about 200 lines) →
   [slices/IL2.md](slices/IL2.md)
-- [ ] **IL3. Red and green fringes on the impact's bright parts** (Game, about 180 lines) → [slices/IL3.md](slices/IL3.md)
+- [x] **IL3. Red and green fringes on the impact's bright parts** (Game, about 180 lines) → [slices/IL3.md](slices/IL3.md)
 
 ## Decisions
 - 643: monsters act in place (the developer's answer). An enemy's turn keeps its stage times, so it pauses 0.2 s after

@@ -11,6 +11,7 @@ namespace Jrpg.Game.Battle;
 /// Draws the last action's effects on its targets: each strip frame by frame at its record's pace and its frame's own
 /// size, centered on the target's drawn sprite, mirrored for a party member's attack (decisions 654, 655), its hit
 /// frame on the impact: its lead starts during the wind-up on every target a damaging action aims at (decision 656).
+/// While the impact's fringe lasts, the strips where damage landed are drawn split into color copies (decision 661).
 /// Each placeholder cue's text shows on the same center (decision 101). Cue texts are measured once a turn.
 /// </summary>
 internal sealed class ImpactEffectsView
@@ -55,12 +56,7 @@ internal sealed class ImpactEffectsView
             _cueTexts = [.. playback.Cues.Select(cue => MeasuredText.Of(_cueFont.Font, cue.Text))];
         }
 
-        for (var index = 0; index < playback.Strips.Count; index++)
-        {
-            var effect = playback.Strips[index];
-            DrawStrip(batch, textures, (effect.File, effect.Target, effect.IsMirrored), playback.Elapsed);
-        }
-
+        DrawLandedStrips(batch, textures, playback);
         for (var index = 0; index < _cueTexts.Length; index++)
         {
             var cue = playback.Cues[index];
@@ -88,13 +84,46 @@ internal sealed class ImpactEffectsView
         }
     }
 
+    // Decision 661: while the fringe lasts, the strips where damage landed split into red, blue and green copies.
+    private void DrawLandedStrips(SpriteBatch batch, TextureLibrary textures, ActionPlayback playback)
+    {
+        var pixels = ColorFringe.PixelsAt(playback.Elapsed);
+        for (var index = 0; index < playback.Strips.Count; index++)
+        {
+            var effect = playback.Strips[index];
+            if (StripFrameAt(textures, (effect.File, effect.Target, effect.IsMirrored), playback.Elapsed) is not { } sprite)
+            {
+                continue;
+            }
+
+            if (pixels > 0)
+            {
+                ChannelSplit.Draw(batch, sprite, pixels, 1);
+            }
+            else
+            {
+                sprite.Draw(batch, Point.Zero, Color.White);
+            }
+        }
+    }
+
     private void DrawStrip(
         SpriteBatch batch, TextureLibrary textures, (string File, Combatant Target, bool IsMirrored) effect, TimeSpan sinceImpact)
+    {
+        if (StripFrameAt(textures, effect, sinceImpact) is { } sprite)
+        {
+            sprite.Draw(batch, Point.Zero, Color.White);
+        }
+    }
+
+    // The strip's frame at this time since the impact as drawn; null before its lead starts or after its last frame.
+    private DrawnSprite? StripFrameAt(
+        TextureLibrary textures, (string File, Combatant Target, bool IsMirrored) effect, TimeSpan sinceImpact)
     {
         var image = textures.Get(ArtFolders.Effects, effect.File);
         if (PaceOf(effect.File, image).FrameAtImpactTime(sinceImpact) is not { } frame)
         {
-            return;
+            return null;
         }
 
         // A square frame at its own size, centered on the target's drawn sprite.
@@ -103,7 +132,7 @@ internal sealed class ImpactEffectsView
         var area = new Rectangle(center.X - (side / 2), center.Y - (side / 2), side, side);
         var source = new Rectangle(frame * side, 0, side, side);
         var flip = effect.IsMirrored ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-        batch.Draw(image, area, source, Color.White, 0, Vector2.Zero, flip, 0);
+        return new DrawnSprite(image, area, source, flip);
     }
 
     // Worked out once per strip image, not per frame: an unlisted strip's record is made on each lookup.

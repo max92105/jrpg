@@ -44,3 +44,6 @@ green copy shifted right and a blue copy in place, before the numbers.
 - Each light batch is a `SpriteBatch.Begin` adding premultiplied colors as they are (`VirtualScreen.BeginLightBatch`, a
   One/One blend: `BlendState.Additive` multiplies by alpha again and would square a fade), so the draw calls grow by
   one batch per light while it plays.
+- Amended 2026-11-15 (IL3): the fringe's three copies are not added but alpha-blended, each into its one color channel
+  (a write-masked `BlendState`, `ChannelSplit`): added copies drew the sprite brighter than its own draw, so the
+  picture jumped when the split ended; masked, the unshifted copies rebuild it exactly. Still no shader.

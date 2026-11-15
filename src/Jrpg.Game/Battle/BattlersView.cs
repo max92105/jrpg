@@ -12,7 +12,8 @@ namespace Jrpg.Game.Battle;
 /// party actor stepped out toward the enemies; an animated enemy loops its strip's frames
 /// (<see cref="BattlerFrames"/>). The actor blinks white twice as its action winds up, a soft spill past its outline
 /// each time (decision 648); whoever falls, party member or enemy, is lit white, then fades out. On an impact the
-/// battlers near where damage landed are washed white with the flash (decision 660).
+/// battlers near where damage landed are washed white with the flash (decision 660), the white split into color copies
+/// while the impact's fringe lasts (decision 661).
 /// </summary>
 internal sealed class BattlersView
 {
@@ -184,14 +185,27 @@ internal sealed class BattlersView
         var image = scaling.IsShrunkSmoothly ? _ui.Battler(textures, art.SpriteFile, scaling.DrawnSize.X) : source;
         var frame = FrameRectangle(index, art, scaling.DrawnSize);
         var effects = art.IsFlipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-        var white = new WhiteLayer(_ui.WhiteSilhouette(textures, image), area, frame, effects);
+        var white = new WhiteLayer(new DrawnSprite(_ui.WhiteSilhouette(textures, image), area, frame, effects));
         DrawSpill(batch, white, opacity * SpillShare * (_sequence.WindUp?.BlinkOf(combatant) ?? 0));
         batch.Draw(image, area, frame, Color.White * opacity, 0, Vector2.Zero, effects, 0);
         var whiteness = BattlerWhiteness.Of(combatant, _sequence.WindUp, WashAt(textures, area.Center));
         if (whiteness > 0)
         {
-            white.Draw(batch, Point.Zero, opacity * whiteness);
+            DrawWhite(batch, white, opacity * whiteness);
         }
+    }
+
+    // Decision 661: while the impact's fringe lasts, the white splits into color copies like the impact strip.
+    private void DrawWhite(SpriteBatch batch, WhiteLayer white, float strength)
+    {
+        var pixels = _sequence.Playback is { Strips.Count: > 0 } playback ? ColorFringe.PixelsAt(playback.Elapsed) : 0;
+        if (pixels <= 0)
+        {
+            white.Draw(batch, Point.Zero, strength);
+            return;
+        }
+
+        ChannelSplit.Draw(batch, white.Silhouette, pixels, strength);
     }
 
     // The nearest hit target's share of the wash at a battler's drawn center, by the distance to the target's.
@@ -233,13 +247,11 @@ internal sealed class BattlersView
     }
 
     // A battler's white silhouette where its sprite is drawn, the same frame of it, flipped as the sprite.
-    private readonly record struct WhiteLayer(Texture2D Silhouette, Rectangle Area, Rectangle? Frame, SpriteEffects Effects)
+    private readonly record struct WhiteLayer(DrawnSprite Silhouette)
     {
         public void Draw(SpriteBatch batch, Point offset, float strength)
         {
-            var area = Area;
-            area.Offset(offset);
-            batch.Draw(Silhouette, area, Frame, Color.White * strength, 0, Vector2.Zero, Effects, 0);
+            Silhouette.Draw(batch, offset, Color.White * strength);
         }
     }
 }

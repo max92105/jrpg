@@ -37,3 +37,13 @@ flow, render-target or shader change.
    other for a split second, then they are clean; the number, the plaque, the panels and the background never fringe.
 2. A heal and a miss: no fringe.
 3. F12 on the impact frame and compare with the clip's frames #77-#80 (the fringe is in the capture).
+
+- **Done, with deviations:** the three copies are not added but alpha-blended, each into its one color channel (a
+  write-masked `BlendState` per copy, `ChannelSplit`): added copies drew the sprite brighter than its own draw, so the
+  picture would have jumped as the split ended; masked, the unshifted copies rebuild it exactly (ADR 0049 amended).
+  `ChannelSplit.Draw` ends and begins the scenes' batch itself, so the views call it in place, no light batch. The
+  shift eases as (1 - t)³ (`Easing.CubicOut`). `BattlersView`'s `WhiteLayer` holds a `DrawnSprite`. No captures in the
+  unattended run. `ImpactEffectsView` 149 lines, `BattlersView` 257, `ChannelSplit` 50; tests 64.
+- **Review:** `DrawnSprite.Draw` is the one draw the plain strip, the white layer and the split copies share, so the
+  copies always line up with the plain draw; the copies split by whole pixels (`ColorFringe.PixelsAt`), so nothing
+  splits once they would land on one place; `StripFrameAt` names its time.

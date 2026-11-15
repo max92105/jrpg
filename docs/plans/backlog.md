@@ -222,9 +222,8 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the battle turn presentation plan (2026-11-14, at approval)
 
-- **Projectiles and skills' own effects** (decision 665): an effect travelling from the attacker to its target, and skills' and items' own swing and impact strips (damaging skills and items play the attacker's impact strip only for now, decision 657). A projectile is a field on `EffectStripDefinition` beside `SwingFile` (a strip and a travel time, read by `ActionWindUp` as the swing is); a skill's own strips are fields on `SkillDefinition` read before the attacker's.
+- **Projectiles** (decision 665): an effect travelling from the attacker to its target, as a field on `EffectStripDefinition` beside `SwingFile` (a strip and a travel time, read by `ActionWindUp` as the swing is). Skills' and items' own strips are built (`effectFile`, the skill effect strips plan); a skill's own swing comes from its strip's record.
 - **A baked soft glow for the actor's blink** (decision 648): if FL1's cheap spill (the white silhouette drawn 8 times around the sprite) isn't enough, a `Ui/GlowMask` (the silhouette's alpha padded and blurred, frame by frame so an animated strip's frames don't bleed) baked once per battler by `UiTextures`.
-- **An animated preview in the Effect strips window** (decision 659): the chosen strip playing at its typed pace, its hit frame marked.
 - **Per-frame times in an effect strip** (decision 632): the golden impact's fast streak and slow sparks share one frame time; a list of times on `EffectStripDefinition` would let each phase keep its own.
 - **Remove `AttackEnemy.png` and `AttackPlayer.png`** (decision 664) and their `art-sources.json` lines once the golden art is final and nothing names them.
 - **Per-action opening and impact sound files** (decision 647): the developer will add them to skills and items; `Game/Battle/ActionSounds` reads them before today's defaults (its `ImpactOf` takes the command then).

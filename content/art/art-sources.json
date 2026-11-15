@@ -153,6 +153,10 @@
       "sourceId": "generated"
     },
     {
+      "path": "effects/FireExplosion.png",
+      "sourceId": "generated"
+    },
+    {
       "path": "effects/GoldenSlashAttack.png",
       "sourceId": "generated"
     },

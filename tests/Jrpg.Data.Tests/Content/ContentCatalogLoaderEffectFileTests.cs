@@ -21,11 +21,11 @@ public sealed class ContentCatalogLoaderEffectFileTests
     public void Load_ItemNamingAStrip_ReadsIt()
     {
         using var content = new CopiedContentRoot("item-strip", "test-world");
-        content.Replace("items.json", "\"id\": \"bomb\",", "\"id\": \"bomb\", \"effectFile\": \"Burst.png\",");
+        content.Replace("items.json", "\"id\": \"bomb_all\",", "\"id\": \"bomb_all\", \"effectFile\": \"Burst.png\",");
 
         var catalog = ContentCatalogLoader.Load(content.Path);
 
-        Assert.Equal("Burst.png", catalog.Items["bomb"].EffectFile);
+        Assert.Equal("Burst.png", catalog.Items["bomb_all"].EffectFile);
     }
 
     [Fact]

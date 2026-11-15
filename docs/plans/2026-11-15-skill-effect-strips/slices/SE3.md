@@ -70,3 +70,9 @@ from 0, where the burst is widest (0 to 6).
    note.
 5. Watch the first explosion of the session for a stall while the strip loads (design.md, Risks); note it if seen.
 6. F12 captures at the wind-up and at the burst.
+
+- **Done, with deviations:** imported headlessly through `ArtImageImport` (443 px, background kept; its note read "8
+  frames"), the throwaway test deleted. The hit lands on frame 4, the fullest burst (a 0.44 s lead inside the 0.7 s
+  wind-up). `ContentCatalogLoaderEffectFileTests`' item test moved from `bomb` to `bomb_all`: the test world copies
+  the live content, where the bomb now has its strip, so injecting a second one was refused as a doubled field. The
+  hand check (Fireball and the bomb in a battle) is the developer's.

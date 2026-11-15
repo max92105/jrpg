@@ -1,5 +1,5 @@
 # A skill's own effect strip (editor push, roadmap row 2)
-Status: approved
+Status: retro pending (every slice done 2026-11-15; the hand checks are the developer's)
 
 Approved on 2026-11-15 by delegation (the developer delegated approval of the editor push's sub-plans), with the
 devil's advocate's review applied: SE3 uses the GIF's measured values (no decode step); the validators chain the strip
@@ -64,7 +64,7 @@ developer was away; his to overturn)" are listed under [Defaults to confirm](#de
 - [x] **SE1. A skill or item names its strip, checked at load and at startup** (Core, Data, about 220 lines) →
   [slices/SE1.md](slices/SE1.md)
 - [x] **SE2. The action plays its own strip and its swing** (Game, about 240 lines) → [slices/SE2.md](slices/SE2.md)
-- [ ] **SE3. Fireball's and the bomb's explosion** (content, about 25 lines; a throwaway import test, deleted) →
+- [x] **SE3. Fireball's and the bomb's explosion** (content, about 25 lines; a throwaway import test, deleted) →
   [slices/SE3.md](slices/SE3.md)
 
 ## Decisions

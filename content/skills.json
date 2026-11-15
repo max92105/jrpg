@@ -17,6 +17,7 @@
     "description": "Strikes every enemy with fire.",
     "iconFile": "Attack.png",
     "soundFile": "PlaceholderSkillFire.wav",
+    "effectFile": "FireExplosion.png",
     "resourceChanges": [ { "resourceId": "mana", "amount": -5 } ],
     "effect": { "kind": "damage", "damageType": "fire", "power": 20, "targeting": "allEnemies" }
   },

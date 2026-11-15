@@ -46,6 +46,7 @@
     "iconFile": "Consumable.png",
     "maxStack": 99,
     "price": 40,
+    "effectFile": "FireExplosion.png",
     "isUsableFromMenu": false,
     "effect": { "kind": "damage", "damageType": "fire", "power": 15, "targeting": "singleEnemy" }
   },

@@ -20,7 +20,7 @@ Older plans are single files with the same sections.
 | [2026-11-15-event-window-cleanup](2026-11-15-event-window-cleanup/README.md) | approved (the editor push's row 3) |
 | [2026-11-15-sprite-cells-and-mirrors](2026-11-15-sprite-cells-and-mirrors/README.md) | approved (the editor push's row 5) |
 | [2026-11-15-cinematic-focus-point](2026-11-15-cinematic-focus-point/README.md) | approved (the editor push's row 4) |
-| [2026-11-15-skill-effect-strips](2026-11-15-skill-effect-strips/README.md) | approved (the editor push's row 2) |
+| [2026-11-15-skill-effect-strips](2026-11-15-skill-effect-strips/README.md) | retro pending (the editor push's row 2; SE1-SE3 done) |
 | [2026-11-14-battle-turn-presentation](done/2026-11-14-battle-turn-presentation/README.md) | done |
 | [2026-11-14-animated-monsters](done/2026-11-14-animated-monsters/README.md) | done |
 | [2026-11-14-cinematics](done/2026-11-14-cinematics/README.md) | done |

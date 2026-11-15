@@ -45,3 +45,10 @@ sources, never read by the game).
    Effect strips...** by eye (Debug reads `content/` at each start).
 2. Sarxian's attack: the same, mirrored, toward the goblins.
 3. F12 captures at the slash and at the burst.
+
+- **Done, with deviations:** the developer said the GIFs are AI-made, so both strips are listed under `generated`
+  (already credited). The import ran headlessly through the editor's own `ArtImageImport` from a throwaway test,
+  deleted after (heights 340 and 480, background kept: both GIFs are transparent, the strips' corners at alpha 0):
+  `GoldenSlashAttack.png` 12 frames of 340 px, `GoldenSlashImpact.png` 8 of 480 px, its burst on frame 2. The records
+  were written by hand in the writer's layout (`ContentWriterRepositoryTests` passes): every enemy's and party member's
+  `attackEffectFile` is `GoldenSlashImpact.png`, paced 80 ms with hit frame 2 and the slash as its swing at 17 ms.

@@ -146,7 +146,7 @@ slice is done and write its deviations in the slice file. Tunables, the timeline
   about 210 lines) → [slices/EE3.md](slices/EE3.md)
 - [x] **EE4. The Effect strips window and Database > Effect strips...** (Editor, about 170 lines) →
   [slices/EE4.md](slices/EE4.md)
-- [ ] **EF7. The golden slash and impact in the repository** (content + hand import, about 60 lines) →
+- [x] **EF7. The golden slash and impact in the repository** (content + hand import, about 60 lines) →
   [slices/EF7.md](slices/EF7.md)
 
 ### Phase 4: the impact's light

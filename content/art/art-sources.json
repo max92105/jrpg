@@ -149,6 +149,14 @@
       "sourceId": "generated"
     },
     {
+      "path": "effects/GoldenSlashAttack.png",
+      "sourceId": "generated"
+    },
+    {
+      "path": "effects/GoldenSlashImpact.png",
+      "sourceId": "generated"
+    },
+    {
       "path": "field-sprites/npc merchant A v00.png",
       "sourceId": "mana-seed"
     },

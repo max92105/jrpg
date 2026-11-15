@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "file": "GoldenSlashAttack.png",
+    "frameMilliseconds": 17
+  },
+  {
+    "file": "GoldenSlashImpact.png",
+    "frameMilliseconds": 80,
+    "hitFrame": 2,
+    "swingFile": "GoldenSlashAttack.png"
+  }
+]

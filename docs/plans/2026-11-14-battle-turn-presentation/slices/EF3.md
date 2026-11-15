@@ -37,3 +37,9 @@ the target's drawn center too. It still starts at the impact; EF4 moves its star
    whatever its frames are), mirrored compared with before for a party attack; F12 a capture.
 2. A goblin's hit on a party member: the strip as drawn, centered on the member.
 3. A miss: "Miss" over the target's middle.
+
+- **Done:** as planned. `BattlersView.AreaOf` is the drawn sprite's area; `TopOf` reads it. The scene passes
+  `session.Catalog.EffectStrips` to `ImpactEffectsView`. No "96 px" or "30 px below" was left in `Game/Battle/` or the map.
+  Review: no Critical; the mirror rule is `EffectOnTarget.IsMirroredFor(attacker)`, read by the playback (and by
+  EF4's wind-up), `IsMirrored` without a default; the view keeps each strip image's pace once (`PaceOf`) rather than
+  looking its record up every frame.

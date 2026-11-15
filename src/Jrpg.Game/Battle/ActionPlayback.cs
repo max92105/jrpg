@@ -32,6 +32,7 @@ internal sealed class ActionPlayback : ISoundTimeline
     private readonly List<CueOnTarget> _cues = [];
     private readonly List<(Combatant Fallen, TimeSpan FadeStart)> _fallen = [];
     private string? _attackEffectFile;
+    private bool _isStripMirrored;
 
     // The action's name, for the placeholder cue an effect without an animation shows (decision 101).
     private string? _actionName;
@@ -109,6 +110,7 @@ internal sealed class ActionPlayback : ISoundTimeline
             case ActionStarted started:
                 _actionName = ActionBannerText.For(started.Actor, started.Command, messages);
                 _attackEffectFile = BattlerArt.Of(started.Actor).AttackEffectFile;
+                _isStripMirrored = EffectOnTarget.IsMirroredFor(started.Actor);
                 break;
             case EffectApplied effect:
                 AddBeatOnce(PlaybackBeatKind.Impact, BattlePacing.ImpactHold);
@@ -176,7 +178,7 @@ internal sealed class ActionPlayback : ISoundTimeline
             // A multi-hit plays one strip on its target, as its hits make one impact.
             if (stack == 0)
             {
-                _strips.Add(new EffectOnTarget(effect.Target, file));
+                _strips.Add(new EffectOnTarget(effect.Target, file, _isStripMirrored));
             }
         }
         else if (_actionName is { } actionName)

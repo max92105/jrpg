@@ -66,7 +66,7 @@ internal sealed class BattleScene : IScene
         _commands = new CommandMenu(session.Inventory, sources.Items);
         _commandPanel = new CommandPanelView(_commands, _battlers, text, ui);
         _numbers = new FloatingNumbersView(_sequence, _battlers, _enemyTags, text);
-        _impactEffects = new ImpactEffectsView(_sequence, _battlers, text);
+        _impactEffects = new ImpactEffectsView(_sequence, _battlers, session.Catalog.EffectStrips, text);
     }
 
     public IReadOnlyList<string> Sounds => _sounds.Files;

@@ -130,7 +130,7 @@ slice is done and write its deviations in the slice file. Tunables, the timeline
   about 210 lines) → [slices/EF1.md](slices/EF1.md)
 - [x] **EF2. The startup check: each listed strip and swing in `effects/`, its hit frame within its frames** (Data,
   about 140 lines) → [slices/EF2.md](slices/EF2.md)
-- [ ] **EF3. The impact strip at its own pace and size, centered on the target, mirrored for the party** (Game, about
+- [x] **EF3. The impact strip at its own pace and size, centered on the target, mirrored for the party** (Game, about
   190 lines) → [slices/EF3.md](slices/EF3.md)
 - [ ] **EF4. The impact strip's hit frame lands on the impact** (Game, about 200 lines) → [slices/EF4.md](slices/EF4.md)
 - [ ] **EF5. The swing its impact strip names sweeps in front of the attacker** (Game, about 120 lines raw, about 190

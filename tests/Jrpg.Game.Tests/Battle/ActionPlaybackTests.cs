@@ -185,7 +185,8 @@ public sealed class ActionPlaybackTests
     {
         var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), new EffectApplied(_goblin, EffectKind.Damage, 13)]);
 
-        Assert.Equal([new EffectOnTarget(_goblin, "AttackPlayer.png")], playback.Strips);
+        var strip = new EffectOnTarget(_goblin, _sarxian.Member!.Definition.AttackEffectFile, IsMirrored: true);
+        Assert.Equal([strip], playback.Strips);
         Assert.Empty(playback.Cues);
     }
 

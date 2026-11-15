@@ -8,28 +8,35 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Draws the last action's effects on its targets: each strip frame by frame, 96 px, 30 px below the target's top
-/// (decision 57), and each placeholder cue's text in the same place (decision 101). Cue texts are measured once a turn.
+/// Draws the last action's effects on its targets: each strip frame by frame at its record's pace and its frame's own
+/// size, centered on the target's drawn sprite, mirrored for a party member's attack (decisions 654, 655), and each
+/// placeholder cue's text on the same center (decision 101). Cue texts are measured once a turn.
 /// </summary>
 internal sealed class ImpactEffectsView
 {
-    private const int EffectSize = 96;
-    private const int BelowTargetTop = 30;
     private const int CueTextPixels = 24;
 
     private readonly BattleTurnSequence _sequence;
     private readonly BattlersView _battlers;
+    private readonly IReadOnlyDictionary<string, EffectStripDefinition> _strips;
+    private readonly Dictionary<string, EffectStrip> _paces = new(StringComparer.Ordinal);
     private readonly OutlinedFont _cueFont;
     private ActionPlayback? _measuredPlayback;
     private MeasuredText[] _cueTexts = [];
 
     /// <param name="sequence">Whose last action is playing.</param>
     /// <param name="battlers">Where each target's sprite is.</param>
+    /// <param name="strips">The strips' records by file (ADR 0048), whose pace each plays at.</param>
     /// <param name="text">The cues' font.</param>
-    public ImpactEffectsView(BattleTurnSequence sequence, BattlersView battlers, ScreenText text)
+    public ImpactEffectsView(
+        BattleTurnSequence sequence,
+        BattlersView battlers,
+        IReadOnlyDictionary<string, EffectStripDefinition> strips,
+        ScreenText text)
     {
         _sequence = sequence;
         _battlers = battlers;
+        _strips = strips;
         _cueFont = new OutlinedFont(text.Fonts.FontAt(CueTextPixels));
     }
 
@@ -57,8 +64,8 @@ internal sealed class ImpactEffectsView
             var opacity = PlaceholderCue.OpacityAt(playback.Elapsed - cue.ShowsAt);
             if (opacity > 0)
             {
-                var area = EffectArea(textures, cue.Target);
-                _cueFont.DrawCentered(batch, _cueTexts[index], area.Center.ToVector2(), (UiTheme.TextPrimary * opacity, 1));
+                var center = _battlers.AreaOf(textures, cue.Target).Center.ToVector2();
+                _cueFont.DrawCentered(batch, _cueTexts[index], center, (UiTheme.TextPrimary * opacity, 1));
             }
         }
     }
@@ -66,18 +73,29 @@ internal sealed class ImpactEffectsView
     private void DrawStrip(SpriteBatch batch, TextureLibrary textures, EffectOnTarget effect, TimeSpan elapsed)
     {
         var image = textures.Get(ArtFolders.Effects, effect.File);
-        if (EffectStrip.Of(new Point(image.Width, image.Height)).FrameAt(elapsed) is not { } frame)
+        if (PaceOf(effect.File, image).FrameAt(elapsed) is not { } frame)
         {
             return;
         }
 
-        var source = new Rectangle(frame * image.Height, 0, image.Height, image.Height);
-        batch.Draw(image, EffectArea(textures, effect.Target), source, Color.White);
+        // A square frame at its own size, centered on the target's drawn sprite.
+        var side = image.Height;
+        var center = _battlers.AreaOf(textures, effect.Target).Center;
+        var area = new Rectangle(center.X - (side / 2), center.Y - (side / 2), side, side);
+        var source = new Rectangle(frame * side, 0, side, side);
+        var flip = effect.IsMirrored ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
+        batch.Draw(image, area, source, Color.White, 0, Vector2.Zero, flip, 0);
     }
 
-    private Rectangle EffectArea(TextureLibrary textures, Combatant target)
+    // Worked out once per strip image, not per frame: an unlisted strip's record is made on each lookup.
+    private EffectStrip PaceOf(string file, Texture2D image)
     {
-        var centerX = _battlers.SpotOf(target).Center.X;
-        return new Rectangle(centerX - (EffectSize / 2), _battlers.TopOf(textures, target) + BelowTargetTop, EffectSize, EffectSize);
+        if (!_paces.TryGetValue(file, out var strip))
+        {
+            strip = EffectStrip.Of(new Point(image.Width, image.Height), EffectStripDefinition.Of(file, _strips));
+            _paces.Add(file, strip);
+        }
+
+        return strip;
     }
 }

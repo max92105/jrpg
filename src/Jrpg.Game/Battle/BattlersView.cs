@@ -101,11 +101,14 @@ internal sealed class BattlersView
 
     /// <summary>Where <paramref name="combatant"/>'s sprite starts at the top, for whatever points at them.</summary>
     /// <exception cref="ArgumentException">The combatant isn't in this battle.</exception>
-    public int TopOf(TextureLibrary textures, Combatant combatant)
-    {
-        var index = IndexOf(combatant);
-        return DrawnArea(textures, _arts[index], SpotOf(combatant)).Top;
-    }
+    public int TopOf(TextureLibrary textures, Combatant combatant) => AreaOf(textures, combatant).Top;
+
+    /// <summary>
+    /// Where <paramref name="combatant"/>'s sprite is drawn now, stepped and slid: what an effect centers on.
+    /// </summary>
+    /// <exception cref="ArgumentException">The combatant isn't in this battle.</exception>
+    public Rectangle AreaOf(TextureLibrary textures, Combatant combatant) =>
+        DrawnArea(textures, _arts[IndexOf(combatant)], SpotOf(combatant));
 
     /// <summary>
     /// Where <paramref name="combatant"/> stands now: their formation spot, stepped out while a party member acts.

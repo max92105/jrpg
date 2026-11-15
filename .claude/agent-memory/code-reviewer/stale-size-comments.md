@@ -89,6 +89,10 @@ call or a rename. These cases slipped past it:
   slice listed rewords (map.md's ActionWindUp entry, ActionWindUp's `strips` param, BattlePacing.SwingStart) left
   undone under "as planned". Check each reword the slice's Changes list names, one by one, against the tree.
 
+- A method rename (sprite cells SC3: StandingCell/WalkCellAt -> StandingFrame/WalkFrameAt) updated the renamed type's
+  map.md entry but left a sibling entry on the same row (`SpriteArea`'s "AreaOver, StandingCell, WalkCellAt"); grep the
+  old member names across docs/map.md after every rename.
+
 **Why:** a comment or doc stating a wrong rule, name or number misleads the next reader.
 
 **How to apply:** after the rule's grep, run the list above against the diff's renames, moves, new members and removed

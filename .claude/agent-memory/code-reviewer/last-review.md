@@ -5,12 +5,13 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-sprite-cells-and-mirrors, slice SC2 (RequiredStructMembers, FacingSequences null filter lines,
-FieldSpriteCatalogValidator sequence checks, loader/writer/art tests). 2026-11-15. Round 1. Verdict: Ready to commit.
+Plan 2026-11-15-sprite-cells-and-mirrors, slice SC3 (SpriteFrame, FacingSequence.MirrorOf, StandingFrame/WalkFrameAt,
+validator mirror rules, both shells' flip). 2026-11-15. Round 1. Verdict: Ready to commit.
 
-- Warning (open): FieldSpriteCatalogValidator.cs:50 comment "A JSON null in place of the list reads as null too" is
-  false: fsi probe through ContentJsonOptions.Strict (RespectNullableAnnotations) throws on `{"cells": null}`; the
-  null half of `is not { Count: > 0 }` guards an impossible state. Fix: drop the comment, test `Count == 0`.
-- Warning (open): FieldSpriteCatalogValidator.cs:53 `facing.ToString().ToLowerInvariant()` duplicates
-  ContentJsonOptions.EnumName (used by CraftingRulesValidator, LootRulesValidator).
-- Fixed from SC1: SC1.md Done note width; ArtReferenceCheck `(long)` cast gone.
+- Warning (open): docs/map.md:41 the `SpriteArea` entry still names `StandingCell`, `WalkCellAt` (renamed to
+  `StandingFrame`, `WalkFrameAt`).
+- Suggestion (open): TileImages.cs:128 builds `new CroppedBitmap(sprite, area)` on both arms; crop once.
+- Suggestion (open): WalkPreview.cs:54 `shown` (SpriteFrame) beside `frame` (Int32Rect) and DrawFrame's `frame`
+  (BitmapSource); name the Int32Rect `source`.
+- Follow-up: FieldSpriteSetupViewModel.PreviewFrameAt has no production caller (PreviewCellAt had none at HEAD either).
+- Fixed from SC2: validator "JSON null" comment gone (Count > 0 now); facing spelled through ContentJsonOptions.EnumName.

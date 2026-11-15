@@ -85,7 +85,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/EW3.md](slices/EW3.md)
 
 ### Phase 2: room and keys
-- [ ] **EW4. The step list beside the chosen step's fields; bigger windows with minimum sizes; the warp's buttons on
+- [x] **EW4. The step list beside the chosen step's fields; bigger windows with minimum sizes; the warp's buttons on
   their own line** (Editor, about 120 lines, XAML only) → [slices/EW4.md](slices/EW4.md)
 - [ ] **EW5. The conditions folded under a one-line summary** (Editor, about 110 lines) →
   [slices/EW5.md](slices/EW5.md)

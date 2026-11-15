@@ -44,3 +44,10 @@ are compared side by side and not committed.
 4. Choose a Move NPC step and add twenty path steps with **Right**: the path text wraps and the fields scroll, the list
    stays.
 5. Drag a corner of either window inward: it stops at its opening size.
+
+- **Done, with deviations:** as planned; "Warp to" takes a 52 px width so Pick... and Go to line up under the map box
+  with the same left margin. No stale size or "under the list" wording was found in `Events/` or `docs/`. The smoke
+  script opened both windows with no binding-error line; its captures aren't opened by an agent (they can show the
+  map's sheets at their edges), so the before-and-after look is the developer's hand check, steps 2 to 5. The
+  fields scroll up and down only (review): sideways scrolling measures them at infinite width, so the lines box and
+  the path text stopped wrapping; every fixed row fits the column at the windows' smallest (about 360 of 428 px).

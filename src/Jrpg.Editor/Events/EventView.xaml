@@ -63,26 +63,32 @@
                   ToolTip="The stage, for at stage and reached stage" />
       </StackPanel>
       <CheckBox Content="Only once per playthrough (remembered in saves)" IsChecked="{Binding IsOnce}" Margin="0,6,0,8" />
-      <TextBlock Text="Steps, run in order" FontWeight="Bold" />
     </StackPanel>
 
     <!-- One drop-down for every step kind, under its group's title; a chosen entry adds its step after the chosen one. -->
-    <StackPanel DockPanel.Dock="Bottom" Margin="0,4,0,0">
-      <StackPanel Orientation="Horizontal">
-        <Button x:Name="AddStepButton" Content="Add step ▾" Width="90" Margin="0,0,4,0" Click="OnAddStepClicked" ToolTip="Add a step after the chosen one">
-          <Button.ContextMenu>
-            <ContextMenu ItemsSource="{Binding AddStepChoices}" ItemContainerStyle="{StaticResource DropDownEntry}" />
-          </Button.ContextMenu>
-        </Button>
-        <Button Content="Remove" Width="60" Command="{Binding RemoveStepCommand}" />
-        <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepUpCommand}" />
-        <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepDownCommand}" />
-      </StackPanel>
+    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,4">
+      <TextBlock Text="Steps, run in order" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,12,0" />
+      <Button x:Name="AddStepButton" Content="Add step ▾" Width="90" Margin="0,0,4,0" Click="OnAddStepClicked" ToolTip="Add a step after the chosen one">
+        <Button.ContextMenu>
+          <ContextMenu ItemsSource="{Binding AddStepChoices}" ItemContainerStyle="{StaticResource DropDownEntry}" />
+        </Button.ContextMenu>
+      </Button>
+      <Button Content="Remove" Width="60" Command="{Binding RemoveStepCommand}" />
+      <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepUpCommand}" />
+      <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveStepDownCommand}" />
     </StackPanel>
 
-    <!-- The chosen step's fields. -->
-    <local:EventStepEditor DockPanel.Dock="Bottom" DataContext="{Binding SelectedStep}" Margin="0,8,0,0" />
-
-    <ListBox ItemsSource="{Binding Steps}" SelectedItem="{Binding SelectedStep}" DisplayMemberPath="Label" />
+    <!-- The steps left and the chosen step's fields right, both the window's height (decision 733). The fields scroll
+         up and down only: a box that wraps needs the column's width, which sideways scrolling would take away. -->
+    <Grid>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="280" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+      <ListBox ItemsSource="{Binding Steps}" SelectedItem="{Binding SelectedStep}" DisplayMemberPath="Label" />
+      <ScrollViewer Grid.Column="1" Margin="12,0,0,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <local:EventStepEditor DataContext="{Binding SelectedStep}" />
+      </ScrollViewer>
+    </Grid>
   </DockPanel>
 </UserControl>

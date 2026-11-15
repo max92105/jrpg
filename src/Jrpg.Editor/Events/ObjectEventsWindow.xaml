@@ -5,8 +5,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:Jrpg.Editor.Events"
         Title="{Binding Title}"
-        Width="820"
-        Height="560"
+        Width="1040"
+        Height="620"
+        MinWidth="1040"
+        MinHeight="620"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False">
   <DockPanel Margin="12" local:EventStepEditor.PickWarpDestination="OnPickWarpDestination" local:EventStepEditor.GoToWarpDestination="OnGoToWarpDestination">
@@ -17,7 +19,7 @@
     <TextBlock x:Name="ProblemText" DockPanel.Dock="Bottom" Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Margin="0,8,0,0" />
 
     <!-- The object's events, in the order they're tried. -->
-    <DockPanel DockPanel.Dock="Left" Width="300">
+    <DockPanel DockPanel.Dock="Left" Width="260">
       <DockPanel DockPanel.Dock="Top" Margin="0,0,0,4">
         <!-- A preset replaces all the events; the first field it leaves empty is shown. -->
         <Button x:Name="PresetButton" DockPanel.Dock="Right" Content="Preset ▾" Width="80" Click="OnPresetClicked" ToolTip="Replaces the object's events with a usual set; the first field left to fill is shown.">
